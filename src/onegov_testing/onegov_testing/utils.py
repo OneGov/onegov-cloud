@@ -1,8 +1,9 @@
 import dectate
 import morepath
+import textwrap
 
 from io import BytesIO
-from onegov.core.utils import Bunch, scan_morepath_modules
+from onegov.core.utils import Bunch, scan_morepath_modules, module_path
 from PIL import Image
 from random import randint
 from uuid import uuid4
@@ -69,6 +70,23 @@ def create_app(app_class, request, use_elasticsearch=False,
         if not depot_storage_path:
             depot_storage_path = request.getfixturevalue('temporary_directory')
 
+    temporary_path = request.getfixturevalue('temporary_path')
+    signing_services = (temporary_path / 'signing-services')
+    signing_services.mkdir()
+
+    cert_file = module_path('onegov.file', 'tests/fixtures/test.crt')
+    cert_key = module_path('onegov.file', 'tests/fixtures/test.crt')
+
+    with (signing_services / '__default__.yml').open('w') as f:
+        f.write(textwrap.dedent(f"""
+            name: swisscom_ais
+            parameters:
+                customer: foo
+                key_static: bar
+                cert_file: {cert_file}
+                cert_key: {cert_key}
+        """))
+
     app = app_class()
     app.namespace = random_namespace()
     app.configure_application(
@@ -80,7 +98,10 @@ def create_app(app_class, request, use_elasticsearch=False,
         identity_secure=False,
         enable_elasticsearch=use_elasticsearch,
         elasticsearch_hosts=elasticsearch_hosts,
-        redis_url=request.getfixturevalue('redis_url')
+        redis_url=request.getfixturevalue('redis_url'),
+        yubikey_client_id='foo',
+        yubikey_secret_key='dGhlIHdvcmxkIGlzIGNvbnRyb2xsZWQgYnkgbGl6YXJkcyE=',
+        signing_services=str(signing_services)
     )
 
     app.set_application_id(app.namespace + '/test')
