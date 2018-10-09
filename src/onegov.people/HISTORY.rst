@@ -1,16 +1,19 @@
 Changelog
 ---------
 
-- Requires Python 3.6.
-  [href]
-
-- Refactors the package.
+- Adds agencies and memberships.
   [msom]
 
 - Enables polymorphic subclasses of people.
   [msom]
 
 - Adds content and meta columns to people.
+  [msom]
+
+- Requires Python 3.6.
+  [href]
+
+- Refactors the package.
   [msom]
 
 0.3.0 (2017-09-26)

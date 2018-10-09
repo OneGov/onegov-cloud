@@ -46,6 +46,9 @@ setup(
     entry_points={
         'onegov': [
             'upgrade = onegov.people.upgrade'
+        ],
+        'console_scripts': [
+            'onegov-people=onegov.people.cli:cli'
         ]
     },
     classifiers=[
