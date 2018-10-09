@@ -15,14 +15,6 @@ def fixtures():
     return Path(module_path('onegov.winterthur', 'tests/fixtures'))
 
 
-@pytest.fixture(scope='session', autouse=True)
-def scan_dependencies():
-    import importscan
-    import onegov
-
-    importscan.scan(onegov.org, ignore=['.test', '.tests'])
-
-
 @pytest.fixture()
 def streets_csv(fixtures):
     with (fixtures / 'streets.csv').open('rb') as f:
