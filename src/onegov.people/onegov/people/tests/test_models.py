@@ -180,21 +180,24 @@ def test_membership_polymorphism(session):
         AgencyMembership(
             title='default',
             agency_id=agency.id,
-            person_id=person.id
+            person_id=person.id,
+            order=0
         )
     )
     session.add(
         MyMembership(
             title='my',
             agency_id=agency.id,
-            person_id=person.id
+            person_id=person.id,
+            order=1
         )
     )
     session.add(
         MyOtherMembership(
             title='other',
             agency_id=agency.id,
-            person_id=person.id
+            person_id=person.id,
+            order=2
         )
     )
     session.flush()

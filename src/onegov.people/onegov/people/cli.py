@@ -106,7 +106,7 @@ def import_agencies(group_context, file, clear, dry_run, visualize):
                     person.memberships.append(
                         AgencyMembership(
                             agency_id=int(values[0]),
-                            title=values[1] or None,
+                            title=values[1] or "",
                             since=values[2] or None,
                             order=int(values[4]),
                             meta={

@@ -68,10 +68,10 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable):
     )
 
     #: the position of the membership within the agency
-    order = Column(Integer)
+    order = Column(Integer, nullable=False)
 
     #: describes the membership
-    title = Column(Text, nullable=True)
+    title = Column(Text, nullable=False)
 
     #: when the membership started
     since = Column(Text, nullable=True)
