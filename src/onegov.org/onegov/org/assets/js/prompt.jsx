@@ -21,7 +21,7 @@ var Prompt = React.createClass({
 
     getInitialState: function() {
         return {
-            'value': this.props.value.trim()
+            'value': (this.props.value && this.props.value.trim() || '')
         };
     },
 
@@ -35,7 +35,7 @@ var Prompt = React.createClass({
                 <h2>{this.props.question}</h2>
                 <p>{this.props.info}</p>
 
-                <input type="text" value={this.state.value} onChange={this.handleChange} />
+                <input type="text" placeholder={this.props.placeholder} value={this.state.value} onChange={this.handleChange} />
 
                 <a className="button secondary cancel">
                     {this.props.cancel}
@@ -68,6 +68,7 @@ var showPrompt = function(options) {
             ok={options.ok}
             cancel={options.cancel}
             value={options.value}
+            placeholder={options.placeholder}
         />,
         el.get(0)
     );
@@ -75,21 +76,32 @@ var showPrompt = function(options) {
     var prompt_el = $(ReactDOM.findDOMNode(prompt));
 
     prompt_el.find('a.cancel').click(function() {
-        prompt_el.foundation('reveal', 'close');
+        dropPrompt(prompt_el);
+        return false;
     });
 
     prompt_el.find('a.ok').click(function() {
         options.success.call(options.target, prompt.state.value.trim());
-        prompt_el.foundation('reveal', 'close');
+        dropPrompt(prompt_el);
+        return false;
     });
 
-    prompt_el.find('input, a.ok').enter(function() {
+    prompt_el.find('input, a.ok').enter(function(e) {
         options.success.call(options.target, prompt.state.value.trim());
-        prompt_el.foundation('reveal', 'close');
+        dropPrompt(prompt_el);
+        return false;
+    });
+
+    $('body').one('opened.fndtn.reveal', function() {
+        prompt_el.find('input').focus().select();
     });
 
     prompt_el.foundation('reveal', 'open');
-    prompt_el.focus();
+};
+
+var dropPrompt = function(el) {
+    el.foundation('reveal', 'close');
+    el.remove();
 };
 
 // sets up a prompt
@@ -104,6 +116,7 @@ jQuery.fn.prompt = function() {
             cancel: $(this).data('prompt-cancel'),
             value: $(this).data('prompt-value'),
             success: eval($(this).data('prompt-success')),
+            placeholder: $(this).data('prompt-placeholder'),
             target: $(this)
         });
     });

@@ -3,10 +3,12 @@ import requests
 import transaction
 
 from datetime import datetime
+from onegov.core.utils import module_path
 from onegov.directory import DirectoryCollection
 from onegov.file import FileCollection
 from onegov_testing.utils import create_image
 from pytz import UTC
+from sedate import utcnow
 from tempfile import NamedTemporaryFile
 from time import sleep
 
@@ -287,7 +289,7 @@ def test_publication_workflow(browser, temporary_path, org_app):
     assert 'public' in r.headers['cache-control']
 
     # make sure unpublishing works
-    browser.find_by_css('.publication-tag a').click()
+    browser.find_by_css('.publication .file-status-tag a').click()
     r = requests.get(file_url)
     assert r.status_code == 403
 
@@ -320,3 +322,47 @@ def test_publication_workflow(browser, temporary_path, org_app):
     r = requests.get(file_url)
     assert r.status_code == 200
     assert 'public' in r.headers['cache-control']
+
+
+def test_signature_workflow(browser, temporary_path, org_app):
+    path = module_path('onegov.org', 'tests/fixtures/sample.pdf')
+    org_app.enable_yubikey = True
+
+    # upload the pdf
+    browser.login_admin()
+    browser.visit('/files')
+    browser.drop_file('.upload-dropzone', path)
+
+    assert browser.is_text_present("Soeben hochgeladen")
+
+    # show the details
+    browser.find_by_css('.upload-filelist .untoggled').click()
+    assert browser.is_text_present("Unsigniert")
+
+    # try to sign the pdf (this won't work in this test-environment due to
+    # it being in a different process, but we should see the error handling)
+    browser.find_by_css('a.is-not-signed').click()
+
+    assert browser.is_text_present("Bitte geben Sie Ihren Yubikey ein")
+    assert browser.is_text_present("Signieren")
+
+    browser.find_by_css('.dialog input').fill('foobar')
+    browser.find_by_text("Signieren").click()
+
+    assert browser.is_text_present("nicht mit einem Yubikey verknüpft")
+
+    # change the database and show the information in the browser
+    f = FileCollection(org_app.session()).query().one()
+    f.signed = True
+    f.signature_metadata = {
+        'signee': 'foo@example.org',
+        'timestamp': utcnow().isoformat()
+    }
+    transaction.commit()
+
+    # make sure the signature information is shown
+    browser.visit('/files')
+    browser.find_by_css('.untoggled').click()
+
+    assert browser.is_text_present('foo@example.org')
+    assert browser.is_text_present('Digital signiert')

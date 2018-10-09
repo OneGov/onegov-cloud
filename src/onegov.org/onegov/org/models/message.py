@@ -3,6 +3,7 @@ from onegov.chat import Message
 from onegov.core.templates import render_template
 from onegov.core.utils import linkify
 from onegov.event import Event
+from onegov.file import File
 from onegov.org import _
 from onegov.org.new_elements import Link, Confirm, Intercooler
 from onegov.ticket import Ticket, TicketCollection
@@ -21,6 +22,34 @@ class TemplateRenderedMessage(Message):
                 'owner': owner
             },
             suppress_global_variables=True
+        )
+
+
+class FileSignatureMessage(TemplateRenderedMessage):
+    __mapper_args__ = {
+        'polymorphic_identity': 'file-signature'
+    }
+
+    @cached_property
+    def signature_metadata(self):
+        f = object_session(self).query(File).filter_by(id=self.channel_id)
+        f = f.with_entities(File.signature_metadata)
+
+        return f.first().signature_metadata
+
+    def link(self, request):
+        return request.class_link(File, {
+            'id': self.channel_id
+        })
+
+    @classmethod
+    def create(cls, file, request):
+        cls.bound_messages(request).add(
+            channel_id=file.id,
+            owner=request.current_username,
+            meta={
+                'name': file.name
+            }
         )
 
 

@@ -13,6 +13,7 @@ from onegov.core.security import Private, Public
 from onegov.core.templates import render_macro
 from onegov.file import File, FileCollection
 from onegov.file.utils import extension_for_content_type
+from onegov.file.errors import AlreadySignedError, InvalidTokenError
 from onegov.org import _, OrgApp
 from onegov.org.new_elements import Link
 from onegov.org.layout import DefaultLayout
@@ -24,8 +25,10 @@ from onegov.org.models import (
     ImageSetCollection,
     LegacyFile,
     LegacyImage,
+    FileSignatureMessage,
 )
 from onegov.org import utils
+from onegov.user import UserCollection
 from sedate import to_timezone, utcnow, standardize_date
 from time import time
 from webob import exc
@@ -369,6 +372,52 @@ def view_upload_file_by_json(self, request):
         'filelink': request.link(f),
         'filename': f.name,
     }
+
+
+@OrgApp.html(model=File, name='sign', request_method='POST',
+             permission=Private)
+def handle_sign(self, request):
+    request.assert_valid_csrf_token()
+    token = request.params.get('token')
+
+    user = UserCollection(request.session).by_username(
+        request.current_username)
+
+    def may_sign():
+        if not token:
+            request.alert(_("Please submit your yubikey"))
+            return False
+
+        if not user.second_factor:
+            request.alert(_("Your account is not linked to a Yubikey"))
+            return False
+
+        if not token.startswith(user.second_factor['data']):
+            request.alert(_("The used Yubikey is not linked to your account"))
+            return False
+
+        return True
+
+    try:
+        if may_sign():
+            request.app.sign_file(
+                file=self,
+                signee=request.current_username,
+                token=token)
+
+            FileSignatureMessage.create(self, request)
+
+    except AlreadySignedError:
+        request.alert(_("This file already has a digital signature"))
+    except InvalidTokenError:
+        request.alert(_("Your Yubikey could not be validated"))
+
+    layout = DefaultLayout(self, request)
+
+    return render_macro(layout.macros['sign_result'], request, {
+        'layout': layout,
+        'file': self,
+    })
 
 
 @OrgApp.view(model=LegacyFile, permission=Public)

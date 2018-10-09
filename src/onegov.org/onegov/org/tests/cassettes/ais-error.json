@@ -1,0 +1,64 @@
+{
+    "version": 1, 
+    "interactions": [
+        {
+            "response": {
+                "status": {
+                    "message": "OK", 
+                    "code": 200
+                }, 
+                "body": {
+                    "string": "{\"SignResponse\":{\"@RequestID\":\"ba76a066708346fb8880c1bb0692f770\",\"@Profile\":\"http:\\/\\/ais.swisscom.ch\\/1.0\",\"Result\":{\"ResultMajor\":\"urn:oasis:names:tc:dss:1.0:resultmajor:RequesterError\",\"ResultMinor\":\"http:\\/\\/ais.swisscom.ch\\/1.0\\/resultminor\\/AuthenticationFailed\",\"ResultMessage\":{\"@xml.lang\":\"en\",\"$\":\"Either ClaimedIdentity or SSL certificate check failed\"}}}}"
+                }, 
+                "headers": {
+                    "date": [
+                        "Thu, 16 Jun 2016 11:09:45 GMT"
+                    ], 
+                    "server": [
+                        "Apache"
+                    ], 
+                    "x-frame-options": [
+                        "SAMEORIGIN"
+                    ], 
+                    "connection": [
+                        "Keep-Alive"
+                    ], 
+                    "content-type": [
+                        "application/json"
+                    ], 
+                    "keep-alive": [
+                        "timeout=10, max=500"
+                    ], 
+                    "set-cookie": [
+                        "AL_BALANCE=$xc/BZx6UeIU7IHjiYusQfB9Vrb7zzF00KHUurb9lXAScBJxcHkS; Path=/"
+                    ]
+                }
+            }, 
+            "request": {
+                "method": "POST", 
+                "uri": "https://ais.swisscom.com/AIS-Server/rs/v1.0/sign", 
+                "body": "{\"SignRequest\": {\"@RequestID\": \"ba76a066708346fb8880c1bb0692f770\", \"OptionalInputs\": {\"SignatureType\": \"urn:ietf:rfc:3369\", \"sc.AddRevocationInformation\": {\"@Type\": \"BOTH\"}, \"ClaimedIdentity\": {\"Name\": \"X:Y\"}, \"AddTimestamp\": {\"@Type\": \"urn:ietf:rfc:3161\"}}, \"InputDocuments\": {\"DocumentHash\": {\"dsig.DigestMethod\": {\"@Algorithm\": \"http://www.w3.org/2001/04/xmlenc#sha256\"}, \"dsig.DigestValue\": \"PRQuHE7wAGFy4gaXF939SbbV2awQlBxq08jwdqWneFo=\"}}, \"@Profile\": \"http://ais.swisscom.ch/1.0\"}}", 
+                "headers": {
+                    "Accept": [
+                        "application/json"
+                    ], 
+                    "Content-Length": [
+                        "504"
+                    ], 
+                    "Connection": [
+                        "keep-alive"
+                    ], 
+                    "Content-Type": [
+                        "application/json;charset=UTF-8"
+                    ], 
+                    "User-Agent": [
+                        "python-requests/2.10.0"
+                    ], 
+                    "Accept-Encoding": [
+                        "gzip, deflate"
+                    ]
+                }
+            }
+        }
+    ]
+}

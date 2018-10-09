@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to sign PDF files.
+  [href]
+
 - Adds support for the latest onegov.core release.
   [href]
 

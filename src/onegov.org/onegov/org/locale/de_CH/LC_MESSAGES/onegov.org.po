@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-09-27 15:01+0200\n"
+"POT-Creation-Date: 2018-10-09 13:05+0200\n"
 "PO-Revision-Date: 2018-09-24 12:21+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1762,8 +1762,8 @@ msgstr ""
 "ein Fotoalbum, fügen ein paar Bilder hinzu und markieren das Album als auf "
 "der Startseite verfügbar."
 
-msgid "uploaded on ${date}"
-msgstr "hochgeladen am ${date}"
+msgid "Digitally signed"
+msgstr "Digital signiert"
 
 msgid "${count} page"
 msgstr "${count} Seite"
@@ -1825,6 +1825,12 @@ msgstr "Erstellt"
 msgid "Disbursed"
 msgstr "Ausbezahlt"
 
+msgid "Digital Signature"
+msgstr "Digitale Signatur"
+
+msgid "Publication"
+msgstr "Publikation"
+
 msgid "Public"
 msgstr "Öffentlich"
 
@@ -1840,6 +1846,21 @@ msgstr "Publikationsdatum:"
 msgid "Reset"
 msgstr "Zurücksetzen"
 
+msgid "Content"
+msgstr "Inhalt"
+
+msgid "1 page"
+msgstr "1 Seite"
+
+msgid "Contains no readable text"
+msgstr "Enthält keinen lesbaren Text"
+
+msgid "1 word"
+msgstr "1 Wort"
+
+msgid "${count} words"
+msgstr "${count} Wörter"
+
 msgid "Do you really want to delete this file?"
 msgstr "Möchten Sie diese Datei wirklich löschen?"
 
@@ -1851,6 +1872,34 @@ msgstr "Bitte geben Sie einen neuen Namen für die Datei ein"
 
 msgid "Rename"
 msgstr "Umbenennen"
+
+msgid "Digitally signed by ${signee} on ${date}"
+msgstr "Digital signiert von ${signee} am ${date}"
+
+msgid "Please enter your yubikey to digitally sign this file"
+msgstr "Bitte geben Sie Ihren Yubikey ein um die Datei digital zu signieren"
+
+msgid "Sign"
+msgstr "Signieren"
+
+msgid ""
+"Published and digitally signed documents can be discovered through the site-"
+"search and in the list of digitally signed documents. This action will be "
+"logged and cannot be undone."
+msgstr ""
+"Publizierte und digital signierte Dokumente können von der Öffentlichkeit "
+"über die Suche gefunden und in der Liste der digital signierten Dokumente "
+"eingesehen werden. Diese Aktion wird aufgezeichnet und kann nicht rückgängig "
+"gemacht werden."
+
+msgid "Unsigned"
+msgstr "Unsigniert"
+
+msgid "Sign now"
+msgstr "Jetzt signieren"
+
+msgid "You are not authorised to digitally sign documents"
+msgstr "Sie sind nicht dazu berechtigt Dokumente digital zu signieren"
 
 msgid "Click to add a description"
 msgstr "Klicken um eine Beschreibung hinzuzufügen"
@@ -2300,6 +2349,9 @@ msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
 
+msgid "File signed."
+msgstr "Datei signiert."
+
 msgid "No directories defined yet."
 msgstr "Noch keine Verzeichnisse definiert."
 
@@ -2531,6 +2583,21 @@ msgstr "Als Standard"
 
 msgid "Manage Photo Albums"
 msgstr "Fotoalben verwalten"
+
+msgid "Please submit your yubikey"
+msgstr "Bitte geben Sie Ihren Yubikey ein"
+
+msgid "Your account is not linked to a Yubikey"
+msgstr "Ihr Konto ist nicht mit einem Yubikey verknüpft"
+
+msgid "The used Yubikey is not linked to your account"
+msgstr "Der verwendete Yubikey ist nicht mit Ihrem Konto verknüpft"
+
+msgid "This file already has a digital signature"
+msgstr "Diese Datei hat bereits eine digital Signatur"
+
+msgid "Your Yubikey could not be validated"
+msgstr "Ihr Yubikey konnte nicht validiert werden"
 
 msgid "This file type is not supported"
 msgstr "Dieser Dateityp wird nicht unterstützt"
@@ -3029,6 +3096,9 @@ msgstr "Ihre Zahlung wurde rückgängig gemacht"
 
 msgid "Your payment has been refunded"
 msgstr "Ihre Zahlung wurde rückerstattet"
+
+#~ msgid "uploaded on ${date}"
+#~ msgstr "hochgeladen am ${date}"
 
 #~ msgid "Signed"
 #~ msgstr "Signiert"

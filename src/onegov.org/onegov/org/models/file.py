@@ -170,6 +170,7 @@ class GeneralFileCollection(FileCollection, GroupFilesByDateMixin):
             id,                             -- Text
             name,                           -- Text
             "order",                        -- Text
+            signed,                         -- Boolean
             created as upload_date,         -- UTCDateTime
             reference->>'content_type'
                 AS content_type             -- Text

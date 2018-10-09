@@ -39,18 +39,6 @@ class Client(BaseClient):
         return reserve
 
 
-@pytest.fixture(scope="session", autouse=True)
-def import_scan():
-    """ Scans all the onegov.* sources to make sure that the tables are
-    created.
-
-    """
-
-    import importscan
-    import onegov
-    importscan.scan(onegov, ignore=['.test', '.tests'])
-
-
 @pytest.fixture(scope='session')
 def handlers():
     yield onegov.ticket.handlers

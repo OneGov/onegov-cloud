@@ -146,6 +146,13 @@ body {
 }
 
 /*
+    Small atomic text particles whose white-space should not be wrapped
+*/
+.nowrap {
+    white-space: nowrap;
+}
+
+/*
     Apply on a row to flip the order of columns on mobile
 */
 @media #{$small-only} {
@@ -3999,6 +4006,11 @@ h2 + div.timeline {
     }
 }
 
+.message-file-signature {
+    $orange-pastel: #fdddb4;
+    background: $orange-pastel;
+}
+
 /*
     Timeline Messages Fly-In
 */
@@ -4511,6 +4523,11 @@ h2 + div.timeline {
             }
         }
 
+        &.signed td:nth-child(3)::after {
+            @include icon('\f023');
+            display: inline;
+        }
+
         td:nth-child(4) {
             text-align: right;
             white-space: nowrap;
@@ -4615,44 +4632,129 @@ h2 + div.timeline {
 }
 
 /*
+    File Status
+*/
+.file-status {
+    margin-left: -2.75rem;
+    padding-top: .35rem;
+
+    h3 {
+        color: $steel;
+        font-size: .875rem;
+        line-height: 1rem;
+        margin: 0 0 .3rem;
+        text-transform: uppercase;
+    }
+}
+
+.file-status-tag {
+    font-size: .875rem;
+    line-height: 1rem;
+    margin: .3rem 2rem .75rem 0;
+
+    .alert-box {
+        margin-bottom: .5rem;
+        padding: 5px 10px 5px 7px;
+        width: 100%;
+
+        &::before {
+            font-size: .875rem;
+            line-height: 1;
+            margin-right: 2px;
+        }
+
+        .close {
+            padding-right: 2px;
+        }
+    }
+
+    .fa {
+        @include prefix(transition-duration, .5s);
+        @include prefix(filter, blur(0));
+    }
+
+    > * {
+        border-radius: 5px;
+        display: inline-block;
+        padding: 3px 5px 3px 3px;
+
+        &.is-published {
+            background: $green-pastel;
+            color: $green-dark;
+        }
+
+        &.is-not-published {
+            background: $red-pastel;
+            color: $red-dark;
+        }
+
+        &.is-signed {
+            background: $yellow-pastel;
+            color: darken($orange-dark, 20%);
+        }
+
+        &.is-not-signed {
+            background: $gray-pastel;
+            color: $black-light;
+        }
+
+        .show-on-hover {
+            display: none;
+        }
+
+        .hide-on-hover {
+            display: inline;
+        }
+    }
+
+    > *:hover {
+        .hide-on-hover {
+            display: none;
+        }
+
+        .show-on-hover {
+            display: inline;
+        }
+    }
+}
+
+/*
+    Signature
+*/
+.signature {
+    margin-bottom: 1rem;
+    padding-top: .01rem;
+}
+
+.signature-status {
+    display: inline-flex;
+    padding: 3px 5px 3px 3px;
+
+    span {
+        line-height: 1.4;
+    }
+
+    &.is-not-signed span {
+        padding-left: 2px;
+    }
+
+    i {
+        padding: 2px 8px 3px 3px;
+    }
+}
+
+/*
     Publication
 */
 .publication {
     display: flex;
-    margin-left: -2.75rem;
-    padding-top: .35rem;
 
-    .publication-tag {
-        font-size: .875rem;
-        line-height: 1rem;
-        margin: .3rem 2rem .75rem 0;
-
-        .fa {
-            @include prefix(transition-duration, .5s);
-            @include prefix(filter, blur(0));
-        }
-
-        a {
-            border-radius: 5px;
-            display: inline-block;
-            padding: 2px 4px 2px 2px;
-
-            &.is-published {
-                background: $green-pastel;
-                color: $green-dark;
-            }
-
-            &.is-not-published {
-                background: $red-pastel;
-                color: $red-dark;
-            }
-        }
-    }
+    margin-bottom: .5rem;
 
     .publication-settings {
         display: flex;
         flex-wrap: wrap;
-        margin-top: -1.5rem;
+        margin-top: -1rem;
         width: 77.5%;
 
         legend {
@@ -4694,8 +4796,8 @@ h2 + div.timeline {
             > a {
                 display: block;
                 font-size: 1rem !important;
-                margin-top: .5rem;
                 margin-right: 1rem;
+                margin-top: .5rem;
             }
         }
     }
@@ -4705,9 +4807,22 @@ h2 + div.timeline {
     visibility: hidden;
 }
 
-.ic-transitioning .publication-tag .fa {
+/*
+    Signature / Publication Animations
+*/
+.ic-transitioning .file-status-tag .fa {
     @include prefix(transform, scale(1.25));
     @include prefix(transition, transform .5s ease-in);
 
     color: $white;
+}
+
+@keyframes oscillate-color {
+    0% { opacity: .25; }
+    50% { opacity: 1; }
+    100% { opacity: .25; }
+}
+
+.signing .fa {
+    animation: oscillate-color 1.5s infinite linear;
 }
