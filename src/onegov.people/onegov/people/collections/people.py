@@ -1,14 +1,21 @@
 from onegov.core import utils
+from onegov.core.collection import GenericCollection
 from onegov.people.models import Person
 
 
-class PersonCollection(object):
+class PersonCollection(GenericCollection):
+    """ Manages a list of people.
 
-    def __init__(self, session):
-        self.session = session
+    Use it like this::
 
-    def query(self):
-        return self.session.query(Person)
+        from onegov.people import PersonCollection
+        people = PersonCollection(session)
+
+    """
+
+    @property
+    def model_class(self):
+        return Person
 
     def add(self, first_name, last_name, **optional):
         person = Person(first_name=first_name, last_name=last_name, **optional)
@@ -17,10 +24,6 @@ class PersonCollection(object):
         self.session.flush()
 
         return person
-
-    def delete(self, person):
-        self.session.delete(person)
-        self.session.flush()
 
     def by_id(self, id):
         if utils.is_uuid(id):

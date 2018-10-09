@@ -1,5 +1,6 @@
-from onegov.people import AgencyCollection
-from onegov.people import PersonCollection
+from onegov.people.collections import AgencyCollection
+from onegov.people.collections import AgencyMembershipCollection
+from onegov.people.collections import PersonCollection
 
 
 def test_people(session):
@@ -34,3 +35,32 @@ def test_agencies(session):
 
     assert agencies.roots == [root]
     assert agencies.roots[0].children == [child]
+
+
+def test_memberships(session):
+    people = PersonCollection(session)
+    tom = people.add(
+        first_name='Tom',
+        last_name='Chandler'
+    )
+
+    agencies = AgencyCollection(session)
+    agency = agencies.add_root(
+        title="Agency"
+    )
+
+    memberships = AgencyMembershipCollection(session)
+    memberships.add(
+        title="Member",
+        agency_id=agency.id,
+        person_id=tom.id,
+        order=2
+    )
+    memberships.add(
+        title="Director",
+        agency_id=agency.id,
+        person_id=tom.id,
+        order=1
+    )
+
+    assert [m.title for m in memberships.query()] == ["Director", "Member"]
