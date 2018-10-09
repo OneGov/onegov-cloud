@@ -78,6 +78,13 @@ def monkeysession(request):
 
 
 @pytest.fixture(scope='session', autouse=True)
+def scan_onegov():
+    import importscan
+    import onegov
+    importscan.scan(onegov, ignore=['.test', '.tests'])
+
+
+@pytest.fixture(scope='session', autouse=True)
 def treat_sqlalchemy_warnings_as_errors():
     """ All onegov models treat SQLAlchemy warnings as errors, because usually
     SQLAlchemy warnings are errors waiting to happen.
