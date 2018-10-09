@@ -1,20 +1,22 @@
-import hashlib
 import pdftotext
 
 from depot.fields.upload import UploadedFile
 from depot.io import utils
 from depot.io.interfaces import FileStorage
 from depot.io.utils import INMEMORY_FILESIZE
+from io import BytesIO
 from onegov.core.html import sanitize_svg
-from onegov.file.utils import IMAGE_MIME_TYPES, get_svg_size, get_image_size
+from onegov.file.utils import digest
+from onegov.file.utils import get_image_size
+from onegov.file.utils import get_svg_size
+from onegov.file.utils import IMAGE_MIME_TYPES
 from PIL import Image
 from tempfile import SpooledTemporaryFile
-from io import BytesIO
 
 
 IMAGE_MAX_SIZE = 1024
 IMAGE_QUALITY = 90
-CHECKSUM_FUNCTION = hashlib.md5
+CHECKSUM_FUNCTION = 'md5'
 
 
 def get_svg_size_or_default(content):
@@ -48,12 +50,7 @@ def limit_and_store_image_size(file, content, content_type):
 
 
 def calculate_checksum(content):
-    checksum = CHECKSUM_FUNCTION()
-
-    for chunk in iter(lambda: content.read(4096), b""):
-        checksum.update(chunk)
-
-    return checksum.hexdigest()
+    return digest(content, type=CHECKSUM_FUNCTION)
 
 
 def store_checksum(file, content, content_type):

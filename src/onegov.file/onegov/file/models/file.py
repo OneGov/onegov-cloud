@@ -107,6 +107,17 @@ class File(Base, Associable, TimestampMixin):
     #: something we ignore)
     signed = Column(Boolean, nullable=False, default=False)
 
+    #: the metadata of the signature - this should include the following
+    #: data::
+    #:
+    #:  - old_digest: The sha-256 hash before the file was signed
+    #:  - new_digest: The sha-256 hash after the file was signed
+    #:  - signee: The username of the user that signed the document
+    #:  - timestamp: The time the document was signed in UTC
+    #:  - request_id: A unique identifier by the signing service
+    #:
+    signature_metadata = deferred(Column(JSON, nullable=True))
+
     #: the type of the file, this can be used to create custom polymorphic
     #: subclasses. See `<http://docs.sqlalchemy.org/en/improve_toc/
     #: orm/extensions/declarative/inheritance.html>`_.
@@ -209,6 +220,28 @@ class File(Base, Associable, TimestampMixin):
             return self.name.rsplit('.', 1)[0]
 
         return self.name
+
+    @property
+    def word_count(self):
+        """ The word-count of this file, if it has an extract. Currently
+        not necessarily super efficient (though unlike many other approaches
+        on stackoverflow this one does not consume much memory).
+
+        """
+        if not self.extract:
+            return 0
+
+        count = 0
+        inside_word = False
+
+        for char in self.extract:
+            if char.isspace():
+                inside_word = False
+            elif not inside_word:
+                count += 1
+                inside_word = True
+
+        return count
 
     def get_thumbnail_id(self, size):
         """ Returns the thumbnail id with the given size (e.g. 'small').

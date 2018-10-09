@@ -1,18 +1,27 @@
+import AIS
+import hashlib
+import isodate
 import morepath
 import os
 import pytest
+import sedate
+import textwrap
 import transaction
+import vcr
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from depot.manager import DepotManager
+from io import BytesIO
 from onegov.core import Framework
-from onegov.core.utils import scan_morepath_modules
-from onegov.file import DepotApp, FileCollection
+from onegov.core.security.rules import has_permission_not_logged_in
+from onegov.core.utils import scan_morepath_modules, module_path, is_uuid
+from onegov.file import DepotApp, File, FileCollection
 from onegov.file.integration import SUPPORTED_STORAGE_BACKENDS
 from onegov_testing.utils import create_image
-from onegov.core.security.rules import has_permission_not_logged_in
 from time import sleep
+from unittest.mock import patch
 from webtest import TestApp as Client
+from yubico_client import Yubico
 
 
 @pytest.fixture(scope='function', params=SUPPORTED_STORAGE_BACKENDS)
@@ -23,6 +32,22 @@ def app(request, postgres_dsn, temporary_path, redis_url):
             f'#!/bin/bash',
             f'touch {temporary_path}/$1'
         )))
+
+    signing_services = (temporary_path / 'signing-services')
+    signing_services.mkdir()
+
+    cert_file = module_path('onegov.file', 'tests/fixtures/test.crt')
+    cert_key = module_path('onegov.file', 'tests/fixtures/test.crt')
+
+    with (signing_services / '__default__.yml').open('w') as f:
+        f.write(textwrap.dedent(f"""
+            name: swisscom_ais
+            parameters:
+                customer: foo
+                key_static: bar
+                cert_file: {cert_file}
+                cert_key: {cert_key}
+        """))
 
     os.chmod(temporary_path / 'bust', 0o775)
 
@@ -47,7 +72,10 @@ def app(request, postgres_dsn, temporary_path, redis_url):
         depot_backend=backend,
         depot_storage_path=str(temporary_path),
         frontend_cache_buster=f'{temporary_path}/bust',
-        redis_url=redis_url
+        redis_url=redis_url,
+        signing_services=str(signing_services),
+        yubikey_client_id='foo',
+        yubikey_secret_key='dGhlIHdvcmxkIGlzIGNvbnRyb2xsZWQgYnkgbGl6YXJkcyE='
     )
 
     app.namespace = 'apps'
@@ -246,3 +274,178 @@ def test_cache_control(app):
     app.anonymous_access = True
     response = client.get('/storage/{}'.format(fid))
     assert response.headers['Cache-Control'] == 'private'
+
+
+def test_ais_success(app):
+    ensure_correct_depot(app)
+
+    path = module_path('onegov.file', 'tests/fixtures/example.pdf')
+    tape = module_path('onegov.file', 'tests/cassettes/ais-success.json')
+
+    # recordings were shamelessly copied from AIS.py's unit tests
+    with vcr.use_cassette(tape, record_mode='none'):
+        with open(path, 'rb') as infile:
+            assert b'/SigFlags' not in infile.read()
+            infile.seek(0)
+
+            outfile = BytesIO()
+            request_id = app.signing_service.sign(infile, outfile)
+
+            name, customer, id = request_id.split('/')
+            assert name == 'swisscom_ais'
+            assert customer == 'foo'
+            assert is_uuid(id)
+
+            outfile.seek(0)
+            assert b'/SigFlags' in outfile.read()
+
+        outfile.seek(0)
+
+
+def test_ais_error(app):
+    ensure_correct_depot(app)
+
+    path = module_path('onegov.file', 'tests/fixtures/example.pdf')
+    tape = module_path('onegov.file', 'tests/cassettes/ais-error.json')
+
+    # recordings were shamelessly copied from AIS.py's unit tests
+    with vcr.use_cassette(tape, record_mode='none'):
+        with open(path, 'rb') as infile:
+            with pytest.raises(AIS.exceptions.AuthenticationFailed):
+                outfile = BytesIO()
+                app.signing_service.sign(infile, outfile)
+
+
+def test_sign_file(app):
+    tape = module_path('onegov.file', 'tests/cassettes/ais-success.json')
+
+    with vcr.use_cassette(tape, record_mode='none'):
+        ensure_correct_depot(app)
+
+        transaction.begin()
+
+        path = module_path('onegov.file', 'tests/fixtures/sample.pdf')
+
+        with open(path, 'rb') as f:
+            app.session().add(File(name='sample.pdf', reference=f))
+
+        with open(path, 'rb') as f:
+            old_digest = hashlib.sha256(f.read()).hexdigest()
+
+        transaction.commit()
+        pdf = app.session().query(File).one()
+
+        token = 'ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
+
+        with patch.object(Yubico, 'verify') as verify:
+            verify.return_value = True
+
+            app.sign_file(file=pdf, signee='admin@example.org', token=token)
+
+            transaction.commit()
+            pdf = app.session().query(File).one()
+
+            assert pdf.signed
+            assert pdf.reference['content_type'] == 'application/pdf'
+            assert pdf.signature_metadata['signee'] == 'admin@example.org'
+            assert pdf.signature_metadata['old_digest'] == old_digest
+            assert pdf.signature_metadata['new_digest']
+            assert pdf.signature_metadata['token'] == token
+            assert pdf.signature_metadata['token_type'] == 'yubikey'
+            assert pdf.signature_metadata['request_id']\
+                .startswith('swisscom_ais/foo/')
+
+            assert len(pdf.reference.file.read()) > 0
+
+            timestamp = isodate.parse_datetime(
+                pdf.signature_metadata['timestamp'])
+
+            now = sedate.utcnow()
+            assert (now - timedelta(seconds=10)) <= timestamp <= now
+
+            with pytest.raises(RuntimeError) as e:
+                app.sign_file(pdf, signee='admin@example.org', token=token)
+
+            assert "already been signed" in str(e)
+
+
+def test_sign_transaction(app, temporary_path):
+    tape = module_path('onegov.file', 'tests/cassettes/ais-success.json')
+
+    with vcr.use_cassette(tape, record_mode='none'):
+        ensure_correct_depot(app)
+        transaction.begin()
+
+        path = module_path('onegov.file', 'tests/fixtures/sample.pdf')
+
+        with open(path, 'rb') as f:
+            app.session().add(File(name='sample.pdf', reference=f))
+
+        with open(path, 'rb') as f:
+            old_digest = hashlib.sha256(f.read()).hexdigest()
+
+        transaction.commit()
+
+        pdf = app.session().query(File).one()
+
+        token = 'ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
+
+        with patch.object(Yubico, 'verify') as verify:
+            verify.return_value = True
+            app.sign_file(file=pdf, signee='admin@example.org', token=token)
+            transaction.abort()
+            transaction.begin()
+
+    # we have to put in the cassette again, to 'rewind' it
+    with vcr.use_cassette(tape, record_mode='none'):
+
+        # ensure that aborting a transaction doesn't result in a changed file
+        pdf = app.session().query(File).one()
+        assert not pdf.signed
+        assert hashlib.sha256(pdf.reference.file.read()).hexdigest()\
+            == old_digest
+
+        # only after a proper commit should this work
+        with patch.object(Yubico, 'verify') as verify:
+            verify.return_value = True
+            app.sign_file(file=pdf, signee='admin@example.org', token=token)
+            transaction.commit()
+
+        pdf = app.session().query(File).one()
+        assert pdf.signed
+        assert hashlib.sha256(pdf.reference.file.read()).hexdigest()\
+            != old_digest
+
+
+def test_find_by_content_signed(app, temporary_path):
+    ensure_correct_depot(app)
+
+    tape = module_path('onegov.file', 'tests/cassettes/ais-success.json')
+    path = module_path('onegov.file', 'tests/fixtures/sample.pdf')
+
+    with vcr.use_cassette(tape, record_mode='none'):
+        transaction.begin()
+
+        with open(path, 'rb') as f:
+            app.session().add(File(name='sample.pdf', reference=f))
+
+        transaction.commit()
+
+        pdf = app.session().query(File).one()
+        token = 'ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
+
+        with patch.object(Yubico, 'verify') as verify:
+            verify.return_value = True
+            app.sign_file(file=pdf, signee='admin@example.org', token=token)
+
+        transaction.commit()
+
+    # after signing we can still lookup the file using the old content
+    files = FileCollection(app.session())
+
+    with open(path, 'rb') as f:
+        assert files.by_content(f).count() == 1
+
+    # and of course by using the content of the signed file
+    pdf = app.session().query(File).one()
+    assert files.by_content(pdf.reference.file.read()).count() == 1

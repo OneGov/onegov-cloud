@@ -33,6 +33,7 @@ setup(
     platforms='any',
     python_requires='>=3.6',
     install_requires=[
+        'AIS.py',
         'onegov.core>=0.4.0',
         'onegov.search',
         'filedepot>=0.4.1',
@@ -49,6 +50,7 @@ setup(
         test=[
             'coverage',
             'onegov_testing',
+            'vcrpy',
             'pytest',
         ],
     ),

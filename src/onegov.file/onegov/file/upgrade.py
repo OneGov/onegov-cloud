@@ -6,7 +6,7 @@ import multiprocessing
 
 from concurrent.futures import ThreadPoolExecutor
 from copy import copy
-from onegov.core.orm.types import UTCDateTime
+from onegov.core.orm.types import UTCDateTime, JSON
 from onegov.core.upgrade import upgrade_task
 from onegov.core.utils import normalize_for_url
 from onegov.file import File, FileCollection
@@ -192,3 +192,9 @@ def extract_pdf_text_of_existing_files(context):
 
     for pdf in pdfs:
         pdf.pages, pdf.extract = extract_pdf_info(pdf.reference.file)
+
+
+@upgrade_task('Add signature_metadata column')
+def add_signature_metadata_column(context):
+    context.operations.add_column(
+        'files', Column('signature_metadata', JSON, nullable=True))

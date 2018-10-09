@@ -1,10 +1,9 @@
 from datetime import timedelta
 from depot.io.utils import file_from_content
-from onegov.file.attachments import calculate_checksum
 from onegov.file.models import File, FileSet
-from onegov.file.utils import as_fileintent
+from onegov.file.utils import as_fileintent, digest
 from sedate import utcnow
-from sqlalchemy import and_, text
+from sqlalchemy import and_, text, or_
 
 
 class FileCollection(object):
@@ -135,8 +134,24 @@ class FileCollection(object):
         one record).
 
         """
+        file = file_from_content(content)
 
-        return self.by_checksum(calculate_checksum(file_from_content(content)))
+        # we need to look up two checksums, the one of the file stored and
+        # possibly the one it had before signing
+        #
+        # XXX maybe it makes sense to combine those into a data structure
+        # that holds all kinds of digests a file is known under
+
+        # checksum
+        md5 = digest(file, 'md5')
+
+        # old_digest of signature_metadata
+        sha = digest(file, 'sha256')
+
+        return self.query().filter(or_(
+            File.checksum == md5,
+            File.signature_metadata['old_digest'].astext == sha
+        ))
 
     def by_content_type(self, content_type):
         """ Returns a query that matches the given MIME content type (may be

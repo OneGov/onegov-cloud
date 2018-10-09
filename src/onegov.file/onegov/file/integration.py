@@ -3,19 +3,30 @@ import os.path
 import shlex
 import shutil
 import subprocess
+import yaml
 
 from blinker import ANY
 from contextlib import contextmanager
+from depot.io.utils import FileIntent
 from depot.manager import DepotManager
 from depot.middleware import FileServeApp
 from more.transaction.main import transaction_tween_factory
 from morepath import App
 from onegov.core.custom import json
 from onegov.core.security import Private, Public
+from onegov.core.utils import is_valid_yubikey, yubikey_public_id
 from onegov.file.collection import FileCollection
+from onegov.file.errors import AlreadySignedError
+from onegov.file.errors import InvalidTokenError
+from onegov.file.errors import TokenConfigurationError
 from onegov.file.models import File
+from onegov.file.sign import SigningService
+from onegov.file.utils import digest, current_dir
 from pathlib import Path
+from sedate import utcnow
+from sqlalchemy.orm import object_session
 from sqlalchemy.orm.attributes import flag_modified
+from tempfile import SpooledTemporaryFile
 
 
 SUPPORTED_STORAGE_BACKENDS = (
@@ -82,6 +93,28 @@ class DepotApp(App):
             Note that this script is optional. If omitted, the cache busting
             turns into a noop.
 
+        :signing_services: Contains signing service configs.
+
+            Each application gets exactly one signing service.
+
+            This integration class will take care of instantiating the
+            signing service and offer it through `self.signing_service`.
+
+            The signing service can be used with any file, though there is
+            first-class support for signing onegov.file models.
+
+            Signing services are implemented using sublcasses of the
+            :class:`onegov.file.sign.SigningService`. Each signature
+            service class is configured using a single yaml file which is
+            stored in the signature config path.
+
+            By default we use the '__default__.yaml' config. Alternatively
+            we can create separate configs for various application ids.
+
+            For example, we might create a `onegov_town-govikon.yaml`, which
+            would take precedence over the default config, if the application
+            with the id `onegov_town-govikon` would use the signing service.
+
         """
 
         self.depot_backend = cfg.get('depot_backend')
@@ -89,7 +122,12 @@ class DepotApp(App):
 
         self.frontend_cache_buster = cfg.get('frontend_cache_buster')
         self.frontend_cache_bust_delay = cfg.get(
-            'frontend_cache_bust_delay', 5)
+            'frontend_cache_bust_delay', 2)
+
+        self.spawned_signing_services = {}
+
+        if 'signing_services' in cfg:
+            self.signing_services = Path(cfg['signing_services'])
 
         if self.depot_backend not in SUPPORTED_STORAGE_BACKENDS:
             raise RuntimeError("Depot app without valid storage backend")
@@ -100,6 +138,9 @@ class DepotApp(App):
 
         if not shutil.which('gs'):
             raise RuntimeError("onegov.file requires ghostscript")
+
+        if not shutil.which('java'):
+            raise RuntimeError("onegov.file requires java")
 
         if self.frontend_cache_buster:
 
@@ -160,6 +201,117 @@ class DepotApp(App):
         cmd = f'sleep {self.frontend_cache_bust_delay} && {bin} {fid}'
 
         subprocess.Popen(cmd, close_fds=True, shell=True)
+
+    def sign_file(self, file, signee, token, token_type='yubikey'):
+        """ Signs the given file and stores metadata about that process.
+
+        During signing the stored file is replaced with the signed version.
+
+        For example::
+
+            pdf = app.sign_file(pdf, 'info@example.org', 'foo')
+
+        :param file:
+
+            The :class:`onegov.file..File` instance to sign.
+
+        :param signee:
+
+            The name of the signee (should be a username).
+
+        :param token:
+
+            The (yubikey) token used to sign the file.
+
+            WARNING: It is the job of the caller to ensure that the yubikey has
+            the right to sign the document (i.e. that it is the right yubikey).
+
+        :param token_type:
+
+            They type of the passed token. Currently only 'yubikey'.
+
+        """
+
+        if file.signed:
+            raise AlreadySignedError(file)
+
+        if token_type == 'yubikey':
+            def is_valid_token(token):
+                if not getattr(self, 'yubikey_client_id', None):
+                    raise TokenConfigurationError(token_type)
+
+                return is_valid_yubikey(
+                    self.yubikey_client_id,
+                    self.yubikey_secret_key,
+                    expected_yubikey_id=yubikey_public_id(token),
+                    yubikey=token
+                )
+        else:
+            raise NotImplementedError(f"Unknown token type: {token_type}")
+
+        if not is_valid_token(token):
+            raise InvalidTokenError(token)
+
+        mb = 1024 ** 2
+        session = object_session(file)
+
+        with SpooledTemporaryFile(max_size=16 * mb, mode='wb') as signed:
+            old_digest = digest(file.reference.file)
+            request_id = self.signing_service.sign(file.reference.file, signed)
+            new_digest = digest(signed)
+
+            signed.seek(0)
+
+            file.reference = FileIntent(
+                fileobj=signed,
+                filename=file.name,
+                content_type=file.reference['content_type'])
+
+        file.signature_metadata = {
+            'old_digest': old_digest,
+            'new_digest': new_digest,
+            'signee': signee,
+            'timestamp': utcnow().isoformat(),
+            'request_id': request_id,
+            'token': token,
+            'token_type': token_type
+        }
+
+        file.signed = True
+        session.flush()
+
+    @property
+    def signing_service_config(self):
+        if not self.signing_services:
+            raise RuntimeError("No signing service config path set")
+
+        paths = (
+            self.signing_services / f'{self.application_id}.yml',
+            self.signing_services / f'__default__.yml',
+        )
+
+        for path in paths:
+            if path.exists():
+                with path.open('r') as f:
+                    return yaml.load(f.read())
+
+        raise RuntimeError(
+            f"No service config found at {self.signing_services}")
+
+    @property
+    def signing_service(self):
+
+        # it is somewhat inefficient to keep multiple instances of the same
+        # service around as many services can have the same config - however
+        # it prevents accidental leaks of state between applications
+        if self.application_id not in self.spawned_signing_services:
+            config = self.signing_service_config
+
+            with current_dir(self.signing_services):
+                self.spawned_signing_services[self.application_id] \
+                    = SigningService.for_config(config)
+
+        return self.spawned_signing_services[self.application_id]
 
     def clear_depot_cache(self):
         DepotManager._aliases.clear()

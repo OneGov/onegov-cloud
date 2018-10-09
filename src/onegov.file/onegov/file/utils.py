@@ -1,6 +1,8 @@
+import hashlib
 import magic
+import os
 
-from contextlib import suppress
+from contextlib import contextmanager, suppress
 from depot.io.utils import FileIntent
 from mimetypes import guess_extension
 from io import IOBase, BytesIO, UnsupportedOperation
@@ -97,6 +99,26 @@ def extension_for_content_type(content_type, filename=None):
 
 def get_image_size(image):
     return tuple('{}px'.format(d) for d in image.size)
+
+
+def digest(fileobj, type='sha256', chunksize=4096):
+    with suppress(UnsupportedOperation):
+        fileobj.seek(0)
+
+    digest = getattr(hashlib, type)()
+
+    for chunk in iter(lambda: fileobj.read(chunksize), b''):
+        digest.update(chunk)
+
+    return digest.hexdigest()
+
+
+@contextmanager
+def current_dir(dir):
+    previous = os.getcwd()
+    os.chdir(dir)
+    yield
+    os.chdir(previous)
 
 
 # we don't support *all* the image types PIL supports

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to digitally sign PDF files.
+  [href]
+
 0.10.1 (2018-10-02)
 ~~~~~~~~~~~~~~~~~~~
 
