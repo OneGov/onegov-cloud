@@ -28,7 +28,7 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable):
     es_properties = {
         'title': {'type': 'text'},
         'description': {'type': 'localized'},
-        'portrait': {'type': 'localized'},
+        'portrait': {'type': 'localized_html'},
     }
 
     #: a short description of the agency
