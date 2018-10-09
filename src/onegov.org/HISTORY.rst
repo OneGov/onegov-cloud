@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.38.0 (2018-10-09)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to sign PDF files.
   [href]
 
