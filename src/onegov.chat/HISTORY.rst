@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.2 (2018-10-10)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Uses session instead of request for bound_messages.
   [href]
 
