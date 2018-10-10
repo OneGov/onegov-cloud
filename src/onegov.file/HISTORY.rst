@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.12.0 (2018-10-10)
+~~~~~~~~~~~~~~~~~~~
+
 - Migrates 'pages' to the more generic 'stats' dictionary which also
   includes a word count.
   [href]
