@@ -10,6 +10,7 @@ from onegov.file.utils import digest
 from onegov.file.utils import get_image_size
 from onegov.file.utils import get_svg_size
 from onegov.file.utils import IMAGE_MIME_TYPES
+from onegov.file.utils import word_count
 from PIL import Image
 from tempfile import SpooledTemporaryFile
 
@@ -72,7 +73,12 @@ def extract_pdf_info(content):
 
 def store_extract_and_pages(file, content, content_type):
     if content_type == 'application/pdf':
-        file.pages, file.extract = extract_pdf_info(content)
+        pages, file.extract = extract_pdf_info(content)
+
+        file.stats = {
+            'pages': pages,
+            'words': word_count(file.extract)
+        }
 
 
 class ProcessedUploadedFile(UploadedFile):

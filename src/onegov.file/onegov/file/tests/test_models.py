@@ -279,4 +279,5 @@ def test_pdf_text_extraction(session):
 
     pdf = session.query(File).one()
     assert 'Adobe® Portable Document Format (PDF)' in pdf.extract
-    assert pdf.pages == 1
+    assert pdf.stats['pages'] == 1
+    assert pdf.stats['words'] > 20

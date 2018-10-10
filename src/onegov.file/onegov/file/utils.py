@@ -113,6 +113,27 @@ def digest(fileobj, type='sha256', chunksize=4096):
     return digest.hexdigest()
 
 
+def word_count(text):
+    """ The word-count of the given text. Goes through the string exactly
+    once and has constant memory usage. Not super sophisticated though.
+
+    """
+    if not text:
+        return 0
+
+    count = 0
+    inside_word = False
+
+    for char in text:
+        if char.isspace():
+            inside_word = False
+        elif not inside_word:
+            count += 1
+            inside_word = True
+
+    return count
+
+
 @contextmanager
 def current_dir(dir):
     previous = os.getcwd()

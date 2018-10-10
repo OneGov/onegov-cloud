@@ -160,8 +160,10 @@ class File(Base, Associable, TimestampMixin):
     #: we load massive amounts of text on simple queries)
     extract = deferred(Column(Text, nullable=True))
 
-    #: the number of pages in the given file if known
-    pages = Column(Integer, nullable=True)
+    #: statistics around the extract (number of pages, words, etc.)
+    #: those are usually set during file upload (as some information is
+    #: lost afterwards)
+    stats = deferred(Column(JSON, nullable=True))
 
     __mapper_args__ = {
         'polymorphic_on': 'type'
@@ -179,8 +181,8 @@ class File(Base, Associable, TimestampMixin):
         if 'extract' in self.reference:
             self.extract = self.reference.pop('extract')
 
-        if 'pages' in self.reference:
-            self.pages = self.reference.pop('pages')
+        if 'stats' in self.reference:
+            self.stats = self.reference.pop('stats')
 
     @observes('name')
     def name_observer(self, name):
@@ -220,28 +222,6 @@ class File(Base, Associable, TimestampMixin):
             return self.name.rsplit('.', 1)[0]
 
         return self.name
-
-    @property
-    def word_count(self):
-        """ The word-count of this file, if it has an extract. Currently
-        not necessarily super efficient (though unlike many other approaches
-        on stackoverflow this one does not consume much memory).
-
-        """
-        if not self.extract:
-            return 0
-
-        count = 0
-        inside_word = False
-
-        for char in self.extract:
-            if char.isspace():
-                inside_word = False
-            elif not inside_word:
-                count += 1
-                inside_word = True
-
-        return count
 
     def get_thumbnail_id(self, size):
         """ Returns the thumbnail id with the given size (e.g. 'small').

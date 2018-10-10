@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Migrates 'pages' to the more generic 'stats' dictionary which also
+  includes a word count.
+  [href]
+
 - Adds log messages when signing a file and when removing a signed file.
   [href]
 

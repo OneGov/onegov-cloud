@@ -6,6 +6,7 @@ import multiprocessing
 
 from concurrent.futures import ThreadPoolExecutor
 from copy import copy
+from onegov.core.orm import as_selectable
 from onegov.core.orm.types import UTCDateTime, JSON
 from onegov.core.upgrade import upgrade_task
 from onegov.core.utils import normalize_for_url
@@ -13,9 +14,11 @@ from onegov.file import File, FileCollection
 from onegov.file.attachments import get_svg_size_or_default, extract_pdf_info
 from onegov.file.filters import WithPDFThumbnailFilter
 from onegov.file.integration import DepotApp
-from onegov.file.utils import get_image_size, content_type_from_fileobj
+from onegov.file.utils import content_type_from_fileobj
+from onegov.file.utils import get_image_size
+from onegov.file.utils import word_count
 from PIL import Image
-from sqlalchemy import Boolean, Column, Integer, Text, text
+from sqlalchemy import Boolean, Column, Integer, Text, text, select
 from sqlalchemy.orm import load_only
 from sqlalchemy.orm.attributes import flag_modified
 
@@ -198,3 +201,34 @@ def extract_pdf_text_of_existing_files(context):
 def add_signature_metadata_column(context):
     context.operations.add_column(
         'files', Column('signature_metadata', JSON, nullable=True))
+
+
+@upgrade_task('Add stats column')
+def add_stats_column(context):
+    context.operations.add_column(
+        'files', Column('stats', JSON, nullable=True))
+
+    selectable = as_selectable("""
+        SELECT
+            id,   -- Text
+            pages -- Integer
+        FROM files
+        WHERE reference->>'content_type' = 'application/pdf'
+    """)
+
+    pages = {
+        f.id: f.pages for f in context.session.execute(
+            select(selectable.c)
+        )
+    }
+
+    pdfs = FileCollection(context.session).by_content_type('application/pdf')
+
+    for pdf in pdfs:
+        pdf.stats = {
+            'pages': pages[pdf.id],
+            'words': word_count(pdf.extract)
+        }
+
+    context.session.flush()
+    context.operations.drop_column('files', 'pages')
