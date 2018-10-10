@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Uses session instead of request for bound_messages.
+  [href]
+
 - Requires Python 3.6.
   [href]
 

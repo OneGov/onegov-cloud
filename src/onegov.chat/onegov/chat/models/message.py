@@ -65,7 +65,7 @@ class Message(Base):
         return self.modified != None
 
     @classmethod
-    def bound_messages(cls, request):
+    def bound_messages(cls, session):
         """ A message collection bound to the polymorphic identity of this
         message.
 
@@ -73,7 +73,7 @@ class Message(Base):
         from onegov.chat import MessageCollection  # XXX circular import
 
         return MessageCollection(
-            request.session,
+            session=session,
             type=cls.__mapper_args__['polymorphic_identity']
         )
 
