@@ -1,7 +1,7 @@
 <tal:b i18n:domain="onegov.feriennet">
     <metal:b use-macro="layout.macros['generic_message']">
         <metal:b fill-slot="title">
-            <a href="${model.link(request)}">${model.meta['title']}</a>
+            <a href="${link}">${model.meta['title']}</a>
         </metal:b>
         <metal:b fill-slot="text">
             <tal:b switch="model.meta['action']">

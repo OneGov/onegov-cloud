@@ -1,9 +1,9 @@
 from onegov.activity import Period
-from onegov.org.models.message import TemplateRenderedMessage
+from onegov.chat import Message
 from onegov.org.models.message import TicketBasedMessage
 
 
-class PeriodMessage(TemplateRenderedMessage):
+class PeriodMessage(Message):
 
     __mapper_args__ = {
         'polymorphic_identity': 'period'
@@ -16,7 +16,7 @@ class PeriodMessage(TemplateRenderedMessage):
     def create(cls, period, request, action):
         assert request.current_username, "reserved for logged-in users"
 
-        return cls.bound_messages(request).add(
+        return cls.bound_messages(request.session).add(
             channel_id=period.id.hex,
             owner=request.current_username,
             meta={
