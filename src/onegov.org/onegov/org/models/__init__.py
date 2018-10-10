@@ -22,7 +22,6 @@ from onegov.org.models.legacy_file import (
 )
 from onegov.org.models.message import DirectoryMessage
 from onegov.org.models.message import EventMessage
-from onegov.org.models.message import FileSignatureMessage
 from onegov.org.models.message import PaymentMessage
 from onegov.org.models.message import ReservationMessage
 from onegov.org.models.message import SubmissionMessage
@@ -72,7 +71,6 @@ __all__ = [
     'ExportCollection',
     'ExtendedDirectory',
     'ExtendedDirectoryEntry',
-    'FileSignatureMessage',
     'FormPersonMove',
     'GeneralFile',
     'GeneralFileCollection',

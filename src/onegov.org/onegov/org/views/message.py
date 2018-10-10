@@ -3,10 +3,44 @@ from onegov.chat import Message
 from onegov.chat import MessageCollection
 from onegov.core.custom import json
 from onegov.core.security import Private
+from onegov.core.templates import render_template
+from onegov.file import File, FileMessage
 from onegov.org import OrgApp, _
 from onegov.org.layout import MessageCollectionLayout
 from onegov.user import User
 from sqlalchemy import inspect
+
+
+# messages rendered by this view need to provide a 'message_[type].pt'
+# template and they should provide a link method that takes a
+# request and returns the link the message points (the subject of the message)
+#
+# for messages which are created outside onegov.org and descendants, the links
+# might have to be implemented in link_message below
+def render_message(message, request, owner, layout):
+    return render_template(
+        template='message_{}'.format(message.type),
+        request=request,
+        content={
+            'layout': layout,
+            'model': message,
+            'owner': owner,
+            'link': link_message(message, request)
+        },
+        suppress_global_variables=True
+    )
+
+
+def link_message(message, request):
+    if hasattr(message, 'link'):
+        return message.link(request)
+
+    if isinstance(message, FileMessage):
+        return request.class_link(File, {
+            'id': message.channel_id
+        })
+
+    raise NotImplementedError
 
 
 class Owner(namedtuple('OwnerBase', ('username', 'realname'))):
@@ -55,8 +89,9 @@ def view_messages_feed(self, request):
                     layout.format_date(m.created, 'weekday_long'),
                     layout.format_date(m.created, 'date_long')
                 )),
-                'html': m.get(
-                    request,
+                'html': render_message(
+                    message=m,
+                    request=request,
                     owner=owners.get(m.owner),
                     layout=layout
                 ),

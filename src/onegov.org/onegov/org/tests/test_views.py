@@ -4475,3 +4475,8 @@ def test_sign_document(client):
 
     # and we should see a message in the activity log
     assert 'Datei signiert' in client.get('/timeline')
+
+    # deleting the signed file at this point should yield another message
+    pdf = FileCollection(client.app.session()).query().one()
+    client.get(f'/storage/{pdf.id}/details').click("Löschen")
+    assert b'Signierte Datei gel\u00f6scht' in client.get('/timeline').body

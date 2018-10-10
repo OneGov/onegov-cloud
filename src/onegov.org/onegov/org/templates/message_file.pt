@@ -1,15 +1,15 @@
 <tal:b i18n:domain="onegov.org">
     <metal:b use-macro="layout.macros['generic_message']">
         <metal:b fill-slot="title">
-            <a href="${link}">${model.channel_id}</a> - ${model.meta.group}
+            <a href="${link}">${model.meta.name}</a>
         </metal:b>
         <metal:b fill-slot="text">
             <tal:b switch="model.meta['action']">
-                <tal:b case="'adopted'" i18n:translate>
-                    Directory entry adopted.
+                <tal:b case="'signature'" i18n:translate>
+                    File signed.
                 </tal:b>
-                <tal:b case="'rejected'" i18n:translate>
-                    Directory entry rejected.
+                <tal:b case="'signed-file-removal'" i18n:translate>
+                    Signed file removed.
                 </tal:b>
             </tal:b>
         </metal:b>

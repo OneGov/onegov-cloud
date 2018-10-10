@@ -25,7 +25,6 @@ from onegov.org.models import (
     ImageSetCollection,
     LegacyFile,
     LegacyImage,
-    FileSignatureMessage,
 )
 from onegov.org import utils
 from onegov.user import UserCollection
@@ -404,8 +403,6 @@ def handle_sign(self, request):
                 file=self,
                 signee=request.current_username,
                 token=token)
-
-            FileSignatureMessage.create(self, request)
 
     except AlreadySignedError:
         request.alert(_("This file already has a digital signature"))

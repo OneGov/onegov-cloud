@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-10-09 13:05+0200\n"
+"POT-Creation-Date: 2018-10-10 09:53+0200\n"
 "PO-Revision-Date: 2018-09-24 12:21+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1941,6 +1941,12 @@ msgstr "Suche"
 msgid "Your search returned no results."
 msgstr "Zu Ihrer Suche wurde nichts gefunden"
 
+msgid "File signed."
+msgstr "Datei signiert."
+
+msgid "Signed file removed."
+msgstr "Signierte Datei gelöscht."
+
 msgid "Good morning,"
 msgstr "Guten Morgen"
 
@@ -2348,9 +2354,6 @@ msgstr "Zurück zur Startseite"
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
-
-msgid "File signed."
-msgstr "Datei signiert."
 
 msgid "No directories defined yet."
 msgstr "Noch keine Verzeichnisse definiert."

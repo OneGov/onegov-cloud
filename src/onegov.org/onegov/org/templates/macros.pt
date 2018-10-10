@@ -910,12 +910,12 @@
                 <span i18n:translate>Digitally signed</span>,
             </tal:b>
             <span>
-                <tal:b i18n:translate tal:condition="result.pages == 1">
-                    <tal:b i18n:name="count">${result.pages}</tal:b> page
+                <tal:b i18n:translate tal:condition="result.stats.get('pages', 0) == 1">
+                    <tal:b i18n:name="count">${result.stats.get('pages', 0)}</tal:b> page
                 </tal:b>
 
-                <tal:b i18n:translate tal:condition="result.pages > 1">
-                    <tal:b i18n:name="count">${result.pages}</tal:b> pages
+                <tal:b i18n:translate tal:condition="result.stats.get('pages', 0) > 1">
+                    <tal:b i18n:name="count">${result.stats.get('pages', 0)}</tal:b> pages
                 </tal:b>
             </span>
         </li>
@@ -1319,26 +1319,26 @@
                 <h3 i18n:translate>Content</h3>
                 <div class="file-content">
                     <div class="file-status-tag">
-                        <div tal:condition="file.pages <= 1">
+                        <div tal:condition="file.stats.get('pages', 0) <= 1">
                             <i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i>
                             <span i18n:translate>1 page</span>
                         </div>
-                        <div tal:condition="file.pages > 1">
+                        <div tal:condition="file.stats.get('pages', 0) > 1">
                             <i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i>
-                            <span i18n:translate><tal:b i18n:name="count">${file.pages}</tal:b> pages</span>
+                            <span i18n:translate><tal:b i18n:name="count">${file.stats.get('pages', 0)}</tal:b> pages</span>
                         </div>
-                        <div tal:define="word_count file.word_count">
-                            <tal:b condition="word_count == 0">
+                        <div tal:define="words file.stats.get('words', 0)">
+                            <tal:b condition="words == 0">
                                 <i class="fa fa-fw fa-exclamation-triangle" aria-hidden="true"></i>
                                 <span i18n:translate>Contains no readable text</span>
                             </tal:b>
-                            <tal:b condition="word_count == 1">
+                            <tal:b condition="words == 1">
                                 <i class="fa fa-fw fa-font" aria-hidden="true"></i>
                                 <span i18n:translate>1 word</span>
                             </tal:b>
-                            <tal:b condition="word_count > 1">
+                            <tal:b condition="words > 1">
                                 <i class="fa fa-fw fa-font" aria-hidden="true"></i>
-                                <span i18n:translate><tal:b i18n:name="count">${word_count}</tal:b> words</span>
+                                <span i18n:translate><tal:b i18n:name="count">${words}</tal:b> words</span>
                             </tal:b>
                         </div>
                     </div>
