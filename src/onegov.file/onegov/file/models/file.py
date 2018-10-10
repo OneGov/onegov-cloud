@@ -12,7 +12,7 @@ from onegov.file.filters import OnlyIfImage, WithThumbnailFilter
 from onegov.file.filters import OnlyIfPDF, WithPDFThumbnailFilter
 from onegov.file.utils import extension_for_content_type
 from pathlib import Path
-from sqlalchemy import Boolean, Column, Index, Integer, Text
+from sqlalchemy import Boolean, Column, Index, Text
 from sqlalchemy import event
 from sqlalchemy.orm import object_session, Session
 from sqlalchemy.orm.attributes import flag_modified
