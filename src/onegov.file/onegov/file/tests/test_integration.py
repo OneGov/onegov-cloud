@@ -15,9 +15,10 @@ from io import BytesIO
 from onegov.core import Framework
 from onegov.core.security.rules import has_permission_not_logged_in
 from onegov.core.utils import scan_morepath_modules, module_path, is_uuid
-from onegov.file import DepotApp, File, FileCollection
-from onegov.file.integration import SUPPORTED_STORAGE_BACKENDS
+from onegov.file import DepotApp, File, FileCollection, FileMessage
+from onegov.file.integration import SUPPORTED_STORAGE_BACKENDS, delete_file
 from onegov_testing.utils import create_image
+from onegov.core.utils import Bunch
 from time import sleep
 from unittest.mock import patch
 from webtest import TestApp as Client
@@ -449,3 +450,53 @@ def test_find_by_content_signed(app, temporary_path):
     # and of course by using the content of the signed file
     pdf = app.session().query(File).one()
     assert files.by_content(pdf.reference.file.read()).count() == 1
+
+
+def test_signature_file_messages(app):
+    tape = module_path('onegov.file', 'tests/cassettes/ais-success.json')
+
+    with vcr.use_cassette(tape, record_mode='none'):
+        ensure_correct_depot(app)
+
+        # sign the file
+        transaction.begin()
+        path = module_path('onegov.file', 'tests/fixtures/sample.pdf')
+        with open(path, 'rb') as f:
+            app.session().add(File(name='sample.pdf', reference=f))
+        transaction.commit()
+
+        pdf = app.session().query(File).one()
+        token = 'ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
+
+        with patch.object(Yubico, 'verify') as verify:
+            verify.return_value = True
+            app.sign_file(file=pdf, signee='admin@example.org', token=token)
+            transaction.commit()
+
+            # ensure that this was logged
+            pdf = app.session().query(File).one()
+            messages = tuple(app.session().query(FileMessage))
+            assert len(messages) == 1
+            assert messages[0].channel_id == pdf.id
+            assert messages[0].owner == 'admin@example.org'
+            assert messages[0].meta['name'] == 'sample.pdf'
+            assert messages[0].meta['action'] == 'signature'
+            assert messages[0].meta['action_metadata']\
+                == pdf.signature_metadata
+
+        # ensure that deleting a signed file is logged as well
+        session = app.session()
+        pdf = session.query(File).one()
+        delete_file(self=pdf, request=Bunch(
+            session=session,
+            current_username='foo',
+            assert_valid_csrf_token=lambda: True
+        ))
+
+        messages = tuple(app.session().query(FileMessage))
+        assert len(messages) == 2
+        assert messages[1].channel_id == pdf.id
+        assert messages[1].owner == 'foo'
+        assert messages[1].meta['name'] == 'sample.pdf'
+        assert messages[1].meta['action'] == 'signed-file-removal'
+        assert not messages[1].meta['action_metadata']
