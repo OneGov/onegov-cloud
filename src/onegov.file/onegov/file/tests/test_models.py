@@ -1,3 +1,4 @@
+import sedate
 import transaction
 import pytest
 
@@ -281,3 +282,37 @@ def test_pdf_text_extraction(session):
     assert 'Adobe® Portable Document Format (PDF)' in pdf.extract
     assert pdf.stats['pages'] == 1
     assert pdf.stats['words'] > 20
+
+
+def test_signature_timestamp(session):
+    path = module_path('onegov.file', 'tests/fixtures/sample.pdf')
+    time = sedate.utcnow()
+
+    with open(path, 'rb') as f:
+        session.add(File(name='sample.pdf', reference=f, signature_metadata={
+            'timestamp': time.isoformat()
+        }))
+
+    transaction.commit()
+
+    # if unsinged, the timestamp is ignored
+    assert session.query(File).one().signature_timestamp is None
+    assert session.query(File).with_entities(File.signature_timestamp).one()\
+        .signature_timestamp is None
+
+    # if signed the timestamp is in UTC (not timezone-aware)
+    session.query(File).one().signed = True
+    transaction.commit()
+
+    assert session.query(File).one().signature_timestamp == time
+    assert session.query(File).with_entities(File.signature_timestamp).one()\
+        .signature_timestamp == time
+
+    # make sure we can filter by time
+    assert session.query(File).filter_by(signature_timestamp=time).first()
+
+    # make sure we get utc for both
+    assert session.query(File).one()\
+        .signature_timestamp.tzinfo.zone == 'UTC'
+    assert session.query(File).with_entities(File.signature_timestamp).one()\
+        .signature_timestamp.tzinfo.zone == 'UTC'

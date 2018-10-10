@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a signature_timestamp hybrid-property.
+  [href]
+
 0.12.0 (2018-10-10)
 ~~~~~~~~~~~~~~~~~~~
 

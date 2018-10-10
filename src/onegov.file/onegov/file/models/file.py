@@ -1,4 +1,6 @@
 import json
+import sedate
+import isodate
 
 from depot.fields.sqlalchemy import UploadedFileField as UploadedFileFieldBase
 from onegov.core.crypto import random_token
@@ -11,14 +13,18 @@ from onegov.file.attachments import ProcessedUploadedFile
 from onegov.file.filters import OnlyIfImage, WithThumbnailFilter
 from onegov.file.filters import OnlyIfPDF, WithPDFThumbnailFilter
 from onegov.file.utils import extension_for_content_type
+from onegov.search import ORMSearchable
 from pathlib import Path
 from sqlalchemy import Boolean, Column, Index, Text
+from sqlalchemy import case
 from sqlalchemy import event
+from sqlalchemy import text
+from sqlalchemy import type_coerce
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import deferred
 from sqlalchemy.orm import object_session, Session
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy_utils import observes
-from sqlalchemy.orm import deferred
-from onegov.search import ORMSearchable
 
 
 class UploadedFileField(UploadedFileFieldBase):
@@ -172,6 +178,31 @@ class File(Base, Associable, TimestampMixin):
     __table_args__ = (
         Index('files_by_type_and_order', 'type', 'order'),
     )
+
+    @hybrid_property
+    def signature_timestamp(self):
+        if self.signed:
+            return sedate.replace_timezone(
+                isodate.parse_datetime(self.signature_metadata['timestamp']),
+                'UTC'
+            )
+
+    @signature_timestamp.expression
+    def signature_timestamp(self):
+        return type_coerce(case(
+            [(
+                File.signed == True,
+                text("""
+                    (
+                        to_timestamp(
+                            signature_metadata->>'timestamp',
+                            'YYYY-MM-DD"T"HH24:MI:SS.US'
+                        )::timestamp without time zone
+                    )
+                """)
+            )],
+            else_=text('NULL')
+        ), UTCDateTime)
 
     @observes('reference')
     def reference_observer(self, reference):
