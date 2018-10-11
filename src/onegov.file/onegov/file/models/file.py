@@ -247,13 +247,6 @@ class File(Base, Associable, TimestampMixin):
         return extension_for_content_type(
             self.reference['content_type'], self.name)
 
-    @property
-    def name_without_extension(self):
-        if '.' in self.name.rstrip()[-5:]:
-            return self.name.rsplit('.', 1)[0]
-
-        return self.name
-
     def get_thumbnail_id(self, size):
         """ Returns the thumbnail id with the given size (e.g. 'small').
 

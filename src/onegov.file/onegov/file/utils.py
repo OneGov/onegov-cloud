@@ -134,6 +134,13 @@ def word_count(text):
     return count
 
 
+def name_without_extension(name):
+    if '.' in name.rstrip()[-5:]:
+        return name.rsplit('.', 1)[0]
+
+    return name
+
+
 @contextmanager
 def current_dir(dir):
     previous = os.getcwd()
