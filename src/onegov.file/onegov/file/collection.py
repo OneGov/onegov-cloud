@@ -1,5 +1,6 @@
 from datetime import timedelta
 from depot.io.utils import file_from_content
+from onegov.chat import Message
 from onegov.file.models import File, FileSet
 from onegov.file.utils import as_fileintent, digest
 from sedate import utcnow
@@ -186,6 +187,36 @@ class FileCollection(object):
                 )
             )
         )
+
+    def locate_signature_metadata(self, digest):
+        """ Looks for the given digest in the files table - if that doesn't
+        work it will go through the audit trail (i.e. the chat messages) and
+        see if the digest can be found there.
+
+        If this database was ever used to sign a file with the given digest,
+        or if a file that was signed had the given digest, this function
+        will find it - barring manual database manipulation in the messages
+        log.
+
+        """
+
+        match = self.by_signature_digest(digest).with_entities(
+            File.signature_metadata).first()
+
+        if match:
+            return match.signature_metadata
+
+        match = self.session.query(Message).filter_by(type='file').filter(or_(
+            text(
+                "meta->'action_metadata'->>'old_digest' = :digest"
+            ).bindparams(digest=digest),
+            text(
+                "meta->'action_metadata'->>'new_digest' = :digest"
+            ).bindparams(digest=digest)
+        )).with_entities(Message.meta).first()
+
+        if match:
+            return match.meta['action_metadata']
 
 
 class FileSetCollection(object):

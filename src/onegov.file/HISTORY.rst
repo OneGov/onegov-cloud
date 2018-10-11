@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to locate signature metadata in the messages.
+  [href]
+
 0.12.1 (2018-10-11)
 ~~~~~~~~~~~~~~~~~~~
 
