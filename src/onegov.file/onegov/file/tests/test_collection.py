@@ -208,3 +208,21 @@ def test_file_publication(files):
 
     files.publish_files(horizon=horizon + timedelta(hours=1))
     assert files.query().filter_by(published=True).count() == 2
+
+
+def test_filter_by_signature_digest(files):
+    file = files.add(
+        filename='foo',
+        content=b'',
+    )
+
+    file.signed = True
+    file.signature_metadata = {
+        'old_digest': 'foo',
+        'new_digest': 'bar'
+    }
+
+    files.session.flush()
+
+    assert files.by_signature_digest('foo').count() == 1
+    assert files.by_signature_digest('bar').count() == 1

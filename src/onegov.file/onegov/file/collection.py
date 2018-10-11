@@ -165,6 +165,28 @@ class FileCollection(object):
             )
         )
 
+    def by_signature_digest(self, digest):
+        """ Returns a query that matches the given digest in the signature
+        metadata. In other words, given a digest this function will find
+        signed files that match the digest - either before or after signing.
+
+        Unsigned files are ignored.
+
+        The digest is expected to be a SHA256 hex.
+
+        """
+
+        return self.query().filter_by(signed=True).filter(
+            or_(
+                text("signature_metadata->>'old_digest' = :digest").bindparams(
+                    digest=digest
+                ),
+                text("signature_metadata->>'new_digest' = :digest").bindparams(
+                    digest=digest
+                )
+            )
+        )
+
 
 class FileSetCollection(object):
     """ Manages filesets. """
