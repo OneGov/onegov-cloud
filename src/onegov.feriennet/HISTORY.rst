@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.4.5 (2018-10-11)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds support for the latest onegov.org release.
   [href]
