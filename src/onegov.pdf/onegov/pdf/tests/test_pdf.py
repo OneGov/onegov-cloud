@@ -102,6 +102,48 @@ def test_pdf():
     assert len(PdfReader(f, decompress=False).pages) == 7
 
 
+def test_pdf_headers():
+
+    file = BytesIO()
+    pdf = Pdf(file)
+    pdf.init_a4_portrait()
+
+    pdf.h1('h1')
+    pdf.h('h1', 1)
+    assert pdf.story[-1].style == pdf.story[-2].style
+
+    pdf.h2('h2')
+    pdf.h('h2', 2)
+    assert pdf.story[-1].style == pdf.story[-2].style
+
+    pdf.h3('h3')
+    pdf.h('h3', 3)
+    assert pdf.story[-1].style == pdf.story[-2].style
+
+    pdf.h4('h4')
+    pdf.h('h4', 4)
+    assert pdf.story[-1].style == pdf.story[-2].style
+
+    pdf.h5('h5')
+    pdf.h('h5', 5)
+    assert pdf.story[-1].style == pdf.story[-2].style
+
+    pdf.h6('h6')
+    pdf.h('h6', 6)
+    assert pdf.story[-1].style == pdf.story[-2].style
+
+    pdf.h('h7', 7)
+    assert pdf.story[-1].style == pdf.story[-2].style
+
+    pdf.generate()
+    file.seek(0)
+    reader = PdfFileReader(file)
+    assert reader.getNumPages() == 1
+    assert reader.getPage(0).extractText() == (
+        'h1\nh1\nh2\nh2\nh3\nh3\nh4\nh4\nh5\nh5\nh6\nh6\nh7\n'
+    )
+
+
 def test_pdf_mini_html():
     file = BytesIO()
     pdf = Pdf(file)

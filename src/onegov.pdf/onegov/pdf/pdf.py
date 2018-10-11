@@ -178,6 +178,22 @@ class Pdf(PDFDocument):
         self.style.heading4.textColor = self.style.normal.textColor
         self.style.heading4.leading = 1.2 * self.style.heading4.fontSize
 
+        self.style.heading5 = deepcopy(self.style.normal)
+        self.style.heading5.fontSize = 1 * self.style.fontSize
+        self.style.heading5.spaceBefore = 1 * self.style.heading5.fontSize
+        self.style.heading5.spaceAfter = 1 * self.style.heading5.fontSize
+        self.style.heading5.fontName = self.style.fontName
+        self.style.heading5.textColor = self.style.normal.textColor
+        self.style.heading5.leading = 1.2 * self.style.heading5.fontSize
+
+        self.style.heading6 = deepcopy(self.style.normal)
+        self.style.heading6.fontSize = 1 * self.style.fontSize
+        self.style.heading6.spaceBefore = 0.67 * self.style.heading6.fontSize
+        self.style.heading6.spaceAfter = 0.67 * self.style.heading6.fontSize
+        self.style.heading6.fontName = self.style.fontName
+        self.style.heading6.textColor = self.style.normal.textColor
+        self.style.heading6.leading = 1.2 * self.style.heading6.fontSize
+
         self.style.paragraph.spaceAfter = 2 * self.style.paragraph.fontSize
         self.style.paragraph.leading = 1.2 * self.style.paragraph.fontSize
 
@@ -226,6 +242,23 @@ class Pdf(PDFDocument):
 
     def h4(self, text, style=None):
         self.story.append(Paragraph(text, style or self.style.heading4))
+
+    def h5(self, text, style=None):
+        self.story.append(Paragraph(text, style or self.style.heading5))
+
+    def h6(self, text, style=None):
+        self.story.append(Paragraph(text, style or self.style.heading6))
+
+    def h(self, title, level=1):
+        """ Adds a header according to the given level (h1-h6). Levels outside
+        the supported range are added as paragraphs with h6 style.
+
+        """
+
+        if 0 < level < 7:
+            getattr(self, 'h{}'.format(level))(title)
+        else:
+            self.p_markup(title, self.style.heading6)
 
     def fit_size(self, width, height, factor=1.0):
         """ Returns the given width and height so that it fits on the page. """

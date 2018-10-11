@@ -1,5 +1,12 @@
 Changelog
 ---------
+
+- Adds h5 and h6.
+  [msom]
+
+- Allows to add a header by level.
+  [msom]
+
 0.3.5 (2018-10-04)
 ~~~~~~~~~~~~~~~~~~~~~
 
