@@ -7,7 +7,7 @@ from onegov.org.forms import SettingsForm
 from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_settings
 from onegov.town.app import TownApp
-from wtforms import StringField
+from wtforms import BooleanField, StringField
 
 
 def get_custom_settings_form(model, request):
@@ -28,13 +28,24 @@ def get_custom_settings_form(model, request):
             description=_("Generalabonnement for Towns"),
             fieldset=_("Homepage")
         )
+        publications_label = StringField(
+            label=_("Publications Label"),
+            description=_("Official Documents"),
+            fieldset=_("Homepage")
+        )
+        hide_publications = BooleanField(
+            label=_("Hide Publications on Homepage"),
+            fieldset=_("Homepage"),
+        )
 
     return move_fields(
         form_class=merge_forms(SettingsForm, CustomFieldsForm),
         fields=(
             'online_counter_label',
             'reservations_label',
-            'daypass_label'
+            'daypass_label',
+            'publications_label',
+            'hide_publications',
         ),
         after='homepage_image_6'
     )

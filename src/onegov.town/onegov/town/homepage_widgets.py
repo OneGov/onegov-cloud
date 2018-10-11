@@ -1,7 +1,7 @@
 from onegov.form import FormCollection
 from onegov.reservation import ResourceCollection
 from onegov.org.elements import Link, LinkGroup
-from onegov.org.models import ImageSetCollection
+from onegov.org.models import ImageSetCollection, PublicationCollection
 from onegov.people import PersonCollection
 from onegov.town import TownApp, _
 
@@ -27,6 +27,17 @@ class ServicesWidget(object):
                 _("Forms and applications")
             )
         )
+
+        # only if there are publications, will we enable the link to them
+        if not layout.org.hide_publications and layout.app.publications_count:
+            yield Link(
+                text=_("Publications"),
+                url=layout.request.class_link(PublicationCollection),
+                subtitle=_(
+                    layout.org.meta.get('publications_label') or
+                    _("Official Documents")
+                )
+            )
 
         yield Link(
             text=_("Reservations"),
