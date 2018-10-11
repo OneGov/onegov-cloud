@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.12.1 (2018-10-11)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to query files by signature digest.
   [href]
 
