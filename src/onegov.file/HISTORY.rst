@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes upgrades not working for older releases.
+  [href]
+
 - Adds a signature_timestamp hybrid-property.
   [href]
 

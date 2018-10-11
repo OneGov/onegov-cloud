@@ -196,6 +196,14 @@ def extract_pdf_text_of_existing_files(context):
     for pdf in pdfs:
         pdf.pages, pdf.extract = extract_pdf_info(pdf.reference.file)
 
+        # potentially dangerous and might not work with other storage
+        # providers, so don't reuse unless you are sure about the
+        # consequences
+        pdf.reference._thaw()
+        pdf.reference['temporary-pages-count'] = pdf.pages
+
+        flag_modified(pdf, 'reference')
+
 
 @upgrade_task('Add signature_metadata column')
 def add_signature_metadata_column(context):
@@ -226,7 +234,7 @@ def add_stats_column(context):
 
     for pdf in pdfs:
         pdf.stats = {
-            'pages': pages[pdf.id],
+            'pages': pdf.reference.pop('temporary-pages-count', pages[pdf.id]),
             'words': word_count(pdf.extract)
         }
 
