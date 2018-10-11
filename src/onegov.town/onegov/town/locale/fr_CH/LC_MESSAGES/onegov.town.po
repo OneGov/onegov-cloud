@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-10-31 14:44+0100\n"
+"POT-Creation-Date: 2018-10-11 15:44+0200\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -28,6 +28,9 @@ msgstr "Contacts et photos"
 msgid "Forms and applications"
 msgstr "Formulaires et candidatures"
 
+msgid "Publications"
+msgstr "Publications"
+
 msgid "Daypasses and rooms"
 msgstr "Cartes journalières et pièces"
 
@@ -36,6 +39,9 @@ msgstr "Carte journalière CFF"
 
 msgid "Generalabonnement for Towns"
 msgstr "Abonnement général pour les villes"
+
+msgid "Official Documents"
+msgstr "Documents officiels"
 
 msgid "People"
 msgstr "Personnes"
@@ -60,6 +66,12 @@ msgstr "Étiquette de réservations"
 
 msgid "SBB Daypass Label"
 msgstr "Étiquette de carte journalière CFF"
+
+msgid "Publications Label"
+msgstr "Étiquette de publications"
+
+msgid "Hide Publications on Homepage"
+msgstr "Masquer les publications sur la page d'accueil"
 
 #~ msgid "Directories"
 #~ msgstr "Répertoires"
