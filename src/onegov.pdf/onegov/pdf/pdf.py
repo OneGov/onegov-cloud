@@ -1,14 +1,14 @@
 from bleach.sanitizer import Cleaner
 from copy import deepcopy
-from datetime import date
 from html5lib.filters.whitespace import Filter as whitespace_filter
 from io import StringIO
 from lxml import etree
 from onegov.pdf.flowables import InlinePDF
+from onegov.pdf.page_functions import empty_page_fn
+from onegov.pdf.templates import Template
 from pdfdocument.document import Empty
 from pdfdocument.document import MarkupParagraph
 from pdfdocument.document import PDFDocument
-from pdfdocument.document import ReportingDocTemplate
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.enums import TA_LEFT
@@ -22,97 +22,7 @@ from reportlab.platypus import Paragraph
 from reportlab.platypus import Table
 from reportlab.platypus.tableofcontents import TableOfContents
 from reportlab.platypus.tables import TableStyle
-from textwrap import shorten
-from textwrap import wrap
 from uuid import uuid4
-
-
-def empty_page_fn(cavnas, doc):
-    pass
-
-
-def page_fn_footer(canvas, doc):
-    """ A standard footer including the page numbers on the right and
-    optionally a copyright with the author on the left.
-
-    Example:
-
-        pdf = Pdf(file, author='OneGov')
-        pdf.init_a4_portrait(page_fn=draw_footer)
-
-    """
-    canvas.saveState()
-    canvas.setFont('Helvetica', 9)
-    if doc.author:
-        canvas.drawString(
-            doc.leftMargin,
-            doc.bottomMargin / 2,
-            '© {} {}'.format(date.today().year, doc.author)
-        )
-    canvas.drawRightString(
-        doc.pagesize[0] - doc.rightMargin,
-        doc.bottomMargin / 2,
-        f'{canvas._pageNumber}'
-    )
-    canvas.restoreState()
-
-
-def page_fn_header(canvas, doc):
-    """ A standard header consisting of a title. The title is automatically
-    wrapped and shortened.
-
-    Example:
-
-        pdf = Pdf(file, author='OneGov')
-        pdf.init_a4_portrait(page_fn=draw_header)
-
-    """
-
-    if doc.title:
-        canvas.saveState()
-        lines = wrap(doc.title, 110)[:2]
-        if len(lines) > 1:
-            lines[1] = shorten(lines[1], 100)
-        text = canvas.beginText()
-        text.setFont('Helvetica', 9)
-        text.setTextOrigin(
-            doc.leftMargin,
-            doc.pagesize[1] - doc.topMargin * 2 / 3
-        )
-        text.textLines(lines)
-        canvas.drawText(text)
-        canvas.restoreState()
-
-
-def page_fn_header_and_footer(canvas, doc):
-    """ A standard header and footer.
-
-    Example:
-
-        pdf = Pdf(file, author='OneGov')
-        pdf.init_a4_portrait(
-            page_fn=draw_footer,
-            page_fn_later=draw_header_and_footer
-        )
-
-    """
-
-    page_fn_header(canvas, doc)
-    page_fn_footer(canvas, doc)
-
-
-class Template(ReportingDocTemplate):
-    """ Extends the ReportingDocTemplate with Table of Contents printing. """
-
-    def afterFlowable(self, flowable):
-
-        ReportingDocTemplate.afterFlowable(self, flowable)
-
-        if hasattr(flowable, 'toc_level'):
-            self.notify('TOCEntry', (
-                flowable.toc_level, flowable.getPlainText(), self.page,
-                flowable.bookmark
-            ))
 
 
 class Pdf(PDFDocument):
