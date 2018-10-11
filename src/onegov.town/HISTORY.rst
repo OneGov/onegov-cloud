@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Shows the publications view on the homepage.
+  [href]
+
 - Requires Python 3.6.
   [href]
 
