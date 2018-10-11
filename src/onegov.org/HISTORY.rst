@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.38.1 (2018-10-11)
+~~~~~~~~~~~~~~~~~~~
+
 - Refactors the way messages are created.
   [href]
 
