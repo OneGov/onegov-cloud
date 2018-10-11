@@ -19,27 +19,26 @@ from onegov.form import FormCollection, render_field
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org import _
 from onegov.org import utils
-from onegov.org.new_elements import Link, LinkGroup
-from onegov.org.new_elements import Block, Confirm, Intercooler
+from onegov.org.models import ExportCollection
+from onegov.org.models import GeneralFileCollection
+from onegov.org.models import ImageFile
+from onegov.org.models import ImageFileCollection
+from onegov.org.models import ImageSetCollection
+from onegov.org.models import News
+from onegov.org.models import PageMove
+from onegov.org.models import PersonMove
+from onegov.org.models import PublicationCollection
+from onegov.org.models import ResourceRecipientCollection
+from onegov.org.models import Search
+from onegov.org.models import SiteCollection
 from onegov.org.models.extensions import PersonLinkExtension
-from onegov.org.models import (
-    ExportCollection,
-    GeneralFileCollection,
-    ImageFile,
-    ImageFileCollection,
-    ImageSetCollection,
-    News,
-    PageMove,
-    PersonMove,
-    ResourceRecipientCollection,
-    Search,
-    SiteCollection,
-)
+from onegov.org.new_elements import Block, Confirm, Intercooler
+from onegov.org.new_elements import Link, LinkGroup
 from onegov.org.theme.org_theme import user_options
 from onegov.org.utils import rrulestr
 from onegov.pay import PaymentCollection, PaymentProviderCollection
-from onegov.reservation import ResourceCollection
 from onegov.people import PersonCollection
+from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.user import Auth, UserCollection
 from onegov.user.utils import password_reset_url
@@ -2058,3 +2057,19 @@ class DirectoryEntryLayout(DirectoryEntryBaseLayout):
                     )
                 )
             ]
+
+
+class PublicationLayout(DefaultLayout):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.request.include('filedigest')
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Publications"), self.request.class_link(
+                PublicationCollection
+            ))
+        ]

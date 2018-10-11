@@ -3,7 +3,7 @@
     html structure:
 
     <form class='upload' action="upload-url" method="POST" enctype="multipart/form-data">
-        <div class="upload-dropzone" />
+        <div class="upload-dropzone dropzone" />
         <div class="upload-progress" />
         <div class="upload-filelist-header" />
         <div class="upload-filelist" />
@@ -21,7 +21,7 @@
     response of the upload handler (the upload handler should return an
     html fragment to the effect).
 
-    See https://smashingmagazine.com/2018/01/drag-drop-fileuploader-vanilla-js
+    See http://archive.is/3m5s8
 */
 var Upload = function(element) {
     var url = element.attr('action');
@@ -67,7 +67,18 @@ var Upload = function(element) {
         xhr.send(data);
     };
 
-    dropzone.on('dragover', false);
+    dropzone.on('dragenter', function() {
+        $(this).toggleClass('drag-over', true);
+    });
+
+    dropzone.on('dragleave drop', function() {
+        $(this).toggleClass('drag-over', false);
+    });
+
+    dropzone.on('dragover', function() {
+        return false;
+    });
+
     dropzone.on('drop', function(e) {
         var files = e.originalEvent.dataTransfer.files;
 

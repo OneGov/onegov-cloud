@@ -1,7 +1,9 @@
 """ The onegov org collection of files uploaded to the site. """
 
 import datetime
+import isodate
 import morepath
+import sedate
 
 from babel.core import Locale
 from babel.dates import parse_pattern
@@ -371,6 +373,32 @@ def view_upload_file_by_json(self, request):
         'filelink': request.link(f),
         'filename': f.name,
     }
+
+
+@OrgApp.html(model=GeneralFileCollection, name='digest', permission=Public)
+def view_file_digest(self, request):
+    name = request.params.get('name')
+    digest = request.params.get('digest')
+
+    if not name:
+        raise exc.HTTPBadRequest("missing filename")
+
+    if not digest:
+        raise exc.HTTPBadRequest("missing digest")
+
+    metadata = self.locate_signature_metadata(digest)
+    layout = DefaultLayout(self, request)
+
+    return render_macro(layout.macros['digest_result'], request, {
+        'layout': layout,
+        'name': name,
+        'is_known': metadata and True or False,
+        'date': metadata and sedate.replace_timezone(
+            isodate.parse_datetime(
+                metadata['timestamp']
+            ), 'UTC'
+        ),
+    })
 
 
 @OrgApp.html(model=File, name='sign', request_method='POST',

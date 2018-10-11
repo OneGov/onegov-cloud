@@ -283,7 +283,7 @@
 
 <metal:upload define-macro="upload" i18n:domain="onegov.org">
     <form action="${upload_url}" class="upload" method="POST" enctype="multipart/form-data">
-        <div class="upload-dropzone" i18n:translate>
+        <div class="upload-dropzone dropzone" i18n:translate>
             Drop files to upload
         </div>
 
@@ -1506,3 +1506,27 @@
            i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"><i class="fa fa-times" aria-hidden="true"></i></a>
     </li>
 </metal:uploaded_image>
+
+<metal:digest_result define-macro="digest_result" i18n:domain="onegov.org">
+    <div class="digest-result digest-${is_known and 'is-known' or 'is-not-known'}" tal:switch="is_known">
+        <tal:b case="True">
+            <div>
+                <i class="fa fa-fw fa-check-circle" aria-hidden="true"></i>
+            </div>
+            <div i18n:translate>
+                <span i18n:name="name">${name}</span>
+                was digitally signed on
+                <span i18n:name="date">${layout.format_date(date, 'datetime')}</span>
+            </div>
+        </tal:b>
+        <tal:b case="False">
+            <div>
+                <i class="fa fa-fw fa-exclamation-circle" aria-hidden="true"></i>
+            </div>
+            <div i18n:translate>
+                <span i18n:name="name">${name}</span>
+                is not in our database
+            </div>
+        </tal:b>
+    </div>
+</metal:digest_result>

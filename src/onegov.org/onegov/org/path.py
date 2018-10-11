@@ -1,5 +1,7 @@
 """ Contains the paths to the different models served by onegov.org. """
 
+import sedate
+
 from datetime import date
 from onegov.chat import MessageCollection
 from onegov.core.converters import extended_date_converter
@@ -45,6 +47,7 @@ from onegov.org.models import News
 from onegov.org.models import Organisation
 from onegov.org.models import PageMove
 from onegov.org.models import PagePersonMove
+from onegov.org.models import PublicationCollection
 from onegov.org.models import ResourcePersonMove
 from onegov.org.models import ResourceRecipient
 from onegov.org.models import ResourceRecipientCollection
@@ -561,3 +564,12 @@ def get_directory_submission_action(app, directory_id, submission_id, action):
 
     if action.valid:
         return action
+
+
+@OrgApp.path(
+    model=PublicationCollection,
+    path='/publications',
+    converters=dict(year=int))
+def get_publication_collection(request, year=None):
+    year = year or sedate.to_timezone(sedate.utcnow(), 'Europe/Zurich').year
+    return PublicationCollection(request.session, year)

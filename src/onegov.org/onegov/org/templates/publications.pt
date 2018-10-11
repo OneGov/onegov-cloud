@@ -1,0 +1,84 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="row">
+            <div class="columns small-12 medium-8">
+                <h2>${model.year}</h2>
+
+                <div class="publications">
+                    <div tal:repeat="(group, publications) grouped.items()" class="publication-group">
+                        <h3>${group}</h3>
+
+                        <ul class="dense" tal:switch="bool(publications)">
+                            <tal:b case="False">
+                                <li i18n:translate>No publications</li>
+                            </tal:b>
+
+                            <tal:b case="True">
+                                <li tal:repeat="publication publications" class="publication-item">
+                                    <tal:b define="file_link link(publication)">
+                                        <a class="file-preview" href="${file_link}">
+                                            <img class="pdf-preview lazyload" data-src="${link(publication, name='medium')}">
+                                        </a>
+
+                                        <ul class="dense">
+                                            <li class="publication-title">
+                                                <a href="${file_link}">${name_without_extension(publication.name)}</a>
+                                            </li>
+                                            <li class="publication-date">
+                                                <span>
+                                                    ${layout.format_date(publication.created, 'date')}
+                                                </span>
+                                            </li>
+                                            <li tal:define="pages publication.stats.get('pages') or 0" class="publication-stats">
+                                                <span>
+                                                    <i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i>
+                                                    <tal:b tal:condition="pages == 0 or pages > 1" i18n:translate>
+                                                        <tal:b i18n:name="count">${pages}</tal:b> pages
+                                                    </tal:b>
+                                                    <tal:b tal:condition="pages == 1" i18n:translate>
+                                                        1 page
+                                                    </tal:b>
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </tal:b>
+                                </li>
+                            </tal:b>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="columns small-12 medium-4 filter-panel">
+                <div class="filter-years">
+                    <h2 class="filter-title" i18n:translate>Years</h2>
+                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['years']" />
+                </div>
+
+                <div class="publication-info">
+                    <h2 class="filter-title" i18n:translate>Information</h2>
+                    <p i18n:translate>
+                        You can search through the content of all listed files
+                        by using the search on the top right.
+                    </p>
+                    <p i18n:translate>
+                        All files have been digitally signed. The digital
+                        signature of a downloaded file can be viewed in Adobe Acrobat Reader or by
+                        dragging an already downloaded file into the field
+                        below:
+                    </p>
+                    <div class="filedigest dropzone"
+                        data-filedigest-handler="${filedigest_handler}"
+                        data-filedigest-target=".filedigest-results"
+                        i18n:translate>
+                        Drop files to verify them
+                    </div>
+                    <div class="filedigest-results">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </tal:b>
+</div>

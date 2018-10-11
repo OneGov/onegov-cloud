@@ -14,7 +14,7 @@ from onegov.gis import MapboxApp
 from onegov.org import directives
 from onegov.org.homepage_widgets import transform_homepage_structure
 from onegov.org.initial_content import create_new_organisation
-from onegov.org.models import Topic, Organisation
+from onegov.org.models import Topic, Organisation, PublicationCollection
 from onegov.org.request import OrgRequest
 from onegov.org.theme import OrgTheme
 from onegov.page import Page, PageCollection
@@ -138,6 +138,10 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
             ))
 
         return result
+
+    @orm_cached(policy='on-table-change:files')
+    def publications_count(self):
+        return PublicationCollection(self.session()).query().count()
 
     def send_email(self, **kwargs):
         """ Wraps :meth:`onegov.core.framework.Framework.send_email`, setting
@@ -386,6 +390,12 @@ def get_photoswipe_asset():
 def get_tags_input():
     yield 'tags-input.js'
     yield 'tags-input-setup.js'
+
+
+@OrgApp.webasset('filedigest')
+def get_filehash():
+    yield 'asmcrypto-lite.js'
+    yield 'filedigest.js'
 
 
 @OrgApp.webasset('common')

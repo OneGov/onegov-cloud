@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-10-10 09:53+0200\n"
+"POT-Creation-Date: 2018-10-11 15:50+0200\n"
 "PO-Revision-Date: 2018-09-24 12:21+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -151,6 +151,9 @@ msgstr "Opérateurs de paiement"
 
 msgid "Directories"
 msgstr "Répertoires"
+
+msgid "Publications"
+msgstr "Publications"
 
 msgid "Delete"
 msgstr "Supprimer"
@@ -1918,6 +1921,12 @@ msgstr "Voulez-vous vraiment supprimer l'image ?"
 msgid "Delete Image"
 msgstr "Supprimez l'image"
 
+msgid "${name} was digitally signed on ${date}"
+msgstr "${name} a été signé numériquement le ${date}"
+
+msgid "${name} is not in our database"
+msgstr "${name} n'est pas dans notre base de données"
+
 msgid ""
 "You are editing a note created by someone else. By saving your changes you "
 "will become the author of the whole note."
@@ -2323,6 +2332,31 @@ msgstr "Pas de paiements pour le moment."
 
 msgid "The following reservations have unfortunately been cancelled:"
 msgstr "Les réservations suivantes ont malheureusement été annulées :"
+
+msgid "No publications"
+msgstr "Aucune publication"
+
+msgid "Years"
+msgstr "Années"
+
+msgid ""
+"You can search through the content of all listed files by using the search "
+"on the top right."
+msgstr ""
+"Vous pouvez chercher dans le contenu de tous les fichiers répertoriés en "
+"utilisant la recherche en haut à droite."
+
+msgid ""
+"All files have been digitally signed. The digital signature of a downloaded "
+"file can be viewed in Adobe Acrobat Reader or by dragging an already "
+"downloaded file into the field below:"
+msgstr ""
+"Tous les fichiers ont été signés numériquement. La signature numérique d'un "
+"fichier téléchargé peut être visualisée dans Adobe Acrobat Reader ou en "
+"faisant glisser un fichier déjà téléchargé dans le champ ci-dessous :"
+
+msgid "Drop files to verify them"
+msgstr "Déposez les fichiers pour les vérifier"
 
 msgid "This is an imported event"
 msgstr "Il s'agit d'un événement importé"
@@ -2784,6 +2818,42 @@ msgstr "${address} a bien été désinscrite"
 #, python-format
 msgid "${address} could not be unsubscribed, wrong token"
 msgstr "${address} n'a pas pu être désinscrite, mauvaise zone de texte"
+
+msgid "January"
+msgstr "Janvier"
+
+msgid "Feburary"
+msgstr "Février"
+
+msgid "March"
+msgstr "Mars"
+
+msgid "April"
+msgstr "Avril"
+
+msgid "May"
+msgstr "Mai"
+
+msgid "June"
+msgstr "Juin"
+
+msgid "July"
+msgstr "Juillet"
+
+msgid "August"
+msgstr "Août"
+
+msgid "September"
+msgstr "Septembre"
+
+msgid "October"
+msgstr "Octobre"
+
+msgid "November"
+msgstr "Novembre"
+
+msgid "December"
+msgstr "Décembre"
 
 msgid "Your registration has been confirmed"
 msgstr "Votre inscription a été confirmée"

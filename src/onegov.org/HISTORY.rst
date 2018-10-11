@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a publications view for signed documents.
+  [href]
+
 0.38.1 (2018-10-11)
 ~~~~~~~~~~~~~~~~~~~
 

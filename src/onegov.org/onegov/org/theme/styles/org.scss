@@ -4587,7 +4587,9 @@ h2 + div.timeline {
 /*
     Upload
 */
-.upload-dropzone {
+.dropzone {
+    @include prefix(transition, border 100ms ease-out);
+
     border: 1px dashed $gainsboro;
     display: flex;
     flex-direction: column;
@@ -4595,6 +4597,10 @@ h2 + div.timeline {
     justify-content: center;
     margin-bottom: 1.5rem;
     text-align: center;
+
+    &.drag-over {
+        border-color: $anchor-font-color;
+    }
 }
 
 .upload-filelist-header {
@@ -4748,7 +4754,6 @@ h2 + div.timeline {
 */
 .publication {
     display: flex;
-
     margin-bottom: .5rem;
 
     .publication-settings {
@@ -4825,4 +4830,83 @@ h2 + div.timeline {
 
 .signing .fa {
     animation: oscillate-color 1.5s infinite linear;
+}
+
+/*
+    Publications
+*/
+.publication-group {
+    margin-bottom: 2rem;
+
+    &:first-child {
+        margin-top: 1.5rem;
+    }
+}
+
+.publication-item {
+    display: flex;
+    margin-bottom: 1rem;
+
+    .pdf-preview {
+        max-height: 96px;
+        width: 64px;
+    }
+
+    > a {
+        flex: 1;
+
+        img {
+            margin-right: 1rem;
+            margin-top: .4rem;
+        }
+    }
+
+    > ul {
+        flex: 8;
+
+        span {
+            font-size: .875rem;
+        }
+    }
+
+    .publication-title {
+        font-weight: bold;
+    }
+
+    .publication-stats span {
+        color: $steel;
+        font-size: .8rem;
+    }
+}
+
+.publication-info * {
+    font-size: .875rem;
+}
+
+/*
+    Filedigest results
+*/
+.filedigest-results {
+    .digest-result {
+        border-radius: 5px;
+        display: flex;
+        margin-bottom: .5rem;
+        overflow: hidden;
+        padding: 3px 5px 3px 3px;
+        text-overflow: ellipsis;
+
+        i {
+            margin: 2px 4px 3px 3px;
+        }
+
+        &.digest-is-known {
+            background: $green-pastel;
+            color: $green-dark;
+        }
+
+        &.digest-is-not-known {
+            background: $red-pastel;
+            color: $red-dark;
+        }
+    }
 }

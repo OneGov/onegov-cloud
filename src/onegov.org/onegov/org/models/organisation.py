@@ -43,6 +43,8 @@ class Organisation(Base, TimestampMixin):
     analytics_code = meta_property()
     online_counter_label = meta_property()
     reservations_label = meta_property()
+    publications_label = meta_property()
+    hide_publications = meta_property()
     daypass_label = meta_property()
     default_map_view = meta_property()
     homepage_structure = meta_property()
