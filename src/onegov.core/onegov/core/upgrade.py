@@ -425,9 +425,12 @@ class UpgradeContext(object):
     def stop_search_updates(self):
         # XXX this would be better handled with a more general approach
         # that doesn't require knowledge of onegov.search
-        getattr(self.app, 'es_orm_events', object()).stopped = True
-        yield
-        getattr(self.app, 'es_orm_events', object()).stopped = False
+        if hasattr(self.app, 'es_orm_events'):
+            self.app.es_orm_events.stopped = True
+            yield
+            self.app.es_orm_events.stopped = False
+        else:
+            yield
 
     def add_column_with_defaults(self, table, column, default):
         # XXX while adding default values we shouldn't reindex the data

@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes core upgrade failing if no elasticsearch is used.
+  [href]
+
 0.73.0 (2018-10-08)
 ~~~~~~~~~~~~~~~~~~~
 
