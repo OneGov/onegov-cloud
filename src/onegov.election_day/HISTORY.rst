@@ -1,5 +1,10 @@
 Changelog
 ---------
+
+- Fixes party panachage results being added for parties only being present
+  in former elections.
+  [msom]
+
 3.6.9 (2018-09-25)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -36,7 +36,8 @@ def parse_party_result(line, errors, results, totals, parties, election_year):
     else:
         key = '{}/{}'.format(name, year)
         totals[year] = total_votes
-        parties[id_] = name
+        if year == election_year:
+            parties[id_] = name
 
         if key in results:
             errors.append(_("${name} was found twice", mapping={'name': key}))
