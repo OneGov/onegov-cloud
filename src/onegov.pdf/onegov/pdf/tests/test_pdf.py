@@ -144,6 +144,76 @@ def test_pdf_headers():
     )
 
 
+def test_pdf_toc():
+
+    file = BytesIO()
+    pdf = Pdf(file)
+    pdf.init_a4_portrait()
+    pdf.table_of_contents()
+    pdf.pagebreak()
+    pdf.h1('a')
+    pdf.h2('a.a')
+    pdf.pagebreak()
+    pdf.h2('a.b')
+    pdf.h3('a.b.a')
+    pdf.h3('a.b.b')
+    pdf.h4('a.b.b.a')
+    pdf.h4('a.b.b.b')
+    pdf.h4('a.b.b.c')
+    pdf.h3('a.b.c')
+    pdf.pagebreak()
+    pdf.h2('a.c')
+    pdf.h3('a.c.a')
+    pdf.h4('a.c.a.a')
+    pdf.h5('a.c.a.a.a')
+    pdf.h5('a.c.a.a.b')
+    pdf.h6('a.c.a.a.b.a')
+    pdf.h6('a.c.a.a.b.b')
+
+    pdf.generate()
+    file.seek(0)
+
+    reader = PdfFileReader(file)
+    assert reader.getNumPages() == 4
+    assert reader.getPage(0).extractText() == (
+        '2\n1 a\n'
+        '2\n1.1 a.a\n'
+        '3\n1.2 a.b\n'
+        '3\n1.2.1 a.b.a\n'
+        '3\n1.2.2 a.b.b\n'
+        '3\n1.2.2.1 a.b.b.a\n'
+        '3\n1.2.2.2 a.b.b.b\n'
+        '3\n1.2.2.3 a.b.b.c\n'
+        '3\n1.2.3 a.b.c\n'
+        '4\n1.3 a.c\n'
+        '4\n1.3.1 a.c.a\n'
+        '4\n1.3.1.1 a.c.a.a\n'
+        '4\n1.3.1.1.1 a.c.a.a.a\n'
+        '4\n1.3.1.1.2 a.c.a.a.b\n'
+        '4\n1.3.1.1.2.1 a.c.a.a.b.a\n'
+        '4\n1.3.1.1.2.2 a.c.a.a.b.b\n'
+    )
+    assert reader.getPage(1).extractText() == '1 a\n1.1 a.a\n'
+    assert reader.getPage(2).extractText() == (
+        '1.2 a.b\n'
+        '1.2.1 a.b.a\n'
+        '1.2.2 a.b.b\n'
+        '1.2.2.1 a.b.b.a\n'
+        '1.2.2.2 a.b.b.b\n'
+        '1.2.2.3 a.b.b.c\n'
+        '1.2.3 a.b.c\n'
+    )
+    assert reader.getPage(3).extractText() == (
+        '1.3 a.c\n'
+        '1.3.1 a.c.a\n'
+        '1.3.1.1 a.c.a.a\n'
+        '1.3.1.1.1 a.c.a.a.a\n'
+        '1.3.1.1.2 a.c.a.a.b\n'
+        '1.3.1.1.2.1 a.c.a.a.b.a\n'
+        '1.3.1.1.2.2 a.c.a.a.b.b\n'
+    )
+
+
 def test_pdf_mini_html():
     file = BytesIO()
     pdf = Pdf(file)

@@ -8,6 +8,7 @@ from onegov.pdf.flowables import InlinePDF
 from pdfdocument.document import Empty
 from pdfdocument.document import MarkupParagraph
 from pdfdocument.document import PDFDocument
+from pdfdocument.document import ReportingDocTemplate
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.enums import TA_LEFT
@@ -19,8 +20,11 @@ from reportlab.platypus import NextPageTemplate
 from reportlab.platypus import PageTemplate
 from reportlab.platypus import Paragraph
 from reportlab.platypus import Table
+from reportlab.platypus.tableofcontents import TableOfContents
+from reportlab.platypus.tables import TableStyle
 from textwrap import shorten
 from textwrap import wrap
+from uuid import uuid4
 
 
 def empty_page_fn(cavnas, doc):
@@ -48,7 +52,7 @@ def page_fn_footer(canvas, doc):
     canvas.drawRightString(
         doc.pagesize[0] - doc.rightMargin,
         doc.bottomMargin / 2,
-        '{}'.format(canvas._pageNumber)
+        f'{canvas._pageNumber}'
     )
     canvas.restoreState()
 
@@ -97,13 +101,31 @@ def page_fn_header_and_footer(canvas, doc):
     page_fn_footer(canvas, doc)
 
 
+class Template(ReportingDocTemplate):
+    """ Extends the ReportingDocTemplate with Table of Contents printing. """
+
+    def afterFlowable(self, flowable):
+
+        ReportingDocTemplate.afterFlowable(self, flowable)
+
+        if hasattr(flowable, 'toc_level'):
+            self.notify('TOCEntry', (
+                flowable.toc_level, flowable.getPlainText(), self.page,
+                flowable.bookmark
+            ))
+
+
 class Pdf(PDFDocument):
     """ A PDF document. """
 
     def __init__(self, *args, **kwargs):
-        header_lines = kwargs.pop('header_lines', None)
         super(Pdf, self).__init__(*args, **kwargs)
-        self.header_lines = header_lines
+
+        self.doc = Template(*args, **kwargs)
+        self.doc.PDFDocument = self
+
+        self.toc = None
+        self.toc_numbering = {}
 
     def init_a4_portrait(self, page_fn=empty_page_fn, page_fn_later=None):
         frame_kwargs = {
@@ -240,23 +262,107 @@ class Pdf(PDFDocument):
             ('LINEBELOW', (0, 0), (-1, 0), 0.2, colors.black),
         )
 
-    def h4(self, text, style=None):
-        self.story.append(Paragraph(text, style or self.style.heading4))
+    def table_of_contents(self):
+        """ Adds a table of contents.
 
-    def h5(self, text, style=None):
-        self.story.append(Paragraph(text, style or self.style.heading5))
+        The entries are added automatically when adding header. Example:
 
-    def h6(self, text, style=None):
-        self.story.append(Paragraph(text, style or self.style.heading6))
+            pdf = Pdf(file, author='OneGov')
+            pdf.init_a4_portrait(page_fn=draw_header)
+            pdf.table_of_contents()
+            pdf.h1('Title')
+            pdf.generate()
+
+        """
+
+        self.toc = TableOfContents()
+        self.toc.levelStyles[0].leftIndent = 0
+        self.toc.levelStyles[0].rightIndent = 0.25 * cm
+        self.toc.levelStyles[0].fontName = self.font_name
+        self.toc.levelStyles[0].fontName = f'{self.font_name}'
+        self.toc.levelStyles[0].spaceBefore = 0.2 * cm
+        for idx in range(1, 7):
+            toc_style = deepcopy(self.toc.levelStyles[0])
+            toc_style.name = f'Level {idx}'
+            toc_style.fontName = self.font_name
+            toc_style.spaceBefore = 0
+            self.toc.levelStyles.append(toc_style)
+
+        self.toc.dotsMinLevel = 7
+        self.toc.tableStyle = TableStyle([
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+            ('LEFTPADDING', (0, 0), (-1, -1), 0),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 0.2 * cm)
+        ])
+        self.story.append(self.toc)
+
+    def _add_toc_heading(self, text, style, level):
+        """ Adds a heading with automatically adding an entry to the table of
+        contents.
+
+        """
+        if self.toc is not None:
+            # increment current level
+            self.toc_numbering.setdefault(level, 0)
+            self.toc_numbering[level] += 1
+
+            # reset higher levels
+            for idx in range(level + 1, max(self.toc_numbering.keys()) + 1):
+                self.toc_numbering[idx] = 0
+
+            # create and prepend the prefix
+            prefix = '.'.join([
+                str(self.toc_numbering.get(idx)) or ''
+                for idx in range(level + 1)
+            ])
+            text = f'{prefix} {text}'
+
+            # create a link
+            bookmark = uuid4().hex
+            text = f'{text}<a name="{bookmark}"/>'
+
+        self.story.append(Paragraph(text, style))
+        # self.story.append(MarkupParagraph(text, style))
+
+        if self.toc is not None:
+            self.story[-1].toc_level = level
+            self.story[-1].bookmark = bookmark
+
+    def h1(self, text, style=None, toc_level=0):
+        style = style or self.style.heading1
+        self._add_toc_heading(text, style, toc_level)
+
+    def h2(self, text, style=None, toc_level=1):
+        style = style or self.style.heading2
+        self._add_toc_heading(text, style, toc_level)
+
+    def h3(self, text, style=None, toc_level=2):
+        style = style or self.style.heading3
+        self._add_toc_heading(text, style, toc_level)
+
+    def h4(self, text, style=None, toc_level=3):
+        style = style or self.style.heading4
+        self._add_toc_heading(text, style, toc_level)
+
+    def h5(self, text, style=None, toc_level=4):
+        style = style or self.style.heading5
+        self._add_toc_heading(text, style, toc_level)
+
+    def h6(self, text, style=None, toc_level=5):
+        style = style or self.style.heading6
+        self._add_toc_heading(text, style, toc_level)
 
     def h(self, title, level=1):
-        """ Adds a header according to the given level (h1-h6). Levels outside
-        the supported range are added as paragraphs with h6 style.
+        """ Adds a header according to the given level (h1-h6).
+
+        Levels outside the supported range are added as paragraphs with h6
+        style (without appearing in the table of contents).
 
         """
 
         if 0 < level < 7:
-            getattr(self, 'h{}'.format(level))(title)
+            getattr(self, f'h{level}')(title)
         else:
             self.p_markup(title, self.style.heading6)
 

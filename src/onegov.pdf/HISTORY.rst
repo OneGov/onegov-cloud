@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds table of contents.
+  [msom]
+
 - Adds h5 and h6.
   [msom]
 
