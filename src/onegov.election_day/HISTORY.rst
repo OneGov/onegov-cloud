@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.6.10 (2018-10-11)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes party panachage results being added for parties only being present
   in former elections.
