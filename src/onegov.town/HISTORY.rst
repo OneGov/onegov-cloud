@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.15.4 (2018-10-11)
+~~~~~~~~~~~~~~~~~~~~~
 
 - Shows the publications view on the homepage.
   [href]
