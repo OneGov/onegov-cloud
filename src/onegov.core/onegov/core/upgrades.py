@@ -90,7 +90,7 @@ def migrate_to_jsonb(connection, schemas):
             yield True
 
 
-@upgrade_task('Rename associated tables', always_run=True)
+@upgrade_task('Rename associated tables')
 def rename_associated_tables(context):
     bases = set()
 
