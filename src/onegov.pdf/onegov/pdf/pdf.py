@@ -15,6 +15,7 @@ from reportlab.lib.enums import TA_LEFT
 from reportlab.lib.enums import TA_RIGHT
 from reportlab.lib.units import cm
 from reportlab.platypus import Frame
+from reportlab.platypus import Image
 from reportlab.platypus import ListFlowable
 from reportlab.platypus import NextPageTemplate
 from reportlab.platypus import PageTemplate
@@ -302,18 +303,27 @@ class Pdf(PDFDocument):
                 factor * height * doc_width / width
             )
 
+    def image(self, filelike, factor=1.0):
+        """ Adds an image and fits it to the page. """
+
+        image = Image(filelike, hAlign='LEFT')
+        image._restrictSize(
+            *self.fit_size(image.imageWidth, image.imageHeight, factor)
+        )
+        self.story.append(image)
+
     def pdf(self, filelike, factor=1.0):
-        """ Adds a PDF and fit it to the page. """
+        """ Adds a PDF and fits it to the page. """
 
-        img = InlinePDF(filelike, self.doc.width)
-        if img.width and img.height:
-            old = img.width
-            img.width, img.height = self.fit_size(
-                img.width, img.height, factor
+        pdf = InlinePDF(filelike, self.doc.width)
+        if pdf.width and pdf.height:
+            old = pdf.width
+            pdf.width, pdf.height = self.fit_size(
+                pdf.width, pdf.height, factor
             )
-            img.scale = img.scale * img.width / old
+            pdf.scale = pdf.scale * pdf.width / old
 
-            self.story.append(img)
+            self.story.append(pdf)
 
     def table(self, data, columns, style=None, ratios=False):
         """ Adds a table where every cell is wrapped in a paragraph so that

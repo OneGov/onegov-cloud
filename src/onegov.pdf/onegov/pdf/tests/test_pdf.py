@@ -1,6 +1,7 @@
 from copy import deepcopy
 from datetime import date
 from io import BytesIO
+from onegov.core.utils import module_path
 from onegov.pdf import page_fn_footer
 from onegov.pdf import page_fn_header
 from onegov.pdf import page_fn_header_and_footer
@@ -8,6 +9,7 @@ from onegov.pdf import Pdf
 from pdfdocument.document import MarkupParagraph
 from pdfrw import PdfReader
 from PyPDF2 import PdfFileReader
+from pytest import mark
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.enums import TA_LEFT
 from reportlab.lib.enums import TA_RIGHT
@@ -242,6 +244,31 @@ def test_pdf_toc_levels():
         '1.1.1.1.1 a.a.a.a.a\n'
         '1.1.1.1.1.1 a.a.a.a.a.a\n'
     )
+
+
+@mark.parametrize("path", [
+    module_path('onegov.pdf', 'tests/fixtures/onegov.jpg'),
+    module_path('onegov.pdf', 'tests/fixtures/onegov.png'),
+])
+def test_pdf_image(path):
+    file = BytesIO()
+    pdf = Pdf(file)
+    pdf.init_a4_portrait()
+    pdf.image(path)
+    pdf.generate()
+    file.seek(0)
+
+    assert len(PdfReader(file, decompress=False).pages) == 1
+
+    file = BytesIO()
+    pdf = Pdf(file)
+    pdf.init_a4_portrait()
+    with open(path, 'rb') as f:
+        pdf.image(BytesIO(f.read()), factor=0.5)
+    pdf.generate()
+    file.seek(0)
+
+    assert len(PdfReader(file, decompress=False).pages) == 1
 
 
 def test_pdf_mini_html():

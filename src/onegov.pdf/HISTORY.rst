@@ -1,16 +1,19 @@
 Changelog
 ---------
 
-- Adds table of contents.
+- Allows to add table of contents to PDFs.
   [msom]
 
-- Adds h5 and h6.
-  [msom]
-
-- Adds a creation date string to the header.
+- Allows to add h5 and h6 headings to PDFs.
   [msom]
 
 - Allows to add a header by level.
+  [msom]
+
+- Allows to add images to PDFs.
+  [msom]
+
+- Allows to add a creation date to the header.
   [msom]
 
 0.3.5 (2018-10-04)
