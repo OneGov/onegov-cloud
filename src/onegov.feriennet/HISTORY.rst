@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes an IE 11 display issue on Windows 7.
+  [href]
+
 - Improves cash payments wording.
   [href]
 
