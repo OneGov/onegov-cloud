@@ -2406,3 +2406,28 @@ def test_timeline_filter(scenario):
         assert a.for_filter(timeline='past').query().count() == 3
         assert a.for_filter(timeline='future').query().count() == 0
         assert a.for_filter(timeline='undated').query().count() == 1
+
+
+def test_no_occasion_in_period_filter(scenario):
+    # an activity with an occasion in one period
+    scenario.add_period(title="Previous", active=False, confirmed=True)
+    scenario.add_activity(title="Running", state='accepted')
+    scenario.add_occasion()
+
+    # ...and no occasion in another
+    scenario.add_period(title="Current", active=True, confirmed=True)
+    scenario.add_activity(title="Swimming", state='accepted')
+
+    scenario.commit()
+    scenario.refresh()
+
+    a = scenario.c.activities.for_filter(timeline='undated')
+
+    # there is one undated activity
+    assert a.query().count() == 1
+
+    # 1 activity has no occasion in the previous period
+    assert a.for_filter(period_id=scenario.periods[0].id).query().count() == 1
+
+    # 2 activites have no occasion in the current period
+    assert a.for_filter(period_id=scenario.periods[1].id).query().count() == 2

@@ -237,11 +237,19 @@ class ActivityCollection(Pagination):
         # if we are looking at activities without occasions, we do not have
         # to apply all the filters below which are occasion-based
         if 'undated' in self.filter.timelines:
-            return query.filter(not_(model_class.id.in_(
-                self.session.query(
-                    distinct(Occasion.activity_id)
-                ).subquery()
-            )))
+            if self.filter.period_ids:
+                return query.filter(
+                    not_(self.session.query(Occasion.activity_id).filter(and_(
+                        Occasion.activity_id == Activity.id,
+                        Occasion.period_id.in_(self.filter.period_ids)
+                    )).exists())
+                )
+            else:
+                return query.filter(
+                    not_(self.session.query(Occasion.activity_id).filter(
+                        Occasion.activity_id == Activity.id,
+                    ).exists())
+                )
 
         now = utcnow()
 
