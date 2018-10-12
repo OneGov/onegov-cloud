@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.4.6 (2018-10-12)
+~~~~~~~~~~~~~~~~~~~
 
 - Hides activities without occasions from anonymous users.
   [href]
