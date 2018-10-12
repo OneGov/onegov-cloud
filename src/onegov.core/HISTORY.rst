@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Allows multiple associations per model.
+  [msom]
+
 0.73.1 (2018-10-11)
 ~~~~~~~~~~~~~~~~~~~
 
@@ -10,12 +14,12 @@ Changelog
 ~~~~~~~~~~~~~~~~~~~
 
 - Moves the yubikey related functions to the core (from onegov.user).
-  
+
   In the future, it might make sense to move this to a onegov.otp package. In
   any case, onegov.user is not the right place as the integraiton happens in
   onegov.core as it is and the user model should not be a prerequisite for
   yubikeys.
-  
+
   [href]
 
 0.72.5 (2018-10-04)
