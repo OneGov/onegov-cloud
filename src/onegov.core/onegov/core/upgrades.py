@@ -105,7 +105,15 @@ def rename_associated_tables(context):
                 continue
 
             if context.has_table(old_name) and context.has_table(new_name):
-                # the new table has probably already been made by the ORM
+                # We expect that the ORM already created the new tables at this
+                # point while still having the old one - we therefore drop the
+                # newly created table (which should be empty at this time).
+                sql = f'SELECT count(*) FROM {new_name}'
+                assert context.session.execute(sql).fetchone().count == 0, f"""
+                    Can not rename the associated table "{old_name}" to
+                    "{new_name}", the new table "{new_name}" already exists
+                    and contains values.
+                """
                 context.operations.drop_table(new_name)
 
             if context.has_table(old_name) and not context.has_table(new_name):
