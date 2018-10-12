@@ -7,7 +7,6 @@ from onegov.feriennet.security import has_public_permission_not_logged_in
 from onegov.feriennet.security import has_private_permission_activities
 from onegov.feriennet.security import has_private_permission_occasions
 from onegov.feriennet.security import is_owner
-from onegov.user import UserCollection
 
 
 def test_is_owner():
@@ -15,31 +14,15 @@ def test_is_owner():
     assert is_owner(username='xy', activity=Bunch(username='xy'))
 
 
-def test_activity_query_policy(session):
-    UserCollection(session).add(
-        username='steven',
-        password='hunter2',
-        role='editor'
-    )
-
-    UserCollection(session).add(
-        username='leland',
-        password='hunter2',
-        role='editor'
-    )
+def test_activity_query_policy(session, scenario):
+    scenario.add_period()
+    scenario.add_user(username='steven', password='hunter2', role='editor')
+    scenario.add_user(username='leland', password='hunter2', role='editor')
+    scenario.add_activity(title="Visit the Pet Cemetary", username='steven')
+    scenario.add_activity(title="Shop at Needful Things", username='leland')
+    scenario.commit()
 
     collection = ActivityCollection(session)
-
-    activities = [
-        collection.add(
-            title="Visit the Pet Cemetary",
-            username="steven"
-        ),
-        collection.add(
-            title="Shop at Needful Things",
-            username="leland"
-        )
-    ]
 
     # admins see all
     policy = ActivityQueryPolicy("steven", 'admin')
@@ -63,7 +46,9 @@ def test_activity_query_policy(session):
     assert policy.granted_subset(collection.query()).count() == 0
 
     # proposed activites stay visible to owners but keep hidden from others
-    activities[0].propose()
+    scenario.refresh()
+    scenario.activities[0].propose()
+    scenario.commit()
 
     policy = ActivityQueryPolicy("steven", 'editor')
     assert policy.granted_subset(collection.query()).count() == 1
@@ -72,14 +57,26 @@ def test_activity_query_policy(session):
     assert policy.granted_subset(collection.query()).count() == 1
 
     # once an activity is accepted, it becomes public
-    activities[0].accept()
-    activities[0].durations = 1
+    scenario.refresh()
+    scenario.activities[0].accept()
+    scenario.commit()
 
     policy = ActivityQueryPolicy("steven", 'admin')
     assert policy.granted_subset(collection.query()).count() == 2
 
     policy = ActivityQueryPolicy("steven", 'editor')
     assert policy.granted_subset(collection.query()).count() == 1
+
+    policy = ActivityQueryPolicy("steven", 'member')
+    assert policy.granted_subset(collection.query()).count() == 0
+
+    policy = ActivityQueryPolicy(None, None)
+    assert policy.granted_subset(collection.query()).count() == 0
+
+    # but members only see it if there's at least one occasion
+    scenario.refresh()
+    scenario.add_occasion(activity=scenario.activities[0])
+    scenario.commit()
 
     policy = ActivityQueryPolicy("steven", 'member')
     assert policy.granted_subset(collection.query()).count() == 1
@@ -89,7 +86,9 @@ def test_activity_query_policy(session):
 
     # if an activity is archived, it remains visible to owners/editors
     # unless the owner is not an editor or admin
-    activities[0].archive()
+    scenario.refresh()
+    scenario.activities[0].archive()
+    scenario.commit()
 
     policy = ActivityQueryPolicy("steven", 'admin')
     assert policy.granted_subset(collection.query()).count() == 2

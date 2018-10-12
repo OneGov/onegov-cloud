@@ -1,7 +1,7 @@
-from onegov.activity import Activity
+from onegov.activity import Activity, Occasion
 from onegov.feriennet.const import VISIBLE_ACTIVITY_STATES
 from morepath.authentication import NO_IDENTITY
-from sqlalchemy import or_
+from sqlalchemy import and_, or_, exists
 
 
 class ActivityQueryPolicy(object):
@@ -28,9 +28,14 @@ class ActivityQueryPolicy(object):
 
     def public_subset(self, query):
         """ Limits the given query to activites meant for the public. """
-        return query.filter(
-            Activity.state.in_(VISIBLE_ACTIVITY_STATES['anonymous'])
-        )
+        return query.filter(and_(
+            Activity.state.in_(VISIBLE_ACTIVITY_STATES['anonymous']),
+
+            # excludes activites without any occasion in any period
+            query.session.query(Occasion.activity_id).filter(
+                Occasion.activity_id == Activity.id
+            ).exists()
+        ))
 
     def private_subset(self, query):
         """ Limits the given query to activites meant for admins/owners.

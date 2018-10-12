@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Hides activities without occasions from anonymous users.
+  [href]
+
 - Fixes archived occasions not being toggleable for editors.
   [href]
 

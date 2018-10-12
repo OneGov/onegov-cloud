@@ -97,9 +97,9 @@ def view_activities(self, request):
     if show_activities:
         filters['timelines'] = [
             link(
-                text=request.translate(_("Scheduled")),
-                active='future' in self.filter.timelines,
-                url=request.link(self.for_filter(timeline='future'))
+                text=request.translate(_("Elapsed")),
+                active='past' in self.filter.timelines,
+                url=request.link(self.for_filter(timeline='past'))
             ),
             link(
                 text=request.translate(_("Now")),
@@ -107,16 +107,18 @@ def view_activities(self, request):
                 url=request.link(self.for_filter(timeline='now'))
             ),
             link(
-                text=request.translate(_("Elapsed")),
-                active='past' in self.filter.timelines,
-                url=request.link(self.for_filter(timeline='past'))
+                text=request.translate(_("Scheduled")),
+                active='future' in self.filter.timelines,
+                url=request.link(self.for_filter(timeline='future'))
             ),
-            link(
+        ]
+
+        if request.is_organiser:
+            filters['timelines'].insert(0, link(
                 text=request.translate(_("Without")),
                 active='undated' in self.filter.timelines,
                 url=request.link(self.for_filter(timeline='undated'))
-            ),
-        ]
+            ))
 
         filters['tags'] = [
             link(
