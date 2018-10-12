@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.10.2 (2018-10-12)
+~~~~~~~~~~~~~~~~~~~
 
 - Improves the 'undated' filter to work with the selected periods.
   [href]
