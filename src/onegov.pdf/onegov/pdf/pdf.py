@@ -247,29 +247,35 @@ class Pdf(PDFDocument):
             self.story[-1].toc_level = level
             self.story[-1].bookmark = bookmark
 
-    def h1(self, text, style=None):
-        style = style or self.style.heading1
-        self._add_toc_heading(text, style, 0)
+    def h1(self, title, style=None):
+        if title:
+            style = style or self.style.heading1
+            self._add_toc_heading(title, style, 0)
 
-    def h2(self, text, style=None):
-        style = style or self.style.heading2
-        self._add_toc_heading(text, style, 1)
+    def h2(self, title, style=None):
+        if title:
+            style = style or self.style.heading2
+            self._add_toc_heading(title, style, 1)
 
-    def h3(self, text, style=None):
-        style = style or self.style.heading3
-        self._add_toc_heading(text, style, 2)
+    def h3(self, title, style=None):
+        if title:
+            style = style or self.style.heading3
+            self._add_toc_heading(title, style, 2)
 
-    def h4(self, text, style=None):
-        style = style or self.style.heading4
-        self._add_toc_heading(text, style, 3)
+    def h4(self, title, style=None):
+        if title:
+            style = style or self.style.heading4
+            self._add_toc_heading(title, style, 3)
 
-    def h5(self, text, style=None):
-        style = style or self.style.heading5
-        self._add_toc_heading(text, style, 4)
+    def h5(self, title, style=None):
+        if title:
+            style = style or self.style.heading5
+            self._add_toc_heading(title, style, 4)
 
-    def h6(self, text, style=None):
-        style = style or self.style.heading6
-        self._add_toc_heading(text, style, 5)
+    def h6(self, title, style=None):
+        if title:
+            style = style or self.style.heading6
+            self._add_toc_heading(title, style, 5)
 
     def h(self, title, level=0):
         """ Adds a header according to the given level (h1-h6).
@@ -278,13 +284,13 @@ class Pdf(PDFDocument):
         style (without appearing in the table of contents).
 
         """
-
-        if level < 1:
-            self.p_markup(title, self.style.heading1)
-        elif level < 7:
-            getattr(self, f'h{level}')(title)
-        else:
-            self.p_markup(title, self.style.heading6)
+        if title:
+            if level < 1:
+                self.p_markup(title, self.style.heading1)
+            elif level < 7:
+                getattr(self, f'h{level}')(title)
+            else:
+                self.p_markup(title, self.style.heading6)
 
     def fit_size(self, width, height, factor=1.0):
         """ Returns the given width and height so that it fits on the page. """
