@@ -1,5 +1,7 @@
+from bleach.linkifier import LinkifyFilter
 from bleach.sanitizer import Cleaner
 from copy import deepcopy
+from functools import partial
 from html5lib.filters.whitespace import Filter as whitespace_filter
 from io import StringIO
 from lxml import etree
@@ -378,31 +380,50 @@ class Pdf(PDFDocument):
 
         self.p(text, style=style or self.style.figcaption)
 
-    def mini_html(self, html):
+    def mini_html(self, html, linkify=False):
         """ Convert a small subset of HTML into ReportLab paragraphs.
 
-        This is very limited and currently supports only paragraphs and
+        This is very limited and currently supports only links, paragraphs and
         non-nested ordered/unordered lists.
+
+        If linkifing is enabled, a-tags are cleaned and kept and the html is
+        linkified automatically.
 
         """
 
         if not html:
             return
 
+        # Remove unwanted markup
+        tags = ['p', 'br', 'strong', 'b', 'em', 'li', 'ol', 'ul', 'li']
+        attributes = {}
+        filters = [whitespace_filter]
+
+        if linkify:
+            def colorize(attrs, new=False):
+                attrs[(None, u'color')] = '#00538c'
+                return attrs
+
+            tags.append('a')
+            attributes['a'] = ('href',)
+            filters.append(
+                partial(LinkifyFilter, parse_email=True, callbacks=[colorize])
+            )
+
+        cleaner = Cleaner(
+            tags=tags,
+            attributes=attributes,
+            strip=True,
+            filters=filters
+        )
+        html = cleaner.clean(html)
+
+        # Walk the tree and convert the elements
         def strip(text):
             text = text.strip('\r\n')
             prefix = ' ' if text.startswith(' ') else ''
             postfix = ' ' if text.endswith(' ') else ''
             return prefix + text.strip() + postfix
-
-        # Remove unwanted markup
-        cleaner = Cleaner(
-            tags=('p', 'br', 'strong', 'b', 'em', 'li', 'ol', 'ul', 'li'),
-            attributes={},
-            strip=True,
-            filters=[whitespace_filter]
-        )
-        html = cleaner.clean(html or '')
 
         def inner_html(element):
             return '{}{}{}'.format(
@@ -414,7 +435,6 @@ class Pdf(PDFDocument):
                 strip(element.tail or '')
             )
 
-        # Walk the tree
         tree = etree.parse(StringIO(html), etree.HTMLParser())
         for element in tree.find('body'):
             if element.tag == 'p':

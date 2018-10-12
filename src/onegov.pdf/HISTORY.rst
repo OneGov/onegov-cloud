@@ -16,6 +16,9 @@ Changelog
 - Allows to add a creation date to the header.
   [msom]
 
+- Adds an option to linkify the html when adding to PDFs.
+  [msom]
+
 0.3.5 (2018-10-04)
 ~~~~~~~~~~~~~~~~~~~~~
 

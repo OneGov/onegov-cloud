@@ -453,6 +453,29 @@ def test_pdf_mini_html_strip():
     assert set(paras) == {'Eins zwei drei vier .'}
 
 
+def test_pdf_mini_html_linkify():
+    file = BytesIO()
+    pdf = Pdf(file)
+    pdf.init_a4_portrait()
+
+    html = """
+    <p>
+        <a href="#" target="blank" class="external">Pellentesque habitant</a>
+         morbi senectus et http://netuset.et turpis mal@fames.ac.
+    </p>
+    """
+    pdf.mini_html(html, linkify=True)
+    paras = [p.text for p in pdf.story if isinstance(p, Paragraph)]
+    assert paras == [
+        '<a color="#00538c" href="#">Pellentesque habitant</a>'
+        ' morbi senectus et '
+        '<a color="#00538c" href="http://netuset.et">http://netuset.et</a>'
+        ' turpis '
+        '<a color="#00538c" href="mailto:mal@fames.ac">mal@fames.ac</a>'
+        '.'
+    ]
+
+
 def test_page_fn_header():
     # no title
     file = BytesIO()
