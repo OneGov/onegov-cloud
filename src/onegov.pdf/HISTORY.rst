@@ -7,6 +7,9 @@ Changelog
 - Adds h5 and h6.
   [msom]
 
+- Adds a creation date string to the header.
+  [msom]
+
 - Allows to add a header by level.
   [msom]
 

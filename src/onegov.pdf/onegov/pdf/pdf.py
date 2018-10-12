@@ -29,13 +29,18 @@ class Pdf(PDFDocument):
     """ A PDF document. """
 
     def __init__(self, *args, **kwargs):
+        toc_levels = kwargs.pop('toc_levels', 3)
+        created = kwargs.pop('created', '')
+
         super(Pdf, self).__init__(*args, **kwargs)
 
         self.doc = Template(*args, **kwargs)
         self.doc.PDFDocument = self
+        self.doc.created = created
 
         self.toc = None
         self.toc_numbering = {}
+        self.toc_levels = toc_levels
 
     def init_a4_portrait(self, page_fn=empty_page_fn, page_fn_later=None):
         frame_kwargs = {
@@ -175,9 +180,9 @@ class Pdf(PDFDocument):
     def table_of_contents(self):
         """ Adds a table of contents.
 
-        The entries are added automatically when adding header. Example:
+        The entries are added automatically when adding headers. Example:
 
-            pdf = Pdf(file, author='OneGov')
+            pdf = Pdf(file, author='OneGov', toc_levels=2)
             pdf.init_a4_portrait(page_fn=draw_header)
             pdf.table_of_contents()
             pdf.h1('Title')
@@ -189,7 +194,7 @@ class Pdf(PDFDocument):
         self.toc.levelStyles[0].leftIndent = 0
         self.toc.levelStyles[0].rightIndent = 0.25 * cm
         self.toc.levelStyles[0].fontName = self.font_name
-        self.toc.levelStyles[0].fontName = f'{self.font_name}'
+        self.toc.levelStyles[0].fontName = f'{self.font_name}-Bold'
         self.toc.levelStyles[0].spaceBefore = 0.2 * cm
         for idx in range(1, 7):
             toc_style = deepcopy(self.toc.levelStyles[0])
@@ -233,45 +238,47 @@ class Pdf(PDFDocument):
             text = f'{text}<a name="{bookmark}"/>'
 
         self.story.append(Paragraph(text, style))
-        # self.story.append(MarkupParagraph(text, style))
 
-        if self.toc is not None:
+        # add the toc entry
+        if self.toc is not None and level < self.toc_levels:
             self.story[-1].toc_level = level
             self.story[-1].bookmark = bookmark
 
-    def h1(self, text, style=None, toc_level=0):
+    def h1(self, text, style=None):
         style = style or self.style.heading1
-        self._add_toc_heading(text, style, toc_level)
+        self._add_toc_heading(text, style, 0)
 
-    def h2(self, text, style=None, toc_level=1):
+    def h2(self, text, style=None):
         style = style or self.style.heading2
-        self._add_toc_heading(text, style, toc_level)
+        self._add_toc_heading(text, style, 1)
 
-    def h3(self, text, style=None, toc_level=2):
+    def h3(self, text, style=None):
         style = style or self.style.heading3
-        self._add_toc_heading(text, style, toc_level)
+        self._add_toc_heading(text, style, 2)
 
-    def h4(self, text, style=None, toc_level=3):
+    def h4(self, text, style=None):
         style = style or self.style.heading4
-        self._add_toc_heading(text, style, toc_level)
+        self._add_toc_heading(text, style, 3)
 
-    def h5(self, text, style=None, toc_level=4):
+    def h5(self, text, style=None):
         style = style or self.style.heading5
-        self._add_toc_heading(text, style, toc_level)
+        self._add_toc_heading(text, style, 4)
 
-    def h6(self, text, style=None, toc_level=5):
+    def h6(self, text, style=None):
         style = style or self.style.heading6
-        self._add_toc_heading(text, style, toc_level)
+        self._add_toc_heading(text, style, 5)
 
-    def h(self, title, level=1):
+    def h(self, title, level=0):
         """ Adds a header according to the given level (h1-h6).
 
-        Levels outside the supported range are added as paragraphs with h6
+        Levels outside the supported range are added as paragraphs with h1/h6
         style (without appearing in the table of contents).
 
         """
 
-        if 0 < level < 7:
+        if level < 1:
+            self.p_markup(title, self.style.heading1)
+        elif level < 7:
             getattr(self, f'h{level}')(title)
         else:
             self.p_markup(title, self.style.heading6)

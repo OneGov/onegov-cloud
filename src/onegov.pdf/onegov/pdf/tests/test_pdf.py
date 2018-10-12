@@ -147,7 +147,7 @@ def test_pdf_headers():
 def test_pdf_toc():
 
     file = BytesIO()
-    pdf = Pdf(file)
+    pdf = Pdf(file, toc_levels=6)
     pdf.init_a4_portrait()
     pdf.table_of_contents()
     pdf.pagebreak()
@@ -211,6 +211,36 @@ def test_pdf_toc():
         '1.3.1.1.2 a.c.a.a.b\n'
         '1.3.1.1.2.1 a.c.a.a.b.a\n'
         '1.3.1.1.2.2 a.c.a.a.b.b\n'
+    )
+
+
+def test_pdf_toc_levels():
+
+    file = BytesIO()
+    pdf = Pdf(file, toc_levels=2)
+    pdf.init_a4_portrait()
+    pdf.table_of_contents()
+    pdf.h1('a')
+    pdf.h2('a.a')
+    pdf.h3('a.a.a')
+    pdf.h4('a.a.a.a')
+    pdf.h5('a.a.a.a.a')
+    pdf.h6('a.a.a.a.a.a')
+
+    pdf.generate()
+    file.seek(0)
+
+    reader = PdfFileReader(file)
+    assert reader.getNumPages() == 1
+    assert reader.getPage(0).extractText() == (
+        '1\n1 a\n'
+        '1\n1.1 a.a\n'
+        '1 a\n'
+        '1.1 a.a\n'
+        '1.1.1 a.a.a\n'
+        '1.1.1.1 a.a.a.a\n'
+        '1.1.1.1.1 a.a.a.a.a\n'
+        '1.1.1.1.1.1 a.a.a.a.a.a\n'
     )
 
 
@@ -444,6 +474,17 @@ def test_page_fn_header():
         'really, really, really, really, really, really, really, really, '
         'really, really, really, [...]\n'
     )
+
+    # created
+    file = BytesIO()
+    pdf = Pdf(file, created='created')
+    pdf.init_a4_portrait(page_fn_header)
+    pdf.generate()
+
+    file.seek(0)
+    reader = PdfFileReader(file)
+    assert reader.getNumPages() == 1
+    assert reader.getPage(0).extractText() == 'created\n'
 
 
 def test_page_fn_footer():
