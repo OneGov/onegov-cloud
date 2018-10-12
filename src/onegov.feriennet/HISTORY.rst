@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Improves cash payments wording.
+  [href]
+
 1.4.5 (2018-10-11)
 ~~~~~~~~~~~~~~~~~~~
 
