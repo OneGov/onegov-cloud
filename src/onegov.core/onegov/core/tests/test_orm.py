@@ -1686,6 +1686,91 @@ def test_associable_many_to_many(postgres_dsn):
     assert session.query(Address).count() == 1
 
 
+def test_associable_multiple(postgres_dsn):
+    Base = declarative_base(cls=ModelBase)
+
+    class Address(Base, Associable):
+        __tablename__ = 'adresses'
+
+        id = Column(Integer, primary_key=True)
+        town = Column(Text, nullable=False)
+
+    class Person(Base, Associable):
+        __tablename__ = 'people'
+
+        id = Column(Integer, primary_key=True)
+        name = Column(Text, nullable=False)
+
+        address = associated(Address, 'address', 'one-to-one')
+
+    class Company(Base):
+        __tablename__ = 'companies'
+
+        id = Column(Integer, primary_key=True)
+        name = Column(Text, nullable=False)
+
+        address = associated(Address, 'address', 'one-to-one')
+        employee = associated(Person, 'employee', 'one-to-many')
+
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('testing')
+
+    session = mgr.session()
+
+    session.add(Company(
+        name='Engulf & Devour',
+        address=Address(town='Ember'),
+        employee=[
+            Person(name='Alice', address=Address(town='Alicante')),
+            Person(name='Bob', address=Address(town='Brigadoon'))
+        ]
+    ))
+
+    company = session.query(Company).first()
+    assert company.address.town == "Ember"
+    assert {e.name: e.address.town for e in company.employee} == {
+        'Alice': 'Alicante', 'Bob': 'Brigadoon'
+    }
+
+    alice = session.query(Person).filter_by(name="Alice").one()
+    assert alice.address.town == "Alicante"
+    assert alice.linked_companies == [company]
+    assert alice.links.count() == 1
+
+    bob = session.query(Person).filter_by(name="Bob").one()
+    assert bob.address.town == "Brigadoon"
+    assert bob.linked_companies == [company]
+    assert bob.links.count() == 1
+
+    addresses = session.query(Address).all()
+    assert session.query(Address).count() == 3
+
+    assert addresses[0].links.count() == 1
+    assert addresses[0].links.first().name == "Engulf & Devour"
+    assert len(addresses[0].linked_companies) == 1
+    assert len(addresses[0].linked_people) == 0
+
+    assert addresses[1].links.count() == 1
+    assert addresses[1].links.first().name == "Alice"
+    assert len(addresses[1].linked_companies) == 0
+    assert len(addresses[1].linked_people) == 1
+
+    assert addresses[2].links.count() == 1
+    assert addresses[2].links.first().name == "Bob"
+    assert len(addresses[2].linked_companies) == 0
+    assert len(addresses[2].linked_people) == 1
+
+    session.delete(alice)
+    session.flush()
+
+    assert session.query(Address).count() == 2
+
+    session.delete(addresses[2])
+    session.flush()
+
+    assert session.query(Company).first().address.town == 'Ember'
+
+
 def test_selectable_sql_query(session):
     stmt = as_selectable("""
         SELECT
