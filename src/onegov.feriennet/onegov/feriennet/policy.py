@@ -1,7 +1,7 @@
 from onegov.activity import Activity, Occasion
 from onegov.feriennet.const import VISIBLE_ACTIVITY_STATES
 from morepath.authentication import NO_IDENTITY
-from sqlalchemy import and_, or_, exists
+from sqlalchemy import and_, or_
 
 
 class ActivityQueryPolicy(object):
@@ -31,7 +31,7 @@ class ActivityQueryPolicy(object):
         return query.filter(and_(
             Activity.state.in_(VISIBLE_ACTIVITY_STATES['anonymous']),
 
-            # excludes activites without any occasion in any period
+            # excludes activites without any occasion
             query.session.query(Occasion.activity_id).filter(
                 Occasion.activity_id == Activity.id
             ).exists()
