@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes clicks being triggered twice in certain cases.
+  [href]
+
 0.39.0 (2018-10-11)
 ~~~~~~~~~~~~~~~~~~~
 
