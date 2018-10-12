@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes archived occasions not being toggleable for editors.
+  [href]
+
 - Fixes an IE 11 display issue on Windows 7.
   [href]
 
