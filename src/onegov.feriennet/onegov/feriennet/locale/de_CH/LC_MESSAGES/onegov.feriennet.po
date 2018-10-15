@@ -1287,7 +1287,7 @@ msgid "Independent of other occasions"
 msgstr "Unabhängig von anderen Durchführungen"
 
 msgid "Please bring ${cost} CHF in cash."
-msgstr "Bitte bringen Sie CHF ${cost} in bar."
+msgstr "Bitte CHF ${cost} dem Veranstalter vor Ort bezahlen."
 
 msgid "Enroll your child now."
 msgstr "Melden Sie Ihr Kind jetzt an."
