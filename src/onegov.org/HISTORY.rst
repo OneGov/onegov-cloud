@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.39.2 (2018-10-15)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to redirect the homepage to a specific module.
   [href]
 
