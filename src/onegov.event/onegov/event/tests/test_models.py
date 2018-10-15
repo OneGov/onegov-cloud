@@ -116,10 +116,16 @@ def test_icalendar_recurrence():
     event = Event(state='initiated')
     assert event.icalendar_recurrence == None
 
-    event.recurrence = 'RRULE:FREQ=YEARLY;INTERVAL=1;COUNT=5'
-    assert event.icalendar_recurrence['FREQ'] == ['YEARLY']
-    assert event.icalendar_recurrence['INTERVAL'] == [1]
-    assert event.icalendar_recurrence['COUNT'] == [5]
+    event.recurrence = (
+        'RRULE:FREQ=WEEKLY;'
+        'UNTIL=20150616T220000Z;'
+        'BYDAY=MO,WE,FR'
+    )
+    assert event.icalendar_recurrence['FREQ'] == ['WEEKLY']
+    assert event.icalendar_recurrence['UNTIL'][0].year == 2015
+    assert event.icalendar_recurrence['UNTIL'][0].month == 6
+    assert event.icalendar_recurrence['UNTIL'][0].day == 16
+    assert event.icalendar_recurrence['BYDAY'] == ['MO', 'WE', 'FR']
 
 
 def test_occurrence_dates(session):
@@ -129,44 +135,48 @@ def test_occurrence_dates(session):
     event.timezone = 'Europe/Zurich'
     event.start = tzdatetime(year, 2, 7, 10, 15, 'Europe/Zurich')
     event.end = tzdatetime(year, 2, 7, 16, 00, 'Europe/Zurich')
-    event.recurrence = 'RRULE:FREQ=YEARLY;INTERVAL=1;COUNT=5'
+    event.recurrence = (
+        f'RRULE:FREQ=WEEKLY;'
+        f'UNTIL={year+2}0211T100000Z;'
+        f'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+    )
 
-    assert len(event.occurrence_dates(limit=False)) == 5
+    assert len(event.occurrence_dates(limit=False)) > 700
 
     dates = event.occurrence_dates()
-    assert len(dates) == 2
+    assert len(dates) < 700
     assert dates[0] == tzdatetime(year, 2, 7, 10, 15, 'Europe/Zurich')
-    assert dates[1] == tzdatetime(year + 1, 2, 7, 10, 15, 'Europe/Zurich')
+    assert dates[-1] == tzdatetime(year + 1, 12, 31, 10, 15, 'Europe/Zurich')
     assert str(dates[0].tzinfo) == 'UTC'
-    assert str(dates[1].tzinfo) == 'UTC'
+    assert str(dates[-1].tzinfo) == 'UTC'
 
     dates = event.occurrence_dates(localize=True)
-    assert len(dates) == 2
+    assert len(dates) < 700
     assert dates[0] == tzdatetime(year, 2, 7, 10, 15, 'Europe/Zurich')
-    assert dates[1] == tzdatetime(year + 1, 2, 7, 10, 15, 'Europe/Zurich')
+    assert dates[-1] == tzdatetime(year + 1, 12, 31, 10, 15, 'Europe/Zurich')
     assert str(dates[0].tzinfo) == 'Europe/Zurich'
-    assert str(dates[1].tzinfo) == 'Europe/Zurich'
+    assert str(dates[-1].tzinfo) == 'Europe/Zurich'
 
     event.title = 'Event'
     session.add(event)
     transaction.commit()
 
     event = session.query(Event).one()
-    assert len(event.occurrence_dates(limit=False)) == 5
+    assert len(event.occurrence_dates(limit=False)) > 700
 
     dates = event.occurrence_dates()
-    assert len(dates) == 2
+    assert len(dates) < 700
     assert dates[0] == tzdatetime(year, 2, 7, 10, 15, 'Europe/Zurich')
-    assert dates[1] == tzdatetime(year + 1, 2, 7, 10, 15, 'Europe/Zurich')
+    assert dates[-1] == tzdatetime(year + 1, 12, 31, 10, 15, 'Europe/Zurich')
     assert str(dates[0].tzinfo) == 'UTC'
-    assert str(dates[1].tzinfo) == 'UTC'
+    assert str(dates[-1].tzinfo) == 'UTC'
 
     dates = event.occurrence_dates(localize=True)
-    assert len(dates) == 2
+    assert len(dates) < 700
     assert dates[0] == tzdatetime(year, 2, 7, 10, 15, 'Europe/Zurich')
-    assert dates[1] == tzdatetime(year + 1, 2, 7, 10, 15, 'Europe/Zurich')
+    assert dates[-1] == tzdatetime(year + 1, 12, 31, 10, 15, 'Europe/Zurich')
     assert str(dates[0].tzinfo) == 'Europe/Zurich'
-    assert str(dates[1].tzinfo) == 'Europe/Zurich'
+    assert str(dates[-1].tzinfo) == 'Europe/Zurich'
 
 
 def test_lastest_occurrence(session):
@@ -183,7 +193,11 @@ def test_lastest_occurrence(session):
                 timezone='Europe/Zurich',
                 start=replace_timezone(start, 'Europe/Zurich'),
                 end=replace_timezone(end, 'Europe/Zurich'),
-                recurrence='RRULE:FREQ=DAILY;COUNT=3'
+                recurrence=(
+                    f'RRULE:FREQ=WEEKLY;'
+                    f'UNTIL={end.year}{end.month:02}{end.day:02}T220000Z;'
+                    f'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+                ),
             )
         )
         transaction.commit()
@@ -213,60 +227,21 @@ def test_occurrence_dates_dst(session):
     event.start = tzdatetime(year, 1, 1, 10, 15, 'Europe/Zurich')
     event.end = tzdatetime(year, 1, 11, 16, 00, 'Europe/Zurich')
 
-    event.recurrence = 'RRULE:FREQ=MONTHLY;COUNT=12'
-    occurrences = event.occurrence_dates(localize=True)
-    assert len(occurrences) == 12
-    assert all((o.hour == 10 for o in occurrences))
+    with pytest.raises(RuntimeError) as e:
+        event.recurrence = (
+            f'RRULE:FREQ=WEEKLY;'
+            f'UNTIL={year}12310000;'
+            f'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+        )
 
-    event.recurrence = 'RRULE:FREQ=MONTHLY;INTERVAL=1;COUNT=12'
-    occurrences = event.occurrence_dates(localize=True)
-    assert len(occurrences) == 12
-    assert all((o.hour == 10 for o in occurrences))
-
-    event.recurrence = f'RRULE:FREQ=MONTHLY;UNTIL={year}12310000'
-    occurrences = event.occurrence_dates(localize=True)
-    assert len(occurrences) == 12
-    assert all((o.hour == 10 for o in occurrences))
-
-    event.recurrence = f'RRULE:FREQ=MONTHLY;UNTIL={year}12310000Z'
-    occurrences = event.occurrence_dates(localize=True)
-    assert len(occurrences) == 12
-    assert all((o.hour == 10 for o in occurrences))
+    assert 'UNTIL is not timezone-aware' in str(e)
 
     event.recurrence = (
-        f'RRULE:FREQ=YEARLY;COUNT=2\r\n'
-        f'RDATE:{year}0606T000000\r\n'
-        f'EXDATE:{year+1}0101T000000'
+        f'RRULE:FREQ=WEEKLY;'
+        f'UNTIL={year}12310000Z;'
+        f'BYDAY=MO,TU,WE,TH,FR,SA,SU'
     )
     occurrences = event.occurrence_dates(localize=True)
-    assert len(occurrences) == 2
-    assert all((o.hour == 10 for o in occurrences))
-
-    event.recurrence = (
-        f'RRULE:FREQ=YEARLY;COUNT=2\r\n'
-        f'RDATE:{year}0606000000\r\n'
-        f'EXDATE:{year+1}0101101500'
-    )
-    occurrences = event.occurrence_dates(localize=True)
-    assert len(occurrences) == 2
-    assert all((o.hour == 10 for o in occurrences))
-
-    event.recurrence = (
-        f'RRULE:FREQ=YEARLY;COUNT=2\r\n'
-        f'RDATE:{year}0606000000Z\r\n'
-        f'EXDATE:{year+1}0101000000Z'
-    )
-    occurrences = event.occurrence_dates(localize=True)
-    assert len(occurrences) == 2
-    assert all((o.hour == 10 for o in occurrences))
-
-    event.recurrence = (
-        f'RRULE:FREQ=YEARLY;COUNT=2\r\n'
-        f'RDATE:{year}0606000000Z\r\n'
-        f'EXDATE:{year+1}0101171700Z'
-    )
-    occurrences = event.occurrence_dates(localize=True)
-    assert len(occurrences) == 2
     assert all((o.hour == 10 for o in occurrences))
 
 
@@ -283,7 +258,11 @@ def test_create_event_recurring(session):
     event.timezone = timezone
     event.start = start
     event.end = end
-    event.recurrence = 'RRULE:FREQ=DAILY;INTERVAL=2;COUNT=5'
+    event.recurrence = (
+        'RRULE:FREQ=WEEKLY;'
+        'UNTIL=200802111500Z;'
+        'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+    )
     event.title = title
     event.content = {'description': description}
     event.location = location
@@ -307,7 +286,11 @@ def test_create_event_recurring(session):
     assert event.localized_end == end
     assert str(event.end.tzinfo) == 'UTC'
     assert str(event.localized_end.tzinfo) == timezone
-    assert event.recurrence == 'RRULE:FREQ=DAILY;INTERVAL=2;COUNT=5'
+    assert event.recurrence == (
+        'RRULE:FREQ=WEEKLY;'
+        'UNTIL=200802111500Z;'
+        'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+    )
     assert event.title == title
     assert event.location == location
     assert sorted(event.tags) == sorted(tags)
@@ -335,37 +318,37 @@ def test_create_event_recurring(session):
     assert occurrences[0].localized_end == end
     assert occurrences[0].name == 'event-2008-02-07'
 
-    start = tzdatetime(2008, 2, 9, 10, 15, timezone)
-    end = tzdatetime(2008, 2, 9, 16, 00, timezone)
+    start = tzdatetime(2008, 2, 8, 10, 15, timezone)
+    end = tzdatetime(2008, 2, 8, 16, 00, timezone)
     assert occurrences[1].start == start
     assert occurrences[1].localized_start == start
     assert occurrences[1].end == end
     assert occurrences[1].localized_end == end
-    assert occurrences[1].name == 'event-2008-02-09'
+    assert occurrences[1].name == 'event-2008-02-08'
 
-    start = tzdatetime(2008, 2, 11, 10, 15, timezone)
-    end = tzdatetime(2008, 2, 11, 16, 00, timezone)
+    start = tzdatetime(2008, 2, 9, 10, 15, timezone)
+    end = tzdatetime(2008, 2, 9, 16, 00, timezone)
     assert occurrences[2].start == start
     assert occurrences[2].localized_start == start
     assert occurrences[2].end == end
     assert occurrences[2].localized_end == end
-    assert occurrences[2].name == 'event-2008-02-11'
+    assert occurrences[2].name == 'event-2008-02-09'
 
-    start = tzdatetime(2008, 2, 13, 10, 15, timezone)
-    end = tzdatetime(2008, 2, 13, 16, 00, timezone)
+    start = tzdatetime(2008, 2, 10, 10, 15, timezone)
+    end = tzdatetime(2008, 2, 10, 16, 00, timezone)
     assert occurrences[3].start == start
     assert occurrences[3].localized_start == start
     assert occurrences[3].end == end
     assert occurrences[3].localized_end == end
-    assert occurrences[3].name == 'event-2008-02-13'
+    assert occurrences[3].name == 'event-2008-02-10'
 
-    start = tzdatetime(2008, 2, 15, 10, 15, timezone)
-    end = tzdatetime(2008, 2, 15, 16, 00, timezone)
+    start = tzdatetime(2008, 2, 11, 10, 15, timezone)
+    end = tzdatetime(2008, 2, 11, 16, 00, timezone)
     assert occurrences[4].start == start
     assert occurrences[4].localized_start == start
     assert occurrences[4].end == end
     assert occurrences[4].localized_end == end
-    assert occurrences[4].name == 'event-2008-02-15'
+    assert occurrences[4].name == 'event-2008-02-11'
 
     assert (sorted([o.id for o in event.occurrences]) ==
             sorted([o.id for o in occurrences]))
@@ -374,62 +357,6 @@ def test_create_event_recurring(session):
     assert occurrences[2].event.id == event.id
     assert occurrences[3].event.id == event.id
     assert occurrences[4].event.id == event.id
-
-
-def test_create_event_recurring_dtstart(session):
-    timezone = 'Europe/Zurich'
-
-    event = Event(state='initiated')
-    event.timezone = timezone
-    event.start = tzdatetime(2008, 2, 7, 10, 15, timezone)
-    event.end = tzdatetime(2008, 2, 7, 16, 00, timezone)
-    event.title = 'Squirrel Park Visit'
-    event.recurrence = ('DTSTART:19970902T090000\n'
-                        'RRULE:FREQ=DAILY;INTERVAL=2;COUNT=5')
-    session.add(event)
-
-    event.submit()
-    event.publish()
-
-    transaction.commit()
-
-    occurrences = session.query(Event).one().occurrences
-    assert len(occurrences) == 5
-    assert occurrences[0].start == tzdatetime(1997, 9, 2, 9, 0, timezone)
-    assert occurrences[0].end == tzdatetime(1997, 9, 2, 14, 45, timezone)
-    assert occurrences[1].start == tzdatetime(1997, 9, 4, 9, 0, timezone)
-    assert occurrences[1].end == tzdatetime(1997, 9, 4, 14, 45, timezone)
-    assert occurrences[2].start == tzdatetime(1997, 9, 6, 9, 0, timezone)
-    assert occurrences[2].end == tzdatetime(1997, 9, 6, 14, 45, timezone)
-    assert occurrences[3].start == tzdatetime(1997, 9, 8, 9, 0, timezone)
-    assert occurrences[3].end == tzdatetime(1997, 9, 8, 14, 45, timezone)
-    assert occurrences[4].start == tzdatetime(1997, 9, 10, 9, 0, timezone)
-    assert occurrences[4].end == tzdatetime(1997, 9, 10, 14, 45, timezone)
-
-
-def test_create_event_recurring_limit(session):
-    timezone = 'Europe/Zurich'
-
-    event = Event(state='initiated')
-    year = datetime.today().year
-    event.timezone = timezone
-    event.start = tzdatetime(year, 2, 7, 10, 15, timezone)
-    event.end = tzdatetime(year, 2, 7, 16, 00, timezone)
-    event.title = 'Squirrel Park Visit'
-    event.recurrence = 'RRULE:FREQ=YEARLY;INTERVAL=1;COUNT=5'
-    session.add(event)
-
-    event.submit()
-    event.publish()
-
-    transaction.commit()
-
-    occurrences = session.query(Event).one().occurrences
-    assert len(occurrences) == 2
-    assert occurrences[0].start == tzdatetime(year, 2, 7, 10, 15, timezone)
-    assert occurrences[0].end == tzdatetime(year, 2, 7, 16, 00, timezone)
-    assert occurrences[1].start == tzdatetime(year + 1, 2, 7, 10, 15, timezone)
-    assert occurrences[1].end == tzdatetime(year + 1, 2, 7, 16, 00, timezone)
 
 
 def test_update_event(session):
@@ -484,7 +411,11 @@ def test_update_event(session):
     assert sorted(occurence.event.tags) == sorted(event.tags)
     assert sorted(occurence.tags) == sorted(event.tags)
 
-    event.recurrence = 'RRULE:FREQ=DAILY;INTERVAL=1;COUNT=2'
+    event.recurrence = (
+        'RRULE:FREQ=WEEKLY;'
+        'UNTIL=20090209T090000Z;'
+        'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+    )
     occurrences = session.query(Event).one().occurrences
     assert len(occurrences) == 2
     assert occurrences[0].start == tzdatetime(2009, 2, 7, 10, 15, timezone)
@@ -589,7 +520,11 @@ def test_as_ical():
         timezone='Europe/Zurich',
         start=tzdatetime(2008, 2, 7, 10, 15, 'Europe/Zurich'),
         end=tzdatetime(2008, 2, 7, 16, 00, 'Europe/Zurich'),
-        recurrence='RRULE:FREQ=DAILY;INTERVAL=2;COUNT=5',
+        recurrence=(
+            'RRULE:FREQ=WEEKLY;'
+            'UNTIL=20080207T150000Z;'
+            'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+        ),
         title='Squirrel Park Visit',
         content={'description': '<em>Furry</em> things will happen!'},
         location='Squirrel Park',
@@ -611,13 +546,15 @@ def test_as_ical():
         'DTEND;VALUE=DATE-TIME:20080207T150000Z',
         'DTSTAMP;VALUE=DATE-TIME:20080207T091500Z',
         'DESCRIPTION:<em>Furry</em> things will happen!',
-        'CATEGORIES:fun',
-        'CATEGORIES:animals',
-        'CATEGORIES:furry',
+        'CATEGORIES:fun,animals,furry',
         'LAST-MODIFIED;VALUE=DATE-TIME:20080207T091500Z',
         'LOCATION:Squirrel Park',
         'GEO:47.051752750515746;8.305739625357093',
-        'RRULE:FREQ=DAILY;COUNT=5;INTERVAL=2',
+        (
+            'RRULE:FREQ=WEEKLY;'
+            'UNTIL=20080207T150000Z;'
+            'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+        ),
         'URL:https://example.org/my-event',
         'END:VEVENT',
         'END:VCALENDAR',
@@ -640,9 +577,7 @@ def test_as_ical():
         'DTEND;VALUE=DATE-TIME:20080207T150000Z',
         'DTSTAMP;VALUE=DATE-TIME:20080207T091500Z',
         'DESCRIPTION:<em>Furry</em> things will happen!',
-        'CATEGORIES:fun',
-        'CATEGORIES:animals',
-        'CATEGORIES:furry',
+        'CATEGORIES:fun,animals,furry',
         'LAST-MODIFIED;VALUE=DATE-TIME:20080207T091500Z',
         'LOCATION:Squirrel Park',
         'GEO:47.051752750515746;8.305739625357093',

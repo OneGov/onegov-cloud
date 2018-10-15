@@ -1,4 +1,5 @@
 from datetime import datetime
+from dateutil import rrule
 from dateutil.rrule import rrulestr
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
@@ -25,6 +26,7 @@ from sqlalchemy import Text
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import validates
 from uuid import uuid4
 
 
@@ -130,6 +132,52 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
 
         return current.union_all(future, past).first()
 
+    @validates('recurrence')
+    def validate_rrule(self, key, r):
+        """ Our rrules are quite limited in their complexity. This validator
+        makes sure that is actually the case.
+
+        This is a somewhat harsh limit, but it mirrors the actual use of
+        onegov.event at this point. More complex rrules are not handled by the
+        UI, nor is there currently a plan to do so.
+
+        We might possibly introduce the ability to just define a list of
+        dates (RDATE) as an alternative. Basically the UI would have a
+        second way of adding dates, which is by selecting a bunch of them.
+
+        The rational is that people commonlyadd  recurring events on a weekly
+        basis (which is a lot of work for a whole year). Or on a monthly
+        or yearly basis, in which case selection of single dates is
+        acceptable, or even preferrable to complex rrules.
+
+        This UI talk doesn't belong into a module of course, but it is again
+        a reailty that only a strict subset of rules is handled and so we want
+        to catch events which we cannot edit in our UI early if they are
+        imported from outside.
+
+        """
+        if r:
+            rule = rrulestr(r)
+
+            # we are limited to simple rrules, which always have a frequency
+            if not hasattr(rule, '_freq'):
+                raise RuntimeError(f"'{r}' is too complex")
+
+            # we also only do weekly recurrences (they can also be used
+            # to do daily recurrences if they are set to include all days)
+            if not rule._freq == rrule.WEEKLY:
+                raise RuntimeError(f"The frequency of '{r}' is not WEEKLY")
+
+            # we require a definite end
+            if not getattr(rule, '_until'):
+                raise RuntimeError(f"'{r}' has no UNTIL")
+
+            # we also want the end date to be timezone-aware
+            if rule._until.tzinfo is None:
+                raise RuntimeError(f"'{r}''s UNTIL is not timezone-aware")
+
+        return r
+
     def occurrence_dates(self, limit=True, localize=False):
         """ Returns the start dates of all occurrences.
 
@@ -147,28 +195,28 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
             # Make sure the RRULE uses local dates (or else the DST is wrong)
             start_local = to_local(self.start, self.timezone)
             try:
-                rrule = rrulestr(self.recurrence, dtstart=self.start)
-                if getattr(rrule, '_dtstart', None):
-                    rrule._dtstart = to_local(rrule._dtstart, self.timezone)
-                if getattr(rrule, '_until', None):
-                    rrule._until = to_local(rrule._until, self.timezone)
-                rrule = rrulestr(str(rrule))
+                rule = rrulestr(self.recurrence, dtstart=self.start)
+                if getattr(rule, '_dtstart', None):
+                    rule._dtstart = to_local(rule._dtstart, self.timezone)
+                if getattr(rule, '_until', None):
+                    rule._until = to_local(rule._until, self.timezone)
+                rule = rrulestr(str(rule))
             except ValueError:
                 # This might happen if only RDATEs and EXDATEs are present
-                rrule = rrulestr(self.recurrence, dtstart=start_local)
+                rule = rrulestr(self.recurrence, dtstart=start_local)
 
             # Make sure, the RDATEs and EXDATEs contain the start times
             for attribute in ('_exdate', '_rdate'):
-                if hasattr(rrule, attribute):
-                    setattr(rrule, attribute, [
+                if hasattr(rule, attribute):
+                    setattr(rule, attribute, [
                         to_local(date_, self.timezone).replace(
                             hour=start_local.hour, minute=start_local.minute
                         )
-                        for date_ in getattr(rrule, attribute)
+                        for date_ in getattr(rule, attribute)
                     ])
 
             # Generate the occurences and convert to UTC
-            dates = [standardize_date(date_, self.timezone) for date_ in rrule]
+            dates = [standardize_date(date_, self.timezone) for date_ in rule]
 
         if localize:
             dates = [to_timezone(date_, self.timezone) for date_ in dates]

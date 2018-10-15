@@ -4,6 +4,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
+from onegov.event import EventCollection
 from sqlalchemy import Column
 
 
@@ -34,3 +35,9 @@ def migrate_coordinates_column(context):
     """)
 
     context.operations.drop_column('events', 'coordinates')
+
+
+@upgrade_task('Validate existing rrules')
+def validate_existing_rrules(context):
+    for event in EventCollection(context.session).query():
+        event.validate_rrule('recurrence', event.recurrence)

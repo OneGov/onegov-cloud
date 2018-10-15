@@ -60,8 +60,12 @@ def test_import_guidle(session, xml):
 
     assert schedules[2].start == tzdatetime(2018, 6, 15, 8, 0)
     assert schedules[2].end == tzdatetime(2018, 6, 15, 23, 59)
-    assert schedules[2].recurrence == 'RRULE:FREQ=DAILY;UNTIL=20181016T0000Z'
+    assert schedules[2].recurrence == (
+        'RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU;UNTIL=20181016T0000Z'
+    )
 
     assert schedules[3].start == tzdatetime(2018, 8, 18, 0, 0)
     assert schedules[3].end == tzdatetime(2018, 8, 18, 23, 59)
-    assert schedules[3].recurrence == 'RRULE:FREQ=DAILY;UNTIL=20181101T0000Z'
+    assert schedules[3].recurrence == (
+        'RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU;UNTIL=20181101T0000Z'
+    )

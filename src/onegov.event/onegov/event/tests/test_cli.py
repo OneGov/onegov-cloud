@@ -24,7 +24,7 @@ def test_import_ical(cfg_path, temporary_directory):
         'DTSTART;VALUE=DATE-TIME:20150616T133000Z',
         'DTEND;VALUE=DATE-TIME:20150616T220000Z',
         'DTSTAMP;VALUE=DATE-TIME:20140101T000000Z',
-        'RRULE:FREQ=DAILY;COUNT=5;INTERVAL=1',
+        'RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU;UNTIL=20150616T220000Z',
         'DESCRIPTION:<em>Furry</em> things will happen!',
         'CATEGORIES:fun',
         'CATEGORIES:animals',

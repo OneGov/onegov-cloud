@@ -158,6 +158,7 @@ class EventCollection(Pagination):
 
         added = 0
         updated = 0
+
         for event in events:
             existing = self.session.query(Event).filter(
                 Event.meta['source'] == event.meta['source']
@@ -260,7 +261,12 @@ class EventCollection(Pagination):
 
             tags = vevent.get('categories')
             if tags:
-                tags = [str(tag) for tag in tags]
+                # categories may be in lists or they may be single values
+                # whose 'cats' member contains the texts
+                if not hasattr(tags, '__iter__'):
+                    tags = [tags]
+
+                tags = [str(c) for tag in tags for c in tag.cats]
 
             uid = str(vevent.get('uid', ''))
             title = str(vevent.get('summary', ''))

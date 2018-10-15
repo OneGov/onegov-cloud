@@ -39,7 +39,11 @@ def test_event_collection(session):
         },
         location='Squirrel Park',
         tags=['fun', 'animals'],
-        recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5'
+        recurrence=(
+            'RRULE:FREQ=WEEKLY;'
+            'BYDAY=MO,TU,WE,TH,FR,SA,SU;'
+            'UNTIL=20150616T220000Z'
+        )
     )
     event_1.submit()
     event_1.publish()
@@ -98,7 +102,11 @@ def test_event_collection_pagination(session):
                 end=datetime(year, month, 18, 16, 00),
                 timezone='US/Eastern',
                 tags=['month-{0}'.format(month)],
-                recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=4'
+                recurrence=(
+                    f'RRULE:FREQ=WEEKLY;'
+                    f'BYDAY=MO,TU,WE,TH,FR,SA,SU;'
+                    f'UNTIL={year}{month:02}18T220000Z'
+                )
             )
             event.submit()
             if year > 2008:
@@ -147,7 +155,11 @@ def test_occurrence_collection(session):
         },
         location='Squirrel Park',
         tags=['fun', 'park', 'animals'],
-        recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5'
+        recurrence=(
+            'RRULE:FREQ=WEEKLY;'
+            'BYDAY=MO,TU,WE,TH,FR,SA,SU;'
+            'UNTIL=20150619T220000Z'
+        )
     )
     event.submit()
     event.publish()
@@ -215,7 +227,11 @@ def test_occurrence_collection_pagination(session):
                 end=datetime(year, month, 18, 16, 00),
                 timezone='US/Eastern',
                 tags=['month-{0}'.format(month)],
-                recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=4'
+                recurrence=(
+                    f'RRULE:FREQ=WEEKLY;'
+                    f'BYDAY=MO,TU,WE,TH,FR,SA,SU;'
+                    f'UNTIL={year}{month:02}21T220000Z'
+                )
             )
             event.submit()
             if year > 2008:
@@ -358,7 +374,11 @@ def test_unique_names(session):
         start=datetime(2015, 6, 16, 9, 30),
         end=datetime(2015, 6, 16, 18, 00),
         timezone='US/Eastern',
-        recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5'
+        recurrence=(
+            'RRULE:FREQ=WEEKLY;'
+            'BYDAY=MO,TU,WE,TH,FR,SA,SU;'
+            'UNTIL=20150620T220000Z'
+        )
     )
     assert event.name == 'squirrel-park-visit-6'
 
@@ -453,7 +473,11 @@ def test_as_ical(session):
             },
             location='Squirrel Park',
             tags=['fun', 'animals'],
-            recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5',
+            recurrence=(
+                'RRULE:FREQ=WEEKLY;'
+                'BYDAY=MO,TU,WE,TH,FR,SA,SU;'
+                'UNTIL=20150616T220000Z'
+            ),
             coordinates=Coordinates(47.051752750515746, 8.305739625357093)
         )
         event.submit()
@@ -498,10 +522,9 @@ def test_as_ical(session):
         'DTSTART;VALUE=DATE-TIME:20150616T133000Z',
         'DTEND;VALUE=DATE-TIME:20150616T220000Z',
         'DTSTAMP;VALUE=DATE-TIME:20140101T000000Z',
-        'RRULE:FREQ=DAILY;COUNT=5;INTERVAL=1',
+        'RRULE:FREQ=WEEKLY;UNTIL=20150616T220000Z;BYDAY=MO,TU,WE,TH,FR,SA,SU',
         'DESCRIPTION:<em>Furry</em> things will happen!',
-        'CATEGORIES:fun',
-        'CATEGORIES:animals',
+        'CATEGORIES:fun,animals',
         'LAST-MODIFIED;VALUE=DATE-TIME:20140101T000000Z',
         'LOCATION:Squirrel Park',
         'GEO:47.051752750515746;8.305739625357093',
@@ -563,7 +586,11 @@ def test_from_import(session):
             timezone='US/Eastern',
             description='Description A',
             organizer='Organizer A',
-            recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5',
+            recurrence=(
+                'RRULE:FREQ=WEEKLY;'
+                'UNTIL=20150616T220000Z;'
+                'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+            ),
             coordinates=Coordinates(48.051752750515746, 9.305739625357093),
             source='import-1-A'
         ),
@@ -577,7 +604,11 @@ def test_from_import(session):
             timezone='US/Eastern',
             description='Description B',
             organizer='Organizer B',
-            recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5',
+            recurrence=(
+                'RRULE:FREQ=WEEKLY;'
+                'UNTIL=20150616T220000Z;'
+                'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+            ),
             coordinates=Coordinates(48.051752750515746, 9.305739625357093),
             source='import-1-B'
         ),
@@ -594,7 +625,11 @@ def test_from_import(session):
             timezone='US/Eastern',
             description='Description C',
             organizer='Organizer C',
-            recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5',
+            recurrence=(
+                'RRULE:FREQ=WEEKLY;'
+                'UNTIL=20150616T220000Z;'
+                'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+            ),
             coordinates=Coordinates(48.051752750515746, 9.305739625357093),
             source='import-2-C'
         )
@@ -612,7 +647,11 @@ def test_from_import(session):
             timezone='US/Eastern',
             description='Description C',
             organizer='Organizer C',
-            recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5',
+            recurrence=(
+                'RRULE:FREQ=WEEKLY;'
+                'UNTIL=20150616T220000Z;'
+                'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+            ),
             coordinates=Coordinates(48.051752750515746, 9.305739625357093),
             source='import-2-C'
         )
@@ -630,7 +669,11 @@ def test_from_import(session):
             timezone='US/Eastern',
             description='Description A',
             organizer='Organizer A',
-            recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5',
+            recurrence=(
+                'RRULE:FREQ=WEEKLY;'
+                'UNTIL=20150616T220000Z;'
+                'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+            ),
             coordinates=Coordinates(48.051752750515746, 9.305739625357093),
             source='import-1-A'
         ),
@@ -650,7 +693,11 @@ def test_from_import(session):
             timezone='US/Eastern',
             description='Description C',
             organizer='Organizer C',
-            recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5',
+            recurrence=(
+                'RRULE:FREQ=WEEKLY;'
+                'UNTIL=20150616T220000Z;'
+                'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+            ),
             coordinates=Coordinates(48.051752750515746, 9.305739625357093),
             source='import-2-C'
         )
@@ -680,10 +727,13 @@ def test_from_ical(session):
         'DTSTART;VALUE=DATE-TIME:20150616T133100Z',
         'DTEND;VALUE=DATE-TIME:20150616T220100Z',
         'DTSTAMP;VALUE=DATE-TIME:20140101T000000Z',
-        'RRULE:FREQ=DAILY;COUNT=4;INTERVAL=1',
+        (
+            'RRULE:FREQ=WEEKLY;'
+            'UNTIL=20150619T220000Z;'
+            'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+        ),
         'DESCRIPTION:<em>Furri</em> things will happen!',
-        'CATEGORIES:funn',
-        'CATEGORIES:annimals',
+        'CATEGORIES:fun,animals',
         'LAST-MODIFIED;VALUE=DATE-TIME:20140101T000000Z',
         'LOCATION:Squirrel Par',
         'GEO:48.051752750515746;9.305739625357093',
@@ -701,9 +751,13 @@ def test_from_ical(session):
     assert event.end == tzdatetime(2015, 6, 16, 18, 1, 'US/Eastern')
     assert str(event.end.tzinfo) == 'UTC'
     assert event.timezone == 'Europe/Zurich'
-    assert event.recurrence == 'RRULE:FREQ=DAILY;COUNT=4;INTERVAL=1'
+    assert event.recurrence == (
+        'RRULE:FREQ=WEEKLY;'
+        'UNTIL=20150619T220000Z;'
+        'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+    )
     assert [o.start.day for o in event.occurrences] == [16, 17, 18, 19]
-    assert sorted(event.tags) == ['annimals', 'funn']
+    assert sorted(event.tags) == ['animals', 'fun']
     assert int(event.coordinates.lat) == 48
     assert int(event.coordinates.lon) == 9
 
@@ -718,10 +772,13 @@ def test_from_ical(session):
         'DTSTART;VALUE=DATE-TIME:20150616T133000Z',
         'DTEND;VALUE=DATE-TIME:20150616T220000Z',
         'DTSTAMP;VALUE=DATE-TIME:20140101T000000Z',
-        'RRULE:FREQ=DAILY;COUNT=5;INTERVAL=1',
+        (
+            'RRULE:FREQ=WEEKLY;'
+            'UNTIL=20150620T220000Z;'
+            'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+        ),
         'DESCRIPTION:<em>Furry</em> things will happen!',
-        'CATEGORIES:fun',
-        'CATEGORIES:animals',
+        'CATEGORIES:fun,animals',
         'LAST-MODIFIED;VALUE=DATE-TIME:20140101T000000Z',
         'LOCATION:Squirrel Park',
         'GEO:47.051752750515746;8.305739625357093',
@@ -739,7 +796,11 @@ def test_from_ical(session):
     assert event.end == tzdatetime(2015, 6, 16, 18, 0, 'US/Eastern')
     assert str(event.end.tzinfo) == 'UTC'
     assert event.timezone == 'Europe/Zurich'
-    assert event.recurrence == 'RRULE:FREQ=DAILY;COUNT=5;INTERVAL=1'
+    assert event.recurrence == (
+        'RRULE:FREQ=WEEKLY;'
+        'UNTIL=20150620T220000Z;'
+        'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+    )
     assert [o.start.day for o in event.occurrences] == [16, 17, 18, 19, 20]
     assert sorted(event.tags) == ['animals', 'fun']
     assert int(event.coordinates.lat) == 47
@@ -756,10 +817,13 @@ def test_from_ical(session):
         'DTSTART;VALUE=DATE:20150616',
         'DTEND;VALUE=DATE:20150616',
         'DTSTAMP;VALUE=DATE-TIME:20140101T000000Z',
-        'RRULE:FREQ=DAILY;COUNT=4;INTERVAL=1',
+        (
+            'RRULE:FREQ=WEEKLY;'
+            'UNTIL=20150616T220000Z;'
+            'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+        ),
         'DESCRIPTION:<em>Furri</em> things will happen!',
-        'CATEGORIES:fun',
-        'CATEGORIES:animals',
+        'CATEGORIES:fun,animals',
         'LAST-MODIFIED;VALUE=DATE-TIME:20140101T000000Z',
         'LOCATION:Squirrel Par',
         'GEO:48.051752750515746;9.305739625357093',
@@ -783,10 +847,13 @@ def test_from_ical(session):
         'DTSTART;VALUE=DATE-TIME:20150616T133000',
         'DTEND;VALUE=DATE-TIME:20150616T220000',
         'DTSTAMP;VALUE=DATE-TIME:20140101T000000Z',
-        'RRULE:FREQ=DAILY;COUNT=5;INTERVAL=1',
+        (
+            'RRULE:FREQ=WEEKLY;'
+            'UNTIL=20150616T220000Z;'
+            'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+        ),
         'DESCRIPTION:<em>Furry</em> things will happen!',
-        'CATEGORIES:fun',
-        'CATEGORIES:animals',
+        'CATEGORIES:fun,animals',
         'LAST-MODIFIED;VALUE=DATE-TIME:20140101T000000Z',
         'LOCATION:Squirrel Park',
         'GEO:47.051752750515746;8.305739625357093',
@@ -810,10 +877,13 @@ def test_from_ical(session):
         'DTSTART;VALUE=DATE-TIME:20150616T133000',
         'DURATION:PT8H30M',
         'DTSTAMP;VALUE=DATE-TIME:20140101T000000Z',
-        'RRULE:FREQ=DAILY;COUNT=5;INTERVAL=1',
+        (
+            'RRULE:FREQ=WEEKLY;'
+            'UNTIL=20150616T220000Z;'
+            'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+        ),
         'DESCRIPTION:<em>Furry</em> things will happen!',
-        'CATEGORIES:fun',
-        'CATEGORIES:animals',
+        'CATEGORIES:fun,animals',
         'LAST-MODIFIED;VALUE=DATE-TIME:20140101T000000Z',
         'LOCATION:Squirrel Park',
         'GEO:47.051752750515746;8.305739625357093',

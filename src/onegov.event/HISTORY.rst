@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Strictly limits rrules to weekly rules with an until date set in UTC.
+  [href]
+
 0.9.0 (2018-09-24)
 ~~~~~~~~~~~~~~~~~~~
 
