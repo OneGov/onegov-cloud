@@ -2,14 +2,15 @@ import click
 import re
 import transaction
 
+from io import BytesIO
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.people import PersonCollection
 from onegov.people.collections import AgencyCollection
 from onegov.people.models import AgencyMembership
+from requests import get
 from textwrap import indent
 from xlrd import open_workbook
-
 
 cli = command_group()
 
@@ -57,9 +58,21 @@ def import_agencies(group_context, file, clear, dry_run, visualize):
                 description=sheet.cell_value(row, 3).strip(),
                 portrait=sheet.cell_value(row, 4).strip(),
                 order=id_,
+                meta={
+                    'export_fields': sheet.cell_value(row, 7),
+                    'state': sheet.cell_value(row, 8)
+                }
             )
+
+            organigram_url = sheet.cell_value(row, 6)
+            if organigram_url:
+                response = get(organigram_url)
+                response.raise_for_status()
+                agency.organigram = BytesIO(response.content)
+
             if sheet.cell_value(row, 5):
                 alphabetical.append(id_)
+
             for child in sheet.cell_value(row, 1).split(','):
                 parents[int(child or -1)] = agency
 
@@ -71,9 +84,6 @@ def import_agencies(group_context, file, clear, dry_run, visualize):
         for order, root in enumerate(agencies.roots):
             root.order = order
             defrag_ordering(root)
-
-        # from onegov.people import Agency
-        # session.query(Agency.order).all()
 
         click.secho("Importing people and memberships", fg='green')
         sheet = workbook.sheet_by_name('Personen')

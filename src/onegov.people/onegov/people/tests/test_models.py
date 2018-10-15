@@ -56,7 +56,8 @@ def test_person_polymorphism(session):
     assert session.query(MyOtherPerson).one().first_name == 'other'
 
 
-def test_agency(session):
+def test_agency(test_app):
+    session = test_app.session()
     session.add(
         Agency(
             title="Foreigners' registration office",
@@ -66,7 +67,8 @@ def test_agency(session):
                 "The Foreigners’ Registration Office is responsible for "
                 "matters related to laws concerning foreigners, as well as "
                 "the granting and extension of residence permits."
-            )
+            ),
+            organigram=b'png'
         )
     )
     session.flush()
@@ -82,6 +84,7 @@ def test_agency(session):
     )
     assert not agency.meta
     assert not agency.content
+    assert agency.organigram.read() == b'png'
 
 
 def test_agency_add_person(session):

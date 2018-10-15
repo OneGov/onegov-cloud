@@ -6,12 +6,13 @@ from onegov.people.models import Person
 from pytest import mark
 from textwrap import dedent
 from textwrap import indent
+from unittest.mock import patch
 
 
 @mark.parametrize("file", [
     module_path('onegov.people', 'tests/fixtures/export-agencies.xls'),
 ])
-def test_import_agencies(cfg_path, temporary_directory, session_manager, file):
+def test_import_agencies(cfg_path, session_manager, file):
     runner = CliRunner()
 
     expected = dedent("""
@@ -80,35 +81,44 @@ def test_import_agencies(cfg_path, temporary_directory, session_manager, file):
             * Mitglied: Weber Monika
     """).strip()
 
+    class DummyResponse(object):
+        content = b'image'
+
+        def raise_for_status(self):
+            pass
+
     # Import
-    result = runner.invoke(cli, [
-        '--config', cfg_path,
-        '--select', '/foo/bar',
-        'import-agencies', file,
-        '--visualize'
-    ])
+    with patch('onegov.people.cli.get', return_value=DummyResponse()):
+        result = runner.invoke(cli, [
+            '--config', cfg_path,
+            '--select', '/foo/bar',
+            'import-agencies', file,
+            '--visualize'
+        ])
     assert result.exit_code == 0
     assert indent(expected, '  ') in result.output
 
     # Reimport
-    result = runner.invoke(cli, [
-        '--config', cfg_path,
-        '--select', '/foo/bar',
-        'import-agencies', file,
-        '--visualize', '--clear'
-    ])
+    with patch('onegov.people.cli.get', return_value=DummyResponse()):
+        result = runner.invoke(cli, [
+            '--config', cfg_path,
+            '--select', '/foo/bar',
+            'import-agencies', file,
+            '--visualize', '--clear'
+        ])
     assert result.exit_code == 0
     assert "Deleting all agencies" in result.output
     assert "Deleting all people" in result.output
     assert indent(expected, '  ') in result.output
 
     # Reimport (dry)
-    result = runner.invoke(cli, [
-        '--config', cfg_path,
-        '--select', '/foo/bar',
-        'import-agencies', file,
-        '--visualize', '--clear', '--dry-run'
-    ])
+    with patch('onegov.people.cli.get', return_value=DummyResponse()):
+        result = runner.invoke(cli, [
+            '--config', cfg_path,
+            '--select', '/foo/bar',
+            'import-agencies', file,
+            '--visualize', '--clear', '--dry-run'
+        ])
     assert result.exit_code == 0
     assert "Deleting all agencies" in result.output
     assert "Deleting all people" in result.output
@@ -120,6 +130,11 @@ def test_import_agencies(cfg_path, temporary_directory, session_manager, file):
     agency = session.query(Agency).filter_by(title="Nationalrat").one()
     assert agency.description == "NR"
     assert agency.portrait == "<p>2016/2019</p>"
+    assert agency.meta['state'] == 'published'
+    assert agency.meta['export_fields'] == (
+        'role,title,academic_title,political_party'
+    )
+    assert agency.organigram.read() == b'image'
 
     person = session.query(Person).filter_by(last_name="Balmer").one()
     assert person.meta['academic_title'] == "lic.iur."

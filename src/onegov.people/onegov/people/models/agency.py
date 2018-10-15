@@ -1,11 +1,19 @@
+from onegov.core.crypto import random_token
 from onegov.core.orm.abstract import AdjacencyList
+from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.utils import normalize_for_url
+from onegov.file import File
+from onegov.file.utils import as_fileintent
 from onegov.people.models.membership import AgencyMembership
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import Text
+
+
+class AgencyOrganigram(File):
+    __mapper_args__ = {'polymorphic_identity': 'agency_organigram'}
 
 
 class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable):
@@ -36,6 +44,21 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable):
 
     #: describes the agency
     portrait = Column(Text, nullable=True)
+
+    #: an organization chart
+    _organigram = associated(AgencyOrganigram, 'organigram', 'one-to-one')
+
+    @property
+    def organigram(self):
+        if self._organigram:
+            return self._organigram.reference.file
+
+    @organigram.setter
+    def organigram(self, value):
+        organigram = AgencyOrganigram(id=random_token())
+        organigram.reference = as_fileintent(value, 'organigram')
+        organigram.name = 'organigram'
+        self._organigram = organigram
 
     def add_person(self, person, title, **kwargs):
         """ Append a person to the agency with the given title. """
