@@ -45,6 +45,6 @@ def cfg_path(postgres_dsn, session_manager, temporary_directory, redis_url):
 
 @fixture(scope='function')
 def test_app(request):
-    app = create_app(TestApp, request)
+    app = create_app(TestApp, request, use_smtp=False)
     yield app
     app.session_manager.dispose()
