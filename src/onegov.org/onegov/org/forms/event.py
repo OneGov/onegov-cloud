@@ -1,10 +1,10 @@
 from datetime import date, datetime, timedelta
 from dateutil import rrule
+from dateutil.rrule import rrulestr
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.gis import CoordinatesField
 from onegov.org import _
-from onegov.org.utils import rrulestr
 from sedate import replace_timezone, to_timezone
 from wtforms import StringField, TextAreaField, validators
 from wtforms.fields.html5 import DateField, EmailField

@@ -5,6 +5,7 @@ from babel import Locale
 from cached_property import cached_property
 from datetime import date, datetime, time, timedelta
 from dateutil import rrule
+from dateutil.rrule import rrulestr
 from decimal import Decimal
 from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.i18n import SiteLocale
@@ -35,7 +36,6 @@ from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.new_elements import Block, Confirm, Intercooler
 from onegov.org.new_elements import Link, LinkGroup
 from onegov.org.theme.org_theme import user_options
-from onegov.org.utils import rrulestr
 from onegov.pay import PaymentCollection, PaymentProviderCollection
 from onegov.people import PersonCollection
 from onegov.reservation import ResourceCollection
