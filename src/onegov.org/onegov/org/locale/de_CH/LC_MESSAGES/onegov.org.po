@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-10-11 15:50+0200\n"
+"POT-Creation-Date: 2018-10-15 11:42+0200\n"
 "PO-Revision-Date: 2018-09-24 12:21+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -976,6 +976,9 @@ msgstr "Startseiten Struktur (nur für fortgeschrittene Benutzer)"
 msgid "The structure of the homepage"
 msgstr "Die Struktur der Homepage"
 
+msgid "Homepage redirect"
+msgstr "Startseiten Weiterleitung"
+
 msgid "The default map view. This should show the whole town"
 msgstr "Die Standard Kartenansicht. Diese sollte die ganze Gemeinde zeigen."
 
@@ -1005,6 +1008,21 @@ msgstr "Einfach"
 
 msgid "With reference number (ESR)"
 msgstr "Mit Referenznummer (ESR)"
+
+msgid "Yes, to directories"
+msgstr "Ja, zu den Verzeichnissen"
+
+msgid "Yes, to events"
+msgstr "Ja, zu den Veranstaltungen"
+
+msgid "Yes, to forms"
+msgstr "Ja, zu den Formularen"
+
+msgid "Yes, to publications"
+msgstr "Ja, zu den Publikationen"
+
+msgid "Yes, to reservations"
+msgstr "Ja, zu den Reservationen"
 
 msgid "Except for"
 msgstr "Ausser an"

@@ -91,3 +91,11 @@ def migrate_enable_map_option(context):
 def fix_directory_order(context):
     for directory in context.session.query(ExtendedDirectory):
         directory.order = normalize_for_url(directory.title)
+
+
+@upgrade_task('Add default redirect setting')
+def add_default_recirect_setting(context):
+    org = context.session.query(Organisation).first()
+
+    if org:
+        org.redirect_homepage_to = 'no'

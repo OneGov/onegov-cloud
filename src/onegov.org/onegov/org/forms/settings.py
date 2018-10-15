@@ -159,6 +159,22 @@ class SettingsForm(Form):
         render_kw={'rows': 32, 'data-editor': 'xml'},
         fieldset=_("Homepage")
     )
+
+    # see homepage.py
+    redirect_homepage_to = RadioField(
+        label=_("Homepage redirect"),
+        fieldset=_("Homepage"),
+        default='no',
+        choices=[
+            ('no', _("No")),
+            ('directories', _("Yes, to directories")),
+            ('events', _("Yes, to events")),
+            ('forms', _("Yes, to forms")),
+            ('publications', _("Yes, to publications")),
+            ('reservations', _("Yes, to reservations")),
+        ],
+    )
+
     default_map_view = CoordinatesField(
         label=_("The default map view. This should show the whole town"),
         render_kw={

@@ -55,6 +55,7 @@ class Organisation(Base, TimestampMixin):
     bank_esr_participant_number = meta_property()
     square_logo_url = meta_property()
     locales = meta_property()
+    redirect_homepage_to = meta_property()
 
     @contact.setter
     def contact(self, value):
