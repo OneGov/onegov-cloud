@@ -18,7 +18,11 @@ class PersonCollection(GenericCollection):
         return Person
 
     def add(self, first_name, last_name, **optional):
-        person = Person(first_name=first_name, last_name=last_name, **optional)
+        person = self.model_class(
+            first_name=first_name,
+            last_name=last_name,
+            **optional
+        )
 
         self.session.add(person)
         self.session.flush()
@@ -27,4 +31,4 @@ class PersonCollection(GenericCollection):
 
     def by_id(self, id):
         if utils.is_uuid(id):
-            return self.query().filter(Person.id == id).first()
+            return self.query().filter(self.model_class.id == id).first()

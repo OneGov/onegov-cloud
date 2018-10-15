@@ -19,4 +19,6 @@ class AgencyCollection(AdjacencyListCollection):
     def roots(self):
         """ Returns the root agencies. """
 
-        return self.query().filter(Agency.parent_id.is_(None)).all()
+        return self.query().filter(
+            self.__listclass__.parent_id.is_(None)
+        ).all()

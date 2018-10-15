@@ -18,4 +18,4 @@ class AgencyMembershipCollection(GenericCollection):
 
     def query(self):
         query = super(AgencyMembershipCollection, self).query()
-        return query.order_by(AgencyMembership.order)
+        return query.order_by(self.model_class.order)
