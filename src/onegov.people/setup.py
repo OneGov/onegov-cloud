@@ -36,7 +36,6 @@ setup(
         'onegov.core>=0.4.0',
         'onegov.file',
         'onegov.search>=1.1.0',
-        'requests'
     ],
     extras_require=dict(
         test=[
@@ -48,9 +47,6 @@ setup(
     entry_points={
         'onegov': [
             'upgrade = onegov.people.upgrade'
-        ],
-        'console_scripts': [
-            'onegov-people=onegov.people.cli:cli'
         ]
     },
     classifiers=[
