@@ -398,6 +398,11 @@ def get_filehash():
     yield 'filedigest.js'
 
 
+@OrgApp.webasset('many')
+def get_many():
+    yield 'many.jsx'
+
+
 @OrgApp.webasset('common')
 def get_common_asset():
     yield 'global.js'

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Takes over many.jsx from onegov.feriennet.
+  [href]
+
 0.39.2 (2018-10-15)
 ~~~~~~~~~~~~~~~~~~~
 
