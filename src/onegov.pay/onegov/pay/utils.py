@@ -56,4 +56,4 @@ class Price(namedtuple('PriceBase', ('amount', 'currency', 'fee'))):
 
 
 def payments_association_table_for(cls):
-    return Base.metadata.tables['payments_for_{}'.format(cls.__tablename__)]
+    return Base.metadata.tables[f'payments_for_{cls.__tablename__}_payments']

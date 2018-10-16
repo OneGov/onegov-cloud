@@ -111,7 +111,9 @@ def test_payment_referential_integrity(postgres_dsn):
 
     assert not list(session.execute("select * from orders"))
     assert not list(session.execute("select * from payments"))
-    assert not list(session.execute("select * from payments_for_orders"))
+    assert not list(session.execute(
+        "select * from payments_for_orders_payment"
+    ))
 
     mgr.dispose()
 
