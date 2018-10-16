@@ -1258,7 +1258,7 @@ class EventBaseLayout(DefaultLayout):
         if recurrence:
             rule = rrulestr(recurrence)
 
-            if rule._freq == rrule.WEEKLY:
+            if getattr(rule, '_freq', None) == rrule.WEEKLY:
                 return _(
                     "Every ${days} until ${end}",
                     mapping={

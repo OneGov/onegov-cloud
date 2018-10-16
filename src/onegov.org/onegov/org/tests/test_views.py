@@ -2290,6 +2290,7 @@ def test_submit_event(client):
     form_page.form['start_time'] = "18:00"
     form_page.form['end_time'] = "22:00"
     form_page.form['end_date'] = end_date.isoformat()
+    form_page.form['repeat'] = 'weekly'
     form_page.form.set('weekly', True, index=0)
     form_page.form.set('weekly', True, index=1)
     form_page.form.set('weekly', True, index=2)

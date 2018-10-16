@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-10-15 11:42+0200\n"
+"POT-Creation-Date: 2018-10-16 12:53+0200\n"
 "PO-Revision-Date: 2018-09-24 12:21+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -674,11 +674,20 @@ msgstr "De"
 msgid "To"
 msgstr "Vers"
 
+msgid "Repeat"
+msgstr "Répéter"
+
 msgid "Repeats itself every"
 msgstr "Se répète tous les"
 
 msgid "Until date"
 msgstr "Jusqu'à"
+
+msgid "Dates"
+msgstr "Dates"
+
+msgid "The end date must be later than the start date."
+msgstr "La date de fin doit être postérieure à la date de début."
 
 msgid "Please set and end date if the event is recurring."
 msgstr "Veuillez préciser une date de fin si l'événement est récurrent."
@@ -686,13 +695,22 @@ msgstr "Veuillez préciser une date de fin si l'événement est récurrent."
 msgid "Please select a weekday if the event is recurring."
 msgstr "Veuillez choisir un jour de la semaine si l'événement est récurrent."
 
-msgid "The end date must be later than the start date."
-msgstr "La date de fin doit être postérieure à la date de début."
+msgid "Without"
+msgstr "Sans"
+
+msgid "Weekly"
+msgstr "Hebdomadaire"
+
+msgid "On additional dates"
+msgstr "À des dates supplémentaires"
 
 msgid "The weekday of the start date must be selected."
 msgstr ""
 "Le jour de la semaine correspondant à la date de début doit être "
 "sélectionné."
+
+msgid "Remove"
+msgstr "Supprimer"
 
 msgid "Send a daily status e-mail."
 msgstr "Envoyez un e-mail de suivi quotidien."

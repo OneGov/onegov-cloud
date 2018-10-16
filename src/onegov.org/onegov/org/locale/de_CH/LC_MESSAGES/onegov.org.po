@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-10-15 11:42+0200\n"
+"POT-Creation-Date: 2018-10-16 12:53+0200\n"
 "PO-Revision-Date: 2018-09-24 12:21+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -675,11 +675,20 @@ msgstr "Von"
 msgid "To"
 msgstr "Bis"
 
+msgid "Repeat"
+msgstr "Wiederholung"
+
 msgid "Repeats itself every"
 msgstr "Wiederholt sich jeden"
 
 msgid "Until date"
 msgstr "Bis Datum"
+
+msgid "Dates"
+msgstr "Daten"
+
+msgid "The end date must be later than the start date."
+msgstr "Das Enddatum muss nach dem Startdatum liegen."
 
 msgid "Please set and end date if the event is recurring."
 msgstr "Bitte ein Enddatum angeben, falls eine Wiederholungen ausgewählt ist."
@@ -687,11 +696,20 @@ msgstr "Bitte ein Enddatum angeben, falls eine Wiederholungen ausgewählt ist."
 msgid "Please select a weekday if the event is recurring."
 msgstr "Bitte ein Wochentag auswählen für sich wiederholende Veranstaltungen."
 
-msgid "The end date must be later than the start date."
-msgstr "Das Enddatum muss nach dem Startdatum liegen."
+msgid "Without"
+msgstr "Ohne"
+
+msgid "Weekly"
+msgstr "Wöchentlich"
+
+msgid "On additional dates"
+msgstr "An zusätzlichen Daten"
 
 msgid "The weekday of the start date must be selected."
 msgstr "Der Wochentag der Veranstaltung muss ausgewählt sein."
+
+msgid "Remove"
+msgstr "Entfernen"
 
 msgid "Send a daily status e-mail."
 msgstr "Ein tägliches Status E-Mail senden."
@@ -3188,6 +3206,9 @@ msgstr "Ihre Zahlung wurde rückgängig gemacht"
 msgid "Your payment has been refunded"
 msgstr "Ihre Zahlung wurde rückerstattet"
 
+#~ msgid "None"
+#~ msgstr "Keines"
+
 #~ msgid "uploaded on ${date}"
 #~ msgstr "hochgeladen am ${date}"
 
@@ -3205,9 +3226,6 @@ msgstr "Ihre Zahlung wurde rückerstattet"
 
 #~ msgid "Not Public"
 #~ msgstr "Nicht öffentlich"
-
-#~ msgid "None"
-#~ msgstr "Keines"
 
 #~ msgid "Will be made public on ${date}"
 #~ msgstr "Wird am ${date} veröffentlicht"

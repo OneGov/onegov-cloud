@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to add multiple irregular dates to an event.
+  [href]
+
 - Takes over many.jsx from onegov.feriennet.
   [href]
 

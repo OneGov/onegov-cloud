@@ -701,9 +701,10 @@
             ${layout.format_datetime_range(event.localized_start, event.localized_end, with_year=True)}
         </dd>
 
-        <tal:b condition="event.recurrence">
+        <!-- we can have reucrrences which we do not display, therefore we check the displayed value -->
+        <tal:b define="recurrence event.recurrence and layout.format_recurrence(event.recurrence)" condition="recurrence">
             <dt i18n:translate>Recurrence</dt>
-            <dd>${layout.format_recurrence(event.recurrence)}</dd>
+            <dd>${recurrence}</dd>
         </tal:b>
 
         <tal:b define="dates event.occurrence_dates(localize=True)" condition="len(dates) > 1">

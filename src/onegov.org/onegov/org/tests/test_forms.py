@@ -263,6 +263,7 @@ def test_event_form_update_apply():
     event = Event()
     form.populate_obj(event)
     form = EventForm()
+    form.request = Bunch(translate=lambda txt: txt, include=lambda src: None)
     form.process(obj=event)
     assert form.data['description'] == 'Rendez-vous automnal des médecines.'
     assert form.data['email'] == 'info@example.org'
@@ -294,7 +295,7 @@ def test_event_form_update_after_midnight():
     assert event.end.day == 17
 
 
-def test_event_form_validate():
+def test_event_form_validate_weekly():
     form = EventForm(MultiDict([
         ('email', 'info@example.org'),
         ('end_date', '2015-06-23'),
@@ -305,7 +306,10 @@ def test_event_form_validate():
         ('location', 'Salon du mieux-vivre à Saignelégier'),
         ('organizer', 'Société de Médecine'),
         ('weekly', 'MO'),
+        ('repeat', 'weekly')
     ]))
+    form.request = Bunch(translate=lambda txt: txt, include=lambda src: None)
+
     assert not form.validate()
     assert form.errors == {
         'weekly': ['The weekday of the start date must be selected.']
@@ -321,7 +325,10 @@ def test_event_form_validate():
         ('location', 'Salon du mieux-vivre à Saignelégier'),
         ('organizer', 'Société de Médecine'),
         ('weekly', 'TU'),
+        ('repeat', 'weekly')
     ]))
+    form.request = Bunch(translate=lambda txt: txt, include=lambda src: None)
+
     assert not form.validate()
     assert form.errors == {
         'end_date': ['Please set and end date if the event is recurring.']
@@ -336,7 +343,10 @@ def test_event_form_validate():
         ('title', 'Salon du mieux-vivre, 16e édition'),
         ('location', 'Salon du mieux-vivre à Saignelégier'),
         ('organizer', 'Société de Médecine'),
+        ('repeat', 'weekly')
     ]))
+    form.request = Bunch(translate=lambda txt: txt, include=lambda src: None)
+
     assert not form.validate()
     assert form.errors == {
         'weekly': ['Please select a weekday if the event is recurring.']
@@ -356,7 +366,8 @@ def test_event_form_create_rrule():
         'start_date': date(2015, 6, 1),
         'end_date': date(2015, 6, 7),
         'weekly': ['MO'],
-        'tags': []
+        'tags': [],
+        'repeat': 'weekly'
     })
     assert occurrences(form) == [date(2015, 6, 1)]
 
