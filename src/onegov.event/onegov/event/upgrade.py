@@ -40,4 +40,4 @@ def migrate_coordinates_column(context):
 @upgrade_task('Validate existing rrules')
 def validate_existing_rrules(context):
     for event in EventCollection(context.session).query():
-        event.validate_rrule('recurrence', event.recurrence)
+        event.validate_recurrence('recurrence', event.recurrence)
