@@ -179,7 +179,7 @@ def test_occurrence_dates(session):
     assert str(dates[-1].tzinfo) == 'Europe/Zurich'
 
 
-def test_lastest_occurrence(session):
+def test_latest_occurrence(session):
 
     def create_event(delta):
         start = datetime.now() + delta
@@ -195,7 +195,7 @@ def test_lastest_occurrence(session):
                 end=replace_timezone(end, 'Europe/Zurich'),
                 recurrence=(
                     f'RRULE:FREQ=WEEKLY;'
-                    f'UNTIL={end.year}{end.month:02}{end.day:02}T220000Z;'
+                    f'UNTIL={end.year}{end.month:02}{end.day + 2:02}T000000Z;'
                     f'BYDAY=MO,TU,WE,TH,FR,SA,SU'
                 ),
             )
