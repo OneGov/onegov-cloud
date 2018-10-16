@@ -1,7 +1,10 @@
 Changelog
 ---------
 
-- Strictly limits rrules to weekly rules with an until date set in UTC.
+- Automatically turn complex rrules into rdate lists during import.
+  [href]
+
+- Strictly limits rrules to weekly rules and lists of rdates.
   [href]
 
 0.9.0 (2018-09-24)

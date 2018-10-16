@@ -11,7 +11,7 @@ from onegov.event import log
 from onegov.event.collections import EventCollection
 from onegov.event.models import Event
 from onegov.event.models import Occurrence
-from onegov.event.utils import GuidleExportData
+from onegov.event.utils import GuidleExportData, as_rdates
 from onegov.gis import Coordinates
 from operator import add
 from requests import get
@@ -126,7 +126,6 @@ def import_json(group_context, url, tagmap):
                 title=title,
                 start=start,
                 end=end,
-                recurrence=recurrence,
                 timezone=timezone,
                 description=description,
                 organizer=organizer,
@@ -135,6 +134,16 @@ def import_json(group_context, url, tagmap):
                 tags=tags or [],
                 meta={'submitter_email': item['submitter_email']},
             )
+
+            # if the recurrence rule is not supported, turn it into a
+            # list of rdates
+            try:
+                event.validate_recurrence('recurrence', recurrence)
+            except RuntimeError:
+                event.recurrence = as_rdates(recurrence)
+            else:
+                event.recurrence = recurrence
+
             # todo: handle item['attachments']
             # todo: handle item['images']
             session.add(event)

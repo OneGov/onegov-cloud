@@ -133,7 +133,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         return current.union_all(future, past).first()
 
     @validates('recurrence')
-    def validate_rrule(self, key, r):
+    def validate_recurrence(self, key, r):
         """ Our rrules are quite limited in their complexity. This validator
         makes sure that is actually the case.
 
@@ -141,11 +141,9 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         onegov.event at this point. More complex rrules are not handled by the
         UI, nor is there currently a plan to do so.
 
-        We might possibly introduce the ability to just define a list of
-        dates (RDATE) as an alternative. Basically the UI would have a
-        second way of adding dates, which is by selecting a bunch of them.
+        Currently supported are weekly recurrences and lists of rdates.
 
-        The rational is that people commonlyadd  recurring events on a weekly
+        The rational is that people commonly add recurring events on a weekly
         basis (which is a lot of work for a whole year). Or on a monthly
         or yearly basis, in which case selection of single dates is
         acceptable, or even preferrable to complex rrules.
@@ -159,8 +157,11 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         if r:
             rule = rrulestr(r)
 
-            # we are limited to simple rrules, which always have a frequency
+            # a rule must either have a frequency or be a list of rdates
             if not hasattr(rule, '_freq'):
+                if all((l.startswith('RDATE') for l in r.splitlines())):
+                    return r
+
                 raise RuntimeError(f"'{r}' is too complex")
 
             # we also only do weekly recurrences (they can also be used
@@ -217,6 +218,11 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
 
             # Generate the occurences and convert to UTC
             dates = [standardize_date(date_, self.timezone) for date_ in rule]
+
+            # Make sure the start date is port of the reucrrence
+            if self.start not in dates:
+                dates.append(self.start)
+                dates.sort()
 
         if localize:
             dates = [to_timezone(date_, self.timezone) for date_ in dates]
