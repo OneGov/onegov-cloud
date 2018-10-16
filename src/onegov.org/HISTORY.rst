@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.40.0 (2018-10-16)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to add multiple irregular dates to an event.
   [href]
 
