@@ -366,11 +366,15 @@
                 <p tal:condition="occasion.note">${occasion.note}</p>
             </div>
 
-            <div class="text-links" tal:condition="show_links and layout.is_editable">
-                <tal:b repeat="link occasion_links(occasion)">
-                    <tal:b replace="structure link(layout)" />
+            <tal:b condition="show_links and layout.is_editable">
+                <tal:b define="links tuple(occasion_links(occasion))" condition="links">
+                    <div class="text-links">
+                        <tal:b repeat="link links">
+                            <tal:b replace="structure link(layout)" />
+                        </tal:b>
+                    </div>
                 </tal:b>
-            </div>
+            </tal:b>
         </div>
 
         <div class="call-to-action" tal:condition="show_enroll">

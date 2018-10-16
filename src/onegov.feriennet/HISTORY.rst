@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes an issue with edit links for editors during inactive periods.
+  [href]
+
 - Moves occasions filter further down.
   [href]
 
