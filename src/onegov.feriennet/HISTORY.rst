@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds support for the latest onegov.pay, onegov.org and onegov.core release.
+  [href]
+
 1.4.7 (2018-10-15)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -2141,30 +2141,6 @@ $booking-left-margin: 2rem;
 }
 
 /*
-    Multiple dates in form
-*/
-
-.field-button {
-    height: 27px;
-    margin-top: 27px;
-    padding: 5px;
-    text-align: center;
-    width: 27px;
-
-    + .field-button {
-        margin-left: 10px;
-    }
-}
-
-.many-fields .date-error {
-    margin-top: 1rem !important;
-}
-
-.many-fields a.button {
-    margin-bottom: 0;
-}
-
-/*
     Sponsoring
 */
 .sponsor {

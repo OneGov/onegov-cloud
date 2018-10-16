@@ -34,12 +34,12 @@ details AS (
         invoice_items
     LEFT JOIN (
         SELECT
-            payments_for_invoice_items.invoice_items_id,
+            payments_for_invoice_items_payments.invoice_items_id,
             ARRAY_AGG(payments."state")::text[] as states
-        
-        FROM payments_for_invoice_items
+
+        FROM payments_for_invoice_items_payments
         LEFT JOIN payments
-            ON payments_for_invoice_items.payment_id = payments.id
+            ON payments_for_invoice_items_payments.payment_id = payments.id
         GROUP BY invoice_items_id
     ) AS payment ON invoice_items_id = id
 ),

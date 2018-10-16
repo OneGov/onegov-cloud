@@ -141,6 +141,8 @@ class OccasionForm(Form):
     def on_request(self):
         self.setup_period_choices()
         self.dates.data = self.dates_to_json(self.parsed_dates)
+        self.request.include('common')
+        self.request.include('many')
 
     def ensure_at_least_one_date(self):
         if not self.parsed_dates:
