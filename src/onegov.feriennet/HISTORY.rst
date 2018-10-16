@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.4.8 (2018-10-16)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes an issue with edit links for editors during inactive periods.
   [href]
