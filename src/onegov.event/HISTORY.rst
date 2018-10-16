@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.9.2 (2018-10-16)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes failing upgrade.
   [href]
