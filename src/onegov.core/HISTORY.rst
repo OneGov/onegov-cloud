@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.74.0 (2018-10-16)
+~~~~~~~~~~~~~~~~~~~
 
 - Allows multiple associations per model.
   [msom]
