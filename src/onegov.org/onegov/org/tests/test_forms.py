@@ -257,6 +257,7 @@ def test_event_form_update_apply():
         ('tags', 'Congress'),
         ('tags', 'Health'),
         ('title', 'Salon du mieux-vivre, 16e édition'),
+        ('repeat', 'without')
     ]))
     assert form.validate()
 
@@ -286,7 +287,8 @@ def test_event_form_update_after_midnight():
         ('start_time', '09:30'),
         ('title', 'Salon du mieux-vivre, 16e édition'),
         ('organizer', 'Société de Médecine'),
-        ('location', 'Salon du mieux-vivre à Saignelégier')
+        ('location', 'Salon du mieux-vivre à Saignelégier'),
+        ('repeat', 'without')
     ]))
     assert form.validate()
 

@@ -2424,6 +2424,7 @@ def test_edit_event(client):
     form_page.form['start_date'] = event_date.isoformat()
     form_page.form['start_time'] = "18:00"
     form_page.form['end_time'] = "22:00"
+    form_page.form['repeat'] = 'without'
     form_page.form.submit().follow().form.submit().follow()
 
     client.login_editor()
@@ -2473,6 +2474,7 @@ def test_delete_event(client):
     form_page.form['start_date'] = event_date.isoformat()
     form_page.form['start_time'] = "18:00"
     form_page.form['end_time'] = "22:00"
+    form_page.form['repeat'] = 'without'
     form_page.form.submit().follow().form.submit().follow()
 
     client.login_editor()
@@ -3310,6 +3312,7 @@ def test_send_ticket_email(client):
         page.form['start_date'] = start.isoformat()
         page.form['start_time'] = "18:00"
         page.form['end_time'] = "22:00"
+        page.form['repeat'] = 'without'
 
         page.form.submit().follow().form.submit()
 
