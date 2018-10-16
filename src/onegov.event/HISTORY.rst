@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.9.1 (2018-10-16)
+~~~~~~~~~~~~~~~~~~~
 
 - Automatically turn complex rrules into rdate lists during import.
   [href]
