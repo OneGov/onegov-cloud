@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Moves occasions filter further down.
+  [href]
+
 - Adds support for the latest onegov.pay, onegov.org and onegov.core release.
   [href]
 
