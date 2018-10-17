@@ -67,6 +67,7 @@ class Layout(object):
     date_long_format = 'dd. MMMM yyyy'
     datetime_long_format = 'd. MMMM yyyy HH:mm'
     weekday_long_format = 'EEEE'
+    weekday_short_format = 'E'
     month_long_format = 'MMMM'
 
     def __init__(self, model, request):
