@@ -1,19 +1,22 @@
 import click
+import pycurl
 
 from csv import reader as csvreader
 from dateutil.parser import parse
 from hashlib import sha1
+from io import BytesIO
 from lxml import etree
 from onegov.core.cli import abort
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.event import log
 from onegov.event.collections import EventCollection
-from onegov.event.models import Event
+from onegov.event.models import Event, EventFile
 from onegov.event.models import Occurrence
 from onegov.event.utils import GuidleExportData, as_rdates
 from onegov.gis import Coordinates
 from operator import add
+from pathlib import Path
 from requests import get
 from sqlalchemy import or_
 from sqlalchemy.dialects.postgresql import array
@@ -41,6 +44,26 @@ def clear(group_context):
             session.delete(occurrence)
 
     return _clear
+
+
+def download_image(image_url):
+    buffer = BytesIO()
+
+    c = pycurl.Curl()
+    c.setopt(c.URL, image_url)
+    c.setopt(c.WRITEDATA, buffer)
+    c.setopt(c.FOLLOWLOCATION, True)
+
+    try:
+        c.perform()
+
+        if c.getinfo(c.RESPONSE_CODE) != 200:
+            return None
+
+    finally:
+        c.close()
+
+    return buffer
 
 
 @cli.command('import-json')
@@ -144,8 +167,16 @@ def import_json(group_context, url, tagmap):
             else:
                 event.recurrence = recurrence
 
+            if item['images']:
+                buffer = download_image(item['images'][0]['url'])
+
+                if buffer:
+                    event.image = EventFile(
+                        name=item['images'][0]['name'],
+                        reference=buffer
+                    )
+
             # todo: handle item['attachments']
-            # todo: handle item['images']
             session.add(event)
             event.submit()
             event.publish()
@@ -211,25 +242,44 @@ def import_guidle(group_context, url, tagmap):
             for offer in GuidleExportData(root).offers():
                 tags, unknown = offer.tags(tagmap)
                 unknown_tags |= unknown
+
+                # medium sized images seem to be larger than what we actually
+                # use, so no need to use bigger sizes (if we do, we need to
+                # change the download_image function to not operate solely
+                # in memory)
+                image_url = offer.image_url(size='medium')
+                if image_url:
+                    buffer = download_image(image_url)
+                else:
+                    buffer = None
+
                 for index, schedule in enumerate(offer.schedules()):
-                    events.append(
-                        Event(
-                            state='initiated',
-                            title=offer.title,
-                            start=schedule.start,
-                            end=schedule.end,
-                            recurrence=schedule.recurrence,
-                            timezone=schedule.timezone,
-                            description=offer.description,
-                            organizer=offer.organizer,
-                            location=offer.location,
-                            coordinates=offer.coordinates,
-                            tags=tags,
-                            source=f'{prefix}-{offer.uid}.{index}',
-                        )
+                    event = Event(
+                        state='initiated',
+                        title=offer.title,
+                        start=schedule.start,
+                        end=schedule.end,
+                        recurrence=schedule.recurrence,
+                        timezone=schedule.timezone,
+                        description=offer.description,
+                        organizer=offer.organizer,
+                        location=offer.location,
+                        coordinates=offer.coordinates,
+                        tags=tags,
+                        source=f'{prefix}-{offer.uid}.{index}',
                     )
+
+                    if buffer:
+                        buffer.seek(0)
+
+                        event.image = EventFile(
+                            name=image_url.rsplit('/', 1)[-1],
+                            reference=buffer
+                        )
+
+                    events.append(event)
+
                 # todo: handle attachements
-                # todo: handle images
 
             collection = EventCollection(app.session())
             added, updated, purged = collection.from_import(events, prefix)
@@ -278,18 +328,22 @@ def fetch(group_context, source, tag, location):
         abort("Provide at least one source")
 
     def _fetch(request, app):
-        try:
-            local_session = app.session()
-            local_events = EventCollection(local_session)
-            assert local_session.info['schema'] == app.schema
 
+        # XXX use a proper depot manager for this
+        def event_file_path(reference):
+            return Path(app.depot_storage_path) / reference['path'] / 'file'
+
+        try:
             result = [0, 0, 0]
+
             for key in source:
-                schema = '{}-{}'.format(app.namespace, key)
-                assert schema in app.session_manager.list_schemas()
-                app.session_manager.set_current_schema(schema)
+                remote_schema = '{}-{}'.format(app.namespace, key)
+                local_schema = app.session_manager.current_schema
+                assert remote_schema in app.session_manager.list_schemas()
+
+                app.session_manager.set_current_schema(remote_schema)
                 remote_session = app.session_manager.session()
-                assert remote_session.info['schema'] == schema
+                assert remote_session.info['schema'] == remote_schema
 
                 query = remote_session.query(Event)
                 query = query.filter(
@@ -307,6 +361,7 @@ def fetch(group_context, source, tag, location):
                             for term in location
                         ])
                     )
+
                 remote_events = [
                     Event(
                         state='initiated',
@@ -318,10 +373,26 @@ def fetch(group_context, source, tag, location):
                         content=event.content,
                         location=event.location,
                         tags=event.tags,
+                        image=(
+                            event.image and
+                            EventFile(
+                                name=event.image.name,
+                                reference=event_file_path(
+                                    event.image.reference
+                                ).open('rb')
+                            ) or None
+                        ),
                         source=f'fetch-{key}-{event.name}',
                         coordinates=event.coordinates,
                     ) for event in query
                 ]
+
+                # be sure to switch back to the local schema, lest we
+                # accidentally update things on the remote
+                app.session_manager.set_current_schema(local_schema)
+                local_events = EventCollection(app.session_manager.session())
+
+                import pdb; pdb.set_trace()
                 result = vector_add(
                     result,
                     local_events.from_import(remote_events, f'fetch-{key}')

@@ -108,6 +108,25 @@ class GuidleOffer(GuidleBase):
             )).strip(),
         ))
 
+    def image_url(self, size):
+        """ Returns the image url for the offer with the given size or None.
+
+        """
+
+        xpath = (
+            f"guidle:offerDetail/"
+            f"guidle:images/"
+            f"guidle:image/"
+            f"guidle:size[@label='{size}']"
+        )
+
+        images = self.find(f"({xpath})[1]")
+
+        if not len(images):
+            return None
+
+        return images[0].attrib['url']
+
     def tags(self, tagmap=None):
         """ Returns a set of known and a set of unkonwn tags. """
 
