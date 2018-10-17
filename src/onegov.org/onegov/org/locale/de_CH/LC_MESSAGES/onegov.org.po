@@ -2161,7 +2161,7 @@ msgstr ""
 "die Anfrage zu übermitteln. Wenn Sie Änderungen vornehmen möchten, klicken "
 "Sie auf \"Bearbeiten\" um zum Formular zurückzukehren."
 
-msgid "Export this events"
+msgid "Export these events"
 msgstr "Diese Termine exportieren"
 
 msgid "Submit your event"

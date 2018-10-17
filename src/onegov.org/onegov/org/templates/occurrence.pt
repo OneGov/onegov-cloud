@@ -30,15 +30,6 @@
             </div>
 
             <div class="large-4 medium-4 columns">
-                <div class="occurrence-map borderless-side-panel" tal:define="coordinates occurrence.event.coordinates" tal:condition="coordinates">
-                    <h2 i18n:translate>Map</h2>
-                    <div class="marker-map" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}"></div>
-                </div>
-
-                <tal:b metal:use-macro="layout.macros['ticket_callout']"
-                    tal:condition="request.is_manager and ticket"
-                />
-
                 <tal:b condition="occurrence.event.source and request.is_manager|nothing">
                     <div class="panel callout imported-event-callout">
                         <p>
@@ -47,6 +38,15 @@
                         </p>
                     </div>
                 </tal:b>
+
+                <div class="occurrence-map borderless-side-panel" tal:define="coordinates occurrence.event.coordinates" tal:condition="coordinates">
+                    <h2 i18n:translate>Map</h2>
+                    <div class="marker-map" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}"></div>
+                </div>
+
+                <tal:b metal:use-macro="layout.macros['ticket_callout']"
+                    tal:condition="request.is_manager and ticket"
+                />
 
                 <div class="borderless-side-panel">
                     <h2 i18n:translate="">Exports</h2>

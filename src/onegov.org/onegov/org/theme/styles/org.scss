@@ -87,6 +87,13 @@ $full-width-banner-height: 333px;
 }
 
 /*
+    Links without href should not show the cursor
+*/
+a:not([href]) {
+    cursor: default;
+}
+
+/*
     Hyphenation for browsers which support it.
 */
 
@@ -2773,29 +2780,50 @@ button {
     Calendar day display
 */
 .calendar-day {
+    $border-radius: 4px;
+
     background-color: $topbar-bg-color;
-    padding: .75rem 0 0;
+    border-radius: $border-radius $border-radius 0 0;
+    font-size: .875rem;
     width: 100%;
 
-    > div {
-        text-align: center;
+    .calendar-day-thumbnail {
+        display: block;
+        background-position: center top;
+        background-size: cover;
+        border-radius: $border-radius $border-radius 0 0;
+        padding-top: 75%;
+        width: 100%;
+
+        .fa {
+            color: $iron;
+            font-size: 3rem;
+            left: 37.25%;
+            position: absolute;
+            top: 20%;
+        }
     }
 
-    .day {
-        font-size: 2.75rem;
-        font-weight: bold;
-    }
-
-    .month {
-        font-size: .875rem;
-        padding: .5rem 0 1rem;
-    }
-
-    .weekday {
+    .calendar-day-date {
         @include primary-color-background;
-        font-size: .7rem;
-        padding: .5rem 0;
-        text-transform: uppercase;
+        border-radius: 0 0 $border-radius $border-radius;
+        line-height: 2.25rem;
+
+        > div {
+            display: inline-block;
+        }
+
+        .weekday {
+            background: $black;
+            border-radius: 0 0 0 $border-radius;
+            color: $white;
+            padding: 0 .7rem;
+            text-transform: uppercase;
+        }
+
+        .day {
+            padding: 0 0 0 .7rem;
+        }
     }
 }
 

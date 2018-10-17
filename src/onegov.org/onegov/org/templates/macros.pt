@@ -742,36 +742,49 @@
 </metal:calendar_day>
 
 <metal:calendar_day_box define-macro="calendar-day-content" i18n:domain="onegov.org">
-    <div class="day">${date.day}<span class="show-for-sr">.</span></div>
-    <div class="month">${layout.format_date(date, 'month_long')}</div>
-    <div class="weekday">${layout.format_date(date, 'weekday_long')}</div>
+    <a href="${link|nothing}" tal:condition="image|nothing"
+        class="calendar-day-thumbnail"
+        style="background-image: url(${request.link(image, name='thumbnail')});">
+    </a>
+
+    <a href="${link|nothing}" tal:condition="not:image|nothing" class="calendar-day-thumbnail">
+        <i class="fa fa-calendar-o" aria-hidden="true"></i>
+    </a>
+
+    <div class="calendar-day-date">
+        <div class="weekday">${layout.format_date(date, 'weekday_short').rstrip('.')}</div>
+        <div class="day">${date.day}.</div>
+        <div class="month">${layout.format_date(date, 'month_long')}</div>
+    </div>
 </metal:calendar_day_box>
 
 <metal:occurrences define-macro="occurrences" i18n:domain="onegov.org">
-    <tal:b tal:define="global lastdaydate 0">
-        <tal:b repeat="occurrence occurrences">
-            <div class="row">
-                <div class="occurrence">
-                    <div class="medium-3 small-12 columns">
-                        <tal:b tal:condition="layout.format_date(occurrence.localized_start, 'date') != lastdaydate">
-                            <metal:b tal:define="date occurrence.localized_start" use-macro="layout.macros['calendar-day']" />
-                        </tal:b>
-                        <div style="width: 100%; height: 1px;"></div>
-                    </div>
-                    <div class="medium-9 small-12 columns">
-                        <h3><a href="${request.link(occurrence)}">${occurrence.title}</a></h3>
-                        <div class="occurrence-date show-for-sr">${layout.format_date(occurrence.localized_start, 'date')}</div>
-                        <div class="occurrence-location">${occurrence.location}</div>
-                        <div class="occurrence-time">${layout.format_date(occurrence.localized_start, 'time')} - ${layout.format_date(occurrence.localized_end, 'time')}</div>
-                        <div><span tal:repeat="tag occurrence.tags" class="blank-label" i18n:translate>${tag}</span></div>
-                    </div>
-                    <div class="clearfix"></div>
+    <tal:b repeat="occurrence occurrences">
+        <div class="row">
+            <div class="occurrence">
+                <div class="medium-3 small-12 columns">
+                    <metal:b
+                        tal:define="
+                            date occurrence.localized_start;
+                            image occurrence.event.image;
+                            link request.link(occurrence)
+                        "
+                        use-macro="layout.macros['calendar-day']"
+                    />
                 </div>
+                <div class="medium-9 small-12 columns">
+                    <h3><a href="${request.link(occurrence)}">${occurrence.title}</a></h3>
+                    <div class="occurrence-date show-for-sr">${layout.format_date(occurrence.localized_start, 'date')}</div>
+                    <div class="occurrence-location">${occurrence.location}</div>
+                    <div class="occurrence-time">${layout.format_date(occurrence.localized_start, 'time')} - ${layout.format_date(occurrence.localized_end, 'time')}</div>
+                    <div><span tal:repeat="tag occurrence.tags" class="blank-label" i18n:translate>${tag}</span></div>
+                </div>
+                <div class="clearfix"></div>
             </div>
-            <tal:b tal:define="global lastdaydate python: layout.format_date(occurrence.localized_start, 'date')" />
-        </tal:b>
-        <div tal:condition="not occurrences" i18n:translate>No events found.</div>
+        </div>
     </tal:b>
+
+    <div tal:condition="not occurrences" i18n:translate>No events found.</div>
 </metal:occurrences>
 
 <metal:date_range_selector define-macro="date-range-selector" i18n:domain="onegov.org">

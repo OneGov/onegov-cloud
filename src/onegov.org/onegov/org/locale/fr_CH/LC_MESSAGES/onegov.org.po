@@ -2169,7 +2169,7 @@ msgstr ""
 " processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur "
 "« Modifier » pour retourner sur le formulaire complété."
 
-msgid "Export this events"
+msgid "Export these events"
 msgstr "Exporter ces événements"
 
 msgid "Submit your event"

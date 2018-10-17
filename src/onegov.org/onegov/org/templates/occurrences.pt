@@ -45,12 +45,15 @@
                     </metal:b>
                 </div>
 
-                <div class="occurrence-exports">
-                    <h2>
-                        <a href="${request.link(layout.model, name='ical')}">
-                            <i class="fa fa-chevron-right"></i> <tal:b i18n:translate="">Export this events</tal:b>
-                        </a>
-                    </h2>
+                <div class="occurrence-exports borderless-side-panel">
+                    <h2 i18n:translate>Exports</h2>
+                    <ul class="calendar-export-list">
+                        <li>
+                            <a href="${request.link(layout.model, name='ical')}" i18n:translate>
+                                Export these events
+                            </a>
+                        </li>
+                    </ul>
                 </div>
 
                 <div class="submit-yours">
