@@ -1241,6 +1241,27 @@ ul.panel-links {
     }
 }
 
+.borderless-side-panel {
+    margin-bottom: 1.5rem;
+
+    h2 {
+        border-bottom: 2px solid $primary-color;
+        font-size: 1rem;
+        margin-bottom: .6rem;
+        padding-bottom: .5rem;
+    }
+
+    ul {
+        list-style: none;
+        margin: 0;
+
+        li {
+            font-size: .875rem;
+            margin-bottom: .4rem;
+        }
+    }
+}
+
 .homepage .side-panel:first-child,
 .side-panel.highlighted {
     background-color: $topbar-bg-color;
@@ -2792,6 +2813,28 @@ button {
 /*
     Events
 */
+.imported-event-callout p {
+    margin-bottom: .75rem;
+}
+
+.imported-event {
+    background-color: rgba(255, 255, 255, .5);
+    border: 1px solid lighten($orange, 25%);
+    display: inline-block;
+    font-family: $font-family-monospace;
+    font-size: .8rem;
+    font-weight: bold;
+    padding: 1px 6px;
+}
+
+.calendar-export-list {
+    a::before {
+        @include icon('\f133');
+        color: $body-font-color;
+        margin-right: 1ex;
+    }
+}
+
 .occurrence {
     margin-bottom: 2.25rem;
 
@@ -2817,8 +2860,9 @@ button {
     }
 }
 
-.occurrence-map {
-    margin-bottom: 2rem;
+.occurrence-map,
+.occurrence-image {
+    margin-bottom: 1.5rem;
 }
 
 .date-range-selector-results {
@@ -2844,38 +2888,6 @@ button {
 
 .occurrence-description {
     max-width: $max-line-width;
-}
-
-.occurrence-exports {
-    @include panel;
-    @include smooth-edges;
-
-    margin-bottom: 1.5em;
-
-    h2 {
-        display: block;
-        font-size: .875rem;
-        margin-bottom: .875rem;
-    }
-}
-
-.occurrence-occurrences {
-    h2 {
-        border-bottom: 2px solid $primary-color;
-        font-size: 1rem;
-        margin-bottom: .6rem;
-        padding-bottom: .5rem;
-    }
-
-    ul {
-        list-style: none;
-        margin: 0;
-
-        li {
-            font-size: .875rem;
-            margin-bottom: .4rem;
-        }
-    }
 }
 
 /*

@@ -18,8 +18,8 @@
                     <p tal:content="structure description"></p>
                 </div>
 
-                <div class="occurrence-map" tal:define="coordinates occurrence.event.coordinates" tal:condition="coordinates">
-                    <div class="marker-map" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}"></div>
+                <div class="occurrence-image" tal:condition="occurrence.event.image">
+                    <img src="${request.link(occurrence.event.image)}">
                 </div>
 
                 <div class="occurrence-organizer" tal:condition="organizer">
@@ -30,30 +30,37 @@
             </div>
 
             <div class="large-4 medium-4 columns">
+                <div class="occurrence-map borderless-side-panel" tal:define="coordinates occurrence.event.coordinates" tal:condition="coordinates">
+                    <h2 i18n:translate>Map</h2>
+                    <div class="marker-map" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}"></div>
+                </div>
+
                 <tal:b metal:use-macro="layout.macros['ticket_callout']"
                     tal:condition="request.is_manager and ticket"
                 />
 
                 <tal:b condition="occurrence.event.source and request.is_manager|nothing">
-                    <div class="panel callout">
-                        <p><tal:b i18n:translate>This is an imported event</tal:b> (<span>${occurrence.event.source}</span>).</p>
+                    <div class="panel callout imported-event-callout">
+                        <p>
+                            <tal:b i18n:translate>This is an imported event</tal:b>
+                            <div class="imported-event">${occurrence.event.source}</div>
+                        </p>
                     </div>
                 </tal:b>
 
-                <div class="occurrence-exports">
-                    <h2>
-                        <a href="${request.link(occurrence, name='ical')}">
-                            <i class="fa fa-chevron-right"></i> <tal:b i18n:translate="">Export this event</tal:b>
-                        </a>
-                    </h2>
-                    <h2 tal:condition="len(occurrences) > 1">
-                        <a href="${request.link(occurrence.event, name='ical')}">
-                            <i class="fa fa-chevron-right"></i> <tal:b i18n:translate="">Export all occurrences of this event</tal:b>
-                        </a>
-                    </h2>
+                <div class="borderless-side-panel">
+                    <h2 i18n:translate="">Exports</h2>
+                    <ul class="calendar-export-list">
+                        <li>
+                            <a href="${request.link(occurrence, name='ical')}" i18n:translate>Export this event</a>
+                        </li>
+                        <li tal:condition="len(occurrences) > 1">
+                            <a href="${request.link(occurrence.event, name='ical')}" i18n:translate>Export all occurrences of this event</a>
+                        </li>
+                    </ul>
                 </div>
 
-                <div class="occurrence-occurrences">
+                <div class="borderless-side-panel">
                     <h2 i18n:translate="">All occurrences of this event</h2>
                     <ul>
                         <li tal:repeat="occurrence occurrences">

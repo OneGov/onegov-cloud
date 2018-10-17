@@ -4,8 +4,12 @@ from cached_property import cached_property
 from datetime import date, datetime, timedelta
 from dateutil import rrule
 from dateutil.rrule import rrulestr
+from onegov.event.models import EventFile
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
+from onegov.form.fields import UploadFileWithORMSupport
+from onegov.form.validators import FileSizeLimit
+from onegov.form.validators import WhitelistedMimeType
 from onegov.gis import CoordinatesField
 from onegov.org import _
 from sedate import replace_timezone, to_timezone
@@ -69,6 +73,21 @@ class EventForm(Form):
         render_kw={'rows': 12}
     )
 
+    image = UploadFileWithORMSupport(
+        label=_("Image"),
+        description="Foobar",
+        file_class=EventFile,
+        validators=[
+            validators.Optional(),
+            WhitelistedMimeType({
+                'image/gif',
+                'image/jpeg',
+                'image/png'
+            }),
+            FileSizeLimit(1 * 1024 * 1024)
+        ]
+    )
+
     location = StringField(
         label=_("Location"),
         description=_("Castle garden"),
@@ -112,7 +131,7 @@ class EventForm(Form):
 
     repeat = RadioField(
         label=_("Repeat"),
-        default='none',
+        default='without',
         choices=(
             ('without', _("Without")),
             ('weekly', _("Weekly")),

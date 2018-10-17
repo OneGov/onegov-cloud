@@ -1350,9 +1350,8 @@ class OccurrenceLayout(EventBaseLayout):
 
             edit_link = Link(
                 text=_("Edit"),
-                url=self.request.return_to(
-                    self.request.link(self.model.event, 'edit'),
-                    self.request.link(self.model.event)
+                url=self.request.return_here(
+                    self.request.link(self.model.event, 'edit')
                 ),
                 attrs={'class': 'edit-link'}
             )

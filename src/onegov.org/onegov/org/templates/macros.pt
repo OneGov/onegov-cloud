@@ -569,13 +569,9 @@
 </metal:payment_status>
 
 <metal:ticket_callout define-macro="ticket_callout" i18n:domain="onegov.org">
-    <div class="side-panel" tal:condition="ticket">
-        <div class="field-display ticket-status-page">
-            <div class="field-display-block">
-                <div class="field-display-label" i18n:translate>Ticket Number</div>
-                <div class="field-display-data ticket-number"><a href="${request.link(ticket)}">${ticket.number}</a></div>
-            </div>
-        </div>
+    <div class="borderless-side-panel" tal:condition="ticket">
+        <h2 i18n:translate>Ticket</h2>
+        <div class="ticket-number"><a href="${request.link(ticket)}">${ticket.number}</a></div>
     </div>
 </metal:ticket_callout>
 
@@ -671,6 +667,13 @@
 
         <dt i18n:translate>Description</dt>
         <dd tal:content="structure event.description.replace('\n', '<br>')" />
+
+        <tal:b condition="event.image">
+            <dt i18n:translate>Image</dt>
+            <dd>
+                <img src="${request.link(event.image)}">
+            </dd>
+        </tal:b>
 
         <dt i18n:translate>Location</dt>
         <dd>${event.location}</dd>
