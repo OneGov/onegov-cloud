@@ -5,6 +5,7 @@ from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
 from icalendar import vRecur
 from onegov.core.orm import Base
+from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
@@ -12,6 +13,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.event.models.mixins import OccurrenceMixin
 from onegov.event.models.occurrence import Occurrence
+from onegov.file import File
 from onegov.gis import CoordinatesMixin
 from onegov.search import ORMSearchable
 from pytz import UTC
@@ -28,6 +30,10 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm import validates
 from uuid import uuid4
+
+
+class EventFile(File):
+    __mapper_args__ = {'polymorphic_identity': 'eventfile'}
 
 
 class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
@@ -66,6 +72,9 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
 
     #: Recurrence of the event (RRULE, see RFC2445)
     recurrence = Column(Text, nullable=True)
+
+    #: The associated image
+    image = associated(EventFile, 'image', 'one-to-one', uselist=False)
 
     #: Recurrence of the event as icalendar object
     @property
