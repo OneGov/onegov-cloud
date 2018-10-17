@@ -1,10 +1,8 @@
 import inspect
 import phonenumbers
 
-from depot.io.utils import FileIntent
 from onegov.core.html import sanitize_html
 from onegov.core.utils import binary_to_dictionary
-from onegov.file.utils import content_type_from_fileobj
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form.validators import ValidPhoneNumber
 from onegov.form.widgets import IconWidget
