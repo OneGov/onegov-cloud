@@ -392,7 +392,6 @@ def fetch(group_context, source, tag, location):
                 app.session_manager.set_current_schema(local_schema)
                 local_events = EventCollection(app.session_manager.session())
 
-                import pdb; pdb.set_trace()
                 result = vector_add(
                     result,
                     local_events.from_import(remote_events, f'fetch-{key}')
