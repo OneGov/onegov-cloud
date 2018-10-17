@@ -1,8 +1,10 @@
 import inspect
 import phonenumbers
 
+from depot.io.utils import FileIntent
 from onegov.core.html import sanitize_html
 from onegov.core.utils import binary_to_dictionary
+from onegov.file.utils import content_type_from_fileobj
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form.validators import ValidPhoneNumber
 from onegov.form.widgets import IconWidget
@@ -99,6 +101,43 @@ class UploadField(FileField):
             return binary_to_dictionary(self.file.read(), self.filename)
         finally:
             self.file.seek(0)
+
+
+class UploadFileWithORMSupport(UploadField):
+    """ Extends the upload field with onegov.file support. """
+
+    def __init__(self, *args, **kwargs):
+        self.file_class = kwargs.pop('file_class')
+        super().__init__(*args, **kwargs)
+
+    def populate_obj(self, obj, name):
+        if self.action == 'keep':
+            pass
+
+        elif self.action == 'delete':
+            setattr(obj, name, None)
+
+        elif self.action == 'replace':
+            self.file.filename = self.filename
+            self.file.seek(0)
+
+            setattr(obj, name, self.file_class(
+                name=self.filename,
+                reference=self.file
+            ))
+
+        else:
+            raise NotImplementedError(f"Unknown action: {self.action}")
+
+    def process_data(self, value):
+        if value:
+            self.data = {
+                'filename': value.name,
+                'size': value.reference.file.content_length,
+                'mimetype': value.reference.content_type
+            }
+        else:
+            super().process_data(value)
 
 
 class HtmlField(TextAreaField):
