@@ -45,7 +45,7 @@ This all is probably best understood in an example:
             __tablename__ == 'payments'
 
         class Payable(object):
-            payment = associated(Address, 'address', 'one-to-one')
+            payment = associated(Payment, 'payment', 'one-to-one')
 
         class Product(Base, Payable):
             __tablename__ == 'products'
