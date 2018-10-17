@@ -37,6 +37,7 @@ setup(
         'icalendar>=4.0.3',
         'lxml',
         'onegov.core>=0.4.0',
+        'onegov.file',
         'onegov.gis',
         'onegov.search',
         'onegov.server',

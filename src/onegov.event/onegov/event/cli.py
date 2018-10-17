@@ -9,6 +9,7 @@ from lxml import etree
 from onegov.core.cli import abort
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
+from onegov.file import DepotApp
 from onegov.event import log
 from onegov.event.collections import EventCollection
 from onegov.event.models import Event, EventFile
@@ -247,7 +248,11 @@ def import_guidle(group_context, url, tagmap):
                 # use, so no need to use bigger sizes (if we do, we need to
                 # change the download_image function to not operate solely
                 # in memory)
-                image_url = offer.image_url(size='medium')
+                if isinstance(app, DepotApp):
+                    image_url = offer.image_url(size='medium')
+                else:
+                    image_url = None
+
                 if image_url:
                     buffer = download_image(image_url)
                 else:
