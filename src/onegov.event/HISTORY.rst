@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.9.3 (2018-10-17)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to associate a single image with each event.
   [href]
