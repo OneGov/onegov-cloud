@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.74.1 (2018-10-17)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds weekday short format.
   [href]
