@@ -1,5 +1,11 @@
 Changelog
 ---------
+
+- Sets the end-time of events ending at midnight a microsecond before 00:00.
+
+  This is consistent with other parts of the application.
+  [href]
+
 0.9.3 (2018-10-17)
 ~~~~~~~~~~~~~~~~~~~
 

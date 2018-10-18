@@ -152,6 +152,9 @@ class GuidleOffer(GuidleBase):
             return Coordinates(lat, lon)
 
     def schedules(self):
+        if "Theatervereinigung" in self.title:
+            import pdb; pdb.set_trace()
+
         for schedule in self.find('guidle:schedules/guidle:date'):
             yield GuidleScheduleDate(schedule)
 
@@ -199,7 +202,7 @@ class GuidleScheduleDate(GuidleBase):
         if end_time:
             end = end_time
         if end <= start:
-            end = end + timedelta(days=1) - timedelta(minutes=1)
+            end = end + timedelta(days=1) - timedelta(microseconds=1)
 
         # Add timezones
         if start:

@@ -6,8 +6,11 @@ from pytest import mark
 from sedate import replace_timezone
 
 
-def tzdatetime(year, month, day, hour, minute, timezone='Europe/Zurich'):
-    return replace_timezone(datetime(year, month, day, hour, minute), timezone)
+def tzdatetime(year, month, day, hour, minute, seconds=0, microseconds=0):
+    return replace_timezone(
+        datetime(year, month, day, hour, minute, seconds, microseconds),
+        timezone='Europe/Zurich'
+    )
 
 
 @mark.parametrize("xml", [
@@ -55,17 +58,17 @@ def test_import_guidle(session, xml):
     )
 
     assert schedules[1].start == tzdatetime(2018, 10, 28, 17, 0)
-    assert schedules[1].end == tzdatetime(2018, 10, 28, 23, 59)
+    assert schedules[1].end == tzdatetime(2018, 10, 28, 23, 59, 59, 999999)
     assert schedules[1].recurrence == ''
 
     assert schedules[2].start == tzdatetime(2018, 6, 15, 8, 0)
-    assert schedules[2].end == tzdatetime(2018, 6, 15, 23, 59)
+    assert schedules[2].end == tzdatetime(2018, 6, 15, 23, 59, 59, 999999)
     assert schedules[2].recurrence == (
         'RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU;UNTIL=20181016T0000Z'
     )
 
     assert schedules[3].start == tzdatetime(2018, 8, 18, 0, 0)
-    assert schedules[3].end == tzdatetime(2018, 8, 18, 23, 59)
+    assert schedules[3].end == tzdatetime(2018, 8, 18, 23, 59, 59, 999999)
     assert schedules[3].recurrence == (
         'RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU;UNTIL=20181101T0000Z'
     )
