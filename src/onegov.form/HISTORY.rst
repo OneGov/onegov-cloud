@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes a few issues with UploadFileWithORMSupport.
+  [href]
+
 0.39.0 (2018-10-18)
 ~~~~~~~~~~~~~~~~~~~
 

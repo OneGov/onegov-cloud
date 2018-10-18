@@ -109,6 +109,9 @@ class UploadFileWithORMSupport(UploadField):
         super().__init__(*args, **kwargs)
 
     def populate_obj(self, obj, name):
+        if not getattr(self, 'action', None):
+            return
+
         if self.action == 'keep':
             pass
 
@@ -116,14 +119,14 @@ class UploadFileWithORMSupport(UploadField):
             setattr(obj, name, None)
 
         elif self.action == 'replace':
-            self.file.filename = self.filename
-            self.file.seek(0)
+            if self.file:
+                self.file.filename = self.filename
+                self.file.seek(0)
 
-            setattr(obj, name, self.file_class(
-                name=self.filename,
-                reference=self.file
-            ))
-
+                setattr(obj, name, self.file_class(
+                    name=self.filename,
+                    reference=self.file
+                ))
         else:
             raise NotImplementedError(f"Unknown action: {self.action}")
 
