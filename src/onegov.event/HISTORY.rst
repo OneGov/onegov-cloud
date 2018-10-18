@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes files being imported with wrong content_type.
+  [href]
+
 0.9.4 (2018-10-18)
 ~~~~~~~~~~~~~~~~~~~
 

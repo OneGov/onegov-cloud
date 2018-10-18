@@ -152,9 +152,6 @@ class GuidleOffer(GuidleBase):
             return Coordinates(lat, lon)
 
     def schedules(self):
-        if "Theatervereinigung" in self.title:
-            import pdb; pdb.set_trace()
-
         for schedule in self.find('guidle:schedules/guidle:date'):
             yield GuidleScheduleDate(schedule)
 

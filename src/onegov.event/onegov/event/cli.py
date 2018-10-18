@@ -10,6 +10,7 @@ from onegov.core.cli import abort
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.file import DepotApp
+from onegov.file.utils import as_fileintent
 from onegov.event import log
 from onegov.event.collections import EventCollection
 from onegov.event.models import Event, EventFile
@@ -172,9 +173,10 @@ def import_json(group_context, url, tagmap):
                 buffer = download_image(item['images'][0]['url'])
 
                 if buffer:
+                    filename = item['images'][0]['name']
                     event.image = EventFile(
-                        name=item['images'][0]['name'],
-                        reference=buffer
+                        name=filename,
+                        reference=as_fileintent(buffer, filename)
                     )
 
             # todo: handle item['attachments']
@@ -276,10 +278,11 @@ def import_guidle(group_context, url, tagmap):
 
                     if buffer:
                         buffer.seek(0)
+                        filename = image_url.rsplit('/', 1)[-1]
 
                         event.image = EventFile(
-                            name=image_url.rsplit('/', 1)[-1],
-                            reference=buffer
+                            name=filename,
+                            reference=as_fileintent(buffer, filename)
                         )
 
                     events.append(event)
@@ -382,9 +385,12 @@ def fetch(group_context, source, tag, location):
                             event.image and
                             EventFile(
                                 name=event.image.name,
-                                reference=event_file_path(
-                                    event.image.reference
-                                ).open('rb')
+                                reference=as_fileintent(
+                                    event_file_path(
+                                        event.image.reference
+                                    ).open('rb'),
+                                    event.image.name
+                                )
                             ) or None
                         ),
                         source=f'fetch-{key}-{event.name}',
