@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.39.0 (2018-10-18)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds UploadFileWithORMSupport, an upload field with onegov.file support.
   [href]
