@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.9.4 (2018-10-18)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to link to external sources.
   [href]

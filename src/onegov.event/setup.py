@@ -4,7 +4,7 @@ name = 'onegov.event'
 description = (
     'Calendar of events for OneGov.'
 )
-version = '0.9.3'
+version = '0.9.4'
 
 
 def get_long_description():
