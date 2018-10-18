@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to link to external sources.
+  [href]
+
 - Sets the end-time of events ending at midnight a microsecond before 00:00.
 
   This is consistent with other parts of the application.

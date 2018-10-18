@@ -106,6 +106,16 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
     def es_skip(self):
         return self.state == 'submitted' or self.state == 'withdrawn'
 
+    def source_url(self, request):
+        """ Returns an url pointing to the external event if imported. """
+        if not self.source:
+            return None
+
+        if self.source.startswith('guidle'):
+            guidle_id = self.source.split('-')[-1].split('.')[0]
+
+            return f"https://www.guidle.com/angebote/{guidle_id}"
+
     def __setattr__(self, name, value):
         """ Automatically update the occurrences if shared attributes change.
         """
