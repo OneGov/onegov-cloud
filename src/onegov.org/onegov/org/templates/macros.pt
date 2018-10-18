@@ -701,7 +701,8 @@
 
         <dt i18n:translate>Date and time</dt>
         <dd>
-            ${layout.format_datetime_range(event.localized_start, event.localized_end, with_year=True)}
+            ${layout.format_date(event.localized_start, 'event')},
+            ${layout.format_time_range(event.localized_start, event.localized_end)}
         </dd>
 
         <!-- we can have reucrrences which we do not display, therefore we check the displayed value -->
@@ -776,7 +777,9 @@
                     <h3><a href="${request.link(occurrence)}">${occurrence.title}</a></h3>
                     <div class="occurrence-date show-for-sr">${layout.format_date(occurrence.localized_start, 'date')}</div>
                     <div class="occurrence-location">${occurrence.location}</div>
-                    <div class="occurrence-time">${layout.format_date(occurrence.localized_start, 'time')} - ${layout.format_date(occurrence.localized_end, 'time')}</div>
+                    <div class="occurrence-time" tal:define="time layout.format_time_range(occurrence.localized_start, occurrence.localized_end)">
+                        ${time[0].upper()}${time[1:]}
+                    </div>
                     <div><span tal:repeat="tag occurrence.tags" class="blank-label" i18n:translate>${tag}</span></div>
                 </div>
                 <div class="clearfix"></div>

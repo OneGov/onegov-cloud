@@ -70,7 +70,7 @@ class Layout(ChameleonLayout):
 
     date_long_without_year_format = 'E d. MMMM'
     datetime_long_without_year_format = 'E d. MMMM HH:mm'
-    event_format = 'EEEE, d. MMMM YYYY, HH:mm'
+    event_format = 'EEEE, d. MMMM YYYY'
 
     def __init__(self, *args, **kwargs):
         # overrides body attributes set in the layout template
@@ -388,7 +388,12 @@ class Layout(ChameleonLayout):
         return to_timezone(date, timezone)
 
     def format_time_range(self, start, end):
-        return utils.format_time_range(start, end)
+        time_range = utils.render_time_range(start, end)
+
+        if time_range in ('00:00 - 24:00', '00:00 - 23:59'):
+            return self.request.translate(_("all day"))
+
+        return time_range
 
     def format_date_range(self, start, end):
         if start == end:

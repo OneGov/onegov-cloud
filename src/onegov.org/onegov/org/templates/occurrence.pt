@@ -6,7 +6,10 @@
         <div class="row">
             <div class="large-8 medium-8 columns">
                 <div class="page-lead">
-                    <div>${layout.format_date(occurrence.localized_start, 'event')}-${layout.format_date(occurrence.localized_end, 'time')}</div>
+                    <div>
+                        ${layout.format_date(occurrence.localized_start, 'event')},
+                        ${layout.format_time_range(occurrence.localized_start, occurrence.localized_end)}
+                    </div>
                     <div tal:condition="occurrence.event.location">${occurrence.event.location}</div>
                 </div>
 
@@ -34,7 +37,7 @@
                     <div class="panel callout imported-event-callout">
                         <p>
                             <tal:b i18n:translate>This is an imported event</tal:b>
-                            <div class="imported-event">${occurrence.event.source}</div>
+                            <a href="${occurrence.event.source_url(layout.request)}" class="imported-event">${occurrence.event.source}</a>
                         </p>
                     </div>
                 </tal:b>
@@ -60,7 +63,7 @@
                     </ul>
                 </div>
 
-                <div class="borderless-side-panel">
+                <div class="borderless-side-panel occurrence-dates">
                     <h2 i18n:translate="">All occurrences of this event</h2>
                     <ul>
                         <li tal:repeat="occurrence occurrences">

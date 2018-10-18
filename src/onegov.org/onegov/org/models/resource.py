@@ -11,7 +11,6 @@ from onegov.org.models.extensions import (
     HiddenFromPublicExtension,
     PersonLinkExtension,
 )
-from onegov.org.utils import correct_time_range
 from onegov.search import ORMSearchable
 from onegov.ticket import Ticket
 from sqlalchemy.sql.expression import cast
@@ -114,13 +113,16 @@ class SharedMethods(object):
         return query
 
     def reservation_title(self, reservation):
-        return correct_time_range(
-            self.title_template.format(
-                start=reservation.display_start(),
-                end=reservation.display_end(),
-                quota=reservation.quota
-            )
+        title = self.title_template.format(
+            start=reservation.display_start(),
+            end=reservation.display_end(),
+            quota=reservation.quota
         )
+
+        if title.endswith('00:00'):
+            return title[:-5] + '24:00'
+
+        return title
 
 
 class SearchableResource(ORMSearchable):

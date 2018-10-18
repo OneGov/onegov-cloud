@@ -305,6 +305,9 @@ class EventForm(Form):
             else:
                 self.repeat.data = 'dates'
                 self.dates.data = self.dates_to_json(tuple(rule))
+        elif self.errors.get('weekly'):
+            self.dates.data = self.dates_to_json(None)
+            self.repeat.data = 'weekly'
         else:
             self.dates.data = self.dates_to_json(None)
             self.repeat.data = 'without'

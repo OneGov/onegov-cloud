@@ -80,16 +80,6 @@ def get_extension_color(extension):
     return get_random_color(extension, lightness=0.5, saturation=0.5)
 
 
-def format_time_range(start, end):
-    return correct_time_range('{:%H:%M} - {:%H:%M}'.format(start, end))
-
-
-def correct_time_range(string):
-    if string.endswith('00:00'):
-        return string[:-5] + '24:00'
-    return string
-
-
 def add_class_to_node(node, classname):
     """ Adds the given classname to the given lxml node's class list. """
 
@@ -223,7 +213,7 @@ def parse_fullcalendar_request(request, timezone):
 def render_time_range(start, end):
     start = '{:%H:%M}'.format(start)
 
-    if (end.time() == time(0, 0)):
+    if end.time() in (time(0, 0), time(23, 59, 59, 999999)):
         end = '24:00'
     else:
         end = '{:%H:%M}'.format(end)

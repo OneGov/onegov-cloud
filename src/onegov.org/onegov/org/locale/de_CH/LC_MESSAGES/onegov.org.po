@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-10-16 12:53+0200\n"
+"POT-Creation-Date: 2018-10-18 09:52+0200\n"
 "PO-Revision-Date: 2018-09-24 12:21+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -95,6 +95,9 @@ msgstr "Sa"
 
 msgid "Su"
 msgstr "So"
+
+msgid "all day"
+msgstr "den ganzen Tag"
 
 msgid "Homepage"
 msgstr "Startseite"
@@ -647,6 +650,9 @@ msgstr "Beschreibung"
 
 msgid "Enjoy a concerto in the castle garden."
 msgstr "Freuen Sie sich auf ein klassisches Konzert im Schlossgarten."
+
+msgid "Image"
+msgstr "Bild"
 
 msgid "Location"
 msgstr "Ort"
@@ -1736,9 +1742,6 @@ msgstr "Rückerstattet"
 msgid "Manual"
 msgstr "Manuell"
 
-msgid "Ticket Number"
-msgstr "Ticket Nummer"
-
 msgid "Previous Page"
 msgstr "Vorherige Seite"
 
@@ -2274,6 +2277,9 @@ msgstr ""
 
 msgid "No activities yet."
 msgstr "Noch keine Aktivitäten."
+
+msgid "Ticket Number"
+msgstr "Ticket Nummer"
 
 msgid "Ticket State"
 msgstr "Ticket Status"

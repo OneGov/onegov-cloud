@@ -2251,8 +2251,8 @@ def test_view_occurrence(client):
     assert "Gemeindesaal" in event
     assert "Politik" in event
     assert "Alle Jahre wieder" in event
-    assert len(event.pyquery('.occurrence-occurrences li')) == 1
-    assert len(event.pyquery('.occurrence-exports h2')) == 1
+    assert len(event.pyquery('.occurrence-dates li')) == 1
+    assert len(event.pyquery('.calendar-export-list li')) == 1
     assert event.click('Diesen Termin exportieren').text.startswith(
         'BEGIN:VCALENDAR'
     )
@@ -2262,8 +2262,8 @@ def test_view_occurrence(client):
     assert "Turnhalle" in event
     assert "Sport" in event
     assert "fit werden" in event
-    assert len(event.pyquery('.occurrence-occurrences li')) == 9
-    assert len(event.pyquery('.occurrence-exports h2')) == 2
+    assert len(event.pyquery('.occurrence-dates li')) == 9
+    assert len(event.pyquery('.calendar-export-list li')) == 2
 
     assert event.click('Diesen Termin exportieren').\
         text.startswith('BEGIN:VCALENDAR')
@@ -2306,7 +2306,7 @@ def test_submit_event(client):
     assert "Ausstellung" in preview_page
     assert "The Organizer" in preview_page
     assert "Gastronomie" in preview_page
-    assert "{} 18:00 - 22:00".format(
+    assert "{}, 18:00 - 22:00".format(
         babel.dates.format_date(
             start_date, format='dd. MMMM yyyy', locale='de'
         )
@@ -2364,7 +2364,7 @@ def test_submit_event(client):
     assert "Ausstellung" in ticket_page
     assert "Gastronomie" in ticket_page
 
-    assert "{} 18:00 - 22:00".format(
+    assert "{}, 18:00 - 22:00".format(
         babel.dates.format_date(
             start_date, format='dd. MMMM yyyy', locale='de'
         )

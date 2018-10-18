@@ -1,6 +1,15 @@
 Changelog
 ---------
 
+- Adds the ability to associate an image with each event.
+  [href]
+
+- Links to external guidle events.
+  [href]
+
+- Improves display of events that last the whole day.
+  [href]
+
 0.40.0 (2018-10-16)
 ~~~~~~~~~~~~~~~~~~~
 

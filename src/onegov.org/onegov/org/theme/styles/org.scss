@@ -2817,12 +2817,12 @@ button {
             background: $black;
             border-radius: 0 0 0 $border-radius;
             color: $white;
-            padding: 0 .7rem;
+            padding: 0 .5rem;
             text-transform: uppercase;
         }
 
         .day {
-            padding: 0 0 0 .7rem;
+            padding: 0 0 0 .4rem;
         }
     }
 }
@@ -2846,12 +2846,13 @@ button {
 }
 
 .imported-event {
-    background-color: rgba(255, 255, 255, .5);
+    background-color: rgba(255, 255, 255, .65);
     border: 1px solid lighten($orange, 25%);
     display: inline-block;
     font-family: $font-family-monospace;
     font-size: .8rem;
     font-weight: bold;
+    margin-top: .5rem;
     padding: 1px 6px;
 }
 
