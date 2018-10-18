@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.74.2 (2018-10-18)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes macro rendering failing with latest chameleon release.
   [href]
