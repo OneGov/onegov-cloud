@@ -3,6 +3,7 @@ import phonenumbers
 
 from onegov.core.html import sanitize_html
 from onegov.core.utils import binary_to_dictionary
+from onegov.file.utils import as_fileintent
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form.validators import ValidPhoneNumber
 from onegov.form.widgets import IconWidget
@@ -125,7 +126,7 @@ class UploadFileWithORMSupport(UploadField):
 
                 setattr(obj, name, self.file_class(
                     name=self.filename,
-                    reference=self.file
+                    reference=as_fileintent(self.file, self.filename)
                 ))
         else:
             raise NotImplementedError(f"Unknown action: {self.action}")

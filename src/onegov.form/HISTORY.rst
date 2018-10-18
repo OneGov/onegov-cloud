@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes wrong content_type being created when uploading files with ORM support.
+  [href]
+
 0.39.1 (2018-10-18)
 ~~~~~~~~~~~~~~~~~~~
 
