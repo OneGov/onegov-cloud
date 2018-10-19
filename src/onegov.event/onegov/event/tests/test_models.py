@@ -534,7 +534,7 @@ def test_as_ical():
         modified=tzdatetime(2008, 2, 7, 10, 15, 'Europe/Zurich'),
         coordinates=Coordinates(47.051752750515746, 8.305739625357093)
     )
-    ical = event.as_ical(url=url).decode().strip().split('\r\n')
+    ical = event.as_ical(url=url).decode().strip().splitlines()
     assert sorted(ical) == sorted([
         'BEGIN:VCALENDAR',
         'VERSION:2.0',
@@ -565,7 +565,7 @@ def test_as_ical():
     occurrence = event.occurrences[0]
     occurrence.modified = tzdatetime(2008, 2, 7, 10, 15, 'Europe/Zurich')
 
-    ical = event.occurrences[0].as_ical(url=url).decode().strip().split('\r\n')
+    ical = event.occurrences[0].as_ical(url=url).decode().strip().splitlines()
     assert sorted(ical) == sorted([
         'BEGIN:VCALENDAR',
         'VERSION:2.0',

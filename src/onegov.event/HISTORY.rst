@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Changes carriage return newlines to simple newlines.
+  [href]
+
 - Fixes ampersands in titles.
   [href]
 

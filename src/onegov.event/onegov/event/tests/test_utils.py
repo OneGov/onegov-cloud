@@ -26,9 +26,9 @@ def test_import_guidle(session, xml):
         "Lorem ipsum\n\n"
         "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam "
         "nonumy eirmod tempor invidunt ut labore et dolore magna "
-        "aliquyam.\r\n\r\n"
-        "anschliessend Apéro\r\n\r\n"
-        "1-Tages- oder 2-Tagespass erhältlich\r\n\r\n"
+        "aliquyam.\n\n"
+        "anschliessend Apéro\n\n"
+        "1-Tages- oder 2-Tagespass erhältlich\n\n"
         "www.theatermenzingen.ch"
     )
     assert offers[0].organizer == (

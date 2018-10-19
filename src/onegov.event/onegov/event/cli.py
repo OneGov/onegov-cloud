@@ -123,7 +123,7 @@ def import_json(group_context, url, tagmap):
                 )).strip(),
             ) if line))
 
-            description = '\r\n\r\n'.join((line for line in (
+            description = '\n\n'.join((line for line in (
                 item['short_description'] or '',
                 item['long_description'] or '',
                 item['event_url'] or '',

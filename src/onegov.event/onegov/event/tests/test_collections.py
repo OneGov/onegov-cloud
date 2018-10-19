@@ -453,7 +453,7 @@ def test_unicode(session):
 
 def test_as_ical(session):
     occurrences = OccurrenceCollection(session)
-    ical = occurrences.as_ical(DummyRequest()).decode().strip().split('\r\n')
+    ical = occurrences.as_ical(DummyRequest()).decode().strip().splitlines()
     assert sorted(ical) == sorted([
         'BEGIN:VCALENDAR',
         'VERSION:2.0',
@@ -501,7 +501,7 @@ def test_as_ical(session):
         session.flush()
 
     occurrences = OccurrenceCollection(session)
-    ical = occurrences.as_ical(DummyRequest()).decode().strip().split('\r\n')
+    ical = occurrences.as_ical(DummyRequest()).decode().strip().splitlines()
     occurrences.query().all()
     assert sorted(ical) == sorted([
         'BEGIN:VCALENDAR',
@@ -511,7 +511,7 @@ def test_as_ical(session):
     ])
 
     occurrences = occurrences.for_filter(start=date(2015, 6, 1))
-    ical = occurrences.as_ical(DummyRequest()).decode().strip().split('\r\n')
+    ical = occurrences.as_ical(DummyRequest()).decode().strip().splitlines()
     assert sorted(ical) == sorted([
         'BEGIN:VCALENDAR',
         'VERSION:2.0',
@@ -550,7 +550,7 @@ def test_as_ical(session):
         start=date(2015, 6, 18),
         end=date(2018, 6, 18),
         tags=['history'])
-    ical = occurrences.as_ical(DummyRequest()).decode().strip().split('\r\n')
+    ical = occurrences.as_ical(DummyRequest()).decode().strip().splitlines()
     assert sorted(ical) == sorted([
         'BEGIN:VCALENDAR',
         'VERSION:2.0',
