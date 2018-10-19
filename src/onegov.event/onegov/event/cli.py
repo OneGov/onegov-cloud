@@ -285,7 +285,6 @@ def import_guidle(group_context, url, tagmap):
 
                     events.append(event)
 
-
             collection = EventCollection(app.session())
             added, updated, purged = collection.from_import(events, prefix)
 
