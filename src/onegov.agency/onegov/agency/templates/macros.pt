@@ -26,9 +26,9 @@
                 <div tal:content="structure agency.portrait"></div>
             </tal:block>
 
-            <tal:block tal:condition="agency.organigram">
+            <tal:block tal:condition="agency.organigram_file">
                 <h3 i18n:translate>Organigram</h3>
-                <img src="${request.link(agency._organigram)}">
+                <img src="${request.link(agency.organigram)}">
             </tal:block>
 
             <tal:block tal:condition="children">

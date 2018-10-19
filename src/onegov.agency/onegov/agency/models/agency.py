@@ -19,16 +19,16 @@ class ExtendedAgency(Agency):
     export_fields = meta_property()
     state = meta_property()  # todo: `is_visible`?
 
-    _pdf = associated(AgencyPdf, 'pdf', 'one-to-one')
+    pdf = associated(AgencyPdf, 'pdf', 'one-to-one')
 
     @property
-    def pdf(self):
-        if self._pdf:
-            return self._pdf.reference.file
+    def pdf_file(self):
+        if self.pdf:
+            return self.pdf.reference.file
 
-    @pdf.setter
-    def pdf(self, value):
+    @pdf_file.setter
+    def pdf_file(self, value):
         pdf = AgencyPdf(id=random_token())
         pdf.reference = as_fileintent(value, 'pdf')
         pdf.name = 'pdf'
-        self._pdf = pdf
+        self.pdf = pdf

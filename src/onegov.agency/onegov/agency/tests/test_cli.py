@@ -134,7 +134,7 @@ def test_import_agencies(cfg_path, session_manager, file):
     assert agency.meta['export_fields'] == (
         'role,title,academic_title,political_party'
     )
-    assert agency.organigram.read() == b'image'
+    assert agency.organigram_file.read() == b'image'
 
     person = session.query(Person).filter_by(last_name="Balmer").one()
     assert person.meta['academic_title'] == "lic.iur."

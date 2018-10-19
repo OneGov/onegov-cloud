@@ -69,7 +69,7 @@ def import_agencies(group_context, file, clear, dry_run, visualize):
             if organigram_url:
                 response = get(organigram_url)
                 response.raise_for_status()
-                agency.organigram = BytesIO(response.content)
+                agency.organigram_file = BytesIO(response.content)
 
             if sheet.cell_value(row, 5):
                 alphabetical.append(id_)
@@ -169,7 +169,7 @@ def export_pdf(group_context):
         #     file.write(pdf.read())
 
         for agency in agencies.query():
-            agency.pdf = AgencyPdf.from_agencies([agency], 'Kanton Zug')
+            agency.pdf_file = AgencyPdf.from_agencies([agency], 'Kanton Zug')
             click.secho(f"Created PDF of '{agency.title}'", fg='green')
 
     return _export_pdf

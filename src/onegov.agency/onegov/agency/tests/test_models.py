@@ -84,7 +84,7 @@ def test_agency(test_app):
     )
     assert not agency.meta
     assert not agency.content
-    assert agency.organigram.read() == b'png'
+    assert agency.organigram_file.read() == b'png'
 
 
 def test_agency_add_person(session):

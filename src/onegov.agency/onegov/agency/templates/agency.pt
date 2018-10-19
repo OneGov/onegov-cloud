@@ -11,11 +11,11 @@
             </div>
             <div class="columns medium-4">
 
-                <div tal:condition="agency.pdf" class="agency-exports borderless-side-panel">
+                <div tal:condition="agency.pdf_file" class="agency-exports borderless-side-panel">
                     <h2 i18n:translate>Exports</h2>
                     <ul class="agency-export-list">
                         <li>
-                            <a href="${request.link(agency._pdf)}" i18n:translate>
+                            <a href="${request.link(agency.pdf)}" i18n:translate>
                                 Export this agency and its children as a PDF
                             </a>
                         </li>

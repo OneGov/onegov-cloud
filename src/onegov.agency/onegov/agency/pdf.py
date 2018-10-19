@@ -79,9 +79,9 @@ class AgencyPdf(Pdf):
             self.memberships(agency)
             has_content = True
 
-        if agency.organigram:
+        if agency.organigram_file:
             self.spacer()
-            self.image(agency.organigram)
+            self.image(agency.organigram_file)
             self.spacer()
             has_content = True
 
