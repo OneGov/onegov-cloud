@@ -141,7 +141,7 @@ class File(Base, Associable, TimestampMixin):
                 # note, the thumbnail configuration should not be changed
                 # anywhere but here - for consistency.
                 WithThumbnailFilter(
-                    name='small', size=(256, 256), format='png'
+                    name='small', size=(512, 512), format='png'
                 )
             ),
             OnlyIfPDF(

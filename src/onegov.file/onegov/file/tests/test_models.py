@@ -152,21 +152,21 @@ def test_pdf_preview_creation(session):
 
 
 def test_max_image_size(session):
-    session.add(File(name='unchanged.png', reference=create_image(1024, 1024)))
-    session.add(File(name='limited.png', reference=create_image(1025, 1024)))
+    session.add(File(name='unchanged.png', reference=create_image(2048, 2048)))
+    session.add(File(name='limited.png', reference=create_image(2049, 2048)))
 
     transaction.commit()
 
     limited, unchanged = session.query(File).order_by(File.name).all()
 
-    assert Image.open(limited.reference.file).size == (1024, 1023)
-    assert Image.open(unchanged.reference.file).size == (1024, 1024)
+    assert Image.open(limited.reference.file).size == (2048, 2047)
+    assert Image.open(unchanged.reference.file).size == (2048, 2048)
 
-    assert unchanged.reference.size == ['1024px', '1024px']
-    assert limited.reference.size == ['1024px', '1023px']
+    assert unchanged.reference.size == ['2048px', '2048px']
+    assert limited.reference.size == ['2048px', '2047px']
 
-    assert unchanged.reference.thumbnail_small['size'] == ['256px', '256px']
-    assert limited.reference.thumbnail_small['size'] == ['256px', '255px']
+    assert unchanged.reference.thumbnail_small['size'] == ['512px', '512px']
+    assert limited.reference.thumbnail_small['size'] == ['512px', '511px']
 
 
 def test_checksum(session):
@@ -218,13 +218,13 @@ def test_determine_unknown_svg_size(session, temporary_path):
 
     # use the default max size as the size if we can't determine one
     logo = session.query(File).order_by(File.name).one()
-    assert logo.reference.size == ['1024px', '1024px']
+    assert logo.reference.size == ['2048px', '2048px']
 
 
 def test_associated_files(session):
     post = Blogpost(
         text="My interview at <company>",
-        files=[File(name='frowney.png', reference=create_image(1024, 1024))]
+        files=[File(name='frowney.png', reference=create_image(2048, 2048))]
     )
 
     session.add(post)
@@ -232,7 +232,7 @@ def test_associated_files(session):
 
     assert len(post.files) == 1
     assert post.files[0].name == 'frowney.png'
-    assert post.files[0].reference.size == ('1024px', '1024px')
+    assert post.files[0].reference.size == ('2048px', '2048px')
 
     assert session.query(File).one().linked_blogposts == [post]
     assert session.query(File).one().links.all() == (post, )

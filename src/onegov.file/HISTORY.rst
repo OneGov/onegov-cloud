@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Increases the thumbnail and image sizes to properly support retina displays.
+  [href]
+
 0.12.2 (2018-10-11)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -15,8 +15,8 @@ from PIL import Image
 from tempfile import SpooledTemporaryFile
 
 
-IMAGE_MAX_SIZE = 1024
-IMAGE_QUALITY = 90
+IMAGE_MAX_SIZE = 2048
+IMAGE_QUALITY = 85
 CHECKSUM_FUNCTION = 'md5'
 
 
