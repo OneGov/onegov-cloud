@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes ampersands in titles.
+  [href]
+
 - Gets the originals when downloading guidle images.
   [href]
 

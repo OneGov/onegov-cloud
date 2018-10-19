@@ -69,7 +69,16 @@ class GuidleOffer(GuidleBase):
 
     @cached_property
     def title(self):
-        return self.get('guidle:offerDetail/guidle:title')
+        title = self.get('guidle:offerDetail/guidle:title')
+
+        # titles are rendered as unsafe html downstream, so we can
+        # losen the rules one tiny bit here.
+
+        # we'll still have '&gt,' and '&lt;', but those are probably
+        # used very rarely in a title, so we can ignore that
+        title = title.replace('&amp;', '&')
+
+        return title
 
     @cached_property
     def description(self):
@@ -86,7 +95,7 @@ class GuidleOffer(GuidleBase):
             self.get('guidle:offerDetail/guidle:homepage'),
             self.get('guidle:offerDetail/guidle:priceInformation'),
             self.get('guidle:offerDetail/guidle:ticketingUrl')
-        ), '\r\n\r\n')
+        ), '\n\n')
 
     @cached_property
     def organizer(self):
