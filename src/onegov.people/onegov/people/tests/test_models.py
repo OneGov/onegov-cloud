@@ -68,7 +68,7 @@ def test_agency(test_app):
                 "matters related to laws concerning foreigners, as well as "
                 "the granting and extension of residence permits."
             ),
-            organigram=b'png'
+            organigram_file=b'png'
         )
     )
     session.flush()
@@ -84,7 +84,7 @@ def test_agency(test_app):
     )
     assert not agency.meta
     assert not agency.content
-    assert agency.organigram.read() == b'png'
+    assert agency.organigram_file.read() == b'png'
 
 
 def test_agency_add_person(session):

@@ -45,20 +45,24 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable):
     #: describes the agency
     portrait = Column(Text, nullable=True)
 
-    #: an organization chart
-    _organigram = associated(AgencyOrganigram, 'organigram', 'one-to-one')
+    #: a reference to the organization chart
+    organigram = associated(AgencyOrganigram, 'organigram', 'one-to-one')
 
     @property
-    def organigram(self):
-        if self._organigram:
-            return self._organigram.reference.file
+    def organigram_file(self):
+        """ Returns the file-like content of the organigram. """
 
-    @organigram.setter
-    def organigram(self, value):
+        if self.organigram:
+            return self.organigram.reference.file
+
+    @organigram_file.setter
+    def organigram_file(self, value):
+        """ Sets the organigram, expects a file-like value. """
+
         organigram = AgencyOrganigram(id=random_token())
         organigram.reference = as_fileintent(value, 'organigram')
         organigram.name = 'organigram'
-        self._organigram = organigram
+        self.organigram = organigram
 
     def add_person(self, person, title, **kwargs):
         """ Append a person to the agency with the given title. """
