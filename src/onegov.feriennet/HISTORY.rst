@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.4.9 (2018-10-19)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes e-mails not showing up in the occasions attendee view.
   [href]
