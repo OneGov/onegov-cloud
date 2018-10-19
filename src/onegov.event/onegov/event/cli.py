@@ -244,12 +244,8 @@ def import_guidle(group_context, url, tagmap):
                 tags, unknown = offer.tags(tagmap)
                 unknown_tags |= unknown
 
-                # medium sized images seem to be larger than what we actually
-                # use, so no need to use bigger sizes (if we do, we need to
-                # change the download_image function to not operate solely
-                # in memory)
                 if isinstance(app, DepotApp):
-                    image_url = offer.image_url(size='medium')
+                    image_url = offer.image_url(size='original')
                 else:
                     image_url = None
 

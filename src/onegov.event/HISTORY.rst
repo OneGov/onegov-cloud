@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Gets the originals when downloading guidle images.
+  [href]
+
 0.9.6 (2018-10-19)
 ~~~~~~~~~~~~~~~~~~~
 
