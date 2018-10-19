@@ -1,0 +1,50 @@
+page-default: &lorem-ipsum
+  text: |
+    <p>
+      Weit hinten, hinter den Wortbergen, fern der Länder Vokalien und
+      Konsonantien leben die Blindtexte. Abgeschieden wohnen sie in
+      Buchstabhausen an der Küste des Semantik, eines grossen Sprachozeans.
+    </p>
+
+    <p>
+      Ein kleines Bächlein namens Duden fließt durch ihren Ort und versorgt
+      sie mit den nötigen Regelialien. Es ist ein paradiesmatisches Land,
+      in dem einem gebratene Satzteile in den Mund fliegen.
+    </p>
+
+    <p>
+      Nicht einmal von der allmächtigen Interpunktion werden die Blindtexte
+      beherrscht – ein geradezu unorthographisches Leben. Eines Tages aber
+      beschloss eine kleine Zeile Blindtext, ihr Name war Lorem Ipsum,
+      hinaus zu gehen in die weite Grammatik.
+    </p>
+
+pages:
+  - title: Aktuelles
+    type: news
+    name: news
+    meta:
+      trait: news
+
+organisation:
+  theme_options:
+    footer-height: 235px
+    primary-color: '#e33521'
+  meta:
+    homepage_structure: |
+      <row>
+        <column span="12">
+          <panel>
+            <links>
+                <link url="./people"
+                    description="Alle Personen">
+                    Personen
+                </link>
+                <link url="./agencies"
+                    description="Alle Organisationen">
+                    Organisationen
+                </link>
+            </links>
+          </panel>
+        </column>
+      </row>

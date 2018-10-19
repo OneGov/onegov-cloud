@@ -1,0 +1,167 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE 1.0\n"
+"POT-Creation-Date: 2018-10-19 16:54+0200\n"
+"PO-Revision-Date: 2018-10-19 16:55+0200\n"
+"Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
+"Language-Team: German\n"
+"Language: de_CH\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Lingua 3.12\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.2\n"
+
+msgid "People"
+msgstr "Personen"
+
+msgid "Agencies"
+msgstr "Organisationen"
+
+msgid "Title"
+msgstr "Titel"
+
+msgid "Description"
+msgstr "Beschreibung"
+
+msgid "Portrait"
+msgstr "Portrait"
+
+msgid "Private"
+msgstr "Privat"
+
+msgid "Public"
+msgstr "Öffentlich"
+
+msgid "Academic Title"
+msgstr "Akademischer Titel"
+
+msgid "First name"
+msgstr "Vorname"
+
+msgid "Last name"
+msgstr "Nachname"
+
+msgid "Profession"
+msgstr "Beruf"
+
+msgid "Political Party"
+msgstr "Politische Partei"
+
+msgid "Year"
+msgstr "Jahrgang"
+
+msgid "Address"
+msgstr "Adresse"
+
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "Direct Phone"
+msgstr "Direktnummer"
+
+msgid "Salutation"
+msgstr "Anrede"
+
+msgid "Email"
+msgstr "E-Mail"
+
+msgid "Website"
+msgstr "Webseite"
+
+msgid "Keywords"
+msgstr "Stichworte"
+
+msgid "Notes"
+msgstr "Bemerkungen"
+
+msgid "Homepage"
+msgstr "Startseite"
+
+msgid "Add"
+msgstr "Hinzufügen"
+
+msgid "Edit"
+msgstr "Bearbeiten"
+
+msgid "Delete"
+msgstr "Löschen"
+
+msgid "Do you really want to delete this agency?"
+msgstr "Möchten Sie die Organisation wirklich löschen?"
+
+msgid "This cannot be undone."
+msgstr "Dies kann nicht rückgängig gemacht werden."
+
+msgid "Delete agency"
+msgstr "Organisation löschen"
+
+msgid "Agency"
+msgstr "Organisation"
+
+msgid "No agencies added yet."
+msgstr "Es wurden noch keine Organisationen hinzugefügt."
+
+msgid "Exports"
+msgstr "Exporte"
+
+msgid "Export all organisations as PDF"
+msgstr "Gesamter Staatskalender als PDF"
+
+msgid "Propose entry"
+msgstr "Eintrag vorschlagen"
+
+msgid "Propose a new entry"
+msgstr "Einen neuen Eintrag vorschlagen"
+
+msgid "Export this agency and its children as a PDF"
+msgstr "Organisation als PDF speichern"
+
+msgid "Report change"
+msgstr "Mutation melden"
+
+msgid "Report a change"
+msgstr "Eine Mutation melden"
+
+msgid "Organigram"
+msgstr "Organigramm"
+
+msgid "Suborganizations"
+msgstr "Unterorganisationen"
+
+msgid "Memberships"
+msgstr "Mitgliedschaften"
+
+msgid "No people found."
+msgstr "Keine Personen gefunden."
+
+msgid "Letter"
+msgstr "Buchstabe"
+
+msgid "Report a change of personnel"
+msgstr "Eine Mutation melden"
+
+msgid "New agency"
+msgstr "Neue Organisation"
+
+msgid "Added a new agency"
+msgstr "Eine neue Organisation wurde hinzufügt"
+
+msgid "New"
+msgstr "Neu"
+
+msgid "Your changes were saved"
+msgstr "Ihre Änderungen wurden gespeichert"
+
+msgid "New person"
+msgstr "Neue Person"
+
+msgid "Added a new person"
+msgstr "Eine neue Person wurde hinzugefügt"
+
+#~ msgid "No people added yet."
+#~ msgstr "Es wurden noch keine Personen hinzugefügt."
+
+#~ msgid "Organizations"
+#~ msgstr "Organisationen"

@@ -1,0 +1,43 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.agency">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <div class="row reverse-on-mobile">
+            <div class="columns medium-8">
+
+                <p tal:condition="not:agencies" i18n:translate="">No agencies added yet.</p>
+                <tal:block tal:repeat="agency agencies">
+                    <div metal:use-macro="layout.macros['agency_list_card']"/>
+                </tal:block>
+
+            </div>
+
+            <div class="columns medium-4">
+
+                <div tal:condition="True" class="agency-exports borderless-side-panel">
+                    <h2 i18n:translate>Exports</h2>
+                    <ul class="agency-export-list">
+                        <li>
+                            <a href="#" i18n:translate>
+                                Export all organisations as PDF
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="submit-yours">
+                    <dl>
+                        <dt>
+                            <a href="#">
+                                <h2 i18n:translate>Propose entry</h2>
+                            </a>
+                        </dt>
+                        <dd i18n:translate>Propose a new entry</dd>
+                    </dl>
+                </div>
+
+            </div>
+        </div>
+    </tal:block>
+</div>

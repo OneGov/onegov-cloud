@@ -1,0 +1,28 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.agency">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <div class="row reverse-on-mobile">
+            <div class="columns medium-8">
+
+                <div metal:use-macro="layout.macros['person_card']" />
+
+            </div>
+            <div class="columns medium-4">
+
+                <div class="submit-yours">
+                    <dl>
+                        <dt>
+                            <a href="#">
+                                <h2 i18n:translate>Report change</h2>
+                            </a>
+                        </dt>
+                        <dd i18n:translate>Report a change of personnel</dd>
+                    </dl>
+                </div>
+
+            </div>
+        </div>
+    </tal:block>
+</div>

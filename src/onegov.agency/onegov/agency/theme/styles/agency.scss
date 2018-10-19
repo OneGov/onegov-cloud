@@ -1,0 +1,31 @@
+.agency-list-card {
+    margin-bottom: 1rem;
+}
+
+.agency-card {
+    h3:not(:first-child) {
+        margin-top: 1em;
+    }
+
+    dt,
+    dd {
+        display: inline;
+        font-weight: normal;
+    }
+
+    .children {
+        &,
+        li {
+            list-style: none;
+            margin-left: 0;
+        }
+    }
+}
+
+.agency-export-list {
+    a::before {
+        @include icon('\f1c1');
+        color: $body-font-color;
+        margin-right: 1ex;
+    }
+}
