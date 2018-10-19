@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.9.7 (2018-10-19)
+~~~~~~~~~~~~~~~~~~~
 
 - Changes carriage return newlines to simple newlines.
   [href]
