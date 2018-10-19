@@ -51,7 +51,7 @@ class OccasionAttendeeCollection(OccasionCollection):
         contacts = {
             u.username: {
                 'emergency': u.data and u.data.get('emergency'),
-                'email': u.data and u.data.get('email', u.username),
+                'email': u.data and u.data.get('email') or u.username,
                 'place': u.data and u.data.get('place')
             }
             for u in self.session.query(
