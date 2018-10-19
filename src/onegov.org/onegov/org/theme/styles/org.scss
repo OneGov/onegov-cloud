@@ -2781,6 +2781,7 @@ button {
 */
 .calendar-day {
     $border-radius: 4px;
+    $icon-size: 3rem;
 
     background-color: $topbar-bg-color;
     border-radius: $border-radius $border-radius 0 0;
@@ -2794,13 +2795,19 @@ button {
         border-radius: $border-radius $border-radius 0 0;
         padding-top: 75%;
         width: 100%;
+        position: relative;
 
         .fa {
+            bottom: 0;
             color: $iron;
-            font-size: 3rem;
-            left: 37.25%;
+            font-size: $icon-size;
+            height: $icon-size;
+            left: 0;
+            margin: auto;
             position: absolute;
-            top: 20%;
+            right: 0;
+            top: 0;
+            width: $icon-size;
         }
     }
 

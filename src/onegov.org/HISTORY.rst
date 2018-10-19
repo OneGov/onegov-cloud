@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes calendar icon in events view not being centered on mobile.
+  [href]
+
 0.40.1 (2018-10-18)
 ~~~~~~~~~~~~~~~~~~~
 
