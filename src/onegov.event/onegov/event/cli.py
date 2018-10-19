@@ -136,7 +136,6 @@ def import_json(group_context, url, tagmap):
             if tagmap and tags:
                 unknown_tags |= set(tags) - tagmap.keys()
                 tags = {tagmap[tag] for tag in tags if tag in tagmap}
-            # todo: handle item['cat2']
 
             coordinates = None
             if item['latitude'] and item['longitude']:
@@ -173,13 +172,12 @@ def import_json(group_context, url, tagmap):
                 buffer = download_image(item['images'][0]['url'])
 
                 if buffer:
-                    filename = item['images'][0]['name']
+                    filename = item['images'][0]['name'] or 'event-image'
                     event.image = EventFile(
                         name=filename,
                         reference=as_fileintent(buffer, filename)
                     )
 
-            # todo: handle item['attachments']
             session.add(event)
             event.submit()
             event.publish()
@@ -287,7 +285,6 @@ def import_guidle(group_context, url, tagmap):
 
                     events.append(event)
 
-                # todo: handle attachements
 
             collection = EventCollection(app.session())
             added, updated, purged = collection.from_import(events, prefix)
@@ -407,7 +404,6 @@ def fetch(group_context, source, tag, location):
                     result,
                     local_events.from_import(remote_events, f'fetch-{key}')
                 )
-                # todo: attachments
 
             click.secho(
                 f"Events successfully fetched "

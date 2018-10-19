@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes importing events with images with no filename throwing an error.
+  [msom]
+
 0.9.5 (2018-10-18)
 ~~~~~~~~~~~~~~~~~~~
 
