@@ -40,7 +40,7 @@ msgid "Generalabonnement for Towns"
 msgstr "Generalabonnement Gemeinde"
 
 msgid "Official Documents"
-msgstr "Offizielle Dokumente"
+msgstr "Amtliche Dokumente"
 
 msgid "People"
 msgstr "Personen"
