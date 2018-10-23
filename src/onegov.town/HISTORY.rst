@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.15.6 (2018-10-23)
+~~~~~~~~~~~~~~~~~~~~~
 
 - Improves German translation.
   [href]
