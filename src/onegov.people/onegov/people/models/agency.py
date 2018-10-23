@@ -6,6 +6,8 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.utils import normalize_for_url
 from onegov.file import File
 from onegov.file.utils import as_fileintent
+from onegov.file.utils import content_type_from_fileobj
+from onegov.file.utils import extension_for_content_type
 from onegov.people.models.membership import AgencyMembership
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
@@ -59,9 +61,13 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable):
     def organigram_file(self, value):
         """ Sets the organigram, expects a file-like value. """
 
+        filename = 'organigram-{}.{}'.format(
+            normalize_for_url(self.title),
+            extension_for_content_type(content_type_from_fileobj(value))
+        )
         organigram = AgencyOrganigram(id=random_token())
-        organigram.reference = as_fileintent(value, 'organigram')
-        organigram.name = 'organigram'
+        organigram.reference = as_fileintent(value, filename)
+        organigram.name = filename
         self.organigram = organigram
 
     def add_person(self, person, title, **kwargs):

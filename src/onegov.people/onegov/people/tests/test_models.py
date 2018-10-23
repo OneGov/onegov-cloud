@@ -1,6 +1,9 @@
+from onegov.core.utils import module_path
 from onegov.people.models import Agency
 from onegov.people.models import AgencyMembership
 from onegov.people.models import Person
+from os.path import splitext
+from pytest import mark
 
 
 def test_person(session):
@@ -67,8 +70,7 @@ def test_agency(test_app):
                 "The Foreigners’ Registration Office is responsible for "
                 "matters related to laws concerning foreigners, as well as "
                 "the granting and extension of residence permits."
-            ),
-            organigram_file=b'png'
+            )
         )
     )
     session.flush()
@@ -84,7 +86,28 @@ def test_agency(test_app):
     )
     assert not agency.meta
     assert not agency.content
-    assert agency.organigram_file.read() == b'png'
+
+
+@mark.parametrize("organigram", [
+    (module_path('onegov.people', 'tests/fixtures/organigram.jpg'), '.jpe'),
+    (module_path('onegov.people', 'tests/fixtures/organigram.png'), '.png'),
+])
+def test_agency_organigram(test_app, organigram):
+    with open(organigram[0], 'rb') as organigram_file:
+        session = test_app.session()
+        session.add(
+            Agency(
+                title="Agency",
+                name="agency",
+                organigram_file=organigram_file
+            )
+        )
+        session.flush()
+    agency = session.query(Agency).one()
+
+    assert splitext(agency.organigram_file.name)[1] == organigram[1]
+    with open(organigram[0], 'rb') as organigram_file:
+        assert agency.organigram_file.read() == organigram_file.read()
 
 
 def test_agency_add_person(session):
