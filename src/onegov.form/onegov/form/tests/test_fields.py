@@ -6,11 +6,13 @@ from gzip import GzipFile
 from io import BytesIO
 from onegov.core.utils import dictionary_to_binary
 from onegov.form import Form
+from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import HtmlField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import OrderedMultiCheckboxField
-from onegov.form.fields import UploadField
 from onegov.form.fields import PhoneNumberField
+from onegov.form.fields import UploadField
 from onegov.form.validators import ValidPhoneNumber
 
 
@@ -115,3 +117,25 @@ def test_phone_number_field():
     field = PhoneNumberField(validators=[ValidPhoneNumber(country='DE')])
     field = field.bind(form, 'phone_number')
     assert field.validators[0].country == 'DE'
+
+
+def test_chosen_select_field():
+    form = Form()
+    field = ChosenSelectField(choices=(('a', 'b'),))
+    field = field.bind(form, 'choice')
+
+    field.data = ''
+    assert 'class="chosen-select"' in field()
+    assert 'data-no_results_text="No results match"' in field()
+    assert 'data-placeholder="Select an Option"' in field()
+
+
+def test_chosen_select_multiple_field():
+    form = Form()
+    field = ChosenSelectMultipleField(choices=(('a', 'b'),))
+    field = field.bind(form, 'choice')
+
+    field.data = ''
+    assert 'class="chosen-select"' in field()
+    assert 'data-no_results_text="No results match"' in field()
+    assert 'data-placeholder="Select Some Options"' in field()

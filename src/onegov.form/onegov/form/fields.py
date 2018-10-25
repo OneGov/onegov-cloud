@@ -6,17 +6,20 @@ from onegov.core.utils import binary_to_dictionary
 from onegov.file.utils import as_fileintent
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form.validators import ValidPhoneNumber
+from onegov.form.widgets import ChosenSelectWidget
 from onegov.form.widgets import IconWidget
 from onegov.form.widgets import MultiCheckboxWidget
 from onegov.form.widgets import OrderedMultiCheckboxWidget
 from onegov.form.widgets import TagsWidget
 from onegov.form.widgets import UploadWidget
 from wtforms import FileField
+from wtforms import SelectField
 from wtforms import SelectMultipleField
 from wtforms import StringField
 from wtforms import TextAreaField
 from wtforms import widgets
-from wtforms.validators import DataRequired, InputRequired
+from wtforms.validators import DataRequired
+from wtforms.validators import InputRequired
 
 
 class MultiCheckboxField(SelectMultipleField):
@@ -207,3 +210,15 @@ class PhoneNumberField(StringField):
             )
         except Exception:
             return self.data
+
+
+class ChosenSelectField(SelectField):
+    """ A select field with chosen.js support. """
+
+    widget = ChosenSelectWidget()
+
+
+class ChosenSelectMultipleField(SelectMultipleField):
+    """ A multiple select field with chosen.js support. """
+
+    widget = ChosenSelectWidget(multiple=True)

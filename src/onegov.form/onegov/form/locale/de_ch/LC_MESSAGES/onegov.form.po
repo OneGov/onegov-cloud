@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-09-18 15:53+0200\n"
+"POT-Creation-Date: 2018-10-24 09:08+0200\n"
 "PO-Revision-Date: 2015-10-15 09:43+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -18,11 +18,14 @@ msgstr ""
 "Generated-By: Lingua 3.11\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "Required"
-msgstr "Pflicht"
+msgid "Select an Option"
+msgstr "Eine Option auswählen"
 
-msgid "Optional"
-msgstr "Optional"
+msgid "No results match"
+msgstr "Keine Ergebnisse gefunden:"
+
+msgid "Select Some Options"
+msgstr "Mehrere Optionen auswählen"
 
 #, python-format
 msgid "The file is too large, please provide a file smaller than {}."
@@ -53,6 +56,12 @@ msgstr ""
 
 msgid "Not a valid phone number."
 msgstr "Ungültige Telefonnummer."
+
+msgid "Required"
+msgstr "Pflicht"
+
+msgid "Optional"
+msgstr "Optional"
 
 msgid "Uploaded file"
 msgstr "Hochgeladene Datei"

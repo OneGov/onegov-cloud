@@ -3,7 +3,10 @@ import humanize
 
 from cgi import escape
 from onegov.form import _
-from wtforms.widgets import ListWidget, FileInput, TextInput
+from wtforms.widgets import FileInput
+from wtforms.widgets import ListWidget
+from wtforms.widgets import Select
+from wtforms.widgets import TextInput
 from wtforms.widgets.core import HTMLString
 
 
@@ -181,3 +184,19 @@ class IconWidget(TextInput):
             id=field.id,
             value=field.data or icons[0]
         ))
+
+
+class ChosenSelectWidget(Select):
+
+    def __call__(self, field, **kwargs):
+        kwargs['class_'] = '{} chosen-select'.format(
+            kwargs.get('class_', '')
+        ).strip()
+        kwargs['data-placeholder'] = field.gettext(_("Select an Option"))
+        kwargs['data-no_results_text'] = field.gettext(_("No results match"))
+        if self.multiple:
+            kwargs['data-placeholder'] = field.gettext(
+                _("Select Some Options")
+            )
+
+        return super(ChosenSelectWidget, self).__call__(field, **kwargs)

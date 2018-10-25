@@ -89,3 +89,14 @@ def get_formcode_asset():
 def get_iconwidget_asset():
     yield 'iconwidget.css'
     yield 'iconwidget.js'
+
+
+@FormApp.webasset(
+    'chosen',
+    filters={'css': ['datauri', 'custom-rcssmin']}
+)
+def get_chosen_asset():
+    # Make sure your app includes jQuery!
+    yield 'chosen.css'
+    yield 'chosen.jquery.js'
+    yield 'chosen-init.js'
