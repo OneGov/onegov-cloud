@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.40.0 (2018-10-25)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds chosen select fields.
   [msom]
