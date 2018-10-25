@@ -120,8 +120,8 @@ def test_agency_add_person(session):
     session.flush()
 
     agency.add_person(patty, "Staff")
-    agency.add_person(selma, "Staff", since="2012")
-    agency.add_person(selma, "Managing director", since="2018")
+    agency.add_person(selma.id, "Staff", since="2012")
+    agency.add_person(str(selma.id), "Managing director", since="2018")
 
     assert [m.order for m in agency.memberships] == [0, 1, 2]
 
