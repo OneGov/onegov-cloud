@@ -1,18 +1,6 @@
 from onegov.form.fields import MultiCheckboxField as MultiCheckboxFieldBase
 from onegov.gazette import _
-from wtforms import SelectField as SelectFieldBase
 from wtforms.fields.html5 import DateTimeLocalField as DateTimeLocalFieldBase
-
-
-class SelectField(SelectFieldBase):
-    """ A select field with chosen support. """
-
-    def __init__(self, *args, **kwargs):
-        render_kw = kwargs.pop('render_kw', {})
-        render_kw['class_'] = 'chosen-select'
-        kwargs['render_kw'] = render_kw
-
-        super().__init__(*args, **kwargs)
 
 
 class MultiCheckboxField(MultiCheckboxFieldBase):

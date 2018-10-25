@@ -1,9 +1,9 @@
 from datetime import date
 from onegov.form import Form
+from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import PhoneNumberField
 from onegov.gazette import _
 from onegov.gazette.fields import MultiCheckboxField
-from onegov.gazette.fields import SelectField
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import Category
 from onegov.gazette.models import Issue
@@ -39,7 +39,7 @@ class NoticeForm(Form):
         render_kw={'maxlength': 60},
     )
 
-    organization = SelectField(
+    organization = ChosenSelectField(
         label=_("Organization"),
         choices=[],
         validators=[
@@ -47,7 +47,7 @@ class NoticeForm(Form):
         ]
     )
 
-    category = SelectField(
+    category = ChosenSelectField(
         label=_("Category"),
         choices=[],
         validators=[

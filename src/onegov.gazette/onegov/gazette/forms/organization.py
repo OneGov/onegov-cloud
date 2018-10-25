@@ -1,6 +1,6 @@
 from onegov.form import Form
+from onegov.form.fields import ChosenSelectField
 from onegov.gazette import _
-from onegov.gazette.fields import SelectField
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import Organization
 from onegov.gazette.validators import UniqueColumnValue
@@ -14,7 +14,7 @@ from wtforms.validators import InputRequired
 
 class OrganizationForm(Form):
 
-    parent = SelectField(
+    parent = ChosenSelectField(
         label=_("Parent Organization"),
         choices=[('', '')]
     )

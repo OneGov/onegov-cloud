@@ -142,8 +142,6 @@ def get_frameworks_asset():
     yield 'foundation.js'
     yield 'underscore.js'
     yield 'stacktable.js'
-    yield 'chosen.css'
-    yield 'chosen.jquery.js'
     yield 'sortable.js'
     yield 'sortable_custom.js'
     yield 'dropzone.js'

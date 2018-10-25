@@ -4,15 +4,6 @@ $(document).foundation();
 // stack tables wishing to be stacked
 $('.stackable').stacktable();
 
-// dropdowns wishing to be chosened
-$('.chosen-select').chosen({
-    no_results_text: "Keine Ergebnisse gefunden:",
-    placeholder_text_multiple: "Mehrere Optionen auswählen",
-    placeholder_text_single: "Eine Option auswählen",
-    search_contains: true,
-    width: '100%'
-});
-
 // Add backend dropdown actions
 $('ul.actions').each(function(index, element) {
     $(element).before(

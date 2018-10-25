@@ -1,7 +1,7 @@
 from onegov.form import Form
+from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import PhoneNumberField
 from onegov.gazette import _
-from onegov.gazette.fields import SelectField
 from onegov.gazette.validators import UniqueColumnValue
 from onegov.user import User
 from onegov.user import UserGroup
@@ -24,7 +24,7 @@ class UserForm(Form):
         ]
     )
 
-    group = SelectField(
+    group = ChosenSelectField(
         label=_("Group"),
         choices=[('', '')]
     )

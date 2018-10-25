@@ -25,6 +25,7 @@ class Layout(ChameleonLayout):
     def __init__(self, model, request):
         super().__init__(model, request)
         self.request.include('frameworks')
+        self.request.include('chosen')
         self.request.include('quill')
         self.request.include('common')
         self.breadcrumbs = []

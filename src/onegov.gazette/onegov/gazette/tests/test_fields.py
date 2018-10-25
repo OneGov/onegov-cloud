@@ -2,7 +2,6 @@ from datetime import datetime
 from onegov.form import Form
 from onegov.gazette.fields import DateTimeLocalField
 from onegov.gazette.fields import MultiCheckboxField
-from onegov.gazette.fields import SelectField
 
 
 class DummyPostData(dict):
@@ -11,15 +10,6 @@ class DummyPostData(dict):
         if not isinstance(v, (list, tuple)):
             v = [v]
         return v
-
-
-def test_select_field():
-    form = Form()
-    field = SelectField(choices=(('a', 'b'),))
-    field = field.bind(form, 'choice')
-
-    field.data = ''
-    assert 'class="chosen-select"' in field()
 
 
 def test_multi_checkbox_field():
