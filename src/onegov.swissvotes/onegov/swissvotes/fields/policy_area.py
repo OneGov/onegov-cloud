@@ -1,9 +1,9 @@
-from wtforms import SelectMultipleField
-from wtforms.widgets import Select
+from onegov.form.fields import ChosenSelectMultipleField
+from onegov.form.widgets import ChosenSelectWidget
 from onegov.swissvotes.models import PolicyArea
 
 
-class PolicyAreaWidget(Select):
+class PolicyAreaWidget(ChosenSelectWidget):
     """ The widget for the chosen field.
 
     Adds custom classes based on provided value.
@@ -18,14 +18,7 @@ class PolicyAreaWidget(Select):
         )
 
 
-class PolicyAreaField(SelectMultipleField):
+class PolicyAreaField(ChosenSelectMultipleField):
     """ A select field with chosen support. """
 
     widget = PolicyAreaWidget(multiple=True)
-
-    def __init__(self, *args, **kwargs):
-        render_kw = kwargs.pop('render_kw', {})
-        render_kw['class_'] = 'chosen-select'
-        kwargs['render_kw'] = render_kw
-
-        super().__init__(*args, **kwargs)

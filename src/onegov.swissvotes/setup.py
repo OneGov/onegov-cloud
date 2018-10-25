@@ -34,7 +34,7 @@ setup(
         'cssmin',
         'onegov.core',
         'onegov.file>=0.10.0',
-        'onegov.form',
+        'onegov.form>=0.40.0',
         'onegov.foundation',
         'onegov.quill>=0.4.0',
         'onegov.shared',

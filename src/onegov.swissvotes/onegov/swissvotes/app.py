@@ -78,8 +78,8 @@ def get_webasset_output():
     return 'assets/bundles'
 
 
-@SwissvotesApp.webasset('common')
-def get_common_asset():
+@SwissvotesApp.webasset('frameworks')
+def get_frameworks_asset():
     yield 'modernizr.js'
     yield 'jquery.js'
     yield 'jquery.tablesorter.js'
@@ -87,9 +87,11 @@ def get_common_asset():
     yield 'tablesaw.jquery.js'
     yield 'tablesaw-create.js'
     yield 'tablesaw-init.js'
-    yield 'chosen.css'
-    yield 'chosen.jquery.js'
     yield 'foundation.js'
     yield 'underscore.js'
     yield 'form_dependencies.js'
+
+
+@SwissvotesApp.webasset('common')
+def get_common_asset():
     yield 'common.js'
