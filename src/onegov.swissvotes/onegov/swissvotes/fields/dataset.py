@@ -202,7 +202,7 @@ class SwissvoteDatasetField(UploadField):
                     elif type_.startswith('NUMERIC'):
                         value = Decimal(str(cell.value))
 
-                except Exception as e:
+                except Exception:
                     errors.append((
                         index, column, f"'{value}' ≠ {type_.lower()}"
                     ))
