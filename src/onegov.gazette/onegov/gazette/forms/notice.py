@@ -83,8 +83,7 @@ class NoticeForm(Form):
         choices=[],
         validators=[
             InputRequired()
-        ],
-        limit=5
+        ]
     )
 
     text = QuillField(
@@ -176,9 +175,6 @@ class NoticeForm(Form):
             if now >= issue.deadline:
                 self.issues.render_kw['data-hot-issue'] = issue.name
 
-        # translate the string of the mutli select field
-        self.issues.translate(self.request)
-
         # Remove the print only option if not publisher
         if not self.request.is_private(self.model):
             self.delete_field('print_only')
@@ -266,9 +262,6 @@ class UnrestrictedNoticeForm(NoticeForm):
                 issue.name,
                 layout.format_issue(issue, date_format='date_with_weekday')
             ))
-
-        # translate the string of the mutli select field
-        self.issues.translate(self.request)
 
     def disable_issues(self):
         self.issues.validators = []

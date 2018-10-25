@@ -19,7 +19,8 @@ def test_multi_checkbox_field():
 
     field.data = ''
     assert 'data-expand-title="Show all"' in field()
-    assert 'data-limit="10"' in field()
+    assert 'data-fold-title="Show less"' in field()
+    assert 'data-limit="5"' in field()
 
     form = Form()
     field = MultiCheckboxField(
