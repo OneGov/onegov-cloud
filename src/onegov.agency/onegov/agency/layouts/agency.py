@@ -15,7 +15,7 @@ class AgencyCollectionLayout(DefaultLayout):
     def breadcrumbs(self):
         return [
             Link(_("Homepage"), self.homepage_url),
-            Link(_("Agencies"), '#')
+            Link(_("Agencies"), self.request.link(self.model))
         ]
 
     @cached_property
@@ -57,8 +57,13 @@ class AgencyLayout(AdjacencyListLayout):
             return [
                 Link(
                     text=_("Edit"),
-                    url=self.request.link(self.model, 'edit'),
+                    url=self.request.link(self.model.proxy(), 'edit'),
                     attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    text=_("Create PDF"),
+                    url=self.request.link(self.model.proxy(), 'create-pdf'),
+                    attrs={'class': 'create-pdf'}
                 ),
                 Link(
                     text=_("Delete"),
@@ -77,5 +82,26 @@ class AgencyLayout(AdjacencyListLayout):
                             redirect_after=self.request.link(self.collection)
                         )
                     )
-                )
+                ),
+                LinkGroup(
+                    title=_("Add"),
+                    links=[
+                        Link(
+                            text=_("Agency"),
+                            url=self.request.link(
+                                self.model.proxy(),
+                                name='new'
+                            ),
+                            attrs={'class': 'new-agency'}
+                        ),
+                        Link(
+                            text=_("Membership"),
+                            url=self.request.link(
+                                self.model.proxy(),
+                                name='new-membership'
+                            ),
+                            attrs={'class': 'new-person'}
+                        ),
+                    ]
+                ),
             ]

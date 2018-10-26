@@ -13,7 +13,18 @@ class ExtendedPerson(Person):
     political_party = meta_property()
     year = meta_property()
     direct_phone = meta_property()
-    keywords = meta_property()
+
+    @property
+    def address_html(self):
+        return '<p>{}</p>'.format(
+            '<br>'.join((self.address or '').splitlines())
+        )
+
+    @property
+    def notes_html(self):
+        return '<p>{}</p>'.format(
+            '<br>'.join((self.notes or '').splitlines())
+        )
 
     @property
     def memberships_by_agency(self):

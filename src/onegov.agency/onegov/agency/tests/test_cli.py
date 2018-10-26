@@ -10,7 +10,7 @@ from unittest.mock import patch
 
 
 @mark.parametrize("file", [
-    module_path('onegov.people', 'tests/fixtures/export-agencies.xls'),
+    module_path('onegov.agency', 'tests/fixtures/export-agencies.xls'),
 ])
 def test_import_agencies(cfg_path, session_manager, file):
     runner = CliRunner()

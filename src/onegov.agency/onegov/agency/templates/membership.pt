@@ -6,21 +6,10 @@
         <div class="row reverse-on-mobile">
             <div class="columns medium-8">
 
-                <div metal:use-macro="layout.macros['person_card']" />
+                <div metal:use-macro="layout.macros['membership_card']" />
 
             </div>
             <div class="columns medium-4">
-
-                <div tal:condition="True" class="person-exports borderless-side-panel">
-                    <h2 i18n:translate>Exports</h2>
-                    <ul class="person-export-list">
-                        <li>
-                            <a href="#" i18n:translate>
-                                Export a vCard of this person
-                            </a>
-                        </li>
-                    </ul>
-                </div>
 
                 <div class="submit-yours">
                     <dl>
@@ -29,11 +18,10 @@
                                 <h2 i18n:translate>Report change</h2>
                             </a>
                         </dt>
-                        <dd i18n:translate>Report a change of personnel</dd>
+                        <dd i18n:translate>Report a change</dd>
                     </dl>
                 </div>
 
             </div>
-        </div>
     </tal:block>
 </div>

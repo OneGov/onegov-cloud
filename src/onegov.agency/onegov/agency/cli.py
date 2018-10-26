@@ -2,12 +2,16 @@ import click
 import re
 import transaction
 
+from bleach import Cleaner
+from html5lib.filters.base import Filter
+from html5lib.filters.whitespace import Filter as whitespace_filter
 from io import BytesIO
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.pdf import AgencyPdf
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
+from onegov.core.html import html_to_text
 from onegov.people.collections import AgencyCollection
 from onegov.people.collections import PersonCollection
 from onegov.people.models import AgencyMembership
@@ -15,16 +19,20 @@ from requests import get
 from textwrap import indent
 from xlrd import open_workbook
 
+
 cli = command_group()
 
 
 @cli.command('import-agencies')
 @click.argument('file', type=click.Path(exists=True))
-@click.option('--clear/--no-clear', default=False)
+@click.option('--clear/--no-clear', default=True)
+@click.option('--skip-root/--no-skip-root', default=True)
+@click.option('--skip-download/--no-skip-download', default=False)
 @click.option('--dry-run/--no-dry-run', default=False)
 @click.option('--visualize/--no-visualize', default=False)
 @pass_group_context
-def import_agencies(group_context, file, clear, dry_run, visualize):
+def import_agencies(group_context, file, clear, skip_root, skip_download,
+                    dry_run, visualize):
     """ Import data from a seantis.agencies export. For example:
 
         onegov-people \
@@ -34,6 +42,52 @@ def import_agencies(group_context, file, clear, dry_run, visualize):
     """
 
     def _import(request, app):
+        EXPORT_FIELDS = {
+            'academic_title': 'person.academic_title',
+            'address': 'person.address',
+            'direct_number': 'person.direct_phone',
+            'firstname': 'person.first_name',
+            'lastname': 'person.last_name',
+            'occupation': 'person.profession',
+            'phone': 'person.phone',
+            'political_party': 'person.political_party',
+            'role': 'membership.title',
+            'start': 'membership.since',
+            'title': 'person.title',
+            'year': 'person.year',
+            'postfix': '??'  # todo:
+        }
+
+        class LinkFilter(Filter):
+            """ Uses the href rather than the content of an a-tag. """
+
+            def __iter__(self):
+                in_link = False
+                for token in Filter.__iter__(self):
+                    if token.get('name') == 'a':
+                        if token['type'] == 'StartTag':
+                            in_link = True
+                            data = token['data'][(None, 'href')]
+                            data = data.replace('mailto:', '')
+                            yield {
+                                'type': 'Characters',
+                                'data': data
+                            }
+                        elif token['type'] == 'EndTag':
+                            in_link = False
+                    elif token['type'] == 'Characters':
+                        if not in_link:
+                            yield token
+                    else:
+                        yield token
+
+        cleaner = Cleaner(
+            tags=['a', 'p', 'br'],
+            attributes={'a': 'href'},
+            strip=True,
+            filters=[LinkFilter, whitespace_filter]
+        )
+
         session = app.session()
 
         if clear:
@@ -50,33 +104,55 @@ def import_agencies(group_context, file, clear, dry_run, visualize):
         agencies = ExtendedAgencyCollection(session)
         people = ExtendedPersonCollection(session)
         sheet = workbook.sheet_by_name('Organisationen')
+        ids = {}
         parents = {}
         alphabetical = []
         for row in range(1, sheet.nrows):
-            id_ = int(sheet.cell_value(row, 0))
-            agency = agencies.add(
-                id=id_,
-                parent=parents.get(id_),
-                title=sheet.cell_value(row, 2).strip(),
-                description=sheet.cell_value(row, 3).strip(),
-                portrait=sheet.cell_value(row, 4).strip(),
-                export_fields=sheet.cell_value(row, 7),
-                state=sheet.cell_value(row, 8),
-                order=id_,
-            )
+            if skip_root and row == 1:
+                continue
 
-            organigram_url = sheet.cell_value(row, 6)
-            if organigram_url:
-                response = get(organigram_url)
-                response.raise_for_status()
-                agency.organigram_file = BytesIO(response.content)
+            # We use our own, internal IDs which are auto-incremented
+            external_id = int(sheet.cell_value(row, 0))
+
+            # Remove the HTML code from the portrait, prepend the description
+            portrait = '\n'.join((
+                sheet.cell_value(row, 3).strip(),
+                html_to_text(cleaner.clean(sheet.cell_value(row, 4)))
+            ))
+            portrait = portrait.replace('\n\n', '\n').strip()
+
+            # Re-map the export fields
+            export_fields = sheet.cell_value(row, 7) or 'role,title'
+            export_fields = export_fields.split(',')
+            export_fields = [EXPORT_FIELDS[field] for field in export_fields]
+
+            agency = agencies.add(
+                parent=parents.get(external_id),
+                title=sheet.cell_value(row, 2).strip(),
+                portrait=portrait,
+                export_fields=export_fields,
+                state=sheet.cell_value(row, 8),
+                order=external_id,
+            )
+            ids[external_id] = agency.id
+
+            # Download and add the organigram
+            if not skip_download:
+                organigram_url = sheet.cell_value(row, 6)
+                if organigram_url:
+                    response = get(organigram_url)
+                    response.raise_for_status()
+                    agency.organigram_file = BytesIO(response.content)
 
             if sheet.cell_value(row, 5):
-                alphabetical.append(id_)
+                alphabetical.append(agency.id)
 
             for child in sheet.cell_value(row, 1).split(','):
-                parents[int(child or -1)] = agency
+                if child:
+                    child = int(child)
+                    parents[child] = agency
 
+        # Let's make sure, the order have nice, cohere values
         def defrag_ordering(agency):
             for order, child in enumerate(agency.children):
                 child.order = order
@@ -89,6 +165,11 @@ def import_agencies(group_context, file, clear, dry_run, visualize):
         click.secho("Importing people and memberships", fg='green')
         sheet = workbook.sheet_by_name('Personen')
         for row in range(1, sheet.nrows):
+            notes = '\n'.join((
+                sheet.cell_value(row, 13).strip(),
+                sheet.cell_value(row, 14).strip()
+            )).strip()
+
             person = people.add(
                 academic_title=sheet.cell_value(row, 0).strip(),
                 profession=sheet.cell_value(row, 1).strip(),
@@ -102,8 +183,7 @@ def import_agencies(group_context, file, clear, dry_run, visualize):
                 direct_phone=sheet.cell_value(row, 9).strip(),
                 salutation=sheet.cell_value(row, 10).strip(),
                 website=sheet.cell_value(row, 12).strip(),
-                keywords=sheet.cell_value(row, 13).strip(),
-                notes=sheet.cell_value(row, 14).strip(),
+                notes=notes,
             )
             memberships = sheet.cell_value(row, 15).split('//')
             for membership in memberships:
@@ -114,7 +194,7 @@ def import_agencies(group_context, file, clear, dry_run, visualize):
                     ).groups()
                     person.memberships.append(
                         AgencyMembership(
-                            agency_id=int(values[0]),
+                            agency_id=ids[int(values[0])],
                             title=values[1] or "",
                             since=values[2] or None,
                             order=int(values[4]),
@@ -124,9 +204,11 @@ def import_agencies(group_context, file, clear, dry_run, visualize):
                         )
                     )
 
+        # Order the memberships alphabetically, if desired
         for id_ in alphabetical:
             agencies.by_id(id_).sort_relationships()
 
+        # Show a tree view of what we imported
         if visualize:
             click.secho("Imported data:", fg='green')
 
@@ -143,6 +225,7 @@ def import_agencies(group_context, file, clear, dry_run, visualize):
             for root in agencies.roots:
                 show(root, 1)
 
+        # Abort the transaction if requested
         if dry_run:
             transaction.abort()
             click.secho("Aborting transaction", fg='yellow')
@@ -152,24 +235,29 @@ def import_agencies(group_context, file, clear, dry_run, visualize):
 
 @cli.command('export-pdf')
 @pass_group_context
+@click.option('--root  /--no-recursive', default=True)
 @click.option('--recursive  /--no-recursive', default=True)
-def export_pdf(group_context):
+def export_pdf(group_context, root, recursive):
 
     def _export_pdf(request, app):
         session = app.session()
         agencies = ExtendedAgencyCollection(session)
 
-        # pdf = AgencyPdf.from_agencies(
-        #     agencies.roots,
-        #     "Kanton Zug",
-        #      title="Staatskalender Kanton Zug",
-        #      toc=True
-        # )
-        # with open('out/_full.pdf', 'wb') as file:
-        #     file.write(pdf.read())
+        if root:
+            app.root_pdf = AgencyPdf.from_agencies(
+                agencies.roots,
+                app.org.name,
+                title=app.org.name,
+                toc=True
+            )
+            click.secho("Root PDF created", fg='green')
 
-        for agency in agencies.query():
-            agency.pdf_file = AgencyPdf.from_agencies([agency], 'Kanton Zug')
-            click.secho(f"Created PDF of '{agency.title}'", fg='green')
+        if recursive:
+            for agency in agencies.query():
+                agency.pdf_file = AgencyPdf.from_agencies(
+                    [agency],
+                    app.org.name
+                )
+                click.secho(f"Created PDF of '{agency.title}'", fg='green')
 
     return _export_pdf

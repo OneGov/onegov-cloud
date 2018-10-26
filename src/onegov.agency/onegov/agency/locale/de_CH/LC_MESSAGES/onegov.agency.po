@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-10-19 16:54+0200\n"
-"PO-Revision-Date: 2018-10-19 16:55+0200\n"
+"POT-Creation-Date: 2018-10-26 11:11+0200\n"
+"PO-Revision-Date: 2018-10-26 11:12+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -18,15 +18,6 @@ msgstr "Personen"
 
 msgid "Agencies"
 msgstr "Organisationen"
-
-msgid "Title"
-msgstr "Titel"
-
-msgid "Description"
-msgstr "Beschreibung"
-
-msgid "Portrait"
-msgstr "Portrait"
 
 msgid "Private"
 msgstr "Privat"
@@ -70,11 +61,65 @@ msgstr "E-Mail"
 msgid "Website"
 msgstr "Webseite"
 
-msgid "Keywords"
-msgstr "Stichworte"
-
 msgid "Notes"
 msgstr "Bemerkungen"
+
+msgid "Title"
+msgstr "Titel"
+
+msgid "Portrait"
+msgstr "Portrait"
+
+msgid "Organigram"
+msgstr "Organigramm"
+
+msgid "Fields to include for each membership"
+msgstr "Zu berücksichtigende Felder der Mitgliedschaften"
+
+msgid "PDF Export"
+msgstr "PDF Export"
+
+msgid "Membership: Title"
+msgstr "Mitgliedschaft: Titel"
+
+msgid "Membership: Since"
+msgstr "Mitgliedschaft: Seit"
+
+msgid "Person: Title"
+msgstr "Person: Nachname, Vorname"
+
+msgid "Person: Last Name"
+msgstr "Person: Nachname"
+
+msgid "Person: First Name"
+msgstr "Person: Vorname"
+
+msgid "Person: Year"
+msgstr "Person: Jahrgang"
+
+msgid "Person: Academic Title"
+msgstr "Person: akademischer Titel"
+
+msgid "Person: Profession"
+msgstr "Person: Beruf"
+
+msgid "Person: Address"
+msgstr "Person: Adresse"
+
+msgid "Person: Political Party"
+msgstr "Person: politische Partei"
+
+msgid "Person: Phone"
+msgstr "Person: Telefon"
+
+msgid "Person: Direct Phone"
+msgstr "Person: Direktnummer"
+
+msgid "Person"
+msgstr "Person"
+
+msgid "Since"
+msgstr "Eintritt"
 
 msgid "Homepage"
 msgstr "Startseite"
@@ -84,6 +129,9 @@ msgstr "Hinzufügen"
 
 msgid "Edit"
 msgstr "Bearbeiten"
+
+msgid "Create PDF"
+msgstr "PDF erstellen"
 
 msgid "Delete"
 msgstr "Löschen"
@@ -100,38 +148,14 @@ msgstr "Organisation löschen"
 msgid "Agency"
 msgstr "Organisation"
 
-msgid "No agencies added yet."
-msgstr "Es wurden noch keine Organisationen hinzugefügt."
+msgid "Membership"
+msgstr "Mitgliedschaft"
 
-msgid "Exports"
-msgstr "Exporte"
+msgid "Do you really want to delete this membership?"
+msgstr "Möchten Sie die Mitgliedschaft wirklich löschen?"
 
-msgid "Export all organisations as PDF"
-msgstr "Gesamter Staatskalender als PDF"
-
-msgid "Propose entry"
-msgstr "Eintrag vorschlagen"
-
-msgid "Propose a new entry"
-msgstr "Einen neuen Eintrag vorschlagen"
-
-msgid "Export this agency and its children as a PDF"
-msgstr "Organisation als PDF speichern"
-
-msgid "Report change"
-msgstr "Mutation melden"
-
-msgid "Report a change"
-msgstr "Eine Mutation melden"
-
-msgid "Organigram"
-msgstr "Organigramm"
-
-msgid "Suborganizations"
-msgstr "Unterorganisationen"
-
-msgid "Memberships"
-msgstr "Mitgliedschaften"
+msgid "Delete membership"
+msgstr "Mitgliedschaft löschen"
 
 msgid "No people found."
 msgstr "Keine Personen gefunden."
@@ -139,11 +163,54 @@ msgstr "Keine Personen gefunden."
 msgid "Letter"
 msgstr "Buchstabe"
 
+msgid "Propose entry"
+msgstr "Eintrag vorschlagen"
+
+msgid "Propose a new entry"
+msgstr "Einen neuen Eintrag vorschlagen"
+
+msgid "Suborganizations"
+msgstr "Unterorganisationen"
+
+msgid "Memberships"
+msgstr "Mitgliedschaften"
+
+msgid "Report change"
+msgstr "Mutation melden"
+
+msgid "Report a change"
+msgstr "Eine Mutation melden"
+
+msgid "Exports"
+msgstr "Exporte"
+
+msgid "Export a vCard of this person"
+msgstr "Elektronische Visitenkarte (vCard)"
+
 msgid "Report a change of personnel"
 msgstr "Eine Mutation melden"
 
+msgid "No agencies added yet."
+msgstr "Es wurden noch keine Organisationen hinzugefügt."
+
+msgid "Export all organisations as PDF"
+msgstr "Gesamter Staatskalender als PDF"
+
+msgid "Export this agency and its children as a PDF"
+msgstr "Organisation als PDF speichern"
+
 msgid "New agency"
 msgstr "Neue Organisation"
+
+msgid "New membership"
+msgstr "Neue Mitgliedschaft"
+
+msgid ""
+"Create a PDF of this agency and all its suborganizations. This may take a "
+"while."
+msgstr ""
+"Ein PDF dieser Organisation und all ihrer Unterorganisationen erstellen. "
+"Kann je nach Anzahl Unterorganisationen eine Weile dauern."
 
 msgid "Added a new agency"
 msgstr "Eine neue Organisation wurde hinzufügt"
@@ -151,14 +218,26 @@ msgstr "Eine neue Organisation wurde hinzufügt"
 msgid "New"
 msgstr "Neu"
 
+msgid "Added a new membership"
+msgstr "Eine neue Mitgliedschaft wurde hinzufügt"
+
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
+
+msgid "PDF created"
+msgstr "PDF erstellt"
 
 msgid "New person"
 msgstr "Neue Person"
 
 msgid "Added a new person"
 msgstr "Eine neue Person wurde hinzugefügt"
+
+#~ msgid "Keywords"
+#~ msgstr "Stichworte"
+
+#~ msgid "Description"
+#~ msgstr "Beschreibung"
 
 #~ msgid "No people added yet."
 #~ msgstr "Es wurden noch keine Personen hinzugefügt."

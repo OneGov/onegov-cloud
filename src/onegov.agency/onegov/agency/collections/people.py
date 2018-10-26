@@ -61,8 +61,8 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
             query = query.join(AgencyMembership.agency)
             query = query.filter(Agency.title == self.agency)
         query = query.order_by(
-            ExtendedPerson.last_name,
-            ExtendedPerson.first_name
+            func.unaccent(ExtendedPerson.last_name),
+            func.unaccent(ExtendedPerson.first_name)
         )
         return query
 

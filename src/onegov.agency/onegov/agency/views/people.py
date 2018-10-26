@@ -20,6 +20,8 @@ from onegov.org.models import AtoZ
 )
 def view_people(self, request):
     request.include('common')
+    request.include('chosen')
+    request.include('redirectable-select')
 
     letters = [
         Link(
@@ -124,7 +126,6 @@ def edit_person(self, request, form):
     if form.submitted(request):
         form.populate_obj(self)
         request.success(_("Your changes were saved"))
-
         return redirect(request.link(self))
     else:
         form.process(obj=self)

@@ -76,11 +76,6 @@ class ExtendedPersonForm(Form):
         fieldset=fieldset('website'),
         filters=(ensure_scheme, )
     )
-    keywords = TextAreaField(
-        label=_("Keywords"),
-        render_kw={'rows': 5},
-        fieldset=fieldset('keywords')
-    )
     notes = TextAreaField(
         label=_("Notes"),
         render_kw={'rows': 5},

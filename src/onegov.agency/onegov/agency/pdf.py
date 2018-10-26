@@ -39,22 +39,29 @@ class AgencyPdf(Pdf):
     def memberships(self, agency):
         """ Adds the memberships of an agency as table. """
 
-        fields = agency.meta.get('export_fields', 'role,title').split(',')
-
         data = []
         for membership in agency.memberships:
-            parts = []
+            title = ''
+            if 'membership.title' in agency.export_fields:
+                title = membership.title
+
+            description = []
             if membership.person:
-                for field in fields:
-                    parts.append(
-                        getattr(membership.person, field, '') or
-                        membership.person.meta.get(field, '') or
-                        getattr(membership, field, '')
-                    )
+                for field in agency.export_fields or []:
+                    if field == 'membership.title':
+                        continue
+                    if field.startswith('membership.'):
+                        field = field.split('membership.')[1]
+                        description.append(getattr(membership, field))
+                    if field.startswith('person.'):
+                        field = field.split('person.')[1]
+                        description.append(getattr(membership.person, field))
+            description = ', '.join([part for part in description if part])
+
             data.append([
-                membership.title if 'role' in fields else '',
+                title,
                 membership.meta.get('prefix', ''),
-                ', '.join([p for p in parts if p])
+                description
             ])
 
         self.table(data, [5.5 * cm, 0.5 * cm, None])
@@ -72,7 +79,7 @@ class AgencyPdf(Pdf):
 
         has_content = False
         if agency.portrait:
-            self.mini_html(agency.portrait, linkify=True)
+            self.mini_html(agency.portrait_html, linkify=True)
             has_content = True
 
         if agency.memberships.count():
@@ -81,7 +88,7 @@ class AgencyPdf(Pdf):
 
         if agency.organigram_file:
             self.spacer()
-            self.image(agency.organigram_file)
+            self.image(BytesIO(agency.organigram_file.read()))
             self.spacer()
             has_content = True
 

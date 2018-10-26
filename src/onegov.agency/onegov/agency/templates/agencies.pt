@@ -15,11 +15,11 @@
 
             <div class="columns medium-4">
 
-                <div tal:condition="True" class="agency-exports borderless-side-panel">
+                <div tal:condition="pdf_link" class="agency-exports borderless-side-panel">
                     <h2 i18n:translate>Exports</h2>
                     <ul class="agency-export-list">
                         <li>
-                            <a href="#" i18n:translate>
+                            <a href="${pdf_link}" i18n:translate>
                                 Export all organisations as PDF
                             </a>
                         </li>

@@ -65,3 +65,7 @@ include/
 # Node
 node_modules/
 share/
+
+# Webassets
+.webassets-cache
+bundles

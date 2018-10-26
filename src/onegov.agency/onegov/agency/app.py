@@ -5,12 +5,13 @@ from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.initial_content import create_new_organisation
 from onegov.agency.theme import AgencyTheme
 from onegov.core import utils
+from onegov.core.utils import normalize_for_url
+from onegov.form import FormApp
 from onegov.org import OrgApp
-from onegov.org.app import get_common_asset as get_org_common_asset
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 
 
-class AgencyApp(OrgApp):
+class AgencyApp(OrgApp, FormApp):
 
     #: the version of this application (do not change manually!)
     version = '0.0.1'
@@ -25,6 +26,23 @@ class AgencyApp(OrgApp):
         agencies.is_visible = True
         agencies.title = _("Agencies")
         return (people, agencies)
+
+    @property
+    def root_pdf_exists(self):
+        return self.filestorage.exists('root.pdf')
+
+    @property
+    def root_pdf(self):
+        result = None
+        if self.filestorage.exists('root.pdf'):
+            with self.filestorage.open('root.pdf', 'rb') as file:
+                result = file.read()
+        return result
+
+    @root_pdf.setter
+    def root_pdf(self, value):
+        with self.filestorage.open('root.pdf', 'wb') as file:
+            file.write(value.read())
 
 
 @AgencyApp.setting(section='org', name='create_new_organisation')
@@ -48,27 +66,16 @@ def get_i18n_localedirs():
     return [mine] + get_org_i18n_localedirs()
 
 
-@AgencyApp.webasset_path()
-def get_js_path():
-    return 'assets/js'
-
-
-@AgencyApp.webasset_path()
-def get_css_path():
-    return 'assets/css'
-
-
 @AgencyApp.webasset_output()
 def get_webasset_output():
     return 'assets/bundles'
 
 
-@AgencyApp.webasset(
-    'common',
-    filters={'css': ['datauri', 'custom-rcssmin']}
-)
-def get_common_asset():
-    yield from get_org_common_asset()
-    yield 'chosen.css'
-    yield 'chosen.jquery.js'
-    yield 'chosen-init.js'
+@AgencyApp.webasset_path()
+def get_js_path():
+    return 'assets/js'
+
+
+@AgencyApp.webasset('redirectable-select')
+def get_redirectable_asset():
+    yield 'redirectable-select.js'

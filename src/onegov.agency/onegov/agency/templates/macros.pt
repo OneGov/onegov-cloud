@@ -19,11 +19,9 @@
 
     <metal:agency_card define-macro="agency_card" i18n:domain="onegov.agency">
         <div class="agency-card agency-single-item" tal:define="memberships list(agency.memberships); children list(agency.children)">
-            <p tal:condition="agency.description">${agency.description}</p>
-
             <tal:block tal:condition="agency.portrait">
                 <h3 i18n:translate>Portrait</h3>
-                <div tal:content="structure agency.portrait"></div>
+                <div tal:content="structure agency.portrait_html"></div>
             </tal:block>
 
             <tal:block tal:condition="agency.organigram_file">
@@ -44,8 +42,14 @@
                 <h3 i18n:translate>People</h3>
                 <dl>
                     <tal:block tal:repeat="membership memberships">
-                        <dt>${membership.title}</dt>
-                        <dd><a href="${request.link(membership.person)}">${membership.person.title}</a></dd>
+                        <tal:block tal:condition="request.is_logged_in">
+                            <dt><a style="text" href="${request.link(membership)}">${membership.title}</a></dt>
+                            <dd>${membership.person.title}</dd>
+                        </tal:block>
+                        <tal:block tal:condition="not:request.is_logged_in">
+                            <dt>${membership.title}</dt>
+                            <dd><a href="${request.link(membership.person)}">${membership.person.title}</a></dd>
+                        </tal:block>
                         <br>
                     </tal:block>
                 </dl>
@@ -61,7 +65,7 @@
                     <a href="${request.link(person)}">${person.title}</a>
                 </li>
                 <li tal:repeat="membership person.memberships_by_agency" class="person-card-function">
-                    <em>${membership.title} ${membership.agency.title}</em>
+                    <em title="${layout.agency_path(membership.agency)}">${membership.title} ${membership.agency.title}</em>
                 </li>
                 <li tal:condition="layout.field_visible('email', model=person)" class="person-card-email">
                     <a href="mailto:${person.email}">${person.email}</a>
@@ -77,6 +81,11 @@
     <metal:person_card define-macro="person_card" i18n:domain="onegov.agency">
         <div class="person-card person-single-item" tal:define="memberships list(person.memberships_by_agency)">
             <dl>
+                <tal:block tal:condition="layout.field_visible('salutation')">
+                    <dt i18n:translate>Salutation</dt>
+                    <dd>${person.salutation}</dd>
+                </tal:block>
+
                 <tal:block tal:condition="layout.field_visible('academic_title')">
                     <dt i18n:translate>Academic Title</dt>
                     <dd>${person.academic_title}</dd>
@@ -99,7 +108,7 @@
 
                 <tal:block tal:condition="layout.field_visible('address')">
                     <dt i18n:translate>Address</dt>
-                    <dd>${person.address}</dd>
+                    <dd tal:content="structure person.address_html"></dd>
                 </tal:block>
 
                 <tal:block tal:condition="layout.field_visible('email')">
@@ -124,21 +133,42 @@
 
                 <tal:block tal:condition="layout.field_visible('notes')">
                     <dt i18n:translate>Notes</dt>
-                    <dd>${person.notes}</dd>
-                </tal:block>
-
-                <tal:block tal:condition="layout.field_visible('keywords')">
-                    <dt i18n:translate>Keywords</dt>
-                    <dd>${person.keywords}</dd>
+                    <dd tal:content="structure person.notes_html"></dd>
                 </tal:block>
 
                 <dt tal:condition="memberships" i18n:translate>Memberships</dt>
                 <dd tal:repeat="membership memberships" class="person-card-membership">
-                    <a href="${request.link(membership.agency)}">${membership.agency.title}</a> - ${membership.title}
+                    <a href="${request.link(membership.agency)}" title="${layout.agency_path(membership.agency)}">${membership.agency.title}</a> - ${membership.title}
                 </dd>
             </dl>
         </div>
     </metal:person_card>
+
+    <metal:membership_card define-macro="membership_card" i18n:domain="onegov.agency">
+        <div class="membership-card membership-single-item">
+            <dl>
+                <tal:block tal:condition="membership.title">
+                    <dt i18n:translate>Title</dt>
+                    <dd>${membership.title}</dd>
+                </tal:block>
+
+                <tal:block tal:condition="membership.agency">
+                    <dt i18n:translate>Agency</dt>
+                    <dd><a href="${request.link(membership.agency)}">${membership.agency.title}</a></dd>
+                </tal:block>
+
+                <tal:block tal:condition="membership.person">
+                    <dt i18n:translate>Person</dt>
+                    <dd><a href="${request.link(membership.person)}">${membership.person.title}</a></dd>
+                </tal:block>
+
+                <tal:block tal:condition="membership.since">
+                    <dt i18n:translate>Since</dt>
+                    <dd>${membership.since}</dd>
+                </tal:block>
+            </dl>
+        </div>
+    </metal:membership_card>
 
     <metal:search_result_people define-macro="search_result_people" i18n:domain="onegov.agency">
         <a href="${request.link(result)}">${result.title}</a>

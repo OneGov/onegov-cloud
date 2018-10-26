@@ -29,7 +29,7 @@
 
                     <div class="filter-periods">
                         <h2 class="filter-title" i18n:translate>Agency</h2>
-                        <select class="chosen-select">
+                        <select class="chosen-select redirectable">
                             <tal:block tal:repeat="agency agencies">
                                 <option value="${agency.value}" tal:attributes="selected agency.selected">${agency.title}</option>
                             </tal:block>

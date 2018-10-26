@@ -29,3 +29,8 @@
         margin-right: 1ex;
     }
 }
+
+.edit-bar {
+    .new-agency::before { @include icon('\f0e8'); }
+    .create-pdf::before { @include icon('\f1c1'); }
+}
