@@ -495,7 +495,7 @@ def view_import(self, request, form):
             }))
         except ValidationError as e:
             error = e
-        except NotImplementedError as e:
+        except NotImplementedError:
             request.alert(_(
                 "The given file is invalid, does it include a metadata.json "
                 "with a data.xlsx, data.csv, or data.json?"

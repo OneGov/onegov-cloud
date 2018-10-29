@@ -106,9 +106,9 @@ class DirectoriesWidget(object):
                     DirectoryEntryCollection, {'directory_name': d.name}
                 ),
                 subtitle=(
-                    d.count == 1 and
-                    _("1 entry") or
-                    _("${count} entries", mapping={'count': d.count})
+                    d.count == 1
+                    and _("1 entry")
+                    or _("${count} entries", mapping={'count': d.count})
                 )
             ) for d in layout.request.exclude_invisible(directories.query())
         ]

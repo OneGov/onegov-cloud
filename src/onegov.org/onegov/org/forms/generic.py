@@ -88,7 +88,7 @@ class ExportForm(Form):
                 )
             )
 
-        raise NotImplemented()
+        raise NotImplementedError()
 
 
 class PaymentMethodForm(Form):
