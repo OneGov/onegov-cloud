@@ -103,7 +103,7 @@ class Scenario(object):
         self.users = []
 
     def __getattribute__(self, name):
-        if name.startswith('add_') and not transaction.manager._txn:
+        if name.startswith('add_') and not transaction.manager.manager._txn:
             transaction.begin()
 
         return super().__getattribute__(name)
