@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.40.4 (2018-10-29)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes pointer cursor not showing up in the files view.
   [href]
 
