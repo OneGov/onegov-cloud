@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.0 (2018-10-29)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds agencies and memberships.
   [msom]
 
