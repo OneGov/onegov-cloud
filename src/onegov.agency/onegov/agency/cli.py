@@ -233,13 +233,13 @@ def import_agencies(group_context, file, clear, skip_root, skip_download,
     return _import
 
 
-@cli.command('export-pdf')
+@cli.command('create-pdf')
 @pass_group_context
 @click.option('--root  /--no-recursive', default=True)
 @click.option('--recursive  /--no-recursive', default=True)
-def export_pdf(group_context, root, recursive):
+def create_pdf(group_context, root, recursive):
 
-    def _export_pdf(request, app):
+    def _create_pdf(request, app):
         session = app.session()
         agencies = ExtendedAgencyCollection(session)
 
@@ -260,4 +260,4 @@ def export_pdf(group_context, root, recursive):
                 )
                 click.secho(f"Created PDF of '{agency.title}'", fg='green')
 
-    return _export_pdf
+    return _create_pdf

@@ -1,6 +1,6 @@
 from click.testing import CliRunner
+from onegov.agency.cli import cli
 from onegov.core.utils import module_path
-from onegov.people.cli import cli
 from onegov.people.models import Agency
 from onegov.people.models import Person
 from pytest import mark
@@ -88,7 +88,7 @@ def test_import_agencies(cfg_path, session_manager, file):
             pass
 
     # Import
-    with patch('onegov.people.cli.get', return_value=DummyResponse()):
+    with patch('onegov.agency.cli.get', return_value=DummyResponse()):
         result = runner.invoke(cli, [
             '--config', cfg_path,
             '--select', '/foo/bar',
@@ -99,7 +99,7 @@ def test_import_agencies(cfg_path, session_manager, file):
     assert indent(expected, '  ') in result.output
 
     # Reimport
-    with patch('onegov.people.cli.get', return_value=DummyResponse()):
+    with patch('onegov.agency.cli.get', return_value=DummyResponse()):
         result = runner.invoke(cli, [
             '--config', cfg_path,
             '--select', '/foo/bar',
@@ -112,7 +112,7 @@ def test_import_agencies(cfg_path, session_manager, file):
     assert indent(expected, '  ') in result.output
 
     # Reimport (dry)
-    with patch('onegov.people.cli.get', return_value=DummyResponse()):
+    with patch('onegov.agency.cli.get', return_value=DummyResponse()):
         result = runner.invoke(cli, [
             '--config', cfg_path,
             '--select', '/foo/bar',
@@ -128,27 +128,30 @@ def test_import_agencies(cfg_path, session_manager, file):
     # Check some additional values
     session = session_manager.session()
     agency = session.query(Agency).filter_by(title="Nationalrat").one()
-    assert agency.description == "NR"
-    assert agency.portrait == "<p>2016/2019</p>"
-    assert agency.meta['state'] == 'published'
-    assert agency.meta['export_fields'] == (
-        'role,title,academic_title,political_party'
-    )
+    assert agency.portrait == "NR\n2016/2019"
+    assert agency.portrait_html == "<p>NR<br>2016/2019</p>"
+    assert agency.state == 'published'
+    assert agency.export_fields == [
+        'membership.title',
+        'person.title',
+        'person.academic_title',
+        'person.political_party'
+    ]
     assert agency.organigram_file.read() == b'image'
 
     person = session.query(Person).filter_by(last_name="Balmer").one()
-    assert person.meta['academic_title'] == "lic.iur."
-    assert person.meta['profession'] == "Rechtsanwalt"
+    assert person.academic_title == "lic.iur."
+    assert person.profession == "Rechtsanwalt"
     assert person.first_name == "Kurt"
     assert person.last_name == "Balmer"
-    assert person.meta['political_party'] == "CVP"
-    assert person.meta['year'] == "1962"
+    assert person.political_party == "CVP"
+    assert person.year == "1962"
     assert person.email == "test@test.test"
     assert person.address == "Eichmatt 11"
     assert person.phone == "041 111 22 33"
-    assert person.meta['direct_phone'] == "041 111 22 34"
+    assert person.direct_phone == "041 111 22 34"
     assert person.website == "https://zg.ch"
-    assert person.meta['keywords'] == "Kantonsrat"
+    assert person.notes == "Kantonsrat"
     assert person.salutation == "Herr"
 
     membership = person.memberships.one()
