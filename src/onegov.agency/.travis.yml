@@ -33,7 +33,7 @@ deploy:
 
   - provider: releases
     api_key:
-        secure: "m07JRSjX4s6Kpj2LGwGv8c+jhG8gPKn0YQpzUV8kHPWVax+cADj/o0SE+QoYfe1qM30OrWyxoTIQy8P2PCEszAnhV14GS6pQbKhOikN9C6Q4rKoDKS5kpbe0mjdUt6oS34LJtecRi/hYIwPF8LJd/VOZmyQUqZ6hhKGCiDAQ1ljjMvZnGqRBRi7o8nufnp4lczi6hvcsVMBXVYn9PLyKKedLXmE71XNoSMCr+qi+udbR+6R+cpGgmKJV/+J1bVxDpMA4EtOCXnCzSiFHq6/qpSYVhJp+ztWcT0ijRCwm6CE6R/lL0F1s6VmfNWoyDcAkTVj3KaFUXNT3LXQNzSmTuwc9hWoNuKYfO+akptVEv3adXs+PLYvWMj1DLjW+AOwFvUUjqMSJMHSqqm0gQ27a1cWaHLqvwe/tiGQbJ/Ak05uq5rKOdyoOJKJOlGtk5hit4eZk2m/qCHwk9pqbjxSNQglnUGbYaoxCR8BOmWBcm7fAepzOcHL+MhkmnzEhkYvTMTR+yT3kvZ82itcY8LJA70tmLvyDBMp6Ip6iaurg8k/k+ZIuuq2OX2DO04M78IgAMi5dIm4g7tlJ3dxS1g3yQaOAuBaGlZvcCRNUfU3ebfaovSb/tMc1HABuBC6cwlJtRD5fZ8BRIKUEVkCnJOQmD+XLkrIX2gwPkxTjwPPT1zg="
+        secure: ""
     file: requirements.txt
     skip_cleanup: true
     on:
@@ -44,7 +44,7 @@ deploy:
     distributions: "sdist bdist_wheel"
     user: seantis
     password:
-        secure: "JTVkbnNnMP8x8jM/SHA/0L5a+dYKO4R8/gGzIHcROos1aJFKGX7Z3eC4YPoI58waUxhQB9jlDlQ2OstnJZbxLlWKGQrYjsxWjVxQTJ8ZvnaIdYVwqKgXuT5dj88ra7ZihbzKEQLQ2WEKLrCnsEOWAroQXrNoTityqeL+wdpgvIXNE7jEXcj55vYi3rn5SHAuuc+/5KDKbeL0y5a8QElrykOtN37zj1R8fHEaP+VKtmypXvdHs5s0FUjMERUTUTbDzIEAfOCSkBp2Tvq3CaJtIpRjSTa5pZXX56xIb85s0fma8d+dk1Z5ni/C25ADa3JVXZHYr3W+pclZbPT8AyFPXp9oMZ3TQ/SFMEaS6w0KETFVH0NHhXjt+n0nNVkNwXZRVJAAtXogB0i35N+N+vqyiPMml60uip/Je9iezADuMXl8WkAWyUsOxDM8pX4RsW/Lp1FI9MLaEG+sRPtBHHrhfnsV4yhe9dxZ+celBQdtqkVQWQnwFS8LfpNFl7CnvPDvpzb538KlQXo+szYWDTyX11njM9SHe5eBRZSwr/1ab4tnD+FaMAVyZCi7ZQsZ+Z54T/U4NmIUU7l8c64widg0wKccHmxjCBNZ6KZQqfSsXL4fIU1GdWX//s4E48V5fUAcsEFmC4vn2O+i7xGFUJ+Ba/OUfOZcMuZv+s+hXnrBm5Q="
+        secure: ""
     on:
         tags: true
         condition: $TOXENV = py36
