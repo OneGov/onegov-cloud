@@ -34,7 +34,7 @@ setup(
         'bleach',
         'onegov.core',
         'onegov.org',
-        'onegov.people',
+        'onegov.people>=0.4.0',
     ],
     extras_require=dict(
         test=[
