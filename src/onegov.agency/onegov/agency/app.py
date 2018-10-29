@@ -5,7 +5,6 @@ from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.initial_content import create_new_organisation
 from onegov.agency.theme import AgencyTheme
 from onegov.core import utils
-from onegov.core.utils import normalize_for_url
 from onegov.form import FormApp
 from onegov.org import OrgApp
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
