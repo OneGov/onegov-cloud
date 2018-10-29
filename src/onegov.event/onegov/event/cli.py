@@ -242,8 +242,8 @@ def import_guidle(group_context, url, tagmap):
             prefix = 'guidle-{}'.format(sha1(url.encode()).hexdigest()[:10])
             collection = EventCollection(app.session())
             updated = dict(collection.query().with_entities(
-                Event.meta['source'],
-                Event.meta['source_updated'],
+                Event.meta['source'].astext,
+                Event.meta['source_updated'].astext,
             ))
 
             root = etree.fromstring(response.text.encode('utf-8'))
