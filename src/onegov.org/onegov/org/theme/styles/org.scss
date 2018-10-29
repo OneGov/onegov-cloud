@@ -87,9 +87,9 @@ $full-width-banner-height: 333px;
 }
 
 /*
-    Links without href should not show the cursor
+    Links without href and no role should not show the cursor
 */
-a:not([href]) {
+a:not([href]):not([role]) {
     cursor: default;
 }
 
