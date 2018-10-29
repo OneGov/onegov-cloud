@@ -4,6 +4,7 @@ from datetime import timedelta
 from freezegun import freeze_time
 from onegov.event import Event
 from onegov.event import EventCollection
+from onegov.event.collections.events import EventImportItem
 from onegov.event import Occurrence
 from onegov.event import OccurrenceCollection
 from onegov.gis import Coordinates
@@ -576,130 +577,155 @@ def test_from_import(session):
     events = EventCollection(session)
 
     assert events.from_import([
-        Event(
-            state='initiated',
-            title='Title A',
-            location='Location A',
-            tags=['Tag A.1', 'Tag A.2'],
-            start=tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern'),
-            end=tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern'),
-            timezone='US/Eastern',
-            description='Description A',
-            organizer='Organizer A',
-            recurrence=(
-                'RRULE:FREQ=WEEKLY;'
-                'UNTIL=20150616T220000Z;'
-                'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+        EventImportItem(
+            event=Event(
+                state='initiated',
+                title='Title A',
+                location='Location A',
+                tags=['Tag A.1', 'Tag A.2'],
+                start=tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern'),
+                end=tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern'),
+                timezone='US/Eastern',
+                description='Description A',
+                organizer='Organizer A',
+                recurrence=(
+                    'RRULE:FREQ=WEEKLY;'
+                    'UNTIL=20150616T220000Z;'
+                    'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+                ),
+                coordinates=Coordinates(48.051752750515746, 9.305739625357093),
+                source='import-1-A'
             ),
-            coordinates=Coordinates(48.051752750515746, 9.305739625357093),
-            source='import-1-A'
+            image=None,
+            filename=None
         ),
-        Event(
-            state='initiated',
-            title='Title B',
-            location='Location B',
-            tags=['Tag B.1', 'Tag B.2'],
-            start=tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern'),
-            end=tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern'),
-            timezone='US/Eastern',
-            description='Description B',
-            organizer='Organizer B',
-            recurrence=(
-                'RRULE:FREQ=WEEKLY;'
-                'UNTIL=20150616T220000Z;'
-                'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+        EventImportItem(
+            event=Event(
+                state='initiated',
+                title='Title B',
+                location='Location B',
+                tags=['Tag B.1', 'Tag B.2'],
+                start=tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern'),
+                end=tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern'),
+                timezone='US/Eastern',
+                description='Description B',
+                organizer='Organizer B',
+                recurrence=(
+                    'RRULE:FREQ=WEEKLY;'
+                    'UNTIL=20150616T220000Z;'
+                    'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+                ),
+                coordinates=Coordinates(48.051752750515746, 9.305739625357093),
+                source='import-1-B'
             ),
-            coordinates=Coordinates(48.051752750515746, 9.305739625357093),
-            source='import-1-B'
-        ),
+            image=None,
+            filename=None
+        )
     ]) == (2, 0, 0)
 
-    assert events.from_import([
-        Event(
-            state='initiated',
-            title='Title C',
-            location='Location C',
-            tags=['Tag C.1', 'Tag C.2'],
-            start=tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern'),
-            end=tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern'),
-            timezone='US/Eastern',
-            description='Description C',
-            organizer='Organizer C',
-            recurrence=(
-                'RRULE:FREQ=WEEKLY;'
-                'UNTIL=20150616T220000Z;'
-                'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+    def items():
+        yield EventImportItem(
+            event=Event(
+                state='initiated',
+                title='Title C',
+                location='Location C',
+                tags=['Tag C.1', 'Tag C.2'],
+                start=tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern'),
+                end=tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern'),
+                timezone='US/Eastern',
+                description='Description C',
+                organizer='Organizer C',
+                recurrence=(
+                    'RRULE:FREQ=WEEKLY;'
+                    'UNTIL=20150616T220000Z;'
+                    'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+                ),
+                coordinates=Coordinates(48.051752750515746, 9.305739625357093),
+                source='import-2-C'
             ),
-            coordinates=Coordinates(48.051752750515746, 9.305739625357093),
-            source='import-2-C'
+            image=None,
+            filename=None
         )
-    ]) == (1, 0, 0)
+
+    assert events.from_import(items()) == (1, 0, 0)
 
     # Already imported
     assert events.from_import([
-        Event(
-            state='initiated',
-            title='Title C',
-            location='Location C',
-            tags=['Tag C.1', 'Tag C.2'],
-            start=tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern'),
-            end=tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern'),
-            timezone='US/Eastern',
-            description='Description C',
-            organizer='Organizer C',
-            recurrence=(
-                'RRULE:FREQ=WEEKLY;'
-                'UNTIL=20150616T220000Z;'
-                'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+        EventImportItem(
+            event=Event(
+                state='initiated',
+                title='Title C',
+                location='Location C',
+                tags=['Tag C.1', 'Tag C.2'],
+                start=tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern'),
+                end=tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern'),
+                timezone='US/Eastern',
+                description='Description C',
+                organizer='Organizer C',
+                recurrence=(
+                    'RRULE:FREQ=WEEKLY;'
+                    'UNTIL=20150616T220000Z;'
+                    'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+                ),
+                coordinates=Coordinates(48.051752750515746, 9.305739625357093),
+                source='import-2-C'
             ),
-            coordinates=Coordinates(48.051752750515746, 9.305739625357093),
-            source='import-2-C'
+            image=None,
+            filename=None
         )
     ]) == (0, 0, 0)
 
     # Update and purge
     assert events.from_import([
-        Event(
-            state='initiated',
-            title='Title',
-            location='Location A',
-            tags=['Tag A.1', 'Tag A.2'],
-            start=tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern'),
-            end=tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern'),
-            timezone='US/Eastern',
-            description='Description A',
-            organizer='Organizer A',
-            recurrence=(
-                'RRULE:FREQ=WEEKLY;'
-                'UNTIL=20150616T220000Z;'
-                'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+        EventImportItem(
+            event=Event(
+                state='initiated',
+                title='Title',
+                location='Location A',
+                tags=['Tag A.1', 'Tag A.2'],
+                start=tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern'),
+                end=tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern'),
+                timezone='US/Eastern',
+                description='Description A',
+                organizer='Organizer A',
+                recurrence=(
+                    'RRULE:FREQ=WEEKLY;'
+                    'UNTIL=20150616T220000Z;'
+                    'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+                ),
+                coordinates=Coordinates(48.051752750515746, 9.305739625357093),
+                source='import-1-A'
             ),
-            coordinates=Coordinates(48.051752750515746, 9.305739625357093),
-            source='import-1-A'
-        ),
+            image=None,
+            filename=None
+        )
     ], 'import-1') == (0, 1, 1)
     assert events.subset_count == 2
 
     # Withdraw
     events.by_name('title-c').withdraw()
     assert events.from_import([
-        Event(
-            state='initiated',
-            title='Title C',
-            location='Location C',
-            tags=['Tag C.1', 'Tag C.2'],
-            start=tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern'),
-            end=tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern'),
-            timezone='US/Eastern',
-            description='Description C',
-            organizer='Organizer C',
-            recurrence=(
-                'RRULE:FREQ=WEEKLY;'
-                'UNTIL=20150616T220000Z;'
-                'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+        EventImportItem(
+            event=Event(
+                state='initiated',
+                title='Title C',
+                location='Location C',
+                tags=['Tag C.1', 'Tag C.2'],
+                start=tzdatetime(2015, 6, 16, 9, 30, 'US/Eastern'),
+                end=tzdatetime(2015, 6, 16, 18, 00, 'US/Eastern'),
+                timezone='US/Eastern',
+                description='Description C',
+                organizer='Organizer C',
+                recurrence=(
+                    'RRULE:FREQ=WEEKLY;'
+                    'UNTIL=20150616T220000Z;'
+                    'BYDAY=MO,TU,WE,TH,FR,SA,SU'
+                ),
+                coordinates=Coordinates(48.051752750515746, 9.305739625357093),
+                source='import-2-C'
             ),
-            coordinates=Coordinates(48.051752750515746, 9.305739625357093),
-            source='import-2-C'
+            image=None,
+            filename=None
         )
     ]) == (0, 0, 0)
     assert events.by_name('title-c').state == 'withdrawn'

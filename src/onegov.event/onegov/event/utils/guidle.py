@@ -68,6 +68,10 @@ class GuidleOffer(GuidleBase):
         return self.root.get('id')
 
     @cached_property
+    def last_update(self):
+        return self.get('guidle:lastUpdateDate')
+
+    @cached_property
     def title(self):
         title = self.get('guidle:offerDetail/guidle:title')
 

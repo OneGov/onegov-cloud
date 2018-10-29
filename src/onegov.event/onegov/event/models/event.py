@@ -14,6 +14,7 @@ from onegov.core.orm.types import UUID
 from onegov.event.models.mixins import OccurrenceMixin
 from onegov.event.models.occurrence import Occurrence
 from onegov.file import File
+from onegov.file.utils import as_fileintent
 from onegov.gis import CoordinatesMixin
 from onegov.search import ORMSearchable
 from pytz import UTC
@@ -70,11 +71,29 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
     #: the source of the event, if imported
     source = meta_property()
 
+    #: when the source of the event was last updated (if imported)
+    source_updated = meta_property()
+
     #: Recurrence of the event (RRULE, see RFC2445)
     recurrence = Column(Text, nullable=True)
 
     #: The associated image
     image = associated(EventFile, 'image', 'one-to-one', uselist=False)
+
+    def set_image(self, content, filename=None):
+        """ Adds or removes the image. """
+
+        filename = filename or 'file'
+        if content:
+            if self.image:
+                self.image.reference = as_fileintent(content, filename)
+            else:
+                self.image = EventFile(
+                    name=filename,
+                    reference=as_fileintent(content, filename)
+                )
+        else:
+            self.image = None
 
     #: Recurrence of the event as icalendar object
     @property

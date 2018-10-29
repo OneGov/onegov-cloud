@@ -113,7 +113,19 @@ def test_import_guidle(cfg_path, temporary_directory, xml):
     assert "Events successfully imported" in result.output
     assert "4 added, 0 updated, 0 deleted" in result.output
 
-    # Reimport
+    # Reimport, not changed due to last_update
+    with patch('onegov.event.cli.get', return_value=response):
+        result = runner.invoke(cli, [
+            '--config', cfg_path,
+            '--select', '/foo/bar',
+            'import-guidle', "'https://example.org/abcd'",
+        ])
+    assert result.exit_code == 0
+    assert "Events successfully imported" in result.output
+    assert "0 added, 0 updated, 0 deleted" in result.output
+
+    # Reimport, not changed due to not changed
+    response.text.replace('2017-10-21', '2017-10-22')
     with patch('onegov.event.cli.get', return_value=response):
         result = runner.invoke(cli, [
             '--config', cfg_path,
@@ -132,17 +144,6 @@ def test_import_guidle(cfg_path, temporary_directory, xml):
     ], 'y')
     assert result.exit_code == 0
 
-    # Import
-    with patch('onegov.event.cli.get', return_value=response):
-        result = runner.invoke(cli, [
-            '--config', cfg_path,
-            '--select', '/foo/bar',
-            'import-guidle', "'https://example.org/abcd'",
-        ])
-    assert result.exit_code == 0
-    assert "Events successfully imported" in result.output
-    assert "4 added, 0 updated, 0 deleted" in result.output
-
     # Create tagmap
     tagmap = path.join(temporary_directory, 'tagmap.csv')
     with open(tagmap, 'w') as f:
@@ -159,7 +160,7 @@ def test_import_guidle(cfg_path, temporary_directory, xml):
     assert result.exit_code == 0
     assert "Events successfully imported" in result.output
     assert "Tags not in tagmap: \"Kulinarik\"!"
-    assert "0 added, 4 updated, 0 deleted" in result.output
+    assert "4 added, 0 updated, 0 deleted" in result.output
 
 
 def test_fetch(cfg_path, session_manager):

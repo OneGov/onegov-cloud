@@ -1,6 +1,8 @@
+from collections import namedtuple
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
+from hashlib import md5
 from icalendar import Calendar as vCalendar
 from onegov.core.collection import Pagination
 from onegov.core.utils import increment_name
@@ -14,6 +16,11 @@ from sedate import standardize_date
 from sedate import to_timezone
 from sqlalchemy import and_
 from sqlalchemy import or_
+
+
+EventImportItem = namedtuple(
+    'EventImportItem', ('event', 'image', 'filename')
+)
 
 
 class EventCollection(Pagination):
@@ -136,46 +143,69 @@ class EventCollection(Pagination):
         query = self.session.query(Event).filter(Event.id == id)
         return query.first()
 
-    def from_import(self, events, purge=None):
+    def from_import(self, items, purge=None):
         """ Add or updates the given events.
 
-        Only updates events which have changed. Doesn't change the states of
-        events allowing to permanently withdraw imported events.
+        Only updates events which have changed. Uses `Event.source_updated` if
+        available, falls back to comparing all relevant attributes.
+
+        Doesn't change the states of events allowing to permanently withdraw
+        imported events.
 
         Optionally removes all events with the given meta-source-prefix not
         present in the given events.
 
+        Images for the given items should be provided seperately to avoid
+        overhead due to the depot storage, see `EventImportItem`.
+
         """
 
-        sources = set((event.source for event in events))
-        assert all(sources) and (len(sources) == len(events))
-
         if purge:
-            assert all((s.startswith(purge) for s in sources))
             query = self.session.query(Event.meta['source'].label('source'))
             query = query.filter(Event.meta['source'].astext.startswith(purge))
-            purge = set((r.source for r in query)) - sources
+            purge = set((r.source for r in query))
 
         added = 0
         updated = 0
 
-        for event in events:
+        for item in items:
+            event = item.event
             existing = self.session.query(Event).filter(
                 Event.meta['source'] == event.meta['source']
             ).first()
 
+            if purge:
+                purge -= set([event.source])
+
             if existing:
-                if (
-                    existing.title != event.title or
-                    existing.location != event.location or
-                    set(existing.tags) != set(event.tags) or
-                    existing.timezone != event.timezone or
-                    existing.start != event.start or
-                    existing.end != event.end or
-                    existing.content != event.content or
-                    existing.coordinates != event.coordinates or
-                    existing.recurrence != event.recurrence
-                ):
+                if existing.source_updated:
+                    changed = existing.source_updated != event.source_updated
+                else:
+                    # No information on provided, figure it out ourselves!
+                    image_changed = (
+                        (existing.image and not item.image) or
+                        (not existing.image and item.image)
+                    )
+                    if existing.image and item.image:
+                        image_changed = (
+                            existing.image.checksum !=
+                            md5(item.image.read()).hexdigest()
+                        )
+                        item.image.seek(0)
+                    changed = (
+                        existing.title != event.title or
+                        existing.location != event.location or
+                        set(existing.tags) != set(event.tags) or
+                        existing.timezone != event.timezone or
+                        existing.start != event.start or
+                        existing.end != event.end or
+                        existing.content != event.content or
+                        existing.coordinates != event.coordinates or
+                        existing.recurrence != event.recurrence or
+                        image_changed
+                    )
+
+                if changed:
                     updated += 1
                     state = existing.state  # avoid updating occurrences
                     existing.state = 'initiated'
@@ -189,11 +219,13 @@ class EventCollection(Pagination):
                     existing.coordinates = event.coordinates
                     existing.recurrence = event.recurrence
                     existing.state = state
+                    existing.set_image(item.image, item.filename)
 
             else:
                 added += 1
                 event.name = self._get_unique_name(event.title)
                 event.state = 'initiated'
+                event.set_image(item.image, item.filename)
                 self.session.add(event)
                 event.submit()
                 event.publish()
@@ -215,7 +247,7 @@ class EventCollection(Pagination):
         We assume the timezone to be Europe/Zurich!
 
         """
-        events = []
+        items = []
 
         cal = vCalendar.from_ical(ical)
         for vevent in cal.walk('vevent'):
@@ -274,21 +306,25 @@ class EventCollection(Pagination):
             organizer = str(vevent.get('organizer', ''))
             location = str(vevent.get('location', ''))
 
-            events.append(
-                Event(
-                    state='initiated',
-                    title=title,
-                    start=start,
-                    end=end,
-                    timezone=timezone,
-                    recurrence=recurrence,
-                    description=description,
-                    organizer=organizer,
-                    location=location,
-                    coordinates=coordinates,
-                    tags=tags or [],
-                    source=f'ical-{uid}',
+            items.append(
+                EventImportItem(
+                    event=Event(
+                        state='initiated',
+                        title=title,
+                        start=start,
+                        end=end,
+                        timezone=timezone,
+                        recurrence=recurrence,
+                        description=description,
+                        organizer=organizer,
+                        location=location,
+                        coordinates=coordinates,
+                        tags=tags or [],
+                        source=f'ical-{uid}',
+                    ),
+                    image=None,
+                    filename=None
                 )
             )
 
-        return self.from_import(events)
+        return self.from_import(items)

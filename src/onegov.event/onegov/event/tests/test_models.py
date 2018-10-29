@@ -3,9 +3,12 @@ import transaction
 
 from datetime import datetime
 from datetime import timedelta
+from io import BytesIO
+from onegov.core.utils import module_path
 from onegov.event import Event
 from onegov.event import Occurrence
 from onegov.gis import Coordinates
+from pytest import mark
 from sedate import replace_timezone
 
 
@@ -48,68 +51,103 @@ def test_transitions():
 
 
 def test_create_event(session):
-    timezone = 'Europe/Zurich'
-    start = tzdatetime(2008, 2, 7, 10, 15, timezone)
-    end = tzdatetime(2008, 2, 7, 16, 00, timezone)
-    title = 'Squirrel Park Visit'
-    description = '<em>Furry</em> things will happen!'
-    location = 'Squirrel Park'
-    tags = ['fun', 'animals', 'furry']
+    start = tzdatetime(2008, 2, 7, 10, 15, 'Europe/Zurich')
+    end = tzdatetime(2008, 2, 7, 16, 00, 'Europe/Zurich')
 
     event = Event(state='initiated')
-    event.timezone = timezone
+    event.timezone = 'Europe/Zurich'
     event.start = start
     event.end = end
-    event.title = title
-    event.content = {'description': description}
-    event.location = location
-    event.tags = tags
+    event.recurrence = None
+    event.title = 'Squirrel Park Visit'
+    event.description = '<em>Furry</em> things will happen!'
+    event.organizer = 'Squirrel Park'
+    event.location = 'Squirrel Park'
+    event.tags = ['fun', 'animals', 'furry']
     event.meta = {'submitter': 'fat.pauly@squirrelpark.org'}
+    event.source = 'source'
+    event.source_updated = 'now'
     event.name = 'event'
     session.add(event)
 
     event.submit()
     event.publish()
 
-    transaction.commit()
+    transaction.commit()  # make sure the dates are converted to UTC
 
     event = session.query(Event).one()
-    assert event.timezone == timezone
+    assert event.timezone == 'Europe/Zurich'
     assert event.start == start
     assert event.localized_start == start
     assert str(event.start.tzinfo) == 'UTC'
-    assert str(event.localized_start.tzinfo) == timezone
+    assert str(event.localized_start.tzinfo) == 'Europe/Zurich'
     assert event.end == end
     assert event.localized_end == end
     assert str(event.end.tzinfo) == 'UTC'
-    assert str(event.localized_end.tzinfo) == timezone
-    assert event.title == title
-    assert event.location == location
-    assert sorted(event.tags) == sorted(tags)
-    assert event.description == description
-    assert event.content == {'description': description}
-    assert event.meta == {'submitter': 'fat.pauly@squirrelpark.org'}
-    assert event.source is None
+    assert str(event.localized_end.tzinfo) == 'Europe/Zurich'
+    assert event.recurrence == None
+    assert event.title == 'Squirrel Park Visit'
+    assert event.location == 'Squirrel Park'
+    assert sorted(event.tags) == sorted(['fun', 'animals', 'furry'])
+    assert event.description == '<em>Furry</em> things will happen!'
+    assert event.organizer == 'Squirrel Park'
+    assert event.meta['submitter'] == 'fat.pauly@squirrelpark.org'
+    assert event.source == 'source'
+    assert event.source_updated == 'now'
     assert event.name == 'event'
 
     occurrence = session.query(Occurrence).one()
-    assert occurrence.timezone == timezone
+    assert occurrence.timezone == 'Europe/Zurich'
     assert occurrence.start == start
     assert occurrence.localized_start == start
     assert str(occurrence.start.tzinfo) == 'UTC'
-    assert str(occurrence.localized_start.tzinfo) == timezone
+    assert str(occurrence.localized_start.tzinfo) == 'Europe/Zurich'
     assert occurrence.end == end
     assert occurrence.localized_end == end
     assert str(occurrence.end.tzinfo) == 'UTC'
-    assert str(occurrence.localized_end.tzinfo) == timezone
-    assert occurrence.title == title
-    assert occurrence.location == location
-    assert sorted(occurrence.tags) == sorted(tags)
-    assert occurrence.event.description == description
+    assert str(occurrence.localized_end.tzinfo) == 'Europe/Zurich'
+    assert occurrence.title == 'Squirrel Park Visit'
+    assert occurrence.location == 'Squirrel Park'
+    assert sorted(occurrence.tags) == sorted(['fun', 'animals', 'furry'])
+    assert occurrence.event.description == '<em>Furry</em> things will happen!'
     assert occurrence.name == 'event-2008-02-07'
 
     assert [o.id for o in event.occurrences] == [occurrence.id]
     assert occurrence.event.id == event.id
+
+
+@mark.parametrize("path", [module_path('onegov.event', 'tests/fixtures')])
+def test_event_image(test_app, path):
+    session = test_app.session()
+
+    event = Event(state='initiated')
+    event.timezone = 'Europe/Zurich'
+    event.start = tzdatetime(2008, 2, 7, 10, 15, 'Europe/Zurich')
+    event.end = tzdatetime(2008, 2, 7, 16, 00, 'Europe/Zurich')
+    event.title = 'Squirrel Park Visit'
+    session.add(event)
+    event.submit()
+    event = session.query(Event).one()
+
+    assert event.image == None
+
+    with open(f'{path}/event.png', 'rb') as file:
+        content = file.read()
+
+    event.set_image(BytesIO(content), 'file.png')
+    session.flush()
+    assert event.image.reference.file.read() == content
+
+    with open(f'{path}/event.jpg', 'rb') as file:
+        content = file.read()
+
+    event.set_image(BytesIO(content), 'file.png')
+    session.flush()
+    assert event.image.reference.file.read() == content
+
+    event.set_image(None, None)
+    session.flush()
+    assert event.image == None
 
 
 def test_icalendar_recurrence():

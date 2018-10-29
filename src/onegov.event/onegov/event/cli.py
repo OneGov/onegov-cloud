@@ -9,13 +9,16 @@ from lxml import etree
 from onegov.core.cli import abort
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
-from onegov.file import DepotApp
-from onegov.file.utils import as_fileintent
 from onegov.event import log
 from onegov.event.collections import EventCollection
-from onegov.event.models import Event, EventFile
+from onegov.event.collections.events import EventImportItem
+from onegov.event.models import Event
+from onegov.event.models import EventFile
 from onegov.event.models import Occurrence
-from onegov.event.utils import GuidleExportData, as_rdates
+from onegov.event.utils import as_rdates
+from onegov.event.utils import GuidleExportData
+from onegov.file import DepotApp
+from onegov.file.utils import as_fileintent
 from onegov.gis import Coordinates
 from operator import add
 from pathlib import Path
@@ -237,52 +240,77 @@ def import_guidle(group_context, url, tagmap):
 
             unknown_tags = set()
             prefix = 'guidle-{}'.format(sha1(url.encode()).hexdigest()[:10])
+            collection = EventCollection(app.session())
+            updated = dict(collection.query().with_entities(
+                Event.meta['source'],
+                Event.meta['source_updated'],
+            ))
 
-            events = []
             root = etree.fromstring(response.text.encode('utf-8'))
-            for offer in GuidleExportData(root).offers():
-                tags, unknown = offer.tags(tagmap)
-                unknown_tags |= unknown
 
-                if isinstance(app, DepotApp):
-                    image_url = offer.image_url(size='original')
-                else:
-                    image_url = None
+            def items(unknown_tags):
+                for offer in GuidleExportData(root).offers():
+                    source = f'{prefix}-{offer.uid}.0'
+                    if offer.last_update == updated.get(source):
+                        # Do not download the images and parse all the fields
+                        # if nothing has changed since the last import. Only
+                        # provide some dummy events with the source set so
+                        # that the purging will work!
+                        for index, schedule in enumerate(offer.schedules()):
+                            yield EventImportItem(
+                                event=Event(
+                                    source=f'{prefix}-{offer.uid}.{index}',
+                                    source_updated=offer.last_update
+                                ),
+                                image=None,
+                                filename=None
+                            )
+                        continue
 
-                if image_url:
-                    buffer = download_image(image_url)
-                else:
-                    buffer = None
+                    tags, unknown = offer.tags(tagmap)
+                    unknown_tags |= unknown
 
-                for index, schedule in enumerate(offer.schedules()):
-                    event = Event(
-                        state='initiated',
-                        title=offer.title,
-                        start=schedule.start,
-                        end=schedule.end,
-                        recurrence=schedule.recurrence,
-                        timezone=schedule.timezone,
-                        description=offer.description,
-                        organizer=offer.organizer,
-                        location=offer.location,
-                        coordinates=offer.coordinates,
-                        tags=tags,
-                        source=f'{prefix}-{offer.uid}.{index}',
-                    )
+                    image = None
+                    filename = None
+                    if isinstance(app, DepotApp):
+                        image_url = offer.image_url(size='original')
+                        if image_url:
+                            image = download_image(image_url)
+                            filename = image_url.rsplit('/', 1)[-1]
 
-                    if buffer:
-                        buffer.seek(0)
-                        filename = image_url.rsplit('/', 1)[-1]
-
-                        event.image = EventFile(
-                            name=filename,
-                            reference=as_fileintent(buffer, filename)
+                    for index, schedule in enumerate(offer.schedules()):
+                        event = Event(
+                            state='initiated',
+                            title=offer.title,
+                            start=schedule.start,
+                            end=schedule.end,
+                            recurrence=schedule.recurrence,
+                            timezone=schedule.timezone,
+                            description=offer.description,
+                            organizer=offer.organizer,
+                            location=offer.location,
+                            coordinates=offer.coordinates,
+                            tags=tags,
+                            source=f'{prefix}-{offer.uid}.{index}',
+                            source_updated=offer.last_update
                         )
 
-                    events.append(event)
+                        if image:
+                            image.seek(0)
 
-            collection = EventCollection(app.session())
-            added, updated, purged = collection.from_import(events, prefix)
+                        yield EventImportItem(
+                            event=event,
+                            image=image,
+                            filename=filename
+                        )
+
+                    if image:
+                        image.close()
+
+            added, updated, purged = collection.from_import(
+                items(unknown_tags),
+                prefix
+            )
 
             if unknown_tags:
                 unknown_tags = ', '.join([f'"{tag}"' for tag in unknown_tags])
@@ -329,9 +357,12 @@ def fetch(group_context, source, tag, location):
 
     def _fetch(request, app):
 
-        # XXX use a proper depot manager for this
-        def event_file_path(reference):
-            return Path(app.depot_storage_path) / reference['path'] / 'file'
+        def event_file(reference):
+            # XXX use a proper depot manager for this
+            path = Path(app.depot_storage_path) / reference['path'] / 'file'
+            with open(path):
+                content = BytesIO(path.open('rb').read())
+            return content
 
         try:
             result = [0, 0, 0]
@@ -362,33 +393,28 @@ def fetch(group_context, source, tag, location):
                         ])
                     )
 
-                remote_events = [
-                    Event(
-                        state='initiated',
-                        title=event.title,
-                        start=event.start,
-                        end=event.end,
-                        timezone=event.timezone,
-                        recurrence=event.recurrence,
-                        content=event.content,
-                        location=event.location,
-                        tags=event.tags,
-                        image=(
-                            event.image and
-                            EventFile(
-                                name=event.image.name,
-                                reference=as_fileintent(
-                                    event_file_path(
-                                        event.image.reference
-                                    ).open('rb'),
-                                    event.image.name
-                                )
-                            ) or None
-                        ),
-                        source=f'fetch-{key}-{event.name}',
-                        coordinates=event.coordinates,
-                    ) for event in query
-                ]
+                def remote_events():
+                    for event in query:
+                        yield EventImportItem(
+                            event=Event(
+                                state='initiated',
+                                title=event.title,
+                                start=event.start,
+                                end=event.end,
+                                timezone=event.timezone,
+                                recurrence=event.recurrence,
+                                content=event.content,
+                                location=event.location,
+                                tags=event.tags,
+                                source=f'fetch-{key}-{event.name}',
+                                coordinates=event.coordinates,
+                            ),
+                            image=(
+                                event_file(event.image.reference)
+                                if event.image else None
+                            ),
+                            filename=event.image.name if event.image else None
+                        )
 
                 # be sure to switch back to the local schema, lest we
                 # accidentally update things on the remote
@@ -397,7 +423,7 @@ def fetch(group_context, source, tag, location):
 
                 result = vector_add(
                     result,
-                    local_events.from_import(remote_events, f'fetch-{key}')
+                    local_events.from_import(remote_events(), f'fetch-{key}')
                 )
 
             click.secho(

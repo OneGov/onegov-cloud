@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Optimizes fetch and guidle import.
+  [msom]
+
 0.9.7 (2018-10-19)
 ~~~~~~~~~~~~~~~~~~~
 

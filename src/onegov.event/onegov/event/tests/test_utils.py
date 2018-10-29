@@ -22,6 +22,7 @@ def test_import_guidle(session, xml):
 
     assert offers[0].uid == '551262854'
     assert offers[0].title == "Theatervorstellung"
+    assert offers[0].last_update == "2017-10-21T22:44:12.834+02:00"
     assert offers[0].description == (
         "Lorem ipsum\n\n"
         "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam "
