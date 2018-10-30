@@ -32,9 +32,14 @@ setup(
     install_requires=[
         'cached_property',
         'bleach',
+        'html5lib',
         'onegov.core',
+        'onegov.form',
+        'onegov.file',
         'onegov.org',
         'onegov.people>=0.4.0',
+        'onegov.pdf',
+        'pyyaml',
     ],
     extras_require=dict(
         test=[
