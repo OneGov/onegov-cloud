@@ -38,7 +38,7 @@ setup(
         'onegov.file',
         'onegov.org',
         'onegov.people>=0.4.0',
-        'onegov.pdf',
+        'onegov.pdf>=0.4.0',
         'pyyaml',
     ],
     extras_require=dict(
