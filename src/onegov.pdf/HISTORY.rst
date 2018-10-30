@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.4.0 (2018-10-30)
+~~~~~~~~~~~~~~~~~~~~~
 
 - Allows to add table of contents to PDFs.
   [msom]
