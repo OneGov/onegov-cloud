@@ -111,6 +111,9 @@ def import_agencies(group_context, file, clear, skip_root, skip_download,
             if skip_root and row == 1:
                 continue
 
+            if row and (row % 50 == 0):
+                app.es_indexer.process()
+
             # We use our own, internal IDs which are auto-incremented
             external_id = int(sheet.cell_value(row, 0))
 
@@ -165,6 +168,9 @@ def import_agencies(group_context, file, clear, skip_root, skip_download,
         click.secho("Importing people and memberships", fg='green')
         sheet = workbook.sheet_by_name('Personen')
         for row in range(1, sheet.nrows):
+            if row and (row % 50 == 0):
+                app.es_indexer.process()
+
             notes = '\n'.join((
                 sheet.cell_value(row, 13).strip(),
                 sheet.cell_value(row, 14).strip()
