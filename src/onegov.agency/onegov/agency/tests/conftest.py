@@ -6,8 +6,15 @@ from pytest import fixture
 from yaml import dump
 
 
+class DummyIndexer():
+    def process(self):
+        pass
+
+
 class TestApp(Framework, DepotApp):
-    pass
+
+    def configure_search(self, **cfg):
+        self.es_indexer = DummyIndexer()
 
 
 @fixture(scope='function')
@@ -16,7 +23,7 @@ def cfg_path(postgres_dsn, session_manager, temporary_directory, redis_url):
         'applications': [
             {
                 'path': '/foo/*',
-                'application': 'onegov.people.tests.conftest.TestApp',
+                'application': 'onegov.agency.tests.conftest.TestApp',
                 'namespace': 'foo',
                 'configuration': {
                     'dsn': postgres_dsn,
