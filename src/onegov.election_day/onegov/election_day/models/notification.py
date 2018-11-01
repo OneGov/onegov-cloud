@@ -1,7 +1,6 @@
 from onegov.ballot.models import Election
 from onegov.ballot.models import Vote
 from onegov.core.custom import json
-from onegov.core.i18n import SiteLocale
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UTCDateTime
@@ -81,7 +80,7 @@ class WebhookNotification(Notification):
         """ Posts the summary of the given vote or election to the webhook
         URL defined for this principal.
 
-        This only works for external URL. If posting to server itself is
+        This only works for external URLs. If posting to the server itself is
         needed, use a process instead of the thread:
 
             process = Process(target=send_post_request, args=(urls, data))
@@ -122,19 +121,7 @@ class EmailNotification(Notification):
         if 'translator' in request.__dict__:
             del request.__dict__['translator']
 
-    def get_subject_prefix(self, model):
-        if not model.completed:
-            return _("New intermediate results")
-        if isinstance(model, Vote):
-            if model.answer == 'accepted' or model.answer == 'proposal':
-                return _("Accepted")
-            if model.answer == 'rejected':
-                return _("Rejected")
-            if model.answer == 'counter-proposal':
-                return _("Counter proposal accepted")
-        return _("Final results")
-
-    def trigger(self, request, model):
+    def send_emails(self, request, elections, votes, subject=None):
         """ Sends the results of the vote or election to all subscribers.
 
         Adds unsubscribe headers (RFC 2369, RFC 8058).
@@ -142,14 +129,11 @@ class EmailNotification(Notification):
         """
         from onegov.election_day.layouts import MailLayout  # circular
 
-        self.update_from_model(model)
-        self.set_locale(request)
-        subject_prefix = self.get_subject_prefix(model)
+        if not elections and not votes:
+            return
 
-        template = 'mail_{}_results.pt'.format(
-            'vote' if isinstance(model, Vote) else 'election'
-        )
-        optout = request.link(request.app.principal, 'unsubscribe-email')
+        self.set_locale(request)
+
         reply_to = '{} <{}>'.format(
             request.app.principal.name,
             request.app.mail['marketing']['sender']
@@ -164,33 +148,29 @@ class EmailNotification(Notification):
                 continue
 
             self.set_locale(request, locale)
-            model_title = model.get_title(locale, request.default_locale)
-            model_url = request.link(SiteLocale(locale, request.link(model)))
-            subject = '{} - {}'.format(
-                model_title, request.translate(subject_prefix)
-            )
 
+            layout = MailLayout(self, request)
+
+            subject_ = subject or layout.subject((elections + votes)[0])
             content = render_template(
-                template,
+                'mail_results.pt',
                 request,
                 {
-                    'title': subject,
-                    'model': model,
-                    'model_title': model_title,
-                    'model_url': model_url,
-                    'optout': optout,
-                    'layout': MailLayout(self, request)
+                    'title': subject_,
+                    'elections': elections,
+                    'votes': votes,
+                    'layout': layout
                 }
             )
 
             for address in addresses:
                 token = request.new_url_safe_token({'address': address})
-                optout_custom = f'{optout}?opaque={token}'
+                optout_custom = f'{layout.optout_link}?opaque={token}'
                 request.app.send_marketing_email(
-                    subject=subject,
+                    subject=subject_,
                     receivers=(address, ),
                     reply_to=reply_to,
-                    content=content.replace(optout, optout_custom),
+                    content=content.replace(layout.optout_link, optout_custom),
                     headers={
                         'List-Unsubscribe': f'<{optout_custom}>',
                         'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
@@ -199,10 +179,36 @@ class EmailNotification(Notification):
 
         self.set_locale(request)
 
+    def trigger(self, request, model):
+        """ Sends the results of the vote or election to all subscribers.
+
+        Adds unsubscribe headers (RFC 2369, RFC 8058).
+
+        """
+
+        self.update_from_model(model)
+
+        self.send_emails(
+            request,
+            elections=[model] if isinstance(model, Election) else [],
+            votes=[model] if isinstance(model, Vote) else []
+        )
+
 
 class SmsNotification(Notification):
 
     __mapper_args__ = {'polymorphic_identity': 'sms'}
+
+    def send_sms(self, request, content):
+        """ Sends the given text to all subscribers. """
+
+        subscribers = request.session.query(SmsSubscriber).all()
+        for subscriber in subscribers:
+            translator = request.app.translations.get(subscriber.locale)
+            translated = translator.gettext(content) if translator else content
+            translated = content.interpolate(translated)
+
+            request.app.send_sms(subscriber.address, translated)
 
     def trigger(self, request, model):
         """ Posts a link to the vote or election to all subscribers.
@@ -225,10 +231,4 @@ class SmsNotification(Notification):
                 mapping={'url': request.app.principal.sms_notification}
             )
 
-        subscribers = request.session.query(SmsSubscriber).all()
-        for subscriber in subscribers:
-            translator = request.app.translations.get(subscriber.locale)
-            translated = translator.gettext(content) if translator else content
-            translated = content.interpolate(translated)
-
-            request.app.send_sms(subscriber.address, translated)
+        self.send_sms(request, content)

@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-18 15:49+0200\n"
-"PO-Revision-Date: 2018-08-20 08:10+0200\n"
+"POT-Creation-Date: 2018-11-01 16:24+0100\n"
+"PO-Revision-Date: 2018-11-01 16:24+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -12,141 +12,10 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 2.1.1\n"
+"X-Generator: Poedit 2.2\n"
 
 msgid "Last change"
 msgstr "Aggiornato"
-
-msgid ""
-"Successfully subscribed to the SMS service. You will receive a SMS every "
-"time new results are published."
-msgstr ""
-"Ti sei iscritto con successo al servizio SMS. Riceverai un SMS ogni volta "
-"che un nuovo risultato verrà pubblicato."
-
-msgid "Successfully subscribed to the email service"
-msgstr "Iscrizione al servizio di posta elettronica avvenuta con successo"
-
-#, python-format
-msgid "Missing columns: '${cols}'"
-msgstr "Colonne mancanti: '${cols}'"
-
-msgid ""
-"Could not find the expected columns, make sure all required columns exist "
-"and that there are no extra columns."
-msgstr ""
-"Le colonne necessarie non sono state trovate. Verifichi per favore che le "
-"colonne esistano e che non vi siano colonne supplementari."
-
-msgid "Some column names appear twice."
-msgstr "Alcuni nomi di colonna figurano due volte."
-
-msgid "Not a valid csv/xls/xlsx file."
-msgstr "Nessun file CSV/XLS/XLSX valido."
-
-msgid "The csv/xls/xlsx file is empty."
-msgstr "Il file CSV/XLS/XLSX è vuoto."
-
-msgid "The file contains an empty line."
-msgstr "Il file contiene una riga vuota."
-
-msgid "Not a valid xls/xlsx file."
-msgstr "Nessun file XLS/XLSX valido."
-
-msgid "The xls/xlsx file contains unsupported cells."
-msgstr "Il file xls/xlsx contiene celle non supportate."
-
-msgid "Results"
-msgstr "Risultati"
-
-msgid "Invalid status"
-msgstr "Stato non valido"
-
-msgid "Invalid election values"
-msgstr "Valori dell'elezione non validi"
-
-msgid "Invalid entity values"
-msgstr "Valori non validi"
-
-#, python-format
-msgid "${name} is unknown"
-msgstr "${name} è sconosciuto"
-
-msgid "Invalid candidate values"
-msgstr "Valori del candidato non validi"
-
-msgid "Invalid candidate results"
-msgstr "Risultati del candidato non validi"
-
-msgid "No data found"
-msgstr "Nessun dato trovato"
-
-msgid "No clear district"
-msgstr "Nessun distretto ben definito"
-
-msgid "Invalid list values"
-msgstr "Valori della lista non validi"
-
-msgid "Invalid list results"
-msgstr "Risultati della lista non validi"
-
-msgid "Invalid list connection values"
-msgstr "Valori della lista delle connessioni non validi"
-
-msgid "Invalid values"
-msgstr "Valori non validi"
-
-#, python-format
-msgid "${name} was found twice"
-msgstr "${name} figura due volte"
-
-msgid "Elected Candidates"
-msgstr "Candidati eletti"
-
-msgid "Unknown candidate"
-msgstr "Candidato non conosciuto"
-
-msgid "List connections"
-msgstr "Elenca i collegamenti"
-
-msgid "Election statistics"
-msgstr "Statistiche delle elezioni"
-
-msgid "Invalid id"
-msgstr "ID non valido"
-
-msgid "Could not read the eligible voters"
-msgstr "Impossibile leggere 'Aventi diritto di voto'"
-
-msgid "Proposal"
-msgstr "Oggetto della votazione"
-
-msgid "Counter Proposal"
-msgstr "Controprogetto"
-
-msgid "Tie-Breaker"
-msgstr "Domanda risolutiva"
-
-msgid "Could not read yeas"
-msgstr "Impossibile leggere 'SÌ'"
-
-msgid "Could not read nays"
-msgstr "Impossibile leggere 'NO'"
-
-msgid "Could not read the empty votes"
-msgstr "Impossibile leggere 'Schede bianche'"
-
-msgid "Could not read the invalid votes"
-msgstr "Impossibile leggere 'Schede nulle'"
-
-msgid "No eligible voters"
-msgstr "Nessun avente diritto di voto"
-
-msgid "More cast votes than eligible voters"
-msgstr "Il numero di voti espressi supera quello degli aventi diritto di voto"
-
-msgid "Invalid ballot type"
-msgstr "Tipo di scheda non valido"
 
 msgid "Type"
 msgstr "Tipo"
@@ -226,20 +95,23 @@ msgstr "Cantonale"
 msgid "Select either majorz or proporz elections."
 msgstr "Seleziona o elezioni maggioritarie o proporzionali."
 
+msgid "Email"
+msgstr "E-mail"
+
+msgid "Phone number"
+msgstr "Numero di telefono"
+
 msgid "Notifications"
 msgstr "Notifiche"
 
-msgid "Email"
-msgstr "E-mail"
+msgid "Votes"
+msgstr "Votazioni"
 
 msgid "SMS"
 msgstr "SMS"
 
 msgid "Webhooks"
 msgstr "Webhooks"
-
-msgid "Phone number"
-msgstr "Numero di telefono"
 
 msgid "Title of the the vote/proposal"
 msgstr "Titolo del voto/iniziativa"
@@ -262,11 +134,20 @@ msgstr "Formato del file"
 msgid "Complete"
 msgstr "Completo"
 
+msgid "Results"
+msgstr "Risultati"
+
+msgid "Elected Candidates"
+msgstr "Candidati eletti"
+
+msgid "List connections"
+msgstr "Elenca i collegamenti"
+
+msgid "Election statistics"
+msgstr "Statistiche delle elezioni"
+
 msgid "OneGov Cloud"
 msgstr "OneGov Cloud"
-
-msgid "Party results"
-msgstr "Risultati del partito"
 
 msgid "Identifier"
 msgstr "Identificatore"
@@ -277,8 +158,17 @@ msgstr "Votazione"
 msgid "Election"
 msgstr "Elezione"
 
+msgid "Party results"
+msgstr "Risultati del partito"
+
 msgid "Proposal / Results"
 msgstr "Oggetto della votazione / Risultati"
+
+msgid "Counter Proposal"
+msgstr "Controprogetto"
+
+msgid "Tie-Breaker"
+msgstr "Domanda risolutiva"
 
 msgid "Vote number"
 msgstr "Numero di voti"
@@ -286,76 +176,279 @@ msgstr "Numero di voti"
 msgid "Default"
 msgstr "Predefinito"
 
-msgid "Expats"
-msgstr "Svizzeri all'estero"
+#, python-format
+msgid "Missing columns: '${cols}'"
+msgstr "Colonne mancanti: '${cols}'"
 
-msgid "Lists"
-msgstr "Liste"
+msgid ""
+"Could not find the expected columns, make sure all required columns exist "
+"and that there are no extra columns."
+msgstr ""
+"Le colonne necessarie non sono state trovate. Verifichi per favore che le "
+"colonne esistano e che non vi siano colonne supplementari."
 
-msgid "Candidates"
-msgstr "Candidati"
+msgid "Some column names appear twice."
+msgstr "Alcuni nomi di colonna figurano due volte."
 
-msgid "Parties"
-msgstr "Parti"
+msgid "Not a valid csv/xls/xlsx file."
+msgstr "Nessun file CSV/XLS/XLSX valido."
 
-msgid "Downloads"
-msgstr "Download"
+msgid "The csv/xls/xlsx file is empty."
+msgstr "Il file CSV/XLS/XLSX è vuoto."
 
-msgid "Panachage"
-msgstr "Panachage"
+msgid "The file contains an empty line."
+msgstr "Il file contiene una riga vuota."
 
-msgid "Party strengths"
-msgstr "Forza delle parti"
+msgid "Not a valid xls/xlsx file."
+msgstr "Nessun file XLS/XLSX valido."
 
-msgid "Elected candidates"
-msgstr "Candidati eletti"
+msgid "The xls/xlsx file contains unsupported cells."
+msgstr "Il file xls/xlsx contiene celle non supportate."
 
-msgid "Votes"
-msgstr "Votazioni"
+msgid "Invalid status"
+msgstr "Stato non valido"
 
-msgid "Compounds of elections"
-msgstr "Componenti delle elezioni"
+msgid "Invalid ballot type"
+msgstr "Tipo di scheda non valido"
 
-msgid "Manage"
-msgstr "Amministrare"
+msgid "No data found"
+msgstr "Nessun dato trovato"
 
-msgid "Data sources"
-msgstr "Origini dati"
-
-msgid "Mappings"
-msgstr "Mapping"
-
-msgid "Subscribers"
-msgstr "Iscritti"
-
-msgid "Email subscribers"
-msgstr "Email iscritti"
-
-msgid "SMS subscribers"
-msgstr "SMS iscritti"
-
-msgid "Final results"
-msgstr "Risultati finali"
-
-msgid "New intermediate results"
-msgstr "Nuovi risultati provvisori"
+msgid "Invalid id"
+msgstr "ID non valido"
 
 #, python-format
-msgid "Final results are available on ${url}"
-msgstr "Risultati finali sono disponibili su ${url}"
+msgid "${name} was found twice"
+msgstr "${name} figura due volte"
 
 #, python-format
-msgid "New intermediate results are available on ${url}"
-msgstr "Nuovi risultati provvisori sono disponibili su ${url}"
+msgid "${name} is unknown"
+msgstr "${name} è sconosciuto"
 
-msgid "Accepted"
-msgstr "Accolto"
+msgid "Could not read yeas"
+msgstr "Impossibile leggere 'SÌ'"
+
+msgid "Could not read nays"
+msgstr "Impossibile leggere 'NO'"
+
+msgid "Could not read the eligible voters"
+msgstr "Impossibile leggere 'Aventi diritto di voto'"
+
+msgid "Could not read the empty votes"
+msgstr "Impossibile leggere 'Schede bianche'"
+
+msgid "Could not read the invalid votes"
+msgstr "Impossibile leggere 'Schede nulle'"
+
+msgid "No eligible voters"
+msgstr "Nessun avente diritto di voto"
+
+msgid "More cast votes than eligible voters"
+msgstr "Il numero di voti espressi supera quello degli aventi diritto di voto"
+
+msgid "Invalid values"
+msgstr "Valori non validi"
+
+msgid "Proposal"
+msgstr "Oggetto della votazione"
+
+msgid "Invalid entity values"
+msgstr "Valori non validi"
+
+msgid "Invalid candidate values"
+msgstr "Valori del candidato non validi"
+
+msgid "Invalid candidate results"
+msgstr "Risultati del candidato non validi"
+
+msgid "No clear district"
+msgstr "Nessun distretto ben definito"
+
+msgid "Invalid list values"
+msgstr "Valori della lista non validi"
+
+msgid "Invalid list results"
+msgstr "Risultati della lista non validi"
+
+msgid "Invalid election values"
+msgstr "Valori dell'elezione non validi"
+
+msgid "Invalid list connection values"
+msgstr "Valori della lista delle connessioni non validi"
+
+msgid "Unknown candidate"
+msgstr "Candidato non conosciuto"
+
+msgid "Nay"
+msgstr "No"
+
+msgid "Yay"
+msgstr "Sì"
 
 msgid "Rejected"
 msgstr "Respinto"
 
+msgid "Elected candidates"
+msgstr "Candidati eletti"
+
+msgid "Accepted"
+msgstr "Accolto"
+
+msgid "Candidates"
+msgstr "Candidati"
+
+msgid "Turnout"
+msgstr "Partecipazione elettorale"
+
+msgid "eligible Voters"
+msgstr "Elettores"
+
+msgid "Received Ballots"
+msgstr "Schede ricevute"
+
+msgid "Lists"
+msgstr "Liste"
+
+#.
+#. Default: The diagram shows the distribution of votes and mandates on list
+#. and sublists. The bars on the left correspond to the list connections, the
+#. bars in the middle to the sublists, the bars to the right to the lists. The
+#. width of the bars and connections is proportional to the votes, blue colored
+#. bars contain the number of mandates.
+msgid "figcaption_connections"
+msgstr ""
+"Il diagramma mostra la distribuzione dei voti e dei mandati in lista e nelle "
+"sottoliste. Le barre sulla sinistra rappresentano le connessioni alla lista, "
+"le barre al centro corrispondono alle sottoliste, quelle a destra alle "
+"liste. L'ampiezza delle barre e delle connessioni è proporzionale ai voti, "
+"le barre colorate di blu contengono i numeri dei mandati."
+
+msgid "Party strengths"
+msgstr "Forza delle parti"
+
+#.
+#. Default: The diagram shows the votes and mandates of the parties. The rimmed
+#. bars (left scale) correspond to the number of mandates, the colored bars
+#. (right scale) to the voices (percentages).
+msgid "figcaption_party_strengths"
+msgstr ""
+"Il diagramma mostra i voti e i mandati dei partiti. Le barre cerchiate "
+"(scala a sinistra) corrispondono al numero dei mandati, le barre colorate "
+"(scala a destra) alle voci (percentuali)."
+
+msgid "Panachage (parties)"
+msgstr "Panachage (parti)"
+
+#.
+#. Default: The diagram shows the origin of the votes. The bars on the left
+#. correspond to the unchanged votes (including the blank list), the bars on
+#. the right side to the final results. The width of the bars and connections
+#. is proportional to the votes.
+msgid "figcaption_panachage"
+msgstr ""
+"Il diagramma mostra l'origine dei voti. Le barre sulla sinistra "
+"corrispondono ai voti invariati (inclusi quelli della lista bianca), le "
+"barre sulla parte destra ai risultati finali. L'ampiezza delle barre e delle "
+"connessioni è proporzionale ai voti."
+
+msgid "Panachage (lists)"
+msgstr "Panachage (liste)"
+
+msgid "Mandates"
+msgstr "Mandati"
+
+msgid "Expats"
+msgstr "Svizzeri all'estero"
+
+msgid "Proposal and counter proposal rejected"
+msgstr "Iniziativa e controprogetto sono state rifiutate"
+
+msgid "Proposal accepted"
+msgstr "Iniziativa accettata"
+
 msgid "Counter proposal accepted"
 msgstr "Controprogetto accettata"
+
+msgid "Seats"
+msgstr "Seggi"
+
+msgid "List"
+msgstr "Lista"
+
+#.
+#. Default: Votes
+msgid "single_votes"
+msgstr "Voti"
+
+msgid "Candidate"
+msgstr "Candidato"
+
+msgid "Party"
+msgstr "Partito"
+
+msgid "Tie breaker in favor of the proposal"
+msgstr "Spareggio a favore della iniziativa"
+
+msgid "Tie breaker in favor of the counter proposal"
+msgstr "Spareggio a favore della controprogetto"
+
+#.
+#. Default: Voter turnout
+msgid "turnout_vote"
+msgstr "Partecipazione al voto"
+
+#.
+#. Default: eligible Voters
+msgid "eligible_voters_vote"
+msgstr "Aventi diritto di voto"
+
+msgid "Cast Ballots"
+msgstr "Schede rientrate"
+
+msgid "Elected"
+msgstr "Eletto"
+
+msgid "Accounted Votes"
+msgstr "Voti validi"
+
+msgid "Accounted Ballots"
+msgstr "Schede valide"
+
+msgid "Blank Ballots"
+msgstr "Schede bianche"
+
+msgid "Invalid Ballots"
+msgstr "Schede nulle"
+
+msgid "List connection"
+msgstr "Collegamenti tra liste"
+
+msgid "Sublist connection"
+msgstr "Collegamenti tra sottoliste"
+
+msgid "Result"
+msgstr "Risultato"
+
+msgid "Yes %"
+msgstr "Sì %"
+
+msgid "No %"
+msgstr "No %"
+
+msgid "Empty"
+msgstr "Bianche"
+
+msgid "Invalid"
+msgstr "Nulle"
+
+msgid "Yes"
+msgstr "Si"
+
+msgid "Total"
+msgstr "Totale"
+
+msgid "Blank list"
+msgstr "Lista bianca"
 
 msgid "Municipality"
 msgstr "Comune"
@@ -410,83 +503,80 @@ msgstr "Regionale"
 msgid "Communal"
 msgstr "Comunale"
 
-msgid "Elections &amp; Votes"
-msgstr "Elezioni &amp; votazioni"
+#, python-format
+msgid "Final results are available on ${url}"
+msgstr "Risultati finali sono disponibili su ${url}"
 
-msgid "There are no elections or votes defined yet."
-msgstr "Non sono ancora state inserite elezioni o votazioni."
+#, python-format
+msgid "New intermediate results are available on ${url}"
+msgstr "Nuovi risultati provvisori sono disponibili su ${url}"
 
-msgid "Elections and votes on ${date}"
-msgstr "Elezioni e votazioni del ${date}"
+msgid "New intermediate results"
+msgstr "Nuovi risultati provvisori"
 
-msgid "Federal Elections"
-msgstr "Elezioni federali"
+msgid "Final results"
+msgstr "Risultati finali"
 
-msgid "Regional Elections"
-msgstr "Elezioni regionali"
+msgid "Parties"
+msgstr "Parti"
 
-msgid "Cantonal Elections"
-msgstr "Elezioni cantonali"
+msgid "Downloads"
+msgstr "Download"
 
-msgid "Communal Elections"
-msgstr "Elezioni communali"
+msgid "Panachage"
+msgstr "Panachage"
 
-msgid "Federal Votes"
-msgstr "Votazioni federali"
+msgid "Compounds of elections"
+msgstr "Componenti delle elezioni"
 
-msgid "Regional Votes"
-msgstr "Votazioni regionali"
+msgid "Manage"
+msgstr "Amministrare"
 
-msgid "Cantonal Votes"
-msgstr "Votazioni cantonali"
+msgid "Data sources"
+msgstr "Origini dati"
 
-msgid "Communal Votes"
-msgstr "Votazioni commuali"
+msgid "Mappings"
+msgstr "Mapping"
 
-msgid "Counted"
-msgstr "Scrutinati"
+msgid "Trigger notifications"
+msgstr "Attivazione delle notifiche"
 
-msgid "Updated"
-msgstr "Aggiornato"
+msgid "Subscribers"
+msgstr "Iscritti"
 
-msgid "Result"
-msgstr "Risultato"
+msgid "Email subscribers"
+msgstr "Email iscritti"
 
-msgid "Yes %"
-msgstr "Sì %"
+msgid "SMS subscribers"
+msgstr "SMS iscritti"
 
-msgid "No %"
-msgstr "No %"
+msgid "Unsubscribe"
+msgstr "Annulla iscrizione"
 
-msgid "Archive"
-msgstr "Archivio"
+msgid "Upload results"
+msgstr "Caricare risultati"
+
+msgid "Your results were uploaded successfully."
+msgstr "I Suoi risultati sono stati caricati correttamente."
+
+msgid "Click here to trigger the notifications."
+msgstr "Clicca qui per attivare le notifiche."
+
+msgid "Click here to see the updated results page."
+msgstr "Cliccare qui per visualizzare la pagina con i risultati aggiornati."
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Il modulo contiene errori. Controlli per favore i campi evidenziati in rosso."
 
-#.
-#. Default: Start
-msgid "homepage"
-msgstr "Pagina iniziale"
+msgid "Please use the following format:"
+msgstr "Utilizzi per favore il formato seguente:"
 
-msgid "Open Data"
-msgstr "Open Data"
+msgid "Format Description"
+msgstr "Descrizione del formato"
 
-msgid "Login"
-msgstr "Login"
-
-msgid "You are logged in:"
-msgstr "Login effettuato:"
-
-msgid "Logout"
-msgstr "Logout"
-
-msgid "Forgot your password?"
-msgstr "Hai dimenticato la password?"
-
-msgid "Reset password"
-msgstr "Ripristina password"
+msgid "No map available for this year."
+msgstr "Nessuna mappa disponibile per quest'anno."
 
 msgid "${counted} of ${total}"
 msgstr "${counted} di ${total}"
@@ -554,17 +644,10 @@ msgstr "Ottieni SMS Alert"
 msgid "Stop SMS subscription"
 msgstr "Interrompi abbonamento SMS"
 
-msgid "Proposal and counter proposal rejected"
-msgstr "Iniziativa e controprogetto sono state rifiutate"
-
-msgid "Proposal accepted"
-msgstr "Iniziativa accettata"
-
-msgid "Tie breaker in favor of the proposal"
-msgstr "Spareggio a favore della iniziativa"
-
-msgid "Tie breaker in favor of the counter proposal"
-msgstr "Spareggio a favore della controprogetto"
+#. Default: Start
+#.
+msgid "homepage"
+msgstr "Pagina iniziale"
 
 msgid "Yeas"
 msgstr "Voti favorevoli"
@@ -572,36 +655,14 @@ msgstr "Voti favorevoli"
 msgid "Nays"
 msgstr "Voti contrari"
 
-msgid "Turnout"
-msgstr "Partecipazione elettorale"
-
-msgid "eligible Voters"
-msgstr "Elettores"
-
-msgid "Received Ballots"
-msgstr "Schede ricevute"
-
-msgid "Seats"
-msgstr "Seggi"
-
-msgid "Mandates"
-msgstr "Mandati"
-
-#. Default: Voter turnout
-#.
-msgid "turnout_vote"
-msgstr "Partecipazione al voto"
-
-#. Default: eligible Voters
-#.
-msgid "eligible_voters_vote"
-msgstr "Aventi diritto di voto"
-
-msgid "Cast Ballots"
-msgstr "Schede rientrate"
+msgid "Counted"
+msgstr "Scrutinati"
 
 msgid "Download a PDF with all the results:"
 msgstr "Scarica un PDF con tutti i risultati:"
+
+msgid "Open Data"
+msgstr "Open Data"
 
 msgid ""
 "The raw data used to display the results is available in the following "
@@ -612,9 +673,6 @@ msgstr ""
 
 msgid "The format of the data is described here:"
 msgstr "Il formato dei dati è descritto qui:"
-
-msgid "Format Description"
-msgstr "Descrizione del formato"
 
 msgid "Terms of use"
 msgstr "Condizioni d’uso"
@@ -654,47 +712,60 @@ msgstr "Incorporare"
 msgid "Download"
 msgstr "Scarica"
 
-#. Default: The diagram shows the votes and mandates of the parties. The rimmed
-#. bars (left scale) correspond to the number of mandates, the colored bars
-#. (right scale) to the voices (percentages).
-#.
-msgid "figcaption_party_strengths"
-msgstr ""
-"Il diagramma mostra i voti e i mandati dei partiti. Le barre cerchiate "
-"(scala a sinistra) corrispondono al numero dei mandati, le barre colorate "
-"(scala a destra) alle voci (percentuali)."
-
 msgid "Year"
 msgstr "Anno"
-
-msgid "Party"
-msgstr "Partito"
-
-#. Default: Votes
-#.
-msgid "single_votes"
-msgstr "Voti"
 
 msgid "Difference"
 msgstr "Differenza"
 
-#. Default: The diagram shows the origin of the votes. The bars on the left
-#. correspond to the unchanged votes (including the blank list), the bars on
-#. the right side to the final results. The width of the bars and connections
-#. is proportional to the votes.
-#.
-msgid "figcaption_panachage"
-msgstr ""
-"Il diagramma mostra l'origine dei voti. Le barre sulla sinistra "
-"corrispondono ai voti invariati (inclusi quelli della lista bianca), le "
-"barre sulla parte destra ai risultati finali. L'ampiezza delle barre e delle "
-"connessioni è proporzionale ai voti."
-
 msgid "View all details online"
 msgstr "Visualizza tutti i dettagli online"
 
-msgid "Unsubscribe"
-msgstr "Annulla iscrizione"
+msgid "Elections &amp; Votes"
+msgstr "Elezioni &amp; votazioni"
+
+msgid "There are no elections or votes defined yet."
+msgstr "Non sono ancora state inserite elezioni o votazioni."
+
+#, python-format
+msgid "Elections and votes on ${date}"
+msgstr "Elezioni e votazioni del ${date}"
+
+msgid "Federal Elections"
+msgstr "Elezioni federali"
+
+msgid "Regional Elections"
+msgstr "Elezioni regionali"
+
+msgid "Cantonal Elections"
+msgstr "Elezioni cantonali"
+
+msgid "Communal Elections"
+msgstr "Elezioni communali"
+
+msgid "Federal Votes"
+msgstr "Votazioni federali"
+
+msgid "Regional Votes"
+msgstr "Votazioni regionali"
+
+msgid "Cantonal Votes"
+msgstr "Votazioni cantonali"
+
+msgid "Communal Votes"
+msgstr "Votazioni commuali"
+
+msgid "Updated"
+msgstr "Aggiornato"
+
+msgid "Archive"
+msgstr "Archivio"
+
+msgid "Forgot your password?"
+msgstr "Hai dimenticato la password?"
+
+msgid "Reset password"
+msgstr "Ripristina password"
 
 msgid "Dear Sir or Madam,"
 msgstr "Gentilissimo Signore o Signora,"
@@ -705,6 +776,15 @@ msgstr "Fare clic sul collegamento seguente per impostare una nuova password:"
 msgid "If you don't want to change your password, you can ignore this email."
 msgstr "Se non si desidera modificare la password, ignorare questa e-mail."
 
+msgid "Login"
+msgstr "Login"
+
+msgid "You are logged in:"
+msgstr "Login effettuato:"
+
+msgid "Logout"
+msgstr "Logout"
+
 msgid ""
 "Successfully subscribed to the email service. You will receive an email "
 "every time new results are published."
@@ -712,38 +792,14 @@ msgstr ""
 "Iscrizione al servizio di posta elettronica avvenuta con successo. Riceverai "
 "una e-mail ogni volta che dei nuovi risultati saranno pubblicati."
 
-msgid "Upload results"
-msgstr "Caricare risultati"
+msgid "Not yet counted"
+msgstr "Non ancora conteggiato"
 
-msgid "Your results were uploaded successfully."
-msgstr "I Suoi risultati sono stati caricati correttamente."
-
-msgid "Click here to trigger the notifications."
-msgstr "Clicca qui per attivare le notifiche."
-
-msgid "Click here to see the updated results page."
-msgstr "Cliccare qui per visualizzare la pagina con i risultati aggiornati."
-
-msgid "Please use the following format:"
-msgstr "Utilizzi per favore il formato seguente:"
-
-msgid "No map available for this year."
-msgstr "Nessuna mappa disponibile per quest'anno."
+msgid "The raw data is available as:"
+msgstr "I dati grezzi sono disponibili come:"
 
 msgid "No candidacies."
 msgstr "Nessuna candidatura."
-
-msgid "Candidate"
-msgstr "Candidato"
-
-msgid "List"
-msgstr "Lista"
-
-msgid "Elected"
-msgstr "Eletto"
-
-msgid "Yes"
-msgstr "Si"
 
 msgid "No"
 msgstr "No"
@@ -754,64 +810,38 @@ msgstr "Tutti i candidati"
 msgid "Elected candidates only"
 msgstr "Solo i candidati eletti"
 
-#. Default: The diagram shows the distribution of votes and mandates on list
-#. and sublists. The bars on the left correspond to the list connections, the
-#. bars in the middle to the sublists, the bars to the right to the lists. The
-#. width of the bars and connections is proportional to the votes, blue colored
-#. bars contain the number of mandates.
-#.
-msgid "figcaption_connections"
-msgstr ""
-"Il diagramma mostra la distribuzione dei voti e dei mandati in lista e nelle "
-"sottoliste. Le barre sulla sinistra rappresentano le connessioni alla lista, "
-"le barre al centro corrispondono alle sottoliste, quelle a destra alle "
-"liste. L'ampiezza delle barre e delle connessioni è proporzionale ai voti, "
-"le barre colorate di blu contengono i numeri dei mandati."
-
-msgid "List connection"
-msgstr "Collegamenti tra liste"
-
-msgid "Sublist connection"
-msgstr "Collegamenti tra sottoliste"
-
 msgid "Subtotal"
 msgstr "Subtotale"
 
-msgid "Total"
-msgstr "Totale"
+msgid "New compound"
+msgstr "Nuovo componente"
 
-msgid "The raw data is available as:"
-msgstr "I dati grezzi sono disponibili come:"
+msgid "No compounds yet."
+msgstr "Ancora nessun componente."
 
-msgid "Accounted Ballots"
-msgstr "Schede valide"
-
-msgid "Blank Ballots"
-msgstr "Schede bianche"
-
-msgid "Invalid Ballots"
-msgstr "Schede nulle"
-
-msgid "Accounted Votes"
-msgstr "Voti validi"
-
-msgid "Not yet counted"
-msgstr "Non ancora conteggiato"
-
-msgid "New mapping"
-msgstr "Nuovo mapping"
-
-msgid "No mappings yet."
-msgstr "Nessun mapping per il momento."
+msgid "Title"
+msgstr "Titolo"
 
 msgid "Actions"
 msgstr "Azioni"
 
-msgid "Delete"
-msgstr "Elimina"
+msgid "View"
+msgstr "Mostrare"
 
 msgid "Edit"
 msgstr "Elabora"
+
+msgid "Upload party results"
+msgstr "Carica risultati partito"
+
+msgid "Clear results"
+msgstr "Ripristina risultati"
+
+msgid "Delete"
+msgstr "Elimina"
+
+msgid "New election"
+msgstr "Nuova elezione"
 
 msgid "New data source"
 msgstr "Nuova origine dati"
@@ -825,29 +855,11 @@ msgstr "Token"
 msgid "Regenerate token"
 msgstr "Rigenera token"
 
-msgid "New compound"
-msgstr "Nuovo componente"
+msgid "New mapping"
+msgstr "Nuovo mapping"
 
-msgid "No compounds yet."
-msgstr "Ancora nessun componente."
-
-msgid "Title"
-msgstr "Titolo"
-
-msgid "View"
-msgstr "Mostrare"
-
-msgid "Upload party results"
-msgstr "Carica risultati partito"
-
-msgid "Clear results"
-msgstr "Ripristina risultati"
-
-msgid "New election"
-msgstr "Nuova elezione"
-
-msgid "Trigger notifications"
-msgstr "Attivazione delle notifiche"
+msgid "No mappings yet."
+msgstr "Nessun mapping per il momento."
 
 msgid "No subscribers yet."
 msgstr "Non ci sono ancora degli iscritti."
@@ -858,26 +870,22 @@ msgstr "Località"
 msgid "New vote"
 msgstr "Nuova votazione"
 
-msgid "Nay"
-msgstr "No"
+msgid "New results are available"
+msgstr "Nuovi risultati sono disponibili"
 
-msgid "Yay"
-msgstr "Sì"
+#, python-format
+msgid "New results are available on ${url}"
+msgstr "Nuovi risultati sono disponibili su ${url}"
 
-msgid "Empty"
-msgstr "Bianche"
+msgid ""
+"Successfully subscribed to the SMS service. You will receive a SMS every "
+"time new results are published."
+msgstr ""
+"Ti sei iscritto con successo al servizio SMS. Riceverai un SMS ogni volta "
+"che un nuovo risultato verrà pubblicato."
 
-msgid "Invalid"
-msgstr "Nulle"
-
-msgid "Panachage (parties)"
-msgstr "Panachage (parti)"
-
-msgid "Panachage (lists)"
-msgstr "Panachage (liste)"
-
-msgid "Blank list"
-msgstr "Lista bianca"
+msgid "Successfully subscribed to the email service"
+msgstr "Iscrizione al servizio di posta elettronica avvenuta con successo"
 
 msgid "Wrong username or password"
 msgstr "Nome utente sconosciuto o password errata"
@@ -912,6 +920,35 @@ msgstr "Pagina non trovata"
 
 msgid "The page you are looking for could not be found."
 msgstr "La pagina che si sta cercando non è stata trovata."
+
+msgid ""
+"You will receive an email as soon as new results have been published. You "
+"can unsubscribe at any time."
+msgstr ""
+"Riceverai una e-mail appena qualche nuovo risultato è stato pubblicato. Puoi "
+"annullare l’iscrizione in qualunque momento."
+
+msgid ""
+"Successfully unsubscribed from the email services. You will no longer "
+"receive an email when new results are published."
+msgstr ""
+"Annullamento iscrizione di posta elettronica avvenuto con successo. Non "
+"verrai più informato via e-mail quando dei nuovi risultati sono stati "
+"pubblicati."
+
+msgid ""
+"You will receive a SMS as soon as new results have been published. The SMS "
+"service is free of charge. You can unsubscribe at any time."
+msgstr ""
+"Riceverai un SMS appena un nuovo risultato verrà pubblicato. Il servizio SMS "
+"è gratuito. Puoi eliminare il tuo abbonamento in ogni momento."
+
+msgid ""
+"Successfully unsubscribed from the SMS services. You will no longer receive "
+"SMS when new results are published."
+msgstr ""
+"Il tuo abbonamento al servizio SMS è stato annullato con successo. Non "
+"riceverai più SMS quando nuovi risultati saranno pubblicati."
 
 #, python-format
 msgid ""
@@ -953,34 +990,78 @@ msgstr ""
 "Risultati finali della elezione federale \"${title}\", ${date}, "
 "${principal}, suddivisi per municipalit e candidati."
 
-msgid ""
-"You will receive an email as soon as new results have been published. You "
-"can unsubscribe at any time."
-msgstr ""
-"Riceverai una e-mail appena qualche nuovo risultato è stato pubblicato. Puoi "
-"annullare l’iscrizione in qualunque momento."
+msgid "Edit vote"
+msgstr "Modifica votazione"
+
+#, python-format
+msgid "Do you really want to clear all results of \"${item}\"?"
+msgstr "Sicuro di voler eliminare tutti i risultati di \"${item}\"?"
+
+#, python-format
+msgid "Do you really want to delete \"${item}\"?"
+msgstr "Sei sicuro/a di voler eliminare \"${item}\"?"
+
+msgid "Delete vote"
+msgstr "Elimina votazione"
 
 msgid ""
-"Successfully unsubscribed from the email services. You will no longer "
-"receive an email when new results are published."
+"There are no changes since the last time the notifications have been "
+"triggered!"
 msgstr ""
-"Annullamento iscrizione di posta elettronica avvenuto con successo. Non "
-"verrai più informato via e-mail quando dei nuovi risultati sono stati "
-"pubblicati."
+"Non ci sono stati cambiamenti dall’ultima che le notifiche sono state "
+"attivate!"
 
-msgid ""
-"You will receive a SMS as soon as new results have been published. The SMS "
-"service is free of charge. You can unsubscribe at any time."
-msgstr ""
-"Riceverai un SMS appena un nuovo risultato verrà pubblicato. Il servizio SMS "
-"è gratuito. Puoi eliminare il tuo abbonamento in ogni momento."
+msgid "Do you really want to retrigger the notfications?"
+msgstr "Vuoi davvero riattivare le notifiche?"
 
-msgid ""
-"Successfully unsubscribed from the SMS services. You will no longer receive "
-"SMS when new results are published."
-msgstr ""
-"Il tuo abbonamento al servizio SMS è stato annullato con successo. Non "
-"riceverai più SMS quando nuovi risultati saranno pubblicati."
+msgid "Vote added."
+msgstr "Voto aggiunto."
+
+msgid "Vote modified."
+msgstr "Voto modificato."
+
+msgid "Results deleted."
+msgstr "Risultati eliminata."
+
+msgid "Vote deleted."
+msgstr "Voto eliminato."
+
+msgid "Notifications triggered."
+msgstr "Notifiche attivate."
+
+msgid "Edit compound"
+msgstr "Modifica componente"
+
+#, python-format
+msgid "Do you really want to clear all party results of \"${item}\"?"
+msgstr "Sicuro di voler eliminare tutti i risultati partito di \"${item}\"?"
+
+msgid "Delete compound"
+msgstr "Elimina componente"
+
+msgid "Compound added."
+msgstr "Componente aggiunto."
+
+msgid "Compound modified."
+msgstr "Componente modificato."
+
+msgid "Compound deleted."
+msgstr "Componente eliminato."
+
+msgid "Edit election"
+msgstr "Modifica elezione"
+
+msgid "Delete election"
+msgstr "Elimina elezione"
+
+msgid "Election added."
+msgstr "Elezione aggiunta."
+
+msgid "Election modified."
+msgstr "Elezione modificata."
+
+msgid "Election deleted."
+msgstr "Elezione eliminata."
 
 msgid "Update results"
 msgstr "Aggiorna risultati"
@@ -990,10 +1071,6 @@ msgstr "Risultati aggiornati."
 
 msgid "Do you really want to regenerate the token?"
 msgstr "Rigenerare il token?"
-
-#, python-format
-msgid "Do you really want to delete \"${item}\"?"
-msgstr "Sei sicuro/a di voler eliminare \"${item}\"?"
 
 msgid "Delete data source"
 msgstr "Elimina origine dati"
@@ -1022,87 +1099,18 @@ msgstr "Mapping modificata."
 msgid "Mapping deleted."
 msgstr "Mappatura eliminata."
 
-msgid "Edit compound"
-msgstr "Modifica componente"
-
-#, python-format
-msgid "Do you really want to clear all party results of \"${item}\"?"
-msgstr "Sicuro di voler eliminare tutti i risultati partito di \"${item}\"?"
-
-msgid "Delete compound"
-msgstr "Elimina componente"
-
-msgid "Compound added."
-msgstr "Componente aggiunto."
-
-msgid "Compound modified."
-msgstr "Componente modificato."
-
-msgid "Results deleted."
-msgstr "Risultati eliminata."
-
-msgid "Compound deleted."
-msgstr "Componente eliminato."
-
-msgid "Edit election"
-msgstr "Modifica elezione"
-
-#, python-format
-msgid "Do you really want to clear all results of \"${item}\"?"
-msgstr "Sicuro di voler eliminare tutti i risultati di \"${item}\"?"
-
-msgid "Delete election"
-msgstr "Elimina elezione"
-
-msgid ""
-"There are no changes since the last time the notifications have been "
-"triggered!"
-msgstr ""
-"Non ci sono stati cambiamenti dall’ultima che le notifiche sono state "
-"attivate!"
-
-msgid "Do you really want to retrigger the notfications?"
-msgstr "Vuoi davvero riattivare le notifiche?"
-
-msgid "Election added."
-msgstr "Elezione aggiunta."
-
-msgid "Election modified."
-msgstr "Elezione modificata."
-
-msgid "Election deleted."
-msgstr "Elezione eliminata."
-
-msgid "Notifications triggered."
-msgstr "Notifiche attivate."
-
 msgid "Delete subscriber"
 msgstr "Elimina iscritto/a"
 
 msgid "Subscriber deleted."
 msgstr "Iscritto eliminato."
 
-msgid "Edit vote"
-msgstr "Modifica votazione"
-
-msgid "Delete vote"
-msgstr "Elimina votazione"
-
-msgid "Vote added."
-msgstr "Voto aggiunto."
-
-msgid "Vote modified."
-msgstr "Voto modificato."
-
-msgid "Vote deleted."
-msgstr "Voto eliminato."
-
-#, python-format
-msgid "The year ${year} is not yet supported"
-msgstr "L'anno ${year} non viene ancora supportato"
+msgid "The data source is not configured properly"
+msgstr "L'origine dati non è configurata correttamente"
 
 msgid "Use an election based on proportional representation"
 msgstr "Nessuna elezione secondo il sistema proporzionale"
 
-msgid "The data source is not configured properly"
-msgstr "L'origine dati non è configurata correttamente"
+#, python-format
+msgid "The year ${year} is not yet supported"
+msgstr "L'anno ${year} non viene ancora supportato"

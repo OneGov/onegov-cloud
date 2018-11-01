@@ -1,3 +1,4 @@
+from onegov.election_day import _
 from onegov.election_day.models import EmailNotification
 from onegov.election_day.models import Notification
 from onegov.election_day.models import SmsNotification
@@ -51,5 +52,63 @@ class NotificationCollection(object):
             notification = WebhookNotification()
             notification.trigger(request, model)
             self.session.add(notification)
+
+        self.session.flush()
+
+    def trigger_summarized(self, request, elections, votes, options):
+        """ Triggers and adds a single notification for all given votes and
+        elections.
+
+        """
+
+        if not (elections or votes) or not options:
+            return
+
+        if 'email' in options and request.app.principal.email_notification:
+            for election in elections:
+                notification = EmailNotification()
+                notification.update_from_model(election)
+                self.session.add(notification)
+            for vote in votes:
+                notification = EmailNotification()
+                notification.update_from_model(vote)
+                self.session.add(notification)
+
+            notification = EmailNotification()
+            notification.send_emails(
+                request,
+                elections,
+                votes,
+                _("New results are available")
+            )
+
+        if 'sms' in options and request.app.principal.sms_notification:
+            for election in elections:
+                notification = SmsNotification()
+                notification.update_from_model(election)
+                self.session.add(notification)
+            for vote in votes:
+                notification = SmsNotification()
+                notification.update_from_model(vote)
+                self.session.add(notification)
+
+            notification = SmsNotification()
+            self.send_sms(
+                request,
+                _(
+                    "New results are available on ${url}",
+                    mapping={'url': request.app.principal.sms_notification}
+                )
+            )
+
+        if 'webhooks' in options and request.app.principal.webhooks:
+            for election in elections:
+                notification = WebhookNotification()
+                notification.trigger(request, election)
+                self.session.add(notification)
+            for vote in votes:
+                notification = WebhookNotification()
+                notification.trigger(request, vote)
+                self.session.add(notification)
 
         self.session.flush()

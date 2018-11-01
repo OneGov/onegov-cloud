@@ -10,6 +10,7 @@ from onegov.election_day.collections import SmsSubscriberCollection
 from onegov.election_day.collections import SubscriberCollection
 from onegov.election_day.layouts.default import DefaultLayout
 from onegov.election_day.models import EmailSubscriber
+from onegov.election_day.models import Principal
 from onegov.election_day.models import SmsSubscriber
 
 
@@ -54,44 +55,39 @@ class ManageLayout(DefaultLayout):
                 []
             ))
 
-        if principal.sms_notification and principal.email_notification:
+        if self.principal.notifications:
+            submenu = []
+            if principal.sms_notification:
+                submenu.append((
+                    _("SMS subscribers"),
+                    self.request.link(SmsSubscriberCollection(session)),
+                    isinstance(self.model, SmsSubscriberCollection),
+                    []
+                ))
+            if self.principal.email_notification:
+                submenu.append((
+                    _("Email subscribers"),
+                    self.request.link(EmailSubscriberCollection(session)),
+                    isinstance(self.model, EmailSubscriberCollection),
+                    []
+                ))
+            submenu.append((
+                _("Trigger notifications"),
+                self.request.link(
+                    self.principal, name='trigger-notifications'
+                ),
+                isinstance(self.model, Principal),
+                []
+            ))
             result.append((
                 _("Subscribers"),
                 '',
                 (
                     isinstance(self.model, SmsSubscriberCollection) or
-                    isinstance(self.model, EmailSubscriberCollection)
+                    isinstance(self.model, EmailSubscriberCollection) or
+                    isinstance(self.model, Principal)
                 ),
-                [
-                    (
-                        _("SMS subscribers"),
-                        self.request.link(SmsSubscriberCollection(session)),
-                        isinstance(self.model, SmsSubscriberCollection),
-                        []
-                    ),
-                    (
-                        _("Email subscribers"),
-                        self.request.link(EmailSubscriberCollection(session)),
-                        isinstance(self.model, EmailSubscriberCollection),
-                        []
-                    )
-                ]
-            ))
-
-        elif principal.sms_notification:
-            result.append((
-                _("SMS subscribers"),
-                self.request.link(SmsSubscriberCollection(session)),
-                isinstance(self.model, SmsSubscriberCollection),
-                []
-            ))
-
-        elif self.principal.email_notification:
-            result.append((
-                _("Email subscribers"),
-                self.request.link(EmailSubscriberCollection(session)),
-                isinstance(self.model, EmailSubscriberCollection),
-                []
+                submenu
             ))
 
         return result

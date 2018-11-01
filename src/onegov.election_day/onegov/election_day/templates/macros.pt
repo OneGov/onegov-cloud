@@ -518,4 +518,130 @@
     <figure metal:use-macro="layout.macros['figcaption_panachage']" />
 </metal:parties_panachage_figure>
 
+<metal:mail_election_result define-macro="mail_election_result" i18n:domain="onegov.election_day">
+    <h1>${layout.model_title(election)}</h1>
+    <p tal:condition="not election.has_results" i18n:translate>No results yet</p>
+    <dl tal:condition="election.has_results and not election.completed and election.type == 'majorz'">
+        <!--! Intermediate results, majorz -->
+        <h2 i18n:translate>Intermediate results</h2>
+        <dt i18n:translate>Counted</dt>
+        <dd><span metal:use-macro="layout.macros['progress']" tal:define="progress election.progress" /></dd>
+        <dl tal:define="candidates python: sorted([(c.votes, c.family_name, c.first_name) for c in election.candidates], reverse=True)">
+            <dt><span i18n:translate>Candidates</span> / <span i18n:translate="single_votes">Votes</span></dt>
+            <dd tal:repeat="candidate candidates"><span>${candidate[1]} ${candidate[2]}<span> / <span>${layout.format_number(candidate[0])}</span></dd>
+        </dl>
+    </dl>
+    <dl tal:condition="election.has_results and not election.completed and election.type == 'proporz'">
+        <!--! Intermediate results, proporz -->
+        <h2 i18n:translate>Intermediate results</h2>
+
+        <dt i18n:translate>Counted</dt>
+        <dd><span metal:use-macro="layout.macros['progress']" tal:define="progress election.progress" /></dd>
+
+        <dl tal:define="lists python: sorted([(l.votes, l.name) for l in election.lists], reverse=True)">
+            <dt><span i18n:translate>Lists</span> / <span i18n:translate="single_votes">Votes</span></dt>
+            <dd tal:repeat="list lists"><span>${list[1]}</span> / <span>${layout.format_number(list[0])}</span></dd>
+        </dl>
+    </dl>
+    <tal:block tal:condition="election.has_results and election.completed and election.type == 'majorz'">
+        <!--! Final results, majorz -->
+        <dl>
+            <dt i18n:translate>Elected Candidates</dt>
+            <dd tal:repeat="name election.elected_candidates">${name[1]} ${name[0]}</dd>
+            <dt i18n:translate>Turnout</dt>
+            <dd>${'{0:.2f}'.format(election.turnout)} %</dd>
+        </dl>
+    </tal:block>
+    <tal:block tal:condition="election.has_results and election.completed and election.type == 'proporz'">
+        <!--! Final results, proporz -->
+        <dl tal:define="lists python: sorted([(l.number_of_mandates, l.name) for l in election.lists if l.number_of_mandates], reverse=True)">
+            <dt><span i18n:translate>Lists</span> / <span i18n:translate>Mandates</span></dt>
+            <dd tal:repeat="list lists"><span>${list[1]}<span> / <span>${list[0]}</span></dd>
+            <dt i18n:translate>Elected Candidates</dt>
+            <dd tal:repeat="name election.elected_candidates">${name[1]} ${name[0]}</dd>
+            <dt i18n:translate>Turnout</dt>
+            <dd>${'{0:.2f}'.format(election.turnout)} %</dd>
+        </dl>
+    </tal:block>
+    <p><a href="${layout.model_url(election)}" i18n:translate>View all details online</a></p>
+</metal:mail_election_result>
+
+<metal:mail_vote_result define-macro="mail_vote_result" i18n:domain="onegov.election_day">
+    <h1>${layout.model_title(vote)}</h1>
+    <p tal:condition="not vote.has_results" i18n:translate>No results yet</p>
+    <dl tal:condition="vote.has_results and not vote.completed and vote.type == 'simple'">
+        <!--! Intermediate results, simple vote -->
+        <h2 i18n:translate>Intermediate results</h2>
+        <dt i18n:translate>Counted</dt>
+        <dd><span metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" /></dd>
+        <dt i18n:translate>Yeas</dt>
+        <dd>${'{0:.2f}'.format(vote.proposal.yeas_percentage)}%</dd>
+        <dt i18n:translate>Nays</dt>
+        <dd>${'{0:.2f}'.format(vote.proposal.nays_percentage)}%</dd>
+    </dl>
+    <dl tal:condition="vote.has_results and not vote.completed and vote.type == 'complex'">
+        <!--! Intermediate results, complex vote -->
+        <h2 i18n:translate>Intermediate results</h2>
+        <dt i18n:translate>Counted</dt>
+        <dd><span metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" /></dd>
+        <dt i18n:translate>Proposal</dt>
+        <dd>
+            ${'{0:.2f}'.format(vote.proposal.yeas_percentage)}% <tal:block i18n:translate>Yeas</tal:block> /
+            ${'{0:.2f}'.format(vote.proposal.nays_percentage)}% <tal:block i18n:translate>Nays</tal:block>
+        </dd>
+        <dt i18n:translate>Counter Proposal</dt>
+        <dd>
+            ${'{0:.2f}'.format(vote.counter_proposal.yeas_percentage)}% <tal:block i18n:translate>Yeas</tal:block> /
+            ${'{0:.2f}'.format(vote.counter_proposal.nays_percentage)}% <tal:block i18n:translate>Nays</tal:block>
+        </dd>
+        <dt i18n:translate>Tie-Breaker</dt>
+        <dd>
+            ${'{0:.2f}'.format(vote.tie_breaker.yeas_percentage)}% <tal:block i18n:translate>Yeas</tal:block> /
+            ${'{0:.2f}'.format(vote.tie_breaker.nays_percentage)}% <tal:block i18n:translate>Nays</tal:block>
+        </dd>
+    </dl>
+    <tal:block tal:condition="vote.has_results and vote.completed and vote.type == 'simple'">
+        <!--! Final results, simple vote -->
+        <h2><tal:block metal:use-macro="layout.macros['answer']" tal:define="answer vote.answer"/></h2>
+        <dl>
+            <dt i18n:translate>Yeas</dt>
+            <dd>${'{0:.2f}'.format(vote.proposal.yeas_percentage)}%</dd>
+            <dt i18n:translate>Nays</dt>
+            <dd>${'{0:.2f}'.format(vote.proposal.nays_percentage)}%</dd>
+            <dt i18n:translate="turnout_vote">Voter turnout</dt>
+            <dd>${'{0:.2f}'.format(vote.turnout)} %</dd>
+        </dl>
+    </tal:block>
+    <tal:block tal:condition="vote.has_results and vote.completed and vote.type == 'complex'">
+        <!--! Final results, complex vote -->
+        <h2 tal:define="proposal vote.proposal.accepted; counter_proposal vote.counter_proposal.accepted; tie_breaker vote.tie_breaker.accepted">
+            <tal:block tal:condition="python: not proposal and not counter_proposal" i18n:translate>Proposal and counter proposal rejected</tal:block>
+            <tal:block tal:condition="python: proposal and not counter_proposal" i18n:translate>Proposal accepted</tal:block>
+            <tal:block tal:condition="python: not proposal and counter_proposal" i18n:translate>Counter proposal accepted</tal:block>
+            <tal:block tal:condition="python: proposal and counter_proposal and tie_breaker" i18n:translate>Tie breaker in favor of the proposal</tal:block>
+            <tal:block tal:condition="python: proposal and counter_proposal and not tie_breaker" i18n:translate>Tie breaker in favor of the counter proposal</tal:block>
+        </h2>
+        <dl>
+            <dt i18n:translate>Proposal</dt>
+            <dd>
+                ${'{0:.2f}'.format(vote.proposal.yeas_percentage)}% <tal:block i18n:translate>Yeas</tal:block> /
+                ${'{0:.2f}'.format(vote.proposal.nays_percentage)}% <tal:block i18n:translate>Nays</tal:block>
+            </dd>
+            <dt i18n:translate>Counter Proposal</dt>
+            <dd>
+                ${'{0:.2f}'.format(vote.counter_proposal.yeas_percentage)}% <tal:block i18n:translate>Yeas</tal:block> /
+                ${'{0:.2f}'.format(vote.counter_proposal.nays_percentage)}% <tal:block i18n:translate>Nays</tal:block>
+            </dd>
+            <dt i18n:translate>Tie-Breaker</dt>
+            <dd>
+                ${'{0:.2f}'.format(vote.tie_breaker.yeas_percentage)}% <tal:block i18n:translate>Yeas</tal:block> /
+                ${'{0:.2f}'.format(vote.tie_breaker.nays_percentage)}% <tal:block i18n:translate>Nays</tal:block>
+            </dd>
+            <dt i18n:translate="turnout_vote">Voter turnout</dt>
+            <dd>${'{0:.2f}'.format(vote.turnout)} %</dd>
+        </dl>
+    </tal:block>
+    <p><a href="${layout.model_url(vote)}" i18n:translate>View all details online</a></p>
+</metal:mail_vote_result>
+
 </body>

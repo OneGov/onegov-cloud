@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-18 15:49+0200\n"
-"PO-Revision-Date: 2018-05-15 17:24+0200\n"
+"POT-Creation-Date: 2018-11-01 16:24+0100\n"
+"PO-Revision-Date: 2018-11-01 16:24+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -11,142 +11,10 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 2.0.7\n"
+"X-Generator: Poedit 2.2\n"
 
 msgid "Last change"
 msgstr "Actualisà"
-
-msgid ""
-"Successfully subscribed to the SMS service. You will receive a SMS every "
-"time new results are published."
-msgstr ""
-"La communicaziun per SMS è vegnida abunada. A partir d'ussa survegnis Vus in "
-"SMS, uschespert che novs resultats èn vegnids publitgads."
-
-msgid "Successfully subscribed to the email service"
-msgstr "Abunà las communicaziuns per e-mail"
-
-#, python-format
-msgid "Missing columns: '${cols}'"
-msgstr "Colonnas che mancan: '${cols}'"
-
-msgid ""
-"Could not find the expected columns, make sure all required columns exist "
-"and that there are no extra columns."
-msgstr ""
-"Las colonnas necessarias n'èn betg vegnidas chattadas. Controllai per "
-"plaschair che las colonnas existian e che naginas colonnas supplementaras na "
-"sajan avant maun."
-
-msgid "Some column names appear twice."
-msgstr "In pèr nums da colonnas vegnan duvrads duas giadas."
-
-msgid "Not a valid csv/xls/xlsx file."
-msgstr "Nagina datoteca CSV/XLS/XLSX valaivla."
-
-msgid "The csv/xls/xlsx file is empty."
-msgstr "La datoteca CSV/XLS/XLSX è vida."
-
-msgid "The file contains an empty line."
-msgstr "La datoteca cuntegna ina lingia vida."
-
-msgid "Not a valid xls/xlsx file."
-msgstr "Nagina datoteca XLS/XLSX valaivla."
-
-msgid "The xls/xlsx file contains unsupported cells."
-msgstr "La datoteca XLS/XLSX cuntegna cellas betg sustegnidas."
-
-msgid "Results"
-msgstr "Resultats"
-
-msgid "Invalid status"
-msgstr "Status nunvalaivel"
-
-msgid "Invalid election values"
-msgstr "Datas electoralas nunvalaivlas"
-
-msgid "Invalid entity values"
-msgstr "Datas nunvalaivlas"
-
-#, python-format
-msgid "${name} is unknown"
-msgstr "${name} n'è betg enconuschent"
-
-msgid "Invalid candidate values"
-msgstr "Datas da candidat nunvalaivlas"
-
-msgid "Invalid candidate results"
-msgstr "Resultats da candidat nunvalaivels"
-
-msgid "No data found"
-msgstr "Chattà naginas datas"
-
-msgid "No clear district"
-msgstr "Nagina clera regiun"
-
-msgid "Invalid list values"
-msgstr "Datas da glista nunvalaivlas"
-
-msgid "Invalid list results"
-msgstr "Resultats da glistas nunvalaivels"
-
-msgid "Invalid list connection values"
-msgstr "Datas nunvalaivlas da colliaziuns da glistas"
-
-msgid "Invalid values"
-msgstr "Valurs nunvalaivlas"
-
-#, python-format
-msgid "${name} was found twice"
-msgstr "${name} è avant maun duas giadas"
-
-msgid "Elected Candidates"
-msgstr "Candidat(a)s elegid(a)s"
-
-msgid "Unknown candidate"
-msgstr "Candidat(a) nunenconuschent(a)"
-
-msgid "List connections"
-msgstr "Colliaziuns da glistas"
-
-msgid "Election statistics"
-msgstr "Statistica electorala"
-
-msgid "Invalid id"
-msgstr "ID nunvalaivel"
-
-msgid "Could not read the eligible voters"
-msgstr "I n'è betg stà pussaivel da leger las persunas cun dretg da votar"
-
-msgid "Proposal"
-msgstr "Project da votaziun"
-
-msgid "Counter Proposal"
-msgstr "Cuntraproposta"
-
-msgid "Tie-Breaker"
-msgstr "Dumonda decisiva"
-
-msgid "Could not read yeas"
-msgstr "I n'è betg stà pussaivel da leger las vuschs affirmativas"
-
-msgid "Could not read nays"
-msgstr "I n'è betg stà pussaivel da leger las vuschs negativas"
-
-msgid "Could not read the empty votes"
-msgstr "I n'è betg stà pussaivel da leger ils cedels da votar vids"
-
-msgid "Could not read the invalid votes"
-msgstr "I n'è betg stà pussaivel da leger ils cedels da votar nunvalaivels"
-
-msgid "No eligible voters"
-msgstr "Naginas persunas cun dretg da votar"
-
-msgid "More cast votes than eligible voters"
-msgstr "Dapli vuschs entradas che persunas cun dretg da votar"
-
-msgid "Invalid ballot type"
-msgstr "Tip da votaziun nunvalaivel"
 
 msgid "Type"
 msgstr "Gener"
@@ -226,20 +94,23 @@ msgstr "Sin plaun chantunal"
 msgid "Select either majorz or proporz elections."
 msgstr "Tscherni u las elecziuns da maiorz u las elecziuns da proporz."
 
+msgid "Email"
+msgstr "E-mail"
+
+msgid "Phone number"
+msgstr "Numer da telefon"
+
 msgid "Notifications"
 msgstr "Communicaziuns"
 
-msgid "Email"
-msgstr "E-mail"
+msgid "Votes"
+msgstr "Votaziuns"
 
 msgid "SMS"
 msgstr "SMS"
 
 msgid "Webhooks"
 msgstr "Webhooks"
-
-msgid "Phone number"
-msgstr "Numer da telefon"
 
 msgid "Title of the the vote/proposal"
 msgstr "Titel da la votaziun / dal project"
@@ -262,11 +133,20 @@ msgstr "Format da la datoteca"
 msgid "Complete"
 msgstr "Resultat eruì cumplettamain"
 
+msgid "Results"
+msgstr "Resultats"
+
+msgid "Elected Candidates"
+msgstr "Candidat(a)s elegid(a)s"
+
+msgid "List connections"
+msgstr "Colliaziuns da glistas"
+
+msgid "Election statistics"
+msgstr "Statistica electorala"
+
 msgid "OneGov Cloud"
 msgstr "OneGov Cloud"
-
-msgid "Party results"
-msgstr "Resultats da las partidas"
 
 msgid "Identifier"
 msgstr "ID"
@@ -277,8 +157,17 @@ msgstr "Votaziun"
 msgid "Election"
 msgstr "Elecziun"
 
+msgid "Party results"
+msgstr "Resultats da las partidas"
+
 msgid "Proposal / Results"
 msgstr "Project da votaziun / Resultats"
+
+msgid "Counter Proposal"
+msgstr "Cuntraproposta"
+
+msgid "Tie-Breaker"
+msgstr "Dumonda decisiva"
 
 msgid "Vote number"
 msgstr "Numer dal project"
@@ -286,76 +175,282 @@ msgstr "Numer dal project"
 msgid "Default"
 msgstr "Standard"
 
-msgid "Expats"
-msgstr "Svizzers a l'exteriur"
+#, python-format
+msgid "Missing columns: '${cols}'"
+msgstr "Colonnas che mancan: '${cols}'"
 
-msgid "Lists"
-msgstr "Glistas"
+msgid ""
+"Could not find the expected columns, make sure all required columns exist "
+"and that there are no extra columns."
+msgstr ""
+"Las colonnas necessarias n'èn betg vegnidas chattadas. Controllai per "
+"plaschair che las colonnas existian e che naginas colonnas supplementaras na "
+"sajan avant maun."
 
-msgid "Candidates"
-msgstr "Candidatas e candidats"
+msgid "Some column names appear twice."
+msgstr "In pèr nums da colonnas vegnan duvrads duas giadas."
 
-msgid "Parties"
-msgstr "Partidas"
+msgid "Not a valid csv/xls/xlsx file."
+msgstr "Nagina datoteca CSV/XLS/XLSX valaivla."
 
-msgid "Downloads"
-msgstr "Downloads"
+msgid "The csv/xls/xlsx file is empty."
+msgstr "La datoteca CSV/XLS/XLSX è vida."
 
-msgid "Panachage"
-msgstr "Statistica da panaschar"
+msgid "The file contains an empty line."
+msgstr "La datoteca cuntegna ina lingia vida."
 
-msgid "Party strengths"
-msgstr "Forza da las partidas"
+msgid "Not a valid xls/xlsx file."
+msgstr "Nagina datoteca XLS/XLSX valaivla."
 
-msgid "Elected candidates"
-msgstr "Candidat(a)s elegid(a)s"
+msgid "The xls/xlsx file contains unsupported cells."
+msgstr "La datoteca XLS/XLSX cuntegna cellas betg sustegnidas."
 
-msgid "Votes"
-msgstr "Votaziuns"
+msgid "Invalid status"
+msgstr "Status nunvalaivel"
 
-msgid "Compounds of elections"
-msgstr "Elecziuns colliadas"
+msgid "Invalid ballot type"
+msgstr "Tip da votaziun nunvalaivel"
 
-msgid "Manage"
-msgstr "Administrar"
+msgid "No data found"
+msgstr "Chattà naginas datas"
 
-msgid "Data sources"
-msgstr "Funtaunas da datas"
-
-msgid "Mappings"
-msgstr "Attribuziuns"
-
-msgid "Subscribers"
-msgstr "Abunents"
-
-msgid "Email subscribers"
-msgstr "E-mail abunents"
-
-msgid "SMS subscribers"
-msgstr "SMS abunents"
-
-msgid "Final results"
-msgstr "Resultats finals"
-
-msgid "New intermediate results"
-msgstr "Novs resultats intermediars"
+msgid "Invalid id"
+msgstr "ID nunvalaivel"
 
 #, python-format
-msgid "Final results are available on ${url}"
-msgstr "Resultats finals disponibels sin ${url}"
+msgid "${name} was found twice"
+msgstr "${name} è avant maun duas giadas"
 
 #, python-format
-msgid "New intermediate results are available on ${url}"
-msgstr "Novs resultats intermediars disponibels sin ${url}"
+msgid "${name} is unknown"
+msgstr "${name} n'è betg enconuschent"
 
-msgid "Accepted"
-msgstr "Acceptà"
+msgid "Could not read yeas"
+msgstr "I n'è betg stà pussaivel da leger las vuschs affirmativas"
+
+msgid "Could not read nays"
+msgstr "I n'è betg stà pussaivel da leger las vuschs negativas"
+
+msgid "Could not read the eligible voters"
+msgstr "I n'è betg stà pussaivel da leger las persunas cun dretg da votar"
+
+msgid "Could not read the empty votes"
+msgstr "I n'è betg stà pussaivel da leger ils cedels da votar vids"
+
+msgid "Could not read the invalid votes"
+msgstr "I n'è betg stà pussaivel da leger ils cedels da votar nunvalaivels"
+
+msgid "No eligible voters"
+msgstr "Naginas persunas cun dretg da votar"
+
+msgid "More cast votes than eligible voters"
+msgstr "Dapli vuschs entradas che persunas cun dretg da votar"
+
+msgid "Invalid values"
+msgstr "Valurs nunvalaivlas"
+
+msgid "Proposal"
+msgstr "Project da votaziun"
+
+msgid "Invalid entity values"
+msgstr "Datas nunvalaivlas"
+
+msgid "Invalid candidate values"
+msgstr "Datas da candidat nunvalaivlas"
+
+msgid "Invalid candidate results"
+msgstr "Resultats da candidat nunvalaivels"
+
+msgid "No clear district"
+msgstr "Nagina clera regiun"
+
+msgid "Invalid list values"
+msgstr "Datas da glista nunvalaivlas"
+
+msgid "Invalid list results"
+msgstr "Resultats da glistas nunvalaivels"
+
+msgid "Invalid election values"
+msgstr "Datas electoralas nunvalaivlas"
+
+msgid "Invalid list connection values"
+msgstr "Datas nunvalaivlas da colliaziuns da glistas"
+
+msgid "Unknown candidate"
+msgstr "Candidat(a) nunenconuschent(a)"
+
+msgid "Nay"
+msgstr "NA"
+
+msgid "Yay"
+msgstr "GEA"
 
 msgid "Rejected"
 msgstr "Refusà"
 
+msgid "Elected candidates"
+msgstr "Candidat(a)s elegid(a)s"
+
+msgid "Accepted"
+msgstr "Acceptà"
+
+msgid "Candidates"
+msgstr "Candidatas e candidats"
+
+msgid "Turnout"
+msgstr "Participaziun a las elecziuns"
+
+msgid "eligible Voters"
+msgstr "Persunas cun dretg d’eleger"
+
+msgid "Received Ballots"
+msgstr "Cedels electorals consegnads"
+
+msgid "Lists"
+msgstr "Glistas"
+
+#.
+#. Default: The diagram shows the distribution of votes and mandates on list
+#. and sublists. The bars on the left correspond to the list connections, the
+#. bars in the middle to the sublists, the bars to the right to the lists. The
+#. width of the bars and connections is proportional to the votes, blue colored
+#. bars contain the number of mandates.
+msgid "figcaption_connections"
+msgstr ""
+"Il diagram mussa la repartiziun da las vuschs e dals mandats sin las "
+"colliaziuns e sutcolliaziuns da glistas. Las travs da la vart sanestra "
+"correspundan a las colliaziuns da glistas, las travs en il center a las "
+"sutglistas, las travs da la vart dretga a las glistas. La ladezza da las "
+"travs e da las colliaziuns è proporziunala a las vuschs, las travs blauas "
+"cuntegnan il dumber da mandats."
+
+msgid "Party strengths"
+msgstr "Forza da las partidas"
+
+#.
+#. Default: The diagram shows the votes and mandates of the parties. The rimmed
+#. bars (left scale) correspond to the number of mandates, the colored bars
+#. (right scale) to the voices (percentages).
+msgid "figcaption_party_strengths"
+msgstr ""
+"Il diagram mussa las vuschs gudagnadas ed ils mandats da las partidas. Las "
+"travs cun ur (scala sanestra) correspundan al dumber da mandats, las travs "
+"coluradas (scala dretga) a las quotas da vuschs en pertschients."
+
+msgid "Panachage (parties)"
+msgstr "Statistica da panaschar (partidas)"
+
+#.
+#. Default: The diagram shows the origin of the votes. The bars on the left
+#. correspond to the unchanged votes (including the blank list), the bars on
+#. the right side to the final results. The width of the bars and connections
+#. is proportional to the votes.
+msgid "figcaption_panachage"
+msgstr ""
+"Il diagram mussa la derivanza da las vuschs da glista gudagnadas e perdidas "
+"pervia dal panaschar. Da la vart sanestra vegnan mussadas las vuschs betg "
+"midadas da las glistas inclusiv la glista en blanco, da la vart dretga las "
+"vuschs da glista panaschadas. La ladezza da las travs e da las colliaziuns è "
+"proporziunala a las vuschs."
+
+msgid "Panachage (lists)"
+msgstr "Statistica da panaschar (glistas)"
+
+msgid "Mandates"
+msgstr "Mandats"
+
+msgid "Expats"
+msgstr "Svizzers a l'exteriur"
+
+msgid "Proposal and counter proposal rejected"
+msgstr "Refusà l'iniziativa e la cuntraproposta"
+
+msgid "Proposal accepted"
+msgstr "Acceptà l'iniziativa"
+
 msgid "Counter proposal accepted"
 msgstr "Acceptà la cuntraproposta"
+
+msgid "Seats"
+msgstr "sezs"
+
+msgid "List"
+msgstr "Glista"
+
+#.
+#. Default: Votes
+msgid "single_votes"
+msgstr "Vuschs"
+
+msgid "Candidate"
+msgstr "Persuna che candidescha"
+
+msgid "Party"
+msgstr "Partida"
+
+msgid "Tie breaker in favor of the proposal"
+msgstr "Dumonda decisiva a favur da l'iniziativa"
+
+msgid "Tie breaker in favor of the counter proposal"
+msgstr "Dumonda decisiva a favur da la cuntraproposta"
+
+#.
+#. Default: Voter turnout
+msgid "turnout_vote"
+msgstr "Participaziun a la votaziun"
+
+#.
+#. Default: eligible Voters
+msgid "eligible_voters_vote"
+msgstr "Persunas cun dretg da votar"
+
+msgid "Cast Ballots"
+msgstr "Cedels da votar entrads"
+
+msgid "Elected"
+msgstr "Elegida/elegì"
+
+msgid "Accounted Votes"
+msgstr "Vuschs valaivlas"
+
+msgid "Accounted Ballots"
+msgstr "Cedels valaivels"
+
+msgid "Blank Ballots"
+msgstr "Cedels electorals vids"
+
+msgid "Invalid Ballots"
+msgstr "Cedels electorals nunvalaivels"
+
+msgid "List connection"
+msgstr "Colliaziun da glistas"
+
+msgid "Sublist connection"
+msgstr "Sutcolliaziun da glistas"
+
+msgid "Result"
+msgstr "Resultat"
+
+msgid "Yes %"
+msgstr "% GEA"
+
+msgid "No %"
+msgstr "% NA"
+
+msgid "Empty"
+msgstr "Vid"
+
+msgid "Invalid"
+msgstr "Nunvalaivel"
+
+msgid "Yes"
+msgstr "Gea"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Blank list"
+msgstr "Glista en blanco"
 
 msgid "Municipality"
 msgstr "Vischnanca"
@@ -410,84 +505,81 @@ msgstr "Sin plaun regiunal"
 msgid "Communal"
 msgstr "Sin plaun communal"
 
-msgid "Elections &amp; Votes"
-msgstr "Elecziuns &amp; votaziuns"
+#, python-format
+msgid "Final results are available on ${url}"
+msgstr "Resultats finals disponibels sin ${url}"
 
-msgid "There are no elections or votes defined yet."
-msgstr "I n'èn anc vegnidas endatadas naginas elecziuns u votaziuns."
+#, python-format
+msgid "New intermediate results are available on ${url}"
+msgstr "Novs resultats intermediars disponibels sin ${url}"
 
-msgid "Elections and votes on ${date}"
-msgstr "Votaziun dals ${date}"
+msgid "New intermediate results"
+msgstr "Novs resultats intermediars"
 
-msgid "Federal Elections"
-msgstr "Elecziuns federalas"
+msgid "Final results"
+msgstr "Resultats finals"
 
-msgid "Regional Elections"
-msgstr "Elecziuns regionalas"
+msgid "Parties"
+msgstr "Partidas"
 
-msgid "Cantonal Elections"
-msgstr "Elecziuns chantunalas"
+msgid "Downloads"
+msgstr "Downloads"
 
-msgid "Communal Elections"
-msgstr "Elecziuns communalas"
+msgid "Panachage"
+msgstr "Statistica da panaschar"
 
-msgid "Federal Votes"
-msgstr "Votaziuns federalas"
+msgid "Compounds of elections"
+msgstr "Elecziuns colliadas"
 
-msgid "Regional Votes"
-msgstr "Votaziuns regionalas"
+msgid "Manage"
+msgstr "Administrar"
 
-msgid "Cantonal Votes"
-msgstr "Votaziuns chantunalas"
+msgid "Data sources"
+msgstr "Funtaunas da datas"
 
-msgid "Communal Votes"
-msgstr "Votaziuns communalas"
+msgid "Mappings"
+msgstr "Attribuziuns"
 
-msgid "Counted"
-msgstr "Dumbrà ora"
+msgid "Trigger notifications"
+msgstr "Trametter communicaziuns als abunents"
 
-msgid "Updated"
-msgstr "Actualisà"
+msgid "Subscribers"
+msgstr "Abunents"
 
-msgid "Result"
-msgstr "Resultat"
+msgid "Email subscribers"
+msgstr "E-mail abunents"
 
-msgid "Yes %"
-msgstr "% GEA"
+msgid "SMS subscribers"
+msgstr "SMS abunents"
 
-msgid "No %"
-msgstr "% NA"
+msgid "Unsubscribe"
+msgstr "Deconnectar"
 
-msgid "Archive"
-msgstr "Archiv"
+msgid "Upload results"
+msgstr "Chargiar si resultats"
+
+msgid "Your results were uploaded successfully."
+msgstr "Voss resultats èn vegnids chargiads si cun success."
+
+msgid "Click here to trigger the notifications."
+msgstr "Cliccar qua per trametter communicaziuns als abunents."
+
+msgid "Click here to see the updated results page."
+msgstr "Cliccai qua per mussar la pagina cun ils resultats actualisads."
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Il formular cuntegna sbagls. Controllai per plaschair ils champs marcads cun "
 "cotschen."
 
-#.
-#. Default: Start
-msgid "homepage"
-msgstr "Pagina iniziala"
+msgid "Please use the following format:"
+msgstr "Duvrai per plaschair il suandant format:"
 
-msgid "Open Data"
-msgstr "Open Data"
+msgid "Format Description"
+msgstr "Descripziun dal format"
 
-msgid "Login"
-msgstr "Annunziar"
-
-msgid "You are logged in:"
-msgstr "Vus essas annunziada/annunzià:"
-
-msgid "Logout"
-msgstr "Deconnectar"
-
-msgid "Forgot your password?"
-msgstr "Emblidà il pled-clav?"
-
-msgid "Reset password"
-msgstr "Redefinir il pled-clav"
+msgid "No map available for this year."
+msgstr "Per quest onn n'è disponibla nagina carta."
 
 msgid "${counted} of ${total}"
 msgstr "${counted} da ${total}"
@@ -591,17 +683,10 @@ msgstr "Abunar la communicaziun per SMS"
 msgid "Stop SMS subscription"
 msgstr "Terminar l'abunament dad SMS"
 
-msgid "Proposal and counter proposal rejected"
-msgstr "Refusà l'iniziativa e la cuntraproposta"
-
-msgid "Proposal accepted"
-msgstr "Acceptà l'iniziativa"
-
-msgid "Tie breaker in favor of the proposal"
-msgstr "Dumonda decisiva a favur da l'iniziativa"
-
-msgid "Tie breaker in favor of the counter proposal"
-msgstr "Dumonda decisiva a favur da la cuntraproposta"
+#. Default: Start
+#.
+msgid "homepage"
+msgstr "Pagina iniziala"
 
 msgid "Yeas"
 msgstr "Vuschs affirmativas"
@@ -609,36 +694,14 @@ msgstr "Vuschs affirmativas"
 msgid "Nays"
 msgstr "Vuschs negativas"
 
-msgid "Turnout"
-msgstr "Participaziun a las elecziuns"
-
-msgid "eligible Voters"
-msgstr "Persunas cun dretg d’eleger"
-
-msgid "Received Ballots"
-msgstr "Cedels electorals consegnads"
-
-msgid "Seats"
-msgstr "sezs"
-
-msgid "Mandates"
-msgstr "Mandats"
-
-#. Default: Voter turnout
-#.
-msgid "turnout_vote"
-msgstr "Participaziun a la votaziun"
-
-#. Default: eligible Voters
-#.
-msgid "eligible_voters_vote"
-msgstr "Persunas cun dretg da votar"
-
-msgid "Cast Ballots"
-msgstr "Cedels da votar entrads"
+msgid "Counted"
+msgstr "Dumbrà ora"
 
 msgid "Download a PDF with all the results:"
 msgstr "In PDF cun tut ils resultats pudais Vus chargiar giu qua:"
+
+msgid "Open Data"
+msgstr "Open Data"
 
 msgid ""
 "The raw data used to display the results is available in the following "
@@ -649,9 +712,6 @@ msgstr ""
 
 msgid "The format of the data is described here:"
 msgstr "Il format da las datas è descrit qua:"
-
-msgid "Format Description"
-msgstr "Descripziun dal format"
 
 msgid "Terms of use"
 msgstr "Cundiziun d'utilisaziun"
@@ -692,48 +752,60 @@ msgstr "Incorporar"
 msgid "Download"
 msgstr "Telechargiar"
 
-#. Default: The diagram shows the votes and mandates of the parties. The rimmed
-#. bars (left scale) correspond to the number of mandates, the colored bars
-#. (right scale) to the voices (percentages).
-#.
-msgid "figcaption_party_strengths"
-msgstr ""
-"Il diagram mussa las vuschs gudagnadas ed ils mandats da las partidas. Las "
-"travs cun ur (scala sanestra) correspundan al dumber da mandats, las travs "
-"coluradas (scala dretga) a las quotas da vuschs en pertschients."
-
 msgid "Year"
 msgstr "Onn"
-
-msgid "Party"
-msgstr "Partida"
-
-#. Default: Votes
-#.
-msgid "single_votes"
-msgstr "Vuschs"
 
 msgid "Difference"
 msgstr "Differenza"
 
-#. Default: The diagram shows the origin of the votes. The bars on the left
-#. correspond to the unchanged votes (including the blank list), the bars on
-#. the right side to the final results. The width of the bars and connections
-#. is proportional to the votes.
-#.
-msgid "figcaption_panachage"
-msgstr ""
-"Il diagram mussa la derivanza da las vuschs da glista gudagnadas e perdidas "
-"pervia dal panaschar. Da la vart sanestra vegnan mussadas las vuschs betg "
-"midadas da las glistas inclusiv la glista en blanco, da la vart dretga las "
-"vuschs da glista panaschadas. La ladezza da las travs e da las colliaziuns è "
-"proporziunala a las vuschs."
-
 msgid "View all details online"
 msgstr "Guardar tut ils detagls online"
 
-msgid "Unsubscribe"
-msgstr "Deconnectar"
+msgid "Elections &amp; Votes"
+msgstr "Elecziuns &amp; votaziuns"
+
+msgid "There are no elections or votes defined yet."
+msgstr "I n'èn anc vegnidas endatadas naginas elecziuns u votaziuns."
+
+#, python-format
+msgid "Elections and votes on ${date}"
+msgstr "Votaziun dals ${date}"
+
+msgid "Federal Elections"
+msgstr "Elecziuns federalas"
+
+msgid "Regional Elections"
+msgstr "Elecziuns regionalas"
+
+msgid "Cantonal Elections"
+msgstr "Elecziuns chantunalas"
+
+msgid "Communal Elections"
+msgstr "Elecziuns communalas"
+
+msgid "Federal Votes"
+msgstr "Votaziuns federalas"
+
+msgid "Regional Votes"
+msgstr "Votaziuns regionalas"
+
+msgid "Cantonal Votes"
+msgstr "Votaziuns chantunalas"
+
+msgid "Communal Votes"
+msgstr "Votaziuns communalas"
+
+msgid "Updated"
+msgstr "Actualisà"
+
+msgid "Archive"
+msgstr "Archiv"
+
+msgid "Forgot your password?"
+msgstr "Emblidà il pled-clav?"
+
+msgid "Reset password"
+msgstr "Redefinir il pled-clav"
 
 msgid "Dear Sir or Madam,"
 msgstr "Stimadas dunnas e stimads signurs,"
@@ -746,6 +818,15 @@ msgstr ""
 "Vus pudais ignorar quest e-mail, sche Vus na vulessas betg midar Voss pled-"
 "clav."
 
+msgid "Login"
+msgstr "Annunziar"
+
+msgid "You are logged in:"
+msgstr "Vus essas annunziada/annunzià:"
+
+msgid "Logout"
+msgstr "Deconnectar"
+
 msgid ""
 "Successfully subscribed to the email service. You will receive an email "
 "every time new results are published."
@@ -753,38 +834,14 @@ msgstr ""
 "Las communicaziuns per e-mail èn vegnidas abunadas. A partir d'ussa "
 "survegnis Vus in e-mail, uschespert che novs resultats èn vegnids publitgads."
 
-msgid "Upload results"
-msgstr "Chargiar si resultats"
+msgid "Not yet counted"
+msgstr "Anc betg eruì il resultat"
 
-msgid "Your results were uploaded successfully."
-msgstr "Voss resultats èn vegnids chargiads si cun success."
-
-msgid "Click here to trigger the notifications."
-msgstr "Cliccar qua per trametter communicaziuns als abunents."
-
-msgid "Click here to see the updated results page."
-msgstr "Cliccai qua per mussar la pagina cun ils resultats actualisads."
-
-msgid "Please use the following format:"
-msgstr "Duvrai per plaschair il suandant format:"
-
-msgid "No map available for this year."
-msgstr "Per quest onn n'è disponibla nagina carta."
+msgid "The raw data is available as:"
+msgstr "Las datas nunelavuradas èn disponiblas en il suandant format:"
 
 msgid "No candidacies."
 msgstr ""
-
-msgid "Candidate"
-msgstr "Persuna che candidescha"
-
-msgid "List"
-msgstr "Glista"
-
-msgid "Elected"
-msgstr "Elegida/elegì"
-
-msgid "Yes"
-msgstr "Gea"
 
 msgid "No"
 msgstr "Na"
@@ -795,65 +852,38 @@ msgstr "Tut las candidatas e candidats"
 msgid "Elected candidates only"
 msgstr "Mo candidat(a)s elegid(a)s"
 
-#. Default: The diagram shows the distribution of votes and mandates on list
-#. and sublists. The bars on the left correspond to the list connections, the
-#. bars in the middle to the sublists, the bars to the right to the lists. The
-#. width of the bars and connections is proportional to the votes, blue colored
-#. bars contain the number of mandates.
-#.
-msgid "figcaption_connections"
-msgstr ""
-"Il diagram mussa la repartiziun da las vuschs e dals mandats sin las "
-"colliaziuns e sutcolliaziuns da glistas. Las travs da la vart sanestra "
-"correspundan a las colliaziuns da glistas, las travs en il center a las "
-"sutglistas, las travs da la vart dretga a las glistas. La ladezza da las "
-"travs e da las colliaziuns è proporziunala a las vuschs, las travs blauas "
-"cuntegnan il dumber da mandats."
-
-msgid "List connection"
-msgstr "Colliaziun da glistas"
-
-msgid "Sublist connection"
-msgstr "Sutcolliaziun da glistas"
-
 msgid "Subtotal"
 msgstr "Summa intermediara"
 
-msgid "Total"
-msgstr "Total"
+msgid "New compound"
+msgstr "Nova colliaziun"
 
-msgid "The raw data is available as:"
-msgstr "Las datas nunelavuradas èn disponiblas en il suandant format:"
+msgid "No compounds yet."
+msgstr "Anc nagina colliaziun."
 
-msgid "Accounted Ballots"
-msgstr "Cedels valaivels"
-
-msgid "Blank Ballots"
-msgstr "Cedels electorals vids"
-
-msgid "Invalid Ballots"
-msgstr "Cedels electorals nunvalaivels"
-
-msgid "Accounted Votes"
-msgstr "Vuschs valaivlas"
-
-msgid "Not yet counted"
-msgstr "Anc betg eruì il resultat"
-
-msgid "New mapping"
-msgstr "Nova attribuziun"
-
-msgid "No mappings yet."
-msgstr "Anc naginas attribuziuns"
+msgid "Title"
+msgstr "Titel"
 
 msgid "Actions"
 msgstr "Acziuns"
 
-msgid "Delete"
-msgstr "Stizzar"
+msgid "View"
+msgstr "Mussar"
 
 msgid "Edit"
 msgstr "Modifitgar"
+
+msgid "Upload party results"
+msgstr "Chargiar si ils resultats da las partidas"
+
+msgid "Clear results"
+msgstr "Stizzar ils resultats"
+
+msgid "Delete"
+msgstr "Stizzar"
+
+msgid "New election"
+msgstr "Nova elecziun"
 
 msgid "New data source"
 msgstr "Nova funtauna da datas"
@@ -867,29 +897,11 @@ msgstr "Token"
 msgid "Regenerate token"
 msgstr "Generar da nov il token"
 
-msgid "New compound"
-msgstr "Nova colliaziun"
+msgid "New mapping"
+msgstr "Nova attribuziun"
 
-msgid "No compounds yet."
-msgstr "Anc nagina colliaziun."
-
-msgid "Title"
-msgstr "Titel"
-
-msgid "View"
-msgstr "Mussar"
-
-msgid "Upload party results"
-msgstr "Chargiar si ils resultats da las partidas"
-
-msgid "Clear results"
-msgstr "Stizzar ils resultats"
-
-msgid "New election"
-msgstr "Nova elecziun"
-
-msgid "Trigger notifications"
-msgstr "Trametter communicaziuns als abunents"
+msgid "No mappings yet."
+msgstr "Anc naginas attribuziuns"
 
 msgid "No subscribers yet."
 msgstr "Anc nagins abunents."
@@ -900,26 +912,22 @@ msgstr "Regiun linguistica"
 msgid "New vote"
 msgstr "Nova votaziun"
 
-msgid "Nay"
-msgstr "NA"
+msgid "New results are available"
+msgstr "Novs resultats disponibels"
 
-msgid "Yay"
-msgstr "GEA"
+#, python-format
+msgid "New results are available on ${url}"
+msgstr "Novs resultats disponibels sin ${url}"
 
-msgid "Empty"
-msgstr "Vid"
+msgid ""
+"Successfully subscribed to the SMS service. You will receive a SMS every "
+"time new results are published."
+msgstr ""
+"La communicaziun per SMS è vegnida abunada. A partir d'ussa survegnis Vus in "
+"SMS, uschespert che novs resultats èn vegnids publitgads."
 
-msgid "Invalid"
-msgstr "Nunvalaivel"
-
-msgid "Panachage (parties)"
-msgstr "Statistica da panaschar (partidas)"
-
-msgid "Panachage (lists)"
-msgstr "Statistica da panaschar (glistas)"
-
-msgid "Blank list"
-msgstr "Glista en blanco"
+msgid "Successfully subscribed to the email service"
+msgstr "Abunà las communicaziuns per e-mail"
 
 msgid "Wrong username or password"
 msgstr ""
@@ -954,6 +962,35 @@ msgstr "Betg chattà la pagina"
 
 msgid "The page you are looking for could not be found."
 msgstr "La pagina giavischada n'è betg vegnida chattada."
+
+msgid ""
+"You will receive an email as soon as new results have been published. You "
+"can unsubscribe at any time."
+msgstr ""
+"Vus survegnis in e-mail, uschespert che novs resultats èn vegnids "
+"publitgads. Vus pudais terminar da tut temp il servetsch dad e-mail."
+
+msgid ""
+"Successfully unsubscribed from the email services. You will no longer "
+"receive an email when new results are published."
+msgstr ""
+"Las communicaziuns per e-mail èn vegnidas terminadas. A partir d'ussa na "
+"survegnis Vus pli nagins e-mails en chaussa."
+
+msgid ""
+"You will receive a SMS as soon as new results have been published. The SMS "
+"service is free of charge. You can unsubscribe at any time."
+msgstr ""
+"Vus survegnis in SMS, uschespert che novs resultats èn vegnids publitgads. "
+"Quest servetsch dad SMS è gratuit. Vus pudais terminar da tut temp il "
+"servetsch dad SMS."
+
+msgid ""
+"Successfully unsubscribed from the SMS services. You will no longer receive "
+"SMS when new results are published."
+msgstr ""
+"La communicaziun per SMS è vegnida terminada. A partir d'ussa na survegnis "
+"Vus pli nagins SMS en chaussa."
 
 #, python-format
 msgid ""
@@ -997,34 +1034,78 @@ msgstr ""
 "Resultats finals da l'elecziun federala \"${title}\", ${date}, ${principal}, "
 "resultats da tut las candidatas e da tut ils candidats tenor vischnancas."
 
-msgid ""
-"You will receive an email as soon as new results have been published. You "
-"can unsubscribe at any time."
-msgstr ""
-"Vus survegnis in e-mail, uschespert che novs resultats èn vegnids "
-"publitgads. Vus pudais terminar da tut temp il servetsch dad e-mail."
+msgid "Edit vote"
+msgstr "Modifitgar la votaziun"
+
+#, python-format
+msgid "Do you really want to clear all results of \"${item}\"?"
+msgstr "Vulais Vus propi stizzar tut ils resultats da \"${item}\"?"
+
+#, python-format
+msgid "Do you really want to delete \"${item}\"?"
+msgstr "Vulais Vus propi stizzar \"${item}\"?"
+
+msgid "Delete vote"
+msgstr "Stizzar la votaziun"
 
 msgid ""
-"Successfully unsubscribed from the email services. You will no longer "
-"receive an email when new results are published."
+"There are no changes since the last time the notifications have been "
+"triggered!"
 msgstr ""
-"Las communicaziuns per e-mail èn vegnidas terminadas. A partir d'ussa na "
-"survegnis Vus pli nagins e-mails en chaussa."
+"Naginas midadas dapi l'ultima giada che las communicaziuns èn vegnidas "
+"tramessas als abunents!"
 
-msgid ""
-"You will receive a SMS as soon as new results have been published. The SMS "
-"service is free of charge. You can unsubscribe at any time."
-msgstr ""
-"Vus survegnis in SMS, uschespert che novs resultats èn vegnids publitgads. "
-"Quest servetsch dad SMS è gratuit. Vus pudais terminar da tut temp il "
-"servetsch dad SMS."
+msgid "Do you really want to retrigger the notfications?"
+msgstr "Propi trametter danovamain communicaziuns als abunents?"
 
-msgid ""
-"Successfully unsubscribed from the SMS services. You will no longer receive "
-"SMS when new results are published."
-msgstr ""
-"La communicaziun per SMS è vegnida terminada. A partir d'ussa na survegnis "
-"Vus pli nagins SMS en chaussa."
+msgid "Vote added."
+msgstr "Agiuntà la votaziun."
+
+msgid "Vote modified."
+msgstr "Midà la votaziun."
+
+msgid "Results deleted."
+msgstr "Stizzà ils resultats."
+
+msgid "Vote deleted."
+msgstr "Stizzà la votaziun."
+
+msgid "Notifications triggered."
+msgstr "Activà las communicaziuns."
+
+msgid "Edit compound"
+msgstr "Elavurar la colliaziun"
+
+#, python-format
+msgid "Do you really want to clear all party results of \"${item}\"?"
+msgstr "Vulais Vus propi stizzar tut ils resultats da partida da \"${item}\"?"
+
+msgid "Delete compound"
+msgstr "Stizzar la colliaziun"
+
+msgid "Compound added."
+msgstr "Agiuntà colliaziun."
+
+msgid "Compound modified."
+msgstr "Midà colliaziun."
+
+msgid "Compound deleted."
+msgstr "Stizzà la colliaziun."
+
+msgid "Edit election"
+msgstr "Modifitgar l'elecziun"
+
+msgid "Delete election"
+msgstr "Stizzar l'elecziun"
+
+msgid "Election added."
+msgstr "Agiuntà l'elecziun."
+
+msgid "Election modified."
+msgstr "Midà l'elecziun."
+
+msgid "Election deleted."
+msgstr "Stizzà l'elecziun."
 
 msgid "Update results"
 msgstr "Actualisar ils resultats"
@@ -1034,10 +1115,6 @@ msgstr "Actualisà ils resultats."
 
 msgid "Do you really want to regenerate the token?"
 msgstr "Vulais Vus propi generar da nov il token?"
-
-#, python-format
-msgid "Do you really want to delete \"${item}\"?"
-msgstr "Vulais Vus propi stizzar \"${item}\"?"
 
 msgid "Delete data source"
 msgstr "Stizzar la funtauna da datas"
@@ -1066,87 +1143,18 @@ msgstr "Midà l'attribuziun."
 msgid "Mapping deleted."
 msgstr "Stizzà l'attribuziun."
 
-msgid "Edit compound"
-msgstr "Elavurar la colliaziun"
-
-#, python-format
-msgid "Do you really want to clear all party results of \"${item}\"?"
-msgstr "Vulais Vus propi stizzar tut ils resultats da partida da \"${item}\"?"
-
-msgid "Delete compound"
-msgstr "Stizzar la colliaziun"
-
-msgid "Compound added."
-msgstr "Agiuntà colliaziun."
-
-msgid "Compound modified."
-msgstr "Midà colliaziun."
-
-msgid "Results deleted."
-msgstr "Stizzà ils resultats."
-
-msgid "Compound deleted."
-msgstr "Stizzà la colliaziun."
-
-msgid "Edit election"
-msgstr "Modifitgar l'elecziun"
-
-#, python-format
-msgid "Do you really want to clear all results of \"${item}\"?"
-msgstr "Vulais Vus propi stizzar tut ils resultats da \"${item}\"?"
-
-msgid "Delete election"
-msgstr "Stizzar l'elecziun"
-
-msgid ""
-"There are no changes since the last time the notifications have been "
-"triggered!"
-msgstr ""
-"Naginas midadas dapi l'ultima giada che las communicaziuns èn vegnidas "
-"tramessas als abunents!"
-
-msgid "Do you really want to retrigger the notfications?"
-msgstr "Propi trametter danovamain communicaziuns als abunents?"
-
-msgid "Election added."
-msgstr "Agiuntà l'elecziun."
-
-msgid "Election modified."
-msgstr "Midà l'elecziun."
-
-msgid "Election deleted."
-msgstr "Stizzà l'elecziun."
-
-msgid "Notifications triggered."
-msgstr "Activà las communicaziuns."
-
 msgid "Delete subscriber"
 msgstr "Stizzar l'abunent(a)"
 
 msgid "Subscriber deleted."
 msgstr "Stizzà l'abunent(a)."
 
-msgid "Edit vote"
-msgstr "Modifitgar la votaziun"
-
-msgid "Delete vote"
-msgstr "Stizzar la votaziun"
-
-msgid "Vote added."
-msgstr "Agiuntà la votaziun."
-
-msgid "Vote modified."
-msgstr "Midà la votaziun."
-
-msgid "Vote deleted."
-msgstr "Stizzà la votaziun."
-
-#, python-format
-msgid "The year ${year} is not yet supported"
-msgstr "L'onn ${year} na vegn anc betg sustegnì"
+msgid "The data source is not configured properly"
+msgstr "La configuraziun da la funtauna da datas n'è betg valaivla"
 
 msgid "Use an election based on proportional representation"
 msgstr "Nagina elecziun da proporz"
 
-msgid "The data source is not configured properly"
-msgstr "La configuraziun da la funtauna da datas n'è betg valaivla"
+#, python-format
+msgid "The year ${year} is not yet supported"
+msgstr "L'onn ${year} na vegn anc betg sustegnì"

@@ -61,6 +61,12 @@ def test_manage_layouts(session):
                 'EmailSubscriberCollection/archive',
                 False,
                 []
+            ),
+            (
+                'Trigger notifications',
+                'DummyPrincipal/trigger-notifications',
+                False,
+                []
             )
         ])
     ]
@@ -174,7 +180,20 @@ def test_manage_layouts(session):
             False,
             []
         ),
-        ('Email subscribers', 'EmailSubscriberCollection/archive', True, [])
+        ('Subscribers', '', True, [
+            (
+                'Email subscribers',
+                'EmailSubscriberCollection/archive',
+                True,
+                []
+            ),
+            (
+                'Trigger notifications',
+                'DummyPrincipal/trigger-notifications',
+                False,
+                []
+            )
+        ])
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
@@ -197,7 +216,15 @@ def test_manage_layouts(session):
             False,
             []
         ),
-        ('SMS subscribers', 'SmsSubscriberCollection/archive', True, [])
+        ('Subscribers', '', True, [
+            ('SMS subscribers', 'SmsSubscriberCollection/archive', True, []),
+            (
+                'Trigger notifications',
+                'DummyPrincipal/trigger-notifications',
+                False,
+                []
+            )
+        ])
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),

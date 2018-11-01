@@ -1,0 +1,16 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="body">
+        <tal:block tal:repeat="election elections">
+            <tal:block metal:use-macro="layout.macros['mail_election_result']" />
+        </tal:block>
+        <tal:block tal:repeat="vote votes">
+            <tal:block metal:use-macro="layout.macros['mail_vote_result']" />
+        </tal:block>
+    </tal:block>
+    <tal:block metal:fill-slot="footer">
+        <p><a href="${layout.optout_link}" i18n:translate>Unsubscribe</a></p>
+    </tal:block>
+</div>
