@@ -22,12 +22,12 @@
 
             <div class="columns medium-4">
                 <div class="filter-panel">
-                    <div class="filter-periods">
+                    <div class="filter-letter">
                         <h2 class="filter-title" i18n:translate>Letter</h2>
                         <div metal:use-macro="layout.macros['tags']" tal:define="tags letters" />
                     </div>
 
-                    <div class="filter-periods">
+                    <div class="filter-agencies">
                         <h2 class="filter-title" i18n:translate>Agency</h2>
                         <select class="chosen-select redirectable">
                             <tal:block tal:repeat="agency agencies">
@@ -35,17 +35,6 @@
                             </tal:block>
                         </select>
                     </div>
-                </div>
-
-                <div class="submit-yours">
-                    <dl>
-                        <dt>
-                            <a href="#">
-                                <h2 i18n:translate>Propose entry</h2>
-                            </a>
-                        </dt>
-                        <dd i18n:translate>Propose a new entry</dd>
-                    </dl>
                 </div>
             </div>
         </div>

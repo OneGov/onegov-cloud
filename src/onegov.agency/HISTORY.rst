@@ -7,6 +7,9 @@ Changelog
 - Fixes redirecting to the selected organisation not working on android.
   [msom]
 
+- Fixes the layouts of the panels for mobiles.
+  [msom]
+
 0.0.3 (2018-10-30)
 ~~~~~~~~~~~~~~~~~~~~
 
