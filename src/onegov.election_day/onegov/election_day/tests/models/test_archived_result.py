@@ -54,8 +54,8 @@ def test_archived_result(session):
     assert result.local_answer == ''
     assert result.local_nays_percentage == 100.0
     assert result.local_yeas_percentage == 0.0
-    assert result.counted == True
-    assert result.completed == True
+    assert result.counted is True
+    assert result.completed is True
     assert result.meta == {
         'answer': 'rejected',
         'nays_percentage': 20.5,
@@ -117,8 +117,8 @@ def test_archived_result(session):
     assert copied.answer == 'rejected'
     assert copied.nays_percentage == 20.5
     assert copied.yeas_percentage == 79.5
-    assert copied.counted == True
-    assert copied.completed == True
+    assert copied.counted is True
+    assert copied.completed is True
     assert copied.meta == {
         'answer': 'rejected',
         'nays_percentage': 20.5,

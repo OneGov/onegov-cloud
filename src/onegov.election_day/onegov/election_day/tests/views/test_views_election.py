@@ -74,9 +74,9 @@ def test_view_election_candidate_by_entity(election_day_app_gr):
             option.text.split(' ')[0]: client.get(option.attrib['value']).json
             for option in view.pyquery('option')
         }
-        assert data['Engler']['3503']['counted'] == True
+        assert data['Engler']['3503']['counted'] is True
         assert data['Engler']['3503']['percentage'] == 100 * 20 / 41
-        assert data['Schmid']['3503']['counted'] == True
+        assert data['Schmid']['3503']['counted'] is True
         assert data['Schmid']['3503']['percentage'] == 100 * 18 / 41
 
     for url in (
@@ -91,9 +91,9 @@ def test_view_election_candidate_by_entity(election_day_app_gr):
             option.text.split(' ')[0]: client.get(option.attrib['value']).json
             for option in view.pyquery('option')
         }
-        assert data['Caluori']['3503']['counted'] == True
+        assert data['Caluori']['3503']['counted'] is True
         assert data['Caluori']['3503']['percentage'] == 100 * 2 / 153
-        assert data['Casanova']['3503']['counted'] == True
+        assert data['Casanova']['3503']['counted'] is True
         assert data['Casanova']['3503']['percentage'] == 0.0
 
 
@@ -118,10 +118,10 @@ def test_view_election_candidate_by_district(election_day_app_gr):
             for option in view.pyquery('option')
         }
         assert data['Engler']['Bernina']['entities'] == [3551, 3561]
-        assert data['Engler']['Bernina']['counted'] == False
+        assert data['Engler']['Bernina']['counted'] is False
         assert data['Engler']['Bernina']['percentage'] == 0.0
         assert data['Schmid']['Bernina']['entities'] == [3551, 3561]
-        assert data['Schmid']['Bernina']['counted'] == False
+        assert data['Schmid']['Bernina']['counted'] is False
         assert data['Schmid']['Bernina']['percentage'] == 0.0
 
     for url in (
@@ -137,10 +137,10 @@ def test_view_election_candidate_by_district(election_day_app_gr):
             for option in view.pyquery('option')
         }
         assert data['Caluori']['Bernina']['entities'] == [3551, 3561]
-        assert data['Caluori']['Bernina']['counted'] == False
+        assert data['Caluori']['Bernina']['counted'] is False
         assert data['Caluori']['Bernina']['percentage'] == 0.0
         assert data['Casanova']['Bernina']['entities'] == [3551, 3561]
-        assert data['Casanova']['Bernina']['counted'] == False
+        assert data['Casanova']['Bernina']['counted'] is False
         assert data['Casanova']['Bernina']['percentage'] == 0.0
 
 
@@ -217,9 +217,9 @@ def test_view_election_list_by_entity(election_day_app_gr):
             option.text: client.get(option.attrib['value']).json
             for option in view.pyquery('option')
         }
-        assert data['CVP']['3503']['counted'] == True
+        assert data['CVP']['3503']['counted'] is True
         assert data['CVP']['3503']['percentage'] == 100 * 6 / 153
-        assert data['FDP']['3503']['counted'] == True
+        assert data['FDP']['3503']['counted'] is True
         assert data['FDP']['3503']['percentage'] == 100 * 8 / 153
 
 
@@ -248,10 +248,10 @@ def test_view_election_list_by_district(election_day_app_gr):
             for option in view.pyquery('option')
         }
         assert data['CVP']['Bernina']['entities'] == [3551, 3561]
-        assert data['CVP']['Bernina']['counted'] == False
+        assert data['CVP']['Bernina']['counted'] is False
         assert data['CVP']['Bernina']['percentage'] == 0.0
         assert data['FDP']['Bernina']['entities'] == [3551, 3561]
-        assert data['FDP']['Bernina']['counted'] == False
+        assert data['FDP']['Bernina']['counted'] is False
         assert data['FDP']['Bernina']['percentage'] == 0.0
 
 
