@@ -4,6 +4,9 @@ Changelog
 - Resolves conflicts with onegov.orgs people views.
   [msom]
 
+- Fixes redirecting to the selected organisation not working on android.
+  [msom]
+
 0.0.3 (2018-10-30)
 ~~~~~~~~~~~~~~~~~~~~
 
