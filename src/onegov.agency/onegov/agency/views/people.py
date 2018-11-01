@@ -15,7 +15,7 @@ from onegov.org.models import AtoZ
 
 @AgencyApp.html(
     model=ExtendedPersonCollection,
-    template='people.pt',
+    template='extended_people.pt',
     permission=Public
 )
 def view_people(self, request):
