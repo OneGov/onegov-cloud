@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.4 (2018-11-01)
+~~~~~~~~~~~~~~~~~~~~
 
 - Resolves conflicts with onegov.orgs people views.
   [msom]
