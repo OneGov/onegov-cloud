@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds summarized notifications.
+  [msom]
+
 3.6.10 (2018-10-11)
 ~~~~~~~~~~~~~~~~~~~
 
