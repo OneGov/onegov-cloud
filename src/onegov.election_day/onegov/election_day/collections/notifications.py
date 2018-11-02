@@ -93,7 +93,7 @@ class NotificationCollection(object):
                 self.session.add(notification)
 
             notification = SmsNotification()
-            self.send_sms(
+            notification.send_sms(
                 request,
                 _(
                     "New results are available on ${url}",

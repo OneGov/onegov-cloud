@@ -151,7 +151,11 @@ class EmailNotification(Notification):
 
             layout = MailLayout(self, request)
 
-            subject_ = subject or layout.subject((elections + votes)[0])
+            if subject:
+                subject_ = request.translate(subject)
+            else:
+                subject_ = layout.subject((elections + votes)[0])
+
             content = render_template(
                 'mail_results.pt',
                 request,
