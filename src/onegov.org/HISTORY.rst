@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes pointer cursor not showing up in the reservations.
+  [href]
+
 0.40.5 (2018-11-01)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -798,7 +798,7 @@ ReservationSelection = React.createClass({
                             })
                         }</ul>
                 }
-                <a onClick={self.handleSubmit} className={this.props.reservations.length === 0 && 'disabled button secondary' || 'button'}>
+                <a onClick={self.handleSubmit} role="button" className={this.props.reservations.length === 0 && 'disabled button secondary' || 'button'}>
                     {locale("Reserve")}
                 </a>
 

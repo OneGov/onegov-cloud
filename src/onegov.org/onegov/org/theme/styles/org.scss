@@ -93,6 +93,10 @@ a:not([href]):not([role]) {
     cursor: default;
 }
 
+.fc-event {
+    cursor: pointer !important;
+}
+
 /*
     Hyphenation for browsers which support it.
 */
