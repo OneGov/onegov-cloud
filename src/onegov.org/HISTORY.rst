@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes json export failing for time values.
+  [href]
+
 - Fixes pointer cursor not showing up in the reservations.
   [href]
 

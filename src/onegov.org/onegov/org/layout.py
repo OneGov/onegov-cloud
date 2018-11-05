@@ -296,6 +296,8 @@ class Layout(ChameleonLayout):
                 return float(value)
             if isinstance(value, (date, datetime)):
                 return value.isoformat()
+            if isinstance(value, time):
+                return f'{value.hour}:{value.minute}'
             if hasattr(value, 'domain'):
                 return self.request.translator(value)
             if isinstance(value, str):
