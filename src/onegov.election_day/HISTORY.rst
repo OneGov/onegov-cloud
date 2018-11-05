@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.7.2 (2018-11-05)
+~~~~~~~~~~~~~~~~~~~
 
 - Updates translations.
   [msom]
