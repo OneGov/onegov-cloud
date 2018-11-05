@@ -1,20 +1,8 @@
 from onegov_testing.utils import create_app
-from onegov.core import Framework
-from onegov.file import DepotApp
+from onegov.agency.app import AgencyApp
 from os import path
 from pytest import fixture
 from yaml import dump
-
-
-class DummyIndexer():
-    def process(self):
-        pass
-
-
-class TestApp(Framework, DepotApp):
-
-    def configure_search(self, **cfg):
-        self.es_indexer = DummyIndexer()
 
 
 @fixture(scope='function')
@@ -23,7 +11,7 @@ def cfg_path(postgres_dsn, session_manager, temporary_directory, redis_url):
         'applications': [
             {
                 'path': '/foo/*',
-                'application': 'onegov.agency.tests.conftest.TestApp',
+                'application': 'onegov.agency.app.AgencyApp',
                 'namespace': 'foo',
                 'configuration': {
                     'dsn': postgres_dsn,
@@ -51,7 +39,7 @@ def cfg_path(postgres_dsn, session_manager, temporary_directory, redis_url):
 
 
 @fixture(scope='function')
-def test_app(request):
-    app = create_app(TestApp, request, use_smtp=False)
+def agency_app(request):
+    app = create_app(AgencyApp, request, use_smtp=False)
     yield app
     app.session_manager.dispose()
