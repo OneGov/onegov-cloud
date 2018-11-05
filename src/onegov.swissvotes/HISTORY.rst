@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.11 (2018-11-05)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds resolution and realization attachments.
   [msom]
