@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.7.1 (2018-11-05)
+~~~~~~~~~~~~~~~~~~~
 
 - Uses a more specific summarized email subject.
   [msom]
