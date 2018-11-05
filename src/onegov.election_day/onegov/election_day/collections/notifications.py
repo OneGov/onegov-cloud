@@ -65,11 +65,14 @@ class NotificationCollection(object):
             return
 
         if 'email' in options and request.app.principal.email_notification:
+            completed = True
             for election in elections:
+                completed &= election.completed
                 notification = EmailNotification()
                 notification.update_from_model(election)
                 self.session.add(notification)
             for vote in votes:
+                completed &= vote.completed
                 notification = EmailNotification()
                 notification.update_from_model(vote)
                 self.session.add(notification)
@@ -79,6 +82,7 @@ class NotificationCollection(object):
                 request,
                 elections,
                 votes,
+                _("The final results are available") if completed else
                 _("New results are available")
             )
 

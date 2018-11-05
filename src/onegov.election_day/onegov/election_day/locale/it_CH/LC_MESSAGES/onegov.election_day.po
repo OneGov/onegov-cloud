@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-01 16:24+0100\n"
-"PO-Revision-Date: 2018-11-01 16:24+0100\n"
+"POT-Creation-Date: 2018-11-05 09:12+0100\n"
+"PO-Revision-Date: 2018-11-05 09:16+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -870,12 +870,15 @@ msgstr "Località"
 msgid "New vote"
 msgstr "Nuova votazione"
 
-msgid "New results are available"
-msgstr "Nuovi risultati sono disponibili"
-
 #, python-format
 msgid "New results are available on ${url}"
 msgstr "Nuovi risultati sono disponibili su ${url}"
+
+msgid "The final results are available"
+msgstr "Risultati finali sono disponibili"
+
+msgid "New results are available"
+msgstr "Nuovi risultati sono disponibili"
 
 msgid ""
 "Successfully subscribed to the SMS service. You will receive a SMS every "
