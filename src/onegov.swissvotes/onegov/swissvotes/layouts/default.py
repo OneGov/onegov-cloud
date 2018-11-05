@@ -2,6 +2,7 @@ from babel import Locale
 from cached_property import cached_property
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
+from onegov.core.utils import groupbylist
 from onegov.swissvotes import _
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.collections import TranslatablePageCollection
@@ -103,3 +104,19 @@ class DefaultLayout(ChameleonLayout):
     @cached_property
     def sentry_js(self):
         return self.app.sentry_js
+
+    def format_policy_areas(self, vote):
+        paths = [area.label_path for area in vote.policy_areas]
+        paths = groupbylist(sorted(paths), key=lambda x: x[0])
+
+        translate = self.request.translate
+        return ",<br>".join([
+            "<span title=\"{}\">{}</span>".format(
+                " &#10;&#10;".join([
+                    " &gt; ".join([translate(part) for part in title])
+                    for title in titles
+                ]),
+                translate(value)
+            )
+            for value, titles in paths
+        ])

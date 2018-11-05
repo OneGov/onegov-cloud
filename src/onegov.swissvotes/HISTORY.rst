@@ -4,6 +4,9 @@ Changelog
 - Reorders the votes columns.
   [msom]
 
+- Only shows the top level of the descriptor in the votes view.
+  [msom]
+
 - Uses the latest onegov.form.
   [msom]
 
