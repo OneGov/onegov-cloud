@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-07 15:24+0200\n"
-"PO-Revision-Date: 2018-09-28 09:23+0200\n"
+"POT-Creation-Date: 2018-11-05 09:55+0100\n"
+"PO-Revision-Date: 2018-11-05 09:55+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.1.1\n"
+"X-Generator: Poedit 2.2\n"
 
 msgid "Homepage"
 msgstr "Startseite"
@@ -32,19 +32,11 @@ msgstr "Disclaimer"
 msgid "Imprint"
 msgstr "Impressum"
 
-msgid "No data."
-msgstr "Keine Daten."
+msgid "Title"
+msgstr "Titel"
 
-#, python-format
-msgid "Some columns are missing: ${columns}."
-msgstr "Einige Spalten fehlen: ${columns}."
-
-#, python-format
-msgid "Some cells contain invalid values: ${errors}."
-msgstr "Einige Zellen enthalten ungültige Werte: ${errors}."
-
-msgid "Not a valid XLSX file."
-msgstr "Keine gültige XLSX-Datei."
+msgid "Content"
+msgstr "Inhalt"
 
 msgid "Voting text"
 msgstr "Abstimmungstext"
@@ -57,12 +49,6 @@ msgstr "Parlamentsberatung"
 
 msgid "Voting booklet"
 msgstr "Abstimmungsbüchlein"
-
-msgid "Title"
-msgstr "Titel"
-
-msgid "Content"
-msgstr "Inhalt"
 
 msgid "From date"
 msgstr "Von"
@@ -81,477 +67,6 @@ msgstr "Politikbereich"
 
 msgid "Full-text search"
 msgstr "Volltextsuche"
-
-msgid "Votes"
-msgstr "Abstimmungen"
-
-msgid "Edit page"
-msgstr "Seite bearbeiten"
-
-msgid "Voter strengths"
-msgstr "Wählerstärken"
-
-msgid "Manage attachments"
-msgstr "Anhänge verwalten"
-
-msgid "Delete vote"
-msgstr "Abstimmung löschen"
-
-msgid "Update dataset"
-msgstr "Datensatz aktualisieren"
-
-msgid "Delete all votes"
-msgstr "Alle Abstimmungen löschen"
-
-msgid "Download dataset (CSV)"
-msgstr "Datensatz herunterladen (CSV)"
-
-msgid "Download dataset (XLSX)"
-msgstr "Datensatz herunterladen (XLSX)"
-
-msgid "actor-acs-abbreviation"
-msgstr "ACS"
-
-msgid "actor-auns-abbreviation"
-msgstr "AUNS"
-
-msgid "actor-bdp-abbreviation"
-msgstr "BDP"
-
-msgid "actor-bpuk-abbreviation"
-msgstr "BPUK"
-
-msgid "actor-csp-abbreviation"
-msgstr "CSP"
-
-msgid "actor-cvp-fr-abbreviation"
-msgstr "CVP-Fr"
-
-msgid "actor-cvp-abbreviation"
-msgstr "CVP"
-
-msgid "actor-dem-abbreviation"
-msgstr "DEM"
-
-msgid "actor-dsp-abbreviation"
-msgstr "DSP"
-
-msgid "actor-eco-abbreviation"
-msgstr "eco"
-
-msgid "actor-edk-abbreviation"
-msgstr "EDK"
-
-msgid "actor-edu-abbreviation"
-msgstr "EDU"
-
-msgid "actor-endk-abbreviation"
-msgstr "EnDK"
-
-msgid "actor-evp-abbreviation"
-msgstr "EVP"
-
-msgid "actor-fdk-abbreviation"
-msgstr "FDK"
-
-msgid "actor-fdp-fr-abbreviation"
-msgstr "FDP-Fr"
-
-msgid "actor-fdp-abbreviation"
-msgstr "FDP"
-
-msgid "actor-fmh-abbreviation"
-msgstr "FMH"
-
-msgid "actor-fps-abbreviation"
-msgstr "FPS"
-
-msgid "actor-frap-abbreviation"
-msgstr "FraP"
-
-msgid "actor-ga-abbreviation"
-msgstr "GA"
-
-msgid "actor-gdk-abbreviation"
-msgstr "GDK"
-
-msgid "actor-gem-abbreviation"
-msgstr "Gem"
-
-msgid "actor-glp-abbreviation"
-msgstr "GLP"
-
-msgid "actor-gps-abbreviation"
-msgstr "GPS"
-
-msgid "actor-gsoa-abbreviation"
-msgstr "GSoA"
-
-msgid "actor-hev-abbreviation"
-msgstr "HEV"
-
-msgid "actor-jcvp-abbreviation"
-msgstr "JCVP"
-
-msgid "actor-jfdp-abbreviation"
-msgstr "JFDP"
-
-msgid "actor-jgps-abbreviation"
-msgstr "JGPS"
-
-msgid "actor-jldu-abbreviation"
-msgstr "JLdU"
-
-msgid "actor-jlps-abbreviation"
-msgstr "JLPS"
-
-msgid "actor-jna-abbreviation"
-msgstr "JNA"
-
-msgid "actor-jsvp-abbreviation"
-msgstr "JSVP"
-
-msgid "actor-juso-abbreviation"
-msgstr "JUSO"
-
-msgid "actor-kdk-abbreviation"
-msgstr "KDK"
-
-msgid "actor-kkjpd-abbreviation"
-msgstr "KKJPD"
-
-msgid "actor-kvp-abbreviation"
-msgstr "KVP"
-
-msgid "actor-ldk-abbreviation"
-msgstr "LDK"
-
-msgid "actor-ldu-abbreviation"
-msgstr "LdU"
-
-msgid "actor-lega-abbreviation"
-msgstr "Lega"
-
-msgid "actor-lps-abbreviation"
-msgstr "LPS"
-
-msgid "actor-mcg-abbreviation"
-msgstr "MCG"
-
-msgid "actor-pda-abbreviation"
-msgstr "PdA"
-
-msgid "actor-poch-abbreviation"
-msgstr "POCH"
-
-msgid "actor-pps-abbreviation"
-msgstr "PPS"
-
-msgid "actor-psa-abbreviation"
-msgstr "PSA"
-
-msgid "actor-rep-abbreviation"
-msgstr "REP"
-
-msgid "actor-sab-abbreviation"
-msgstr "SAB"
-
-msgid "actor-sante-abbreviation"
-msgstr "santé"
-
-msgid "actor-sav-abbreviation"
-msgstr "SAV"
-
-msgid "actor-sbk-abbreviation"
-msgstr "SBK"
-
-msgid "actor-sblv-abbreviation"
-msgstr "SBLV"
-
-msgid "actor-sbv-asb-abbreviation"
-msgstr "SBV"
-
-msgid "actor-sbv-usp-abbreviation"
-msgstr "SBV"
-
-msgid "actor-sd-abbreviation"
-msgstr "SD"
-
-msgid "actor-seks-abbreviation"
-msgstr "SEKS"
-
-msgid "actor-sgb-abbreviation"
-msgstr "SGB"
-
-msgid "actor-sgv-abbreviation"
-msgstr "SGV"
-
-msgid "actor-skos-abbreviation"
-msgstr "SKOS"
-
-msgid "actor-sks-abbreviation"
-msgstr "SKS"
-
-msgid "actor-smv-abbreviation"
-msgstr "SMV"
-
-msgid "actor-sodk-abbreviation"
-msgstr "SODK"
-
-msgid "actor-sol-abbreviation"
-msgstr "Sol."
-
-msgid "actor-sps-abbreviation"
-msgstr "SPS"
-
-msgid "actor-ssv-abbreviation"
-msgstr "SSV"
-
-msgid "actor-svp-abbreviation"
-msgstr "SVP"
-
-msgid "actor-tcs-abbreviation"
-msgstr "TCS"
-
-msgid "actor-travs-abbreviation"
-msgstr "TravS"
-
-msgid "actor-vcs-abbreviation"
-msgstr "VCS"
-
-msgid "actor-vdk-abbreviation"
-msgstr "VDK"
-
-msgid "actor-voev-abbreviation"
-msgstr "VöV"
-
-msgid "actor-vpod-abbreviation"
-msgstr "VPOD"
-
-msgid "actor-vsa-abbreviation"
-msgstr "VSA"
-
-msgid "actor-acs-label"
-msgstr "Automobil Club der Schweiz"
-
-msgid "actor-auns-label"
-msgstr "Aktion für eine unabhängige und neutrale Schweiz"
-
-msgid "actor-bdp-label"
-msgstr "Bürgerlich-Demokratische Partei"
-
-msgid "actor-bpuk-label"
-msgstr "Schweiz. Bau-, Planungs- und Umweltschutzdirektorenkonferenz"
-
-msgid "actor-csp-label"
-msgstr "Christlichsoziale Partei"
-
-msgid "actor-cvp-fr-label"
-msgstr "CVP Frauen"
-
-msgid "actor-cvp-label"
-msgstr "Christlichdemokratische Volkspartei der Schweiz"
-
-msgid "actor-dem-label"
-msgstr "Demokratische Partei"
-
-msgid "actor-dsp-label"
-msgstr "Demokratisch-Soziale Partei Basel-Stadt"
-
-msgid "actor-eco-label"
-msgstr "economiesuisse"
-
-msgid "actor-edk-label"
-msgstr "Erziehungsdirektorenkonferenz"
-
-msgid "actor-edu-label"
-msgstr "Eidgenössisch-Demokratische Union"
-
-msgid "actor-endk-label"
-msgstr "Energiedirektorenkonferenz"
-
-msgid "actor-evp-label"
-msgstr "Evangelische Volkspartei der Schweiz"
-
-msgid "actor-fdk-label"
-msgstr "Finanzdirektorenkonferenz"
-
-msgid "actor-fdp-fr-label"
-msgstr "FDP.Die Liberalen Frauen"
-
-msgid "actor-fdp-label"
-msgstr "Freisinnig-demokratische Partei der Schweiz"
-
-msgid "actor-fmh-label"
-msgstr "Verbindung Schweizer Ärztinnen und Ärzte"
-
-msgid "actor-fps-label"
-msgstr "Freiheits-Partei der Schweiz"
-
-msgid "actor-frap-label"
-msgstr "Frauen macht Politik!"
-
-msgid "actor-ga-label"
-msgstr "Grüne Alternative"
-
-msgid "actor-gdk-label"
-msgstr "Gesundheitsdirektorenkonferenz"
-
-msgid "actor-gem-label"
-msgstr "Schweiz. Gemeindeverband SGV"
-
-msgid "actor-glp-label"
-msgstr "Grünliberale Partei"
-
-msgid "actor-gps-label"
-msgstr "Grüne Partei der Schweiz"
-
-msgid "actor-gsoa-label"
-msgstr "Gruppe für eine Schweiz ohne Armee"
-
-msgid "actor-hev-label"
-msgstr "Hauseigentümerverband"
-
-msgid "actor-jcvp-label"
-msgstr "Junge CVP"
-
-msgid "actor-jfdp-label"
-msgstr "Junge FDP"
-
-msgid "actor-jgps-label"
-msgstr "Junge Grüne"
-
-msgid "actor-jldu-label"
-msgstr "Junger LdU"
-
-msgid "actor-jlps-label"
-msgstr "Junge LPS"
-
-msgid "actor-jna-label"
-msgstr "Junge NA"
-
-msgid "actor-jsvp-label"
-msgstr "Junge SVP"
-
-msgid "actor-juso-label"
-msgstr "JungsozialistInnen Schweiz"
-
-msgid "actor-kdk-label"
-msgstr "Konferenz der Kantonsregierungen"
-
-msgid "actor-kkjpd-label"
-msgstr "Konferenz der kant. Justiz- und Polizeidirektoren"
-
-msgid "actor-kvp-label"
-msgstr "Katholische Volkspartei"
-
-msgid "actor-ldk-label"
-msgstr "Landwirtschaftsdirektorenkonferenz"
-
-msgid "actor-ldu-label"
-msgstr "Landesring der Unabhängigen"
-
-msgid "actor-lega-label"
-msgstr "Lega dei Ticinesi"
-
-msgid "actor-lps-label"
-msgstr "Liberale Partei der Schweiz"
-
-msgid "actor-mcg-label"
-msgstr "Mouvement Citoyens Genevois"
-
-msgid "actor-pda-label"
-msgstr "Partei der Arbeit"
-
-msgid "actor-poch-label"
-msgstr "Progressive Organisationen der Schweiz"
-
-msgid "actor-pps-label"
-msgstr "Piratenpartei"
-
-msgid "actor-psa-label"
-msgstr "Autonome Sozialistische Partei"
-
-msgid "actor-rep-label"
-msgstr "Schweizerische Republikanische Bewegung"
-
-msgid "actor-sab-label"
-msgstr "Schweizerische Arbeitsgemeinschaft für die Berggebiete"
-
-msgid "actor-sante-label"
-msgstr "santésuisse Verband Schweizer Krankenversicherer"
-
-msgid "actor-sav-label"
-msgstr "Schweizerischer Arbeitgeberverband"
-
-msgid "actor-sbk-label"
-msgstr "Schweizer Bischofskonferenz"
-
-msgid "actor-sblv-label"
-msgstr "Schweizerischer Bäuerinnen- und Landfrauenverband"
-
-msgid "actor-sbv-asb-label"
-msgstr "Schweizerische Bankiervereinigung"
-
-msgid "actor-sbv-usp-label"
-msgstr "Schweizerischer Bauernverband"
-
-msgid "actor-sd-label"
-msgstr "Schweizer Demokraten"
-
-msgid "actor-seks-label"
-msgstr "Schweizerischer Evangelischer Kirchenbund"
-
-msgid "actor-sgb-label"
-msgstr "Schweizerischer Gewerkschaftsbund"
-
-msgid "actor-sgv-label"
-msgstr "Schweizerischer Gewerbeverband"
-
-msgid "actor-skos-label"
-msgstr "Schweizerische Konferenz für Sozialhilfe"
-
-msgid "actor-sks-label"
-msgstr "Stiftung für Konsumentenschutz"
-
-msgid "actor-smv-label"
-msgstr "Schweizerischer Mieterinnen- und Mieterverband"
-
-msgid "actor-sodk-label"
-msgstr "Sozialdirektorenkonferenz"
-
-msgid "actor-sol-label"
-msgstr "Solidarität"
-
-msgid "actor-sps-label"
-msgstr "Sozialdemokratische Partei der Schweiz"
-
-msgid "actor-ssv-label"
-msgstr "Schweiz. Städteverband"
-
-msgid "actor-svp-label"
-msgstr "Schweizerische Volkspartei"
-
-msgid "actor-tcs-label"
-msgstr "Touring Club Schweiz"
-
-msgid "actor-travs-label"
-msgstr "Travail.Suisse"
-
-msgid "actor-vcs-label"
-msgstr "Verkehrs-Club der Schweiz"
-
-msgid "actor-vdk-label"
-msgstr "Volkswirtschaftsdirektorenkonferenz"
-
-msgid "actor-voev-label"
-msgstr "Verband öffentlicher Verkehr"
-
-msgid "actor-vpod-label"
-msgstr "Verband des Personals öffentlicher Dienste"
-
-msgid "actor-vsa-label"
-msgstr "Vereinigung schweizerischer Angestelltenverbände"
 
 msgid "d-1-1"
 msgstr "Staatsordnung"
@@ -1154,59 +669,476 @@ msgstr "Stimmfreigabe"
 msgid "Organization no longer exists"
 msgstr "Organisation existiert nicht mehr"
 
-msgid "The form contains errors. Please check the fields marked in red."
-msgstr ""
-"Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
+msgid "actor-acs-abbreviation"
+msgstr "ACS"
 
-msgid "Login"
-msgstr "Anmelden"
+msgid "actor-auns-abbreviation"
+msgstr "AUNS"
 
-msgid "Logout"
-msgstr "Abmelden"
+msgid "actor-bdp-abbreviation"
+msgstr "BDP"
 
-msgid "Forgot your password?"
-msgstr "Passwort vergessen?"
+msgid "actor-bpuk-abbreviation"
+msgstr "BPUK"
 
-msgid "Reset password"
-msgstr "Passwort zurücksetzen"
+msgid "actor-csp-abbreviation"
+msgstr "CSP"
 
-msgid "You are here"
-msgstr "Aktuelle Seite"
+msgid "actor-cvp-fr-abbreviation"
+msgstr "CVP-Fr"
 
-msgid "Previous Page"
-msgstr "Vorherige Seite"
+msgid "actor-cvp-abbreviation"
+msgstr "CVP"
 
-msgid "Next Page"
-msgstr "Nächste Seite"
+msgid "actor-dem-abbreviation"
+msgstr "DEM"
 
-msgid "Cancel"
-msgstr "Abbrechen"
+msgid "actor-dsp-abbreviation"
+msgstr "DSP"
 
-msgid "Submit"
-msgstr "Absenden"
+msgid "actor-eco-abbreviation"
+msgstr "eco"
 
-msgid "Reset"
-msgstr "Zurücksetzen"
+msgid "actor-edk-abbreviation"
+msgstr "EDK"
 
-msgid "Stack"
-msgstr "Gestapelt"
+msgid "actor-edu-abbreviation"
+msgstr "EDU"
 
-msgid "Toggle"
-msgstr "Auswahl"
+msgid "actor-endk-abbreviation"
+msgstr "EnDK"
 
-msgid "Columns"
-msgstr "Spalten"
+msgid "actor-evp-abbreviation"
+msgstr "EVP"
 
-msgid "Dear Sir or Madam,"
-msgstr "Sehr geehrte Damen und Herren,"
+msgid "actor-fdk-abbreviation"
+msgstr "FDK"
 
-msgid "Click the following link to set a new password:"
-msgstr "Klicken Sie auf den folgenden Link, um ein neues Passwort zu setzen:"
+msgid "actor-fdp-fr-abbreviation"
+msgstr "FDP-Fr"
 
-msgid "If you don't want to change your password, you can ignore this email."
-msgstr ""
-"Sie können dieses E-Mail ignorieren, falls Sie Ihr Passwort nicht ändern "
-"möchten."
+msgid "actor-fdp-abbreviation"
+msgstr "FDP"
+
+msgid "actor-fmh-abbreviation"
+msgstr "FMH"
+
+msgid "actor-fps-abbreviation"
+msgstr "FPS"
+
+msgid "actor-frap-abbreviation"
+msgstr "FraP"
+
+msgid "actor-ga-abbreviation"
+msgstr "GA"
+
+msgid "actor-gdk-abbreviation"
+msgstr "GDK"
+
+msgid "actor-gem-abbreviation"
+msgstr "Gem"
+
+msgid "actor-glp-abbreviation"
+msgstr "GLP"
+
+msgid "actor-gps-abbreviation"
+msgstr "GPS"
+
+msgid "actor-gsoa-abbreviation"
+msgstr "GSoA"
+
+msgid "actor-hev-abbreviation"
+msgstr "HEV"
+
+msgid "actor-jcvp-abbreviation"
+msgstr "JCVP"
+
+msgid "actor-jfdp-abbreviation"
+msgstr "JFDP"
+
+msgid "actor-jgps-abbreviation"
+msgstr "JGPS"
+
+msgid "actor-jldu-abbreviation"
+msgstr "JLdU"
+
+msgid "actor-jlps-abbreviation"
+msgstr "JLPS"
+
+msgid "actor-jna-abbreviation"
+msgstr "JNA"
+
+msgid "actor-jsvp-abbreviation"
+msgstr "JSVP"
+
+msgid "actor-juso-abbreviation"
+msgstr "JUSO"
+
+msgid "actor-kdk-abbreviation"
+msgstr "KDK"
+
+msgid "actor-kkjpd-abbreviation"
+msgstr "KKJPD"
+
+msgid "actor-kvp-abbreviation"
+msgstr "KVP"
+
+msgid "actor-ldk-abbreviation"
+msgstr "LDK"
+
+msgid "actor-ldu-abbreviation"
+msgstr "LdU"
+
+msgid "actor-lega-abbreviation"
+msgstr "Lega"
+
+msgid "actor-lps-abbreviation"
+msgstr "LPS"
+
+msgid "actor-mcg-abbreviation"
+msgstr "MCG"
+
+msgid "actor-pda-abbreviation"
+msgstr "PdA"
+
+msgid "actor-poch-abbreviation"
+msgstr "POCH"
+
+msgid "actor-pps-abbreviation"
+msgstr "PPS"
+
+msgid "actor-psa-abbreviation"
+msgstr "PSA"
+
+msgid "actor-rep-abbreviation"
+msgstr "REP"
+
+msgid "actor-sab-abbreviation"
+msgstr "SAB"
+
+msgid "actor-sante-abbreviation"
+msgstr "santé"
+
+msgid "actor-sav-abbreviation"
+msgstr "SAV"
+
+msgid "actor-sbk-abbreviation"
+msgstr "SBK"
+
+msgid "actor-sblv-abbreviation"
+msgstr "SBLV"
+
+msgid "actor-sbv-asb-abbreviation"
+msgstr "SBV"
+
+msgid "actor-sbv-usp-abbreviation"
+msgstr "SBV"
+
+msgid "actor-sd-abbreviation"
+msgstr "SD"
+
+msgid "actor-seks-abbreviation"
+msgstr "SEKS"
+
+msgid "actor-sgb-abbreviation"
+msgstr "SGB"
+
+msgid "actor-sgv-abbreviation"
+msgstr "SGV"
+
+msgid "actor-skos-abbreviation"
+msgstr "SKOS"
+
+msgid "actor-sks-abbreviation"
+msgstr "SKS"
+
+msgid "actor-smv-abbreviation"
+msgstr "SMV"
+
+msgid "actor-sodk-abbreviation"
+msgstr "SODK"
+
+msgid "actor-sol-abbreviation"
+msgstr "Sol."
+
+msgid "actor-sps-abbreviation"
+msgstr "SPS"
+
+msgid "actor-ssv-abbreviation"
+msgstr "SSV"
+
+msgid "actor-svp-abbreviation"
+msgstr "SVP"
+
+msgid "actor-tcs-abbreviation"
+msgstr "TCS"
+
+msgid "actor-travs-abbreviation"
+msgstr "TravS"
+
+msgid "actor-vcs-abbreviation"
+msgstr "VCS"
+
+msgid "actor-vdk-abbreviation"
+msgstr "VDK"
+
+msgid "actor-voev-abbreviation"
+msgstr "VöV"
+
+msgid "actor-vpod-abbreviation"
+msgstr "VPOD"
+
+msgid "actor-vsa-abbreviation"
+msgstr "VSA"
+
+msgid "actor-acs-label"
+msgstr "Automobil Club der Schweiz"
+
+msgid "actor-auns-label"
+msgstr "Aktion für eine unabhängige und neutrale Schweiz"
+
+msgid "actor-bdp-label"
+msgstr "Bürgerlich-Demokratische Partei"
+
+msgid "actor-bpuk-label"
+msgstr "Schweiz. Bau-, Planungs- und Umweltschutzdirektorenkonferenz"
+
+msgid "actor-csp-label"
+msgstr "Christlichsoziale Partei"
+
+msgid "actor-cvp-fr-label"
+msgstr "CVP Frauen"
+
+msgid "actor-cvp-label"
+msgstr "Christlichdemokratische Volkspartei der Schweiz"
+
+msgid "actor-dem-label"
+msgstr "Demokratische Partei"
+
+msgid "actor-dsp-label"
+msgstr "Demokratisch-Soziale Partei Basel-Stadt"
+
+msgid "actor-eco-label"
+msgstr "economiesuisse"
+
+msgid "actor-edk-label"
+msgstr "Erziehungsdirektorenkonferenz"
+
+msgid "actor-edu-label"
+msgstr "Eidgenössisch-Demokratische Union"
+
+msgid "actor-endk-label"
+msgstr "Energiedirektorenkonferenz"
+
+msgid "actor-evp-label"
+msgstr "Evangelische Volkspartei der Schweiz"
+
+msgid "actor-fdk-label"
+msgstr "Finanzdirektorenkonferenz"
+
+msgid "actor-fdp-fr-label"
+msgstr "FDP.Die Liberalen Frauen"
+
+msgid "actor-fdp-label"
+msgstr "Freisinnig-demokratische Partei der Schweiz"
+
+msgid "actor-fmh-label"
+msgstr "Verbindung Schweizer Ärztinnen und Ärzte"
+
+msgid "actor-fps-label"
+msgstr "Freiheits-Partei der Schweiz"
+
+msgid "actor-frap-label"
+msgstr "Frauen macht Politik!"
+
+msgid "actor-ga-label"
+msgstr "Grüne Alternative"
+
+msgid "actor-gdk-label"
+msgstr "Gesundheitsdirektorenkonferenz"
+
+msgid "actor-gem-label"
+msgstr "Schweiz. Gemeindeverband SGV"
+
+msgid "actor-glp-label"
+msgstr "Grünliberale Partei"
+
+msgid "actor-gps-label"
+msgstr "Grüne Partei der Schweiz"
+
+msgid "actor-gsoa-label"
+msgstr "Gruppe für eine Schweiz ohne Armee"
+
+msgid "actor-hev-label"
+msgstr "Hauseigentümerverband"
+
+msgid "actor-jcvp-label"
+msgstr "Junge CVP"
+
+msgid "actor-jfdp-label"
+msgstr "Junge FDP"
+
+msgid "actor-jgps-label"
+msgstr "Junge Grüne"
+
+msgid "actor-jldu-label"
+msgstr "Junger LdU"
+
+msgid "actor-jlps-label"
+msgstr "Junge LPS"
+
+msgid "actor-jna-label"
+msgstr "Junge NA"
+
+msgid "actor-jsvp-label"
+msgstr "Junge SVP"
+
+msgid "actor-juso-label"
+msgstr "JungsozialistInnen Schweiz"
+
+msgid "actor-kdk-label"
+msgstr "Konferenz der Kantonsregierungen"
+
+msgid "actor-kkjpd-label"
+msgstr "Konferenz der kant. Justiz- und Polizeidirektoren"
+
+msgid "actor-kvp-label"
+msgstr "Katholische Volkspartei"
+
+msgid "actor-ldk-label"
+msgstr "Landwirtschaftsdirektorenkonferenz"
+
+msgid "actor-ldu-label"
+msgstr "Landesring der Unabhängigen"
+
+msgid "actor-lega-label"
+msgstr "Lega dei Ticinesi"
+
+msgid "actor-lps-label"
+msgstr "Liberale Partei der Schweiz"
+
+msgid "actor-mcg-label"
+msgstr "Mouvement Citoyens Genevois"
+
+msgid "actor-pda-label"
+msgstr "Partei der Arbeit"
+
+msgid "actor-poch-label"
+msgstr "Progressive Organisationen der Schweiz"
+
+msgid "actor-pps-label"
+msgstr "Piratenpartei"
+
+msgid "actor-psa-label"
+msgstr "Autonome Sozialistische Partei"
+
+msgid "actor-rep-label"
+msgstr "Schweizerische Republikanische Bewegung"
+
+msgid "actor-sab-label"
+msgstr "Schweizerische Arbeitsgemeinschaft für die Berggebiete"
+
+msgid "actor-sante-label"
+msgstr "santésuisse Verband Schweizer Krankenversicherer"
+
+msgid "actor-sav-label"
+msgstr "Schweizerischer Arbeitgeberverband"
+
+msgid "actor-sbk-label"
+msgstr "Schweizer Bischofskonferenz"
+
+msgid "actor-sblv-label"
+msgstr "Schweizerischer Bäuerinnen- und Landfrauenverband"
+
+msgid "actor-sbv-asb-label"
+msgstr "Schweizerische Bankiervereinigung"
+
+msgid "actor-sbv-usp-label"
+msgstr "Schweizerischer Bauernverband"
+
+msgid "actor-sd-label"
+msgstr "Schweizer Demokraten"
+
+msgid "actor-seks-label"
+msgstr "Schweizerischer Evangelischer Kirchenbund"
+
+msgid "actor-sgb-label"
+msgstr "Schweizerischer Gewerkschaftsbund"
+
+msgid "actor-sgv-label"
+msgstr "Schweizerischer Gewerbeverband"
+
+msgid "actor-skos-label"
+msgstr "Schweizerische Konferenz für Sozialhilfe"
+
+msgid "actor-sks-label"
+msgstr "Stiftung für Konsumentenschutz"
+
+msgid "actor-smv-label"
+msgstr "Schweizerischer Mieterinnen- und Mieterverband"
+
+msgid "actor-sodk-label"
+msgstr "Sozialdirektorenkonferenz"
+
+msgid "actor-sol-label"
+msgstr "Solidarität"
+
+msgid "actor-sps-label"
+msgstr "Sozialdemokratische Partei der Schweiz"
+
+msgid "actor-ssv-label"
+msgstr "Schweiz. Städteverband"
+
+msgid "actor-svp-label"
+msgstr "Schweizerische Volkspartei"
+
+msgid "actor-tcs-label"
+msgstr "Touring Club Schweiz"
+
+msgid "actor-travs-label"
+msgstr "Travail.Suisse"
+
+msgid "actor-vcs-label"
+msgstr "Verkehrs-Club der Schweiz"
+
+msgid "actor-vdk-label"
+msgstr "Volkswirtschaftsdirektorenkonferenz"
+
+msgid "actor-voev-label"
+msgstr "Verband öffentlicher Verkehr"
+
+msgid "actor-vpod-label"
+msgstr "Verband des Personals öffentlicher Dienste"
+
+msgid "actor-vsa-label"
+msgstr "Vereinigung schweizerischer Angestelltenverbände"
+
+msgid "Edit page"
+msgstr "Seite bearbeiten"
+
+msgid "Votes"
+msgstr "Abstimmungen"
+
+msgid "Update dataset"
+msgstr "Datensatz aktualisieren"
+
+msgid "Delete all votes"
+msgstr "Alle Abstimmungen löschen"
+
+msgid "Download dataset (CSV)"
+msgstr "Datensatz herunterladen (CSV)"
+
+msgid "Download dataset (XLSX)"
+msgstr "Datensatz herunterladen (XLSX)"
+
+msgid "Voter strengths"
+msgstr "Wählerstärken"
+
+msgid "Manage attachments"
+msgstr "Anhänge verwalten"
+
+msgid "Delete vote"
+msgstr "Abstimmung löschen"
 
 msgid "Voting campaign"
 msgstr "Abstimmungskampf"
@@ -1228,6 +1160,10 @@ msgstr "Partei"
 
 msgid "Others"
 msgstr "Übrige"
+
+msgid "The form contains errors. Please check the fields marked in red."
+msgstr ""
+"Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
 
 msgid "General"
 msgstr "Allgemeines"
@@ -1310,6 +1246,56 @@ msgstr "Stände"
 msgid "Turnout"
 msgstr "Stimmbeteiligung"
 
+msgid "You are here"
+msgstr "Aktuelle Seite"
+
+msgid "Previous Page"
+msgstr "Vorherige Seite"
+
+msgid "Next Page"
+msgstr "Nächste Seite"
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid "Submit"
+msgstr "Absenden"
+
+msgid "Reset"
+msgstr "Zurücksetzen"
+
+msgid "Stack"
+msgstr "Gestapelt"
+
+msgid "Toggle"
+msgstr "Auswahl"
+
+msgid "Columns"
+msgstr "Spalten"
+
+msgid "Forgot your password?"
+msgstr "Passwort vergessen?"
+
+msgid "Reset password"
+msgstr "Passwort zurücksetzen"
+
+msgid "Dear Sir or Madam,"
+msgstr "Sehr geehrte Damen und Herren,"
+
+msgid "Click the following link to set a new password:"
+msgstr "Klicken Sie auf den folgenden Link, um ein neues Passwort zu setzen:"
+
+msgid "If you don't want to change your password, you can ignore this email."
+msgstr ""
+"Sie können dieses E-Mail ignorieren, falls Sie Ihr Passwort nicht ändern "
+"möchten."
+
+msgid "Login"
+msgstr "Anmelden"
+
+msgid "Logout"
+msgstr "Abmelden"
+
 msgid "Filter"
 msgstr "Filtern"
 
@@ -1319,8 +1305,22 @@ msgstr "Resultate"
 msgid "Date"
 msgstr "Datum"
 
-msgid "Yeas People"
-msgstr "Ja Volk"
+msgid "Yeas Percentage People"
+msgstr "Ja-Anteil Volk"
+
+msgid "No data."
+msgstr "Keine Daten."
+
+#, python-format
+msgid "Some columns are missing: ${columns}."
+msgstr "Einige Spalten fehlen: ${columns}."
+
+#, python-format
+msgid "Some cells contain invalid values: ${errors}."
+msgstr "Einige Zellen enthalten ungültige Werte: ${errors}."
+
+msgid "Not a valid XLSX file."
+msgstr "Keine gültige XLSX-Datei."
 
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"
@@ -1341,31 +1341,8 @@ msgstr "Passwort geändert."
 msgid "Password reset"
 msgstr "Passwort zurücksetzen"
 
-msgid "Access Denied"
-msgstr "Zugriff verweigert"
-
-msgid "You are trying to open a page for which you are not authorized."
-msgstr ""
-"Sie versuchen eine Seite zu öffnen, für die Sie nicht autorisiert sind."
-
-msgid "Page not Found"
-msgstr "Seite nicht gefunden"
-
-msgid "The page you are looking for could not be found."
-msgstr "Die angeforderte Seite konnte nicht gefunden werden."
-
 msgid "Page modified."
 msgstr "Seite geändert."
-
-#, python-format
-msgid "Do you really want to delete \"${item}\"?"
-msgstr "Möchten Sie \"${item}\" wirklich löschen?"
-
-msgid "Attachments updated"
-msgstr "Anhänge aktualisiert"
-
-msgid "Vote deleted"
-msgstr "Abstimmung gelöscht."
 
 msgid "Do you really want to delete all votes?!"
 msgstr "Möchten Sie wirklich alle Abstimmungen löschen?!"
@@ -1380,3 +1357,29 @@ msgstr "Alle Abstimmungen gelöscht"
 #, python-format
 msgid "The dataset contains unknown descriptors: ${items}."
 msgstr "Der Datensatz enthält unbekannte Deskriptoren: ${items}."
+
+#, python-format
+msgid "Do you really want to delete \"${item}\"?"
+msgstr "Möchten Sie \"${item}\" wirklich löschen?"
+
+msgid "Attachments updated"
+msgstr "Anhänge aktualisiert"
+
+msgid "Vote deleted"
+msgstr "Abstimmung gelöscht."
+
+msgid "Access Denied"
+msgstr "Zugriff verweigert"
+
+msgid "You are trying to open a page for which you are not authorized."
+msgstr ""
+"Sie versuchen eine Seite zu öffnen, für die Sie nicht autorisiert sind."
+
+msgid "Page not Found"
+msgstr "Seite nicht gefunden"
+
+msgid "The page you are looking for could not be found."
+msgstr "Die angeforderte Seite konnte nicht gefunden werden."
+
+#~ msgid "Yeas People"
+#~ msgstr "Ja Volk"

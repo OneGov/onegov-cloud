@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-10-07 15:24+0200\n"
+"POT-Creation-Date: 2018-11-05 09:55+0100\n"
 "PO-Revision-Date: 2018-09-18 15:04+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: English\n"
@@ -34,19 +34,11 @@ msgstr "Disclaimer"
 msgid "Imprint"
 msgstr "Imprint"
 
-msgid "No data."
-msgstr ""
+msgid "Title"
+msgstr "Title"
 
-#, python-format
-msgid "Some columns are missing: ${columns}."
-msgstr ""
-
-#, python-format
-msgid "Some cells contain invalid values: ${errors}."
-msgstr ""
-
-msgid "Not a valid XLSX file."
-msgstr ""
+msgid "Content"
+msgstr "Content"
 
 msgid "Voting text"
 msgstr "Voting text"
@@ -59,12 +51,6 @@ msgstr "Parliamentary debate"
 
 msgid "Voting booklet"
 msgstr ""
-
-msgid "Title"
-msgstr "Title"
-
-msgid "Content"
-msgstr "Content"
 
 msgid "From date"
 msgstr "From date"
@@ -83,477 +69,6 @@ msgstr "Policy area"
 
 msgid "Full-text search"
 msgstr ""
-
-msgid "Votes"
-msgstr "Votes"
-
-msgid "Edit page"
-msgstr "Edit page"
-
-msgid "Voter strengths"
-msgstr "Voter strengths"
-
-msgid "Manage attachments"
-msgstr "Manage attachments"
-
-msgid "Delete vote"
-msgstr "Delete vote"
-
-msgid "Update dataset"
-msgstr "Update dataset"
-
-msgid "Delete all votes"
-msgstr "Delete all votes"
-
-msgid "Download dataset (CSV)"
-msgstr "Download dataset (CSV)"
-
-msgid "Download dataset (XLSX)"
-msgstr "Download dataset (XLSX)"
-
-msgid "actor-acs-abbreviation"
-msgstr "actor-acs-abbreviation"
-
-msgid "actor-auns-abbreviation"
-msgstr "actor-auns-abbreviation"
-
-msgid "actor-bdp-abbreviation"
-msgstr "actor-bdp-abbreviation"
-
-msgid "actor-bpuk-abbreviation"
-msgstr "actor-bpuk-abbreviation"
-
-msgid "actor-csp-abbreviation"
-msgstr "actor-csp-abbreviation"
-
-msgid "actor-cvp-fr-abbreviation"
-msgstr "actor-cvp-fr-abbreviation"
-
-msgid "actor-cvp-abbreviation"
-msgstr "actor-cvp-abbreviation"
-
-msgid "actor-dem-abbreviation"
-msgstr "actor-dem-abbreviation"
-
-msgid "actor-dsp-abbreviation"
-msgstr "actor-dsp-abbreviation"
-
-msgid "actor-eco-abbreviation"
-msgstr "actor-eco-abbreviation"
-
-msgid "actor-edk-abbreviation"
-msgstr "actor-edk-abbreviation"
-
-msgid "actor-edu-abbreviation"
-msgstr "actor-edu-abbreviation"
-
-msgid "actor-endk-abbreviation"
-msgstr "actor-endk-abbreviation"
-
-msgid "actor-evp-abbreviation"
-msgstr "actor-evp-abbreviation"
-
-msgid "actor-fdk-abbreviation"
-msgstr "actor-fdk-abbreviation"
-
-msgid "actor-fdp-fr-abbreviation"
-msgstr "actor-fdp-fr-abbreviation"
-
-msgid "actor-fdp-abbreviation"
-msgstr "actor-fdp-abbreviation"
-
-msgid "actor-fmh-abbreviation"
-msgstr "actor-fmh-abbreviation"
-
-msgid "actor-fps-abbreviation"
-msgstr "actor-fps-abbreviation"
-
-msgid "actor-frap-abbreviation"
-msgstr "actor-frap-abbreviation"
-
-msgid "actor-ga-abbreviation"
-msgstr "actor-ga-abbreviation"
-
-msgid "actor-gdk-abbreviation"
-msgstr "actor-gdk-abbreviation"
-
-msgid "actor-gem-abbreviation"
-msgstr "actor-gem-abbreviation"
-
-msgid "actor-glp-abbreviation"
-msgstr "actor-glp-abbreviation"
-
-msgid "actor-gps-abbreviation"
-msgstr "actor-gps-abbreviation"
-
-msgid "actor-gsoa-abbreviation"
-msgstr "actor-gsoa-abbreviation"
-
-msgid "actor-hev-abbreviation"
-msgstr "actor-hev-abbreviation"
-
-msgid "actor-jcvp-abbreviation"
-msgstr "actor-jcvp-abbreviation"
-
-msgid "actor-jfdp-abbreviation"
-msgstr "actor-jfdp-abbreviation"
-
-msgid "actor-jgps-abbreviation"
-msgstr "actor-jgps-abbreviation"
-
-msgid "actor-jldu-abbreviation"
-msgstr "actor-jldu-abbreviation"
-
-msgid "actor-jlps-abbreviation"
-msgstr "actor-jlps-abbreviation"
-
-msgid "actor-jna-abbreviation"
-msgstr "actor-jna-abbreviation"
-
-msgid "actor-jsvp-abbreviation"
-msgstr "actor-jsvp-abbreviation"
-
-msgid "actor-juso-abbreviation"
-msgstr "actor-juso-abbreviation"
-
-msgid "actor-kdk-abbreviation"
-msgstr "actor-kdk-abbreviation"
-
-msgid "actor-kkjpd-abbreviation"
-msgstr "actor-kkjpd-abbreviation"
-
-msgid "actor-kvp-abbreviation"
-msgstr "actor-kvp-abbreviation"
-
-msgid "actor-ldk-abbreviation"
-msgstr "actor-ldk-abbreviation"
-
-msgid "actor-ldu-abbreviation"
-msgstr "actor-ldu-abbreviation"
-
-msgid "actor-lega-abbreviation"
-msgstr "actor-lega-abbreviation"
-
-msgid "actor-lps-abbreviation"
-msgstr "actor-lps-abbreviation"
-
-msgid "actor-mcg-abbreviation"
-msgstr "actor-mcg-abbreviation"
-
-msgid "actor-pda-abbreviation"
-msgstr "actor-pda-abbreviation"
-
-msgid "actor-poch-abbreviation"
-msgstr "actor-poch-abbreviation"
-
-msgid "actor-pps-abbreviation"
-msgstr "actor-pps-abbreviation"
-
-msgid "actor-psa-abbreviation"
-msgstr "actor-psa-abbreviation"
-
-msgid "actor-rep-abbreviation"
-msgstr "actor-rep-abbreviation"
-
-msgid "actor-sab-abbreviation"
-msgstr "actor-sab-abbreviation"
-
-msgid "actor-sante-abbreviation"
-msgstr "actor-sante-abbreviation"
-
-msgid "actor-sav-abbreviation"
-msgstr "actor-sav-abbreviation"
-
-msgid "actor-sbk-abbreviation"
-msgstr "actor-sbk-abbreviation"
-
-msgid "actor-sblv-abbreviation"
-msgstr "actor-sblv-abbreviation"
-
-msgid "actor-sbv-asb-abbreviation"
-msgstr "actor-sbv-asb-abbreviation"
-
-msgid "actor-sbv-usp-abbreviation"
-msgstr "actor-sbv-usp-abbreviation"
-
-msgid "actor-sd-abbreviation"
-msgstr "actor-sd-abbreviation"
-
-msgid "actor-seks-abbreviation"
-msgstr "actor-seks-abbreviation"
-
-msgid "actor-sgb-abbreviation"
-msgstr "actor-sgb-abbreviation"
-
-msgid "actor-sgv-abbreviation"
-msgstr "actor-sgv-abbreviation"
-
-msgid "actor-skos-abbreviation"
-msgstr "actor-skos-abbreviation"
-
-msgid "actor-sks-abbreviation"
-msgstr "actor-sks-abbreviation"
-
-msgid "actor-smv-abbreviation"
-msgstr "actor-smv-abbreviation"
-
-msgid "actor-sodk-abbreviation"
-msgstr "actor-sodk-abbreviation"
-
-msgid "actor-sol-abbreviation"
-msgstr "actor-sol-abbreviation"
-
-msgid "actor-sps-abbreviation"
-msgstr "actor-sps-abbreviation"
-
-msgid "actor-ssv-abbreviation"
-msgstr "actor-ssv-abbreviation"
-
-msgid "actor-svp-abbreviation"
-msgstr "actor-svp-abbreviation"
-
-msgid "actor-tcs-abbreviation"
-msgstr "actor-tcs-abbreviation"
-
-msgid "actor-travs-abbreviation"
-msgstr "actor-travs-abbreviation"
-
-msgid "actor-vcs-abbreviation"
-msgstr "actor-vcs-abbreviation"
-
-msgid "actor-vdk-abbreviation"
-msgstr "actor-vdk-abbreviation"
-
-msgid "actor-voev-abbreviation"
-msgstr "actor-voev-abbreviation"
-
-msgid "actor-vpod-abbreviation"
-msgstr "actor-vpod-abbreviation"
-
-msgid "actor-vsa-abbreviation"
-msgstr "actor-vsa-abbreviation"
-
-msgid "actor-acs-label"
-msgstr "actor-acs-label"
-
-msgid "actor-auns-label"
-msgstr "actor-auns-label"
-
-msgid "actor-bdp-label"
-msgstr "actor-bdp-label"
-
-msgid "actor-bpuk-label"
-msgstr "actor-bpuk-label"
-
-msgid "actor-csp-label"
-msgstr "actor-csp-label"
-
-msgid "actor-cvp-fr-label"
-msgstr "actor-cvp-fr-label"
-
-msgid "actor-cvp-label"
-msgstr "actor-cvp-label"
-
-msgid "actor-dem-label"
-msgstr "actor-dem-label"
-
-msgid "actor-dsp-label"
-msgstr "actor-dsp-label"
-
-msgid "actor-eco-label"
-msgstr "actor-eco-label"
-
-msgid "actor-edk-label"
-msgstr "actor-edk-label"
-
-msgid "actor-edu-label"
-msgstr "actor-edu-label"
-
-msgid "actor-endk-label"
-msgstr "actor-endk-label"
-
-msgid "actor-evp-label"
-msgstr "actor-evp-label"
-
-msgid "actor-fdk-label"
-msgstr "actor-fdk-label"
-
-msgid "actor-fdp-fr-label"
-msgstr "actor-fdp-fr-label"
-
-msgid "actor-fdp-label"
-msgstr "actor-fdp-label"
-
-msgid "actor-fmh-label"
-msgstr "actor-fmh-label"
-
-msgid "actor-fps-label"
-msgstr "actor-fps-label"
-
-msgid "actor-frap-label"
-msgstr "actor-frap-label"
-
-msgid "actor-ga-label"
-msgstr "actor-ga-label"
-
-msgid "actor-gdk-label"
-msgstr "actor-gdk-label"
-
-msgid "actor-gem-label"
-msgstr "actor-gem-label"
-
-msgid "actor-glp-label"
-msgstr "actor-glp-label"
-
-msgid "actor-gps-label"
-msgstr "actor-gps-label"
-
-msgid "actor-gsoa-label"
-msgstr "actor-gsoa-label"
-
-msgid "actor-hev-label"
-msgstr "actor-hev-label"
-
-msgid "actor-jcvp-label"
-msgstr "actor-jcvp-label"
-
-msgid "actor-jfdp-label"
-msgstr "actor-jfdp-label"
-
-msgid "actor-jgps-label"
-msgstr "actor-jgps-label"
-
-msgid "actor-jldu-label"
-msgstr "actor-jldu-label"
-
-msgid "actor-jlps-label"
-msgstr "actor-jlps-label"
-
-msgid "actor-jna-label"
-msgstr "actor-jna-label"
-
-msgid "actor-jsvp-label"
-msgstr "actor-jsvp-label"
-
-msgid "actor-juso-label"
-msgstr "actor-juso-label"
-
-msgid "actor-kdk-label"
-msgstr "actor-kdk-label"
-
-msgid "actor-kkjpd-label"
-msgstr "actor-kkjpd-label"
-
-msgid "actor-kvp-label"
-msgstr "actor-kvp-label"
-
-msgid "actor-ldk-label"
-msgstr "actor-ldk-label"
-
-msgid "actor-ldu-label"
-msgstr "actor-ldu-label"
-
-msgid "actor-lega-label"
-msgstr "actor-lega-label"
-
-msgid "actor-lps-label"
-msgstr "actor-lps-label"
-
-msgid "actor-mcg-label"
-msgstr "actor-mcg-label"
-
-msgid "actor-pda-label"
-msgstr "actor-pda-label"
-
-msgid "actor-poch-label"
-msgstr "actor-poch-label"
-
-msgid "actor-pps-label"
-msgstr "actor-pps-label"
-
-msgid "actor-psa-label"
-msgstr "actor-psa-label"
-
-msgid "actor-rep-label"
-msgstr "actor-rep-label"
-
-msgid "actor-sab-label"
-msgstr "actor-sab-label"
-
-msgid "actor-sante-label"
-msgstr "actor-sante-label"
-
-msgid "actor-sav-label"
-msgstr "actor-sav-label"
-
-msgid "actor-sbk-label"
-msgstr "actor-sbk-label"
-
-msgid "actor-sblv-label"
-msgstr "actor-sblv-label"
-
-msgid "actor-sbv-asb-label"
-msgstr "actor-sbv-asb-label"
-
-msgid "actor-sbv-usp-label"
-msgstr "actor-sbv-usp-label"
-
-msgid "actor-sd-label"
-msgstr "actor-sd-label"
-
-msgid "actor-seks-label"
-msgstr "actor-seks-label"
-
-msgid "actor-sgb-label"
-msgstr "actor-sgb-label"
-
-msgid "actor-sgv-label"
-msgstr "actor-sgv-label"
-
-msgid "actor-skos-label"
-msgstr "actor-skos-label"
-
-msgid "actor-sks-label"
-msgstr "actor-sks-label"
-
-msgid "actor-smv-label"
-msgstr "actor-smv-label"
-
-msgid "actor-sodk-label"
-msgstr "actor-sodk-label"
-
-msgid "actor-sol-label"
-msgstr "actor-sol-label"
-
-msgid "actor-sps-label"
-msgstr "actor-sps-label"
-
-msgid "actor-ssv-label"
-msgstr "actor-ssv-label"
-
-msgid "actor-svp-label"
-msgstr "actor-svp-label"
-
-msgid "actor-tcs-label"
-msgstr "actor-tcs-label"
-
-msgid "actor-travs-label"
-msgstr "actor-travs-label"
-
-msgid "actor-vcs-label"
-msgstr "actor-vcs-label"
-
-msgid "actor-vdk-label"
-msgstr "actor-vdk-label"
-
-msgid "actor-voev-label"
-msgstr "actor-voev-label"
-
-msgid "actor-vpod-label"
-msgstr "actor-vpod-label"
-
-msgid "actor-vsa-label"
-msgstr "actor-vsa-label"
 
 msgid "d-1-1"
 msgstr "d-1-1"
@@ -1153,56 +668,476 @@ msgstr "Free vote"
 msgid "Organization no longer exists"
 msgstr "Organization no longer exists"
 
-msgid "The form contains errors. Please check the fields marked in red."
-msgstr "The form contains errors. Please check the fields marked in red."
+msgid "actor-acs-abbreviation"
+msgstr "actor-acs-abbreviation"
 
-msgid "Login"
-msgstr "Login"
+msgid "actor-auns-abbreviation"
+msgstr "actor-auns-abbreviation"
 
-msgid "Logout"
-msgstr "Logout"
+msgid "actor-bdp-abbreviation"
+msgstr "actor-bdp-abbreviation"
 
-msgid "Forgot your password?"
-msgstr "Forgot your password?"
+msgid "actor-bpuk-abbreviation"
+msgstr "actor-bpuk-abbreviation"
 
-msgid "Reset password"
-msgstr "Reset password"
+msgid "actor-csp-abbreviation"
+msgstr "actor-csp-abbreviation"
 
-msgid "You are here"
-msgstr "You are here"
+msgid "actor-cvp-fr-abbreviation"
+msgstr "actor-cvp-fr-abbreviation"
 
-msgid "Previous Page"
-msgstr "Previous Page"
+msgid "actor-cvp-abbreviation"
+msgstr "actor-cvp-abbreviation"
 
-msgid "Next Page"
-msgstr "Next Page"
+msgid "actor-dem-abbreviation"
+msgstr "actor-dem-abbreviation"
 
-msgid "Cancel"
-msgstr "Cancel"
+msgid "actor-dsp-abbreviation"
+msgstr "actor-dsp-abbreviation"
 
-msgid "Submit"
-msgstr "Submit"
+msgid "actor-eco-abbreviation"
+msgstr "actor-eco-abbreviation"
 
-msgid "Reset"
-msgstr ""
+msgid "actor-edk-abbreviation"
+msgstr "actor-edk-abbreviation"
 
-msgid "Stack"
-msgstr "Stack"
+msgid "actor-edu-abbreviation"
+msgstr "actor-edu-abbreviation"
 
-msgid "Toggle"
-msgstr "Toggle"
+msgid "actor-endk-abbreviation"
+msgstr "actor-endk-abbreviation"
 
-msgid "Columns"
-msgstr "Columns"
+msgid "actor-evp-abbreviation"
+msgstr "actor-evp-abbreviation"
 
-msgid "Dear Sir or Madam,"
-msgstr "Dear Sir or Madam,"
+msgid "actor-fdk-abbreviation"
+msgstr "actor-fdk-abbreviation"
 
-msgid "Click the following link to set a new password:"
-msgstr "Click the following link to set a new password:"
+msgid "actor-fdp-fr-abbreviation"
+msgstr "actor-fdp-fr-abbreviation"
 
-msgid "If you don't want to change your password, you can ignore this email."
-msgstr "If you don't want to change your password, you can ignore this email."
+msgid "actor-fdp-abbreviation"
+msgstr "actor-fdp-abbreviation"
+
+msgid "actor-fmh-abbreviation"
+msgstr "actor-fmh-abbreviation"
+
+msgid "actor-fps-abbreviation"
+msgstr "actor-fps-abbreviation"
+
+msgid "actor-frap-abbreviation"
+msgstr "actor-frap-abbreviation"
+
+msgid "actor-ga-abbreviation"
+msgstr "actor-ga-abbreviation"
+
+msgid "actor-gdk-abbreviation"
+msgstr "actor-gdk-abbreviation"
+
+msgid "actor-gem-abbreviation"
+msgstr "actor-gem-abbreviation"
+
+msgid "actor-glp-abbreviation"
+msgstr "actor-glp-abbreviation"
+
+msgid "actor-gps-abbreviation"
+msgstr "actor-gps-abbreviation"
+
+msgid "actor-gsoa-abbreviation"
+msgstr "actor-gsoa-abbreviation"
+
+msgid "actor-hev-abbreviation"
+msgstr "actor-hev-abbreviation"
+
+msgid "actor-jcvp-abbreviation"
+msgstr "actor-jcvp-abbreviation"
+
+msgid "actor-jfdp-abbreviation"
+msgstr "actor-jfdp-abbreviation"
+
+msgid "actor-jgps-abbreviation"
+msgstr "actor-jgps-abbreviation"
+
+msgid "actor-jldu-abbreviation"
+msgstr "actor-jldu-abbreviation"
+
+msgid "actor-jlps-abbreviation"
+msgstr "actor-jlps-abbreviation"
+
+msgid "actor-jna-abbreviation"
+msgstr "actor-jna-abbreviation"
+
+msgid "actor-jsvp-abbreviation"
+msgstr "actor-jsvp-abbreviation"
+
+msgid "actor-juso-abbreviation"
+msgstr "actor-juso-abbreviation"
+
+msgid "actor-kdk-abbreviation"
+msgstr "actor-kdk-abbreviation"
+
+msgid "actor-kkjpd-abbreviation"
+msgstr "actor-kkjpd-abbreviation"
+
+msgid "actor-kvp-abbreviation"
+msgstr "actor-kvp-abbreviation"
+
+msgid "actor-ldk-abbreviation"
+msgstr "actor-ldk-abbreviation"
+
+msgid "actor-ldu-abbreviation"
+msgstr "actor-ldu-abbreviation"
+
+msgid "actor-lega-abbreviation"
+msgstr "actor-lega-abbreviation"
+
+msgid "actor-lps-abbreviation"
+msgstr "actor-lps-abbreviation"
+
+msgid "actor-mcg-abbreviation"
+msgstr "actor-mcg-abbreviation"
+
+msgid "actor-pda-abbreviation"
+msgstr "actor-pda-abbreviation"
+
+msgid "actor-poch-abbreviation"
+msgstr "actor-poch-abbreviation"
+
+msgid "actor-pps-abbreviation"
+msgstr "actor-pps-abbreviation"
+
+msgid "actor-psa-abbreviation"
+msgstr "actor-psa-abbreviation"
+
+msgid "actor-rep-abbreviation"
+msgstr "actor-rep-abbreviation"
+
+msgid "actor-sab-abbreviation"
+msgstr "actor-sab-abbreviation"
+
+msgid "actor-sante-abbreviation"
+msgstr "actor-sante-abbreviation"
+
+msgid "actor-sav-abbreviation"
+msgstr "actor-sav-abbreviation"
+
+msgid "actor-sbk-abbreviation"
+msgstr "actor-sbk-abbreviation"
+
+msgid "actor-sblv-abbreviation"
+msgstr "actor-sblv-abbreviation"
+
+msgid "actor-sbv-asb-abbreviation"
+msgstr "actor-sbv-asb-abbreviation"
+
+msgid "actor-sbv-usp-abbreviation"
+msgstr "actor-sbv-usp-abbreviation"
+
+msgid "actor-sd-abbreviation"
+msgstr "actor-sd-abbreviation"
+
+msgid "actor-seks-abbreviation"
+msgstr "actor-seks-abbreviation"
+
+msgid "actor-sgb-abbreviation"
+msgstr "actor-sgb-abbreviation"
+
+msgid "actor-sgv-abbreviation"
+msgstr "actor-sgv-abbreviation"
+
+msgid "actor-skos-abbreviation"
+msgstr "actor-skos-abbreviation"
+
+msgid "actor-sks-abbreviation"
+msgstr "actor-sks-abbreviation"
+
+msgid "actor-smv-abbreviation"
+msgstr "actor-smv-abbreviation"
+
+msgid "actor-sodk-abbreviation"
+msgstr "actor-sodk-abbreviation"
+
+msgid "actor-sol-abbreviation"
+msgstr "actor-sol-abbreviation"
+
+msgid "actor-sps-abbreviation"
+msgstr "actor-sps-abbreviation"
+
+msgid "actor-ssv-abbreviation"
+msgstr "actor-ssv-abbreviation"
+
+msgid "actor-svp-abbreviation"
+msgstr "actor-svp-abbreviation"
+
+msgid "actor-tcs-abbreviation"
+msgstr "actor-tcs-abbreviation"
+
+msgid "actor-travs-abbreviation"
+msgstr "actor-travs-abbreviation"
+
+msgid "actor-vcs-abbreviation"
+msgstr "actor-vcs-abbreviation"
+
+msgid "actor-vdk-abbreviation"
+msgstr "actor-vdk-abbreviation"
+
+msgid "actor-voev-abbreviation"
+msgstr "actor-voev-abbreviation"
+
+msgid "actor-vpod-abbreviation"
+msgstr "actor-vpod-abbreviation"
+
+msgid "actor-vsa-abbreviation"
+msgstr "actor-vsa-abbreviation"
+
+msgid "actor-acs-label"
+msgstr "actor-acs-label"
+
+msgid "actor-auns-label"
+msgstr "actor-auns-label"
+
+msgid "actor-bdp-label"
+msgstr "actor-bdp-label"
+
+msgid "actor-bpuk-label"
+msgstr "actor-bpuk-label"
+
+msgid "actor-csp-label"
+msgstr "actor-csp-label"
+
+msgid "actor-cvp-fr-label"
+msgstr "actor-cvp-fr-label"
+
+msgid "actor-cvp-label"
+msgstr "actor-cvp-label"
+
+msgid "actor-dem-label"
+msgstr "actor-dem-label"
+
+msgid "actor-dsp-label"
+msgstr "actor-dsp-label"
+
+msgid "actor-eco-label"
+msgstr "actor-eco-label"
+
+msgid "actor-edk-label"
+msgstr "actor-edk-label"
+
+msgid "actor-edu-label"
+msgstr "actor-edu-label"
+
+msgid "actor-endk-label"
+msgstr "actor-endk-label"
+
+msgid "actor-evp-label"
+msgstr "actor-evp-label"
+
+msgid "actor-fdk-label"
+msgstr "actor-fdk-label"
+
+msgid "actor-fdp-fr-label"
+msgstr "actor-fdp-fr-label"
+
+msgid "actor-fdp-label"
+msgstr "actor-fdp-label"
+
+msgid "actor-fmh-label"
+msgstr "actor-fmh-label"
+
+msgid "actor-fps-label"
+msgstr "actor-fps-label"
+
+msgid "actor-frap-label"
+msgstr "actor-frap-label"
+
+msgid "actor-ga-label"
+msgstr "actor-ga-label"
+
+msgid "actor-gdk-label"
+msgstr "actor-gdk-label"
+
+msgid "actor-gem-label"
+msgstr "actor-gem-label"
+
+msgid "actor-glp-label"
+msgstr "actor-glp-label"
+
+msgid "actor-gps-label"
+msgstr "actor-gps-label"
+
+msgid "actor-gsoa-label"
+msgstr "actor-gsoa-label"
+
+msgid "actor-hev-label"
+msgstr "actor-hev-label"
+
+msgid "actor-jcvp-label"
+msgstr "actor-jcvp-label"
+
+msgid "actor-jfdp-label"
+msgstr "actor-jfdp-label"
+
+msgid "actor-jgps-label"
+msgstr "actor-jgps-label"
+
+msgid "actor-jldu-label"
+msgstr "actor-jldu-label"
+
+msgid "actor-jlps-label"
+msgstr "actor-jlps-label"
+
+msgid "actor-jna-label"
+msgstr "actor-jna-label"
+
+msgid "actor-jsvp-label"
+msgstr "actor-jsvp-label"
+
+msgid "actor-juso-label"
+msgstr "actor-juso-label"
+
+msgid "actor-kdk-label"
+msgstr "actor-kdk-label"
+
+msgid "actor-kkjpd-label"
+msgstr "actor-kkjpd-label"
+
+msgid "actor-kvp-label"
+msgstr "actor-kvp-label"
+
+msgid "actor-ldk-label"
+msgstr "actor-ldk-label"
+
+msgid "actor-ldu-label"
+msgstr "actor-ldu-label"
+
+msgid "actor-lega-label"
+msgstr "actor-lega-label"
+
+msgid "actor-lps-label"
+msgstr "actor-lps-label"
+
+msgid "actor-mcg-label"
+msgstr "actor-mcg-label"
+
+msgid "actor-pda-label"
+msgstr "actor-pda-label"
+
+msgid "actor-poch-label"
+msgstr "actor-poch-label"
+
+msgid "actor-pps-label"
+msgstr "actor-pps-label"
+
+msgid "actor-psa-label"
+msgstr "actor-psa-label"
+
+msgid "actor-rep-label"
+msgstr "actor-rep-label"
+
+msgid "actor-sab-label"
+msgstr "actor-sab-label"
+
+msgid "actor-sante-label"
+msgstr "actor-sante-label"
+
+msgid "actor-sav-label"
+msgstr "actor-sav-label"
+
+msgid "actor-sbk-label"
+msgstr "actor-sbk-label"
+
+msgid "actor-sblv-label"
+msgstr "actor-sblv-label"
+
+msgid "actor-sbv-asb-label"
+msgstr "actor-sbv-asb-label"
+
+msgid "actor-sbv-usp-label"
+msgstr "actor-sbv-usp-label"
+
+msgid "actor-sd-label"
+msgstr "actor-sd-label"
+
+msgid "actor-seks-label"
+msgstr "actor-seks-label"
+
+msgid "actor-sgb-label"
+msgstr "actor-sgb-label"
+
+msgid "actor-sgv-label"
+msgstr "actor-sgv-label"
+
+msgid "actor-skos-label"
+msgstr "actor-skos-label"
+
+msgid "actor-sks-label"
+msgstr "actor-sks-label"
+
+msgid "actor-smv-label"
+msgstr "actor-smv-label"
+
+msgid "actor-sodk-label"
+msgstr "actor-sodk-label"
+
+msgid "actor-sol-label"
+msgstr "actor-sol-label"
+
+msgid "actor-sps-label"
+msgstr "actor-sps-label"
+
+msgid "actor-ssv-label"
+msgstr "actor-ssv-label"
+
+msgid "actor-svp-label"
+msgstr "actor-svp-label"
+
+msgid "actor-tcs-label"
+msgstr "actor-tcs-label"
+
+msgid "actor-travs-label"
+msgstr "actor-travs-label"
+
+msgid "actor-vcs-label"
+msgstr "actor-vcs-label"
+
+msgid "actor-vdk-label"
+msgstr "actor-vdk-label"
+
+msgid "actor-voev-label"
+msgstr "actor-voev-label"
+
+msgid "actor-vpod-label"
+msgstr "actor-vpod-label"
+
+msgid "actor-vsa-label"
+msgstr "actor-vsa-label"
+
+msgid "Edit page"
+msgstr "Edit page"
+
+msgid "Votes"
+msgstr "Votes"
+
+msgid "Update dataset"
+msgstr "Update dataset"
+
+msgid "Delete all votes"
+msgstr "Delete all votes"
+
+msgid "Download dataset (CSV)"
+msgstr "Download dataset (CSV)"
+
+msgid "Download dataset (XLSX)"
+msgstr "Download dataset (XLSX)"
+
+msgid "Voter strengths"
+msgstr "Voter strengths"
+
+msgid "Manage attachments"
+msgstr "Manage attachments"
+
+msgid "Delete vote"
+msgstr "Delete vote"
 
 msgid "Voting campaign"
 msgstr "Voting campaign"
@@ -1224,6 +1159,9 @@ msgstr "Party"
 
 msgid "Others"
 msgstr "Others"
+
+msgid "The form contains errors. Please check the fields marked in red."
+msgstr "The form contains errors. Please check the fields marked in red."
 
 msgid "General"
 msgstr "General"
@@ -1306,6 +1244,54 @@ msgstr "Cantons"
 msgid "Turnout"
 msgstr "Turnout"
 
+msgid "You are here"
+msgstr "You are here"
+
+msgid "Previous Page"
+msgstr "Previous Page"
+
+msgid "Next Page"
+msgstr "Next Page"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Submit"
+msgstr "Submit"
+
+msgid "Reset"
+msgstr ""
+
+msgid "Stack"
+msgstr "Stack"
+
+msgid "Toggle"
+msgstr "Toggle"
+
+msgid "Columns"
+msgstr "Columns"
+
+msgid "Forgot your password?"
+msgstr "Forgot your password?"
+
+msgid "Reset password"
+msgstr "Reset password"
+
+msgid "Dear Sir or Madam,"
+msgstr "Dear Sir or Madam,"
+
+msgid "Click the following link to set a new password:"
+msgstr "Click the following link to set a new password:"
+
+msgid "If you don't want to change your password, you can ignore this email."
+msgstr "If you don't want to change your password, you can ignore this email."
+
+msgid "Login"
+msgstr "Login"
+
+msgid "Logout"
+msgstr "Logout"
+
 msgid "Filter"
 msgstr "Filter"
 
@@ -1315,8 +1301,22 @@ msgstr "Results"
 msgid "Date"
 msgstr "Date"
 
-msgid "Yeas People"
-msgstr "Yeas People"
+msgid "Yeas Percentage People"
+msgstr ""
+
+msgid "No data."
+msgstr ""
+
+#, python-format
+msgid "Some columns are missing: ${columns}."
+msgstr ""
+
+#, python-format
+msgid "Some cells contain invalid values: ${errors}."
+msgstr ""
+
+msgid "Not a valid XLSX file."
+msgstr ""
 
 msgid "Wrong username or password"
 msgstr "Wrong username or password"
@@ -1338,30 +1338,8 @@ msgstr "Password changed."
 msgid "Password reset"
 msgstr "Password reset"
 
-msgid "Access Denied"
-msgstr "Access Denied"
-
-msgid "You are trying to open a page for which you are not authorized."
-msgstr "You are trying to open a page for which you are not authorized."
-
-msgid "Page not Found"
-msgstr "Page not Found"
-
-msgid "The page you are looking for could not be found."
-msgstr "The page you are looking for could not be found."
-
 msgid "Page modified."
 msgstr "Page modified."
-
-#, python-format
-msgid "Do you really want to delete \"${item}\"?"
-msgstr "Do you really want to delete \"${item}\"?"
-
-msgid "Attachments updated"
-msgstr "Attachments updated"
-
-msgid "Vote deleted"
-msgstr "Vote deleted"
 
 msgid "Do you really want to delete all votes?!"
 msgstr "Do you really want to delete all votes?!"
@@ -1376,3 +1354,28 @@ msgstr "All votes deleted"
 #, python-format
 msgid "The dataset contains unknown descriptors: ${items}."
 msgstr "The dataset contains unknown descriptors: ${items}."
+
+#, python-format
+msgid "Do you really want to delete \"${item}\"?"
+msgstr "Do you really want to delete \"${item}\"?"
+
+msgid "Attachments updated"
+msgstr "Attachments updated"
+
+msgid "Vote deleted"
+msgstr "Vote deleted"
+
+msgid "Access Denied"
+msgstr "Access Denied"
+
+msgid "You are trying to open a page for which you are not authorized."
+msgstr "You are trying to open a page for which you are not authorized."
+
+msgid "Page not Found"
+msgstr "Page not Found"
+
+msgid "The page you are looking for could not be found."
+msgstr "The page you are looking for could not be found."
+
+#~ msgid "Yeas People"
+#~ msgstr "Yeas People"

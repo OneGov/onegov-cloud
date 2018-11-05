@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Reorders the votes columns.
+  [msom]
+
 - Uses the latest onegov.form.
   [msom]
 
