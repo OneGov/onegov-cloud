@@ -50,13 +50,17 @@
                 <!-- Submission (popular initiatives) -->
                 <tal:block tal:condition="vote._legal_form == 3">
                     <tr>
-                        <th scope="rowgroup" rowspan="2" class="hide-for-small" i18n:translate>Submission</th>
+                        <th scope="rowgroup" rowspan="3" class="hide-for-small" i18n:translate>Submission</th>
                         <th scope="row" i18n:translate>Signatures</th>
                         <td>${layout.format_number(vote.signatures_valid)}</td>
                     </tr>
                     <tr>
                         <th scope="row" i18n:translate>Initiator</th>
                         <td>${vote.initiator}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" i18n:translate>Realization</th>
+                        <td><a tal:condition="vote.realization" href="${request.link(vote.realization)}">PDF</a></td>
                     </tr>
                 </tal:block>
                 <!-- Pre-parliamentary phase -->
@@ -112,13 +116,17 @@
                 <!-- Submission (optional referendum) -->
                 <tal:block tal:condition="vote._legal_form == 2">
                     <tr>
-                        <th scope="rowgroup" rowspan="2" class="hide-for-small" i18n:translate>Submission</th>
+                        <th scope="rowgroup" rowspan="3" class="hide-for-small" i18n:translate>Submission</th>
                         <th scope="row" i18n:translate>Signatures</th>
                         <td>${layout.format_number(vote.signatures_valid)}</td>
                     </tr>
                     <tr>
                         <th scope="row" i18n:translate>Initiator</th>
                         <td>${vote.initiator}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" i18n:translate>Realization</th>
+                        <td><a tal:condition="vote.realization" href="${request.link(vote.realization)}">PDF</a></td>
                     </tr>
                 </tal:block>
                 <!-- Voting campaign -->
@@ -150,7 +158,7 @@
                 </tr>
                 <!-- Results -->
                 <tr>
-                    <th scope="rowgroup" rowspan="5" class="hide-for-small" i18n:translate>Vote</th>
+                    <th scope="rowgroup" rowspan="6" class="hide-for-small" i18n:translate>Vote</th>
                     <th scope="row" i18n:translate>Voting result</th>
                     <td>${vote.result}</td>
                 </tr>
@@ -179,6 +187,10 @@
                 <tr>
                     <th scope="row" i18n:translate>Voting booklet</th>
                     <td><a tal:condition="vote.voting_booklet" href="${request.link(vote.voting_booklet)}">PDF</a></td>
+                </tr>
+                <tr>
+                    <th scope="row" i18n:translate>Resolution</th>
+                    <td><a tal:condition="vote.resolution" href="${request.link(vote.resolution)}">PDF</a></td>
                 </tr>
             </table>
         </div>

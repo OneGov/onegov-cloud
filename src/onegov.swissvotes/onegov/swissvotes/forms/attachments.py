@@ -44,6 +44,22 @@ class AttachmentsForm(Form):
         ]
     )
 
+    resolution = UploadField(
+        label=_("Resolution"),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(25 * 1024 * 1024)
+        ]
+    )
+
+    realization = UploadField(
+        label=_("Realization"),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(25 * 1024 * 1024)
+        ]
+    )
+
     def update_model(self, model):
         locale = self.request.locale
         if self.voting_text.action == 'delete':
@@ -90,6 +106,28 @@ class AttachmentsForm(Form):
                 )
                 model.voting_booklet = voting_booklet
 
+        if self.resolution.action == 'delete':
+            del model.resolution
+        if self.resolution.action == 'replace':
+            if self.resolution.data:
+                resolution = SwissVoteFile(id=random_token())
+                resolution.reference = as_fileintent(
+                    self.resolution.raw_data[-1].file,
+                    f'resolution-{locale}'
+                )
+                model.resolution = resolution
+
+        if self.realization.action == 'delete':
+            del model.realization
+        if self.realization.action == 'replace':
+            if self.realization.data:
+                realization = SwissVoteFile(id=random_token())
+                realization.reference = as_fileintent(
+                    self.realization.raw_data[-1].file,
+                    f'realization-{locale}'
+                )
+                model.realization = realization
+
     def apply_model(self, model):
         def assign_file(field, file):
             # todo: implement something better
@@ -118,4 +156,14 @@ class AttachmentsForm(Form):
             assign_file(
                 self.voting_booklet,
                 self.model.voting_booklet
+            )
+        if self.model.resolution:
+            assign_file(
+                self.resolution,
+                self.model.resolution
+            )
+        if self.model.realization:
+            assign_file(
+                self.realization,
+                self.model.realization
             )

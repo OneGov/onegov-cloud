@@ -91,7 +91,9 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
         'voting_text',
         'federal_council_message',
         'parliamentary_debate',
-        # we don't include the voting_booklet, they contain other votes!
+        # we don't include the voting_booklet and the resolution, they might
+        # contain other votes from the same day!
+        'realization'
     }
 
     id = Column(Integer, nullable=False, primary_key=True)
@@ -221,6 +223,8 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     federal_council_message = LocalizedFile()
     parliamentary_debate = LocalizedFile()
     voting_booklet = LocalizedFile()
+    resolution = LocalizedFile()
+    realization = LocalizedFile()
 
     # searchable attachment texts
     searchable_text_de_CH = Column(TSVECTOR)
@@ -232,7 +236,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
                 SwissVote.__dict__[file].__get_by_locale__(self, locale)
                 for file in self.indexed_files
             ]
-            text = ' '.join([file.extract for file in files if file]).strip()
+            text = ' '.join([f.extract or '' for f in files if f]).strip()
             if text:
                 setattr(
                     self,

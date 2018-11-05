@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds resolution and realization attachments.
+  [msom]
+
 - Reorders the votes columns.
   [msom]
 
