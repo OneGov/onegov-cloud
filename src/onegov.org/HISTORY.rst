@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.40.6 (2018-11-05)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes json export failing for time values.
   [href]
 
