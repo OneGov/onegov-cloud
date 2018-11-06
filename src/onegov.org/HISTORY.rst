@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes a few more instances where the wrong cursor would show up.
+  [href]
+
 0.40.6 (2018-11-05)
 ~~~~~~~~~~~~~~~~~~~
 

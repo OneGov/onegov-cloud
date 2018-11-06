@@ -782,7 +782,7 @@ ReservationSelection = React.createClass({
                                 return (
                                     <li key={ix} className="reservation">
                                         <span className="reservation-date" data-quota={r.quota}>
-                                            <a onClick={boundGotoDate} title={locale('Goto date')}>
+                                            <a onClick={boundGotoDate} title={locale('Goto date')} role="link">
                                                 {date.format('ddd LL')}
                                             </a>
                                         </span>
@@ -792,7 +792,7 @@ ReservationSelection = React.createClass({
                                                 {r.price.amount.toFixed(2)} {r.price.currency}
                                             </span>
                                         )}
-                                        <a className="delete" onClick={boundClick}>{locale('Remove')}</a>
+                                        <a className="delete" onClick={boundClick} role="button">{locale('Remove')}</a>
                                     </li>
                                 );
                             })
@@ -806,12 +806,12 @@ ReservationSelection = React.createClass({
                     this.props.prediction &&
                         <div className="prediction reservation">
                             <span className="reservation-date" data-quota={this.props.prediction.quota}>
-                                <a onClick={boundGotoPredictionDate} title={locale('Goto date')}>
+                                <a onClick={boundGotoPredictionDate} title={locale('Goto date')} role="link">
                                     {prediction_date.format('ddd LL')}
                                 </a>
                             </span>
                             <span className="reservation-time">{this.props.prediction.time}</span>
-                            <a className="reserve" onClick={self.handleReservePrediction}>{locale('Add Suggestion')}</a>
+                            <a className="reserve" onClick={self.handleReservePrediction} role="button">{locale('Add Suggestion')}</a>
                         </div>
                 }
             </div>
