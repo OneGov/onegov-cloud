@@ -1,13 +1,13 @@
-from onegov.people import AgencyMembership
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
-from onegov.agency.models import ExtendedAgency
-from onegov.agency.models import ExtendedPerson
 from onegov.agency.layouts import AgencyCollectionLayout
 from onegov.agency.layouts import AgencyLayout
-from onegov.agency.layouts import MembershipLayout
 from onegov.agency.layouts import ExtendedPersonCollectionLayout
 from onegov.agency.layouts import ExtendedPersonLayout
+from onegov.agency.layouts import MembershipLayout
+from onegov.agency.models import ExtendedAgency
+from onegov.agency.models import ExtendedPerson
+from onegov.people import AgencyMembership
 
 
 class DummyApp(object):
