@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds vCards to people.
+  [msom]
+
 0.4.0 (2018-10-29)
 ~~~~~~~~~~~~~~~~~~~
 

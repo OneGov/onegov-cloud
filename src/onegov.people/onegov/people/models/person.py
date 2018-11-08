@@ -6,6 +6,9 @@ from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import Text
 from uuid import uuid4
+from vobject import vCard
+from vobject.vcard import Address
+from vobject.vcard import Name
 
 
 class Person(Base, ContentMixin, TimestampMixin, ORMSearchable):
@@ -83,3 +86,25 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     #: some remarks about the person
     notes = Column(Text, nullable=True)
+
+    @property
+    def vcard(self):
+        result = vCard()
+        result.add('n').value = Name(
+            prefix=self.salutation or "",
+            given=self.first_name or "",
+            family=self.last_name or "",
+        )
+        result.add('fn').value = self.spoken_title
+        result.add('title').value = self.function or ""
+        result.add('adr').value = Address(street=self.address or "")
+        result.add('email').value = self.email or ""
+        result.add('tel').value = self.phone or ""
+        result.add('url').value = self.website or ""
+        result.add('photo').value = self.picture_url or ""
+        for membership in self.memberships:
+                result.add('org').value = [
+                    membership.agency.title,
+                    membership.title
+                ]
+        return result.serialize()

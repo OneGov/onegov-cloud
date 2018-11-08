@@ -36,6 +36,7 @@ setup(
         'onegov.core>=0.4.0',
         'onegov.file',
         'onegov.search>=1.1.0',
+        'vobject'
     ],
     extras_require=dict(
         test=[

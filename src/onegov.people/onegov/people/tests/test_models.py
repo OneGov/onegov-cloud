@@ -41,6 +41,48 @@ def test_person(session):
     assert person.spoken_title == "Hans Maulwurf"
 
 
+def test_person_vcard(session):
+    person = Person(
+        salutation="Dr.",
+        first_name="Erika",
+        last_name="Mustermann",
+        picture_url=(
+            "http://commons.wikimedia.org/wiki/"
+            "File:Erika_Mustermann_2010.jpg"
+        ),
+        phone="+49 221 9999123",
+        address="Heidestraße 17\n51147 Köln\nGermany",
+        email="erika@mustermann.de",
+        website="http://de.wikipedia.org/"
+    )
+    session.add(person)
+    session.flush()
+
+    agency = Agency(
+        name="wikimedia",
+        title="Wikimedia"
+    )
+    agency.add_person(person, "Redaktion & Gestaltung")
+    session.add(agency)
+    session.flush()
+
+    vcard = person.vcard
+    assert "BEGIN:VCARD" in vcard
+    assert "VERSION:3.0" in vcard
+    assert "N:Mustermann;Erika;;Dr.;" in vcard
+    assert "FN:Dr. Erika Mustermann" in vcard
+    assert "ORG:Wikimedia;Redaktion & Gestaltung" in vcard
+    assert (
+        "PHOTO:http://commons.wikimedia.org/wiki/"
+        "File:Erika_Mustermann_2010.jpg"
+    ) in vcard
+    assert "TEL:+49 221 9999123" in vcard
+    assert "ADR:;;Heidestraße 17\\n51147 Köln\\nGermany;;;;" in vcard
+    assert "EMAIL:erika@mustermann.de" in vcard
+    assert "URL:http://de.wikipedia.org/" in vcard
+    assert "END:VCARD" in vcard
+
+
 def test_person_polymorphism(session):
 
     class MyPerson(Person):
