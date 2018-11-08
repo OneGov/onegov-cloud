@@ -43,7 +43,7 @@ class SogcConverter(object):
 
     def issues(self, session):
         query = session.query(Issue.name)
-        query = query.filter(Issue.date > self.publication_date)
+        query = query.filter(Issue.date >= self.publication_date)
         query = query.order_by(Issue.date)
         query = query.first()
         return [query.name] if query else []

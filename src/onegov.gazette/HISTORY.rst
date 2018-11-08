@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Allows to publish imported SOGC notices on the same date.
+  [msom]
+
 1.17.3 (2018-10-30)
 ~~~~~~~~~~~~~~~~~~~~
 
