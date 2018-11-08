@@ -209,7 +209,7 @@
             </tal:b>
         </tal:b>
         <tal:b condition="cancel|nothing">
-            <a class="button secondary cancel-button" href="${cancel}" i18n:translate="">
+            <a class="button secondary cancel-button" href="${cancel}" i18n:translate="" role="button">
                 <tal:b condition="not:cancel_text|nothing">
                     Cancel
                 </tal:b>
@@ -222,7 +222,7 @@
             <input type="submit" value="Submit" class="button" i18n:attributes="value">
         </tal:b>
         <tal:b condition="button_text|nothing">
-            <input type="submit" value="${button_text}" class="button">
+            <input type="submit" value="${button_text}" class="button" role="button">
         </tal:b>
     </form>
 </metal:form>
@@ -1366,7 +1366,7 @@
             </tal:b>
         </div>
         <div class="columns small-2 file-actions">
-            <a class="button secondary confirm delete"
+            <a class="button secondary confirm delete" role="button"
                 ic-delete-from="${request.link(file)}?csrf-token=${layout.csrf_token}"
                 ic-on-success="
                     var info = $(elt).closest('tr');
@@ -1382,7 +1382,7 @@
                 i18n:translate>
                 Delete
             </a>
-            <a class="button secondary rename prompt"
+            <a class="button secondary rename prompt" role="button"
                 data-prompt="Please provide the new name for the file"
                 data-prompt-ok="Rename"
                 data-prompt-cancel="Cancel"

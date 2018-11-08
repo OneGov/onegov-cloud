@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds 'button' role to more links.
+  [href]
+
 0.40.7 (2018-11-06)
 ~~~~~~~~~~~~~~~~~~~
 
