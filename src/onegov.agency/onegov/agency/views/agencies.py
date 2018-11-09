@@ -8,7 +8,7 @@ from onegov.agency.forms import MembershipForm
 from onegov.agency.layouts import AgencyCollectionLayout
 from onegov.agency.layouts import AgencyLayout
 from onegov.agency.models import ExtendedAgency
-from onegov.agency.pdf import AgencyPdf
+from onegov.agency.pdf import DefaultAgencyPdf
 from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
@@ -178,9 +178,12 @@ def get_root_pdf(self, request):
 def create_agency_pdf(self, request, form):
 
     if form.submitted(request):
-        self.pdf_file = AgencyPdf.from_agencies(
-            [self],
-            request.app.org.name
+        self.pdf_file = DefaultAgencyPdf.from_agencies(
+            agencies=[self],
+            author=request.app.org.name,
+            title="",
+            toc=False,
+            exclude=request.app.org.hidden_people_fields
         )
         request.success(_("PDF created"))
         return redirect(request.link(self))

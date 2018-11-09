@@ -6,10 +6,11 @@ from onegov.pdf import Pdf
 from reportlab.lib.units import cm
 
 
-class AgencyPdf(Pdf):
+class DefaultAgencyPdf(Pdf):
+    """ A standard PDF of an agency. """
 
     @classmethod
-    def from_agencies(cls, agencies, author, title="", toc=False):
+    def from_agencies(cls, agencies, author, title, toc, exclude):
         """ Create an index PDF from a collection of notices. """
 
         result = BytesIO()
@@ -29,14 +30,14 @@ class AgencyPdf(Pdf):
             pdf.table_of_contents()
             pdf.pagebreak()
         for agency in agencies:
-            pdf.agency(agency)
+            pdf.agency(agency, exclude)
             pdf.pagebreak()
         pdf.generate()
 
         result.seek(0)
         return result
 
-    def memberships(self, agency):
+    def memberships(self, agency, exclude):
         """ Adds the memberships of an agency as table. """
 
         data = []
@@ -55,6 +56,8 @@ class AgencyPdf(Pdf):
                         description.append(getattr(membership, field))
                     if field.startswith('person.'):
                         field = field.split('person.')[1]
+                        if field in exclude:
+                            continue
                         description.append(getattr(membership.person, field))
             description = ', '.join([part for part in description if part])
 
@@ -66,7 +69,7 @@ class AgencyPdf(Pdf):
 
         self.table(data, [5.5 * cm, 0.5 * cm, None])
 
-    def agency(self, agency, level=1, content_so_far=False):
+    def agency(self, agency, exclude, level=1, content_so_far=False):
         """ Adds a single agency with the portrait and memberships. """
 
         if (level < 4) and content_so_far:
@@ -83,7 +86,7 @@ class AgencyPdf(Pdf):
             has_content = True
 
         if agency.memberships.count():
-            self.memberships(agency)
+            self.memberships(agency, exclude)
             has_content = True
 
         if agency.organigram_file:
@@ -94,7 +97,7 @@ class AgencyPdf(Pdf):
 
         for child in agency.children:
             child_has_content = self.agency(
-                child, level + 1, has_content
+                child, exclude, level + 1, has_content
             )
             has_content = has_content or child_has_content
 

@@ -8,7 +8,7 @@ from html5lib.filters.whitespace import Filter as whitespace_filter
 from io import BytesIO
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
-from onegov.agency.pdf import AgencyPdf
+from onegov.agency.pdf import DefaultAgencyPdf
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.core.html import html_to_text
@@ -250,19 +250,23 @@ def create_pdf(group_context, root, recursive):
         agencies = ExtendedAgencyCollection(session)
 
         if root:
-            app.root_pdf = AgencyPdf.from_agencies(
-                agencies.roots,
-                app.org.name,
+            app.root_pdf = DefaultAgencyPdf.from_agencies(
+                agencies=agencies.roots,
+                author=app.org.name,
                 title=app.org.name,
-                toc=True
+                toc=True,
+                exclude=app.org.hidden_people_fields
             )
             click.secho("Root PDF created", fg='green')
 
         if recursive:
             for agency in agencies.query():
-                agency.pdf_file = AgencyPdf.from_agencies(
-                    [agency],
-                    app.org.name
+                agency.pdf_file = DefaultAgencyPdf.from_agencies(
+                    agencies=[agency],
+                    author=app.org.name,
+                    title="",
+                    toc=False,
+                    exclude=app.org.hidden_people_fields
                 )
                 click.secho(f"Created PDF of '{agency.title}'", fg='green')
 
