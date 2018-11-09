@@ -28,11 +28,6 @@ class MembershipForm(Form):
         label=_("Since"),
     )
 
-    def get_useful_data(self):
-        result = super(MembershipForm, self).get_useful_data()
-        result['person'] = self.person_id.data
-        return result
-
     def on_request(self):
         self.request.include('common')
         self.request.include('chosen')

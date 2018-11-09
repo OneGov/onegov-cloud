@@ -110,7 +110,6 @@ def test_membership_form(session):
     }))
     assert form.get_useful_data() == {
         'person_id': str(doctor.id),
-        'person': str(doctor.id),
         'since': "2000",
         'title': "Doctor",
     }

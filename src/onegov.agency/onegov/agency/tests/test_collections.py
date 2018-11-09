@@ -48,8 +48,8 @@ def test_extended_people_filter(session):
     ned = people.add(first_name="Ned", last_name="Flanders")
 
     agencies = ExtendedAgencyCollection(session)
-    agencies.add_root(title="Police").add_person(ned, "Snitch")
-    agencies.add_root(title="Ħospital").add_person(ned, "Volunteer")
+    agencies.add_root(title="Police").add_person(ned.id, "Snitch")
+    agencies.add_root(title="Ħospital").add_person(ned.id, "Volunteer")
     agencies.add_root(title="Moe's Tavern")
 
     assert [p.last_name for p in people.query()] == [
@@ -94,7 +94,7 @@ def test_extended_people_used_agencies(session):
 
     people = ExtendedPersonCollection(session)
     ned = people.add(first_name="Ned", last_name="Flanders")
-    police.add_person(ned, "Snitch")
-    hospital.add_person(ned, "Volunteer")
+    police.add_person(ned.id, "Snitch")
+    hospital.add_person(ned.id, "Volunteer")
 
     assert people.used_agencies == ['Ħospital', 'Police']
