@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-10-18 09:52+0200\n"
+"POT-Creation-Date: 2018-11-09 07:30+0100\n"
 "PO-Revision-Date: 2018-09-24 12:21+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2362,6 +2362,9 @@ msgstr "Aucun fichier téléchargé pour le moment"
 
 msgid "The OneGov Cloud Team"
 msgstr "L'équipe de OneGov Cloud"
+
+msgid "Export a vCard of this person"
+msgstr ""
 
 msgid "No payments yet."
 msgstr "Pas de paiements pour le moment."

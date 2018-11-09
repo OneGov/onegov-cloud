@@ -750,6 +750,10 @@ def test_people_view(client):
 
     assert 'Gordon Flash' in person
 
+    vcard = person.click('Elektronische Visitenkarte').text
+    assert 'FN:Flash Gordon' in vcard
+    assert 'N:Gordon;Flash;;;' in vcard
+
     people = client.get('/people')
 
     assert 'Gordon Flash' in people

@@ -1,5 +1,6 @@
 import morepath
 
+from morepath.request import Response
 from onegov.core.security import Public, Private
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
@@ -87,3 +88,14 @@ def handle_edit_person(self, request, form):
 def handle_delete_person(self, request):
     request.assert_valid_csrf_token()
     PersonCollection(request.session).delete(self)
+
+
+@OrgApp.view(model=Person, name='vcard', permission=Public)
+def vcard_export_person(self, request):
+    """ Returns the persons vCard. """
+
+    return Response(
+        self.vcard,
+        content_type='text/vcard',
+        content_disposition='inline; filename=card.vcf'
+    )
