@@ -11,6 +11,19 @@ from vobject.vcard import Address
 from vobject.vcard import Name
 
 
+DEFAULT_VCARD_FIELDS = (
+    'salutation',
+    'academic_title',
+    'function',
+    'picture_url',
+    'email',
+    'phone',
+    'phone_direct',
+    'website',
+    'address',
+)
+
+
 class Person(Base, ContentMixin, TimestampMixin, ORMSearchable):
     """ A person. """
 
@@ -108,21 +121,12 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable):
         """ Returns the person as vCard (3.0).
 
         Allows to specify the included attributes, provides a reasonable
-        default if none are specified.
+        default if none are specified. Always includes the first and last
+        name.
 
         """
         if fields is None:
-            fields = (
-                'salutation',
-                'academic_title',
-                'function',
-                'picture_url',
-                'email',
-                'phone',
-                'phone_direct',
-                'website',
-                'address',
-            )
+            fields = DEFAULT_VCARD_FIELDS
 
         result = vCard()
 
