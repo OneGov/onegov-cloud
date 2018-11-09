@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-10-26 11:11+0200\n"
+"POT-Creation-Date: 2018-11-09 17:10+0100\n"
 "PO-Revision-Date: 2018-10-26 11:12+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -18,51 +18,6 @@ msgstr "Personen"
 
 msgid "Agencies"
 msgstr "Organisationen"
-
-msgid "Private"
-msgstr "Privat"
-
-msgid "Public"
-msgstr "Öffentlich"
-
-msgid "Academic Title"
-msgstr "Akademischer Titel"
-
-msgid "First name"
-msgstr "Vorname"
-
-msgid "Last name"
-msgstr "Nachname"
-
-msgid "Profession"
-msgstr "Beruf"
-
-msgid "Political Party"
-msgstr "Politische Partei"
-
-msgid "Year"
-msgstr "Jahrgang"
-
-msgid "Address"
-msgstr "Adresse"
-
-msgid "Phone"
-msgstr "Telefon"
-
-msgid "Direct Phone"
-msgstr "Direktnummer"
-
-msgid "Salutation"
-msgstr "Anrede"
-
-msgid "Email"
-msgstr "E-Mail"
-
-msgid "Website"
-msgstr "Webseite"
-
-msgid "Notes"
-msgstr "Bemerkungen"
 
 msgid "Title"
 msgstr "Titel"
@@ -121,6 +76,60 @@ msgstr "Person"
 msgid "Since"
 msgstr "Eintritt"
 
+msgid "ID"
+msgstr ""
+
+msgid "Suborganizations"
+msgstr "Unterorganisationen"
+
+msgid "Export Fields"
+msgstr ""
+
+msgid "Salutation"
+msgstr "Anrede"
+
+msgid "Academic Title"
+msgstr "Akademischer Titel"
+
+msgid "First name"
+msgstr "Vorname"
+
+msgid "Last name"
+msgstr "Nachname"
+
+msgid "Profession"
+msgstr "Beruf"
+
+msgid "Political Party"
+msgstr "Politische Partei"
+
+msgid "Year"
+msgstr "Jahrgang"
+
+msgid "Address"
+msgstr "Adresse"
+
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "Direct Phone"
+msgstr "Direktnummer"
+
+msgid "Email"
+msgstr "E-Mail"
+
+msgid "Website"
+msgstr "Webseite"
+
+msgid "Notes"
+msgstr "Bemerkungen"
+
+msgid "Memberships"
+msgstr "Mitgliedschaften"
+
+msgid "Agency"
+msgstr "Organisation"
+
 msgid "Homepage"
 msgstr "Startseite"
 
@@ -145,9 +154,6 @@ msgstr "Dies kann nicht rückgängig gemacht werden."
 msgid "Delete agency"
 msgstr "Organisation löschen"
 
-msgid "Agency"
-msgstr "Organisation"
-
 msgid "Membership"
 msgstr "Mitgliedschaft"
 
@@ -157,38 +163,14 @@ msgstr "Möchten Sie die Mitgliedschaft wirklich löschen?"
 msgid "Delete membership"
 msgstr "Mitgliedschaft löschen"
 
-msgid "No people found."
-msgstr "Keine Personen gefunden."
-
-msgid "Letter"
-msgstr "Buchstabe"
-
-msgid "Propose entry"
-msgstr "Eintrag vorschlagen"
-
-msgid "Propose a new entry"
-msgstr "Einen neuen Eintrag vorschlagen"
-
-msgid "Suborganizations"
-msgstr "Unterorganisationen"
-
-msgid "Memberships"
-msgstr "Mitgliedschaften"
-
-msgid "Report change"
-msgstr "Mutation melden"
-
-msgid "Report a change"
-msgstr "Eine Mutation melden"
+msgid "Born"
+msgstr ""
 
 msgid "Exports"
 msgstr "Exporte"
 
 msgid "Export a vCard of this person"
 msgstr "Elektronische Visitenkarte (vCard)"
-
-msgid "Report a change of personnel"
-msgstr "Eine Mutation melden"
 
 msgid "No agencies added yet."
 msgstr "Es wurden noch keine Organisationen hinzugefügt."
@@ -198,6 +180,12 @@ msgstr "Gesamter Staatskalender als PDF"
 
 msgid "Export this agency and its children as a PDF"
 msgstr "Organisation als PDF speichern"
+
+msgid "No people found."
+msgstr "Keine Personen gefunden."
+
+msgid "Letter"
+msgstr "Buchstabe"
 
 msgid "New agency"
 msgstr "Neue Organisation"
@@ -232,15 +220,3 @@ msgstr "Neue Person"
 
 msgid "Added a new person"
 msgstr "Eine neue Person wurde hinzugefügt"
-
-#~ msgid "Keywords"
-#~ msgstr "Stichworte"
-
-#~ msgid "Description"
-#~ msgstr "Beschreibung"
-
-#~ msgid "No people added yet."
-#~ msgstr "Es wurden noch keine Personen hinzugefügt."
-
-#~ msgid "Organizations"
-#~ msgstr "Organisationen"

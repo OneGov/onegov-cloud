@@ -26,17 +26,6 @@
                     </ul>
                 </div>
 
-                <div class="submit-yours">
-                    <dl>
-                        <dt>
-                            <a href="#">
-                                <h2 i18n:translate>Propose entry</h2>
-                            </a>
-                        </dt>
-                        <dd i18n:translate>Propose a new entry</dd>
-                    </dl>
-                </div>
-
             </div>
         </div>
     </tal:block>
