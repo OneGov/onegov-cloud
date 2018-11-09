@@ -11,19 +11,6 @@ from vobject.vcard import Address
 from vobject.vcard import Name
 
 
-DEFAULT_VCARD_FIELDS = (
-    'salutation',
-    'academic_title',
-    'function',
-    'picture_url',
-    'email',
-    'phone',
-    'phone_direct',
-    'website',
-    'address',
-)
-
-
 class Person(Base, ContentMixin, TimestampMixin, ORMSearchable):
     """ A person. """
 
@@ -117,7 +104,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable):
     #: some remarks about the person
     notes = Column(Text, nullable=True)
 
-    def vcard(self, fields=None):
+    def vcard(self, exclude=None):
         """ Returns the person as vCard (3.0).
 
         Allows to specify the included attributes, provides a reasonable
@@ -125,15 +112,13 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable):
         name.
 
         """
-        if fields is None:
-            fields = DEFAULT_VCARD_FIELDS
-
+        exclude = exclude or ['notes']
         result = vCard()
 
         prefix = []
-        if 'salutation' in fields and self.salutation:
+        if 'salutation' not in exclude and self.salutation:
             prefix.append(self.salutation)
-        if 'academic_title' in fields and self.academic_title:
+        if 'academic_title' not in exclude and self.academic_title:
             prefix.append(self.academic_title)
         prefix = " ".join(prefix)
 
@@ -148,21 +133,21 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable):
         )).strip()
 
         # optional fields
-        if 'function' in fields and self.function:
+        if 'function' not in exclude and self.function:
             result.add('title').value = self.function
-        if 'picture_url' in fields and self.picture_url:
+        if 'picture_url' not in exclude and self.picture_url:
             result.add('photo').value = self.picture_url
-        if 'email' in fields and self.email:
+        if 'email' not in exclude and self.email:
             result.add('email').value = self.email
-        if 'phone' in fields and self.phone:
+        if 'phone' not in exclude and self.phone:
             result.add('tel').value = self.phone
-        if 'phone_direct' in fields and self.phone_direct:
+        if 'phone_direct' not in exclude and self.phone_direct:
             result.add('tel').value = self.phone_direct
-        if 'website' in fields and self.website:
+        if 'website' not in exclude and self.website:
             result.add('url').value = self.website
-        if 'address' in fields and self.address:
+        if 'address' not in exclude and self.address:
             result.add('adr').value = Address(street=self.address)
-        if 'notes' in fields and self.notes:
+        if 'notes' not in exclude and self.notes:
             result.add('note').value = self.notes
 
         for membership in self.memberships:

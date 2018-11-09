@@ -97,10 +97,12 @@ def test_person_vcard(session):
     assert "END:VCARD" in vcard
 
     vcard = person.vcard((
-        'academic_title',
-        'email',
-        'phone',
-        'notes',
+        'salutation',
+        'function',
+        'picture_url',
+        'phone_direct',
+        'website',
+        'address',
     ))
     assert "BEGIN:VCARD" in vcard
     assert "VERSION:3.0" in vcard
