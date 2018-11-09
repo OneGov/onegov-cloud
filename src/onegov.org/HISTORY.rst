@@ -4,6 +4,12 @@ Changelog
 - Adds vCards to people.
   [msom]
 
+- Adds more fields to people.
+  [msom]
+
+- Makes the display of person fields configurable.
+  [msom]
+
 0.40.8 (2018-11-08)
 ~~~~~~~~~~~~~~~~~~~
 

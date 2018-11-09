@@ -94,8 +94,10 @@ def handle_delete_person(self, request):
 def vcard_export_person(self, request):
     """ Returns the persons vCard. """
 
+    exclude = request.app.org.excluded_person_fields(request) + ['notes']
+
     return Response(
-        self.vcard,
+        self.vcard(exclude),
         content_type='text/vcard',
         content_disposition='inline; filename=card.vcf'
     )

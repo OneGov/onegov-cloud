@@ -8,10 +8,17 @@ from wtforms.fields.html5 import EmailField
 class PersonForm(Form):
     """ Form to edit people. """
 
+    salutation = StringField(_("Salutation"))
+    academic_title = StringField(_("Academic Title"))
+
     first_name = StringField(_("First name"), [validators.InputRequired()])
     last_name = StringField(_("Last name"), [validators.InputRequired()])
 
     function = StringField(_("Function"))
+
+    born = StringField(_("Born"))
+    profession = StringField(_("Profession"))
+    political_party = StringField(_("Political Party"))
 
     picture_url = StringField(
         label=_("Picture"),
@@ -21,6 +28,7 @@ class PersonForm(Form):
 
     email = EmailField(_("E-Mail"))
     phone = StringField(_("Phone"))
+    phone_direct = StringField(_("Direct Phone Number"))
     website = StringField(_("Website"), filters=(ensure_scheme, ))
 
     address = TextAreaField(

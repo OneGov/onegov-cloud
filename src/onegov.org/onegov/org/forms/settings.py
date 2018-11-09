@@ -3,6 +3,7 @@ import re
 from lxml import etree
 from onegov.form import Form
 from onegov.form import with_options
+from onegov.form.fields import MultiCheckboxField
 from onegov.form.validators import Stdnum
 from onegov.gis import CoordinatesField
 from onegov.org import _
@@ -172,6 +173,24 @@ class SettingsForm(Form):
             ('forms', _("Yes, to forms")),
             ('publications', _("Yes, to publications")),
             ('reservations', _("Yes, to reservations")),
+        ],
+    )
+
+    hidden_people_fields = MultiCheckboxField(
+        label=_("Hide these fields for non-logged-in users"),
+        fieldset=_("People"),
+        choices=[
+            ('salutation', _("Salutation")),
+            ('academic_title', _("Academic Title")),
+            ('born', _("Born")),
+            ('profession', _("Profession")),
+            ('political_party', _("Political Party")),
+            ('email', _("E-Mail")),
+            ('phone', _("Phone")),
+            ('phone_direct', _("Direct Phone Number")),
+            ('website', _("Website")),
+            ('address', _("Address")),
+            ('notes', _("Notes")),
         ],
     )
 

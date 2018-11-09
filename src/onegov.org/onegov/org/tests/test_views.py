@@ -738,26 +738,48 @@ def test_hide_form(client):
 
 
 def test_people_view(client):
+    client.login_admin()
+    settings = client.get('/settings')
+    settings.form['hidden_people_fields'] = ['academic_title', 'profession']
+    settings.form.submit()
+    client.logout()
+
     client.login_editor()
 
     people = client.get('/people')
     assert 'noch keine Personen' in people
 
     new_person = people.click('Person')
+    new_person.form['academic_title'] = 'Dr.'
     new_person.form['first_name'] = 'Flash'
     new_person.form['last_name'] = 'Gordon'
+    new_person.form['profession'] = 'Hero'
     person = new_person.form.submit().follow()
 
     assert 'Gordon Flash' in person
+    assert 'Dr.' in person
+    assert 'Hero' in person
+
+    vcard = person.click('Elektronische Visitenkarte').text
+    assert 'FN:Dr. Flash Gordon' in vcard
+    assert 'N:Gordon;Flash;;Dr.;' in vcard
+
+    client.logout()
+    people = client.get('/people')
+    assert 'Gordon Flash' in people
+
+    person = people.click('Gordon Flash')
+    assert 'Gordon Flash' in person
+    assert 'Dr.' not in person
+    assert 'Hero' not in person
 
     vcard = person.click('Elektronische Visitenkarte').text
     assert 'FN:Flash Gordon' in vcard
     assert 'N:Gordon;Flash;;;' in vcard
 
-    people = client.get('/people')
+    client.login_editor()
 
-    assert 'Gordon Flash' in people
-
+    person = client.get('/people').click('Gordon Flash')
     edit_person = person.click('Bearbeiten')
     edit_person.form['first_name'] = 'Merciless'
     edit_person.form['last_name'] = 'Ming'

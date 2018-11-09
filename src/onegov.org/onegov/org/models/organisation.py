@@ -56,6 +56,7 @@ class Organisation(Base, TimestampMixin):
     square_logo_url = meta_property()
     locales = meta_property()
     redirect_homepage_to = meta_property()
+    hidden_people_fields = meta_property(default=list)
 
     @contact.setter
     def contact(self, value):
@@ -79,3 +80,6 @@ class Organisation(Base, TimestampMixin):
             parts = self.name.split(' ')
 
         return ' '.join(parts[:-1]), parts[-1]
+
+    def excluded_person_fields(self, request):
+        return [] if request.is_logged_in else self.hidden_people_fields

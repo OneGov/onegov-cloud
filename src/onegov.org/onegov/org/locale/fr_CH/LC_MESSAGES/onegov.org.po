@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-11-09 07:30+0100\n"
+"POT-Creation-Date: 2018-11-09 11:13+0100\n"
 "PO-Revision-Date: 2018-09-24 12:21+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -722,6 +722,12 @@ msgstr "Envoyez un e-mail de suivi quotidien."
 msgid "E-Mail Address"
 msgstr "Adresse e-mail"
 
+msgid "Salutation"
+msgstr ""
+
+msgid "Academic Title"
+msgstr ""
+
 msgid "First name"
 msgstr "Prénom"
 
@@ -731,8 +737,20 @@ msgstr "Nom de famille"
 msgid "Function"
 msgstr "Fonction"
 
+msgid "Born"
+msgstr ""
+
+msgid "Profession"
+msgstr ""
+
+msgid "Political Party"
+msgstr ""
+
 msgid "Phone"
 msgstr "Téléphone"
+
+msgid "Direct Phone Number"
+msgstr ""
 
 msgid "Website"
 msgstr "Site Web"
@@ -1003,6 +1021,9 @@ msgstr "La structure de la page d'accueil"
 
 msgid "Homepage redirect"
 msgstr "Redirection vers la page d'accueil"
+
+msgid "Hide these fields for non-logged-in users"
+msgstr ""
 
 msgid "The default map view. This should show the whole town"
 msgstr "La vue par défaut de la carte. Cela devrait montrer la ville entière"
