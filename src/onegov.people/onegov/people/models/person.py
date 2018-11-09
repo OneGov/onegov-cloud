@@ -42,13 +42,11 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     @property
     def spoken_title(self):
-        """ Returns the Western-ordered name. Includes the academic title and
-        salutation if available.
+        """ Returns the Western-ordered name. Includes the academic title if
+        available.
 
         """
         parts = []
-        if self.salutation:
-            parts.append(self.salutation)
         if self.academic_title:
             parts.append(self.academic_title)
         parts.append(self.first_name)
@@ -115,12 +113,9 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable):
         exclude = exclude or ['notes']
         result = vCard()
 
-        prefix = []
-        if 'salutation' not in exclude and self.salutation:
-            prefix.append(self.salutation)
+        prefix = ""
         if 'academic_title' not in exclude and self.academic_title:
-            prefix.append(self.academic_title)
-        prefix = " ".join(prefix)
+            prefix = self.academic_title
 
         # mandatory fields
         result.add('n').value = Name(

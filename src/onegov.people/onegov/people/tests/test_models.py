@@ -45,16 +45,10 @@ def test_person(session):
     assert person.address == "Fakestreet 1, Springfield"
     assert person.notes == "Has bad vision."
 
-    assert person.spoken_title == "Mr. Dr. Hans Maulwurf"
-
-    person.salutation = None
     assert person.spoken_title == "Dr. Hans Maulwurf"
 
     person.academic_title = None
     assert person.spoken_title == "Hans Maulwurf"
-
-    person.salutation = "Mr."
-    assert person.spoken_title == "Mr. Hans Maulwurf"
 
 
 def test_person_vcard(session):
@@ -85,8 +79,8 @@ def test_person_vcard(session):
     assert "VERSION:3.0" in vcard
     assert "ADR:;;Fakestreet 1\\, Springfield;;;;" in vcard
     assert "EMAIL:han.maulwurf@springfield.com" in vcard
-    assert "FN:Mr. Dr. Hans Maulwurf" in vcard
-    assert "N:Maulwurf;Hans;;Mr. Dr.;" in vcard
+    assert "FN:Dr. Hans Maulwurf" in vcard
+    assert "N:Maulwurf;Hans;;Dr.;" in vcard
     assert "ORG:Agency;Membership" in vcard
     assert "PHOTO:https://thats.me/hans-maulwurf/picture" in vcard
     assert "TEL:11122334455" in vcard
@@ -97,7 +91,7 @@ def test_person_vcard(session):
     assert "END:VCARD" in vcard
 
     vcard = person.vcard((
-        'salutation',
+        'academic_title',
         'function',
         'picture_url',
         'phone_direct',
@@ -108,8 +102,8 @@ def test_person_vcard(session):
     assert "VERSION:3.0" in vcard
     assert "ADR:" not in vcard
     assert "EMAIL:han.maulwurf@springfield.com" in vcard
-    assert "FN:Dr. Hans Maulwurf" in vcard
-    assert "N:Maulwurf;Hans;;Dr.;" in vcard
+    assert "FN:Hans Maulwurf" in vcard
+    assert "N:Maulwurf;Hans;;;" in vcard
     assert "ORG:Agency;Membership" in vcard
     assert "PHOTO:" not in vcard
     assert "TEL:11122334455" in vcard

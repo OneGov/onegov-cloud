@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Removes the saluation from the spoken title and vCard.
+  [msom]
+
 0.6.0 (2018-11-09)
 ~~~~~~~~~~~~~~~~~~~
 
