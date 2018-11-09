@@ -5,11 +5,11 @@ homepage_structure = """<row>
   <column span="12">
     <panel>
       <links>
-          <link url="./personen"
+          <link url="./people"
               description="Personen">
               Alle Personen
           </link>
-          <link url="./organisationen"
+          <link url="./organizations"
               description="Organisationen">
               Alle Organisationen
           </link>

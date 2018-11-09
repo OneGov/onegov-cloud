@@ -9,7 +9,7 @@ from onegov.people import AgencyMembershipCollection
 
 @AgencyApp.path(
     model=ExtendedPersonCollection,
-    path='/personen',
+    path='/people',
     converters=dict(page=int)
 )
 def get_people(app, page=0, letter=None, agency=None):
@@ -18,7 +18,7 @@ def get_people(app, page=0, letter=None, agency=None):
 
 @AgencyApp.path(
     model=ExtendedAgencyCollection,
-    path='/organisationen'
+    path='/organizations'
 )
 def get_agencies(app):
     return ExtendedAgencyCollection(app.session())
@@ -26,7 +26,7 @@ def get_agencies(app):
 
 @AgencyApp.path(
     model=Agency,
-    path='/organisation',
+    path='/organization',
     absorb=True
 )
 def get_agency(app, absorb):
@@ -44,7 +44,7 @@ def get_agency_proxy(app, id):
 
 @AgencyApp.path(
     model=AgencyMembership,
-    path='/mitgliedschaft/{id}'
+    path='/membership/{id}'
 )
 def get_membership(app, id):
     return AgencyMembershipCollection(app.session()).by_id(id)
