@@ -141,7 +141,7 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable):
         )
         result.add('fn').value = " ".join((
             prefix, self.first_name, self.last_name
-        ))
+        )).strip()
 
         # optional fields
         if 'function' in fields and self.function:
