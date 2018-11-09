@@ -1,7 +1,6 @@
 from cgi import FieldStorage
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.forms import ExtendedAgencyForm
-from onegov.agency.forms import ExtendedPersonForm
 from onegov.agency.forms import MembershipForm
 from onegov.agency.models import ExtendedAgency
 from tempfile import TemporaryFile
@@ -114,58 +113,4 @@ def test_membership_form(session):
         'person': str(doctor.id),
         'since': "2000",
         'title': "Doctor",
-    }
-
-
-def test_extended_person_form(session):
-    form = ExtendedPersonForm()
-    assert {str(fs.label): set(fs.fields.keys()) for fs in form.fieldsets} == {
-        'Private': {
-            'email',
-            'notes',
-            'salutation',
-            'website',
-        },
-        'Public': {
-            'academic_title',
-            'address',
-            'direct_phone',
-            'first_name',
-            'last_name',
-            'phone',
-            'political_party',
-            'profession',
-            'year',
-        }
-    }
-
-    form = ExtendedPersonForm(DummyPostData({
-        'academic_title': "Dr.",
-        'salutation': "Mr.",
-        'first_name': "Nick",
-        'last_name': "Rivera",
-        'profession': "Doctor",
-        'political_party': "None",
-        'year': "-",
-        'address': "Springfield",
-        'phone': "111222333",
-        'direct_phone': "111222444",
-        'email': "nick.rivera@hospital.springfield.com",
-        'website': "https://hospital.springfield.com/staff/nick.rivera",
-        'notes': "Not thaaat good",
-    }))
-    assert form.get_useful_data() == {
-        'academic_title': "Dr.",
-        'salutation': "Mr.",
-        'first_name': "Nick",
-        'last_name': "Rivera",
-        'profession': "Doctor",
-        'political_party': "None",
-        'year': "-",
-        'address': "Springfield",
-        'phone': "111222333",
-        'direct_phone': "111222444",
-        'email': "nick.rivera@hospital.springfield.com",
-        'website': "https://hospital.springfield.com/staff/nick.rivera",
-        'notes': "Not thaaat good",
     }

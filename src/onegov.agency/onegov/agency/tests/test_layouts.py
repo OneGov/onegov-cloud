@@ -131,20 +131,6 @@ def test_extended_person_collection_layout():
     assert layout.agency_path(root) == 'Root'
     assert layout.agency_path(child) == 'Root > Child'
 
-    # VisibilityMixin
-    person = ExtendedPerson(
-        first_name="Hans",
-        last_name="Maulwurf",
-        email="hans.maulwurf@springfield.com"
-    )
-    assert layout.field_visible('first_name', person) is True
-    assert layout.field_visible('year', person) is False
-    assert layout.field_visible('email', person) is False
-
-    request.is_logged_in = True
-    layout = ExtendedPersonCollectionLayout(model, request)
-    assert layout.field_visible('email', person) is True
-
 
 def test_extended_person_layout():
     request = DummyRequest()
@@ -172,12 +158,3 @@ def test_extended_person_layout():
     child = ExtendedAgency('Child', parent=root)
     assert layout.agency_path(root) == 'Root'
     assert layout.agency_path(child) == 'Root > Child'
-
-    # VisibilityMixin
-    assert layout.field_visible('first_name') is True
-    assert layout.field_visible('year') is False
-    assert layout.field_visible('email') is False
-
-    request.is_logged_in = True
-    layout = ExtendedPersonCollectionLayout(model, request)
-    assert layout.field_visible('email') is True

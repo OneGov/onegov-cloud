@@ -3,13 +3,13 @@ from morepath import redirect
 from onegov.agency import _
 from onegov.agency import AgencyApp
 from onegov.agency.collections import ExtendedPersonCollection
-from onegov.agency.forms import ExtendedPersonForm
+from onegov.agency.layouts import ExtendedPersonCollectionLayout
+from onegov.agency.layouts import ExtendedPersonLayout
 from onegov.agency.models import ExtendedPerson
 from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.org.elements import Link
-from onegov.agency.layouts import ExtendedPersonCollectionLayout
-from onegov.agency.layouts import ExtendedPersonLayout
+from onegov.org.forms import PersonForm
 from onegov.org.models import AtoZ
 
 
@@ -93,7 +93,7 @@ def view_person(self, request):
     name='new',
     template='form.pt',
     permission=Private,
-    form=ExtendedPersonForm
+    form=PersonForm
 )
 def add_person(self, request, form):
 
@@ -119,7 +119,7 @@ def add_person(self, request, form):
     name='edit',
     template='form.pt',
     permission=Private,
-    form=ExtendedPersonForm
+    form=PersonForm
 )
 def edit_person(self, request, form):
 

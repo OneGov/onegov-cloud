@@ -47,8 +47,9 @@ def test_extended_person(session):
         academic_title="Dr.",
         profession="Politican",
         political_party="Democratic Party",
-        year="2000",
-        direct_phone="+1 234 56 78",
+        born="2000",
+        phone="+1 234 56 78",
+        phone_direct="+1 234 56 79",
         address="Street 1\nCity",
         notes="This is\na note."
     )
@@ -62,33 +63,10 @@ def test_extended_person(session):
     assert person.academic_title == "Dr."
     assert person.profession == "Politican"
     assert person.political_party == "Democratic Party"
-    assert person.year == "2000"
-    assert person.direct_phone == "+1 234 56 78"
+    assert person.born == "2000"
+    assert person.phone == "+1 234 56 78"
+    assert person.phone_direct == "+1 234 56 79"
     assert person.address == "Street 1\nCity"
     assert person.address_html == "<p>Street 1<br>City</p>"
     assert person.notes == "This is\na note."
     assert person.notes_html == "<p>This is<br>a note.</p>"
-
-
-def test_extended_person_membership_by_agency(session):
-    agency_a = ExtendedAgency(title="A", name="a")
-    agency_b = ExtendedAgency(title="B", name="b")
-    agency_c = ExtendedAgency(title="C", name="c")
-    agency_d = ExtendedAgency(title="D", name="d")
-    person = ExtendedPerson(first_name="Hans", last_name="Maulwurf")
-    session.add(agency_a)
-    session.add(agency_b)
-    session.add(agency_c)
-    session.add(agency_d)
-    session.add(person)
-    session.flush()
-
-    agency_b.add_person(person, 'l')
-    agency_c.add_person(person, 'm')
-    agency_a.add_person(person, 'n')
-    agency_d.add_person(person, 'o')
-
-    person = session.query(ExtendedPerson).one()
-    assert [m.title for m in person.memberships_by_agency] == [
-        'n', 'l', 'm', 'o'
-    ]
