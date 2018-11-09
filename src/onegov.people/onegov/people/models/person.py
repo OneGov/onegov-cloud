@@ -42,15 +42,17 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     @property
     def spoken_title(self):
-        """ Returns the Western-ordered name. Includes the salutation if
-        available.
+        """ Returns the Western-ordered name. Includes the academic title and
+        salutation if available.
 
         """
-
+        parts = []
         if self.salutation:
-            parts = self.salutation, self.first_name, self.last_name
-        else:
-            parts = self.first_name, self.last_name
+            parts.append(self.salutation)
+        if self.academic_title:
+            parts.append(self.academic_title)
+        parts.append(self.first_name)
+        parts.append(self.last_name)
 
         return " ".join(parts)
 
@@ -60,14 +62,26 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable):
     #: the salutation used for the person
     salutation = Column(Text, nullable=True)
 
+    #: the academic title of the person
+    academic_title = Column(Text, nullable=True)
+
     #: the first name of the person
     first_name = Column(Text, nullable=False)
 
     #: the last name of the person
     last_name = Column(Text, nullable=False)
 
+    #: when the person was born
+    born = Column(Text, nullable=True)
+
+    #: the professsion of the person
+    profession = Column(Text, nullable=True)
+
     #: the function of the person
     function = Column(Text, nullable=True)
+
+    #: the political party the person belongs to
+    political_party = Column(Text, nullable=True)
 
     #: an URL leading to a picture of the person
     picture_url = Column(Text, nullable=True)
@@ -78,6 +92,9 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable):
     #: the phone number of the person
     phone = Column(Text, nullable=True)
 
+    #: the direct phone number of the person
+    phone_direct = Column(Text, nullable=True)
+
     #: the website related to the person
     website = Column(Text, nullable=True)
 
@@ -87,24 +104,76 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable):
     #: some remarks about the person
     notes = Column(Text, nullable=True)
 
-    @property
-    def vcard(self):
+    def vcard(self, fields=None):
+        """ Returns the person as vCard (3.0).
+
+        Allows to specify the included attributes, provides a reasonable
+        default if none are specified.
+
+        """
+        if fields is None:
+            fields = (
+                'salutation',
+                'academic_title',
+                'function',
+                'picture_url',
+                'email',
+                'phone',
+                'phone_direct',
+                'website',
+                'address',
+            )
+
         result = vCard()
+
+        prefix = []
+        if 'salutation' in fields and self.salutation:
+            prefix.append(self.salutation)
+        if 'academic_title' in fields and self.academic_title:
+            prefix.append(self.academic_title)
+        prefix = " ".join(prefix)
+
+        # mandatory fields
         result.add('n').value = Name(
-            prefix=self.salutation or "",
-            given=self.first_name or "",
-            family=self.last_name or "",
+            prefix=prefix,
+            given=self.first_name,
+            family=self.last_name,
         )
-        result.add('fn').value = self.spoken_title
-        result.add('title').value = self.function or ""
-        result.add('adr').value = Address(street=self.address or "")
-        result.add('email').value = self.email or ""
-        result.add('tel').value = self.phone or ""
-        result.add('url').value = self.website or ""
-        result.add('photo').value = self.picture_url or ""
+        result.add('fn').value = " ".join((
+            prefix, self.first_name, self.last_name
+        ))
+
+        # optional fields
+        if 'function' in fields and self.function:
+            result.add('title').value = self.function
+        if 'picture_url' in fields and self.picture_url:
+            result.add('photo').value = self.picture_url
+        if 'email' in fields and self.email:
+            result.add('email').value = self.email
+        if 'phone' in fields and self.phone:
+            result.add('tel').value = self.phone
+        if 'phone_direct' in fields and self.phone_direct:
+            result.add('tel').value = self.phone_direct
+        if 'website' in fields and self.website:
+            result.add('url').value = self.website
+        if 'address' in fields and self.address:
+            result.add('adr').value = Address(street=self.address)
+        if 'notes' in fields and self.notes:
+            result.add('note').value = self.notes
+
         for membership in self.memberships:
                 result.add('org').value = [
                     membership.agency.title,
                     membership.title
                 ]
+
         return result.serialize()
+
+    @property
+    def memberships_by_agency(self):
+        """ Returns the memberships sorted alphabetically by the agency. """
+
+        def sortkey(membership):
+            return membership.agency.title
+
+        return sorted(self.memberships, key=sortkey)

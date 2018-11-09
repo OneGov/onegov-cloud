@@ -40,3 +40,36 @@ def add_meta_data_and_content_columns(context):
 
     if not context.has_column('people', 'content'):
         context.operations.add_column('people', Column('content', JSON))
+
+
+@upgrade_task('Add additional person columns')
+def add_additional_person_columns(context):
+    if not context.has_column('people', 'academic_title'):
+        context.operations.add_column(
+            'people',
+            Column('academic_title', Text, nullable=True)
+        )
+
+    if not context.has_column('people', 'born'):
+        context.operations.add_column(
+            'people',
+            Column('born', Text, nullable=True)
+        )
+
+    if not context.has_column('people', 'profession'):
+        context.operations.add_column(
+            'people',
+            Column('profession', Text, nullable=True)
+        )
+
+    if not context.has_column('people', 'political_party'):
+        context.operations.add_column(
+            'people',
+            Column('political_party', Text, nullable=True)
+        )
+
+    if not context.has_column('people', 'phone_direct'):
+        context.operations.add_column(
+            'people',
+            Column('phone_direct', Text, nullable=True)
+        )

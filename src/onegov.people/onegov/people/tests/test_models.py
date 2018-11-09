@@ -9,78 +9,137 @@ from pytest import mark
 def test_person(session):
     session.add(
         Person(
-            salutation="Herr",
+            salutation="Mr.",
+            academic_title="Dr.",
             first_name="Hans",
             last_name="Maulwurf",
+            born="1970",
+            profession="Truck Driver",
             function="Director",
+            political_party="Democratic Party",
             picture_url="https://thats.me/hans-maulwurf/picture",
             email="han.maulwurf@springfield.com",
             phone="11122334455",
+            phone_direct="11122334456",
             website="https://thats.me/hans-maulwurf",
             address="Fakestreet 1, Springfield",
-            notes="bad vision",
+            notes="Has bad vision.",
         )
     )
     session.flush()
     person = session.query(Person).one()
 
-    assert person.salutation == "Herr"
+    assert person.salutation == "Mr."
+    assert person.academic_title == "Dr."
     assert person.first_name == "Hans"
     assert person.last_name == "Maulwurf"
+    assert person.born == "1970"
+    assert person.profession == "Truck Driver"
     assert person.function == "Director"
+    assert person.political_party == "Democratic Party"
     assert person.picture_url == "https://thats.me/hans-maulwurf/picture"
     assert person.email == "han.maulwurf@springfield.com"
     assert person.phone == "11122334455"
+    assert person.phone_direct == "11122334456"
     assert person.website == "https://thats.me/hans-maulwurf"
     assert person.address == "Fakestreet 1, Springfield"
-    assert person.notes == "bad vision"
-    assert person.title == "Maulwurf Hans"
-    assert person.spoken_title == "Herr Hans Maulwurf"
+    assert person.notes == "Has bad vision."
+
+    assert person.spoken_title == "Mr. Dr. Hans Maulwurf"
 
     person.salutation = None
+    assert person.spoken_title == "Dr. Hans Maulwurf"
+
+    person.academic_title = None
     assert person.spoken_title == "Hans Maulwurf"
+
+    person.salutation = "Mr."
+    assert person.spoken_title == "Mr. Hans Maulwurf"
 
 
 def test_person_vcard(session):
     person = Person(
-        salutation="Dr.",
-        first_name="Erika",
-        last_name="Mustermann",
-        picture_url=(
-            "http://commons.wikimedia.org/wiki/"
-            "File:Erika_Mustermann_2010.jpg"
-        ),
-        phone="+49 221 9999123",
-        address="Heidestraße 17\n51147 Köln\nGermany",
-        email="erika@mustermann.de",
-        website="http://de.wikipedia.org/"
+        salutation="Mr.",
+        academic_title="Dr.",
+        first_name="Hans",
+        last_name="Maulwurf",
+        function="Director",
+        picture_url="https://thats.me/hans-maulwurf/picture",
+        email="han.maulwurf@springfield.com",
+        phone="11122334455",
+        phone_direct="11122334456",
+        website="https://thats.me/hans-maulwurf",
+        address="Fakestreet 1, Springfield",
+        notes="Has bad vision.",
     )
     session.add(person)
     session.flush()
 
-    agency = Agency(
-        name="wikimedia",
-        title="Wikimedia"
-    )
-    agency.add_person(person, "Redaktion & Gestaltung")
+    agency = Agency(name="agency", title="Agency")
+    agency.add_person(person, "Membership")
     session.add(agency)
     session.flush()
 
-    vcard = person.vcard
+    vcard = person.vcard()
     assert "BEGIN:VCARD" in vcard
     assert "VERSION:3.0" in vcard
-    assert "N:Mustermann;Erika;;Dr.;" in vcard
-    assert "FN:Dr. Erika Mustermann" in vcard
-    assert "ORG:Wikimedia;Redaktion & Gestaltung" in vcard
-    assert (
-        "PHOTO:http://commons.wikimedia.org/wiki/"
-        "File:Erika_Mustermann_2010.jpg"
-    ) in vcard
-    assert "TEL:+49 221 9999123" in vcard
-    assert "ADR:;;Heidestraße 17\\n51147 Köln\\nGermany;;;;" in vcard
-    assert "EMAIL:erika@mustermann.de" in vcard
-    assert "URL:http://de.wikipedia.org/" in vcard
+    assert "ADR:;;Fakestreet 1\\, Springfield;;;;" in vcard
+    assert "EMAIL:han.maulwurf@springfield.com" in vcard
+    assert "FN:Mr. Dr. Hans Maulwurf" in vcard
+    assert "N:Maulwurf;Hans;;Mr. Dr.;" in vcard
+    assert "ORG:Agency;Membership" in vcard
+    assert "PHOTO:https://thats.me/hans-maulwurf/picture" in vcard
+    assert "TEL:11122334455" in vcard
+    assert "TEL:11122334456" in vcard
+    assert "TITLE:Director" in vcard
+    assert "URL:https://thats.me/hans-maulwurf" in vcard
+    assert "NOTE:" not in vcard
     assert "END:VCARD" in vcard
+
+    vcard = person.vcard((
+        'academic_title',
+        'email',
+        'phone',
+        'notes',
+    ))
+    assert "BEGIN:VCARD" in vcard
+    assert "VERSION:3.0" in vcard
+    assert "ADR:" not in vcard
+    assert "EMAIL:han.maulwurf@springfield.com" in vcard
+    assert "FN:Dr. Hans Maulwurf" in vcard
+    assert "N:Maulwurf;Hans;;Dr.;" in vcard
+    assert "ORG:Agency;Membership" in vcard
+    assert "PHOTO:" not in vcard
+    assert "TEL:11122334455" in vcard
+    assert "TEL:11122334456" not in vcard
+    assert "TITLE:" not in vcard
+    assert "URL:" not in vcard
+    assert "NOTE:Has bad vision." in vcard
+    assert "END:VCARD" in vcard
+
+
+def test_person_membership_by_agency(session):
+    agency_a = Agency(title="A", name="a")
+    agency_b = Agency(title="B", name="b")
+    agency_c = Agency(title="C", name="c")
+    agency_d = Agency(title="D", name="d")
+    person = Person(first_name="Hans", last_name="Maulwurf")
+    session.add(agency_a)
+    session.add(agency_b)
+    session.add(agency_c)
+    session.add(agency_d)
+    session.add(person)
+    session.flush()
+
+    agency_b.add_person(person, 'l')
+    agency_c.add_person(person, 'm')
+    agency_a.add_person(person, 'n')
+    agency_d.add_person(person, 'o')
+
+    person = session.query(Person).one()
+    assert [m.title for m in person.memberships_by_agency] == [
+        'n', 'l', 'm', 'o'
+    ]
 
 
 def test_person_polymorphism(session):

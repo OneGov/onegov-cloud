@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds additional columns to people.
+  [msom]
+
 0.5.0 (2018-11-08)
 ~~~~~~~~~~~~~~~~~~~
 
