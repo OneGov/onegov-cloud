@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Simplifies adding a person to an agency.
+  [msom]
+
 0.6.1 (2018-11-09)
 ~~~~~~~~~~~~~~~~~~~
 

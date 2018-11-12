@@ -75,11 +75,10 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable):
             organigram.name = filename
             self.organigram = organigram
 
-    def add_person(self, person, title, **kwargs):
+    def add_person(self, person_id, title, **kwargs):
         """ Append a person to the agency with the given title. """
 
         order = kwargs.pop('order', 2 ** 16)
-        person_id = person.id if isinstance(person, Person) else person
 
         self.memberships.append(
             AgencyMembership(
