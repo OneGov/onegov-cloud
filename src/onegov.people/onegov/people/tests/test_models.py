@@ -70,7 +70,7 @@ def test_person_vcard(session):
     session.flush()
 
     agency = Agency(name="agency", title="Agency")
-    agency.add_person(person, "Membership")
+    agency.add_person(person.id, "Membership")
     session.add(agency)
     session.flush()
 
@@ -127,10 +127,10 @@ def test_person_membership_by_agency(session):
     session.add(person)
     session.flush()
 
-    agency_b.add_person(person, 'l')
-    agency_c.add_person(person, 'm')
-    agency_a.add_person(person, 'n')
-    agency_d.add_person(person, 'o')
+    agency_b.add_person(person.id, 'l')
+    agency_c.add_person(person.id, 'm')
+    agency_a.add_person(person.id, 'n')
+    agency_d.add_person(person.id, 'o')
 
     person = session.query(Person).one()
     assert [m.title for m in person.memberships_by_agency] == [
@@ -216,7 +216,7 @@ def test_agency_add_person(session):
     session.add(selma)
     session.flush()
 
-    agency.add_person(patty, "Staff")
+    agency.add_person(patty.id, "Staff")
     agency.add_person(selma.id, "Staff", since="2012")
     agency.add_person(str(selma.id), "Managing director", since="2018")
 
