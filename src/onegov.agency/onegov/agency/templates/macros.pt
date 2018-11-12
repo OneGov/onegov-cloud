@@ -43,8 +43,8 @@
                 <dl>
                     <tal:block tal:repeat="membership memberships">
                         <tal:block tal:condition="request.is_logged_in">
-                            <dt><a style="text" href="${request.link(membership)}">${membership.title}</a></dt>
-                            <dd>${membership.person.title}</dd>
+                            <dt><em><a style="text" href="${request.link(membership)}">${membership.title}</a></em></dt>
+                            <dd><a href="${request.link(membership.person)}">${membership.person.title}</a></dd>
                         </tal:block>
                         <tal:block tal:condition="not:request.is_logged_in">
                             <dt>${membership.title}</dt>
