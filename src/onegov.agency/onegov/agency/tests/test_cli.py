@@ -1,8 +1,10 @@
 from click.testing import CliRunner
 from onegov.agency.cli import cli
 from onegov.core.utils import module_path
+from onegov.org.cli import cli as org_cli
 from onegov.people.models import Agency
 from onegov.people.models import Person
+from pathlib import Path
 from pytest import mark
 from textwrap import dedent
 from textwrap import indent
@@ -14,6 +16,13 @@ from unittest.mock import patch
 ])
 def test_import_agencies(cfg_path, session_manager, file):
     runner = CliRunner()
+
+    result = runner.invoke(org_cli, [
+        '--config', cfg_path,
+        '--select', '/agency/zug',
+        'add', 'Kanton Zug'
+    ])
+    assert result.exit_code == 0
 
     expected = dedent("""
         Bundesbehörden
@@ -91,7 +100,7 @@ def test_import_agencies(cfg_path, session_manager, file):
     with patch('onegov.agency.cli.get', return_value=DummyResponse()):
         result = runner.invoke(cli, [
             '--config', cfg_path,
-            '--select', '/foo/bar',
+            '--select', '/agency/zug',
             'import-agencies', file,
             '--visualize'
         ])
@@ -102,7 +111,7 @@ def test_import_agencies(cfg_path, session_manager, file):
     with patch('onegov.agency.cli.get', return_value=DummyResponse()):
         result = runner.invoke(cli, [
             '--config', cfg_path,
-            '--select', '/foo/bar',
+            '--select', '/agency/zug',
             'import-agencies', file,
             '--visualize', '--clear'
         ])
@@ -115,7 +124,7 @@ def test_import_agencies(cfg_path, session_manager, file):
     with patch('onegov.agency.cli.get', return_value=DummyResponse()):
         result = runner.invoke(cli, [
             '--config', cfg_path,
-            '--select', '/foo/bar',
+            '--select', '/agency/zug',
             'import-agencies', file,
             '--visualize', '--clear', '--dry-run'
         ])
@@ -126,6 +135,7 @@ def test_import_agencies(cfg_path, session_manager, file):
     assert "Aborting transaction" in result.output
 
     # Check some additional values
+    session_manager.set_current_schema('agency-zug')
     session = session_manager.session()
     agency = session.query(Agency).filter_by(title="Nationalrat").one()
     assert agency.portrait == "NR\n2016/2019"
@@ -158,3 +168,46 @@ def test_import_agencies(cfg_path, session_manager, file):
     assert membership.meta['prefix'] == "xx"
     assert membership.since == "2000"
     assert membership.title == "Stimmenzähler"
+
+
+@mark.parametrize("file", [
+    module_path('onegov.agency', 'tests/fixtures/export-agencies-pdf.xls'),
+])
+def test_create_pdf(temporary_directory, cfg_path, file):
+    runner = CliRunner()
+
+    class DummyResponse(object):
+        content = b'image'
+
+        def raise_for_status(self):
+            pass
+
+    result = runner.invoke(org_cli, [
+        '--config', cfg_path,
+        '--select', '/agency/zug',
+        'add', 'Kanton Zug'
+    ])
+    assert result.exit_code == 0
+
+    with patch('onegov.agency.cli.get', return_value=DummyResponse()):
+        result = runner.invoke(cli, [
+            '--config', cfg_path,
+            '--select', '/agency/zug',
+            'import-agencies', file
+        ])
+    assert result.exit_code == 0
+
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/agency/zug',
+        'create-pdf'
+    ])
+    assert result.exit_code == 0
+    assert "Root PDF created" in result.output
+    assert "Created PDF of 'Bundesbehörden'" in result.output
+    assert "Created PDF of 'Nationalrat'" in result.output
+    assert "Created PDF of 'Ständerat'" in result.output
+
+    assert (
+        Path(temporary_directory) / 'file-storage' / 'agency-zug' / 'root.pdf'
+    ).exists()

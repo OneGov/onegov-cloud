@@ -50,6 +50,7 @@ setup(
             'mock',
             'onegov_testing',
             'pyquery',
+            'PyPDF2',
             'pytest-localserver',
             'pytest>=3.0.0',
             'webtest',

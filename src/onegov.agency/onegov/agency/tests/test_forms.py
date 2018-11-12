@@ -3,6 +3,8 @@ from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.forms import ExtendedAgencyForm
 from onegov.agency.forms import MembershipForm
 from onegov.agency.models import ExtendedAgency
+from onegov.agency.models import ExtendedPerson
+from onegov.people import AgencyMembership
 from tempfile import TemporaryFile
 
 
@@ -90,6 +92,18 @@ def test_extended_agency_form(agency_app):
         ('person.last_name', 'Person: Last Name')
     ]
     assert form.organigram.data['size']
+
+
+def test_extended_agency_form_choices():
+    models = {
+        'membership': AgencyMembership(),
+        'person': ExtendedPerson(first_name="f", last_name="l")
+    }
+
+    form = ExtendedAgencyForm()
+    for choice in form.export_fields.choices:
+        model, attribute = choice[0].split('.')
+        assert hasattr(models[model], attribute)
 
 
 def test_membership_form(session):
