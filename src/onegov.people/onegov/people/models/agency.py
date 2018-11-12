@@ -9,7 +9,6 @@ from onegov.file.utils import as_fileintent
 from onegov.file.utils import content_type_from_fileobj
 from onegov.file.utils import extension_for_content_type
 from onegov.people.models.membership import AgencyMembership
-from onegov.people.models.person import Person
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import Text
