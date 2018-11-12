@@ -5,6 +5,7 @@ from onegov.agency.utils import export_to_xlsx
 from onegov.core.utils import module_path
 from pytest import mark
 from xlrd import open_workbook
+from zipfile import ZipFile
 
 
 class DummyRequest(object):
@@ -150,3 +151,8 @@ def test_utils_xlsx(agency_app, file):
     assert sheet.cell(1, 1).value == '0'
     assert sheet.cell(1, 2).value == 'Major'
     assert sheet.cell(1, 3).value == '2001'
+
+    organigram.seek(0)
+    output.seek(0)
+    zip = ZipFile(output)
+    assert zip.read('xl/media/image1.png') == organigram.read()
