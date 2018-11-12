@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-11-09 17:10+0100\n"
-"PO-Revision-Date: 2018-10-26 11:12+0200\n"
+"POT-Creation-Date: 2018-11-12 15:06+0100\n"
+"PO-Revision-Date: 2018-11-12 15:05+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -49,7 +49,7 @@ msgstr "Person: Nachname"
 msgid "Person: First Name"
 msgstr "Person: Vorname"
 
-msgid "Person: Year"
+msgid "Person: Born"
 msgstr "Person: Jahrgang"
 
 msgid "Person: Academic Title"
@@ -77,13 +77,19 @@ msgid "Since"
 msgstr "Eintritt"
 
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 msgid "Suborganizations"
 msgstr "Unterorganisationen"
 
 msgid "Export Fields"
-msgstr ""
+msgstr "Exportfelder"
+
+msgid "Organigrams"
+msgstr "Organigramme"
+
+msgid "Agency"
+msgstr "Organisation"
 
 msgid "Salutation"
 msgstr "Anrede"
@@ -103,7 +109,7 @@ msgstr "Beruf"
 msgid "Political Party"
 msgstr "Politische Partei"
 
-msgid "Year"
+msgid "Born"
 msgstr "Jahrgang"
 
 msgid "Address"
@@ -126,9 +132,6 @@ msgstr "Bemerkungen"
 
 msgid "Memberships"
 msgstr "Mitgliedschaften"
-
-msgid "Agency"
-msgstr "Organisation"
 
 msgid "Homepage"
 msgstr "Startseite"
@@ -163,9 +166,6 @@ msgstr "Möchten Sie die Mitgliedschaft wirklich löschen?"
 msgid "Delete membership"
 msgstr "Mitgliedschaft löschen"
 
-msgid "Born"
-msgstr ""
-
 msgid "Exports"
 msgstr "Exporte"
 
@@ -177,6 +177,9 @@ msgstr "Es wurden noch keine Organisationen hinzugefügt."
 
 msgid "Export all organisations as PDF"
 msgstr "Gesamter Staatskalender als PDF"
+
+msgid "Export all organisations as XLSX"
+msgstr "Gesamter Staatskalender als XLSX"
 
 msgid "Export this agency and its children as a PDF"
 msgstr "Organisation als PDF speichern"

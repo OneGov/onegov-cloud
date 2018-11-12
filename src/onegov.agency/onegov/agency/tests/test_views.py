@@ -156,7 +156,7 @@ def test_views(client):
     assert pdf.content_length
 
     # ... XLSX Export
-    xlsx = client.get('/export-agencies')
+    xlsx = agencies.click("Gesamter Staatskalender als XLSX")
     assert xlsx.content_type == (
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )

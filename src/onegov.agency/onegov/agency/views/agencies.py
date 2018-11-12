@@ -26,11 +26,15 @@ def view_agencies(self, request):
     pdf_link = None
     if request.app.root_pdf_exists:
         pdf_link = request.link(self, name='pdf')
+    xlsx_link = None
+    if request.is_manager:
+        xlsx_link = request.link(request.app.org, name='export-agencies')
 
     return {
         'title': _("Agencies"),
         'agencies': self.roots,
         'pdf_link': pdf_link,
+        'xlsx_link': xlsx_link,
         'layout': AgencyCollectionLayout(self, request)
     }
 
