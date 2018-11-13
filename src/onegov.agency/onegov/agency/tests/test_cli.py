@@ -12,7 +12,7 @@ from unittest.mock import patch
 
 
 @mark.parametrize("file", [
-    module_path('onegov.agency', 'tests/fixtures/export-agencies.xls'),
+    module_path('onegov.agency', 'tests/fixtures/export.xls'),
 ])
 def test_import_agencies(cfg_path, session_manager, file):
     runner = CliRunner()
@@ -171,7 +171,7 @@ def test_import_agencies(cfg_path, session_manager, file):
 
 
 @mark.parametrize("file", [
-    module_path('onegov.agency', 'tests/fixtures/export-agencies-pdf.xls'),
+    module_path('onegov.agency', 'tests/fixtures/export-pdf.xls'),
 ])
 def test_create_pdf(temporary_directory, cfg_path, file):
     runner = CliRunner()
