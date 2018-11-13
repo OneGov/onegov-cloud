@@ -18,21 +18,37 @@ class ExtendedAgency(Agency):
 
     es_type_name = 'extended_agency'
 
+    #: Defines which fields of a membership and person should be exported to
+    #: the PDF. The fields are expected to contain two parts seperated by a
+    #: point. The first part is either `membership` or `person`, the second
+    #: the name of the attribute (e.g. `membership.title`).
     export_fields = meta_property(default=list)
 
     state = meta_property()  # todo: `is_visible`?
 
+    #: The PDF for the agency and all its suborganizations.
     pdf = associated(AgencyPdf, 'pdf', 'one-to-one')
 
     trait = 'agency'
 
     @property
     def pdf_file(self):
+        """ Returns the PDF content for the agency (and all its
+        suborganizations).
+
+        """
+
         if self.pdf:
             return self.pdf.reference.file
 
     @pdf_file.setter
     def pdf_file(self, value):
+        """ Sets the PDF content for the agency (and all its
+        suborganizations). Automatically sets a nice filename. Replaces only
+        the reference, if possible.
+
+        """
+
         filename = '{}.pdf'.format(normalize_for_url(self.title))
         if self.pdf:
             self.pdf.reference = as_fileintent(value, filename)
@@ -45,9 +61,14 @@ class ExtendedAgency(Agency):
 
     @property
     def portrait_html(self):
+        """ Returns the portrait as HTML. """
+
         return '<p>{}</p>'.format(linkify(self.portrait).replace('\n', '<br>'))
 
     def proxy(self):
+        """ Returns a proxy object to this agency allowing alternative linking
+        paths. """
+
         return AgencyProxy(self)
 
 
