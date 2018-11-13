@@ -64,6 +64,9 @@ def export_to_xlsx(request, file):
     memberships.write(0, 1, translate(_("Person")))
     memberships.write(0, 2, translate(_("Title")))
     memberships.write(0, 3, translate(_("Since")))
+    memberships.write(0, 4, translate(_("Prefix")))
+    memberships.write(0, 5, translate(_("Addition")))
+    memberships.write(0, 6, translate(_("Note")))
 
     m_row = 0
     for index, person in enumerate(ExtendedPersonCollection(session).query()):
@@ -89,6 +92,9 @@ def export_to_xlsx(request, file):
             memberships.write(m_row, 1, str(index))
             memberships.write(m_row, 2, membership.title)
             memberships.write(m_row, 3, membership.since)
+            memberships.write(m_row, 4, membership.prefix)
+            memberships.write(m_row, 5, membership.addition)
+            memberships.write(m_row, 6, membership.note)
 
     workbook.close()
 

@@ -119,11 +119,17 @@ def test_membership_form(session):
 
     form = MembershipForm(DummyPostData({
         'person_id': str(doctor.id),
-        'since': "2000",
         'title': "Doctor",
+        'since': "2000",
+        'addition': "Surgery",
+        'note': "Retired",
+        'prefix': "*",
     }))
     assert form.get_useful_data() == {
         'person_id': str(doctor.id),
-        'since': "2000",
         'title': "Doctor",
+        'addition': "Surgery",
+        'note': "Retired",
+        'since': "2000",
+        'prefix': "*",
     }

@@ -28,6 +28,18 @@ class MembershipForm(Form):
         label=_("Since"),
     )
 
+    note = StringField(
+        label=_("Note"),
+    )
+
+    addition = StringField(
+        label=_("Addition"),
+    )
+
+    prefix = StringField(
+        label=_("Prefix"),
+    )
+
     def on_request(self):
         self.request.include('common')
         self.request.include('chosen')

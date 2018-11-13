@@ -60,8 +60,6 @@ class ExtendedAgencyForm(Form):
 
     # todo: hide from public?
 
-    # todo: coordinates?
-
     def get_useful_data(self):
         exclude = {'csrf_token', 'organigram'}
         result = super(ExtendedAgencyForm, self).get_useful_data(exclude)

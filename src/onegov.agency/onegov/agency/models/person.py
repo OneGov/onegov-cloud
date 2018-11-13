@@ -2,6 +2,7 @@ from onegov.people import Person
 
 
 class ExtendedPerson(Person):
+    """ An extended version of the standard person from onegov.people. """
 
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 

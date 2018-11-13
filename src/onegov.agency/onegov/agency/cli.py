@@ -8,13 +8,13 @@ from html5lib.filters.whitespace import Filter as whitespace_filter
 from io import BytesIO
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
+from onegov.agency.models import ExtendedAgencyMembership
 from onegov.agency.pdf import DefaultAgencyPdf
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.core.html import html_to_text
 from onegov.people.collections import AgencyCollection
 from onegov.people.collections import PersonCollection
-from onegov.people.models import AgencyMembership
 from requests import get
 from textwrap import indent
 from xlrd import open_workbook
@@ -51,11 +51,11 @@ def import_agencies(group_context, file, clear, skip_root, skip_download,
             'occupation': 'person.profession',
             'phone': 'person.phone',
             'political_party': 'person.political_party',
+            'postfix': 'membership.addition',
             'role': 'membership.title',
             'start': 'membership.since',
             'title': 'person.title',
             'year': 'person.born',
-            'postfix': '??'  # todo:
         }
 
         class LinkFilter(Filter):
@@ -195,18 +195,19 @@ def import_agencies(group_context, file, clear, skip_root, skip_download,
             for membership in memberships:
                 if membership:
                     values = re.match(
-                        r'^\((\d*)\)\((.*)\)\((.*)\)\((.*)\)\((\d*)\)$',
+                        r'^\((\d*)\)\((.*)\)\((.*)\)\((.*)\)'
+                        r'\((.*)\)\((.*)\)\((\d*)\)$',
                         membership
                     ).groups()
                     person.memberships.append(
-                        AgencyMembership(
+                        ExtendedAgencyMembership(
                             agency_id=ids[int(values[0])],
                             title=values[1] or "",
                             since=values[2] or None,
-                            order=int(values[4]),
-                            meta={
-                                'prefix': values[3],
-                            }
+                            prefix=values[3],
+                            addition=values[4],
+                            note=values[5],
+                            order=int(values[6]),
                         )
                     )
 

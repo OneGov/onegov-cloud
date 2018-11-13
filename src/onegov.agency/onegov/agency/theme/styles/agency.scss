@@ -20,6 +20,17 @@
             margin-left: 0;
         }
     }
+
+    .memberships {
+        dt {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 0;
+        }
+        dd {
+            display: block;
+        }
+    }
 }
 
 .agency-export-list {

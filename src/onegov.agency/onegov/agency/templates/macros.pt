@@ -40,17 +40,15 @@
 
             <tal:block tal:condition="memberships">
                 <h3 i18n:translate>People</h3>
-                <dl>
+                <dl class="memberships">
                     <tal:block tal:repeat="membership memberships">
-                        <tal:block tal:condition="request.is_logged_in">
-                            <dt><em><a style="text" href="${request.link(membership)}">${membership.title}</a></em></dt>
-                            <dd><a href="${request.link(membership.person)}">${membership.person.title}</a></dd>
-                        </tal:block>
-                        <tal:block tal:condition="not:request.is_logged_in">
-                            <dt>${membership.title}</dt>
-                            <dd><a href="${request.link(membership.person)}">${membership.person.title}</a></dd>
-                        </tal:block>
-                        <br>
+                        <dt>
+                            <a style="text" href="${request.link(membership)}">${membership.title}</a>
+                        </dt>
+                        <dd>
+                            <span tal:condition="membership.prefix|None">${membership.prefix}</span>
+                            <a href="${request.link(membership.person)}">${membership.person.title}</a>
+                        </dd>
                     </tal:block>
                 </dl>
             </tal:block>
@@ -162,9 +160,19 @@
                     <dd><a href="${request.link(membership.person)}">${membership.person.title}</a></dd>
                 </tal:block>
 
-                <tal:block tal:condition="membership.since">
+                <tal:block tal:condition="membership.since|None">
                     <dt i18n:translate>Since</dt>
                     <dd>${membership.since}</dd>
+                </tal:block>
+
+                <tal:block tal:condition="membership.note|None">
+                    <dt i18n:translate>Note</dt>
+                    <dd>${membership.note}</dd>
+                </tal:block>
+
+                <tal:block tal:condition="membership.addition|None">
+                    <dt i18n:translate>Addition</dt>
+                    <dd>${membership.addition}</dd>
                 </tal:block>
             </dl>
         </div>

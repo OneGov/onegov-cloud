@@ -165,9 +165,11 @@ def test_import_agencies(cfg_path, session_manager, file):
     assert person.salutation == "Herr"
 
     membership = person.memberships.one()
-    assert membership.meta['prefix'] == "xx"
-    assert membership.since == "2000"
     assert membership.title == "Stimmenzähler"
+    assert membership.since == "2000"
+    assert membership.addition == "yy"
+    assert membership.note == "zz"
+    assert membership.prefix == "xx"
 
 
 @mark.parametrize("file", [

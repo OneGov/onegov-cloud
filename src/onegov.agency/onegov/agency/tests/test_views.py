@@ -116,27 +116,38 @@ def test_views(client):
     new_membership.form['title'] = "Mitglied von Zug"
     new_membership.form['person_id'].select(text="Aeschi Thomas")
     new_membership.form['since'] = "2016"
-    membership = new_membership.form.submit().follow()
+    new_membership.form['addition'] = "SVP Fraktion"
+    new_membership.form['note'] = "seit 2011"
+    new_membership.form['prefix'] = "***"
+    agency = new_membership.form.submit().follow()
 
+    assert "Mitglied von Zug" in agency
+    assert "Aeschi Thomas" in agency
+    assert "***" in agency
+
+    membership = agency.click("Mitglied von Zug")
     assert "Mitglied von Zug" in membership
     assert "Aeschi Thomas" in membership
+    assert "2016" in membership
+    assert "SVP Fraktion" in membership
+    assert "seit 2011" in membership
 
     new_membership = sr.click("Mitgliedschaft", href='new')
     new_membership.form['title'] = "Standerat für Zug"
     new_membership.form['person_id'].select(text="Eder Joachim")
-    membership = new_membership.form.submit().follow()
+    agency = new_membership.form.submit().follow()
 
-    assert "Standerat für Zug" in membership
-    assert "Eder Joachim" in membership
+    assert "Standerat für Zug" in agency
+    assert "Eder Joachim" in agency
 
     # ... edit membership
-    edit_membership = membership.click("Standerat für Zug").click("Bearbeiten")
+    edit_membership = agency.click("Standerat für Zug").click("Bearbeiten")
     edit_membership.form['title'] = "Ständerat für Zug"
     edit_membership.form['person_id'].select(text="Eder Joachim")
-    membership = edit_membership.form.submit().follow()
+    agency = edit_membership.form.submit().follow()
 
-    assert "Ständerat für Zug" in membership
-    assert "Eder Joachim" in membership
+    assert "Ständerat für Zug" in agency
+    assert "Eder Joachim" in agency
 
     # ... PDFs
     client.login_editor()

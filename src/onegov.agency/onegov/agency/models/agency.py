@@ -1,3 +1,4 @@
+from onegov.agency.models.membership import ExtendedAgencyMembership
 from onegov.core.crypto import random_token
 from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import meta_property
@@ -9,10 +10,13 @@ from onegov.people import Agency
 
 
 class AgencyPdf(File):
+    """ A PDF containing all data of an agency and its suborganizations. """
+
     __mapper_args__ = {'polymorphic_identity': 'agency_pdf'}
 
 
 class ExtendedAgency(Agency):
+    """ An extended version of the standard agency from onegov.people. """
 
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
@@ -70,6 +74,23 @@ class ExtendedAgency(Agency):
         paths. """
 
         return AgencyProxy(self)
+
+    def add_person(self, person_id, title, **kwargs):
+        """ Appends a person to the agency with the given title. """
+
+        order = kwargs.pop('order', 2 ** 16)
+
+        self.memberships.append(
+            ExtendedAgencyMembership(
+                person_id=person_id,
+                title=title,
+                order=order,
+                **kwargs
+            )
+        )
+
+        for order, membership in enumerate(self.memberships):
+            membership.order = order
 
 
 class AgencyProxy(object):

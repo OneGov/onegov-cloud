@@ -54,7 +54,14 @@ def test_utils_xlsx(agency_app, file):
             'person.title'
         ]
     )
-    gov.add_person(quimby.id, "Major", since="2001")
+    gov.add_person(
+        quimby.id,
+        "Major",
+        since="2001",
+        prefix="*",
+        addition="Second term",
+        note="Suspicion of corruption",
+    )
     dmv = agencies.add(
         parent=root,
         title="Department of Motor Vehicles",
@@ -139,18 +146,24 @@ def test_utils_xlsx(agency_app, file):
     assert sheet.cell(1, 13).value == 'Currently Major.'
 
     sheet = book.sheet_by_name('Memberships')
-    assert sheet.ncols == 4
+    assert sheet.ncols == 7
     assert sheet.nrows == 2
 
     assert sheet.cell(0, 0).value == 'Agency'
     assert sheet.cell(0, 1).value == 'Person'
     assert sheet.cell(0, 2).value == 'Title'
     assert sheet.cell(0, 3).value == 'Since'
+    assert sheet.cell(0, 4).value == 'Prefix'
+    assert sheet.cell(0, 5).value == 'Addition'
+    assert sheet.cell(0, 6).value == 'Note'
 
     assert sheet.cell(1, 0).value == str(gov.id)
     assert sheet.cell(1, 1).value == '0'
     assert sheet.cell(1, 2).value == 'Major'
     assert sheet.cell(1, 3).value == '2001'
+    assert sheet.cell(1, 4).value == '*'
+    assert sheet.cell(1, 5).value == 'Second term'
+    assert sheet.cell(1, 6).value == 'Suspicion of corruption'
 
     organigram.seek(0)
     output.seek(0)
