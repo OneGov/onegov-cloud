@@ -42,6 +42,7 @@ class ExtendedAgencyForm(Form):
         choices=[
             ('membership.title', _("Membership: Title")),
             ('membership.since', _("Membership: Since")),
+            ('membership.addition', _("Membership: Addition")),
             ('person.title', _("Person: Title")),
             ('person.last_name', _("Person: Last Name")),
             ('person.first_name', _("Person: First Name")),
@@ -52,13 +53,10 @@ class ExtendedAgencyForm(Form):
             ('person.political_party', _("Person: Political Party")),
             ('person.phone', _("Person: Phone")),
             ('person.phone_direct', _("Person: Direct Phone")),
-            # todo: postfix?
         ],
         default=['membership.title', 'person.title'],
         fieldset=_("PDF Export"),
     )
-
-    # todo: hide from public?
 
     def get_useful_data(self):
         exclude = {'csrf_token', 'organigram'}
@@ -76,6 +74,8 @@ class ExtendedAgencyForm(Form):
         if self.organigram.action == 'replace':
             if self.organigram.data:
                 model.organigram_file = self.organigram.raw_data[-1].file
+        if hasattr(self, 'is_hidden_from_public'):
+            model.is_hidden_from_public = self.is_hidden_from_public.data
 
     def reorder_export_fields(self):
         titles = dict(self.export_fields.choices)
@@ -96,5 +96,7 @@ class ExtendedAgencyForm(Form):
             fs.type = model.organigram_file.content_type
             fs.filename = model.organigram_file.filename
             self.organigram.data = self.organigram.process_fieldstorage(fs)
+        if hasattr(self, 'is_hidden_from_public'):
+            self.is_hidden_from_public.data = model.is_hidden_from_public
 
         self.reorder_export_fields()

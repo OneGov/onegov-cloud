@@ -6,6 +6,7 @@ from onegov.core.utils import linkify
 from onegov.core.utils import normalize_for_url
 from onegov.file import File
 from onegov.file.utils import as_fileintent
+from onegov.org.models.extensions import HiddenFromPublicExtension
 from onegov.people import Agency
 
 
@@ -15,20 +16,22 @@ class AgencyPdf(File):
     __mapper_args__ = {'polymorphic_identity': 'agency_pdf'}
 
 
-class ExtendedAgency(Agency):
+class ExtendedAgency(Agency, HiddenFromPublicExtension):
     """ An extended version of the standard agency from onegov.people. """
 
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
     es_type_name = 'extended_agency'
 
+    @property
+    def es_public(self):
+        return not self.is_hidden_from_public
+
     #: Defines which fields of a membership and person should be exported to
     #: the PDF. The fields are expected to contain two parts seperated by a
     #: point. The first part is either `membership` or `person`, the second
     #: the name of the attribute (e.g. `membership.title`).
     export_fields = meta_property(default=list)
-
-    state = meta_property()  # todo: `is_visible`?
 
     #: The PDF for the agency and all its suborganizations.
     pdf = associated(AgencyPdf, 'pdf', 'one-to-one')

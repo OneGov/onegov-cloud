@@ -134,7 +134,7 @@ def import_agencies(group_context, file, clear, skip_root, skip_download,
                 title=sheet.cell_value(row, 2).strip(),
                 portrait=portrait,
                 export_fields=export_fields,
-                state=sheet.cell_value(row, 8),
+                is_hidden_from_public=sheet.cell_value(row, 8) == 'private',
                 order=external_id,
             )
             ids[external_id] = agency.id
@@ -189,9 +189,10 @@ def import_agencies(group_context, file, clear, skip_root, skip_download,
                 phone_direct=sheet.cell_value(row, 9).strip(),
                 salutation=sheet.cell_value(row, 10).strip(),
                 website=sheet.cell_value(row, 12).strip(),
+                is_hidden_from_public=sheet.cell_value(row, 15) == 'private',
                 notes=notes,
             )
-            memberships = sheet.cell_value(row, 15).split('//')
+            memberships = sheet.cell_value(row, 16).split('//')
             for membership in memberships:
                 if membership:
                     values = re.match(

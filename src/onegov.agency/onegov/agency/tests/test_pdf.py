@@ -82,3 +82,57 @@ def test_default_agency_pdf(session):
     assert "Bundesbehörden" not in pdf
     assert "FDP" not in pdf
     assert "SVP" not in pdf
+
+
+def test_default_agency_pdf_hidden(session):
+    people = ExtendedPersonCollection(session)
+    aeschi = people.add(
+        last_name="Aeschi",
+        first_name="Thomas",
+        is_hidden_from_public=True
+    )
+    eder = people.add(
+        last_name="Eder",
+        first_name="Joachim"
+    )
+
+    agencies = ExtendedAgencyCollection(session)
+    bund = agencies.add_root(title="Bundesbehörden")
+    agencies.add(
+        parent=bund,
+        title="Bundesrat",
+        is_hidden_from_public=True
+    )
+    nr = agencies.add(
+        parent=bund,
+        title="Nationalrat",
+        export_fields=['membership.title', 'person.title']
+    )
+    sr = agencies.add(
+        parent=bund,
+        title="Ständerat",
+        export_fields=['membership.title', 'person.title']
+    )
+
+    nr.add_person(aeschi.id, "Mitglied von Zug")
+    sr.add_person(eder.id, "Ständerat für Zug", is_hidden_from_public=True)
+
+    file = DefaultAgencyPdf.from_agencies(
+        agencies=[bund],
+        author="Kanton Zug",
+        title="Staatskalender Zug",
+        toc=False,
+        exclude=[]
+    )
+    reader = PdfFileReader(file)
+    pdf = '\n'.join([
+        reader.getPage(page).extractText()
+        for page in range(reader.getNumPages())
+    ])
+    assert "Bundesrat" not in pdf
+    assert "Nationalrat" in pdf
+    assert "Ständerat" in pdf
+    assert "Mitglied von Zug" not in pdf
+    assert "Aeschi" not in pdf
+    assert "Ständerat für Zug" not in pdf
+    assert "Eder" not in pdf

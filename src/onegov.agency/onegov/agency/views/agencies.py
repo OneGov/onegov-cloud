@@ -8,12 +8,29 @@ from onegov.agency.forms import MembershipForm
 from onegov.agency.layouts import AgencyCollectionLayout
 from onegov.agency.layouts import AgencyLayout
 from onegov.agency.models import ExtendedAgency
+from onegov.agency.models import ExtendedAgencyMembership
 from onegov.agency.pdf import DefaultAgencyPdf
 from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form
 from onegov.org.elements import Link
+
+
+def get_agency_form_class(model, request):
+    if isinstance(model, ExtendedAgency):
+        return model.with_content_extensions(ExtendedAgencyForm, request)
+    return ExtendedAgency(title='title').with_content_extensions(
+        ExtendedAgencyForm, request
+    )
+
+
+def get_membership_form_class(model, request):
+    if isinstance(model, ExtendedAgencyMembership):
+        return model.with_content_extensions(MembershipForm, request)
+    return ExtendedAgencyMembership().with_content_extensions(
+        MembershipForm, request
+    )
 
 
 @AgencyApp.html(
@@ -58,7 +75,7 @@ def view_agency(self, request):
     name='new',
     template='form.pt',
     permission=Private,
-    form=ExtendedAgencyForm
+    form=get_agency_form_class
 )
 def add_root_agency(self, request, form):
 
@@ -82,7 +99,7 @@ def add_root_agency(self, request, form):
     name='new',
     template='form.pt',
     permission=Private,
-    form=ExtendedAgencyForm
+    form=get_agency_form_class
 )
 def add_agency(self, request, form):
 
@@ -107,7 +124,7 @@ def add_agency(self, request, form):
     name='new-membership',
     template='form.pt',
     permission=Private,
-    form=MembershipForm
+    form=get_membership_form_class
 )
 def add_membership(self, request, form):
 
@@ -131,7 +148,7 @@ def add_membership(self, request, form):
     name='edit',
     template='form.pt',
     permission=Private,
-    form=ExtendedAgencyForm
+    form=get_agency_form_class
 )
 def edit_agency(self, request, form):
 

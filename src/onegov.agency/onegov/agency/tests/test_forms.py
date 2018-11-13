@@ -3,8 +3,8 @@ from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.forms import ExtendedAgencyForm
 from onegov.agency.forms import MembershipForm
 from onegov.agency.models import ExtendedAgency
+from onegov.agency.models import ExtendedAgencyMembership
 from onegov.agency.models import ExtendedPerson
-from onegov.people import AgencyMembership
 from tempfile import TemporaryFile
 
 
@@ -96,7 +96,7 @@ def test_extended_agency_form(agency_app):
 
 def test_extended_agency_form_choices():
     models = {
-        'membership': AgencyMembership(),
+        'membership': ExtendedAgencyMembership(),
         'person': ExtendedPerson(first_name="f", last_name="l")
     }
 

@@ -190,3 +190,62 @@ def test_views(client):
     bund = client.get('/organizations').click("Bundesbehörden")
     agencies = bund.click("Löschen")
     assert "noch keine Organisationen" in client.get('/organizations')
+
+
+def test_views_hidden(client):
+    # Add data
+    client.login_editor()
+
+    new_person = client.get('/people').click('Person', href='new')
+    new_person.form['first_name'] = 'Thomas'
+    new_person.form['last_name'] = 'Aeschi'
+    new_person.form['is_hidden_from_public'] = True
+    person = new_person.form.submit().follow()
+    assert 'Thomas' in person
+    assert 'Aeschi' in person
+    assert 'Aeschi' in client.get('/people')
+
+    new_agency = client.get('/organizations').click('Organisation', href='new')
+    new_agency.form['title'] = 'Bundesbehörden'
+    root = new_agency.form.submit().follow()
+    assert 'Bundesbehörden' in root
+
+    new_agency = root.click('Organisation', href='new')
+    new_agency.form['title'] = 'Nationalrat'
+    new_agency.form['is_hidden_from_public'] = True
+    child = new_agency.form.submit().follow()
+    assert 'Nationalrat' in child
+    assert 'Nationalrat' in client.get('/organizations')
+
+    new_membership = root.click("Mitgliedschaft", href='new')
+    new_membership.form['title'] = "Mitglied von Zug"
+    new_membership.form['person_id'].select(text="Aeschi Thomas")
+    new_membership.form['is_hidden_from_public'] = True
+    agency = new_membership.form.submit().follow()
+    assert "Mitglied von Zug" in agency
+    assert "Aeschi Thomas" in agency
+    root_membership = agency.click("Mitglied von Zug")
+    assert "Mitglied von Zug" in root_membership
+    assert "Aeschi Thomas" in root_membership
+
+    new_membership = child.click("Mitgliedschaft", href='new')
+    new_membership.form['title'] = "Nationalrat Zug"
+    new_membership.form['person_id'].select(text="Aeschi Thomas")
+    new_membership.form['is_hidden_from_public'] = True
+    agency = new_membership.form.submit().follow()
+    assert "Nationalrat Zug" in agency
+    assert "Aeschi Thomas" in agency
+    child_membership = agency.click("Nationalrat Zug")
+    assert "Nationalrat Zug" in child_membership
+    assert "Aeschi Thomas" in child_membership
+
+    # Test forbidden views
+    client.logout()
+    client.get(person.request.url, status=403)
+    client.get(child.request.url, status=403)
+    client.get(root_membership.request.url, status=403)
+    client.get(child_membership.request.url, status=403)
+
+    # Test hiding
+    assert 'Aeschi' not in client.get('/people')
+    assert 'Nationalrat' not in client.get('/organizations')

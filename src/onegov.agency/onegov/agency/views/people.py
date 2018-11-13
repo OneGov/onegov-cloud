@@ -13,6 +13,12 @@ from onegov.org.forms import PersonForm
 from onegov.org.models import AtoZ
 
 
+def get_person_form_class(model, request):
+    if isinstance(model, ExtendedPerson):
+        return model.with_content_extensions(PersonForm, request)
+    return ExtendedPerson().with_content_extensions(PersonForm, request)
+
+
 @AgencyApp.html(
     model=ExtendedPersonCollection,
     template='extended_people.pt',
@@ -22,6 +28,9 @@ def view_people(self, request):
     request.include('common')
     request.include('chosen')
     request.include('redirectable-select')
+
+    if not request.is_logged_in:
+        self.exclude_hidden = True
 
     letters = [
         Link(
@@ -60,7 +69,6 @@ def view_people(self, request):
             return item.title
 
         def get_items(self):
-            # todo: exclude invisible
             return people
 
     people = AtoZPeople(request).get_items_by_letter()
@@ -93,7 +101,7 @@ def view_person(self, request):
     name='new',
     template='form.pt',
     permission=Private,
-    form=PersonForm
+    form=get_person_form_class
 )
 def add_person(self, request, form):
 
@@ -119,7 +127,7 @@ def add_person(self, request, form):
     name='edit',
     template='form.pt',
     permission=Private,
-    form=PersonForm
+    form=get_person_form_class
 )
 def edit_person(self, request, form):
 

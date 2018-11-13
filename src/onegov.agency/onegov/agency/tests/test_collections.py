@@ -98,3 +98,20 @@ def test_extended_people_used_agencies(session):
     hospital.add_person(ned.id, "Volunteer")
 
     assert people.used_agencies == ['Ħospital', 'Police']
+
+
+def test_extended_people_exclude_hidden(session):
+    people = ExtendedPersonCollection(session)
+    assert people.exclude_hidden is False
+
+    person = people.add(first_name="Hans", last_name="Maulwurf")
+    assert people.query().count() == 1
+
+    people.exclude_hidden = True
+    assert people.query().count() == 1
+
+    person.is_hidden_from_public = True
+    assert people.query().count() == 0
+
+    person.is_hidden_from_public = False
+    assert people.query().count() == 1

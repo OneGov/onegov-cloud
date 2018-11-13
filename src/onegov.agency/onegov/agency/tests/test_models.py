@@ -25,11 +25,12 @@ def test_extended_agency(agency_app):
     assert agency.portrait == "This is a test\nagency."
     assert agency.portrait_html == "<p>This is a test<br>agency.</p>"
     assert agency.export_fields == []
-    assert agency.state is None
     assert agency.pdf is None
     assert agency.pdf_file is None
     assert agency.trait == 'agency'
     assert agency.proxy().id == agency.id
+    assert agency.is_hidden_from_public is None
+    assert agency.es_public is True
 
     agency.pdf_file = b'PDF'
     assert agency.pdf_file.read() == b'PDF'
@@ -40,6 +41,9 @@ def test_extended_agency(agency_app):
     assert agency.pdf_file.read() == b'PDF2'
     assert agency.pdf_file.filename == 'test-agency.pdf'
     assert agency.pdf.name == 'test-agency.pdf'
+
+    agency.is_hidden_from_public = True
+    assert agency.es_public is False
 
 
 def test_extended_agency_add_person(session):
@@ -88,6 +92,11 @@ def test_extended_person(session):
     assert person.address_html == "<p>Street 1<br>City</p>"
     assert person.notes == "This is\na note."
     assert person.notes_html == "<p>This is<br>a note.</p>"
+    assert person.is_hidden_from_public is None
+    assert person.es_public is True
+
+    person.is_hidden_from_public = True
+    assert person.es_public is False
 
 
 def test_extended_membership(session):
@@ -120,9 +129,22 @@ def test_extended_membership(session):
     assert membership.note == "Interim"
     assert membership.addition == "Production"
     assert membership.prefix == "*"
+    assert membership.is_hidden_from_public is None
+    assert membership.es_public is True
     assert membership.agency_id == agency.id
     assert membership.person_id == person.id
     assert membership.agency == agency
     assert membership.person == person
     assert agency.memberships.one() == membership
     assert person.memberships.one() == membership
+
+    membership.is_hidden_from_public = True
+    assert membership.es_public is False
+
+    membership.is_hidden_from_public = False
+    membership.agency.is_hidden_from_public = True
+    assert membership.es_public is False
+
+    membership.agency.is_hidden_from_public = False
+    membership.person.is_hidden_from_public = True
+    assert membership.es_public is False

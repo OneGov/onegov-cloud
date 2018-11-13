@@ -10,6 +10,10 @@ from onegov.people import AgencyMembership
 from onegov.people import AgencyMembershipCollection
 
 
+def get_membership_form_class(model, request):
+    return model.with_content_extensions(MembershipForm, request)
+
+
 @AgencyApp.html(
     model=AgencyMembership,
     template='membership.pt',
@@ -29,7 +33,7 @@ def view_membership(self, request):
     name='edit',
     template='form.pt',
     permission=Private,
-    form=MembershipForm
+    form=get_membership_form_class
 )
 def edit_membership(self, request, form):
 

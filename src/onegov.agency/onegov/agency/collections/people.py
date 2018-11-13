@@ -5,6 +5,7 @@ from onegov.people import Agency
 from onegov.people import AgencyMembership
 from onegov.people import PersonCollection
 from sqlalchemy import func
+from sqlalchemy import or_
 
 
 class ExtendedPersonCollection(PersonCollection, Pagination):
@@ -24,6 +25,7 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
         self.page = page
         self.letter = letter
         self.agency = agency
+        self.exclude_hidden = False
 
     def subset(self):
         return self.query()
@@ -52,6 +54,13 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
 
     def query(self):
         query = self.session.query(ExtendedPerson)
+        if self.exclude_hidden:
+            query = query.filter(
+                or_(
+                    ExtendedPerson.meta['is_hidden_from_public'] == False,
+                    ExtendedPerson.meta['is_hidden_from_public'] == None,
+                )
+            )
         if self.letter:
             query = query.filter(
                 func.unaccent(ExtendedPerson.last_name).startswith(self.letter)

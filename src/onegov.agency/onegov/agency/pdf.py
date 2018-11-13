@@ -30,6 +30,8 @@ class DefaultAgencyPdf(Pdf):
             pdf.table_of_contents()
             pdf.pagebreak()
         for agency in agencies:
+            if agency.is_hidden_from_public:
+                continue
             pdf.agency(agency, exclude)
             pdf.pagebreak()
         pdf.generate()
@@ -42,6 +44,12 @@ class DefaultAgencyPdf(Pdf):
 
         data = []
         for membership in agency.memberships:
+            if (
+                membership.is_hidden_from_public or
+                membership.person.is_hidden_from_public
+            ):
+                continue
+
             title = ''
             if 'membership.title' in agency.export_fields:
                 title = membership.title
@@ -67,7 +75,8 @@ class DefaultAgencyPdf(Pdf):
                 description
             ])
 
-        self.table(data, [5.5 * cm, 0.5 * cm, None])
+        if data:
+            self.table(data, [5.5 * cm, 0.5 * cm, None])
 
     def agency(self, agency, exclude, level=1, content_so_far=False):
         """ Adds a single agency with the portrait and memberships. """
@@ -96,6 +105,8 @@ class DefaultAgencyPdf(Pdf):
             has_content = True
 
         for child in agency.children:
+            if child.is_hidden_from_public:
+                continue
             child_has_content = self.agency(
                 child, exclude, level + 1, has_content
             )
