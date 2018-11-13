@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the spoken name to the elasticsearch suggestions.
+  [msom]
+
 0.6.3 (2018-11-12)
 ~~~~~~~~~~~~~~~~~~~
 

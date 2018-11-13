@@ -35,6 +35,10 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable):
     }
 
     @property
+    def es_suggestion(self):
+        return (self.title, f"{self.first_name} {self.last_name}")
+
+    @property
     def title(self):
         """ Returns the Estern-ordered name. """
 
