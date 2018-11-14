@@ -8,6 +8,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy.orm import backref
+from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
@@ -75,3 +76,14 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable):
 
     #: when the membership started
     since = Column(Text, nullable=True)
+
+    @property
+    def siblings(self):
+        """ Returns a query that includes all siblings, including the item
+        itself.
+
+        """
+        query = object_session(self).query(self.__class__)
+        query = query.order_by(self.__class__.order)
+        query = query.filter(self.__class__.agency == self.agency)
+        return query

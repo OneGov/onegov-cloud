@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to move memberships of an agency.
+  [msom]
+
 0.6.4 (2018-11-13)
 ~~~~~~~~~~~~~~~~~~~
 

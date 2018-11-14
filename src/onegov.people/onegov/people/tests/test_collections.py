@@ -1,3 +1,4 @@
+from onegov.core.orm.abstract import MoveDirection
 from onegov.people.collections import AgencyCollection
 from onegov.people.collections import AgencyMembershipCollection
 from onegov.people.collections import PersonCollection
@@ -64,3 +65,39 @@ def test_memberships(session):
     )
 
     assert [m.title for m in memberships.query()] == ["Director", "Member"]
+
+
+def test_memberships_move(session):
+    people = PersonCollection(session)
+    person = people.add(first_name='First', last_name='Name')
+
+    agencies = AgencyCollection(session)
+    agency = agencies.add_root(title="Agency")
+
+    memberships = AgencyMembershipCollection(session)
+    membership_a = memberships.add(
+        title="A",
+        agency_id=agency.id,
+        person_id=person.id,
+        order=1
+    )
+    membership_b = memberships.add(
+        title="B",
+        agency_id=agency.id,
+        person_id=person.id,
+        order=2
+    )
+    membership_c = memberships.add(
+        title="C",
+        agency_id=agency.id,
+        person_id=person.id,
+        order=3
+    )
+
+    assert [m.title for m in memberships.query()] == ['A', 'B', 'C']
+
+    memberships.move(membership_a, membership_b, MoveDirection.below)
+    assert [m.title for m in memberships.query()] == ['B', 'A', 'C']
+
+    memberships.move(membership_c, membership_b, MoveDirection.above)
+    assert [m.title for m in memberships.query()] == ['C', 'B', 'A']

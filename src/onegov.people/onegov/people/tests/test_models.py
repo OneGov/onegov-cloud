@@ -328,3 +328,40 @@ def test_membership_polymorphism(session):
     assert session.query(AgencyMembership).count() == 3
     assert session.query(MyMembership).one().title == 'my'
     assert session.query(MyOtherMembership).one().title == 'other'
+
+
+def test_membership_siblings(session):
+    agency_a = Agency(title='A', name='a')
+    agency_b = Agency(title='B', name='b')
+    person = Person(first_name='a', last_name='person')
+    session.add(agency_a)
+    session.add(agency_b)
+    session.add(person)
+    session.flush()
+
+    membership_x = AgencyMembership(
+        title="X",
+        order=1,
+        agency_id=agency_a.id,
+        person_id=person.id
+    )
+    membership_y = AgencyMembership(
+        title="Y",
+        order=2,
+        agency_id=agency_a.id,
+        person_id=person.id
+    )
+    membership_z = AgencyMembership(
+        title="Z",
+        order=3,
+        agency_id=agency_b.id,
+        person_id=person.id
+    )
+    session.add(membership_z)
+    session.add(membership_x)
+    session.add(membership_y)
+    session.flush()
+
+    assert [m.title for m in membership_x.siblings] == ['X', 'Y']
+    assert [m.title for m in membership_y.siblings] == ['X', 'Y']
+    assert [m.title for m in membership_z.siblings] == ['Z']
