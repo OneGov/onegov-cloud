@@ -3,6 +3,7 @@ from onegov.agency import _
 from onegov.agency import AgencyApp
 from onegov.agency.forms import MembershipForm
 from onegov.agency.layouts import MembershipLayout
+from onegov.agency.models import AgencyMembershipMove
 from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.org.elements import Link
@@ -63,3 +64,13 @@ def delete_membership(self, request):
 
     request.assert_valid_csrf_token()
     AgencyMembershipCollection(request.session).delete(self)
+
+
+@AgencyApp.view(
+    model=AgencyMembershipMove,
+    permission=Private,
+    request_method='PUT'
+)
+def move_membership(self, request):
+    request.assert_valid_csrf_token()
+    self.execute()

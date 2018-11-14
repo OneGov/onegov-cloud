@@ -1,3 +1,6 @@
+from onegov.agency.collections import ExtendedAgencyCollection
+from onegov.agency.models import AgencyMembershipMove
+from onegov.agency.models import AgencyMove
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedAgencyMembership
 from onegov.agency.models import ExtendedPerson
@@ -148,3 +151,85 @@ def test_extended_membership(session):
     membership.agency.is_hidden_from_public = False
     membership.person.is_hidden_from_public = True
     assert membership.es_public is False
+
+
+def test_agency_move(session):
+    # test URL template
+    move = AgencyMove(None, None, None, None).for_url_template()
+    assert move.direction == '{direction}'
+    assert move.subject_id == '{subject_id}'
+    assert move.target_id == '{target_id}'
+
+    # test execute
+    collection = ExtendedAgencyCollection(session)
+    collection.add_root(title='2', id=2, order=2)
+    collection.add_root(title='1', id=1, oder=1)
+    parent = collection.add_root(title='3', id=3, order=3)
+    collection.add(parent=parent, title='5', id=5, order=2)
+    collection.add(parent=parent, title='4', id=4, order=1)
+
+    def tree():
+        return [
+            [o.title, [c.title for c in o.children]]
+            for o in collection.query().filter_by(parent_id=None)
+        ]
+
+    assert tree() == [['1', []], ['2', []], ['3', ['4', '5']]]
+
+    AgencyMove(session, 1, 2, 'below').execute()
+    assert tree() == [['2', []], ['1', []], ['3', ['4', '5']]]
+
+    AgencyMove(session, 3, 1, 'above').execute()
+    assert tree() == [['2', []], ['3', ['4', '5']], ['1', []]]
+
+    AgencyMove(session, 5, 4, 'above').execute()
+    session.flush()
+    session.expire_all()
+    assert tree() == [['2', []], ['3', ['5', '4']], ['1', []]]
+
+    # invalid
+    AgencyMove(session, 8, 9, 'above').execute()
+    assert tree() == [['2', []], ['3', ['5', '4']], ['1', []]]
+
+    AgencyMove(session, 5, 2, 'above').execute()
+    session.expire_all()
+    assert tree() == [['2', []], ['3', ['5', '4']], ['1', []]]
+
+
+def test_membership_move(session):
+    # test URL template
+    move = AgencyMembershipMove(None, None, None, None).for_url_template()
+    assert move.direction == '{direction}'
+    assert move.subject_id == '{subject_id}'
+    assert move.target_id == '{target_id}'
+
+    # test execute
+    agency_a = ExtendedAgency(title="A", name="a",)
+    agency_b = ExtendedAgency(title="B", name="b",)
+    person = ExtendedPerson(first_name="P", last_name="P")
+    session.add(agency_a)
+    session.add(agency_b)
+    session.add(person)
+    session.flush()
+
+    agency_a.add_person(person.id, "X")
+    agency_a.add_person(person.id, "Y")
+    agency_a.add_person(person.id, "Z")
+    agency_b.add_person(person.id, "K")
+
+    x = agency_a.memberships.filter_by(title="X").one().id
+    y = agency_a.memberships.filter_by(title="Y").one().id
+    z = agency_a.memberships.filter_by(title="Z").one().id
+    k = agency_b.memberships.one().id
+
+    assert [m.title for m in agency_a.memberships] == ['X', 'Y', 'Z']
+
+    AgencyMembershipMove(session, x, y, 'below').execute()
+    assert [m.title for m in agency_a.memberships] == ['Y', 'X', 'Z']
+
+    AgencyMembershipMove(session, z, y, 'above').execute()
+    assert [m.title for m in agency_a.memberships] == ['Z', 'Y', 'X']
+
+    # invalid
+    AgencyMembershipMove(session, x, k, 'above').execute()
+    assert [m.title for m in agency_a.memberships] == ['Z', 'Y', 'X']

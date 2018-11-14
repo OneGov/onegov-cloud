@@ -61,6 +61,7 @@ def test_agency_collection_layout():
     layout = AgencyCollectionLayout(model, request)
     assert layout.editbar_links is None
     assert path(layout.breadcrumbs) == 'Org/ExtendedAgencyCollection'
+    assert layout.move_agency_url_template == 'AgencyMove/?csrf-token=x'
 
     # Log in as manager
     request.is_manager = True
@@ -79,6 +80,9 @@ def test_agency_layout():
     assert layout.editbar_links is None
     assert path(layout.breadcrumbs) == \
         'Org/ExtendedAgencyCollection/ExtendedAgency'
+    assert layout.move_agency_url_template == 'AgencyMove/?csrf-token=x'
+    assert layout.move_membership_url_template == \
+        'AgencyMembershipMove/?csrf-token=x'
 
     # Log in as manager
     request.is_manager = True

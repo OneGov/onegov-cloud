@@ -56,7 +56,11 @@ class ExtendedAgencyForm(Form):
         ],
         default=['membership.title', 'person.title'],
         fieldset=_("PDF Export"),
+        render_kw={'class_': 'sortable-multi-checkbox'}
     )
+
+    def on_request(self):
+        self.request.include('sortable-multi-checkbox')
 
     def get_useful_data(self):
         exclude = {'csrf_token', 'organigram'}

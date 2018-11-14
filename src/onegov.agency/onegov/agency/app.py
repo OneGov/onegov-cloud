@@ -78,3 +78,10 @@ def get_js_path():
 @AgencyApp.webasset('redirectable-select')
 def get_redirectable_asset():
     yield 'redirectable-select.js'
+
+
+@AgencyApp.webasset('sortable-multi-checkbox')
+def get_sortable_multi_checkbox_asset():
+    yield 'jquery.js'
+    yield 'sortable.js'
+    yield 'sortable-multi-checkbox.js'

@@ -7,9 +7,19 @@
             <div class="columns medium-8">
 
                 <p tal:condition="not:agencies" i18n:translate="">No agencies added yet.</p>
-                <tal:block tal:repeat="agency agencies">
-                    <div metal:use-macro="layout.macros['agency_list_card']"/>
-                </tal:block>
+
+                <ul class="agencies" data-sortable data-sortable-url="${layout.move_agency_url_template}">
+                    <li tal:repeat="agency agencies" class="agency-card agency-list-card" data-sortable-id="${agency.id}">
+                        <strong><a href="${request.link(agency)}">${agency.title}</a></strong>
+                        <ul>
+                            <tal:block tal:repeat="child agency.children">
+                                <li tal:condition="not child.is_hidden_from_public or request.is_logged_in">
+                                    <a href="${request.link(child)}">${child.title}</a>
+                                </li>
+                            </tal:block>
+                        </ul>
+                    </li>
+                </ul>
 
             </div>
 

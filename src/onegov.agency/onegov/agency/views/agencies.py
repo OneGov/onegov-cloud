@@ -7,6 +7,7 @@ from onegov.agency.forms import ExtendedAgencyForm
 from onegov.agency.forms import MembershipForm
 from onegov.agency.layouts import AgencyCollectionLayout
 from onegov.agency.layouts import AgencyLayout
+from onegov.agency.models import AgencyMove
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedAgencyMembership
 from onegov.agency.pdf import DefaultAgencyPdf
@@ -232,3 +233,13 @@ def delete_agency(self, request):
 
     request.assert_valid_csrf_token()
     ExtendedAgencyCollection(request.session).delete(self)
+
+
+@AgencyApp.view(
+    model=AgencyMove,
+    permission=Private,
+    request_method='PUT'
+)
+def move_agency(self, request):
+    request.assert_valid_csrf_token()
+    self.execute()

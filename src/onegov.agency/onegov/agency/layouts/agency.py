@@ -1,5 +1,7 @@
 from cached_property import cached_property
 from onegov.agency.collections import ExtendedAgencyCollection
+from onegov.agency.models import AgencyMembershipMove
+from onegov.agency.models import AgencyMove
 from onegov.org import _
 from onegov.org.layout import AdjacencyListLayout
 from onegov.org.layout import DefaultLayout
@@ -9,7 +11,16 @@ from onegov.org.new_elements import Link
 from onegov.org.new_elements import LinkGroup
 
 
-class AgencyCollectionLayout(DefaultLayout):
+class MoveAgencyMixin(object):
+
+    @cached_property
+    def move_agency_url_template(self):
+        return self.csrf_protected_url(
+            self.request.link(AgencyMove.for_url_template())
+        )
+
+
+class AgencyCollectionLayout(DefaultLayout, MoveAgencyMixin):
 
     @cached_property
     def breadcrumbs(self):
@@ -38,7 +49,7 @@ class AgencyCollectionLayout(DefaultLayout):
             ]
 
 
-class AgencyLayout(AdjacencyListLayout):
+class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
 
     @cached_property
     def collection(self):
@@ -105,3 +116,9 @@ class AgencyLayout(AdjacencyListLayout):
                     ]
                 ),
             ]
+
+    @cached_property
+    def move_membership_url_template(self):
+        return self.csrf_protected_url(
+            self.request.link(AgencyMembershipMove.for_url_template())
+        )

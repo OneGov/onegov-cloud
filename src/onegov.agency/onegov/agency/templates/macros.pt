@@ -6,19 +6,6 @@
       i18n:domain="onegov.agency">
 <body>
 
-    <metal:agency_card define-macro="agency_list_card" i18n:domain="onegov.agency">
-        <div class="agency-card agency-list-card">
-            <strong><a href="${request.link(agency)}">${agency.title}</a></strong>
-            <ul>
-                <tal:block tal:repeat="child agency.children">
-                    <li tal:condition="not child.is_hidden_from_public or request.is_logged_in">
-                        <a href="${request.link(child)}">${child.title}</a>
-                    </li>
-                </tal:block>
-            </ul>
-        </div>
-    </metal:agency_card>
-
     <metal:agency_card define-macro="agency_card" i18n:domain="onegov.agency">
         <div class="agency-card agency-single-item" tal:define="memberships list(agency.memberships); children list(agency.children)">
             <tal:block tal:condition="agency.portrait">
@@ -33,9 +20,9 @@
 
             <tal:block tal:condition="children">
                 <h3 i18n:translate>Suborganizations</h3>
-                <ul class="children">
+                <ul class="children" data-sortable data-sortable-url="${layout.move_agency_url_template}">
                     <tal:block tal:repeat="child children">
-                        <li tal:condition="not child.is_hidden_from_public or request.is_logged_in">
+                        <li tal:condition="not child.is_hidden_from_public or request.is_logged_in" data-sortable-id="${child.id}">
                             <a href="${request.link(child)}">${child.title}</a>
                         </li>
                     </tal:block>
@@ -44,19 +31,15 @@
 
             <tal:block tal:condition="memberships">
                 <h3 i18n:translate>People</h3>
-                <dl class="memberships">
+                <ul class="memberships" data-sortable data-sortable-url="${layout.move_membership_url_template}">
                     <tal:block tal:repeat="membership memberships">
-                        <tal:block tal:condition="(not membership.is_hidden_from_public and not membership.person.is_hidden_from_public) or request.is_logged_in">
-                            <dt>
-                                <a style="text" href="${request.link(membership)}">${membership.title}</a>
-                            </dt>
-                            <dd>
-                                <span tal:condition="membership.prefix|None">${membership.prefix}</span>
-                                <a href="${request.link(membership.person)}">${membership.person.title}</a>
-                            </dd>
-                        </tal:block>
+                        <li tal:condition="(not membership.is_hidden_from_public and not membership.person.is_hidden_from_public) or request.is_logged_in" data-sortable-id="${membership.id}">
+                            <strong><a style="text" href="${request.link(membership)}">${membership.title}</a></strong>
+                            <span tal:condition="membership.prefix|None">${membership.prefix}</span>
+                            <a href="${request.link(membership.person)}">${membership.person.title}</a>
+                        </li>
                     </tal:block>
-                </dl>
+                </ul>
             </tal:block>
 
         </div>

@@ -1,3 +1,8 @@
+.agencies {
+    list-style: none;
+    margin-left: 0;
+
+}
 .agency-list-card {
     margin-bottom: 1rem;
 }
@@ -13,22 +18,12 @@
         font-weight: normal;
     }
 
-    .children {
+    .children,
+    .memberships {
         &,
         li {
             list-style: none;
             margin-left: 0;
-        }
-    }
-
-    .memberships {
-        dt {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 0;
-        }
-        dd {
-            display: block;
         }
     }
 }
