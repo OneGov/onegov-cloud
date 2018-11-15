@@ -2631,7 +2631,7 @@ def test_basic_autocomplete(client_with_es):
 
     client.app.es_client.indices.refresh(index='_all')
     assert client.get('/search/suggest?q=Go').json == ["Gordon Flash"]
-    assert client.get('/search/suggest?q=Fl').json == []
+    assert client.get('/search/suggest?q=Fl').json == ["Flash Gordon"]
 
 
 def test_unsubscribe_link(client):

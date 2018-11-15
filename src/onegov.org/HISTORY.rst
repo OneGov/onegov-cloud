@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds compatibility with latest onegov.people release.
+  [msom]
+
 0.41.0 (2018-11-09)
 ~~~~~~~~~~~~~~~~~~~
 
