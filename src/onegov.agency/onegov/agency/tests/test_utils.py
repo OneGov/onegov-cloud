@@ -62,7 +62,7 @@ def test_utils_xlsx(agency_app, file):
         addition="Second term",
         note="Suspicion of corruption",
     )
-    dmv = agencies.add(
+    agencies.add(
         parent=root,
         title="Department of Motor Vehicles",
     )
@@ -78,38 +78,40 @@ def test_utils_xlsx(agency_app, file):
     assert sheet.nrows == 4
 
     assert sheet.cell(0, 0).value == 'ID'
-    assert sheet.cell(0, 1).value == 'Suborganizations'
-    assert sheet.cell(0, 2).value == 'Title'
-    assert sheet.cell(0, 3).value == 'Portrait'
-    assert sheet.cell(0, 4).value == 'Export Fields'
+    assert sheet.cell(0, 1).value == 'Title'
+    assert sheet.cell(0, 2).value == 'Portrait'
+    assert sheet.cell(0, 3).value == 'Export Fields'
+    assert sheet.cell(0, 4).value == 'ID of Parent Organization'
 
-    assert sheet.cell(1, 0).value == str(root.id)
-    assert sheet.cell(1, 1).value == f'{dmv.id}, {gov.id}'
-    assert sheet.cell(1, 2).value == 'Communal'
+    assert sheet.cell(1, 0).value == '1'
+    assert sheet.cell(1, 1).value == 'Communal'
+    assert sheet.cell(1, 2).value == ''
     assert sheet.cell(1, 3).value == ''
     assert sheet.cell(1, 4).value == ''
 
-    assert sheet.cell(2, 0).value == str(dmv.id)
-    assert sheet.cell(2, 1).value == ''
-    assert sheet.cell(2, 2).value == 'Department of Motor Vehicles'
+    assert sheet.cell(2, 0).value == '2'
+    assert sheet.cell(2, 1).value == 'Department of Motor Vehicles'
+    assert sheet.cell(2, 2).value == ''
     assert sheet.cell(2, 3).value == ''
-    assert sheet.cell(2, 4).value == ''
+    assert sheet.cell(2, 4).value == '1'
 
-    assert sheet.cell(3, 0).value == str(gov.id)
-    assert sheet.cell(3, 1).value == ''
-    assert sheet.cell(3, 2).value == 'Government'
-    assert sheet.cell(3, 3).value == '2016/2019'
-    assert sheet.cell(3, 4).value == 'membership.title, person.title'
+    assert sheet.cell(3, 0).value == '3'
+    assert sheet.cell(3, 1).value == 'Government'
+    assert sheet.cell(3, 2).value == '2016/2019'
+    assert sheet.cell(3, 3).value == 'membership.title, person.title'
+    assert sheet.cell(3, 4).value == '1'
 
     sheet = book.sheet_by_name('Organigrams')
-    assert sheet.ncols == 2
+    assert sheet.ncols == 3
     assert sheet.nrows == 2
 
     assert sheet.cell(0, 0).value == 'Agency'
-    assert sheet.cell(0, 1).value == 'Organigram'
+    assert sheet.cell(0, 1).value == 'Agency ID'
+    assert sheet.cell(0, 2).value == 'Organigram'
 
-    assert sheet.cell(1, 0).value == str(gov.id)
-    assert sheet.cell(1, 1).value == ''
+    assert sheet.cell(1, 0).value == 'Government'
+    assert sheet.cell(1, 1).value == '3'
+    assert sheet.cell(1, 2).value == ''
 
     sheet = book.sheet_by_name('People')
     assert sheet.ncols == 14
@@ -130,7 +132,7 @@ def test_utils_xlsx(agency_app, file):
     assert sheet.cell(0, 12).value == 'Website'
     assert sheet.cell(0, 13).value == 'Notes'
 
-    assert sheet.cell(1, 0).value == '0'
+    assert sheet.cell(1, 0).value == '1'
     assert sheet.cell(1, 1).value == 'Mr.'
     assert sheet.cell(1, 2).value == 'Dr.'
     assert sheet.cell(1, 3).value == 'Joe'
@@ -146,7 +148,7 @@ def test_utils_xlsx(agency_app, file):
     assert sheet.cell(1, 13).value == 'Currently Major.'
 
     sheet = book.sheet_by_name('Memberships')
-    assert sheet.ncols == 7
+    assert sheet.ncols == 8
     assert sheet.nrows == 2
 
     assert sheet.cell(0, 0).value == 'Agency'
@@ -156,14 +158,16 @@ def test_utils_xlsx(agency_app, file):
     assert sheet.cell(0, 4).value == 'Prefix'
     assert sheet.cell(0, 5).value == 'Addition'
     assert sheet.cell(0, 6).value == 'Note'
+    assert sheet.cell(0, 7).value == 'Order'
 
-    assert sheet.cell(1, 0).value == str(gov.id)
-    assert sheet.cell(1, 1).value == '0'
+    assert sheet.cell(1, 0).value == '3'
+    assert sheet.cell(1, 1).value == '1'
     assert sheet.cell(1, 2).value == 'Major'
     assert sheet.cell(1, 3).value == '2001'
     assert sheet.cell(1, 4).value == '*'
     assert sheet.cell(1, 5).value == 'Second term'
     assert sheet.cell(1, 6).value == 'Suspicion of corruption'
+    assert sheet.cell(1, 7).value == '0'
 
     organigram.seek(0)
     output.seek(0)
