@@ -1,7 +1,34 @@
 Changelog
 ---------
 
-- Adds XLSX export.
+- Adds an XLSX export.
+  [msom]
+
+- Allows to sort the relationships of an agency alphabetically.
+  [msom]
+
+- Allows to create the root PDF using the UI.
+  [msom]
+
+- Allows to order agencies, memberships and export fields.
+  [msom]
+
+- Allows to hide agencies, people and memberships from the public.
+  [msom]
+
+- Adds an addition and a note field to memberships.
+  [msom]
+
+- Removes the mutation panels.
+  [msom]
+
+- Exclude the person details configured in the organization.
+  [msom]
+
+- Uses English paths.
+  [msom]
+
+- Fixes adding memberships throwing an error.
   [msom]
 
 0.0.4 (2018-11-01)
