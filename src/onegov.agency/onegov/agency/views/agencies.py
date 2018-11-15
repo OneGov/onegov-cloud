@@ -144,6 +144,17 @@ def add_membership(self, request, form):
     }
 
 
+@AgencyApp.view(
+    model=ExtendedAgency,
+    name='sort-relationships',
+    request_method='POST',
+    permission=Private,
+)
+def sort_relationships(self, request):
+    request.assert_valid_csrf_token()
+    self.sort_relationships()
+
+
 @AgencyApp.form(
     model=ExtendedAgency,
     name='edit',

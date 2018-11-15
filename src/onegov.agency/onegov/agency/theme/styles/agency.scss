@@ -45,4 +45,5 @@
 .edit-bar {
     .new-agency::before { @include icon('\f0e8'); }
     .create-pdf::before { @include icon('\f1c1'); }
+    .sort-alphabetically::before { @include icon('\f15d'); }
 }

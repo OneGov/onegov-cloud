@@ -49,9 +49,17 @@ def hrefs(items):
     for item in items:
         if hasattr(item, 'links'):
             for ln in item.links:
-                yield ln.attrs.get('href') or ln.attrs.get('ic-delete-from')
+                yield (
+                    ln.attrs.get('href') or
+                    ln.attrs.get('ic-delete-from') or
+                    ln.attrs.get('ic-post-to')
+                )
         else:
-            yield item.attrs.get('href') or item.attrs.get('ic-delete-from')
+            yield (
+                item.attrs.get('href') or
+                item.attrs.get('ic-delete-from') or
+                item.attrs.get('ic-post-to')
+            )
 
 
 def test_agency_collection_layout():
@@ -90,6 +98,7 @@ def test_agency_layout():
     layout = AgencyLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
         'AgencyProxy/edit',
+        'AgencyProxy/sort-relationships?csrf-token=x',
         'AgencyProxy/create-pdf',
         'ExtendedAgency/?csrf-token=x',
         'AgencyProxy/new',

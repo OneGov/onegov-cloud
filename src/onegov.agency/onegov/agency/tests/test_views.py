@@ -146,6 +146,26 @@ def test_views(client):
     assert "Ständerat für Zug" in agency
     assert "Eder Joachim" in agency
 
+    # ... sort memberships
+    new_membership = sr.click("Mitgliedschaft", href='new')
+    new_membership.form['title'] = "Zweiter Ständerat für Zug"
+    new_membership.form['person_id'].select(text="Aeschi Thomas")
+    agency = new_membership.form.submit().follow()
+
+    assert [a.text for a in agency.pyquery('ul.memberships li a')] == [
+        'Ständerat für Zug', 'Eder Joachim',
+        'Zweiter Ständerat für Zug', 'Aeschi Thomas',
+    ]
+
+    agency.click("Mitgliedschaften sortieren")
+    agency = client.get(agency.request.url)
+    assert [a.text for a in agency.pyquery('ul.memberships li a')] == [
+        'Zweiter Ständerat für Zug', 'Aeschi Thomas',
+        'Ständerat für Zug', 'Eder Joachim',
+    ]
+
+    agency.click("Zweiter Ständerat für Zug").click("Löschen")
+
     # ... PDFs
     client.login_editor()
     bund = client.get('/organizations').click("Bundesbehörden")

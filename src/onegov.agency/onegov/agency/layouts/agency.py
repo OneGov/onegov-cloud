@@ -77,6 +77,29 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
                     attrs={'class': 'edit-link'}
                 ),
                 Link(
+                    text=_("Sort relationships"),
+                    url=self.csrf_protected_url(
+                        self.request.link(
+                            self.model.proxy(), 'sort-relationships'
+                        )
+                    ),
+                    attrs={'class': 'sort-alphabetically'},
+                    traits=(
+                        Confirm(
+                            _(
+                                "Do you really want to sort the relationships "
+                                "alphabetically by last name and first name?"
+                            ),
+                            _("This cannot be undone."),
+                            _("Sort relationships")
+                        ),
+                        Intercooler(
+                            request_method='POST',
+                            redirect_after=self.request.link(self.model)
+                        )
+                    )
+                ),
+                Link(
                     text=_("Create PDF"),
                     url=self.request.link(self.model.proxy(), 'create-pdf'),
                     attrs={'class': 'create-pdf'}
