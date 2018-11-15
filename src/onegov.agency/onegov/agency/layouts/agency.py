@@ -33,6 +33,11 @@ class AgencyCollectionLayout(DefaultLayout, MoveAgencyMixin):
     def editbar_links(self):
         if self.request.is_manager:
             return [
+                Link(
+                    text=_("Create PDF"),
+                    url=self.request.link(self.model, 'create-pdf'),
+                    attrs={'class': 'create-pdf'}
+                ),
                 LinkGroup(
                     title=_("Add"),
                     links=[

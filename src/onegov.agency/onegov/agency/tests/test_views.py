@@ -158,11 +158,10 @@ def test_views(client):
     assert pdf.content_type == 'application/pdf'
     assert pdf.content_length
 
-    client.app.root_pdf = BytesIO(pdf.body)
-
     agencies = client.get('/organizations')
+    agencies = agencies.click("PDF erstellen").form.submit().follow()
+
     pdf = agencies.click("Gesamter Staatskalender als PDF")
-    pdf = bund.click("Organisation als PDF speichern")
     assert pdf.content_type == 'application/pdf'
     assert pdf.content_length
 

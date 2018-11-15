@@ -191,6 +191,40 @@ def get_root_pdf(self, request):
 
 
 @AgencyApp.form(
+    model=ExtendedAgencyCollection,
+    name='create-pdf',
+    template='form.pt',
+    permission=Private,
+    form=Form
+)
+def create_root_pdf(self, request, form):
+
+    if form.submitted(request):
+        request.app.root_pdf = DefaultAgencyPdf.from_agencies(
+            agencies=self.roots,
+            author=request.app.org.name,
+            title=request.app.org.name,
+            toc=True,
+            exclude=request.app.org.hidden_people_fields
+        )
+        request.success(_("PDF created"))
+        return redirect(request.link(self))
+
+    layout = AgencyCollectionLayout(self, request)
+    layout.breadcrumbs.append(Link(_("Create PDF"), '#'))
+
+    return {
+        'layout': layout,
+        'title': _("Create PDF"),
+        'helptext': _(
+            "Create a PDF of this agency and all its suborganizations. "
+            "This may take a while."
+        ),
+        'form': form
+    }
+
+
+@AgencyApp.form(
     model=ExtendedAgency,
     name='create-pdf',
     template='form.pt',
