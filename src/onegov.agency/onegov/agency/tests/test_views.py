@@ -1,6 +1,3 @@
-from io import BytesIO
-
-
 def test_views(client):
     client.login_admin()
     settings = client.get('/settings')
