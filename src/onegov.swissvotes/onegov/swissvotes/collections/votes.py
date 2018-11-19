@@ -1,5 +1,6 @@
 from cached_property import cached_property
 from csv import writer
+from decimal import Decimal
 from onegov.core.collection import Pagination
 from onegov.swissvotes.fields.dataset import COLUMNS
 from onegov.swissvotes.models import PolicyArea
@@ -192,6 +193,55 @@ class SwissVoteCollection(Pagination):
         if (self.page or 0) + 1 < self.pages_count:
             return self.page_by_index((self.page or 0) + 1)
 
+    @property
+    def term_filter_numeric(self):
+        """ Returns a list of SqlAlchemy filter statements matching possible
+        numeric attributes based on the term.
+
+        """
+
+        result = []
+        for part in self.term.split():
+            if part.replace('.', '').isnumeric():
+                number = Decimal(part)
+                result.append(SwissVote.bfs_number == number)
+                result.append(SwissVote.procedure_number == number)
+
+        return result
+
+    @property
+    def term_filter_text(self):
+        """ Returns a list of SqlAlchemy filter statements matching possible
+        fulltext attributes based on the term.
+
+        """
+
+        term = ' <-> '.join([x for x in self.term.split() if x.isalnum()])
+
+        def match_convert(column, language='german'):
+            return func.to_tsvector(language, column).\
+                match(term, postgresql_regconfig='german')
+
+        def match(column, language='german'):
+            return column.match(term, postgresql_regconfig='german')
+
+        return [
+            match_convert(SwissVote.title),
+            match_convert(SwissVote.keyword),
+            match_convert(SwissVote.initiator),
+            match(SwissVote.searchable_text_de_CH),
+            match(SwissVote.searchable_text_fr_CH, 'french'),
+        ]
+
+    @property
+    def term_filter(self):
+        """ Returns a list of SqlAlchemy filter statements based on the search
+        term.
+
+        """
+
+        return self.term_filter_numeric + self.term_filter_text
+
     def query(self):
         """ Returns the votes matching to the current filters and order. """
 
@@ -243,24 +293,7 @@ class SwissVoteCollection(Pagination):
                 )
 
         if self.term:
-            term = ' <-> '.join([x for x in self.term.split() if x.isalnum()])
-
-            def match_convert(column, language='german'):
-                return func.to_tsvector(language, column).\
-                    match(term, postgresql_regconfig='german')
-
-            def match(column, language='german'):
-                return column.match(term, postgresql_regconfig='german')
-
-            query = query.filter(
-                or_(
-                    match_convert(SwissVote.title),
-                    match_convert(SwissVote.keyword),
-                    match_convert(SwissVote.initiator),
-                    match(SwissVote.searchable_text_de_CH),
-                    match(SwissVote.searchable_text_fr_CH, 'french'),
-                )
-            )
+            query = query.filter(or_(*self.term_filter))
 
         query = query.order_by(self.order_by)
 

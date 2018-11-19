@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Allows to search for BFS and procedure numbers.
+  [msom]
+
 - Fixes the formatting of BFS numbers.
   [msom]
 
