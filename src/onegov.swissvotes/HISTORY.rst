@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes the formatting of BFS numbers.
+  [msom]
+
 0.0.11 (2018-11-05)
 ~~~~~~~~~~~~~~~~~~~
 

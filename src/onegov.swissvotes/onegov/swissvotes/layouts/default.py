@@ -120,3 +120,9 @@ class DefaultLayout(ChameleonLayout):
             )
             for value, titles in paths
         ])
+
+    def format_bfs_number(self, number, decimal_places=None):
+        """ Hide the decimal places if there are none (simple votes). """
+
+        decimal_places = 0 if number.to_integral_value() == number else 1
+        return self.format_number(number, decimal_places)
