@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-05 11:21+0100\n"
+"POT-Creation-Date: 2018-11-19 14:59+0100\n"
 "PO-Revision-Date: 2018-09-18 11:29+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -71,7 +71,31 @@ msgstr ""
 msgid "Policy area"
 msgstr ""
 
-msgid "Full-text search"
+msgid "Text Search"
+msgstr ""
+
+msgid "Full Text"
+msgstr ""
+
+msgid "Position of the Federal Council"
+msgstr ""
+
+msgid "Other Filters"
+msgstr ""
+
+msgid "Position of the National Council"
+msgstr ""
+
+msgid "Position of the Council of States"
+msgstr ""
+
+msgid "Yes"
+msgstr ""
+
+msgid "No"
+msgstr ""
+
+msgid "Without / Unknown"
 msgstr ""
 
 msgid "d-1-1"
@@ -1206,9 +1230,6 @@ msgstr ""
 msgid "Pre-parliamentary phase"
 msgstr ""
 
-msgid "Position of the Federal Council"
-msgstr ""
-
 msgid "Department in charge"
 msgstr ""
 
@@ -1222,12 +1243,6 @@ msgid "Procedure number"
 msgstr ""
 
 msgid "Parliament's position"
-msgstr ""
-
-msgid "Position of the National Council"
-msgstr ""
-
-msgid "Position of the Council of States"
 msgstr ""
 
 msgid "Recommendations of the Parties"

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-05 11:21+0100\n"
-"PO-Revision-Date: 2018-11-05 11:22+0100\n"
+"POT-Creation-Date: 2018-11-19 14:59+0100\n"
+"PO-Revision-Date: 2018-11-19 14:59+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -71,8 +71,32 @@ msgstr "Abstimmungsergebnis"
 msgid "Policy area"
 msgstr "Politikbereich"
 
-msgid "Full-text search"
-msgstr "Volltextsuche"
+msgid "Text Search"
+msgstr "Textsuche"
+
+msgid "Full Text"
+msgstr "Volltext"
+
+msgid "Position of the Federal Council"
+msgstr "Position des Bundesrates"
+
+msgid "Other Filters"
+msgstr "Weitere Filter"
+
+msgid "Position of the National Council"
+msgstr "Position des Nationalrates"
+
+msgid "Position of the Council of States"
+msgstr "Position des Ständerates"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nein"
+
+msgid "Without / Unknown"
+msgstr "Ohne / Unbekannt"
 
 msgid "d-1-1"
 msgstr "Staatsordnung"
@@ -1201,9 +1225,6 @@ msgstr "Urheber"
 msgid "Pre-parliamentary phase"
 msgstr "Vorparlamentarische Phase"
 
-msgid "Position of the Federal Council"
-msgstr "Position des Bundesrates"
-
 msgid "Department in charge"
 msgstr "Federführendes Departement"
 
@@ -1218,12 +1239,6 @@ msgstr "Geschäftsnummer"
 
 msgid "Parliament's position"
 msgstr "Position des Parlaments"
-
-msgid "Position of the National Council"
-msgstr "Position des Nationalrates"
-
-msgid "Position of the Council of States"
-msgstr "Position des Ständerates"
 
 msgid "Recommendations of the Parties"
 msgstr "Parteiparolen"
@@ -1386,6 +1401,3 @@ msgstr "Seite nicht gefunden"
 
 msgid "The page you are looking for could not be found."
 msgstr "Die angeforderte Seite konnte nicht gefunden werden."
-
-#~ msgid "Yeas People"
-#~ msgstr "Ja Volk"

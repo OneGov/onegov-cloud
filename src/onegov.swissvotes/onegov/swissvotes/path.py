@@ -45,6 +45,10 @@ def get_locale(request, app, locale, to=None):
         result=[int],
         policy_area=[str],
         term=str,
+        full_text=bool,
+        position_federal_council=[int],
+        position_national_council=[int],
+        position_council_of_states=[int],
         sort_by=str,
         sort_order=str
     )
@@ -58,6 +62,10 @@ def get_votes(
     result=None,
     policy_area=None,
     term=None,
+    full_text=None,
+    position_federal_council=None,
+    position_national_council=None,
+    position_council_of_states=None,
     sort_by=None,
     sort_order=None
 ):
@@ -70,6 +78,10 @@ def get_votes(
         result=result,
         policy_area=policy_area,
         term=term,
+        full_text=full_text,
+        position_federal_council=position_federal_council,
+        position_national_council=position_national_council,
+        position_council_of_states=position_council_of_states,
         sort_by=sort_by,
         sort_order=sort_order
     )

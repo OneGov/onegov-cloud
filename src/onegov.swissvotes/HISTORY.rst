@@ -4,6 +4,12 @@ Changelog
 - Allows to search for BFS and procedure numbers.
   [msom]
 
+- Allows to search by council positions.
+  [msom]
+
+- Adds a full text search option.
+  [msom]
+
 - Fixes the formatting of BFS numbers.
   [msom]
 

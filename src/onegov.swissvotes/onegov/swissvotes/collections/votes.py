@@ -1,6 +1,7 @@
 from cached_property import cached_property
 from csv import writer
 from decimal import Decimal
+from decimal import InvalidOperation
 from onegov.core.collection import Pagination
 from onegov.swissvotes.fields.dataset import COLUMNS
 from onegov.swissvotes.models import PolicyArea
@@ -36,6 +37,10 @@ class SwissVoteCollection(Pagination):
         result=None,
         policy_area=None,
         term=None,
+        full_text=None,
+        position_federal_council=None,
+        position_national_council=None,
+        position_council_of_states=None,
         sort_by=None,
         sort_order=None
     ):
@@ -47,6 +52,10 @@ class SwissVoteCollection(Pagination):
         self.result = result
         self.policy_area = policy_area
         self.term = term
+        self.full_text = full_text
+        self.position_federal_council = position_federal_council
+        self.position_national_council = position_national_council
+        self.position_council_of_states = position_council_of_states
         self.sort_by = sort_by
         self.sort_order = sort_order
 
@@ -62,6 +71,19 @@ class SwissVoteCollection(Pagination):
             set(self.result or []) == set(other.result or []) and
             set(self.policy_area or []) == set(other.policy_area or []) and
             (self.term or None) == (other.term or None) and
+            (self.full_text or None) == (other.full_text or None) and
+            (
+                (self.position_federal_council or []) ==
+                (other.position_federal_council or [])
+            ) and
+            (
+                (self.position_national_council or []) ==
+                (other.position_national_council or [])
+            ) and
+            (
+                (self.position_council_of_states or []) ==
+                (other.position_council_of_states or [])
+            ) and
             (self.sort_by or None) == (other.sort_by or None) and
             (self.sort_order or None) == (other.sort_order or None)
         )
@@ -89,6 +111,10 @@ class SwissVoteCollection(Pagination):
             result=self.result,
             policy_area=self.policy_area,
             term=self.term,
+            full_text=self.full_text,
+            position_federal_council=self.position_federal_council,
+            position_national_council=self.position_national_council,
+            position_council_of_states=self.position_council_of_states,
             sort_by=self.sort_by,
             sort_order=self.sort_order
         )
@@ -146,6 +172,10 @@ class SwissVoteCollection(Pagination):
             result=self.result,
             policy_area=self.policy_area,
             term=self.term,
+            full_text=self.full_text,
+            position_federal_council=self.position_federal_council,
+            position_national_council=self.position_national_council,
+            position_council_of_states=self.position_council_of_states,
             sort_by=sort_by,
             sort_order=sort_order
         )
@@ -225,6 +255,11 @@ class SwissVoteCollection(Pagination):
         def match(column, language='german'):
             return column.match(term, postgresql_regconfig='german')
 
+        if not self.full_text:
+            return [
+                match_convert(SwissVote.title),
+                match_convert(SwissVote.keyword),
+            ]
         return [
             match_convert(SwissVote.title),
             match_convert(SwissVote.keyword),
@@ -254,9 +289,7 @@ class SwissVoteCollection(Pagination):
         if self.legal_form:
             query = query.filter(SwissVote._legal_form.in_(self.legal_form))
         if self.result:
-            query = query.filter(
-                SwissVote._result.in_(self.result)
-            )
+            query = query.filter(SwissVote._result.in_(self.result))
         if self.policy_area:
             levels = [[], [], []]
             for area in self.policy_area:
@@ -291,9 +324,29 @@ class SwissVoteCollection(Pagination):
                         SwissVote.descriptor_3_level_3.in_(levels[2])
                     )
                 )
-
         if self.term:
             query = query.filter(or_(*self.term_filter))
+        if self.position_federal_council:
+            query = query.filter(
+                SwissVote._position_federal_council.in_([
+                    None if position == -1 else position
+                    for position in self.position_federal_council
+                ])
+            )
+        if self.position_national_council:
+            query = query.filter(
+                SwissVote._position_national_council.in_([
+                    None if position == -1 else position
+                    for position in self.position_national_council
+                ])
+            )
+        if self.position_council_of_states:
+            query = query.filter(
+                SwissVote._position_council_of_states.in_([
+                    None if position == -1 else position
+                    for position in self.position_council_of_states
+                ])
+            )
 
         query = query.order_by(self.order_by)
 
@@ -301,6 +354,10 @@ class SwissVoteCollection(Pagination):
 
     def by_bfs_number(self, bfs_number):
         """ Returns the vote with the given BFS number. """
+        try:
+            bfs_number = Decimal(bfs_number)
+        except InvalidOperation:
+            return None
 
         query = self.query().filter(SwissVote.bfs_number == bfs_number)
         return query.first()

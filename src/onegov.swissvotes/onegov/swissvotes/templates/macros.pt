@@ -112,10 +112,10 @@
     <metal:fields define-macro="fields" i18n:domain="onegov.swissvotes">
         <div class="row">
             <tal:block repeat="field fields">
-                <div class="columns large-6 small-12">
+                <div class="columns medium-${field.render_kw['size']|12} small-12 field-type-${field.type.lower()}">
                     <metal:field use-macro="layout.macros['field']" />
                 </div>
-                <div class="clearfix" tal:condition="repeat.field.odd"></div>
+                <div class="clearfix" tal:condition="field.render_kw['clear']|True"></div>
             </tal:block>
         </div>
     </metal:fields>

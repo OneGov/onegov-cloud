@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-11-05 11:21+0100\n"
+"POT-Creation-Date: 2018-11-19 14:59+0100\n"
 "PO-Revision-Date: 2018-09-18 15:04+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: English\n"
@@ -73,7 +73,31 @@ msgstr "Voting result"
 msgid "Policy area"
 msgstr "Policy area"
 
-msgid "Full-text search"
+msgid "Text Search"
+msgstr ""
+
+msgid "Full Text"
+msgstr ""
+
+msgid "Position of the Federal Council"
+msgstr "Position of the Federal Council"
+
+msgid "Other Filters"
+msgstr ""
+
+msgid "Position of the National Council"
+msgstr "Position of the National Council"
+
+msgid "Position of the Council of States"
+msgstr "Position of the Council of States"
+
+msgid "Yes"
+msgstr ""
+
+msgid "No"
+msgstr ""
+
+msgid "Without / Unknown"
 msgstr ""
 
 msgid "d-1-1"
@@ -1199,9 +1223,6 @@ msgstr "Initiator"
 msgid "Pre-parliamentary phase"
 msgstr "Pre-parliamentary phase"
 
-msgid "Position of the Federal Council"
-msgstr "Position of the Federal Council"
-
 msgid "Department in charge"
 msgstr "Department in charge"
 
@@ -1216,12 +1237,6 @@ msgstr "Procedure number"
 
 msgid "Parliament's position"
 msgstr "Parliament's position"
-
-msgid "Position of the National Council"
-msgstr "Position of the National Council"
-
-msgid "Position of the Council of States"
-msgstr "Position of the Council of States"
 
 msgid "Recommendations of the Parties"
 msgstr "Recommendations of the Parties"
@@ -1382,6 +1397,3 @@ msgstr "Page not Found"
 
 msgid "The page you are looking for could not be found."
 msgstr "The page you are looking for could not be found."
-
-#~ msgid "Yeas People"
-#~ msgstr "Yeas People"
