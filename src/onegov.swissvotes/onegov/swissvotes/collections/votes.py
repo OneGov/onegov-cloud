@@ -282,6 +282,12 @@ class SwissVoteCollection(Pagination):
 
         query = self.session.query(SwissVote)
 
+        def in_or_none(column, values):
+            statement = column.in_(values)
+            if -1 in values:
+                statement = or_(statement, column.is_(None))
+            return statement
+
         if self.from_date:
             query = query.filter(SwissVote.date >= self.from_date)
         if self.to_date:
@@ -328,24 +334,24 @@ class SwissVoteCollection(Pagination):
             query = query.filter(or_(*self.term_filter))
         if self.position_federal_council:
             query = query.filter(
-                SwissVote._position_federal_council.in_([
-                    None if position == -1 else position
-                    for position in self.position_federal_council
-                ])
+                in_or_none(
+                    SwissVote._position_federal_council,
+                    self.position_federal_council
+                )
             )
         if self.position_national_council:
             query = query.filter(
-                SwissVote._position_national_council.in_([
-                    None if position == -1 else position
-                    for position in self.position_national_council
-                ])
+                in_or_none(
+                    SwissVote._position_national_council,
+                    self.position_national_council
+                )
             )
         if self.position_council_of_states:
             query = query.filter(
-                SwissVote._position_council_of_states.in_([
-                    None if position == -1 else position
-                    for position in self.position_council_of_states
-                ])
+                in_or_none(
+                    SwissVote._position_council_of_states,
+                    self.position_council_of_states
+                )
             )
 
         query = query.order_by(self.order_by)
