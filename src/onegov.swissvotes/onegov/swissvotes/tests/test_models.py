@@ -511,7 +511,7 @@ def test_vote_attachments(swissvotes_app):
 
     assert len(vote.files) == 1
     assert vote.voting_text.name == 'voting_text-de_CH'
-    assert "abstimmungstext" in vote.searchable_text_de_CH
+    assert "abstimmungstex" in vote.searchable_text_de_CH
     assert vote.searchable_text_fr_CH is None
 
     swissvotes_app.session_manager.current_locale = 'fr_CH'
