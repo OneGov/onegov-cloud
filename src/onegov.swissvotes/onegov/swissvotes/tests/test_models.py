@@ -356,7 +356,7 @@ def test_vote(session):
     assert vote._recommendation_lega == 5
     assert vote._recommendation_kvp == 66
     assert vote._recommendation_glp == 66
-    assert vote._recommendation_bdp == None
+    assert vote._recommendation_bdp is None
     assert vote._recommendation_mcg == 9999
     assert vote._recommendation_sav == 1
     assert vote._recommendation_eco == 2
