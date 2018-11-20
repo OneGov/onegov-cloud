@@ -51,6 +51,7 @@ setup(
             'freezegun',
             'mock',
             'onegov_testing',
+            'onegov.pdf',
             'pyquery',
             'pytest-localserver',
             'pytest>=3.0.0',
