@@ -1,6 +1,30 @@
 // initialize all foundation functions
 $(document).foundation();
 
+// Make the extended filters of the search collapsible
+var initSearchFilters = function() {
+    var fieldset = $('#fieldset-other-filters');
+    var key = 'fieldset-other-filters-hidden';
+
+    fieldset.click(function() {
+        localStorage.setItem(key, $(this).hasClass('collapsed') ? 'visible' : 'hidden');
+        $(this).toggleClass('collapsed').children('.formfields').toggle();
+    });
+
+    if (key in localStorage) {
+        var value = localStorage.getItem(key);
+        console.log('get ' + value);
+        if (value == 'hidden') {
+            console.log('clicking');
+            fieldset.click();
+        }
+    } else {
+        fieldset.click();
+    }
+};
+initSearchFilters();
+
+
 // Add backend dropdown actions
 $('ul.actions').each(function(index, element) {
     $(element).before(
