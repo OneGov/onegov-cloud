@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.12 (2018-11-20)
+~~~~~~~~~~~~~~~~~~~
 
 - Allows to search for BFS and procedure numbers.
   [msom]
