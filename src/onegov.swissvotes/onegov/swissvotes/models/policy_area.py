@@ -358,6 +358,9 @@ class PolicyArea(object):
     def __repr__(self):
         return self.value
 
+    def __eq__(self, other):
+        return self.value == other.value
+
     @cached_property
     def level(self):
         return self.value.count('.') + 1

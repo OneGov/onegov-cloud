@@ -248,6 +248,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     def recommendations_parties(self):
         return self.group_recommendations((
             (Actor('bdp'), self._recommendation_bdp),
+            (Actor('csp'), self._recommendation_csp),
             (Actor('cvp'), self._recommendation_cvp),
             (Actor('edu'), self._recommendation_edu),
             (Actor('evp'), self._recommendation_evp),
@@ -266,7 +267,6 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
             (Actor('sd'), self._recommendation_sd),
             (Actor('sps'), self._recommendation_sps),
             (Actor('svp'), self._recommendation_svp),
-            (Actor('csp'), self._recommendation_csp),
         ))
 
     _recommendation_sav = Column('recommendation_sav', Integer)
