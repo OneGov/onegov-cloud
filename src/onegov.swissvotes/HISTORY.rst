@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes displaying yeas and nays of council positions.
+  [msom]
+
 0.0.13 (2018-11-21)
 ~~~~~~~~~~~~~~~~~~~
 
