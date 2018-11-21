@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.13 (2018-11-21)
+~~~~~~~~~~~~~~~~~~~
 
 - Improves the XLSX import.
   [msom]
