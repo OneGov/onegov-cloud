@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from dateutil.parser import parse
 from decimal import Decimal
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
@@ -172,11 +173,11 @@ class SwissvoteDatasetField(UploadField):
             raise ValueError(_("No data."))
 
         headers = [column.value for column in sheet.row(0)]
-        missing = set(headers) - set(COLUMNS.values())
+        missing = set(COLUMNS.values()) - set(headers)
         if missing:
             raise ValueError(_(
                 "Some columns are missing: ${columns}.",
-                mappping={'columns': ', '.join(missing)}
+                mapping={'columns': ', '.join(missing)}
             ))
 
         for index in range(1, sheet.nrows):
@@ -184,32 +185,54 @@ class SwissvoteDatasetField(UploadField):
             vote = SwissVote()
             for attribute, column in COLUMNS.items():
                 cell = row[headers.index(column)]
-                type_ = str(vote.__table__.columns[attribute.lstrip('_')].type)
+                table_column = vote.__table__.columns[attribute.lstrip('_')]
+                type_ = str(table_column.type)
+                nullable = table_column.nullable
                 try:
                     if cell.ctype == XL_CELL_EMPTY:
                         value = None
                     elif type_ == 'TEXT':
                         value = str(cell.value)
                     elif type_ == 'DATE':
-                        value = xldate.xldate_as_datetime(
-                            cell.value,
-                            workbook.datemode
-                        ).date()
+                        if isinstance(cell.value, str):
+                            value = parse(cell.value, dayfirst=True).date()
+                        else:
+                            value = xldate.xldate_as_datetime(
+                                cell.value,
+                                workbook.datemode
+                            ).date()
                     elif type_ == 'INTEGER':
-                        value = int(cell.value)
+                        if isinstance(cell.value, str):
+                            value = cell.value
+                            value = '' if value == '.' else value
+                            value = int(value) if value else None
+                        else:
+                            value = int(cell.value)
                     elif type_ == 'INT4RANGE':
                         value = NumericRange(*[
                             int(bound) for bound in cell.value.split('-')
                         ])
                     elif type_.startswith('NUMERIC'):
-                        value = Decimal(str(cell.value))
+                        if isinstance(cell.value, str):
+                            value = cell.value
+                            value = '' if value == '.' else value
+                            value = Decimal(str(value)) if value else None
+                        else:
+                            value = Decimal(str(cell.value))
+                        if value is not None:
+                            prec = table_column.type.precision
+                            scale = table_column.type.scale
+                            value = Decimal(format(value, f'{prec}.{scale}f'))
 
                 except Exception:
                     errors.append((
                         index, column, f"'{value}' ≠ {type_.lower()}"
                     ))
 
-                setattr(vote, attribute, value)
+                else:
+                    if not nullable and value is None:
+                        errors.append((index, column, "∅"))
+                    setattr(vote, attribute, value)
 
             data.append(vote)
 

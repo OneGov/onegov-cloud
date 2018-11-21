@@ -39,6 +39,7 @@ setup(
         'onegov.quill>=0.4.0',
         'onegov.shared',
         'onegov.user',
+        'python-dateutil',
         'raven',
         'requests',
         'rjsmin',

@@ -6,11 +6,9 @@ from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.core.crypto import random_token
 from onegov.file.utils import as_fileintent
-from onegov.swissvotes import _
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import SwissVoteFile
-from onegov.swissvotes.models import TranslatablePage
 from sqlalchemy import create_engine
 
 
@@ -28,31 +26,7 @@ def add(group_context):
 
     def add_instance(request, app):
         app.cache.invalidate()
-
-        translators = {
-            locale: app.translations.get(locale) for locale in app.locales
-        }
-        session = app.session()
-        for page, title in (
-            ('home', _("Homepage")),
-            ('dataset', _("Dataset")),
-            ('about', _("About")),
-            ('contact', _("Contact")),
-            ('disclaimer', _("Disclaimer")),
-            ('imprint', _("Imprint")),
-        ):
-            translations = {
-                locale: title.interpolate(translators[locale].gettext(title))
-                for locale in app.locales
-            }
-            session.add(
-                TranslatablePage(
-                    id=page,
-                    title_translations=translations,
-                    content_translations=translations
-                )
-            )
-
+        app.add_initial_content()
         click.echo("Instance was created successfully")
 
     return add_instance
