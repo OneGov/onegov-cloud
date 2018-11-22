@@ -631,6 +631,20 @@ a.button.right {
     &:last-child {
         margin-bottom: 1em;
     }
+
+    &.dates {
+        dd a {
+            padding: 0;
+        }
+    }
+
+    @media #{$small-only} {
+        dd {
+            clear: both;
+            float: none;
+        }
+    }
+
 }
 
 
