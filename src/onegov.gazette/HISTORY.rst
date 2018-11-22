@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Shows more notices per page.
+  [msom]
+
 1.17.4 (2018-11-08)
 ~~~~~~~~~~~~~~~~~~~~
 

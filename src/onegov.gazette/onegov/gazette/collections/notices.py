@@ -27,6 +27,8 @@ TRANSLATIONS = {
 class GazetteNoticeCollection(OfficialNoticeCollection):
     """ Manage a list of gazette specific official notices. """
 
+    batch_size = 20
+
     @property
     def model_class(self):
         return GazetteNotice
