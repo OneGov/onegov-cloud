@@ -48,6 +48,9 @@
                                 <i class="fa fa-check"></i>
                             </button>
                         </dd>
+                        <dd tal:condition="current_issue">
+                            <button type="submit" class="small secondary date-shortcut" data-date="${current_issue.date.isoformat()}">${current_issue.name}</button>
+                        </dd>
                     </dl>
                 </form>
 

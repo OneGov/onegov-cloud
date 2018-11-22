@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a shortcut to filter for the current issue.
+  [msom]
+
 - Shows more notices per page.
   [msom]
 
