@@ -36,10 +36,20 @@
                         </dd>
                     </dl>
 
-                    <dl class="sub-nav dates">
+                    <dl class="sub-nav dates" tal:define="current_issue issues.current_issue">
                         <dt><tal:block i18n:translate>Issue date</tal:block>:</dt>
                         <dd><input type="date" name="from_date" value="${from_date}" placeholder=""></dd>
                         <dd><input type="date" name="to_date" value="${to_date}" placeholder=""></dd>
+                        <dd>
+                            <select >
+                                <tal:block tal:repeat="issue issues.query()">
+                                    <option value="${issue.date.isoformat()}" tal:attributes="selected (issue.date == from_date and issue.date == to_date)">${issue.name}</option>
+                                </tal:block>
+                            </select>
+                        </dd>
+                        <dd tal:condition="current_issue">
+                            <button type="submit" class="small secondary date-shortcut" data-date="${current_issue.date.isoformat()}">${current_issue.name}</button>
+                        </dd>
                         <dd tal:condition="from_date or to_date or term">
                             <a href="${clear}"><i class="fa fa-close" aria-hidden="true"></i></a>
                         </dd>
@@ -47,9 +57,6 @@
                             <button type="submit" aria-label="Submit" i18n:attributes="aria-label">
                                 <i class="fa fa-check"></i>
                             </button>
-                        </dd>
-                        <dd tal:condition="current_issue">
-                            <button type="submit" class="small secondary date-shortcut" data-date="${current_issue.date.isoformat()}">${current_issue.name}</button>
                         </dd>
                     </dl>
                 </form>

@@ -623,6 +623,15 @@ a.button.right {
         }
     }
 
+    select {
+        box-sizing: content-box;
+        height: 1.7em;
+        margin: 0;
+        min-width: 80px;
+        padding: .2em .5em;
+        width: 80%;
+    }
+
     button {
         margin: 0;
         padding: 0 .2em;
@@ -634,7 +643,16 @@ a.button.right {
 
     &.dates {
         dd a {
+            line-height: 2rem;
             padding: 0;
+        }
+
+        dd button {
+            padding-top: .4rem;
+
+            &.small {
+                padding-top: .5rem;
+            }
         }
     }
 
@@ -642,6 +660,7 @@ a.button.right {
         dd {
             clear: both;
             float: none;
+            margin-bottom: .5rem;
         }
     }
 

@@ -74,8 +74,14 @@ $('a.notice-filter').click(function(event) {
 });
 
 // Fill the notice filter dates when clicking on the shortcuts
-$('.date-shortcut').click(function(event) {
+$('.date-shortcut').click(function() {
     var date = $(this).data('date');
     $('input[name=from_date]').val(date);
     $('input[name=to_date]').val(date);
+});
+$('.sub-nav.dates select').on('change', function() {
+    var date = $(this).val();
+    $('input[name=from_date]').val(date);
+    $('input[name=to_date]').val(date);
+    $(this).parents('form').submit();
 });

@@ -8,6 +8,7 @@ from onegov.core.utils import normalize_for_url
 from onegov.gazette import _
 from onegov.gazette import GazetteApp
 from onegov.gazette.collections import GazetteNoticeCollection
+from onegov.gazette.collections import IssueCollection
 from onegov.gazette.collections.notices import TRANSLATIONS
 from onegov.gazette.forms import EmptyForm
 from onegov.gazette.forms import NoticeForm
@@ -169,7 +170,7 @@ def view_notices(self, request):
         'term': self.term,
         'from_date': self.from_date,
         'to_date': self.to_date,
-        'current_issue': layout.current_issue,
+        'issues': IssueCollection(request.session),
         'orderings': orderings,
         'clear': request.link(self.for_dates(None, None).for_term(None)),
         'new_notice': request.link(self, name='new-notice'),

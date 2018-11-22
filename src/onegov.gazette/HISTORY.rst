@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a dropdown to filter for a specific issue.
+  [msom]
+
 - Adds a shortcut to filter for the current issue.
   [msom]
 
