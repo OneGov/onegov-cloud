@@ -715,7 +715,7 @@ def is_valid_yubikey(client_id, secret_key, expected_yubikey_id, yubikey):
             raise e
 
         return False
-    except SignatureVerificationError as e:
+    except SignatureVerificationError:
         return False
 
 
