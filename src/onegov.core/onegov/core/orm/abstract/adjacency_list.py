@@ -274,6 +274,13 @@ class AdjacencyListCollection(object):
 
         return query
 
+    @property
+    def roots(self):
+        """ Returns the root elements. """
+        return self.query().filter(
+            self.__listclass__.parent_id.is_(None)
+        ).all()
+
     def by_id(self, item_id):
         """ Takes the given page id and returns the page. Try to keep this
         id away from the public. It's not a security problem if it leaks, but

@@ -57,6 +57,8 @@ def test_add(session):
     assert list(grandchild.ancestors) == [adam, child]
     assert repr(grandchild) == "FamilyMember(name='enoch', id=3, parent_id=2)"
 
+    assert family.roots == [adam]
+
 
 def test_add_unique_page(session):
 
