@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes peoples phone numbers not beeing displayed.
+  [msom]
+
 - Removes unused js parameters.
   [msom]
 
