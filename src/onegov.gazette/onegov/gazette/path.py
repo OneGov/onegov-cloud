@@ -101,11 +101,26 @@ def get_issue_pdf(request, app, name):
     converters=dict(
         from_date=extended_date_converter,
         to_date=extended_date_converter,
-        source=uuid_converter
+        categories=[str],
+        organizations=[str],
+        source=uuid_converter,
     )
 )
-def get_notices(app, state, page=0, term=None, order=None, direction=None,
-                from_date=None, to_date=None, source=None):
+def get_notices(
+    app,
+    state,
+    page=0,
+    term=None,
+    order=None,
+    direction=None,
+    from_date=None,
+    to_date=None,
+    categories=None,
+    organizations=None,
+    source=None
+):
+    categories = [c for c in categories if c] if categories else None
+    organizations = [c for c in organizations if c] if organizations else None
     return GazetteNoticeCollection(
         app.session(),
         state=state,
@@ -115,6 +130,8 @@ def get_notices(app, state, page=0, term=None, order=None, direction=None,
         direction=direction,
         from_date=from_date,
         to_date=to_date,
+        categories=categories,
+        organizations=organizations,
         source=source
     )
 

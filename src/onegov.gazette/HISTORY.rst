@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Allows to filter by categories and organizations.
+  [msom]
+
 - Adds a dropdown to filter for a specific issue.
   [msom]
 

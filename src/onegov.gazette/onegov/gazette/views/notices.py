@@ -8,7 +8,6 @@ from onegov.core.utils import normalize_for_url
 from onegov.gazette import _
 from onegov.gazette import GazetteApp
 from onegov.gazette.collections import GazetteNoticeCollection
-from onegov.gazette.collections import IssueCollection
 from onegov.gazette.collections.notices import TRANSLATIONS
 from onegov.gazette.forms import EmptyForm
 from onegov.gazette.forms import NoticeForm
@@ -161,18 +160,25 @@ def view_notices(self, request):
     if is_publisher and self.state == 'published':
         index = request.link(self, name='index')
 
+    clear = {}
+    if self.term:
+        clear['term'] = request.link(self.for_term(None))
+    if self.from_date or self.to_date:
+        clear['dates'] = request.link(self.for_dates(None, None))
+    if self.organizations:
+        clear['organization'] = request.link(self.for_organizations(None))
+    if self.categories:
+        clear['category'] = request.link(self.for_categories(None))
+
     return {
         'layout': layout,
+        'collection': self,
         'is_publisher': is_publisher,
         'notices': self.batch,
         'title': title,
         'filters': filters,
-        'term': self.term,
-        'from_date': self.from_date,
-        'to_date': self.to_date,
-        'issues': IssueCollection(request.session),
         'orderings': orderings,
-        'clear': request.link(self.for_dates(None, None).for_term(None)),
+        'clear': clear,
         'new_notice': request.link(self, name='new-notice'),
         'preview': preview,
         'index': index

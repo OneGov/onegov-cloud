@@ -200,6 +200,54 @@ def test_notice_collection_issues(session, issues):
     assert sorted(collection.issues) == ['2017-48', '2017-49']
 
 
+def test_notice_collection_for_organizations(session):
+    collection = GazetteNoticeCollection(session)
+
+    organizations = OrganizationCollection(session)
+    organizations.add_root(name='1', title='A')
+    organizations.add_root(name='2', title='B')
+    organizations.add_root(name='3', title='C')
+    for organization, count in (('1', 2), ('2', 4), ('3', 10)):
+        for x in range(count):
+            collection.add(
+                title='',
+                text='',
+                organization_id=organization,
+                category_id='',
+                issues=['2017-{}'.format(y) for y in range(x)],
+                user=None
+            )
+
+    assert collection.for_organizations(['1']).query().count() == 2
+    assert collection.for_organizations(['2']).query().count() == 4
+    assert collection.for_organizations(['3']).query().count() == 10
+    assert collection.for_organizations(['1', '3']).query().count() == 12
+
+
+def test_notice_collection_for_categories(session):
+    collection = GazetteNoticeCollection(session)
+
+    categories = CategoryCollection(session)
+    categories.add_root(name='1', title='A')
+    categories.add_root(name='2', title='B')
+    categories.add_root(name='3', title='C')
+    for category, count in (('1', 2), ('2', 4), ('3', 1)):
+        for x in range(count):
+            collection.add(
+                title='',
+                text='',
+                organization_id=None,
+                category_id=category,
+                issues=['2017-{}'.format(y) for y in range(x)],
+                user=None
+            )
+
+    assert collection.for_categories(['1']).query().count() == 2
+    assert collection.for_categories(['2']).query().count() == 4
+    assert collection.for_categories(['3']).query().count() == 1
+    assert collection.for_categories(['1', '3']).query().count() == 3
+
+
 def test_notice_collection_count_by_organization(session):
     collection = GazetteNoticeCollection(session)
     assert collection.count_by_organization() == []
@@ -305,3 +353,74 @@ def test_notice_collection_count_by_group(session):
     assert collection.count_by_group() == [
         ('A', 1)
     ]
+
+
+def test_notice_collection_used_issues(session):
+    collection = GazetteNoticeCollection(session)
+
+    issues = IssueCollection(session)
+    a = issues.add(
+        name='2017-1', number=1, date=date(2017, 1, 2),
+        deadline=standardize_date(datetime(2017, 1, 1, 12, 0), 'UTC')
+    )
+    b = issues.add(
+        name='2017-2', number=2, date=date(2017, 2, 2),
+        deadline=standardize_date(datetime(2017, 2, 1, 12, 0), 'UTC')
+    )
+    c = issues.add(
+        name='2017-3', number=3, date=date(2017, 3, 2),
+        deadline=standardize_date(datetime(2017, 3, 1, 12, 0), 'UTC')
+    )
+    for issues in (('3', '2'), ('1',), ('1', '3')):
+        collection.add(
+            title='',
+            text='',
+            organization_id='',
+            category_id='',
+            issues=[f'2017-{issue}' for issue in issues],
+            user=None
+        )
+
+    assert collection.used_issues == [a, b, c]
+
+
+def test_notice_collection_used_organizations(session):
+    collection = GazetteNoticeCollection(session)
+
+    organizations = OrganizationCollection(session)
+    a = organizations.add_root(name='1', title='A')
+    b = organizations.add_root(name='2', title='B')
+    c = organizations.add_root(name='3', title='C')
+    for organization, count in (('1', 2), ('2', 4), ('3', 10)):
+        for x in range(count):
+            collection.add(
+                title='',
+                text='',
+                organization_id=organization,
+                category_id='',
+                issues=['2017-{}'.format(y) for y in range(x)],
+                user=None
+            )
+
+    assert collection.used_organizations == [a, b, c]
+
+
+def test_notice_collection_used_categories(session):
+    collection = GazetteNoticeCollection(session)
+
+    categories = CategoryCollection(session)
+    a = categories.add_root(name='1', title='A')
+    b = categories.add_root(name='2', title='B')
+    c = categories.add_root(name='3', title='C')
+    for category, count in (('1', 2), ('2', 4), ('3', 1)):
+        for x in range(count):
+            collection.add(
+                title='',
+                text='',
+                organization_id=None,
+                category_id=category,
+                issues=['2017-{}'.format(y) for y in range(x)],
+                user=None
+            )
+
+    assert collection.used_categories == [a, b, c]

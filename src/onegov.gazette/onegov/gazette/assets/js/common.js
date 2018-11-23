@@ -65,21 +65,30 @@ $('ul[data-hot-issue]').each(function() {
     $("label[for='" + input + "']").addClass('warning');
 });
 
-// Submit the whole notice selection when clicking on the state links
+// Set up the chosen select in the subnavs (they have a different width)
+$('.sub-nav-chosen-select').chosen({
+    search_contains: true,
+});
+
+// Submit the whole notice selection/form when clicking on the state links
+// or the chose selects
 $('a.notice-filter').click(function(event) {
     var form = $(this).parents('form');
     form.attr('action', this.getAttribute('href'));
     form.submit();
     event.preventDefault();
 });
+$('.sub-nav-chosen-select').on('change', function() {
+    $(this).parents('form').submit();
+});
 
-// Fill the notice filter dates when clicking on the shortcuts
+// Fill the notice filter dates when clicking on the date shortcuts
 $('.date-shortcut').click(function() {
     var date = $(this).data('date');
     $('input[name=from_date]').val(date);
     $('input[name=to_date]').val(date);
 });
-$('.sub-nav.dates select').on('change', function() {
+$('.sub-nav.issue select').on('change', function() {
     var date = $(this).val();
     $('input[name=from_date]').val(date);
     $('input[name=to_date]').val(date);

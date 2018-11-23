@@ -640,19 +640,56 @@ a.button.right {
     &:last-child {
         margin-bottom: 1em;
     }
+}
 
-    &.dates {
-        dd a {
-            line-height: 2rem;
-            padding: 0;
+.sub-nav-chosen {
+    @include clearfix();
+
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 10px 10px 10px 0;
+
+    dt {
+        color: $steel;
+        float: left;
+        font-size: .875rem;
+        font-weight: normal;
+        margin-bottom: 0;
+        margin-left: 1rem;
+        text-transform: uppercase;
+    }
+
+    dd {
+        color: $steel;
+        float: left;
+        font-size: .875rem;
+        font-weight: normal;
+        margin-bottom: 0;
+        margin-left: 1rem;
+
+        a {
+            background-color: transparent;
+            color: $steel;
         }
+    }
 
-        dd button {
-            padding-top: .4rem;
+    .chosen-container {
+        margin-bottom: 0;
+    }
+}
 
-            &.small {
-                padding-top: .5rem;
-            }
+.sub-nav,
+.sub-nav-chosen {
+    .clear-link {
+        line-height: 2rem;
+        padding: 0;
+    }
+
+    button {
+        margin: .4rem;
+
+        &.small {
+            margin-top: .5rem;
         }
     }
 
@@ -660,12 +697,10 @@ a.button.right {
         dd {
             clear: both;
             float: none;
-            margin-bottom: .5rem;
+            margin-bottom: .2rem;
         }
     }
-
 }
-
 
 /*
     Forms
@@ -696,6 +731,10 @@ form {
         min-height: 30em;
     }
 
+}
+
+.manage-notices form {
+    margin-bottom: 1rem;
 }
 
 
@@ -782,4 +821,9 @@ form {
         font-family: $input-font-family !important;
         font-size: $input-font-size !important;
     }
+}
+
+.chosen-container-single .chosen-single div {
+    top: 5px !important;
+    width: 16px !important;
 }

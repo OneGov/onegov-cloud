@@ -144,7 +144,7 @@ def test_view_notices(gazette_app):
         assert "Kantonsratswahlen" in editor_3.get('/notices/accepted')
 
 
-def test_view_notices_search(gazette_app):
+def test_view_notices_filter(gazette_app):
     with freeze_time("2017-11-01 11:00"):
 
         client = Client(gazette_app)
@@ -153,7 +153,7 @@ def test_view_notices_search(gazette_app):
         # new notice
         manage = client.get('/notices/drafted/new-notice')
         manage.form['title'] = "Erneuerungswahlen"
-        manage.form['organization'] = '200'
+        manage.form['organization'] = '100'
         manage.form['category'] = '11'
         manage.form['issues'] = ['2017-44', '2017-45']
         manage.form['text'] = "1. Oktober 2017"
@@ -162,34 +162,89 @@ def test_view_notices_search(gazette_app):
         manage.form['author_date'] = '2019-01-01'
         manage.form.submit()
         client.get('/notice/erneuerungswahlen/submit').form.submit()
-        client.get('/notice/erneuerungswahlen/accept').form.submit()
 
         manage = client.get('/notices/drafted/new-notice')
         manage.form['title'] = "Kantonsratswahlen"
         manage.form['organization'] = '200'
-        manage.form['category'] = '11'
-        manage.form['issues'] = ['2017-44', '2017-45']
+        manage.form['category'] = '12'
+        manage.form['issues'] = ['2017-45', '2017-46']
         manage.form['text'] = "10. Oktober 2017"
         manage.form['author_place'] = 'Govikon'
         manage.form['author_name'] = 'State Chancellerist'
         manage.form['author_date'] = '2019-01-01'
         manage.form.submit()
         client.get('/notice/kantonsratswahlen/submit').form.submit()
-        client.get('/notice/kantonsratswahlen/accept').form.submit()
 
-        assert "Erneuerungswahlen" in client.get('/notices/accepted')
-        assert "Kantonsratswahlen" in client.get('/notices/accepted')
+        manage = client.get('/notices/drafted/new-notice')
+        manage.form['title'] = "Regierungsratswahlen"
+        manage.form['organization'] = '300'
+        manage.form['category'] = '13'
+        manage.form['issues'] = ['2017-47']
+        manage.form['text'] = "10. Oktober 2017"
+        manage.form['author_place'] = 'Govikon'
+        manage.form['author_name'] = 'State Chancellerist'
+        manage.form['author_date'] = '2019-01-01'
+        manage.form.submit()
+        client.get('/notice/regierungsratswahlen/submit').form.submit()
 
-        url = '/notices/accepted?term={}'
+        manage = client.get('/notices/submitted')
+        assert "Erneuerungswahlen" in manage
+        assert "Kantonsratswahlen" in manage
+        assert "Regierungsratswahlen" in manage
 
-        assert "Erneuerung" in client.get(url.format('wahlen'))
-        assert "Kantonsrat" in client.get(url.format('wahlen'))
+        assert '<option value="2017-11-03">2017-44</option>' in manage
+        assert '<option value="2017-11-10">2017-45</option>' in manage
+        assert '<option value="2017-11-17">2017-46</option>' in manage
+        assert '<option value="2017-11-24">2017-47</option>' in manage
+        assert '<option value="2017-12-01">2017-48</option>' not in manage
 
-        assert "Erneuerung" not in client.get(url.format('10.+Oktober'))
-        assert "Kantonsrat" in client.get(url.format('10.+Oktober'))
+        assert '<option value="100">State Chancellery</option>' in manage
+        assert '<option value="200">Civic Community</option>' in manage
+        assert '<option value="300">Municipality</option>' in manage
+        assert '<option value="500">Corporation</option>' not in manage
 
-        assert "Erneuerung" in client.get(url.format('neuerun'))
-        assert "Kantonsrat" not in client.get(url.format('neuerun'))
+        assert '<option value="11">Education</option>' in manage
+        assert '<option value="12">Submissions</option>' in manage
+        assert '<option value="13">Commercial Register</option>' in manage
+        assert '<option value="14">Elections</option>' not in manage
+
+        manage.form['term'] = 'neuerun'
+        manage = manage.form.submit().maybe_follow()
+        assert "Erneuerungswahlen" in manage
+        assert "Kantonsratswahlen" not in manage
+        assert "Regierungsratswahlen" not in manage
+
+        manage = client.get('/notices/submitted')
+        manage.form['term'] = '10. Oktober'
+        manage = manage.form.submit().maybe_follow()
+        assert "Erneuerungswahlen" not in manage
+        assert "Kantonsratswahlen" in manage
+        assert "Regierungsratswahlen" in manage
+
+        manage = client.get('/notices/submitted')
+        manage.form['term'] = '10. Oktober'
+        manage.form['categories'] = '12'
+        manage = manage.form.submit().maybe_follow()
+        assert "Erneuerungswahlen" not in manage
+        assert "Kantonsratswahlen" in manage
+        assert "Regierungsratswahlen" not in manage
+
+        manage = client.get('/notices/submitted')
+        manage.form['term'] = '10. Oktober'
+        manage.form['organizations'] = '200'
+        manage = manage.form.submit().maybe_follow()
+        assert "Erneuerungswahlen" not in manage
+        assert "Kantonsratswahlen" in manage
+        assert "Regierungsratswahlen" not in manage
+
+        manage = client.get('/notices/submitted')
+        manage.form['term'] = '10. Oktober'
+        manage.form['from_date'] = '2017-11-17'
+        manage.form['to_date'] = '2017-11-17'
+        manage = manage.form.submit().maybe_follow()
+        assert "Erneuerungswahlen" not in manage
+        assert "Kantonsratswahlen" in manage
+        assert "Regierungsratswahlen" not in manage
 
 
 def test_view_notices_order(gazette_app):

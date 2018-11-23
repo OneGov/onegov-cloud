@@ -2,8 +2,10 @@ from itertools import groupby
 from onegov.chat import MessageCollection
 from onegov.core.utils import groupbylist
 from onegov.gazette import _
+from onegov.gazette.models import Category
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import Issue
+from onegov.gazette.models import Organization
 from onegov.gazette.models.notice import GazetteNoticeChange
 from onegov.notice import OfficialNoticeCollection
 from onegov.user import User
@@ -122,6 +124,33 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
 
         result = super(GazetteNoticeCollection, self).for_order(
             order, direction
+        )
+        result.from_date = self.from_date
+        result.to_date = self.to_date
+        result.source = self.source
+        return result
+
+    def for_organizations(self, organizations):
+        """ Returns a new instance of the collection with the given
+        organizations.
+
+        """
+
+        result = super(GazetteNoticeCollection, self).for_organizations(
+            organizations
+        )
+        result.from_date = self.from_date
+        result.to_date = self.to_date
+        result.source = self.source
+        return result
+
+    def for_categories(self, categories):
+        """ Returns a new instance of the collection with the given categories.
+
+        """
+
+        result = super(GazetteNoticeCollection, self).for_categories(
+            categories
         )
         result.from_date = self.from_date
         result.to_date = self.to_date
@@ -318,3 +347,45 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
                         result[name] = result[name] + 1
                 marker = state == 'rejected'
         return sorted(list(result.items()), key=lambda x: x[1], reverse=True)
+
+    @property
+    def used_issues(self):
+        """ Returns all issues currently in use. """
+
+        session = self.session
+
+        used = session.query(GazetteNotice._issues.keys().label('list'))
+        used = list(set([value for item in used for value in item.list]))
+
+        result = session.query(Issue)
+        result = result.filter(Issue.name.in_(used))
+        result = result.order_by(Issue.name)
+        return result.all()
+
+    @property
+    def used_organizations(self):
+        """ Returns all organizations currently in use. """
+
+        session = self.session
+
+        used = session.query(GazetteNotice._organizations.keys().label('list'))
+        used = list(set([value for item in used for value in item.list]))
+
+        result = session.query(Organization)
+        result = result.filter(Organization.name.in_(used))
+        result = result.order_by(Organization.title)
+        return result.all()
+
+    @property
+    def used_categories(self):
+        """ Returns all categories currently in use. """
+
+        session = self.session
+
+        used = session.query(GazetteNotice._categories.keys().label('list'))
+        used = list(set([value for item in used for value in item.list]))
+
+        result = session.query(Category)
+        result = result.filter(Category.name.in_(used))
+        result = result.order_by(Category.title)
+        return result.all()
