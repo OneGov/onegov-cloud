@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds compatibility with onegov.core 0.74.3.
+  [msom]
+
 0.7.0 (2018-11-14)
 ~~~~~~~~~~~~~~~~~~~
 

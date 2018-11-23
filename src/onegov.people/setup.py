@@ -33,7 +33,7 @@ setup(
     platforms='any',
     python_requires='>=3.6',
     install_requires=[
-        'onegov.core>=0.4.0',
+        'onegov.core>=0.74.3',
         'onegov.file',
         'onegov.search>=1.1.0',
         'vobject'
