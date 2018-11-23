@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.74.3 (2018-11-23)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a roots property to adjacency lists.
   [msom]
