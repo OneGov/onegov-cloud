@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.8.2 (2018-11-23)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds more filter functions to categories.
   [msom]
