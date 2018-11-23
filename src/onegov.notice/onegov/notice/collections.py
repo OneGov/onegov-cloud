@@ -193,30 +193,9 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
     def model_class(self):
         return OfficialNotice
 
-    def query(self):
-        """ Returns a filtered and sorted query.
+    def filter_query(self, query):
+        """ Filters the given query by the state of the collection. """
 
-        Filters by:
-        - notice.state matches state
-        - notice.user_id is in user_ids
-        - notice.group_id is in group_ids
-        - notice.issues has any of the issues
-        - term is in title, text, category, organization, groupname, usernames
-
-        Orders by:
-        - any notice columns
-        - group name (group.name)
-        - users real name (user.realname)
-        - username (user.username)
-        - username or users real name (user.name)
-
-        """
-
-        query = self.session.query(self.model_class)
-        query = query.join(self.model_class.group, isouter=True)
-        query = query.join(self.model_class.user, isouter=True)
-
-        # filtering
         if self.state:
             query = query.filter(self.model_class.state == self.state)
         if self.term:
@@ -250,6 +229,11 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
                 self.model_class._organizations.has_any(self.organizations)
             )
 
+        return query
+
+    def order_query(self, query):
+        """ Orders the given query by the state of the collection. """
+
         direction = desc if self.direction == 'desc' else asc
         if self.order in inspect(self.model_class).columns.keys():
             attribute = getattr(self.model_class, self.order)
@@ -263,8 +247,33 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
             attribute = func.coalesce(User.realname, User.username, '')
         else:
             attribute = self.model_class.first_issue
-        query = query.order_by(None).order_by(direction(attribute))
 
+        return query.order_by(None).order_by(direction(attribute))
+
+    def query(self):
+        """ Returns a filtered and sorted query.
+
+        Filters by:
+        - notice.state matches state
+        - notice.user_id is in user_ids
+        - notice.group_id is in group_ids
+        - notice.issues has any of the issues
+        - term is in title, text, category, organization, groupname, usernames
+
+        Orders by:
+        - any notice columns
+        - group name (group.name)
+        - users real name (user.realname)
+        - username (user.username)
+        - username or users real name (user.name)
+
+        """
+
+        query = self.session.query(self.model_class)
+        query = query.join(self.model_class.group, isouter=True)
+        query = query.join(self.model_class.user, isouter=True)
+        query = self.filter_query(query)
+        query = self.order_query(query)
         return query
 
     def _get_unique_name(self, name):

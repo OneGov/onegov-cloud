@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Allows to overwrite filtering and ordering of notice queries.
+  [msom]
+
 0.8.2 (2018-11-23)
 ~~~~~~~~~~~~~~~~~~~
 
