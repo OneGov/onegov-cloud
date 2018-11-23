@@ -283,8 +283,9 @@ def test_notice_collection_categories(session):
         (['1', '4'], ['c', 'd', 'g']),
         (['2', '3'], ['c', 'e', 'f']),
     ):
-        notices.categories = categories
-        assert sorted([notice.title for notice in notices.query()]) == result
+        assert sorted([
+            n.title for n in notices.for_categories(categories).query()
+        ]) == result
 
 
 def test_notice_collection_organizations(session):
@@ -307,8 +308,9 @@ def test_notice_collection_organizations(session):
         (['1', '4'], ['c', 'd', 'g']),
         (['2', '3'], ['c', 'e', 'f']),
     ):
-        notices.organizations = organizations
-        assert sorted([notice.title for notice in notices.query()]) == result
+        assert sorted([
+            n.title for n in notices.for_organizations(organizations).query()
+        ]) == result
 
 
 def test_notice_collection_order(session):

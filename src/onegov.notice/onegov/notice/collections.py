@@ -148,6 +148,43 @@ class OfficialNoticeCollectionPagination(Pagination):
             group_ids=self.group_ids
         )
 
+    def for_organizations(self, organizations):
+        """ Returns a new instance of the collection with the given
+        organizations.
+
+        """
+
+        return self.__class__(
+            self.session,
+            state=self.state,
+            term=self.term,
+            order=self.order,
+            direction=self.direction,
+            issues=self.issues,
+            categories=self.categories,
+            organizations=organizations,
+            user_ids=self.user_ids,
+            group_ids=self.group_ids
+        )
+
+    def for_categories(self, categories):
+        """ Returns a new instance of the collection with the given categories.
+
+        """
+
+        return self.__class__(
+            self.session,
+            state=self.state,
+            term=self.term,
+            order=self.order,
+            direction=self.direction,
+            issues=self.issues,
+            categories=categories,
+            organizations=self.organizations,
+            user_ids=self.user_ids,
+            group_ids=self.group_ids
+        )
+
 
 class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
     """ Manage a list of official notices. """
