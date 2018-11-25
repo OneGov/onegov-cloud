@@ -3,21 +3,22 @@ $(document).foundation();
 
 // Make the extended filters of the search collapsible
 var initSearchFilters = function() {
-    var fieldset = $('#fieldset-other-filters');
+    var fieldsetLegend = $('#fieldset-other-filters legend');
     var key = 'fieldset-other-filters-hidden';
 
-    fieldset.click(function() {
-        localStorage.setItem(key, $(this).hasClass('collapsed') ? 'visible' : 'hidden');
-        $(this).toggleClass('collapsed').children('.formfields').toggle();
+    fieldsetLegend.click(function() {
+        var fieldset = $(this).parent('fieldset');
+        localStorage.setItem(key, fieldset.hasClass('collapsed') ? 'visible' : 'hidden');
+        fieldset.toggleClass('collapsed').children('.formfields').toggle();
     });
 
     if (key in localStorage) {
         var value = localStorage.getItem(key);
         if (value == 'hidden') {
-            fieldset.click();
+            fieldsetLegend.click();
         }
     } else {
-        fieldset.click();
+        fieldsetLegend.click();
     }
 };
 initSearchFilters();
