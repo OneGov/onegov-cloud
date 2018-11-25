@@ -13,9 +13,7 @@ var initSearchFilters = function() {
 
     if (key in localStorage) {
         var value = localStorage.getItem(key);
-        console.log('get ' + value);
         if (value == 'hidden') {
-            console.log('clicking');
             fieldset.click();
         }
     } else {
