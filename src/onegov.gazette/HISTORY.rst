@@ -19,6 +19,9 @@ Changelog
 - Fixes notice form trying to set phone numbers of non-existing users.
   [msom]
 
+- Fixes export of organizations not being in order.
+  [msom]
+
 1.17.4 (2018-11-08)
 ~~~~~~~~~~~~~~~~~~~~
 

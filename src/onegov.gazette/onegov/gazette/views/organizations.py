@@ -215,16 +215,27 @@ def export_organizations(self, request):
         request.translate(_("Parent Organization"))
     ))
 
-    query = self.query().order_by(None).order_by(Organization.name)
-    for index, organization in enumerate(query):
-        worksheet.write_row(index + 1, 0, (
-            organization.id or '',
-            organization.name or '',
-            organization.title or '',
-            organization.active,
-            organization.external_name or '',
-            organization.parent_id or ''
+    index = 0
+    for root in self.roots:
+        index += 1
+        worksheet.write_row(index, 0, (
+            root.id or '',
+            root.name or '',
+            root.title or '',
+            root.active,
+            root.external_name or '',
+            root.parent_id or ''
         ))
+        for organization in root.children:
+            index += 1
+            worksheet.write_row(index, 0, (
+                organization.id or '',
+                organization.name or '',
+                organization.title or '',
+                organization.active,
+                organization.external_name or '',
+                organization.parent_id or ''
+            ))
 
     workbook.close()
     output.seek(0)
