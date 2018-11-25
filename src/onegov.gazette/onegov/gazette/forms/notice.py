@@ -192,7 +192,7 @@ class NoticeForm(Form):
         model.issues = self.issues.data
         if self.print_only:
             model.print_only = self.print_only.data
-        if self.phone_number.data:
+        if self.phone_number.data and model.user:
             model.user.phone_number = self.phone_number.formatted_data
         model.apply_meta(self.request.session)
 
@@ -207,7 +207,8 @@ class NoticeForm(Form):
         self.at_cost.data = 'yes' if model.at_cost else 'no'
         self.billing_address.data = model.billing_address or ''
         self.issues.data = list(model.issues.keys())
-        self.phone_number.data = model.user.phone_number
+        if model.user:
+            self.phone_number.data = model.user.phone_number
         if self.print_only:
             self.print_only.data = True if model.print_only else False
 

@@ -16,6 +16,9 @@ Changelog
 - Shows more notices per page.
   [msom]
 
+- Fixes notice form trying to set phone numbers of non-existing users.
+  [msom]
+
 1.17.4 (2018-11-08)
 ~~~~~~~~~~~~~~~~~~~~
 
