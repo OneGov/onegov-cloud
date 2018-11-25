@@ -24,3 +24,12 @@
         font-size: $input-font-size !important;
     }
 }
+
+.chosen-container-single .chosen-single div {
+    top: 5px !important;
+    width: 16px !important;
+}
+
+.chosen-container-single .chosen-single abbr {
+    top: 11px !important;
+}

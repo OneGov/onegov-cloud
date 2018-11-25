@@ -27,7 +27,7 @@ def get_person_form_class(model, request):
 def view_people(self, request):
     request.include('common')
     request.include('chosen')
-    request.include('redirectable-select')
+    request.include('people-select')
 
     if not request.is_logged_in:
         self.exclude_hidden = True
@@ -55,7 +55,7 @@ def view_people(self, request):
     agencies.insert(
         0,
         Option(
-            title='-',
+            title='',
             value=request.link(self.for_filter(agency=None)),
             selected=(self.agency is None),
         )

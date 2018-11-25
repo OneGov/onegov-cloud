@@ -185,7 +185,7 @@ def test_views(client):
     # Organization filter in peoples view
     people = client.get('/people')
     options = {o.text: o.attrib for o in people.pyquery('option')}
-    assert set(options.keys()) == {'-', 'Nationalrat', 'Ständerat'}
+    assert set(options.keys()) == {None, 'Nationalrat', 'Ständerat'}
 
     people = client.get(options['Nationalrat']['value'])
     assert "Aeschi Thomas" in people

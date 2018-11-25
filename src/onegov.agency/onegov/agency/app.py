@@ -75,9 +75,9 @@ def get_js_path():
     return 'assets/js'
 
 
-@AgencyApp.webasset('redirectable-select')
-def get_redirectable_asset():
-    yield 'redirectable-select.js'
+@AgencyApp.webasset('people-select')
+def get_people_select_asset():
+    yield 'people-select.js'
 
 
 @AgencyApp.webasset('sortable-multi-checkbox')

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Allows to clear the organisation filter.
+  [msom]
+
 - Removes the XLSX export.
   [msom]
 
