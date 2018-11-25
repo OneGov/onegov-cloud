@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Removes XLSX data format from suggested citations.
+  [msom]
+
 3.7.2 (2018-11-05)
 ~~~~~~~~~~~~~~~~~~~
 
