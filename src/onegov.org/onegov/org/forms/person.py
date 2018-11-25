@@ -16,10 +16,6 @@ class PersonForm(Form):
 
     function = StringField(_("Function"))
 
-    born = StringField(_("Born"))
-    profession = StringField(_("Profession"))
-    political_party = StringField(_("Political Party"))
-
     picture_url = StringField(
         label=_("Picture"),
         description=_("URL pointing to the picture"),
@@ -29,6 +25,9 @@ class PersonForm(Form):
     email = EmailField(_("E-Mail"))
     phone = StringField(_("Phone"))
     phone_direct = StringField(_("Direct Phone Number"))
+    born = StringField(_("Born"))
+    profession = StringField(_("Profession"))
+    political_party = StringField(_("Political Party"))
     website = StringField(_("Website"), filters=(ensure_scheme, ))
 
     address = TextAreaField(
