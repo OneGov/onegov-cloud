@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.18.0 (2018-11-25)
+~~~~~~~~~~~~~~~~~~~~
 
 - Allows to filter by categories and organizations.
   [msom]
