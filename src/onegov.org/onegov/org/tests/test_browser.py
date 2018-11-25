@@ -146,6 +146,7 @@ def test_upload_image_with_error(browser, org_app):
     assert not browser.is_element_present_by_css('.field-display img')
 
 
+@pytest.mark.skip(reason="Seems to have some sort of race condition")
 def test_browse_directory_editor(browser, org_app):
     browser.login_admin()
     browser.visit('/directories/+new')
