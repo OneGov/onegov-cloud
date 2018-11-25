@@ -750,10 +750,12 @@ form {
 
         legend {
             background-color: $white-smoke;
-            color: $input-font-color;
+            border-bottom: 1px solid $input-border-color;
+            color: $monsoon;
             font-size: $input-font-size;
             margin-bottom: .75rem;
             text-align: center;
+            width: 100%;
         }
 
         legend::before,

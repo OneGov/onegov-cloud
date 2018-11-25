@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes the additional filters legend styling on Firefox.
+  [msom]
+
 1.18.0 (2018-11-25)
 ~~~~~~~~~~~~~~~~~~~~
 
