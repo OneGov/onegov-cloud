@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Removes the XLSX export.
+  [msom]
+
 - Fixes peoples phone numbers not beeing displayed.
   [msom]
 

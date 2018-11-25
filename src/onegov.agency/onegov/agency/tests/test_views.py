@@ -182,13 +182,6 @@ def test_views(client):
     assert pdf.content_type == 'application/pdf'
     assert pdf.content_length
 
-    # ... XLSX Export
-    xlsx = agencies.click("Gesamter Staatskalender als XLSX")
-    assert xlsx.content_type == (
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    )
-    assert xlsx.content_length
-
     # Organization filter in peoples view
     people = client.get('/people')
     options = {o.text: o.attrib for o in people.pyquery('option')}

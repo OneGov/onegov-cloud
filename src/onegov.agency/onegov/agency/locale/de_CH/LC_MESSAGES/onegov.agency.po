@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-11-15 13:30+0100\n"
+"POT-Creation-Date: 2018-11-25 10:37+0100\n"
 "PO-Revision-Date: 2018-11-15 13:30+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -88,69 +88,6 @@ msgstr "Zusatz"
 msgid "Prefix"
 msgstr "Präfix"
 
-msgid "ID"
-msgstr "ID"
-
-msgid "Export Fields"
-msgstr "Exportfelder"
-
-msgid "ID of Parent Organization"
-msgstr "ID der übergeordneten Organisation"
-
-msgid "Organigrams"
-msgstr "Organigramme"
-
-msgid "Agency"
-msgstr "Organisation"
-
-msgid "Agency ID"
-msgstr "ID der Organisation"
-
-msgid "Salutation"
-msgstr "Anrede"
-
-msgid "Academic Title"
-msgstr "Akademischer Titel"
-
-msgid "First name"
-msgstr "Vorname"
-
-msgid "Last name"
-msgstr "Nachname"
-
-msgid "Profession"
-msgstr "Beruf"
-
-msgid "Political Party"
-msgstr "Politische Partei"
-
-msgid "Born"
-msgstr "Jahrgang"
-
-msgid "Address"
-msgstr "Adresse"
-
-msgid "Phone"
-msgstr "Telefon"
-
-msgid "Direct Phone"
-msgstr "Direktnummer"
-
-msgid "Email"
-msgstr "E-Mail"
-
-msgid "Website"
-msgstr "Webseite"
-
-msgid "Notes"
-msgstr "Bemerkungen"
-
-msgid "Memberships"
-msgstr "Mitgliedschaften"
-
-msgid "Order"
-msgstr "Sortierung"
-
 msgid "Homepage"
 msgstr "Startseite"
 
@@ -185,6 +122,9 @@ msgstr "Möchten Sie die Organisation wirklich löschen?"
 msgid "Delete agency"
 msgstr "Organisation löschen"
 
+msgid "Agency"
+msgstr "Organisation"
+
 msgid "Membership"
 msgstr "Mitgliedschaft"
 
@@ -197,6 +137,42 @@ msgstr "Mitgliedschaft löschen"
 msgid "Suborganizations"
 msgstr "Unterorganisationen"
 
+msgid "Salutation"
+msgstr "Anrede"
+
+msgid "Academic Title"
+msgstr "Akademischer Titel"
+
+msgid "Profession"
+msgstr "Beruf"
+
+msgid "Political Party"
+msgstr "Politische Partei"
+
+msgid "Born"
+msgstr "Jahrgang"
+
+msgid "Address"
+msgstr "Adresse"
+
+msgid "Email"
+msgstr "E-Mail"
+
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "Direct Phone"
+msgstr "Direktnummer"
+
+msgid "Website"
+msgstr "Webseite"
+
+msgid "Notes"
+msgstr "Bemerkungen"
+
+msgid "Memberships"
+msgstr "Mitgliedschaften"
+
 msgid "Exports"
 msgstr "Exporte"
 
@@ -208,9 +184,6 @@ msgstr "Es wurden noch keine Organisationen hinzugefügt."
 
 msgid "Export all organisations as PDF"
 msgstr "Gesamter Staatskalender als PDF"
-
-msgid "Export all organisations as XLSX"
-msgstr "Gesamter Staatskalender als XLSX"
 
 msgid "Export this agency and its children as a PDF"
 msgstr "Organisation als PDF speichern"
