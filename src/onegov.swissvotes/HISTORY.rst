@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.15 (2018-11-25)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes switching the extended filters.
   [msom]
