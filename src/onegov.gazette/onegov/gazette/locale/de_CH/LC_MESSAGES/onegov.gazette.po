@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-18 16:15+0200\n"
-"PO-Revision-Date: 2018-09-18 16:15+0200\n"
+"POT-Creation-Date: 2018-11-25 07:53+0100\n"
+"PO-Revision-Date: 2018-11-25 07:53+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -12,7 +12,67 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.1.1\n"
+"X-Generator: Poedit 2.2\n"
+
+msgid "Show all"
+msgstr "Alle anzeigen"
+
+msgid "Show less"
+msgstr "Weniger anzeigen"
+
+#, python-format
+msgid "No. ${issue_number}, ${issue_date} / ${notice_number}"
+msgstr "Nr. ${issue_number}, ${issue_date} / ${notice_number}"
+
+#, python-format
+msgid "No. ${issue_number}, ${issue_date}"
+msgstr "Nr. ${issue_number}, ${issue_date}"
+
+msgid "Official Notices"
+msgstr "Meldungen"
+
+msgid "Issues"
+msgstr "Ausgaben"
+
+msgid "Organizations"
+msgstr "Organisationen"
+
+msgid "Categories"
+msgstr "Rubriken"
+
+msgid "Groups"
+msgstr "Gruppen"
+
+msgid "Users"
+msgstr "Benutzer"
+
+msgid "Manage"
+msgstr "Verwalten"
+
+msgid "Statistics"
+msgstr "Statistiken"
+
+msgid "Dashboard"
+msgstr "Offene Meldungen"
+
+msgid "Published Official Notices"
+msgstr "Veröffentlichte Meldungen"
+
+msgid "This value already exists."
+msgstr "Dieser Wert ist bereits vorhanden."
+
+msgid "This value is in use."
+msgstr "Dieser Wert wird verwendet."
+
+msgid "CSRF token expired"
+msgstr ""
+"Die Seite ist wegen Inaktivität abgelaufen. Bitte versuchen Sie es erneut."
+
+msgid "Gazette"
+msgstr "Amtsblatt"
+
+msgid "Index"
+msgstr "Stichwortverzeichnis"
 
 msgid "Group"
 msgstr "Gruppe"
@@ -50,92 +110,20 @@ msgstr "Eingabeschluss"
 msgid "Editors"
 msgstr "Redaktoren"
 
-msgid "Organizations"
-msgstr "Organisationen"
+msgid "Role"
+msgstr "Rolle"
 
-msgid "Categories"
-msgstr "Rubriken"
+msgid "Phone number"
+msgstr "Telefonnummer"
 
-msgid "Issues"
-msgstr "Ausgaben"
+msgid "Editor"
+msgstr "Redaktor"
 
-msgid "Show all"
-msgstr "Alle anzeigen"
+msgid "Publisher"
+msgstr "Herausgeber"
 
-msgid "Show less"
-msgstr "Weniger anzeigen"
-
-#, python-format
-msgid "No. ${issue_number}, ${issue_date} / ${notice_number}"
-msgstr "Nr. ${issue_number}, ${issue_date} / ${notice_number}"
-
-#, python-format
-msgid "No. ${issue_number}, ${issue_date}"
-msgstr "Nr. ${issue_number}, ${issue_date}"
-
-msgid "Official Notices"
-msgstr "Meldungen"
-
-msgid "Groups"
-msgstr "Gruppen"
-
-msgid "Users"
-msgstr "Benutzer"
-
-msgid "Manage"
-msgstr "Verwalten"
-
-msgid "Statistics"
-msgstr "Statistiken"
-
-msgid "Dashboard"
-msgstr "Offene Meldungen"
-
-msgid "Published Official Notices"
-msgstr "Veröffentlichte Meldungen"
-
-msgid "Gazette"
-msgstr "Amtsblatt"
-
-msgid "Index"
-msgstr "Stichwortverzeichnis"
-
-msgid "CSRF token expired"
-msgstr ""
-"Die Seite ist wegen Inaktivität abgelaufen. Bitte versuchen Sie es erneut."
-
-msgid "This value already exists."
-msgstr "Dieser Wert ist bereits vorhanden."
-
-msgid "This value is in use."
-msgstr "Dieser Wert wird verwendet."
-
-msgid "drafted"
-msgstr "in Arbeit"
-
-msgid "submitted"
-msgstr "eingereicht"
-
-msgid "rejected"
-msgstr "zurückgewiesen"
-
-msgid "accepted"
-msgstr "angenommen"
-
-msgid "published"
-msgstr "veröffentlicht"
-
-msgid "imported"
-msgstr "importiert"
-
-msgid "created"
-msgstr "erstellt"
-
-msgid "Leave blank to set the value automatically."
-msgstr "Leer lassen, um den Wert automatisch zu setzen."
-
-msgid "Comment"
-msgstr "Bemerkung"
+msgid "- none -"
+msgstr "- keine -"
 
 msgid "Title (maximum 60 characters)"
 msgstr "Titel (höchstens 60 Zeichen)"
@@ -182,23 +170,57 @@ msgstr "Ja"
 msgid "Select one"
 msgstr "Bitte auswählen"
 
-msgid "- none -"
-msgstr "- keine -"
+msgid "Leave blank to set the value automatically."
+msgstr "Leer lassen, um den Wert automatisch zu setzen."
 
-msgid "Role"
-msgstr "Rolle"
+msgid "Comment"
+msgstr "Bemerkung"
 
-msgid "Phone number"
-msgstr "Telefonnummer"
+msgid "imported"
+msgstr "importiert"
 
-msgid "Editor"
-msgstr "Redaktor"
+msgid "submitted"
+msgstr "eingereicht"
 
-msgid "Publisher"
-msgstr "Herausgeber"
+msgid "rejected"
+msgstr "zurückgewiesen"
 
-msgid "Archive"
-msgstr "Archiv"
+msgid "accepted"
+msgstr "angenommen"
+
+msgid "published"
+msgstr "veröffentlicht"
+
+msgid "New"
+msgstr "Neu"
+
+msgid "No official notices."
+msgstr "Keine Meldungen."
+
+msgid "Rejected"
+msgstr "Zurückgewiesen"
+
+msgid "User"
+msgstr "Benutzer"
+
+msgid "Drafted"
+msgstr "in Arbeit"
+
+msgid "Submitted"
+msgstr "Eingereicht"
+
+msgid "Dear Sir or Madam,"
+msgstr "Sehr geehrte Dame, sehr geehrter Herr"
+
+msgid "Your user account has been created."
+msgstr ""
+"Ihr Benutzerkonto für die Einreichung von Amtsblattinseraten wurde erstellt."
+
+msgid "Click the following link to set a password:"
+msgstr "Klicken Sie auf den folgenden Link um ein Passwort festzulegen:"
+
+msgid "Set password"
+msgstr "Passwort festlegen"
 
 msgid "Close"
 msgstr "Schliessen"
@@ -221,72 +243,51 @@ msgstr "Dateien zum Hochladen hier ablegen"
 msgid "Upload"
 msgstr "Hochladen"
 
-msgid "New"
-msgstr "Neu"
+msgid "State"
+msgstr "Status"
 
-msgid "No categories."
-msgstr "Keine Rubriken."
+msgid "Additional Filters"
+msgstr "Weitere Filter"
 
-msgid "Edit"
-msgstr "Bearbeiten"
+msgid "Processed by me"
+msgstr "Von mir bearbeitet"
+
+msgid "Search"
+msgstr "Suche"
+
+msgid "Submit"
+msgstr "Einreichen"
+
+msgid "Issue date"
+msgstr "Ausgabedatum"
+
+msgid "Issue"
+msgstr "Ausgabe"
 
 msgid "Download"
 msgstr "Herunterladen"
 
-msgid "Download as XLSX."
-msgstr "Als XLSX herunterladen."
+msgid "Download as PDF."
+msgstr "Als PDF herunterladen."
 
-msgid "No official notices."
-msgstr "Keine Meldungen."
-
-msgid "Rejected"
-msgstr "Zurückgewiesen"
-
-msgid "User"
-msgstr "Benutzer"
-
-msgid "Drafted"
-msgstr "in Arbeit"
-
-msgid "Submitted"
-msgstr "Eingereicht"
+msgid "Download the index as PDF."
+msgstr "Das Stichwortregister als PDF herunterladen."
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
 
-msgid "Number of Users"
-msgstr "Anzahl Benutzer"
+msgid "Order"
+msgstr "Ordnen"
 
-msgid "No groups."
-msgstr "Keine Gruppen."
+msgid "No organizations."
+msgstr "Keine Organisationen."
 
-msgid "Upcoming Issues"
-msgstr "Kommende Ausgaben"
+msgid "Edit"
+msgstr "Bearbeiten"
 
-msgid "Past Issues"
-msgstr "Vergangene Ausgaben"
-
-msgid "homepage"
-msgstr "Startseite"
-
-msgid "Login"
-msgstr "Anmelden"
-
-msgid "Logged in as"
-msgstr "Angemeldet als"
-
-msgid "Logout"
-msgstr "Abmelden"
-
-msgid "Help"
-msgstr "Hilfe"
-
-msgid "Forgot your password?"
-msgstr "Passwort vergessen?"
-
-msgid "Reset password"
-msgstr "Passwort zurücksetzen"
+msgid "Download as XLSX."
+msgstr "Als XLSX herunterladen."
 
 msgid "Cancel"
 msgstr "Abbrechen"
@@ -306,9 +307,6 @@ msgstr "Aktuelle Seite"
 msgid "Next deadline"
 msgstr "Nächster Eingabeschluss"
 
-msgid "Issue"
-msgstr "Ausgabe"
-
 msgid "PDF"
 msgstr "PDF"
 
@@ -318,104 +316,14 @@ msgstr "Keine Ausgaben."
 msgid "Publish"
 msgstr "Veröffentlichen"
 
-msgid "Dear Sirs and Madams,"
-msgstr "Sehr geehrte Damen und Herren,"
+msgid "Archive"
+msgstr "Archiv"
 
-msgid "Your official notice has been rejected:"
-msgstr ""
-"Ihr Inserat für den amtlichen Teil des Amtsblatts wurde zurückgewiesen:"
+msgid "Forgot your password?"
+msgstr "Passwort vergessen?"
 
-msgid "Dear Publisher,"
-msgstr "Sehr geehrte Amtsblattredaktion"
-
-msgid "Please publish the following official notice:"
-msgstr "Bitte publizieren Sie folgendes Inserat für den amtlichen Teil"
-
-msgid "Attachments"
-msgstr "Anhänge"
-
-msgid "Dear Sir or Madam,"
-msgstr "Sehr geehrte Dame, sehr geehrter Herr"
-
-msgid "Click the following link to set a new password:"
-msgstr ""
-"Klicken Sie auf den folgenden Link, um ein Passwort für die Einreichung von "
-"Amtsblattinseraten zu setzen:"
-
-msgid "If you don't want to change your password, you can ignore this email."
-msgstr ""
-"Sie können dieses E-Mail ignorieren, falls Sie Ihr Passwort nicht ändern "
-"möchten."
-
-msgid "Your user account has been created."
-msgstr ""
-"Ihr Benutzerkonto für die Einreichung von Amtsblattinseraten wurde erstellt."
-
-msgid "Click the following link to set a password:"
-msgstr "Klicken Sie auf den folgenden Link um ein Passwort festzulegen:"
-
-msgid "Set password"
-msgstr "Passwort festlegen"
-
-msgid "This official notice has been rejected."
-msgstr "Diese Meldung wurde zurückgewiesen."
-
-msgid "State"
-msgstr "Status"
-
-msgid "Source"
-msgstr "Quelle"
-
-msgid "Changes"
-msgstr "Änderungen"
-
-msgid "Date/Time"
-msgstr "Datum/Zeit"
-
-msgid "Change"
-msgstr "Änderung"
-
-msgid "Search"
-msgstr "Suche"
-
-msgid "Issue date"
-msgstr "Ausgabedatum"
-
-msgid "Submit"
-msgstr "Einreichen"
-
-msgid "Download as PDF."
-msgstr "Als PDF herunterladen."
-
-msgid "Download the index as PDF."
-msgstr "Das Stichwortregister als PDF herunterladen."
-
-msgid "Order"
-msgstr "Ordnen"
-
-msgid "No organizations."
-msgstr "Keine Organisationen."
-
-msgid "Order Organizations"
-msgstr "Organisationen ordnen"
-
-msgid "Print"
-msgstr "Drucken"
-
-msgid "Sessions"
-msgstr "Sitzungen"
-
-msgid "Login Timestamp"
-msgstr "Anmeldung"
-
-msgid "IP Address"
-msgstr "Adresse"
-
-msgid "User Agent"
-msgstr "Browser"
-
-msgid "Clear Sessions"
-msgstr "Sitzungen beenden"
+msgid "Reset password"
+msgstr "Passwort zurücksetzen"
 
 msgid "Filter by date"
 msgstr "Nach Datum filtern"
@@ -432,98 +340,119 @@ msgstr "Rubriken"
 msgid "By Groups"
 msgstr "Gruppen"
 
+msgid "Print"
+msgstr "Drucken"
+
+msgid "Upcoming Issues"
+msgstr "Kommende Ausgaben"
+
+msgid "Past Issues"
+msgstr "Vergangene Ausgaben"
+
+msgid "Sessions"
+msgstr "Sitzungen"
+
+msgid "Login Timestamp"
+msgstr "Anmeldung"
+
+msgid "IP Address"
+msgstr "Adresse"
+
+msgid "User Agent"
+msgstr "Browser"
+
+msgid "Clear Sessions"
+msgstr "Sitzungen beenden"
+
 msgid "No users."
 msgstr "Keine Benutzer."
 
-msgid "Wrong username or password"
-msgstr "Unbekannter Benutzername oder falsches Passwort"
+msgid "Dear Sirs and Madams,"
+msgstr "Sehr geehrte Damen und Herren,"
 
-#, python-format
-msgid ""
-"A password reset link has been sent to ${email}, provided an account exists "
-"for this email address."
+msgid "Your official notice has been rejected:"
 msgstr ""
-"Eine E-Mail wurde an ${email} gesendet (sofern die Adresse gültig ist)."
+"Ihr Inserat für den amtlichen Teil des Amtsblatts wurde zurückgewiesen:"
 
-msgid "Wrong username or password reset link not valid any more."
-msgstr "Ungültige Adresse oder abgelaufener Link."
-
-msgid "Password changed."
-msgstr "Passwort geändert."
-
-msgid "Password reset"
-msgstr "Persönliches Passwort Amtsblattredaktion zurücksetzen"
-
-msgid "New Category"
-msgstr "Neue Rubrik"
-
-msgid "Save"
-msgstr "Speichern"
-
-msgid "Edit Category"
-msgstr "Rubrik bearbeiten"
-
-#, python-format
-msgid "Do you really want to delete \"${item}\"?"
-msgstr "Möchten Sie \"${item}\" wirklich löschen?"
-
-msgid "Delete Category"
-msgstr "Rubrik löschen"
-
-msgid "Category added."
-msgstr "Rubrik hinzugefügt."
-
-msgid "Category modified."
-msgstr "Rubrik geändert."
-
-msgid "Only unused categorys may be deleted."
-msgstr "Es können nur unbenutzte Rubriken gelöscht werden."
-
-msgid "Category deleted."
-msgstr "Rubrik gelöscht."
-
-msgid "Access Denied"
-msgstr "Zugriff verweigert"
-
-msgid "You are trying to open a page for which you are not authorized."
+msgid "Click the following link to set a new password:"
 msgstr ""
-"Sie versuchen eine Seite zu öffnen, für die Sie nicht autorisiert sind."
+"Klicken Sie auf den folgenden Link, um ein Passwort für die Einreichung von "
+"Amtsblattinseraten zu setzen:"
 
-msgid "Page not Found"
-msgstr "Seite nicht gefunden"
+msgid "If you don't want to change your password, you can ignore this email."
+msgstr ""
+"Sie können dieses E-Mail ignorieren, falls Sie Ihr Passwort nicht ändern "
+"möchten."
 
-msgid "The page you are looking for could not be found."
-msgstr "Die angeforderte Seite konnte nicht gefunden werden."
+msgid "homepage"
+msgstr "Startseite"
 
-msgid "New Group"
-msgstr "Neue Gruppe"
+msgid "Login"
+msgstr "Anmelden"
 
-msgid "Edit Group"
-msgstr "Gruppe bearbeiten"
+msgid "Logged in as"
+msgstr "Angemeldet als"
 
-msgid "Delete Group"
-msgstr "Gruppe löschen"
+msgid "Logout"
+msgstr "Abmelden"
 
-msgid "Group added."
-msgstr "Gruppe hinzugefügt."
+msgid "Help"
+msgstr "Hilfe"
 
-msgid "Group modified."
-msgstr "Gruppe geändert."
+msgid "No categories."
+msgstr "Keine Rubriken."
 
-msgid "There are official notices linked to this group!"
-msgstr "Diese Gruppe hat Meldungen!"
+msgid "Dear Publisher,"
+msgstr "Sehr geehrte Amtsblattredaktion"
 
-msgid "Only groups without users may be deleted."
-msgstr "Es können nur Gruppen ohne Benutzer gelöscht werden."
+msgid "Please publish the following official notice:"
+msgstr "Bitte publizieren Sie folgendes Inserat für den amtlichen Teil"
 
-msgid "Group deleted."
-msgstr "Gruppe gelöscht."
+msgid "Attachments"
+msgstr "Anhänge"
+
+msgid "This official notice has been rejected."
+msgstr "Diese Meldung wurde zurückgewiesen."
+
+msgid "Source"
+msgstr "Quelle"
+
+msgid "Changes"
+msgstr "Änderungen"
+
+msgid "Date/Time"
+msgstr "Datum/Zeit"
+
+msgid "Change"
+msgstr "Änderung"
+
+msgid "Order Organizations"
+msgstr "Organisationen ordnen"
+
+msgid "Number of Users"
+msgstr "Anzahl Benutzer"
+
+msgid "No groups."
+msgstr "Keine Gruppen."
+
+msgid "drafted"
+msgstr "in Arbeit"
+
+msgid "created"
+msgstr "erstellt"
 
 msgid "New Issue"
 msgstr "Neue Ausgabe"
 
+msgid "Save"
+msgstr "Speichern"
+
 msgid "Edit Issue"
 msgstr "Ausgabe bearbeiten"
+
+#, python-format
+msgid "Do you really want to delete \"${item}\"?"
+msgstr "Möchten Sie \"${item}\" wirklich löschen?"
 
 msgid "Delete Issue"
 msgstr "Ausgabe löschen"
@@ -572,6 +501,66 @@ msgstr ""
 
 msgid "Year"
 msgstr "Jahr"
+
+msgid "Wrong username or password"
+msgstr "Unbekannter Benutzername oder falsches Passwort"
+
+#, python-format
+msgid ""
+"A password reset link has been sent to ${email}, provided an account exists "
+"for this email address."
+msgstr ""
+"Eine E-Mail wurde an ${email} gesendet (sofern die Adresse gültig ist)."
+
+msgid "Wrong username or password reset link not valid any more."
+msgstr "Ungültige Adresse oder abgelaufener Link."
+
+msgid "Password changed."
+msgstr "Passwort geändert."
+
+msgid "Password reset"
+msgstr "Persönliches Passwort Amtsblattredaktion zurücksetzen"
+
+msgid "You have rejected messages."
+msgstr "Sie haben zurückgewiesene Meldungen."
+
+msgid "You have drafted messages with past issues."
+msgstr "Sie haben Meldungen in Arbeit mit vergangenen Ausgaben."
+
+msgid "You have drafted messages with issues close to the deadline."
+msgstr ""
+"Sie haben Meldungen in Arbeit, für welche der Eingabeschluss bald erreicht "
+"ist."
+
+msgid "New User"
+msgstr "Neuer Benutzer"
+
+msgid "Edit User"
+msgstr "Benutzer bearbeiten"
+
+msgid "Delete User"
+msgstr "Benutzer löschen"
+
+msgid "Do you really clear all active sessions?"
+msgstr "Wollen Sie wirklich alle Sitzungen beenden?"
+
+msgid "User added."
+msgstr "Benutzer hinzugefügt."
+
+msgid "User modified."
+msgstr "Benutzer geändert."
+
+msgid "There are official notices linked to this user!"
+msgstr "Dieser Nutzer hat Meldungen!"
+
+msgid "Publishers"
+msgstr "Herausgeber"
+
+msgid "User deleted."
+msgstr "Benutzer gelöscht."
+
+msgid "User account created"
+msgstr "Benutzerkonto Amtsblattredaktion erstellt"
 
 msgid "Edit Official Notice"
 msgstr "Meldung bearbeiten"
@@ -637,14 +626,26 @@ msgstr "Bitte Ausgaben neu wählen."
 msgid "This official notice has already been published!"
 msgstr "Diese Meldung wurde bereits veröffentlicht!"
 
-msgid "Attachment added."
-msgstr "Anhang hinzugefügt."
+msgid "New Category"
+msgstr "Neue Rubrik"
 
-msgid "Attachment deleted."
-msgstr "Anhang gelöscht."
+msgid "Edit Category"
+msgstr "Rubrik bearbeiten"
 
-msgid "Attachments of accepted notices can not be deleted."
-msgstr "Anhänge von angenommenen Meldungen können nicht gelöscht werden."
+msgid "Delete Category"
+msgstr "Rubrik löschen"
+
+msgid "Category added."
+msgstr "Rubrik hinzugefügt."
+
+msgid "Category modified."
+msgstr "Rubrik geändert."
+
+msgid "Only unused categorys may be deleted."
+msgstr "Es können nur unbenutzte Rubriken gelöscht werden."
+
+msgid "Category deleted."
+msgstr "Rubrik gelöscht."
 
 #, python-format
 msgid "Do you really want to submit \"${item}\"?"
@@ -697,6 +698,30 @@ msgstr "Kostenpflichtig"
 msgid "Official Notice Rejected ${id}"
 msgstr "Inserat für den amtlichen Teil zurückgewiesen ${id}"
 
+msgid "New Group"
+msgstr "Neue Gruppe"
+
+msgid "Edit Group"
+msgstr "Gruppe bearbeiten"
+
+msgid "Delete Group"
+msgstr "Gruppe löschen"
+
+msgid "Group added."
+msgstr "Gruppe hinzugefügt."
+
+msgid "Group modified."
+msgstr "Gruppe geändert."
+
+msgid "There are official notices linked to this group!"
+msgstr "Diese Gruppe hat Meldungen!"
+
+msgid "Only groups without users may be deleted."
+msgstr "Es können nur Gruppen ohne Benutzer gelöscht werden."
+
+msgid "Group deleted."
+msgstr "Gruppe gelöscht."
+
 msgid "New Official Notice"
 msgstr "Neue Meldung"
 
@@ -708,6 +733,15 @@ msgstr "Aktualisieren"
 
 msgid "Notices updated."
 msgstr "Meldungen aktualisiert."
+
+msgid "Attachment added."
+msgstr "Anhang hinzugefügt."
+
+msgid "Attachment deleted."
+msgstr "Anhang gelöscht."
+
+msgid "Attachments of accepted notices can not be deleted."
+msgstr "Anhänge von angenommenen Meldungen können nicht gelöscht werden."
 
 msgid "New Organization"
 msgstr "Neue Organisation"
@@ -732,46 +766,18 @@ msgstr ""
 msgid "Organization deleted."
 msgstr "Organisation gelöscht."
 
-msgid "You have rejected messages."
-msgstr "Sie haben zurückgewiesene Meldungen."
+msgid "Access Denied"
+msgstr "Zugriff verweigert"
 
-msgid "You have drafted messages with past issues."
-msgstr "Sie haben Meldungen in Arbeit mit vergangenen Ausgaben."
-
-msgid "You have drafted messages with issues close to the deadline."
+msgid "You are trying to open a page for which you are not authorized."
 msgstr ""
-"Sie haben Meldungen in Arbeit, für welche der Eingabeschluss bald erreicht "
-"ist."
+"Sie versuchen eine Seite zu öffnen, für die Sie nicht autorisiert sind."
 
-msgid "New User"
-msgstr "Neuer Benutzer"
+msgid "Page not Found"
+msgstr "Seite nicht gefunden"
 
-msgid "Edit User"
-msgstr "Benutzer bearbeiten"
-
-msgid "Delete User"
-msgstr "Benutzer löschen"
-
-msgid "Do you really clear all active sessions?"
-msgstr "Wollen Sie wirklich alle Sitzungen beenden?"
-
-msgid "User added."
-msgstr "Benutzer hinzugefügt."
-
-msgid "User modified."
-msgstr "Benutzer geändert."
-
-msgid "There are official notices linked to this user!"
-msgstr "Dieser Nutzer hat Meldungen!"
-
-msgid "Publishers"
-msgstr "Herausgeber"
-
-msgid "User deleted."
-msgstr "Benutzer gelöscht."
-
-msgid "User account created"
-msgstr "Benutzerkonto Amtsblattredaktion erstellt"
+msgid "The page you are looking for could not be found."
+msgstr "Die angeforderte Seite konnte nicht gefunden werden."
 
 #~ msgid "Not a valid phone number."
 #~ msgstr "Keine gültige Telefonnummer."

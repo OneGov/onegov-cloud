@@ -104,6 +104,7 @@ def get_issue_pdf(request, app, name):
         categories=[str],
         organizations=[str],
         source=uuid_converter,
+        own=bool
     )
 )
 def get_notices(
@@ -117,7 +118,8 @@ def get_notices(
     to_date=None,
     categories=None,
     organizations=None,
-    source=None
+    source=None,
+    own=None
 ):
     categories = [c for c in categories if c] if categories else None
     organizations = [c for c in organizations if c] if organizations else None
@@ -132,7 +134,8 @@ def get_notices(
         to_date=to_date,
         categories=categories,
         organizations=organizations,
-        source=source
+        source=source,
+        own=own
     )
 
 

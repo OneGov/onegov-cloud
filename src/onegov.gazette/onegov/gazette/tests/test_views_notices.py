@@ -148,9 +148,8 @@ def test_view_notices_filter(gazette_app):
     with freeze_time("2017-11-01 11:00"):
 
         client = Client(gazette_app)
-        login_publisher(client)
 
-        # new notice
+        login_editor_1(client)
         manage = client.get('/notices/drafted/new-notice')
         manage.form['title'] = "Erneuerungswahlen"
         manage.form['organization'] = '100'
@@ -163,18 +162,20 @@ def test_view_notices_filter(gazette_app):
         manage.form.submit()
         client.get('/notice/erneuerungswahlen/submit').form.submit()
 
+        login_editor_2(client)
         manage = client.get('/notices/drafted/new-notice')
         manage.form['title'] = "Kantonsratswahlen"
         manage.form['organization'] = '200'
         manage.form['category'] = '12'
         manage.form['issues'] = ['2017-45', '2017-46']
-        manage.form['text'] = "10. Oktober 2017"
+        manage.form['text'] = "9. Oktober 2017"
         manage.form['author_place'] = 'Govikon'
         manage.form['author_name'] = 'State Chancellerist'
         manage.form['author_date'] = '2019-01-01'
         manage.form.submit()
         client.get('/notice/kantonsratswahlen/submit').form.submit()
 
+        login_publisher(client)
         manage = client.get('/notices/drafted/new-notice')
         manage.form['title'] = "Regierungsratswahlen"
         manage.form['organization'] = '300'
@@ -186,6 +187,10 @@ def test_view_notices_filter(gazette_app):
         manage.form['author_date'] = '2019-01-01'
         manage.form.submit()
         client.get('/notice/regierungsratswahlen/submit').form.submit()
+
+        manage = client.get('/notice/kantonsratswahlen/edit')
+        manage.form['text'] = "10. Oktober 2017"
+        manage.form.submit()
 
         manage = client.get('/notices/submitted')
         assert "Erneuerungswahlen" in manage
@@ -245,6 +250,13 @@ def test_view_notices_filter(gazette_app):
         assert "Erneuerungswahlen" not in manage
         assert "Kantonsratswahlen" in manage
         assert "Regierungsratswahlen" not in manage
+
+        manage = client.get('/notices/submitted')
+        manage.form['own'] = True
+        manage = manage.form.submit().maybe_follow()
+        assert "Erneuerungswahlen" not in manage
+        assert "Kantonsratswahlen" in manage
+        assert "Regierungsratswahlen" in manage
 
 
 def test_view_notices_order(gazette_app):

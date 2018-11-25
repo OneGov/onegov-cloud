@@ -5,10 +5,16 @@ from onegov.gazette.collections import CategoryCollection
 from onegov.gazette.collections import GazetteNoticeCollection
 from onegov.gazette.collections import IssueCollection
 from onegov.gazette.collections import OrganizationCollection
+from onegov.gazette.models.notice import GazetteNoticeChange
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
 from sedate import standardize_date
 from collections import OrderedDict
+
+
+class DummyIdentity():
+    def __init__(self, userid):
+        self.userid = userid
 
 
 class DummyApp(object):
@@ -17,8 +23,9 @@ class DummyApp(object):
 
 
 class DummyRequest(object):
-    def __init__(self, principal):
+    def __init__(self, principal, identity=None):
         self.app = DummyApp(principal)
+        self.identity = identity
 
 
 def test_category_collection(session):
@@ -198,6 +205,69 @@ def test_notice_collection_issues(session, issues):
 
     collection = collection.for_dates(date(2017, 12, 1), date(2017, 12, 10))
     assert sorted(collection.issues) == ['2017-48', '2017-49']
+
+
+def test_notice_collection_own_user_id(session):
+    users = UserCollection(session)
+    user_a = users.add(username='a@a.a', password='a', role='admin')
+    user_b = users.add(username='b@b.b', password='b', role='admin')
+    user_c = users.add(username='c@c.c', password='c', role='admin')
+
+    collection = GazetteNoticeCollection(session)
+    for title, user, annotators in (
+        ('A', user_a, []),
+        ('B', user_b, [user_a]),
+        ('C', user_c, [user_a, user_b]),
+    ):
+        notice = collection.add(
+            title=title,
+            text='Text',
+            organization_id='100',
+            category_id='11',
+            issues=['2017-46'],
+            user=user
+        )
+        for annotator in annotators:
+            notice.changes.append(
+                GazetteNoticeChange(
+                    channel_id=str(notice.id),
+                    owner=str(annotator.id),
+                )
+            )
+
+    assert collection.query().count() == 3
+
+    collection.own_user_id = str(user_a.id)
+    assert collection.query().count() == 3
+
+    collection.own_user_id = str(user_b.id)
+    assert collection.query().count() == 2
+
+    collection.own_user_id = str(user_c.id)
+    assert collection.query().count() == 1
+
+
+def test_notice_collection_on_request(session):
+    collection = GazetteNoticeCollection(session)
+
+    collection.on_request(DummyRequest(None))
+    assert collection.own_user_id is None
+
+    collection.own = True
+    collection.on_request(DummyRequest(None))
+    assert collection.own_user_id is None
+
+    collection.on_request(DummyRequest(None, DummyIdentity(None)))
+    assert collection.own_user_id is None
+
+    collection.on_request(DummyRequest(None, DummyIdentity('a@a.a')))
+    assert collection.own_user_id is None
+
+    users = UserCollection(session)
+    user = users.add(username='a@a.a', password='a', role='admin')
+
+    collection.on_request(DummyRequest(None, DummyIdentity('a@a.a')))
+    assert collection.own_user_id == str(user.id)
 
 
 def test_notice_collection_for_organizations(session):

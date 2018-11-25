@@ -70,13 +70,16 @@ $('.sub-nav-chosen-select').chosen({
     search_contains: true,
 });
 
-// Submit the whole notice selection/form when clicking on the state links
-// or the chose selects
+// Submit the whole notice selection/form when clicking on the state links,
+// the chosen selects or the checkbox.
 $('a.notice-filter').click(function(event) {
     var form = $(this).parents('form');
     form.attr('action', this.getAttribute('href'));
     form.submit();
     event.preventDefault();
+});
+$('input[name=own]').on('change', function() {
+    $(this).parents('form').submit();
 });
 $('.sub-nav-chosen-select').on('change', function() {
     $(this).parents('form').submit();
@@ -94,3 +97,25 @@ $('.sub-nav.issue select').on('change', function() {
     $('input[name=to_date]').val(date);
     $(this).parents('form').submit();
 });
+
+// Make the extended filters ncollapsible
+var initSearchFilters = function() {
+    var fieldsetLegend = $('fieldset#additional-filters legend');
+    var key = 'fieldset-additional-filters-hidden';
+
+    fieldsetLegend.click(function() {
+        var fieldset = $(this).parent('fieldset');
+        localStorage.setItem(key, fieldset.hasClass('collapsed') ? 'visible' : 'hidden');
+        fieldset.toggleClass('collapsed').children('dl').toggle();
+    });
+
+    if (key in localStorage) {
+        var value = localStorage.getItem(key);
+        if (value == 'hidden') {
+            fieldsetLegend.click();
+        }
+    } else {
+        fieldsetLegend.click();
+    }
+};
+initSearchFilters();

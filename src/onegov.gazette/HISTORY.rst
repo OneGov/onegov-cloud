@@ -4,6 +4,9 @@ Changelog
 - Allows to filter by categories and organizations.
   [msom]
 
+- Allows to filter notices with has been processed by the logged-in user.
+  [msom]
+
 - Adds a dropdown to filter for a specific issue.
   [msom]
 

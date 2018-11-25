@@ -41,7 +41,7 @@ setup(
         'onegov.file',
         'onegov.form>=0.40.0',
         'onegov.foundation',
-        'onegov.notice>=0.8.2',
+        'onegov.notice>=0.9.0',
         'onegov.pdf>=0.3.3',
         'onegov.quill>=0.3.2',
         'onegov.shared',

@@ -50,7 +50,8 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         group_ids=None,
         from_date=None,
         to_date=None,
-        source=None
+        source=None,
+        own=None
     ):
         # get the issues from the date filters
         issues = None
@@ -78,6 +79,14 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         self.from_date = from_date
         self.to_date = to_date
         self.source = source
+        self.own = own
+        self.own_user_id = None
+
+    def on_request(self, request):
+        if self.own and request.identity and request.identity.userid:
+            id_ = self.session.query(User.id)
+            id_ = id_.filter_by(username=request.identity.userid).first()
+            self.own_user_id = str(id_[0]) if id_ else None
 
     def page_by_index(self, index):
         return self.__class__(
@@ -94,7 +103,8 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
             group_ids=self.group_ids,
             from_date=self.from_date,
             to_date=self.to_date,
-            source=self.source
+            source=self.source,
+            own=self.own
         )
 
     def for_state(self, state):
@@ -104,6 +114,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         result.from_date = self.from_date
         result.to_date = self.to_date
         result.source = self.source
+        result.own = self.own
         return result
 
     def for_term(self, term):
@@ -113,6 +124,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         result.from_date = self.from_date
         result.to_date = self.to_date
         result.source = self.source
+        result.own = self.own
         return result
 
     def for_order(self, order, direction=None):
@@ -128,6 +140,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         result.from_date = self.from_date
         result.to_date = self.to_date
         result.source = self.source
+        result.own = self.own
         return result
 
     def for_organizations(self, organizations):
@@ -142,6 +155,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         result.from_date = self.from_date
         result.to_date = self.to_date
         result.source = self.source
+        result.own = self.own
         return result
 
     def for_categories(self, categories):
@@ -155,6 +169,7 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         result.from_date = self.from_date
         result.to_date = self.to_date
         result.source = self.source
+        result.own = self.own
         return result
 
     def for_dates(self, from_date, to_date):
@@ -173,8 +188,27 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
             group_ids=self.group_ids,
             from_date=from_date,
             to_date=to_date,
-            source=self.source
+            source=self.source,
+            own=self.own
         )
+
+    def filter_query(self, query):
+        """ Allows additionally to filter for notices with changes made by a
+        given user.
+
+        """
+
+        if self.own_user_id:
+            subquery = super(GazetteNoticeCollection, self).filter_query(query)
+            subquery = subquery.with_entities(GazetteNotice.id.distinct())
+            subquery = subquery.join(self.model_class.changes, isouter=True)
+            subquery = subquery.filter(
+                GazetteNoticeChange.owner == self.own_user_id
+            )
+            subquery = subquery.subquery()
+            return query.filter(GazetteNotice.id.in_(subquery))
+
+        return super(GazetteNoticeCollection, self).filter_query(query)
 
     def add(self, title, text, organization_id, category_id, user, issues,
             **kwargs):

@@ -43,6 +43,10 @@ html {
     font-size: $h4-font-size;
 }
 
+@mixin icon($icon) {
+    content: $icon;
+    font-family: 'FontAwesome';
+}
 
 /*
     Before Content
@@ -734,7 +738,44 @@ form {
 }
 
 .manage-notices form {
+    background-color: $white-smoke;
     margin-bottom: 1rem;
+
+    fieldset {
+        border: 0;
+        border-top: 1px solid $table-border-color;
+        cursor: pointer;
+        margin: 0;
+        padding: 0;
+
+        legend {
+            background-color: $white-smoke;
+            color: $input-font-color;
+            font-size: $input-font-size;
+            margin-bottom: .75rem;
+            text-align: center;
+        }
+
+        legend::before,
+        legend::after {
+            @include icon('\f077');
+            font-size: .85em;
+            margin: 0 .75rem;
+        }
+
+        &.collapsed {
+            legend::before,
+            legend::after {
+                @include icon('\f078');
+                margin: 0 .75rem;
+            }
+        }
+    }
+
+
+    &:focus-within {
+        border-color: $body-font-color;
+    }
 }
 
 

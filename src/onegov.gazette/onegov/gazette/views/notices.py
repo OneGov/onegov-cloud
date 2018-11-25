@@ -96,6 +96,8 @@ def view_notices(self, request):
 
     """
 
+    self.on_request(request)
+
     layout = Layout(self, request)
     is_publisher = request.is_private(self)
 
