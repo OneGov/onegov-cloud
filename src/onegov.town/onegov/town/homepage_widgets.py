@@ -23,8 +23,8 @@ class ServicesWidget(object):
             text=_("Online Counter"),
             url=layout.request.class_link(FormCollection),
             subtitle=(
-                layout.org.meta.get('online_counter_label') or
-                _("Forms and applications")
+                layout.org.meta.get('online_counter_label')
+                or _("Forms and applications")
             )
         )
 
@@ -34,8 +34,8 @@ class ServicesWidget(object):
                 text=_("Publications"),
                 url=layout.request.class_link(PublicationCollection),
                 subtitle=_(
-                    layout.org.meta.get('publications_label') or
-                    _("Official Documents")
+                    layout.org.meta.get('publications_label')
+                    or _("Official Documents")
                 )
             )
 
@@ -43,8 +43,8 @@ class ServicesWidget(object):
             text=_("Reservations"),
             url=layout.request.class_link(ResourceCollection),
             subtitle=(
-                layout.org.meta.get('reservations_label') or
-                _("Daypasses and rooms")
+                layout.org.meta.get('reservations_label')
+                or _("Daypasses and rooms")
             )
         )
 
@@ -59,8 +59,8 @@ class ServicesWidget(object):
                 text=_("SBB Daypass"),
                 url=layout.request.link(sbb_daypass),
                 subtitle=(
-                    layout.org.meta.get('daypass_label') or
-                    _("Generalabonnement for Towns")
+                    layout.org.meta.get('daypass_label') 
+                    or _("Generalabonnement for Towns")
                 )
             )
 

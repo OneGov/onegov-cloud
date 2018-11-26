@@ -43,7 +43,7 @@ def create_new_organisation(app, name, reply_to=None, forms=None,
     add_pages(session, path)
     add_builtin_forms(session, forms)
     add_resources(app.libres_context)
-    add_events(session, name, translate)
+    add_events(session, name, translate, create_files)
 
     if create_files:
         add_filesets(session, name, path)
