@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Displays the persons picture in the detail view, if available.
+  [msom]
+
 1.0.1 (2018-11-26)
 ~~~~~~~~~~~~~~~~~~~~
 

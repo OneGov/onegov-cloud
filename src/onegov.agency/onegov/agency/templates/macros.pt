@@ -69,71 +69,81 @@
 
     <metal:person_card define-macro="person_card" i18n:domain="onegov.agency">
         <div class="person-card person-single-item" tal:define="memberships list(person.memberships_by_agency); exclude request.app.org.excluded_person_fields(request)">
-            <dl>
-                <tal:block tal:condition="person.salutation and 'salutation' not in exclude">
-                    <dt i18n:translate>Salutation</dt>
-                    <dd>${person.salutation}</dd>
-                </tal:block>
+            <div class="row">
+                <div tal:condition="person.picture_url" class="columns medium-4">
+                    <div aria-hidden="true" >
+                        <div class="person-card-portrait">
+                            <div class="cover-image" style='background-image: url("${person.picture_url}");'></div>
+                        </div>
+                    </div>
+                </div>
+                <div tal:define="size 8 if person.picture_url else 12" tal:attributes="class 'columns medium-{}'.format(size)">
+                    <dl>
+                        <tal:block tal:condition="person.salutation and 'salutation' not in exclude">
+                            <dt i18n:translate>Salutation</dt>
+                            <dd>${person.salutation}</dd>
+                        </tal:block>
 
-                <tal:block tal:condition="person.academic_title and 'academic_title' not in exclude">
-                    <dt i18n:translate>Academic Title</dt>
-                    <dd>${person.academic_title}</dd>
-                </tal:block>
+                        <tal:block tal:condition="person.academic_title and 'academic_title' not in exclude">
+                            <dt i18n:translate>Academic Title</dt>
+                            <dd>${person.academic_title}</dd>
+                        </tal:block>
 
-                <tal:block tal:condition="person.profession and 'profession' not in exclude">
-                    <dt i18n:translate>Profession</dt>
-                    <dd>${person.profession}</dd>
-                </tal:block>
+                        <tal:block tal:condition="person.profession and 'profession' not in exclude">
+                            <dt i18n:translate>Profession</dt>
+                            <dd>${person.profession}</dd>
+                        </tal:block>
 
-                <tal:block tal:condition="person.political_party and 'political_party' not in exclude">
-                    <dt i18n:translate>Political Party</dt>
-                    <dd>${person.political_party}</dd>
-                </tal:block>
+                        <tal:block tal:condition="person.political_party and 'political_party' not in exclude">
+                            <dt i18n:translate>Political Party</dt>
+                            <dd>${person.political_party}</dd>
+                        </tal:block>
 
-                <tal:block tal:condition="person.born and 'born' not in exclude">
-                    <dt i18n:translate>Born</dt>
-                    <dd>${person.born}</dd>
-                </tal:block>
+                        <tal:block tal:condition="person.born and 'born' not in exclude">
+                            <dt i18n:translate>Born</dt>
+                            <dd>${person.born}</dd>
+                        </tal:block>
 
-                <tal:block tal:condition="person.address and 'address' not in exclude">
-                    <dt i18n:translate>Address</dt>
-                    <dd tal:content="structure person.address_html"></dd>
-                </tal:block>
+                        <tal:block tal:condition="person.address and 'address' not in exclude">
+                            <dt i18n:translate>Address</dt>
+                            <dd tal:content="structure person.address_html"></dd>
+                        </tal:block>
 
-                <tal:block tal:condition="person.email and 'email' not in exclude">
-                    <dt i18n:translate>Email</dt>
-                    <dd><a href="mailto:${person.email}">${person.email}</a></dd>
-                </tal:block>
+                        <tal:block tal:condition="person.email and 'email' not in exclude">
+                            <dt i18n:translate>Email</dt>
+                            <dd><a href="mailto:${person.email}">${person.email}</a></dd>
+                        </tal:block>
 
-                <tal:block tal:condition="person.phone and 'phone' not in exclude">
-                    <dt i18n:translate>Phone</dt>
-                    <dd><a href="tel:${person.phone}">${person.phone}</a></dd>
-                </tal:block>
+                        <tal:block tal:condition="person.phone and 'phone' not in exclude">
+                            <dt i18n:translate>Phone</dt>
+                            <dd><a href="tel:${person.phone}">${person.phone}</a></dd>
+                        </tal:block>
 
-                <tal:block tal:condition="person.phone_direct and 'phone_direct' not in exclude">
-                    <dt i18n:translate>Direct Phone</dt>
-                    <dd><a href="tel:${person.phone_direct}">${person.phone_direct}</a></dd>
-                </tal:block>
+                        <tal:block tal:condition="person.phone_direct and 'phone_direct' not in exclude">
+                            <dt i18n:translate>Direct Phone</dt>
+                            <dd><a href="tel:${person.phone_direct}">${person.phone_direct}</a></dd>
+                        </tal:block>
 
-                <tal:block tal:condition="person.website and 'website' not in exclude">
-                    <dt i18n:translate>Website</dt>
-                    <dd><a href="${person.website}">${person.website}</a></dd>
-                </tal:block>
+                        <tal:block tal:condition="person.website and 'website' not in exclude">
+                            <dt i18n:translate>Website</dt>
+                            <dd><a href="${person.website}">${person.website}</a></dd>
+                        </tal:block>
 
-                <tal:block tal:condition="person.notes and 'notes' not in exclude">
-                    <dt i18n:translate>Notes</dt>
-                    <dd tal:content="structure person.notes_html"></dd>
-                </tal:block>
+                        <tal:block tal:condition="person.notes and 'notes' not in exclude">
+                            <dt i18n:translate>Notes</dt>
+                            <dd tal:content="structure person.notes_html"></dd>
+                        </tal:block>
 
-                <dt tal:condition="memberships" i18n:translate>Memberships</dt>
+                        <dt tal:condition="memberships" i18n:translate>Memberships</dt>
 
-                <tal:block tal:repeat="membership memberships">
-                    <dd tal:condition="not membership.is_hidden_from_public or request.is_logged_in" class="person-card-membership">
-                        <a href="${request.link(membership.agency)}" title="${layout.agency_path(membership.agency)|None}">${membership.agency.title}</a> - ${membership.title}
-                    </dd>
-                </tal:block>
-
-            </dl>
+                        <tal:block tal:repeat="membership memberships">
+                            <dd tal:condition="not membership.is_hidden_from_public or request.is_logged_in" class="person-card-membership">
+                                <a href="${request.link(membership.agency)}" title="${layout.agency_path(membership.agency)|None}">${membership.agency.title}</a> - ${membership.title}
+                            </dd>
+                        </tal:block>
+                    </dl>
+                </div>
+            </div>
         </div>
     </metal:person_card>
 
