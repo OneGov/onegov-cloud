@@ -12,6 +12,7 @@ from onegov.org import _
 from onegov.org.models import Organisation
 from onegov.page import PageCollection
 from onegov.reservation import ResourceCollection
+from pathlib import Path
 from sedate import as_datetime
 
 
@@ -53,7 +54,7 @@ def create_new_organisation(app, name, create_files=True, path=None,
 
     add_pages(session, path)
     add_builtin_forms(session, locale=locale)
-    add_events(session, name, translate)
+    add_events(session, name, translate, create_files)
     add_resources(app.libres_context, translate)
 
     if create_files:
@@ -176,11 +177,13 @@ def add_filesets(session, organisation_name, path):
                 )
 
 
-def add_events(session, name, translate):
+def add_events(session, name, translate, create_files):
     start = as_datetime(datetime.today().date())
 
     while start.weekday() != 6:
         start = start + timedelta(days=1)
+
+    imgs = Path(module_path('onegov.org', 'content/images'))
 
     events = EventCollection(session)
     event = events.add(
@@ -196,8 +199,13 @@ def add_events(session, name, translate):
             "description": translate(_("We celebrate our 150th anniversary.")),
             "organizer": name
         },
-        meta={"submitter_email": "info@example.org"},
+        meta={"submitter_email": "info@example.org"}
     )
+
+    if create_files:
+        with (imgs / '3krgixyesbg-gregoire-bertaud.jpg').open('rb') as f:
+            event.set_image(f)
+
     event.submit()
     event.publish()
     event = events.add(
@@ -213,6 +221,11 @@ def add_events(session, name, translate):
         },
         meta={"submitter_email": "info@example.org"},
     )
+
+    if create_files:
+        with (imgs / '3avlwp-7bg8-mikael-kristenson.jpg').open('rb') as f:
+            event.set_image(f)
+
     event.submit()
     event.publish()
     event = events.add(
@@ -233,6 +246,11 @@ def add_events(session, name, translate):
         },
         meta={"submitter_email": "info@example.org"},
     )
+
+    if create_files:
+        with (imgs / 'uvdrvtwvqlu-swaminathan-jayaraman.jpg').open('rb') as f:
+            event.set_image(f)
+
     event.submit()
     event.publish()
     event = events.add(
@@ -248,5 +266,10 @@ def add_events(session, name, translate):
         },
         meta={"submitter_email": "info@example.org"},
     )
+
+    if create_files:
+        with (imgs / 'eg4dcqkdoka-nathan-rogers.jpg').open('rb') as f:
+            event.set_image(f)
+
     event.submit()
     event.publish()

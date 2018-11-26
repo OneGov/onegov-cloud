@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds stock images to initial events.
+  [href]
+
 0.41.2 (2018-11-25)
 ~~~~~~~~~~~~~~~~~~~
 
