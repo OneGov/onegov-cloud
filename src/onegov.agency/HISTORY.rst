@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.1.0 (2018-11-26)
+~~~~~~~~~~~~~~~~~~~~
 
 - Adds a view to display all hidden elements.
   [msom]
