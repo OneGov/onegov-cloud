@@ -183,7 +183,11 @@ def test_view_issues_publish(gazette_app):
         client = Client(gazette_app)
         login_publisher(client)
 
-        for number, issues in enumerate(((44, 45), (45, 46), (45,))):
+        for number, issues, print_only, accept in (
+            (0, (44, 45), False, True),
+            (1, (45, 46), True, True),
+            (2, (45,), False, False),
+        ):
             slug = 'notice-{}'.format(number)
             manage = client.get('/notices/drafted/new-notice')
             manage.form['title'] = slug
@@ -194,10 +198,10 @@ def test_view_issues_publish(gazette_app):
             manage.form['author_place'] = 'Govikon'
             manage.form['author_name'] = 'State Chancellerist'
             manage.form['author_date'] = '2019-01-01'
+            manage.form['print_only'] = print_only
             manage = manage.form.submit()
-
             client.get('/notice/{}/submit'.format(slug)).form.submit()
-            if len(issues) > 1:
+            if accept:
                 client.get('/notice/{}/accept'.format(slug)).form.submit()
 
         # publish 44
@@ -205,8 +209,9 @@ def test_view_issues_publish(gazette_app):
         manage = manage.form.submit().maybe_follow()
         assert "Ausgabe veröffentlicht." in manage
         assert "2017-44.pdf" in manage
+        assert "2017-44.pdf (Stopp Internet)" in manage
 
-        manage = manage.click('2017-44.pdf')
+        manage = manage.click(href='2017-44.pdf')
         assert manage.content_type == 'application/pdf'
         reader = PdfFileReader(BytesIO(manage.body))
         text = ''.join([page.extractText() for page in reader.pages])
@@ -219,6 +224,16 @@ def test_view_issues_publish(gazette_app):
             'Text\n'
             'Govikon, 1. Januar 2019\n'
             'State Chancellerist\n'
+        )
+
+        manage = client.get('/issues')
+        manage = manage.click('2017-44.pdf', href='print-only-pdf')
+        assert manage.content_type == 'application/pdf'
+        reader = PdfFileReader(BytesIO(manage.body))
+        text = ''.join([page.extractText() for page in reader.pages])
+        assert text == (
+            '© 2017 Govikon\n'
+            '1\nAmtsblatt Nr. 44, 03.11.2017\n'
         )
 
         notice_0 = client.get('/notice/notice-0')
@@ -235,8 +250,24 @@ def test_view_issues_publish(gazette_app):
         manage = manage.form.submit().maybe_follow()
         assert "Ausgabe veröffentlicht." in manage
         assert "2017-46.pdf" in manage
+        assert "2017-46.pdf (Stopp Internet)" in manage
 
-        manage = manage.click('2017-46.pdf')
+        manage = manage.click(href='2017-46.pdf')
+        assert manage.content_type == 'application/pdf'
+        reader = PdfFileReader(BytesIO(manage.body))
+        text = ''.join([page.extractText() for page in reader.pages])
+        assert text == (
+            '© 2017 Govikon\n'
+            '1\nAmtsblatt Nr. 46, 17.11.2017\n'
+            'Eine Meldung ist online nicht verfügbar und nicht in diesem '
+            'PDF enthalten.\n'
+            'Civic Community\n'
+            'Commercial Register\n'
+            '2\nDiese Meldung ist nur in der Papierversion erhältlich.\n'
+        )
+
+        manage = client.get('/issues')
+        manage = manage.click('2017-46.pdf', href='print-only-pdf')
         assert manage.content_type == 'application/pdf'
         reader = PdfFileReader(BytesIO(manage.body))
         text = ''.join([page.extractText() for page in reader.pages])
@@ -266,8 +297,28 @@ def test_view_issues_publish(gazette_app):
         manage = manage.form.submit().maybe_follow()
         assert "Ausgabe veröffentlicht." in manage
         assert "2017-45.pdf" in manage
+        assert "2017-45.pdf (Stopp Internet)" in manage
 
-        manage = manage.click('2017-45.pdf')
+        manage = manage.click(href='2017-45.pdf')
+        assert manage.content_type == 'application/pdf'
+        reader = PdfFileReader(BytesIO(manage.body))
+        text = ''.join([page.extractText() for page in reader.pages])
+        assert text == (
+            '© 2017 Govikon\n'
+            '1\nAmtsblatt Nr. 45, 10.11.2017\n'
+            'Eine Meldung ist online nicht verfügbar und nicht in diesem '
+            'PDF enthalten.\n'
+            'Civic Community\n'
+            'Commercial Register\n'
+            '2\nnotice-0\n'
+            'Text\n'
+            'Govikon, 1. Januar 2019\n'
+            'State Chancellerist\n'
+            '3\nDiese Meldung ist nur in der Papierversion erhältlich.\n'
+        )
+
+        manage = client.get('/issues')
+        manage = manage.click('2017-45.pdf', href='print-only-pdf')
         assert manage.content_type == 'application/pdf'
         reader = PdfFileReader(BytesIO(manage.body))
         text = ''.join([page.extractText() for page in reader.pages])
@@ -276,10 +327,6 @@ def test_view_issues_publish(gazette_app):
             '1\nAmtsblatt Nr. 45, 10.11.2017\n'
             'Civic Community\n'
             'Commercial Register\n'
-            '2\nnotice-0\n'
-            'Text\n'
-            'Govikon, 1. Januar 2019\n'
-            'State Chancellerist\n'
             '3\nnotice-1\n'
             'Text\n'
             'Govikon, 1. Januar 2019\n'
@@ -302,12 +349,29 @@ def test_view_issues_publish(gazette_app):
         manage = manage.form.submit().maybe_follow()
         assert "Ausgabe veröffentlicht." in manage
         assert "2017-46.pdf" in manage
+        assert "2017-46.pdf (Stopp Internet)" in manage
         assert "Publikationsnummern haben geändert" in manage
 
-        manage = manage.click('2017-46.pdf')
+        manage = manage.click(href='2017-46.pdf')
         assert manage.content_type == 'application/pdf'
         reader = PdfFileReader(BytesIO(manage.body))
         text = ''.join([page.extractText() for page in reader.pages])
+        assert text == (
+            '© 2017 Govikon\n'
+            '1\nAmtsblatt Nr. 46, 17.11.2017\n'
+            'Eine Meldung ist online nicht verfügbar und nicht in diesem '
+            'PDF enthalten.\n'
+            'Civic Community\n'
+            'Commercial Register\n'
+            '4\nDiese Meldung ist nur in der Papierversion erhältlich.\n'
+        )
+
+        manage = client.get('/issues')
+        manage = manage.click('2017-46.pdf', href='print-only-pdf')
+        assert manage.content_type == 'application/pdf'
+        reader = PdfFileReader(BytesIO(manage.body))
+        text = ''.join([page.extractText() for page in reader.pages])
+
         assert text == (
             '© 2017 Govikon\n'
             '1\nAmtsblatt Nr. 46, 17.11.2017\n'

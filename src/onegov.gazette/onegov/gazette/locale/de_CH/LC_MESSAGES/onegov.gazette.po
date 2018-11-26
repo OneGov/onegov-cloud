@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-25 07:53+0100\n"
-"PO-Revision-Date: 2018-11-25 07:53+0100\n"
+"POT-Creation-Date: 2018-11-25 14:39+0100\n"
+"PO-Revision-Date: 2018-11-25 14:40+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -71,8 +71,27 @@ msgstr ""
 msgid "Gazette"
 msgstr "Amtsblatt"
 
+#, python-format
+msgid ""
+"One notice is not published online and therefore not included in this "
+"PDF."
+msgstr ""
+"Eine Meldung ist online nicht verfügbar und nicht in diesem PDF "
+"enthalten."
+
+#, python-format
+msgid ""
+"${number} notices are not published online and therefore not included in "
+"this PDF."
+msgstr ""
+"${number} Meldungen sind online nicht verfügbar und nicht in diesem PDF "
+"enthalten."
+
 msgid "Index"
 msgstr "Stichwortverzeichnis"
+
+msgid "This official notice is only available in the print version."
+msgstr "Diese Meldung ist nur in der Papierversion erhältlich."
 
 msgid "Group"
 msgstr "Gruppe"

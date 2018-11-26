@@ -196,7 +196,10 @@
                     <td>${layout.format_date(issue.date, 'date')}</td>
                     <td>${layout.format_date(issue.deadline, 'datetime_with_weekday')}</td>
                     <td tal:condition="layout.publishing">
-                        <a tal:condition="issue.pdf" href="${request.link(issue.pdf)}">${issue.pdf.name}</a>
+                        <tal:block tal:condition="issue.pdf">
+                            <a href="${request.link(issue.pdf)}">${issue.pdf.name}</a><br>
+                            <a href="${request.link(issue, 'print-only-pdf')}">${issue.pdf.name} (<tal:block i18n:translate>Print only</tal:block>)</a>
+                        </tal:block>
                     </td>
                     <td class="right-aligned">
                         <ul class="actions" data-title="Actions" i18n:attributes="data-title">

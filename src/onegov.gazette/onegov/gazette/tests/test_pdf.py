@@ -3,11 +3,13 @@ from io import BytesIO
 from onegov.core.crypto import random_token
 from onegov.file.utils import as_fileintent
 from onegov.gazette.collections import GazetteNoticeCollection
+from onegov.gazette.layout import Layout
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import GazetteNoticeFile
 from onegov.gazette.models import Issue
 from onegov.gazette.pdf import IndexPdf
 from onegov.gazette.pdf import IssuePdf
+from onegov.gazette.pdf import IssuePrintOnlyPdf
 from onegov.gazette.pdf import NoticesPdf
 from onegov.gazette.pdf import Pdf
 from PyPDF2 import PdfFileReader
@@ -35,6 +37,21 @@ class DummyRequest(object):
 
     def include(self, resource):
         pass
+
+
+def extract_pdf_story(pdf):
+    story = []
+    for element in pdf.story:
+        if hasattr(element, 'text'):
+            story.append(
+                element.text.replace('<b>', '')
+                       .replace('</b>', '')
+                       .replace('<i><font size="9.84375">', '')
+                       .replace('</font></i>', '')
+            )
+        elif hasattr(element, '_cellvalues'):
+            story.extend([x.text for x in element._cellvalues[0]])
+    return story
 
 
 def pdf_attachment(content):
@@ -218,6 +235,65 @@ def test_issues_pdf_h():
         assert h4.called
 
 
+def test_issues_pdf_notice(gazette_app):
+    session = gazette_app.session()
+
+    with freeze_time("2017-01-01 12:00"):
+        notice = GazetteNotice(
+            title='title',
+            text='text',
+            author_place='place',
+            author_date=utcnow(),
+            author_name='author',
+            state='drafted'
+        )
+        notice.files.append(pdf_attachment('attachment'))
+        session.add(notice)
+        session.flush()
+
+    layout = Layout(notice, DummyRequest(session, gazette_app.principal))
+
+    pdf = IssuePdf(BytesIO())
+    pdf.init_a4_portrait()
+
+    pdf.notice(notice, layout, '1')
+    assert extract_pdf_story(pdf) == [
+        '1', 'title', 'text', 'place, 1. Januar 2017<br/>author'
+    ]
+
+    notice.print_only = True
+    pdf.notice(notice, layout, '2')
+    assert extract_pdf_story(pdf) == [
+        '1', 'title', 'text', 'place, 1. Januar 2017<br/>author',
+        '2',
+        '<i>This official notice is only available in the print version.</i>'
+    ]
+
+
+def test_issues_pdf_excluded_notices_note(gazette_app):
+    request = DummyRequest(gazette_app.session(), gazette_app.principal)
+
+    pdf = IssuePdf(BytesIO())
+    pdf.init_a4_portrait()
+
+    pdf.excluded_notices_note(0, request)
+    assert extract_pdf_story(pdf) == []
+
+    pdf.excluded_notices_note(1, request)
+    assert extract_pdf_story(pdf) == [
+        'One notice is not published online and therefore not included '
+        'in this PDF.'
+    ]
+
+    pdf.excluded_notices_note(10, request)
+    assert extract_pdf_story(pdf) == [
+        'One notice is not published online and therefore not included '
+        'in this PDF.',
+        '10 notices are not published online and therefore not included in '
+        'this PDF.'
+    ]
+
+
 def test_issues_pdf_unfold_data(session):
     def notice(title, text, number=None):
         notice = GazetteNotice(
@@ -304,18 +380,7 @@ def test_issues_pdf_unfold_data(session):
         '14', 'title-3-d', 'text-3-d',
     ]
 
-    story = []
-    for element in pdf.story:
-        if hasattr(element, 'text'):
-            story.append(
-                element.text.replace('<b>', '')
-                       .replace('</b>', '')
-                       .replace('<i><font size="9.84375">', '')
-                       .replace('</font></i>', '')
-            )
-        elif hasattr(element, '_cellvalues'):
-            story.extend([x.text for x in element._cellvalues[0]])
-    assert story == expected
+    assert extract_pdf_story(pdf) == expected
 
     pdf.generate()
     file.seek(0)
@@ -325,23 +390,23 @@ def test_issues_pdf_unfold_data(session):
 
 
 def test_issues_pdf_query_notices(session, issues, organizations, categories):
-    for _issues, organization_id, category_id in (
-        ({'2017-40': '1', '2017-41': '4'}, '100', '10'),
-        ({'2017-40': '2', '2017-41': '3'}, '100', '10'),
-        ({'2017-40': '3', '2017-41': '2'}, '100', '10'),
-        ({'2017-40': '4', '2017-41': '1'}, '100', '10'),
-        ({'2017-41': '5', '2017-42': '1'}, '100', '10'),
+    for _issues in (
+        {'2017-40': '1', '2017-41': '4'},
+        {'2017-40': '2', '2017-41': '3'},
+        {'2017-40': '3', '2017-41': '2'},
+        {'2017-40': '4', '2017-41': '1'},
+        {'2017-41': '5', '2017-42': '1'},
     ):
         session.add(
             GazetteNotice(
-                title='{}-{}'.format(organization_id, category_id),
+                title='title',
                 text=', '.join([
                     '{}-{}'.format(issue, _issues[issue])
                     for issue in sorted(_issues)
                 ]),
                 _issues=_issues,
-                organization_id=organization_id,
-                category_id=category_id,
+                organization_id='100',
+                category_id='10',
                 state='published'
             )
         )
@@ -366,16 +431,104 @@ def test_issues_pdf_query_notices(session, issues, organizations, categories):
     ]
 
 
+def test_issues_pdf_query_used(session, issues, organizations, categories):
+    issues = {issue.name: issue for issue in issues}
+    for _issues, organization_id, category_id in (
+        ({'2017-40': '1', '2017-41': '4'}, '100', '14'),
+        ({'2017-40': '2', '2017-41': '3'}, '200', '13'),
+        ({'2017-40': '3', '2017-41': '2'}, '300', '12'),
+        ({'2017-40': '4', '2017-41': '1'}, '410', '11'),
+        ({'2017-41': '5', '2017-42': '1'}, '420', '10'),
+    ):
+        session.add(
+            GazetteNotice(
+                title='title',
+                text=', '.join([
+                    '{}-{}'.format(issue, _issues[issue])
+                    for issue in sorted(_issues)
+                ]),
+                _issues=_issues,
+                organization_id=organization_id,
+                category_id=category_id,
+                state='published'
+            )
+        )
+    session.flush()
+
+    assert IssuePdf.query_used_categories(session, issues['2017-40']) == {
+        '11', '12', '13', '14'
+    }
+    assert IssuePdf.query_used_categories(session, issues['2017-41']) == {
+        '10', '11', '12', '13', '14'
+    }
+    assert IssuePdf.query_used_categories(session, issues['2017-42']) == {'10'}
+    assert IssuePdf.query_used_categories(session, issues['2017-43']) == set()
+
+    assert IssuePdf.query_used_organizations(session, issues['2017-40']) == {
+        '100', '200', '300', '410'
+    }
+    assert IssuePdf.query_used_organizations(session, issues['2017-41']) == {
+        '100', '200', '300', '410', '420'
+    }
+    assert IssuePdf.query_used_organizations(session, issues['2017-42']) == {
+        '420'
+    }
+    assert IssuePdf.query_used_organizations(session, issues['2017-43']) == \
+        set()
+
+
+def test_issues_pdf_query_excluded_notices_count(session, issues):
+    issues = {issue.name: issue for issue in issues}
+    for _issues, meta in (
+        ({'2017-40': '1', '2017-41': '4'}, None),
+        ({'2017-40': '2', '2017-41': '3'}, {}),
+        ({'2017-40': '3', '2017-41': '2'}, {'print_only': None}),
+        ({'2017-40': '4', '2017-41': '1'}, {'print_only': True}),
+        ({'2017-41': '5', '2017-42': '1'}, {'print_only': False}),
+    ):
+        session.add(
+            GazetteNotice(
+                title='title',
+                text=', '.join([
+                    '{}-{}'.format(issue, _issues[issue])
+                    for issue in sorted(_issues)
+                ]),
+                _issues=_issues,
+                organization_id='100',
+                category_id='10',
+                state='published',
+                meta=meta
+            )
+        )
+    session.flush()
+
+    assert IssuePdf.query_excluded_notices_count(
+        session, issues['2017-40']
+    ) == 1
+    assert IssuePdf.query_excluded_notices_count(
+        session, issues['2017-41']
+    ) == 1
+    assert IssuePdf.query_excluded_notices_count(
+        session, issues['2017-42']
+    ) == 0
+    assert IssuePdf.query_excluded_notices_count(
+        session, issues['2017-43']
+    ) == 0
+
+
 def test_issues_pdf_from_issue(gazette_app):
     session = gazette_app.session()
     principal = gazette_app.principal
 
-    for _issues, organization_id, category_id, attachments in (
-        ({'2017-40': '1', '2017-41': '4'}, '100', '10', []),
-        ({'2017-40': '2', '2017-41': '3'}, '200', '10', ['--a--']),
-        ({'2017-40': '3', '2017-41': '2'}, '100', '10', []),
-        ({'2017-40': '4', '2017-41': '1'}, '410', '11', ['--c--', '--d--']),
-        ({'2017-41': '5', '2017-42': '1'}, '420', '11', []),
+    for _issues, organization_id, category_id, attachments, meta in (
+        ({'2017-40': '1', '2017-41': '4'}, '100', '10', [], None),
+        ({'2017-40': '2', '2017-41': '3'}, '200', '10', ['-a-'], {}),
+        ({'2017-40': '3', '2017-41': '2'}, '100', '10', [],
+         {'print_only': True}),
+        ({'2017-40': '4', '2017-41': '1'}, '410', '11', ['-c-', '-d-'],
+         {'print_only': False}),
+        ({'2017-41': '5', '2017-42': '1'}, '420', '11', [],
+         {'print_only': None}),
     ):
         notice = GazetteNotice(
             title='{}-{}'.format(organization_id, category_id),
@@ -386,7 +539,8 @@ def test_issues_pdf_from_issue(gazette_app):
             _issues=_issues,
             organization_id=organization_id,
             category_id=category_id,
-            state='published'
+            state='published',
+            meta=meta
         )
         for content in attachments:
             notice.files.append(pdf_attachment(content))
@@ -401,14 +555,16 @@ def test_issues_pdf_from_issue(gazette_app):
         assert [page.extractText() for page in reader.pages] == [
             # page 1
             '© 2017 Govikon\n1\nGazette No. 40, 06.10.2017\n'
+            'One notice is not published online and therefore not included '
+            'in this PDF.\n'
             'State Chancellery\n'
             'Complaints\n'
             '5\n100-10\n2017-40-1, 2017-41-4\n'
-            '6\n100-10\n2017-40-3, 2017-41-2\n'
+            '6\nThis official notice is only available in the print version.\n'
             'Civic Community\n'
             'Complaints\n'
             '7\n200-10\n2017-40-2, 2017-41-3\n',
-            # page 2 (--a--)
+            # page 2 (-a-)
             'Gazette No. 40, 06.10.2017\n© 2017 Govikon\n2\n',
             # page 3
             'Gazette No. 40, 06.10.2017\n© 2017 Govikon\n3\n'
@@ -416,9 +572,9 @@ def test_issues_pdf_from_issue(gazette_app):
             'Evangelical Reformed Parish\n'
             'Education\n'
             '8\n410-11\n2017-40-4, 2017-41-1\n',
-            # page 4 (--c--)
+            # page 4 (-c-)
             'Gazette No. 40, 06.10.2017\n© 2017 Govikon\n4\n',
-            # page 5 (--d--)
+            # page 5 (-d-)
             'Gazette No. 40, 06.10.2017\n© 2017 Govikon\n5\n'
         ]
 
@@ -428,14 +584,16 @@ def test_issues_pdf_from_issue(gazette_app):
         assert [page.extractText() for page in reader.pages] == [
             # page 1
             '© 2017 Govikon\n1\nGazette No. 41, 13.10.2017\n'
+            'One notice is not published online and therefore not included '
+            'in this PDF.\n'
             'State Chancellery\n'
             'Complaints\n'
-            '5\n100-10\n2017-40-3, 2017-41-2\n'
+            '5\nThis official notice is only available in the print version.\n'
             '6\n100-10\n2017-40-1, 2017-41-4\n'
             'Civic Community\n'
             'Complaints\n'
             '7\n200-10\n2017-40-2, 2017-41-3\n',
-            # page 2 (--a--)
+            # page 2 (-a-)
             'Gazette No. 41, 13.10.2017\n© 2017 Govikon\n2\n',
             # page 3
             'Gazette No. 41, 13.10.2017\n© 2017 Govikon\n3\n'
@@ -443,9 +601,9 @@ def test_issues_pdf_from_issue(gazette_app):
             'Evangelical Reformed Parish\n'
             'Education\n'
             '8\n410-11\n2017-40-4, 2017-41-1\n',
-            # page 4 (--c--)
+            # page 4 (-c-)
             'Gazette No. 41, 13.10.2017\n© 2017 Govikon\n4\n',
-            # page 5 (--d--)
+            # page 5 (-d-)
             'Gazette No. 41, 13.10.2017\n© 2017 Govikon\n5\n',
             # page 6
             'Gazette No. 41, 13.10.2017\n© 2017 Govikon\n6\n'
@@ -464,4 +622,166 @@ def test_issues_pdf_from_issue(gazette_app):
             'Sikh Community\n'
             'Education\n'
             '5\n420-11\n2017-41-5, 2017-42-1\n'
+        ]
+
+
+def test_issues_po_pdf_query_notices(session, issues, organizations,
+                                     categories):
+    for _issues, meta in (
+        ({'2017-40': '1', '2017-41': '4'}, None),
+        ({'2017-40': '2', '2017-41': '3'}, {}),
+        ({'2017-40': '3', '2017-41': '2'}, {'print_only': None}),
+        ({'2017-40': '4', '2017-41': '1'}, {'print_only': True}),
+        ({'2017-41': '5', '2017-42': '1'}, {'print_only': False}),
+    ):
+        session.add(
+            GazetteNotice(
+                title='title',
+                text=', '.join([
+                    '{}-{}'.format(issue, _issues[issue])
+                    for issue in sorted(_issues)
+                ]),
+                _issues=_issues,
+                organization_id='100',
+                category_id='10',
+                state='published',
+                meta=meta
+            )
+        )
+    session.flush()
+
+    query = session.query(GazetteNotice)
+    assert IssuePrintOnlyPdf.query_notices(
+        session, '2017-40', '100', '10'
+    ) == [query.filter_by(text='2017-40-4, 2017-41-1').one().id]
+
+    assert IssuePrintOnlyPdf.query_notices(
+        session, '2017-41', '100', '10'
+    ) == [query.filter_by(text='2017-40-4, 2017-41-1').one().id]
+
+    assert IssuePrintOnlyPdf.query_notices(
+        session, '2017-42', '100', '10'
+    ) == []
+
+
+def test_issues_po_pdf_query_used(session, issues, organizations, categories):
+    issues = {issue.name: issue for issue in issues}
+    for _issues, organization_id, category_id, meta in (
+        ({'2017-40': '1', '2017-41': '4'}, '100', '14', None),
+        ({'2017-40': '2', '2017-41': '3'}, '200', '13', {}),
+        ({'2017-40': '3', '2017-41': '2'}, '300', '12', {'print_only': None}),
+        ({'2017-40': '4', '2017-41': '1'}, '410', '11', {'print_only': True}),
+        ({'2017-41': '5', '2017-42': '1'}, '420', '10', {'print_only': False}),
+    ):
+        session.add(
+            GazetteNotice(
+                title='title',
+                text=', '.join([
+                    '{}-{}'.format(issue, _issues[issue])
+                    for issue in sorted(_issues)
+                ]),
+                _issues=_issues,
+                organization_id=organization_id,
+                category_id=category_id,
+                state='published',
+                meta=meta
+            )
+        )
+    session.flush()
+
+    assert IssuePrintOnlyPdf.query_used_categories(
+        session, issues['2017-40']
+    ) == {'11'}
+    assert IssuePrintOnlyPdf.query_used_categories(
+        session, issues['2017-41']
+    ) == {'11'}
+    assert IssuePrintOnlyPdf.query_used_categories(
+        session, issues['2017-42']
+    ) == set()
+    assert IssuePrintOnlyPdf.query_used_categories(
+        session, issues['2017-43']
+    ) == set()
+
+    assert IssuePrintOnlyPdf.query_used_organizations(
+        session, issues['2017-40']
+    ) == {'410'}
+    assert IssuePrintOnlyPdf.query_used_organizations(
+        session, issues['2017-41']
+    ) == {'410'}
+    assert IssuePrintOnlyPdf.query_used_organizations(
+        session, issues['2017-42']
+    ) == set()
+    assert IssuePrintOnlyPdf.query_used_organizations(
+        session, issues['2017-43']
+    ) == set()
+
+
+def test_issues_po_pdf_from_issue(gazette_app):
+    session = gazette_app.session()
+    principal = gazette_app.principal
+
+    for _issues, organization_id, category_id, attachments, meta in (
+        ({'2017-40': '1', '2017-41': '4'}, '100', '10', [], None),
+        ({'2017-40': '2', '2017-41': '3'}, '200', '10', ['-a-'], {}),
+        ({'2017-40': '3', '2017-41': '2'}, '100', '10', [],
+         {'print_only': True}),
+        ({'2017-40': '4', '2017-41': '1'}, '410', '11', ['-c-', '-d-'],
+         {'print_only': False}),
+        ({'2017-41': '5', '2017-42': '1'}, '420', '11', [],
+         {'print_only': None}),
+    ):
+        notice = GazetteNotice(
+            title='{}-{}'.format(organization_id, category_id),
+            text=', '.join([
+                '{}-{}'.format(issue, _issues[issue])
+                for issue in sorted(_issues)
+            ]),
+            _issues=_issues,
+            organization_id=organization_id,
+            category_id=category_id,
+            state='published',
+            meta=meta
+        )
+        for content in attachments:
+            notice.files.append(pdf_attachment(content))
+
+        session.add(notice)
+    session.flush()
+
+    with freeze_time("2017-01-01 12:00"):
+        issue = session.query(Issue).filter_by(number=40).one()
+        file = IssuePrintOnlyPdf.from_issue(
+            issue, DummyRequest(session, principal)
+        )
+        reader = PdfFileReader(file)
+        file.seek(0)
+        assert [page.extractText() for page in reader.pages] == [
+            # page 1
+            '© 2017 Govikon\n1\nGazette No. 40, 06.10.2017\n'
+            'State Chancellery\n'
+            'Complaints\n'
+            '3\n100-10\n2017-40-3, 2017-41-2\n'
+        ]
+
+        issue = session.query(Issue).filter_by(number=41).one()
+        file = IssuePrintOnlyPdf.from_issue(
+            issue, DummyRequest(session, principal)
+        )
+        reader = PdfFileReader(file)
+        assert [page.extractText() for page in reader.pages] == [
+            # page 1
+            '© 2017 Govikon\n1\nGazette No. 41, 13.10.2017\n'
+            'State Chancellery\n'
+            'Complaints\n'
+            '2\n100-10\n2017-40-3, 2017-41-2\n'
+        ]
+
+    with freeze_time("2018-01-01 12:00"):
+        issue = session.query(Issue).filter_by(number=42).one()
+        file = IssuePrintOnlyPdf.from_issue(
+            issue, DummyRequest(session, principal)
+        )
+        reader = PdfFileReader(file)
+        assert [page.extractText() for page in reader.pages] == [
+            '© 2018 Govikon\n1\nGazette No. 42, 20.10.2017\n'
         ]

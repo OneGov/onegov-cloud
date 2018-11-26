@@ -1,11 +1,12 @@
 from copy import deepcopy
 from io import BytesIO
 from onegov.gazette import _
-from onegov.gazette.models import IssueName
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import Category
 from onegov.gazette.models import GazetteNotice
+from onegov.gazette.models import IssueName
 from onegov.gazette.models import Organization
+from onegov.gazette.utils import bool_is
 from onegov.pdf import page_fn_footer
 from onegov.pdf import page_fn_header_and_footer
 from onegov.pdf import Pdf as PdfBase
@@ -242,7 +243,7 @@ class NoticesPdf(Pdf):
 class IssuePdf(NoticesPdf):
     """ A PDF containing all the notices of a single issue.
 
-    Generating this PDF automatically assigns publication numbers!
+    Allows to automatically assign publication numbers when generating the PDF.
 
     """
 
@@ -253,6 +254,43 @@ class IssuePdf(NoticesPdf):
             self.p_markup(title, self.style.title)
         else:
             getattr(self, 'h{}'.format(min(level, 4)))(title)
+
+    def notice(self, notice, layout, publication_number='xxx'):
+        """ Adds an official notice. Hides the content if it is print only. """
+
+        if notice.print_only:
+            title = layout.request.translate(_(
+                "This official notice is only available in the print version."
+            ))
+            self.table(
+                [[
+                    MarkupParagraph(publication_number, self.style.normal),
+                    MarkupParagraph(f'<i>{title}</i>', self.style.normal)
+                ]],
+                [self.style.leftIndent, None],
+                style=self.style.table_h_notice
+            )
+        else:
+            super(IssuePdf, self).notice(notice, layout, publication_number)
+
+    def excluded_notices_note(self, number, request):
+        """ Adds a paragraph with the number of excluded (print only) notices.
+
+        """
+        note = ""
+        if number == 1:
+            note = _(
+                "One notice is not published online and "
+                "therefore not included in this PDF.",
+            )
+        if number > 1:
+            note = _(
+                "${number} notices are not published online and "
+                "therefore not included in this PDF.",
+                mapping={'number': number}
+            )
+        if note:
+            self.p_markup(request.translate(note), style=self.style.paragraph)
 
     def unfold_data(
         self, session, layout, issue, data, publication_number, level=1
@@ -268,9 +306,12 @@ class IssuePdf(NoticesPdf):
             notices = item.get('notices', [])
             for id_ in notices:
                 notice = session.query(GazetteNotice).filter_by(id=id_).one()
-                notice.set_publication_number(issue, publication_number)
-                self.notice(notice, layout, publication_number)
-                publication_number = publication_number + 1
+                if publication_number is None:
+                    self.notice(notice, layout, notice.issues[issue])
+                else:
+                    notice.set_publication_number(issue, publication_number)
+                    self.notice(notice, layout, publication_number)
+                    publication_number = publication_number + 1
 
             children = item.get('children', [])
             if children:
@@ -307,32 +348,48 @@ class IssuePdf(NoticesPdf):
         return [notice[0] for notice in notices]
 
     @classmethod
+    def query_used_categories(cls, session, issue):
+        query = session.query(GazetteNotice._categories.keys())
+        query = query.filter(
+            GazetteNotice._issues.has_key(issue.name),  # noqa
+            GazetteNotice.state == 'published',
+        )
+        return set([result[0][0] for result in query if result[0]])
+
+    @classmethod
+    def query_used_organizations(cls, session, issue):
+        query = session.query(GazetteNotice._organizations.keys())
+        query = query.filter(
+            GazetteNotice._issues.has_key(issue.name),  # noqa
+            GazetteNotice.state == 'published',
+        )
+        return set([result[0][0] for result in query if result[0]])
+
+    @classmethod
+    def query_excluded_notices_count(cls, session, issue):
+        query = session.query(GazetteNotice)
+        query = query.filter(
+            GazetteNotice._issues.has_key(issue.name),  # noqa
+            GazetteNotice.state == 'published',
+            bool_is(GazetteNotice.meta['print_only'], True)
+        )
+        return query.count()
+
+    @classmethod
     def from_issue(cls, issue, request, first_publication_number):
         """ Generate a PDF for one issue.
 
-        Uses the given number as a starting point for the publication numbers.
+        Uses `first_publication_number` as a starting point for assigning
+        publication numbers. Uses the existing numbers of the notices if None.
 
         """
 
         # Collect the data
         data = []
-
         session = request.session
-
-        used_categories = session.query(GazetteNotice._categories.keys())
-        used_categories = used_categories.filter(
-            GazetteNotice._issues.has_key(issue.name),  # noqa
-            GazetteNotice.state == 'published',
-        )
-        used_categories = [c[0][0] for c in used_categories if c[0]]
-
-        used_organizations = session.query(GazetteNotice._organizations.keys())
-        used_organizations = used_organizations.filter(
-            GazetteNotice._issues.has_key(issue.name),  # noqa
-            GazetteNotice.state == 'published',
-        )
-        used_organizations = [o[0][0] for o in used_organizations if o[0]]
-
+        used_categories = cls.query_used_categories(session, issue)
+        used_organizations = cls.query_used_organizations(session, issue)
+        excluded_notices = cls.query_excluded_notices_count(session, issue)
         if used_categories and used_organizations:
             categories = session.query(Category)
             categories = categories.filter(Category.name.in_(used_categories))
@@ -397,6 +454,7 @@ class IssuePdf(NoticesPdf):
             page_fn_later=page_fn_header_and_footer
         )
         pdf.h(title)
+        pdf.excluded_notices_note(excluded_notices, request)
         pdf.unfold_data(
             session, layout, issue.name, data, first_publication_number
         )
@@ -405,3 +463,70 @@ class IssuePdf(NoticesPdf):
         file.seek(0)
 
         return file
+
+
+class IssuePrintOnlyPdf(IssuePdf):
+    """ A PDF containing all the print only notices of a single issue.
+
+    Generating this PDF does NOT assigns publication numbers!
+
+    """
+
+    def notice(self, notice, layout, publication_number='xxx'):
+        """ Adds an official notice. """
+
+        if notice.print_only:
+            super(IssuePdf, self).notice(notice, layout, publication_number)
+
+    @staticmethod
+    def query_notices(session, issue, organization, category):
+        """ Queries all notices with the given values, ordered by publication
+        number.
+
+        """
+
+        notices = session.query(
+            GazetteNotice.id
+        )
+        notices = notices.filter(
+            GazetteNotice._issues.has_key(issue),  # noqa
+            GazetteNotice.state == 'published',
+            GazetteNotice._organizations.has_key(organization),
+            GazetteNotice._categories.has_key(category),
+            bool_is(GazetteNotice.meta['print_only'], True)
+        )
+        notices = notices.order_by(
+            GazetteNotice._issues[issue],
+            GazetteNotice.title
+        )
+        return [notice[0] for notice in notices]
+
+    @classmethod
+    def query_used_categories(cls, session, issue):
+        query = session.query(GazetteNotice._categories.keys())
+        query = query.filter(
+            GazetteNotice._issues.has_key(issue.name),  # noqa
+            GazetteNotice.state == 'published',
+            bool_is(GazetteNotice.meta['print_only'], True)
+        )
+        return set([result[0][0] for result in query if result[0]])
+
+    @classmethod
+    def query_used_organizations(cls, session, issue):
+        query = session.query(GazetteNotice._organizations.keys())
+        query = query.filter(
+            GazetteNotice._issues.has_key(issue.name),  # noqa
+            GazetteNotice.state == 'published',
+            bool_is(GazetteNotice.meta['print_only'], True)
+        )
+        return set([result[0][0] for result in query if result[0]])
+
+    @classmethod
+    def query_excluded_notices_count(cls, session, issue):
+        return 0
+
+    @classmethod
+    def from_issue(cls, issue, request):
+        """ Generate a PDF for one issue. """
+
+        return super(IssuePrintOnlyPdf, cls).from_issue(issue, request, None)

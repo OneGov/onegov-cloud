@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Uses a separate issue PDF for the print only notices.
+  [msom]
+
 - Fixes the additional filters legend styling on Firefox.
   [msom]
 

@@ -4,6 +4,7 @@ from lxml import etree
 from onegov.core.utils import module_path
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models import Issue
+from onegov.gazette.utils import bool_is
 from onegov.gazette.utils import SogcImporter
 from onegov.gazette.utils.sogc_converter import KK01
 from onegov.gazette.utils.sogc_converter import KK02
@@ -514,3 +515,23 @@ def test_sogc_converter_KK10(gazette_app, xml):
         '<p><strong>Rechtliche Hinweise und Fristen</strong>'
         '<br>Meldung nach SchKG</p>'
     )
+
+
+def test_bool_is(session):
+    session.add(GazetteNotice(title='F.1'))
+    session.add(GazetteNotice(title='F.2', meta={'y': 1}))
+    session.add(GazetteNotice(title='F.3', meta={'x': None}))
+    session.add(GazetteNotice(title='F.4', meta={'x': None, 'y': 1}))
+    session.add(GazetteNotice(title='F.5', meta={'x': False}))
+    session.add(GazetteNotice(title='F.6', meta={'x': False, 'y': 1}))
+    session.add(GazetteNotice(title='T.1', meta={'x': True}))
+    session.add(GazetteNotice(title='T.2', meta={'x': True, 'y': 1}))
+    session.flush()
+
+    query = session.query(GazetteNotice)
+    assert sorted([
+        r.title for r in query.filter(bool_is(GazetteNotice.meta['x'], True))
+    ]) == ['T.1', 'T.2']
+    assert sorted([
+        r.title for r in query.filter(bool_is(GazetteNotice.meta['x'], False))
+    ]) == ['F.1', 'F.2', 'F.3', 'F.4', 'F.5', 'F.6']

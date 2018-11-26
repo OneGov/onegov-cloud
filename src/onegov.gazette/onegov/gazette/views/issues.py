@@ -11,6 +11,7 @@ from onegov.gazette.forms import EmptyForm
 from onegov.gazette.forms import IssueForm
 from onegov.gazette.layout import Layout
 from onegov.gazette.models import Issue
+from onegov.gazette.pdf import IssuePrintOnlyPdf
 from sedate import to_timezone
 from xlsxwriter import Workbook
 
@@ -236,6 +237,24 @@ def publish_issue(self, request, form):
             }
         ),
     }
+
+
+@GazetteApp.view(
+    model=Issue,
+    name='print-only-pdf',
+    permission=Private
+)
+def print_only_pdf(self, request):
+    """ Creates the PDF with all the print only notices of an issue. """
+
+    response = Response()
+    response.content_type = 'application/pdf'
+    response.content_disposition = 'inline; filename={}-{}.pdf'.format(
+        self.name,
+        request.translate(_("Print only")).lower().replace(' ', '-')
+    )
+    response.body = IssuePrintOnlyPdf.from_issue(self, request).read()
+    return response
 
 
 @GazetteApp.view(
