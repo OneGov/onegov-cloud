@@ -33,7 +33,7 @@ setup(
     platforms='any',
     python_requires='>=3.6',
     install_requires=[
-        'AIS.py',
+        'AIS.py>=0.2.2',
         'filedepot>=0.4.1',
         'isodate',
         'lxml',
