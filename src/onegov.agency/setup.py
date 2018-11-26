@@ -41,7 +41,6 @@ setup(
         'onegov.pdf>=0.4.0',
         'pyyaml',
         'xlrd',
-        'xlsxwriter'
     ],
     extras_require=dict(
         test=[

@@ -35,12 +35,6 @@
         color: $body-font-color;
         margin-right: 1ex;
     }
-
-    li.agency-export-xlsx a::before {
-        @include icon('\f1c3');
-        color: $body-font-color;
-        margin-right: 1ex;
-    }
 }
 
 .edit-bar {

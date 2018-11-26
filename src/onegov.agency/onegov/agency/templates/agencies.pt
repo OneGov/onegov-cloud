@@ -25,7 +25,7 @@
 
             <div class="columns medium-4">
 
-                <div tal:condition="pdf_link or xlsx_link" class="agency-exports borderless-side-panel">
+                <div tal:condition="pdf_link" class="agency-exports borderless-side-panel">
                     <h2 i18n:translate>Exports</h2>
                     <ul class="agency-export-list">
                         <li tal:condition="pdf_link" class="agency-export-pdf">
