@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.0.1 (2018-11-26)
+~~~~~~~~~~~~~~~~~~~~
 
 - Allows to clear the organisation filter.
   [msom]
