@@ -428,8 +428,8 @@ def view_activity(self, request):
             activity=self,
             show_inactive=request.is_organiser,
             show_archived=request.is_admin or (
-                request.is_organiser and
-                self.username == request.current_username
+                request.is_organiser
+                and self.username == request.current_username
             )
         ),
     }
@@ -600,8 +600,8 @@ def administer_activity(model, request, action, template, subject):
 
     # publish the request from the current period, or the latest
     publication_request = (
-        model.request_by_period(request.app.active_period) or
-        model.latest_request
+        model.request_by_period(request.app.active_period)
+        or model.latest_request
     )
 
     tickets = TicketCollection(session)
