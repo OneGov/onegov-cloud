@@ -7,6 +7,9 @@ Changelog
 - Displays the persons picture in the detail view, if available.
   [msom]
 
+- Fixes cursor styling of chosen selects.
+  [msom]
+
 1.0.1 (2018-11-26)
 ~~~~~~~~~~~~~~~~~~~~
 
