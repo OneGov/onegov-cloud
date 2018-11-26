@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-11-25 10:37+0100\n"
-"PO-Revision-Date: 2018-11-15 13:30+0100\n"
+"POT-Creation-Date: 2018-11-26 14:27+0100\n"
+"PO-Revision-Date: 2018-11-26 14:28+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -188,6 +188,15 @@ msgstr "Gesamter Staatskalender als PDF"
 msgid "Export this agency and its children as a PDF"
 msgstr "Organisation als PDF speichern"
 
+msgid "No hidden agencies."
+msgstr "Keine versteckte Organisationen."
+
+msgid "No hidden memberships."
+msgstr "Keine versteckte Mitgliedschaften."
+
+msgid "No hidden people."
+msgstr "Keine versteckte Personen."
+
 msgid "No people found."
 msgstr "Keine Personen gefunden."
 
@@ -221,6 +230,9 @@ msgstr "Ihre Änderungen wurden gespeichert"
 
 msgid "PDF created"
 msgstr "PDF erstellt"
+
+msgid "Hidden elements"
+msgstr "Versteckte Einträge"
 
 msgid "New person"
 msgstr "Neue Person"

@@ -1,19 +1,24 @@
 from io import BytesIO
-from onegov.agency.collections import ExtendedAgencyCollection
-from onegov.agency.collections import ExtendedPersonCollection
+from onegov.agency.app import get_top_navigation
 
 
-def test_app_root_pages(agency_app):
-    root_pages = agency_app.root_pages
-    assert len(root_pages) == 2
+class DummyRequest():
+    is_manager = False
 
-    assert isinstance(root_pages[0], ExtendedPersonCollection)
-    assert root_pages[0].is_visible is True
-    assert str(root_pages[0].title) == "People"
+    def class_link(self, cls, name=''):
+        return f'{cls.__name__}/{name}'
 
-    assert isinstance(root_pages[1], ExtendedAgencyCollection)
-    assert root_pages[1].is_visible is True
-    assert str(root_pages[1].title) == "Agencies"
+
+def test_app_get_top_navigation():
+    request = DummyRequest()
+    assert [a.text for a in get_top_navigation(request)] == [
+        'People', 'Agencies'
+    ]
+
+    request.is_manager = True
+    assert [a.text for a in get_top_navigation(request)] == [
+        'People', 'Agencies', 'Hidden elements'
+    ]
 
 
 def test_app_root_pdf(agency_app):

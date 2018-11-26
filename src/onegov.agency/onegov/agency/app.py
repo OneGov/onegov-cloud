@@ -1,4 +1,3 @@
-from cached_property import cached_property
 from onegov.agency import _
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
@@ -8,23 +7,15 @@ from onegov.core import utils
 from onegov.form import FormApp
 from onegov.org import OrgApp
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
+from onegov.org.custom import get_global_tools
+from onegov.org.models import Organisation
+from onegov.org.new_elements import Link
 
 
 class AgencyApp(OrgApp, FormApp):
 
     #: the version of this application (do not change manually!)
     version = '0.0.1'
-
-    @cached_property
-    def root_pages(self):
-        session = self.session()
-        people = ExtendedPersonCollection(session)
-        people.is_visible = True
-        people.title = _("People")
-        agencies = ExtendedAgencyCollection(session)
-        agencies.is_visible = True
-        agencies.title = _("Agencies")
-        return (people, agencies)
 
     @property
     def root_pdf_exists(self):
@@ -52,6 +43,30 @@ def get_create_new_organisation_factory():
 @AgencyApp.template_directory()
 def get_template_directory():
     return 'templates'
+
+
+@AgencyApp.template_variables()
+def get_template_variables(request):
+    return {
+        'global_tools': tuple(get_global_tools(request)),
+        'top_navigation': tuple(get_top_navigation(request)),
+    }
+
+
+def get_top_navigation(request):
+    yield Link(
+        text=_("People"),
+        url=request.class_link(ExtendedPersonCollection)
+    )
+    yield Link(
+        text=_("Agencies"),
+        url=request.class_link(ExtendedAgencyCollection)
+    )
+    if request.is_manager:
+        yield Link(
+            text=_("Hidden elements"),
+            url=request.class_link(Organisation, name='view-hidden')
+        )
 
 
 @AgencyApp.setting(section='core', name='theme')

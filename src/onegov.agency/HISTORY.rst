@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a view to display all hidden elements.
+  [msom]
+
 - Displays the persons picture in the detail view, if available.
   [msom]
 

@@ -248,6 +248,12 @@ def test_views_hidden(client):
     assert "Nationalrat Zug" in child_membership
     assert "Aeschi Thomas" in child_membership
 
+    hidden = client.get('/').click("Versteckte Einträge")
+    assert "Nationalrat" in hidden
+    assert "Mitglied von Zug" in hidden
+    assert "Nationalrat Zug" in hidden
+    assert "Aeschi Thomas" in hidden
+
     # Test forbidden views
     client.logout()
     client.get(person.request.url, status=403)
@@ -256,5 +262,6 @@ def test_views_hidden(client):
     client.get(child_membership.request.url, status=403)
 
     # Test hiding
-    assert 'Aeschi' not in client.get('/people')
-    assert 'Nationalrat' not in client.get('/organizations')
+    assert "Aeschi" not in client.get('/people')
+    assert "Nationalrat" not in client.get('/organizations')
+    assert "Versteckte Einträge" not in client.get('/')
