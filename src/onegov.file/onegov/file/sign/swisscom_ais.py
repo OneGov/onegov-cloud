@@ -3,7 +3,6 @@ import os
 from AIS import AIS
 from AIS import PDF
 from onegov.file.sign.generic import SigningService
-from uuid import uuid4
 
 
 class SwisscomAIS(SigningService, service_name='swisscom_ais'):
