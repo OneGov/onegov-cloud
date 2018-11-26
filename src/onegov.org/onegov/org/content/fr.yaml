@@ -76,6 +76,8 @@ filesets:
         note: "Concert de charité de {organisation}"
       - path: images/jwimshwif14-jeff-sheldon.jpg
         note: "Apprentissage à vie avec {organisation}"
+      - path: images/tdvsbpscg7c-tim-napier.jpg
+        note: "La salle peut être louée"
 
 organisation:
   theme_options:

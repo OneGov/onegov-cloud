@@ -75,6 +75,8 @@ filesets:
         note: "{organisation} Benefiz Konzert"
       - path: images/jwimshwif14-jeff-sheldon.jpg
         note: "Lebenslanges Lernen mit {organisation}"
+      - path: images/tdvsbpscg7c-tim-napier.jpg
+        note: "Der Saal kann gemietet werden"
 
 organisation:
   theme_options:
