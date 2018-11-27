@@ -182,6 +182,15 @@ def test_election_compound_layout_menu_proporz(session):
     assert ElectionCompoundLayout(compound, request).menu == [
         ('__districts', 'ElectionCompound/districts', False, []),
         ('Elected candidates', 'ElectionCompound/candidates', False, []),
+        ('Panachage', 'ElectionCompound/parties-panachage', False, []),
+        ('Downloads', 'ElectionCompound/data', False, [])
+    ]
+
+    compound.party_strengths = True
+
+    assert ElectionCompoundLayout(compound, request).menu == [
+        ('__districts', 'ElectionCompound/districts', False, []),
+        ('Elected candidates', 'ElectionCompound/candidates', False, []),
         ('Party strengths', 'ElectionCompound/party-strengths', False, []),
         ('Panachage', 'ElectionCompound/parties-panachage', False, []),
         ('Downloads', 'ElectionCompound/data', False, [])

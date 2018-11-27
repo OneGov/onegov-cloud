@@ -1,5 +1,10 @@
 Changelog
 ---------
+
+- Adds a configuration option to enable/disable party strengths of election
+  compounds.
+  [msom]
+
 3.7.3 (2018-11-25)
 ~~~~~~~~~~~~~~~~~~~
 

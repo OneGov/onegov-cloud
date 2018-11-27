@@ -3,6 +3,7 @@ from onegov.ballot import Election
 from onegov.election_day import _
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
+from wtforms import BooleanField
 from wtforms import RadioField
 from wtforms import StringField
 from wtforms.fields.html5 import DateField
@@ -56,16 +57,21 @@ class ElectionCompoundForm(Form):
         render_kw={'lang': 'rm'}
     )
 
-    related_link = URLField(
-        label=_("Related link")
-    )
-
     elections = MultiCheckboxField(
         label=_("Elections"),
         choices=[],
         validators=[
             InputRequired()
         ],
+    )
+
+    related_link = URLField(
+        label=_("Related link")
+    )
+
+    party_strengths = BooleanField(
+        label=_("Party strengths"),
+        render_kw=dict(force_simple=True)
     )
 
     def validate(self):
@@ -111,6 +117,7 @@ class ElectionCompoundForm(Form):
         model.date = self.date.data
         model.shortcode = self.shortcode.data
         model.related_link = self.related_link.data
+        model.party_strengths = self.party_strengths.data
 
         elections = self.request.session.query(Election)
         elections = elections.filter(Election.id.in_(self.elections.data))
@@ -138,4 +145,5 @@ class ElectionCompoundForm(Form):
         self.date.data = model.date
         self.shortcode.data = model.shortcode
         self.related_link.data = model.related_link
+        self.party_strengths.data = model.party_strengths
         self.elections.data = [election.id for election in model.elections]
