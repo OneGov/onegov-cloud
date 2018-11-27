@@ -10,6 +10,11 @@ matrix:
       python: "3.6"
       env: TOXENV=pep8
 
+addons:
+  apt:
+    packages:
+      - libpoppler-cpp-dev
+
 install:
   - pip install tox
   - if [ "$TOXENV" = 'py36' ]; then pip install coveralls; fi
