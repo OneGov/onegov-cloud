@@ -63,7 +63,7 @@ class StripeCaptureManager(object):
         try:
             with stripe_api_key(self.api_key):
                 self.charge.capture()
-        except Exception as e:
+        except Exception:
             # we can never fail or we might end up with an incosistent
             # database -> so must swallow any errors and report them
             log.exception("Stripe charge with capture id {} failed".format(
