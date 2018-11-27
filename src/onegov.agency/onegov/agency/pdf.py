@@ -45,8 +45,8 @@ class DefaultAgencyPdf(Pdf):
         data = []
         for membership in agency.memberships:
             if (
-                membership.is_hidden_from_public or
-                membership.person.is_hidden_from_public
+                membership.is_hidden_from_public
+                or membership.person.is_hidden_from_public
             ):
                 continue
 

@@ -32,9 +32,9 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
 
     def __eq__(self, other):
         return (
-            self.page == other.page and
-            self.letter == other.letter and
-            self.agency == other.agency
+            self.page == other.page
+            and self.letter == other.letter
+            and self.agency == other.agency
         )
 
     def page_by_index(self, page):

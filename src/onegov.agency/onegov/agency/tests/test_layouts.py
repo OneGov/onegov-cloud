@@ -50,15 +50,15 @@ def hrefs(items):
         if hasattr(item, 'links'):
             for ln in item.links:
                 yield (
-                    ln.attrs.get('href') or
-                    ln.attrs.get('ic-delete-from') or
-                    ln.attrs.get('ic-post-to')
+                    ln.attrs.get('href')
+                    or ln.attrs.get('ic-delete-from')
+                    or ln.attrs.get('ic-post-to')
                 )
         else:
             yield (
-                item.attrs.get('href') or
-                item.attrs.get('ic-delete-from') or
-                item.attrs.get('ic-post-to')
+                item.attrs.get('href')
+                or item.attrs.get('ic-delete-from')
+                or item.attrs.get('ic-post-to')
             )
 
 
