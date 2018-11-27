@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.7.4 (2018-11-27)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a configuration option to enable/disable party strengths of election
   compounds.
