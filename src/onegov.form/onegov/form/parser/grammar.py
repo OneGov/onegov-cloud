@@ -383,7 +383,7 @@ def marker_box(characters):
     """
 
     check = mark_enclosed_in(characters)('checked')
-    pricing = enclosed_in(decimal() + currency(), '()')('pricing')
+    pricing = Group(enclosed_in(decimal() + currency(), '()'))('pricing')
 
     label_text = with_whitespace_inside(text_without(characters + '()'))
     label = MatchFirst((

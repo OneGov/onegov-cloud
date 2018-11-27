@@ -1,5 +1,11 @@
 Changelog
 ---------
+
+- Fixes onegov.form parsing no longer working as expected.
+
+  The latest pyparsing release changed some things.
+  [href]
+
 0.40.0 (2018-10-25)
 ~~~~~~~~~~~~~~~~~~~
 
