@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.41.4 (2018-11-27)
+~~~~~~~~~~~~~~~~~~~
+
 - Moves less important person details down on the edit form.
   [msom]
 
