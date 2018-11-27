@@ -1,14 +1,14 @@
 Changelog
 ---------
 
+- Moves less important person details down on the edit form.
+  [msom]
+
 0.41.3 (2018-11-27)
 ~~~~~~~~~~~~~~~~~~~
 
 - Adds stock images to initial events.
   [href]
-
-- Moves less important person details down on the edit form.
-  [msom]
 
 0.41.2 (2018-11-25)
 ~~~~~~~~~~~~~~~~~~~
