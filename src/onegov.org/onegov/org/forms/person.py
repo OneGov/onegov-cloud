@@ -16,12 +16,6 @@ class PersonForm(Form):
 
     function = StringField(_("Function"))
 
-    picture_url = StringField(
-        label=_("Picture"),
-        description=_("URL pointing to the picture"),
-        render_kw={'class_': 'image-url'}
-    )
-
     email = EmailField(_("E-Mail"))
     phone = StringField(_("Phone"))
     phone_direct = StringField(_("Direct Phone Number"))
@@ -33,6 +27,12 @@ class PersonForm(Form):
     address = TextAreaField(
         label=_("Address"),
         render_kw={'rows': 5}
+    )
+
+    picture_url = StringField(
+        label=_("Picture"),
+        description=_("URL pointing to the picture"),
+        render_kw={'class_': 'image-url'}
     )
 
     notes = TextAreaField(
