@@ -64,7 +64,7 @@ def get_top_navigation(request):
     )
     if request.is_manager:
         yield Link(
-            text=_("Hidden elements"),
+            text=_("Hidden contents"),
             url=request.class_link(Organisation, name='view-hidden')
         )
 

@@ -248,7 +248,7 @@ def test_views_hidden(client):
     assert "Nationalrat Zug" in child_membership
     assert "Aeschi Thomas" in child_membership
 
-    hidden = client.get('/').click("Versteckte Einträge")
+    hidden = client.get('/').click("Versteckte Inhalte")
     assert "Nationalrat" in hidden
     assert "Mitglied von Zug" in hidden
     assert "Nationalrat Zug" in hidden

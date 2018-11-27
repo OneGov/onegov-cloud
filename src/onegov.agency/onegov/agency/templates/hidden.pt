@@ -3,38 +3,44 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
-        <h2 i18n:translate>Agencies</h2>
-        <p tal:condition="not:agencies" i18n:translate="">No hidden agencies.</p>
-        <ul tal:condition="agencies" class="hidden-agencies">
-            <li tal:repeat="agency agencies">
-                <span tal:repeat="ancestor agency.ancestors">${ancestor.title}</span>
-                <strong><a href="${request.link(agency)}">${agency.title}</a></strong>
-            </li>
-        </ul>
 
-        <h2 i18n:translate>Memberships</h2>
-        <p tal:condition="not:memberships" i18n:translate="">No hidden memberships.</p>
-        <ul tal:condition="memberships" class="hidden-memberships">
-            <li tal:repeat="membership memberships">
-                <span tal:repeat="ancestor membership.agency.ancestors">${ancestor.title}</span>
-                <span>${membership.agency.title}</span>
-                <strong><a href="${request.link(membership)}">${membership.title}</a></strong>
-            </li>
-        </ul>
+        <p tal:condition="not:(agencies or memberships or people)" i18n:translate="">No hidden people.</p>
 
-        <h2 i18n:translate>People</h2>
-        <p tal:condition="not:people" i18n:translate="">No hidden people.</p>
-        <ul tal:condition="people" class="hidden-people">
-            <li tal:repeat="person people">
-                <strong><a href="${request.link(person)}">${person.title}</a></strong>
-                <ul tal:define="memberships person.memberships_by_agency" tal:condition="memberships">
-                    <li tal:repeat="membership memberships">
-                        <span tal:repeat="ancestor membership.agency.ancestors">${ancestor.title}</span>
-                        <span>${membership.agency.title}</span>
-                        <span class="last">${membership.title}</span>
-                    </li>
-                </ul>
-            </li>
-        </ul>
+        <tal:block tal:condition="agencies">
+            <h3 i18n:translate>Agencies</h3>
+            <ul class="hidden-agencies">
+                <li tal:repeat="agency agencies">
+                    <span tal:repeat="ancestor agency.ancestors">${ancestor.title}</span>
+                    <strong><a href="${request.link(agency)}">${agency.title}</a></strong>
+                </li>
+            </ul>
+        </tal:block>
+
+        <tal:block  tal:condition="memberships">
+            <h3 i18n:translate>Memberships</h3>
+            <ul class="hidden-memberships">
+                <li tal:repeat="membership memberships">
+                    <span tal:repeat="ancestor membership.agency.ancestors">${ancestor.title}</span>
+                    <span>${membership.agency.title}</span>
+                    <strong><a href="${request.link(membership)}">${membership.title}</a></strong>
+                </li>
+            </ul>
+        </tal:block>
+
+        <tal:block tal:condition="people">
+            <h3 i18n:translate>People</h3>
+            <ul class="hidden-people">
+                <li tal:repeat="person people">
+                    <strong><a href="${request.link(person)}">${person.title}</a></strong>
+                    <ul tal:define="memberships person.memberships_by_agency" tal:condition="memberships">
+                        <li tal:repeat="membership memberships">
+                            <span tal:repeat="ancestor membership.agency.ancestors">${ancestor.title}</span>
+                            <span>${membership.agency.title}</span>
+                            <span class="last">${membership.title}</span>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </tal:block>
     </tal:block>
 </div>

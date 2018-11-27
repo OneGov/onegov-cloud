@@ -46,10 +46,10 @@ def view_hidden_agencies(self, request):
     people = people.all()
 
     layout = DefaultLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Hidden elements"), '#'))
+    layout.breadcrumbs.append(Link(_("Hidden contents"), '#'))
 
     return {
-        'title': _("Hidden elements"),
+        'title': _("Hidden contents"),
         'agencies': agencies,
         'memberships': memberships,
         'people': people,

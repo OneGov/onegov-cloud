@@ -17,7 +17,7 @@ def test_app_get_top_navigation():
 
     request.is_manager = True
     assert [a.text for a in get_top_navigation(request)] == [
-        'People', 'Agencies', 'Hidden elements'
+        'People', 'Agencies', 'Hidden contents'
     ]
 
 
