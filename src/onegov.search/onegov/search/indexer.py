@@ -250,7 +250,7 @@ class Indexer(object):
     def process_task(self, task):
         try:
             getattr(self, task['action'])(task)
-        except SearchOfflineError as e:
+        except SearchOfflineError:
             return False
 
         self.queue.task_done()
