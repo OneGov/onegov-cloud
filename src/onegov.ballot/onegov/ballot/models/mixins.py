@@ -79,8 +79,8 @@ class TitleTranslationsMixin(object):
         if default_locale is None:
             return translations.get(locale, None)
         return (
-            translations.get(locale, None) or
-            translations.get(default_locale, None)
+            translations.get(locale, None)
+            or translations.get(default_locale, None)
         )
 
     @property

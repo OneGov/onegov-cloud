@@ -261,8 +261,8 @@ def change_election_type_column(context):
 def replace_results_group(context):
     for table in ('ballot_results', 'election_results'):
         if (
-            context.has_column(table, 'group') and
-            not context.has_column(table, 'name')
+            context.has_column(table, 'group')
+            and not context.has_column(table, 'name')
         ):
             context.operations.alter_column(
                 table, 'group', new_column_name='name'
@@ -429,9 +429,9 @@ def add_update_contraints(context):
 @upgrade_task('Migrate election compounds', always_run=True)
 def migrate_election_compounds(context):
     if (
-        context.has_table('election_compounds') and
-        context.has_table('election_compound_associations') and
-        context.has_column('election_compounds', 'elections')
+        context.has_table('election_compounds')
+        and context.has_table('election_compound_associations')
+        and context.has_column('election_compounds', 'elections')
     ):
         session = context.session
         query = session.execute(

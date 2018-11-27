@@ -167,10 +167,10 @@ class List(Base, TimestampMixin):
         empty = empty.order_by(None)
         for result in empty:
             update = (
-                result.name not in percentage or
-                (
-                    set(percentage[result.name]['entities']) !=
-                    set(result.entities)
+                result.name not in percentage
+                or (
+                    set(percentage[result.name]['entities'])
+                    != set(result.entities)
                 )
             )
             if update:

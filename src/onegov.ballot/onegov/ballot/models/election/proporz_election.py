@@ -259,8 +259,8 @@ class ProporzElection(Election, PartyResultExportMixin):
             )
             panachage_lists = [t[0] for t in panachage_lists]
             panachage_lists = sorted(
-                set(panachage_lists) |
-                set([r.source for r in panachage_results])
+                set(panachage_lists)
+                | set([r.source for r in panachage_results])
             )
 
             list_lookup = {str(id[0]): id[1] for id in list_ids}

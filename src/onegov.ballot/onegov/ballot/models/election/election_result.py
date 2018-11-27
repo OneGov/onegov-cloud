@@ -63,8 +63,9 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
         """ The number of accounted votes. """
 
         return (
-            self.election.number_of_mandates * self.accounted_ballots -
-            self.blank_votes - self.invalid_votes
+            self.election.number_of_mandates * self.accounted_ballots
+            - self.blank_votes
+            - self.invalid_votes
         )
 
     @accounted_votes.expression
