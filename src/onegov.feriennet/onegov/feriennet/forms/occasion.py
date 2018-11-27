@@ -242,11 +242,12 @@ class OccasionForm(Form):
             ],
             'extra': {
                 'defaultDate': (
-                    self.request.app.active_period and
-                    self.request.app.active_period.execution_start.isoformat()
+                    self.request.app.active_period
+                    and self.request.app.active_period
+                        .execution_start.isoformat()
                 ) or (
-                    self.request.app.periods and
-                    self.request.app.periods[0].execution_start.isoformat()
+                    self.request.app.periods
+                    and self.request.app.periods[0].execution_start.isoformat()
                 ),
                 'defaultTime': '08:00'
             }
