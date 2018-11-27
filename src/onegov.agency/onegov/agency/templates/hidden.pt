@@ -4,7 +4,7 @@
     </tal:block>
     <tal:block metal:fill-slot="content">
 
-        <p tal:condition="not:(agencies or memberships or people)" i18n:translate="">No hidden people.</p>
+        <p tal:condition="not:(agencies or memberships or people)" i18n:translate="">No hidden contents.</p>
 
         <tal:block tal:condition="agencies">
             <h3 i18n:translate>Agencies</h3>
