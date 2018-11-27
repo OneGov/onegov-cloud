@@ -147,18 +147,18 @@ class Layout(ChameleonLayout):
                 _("Official Notices"),
                 self.manage_notices_link,
                 (
-                    isinstance(self.model, GazetteNoticeCollection) and
-                    'statistics' not in self.request.url
+                    isinstance(self.model, GazetteNoticeCollection)
+                    and 'statistics' not in self.request.url
                 ),
                 []
             ))
 
             active = (
-                isinstance(self.model, IssueCollection) or
-                isinstance(self.model, OrganizationCollection) or
-                isinstance(self.model, CategoryCollection) or
-                isinstance(self.model, UserCollection) or
-                isinstance(self.model, UserGroupCollection)
+                isinstance(self.model, IssueCollection)
+                or isinstance(self.model, OrganizationCollection)
+                or isinstance(self.model, CategoryCollection)
+                or isinstance(self.model, UserCollection)
+                or isinstance(self.model, UserGroupCollection)
             )
             manage = [
                 (
@@ -201,8 +201,8 @@ class Layout(ChameleonLayout):
                     name='statistics'
                 ),
                 (
-                    isinstance(self.model, GazetteNoticeCollection) and
-                    'statistics' in self.request.url
+                    isinstance(self.model, GazetteNoticeCollection)
+                    and 'statistics' in self.request.url
                 ),
                 []
             ))

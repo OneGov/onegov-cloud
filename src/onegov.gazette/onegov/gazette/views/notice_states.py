@@ -42,8 +42,8 @@ def send_accepted_mail(request, notice):
         )
 
     reply_to = (
-        request.app.principal.on_accept.get('mail_from') or
-        request.app.mail['transactional']['sender']
+        request.app.principal.on_accept.get('mail_from')
+        or request.app.mail['transactional']['sender']
     )
 
     subject = construct_subject(notice, request)
@@ -114,10 +114,10 @@ def submit_notice(self, request, form):
         }
 
     if (
-        self.expired_issues or
-        (self.overdue_issues and not is_private) or
-        self.invalid_category or
-        self.invalid_organization
+        self.expired_issues
+        or (self.overdue_issues and not is_private)
+        or self.invalid_category
+        or self.invalid_organization
     ):
         return redirect(request.link(self, name='edit'))
 
@@ -169,9 +169,9 @@ def accept_notice(self, request, form):
 
     if (
         self.state == 'submitted' and (
-            self.expired_issues or
-            self.invalid_category or
-            self.invalid_organization
+            self.expired_issues
+            or self.invalid_category
+            or self.invalid_organization
         )
     ):
         return redirect(request.link(self, name='edit'))

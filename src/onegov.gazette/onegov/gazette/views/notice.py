@@ -334,9 +334,9 @@ def delete_notice(self, request, form):
             raise HTTPForbidden()
 
     if (
-        (self.state == 'submitted' and not is_secret) or
-        (self.state == 'accepted' and not is_private) or
-        (self.state == 'published')
+        (self.state == 'submitted' and not is_secret)
+        or (self.state == 'accepted' and not is_private)
+        or (self.state == 'published')
     ):
         request.message(
             _(
