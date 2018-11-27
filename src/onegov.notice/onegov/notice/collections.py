@@ -56,16 +56,16 @@ class OfficialNoticeCollectionPagination(Pagination):
 
     def __eq__(self, other):
         return (
-            self.page == other.page and
-            self.state == other.state and
-            self.term == other.term and
-            self.order == other.order and
-            self.direction == other.direction and
-            self.issues == other.issues and
-            self.categories == other.categories and
-            self.organizations == other.organizations and
-            self.user_ids == other.user_ids and
-            self.group_ids == other.group_ids
+            self.page == other.page
+            and self.state == other.state
+            and self.term == other.term
+            and self.order == other.order
+            and self.direction == other.direction
+            and self.issues == other.issues
+            and self.categories == other.categories
+            and self.organizations == other.organizations
+            and self.user_ids == other.user_ids
+            and self.group_ids == other.group_ids
         )
 
     def subset(self):
