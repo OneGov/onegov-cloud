@@ -4,7 +4,7 @@ name = 'onegov.agency'
 description = (
     'Administrative units and relationships for administrative directories.'
 )
-version = '1.1.1'
+version = '1.1.2'
 
 
 def get_long_description():
