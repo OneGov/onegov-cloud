@@ -63,7 +63,7 @@ def test_setup_database(postgres_dsn, redis_url):
     tables = set(r[0] for r in tables.fetchall())
 
     assert 'documents' in tables
-    assert 'payments_for_reservations' in tables
+    assert 'payments_for_reservations_payment' in tables
     assert 'resources' in tables
     assert 'allocations' in tables
     assert 'reserved_slots' in tables
@@ -92,7 +92,7 @@ def test_libres_context(postgres_dsn):
 
     tables = set(r[0] for r in tables.fetchall())
 
-    assert 'payments_for_reservations' in tables
+    assert 'payments_for_reservations_payment' in tables
     assert 'resources' in tables
     assert 'allocations' in tables
     assert 'reserved_slots' in tables
