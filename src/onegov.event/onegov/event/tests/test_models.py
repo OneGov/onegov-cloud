@@ -388,8 +388,8 @@ def test_create_event_recurring(session):
     assert occurrences[4].localized_end == end
     assert occurrences[4].name == 'event-2008-02-11'
 
-    assert (sorted([o.id for o in event.occurrences]) ==
-            sorted([o.id for o in occurrences]))
+    assert (sorted([o.id for o in event.occurrences])
+            == sorted([o.id for o in occurrences]))
     assert occurrences[0].event.id == event.id
     assert occurrences[1].event.id == event.id
     assert occurrences[2].event.id == event.id

@@ -183,26 +183,26 @@ class EventCollection(Pagination):
                 else:
                     # No information on provided, figure it out ourselves!
                     image_changed = (
-                        (existing.image and not item.image) or
-                        (not existing.image and item.image)
+                        (existing.image and not item.image)
+                        or (not existing.image and item.image)
                     )
                     if existing.image and item.image:
                         image_changed = (
-                            existing.image.checksum !=
-                            md5(item.image.read()).hexdigest()
+                            existing.image.checksum
+                            != md5(item.image.read()).hexdigest()
                         )
                         item.image.seek(0)
                     changed = (
-                        existing.title != event.title or
-                        existing.location != event.location or
-                        set(existing.tags) != set(event.tags) or
-                        existing.timezone != event.timezone or
-                        existing.start != event.start or
-                        existing.end != event.end or
-                        existing.content != event.content or
-                        existing.coordinates != event.coordinates or
-                        existing.recurrence != event.recurrence or
-                        image_changed
+                        existing.title != event.title
+                        or existing.location != event.location
+                        or set(existing.tags) != set(event.tags)
+                        or existing.timezone != event.timezone
+                        or existing.start != event.start
+                        or existing.end != event.end
+                        or existing.content != event.content
+                        or existing.coordinates != event.coordinates
+                        or existing.recurrence != event.recurrence
+                        or image_changed
                     )
 
                 if changed:
