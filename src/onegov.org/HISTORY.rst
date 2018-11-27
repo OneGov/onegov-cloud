@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds stock images to initial events.
+  [href]
+
 - Moves less important person details down on the edit form.
   [msom]
 
