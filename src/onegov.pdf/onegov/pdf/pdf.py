@@ -34,12 +34,14 @@ class Pdf(PDFDocument):
     def __init__(self, *args, **kwargs):
         toc_levels = kwargs.pop('toc_levels', 3)
         created = kwargs.pop('created', '')
+        logo = kwargs.pop('logo', None)
 
         super(Pdf, self).__init__(*args, **kwargs)
 
         self.doc = Template(*args, **kwargs)
         self.doc.PDFDocument = self
         self.doc.created = created
+        self.doc.logo = logo
 
         self.toc = None
         self.toc_numbering = {}

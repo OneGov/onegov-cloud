@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Allows to add SVG header logos.
+  [msom]
+
 0.4.0 (2018-10-30)
 ~~~~~~~~~~~~~~~~~~~~~
 

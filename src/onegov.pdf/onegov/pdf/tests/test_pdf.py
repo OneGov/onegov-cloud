@@ -5,6 +5,8 @@ from onegov.core.utils import module_path
 from onegov.pdf import page_fn_footer
 from onegov.pdf import page_fn_header
 from onegov.pdf import page_fn_header_and_footer
+from onegov.pdf import page_fn_header_logo
+from onegov.pdf import page_fn_header_logo_and_footer
 from onegov.pdf import Pdf
 from pdfdocument.document import MarkupParagraph
 from pdfrw import PdfReader
@@ -592,3 +594,51 @@ def test_page_fn_header_and_footer():
     assert reader.getNumPages() == 2
     assert reader.getPage(0).extractText() == f'title\n© {year} author\n1\n'
     assert reader.getPage(1).extractText() == f'title\n© {year} author\n2\n'
+
+
+@mark.parametrize("path", [
+    module_path('onegov.pdf', 'tests/fixtures/onegov.svg'),
+])
+def test_page_fn_header_logo(path):
+    with open(path) as file:
+        logo = file.read()
+
+    # no logo
+    file = BytesIO()
+    pdf = Pdf(file)
+    pdf.init_a4_portrait(page_fn_header_logo)
+    pdf.generate()
+
+    file.seek(0)
+    reader = PdfFileReader(file)
+    assert reader.getNumPages() == 1
+    assert reader.getPage(0).extractText() == ''
+
+    # logo
+    file = BytesIO()
+    pdf = Pdf(file, logo=logo)
+    pdf.init_a4_portrait(page_fn_header_logo)
+    pdf.generate()
+
+    file.seek(0)
+    reader = PdfFileReader(file)
+    assert reader.getNumPages() == 1
+    assert reader.getPage(0).extractText() == 'onegov.ch\n'
+
+
+@mark.parametrize("path", [
+    module_path('onegov.pdf', 'tests/fixtures/onegov.svg'),
+])
+def test_page_fn_header_logo_and_footer(path):
+    with open(path) as file:
+        logo = file.read()
+
+    file = BytesIO()
+    pdf = Pdf(file, author='author', logo=logo)
+    pdf.init_a4_portrait(page_fn_header_logo_and_footer)
+    pdf.generate()
+
+    file.seek(0)
+    reader = PdfFileReader(file)
+    assert reader.getNumPages() == 1
+    assert reader.getPage(0).extractText() == 'onegov.ch\n© 2018 author\n1\n'

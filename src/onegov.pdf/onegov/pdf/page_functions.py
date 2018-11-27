@@ -1,4 +1,7 @@
 from datetime import date
+from lxml import etree
+from reportlab.graphics import renderPDF
+from svglib.svglib import SvgRenderer
 from textwrap import shorten
 from textwrap import wrap
 
@@ -16,7 +19,7 @@ def page_fn_footer(canvas, doc):
     Example:
 
         pdf = Pdf(file, author='OneGov')
-        pdf.init_a4_portrait(page_fn=draw_footer)
+        pdf.init_a4_portrait(page_fn=page_fn_footer)
 
     """
     canvas.saveState()
@@ -41,8 +44,8 @@ def page_fn_header(canvas, doc):
 
     Example:
 
-        pdf = Pdf(file, author='OneGov', crated='1.1.2000')
-        pdf.init_a4_portrait(page_fn=draw_header)
+        pdf = Pdf(file, author='OneGov', created='1.1.2000')
+        pdf.init_a4_portrait(page_fn=page_fn_header)
 
     """
 
@@ -68,6 +71,36 @@ def page_fn_header(canvas, doc):
     canvas.restoreState()
 
 
+def page_fn_header_logo(canvas, doc):
+    """ A standard header consisting of a SVG logo.
+
+    The logo is drawn in its original size placed at the bottom on the header,
+    which allows to give extra margin at the bottom directly in the SVG.
+
+    Example:
+
+        pdf = Pdf(
+            file, author='OneGov', created='1.1.2000',
+            logo='<?xml version="1.0"><svg>...</svg>'
+        )
+        pdf.init_a4_portrait(page_fn=page_fn_header_logo)
+
+    """
+
+    canvas.saveState()
+    if doc.logo:
+        parser = etree.XMLParser(remove_comments=True, recover=True)
+        svg = etree.fromstring(doc.logo.encode('utf-8'), parser=parser)
+        drawing = SvgRenderer().render(svg)
+        renderPDF.draw(
+            drawing,
+            canvas,
+            doc.leftMargin,
+            doc.pagesize[1] - doc.topMargin
+        )
+    canvas.restoreState()
+
+
 def page_fn_header_and_footer(canvas, doc):
     """ A standard header and footer.
 
@@ -75,11 +108,31 @@ def page_fn_header_and_footer(canvas, doc):
 
         pdf = Pdf(file, title='Title', created='1.1.2000', author='OneGov')
         pdf.init_a4_portrait(
-            page_fn=draw_footer,
-            page_fn_later=draw_header_and_footer
+            page_fn=page_fn_footer,
+            page_fn_later=page_fn_header_and_footer
         )
 
     """
 
     page_fn_header(canvas, doc)
+    page_fn_footer(canvas, doc)
+
+
+def page_fn_header_logo_and_footer(canvas, doc):
+    """ A standard header logo and footer.
+
+    Example:
+
+        pdf = Pdf(
+            file, title='Title', created='1.1.2000', author='OneGov',
+            logo='<?xml version="1.0"><svg>...</svg>'
+        )
+        pdf.init_a4_portrait(
+            page_fn=page_fn_header_logo_and_footer,
+            page_fn_later=page_fn_header_and_footer
+        )
+
+    """
+
+    page_fn_header_logo(canvas, doc)
     page_fn_footer(canvas, doc)

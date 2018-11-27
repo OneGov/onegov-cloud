@@ -34,11 +34,13 @@ setup(
     python_requires='>=3.6',
     install_requires=[
         'bleach',
+        'lxml',
         'html5lib',
         'onegov.core>=0.4.0',
         'pdfdocument',
         'pdfrw',
-        'reportlab'
+        'reportlab',
+        'svglib>=0.9.0b'
     ],
     extras_require=dict(
         test=[
