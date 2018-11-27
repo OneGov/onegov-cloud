@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.1.1 (2018-11-27)
+~~~~~~~~~~~~~~~~~~~~
 
 - Restyles the hidden contents views.
   [msom]
