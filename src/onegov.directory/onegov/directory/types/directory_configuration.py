@@ -186,8 +186,8 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
             k: SAFE_FORMAT_TRANSLATORS.get(type(v), str)(v)
             for k, v in data.items()
             if (
-                type(v) in (str, int, float) or
-                type(v) in SAFE_FORMAT_TRANSLATORS
+                type(v) in (str, int, float)
+                or type(v) in SAFE_FORMAT_TRANSLATORS
             )
         }
 
@@ -208,8 +208,8 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
     def extract_order(self, data):
         # by default we use the title as order
         attribute = (
-            (self.order and 'order') or
-            (self.title and 'title')
+            (self.order and 'order')
+            or (self.title and 'title')
         )
         order = normalize_for_url(self.join(data, attribute))
         order = pad_numbers_in_chunks(order)

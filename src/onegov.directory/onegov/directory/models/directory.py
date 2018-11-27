@@ -133,10 +133,10 @@ class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
                     continue
 
                 delete = (
-                    f.note not in values or
-                    values[f.note] is None or
-                    values[f.note].data == {} or
-                    values[f.note].data is not None
+                    f.note not in values
+                    or values[f.note] is None
+                    or values[f.note].data == {}
+                    or values[f.note].data is not None
                 )
 
                 if delete:

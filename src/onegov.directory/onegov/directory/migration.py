@@ -218,10 +218,10 @@ class StructuralChanges(object):
 
     def __bool__(self):
         return bool(
-            self.added_fields or
-            self.removed_fields or
-            self.renamed_fields or
-            self.changed_fields
+            self.added_fields
+            or self.removed_fields
+            or self.renamed_fields
+            or self.changed_fields
         )
 
     def detect_added_fields(self):
