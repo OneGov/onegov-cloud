@@ -189,9 +189,9 @@ class FormSubmissionCollection(object):
         submission.registration_window = registration_window
         submission.spots = spots
         submission.payment_method = (
-            payment_method or
-            definition and definition.payment_method or
-            'manual'
+            payment_method
+            or definition and definition.payment_method
+            or 'manual'
         )
 
         # extensions are inherited from definitions
@@ -293,8 +293,8 @@ class FormSubmissionCollection(object):
 
         files_to_add = set(
             id for id in (files - files_to_remove)
-            if submission.data.get(id) and
-            not submission.data[id]['data'].startswith('@')
+            if submission.data.get(id)
+            and not submission.data[id]['data'].startswith('@')
         )
 
         files_to_keep = files - files_to_remove - files_to_add

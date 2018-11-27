@@ -52,8 +52,8 @@ class UploadField(FileField):
         # when the action was to keep the current file - an evil approach
         if isinstance(caller, (DataRequired, InputRequired)):
             truthy = (
-                getattr(self, '_data', None) or
-                getattr(self, 'action', None) == 'keep'
+                getattr(self, '_data', None)
+                or getattr(self, 'action', None) == 'keep'
             )
 
             return truthy

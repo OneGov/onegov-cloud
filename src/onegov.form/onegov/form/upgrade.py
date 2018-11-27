@@ -91,9 +91,9 @@ def add_payment_method_to_definitions_and_submissions(context):
         table='submissions',
         column=Column('payment_method', Text, nullable=False),
         default=lambda submission: (
-            submission.form and
-            submission.form.content.get('payment_method', 'manual') or
-            'manual'
+            submission.form
+            and submission.form.content.get('payment_method', 'manual')
+            or 'manual'
         )
     )
 

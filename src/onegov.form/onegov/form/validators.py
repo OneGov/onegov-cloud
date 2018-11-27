@@ -214,8 +214,8 @@ class ValidPhoneNumber(object):
                 raise ValidationError(self.message)
 
             valid = (
-                phonenumbers.is_valid_number(number) and
-                phonenumbers.is_possible_number(number)
+                phonenumbers.is_valid_number(number)
+                and phonenumbers.is_possible_number(number)
             )
             if not valid:
                 raise ValidationError(self.message)
