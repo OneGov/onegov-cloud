@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.40.1 (2018-11-27)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes onegov.form parsing no longer working as expected.
 
