@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Allows to use a SVG header logo in the issue PDF.
+  [msom]
+
 1.19.0 (2018-11-26)
 ~~~~~~~~~~~~~~~~~~~~
 

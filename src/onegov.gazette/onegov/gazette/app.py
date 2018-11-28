@@ -54,6 +54,19 @@ class GazetteApp(Framework, DepotApp, QuillApp, FormApp):
             return FilestorageFile(self.principal.logo)
 
     @property
+    def logo_for_pdf(self):
+        """ Returns the SVG logo used for PDFs as string.
+
+        """
+        return self.cache.get_or_create('logo_for_pdf', self.load_logo_for_pdf)
+
+    def load_logo_for_pdf(self):
+        if self.filestorage.isfile(self.principal.logo_for_pdf):
+            with self.filestorage.open(self.principal.logo_for_pdf) as file:
+                result = file.read()
+            return result
+
+    @property
     def theme_options(self):
         assert self.principal.color is not None, """ No color defined, be
         sure to define one in your principal.yml like this:

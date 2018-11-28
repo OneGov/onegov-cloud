@@ -9,6 +9,7 @@ from onegov.gazette.models import Organization
 from onegov.gazette.utils import bool_is
 from onegov.pdf import page_fn_footer
 from onegov.pdf import page_fn_header_and_footer
+from onegov.pdf import page_fn_header_logo_and_footer
 from onegov.pdf import Pdf as PdfBase
 from pdfdocument.document import MarkupParagraph
 
@@ -447,10 +448,11 @@ class IssuePdf(NoticesPdf):
         pdf = cls(
             file,
             title=title,
-            author=request.app.principal.name
+            author=request.app.principal.name,
+            logo=request.app.logo_for_pdf
         )
         pdf.init_a4_portrait(
-            page_fn=page_fn_footer,
+            page_fn=page_fn_header_logo_and_footer,
             page_fn_later=page_fn_header_and_footer
         )
         pdf.h(title)

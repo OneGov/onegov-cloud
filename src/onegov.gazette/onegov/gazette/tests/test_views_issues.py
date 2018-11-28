@@ -216,6 +216,7 @@ def test_view_issues_publish(gazette_app):
         reader = PdfFileReader(BytesIO(manage.body))
         text = ''.join([page.extractText() for page in reader.pages])
         assert text == (
+            'onegov.ch\n'
             '© 2017 Govikon\n'
             '1\nAmtsblatt Nr. 44, 03.11.2017\n'
             'Civic Community\n'
@@ -232,6 +233,7 @@ def test_view_issues_publish(gazette_app):
         reader = PdfFileReader(BytesIO(manage.body))
         text = ''.join([page.extractText() for page in reader.pages])
         assert text == (
+            'onegov.ch\n'
             '© 2017 Govikon\n'
             '1\nAmtsblatt Nr. 44, 03.11.2017\n'
         )
@@ -257,6 +259,7 @@ def test_view_issues_publish(gazette_app):
         reader = PdfFileReader(BytesIO(manage.body))
         text = ''.join([page.extractText() for page in reader.pages])
         assert text == (
+            'onegov.ch\n'
             '© 2017 Govikon\n'
             '1\nAmtsblatt Nr. 46, 17.11.2017\n'
             'Eine Meldung ist online nicht verfügbar und nicht in diesem '
@@ -272,6 +275,7 @@ def test_view_issues_publish(gazette_app):
         reader = PdfFileReader(BytesIO(manage.body))
         text = ''.join([page.extractText() for page in reader.pages])
         assert text == (
+            'onegov.ch\n'
             '© 2017 Govikon\n'
             '1\nAmtsblatt Nr. 46, 17.11.2017\n'
             'Civic Community\n'
@@ -304,6 +308,7 @@ def test_view_issues_publish(gazette_app):
         reader = PdfFileReader(BytesIO(manage.body))
         text = ''.join([page.extractText() for page in reader.pages])
         assert text == (
+            'onegov.ch\n'
             '© 2017 Govikon\n'
             '1\nAmtsblatt Nr. 45, 10.11.2017\n'
             'Eine Meldung ist online nicht verfügbar und nicht in diesem '
@@ -323,6 +328,7 @@ def test_view_issues_publish(gazette_app):
         reader = PdfFileReader(BytesIO(manage.body))
         text = ''.join([page.extractText() for page in reader.pages])
         assert text == (
+            'onegov.ch\n'
             '© 2017 Govikon\n'
             '1\nAmtsblatt Nr. 45, 10.11.2017\n'
             'Civic Community\n'
@@ -357,6 +363,7 @@ def test_view_issues_publish(gazette_app):
         reader = PdfFileReader(BytesIO(manage.body))
         text = ''.join([page.extractText() for page in reader.pages])
         assert text == (
+            'onegov.ch\n'
             '© 2017 Govikon\n'
             '1\nAmtsblatt Nr. 46, 17.11.2017\n'
             'Eine Meldung ist online nicht verfügbar und nicht in diesem '
@@ -373,6 +380,7 @@ def test_view_issues_publish(gazette_app):
         text = ''.join([page.extractText() for page in reader.pages])
 
         assert text == (
+            'onegov.ch\n'
             '© 2017 Govikon\n'
             '1\nAmtsblatt Nr. 46, 17.11.2017\n'
             'Civic Community\n'

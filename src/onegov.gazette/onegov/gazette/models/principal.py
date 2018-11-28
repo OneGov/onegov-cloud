@@ -14,6 +14,7 @@ class Principal(object):
         self,
         name='',
         logo='',
+        logo_for_pdf='',
         color='',
         canton=None,
         on_accept=None,
@@ -37,6 +38,7 @@ class Principal(object):
         self.canton = canton
         self.name = name
         self.logo = logo
+        self.logo_for_pdf = logo_for_pdf
         self.color = color
         self.on_accept = on_accept or {}
         self.time_zone = time_zone

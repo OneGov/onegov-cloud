@@ -15,12 +15,14 @@ from onegov.gazette.pdf import Pdf
 from PyPDF2 import PdfFileReader
 from sedate import utcnow
 from unittest.mock import patch
+from onegov.gazette.tests.conftest import LOGO
 
 
 class DummyApp(object):
     def __init__(self, session, principal):
         self._session = session
         self.principal = principal
+        self.logo_for_pdf = LOGO
 
     def session(self):
         return self._session
@@ -554,7 +556,7 @@ def test_issues_pdf_from_issue(gazette_app):
         reader = PdfFileReader(file)
         assert [page.extractText() for page in reader.pages] == [
             # page 1
-            '© 2017 Govikon\n1\nGazette No. 40, 06.10.2017\n'
+            'onegov.ch\n© 2017 Govikon\n1\nGazette No. 40, 06.10.2017\n'
             'One notice is not published online and therefore not included '
             'in this PDF.\n'
             'State Chancellery\n'
@@ -583,7 +585,7 @@ def test_issues_pdf_from_issue(gazette_app):
         reader = PdfFileReader(file)
         assert [page.extractText() for page in reader.pages] == [
             # page 1
-            '© 2017 Govikon\n1\nGazette No. 41, 13.10.2017\n'
+            'onegov.ch\n© 2017 Govikon\n1\nGazette No. 41, 13.10.2017\n'
             'One notice is not published online and therefore not included '
             'in this PDF.\n'
             'State Chancellery\n'
@@ -617,7 +619,7 @@ def test_issues_pdf_from_issue(gazette_app):
         file = IssuePdf.from_issue(issue, DummyRequest(session, principal), 5)
         reader = PdfFileReader(file)
         assert [page.extractText() for page in reader.pages] == [
-            '© 2018 Govikon\n1\nGazette No. 42, 20.10.2017\n'
+            'onegov.ch\n© 2018 Govikon\n1\nGazette No. 42, 20.10.2017\n'
             'Churches\n'
             'Sikh Community\n'
             'Education\n'
@@ -757,7 +759,7 @@ def test_issues_po_pdf_from_issue(gazette_app):
         file.seek(0)
         assert [page.extractText() for page in reader.pages] == [
             # page 1
-            '© 2017 Govikon\n1\nGazette No. 40, 06.10.2017\n'
+            'onegov.ch\n© 2017 Govikon\n1\nGazette No. 40, 06.10.2017\n'
             'State Chancellery\n'
             'Complaints\n'
             '3\n100-10\n2017-40-3, 2017-41-2\n'
@@ -770,7 +772,7 @@ def test_issues_po_pdf_from_issue(gazette_app):
         reader = PdfFileReader(file)
         assert [page.extractText() for page in reader.pages] == [
             # page 1
-            '© 2017 Govikon\n1\nGazette No. 41, 13.10.2017\n'
+            'onegov.ch\n© 2017 Govikon\n1\nGazette No. 41, 13.10.2017\n'
             'State Chancellery\n'
             'Complaints\n'
             '2\n100-10\n2017-40-3, 2017-41-2\n'
@@ -783,5 +785,5 @@ def test_issues_po_pdf_from_issue(gazette_app):
         )
         reader = PdfFileReader(file)
         assert [page.extractText() for page in reader.pages] == [
-            '© 2018 Govikon\n1\nGazette No. 42, 20.10.2017\n'
+            'onegov.ch\n© 2018 Govikon\n1\nGazette No. 42, 20.10.2017\n'
         ]

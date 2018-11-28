@@ -20,9 +20,38 @@ PRINCIPAL = """
     name: Govikon
     color: '#006FB5'
     logo: 'govikon.svg'
+    logo_for_pdf: 'govikon-pdf.svg'
     on_accept:
         mail_to: 'printer@onegov.org'
     publishing: True
+"""
+
+
+LOGO = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg3765"
+   version="1.1"
+   viewBox="0 0 30.000002 7.8254137"
+   height="0.78254139cm"
+   width="3.0000002cm">
+  <g transform="translate(-95.867724,-50.018762)">
+    <text
+       id="text3769"
+       y="54.592094"
+       x="95.535599"
+       style="font-size:6.01939869px;line-height:125%;font-family:sans-serif;"
+       xml:space="preserve"><tspan
+         style="stroke-width:0.15048496px"
+         y="54.592094"
+         x="95.535599"
+         id="tspan3767">onegov.ch</tspan></text>
+  </g>
+</svg>
 """
 
 
@@ -140,6 +169,7 @@ def create_gazette(request, temporary_path):
     )
     app.session_manager.set_locale('de_CH', 'de_CH')
     app.filestorage.settext('principal.yml', dedent(PRINCIPAL))
+    app.filestorage.settext('govikon-pdf.svg', LOGO)
 
     group_id = uuid4()
     session = app.session()
