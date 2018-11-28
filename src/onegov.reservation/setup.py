@@ -41,6 +41,7 @@ setup(
     extras_require=dict(
         test=[
             'coverage',
+            'freezegun',
             'onegov_testing',
             'pytest',
         ],

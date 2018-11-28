@@ -1,3 +1,4 @@
+from datetime import timedelta
 from onegov.core.cache import lru_cache
 from libres import new_scheduler
 from libres.db.models import Allocation
@@ -8,6 +9,7 @@ from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.form import parse_form
 from onegov.pay import Price, process_payment
+from sedate import align_date_to_day, utcnow
 from sqlalchemy import Column, Text
 from sqlalchemy.orm import relationship
 from uuid import uuid4
@@ -83,6 +85,9 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
     #: the reservations cost a given amount per unit (allocations * quota)
     price_per_item = content_property('price_per_reservation')
 
+    #: reservation deadline (e.g. None, (5, 'd'), (24, 'h'))
+    deadline = content_property()
+
     __mapper_args__ = {
         "polymorphic_on": 'type'
     }
@@ -103,6 +108,25 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
 
     #: the view to open in the calendar (fullCalendar view name)
     view = 'month'
+
+    @deadline.setter
+    def set_deadline(self, value):
+        value = value or None
+
+        if value:
+            if len(value) != 2:
+                raise ValueError("Deadline is not a tuple with two elements")
+
+            if type(value[0]) != int:
+                raise ValueError("Deadline value is not an int")
+
+            if value[0] < 1:
+                raise ValueError("Deadline value is smaller than 1")
+
+            if value[1] not in ('d', 'h'):
+                raise ValueError("Deadline unit must be 'd' or 'h'")
+
+        self.content['deadline'] = value
 
     def highlight_allocations(self, allocations):
         """ The allocation to jump to in the view. """
@@ -167,3 +191,27 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
                 self.payment_method, price, provider, payment_token)
 
         return True
+
+    def is_past_deadline(self, date):
+        if not self.deadline:
+            return False
+
+        if not date.tzinfo:
+            raise RuntimeError(f"The given date has no timezone: {date}")
+
+        if not self.timezone:
+            raise RuntimeError(f"No timezone set on the resource")
+
+        n, unit = self.deadline
+
+        # hours result in a simple offset
+        def deadline_using_h():
+            return date - timedelta(hours=n)
+
+        # days require that we align the date to the beginning of the date
+        def deadline_using_d():
+            return align_date_to_day(date, self.timezone, 'down')\
+                - timedelta(days=(n - 1))
+
+        deadline = locals()[f'deadline_using_{unit}']()
+        return deadline <= utcnow()
