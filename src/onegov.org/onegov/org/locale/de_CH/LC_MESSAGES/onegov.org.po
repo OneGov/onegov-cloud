@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-11-09 11:13+0100\n"
+"POT-Creation-Date: 2018-11-28 14:25+0100\n"
 "PO-Revision-Date: 2018-11-09 11:12+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -738,6 +738,12 @@ msgstr "Nachname"
 msgid "Function"
 msgstr "Funktion"
 
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "Direct Phone Number"
+msgstr "Direktnummer"
+
 msgid "Born"
 msgstr "Geboren"
 
@@ -747,23 +753,17 @@ msgstr "Beruf"
 msgid "Political Party"
 msgstr "Politische Partei"
 
-msgid "Phone"
-msgstr "Telefon"
-
-msgid "Direct Phone Number"
-msgstr "Direktnummer"
-
 msgid "Website"
 msgstr "Webseite"
+
+msgid "Address"
+msgstr "Adresse"
 
 msgid "Picture"
 msgstr "Bild"
 
 msgid "URL pointing to the picture"
 msgstr "Link zum Bild"
-
-msgid "Address"
-msgstr "Adresse"
 
 msgid "Notes"
 msgstr "Notizen"
@@ -825,6 +825,18 @@ msgstr "Dient zur Gruppierung in der Übersicht"
 msgid "Extra Fields Definition"
 msgstr "Extra-Felder Definition"
 
+msgid "Closing date for the public"
+msgstr "Annahmeschluss für die Öffentlichkeit"
+
+msgid "Closing date"
+msgstr "Annahmeschluss"
+
+msgid "Hours"
+msgstr "Stunden"
+
+msgid "Days"
+msgstr "Tage"
+
 msgid "Price"
 msgstr "Preis"
 
@@ -836,6 +848,15 @@ msgstr "Preis pro Stunde"
 
 msgid "Currency"
 msgstr "Währung"
+
+msgid "No closing date"
+msgstr "Kein Annahmeschluss"
+
+msgid "Stop accepting reservations days before the allocation"
+msgstr "Tage vor der Einteilung keine Reservationen mehr annehmen"
+
+msgid "Stop accepting reservations hours before the allocation"
+msgstr "Stunden vor der Einteilung keine Reservationen mehr annehmen"
 
 msgid "Free of charge"
 msgstr "Kostenlos"
@@ -2537,6 +2558,18 @@ msgstr ""
 msgid "The payment amount is"
 msgstr "Ihr Betrag"
 
+msgid "Reservations must be made at least one day in advance."
+msgstr "Reservationen müsen mindestens ein Tag im Voraus gemacht werden."
+
+msgid "Reservations must be made at least one hour in advance."
+msgstr "Reservationen müssen mindestens eine Stunde im Voraus gemacht werden."
+
+msgid "Reservations must be made at least ${n} days in advance."
+msgstr "Reservationen müssen mindestens ${n} Tage im Voraus gemacht werden."
+
+msgid "Reservations must be made at least ${n} hours in advance."
+msgstr "Reservationen müssen mindestens ${n} Stunden im Voraus gemacht werden."
+
 msgid "Select a free time span in the calendar below to create an allocation."
 msgstr ""
 "Wählen Sie eine freie Zeitspanne im Kalender aus um eine Einteilung zu "
@@ -2718,6 +2751,10 @@ msgstr "Weiter"
 msgid "Confirm your reservation"
 msgstr "Bestätigen Sie Ihre Reservation"
 
+#, python-format
+msgid "Reservations must be made ${n} ${unit} in advance"
+msgstr "Reservationen müssen ${n} ${unit} im Voraus gemacht werden"
+
 msgid "Reserve"
 msgstr "Reservieren"
 
@@ -2743,20 +2780,32 @@ msgstr "Die Reservationen wurden abgelehnt"
 msgid "The reservation was rejected"
 msgstr "Die Reservation wurde abgelehnt"
 
+msgid "hour"
+msgstr "Stunde"
+
 msgid "Your payment could not be processed"
 msgstr "Ihre Zahlung konnte nicht verarbeitet werden"
 
 msgid "The following reservations were rejected"
 msgstr "Die folgenden Reservationen wurden abgelehnt"
 
+msgid "hours"
+msgstr "Stunden"
+
 msgid "Your reservations were accepted"
 msgstr "Ihre Reservationen wurden angenommen"
+
+msgid "day"
+msgstr "Tag"
 
 msgid "Pay Online and Complete"
 msgstr "Online zahlen und abschliessen"
 
 msgid "A ticket has been opened"
 msgstr "Ein neues Ticket wurde für Sie eröffnet"
+
+msgid "days"
+msgstr "Tage"
 
 msgid "Submit an event"
 msgstr "Veranstaltung melden"
