@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.6.0 (2018-11-28)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds an advisory deadline to the resource.
   [href]
 
