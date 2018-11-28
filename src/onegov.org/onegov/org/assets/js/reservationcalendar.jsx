@@ -350,6 +350,9 @@ rc.showPopup = function(calendar, element, content, position, extraClasses) {
         type: 'tooltip',
         onopen: function() {
             rc.onPopupOpen.call(this, calendar);
+            setTimeout(function() {
+                window.dispatchEvent(new Event('resize'));
+            }, 0);
         },
         onclose: function() {
             $(element).closest('.fc-event').removeClass('has-popup');
@@ -364,7 +367,6 @@ rc.showPopup = function(calendar, element, content, position, extraClasses) {
             options.vertical = 'top';
             options.extraClasses = _.union(['top'], extraClasses || []);
             options.offsettop = -5;
-            options.offsetleft = 20; // for some reason the popup's a bit off center
             break;
         case 'right':
             options.horizontal = 'right';
