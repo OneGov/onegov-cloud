@@ -2775,19 +2775,11 @@ button {
     .fc .fc-toolbar {
         width: 100%;
     }
-
-    .fc-view-container {
-        margin-bottom: 1rem;
-    }
 }
 
 @media #{$large-up} {
     .fc .fc-toolbar {
         width: 80%;
-    }
-
-    .fc-view-container {
-        margin-bottom: 0;
     }
 }
 
@@ -2802,6 +2794,18 @@ button {
     .fc-center {
         display: inline-block;
         width: 40%;
+    }
+}
+
+@media #{$small-only} {
+    .calendar-footer {
+        display: none !important;
+    }
+}
+
+@media #{$medium-only} {
+    .calendar-footer {
+        width: 75%;
     }
 }
 
