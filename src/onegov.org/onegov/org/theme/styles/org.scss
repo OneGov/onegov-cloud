@@ -2110,7 +2110,7 @@ $person-email-icon: '\f003';
         margin-bottom: 1em;
 
         span:not(:last-child)::after {
-            content: ','
+            content: ',';
         }
     }
 
@@ -2818,13 +2818,13 @@ button {
     width: 100%;
 
     .calendar-day-thumbnail {
-        display: block;
         background-position: center top;
         background-size: cover;
         border-radius: $border-radius $border-radius 0 0;
+        display: block;
         padding-top: 75%;
-        width: 100%;
         position: relative;
+        width: 100%;
 
         .fa {
             bottom: 0;
