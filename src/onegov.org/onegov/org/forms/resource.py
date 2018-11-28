@@ -47,7 +47,7 @@ class ResourceBaseForm(Form):
     deadline_unit = RadioField(
         label=_("Closing date for the public"),
         fieldset=_("Closing date"),
-        default='no',
+        default='n',
         validators=[validators.InputRequired()],
         choices=(
             ('n', _(
@@ -134,16 +134,13 @@ class ResourceBaseForm(Form):
 
     @property
     def deadline(self):
-        if self.deadline_unit.data == 'n':
-            return None
-
         if self.deadline_unit.data == 'h':
             return (self.deadline_hours.data, 'h')
 
         if self.deadline_unit.data == 'd':
             return (self.deadline_days.data, 'd')
 
-        raise NotImplementedError()
+        return None
 
     @deadline.setter
     def deadline(self, value):
