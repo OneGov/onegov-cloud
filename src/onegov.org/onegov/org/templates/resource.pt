@@ -28,18 +28,34 @@
             data-resources-url="${resources_url}"
             data-resource-active="${resource.name}"
         ></div>
+        <div class="calendar-footer" tal:condition="resource.deadline">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+
+            <span i18n:translate tal:condition="resource.deadline[0] == 1 and resource.deadline[1] == 'd'">
+                Reservations must be made at least one day in advance.
+            </span>
+            <span i18n:translate tal:condition="resource.deadline[0] == 1 and resource.deadline[1] == 'h'">
+                Reservations must be made at least one hour in advance.
+            </span>
+            <span i18n:translate tal:condition="resource.deadline[0] > 1 and resource.deadline[1] == 'd'">
+                Reservations must be made at least <tal:b i18n:name="n">${resource.deadline[0]}</tal:b> days in advance.
+            </span>
+            <span i18n:translate tal:condition="resource.deadline[0] > 1 and resource.deadline[1] == 'h'">
+                Reservations must be made at least <tal:b i18n:name="n">${resource.deadline[0]}</tal:b> hours in advance.
+            </span>
+        </div>
 
         <div class="clearfix"></div>
 
-        <div class="panel" i18n:translate tal:condition="request.is_manager">
-            Select a free time span in the calendar below to create an allocation.
+        <div class="panel" tal:condition="request.is_manager">
+            <span i18n:translate>Select a free time span in the calendar below to create an allocation.</span>
         </div>
 
         <tal:b
             define="
-                lead None; 
-                text resource.content.get('text'); 
-                people resource.people; 
+                lead None;
+                text resource.content.get('text');
+                people resource.people;
                 contact resource.contact_html;
                 coordinates resource.coordinates;
             "

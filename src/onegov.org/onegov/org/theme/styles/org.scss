@@ -2756,6 +2756,18 @@ button {
     }
 }
 
+.calendar-footer {
+    background: $white-smoke;
+    border: 1px solid $gainsboro;
+    color: $steel;
+    font-size: .8rem;
+    margin-bottom: 1.5rem;
+    margin-top: calc(-1.5rem - 1px);
+    padding: 2px 5px;
+    text-align: center;
+    width: 80%;
+}
+
 /*
     Fullcalendar responsive design
 */

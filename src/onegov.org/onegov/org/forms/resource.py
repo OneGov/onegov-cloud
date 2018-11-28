@@ -12,7 +12,7 @@ from wtforms import StringField
 from wtforms import TextAreaField
 from wtforms import TextField
 from wtforms import validators
-from wtforms.fields.html5 import DecimalField
+from wtforms.fields.html5 import DecimalField, IntegerField
 
 
 class ResourceBaseForm(Form):
@@ -42,6 +42,43 @@ class ResourceBaseForm(Form):
             )
         ],
         render_kw={'rows': 32, 'data-editor': 'form'}
+    )
+
+    deadline_unit = RadioField(
+        label=_("Closing date for the public"),
+        fieldset=_("Closing date"),
+        default='no',
+        validators=[validators.InputRequired()],
+        choices=(
+            ('n', _(
+                "No closing date")),
+            ('d', _(
+                "Stop accepting reservations days before the allocation")),
+            ('h', _(
+                "Stop accepting reservations hours before the allocation")),
+        )
+    )
+
+    deadline_hours = IntegerField(
+        label=_("Hours"),
+        fieldset=_("Closing date"),
+        depends_on=('deadline_unit', 'h'),
+        default=1,
+        validators=[
+            validators.InputRequired(),
+            validators.NumberRange(min=1)
+        ]
+    )
+
+    deadline_days = IntegerField(
+        label=_("Days"),
+        fieldset=_("Closing date"),
+        depends_on=('deadline_unit', 'd'),
+        default=1,
+        validators=[
+            validators.InputRequired(),
+            validators.NumberRange(min=1)
+        ]
     )
 
     pricing_method = RadioField(
@@ -94,6 +131,44 @@ class ResourceBaseForm(Form):
                     "The price must be larger than zero"
                 ))
                 return False
+
+    @property
+    def deadline(self):
+        if self.deadline_unit.data == 'n':
+            return None
+
+        if self.deadline_unit.data == 'h':
+            return (self.deadline_hours.data, 'h')
+
+        if self.deadline_unit.data == 'd':
+            return (self.deadline_days.data, 'd')
+
+        raise NotImplementedError()
+
+    @deadline.setter
+    def deadline(self, value):
+        self.deadline_unit.data = 'n'
+
+        if not value:
+            return
+
+        value, unit = value
+        self.deadline_unit.data = unit
+
+        if unit == 'h':
+            self.deadline_hours.data = value
+        elif unit == 'd':
+            self.deadline_days.data = value
+        else:
+            raise NotImplementedError()
+
+    def populate_obj(self, obj):
+        super().populate_obj(obj, exclude=('deadline', ))
+        obj.deadline = self.deadline
+
+    def process_obj(self, obj):
+        super().process_obj(obj)
+        self.deadline = obj.deadline
 
 
 class ResourceForm(merge_forms(ResourceBaseForm, PaymentMethodForm)):

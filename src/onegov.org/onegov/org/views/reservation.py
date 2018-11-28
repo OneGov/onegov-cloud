@@ -51,6 +51,30 @@ def assert_access_only_if_there_are_reservations(reservations):
         raise exc.HTTPForbidden()
 
 
+def respond_with_success(request):
+    @request.after
+    def trigger_calendar_update(response):
+        response.headers.add('X-IC-Trigger', 'rc-reservations-changed')
+
+    return {
+        'success': True
+    }
+
+
+def respond_with_error(request, error):
+    message = {
+        'message': error,
+        'success': False
+    }
+
+    @request.after
+    def trigger(response):
+        response.headers.add('X-IC-Trigger', 'rc-reservation-error')
+        response.headers.add('X-IC-Trigger-Data', json.dumps(message))
+
+    return message
+
+
 @OrgApp.json(model=Allocation, name='reserve', request_method='POST',
              permission=Public)
 def reserve_allocation(self, request):
@@ -85,6 +109,35 @@ def reserve_allocation(self, request):
 
     resource = request.app.libres_resources.by_allocation(self)
 
+    # if there's a deadline, make sure to observe it for anonymous users...
+    if not request.is_manager and resource.is_past_deadline(start):
+        n, unit = resource.deadline
+
+        if unit == 'h' and n == 1:
+            unit = request.translate(_("hour"))
+
+        elif unit == 'h' and n > 1:
+            unit = request.translate(_("hours"))
+
+        elif unit == 'd' and n == 1:
+            unit = request.translate(_("day"))
+
+        elif unit == 'd' and n > 1:
+            unit = request.translate(_("days"))
+
+        else:
+            raise NotImplementedError()
+
+        err = request.translate(
+            _("Reservations must be made ${n} ${unit} in advance", mapping={
+                'n': n,
+                'unit': unit
+            })
+        )
+
+        return respond_with_error(request, err)
+
+    # ...otherwise, try to reserve
     try:
         resource.scheduler.reserve(
             email='0xdeadbeef@example.org',  # will be set later
@@ -94,26 +147,9 @@ def reserve_allocation(self, request):
             single_token_per_session=True
         )
     except LibresError as e:
-        message = {
-            'message': utils.get_libres_error(e, request),
-            'success': False
-        }
-
-        @request.after
-        def trigger_calendar_update(response):
-            response.headers.add('X-IC-Trigger', 'rc-reservation-error')
-            response.headers.add('X-IC-Trigger-Data', json.dumps(message))
-
-        return message
+        return respond_with_error(request, utils.get_libres_error(e, request))
     else:
-
-        @request.after
-        def trigger_calendar_update(response):
-            response.headers.add('X-IC-Trigger', 'rc-reservations-changed')
-
-        return {
-            'success': True
-        }
+        return respond_with_success(request)
 
 
 @OrgApp.json(model=Reservation, request_method='DELETE', permission=Public)
