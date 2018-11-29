@@ -403,6 +403,12 @@ def get_many():
     yield 'many.jsx'
 
 
+@OrgApp.webasset('monthly-view')
+def get_monthly_view():
+    yield 'daypicker.js'
+    yield 'monthly-view.jsx'
+
+
 @OrgApp.webasset('common')
 def get_common_asset():
     yield 'global.js'

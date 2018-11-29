@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Shows a new date widget for event dates.
+  [href]
+
 - Fixes print output of events and reservations.
   [href]
 

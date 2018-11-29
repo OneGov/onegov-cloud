@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-11-28 14:25+0100\n"
+"POT-Creation-Date: 2018-11-29 15:56+0100\n"
 "PO-Revision-Date: 2018-11-09 11:12+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2435,9 +2435,6 @@ msgstr ""
 msgid "Drop files to verify them"
 msgstr "Dateien zur Prüfung hierhin ziehen"
 
-msgid "This is an imported event"
-msgstr "Dies ist eine importierte Veranstaltung"
-
 msgid "Export this event"
 msgstr "Diesen Termin exportieren"
 
@@ -2446,6 +2443,12 @@ msgstr "Alle Termine exportieren"
 
 msgid "All occurrences of this event"
 msgstr "Alle Termine dieser Veranstaltung"
+
+msgid "Origin"
+msgstr "Herkunft"
+
+msgid "This is an imported event"
+msgstr "Dies ist eine importierte Veranstaltung"
 
 msgid ""
 "Subscribers may always unsubscribe themselves through a link shown at the "

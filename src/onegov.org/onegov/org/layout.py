@@ -71,6 +71,7 @@ class Layout(ChameleonLayout):
     date_long_without_year_format = 'E d. MMMM'
     datetime_long_without_year_format = 'E d. MMMM HH:mm'
     event_format = 'EEEE, d. MMMM YYYY'
+    isodate_format = 'y-M-d'
 
     def __init__(self, *args, **kwargs):
         # overrides body attributes set in the layout template
@@ -1307,6 +1308,10 @@ class OccurrencesLayout(EventBaseLayout):
 
 
 class OccurrenceLayout(EventBaseLayout):
+
+    def __init__(self, model, request):
+        super().__init__(model, request)
+        self.request.include('monthly-view')
 
     @cached_property
     def collection(self):

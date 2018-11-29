@@ -2277,7 +2277,8 @@ def test_view_occurrence(client):
     assert "Gemeindesaal" in event
     assert "Politik" in event
     assert "Alle Jahre wieder" in event
-    assert len(event.pyquery('.occurrence-dates li')) == 1
+    assert len(event.pyquery('.monthly-view').attr['data-dates'].split(';')) \
+        == 1
     assert len(event.pyquery('.calendar-export-list li')) == 1
     assert event.click('Diesen Termin exportieren').text.startswith(
         'BEGIN:VCALENDAR'
@@ -2288,7 +2289,8 @@ def test_view_occurrence(client):
     assert "Turnhalle" in event
     assert "Sport" in event
     assert "fit werden" in event
-    assert len(event.pyquery('.occurrence-dates li')) == 9
+    assert len(event.pyquery('.monthly-view').attr['data-dates'].split(';')) \
+        == 9
     assert len(event.pyquery('.calendar-export-list li')) == 2
 
     assert event.click('Diesen Termin exportieren').\

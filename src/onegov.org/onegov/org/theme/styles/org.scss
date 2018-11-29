@@ -2862,11 +2862,12 @@ button {
         }
 
         .date {
-            padding: 0 0 0 .3rem;
-            max-width: 65%;
             overflow: hidden;
+            padding: 0 0 0 .5rem;
+            position: absolute;
             text-overflow: ellipsis;
             white-space: nowrap;
+            width: 60%;
         }
     }
 }
@@ -2885,19 +2886,15 @@ button {
 /*
     Events
 */
-.imported-event-callout p {
-    margin-bottom: .75rem;
+.imported-event-panel p {
+    font-size: .875rem;
 }
 
 .imported-event {
-    background-color: rgba(255, 255, 255, .65);
-    border: 1px solid lighten($orange, 25%);
     display: inline-block;
     font-family: $font-family-monospace;
     font-size: .8rem;
-    font-weight: bold;
     margin-top: .5rem;
-    padding: 1px 6px;
 }
 
 .calendar-export-list {
@@ -5011,7 +5008,6 @@ h2 + div.timeline {
     }
 }
 
-
 /*
     Multiple dates in form
 */
@@ -5034,4 +5030,110 @@ h2 + div.timeline {
 
 .many-fields a.button {
     margin-bottom: 0;
+}
+
+/*
+    Custom daypicker styling (we ignore upstream completely)
+*/
+.DayPicker {
+    * {
+        @include prefix(user-select, none);
+        font-size: .875rem;
+    }
+
+    *:focus {
+        outline: none;
+    }
+
+    [role="rowgroup"] {
+        width: 100%;
+    }
+
+    [role="row"] {
+        display: flex;
+
+        > div {
+            flex: 1 0;
+            font-size: .875rem;
+            height: auto;
+            line-height: 2.25;
+            position: relative;
+            text-align: center;
+        }
+
+        > div:nth-child(6),
+        > div:nth-child(7) {
+            background: $white-smoke;
+        }
+
+        > [aria-selected="true"] {
+            color: $white;
+        }
+
+        > [aria-selected="true"]::after {
+            background: $primary-color;
+            border-radius: 50%;
+            bottom: 0;
+            color: $primary-fg-color;
+            content: '';
+            display: block;
+            height: 1.75rem;
+            left: 0;
+            margin: auto;
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 1.75rem;
+            z-index: -1;
+        }
+    }
+
+    [role="columnheader"] * {
+        border: 0;
+        cursor: default;
+        text-decoration: none;
+        text-transform: uppercase;
+    }
+
+    [role="heading"] {
+        text-align: center;
+
+        div {
+            display: inline-block;
+            margin-bottom: .4rem;
+        }
+    }
+}
+
+.DayPicker-NavBar [role="button"] {
+    &:hover {
+        cursor: pointer;
+
+        &::before {
+            color: $anchor-font-color-hover;
+        }
+    }
+
+    &::before {
+        color: $anchor-font-color;
+        font-family: "FontAwesome";
+        line-height: 1.7;
+        position: absolute;
+        text-align: center;
+        width: 8%;
+    }
+
+    &:first-child::before {
+        content: '\f104';
+        left: 4%;
+    }
+
+    &:last-child::before {
+        content: '\f105';
+        right: 4%;
+    }
+}
+
+.DayPicker-NavButton--interactionDisabled {
+    display: none;
 }

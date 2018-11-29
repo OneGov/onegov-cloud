@@ -33,15 +33,6 @@
             </div>
 
             <div class="large-4 medium-4 columns">
-                <tal:b condition="occurrence.event.source and request.is_manager|nothing">
-                    <div class="panel callout imported-event-callout">
-                        <p>
-                            <tal:b i18n:translate>This is an imported event</tal:b>
-                            <a href="${occurrence.event.source_url(layout.request)}" class="imported-event">${occurrence.event.source}</a>
-                        </p>
-                    </div>
-                </tal:b>
-
                 <div class="occurrence-map borderless-side-panel" tal:define="coordinates occurrence.event.coordinates" tal:condition="coordinates">
                     <h2 i18n:translate>Map</h2>
                     <div class="marker-map" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}"></div>
@@ -65,11 +56,28 @@
 
                 <div class="borderless-side-panel occurrence-dates">
                     <h2 i18n:translate="">All occurrences of this event</h2>
-                    <ul>
-                        <li tal:repeat="occurrence occurrences">
-                            ${layout.format_date(occurrence, 'date')}
-                        </li>
-                    </ul>
+                    <div class="monthly-view" data-dates="${';'.join(layout.format_date(o, 'isodate') for o in occurrences)}"></div>
+                </div>
+
+                <div class="borderless-side-panel imported-event-panel" tal:condition="occurrence.event.source and request.is_manager|nothing">
+                    <h2 i18n:translate="">Origin</h2>
+                    <p tal:define="source_url occurrence.event.source_url(layout.request)">
+                        <tal:b i18n:translate>This is an imported event</tal:b>:
+
+                        <tal:b condition="source_url">
+                            <a href="${source_url}" class="imported-event">
+                                <i class="fa fa-fw fa-link" aria-hidden="true"></i>
+                                ${occurrence.event.source}
+                            </a>
+                        </tal:b>
+
+                        <tal:b condition="not:source_url">
+                            <span class="imported-event">
+                                <i class="fa fa-fw fa-key" aria-hidden="true"></i>
+                                ${occurrence.event.source}
+                            </span>
+                        </tal:b>
+                    </p>
                 </div>
             </div>
         </div>
