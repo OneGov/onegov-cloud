@@ -45,8 +45,7 @@ def test_agency_pdf_default(session):
 
     file = AgencyPdfDefault.from_agencies(
         agencies=[bund],
-        author="Kanton Zug",
-        title="Staatskalender Zug",
+        title="Staatskalender",
         toc=True,
         exclude=[]
     )
@@ -55,8 +54,7 @@ def test_agency_pdf_default(session):
         reader.getPage(page).extractText()
         for page in range(reader.getNumPages())
     ])
-    assert "Kanton Zug" in pdf
-    assert "Staatskalender Zug" in pdf
+    assert "Staatskalender" in pdf
     assert "1 Bundesbehörden" in pdf
     assert "1.1 Nationalrat" in pdf
     assert "1.2 Ständerat" in pdf
@@ -69,8 +67,7 @@ def test_agency_pdf_default(session):
 
     file = AgencyPdfDefault.from_agencies(
         agencies=[nr, sr],
-        author="Kanton Zug",
-        title="Staatskalender Zug",
+        title="Staatskalender",
         toc=False,
         exclude=['political_party']
     )
@@ -79,15 +76,13 @@ def test_agency_pdf_default(session):
         reader.getPage(page).extractText()
         for page in range(reader.getNumPages())
     ])
-    assert "Kanton Zug" in pdf
-    assert "Staatskalender Zug" in pdf
+    assert "Staatskalender" in pdf
     assert "Bundesbehörden" not in pdf
     assert "FDP" not in pdf
     assert "SVP" not in pdf
 
     file = AgencyPdfDefault.from_agencies(
         agencies=[nr],
-        author="Kanton Zug",
         title="Nationalrat",
         toc=False,
         exclude=[]
@@ -98,7 +93,6 @@ def test_agency_pdf_default(session):
         for page in range(reader.getNumPages())
     ])
     assert pdf == (
-        '© 2018 Kanton Zug\n'
         '1\nNationalrat\n2016/2019\nMitglied von Zug\nAeschi Thomas\n'
     )
 
@@ -138,8 +132,7 @@ def test_agency_pdf_default_hidden(session):
 
     file = AgencyPdfDefault.from_agencies(
         agencies=[bund],
-        author="Kanton Zug",
-        title="Staatskalender Zug",
+        title="Staatskalender",
         toc=False,
         exclude=[]
     )
@@ -196,8 +189,7 @@ def test_agency_pdf_ar(session):
 
     file = AgencyPdfAr.from_agencies(
         agencies=[bund],
-        author="Kanton AR",
-        title="Staatskalender AR",
+        title="Staatskalender",
         toc=True,
         exclude=[]
     )
@@ -207,19 +199,19 @@ def test_agency_pdf_ar(session):
         for page in range(reader.getNumPages())
     ])
     assert pdf == (
-        '© 2018 Kanton AR\n1\n'
-        'Staatskalender AR\n'
+        '© 2018 Kanton Appenzell Ausserrhoden\n1\n'
+        'Staatskalender\n'
         '2\n1 Bundesbehörden\n'
         '2\n1.1 Nationalrat\n'
         '3\n1.2 Ständerat\n\n'
-        'Staatskalender AR\n29.11.2018\n'
-        '© 2018 Kanton AR\n2\n'
+        'Staatskalender\n29.11.2018\n'
+        '© 2018 Kanton Appenzell Ausserrhoden\n2\n'
         '1 Bundesbehörden\n'
         '1.1 Nationalrat\n'
         '2016/2019\n'
         'Mitglied von AR\nAeschi Thomas\n\n'
-        'Staatskalender AR\n29.11.2018\n'
-        '© 2018 Kanton AR\n3\n'
+        'Staatskalender\n29.11.2018\n'
+        '© 2018 Kanton Appenzell Ausserrhoden\n3\n'
         '1.2 Ständerat\n'
         'Joachim, Eder, FDP\n'
     )
@@ -264,7 +256,6 @@ def test_agency_pdf_zg(session):
 
     file = AgencyPdfZg.from_agencies(
         agencies=[bund],
-        author="Kanton Zug",
         title="Staatskalender",
         toc=True,
         exclude=[]

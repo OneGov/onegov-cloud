@@ -253,7 +253,6 @@ def create_pdf(group_context, root, recursive):
         if root:
             app.root_pdf = app.pdf_class.from_agencies(
                 agencies=agencies.roots,
-                author=app.org.name,
                 title=app.org.name,
                 toc=True,
                 exclude=app.org.hidden_people_fields
@@ -264,7 +263,6 @@ def create_pdf(group_context, root, recursive):
             for agency in agencies.query():
                 agency.pdf_file = app.pdf_class.from_agencies(
                     agencies=[agency],
-                    author=app.org.name,
                     title=agency.title,
                     toc=False,
                     exclude=app.org.hidden_people_fields

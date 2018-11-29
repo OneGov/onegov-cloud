@@ -22,7 +22,7 @@ class AgencyPdfDefault(Pdf):
         return page_fn_header_and_footer
 
     @classmethod
-    def from_agencies(cls, agencies, author, title, toc, exclude):
+    def from_agencies(cls, agencies, title, toc, exclude):
         """ Create an index PDF from a collection of notices. """
 
         result = BytesIO()
@@ -30,7 +30,6 @@ class AgencyPdfDefault(Pdf):
             result,
             title=title,
             created=f"{date.today():%d.%m.%Y}",
-            author=author
         )
         pdf.init_a4_portrait(
             page_fn=pdf.page_fn,
@@ -175,6 +174,7 @@ class AgencyPdfZg(AgencyPdfDefault):
         with open(filename) as file:
             logo = file.read()
         kwargs['logo'] = logo
+        kwargs['author'] = "Kanton Zug"
         super(AgencyPdfDefault, self).__init__(*args, **kwargs)
 
 
@@ -193,4 +193,5 @@ class AgencyPdfAr(AgencyPdfDefault):
         with open(filename) as file:
             logo = file.read()
         kwargs['logo'] = logo
+        kwargs['author'] = "Kanton Appenzell Ausserrhoden"
         super(AgencyPdfDefault, self).__init__(*args, **kwargs)

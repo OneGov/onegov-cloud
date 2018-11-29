@@ -287,9 +287,7 @@ def test_view_pdf_settings(client):
 
     assert client.get('/settings').form['pdf_layout'].value == 'default'
 
-    assert get_pdf() == (
-        '© 2018 Govikon\n1\nGovikon\n0\nPlaceholder for table of contents\n'
-    )
+    assert get_pdf() == '1\nGovikon\n0\nPlaceholder for table of contents\n'
 
     settings = client.get('/settings')
     settings.form['pdf_layout'] = 'zg'

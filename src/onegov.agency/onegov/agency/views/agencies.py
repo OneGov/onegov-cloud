@@ -208,7 +208,6 @@ def create_root_pdf(self, request, form):
     if form.submitted(request):
         request.app.root_pdf = request.app.pdf_class.from_agencies(
             agencies=self.roots,
-            author=request.app.org.name,
             title=request.app.org.name,
             toc=True,
             exclude=request.app.org.hidden_people_fields
@@ -242,7 +241,6 @@ def create_agency_pdf(self, request, form):
     if form.submitted(request):
         self.pdf_file = request.app.pdf_class.from_agencies(
             agencies=[self],
-            author=request.app.org.name,
             title=self.title,
             toc=False,
             exclude=request.app.org.hidden_people_fields
