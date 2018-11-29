@@ -4,6 +4,9 @@ Changelog
 0.42.0 (2018-11-28)
 ~~~~~~~~~~~~~~~~~~~
 
+- Adds the ability to set a deadline for new reservations.
+  [href]
+
 0.41.4 (2018-11-27)
 ~~~~~~~~~~~~~~~~~~~
 
