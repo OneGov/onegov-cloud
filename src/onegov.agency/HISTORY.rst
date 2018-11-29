@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.2.1 (2018-11-29)
+~~~~~~~~~~~~~~~~~~~~
 
 - Makes author in PDF layouts hard-coded.
   [msom]
