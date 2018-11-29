@@ -2861,8 +2861,12 @@ button {
             text-transform: uppercase;
         }
 
-        .day {
-            padding: 0 0 0 .4rem;
+        .date {
+            padding: 0 0 0 .3rem;
+            max-width: 65%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     }
 }
