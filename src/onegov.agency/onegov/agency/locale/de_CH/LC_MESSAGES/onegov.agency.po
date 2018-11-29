@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-11-29 09:54+0100\n"
-"PO-Revision-Date: 2018-11-29 09:51+0100\n"
+"POT-Creation-Date: 2018-11-29 15:58+0100\n"
+"PO-Revision-Date: 2018-11-29 15:42+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -76,6 +76,12 @@ msgstr "Person: Telefon"
 msgid "Person: Direct Phone"
 msgstr "Person: Direktnummer"
 
+msgid "E-Mail"
+msgstr "E-Mail"
+
+msgid "Message"
+msgstr "Nachricht"
+
 msgid "Person"
 msgstr "Person"
 
@@ -90,6 +96,12 @@ msgstr "Zusatz"
 
 msgid "Prefix"
 msgstr "Präfix"
+
+msgid "Agency"
+msgstr "Organisation"
+
+msgid "Mutation"
+msgstr "Mutation"
 
 msgid "Homepage"
 msgstr "Startseite"
@@ -124,9 +136,6 @@ msgstr "Möchten Sie die Organisation wirklich löschen?"
 
 msgid "Delete agency"
 msgstr "Organisation löschen"
-
-msgid "Agency"
-msgstr "Organisation"
 
 msgid "Membership"
 msgstr "Mitgliedschaft"
@@ -176,11 +185,23 @@ msgstr "Bemerkungen"
 msgid "Memberships"
 msgstr "Mitgliedschaften"
 
+msgid "Mutation report"
+msgstr "Mutationsmeldung"
+
+msgid "Path"
+msgstr "Pfad"
+
 msgid "Exports"
 msgstr "Exporte"
 
 msgid "Export a vCard of this person"
 msgstr "Elektronische Visitenkarte (vCard)"
+
+msgid "Report change"
+msgstr "Mutation melden"
+
+msgid "Report a change"
+msgstr "Eine Mutation melden"
 
 msgid "No agencies added yet."
 msgstr "Es wurden noch keine Organisationen hinzugefügt."
@@ -227,6 +248,12 @@ msgstr "Ihre Änderungen wurden gespeichert"
 
 msgid "PDF created"
 msgstr "PDF erstellt"
+
+msgid "Thank you for your submission!"
+msgstr "Vielen Dank für Ihre Eingabe!"
+
+msgid "A ticket has been opened"
+msgstr "Ein neues Ticket wurde für Sie eröffnet"
 
 msgid "New person"
 msgstr "Neue Person"

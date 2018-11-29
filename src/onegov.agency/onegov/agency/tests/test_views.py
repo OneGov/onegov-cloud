@@ -294,3 +294,72 @@ def test_view_pdf_settings(client):
     settings.form.submit()
 
     assert get_pdf() == 'Govikon\n0\nPlaceholder for table of contents\n'
+
+
+def test_view_report_change(client):
+    # Add data
+    client.login_editor()
+
+    new = client.get('/people').click("Person", href='new')
+    new.form['academic_title'] = "Dr."
+    new.form['first_name'] = "Nick"
+    new.form['last_name'] = "Rivera"
+    person = new.form.submit().follow()
+
+    new = client.get('/organizations').click("Organisation", href='new')
+    new.form['title'] = "Hospital Springfield"
+    agency = new.form.submit().follow()
+
+    new = agency.click("Mitgliedschaft", href='new')
+    new.form['title'] = "Doctor"
+    new.form['person_id'].select(text="Rivera Nick")
+
+    # Report agency change
+    change = agency.click("Mutation melden")
+    change.form['email'] = "info@hospital-springfield.com"
+    change.form['message'] = "Please add our address."
+    change = change.form.submit().follow()
+    assert "Vielen Dank für Ihre Eingabe!" in change
+
+    ticket_number = change.pyquery('.ticket-number a')[0].attrib['href']
+    ticket = client.get(ticket_number)
+    assert "Mutationsmeldung" in ticket
+    assert "Hospital Springfield" in ticket
+    assert "Please add our address." in ticket
+    assert "info@hospital-springfield.com" in ticket
+    ticket = ticket.click("Ticket annehmen").follow()
+    ticket = ticket.click("Ticket abschliessen").follow()
+
+    agency.click("Löschen")
+
+    ticket = client.get(ticket_number)
+    assert "Der hinterlegte Datensatz wurde entfernt." in ticket
+    assert "Mutationsmeldung" in ticket
+    assert "Hospital Springfield" in ticket
+    assert "Please add our address." in ticket
+    assert "info@hospital-springfield.com" in ticket
+
+    # Report person change
+    change = person.click("Mutation melden")
+    change.form['email'] = "info@hospital-springfield.com"
+    change.form['message'] = "Dr. Rivera's retired."
+    change = change.form.submit().follow()
+    assert "Vielen Dank für Ihre Eingabe!" in change
+
+    ticket_number = change.pyquery('.ticket-number a')[0].attrib['href']
+    ticket = client.get(ticket_number)
+    assert "Mutationsmeldung" in ticket
+    assert "Rivera Nick" in ticket
+    assert "Dr. Rivera's retired." in ticket
+    assert "info@hospital-springfield.com" in ticket
+    ticket = ticket.click("Ticket annehmen").follow()
+    ticket = ticket.click("Ticket abschliessen").follow()
+
+    person.click("Löschen")
+
+    ticket = client.get(ticket_number)
+    assert "Der hinterlegte Datensatz wurde entfernt." in ticket
+    assert "Mutationsmeldung" in ticket
+    assert "Rivera Nick" in ticket
+    assert "Dr. Rivera's retired." in ticket
+    assert "info@hospital-springfield.com" in ticket

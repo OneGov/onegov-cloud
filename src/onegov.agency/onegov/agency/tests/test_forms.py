@@ -2,6 +2,7 @@ from cgi import FieldStorage
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.forms import ExtendedAgencyForm
 from onegov.agency.forms import MembershipForm
+from onegov.agency.forms import MutationForm
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedAgencyMembership
 from onegov.agency.models import ExtendedPerson
@@ -132,4 +133,15 @@ def test_membership_form(session):
         'note': "Retired",
         'since': "2000",
         'prefix': "*",
+    }
+
+
+def test_mutation_form():
+    form = MutationForm(DummyPostData({
+        'email': 'info@hospital-springfield.org',
+        'message': "Nick Rivera's retired."
+    }))
+    assert form.get_useful_data() == {
+        'email': 'info@hospital-springfield.org',
+        'message': "Nick Rivera's retired."
     }

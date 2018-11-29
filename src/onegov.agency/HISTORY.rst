@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Allows to report mutations of a person or agency.
+  [msom]
+
 1.2.1 (2018-11-29)
 ~~~~~~~~~~~~~~~~~~~~
 

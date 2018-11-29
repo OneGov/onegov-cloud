@@ -1,0 +1,48 @@
+$agn-handler-icon: '\f0e8';
+$per-handler-icon: '\f007';
+
+.AGN-link::before {
+    @include icon($agn-handler-icon);
+    display: inline-block;
+    margin-right: 1ex;
+}
+
+.PER-link::before {
+    @include icon($per-handler-icon);
+    display: inline-block;
+    margin-right: 1ex;
+}
+
+.ticket-handler-AGN td:first-child::before {
+    @include icon($agn-handler-icon);
+}
+
+.ticket-handler-PER td:first-child::before {
+    @include icon($per-handler-icon);
+}
+
+button {
+    .AGN-sub-link::before {
+        @include icon($agn-handler-icon);
+        display: inline-block;
+        margin-right: 1ex;
+    }
+
+    .PER-sub-link::before {
+        @include icon($per-handler-icon);
+        display: inline-block;
+        margin-right: 1ex;
+    }
+}
+
+dl.agency-mutation span {
+    font-size: .875rem;
+    line-height: .875rem;
+    margin: 0;
+    text-transform: uppercase;
+
+    &:not(:last-child)::after {
+        content: '/';
+        margin-left: .5em;
+    }
+}

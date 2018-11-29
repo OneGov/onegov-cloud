@@ -42,7 +42,7 @@ def cfg_path(postgres_dsn, session_manager, temporary_directory, redis_url):
 
 @fixture(scope='function')
 def agency_app(request):
-    app = create_app(AgencyApp, request, use_smtp=False)
+    app = create_app(AgencyApp, request, use_smtp=True)
     org = create_new_organisation(app, name="Govikon")
     org.meta['reply_to'] = 'mails@govikon.ch'
     org.meta['locales'] = 'de_CH'

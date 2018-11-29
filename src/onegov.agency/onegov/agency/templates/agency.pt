@@ -25,6 +25,17 @@
                     </ul>
                 </div>
 
+                 <div class="submit-yours">
+                    <dl>
+                        <dt>
+                            <a href="${request.link(agency.proxy(), 'report-change')}">
+                                <h2 i18n:translate>Report change</h2>
+                            </a>
+                        </dt>
+                        <dd i18n:translate>Report a change</dd>
+                    </dl>
+                </div>
+
             </div>
     </tal:block>
 </div>

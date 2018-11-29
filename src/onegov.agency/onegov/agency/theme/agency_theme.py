@@ -14,7 +14,8 @@ class AgencyTheme(OrgTheme):
         return super().post_imports + [
             'agency',
             'chosen',
-            'people'
+            'people',
+            'ticket'
         ]
 
     @property

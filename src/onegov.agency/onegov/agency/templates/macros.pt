@@ -210,4 +210,29 @@
         </p>
     </metal:search_result_agency_memberships>
 
+    <metal:display_agency_mutation define-macro="display_agency_mutation" i18n:domain="onegov.agency">
+        <h2 i18n:translate>Mutation report</h2>
+        <dl class="agency-mutation">
+            <dt i18n:translate>Agency</dt>
+            <dd><a href="${request.link(agency)}">${agency.title}</a></dd>
+
+            <dt i18n:translate>Path</dt>
+            <dd><span tal:repeat="ancestor agency.ancestors">${ancestor.title}</span> <span>${agency.title}</span></dd>
+
+            <dt i18n:translate>Message</dt>
+            <dd>${message}</dd>
+        </dl>
+    </metal:display_agency_mutation>
+
+    <metal:display_person_mutation define-macro="display_person_mutation" i18n:domain="onegov.agency">
+        <h2 i18n:translate>Mutation report</h2>
+        <dl class="agency-mutation">
+            <dt i18n:translate>Person</dt>
+            <dd><a href="${request.link(person)}">${person.title}</a></dd>
+
+            <dt i18n:translate>Message</dt>
+            <dd>${message}</dd>
+        </dl>
+    </metal:display_person_mutation>
+
 </body>
