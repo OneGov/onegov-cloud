@@ -9,7 +9,6 @@ from io import BytesIO
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.models import ExtendedAgencyMembership
-from onegov.agency.pdf import DefaultAgencyPdf
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.core.html import html_to_text
@@ -252,7 +251,7 @@ def create_pdf(group_context, root, recursive):
         agencies = ExtendedAgencyCollection(session)
 
         if root:
-            app.root_pdf = DefaultAgencyPdf.from_agencies(
+            app.root_pdf = app.pdf_class.from_agencies(
                 agencies=agencies.roots,
                 author=app.org.name,
                 title=app.org.name,
@@ -263,10 +262,10 @@ def create_pdf(group_context, root, recursive):
 
         if recursive:
             for agency in agencies.query():
-                agency.pdf_file = DefaultAgencyPdf.from_agencies(
+                agency.pdf_file = app.pdf_class.from_agencies(
                     agencies=[agency],
                     author=app.org.name,
-                    title="",
+                    title=agency.title,
                     toc=False,
                     exclude=app.org.hidden_people_fields
                 )

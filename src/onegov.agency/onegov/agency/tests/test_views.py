@@ -1,3 +1,7 @@
+from io import BytesIO
+from PyPDF2 import PdfFileReader
+
+
 def test_views(client):
     client.login_admin()
     settings = client.get('/settings')
@@ -265,3 +269,30 @@ def test_views_hidden(client):
     assert "Aeschi" not in client.get('/people')
     assert "Nationalrat" not in client.get('/organizations')
     assert "Versteckte Einträge" not in client.get('/')
+
+
+def test_view_pdf_settings(client):
+    def get_pdf():
+        agencies = client.get('/organizations')
+        agencies = agencies.click("PDF erstellen").form.submit().follow()
+
+        pdf = agencies.click("Gesamter Staatskalender als PDF")
+        reader = PdfFileReader(BytesIO(pdf.body))
+        return '\n'.join([
+            reader.getPage(page).extractText()
+            for page in range(reader.getNumPages())
+        ])
+
+    client.login_admin()
+
+    assert client.get('/settings').form['pdf_layout'].value == 'default'
+
+    assert get_pdf() == (
+        '© 2018 Govikon\n1\nGovikon\n0\nPlaceholder for table of contents\n'
+    )
+
+    settings = client.get('/settings')
+    settings.form['pdf_layout'] = 'zg'
+    settings.form.submit()
+
+    assert get_pdf() == 'Govikon\n0\nPlaceholder for table of contents\n'

@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds organisation specific PDF layouts.
+  [msom]
+
 1.1.3 (2018-11-27)
 ~~~~~~~~~~~~~~~~~~~~
 

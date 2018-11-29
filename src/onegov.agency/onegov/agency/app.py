@@ -10,6 +10,9 @@ from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 from onegov.org.custom import get_global_tools
 from onegov.org.models import Organisation
 from onegov.org.new_elements import Link
+from onegov.agency.pdf import AgencyPdfAr
+from onegov.agency.pdf import AgencyPdfDefault
+from onegov.agency.pdf import AgencyPdfZg
 
 
 class AgencyApp(OrgApp, FormApp):
@@ -33,6 +36,15 @@ class AgencyApp(OrgApp, FormApp):
     def root_pdf(self, value):
         with self.filestorage.open('root.pdf', 'wb') as file:
             file.write(value.read())
+
+    @property
+    def pdf_class(self):
+        pdf_layout = self.org.meta.get('pdf_layout')
+        if pdf_layout == 'ar':
+            return AgencyPdfAr
+        if pdf_layout == 'zg':
+            return AgencyPdfZg
+        return AgencyPdfDefault
 
 
 @AgencyApp.setting(section='org', name='create_new_organisation')

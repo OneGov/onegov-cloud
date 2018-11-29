@@ -10,7 +10,6 @@ from onegov.agency.layouts import AgencyLayout
 from onegov.agency.models import AgencyMove
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedAgencyMembership
-from onegov.agency.pdf import DefaultAgencyPdf
 from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
@@ -207,7 +206,7 @@ def get_root_pdf(self, request):
 def create_root_pdf(self, request, form):
 
     if form.submitted(request):
-        request.app.root_pdf = DefaultAgencyPdf.from_agencies(
+        request.app.root_pdf = request.app.pdf_class.from_agencies(
             agencies=self.roots,
             author=request.app.org.name,
             title=request.app.org.name,
@@ -241,10 +240,10 @@ def create_root_pdf(self, request, form):
 def create_agency_pdf(self, request, form):
 
     if form.submitted(request):
-        self.pdf_file = DefaultAgencyPdf.from_agencies(
+        self.pdf_file = request.app.pdf_class.from_agencies(
             agencies=[self],
             author=request.app.org.name,
-            title="",
+            title=self.title,
             toc=False,
             exclude=request.app.org.hidden_people_fields
         )
