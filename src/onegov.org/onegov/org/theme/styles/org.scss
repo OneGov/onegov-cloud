@@ -4260,12 +4260,12 @@ h2 + div.timeline {
 @media print {
     .globals,
     .alert-box,
+    .calendar-day .calendar-day-thumbnail,
     .date-range-selector,
     .date-range-selector-result,
     .edit-bar,
     footer,
     .occurrence-exports,
-    .occurrences-day-date,
     .occurrences-filter-tags,
     .page-links,
     .searchbox,
@@ -4413,6 +4413,21 @@ h2 + div.timeline {
         > .columns {
             margin-bottom: 0;
         }
+    }
+
+    .calendar-day {
+        border-bottom: 2px solid $body-font-color !important;
+    }
+
+    .calendar-day-date {
+        background: $white !important;
+
+    }
+
+    .calendar-day .calendar-day-date > * {
+        background: $white !important;
+        color: $body-font-color !important;
+        padding-left: 0 !important;
     }
 }
 

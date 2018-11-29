@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes print output of events and reservations.
+  [href]
+
 0.42.0 (2018-11-28)
 ~~~~~~~~~~~~~~~~~~~
 
