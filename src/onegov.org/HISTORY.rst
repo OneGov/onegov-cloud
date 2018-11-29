@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.43.0 (2018-11-29)
+~~~~~~~~~~~~~~~~~~~
+
 - Shows a new date widget for event dates.
   [href]
 

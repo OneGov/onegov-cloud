@@ -4,7 +4,7 @@ name = 'onegov.org'
 description = (
     'A OneGov Cloud base application for organisations.'
 )
-version = '0.42.0'
+version = '0.43.0'
 
 
 def get_long_description():
