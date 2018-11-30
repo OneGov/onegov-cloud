@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes depot files not being cleaned when using associations.
+  [href]
+
 0.13.0 (2018-10-19)
 ~~~~~~~~~~~~~~~~~~~
 

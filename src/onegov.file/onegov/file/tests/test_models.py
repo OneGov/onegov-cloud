@@ -9,6 +9,8 @@ from onegov.core.utils import module_path
 from onegov.file import File, FileSet, AssociatedFiles
 from onegov.file.models.fileset import file_to_set_associations
 from onegov_testing.utils import create_image
+from pathlib import Path
+from onegov.file.utils import as_fileintent
 from PIL import Image
 from sqlalchemy import Column
 from sqlalchemy import Integer
@@ -234,13 +236,23 @@ def test_associated_files(session):
     assert post.files[0].name == 'frowney.png'
     assert post.files[0].reference.size == ('2048px', '2048px')
 
+    folder = Path(post.files[0].reference.file._metadata_path).parent.parent
+
+    # 1 image + 1 thumbnail
+    assert sum(1 for p in folder.iterdir()) == 2
+
     assert session.query(File).one().linked_blogposts == [post]
     assert session.query(File).one().links.all() == (post, )
 
     session.delete(post)
-    session.flush()
 
+    session.flush()
     assert session.query(File).count() == 0
+    assert sum(1 for p in folder.iterdir()) == 2  # not commited yet..
+
+    transaction.commit()
+    assert session.query(File).count() == 0
+    assert sum(1 for p in folder.iterdir()) == 0
 
 
 def test_update_metadata(session):
@@ -316,3 +328,55 @@ def test_signature_timestamp(session):
         .signature_timestamp.tzinfo.zone == 'UTC'
     assert session.query(File).with_entities(File.signature_timestamp).one()\
         .signature_timestamp.tzinfo.zone == 'UTC'
+
+
+def test_file_cleanup(session):
+    session.add(File(name='readme.txt', reference=b'foo'))
+    transaction.commit()
+
+    readme = session.query(File).first()
+
+    folder = Path(readme.reference.file._metadata_path).parent.parent
+    assert sum(1 for f in folder.iterdir()) == 1
+
+    readme.reference = as_fileintent(b'bar', 'readme.txt')
+    transaction.commit()
+
+    assert sum(1 for f in folder.iterdir()) == 1
+    assert session.query(File).first().reference.file.read() == b'bar'
+
+
+def test_associated_files_cleanup(session):
+    post = Blogpost(
+        text="Foo",
+        files=[
+            File(name='foo.txt', reference=b'foo'),
+            File(name='bar.txt', reference=b'bar')
+        ]
+    )
+
+    session.add(post)
+    session.flush()
+
+    post = session.query(Blogpost).first()
+    folder = Path(post.files[0].reference.file._metadata_path).parent.parent
+    assert session.query(File).count() == 2
+    assert sum(1 for p in folder.iterdir()) == 2
+
+    post = session.query(Blogpost).first()
+    post.files = [File(name='bar.txt', reference=b'bar')]
+
+    session.flush()
+    assert session.query(File).count() == 1
+    assert sum(1 for p in folder.iterdir()) == 3
+
+    transaction.commit()
+    assert session.query(File).count() == 1
+    assert sum(1 for p in folder.iterdir()) == 1
+
+    post.files = []
+    session.flush()
+    transaction.abort()
+
+    assert session.query(File).count() == 1
+    assert sum(1 for p in folder.iterdir()) == 1

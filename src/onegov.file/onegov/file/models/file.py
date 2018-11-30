@@ -312,3 +312,20 @@ def update_metadata_after_commit(session):
 def discard_metadata_on_rollback(session, previous_transaction):
     if 'pending_metadata_changes' in session.info:
         del session.info['pending_metadata_changes']
+
+
+@event.listens_for(File, 'after_delete')
+def after_delete(mapper, connection, target):
+    """ Depot doesn't support associations and it is unclear if it should.
+
+    Luckily, we can easily work around this by automatically adding files to
+    depot's kill-list whenver a file is deleted.
+
+    This kill list is executed whenever a commit has succeded, so we can add
+    these files even if it's not necessary at the end.
+
+    """
+    session = object_session(target)
+
+    session._depot_old = getattr(session, '_depot_old', set())
+    session._depot_old.update(target.reference.files)
