@@ -3,8 +3,6 @@ import importlib
 import pkg_resources
 import transaction
 
-from alembic.migration import MigrationContext
-from alembic.operations import Operations
 from contextlib import contextmanager
 from inspect import getmembers, isfunction, ismethod
 from onegov.core.orm import Base, find_models
@@ -362,6 +360,11 @@ class UpgradeContext(object):
     """
 
     def __init__(self, request):
+
+        # alembic is a somewhat heavy import (thanks to the integrated mako)
+        # -> since we really only ever need it during upgrades we lazy load
+        from alembic.migration import MigrationContext
+        from alembic.operations import Operations
 
         # we need to reset the request session property every time because
         # we reuse the request over various session managers
