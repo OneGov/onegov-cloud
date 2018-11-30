@@ -1,7 +1,5 @@
 from datetime import date
 from lxml import etree
-from reportlab.graphics import renderPDF
-from svglib.svglib import SvgRenderer
 from textwrap import shorten
 from textwrap import wrap
 
@@ -86,6 +84,12 @@ def page_fn_header_logo(canvas, doc):
         pdf.init_a4_portrait(page_fn=page_fn_header_logo)
 
     """
+
+    # reportlab and svglib are particularly heavy imports which are loaded by
+    # morepath's scan - until we can teach that scanner to ignore certain
+    # modules automatically we lazy load these modules here
+    from reportlab.graphics import renderPDF
+    from svglib.svglib import SvgRenderer
 
     canvas.saveState()
     if doc.logo:
