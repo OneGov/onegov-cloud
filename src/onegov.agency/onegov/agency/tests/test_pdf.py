@@ -1,3 +1,4 @@
+from datetime import date
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.pdf import AgencyPdfAr
@@ -199,21 +200,21 @@ def test_agency_pdf_ar(session):
         for page in range(reader.getNumPages())
     ])
     assert pdf == (
-        '© 2018 Kanton Appenzell Ausserrhoden\n1\n'
-        'Staatskalender\n'
-        '2\n1 Bundesbehörden\n'
-        '2\n1.1 Nationalrat\n'
-        '3\n1.2 Ständerat\n\n'
-        'Staatskalender\n29.11.2018\n'
-        '© 2018 Kanton Appenzell Ausserrhoden\n2\n'
-        '1 Bundesbehörden\n'
-        '1.1 Nationalrat\n'
-        '2016/2019\n'
-        'Mitglied von AR\nAeschi Thomas\n\n'
-        'Staatskalender\n29.11.2018\n'
-        '© 2018 Kanton Appenzell Ausserrhoden\n3\n'
-        '1.2 Ständerat\n'
-        'Joachim, Eder, FDP\n'
+        f'© 2018 Kanton Appenzell Ausserrhoden\n1\n'
+        f'Staatskalender\n'
+        f'2\n1 Bundesbehörden\n'
+        f'2\n1.1 Nationalrat\n'
+        f'3\n1.2 Ständerat\n\n'
+        f'Staatskalender\n{date.today():%d.%m.%Y}\n'
+        f'© 2018 Kanton Appenzell Ausserrhoden\n2\n'
+        f'1 Bundesbehörden\n'
+        f'1.1 Nationalrat\n'
+        f'2016/2019\n'
+        f'Mitglied von AR\nAeschi Thomas\n\n'
+        f'Staatskalender\n{date.today():%d.%m.%Y}\n'
+        f'© 2018 Kanton Appenzell Ausserrhoden\n3\n'
+        f'1.2 Ständerat\n'
+        f'Joachim, Eder, FDP\n'
     )
 
 
@@ -266,15 +267,15 @@ def test_agency_pdf_zg(session):
         for page in range(reader.getNumPages())
     ])
     assert pdf == (
-        'Staatskalender\n'
-        '2\n1 Bundesbehörden\n'
-        '2\n1.1 Nationalrat\n'
-        '3\n1.2 Ständerat\n\n'
-        'Staatskalender\nDruckdatum: 29.11.2018\n2\n'
-        '1 Bundesbehörden\n'
-        '1.1 Nationalrat\n'
-        '2016/2019\n'
-        'Mitglied von Zug\nAeschi Thomas\n\n'
-        'Staatskalender\nDruckdatum: 29.11.2018\n3\n'
-        '1.2 Ständerat\nJoachim, Eder, FDP\n'
+        f'Staatskalender\n'
+        f'2\n1 Bundesbehörden\n'
+        f'2\n1.1 Nationalrat\n'
+        f'3\n1.2 Ständerat\n\n'
+        f'Staatskalender\nDruckdatum: {date.today():%d.%m.%Y}\n2\n'
+        f'1 Bundesbehörden\n'
+        f'1.1 Nationalrat\n'
+        f'2016/2019\n'
+        f'Mitglied von Zug\nAeschi Thomas\n\n'
+        f'Staatskalender\nDruckdatum: {date.today():%d.%m.%Y}\n3\n'
+        f'1.2 Ständerat\nJoachim, Eder, FDP\n'
     )
