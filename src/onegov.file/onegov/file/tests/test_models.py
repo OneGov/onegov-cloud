@@ -416,6 +416,7 @@ def test_1n1_associated_file_cleanup(session):
     item.content.reference = as_fileintent(b'baz', 'baz')
 
     session.flush()
+    transaction.commit()
 
     assert session.query(File).count() == 1
     assert item.content.reference.file.read() == b'baz'
