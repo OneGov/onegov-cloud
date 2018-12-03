@@ -17,7 +17,7 @@ from onegov.town.initial_content import create_new_organisation
 class TownApp(OrgApp):
 
     #: the version of this application (do not change manually!)
-    version = '1.15.7'
+    version = '1.15.8'
 
     def configure_organisation(self, **cfg):
         cfg.setdefault('enable_user_registration', False)

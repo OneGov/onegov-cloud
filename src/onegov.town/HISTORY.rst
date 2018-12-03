@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.15.8 (2018-12-03)
+~~~~~~~~~~~~~~~~~~~~~
 
 - Hides map provider.
   [href]
