@@ -5,6 +5,7 @@ import pytest
 from depot.manager import DepotManager
 from io import BytesIO
 from onegov.core.orm import Base
+from onegov.core.orm.abstract import associated
 from onegov.core.utils import module_path
 from onegov.file import File, FileSet, AssociatedFiles
 from onegov.file.models.fileset import file_to_set_associations
@@ -26,6 +27,18 @@ class Blogpost(Base, AssociatedFiles):
 
     id = Column(Integer, primary_key=True)
     text = Column(Text, nullable=False)
+
+
+class MediaItemFile(File):
+    __mapper_args__ = {'polymorphic_identity': 'media_item'}
+
+
+class MediaItem(Base):
+    __tablename__ = 'media_items'
+
+    id = Column(Integer, primary_key=True)
+    description = Column(Text, nullable=False)
+    content = associated(MediaItemFile, 'content', 'one-to-one')
 
 
 @pytest.mark.parametrize('cls', [File, PolymorphicFile])
@@ -380,3 +393,30 @@ def test_associated_files_cleanup(session):
 
     assert session.query(File).count() == 1
     assert sum(1 for p in folder.iterdir()) == 1
+
+
+@pytest.mark.xfail
+def test_1n1_associated_file_cleanup(session):
+
+    item = MediaItem(description="Foo")
+    item.content = MediaItemFile(id='abcd', name='bar')
+    item.content.reference = as_fileintent(b'bar', 'bar')
+
+    session.add(item)
+    session.flush()
+
+    item = session.query(MediaItem).one()
+
+    folder = Path(item.content.reference.file._metadata_path).parent.parent
+    assert session.query(File).count() == 1
+    assert item.content.reference.file.read() == b'bar'
+    assert sum(1 for p in folder.iterdir()) == 1
+
+    item.content = MediaItemFile(id='abcd', name='baz')
+    item.content.reference = as_fileintent(b'baz', 'baz')
+
+    session.flush()
+
+    assert session.query(File).count() == 1
+    assert item.content.reference.file.read() == b'baz'
+    assert sum(1 for p in folder.iterdir()) == 1  # 2
