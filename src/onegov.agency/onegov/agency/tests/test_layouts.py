@@ -10,8 +10,12 @@ from onegov.agency.models import ExtendedPerson
 from onegov.people import AgencyMembership
 
 
+class DummyOrg(object):
+    geo_provider = None
+
+
 class DummyApp(object):
-    org = 'Org'
+    org = DummyOrg()
 
 
 class DummyRequest(object):
@@ -68,7 +72,7 @@ def test_agency_collection_layout():
 
     layout = AgencyCollectionLayout(model, request)
     assert layout.editbar_links is None
-    assert path(layout.breadcrumbs) == 'Org/ExtendedAgencyCollection'
+    assert path(layout.breadcrumbs) == 'DummyOrg/ExtendedAgencyCollection'
     assert layout.move_agency_url_template == 'AgencyMove/?csrf-token=x'
 
     # Log in as manager
@@ -88,7 +92,7 @@ def test_agency_layout():
     assert isinstance(layout.collection, ExtendedAgencyCollection)
     assert layout.editbar_links is None
     assert path(layout.breadcrumbs) == \
-        'Org/ExtendedAgencyCollection/ExtendedAgency'
+        'DummyOrg/ExtendedAgencyCollection/ExtendedAgency'
     assert layout.move_agency_url_template == 'AgencyMove/?csrf-token=x'
     assert layout.move_membership_url_template == \
         'AgencyMembershipMove/?csrf-token=x'
@@ -113,7 +117,7 @@ def test_membership_layout():
     layout = MembershipLayout(model, request)
     assert layout.editbar_links is None
     assert path(layout.breadcrumbs) == \
-        'Org/ExtendedAgencyCollection/ExtendedAgency/AgencyMembership'
+        'DummyOrg/ExtendedAgencyCollection/ExtendedAgency/AgencyMembership'
 
     # Log in as manager
     request.is_manager = True
@@ -130,7 +134,7 @@ def test_extended_person_collection_layout():
 
     layout = ExtendedPersonCollectionLayout(model, request)
     assert layout.editbar_links is None
-    assert path(layout.breadcrumbs) == 'Org/#'
+    assert path(layout.breadcrumbs) == 'DummyOrg/#'
 
     # Log in as manager
     request.is_manager = True
@@ -157,7 +161,7 @@ def test_extended_person_layout():
     layout = ExtendedPersonLayout(model, request)
     assert layout.editbar_links is None
     assert path(layout.breadcrumbs) == \
-        'Org/ExtendedPersonCollection/ExtendedPerson'
+        'DummyOrg/ExtendedPersonCollection/ExtendedPerson'
 
     # Log in as manager
     request.is_manager = True
