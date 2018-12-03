@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.44.0 (2018-12-03)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds support for multiple geo providers.
   [href]
 
