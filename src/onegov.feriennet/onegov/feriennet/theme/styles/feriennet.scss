@@ -42,6 +42,13 @@ a > h6 {
 }
 
 /*
+    hide the map provider
+*/
+#fieldset-maps .field-geo_provider {
+    display: none;
+}
+
+/*
     registration on homepage
 */
 .homepage .register {

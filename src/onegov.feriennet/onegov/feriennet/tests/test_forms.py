@@ -138,7 +138,8 @@ def test_notification_template_send_form(session):
     def request(admin):
         return Bunch(
             app=Bunch(
-                active_period=periods.active()
+                active_period=periods.active(),
+                org=Bunch(geo_provider='geo-mapbox')
             ),
             session=session,
             include=lambda *args: None,

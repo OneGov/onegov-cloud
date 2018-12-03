@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Hides map provider.
+  [href]
+
 1.4.9 (2018-10-19)
 ~~~~~~~~~~~~~~~~~~~
 
