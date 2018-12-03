@@ -270,3 +270,27 @@ def create_pdf(group_context, root, recursive):
                 click.secho(f"Created PDF of '{agency.title}'", fg='green')
 
     return _create_pdf
+
+
+@cli.command('enable-yubikey')
+@pass_group_context
+def enable_yubikey(group_context):
+
+    def _enable_yubikey(request, app):
+        if app.org:
+            app.org.meta['enable_yubikey'] = True
+            click.secho("YubiKey enabled", fg='green')
+
+    return _enable_yubikey
+
+
+@cli.command('disable-yubikey')
+@pass_group_context
+def disable_yubikey(group_context):
+
+    def _disable_yubikey(request, app):
+        if app.org:
+            app.org.meta['enable_yubikey'] = False
+            click.secho("YubiKey disabled", fg='green')
+
+    return _disable_yubikey

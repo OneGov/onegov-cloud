@@ -50,3 +50,15 @@ def test_app_pdf_class(agency_app):
 
     agency_app.org.meta['pdf_layout'] = 'invalid'
     assert agency_app.pdf_class == AgencyPdfDefault
+
+
+def test_app_enable_yubikey(agency_app):
+    assert 'enable_yubikey' not in agency_app.org.meta
+    assert agency_app.enable_yubikey is False
+
+    agency_app.org.meta['enable_yubikey'] = True
+    assert agency_app.enable_yubikey is True
+
+    agency_app._enable_yubikey = True
+    agency_app.org.meta['enable_yubikey'] = False
+    assert agency_app.enable_yubikey is False

@@ -46,6 +46,14 @@ class AgencyApp(OrgApp, FormApp):
             return AgencyPdfZg
         return AgencyPdfDefault
 
+    @property
+    def enable_yubikey(self):
+        return self.org.meta.get('enable_yubikey', self._enable_yubikey)
+
+    @enable_yubikey.setter
+    def enable_yubikey(self, value):
+        self._enable_yubikey = value
+
 
 @AgencyApp.setting(section='org', name='create_new_organisation')
 def get_create_new_organisation_factory():
