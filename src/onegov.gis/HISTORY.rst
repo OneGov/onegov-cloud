@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to define differente geo js providers.
+  [href]
+
 0.7.2 (2018-08-27)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -56,6 +56,24 @@ def get_leaflet_asset():
     yield 'leaflet-integration.js'
 
 
+@MapboxApp.webasset('proj4js')
+def get_proj4js_asset():
+    yield 'proj4js.js'
+    yield 'proj4js-leaflet.js'
+
+
+@MapboxApp.webasset('geo-mapbox')
+def get_geo_mapbox():
+    yield 'leaflet'
+
+
+@MapboxApp.webasset('geo-vermessungsamt-winterthur')
+def get_geo_vermessungsamt_winterthur():
+    yield 'leaflet'
+    yield 'proj4js'
+    yield 'geo-vermessungsamt-winterthur.js'
+
+
 @MapboxApp.tween_factory()
 def inject_mapbox_api_token_tween_factory(app, handler):
 
