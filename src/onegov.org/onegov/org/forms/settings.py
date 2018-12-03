@@ -201,6 +201,17 @@ class SettingsForm(Form):
         },
         fieldset=_("Maps")
     )
+
+    geo_provider = RadioField(
+        label=_("Geo provider"),
+        fieldset=_("Maps"),
+        default='geo-mapbox',
+        choices=[
+            ('geo-mapbox', _("Mapbox (Default)")),
+            ('geo-vermessungsamt-winterthur', "Vermessungsamt Winterthur")
+        ]
+    )
+
     analytics_code = TextAreaField(
         label=_("Analytics Code"),
         description=_("JavaScript for web statistics support"),

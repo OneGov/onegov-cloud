@@ -460,6 +460,9 @@ class DefaultLayout(Layout):
         # always include the common js files
         self.request.include('common')
 
+        # always include the map components
+        self.request.include(self.org.geo_provider)
+
         if self.request.is_manager:
             self.request.include('sortable')
 

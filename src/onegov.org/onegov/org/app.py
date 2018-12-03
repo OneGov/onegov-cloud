@@ -430,7 +430,6 @@ def get_common_asset():
     yield 'form_dependencies.js'
     yield 'confirm.jsx'
     yield 'typeahead.jsx'
-    yield 'leaflet'
     yield 'pay'
     yield 'moment.js'
     yield 'moment.de-ch.js'

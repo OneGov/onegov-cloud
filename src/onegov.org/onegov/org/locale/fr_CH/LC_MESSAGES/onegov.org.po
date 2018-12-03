@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-11-29 15:56+0100\n"
+"POT-Creation-Date: 2018-12-03 11:46+0100\n"
 "PO-Revision-Date: 2018-09-24 12:21+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1053,6 +1053,9 @@ msgstr "La vue par défaut de la carte. Cela devrait montrer la ville entière"
 msgid "Maps"
 msgstr "Cartes"
 
+msgid "Geo provider"
+msgstr "Fournisseur de geo"
+
 msgid "Analytics Code"
 msgstr "Code Analytics"
 
@@ -1091,6 +1094,9 @@ msgstr "Oui, aux publications"
 
 msgid "Yes, to reservations"
 msgstr "Oui, aux réservations"
+
+msgid "Mapbox (Default)"
+msgstr "Mapbox (défaut)"
 
 msgid "Except for"
 msgstr "À l'exception de"

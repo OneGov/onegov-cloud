@@ -5,6 +5,7 @@ import more.transaction
 import more.webassets
 
 from datetime import datetime
+from onegov.core.utils import Bunch
 from onegov.org import OrgApp
 from onegov.org.new_elements import Link
 from onegov.org.layout import (
@@ -24,6 +25,7 @@ class MockRequest(object):
     locale = 'en'
     is_logged_in = False
     is_manager = False
+    app = Bunch(org=Bunch(geo_provider='geo-mapbox'))
 
     def include(self, *args, **kwargs):
         pass
@@ -160,6 +162,7 @@ def test_template_layout(postgres_dsn, redis_url):
         org.name = 'Govikon'
         org.theme_options = theme_options
         org.locales = ['de_CH']
+        org.geo_provider = 'geo-mapbox'
 
         # disable LibresIntegration for this test
         def configure_libres(self, **cfg):
