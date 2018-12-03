@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.2 (2018-12-03)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Moves geo code to onegov.gis.
   [href]
 
