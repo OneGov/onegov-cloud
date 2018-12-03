@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.4.0 (2018-12-03)
+~~~~~~~~~~~~~~~~~~~~
 
 - Allows to enable or disable YubiKeys on instance level.
   [msom]
