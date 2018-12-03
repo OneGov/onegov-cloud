@@ -5069,6 +5069,7 @@ h2 + div.timeline {
         > div:nth-child(6),
         > div:nth-child(7) {
             background: $white-smoke;
+            z-index: -2;
         }
 
         > [aria-selected="true"] {
