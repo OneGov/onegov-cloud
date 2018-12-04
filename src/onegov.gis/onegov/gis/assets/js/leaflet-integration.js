@@ -80,7 +80,7 @@ function luma(color) {
     var b = (rgb >> 0) & 0xff;
 
     // RGB to Luma per ITU BT.601
-    return 0.299 * r + 0.587 * g + 0.114 * b
+    return 0.299 * r + 0.587 * g + 0.114 * b;
 }
 
 function isBrightColor(color) {
@@ -271,11 +271,11 @@ function spawnMapboxMap(target, options) {
     return L.map(target, options).addLayer(getMapboxTiles());
 }
 
-function spawnDefaultMap(target, options) {
-    return spawnMapboxMap(target, options);
+function spawnDefaultMap(target, options, cb) {
+    cb(spawnMapboxMap(target, options));
 }
 
-function spawnMap(element, lat, lon, zoom, includeZoomControls) {
+function spawnMap(element, lat, lon, zoom, includeZoomControls, cb) {
 
     var $el = $(element);
 
@@ -291,29 +291,31 @@ function spawnMap(element, lat, lon, zoom, includeZoomControls) {
         preferCanvas: true
     };
 
-    var map = spawnDefaultMap(element[0], options).setView([lat, lon], zoom);
+    spawnDefaultMap(element[0], options, function(map) {
+        map.setView([lat, lon], zoom);
 
-    if (typeof includeZoomControls === 'undefined' || includeZoomControls) {
-        new L.Control.Zoom({position: 'topright'}).addTo(map);
-    }
+        if (typeof includeZoomControls === 'undefined' || includeZoomControls) {
+            new L.Control.Zoom({position: 'topright'}).addTo(map);
+        }
 
-    // remove leaflet link - we don't advertise other open source projects
-    // we depend on as visibly either
-    map.attributionControl.setPrefix('');
+        // remove leaflet link - we don't advertise other open source projects
+        // we depend on as visibly either
+        map.attributionControl.setPrefix('');
 
-    map.on('load', function() {
-        var container = $(map._container);
+        map.on('load', function() {
+            var container = $(map._container);
 
-        // buttons inside the map lead to form-submit if not prevented form it
-        container.find('button').on('click', function(e) {
-            e.preventDefault();
+            // buttons inside the map lead to form-submit if not prevented form it
+            container.find('button').on('click', function(e) {
+                e.preventDefault();
+            });
         });
+
+        document.leafletmaps = document.leafletmaps || [];
+        document.leafletmaps.push(map);
+
+        cb(map);
     });
-
-    document.leafletmaps = document.leafletmaps || [];
-    document.leafletmaps.push(map);
-
-    return map;
 }
 
 var MapboxInput = function(input) {
@@ -349,20 +351,20 @@ var MapboxInput = function(input) {
     var el = $('<div class="map">')
         .appendTo(wrapper);
 
-    var map = spawnMap(el, lat, lon, zoom);
+    spawnMap(el, lat, lon, zoom, true, function(map) {
+        switch (input.data('map-type')) {
+            case 'crosshair':
+                asCrosshairMap(map, input);
+                break;
+            case 'marker':
+                asMarkerMap(map, input);
+                break;
+            default:
+                break;
+        }
 
-    switch (input.data('map-type')) {
-        case 'crosshair':
-            asCrosshairMap(map, input);
-            break;
-        case 'marker':
-            asMarkerMap(map, input);
-            break;
-        default:
-            break;
-    }
-
-    addGeocoder(map);
+        addGeocoder(map);
+    });
 };
 
 var MapboxMarkerMap = function(target) {
@@ -371,69 +373,70 @@ var MapboxMarkerMap = function(target) {
     var zoom = target.data('zoom') || $('body').data('default-zoom') || 10;
     var includeZoomControls = target.data('map-type') !== 'thumbnail';
 
-    var map = spawnMap(target, lat, lon, zoom, includeZoomControls);
-    addExternalLinkButton(map);
+    spawnMap(target, lat, lon, zoom, includeZoomControls, function(map) {
+        addExternalLinkButton(map);
 
-    /* for now we do not support clicking the marker, so we use marker-noclick
-    as a way to disable the pointer cursor */
-    var icon = L.VectorMarkers.icon(getMarkerOptions(target, {
-        extraClasses: ['marker-' + target.data('map-type')]
-    }));
+        /* for now we do not support clicking the marker, so we use marker-noclick
+        as a way to disable the pointer cursor */
+        var icon = L.VectorMarkers.icon(getMarkerOptions(target, {
+            extraClasses: ['marker-' + target.data('map-type')]
+        }));
 
-    var marker = L.marker({'lat': lat, 'lng': lon}, {
-        icon: icon,
-        draggable: false
+        var marker = L.marker({'lat': lat, 'lng': lon}, {
+            icon: icon,
+            draggable: false
+        });
+        marker.addTo(map);
+
+        switch (target.data('map-type')) {
+            case 'thumbnail':
+                asThumbnailMap(map, target);
+                break;
+            default:
+                break;
+        }
     });
-    marker.addTo(map);
-
-    switch (target.data('map-type')) {
-        case 'thumbnail':
-            asThumbnailMap(map, target);
-            break;
-        default:
-            break;
-    }
 };
 
 var MapboxGeojsonMap = function(target) {
     // a map that displays a large number of map markers
-
     var lat = target.data('lat');
     var lon = target.data('lon');
     var zoom = target.data('zoom');
     var includeZoomControls = true;
-    var map = spawnMap(target, lat, lon, zoom, includeZoomControls);
 
-    var icon = L.VectorMarkers.icon(getMarkerOptions(target));
+    spawnMap(target, lat, lon, zoom, includeZoomControls, function(map) {
+        var icon = L.VectorMarkers.icon(getMarkerOptions(target));
 
-    var pointToLayer = function(_feature, latlng) {
-        return L.marker({'lat': latlng.lat, 'lng': latlng.lng}, {
-            icon: icon
+        var pointToLayer = function(_feature, latlng) {
+            return L.marker({'lat': latlng.lat, 'lng': latlng.lng}, {
+                icon: icon
+            });
+        };
+
+        var onEachFeature = function(feature, layer) {
+            if (feature.properties) {
+                layer.bindPopup(
+                    '<a class="popup-title" href="' + feature.properties.link + '">' +
+                    feature.properties.title +
+                    '</a>' +
+                    '<div class="popup-lead">' + (feature.properties.lead || '') + '</div>'
+                );
+            }
+        };
+
+        $.getJSON(target.data('geojson'), function(features) {
+            if (features.length === 0) {
+                return;
+            }
+
+            var layer = L.geoJSON(features, {
+                pointToLayer: pointToLayer,
+                onEachFeature: onEachFeature
+            }).addTo(map);
+
+            map.fitBounds(layer.getBounds().pad(0.185), {maxZoom: zoom});
         });
-    };
-
-    var onEachFeature = function(feature, layer) {
-        if (feature.properties) {
-            layer.bindPopup(
-                '<a class="popup-title" href="' + feature.properties.link + '">' +
-                feature.properties.title +
-                '</a>' +
-                '<div class="popup-lead">' + (feature.properties.lead || '') + '</div>'
-            );
-        }
-    };
-
-    $.getJSON(target.data('geojson'), function(features) {
-        if (features.length === 0) {
-            return;
-        }
-
-        var layer = L.geoJSON(features, {
-            pointToLayer: pointToLayer,
-            onEachFeature: onEachFeature
-        }).addTo(map);
-
-        map.fitBounds(layer.getBounds().pad(0.185), {maxZoom: zoom});
     });
 };
 

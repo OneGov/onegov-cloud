@@ -29,7 +29,7 @@ function epsg_2056_projection() {
     );
 }
 
-function spawnDefaultMap(target, options) {
+function spawnDefaultMap(target, options, cb) {
     var service = 'https://stadtplan.winterthur.ch/wms/Hintergrundkarte_LK_AV_Situationsplan?';
     var layers = 'Hintergrundkarte_LK_AV_Situationsplan';
     var projection = epsg_2056_projection();
@@ -45,5 +45,5 @@ function spawnDefaultMap(target, options) {
         'minZoom': 0
     }).addTo(map);
 
-    return map;
+    cb(map);
 }
