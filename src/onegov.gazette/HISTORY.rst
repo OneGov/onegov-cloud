@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.21.0 (2018-12-04)
+~~~~~~~~~~~~~~~~~~~~
 
 - Allows to search notices by deleted users and groups.
   [msom]
