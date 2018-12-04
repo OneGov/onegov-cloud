@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Allows to overwrite the used columns when full-text querying notices.
+  [msom]
+
 0.9.0 (2018-11-23)
 ~~~~~~~~~~~~~~~~~~~
 

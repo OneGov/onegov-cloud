@@ -193,6 +193,23 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
     def model_class(self):
         return OfficialNotice
 
+    @property
+    def term_columns(self):
+        """ The columns used for full text search. """
+
+        return [
+            cast(self.model_class.id, String),
+            self.model_class.title,
+            self.model_class.text,
+            self.model_class.author_name,
+            self.model_class.author_place,
+            self.model_class.category,
+            self.model_class.organization,
+            UserGroup.name,
+            User.realname,
+            User.username
+        ]
+
     def filter_query(self, query):
         """ Filters the given query by the state of the collection. """
 
@@ -202,16 +219,7 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
             term = '%{}%'.format(self.term)
             query = query.filter(
                 or_(
-                    cast(self.model_class.id, String).ilike(term),
-                    self.model_class.title.ilike(term),
-                    self.model_class.text.ilike(term),
-                    self.model_class.author_name.ilike(term),
-                    self.model_class.author_place.ilike(term),
-                    self.model_class.category.ilike(term),
-                    self.model_class.organization.ilike(term),
-                    UserGroup.name.ilike(term),
-                    User.realname.ilike(term),
-                    User.username.ilike(term)
+                    *[column.ilike(term) for column in self.term_columns]
                 )
             )
         if self.user_ids:
