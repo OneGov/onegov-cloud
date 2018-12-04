@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from datetime import date
 from datetime import datetime
 from freezegun import freeze_time
@@ -5,11 +6,12 @@ from onegov.gazette.collections import CategoryCollection
 from onegov.gazette.collections import GazetteNoticeCollection
 from onegov.gazette.collections import IssueCollection
 from onegov.gazette.collections import OrganizationCollection
+from onegov.gazette.models import GazetteNotice
 from onegov.gazette.models.notice import GazetteNoticeChange
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
 from sedate import standardize_date
-from collections import OrderedDict
+from transaction import commit
 
 
 class DummyIdentity():
@@ -245,6 +247,81 @@ def test_notice_collection_own_user_id(session):
 
     collection.own_user_id = str(user_c.id)
     assert collection.query().count() == 1
+
+
+def test_notice_collection_query_deleted_user(session):
+    groups = UserGroupCollection(session)
+    group_a = groups.add(name="Group A")
+    group_b = groups.add(name="Group B")
+
+    users = UserCollection(session)
+    user_a = users.add(
+        realname="User A",
+        username='a@a.a',
+        password='a',
+        role='admin',
+        group=group_a
+    )
+    user_b = users.add(
+        realname="User B",
+        username='b@b.b',
+        password='b',
+        role='admin',
+        group=group_b
+    )
+
+    notices = GazetteNoticeCollection(session)
+    notice_a = notices.add(
+        title='A',
+        text='Text',
+        organization_id='100',
+        category_id='11',
+        issues=['2017-46'],
+        user=user_a
+    )
+    notice_b = notices.add(
+        title='B',
+        text='Text',
+        organization_id='100',
+        category_id='11',
+        issues=['2017-46'],
+        user=user_b
+    )
+
+    assert notices.query().count() == 2
+
+    assert notice_a.user is not None
+    assert notice_b.user is not None
+    assert notice_a.group is not None
+    assert notice_b.group is not None
+
+    assert notices.for_term("User A").query().one() == notice_a
+    assert notices.for_term("User B").query().one() == notice_b
+    assert notices.for_term("Group A").query().one() == notice_a
+    assert notices.for_term("Group B").query().one() == notice_b
+
+    users.delete(user_a.username)
+    users.delete(user_b.username)
+    groups.delete(group_a)
+    groups.delete(group_b)
+    commit()
+
+    assert users.query().count() == 0
+    assert groups.query().count() == 0
+
+    notice_a = notices.query().filter(GazetteNotice.title == 'A').one()
+    notice_b = notices.query().filter(GazetteNotice.title == 'B').one()
+
+    assert notice_a.user is None
+    assert notice_b.user is None
+    assert notice_a.group is None
+    assert notice_b.group is None
+
+    assert notices.query().count() == 2
+    assert notices.for_term("User A").query().one() == notice_a
+    assert notices.for_term("User B").query().one() == notice_b
+    assert notices.for_term("Group A").query().one() == notice_a
+    assert notices.for_term("Group B").query().one() == notice_b
 
 
 def test_notice_collection_on_request(session):

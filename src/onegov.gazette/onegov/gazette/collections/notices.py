@@ -192,6 +192,15 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
             own=self.own
         )
 
+    @property
+    def term_columns(self):
+        """ The columns used for full text search. """
+
+        return super(GazetteNoticeCollection, self).term_columns + [
+            self.model_class.meta['group_name'].astext,
+            self.model_class.meta['user_name'].astext,
+        ]
+
     def filter_query(self, query):
         """ Allows additionally to filter for notices with changes made by a
         given user.
