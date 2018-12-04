@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for ZugMap.
+  [href]
+
 0.44.0 (2018-12-03)
 ~~~~~~~~~~~~~~~~~~~
 

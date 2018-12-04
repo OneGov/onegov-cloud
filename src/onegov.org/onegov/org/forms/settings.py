@@ -208,7 +208,9 @@ class SettingsForm(Form):
         default='geo-mapbox',
         choices=[
             ('geo-mapbox', _("Mapbox (Default)")),
-            ('geo-vermessungsamt-winterthur', "Vermessungsamt Winterthur")
+            ('geo-vermessungsamt-winterthur', "Vermessungsamt Winterthur"),
+            ('geo-zugmap-luftbild', "ZugMap Luftbild"),
+            ('geo-zugmap-ortsplan', "ZugMap Ortsplan"),
         ]
     )
 
