@@ -59,6 +59,12 @@ class SwissVoteCollection(Pagination):
         self.sort_by = sort_by
         self.sort_order = sort_order
 
+    def add(self, **kwargs):
+        vote = SwissVote(**kwargs)
+        self.session.add(vote)
+        self.session.flush()
+        return vote
+
     def subset(self):
         return self.query()
 
@@ -231,11 +237,12 @@ class SwissVoteCollection(Pagination):
         """
 
         result = []
-        for part in self.term.split():
-            if part.replace('.', '').isnumeric():
-                number = Decimal(part)
-                result.append(SwissVote.bfs_number == number)
-                result.append(SwissVote.procedure_number == number)
+        if self.term:
+            for part in self.term.split():
+                if part.replace('.', '').isnumeric():
+                    number = Decimal(part)
+                    result.append(SwissVote.bfs_number == number)
+                    result.append(SwissVote.procedure_number == number)
 
         return result
 
@@ -246,7 +253,12 @@ class SwissVoteCollection(Pagination):
 
         """
 
-        term = ' <-> '.join([x for x in self.term.split() if x.isalnum()])
+        if not self.term:
+            return []
+
+        # Once we upgrade to PostgreSql 11, we can use websearch_to_tsquery
+        term = ''.join((c for c in self.term if c.isalnum() or c in ',. '))
+        term = ' <-> '.join([part for part in term.split()])
 
         def match_convert(column, language='german'):
             return func.to_tsvector(language, column).\
@@ -374,24 +386,24 @@ class SwissVoteCollection(Pagination):
 
         query = self.session.query
         return [
-            [
+            set([
                 x[0] for x in query(SwissVote.descriptor_1_level_1).union(
                     query(SwissVote.descriptor_2_level_1),
                     query(SwissVote.descriptor_3_level_1)
                 ).all() if x[0]
-            ],
-            [
+            ]),
+            set([
                 x[0] for x in query(SwissVote.descriptor_1_level_2).union(
                     query(SwissVote.descriptor_2_level_2),
                     query(SwissVote.descriptor_3_level_2)
                 ).all() if x[0]
-            ],
-            [
+            ]),
+            set([
                 x[0] for x in query(SwissVote.descriptor_1_level_3).union(
                     query(SwissVote.descriptor_2_level_3),
                     query(SwissVote.descriptor_3_level_3)
                 ).all() if x[0]
-            ],
+            ]),
         ]
 
     def update(self, votes):
