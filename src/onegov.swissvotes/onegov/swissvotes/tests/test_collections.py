@@ -234,18 +234,155 @@ def test_vote_term_filter():
     ]
 
 
-def test_votes_query(session):
-    # todo: from_date
-    # todo: to_date
-    # todo: legal_form
-    # todo: result
-    # todo: policy_area
-    # todo: term
-    # todo: position_federal_council
-    # todo: position_national_council
-    # todo: position_council_of_states
-    # todo: term / full_text
-    pass
+def test_votes_query(session, attachments):
+    votes = SwissVoteCollection(session)
+    votes.add(
+        id=1,
+        bfs_number=Decimal('100'),
+        date=date(1990, 6, 2),
+        decade=NumericRange(1990, 1999),
+        legislation_number=4,
+        legislation_decade=NumericRange(1990, 1994),
+        title="Vote on that one thing",
+        votes_on_same_day=1,
+        _legal_form=1,
+        descriptor_1_level_1=Decimal('4'),
+        descriptor_1_level_2=Decimal('4.2'),
+        descriptor_1_level_3=Decimal('4.21'),
+        descriptor_2_level_1=Decimal('10'),
+        descriptor_2_level_2=Decimal('10.3'),
+        descriptor_2_level_3=Decimal('10.35'),
+        descriptor_3_level_1=Decimal('10'),
+        descriptor_3_level_2=Decimal('10.3'),
+        descriptor_3_level_3=Decimal('10.33'),
+        _position_federal_council=3,
+        _position_council_of_states=1,
+        _position_national_council=2,
+        _result=1,
+    )
+    votes.add(
+        id=2,
+        bfs_number=Decimal('200.1'),
+        date=date(1990, 9, 2),
+        decade=NumericRange(1990, 1999),
+        legislation_number=4,
+        legislation_decade=NumericRange(1990, 1994),
+        title="We want this version the thing",
+        keyword="Variant A of X",
+        initiator="The group that wants something",
+        votes_on_same_day=1,
+        _legal_form=2,
+        descriptor_1_level_1=Decimal('10'),
+        descriptor_1_level_2=Decimal('10.3'),
+        descriptor_1_level_3=Decimal('10.35'),
+        descriptor_2_level_1=Decimal('1'),
+        descriptor_2_level_2=Decimal('1.6'),
+        descriptor_2_level_3=Decimal('1.62'),
+        _position_federal_council=2,
+        _position_council_of_states=2,
+        _position_national_council=1,
+        _result=1
+    )
+    vote = votes.add(
+        id=3,
+        bfs_number=Decimal('200.2'),
+        date=date(1990, 9, 2),
+        decade=NumericRange(1990, 1999),
+        legislation_number=4,
+        legislation_decade=NumericRange(1990, 1994),
+        title="We want that version of the thing",
+        keyword="Variant B of X",
+        votes_on_same_day=1,
+        _legal_form=2,
+        descriptor_3_level_1=Decimal('8'),
+        descriptor_3_level_2=Decimal('8.3'),
+        _position_federal_council=1,
+        _position_council_of_states=1,
+        _position_national_council=1,
+        _result=2
+    )
+    for name, attachment in attachments.items():
+        setattr(vote, name, attachment)
+        session.flush()
+
+    def count(**kwargs):
+        return SwissVoteCollection(session, **kwargs).query().count()
+
+    assert count() == 3
+
+    assert count(from_date=date(1900, 1, 1)) == 3
+    assert count(from_date=date(1990, 6, 2)) == 3
+    assert count(from_date=date(1990, 9, 2)) == 2
+    assert count(from_date=date(1991, 3, 2)) == 0
+    assert count(to_date=date(1900, 1, 1)) == 0
+    assert count(to_date=date(1990, 6, 2)) == 1
+    assert count(to_date=date(1990, 9, 2)) == 3
+    assert count(to_date=date(1991, 3, 2)) == 3
+    assert count(from_date=date(1990, 6, 2), to_date=date(1990, 6, 2)) == 1
+    assert count(from_date=date(1990, 6, 2), to_date=date(1990, 9, 2)) == 3
+    assert count(from_date=date(1990, 9, 2), to_date=date(1990, 6, 2)) == 0
+
+    assert count(legal_form=[]) == 3
+    assert count(legal_form=[1]) == 1
+    assert count(legal_form=[2]) == 2
+    assert count(legal_form=[1, 2]) == 3
+    assert count(legal_form=[3]) == 0
+
+    assert count(result=[]) == 3
+    assert count(result=[1]) == 2
+    assert count(result=[2]) == 1
+    assert count(result=[1, 2]) == 3
+    assert count(result=[3]) == 0
+
+    assert count(position_federal_council=[]) == 3
+    assert count(position_federal_council=[1]) == 1
+    assert count(position_federal_council=[2]) == 1
+    assert count(position_federal_council=[1, 2]) == 2
+    assert count(position_federal_council=[3]) == 1
+
+    assert count(position_council_of_states=[]) == 3
+    assert count(position_council_of_states=[1]) == 2
+    assert count(position_council_of_states=[2]) == 1
+    assert count(position_council_of_states=[1, 2]) == 3
+    assert count(position_council_of_states=[3]) == 0
+
+    assert count(position_national_council=[]) == 3
+    assert count(position_national_council=[1]) == 2
+    assert count(position_national_council=[2]) == 1
+    assert count(position_national_council=[1, 2]) == 3
+    assert count(position_national_council=[3]) == 0
+
+    assert count(policy_area=['1']) == 1
+    assert count(policy_area=['4']) == 1
+    assert count(policy_area=['8']) == 1
+    assert count(policy_area=['10']) == 2
+    assert count(policy_area=['1', '4']) == 2
+    assert count(policy_area=['8', '10']) == 3
+    assert count(policy_area=['1', '8', '10']) == 3
+    assert count(policy_area=['1', '4', '8', '10']) == 3
+    assert count(policy_area=['4.42']) == 1
+    assert count(policy_area=['4.42.421']) == 1
+    assert count(policy_area=['4.42.421', '10']) == 1
+    assert count(policy_area=['4.42.421', '10.103']) == 1
+    assert count(policy_area=['4.42.421', '10.103.1033']) == 1
+    assert count(policy_area=['4.42.421', '10.103.1035']) == 2
+
+    assert count(term='thing') == 3
+    assert count(term='that one thing') == 1
+    assert count(term='version') == 2
+    assert count(term='variant') == 2
+    assert count(term='riant') == 0
+    assert count(term='A of X') == 1
+    assert count(term='group') == 0
+    assert count(term='group', full_text=True) == 1
+    assert count(term='The group that wants something', full_text=True) == 1
+
+    assert count(term='Abstimmungstext') == 0
+    assert count(term='Abstimmungstext', full_text=True) == 1
+    assert count(term='council message', full_text=True) == 1
+    assert count(term='Parlamentdebatte', full_text=True) == 1
+    assert count(term='Réalisation', full_text=True) == 1
+    assert count(term='booklet', full_text=True) == 0
 
 
 def test_votes_order(session):

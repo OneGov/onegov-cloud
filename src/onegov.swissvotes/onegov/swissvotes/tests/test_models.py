@@ -1,15 +1,11 @@
 from datetime import date
 from decimal import Decimal
-from io import BytesIO
-from onegov.file.utils import as_fileintent
-from onegov.pdf import Pdf
 from onegov.swissvotes.models.actor import Actor
 from onegov.swissvotes.models.localized_file import LocalizedFile
 from onegov.swissvotes.models.page import TranslatablePage
 from onegov.swissvotes.models.policy_area import PolicyArea
 from onegov.swissvotes.models.principal import Principal
 from onegov.swissvotes.models.vote import SwissVote
-from onegov.swissvotes.models.vote import SwissVoteFile
 from psycopg2.extras import NumericRange
 from translationstring import TranslationString
 
@@ -461,7 +457,7 @@ def test_vote_codes():
     assert SwissVote.codes('recommendation')[5] == "Free vote"
 
 
-def test_vote_attachments(swissvotes_app):
+def test_vote_attachments(swissvotes_app, attachments):
     session = swissvotes_app.session()
     session.add(
         SwissVote(
@@ -496,17 +492,7 @@ def test_vote_attachments(swissvotes_app):
         'voting_text',
     }
 
-    file = BytesIO()
-    pdf = Pdf(file)
-    pdf.init_report()
-    pdf.p('Abstimmungstext')
-    pdf.generate()
-    file.seek(0)
-
-    voting_text = SwissVoteFile(id='aaa')
-    voting_text.reference = as_fileintent(file, 'voting_text')
-    vote.voting_text = voting_text
-
+    vote.voting_text = attachments['voting_text']
     session.flush()
 
     assert len(vote.files) == 1
@@ -516,17 +502,7 @@ def test_vote_attachments(swissvotes_app):
 
     swissvotes_app.session_manager.current_locale = 'fr_CH'
 
-    file = BytesIO()
-    pdf = Pdf(file)
-    pdf.init_report()
-    pdf.p('Réalisation')
-    pdf.generate()
-    file.seek(0)
-
-    realization = SwissVoteFile(id='bbb')
-    realization.reference = as_fileintent(file, 'realization')
-    vote.realization = realization
-
+    vote.realization = attachments['realization']
     session.flush()
 
     assert len(vote.files) == 2
