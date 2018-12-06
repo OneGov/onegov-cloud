@@ -1,5 +1,14 @@
 Changelog
 ---------
+
+- Allows to filter occurrences by relative date ranges.
+  [msom]
+
+- Makes the ``outdated`` parameter of the occurrence collection stateful and
+  more straightforward. If ``outdated`` is set to False, no outdated
+  occurrences are returned no matter what start date is set.
+  [msom]
+
 0.9.8 (2018-10-29)
 ~~~~~~~~~~~~~~~~~~~
 

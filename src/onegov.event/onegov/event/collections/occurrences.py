@@ -2,6 +2,7 @@ from cached_property import cached_property
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
+from dateutil.relativedelta import relativedelta
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
 from onegov.core.collection import Pagination
@@ -25,16 +26,29 @@ class OccurrenceCollection(Pagination):
     Occurrences are read only (no ``add`` method here), they are generated
     automatically when adding a new event.
 
-    Occurrences can be filtered by start and end dates as well as tags.
+    Occurrences can be filtered by relative date ranges (``today``,
+    ``tomorrow``, ``weekend``, ``week``, ``month``) or by a given start date
+    and/or end date. The range filter is dominant and overwrites the start and
+    end dates if provided.
 
-    By default, only current occurrences are returned.
+    By default, only current occurrences are used.
+
+    Occurrences can be additionally filtered by tags.
+
     """
 
-    def __init__(self, session, page=0, start=None, end=None, tags=None):
+    date_ranges = ('today', 'tomorrow', 'weekend', 'week', 'month')
+
+    def __init__(
+        self, session, page=0,
+        range=None, start=None, end=None, outdated=False,
+        tags=None
+    ):
         self.session = session
         self.page = page
-        self.start = start
-        self.end = end
+        self.range = range if range in self.date_ranges else None
+        self.start, self.end = self.range_to_dates(range, start, end)
+        self.outdated = outdated
         self.tags = tags if tags else []
 
     def __eq__(self, other):
@@ -49,28 +63,90 @@ class OccurrenceCollection(Pagination):
 
     def page_by_index(self, index):
         return self.__class__(
-            self.session, index, self.start, self.end, self.tags
+            self.session,
+            page=index,
+            range=self.range,
+            start=self.start,
+            end=self.end,
+            outdated=self.outdated,
+            tags=self.tags
         )
 
-    def for_filter(self, **kwargs):
-        """ Returns a new instance of the collection.
+    def range_to_dates(self, range, start=None, end=None):
+        """ Returns the start and end date for the given range relative to now.
+        Defaults to the given start and end date.
 
-        Copies the current filters if not specified. Also adds or removes a
-        single tag if given.
+        Valid ranges are:
+            - today
+            - tomorrow
+            - weekend (next or current Friday to Sunday)
+            - week (current Monday to Sunday)
+            - month (current)
+
+        """
+        if range not in self.date_ranges:
+            return start, end
+
+        today = date.today()
+        weekday = today.weekday()
+
+        if range == 'today':
+            return today, today
+        if range == 'tomorrow':
+            tomorrow = today + timedelta(days=1)
+            return tomorrow, tomorrow
+        if range == 'weekend':
+            return (
+                today + timedelta(days=4 - weekday),
+                today + timedelta(days=6 - weekday)
+            )
+        if range == 'week':
+            return (
+                today - timedelta(days=weekday),
+                today + timedelta(days=6 - weekday)
+            )
+        if range == 'month':
+            start = today.replace(day=1)
+            return start, start + relativedelta(months=1, days=-1)
+        pass
+
+    def for_filter(self, **kwargs):
+        """ Returns a new instance of the collection with the given filters
+        and copies the current filters if not specified.
+
+        If a valid range is provided, start and end dates are ignored. If the
+        range is invalid, it is ignored.
+
+        Adds or removes a single tag if given.
         """
 
-        start = kwargs['start'] if 'start' in kwargs else self.start
-        end = kwargs['end'] if 'end' in kwargs else self.end
-        tags = kwargs['tags'] if 'tags' in kwargs else list(self.tags)
-
+        tags = kwargs.get('tags', list(self.tags))
         if 'tag' in kwargs:
-            tag = kwargs['tag']
+            tag = kwargs.get('tag')
             if tag in tags:
                 tags.remove(tag)
             elif tag is not None:
                 tags.append(tag)
 
-        return self.__class__(self.session, 0, start, end, tags)
+        range = kwargs.get('range', self.range)
+        start = kwargs.get('start', self.start)
+        end = kwargs.get('end', self.end)
+        if 'range' in kwargs and kwargs.get('range') in self.date_ranges:
+            range = kwargs.get('range')
+            start = None
+            end = None
+        elif 'start' in kwargs or 'end' in kwargs:
+            range = None
+
+        return self.__class__(
+            self.session,
+            page=0,
+            range=range,
+            start=start,
+            end=end,
+            outdated=kwargs.get('outdated', self.outdated),
+            tags=tags
+        )
 
     @cached_property
     def used_timezones(self):
@@ -93,7 +169,7 @@ class OccurrenceCollection(Pagination):
 
         return get_unique_hstore_keys(self.session, Occurrence._tags)
 
-    def query(self, outdated=False):
+    def query(self):
         """ Queries occurrences with the set parameters.
 
         Finds all occurrences with any of the set tags and within the set
@@ -101,30 +177,18 @@ class OccurrenceCollection(Pagination):
         therefore without a timezone - we search for the given date in the
         timezone of the occurrence!.
 
-        If no start date is set and ``outdated`` is not set, only current
-        occurrences are returned.
         """
 
         query = self.session.query(Occurrence)
 
-        if self.start is not None:
-            assert type(self.start) is date
-            start = as_datetime(self.start)
-
-            expressions = []
-            for timezone in self.used_timezones:
-                localized_start = replace_timezone(start, timezone)
-                localized_start = standardize_date(localized_start, timezone)
-                expressions.append(
-                    and_(
-                        Occurrence.timezone == timezone,
-                        Occurrence.start >= localized_start
-                    )
-                )
-
-            query = query.filter(or_(*expressions))
-        elif not outdated:
-            start = as_datetime(date.today())
+        if self.start is not None or self.outdated is False:
+            if self.start is None:
+                start = date.today()
+            else:
+                start = self.start
+                if self.outdated is False:
+                    start = max(self.start, date.today())
+            start = as_datetime(start)
 
             expressions = []
             for timezone in self.used_timezones:
@@ -140,7 +204,6 @@ class OccurrenceCollection(Pagination):
             query = query.filter(or_(*expressions))
 
         if self.end is not None:
-            assert type(self.end) is date
             end = as_datetime(self.end)
             end = end + timedelta(days=1)
 
@@ -192,6 +255,7 @@ class OccurrenceCollection(Pagination):
 
         query = self.query().with_entities(Occurrence.event_id)
         event_ids = set([r.event_id for r in query])
+
         query = self.session.query(Event).filter(Event.id.in_(event_ids))
         for event in query:
             modified = event.modified or event.created or datetime.utcnow()
