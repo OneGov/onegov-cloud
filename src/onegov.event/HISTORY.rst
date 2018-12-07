@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.0.0 (2018-12-07)
+~~~~~~~~~~~~~~~~~~~
 
 - Allows to filter occurrences by relative date ranges.
   [msom]
