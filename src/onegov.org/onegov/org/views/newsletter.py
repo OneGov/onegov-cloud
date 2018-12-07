@@ -38,7 +38,7 @@ def get_newsletter_form(model, request):
     query = query.options(undefer('created'))
     form = form.with_news(request, query.all())
 
-    query = OccurrenceCollection(request.session).query(outdated=False)
+    query = OccurrenceCollection(request.session).query()
     subquery = query.with_entities(Occurrence.id)
     subquery = subquery.order_by(None)
     subquery = subquery.order_by(

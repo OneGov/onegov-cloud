@@ -35,14 +35,30 @@
                             </span>
                         </tal:b>
                     </div>
+                </div>
 
+                <div class="occurrence-exports borderless-side-panel">
+                    <h2 i18n:translate>Date</h2>
                     <metal:b use-macro="layout.macros['date-range-selector']">
                         <tal:b metal:fill-slot="before-date-range">
+                            <input type="hidden" name="range" value="">
                             <tal:b tal:repeat="tag active_tags">
                                 <input type="hidden" name="tags" value="${tag}">
                             </tal:b>
                         </tal:b>
                     </metal:b>
+
+                    <div class="occurrences-filter-ranges">
+                        <div class="filter-panel">
+                            <ul class="tags">
+                                <li tal:repeat="range ranges">
+                                    <span class="blank-label rounded ${range.active and 'active' or ''}">
+                                        <tal:b replace="structure range(request)"></tal:b>
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="occurrence-exports borderless-side-panel">

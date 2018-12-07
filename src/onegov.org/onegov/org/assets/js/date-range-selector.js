@@ -3,6 +3,7 @@ var set_date_range_selector_filter = function(name, value) {
     var location = new Url();
     location.query[name] = value;
     delete location.query.page;
+    delete location.query.range;
     window.location.href = location.toString();
 };
 

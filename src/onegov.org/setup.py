@@ -40,7 +40,7 @@ setup(
         'onegov.chat',
         'onegov.core>=0.41.0',
         'onegov.directory>=0.4.1',
-        'onegov.event>=0.9.0',
+        'onegov.event>=1.0.0',
         'onegov.file>=0.2.1',
         'onegov.form>=0.18.0',
         'onegov.foundation>=0.0.7',

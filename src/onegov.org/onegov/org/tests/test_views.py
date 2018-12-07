@@ -2260,10 +2260,18 @@ def test_view_occurrences(client):
         unique_dates[1].isoformat(),
         unique_dates[-2].isoformat()
     )
-
     assert tags(query) == ["Sport"]
     assert min(dates(query)) == unique_dates[1]
     assert max(dates(query)) == unique_dates[-2]
+
+    query = 'range=weekend'
+    assert tags(query) == ["Party"]
+    assert min(dates(query)) == unique_dates[0]
+    assert max(dates(query)) == unique_dates[0]
+    assert total_events(query) == 1
+
+    query = 'range=weekend&start={}'.format(unique_dates[-2].isoformat())
+    assert total_events(query) == 1
 
     assert client.get('/events/').click('Diese Termine exportieren').\
         text.startswith('BEGIN:VCALENDAR')

@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-12-03 11:46+0100\n"
-"PO-Revision-Date: 2018-09-24 12:21+0200\n"
+"POT-Creation-Date: 2018-12-06 14:53+0100\n"
+"PO-Revision-Date: 2018-12-06 14:53+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
 "Language: fr_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.12\n"
-"X-Generator: Poedit 2.1.1\n"
+"X-Generator: Poedit 2.2\n"
 
 msgid "Login"
 msgstr "Connexion"
@@ -3039,6 +3039,18 @@ msgstr "Exporter un événement"
 
 msgid "Exports all future events."
 msgstr "Exporte tous les événements futurs."
+
+msgid "Today"
+msgstr "Aujourd’hui"
+
+msgid "Tomorrow"
+msgstr "Demain"
+
+msgid "This weekend"
+msgstr "Ce week-end"
+
+msgid "This week"
+msgstr "Cette semaine"
 
 msgid "Select images"
 msgstr "Sélectionner des images"

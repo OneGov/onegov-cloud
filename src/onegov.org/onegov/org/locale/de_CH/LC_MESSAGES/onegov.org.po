@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-12-03 11:46+0100\n"
-"PO-Revision-Date: 2018-11-09 11:12+0100\n"
+"POT-Creation-Date: 2018-12-06 14:53+0100\n"
+"PO-Revision-Date: 2018-12-06 14:53+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -3027,6 +3027,18 @@ msgstr "Veranstaltungs-Export"
 
 msgid "Exports all future events."
 msgstr "Exportiert alle zukünftigen Veranstaltungen."
+
+msgid "Today"
+msgstr "Heute"
+
+msgid "Tomorrow"
+msgstr "Morgen"
+
+msgid "This weekend"
+msgstr "Dieses Wochenende"
+
+msgid "This week"
+msgstr "Diese Woche"
 
 msgid "Select images"
 msgstr "Bilder auswählen"

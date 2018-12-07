@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds relative date range filters for events.
+  [msom]
+
 0.44.1 (2018-12-04)
 ~~~~~~~~~~~~~~~~~~~
 

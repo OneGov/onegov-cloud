@@ -37,6 +37,32 @@ def view_occurrences(self, request):
         ) for tag, translation in translated_tags
     )
 
+    ranges = [
+        Link(
+            text=_("All"),
+            url=request.link(
+                self.for_filter(range=range, start=None, end=None)
+            ),
+            active=(
+                not self.range and not self.start and not self.end
+            ) and 'active' or ''
+        )
+    ] + [
+        Link(
+            text=translation,
+            url=request.link(
+                self.for_filter(range=range, start=None, end=None)
+            ),
+            active=range == self.range and 'active' or ''
+        ) for range, translation in (
+            ('today', _("Today")),
+            ('tomorrow', _("Tomorrow")),
+            ('weekend', _("This weekend")),
+            ('week', _("This week")),
+            ('month', _("This month")),
+        )
+    ]
+
     return {
         'active_tags': self.tags,
         'add_link': request.link(self, name='new'),
@@ -46,6 +72,7 @@ def view_occurrences(self, request):
         'number_of_occurrences': self.subset_count,
         'occurrences': self.batch,
         'start': self.start.isoformat() if self.start else '',
+        'ranges': ranges,
         'tags': tags,
         'title': _('Events'),
     }
