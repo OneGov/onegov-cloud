@@ -377,8 +377,8 @@ def test_votes_query(session):
 
 
 def test_votes_query_attachments(session, attachments, postgres_version):
-    if postgres_version < 10:
-        skip("PostgreSQL 10+ required")
+    if int(postgres_version.split('.')[0]) < 10:
+        skip("PostgreSQL 10+")
 
     votes = SwissVoteCollection(session)
     votes.add(
