@@ -95,13 +95,6 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         else:
             self.image = None
 
-    #: Recurrence of the event as icalendar object
-    @property
-    def icalendar_recurrence(self):
-        if not self.recurrence:
-            return None
-        return vRecur.from_ical(self.recurrence.replace('RRULE:', ''))
-
     #: Occurences of the event
     occurrences = relationship(
         "Occurrence",
@@ -329,30 +322,51 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         assert self.state == 'published'
         self.state = 'withdrawn'
 
-    def as_ical(self, url=None):
-        """ Returns the event and all its occurrences as iCalendar string. """
+    def get_ical_vevents(self, url=None):
+        """ Returns the event and all its occurrences as icalendar objects.
+
+        If the calendar has a bunch of RDATE's instead of a proper RRULE, we
+        return every occurrence as seperate event since most calendars doen't
+        support RDATE's.
+
+        """
 
         modified = self.modified or self.created or datetime.utcnow()
-
-        vevent = vEvent()
-        vevent.add('uid', f'{self.name}@onegov.event')
-        vevent.add('summary', self.title)
-        vevent.add('dtstart', to_timezone(self.start, UTC))
-        vevent.add('dtend', to_timezone(self.end, UTC))
-        vevent.add('last-modified', modified)
-        vevent.add('dtstamp', modified)
-        vevent.add('location', self.location)
-        vevent.add('description', self.description)
-        vevent.add('categories', self.tags)
+        rrule = ''
         if self.recurrence:
-            vevent.add('rrule', self.icalendar_recurrence)
-        if url:
-            vevent.add('url', url)
-        if self.coordinates:
-            vevent.add('geo', (self.coordinates.lat, self.coordinates.lon))
+            rrule = vRecur.from_ical(self.recurrence.replace('RRULE:', ''))
 
+        for dtstart in self.occurrence_dates():
+            dtstart = to_timezone(dtstart, UTC)
+            dtend = dtstart + (self.end - self.start)
+            vevent = vEvent()
+            vevent.add('uid', f'{self.name}-{dtstart.date()}@onegov.event')
+            vevent.add('summary', self.title)
+            vevent.add('dtstart', dtstart)
+            vevent.add('dtend', dtend)
+            vevent.add('last-modified', modified)
+            vevent.add('dtstamp', modified)
+            vevent.add('location', self.location)
+            vevent.add('description', self.description)
+            vevent.add('categories', self.tags)
+            if rrule:
+                vevent.add('rrule', rrule)
+            if url:
+                vevent.add('url', url)
+            if self.coordinates:
+                vevent.add('geo', (self.coordinates.lat, self.coordinates.lon))
+            yield vevent
+
+            if rrule:
+                break
+
+    def as_ical(self, url=None):
+        """ Returns the event and all its occurrences as iCalendar string.
+
+        """
         vcalendar = vCalendar()
         vcalendar.add('prodid', '-//OneGov//onegov.event//')
         vcalendar.add('version', '2.0')
-        vcalendar.add_component(vevent)
+        for vevent in self.get_ical_vevents(url):
+            vcalendar.add_component(vevent)
         return vcalendar.to_ical()

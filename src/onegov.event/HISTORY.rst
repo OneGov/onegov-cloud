@@ -12,6 +12,9 @@ Changelog
 - Fixes JSON import of recurring events.
   [msom]
 
+- Fixes iCal export of events with indiviudal dates instead.
+  [msom]
+
 0.9.8 (2018-10-29)
 ~~~~~~~~~~~~~~~~~~~
 

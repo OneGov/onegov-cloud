@@ -1,19 +1,15 @@
 from cached_property import cached_property
 from datetime import date
-from datetime import datetime
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 from icalendar import Calendar as vCalendar
-from icalendar import Event as vEvent
 from onegov.core.collection import Pagination
 from onegov.core.utils import get_unique_hstore_keys
 from onegov.event.models import Event
 from onegov.event.models import Occurrence
-from pytz import UTC
 from sedate import as_datetime
 from sedate import replace_timezone
 from sedate import standardize_date
-from sedate import to_timezone
 from sqlalchemy import and_
 from sqlalchemy import distinct
 from sqlalchemy import or_
@@ -258,25 +254,7 @@ class OccurrenceCollection(Pagination):
 
         query = self.session.query(Event).filter(Event.id.in_(event_ids))
         for event in query:
-            modified = event.modified or event.created or datetime.utcnow()
-
-            vevent = vEvent()
-            vevent.add('uid', f'{event.name}@onegov.event')
-            vevent.add('summary', event.title)
-            vevent.add('dtstart', to_timezone(event.start, UTC))
-            vevent.add('dtend', to_timezone(event.end, UTC))
-            vevent.add('last-modified', modified)
-            vevent.add('dtstamp', modified)
-            vevent.add('location', event.location)
-            vevent.add('description', event.description)
-            vevent.add('categories', event.tags)
-            if event.recurrence:
-                vevent.add('rrule', event.icalendar_recurrence)
-            if event.coordinates:
-                vevent.add(
-                    'geo', (event.coordinates.lat, event.coordinates.lon)
-                )
-            vevent.add('url', request.link(event))
-            vcalendar.add_component(vevent)
+            for vevent in event.get_ical_vevents(request.link(event)):
+                vcalendar.add_component(vevent)
 
         return vcalendar.to_ical()

@@ -7,6 +7,7 @@ from io import BytesIO
 from onegov.core.utils import module_path
 from onegov.event import Event
 from onegov.event import Occurrence
+from onegov.event.utils import as_rdates
 from onegov.gis import Coordinates
 from pytest import mark
 from sedate import replace_timezone
@@ -148,22 +149,6 @@ def test_event_image(test_app, path):
     event.set_image(None, None)
     session.flush()
     assert event.image == None
-
-
-def test_icalendar_recurrence():
-    event = Event(state='initiated')
-    assert event.icalendar_recurrence == None
-
-    event.recurrence = (
-        'RRULE:FREQ=WEEKLY;'
-        'UNTIL=20150616T220000Z;'
-        'BYDAY=MO,WE,FR'
-    )
-    assert event.icalendar_recurrence['FREQ'] == ['WEEKLY']
-    assert event.icalendar_recurrence['UNTIL'][0].year == 2015
-    assert event.icalendar_recurrence['UNTIL'][0].month == 6
-    assert event.icalendar_recurrence['UNTIL'][0].day == 16
-    assert event.icalendar_recurrence['BYDAY'] == ['MO', 'WE', 'FR']
 
 
 def test_occurrence_dates(session):
@@ -578,7 +563,7 @@ def test_as_ical():
         'VERSION:2.0',
         'PRODID:-//OneGov//onegov.event//',
         'BEGIN:VEVENT',
-        'UID:event@onegov.event',
+        'UID:event-2008-02-07@onegov.event',
         'SUMMARY:Squirrel Park Visit',
         'DTSTART;VALUE=DATE-TIME:20080207T091500Z',
         'DTEND;VALUE=DATE-TIME:20080207T150000Z',
@@ -622,4 +607,39 @@ def test_as_ical():
         'URL:https://example.org/my-event',
         'END:VEVENT',
         'END:VCALENDAR',
+    ])
+
+    event.recurrence = as_rdates('FREQ=WEEKLY;COUNT=2', event.start)
+    ical = event.as_ical(url=url).decode().strip().splitlines()
+    assert sorted(ical) == sorted([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'BEGIN:VEVENT',
+        'UID:event-2008-02-07@onegov.event',
+        'SUMMARY:Squirrel Park Visit',
+        'DTSTART;VALUE=DATE-TIME:20080207T091500Z',
+        'DTEND;VALUE=DATE-TIME:20080207T150000Z',
+        'DTSTAMP;VALUE=DATE-TIME:20080207T091500Z',
+        'DESCRIPTION:<em>Furry</em> things will happen!',
+        'CATEGORIES:fun,animals,furry',
+        'LAST-MODIFIED;VALUE=DATE-TIME:20080207T091500Z',
+        'LOCATION:Squirrel Park',
+        'GEO:47.051752750515746;8.305739625357093',
+        'URL:https://example.org/my-event',
+        'END:VEVENT',
+        'BEGIN:VEVENT',
+        'UID:event-2008-02-14@onegov.event',
+        'SUMMARY:Squirrel Park Visit',
+        'DTSTART;VALUE=DATE-TIME:20080214T091500Z',
+        'DTEND;VALUE=DATE-TIME:20080214T150000Z',
+        'DTSTAMP;VALUE=DATE-TIME:20080207T091500Z',
+        'DESCRIPTION:<em>Furry</em> things will happen!',
+        'CATEGORIES:fun,animals,furry',
+        'LAST-MODIFIED;VALUE=DATE-TIME:20080207T091500Z',
+        'LOCATION:Squirrel Park',
+        'GEO:47.051752750515746;8.305739625357093',
+        'URL:https://example.org/my-event',
+        'END:VEVENT',
+        'END:VCALENDAR'
     ])
