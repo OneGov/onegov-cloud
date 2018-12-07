@@ -9,6 +9,9 @@ Changelog
   occurrences are returned no matter what start date is set.
   [msom]
 
+- Fixes JSON import of recurring events.
+  [msom]
+
 0.9.8 (2018-10-29)
 ~~~~~~~~~~~~~~~~~~~
 

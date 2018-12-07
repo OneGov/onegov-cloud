@@ -1,8 +1,11 @@
 from datetime import datetime
+from dateutil.parser import parse
 from lxml import etree
 from onegov.core.utils import module_path
+from onegov.event.utils import as_rdates
 from onegov.event.utils import GuidleExportData
 from pytest import mark
+from pytest import raises
 from sedate import replace_timezone
 
 
@@ -72,4 +75,94 @@ def test_import_guidle(session, xml):
     assert schedules[3].end == tzdatetime(2018, 8, 18, 23, 59, 59, 999999)
     assert schedules[3].recurrence == (
         'RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU;UNTIL=20181101T0000Z'
+    )
+
+
+def test_as_rdates():
+    with raises(AssertionError):
+        as_rdates('RRULE:FREQ=DAILY;COUNT=1\nRDATE:20190223T000000\n')
+
+    rrule = (
+        'RRULE:FREQ=DAILY;COUNT=1\n'
+        'RDATE:20190223T000000\n'
+    )
+    assert as_rdates(rrule, parse('2018-11-03T09:00:00+00:00')) == (
+        'RDATE:2018-11-03T000000Z\n'
+        'RDATE:2019-02-23T000000Z'
+    )
+
+    rrule = (
+        'RRULE:FREQ=DAILY;COUNT=7\n'
+        'EXDATE:20181111T000000,20181112T000000,20181113T000000,'
+        '20181114T000000,20181115T000000,20181116T000000\n'
+        'RDATE:20181201T000000,20190112T000000\n'
+    )
+    assert as_rdates(rrule, parse('2018-09-05T10:30:00+00:00')) == (
+        'RDATE:2018-09-05T000000Z\n'
+        'RDATE:2018-09-06T000000Z\n'
+        'RDATE:2018-09-07T000000Z\n'
+        'RDATE:2018-09-08T000000Z\n'
+        'RDATE:2018-09-09T000000Z\n'
+        'RDATE:2018-09-10T000000Z\n'
+        'RDATE:2018-09-11T000000Z\n'
+        'RDATE:2018-12-01T000000Z\n'
+        'RDATE:2019-01-12T000000Z'
+    )
+
+    rrule = (
+        'RRULE:FREQ=MONTHLY;BYDAY=-1FR;COUNT=6\n'
+        'EXDATE:20180727T000000,20181224T000000,20181228T000000,'
+        '20190125T000000\n'
+        'RDATE:20181207T000000,20181222T000000\n'
+    )
+    assert as_rdates(rrule, parse('2018-08-31T07:30:00+00:00')) == (
+        'RDATE:2018-08-31T000000Z\n'
+        'RDATE:2018-09-28T000000Z\n'
+        'RDATE:2018-10-26T000000Z\n'
+        'RDATE:2018-11-30T000000Z\n'
+        'RDATE:2018-12-07T000000Z\n'
+        'RDATE:2018-12-22T000000Z'
+    )
+
+    rrule = (
+        'RRULE:FREQ=MONTHLY;BYDAY=-1SA;COUNT=4\n'
+        'EXDATE:20181027T000000,20181124T000000\n'
+        'RDATE:20181110T000000,20181215T000000\n'
+    )
+    assert as_rdates(rrule, parse('2018-08-25T08:30:00+00:00')) == (
+        'RDATE:2018-08-25T000000Z\n'
+        'RDATE:2018-09-29T000000Z\n'
+        'RDATE:2018-11-10T000000Z\n'
+        'RDATE:2018-12-15T000000Z'
+    )
+
+    rrule = (
+        'RRULE:FREQ=MONTHLY;BYDAY=+1FR;UNTIL=20181207T000000\n'
+    )
+    assert as_rdates(rrule, parse('2018-01-05T15:00:00+00:00')) == (
+        'RDATE:2018-01-05T000000Z\n'
+        'RDATE:2018-02-02T000000Z\n'
+        'RDATE:2018-03-02T000000Z\n'
+        'RDATE:2018-04-06T000000Z\n'
+        'RDATE:2018-05-04T000000Z\n'
+        'RDATE:2018-06-01T000000Z\n'
+        'RDATE:2018-07-06T000000Z\n'
+        'RDATE:2018-08-03T000000Z\n'
+        'RDATE:2018-09-07T000000Z\n'
+        'RDATE:2018-10-05T000000Z\n'
+        'RDATE:2018-11-02T000000Z\n'
+        'RDATE:2018-12-07T000000Z'
+    )
+
+    rrule = (
+        'RRULE:FREQ=MONTHLY;BYDAY=+4SA;COUNT=5\n'
+        'EXDATE:20181124T000000,20181222T000000\n'
+        'RDATE:20181117T000000,20181215T000000\n'
+    )
+    as_rdates(rrule, parse('2018-08-25T13:00:00+00:00')) == (
+        'RDATE:2018-08-25T000000Z\n'
+        'RDATE:2018-09-22T000000Z\n'
+        'RDATE:2018-10-27T000000Z\n'
+        'RDATE:2018-11-17T000000Z\n'
+        'RDATE:2018-12-15T000000Z'
     )

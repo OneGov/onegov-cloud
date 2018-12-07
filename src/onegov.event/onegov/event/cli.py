@@ -2,8 +2,12 @@ import click
 import pycurl
 
 from csv import reader as csvreader
+from datetime import date
+from datetime import datetime
+from datetime import timedelta
 from dateutil.parser import parse
 from hashlib import sha1
+from icalendar import Calendar as vCalendar
 from io import BytesIO
 from lxml import etree
 from onegov.core.cli import abort
@@ -22,9 +26,16 @@ from onegov.file.utils import as_fileintent
 from onegov.gis import Coordinates
 from operator import add
 from pathlib import Path
+from pytz import UTC
 from requests import get
+from sedate import as_datetime
+from sedate import replace_timezone
+from sedate import standardize_date
+from sedate import to_timezone
 from sqlalchemy import or_
 from sqlalchemy.dialects.postgresql import array
+from urllib.parse import urlparse
+
 
 cli = command_group()
 
@@ -71,11 +82,48 @@ def download_image(image_url):
     return buffer
 
 
+def get_event_dates(url, timezone):
+    """ Get the start and end datetime of an event in a seantis.dir.events
+    events calendar.
+
+    The start and end datetime in the seantis.dir.events JSON export is
+    wrong since they refer to the next occurrence and not the first one. This
+    is unusable together with the recurrece
+
+    """
+
+    response = get(urlparse(url)._replace(query='type=ical').geturl())
+    response.raise_for_status()
+
+    for event in vCalendar.from_ical(response.text).walk('vevent'):
+        start = event.get('dtstart').dt
+        if type(start) is date:
+            start = replace_timezone(as_datetime(start), timezone)
+        elif type(start) is datetime:
+            if start.tzinfo is None:
+                start = standardize_date(start, timezone)
+            else:
+                start = to_timezone(start, UTC)
+
+        end = event.get('dtend').dt
+        if type(end) is date:
+            end = replace_timezone(as_datetime(end), timezone)
+            end = end + timedelta(days=1, minutes=-1)
+        elif type(end) is datetime:
+            if end.tzinfo is None:
+                end = standardize_date(end, timezone)
+            else:
+                end = to_timezone(end, UTC)
+
+        return start, end
+
+
 @cli.command('import-json')
 @pass_group_context
 @click.argument('url')
 @click.option('--tagmap', type=click.File())
-def import_json(group_context, url, tagmap):
+@click.option('--clear/-no-clear', default=False)
+def import_json(group_context, url, tagmap, clear):
     """ Fetches the events from a seantis.dir.events instance.
 
     This command is intended for migration and to be removed in the future.
@@ -99,6 +147,14 @@ def import_json(group_context, url, tagmap):
         session = app.session()
         events = EventCollection(session)
 
+        if clear:
+            click.secho("Removing all events", fg='yellow')
+            session = app.session()
+            for event in session.query(Event):
+                session.delete(event)
+            for occurrence in session.query(Occurrence):
+                session.delete(occurrence)
+
         for item in response:
             title = item['title']
 
@@ -106,6 +162,8 @@ def import_json(group_context, url, tagmap):
             end = parse(item['end'])
             timezone = item['timezone']
             recurrence = item['recurrence']
+            if recurrence:
+                start, end = get_event_dates(item['url'], timezone)
 
             organizer = ', '.join((line for line in (
                 item['organizer'] or '',
@@ -167,7 +225,9 @@ def import_json(group_context, url, tagmap):
             try:
                 event.validate_recurrence('recurrence', recurrence)
             except RuntimeError:
-                event.recurrence = as_rdates(recurrence)
+                event.recurrence = as_rdates(recurrence, start)
+                if not event.recurrence:
+                    raise RuntimeError(f"Could not convert '{recurrence}'")
             else:
                 event.recurrence = recurrence
 
