@@ -85,3 +85,9 @@ def attachments(swissvotes_app):
         result[name] = attachment
 
     yield result
+
+
+@fixture(scope="function")
+def postgres_version(session):
+    connection = session.connection()
+    yield float(connection.execute('show server_version;').fetchone()[0])

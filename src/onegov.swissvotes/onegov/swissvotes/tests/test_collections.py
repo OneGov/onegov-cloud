@@ -3,6 +3,7 @@ from decimal import Decimal
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.collections import TranslatablePageCollection
 from psycopg2.extras import NumericRange
+from pytest import skip
 
 
 def test_pages(session):
@@ -234,7 +235,7 @@ def test_vote_term_filter():
     ]
 
 
-def test_votes_query(session, attachments):
+def test_votes_query(session):
     votes = SwissVoteCollection(session)
     votes.add(
         id=1,
@@ -283,7 +284,7 @@ def test_votes_query(session, attachments):
         _position_national_council=1,
         _result=1
     )
-    vote = votes.add(
+    votes.add(
         id=3,
         bfs_number=Decimal('200.2'),
         date=date(1990, 9, 2),
@@ -301,9 +302,6 @@ def test_votes_query(session, attachments):
         _position_national_council=1,
         _result=2
     )
-    for name, attachment in attachments.items():
-        setattr(vote, name, attachment)
-        session.flush()
 
     def count(**kwargs):
         return SwissVoteCollection(session, **kwargs).query().count()
@@ -376,6 +374,54 @@ def test_votes_query(session, attachments):
     assert count(term='group') == 0
     assert count(term='group', full_text=True) == 1
     assert count(term='The group that wants something', full_text=True) == 1
+
+
+def test_votes_query_attachments(session, attachments, postgres_version):
+    if postgres_version < 10:
+        skip("PostgreSQL 10+ required")
+
+    votes = SwissVoteCollection(session)
+    votes.add(
+        id=1,
+        bfs_number=Decimal('100'),
+        date=date(1990, 6, 2),
+        decade=NumericRange(1990, 1999),
+        legislation_number=4,
+        legislation_decade=NumericRange(1990, 1994),
+        title="Vote on that one thing",
+        votes_on_same_day=1,
+        _legal_form=1,
+    )
+    votes.add(
+        id=2,
+        bfs_number=Decimal('200.1'),
+        date=date(1990, 9, 2),
+        decade=NumericRange(1990, 1999),
+        legislation_number=4,
+        legislation_decade=NumericRange(1990, 1994),
+        title="We want this version the thing",
+        votes_on_same_day=1,
+        _legal_form=2,
+    )
+    vote = votes.add(
+        id=3,
+        bfs_number=Decimal('200.2'),
+        date=date(1990, 9, 2),
+        decade=NumericRange(1990, 1999),
+        legislation_number=4,
+        legislation_decade=NumericRange(1990, 1994),
+        title="We want that version of the thing",
+        votes_on_same_day=1,
+        _legal_form=2,
+    )
+    for name, attachment in attachments.items():
+        setattr(vote, name, attachment)
+        session.flush()
+
+    def count(**kwargs):
+        return SwissVoteCollection(session, **kwargs).query().count()
+
+    assert count() == 3
 
     assert count(term='Abstimmungstext') == 0
     assert count(term='Abstimmungstext', full_text=True) == 1
