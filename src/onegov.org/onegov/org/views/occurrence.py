@@ -69,7 +69,6 @@ def view_occurrences(self, request):
         'date_placeholder': date.today().isoformat(),
         'end': self.end.isoformat() if self.end else '',
         'layout': layout,
-        'number_of_occurrences': self.subset_count,
         'occurrences': self.batch,
         'start': self.start.isoformat() if self.start else '',
         'ranges': ranges,

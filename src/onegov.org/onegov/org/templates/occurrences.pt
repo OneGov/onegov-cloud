@@ -20,14 +20,8 @@
 
             <div class="large-4 medium-4 columns">
 
-                <div class="filter-panel">
-                    <div class="date-range-selector-results">
-                        <div class="date-range-selector-result">
-                            <span>${number_of_occurrences}</span>
-                            <span i18n:translate="">Events</span>
-                        </div>
-                    </div>
-
+                <div class="tag-filters borderless-side-panel">
+                    <h2 i18n:translate>Tags</h2>
                     <div class="occurrences-filter-tags">
                         <tal:b tal:repeat="tag tags">
                             <span class="blank-label ${tag.active and 'active' or ''}">
@@ -37,7 +31,7 @@
                     </div>
                 </div>
 
-                <div class="occurrence-exports borderless-side-panel">
+                <div class="date-filters borderless-side-panel">
                     <h2 i18n:translate>Date</h2>
                     <div class="occurrences-filter-ranges">
                         <div class="filter-panel">

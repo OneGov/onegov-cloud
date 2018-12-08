@@ -2186,10 +2186,6 @@ def test_view_occurrences(client):
         page = client.get(f'/events/?{query}')
         return [event.text for event in page.pyquery('h3 a')]
 
-    def total_events(query=''):
-        page = client.get(f'/events/?{query}')
-        return int(page.pyquery('.date-range-selector-result span')[0].text)
-
     def dates(query=''):
         page = client.get(f'/events/?{query}')
         return [datetime.strptime(div.text, '%d.%m.%Y').date() for div
@@ -2203,9 +2199,7 @@ def test_view_occurrences(client):
     def as_json(query=''):
         return client.get(f'/events/json?{query}').json
 
-    assert total_events() == 12
     assert len(events()) == 10
-    assert total_events('page=1') == 12
     assert len(events('page=1')) == 2
     assert dates() == sorted(dates())
     assert len(as_json()) == 12
@@ -2213,28 +2207,26 @@ def test_view_occurrences(client):
 
     query = 'tags=Party'
     assert tags(query) == ["Party"]
-    assert total_events(query) == 1
     assert events(query) == ["150 Jahre Govikon"]
     assert len(as_json('cat1=Party')) == 1
     assert len(as_json('cat1=Party&cat2=Sportanlage')) == 1
 
     query = 'tags=Politics'
     assert tags(query) == ["Politik"]
-    assert total_events(query) == 1
     assert events(query) == ["Generalversammlung"]
     assert len(as_json('cat1=Politics')) == 1
     assert len(as_json('cat2=Saal')) == 1
 
     query = 'tags=Sports'
     assert tags(query) == ["Sport"]
-    assert total_events(query) == 10
+    assert len(events(query)) == 10
     assert set(events(query)) == set(["Gemeinsames Turnen", "Fussballturnier"])
     assert len(as_json('cat1=Sports')) == 10
     assert len(as_json('cat2=Turnhalle&cat2=Sportanlage')) == 11
 
     query = 'tags=Politics&tags=Party'
     assert sorted(tags(query)) == ["Party", "Politik"]
-    assert total_events(query) == 2
+    assert len(events(query)) == 2
     assert set(events(query)) == set(["150 Jahre Govikon",
                                       "Generalversammlung"])
     assert len(as_json('cat1=Politics&cat1=Party')) == 2
@@ -2268,10 +2260,10 @@ def test_view_occurrences(client):
     assert tags(query) == ["Party"]
     assert min(dates(query)) == unique_dates[0]
     assert max(dates(query)) == unique_dates[0]
-    assert total_events(query) == 1
+    assert len(events(query)) == 1
 
     query = 'range=weekend&start={}'.format(unique_dates[-2].isoformat())
-    assert total_events(query) == 1
+    assert len(events(query)) == 1
 
     assert client.get('/events/').click('Diese Termine exportieren').\
         text.startswith('BEGIN:VCALENDAR')
