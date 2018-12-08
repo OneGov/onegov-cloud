@@ -3,7 +3,7 @@ import re
 from lxml import etree
 from onegov.form import Form
 from onegov.form import with_options
-from onegov.form.fields import MultiCheckboxField
+from onegov.form.fields import MultiCheckboxField, TagsField
 from onegov.form.validators import Stdnum
 from onegov.gis import CoordinatesField
 from onegov.org import _
@@ -194,6 +194,11 @@ class SettingsForm(Form):
         ],
     )
 
+    event_locations = TagsField(
+        label=_("Values of the location filter"),
+        fieldset=_("Events"),
+    )
+
     default_map_view = CoordinatesField(
         label=_("The default map view. This should show the whole town"),
         render_kw={
@@ -223,6 +228,9 @@ class SettingsForm(Form):
     # the footer height is determined by javascript, see org.scss and
     # common.js for more information (search for footer)
     footer_height = HiddenField()
+
+    def on_request(self):
+        self.request.include('tags-input')
 
     def validate_homepage_structure(self, field):
         if field.data:

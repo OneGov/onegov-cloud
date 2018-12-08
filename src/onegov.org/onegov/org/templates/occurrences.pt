@@ -20,14 +20,29 @@
 
             <div class="large-4 medium-4 columns">
 
-                <div class="tag-filters borderless-side-panel">
-                    <h2 i18n:translate>Tags</h2>
+                <div class="tag-filters borderless-side-panel" tal:condition="tags">
+                    <h2 i18n:translate>Tag</h2>
                     <div class="occurrences-filter-tags">
                         <tal:b tal:repeat="tag tags">
                             <span class="blank-label ${tag.active and 'active' or ''}">
                                 <tal:b replace="structure tag(request)"></tal:b>
                             </span>
                         </tal:b>
+                    </div>
+                </div>
+
+                <div class="location-filters borderless-side-panel" tal:condition="locations">
+                    <h2 i18n:translate>Location</h2>
+                    <div class="occurrences-filter-locations">
+                        <div class="filter-panel">
+                            <ul class="tags">
+                                <li tal:repeat="location locations">
+                                    <span class="blank-label ${location.active and 'active' or ''}">
+                                        <tal:b replace="structure location(request)"></tal:b>
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 

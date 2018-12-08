@@ -12,8 +12,6 @@ from onegov.org.forms import ExportForm
 from onegov.org.layout import OccurrenceLayout, OccurrencesLayout
 from onegov.ticket import TicketCollection
 from sedate import as_datetime, replace_timezone
-from sqlalchemy import or_
-from sqlalchemy.dialects.postgresql import array
 from sqlalchemy.orm import joinedload
 
 
@@ -29,13 +27,21 @@ def view_occurrences(self, request):
     ]
     translated_tags.sort(key=lambda i: i[1])
 
-    tags = (
+    tags = [
         Link(
             text=translation,
             url=request.link(self.for_filter(tag=tag)),
             active=tag in self.tags and 'active' or ''
         ) for tag, translation in translated_tags
-    )
+    ]
+
+    locations = [
+        Link(
+            text=location,
+            url=request.link(self.for_filter(location=location)),
+            active=location in self.locations and 'active' or ''
+        ) for location in request.app.org.event_locations
+    ]
 
     ranges = [
         Link(
@@ -73,6 +79,7 @@ def view_occurrences(self, request):
         'start': self.start.isoformat() if self.start else '',
         'ranges': ranges,
         'tags': tags,
+        'locations': locations,
         'title': _('Events'),
     }
 
@@ -190,20 +197,10 @@ def json_export_occurences(self, request):
     def cors(response):
         response.headers.add('Access-Control-Allow-Origin', '*')
 
-    query = self.query()
-
-    tags = request.params.getall('cat1')
-    if tags:
-        query = query.filter(Occurrence._tags.has_any(array(tags)))
-
-    locations = request.params.getall('cat2')
-    if locations:
-        query = query.filter(
-            or_(*[
-                Occurrence.location.ilike(f'%{location}%')
-                for location in locations
-            ])
-        )
+    query = self.for_filter(
+        tags=request.params.getall('cat1'),
+        locations=request.params.getall('cat2')
+    ).query()
 
     limit = request.params.get('max')
     if limit and limit.isdigit():

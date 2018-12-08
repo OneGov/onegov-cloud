@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-12-06 14:53+0100\n"
-"PO-Revision-Date: 2018-12-06 14:53+0100\n"
+"POT-Creation-Date: 2018-12-08 11:01+0100\n"
+"PO-Revision-Date: 2018-12-08 11:02+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
 "Language: fr_CH\n"
@@ -1046,6 +1046,9 @@ msgstr "Redirection vers la page d'accueil"
 
 msgid "Hide these fields for non-logged-in users"
 msgstr "Masquer ces champs pour les utilisateurs non connectés"
+
+msgid "Values of the location filter"
+msgstr "Valeurs du filtre de localisation"
 
 msgid "The default map view. This should show the whole town"
 msgstr "La vue par défaut de la carte. Cela devrait montrer la ville entière"
@@ -2217,6 +2220,9 @@ msgstr ""
 "Veuillez vérifier vos données et appuyez sur « Compléter » pour finaliser le "
 "processus. S'il y a quelque chose que vous souhaitez modifier, cliquez sur « "
 "Modifier » pour retourner sur le formulaire complété."
+
+msgid "Tag"
+msgstr "Étiquette"
 
 msgid "Export these events"
 msgstr "Exporter ces événements"

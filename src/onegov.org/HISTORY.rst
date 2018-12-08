@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds location filters for events.
+  [msom]
+
 0.45.0 (2018-12-07)
 ~~~~~~~~~~~~~~~~~~~
 

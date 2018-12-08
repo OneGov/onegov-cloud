@@ -2181,6 +2181,13 @@ def test_cleanup_allocations(client):
 
 
 def test_view_occurrences(client):
+    client.login_admin()
+    settings = client.get('/settings')
+    settings.form['event_locations'] = [
+        "Gemeindesaal", "Sportanlage", "Turnhalle"
+    ]
+    settings.form.submit()
+    client.logout()
 
     def events(query=''):
         page = client.get(f'/events/?{query}')
@@ -2188,13 +2195,15 @@ def test_view_occurrences(client):
 
     def dates(query=''):
         page = client.get(f'/events/?{query}')
-        return [datetime.strptime(div.text, '%d.%m.%Y').date() for div
-                in page.pyquery('.occurrence-date')]
+        return [
+            datetime.strptime(div.text, '%d.%m.%Y').date()
+            for div in page.pyquery('.occurrence-date')
+        ]
 
     def tags(query=''):
         page = client.get(f'/events/?{query}')
-        tags = [tag.text.strip() for tag in page.pyquery('.blank-label')]
-        return list(set([tag for tag in tags if tag]))
+        tags = [s.text.strip() for s in page.pyquery('.occurrence-tags span')]
+        return list(set(tags))
 
     def as_json(query=''):
         return client.get(f'/events/json?{query}').json
@@ -2202,36 +2211,40 @@ def test_view_occurrences(client):
     assert len(events()) == 10
     assert len(events('page=1')) == 2
     assert dates() == sorted(dates())
-    assert len(as_json()) == 12
-    assert len(as_json('max=3')) == 3
 
+    # Test tags
     query = 'tags=Party'
     assert tags(query) == ["Party"]
     assert events(query) == ["150 Jahre Govikon"]
-    assert len(as_json('cat1=Party')) == 1
-    assert len(as_json('cat1=Party&cat2=Sportanlage')) == 1
 
     query = 'tags=Politics'
     assert tags(query) == ["Politik"]
     assert events(query) == ["Generalversammlung"]
-    assert len(as_json('cat1=Politics')) == 1
-    assert len(as_json('cat2=Saal')) == 1
 
     query = 'tags=Sports'
     assert tags(query) == ["Sport"]
     assert len(events(query)) == 10
     assert set(events(query)) == set(["Gemeinsames Turnen", "Fussballturnier"])
-    assert len(as_json('cat1=Sports')) == 10
-    assert len(as_json('cat2=Turnhalle&cat2=Sportanlage')) == 11
 
     query = 'tags=Politics&tags=Party'
     assert sorted(tags(query)) == ["Party", "Politik"]
     assert len(events(query)) == 2
     assert set(events(query)) == set(["150 Jahre Govikon",
                                       "Generalversammlung"])
-    assert len(as_json('cat1=Politics&cat1=Party')) == 2
-    assert len(as_json('max=1&cat1=Politics&cat1=Party')) == 1
 
+    # Test locations
+    query = 'locations=Sportanlage'
+    assert sorted(events(query)) == ["150 Jahre Govikon", "Fussballturnier"]
+
+    query = 'locations=Gemeindesaal&locations=Turnhalle'
+    assert sorted(set(events(query))) == [
+        "Gemeinsames Turnen", "Generalversammlung"
+    ]
+
+    query = 'locations=halle'
+    assert events(query) == []
+
+    # Test dates
     unique_dates = sorted(set(dates()))
 
     query = 'start={}'.format(unique_dates[1].isoformat())
@@ -2265,6 +2278,20 @@ def test_view_occurrences(client):
     query = 'range=weekend&start={}'.format(unique_dates[-2].isoformat())
     assert len(events(query)) == 1
 
+    # Test JSON
+    assert len(as_json()) == 12
+    assert len(as_json('max=3')) == 3
+    assert len(as_json('cat1=Party')) == 1
+    assert len(as_json('cat1=Party&cat2=Sportanlage')) == 1
+    assert len(as_json('cat1=Politics')) == 1
+    assert len(as_json('cat2=Gemeindesaal')) == 1
+    assert len(as_json('cat2=saal')) == 0
+    assert len(as_json('cat1=Sports')) == 10
+    assert len(as_json('cat2=Turnhalle&cat2=Sportanlage')) == 11
+    assert len(as_json('cat1=Politics&cat1=Party')) == 2
+    assert len(as_json('max=1&cat1=Politics&cat1=Party')) == 1
+
+    # Test iCal
     assert client.get('/events/').click('Diese Termine exportieren').\
         text.startswith('BEGIN:VCALENDAR')
 

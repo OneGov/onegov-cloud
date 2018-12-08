@@ -57,6 +57,7 @@ class Organisation(Base, TimestampMixin):
     locales = meta_property()
     redirect_homepage_to = meta_property()
     hidden_people_fields = meta_property(default=list)
+    event_locations = meta_property(default=list)
     geo_provider = meta_property(default='geo-mapbox')
 
     @contact.setter

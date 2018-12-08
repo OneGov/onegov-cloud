@@ -352,12 +352,26 @@ def get_resource_move(app, key, subject, direction, target):
             session, resource, subject, target, direction)
 
 
-@OrgApp.path(model=OccurrenceCollection, path='/events',
-             converters=dict(start=extended_date_converter,
-                             end=extended_date_converter, tags=[]))
-def get_occurrences(app, page=0, range=None, start=None, end=None, tags=None):
+@OrgApp.path(
+    model=OccurrenceCollection, path='/events',
+    converters=dict(
+        start=extended_date_converter,
+        end=extended_date_converter,
+        tags=[],
+        locations=[]
+    )
+)
+def get_occurrences(
+    app, page=0, range=None, start=None, end=None, tags=None, locations=None
+):
     return OccurrenceCollection(
-        app.session(), page=page, range=range, start=start, end=end, tags=tags
+        app.session(),
+        page=page,
+        range=range,
+        start=start,
+        end=end,
+        tags=tags,
+        locations=locations
     )
 
 
