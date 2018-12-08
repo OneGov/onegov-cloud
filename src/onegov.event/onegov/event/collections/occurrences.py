@@ -29,16 +29,22 @@ class OccurrenceCollection(Pagination):
 
     By default, only current occurrences are used.
 
-    Occurrences can be additionally filtered by tags.
+    Occurrences can be additionally filtered by tags and locations.
 
     """
 
     date_ranges = ('today', 'tomorrow', 'weekend', 'week', 'month')
 
     def __init__(
-        self, session, page=0,
-        range=None, start=None, end=None, outdated=False,
-        tags=None
+        self,
+        session,
+        page=0,
+        range=None,
+        start=None,
+        end=None,
+        outdated=False,
+        tags=None,
+        locations=None
     ):
         self.session = session
         self.page = page
@@ -46,6 +52,7 @@ class OccurrenceCollection(Pagination):
         self.start, self.end = self.range_to_dates(range, start, end)
         self.outdated = outdated
         self.tags = tags if tags else []
+        self.locations = locations if locations else []
 
     def __eq__(self, other):
         return self.page == other.page
@@ -65,7 +72,8 @@ class OccurrenceCollection(Pagination):
             start=self.start,
             end=self.end,
             outdated=self.outdated,
-            tags=self.tags
+            tags=self.tags,
+            locations=self.locations
         )
 
     def range_to_dates(self, range, start=None, end=None):
@@ -113,16 +121,8 @@ class OccurrenceCollection(Pagination):
         If a valid range is provided, start and end dates are ignored. If the
         range is invalid, it is ignored.
 
-        Adds or removes a single tag if given.
+        Adds or removes a single tag/location if given.
         """
-
-        tags = kwargs.get('tags', list(self.tags))
-        if 'tag' in kwargs:
-            tag = kwargs.get('tag')
-            if tag in tags:
-                tags.remove(tag)
-            elif tag is not None:
-                tags.append(tag)
 
         range = kwargs.get('range', self.range)
         start = kwargs.get('start', self.start)
@@ -134,6 +134,22 @@ class OccurrenceCollection(Pagination):
         elif 'start' in kwargs or 'end' in kwargs:
             range = None
 
+        tags = kwargs.get('tags', list(self.tags))
+        if 'tag' in kwargs:
+            tag = kwargs.get('tag')
+            if tag in tags:
+                tags.remove(tag)
+            elif tag is not None:
+                tags.append(tag)
+
+        locations = kwargs.get('locations', list(self.locations))
+        if 'location' in kwargs:
+            location = kwargs.get('location')
+            if location in locations:
+                locations.remove(location)
+            elif location is not None:
+                locations.append(location)
+
         return self.__class__(
             self.session,
             page=0,
@@ -141,7 +157,8 @@ class OccurrenceCollection(Pagination):
             start=start,
             end=end,
             outdated=kwargs.get('outdated', self.outdated),
-            tags=tags
+            tags=tags,
+            locations=locations
         )
 
     @cached_property
@@ -168,10 +185,14 @@ class OccurrenceCollection(Pagination):
     def query(self):
         """ Queries occurrences with the set parameters.
 
-        Finds all occurrences with any of the set tags and within the set
-        start and end date. Start and end date are assumed to be dates only and
-        therefore without a timezone - we search for the given date in the
-        timezone of the occurrence!.
+        Finds occurrences which:
+        * are between start and end date
+        * have any of the tags
+        * have any of the locations (exact word)
+
+        Start and end date are assumed to be dates only and therefore without
+        a timezone - we search for the given date in the timezone of the
+        occurrence.
 
         """
 
@@ -218,6 +239,14 @@ class OccurrenceCollection(Pagination):
 
         if self.tags:
             query = query.filter(Occurrence._tags.has_any(array(self.tags)))
+
+        if self.locations:
+            query = query.filter(
+                or_(*[
+                    Occurrence.location.op('~')(f'\\y{location}\\y')
+                    for location in self.locations
+                ])
+            )
 
         query = query.order_by(Occurrence.start, Occurrence.title)
 

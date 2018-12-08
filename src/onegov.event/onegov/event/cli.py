@@ -406,6 +406,7 @@ def fetch(group_context, source, tag, location):
         onegov-event --select '/veranstaltungen/zug' fetch \
             --source menzingen --source steinhausen
             --tag Sport --tag Konzert
+            --location Zug
 
     """
 
@@ -448,7 +449,7 @@ def fetch(group_context, source, tag, location):
                 if location:
                     query = query.filter(
                         or_(*[
-                            Event.location.ilike(f'%{term}%')
+                            Event.location.op('~')(f'\\y{term}\\y')
                             for term in location
                         ])
                     )
