@@ -8,7 +8,7 @@
 
             <h2>${layout.title}<tal:block tal:condition="vote.keyword"> <small>${vote.keyword}</small></tal:block></h2>
             <table>
-                <!-- General -->
+                <!--! General -->
                 <tr>
                     <th scope="rowgroup" rowspan="10" class="hide-for-small" i18n:translate>General</th>
                     <th i18n:translate>Title</th>
@@ -54,7 +54,7 @@
                     <th scope="row" i18n:translate>Related votes</th>
                     <td></td>
                 </tr>
-                <!-- Submission (popular initiatives) -->
+                <!--! Submission (popular initiatives) -->
                 <tal:block tal:condition="vote._legal_form == 3">
                     <tr>
                         <th scope="rowgroup" rowspan="4" class="hide-for-small" i18n:translate>Submission</th>
@@ -78,7 +78,7 @@
                         <td><a tal:condition="vote.realization" href="${request.link(vote.realization)}">PDF</a></td>
                     </tr>
                 </tal:block>
-                <!-- Pre-parliamentary phase -->
+                <!--! Pre-parliamentary phase -->
                 <tr>
                     <th scope="rowgroup" rowspan="2" class="hide-for-small" i18n:translate>Pre-parliamentary phase</th>
                     <th scope="row" i18n:translate>Federal council message</th>
@@ -88,7 +88,7 @@
                     <th scope="row" i18n:translate>Position of the Federal Council</th>
                     <td>${vote.position_federal_council}</td>
                 </tr>
-                <!-- Parliamentary phase -->
+                <!--! Parliamentary phase -->
                 <tr>
                     <th scope="rowgroup" rowspan="6" class="hide-for-small" i18n:translate>Parliamentary phase</th>
                     <th scope="row" i18n:translate>Procedure number</th>
@@ -128,7 +128,7 @@
                         </tal:block>
                     </td>
                 </tr>
-                <!-- Submission (optional referendum) -->
+                <!--! Submission (optional referendum) -->
                 <tal:block tal:condition="vote._legal_form == 2">
                     <tr>
                         <th scope="rowgroup" rowspan="4" class="hide-for-small" i18n:translate>Submission</th>
@@ -153,7 +153,7 @@
                         <td><a tal:condition="vote.realization" href="${request.link(vote.realization)}">PDF</a></td>
                     </tr>
                 </tal:block>
-                <!-- Voting campaign -->
+                <!--! Voting campaign -->
                 <tr>
                     <th scope="rowgroup" rowspan="4" class="hide-for-small" i18n:translate>Voting campaign</th>
                     <th scope="row" i18n:translate>Voting booklet</th>
@@ -184,7 +184,7 @@
                         </dl>
                     </td>
                 </tr>
-                <!-- Results -->
+                <!--! Results -->
                 <tr>
                     <th scope="rowgroup" rowspan="7" class="hide-for-small" i18n:translate>Vote</th>
                     <th scope="row" i18n:translate>Voting result</th>
