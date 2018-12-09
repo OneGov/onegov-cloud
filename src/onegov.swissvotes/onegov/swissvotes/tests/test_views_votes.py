@@ -5,13 +5,6 @@ from webtest.forms import Upload
 from onegov.swissvotes.models import SwissVote
 
 
-def login(client):
-    login = client.get('/auth/login')
-    login.form['username'] = 'admin@example.org'
-    login.form['password'] = 'hunter2'
-    login.form.submit()
-
-
 @mark.parametrize("file", [
     module_path('onegov.swissvotes', 'tests/fixtures/votes.xlsx'),
 ])
@@ -19,12 +12,13 @@ def test_update_votes(swissvotes_app, file):
     client = Client(swissvotes_app)
     client.get('/locale/de_CH').follow()
 
-    login(client)
+    login = client.get('/auth/login')
+    login.form['username'] = 'admin@example.org'
+    login.form['password'] = 'hunter2'
+    login.form.submit()
 
     with open(file, 'rb') as f:
         content = f.read()
-
-    # todo: fixture kleiner!
 
     # Upload
     manage = client.get('/votes/update')

@@ -1,4 +1,4 @@
-from onegov.core.security import Private
+from onegov.core.security import Personal
 from onegov.core.security import Public
 from onegov.core.templates import render_template
 from onegov.swissvotes import _
@@ -43,7 +43,7 @@ def handle_login(self, request, form):
 @SwissvotesApp.html(
     model=Auth,
     name='logout',
-    permission=Private
+    permission=Personal
 )
 def view_logout(self, request):
     """ Handles the logout requests. """
