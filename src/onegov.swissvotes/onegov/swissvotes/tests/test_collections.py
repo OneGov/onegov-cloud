@@ -1,9 +1,14 @@
+from csv import DictReader
 from datetime import date
 from decimal import Decimal
+from io import BytesIO
+from io import StringIO
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.collections import TranslatablePageCollection
+from onegov.swissvotes.models import SwissVote
 from psycopg2.extras import NumericRange
 from pytest import skip
+from xlrd import open_workbook
 
 
 def test_pages(session):
@@ -432,12 +437,93 @@ def test_votes_query_attachments(session, attachments, postgres_version):
 
 
 def test_votes_order(session):
-    # todo: current_sort_by
-    # todo: current_sort_order
-    # todo: sort_order_by_key
-    # todo: by_order
-    # todo: order_by
-    pass
+    votes = SwissVoteCollection(session)
+
+    for index, title in enumerate(('First', 'Śecond', 'Third'), start=1):
+        votes.add(
+            id=index,
+            bfs_number=Decimal(str(index)),
+            date=date(1990, 6, index),
+            decade=NumericRange(1990, 1999),
+            legislation_number=1,
+            legislation_decade=NumericRange(1990, 1994),
+            title=title,
+            votes_on_same_day=1,
+            _legal_form=index,
+            _result=index,
+            result_people_yeas_p=index / 10
+        )
+
+    assert votes.sort_order_by_key('date') == 'descending'
+    assert votes.sort_order_by_key('legal_form') == 'unsorted'
+    assert votes.sort_order_by_key('result') == 'unsorted'
+    assert votes.sort_order_by_key('result_people_yeas_p') == 'unsorted'
+    assert votes.sort_order_by_key('title') == 'unsorted'
+    assert votes.sort_order_by_key('invalid') == 'unsorted'
+
+    assert votes.current_sort_by == 'date'
+    assert votes.current_sort_order == 'descending'
+    assert 'date' in str(votes.order_by)
+    assert 'DESC' in str(votes.order_by)
+    assert [vote.id for vote in votes.query()] == [3, 2, 1]
+
+    votes = votes.by_order('date')
+    assert votes.current_sort_by == 'date'
+    assert votes.current_sort_order == 'ascending'
+    assert 'date' in str(votes.order_by)
+    assert [vote.id for vote in votes.query()] == [1, 2, 3]
+
+    votes = votes.by_order('legal_form')
+    assert votes.current_sort_by == 'legal_form'
+    assert votes.current_sort_order == 'ascending'
+    assert 'legal_form' in str(votes.order_by)
+    assert [vote.id for vote in votes.query()] == [1, 2, 3]
+
+    votes = votes.by_order('legal_form')
+    assert votes.current_sort_by == 'legal_form'
+    assert votes.current_sort_order == 'descending'
+    assert 'legal_form' in str(votes.order_by)
+    assert 'DESC' in str(votes.order_by)
+    assert [vote.id for vote in votes.query()] == [3, 2, 1]
+
+    votes = votes.by_order('result')
+    assert votes.current_sort_by == 'result'
+    assert votes.current_sort_order == 'ascending'
+    assert 'result' in str(votes.order_by)
+    assert [vote.id for vote in votes.query()] == [1, 2, 3]
+
+    votes = votes.by_order('result')
+    assert votes.current_sort_by == 'result'
+    assert votes.current_sort_order == 'descending'
+    assert 'result' in str(votes.order_by)
+    assert 'DESC' in str(votes.order_by)
+    assert [vote.id for vote in votes.query()] == [3, 2, 1]
+
+    votes = votes.by_order('result_people_yeas_p')
+    assert votes.current_sort_by == 'result_people_yeas_p'
+    assert votes.current_sort_order == 'ascending'
+    assert 'result_people_yeas_p' in str(votes.order_by)
+    assert [vote.id for vote in votes.query()] == [1, 2, 3]
+
+    votes = votes.by_order('result_people_yeas_p')
+    assert votes.current_sort_by == 'result_people_yeas_p'
+    assert votes.current_sort_order == 'descending'
+    assert 'result_people_yeas_p' in str(votes.order_by)
+    assert 'DESC' in str(votes.order_by)
+    assert [vote.id for vote in votes.query()] == [3, 2, 1]
+
+    votes = votes.by_order('title')
+    assert votes.current_sort_by == 'title'
+    assert votes.current_sort_order == 'ascending'
+    assert 'title' in str(votes.order_by)
+    assert [vote.id for vote in votes.query()] == [1, 2, 3]
+
+    votes = votes.by_order('title')
+    assert votes.current_sort_by == 'title'
+    assert votes.current_sort_order == 'descending'
+    assert 'title' in str(votes.order_by)
+    assert 'DESC' in str(votes.order_by)
+    assert [vote.id for vote in votes.query()] == [3, 2, 1]
 
 
 def test_votes_available_descriptors(session):
@@ -503,11 +589,419 @@ def test_votes_available_descriptors(session):
 
 
 def test_votes_update(session):
-    # todo: update
-    pass
+    votes = SwissVoteCollection(session)
+
+    added, updated = votes.update([
+        SwissVote(
+            bfs_number=Decimal('1'),
+            date=date(1990, 6, 1),
+            decade=NumericRange(1990, 1999),
+            legislation_number=1,
+            legislation_decade=NumericRange(1990, 1994),
+            title="First",
+            votes_on_same_day=2,
+            _legal_form=1,
+        ),
+        SwissVote(
+            bfs_number=Decimal('2'),
+            date=date(1990, 6, 1),
+            decade=NumericRange(1990, 1999),
+            legislation_number=2,
+            legislation_decade=NumericRange(1990, 1994),
+            title="Second",
+            votes_on_same_day=2,
+            _legal_form=1,
+        )
+    ])
+    assert added == 2
+    assert updated == 0
+    assert votes.query().count() == 2
+
+    added, updated = votes.update([
+        SwissVote(
+            bfs_number=Decimal('1'),
+            date=date(1990, 6, 1),
+            decade=NumericRange(1990, 1999),
+            legislation_number=1,
+            legislation_decade=NumericRange(1990, 1994),
+            title="First",
+            votes_on_same_day=2,
+            _legal_form=1,
+        )
+    ])
+    assert added == 0
+    assert updated == 0
+
+    added, updated = votes.update([
+        SwissVote(
+            bfs_number=Decimal('1'),
+            date=date(1990, 6, 1),
+            decade=NumericRange(1990, 1999),
+            legislation_number=1,
+            legislation_decade=NumericRange(1990, 1994),
+            title="First vote",
+            votes_on_same_day=2,
+            _legal_form=1,
+        )
+    ])
+    assert added == 0
+    assert updated == 1
+    assert votes.by_bfs_number(Decimal('1')).title == 'First vote'
 
 
 def test_votes_export(session):
-    # todo: export_csv
-    # todo: export_xlsx
-    pass
+    votes = SwissVoteCollection(session)
+    votes.add(
+        bfs_number=Decimal('100.1'),
+        date=date(1990, 6, 2),
+        decade=NumericRange(1990, 1999),
+        legislation_number=4,
+        legislation_decade=NumericRange(1990, 1994),
+        title="Vote",
+        keyword="Keyword",
+        votes_on_same_day=2,
+        _legal_form=1,
+        initiator="Initiator",
+        anneepolitique="anneepolitique",
+        descriptor_1_level_1=Decimal('4'),
+        descriptor_1_level_2=Decimal('4.2'),
+        descriptor_1_level_3=Decimal('4.21'),
+        descriptor_2_level_1=Decimal('10'),
+        descriptor_2_level_2=Decimal('10.3'),
+        descriptor_2_level_3=Decimal('10.35'),
+        descriptor_3_level_1=Decimal('10'),
+        descriptor_3_level_2=Decimal('10.3'),
+        descriptor_3_level_3=Decimal('10.33'),
+        _result=1,
+        result_eligible_voters=2,
+        result_votes_empty=3,
+        result_votes_invalid=4,
+        result_votes_valid=5,
+        result_votes_total=6,
+        result_turnout=Decimal('20.01'),
+        _result_people_accepted=1,
+        result_people_yeas=8,
+        result_people_nays=9,
+        result_people_yeas_p=Decimal('40.01'),
+        _result_cantons_accepted=1,
+        result_cantons_yeas=Decimal('1.5'),
+        result_cantons_nays=Decimal('24.5'),
+        result_cantons_yeas_p=Decimal('60.01'),
+        _department_in_charge=1,
+        procedure_number=Decimal('24.557'),
+        _position_federal_council=1,
+        _position_parliament=1,
+        _position_national_council=1,
+        position_national_council_yeas=10,
+        position_national_council_nays=20,
+        _position_council_of_states=1,
+        position_council_of_states_yeas=30,
+        position_council_of_states_nays=40,
+        duration_federal_assembly=30,
+        duration_post_federal_assembly=31,
+        duration_initative_collection=32,
+        duration_initative_federal_council=33,
+        duration_initative_total=34,
+        duration_referendum_collection=35,
+        duration_referendum_total=36,
+        signatures_valid=40,
+        signatures_invalid=41,
+        _recommendation_fdp=1,
+        _recommendation_cvp=1,
+        _recommendation_sps=1,
+        _recommendation_svp=1,
+        _recommendation_lps=2,
+        _recommendation_ldu=2,
+        _recommendation_evp=2,
+        _recommendation_csp=3,
+        _recommendation_pda=3,
+        _recommendation_poch=3,
+        _recommendation_gps=4,
+        _recommendation_sd=4,
+        _recommendation_rep=4,
+        _recommendation_edu=5,
+        _recommendation_fps=5,
+        _recommendation_lega=5,
+        _recommendation_kvp=66,
+        _recommendation_glp=66,
+        _recommendation_bdp=None,
+        _recommendation_mcg=9999,
+        _recommendation_sav=1,
+        _recommendation_eco=2,
+        _recommendation_sgv=3,
+        _recommendation_sbv_usp=3,
+        _recommendation_sgb=3,
+        _recommendation_travs=3,
+        _recommendation_vsa=9999,
+        national_council_election_year=1990,
+        national_council_share_fdp=Decimal('01.10'),
+        national_council_share_cvp=Decimal('02.10'),
+        national_council_share_sp=Decimal('03.10'),
+        national_council_share_svp=Decimal('04.10'),
+        national_council_share_lps=Decimal('05.10'),
+        national_council_share_ldu=Decimal('06.10'),
+        national_council_share_evp=Decimal('07.10'),
+        national_council_share_csp=Decimal('08.10'),
+        national_council_share_pda=Decimal('09.10'),
+        national_council_share_poch=Decimal('10.10'),
+        national_council_share_gps=Decimal('11.10'),
+        national_council_share_sd=Decimal('12.10'),
+        national_council_share_rep=Decimal('13.10'),
+        national_council_share_edu=Decimal('14.10'),
+        national_council_share_fps=Decimal('15.10'),
+        national_council_share_lega=Decimal('16.10'),
+        national_council_share_kvp=Decimal('17.10'),
+        national_council_share_glp=Decimal('18.10'),
+        national_council_share_bdp=Decimal('19.10'),
+        national_council_share_mcg=Decimal('20.20'),
+        national_council_share_ubrige=Decimal('21.20'),
+        national_council_share_yeas=Decimal('22.20'),
+        national_council_share_nays=Decimal('23.20'),
+        national_council_share_neutral=Decimal('24.20'),
+        national_council_share_vague=Decimal('25.10'),
+    )
+
+    file = StringIO()
+    votes.export_csv(file)
+    file.seek(0)
+    rows = list(DictReader(file))
+    assert len(rows) == 1
+    csv = dict(rows[0])
+    assert csv == {
+        'anr': '100,1',
+        'datum': '02.06.1990',
+        'legislatur': '4',
+        'legisjahr': '1990-1994',
+        'jahrzehnt': '1990-1999',
+        'titel': 'Vote',
+        'stichwort': 'Keyword',
+        'anzahl': '2',
+        'rechtsform': '1',
+        'd1e1': '4',
+        'd1e2': '4,2',
+        'd1e3': '4,21',
+        'd2e1': '10',
+        'd2e2': '10,3',
+        'd2e3': '10,35',
+        'd3e1': '10',
+        'd3e2': '10,3',
+        'd3e3': '10,33',
+        'volk': '1',
+        'stand': '1',
+        'annahme': '1',
+        'berecht': '2',
+        'stimmen': '6',
+        'bet': '20,01',
+        'leer': '3',
+        'ungultig': '4',
+        'gultig': '5',
+        'volkja': '8',
+        'volknein': '9',
+        'volkja-proz': '40,01',
+        'kt-ja': '1,5',
+        'kt-nein': '24,5',
+        'ktjaproz': '60,01',
+        'dep': '1',
+        'gesch_nr': '24,557',
+        'br-pos': '1',
+        'bv-pos': '1',
+        'nr-pos': '1',
+        'nrja': '10',
+        'nrnein': '20',
+        'sr-pos': '1',
+        'srja': '30',
+        'srnein': '40',
+        'dauer_bv': '30',
+        'dauer_abst': '31',
+        'i-dauer_samm': '32',
+        'i-dauer_br': '33',
+        'i-dauer_tot': '34',
+        'fr-dauer_samm': '35',
+        'fr-dauer_tot': '36',
+        'unter_g': '40',
+        'unter_u': '41',
+        'p-fdp': '1',
+        'p-cvp': '1',
+        'p-sps': '1',
+        'p-svp': '1',
+        'p-lps': '2',
+        'p-ldu': '2',
+        'p-evp': '2',
+        'p-ucsp': '3',
+        'p-pda': '3',
+        'p-poch': '3',
+        'p-gps': '4',
+        'p-sd': '4',
+        'p-rep': '4',
+        'p-edu': '5',
+        'p-fps': '5',
+        'p-lega': '5',
+        'p-kvp': '66',
+        'p-glp': '66',
+        'p-bdp': '.',
+        'p-mcg': '9999',
+        'zsa': '1',
+        'eco': '2',
+        'sgv': '3',
+        'sbv': '3',
+        'sgb': '3',
+        'cng-travs': '3',
+        'vsa': '9999',
+        'nr-wahl': '1990',
+        'w-fdp': '1,1',
+        'w-cvp': '2,1',
+        'w-sp': '3,1',
+        'w-svp': '4,1',
+        'w-lps': '5,1',
+        'w-ldu': '6,1',
+        'w-evp': '7,1',
+        'w-csp': '8,1',
+        'w-pda': '9,1',
+        'w-poch': '10,1',
+        'w-gps': '11,1',
+        'w-sd': '12,1',
+        'w-rep': '13,1',
+        'w-edu': '14,1',
+        'w-fps': '15,1',
+        'w-lega': '16,1',
+        'w-kvp': '17,1',
+        'w-glp': '18,1',
+        'w-bdp': '19,1',
+        'w-mcg': '20,2',
+        'w-ubrige': '21,2',
+        'ja-lager': '22,2',
+        'nein-lager': '23,2',
+        'neutral': '24,2',
+        'unbestimmt': '25,1',
+        'urheber': 'Initiator',
+        'anneepolitique': 'anneepolitique'
+    }
+
+    file = BytesIO()
+    votes.export_xlsx(file)
+    file.seek(0)
+    workbook = open_workbook(file_contents=file.read())
+    sheet = workbook.sheet_by_index(0)
+    xlsx = dict(
+        zip(
+            [cell.value for cell in sheet.row(0)],
+            [cell.value for cell in sheet.row(1)]
+        )
+    )
+    xlsx = dict(
+        zip(
+            [cell.value for cell in sheet.row(0)],
+            [cell.value for cell in sheet.row(1)]
+        )
+    )
+    assert xlsx == {
+        'anr': 100.1,
+        'datum': 33026.0,
+        'legislatur': 4.0,
+        'legisjahr': '1990-1994',
+        'jahrzehnt': '1990-1999',
+        'titel': 'Vote',
+        'stichwort': 'Keyword',
+        'anzahl': 2.0,
+        'rechtsform': 1.0,
+        'd1e1': 4.0,
+        'd1e2': 4.2,
+        'd1e3': 4.21,
+        'd2e1': 10.0,
+        'd2e2': 10.3,
+        'd2e3': 10.35,
+        'd3e1': 10.0,
+        'd3e2': 10.3,
+        'd3e3': 10.33,
+        'volk': 1.0,
+        'stand': 1.0,
+        'annahme': 1.0,
+        'berecht': 2.0,
+        'stimmen': 6.0,
+        'bet': 20.01,
+        'leer': 3.0,
+        'ungultig': 4.0,
+        'gultig': 5.0,
+        'volkja': 8.0,
+        'volknein': 9.0,
+        'volkja-proz': 40.01,
+        'kt-ja': 1.5,
+        'kt-nein': 24.5,
+        'ktjaproz': 60.01,
+        'dep': 1.0,
+        'gesch_nr': 24.557,
+        'br-pos': 1.0,
+        'bv-pos': 1.0,
+        'nr-pos': 1.0,
+        'nrja': 10.0,
+        'nrnein': 20.0,
+        'sr-pos': 1.0,
+        'srja': 30.0,
+        'srnein': 40.0,
+        'dauer_bv': 30.0,
+        'dauer_abst': 31.0,
+        'i-dauer_samm': 32.0,
+        'i-dauer_br': 33.0,
+        'i-dauer_tot': 34.0,
+        'fr-dauer_samm': 35.0,
+        'fr-dauer_tot': 36.0,
+        'unter_g': 40.0,
+        'unter_u': 41.0,
+        'p-fdp': 1.0,
+        'p-cvp': 1.0,
+        'p-sps': 1.0,
+        'p-svp': 1.0,
+        'p-lps': 2.0,
+        'p-ldu': 2.0,
+        'p-evp': 2.0,
+        'p-ucsp': 3.0,
+        'p-pda': 3.0,
+        'p-poch': 3.0,
+        'p-gps': 4.0,
+        'p-sd': 4.0,
+        'p-rep': 4.0,
+        'p-edu': 5.0,
+        'p-fps': 5.0,
+        'p-lega': 5.0,
+        'p-kvp': 66.0,
+        'p-glp': 66.0,
+        'p-bdp': '',
+        'p-mcg': 9999.0,
+        'zsa': 1.0,
+        'eco': 2.0,
+        'sgv': 3.0,
+        'sbv': 3.0,
+        'sgb': 3.0,
+        'cng-travs': 3.0,
+        'vsa': 9999.0,
+        'nr-wahl': 1990.0,
+        'w-fdp': 1.1,
+        'w-cvp': 2.1,
+        'w-sp': 3.1,
+        'w-svp': 4.1,
+        'w-lps': 5.1,
+        'w-ldu': 6.1,
+        'w-evp': 7.1,
+        'w-csp': 8.1,
+        'w-pda': 9.1,
+        'w-poch': 10.1,
+        'w-gps': 11.1,
+        'w-sd': 12.1,
+        'w-rep': 13.1,
+        'w-edu': 14.1,
+        'w-fps': 15.1,
+        'w-lega': 16.1,
+        'w-kvp': 17.1,
+        'w-glp': 18.1,
+        'w-bdp': 19.1,
+        'w-mcg': 20.2,
+        'w-ubrige': 21.2,
+        'ja-lager': 22.2,
+        'nein-lager': 23.2,
+        'neutral': 24.2,
+        'unbestimmt': 25.1,
+        'urheber': 'Initiator',
+        'anneepolitique': 'anneepolitique',
+    }
+
+    assert csv.keys() == xlsx.keys()
