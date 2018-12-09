@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.16 (2018-12-09)
+~~~~~~~~~~~~~~~~~~~
 
 - Reorganizes the vote details view.
   [msom]
