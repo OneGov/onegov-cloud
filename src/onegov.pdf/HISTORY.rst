@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.5.1 (2018-12-09)
+~~~~~~~~~~~~~~~~~~~~~
 
 - Updates requirements.
   [msom]
