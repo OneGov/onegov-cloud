@@ -40,7 +40,7 @@ setup(
         'pdfdocument',
         'pdfrw',
         'reportlab',
-        'svglib>=0.9.0b'
+        'svglib>=0.9.0'
     ],
     extras_require=dict(
         test=[
