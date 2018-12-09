@@ -4,6 +4,9 @@ Changelog
 - Reorganizes the vote details view.
   [msom]
 
+- Makes groups of vote details collapsible.
+  [msom]
+
 0.0.15 (2018-11-25)
 ~~~~~~~~~~~~~~~~~~~
 

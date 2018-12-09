@@ -23,6 +23,9 @@ var initSearchFilters = function() {
 };
 initSearchFilters();
 
+$('table.collapsible').click(function() {
+    $(this).toggleClass('collapsed').children('.formfields').toggle();
+});
 
 // Add backend dropdown actions
 $('ul.actions').each(function(index, element) {

@@ -20,9 +20,22 @@ table {
     td,
     th {
         border-bottom: 1px solid $table-border-color;
+
+        &.column-25 {
+            width: 25%;
+        }
+
+        &.column-30 {
+            width: 30%;
+        }
+    }
+
+    thead {
+        background-color: $table-border-color;
     }
 
     th {
+
         a {
             color: $black;
         }
@@ -38,17 +51,8 @@ table {
         &.sort-descending a {
             @include sort($descending);
         }
-
-        &.column-25 {
-            width: 25%;
-        }
-
     }
 
-    th[rowspan] {
-        background: $table-even-row-bg;
-        border-right: solid $table-border-size $table-border-color;
-    }
 
     dl {
         font-size: .875rem;
@@ -72,6 +76,30 @@ table {
             }
         }
     }
+
+    &.collapsible {
+        thead {
+            cursor: pointer;
+
+            th::after {
+                @include icon('\f077');
+                font-size: .75rem;
+                margin-left: .75rem;
+                margin-right: .75rem;
+            }
+        }
+
+        &.collapsed {
+            thead th::after {
+                @include icon('\f078');
+            }
+
+            tbody {
+                display: none;
+            }
+        }
+    }
+
 }
 
 .tablesorter {
