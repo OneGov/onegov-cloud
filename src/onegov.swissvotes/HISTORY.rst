@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.17 (2018-12-09)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes data import.
   [msom]
