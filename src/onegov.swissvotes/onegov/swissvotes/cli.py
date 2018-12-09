@@ -1,6 +1,8 @@
 import click
 import os
 
+from decimal import Decimal
+from decimal import InvalidOperation
 from onegov.core.cli import abort
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
@@ -10,7 +12,6 @@ from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import SwissVoteFile
 from sqlalchemy import create_engine
-
 
 cli = command_group()
 
@@ -110,8 +111,8 @@ def import_data(group_context, folder):
                         continue
 
                     try:
-                        bfs_number = float(name.replace('.pdf', ''))
-                    except ValueError:
+                        bfs_number = Decimal(name.replace('.pdf', ''))
+                    except InvalidOperation:
                         click.secho(
                             f"Invalid name: {attachment}/{locale}/{name}",
                             fg='red'
