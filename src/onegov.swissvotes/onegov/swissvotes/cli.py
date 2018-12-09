@@ -106,7 +106,7 @@ def import_data(group_context, folder):
                 )
             }
             for locale, locale_folder in locales.items():
-                for name in os.listdir(locale_folder):
+                for name in sorted(os.listdir(locale_folder)):
                     if not name.endswith('.pdf'):
                         continue
 
