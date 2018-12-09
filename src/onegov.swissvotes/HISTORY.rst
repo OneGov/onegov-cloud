@@ -4,6 +4,9 @@ Changelog
 - Import data files in alphabetical order.
   [msom]
 
+- Fixes XLSX import for quasi-empty string cells.
+  [msom]
+
 0.0.17 (2018-12-09)
 ~~~~~~~~~~~~~~~~~~~
 

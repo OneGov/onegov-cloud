@@ -193,6 +193,7 @@ class SwissvoteDatasetField(UploadField):
                         value = None
                     elif type_ == 'TEXT':
                         value = str(cell.value)
+                        value = '' if value == '.' else value
                     elif type_ == 'DATE':
                         if isinstance(cell.value, str):
                             value = parse(cell.value, dayfirst=True).date()
