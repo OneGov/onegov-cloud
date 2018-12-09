@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-11-19 14:59+0100\n"
+"POT-Creation-Date: 2018-12-09 13:43+0100\n"
 "PO-Revision-Date: 2018-09-18 15:04+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: English\n"
@@ -1202,38 +1202,47 @@ msgstr "Keyword"
 msgid "Vote date"
 msgstr "Vote date"
 
-msgid "BFS number"
-msgstr "BFS number"
+msgid "Brief description Swissvotes"
+msgstr ""
 
-msgid "Année politique Suisse"
-msgstr "Année politique Suisse"
+msgid "Description Année Politique Suisse"
+msgstr ""
 
 msgid "Link"
 msgstr "Link"
 
+msgid "Vote number"
+msgstr ""
+
+msgid "Related votes"
+msgstr ""
+
 msgid "Submission"
 msgstr "Submission"
-
-msgid "Signatures"
-msgstr "Signatures"
 
 msgid "Initiator"
 msgstr "Initiator"
 
+msgid "Signatures"
+msgstr "Signatures"
+
+msgid "Collection duration"
+msgstr ""
+
+msgid "Days"
+msgstr ""
+
 msgid "Pre-parliamentary phase"
 msgstr "Pre-parliamentary phase"
-
-msgid "Department in charge"
-msgstr "Department in charge"
 
 msgid "Parliamentary phase"
 msgstr "Parliamentary phase"
 
-msgid "Legislation"
-msgstr "Legislation"
-
 msgid "Procedure number"
 msgstr "Procedure number"
+
+msgid "Duration in Parliament"
+msgstr ""
 
 msgid "Parliament's position"
 msgstr "Parliament's position"
@@ -1241,14 +1250,14 @@ msgstr "Parliament's position"
 msgid "Recommendations of the Parties"
 msgstr "Recommendations of the Parties"
 
-msgid "Recommendations of the Associations"
-msgstr "Recommendations of the Associations"
-
-msgid "Cumulative electoral strength"
-msgstr "Cumulative electoral strength"
+msgid "Voter share of yes camp"
+msgstr ""
 
 msgid "Details"
 msgstr "Details"
+
+msgid "Further Recommendations"
+msgstr ""
 
 msgid "Vote"
 msgstr "Vote"
@@ -1264,6 +1273,12 @@ msgstr "Cantons"
 
 msgid "Turnout"
 msgstr "Turnout"
+
+msgid "Result by canton, district and municipality"
+msgstr ""
+
+msgid "Interactive map"
+msgstr ""
 
 msgid "You are here"
 msgstr "You are here"

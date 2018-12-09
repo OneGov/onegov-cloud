@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-19 14:59+0100\n"
-"PO-Revision-Date: 2018-11-19 14:59+0100\n"
+"POT-Creation-Date: 2018-12-09 13:43+0100\n"
+"PO-Revision-Date: 2018-12-09 13:44+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -42,7 +42,7 @@ msgid "Voting text"
 msgstr "Abstimmungstext"
 
 msgid "Federal council message"
-msgstr "Botschaft des Bundesrates"
+msgstr "Botschaft des Bundesrats"
 
 msgid "Parliamentary debate"
 msgstr "Parlamentsberatung"
@@ -78,16 +78,16 @@ msgid "Full Text"
 msgstr "Volltext"
 
 msgid "Position of the Federal Council"
-msgstr "Position des Bundesrates"
+msgstr "Position des Bundesrats"
 
 msgid "Other Filters"
 msgstr "Weitere Filter"
 
 msgid "Position of the National Council"
-msgstr "Position des Nationalrates"
+msgstr "Position des Nationalrats"
 
 msgid "Position of the Council of States"
-msgstr "Position des Ständerates"
+msgstr "Position des Ständerats"
 
 msgid "Yes"
 msgstr "Ja"
@@ -1204,38 +1204,47 @@ msgstr "Stichwort"
 msgid "Vote date"
 msgstr "Abstimmungsdatum"
 
-msgid "BFS number"
-msgstr "BFS Nummer"
+msgid "Brief description Swissvotes"
+msgstr "Kurzbeschreibung Swissvotes"
 
-msgid "Année politique Suisse"
-msgstr "Année politique Suisse"
+msgid "Description Année Politique Suisse"
+msgstr "Beschreibung Année Politique Suisse"
 
 msgid "Link"
 msgstr "Link"
 
+msgid "Vote number"
+msgstr "Abstimmungsnummer"
+
+msgid "Related votes"
+msgstr "Verwandte Vorlagen "
+
 msgid "Submission"
 msgstr "Einreichung"
-
-msgid "Signatures"
-msgstr "Unterschriften"
 
 msgid "Initiator"
 msgstr "Urheber"
 
+msgid "Signatures"
+msgstr "Unterschriften"
+
+msgid "Collection duration"
+msgstr "Sammeldauer"
+
+msgid "Days"
+msgstr "Tage"
+
 msgid "Pre-parliamentary phase"
 msgstr "Vorparlamentarische Phase"
-
-msgid "Department in charge"
-msgstr "Federführendes Departement"
 
 msgid "Parliamentary phase"
 msgstr "Im Parlament"
 
-msgid "Legislation"
-msgstr "Legislatur"
-
 msgid "Procedure number"
 msgstr "Geschäftsnummer"
+
+msgid "Duration in Parliament"
+msgstr "Behandlungsdauer Parlament"
 
 msgid "Parliament's position"
 msgstr "Position des Parlaments"
@@ -1243,14 +1252,14 @@ msgstr "Position des Parlaments"
 msgid "Recommendations of the Parties"
 msgstr "Parteiparolen"
 
-msgid "Recommendations of the Associations"
-msgstr "Verbandsparolen"
-
-msgid "Cumulative electoral strength"
-msgstr "Kumulierter Wähleranteil"
+msgid "Voter share of yes camp"
+msgstr "Wähleranteil des Ja-Lagers"
 
 msgid "Details"
 msgstr "Details"
+
+msgid "Further Recommendations"
+msgstr "Weitere Parolen"
 
 msgid "Vote"
 msgstr "Abstimmung"
@@ -1266,6 +1275,12 @@ msgstr "Stände"
 
 msgid "Turnout"
 msgstr "Stimmbeteiligung"
+
+msgid "Result by canton, district and municipality"
+msgstr "Abstimmungsergebnis pro Kanton, Bezirk und Gemeinde"
+
+msgid "Interactive map"
+msgstr "Interaktive Karte"
 
 msgid "You are here"
 msgstr "Aktuelle Seite"
