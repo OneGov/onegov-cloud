@@ -33,7 +33,8 @@ class DefaultLayout(ChameleonLayout):
 
         for page in ('dataset', 'about', 'contact'):
             page = self.pages.by_id(page)
-            result.append((page.title, self.request.link(page)))
+            if page:
+                result.append((page.title, self.request.link(page)))
 
         return result
 
@@ -60,12 +61,16 @@ class DefaultLayout(ChameleonLayout):
     @cached_property
     def disclaimer_link(self):
         page = self.pages.by_id('disclaimer')
-        return page.title, self.request.link(page)
+        if page:
+            return page.title, self.request.link(page)
+        return '', ''
 
     @cached_property
     def imprint_link(self):
         page = self.pages.by_id('imprint')
-        return page.title, self.request.link(page)
+        if page:
+            return page.title, self.request.link(page)
+        return '', ''
 
     @cached_property
     def votes_link(self):

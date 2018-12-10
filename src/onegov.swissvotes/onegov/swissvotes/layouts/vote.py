@@ -12,7 +12,7 @@ class VoteLayout(DefaultLayout):
     @cached_property
     def editbar_links(self):
         if not self.request.has_role('admin', 'editor'):
-            return
+            return []
         return [
             (
                 _("Manage attachments"),
