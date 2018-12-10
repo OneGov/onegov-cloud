@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves tag input handling.
+  [href]
+
 0.46.0 (2018-12-08)
 ~~~~~~~~~~~~~~~~~~~
 

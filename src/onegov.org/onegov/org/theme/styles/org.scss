@@ -4457,15 +4457,18 @@ h2 + div.timeline {
     @include form-element;
     height: auto;
     max-width: 100%;
+    padding-bottom: calc(.5rem - 6px);
 
     .tag {
         background: $silver;
         border-radius: 2px;
         color: $body-font-color;
         cursor: pointer;
-        display: inline-block;
+        display: inline-flex;
+        flex-wrap: wrap;
         font: inherit;
-        margin-right: 8px;
+        margin: 0 6px 6px 0;
+
         outline: 1px solid $gainsboro;
         padding: 0 4px;
         transition: all 100ms ease;
@@ -4489,12 +4492,14 @@ h2 + div.timeline {
         border: 0 !important;
         box-shadow: none !important;
         display: inline-block !important;
+        flex: 1;
         font: inherit !important;
         font-size: 100% !important;
         height: auto !important;
         margin: 0 !important;
         outline: none !important;
-        padding: 0 !important;
+        padding: 0 6px 6px 0 !important;
+        width: auto;
     }
 
     .selected ~ input {
