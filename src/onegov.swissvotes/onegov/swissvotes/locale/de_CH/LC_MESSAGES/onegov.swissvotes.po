@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-09 13:43+0100\n"
-"PO-Revision-Date: 2018-12-09 13:44+0100\n"
+"POT-Creation-Date: 2018-12-10 08:54+0100\n"
+"PO-Revision-Date: 2018-12-10 08:54+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -365,6 +365,9 @@ msgstr "Privatrecht"
 msgid "d-3-165"
 msgstr "Strafrecht"
 
+msgid "d-3-166"
+msgstr "Datenschutz"
+
 msgid "d-3-211"
 msgstr "Neutralität"
 
@@ -445,6 +448,9 @@ msgstr "Preispolitik"
 
 msgid "d-3-415"
 msgstr "Konsumentenschutz"
+
+msgid "d-3-416"
+msgstr "Gesellschaftsrecht"
 
 msgid "d-3-421"
 msgstr "Arbeitsbedingungen"

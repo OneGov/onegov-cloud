@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds descriptors.
+  [msom]
+
 - Fixes the click area of collapsible tables.
   [msom]
 
