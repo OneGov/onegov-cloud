@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.19 (2018-12-10)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds descriptors.
   [msom]
