@@ -23,6 +23,7 @@ var initSearchFilters = function() {
 };
 initSearchFilters();
 
+// Make the vote detail tables collapsible
 $('table.collapsible thead').click(function() {
     $(this).parent('table').toggleClass('collapsed');
 });
