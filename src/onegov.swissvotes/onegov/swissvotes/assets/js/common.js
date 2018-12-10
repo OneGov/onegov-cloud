@@ -23,8 +23,8 @@ var initSearchFilters = function() {
 };
 initSearchFilters();
 
-$('table.collapsible').click(function() {
-    $(this).toggleClass('collapsed').children('.formfields').toggle();
+$('table.collapsible thead').click(function() {
+    $(this).parent('table').toggleClass('collapsed');
 });
 
 // Add backend dropdown actions

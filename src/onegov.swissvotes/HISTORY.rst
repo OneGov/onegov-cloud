@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes the click area of collapsible tables.
+  [msom]
+
 0.0.18 (2018-12-09)
 ~~~~~~~~~~~~~~~~~~~
 
