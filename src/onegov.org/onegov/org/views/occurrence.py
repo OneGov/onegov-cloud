@@ -4,7 +4,7 @@ from collections import OrderedDict
 from datetime import date
 from morepath.request import Response
 from onegov.core.security import Public, Private
-from onegov.core.utils import linkify
+from onegov.core.utils import linkify, normalize_for_url
 from onegov.event import Occurrence, OccurrenceCollection
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
@@ -40,7 +40,10 @@ def view_occurrences(self, request):
             text=location,
             url=request.link(self.for_filter(location=location)),
             active=location in self.locations and 'active' or ''
-        ) for location in request.app.org.event_locations
+        ) for location in sorted(
+            request.app.org.event_locations,
+            key=lambda l: normalize_for_url(l)
+        )
     ]
 
     ranges = [

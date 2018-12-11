@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Sorts location filters in events by name.
+  [href]
+
 0.46.1 (2018-12-11)
 ~~~~~~~~~~~~~~~~~~~
 
