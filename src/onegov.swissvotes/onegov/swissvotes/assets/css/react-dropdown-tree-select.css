@@ -24,8 +24,9 @@
 
 .react-dropdown-tree-select .node>label {
     cursor: pointer;
-    margin-left: 2px;
     display: inline-block;
+    line-height: 1em;
+    height: 1em;
 }
 
 .react-dropdown-tree-select .tag-list {
@@ -75,6 +76,8 @@
     font-weight: bold;
     display: inline-block;
     width: 1.5em;
+    line-height: 1em;
+    height: 1em;
 }
 
 .react-dropdown-tree-select .toggle:after {
@@ -97,7 +100,8 @@
 
 .react-dropdown-tree-select .checkbox-item {
     vertical-align: middle;
-    margin: 0 4px 0 0;
+    margin: 2px 0.5em 0 0 !important;
+    height: 1em;
 }
 
 .react-dropdown-tree-select .checkbox-item.simple-select {

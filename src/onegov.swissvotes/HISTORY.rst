@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Visually aligns the multiple tree select widget options.
+  [msom]
+
 0.0.21 (2018-12-11)
 ~~~~~~~~~~~~~~~~~~~
 
