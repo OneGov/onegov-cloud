@@ -1,8 +1,10 @@
+import secrets
+
 from datetime import timedelta
-from onegov.core.cache import lru_cache
 from libres import new_scheduler
 from libres.db.models import Allocation
 from libres.db.models.base import ORMBase
+from onegov.core.cache import lru_cache
 from onegov.core.orm import ModelBase
 from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
@@ -87,6 +89,9 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
 
     #: reservation deadline (e.g. None, (5, 'd'), (24, 'h'))
     deadline = content_property()
+
+    #: secret token to get anonymous access to calendar data
+    access_token = content_property()
 
     __mapper_args__ = {
         "polymorphic_on": 'type'
@@ -215,3 +220,6 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
 
         deadline = locals()[f'deadline_using_{unit}']()
         return deadline <= utcnow()
+
+    def renew_access_token(self):
+        self.access_token = secrets.token_hex(16)

@@ -76,3 +76,11 @@ def set_defaults_on_existing_reservation_resourcd_objects(context):
             resource.price_per_hour = 0
             resource.price_per_item = 0
             resource.currency = 'CHF'
+
+
+@upgrade_task('Add access_token to existing resources')
+def add_access_token_to_existing_resources(context):
+
+    if run_upgrades(context):
+        for resource in context.session.query(Resource):
+            resource.renew_access_token()

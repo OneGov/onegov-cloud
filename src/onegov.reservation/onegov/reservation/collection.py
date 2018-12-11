@@ -36,6 +36,7 @@ class ResourceCollection(object):
         resource.content = content
         resource.definition = definition
         resource.group = group
+        resource.renew_access_token()
 
         self.session.add(resource)
         self.session.flush()
