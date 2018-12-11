@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.7.0 (2018-12-11)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds an access token to the resource.
   [href]
 
