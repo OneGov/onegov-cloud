@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.20 (2018-12-11)
+~~~~~~~~~~~~~~~~~~~
 
 - Uses a multiple tree select widget for policy descriptors.
   [msom]
