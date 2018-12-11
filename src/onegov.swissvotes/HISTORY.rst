@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.21 (2018-12-11)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds more margins to the multiple tree select widget.
   [msom]
