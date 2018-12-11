@@ -71,7 +71,10 @@
 
 .react-dropdown-tree-select .toggle {
     white-space: pre;
-    margin-right: 4px
+    font-style: normal;
+    font-weight: bold;
+    display: inline-block;
+    width: 1.5em;
 }
 
 .react-dropdown-tree-select .toggle:after {
