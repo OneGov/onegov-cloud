@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-10 08:54+0100\n"
-"PO-Revision-Date: 2018-12-10 08:54+0100\n"
+"POT-Creation-Date: 2018-12-11 16:16+0100\n"
+"PO-Revision-Date: 2018-12-11 16:14+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -97,6 +97,24 @@ msgstr "Nein"
 
 msgid "Without / Unknown"
 msgstr "Ohne / Unbekannt"
+
+msgid "Voter strengths"
+msgstr "Wählerstärken"
+
+msgid "Manage attachments"
+msgstr "Anhänge verwalten"
+
+msgid "Delete vote"
+msgstr "Abstimmung löschen"
+
+msgid "Votes"
+msgstr "Abstimmungen"
+
+msgid "Update dataset"
+msgstr "Datensatz aktualisieren"
+
+msgid "Delete all votes"
+msgstr "Alle Abstimmungen löschen"
 
 msgid "d-1-1"
 msgstr "Staatsordnung"
@@ -1152,29 +1170,11 @@ msgstr "Vereinigung schweizerischer Angestelltenverbände"
 msgid "Edit page"
 msgstr "Seite bearbeiten"
 
-msgid "Votes"
-msgstr "Abstimmungen"
-
-msgid "Update dataset"
-msgstr "Datensatz aktualisieren"
-
-msgid "Delete all votes"
-msgstr "Alle Abstimmungen löschen"
-
 msgid "Download dataset (CSV)"
 msgstr "Datensatz herunterladen (CSV)"
 
 msgid "Download dataset (XLSX)"
 msgstr "Datensatz herunterladen (XLSX)"
-
-msgid "Voter strengths"
-msgstr "Wählerstärken"
-
-msgid "Manage attachments"
-msgstr "Anhänge verwalten"
-
-msgid "Delete vote"
-msgstr "Abstimmung löschen"
 
 msgid "Voting campaign"
 msgstr "Abstimmungskampf"
@@ -1363,6 +1363,12 @@ msgstr "Einige Zellen enthalten ungültige Werte: ${errors}."
 
 msgid "Not a valid XLSX file."
 msgstr "Keine gültige XLSX-Datei."
+
+msgid "Select Some Options"
+msgstr "Optionen auswählen"
+
+msgid "No results match"
+msgstr "Keine Ergebnisse gefunden"
 
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"

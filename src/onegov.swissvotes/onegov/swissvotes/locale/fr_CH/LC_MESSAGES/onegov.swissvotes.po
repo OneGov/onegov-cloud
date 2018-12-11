@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-10 08:54+0100\n"
+"POT-Creation-Date: 2018-12-11 16:16+0100\n"
 "PO-Revision-Date: 2018-09-18 11:29+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -96,6 +96,24 @@ msgid "No"
 msgstr ""
 
 msgid "Without / Unknown"
+msgstr ""
+
+msgid "Voter strengths"
+msgstr ""
+
+msgid "Manage attachments"
+msgstr ""
+
+msgid "Delete vote"
+msgstr "Supprimer la votation"
+
+msgid "Votes"
+msgstr "Votations"
+
+msgid "Update dataset"
+msgstr ""
+
+msgid "Delete all votes"
 msgstr ""
 
 msgid "d-1-1"
@@ -1156,29 +1174,11 @@ msgstr "Fédération des sociétés suisses d'employés"
 msgid "Edit page"
 msgstr ""
 
-msgid "Votes"
-msgstr "Votations"
-
-msgid "Update dataset"
-msgstr ""
-
-msgid "Delete all votes"
-msgstr ""
-
 msgid "Download dataset (CSV)"
 msgstr ""
 
 msgid "Download dataset (XLSX)"
 msgstr ""
-
-msgid "Voter strengths"
-msgstr ""
-
-msgid "Manage attachments"
-msgstr ""
-
-msgid "Delete vote"
-msgstr "Supprimer la votation"
 
 msgid "Voting campaign"
 msgstr ""
@@ -1367,6 +1367,12 @@ msgid "Some cells contain invalid values: ${errors}."
 msgstr ""
 
 msgid "Not a valid XLSX file."
+msgstr ""
+
+msgid "Select Some Options"
+msgstr ""
+
+msgid "No results match"
 msgstr ""
 
 msgid "Wrong username or password"

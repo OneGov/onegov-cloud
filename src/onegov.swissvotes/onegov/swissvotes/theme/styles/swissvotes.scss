@@ -128,14 +128,13 @@ h2 small {
     Votes
 */
 .votes {
-    .chosen-container .chosen-results li,
     select option {
         &.level-2 {
-            padding-left: .5em;
+            padding-left: 1em;
         }
 
         &.level-3 {
-            padding-left: 1em;
+            padding-left: 2em;
         }
     }
 }

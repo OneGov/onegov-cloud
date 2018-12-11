@@ -116,9 +116,14 @@ def get_frameworks_asset():
     yield 'tablesaw-init.js'
     yield 'foundation.js'
     yield 'underscore.js'
+    yield 'react.js'
+    yield 'react-dom.js'
+    yield 'react-dropdown-tree-select.js'
+    yield 'react-dropdown-tree-select.css'
     yield 'form_dependencies.js'
 
 
 @SwissvotesApp.webasset('common')
 def get_common_asset():
     yield 'common.js'
+    yield 'policy-selector.jsx'

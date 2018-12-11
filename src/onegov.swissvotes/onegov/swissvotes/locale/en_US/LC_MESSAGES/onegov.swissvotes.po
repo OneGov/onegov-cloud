@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-12-10 08:54+0100\n"
+"POT-Creation-Date: 2018-12-11 16:16+0100\n"
 "PO-Revision-Date: 2018-09-18 15:04+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: English\n"
@@ -99,6 +99,24 @@ msgstr ""
 
 msgid "Without / Unknown"
 msgstr ""
+
+msgid "Voter strengths"
+msgstr "Voter strengths"
+
+msgid "Manage attachments"
+msgstr "Manage attachments"
+
+msgid "Delete vote"
+msgstr "Delete vote"
+
+msgid "Votes"
+msgstr "Votes"
+
+msgid "Update dataset"
+msgstr "Update dataset"
+
+msgid "Delete all votes"
+msgstr "Delete all votes"
 
 msgid "d-1-1"
 msgstr "d-1-1"
@@ -1151,29 +1169,11 @@ msgstr "actor-vsa-label"
 msgid "Edit page"
 msgstr "Edit page"
 
-msgid "Votes"
-msgstr "Votes"
-
-msgid "Update dataset"
-msgstr "Update dataset"
-
-msgid "Delete all votes"
-msgstr "Delete all votes"
-
 msgid "Download dataset (CSV)"
 msgstr "Download dataset (CSV)"
 
 msgid "Download dataset (XLSX)"
 msgstr "Download dataset (XLSX)"
-
-msgid "Voter strengths"
-msgstr "Voter strengths"
-
-msgid "Manage attachments"
-msgstr "Manage attachments"
-
-msgid "Delete vote"
-msgstr "Delete vote"
 
 msgid "Voting campaign"
 msgstr "Voting campaign"
@@ -1358,6 +1358,12 @@ msgid "Some cells contain invalid values: ${errors}."
 msgstr ""
 
 msgid "Not a valid XLSX file."
+msgstr ""
+
+msgid "Select Some Options"
+msgstr ""
+
+msgid "No results match"
 msgstr ""
 
 msgid "Wrong username or password"

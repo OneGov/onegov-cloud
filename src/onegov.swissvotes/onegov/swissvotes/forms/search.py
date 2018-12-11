@@ -85,24 +85,21 @@ class SearchForm(Form):
         votes = SwissVoteCollection(self.request.session)
         available = votes.available_descriptors
 
-        def add_choice(value, label, level):
-            self.policy_area.choices.append(
-                (value, '‧' * level + ' ' + self.request.translate(label))
-            )
+        def serialize(item):
+            children = [serialize(child) for child in item.children]
+            children = [child for child in children if child]
+            if not item.value:
+                return children
+            value = PolicyArea(item.path).descriptor_decimal
+            if not children and not any((value in s for s in available)):
+                return None
+            return {
+                "label": self.request.translate(item.label),
+                "value": '.'.join([str(x) for x in item.path]),
+                "children": children
+            }
 
-        self.policy_area.choices = []
-        for key_1, value_1 in POLICY_AREA.items():
-            area = PolicyArea([key_1])
-            if area.descriptor_decimal in available[0]:
-                add_choice(area.value, value_1.get('label'), 0)
-            for key_2, value_2 in value_1.get('children', {}).items():
-                area = PolicyArea([key_1, key_2])
-                if area.descriptor_decimal in available[1]:
-                    add_choice(area.value, value_2.get('label'), 1)
-                for key_3, value_3 in value_2.get('children', {}).items():
-                    area = PolicyArea([key_1, key_2, key_3])
-                    if area.descriptor_decimal in available[2]:
-                        add_choice(area.value, value_3.get('label'), 2)
+        self.policy_area.tree = serialize(POLICY_AREA)
 
     def populate_choice(self, name, add_none=False):
         field = getattr(self, name)
