@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-12-08 11:01+0100\n"
+"POT-Creation-Date: 2018-12-11 09:32+0100\n"
 "PO-Revision-Date: 2018-12-08 11:02+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -637,6 +637,9 @@ msgstr "Rencontre"
 msgid "Talk"
 msgstr "Conférence"
 
+msgid "Submitter"
+msgstr "Auteur"
+
 msgid "Title"
 msgstr "Titre"
 
@@ -652,8 +655,8 @@ msgstr "Profitez d'un concerto dans le jardin du château."
 msgid "Image"
 msgstr "Image"
 
-msgid "Location"
-msgstr "Localisation"
+msgid "Venue"
+msgstr "Lieu"
 
 msgid "Castle garden"
 msgstr "Jardin du château"
@@ -878,9 +881,6 @@ msgstr "Décrit de quoi parle cette page"
 
 msgid "Map"
 msgstr "Carte"
-
-msgid "Submitter"
-msgstr "Auteur"
 
 msgid "Time"
 msgstr "Heure"
@@ -1819,6 +1819,9 @@ msgstr "Publié"
 
 msgid "Withdrawn"
 msgstr "Retiré"
+
+msgid "Location"
+msgstr "Localisation"
 
 msgid "Date and time"
 msgstr "Date et heure"

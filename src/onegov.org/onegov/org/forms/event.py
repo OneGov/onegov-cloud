@@ -56,7 +56,7 @@ class EventForm(Form):
     timezone = 'Europe/Zurich'
 
     email = EmailField(
-        label=_("E-Mail"),
+        label=_("Submitter"),
         description="max.muster@example.org",
         validators=[validators.InputRequired(), validators.Email()]
     )
@@ -89,7 +89,7 @@ class EventForm(Form):
     )
 
     location = StringField(
-        label=_("Location"),
+        label=_("Venue"),
         description=_("Castle garden"),
         validators=[validators.InputRequired()]
     )

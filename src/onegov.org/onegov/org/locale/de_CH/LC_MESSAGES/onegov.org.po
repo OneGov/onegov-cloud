@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-12-08 11:01+0100\n"
+"POT-Creation-Date: 2018-12-11 09:32+0100\n"
 "PO-Revision-Date: 2018-12-08 11:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -639,6 +639,9 @@ msgstr "Treffen"
 msgid "Talk"
 msgstr "Vortrag"
 
+msgid "Submitter"
+msgstr "Antragsteller/in"
+
 msgid "Title"
 msgstr "Titel"
 
@@ -654,8 +657,8 @@ msgstr "Freuen Sie sich auf ein klassisches Konzert im Schlossgarten."
 msgid "Image"
 msgstr "Bild"
 
-msgid "Location"
-msgstr "Ort"
+msgid "Venue"
+msgstr "Veranstaltungsort"
 
 msgid "Castle garden"
 msgstr "Schlossgarten"
@@ -878,9 +881,6 @@ msgstr "Beschreibt kurz um was es bei diesem Thema geht"
 
 msgid "Map"
 msgstr "Karte"
-
-msgid "Submitter"
-msgstr "Antragsteller/in"
 
 msgid "Time"
 msgstr "Zeit"
@@ -1813,6 +1813,9 @@ msgstr "Veröffentlicht"
 
 msgid "Withdrawn"
 msgstr "Zurückgezogen"
+
+msgid "Location"
+msgstr "Ort"
 
 msgid "Date and time"
 msgstr "Datum und Zeit"
