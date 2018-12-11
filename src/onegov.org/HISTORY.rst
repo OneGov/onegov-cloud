@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes multi-date selection for events not working in Chrome.
+  [href]
+
 - Improves tag input handling.
   [href]
 
