@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.46.1 (2018-12-11)
+~~~~~~~~~~~~~~~~~~~
+
 - Improves wording of event submitter and venue fields.
   [href]
 
