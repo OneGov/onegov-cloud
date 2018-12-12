@@ -1194,6 +1194,11 @@ class ResourceLayout(DefaultLayout):
                     text=_("Export"),
                     url=self.request.link(self.model, 'export'),
                     attrs={'class': ('export-link', 'calendar-dependent')}
+                ),
+                Link(
+                    text=_("Subscribe"),
+                    url=self.request.link(self.model, 'subscribe'),
+                    attrs={'class': 'subscribe-link'}
                 )
             ]
 

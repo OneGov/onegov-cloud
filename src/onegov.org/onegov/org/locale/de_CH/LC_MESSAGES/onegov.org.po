@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-12-11 09:32+0100\n"
+"POT-Creation-Date: 2018-12-11 16:31+0100\n"
 "PO-Revision-Date: 2018-12-08 11:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -199,6 +199,9 @@ msgstr "Aufräumen"
 
 msgid "Occupancy"
 msgstr "Belegung"
+
+msgid "Subscribe"
+msgstr "Abonnieren"
 
 msgid "Send"
 msgstr "Senden"
@@ -2315,6 +2318,19 @@ msgstr "abmelden"
 msgid "Or by changing the settings in your user profile."
 msgstr ""
 "Alternativ können Sie die Einstellungen in Ihrem Benutzerprofil anpassen."
+
+msgid ""
+"The following link can be used to subscribe to the reservations of this "
+"calendar. It can be used by anyone that knows the link in multiple calendar "
+"applications."
+msgstr "Der folgende Link kann zur Abonnierung der Reservationen dieses Kalenders verwendet werden. Alle die den Link kennen können diesen in verschiedenen Kalender-Applikationen verwenden."
+
+msgid ""
+"Note that we have no control over how often calendar applications update the "
+"calendars they are subscribed to (if they update at all). Therefore the "
+"information shown in the calendar may be wrong or out of date. Use it at "
+"your own risk."
+msgstr "Beachten Sie bitte das wir keine Kontrolle darüber haben wie oft die Kalender-Applikation das Abonnoment aktualisiert (sofern das überhaupt geschieht). Deshalb ist die Information in der Kalender-Applikation mit Vorsicht zu geniessen."
 
 msgid "Select the images that should be shown inside this album."
 msgstr "Wählen Sie die Bilder aus welche im Album angezeigt werden sollen."

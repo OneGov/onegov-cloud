@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to subscribe to reservation calendars.
+  [href]
+
 0.46.2 (2018-12-11)
 ~~~~~~~~~~~~~~~~~~~
 

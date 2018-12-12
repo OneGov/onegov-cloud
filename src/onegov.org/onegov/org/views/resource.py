@@ -1,3 +1,4 @@
+import icalendar
 import morepath
 import sedate
 
@@ -5,7 +6,10 @@ from collections import OrderedDict, namedtuple
 from datetime import datetime, timedelta
 from isodate import parse_date, ISO8601Error
 from itertools import groupby
+from morepath.request import Response
 from onegov.core.security import Public, Private
+from onegov.core.utils import module_path
+from onegov.core.orm import as_selectable_from_path
 from onegov.form import FormSubmission
 from onegov.reservation import ResourceCollection, Resource, Reservation
 from onegov.org import _, OrgApp, utils
@@ -17,6 +21,10 @@ from onegov.org.layout import ResourcesLayout, ResourceLayout
 from onegov.org.models.resource import DaypassResource, RoomResource
 from onegov.org.utils import group_by_column, keywords_first
 from onegov.ticket import Ticket
+from purl import URL
+from sedate import utcnow, standardize_date
+from sqlalchemy import and_, select
+from sqlalchemy.orm import object_session
 from webob import exc
 
 
@@ -335,6 +343,82 @@ def view_occupancy(self, request):
         'count': count,
         'utilisation': utilisation
     }
+
+
+@OrgApp.html(model=Resource, template='resource-subscribe.pt',
+             permission=Private, name='subscribe')
+def view_resource_subscribe(self, request):
+    url = URL(request.link(self, 'ical'))
+    url = url.scheme('webcal')
+    url = url.remove_query_param('view')
+    url = url.query_param('access-token', self.access_token)
+    url = url.as_string()
+
+    layout = ResourceLayout(self, request)
+    layout.breadcrumbs.append(Link(_("Subscribe"), '#'))
+
+    return {
+        'title': self.title,
+        'resource': self,
+        'layout': layout,
+        'url': url
+    }
+
+
+@OrgApp.view(model=Resource, permission=Public, name='ical')
+def view_ical(self, request):
+    assert self.access_token is not None
+
+    if request.params.get('access-token') != self.access_token:
+        raise exc.HTTPForbidden()
+
+    s = utcnow() - timedelta(days=30)
+    e = utcnow() + timedelta(days=30 * 12)
+
+    cal = icalendar.Calendar()
+    cal.add('prodid', '-//OneGov//onegov.org//')
+    cal.add('version', '2.0')
+    cal.add('method', 'PUBLISH')
+
+    cal.add('x-wr-calname', self.title)
+    cal.add('x-wr-relcalid', self.id.hex)
+
+    # refresh every 120 minutes by default (Outlook and maybe others)
+    cal.add('x-published-ttl', 'PT120M')
+
+    # add allocations/reservations
+    date = utcnow()
+    path = module_path('onegov.org', 'queries/resource-ical.sql')
+    stmt = as_selectable_from_path(path)
+
+    records = object_session(self).execute(select(stmt.c).where(and_(
+        stmt.c.resource == self.id, s <= stmt.c.start, stmt.c.start <= e
+    )))
+
+    for r in records:
+        start = r.start
+        end = r.end + timedelta(microseconds=1)
+
+        evt = icalendar.Event()
+        evt.add('uid', r.token)
+        evt.add('summary', r.title)
+        evt.add('location', self.title)
+        evt.add('description', r.description)
+        evt.add('dtstart', standardize_date(start, 'UTC'))
+        evt.add('dtend', standardize_date(end, 'UTC'))
+        evt.add('dtstamp', date)
+        evt.add('url', request.class_link(Ticket, {
+            'handler_code': r.handler_code,
+            'id': r.ticket_id
+        }))
+
+        cal.add_component(evt)
+
+    return Response(
+        cal.to_ical(),
+        content_type='text/calendar',
+        content_disposition=f'inline; filename={self.name}.ics'
+    )
 
 
 @OrgApp.form(model=Resource, permission=Private, name='export',

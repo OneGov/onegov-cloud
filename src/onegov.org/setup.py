@@ -35,6 +35,7 @@ setup(
     install_requires=[
         'babel',
         'click',
+        'icalendar',
         'isodate',
         'lxml',
         'onegov.chat',
