@@ -201,8 +201,18 @@
                     <tr>
                         <th class="column-30" i18n:translate>Voter share of yes camp</th>
                         <td>
-                            ${layout.format_number(vote.national_council_share_yeas, 1)}%
-                            <tal:block tal:condition="vote.has_national_council_share_data">(<a href="${request.link(vote, 'strengths')}" i18n:translate>Details</a>)</tal:block>
+                            <tal:block tal:condition="vote.has_national_council_share_data">
+                                <tal:block tal:condition="vote.national_council_share_yeas is not None">
+                                    ${layout.format_number(vote.national_council_share_yeas, 1)}%
+                                </tal:block>
+                                <tal:block tal:condition="vote.national_council_share_yeas is None">?</tal:block>
+                                (<a href="${request.link(vote, 'strengths')}" i18n:translate>Details</a>)
+                            </tal:block>
+                            <tal:block tal:condition="not vote.has_national_council_share_data">
+                                <tal:block tal:condition="vote.national_council_share_yeas is not None">
+                                    ${layout.format_number(vote.national_council_share_yeas, 1)}%
+                                </tal:block>
+                            </tal:block>
                         </td>
                     </tr>
                     <tr>

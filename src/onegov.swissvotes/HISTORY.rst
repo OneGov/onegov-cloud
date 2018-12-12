@@ -4,6 +4,9 @@ Changelog
 - Fixes default sorting of votes collections.
   [msom]
 
+- Fixes display of the voter share of yes camp.
+  [msom]
+
 0.0.23 (2018-12-11)
 ~~~~~~~~~~~~~~~~~~~
 
