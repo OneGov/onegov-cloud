@@ -132,8 +132,10 @@ class SwissVoteCollection(Pagination):
         Defaults to a reasonable value.
 
         """
-        result = self.initial_sort_by if self.sort_by is None else self.sort_by
-        return result if result in self.SORT_BYS else self.initial_sort_by
+        if self.sort_by in self.SORT_BYS:
+            return self.sort_by
+
+        return self.initial_sort_by
 
     @property
     def current_sort_order(self):
@@ -142,11 +144,16 @@ class SwissVoteCollection(Pagination):
         Defaults to a reasonable value.
 
         """
+        if self.sort_by in self.SORT_BYS:
+            if self.sort_order in self.SORT_ORDERS:
+                return self.sort_order
 
-        default = self.default_sort_order
-        default = self.initial_sort_order if self.sort_by is None else default
-        result = default if self.sort_order is None else self.sort_order
-        return result if result in self.SORT_ORDERS else default
+            if self.sort_by == self.initial_sort_by:
+                return self.initial_sort_order
+
+            return self.default_sort_order
+
+        return self.initial_sort_order
 
     def sort_order_by_key(self, sort_by):
         """ Returns the sort order by key.

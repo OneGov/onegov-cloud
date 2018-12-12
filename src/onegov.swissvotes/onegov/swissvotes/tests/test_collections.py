@@ -461,6 +461,27 @@ def test_votes_order(session):
     assert votes.sort_order_by_key('title') == 'unsorted'
     assert votes.sort_order_by_key('invalid') == 'unsorted'
 
+    votes = SwissVoteCollection(session, sort_by='', sort_order='')
+    assert votes.current_sort_by == 'date'
+    assert votes.current_sort_order == 'descending'
+
+    votes = SwissVoteCollection(session, sort_by='xx', sort_order='yy')
+    assert votes.current_sort_by == 'date'
+    assert votes.current_sort_order == 'descending'
+
+    votes = SwissVoteCollection(session, sort_by='date', sort_order='yy')
+    assert votes.current_sort_by == 'date'
+    assert votes.current_sort_order == 'descending'
+
+    votes = SwissVoteCollection(session, sort_by='xx', sort_order='ascending')
+    assert votes.current_sort_by == 'date'
+    assert votes.current_sort_order == 'descending'
+
+    votes = SwissVoteCollection(session, sort_by='result', sort_order='yy')
+    assert votes.current_sort_by == 'result'
+    assert votes.current_sort_order == 'ascending'
+
+    votes = SwissVoteCollection(session)
     assert votes.current_sort_by == 'date'
     assert votes.current_sort_order == 'descending'
     assert 'date' in str(votes.order_by)
@@ -524,6 +545,18 @@ def test_votes_order(session):
     assert 'title' in str(votes.order_by)
     assert 'DESC' in str(votes.order_by)
     assert [vote.id for vote in votes.query()] == [3, 2, 1]
+
+    votes = votes.by_order(None)
+    assert votes.current_sort_by == 'date'
+    assert votes.current_sort_order == 'descending'
+
+    votes = votes.by_order('')
+    assert votes.current_sort_by == 'date'
+    assert votes.current_sort_order == 'descending'
+
+    votes = votes.by_order('xxx')
+    assert votes.current_sort_by == 'date'
+    assert votes.current_sort_order == 'descending'
 
 
 def test_votes_available_descriptors(session):

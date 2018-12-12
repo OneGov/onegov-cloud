@@ -1,8 +1,10 @@
 Changelog
 ---------
+
+- Fixes default sorting of votes collections.
+  [msom]
+
 0.0.23 (2018-12-11)
-~~~~~~~~~~~~~~~~~~~
-0.0.22 (2018-12-11)
 ~~~~~~~~~~~~~~~~~~~
 
 - Visually aligns the multiple tree select widget options.
