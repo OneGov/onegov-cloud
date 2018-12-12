@@ -38,7 +38,7 @@ class PolicyAreaField(SelectMultipleField):
     widget = PolicyAreaWidget(multiple=True)
 
     def __init__(self, *args, **kwargs):
-        self.tree = kwargs.pop('tree', {})
+        self.tree = kwargs.pop('tree', [])
         super().__init__(*args, **kwargs)
 
     @property
@@ -55,10 +55,9 @@ class PolicyAreaField(SelectMultipleField):
             expanded = False
             for child in item['children']:
                 expanded = True if preselect(child) else expanded
-            expanded = expanded or checked
             item['checked'] = checked
             item['expanded'] = expanded
-            return expanded
+            return expanded or checked
 
         for item in tree:
             preselect(item)
