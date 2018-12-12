@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Reworks mobile view of events.
+  [href]
+
 - Adds the ability to subscribe to reservation calendars.
   [href]
 

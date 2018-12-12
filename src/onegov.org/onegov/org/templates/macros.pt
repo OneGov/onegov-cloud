@@ -763,7 +763,13 @@
 
     <div class="calendar-day-date">
         <div class="weekday">${layout.format_date(date, 'weekday_short').rstrip('.')}</div>
-        <div class="date">${date.day}. ${layout.format_date(date, 'month_long')}</div>
+        <div class="date">
+            ${date.day}.
+            <tal:b define="month layout.format_date(date, 'month_long')">
+                <span class="long-month">${month}</span>
+                <span class="short-month">${month[:3]}</span>
+            </tal:b>
+        </div>
     </div>
 </metal:calendar_day_box>
 
@@ -771,7 +777,7 @@
     <tal:b repeat="occurrence occurrences">
         <div class="row">
             <div class="occurrence">
-                <div class="large-3 medium-4 small-12 columns">
+                <div class="large-3 medium-4 small-5 columns calendar-day-column">
                     <metal:b
                         tal:define="
                             date occurrence.localized_start;
@@ -781,7 +787,7 @@
                         use-macro="layout.macros['calendar-day']"
                     />
                 </div>
-                <div class="large-9 medium-8 small-12 columns">
+                <div class="large-9 medium-8 small-7 columns calendar-text-column">
                     <h3><a href="${request.link(occurrence)}">${occurrence.title}</a></h3>
                     <div class="occurrence-date show-for-sr">${layout.format_date(occurrence.localized_start, 'date')}</div>
                     <div class="occurrence-location">${occurrence.location}</div>

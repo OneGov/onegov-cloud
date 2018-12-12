@@ -2870,9 +2870,57 @@ button {
             text-overflow: ellipsis;
             white-space: nowrap;
             width: 60%;
+
+            .long-month {
+                display: inline;
+            }
+
+            .short-month {
+                display: none;
+            }
         }
     }
 }
+
+@media #{$small-only} {
+    .occurrece {
+        margin-bottom: 1rem !important;
+    }
+
+    .calendar-day {
+        .calendar-day-date {
+            font-size: .875rem;
+
+            .date {
+                .long-month {
+                    display: none;
+                }
+
+                .short-month {
+                    display: inline;
+                }
+            }            
+        }
+    }
+
+    .calendar-text-column {
+        padding-left: 0;
+
+        h3 {
+            font-size: 1rem !important;
+        }
+
+        .occurrence-location,
+        .occurrence-time {
+            font-size: .875rem !important;
+        }
+
+        .occurrence-tags {
+            display: none;
+        }
+    }
+}
+
 
 /*
     Leaflet customisation
