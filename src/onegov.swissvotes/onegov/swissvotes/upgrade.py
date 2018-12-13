@@ -20,8 +20,8 @@ def rename_recommendation_columns(context):
         old = f'recommendation_{old}'
         new = f'recommendation_{new}'
         if (
-            context.has_column('swissvotes', old) and
-            not context.has_column('swissvotes', new)
+            context.has_column('swissvotes', old)
+            and not context.has_column('swissvotes', new)
         ):
             context.operations.alter_column(
                 'swissvotes', old, new_column_name=new

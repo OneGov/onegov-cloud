@@ -92,8 +92,8 @@ def import_data(group_context, folder):
             name: os.path.join(folder, name)
             for name in os.listdir(folder)
             if (
-                os.path.isdir(os.path.join(folder, name)) and
-                hasattr(SwissVote, name)
+                os.path.isdir(os.path.join(folder, name))
+                and hasattr(SwissVote, name)
             )
         }
         for attachment, attachment_folder in attachments.items():
@@ -101,8 +101,8 @@ def import_data(group_context, folder):
                 name: os.path.join(attachment_folder, name)
                 for name in os.listdir(attachment_folder)
                 if (
-                    os.path.isdir(os.path.join(attachment_folder, name)) and
-                    name in app.locales
+                    os.path.isdir(os.path.join(attachment_folder, name))
+                    and name in app.locales
                 )
             }
             for locale, locale_folder in locales.items():

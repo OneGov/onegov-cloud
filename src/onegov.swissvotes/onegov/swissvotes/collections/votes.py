@@ -70,28 +70,28 @@ class SwissVoteCollection(Pagination):
 
     def __eq__(self, other):
         return (
-            (self.page or 0) == (other.page or 0) and
-            (self.from_date or None) == (other.from_date or None) and
-            (self.to_date or None) == (other.to_date or None) and
-            set(self.legal_form or []) == set(other.legal_form or []) and
-            set(self.result or []) == set(other.result or []) and
-            set(self.policy_area or []) == set(other.policy_area or []) and
-            (self.term or None) == (other.term or None) and
-            (self.full_text or None) == (other.full_text or None) and
-            (
-                (self.position_federal_council or []) ==
-                (other.position_federal_council or [])
-            ) and
-            (
-                (self.position_national_council or []) ==
-                (other.position_national_council or [])
-            ) and
-            (
-                (self.position_council_of_states or []) ==
-                (other.position_council_of_states or [])
-            ) and
-            (self.sort_by or None) == (other.sort_by or None) and
-            (self.sort_order or None) == (other.sort_order or None)
+            (self.page or 0) == (other.page or 0)
+            and (self.from_date or None) == (other.from_date or None)
+            and (self.to_date or None) == (other.to_date or None)
+            and set(self.legal_form or []) == set(other.legal_form or [])
+            and set(self.result or []) == set(other.result or [])
+            and set(self.policy_area or []) == set(other.policy_area or [])
+            and (self.term or None) == (other.term or None)
+            and (self.full_text or None) == (other.full_text or None)
+            and (
+                (self.position_federal_council or [])
+                == (other.position_federal_council or [])
+            )
+            and (
+                (self.position_national_council or [])
+                == (other.position_national_council or [])
+            )
+            and (
+                (self.position_council_of_states or [])
+                == (other.position_council_of_states or [])
+            )
+            and (self.sort_by or None) == (other.sort_by or None)
+            and (self.sort_order or None) == (other.sort_order or None)
         )
 
     def default(self):
@@ -205,8 +205,8 @@ class SwissVoteCollection(Pagination):
             result = unaccent(SwissVote.title)
         else:
             result = (
-                getattr(SwissVote, f'_{self.current_sort_by}', None) or
-                getattr(SwissVote, self.current_sort_by, None)
+                getattr(SwissVote, f'_{self.current_sort_by}', None)
+                or getattr(SwissVote, self.current_sort_by, None)
             )
             if not result:
                 raise NotImplementedError()

@@ -98,9 +98,9 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
                 (3, _("Neutral"))
             ))
         if (
-            attribute == 'position_parliament' or
-            attribute == 'position_national_council' or
-            attribute == 'position_council_of_states'
+            attribute == 'position_parliament'
+            or attribute == 'position_national_council'
+            or attribute == 'position_council_of_states'
         ):
             return OrderedDict((
                 (1, _("Accepting")),
