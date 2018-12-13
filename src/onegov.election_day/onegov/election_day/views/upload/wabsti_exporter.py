@@ -55,8 +55,8 @@ def view_upload_wabsti_vote(self, request):
 
     data_source = authenticated_source(request)
     if (
-        data_source.type != 'vote' or
-        not all((item.vote for item in data_source.items))
+        data_source.type != 'vote'
+        or not all((item.vote for item in data_source.items))
     ):
         return {
             'status': 'error',
@@ -141,8 +141,8 @@ def view_upload_wabsti_majorz(self, request):
 
     data_source = authenticated_source(request)
     if (
-        data_source.type != 'majorz' or
-        not all((item.election for item in data_source.items))
+        data_source.type != 'majorz'
+        or not all((item.election for item in data_source.items))
     ):
         return {
             'status': 'error',
@@ -239,8 +239,8 @@ def view_upload_wabsti_proporz(self, request):
 
     data_source = authenticated_source(request)
     if (
-        data_source.type != 'proporz' or
-        not all((item.election for item in data_source.items))
+        data_source.type != 'proporz'
+        or not all((item.election for item in data_source.items))
     ):
         return {
             'status': 'error',

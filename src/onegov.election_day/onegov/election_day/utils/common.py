@@ -27,10 +27,10 @@ def add_local_results(source, target, principal, session):
     """
 
     adjust = (
-        principal.domain == 'municipality' and
-        principal.id and
-        source.type == 'vote' and
-        source.external_id
+        principal.domain == 'municipality'
+        and principal.id
+        and source.type == 'vote'
+        and source.external_id
     )
     if adjust:
         entity_id = principal.id

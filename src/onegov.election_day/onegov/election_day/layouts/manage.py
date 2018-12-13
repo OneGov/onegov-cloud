@@ -49,8 +49,8 @@ class ManageLayout(DefaultLayout):
                 _("Data sources"),
                 self.request.link(DataSourceCollection(session)),
                 (
-                    isinstance(self.model, DataSourceCollection) or
-                    isinstance(self.model, DataSourceItemCollection)
+                    isinstance(self.model, DataSourceCollection)
+                    or isinstance(self.model, DataSourceItemCollection)
                 ),
                 []
             ))
@@ -83,9 +83,9 @@ class ManageLayout(DefaultLayout):
                 _("Subscribers"),
                 '',
                 (
-                    isinstance(self.model, SmsSubscriberCollection) or
-                    isinstance(self.model, EmailSubscriberCollection) or
-                    isinstance(self.model, Principal)
+                    isinstance(self.model, SmsSubscriberCollection)
+                    or isinstance(self.model, EmailSubscriberCollection)
+                    or isinstance(self.model, Principal)
                 ),
                 submenu
             ))

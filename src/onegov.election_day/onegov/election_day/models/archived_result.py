@@ -135,8 +135,8 @@ class ArchivedResult(Base, ContentMixin, TimestampMixin,
 
         """
         return (
-            self.is_fetched(request) and
-            request.app.principal.domain == 'municipality'
+            self.is_fetched(request)
+            and request.app.principal.domain == 'municipality'
         )
 
     def display_answer(self, request):

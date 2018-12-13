@@ -67,60 +67,60 @@ class ElectionLayout(DetailLayout):
 
         if tab == 'lists':
             return (
-                self.proporz and
-                not self.tacit
+                self.proporz
+                and not self.tacit
             )
         if tab == 'list-by-entity':
             return (
-                self.show_map and
-                self.proporz and
-                not self.tacit
+                self.show_map
+                and self.proporz
+                and not self.tacit
             )
         if tab == 'list-by-district':
             return (
-                self.show_map and
-                self.has_districts and
-                self.proporz and
-                not self.tacit
+                self.show_map
+                and self.has_districts
+                and self.proporz
+                and not self.tacit
             )
         if tab == 'candidate-by-entity':
             return (
-                self.has_candidates and
-                self.show_map and
-                not self.tacit
+                self.has_candidates
+                and self.show_map
+                and not self.tacit
             )
         if tab == 'candidate-by-district':
             return (
-                self.has_candidates and
-                self.show_map and
-                self.has_districts and
-                not self.tacit
+                self.has_candidates
+                and self.show_map
+                and self.has_districts
+                and not self.tacit
             )
         if tab == 'connections':
             return (
-                self.proporz and
-                not self.tacit and
-                self.model.list_connections.first() is not None
+                self.proporz
+                and not self.tacit
+                and self.model.list_connections.first() is not None
             )
         if tab == 'party-strengths':
             return (
-                self.proporz and
-                not self.tacit and
-                self.model.party_results.first() is not None
+                self.proporz
+                and not self.tacit
+                and self.model.party_results.first() is not None
             )
         if tab == 'parties-panachage':
             return (
-                self.proporz and
-                not self.tacit and
-                self.model.panachage_results.first() is not None
+                self.proporz
+                and not self.tacit
+                and self.model.panachage_results.first() is not None
             )
         if tab == 'statistics':
             return not self.tacit
         if tab == 'lists-panachage':
             return (
-                self.proporz and
-                not self.tacit and
-                self.model.has_lists_panachage_data
+                self.proporz
+                and not self.tacit
+                and self.model.has_lists_panachage_data
             )
 
         return True

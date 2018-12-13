@@ -42,16 +42,16 @@ def parse_election_result(line, errors, entities, added_entities):
         entity_id = int(line.bfs or 0)
         eligible_voters = int(line.stimmber or 0)
         received_ballots = int(
-            getattr(line, 'wzabgegeben', 0) or
-            getattr(line, 'stimmabgegeben', 0)
+            getattr(line, 'wzabgegeben', 0)
+            or getattr(line, 'stimmabgegeben', 0)
         )
         blank_ballots = int(
-            getattr(line, 'wzleer', 0) or
-            getattr(line, 'stimmleer', 0)
+            getattr(line, 'wzleer', 0)
+            or getattr(line, 'stimmleer', 0)
         )
         invalid_ballots = int(
-            getattr(line, 'wzungueltig', 0) or
-            getattr(line, 'stimmungueltig', 0)
+            getattr(line, 'wzungueltig', 0)
+            or getattr(line, 'stimmungueltig', 0)
         )
 
         blank_votes = None

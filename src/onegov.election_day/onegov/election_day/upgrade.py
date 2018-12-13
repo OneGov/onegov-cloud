@@ -131,8 +131,8 @@ def change_last_change_columns(context):
         )
 
     if (
-        context.has_column('notifications', 'last_change') and
-        not context.has_column('notifications', 'last_modified')
+        context.has_column('notifications', 'last_change')
+        and not context.has_column('notifications', 'last_modified')
     ):
         context.operations.execute(
             'ALTER TABLE {} RENAME COLUMN {} TO {};'.format(
@@ -157,8 +157,8 @@ def make_subscriber_polymorphic(context):
         )
 
     if (
-        context.has_column('subscribers', 'phone_number') and
-        not context.has_column('subscribers', 'address')
+        context.has_column('subscribers', 'phone_number')
+        and not context.has_column('subscribers', 'address')
     ):
         context.operations.execute(
             'ALTER TABLE {} RENAME COLUMN {} TO {};'.format(
@@ -176,8 +176,8 @@ def make_subscriber_polymorphic(context):
 @upgrade_task('Make notifications polymorphic')
 def make_notifications_polymorphic(context):
     if (
-        context.has_column('notifications', 'action') and
-        not context.has_column('notifications', 'type')
+        context.has_column('notifications', 'action')
+        and not context.has_column('notifications', 'type')
     ):
         context.operations.execute(
             'ALTER TABLE {} RENAME COLUMN {} TO {};'.format(
@@ -205,8 +205,8 @@ def apply_static_data(context):
             assert vote.date and vote.date.year in principal.entities
             for result in ballot.results:
                 assert (
-                    result.entity_id in principal.entities[vote.date.year] or
-                    result.entity_id == 0
+                    result.entity_id in principal.entities[vote.date.year]
+                    or result.entity_id == 0
                 )
                 result.name = principal.entities.\
                     get(vote.date.year, {}).\
@@ -221,8 +221,8 @@ def apply_static_data(context):
         assert election.date and election.date.year in principal.entities
         for result in election.results:
             assert (
-                result.entity_id in principal.entities[election.date.year] or
-                result.entity_id == 0
+                result.entity_id in principal.entities[election.date.year]
+                or result.entity_id == 0
             )
             result.name = principal.entities.\
                 get(election.date.year, {}).\

@@ -165,44 +165,44 @@ def test_get_summary(session):
         vote_result = archive.update(vote, request)
 
         assert (
-            get_summary(election, request) ==
-            get_election_summary(election, request)
+            get_summary(election, request)
+            == get_election_summary(election, request)
         )
         assert (
-            get_summary(election_result, request) ==
-            get_election_summary(election, request)
+            get_summary(election_result, request)
+            == get_election_summary(election, request)
         )
         assert (
-            get_summary(election_result, request) ==
-            get_election_summary(election, None, request.link(election))
+            get_summary(election_result, request)
+            == get_election_summary(election, None, request.link(election))
         )
 
         assert (
-            get_summary(election_compound, request) ==
-            get_election_compound_summary(election_compound, request)
+            get_summary(election_compound, request)
+            == get_election_compound_summary(election_compound, request)
         )
         assert (
-            get_summary(election_compound_result, request) ==
-            get_election_compound_summary(election_compound, request)
+            get_summary(election_compound_result, request)
+            == get_election_compound_summary(election_compound, request)
         )
         assert (
-            get_summary(election_compound_result, request) ==
-            get_election_compound_summary(
+            get_summary(election_compound_result, request)
+            == get_election_compound_summary(
                 election_compound, request, request.link(election_compound)
             )
         )
 
         assert (
-            get_summary(vote, request) ==
-            get_vote_summary(vote, request)
+            get_summary(vote, request)
+            == get_vote_summary(vote, request)
         )
         assert (
-            get_summary(vote_result, request) ==
-            get_vote_summary(vote, request)
+            get_summary(vote_result, request)
+            == get_vote_summary(vote, request)
         )
         assert (
-            get_summary(vote_result, request) ==
-            get_vote_summary(vote, None, request.link(vote))
+            get_summary(vote_result, request)
+            == get_vote_summary(vote, None, request.link(vote))
         )
 
 

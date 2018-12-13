@@ -525,8 +525,8 @@ class PdfGenerator():
 
         districts = {
             election.id: (
-                election.results.first().district or
-                election.results.first().name
+                election.results.first().district
+                or election.results.first().name
             )
             for election in compound.elections if election.results.first()
         }

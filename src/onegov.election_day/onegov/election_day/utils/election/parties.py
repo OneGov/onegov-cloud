@@ -74,8 +74,8 @@ def get_party_results_deltas(election, years, parties):
                     last = party.get(years[index - 1])
                     if values and last:
                         diff = (
-                            (values.get('votes', {}).get('permille', 0) or 0) -
-                            (last.get('votes', {}).get('permille', 0) or 0)
+                            (values.get('votes', {}).get('permille', 0) or 0)
+                            - (last.get('votes', {}).get('permille', 0) or 0)
                         ) / 10
                         delta = '{}%'.format(diff)
                 result.append(delta)
@@ -150,9 +150,9 @@ def get_parties_panachage_data(item, request=None):
         return {}
 
     parties = sorted(
-        set([result.source for result in results]) |
-        set([result.target for result in results]) |
-        set([result.name for result in party_results])
+        set([result.source for result in results])
+        | set([result.target for result in results])
+        | set([result.name for result in party_results])
     )
 
     def left_node(party):

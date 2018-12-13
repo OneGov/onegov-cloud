@@ -45,9 +45,9 @@ def parse_domain(domain):
 
 def line_is_relevant(line, domain, district, number):
     return (
-        parse_domain(line.art) == domain and
-        line.sortwahlkreis == district and
-        line.sortgeschaeft == number
+        parse_domain(line.art) == domain
+        and line.sortwahlkreis == district
+        and line.sortgeschaeft == number
     )
 
 
@@ -237,8 +237,8 @@ def import_vote_wabstic(vote, principal, number, district,
     for ballot_type in used_ballot_types:
         # Add the missing entities
         remaining = (
-            entities.keys() -
-            set(result.entity_id for result in ballot_results[ballot_type])
+            entities.keys()
+            - set(result.entity_id for result in ballot_results[ballot_type])
         )
         for entity_id in remaining:
             entity = entities[entity_id]

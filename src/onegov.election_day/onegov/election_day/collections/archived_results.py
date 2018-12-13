@@ -220,9 +220,9 @@ class ArchivedResultCollection(object):
         """ Add a new election or vote and create a result entry.  """
 
         assert (
-            isinstance(item, Election) or
-            isinstance(item, ElectionCompound) or
-            isinstance(item, Vote)
+            isinstance(item, Election)
+            or isinstance(item, ElectionCompound)
+            or isinstance(item, Vote)
         )
 
         self.session.add(item)
@@ -235,9 +235,9 @@ class ArchivedResultCollection(object):
         """ Clears an election or vote and the associated result entry.  """
 
         assert (
-            isinstance(item, Election) or
-            isinstance(item, ElectionCompound) or
-            isinstance(item, Vote)
+            isinstance(item, Election)
+            or isinstance(item, ElectionCompound)
+            or isinstance(item, Vote)
         )
 
         item.clear_results()
@@ -249,9 +249,9 @@ class ArchivedResultCollection(object):
         """ Deletes an election or vote and the associated result entry.  """
 
         assert (
-            isinstance(item, Election) or
-            isinstance(item, ElectionCompound) or
-            isinstance(item, Vote)
+            isinstance(item, Election)
+            or isinstance(item, ElectionCompound)
+            or isinstance(item, Vote)
         )
 
         for result in self.query().filter_by(url=request.link(item)):

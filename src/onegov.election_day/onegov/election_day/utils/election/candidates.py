@@ -51,9 +51,9 @@ def get_candidates_data(election, request):
 
     majority = 0
     if (
-        election.type == 'majorz' and
-        election.majority_type == 'absolute' and
-        election.absolute_majority is not None
+        election.type == 'majorz'
+        and election.majority_type == 'absolute'
+        and election.absolute_majority is not None
     ):
         majority = election.absolute_majority
 
@@ -65,8 +65,8 @@ def get_candidates_data(election, request):
                 'class': 'active' if candidate[2] else 'inactive'
             } for candidate in candidates.all()
             if (
-                election.type == 'majorz' or
-                election.type == 'proporz' and candidate[2]
+                election.type == 'majorz'
+                or election.type == 'proporz' and candidate[2]
             )
         ],
         'majority': majority,

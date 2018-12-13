@@ -223,8 +223,8 @@ def import_election_wabstic_majorz(
             line_errors.append(_("Invalid entity values"))
         else:
             eligible_voters = (
-                eligible_voters or
-                added_entities.get(entity_id, {}).get('eligible_voters', 0)
+                eligible_voters
+                or added_entities.get(entity_id, {}).get('eligible_voters', 0)
             )
             entity['eligible_voters'] = eligible_voters
 

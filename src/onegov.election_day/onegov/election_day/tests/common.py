@@ -75,9 +75,9 @@ class DummyPrincipal(object):
     @property
     def notifications(self):
         if (
-            (len(self.webhooks) > 0) or
-            self.sms_notification or
-            self.email_notification
+            (len(self.webhooks) > 0)
+            or self.sms_notification
+            or self.email_notification
         ):
             return True
         return False

@@ -285,8 +285,8 @@ def import_election_wabstic_proporz(
             line_errors.append(_("Invalid entity values"))
         else:
             eligible_voters = (
-                eligible_voters or
-                added_entities.get(entity_id, {}).get('eligible_voters', 0)
+                eligible_voters
+                or added_entities.get(entity_id, {}).get('eligible_voters', 0)
             )
             entity['eligible_voters'] = eligible_voters
 
@@ -494,8 +494,8 @@ def import_election_wabstic_proporz(
             line_errors.append(_("Invalid candidate results"))
         else:
             if (
-                entity_id not in added_entities or
-                candidate_id not in added_candidates
+                entity_id not in added_entities
+                or candidate_id not in added_candidates
             ):
                 # Only add the candidate result if the entity and the candidate
                 # are present (there is no SortGeschaeft in this file)
