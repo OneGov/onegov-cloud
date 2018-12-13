@@ -121,12 +121,12 @@ def test_swissvotes_dataset_field():
         1.1,  # titel / TEXT
     ])
     worksheet.write_row(5, 0, [
-        date.today(),  # anr / NUMERIC
-        date.today(),  # datum / DATE
-        date.today(),  # legislatur / INTEGER
-        date.today(),  # legisjahr / INT4RANGE
-        date.today(),  # jahrzent / INT4RANGE
-        date.today(),  # titel / TEXT
+        date(2018, 12, 12),  # anr / NUMERIC
+        date(2018, 12, 12),  # datum / DATE
+        date(2018, 12, 12),  # legislatur / INTEGER
+        date(2018, 12, 12),  # legisjahr / INT4RANGE
+        date(2018, 12, 12),  # jahrzent / INT4RANGE
+        date(2018, 12, 12),  # titel / TEXT
     ])
     workbook.close()
     file.seek(0)

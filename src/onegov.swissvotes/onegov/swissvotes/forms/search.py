@@ -108,7 +108,8 @@ class SearchForm(Form):
             field.choices.append((-1, _("Without / Unknown")))
 
     def on_request(self):
-        self.delete_field('csrf_token')
+        if hasattr(self, 'csrf_token'):
+            self.delete_field('csrf_token')
         self.populate_choice('legal_form')
         self.populate_choice('result')
         self.populate_choice('position_federal_council', True)
@@ -119,7 +120,7 @@ class SearchForm(Form):
     def select_all(self, name):
         field = getattr(self, name)
         if not field.data:
-            field.data = next(zip(*field.choices))
+            field.data = list(next(zip(*field.choices)))
 
     def apply_model(self, model):
         self.from_date.data = model.from_date

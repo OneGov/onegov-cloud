@@ -70,6 +70,7 @@ def attachments(swissvotes_app):
         ('federal_council_message', "Federal council message"),
         ('parliamentary_debate', "Parlamentdebatte"),
         ('realization', "Réalisation"),
+        ('resolution', "Resolution"),
         ('voting_booklet', "Voting booklet"),
         ('voting_text', "Abstimmungstext"),
     ):
