@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.25 (2018-12-17)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the swissvotes logo.
   [msom]
