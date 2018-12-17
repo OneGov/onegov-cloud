@@ -41,17 +41,31 @@ def test_format_number():
     layout.request.locale = 'de_CH'
     assert layout.format_number(100) == "100"
     assert layout.format_number(100, 2) == "100.00"
+    assert layout.format_number(10, 2, 6) == " 10.00"
+    assert layout.format_number(10, 2, '06') == "010.00"
+    assert layout.format_number(10, padding=3) == " 10"
+    assert layout.format_number(10, padding='03') == "010"
     assert layout.format_number(1000) == "1’000"
+    assert layout.format_number(1000, 2, 10) == "  1’000.00"
+    assert layout.format_number(1000, 2, '010') == "001’000.00"
     assert layout.format_number(1000.00) == "1’000.00"
     assert layout.format_number(1000.00, 0) == "1’000"
+    assert layout.format_number(1.1, 2, '05') == "01.10"
     assert layout.format_number(None) == ""
 
     layout.request.locale = 'de'
     assert layout.format_number(100) == "100"
     assert layout.format_number(100, 2) == "100,00"
+    assert layout.format_number(10, 2, 6) == " 10,00"
+    assert layout.format_number(10, 2, '06') == "010,00"
+    assert layout.format_number(10, padding=3) == " 10"
+    assert layout.format_number(10, padding='03') == "010"
     assert layout.format_number(1000) == "1.000"
+    assert layout.format_number(1000, 2, 10) == "  1.000,00"
+    assert layout.format_number(1000, 2, '010') == "001.000,00"
     assert layout.format_number(1000.00) == "1.000,00"
     assert layout.format_number(1000.00, 0) == "1.000"
+    assert layout.format_number(1.1, 2, '05') == "01,10"
     assert layout.format_number(None) == ""
 
 

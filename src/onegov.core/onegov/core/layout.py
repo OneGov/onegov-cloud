@@ -147,7 +147,7 @@ class Layout(object):
             babel.numbers.get_group_symbol(locale)
         )
 
-    def format_number(self, number, decimal_places=None):
+    def format_number(self, number, decimal_places=None, padding=''):
         """ Takes the given numer and formats it according to locale.
 
         If the number is an integer, the default decimal places are 0,
@@ -164,7 +164,7 @@ class Layout(object):
                 decimal_places = 2
 
         decimal, group = self.number_symbols(self.request.locale)
-        result = '{{:,.{}f}}'.format(decimal_places).format(number)
+        result = '{{:{},.{}f}}'.format(padding, decimal_places).format(number)
         return result.translate({ord(','): group, ord('.'): decimal})
 
     @property
