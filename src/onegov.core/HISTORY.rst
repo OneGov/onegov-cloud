@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.74.4 (2018-12-17)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a padding option to number formatting.
   [msom]
