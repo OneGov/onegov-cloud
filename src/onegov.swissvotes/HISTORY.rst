@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.24 (2018-12-17)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes default sorting of votes collections.
   [msom]
