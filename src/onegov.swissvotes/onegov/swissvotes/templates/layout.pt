@@ -44,14 +44,11 @@
         </div>
         <div class="title">
             <div class="row">
-                <div class="columns small-12 large-7">
-                    <a href="${layout.homepage_link}"><h1><img src="${layout.static_path}/images/logo.svg" height="47px" width="333px" alt="Swissvotes"></h1></a>
-                </div>
-                <div class="columns small-6 large-3">
-                    <img src="${layout.static_path}/images/logo_aps.svg" height="100px" width="160px" alt="année politique suisse">
-                </div>
-                <div class="columns small-6 large-2">
-                    <img class="right" src="${layout.static_path}/images/logo_unibe.svg" height="1000px" width="130px" alt="Universität Basel">
+                <div class="columns small-12 small-only-text-center">
+                    <a href="${layout.homepage_link}"><img src="${layout.static_path}/images/logo.svg" height="100" alt="Swissvotes"></a>
+                    <img class="right hide-for-small" src="${layout.static_path}/images/logo_unibe.svg" height="100" alt="Universität Basel">
+                    <img class="right hide-for-small" src="${layout.static_path}/images/logo_aps.svg" height="100" alt="année politique suisse">
+                    <div class="clearfix"></div>
                 </div>
             </div>
         </div>

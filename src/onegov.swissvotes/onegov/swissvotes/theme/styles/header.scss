@@ -20,15 +20,14 @@ header {
     }
 
     .title {
-        margin: 1.75rem;
-    }
+        img {
+            margin: 1.75rem 0;
 
-    h1 {
-        color: darken($primary-color, 15%);
-        font-size: 3.75rem;
-        font-variant: small-caps;
-        letter-spacing: 1px;
-        margin: .5em 0 0;
+            &.right {
+                margin-left: 1rem;
+            }
+        }
+
     }
 
     .main-navigation {
