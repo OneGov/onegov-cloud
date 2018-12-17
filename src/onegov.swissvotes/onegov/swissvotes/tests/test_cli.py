@@ -150,10 +150,10 @@ def test_import_attachments(session_manager, temporary_directory, redis_url):
         'voting_booklet',
         'voting_text',
     ):
-        create_file(folder / name / 'de_CH' / '1.0.pdf', f"1{name}de")
-        create_file(folder / name / 'fr_CH' / '1.0.pdf', f"1{name}fr")
-        create_file(folder / name / 'de_CH' / '2.0.pdf', f"2{name}de")
-        create_file(folder / name / 'fr_CH' / '2.0.pdf', f"2{name}fr")
+        create_file(folder / name / 'de_CH' / '1.0.pdf', f"A 1{name}de end")
+        create_file(folder / name / 'fr_CH' / '1.0.pdf', f"B 1{name}fr end")
+        create_file(folder / name / 'de_CH' / '2.0.pdf', f"C 2{name}de end")
+        create_file(folder / name / 'fr_CH' / '2.0.pdf', f"D 2{name}fr end")
 
     session_manager.ensure_schema_exists('onegov_swissvotes-govikon')
     session_manager.set_current_schema('onegov_swissvotes-govikon')
@@ -214,4 +214,4 @@ def test_import_attachments(session_manager, temporary_directory, redis_url):
                 'voting_booklet',
                 'voting_text',
             ):
-                assert getattr(vote, name).extract == f'{number}{name}{lang}'
+                assert f'{number}{name}{lang}' in getattr(vote, name).extract
