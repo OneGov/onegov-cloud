@@ -150,10 +150,10 @@ def test_import_attachments(session_manager, temporary_directory, redis_url):
         'voting_booklet',
         'voting_text',
     ):
-        create_file(folder / name / 'de_CH' / '1.0.pdf', f"1-{name}-de_CH")
-        create_file(folder / name / 'fr_CH' / '1.0.pdf', f"1-{name}-fr_CH")
-        create_file(folder / name / 'de_CH' / '2.0.pdf', f"2-{name}-de_CH")
-        create_file(folder / name / 'fr_CH' / '2.0.pdf', f"2-{name}-fr_CH")
+        create_file(folder / name / 'de_CH' / '1.0.pdf', f"1{name}de")
+        create_file(folder / name / 'fr_CH' / '1.0.pdf', f"1{name}fr")
+        create_file(folder / name / 'de_CH' / '2.0.pdf', f"2{name}de")
+        create_file(folder / name / 'fr_CH' / '2.0.pdf', f"2{name}fr")
 
     session_manager.ensure_schema_exists('onegov_swissvotes-govikon')
     session_manager.set_current_schema('onegov_swissvotes-govikon')
@@ -204,8 +204,8 @@ def test_import_attachments(session_manager, temporary_directory, redis_url):
 
     for number in (1, 2):
         vote = session.query(SwissVote).filter_by(id=number).one()
-        for locale in ('de_CH', 'fr_CH'):
-            vote.session_manager.current_locale = locale
+        for lang in ('de', 'fr'):
+            vote.session_manager.current_locale = f'{lang}_CH'
             for name in (
                 'federal_council_message',
                 'parliamentary_debate',
@@ -214,5 +214,4 @@ def test_import_attachments(session_manager, temporary_directory, redis_url):
                 'voting_booklet',
                 'voting_text',
             ):
-                assert getattr(vote, name).extract == \
-                    f'{number}-{name}-{locale}'
+                assert getattr(vote, name).extract == f'{number}{name}{lang}'
