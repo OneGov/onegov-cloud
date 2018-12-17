@@ -11,7 +11,9 @@ from onegov.file.utils import as_fileintent
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import SwissVoteFile
+from onegov.swissvotes.models.localized_file import LocalizedFile
 from sqlalchemy import create_engine
+
 
 cli = command_group()
 
@@ -69,8 +71,8 @@ def delete(group_context):
 @cli.command('import')
 @click.argument('folder', type=click.Path(exists=True))
 @pass_group_context
-def import_data(group_context, folder):
-    """ Import a data from the given folder. For example:
+def import_attachments(group_context, folder):
+    """ Import a attachments from the given folder. For example:
 
         onegov-swissvotes \
             --select '/onegov_swissvotes/swissvotes' \
@@ -88,40 +90,50 @@ def import_data(group_context, folder):
     def _import(request, app):
         votes = SwissVoteCollection(app.session())
 
-        attachments = {
-            name: os.path.join(folder, name)
-            for name in os.listdir(folder)
+        attachments = {}
+        for name in os.listdir(folder):
             if (
                 os.path.isdir(os.path.join(folder, name))
-                and hasattr(SwissVote, name)
-            )
-        }
+                and isinstance(SwissVote.__dict__.get(name), LocalizedFile)
+            ):
+                attachments[name] = os.path.join(folder, name)
+            else:
+                click.secho(f"Ignoring /{name}", fg='yellow')
+
         for attachment, attachment_folder in attachments.items():
-            locales = {
-                name: os.path.join(attachment_folder, name)
-                for name in os.listdir(attachment_folder)
+            locales = {}
+            for name in os.listdir(attachment_folder):
                 if (
                     os.path.isdir(os.path.join(attachment_folder, name))
                     and name in app.locales
-                )
-            }
+                ):
+                    locales[name] = os.path.join(attachment_folder, name)
+                else:
+                    click.secho(f"Ignoring /{attachment}/{name}", fg='yellow')
+
             for locale, locale_folder in locales.items():
                 for name in sorted(os.listdir(locale_folder)):
                     if not name.endswith('.pdf'):
+                        click.secho(
+                            f"Ignoring {attachment}/{locale}/{name}",
+                            fg='yellow'
+                        )
                         continue
 
                     try:
                         bfs_number = Decimal(name.replace('.pdf', ''))
                     except InvalidOperation:
                         click.secho(
-                            f"Invalid name: {attachment}/{locale}/{name}",
+                            f"Invalid name {attachment}/{locale}/{name}",
                             fg='red'
                         )
+                        continue
 
                     vote = votes.by_bfs_number(bfs_number)
                     if not vote:
                         click.secho(
-                            f"No matching vote: {attachment}/{locale}/{name}",
+                            f"No matching vote {bfs_number} for "
+                            f"{attachment}/{locale}/{name}",
                             fg='red'
                         )
                         continue
