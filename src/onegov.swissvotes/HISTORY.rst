@@ -7,6 +7,9 @@ Changelog
 - Fixes display of the voter share of yes camp.
   [msom]
 
+- Fixes display of procedure number.
+  [msom]
+
 0.0.23 (2018-12-11)
 ~~~~~~~~~~~~~~~~~~~
 

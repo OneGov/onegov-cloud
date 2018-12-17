@@ -32,7 +32,7 @@ setup(
         'babel>=2.6.0',
         'cached_property',
         'cssmin',
-        'onegov.core',
+        'onegov.core>=0.74.4',
         'onegov.file>=0.10.0',
         'onegov.form>=0.40.0',
         'onegov.foundation',
