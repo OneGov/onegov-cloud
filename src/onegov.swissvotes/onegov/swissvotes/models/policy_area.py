@@ -289,6 +289,7 @@ class PolicyArea(object):
         for part in self.descriptor_path:
             lookup = lookup.get(part)
             if not lookup:
+                result.append(str(self.descriptor_decimal))
                 break
             result.append(lookup.label or str(self.descriptor))
         return result

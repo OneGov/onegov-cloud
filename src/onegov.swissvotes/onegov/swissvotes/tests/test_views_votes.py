@@ -1,8 +1,11 @@
+from io import BytesIO
 from onegov.core.utils import module_path
+from onegov.swissvotes.fields.dataset import COLUMNS
+from onegov.swissvotes.models import SwissVote
 from pytest import mark
 from webtest import TestApp as Client
 from webtest.forms import Upload
-from onegov.swissvotes.models import SwissVote
+from xlsxwriter.workbook import Workbook
 
 
 @mark.parametrize("file", [
@@ -70,3 +73,56 @@ def test_update_votes(swissvotes_app, file):
     assert "Datensatz aktualisiert (0 hinzugefügt, 0 geändert)" in manage
 
     assert csv == client.get('/votes/csv').body
+
+    # Delete all votes
+    manage = client.get('/votes/delete')
+    manage = manage.form.submit().follow()
+
+    assert swissvotes_app.session().query(SwissVote).count() == 0
+
+
+def test_update_votes_unknown_descriptors(swissvotes_app):
+    client = Client(swissvotes_app)
+    client.get('/locale/de_CH').follow()
+
+    login = client.get('/auth/login')
+    login.form['username'] = 'admin@example.org'
+    login.form['password'] = 'hunter2'
+    login.form.submit()
+
+    file = BytesIO()
+    workbook = Workbook(file)
+    worksheet = workbook.add_worksheet()
+    worksheet.write_row(0, 0, COLUMNS.values())
+    worksheet.write_row(1, 0, [
+        '100.1',  # anr
+        '1.2.2008',  # datum
+        '1',  # legislatur
+        '2004-2008',  # legisjahr
+        '2000-2009',  # jahrzent
+        'titel',  # titel
+        'stichwort',  # stichwort
+        '2',  # anzahl
+        '3',  # rechtsform
+        '13',  # d1e1
+        '',  # d1e2
+        '',  # d1e3
+        '12',  # d2e1
+        '12.6',  # d2e2
+        '',  # d2e3
+        '12',  # d3e1
+        '12.5',  # d3e2
+        '12.55',  # d3e3
+    ])
+    workbook.close()
+    file.seek(0)
+
+    manage = client.get('/votes/update')
+    manage.form['dataset'] = Upload(
+        'votes.xlsx',
+        file.read(),
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    manage = manage.form.submit().follow()
+    assert "Datensatz aktualisiert (1 hinzugefügt, 0 geändert)" in manage
+    assert "unbekannte Deskriptoren: 12.55, 12.6, 13" in manage

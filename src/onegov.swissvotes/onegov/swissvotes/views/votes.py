@@ -119,7 +119,7 @@ def export_votes_xlsx(self, request):
     template='form.pt',
     name='delete'
 )
-def delete_vote(self, request, form):
+def delete_votes(self, request, form):
     self = self.default()
 
     layout = DeleteVotesLayout(self, request)
