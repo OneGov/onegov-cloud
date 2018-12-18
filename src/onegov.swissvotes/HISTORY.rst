@@ -1,5 +1,10 @@
 Changelog
 ---------
+
+- Shows the localized file of the default locale if none is available for the
+  current locale.
+  [msom]
+
 0.0.25 (2018-12-17)
 ~~~~~~~~~~~~~~~~~~~
 

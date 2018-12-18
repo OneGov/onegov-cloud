@@ -18,7 +18,13 @@ from onegov.swissvotes.models import SwissVote
 )
 def view_vote(self, request):
     return {
-        'layout': VoteLayout(self, request)
+        'layout': VoteLayout(self, request),
+        'voting_text': self.get_file('voting_text'),
+        'federal_council_message': self.get_file('federal_council_message'),
+        'parliamentary_debate': self.get_file('parliamentary_debate'),
+        'voting_booklet': self.get_file('voting_booklet'),
+        'resolution': self.get_file('resolution'),
+        'realization': self.get_file('realization'),
     }
 
 

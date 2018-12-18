@@ -274,3 +274,14 @@ def test_vote_upload(swissvotes_app, attachments):
         assert page.content_type == 'application/pdf'
         assert page.content_length
         assert page.body
+
+    # Fallback
+    client.get('/locale/en_US').follow()
+    manage = client.get('/').maybe_follow().click("Votes")
+    manage = manage.click("Details")
+    for name in names:
+        name = name.replace('_', '-')
+        page = client.get(manage.pyquery(f'a.{name}')[0].attrib['href'])
+        assert page.content_type == 'application/pdf'
+        assert page.content_length
+        assert page.body
