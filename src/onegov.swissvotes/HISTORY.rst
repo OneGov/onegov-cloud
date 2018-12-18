@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.26 (2018-12-18)
+~~~~~~~~~~~~~~~~~~~
 
 - Shows the localized file of the default locale if none is available for the
   current locale.
