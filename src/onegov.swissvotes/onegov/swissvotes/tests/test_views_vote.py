@@ -4,6 +4,7 @@ from onegov.swissvotes.models import SwissVote
 from psycopg2.extras import NumericRange
 from transaction import commit
 from webtest import TestApp as Client
+from webtest.forms import Upload
 
 
 def test_view_vote(swissvotes_app):
@@ -123,7 +124,8 @@ def test_view_vote(swissvotes_app):
     client = Client(swissvotes_app)
     client.get('/locale/de_CH').follow()
 
-    page = client.get('/vote/100.1')
+    page = client.get('/').maybe_follow().click("Abstimmungen")
+    page = page.click("Details")
     assert "100.1" in page
     assert "Vote" in page
     assert "Keyword" in page
@@ -180,13 +182,14 @@ def test_view_vote(swissvotes_app):
     swissvotes_app.session().query(SwissVote).one()._legal_form = 3
     commit()
 
-    page = client.get('/vote/100.1')
+    page = client.get('/').maybe_follow().click("Abstimmungen")
+    page = page.click("Details")
     assert "Volksinitiative" in page
     assert "Initiator" in page
     assert "32 Tage" in page
 
     # Party strengths
-    page = client.get('/vote/100.1/strengths')
+    page = page.click("Details")
     assert "Nationalratswahl 1990"
     assert "21.2%" in page
     assert "22.2%" in page
@@ -220,7 +223,54 @@ def test_view_vote(swissvotes_app):
     login.form.submit()
 
     # Delete vote
-    manage = client.get('/vote/100.1/delete')
+    manage = client.get('/').maybe_follow().click("Abstimmungen")
+    manage = manage.click("Details").click("Abstimmung löschen")
     manage = manage.form.submit().follow()
 
     assert swissvotes_app.session().query(SwissVote).count() == 0
+
+
+def test_vote_upload(swissvotes_app, attachments):
+    names = attachments.keys()
+
+    swissvotes_app.session().add(
+        SwissVote(
+            bfs_number=Decimal('100.1'),
+            date=date(1990, 6, 2),
+            decade=NumericRange(1990, 1999),
+            legislation_number=4,
+            legislation_decade=NumericRange(1990, 1994),
+            title="Vote",
+            keyword="Keyword",
+            votes_on_same_day=2,
+            _legal_form=3,
+            initiator="Initiator",
+        )
+    )
+    commit()
+
+    client = Client(swissvotes_app)
+    client.get('/locale/de_CH').follow()
+
+    login = client.get('/auth/login')
+    login.form['username'] = 'admin@example.org'
+    login.form['password'] = 'hunter2'
+    login.form.submit()
+
+    manage = client.get('/').maybe_follow().click("Abstimmungen")
+    manage = manage.click("Details").click("Anhänge verwalten")
+    for name in names:
+        manage.form[name] = Upload(
+            f'{name}.pdf',
+            attachments[name].reference.file.read(),
+            'application/pdf'
+        )
+    manage = manage.form.submit().follow()
+    assert "Anhänge aktualisiert" in manage
+
+    for name in names:
+        name = name.replace('_', '-')
+        page = client.get(manage.pyquery(f'a.{name}')[0].attrib['href'])
+        assert page.content_type == 'application/pdf'
+        assert page.content_length
+        assert page.body

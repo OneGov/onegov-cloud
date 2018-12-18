@@ -24,7 +24,8 @@ def test_update_votes(swissvotes_app, file):
         content = f.read()
 
     # Upload
-    manage = client.get('/votes/update')
+    manage = client.get('/').maybe_follow().click("Abstimmungen")
+    manage = manage.click("Datensatz aktualisieren")
     manage.form['dataset'] = Upload(
         'votes.xlsx',
         content,
@@ -49,7 +50,8 @@ def test_update_votes(swissvotes_app, file):
     assert vote.recommendations_parties['Nay'][0].name == 'sps'
 
     # Upload (unchanged)
-    manage = client.get('/votes/update')
+    manage = client.get('/').maybe_follow().click("Abstimmungen")
+    manage = manage.click("Datensatz aktualisieren")
     manage.form['dataset'] = Upload(
         'votes.xlsx',
         content,
@@ -59,11 +61,13 @@ def test_update_votes(swissvotes_app, file):
     assert "Datensatz aktualisiert (0 hinzugefügt, 0 geändert)" in manage
 
     # Download
-    csv = client.get('/votes/csv').body
-    xlsx = client.get('/votes/xlsx').body
+    manage = client.get('/').maybe_follow().click("Abstimmungen")
+    csv = manage.click("Datensatz herunterladen", index=0).body
+    xlsx = manage.click("Datensatz herunterladen", index=1).body
 
     # Upload (roundtrip)
-    manage = client.get('/votes/update')
+    manage = client.get('/').maybe_follow().click("Abstimmungen")
+    manage = manage.click("Datensatz aktualisieren")
     manage.form['dataset'] = Upload(
         'votes.xlsx',
         xlsx,
@@ -75,7 +79,8 @@ def test_update_votes(swissvotes_app, file):
     assert csv == client.get('/votes/csv').body
 
     # Delete all votes
-    manage = client.get('/votes/delete')
+    manage = client.get('/').maybe_follow().click("Abstimmungen")
+    manage = manage.click("Alle Abstimmungen löschen")
     manage = manage.form.submit().follow()
 
     assert swissvotes_app.session().query(SwissVote).count() == 0
@@ -117,7 +122,8 @@ def test_update_votes_unknown_descriptors(swissvotes_app):
     workbook.close()
     file.seek(0)
 
-    manage = client.get('/votes/update')
+    manage = client.get('/').maybe_follow().click("Abstimmungen")
+    manage = manage.click("Datensatz aktualisieren")
     manage.form['dataset'] = Upload(
         'votes.xlsx',
         file.read(),
