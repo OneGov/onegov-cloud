@@ -692,10 +692,6 @@
             "district": "Zofingen",
             "name": "Aarburg"
         },
-        "4272": {
-            "district": "Zofingen",
-            "name": "Attelwil"
-        },
         "4273": {
             "district": "Zofingen",
             "name": "Bottenwil"
@@ -1683,10 +1679,6 @@
         "663": {
             "district": "Bern-Mittelland",
             "name": "Frauenkappelen"
-        },
-        "664": {
-            "district": "Bern-Mittelland",
-            "name": "Golaten"
         },
         "665": {
             "district": "Bern-Mittelland",
@@ -3505,18 +3497,6 @@
             "district": "Viamala",
             "name": "Avers"
         },
-        "3691": {
-            "district": "Viamala",
-            "name": "Hinterrhein"
-        },
-        "3693": {
-            "district": "Viamala",
-            "name": "Nufenen"
-        },
-        "3694": {
-            "district": "Viamala",
-            "name": "Spl\u00fcgen"
-        },
         "3695": {
             "district": "Viamala",
             "name": "Sufers"
@@ -3552,6 +3532,10 @@
         "3713": {
             "district": "Viamala",
             "name": "Ferrera"
+        },
+        "3714": {
+            "district": "Viamala",
+            "name": "Rheinwald"
         },
         "3721": {
             "district": "Imboden",
@@ -3883,10 +3867,6 @@
             "district": "Del\u00e9mont",
             "name": "Pleigne"
         },
-        "6720": {
-            "district": "Del\u00e9mont",
-            "name": "Rebeuvelier"
-        },
         "6721": {
             "district": "Del\u00e9mont",
             "name": "Rossemaison"
@@ -3898,10 +3878,6 @@
         "6724": {
             "district": "Del\u00e9mont",
             "name": "Soyhi\u00e8res"
-        },
-        "6728": {
-            "district": "Del\u00e9mont",
-            "name": "Vellerat"
         },
         "6729": {
             "district": "Del\u00e9mont",
@@ -8253,10 +8229,6 @@
             "district": "Andelfingen",
             "name": "Marthalen"
         },
-        "36": {
-            "district": "Andelfingen",
-            "name": "Oberstammheim"
-        },
         "37": {
             "district": "Andelfingen",
             "name": "Ossingen"
@@ -8277,17 +8249,9 @@
             "district": "Andelfingen",
             "name": "Truttikon"
         },
-        "42": {
-            "district": "Andelfingen",
-            "name": "Unterstammheim"
-        },
         "43": {
             "district": "Andelfingen",
             "name": "Volken"
-        },
-        "44": {
-            "district": "Andelfingen",
-            "name": "Waltalingen"
         },
         "51": {
             "district": "B\u00fclach",
@@ -8513,10 +8477,6 @@
             "district": "Horgen",
             "name": "Adliswil"
         },
-        "134": {
-            "district": "Horgen",
-            "name": "H\u00fctten"
-        },
         "135": {
             "district": "Horgen",
             "name": "Kilchberg (ZH)"
@@ -8537,17 +8497,9 @@
             "district": "Horgen",
             "name": "R\u00fcschlikon"
         },
-        "140": {
-            "district": "Horgen",
-            "name": "Sch\u00f6nenberg (ZH)"
-        },
         "141": {
             "district": "Horgen",
             "name": "Thalwil"
-        },
-        "142": {
-            "district": "Horgen",
-            "name": "W\u00e4denswil"
         },
         "151": {
             "district": "Meilen",
@@ -8780,6 +8732,14 @@
         "261": {
             "district": "Z\u00fcrich",
             "name": "Z\u00fcrich"
+        },
+        "292": {
+            "district": "Andelfingen",
+            "name": "Stammheim"
+        },
+        "293": {
+            "district": "Horgen",
+            "name": "W\u00e4denswil"
         },
         "294": {
             "district": "Winterthur",

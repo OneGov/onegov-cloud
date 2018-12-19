@@ -1,10 +1,11 @@
+from freezegun import freeze_time
 from onegov.election_day.models import Canton
 from onegov.election_day.models import Municipality
 from onegov.election_day.models import Principal
 from textwrap import dedent
 
 
-SUPPORTED_YEARS = list(range(2002, 2018 + 1))
+SUPPORTED_YEARS = list(range(2002, 2019 + 1))
 
 SUPPORTED_YEARS_MAP = list(range(2013, 2018 + 1))
 SUPPORTED_YEARS_NO_MAP = list(set(SUPPORTED_YEARS) - set(SUPPORTED_YEARS_MAP))
@@ -227,10 +228,11 @@ def test_canton_has_districts():
 
 def test_municipality_entities():
     # Municipality without quarters
-    principal = Municipality(name='Kriens', municipality='1059')
-    assert principal.entities == {
-        year: {1059: {'name': 'Kriens'}} for year in SUPPORTED_YEARS
-    }
+    with freeze_time("{}-01-01".format(SUPPORTED_YEARS[-1])):
+        principal = Municipality(name='Kriens', municipality='1059')
+        assert principal.entities == {
+            year: {1059: {'name': 'Kriens'}} for year in SUPPORTED_YEARS
+        }
 
     # Municipality with quarters
     principal = Municipality(name='Bern', municipality='351')
@@ -247,12 +249,13 @@ def test_municipality_entities():
 
 def test_principal_years_available():
     # Municipality without quarters/map
-    principal = Municipality(name='Kriens', municipality='1059')
-    assert not principal.is_year_available(2000)
-    assert not principal.is_year_available(2000, map_required=False)
-    for year in SUPPORTED_YEARS:
-        assert not principal.is_year_available(year)
-        assert principal.is_year_available(year, map_required=False)
+    with freeze_time("{}-01-01".format(SUPPORTED_YEARS[-1])):
+        principal = Municipality(name='Kriens', municipality='1059')
+        assert not principal.is_year_available(2000)
+        assert not principal.is_year_available(2000, map_required=False)
+        for year in SUPPORTED_YEARS:
+            assert not principal.is_year_available(year)
+            assert principal.is_year_available(year, map_required=False)
 
     # Municipality with quarters/map
     principal = Municipality(name='Bern', municipality='351')

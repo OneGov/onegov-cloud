@@ -1,0 +1,334 @@
+{
+    "1001": {
+        "district": "Entlebuch",
+        "name": "Doppleschwand"
+    },
+    "1002": {
+        "district": "Entlebuch",
+        "name": "Entlebuch"
+    },
+    "1004": {
+        "district": "Entlebuch",
+        "name": "Fl\u00fchli"
+    },
+    "1005": {
+        "district": "Entlebuch",
+        "name": "Hasle (LU)"
+    },
+    "1007": {
+        "district": "Entlebuch",
+        "name": "Romoos"
+    },
+    "1008": {
+        "district": "Entlebuch",
+        "name": "Sch\u00fcpfheim"
+    },
+    "1009": {
+        "district": "Entlebuch",
+        "name": "Werthenstein"
+    },
+    "1010": {
+        "district": "Entlebuch",
+        "name": "Escholzmatt-Marbach"
+    },
+    "1021": {
+        "district": "Hochdorf",
+        "name": "Aesch (LU)"
+    },
+    "1022": {
+        "district": "Hochdorf",
+        "name": "Altwis"
+    },
+    "1023": {
+        "district": "Hochdorf",
+        "name": "Ballwil"
+    },
+    "1024": {
+        "district": "Hochdorf",
+        "name": "Emmen"
+    },
+    "1025": {
+        "district": "Hochdorf",
+        "name": "Ermensee"
+    },
+    "1026": {
+        "district": "Hochdorf",
+        "name": "Eschenbach (LU)"
+    },
+    "1030": {
+        "district": "Hochdorf",
+        "name": "Hitzkirch"
+    },
+    "1031": {
+        "district": "Hochdorf",
+        "name": "Hochdorf"
+    },
+    "1032": {
+        "district": "Hochdorf",
+        "name": "Hohenrain"
+    },
+    "1033": {
+        "district": "Hochdorf",
+        "name": "Inwil"
+    },
+    "1037": {
+        "district": "Hochdorf",
+        "name": "Rain"
+    },
+    "1039": {
+        "district": "Hochdorf",
+        "name": "R\u00f6merswil"
+    },
+    "1040": {
+        "district": "Hochdorf",
+        "name": "Rothenburg"
+    },
+    "1041": {
+        "district": "Hochdorf",
+        "name": "Schongau"
+    },
+    "1051": {
+        "district": "Luzern-Land",
+        "name": "Adligenswil"
+    },
+    "1052": {
+        "district": "Luzern-Land",
+        "name": "Buchrain"
+    },
+    "1053": {
+        "district": "Luzern-Land",
+        "name": "Dierikon"
+    },
+    "1054": {
+        "district": "Luzern-Land",
+        "name": "Ebikon"
+    },
+    "1055": {
+        "district": "Luzern-Land",
+        "name": "Gisikon"
+    },
+    "1056": {
+        "district": "Luzern-Land",
+        "name": "Greppen"
+    },
+    "1057": {
+        "district": "Luzern-Land",
+        "name": "Honau"
+    },
+    "1058": {
+        "district": "Luzern-Land",
+        "name": "Horw"
+    },
+    "1059": {
+        "district": "Luzern-Land",
+        "name": "Kriens"
+    },
+    "1061": {
+        "district": "Luzern-Stadt",
+        "name": "Luzern"
+    },
+    "1062": {
+        "district": "Luzern-Land",
+        "name": "Malters"
+    },
+    "1063": {
+        "district": "Luzern-Land",
+        "name": "Meggen"
+    },
+    "1064": {
+        "district": "Luzern-Land",
+        "name": "Meierskappel"
+    },
+    "1065": {
+        "district": "Luzern-Land",
+        "name": "Root"
+    },
+    "1066": {
+        "district": "Luzern-Land",
+        "name": "Schwarzenberg"
+    },
+    "1067": {
+        "district": "Luzern-Land",
+        "name": "Udligenswil"
+    },
+    "1068": {
+        "district": "Luzern-Land",
+        "name": "Vitznau"
+    },
+    "1069": {
+        "district": "Luzern-Land",
+        "name": "Weggis"
+    },
+    "1081": {
+        "district": "Sursee",
+        "name": "Berom\u00fcnster"
+    },
+    "1082": {
+        "district": "Sursee",
+        "name": "B\u00fcron"
+    },
+    "1083": {
+        "district": "Sursee",
+        "name": "Buttisholz"
+    },
+    "1084": {
+        "district": "Sursee",
+        "name": "Eich"
+    },
+    "1085": {
+        "district": "Sursee",
+        "name": "Geuensee"
+    },
+    "1086": {
+        "district": "Sursee",
+        "name": "Grosswangen"
+    },
+    "1088": {
+        "district": "Sursee",
+        "name": "Hildisrieden"
+    },
+    "1089": {
+        "district": "Sursee",
+        "name": "Knutwil"
+    },
+    "1091": {
+        "district": "Sursee",
+        "name": "Mauensee"
+    },
+    "1093": {
+        "district": "Sursee",
+        "name": "Neuenkirch"
+    },
+    "1094": {
+        "district": "Sursee",
+        "name": "Nottwil"
+    },
+    "1095": {
+        "district": "Sursee",
+        "name": "Oberkirch"
+    },
+    "1097": {
+        "district": "Sursee",
+        "name": "Rickenbach (LU)"
+    },
+    "1098": {
+        "district": "Sursee",
+        "name": "Ruswil"
+    },
+    "1099": {
+        "district": "Sursee",
+        "name": "Schenkon"
+    },
+    "1100": {
+        "district": "Sursee",
+        "name": "Schlierbach"
+    },
+    "1102": {
+        "district": "Sursee",
+        "name": "Sempach"
+    },
+    "1103": {
+        "district": "Sursee",
+        "name": "Sursee"
+    },
+    "1104": {
+        "district": "Sursee",
+        "name": "Triengen"
+    },
+    "1107": {
+        "district": "Entlebuch",
+        "name": "Wolhusen"
+    },
+    "1121": {
+        "district": "Willisau",
+        "name": "Alberswil"
+    },
+    "1122": {
+        "district": "Willisau",
+        "name": "Altb\u00fcron"
+    },
+    "1123": {
+        "district": "Willisau",
+        "name": "Altishofen"
+    },
+    "1125": {
+        "district": "Willisau",
+        "name": "Dagmersellen"
+    },
+    "1126": {
+        "district": "Willisau",
+        "name": "Ebersecken"
+    },
+    "1127": {
+        "district": "Willisau",
+        "name": "Egolzwil"
+    },
+    "1128": {
+        "district": "Willisau",
+        "name": "Ettiswil"
+    },
+    "1129": {
+        "district": "Willisau",
+        "name": "Fischbach"
+    },
+    "1130": {
+        "district": "Willisau",
+        "name": "Gettnau"
+    },
+    "1131": {
+        "district": "Willisau",
+        "name": "Grossdietwil"
+    },
+    "1132": {
+        "district": "Willisau",
+        "name": "Hergiswil bei Willisau"
+    },
+    "1135": {
+        "district": "Willisau",
+        "name": "Luthern"
+    },
+    "1136": {
+        "district": "Willisau",
+        "name": "Menznau"
+    },
+    "1137": {
+        "district": "Willisau",
+        "name": "Nebikon"
+    },
+    "1139": {
+        "district": "Willisau",
+        "name": "Pfaffnau"
+    },
+    "1140": {
+        "district": "Willisau",
+        "name": "Reiden"
+    },
+    "1142": {
+        "district": "Willisau",
+        "name": "Roggliswil"
+    },
+    "1143": {
+        "district": "Willisau",
+        "name": "Sch\u00f6tz"
+    },
+    "1145": {
+        "district": "Willisau",
+        "name": "Ufhusen"
+    },
+    "1146": {
+        "district": "Willisau",
+        "name": "Wauwil"
+    },
+    "1147": {
+        "district": "Willisau",
+        "name": "Wikon"
+    },
+    "1150": {
+        "district": "Willisau",
+        "name": "Zell (LU)"
+    },
+    "1151": {
+        "district": "Willisau",
+        "name": "Willisau"
+    }
+}
