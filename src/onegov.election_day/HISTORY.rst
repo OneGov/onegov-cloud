@@ -4,6 +4,9 @@ Changelog
 - Adds municipalities and quarter data for 2019.
   [msom]
 
+- Adds interim map data for 2019.
+  [msom]
+
 3.7.4 (2018-11-27)
 ~~~~~~~~~~~~~~~~~~~
 
