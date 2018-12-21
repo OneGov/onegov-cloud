@@ -58,3 +58,8 @@ ul.hidden-people span {
         margin-left: .5em;
     }
 }
+
+li[data-sortable-id] a,
+ul.sortable-multi-checkbox li label {
+    cursor: grab;
+}

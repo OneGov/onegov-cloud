@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Indicates drag and drop-sortable items by using the grab cursor.
+  [msom]
+
 1.4.0 (2018-12-03)
 ~~~~~~~~~~~~~~~~~~~~
 
