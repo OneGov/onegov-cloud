@@ -1,7 +1,7 @@
 from morepath import redirect
 from morepath.request import Response
 from onegov.core.security import Personal
-from onegov.core.security import Secret
+from onegov.core.security import Private
 from onegov.core.utils import normalize_for_url
 from onegov.gazette import _
 from onegov.gazette import GazetteApp
@@ -98,8 +98,9 @@ def view_notice(self, request):
             actions.append(action['delete'])
     elif self.state == 'accepted':
         actions.append(action['copy'])
-        if admin:
+        if publisher:
             actions.append(action['edit_un'])
+        if admin:
             actions.append(action['attachments'])
         if publisher:
             actions.append(action['delete'])
@@ -109,8 +110,9 @@ def view_notice(self, request):
             actions.append(action['delete'])
     elif self.state == 'published':
         actions.append(action['copy'])
-        if admin:
+        if publisher:
             actions.append(action['edit_un'])
+        if admin:
             actions.append(action['attachments'])
 
     actions.append(action['preview'])
@@ -261,7 +263,7 @@ def edit_notice(self, request, form):
     model=GazetteNotice,
     name='edit-unrestricted',
     template='form.pt',
-    permission=Secret,
+    permission=Private,
     form=UnrestrictedNoticeForm
 )
 def edit_notice_unrestricted(self, request, form):

@@ -190,12 +190,11 @@ def test_view_notice_edit_unrestricted(gazette_app):
     # drafted
     with freeze_time(future):
         edit_notice_unrestricted(editor_1, 'notice', forbidden=True)
-        edit_notice_unrestricted(publisher, 'notice', forbidden=True)
-        edit_notice_unrestricted(
-            admin, 'notice', title='unres_drafted', phone_number='+41415112291'
-        )
-        assert 'unres_drafted' in editor_1.get('/notice/notice')
-        assert '+41415112291' in editor_1.get('/notice/notice')
+        edit_notice_unrestricted(publisher, 'notice', title='unres_drafted')
+        edit_notice_unrestricted(admin, 'notice', phone_number='+41415112291')
+        notice = editor_1.get('/notice/notice')
+        assert 'unres_drafted' in notice
+        assert '+41415112291' in notice
         assert '+41415112291' in admin.get('/user/editor1%40example.org/edit')
 
         manage = admin.get('/notice/notice/edit-unrestricted')
@@ -207,26 +206,32 @@ def test_view_notice_edit_unrestricted(gazette_app):
         submit_notice(editor_1, 'notice')
     with freeze_time(future):
         edit_notice_unrestricted(editor_1, 'notice', forbidden=True)
-        edit_notice_unrestricted(publisher, 'notice', forbidden=True)
+        edit_notice_unrestricted(publisher, 'notice', author_name='Somebody')
         edit_notice_unrestricted(admin, 'notice', title='unres_submitted')
-        assert 'unres_submitted' in editor_1.get('/notice/notice')
+        notice = editor_1.get('/notice/notice')
+        assert 'Somebody' in notice
+        assert 'unres_submitted' in notice
 
-        manage = admin.get('/notice/notice/edit-unrestricted')
-        assert "(Complaints)" in manage
-        assert "(Sikh Community)" in manage
+        for user in (publisher, admin):
+            manage = user.get('/notice/notice/edit-unrestricted')
+            assert "(Complaints)" in manage
+            assert "(Sikh Community)" in manage
 
     # rejected
     with freeze_time(then):
         reject_notice(publisher, 'notice')
     with freeze_time(future):
         edit_notice_unrestricted(editor_1, 'notice', forbidden=True)
-        edit_notice_unrestricted(publisher, 'notice', forbidden=True)
+        edit_notice_unrestricted(publisher, 'notice', author_name='Someone')
         edit_notice_unrestricted(admin, 'notice', title='unres_rejected')
-        assert 'unres_rejected' in editor_1.get('/notice/notice')
+        notice = editor_1.get('/notice/notice')
+        assert 'Someone' in notice
+        assert 'unres_rejected' in notice
 
-        manage = admin.get('/notice/notice/edit-unrestricted')
-        assert "(Complaints)" in manage
-        assert "(Sikh Community)" in manage
+        for user in (publisher, admin):
+            manage = user.get('/notice/notice/edit-unrestricted')
+            assert "(Complaints)" in manage
+            assert "(Sikh Community)" in manage
 
     # accepted
     with freeze_time(then):
@@ -234,11 +239,14 @@ def test_view_notice_edit_unrestricted(gazette_app):
         accept_notice(publisher, 'notice')
     with freeze_time(future):
         edit_notice_unrestricted(editor_1, 'notice', forbidden=True)
-        edit_notice_unrestricted(publisher, 'notice', forbidden=True)
+        edit_notice_unrestricted(publisher, 'notice', author_name='No one')
         edit_notice_unrestricted(admin, 'notice', title='unres_accepted')
-        assert 'unres_accepted' in editor_1.get('/notice/notice')
+        notice = editor_1.get('/notice/notice')
+        assert 'No one' in notice
+        assert 'unres_accepted' in notice
 
-        manage = admin.get('/notice/notice/edit-unrestricted')
-        assert "(Complaints)" in manage
-        assert "(Sikh Community)" in manage
-        assert "Diese Meldung wurde bereits angenommen!" in manage
+        for user in (publisher, admin):
+            manage = user.get('/notice/notice/edit-unrestricted')
+            assert "(Complaints)" in manage
+            assert "(Sikh Community)" in manage
+            assert "Diese Meldung wurde bereits angenommen!" in manage
