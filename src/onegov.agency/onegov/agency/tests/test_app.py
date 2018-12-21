@@ -1,26 +1,68 @@
 from io import BytesIO
-from onegov.agency.app import get_top_navigation
+from onegov.agency.custom import get_global_tools
+from onegov.agency.custom import get_top_navigation
 from onegov.agency.pdf import AgencyPdfAr
 from onegov.agency.pdf import AgencyPdfDefault
 from onegov.agency.pdf import AgencyPdfZg
+from onegov.org.new_elements import Link
+from onegov.org.new_elements import LinkGroup
 
 
 class DummyRequest():
+    is_logged_in = False
     is_manager = False
+    is_admin = False
+    path = ''
 
     def class_link(self, cls, name=''):
         return f'{cls.__name__}/{name}'
 
+    def link(self, target, name):
+        return f"{target.__class__.__name__}/{name}"
 
-def test_app_get_top_navigation():
+    def transform(self, url):
+        return url
+
+
+def test_app_custom(agency_app):
+    def as_text(items):
+        result = []
+        for item in items:
+            if isinstance(item, Link):
+                result.append(item.text)
+            if isinstance(item, LinkGroup):
+                result.append({item.title: as_text(item.links)})
+        return result
+
     request = DummyRequest()
-    assert [a.text for a in get_top_navigation(request)] == [
-        'People', 'Agencies'
+    request.app = agency_app
+
+    assert as_text(get_top_navigation(request)) == ['People', 'Agencies']
+    assert as_text(get_global_tools(request)) == ['Login']
+
+    request.is_logged_in = True
+    request.current_username = 'Peter'
+    assert as_text(get_top_navigation(request)) == ['People', 'Agencies']
+    assert as_text(get_global_tools(request)) == [
+        {'Peter': ['User Profile', 'Logout']}
     ]
 
     request.is_manager = True
-    assert [a.text for a in get_top_navigation(request)] == [
-        'People', 'Agencies', 'Hidden contents'
+    assert as_text(get_top_navigation(request)) == ['People', 'Agencies']
+    assert as_text(get_global_tools(request)) == [
+        {'Peter': ['User Profile', 'Logout']},
+        {'Management': ['Timeline', 'Files', 'Images', 'Payments',
+                        'Hidden contents']},
+        {'Tickets': ['Open Tickets', 'Pending Tickets', 'Closed Tickets']}
+    ]
+
+    request.is_admin = True
+    assert as_text(get_top_navigation(request)) == ['People', 'Agencies']
+    assert as_text(get_global_tools(request)) == [
+        {'Peter': ['User Profile', 'Logout']},
+        {'Management': ['Timeline', 'Files', 'Images', 'Payments',
+                        'Settings', 'Users', 'Hidden contents']},
+        {'Tickets': ['Open Tickets', 'Pending Tickets', 'Closed Tickets']}
     ]
 
 

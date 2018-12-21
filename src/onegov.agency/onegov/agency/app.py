@@ -1,18 +1,14 @@
-from onegov.agency import _
-from onegov.agency.collections import ExtendedAgencyCollection
-from onegov.agency.collections import ExtendedPersonCollection
+from onegov.agency.custom import get_global_tools
+from onegov.agency.custom import get_top_navigation
 from onegov.agency.initial_content import create_new_organisation
+from onegov.agency.pdf import AgencyPdfAr
+from onegov.agency.pdf import AgencyPdfDefault
+from onegov.agency.pdf import AgencyPdfZg
 from onegov.agency.theme import AgencyTheme
 from onegov.core import utils
 from onegov.form import FormApp
 from onegov.org import OrgApp
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
-from onegov.org.custom import get_global_tools
-from onegov.org.models import Organisation
-from onegov.org.new_elements import Link
-from onegov.agency.pdf import AgencyPdfAr
-from onegov.agency.pdf import AgencyPdfDefault
-from onegov.agency.pdf import AgencyPdfZg
 
 
 class AgencyApp(OrgApp, FormApp):
@@ -71,22 +67,6 @@ def get_template_variables(request):
         'global_tools': tuple(get_global_tools(request)),
         'top_navigation': tuple(get_top_navigation(request)),
     }
-
-
-def get_top_navigation(request):
-    yield Link(
-        text=_("People"),
-        url=request.class_link(ExtendedPersonCollection)
-    )
-    yield Link(
-        text=_("Agencies"),
-        url=request.class_link(ExtendedAgencyCollection)
-    )
-    if request.is_manager:
-        yield Link(
-            text=_("Hidden contents"),
-            url=request.class_link(Organisation, name='view-hidden')
-        )
 
 
 @AgencyApp.setting(section='core', name='theme')

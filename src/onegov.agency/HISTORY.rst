@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Moves the hidden contents view to the management settings.
+  [msom]
+
 - Indicates drag and drop-sortable items by using the grab cursor.
   [msom]
 

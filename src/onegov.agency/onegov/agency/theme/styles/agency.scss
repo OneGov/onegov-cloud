@@ -63,3 +63,7 @@ li[data-sortable-id] a,
 ul.sortable-multi-checkbox li label {
     cursor: grab;
 }
+
+.globals .hidden-contents::before {
+    @include icon('\f070');
+}
