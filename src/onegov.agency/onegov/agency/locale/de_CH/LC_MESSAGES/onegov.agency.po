@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-11-29 15:58+0100\n"
-"PO-Revision-Date: 2018-11-29 15:42+0100\n"
+"POT-Creation-Date: 2018-12-21 11:29+0100\n"
+"PO-Revision-Date: 2018-12-21 11:18+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -36,6 +36,9 @@ msgstr "Zu berücksichtigende Felder der Mitgliedschaften"
 
 msgid "PDF Export"
 msgstr "PDF Export"
+
+msgid "Destination"
+msgstr "Ziel"
 
 msgid "Membership: Title"
 msgstr "Mitgliedschaft: Titel"
@@ -76,6 +79,9 @@ msgstr "Person: Telefon"
 msgid "Person: Direct Phone"
 msgstr "Person: Direktnummer"
 
+msgid "- Root -"
+msgstr "- oberste Ebene -"
+
 msgid "E-Mail"
 msgstr "E-Mail"
 
@@ -115,11 +121,23 @@ msgstr "Hinzufügen"
 msgid "Edit"
 msgstr "Bearbeiten"
 
-msgid "Sort relationships"
-msgstr "Mitgliedschaften sortieren"
+msgid "Move"
+msgstr "Verschieben"
 
 msgid "Delete"
 msgstr "Löschen"
+
+msgid "Sort relationships"
+msgstr "Mitgliedschaften sortieren"
+
+msgid "Do you really want to delete this agency?"
+msgstr "Möchten Sie die Organisation wirklich löschen?"
+
+msgid "This cannot be undone."
+msgstr "Dies kann nicht rückgängig gemacht werden."
+
+msgid "Delete agency"
+msgstr "Organisation löschen"
 
 msgid ""
 "Do you really want to sort the relationships alphabetically by last name and "
@@ -127,15 +145,6 @@ msgid ""
 msgstr ""
 "Möchten Sie die Mitgliedschaften alphabetisch nach Nachname und Vornamen "
 "sortieren?"
-
-msgid "This cannot be undone."
-msgstr "Dies kann nicht rückgängig gemacht werden."
-
-msgid "Do you really want to delete this agency?"
-msgstr "Möchten Sie die Organisation wirklich löschen?"
-
-msgid "Delete agency"
-msgstr "Organisation löschen"
 
 msgid "Membership"
 msgstr "Mitgliedschaft"
@@ -228,6 +237,13 @@ msgid "New membership"
 msgstr "Neue Mitgliedschaft"
 
 msgid ""
+"Moves the whole agency and all its people and suborganizations to the given "
+"destination."
+msgstr ""
+"Verschiebt die gesamte Organisation mit allen Personen und "
+"Unterorganisationen an den entsprechenden Ort."
+
+msgid ""
 "Create a PDF of this agency and all its suborganizations. This may take a "
 "while."
 msgstr ""
@@ -245,6 +261,9 @@ msgstr "Eine neue Mitgliedschaft wurde hinzufügt"
 
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
+
+msgid "Agency moved"
+msgstr "Organisation verschoben"
 
 msgid "PDF created"
 msgstr "PDF erstellt"

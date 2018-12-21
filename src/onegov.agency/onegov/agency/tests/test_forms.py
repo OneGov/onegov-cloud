@@ -1,7 +1,9 @@
 from cgi import FieldStorage
+from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.forms import ExtendedAgencyForm
 from onegov.agency.forms import MembershipForm
+from onegov.agency.forms import MoveAgencyForm
 from onegov.agency.forms import MutationForm
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedAgencyMembership
@@ -105,6 +107,69 @@ def test_extended_agency_form_choices():
     for choice in form.export_fields.choices:
         model, attribute = choice[0].split('.')
         assert hasattr(models[model], attribute)
+
+
+def test_move_agency_form(session):
+    agencies = ExtendedAgencyCollection(session)
+    agency_a = agencies.add_root(title="a")
+    agencies.add(title="a.1", parent=agency_a)
+    agency_a_2 = agencies.add(title="a.2", parent=agency_a)
+    agency_a_2_1 = agencies.add(title="a.2.1", parent=agency_a_2)
+    agency_f = agencies.add_root(title="f")
+    agencies.add_root(title="ç")
+
+    # request
+    form = MoveAgencyForm()
+    form.request = DummyRequest(session)
+    form.on_request()
+    assert form.parent_id.choices == [
+        ('root', '- Root -'),
+        ('1', 'a'), ('2', 'a.1'), ('3', 'a.2'), ('4', 'a.2.1'),
+        ('6', 'ç'), ('5', 'f')
+    ]
+
+    # apply
+    form.apply_model(agency_a)
+    assert form.parent_id.choices == [
+        ('6', 'ç'), ('5', 'f')
+    ]
+
+    form.on_request()
+    form.apply_model(agency_a_2)
+    assert form.parent_id.choices == [
+        ('root', '- Root -'),
+        ('2', 'a.1'),
+        ('6', 'ç'), ('5', 'f')
+    ]
+
+    form.on_request()
+    form.apply_model(agency_a_2_1)
+    assert form.parent_id.choices == [
+        ('root', '- Root -'),
+        ('1', 'a'), ('2', 'a.1'),
+        ('6', 'ç'), ('5', 'f')
+    ]
+
+    form.on_request()
+    form.apply_model(agency_f)
+    assert form.parent_id.choices == [
+        ('1', 'a'), ('2', 'a.1'), ('3', 'a.2'), ('4', 'a.2.1'),
+        ('6', 'ç')
+    ]
+
+    # update
+    model = ExtendedAgency(title="Agency")
+    form = MoveAgencyForm()
+    form.update_model(model)
+    assert model.parent_id == None
+
+    form = MoveAgencyForm(DummyPostData({'parent_id': 'root'}))
+    form.update_model(model)
+    assert model.parent_id == None
+
+    form = MoveAgencyForm(DummyPostData({'parent_id': '10'}))
+    form.update_model(model)
+    assert model.parent_id == 10
 
 
 def test_membership_form(session):

@@ -5,6 +5,7 @@ from onegov.agency import AgencyApp
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.forms import ExtendedAgencyForm
 from onegov.agency.forms import MembershipForm
+from onegov.agency.forms import MoveAgencyForm
 from onegov.agency.layouts import AgencyCollectionLayout
 from onegov.agency.layouts import AgencyLayout
 from onegov.agency.models import AgencyMove
@@ -177,6 +178,37 @@ def edit_agency(self, request, form):
     }
 
 
+@AgencyApp.form(
+    model=ExtendedAgency,
+    name='move',
+    template='form.pt',
+    permission=Private,
+    form=MoveAgencyForm
+)
+def move_agency(self, request, form):
+
+    if form.submitted(request):
+        form.update_model(self)
+        request.success(_("Agency moved"))
+        return redirect(request.link(self))
+
+    if not form.errors:
+        form.apply_model(self)
+
+    layout = AgencyLayout(self, request)
+    layout.breadcrumbs.append(Link(_("Move"), '#'))
+
+    return {
+        'layout': layout,
+        'title': self.title,
+        'helptext': _(
+            "Moves the whole agency and all its people and suborganizations "
+            "to the given destination."
+        ),
+        'form': form
+    }
+
+
 @AgencyApp.view(
     model=ExtendedAgencyCollection,
     name='pdf',
@@ -278,6 +310,6 @@ def delete_agency(self, request):
     permission=Private,
     request_method='PUT'
 )
-def move_agency(self, request):
+def execute_agency_move(self, request):
     request.assert_valid_csrf_token()
     self.execute()

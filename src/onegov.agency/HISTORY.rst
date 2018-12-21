@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Allows to move agencies.
+  [msom]
+
 - Moves the hidden contents view to the management settings.
   [msom]
 

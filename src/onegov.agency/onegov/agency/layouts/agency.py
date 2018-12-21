@@ -77,6 +77,29 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
                     attrs={'class': 'edit-link'}
                 ),
                 Link(
+                    text=_("Move"),
+                    url=self.request.link(self.model.proxy(), 'move'),
+                    attrs={'class': 'move'}
+                ),
+                Link(
+                    text=_("Delete"),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _("Do you really want to delete this agency?"),
+                            _("This cannot be undone."),
+                            _("Delete agency")
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.link(self.collection)
+                        )
+                    )
+                ),
+                Link(
                     text=_("Sort relationships"),
                     url=self.csrf_protected_url(
                         self.request.link(
@@ -103,24 +126,6 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
                     text=_("Create PDF"),
                     url=self.request.link(self.model.proxy(), 'create-pdf'),
                     attrs={'class': 'create-pdf'}
-                ),
-                Link(
-                    text=_("Delete"),
-                    url=self.csrf_protected_url(
-                        self.request.link(self.model)
-                    ),
-                    attrs={'class': 'delete-link'},
-                    traits=(
-                        Confirm(
-                            _("Do you really want to delete this agency?"),
-                            _("This cannot be undone."),
-                            _("Delete agency")
-                        ),
-                        Intercooler(
-                            request_method='DELETE',
-                            redirect_after=self.request.link(self.collection)
-                        )
-                    )
                 ),
                 LinkGroup(
                     title=_("Add"),

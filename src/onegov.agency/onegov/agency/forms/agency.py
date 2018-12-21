@@ -1,11 +1,15 @@
 from cgi import FieldStorage
 from io import BytesIO
 from onegov.agency import _
+from onegov.agency.models import ExtendedAgency
 from onegov.form import Form
-from onegov.form.fields import UploadField
+from onegov.form.fields import ChosenSelectField
 from onegov.form.fields import MultiCheckboxField
+from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
+from sqlalchemy import func
+from sqlalchemy import String
 from wtforms import StringField
 from wtforms import TextAreaField
 from wtforms import validators
@@ -104,3 +108,49 @@ class ExtendedAgencyForm(Form):
             self.is_hidden_from_public.data = model.is_hidden_from_public
 
         self.reorder_export_fields()
+
+
+class MoveAgencyForm(Form):
+    """ Form to move an agency. """
+
+    parent_id = ChosenSelectField(
+        label=_("Destination"),
+        choices=[],
+        validators=[
+            validators.InputRequired()
+        ]
+    )
+
+    def on_request(self):
+        self.request.include('common')
+        self.request.include('chosen')
+
+        self.parent_id.choices = self.request.session.query(
+            ExtendedAgency.id.cast(String),
+            ExtendedAgency.title
+        ).order_by(func.unaccent(ExtendedAgency.title)).all()
+        self.parent_id.choices.insert(
+            0, ('root', self.request.translate(_("- Root -")))
+        )
+
+    def update_model(self, model):
+        model.parent_id = (
+            int(self.parent_id.data) if self.parent_id.data.isdigit() else None
+        )
+
+    def apply_model(self, model):
+        def remove(item):
+            self.parent_id.choices.pop(
+                self.parent_id.choices.index((str(item.id), item.title))
+            )
+
+        def remove_with_children(item):
+            remove(item)
+            for child in item.children:
+                remove_with_children(child)
+
+        if model.parent:
+            remove(model.parent)
+        else:
+            self.parent_id.choices.pop(0)
+        remove_with_children(model)

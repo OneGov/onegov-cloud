@@ -199,8 +199,27 @@ def test_views(client):
     assert "Aeschi Thomas" not in people
     assert "Eder Joachim" in people
 
+    # Move agencies
+    move = sr.click("Verschieben")
+    move.form['parent_id'].select(text="- oberste Ebene -")
+    sr = move.form.submit().maybe_follow()
+    assert "Organisation verschoben" in sr
+
+    move = bund.click("Verschieben")
+    move.form['parent_id'].select(text="Ständerat")
+    bund = move.form.submit().maybe_follow()
+    assert "Organisation verschoben" in bund
+
+    client.get('/organizations').click("Ständerat").click("Eder Joachim")
+    client.get('/organizations').click("Ständerat").click("Bundesbehörden")\
+        .click("Nationalrat")
+    client.get('/organizations').click("Ständerat").click("Bundesbehörden")\
+        .click("Nationalrat")
+    client.get('/organizations').click("Ständerat").click("Bundesbehörden")\
+        .click("Nationalrat").click("Aeschi Thomas")
+
     # Delete agency
-    bund = client.get('/organizations').click("Bundesbehörden")
+    bund = client.get('/organizations').click("Ständerat")
     agencies = bund.click("Löschen")
     assert "noch keine Organisationen" in client.get('/organizations')
 

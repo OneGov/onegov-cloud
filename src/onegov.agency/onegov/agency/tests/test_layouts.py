@@ -102,9 +102,10 @@ def test_agency_layout():
     layout = AgencyLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
         'AgencyProxy/edit',
+        'AgencyProxy/move',
+        'ExtendedAgency/?csrf-token=x',
         'AgencyProxy/sort-relationships?csrf-token=x',
         'AgencyProxy/create-pdf',
-        'ExtendedAgency/?csrf-token=x',
         'AgencyProxy/new',
         'AgencyProxy/new-membership'
     ]

@@ -38,8 +38,9 @@
 }
 
 .edit-bar {
-    .new-agency::before { @include icon('\f0e8'); }
     .create-pdf::before { @include icon('\f1c1'); }
+    .move::before { @include icon('\f047'); }
+    .new-agency::before { @include icon('\f0e8'); }
     .sort-alphabetically::before { @include icon('\f15d'); }
     .view-hidden::before { @include icon('\f070'); }
 }
