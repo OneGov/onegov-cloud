@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.22.0 (2018-12-21)
+~~~~~~~~~~~~~~~~~~~~
 
 - Enables unrestricted editing for publishers.
   [msom]
