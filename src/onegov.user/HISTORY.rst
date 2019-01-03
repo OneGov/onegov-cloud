@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.19.1 (2019-01-03)
+~~~~~~~~~~~~~~~~~~~
 
 - Renders password fields with autocomplete=new-password/current-password.
   [href]
