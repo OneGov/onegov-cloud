@@ -50,6 +50,8 @@ var processCommonNodes = function(elements, out_of_band) {
 
         if (handlers && handlers.click && handlers.click.length > 0) {
             link[0].click();
+        } else if (link.data('elementAdded.ic') === true) {
+            Intercooler.triggerRequest(link);
         } else {
             window.location = link.attr('href');
         }

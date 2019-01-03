@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes click-through not triggering Intercooler requests.
+  [href]
+
 0.46.3 (2018-12-12)
 ~~~~~~~~~~~~~~~~~~~
 
