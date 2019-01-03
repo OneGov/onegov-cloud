@@ -58,7 +58,7 @@ setup(
         'onegov.user>=0.11.0',
 
         # Pillow 5.4.0 has a number of problems related to PNG
-        'pillow!=5.4.0',
+        'Pillow!=5.4.0',
 
         'purl',
         'python-dateutil',
