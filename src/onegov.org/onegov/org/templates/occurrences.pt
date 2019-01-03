@@ -24,7 +24,7 @@
                     <h2 i18n:translate>Tag</h2>
                     <div class="occurrences-filter-tags">
                         <tal:b tal:repeat="tag tags">
-                            <span class="blank-label ${tag.active and 'active' or ''}">
+                            <span class="blank-label click-through ${tag.active and 'active' or ''}">
                                 <tal:b replace="structure tag(request)"></tal:b>
                             </span>
                         </tal:b>
@@ -37,7 +37,7 @@
                         <div class="filter-panel">
                             <ul class="tags">
                                 <li tal:repeat="location locations">
-                                    <span class="blank-label ${location.active and 'active' or ''}">
+                                    <span class="blank-label click-through ${location.active and 'active' or ''}">
                                         <tal:b replace="structure location(request)"></tal:b>
                                     </span>
                                 </li>
@@ -52,7 +52,7 @@
                         <div class="filter-panel">
                             <ul class="tags">
                                 <li tal:repeat="range ranges">
-                                    <span class="blank-label rounded ${range.active and 'active' or ''}">
+                                    <span class="blank-label click-through rounded ${range.active and 'active' or ''}">
                                         <tal:b replace="structure range(request)"></tal:b>
                                     </span>
                                 </li>
