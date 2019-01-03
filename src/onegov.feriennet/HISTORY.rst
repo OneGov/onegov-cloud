@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes default logo clipping on mobile.
+  [href]
+
 1.4.10 (2018-12-03)
 ~~~~~~~~~~~~~~~~~~~
 

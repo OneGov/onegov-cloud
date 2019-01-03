@@ -8,7 +8,7 @@
 
 <metal:default_logo define-macro="default_logo">
 
-<svg xmlns="http://www.w3.org/2000/svg" width="511" height="108" viewBox="0 0 511 108">
+<svg xmlns="http://www.w3.org/2000/svg" width="511" height="108" viewBox="0 0 511 108" style="max-width: 100%; height: auto">
   <g fill="none" fill-rule="evenodd">
     <g transform="translate(0 5)">
       <g transform="translate(12 23)">
