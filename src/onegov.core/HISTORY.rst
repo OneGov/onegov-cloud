@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Uses SameSite=Lax on all session cookies.
+  [href]
+
 0.74.4 (2018-12-17)
 ~~~~~~~~~~~~~~~~~~~
 
