@@ -22,7 +22,8 @@ class PasswordResetForm(Form):
     )
     password = PasswordField(
         label=_("New Password"),
-        validators=[validators.InputRequired(), validators.Length(min=8)]
+        validators=[validators.InputRequired(), validators.Length(min=8)],
+        render_kw={'autocomplete': 'new-password'}
     )
     token = HiddenField()
 

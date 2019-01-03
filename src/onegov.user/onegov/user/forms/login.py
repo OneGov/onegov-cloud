@@ -12,7 +12,8 @@ class LoginForm(Form):
     )
     password = PasswordField(
         label=_("Password"),
-        validators=[validators.InputRequired()]
+        validators=[validators.InputRequired()],
+        render_kw={'autocomplete': 'current-password'}
     )
     yubikey = StringField(
         label=_("YubiKey"),
