@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Hides ticket handlers/groups for which there are no tickets.
+  [href]
+
 - Fixes click-through not triggering Intercooler requests.
   [href]
 

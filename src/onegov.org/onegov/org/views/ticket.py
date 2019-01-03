@@ -1,7 +1,9 @@
 import morepath
 
 from onegov.chat import MessageCollection
+from onegov.core.utils import normalize_for_url
 from onegov.core.custom import json
+from onegov.core.orm import as_selectable
 from onegov.core.security import Public, Private
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
@@ -17,6 +19,7 @@ from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket import Ticket, TicketCollection
 from onegov.ticket.errors import InvalidStateChange
 from onegov.user import User, UserCollection
+from sqlalchemy import select
 
 
 @OrgApp.html(model=Ticket, template='ticket.pt', permission=Private)
@@ -273,6 +276,20 @@ def view_ticket_status(self, request):
 @OrgApp.html(model=TicketCollection, template='tickets.pt',
              permission=Private)
 def view_tickets(self, request):
+    query = as_selectable("""
+        SELECT
+            handler_code,                         -- Text
+            ARRAY_AGG(DISTINCT "group") AS groups -- ARRAY(Text)
+        FROM tickets GROUP BY handler_code
+    """)
+
+    groups = {
+        r.handler_code: r.groups
+        for r in request.session.execute(select(query.c))
+    }
+
+    for handler in groups:
+        groups[handler].sort(key=lambda g: normalize_for_url(g))
 
     def get_filters():
         states = (
@@ -291,18 +308,21 @@ def view_tickets(self, request):
             )
 
     def get_handlers():
+        nonlocal groups
 
         handlers = []
 
         for key, handler in ticket_handlers.registry.items():
-            handlers.append((key, request.translate(handler.handler_title)))
+            if key in groups:
+                handlers.append(
+                    (key, request.translate(handler.handler_title)))
 
         handlers.sort(key=lambda item: item[1])
         handlers.insert(0, ('ALL', _("All Tickets")))
 
         for id, text in handlers:
-            groups = id != 'ALL' and tuple(get_groups(id))
-            parent = groups and len(groups) > 1
+            grouplinks = id != 'ALL' and tuple(get_groups(id))
+            parent = grouplinks and len(grouplinks) > 1
             classes = parent and (id + '-link', 'is-parent') or (id + '-link',)
 
             yield Link(
@@ -313,7 +333,7 @@ def view_tickets(self, request):
             )
 
             if parent:
-                yield from groups
+                yield from grouplinks
 
     def get_owners():
 
@@ -338,7 +358,7 @@ def view_tickets(self, request):
     def get_groups(handler):
         base = self.for_handler(handler)
 
-        for group in self.available_groups(handler):
+        for group in groups[handler]:
             yield Link(
                 text=group,
                 url=request.link(base.for_group(group)),
