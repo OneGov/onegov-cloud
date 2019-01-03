@@ -56,7 +56,10 @@ setup(
         'onegov.shared',
         'onegov.ticket>=0.4.1',
         'onegov.user>=0.11.0',
-        'pillow',
+
+        # Pillow 5.4.0 has a number of problems related to PNG
+        'pillow!=5.4.0',
+
         'purl',
         'python-dateutil',
         'python-magic>=0.4.12',
