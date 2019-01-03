@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.46.4 (2019-01-03)
+~~~~~~~~~~~~~~~~~~~
+
 - Hides ticket handlers/groups for which there are no tickets.
   [href]
 
