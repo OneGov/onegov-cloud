@@ -42,7 +42,7 @@ setup(
         'onegov.core>=0.4.0',
         'onegov.search',
         'pdftotext',
-        'pillow',
+        'Pillow!=5.4.0',
         'python-magic',
         'sedate',
         'sqlalchemy',
