@@ -34,7 +34,7 @@ setup(
     install_requires=[
         'coverage',
         'mirakuru',
-        'Pillow',
+        'Pillow!=5.4.0',
         'port-for',
         'pytest>=3.0.6',
         'pytest-redis',
