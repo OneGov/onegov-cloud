@@ -22,8 +22,10 @@
             </div>
         </tal:b>
 
-        <div tal:condition="not:period" i18n:translate>
-            No bookings yet.
+        <div tal:condition="not:period">
+            <p i18n:translate>
+                No bookings yet.
+            </p>
         </div>
 
         <div class="my-bookings" tal:condition="period">

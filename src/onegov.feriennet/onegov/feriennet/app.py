@@ -24,7 +24,10 @@ BANNER_TEMPLATE = """
                  border="0"
                  height="1"
                  width="1"
-                 onerror="this.style.display='none'"
+                 onerror="
+                    this.getAttribute('src').length != 0
+                    && this.parentNode.parentNode.remove()
+                 "
                  alt="Advertisement">
     </div>
 </div>

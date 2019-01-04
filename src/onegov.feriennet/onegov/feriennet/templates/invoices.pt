@@ -5,7 +5,17 @@
     <tal:b metal:fill-slot="content">
     <div class="row">
         <div class="columns small-12 medium-8">
-            <tal:b condition="not: bills" i18n:translate>No bills created yet.</tal:b>
+            <tal:b condition="not: bills">
+                <p i18n:translate>
+                No bills created yet.
+                </p>
+            </tal:b>
+
+            <tal:b
+                    define="banner layout.app.banner(request, 'bookings')"
+                    condition="banner"
+                    replace="structure banner"
+                />
 
             <div class="bills" tal:condition="bills">
                 <div class="bills-header show-for-print">

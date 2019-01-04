@@ -1110,7 +1110,7 @@ $booking-left-margin: 2rem;
     My Bookings Print View
 */
 @media print {
-    .sponsor-banner-bookings {
+    .sponsor-banner {
         display: none;
     }
 
@@ -2173,16 +2173,17 @@ $booking-left-margin: 2rem;
     Sponsoring banners
 */
 .sponsor-banner {
-    margin-bottom: 2rem;
-}
-
-.sponsor-banner-bookings {
     /*
         aspect ratio 16:5 (100/16*5 =31.25)
         see https://stackoverflow.com/q/1495407
     */
     padding-bottom: 31.25%;
     position: relative;
+
+    div > img,
+    div > a > img, {
+        border-radius: 2px;
+    }
 
     a {
         bottom: 0;

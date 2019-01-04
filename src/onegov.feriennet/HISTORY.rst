@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds banners to invoices view.
+  [href]
+
 - Fixes default logo clipping on mobile.
   [href]
 
