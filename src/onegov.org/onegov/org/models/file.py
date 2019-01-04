@@ -75,14 +75,14 @@ class GroupFilesByDateMixin(object):
             end=older_end)
 
     def query_intervals(self, intervals, before_filter=None, process=None):
-        base_query = self.query().order_by(desc(File.last_change))
+        base_query = self.query().order_by(desc(File.created))
 
         if before_filter:
             base_query = before_filter(base_query)
 
         for interval in intervals:
-            query = base_query.filter(File.last_change >= interval.start)
-            query = query.filter(File.last_change <= interval.end)
+            query = base_query.filter(File.created >= interval.start)
+            query = query.filter(File.created <= interval.end)
 
             for result in query.all():
                 if process is not None:
