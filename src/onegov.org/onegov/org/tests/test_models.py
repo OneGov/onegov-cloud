@@ -127,17 +127,17 @@ def test_image_grouping(session):
 
     # catches all intervals
     images = [collection.add('x.png', create_image()) for r in range(0, 11)]
-    images[0].modified = datetime(2008, 9, 1, 16, 0, tzinfo=utc)   # next month
-    images[1].modified = datetime(2008, 8, 3, 16, 0, tzinfo=utc)   # this month
-    images[2].modified = datetime(2008, 8, 2, 16, 0, tzinfo=utc)   # this month
-    images[3].modified = datetime(2008, 8, 1, 0, 0, tzinfo=utc)    # this month
-    images[4].modified = datetime(2008, 7, 1, 16, 0, tzinfo=utc)   # last month
-    images[5].modified = datetime(2008, 5, 1, 16, 0, tzinfo=utc)   # this year
-    images[6].modified = datetime(2008, 2, 4, 12, 0, tzinfo=utc)   # this year
-    images[7].modified = datetime(2007, 12, 1, 16, 0, tzinfo=utc)  # last year
-    images[8].modified = datetime(2007, 10, 2, 14, 0, tzinfo=utc)  # last year
-    images[9].modified = datetime(2005, 4, 1, 16, 0, tzinfo=utc)   # older
-    images[10].modified = datetime(2002, 6, 4, 16, 0, tzinfo=utc)  # older
+    images[0].created = datetime(2008, 9, 1, 16, 0, tzinfo=utc)   # next month
+    images[1].created = datetime(2008, 8, 3, 16, 0, tzinfo=utc)   # this month
+    images[2].created = datetime(2008, 8, 2, 16, 0, tzinfo=utc)   # this month
+    images[3].created = datetime(2008, 8, 1, 0, 0, tzinfo=utc)    # this month
+    images[4].created = datetime(2008, 7, 1, 16, 0, tzinfo=utc)   # last month
+    images[5].created = datetime(2008, 5, 1, 16, 0, tzinfo=utc)   # this year
+    images[6].created = datetime(2008, 2, 4, 12, 0, tzinfo=utc)   # this year
+    images[7].created = datetime(2007, 12, 1, 16, 0, tzinfo=utc)  # last year
+    images[8].created = datetime(2007, 10, 2, 14, 0, tzinfo=utc)  # last year
+    images[9].created = datetime(2005, 4, 1, 16, 0, tzinfo=utc)   # older
+    images[10].created = datetime(2002, 6, 4, 16, 0, tzinfo=utc)  # older
 
     grouped = grouped_by_date(datetime(2008, 8, 8))
 
@@ -151,9 +151,9 @@ def test_image_grouping(session):
 
     # only catch some intervals
     images = [collection.add('x.png', create_image()) for r in range(0, 3)]
-    images[0].modified = datetime(2008, 8, 3, 16, 0, tzinfo=utc)  # this month
-    images[1].modified = datetime(2008, 5, 1, 16, 0, tzinfo=utc)  # this year
-    images[2].modified = datetime(2002, 6, 4, 16, 0, tzinfo=utc)  # older
+    images[0].created = datetime(2008, 8, 3, 16, 0, tzinfo=utc)  # this month
+    images[1].created = datetime(2008, 5, 1, 16, 0, tzinfo=utc)  # this year
+    images[2].created = datetime(2002, 6, 4, 16, 0, tzinfo=utc)  # older
 
     grouped = grouped_by_date(datetime(2008, 8, 8))
     assert grouped['This month'] == [img.id for img in images[0:1]]
@@ -164,8 +164,8 @@ def test_image_grouping(session):
 
     # catch a different set of intervals
     images = [collection.add('x.png', create_image()) for r in range(0, 2)]
-    images[0].modified = datetime(2008, 7, 1, 16, 0, tzinfo=utc)  # last month
-    images[1].modified = datetime(2002, 6, 4, 16, 0, tzinfo=utc)  # older
+    images[0].created = datetime(2008, 7, 1, 16, 0, tzinfo=utc)  # last month
+    images[1].created = datetime(2002, 6, 4, 16, 0, tzinfo=utc)  # older
 
     grouped = grouped_by_date(datetime(2008, 8, 8))
     assert grouped['Last month'] == [img.id for img in images[0:1]]
@@ -175,13 +175,13 @@ def test_image_grouping(session):
 
     # use a different date and catch a reduced set of intervals
     images = [collection.add('x.png', create_image()) for r in range(0, 7)]
-    images[0].modified = datetime(2008, 1, 3, 16, 0, tzinfo=utc)   # this month
-    images[1].modified = datetime(2008, 1, 2, 16, 0, tzinfo=utc)   # this month
-    images[2].modified = datetime(2008, 1, 1, 0, 0, tzinfo=utc)    # this month
-    images[3].modified = datetime(2007, 12, 14, 16, 0, tzinfo=utc)  # lst month
-    images[4].modified = datetime(2007, 12, 12, 16, 0, tzinfo=utc)  # lst month
-    images[5].modified = datetime(2007, 10, 2, 14, 0, tzinfo=utc)  # last year
-    images[6].modified = datetime(2002, 6, 4, 16, 0, tzinfo=utc)   # older
+    images[0].created = datetime(2008, 1, 3, 16, 0, tzinfo=utc)   # this month
+    images[1].created = datetime(2008, 1, 2, 16, 0, tzinfo=utc)   # this month
+    images[2].created = datetime(2008, 1, 1, 0, 0, tzinfo=utc)    # this month
+    images[3].created = datetime(2007, 12, 14, 16, 0, tzinfo=utc)  # lst month
+    images[4].created = datetime(2007, 12, 12, 16, 0, tzinfo=utc)  # lst month
+    images[5].created = datetime(2007, 10, 2, 14, 0, tzinfo=utc)  # last year
+    images[6].created = datetime(2002, 6, 4, 16, 0, tzinfo=utc)   # older
 
     grouped = grouped_by_date(datetime(2008, 1, 8))
     assert grouped['This month'] == [img.id for img in images[0:3]]
