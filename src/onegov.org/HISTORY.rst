@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.46.5 (2019-01-04)
+~~~~~~~~~~~~~~~~~~~
+
 - Orders uploaded images by creation date instead of modification date.
   [href]
 
