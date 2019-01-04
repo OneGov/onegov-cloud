@@ -31,11 +31,13 @@ class NotificationTemplateForm(Form):
     )
 
     def ensure_not_duplicate_subject(self):
-        q = self.request.session.query(exists().where(
-            NotificationTemplate.subject == self.subject.data
-        ))
+        c = exists().where(NotificationTemplate.subject == self.subject.data)
 
-        if q.scalar():
+        # in edit mode we must exclude the current model
+        if isinstance(self.model, NotificationTemplate):
+            c = c.where(NotificationTemplate.id != self.model.id)
+
+        if self.request.session.query(c).scalar():
             self.subject.errors.append(
                 _("A notification with this subject exists already")
             )

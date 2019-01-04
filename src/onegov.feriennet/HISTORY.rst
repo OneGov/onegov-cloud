@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes notifications duplicate error during edits.
+  [href]
+
 - Adds banners to invoices view.
   [href]
 
