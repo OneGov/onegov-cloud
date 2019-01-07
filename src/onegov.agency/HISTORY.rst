@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.5.0 (2019-01-07)
+~~~~~~~~~~~~~~~~~~~~
 
 - Allows to move agencies.
   [msom]
