@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Reorganises settings into separate views.
+  [href]
+
 - Fixes notifications duplicate error during edits.
   [href]
 

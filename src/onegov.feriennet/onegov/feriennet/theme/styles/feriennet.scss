@@ -37,14 +37,14 @@ a > h6 {
 /*
     hide the homepage settings
 */
-#fieldset-homepage {
+.homepage-settings {
     display: none;
 }
 
 /*
     hide the map provider
 */
-#fieldset-maps .field-geo_provider {
+.field-geo_provider {
     display: none;
 }
 
@@ -125,20 +125,8 @@ ul.single-line {
 }
 
 /*
-    The bank settings are hidden by default, they are currently only used
-    for onegov.feriennet and should probably replaced by something feriennet
-    specific.
-*/
-#page-settings #fieldset-payment {
-    display: block;
-}
-
-/*
     Improve the look of the custom homepage settings
 */
-#page-settings #fieldset-advanced {
-    margin-bottom: 0;
-}
 
 .field-show_related_contacts,
 .field-show_political_municipality,

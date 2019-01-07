@@ -387,7 +387,7 @@ def test_organiser_info(client, scenario):
 
     # we can show/hide information individually
     def with_public_organiser_data(values):
-        page = admin.get('/settings')
+        page = admin.get('/feriennet-settings')
         page.form['public_organiser_data'] = values
         page.form.submit()
 
@@ -905,7 +905,7 @@ def test_confirmed_booking_view(scenario, client):
     assert "Gebucht" not in page
 
     # Related contacts are hidden at this point
-    page = client.get('/settings')
+    page = client.get('/feriennet-settings')
     page.form['show_related_contacts'] = True
     page.form.submit()
 
@@ -928,7 +928,7 @@ def test_confirmed_booking_view(scenario, client):
     assert "Elternteil" in page
 
     # Unless that option was disabled
-    page = client.get('/settings')
+    page = client.get('/feriennet-settings')
     page.form['show_related_contacts'] = False
     page.form.submit()
 
@@ -1270,10 +1270,10 @@ def test_import_account_statement(client, scenario):
     page = page.click('Kontoauszug importieren')
     assert "kein Bankkonto" in page
 
-    settings = page.click('Einstellungen', index=1)
+    settings = page.click('Einstellungen', index=1).click('Feriennet', index=0)
     settings.form['bank_account'] = 'CH6309000000250097798'
     settings.form['bank_beneficiary'] = 'Initech'
-    settings = settings.form.submit()
+    settings.form.submit()
 
     page = page.click('Rechnungen')
     code = page.pyquery('.invoice-items-payment li:last').text()

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-09-24 16:14+0200\n"
+"POT-Creation-Date: 2019-01-07 15:46+0100\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -579,8 +579,8 @@ msgid ""
 "The parents pay the pass by bill, the organisers are paid in cash at the "
 "beginning of each occasion"
 msgstr ""
-"Die Eltern zahlen den Pass per Rechnung, zusätzliche Teilnahmegebühren werden "
-"dem Veranstalter bar vor Ort bezahlt"
+"Die Eltern zahlen den Pass per Rechnung, zusätzliche Teilnahmegebühren "
+"werden dem Veranstalter bar vor Ort bezahlt"
 
 msgid "Yes"
 msgstr "Ja"
@@ -1897,20 +1897,20 @@ msgstr "Ein Ticket wurde eröffnet"
 msgid "Clone"
 msgstr "Duplizieren"
 
-msgid "Scheduled"
-msgstr "Geplant"
+msgid "Elapsed"
+msgstr "Vergangen"
 
 msgid "Now"
 msgstr "Jetzt"
 
-msgid "Elapsed"
-msgstr "Vergangen"
-
-msgid "Without"
-msgstr "Ohne"
+msgid "Scheduled"
+msgstr "Geplant"
 
 msgid "Reinstate"
 msgstr "Reaktivieren"
+
+msgid "Without"
+msgstr "Ohne"
 
 msgid " 3 - 6 years"
 msgstr " 3 - 6 Jahre"
@@ -2080,15 +2080,45 @@ msgstr "Teilnehmer bearbeiten"
 msgid "Booking Limit of ${name}"
 msgstr "Buchungslimite von ${name}"
 
+msgid "Feriennet Settings"
+msgstr "Feriennet Einstellungen"
+
+msgid "Settings"
+msgstr "Einstellungen"
+
+msgid "Feriennet"
+msgstr "Feriennet"
+
+msgid "Payment"
+msgstr "Bezahlung"
+
+msgid "Payment Order"
+msgstr "Einzahlungsschein"
+
+msgid "ESR participant number"
+msgstr "ESR Teilnehmernummer"
+
 msgid "Require the political municipality in the userprofile"
 msgstr "Verlange die politische Gemeinde im Benutzerprofil"
+
+msgid "Userprofile"
+msgstr "Benutzerprofil"
 
 msgid "Parents can see the contacts of other parents in the same activity"
 msgstr ""
 "Eltern können die Kontaktdaten anderer Eltern des gleichen Angebots sehen"
 
+msgid "Privacy"
+msgstr "Privatsphäre"
+
 msgid "Public organiser data"
 msgstr "Öffentliche Veranstalterdaten"
+
+msgid "Basic"
+msgstr "Einfach"
+
+msgid "With reference number (ESR)"
+msgstr "Mit Referenznummer (ESR)"
 
 msgid "E-Mail"
 msgstr "E-Mail"
