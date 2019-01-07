@@ -4,7 +4,7 @@ from PyPDF2 import PdfFileReader
 
 def test_views(client):
     client.login_admin()
-    settings = client.get('/settings')
+    settings = client.get('/module-settings')
     settings.form['hidden_people_fields'] = ['academic_title', 'born']
     settings.form.submit()
     client.logout()
@@ -304,11 +304,12 @@ def test_view_pdf_settings(client):
 
     client.login_admin()
 
-    assert client.get('/settings').form['pdf_layout'].value == 'default'
+    assert client.get('/pdf-layout-settings')\
+        .form['pdf_layout'].value == 'default'
 
     assert get_pdf() == '1\nGovikon\n0\nPlaceholder for table of contents\n'
 
-    settings = client.get('/settings')
+    settings = client.get('/pdf-layout-settings')
     settings.form['pdf_layout'] = 'zg'
     settings.form.submit()
 
