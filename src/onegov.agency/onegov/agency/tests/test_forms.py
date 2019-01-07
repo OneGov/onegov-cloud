@@ -201,6 +201,36 @@ def test_membership_form(session):
     }
 
 
+def test_membership_form_choices(session):
+    people = ExtendedPersonCollection(session)
+    people.add(first_name="Nick", last_name="Rivera")
+    people.add(first_name="Nick", last_name="Rivera", phone="1234")
+    people.add(first_name="Nick", last_name="Rivera", phone="5555", email="x")
+    people.add(first_name="Nick", last_name="Rivera", phone_direct="4")
+    people.add(first_name="Nick", last_name="Rivera", address="Street")
+    people.add(first_name="Nick", last_name="Rivera", email="n@h.com")
+
+    agencies = ExtendedAgencyCollection(session)
+    agency = agencies.add_root(title="Hospital")
+    doc = people.add(first_name="Nick", last_name="Rivera")
+    agency.add_person(doc.id, "Doc")
+
+    request = DummyRequest(session)
+    form = MembershipForm()
+    form.request = request
+    form.on_request()
+
+    assert sorted([x[1] for x in form.person_id.choices]) == [
+        'Rivera Nick',
+        'Rivera Nick (1234)',
+        'Rivera Nick (4)',
+        'Rivera Nick (5555)',
+        'Rivera Nick (Hospital)',
+        'Rivera Nick (Street)',
+        'Rivera Nick (n@h.com)'
+    ]
+
+
 def test_mutation_form():
     form = MutationForm(DummyPostData({
         'email': 'info@hospital-springfield.org',

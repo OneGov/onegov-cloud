@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Shows additional information for ambiguous people when editing memberships.
+  [msom]
+
 1.5.0 (2019-01-07)
 ~~~~~~~~~~~~~~~~~~~~
 
