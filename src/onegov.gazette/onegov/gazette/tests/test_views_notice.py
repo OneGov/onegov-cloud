@@ -319,16 +319,17 @@ def test_view_notice_pdf_preview(gazette_app):
         manage.form['author_date'] = '2019-01-01'
         manage.form.submit()
 
-    response = editor_1.get('/notice/titel/preview-pdf')
-    assert response.headers['Content-Type'] == 'application/pdf'
-    assert response.headers['Content-Disposition'] == \
-        'inline; filename=amtsblatt-govikon-titel.pdf'
+    with freeze_time("2018-01-01 12:00"):
+        response = editor_1.get('/notice/titel/preview-pdf')
+        assert response.headers['Content-Type'] == 'application/pdf'
+        assert response.headers['Content-Disposition'] == \
+            'inline; filename=amtsblatt-govikon-titel.pdf'
 
-    reader = PdfFileReader(BytesIO(response.body))
-    assert [page.extractText() for page in reader.pages] == [
-        '© 2018 Govikon\n1\nxxx\nTitel\n1. Oktober 2017\n'
-        'Govikon, 1. Januar 2019\nState Chancellerist\n'
-    ]
+        reader = PdfFileReader(BytesIO(response.body))
+        assert [page.extractText() for page in reader.pages] == [
+            '© 2018 Govikon\n1\nxxx\nTitel\n1. Oktober 2017\n'
+            'Govikon, 1. Januar 2019\nState Chancellerist\n'
+        ]
 
 
 def test_view_notice_delete(gazette_app):

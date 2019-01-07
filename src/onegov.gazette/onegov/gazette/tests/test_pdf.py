@@ -12,10 +12,10 @@ from onegov.gazette.pdf import IssuePdf
 from onegov.gazette.pdf import IssuePrintOnlyPdf
 from onegov.gazette.pdf import NoticesPdf
 from onegov.gazette.pdf import Pdf
+from onegov.gazette.tests.conftest import LOGO
 from PyPDF2 import PdfFileReader
 from sedate import utcnow
 from unittest.mock import patch
-from onegov.gazette.tests.conftest import LOGO
 
 
 class DummyApp(object):
@@ -86,13 +86,15 @@ def test_notices_pdf_from_notice(gazette_app):
         session.add(notice)
         session.flush()
 
-    request = DummyRequest(session, gazette_app.principal)
-    file = NoticesPdf.from_notice(notice, request)
-    reader = PdfFileReader(file)
-    assert [page.extractText() for page in reader.pages] == [
-        '© 2018 Govikon\n1\nxxx\ntitle\ntext\nplace, 1. Januar 2017\nauthor\n',
-        '© 2018 Govikon\n2\n'
-    ]
+    with freeze_time("2018-01-01 12:00"):
+        request = DummyRequest(session, gazette_app.principal)
+        file = NoticesPdf.from_notice(notice, request)
+        reader = PdfFileReader(file)
+        assert [page.extractText() for page in reader.pages] == [
+            '© 2018 Govikon\n1\n'
+            'xxx\ntitle\ntext\nplace, 1. Januar 2017\nauthor\n',
+            '© 2018 Govikon\n2\n'
+        ]
 
 
 def test_notices_pdf_from_notices(gazette_app):
@@ -123,36 +125,39 @@ def test_notices_pdf_from_notices(gazette_app):
         session.add(notice)
         session.flush()
 
-    request = DummyRequest(session, gazette_app.principal)
-    notices = GazetteNoticeCollection(session)
-    file = NoticesPdf.from_notices(notices, request)
-    reader = PdfFileReader(file)
-    assert [page.extractText() for page in reader.pages] == [
-        (
-            '© 2018 Govikon\n1\n'
-            'xxx\nfirst title\nfirst text\n'
-            'first place, 1. Januar 2017\nfirst author\n'
-        ),
-        '© 2018 Govikon\n2\n',
-        (
-            '© 2018 Govikon\n3\n'
-            'xxx\nsecond title\nsecond text\n'
-            'second place, 2. Januar 2017\nsecond author\n'
-        )
-    ]
+    with freeze_time("2018-01-01 12:00"):
+        request = DummyRequest(session, gazette_app.principal)
+        notices = GazetteNoticeCollection(session)
+        file = NoticesPdf.from_notices(notices, request)
+        reader = PdfFileReader(file)
+        assert [page.extractText() for page in reader.pages] == [
+            (
+                '© 2018 Govikon\n1\n'
+                'xxx\nfirst title\nfirst text\n'
+                'first place, 1. Januar 2017\nfirst author\n'
+            ),
+            '© 2018 Govikon\n2\n',
+            (
+                '© 2018 Govikon\n3\n'
+                'xxx\nsecond title\nsecond text\n'
+                'second place, 2. Januar 2017\nsecond author\n'
+            )
+        ]
 
-    file = NoticesPdf.from_notices(notices.for_order('title', 'desc'), request)
-    reader = PdfFileReader(file)
-    assert [page.extractText() for page in reader.pages] == [
-        (
-            '© 2018 Govikon\n1\n'
-            'xxx\nsecond title\nsecond text\n'
-            'second place, 2. Januar 2017\nsecond author\n'
-            'xxx\nfirst title\nfirst text\n'
-            'first place, 1. Januar 2017\nfirst author\n'
-        ),
-        '© 2018 Govikon\n2\n'
-    ]
+        file = NoticesPdf.from_notices(
+            notices.for_order('title', 'desc'), request
+        )
+        reader = PdfFileReader(file)
+        assert [page.extractText() for page in reader.pages] == [
+            (
+                '© 2018 Govikon\n1\n'
+                'xxx\nsecond title\nsecond text\n'
+                'second place, 2. Januar 2017\nsecond author\n'
+                'xxx\nfirst title\nfirst text\n'
+                'first place, 1. Januar 2017\nfirst author\n'
+            ),
+            '© 2018 Govikon\n2\n'
+        ]
 
 
 def test_index_pdf_from_notices(gazette_app):
@@ -188,28 +193,29 @@ def test_index_pdf_from_notices(gazette_app):
         session.add(notice)
         session.flush()
 
-    request = DummyRequest(session, gazette_app.principal)
-    notices = GazetteNoticeCollection(session)
-    file = IndexPdf.from_notices(notices, request)
-    reader = PdfFileReader(file)
-    assert [page.extractText() for page in reader.pages] == [
-        (
-            '© 2018 Govikon\n1\nGazette\nIndex\n'
-            'Organizations\n'
-            'C\n'
-            'Civic Community  2017-40-2, 2017-42-4\n'
-            'S\n'
-            'State Chancellery  2017-40-1, 2017-41-3\n'
-        ),
-        (
-            'Gazette\n© 2018 Govikon\n2\n'
-            'Categories\n'
-            'C\n'
-            'Complaints  2017-40-1, 2017-41-3\n'
-            'E\n'
-            'Education  2017-40-2, 2017-42-4\n'
-        )
-    ]
+    with freeze_time("2018-01-01 12:00"):
+        request = DummyRequest(session, gazette_app.principal)
+        notices = GazetteNoticeCollection(session)
+        file = IndexPdf.from_notices(notices, request)
+        reader = PdfFileReader(file)
+        assert [page.extractText() for page in reader.pages] == [
+            (
+                '© 2018 Govikon\n1\nGazette\nIndex\n'
+                'Organizations\n'
+                'C\n'
+                'Civic Community  2017-40-2, 2017-42-4\n'
+                'S\n'
+                'State Chancellery  2017-40-1, 2017-41-3\n'
+            ),
+            (
+                'Gazette\n© 2018 Govikon\n2\n'
+                'Categories\n'
+                'C\n'
+                'Complaints  2017-40-1, 2017-41-3\n'
+                'E\n'
+                'Education  2017-40-2, 2017-42-4\n'
+            )
+        ]
 
 
 def test_issues_pdf_h():
