@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-12-11 16:31+0100\n"
+"POT-Creation-Date: 2019-01-07 15:36+0100\n"
 "PO-Revision-Date: 2018-12-08 11:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -958,21 +958,6 @@ msgstr "Primärfarbe"
 msgid "Languages"
 msgstr "Sprachen"
 
-msgid "Bank Account (IBAN)"
-msgstr "Bankkonto (IBAN)"
-
-msgid "Payment"
-msgstr "Bezahlung"
-
-msgid "Beneficiary"
-msgstr "Begünstigter"
-
-msgid "Payment Order"
-msgstr "Einzahlungsschein"
-
-msgid "ESR participant number"
-msgstr "ESR Teilnehmernummer"
-
 msgid "Contact"
 msgstr "Kontakt"
 
@@ -1054,9 +1039,6 @@ msgstr "Werte des Ortfilters"
 msgid "The default map view. This should show the whole town"
 msgstr "Die Standard Kartenansicht. Diese sollte die ganze Gemeinde zeigen."
 
-msgid "Maps"
-msgstr "Karten"
-
 msgid "Geo provider"
 msgstr "Geo Anbieter"
 
@@ -1066,23 +1048,11 @@ msgstr "Analytics Code"
 msgid "JavaScript for web statistics support"
 msgstr "JavaScript für Web-Statistik"
 
-msgid "Advanced"
-msgstr "Erweitert"
-
-msgid "A beneficiary is required if a bank account is given."
-msgstr "Ein Begünstigter ist nötig wenn ein Bank Konto angegeben wird."
-
 msgid "German"
 msgstr "Deutsch"
 
 msgid "French"
 msgstr "Französisch"
-
-msgid "Basic"
-msgstr "Einfach"
-
-msgid "With reference number (ESR)"
-msgstr "Mit Referenznummer (ESR)"
 
 msgid "Yes, to directories"
 msgstr "Ja, zu den Verzeichnissen"
@@ -1279,6 +1249,9 @@ msgstr "Warteliste"
 
 msgid "Do not accept any submissions"
 msgstr "Keine Anmeldungen akzeptieren"
+
+msgid "Advanced"
+msgstr "Erweitert"
 
 #, python-format
 msgid ""
@@ -1894,6 +1867,9 @@ msgstr "Privatsphäre"
 msgid "Send me my entered data by e-mail."
 msgstr "Versand meiner Eingaben an meine E-Mail Adresse."
 
+msgid "Payment"
+msgstr "Bezahlung"
+
 msgid "Pay Online Now"
 msgstr "Jetzt online bezahlen"
 
@@ -2323,14 +2299,21 @@ msgid ""
 "The following link can be used to subscribe to the reservations of this "
 "calendar. It can be used by anyone that knows the link in multiple calendar "
 "applications."
-msgstr "Der folgende Link kann zur Abonnierung der Reservationen dieses Kalenders verwendet werden. Alle die den Link kennen können diesen in verschiedenen Kalender-Applikationen verwenden."
+msgstr ""
+"Der folgende Link kann zur Abonnierung der Reservationen dieses Kalenders "
+"verwendet werden. Alle die den Link kennen können diesen in verschiedenen "
+"Kalender-Applikationen verwenden."
 
 msgid ""
 "Note that we have no control over how often calendar applications update the "
 "calendars they are subscribed to (if they update at all). Therefore the "
 "information shown in the calendar may be wrong or out of date. Use it at "
 "your own risk."
-msgstr "Beachten Sie bitte das wir keine Kontrolle darüber haben wie oft die Kalender-Applikation das Abonnoment aktualisiert (sofern das überhaupt geschieht). Deshalb ist die Information in der Kalender-Applikation mit Vorsicht zu geniessen."
+msgstr ""
+"Beachten Sie bitte das wir keine Kontrolle darüber haben wie oft die "
+"Kalender-Applikation das Abonnoment aktualisiert (sofern das überhaupt "
+"geschieht). Deshalb ist die Information in der Kalender-Applikation mit "
+"Vorsicht zu geniessen."
 
 msgid "Select the images that should be shown inside this album."
 msgstr "Wählen Sie die Bilder aus welche im Album angezeigt werden sollen."
@@ -3211,6 +3194,15 @@ msgstr "Ein Formular mit diesem Namen existiert bereits"
 msgid "Added a new form"
 msgstr "Ein neues Formular wurd hinzugefügt"
 
+msgid "Footer"
+msgstr "Fusszeile"
+
+msgid "Modules"
+msgstr "Module"
+
+msgid "Analytics"
+msgstr "Web-Statistik"
+
 msgid "User Management"
 msgstr "Benutzerverwaltung"
 
@@ -3330,6 +3322,30 @@ msgstr "Ihre Zahlung wurde rückgängig gemacht"
 
 msgid "Your payment has been refunded"
 msgstr "Ihre Zahlung wurde rückerstattet"
+
+#~ msgid "Bank Account (IBAN)"
+#~ msgstr "Bankkonto (IBAN)"
+
+#~ msgid "Beneficiary"
+#~ msgstr "Begünstigter"
+
+#~ msgid "Payment Order"
+#~ msgstr "Einzahlungsschein"
+
+#~ msgid "ESR participant number"
+#~ msgstr "ESR Teilnehmernummer"
+
+#~ msgid "Maps"
+#~ msgstr "Karten"
+
+#~ msgid "A beneficiary is required if a bank account is given."
+#~ msgstr "Ein Begünstigter ist nötig wenn ein Bank Konto angegeben wird."
+
+#~ msgid "Basic"
+#~ msgstr "Einfach"
+
+#~ msgid "With reference number (ESR)"
+#~ msgstr "Mit Referenznummer (ESR)"
 
 #~ msgid "None"
 #~ msgstr "Keines"

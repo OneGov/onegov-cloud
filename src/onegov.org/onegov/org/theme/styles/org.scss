@@ -178,15 +178,6 @@ body {
 }
 
 /*
-    The bank settings are hidden by default, they are currently only used
-    for onegov.feriennet and should probably replaced by something feriennet
-    specific.
-*/
-#page-settings #fieldset-payment {
-    display: none;
-}
-
-/*
     Heading sizes
 */
 .h1-size { font-size: $h1-font-size - $h1-font-reduction; }
@@ -1983,6 +1974,24 @@ div#redactor-droparea {
 }
 
 /*
+    settings
+*/
+
+.org-settings {
+    font-size: 1rem;
+    list-style: none;
+    margin: 0;
+
+    i.fa {
+        border-radius: 50px;
+        display: inline-block;
+        height: 3ex;
+        text-align: center;
+        width: 3ex;
+    }
+}
+
+/*
     news list
 */
 
@@ -2899,7 +2908,7 @@ button {
                 .short-month {
                     display: inline;
                 }
-            }            
+            }
         }
     }
 

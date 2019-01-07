@@ -739,7 +739,7 @@ def test_hide_form(client):
 
 def test_people_view(client):
     client.login_admin()
-    settings = client.get('/settings')
+    settings = client.get('/module-settings')
     settings.form['hidden_people_fields'] = ['academic_title', 'profession']
     settings.form.submit()
     client.logout()
@@ -2182,7 +2182,7 @@ def test_cleanup_allocations(client):
 
 def test_view_occurrences(client):
     client.login_admin()
-    settings = client.get('/settings')
+    settings = client.get('/module-settings')
     settings.form['event_locations'] = [
         "Gemeindesaal", "Sportanlage", "Turnhalle"
     ]
@@ -2993,15 +2993,16 @@ def test_newsletter_test_delivery(client):
 def test_map_default_view(client):
     client.login_admin()
 
-    settings = client.get('/settings')
+    settings = client.get('/map-settings')
 
     assert not decode_map_value(settings.form['default_map_view'].value)
 
     settings.form['default_map_view'] = encode_map_value({
         'lat': 47, 'lon': 8, 'zoom': 12
     })
-    settings = settings.form.submit().follow()
+    settings.form.submit()
 
+    settings = client.get('/map-settings')
     coordinates = decode_map_value(settings.form['default_map_view'].value)
     assert coordinates.lat == 47
     assert coordinates.lon == 8
@@ -3073,44 +3074,55 @@ def test_manage_album(client):
 
 def test_settings(client):
 
-    assert client.get('/settings', expect_errors=True).status_code == 403
+    assert client.get('/general-settings', expect_errors=True)\
+        .status_code == 403
 
     client.login_admin()
 
-    settings_page = client.get('/settings')
-    document = settings_page.pyquery
+    # general settings
+    settings = client.get('/general-settings')
+    document = settings.pyquery
 
     assert document.find('input[name=name]').val() == 'Govikon'
     assert document.find('input[name=primary_color]').val() == '#006fba'
 
-    settings_page.form['primary_color'] = '#xxx'
-    settings_page.form['reply_to'] = 'info@govikon.ch'
-    settings_page = settings_page.form.submit()
+    settings.form['primary_color'] = '#xxx'
+    settings.form['reply_to'] = 'info@govikon.ch'
+    settings = settings.form.submit()
 
-    assert "Ungültige Farbe." in settings_page.text
+    assert "Ungültige Farbe." in settings.text
 
-    settings_page.form['primary_color'] = '#ccddee'
-    settings_page.form['reply_to'] = 'info@govikon.ch'
-    settings_page = settings_page.form.submit().follow()
+    settings.form['primary_color'] = '#ccddee'
+    settings.form['reply_to'] = 'info@govikon.ch'
+    settings.form.submit()
 
-    assert "Ungültige Farbe." not in settings_page.text
+    settings = client.get('/general-settings')
+    assert "Ungültige Farbe." not in settings.text
 
-    settings_page.form['logo_url'] = 'https://seantis.ch/logo.img'
-    settings_page.form['reply_to'] = 'info@govikon.ch'
-    settings_page = settings_page.form.submit().follow()
+    settings.form['logo_url'] = 'https://seantis.ch/logo.img'
+    settings.form['reply_to'] = 'info@govikon.ch'
+    settings.form.submit()
 
-    assert '<img src="https://seantis.ch/logo.img"' in settings_page.text
+    settings = client.get('/general-settings')
+    assert '<img src="https://seantis.ch/logo.img"' in settings.text
 
-    settings_page.form['homepage_image_1'] = "http://images/one"
-    settings_page.form['homepage_image_2'] = "http://images/two"
-    settings_page = settings_page.form.submit().follow()
+    # homepage settings
+    settings = client.get('/homepage-settings')
+    settings.form['homepage_image_1'] = "http://images/one"
+    settings.form['homepage_image_2'] = "http://images/two"
+    settings.form.submit()
 
-    assert 'http://images/one' in settings_page
-    assert 'http://images/two' in settings_page
+    settings = client.get('/homepage-settings')
+    assert 'http://images/one' in settings
+    assert 'http://images/two' in settings
 
-    settings_page.form['analytics_code'] = '<script>alert("Hi!");</script>'
-    settings_page = settings_page.form.submit().follow()
-    assert '<script>alert("Hi!");</script>' in settings_page.text
+    # analytics settings
+    settings = client.get('/analytics-settings')
+    settings.form['analytics_code'] = '<script>alert("Hi!");</script>'
+    settings.form.submit()
+
+    settings = client.get('/analytics-settings')
+    assert '<script>alert("Hi!");</script>' in settings.text
 
 
 def test_registration_honeypot(client):
@@ -3862,13 +3874,14 @@ def test_switch_languages(client):
 
     client.login_admin()
 
-    page = client.get('/settings')
+    page = client.get('/general-settings')
     assert 'Deutsch' in page
     assert 'Allemand' not in page
 
     page.form['locales'] = 'fr_CH'
-    page = page.form.submit().follow()
+    page.form.submit().follow()
 
+    page = client.get('/general-settings')
     assert 'Allemand' in page
     assert 'Deutsch' not in page
 

@@ -562,6 +562,30 @@ class AdjacencyListLayout(DefaultLayout):
                 )
 
 
+class SettingsLayout(DefaultLayout):
+    def __init__(self, model, request, setting=None):
+        super().__init__(model, request)
+
+        self.include_editor()
+        self.include_code_editor()
+        self.request.include('check_contrast')
+        self.request.include('tags-input')
+
+        self.setting = setting
+
+    @cached_property
+    def breadcrumbs(self):
+        bc = [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Settings"), self.request.link(self.org, 'settings'))
+        ]
+
+        if self.setting:
+            bc.append(Link(_(self.setting), '#'))
+
+        return bc
+
+
 class PageLayout(AdjacencyListLayout):
 
     @cached_property

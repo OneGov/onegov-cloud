@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Reorganises settings into separate views.
+  [href]
+
 0.46.5 (2019-01-04)
 ~~~~~~~~~~~~~~~~~~~
 

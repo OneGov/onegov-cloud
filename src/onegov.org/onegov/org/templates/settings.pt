@@ -1,0 +1,13 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <ul class="org-settings">
+            <li tal:repeat="setting settings" class="${setting.name}">
+                <i class="fa ${setting.icon}" aria-hidden="true"></i>
+                <a href="${setting.link}">${setting.title}</a>
+            </li>
+        </ul>
+    </tal:b>
+</div>

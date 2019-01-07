@@ -20,7 +20,12 @@ from onegov.org.forms.resource import ResourceCleanupForm
 from onegov.org.forms.resource import ResourceExportForm
 from onegov.org.forms.resource import ResourceForm
 from onegov.org.forms.resource_recipient import ResourceRecipientForm
-from onegov.org.forms.settings import SettingsForm
+from onegov.org.forms.settings import AnalyticsSettingsForm
+from onegov.org.forms.settings import FooterSettingsForm
+from onegov.org.forms.settings import GeneralSettingsForm
+from onegov.org.forms.settings import HomepageSettingsForm
+from onegov.org.forms.settings import MapSettingsForm
+from onegov.org.forms.settings import ModuleSettingsForm
 from onegov.org.forms.signup import SignupForm
 from onegov.org.forms.ticket_note import TicketNoteForm
 from onegov.org.forms.user import ManageUserForm, NewUserForm
@@ -28,6 +33,7 @@ from onegov.org.forms.userprofile import UserProfileForm
 
 
 __all__ = [
+    'AnalyticsSettingsForm',
     'DateRangeForm',
     'DaypassAllocationEditForm',
     'DaypassAllocationForm',
@@ -35,12 +41,17 @@ __all__ = [
     'DirectoryImportForm',
     'EventForm',
     'ExportForm',
+    'FooterSettingsForm',
     'FormDefinitionForm',
     'FormRegistrationWindowForm',
     'FormSubmissionsExport',
+    'GeneralSettingsForm',
+    'HomepageSettingsForm',
     'ImageSetForm',
     'LinkForm',
     'ManageUserForm',
+    'MapSettingsForm',
+    'ModuleSettingsForm',
     'NewsletterForm',
     'NewsletterSendForm',
     'NewsletterTestForm',
@@ -54,7 +65,6 @@ __all__ = [
     'ResourceRecipientForm',
     'RoomAllocationEditForm',
     'RoomAllocationForm',
-    'SettingsForm',
     'SignupForm',
     'TicketNoteForm',
     'UserProfileForm',

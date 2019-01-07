@@ -79,3 +79,26 @@ class DirectorySearchWidgetAction(Action):
         assert hasattr(cls, 'adapt')
 
         directory_search_widget_registry[self.name] = cls
+
+
+class SettingsView(Action):
+    """ Registers a settings view. """
+
+    config = {
+        'settings_view_registry': dict
+    }
+
+    def __init__(self, name, title, order=0, icon='fa-cogs'):
+        self.name = name
+        self.setting = {
+            'name': name,
+            'title': title,
+            'order': order,
+            'icon': icon
+        }
+
+    def identifier(self, settings_view_registry):
+        return self.name
+
+    def perform(self, func, settings_view_registry):
+        settings_view_registry[self.name] = self.setting

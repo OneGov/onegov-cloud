@@ -4,7 +4,6 @@ from lxml import etree
 from onegov.form import Form
 from onegov.form import with_options
 from onegov.form.fields import MultiCheckboxField, TagsField
-from onegov.form.validators import Stdnum
 from onegov.gis import CoordinatesField
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
@@ -23,148 +22,154 @@ from wtforms_components import ColorField
 ERROR_LINE_RE = re.compile(r'line ([0-9]+)')
 
 
-class SettingsForm(Form):
+class GeneralSettingsForm(Form):
     """ Defines the settings form for onegov org. """
 
     name = StringField(
         label=_("Name"),
-        validators=[validators.InputRequired()],
-        fieldset=_("General")
-    )
+        validators=[validators.InputRequired()])
+
     logo_url = StringField(
         label=_("Logo"),
         description=_("URL pointing to the logo"),
-        fieldset=_("General"),
-        render_kw={'class_': 'image-url'}
-    )
+        render_kw={'class_': 'image-url'})
+
     square_logo_url = StringField(
         label=_("Logo (Square)"),
         description=_("URL pointing to the logo"),
-        fieldset=_("General"),
-        render_kw={'class_': 'image-url'}
-    )
+        render_kw={'class_': 'image-url'})
+
     reply_to = EmailField(
         _("E-Mail Reply Address"), [validators.InputRequired()],
-        description=_("Replies to automated e-mails go to this address."),
-        fieldset=_("General")
-    )
+        description=_("Replies to automated e-mails go to this address."))
+
     primary_color = ColorField(
-        label=_("Primary Color"),
-        fieldset=_("General")
-    )
+        label=_("Primary Color"))
+
     locales = RadioField(
         label=_("Languages"),
-        fieldset=_("General"),
         choices=(
             ('de_CH', _("German")),
             ('fr_CH', _("French"))
         ),
-        validators=[validators.InputRequired()]
-    )
-    bank_account = StringField(
-        label=_("Bank Account (IBAN)"),
-        fieldset=_("Payment"),
-        validators=[Stdnum(format='iban')]
-    )
-    bank_beneficiary = StringField(
-        label=_("Beneficiary"),
-        fieldset=_("Payment"),
-    )
-    bank_payment_order_type = RadioField(
-        label=_("Payment Order"),
-        fieldset=_("Payment"),
-        choices=[
-            ('basic', _("Basic")),
-            ('esr', _("With reference number (ESR)")),
-        ],
-        default='basic'
-    )
-    bank_esr_participant_number = StringField(
-        label=_("ESR participant number"),
-        fieldset=_("Payment"),
-        validators=[validators.InputRequired()],
-        depends_on=('bank_payment_order_type', 'esr')
-    )
+        validators=[validators.InputRequired()])
+
+    # the footer height is determined by javascript, see org.scss and
+    # common.js for more information (search for footer)
+    footer_height = HiddenField()
+
+    @property
+    def theme_options(self):
+        options = self.model.theme_options
+        options['footer-height'] = self.footer_height.data
+
+        try:
+            options['primary-color'] = self.primary_color.data.get_hex()
+        except AttributeError:
+            options['primary-color'] = user_options['primary-color']
+
+        # override the options using the default values if no value was given
+        for key in options:
+            if not options[key]:
+                options[key] = user_options[key]
+
+        return options
+
+    @theme_options.setter
+    def theme_options(self, options):
+        self.primary_color.data = options.get('primary-color')
+        self.footer_height.data = options.get('footer-height')
+
+    def populate_obj(self, model):
+        super().populate_obj(model)
+        model.theme_options = self.theme_options
+
+    def process_obj(self, model):
+        super().process_obj(model)
+        self.theme_options = model.theme_options
+
+    def on_request(self):
+
+        @self.request.after
+        def clear_locale(response):
+            response.delete_cookie('locale')
+
+
+class FooterSettingsForm(Form):
+
     contact = TextAreaField(
         label=_("Contact"),
         description=_("The address and phone number of the municipality"),
         render_kw={'rows': 8},
-        fieldset=_("Information")
-    )
+        fieldset=_("Information"))
+
     contact_url = URLField(
         label=_("Contact Link"),
         description=_("URL pointing to a contact page"),
         fieldset=_("Information"),
-        render_kw={'class_': 'internal-url'}
-    )
+        render_kw={'class_': 'internal-url'})
+
     opening_hours = TextAreaField(
         label=_("Opening Hours"),
         description=_("The opening hours of the municipality"),
         render_kw={'rows': 8},
-        fieldset=_("Information")
-    )
+        fieldset=_("Information"))
+
     opening_hours_url = URLField(
         label=_("Opening Hours Link"),
         description=_("URL pointing to an opening hours page"),
         fieldset=_("Information"),
-        render_kw={'class_': 'internal-url'}
-    )
+        render_kw={'class_': 'internal-url'})
+
     facebook_url = URLField(
         label=_("Facebook"),
         description=_("URL pointing to the facebook site"),
-        fieldset=_("Social Media")
-    )
+        fieldset=_("Social Media"))
+
     twitter_url = URLField(
         label=_("Twitter"),
         description=_("URL pointing to the twitter site"),
-        fieldset=_("Social Media")
-    )
+        fieldset=_("Social Media"))
+
+
+class HomepageSettingsForm(Form):
+
     homepage_image_1 = StringField(
         label=_("Homepage Image #1"),
-        render_kw={'class_': 'image-url'},
-        fieldset=_("Homepage")
-    )
+        render_kw={'class_': 'image-url'})
+
     homepage_image_2 = StringField(
         label=_("Homepage Image #2"),
-        render_kw={'class_': 'image-url'},
-        fieldset=_("Homepage")
-    )
+        render_kw={'class_': 'image-url'})
+
     homepage_image_3 = StringField(
         label=_("Homepage Image #3"),
-        render_kw={'class_': 'image-url'},
-        fieldset=_("Homepage")
-    )
+        render_kw={'class_': 'image-url'})
+
     homepage_image_4 = StringField(
         label=_("Homepage Image #4"),
-        render_kw={'class_': 'image-url'},
-        fieldset=_("Homepage")
-    )
+        render_kw={'class_': 'image-url'})
+
     homepage_image_5 = StringField(
         label=_("Homepage Image #5"),
-        render_kw={'class_': 'image-url'},
-        fieldset=_("Homepage")
-    )
+        render_kw={'class_': 'image-url'})
+
     homepage_image_6 = StringField(
         label=_("Homepage Image #6"),
-        render_kw={'class_': 'image-url'},
-        fieldset=_("Homepage")
-    )
+        render_kw={'class_': 'image-url'})
+
     homepage_cover = HtmlField(
         label=_("Homepage Cover"),
-        render_kw={'rows': 10},
-        fieldset=_("Homepage")
-    )
+        render_kw={'rows': 10})
+
     homepage_structure = TextAreaField(
         label=_("Homepage Structure (for advanced users only)"),
         description=_("The structure of the homepage"),
-        render_kw={'rows': 32, 'data-editor': 'xml'},
-        fieldset=_("Homepage")
-    )
+        render_kw={'rows': 32, 'data-editor': 'xml'})
 
     # see homepage.py
     redirect_homepage_to = RadioField(
         label=_("Homepage redirect"),
-        fieldset=_("Homepage"),
         default='no',
         choices=[
             ('no', _("No")),
@@ -173,64 +178,7 @@ class SettingsForm(Form):
             ('forms', _("Yes, to forms")),
             ('publications', _("Yes, to publications")),
             ('reservations', _("Yes, to reservations")),
-        ],
-    )
-
-    hidden_people_fields = MultiCheckboxField(
-        label=_("Hide these fields for non-logged-in users"),
-        fieldset=_("People"),
-        choices=[
-            ('salutation', _("Salutation")),
-            ('academic_title', _("Academic Title")),
-            ('born', _("Born")),
-            ('profession', _("Profession")),
-            ('political_party', _("Political Party")),
-            ('email', _("E-Mail")),
-            ('phone', _("Phone")),
-            ('phone_direct', _("Direct Phone Number")),
-            ('website', _("Website")),
-            ('address', _("Address")),
-            ('notes', _("Notes")),
-        ],
-    )
-
-    event_locations = TagsField(
-        label=_("Values of the location filter"),
-        fieldset=_("Events"),
-    )
-
-    default_map_view = CoordinatesField(
-        label=_("The default map view. This should show the whole town"),
-        render_kw={
-            'data-map-type': 'crosshair'
-        },
-        fieldset=_("Maps")
-    )
-
-    geo_provider = RadioField(
-        label=_("Geo provider"),
-        fieldset=_("Maps"),
-        default='geo-mapbox',
-        choices=[
-            ('geo-mapbox', _("Mapbox (Default)")),
-            ('geo-vermessungsamt-winterthur', "Vermessungsamt Winterthur"),
-            ('geo-zugmap-luftbild', "ZugMap Luftbild"),
-            ('geo-zugmap-ortsplan', "ZugMap Ortsplan"),
-        ]
-    )
-
-    analytics_code = TextAreaField(
-        label=_("Analytics Code"),
-        description=_("JavaScript for web statistics support"),
-        render_kw={'rows': 10},
-        fieldset=_("Advanced")
-    )
-    # the footer height is determined by javascript, see org.scss and
-    # common.js for more information (search for footer)
-    footer_height = HiddenField()
-
-    def on_request(self):
-        self.request.include('tags-input')
+        ])
 
     def validate_homepage_structure(self, field):
         if field.data:
@@ -250,46 +198,88 @@ class SettingsForm(Form):
 
     @property
     def theme_options(self):
-        try:
-            primary_color = self.primary_color.data.get_hex()
-        except AttributeError:
-            primary_color = user_options['primary-color']
-
-        options = {
-            'primary-color': primary_color,
-            'footer-height': self.footer_height.data
-        }
+        options = self.model.theme_options
 
         # set the images only if provided
         for i in range(1, 7):
             image = getattr(self, 'homepage_image_{}'.format(i)).data
 
             if not image:
-                continue
+                options.pop(f'tile-image-{i}', None)
+            else:
+                options[f'tile-image-{i}'] = '"{}"'.format(image)
 
-            options['tile-image-{}'.format(i)] = '"{}"'.format(image)
-
-        # override the options using the default vaules if no value was given
+        # override the options using the default values if no value was given
         for key in options:
             if not options[key]:
                 options[key] = user_options[key]
 
         return options
 
-    def ensure_beneificary_if_bank_account(self):
-        if self.bank_account.data and not self.bank_beneficiary.data:
-            self.bank_beneficiary.errors.append(_(
-                "A beneficiary is required if a bank account is given."
-            ))
-            return False
-
     @theme_options.setter
     def theme_options(self, options):
-        self.primary_color.data = options.get('primary-color')
-        self.footer_height.data = options.get('footer-height')
         self.homepage_image_1.data = options.get('tile-image-1', '').strip('"')
         self.homepage_image_2.data = options.get('tile-image-2', '').strip('"')
         self.homepage_image_3.data = options.get('tile-image-3', '').strip('"')
         self.homepage_image_4.data = options.get('tile-image-4', '').strip('"')
         self.homepage_image_5.data = options.get('tile-image-5', '').strip('"')
         self.homepage_image_6.data = options.get('tile-image-6', '').strip('"')
+
+    def populate_obj(self, model):
+        super().populate_obj(model)
+        model.theme_options = self.theme_options
+
+    def process_obj(self, model):
+        super().process_obj(model)
+        self.theme_options = model.theme_options
+
+
+class ModuleSettingsForm(Form):
+
+    hidden_people_fields = MultiCheckboxField(
+        label=_("Hide these fields for non-logged-in users"),
+        fieldset=_("People"),
+        choices=[
+            ('salutation', _("Salutation")),
+            ('academic_title', _("Academic Title")),
+            ('born', _("Born")),
+            ('profession', _("Profession")),
+            ('political_party', _("Political Party")),
+            ('email', _("E-Mail")),
+            ('phone', _("Phone")),
+            ('phone_direct', _("Direct Phone Number")),
+            ('website', _("Website")),
+            ('address', _("Address")),
+            ('notes', _("Notes")),
+        ])
+
+    event_locations = TagsField(
+        label=_("Values of the location filter"),
+        fieldset=_("Events"),)
+
+
+class MapSettingsForm(Form):
+
+    default_map_view = CoordinatesField(
+        label=_("The default map view. This should show the whole town"),
+        render_kw={
+            'data-map-type': 'crosshair'
+        })
+
+    geo_provider = RadioField(
+        label=_("Geo provider"),
+        default='geo-mapbox',
+        choices=[
+            ('geo-mapbox', _("Mapbox (Default)")),
+            ('geo-vermessungsamt-winterthur', "Vermessungsamt Winterthur"),
+            ('geo-zugmap-luftbild', "ZugMap Luftbild"),
+            ('geo-zugmap-ortsplan', "ZugMap Ortsplan"),
+        ])
+
+
+class AnalyticsSettingsForm(Form):
+
+    analytics_code = TextAreaField(
+        label=_("Analytics Code"),
+        description=_("JavaScript for web statistics support"),
+        render_kw={'rows': 10, 'data-editor': 'html'})
