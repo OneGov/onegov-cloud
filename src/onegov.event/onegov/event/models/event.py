@@ -116,7 +116,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
 
     @property
     def es_skip(self):
-        return self.state == 'submitted' or self.state == 'withdrawn'
+        return self.state != 'published' or getattr(self, '_es_skip', False)
 
     def source_url(self, request):
         """ Returns an url pointing to the external event if imported. """

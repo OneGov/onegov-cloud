@@ -456,6 +456,7 @@ def fetch(group_context, source, tag, location):
 
                 def remote_events():
                     for event in query:
+                        event._es_skip = True
                         yield EventImportItem(
                             event=Event(
                                 state='initiated',

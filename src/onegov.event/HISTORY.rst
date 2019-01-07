@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes fetching events messing up the search index.
+  [msom]
+
 1.1.0 (2018-12-08)
 ~~~~~~~~~~~~~~~~~~~
 
