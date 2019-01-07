@@ -1,4 +1,5 @@
 from datetime import date
+from freezegun import freeze_time
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.pdf import AgencyPdfAr
@@ -151,6 +152,7 @@ def test_agency_pdf_default_hidden(session):
     assert "Eder" not in pdf
 
 
+@freeze_time("2018-01-01")
 def test_agency_pdf_ar(session):
     people = ExtendedPersonCollection(session)
     aeschi = people.add(
