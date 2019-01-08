@@ -4,6 +4,9 @@ Changelog
 - Adds a pagination to the vote details view.
   [msom]
 
+- Adjusts styles to look more like anneepolitique.swiss.
+  [msom]
+
 0.0.26 (2018-12-18)
 ~~~~~~~~~~~~~~~~~~~
 

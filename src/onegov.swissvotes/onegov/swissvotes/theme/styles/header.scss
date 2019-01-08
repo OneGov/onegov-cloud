@@ -3,7 +3,6 @@ header {
 
     .languages {
         background-color: $primary-color;
-        color: $white;
 
         ul {
             margin: 0 .9375rem;
@@ -15,7 +14,7 @@ header {
         }
 
         a {
-            color: $black;
+            color: $white;
         }
     }
 

@@ -24,6 +24,7 @@
     -->
 
     <link rel="stylesheet" type="text/css" href="${layout.static_path}/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="${layout.static_path}/apercu/css/apercu.css">
     <script tal:condition="layout.sentry_js" src="https://cdn.ravenjs.com/3.26.1/raven.min.js"></script>
     <script tal:condition="layout.sentry_js">Raven.config('${layout.sentry_js}').install()</script>
     <link rel="stylesheet" type="text/css" href="${request.theme_link}">
@@ -34,10 +35,11 @@
             <div class="row">
                 <nav role="navigation" class="right">
                     <ul class="inline-list">
-                        <li tal:repeat="(locale, lang, title, href) layout.locales">
-                            <span tal:condition="request.locale == locale">${title}</span>
-                            <a tal:condition="request.locale != locale" rel="alternate" href="${href}" lang="${lang}" hreflang="${lang}">${title}</a>
-                        </li>
+                        <tal:block tal:repeat="(locale, lang, title, href) layout.locales">
+                            <li tal:condition="request.locale != locale">
+                                <a rel="alternate" href="${href}" lang="${lang}" hreflang="${lang}">${lang}</a>
+                            </li>
+                        </tal:block>
                     </ul>
                 </nav>
             </div>
@@ -46,8 +48,8 @@
             <div class="row">
                 <div class="columns small-12 small-only-text-center">
                     <a href="${layout.homepage_link}"><img src="${layout.static_path}/images/logo.svg" height="100" alt="Swissvotes"></a>
-                    <img class="right hide-for-small" src="${layout.static_path}/images/logo_unibe.svg" height="100" alt="Universität Basel">
-                    <img class="right hide-for-small" src="${layout.static_path}/images/logo_aps.svg" height="100" alt="année politique suisse">
+                    <a href="http://unibe.ch"><img class="right hide-for-small" src="${layout.static_path}/images/logo_unibe.svg" height="100" alt="Universität Basel"></a>
+                    <a href="https://anneepolitique.swiss"><img class="right hide-for-small" src="${layout.static_path}/images/logo_aps.svg" height="100" alt="année politique suisse"></a>
                     <div class="clearfix"></div>
                 </div>
             </div>

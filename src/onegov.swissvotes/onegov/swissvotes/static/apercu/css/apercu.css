@@ -1,0 +1,32 @@
+@font-face {
+    font-family: Apercu;
+    font-weight: normal;
+    src: url(../fonts/apercu_regular-4bbe7609233106ded0f96b5c43251cf9a88d8378956b125aa931b5fc76aaedfb.eot);
+    src: url(../fonts/apercu_regular-4bbe7609233106ded0f96b5c43251cf9a88d8378956b125aa931b5fc76aaedfb.eot?#iefix) format("embedded-opentype"),
+         url(../fonts/apercu_regular-e918a3fcb44e725952c49774404f5564c0e5bf79fe03fdd78ec2034561153672.woff2) format("woff2"),
+         url(../fonts/apercu_regular-594454d6cae244ec0bcff7bd0da9d3e39d2a6fcd9bfae597b62b3a4974c67312.woff) format("woff"),
+         url(../fonts/apercu_regular-de1cff08f269e163b678b793c7e99af48b26ad240af0065a9dfa4f490340b275.ttf) format("ttf"),
+         url(../fonts/apercu_regular-597c90d95ec7264034dec18fb3cad8efe74c743efec0abcc06091a166b407bd0.svg#Apercu) format("svg");
+}
+
+@font-face {
+    font-family: Apercu;
+    font-weight: bold;
+    src: url(../fonts/apercu_bold-22e2557b62052e11ab836197a61fad8d5eea85097c15d965f57c5424bc95952e.eot);
+    src: url(../fonts/apercu_bold-22e2557b62052e11ab836197a61fad8d5eea85097c15d965f57c5424bc95952e.eot?#iefix) format("embedded-opentype"),
+         url(../fonts/apercu_bold-88a83d6555af69a761e9d9c92ec7b587a1de45c95e4365ab8ef3d0abeb823ff0.woff2) format("woff2"),
+         url(../fonts/apercu_bold-48037043f6325258027cc41e2f029baf9eb296c74f525bb4f52e44765abbbcfe.woff) format("woff"),
+         url(../fonts/apercu_bold-34ca427ccd7fd0fe48188513073c14a80ab4a7ac5023bced7a6517a583df855d.ttf) format("ttf"),
+         url(../fonts/apercu_bold-10096edb6c4991dbe345a52930ff7d1c6833b038a1d04b17e3c24ecb2047ac9b.svg#Apercu) format("svg");
+}
+
+@font-face {
+    font-family: Apercu;
+    font-weight: lighter;
+    src: url(../fonts/apercu_light-95151640cabc7e000a62ebe2544fc154ae4fed6a88cd606aef03727783c99fe3.eot);
+    src: url(../fonts/apercu_light-95151640cabc7e000a62ebe2544fc154ae4fed6a88cd606aef03727783c99fe3.eot?#iefix) format("embedded-opentype"),
+         url(../fonts/apercu_light-7e5f1ba9c6b5f53841140123ff5d1bf5f2b13b9544e41ea483f241f22f109c68.woff2) format("woff2"),
+         url(../fonts/apercu_light-dc27b9756dc26fe29b19e276b9669d39b8338f7d7163206d0d9952f42c4ecca2.woff) format("woff"),
+         url(../fonts/apercu_light-ccf21d6e8ea936d25d1ae65f4edb48ae1c580ff2375055538389711afbdaedc6.ttf) format("ttf"),
+         url(../fonts/apercu_light-a1eaa019407121bb6661c07b408f3fdd6358f7a7a006bb3d6341148755e74969.svg#Apercu) format("svg");
+}
