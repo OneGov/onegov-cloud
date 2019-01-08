@@ -4,9 +4,6 @@ Changelog
 - Reorganises settings into separate views.
   [href]
 
-1.5.1 (2019-01-07)
-~~~~~~~~~~~~~~~~~~~~
-
 - Shows additional information for ambiguous people when editing memberships.
   [msom]
 
