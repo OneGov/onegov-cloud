@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.27 (2019-01-08)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a pagination to the vote details view.
   [msom]
