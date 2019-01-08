@@ -6,6 +6,15 @@
     <tal:block metal:fill-slot="content">
         <div class="vote">
 
+            <ul class="pagination" role="menubar" aria-label="Pagination" i18n:attributes="aria-label">
+                <li class="previous" tal:condition="prev">
+                    <a href="${request.link(prev)}" i18n:translate>Previous vote</a>
+                </li>
+                <li class="next right" tal:condition="next">
+                    <a href="${request.link(next)}" i18n:translate>Next vote</a>
+                </li>
+            </ul>
+
             <h2>${layout.title}<tal:block tal:condition="vote.keyword"> <small>${vote.keyword}</small></tal:block></h2>
 
             <table class="collapsible">
@@ -272,6 +281,7 @@
                     </tr>
                 </tbody>
             </table>
+
         </div>
     </tal:block>
 </div>

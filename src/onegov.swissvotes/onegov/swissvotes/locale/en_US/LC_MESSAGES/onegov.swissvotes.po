@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-12-11 16:16+0100\n"
+"POT-Creation-Date: 2019-01-08 09:31+0100\n"
 "PO-Revision-Date: 2018-09-18 15:04+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: English\n"
@@ -1284,6 +1284,15 @@ msgid "Result by canton, district and municipality"
 msgstr ""
 
 msgid "Interactive map"
+msgstr ""
+
+msgid "Pagination"
+msgstr ""
+
+msgid "Previous vote"
+msgstr ""
+
+msgid "Next vote"
 msgstr ""
 
 msgid "You are here"

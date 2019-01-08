@@ -140,6 +140,32 @@ h2 small {
 }
 
 /*
+    Vote
+*/
+.vote {
+    ul.pagination {
+
+        li.previous a {
+            padding-left: 0;
+
+            &::before {
+                @include icon('\f053');
+                margin-right: 1em;
+            }
+        }
+
+        li.next a {
+            padding-right: 0;
+
+            &::after {
+                @include icon('\f054');
+                margin-left: 1em;
+            }
+        }
+    }
+}
+
+/*
     Content pages
 */
 .page-content p {

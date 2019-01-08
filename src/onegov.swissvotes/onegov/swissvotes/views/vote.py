@@ -17,6 +17,12 @@ from onegov.swissvotes.models import SwissVote
     template='vote.pt'
 )
 def view_vote(self, request):
+    query = request.session.query(SwissVote)
+    prev = query.order_by(SwissVote.bfs_number.desc())
+    prev = prev.filter(SwissVote.bfs_number < self.bfs_number).first()
+    next = query.order_by(SwissVote.bfs_number.asc())
+    next = next.filter(SwissVote.bfs_number > self.bfs_number).first()
+
     return {
         'layout': VoteLayout(self, request),
         'voting_text': self.get_file('voting_text'),
@@ -25,6 +31,8 @@ def view_vote(self, request):
         'voting_booklet': self.get_file('voting_booklet'),
         'resolution': self.get_file('resolution'),
         'realization': self.get_file('realization'),
+        'prev': prev,
+        'next': next,
     }
 
 
