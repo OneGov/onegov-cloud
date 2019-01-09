@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.48.0 (2019-01-09)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to include publications in newsletters.
   [href]
 
