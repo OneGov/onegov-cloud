@@ -937,7 +937,7 @@ msgid "Occasion Age"
 msgstr "Âge pour l'activité"
 
 msgid "Occasion Spots"
-msgstr "Lieux de l'événement"
+msgstr "Evénement places"
 
 msgid "Occasion Cost"
 msgstr "Coût de l'activité"
