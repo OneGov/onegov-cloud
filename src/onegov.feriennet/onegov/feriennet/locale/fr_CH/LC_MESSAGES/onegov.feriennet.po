@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-01-09 08:12+0100\n"
+"POT-Creation-Date: 2019-01-09 14:41+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -484,6 +484,9 @@ msgstr "Musique"
 
 msgid "Nature"
 msgstr "Nature"
+
+msgid "Professions"
+msgstr "Métiers"
 
 msgid "Science"
 msgstr "Sciences"

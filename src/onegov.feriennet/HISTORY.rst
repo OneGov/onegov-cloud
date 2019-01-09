@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds new category "Professions".
+  [href]
+
 - Adds the latest Pro Juventute logo.
   [href]
 

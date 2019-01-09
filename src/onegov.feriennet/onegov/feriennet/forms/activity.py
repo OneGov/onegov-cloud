@@ -26,6 +26,7 @@ TAGS = tuple((tag, tag) for tag in (
     _("Museums"),
     _("Music"),
     _("Nature"),
+    _("Professions"),
     _("Science"),
     _("Security"),
     _("Sightseeing"),
