@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.15.9 (2019-01-09)
+~~~~~~~~~~~~~~~~~~~~~
 
 - Reorganises settings into separate views.
   [href]
