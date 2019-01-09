@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds the latest Pro Juventute logo.
+  [href]
+
 1.4.11 (2019-01-09)
 ~~~~~~~~~~~~~~~~~~~
 
