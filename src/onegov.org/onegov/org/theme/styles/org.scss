@@ -3425,6 +3425,30 @@ ul.search-results {
     background-color: $yellow-pastel;
 }
 
+.newsletter-block > h2,
+.newsletter-block .newslist h2 {
+    font-size: $h3-font-size;
+}
+
+.newsletter-block + .newsletter-block {
+    margin-top: 2rem;
+}
+
+.newsletter-publications-block {
+    margin-bottom: 3.5rem;
+}
+
+.newsletter-layout {
+
+    form .field-type-multicheckboxfield ul {
+        @include form-element;
+        height: auto;
+        max-height: 500px;
+        max-width: 100%;
+        overflow-y: scroll;
+    }
+}
+
 /*
     Reservation calendar
 */

@@ -1564,3 +1564,33 @@
         </tal:b>
     </div>
 </metal:digest_result>
+
+<metal:publication define-macro="publication" i18n:domain="onegov.org">
+    <div tal:define="file_link link(publication)" class="publication-item">
+        <a class="file-preview" href="${file_link}">
+            <img class="pdf-preview lazyload" data-src="${link(publication, name='medium')}">
+        </a>
+
+        <ul class="dense">
+            <li class="publication-title">
+                <a href="${file_link}">${name_without_extension(publication.name)}</a>
+            </li>
+            <li class="publication-date">
+                <span>
+                    ${layout.format_date(publication.created, 'date')}
+                </span>
+            </li>
+            <li tal:define="pages publication.stats.get('pages') or 0" class="publication-stats">
+                <span>
+                    <i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i>
+                    <tal:b tal:condition="pages == 0 or pages > 1" i18n:translate>
+                        <tal:b i18n:name="count">${pages}</tal:b> pages
+                    </tal:b>
+                    <tal:b tal:condition="pages == 1" i18n:translate>
+                        1 page
+                    </tal:b>
+                </span>
+            </li>
+        </ul>
+    </div>
+</metal:publication>

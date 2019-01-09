@@ -17,6 +17,17 @@
             </tal:b>
         </tal:b>
 
+        <tal:b condition="publications">
+            <h2 i18n:translate>Publications</h2>
+
+            <tal:b repeat="publication publications">
+                <strong><a href="${request.link(publication)}">${name_without_extension(publication.name)}</a></strong>
+                <ul class="flat">
+                    <li>${layout.format_date(publication.created, 'date')}</li>
+                </ul>
+            </tal:b>
+        </tal:b>
+
         <tal:b condition="occurrences">
             <h2 i18n:translate>Events</h2>
 

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-01-07 15:36+0100\n"
+"POT-Creation-Date: 2019-01-09 10:56+0100\n"
 "PO-Revision-Date: 2018-12-08 11:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -899,9 +899,6 @@ msgstr "Ein paar Worte zu dieser Ausgabe des Newsletters"
 
 msgid "Latest news"
 msgstr "Aktuelles"
-
-msgid "Selected News / Events"
-msgstr "Ausgewählte Nachrichten und Veranstaltungen"
 
 msgid "Now"
 msgstr "Jetzt"
@@ -3322,6 +3319,9 @@ msgstr "Ihre Zahlung wurde rückgängig gemacht"
 
 msgid "Your payment has been refunded"
 msgstr "Ihre Zahlung wurde rückerstattet"
+
+#~ msgid "Selected News / Events"
+#~ msgstr "Ausgewählte Nachrichten und Veranstaltungen"
 
 #~ msgid "Bank Account (IBAN)"
 #~ msgstr "Bankkonto (IBAN)"

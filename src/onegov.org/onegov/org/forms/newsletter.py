@@ -47,6 +47,9 @@ class NewsletterForm(Form):
             )
         ) for item in news)
 
+        if not choices:
+            return cls
+
         class NewsletterWithNewsForm(cls):
 
             news = MultiCheckboxField(
@@ -55,8 +58,7 @@ class NewsletterForm(Form):
                 render_kw={
                     'prefix_label': False,
                     'class_': 'recommended'
-                },
-                fieldset=_("Selected News / Events")
+                }
             )
 
             def update_model(self, model, request):
@@ -72,14 +74,21 @@ class NewsletterForm(Form):
     @classmethod
     def with_occurrences(cls, request, occurrences):
 
+        layout = Layout(None, request)
+
         choices = tuple(
             (
                 str(item.id),
                 '<div class="title">{}</div><div class="date">{}</div>'.format(
-                    item.title, item.localized_start.strftime('%d.%m.%Y %H:%M')
+                    item.title, layout.format_date(
+                        item.localized_start, 'datetime'
+                    )
                 )
             ) for item in occurrences
         )
+
+        if not choices:
+            return cls
 
         class NewsletterWithOccurrencesForm(cls):
 
@@ -89,8 +98,7 @@ class NewsletterForm(Form):
                 render_kw={
                     'prefix_label': False,
                     'class_': 'recommended'
-                },
-                fieldset=_("Selected News / Events")
+                }
             )
 
             def update_model(self, model, request):
@@ -102,6 +110,44 @@ class NewsletterForm(Form):
                 self.occurrences.data = model.content.get('occurrences')
 
         return NewsletterWithOccurrencesForm
+
+    @classmethod
+    def with_publications(cls, request, publications):
+
+        layout = Layout(None, request)
+
+        choices = tuple(
+            (
+                str(item.id),
+                '<div class="title">{}</div><div class="date">{}</div>'.format(
+                    item.name, layout.format_date(item.created, 'date')
+                )
+            ) for item in publications
+        )
+
+        if not choices:
+            return cls
+
+        class NewsletterWithPublicationsForm(cls):
+
+            publications = MultiCheckboxField(
+                label=_("Events"),
+                choices=choices,
+                render_kw={
+                    'prefix_label': False,
+                    'class_': 'recommended'
+                }
+            )
+
+            def update_model(self, model, request):
+                super().update_model(model, request)
+                model.content['publications'] = self.publications.data
+
+            def apply_model(self, model):
+                super().apply_model(model)
+                self.publications.data = model.content.get('publications')
+
+        return NewsletterWithPublicationsForm
 
 
 class NewsletterSendForm(Form):

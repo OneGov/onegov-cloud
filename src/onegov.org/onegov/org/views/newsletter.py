@@ -8,6 +8,8 @@ from onegov.core.security import Public, Private
 from onegov.core.templates import render_template
 from onegov.core.utils import linkify
 from onegov.event import Occurrence, OccurrenceCollection
+from onegov.file import File
+from onegov.file.utils import name_without_extension
 from onegov.newsletter import Newsletter
 from onegov.newsletter import NewsletterCollection
 from onegov.newsletter import Recipient
@@ -22,6 +24,7 @@ from onegov.org.layout import DefaultMailLayout
 from onegov.org.layout import NewsletterLayout
 from onegov.org.layout import RecipientLayout
 from onegov.org.models import News
+from onegov.org.models import PublicationCollection
 from sedate import utcnow
 from sqlalchemy import desc
 from sqlalchemy.orm import undefer
@@ -32,23 +35,40 @@ def get_newsletter_form(model, request):
 
     form = NewsletterForm
 
-    query = request.session.query(News)
-    query = query.filter(News.parent != None)
-    query = query.order_by(desc(News.created))
-    query = query.options(undefer('created'))
-    form = form.with_news(request, query.all())
+    def news():
+        q = request.session.query(News)
+        q = q.filter(News.parent != None)
+        q = q.order_by(desc(News.created))
+        q = q.options(undefer('created'))
 
-    query = OccurrenceCollection(request.session).query()
-    subquery = query.with_entities(Occurrence.id)
-    subquery = subquery.order_by(None)
-    subquery = subquery.order_by(
-        Occurrence.event_id,
-        Occurrence.start
-    )
-    subquery = subquery.distinct(Occurrence.event_id).subquery()
-    query.filter(Occurrence.id.in_(subquery))
+        return q
 
-    form = form.with_occurrences(request, query.all())
+    form = form.with_news(request, news())
+
+    def publications():
+        q = PublicationCollection(request.session).query()
+        q = q.filter(File.published == True)
+        q = q.filter(File.signed == True)
+        q = q.order_by(desc(File.created))
+
+        return q
+
+    form = form.with_publications(request, publications())
+
+    def occurrences():
+        q = OccurrenceCollection(request.session).query()
+
+        s = q.with_entities(Occurrence.id)
+        s = s.order_by(None)
+        s = s.order_by(
+            Occurrence.event_id,
+            Occurrence.start)
+
+        s = s.distinct(Occurrence.event_id).subquery()
+
+        return q.filter(Occurrence.id.in_(s))
+
+    form = form.with_occurrences(request, occurrences())
 
     return form
 
@@ -78,7 +98,20 @@ def occurrences_by_newsletter(newsletter, request):
     query = query.order_by(Occurrence.start, Occurrence.title)
     query = query.filter(Occurrence.id.in_(occurrence_ids))
 
-    return query.all()
+    return query
+
+
+def publications_by_newsletter(newsletter, request):
+    publication_ids = newsletter.content.get('publications')
+
+    if not publication_ids:
+        return None
+
+    query = PublicationCollection(request.session).query()
+    query = query.filter(File.id.in_(publication_ids))
+    query = query.order_by(File.created)
+
+    return query
 
 
 @OrgApp.form(model=NewsletterCollection, template='newsletter_collection.pt',
@@ -148,13 +181,20 @@ def handle_newsletters(self, request, form):
 @OrgApp.html(model=Newsletter, template='newsletter.pt', permission=Public)
 def view_newsletter(self, request):
 
+    # link to file and thumbnail by id
+    def link(f, name=None):
+        return request.class_link(File, {'id': f.id}, name=name)
+
     return {
         'layout': NewsletterLayout(self, request),
         'newsletter': self,
         'news': news_by_newsletter(self, request),
         'occurrences': occurrences_by_newsletter(self, request),
+        'publications': publications_by_newsletter(self, request),
         'title': self.title,
         'lead': linkify(self.lead),
+        'link': link,
+        'name_without_extension': name_without_extension,
     }
 
 
@@ -241,7 +281,9 @@ def send_newsletter(request, newsletter, recipients, is_test=False):
             'title': newsletter.title,
             'unsubscribe': '$unsubscribe',
             'news': news_by_newsletter(newsletter, request),
-            'occurrences': occurrences_by_newsletter(newsletter, request)
+            'occurrences': occurrences_by_newsletter(newsletter, request),
+            'publications': publications_by_newsletter(newsletter, request),
+            'name_without_extension': name_without_extension
         }
     ))
 
