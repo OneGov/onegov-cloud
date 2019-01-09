@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-01-07 15:46+0100\n"
+"POT-Creation-Date: 2019-01-09 08:12+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -100,10 +100,10 @@ msgid "You will have to request publication again"
 msgstr "Vous devrez à nouveau demander la publication"
 
 msgid "Provide Again"
-msgstr "Proposer à nouveau"
+msgstr "Proposer l’activité de nouveau"
 
 msgid "Submit Activity"
-msgstr "Soumettre l'activité"
+msgstr "Saisir nouvelle activité"
 
 msgid "Edit"
 msgstr "Modifier"
@@ -771,7 +771,7 @@ msgid "Organisers"
 msgstr "Organisateurs"
 
 msgid "Members"
-msgstr "Participants"
+msgstr "Members"
 
 msgid "Active users"
 msgstr "Utilisateurs actifs"
@@ -943,7 +943,7 @@ msgid "Occasion Cost"
 msgstr "Coût de l'activité"
 
 msgid "Occasion Meeting Point"
-msgstr "Lieu de renvez-vous pour l'activité"
+msgstr "Lieu de rendez-vous pour l'activité"
 
 msgid "Occasion May Overlap"
 msgstr "L'événement peut se prolonger"
@@ -1111,8 +1111,8 @@ msgid ""
 "To import a bank statement you need an account with one of the following "
 "banks:"
 msgstr ""
-"Pour importer un relevé bancaire, vous aurez besoin d'un compte chez l'une "
-"des banques suivantes :"
+"Pour importer un relevé bancaire, vous aurez besoin d’un compte bancaire "
+"auprès d’une des banques suivantes:"
 
 msgid ""
 "Your statement is required to be in \"ISO-20022 format (without picture)\". "
@@ -1331,10 +1331,11 @@ msgid "The deadline for last-minute bookings is the ${date}."
 msgstr ""
 "La date limite pour les réservations de dernière minute est le ${date}."
 
-msgid "Last-minute bookings are possible up to ${days} before each occasion."
+msgid ""
+"Last-minute bookings are possible up to ${days} days before each occasion."
 msgstr ""
-"Les réservations de dernière minute sont possibles jusqu'à ${days} avant "
-"chaque événement."
+"Les réservations de dernière minute sont possibles jusqu'à ${days} jours "
+"avant chaque événement."
 
 msgid ""
 "Each child is assigned up to ${count} activities. To ensure a good matching "
@@ -2085,7 +2086,7 @@ msgid ""
 "future period. To publish archived activities again a new publication "
 "request needs to be filed."
 msgstr ""
-"Cela archivera toutes les activités qui n'ont pas encore de dates attribées "
+"Cela archivera toutes les activités qui n'ont pas encore de dates attribuées "
 "pour une période future. Pour publier à nouveau une activité archivée, une "
 "nouvelle demande de publication doit être soumise."
 
@@ -2099,12 +2100,6 @@ msgstr "Modifier le participant"
 msgid "Booking Limit of ${name}"
 msgstr "Limite de réservation de ${name}"
 
-msgid "Feriennet Settings"
-msgstr "Paramètres Feriennet"
-
-msgid "Settings"
-msgstr "Paramètres"
-
 msgid "Feriennet"
 msgstr "Feriennet"
 
@@ -2112,7 +2107,7 @@ msgid "Payment"
 msgstr "Paiement"
 
 msgid "Payment Order"
-msgstr "Demande de paiement"
+msgstr "Mode de paiement"
 
 msgid "ESR participant number"
 msgstr "Numéro de compte postal du participant"
@@ -2137,7 +2132,7 @@ msgid "Basic"
 msgstr "Simple"
 
 msgid "With reference number (ESR)"
-msgstr "Avec un numéro de référence (ESR)"
+msgstr "Avec un bulletin de paiement (BVR)"
 
 msgid "E-Mail"
 msgstr "E-mail"
@@ -2234,6 +2229,12 @@ msgstr "Voulez-vous vraiment supprimer la réservation de ${attendee} ?"
 #, python-format
 msgid "Do you really want to cancel ${attendee}'s booking?"
 msgstr "Voulez-vous vraiment annuler la réservation de ${attendee} ?"
+
+#~ msgid "Feriennet Settings"
+#~ msgstr "Paramètres Feriennet"
+
+#~ msgid "Settings"
+#~ msgstr "Paramètres"
 
 #~ msgid "Edit contact info"
 #~ msgstr "Modifier les coordonnées"

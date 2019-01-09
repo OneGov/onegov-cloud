@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-01-07 15:46+0100\n"
+"POT-Creation-Date: 2019-01-09 08:12+0100\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1322,7 +1322,8 @@ msgstr "Es können keine weiteren Buchungen mehr vorgenommen werden."
 msgid "The deadline for last-minute bookings is the ${date}."
 msgstr "Der Anmeldeschluss ist der ${date}."
 
-msgid "Last-minute bookings are possible up to ${days} before each occasion."
+msgid ""
+"Last-minute bookings are possible up to ${days} days before each occasion."
 msgstr ""
 "Anmeldungen sind bis zu ${days} Tage vor der jeweiligen Durchführung möglich."
 
@@ -1825,7 +1826,7 @@ msgstr "Die Buchung für ${name} war erfolgreich"
 
 #, python-format
 msgid "The occasion was added to ${name}'s wishlist"
-msgstr "Die Durchführung wurde zu ${name}'s Wunschliste hinzugefügt"
+msgstr "Die Durchführung wurde zu ${name}s Wunschliste hinzugefügt"
 
 msgid "The booking was cancelled successfully"
 msgstr "Die Buchung wurde erfolgreich abgesagt"
@@ -2040,7 +2041,7 @@ msgid ""
 "have been compiled."
 msgstr ""
 "Ein Zeitraum kann erst archiviert werden wenn die Zuteilung gemacht und die "
-"Rechungen erstellt wurden."
+"Rechnungen erstellt wurden."
 
 #, python-format
 msgid "Do you really want to activate \"${title}\"?"
@@ -2079,12 +2080,6 @@ msgstr "Teilnehmer bearbeiten"
 #, python-format
 msgid "Booking Limit of ${name}"
 msgstr "Buchungslimite von ${name}"
-
-msgid "Feriennet Settings"
-msgstr "Feriennet Einstellungen"
-
-msgid "Settings"
-msgstr "Einstellungen"
 
 msgid "Feriennet"
 msgstr "Feriennet"
@@ -2216,6 +2211,12 @@ msgstr "Möchten Sie ${attendee}s Buchung wirklich löschen?"
 #, python-format
 msgid "Do you really want to cancel ${attendee}'s booking?"
 msgstr "Möchten Sie ${attendee}s Buchung wirklich absagen?"
+
+#~ msgid "Feriennet Settings"
+#~ msgstr "Feriennet Einstellungen"
+
+#~ msgid "Settings"
+#~ msgstr "Einstellungen"
 
 #~ msgid "Edit contact info"
 #~ msgstr "Kontakt ändern"

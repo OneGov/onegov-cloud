@@ -666,7 +666,7 @@ def test_enroll_child(client, scenario):
     client.fill_out_profile()
 
     activity = enroll.form.submit().follow()
-    assert "zu Tom\u00A0Sawyer's Wunschliste hinzugefügt" in activity
+    assert "zu Tom\u00A0Sawyers Wunschliste hinzugefügt" in activity
 
     # prevent double-subscriptions
     enroll = activity.click("Anmelden")
@@ -709,7 +709,7 @@ def test_enroll_child(client, scenario):
     enroll.form['last_name'] = "Finn"
     activity = enroll.form.submit().follow()
 
-    assert "zu Huckleberry\u00A0Finn's Wunschliste hinzugefügt" in activity
+    assert "zu Huckleberry\u00A0Finns Wunschliste hinzugefügt" in activity
 
     # prevent booking over the limit
     with scenario.update():

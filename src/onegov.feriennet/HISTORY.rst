@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes some translations.
+  [href]
+
 - Reorganises settings into separate views.
   [href]
 
