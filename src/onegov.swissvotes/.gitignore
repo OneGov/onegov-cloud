@@ -69,3 +69,4 @@ include/
 # Node
 node_modules/
 share/
+package-lock.json

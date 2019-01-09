@@ -46,3 +46,17 @@ $('table:not(.tablesaw).sortable').tablesorter();
 // force all dropdowns to be rendered in the direction specified in the
 // options of said dropdown (so if we say align:left, *always* align left)
 Foundation.libs.dropdown.small = function() { return false; };
+
+
+// initalize the bar chaarts
+$(document).ready(function() {
+    $('.bar-chart').each(function(ix, el) {
+        var dataurl = $(el).data('dataurl');
+        $.ajax({url: dataurl}).done(function(data) {
+            var chart = barChart({
+                data: data,
+                interactive: true
+            })(el);
+        });
+    });
+});

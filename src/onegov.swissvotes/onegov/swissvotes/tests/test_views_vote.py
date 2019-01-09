@@ -217,12 +217,26 @@ def test_view_vote(swissvotes_app):
     assert "19.1%" in page
     assert "20.2%" in page
 
+    # Percentages
+    page = client.get(page.request.url.replace('/strengths', '/percentages'))
+    assert page.json == {
+        'results': [
+            {'text': 'Bundesrat', 'value': 100.0},
+            {'text': 'Nationalrat', 'value': 33.3},
+            {'text': 'Ständerat', 'value': 42.9},
+            {'text': 'Ja-Lager', 'value': 22.2},
+            {'text': 'Volk', 'value': 40.0},
+            {'text': 'Stände', 'value': 60.0}
+        ],
+        'title': 'Vote'
+    }
+
+    # Delete vote
     login = client.get('/auth/login')
     login.form['username'] = 'admin@example.org'
     login.form['password'] = 'hunter2'
     login.form.submit()
 
-    # Delete vote
     manage = client.get('/').maybe_follow().click("Abstimmungen")
     manage = manage.click("Details").click("Abstimmung löschen")
     manage = manage.form.submit().follow()

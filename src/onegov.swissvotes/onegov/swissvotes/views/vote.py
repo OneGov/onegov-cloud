@@ -36,6 +36,21 @@ def view_vote(self, request):
     }
 
 
+@SwissvotesApp.json(
+    model=SwissVote,
+    permission=Public,
+    name='percentages'
+)
+def view_vote_percentages(self, request):
+    return {
+        'results': [
+            {'text': request.translate(text), 'value': value}
+            for text, value in self.percentages.items() if value is not None
+        ],
+        'title': self.title
+    }
+
+
 @SwissvotesApp.html(
     model=SwissVote,
     permission=Public,

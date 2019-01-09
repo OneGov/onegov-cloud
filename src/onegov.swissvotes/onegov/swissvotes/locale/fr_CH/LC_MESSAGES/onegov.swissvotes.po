@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-08 09:31+0100\n"
+"POT-Creation-Date: 2019-01-09 11:16+0100\n"
 "PO-Revision-Date: 2018-09-18 11:29+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -644,6 +644,24 @@ msgstr "Radio et télevision, nouvelles technologies"
 msgid "d-3-1254"
 msgstr "Liberté de la presse"
 
+msgid "Federal Council"
+msgstr ""
+
+msgid "National Council"
+msgstr ""
+
+msgid "Council of States"
+msgstr ""
+
+msgid "Yes Camp"
+msgstr ""
+
+msgid "People"
+msgstr ""
+
+msgid "Cantons"
+msgstr ""
+
 msgid "Mandatory referendum"
 msgstr "Référendum obligatoire"
 
@@ -1206,6 +1224,15 @@ msgstr ""
 "Le formulaire contient des erreurs. Prière de vérifier les champs entourés "
 "en rouge."
 
+msgid "Pagination"
+msgstr ""
+
+msgid "Previous vote"
+msgstr ""
+
+msgid "Next vote"
+msgstr ""
+
 msgid "General"
 msgstr ""
 
@@ -1275,14 +1302,8 @@ msgstr ""
 msgid "Vote"
 msgstr "Votation"
 
-msgid "People"
-msgstr ""
-
 msgid "Yeas"
 msgstr "Oui"
-
-msgid "Cantons"
-msgstr ""
 
 msgid "Turnout"
 msgstr "Participation électorale"
@@ -1291,15 +1312,6 @@ msgid "Result by canton, district and municipality"
 msgstr ""
 
 msgid "Interactive map"
-msgstr ""
-
-msgid "Pagination"
-msgstr ""
-
-msgid "Previous vote"
-msgstr ""
-
-msgid "Next vote"
 msgstr ""
 
 msgid "You are here"

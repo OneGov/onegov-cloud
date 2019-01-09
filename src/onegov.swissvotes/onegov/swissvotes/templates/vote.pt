@@ -17,6 +17,14 @@
 
             <h2>${layout.title}<tal:block tal:condition="vote.keyword"> <small>${vote.keyword}</small></tal:block></h2>
 
+            <div class="row">
+                <div class="small-12 small-centered large-10 columns">
+                    <figure>
+                        <div class="bar-chart" data-dataurl="${request.link(vote, name='percentages')}"></div>
+                    </figure>
+                </div>
+            </div>
+
             <table class="collapsible">
                 <thead>
                     <tr><th colspan="2" i18n:translate>General</th></tr>

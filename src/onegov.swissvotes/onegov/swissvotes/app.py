@@ -114,6 +114,8 @@ def get_frameworks_asset():
     yield 'tablesaw.jquery.js'
     yield 'tablesaw-create.js'
     yield 'tablesaw-init.js'
+    yield 'd3.js'
+    yield 'd3.chart.bar.js'
     yield 'foundation.js'
     yield 'underscore.js'
     yield 'react.js'

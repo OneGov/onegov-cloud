@@ -509,3 +509,8 @@ def test_vote_attachments(swissvotes_app, attachments):
     assert vote.voting_text is None
     assert vote.realization.name == 'realization-fr_CH'
     assert "réalis" in vote.searchable_text_fr_CH
+
+
+def test_vote_percentages():
+    # todo:
+    pass

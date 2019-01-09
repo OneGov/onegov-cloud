@@ -1,0 +1,24 @@
+{
+  "name": "onegov-swissvotes",
+  "version": "1.0.0",
+  "description": "A package for onegov.swissvotes to run tests",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OneGov/onegov.swissvotes.git"
+  },
+  "author": "onegov",
+  "license": "GPL-2.0",
+  "devDependencies": {
+    "jest": "18.1.0",
+    "jsdom": "9.9.1"
+  },
+  "jest": {
+    "testPathDirs": [
+      "onegov"
+    ]
+  }
+}

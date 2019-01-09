@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-08 09:31+0100\n"
-"PO-Revision-Date: 2019-01-08 09:31+0100\n"
+"POT-Creation-Date: 2019-01-09 11:16+0100\n"
+"PO-Revision-Date: 2019-01-09 11:17+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -644,6 +644,24 @@ msgstr "Radio, Fernsehen, Elektronische Medien"
 msgid "d-3-1254"
 msgstr "Medienfreiheit"
 
+msgid "Federal Council"
+msgstr "Bundesrat"
+
+msgid "National Council"
+msgstr "Nationalrat"
+
+msgid "Council of States"
+msgstr "Ständerat"
+
+msgid "Yes Camp"
+msgstr "Ja-Lager"
+
+msgid "People"
+msgstr "Volk"
+
+msgid "Cantons"
+msgstr "Stände"
+
 msgid "Mandatory referendum"
 msgstr "Obligatorisches Referendum"
 
@@ -1201,6 +1219,15 @@ msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
 
+msgid "Pagination"
+msgstr "Paginierung"
+
+msgid "Previous vote"
+msgstr "Vorherige Abstimmung"
+
+msgid "Next vote"
+msgstr "Nächste Abstimmung"
+
 msgid "General"
 msgstr "Allgemeines"
 
@@ -1270,14 +1297,8 @@ msgstr "Weitere Parolen"
 msgid "Vote"
 msgstr "Abstimmung"
 
-msgid "People"
-msgstr "Volk"
-
 msgid "Yeas"
 msgstr "Jastimmen"
-
-msgid "Cantons"
-msgstr "Stände"
 
 msgid "Turnout"
 msgstr "Stimmbeteiligung"
@@ -1287,15 +1308,6 @@ msgstr "Abstimmungsergebnis pro Kanton, Bezirk und Gemeinde"
 
 msgid "Interactive map"
 msgstr "Interaktive Karte"
-
-msgid "Pagination"
-msgstr "Paginierung"
-
-msgid "Previous vote"
-msgstr "Vorherige Abstimmung"
-
-msgid "Next vote"
-msgstr "Nächste Abstimmung"
 
 msgid "You are here"
 msgstr "Aktuelle Seite"

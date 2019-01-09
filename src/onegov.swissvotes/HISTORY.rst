@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a bar chart with the percentages of the positions and results.
+  [msom]
+
 0.0.27 (2019-01-08)
 ~~~~~~~~~~~~~~~~~~~
 
