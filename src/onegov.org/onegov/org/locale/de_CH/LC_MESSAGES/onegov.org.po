@@ -2134,7 +2134,7 @@ msgid ""
 "You are receiving this e-mail because you signed up for the ${org} "
 "newsletter."
 msgstr ""
-"Sie erhalten Diese E-Mail weil Sie sich für den ${org} Newsletter angemeldet "
+"Sie erhalten diese E-Mail weil Sie sich für den ${org} Newsletter angemeldet "
 "haben."
 
 msgid "Click here to view web version."
