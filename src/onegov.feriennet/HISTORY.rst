@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.4.12 (2019-01-09)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds new category "Professions".
   [href]
