@@ -13,16 +13,19 @@ matrix:
 addons:
   postgresql: "9.6"
   apt:
-        packages:
-            - ghostscript
-            - libpoppler-cpp-dev
+    packages:
+      - ghostscript
+      - libpoppler-cpp-dev
 
 install:
     - pip install tox
+    - nvm install node
+    - npm install
     - if [ "$TOXENV" = 'py36' ]; then pip install coveralls; fi
 
 script:
     - tox -e $TOXENV
+    - npm t
 
 after_success:
     - if [ "$TOXENV" = 'py36' ]; then coveralls; fi
