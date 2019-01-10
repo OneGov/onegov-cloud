@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes publication extension shown in newsletter form.
+  [href]
+
 0.48.1 (2019-01-10)
 ~~~~~~~~~~~~~~~~~~~
 

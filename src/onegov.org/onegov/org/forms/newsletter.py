@@ -1,5 +1,6 @@
 from datetime import timedelta
 from onegov.core.layout import Layout
+from onegov.file.utils import name_without_extension
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.newsletter import Recipient
@@ -120,7 +121,8 @@ class NewsletterForm(Form):
             (
                 str(item.id),
                 '<div class="title">{}</div><div class="date">{}</div>'.format(
-                    item.name, layout.format_date(item.created, 'date')
+                    name_without_extension(item.name),
+                    layout.format_date(item.created, 'date')
                 )
             ) for item in publications
         )
