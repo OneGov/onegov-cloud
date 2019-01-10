@@ -131,7 +131,7 @@ class NewsletterForm(Form):
         class NewsletterWithPublicationsForm(cls):
 
             publications = MultiCheckboxField(
-                label=_("Events"),
+                label=_("Publications"),
                 choices=choices,
                 render_kw={
                     'prefix_label': False,

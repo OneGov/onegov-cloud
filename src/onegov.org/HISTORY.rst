@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes wrong label on newsletter form.
+  [href]
+
 0.48.0 (2019-01-09)
 ~~~~~~~~~~~~~~~~~~~
 
