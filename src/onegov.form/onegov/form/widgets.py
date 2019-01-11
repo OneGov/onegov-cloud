@@ -200,3 +200,27 @@ class ChosenSelectWidget(Select):
             )
 
         return super(ChosenSelectWidget, self).__call__(field, **kwargs)
+
+
+class PreviewWidget(object):
+    """ A widget that displays the html of a specific view whenver there's
+    a change in other fields. JavaScript is used to facilitate this.
+
+    """
+
+    template = chameleon.PageTemplate("""
+        <div class="form-preview-widget"
+             data-url="${url or ''}"
+             data-fields="${','.join(fields)}"
+             data-events="${','.join(events)}">
+        </div>
+    """)
+
+    def __call__(self, field, **kwargs):
+        field.meta.request.include('preview-widget-handler')
+
+        return HTMLString(self.template.render(
+            url=callable(field.url) and field.url(field.meta) or field.url,
+            fields=field.fields,
+            events=field.events,
+        ))

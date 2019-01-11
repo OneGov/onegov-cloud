@@ -10,6 +10,7 @@ from onegov.form.widgets import ChosenSelectWidget
 from onegov.form.widgets import IconWidget
 from onegov.form.widgets import MultiCheckboxWidget
 from onegov.form.widgets import OrderedMultiCheckboxWidget
+from onegov.form.widgets import PreviewWidget
 from onegov.form.widgets import TagsWidget
 from onegov.form.widgets import UploadWidget
 from wtforms import FileField
@@ -18,6 +19,7 @@ from wtforms import SelectMultipleField
 from wtforms import StringField
 from wtforms import TextAreaField
 from wtforms import widgets
+from wtforms.fields import Field
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
 
@@ -222,3 +224,18 @@ class ChosenSelectMultipleField(SelectMultipleField):
     """ A multiple select field with chosen.js support. """
 
     widget = ChosenSelectWidget(multiple=True)
+
+
+class PreviewField(Field):
+
+    widget = PreviewWidget()
+
+    def __init__(self, *args, **kwargs):
+        self.fields = kwargs.pop('fields', ())
+        self.url = kwargs.pop('url', None)
+        self.events = kwargs.pop('events', ())
+
+        super().__init__(*args, **kwargs)
+
+    def populate_obj(self, obj, name):
+        pass

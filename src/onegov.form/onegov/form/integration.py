@@ -91,6 +91,11 @@ def get_iconwidget_asset():
     yield 'iconwidget.js'
 
 
+@FormApp.webasset('preview-widget-handler')
+def get_preview_widget_asset():
+    yield 'preview-widget.js'
+
+
 @FormApp.webasset(
     'chosen',
     filters={'css': ['datauri', 'custom-rcssmin']}
