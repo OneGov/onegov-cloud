@@ -42,8 +42,9 @@ var PreviewWidgetHandler = function(el) {
     this.init = function() {
         fields.forEach(function(name) {
             var selector = '[name="' + name + '"]';
+            var inputs = [].slice.call(form.querySelectorAll(selector)); // IE 11 NodeList to Array
 
-            form.querySelectorAll(selector).forEach(function(field) {
+            inputs.forEach(function(field) {
                 events.forEach(function(event) {
                     implementations[event](field);
                 });
@@ -66,7 +67,8 @@ var PreviewWidgetRegistry = function(root) {
     };
 
     this.init = function() {
-        root.querySelectorAll('form .form-preview-widget').forEach(register);
+        var widgets = [].slice.call(root.querySelectorAll('form .form-preview-widget'));
+        widgets.forEach(register);
     };
 
     return this;
