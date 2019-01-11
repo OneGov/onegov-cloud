@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.41.1 (2019-01-11)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes preview not working in IE11.
   [href]
