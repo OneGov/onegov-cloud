@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.75.0 (2019-01-11)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds request reference to form.meta.
   [href]
