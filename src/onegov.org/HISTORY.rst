@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to define holidays in the organisation settings.
+  [href]
+
 0.48.2 (2019-01-10)
 ~~~~~~~~~~~~~~~~~~~
 

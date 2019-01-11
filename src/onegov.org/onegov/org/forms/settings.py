@@ -4,13 +4,12 @@ from lxml import etree
 from onegov.form import Form
 from onegov.form import with_options
 from onegov.form.fields import MultiCheckboxField, TagsField
+from onegov.form.fields import PreviewField
 from onegov.gis import CoordinatesField
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
-from onegov.org.homepage_widgets import (
-    transform_homepage_structure,
-    XML_LINE_OFFSET
-)
+from onegov.org.homepage_widgets import transform_homepage_structure
+from onegov.org.homepage_widgets import XML_LINE_OFFSET
 from onegov.org.theme import user_options
 from wtforms import HiddenField, StringField, TextAreaField, RadioField
 from wtforms import ValidationError
@@ -283,3 +282,110 @@ class AnalyticsSettingsForm(Form):
         label=_("Analytics Code"),
         description=_("JavaScript for web statistics support"),
         render_kw={'rows': 10, 'data-editor': 'html'})
+
+
+class HolidaySettingsForm(Form):
+
+    cantonal_holidays = MultiCheckboxField(
+        label=_("Cantonal holidays"),
+        choices=[
+            ('AG', 'Aargau'),
+            ('AR', 'Appenzell Ausserrhoden'),
+            ('AI', 'Appenzell Innerrhoden'),
+            ('BL', 'Basel-Landschaft'),
+            ('BS', 'Basel-Stadt'),
+            ('BE', 'Berne'),
+            ('FR', 'Fribourg'),
+            ('GE', 'Geneva'),
+            ('GL', 'Glarus'),
+            ('GR', 'Grisons'),
+            ('JU', 'Jura'),
+            ('LU', 'Lucerne'),
+            ('NE', 'Neuchâtel'),
+            ('NW', 'Nidwalden'),
+            ('OW', 'Obwalden'),
+            ('SH', 'Schaffhausen'),
+            ('SZ', 'Schwyz'),
+            ('SO', 'Solothurn'),
+            ('SG', 'St. Gallen'),
+            ('TG', 'Thurgau'),
+            ('TI', 'Ticino'),
+            ('UR', 'Uri'),
+            ('VS', 'Valais'),
+            ('VD', 'Vaud'),
+            ('ZG', 'Zug'),
+            ('ZH', 'Zürich'),
+        ])
+
+    other_holidays = TextAreaField(
+        label=_("Other holidays"),
+        description=("31.10 - Halloween"),
+        render_kw={'rows': 10})
+
+    preview = PreviewField(
+        label=_("Preview"),
+        fields=('cantonal_holidays', 'other_holidays'),
+        events=('change', 'click', 'enter'),
+        url=lambda meta: meta.request.link(
+            meta.request.app.org,
+            name='holiday-settings-preview'
+        ))
+
+    def validate_other_holidays(self, field):
+        if not field.data:
+            return
+
+        for line in field.data.splitlines():
+
+            if not line.strip():
+                continue
+
+            if line.count('-') < 1:
+                raise ValidationError(_("Format: Day.Month - Description"))
+            if line.count('-') > 1:
+                raise ValidationError(_("Please enter one date per line"))
+
+            date, description = line.split('-')
+
+            if date.count('.') < 1:
+                raise ValidationError(_("Format: Day.Month - Description"))
+            if date.count('.') > 1:
+                raise ValidationError(_("Please enter only day and month"))
+
+    @property
+    def holiday_settings(self):
+
+        def parse_line(line):
+            date, desc = line.strip().split('-')
+            day, month = date.split('.')
+
+            return int(month), int(day), desc.strip()
+
+        return {
+            'cantons': self.cantonal_holidays.data,
+            'other': (
+                parse_line(l) for l in self.other_holidays.data.splitlines()
+                if l.strip()
+            )
+        }
+
+    @holiday_settings.setter
+    def holiday_settings(self, data):
+        data = data or {}
+
+        def format_other(d):
+            return f'{d[1]:02d}.{d[0]:02d} - {d[2]}'
+
+        self.cantonal_holidays.data = data.get(
+            'cantons', ())
+
+        self.other_holidays.data = '\n'.join(
+            format_other(d) for d in data.get('other', ()))
+
+    def populate_obj(self, model):
+        super().populate_obj(model)
+        model.holiday_settings = self.holiday_settings
+
+    def process_obj(self, model):
+        super().process_obj(model)
+        self.holiday_settings = model.holiday_settings

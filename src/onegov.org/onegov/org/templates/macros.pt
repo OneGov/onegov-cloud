@@ -1594,3 +1594,11 @@
         </ul>
     </div>
 </metal:publication>
+
+<metal:holidays define-macro="holidays" i18n:domain="onegov.org">
+    <ul class="holidays">
+        <li tal:repeat="(holiday, descriptions) holidays.all(year)">
+            ${layout.format_date(holiday, 'date')} - ${', '.join(descriptions)}
+        </li>
+    </ul>
+</metal:holidays>

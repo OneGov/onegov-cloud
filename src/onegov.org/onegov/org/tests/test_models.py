@@ -6,6 +6,7 @@ from freezegun import freeze_time
 from onegov.core.request import CoreRequest
 from onegov.core.utils import module_path, rchop
 from onegov.org.models import Clipboard, ImageFileCollection
+from onegov.org.models import Organisation
 from onegov.org.models import SiteCollection
 from onegov.org.models.file import GroupFilesByDateMixin
 from onegov.org.models.resource import SharedMethods
@@ -248,3 +249,37 @@ def test_sitecollection(org_app):
     builtin_forms = set(rchop(p, '.form') for p in paths)
 
     assert {o.name for o in objects['forms']} == set(builtin_forms)
+
+
+def test_holidays():
+    o = Organisation(holiday_settings={})
+
+    assert date(2000, 1, 1) not in o.holidays
+    assert date(2000, 1, 2) not in o.holidays
+    assert date(2000, 1, 3) not in o.holidays
+
+    assert len(o.holidays.all(2000)) == 0
+
+    o.holiday_settings['cantons'] = ['AR']
+
+    assert date(2000, 1, 1) in o.holidays
+    assert date(2000, 1, 2) not in o.holidays
+    assert date(2000, 1, 3) not in o.holidays
+
+    assert len(o.holidays.all(2000)) == 8
+
+    o.holiday_settings['cantons'] = ['AR', 'ZG']
+
+    assert date(2000, 1, 1) in o.holidays
+    assert date(2000, 1, 2) in o.holidays
+    assert date(2000, 1, 3) not in o.holidays
+
+    assert len(o.holidays.all(2000)) == 13
+
+    o.holiday_settings['other'] = [[1, 3, 'Fooyears day']]
+
+    assert date(2000, 1, 1) in o.holidays
+    assert date(2000, 1, 2) in o.holidays
+    assert date(2000, 1, 3) in o.holidays
+
+    assert len(o.holidays.all(2000)) == 14

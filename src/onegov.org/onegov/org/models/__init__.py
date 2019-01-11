@@ -42,6 +42,7 @@ from onegov.org.models.recipient import ResourceRecipientCollection
 from onegov.org.models.resource import DaypassResource
 from onegov.org.models.search import Search
 from onegov.org.models.sitecollection import SiteCollection
+from onegov.org.models.swiss_holidays import SwissHolidays
 from onegov.org.models.traitinfo import TraitInfo
 
 __all__ = [
@@ -89,6 +90,7 @@ __all__ = [
     'Search',
     'SiteCollection',
     'SubmissionMessage',
+    'SwissHolidays',
     'TicketMessage',
     'TicketNote',
     'Topic',

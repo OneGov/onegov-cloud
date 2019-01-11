@@ -5,6 +5,7 @@ from onegov.core.orm.mixins import meta_property, TimestampMixin
 from onegov.core.orm.types import JSON, UUID
 from onegov.core.utils import linkify
 from onegov.org.theme import user_options
+from onegov.org.models.swiss_holidays import SwissHolidays
 from sqlalchemy import Column, Text
 from uuid import uuid4
 
@@ -59,6 +60,18 @@ class Organisation(Base, TimestampMixin):
     hidden_people_fields = meta_property(default=list)
     event_locations = meta_property(default=list)
     geo_provider = meta_property(default='geo-mapbox')
+    holiday_settings = meta_property(default=dict)
+
+    @property
+    def holidays(self):
+        """ Returns a SwissHolidays instance, as configured by the
+        holiday_settings on the UI.
+
+        """
+        return SwissHolidays(
+            cantons=self.holiday_settings.get('cantons', ()),
+            other=self.holiday_settings.get('other', ())
+        )
 
     @contact.setter
     def contact(self, value):

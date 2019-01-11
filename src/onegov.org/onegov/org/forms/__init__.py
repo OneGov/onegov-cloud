@@ -23,6 +23,7 @@ from onegov.org.forms.resource_recipient import ResourceRecipientForm
 from onegov.org.forms.settings import AnalyticsSettingsForm
 from onegov.org.forms.settings import FooterSettingsForm
 from onegov.org.forms.settings import GeneralSettingsForm
+from onegov.org.forms.settings import HolidaySettingsForm
 from onegov.org.forms.settings import HomepageSettingsForm
 from onegov.org.forms.settings import MapSettingsForm
 from onegov.org.forms.settings import ModuleSettingsForm
@@ -46,6 +47,7 @@ __all__ = [
     'FormRegistrationWindowForm',
     'FormSubmissionsExport',
     'GeneralSettingsForm',
+    'HolidaySettingsForm',
     'HomepageSettingsForm',
     'ImageSetForm',
     'LinkForm',

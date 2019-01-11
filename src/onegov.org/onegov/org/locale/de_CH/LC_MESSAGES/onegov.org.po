@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-01-09 10:56+0100\n"
+"POT-Creation-Date: 2019-01-11 21:34+0100\n"
 "PO-Revision-Date: 2018-12-08 11:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1045,6 +1045,15 @@ msgstr "Analytics Code"
 msgid "JavaScript for web statistics support"
 msgstr "JavaScript für Web-Statistik"
 
+msgid "Cantonal holidays"
+msgstr "Kantonale Feiertage"
+
+msgid "Other holidays"
+msgstr "Andere Feiertage"
+
+msgid "Preview"
+msgstr "Vorschau"
+
 msgid "German"
 msgstr "Deutsch"
 
@@ -1068,6 +1077,15 @@ msgstr "Ja, zu den Reservationen"
 
 msgid "Mapbox (Default)"
 msgstr "Mapbox (Standard)"
+
+msgid "Format: Day.Month - Description"
+msgstr "Format: Tag.Monat - Beschreibung"
+
+msgid "Please enter one date per line"
+msgstr "Bitte geben Sie ein Datum pro Zeile ein"
+
+msgid "Please enter only day and month"
+msgstr "Bitte geben Sie nur Tag und Monat ein"
 
 msgid "Except for"
 msgstr "Ausser an"
@@ -1436,6 +1454,159 @@ msgstr "Letztes Jahr"
 
 msgid "This year"
 msgstr "Dieses Jahr"
+
+msgid "Aargau"
+msgstr "Aargau"
+
+msgid "Appenzell Ausserrhoden"
+msgstr "Appenzell Ausserrhoden"
+
+msgid "Appenzell Innerrhoden"
+msgstr "Appenzell Innerrhoden"
+
+msgid "Basel-Landschaft"
+msgstr "Basel-Landschaft"
+
+msgid "Basel-Stadt"
+msgstr "Basel-Stadt"
+
+msgid "Berne"
+msgstr "Bern"
+
+msgid "Fribourg"
+msgstr "Freiburg"
+
+msgid "Geneva"
+msgstr "Genf"
+
+msgid "Glarus"
+msgstr "Glarus"
+
+msgid "Grisons"
+msgstr "Graubünden"
+
+msgid "Jura"
+msgstr "Jura"
+
+msgid "Lucerne"
+msgstr "Luzern"
+
+msgid "Neuchâtel"
+msgstr "Neuenburg"
+
+msgid "Nidwalden"
+msgstr "Nidwalden"
+
+msgid "Obwalden"
+msgstr "Obwalden"
+
+msgid "Schaffhausen"
+msgstr "Schaffhausen"
+
+msgid "Schwyz"
+msgstr "Schwyz"
+
+msgid "Solothurn"
+msgstr "Solothurn"
+
+msgid "St. Gallen"
+msgstr "St. Gallen"
+
+msgid "Thurgau"
+msgstr "Thurgau"
+
+msgid "Ticino"
+msgstr "Tessin"
+
+msgid "Uri"
+msgstr "Uri"
+
+msgid "Valais"
+msgstr "Wallis"
+
+msgid "Vaud"
+msgstr "Waadt"
+
+msgid "Zug"
+msgstr "Zug"
+
+msgid "Zürich"
+msgstr "Zürich"
+
+msgid "Neujahrestag"
+msgstr "Neujahrestag"
+
+msgid "Ostern"
+msgstr "Ostern"
+
+msgid "Auffahrt"
+msgstr "Auffahrt"
+
+msgid "Pfingsten"
+msgstr "Pfingsten"
+
+msgid "Pfingstmontag"
+msgstr "Pfingstmontag"
+
+msgid "Weihnachten"
+msgstr "Weihnachten"
+
+msgid "Berchtoldstag"
+msgstr "Berchtoldstag"
+
+msgid "Heilige Drei Könige"
+msgstr "Heilige Drei Könige"
+
+msgid "Jahrestag der Ausrufung der Republik"
+msgstr "Jahrestag der Ausrufung der Republik"
+
+msgid "Josefstag"
+msgstr "Josefstag"
+
+msgid "Karfreitag"
+msgstr "Karfreitag"
+
+msgid "Ostermontag"
+msgstr "Ostermontag"
+
+msgid "Tag der Arbeit"
+msgstr "Tag der Arbeit"
+
+msgid "Fronleichnam"
+msgstr "Fronleichnam"
+
+msgid "Fest der Unabhängigkeit"
+msgstr "Fest der Unabhängigkeit"
+
+msgid "Peter und Paul"
+msgstr "Peter und Paul"
+
+msgid "Nationalfeiertag"
+msgstr "Nationalfeiertag"
+
+msgid "Mariä Himmelfahrt"
+msgstr "Mariä Himmelfahrt"
+
+msgid "Bruder Klaus"
+msgstr "Bruder Klaus"
+
+msgid "Allerheiligen"
+msgstr "Allerheiligen"
+
+msgid "Mariä Empfängnis"
+msgstr "Mariä Empfängnis"
+
+msgid "Escalade de Genève"
+msgstr "Escalade de Genève"
+
+msgid "Stephanstag"
+msgstr "Stephanstag"
+
+msgid "Wiederherstellung der Republik"
+msgstr "Wiederherstellung der Republik"
+
+msgid "Näfelser Fahrt"
+msgstr "Näfelser Fahrt"
 
 msgid "Link"
 msgstr "Verknüpfung"
@@ -3199,6 +3370,12 @@ msgstr "Module"
 
 msgid "Analytics"
 msgstr "Web-Statistik"
+
+msgid "Holidays"
+msgstr "Feiertage"
+
+msgid "No holidays defined"
+msgstr "Keine Feiertage definiert"
 
 msgid "User Management"
 msgstr "Benutzerverwaltung"

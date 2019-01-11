@@ -3,16 +3,20 @@
 from copy import copy
 from dectate import Query
 from onegov.core.security import Secret
-from onegov.org.layout import SettingsLayout
+from onegov.core.templates import render_macro
 from onegov.org import _
 from onegov.org.app import OrgApp
-from onegov.org.forms import GeneralSettingsForm
-from onegov.org.forms import HomepageSettingsForm
-from onegov.org.forms import FooterSettingsForm
-from onegov.org.forms import ModuleSettingsForm
-from onegov.org.forms import MapSettingsForm
 from onegov.org.forms import AnalyticsSettingsForm
+from onegov.org.forms import FooterSettingsForm
+from onegov.org.forms import GeneralSettingsForm
+from onegov.org.forms import HolidaySettingsForm
+from onegov.org.forms import HomepageSettingsForm
+from onegov.org.forms import MapSettingsForm
+from onegov.org.forms import ModuleSettingsForm
+from onegov.org.layout import DefaultLayout
+from onegov.org.layout import SettingsLayout
 from onegov.org.models import Organisation
+from onegov.org.models import SwissHolidays
 
 
 @OrgApp.html(
@@ -106,3 +110,41 @@ def handle_map_settings(self, request, form):
     icon='fa-line-chart ', order=-600)
 def handle_analytics_settings(self, request, form):
     return handle_generic_settings(self, request, form, _("Analytics"))
+
+
+@OrgApp.form(
+    model=Organisation, name='holiday-settings', template='form.pt',
+    permission=Secret, form=HolidaySettingsForm, setting=_("Holidays"),
+    icon='fa-calendar-o', order=-500)
+def handle_holiday_settings(self, request, form):
+    return handle_generic_settings(self, request, form, _("Holidays"))
+
+
+@OrgApp.form(model=Organisation, name='holiday-settings-preview',
+             permission=Secret, form=HolidaySettingsForm)
+def preview_holiday_settings(self, request, form):
+    layout = DefaultLayout(self, request)
+
+    if form.submitted(request):
+        holidays = SwissHolidays(
+            cantons=form.holiday_settings.get('cantons', ()),
+            other=form.holiday_settings.get('other', ())
+        )
+    else:
+        holidays = SwissHolidays(
+            cantons=form.holiday_settings.get('cantons', ())
+        )
+
+    if not holidays.all(layout.today().year):
+        msg = request.translate(_("No holidays defined"))
+        return f'<i class="holidays">{msg}</i>'
+
+    return render_macro(
+        layout.macros['holidays'],
+        request,
+        {
+            'holidays': holidays,
+            'layout': layout,
+            'year': layout.today().year,
+        }
+    )
