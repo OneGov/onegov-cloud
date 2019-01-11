@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.41.0 (2019-01-11)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a preview field for AJAX previews inside forms.
   [href]
