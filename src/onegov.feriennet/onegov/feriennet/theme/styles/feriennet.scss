@@ -35,9 +35,10 @@ a > h6 {
 }
 
 /*
-    hide the homepage settings
+    hide certain settings
 */
-.homepage-settings {
+.homepage-settings,
+.holiday-settings {
     display: none;
 }
 
