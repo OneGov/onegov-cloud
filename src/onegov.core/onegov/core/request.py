@@ -294,6 +294,11 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             meta['csrf_time_limit'] = timedelta(
                 seconds=self.app.csrf_time_limit)
 
+        # XXX it might be cleaner to always use the request in the meta,
+        # instead of adding it to the form like it is done below - the meta
+        # can also be accessed by form widgets
+        meta['request'] = self
+
         formdata = self.POST and self.POST or None
         form = form_class(formdata=formdata, meta=meta, data=data)
 
