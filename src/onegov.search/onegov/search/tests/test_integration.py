@@ -1,4 +1,5 @@
 import morepath
+import pytest
 import sedate
 import transaction
 
@@ -693,6 +694,7 @@ def test_language_update(es_url, postgres_dsn):
     assert french
 
 
+@pytest.mark.flaky(reruns=3)
 def test_date_decay(es_url, postgres_dsn):
 
     class App(Framework, ElasticsearchApp):
