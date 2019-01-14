@@ -290,6 +290,7 @@ class ElasticsearchApp(morepath.App):
             text=query,
             completion={
                 'field': 'es_suggestion',
+                'skip_duplicates': True,
                 'contexts': {
                     'es_suggestion_context': context
                 }
