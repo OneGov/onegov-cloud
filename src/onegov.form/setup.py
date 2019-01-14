@@ -45,7 +45,7 @@ setup(
         'onegov.pay',
         'onegov.search',
         'phonenumbers',
-        'pyparsing>=2.3.0',  # 2.1.2 has a problem with Python 3
+        'pyparsing>=2.3.1',
         'pyyaml',
         'python-dateutil',
         'python-stdnum',

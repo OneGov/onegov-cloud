@@ -49,6 +49,11 @@ def as_int(tokens):
     return int(tokens[0]) if tokens else None
 
 
+def as_joined_string(tokens):
+    """ Joins the given tokens into a single string. """
+    return ''.join(tokens[0])
+
+
 def as_decimal(tokens):
     """ Converts the token to decimal if possible. """
     if tokens and tokens[0] == '-':
@@ -390,7 +395,7 @@ def marker_box(characters):
         label_text + FollowedBy(pricing),
         Combine(label_text + with_whitespace_inside(text)),
         label_text
-    ))('label')
+    )).setParseAction(as_joined_string)('label')
 
     return check + label + Optional(pricing)
 
