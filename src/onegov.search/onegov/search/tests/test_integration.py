@@ -765,7 +765,7 @@ def test_date_decay(es_url, postgres_dsn):
     transaction.commit()
 
     # Travis needs some time to catch-up, no problem locally
-    for _ in range(0, 10):
+    for _ in range(0, 60):
         result = search("Dokument")
 
         if result[0].meta.id == '1' and result[1].meta.id == '2':
