@@ -32,7 +32,7 @@ def test_update_votes(swissvotes_app, file):
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
     manage = manage.form.submit().follow()
-    assert "Datensatz aktualisiert (634 hinzugefügt, 0 geändert)" in manage
+    assert "Datensatz aktualisiert (641 hinzugefügt, 0 geändert)" in manage
 
     session = swissvotes_app.session()
     vote = session.query(SwissVote).filter_by(bfs_number=82.2).one()

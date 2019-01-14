@@ -192,6 +192,213 @@ def test_vote(session):
             result_cantons_yeas=Decimal('1.5'),
             result_cantons_nays=Decimal('24.5'),
             result_cantons_yeas_p=Decimal('60.01'),
+            result_ag_eligible_voters=101,
+            result_ag_votes_valid=102,
+            result_ag_votes_total=103,
+            result_ag_turnout=Decimal('10.40'),
+            result_ag_yeas=105,
+            result_ag_nays=107,
+            result_ag_yeas_p=Decimal('10.80'),
+            _result_ag_accepted=0,
+            result_ai_eligible_voters=101,
+            result_ai_votes_valid=102,
+            result_ai_votes_total=103,
+            result_ai_turnout=Decimal('10.40'),
+            result_ai_yeas=105,
+            result_ai_nays=107,
+            result_ai_yeas_p=Decimal('10.80'),
+            _result_ai_accepted=0,
+            result_ar_eligible_voters=101,
+            result_ar_votes_valid=102,
+            result_ar_votes_total=103,
+            result_ar_turnout=Decimal('10.40'),
+            result_ar_yeas=105,
+            result_ar_nays=107,
+            result_ar_yeas_p=Decimal('10.80'),
+            _result_ar_accepted=0,
+            result_be_eligible_voters=101,
+            result_be_votes_valid=102,
+            result_be_votes_total=103,
+            result_be_turnout=Decimal('10.40'),
+            result_be_yeas=105,
+            result_be_nays=107,
+            result_be_yeas_p=Decimal('10.80'),
+            _result_be_accepted=0,
+            result_bl_eligible_voters=101,
+            result_bl_votes_valid=102,
+            result_bl_votes_total=103,
+            result_bl_turnout=Decimal('10.40'),
+            result_bl_yeas=105,
+            result_bl_nays=107,
+            result_bl_yeas_p=Decimal('10.80'),
+            _result_bl_accepted=0,
+            result_bs_eligible_voters=101,
+            result_bs_votes_valid=102,
+            result_bs_votes_total=103,
+            result_bs_turnout=Decimal('10.40'),
+            result_bs_yeas=105,
+            result_bs_nays=107,
+            result_bs_yeas_p=Decimal('10.80'),
+            _result_bs_accepted=0,
+            result_fr_eligible_voters=101,
+            result_fr_votes_valid=102,
+            result_fr_votes_total=103,
+            result_fr_turnout=Decimal('10.40'),
+            result_fr_yeas=105,
+            result_fr_nays=107,
+            result_fr_yeas_p=Decimal('10.80'),
+            _result_fr_accepted=0,
+            result_ge_eligible_voters=101,
+            result_ge_votes_valid=102,
+            result_ge_votes_total=103,
+            result_ge_turnout=Decimal('10.40'),
+            result_ge_yeas=105,
+            result_ge_nays=107,
+            result_ge_yeas_p=Decimal('10.80'),
+            _result_ge_accepted=0,
+            result_gl_eligible_voters=101,
+            result_gl_votes_valid=102,
+            result_gl_votes_total=103,
+            result_gl_turnout=Decimal('10.40'),
+            result_gl_yeas=105,
+            result_gl_nays=107,
+            result_gl_yeas_p=Decimal('10.80'),
+            _result_gl_accepted=0,
+            result_gr_eligible_voters=101,
+            result_gr_votes_valid=102,
+            result_gr_votes_total=103,
+            result_gr_turnout=Decimal('10.40'),
+            result_gr_yeas=105,
+            result_gr_nays=107,
+            result_gr_yeas_p=Decimal('10.80'),
+            _result_gr_accepted=0,
+            result_ju_eligible_voters=101,
+            result_ju_votes_valid=102,
+            result_ju_votes_total=103,
+            result_ju_turnout=Decimal('10.40'),
+            result_ju_yeas=105,
+            result_ju_nays=107,
+            result_ju_yeas_p=Decimal('10.80'),
+            _result_ju_accepted=0,
+            result_lu_eligible_voters=101,
+            result_lu_votes_valid=102,
+            result_lu_votes_total=103,
+            result_lu_turnout=Decimal('10.40'),
+            result_lu_yeas=105,
+            result_lu_nays=107,
+            result_lu_yeas_p=Decimal('10.80'),
+            _result_lu_accepted=0,
+            result_ne_eligible_voters=101,
+            result_ne_votes_valid=102,
+            result_ne_votes_total=103,
+            result_ne_turnout=Decimal('10.40'),
+            result_ne_yeas=105,
+            result_ne_nays=107,
+            result_ne_yeas_p=Decimal('10.80'),
+            _result_ne_accepted=0,
+            result_nw_eligible_voters=101,
+            result_nw_votes_valid=102,
+            result_nw_votes_total=103,
+            result_nw_turnout=Decimal('10.40'),
+            result_nw_yeas=105,
+            result_nw_nays=107,
+            result_nw_yeas_p=Decimal('10.80'),
+            _result_nw_accepted=0,
+            result_ow_eligible_voters=101,
+            result_ow_votes_valid=102,
+            result_ow_votes_total=103,
+            result_ow_turnout=Decimal('10.40'),
+            result_ow_yeas=105,
+            result_ow_nays=107,
+            result_ow_yeas_p=Decimal('10.80'),
+            _result_ow_accepted=0,
+            result_sg_eligible_voters=101,
+            result_sg_votes_valid=102,
+            result_sg_votes_total=103,
+            result_sg_turnout=Decimal('10.40'),
+            result_sg_yeas=105,
+            result_sg_nays=107,
+            result_sg_yeas_p=Decimal('10.80'),
+            _result_sg_accepted=0,
+            result_sh_eligible_voters=101,
+            result_sh_votes_valid=102,
+            result_sh_votes_total=103,
+            result_sh_turnout=Decimal('10.40'),
+            result_sh_yeas=105,
+            result_sh_nays=107,
+            result_sh_yeas_p=Decimal('10.80'),
+            _result_sh_accepted=0,
+            result_so_eligible_voters=101,
+            result_so_votes_valid=102,
+            result_so_votes_total=103,
+            result_so_turnout=Decimal('10.40'),
+            result_so_yeas=105,
+            result_so_nays=107,
+            result_so_yeas_p=Decimal('10.80'),
+            _result_so_accepted=0,
+            result_sz_eligible_voters=101,
+            result_sz_votes_valid=102,
+            result_sz_votes_total=103,
+            result_sz_turnout=Decimal('10.40'),
+            result_sz_yeas=105,
+            result_sz_nays=107,
+            result_sz_yeas_p=Decimal('10.80'),
+            _result_sz_accepted=0,
+            result_tg_eligible_voters=101,
+            result_tg_votes_valid=102,
+            result_tg_votes_total=103,
+            result_tg_turnout=Decimal('10.40'),
+            result_tg_yeas=105,
+            result_tg_nays=107,
+            result_tg_yeas_p=Decimal('10.80'),
+            _result_tg_accepted=0,
+            result_ti_eligible_voters=101,
+            result_ti_votes_valid=102,
+            result_ti_votes_total=103,
+            result_ti_turnout=Decimal('10.40'),
+            result_ti_yeas=105,
+            result_ti_nays=107,
+            result_ti_yeas_p=Decimal('10.80'),
+            _result_ti_accepted=0,
+            result_ur_eligible_voters=101,
+            result_ur_votes_valid=102,
+            result_ur_votes_total=103,
+            result_ur_turnout=Decimal('10.40'),
+            result_ur_yeas=105,
+            result_ur_nays=107,
+            result_ur_yeas_p=Decimal('10.80'),
+            _result_ur_accepted=0,
+            result_vd_eligible_voters=101,
+            result_vd_votes_valid=102,
+            result_vd_votes_total=103,
+            result_vd_turnout=Decimal('10.40'),
+            result_vd_yeas=105,
+            result_vd_nays=107,
+            result_vd_yeas_p=Decimal('10.80'),
+            _result_vd_accepted=0,
+            result_vs_eligible_voters=101,
+            result_vs_votes_valid=102,
+            result_vs_votes_total=103,
+            result_vs_turnout=Decimal('10.40'),
+            result_vs_yeas=105,
+            result_vs_nays=107,
+            result_vs_yeas_p=Decimal('10.80'),
+            _result_vs_accepted=0,
+            result_zg_eligible_voters=101,
+            result_zg_votes_valid=102,
+            result_zg_votes_total=103,
+            result_zg_turnout=Decimal('10.40'),
+            result_zg_yeas=105,
+            result_zg_nays=107,
+            result_zg_yeas_p=Decimal('10.80'),
+            _result_zg_accepted=0,
+            result_zh_eligible_voters=101,
+            result_zh_votes_valid=102,
+            result_zh_votes_total=103,
+            result_zh_turnout=Decimal('10.40'),
+            result_zh_yeas=105,
+            result_zh_nays=107,
+            result_zh_yeas_p=Decimal('10.80'),
             _department_in_charge=1,
             procedure_number=Decimal('24.557'),
             _position_federal_council=1,
@@ -309,6 +516,238 @@ def test_vote(session):
     assert vote.result_cantons_yeas == Decimal('1.5')
     assert vote.result_cantons_nays == Decimal('24.5')
     assert vote.result_cantons_yeas_p == Decimal('60.01')
+    assert vote.result_ag_eligible_voters == 101
+    assert vote.result_ag_votes_valid == 102
+    assert vote.result_ag_votes_total == 103
+    assert vote.result_ag_turnout == Decimal('10.40')
+    assert vote.result_ag_yeas == 105
+    assert vote.result_ag_nays == 107
+    assert vote.result_ag_yeas_p == Decimal('10.80')
+    assert vote._result_ag_accepted == 0
+    assert vote.result_ag_accepted == "Rejected"
+    assert vote.result_ai_eligible_voters == 101
+    assert vote.result_ai_votes_valid == 102
+    assert vote.result_ai_votes_total == 103
+    assert vote.result_ai_turnout == Decimal('10.40')
+    assert vote.result_ai_yeas == 105
+    assert vote.result_ai_nays == 107
+    assert vote.result_ai_yeas_p == Decimal('10.80')
+    assert vote._result_ai_accepted == 0
+    assert vote.result_ai_accepted == "Rejected"
+    assert vote.result_ar_eligible_voters == 101
+    assert vote.result_ar_votes_valid == 102
+    assert vote.result_ar_votes_total == 103
+    assert vote.result_ar_turnout == Decimal('10.40')
+    assert vote.result_ar_yeas == 105
+    assert vote.result_ar_nays == 107
+    assert vote.result_ar_yeas_p == Decimal('10.80')
+    assert vote._result_ar_accepted == 0
+    assert vote.result_ar_accepted == "Rejected"
+    assert vote.result_be_eligible_voters == 101
+    assert vote.result_be_votes_valid == 102
+    assert vote.result_be_votes_total == 103
+    assert vote.result_be_turnout == Decimal('10.40')
+    assert vote.result_be_yeas == 105
+    assert vote.result_be_nays == 107
+    assert vote.result_be_yeas_p == Decimal('10.80')
+    assert vote._result_be_accepted == 0
+    assert vote.result_be_accepted == "Rejected"
+    assert vote.result_bl_eligible_voters == 101
+    assert vote.result_bl_votes_valid == 102
+    assert vote.result_bl_votes_total == 103
+    assert vote.result_bl_turnout == Decimal('10.40')
+    assert vote.result_bl_yeas == 105
+    assert vote.result_bl_nays == 107
+    assert vote.result_bl_yeas_p == Decimal('10.80')
+    assert vote._result_bl_accepted == 0
+    assert vote.result_bl_accepted == "Rejected"
+    assert vote.result_bs_eligible_voters == 101
+    assert vote.result_bs_votes_valid == 102
+    assert vote.result_bs_votes_total == 103
+    assert vote.result_bs_turnout == Decimal('10.40')
+    assert vote.result_bs_yeas == 105
+    assert vote.result_bs_nays == 107
+    assert vote.result_bs_yeas_p == Decimal('10.80')
+    assert vote._result_bs_accepted == 0
+    assert vote.result_bs_accepted == "Rejected"
+    assert vote.result_fr_eligible_voters == 101
+    assert vote.result_fr_votes_valid == 102
+    assert vote.result_fr_votes_total == 103
+    assert vote.result_fr_turnout == Decimal('10.40')
+    assert vote.result_fr_yeas == 105
+    assert vote.result_fr_nays == 107
+    assert vote.result_fr_yeas_p == Decimal('10.80')
+    assert vote._result_fr_accepted == 0
+    assert vote.result_fr_accepted == "Rejected"
+    assert vote.result_ge_eligible_voters == 101
+    assert vote.result_ge_votes_valid == 102
+    assert vote.result_ge_votes_total == 103
+    assert vote.result_ge_turnout == Decimal('10.40')
+    assert vote.result_ge_yeas == 105
+    assert vote.result_ge_nays == 107
+    assert vote.result_ge_yeas_p == Decimal('10.80')
+    assert vote._result_ge_accepted == 0
+    assert vote.result_ge_accepted == "Rejected"
+    assert vote.result_gl_eligible_voters == 101
+    assert vote.result_gl_votes_valid == 102
+    assert vote.result_gl_votes_total == 103
+    assert vote.result_gl_turnout == Decimal('10.40')
+    assert vote.result_gl_yeas == 105
+    assert vote.result_gl_nays == 107
+    assert vote.result_gl_yeas_p == Decimal('10.80')
+    assert vote._result_gl_accepted == 0
+    assert vote.result_gl_accepted == "Rejected"
+    assert vote.result_gr_eligible_voters == 101
+    assert vote.result_gr_votes_valid == 102
+    assert vote.result_gr_votes_total == 103
+    assert vote.result_gr_turnout == Decimal('10.40')
+    assert vote.result_gr_yeas == 105
+    assert vote.result_gr_nays == 107
+    assert vote.result_gr_yeas_p == Decimal('10.80')
+    assert vote._result_gr_accepted == 0
+    assert vote.result_gr_accepted == "Rejected"
+    assert vote.result_ju_eligible_voters == 101
+    assert vote.result_ju_votes_valid == 102
+    assert vote.result_ju_votes_total == 103
+    assert vote.result_ju_turnout == Decimal('10.40')
+    assert vote.result_ju_yeas == 105
+    assert vote.result_ju_nays == 107
+    assert vote.result_ju_yeas_p == Decimal('10.80')
+    assert vote._result_ju_accepted == 0
+    assert vote.result_ju_accepted == "Rejected"
+    assert vote.result_lu_eligible_voters == 101
+    assert vote.result_lu_votes_valid == 102
+    assert vote.result_lu_votes_total == 103
+    assert vote.result_lu_turnout == Decimal('10.40')
+    assert vote.result_lu_yeas == 105
+    assert vote.result_lu_nays == 107
+    assert vote.result_lu_yeas_p == Decimal('10.80')
+    assert vote._result_lu_accepted == 0
+    assert vote.result_lu_accepted == "Rejected"
+    assert vote.result_ne_eligible_voters == 101
+    assert vote.result_ne_votes_valid == 102
+    assert vote.result_ne_votes_total == 103
+    assert vote.result_ne_turnout == Decimal('10.40')
+    assert vote.result_ne_yeas == 105
+    assert vote.result_ne_nays == 107
+    assert vote.result_ne_yeas_p == Decimal('10.80')
+    assert vote._result_ne_accepted == 0
+    assert vote.result_ne_accepted == "Rejected"
+    assert vote.result_nw_eligible_voters == 101
+    assert vote.result_nw_votes_valid == 102
+    assert vote.result_nw_votes_total == 103
+    assert vote.result_nw_turnout == Decimal('10.40')
+    assert vote.result_nw_yeas == 105
+    assert vote.result_nw_nays == 107
+    assert vote.result_nw_yeas_p == Decimal('10.80')
+    assert vote._result_nw_accepted == 0
+    assert vote.result_nw_accepted == "Rejected"
+    assert vote.result_ow_eligible_voters == 101
+    assert vote.result_ow_votes_valid == 102
+    assert vote.result_ow_votes_total == 103
+    assert vote.result_ow_turnout == Decimal('10.40')
+    assert vote.result_ow_yeas == 105
+    assert vote.result_ow_nays == 107
+    assert vote.result_ow_yeas_p == Decimal('10.80')
+    assert vote._result_ow_accepted == 0
+    assert vote.result_ow_accepted == "Rejected"
+    assert vote.result_sg_eligible_voters == 101
+    assert vote.result_sg_votes_valid == 102
+    assert vote.result_sg_votes_total == 103
+    assert vote.result_sg_turnout == Decimal('10.40')
+    assert vote.result_sg_yeas == 105
+    assert vote.result_sg_nays == 107
+    assert vote.result_sg_yeas_p == Decimal('10.80')
+    assert vote._result_sg_accepted == 0
+    assert vote.result_sg_accepted == "Rejected"
+    assert vote.result_sh_eligible_voters == 101
+    assert vote.result_sh_votes_valid == 102
+    assert vote.result_sh_votes_total == 103
+    assert vote.result_sh_turnout == Decimal('10.40')
+    assert vote.result_sh_yeas == 105
+    assert vote.result_sh_nays == 107
+    assert vote.result_sh_yeas_p == Decimal('10.80')
+    assert vote._result_sh_accepted == 0
+    assert vote.result_sh_accepted == "Rejected"
+    assert vote.result_so_eligible_voters == 101
+    assert vote.result_so_votes_valid == 102
+    assert vote.result_so_votes_total == 103
+    assert vote.result_so_turnout == Decimal('10.40')
+    assert vote.result_so_yeas == 105
+    assert vote.result_so_nays == 107
+    assert vote.result_so_yeas_p == Decimal('10.80')
+    assert vote._result_so_accepted == 0
+    assert vote.result_so_accepted == "Rejected"
+    assert vote.result_sz_eligible_voters == 101
+    assert vote.result_sz_votes_valid == 102
+    assert vote.result_sz_votes_total == 103
+    assert vote.result_sz_turnout == Decimal('10.40')
+    assert vote.result_sz_yeas == 105
+    assert vote.result_sz_nays == 107
+    assert vote.result_sz_yeas_p == Decimal('10.80')
+    assert vote._result_sz_accepted == 0
+    assert vote.result_sz_accepted == "Rejected"
+    assert vote.result_tg_eligible_voters == 101
+    assert vote.result_tg_votes_valid == 102
+    assert vote.result_tg_votes_total == 103
+    assert vote.result_tg_turnout == Decimal('10.40')
+    assert vote.result_tg_yeas == 105
+    assert vote.result_tg_nays == 107
+    assert vote.result_tg_yeas_p == Decimal('10.80')
+    assert vote._result_tg_accepted == 0
+    assert vote.result_tg_accepted == "Rejected"
+    assert vote.result_ti_eligible_voters == 101
+    assert vote.result_ti_votes_valid == 102
+    assert vote.result_ti_votes_total == 103
+    assert vote.result_ti_turnout == Decimal('10.40')
+    assert vote.result_ti_yeas == 105
+    assert vote.result_ti_nays == 107
+    assert vote.result_ti_yeas_p == Decimal('10.80')
+    assert vote._result_ti_accepted == 0
+    assert vote.result_ti_accepted == "Rejected"
+    assert vote.result_ur_eligible_voters == 101
+    assert vote.result_ur_votes_valid == 102
+    assert vote.result_ur_votes_total == 103
+    assert vote.result_ur_turnout == Decimal('10.40')
+    assert vote.result_ur_yeas == 105
+    assert vote.result_ur_nays == 107
+    assert vote.result_ur_yeas_p == Decimal('10.80')
+    assert vote._result_ur_accepted == 0
+    assert vote.result_ur_accepted == "Rejected"
+    assert vote.result_vd_eligible_voters == 101
+    assert vote.result_vd_votes_valid == 102
+    assert vote.result_vd_votes_total == 103
+    assert vote.result_vd_turnout == Decimal('10.40')
+    assert vote.result_vd_yeas == 105
+    assert vote.result_vd_nays == 107
+    assert vote.result_vd_yeas_p == Decimal('10.80')
+    assert vote._result_vd_accepted == 0
+    assert vote.result_vd_accepted == "Rejected"
+    assert vote.result_vs_eligible_voters == 101
+    assert vote.result_vs_votes_valid == 102
+    assert vote.result_vs_votes_total == 103
+    assert vote.result_vs_turnout == Decimal('10.40')
+    assert vote.result_vs_yeas == 105
+    assert vote.result_vs_nays == 107
+    assert vote.result_vs_yeas_p == Decimal('10.80')
+    assert vote._result_vs_accepted == 0
+    assert vote.result_vs_accepted == "Rejected"
+    assert vote.result_zg_eligible_voters == 101
+    assert vote.result_zg_votes_valid == 102
+    assert vote.result_zg_votes_total == 103
+    assert vote.result_zg_turnout == Decimal('10.40')
+    assert vote.result_zg_yeas == 105
+    assert vote.result_zg_nays == 107
+    assert vote.result_zg_yeas_p == Decimal('10.80')
+    assert vote._result_zg_accepted == 0
+    assert vote.result_zg_accepted == "Rejected"
+    assert vote.result_zh_eligible_voters == 101
+    assert vote.result_zh_votes_valid == 102
+    assert vote.result_zh_votes_total == 103
+    assert vote.result_zh_turnout == Decimal('10.40')
+    assert vote.result_zh_yeas == 105
+    assert vote.result_zh_nays == 107
+    assert vote.result_zh_yeas_p == Decimal('10.80')
     assert vote._department_in_charge == 1
     assert vote.department_in_charge == \
         "Federal Department of Foreign Affairs (FDFA)"
@@ -448,6 +887,7 @@ def test_vote_codes():
     assert SwissVote.codes('result')[0] == "Rejected"
     assert SwissVote.codes('result_people_accepted')[0] == "Rejected"
     assert SwissVote.codes('result_cantons_accepted')[0] == "Rejected"
+    assert SwissVote.codes('result_ai_accepted')[1] == "Accepted"
     assert SwissVote.codes('department_in_charge')[8] == \
         "Federal Chancellery (FCh)"
     assert SwissVote.codes('position_federal_council')[3] == "Neutral"

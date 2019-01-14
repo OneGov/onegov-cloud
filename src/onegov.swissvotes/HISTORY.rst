@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds cantonal results columns.
+  [msom]
+
 0.0.28 (2019-01-09)
 ~~~~~~~~~~~~~~~~~~~
 

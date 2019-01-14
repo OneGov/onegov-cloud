@@ -8,6 +8,7 @@ from onegov.swissvotes.models import PolicyArea
 from onegov.swissvotes.models import SwissVote
 from sqlalchemy import func
 from sqlalchemy import or_
+from sqlalchemy.orm import undefer_group
 from xlsxwriter.workbook import Workbook
 
 
@@ -418,9 +419,10 @@ class SwissVoteCollection(Pagination):
 
         added = 0
         updated = 0
-        query = self.session.query(SwissVote)
+        query = self.session.query(SwissVote).options(undefer_group("dataset"))
+        existing = {vote.bfs_number: vote for vote in query}
         for vote in votes:
-            old = query.filter_by(bfs_number=vote.bfs_number).first()
+            old = existing.get(vote.bfs_number)
             if old:
                 changed = False
                 for attribute in COLUMNS.keys():
@@ -443,7 +445,10 @@ class SwissVoteCollection(Pagination):
         csv = writer(file)
         csv.writerow(COLUMNS.values())
 
-        for vote in self.query().order_by(None).order_by(SwissVote.bfs_number):
+        query = self.query().options(undefer_group("dataset"))
+        query = query.order_by(None).order_by(SwissVote.bfs_number)
+
+        for vote in query:
             row = []
             for attribute in COLUMNS.keys():
                 value = getattr(vote, attribute)
@@ -471,8 +476,11 @@ class SwissVoteCollection(Pagination):
         worksheet = workbook.add_worksheet()
         worksheet.write_row(0, 0, COLUMNS.values())
 
+        query = self.query().options(undefer_group("dataset"))
+        query = query.order_by(None).order_by(SwissVote.bfs_number)
+
         row = 0
-        for vote in self.query().order_by(None).order_by(SwissVote.bfs_number):
+        for vote in query:
             row += 1
             for column_, attribute in enumerate(COLUMNS.keys()):
                 value = getattr(vote, attribute)

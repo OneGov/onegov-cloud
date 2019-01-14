@@ -6,6 +6,7 @@ from onegov.core.upgrade import upgrade_task
 from onegov.swissvotes.models import SwissVote
 from sqlalchemy import Column
 from sqlalchemy import Integer
+from sqlalchemy import Numeric
 from sqlalchemy.dialects.postgresql import TSVECTOR
 
 
@@ -57,3 +58,33 @@ def add_parliament_position_columns(context):
                     setattr(vote, f'_{col}', 1)
                 elif yeas < nays:
                     setattr(vote, f'_{col}', 2)
+
+
+@upgrade_task('Add cantonal result columns')
+def add_cantonal_result_columns(context):
+    for canton in (
+        'ag', 'ai', 'ar', 'be', 'bl', 'bs', 'fr', 'ge', 'gl', 'gr', 'ju', 'lu',
+        'ne', 'nw', 'ow', 'sg', 'sh', 'so', 'sz', 'tg', 'ti', 'ur', 'vd', 'vs',
+        'zg', 'zh'
+    ):
+        for column in (
+            f'result_{canton}_eligible_voters',
+            f'result_{canton}_votes_valid',
+            f'result_{canton}_votes_total',
+            f'result_{canton}_yeas',
+            f'result_{canton}_nays',
+            f'result_{canton}_accepted'
+        ):
+            if not context.has_column('swissvotes', column):
+                context.operations.add_column(
+                    'swissvotes', Column(column, Integer)
+                )
+
+        for column in (
+            f'result_{canton}_turnout',
+            f'result_{canton}_yeas_p'
+        ):
+            if not context.has_column('swissvotes', column):
+                context.operations.add_column(
+                    'swissvotes', Column(column, Numeric(13, 10))
+                )

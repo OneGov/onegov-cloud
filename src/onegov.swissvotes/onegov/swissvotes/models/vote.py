@@ -17,6 +17,7 @@ from sqlalchemy import Text
 from sqlalchemy_utils import observes
 from sqlalchemy.dialects.postgresql import INT4RANGE
 from sqlalchemy.dialects.postgresql import TSVECTOR
+from sqlalchemy.orm import deferred
 
 
 class SwissVoteFile(File):
@@ -66,16 +67,16 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
                 (3, _("Popular initiative")),
                 (4, _("Direct counter-proposal")),
             ))
-        if attribute == 'result' or attribute == 'result_people_accepted':
-            return OrderedDict((
-                (0, _("Rejected")),
-                (1, _("Accepted")),
-            ))
         if attribute == 'result_cantons_accepted':
             return OrderedDict((
                 (0, _("Rejected")),
                 (1, _("Accepted")),
                 (3, _("Majority of the cantons not necessary")),
+            ))
+        if attribute == 'result' or attribute.endswith('_accepted'):
+            return OrderedDict((
+                (0, _("Rejected")),
+                (1, _("Accepted")),
             ))
         if attribute == 'department_in_charge':
             return OrderedDict((
@@ -171,16 +172,304 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     result_votes_valid = Column(Integer)
     result_votes_total = Column(Integer)
     result_turnout = Column(Numeric(13, 10))
+
     _result_people_accepted = Column('result_people_accepted', Integer)
     result_people_accepted = encoded_property()
     result_people_yeas = Column(Integer)
     result_people_nays = Column(Integer)
     result_people_yeas_p = Column(Numeric(13, 10))
+
     _result_cantons_accepted = Column('result_cantons_accepted', Integer)
     result_cantons_accepted = encoded_property()
     result_cantons_yeas = Column(Numeric(3, 1))
     result_cantons_nays = Column(Numeric(3, 1))
     result_cantons_yeas_p = Column(Numeric(13, 10))
+
+    result_ag_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_ag_votes_valid = deferred(Column(Integer), group='dataset')
+    result_ag_votes_total = deferred(Column(Integer), group='dataset')
+    result_ag_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_ag_yeas = deferred(Column(Integer), group='dataset')
+    result_ag_nays = deferred(Column(Integer), group='dataset')
+    result_ag_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_ag_accepted = deferred(Column('result_ag_accepted', Integer),
+                                   group='dataset')
+    result_ag_accepted = encoded_property()
+
+    result_ai_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_ai_votes_valid = deferred(Column(Integer), group='dataset')
+    result_ai_votes_total = deferred(Column(Integer), group='dataset')
+    result_ai_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_ai_yeas = deferred(Column(Integer), group='dataset')
+    result_ai_nays = deferred(Column(Integer), group='dataset')
+    result_ai_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_ai_accepted = deferred(Column('result_ai_accepted', Integer),
+                                   group='dataset')
+    result_ai_accepted = encoded_property()
+
+    result_ar_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_ar_votes_valid = deferred(Column(Integer), group='dataset')
+    result_ar_votes_total = deferred(Column(Integer), group='dataset')
+    result_ar_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_ar_yeas = deferred(Column(Integer), group='dataset')
+    result_ar_nays = deferred(Column(Integer), group='dataset')
+    result_ar_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_ar_accepted = deferred(Column('result_ar_accepted', Integer),
+                                   group='dataset')
+    result_ar_accepted = encoded_property()
+
+    result_be_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_be_votes_valid = deferred(Column(Integer), group='dataset')
+    result_be_votes_total = deferred(Column(Integer), group='dataset')
+    result_be_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_be_yeas = deferred(Column(Integer), group='dataset')
+    result_be_nays = deferred(Column(Integer), group='dataset')
+    result_be_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_be_accepted = deferred(Column('result_be_accepted', Integer),
+                                   group='dataset')
+    result_be_accepted = encoded_property()
+
+    result_bl_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_bl_votes_valid = deferred(Column(Integer), group='dataset')
+    result_bl_votes_total = deferred(Column(Integer), group='dataset')
+    result_bl_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_bl_yeas = deferred(Column(Integer), group='dataset')
+    result_bl_nays = deferred(Column(Integer), group='dataset')
+    result_bl_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_bl_accepted = deferred(Column('result_bl_accepted', Integer),
+                                   group='dataset')
+    result_bl_accepted = encoded_property()
+
+    result_bs_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_bs_votes_valid = deferred(Column(Integer), group='dataset')
+    result_bs_votes_total = deferred(Column(Integer), group='dataset')
+    result_bs_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_bs_yeas = deferred(Column(Integer), group='dataset')
+    result_bs_nays = deferred(Column(Integer), group='dataset')
+    result_bs_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_bs_accepted = deferred(Column('result_bs_accepted', Integer),
+                                   group='dataset')
+    result_bs_accepted = encoded_property()
+
+    result_fr_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_fr_votes_valid = deferred(Column(Integer), group='dataset')
+    result_fr_votes_total = deferred(Column(Integer), group='dataset')
+    result_fr_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_fr_yeas = deferred(Column(Integer), group='dataset')
+    result_fr_nays = deferred(Column(Integer), group='dataset')
+    result_fr_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_fr_accepted = deferred(Column('result_fr_accepted', Integer),
+                                   group='dataset')
+    result_fr_accepted = encoded_property()
+
+    result_ge_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_ge_votes_valid = deferred(Column(Integer), group='dataset')
+    result_ge_votes_total = deferred(Column(Integer), group='dataset')
+    result_ge_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_ge_yeas = deferred(Column(Integer), group='dataset')
+    result_ge_nays = deferred(Column(Integer), group='dataset')
+    result_ge_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_ge_accepted = deferred(Column('result_ge_accepted', Integer),
+                                   group='dataset')
+    result_ge_accepted = encoded_property()
+
+    result_gl_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_gl_votes_valid = deferred(Column(Integer), group='dataset')
+    result_gl_votes_total = deferred(Column(Integer), group='dataset')
+    result_gl_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_gl_yeas = deferred(Column(Integer), group='dataset')
+    result_gl_nays = deferred(Column(Integer), group='dataset')
+    result_gl_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_gl_accepted = deferred(Column('result_gl_accepted', Integer),
+                                   group='dataset')
+    result_gl_accepted = encoded_property()
+
+    result_gr_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_gr_votes_valid = deferred(Column(Integer), group='dataset')
+    result_gr_votes_total = deferred(Column(Integer), group='dataset')
+    result_gr_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_gr_yeas = deferred(Column(Integer), group='dataset')
+    result_gr_nays = deferred(Column(Integer), group='dataset')
+    result_gr_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_gr_accepted = deferred(Column('result_gr_accepted', Integer),
+                                   group='dataset')
+    result_gr_accepted = encoded_property()
+
+    result_ju_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_ju_votes_valid = deferred(Column(Integer), group='dataset')
+    result_ju_votes_total = deferred(Column(Integer), group='dataset')
+    result_ju_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_ju_yeas = deferred(Column(Integer), group='dataset')
+    result_ju_nays = deferred(Column(Integer), group='dataset')
+    result_ju_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_ju_accepted = deferred(Column('result_ju_accepted', Integer),
+                                   group='dataset')
+    result_ju_accepted = encoded_property()
+
+    result_lu_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_lu_votes_valid = deferred(Column(Integer), group='dataset')
+    result_lu_votes_total = deferred(Column(Integer), group='dataset')
+    result_lu_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_lu_yeas = deferred(Column(Integer), group='dataset')
+    result_lu_nays = deferred(Column(Integer), group='dataset')
+    result_lu_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_lu_accepted = deferred(Column('result_lu_accepted', Integer),
+                                   group='dataset')
+    result_lu_accepted = encoded_property()
+
+    result_ne_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_ne_votes_valid = deferred(Column(Integer), group='dataset')
+    result_ne_votes_total = deferred(Column(Integer), group='dataset')
+    result_ne_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_ne_yeas = deferred(Column(Integer), group='dataset')
+    result_ne_nays = deferred(Column(Integer), group='dataset')
+    result_ne_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_ne_accepted = deferred(Column('result_ne_accepted', Integer),
+                                   group='dataset')
+    result_ne_accepted = encoded_property()
+
+    result_nw_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_nw_votes_valid = deferred(Column(Integer), group='dataset')
+    result_nw_votes_total = deferred(Column(Integer), group='dataset')
+    result_nw_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_nw_yeas = deferred(Column(Integer), group='dataset')
+    result_nw_nays = deferred(Column(Integer), group='dataset')
+    result_nw_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_nw_accepted = deferred(Column('result_nw_accepted', Integer),
+                                   group='dataset')
+    result_nw_accepted = encoded_property()
+
+    result_ow_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_ow_votes_valid = deferred(Column(Integer), group='dataset')
+    result_ow_votes_total = deferred(Column(Integer), group='dataset')
+    result_ow_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_ow_yeas = deferred(Column(Integer), group='dataset')
+    result_ow_nays = deferred(Column(Integer), group='dataset')
+    result_ow_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_ow_accepted = deferred(Column('result_ow_accepted', Integer),
+                                   group='dataset')
+    result_ow_accepted = encoded_property()
+
+    result_sg_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_sg_votes_valid = deferred(Column(Integer), group='dataset')
+    result_sg_votes_total = deferred(Column(Integer), group='dataset')
+    result_sg_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_sg_yeas = deferred(Column(Integer), group='dataset')
+    result_sg_nays = deferred(Column(Integer), group='dataset')
+    result_sg_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_sg_accepted = deferred(Column('result_sg_accepted', Integer),
+                                   group='dataset')
+    result_sg_accepted = encoded_property()
+
+    result_sh_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_sh_votes_valid = deferred(Column(Integer), group='dataset')
+    result_sh_votes_total = deferred(Column(Integer), group='dataset')
+    result_sh_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_sh_yeas = deferred(Column(Integer), group='dataset')
+    result_sh_nays = deferred(Column(Integer), group='dataset')
+    result_sh_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_sh_accepted = deferred(Column('result_sh_accepted', Integer),
+                                   group='dataset')
+    result_sh_accepted = encoded_property()
+
+    result_so_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_so_votes_valid = deferred(Column(Integer), group='dataset')
+    result_so_votes_total = deferred(Column(Integer), group='dataset')
+    result_so_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_so_yeas = deferred(Column(Integer), group='dataset')
+    result_so_nays = deferred(Column(Integer), group='dataset')
+    result_so_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_so_accepted = deferred(Column('result_so_accepted', Integer),
+                                   group='dataset')
+    result_so_accepted = encoded_property()
+
+    result_sz_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_sz_votes_valid = deferred(Column(Integer), group='dataset')
+    result_sz_votes_total = deferred(Column(Integer), group='dataset')
+    result_sz_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_sz_yeas = deferred(Column(Integer), group='dataset')
+    result_sz_nays = deferred(Column(Integer), group='dataset')
+    result_sz_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_sz_accepted = deferred(Column('result_sz_accepted', Integer),
+                                   group='dataset')
+    result_sz_accepted = encoded_property()
+
+    result_tg_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_tg_votes_valid = deferred(Column(Integer), group='dataset')
+    result_tg_votes_total = deferred(Column(Integer), group='dataset')
+    result_tg_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_tg_yeas = deferred(Column(Integer), group='dataset')
+    result_tg_nays = deferred(Column(Integer), group='dataset')
+    result_tg_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_tg_accepted = deferred(Column('result_tg_accepted', Integer),
+                                   group='dataset')
+    result_tg_accepted = encoded_property()
+
+    result_ti_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_ti_votes_valid = deferred(Column(Integer), group='dataset')
+    result_ti_votes_total = deferred(Column(Integer), group='dataset')
+    result_ti_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_ti_yeas = deferred(Column(Integer), group='dataset')
+    result_ti_nays = deferred(Column(Integer), group='dataset')
+    result_ti_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_ti_accepted = deferred(Column('result_ti_accepted', Integer),
+                                   group='dataset')
+    result_ti_accepted = encoded_property()
+
+    result_ur_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_ur_votes_valid = deferred(Column(Integer), group='dataset')
+    result_ur_votes_total = deferred(Column(Integer), group='dataset')
+    result_ur_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_ur_yeas = deferred(Column(Integer), group='dataset')
+    result_ur_nays = deferred(Column(Integer), group='dataset')
+    result_ur_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_ur_accepted = deferred(Column('result_ur_accepted', Integer),
+                                   group='dataset')
+    result_ur_accepted = encoded_property()
+
+    result_vd_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_vd_votes_valid = deferred(Column(Integer), group='dataset')
+    result_vd_votes_total = deferred(Column(Integer), group='dataset')
+    result_vd_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_vd_yeas = deferred(Column(Integer), group='dataset')
+    result_vd_nays = deferred(Column(Integer), group='dataset')
+    result_vd_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_vd_accepted = deferred(Column('result_vd_accepted', Integer),
+                                   group='dataset')
+    result_vd_accepted = encoded_property()
+
+    result_vs_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_vs_votes_valid = deferred(Column(Integer), group='dataset')
+    result_vs_votes_total = deferred(Column(Integer), group='dataset')
+    result_vs_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_vs_yeas = deferred(Column(Integer), group='dataset')
+    result_vs_nays = deferred(Column(Integer), group='dataset')
+    result_vs_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_vs_accepted = deferred(Column('result_vs_accepted', Integer),
+                                   group='dataset')
+    result_vs_accepted = encoded_property()
+
+    result_zg_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_zg_votes_valid = deferred(Column(Integer), group='dataset')
+    result_zg_votes_total = deferred(Column(Integer), group='dataset')
+    result_zg_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_zg_yeas = deferred(Column(Integer), group='dataset')
+    result_zg_nays = deferred(Column(Integer), group='dataset')
+    result_zg_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_zg_accepted = deferred(Column('result_zg_accepted', Integer),
+                                   group='dataset')
+    result_zg_accepted = encoded_property()
+
+    result_zh_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_zh_votes_valid = deferred(Column(Integer), group='dataset')
+    result_zh_votes_total = deferred(Column(Integer), group='dataset')
+    result_zh_turnout = deferred(Column(Numeric(13, 10)), group='dataset')
+    result_zh_yeas = deferred(Column(Integer), group='dataset')
+    result_zh_nays = deferred(Column(Integer), group='dataset')
+    result_zh_yeas_p = deferred(Column(Numeric(13, 10)), group='dataset')
+    _result_zh_accepted = deferred(Column('result_zh_accepted', Integer),
+                                   group='dataset')
+    result_zh_accepted = encoded_property()
 
     # Authorities
     _department_in_charge = Column('department_in_charge', Integer)
