@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-01-11 21:34+0100\n"
+"POT-Creation-Date: 2019-01-14 16:22+0100\n"
 "PO-Revision-Date: 2018-12-08 11:02+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1093,6 +1093,9 @@ msgstr "Veuillez ne renseigner que des jours et des mois"
 
 msgid "Except for"
 msgstr "À l'exception de"
+
+msgid "On holidays"
+msgstr "En vacances"
 
 msgid "Daypasses"
 msgstr "Cartes journalières"
@@ -3420,6 +3423,9 @@ msgstr "Un compte a été créé pour vous"
 
 msgid "New allocation"
 msgstr "Nouvelle allocation"
+
+msgid "No allocations to add"
+msgstr "Aucune allocation à ajouter"
 
 #, python-format
 msgid "Successfully added ${n} allocations"

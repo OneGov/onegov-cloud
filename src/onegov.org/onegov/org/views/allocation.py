@@ -102,12 +102,18 @@ def handle_new_allocation(self, request, form):
         except LibresError as e:
             utils.show_libres_error(e, request)
         else:
-            request.success(_("Successfully added ${n} allocations", mapping={
-                'n': len(allocations)
-            }))
+            if not allocations:
+                request.alert(_("No allocations to add"))
+            else:
+                request.success(
+                    _("Successfully added ${n} allocations", mapping={
+                        'n': len(allocations)
+                    }))
 
-            self.highlight_allocations(allocations)
-            return morepath.redirect(request.link(self))
+                self.highlight_allocations(allocations)
+
+                return morepath.redirect(request.link(self))
+
     elif not request.POST:
         start, end = utils.parse_fullcalendar_request(request, self.timezone)
         whole_day = request.params.get('whole_day') == 'yes'

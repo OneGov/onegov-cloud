@@ -1,5 +1,5 @@
 from collections import defaultdict
-from datetime import date
+from datetime import date, datetime
 from dateutil.easter import easter
 from dateutil.relativedelta import MO, TH, FR
 from dateutil.relativedelta import relativedelta as rd
@@ -76,9 +76,12 @@ class SwissHolidays(object):
 
         self._other[(month, day)].add(description)
 
+    def __bool__(self):
+        return (self._cantons or self._other) and True or False
+
     def __contains__(self, dt):
-        if not isinstance(dt, date):
-            raise ValueError(f"Unsupported type: {type(date)}")
+        if not isinstance(dt, date) or isinstance(dt, datetime):
+            raise ValueError(f"Unsupported type: {type(dt)}")
 
         if (dt.month, dt.day) in self._other:
             return True
@@ -113,6 +116,26 @@ class SwissHolidays(object):
         dates = sorted(list(combined.keys()))
 
         return [(dt, sorted(combined[dt])) for dt in dates]
+
+    def between(self, start, end):
+        """ Returns all the holidays between the given start and end date in
+        the same manner ass :meth:`all`.
+
+        """
+        assert start <= end
+
+        if start.year == end.year:
+            years = (start.year, )
+        else:
+            years = (start.year, end.year)
+
+        def generate():
+            for year in years:
+                for dt, descriptions in self.all(year):
+                    if start <= dt and dt <= end:
+                        yield dt, descriptions
+
+        return list(generate())
 
     def other(self, year):
         """ Returns all custom defined holidays for the given year. """

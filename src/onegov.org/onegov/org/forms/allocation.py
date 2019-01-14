@@ -1,5 +1,6 @@
 import sedate
 
+from cached_property import cached_property
 from datetime import datetime, timedelta
 from dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR, SA, SU
 from onegov.form import Form
@@ -33,8 +34,10 @@ class AllocationFormHelpers(object):
 
     def generate_dates(self, start, end,
                        start_time=None, end_time=None, weekdays=None):
-        """ Takes the given dates and generates the date tuples using rrule.
-        The `except_for` field will be considered if present.
+        """ Takes the given dates and generates the date tuples.
+
+        The ``except_for`` field will be considered if present, as will the
+        ``on_holidays`` setting.
 
         """
 
@@ -50,7 +53,7 @@ class AllocationFormHelpers(object):
             dates = rrule(DAILY, dtstart=start, until=end, byweekday=weekdays)
 
         if start_time is None or end_time is None:
-            return [(d, d) for d in dates]
+            return [(d, d) for d in dates if not self.is_excluded(d)]
         else:
             if end_time < start_time:
                 end_offset = timedelta(days=1)
@@ -61,7 +64,7 @@ class AllocationFormHelpers(object):
                 (
                     datetime.combine(d, start_time),
                     datetime.combine(d + end_offset, end_time)
-                ) for d in dates
+                ) for d in dates if not self.is_excluded(d)
             ]
 
     def combine_datetime(self, field, time_field):
@@ -77,6 +80,9 @@ class AllocationFormHelpers(object):
             return None
 
         return datetime.combine(d, t)
+
+    def is_excluded(self, date):
+        return False
 
 
 class AllocationForm(Form, AllocationFormHelpers):
@@ -110,11 +116,40 @@ class AllocationForm(Form, AllocationFormHelpers):
         fieldset=("Date")
     )
 
+    on_holidays = RadioField(
+        label=_("On holidays"),
+        choices=(
+            ('yes', _("Yes")),
+            ('no', _("No"))
+        ),
+        default='yes',
+        fieldset=_("Date"))
+
+    def on_request(self):
+        if not self.request.app.org.holidays:
+            self.delete_field('on_holidays')
+
     @property
     def weekdays(self):
         """ The rrule weekdays derived from the except_for field. """
         exceptions = {x for x in (self.except_for.data or tuple())}
         return [int(d[0]) for d in WEEKDAYS if d[0] not in exceptions]
+
+    @cached_property
+    def exceptions(self):
+        if not hasattr(self, 'request'):
+            return ()
+
+        if not self.on_holidays:
+            return ()
+
+        if self.on_holidays.data == 'yes':
+            return ()
+
+        return self.request.app.org.holidays
+
+    def is_excluded(self, date):
+        return date.date() in self.exceptions
 
     @property
     def dates(self):
@@ -249,14 +284,14 @@ class RoomAllocationForm(AllocationForm):
             ('no', _("No"))
         ],
         default='yes',
-        fieldset=_("Date")
+        fieldset=_("Time")
     )
 
     start_time = TimeField(
         label=_("Each starting at"),
         description=_("HH:MM"),
         validators=[InputRequired()],
-        fieldset=_("Date"),
+        fieldset=_("Time"),
         depends_on=('as_whole_day', 'no')
     )
 
@@ -264,7 +299,7 @@ class RoomAllocationForm(AllocationForm):
         label=_("Each ending at"),
         description=_("HH:MM"),
         validators=[InputRequired()],
-        fieldset=_("Date"),
+        fieldset=_("Time"),
         depends_on=('as_whole_day', 'no')
     )
 
@@ -310,14 +345,14 @@ class RoomAllocationEditForm(AllocationEditForm):
             ('no', _("No"))
         ],
         default='yes',
-        fieldset=_("Date")
+        fieldset=_("Time")
     )
 
     start_time = TimeField(
         label=_("From"),
         description=_("HH:MM"),
         validators=[DataRequired()],
-        fieldset=_("Date"),
+        fieldset=_("Time"),
         depends_on=('as_whole_day', 'no')
     )
 
@@ -325,7 +360,7 @@ class RoomAllocationEditForm(AllocationEditForm):
         label=_("Until"),
         description=_("HH:MM"),
         validators=[DataRequired()],
-        fieldset=_("Date"),
+        fieldset=_("Time"),
         depends_on=('as_whole_day', 'no')
     )
 

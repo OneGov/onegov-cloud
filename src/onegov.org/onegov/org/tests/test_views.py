@@ -1333,6 +1333,57 @@ def test_allocation_times(client):
     assert slots.json[1]['end'] == '2015-08-26T00:00:00+02:00'
 
 
+def test_allocation_holidays(client):
+    client.login_admin()
+
+    page = client.get('/holiday-settings')
+    page.select_checkbox('cantonal_holidays', "Zürich")
+    page.form.submit()
+
+    # allocations that are made during holidays
+    page = client.get('/resources').click('Raum')
+    page.form['title'] = 'Foo'
+    page.form.submit()
+
+    new = client.get('/resource/foo/new-allocation')
+    new.form['start'] = '2019-07-30'
+    new.form['end'] = '2019-08-02'
+    new.form['start_time'] = '07:00'
+    new.form['end_time'] = '12:00'
+    new.form['on_holidays'] = 'yes'
+    new.form['as_whole_day'] = 'no'
+    new.form.submit()
+
+    slots = client.get('/resource/foo/slots?start=2019-07-29&end=2019-08-03')
+
+    assert len(slots.json) == 4
+    assert slots.json[0]['start'].startswith('2019-07-30')
+    assert slots.json[1]['start'].startswith('2019-07-31')
+    assert slots.json[2]['start'].startswith('2019-08-01')
+    assert slots.json[3]['start'].startswith('2019-08-02')
+
+    # allocations that are not made during holidays
+    page = client.get('/resources').click('Raum')
+    page.form['title'] = 'Bar'
+    page.form.submit()
+
+    new = client.get('/resource/bar/new-allocation')
+    new.form['start'] = '2019-07-30'
+    new.form['end'] = '2019-08-02'
+    new.form['start_time'] = '07:00'
+    new.form['end_time'] = '12:00'
+    new.form['on_holidays'] = 'no'
+    new.form['as_whole_day'] = 'no'
+    new.form.submit()
+
+    slots = client.get('/resource/bar/slots?start=2019-07-29&end=2019-08-03')
+
+    assert len(slots.json) == 3
+    assert slots.json[0]['start'].startswith('2019-07-30')
+    assert slots.json[1]['start'].startswith('2019-07-31')
+    assert slots.json[2]['start'].startswith('2019-08-02')
+
+
 def test_reserve_allocation(client):
 
     # prepate the required data

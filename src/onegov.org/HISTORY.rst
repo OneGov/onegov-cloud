@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to skip allocations on holidays.
+  [href]
+
 - No longer wraps autocomplete search results.
   [href]
 
