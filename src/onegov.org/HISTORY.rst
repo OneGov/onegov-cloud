@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- No longer wraps autocomplete search results.
+  [href]
+
 - Adds the ability to define holidays in the organisation settings.
   [href]
 

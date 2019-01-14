@@ -3192,6 +3192,12 @@ button {
         display: none;
     }
 
+    [data-typeahead-container] a {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
     .reset-button {
         $size: 1rem;
 
