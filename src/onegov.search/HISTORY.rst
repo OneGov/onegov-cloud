@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.6.2 (2019-01-14)
+~~~~~~~~~~~~~~~~~~~
+
 - Improves autocomplete search results.
   [href]
 
