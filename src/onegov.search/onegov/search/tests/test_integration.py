@@ -741,6 +741,7 @@ def test_date_decay(es_url, postgres_dsn):
     def search(title):
         app.es_indexer.process()
         app.es_client.indices.refresh(index='_all')
+        app.es_client.indices.flush(index='_all')
 
         search = app.es_search(languages=['de'])
         search = search.query(MatchPhrase(title={"query": title}))
@@ -748,8 +749,8 @@ def test_date_decay(es_url, postgres_dsn):
         search.query = FunctionScore(query=search.query, functions=[
             SF('gauss', es_last_change={
                 'offset': '7d',
-                'scale': '90d',
-                'decay': '0.5'
+                'scale': '30d',
+                'decay': '0.75'
             })
         ])
 
@@ -767,13 +768,12 @@ def test_date_decay(es_url, postgres_dsn):
     transaction.commit()
 
     # Travis needs some time to catch-up, no problem locally
-    for _ in range(0, 60):
-        result = search("Dokument")
+    for _ in range(0, 12):
+        if search("Dokument")[0].meta.id == '1':
+            if search("Dokument")[1].meta.id == '2':
+                break
 
-        if result[0].meta.id == '1' and result[1].meta.id == '2':
-            break
-
-        sleep(1.0)
+        sleep(5.0)
 
     else:
         assert search("Dokument")[0].meta.id == '1'
