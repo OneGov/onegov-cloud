@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.41.2 (2019-01-14)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds compatibility with pyparsing 2.3.1.
   [href]
