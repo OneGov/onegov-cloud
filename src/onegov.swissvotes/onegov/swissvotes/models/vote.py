@@ -50,7 +50,12 @@ class encoded_property(object):
 
 class SwissVote(Base, TimestampMixin, AssociatedFiles):
 
-    """ A single vote as defined by the code book. """
+    """ A single vote as defined by the code book.
+
+    Some columns are only used when importing/exporting the dataset and are
+    lazy loaded.
+
+    """
 
     __tablename__ = 'swissvotes'
 
@@ -166,11 +171,11 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     # Result
     _result = Column('result', Integer)
     result = encoded_property()
-    result_eligible_voters = Column(Integer)
-    result_votes_empty = Column(Integer)
-    result_votes_invalid = Column(Integer)
-    result_votes_valid = Column(Integer)
-    result_votes_total = Column(Integer)
+    result_eligible_voters = deferred(Column(Integer), group='dataset')
+    result_votes_empty = deferred(Column(Integer), group='dataset')
+    result_votes_invalid = deferred(Column(Integer), group='dataset')
+    result_votes_valid = deferred(Column(Integer), group='dataset')
+    result_votes_total = deferred(Column(Integer), group='dataset')
     result_turnout = Column(Numeric(13, 10))
 
     _result_people_accepted = Column('result_people_accepted', Integer)
