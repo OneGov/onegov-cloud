@@ -4,6 +4,9 @@ Changelog
 - Adds cantonal results columns.
   [msom]
 
+- Fixes formatting of procedure numbers.
+  [msom]
+
 0.0.28 (2019-01-09)
 ~~~~~~~~~~~~~~~~~~~
 

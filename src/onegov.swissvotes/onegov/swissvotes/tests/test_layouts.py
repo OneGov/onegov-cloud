@@ -90,6 +90,20 @@ def test_layout_default(swissvotes_app):
     assert layout.format_bfs_number(Decimal('100.1')) == '100.1'
     assert layout.format_bfs_number(Decimal('100.12')) == '100.1'
 
+    assert layout.format_procedure_number(None) == ''
+    assert layout.format_procedure_number(Decimal('0')) == '0'
+    assert layout.format_procedure_number(Decimal('00.087')) == '00.087'
+    assert layout.format_procedure_number(Decimal('0.087')) == '00.087'
+    assert layout.format_procedure_number(Decimal('02.060')) == '02.060'
+    assert layout.format_procedure_number(Decimal('2.06')) == '02.060'
+    assert layout.format_procedure_number(Decimal('16.479')) == '16.479'
+    assert layout.format_procedure_number(Decimal('1859')) == '1859'
+    assert layout.format_procedure_number(Decimal('1859.000')) == '1859'
+    assert layout.format_procedure_number(Decimal('9309')) == '9309'
+    assert layout.format_procedure_number(Decimal('9309.0')) == '9309'
+    assert layout.format_procedure_number(Decimal('12239')) == '12239'
+    assert layout.format_procedure_number(Decimal('12239.0')) == '12239'
+
     # Login
     request.is_logged_in = True
     layout = DefaultLayout(model, request)
