@@ -1,6 +1,7 @@
 from datetime import date
 from decimal import Decimal
 from onegov.swissvotes.models.actor import Actor
+from onegov.swissvotes.models.canton import Canton
 from onegov.swissvotes.models.localized_file import LocalizedFile
 from onegov.swissvotes.models.page import TranslatablePage
 from onegov.swissvotes.models.policy_area import PolicyArea
@@ -38,6 +39,29 @@ def test_actor():
 
     assert Actor('csp') == Actor('csp')
     assert Actor('csp') != Actor('xxx')
+
+
+def test_canton():
+    assert len(Canton.abbreviations()) == 26
+
+    canton = Canton('lu')
+    assert canton.abbreviation == 'lu'
+    assert not isinstance(canton.abbreviation, TranslationString)
+    assert canton.label == 'canton-lu-label'
+    assert isinstance(canton.label, TranslationString)
+    assert canton.html(DummyRequest()) == (
+        '<span title="canton-lu-label">LU</span>'
+    )
+
+    canton = Canton('xxx')
+    assert canton.abbreviation == 'xxx'
+    assert not isinstance(canton.abbreviation, TranslationString)
+    assert canton.label == 'XXX'
+    assert not isinstance(canton.label, TranslationString)
+    assert canton.html(DummyRequest()) == '<span title="XXX">XXX</span>'
+
+    assert Canton('lu') == Canton('lu')
+    assert Canton('lu') != Canton('xxx')
 
 
 def test_localized_file():
@@ -154,7 +178,7 @@ def test_principal(session):
     assert principal
 
 
-def test_vote1(session):
+def test_vote(session):
     vote = SwissVote()
     vote.bfs_number = Decimal('100.1')
     vote.date = date(1990, 6, 2)
@@ -374,7 +398,7 @@ def test_vote1(session):
     vote.result_vd_yeas = 105
     vote.result_vd_nays = 107
     vote.result_vd_yeas_p = Decimal('10.80')
-    vote._result_vd_accepted = 0
+    vote._result_vd_accepted = 1
     vote.result_vs_eligible_voters = 101
     vote.result_vs_votes_valid = 102
     vote.result_vs_votes_total = 103
@@ -382,7 +406,7 @@ def test_vote1(session):
     vote.result_vs_yeas = 105
     vote.result_vs_nays = 107
     vote.result_vs_yeas_p = Decimal('10.80')
-    vote._result_vs_accepted = 0
+    vote._result_vs_accepted = 1
     vote.result_zg_eligible_voters = 101
     vote.result_zg_votes_valid = 102
     vote.result_zg_votes_total = 103
@@ -719,8 +743,8 @@ def test_vote1(session):
     assert vote.result_vd_yeas == 105
     assert vote.result_vd_nays == 107
     assert vote.result_vd_yeas_p == Decimal('10.80')
-    assert vote._result_vd_accepted == 0
-    assert vote.result_vd_accepted == "Rejected"
+    assert vote._result_vd_accepted == 1
+    assert vote.result_vd_accepted == "Accepted"
     assert vote.result_vs_eligible_voters == 101
     assert vote.result_vs_votes_valid == 102
     assert vote.result_vs_votes_total == 103
@@ -728,8 +752,8 @@ def test_vote1(session):
     assert vote.result_vs_yeas == 105
     assert vote.result_vs_nays == 107
     assert vote.result_vs_yeas_p == Decimal('10.80')
-    assert vote._result_vs_accepted == 0
-    assert vote.result_vs_accepted == "Rejected"
+    assert vote._result_vs_accepted == 1
+    assert vote.result_vs_accepted == "Accepted"
     assert vote.result_zg_eligible_voters == 101
     assert vote.result_zg_votes_valid == 102
     assert vote.result_zg_votes_total == 103
@@ -746,6 +770,8 @@ def test_vote1(session):
     assert vote.result_zh_yeas == 105
     assert vote.result_zh_nays == 107
     assert vote.result_zh_yeas_p == Decimal('10.80')
+    assert vote._result_zh_accepted is None
+    assert vote.result_zh_accepted is None
     assert vote._department_in_charge == 1
     assert vote.department_in_charge == \
         "Federal Department of Foreign Affairs (FDFA)"
@@ -829,6 +855,37 @@ def test_vote1(session):
         PolicyArea('4.42.421'),
         PolicyArea('10.103.1035'),
         PolicyArea('10.103.1033')
+    ]
+
+    assert vote.results_cantons['Rejected'] == [
+        Canton('ag'),
+        Canton('ai'),
+        Canton('ar'),
+        Canton('be'),
+        Canton('bl'),
+        Canton('bs'),
+        Canton('fr'),
+        Canton('ge'),
+        Canton('gl'),
+        Canton('gr'),
+        Canton('ju'),
+        Canton('lu'),
+        Canton('ne'),
+        Canton('nw'),
+        Canton('ow'),
+        Canton('sg'),
+        Canton('sh'),
+        Canton('so'),
+        Canton('sz'),
+        Canton('tg'),
+        Canton('ti'),
+        Canton('ur'),
+        Canton('zg'),
+        # Canton('zh'),
+    ]
+    assert vote.results_cantons['Accepted'] == [
+        Canton('vd'),
+        Canton('vs'),
     ]
 
     assert list(vote.recommendations_parties.keys()) == [

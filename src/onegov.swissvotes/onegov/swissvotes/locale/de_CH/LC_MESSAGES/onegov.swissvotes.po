@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-09 11:16+0100\n"
-"PO-Revision-Date: 2019-01-09 11:17+0100\n"
+"POT-Creation-Date: 2019-01-15 10:53+0100\n"
+"PO-Revision-Date: 2019-01-15 10:57+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.2\n"
+"X-Generator: Poedit 2.2.1\n"
 
 msgid "Homepage"
 msgstr "Startseite"
@@ -1184,6 +1184,84 @@ msgstr "Verband des Personals öffentlicher Dienste"
 
 msgid "actor-vsa-label"
 msgstr "Vereinigung schweizerischer Angestelltenverbände"
+
+msgid "canton-ag-label"
+msgstr "Aargau"
+
+msgid "canton-ai-label"
+msgstr "Appenzell Innerrhoden"
+
+msgid "canton-ar-label"
+msgstr "Appenzell Ausserrhoden"
+
+msgid "canton-be-label"
+msgstr "Bern"
+
+msgid "canton-bl-label"
+msgstr "Basel-Landschaft"
+
+msgid "canton-bs-label"
+msgstr "Basel-Stadt"
+
+msgid "canton-fr-label"
+msgstr "Freiburg"
+
+msgid "canton-ge-label"
+msgstr "Genf"
+
+msgid "canton-gl-label"
+msgstr "Glarus"
+
+msgid "canton-gr-label"
+msgstr "Graubünden"
+
+msgid "canton-ju-label"
+msgstr "Jura"
+
+msgid "canton-lu-label"
+msgstr "Luzern"
+
+msgid "canton-ne-label"
+msgstr "Neuenburg"
+
+msgid "canton-nw-label"
+msgstr "Nidwalden"
+
+msgid "canton-ow-label"
+msgstr "Obwalden"
+
+msgid "canton-sg-label"
+msgstr "St. Gallen"
+
+msgid "canton-sh-label"
+msgstr "Schaffhausen"
+
+msgid "canton-so-label"
+msgstr "Solothurn"
+
+msgid "canton-sz-label"
+msgstr "Schwyz"
+
+msgid "canton-tg-label"
+msgstr "Thurgau"
+
+msgid "canton-ti-label"
+msgstr "Tessin"
+
+msgid "canton-ur-label"
+msgstr "Uri"
+
+msgid "canton-vd-label"
+msgstr "Waadt"
+
+msgid "canton-vs-label"
+msgstr "Wallis"
+
+msgid "canton-zg-label"
+msgstr "Zug"
+
+msgid "canton-zh-label"
+msgstr "Zürich"
 
 msgid "Edit page"
 msgstr "Seite bearbeiten"

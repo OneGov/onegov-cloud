@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Adds cantonal results columns.
+- Adds cantonal results.
   [msom]
 
 - Fixes formatting of procedure numbers.
