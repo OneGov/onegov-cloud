@@ -1223,12 +1223,47 @@ class ResourceLayout(DefaultLayout):
                     text=_("Subscribe"),
                     url=self.request.link(self.model, 'subscribe'),
                     attrs={'class': 'subscribe-link'}
+                ),
+                Link(
+                    text=_("Rules"),
+                    url=self.request.link(self.model, 'rules'),
+                    attrs={'class': 'rule-link'}
                 )
             ]
 
 
 class ReservationLayout(ResourceLayout):
     editbar_links = None
+
+
+class AllocationRulesLayout(ResourceLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Reservations"), self.request.link(self.collection)),
+            Link(_(self.model.title), self.request.link(self.model)),
+            Link(_("Rules"), '#')
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        return [
+            LinkGroup(
+                title=_("Add"),
+                links=[
+                    Link(
+                        text=_("Rule"),
+                        url=self.request.link(
+                            self.model,
+                            name='new-rule'
+                        ),
+                        attrs={'class': 'new-link'}
+                    )
+                ]
+            ),
+        ]
 
 
 class AllocationEditFormLayout(DefaultLayout):

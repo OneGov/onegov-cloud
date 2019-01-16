@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-01-14 16:22+0100\n"
+"POT-Creation-Date: 2019-01-16 14:27+0100\n"
 "PO-Revision-Date: 2018-12-08 11:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -123,6 +123,9 @@ msgstr "Reservationen"
 msgid "Notifications"
 msgstr "Mitteilungen"
 
+msgid "Rules"
+msgstr "Regeln"
+
 msgid "Edit allocation"
 msgstr "Einteilung bearbeiten"
 
@@ -160,6 +163,9 @@ msgstr "Publikationen"
 msgid "Delete"
 msgstr "Löschen"
 
+msgid "Add"
+msgstr "Hinzufügen"
+
 msgid "New"
 msgstr "Neu"
 
@@ -175,9 +181,6 @@ msgid ""
 msgstr ""
 "Es existieren Eingaben die mit diesem Formular verknüpft sind. Löschen Sie "
 "diese Eingaben bevor Sie das Formular löschen."
-
-msgid "Add"
-msgstr "Hinzufügen"
 
 msgid "New Note"
 msgstr "Neue Notiz"
@@ -292,6 +295,9 @@ msgstr "Möchten Sie diese Reservations-Ressource wirklich löschen?"
 
 msgid "Delete resource"
 msgstr "Reservations-Ressource löschen"
+
+msgid "Rule"
+msgstr "Regel"
 
 msgid "This event can't be editet."
 msgstr "Diese Veranstaltung kann nicht bearbeitet werden."
@@ -1087,6 +1093,12 @@ msgstr "Bitte geben Sie ein Datum pro Zeile ein"
 msgid "Please enter only day and month"
 msgstr "Bitte geben Sie nur Tag und Monat ein"
 
+msgid "General availability"
+msgstr "Generelle Verfügbarkeit"
+
+msgid "Extend"
+msgstr "Verlängern"
+
 msgid "Except for"
 msgstr "Ausser an"
 
@@ -1116,6 +1128,18 @@ msgstr "Optionen"
 
 msgid "Until"
 msgstr "Bis zum"
+
+msgid "Extend by one day at midnight"
+msgstr "Mitternachts um einen Tag verlängern"
+
+msgid "Extend by one month at the end of the month"
+msgstr "Ende Monat um einen Monat verlängern"
+
+msgid "Extend by one year at the end of the year"
+msgstr "Ende Jahr um ein Jahr verlängern"
+
+msgid "Start date before end date"
+msgstr "Start Datum vor Ende"
 
 msgid "New entries"
 msgstr "Neue Einträge"
@@ -2586,6 +2610,9 @@ msgstr "Noch keine Dateien hochgeladen"
 msgid "The OneGov Cloud Team"
 msgstr "Das OneGov Cloud Team"
 
+msgid "No rules defined."
+msgstr "Keine Regeln definiert."
+
 msgid "Export a vCard of this person"
 msgstr "Elektronische Visitenkarte (vCard)"
 
@@ -3401,12 +3428,54 @@ msgstr "Ein Konto wurde für Sie erstellt"
 msgid "New allocation"
 msgstr "Neue Einteilung"
 
+msgid "New Rule"
+msgstr "Neue Regel"
+
+msgid ""
+"Rules ensure that the allocations between start/end exist and that they are "
+"extended beyond those dates at the given intervals. "
+msgstr ""
+"Regeln stellen sicher dass die Einteilungen zwischen Start und Ende bestehen "
+"und dass sie im gewählten Interval verlängert werden."
+
+msgid "The rule was stopped"
+msgstr "Die Regel wurde gestoppt"
+
+#, python-format
+msgid "The rule was deleted, along with ${n} allocations"
+msgstr "Die Regel wurde gelöscht, zusammen mit ${n} Einteilungen"
+
+#, python-format
+msgid "New rule active, ${n} allocations created"
+msgstr "Regel aktiv, ${n} Einteilungen erstellt"
+
+msgid "Stop"
+msgstr "Stop"
+
 msgid "No allocations to add"
 msgstr "Keine Einteilungen die hinzugefügt werden können"
 
 #, python-format
 msgid "Successfully added ${n} allocations"
 msgstr "${n} Einteilungen wurden hinzugefügt"
+
+#, python-format
+msgid "Do you really want to stop \"${title}\"?"
+msgstr "Möchten Sie \"${title}\" wirklich stoppen?"
+
+msgid "The rule will be removed without affecting existing allocations."
+msgstr "Die Regel wird entfernt, bestehende Einteilungen bleiben."
+
+msgid "Stop rule"
+msgstr "Regel stoppen"
+
+msgid ""
+"All allocations created by the rule will be removed, if they haven't been "
+"reserved yet."
+msgstr "Alle Einteilungen der Regel werden entfernt, sofern nicht reserviert."
+
+msgid "Delete rule"
+msgstr "Regel löschen"
 
 #, python-format
 msgid "Search through ${count} indexed documents"

@@ -97,6 +97,10 @@ a:not([href]):not([role]) {
     cursor: pointer !important;
 }
 
+.confirm {
+    cursor: pointer !important;
+}
+
 .partition-occupied {
     cursor: default !important;
 }
@@ -158,6 +162,13 @@ body {
     color: $body-font-color;
     font-size: 1rem;
     line-height: auto;
+}
+
+/*
+    Small text
+*/
+.small-text {
+    font-size: .875rem;
 }
 
 /*
@@ -1349,6 +1360,7 @@ $payment-capture-icon: '\f09d';
 $payment-refund-icon: '\f0e2';
 $payment-provider-icon: '\f283';
 $payments-icon: '\f09d';
+$rule-link-icon: '\f085';
 $select-icon: '\f14a';
 $send-link-icon: '\f1d9';
 $sync-icon: '\f021';
@@ -1482,6 +1494,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .send-link::before { @include icon($send-link-icon); }
     .subscribe-link::before { @include icon($subscribe-link-icon); }
     .test-link::before { @include icon($test-link-icon); }
+    .rule-link::before { @include icon($rule-link-icon); }
     .sync::before { @include icon($sync-icon); }
     .unmute::before { @include icon($unmute); }
     .upload::before { @include icon($upload-icon); }
@@ -5243,4 +5256,77 @@ h2 + div.timeline {
 
 .DayPicker-NavButton--interactionDisabled {
     display: none;
+}
+
+/*
+    Allocation rules
+*/
+
+.allocation-rules {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    margin: 0;
+
+    .allocation-rule {
+        background: $snow;
+        border-radius: 2px;
+        flex: 0 0 32.66%;
+        margin-bottom: 1rem;
+        margin-right: 1%;
+        position: relative;
+
+        &:nth-child(3n) {
+            margin-right: 0;
+        }
+    }
+
+    @media #{$small-only} {
+        .allocation-rule {
+            flex: 0 0 100%;
+            margin-right: 0;
+        }
+    }
+
+    .allocation-rule-details > div:first-child .field-display:first-of-type {
+        dt {
+            display: none;
+        }
+
+        dd {
+            background: $silver;
+            border-radius: 2px 2px 0 0;
+            font-size: 1rem;
+            font-weight: bold;
+            left: -.5rem ;
+            margin-bottom: -.25rem;
+            padding: 0 8rem .2rem .5rem;
+            position: relative;
+            top: -.5rem;
+            width: calc(100% + 1rem);
+        }
+    }
+
+    .allocation-rule-details {
+        padding: .5rem .5rem 0;
+
+        * {
+            font-size: .8rem;
+        }
+
+        h2 {
+            display: none;
+        }
+
+        dd {
+            margin-bottom: .25rem;
+        }
+    }
+
+    .allocation-rule-actions {
+        font-size: .8rem;
+        position: absolute;
+        right: .5rem;
+        top: .275rem;
+    }
 }

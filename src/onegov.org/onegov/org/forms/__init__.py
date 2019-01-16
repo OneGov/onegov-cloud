@@ -1,3 +1,4 @@
+from onegov.org.forms.allocation import AllocationRuleForm
 from onegov.org.forms.allocation import DaypassAllocationEditForm
 from onegov.org.forms.allocation import DaypassAllocationForm
 from onegov.org.forms.allocation import RoomAllocationEditForm
@@ -34,6 +35,7 @@ from onegov.org.forms.userprofile import UserProfileForm
 
 
 __all__ = [
+    'AllocationRuleForm',
     'AnalyticsSettingsForm',
     'DateRangeForm',
     'DaypassAllocationEditForm',

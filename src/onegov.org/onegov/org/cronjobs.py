@@ -12,6 +12,7 @@ from onegov.org.views.newsletter import send_newsletter
 from onegov.reservation import Reservation, Resource, ResourceCollection
 from onegov.ticket import Ticket, TicketCollection
 from onegov.user import User, UserCollection
+from onegov.org.views.allocation import handle_rules_cronjob
 from sedate import replace_timezone, to_timezone, utcnow, align_date_to_day
 from sqlalchemy import and_
 from sqlalchemy.orm import undefer
@@ -57,6 +58,14 @@ def send_scheduled_newsletter(request):
 
 def publish_files(request):
     FileCollection(request.session).publish_files()
+
+
+@OrgApp.cronjob(hour=23, minute=45, timezone='Europe/Zurich')
+def process_resource_rules(request):
+    resources = ResourceCollection(request.app.libres_context)
+
+    for resource in resources.query():
+        handle_rules_cronjob(resources.bind(resource), request)
 
 
 @OrgApp.cronjob(hour=8, minute=30, timezone='Europe/Zurich')

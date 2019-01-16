@@ -2,11 +2,13 @@ import sedate
 
 from cached_property import cached_property
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 from dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR, SA, SU
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.org import _
-from wtforms.fields import RadioField
+from uuid import uuid4
+from wtforms.fields import StringField, RadioField
 from wtforms.fields.html5 import DateField, IntegerField
 from wtforms.validators import DataRequired, NumberRange, InputRequired
 from wtforms_components import TimeField
@@ -85,6 +87,101 @@ class AllocationFormHelpers(object):
         return False
 
 
+class AllocationRuleForm(Form):
+    """ Base form form allocation rules. """
+
+    title = StringField(
+        label=_("Title"),
+        description=_("General availability"),
+        validators=[InputRequired()],
+        fieldset=_("Rule"))
+
+    extend = RadioField(
+        label=_("Extend"),
+        validators=[InputRequired()],
+        fieldset=_("Rule"),
+        default='daily',
+        choices=(
+            ('daily', _("Extend by one day at midnight")),
+            ('monthly', _("Extend by one month at the end of the month")),
+            ('yearly', _("Extend by one year at the end of the year"))
+        ))
+
+    @cached_property
+    def rule_id(self):
+        return uuid4().hex
+
+    @cached_property
+    def iteration(self):
+        return 0
+
+    @cached_property
+    def last_run(self):
+        None
+
+    @property
+    def rule(self):
+        return {
+            'id': self.rule_id,
+            'title': self.title.data,
+            'extend': self.extend.data,
+            'options': self.options,
+            'iteration': self.iteration,
+            'last_run': self.last_run,
+        }
+
+    @rule.setter
+    def rule(self, value):
+        self.__dict__['rule_id'] = value['id']
+        self.__dict__['iteration'] = value['iteration']
+        self.__dict__['last_run'] = value['last_run']
+
+        self.title.data = value['title']
+        self.extend.data = value['extend']
+
+        for k, v in value['options'].items():
+            if hasattr(self, k):
+                getattr(self, k).data = v
+
+    @property
+    def options(self):
+        return {
+            k: getattr(self, k).data for k in self._fields
+            if k not in ('title', 'extend', 'csrf_token')
+        }
+
+    def apply(self, resource):
+        if self.iteration == 0:
+            dates = self.dates
+        else:
+            unit = {
+                'daily': 'days',
+                'monthly': 'months',
+                'yearly': 'years'
+            }[self.extend.data]
+
+            start = self.end.data + timedelta(days=1)
+            end = self.end.data + relativedelta(**{unit: self.iteration})
+
+            dates = self.generate_dates(
+                start,
+                end,
+                weekdays=self.weekdays
+            )
+
+        data = {**(self.data or {}), 'rule': self.rule_id}
+
+        return len(resource.scheduler.allocate(
+            dates=dates,
+            whole_day=self.whole_day,
+            quota=self.quota,
+            quota_limit=self.quota_limit,
+            data=data,
+            partly_available=self.partly_available,
+            skip_overlapping=True
+        ))
+
+
 class AllocationForm(Form, AllocationFormHelpers):
     """ Baseform for all allocation forms. Allocation forms are expected
     to implement the methods above (which contain a NotImplementedException).
@@ -128,6 +225,12 @@ class AllocationForm(Form, AllocationFormHelpers):
     def on_request(self):
         if not self.request.app.org.holidays:
             self.delete_field('on_holidays')
+
+    def ensure_start_before_end(self):
+        if self.start.data and self.end.data:
+            if self.start.data > self.end.data:
+                self.start.errors.append(_("Start date before end date"))
+                return False
 
     @property
     def weekdays(self):

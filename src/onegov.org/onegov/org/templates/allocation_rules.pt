@@ -1,0 +1,23 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+
+        <p tal:condition="not:rules" i18n:translate>
+            No rules defined.
+        </p>
+
+        <ul class="allocation-rules" tal:condition="rules">
+            <li class="allocation-rule" tal:repeat="rule rules">
+                <div class="allocation-rule-details">
+                    <metal:b use-macro="layout.macros['display_form']" tal:define="form rule['form']" />
+                </div>
+                <div class="allocation-rule-actions text-links">
+                    <tal:b repeat="action rule.actions" content="structure action(layout)" />
+                </div>
+            </li>
+        </ul>
+
+    </tal:b>
+</div>

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to define rules by which allocations are created.
+  [href]
+
 - Adds the ability to skip allocations on holidays.
   [href]
 

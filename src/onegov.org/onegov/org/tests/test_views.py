@@ -4603,3 +4603,208 @@ def test_sign_document(client):
     pdf = FileCollection(client.app.session()).query().one()
     client.get(f'/storage/{pdf.id}/details').click("Löschen")
     assert b'Signierte Datei gel\u00f6scht' in client.get('/timeline').body
+
+
+def test_allocation_rules_on_rooms(client):
+    client.login_admin()
+
+    resources = client.get('/resources')
+
+    page = resources.click('Raum')
+    page.form['title'] = 'Room'
+    page.form.submit()
+
+    def count_allocations():
+        s = '2000-01-01'
+        e = '2050-01-31'
+
+        return len(client.get(f'/resource/room/slots?start={s}&end={e}').json)
+
+    def run_cronjob():
+        client.get(f'/resource/room/process-rules')
+
+    page = client.get('/resource/room').click("Regeln").click("Regel")
+    page.form['title'] = 'Täglich'
+    page.form['extend'] = 'daily'
+    page.form['start'] = '2019-01-01'
+    page.form['end'] = '2019-01-02'
+    page.form['as_whole_day'] = 'yes'
+
+    page.select_checkbox('except_for', "Sa")
+    page.select_checkbox('except_for', "So")
+
+    page = page.form.submit().follow()
+
+    assert 'Regel aktiv, 2 Einteilungen erstellt' in page
+    assert count_allocations() == 2
+
+    # running the cronjob once will add a new allocation
+    with freeze_time('2019-01-02 22:00:00'):
+        run_cronjob()
+
+    assert count_allocations() == 3
+
+    # running it a second time will not as there needs to be enough time
+    # between the two calls for the second one to succeed
+    with freeze_time('2019-01-02 22:00:00'):
+        run_cronjob()
+
+    assert count_allocations() == 3
+
+    with freeze_time('2019-01-03 22:00:00'):
+        run_cronjob()
+
+    assert count_allocations() == 4
+
+    # the next two times won't change anything as those are Saturday, Sunday
+    with freeze_time('2019-01-04 22:00:00'):
+        run_cronjob()
+
+    assert count_allocations() == 4
+
+    with freeze_time('2019-01-05 22:00:00'):
+        run_cronjob()
+
+    assert count_allocations() == 4
+
+    # then the cronjob should pick up again
+    with freeze_time('2019-01-06 22:00:00'):
+        run_cronjob()
+
+    assert count_allocations() == 5
+
+    with freeze_time('2019-01-07 22:00:00'):
+        run_cronjob()
+
+    assert count_allocations() == 6
+
+    # deleting the rule will delete all associated slots (but not others)
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('room')
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    scheduler.allocate(
+        dates=(datetime(2018, 1, 1), datetime(2018, 1, 1)),
+        whole_day=True,
+    )
+
+    transaction.commit()
+
+    assert count_allocations() == 7
+
+    page = client.get('/resource/room').click("Regeln")
+    page.click('Löschen')
+
+    assert count_allocations() == 1
+
+
+def test_allocation_rules_on_daypasses(client):
+    client.login_admin()
+
+    resources = client.get('/resources')
+
+    page = resources.click('Tageskarte', index=0)
+    page.form['title'] = 'Daypass'
+    page.form.submit()
+
+    def count_allocations():
+        s = '2000-01-01'
+        e = '2050-01-31'
+
+        return len(client.get(
+            f'/resource/daypass/slots?start={s}&end={e}').json)
+
+    def run_cronjob():
+        client.get(f'/resource/daypass/process-rules')
+
+    page = client.get('/resource/daypass').click("Regeln").click("Regel")
+    page.form['title'] = 'Monatlich'
+    page.form['extend'] = 'monthly'
+    page.form['start'] = '2019-01-01'
+    page.form['end'] = '2019-01-31'
+    page.form['daypasses'] = '1'
+    page.form['daypasses_limit'] = '1'
+    page = page.form.submit().follow()
+
+    assert 'Regel aktiv, 31 Einteilungen erstellt' in page
+    assert count_allocations() == 31
+
+    # running the cronjob on an ordinary day will not change anything
+    with freeze_time('2019-01-30 22:00:00'):
+        run_cronjob()
+
+    assert count_allocations() == 31
+
+    # only run at the end of the month does it work
+    with freeze_time('2019-01-31 22:00:00'):
+        run_cronjob()
+
+    assert count_allocations() == 59
+
+    # running it a second time on the same day has no effect
+    with freeze_time('2019-01-31 22:00:00'):
+        run_cronjob()
+
+    assert count_allocations() == 59
+
+    # add another month
+    with freeze_time('2019-02-28 22:00:00'):
+        run_cronjob()
+
+    assert count_allocations() == 90
+
+    # let's stop the rule, which should leave existing allocations
+    page = client.get('/resource/daypass').click("Regeln")
+    page.click('Stop')
+
+    page = client.get('/resource/daypass').click("Regeln")
+    assert "Keine Regeln" in page
+    assert count_allocations() == 90
+
+
+def test_allocation_rules_with_holidays(client):
+    client.login_admin()
+
+    page = client.get('/holiday-settings')
+    page.select_checkbox('cantonal_holidays', "Zug")
+    page.form.submit()
+
+    resources = client.get('/resources')
+    page = resources.click('Tageskarte', index=0)
+    page.form['title'] = 'Daypass'
+    page.form.submit()
+
+    def count_allocations():
+        s = '2000-01-01'
+        e = '2050-01-31'
+
+        return len(client.get(
+            f'/resource/daypass/slots?start={s}&end={e}').json)
+
+    def run_cronjob():
+        client.get(f'/resource/daypass/process-rules')
+
+    page = client.get('/resource/daypass').click("Regeln").click("Regel")
+    page.form['title'] = 'Jährlich'
+    page.form['extend'] = 'yearly'
+    page.form['start'] = '2019-01-01'
+    page.form['end'] = '2019-12-31'
+    page.form['daypasses'] = '1'
+    page.form['daypasses_limit'] = '1'
+    page.form['on_holidays'] = 'no'
+    page = page.form.submit().follow()
+
+    assert 'Regel aktiv, 352 Einteilungen erstellt' in page
+    assert count_allocations() == 352
+
+    # running the cronjob on an ordinary day will not change anything
+    with freeze_time('2019-01-31 22:00:00'):
+        run_cronjob()
+
+    assert count_allocations() == 352
+
+    # only run at the end of the year does it work
+    with freeze_time('2019-12-31 22:00:00'):
+        run_cronjob()
+
+    assert count_allocations() == 705
