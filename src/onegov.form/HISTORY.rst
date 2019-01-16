@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes choices in form displays not being translated.
+  [href]
+
 0.41.2 (2019-01-14)
 ~~~~~~~~~~~~~~~~~~~
 

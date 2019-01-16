@@ -5,6 +5,7 @@ import humanize
 from html import escape
 from onegov.core.markdown import render_untrusted_markdown
 from onegov.form import log
+from translationstring import TranslationString
 
 
 __all__ = ['render_field']
@@ -55,6 +56,12 @@ class BaseRenderer(object):
 
     def escape(self, text):
         return escape(text, quote=True)
+
+    def translate(self, field, text):
+        if isinstance(text, TranslationString):
+            return field.gettext(text)
+
+        return text
 
 
 @registry.register_for(
@@ -130,7 +137,9 @@ class UploadFieldRenderer(BaseRenderer):
 class RadioFieldRenderer(BaseRenderer):
 
     def __call__(self, field):
-        return "✓ " + self.escape(dict(field.choices)[field.data])
+        return "✓ " + self.escape(self.translate(
+            field, dict(field.choices)[field.data]
+        ))
 
 
 @registry.register_for('MultiCheckboxField')
@@ -138,7 +147,9 @@ class MultiCheckboxFieldRenderer(BaseRenderer):
 
     def __call__(self, field):
         return "".join(
-            "✓ " + self.escape(dict(field.choices)[value]) + '<br>'
+            "✓ "
+            + self.escape(self.translate(field, dict(field.choices)[value]))
+            + '<br>'
             for value in field.data
         )[:-4]
 
