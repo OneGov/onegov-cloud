@@ -1331,7 +1331,6 @@ $manage-recipients: '\f003';
 $manage-subscribers: '\f0c0';
 $mark-as-paid: '\f058';
 $mark-as-unpaid: '\f057';
-$mute: '\f131';
 $new-daypass-icon: '\f145';
 $new-directory-icon: '\f0e8';
 $new-directory-entry-icon: '\f114';
@@ -1362,7 +1361,6 @@ $sync-icon: '\f021';
 $subscribe-link-icon: '\f0c1';
 $test-link-icon: '\f0e9';
 $occupancy-link-icon: '\f022';
-$unmute: '\f130';
 $upload-icon: '\f0ee';
 $view-link: '\f06e';
 
@@ -1460,7 +1458,6 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .manage-subscribers::before { @include icon($manage-subscribers); }
     .mark-as-paid::before { @include icon($mark-as-paid); }
     .mark-as-unpaid::before { @include icon($mark-as-unpaid); }
-    .mute::before { @include icon($mute); }
     .new-daypass::before { @include icon($new-daypass-icon); }
     .new-directory::before { @include icon($new-directory-icon); }
     .new-directory-entry::before { @include icon($new-directory-entry-icon); }
@@ -1491,7 +1488,6 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .test-link::before { @include icon($test-link-icon); }
     .rule-link::before { @include icon($rule-link-icon); }
     .sync::before { @include icon($sync-icon); }
-    .unmute::before { @include icon($unmute); }
     .upload::before { @include icon($upload-icon); }
     .view-link::before { @include icon($view-link); }
 }
@@ -2435,9 +2431,7 @@ tr.ticket:hover {
     margin: 0;
 }
 
-.new-note,
-.mute,
-.unmute {
+.new-note {
     float: right;
 }
 
@@ -5323,5 +5317,47 @@ h2 + div.timeline {
         position: absolute;
         right: .5rem;
         top: .275rem;
+    }
+}
+
+/*
+    Ticket submitter
+*/
+.ticket-submitter {
+    background: $white-smoke;
+    border-radius: 2px;
+    font-size: .875rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    text-align: left;
+
+    .ticket-submitter-address {
+        max-width: 90%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &.ticket-submitter-muted .ticket-submitter-notification-status > i::before {
+        color: $red;
+    }
+
+    .button {
+        margin: .5rem 0 0;
+        display: block;
+    }
+
+    h2 {
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+    h3 {
+        font-size: .875rem;
+    }
+
+    .ticket-submitter-notification-status > span {
+        display: inline-block;
+        margin-bottom: .5rem;
     }
 }

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-01-16 14:27+0100\n"
+"POT-Creation-Date: 2019-01-17 15:26+0100\n"
 "PO-Revision-Date: 2018-12-08 11:02+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -236,12 +236,6 @@ msgstr "Supprimer le formulaire"
 
 msgid "Accept ticket"
 msgstr "Accepter le ticket"
-
-msgid "Enable E-Mails"
-msgstr "Activer les e-mails"
-
-msgid "Disable E-Mails"
-msgstr "Désactiver les e-mails"
 
 msgid "Refund Payment"
 msgstr "Rembourser le paiement"
@@ -2528,9 +2522,6 @@ msgstr "Sélectionnez les images qui devraient être affichées dans cet album."
 msgid "Confirm selection"
 msgstr "Confirmer la sélection"
 
-msgid "No e-mails will be sent for this ticket."
-msgstr "Aucun e-mail ne sera envoyé pour ce ticket."
-
 msgid ""
 "The record behind this ticket was removed. The following information is a "
 "snapshot kept for future reference."
@@ -2541,8 +2532,17 @@ msgstr ""
 msgid "No activities yet."
 msgstr "Aucune activité pour le moment."
 
-msgid "Ticket Number"
-msgstr "Numéro du ticket"
+msgid "Ticket updates by e-mail"
+msgstr "Mises à jour de billets par e-mail"
+
+msgid "Disable E-Mails"
+msgstr "Désactiver les e-mails"
+
+msgid "No ticket updates by e-mail"
+msgstr "Aucune mise à jour de billets par e-mail"
+
+msgid "Enable E-Mails"
+msgstr "Activer les e-mails"
 
 msgid "Ticket State"
 msgstr "Statut du ticket"
@@ -2749,6 +2749,9 @@ msgstr ""
 
 msgid "Best regards,"
 msgstr "Cordialement,"
+
+msgid "Ticket Number"
+msgstr "Numéro du ticket"
 
 msgid "No photo albums defined yet."
 msgstr "Aucun album photo défini pour le moment."
@@ -3597,6 +3600,9 @@ msgstr "Votre paiement a été retiré"
 
 msgid "Your payment has been refunded"
 msgstr "Votre paiement a été remboursé"
+
+#~ msgid "No e-mails will be sent for this ticket."
+#~ msgstr "Aucun e-mail ne sera envoyé pour ce ticket."
 
 #~ msgid "Bern"
 #~ msgstr "Berne"

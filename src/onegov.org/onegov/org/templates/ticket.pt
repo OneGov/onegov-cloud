@@ -8,9 +8,6 @@
             <!--! note that the following snippet is DUPLICATED below, because when
                   printing this site we want the content panel to be shown first -->
             <div class="columns small-12 medium-8 hide-for-print">
-                <div tal:condition="ticket.muted" class="panel callout" i18n:translate>
-                    No e-mails will be sent for this ticket.
-                </div>
                 <div tal:condition="deleted" class="panel callout" i18n:translate>
                     The record behind this ticket was removed. The following information
                     is a snapshot kept for future reference.
@@ -30,15 +27,44 @@
             <!--! -->
 
             <div class="columns small-12 medium-4">
+                <div class="ticket-submitter ${ticket.muted and 'ticket-submitter-muted' or 'ticket-submitter-unmuted'}">
+                    <h2 i18n:translate>Submitter</h2>
+
+                    <div class="ticket-submitter-address">
+                        <i class="fa fa-fw fa-envelope-o" aria-hidden="true"></i>
+                        <a tal:define="submitter handler.email|ticket.snapshot.email"
+                        href="mailto:${submitter}">${submitter}</a>
+                    </div>
+
+                    <div tal:condition="not:ticket.muted" class="ticket-submitter-notification-status">
+                        <i class="fa fa-fw fa-check" aria-hidden="true"></i>
+
+                        <span i18n:translate>
+                            Ticket updates by e-mail
+                        </span>
+
+                        <a class="button small secondary" href="${request.link(ticket, 'mute')}">
+                            <i class="fa fa-fw fa-microphone-slash" aria-hidden="true"></i>
+                            <span i18n:translate>Disable E-Mails</span>
+                        </a>
+                    </div>
+
+                    <div tal:condition="ticket.muted" class="ticket-submitter-notification-status">
+                        <i class="fa fa-fw fa-times" aria-hidden="true"></i>
+
+                        <span i18n:translate>
+                            No ticket updates by e-mail
+                        </span>
+
+                        <a class="button small secondary" href="${request.link(ticket, 'unmute')}">
+                            <i class="fa fa-fw fa-microphone" aria-hidden="true"></i>
+                            <span i18n:translate>Enable E-Mails</span>
+                        </a>
+                    </div>
+                </div>
+
                 <div class="side-panel highlighted">
                     <div class="field-display ticket-status-page">
-                        <div class="field-display-block">
-                            <div class="field-display-label" i18n:translate>Ticket Number</div>
-                            <div class="field-display-data ticket-number">
-                                ${ticket.number}
-                            </div>
-                        </div>
-
                         <div class="field-display-block">
                             <div class="field-display-label" i18n:translate>Ticket State</div>
                             <div class="field-display-data ticket-state">
@@ -80,13 +106,6 @@
                             <div class="field-display-label" i18n:translate>Owner</div>
                             <div class="field-display-data ticket-owner">
                                 <a href="mailto:${ticket.user.username}">${ticket.user.username}</a>
-                            </div>
-                        </div>
-
-                        <div class="field-display-block" tal:define="submitter handler.email|ticket.snapshot.email|nothing" tal:condition="submitter">
-                            <div class="field-display-label" i18n:translate>Submitter</div>
-                            <div class="field-display-data ticket-submitter">
-                                <a href="mailto:${submitter}">${submitter}</a>
                             </div>
                         </div>
 
