@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.49.0 (2019-01-17)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to define rules by which allocations are created.
   [href]
 
