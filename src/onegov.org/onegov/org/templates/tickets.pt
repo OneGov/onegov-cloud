@@ -26,7 +26,7 @@
                                     </button>
                                     <ul id="owners" data-dropdown-content class="f-dropdown disable-scroll" aria-hidden="true">
                                         <li tal:repeat="link owners">
-                                            <a href="${link.url}" class="${not repeat.link.start and 'ticket-group-filter' or 'ALL-link'}">
+                                            <a href="${link.attrs.href}" class="${not repeat.link.start and 'ticket-group-filter' or 'ALL-link'}">
                                                 <tal:b condition="link.model|nothing">
                                                     <metal:identicon use-macro="layout.macros.identicon" tal:define="initials link.model.initials; username link.model.username" />
                                                 </tal:b>
@@ -39,8 +39,8 @@
 
                                 <span>
                                     <button href="#" data-dropdown="handlers" aria-controls="handlers" aria-expanded="false" class="${has_handler_filter and 'tiny primary radius button dropdown' or 'tiny secondary radius button dropdown'} selected-handler">
-                                        <span i18n:translate class="show-for-sr">Kind:</span> 
-                                        <span class="${' '.join(handler.classes)}">${handler.text}</span>
+                                        <span i18n:translate class="show-for-sr">Kind:</span>
+                                        <span class="${' '.join(handler.attrs['class'])}">${handler.text}</span>
                                     </button>
                                     <ul id="handlers" data-dropdown-content class="f-dropdown disable-scroll" aria-hidden="true">
                                         <li tal:repeat="link handlers"><tal:b replace="structure link(layout)"></tal:b></li>

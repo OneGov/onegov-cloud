@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Moves ticket submitter information into its own box.
+- Moves ticket submitter/payment information into its own box.
   [href]
 
 0.49.0 (2019-01-17)

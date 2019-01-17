@@ -159,6 +159,8 @@ def mark_as_paid(self, request):
     request.assert_valid_csrf_token()
     send_ticket_notifications(self, request, 'marked-as-paid')
 
+    request.success(_("The ticket was marked as paid"))
+
     assert self.source == 'manual'
     self.state = 'paid'
 
@@ -171,6 +173,8 @@ def mark_as_paid(self, request):
 def mark_as_unpaid(self, request):
     request.assert_valid_csrf_token()
     send_ticket_notifications(self, request, 'marked-as-unpaid')
+
+    request.success(_("The ticket was marked as unpaid"))
 
     assert self.source == 'manual'
     self.state = 'open'
@@ -185,6 +189,8 @@ def capture(self, request):
     request.assert_valid_csrf_token()
     send_ticket_notifications(self, request, 'captured')
 
+    request.success(_("The payment was captured"))
+
     assert self.source == 'stripe_connect'
     self.charge.capture()
 
@@ -197,6 +203,8 @@ def capture(self, request):
 def refund(self, request):
     request.assert_valid_csrf_token()
     send_ticket_notifications(self, request, 'refunded')
+
+    request.success(_("The payment was refunded"))
 
     assert self.source == 'stripe_connect'
     self.refund()

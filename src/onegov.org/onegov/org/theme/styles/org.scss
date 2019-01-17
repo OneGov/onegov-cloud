@@ -1456,8 +1456,6 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .internal-url::before { @include icon($internal-link-icon); }
     .manage-recipients::before { @include icon($manage-recipients); }
     .manage-subscribers::before { @include icon($manage-subscribers); }
-    .mark-as-paid::before { @include icon($mark-as-paid); }
-    .mark-as-unpaid::before { @include icon($mark-as-unpaid); }
     .new-daypass::before { @include icon($new-daypass-icon); }
     .new-directory::before { @include icon($new-directory-icon); }
     .new-directory-entry::before { @include icon($new-directory-entry-icon); }
@@ -1478,9 +1476,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .new-user::before { @include icon($new-user-icon); }
     .occupancy-link::before { @include icon($occupancy-link-icon); }
     .paste-link::before { @include icon($paste-link-icon); }
-    .payment-capture::before { @include icon($payment-capture-icon); }
     .payment-provider::before { @include icon($payment-provider-icon); }
-    .payment-refund::before { @include icon($payment-refund-icon); }
     .payments::before { @include icon($payments-icon); }
     .select::before { @include icon($select-icon); }
     .send-link::before { @include icon($send-link-icon); }
@@ -1491,6 +1487,11 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .upload::before { @include icon($upload-icon); }
     .view-link::before { @include icon($view-link); }
 }
+
+.mark-as-paid::before { @include icon($mark-as-paid); }
+.mark-as-unpaid::before { @include icon($mark-as-unpaid); }
+.payment-capture::before { @include icon($payment-capture-icon); }
+.payment-refund::before { @include icon($payment-refund-icon); }
 
 /*
     reservation actions popup
@@ -5321,16 +5322,44 @@ h2 + div.timeline {
 }
 
 /*
-    Ticket submitter
+    Ticket panels
 */
-.ticket-submitter {
+.ticket-panel {
     background: $white-smoke;
     border-radius: 2px;
-    font-size: .875rem;
     margin-bottom: 1rem;
     padding: 1rem;
-    text-align: left;
 
+    * {
+        font-size: .875rem;
+    }
+
+    h2 {
+        font-size: 1rem;
+        font-weight: bold;
+        margin-top: -1px;
+    }
+
+    .button {
+        display: block;
+        font-size: .875rem;
+        margin: .5rem 0 0;
+
+        &::before {
+            width: 1.28571429em;
+        }
+    }
+
+    .field-display-block + .field-display-block {
+        margin-top: .5rem;
+    }
+
+    .field-display-block + .button {
+        margin-top: 1rem;
+    }
+}
+
+.ticket-submitter {
     .ticket-submitter-address {
         max-width: 90%;
         overflow: hidden;
@@ -5340,20 +5369,6 @@ h2 + div.timeline {
 
     &.ticket-submitter-muted .ticket-submitter-notification-status > i::before {
         color: $red;
-    }
-
-    .button {
-        margin: .5rem 0 0;
-        display: block;
-    }
-
-    h2 {
-        font-size: 1rem;
-        font-weight: bold;
-    }
-
-    h3 {
-        font-size: .875rem;
     }
 
     .ticket-submitter-notification-status > span {

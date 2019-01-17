@@ -6,7 +6,7 @@ from onegov.core.custom import json
 from onegov.core.orm import as_selectable
 from onegov.core.security import Public, Private
 from onegov.org import _, OrgApp
-from onegov.org.elements import Link
+from onegov.org.new_elements import Link, Intercooler, Confirm
 from onegov.org.forms import TicketNoteForm
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import TicketLayout
@@ -37,25 +37,121 @@ def view_ticket(self, request):
         handler.refresh()
         summary = handler.get_summary(request)
 
-    if self.handler.payment:
-        self.handler.payment.sync()
+    if handler.payment:
+        handler.payment.sync()
 
     messages = MessageCollection(
         request.session,
         channel_id=self.number
     )
 
+    # if we have a payment, show the payment button
+    layout = TicketLayout(self, request)
+    payment_button = None
+
+    if self.state == 'pending':
+        payment = handler.payment
+
+        if payment and payment.source == 'manual':
+            payment_button = get_manual_payment_button(payment, layout)
+
+        if payment and payment.source == 'stripe_connect':
+            payment_button = get_stripe_payment_button(payment, layout)
+
     return {
         'title': self.number,
-        'layout': TicketLayout(self, request),
+        'layout': layout,
         'ticket': self,
         'summary': summary,
         'deleted': handler.deleted,
         'handler': handler,
+        'payment_button': payment_button,
         'feed_data': json.dumps(
             view_messages_feed(messages, request)
         ),
     }
+
+
+def get_manual_payment_button(payment, layout):
+    if payment.state == 'open':
+        return Link(
+            text=_("Mark as paid"),
+            url=layout.csrf_protected_url(
+                layout.request.link(payment, 'mark-as-paid'),
+            ),
+            attrs={'class': 'mark-as-paid button small secondary'},
+            traits=(
+                Intercooler(
+                    request_method='POST',
+                    redirect_after=layout.request.url,
+                ),
+            )
+        )
+
+    return Link(
+        text=_("Mark as unpaid"),
+        url=layout.csrf_protected_url(
+            layout.request.link(payment, 'mark-as-unpaid'),
+        ),
+        attrs={'class': 'mark-as-unpaid button small secondary'},
+        traits=(
+            Intercooler(
+                request_method='POST',
+                redirect_after=layout.request.url,
+            ),
+        )
+    )
+
+
+def get_stripe_payment_button(payment, layout):
+    if payment.state == 'open':
+        return Link(
+            text=_("Capture Payment"),
+            url=layout.csrf_protected_url(
+                layout.request.link(payment, 'capture')
+            ),
+            attrs={'class': 'payment-capture button small secondary'},
+            traits=(
+                Confirm(
+                    _("Do you really want capture the payment?"),
+                    _(
+                        "This usually happens automatically, so there is "
+                        "no reason not do capture the payment."
+                    ),
+                    _("Capture payment")
+                ),
+                Intercooler(
+                    request_method='POST',
+                    redirect_after=layout.request.url
+                ),
+            )
+        )
+
+    if payment.state == 'paid':
+        amount = '{:02f} {}'.format(payment.amount, payment.currency)
+
+        return Link(
+            text=_("Refund Payment"),
+            url=layout.csrf_protected_url(
+                layout.request.link(payment, 'refund')
+            ),
+            attrs={'class': 'payment-refund button small secondary'},
+            traits=(
+                Confirm(
+                    _("Do you really want to refund ${amount}?", mapping={
+                        'amount': amount
+                    }),
+                    _("This cannot be undone."),
+                    _("Refund ${amount}", mapping={
+                        'amount': amount
+                    })
+                ),
+                Intercooler(
+                    request_method='POST',
+                    redirect_after=layout.request.url
+                )
+            )
+        )
 
 
 def send_email_if_enabled(ticket, request, template, subject):
@@ -304,7 +400,7 @@ def view_tickets(self, request):
                 text=text,
                 url=request.link(self.for_state(id)),
                 active=self.state == id,
-                classes=('ticket-filter-' + id, )
+                attrs={'class': 'ticket-filter-' + id}
             )
 
     def get_handlers():
@@ -329,7 +425,7 @@ def view_tickets(self, request):
                 text=text,
                 url=request.link(self.for_handler(id).for_group(None)),
                 active=self.handler == id and self.group is None,
-                classes=classes
+                attrs={'class': ' '.join(classes)}
             )
 
             if parent:
@@ -363,7 +459,9 @@ def view_tickets(self, request):
                 text=group,
                 url=request.link(base.for_group(group)),
                 active=self.handler == handler and self.group == group,
-                classes=(handler + '-sub-link', 'ticket-group-filter')
+                attrs={'class': ' '.join(
+                    (handler + '-sub-link', 'ticket-group-filter')
+                )}
             )
 
     if self.state == 'open':

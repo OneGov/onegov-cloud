@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-01-17 15:26+0100\n"
+"POT-Creation-Date: 2019-01-17 16:37+0100\n"
 "PO-Revision-Date: 2018-12-08 11:02+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -186,15 +186,6 @@ msgstr ""
 msgid "New Note"
 msgstr "Nouveau commentaire"
 
-msgid "Mark as paid"
-msgstr "Marquer comme payé"
-
-msgid "Mark as unpaid"
-msgstr "Marquer comme non payé"
-
-msgid "Capture Payment"
-msgstr "Capturer le paiement"
-
 msgid "Recipients"
 msgstr "Destinataires"
 
@@ -237,9 +228,6 @@ msgstr "Supprimer le formulaire"
 msgid "Accept ticket"
 msgstr "Accepter le ticket"
 
-msgid "Refund Payment"
-msgstr "Rembourser le paiement"
-
 msgid "This resource can't be deleted."
 msgstr "Cette ressource ne peut être supprimée."
 
@@ -269,19 +257,6 @@ msgstr "Supprimer la personne"
 
 msgid "Close ticket"
 msgstr "Fermer le ticket"
-
-msgid "Do you really want capture the payment?"
-msgstr "Voulez-vous vraiment capturer le paiement ?"
-
-msgid ""
-"This usually happens automatically, so there is no reason not do capture the"
-" payment."
-msgstr ""
-"Cela arrive généralement automatiquement, il n'y a donc aucune raison de ne "
-"pas capturer le paiement."
-
-msgid "Capture payment"
-msgstr "Capturer le paiement"
 
 msgid "Do you really want to delete this resource?"
 msgstr "Voulez-vous vraiment supprimer cette ressource ?"
@@ -325,14 +300,6 @@ msgstr "Personne"
 
 msgid "Reopen ticket"
 msgstr "Ré-ouvrir le ticket"
-
-#, python-format
-msgid "Do you really want to refund ${amount}?"
-msgstr "Voulez-vous vraiment rembourser ${amount} ?"
-
-#, python-format
-msgid "Refund ${amount}"
-msgstr "Rembourser ${amount}"
 
 msgid "Room"
 msgstr "Espace"
@@ -2533,28 +2500,22 @@ msgid "No activities yet."
 msgstr "Aucune activité pour le moment."
 
 msgid "Ticket updates by e-mail"
-msgstr "Mises à jour de billets par e-mail"
+msgstr "Mises à jour de tickets par e-mail"
 
 msgid "Disable E-Mails"
 msgstr "Désactiver les e-mails"
 
 msgid "No ticket updates by e-mail"
-msgstr "Aucune mise à jour de billets par e-mail"
+msgstr "Aucune mise à jour de tickets par e-mail"
 
 msgid "Enable E-Mails"
 msgstr "Activer les e-mails"
 
-msgid "Ticket State"
-msgstr "Statut du ticket"
+msgid "Amount"
+msgstr "Montant"
 
-msgid "Payment Amount"
-msgstr "Montant du paiement"
-
-msgid "Payment State"
-msgstr "État de paiement"
-
-msgid "Payment Source"
-msgstr "Source de paiement"
+msgid "Source"
+msgstr "Source"
 
 msgid "Owner"
 msgstr "Propriétaire"
@@ -3095,6 +3056,9 @@ msgstr "Vous avez activé les e-mails pour le ticket ${number}"
 msgid "Your request has been submitted"
 msgstr "Votre demande a été envoyée"
 
+msgid "Mark as unpaid"
+msgstr "Marquer comme non payé"
+
 msgid "Your note was added"
 msgstr "Votre note a été ajoutée"
 
@@ -3103,6 +3067,15 @@ msgstr "Votre demande est actuellement en attente"
 
 msgid "Ticket Status"
 msgstr "Statut du ticket"
+
+msgid "Mark as paid"
+msgstr "Marquer comme payé"
+
+msgid "Capture Payment"
+msgstr "Capturer le paiement"
+
+msgid "Refund Payment"
+msgstr "Rembourser le paiement"
 
 msgid "The ticket cannot be accepted because it's not open"
 msgstr "Le ticket ne peut pas être accepté car il n'est pas ouvert"
@@ -3139,6 +3112,27 @@ msgstr "Votre ticket a été réouvert"
 
 msgid "All Users"
 msgstr "Tous les utilisateurs"
+
+msgid "Do you really want capture the payment?"
+msgstr "Voulez-vous vraiment capturer le paiement ?"
+
+msgid ""
+"This usually happens automatically, so there is no reason not do capture the"
+" payment."
+msgstr ""
+"Cela arrive généralement automatiquement, il n'y a donc aucune raison de ne "
+"pas capturer le paiement."
+
+msgid "Capture payment"
+msgstr "Capturer le paiement"
+
+#, python-format
+msgid "Do you really want to refund ${amount}?"
+msgstr "Voulez-vous vraiment rembourser ${amount} ?"
+
+#, python-format
+msgid "Refund ${amount}"
+msgstr "Rembourser ${amount}"
 
 #, python-format
 msgid "the subscription for ${address} was successfully confirmed"
@@ -3600,6 +3594,30 @@ msgstr "Votre paiement a été retiré"
 
 msgid "Your payment has been refunded"
 msgstr "Votre paiement a été remboursé"
+
+msgid "The ticket was marked as paid"
+msgstr "Le ticket a été marqué comme payé"
+
+msgid "The ticket was marked as unpaid"
+msgstr "Le ticket a été marqué comme non payé"
+
+msgid "The payment was captured"
+msgstr "Le paiement a été saisi"
+
+msgid "The payment was refunded"
+msgstr "Le paiement a été remboursé"
+
+#~ msgid "Ticket State"
+#~ msgstr "Statut du ticket"
+
+#~ msgid "Payment Amount"
+#~ msgstr "Montant du paiement"
+
+#~ msgid "Payment State"
+#~ msgstr "État de paiement"
+
+#~ msgid "Payment Source"
+#~ msgstr "Source de paiement"
 
 #~ msgid "No e-mails will be sent for this ticket."
 #~ msgstr "Aucun e-mail ne sera envoyé pour ce ticket."

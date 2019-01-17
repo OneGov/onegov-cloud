@@ -6,7 +6,7 @@
         <div class="panel" tal:condition="ticket.state in {'open', 'closed'}">
             <tal:b metal:use-macro="layout.macros['ticket_status_page_message']" />
         </div>
-        <div class="field-display ticket-status-page">
+        <div class="field-display">
             <div class="field-display-label" i18n:translate>Ticket Number</div>
             <div class="field-display-data ticket-number">
                 <tal:b condition="request.is_manager">
