@@ -93,16 +93,11 @@ a:not([href]):not([role]) {
     cursor: default;
 }
 
-.fc-event {
-    cursor: pointer !important;
-}
-
-.confirm {
-    cursor: pointer !important;
-}
-
+.button,
+.confirm,
+.fc-event,
 .partition-occupied {
-    cursor: default !important;
+    cursor: pointer !important;
 }
 
 /*
