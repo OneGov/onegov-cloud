@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.7.4 (2019-01-18)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds an expats attribute to elections and votes.
   [msom]
