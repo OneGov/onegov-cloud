@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Hides the absolute majority for intermediate results.
+  [msom]
+
 3.8.0 (2018-12-20)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -320,7 +320,7 @@
             </li>
             <li tal:condition="layout.majorz and election.majority_type=='absolute'">
                 <span i18n:translate="">Absolute majority</span>
-                <strong tal:condition="election.absolute_majority">${layout.format_number(election.absolute_majority or 0)}</strong>
+                <strong tal:condition="election.absolute_majority and layout.completed">${layout.format_number(election.absolute_majority or 0)}</strong>
             </li>
         </ul>
     </tal:block>

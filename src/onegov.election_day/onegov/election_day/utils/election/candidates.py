@@ -54,6 +54,7 @@ def get_candidates_data(election, request):
         election.type == 'majorz'
         and election.majority_type == 'absolute'
         and election.absolute_majority is not None
+        and election.completed
     ):
         majority = election.absolute_majority
 
