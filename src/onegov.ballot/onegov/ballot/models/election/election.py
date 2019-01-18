@@ -254,6 +254,10 @@ class Election(Base, ContentMixin, TimestampMixin,
     #: may be used to mark an election as a tacit election
     tacit = meta_property('tacit', default=False)
 
+    #: may be used to indicate that the vote contains expats as seperate
+    #: resultas (typically with entity_id = 0)
+    expats = meta_property('expats', default=False)
+
     #: may be used to mark an election as distinct, e.g. a regional election
     #: containing only the municipalities of one district of a canton.
     distinct = meta_property('distinct', default=True)

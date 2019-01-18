@@ -230,6 +230,10 @@ class Vote(Base, ContentMixin, TimestampMixin,
     #: may be used to store a link related to this vote
     related_link = meta_property('related_link')
 
+    #: may be used to indicate that the vote contains expats as seperate
+    #: resultas (typically with entity_id = 0)
+    expats = meta_property('expats', default=False)
+
     def clear_results(self):
         """ Clear all the results. """
 
