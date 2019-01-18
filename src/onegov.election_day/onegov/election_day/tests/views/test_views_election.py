@@ -1,5 +1,6 @@
 from datetime import date
 from freezegun import freeze_time
+from math import isclose
 from onegov.election_day.tests.common import login
 from onegov.election_day.tests.common import MAJORZ_HEADER
 from onegov.election_day.tests.common import upload_majorz_election
@@ -75,9 +76,9 @@ def test_view_election_candidate_by_entity(election_day_app_gr):
             for option in view.pyquery('option')
         }
         assert data['Engler']['3503']['counted'] is True
-        assert data['Engler']['3503']['percentage'] == 100 * 20 / 41
+        assert isclose(data['Engler']['3503']['percentage'], 100 * 20 / 21)
         assert data['Schmid']['3503']['counted'] is True
-        assert data['Schmid']['3503']['percentage'] == 100 * 18 / 41
+        assert isclose(data['Schmid']['3503']['percentage'], 100 * 18 / 21)
 
     for url in (
         '/election/proporz-election/candidate-by-entity',
@@ -92,7 +93,7 @@ def test_view_election_candidate_by_entity(election_day_app_gr):
             for option in view.pyquery('option')
         }
         assert data['Caluori']['3503']['counted'] is True
-        assert data['Caluori']['3503']['percentage'] == 100 * 2 / 153
+        assert isclose(data['Caluori']['3503']['percentage'], 100 * 2 / 31)
         assert data['Casanova']['3503']['counted'] is True
         assert data['Casanova']['3503']['percentage'] == 0.0
 
