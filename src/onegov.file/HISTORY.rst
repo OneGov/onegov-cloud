@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.13.1 (2019-01-18)
+~~~~~~~~~~~~~~~~~~~
+
 - Enables onegov.chat to use onegov.file and vice versa (circular import).
   [href]
 
