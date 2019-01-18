@@ -4,7 +4,8 @@ from onegov.chat import MessageCollection
 from onegov.core.custom import json
 from onegov.core.security import Private
 from onegov.core.templates import render_template
-from onegov.file import File, FileMessage
+from onegov.file import File
+from onegov.file.models.file_message import FileMessage
 from onegov.org import OrgApp, _
 from onegov.org.layout import MessageCollectionLayout
 from onegov.user import User
