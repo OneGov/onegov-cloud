@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes invalid allocation error for certain rules.
+  [href]
+
 - Moves ticket submitter/payment information into its own box.
   [href]
 

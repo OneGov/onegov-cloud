@@ -163,9 +163,18 @@ class AllocationRuleForm(Form):
             start = self.end.data + timedelta(days=1)
             end = self.end.data + relativedelta(**{unit: self.iteration})
 
+            if hasattr(self, 'start_time'):
+                start_time = self.start_time.data
+                end_time = self.end_time.data
+            else:
+                start_time = None
+                end_time = None
+
             dates = self.generate_dates(
                 start,
                 end,
+                start_time=start_time,
+                end_time=end_time,
                 weekdays=self.weekdays
             )
 
