@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.49.2 (2019-01-18)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds support for latest onegov.file release.
   [href]
 
