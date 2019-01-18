@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.2.0 (2019-01-18)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to store files with messages.
   [href]
 
