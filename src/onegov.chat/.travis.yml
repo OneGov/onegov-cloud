@@ -2,6 +2,10 @@ cache: pip
 
 addons:
     postgresql: "9.6"
+    apt:
+      packages:
+        - ghostscript
+        - libpoppler-cpp-dev
 
 matrix:
   include:
