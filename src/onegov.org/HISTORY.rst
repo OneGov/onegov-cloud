@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.49.1 (2019-01-18)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes invalid allocation error for certain rules.
   [href]
 
