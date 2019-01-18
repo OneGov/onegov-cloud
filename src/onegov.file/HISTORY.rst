@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Enables onegov.chat to use onegov.file and vice versa (circular import).
+  [href]
+
 - Fixes depot files not being cleaned when using associations.
   [href]
 

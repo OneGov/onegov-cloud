@@ -19,7 +19,7 @@ from onegov.file.collection import FileCollection
 from onegov.file.errors import AlreadySignedError
 from onegov.file.errors import InvalidTokenError
 from onegov.file.errors import TokenConfigurationError
-from onegov.file.models import File, FileMessage
+from onegov.file.models import File
 from onegov.file.sign import SigningService
 from onegov.file.utils import digest, current_dir
 from pathlib import Path
@@ -279,6 +279,7 @@ class DepotApp(App):
 
         file.signed = True
 
+        from onegov.file.models.file_message import FileMessage  # circular
         FileMessage.log_signature(file, signee)
 
         session.flush()
@@ -483,6 +484,7 @@ def delete_file(self, request):
     request.assert_valid_csrf_token()
 
     if self.signed:
+        from onegov.file.models.file_message import FileMessage  # circular
         FileMessage.log_signed_file_removal(self, request.current_username)
 
     FileCollection(request.session).delete(self)

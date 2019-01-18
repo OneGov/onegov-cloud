@@ -15,7 +15,8 @@ from io import BytesIO
 from onegov.core import Framework
 from onegov.core.security.rules import has_permission_not_logged_in
 from onegov.core.utils import scan_morepath_modules, module_path, is_uuid
-from onegov.file import DepotApp, File, FileCollection, FileMessage
+from onegov.file import DepotApp, File, FileCollection
+from onegov.file.models.file_message import FileMessage
 from onegov.file.integration import SUPPORTED_STORAGE_BACKENDS, delete_file
 from onegov_testing.utils import create_image
 from onegov.core.utils import Bunch

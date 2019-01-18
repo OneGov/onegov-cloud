@@ -1,6 +1,5 @@
 from datetime import timedelta
 from depot.io.utils import file_from_content
-from onegov.chat import Message
 from onegov.file.models import File, FileSet
 from onegov.file.utils import as_fileintent, digest
 from sedate import utcnow
@@ -205,6 +204,8 @@ class FileCollection(object):
 
         if match:
             return match.signature_metadata
+
+        from onegov.chat import Message  # circular import
 
         match = self.session.query(Message).filter_by(type='file').filter(or_(
             text(
