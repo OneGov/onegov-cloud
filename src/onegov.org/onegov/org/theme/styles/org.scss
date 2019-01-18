@@ -3650,6 +3650,8 @@ ul.search-results {
     Ticket summary customisations
 */
 .ticket-summary {
+    margin-bottom: 1.5rem;
+
     h2 {
         font-size: $h3-font-size;
     }
@@ -3666,12 +3668,16 @@ ul.search-results {
         font-size: $h6-font-size;
     }
 
+    dd {
+        margin-bottom: .5rem;
+    }
+
     .reservations {
         list-style: none;
         margin: 0;
 
         li {
-            margin-bottom: 1.5rem;
+            margin-bottom: .5rem;
         }
     }
 }
@@ -4410,7 +4416,18 @@ h2 + div.timeline {
         line-height: 1.5 !important;
     }
 
+    .ticket-summary h2,
+    .ticket-timeline h2 {
+        font-weight: bold;
+    }
+
+    .ticket-submitter-notification-status {
+        display: none;
+    }
+
     .ticket-summary {
+        margin-bottom: 0;
+
         * {
             font-size: 12px !important;
         }
@@ -4420,8 +4437,29 @@ h2 + div.timeline {
         }
     }
 
+    .ticket-panel *,
     .ticket-timeline * {
         font-size: 12px !important;
+    }
+
+    .ticket-panel {
+        background: $white !important;
+        display: flex;
+        flex-wrap: wrap;
+        padding: 0 !important;
+
+        > * {
+            margin: 0 1rem 0 0 !important;
+        }
+
+        > h2 {
+            flex: 0 0 100%;
+            margin-bottom: .25rem !important;
+        }
+    }
+
+    .ticket-panel .button {
+        display: none !important;
     }
 
     .timeline {

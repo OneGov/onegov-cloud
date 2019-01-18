@@ -142,6 +142,7 @@
                     is a snapshot kept for future reference.
                 </div>
                 <div class="ticket-summary">
+                    <h2 i18n:translate>Summary</h2>
                     <tal:b replace="structure summary" />
                 </div>
 
