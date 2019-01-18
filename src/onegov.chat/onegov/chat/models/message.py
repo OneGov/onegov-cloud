@@ -1,7 +1,9 @@
 import sedate
 
 from onegov.core.orm import Base
+from onegov.core.orm.abstract import associated
 from onegov.core.orm.types import JSON, UTCDateTime
+from onegov.file import File
 from sqlalchemy import Column, Text
 from sqlalchemy import event
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -44,6 +46,9 @@ class Message(Base):
     #: the time this message was modified - not taken from the timestamp mixin
     #: because here we don't want it to be deferred
     modified = Column(UTCDateTime, onupdate=sedate.utcnow)
+
+    #: a single optional file associated with this message
+    file = associated(File, 'file', 'one-to-one')
 
     __mapper_args__ = {
         'order_by': id
