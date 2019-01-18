@@ -21,8 +21,8 @@ def test_candidate_percentages(session):
         district='1',
         entity_id=1,
         counted=True,
-        eligible_voters=1000,
-        received_ballots=500,
+        eligible_voters=2000,
+        received_ballots=1015,
         blank_ballots=10,
         invalid_ballots=5,
         blank_votes=80,
@@ -33,10 +33,10 @@ def test_candidate_percentages(session):
         district='1',
         entity_id=2,
         counted=True,
-        eligible_voters=100,
-        received_ballots=50,
-        blank_ballots=1,
-        invalid_ballots=0,
+        eligible_voters=2000,
+        received_ballots=1005,
+        blank_ballots=3,
+        invalid_ballots=2,
         blank_votes=8,
         invalid_votes=1
     )
@@ -107,13 +107,13 @@ def test_candidate_percentages(session):
     election_result_1.candidate_results.append(
         CandidateResult(
             candidate_id=candidate_1.id,
-            votes=52,
+            votes=50,
         )
     )
     election_result_1.candidate_results.append(
         CandidateResult(
             candidate_id=candidate_2.id,
-            votes=11
+            votes=10
         )
     )
     election_result_1.candidate_results.append(
@@ -139,7 +139,7 @@ def test_candidate_percentages(session):
     election_result_2.candidate_results.append(
         CandidateResult(
             candidate_id=candidate_1.id,
-            votes=20
+            votes=30
         )
     )
     election_result_2.candidate_results.append(
@@ -159,38 +159,38 @@ def test_candidate_percentages(session):
     session.flush()
 
     assert candidate_1.percentage_by_entity == {
-        1: {'counted': True, 'percentage': 100 * 52 / 285},
-        2: {'counted': True, 'percentage': 100 * 20 / 40},
+        1: {'counted': True, 'percentage': 100 * 50 / 1000},
+        2: {'counted': True, 'percentage': 100 * 30 / 1000},
         3: {'counted': False, 'percentage': 0.0},
         4: {'counted': True, 'percentage': 0.0}
     }
     assert candidate_2.percentage_by_entity == {
-        1: {'counted': True, 'percentage': 100 * 11 / 285},
+        1: {'counted': True, 'percentage': 100 * 10 / 1000},
         2: {'counted': True, 'percentage': 0.0},
         3: {'counted': False, 'percentage': 0.0},
         4: {'counted': True, 'percentage': 0.0}
     }
     assert candidate_3.percentage_by_entity == {
-        1: {'counted': True, 'percentage': 100 * 20 / 285},
+        1: {'counted': True, 'percentage': 100 * 20 / 1000},
         2: {'counted': True, 'percentage': 0.0},
         3: {'counted': False, 'percentage': 0.0},
         4: {'counted': True, 'percentage': 0.0}
     }
     assert candidate_4.percentage_by_entity == {
-        1: {'counted': True, 'percentage': 100 * 1 / 285},
+        1: {'counted': True, 'percentage': 100 * 1 / 1000},
         2: {'counted': True, 'percentage': 0.0},
         3: {'counted': False, 'percentage': 0.0},
         4: {'counted': True, 'percentage': 0.0}
     }
     assert candidate_5.percentage_by_entity == {
         1: {'counted': True, 'percentage': 0.0},
-        2: {'counted': True, 'percentage': 100 * 5 / 40},
+        2: {'counted': True, 'percentage': 100 * 5 / 1000},
         3: {'counted': False, 'percentage': 0.0},
         4: {'counted': True, 'percentage': 0.0}
     }
 
     assert candidate_1.percentage_by_district == {
-        '1': {'counted': True, 'entities': [1, 2], 'percentage': 7200 / 325},
+        '1': {'counted': True, 'entities': [1, 2], 'percentage': 8000 / 2000},
         '2': {'counted': False, 'entities': [3, 4], 'percentage': 0.0}
     }
     assert candidate_2.percentage_by_district == {
@@ -206,6 +206,6 @@ def test_candidate_percentages(session):
         '2': {'counted': False, 'entities': [3, 4], 'percentage': 0.0}
     }
     assert candidate_5.percentage_by_district == {
-        '1': {'counted': True, 'entities': [1, 2], 'percentage': 500 / 325},
+        '1': {'counted': True, 'entities': [1, 2], 'percentage': 500 / 2000},
         '2': {'counted': False, 'entities': [3, 4], 'percentage': 0.0}
     }

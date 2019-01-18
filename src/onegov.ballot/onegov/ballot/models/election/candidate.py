@@ -86,7 +86,7 @@ class Candidate(Base, TimestampMixin):
         results = results.with_entities(
             ElectionResult.entity_id.label('id'),
             ElectionResult.counted.label('counted'),
-            ElectionResult.accounted_votes.label('total'),
+            ElectionResult.accounted_ballots.label('total'),
             CandidateResult.votes.label('votes')
         )
         results = results.all()
@@ -126,7 +126,7 @@ class Candidate(Base, TimestampMixin):
             func.coalesce(
                 func.bool_and(ElectionResult.counted), False
             ).label('counted'),
-            func.sum(ElectionResult.accounted_votes).label('total'),
+            func.sum(ElectionResult.accounted_ballots).label('total'),
             func.sum(CandidateResult.votes).label('votes'),
         )
         results = results.group_by(ElectionResult.district)

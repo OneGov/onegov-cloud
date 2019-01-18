@@ -4,6 +4,9 @@ Changelog
 - Adds an expats attribute to elections and votes.
   [msom]
 
+- Fixes calcualtion of the candidates percentages by entity and district.
+  [msom]
+
 3.7.3 (2018-11-27)
 ~~~~~~~~~~~~~~~~~~~
 
