@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes association proxy not working properly with some polymorphic classes.
+  [href]
+
 0.75.0 (2019-01-11)
 ~~~~~~~~~~~~~~~~~~~
 

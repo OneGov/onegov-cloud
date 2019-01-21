@@ -65,7 +65,7 @@ from sqlalchemy import Table
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import object_session
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import backref, relationship
 
 
 class RegisteredLink(namedtuple("RegisteredLink", (
@@ -137,7 +137,7 @@ def associated(associated_cls, attribute_name, cardinality='one-to-many',
         )
         key = '{}_id'.format(cls.__tablename__)
         target = '{}.id'.format(cls.__tablename__)
-        backref = 'linked_{}'.format(cls.__tablename__)
+        backref_name = 'linked_{}'.format(cls.__tablename__)
 
         association_key = associated_cls.__name__.lower() + '_id'
         association_id = associated_cls.id
@@ -151,12 +151,30 @@ def associated(associated_cls, attribute_name, cardinality='one-to-many',
         assert issubclass(associated_cls, Associable)
 
         associated_cls.register_link(
-            backref, cls, association, key, attribute_name, cardinality)
+            backref_name, cls, association, key, attribute_name, cardinality)
 
         return relationship(
             argument=associated_cls,
             secondary=association,
-            backref=backref,
+            # The reference from the files class back to the target class fails
+            # to account for polymorphic identities.
+            #
+            # I think this cannot be fixed, as the file class would have to
+            # keep track of the polymorphic class in question through a
+            # separate column and a loading strategy that takes that into
+            # account.
+            #
+            # As a result we disable type-checks here. Note that the target
+            # class may have to override __eq__ and __hash__ to get cascades
+            # to work properly.
+            #
+            # Have a look at onegov.chat.models.Message to see how that has
+            # been done.
+            backref=backref(
+                backref_name,
+                enable_typechecks=False
+            ),
+            active_history=True,
             single_parent=single_parent,
             cascade=cascade,
             uselist=uselist,
