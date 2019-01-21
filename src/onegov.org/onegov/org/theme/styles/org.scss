@@ -3652,6 +3652,10 @@ ul.search-results {
 .ticket-summary {
     margin-bottom: 1.5rem;
 
+    > div {
+        margin-bottom: 1rem;
+    }
+
     h2 {
         font-size: $h3-font-size;
     }
