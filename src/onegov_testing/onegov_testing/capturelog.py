@@ -67,21 +67,14 @@ class CaptureLogHandler(logging.StreamHandler):
     def __init__(self):
         """Creates a new log handler."""
 
-        logging.StreamHandler.__init__(self)
-        self.stream = py.io.TextIO()
+        super().__init__(stream=py.io.TextIO())
         self.records = []
-
-    def close(self):
-        """Close this log handler and its underlying stream."""
-
-        logging.StreamHandler.close(self)
-        self.stream.close()
 
     def emit(self, record):
         """Keep the log records in a list in addition to the log text."""
 
         self.records.append(record)
-        logging.StreamHandler.emit(self, record)
+        return super().emit(record)
 
 
 class CaptureLogFuncArg(object):
