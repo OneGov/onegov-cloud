@@ -114,6 +114,18 @@ class UploadFileWithORMSupport(UploadField):
         self.file_class = kwargs.pop('file_class')
         super().__init__(*args, **kwargs)
 
+    def create(self):
+        if not self.file:
+            return None
+
+        self.file.filename = self.filename
+        self.file.seek(0)
+
+        return self.file_class(
+            name=self.filename,
+            reference=as_fileintent(self.file, self.filename)
+        )
+
     def populate_obj(self, obj, name):
         if not getattr(self, 'action', None):
             return
@@ -125,14 +137,8 @@ class UploadFileWithORMSupport(UploadField):
             setattr(obj, name, None)
 
         elif self.action == 'replace':
-            if self.file:
-                self.file.filename = self.filename
-                self.file.seek(0)
+            setattr(obj, name, self.create())
 
-                setattr(obj, name, self.file_class(
-                    name=self.filename,
-                    reference=as_fileintent(self.file, self.filename)
-                ))
         else:
             raise NotImplementedError(f"Unknown action: {self.action}")
 
