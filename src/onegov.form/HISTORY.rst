@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.41.4 (2019-01-21)
+~~~~~~~~~~~~~~~~~~~
 
 - Refactors upload widget slightly to improve access to uploads.
   [href]
