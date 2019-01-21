@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves support for files attached to messages.
+  [href]
+
 0.2.0 (2019-01-18)
 ~~~~~~~~~~~~~~~~~~~~~
 

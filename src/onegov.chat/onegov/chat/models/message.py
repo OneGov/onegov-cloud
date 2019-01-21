@@ -10,6 +10,10 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from ulid import ulid
 
 
+class MessageFile(File):
+    __mapper_args__ = {'polymorphic_identity': 'messagefile'}
+
+
 class Message(Base):
     """ A single chat message bound to channel. """
 
@@ -53,6 +57,22 @@ class Message(Base):
     __mapper_args__ = {
         'order_by': id
     }
+
+    # we need to override __hash__ and __eq__ to establish the equivalence of
+    # polymorphic subclasses that differ - we need to compare the base class
+    # with subclasses to work around a limitation of the association proxy
+    # (see backref in onegov.core.orm.abstract.associable.associated)
+    def __hash__(self):
+        return super().__hash__()
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__) \
+                and self.id == other.id\
+                and self.channel_id == other.channel_id:
+
+            return True
+
+        return super().__eq__(other)
 
     def get(self, request):
         """ Code rendering a message should call this method to get the

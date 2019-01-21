@@ -1,3 +1,3 @@
-from onegov.chat.models.message import Message
+from onegov.chat.models.message import Message, MessageFile
 
-__all__ = ['Message']
+__all__ = ('Message', 'MessageFile')
