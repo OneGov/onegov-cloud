@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.50.0 (2019-01-22)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to attach files to ticket notes.
   [href]
 
