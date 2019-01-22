@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Removes unused active history on association proxy.
+  [href]
+
 0.75.1 (2019-01-21)
 ~~~~~~~~~~~~~~~~~~~
 

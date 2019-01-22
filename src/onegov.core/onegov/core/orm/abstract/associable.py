@@ -174,7 +174,6 @@ def associated(associated_cls, attribute_name, cardinality='one-to-many',
                 backref_name,
                 enable_typechecks=False
             ),
-            active_history=True,
             single_parent=single_parent,
             cascade=cascade,
             uselist=uselist,
