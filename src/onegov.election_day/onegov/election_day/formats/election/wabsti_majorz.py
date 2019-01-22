@@ -198,6 +198,10 @@ def import_election_wabsti_majorz(
                     c_result.candidate_id = candidate.id
                     result.candidate_results.append(c_result)
 
+            # Skip expats if not enabled
+            if result and result.entity_id == 0 and not election.expats:
+                continue
+
             # Pass the errors and continue to next line
             if line_errors:
                 errors.extend(

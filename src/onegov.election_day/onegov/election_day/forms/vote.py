@@ -1,6 +1,7 @@
 from datetime import date
 from onegov.election_day import _
 from onegov.form import Form
+from wtforms import BooleanField
 from wtforms import RadioField
 from wtforms import StringField
 from wtforms.fields.html5 import DateField
@@ -27,6 +28,11 @@ class VoteForm(Form):
         validators=[
             InputRequired()
         ]
+    )
+
+    expats = BooleanField(
+        label=_("Expats"),
+        render_kw=dict(force_simple=True)
     )
 
     date = DateField(
@@ -138,6 +144,7 @@ class VoteForm(Form):
     def update_model(self, model):
         model.date = self.date.data
         model.domain = self.domain.data
+        model.expats = self.expats.data
         model.shortcode = self.shortcode.data
         model.related_link = self.related_link.data
 
@@ -184,6 +191,7 @@ class VoteForm(Form):
 
         self.date.data = model.date
         self.domain.data = model.domain
+        self.expats.data = model.expats
         self.shortcode.data = model.shortcode
         self.related_link.data = model.related_link
 

@@ -27,6 +27,7 @@ def test_import_wabsti_vote(session, tar_file):
 
     # Test federal results
     principal = Canton(canton='sg')
+    vote.expats = True
     for number, yeas, nays, yeas_p, nays_p, turnout in (
         (1, 102759, 91138, 53.0, 47.0, 61.7),
         (2, 90715, 106942, 45.9, 54.1, 62.4),
@@ -202,7 +203,7 @@ def test_import_wabsti_vote_invalid_values(session):
                 )),
                 ','.join((
                     '0',  # Vorlage-Nr.',
-                    '0',  # BfS-Nr.',
+                    '1701',  # BfS-Nr.',
                     '100',  # Stimmberechtigte',
                     '0',  # leere SZ',
                     '0',  # ungültige SZ',
@@ -219,7 +220,7 @@ def test_import_wabsti_vote_invalid_values(session):
                 )),
                 ','.join((
                     '0',  # Vorlage-Nr.',
-                    '0',  # BfS-Nr.',
+                    '1701',  # BfS-Nr.',
                     '100',  # Stimmberechtigte',
                     '0',  # leere SZ',
                     '0',  # ungültige SZ',
@@ -265,7 +266,7 @@ def test_import_wabsti_vote_invalid_values(session):
         (2, 'Could not read yeas'),
         (2, 'Invalid id'),
         (2, 'Invalid values'),
-        (4, '0 was found twice'),
+        (4, '1701 was found twice'),
         (5, '4448 is unknown')
     ]
 
@@ -278,113 +279,123 @@ def test_import_wabsti_vote_expats(session):
     vote = session.query(Vote).one()
     principal = Canton(canton='zg')
 
-    errors = import_vote_wabsti(
-        vote, principal, 0,
-        BytesIO((
-            '\n'.join((
-                ','.join((
-                    'Vorlage-Nr.',
-                    'BfS-Nr.',
-                    'Stimmberechtigte',
-                    'leere SZ',
-                    'ungültige SZ',
-                    'Ja',
-                    'Nein',
-                    'InitOAntw',
-                    'GegenvJa',
-                    'GegenvNein',
-                    'GegenvOAntw',
-                    'StichfrJa',
-                    'StichfrNein',
-                    'StichfrOAntw',
-                    'StimmBet',
-                )),
-                ','.join((
-                    '0',  # Vorlage-Nr.',
-                    '9170',  # BfS-Nr.',
-                    '100',  # Stimmberechtigte',
-                    '1',  # leere SZ',
-                    '1',  # ungültige SZ',
-                    '20',  # Ja',
-                    '10',  # Nein',
-                    '0',  # InitOAntw',
-                    '0',  # GegenvJa',
-                    '0',  # GegenvNein',
-                    '0',  # GegenvOAntw',
-                    '0',  # StichfrJa',
-                    '0',  # StichfrNein',
-                    '0',  # StichfrOAntw',
-                    '10.0',  # StimmBet',
-                )),
-                ','.join((
-                    '0',  # Vorlage-Nr.',
-                    '0',  # BfS-Nr.',
-                    '100',  # Stimmberechtigte',
-                    '1',  # leere SZ',
-                    '1',  # ungültige SZ',
-                    '20',  # Ja',
-                    '10',  # Nein',
-                    '0',  # InitOAntw',
-                    '0',  # GegenvJa',
-                    '0',  # GegenvNein',
-                    '0',  # GegenvOAntw',
-                    '0',  # StichfrJa',
-                    '0',  # StichfrNein',
-                    '0',  # StichfrOAntw',
-                    '10.0',  # StimmBet',
-                )),
-            ))
-        ).encode('utf-8')),
-        'text/plain'
-    )
-    assert [(e.line, e.error.interpolate()) for e in errors] == [
-        (3, '0 was found twice'),
-    ]
+    for expats in (False, True):
+        vote.expats = expats
+        errors = import_vote_wabsti(
+            vote, principal, 0,
+            BytesIO((
+                '\n'.join((
+                    ','.join((
+                        'Vorlage-Nr.',
+                        'BfS-Nr.',
+                        'Stimmberechtigte',
+                        'leere SZ',
+                        'ungültige SZ',
+                        'Ja',
+                        'Nein',
+                        'InitOAntw',
+                        'GegenvJa',
+                        'GegenvNein',
+                        'GegenvOAntw',
+                        'StichfrJa',
+                        'StichfrNein',
+                        'StichfrOAntw',
+                        'StimmBet',
+                    )),
+                    ','.join((
+                        '0',  # Vorlage-Nr.',
+                        '9170',  # BfS-Nr.',
+                        '100',  # Stimmberechtigte',
+                        '1',  # leere SZ',
+                        '1',  # ungültige SZ',
+                        '20',  # Ja',
+                        '10',  # Nein',
+                        '0',  # InitOAntw',
+                        '0',  # GegenvJa',
+                        '0',  # GegenvNein',
+                        '0',  # GegenvOAntw',
+                        '0',  # StichfrJa',
+                        '0',  # StichfrNein',
+                        '0',  # StichfrOAntw',
+                        '10.0',  # StimmBet',
+                    )),
+                    ','.join((
+                        '0',  # Vorlage-Nr.',
+                        '0',  # BfS-Nr.',
+                        '100',  # Stimmberechtigte',
+                        '1',  # leere SZ',
+                        '1',  # ungültige SZ',
+                        '20',  # Ja',
+                        '10',  # Nein',
+                        '0',  # InitOAntw',
+                        '0',  # GegenvJa',
+                        '0',  # GegenvNein',
+                        '0',  # GegenvOAntw',
+                        '0',  # StichfrJa',
+                        '0',  # StichfrNein',
+                        '0',  # StichfrOAntw',
+                        '10.0',  # StimmBet',
+                    )),
+                ))
+            ).encode('utf-8')),
+            'text/plain'
+        )
+        errors = [(e.line, e.error.interpolate()) for e in errors]
+        if expats:
+            assert errors == [(3, '0 was found twice')]
+        else:
+            assert errors == [(None, 'No data found')]
 
-    errors = import_vote_wabsti(
-        vote, principal, 0,
-        BytesIO((
-            '\n'.join((
-                ','.join((
-                    'Vorlage-Nr.',
-                    'BfS-Nr.',
-                    'Stimmberechtigte',
-                    'leere SZ',
-                    'ungültige SZ',
-                    'Ja',
-                    'Nein',
-                    'InitOAntw',
-                    'GegenvJa',
-                    'GegenvNein',
-                    'GegenvOAntw',
-                    'StichfrJa',
-                    'StichfrNein',
-                    'StichfrOAntw',
-                    'StimmBet',
-                )),
-                ','.join((
-                    '0',  # Vorlage-Nr.',
-                    '9170',  # BfS-Nr.',
-                    '100',  # Stimmberechtigte',
-                    '1',  # leere SZ',
-                    '1',  # ungültige SZ',
-                    '20',  # Ja',
-                    '10',  # Nein',
-                    '0',  # InitOAntw',
-                    '0',  # GegenvJa',
-                    '0',  # GegenvNein',
-                    '0',  # GegenvOAntw',
-                    '0',  # StichfrJa',
-                    '0',  # StichfrNein',
-                    '0',  # StichfrOAntw',
-                    '10.0',  # StimmBet',
-                )),
-            ))
-        ).encode('utf-8')),
-        'text/plain'
-    )
-    assert not errors
-    assert vote.proposal.results.filter_by(entity_id=0).one().yeas == 20
+        errors = import_vote_wabsti(
+            vote, principal, 0,
+            BytesIO((
+                '\n'.join((
+                    ','.join((
+                        'Vorlage-Nr.',
+                        'BfS-Nr.',
+                        'Stimmberechtigte',
+                        'leere SZ',
+                        'ungültige SZ',
+                        'Ja',
+                        'Nein',
+                        'InitOAntw',
+                        'GegenvJa',
+                        'GegenvNein',
+                        'GegenvOAntw',
+                        'StichfrJa',
+                        'StichfrNein',
+                        'StichfrOAntw',
+                        'StimmBet',
+                    )),
+                    ','.join((
+                        '0',  # Vorlage-Nr.',
+                        '9170',  # BfS-Nr.',
+                        '100',  # Stimmberechtigte',
+                        '1',  # leere SZ',
+                        '1',  # ungültige SZ',
+                        '20',  # Ja',
+                        '10',  # Nein',
+                        '0',  # InitOAntw',
+                        '0',  # GegenvJa',
+                        '0',  # GegenvNein',
+                        '0',  # GegenvOAntw',
+                        '0',  # StichfrJa',
+                        '0',  # StichfrNein',
+                        '0',  # StichfrOAntw',
+                        '10.0',  # StimmBet',
+                    )),
+                ))
+            ).encode('utf-8')),
+            'text/plain'
+        )
+        errors = [(e.line, e.error.interpolate()) for e in errors]
+        result = vote.proposal.results.filter_by(entity_id=0).first()
+        if expats:
+            assert errors == []
+            assert result.yeas == 20
+        else:
+            assert errors == [(None, 'No data found')]
+            assert result is None
 
 
 def test_import_wabsti_vote_temporary_results(session):
@@ -418,7 +429,7 @@ def test_import_wabsti_vote_temporary_results(session):
                 )),
                 ','.join((
                     '0',  # Vorlage-Nr.',
-                    '0',  # BfS-Nr.',
+                    '1703',  # BfS-Nr.',
                     '100',  # Stimmberechtigte',
                     '1',  # leere SZ',
                     '1',  # ungültige SZ',
@@ -474,7 +485,7 @@ def test_import_wabsti_vote_temporary_results(session):
     assert not errors
     assert sorted(
         (v.entity_id for v in vote.proposal.results.filter_by(counted=True))
-    ) == [0, 1701]
+    ) == [1701, 1703]
     assert sorted(
         (v.entity_id for v in vote.proposal.results.filter_by(counted=False))
-    ) == [1702, 1703, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711]
+    ) == [1702, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711]

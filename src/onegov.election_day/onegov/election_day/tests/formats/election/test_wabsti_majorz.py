@@ -324,41 +324,48 @@ def test_import_wabsti_majorz_expats(session):
     election = session.query(Election).one()
     principal = Canton(canton='sg')
 
-    for entity_id in (9170, 0):
-        errors = import_election_wabsti_majorz(
-            election, principal,
-            BytesIO((
-                '\n'.join((
-                    ','.join((
-                        'AnzMandate',
-                        'BFS',
-                        'StimmBer',
-                        'StimmAbgegeben',
-                        'StimmLeer',
-                        'StimmUngueltig',
-                        'KandName_1',
-                        'Stimmen_1',
-                        'KandName_2',
-                        'Stimmen_2',
-                    )),
-                    ','.join((
-                        '',
-                        str(entity_id),
-                        '100',
-                        '90',
-                        '1',
-                        '1',
-                        'Leere Zeilen',
-                        '0',
-                        'Ungültige Stimmen',
-                        '1'
-                    )),
-                ))
-            ).encode('utf-8')), 'text/plain'
-        )
-
-        assert not errors
-        assert election.results.filter_by(entity_id=0).one().invalid_votes == 1
+    for expats in (False, True):
+        election.expats = expats
+        for entity_id in (9170, 0):
+            errors = import_election_wabsti_majorz(
+                election, principal,
+                BytesIO((
+                    '\n'.join((
+                        ','.join((
+                            'AnzMandate',
+                            'BFS',
+                            'StimmBer',
+                            'StimmAbgegeben',
+                            'StimmLeer',
+                            'StimmUngueltig',
+                            'KandName_1',
+                            'Stimmen_1',
+                            'KandName_2',
+                            'Stimmen_2',
+                        )),
+                        ','.join((
+                            '',
+                            str(entity_id),
+                            '100',
+                            '90',
+                            '1',
+                            '1',
+                            'Leere Zeilen',
+                            '0',
+                            'Ungültige Stimmen',
+                            '1'
+                        )),
+                    ))
+                ).encode('utf-8')), 'text/plain'
+            )
+            errors = [(e.line, e.error.interpolate()) for e in errors]
+            result = election.results.filter_by(entity_id=0).first()
+            if expats:
+                assert errors == []
+                assert result.invalid_votes == 1
+            else:
+                assert errors == [(None, 'No data found')]
+                assert result is None
 
 
 def test_import_wabsti_majorz_temporary_results(session):

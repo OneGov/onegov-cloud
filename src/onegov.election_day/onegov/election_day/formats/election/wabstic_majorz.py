@@ -137,6 +137,7 @@ def import_election_wabstic_majorz(
             if absolute_majority == -1:
                 absolute_majority = None
 
+        # Pass the errors and continue to next line
         if line_errors:
             errors.extend(
                 FileImportError(
@@ -174,6 +175,11 @@ def import_election_wabstic_majorz(
         except ValueError:
             line_errors.append(_("Could not read the eligible voters"))
 
+        # Skip expats if not enabled
+        if entity_id == 0 and not election.expats:
+            continue
+
+        # Pass the errors and continue to next line
         if line_errors:
             errors.extend(
                 FileImportError(
@@ -206,6 +212,7 @@ def import_election_wabstic_majorz(
 
             if entity_id not in added_entities:
                 # Only add it if present (there is there no SortGeschaeft)
+                # .. this also skips expats if not enabled
                 continue
 
         entity = added_entities[entity_id]
@@ -244,6 +251,7 @@ def import_election_wabstic_majorz(
             entity['blank_votes'] = blank_votes
             entity['invalid_votes'] = invalid_votes
 
+        # Pass the errors and continue to next line
         if line_errors:
             errors.extend(
                 FileImportError(
@@ -279,6 +287,7 @@ def import_election_wabstic_majorz(
                 party=party
             )
 
+        # Pass the errors and continue to next line
         if line_errors:
             errors.extend(
                 FileImportError(
@@ -304,9 +313,14 @@ def import_election_wabstic_majorz(
         except (ValueError, AssertionError):
             line_errors.append(_("Invalid candidate results"))
         else:
+            if entity_id == 0 and not election.expats:
+                # Skip expats if not enabled
+                continue
+
             if entity_id not in added_entities:
                 line_errors.append(_("Invalid entity values"))
 
+        # Pass the errors and continue to next line
         if line_errors:
             errors.extend(
                 FileImportError(

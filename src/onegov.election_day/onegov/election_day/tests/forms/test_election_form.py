@@ -62,6 +62,7 @@ def test_election_form_model(session):
     model.related_link = 'http://u.rl'
     model.tacit = False
     model.distinct = False
+    model.expats = False
 
     form = ElectionForm()
     form.apply_model(model)
@@ -79,6 +80,7 @@ def test_election_form_model(session):
     assert form.related_link.data == 'http://u.rl'
     assert form.tacit.data is False
     assert form.distinct.data is False
+    assert form.expats.data is False
 
     form.election_de.data = 'An Election (DE)'
     form.election_fr.data = 'An Election (FR)'
@@ -94,6 +96,7 @@ def test_election_form_model(session):
     form.related_link.data = 'http://ur.l'
     form.tacit.data = True
     form.distinct.data = True
+    form.expats.data = True
 
     form.update_model(model)
 
@@ -112,6 +115,7 @@ def test_election_form_model(session):
     assert model.related_link == 'http://ur.l'
     assert model.tacit is True
     assert model.distinct is True
+    assert model.expats is True
 
 
 def test_election_form_relations(session):

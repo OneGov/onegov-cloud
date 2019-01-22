@@ -64,6 +64,11 @@ class ElectionForm(Form):
         render_kw=dict(force_simple=True)
     )
 
+    expats = BooleanField(
+        label=_("Expats"),
+        render_kw=dict(force_simple=True)
+    )
+
     distinct = BooleanField(
         label=_("Distinct district"),
         render_kw=dict(force_simple=True),
@@ -156,6 +161,7 @@ class ElectionForm(Form):
         model.absolute_majority = self.absolute_majority.data or None
         model.related_link = self.related_link.data
         model.tacit = self.tacit.data
+        model.expats = self.expats.data
         model.distinct = self.distinct.data
 
         titles = {}
@@ -203,6 +209,7 @@ class ElectionForm(Form):
         self.absolute_majority.data = model.absolute_majority
         self.related_link.data = model.related_link
         self.tacit.data = model.tacit
+        self.expats.data = model.expats
         self.distinct.data = model.distinct
 
         if model.type == 'majorz':

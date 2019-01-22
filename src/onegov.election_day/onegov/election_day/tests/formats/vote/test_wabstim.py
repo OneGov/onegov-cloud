@@ -228,47 +228,53 @@ def test_import_wabstim_vote_expats(session):
     vote = session.query(Vote).one()
     principal = Municipality(municipality='3427')
 
-    errors = import_vote_wabstim(
-        vote, principal,
-        BytesIO((
-            '\n'.join((
-                ','.join((
-                    'Freigegeben',
-                    'StiLeer',
-                    'StiUngueltig',
-                    'StiJaHG',
-                    'StiNeinHG',
-                    'StiOhneAwHG',
-                    'StiJaN1',
-                    'StiNeinN1',
-                    'StiOhneAwN1',
-                    'StiJaN2',
-                    'StiNeinN2',
-                    'StiOhneAwN2',
-                    'Stimmberechtigte',
-                    'BFS',
-                )),
-                ','.join((
-                    '14:15',  # Freigegeben
-                    '0',  # StiLeer
-                    '0',  # StiUngueltig
-                    '10',  # StiJaHG
-                    '20',  # StiNeinHG
-                    '',  # StiOhneAwHG
-                    '',  # StiJaN1
-                    '',  # StiNeinN1
-                    '',  # StiOhneAwN1
-                    '',  # StiJaN2
-                    '',  # StiNeinN2
-                    '',  # StiOhneAwN2
-                    '100',  # Stimmberechtigte
-                    '0',  # BFS
-                )),
-            ))
-        ).encode('utf-8')),
-        'text/plain',
-    )
-    assert '0 is unknown' in [e.error.interpolate() for e in errors]
+    for expats in (False, True):
+        vote.expats = expats
+        errors = import_vote_wabstim(
+            vote, principal,
+            BytesIO((
+                '\n'.join((
+                    ','.join((
+                        'Freigegeben',
+                        'StiLeer',
+                        'StiUngueltig',
+                        'StiJaHG',
+                        'StiNeinHG',
+                        'StiOhneAwHG',
+                        'StiJaN1',
+                        'StiNeinN1',
+                        'StiOhneAwN1',
+                        'StiJaN2',
+                        'StiNeinN2',
+                        'StiOhneAwN2',
+                        'Stimmberechtigte',
+                        'BFS',
+                    )),
+                    ','.join((
+                        '14:15',  # Freigegeben
+                        '0',  # StiLeer
+                        '0',  # StiUngueltig
+                        '10',  # StiJaHG
+                        '20',  # StiNeinHG
+                        '',  # StiOhneAwHG
+                        '',  # StiJaN1
+                        '',  # StiNeinN1
+                        '',  # StiOhneAwN1
+                        '',  # StiJaN2
+                        '',  # StiNeinN2
+                        '',  # StiOhneAwN2
+                        '100',  # Stimmberechtigte
+                        '0',  # BFS
+                    )),
+                ))
+            ).encode('utf-8')),
+            'text/plain',
+        )
+        errors = [e.error.interpolate() for e in errors]
+        if expats:
+            assert errors == []
+        else:
+            assert errors == ['No data found']
 
 
 def test_import_wabstim_vote_temporary_results(session):

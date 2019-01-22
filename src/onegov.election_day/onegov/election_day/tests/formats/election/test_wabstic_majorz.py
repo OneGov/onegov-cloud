@@ -19,6 +19,7 @@ def test_import_wabstic_majorz(session, tar_file):
             domain='canton',
             date=date(2016, 2, 28),
             number_of_mandates=6,
+            expats=True
         )
     )
     session.flush()
@@ -292,103 +293,110 @@ def test_import_wabstic_majorz_expats(session):
     election = session.query(Election).one()
     principal = Canton(canton='sg')
 
-    for entity_id in ('9170', '0'):
-        errors = import_election_wabstic_majorz(
-            election, principal, '0', '0',
-            BytesIO((
-                '\n'.join((
-                    ','.join((
-                        'SortGeschaeft',
-                        'AbsolutesMehr',
-                        'Ausmittlungsstand',
-                    )),
-                    ','.join((
-                        '0',
-                        '5000',  # AbsolutesMehr
-                        '0',  # Ausmittlungsstand
-                    )),
-                ))
-            ).encode('utf-8')), 'text/plain',
-            BytesIO((
-                '\n'.join((
-                    ','.join((
-                        'SortWahlkreis',
-                        'SortGeschaeft',
-                        'BfsNrGemeinde',
-                        'Stimmberechtigte',
-                    )),
-                    ','.join((
-                        '0',
-                        '0',
-                        entity_id,  # BfsNrGemeinde
-                        '10000',  # Stimmberechtigte
-                    )),
-                ))
-            ).encode('utf-8')), 'text/plain',
-            BytesIO((
-                '\n'.join((
-                    ','.join((
-                        'BfsNrGemeinde',
-                        'Stimmberechtigte',
-                        'Sperrung',
-                        'StmAbgegeben',
-                        'StmLeer',
-                        'StmUngueltig',
-                        'StimmenLeer',
-                        'StimmenUngueltig',
-                    )),
-                    ','.join((
-                        entity_id,  # BfsNrGemeinde
-                        '10000',  # Stimmberechtigte
-                        '',  # Sperrung
-                        '',  # StmAbgegeben
-                        '',  # StmLeer
-                        '1',  # StmUngueltig
-                        '',  # StimmenLeer
-                        '1',  # StimmenUngueltig
-                    )),
-                ))
-            ).encode('utf-8')), 'text/plain',
-            BytesIO((
-                '\n'.join((
-                    ','.join((
-                        'SortGeschaeft',
-                        'KNR',
-                        'Nachname',
-                        'Vorname',
-                        'Gewahlt',
-                        'Partei',
-                    )),
-                    ','.join((
-                        '0',
-                        '1',  # KNR
-                        'xxx',  # Nachname
-                        'xxx',  # Vorname
-                        '',  # Gewahlt
-                        '',  # Partei
-                    )),
-                ))
-            ).encode('utf-8')), 'text/plain',
-            BytesIO((
-                '\n'.join((
-                    ','.join((
-                        'SortGeschaeft',
-                        'BfsNrGemeinde',
-                        'KNR',
-                        'Stimmen',
-                    )),
-                    ','.join((
-                        '0',
-                        entity_id,  # BfsNrGemeinde
-                        '1',  # KNR
-                        '10',  # Stimmen
-                    )),
-                ))
-            ).encode('utf-8')), 'text/plain'
-        )
-
-        assert not errors
-        assert election.results.filter_by(entity_id=0).one().invalid_votes == 1
+    for expats in (False, True):
+        election.expats = expats
+        for entity_id in ('9170', '0'):
+            errors = import_election_wabstic_majorz(
+                election, principal, '0', '0',
+                BytesIO((
+                    '\n'.join((
+                        ','.join((
+                            'SortGeschaeft',
+                            'AbsolutesMehr',
+                            'Ausmittlungsstand',
+                        )),
+                        ','.join((
+                            '0',
+                            '5000',  # AbsolutesMehr
+                            '0',  # Ausmittlungsstand
+                        )),
+                    ))
+                ).encode('utf-8')), 'text/plain',
+                BytesIO((
+                    '\n'.join((
+                        ','.join((
+                            'SortWahlkreis',
+                            'SortGeschaeft',
+                            'BfsNrGemeinde',
+                            'Stimmberechtigte',
+                        )),
+                        ','.join((
+                            '0',
+                            '0',
+                            entity_id,  # BfsNrGemeinde
+                            '10000',  # Stimmberechtigte
+                        )),
+                    ))
+                ).encode('utf-8')), 'text/plain',
+                BytesIO((
+                    '\n'.join((
+                        ','.join((
+                            'BfsNrGemeinde',
+                            'Stimmberechtigte',
+                            'Sperrung',
+                            'StmAbgegeben',
+                            'StmLeer',
+                            'StmUngueltig',
+                            'StimmenLeer',
+                            'StimmenUngueltig',
+                        )),
+                        ','.join((
+                            entity_id,  # BfsNrGemeinde
+                            '10000',  # Stimmberechtigte
+                            '',  # Sperrung
+                            '',  # StmAbgegeben
+                            '',  # StmLeer
+                            '1',  # StmUngueltig
+                            '',  # StimmenLeer
+                            '1',  # StimmenUngueltig
+                        )),
+                    ))
+                ).encode('utf-8')), 'text/plain',
+                BytesIO((
+                    '\n'.join((
+                        ','.join((
+                            'SortGeschaeft',
+                            'KNR',
+                            'Nachname',
+                            'Vorname',
+                            'Gewahlt',
+                            'Partei',
+                        )),
+                        ','.join((
+                            '0',
+                            '1',  # KNR
+                            'xxx',  # Nachname
+                            'xxx',  # Vorname
+                            '',  # Gewahlt
+                            '',  # Partei
+                        )),
+                    ))
+                ).encode('utf-8')), 'text/plain',
+                BytesIO((
+                    '\n'.join((
+                        ','.join((
+                            'SortGeschaeft',
+                            'BfsNrGemeinde',
+                            'KNR',
+                            'Stimmen',
+                        )),
+                        ','.join((
+                            '0',
+                            entity_id,  # BfsNrGemeinde
+                            '1',  # KNR
+                            '10',  # Stimmen
+                        )),
+                    ))
+                ).encode('utf-8')), 'text/plain'
+            )
+            errors = [(e.line, e.error.interpolate()) for e in errors]
+            result = election.results.filter_by(entity_id=0).first()
+            if expats:
+                assert errors == []
+                assert result.invalid_votes == 1
+            else:
+                assert errors == []
+                assert result is None
 
 
 def test_import_wabstic_majorz_temporary_results(session):

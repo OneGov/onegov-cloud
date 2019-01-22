@@ -60,9 +60,6 @@ def parse_election_result(line, errors, entities):
         blank_votes = int(line.entity_blank_votes or 0)
         invalid_votes = int(line.entity_invalid_votes or 0)
 
-        if not eligible_voters:
-            raise ValueError()
-
     except ValueError:
         errors.append(_("Invalid entity values"))
     else:
@@ -242,6 +239,10 @@ def import_election_internal_proporz(election, principal, file, mimetype):
         list_result = parse_list_result(line, line_errors)
         connection, subconnection = parse_connection(line, line_errors)
         parse_panachage_results(line, line_errors, panachage)
+
+        # Skip expats if not enabled
+        if result and result.entity_id == 0 and not election.expats:
+            continue
 
         # Pass the errors and continue to next line
         if line_errors:

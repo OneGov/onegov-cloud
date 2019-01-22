@@ -234,68 +234,78 @@ def test_import_default_vote_expats(session):
     vote = session.query(Vote).one()
     principal = Canton(canton='zg')
 
-    errors = import_vote_default(
-        vote, principal, 'proposal',
-        BytesIO((
-            '\n'.join((
-                ','.join((
-                    'ID',
-                    'Ja Stimmen',
-                    'Nein Stimmen',
-                    'Ungültige Stimmzettel',
-                    'Leere Stimmzettel',
-                    'Stimmberechtigte',
-                )),
-                ','.join((
-                    '9170',  # ID
-                    '20',  # Ja Stimmen
-                    '10',  # Nein Stimmen
-                    '0',  # Ungültige Stimmzettel
-                    '0',  # Leere Stimmzettel
-                    '100',  # Stimmberechtigte
-                )),
-                ','.join((
-                    '0',  # ID
-                    '20',  # Ja Stimmen
-                    '10',  # Nein Stimmen
-                    '0',  # Ungültige Stimmzettel
-                    '0',  # Leere Stimmzettel
-                    '100',  # Stimmberechtigte
-                )),
-            ))
-        ).encode('utf-8')),
-        'text/plain'
-    )
-    assert [(e.line, e.error.interpolate()) for e in errors] == [
-        (3, '0 was found twice'),
-    ]
+    for expats in (False, True):
+        vote.expats = expats
+        errors = import_vote_default(
+            vote, principal, 'proposal',
+            BytesIO((
+                '\n'.join((
+                    ','.join((
+                        'ID',
+                        'Ja Stimmen',
+                        'Nein Stimmen',
+                        'Ungültige Stimmzettel',
+                        'Leere Stimmzettel',
+                        'Stimmberechtigte',
+                    )),
+                    ','.join((
+                        '9170',  # ID
+                        '20',  # Ja Stimmen
+                        '10',  # Nein Stimmen
+                        '0',  # Ungültige Stimmzettel
+                        '0',  # Leere Stimmzettel
+                        '100',  # Stimmberechtigte
+                    )),
+                    ','.join((
+                        '0',  # ID
+                        '20',  # Ja Stimmen
+                        '10',  # Nein Stimmen
+                        '0',  # Ungültige Stimmzettel
+                        '0',  # Leere Stimmzettel
+                        '100',  # Stimmberechtigte
+                    )),
+                ))
+            ).encode('utf-8')),
+            'text/plain'
+        )
+        errors = [(e.line, e.error.interpolate()) for e in errors]
+        if expats:
+            assert errors == [(3, '0 was found twice')]
+        else:
+            assert errors == [(None, 'No data found')]
 
-    errors = import_vote_default(
-        vote, principal, 'proposal',
-        BytesIO((
-            '\n'.join((
-                ','.join((
-                    'ID',
-                    'Ja Stimmen',
-                    'Nein Stimmen',
-                    'Ungültige Stimmzettel',
-                    'Leere Stimmzettel',
-                    'Stimmberechtigte',
-                )),
-                ','.join((
-                    '0',  # ID
-                    '20',  # Ja Stimmen
-                    '10',  # Nein Stimmen
-                    '0',  # Ungültige Stimmzettel
-                    '0',  # Leere Stimmzettel
-                    '100',  # Stimmberechtigte
-                )),
-            ))
-        ).encode('utf-8')),
-        'text/plain'
-    )
-    assert not errors
-    assert vote.proposal.results.filter_by(entity_id=0).one().yeas == 20
+        errors = import_vote_default(
+            vote, principal, 'proposal',
+            BytesIO((
+                '\n'.join((
+                    ','.join((
+                        'ID',
+                        'Ja Stimmen',
+                        'Nein Stimmen',
+                        'Ungültige Stimmzettel',
+                        'Leere Stimmzettel',
+                        'Stimmberechtigte',
+                    )),
+                    ','.join((
+                        '0',  # ID
+                        '20',  # Ja Stimmen
+                        '10',  # Nein Stimmen
+                        '0',  # Ungültige Stimmzettel
+                        '0',  # Leere Stimmzettel
+                        '100',  # Stimmberechtigte
+                    )),
+                ))
+            ).encode('utf-8')),
+            'text/plain'
+        )
+        errors = [(e.line, e.error.interpolate()) for e in errors]
+        result = vote.proposal.results.filter_by(entity_id=0).first()
+        if expats:
+            assert errors == []
+            assert result.yeas == 20
+        else:
+            assert errors == [(None, 'No data found')]
+            assert result is None
 
 
 def test_import_default_vote_temporary_results(session):
@@ -319,7 +329,7 @@ def test_import_default_vote_temporary_results(session):
                     'Stimmberechtigte',
                 )),
                 ','.join((
-                    '0',  # ID
+                    '1704',  # ID
                     '20',  # Ja Stimmen
                     '10',  # Nein Stimmen
                     '1',  # Ungültige Stimmzettel
@@ -358,7 +368,7 @@ def test_import_default_vote_temporary_results(session):
     assert not errors
     assert sorted(
         (v.entity_id for v in vote.proposal.results.filter_by(counted=True))
-    ) == [0, 1701]
+    ) == [1701, 1704]
     assert sorted(
         (v.entity_id for v in vote.proposal.results.filter_by(counted=False))
-    ) == [1702, 1703, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711]
+    ) == [1702, 1703, 1705, 1706, 1707, 1708, 1709, 1710, 1711]

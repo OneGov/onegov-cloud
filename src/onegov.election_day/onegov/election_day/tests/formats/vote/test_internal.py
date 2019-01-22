@@ -26,6 +26,7 @@ def test_import_internal_vote(session, tar_file):
 
     # Test federal results
     principal = Canton(canton='sg')
+    vote.expats = True
 
     errors = import_vote_internal(vote, principal, BytesIO(csv), 'text/plain')
     assert not errors
@@ -184,83 +185,93 @@ def test_import_internal_vote_expats(session):
     vote = session.query(Vote).one()
     principal = Canton(canton='zg')
 
-    errors = import_vote_internal(
-        vote, principal,
-        BytesIO((
-            '\n'.join((
-                ','.join((
-                    'status',
-                    'type',
-                    'entity_id',
-                    'counted',
-                    'yeas',
-                    'nays',
-                    'invalid',
-                    'empty',
-                    'eligible_voters',
-                )),
-                ','.join((
-                    'unknown',  # status
-                    'proposal',  # type
-                    '9170',  # entity_id
-                    'true',  # counted
-                    '20',  # yeas
-                    '10',  # nays
-                    '0',  # invalid
-                    '0',  # empty
-                    '100',  # eligible_voters
-                )),
-                ','.join((
-                    'unknown',  # status
-                    'proposal',  # type
-                    '0',  # entity_id
-                    'true',  # counted
-                    '20',  # yeas
-                    '10',  # nays
-                    '0',  # invalid
-                    '0',  # empty
-                    '100',  # eligible_voters
-                )),
-            ))
-        ).encode('utf-8')),
-        'text/plain'
-    )
-    assert [(e.line, e.error.interpolate()) for e in errors] == [
-        (3, '0 was found twice'),
-    ]
+    for expats in (False, True):
+        vote.expats = expats
+        errors = import_vote_internal(
+            vote, principal,
+            BytesIO((
+                '\n'.join((
+                    ','.join((
+                        'status',
+                        'type',
+                        'entity_id',
+                        'counted',
+                        'yeas',
+                        'nays',
+                        'invalid',
+                        'empty',
+                        'eligible_voters',
+                    )),
+                    ','.join((
+                        'unknown',  # status
+                        'proposal',  # type
+                        '9170',  # entity_id
+                        'true',  # counted
+                        '20',  # yeas
+                        '10',  # nays
+                        '0',  # invalid
+                        '0',  # empty
+                        '100',  # eligible_voters
+                    )),
+                    ','.join((
+                        'unknown',  # status
+                        'proposal',  # type
+                        '0',  # entity_id
+                        'true',  # counted
+                        '20',  # yeas
+                        '10',  # nays
+                        '0',  # invalid
+                        '0',  # empty
+                        '100',  # eligible_voters
+                    )),
+                ))
+            ).encode('utf-8')),
+            'text/plain'
+        )
+        errors = [(e.line, e.error.interpolate()) for e in errors]
+        if expats:
+            assert errors == [(3, '0 was found twice')]
+        else:
+            assert errors == [(None, 'No data found')]
 
-    errors = import_vote_internal(
-        vote, principal,
-        BytesIO((
-            '\n'.join((
-                ','.join((
-                    'status',
-                    'type',
-                    'entity_id',
-                    'counted',
-                    'yeas',
-                    'nays',
-                    'invalid',
-                    'empty',
-                    'eligible_voters',
-                )),
-                ','.join((
-                    'unknown',  # status
-                    'proposal',  # type
-                    '9170',  # entity_id
-                    'true',  # counted
-                    '20',  # yeas
-                    '10',  # nays
-                    '0',  # invalid
-                    '0',  # empty
-                    '100',  # eligible_voters
-                )),
-            ))
-        ).encode('utf-8')),
-        'text/plain'
-    )
-    assert not errors
-    assert vote.proposal.results.filter_by(entity_id=0).one().yeas == 20
+        errors = import_vote_internal(
+            vote, principal,
+            BytesIO((
+                '\n'.join((
+                    ','.join((
+                        'status',
+                        'type',
+                        'entity_id',
+                        'counted',
+                        'yeas',
+                        'nays',
+                        'invalid',
+                        'empty',
+                        'eligible_voters',
+                    )),
+                    ','.join((
+                        'unknown',  # status
+                        'proposal',  # type
+                        '9170',  # entity_id
+                        'true',  # counted
+                        '20',  # yeas
+                        '10',  # nays
+                        '0',  # invalid
+                        '0',  # empty
+                        '100',  # eligible_voters
+                    )),
+                ))
+            ).encode('utf-8')),
+            'text/plain'
+        )
+        errors = [(e.line, e.error.interpolate()) for e in errors]
+        result = vote.proposal.results.filter_by(entity_id=0).first()
+        if expats:
+            assert errors == []
+            assert result.yeas == 20
+        else:
+            assert errors == [(None, 'No data found')]
+            assert result is None
 
 
 def test_import_internal_vote_temporary_results(session):
@@ -289,7 +300,7 @@ def test_import_internal_vote_temporary_results(session):
                 ','.join((
                     'unknown',  # status
                     'proposal',  # type
-                    '0',  # entity_id
+                    '1703',  # entity_id
                     'true',  # counted
                     '20',  # yeas
                     '10',  # nays
@@ -326,7 +337,7 @@ def test_import_internal_vote_temporary_results(session):
     assert not errors
     assert sorted(
         (v.entity_id for v in vote.proposal.results.filter_by(counted=True))
-    ) == [0, 1701]
+    ) == [1701, 1703]
     assert sorted(
         (v.entity_id for v in vote.proposal.results.filter_by(counted=False))
-    ) == [1702, 1703, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711]
+    ) == [1702, 1704, 1705, 1706, 1707, 1708, 1709, 1710, 1711]

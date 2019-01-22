@@ -302,62 +302,70 @@ def test_import_internal_proporz_expats(session):
     election = session.query(Election).one()
     principal = Canton(canton='zg')
 
-    for entity_id in (9170, 0):
-        errors = import_election_internal_proporz(
-            election, principal,
-            BytesIO((
-                '\n'.join((
-                    ','.join((
-                        'election_status',
-                        'entity_id',
-                        'entity_counted',
-                        'entity_eligible_voters',
-                        'entity_received_ballots',
-                        'entity_blank_ballots',
-                        'entity_invalid_ballots',
-                        'entity_blank_votes',
-                        'entity_invalid_votes',
-                        'list_name',
-                        'list_id',
-                        'list_number_of_mandates',
-                        'list_votes',
-                        'list_connection',
-                        'list_connection_parent',
-                        'candidate_family_name',
-                        'candidate_first_name',
-                        'candidate_id',
-                        'candidate_elected',
-                        'candidate_votes',
-                        'candidate_party',
-                    )),
-                    ','.join((
-                        'unknown',  # election_status
-                        str(entity_id),  # entity_id
-                        'True',  # entity_counted
-                        '111',  # entity_eligible_voters
-                        '11',  # entity_received_ballots
-                        '1',  # entity_blank_ballots
-                        '1',  # entity_invalid_ballots
-                        '1',  # entity_blank_votes
-                        '1',  # entity_invalid_votes
-                        '',  # list_name
-                        '',  # list_id
-                        '',  # list_number_of_mandates
-                        '',  # list_votes
-                        '',  # list_connection
-                        '',  # list_connection_parent
-                        'xxx',  # candidate_family_name
-                        'xxx',  # candidate_first_name
-                        '1',  # candidate_id
-                        'false',  # candidate_elected
-                        '1',  # candidate_votes
-                        '',  # candidate_party
+    for expats in (False, True):
+        election.expats = expats
+        for entity_id in (9170, 0):
+            errors = import_election_internal_proporz(
+                election, principal,
+                BytesIO((
+                    '\n'.join((
+                        ','.join((
+                            'election_status',
+                            'entity_id',
+                            'entity_counted',
+                            'entity_eligible_voters',
+                            'entity_received_ballots',
+                            'entity_blank_ballots',
+                            'entity_invalid_ballots',
+                            'entity_blank_votes',
+                            'entity_invalid_votes',
+                            'list_name',
+                            'list_id',
+                            'list_number_of_mandates',
+                            'list_votes',
+                            'list_connection',
+                            'list_connection_parent',
+                            'candidate_family_name',
+                            'candidate_first_name',
+                            'candidate_id',
+                            'candidate_elected',
+                            'candidate_votes',
+                            'candidate_party',
+                        )),
+                        ','.join((
+                            'unknown',  # election_status
+                            str(entity_id),  # entity_id
+                            'True',  # entity_counted
+                            '111',  # entity_eligible_voters
+                            '11',  # entity_received_ballots
+                            '1',  # entity_blank_ballots
+                            '1',  # entity_invalid_ballots
+                            '1',  # entity_blank_votes
+                            '1',  # entity_invalid_votes
+                            '',  # list_name
+                            '',  # list_id
+                            '',  # list_number_of_mandates
+                            '',  # list_votes
+                            '',  # list_connection
+                            '',  # list_connection_parent
+                            'xxx',  # candidate_family_name
+                            'xxx',  # candidate_first_name
+                            '1',  # candidate_id
+                            'false',  # candidate_elected
+                            '1',  # candidate_votes
+                            '',  # candidate_party
+                        ))
                     ))
-                ))
-            ).encode('utf-8')), 'text/plain',
-        )
-        assert not errors
-        assert election.results.filter_by(entity_id=0).one().invalid_votes == 1
+                ).encode('utf-8')), 'text/plain',
+            )
+            errors = [(e.line, e.error.interpolate()) for e in errors]
+            result = election.results.filter_by(entity_id=0).first()
+            if expats:
+                assert errors == []
+                assert result.invalid_votes == 1
+            else:
+                assert errors == [(None, 'No data found')]
+                assert result is None
 
 
 def test_import_internal_proporz_temporary_results(session):

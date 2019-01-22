@@ -141,6 +141,10 @@ def import_vote_wabstic(vote, principal, number, district,
                 line_errors.append(
                     _("${name} is unknown", mapping={'name': entity_id}))
 
+        # Skip expats if not enabled
+        if entity_id == 0 and not vote.expats:
+            continue
+
         # Check if the entity is counted
         try:
             counted = False if int(line.sperrung or 0) == 0 else True
@@ -155,10 +159,6 @@ def import_vote_wabstic(vote, principal, number, district,
             eligible_voters = int(line.stimmberechtigte or 0)
         except ValueError:
             line_errors.append(_("Could not read the eligible voters"))
-        else:
-            # Ignore the expats if no eligible voters
-            if not entity_id and not eligible_voters:
-                continue
 
         # Parse the invalid votes
         try:

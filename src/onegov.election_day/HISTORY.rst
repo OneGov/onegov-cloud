@@ -1,7 +1,16 @@
 Changelog
 ---------
+
+- Adds a confiugration option to elections and votes to use/ignore expats
+  results during upload.
+  [msom]
+
 3.8.2 (2019-01-21)
 ~~~~~~~~~~~~~~~~~~~
+
+- Uses lates onegov.ballot.
+  [msom]
+
 3.8.1 (2019-01-18)
 ~~~~~~~~~~~~~~~~~~~
 

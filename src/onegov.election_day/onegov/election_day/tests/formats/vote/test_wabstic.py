@@ -35,6 +35,7 @@ def test_import_wabstic_vote(session, tar_file):
 
     # Test federal results
     principal = Canton(name='sg', canton='sg')
+    vote.expats = True
     for number, yeas, completed in (
         ('1', 70821, True),
         ('2', 84247, False),
@@ -51,6 +52,7 @@ def test_import_wabstic_vote(session, tar_file):
 
     # Test cantonal results
     vote.domain = 'canton'
+    vote.expats = True
     errors = import_vote_wabstic(
         vote, principal, '3', '1',
         BytesIO(sg_geschaefte), 'text/plain',
@@ -63,6 +65,7 @@ def test_import_wabstic_vote(session, tar_file):
 
     # Test communal results
     vote.domain = 'municipality'
+    vote.expats = False
     for district, number, entity_id, yeas in (
         ('3', '1', 3204, 1871),
         ('43', '1', 3292, 743),
@@ -288,73 +291,80 @@ def test_import_wabstic_vote_expats(session):
     vote = session.query(Vote).one()
     principal = Canton(canton='sg')
 
-    for entity_id in ('9170', '0'):
-        errors = import_vote_wabstic(
-            vote, principal, '0', '0',
-            BytesIO((
-                '\n'.join((
-                    ','.join((
-                        'Art',
-                        'SortWahlkreis',
-                        'SortGeschaeft',
-                        'Ausmittlungsstand'
-                    )),
-                    ','.join((
-                        'Eidg',
-                        '0',
-                        '0',
-                        '0'
-                    )),
-                ))
-            ).encode('utf-8')),
-            'text/plain',
-            BytesIO((
-                '\n'.join((
-                    ','.join((
-                        'Art',
-                        'SortWahlkreis',
-                        'SortGeschaeft',
-                        'BfsNrGemeinde',
-                        'Sperrung',
-                        'Stimmberechtigte',
-                        'StmUngueltig',
-                        'StmLeer',
-                        'StmHGJa',
-                        'StmHGNein',
-                        'StmHGOhneAw',
-                        'StmN1Ja',
-                        'StmN1Nein',
-                        'StmN1OhneAw',
-                        'StmN2Ja',
-                        'StmN2Nein',
-                        'StmN2OhneAw',
-                    )),
-                    ','.join((
-                        'Eidg',
-                        '0',
-                        '0',
-                        entity_id,  # 'BfsNrGemeinde',
-                        '2000',  # 'Sperrung',
-                        '100',  # 'Stimmberechtigte',
-                        '0',  # 'StmUngueltig',
-                        '1',  # 'StmLeer',
-                        '',  # 'StmHGJa',
-                        '',  # 'StmHGNein',
-                        '',  # 'StmHGOhneAw',
-                        '',  # 'StmN1Ja',
-                        '',  # 'StmN1Nein',
-                        '',  # 'StmN1OhneAw',
-                        '',  # 'StmN2Ja',
-                        '',  # 'StmN2Nein',
-                        '',  # 'StmN2OhneAw',
+    for expats in (False, True):
+        for entity_id in ('9170', '0'):
+            vote.expats = expats
+            errors = import_vote_wabstic(
+                vote, principal, '0', '0',
+                BytesIO((
+                    '\n'.join((
+                        ','.join((
+                            'Art',
+                            'SortWahlkreis',
+                            'SortGeschaeft',
+                            'Ausmittlungsstand'
+                        )),
+                        ','.join((
+                            'Eidg',
+                            '0',
+                            '0',
+                            '0'
+                        )),
                     ))
-                ))
-            ).encode('utf-8')),
-            'text/plain'
-        )
+                ).encode('utf-8')),
+                'text/plain',
+                BytesIO((
+                    '\n'.join((
+                        ','.join((
+                            'Art',
+                            'SortWahlkreis',
+                            'SortGeschaeft',
+                            'BfsNrGemeinde',
+                            'Sperrung',
+                            'Stimmberechtigte',
+                            'StmUngueltig',
+                            'StmLeer',
+                            'StmHGJa',
+                            'StmHGNein',
+                            'StmHGOhneAw',
+                            'StmN1Ja',
+                            'StmN1Nein',
+                            'StmN1OhneAw',
+                            'StmN2Ja',
+                            'StmN2Nein',
+                            'StmN2OhneAw',
+                        )),
+                        ','.join((
+                            'Eidg',
+                            '0',
+                            '0',
+                            entity_id,  # 'BfsNrGemeinde',
+                            '2000',  # 'Sperrung',
+                            '100',  # 'Stimmberechtigte',
+                            '0',  # 'StmUngueltig',
+                            '1',  # 'StmLeer',
+                            '',  # 'StmHGJa',
+                            '',  # 'StmHGNein',
+                            '',  # 'StmHGOhneAw',
+                            '',  # 'StmN1Ja',
+                            '',  # 'StmN1Nein',
+                            '',  # 'StmN1OhneAw',
+                            '',  # 'StmN2Ja',
+                            '',  # 'StmN2Nein',
+                            '',  # 'StmN2OhneAw',
+                        ))
+                    ))
+                ).encode('utf-8')),
+                'text/plain'
+            )
 
-        assert not errors
-        assert vote.proposal.results.filter_by(entity_id=0).one().empty == 1
+            assert not errors
+
+            result = vote.proposal.results.filter_by(entity_id=0).first()
+            if expats:
+                assert result.empty == 1
+            else:
+                assert result is None
 
 
 def test_import_wabstic_vote_temporary_results(session):

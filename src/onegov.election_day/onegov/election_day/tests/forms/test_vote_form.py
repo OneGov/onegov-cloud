@@ -77,6 +77,7 @@ def test_vote_form_model(election_day_app):
     assert form.shortcode.data == 'xy'
     assert form.related_link.data == 'http://u.rl'
     assert form.vote_type.data == 'simple'
+    assert form.expats.data is False
 
     fieldsets = [f.label for f in form.fieldsets if f.label]
     assert 'Title of the counter proposal' not in fieldsets
@@ -91,6 +92,7 @@ def test_vote_form_model(election_day_app):
     form.shortcode.data = 'yz'
     form.related_link.data = 'http://ur.l'
     form.vote_type.data = 'complex'
+    form.expats.data = True
 
     form.update_model(model)
 
@@ -105,6 +107,7 @@ def test_vote_form_model(election_day_app):
     assert model.shortcode == 'yz'
     assert model.related_link == 'http://ur.l'
     assert model.type == 'simple'
+    assert model.expats == True
 
 
 def test_vote_form_model_complex(election_day_app):

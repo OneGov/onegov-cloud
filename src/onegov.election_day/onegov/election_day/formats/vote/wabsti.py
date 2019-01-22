@@ -97,6 +97,10 @@ def import_vote_wabsti(vote, principal, vote_number, file, mimetype):
             else:
                 added_entity_ids.add(entity_id)
 
+        # Skip expats if not enabled
+        if entity_id == 0 and not vote.expats:
+            continue
+
         # the yeas
         yeas = {}
         try:
@@ -120,10 +124,6 @@ def import_vote_wabsti(vote, principal, vote_number, file, mimetype):
             eligible_voters = int(line.stimmberechtigte or 0)
         except ValueError:
             line_errors.append(_("Could not read the eligible voters"))
-        else:
-            # Ignore the expats if no eligible voters
-            if not entity_id and not eligible_voters:
-                continue
 
         # the empty votes
         empty = {}

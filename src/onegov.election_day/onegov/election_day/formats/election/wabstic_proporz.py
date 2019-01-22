@@ -199,6 +199,7 @@ def import_election_wabstic_proporz(
         except (ValueError, AssertionError):
             line_errors.append(_("Invalid values"))
 
+        # Pass the errors and continue to next line
         if line_errors:
             errors.extend(
                 FileImportError(
@@ -236,6 +237,11 @@ def import_election_wabstic_proporz(
         except ValueError:
             line_errors.append(_("Could not read the eligible voters"))
 
+        # Skip expats if not enabled
+        if entity_id == 0 and not election.expats:
+            continue
+
+        # Pass the errors and continue to next line
         if line_errors:
             errors.extend(
                 FileImportError(
@@ -268,6 +274,7 @@ def import_election_wabstic_proporz(
 
             if entity_id not in added_entities:
                 # Only add it if present (there is there no SortGeschaeft)
+                # .. this also skips expats if not enabled
                 continue
 
         entity = added_entities[entity_id]
@@ -303,6 +310,7 @@ def import_election_wabstic_proporz(
             entity['invalid_ballots'] = invalid_ballots
             entity['blank_votes'] = 0  # they are in the list results
 
+        # Pass the errors and continue to next line
         if line_errors:
             errors.extend(
                 FileImportError(
@@ -336,6 +344,7 @@ def import_election_wabstic_proporz(
                 line_errors.append(
                     _("${name} was found twice", mapping={'name': list_id}))
 
+        # Pass the errors and continue to next line
         if line_errors:
             errors.extend(
                 FileImportError(
@@ -385,6 +394,7 @@ def import_election_wabstic_proporz(
             if entity_id not in added_entities:
                 # Only add the list result if the entity is present (there is
                 # no SortGeschaeft in this file)
+                # .. this also skips expats if not enabled
                 continue
 
             if entity_id not in added_entities:
@@ -400,6 +410,7 @@ def import_election_wabstic_proporz(
                     )
                 )
 
+        # Pass the errors and continue to next line
         if line_errors:
             errors.extend(
                 FileImportError(
@@ -439,6 +450,7 @@ def import_election_wabstic_proporz(
             if list_id not in added_lists:
                 line_errors.append(_("Invalid list values"))
 
+        # Pass the errors and continue to next line
         if line_errors:
             errors.extend(
                 FileImportError(
@@ -472,6 +484,7 @@ def import_election_wabstic_proporz(
         else:
             added_candidates[candidate_id].elected = elected
 
+        # Pass the errors and continue to next line
         if line_errors:
             errors.extend(
                 FileImportError(
@@ -499,6 +512,7 @@ def import_election_wabstic_proporz(
             ):
                 # Only add the candidate result if the entity and the candidate
                 # are present (there is no SortGeschaeft in this file)
+                # .. this also skips expats if not enabled
                 continue
 
             if candidate_id in added_results.get(entity_id, {}):
@@ -511,6 +525,7 @@ def import_election_wabstic_proporz(
                     )
                 )
 
+        # Pass the errors and continue to next line
         if line_errors:
             errors.extend(
                 FileImportError(

@@ -231,6 +231,10 @@ def import_election_wabsti_proporz(
             list_result = parse_list_result(line, line_errors)
             parse_panachage_results(line, line_errors, panachage)
 
+            # Skip expats if not enabled
+            if result and result.entity_id == 0 and not election.expats:
+                continue
+
             # Pass the errors and continue to next line
             if line_errors:
                 errors.extend(
@@ -286,6 +290,7 @@ def import_election_wabsti_proporz(
                     line, line_errors
                 )
 
+                # Pass the errors and continue to next line
                 if line_errors:
                     errors.extend(
                         FileImportError(

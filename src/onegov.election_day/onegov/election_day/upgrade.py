@@ -274,3 +274,20 @@ def add_contraints_to_notifications_and_sources(context):
                 f' FOREIGN KEY ({ref}_id) REFERENCES {ref}s (id)'
                 f' ON UPDATE CASCADE'
             )
+
+
+@upgrade_task('Enable expats on votes and elections')
+def enable_expats(context):
+    principal = getattr(context.app, 'principal', None)
+    if not principal:
+        return
+
+    for vote in context.session.query(Vote):
+        ballot = vote.ballots.first()
+        if ballot:
+            if ballot.results.filter_by(entity_id=0).first():
+                vote.expats = True
+
+    for election in context.session.query(Election):
+        if election.results.filter_by(entity_id=0).first():
+            election.expats = True

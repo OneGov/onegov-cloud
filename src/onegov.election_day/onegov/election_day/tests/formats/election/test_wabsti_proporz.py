@@ -438,40 +438,45 @@ def test_import_wabsti_proporz_expats(session):
     election = session.query(Election).one()
     principal = Canton(canton='sg')
 
-    for entity_id in (9170, 0):
-        errors = import_election_wabsti_proporz(
-            election, principal,
-            BytesIO((
-                '\n'.join((
-                    ','.join((
-                        'Einheit_BFS',
-                        'Liste_KandID',
-                        'Kand_Nachname',
-                        'Kand_Vorname',
-                        'Liste_ID',
-                        'Liste_Code',
-                        'Kand_StimmenTotal',
-                        'Liste_ParteistimmenTotal',
-                    )),
-                    ','.join((
-                        str(entity_id),
-                        '7',
-                        'xxx',
-                        'xxx',
-                        '8',
-                        '9',
-                        '50',
-                        '60',
-                    )),
-                ))
-            ).encode('utf-8')), 'text/plain',
-        )
-
-        assert not errors
-
-        candidate = election.candidates.one()
-        assert candidate.results.one().election_result.entity_id == 0
-        assert candidate.votes == 50
+    for expats in (False, True):
+        election.expats = expats
+        for entity_id in (9170, 0):
+            errors = import_election_wabsti_proporz(
+                election, principal,
+                BytesIO((
+                    '\n'.join((
+                        ','.join((
+                            'Einheit_BFS',
+                            'Liste_KandID',
+                            'Kand_Nachname',
+                            'Kand_Vorname',
+                            'Liste_ID',
+                            'Liste_Code',
+                            'Kand_StimmenTotal',
+                            'Liste_ParteistimmenTotal',
+                        )),
+                        ','.join((
+                            str(entity_id),
+                            '7',
+                            'xxx',
+                            'xxx',
+                            '8',
+                            '9',
+                            '50',
+                            '60',
+                        )),
+                    ))
+                ).encode('utf-8')), 'text/plain',
+            )
+            errors = [(e.line, e.error.interpolate()) for e in errors]
+            candidate = election.candidates.first()
+            if expats:
+                assert errors == []
+                assert candidate.results.one().election_result.entity_id == 0
+                assert candidate.votes == 50
+            else:
+                assert errors == [(None, 'No data found')]
+                assert candidate is None
 
 
 def test_import_wabsti_proporz_temporary_results(session):

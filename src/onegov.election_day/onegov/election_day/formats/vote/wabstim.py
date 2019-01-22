@@ -1,5 +1,6 @@
 from onegov.ballot import BallotResult
 from onegov.election_day import _
+from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 
@@ -65,13 +66,16 @@ def import_vote_wabstim(vote, principal, file, mimetype):
         except ValueError:
             line_errors.append(_("Invalid id"))
         else:
+            if entity_id not in entities and entity_id in EXPATS:
+                entity_id = 0
+
             if entity_id in added_entity_ids:
                 line_errors.append(
                     _("${name} was found twice", mapping={
                         'name': entity_id
                     }))
 
-            if entity_id not in entities:
+            if entity_id and entity_id not in entities:
                 line_errors.append(
                     _("${name} is unknown", mapping={
                         'name': entity_id
@@ -83,6 +87,10 @@ def import_vote_wabstim(vote, principal, file, mimetype):
             counted = True if line.freigegeben else False
         except ValueError:
             line_errors.append(_("Invalid values"))
+
+        # Skip expats if not enabled
+        if entity_id == 0 and not vote.expats:
+            continue
 
         # the yeas
         yeas = {}
