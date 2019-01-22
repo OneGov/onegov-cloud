@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds compatibility with latest onegov.org release.
+  [href]
+
 1.4.12 (2019-01-09)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -1,6 +1,6 @@
 from onegov.activity import Period
 from onegov.chat import Message
-from onegov.org.models.message import TicketBasedMessage
+from onegov.org.models.message import TicketMessageMixin
 
 
 class PeriodMessage(Message):
@@ -26,7 +26,7 @@ class PeriodMessage(Message):
         )
 
 
-class ActivityMessage(TicketBasedMessage):
+class ActivityMessage(Message, TicketMessageMixin):
 
     __mapper_args__ = {
         'polymorphic_identity': 'activity'
