@@ -4808,3 +4808,79 @@ def test_allocation_rules_with_holidays(client):
         run_cronjob()
 
     assert count_allocations() == 705
+
+
+def test_ticket_notes(client):
+    collection = FormCollection(client.app.session())
+    collection.definitions.add('Profile', definition=textwrap.dedent("""
+        First name * = ___
+        Last name * = ___
+        E-Mail * = @@@
+    """), type='custom')
+
+    transaction.commit()
+
+    # submit a form
+    client.login_admin()
+
+    page = client.get('/forms').click('Profile')
+    page.form['first_name'] = 'Foo'
+    page.form['last_name'] = 'Bar'
+    page.form['e_mail'] = 'foo@bar.baz'
+    page = page.form.submit().follow().form.submit().follow()
+
+    # make sure a ticket has been created
+    assert 'FRM-' in page
+    assert 'ticket-state-open' in page
+
+    # add a note
+    page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+    page = page.click("Neue Notiz")
+    page.form['text'] = "Looks like example input to me"
+    page = page.form.submit().follow()
+
+    assert "Looks like example input to me" in page
+
+    # edit the note
+    note_url_ex = re.compile(r'http://localhost/ticket-notes/[A-Z0-9]+')
+    note_url = note_url_ex.search(str(page)).group()
+
+    page = client.get(note_url + '/edit')
+    page.form['text'] = "I will investigate"
+    page = page.form.submit().follow()
+
+    assert "I will investigate" in page
+
+    # delete the note
+    csrf_token_ex = re.compile(r'\?csrf-token=[a-zA-Z0-9\._\-]+')
+    csrf_token = csrf_token_ex.search(str(page)).group()
+
+    client.delete(note_url + csrf_token)
+    page = client.get(page.request.url)
+
+    assert "I will investigate" not in page
+
+    # upload a file
+    page = page.click("Neue Notiz")
+    page.form['text'] = "The profile is actually okay, I got an ID scan"
+    page.form['file'] = Upload('Test.txt', b'Proof')
+    page = page.form.submit().follow()
+
+    assert "The profile is actually okay" in page
+    assert "Test.txt" in page
+
+    # access the file
+    file_url_ex = re.compile(r'http://localhost/storage/[A-Z0-9a-z]+')
+    file_url = file_url_ex.search(str(page)).group()
+
+    page = client.get(file_url)
+    assert page.body == b"Proof"
+
+    # anonymous users do not have access to these files
+    assert page.cache_control.private
+    assert client.spawn().get(file_url, expect_errors=True).status_code == 404
+
+    # make sure we see it in the timeline as well
+    page = client.get('/timeline')
+    assert "The profile is actually okay" in page
+    assert "Test.txt" in page

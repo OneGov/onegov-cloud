@@ -1109,6 +1109,9 @@
     <div class="text">
         <metal:b define-slot="text" />
     </div>
+    <div class="file" tal:condition="model.file">
+        <a href="${request.link(model.file)}">${model.file.name}</a>
+    </div>
     <div class="actions">
         <metal:b define-slot="actions" />
     </div>

@@ -8,7 +8,7 @@ from onegov.ticket import Ticket, TicketCollection
 from sqlalchemy.orm import object_session
 
 
-class TicketBasedMessage(Message):
+class TicketMessageMixin(object):
 
     def link(self, request):
         return request.class_link(Ticket, {
@@ -42,15 +42,16 @@ class TicketBasedMessage(Message):
         )
 
 
-class TicketNote(TicketBasedMessage):
+class TicketNote(Message, TicketMessageMixin):
     __mapper_args__ = {
         'polymorphic_identity': 'ticket_note'
     }
 
     @classmethod
-    def create(cls, ticket, request, text):
+    def create(cls, ticket, request, text, file=None):
         note = super().create(ticket, request)
         note.text = text
+        note.file = file
 
         return note
 
@@ -75,7 +76,7 @@ class TicketNote(TicketBasedMessage):
             ))
 
 
-class TicketMessage(TicketBasedMessage):
+class TicketMessage(Message, TicketMessageMixin):
 
     __mapper_args__ = {
         'polymorphic_identity': 'ticket'
@@ -86,7 +87,7 @@ class TicketMessage(TicketBasedMessage):
         return super().create(ticket, request, change=change)
 
 
-class ReservationMessage(TicketBasedMessage):
+class ReservationMessage(Message, TicketMessageMixin):
 
     __mapper_args__ = {
         'polymorphic_identity': 'reservation'
@@ -99,7 +100,7 @@ class ReservationMessage(TicketBasedMessage):
         ])
 
 
-class SubmissionMessage(TicketBasedMessage):
+class SubmissionMessage(Message, TicketMessageMixin):
 
     __mapper_args__ = {
         'polymorphic_identity': 'submission'
@@ -110,7 +111,7 @@ class SubmissionMessage(TicketBasedMessage):
         return super().create(ticket, request, change=change)
 
 
-class EventMessage(TicketBasedMessage):
+class EventMessage(Message, TicketMessageMixin):
 
     __mapper_args__ = {
         'polymorphic_identity': 'event'
@@ -125,7 +126,7 @@ class EventMessage(TicketBasedMessage):
         return request.class_link(Event, {'name': self.meta['event_name']})
 
 
-class PaymentMessage(TicketBasedMessage):
+class PaymentMessage(Message, TicketMessageMixin):
 
     __mapper_args__ = {
         'polymorphic_identity': 'payment'
@@ -142,7 +143,7 @@ class PaymentMessage(TicketBasedMessage):
         )
 
 
-class DirectoryMessage(TicketBasedMessage):
+class DirectoryMessage(Message, TicketMessageMixin):
 
     __mapper_args__ = {
         'polymorphic_identity': 'directory'

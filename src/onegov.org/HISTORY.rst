@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to attach files to ticket notes.
+  [href]
+
 - Fixes events export not working.
   [href]
 

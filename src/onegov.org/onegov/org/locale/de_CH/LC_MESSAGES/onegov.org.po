@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-01-17 16:37+0100\n"
+"POT-Creation-Date: 2019-01-22 09:12+0100\n"
 "PO-Revision-Date: 2018-12-08 11:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -690,6 +690,15 @@ msgstr "Der Wochentag der Veranstaltung muss ausgewählt sein."
 msgid "Remove"
 msgstr "Entfernen"
 
+msgid "Text"
+msgstr "Text"
+
+msgid "Your note about this ticket"
+msgstr "Ihre Notiz zu dem Ticket"
+
+msgid "Attachment"
+msgstr "Anhang"
+
 msgid "Send a daily status e-mail."
 msgstr "Ein tägliches Status E-Mail senden."
 
@@ -776,12 +785,6 @@ msgstr "Kreditkarten-Zahlungen optional"
 
 msgid "Credit card payments required"
 msgstr "Kreditkarten-Zahlung erforderlich"
-
-msgid "Text"
-msgstr "Text"
-
-msgid "Your note about this ticket"
-msgstr "Ihre Notiz zu dem Ticket"
 
 msgid "Lead"
 msgstr "Einleitung"
@@ -2155,11 +2158,14 @@ msgstr ""
 "Sie der neue Autor der ganzen Notiz."
 
 msgid ""
-"Notes are private and only shown to logged-in members. You can use links/e-"
-"mail addresses are turned into clickable links."
+"Notes are private and only shown to logged-in members. URLs and e-mail "
+"addresses are turned into links."
 msgstr ""
 "Notizen sind privat und werden nur angemeldeten Benutzern angezeigt. E-Mail "
 "Adressen und Links werden klickbar gemacht."
+
+msgid "Attachments are optional. Supported file types:"
+msgstr "Anhänge sind optional. Unterstütze Datei-Typen:"
 
 msgid "No reservation resources defined yet."
 msgstr "Es wurden noch keine Ressourcen hinzugefügt."
@@ -2513,6 +2519,9 @@ msgstr "Reaktionszeit"
 
 msgid "Process Time"
 msgstr "Bearbeitungszeit"
+
+msgid "Summary"
+msgstr "Zusammenfassung"
 
 msgid "Username"
 msgstr "Benutzername"
@@ -3580,6 +3589,9 @@ msgstr "Die Zahlung wurde eingenommen"
 
 msgid "The payment was refunded"
 msgstr "Die Zahlung wurde rückerstattet"
+
+#~ msgid "New File"
+#~ msgstr "Neue Datei"
 
 #~ msgid "Ticket State"
 #~ msgstr "Ticket Status"

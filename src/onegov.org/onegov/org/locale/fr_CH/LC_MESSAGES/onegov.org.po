@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-01-17 16:37+0100\n"
+"POT-Creation-Date: 2019-01-22 09:12+0100\n"
 "PO-Revision-Date: 2018-12-08 11:02+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -691,6 +691,15 @@ msgstr ""
 msgid "Remove"
 msgstr "Supprimer"
 
+msgid "Text"
+msgstr "Texte"
+
+msgid "Your note about this ticket"
+msgstr "Votre note à propos de ce ticket"
+
+msgid "Attachment"
+msgstr "Pièce jointe"
+
 msgid "Send a daily status e-mail."
 msgstr "Envoyez un e-mail de suivi quotidien."
 
@@ -777,12 +786,6 @@ msgstr "Paiements par carte de crédit en option"
 
 msgid "Credit card payments required"
 msgstr "Paiements par carte de crédit requis"
-
-msgid "Text"
-msgstr "Texte"
-
-msgid "Your note about this ticket"
-msgstr "Votre note à propos de ce ticket"
 
 msgid "Lead"
 msgstr "Accroche"
@@ -2164,12 +2167,16 @@ msgstr ""
 "modifications, vous deviendrez l'auteur de l'intégralité de la note."
 
 msgid ""
-"Notes are private and only shown to logged-in members. You can use "
-"links/e-mail addresses are turned into clickable links."
+"Notes are private and only shown to logged-in members. URLs and e-mail "
+"addresses are turned into links."
 msgstr ""
 "Les notes sont privées et ne s'affichent que pour les membres connectés. "
 "Vous pouvez utiliser des liens/des adresses e-mail qui sont transformées en "
 "liens cliquables."
+
+msgid "Attachments are optional. Supported file types:"
+msgstr ""
+"Les pièces jointes sont facultatives. Types de fichiers pris en charge :"
 
 msgid "No reservation resources defined yet."
 msgstr "Aucune ressource de réservation n'est encore définie."
@@ -2525,6 +2532,9 @@ msgstr "Temps de réaction"
 
 msgid "Process Time"
 msgstr "Temps de traitement"
+
+msgid "Summary"
+msgstr "Sommaire"
 
 msgid "Username"
 msgstr "Nom d'utilisateur"
@@ -3606,6 +3616,9 @@ msgstr "Le paiement a été saisi"
 
 msgid "The payment was refunded"
 msgstr "Le paiement a été remboursé"
+
+#~ msgid "New File"
+#~ msgstr "Nouveau fichier"
 
 #~ msgid "Ticket State"
 #~ msgstr "Statut du ticket"

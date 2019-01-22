@@ -19,7 +19,6 @@ from onegov.file.integration import get_file
 from onegov.form import CompleteFormSubmission
 from onegov.form import FormCollection
 from onegov.form import FormDefinition
-from onegov.form import FormFile
 from onegov.form import FormRegistrationWindow
 from onegov.form import PendingFormSubmission
 from onegov.newsletter import Newsletter
@@ -163,7 +162,7 @@ def get_form_registration_window(request, id):
 
 @OrgApp.path(model=File, path='/storage/{id}')
 def get_file_for_org(request, app, id):
-    """ Form files are kept private and out of any caches.
+    """ Some files are kept private and out of any caches.
 
     This approach is not all that morepath-y, as we could override the views
     instead to change the required permissions, but this approach has the
@@ -171,9 +170,15 @@ def get_file_for_org(request, app, id):
     have to care for additional views added in the future.
 
     """
+
+    protected_filetypes = (
+        'formfile',
+        'messagefile',
+    )
+
     obj = get_file(app, id)
 
-    if obj and isinstance(obj, FormFile):
+    if obj and obj.type in protected_filetypes:
         if not request.has_role('editor', 'admin'):
             obj = None
         else:

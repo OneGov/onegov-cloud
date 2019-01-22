@@ -4137,6 +4137,7 @@ h2 + div.timeline {
     box-shadow: 2px 2px 2px rgba(150, 150, 150, .25);
     display: inline-block;
     font-size: .875rem;
+    position: relative;
     margin-bottom: 1.5rem;
     width: 100%;
 
@@ -4154,24 +4155,37 @@ h2 + div.timeline {
 
     .title,
     .text,
-    .timestamp {
+    .timestamp,
+    .file {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
 
-    .text {
+    .actions,
+    .text,
+    .file {
         margin-bottom: .5rem;
+    }
+
+    .file {
+        background: rgba(255, 255, 255, .7);
+        border-radius: 2px;
+        box-shadow: 1px 1px 2px rgba(150, 150, 150, .3);
+        display: inline-block;
+        padding: 1px 6px;
+
+        ::before {
+            @include icon('\f0c6');
+            margin-right: .5ex;
+        }
     }
 
     .actions,
     .text,
-    .timestamp {
+    .timestamp,
+    .file {
         margin-left: 4rem;
-    }
-
-    .actions {
-        margin-bottom: .5rem;
     }
 }
 

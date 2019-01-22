@@ -183,7 +183,7 @@ def send_email_if_enabled(ticket, request, template, subject):
 def handle_new_note(self, request, form):
 
     if form.submitted(request):
-        TicketNote.create(self, request, form.text.data)
+        TicketNote.create(self, request, form.text.data, form.file.create())
         request.success(_("Your note was added"))
         return request.redirect(request.link(self))
 
@@ -217,7 +217,7 @@ def delete_ticket_note(self, request):
 )
 def handle_edit_note(self, request, form):
     if form.submitted(request):
-        self.text = form.text.data
+        form.populate_obj(self)
         self.owner = request.current_username
 
         # force a change of the ticket to make sure that it gets reindexed

@@ -29,7 +29,7 @@ from onegov.org.forms.settings import HomepageSettingsForm
 from onegov.org.forms.settings import MapSettingsForm
 from onegov.org.forms.settings import ModuleSettingsForm
 from onegov.org.forms.signup import SignupForm
-from onegov.org.forms.ticket_note import TicketNoteForm
+from onegov.org.forms.ticketnotes import TicketNoteForm
 from onegov.org.forms.user import ManageUserForm, NewUserForm
 from onegov.org.forms.userprofile import UserProfileForm
 

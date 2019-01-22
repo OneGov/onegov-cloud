@@ -13,10 +13,23 @@
                         </div>
                     </tal:b>
                     <tal:b case="default">
-                        <div class="panel" i18n:translate>
-                            Notes are private and only shown to logged-in members. You can use
-                            links/e-mail addresses are turned into clickable links.
+                        <div class="panel">
+                            <p i18n:translate>
+                                Notes are private and only shown to logged-in members. URLs and
+                                e-mail addresses are turned into links.
+                            </p>
+                            <p i18n:translate>
+                                Attachments are optional. Supported file types:
+                            </p>
+                            <div class="small-text">
+                                <span class="label secondary radius">GIF</span>
+                                <span class="label secondary radius">JPG</span>
+                                <span class="label secondary radius">PDF</span>
+                                <span class="label secondary radius">PNG</span>
+                                <span class="label secondary radius">SVG</span>
+                            </div>
                         </div>
+
                     </tal:b>
                 </tal:b>
 

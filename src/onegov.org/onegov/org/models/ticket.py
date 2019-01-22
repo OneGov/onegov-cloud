@@ -17,6 +17,20 @@ class OrgTicketExtraText(object):
 
     @property
     def extra_localized_text(self):
+
+        # extracts of attachments are currently not searchable - if they were
+        # we would add this here - probably in a raw SQL query that
+        # concatenates all the text
+        #
+        # for now I've decided against it as it would lower the hit-rate
+        # for notes (which should be very easy to find), just to be able
+        # to search through files which are mostly going to be irrelevant
+        # for what the user wants to find
+        #
+        # if the user wants to have a ticket findable through the file content
+        # we should advise them to enter a meaningful note with the file
+        # instead.
+        #
         q = object_session(self).query(TicketNote)
         q = q.filter_by(channel_id=self.number)
         q = q.filter_by(type='ticket_note')
