@@ -18,13 +18,11 @@ HEADERS_WP_WAHL = (
 HEADERS_WPSTATIC_GEMEINDEN = (
     'sortwahlkreis',  # provides the link to the election
     'sortgeschaeft',  # provides the link to the election
-    'sortgemeinde',  # id (BFS)
-    'sortgemeindesub',  # id (BFS)
+    'bfsnrgemeinde',  # BFS
     'stimmberechtigte',  # eligible votes
 )
 HEADERS_WP_GEMEINDEN = (
-    'sortgemeinde',  # id (BFS)
-    'sortgemeindesub',  # id (BFS)
+    'bfsnrgemeinde',  # BFS
     'stimmberechtigte',  # eligible votes
     'sperrung',  # counted
     'stmabgegeben',  # received ballots
@@ -41,8 +39,7 @@ HEADERS_WP_LISTEN = (
     'listuntverb',
 )
 HEADERS_WP_LISTENGDE = (
-    'sortgemeinde',  # id (BFS)
-    'sortgemeindesub',  # id (BFS)
+    'bfsnrgemeinde',  # BFS
     'listnr',
     'stimmentotal',
 )
@@ -58,8 +55,7 @@ HEADERS_WP_KANDIDATEN = (
     'gewahlt',  # elected
 )
 HEADERS_WP_KANDIDATENGDE = (
-    'sortgemeinde',  # id (BFS)
-    'sortgemeindesub',  # id (BFS)
+    'bfsnrgemeinde',  # BFS
     'knr',  # candidate id
     'stimmen',  # votes
 )
@@ -73,14 +69,8 @@ def line_is_relevant(line, number, district=None):
 
 
 def get_entity_id(line, entities):
-    entity_id = int(line.sortgemeinde or 0)
-    sub_entity_id = int(line.sortgemeindesub or 0)
-    if entity_id not in entities:
-        if sub_entity_id in entities:
-            entity_id = sub_entity_id
-        elif entity_id in EXPATS or sub_entity_id in EXPATS:
-            entity_id = 0
-    return entity_id
+    entity_id = int(line.bfsnrgemeinde or 0)
+    return 0 if entity_id in EXPATS else entity_id
 
 
 def get_candidate_id(line):
@@ -220,6 +210,8 @@ def import_election_wabstic_proporz(
         # Parse the id of the entity
         try:
             entity_id = get_entity_id(line, entities)
+            if entity_id == 3251:
+                pass
         except ValueError:
             line_errors.append(_("Invalid id"))
         else:

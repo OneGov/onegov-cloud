@@ -15,7 +15,7 @@ from pytest import mark
     module_path('onegov.election_day',
                 'tests/fixtures/wabstic_proporz.tar.gz'),
 ])
-def test_import_wabstic_proporz(session, tar_file):
+def test_import_wabstic_proporz1(session, tar_file):
     session.add(
         ProporzElection(
             title='election',
@@ -30,17 +30,9 @@ def test_import_wabstic_proporz(session, tar_file):
     principal = Canton(canton='sg')
 
     # The tar file contains
-    #  - cantonal results from SG from the 18.10.2015
-    #  - regional results from SG from the 28.02.2016
+    #  - regional results from SG from the 28.02.2016 (Kantonsrat)
+    #  - cantonal results from SG from the 18.10.2015 (Nationalrat)
     with tarfile.open(tar_file, 'r|gz') as f:
-        cantonal_wpstatic_gemeinden = f.extractfile(f.next()).read()
-        cantonal_wpstatic_kandidaten = f.extractfile(f.next()).read()
-        cantonal_wp_gemeinden = f.extractfile(f.next()).read()
-        cantonal_wp_kandidaten = f.extractfile(f.next()).read()
-        cantonal_wp_kandidatengde = f.extractfile(f.next()).read()
-        cantonal_wp_listen = f.extractfile(f.next()).read()
-        cantonal_wp_listengde = f.extractfile(f.next()).read()
-        cantonal_wp_wahl = f.extractfile(f.next()).read()
         regional_wpstatic_gemeinden = f.extractfile(f.next()).read()
         regional_wpstatic_kandidaten = f.extractfile(f.next()).read()
         regional_wp_gemeinden = f.extractfile(f.next()).read()
@@ -49,6 +41,14 @@ def test_import_wabstic_proporz(session, tar_file):
         regional_wp_listen = f.extractfile(f.next()).read()
         regional_wp_listengde = f.extractfile(f.next()).read()
         regional_wp_wahl = f.extractfile(f.next()).read()
+        cantonal_wpstatic_gemeinden = f.extractfile(f.next()).read()
+        cantonal_wpstatic_kandidaten = f.extractfile(f.next()).read()
+        cantonal_wp_gemeinden = f.extractfile(f.next()).read()
+        cantonal_wp_kandidaten = f.extractfile(f.next()).read()
+        cantonal_wp_kandidatengde = f.extractfile(f.next()).read()
+        cantonal_wp_listen = f.extractfile(f.next()).read()
+        cantonal_wp_listengde = f.extractfile(f.next()).read()
+        cantonal_wp_wahl = f.extractfile(f.next()).read()
 
     # Test cantonal election
     election.expats = True
@@ -148,20 +148,18 @@ def test_import_wabstic_proporz_missing_headers(session):
     errors = import_election_wabstic_proporz(
         election, principal, '0', '0',
         BytesIO('Ausmittlungsstand,\n'.encode('utf-8')), 'text/plain',
-        BytesIO((
+        BytesIO((  # wpstatic_gemeinden
             '\n'.join((
                 ','.join((
                     'SortWahlkreis',
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'Stimmberechtigte',
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
-        BytesIO((
+        BytesIO((  # wp_gemeinden
             '\n'.join((
                 ','.join((
-                    'SortGemeindeSub',
                     'Stimmberechtigte',
                     'Sperrung',
                     'StmAbgegeben',
@@ -171,7 +169,7 @@ def test_import_wabstic_proporz_missing_headers(session):
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
-        BytesIO((
+        BytesIO((  # wp_listen
             '\n'.join((
                 ','.join((
                     'ListNr',
@@ -182,16 +180,15 @@ def test_import_wabstic_proporz_missing_headers(session):
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
-        BytesIO((
+        BytesIO((  # wp_listengde
             '\n'.join((
                 ','.join((
-                    'SortGemeindeSub',
                     'ListNr',
                     'StimmenTotal',
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
-        BytesIO((
+        BytesIO((  # wpstatic_kandidaten
             '\n'.join((
                 ','.join((
                     'KNR',
@@ -200,7 +197,7 @@ def test_import_wabstic_proporz_missing_headers(session):
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
-        BytesIO((
+        BytesIO((  # wp_kandidaten
             '\n'.join((
                 ','.join((
                     'KNR',
@@ -208,10 +205,9 @@ def test_import_wabstic_proporz_missing_headers(session):
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
-        BytesIO((
+        BytesIO((  # wp_kandidatengde
             '\n'.join((
                 ','.join((
-                    'SortGemeindeSub',
                     'KNR',
                     'Stimmen',
                 )),
@@ -219,11 +215,11 @@ def test_import_wabstic_proporz_missing_headers(session):
         ).encode('utf-8')), 'text/plain'
     )
     assert sorted([(e.filename, e.error.interpolate()) for e in errors]) == [
-        ('wp_gemeinden', "Missing columns: 'sortgemeinde'"),
+        ('wp_gemeinden', "Missing columns: 'bfsnrgemeinde'"),
         ('wp_kandidaten', "Missing columns: 'sortgeschaeft'"),
-        ('wp_kandidatengde', "Missing columns: 'sortgemeinde'"),
+        ('wp_kandidatengde', "Missing columns: 'bfsnrgemeinde'"),
         ('wp_listen', "Missing columns: 'sortgeschaeft'"),
-        ('wp_listengde', "Missing columns: 'sortgemeinde'"),
+        ('wp_listengde', "Missing columns: 'bfsnrgemeinde'"),
         ('wp_wahl', "Missing columns: 'sortgeschaeft'"),
         ('wpstatic_gemeinden', "Missing columns: 'sortgeschaeft'"),
         ('wpstatic_kandidaten', "Missing columns: 'sortgeschaeft'"),
@@ -262,8 +258,7 @@ def test_import_wabstic_proporz_invalid_values(session):
                 ','.join((
                     'SortWahlkreis',
                     'SortGeschaeft',
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'Stimmberechtigte',
                 )),
                 ','.join((
@@ -285,8 +280,7 @@ def test_import_wabstic_proporz_invalid_values(session):
         BytesIO((
             '\n'.join((
                 ','.join((
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'Stimmberechtigte',
                     'Sperrung',
                     'StmAbgegeben',
@@ -295,8 +289,7 @@ def test_import_wabstic_proporz_invalid_values(session):
                     'AnzWZAmtLeer',
                 )),
                 ','.join((
-                    '3215',  # SortGemeinde
-                    '200',  # SortGemeindeSub
+                    '3215',  # BfsNrGemeinde
                     'xxx',  # Stimmberechtigte
                     'xxx',  # Sperrung
                     'xxx',  # StmAbgegeben
@@ -329,14 +322,12 @@ def test_import_wabstic_proporz_invalid_values(session):
         BytesIO((
             '\n'.join((
                 ','.join((
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'ListNr',
                     'StimmenTotal',
                 )),
                 ','.join((
-                    '100',  # SortGemeinde
-                    '200',  # SortGemeindeSub
+                    '100',  # BfsNrGemeinde
                     'xxx',  # ListNr
                     'xxx',  # StimmenTotal
                 )),
@@ -375,14 +366,12 @@ def test_import_wabstic_proporz_invalid_values(session):
         BytesIO((
             '\n'.join((
                 ','.join((
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'KNR',
                     'Stimmen',
                 )),
                 ','.join((
-                    '100',  # SortGemeinde
-                    '200',  # SortGemeindeSub
+                    '100',  # BfsNrGemeinde
                     'xxx',  # KNR
                     'xxx',  # Stimmen
                 )),
@@ -421,12 +410,7 @@ def test_import_wabstic_proporz_expats(session):
 
     for expats in (False, True):
         election.expats = expats
-        for entity_id, sub_entity_id in (
-            ('9170', ''),
-            ('0', ''),
-            ('', '9170'),
-            ('', '0'),
-        ):
+        for entity_id in ('9170', '0'):
             errors = import_election_wabstic_proporz(
                 election, principal, '0', '0',
                 BytesIO((  # wp_wahl
@@ -446,15 +430,13 @@ def test_import_wabstic_proporz_expats(session):
                         ','.join((
                             'SortWahlkreis',
                             'SortGeschaeft',
-                            'SortGemeinde',
-                            'SortGemeindeSub',
+                            'BfsNrGemeinde',
                             'Stimmberechtigte',
                         )),
                         ','.join((
                             '0',
                             '0',
-                            entity_id,  # SortGemeinde
-                            sub_entity_id,  # SortGemeindeSub
+                            entity_id,  # BfsNrGemeinde
                             '',  # Stimmberechtigte
                         )),
                     ))
@@ -462,8 +444,7 @@ def test_import_wabstic_proporz_expats(session):
                 BytesIO((  # wp_gemeinden
                     '\n'.join((
                         ','.join((
-                            'SortGemeinde',
-                            'SortGemeindeSub',
+                            'BfsNrGemeinde',
                             'Stimmberechtigte',
                             'Sperrung',
                             'StmAbgegeben',
@@ -472,8 +453,7 @@ def test_import_wabstic_proporz_expats(session):
                             'AnzWZAmtLeer',
                         )),
                         ','.join((
-                            entity_id,  # SortGemeinde
-                            sub_entity_id,  # SortGemeindeSub
+                            entity_id,  # BfsNrGemeinde
                             '10000',  # Stimmberechtigte
                             '',  # Sperrung
                             '',  # StmAbgegeben
@@ -506,14 +486,12 @@ def test_import_wabstic_proporz_expats(session):
                 BytesIO((  # wp_listengde
                     '\n'.join((
                         ','.join((
-                            'SortGemeinde',
-                            'SortGemeindeSub',
+                            'BfsNrGemeinde',
                             'ListNr',
                             'StimmenTotal',
                         )),
                         ','.join((
-                            entity_id,  # SortGemeinde
-                            sub_entity_id,  # SortGemeindeSub
+                            entity_id,  # BfsNrGemeinde
                             '1',  # ListNr
                             '0',  # StimmenTotal
                         )),
@@ -552,14 +530,12 @@ def test_import_wabstic_proporz_expats(session):
                 BytesIO((  # wp_kandidatengde
                     '\n'.join((
                         ','.join((
-                            'SortGemeinde',
-                            'SortGemeindeSub',
+                            'BfsNrGemeinde',
                             'KNR',
                             'Stimmen',
                         )),
                         ','.join((
-                            entity_id,  # SortGemeinde
-                            sub_entity_id,  # SortGemeindeSub
+                            entity_id,  # BfsNrGemeinde
                             '101',  # KNR
                             '100',  # Stimmen
                         )),
@@ -608,22 +584,19 @@ def test_import_wabstic_proporz_temporary_results(session):
                 ','.join((
                     'SortWahlkreis',
                     'SortGeschaeft',
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'Stimmberechtigte',
                 )),
                 ','.join((
                     '0',
                     '0',
-                    '3203',  # SortGemeinde
-                    '',  # SortGemeindeSub
+                    '3203',  # BfsNrGemeinde
                     '',  # Stimmberechtigte
                 )),
                 ','.join((
                     '0',
                     '0',
-                    '3204',  # SortGemeinde
-                    '',  # SortGemeindeSub
+                    '3204',  # BfsNrGemeinde
                     '',  # Stimmberechtigte
                 )),
             ))
@@ -631,8 +604,7 @@ def test_import_wabstic_proporz_temporary_results(session):
         BytesIO((  # wp_gemeinden
             '\n'.join((
                 ','.join((
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'Stimmberechtigte',
                     'Sperrung',
                     'StmAbgegeben',
@@ -641,8 +613,7 @@ def test_import_wabstic_proporz_temporary_results(session):
                     'AnzWZAmtLeer',
                 )),
                 ','.join((
-                    '3203',  # SortGemeinde
-                    '',  # SortGemeindeSub
+                    '3203',  # BfsNrGemeinde
                     '10000',  # Stimmberechtigte
                     '1200',  # Sperrung
                     '',  # StmAbgegeben
@@ -651,8 +622,7 @@ def test_import_wabstic_proporz_temporary_results(session):
                     '',  # AnzWZAmtLeer
                 )),
                 ','.join((
-                    '3204',  # SortGemeinde
-                    '',  # SortGemeindeSub
+                    '3204',  # BfsNrGemeinde
                     '10000',  # Stimmberechtigte
                     '',  # Sperrung
                     '',  # StmAbgegeben
@@ -685,20 +655,17 @@ def test_import_wabstic_proporz_temporary_results(session):
         BytesIO((  # wp_listengde
             '\n'.join((
                 ','.join((
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'ListNr',
                     'StimmenTotal',
                 )),
                 ','.join((
-                    '3203',  # SortGemeinde
-                    '',  # SortGemeindeSub
+                    '3203',  # BfsNrGemeinde
                     '1',  # ListNr
                     '0',  # StimmenTotal
                 )),
                 ','.join((
-                    '3204',  # SortGemeinde
-                    '',  # SortGemeindeSub
+                    '3204',  # BfsNrGemeinde
                     '1',  # ListNr
                     '0',  # StimmenTotal
                 )),
@@ -737,20 +704,17 @@ def test_import_wabstic_proporz_temporary_results(session):
         BytesIO((  # wp_kandidatengde
             '\n'.join((
                 ','.join((
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'KNR',
                     'Stimmen',
                 )),
                 ','.join((
-                    '3203',  # SortGemeinde
-                    '',  # SortGemeindeSub
+                    '3203',  # BfsNrGemeinde
                     '101',  # KNR
                     '100',  # Stimmen
                 )),
                 ','.join((
-                    '3204',  # SortGemeinde
-                    '',  # SortGemeindeSub
+                    '3204',  # BfsNrGemeinde
                     '101',  # KNR
                     '100',  # Stimmen
                 )),
@@ -802,8 +766,7 @@ def test_import_wabstic_proporz_regional(session):
                     ','.join((
                         'SortWahlkreis',
                         'SortGeschaeft',
-                        'SortGemeinde',
-                        'SortGemeindeSub',
+                        'BfsNrGemeinde',
                         'Stimmberechtigte',
                     )),
                     ','.join((
@@ -825,8 +788,7 @@ def test_import_wabstic_proporz_regional(session):
             BytesIO((  # wp_gemeinden
                 '\n'.join((
                     ','.join((
-                        'SortGemeinde',
-                        'SortGemeindeSub',
+                        'BfsNrGemeinde',
                         'Stimmberechtigte',
                         'Sperrung',
                         'StmAbgegeben',
@@ -835,8 +797,7 @@ def test_import_wabstic_proporz_regional(session):
                         'AnzWZAmtLeer',
                     )),
                     ','.join((
-                        '1701',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '1701',  # BfsNrGemeinde
                         '10000',  # Stimmberechtigte
                         '1200',  # Sperrung
                         '',  # StmAbgegeben
@@ -845,8 +806,7 @@ def test_import_wabstic_proporz_regional(session):
                         '',  # AnzWZAmtLeer
                     )),
                     ','.join((
-                        '1702',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '1702',  # BfsNrGemeinde
                         '10000',  # Stimmberechtigte
                         '',  # Sperrung
                         '',  # StmAbgegeben
@@ -879,20 +839,17 @@ def test_import_wabstic_proporz_regional(session):
             BytesIO((  # wp_listengde
                 '\n'.join((
                     ','.join((
-                        'SortGemeinde',
-                        'SortGemeindeSub',
+                        'BfsNrGemeinde',
                         'ListNr',
                         'StimmenTotal',
                     )),
                     ','.join((
-                        '1701',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '1701',  # BfsNrGemeinde
                         '1',  # ListNr
                         '0',  # StimmenTotal
                     )),
                     ','.join((
-                        '1702',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '1702',  # BfsNrGemeinde
                         '1',  # ListNr
                         '0',  # StimmenTotal
                     )),
@@ -931,20 +888,17 @@ def test_import_wabstic_proporz_regional(session):
             BytesIO((  # wp_kandidatengde
                 '\n'.join((
                     ','.join((
-                        'SortGemeinde',
-                        'SortGemeindeSub',
+                        'BfsNrGemeinde',
                         'KNR',
                         'Stimmen',
                     )),
                     ','.join((
-                        '1701',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '1701',  # BfsNrGemeinde
                         '101',  # KNR
                         '100',  # Stimmen
                     )),
                     ','.join((
-                        '1702',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '1702',  # BfsNrGemeinde
                         '101',  # KNR
                         '100',  # Stimmen
                     )),
@@ -972,22 +926,19 @@ def test_import_wabstic_proporz_regional(session):
                     ','.join((
                         'SortWahlkreis',
                         'SortGeschaeft',
-                        'SortGemeinde',
-                        'SortGemeindeSub',
+                        'BfsNrGemeinde',
                         'Stimmberechtigte',
                     )),
                     ','.join((
                         '0',
                         '0',
-                        '3231',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '3231',  # BfsNrGemeinde
                         '',  # Stimmberechtigte
                     )),
                     ','.join((
                         '0',
                         '0',
-                        '3276',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '3276',  # BfsNrGemeinde
                         '',  # Stimmberechtigte
                     )),
                 ))
@@ -995,8 +946,7 @@ def test_import_wabstic_proporz_regional(session):
             BytesIO((  # wp_gemeinden
                 '\n'.join((
                     ','.join((
-                        'SortGemeinde',
-                        'SortGemeindeSub',
+                        'BfsNrGemeinde',
                         'Stimmberechtigte',
                         'Sperrung',
                         'StmAbgegeben',
@@ -1005,8 +955,7 @@ def test_import_wabstic_proporz_regional(session):
                         'AnzWZAmtLeer',
                     )),
                     ','.join((
-                        '3231',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '3231',  # BfsNrGemeinde
                         '10000',  # Stimmberechtigte
                         '1200',  # Sperrung
                         '',  # StmAbgegeben
@@ -1015,8 +964,7 @@ def test_import_wabstic_proporz_regional(session):
                         '',  # AnzWZAmtLeer
                     )),
                     ','.join((
-                        '3276',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '3276',  # BfsNrGemeinde
                         '10000',  # Stimmberechtigte
                         '',  # Sperrung
                         '',  # StmAbgegeben
@@ -1049,20 +997,17 @@ def test_import_wabstic_proporz_regional(session):
             BytesIO((  # wp_listengde
                 '\n'.join((
                     ','.join((
-                        'SortGemeinde',
-                        'SortGemeindeSub',
+                        'BfsNrGemeinde',
                         'ListNr',
                         'StimmenTotal',
                     )),
                     ','.join((
-                        '3231',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '3231',  # BfsNrGemeinde
                         '1',  # ListNr
                         '0',  # StimmenTotal
                     )),
                     ','.join((
-                        '3276',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '3276',  # BfsNrGemeinde
                         '1',  # ListNr
                         '0',  # StimmenTotal
                     )),
@@ -1101,20 +1046,17 @@ def test_import_wabstic_proporz_regional(session):
             BytesIO((  # wp_kandidatengde
                 '\n'.join((
                     ','.join((
-                        'SortGemeinde',
-                        'SortGemeindeSub',
+                        'BfsNrGemeinde',
                         'KNR',
                         'Stimmen',
                     )),
                     ','.join((
-                        '3231',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '3231',  # BfsNrGemeinde
                         '101',  # KNR
                         '100',  # Stimmen
                     )),
                     ','.join((
-                        '3276',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '3276',  # BfsNrGemeinde
                         '101',  # KNR
                         '100',  # Stimmen
                     )),
@@ -1144,15 +1086,13 @@ def test_import_wabstic_proporz_regional(session):
                 ','.join((
                     'SortWahlkreis',
                     'SortGeschaeft',
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'Stimmberechtigte',
                 )),
                 ','.join((
                     '0',
                     '0',
-                    '1701',  # SortGemeinde
-                    '',  # SortGemeindeSub
+                    '1701',  # BfsNrGemeinde
                     '',  # Stimmberechtigte
                 )),
             ))
@@ -1160,8 +1100,7 @@ def test_import_wabstic_proporz_regional(session):
         BytesIO((  # wp_gemeinden
             '\n'.join((
                 ','.join((
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'Stimmberechtigte',
                     'Sperrung',
                     'StmAbgegeben',
@@ -1170,8 +1109,7 @@ def test_import_wabstic_proporz_regional(session):
                     'AnzWZAmtLeer',
                 )),
                 ','.join((
-                    '1701',  # SortGemeinde
-                    '',  # SortGemeindeSub
+                    '1701',  # BfsNrGemeinde
                     '10000',  # Stimmberechtigte
                     '1200',  # Sperrung
                     '',  # StmAbgegeben
@@ -1204,14 +1142,12 @@ def test_import_wabstic_proporz_regional(session):
         BytesIO((  # wp_listengde
             '\n'.join((
                 ','.join((
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'ListNr',
                     'StimmenTotal',
                 )),
                 ','.join((
-                    '1701',  # SortGemeinde
-                    '',  # SortGemeindeSub
+                    '1701',  # BfsNrGemeinde
                     '1',  # ListNr
                     '0',  # StimmenTotal
                 )),
@@ -1250,14 +1186,12 @@ def test_import_wabstic_proporz_regional(session):
         BytesIO((  # wp_kandidatengde
             '\n'.join((
                 ','.join((
-                    'SortGemeinde',
-                    'SortGemeindeSub',
+                    'BfsNrGemeinde',
                     'KNR',
                     'Stimmen',
                 )),
                 ','.join((
-                    '1701',  # SortGemeinde
-                    '',  # SortGemeindeSub
+                    '1701',  # BfsNrGemeinde
                     '101',  # KNR
                     '100',  # Stimmen
                 )),
@@ -1290,15 +1224,13 @@ def test_import_wabstic_proporz_regional(session):
                     ','.join((
                         'SortWahlkreis',
                         'SortGeschaeft',
-                        'SortGemeinde',
-                        'SortGemeindeSub',
+                        'BfsNrGemeinde',
                         'Stimmberechtigte',
                     )),
                     ','.join((
                         '0',
                         '0',
-                        '3231',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '3231',  # BfsNrGemeinde
                         '',  # Stimmberechtigte
                     )),
                 ))
@@ -1306,8 +1238,7 @@ def test_import_wabstic_proporz_regional(session):
             BytesIO((  # wp_gemeinden
                 '\n'.join((
                     ','.join((
-                        'SortGemeinde',
-                        'SortGemeindeSub',
+                        'BfsNrGemeinde',
                         'Stimmberechtigte',
                         'Sperrung',
                         'StmAbgegeben',
@@ -1316,8 +1247,7 @@ def test_import_wabstic_proporz_regional(session):
                         'AnzWZAmtLeer',
                     )),
                     ','.join((
-                        '3231',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '3231',  # BfsNrGemeinde
                         '10000',  # Stimmberechtigte
                         '1200',  # Sperrung
                         '',  # StmAbgegeben
@@ -1350,14 +1280,12 @@ def test_import_wabstic_proporz_regional(session):
             BytesIO((  # wp_listengde
                 '\n'.join((
                     ','.join((
-                        'SortGemeinde',
-                        'SortGemeindeSub',
+                        'BfsNrGemeinde',
                         'ListNr',
                         'StimmenTotal',
                     )),
                     ','.join((
-                        '3231',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '3231',  # BfsNrGemeinde
                         '1',  # ListNr
                         '0',  # StimmenTotal
                     )),
@@ -1396,14 +1324,12 @@ def test_import_wabstic_proporz_regional(session):
             BytesIO((  # wp_kandidatengde
                 '\n'.join((
                     ','.join((
-                        'SortGemeinde',
-                        'SortGemeindeSub',
+                        'BfsNrGemeinde',
                         'KNR',
                         'Stimmen',
                     )),
                     ','.join((
-                        '3231',  # SortGemeinde
-                        '',  # SortGemeindeSub
+                        '3231',  # BfsNrGemeinde
                         '101',  # KNR
                         '100',  # Stimmen
                     )),

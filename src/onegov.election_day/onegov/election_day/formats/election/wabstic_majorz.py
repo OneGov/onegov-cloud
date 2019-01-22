@@ -15,11 +15,11 @@ HEADERS_WM_WAHL = (
 HEADERS_WMSTATIC_GEMEINDEN = (
     'sortwahlkreis',  # provides the link to the election
     'sortgeschaeft',  # provides the link to the election
-    'bfsnrgemeinde',
+    'bfsnrgemeinde',  # BFS
     'stimmberechtigte',  # eligible votes
 )
 HEADERS_WM_GEMEINDEN = (
-    'bfsnrgemeinde',
+    'bfsnrgemeinde',  # BFS
     'stimmberechtigte',  # eligible votes
     'sperrung',  # counted
     'stmabgegeben',  # received ballots
@@ -38,7 +38,7 @@ HEADERS_WM_KANDIDATEN = (
 )
 HEADERS_WM_KANDIDATENGDE = (
     'sortgeschaeft',  # provides the link to the election
-    'bfsnrgemeinde',
+    'bfsnrgemeinde',  # BFS
     'knr',  # candidate id
     'stimmen',  # votes
 )

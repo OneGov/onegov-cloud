@@ -5,6 +5,9 @@ Changelog
   results during upload.
   [msom]
 
+- Updates the WabstiCExprt (proporz) import to the latest version.
+  [msom]
+
 3.8.2 (2019-01-21)
 ~~~~~~~~~~~~~~~~~~~
 
