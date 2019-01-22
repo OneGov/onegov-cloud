@@ -107,7 +107,7 @@ def test_vote_form_model(election_day_app):
     assert model.shortcode == 'yz'
     assert model.related_link == 'http://ur.l'
     assert model.type == 'simple'
-    assert model.expats == True
+    assert model.expats is True
 
 
 def test_vote_form_model_complex(election_day_app):
