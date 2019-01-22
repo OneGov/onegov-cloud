@@ -160,9 +160,9 @@ def export_occurrences(self, request, form):
 
 
 def run_export(request, formatter):
-    occasions = OccurrenceCollection(request.session)
+    occasions = OccurrenceCollection(request.session, outdated=False)
 
-    query = occasions.query(outdated=False)
+    query = occasions.query()
     query = query.options(joinedload(Occurrence.event))
     query = query.order_by(Occurrence.start)
 

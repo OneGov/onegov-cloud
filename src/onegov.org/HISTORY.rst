@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes events export not working.
+  [href]
+
 0.49.2 (2019-01-18)
 ~~~~~~~~~~~~~~~~~~~
 
