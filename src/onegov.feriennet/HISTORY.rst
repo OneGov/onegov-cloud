@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Updates Concordia banners.
+  [href]
+
 1.4.13 (2019-01-22)
 ~~~~~~~~~~~~~~~~~~~
 
