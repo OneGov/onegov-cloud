@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.76.0 (2019-01-23)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds an utility function to turn strings with newlines into paragraphs.
   [href]
