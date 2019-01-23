@@ -61,3 +61,5 @@ onegov/election_day/assets/.webassets-cache
 
 # Node
 node_modules/
+share/
+package-lock.json
