@@ -49,6 +49,9 @@ _email_regex = re.compile((
     r"\sdot\s))+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)"
 ))
 
+# detects multiple successive newlines
+_multiple_newlines = re.compile(r'\n{2,}', re.MULTILINE)
+
 # for yubikeys
 ALPHABET = 'cbdefghijklnrtuv'
 ALPHABET_RE = re.compile(r'^[cbdefghijklnrtuv]{12,44}$')
@@ -309,6 +312,24 @@ def linkify(text, escape=True):
 
     return bleach.clean(
         linkified, tags=['a'], attributes={'a': ['href', 'rel']})
+
+
+def paragraphify(text):
+    """ Takes a text with newlines groups them into paragraphs according to the
+    following rules:
+
+    If there's a single newline between two lines, a <br> will replace that
+    newline.
+
+    If there are multiple newlines between two lines, each line will become
+    a paragraph and the extra newlines are discarded.
+
+    """
+    text = text.replace('\r', '')
+
+    return ''.join(f'<p>{p}</p>' for p in (
+        p.replace('\n', '<br>') for p in _multiple_newlines.split(text)
+    ))
 
 
 def ensure_scheme(url, default='http'):

@@ -301,3 +301,11 @@ def test_yubikey_public_id():
 
     with pytest.raises(TypeError):
         utils.yubikey_public_id(None)
+
+
+def test_paragraphify():
+    assert utils.paragraphify('foo') == '<p>foo</p>'
+    assert utils.paragraphify('foo\nbar') == '<p>foo<br>bar</p>'
+    assert utils.paragraphify('foo\n\nbar') == '<p>foo</p><p>bar</p>'
+    assert utils.paragraphify('foo\r\nbar') == '<p>foo<br>bar</p>'
+    assert utils.paragraphify('foo\r\n\r\nbar') == '<p>foo</p><p>bar</p>'

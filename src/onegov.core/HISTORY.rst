@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds an utility function to turn strings with newlines into paragraphs.
+  [href]
+
 - Removes unused active history on association proxy.
   [href]
 
