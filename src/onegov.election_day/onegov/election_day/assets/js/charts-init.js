@@ -156,6 +156,7 @@ var initDistrictsMap = function(el) {
             $(el).change(function() {
                 var dataurl = $(this).val();
                 $('.entities-map,.districts-map').each(function(ix, el) {
+                    $(el).data('dataurl', dataurl);
                     $(el).data('map').update(dataurl);
                 });
             });

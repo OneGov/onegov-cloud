@@ -58,7 +58,8 @@
         }
 
         var municipalities;
-        var applyData = function(municipalities, data) {
+        var expats;
+        var applyData = function(data) {
             if (municipalities && data && scale) {
                 municipalities.attr('fill', function(d) {
                     d.properties.result = data[d.properties.id];
@@ -78,6 +79,15 @@
                         return 'uncounted';
                     }
                     return 'extraneous';
+                });
+            }
+            if (expats && data && scale && (0 in data)) {
+                expats.attr('fill', function(d) {
+                    d.properties.result = data[0];
+                    if (!isUndefined(d.properties.result)) {
+                        return scale(d.properties.result.percentage);
+                    }
+                    return '#eee';
                 });
             }
         };
@@ -145,7 +155,7 @@
                     )
                     .enter().append('path')
                     .attr('d', path);
-                applyData(municipalities, data);
+
                 if (interactive) {
                     municipalities
                         .on('mouseover.tooltip', tooltip.show)
@@ -178,12 +188,11 @@
                         .attr('d', path);
                 }
 
-                // Add the expats
+                // Add globe
                 var bboxMap = svg[0][0].getBBox();
                 if (0 in data) {
-                    // the globe is 230px unscaled, we place it in the lower
-                    // left corner for now
-                    globe = svg.append('g')
+                    // the globe is 230px unscaled, we place it in the lower left corner for now
+                    var globe = svg.append('g')
                         .attr(
                             'transform',
                             'translate(0,' + Math.round(bboxMap.y + 3 / 4 * bboxMap.height) +  ')'
@@ -191,7 +200,6 @@
                         .property('__data__', {
                             'properties': {
                               'name': labelExpats,
-                              'result': data[0]
                             }
                           }
                         )
@@ -201,10 +209,8 @@
                             'scale(' + (bboxMap.width - bboxMap.x)/230/10 + ')'
                         );
 
-                    globe.append('g')
+                    expats = globe.append('g')
                         .append('path')
-                        .attr('fill', 'white')
-                        .attr('fill', scale(data[0].percentage))
                         .attr('stroke', 'none')
                         .attr('d', "M 306.11308,163.17191 C 306.11308,224.93199 256.04569,274.99881 194.2941,274.99881 C 132.53683,274.99881 82.472286,224.93144 82.472286,163.17191 C 82.472286,101.41465 132.53683,51.352937 194.2941,51.352937 C 256.04569,51.352937 306.11308,101.41465 306.11308,163.17191 L 306.11308,163.17191 z ");
 
@@ -221,6 +227,9 @@
                             .on('click', tooltip.show);
                     }
                 }
+
+                // Apply data
+                applyData(data);
 
                 // Add the the legend (we need to up/downscale the elements)
                 var unitScale = d3.scale.linear()
@@ -321,7 +330,7 @@
         };
 
         chart.update = function(url) {
-            d3.json(url, function(data) { applyData(municipalities, data); });
+            d3.json(url, function(data) { applyData(data); });
         };
 
         return chart;
