@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.9.0 (2019-01-24)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds final mapdata for 2019.
   [msom]
