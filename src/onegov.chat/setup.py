@@ -4,7 +4,7 @@ name = 'onegov.chat'
 description = (
     'Chat messages for OneGov Cloud.'
 )
-version = '0.2.1'
+version = '0.3.0'
 
 
 def get_long_description():
