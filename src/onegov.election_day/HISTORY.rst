@@ -17,7 +17,7 @@ Changelog
 3.8.2 (2019-01-21)
 ~~~~~~~~~~~~~~~~~~~
 
-- Uses lates onegov.ballot.
+- Fixes the calculation of the candidates percentages by entity and district.
   [msom]
 
 3.8.1 (2019-01-18)
