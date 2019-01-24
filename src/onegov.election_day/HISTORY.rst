@@ -8,7 +8,7 @@ Changelog
   results during upload.
   [msom]
 
-- Updates the WabstiCExprt (proporz) import to the latest version.
+- Updates the WabstiCExport (proporz) import to the latest version.
   [msom]
 
 - Fixes expats in maps not getting updated on change.
