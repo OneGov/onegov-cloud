@@ -22,9 +22,15 @@ class MessageCollection(GenericCollection):
         return Message.get_polymorphic_class(self.type, Message)
 
     def add(self, **kwargs):
-        if self.type != '*':
-            kwargs.setdefault('type', self.type)
-        return super().add(**kwargs)
+        t = kwargs.pop('type', self.type)
+
+        if not isinstance(t, str):
+            raise RuntimeError(f"Multiple types to add a message with: {t}")
+
+        if t == '*':
+            t = None
+
+        return super().add(type=t, **kwargs)
 
     def query(self):
         """ Queries the messages with the given parameters. """
@@ -32,7 +38,10 @@ class MessageCollection(GenericCollection):
         q = self.session.query(self.model_class)
 
         if self.type != '*':
-            q = q.filter_by(type=self.type)
+            if isinstance(self.type, str):
+                q = q.filter_by(type=self.type)
+            else:
+                q = q.filter(self.model_class.type.in_(self.type))
 
         if self.channel_id != '*':
             q = q.filter_by(channel_id=self.channel_id)
