@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds final mapdata for 2019.
+  [msom]
+
 - Adds a confiugration option to elections and votes to use/ignore expats
   results during upload.
   [msom]
