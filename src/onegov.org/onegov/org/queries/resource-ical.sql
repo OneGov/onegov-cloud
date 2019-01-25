@@ -16,6 +16,6 @@ ON reservations.token = tickets.handler_id::uuid
 
 WHERE
     "status" = 'approved'
-    AND (("data"::jsonb)->'accepted')::boolean = TRUE
+    AND (("data"::jsonb)->>'accepted')::boolean = TRUE
 
-ORDER BY start
+ORDER BY start;
