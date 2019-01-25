@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.50.1 (2019-01-25)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes resources ical subscription not working on Postgres 10.
   [href]
 
