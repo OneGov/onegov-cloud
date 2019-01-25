@@ -74,6 +74,16 @@ class Message(Base):
 
         return super().__eq__(other)
 
+    @property
+    def subtype(self):
+        """ An optional subtype for this message used for separating messages
+        of a type further (currently for UI).
+
+        Should be made unique, but there's no guarantee.
+
+        """
+        return None
+
     def get(self, request):
         """ Code rendering a message should call this method to get the
         actual text of the message. It might be rendered from meta or it

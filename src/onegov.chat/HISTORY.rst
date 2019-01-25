@@ -1,8 +1,14 @@
 Changelog
 ---------
 
+- Adds an optional subtype property to messages.
+  [href]
+
 0.3.0 (2019-01-24)
 ~~~~~~~~~~~~~~~~~~~~~
+
+- Adds the ability to filter the collection by multiple types
+  [href]
 
 0.2.1 (2019-01-21)
 ~~~~~~~~~~~~~~~~~~~~~
