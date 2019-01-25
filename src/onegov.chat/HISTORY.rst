@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.0 (2019-01-25)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Adds an optional subtype property to messages.
   [href]
 
