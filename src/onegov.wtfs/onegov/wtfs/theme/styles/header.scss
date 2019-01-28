@@ -1,0 +1,183 @@
+header {
+    margin-bottom: .75rem;
+
+    .auth {
+        background-color: $primary-color;
+        color: $white;
+
+        a {
+            color: $white;
+            height: 2.5rem;
+            line-height: 2.5rem;
+            padding: 0 .5rem;
+
+            &::before {
+                @include icon('\f090');
+                margin-right: .75rem;
+            }
+        }
+    }
+
+    .title {
+        img {
+            margin: 1.75rem 0;
+
+            &.right {
+                margin-left: 1rem;
+            }
+        }
+
+    }
+
+    .main-navigation {
+        background-color: $topbar-bg-color;
+        margin-bottom: .1rem;
+        min-height: 3rem;
+
+        .top-bar {
+            &.expanded {
+                box-shadow: none;
+            }
+
+            ul li {
+                a {
+                    color: $body-font-color;
+                    font-size: .8rem;
+                    font-weight: normal;
+                    text-transform: uppercase;
+
+                    @media #{$medium-up} {
+                        padding: .1rem 1.2rem !important;
+
+                        &:hover {
+                            @include primary-color-background;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .edit-bar {
+        background-color: $editbar-bg-color;
+        margin-bottom: 2px;
+        margin-top: -2px;
+
+        .border {
+            border-bottom: 1px dashed $iron;
+        }
+
+        .button,
+        button {
+            background-color: $editbar-bg-color;
+            color: $body-font-color;
+            padding-left: 1rem;
+            padding-right: 1rem;
+
+            &.dropdown {
+                padding-right: 1.25rem;
+
+                &::after {
+                    display: none;
+                }
+
+                &::before {
+                    @include icon('\f078');
+                    content: '\f078';
+                    margin-right: .75rem;
+                }
+            }
+
+            &:hover {
+                @include primary-color-background;
+            }
+        }
+
+        button.tiny {
+            font-size: .8rem;
+            margin-bottom: 0;
+
+            &.right-side {
+                float: right;
+            }
+        }
+
+        > a {
+            margin-bottom: 0;
+        }
+
+        a.tiny {
+            font-size: .8rem;
+        }
+
+        a::before {
+            display: inline-block;
+            margin-right: 1.5ex;
+            text-align: center;
+            width: 15px;
+        }
+
+        .delete-icon::before { @include icon('\f014'); }
+        .edit-icon::before { @include icon('\f040'); }
+        .export-icon::before { @include icon('\f019'); }
+        .upload-icon::before { @include icon('\f0ee'); }
+    }
+
+    .breadcrumbs {
+        @include hairline;
+        font-style: italic;
+        margin-bottom: 1rem;
+        padding-bottom: .7rem;
+        padding-left: 1rem;
+
+        li {
+            line-height: 1rem;
+
+            // highlight the parent
+            &:nth-last-child(2) {
+                font-weight: bold;
+            }
+        }
+
+        .current a {
+            cursor: pointer;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+
+        @media #{$small-only} {
+            padding-left: 1rem;
+
+            li {
+                float: none;
+                padding-left: 0;
+
+                + li {
+                    margin-top: .5rem;
+                }
+
+                &:first-child {
+                    list-style: none;
+                    margin-left: -1rem;
+                }
+
+                &::before {
+                    margin-left: 0;
+                }
+            }
+        }
+    }
+}
+
+
+@media print {
+    .languages,
+    .title .columns:not(:first-child),
+    .main-navigation,
+    .top-bar,
+    .breadcrumbs {
+        display: none;
+    }
+}

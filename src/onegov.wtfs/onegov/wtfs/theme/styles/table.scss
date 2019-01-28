@@ -1,0 +1,203 @@
+$unsorted: '\f0dc';
+$ascending: '\f0de';
+$descending: '\f0dd';
+
+@mixin sort($order) {
+    &::after {
+        content: $order;
+        font-family: 'FontAwesome';
+        margin-left: .75ex;
+    }
+}
+
+table {
+    border-collapse: separate;
+    border-left: solid $table-border-size $table-border-color;
+    border-right: solid $table-border-size $table-border-color;
+    border-top: solid $table-border-size $table-border-color;
+    width: 100%;
+
+    td,
+    th {
+        border-bottom: 1px solid $table-border-color;
+
+        &.column-25 {
+            width: 25%;
+        }
+
+        &.column-30 {
+            width: 30%;
+        }
+    }
+
+    thead {
+        background-color: $table-border-color;
+    }
+
+    th {
+
+        a {
+            color: $black;
+        }
+
+        &.sort-unsorted a {
+            @include sort($unsorted);
+        }
+
+        &.sort-ascending a {
+            @include sort($ascending);
+        }
+
+        &.sort-descending a {
+            @include sort($descending);
+        }
+    }
+
+
+    dl {
+        font-size: .875rem;
+        line-height: initial;
+        margin: 0;
+
+        dt {
+            display: inline;
+            font-weight: normal;
+
+            &::after {
+                content: ':';
+            }
+        }
+
+        dd {
+            display: inline;
+
+            &:not(:last-child)::after {
+                content: ',';
+            }
+        }
+    }
+
+    &.collapsible {
+        thead {
+            cursor: pointer;
+
+            th::after {
+                @include icon('\f077');
+                font-size: .75rem;
+                margin-left: .75rem;
+                margin-right: .75rem;
+            }
+        }
+
+        &.collapsed {
+            thead th::after {
+                @include icon('\f078');
+            }
+
+            tbody {
+                display: none;
+            }
+        }
+    }
+
+}
+
+.tablesorter {
+    .tablesorter-headerUnSorted:not(.sorter-false) .tablesorter-header-inner {
+        @include sort($unsorted);
+    }
+
+    .tablesorter-headerAsc:not(.sorter-false) .tablesorter-header-inner {
+        @include sort($ascending);
+    }
+
+    .tablesorter-headerDesc:not(.sorter-false) .tablesorter-header-inner {
+        @include sort($descending);
+    }
+}
+
+.tablesaw {
+    .sort-title-fix {
+        display: none;
+    }
+
+    &.tablesaw-columntoggle {
+        border-left: solid $table-border-size $table-border-color;
+        border-right: solid $table-border-size $table-border-color;
+        border-top: solid $table-border-size $table-border-color;
+    }
+
+    &.tablesaw-stack {
+        .sort-unsorted .tablesaw-cell-label a,
+        .tablesaw-cell-content a.sort-unsorted {
+            @include sort($unsorted);
+        }
+
+        .sort-ascending .tablesaw-cell-label a,
+        .tablesaw-cell-content a.sort-ascending {
+            @include sort($ascending);
+        }
+
+        .sort-descending .tablesaw-cell-label a,
+        .tablesaw-cell-content a.sort-descending {
+            @include sort($descending);
+        }
+
+        @media #{$small-only} {
+            .sort-title-fix {
+                color: $black;
+                display: inline;
+            }
+
+            tbody,
+            tfoot {
+                background-color: $white;
+
+                tr {
+                    border: 0 !important;
+                }
+
+                td,
+                th {
+                    border-bottom: 0;
+                    text-align: left;
+                }
+
+                td {
+                    .tablesaw-cell-label,
+                    .tablesaw-cell-label a {
+                        color: $black;
+                        font-weight: normal;
+                    }
+
+                    .tablesaw-cell-content {
+                        float: right;
+                        text-align: right;
+                    }
+                }
+
+                td:first-child {
+                    .tablesaw-cell-label {
+                        display: none;
+                    }
+
+                    .tablesaw-cell-content {
+                        border-bottom: 3px solid $gainsboro;
+                        font-size: 1.2em;
+                        font-weight: bold;
+                        max-width: 100%;
+                        padding-top: 2em;
+                        text-align: center;
+                        width: 100%;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.tablesaw-modeswitch {
+    @media #{$medium-up} {
+        display: none;
+    }
+}

@@ -1,0 +1,198 @@
+form {
+    label > ul,
+    .upload-widget > ul,
+    .group-label > ul {
+        list-style: none;
+
+        margin: 0;
+        margin-bottom: .75rem;
+
+        li input[type="checkbox"],
+        li input[type="radio"] {
+            margin: 0;
+        }
+    }
+
+    .group-label {
+        color: $form-label-font-color;
+        font-size: $form-label-font-size;
+
+        > ul li {
+            align-content: flex-start;
+            align-items: flex-start;
+            display: flex;
+
+            label {
+                margin-top: .2rem;
+            }
+
+            input {
+                flex-shrink: 0;
+            }
+        }
+    }
+
+    .label-text,
+    label > ul label {
+        max-width: 90%;
+    }
+
+    input[type="checkbox"],
+    input[type="radio"] {
+        display: inline-block;
+        float: left;
+        margin: .4rem .5rem 0 0 !important;
+
+        + .label-text,
+        + label {
+            display: inline-block;
+            margin-left: 0;
+            vertical-align: text-top;
+        }
+    }
+
+    input[type="radio"] {
+        margin: .29rem .4rem 0 0 !important;
+    }
+
+    input.invalid,
+    input.invalid:focus {
+        border-color: $alert-color;
+    }
+
+    .formcode-select {
+        @include form-element;
+        height: 100%;
+        min-height: 2.3125rem;
+    }
+
+    small.error {
+        padding: .5rem;
+        padding-left: .5rem;
+    }
+
+    .label-required {
+        color: $primary-color;
+        font-weight: bold;
+    }
+
+    .placeholder {
+        color: $monsoon;
+        font-size: .8rem;
+        margin-bottom: .4rem;
+    }
+
+    .map-wrapper {
+        margin-bottom: 1rem;
+    }
+
+    fieldset {
+        border: 0;
+        border-top: 1px solid $table-border-color;
+        margin-bottom: 1rem;
+        padding: 0;
+
+        legend {
+            color: $input-font-color;
+            font-size: $input-font-size;
+            margin-bottom: .75rem;
+            padding: 0 .75rem;
+            text-align: center;
+        }
+
+        &:focus-within {
+            border-color: $body-font-color;
+        }
+    }
+
+    .upload-widget.without-data {
+        margin-bottom: .5rem;
+    }
+
+    .upload-widget p {
+        color: $success-color;
+        font-size: $form-label-font-size;
+        margin-bottom: 0;
+    }
+
+    .upload-widget.with-data input[type='file'] {
+        margin-left: 2em;
+    }
+
+    /*
+        One line checkboxes
+    */
+    .oneline-checkboxes {
+        li {
+            display: inline-block;
+        }
+
+        label {
+            margin-left: 0;
+            margin-right: .8rem;
+        }
+    }
+
+    /*
+        Some fields need extra margins
+    */
+    .field-type-booleanfield + .clearfix,
+    .field-type-booleanfield:last-of-type > div {
+        margin-bottom: .75rem;
+    }
+
+    .field-type-booleanfield + [class*="field-type"] {
+        margin-top: .5rem;
+    }
+
+    .field-type-booleanfield + .field-type-htmlfield {
+        margin-top: 1rem;
+    }
+
+    .error {
+        input[type="checkbox"],
+        input[type="radio"] {
+            margin-bottom: inherit;
+        }
+    }
+
+    .chosen-container {
+        margin-bottom: $form-spacing;
+
+        .chosen-choices {
+            min-height: ($input-font-size + ($form-spacing * 1.5) - rem-calc(1));
+            padding: ($form-spacing / 4) ($form-spacing / 2) !important;
+        }
+
+        li {
+            font-size: .875rem;
+        }
+    }
+
+    .ql-editor {
+        min-height: 30em;
+    }
+
+    /*
+    Make the search filters toggable
+    */
+    #fieldset-other-filters {
+        cursor: pointer;
+
+        legend::before,
+        legend::after {
+            @include icon('\f077');
+            margin-left: .75rem;
+            margin-right: .75rem;
+        }
+
+        &.collapsed {
+            legend::before,
+            legend::after {
+                @include icon('\f078');
+                margin-left: .75rem;
+                margin-right: .75rem;
+            }
+        }
+    }
+}

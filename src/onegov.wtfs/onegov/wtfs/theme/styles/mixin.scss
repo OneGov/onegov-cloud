@@ -1,0 +1,29 @@
+/*
+    useful mixins
+*/
+
+@mixin hairline {
+    border: 0;
+    border-bottom: 1px solid $gray;
+}
+
+@mixin icon($icon) {
+    content: $icon;
+    display: inline-block;
+    font-family: 'FontAwesome';
+    font-weight: normal;
+    width: 1.5ex;
+}
+
+@mixin prefix ($prop, $val) {
+    // sass-lint:disable-block property-sort-order
+    -webkit-#{$prop}: #{$val};
+    -moz-#{$prop}: #{$val};
+    -ms-#{$prop}: #{$val};
+    #{$prop}: #{$val};
+}
+
+@mixin primary-color-background {
+    background-color: $primary-color;
+    color: $primary-fg-color;
+}

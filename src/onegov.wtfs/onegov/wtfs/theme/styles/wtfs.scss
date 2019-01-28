@@ -1,0 +1,125 @@
+/*
+    Fixes a foundation js error
+*/
+.foundation-data-attribute-namespace {
+    font-family: false;
+}
+
+/*
+    Zurb foundation uses this without !import, which causes IE11 to not
+    apply the placeholder color.
+*/
+:-ms-input-placeholder {
+    color: $input-placeholder-font-color !important;
+}
+
+/*
+    Hyphenation for browsers which support it.
+*/
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    @include prefix(hyphens, auto);
+}
+
+/*
+    Get rid of the jump that is introduced when switching from a site with
+    scrollbar to a site without (or vice versa)
+
+    As a side-effect, this disables horizontal scrolling, but we don't have
+    that anyway because of our mobile-first design.
+*/
+html {
+    @media #{$medium-up} {
+        overflow-x: hidden;
+        width: 100vw;
+    }
+}
+
+html,
+body {
+    height: 100%;
+}
+
+/*
+    Rounded corners for panels.
+*/
+.panel {
+    border-radius: 2px;
+
+    // Zurb lacks a separate color for callout panels.
+    &.callout {
+        border-color: $callout-panel-border-color;
+    }
+}
+
+/*
+    Print Styles
+*/
+@media print {
+    .alert-box,
+    .date-range-selector,
+    .date-range-selector-result {
+        display: none;
+    }
+
+    html,
+    body {
+        height: 99%; // avoids blank pages at the end
+    }
+
+    body {
+        font-size: 12px !important;
+    }
+
+    .field-display-block .field-display-label,
+    .field-display-block .field-display-data,
+    .field-display-block .field-display-data * {
+        background-color: transparent;
+        color: $body-font-color !important;
+        font-size: 12px !important;
+        margin: 0 !important;
+        padding: 0;
+    }
+
+    h1 {
+        font-size: 1.6rem;
+    }
+
+    h2 {
+        @include hairline;
+        font-size: 1.2rem;
+        margin-bottom: .25rem;
+    }
+
+    h3 {
+        font-size: 1.1rem;
+        margin-bottom: .15rem;
+    }
+
+    h4,
+    h5,
+    h6 {
+        font-size: 1rem;
+    }
+
+    ul.breadcrumbs {
+        padding: 0 0 .25rem 1rem;
+
+        * {
+            font-size: 9px;
+        }
+    }
+}
+
+/*
+    Subtitles
+*/
+h2 small {
+    display: block;
+    line-height: 1.25;
+}

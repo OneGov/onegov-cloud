@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal">
+<body>
+
+    <metal:navigation define-macro="top_navigation">
+        <div class="main-navigation" tal:define="links top_navigation|layout.top_navigation">
+            <nav class="top-bar" data-topbar role="navigation" tal:condition="links">
+                <ul class="title-area">
+                    <!--! this section needs to be included (even though it's empty),
+                    or the responsive menu bar icon won't be rendered -->
+                    <li class="name" style="width: 0;"></li>
+                    <li class="toggle-topbar menu-icon">
+                        <a href="#"><span>Menu</span></a>
+                    </li>
+                </ul>
+                <section class="top-bar-section">
+                    <ul class="left">
+                        <tal:block repeat="link links">
+                            <li><a href="${link[1]}">${link[0]}</a></li>
+                        </tal:block>
+                    </ul>
+                </section>
+            </nav>
+            <div class="clearfix"></div>
+        </div>
+    </metal:navigation>
+
+    <metal:editbar define-macro="editbar">
+        <div tal:condition="layout.editbar_links">
+            <div class="edit-bar">
+                <tal:block repeat="link layout.editbar_links">
+                    <a href="${link[1]}" class="button tiny ${link[2]}">${link[0]}</a>
+                </tal:block>
+            </div>
+        </div>
+    </metal:editbar>
+
+    <metal:breadcrumbs define-macro="breadcrumbs">
+        <nav role="navigation" aria-label="You are here" i18n:attributes="aria-label">
+            <ul class="breadcrumbs" tal:condition="layout.breadcrumbs">
+                <tal:block repeat="breadcrumb layout.breadcrumbs">
+                    <li class="${breadcrumb[2]}"><a href="${breadcrumb[1]}">${breadcrumb[0]}</a></li>
+                </tal:block>
+            </ul>
+        </nav>
+    </metal:breadcrumbs>
+
+    <metal:pagination define-macro="pagination" i18n:domain="onegov.wtfs">
+        <ul class="pagination" role="menubar" aria-label="Pagination">
+            <tal:block repeat="page collection.pages">
+                <tal:block define="
+                    previous current_page.previous;
+                    next current_page.next;
+                    is_current current_page == page;
+                    is_visible (abs((current_page.page or 0)-(page.page or 0)) < 4) or repeat.page.start or repeat.page.end;
+                ">
+                    <tal:block condition="repeat.page.start and previous">
+                        <li class="arrow">
+                            <a href="${request.link(previous)}" aria-label="Previous Page" i18n:attributes="aria-label"><i class="fa fa-chevron-left"></i></a>
+                        </li>
+                    </tal:block>
+
+                    <li tal:condition="is_visible" class="${is_current and 'current' or ''} ${repeat.page.start and 'first' or ''} ${repeat.page.end and 'last' or ''}">
+                        <a href="${request.link(page)}">${page.page + 1}</a>
+                    </li>
+
+                    <tal:block condition="repeat.page.end and next">
+                        <li class="arrow">
+                            <a href="${request.link(next)}" aria-label="Next Page" i18n:attributes="aria-label"><i class="fa fa-chevron-right"></i></a>
+                        </li>
+                    </tal:block>
+                </tal:block>
+            </tal:block>
+        </ul>
+    </metal:pagination>
+
+    <metal:form define-macro="form" i18n:domain="onegov.wtfs">
+        <form tal:attributes="action form.action; method form_method|'POST'" enctype="multipart/form-data">
+            <tal:block repeat="fieldset form.fieldsets">
+                <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower().replace(' ', '-')}">
+                    <legend>${fieldset.label}</legend>
+                    <div class="formfields">
+                        <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
+                        <div class="clearfix"></div>
+                    </div>
+                </fieldset>
+                <tal:block condition="not:fieldset.is_visible">
+                    <div class="formfields">
+                        <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
+                        <div class="clearfix"></div>
+                    </div>
+                </tal:block>
+            </tal:block>
+            <tal:block condition="cancel|nothing">
+                <a class="button secondary cancel-button" href="${cancel}" i18n:translate="">Cancel</a>
+            </tal:block>
+            <tal:block condition="not: button_text|nothing">
+                <input type="submit" value="Submit" class="button ${button_class|nothing}" i18n:attributes="value">
+            </tal:block>
+            <tal:block condition="button_text|nothing">
+                <input type="submit" value="${button_text}" class="button ${button_class|nothing}">
+            </tal:block>
+            <tal:block condition="reset|nothing">
+                <a class="button secondary reset-button" href="${reset}" i18n:translate="">Reset</a>
+            </tal:block>
+        </form>
+    </metal:form>
+
+    <metal:fields define-macro="fields" i18n:domain="onegov.wtfs">
+        <div class="row">
+            <tal:block repeat="field fields">
+                <div class="columns medium-${field.render_kw['size']|12} small-12 field-type-${field.type.lower()}">
+                    <metal:field use-macro="layout.macros['field']" />
+                </div>
+                <div class="clearfix" tal:condition="field.render_kw['clear']|True"></div>
+            </tal:block>
+        </div>
+    </metal:fields>
+
+    <metal:field define-macro="field" i18n:domain="onegov.wtfs">
+        <tal:block define="input_type field.widget.input_type|None">
+            <tal:block condition="input_type == 'hidden'">
+                <tal:block condition="field.type == 'QuillField'">
+                    <label tal:attributes="class field.errors and 'error' or None">
+                        <span class="label-text">${field.label.text}</span>
+                        <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+                    </label>
+                </tal:block>
+                ${field()}
+                <small class="error" tal:repeat="error field.errors">${error}</small>
+            </tal:block>
+            <tal:block condition="input_type != 'hidden'">
+                <label tal:attributes="class field.errors and 'error' or None">
+                    <!--! render the label after the field if it's a boolean field -->
+                    <tal:block condition="field.type == 'BooleanField'">
+                        ${field(placeholder=request.translate(field.description))}
+                        <span class="label-text">${field.label.text}</span>
+                        <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+                    </tal:block>
+                    <tal:block condition="field.type != 'BooleanField'">
+                        <span class="label-text">${field.label.text}</span>
+                        <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+                        ${field(placeholder=request.translate(field.description))}
+                    </tal:block>
+                </label>
+                <small class="error" tal:repeat="error field.errors">${error}</small>
+            </tal:block>
+        </tal:block>
+    </metal:field>
+
+    <metal:tablesaw_translations define-macro="tablesaw_translations" i18n:domain="onegov.wtfs">
+        <script>
+            TablesawConfig = {
+                i18n: {
+                    modeStack: '<tal:block i18n:translate>Stack</tal:block>',
+                    modeToggle: '<tal:block i18n:translate>Toggle</tal:block>',
+                    modeSwitchColumns: '<tal:block i18n:translate>Columns</tal:block>',
+                    modeSwitchColumnsAbbreviated: '<tal:block i18n:translate>Columns</tal:block>',
+                }
+            };
+        </script>
+    </metal:tablesaw_translations>
+
+</body>

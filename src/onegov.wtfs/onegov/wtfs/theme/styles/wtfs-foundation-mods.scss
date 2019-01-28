@@ -1,0 +1,125 @@
+$primary-color: #ff1900;
+$footer-height: 38px;
+
+/*
+    Base colors
+*/
+$black: #0f0f0f;
+$black-dark: #000;
+$black-light: #363738;
+$black-pastel: #dadada;
+$blue: #2575ed;
+$blue-dark: #1a52a5;
+$blue-light: #92baf6;
+$blue-pastel: #d3e3fb;
+$gray: #e0e3e5;
+$gray-dark: #b3b6b7;
+$gray-light: #f0f1f2;
+$gray-pastel: #f7f8f8;
+$green: #2c9f42;
+$green-dark: #237f35;
+$green-light: #96cfa1;
+$green-pastel: #d4ecd8;
+$orange: #ffb100;
+$orange-dark: #d59200;
+$red: #de2c3b;
+$red-dark: #b2232f;
+$red-light: #ef969d;
+$red-pastel: #f8d5d8;
+$white: #fff;
+$yellow: #ffc800;
+$yellow-dark: #cca000;
+$yellow-light: #ffe480;
+$yellow-pastel: #fff4cc;
+
+/*
+    Main colors
+*/
+
+$secondary-color: $gray;
+$alert-color: $red-dark;
+$info-color: $blue-dark;
+$success-color: $green-dark;
+$warning-color: $orange-dark;
+
+/*
+    Anchors
+*/
+
+$anchor-font-color: $primary-color;
+$anchor-font-color-hover: scale-color($anchor-font-color, $lightness: -20%);
+
+/*
+    Panels
+*/
+$panel-bg: $gray-pastel;
+$panel-border-color: scale-color($panel-bg, $lightness: -5%) !default;
+
+$callout-panel-bg: $yellow-light;
+$callout-panel-border-color: $yellow;
+
+/*
+    Labels
+*/
+$label-padding: rem-calc(6 10 6);
+$label-radius: 1px;
+
+/*
+    Round corners
+*/
+$global-radius: 1px;
+
+$body-font-color: #333;
+$bottom-links-color: #777;
+$bottom-links-size: .8rem;
+$crumb-bg: #fff;
+$crumb-border-size: 0;
+$f-dropdown-list-hover-bg: $gray;
+$header-line-height: 1.25;
+$include-print-styles: false;
+$row-width: rem-calc(1050);
+$side-nav-font-weight-active: bold;
+$side-nav-link-padding: rem-calc(0 14);
+$side-nav-padding: 0;
+$sub-nav-padding: .25rem;
+$table-border-style: none;
+$thumb-border-width: 0;
+$thumb-box-shadow: 0 0 0 2px rgba($black, .1);
+$thumb-box-shadow-hover: 0 0 0 2px rgba($black, .3);
+
+/*
+    Topbar
+*/
+$top-bar-border-size: .3rem;
+$topbar-bg-color: $gray-pastel;
+$topbar-dropdown-bg: $gray-pastel;
+$topbar-link-bg-hover: $gray;
+$topbar-link-color: #312f2e;
+$topbar-link-color-active: #312f2e;
+$topbar-link-color-active-hover: #312f2e;
+$topbar-link-color-hover: #312f2e;
+$topbar-link-weight: bold;
+$topbar-menu-icon-color: #312f2e;
+$topbar-menu-link-color: #312f2e;
+
+/*
+    Editbar
+*/
+$editbar-bg-color: $topbar-link-bg-hover;
+
+/*
+    Adds support for bright primary colors.
+*/
+$anchor-font-color: $primary-color;
+$crumb-font-color: $primary-color;
+$side-nav-link-color: $primary-color;
+$side-nav-link-color-active: #333;
+$side-nav-link-color-hover: #333;
+$primary-fg-color: if(lightness($primary-color) >= 60%, $body-font-color, $white);
+$button-font-color: $primary-fg-color;
+
+@if lightness($primary-color) >= 50% {
+    $anchor-font-color: scale-color($anchor-font-color, $lightness: -45%, $saturation: +10%);
+    $crumb-font-color: scale-color($crumb-font-color, $lightness: -45%, $saturation: +10%);
+    $side-nav-link-color: scale-color($side-nav-link-color, $lightness: -45%, $saturation: +10%);
+}
