@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.42.0 (2019-01-28)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to use iframes in preview widgets.
   [href]

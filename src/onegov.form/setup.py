@@ -4,7 +4,7 @@ name = 'onegov.form'
 description = (
     'Common OneGov form library based on WTForms.'
 )
-version = '0.41.4'
+version = '0.42.0'
 
 
 def get_long_description():
