@@ -11,8 +11,13 @@ header {
             line-height: 2.5rem;
             padding: 0 .5rem;
 
-            &::before {
+            &.login::before {
                 @include icon('\f090');
+                margin-right: .75rem;
+            }
+
+            &.logout::before {
+                @include icon('\f08b');
                 margin-right: .75rem;
             }
         }
