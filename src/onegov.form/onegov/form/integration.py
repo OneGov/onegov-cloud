@@ -93,6 +93,7 @@ def get_iconwidget_asset():
 
 @FormApp.webasset('preview-widget-handler')
 def get_preview_widget_asset():
+    yield 'preview-widget.css'
     yield 'preview-widget.js'
 
 

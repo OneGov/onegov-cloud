@@ -240,6 +240,7 @@ class PreviewField(Field):
         self.fields = kwargs.pop('fields', ())
         self.url = kwargs.pop('url', None)
         self.events = kwargs.pop('events', ())
+        self.display = kwargs.pop('display', 'inline')
 
         super().__init__(*args, **kwargs)
 

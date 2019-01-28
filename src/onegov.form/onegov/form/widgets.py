@@ -212,7 +212,8 @@ class PreviewWidget(object):
         <div class="form-preview-widget"
              data-url="${url or ''}"
              data-fields="${','.join(fields)}"
-             data-events="${','.join(events)}">
+             data-events="${','.join(events)}"
+             data-display="${display}">
         </div>
     """)
 
@@ -223,4 +224,5 @@ class PreviewWidget(object):
             url=callable(field.url) and field.url(field.meta) or field.url,
             fields=field.fields,
             events=field.events,
+            display=field.display,
         ))

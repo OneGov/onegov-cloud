@@ -2,6 +2,7 @@ var PreviewWidgetHandler = function(el) {
     var fields = el.getAttribute('data-fields').split(',');
     var events = el.getAttribute('data-events').split(',');
     var url = el.getAttribute('data-url');
+    var display = el.getAttribute('data-display');
 
     var form = (function() {
         for (var node = el; node.parentNode !== null; node = node.parentNode) {
@@ -12,11 +13,48 @@ var PreviewWidgetHandler = function(el) {
         return null;
     })();
 
+    var debounce = function(callback, time) {
+        var timeout;
+
+        return function() {
+            var self = this, args = arguments;
+
+            if (timeout) {
+                clearTimeout(timeout);
+            }
+
+            timeout = setTimeout(function() {
+                timeout = null;
+                callback.apply(self, args);
+            }, time);
+        };
+    };
+
+    var apply = function(html) {
+        if (display === 'iframe') {
+            el.innerHTML = '';
+
+            var container = document.createElement('iframe');
+            container.src = "about:blank";
+            container.addEventListener('load', function() {
+                container.style.height = 0;
+                container.style.height = container.contentWindow.document.body.scrollHeight + 'px';
+            });
+
+            el.appendChild(container);
+            container.contentWindow.document.open();
+            container.contentWindow.document.write(html);
+            container.contentWindow.document.close();
+        } else {
+            el.innerHTML = event.target.responseText;
+        }
+    };
+
     var submit = function() {
         var xhr = new XMLHttpRequest();
 
         xhr.addEventListener("load", function(event) {
-            el.innerHTML = event.target.responseText;
+            apply(event.target.responseText);
         });
 
         xhr.open("POST", url);
@@ -29,6 +67,11 @@ var PreviewWidgetHandler = function(el) {
         },
         'click': function(field) {
             field.addEventListener('click', submit, false);
+        },
+        'type': function(field) {
+            field.addEventListener('keypress', debounce(function() {
+                submit();
+            }, 250));
         },
         'enter': function(field) {
             field.addEventListener('keypress', function(e) {

@@ -1,5 +1,12 @@
 Changelog
 ---------
+
+- Adds the ability to use iframes in preview widgets.
+  [href]
+
+- Adds new 'typing' event to preview widgets.
+  [href]
+
 0.41.4 (2019-01-21)
 ~~~~~~~~~~~~~~~~~~~
 
