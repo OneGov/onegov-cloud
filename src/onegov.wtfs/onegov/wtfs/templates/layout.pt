@@ -11,7 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="version" content="${layout.app_version}">
     <title>
-        <tal:block metal:define-slot="title">SWISSVOTES</tal:block>
+        <tal:block metal:define-slot="title">Stadt Winterthur</tal:block>
     </title>
     <!-- This site is running on the
       ___              ____               ____ _                 _
