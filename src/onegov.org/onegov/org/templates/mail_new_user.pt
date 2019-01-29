@@ -3,7 +3,7 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="body">
-        <p i18n:translate>Dear Sir or Madam,</p>
+        <p i18n:translate>Hello!</p>
 
         <p i18n:translate>
             An administrator just created a new account on

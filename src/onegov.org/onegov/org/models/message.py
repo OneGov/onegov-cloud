@@ -1,11 +1,15 @@
 from cached_property import cached_property
 from onegov.chat import Message
-from onegov.core.utils import linkify
+from onegov.core.utils import paragraphify, linkify
 from onegov.event import Event
 from onegov.org import _
 from onegov.org.new_elements import Link, Confirm, Intercooler
 from onegov.ticket import Ticket, TicketCollection
 from sqlalchemy.orm import object_session
+
+# 👉 when adding new ticket messages be sure to evaluate if they should
+# be added to the ticket status page through the org.public_ticket_messages
+# setting
 
 
 class TicketMessageMixin(object):
@@ -24,7 +28,7 @@ class TicketMessageMixin(object):
         )
 
     @classmethod
-    def create(cls, ticket, request, **extra_meta):
+    def create(cls, ticket, request, text=None, owner=None, **extra_meta):
         meta = {
             'id': ticket.id.hex,
             'handler_code': ticket.handler_code,
@@ -35,9 +39,13 @@ class TicketMessageMixin(object):
         # force a change of the ticket to make sure that it gets reindexed
         ticket.force_update()
 
+        # the owner can be forced to a specific value
+        owner = owner or request.current_username or ticket.ticket_email
+
         return cls.bound_messages(request.session).add(
             channel_id=ticket.number,
-            owner=request.current_username or ticket.ticket_email,
+            owner=owner,
+            text=text,
             meta=meta
         )
 
@@ -49,15 +57,14 @@ class TicketNote(Message, TicketMessageMixin):
 
     @classmethod
     def create(cls, ticket, request, text, file=None):
-        note = super().create(ticket, request)
-        note.text = text
+        note = super().create(ticket, request, text=text)
         note.file = file
 
         return note
 
     @property
     def formatted_text(self):
-        return linkify(self.text).replace('\n', '<br>')
+        return paragraphify(linkify(self.text))
 
     def links(self, layout):
         yield Link(_("Edit"), layout.request.link(self, 'edit'))
@@ -74,6 +81,44 @@ class TicketNote(Message, TicketMessageMixin):
                     redirect_after=layout.request.link(self.ticket)
                 )
             ))
+
+
+class TicketChatMessage(Message, TicketMessageMixin):
+    """ Chat messages sent between the person in charge of the ticket and
+    the submitter of the ticket.
+
+    Paramters of note:
+
+    - origin: 'external' or 'internal', to differentiate between the
+              messages sent from the organisation to someone outside or
+              from someone outside to someone inside.
+
+    - notify: only relevant for messages originating from 'internal' - if the
+              last sent message with origin 'internal' has this flag, a
+              notification is sent to the owner of that message, whenever
+              a new external reply comes in.
+
+    """
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'ticket_chat'
+    }
+
+    @classmethod
+    def create(cls, ticket, request, text, owner, origin,
+               notify=False, recipient=None):
+
+        return super().create(
+            ticket, request, text=text, owner=owner, origin=origin,
+            notify=notify, recipient=recipient)
+
+    @property
+    def formatted_text(self):
+        return paragraphify(linkify(self.text))
+
+    @property
+    def subtype(self):
+        return self.meta.get('origin', None)
 
 
 class TicketMessage(Message, TicketMessageMixin):

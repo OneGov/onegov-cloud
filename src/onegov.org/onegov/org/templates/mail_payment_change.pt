@@ -3,7 +3,7 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="body">
-        <p i18n:translate>Dear Sir or Madam,</p>
+        <p i18n:translate>Hello!</p>
 
         <tal:b tal:switch="change">
             <p tal:case="'marked-as-paid'" i18n:translate>Your ticket has received a payment.</p>
@@ -12,8 +12,11 @@
         </tal:b>
 
         <p>
-            <span i18n:translate>The ticket number is</span>: <span class="ticket-number">${model.number}</span><br>
-            <span i18n:translate>The payment amount is</span>: <span class="ticket-number">${layout.format_number(payment.amount)} ${payment.currency}</span>
+            <span i18n:translate>Amount:</span> <span class="ticket-number">${layout.format_number(payment.amount)} ${payment.currency}</span>
+        </p>
+
+        <p>
+            <a href="${request.link(ticket, 'status')}" i18n:translate>Check ticket status</a>
         </p>
     </tal:b>
 </div>

@@ -152,7 +152,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         """
         category = kwargs.get('category', 'marketing')
 
-        reply_to = self.org.meta.get('reply_to', kwargs.pop('reply_to', None))
+        reply_to = kwargs.pop('reply_to', self.org.meta.get('reply_to', None))
         reply_to = reply_to or self.mail[category]['sender']
         reply_to = "{} <{}>".format(self.org.title, reply_to)
 
@@ -289,6 +289,25 @@ def get_is_complete_userprofile_handler():
 @OrgApp.setting(section='org', name='default_directory_search_widget')
 def get_default_directory_search_widget():
     return None
+
+
+@OrgApp.setting(section='org', name='public_ticket_messages')
+def get_public_ticket_messages():
+    """ Returns a list of message types which are availble on the ticket
+    status page, visible to anyone that knows the unguessable url.
+
+    """
+
+    # do *not* add ticket_note here, those are private!
+    return (
+        'directory',
+        'event',
+        'payment',
+        'reservation',
+        'submission',
+        'ticket',
+        'ticket_chat',
+    )
 
 
 @OrgApp.webasset_path()

@@ -5,7 +5,7 @@ from onegov.form import merge_forms
 from onegov.org import OrgApp, _
 from onegov.org.forms import DateRangeForm, ExportForm
 from onegov.org.layout import PaymentCollectionLayout
-from onegov.org.mail import send_transactional_html_mail
+from onegov.org.mail import send_ticket_mail
 from onegov.org.models import PaymentMessage
 from onegov.org.new_elements import Link
 from sedate import align_range_to_day, standardize_date, as_datetime
@@ -47,18 +47,19 @@ def send_ticket_notifications(payment, request, change):
 
         # send an e-mail
         email = ticket.snapshot.get('email') or ticket.handler.email
-        if email != request.current_username and not ticket.muted:
-            send_transactional_html_mail(
-                request=request,
-                template='mail_payment_change.pt',
-                subject=EMAIL_SUBJECTS[change],
-                receivers=(email, ),
-                content={
-                    'model': ticket,
-                    'payment': payment,
-                    'change': change
-                }
-            )
+
+        send_ticket_mail(
+            request=request,
+            template='mail_payment_change.pt',
+            subject=EMAIL_SUBJECTS[change],
+            receivers=(email, ),
+            ticket=ticket,
+            content={
+                'model': ticket,
+                'payment': payment,
+                'change': change
+            }
+        )
 
 
 @OrgApp.html(

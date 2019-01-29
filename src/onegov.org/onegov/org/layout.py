@@ -933,6 +933,38 @@ class TicketNoteLayout(DefaultLayout):
         ]
 
 
+class TicketChatMessageLayout(DefaultLayout):
+
+    def __init__(self, model, request, internal=False):
+        super().__init__(model, request)
+        self.internal = internal
+
+    @cached_property
+    def breadcrumbs(self):
+        return self.internal\
+            and self.internal_breadcrumbs\
+            or self.public_breadcrumbs
+
+    @property
+    def internal_breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Tickets"), self.request.link(
+                TicketCollection(self.request.session)
+            )),
+            Link(self.ticket.number, self.request.link(self.ticket)),
+            Link(_("New Message"), '#')
+        ]
+
+    @property
+    def public_breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Ticket Status"), self.request.link(self.model, 'status')),
+            Link(_("New Message"), '#')
+        ]
+
+
 class ResourcesLayout(DefaultLayout):
 
     @cached_property

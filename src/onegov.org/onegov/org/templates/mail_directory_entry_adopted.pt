@@ -3,14 +3,13 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="body">
-        <p i18n:translate>Dear Sir or Madam,</p>
+        <p i18n:translate>Hi!</p>
         <p i18n:translate>Your directory submission has been adopted:</p>
 
-        <p>${ticket.group} - ${ticket.title}</p>
+        <p><b>${ticket.group} - ${ticket.title}</b></p>
 
-        <tal:b tal:condition="ticket">
-            <p><span i18n:translate>The ticket number is</span>: <span class="ticket-number">${ticket.number}</span></p>
+        <p>
             <a href="${request.link(ticket, 'status')}" i18n:translate>Check ticket status</a>
-        </tal:b>
+        </p>
     </tal:b>
 </div>

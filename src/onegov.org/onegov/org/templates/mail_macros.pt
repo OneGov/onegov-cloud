@@ -31,16 +31,16 @@
 </metal:reservations>
 
 <metal:event define-macro="event" i18n:domain="onegov.org">
-    <p>${model.title}</p>
+    <p><b>${model.title}</b></p>
     <p>${model.location}</p>
     <p>${model.organizer}</p>
-    <p tal:content="structure model.description.replace('\n', '<br />')" />
+    <p tal:condition="model.description" tal:content="structure model.description.replace('\n', '<br />')" />
     <p>
         <ul tal:define="occurrences model.occurrence_dates(localize=True)">
             <li tal:repeat="occurrence occurrences">${layout.format_date(occurrence, 'datetime')} - ${layout.format_date(model.localized_end, 'time')}</li>
         </ul>
     </p>
-    <p>
+    <p tal:condition="model.tags">
         <ul><li tal:repeat="tag model.tags" i18n:translate="">${tag}</li></ul>
     </p>
 </metal:event>
@@ -59,14 +59,15 @@
 </metal:display_form>
 
 <metal:display_field define-macro="display_fields" i18n:domain="onegov.org">
-    <dl class="field-display" tal:repeat="field fields">
-        <tal:b define="rendered layout.render_field(field)|nothing" condition="rendered">
-            <dt>${field.label.text}</dt>
-            <dd>
-                <tal:b replace="structure rendered" />
-            </dd>
+    <table class="field-display">
+        <tal:b repeat="field fields">
+            <tal:b define="rendered layout.render_field(field)|nothing" condition="rendered">
+                <tr><td><b>${field.label.text}</b></td></tr>
+                <tr><td><tal:b replace="structure rendered" /></td></tr>
+                <tr><td height="5"></td></tr>
+            </tal:b>
         </tal:b>
-    </dl>
+    </table>
 </metal:display_field>
 
 </body>

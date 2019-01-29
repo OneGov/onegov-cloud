@@ -45,20 +45,16 @@ class DirectorySubmissionAction(object):
             .first()
 
     def send_mail_if_enabled(self, request, subject, template):
-        if self.ticket.muted:
-            return
-
-        if self.ticket.ticket_email == request.current_username:
-            return
 
         # XXX circular import
-        from onegov.org.mail import send_transactional_html_mail
+        from onegov.org.mail import send_ticket_mail
 
-        return send_transactional_html_mail(
+        return send_ticket_mail(
             request=request,
             template=template,
             subject=subject,
             receivers=(self.ticket.ticket_email, ),
+            ticket=self.ticket,
             content={
                 'model': self.directory,
                 'ticket': self.ticket

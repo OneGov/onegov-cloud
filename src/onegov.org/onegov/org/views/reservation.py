@@ -12,7 +12,7 @@ from onegov.org import utils
 from onegov.org.elements import Link
 from onegov.org.forms import ReservationForm
 from onegov.org.layout import ReservationLayout
-from onegov.org.mail import send_transactional_html_mail
+from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage, ReservationMessage
 from onegov.reservation import Allocation, Reservation, Resource
 from onegov.ticket import TicketCollection
@@ -376,26 +376,25 @@ def finalize_reservation(self, request):
             )
             TicketMessage.create(ticket, request, 'opened')
 
-        if reservations[0].email != request.current_username:
-            if not ticket.muted:
-                show_submission = request.params.get('send_by_email') == 'yes'
+        show_submission = request.params.get('send_by_email') == 'yes'
 
-                if submission and show_submission:
-                    form = submission.form_obj
-                else:
-                    form = None
+        if submission and show_submission:
+            form = submission.form_obj
+        else:
+            form = None
 
-                send_transactional_html_mail(
-                    request=request,
-                    template='mail_ticket_opened.pt',
-                    subject=_("A ticket has been opened"),
-                    receivers=(reservations[0].email, ),
-                    content={
-                        'model': ticket,
-                        'form': form,
-                        'show_submission': show_submission
-                    }
-                )
+        send_ticket_mail(
+            request=request,
+            template='mail_ticket_opened.pt',
+            subject=_("Your ticket has been opened"),
+            receivers=(reservations[0].email, ),
+            ticket=ticket,
+            content={
+                'model': ticket,
+                'form': form,
+                'show_submission': show_submission
+            }
+        )
 
         request.success(_("Thank you for your reservation!"))
 
@@ -412,18 +411,18 @@ def accept_reservation(self, request):
         tickets = TicketCollection(request.session)
         ticket = tickets.by_handler_id(self.token.hex)
 
-        if self.email != request.current_username and not ticket.muted:
-            send_transactional_html_mail(
-                request=request,
-                template='mail_reservation_accepted.pt',
-                subject=_("Your reservations were accepted"),
-                receivers=(self.email, ),
-                content={
-                    'model': self,
-                    'resource': resource,
-                    'reservations': reservations
-                }
-            )
+        send_ticket_mail(
+            request=request,
+            template='mail_reservation_accepted.pt',
+            subject=_("Your reservations were accepted"),
+            receivers=(self.email, ),
+            ticket=ticket,
+            content={
+                'model': self,
+                'resource': resource,
+                'reservations': reservations
+            }
+        )
 
         for reservation in reservations:
             reservation.data = reservation.data or {}
@@ -480,18 +479,18 @@ def reject_reservation(self, request):
     if payment:
         request.session.delete(payment)
 
-    if self.email != request.current_username and not ticket.muted:
-        send_transactional_html_mail(
-            request=request,
-            template='mail_reservation_rejected.pt',
-            subject=_("The following reservations were rejected"),
-            receivers=(self.email, ),
-            content={
-                'model': self,
-                'resource': resource,
-                'reservations': targeted
-            }
-        )
+    send_ticket_mail(
+        request=request,
+        template='mail_reservation_rejected.pt',
+        subject=_("The following reservations were rejected"),
+        receivers=(self.email, ),
+        ticket=ticket,
+        content={
+            'model': self,
+            'resource': resource,
+            'reservations': targeted
+        }
+    )
 
     ReservationMessage.create(targeted, ticket, request, 'rejected')
 

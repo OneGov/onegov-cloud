@@ -3,19 +3,21 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="body">
-        <p i18n:translate>Dear Sir or Madam,</p>
-        <p i18n:translate>A new ticket has been opened</p>
+        <p i18n:translate>Hello!</p>
+        <p><span i18n:translate>A new ticket has been opened:</span></p>
 
-        <p><span i18n:translate>The ticket number is</span>: <span class="ticket-number">${model.number}</span></p>
+        <p><span class="ticket-number">${model.reference(request)}</span></p>
 
         <p i18n:translate>We will send another e-mail once your ticket has
         been completed. In the meantime you can check the status of your
         ticket at any time:</p>
-        <a href="${request.link(model, 'status')}" i18n:translate>Check ticket status</a>
+
+        <a href="${request.link(ticket, 'status')}" i18n:translate>Check ticket status</a>
 
         <tal:b condition="show_submission|nothing">
             <hr class="large">
             <metal:b use-macro="layout.macros['display_form']" />
         </tal:b>
+
     </tal:b>
 </div>

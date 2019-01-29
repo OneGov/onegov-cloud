@@ -12,11 +12,11 @@
                     The record behind this ticket was removed. The following information
                     is a snapshot kept for future reference.
                 </div>
-                <div class="ticket-summary">
+                <div class="ticket-summary" id="summary">
                     <tal:b replace="structure summary" />
                 </div>
 
-                <div class="ticket-timeline">
+                <div class="ticket-timeline" id="timeline">
                     <h2 i18n:translate>Timeline</h2>
                     <div class="timeline" data-feed-data="${feed_data}" data-feed='static'></div>
                     <p class="timeline-no-messages" i18n:translate style="display: none;">
@@ -61,6 +61,46 @@
                             <span i18n:translate>Enable E-Mails</span>
                         </a>
                     </div>
+
+                    <tal:b condition="ticket.state != 'closed'">
+                        <a class="button small primary" href="${request.link(ticket, 'message-to-submitter')}">
+                            <i class="fa fa-fw fa-comment-o" aria-hidden="true"></i>
+                            <span i18n:translate>Send Message</span>
+                        </a>
+                    </tal:b>
+
+                    <tal:b condition="ticket.state == 'closed'">
+                        <a class="button small disabled confirm"
+                            data-confirm="Messages cannot be sent when the ticket is closed"
+                            data-confirm-extra="Please reopen the ticket to send a message"
+                            data-confirm-no="Cancel"
+                            i18n:attributes="data-confirm;data-confirm-extra;data-confirm-no">
+
+                            <i class="fa fa-fw fa-comment-o" aria-hidden="true"></i>
+                            <span i18n:translate>Send Message</span>
+                        </a>
+                    </tal:b>
+
+                    <ul class="counts" tal:condition="counts and (counts.notes or counts.internal or counts.external)">
+                        <li tal:condition="counts.external" class="counts-external">
+                            <a href="#timeline" i18n:translate>
+                                <span class="counts-value" i18n:name="count">${counts.external}</span> received
+                            </a>
+                        </li>
+                        <li tal:condition="counts.internal" class="counts-internal">
+                            <a href="#timeline" i18n:translate>
+                                <span class="counts-value" i18n:name="count">${counts.internal}</span> sent
+                            </a>
+                        </li>
+                        <li tal:condition="counts.notes" class="counts-note">
+                            <a href="#timeline" i18n:translate tal:condition="counts.notes == 1">
+                                <span class="counts-value" i18n:name="count">${counts.notes}</span> note
+                            </a>
+                            <a href="#timeline" i18n:translate tal:condition="counts.notes > 1">
+                                <span class="counts-value" i18n:name="count">${counts.notes}</span> notes
+                            </a>
+                        </li>
+                    </ul>
                 </div>
 
                 <div class="ticket-panel" tal:define="payment handler.payment" tal:condition="payment">

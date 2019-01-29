@@ -5,7 +5,7 @@ from onegov.event import EventCollection
 from onegov.form import FormSubmissionCollection
 from onegov.org import _
 from onegov.org.layout import DefaultLayout, EventLayout
-from onegov.org.models.message import TicketNote
+from onegov.chat import Message
 from onegov.org.new_elements import Link, LinkGroup, Confirm, Intercooler
 from onegov.reservation import Allocation, Resource, Reservation
 from onegov.ticket import Ticket, Handler, handlers
@@ -13,7 +13,27 @@ from purl import URL
 from sqlalchemy.orm import object_session
 
 
-class OrgTicketExtraText(object):
+class OrgTicketMixin(object):
+    """ Adds additional methods to the ticket, needed by the organisations
+    implementation of it. Strictly limited to things that
+    do not belong into onegov.ticket.
+
+    """
+
+    def reference(self, request):
+        """ Returns the reference which should be used wherever we talk about
+        a ticket, but do not show it (say in an e-mail subject).
+
+        This reference should not be changed so it stays consistent.
+
+        If you want, you can override the content of the reference group,
+        shown in brackets (see :meth:`reference_group`).
+
+        """
+        return f'{self.number} / {self.reference_group(request)}'
+
+    def reference_group(self, request):
+        return request.translate(self.group)
 
     @property
     def extra_localized_text(self):
@@ -31,30 +51,33 @@ class OrgTicketExtraText(object):
         # we should advise them to enter a meaningful note with the file
         # instead.
         #
-        q = object_session(self).query(TicketNote)
+        q = object_session(self).query(Message)
         q = q.filter_by(channel_id=self.number)
-        q = q.filter_by(type='ticket_note')
-        q = q.with_entities(TicketNote.text)
+        q = q.filter(Message.type.in_(('ticket_note', 'ticket_chat')))
+        q = q.with_entities(Message.text)
 
         return ' '.join(n.text for n in q if n.text)
 
 
-class FormSubmissionTicket(OrgTicketExtraText, Ticket):
+class FormSubmissionTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'FRM'}
     es_type_name = 'submission_tickets'
 
 
-class ReservationTicket(OrgTicketExtraText, Ticket):
+class ReservationTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'RSV'}
     es_type_name = 'reservation_tickets'
 
 
-class EventSubmissionTicket(OrgTicketExtraText, Ticket):
+class EventSubmissionTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'EVN'}
     es_type_name = 'event_tickets'
 
+    def reference_group(self, request):
+        return self.title
 
-class DirectoryEntryTicket(OrgTicketExtraText, Ticket):
+
+class DirectoryEntryTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'DIR'}
     es_type_name = 'directory_tickets'
 

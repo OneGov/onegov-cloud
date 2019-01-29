@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-01-22 10:54+0100\n"
-"PO-Revision-Date: 2018-12-08 11:01+0100\n"
+"POT-Creation-Date: 2019-01-29 13:01+0100\n"
+"PO-Revision-Date: 2019-01-25 13:43+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.2\n"
+"X-Generator: Poedit 2.2.1\n"
 
 msgid "Login"
 msgstr "Login"
@@ -116,6 +116,12 @@ msgstr "Anmeldungszeitraum"
 
 msgid "People"
 msgstr "Personen"
+
+msgid "New Message"
+msgstr "Neue Nachricht"
+
+msgid "Ticket Status"
+msgstr "Ticket Status"
 
 msgid "Reservations"
 msgstr "Reservationen"
@@ -690,6 +696,9 @@ msgstr "Der Wochentag der Veranstaltung muss ausgewählt sein."
 msgid "Remove"
 msgstr "Entfernen"
 
+msgid "Send a daily status e-mail."
+msgstr "Ein tägliches Status E-Mail senden."
+
 msgid "Text"
 msgstr "Text"
 
@@ -699,8 +708,14 @@ msgstr "Ihre Notiz zu dem Ticket"
 msgid "Attachment"
 msgstr "Anhang"
 
-msgid "Send a daily status e-mail."
-msgstr "Ein tägliches Status E-Mail senden."
+msgid "Message"
+msgstr "Nachricht"
+
+msgid "Your message"
+msgstr "Ihre Nachricht"
+
+msgid "Notify me about replies"
+msgstr "Ich möchte eine Benachrichtigung bei Antworten"
 
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
@@ -1764,6 +1779,28 @@ msgstr "Verändert:"
 msgid "Confirm"
 msgstr "Bestätigen"
 
+msgid "Hello!"
+msgstr "Guten Tag!"
+
+msgid "A message has been sent regarding ${ref}:"
+msgstr "Sie haben zu ${ref} eine Nachricht erhalten:"
+
+msgid "${author} wrote"
+msgstr "${author} schrieb"
+
+#. Used in sentence: "Please ${link} to reply."
+msgid "visit the ticket status page"
+msgstr "öffnen Sie den Ticket Status"
+
+#. Canonical text for ${link} is: "visit the ticket status page"
+#. Canonical text for ${link} is: "visit the ticket page"
+msgid "Please ${link} to reply."
+msgstr "Bitte ${link} um zu antworten"
+
+#. Used in sentence: "Please ${link} to reply."
+msgid "visit the ticket page"
+msgstr "öffnen Sie das Ticket"
+
 msgid ""
 "The user ${username} was created successfully. Please write down the user's "
 "password, as it won't be shown to you again:"
@@ -1814,9 +1851,6 @@ msgstr ""
 
 msgid "No images uploaded yet"
 msgstr "Noch keine Bilder hochgeladen"
-
-msgid "Dear Sir or Madam,"
-msgstr "Guten Tag"
 
 msgid "An administrator just created a new account on ${org} for you."
 msgstr ""
@@ -2208,11 +2242,8 @@ msgstr ""
 "dieses E-Mail nicht mehr bekommen möchten, melden Sie sich bitte bei einem "
 "Administrator damit dieser Sie von der Empfängerliste streichen kann."
 
-msgid "A new ticket has been opened"
-msgstr "Ein neues Ticket wurde für Sie eröffnet"
-
-msgid "The ticket number is"
-msgstr "Ihre Ticket Referenz"
+msgid "A new ticket has been opened:"
+msgstr "Ein neues Ticket wurde für Sie eröffnet:"
 
 msgid ""
 "We will send another e-mail once your ticket has been completed. In the "
@@ -2305,8 +2336,11 @@ msgstr "Klicken Sie hier um sich abzumelden."
 msgid "This album does not contain any images yet."
 msgstr "Dieses Fotoalbum enthält noch keine Bilder."
 
+msgid "Hi!"
+msgstr ""
+
 msgid "Your directory submission has unfortunately been rejected:"
-msgstr "Ihre Verzeichniseintrag Eintabe wurde leider abgelehnt:"
+msgstr "Ihre Verzeichniseintrag Eingabe wurde leider abgelehnt:"
 
 msgid "1 reservation accepted."
 msgstr "1 Reservation angenommen."
@@ -2502,6 +2536,27 @@ msgstr "Keine Ticket Updates via E-Mail"
 msgid "Enable E-Mails"
 msgstr "E-Mails aktivieren"
 
+msgid "Send Message"
+msgstr "Nachricht senden"
+
+msgid "Messages cannot be sent when the ticket is closed"
+msgstr "Zu geschlossenen Tickets können keine Nachrichten versendet werden"
+
+msgid "Please reopen the ticket to send a message"
+msgstr "Bitte öffnen Sie das Ticket wieder um eine Nachricht zu senden"
+
+msgid "${count} received"
+msgstr "${count} Empfangen"
+
+msgid "${count} sent"
+msgstr "${count} Gesendet"
+
+msgid "${count} note"
+msgstr "${count} Notiz"
+
+msgid "${count} notes"
+msgstr "${count} Notizen"
+
 msgid "Amount"
 msgstr "Betrag"
 
@@ -2676,6 +2731,9 @@ msgstr "Ihre Anmeldung für \"${title}\" wurde storniert."
 msgid "Registration"
 msgstr "Anmeldung"
 
+msgid "The ticket number is"
+msgstr "Ihre Ticket Referenz"
+
 msgid "Hello"
 msgstr "Grüezi"
 
@@ -2706,6 +2764,18 @@ msgstr "Mit freundlichen Grüssen,"
 
 msgid "Ticket Number"
 msgstr "Ticket Nummer"
+
+msgid "Subject"
+msgstr "Betreff"
+
+msgid ""
+"Forgot something or have a special request? Add a message to the ticket."
+msgstr ""
+"Haben Sie ein besonderes Anliegen oder haben Sie etwas vergessen? Dann fügen "
+"Sie dem Ticket eine Nachricht hinzu."
+
+msgid "New messages have been disabled because the ticket has been closed."
+msgstr "Nachrichten wurden deaktiviert, da das Ticket geschlossen wurde."
 
 msgid "No photo albums defined yet."
 msgstr "Noch keine Fotoalben erstellt."
@@ -2740,8 +2810,8 @@ msgstr ""
 "Ihre Ticket Zahlung wurde rückerstattet. Bitte beachten Sie dass es ein paar "
 "Tage dauern kann bis der Betrag auf Ihrer Kreditkartenabrechnung erscheint."
 
-msgid "The payment amount is"
-msgstr "Ihr Betrag"
+msgid "Amount:"
+msgstr "Betrag:"
 
 msgid "Reservations must be made at least one day in advance."
 msgstr "Reservationen müsen mindestens ein Tag im Voraus gemacht werden."
@@ -2779,8 +2849,17 @@ msgstr "Es wurden noch keine Newsletter versendet"
 msgid "Not yet sent."
 msgstr "Noch nicht gesendet."
 
-msgid "Your ticket has been closed"
-msgstr "Ihr Ticket wurde geschlossen"
+msgid "Your ticket has been closed."
+msgstr "Ihr Ticket wurde geschlossen."
+
+msgid "Your ticket's timeline has been archived for future reference:"
+msgstr "Der Verlauf ihres Tickets wurde als zukünftige Referenz archiviert:"
+
+msgid "Ticket Timeline"
+msgstr "Ticket Verlauf"
+
+msgid "Thank you for your request."
+msgstr "Vielen Dank für Ihre Anfrage."
 
 msgid "External link"
 msgstr "Externer Link"
@@ -2846,7 +2925,7 @@ msgstr ""
 "Sie weiterfahren."
 
 msgid "You have been logged in."
-msgstr "Sie wurden eingeloggt."
+msgstr "Sie wurden angemeldet."
 
 msgid "A user with this address already exists"
 msgstr "Ein Benutzer mit dieser E-Mail Adresse existiert bereits"
@@ -2959,6 +3038,9 @@ msgstr ""
 "Die mit der Reservation verknüpfte Zahlung muss rückgängig gemacht werden "
 "bevor die Reservation gelöscht werden kann"
 
+msgid "The following reservations were rejected"
+msgstr "Die folgenden Reservationen wurden abgelehnt"
+
 msgid "The reservations were rejected"
 msgstr "Die Reservationen wurden abgelehnt"
 
@@ -2971,23 +3053,20 @@ msgstr "Stunde"
 msgid "Your payment could not be processed"
 msgstr "Ihre Zahlung konnte nicht verarbeitet werden"
 
-msgid "The following reservations were rejected"
-msgstr "Die folgenden Reservationen wurden abgelehnt"
-
-msgid "hours"
-msgstr "Stunden"
+msgid "Your ticket has been opened"
+msgstr "Ihr Ticket wurde eröffnet"
 
 msgid "Your reservations were accepted"
 msgstr "Ihre Reservationen wurden angenommen"
+
+msgid "hours"
+msgstr "Stunden"
 
 msgid "day"
 msgstr "Tag"
 
 msgid "Pay Online and Complete"
 msgstr "Online zahlen und abschliessen"
-
-msgid "A ticket has been opened"
-msgstr "Ein neues Ticket wurde für Sie eröffnet"
 
 msgid "days"
 msgstr "Tage"
@@ -3011,11 +3090,11 @@ msgstr ""
 msgid "You have accepted the event ${title}"
 msgstr "Sie haben die Veranstaltung ${title} angenommen"
 
-msgid "Thank you for your submission!"
-msgstr "Vielen Dank für Ihre Eingabe!"
-
 msgid "Your event was accepted"
 msgstr "Ihre Veranstaltung wurde angenommen"
+
+msgid "Thank you for your submission!"
+msgstr "Vielen Dank für Ihre Eingabe!"
 
 msgid "Your event was rejected"
 msgstr "Ihre Veranstaltung wurde abgelehnt"
@@ -3037,20 +3116,28 @@ msgstr "Sie haben E-Mails für das Ticket ${number} deaktiviert"
 msgid "You have enabled e-mails for ticket ${number}"
 msgstr "Sie haben E-Mails für das Ticket ${number} aktiviert"
 
+#, python-format
+msgid ""
+"The following message will be sent to ${address} and it will be recorded for "
+"future reference."
+msgstr ""
+"Die folgende Nachricht wird an ${address} gesendet und als zukünftige "
+"Referenz gespeichert."
+
 msgid "Your request has been submitted"
 msgstr "Anfrage eingereicht"
 
 msgid "Mark as unpaid"
 msgstr "Als unbezahlt markieren"
 
+msgid "Your ticket has a new message"
+msgstr "Ihr Ticket hat eine neue Nachricht"
+
 msgid "Your note was added"
 msgstr "Ihre Notiz wurde hinzugefügt"
 
 msgid "Your request is currently pending"
 msgstr "Ihr Anliegen wird zur Zeit bearbeitet"
-
-msgid "Ticket Status"
-msgstr "Ticket Status"
 
 msgid "Mark as paid"
 msgstr "Als bezahlt markieren"
@@ -3084,8 +3171,17 @@ msgstr ""
 msgid "You have reopened ticket ${number}"
 msgstr "Sie haben das Ticket ${number} wieder geöffnet"
 
+msgid "The ticket has already been closed"
+msgstr "Das Ticket wurde bereits geschlossen"
+
+msgid "Your message has been sent"
+msgstr "Ihre Nachricht wurde gesendet"
+
 msgid "Your request has been processed"
 msgstr "Ihr Anliegen wurde abgeschlossen"
+
+msgid "Your message has been received"
+msgstr "Ihre Nachricht wurde übermittelt"
 
 msgid "All"
 msgstr "Alle"
@@ -3093,8 +3189,8 @@ msgstr "Alle"
 msgid "All Tickets"
 msgstr "Alle Tickets"
 
-msgid "Your ticket has been repoened"
-msgstr "Das Ticket wurde wieder geöffnet"
+msgid "Your ticket has been closed"
+msgstr "Ihr Ticket wurde geschlossen"
 
 msgid "All Users"
 msgstr "Alle Benutzer"
@@ -3586,6 +3682,21 @@ msgstr "Die Zahlung wurde eingenommen"
 
 msgid "The payment was refunded"
 msgstr "Die Zahlung wurde rückerstattet"
+
+#~ msgid "${count} notes created"
+#~ msgstr "${count} Notizen erstellt"
+
+#~ msgid "${count} messages sent"
+#~ msgstr "${count} Nachrichten gesendet"
+
+#~ msgid "${count} messages received"
+#~ msgstr "${count} Nachrichten empfangen"
+
+#~ msgid "Dear Sir or Madam,"
+#~ msgstr "Guten Tag"
+
+#~ msgid "Your ticket has been repoened"
+#~ msgstr "Das Ticket wurde wieder geöffnet"
 
 #~ msgid "Attachments are optional."
 #~ msgstr "Anhänge sind optional."

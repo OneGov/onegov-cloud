@@ -166,6 +166,10 @@ body {
     font-size: .875rem;
 }
 
+.tiny-text {
+    font-size: .8rem;
+}
+
 /*
     Small atomic text particles whose white-space should not be wrapped
 */
@@ -4134,11 +4138,12 @@ h2 + div.timeline {
 .message {
     background-color: $gray-pastel;
     border: 1px solid rgba(175, 150, 150, .25);
-    box-shadow: 2px 2px 2px rgba(150, 150, 150, .25);
+    border-radius: 2px;
+    box-shadow: 3px 3px 3px rgba(220, 220, 220, .2);
     display: inline-block;
     font-size: .875rem;
-    position: relative;
     margin-bottom: 1.5rem;
+    position: relative;
     width: 100%;
 
     .identicon {
@@ -4153,8 +4158,16 @@ h2 + div.timeline {
         padding: .25rem .5rem;
     }
 
+    .text p {
+        font-size: .875rem;
+        margin-bottom: 0;
+
+        + p {
+            margin-top: .5rem;
+        }
+    }
+
     .title,
-    .text,
     .timestamp,
     .file {
         overflow: hidden;
@@ -4197,11 +4210,11 @@ h2 + div.timeline {
 .message-event,
 .message-directory,
 .message-submission {
-    background: $green-pastel;
+    background: lighten($green-pastel, 2.5%);
 }
 
 .message-ticket_note {
-    background: $yellow-pastel;
+    background: lighten($yellow-pastel, 2.5%);
 
     .text {
         max-width: $max-line-width;
@@ -4211,9 +4224,16 @@ h2 + div.timeline {
     }
 }
 
+.message-ticket_chat-internal {
+    background: lighten($blue-pastel, 3%);
+}
+
+.message-ticket_chat-external {
+    background: darken($blue-pastel, 3%);
+}
+
 .message-file {
-    $orange-pastel: #fdf6f1;
-    background: $orange-pastel;
+    background: lighten($red-pastel, 2.5%);
 }
 
 /*
@@ -4395,8 +4415,9 @@ h2 + div.timeline {
     .searchbox,
     .side-nav,
     div.push,
+    .counts,
     .top-bar {
-        display: none;
+        display: none !important;
     }
 
     .side-panel {
@@ -5430,5 +5451,75 @@ h2 + div.timeline {
     .ticket-submitter-notification-status > span {
         display: inline-block;
         margin-bottom: .5rem;
+    }
+}
+
+/*
+    Ticket status page message adjustments
+*/
+.status-chat {
+    .title {
+        // use this instead of visibility:hidden or display:none - we do not
+        // want this to bread by screen-readers, but we also want the element
+        // to stick around so the line defined by ::before stays
+        border: 0;
+        height: 0;
+        padding: 0;
+        width: 0;
+    }
+}
+
+/*
+    Ticket counts
+*/
+.counts {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    list-style: none;
+    margin: .5rem 0 -.75rem -.25rem;
+    text-align: center;
+    width: calc(100% + .5rem);
+
+    > li {
+        border: .25rem solid #f5f5f5;
+        display: inline-block;
+        flex-basis: 0;
+        flex-grow: 1;
+        line-height: 1.3;
+        margin: auto;
+        padding: 1ex;
+        text-align: center;
+        white-space: nowrap;
+
+        * {
+            font-size: .8rem !important;
+        }
+    }
+
+    .counts-value {
+        border-radius: 50px;
+        display: inline-block;
+        font-weight: bold;
+        margin-right: .5ex;
+        min-height: 2.6ex;
+        min-width: 2.6ex;
+        padding: 0 2px;
+        text-align: center;
+    }
+
+    > .counts-note .counts-value {
+        background: $yellow-light;
+        color: #333;
+    }
+
+    > .counts-external .counts-value {
+        background: $blue-dark;
+        color: $white;
+    }
+
+    > .counts-internal .counts-value {
+        background: $blue-light;
+        color: #333;
     }
 }

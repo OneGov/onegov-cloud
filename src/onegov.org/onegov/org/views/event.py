@@ -8,7 +8,7 @@ from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.org.forms import EventForm
 from onegov.org.layout import EventLayout
-from onegov.org.mail import send_transactional_html_mail
+from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage, EventMessage
 from onegov.ticket import TicketCollection
 from sedate import utcnow
@@ -65,18 +65,17 @@ def publish_event(self, request):
     session = request.session
     ticket = TicketCollection(session).by_handler_id(self.id.hex)
 
-    if self.meta['submitter_email'] != request.current_username:
-        if not ticket.muted:
-            send_transactional_html_mail(
-                request=request,
-                template='mail_event_accepted.pt',
-                subject=_("Your event was accepted"),
-                receivers=(self.meta['submitter_email'], ),
-                content={
-                    'model': self,
-                    'ticket': ticket
-                }
-            )
+    send_ticket_mail(
+        request=request,
+        template='mail_event_accepted.pt',
+        subject=_("Your event was accepted"),
+        receivers=(self.meta['submitter_email'], ),
+        ticket=ticket,
+        content={
+            'model': self,
+            'ticket': ticket
+        }
+    )
 
     EventMessage.create(self, ticket, request, 'published')
 
@@ -177,17 +176,13 @@ def view_event(self, request):
             )
             TicketMessage.create(ticket, request, 'opened')
 
-        if self.meta['submitter_email'] != request.current_username:
-            if not ticket.muted:
-                send_transactional_html_mail(
-                    request=request,
-                    template='mail_ticket_opened.pt',
-                    subject=_("A ticket has been opened"),
-                    receivers=(self.meta['submitter_email'], ),
-                    content={
-                        'model': ticket
-                    }
-                )
+        send_ticket_mail(
+            request=request,
+            template='mail_ticket_opened.pt',
+            subject=_("Your ticket has been opened"),
+            receivers=(self.meta['submitter_email'], ),
+            ticket=ticket,
+        )
 
         request.success(_("Thank you for your submission!"))
 
@@ -273,23 +268,22 @@ def handle_delete_event(self, request):
     # Create a snapshot of the ticket to keep the useful information.
     tickets = TicketCollection(request.session)
     ticket = tickets.by_handler_id(self.id.hex)
+
     if ticket:
         ticket.create_snapshot(request)
 
-    if ticket and self.meta['submitter_email'] != request.current_username:
-        if not ticket.muted:
-            send_transactional_html_mail(
-                request=request,
-                template='mail_event_rejected.pt',
-                subject=_("Your event was rejected"),
-                receivers=(self.meta['submitter_email'], ),
-                content={
-                    'model': self,
-                    'ticket': ticket
-                }
-            )
+        send_ticket_mail(
+            request=request,
+            template='mail_event_rejected.pt',
+            subject=_("Your event was rejected"),
+            receivers=(self.meta['submitter_email'], ),
+            ticket=ticket,
+            content={
+                'model': self,
+                'ticket': ticket
+            }
+        )
 
-    if ticket:
         EventMessage.create(self, ticket, request, 'deleted')
 
     EventCollection(request.session).delete(self)

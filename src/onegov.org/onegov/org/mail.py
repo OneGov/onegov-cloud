@@ -40,3 +40,39 @@ def send_transactional_html_mail(*args, **kwargs):
 def send_marketing_html_mail(*args, **kwargs):
     kwargs['category'] = 'marketing'
     return send_html_mail(*args, **kwargs)
+
+
+def send_ticket_mail(request, template, subject, receivers, ticket,
+                     content=None, force=False, **kwargs):
+
+    if not force:
+
+        if ticket.muted:
+            return
+
+        if request.current_username in receivers:
+            if len(receivers) == 1:
+                return
+
+            receivers = tuple(
+                r for r in receivers if r != request.current_username
+            )
+
+    subject = ticket.reference(request) + ': ' + request.translate(subject)
+
+    content = content or {}
+
+    # legacy behavior
+    if 'model' not in content:
+        content['model'] = ticket
+
+    if 'ticket' not in content:
+        content['ticket'] = ticket
+
+    return send_transactional_html_mail(
+        request=request,
+        template=template,
+        subject=subject,
+        receivers=receivers,
+        content=content,
+        **kwargs)

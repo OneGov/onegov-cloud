@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-01-22 10:54+0100\n"
+"POT-Creation-Date: 2019-01-29 13:01+0100\n"
 "PO-Revision-Date: 2018-12-08 11:02+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -117,6 +117,12 @@ msgstr "Fenêtres d'inscription"
 
 msgid "People"
 msgstr "Personnes"
+
+msgid "New Message"
+msgstr ""
+
+msgid "Ticket Status"
+msgstr "Statut du ticket"
 
 msgid "Reservations"
 msgstr "Réservations"
@@ -689,6 +695,9 @@ msgstr ""
 msgid "Remove"
 msgstr "Supprimer"
 
+msgid "Send a daily status e-mail."
+msgstr "Envoyez un e-mail de suivi quotidien."
+
 msgid "Text"
 msgstr "Texte"
 
@@ -698,8 +707,14 @@ msgstr "Votre note à propos de ce ticket"
 msgid "Attachment"
 msgstr "Pièce jointe"
 
-msgid "Send a daily status e-mail."
-msgstr "Envoyez un e-mail de suivi quotidien."
+msgid "Message"
+msgstr ""
+
+msgid "Your message"
+msgstr ""
+
+msgid "Notify me about replies"
+msgstr ""
 
 msgid "E-Mail Address"
 msgstr "Adresse e-mail"
@@ -1768,6 +1783,28 @@ msgstr "Changé :"
 msgid "Confirm"
 msgstr "Confirmer"
 
+msgid "Hello!"
+msgstr "Bonjour!"
+
+msgid "A message has been sent regarding ${ref}:"
+msgstr ""
+
+msgid "${author} wrote"
+msgstr ""
+
+#. Used in sentence: "Please ${link} to reply."
+msgid "visit the ticket status page"
+msgstr ""
+
+#. Canonical text for ${link} is: "visit the ticket status page"
+#. Canonical text for ${link} is: "visit the ticket page"
+msgid "Please ${link} to reply."
+msgstr ""
+
+#. Used in sentence: "Please ${link} to reply."
+msgid "visit the ticket page"
+msgstr ""
+
 msgid ""
 "The user ${username} was created successfully. Please write down the user's "
 "password, as it won't be shown to you again:"
@@ -1819,9 +1856,6 @@ msgstr ""
 
 msgid "No images uploaded yet"
 msgstr "Aucune image téléchargée pour le moment"
-
-msgid "Dear Sir or Madam,"
-msgstr "Cher Monsieur, chère Madame,"
 
 msgid "An administrator just created a new account on ${org} for you."
 msgstr ""
@@ -2215,11 +2249,8 @@ msgstr ""
 "ne souhaitez plus recevoir ce courriel, veuillez contacter un administrateur "
 "pour qu'il vous enlève de la liste des destinataires."
 
-msgid "A new ticket has been opened"
-msgstr "Un nouveau ticket a été ouvert"
-
-msgid "The ticket number is"
-msgstr "Le numéro du ticket est"
+msgid "A new ticket has been opened:"
+msgstr ""
 
 msgid ""
 "We will send another e-mail once your ticket has been completed. In the "
@@ -2310,6 +2341,9 @@ msgstr "Cliquer ici pour vous désabonner."
 
 msgid "This album does not contain any images yet."
 msgstr "Cet album ne contient pas encore d'images."
+
+msgid "Hi!"
+msgstr ""
 
 msgid "Your directory submission has unfortunately been rejected:"
 msgstr "Votre proposition de répertoire a malheureusement été rejetée :"
@@ -2508,6 +2542,27 @@ msgstr "Aucune mise à jour de tickets par e-mail"
 msgid "Enable E-Mails"
 msgstr "Activer les e-mails"
 
+msgid "Send Message"
+msgstr ""
+
+msgid "Messages cannot be sent when the ticket is closed"
+msgstr ""
+
+msgid "Please reopen the ticket to send a message"
+msgstr ""
+
+msgid "${count} received"
+msgstr ""
+
+msgid "${count} sent"
+msgstr ""
+
+msgid "${count} note"
+msgstr ""
+
+msgid "${count} notes"
+msgstr ""
+
 msgid "Amount"
 msgstr "Montant"
 
@@ -2684,6 +2739,9 @@ msgstr "Votre inscription pour \"${title}\" a été confirmée."
 msgid "Registration"
 msgstr "Inscription "
 
+msgid "The ticket number is"
+msgstr "Le numéro du ticket est"
+
 msgid "Hello"
 msgstr "Bonjour"
 
@@ -2712,6 +2770,16 @@ msgstr "Cordialement,"
 
 msgid "Ticket Number"
 msgstr "Numéro du ticket"
+
+msgid "Subject"
+msgstr ""
+
+msgid ""
+"Forgot something or have a special request? Add a message to the ticket."
+msgstr ""
+
+msgid "New messages have been disabled because the ticket has been closed."
+msgstr ""
 
 msgid "No photo albums defined yet."
 msgstr "Aucun album photo défini pour le moment."
@@ -2747,8 +2815,8 @@ msgstr ""
 "avant que le montant du remboursement ne figure sur votre relevé de carte de "
 "crédit."
 
-msgid "The payment amount is"
-msgstr "Le montant du paiement est"
+msgid "Amount:"
+msgstr ""
 
 msgid "Reservations must be made at least one day in advance."
 msgstr ""
@@ -2791,8 +2859,17 @@ msgstr "Pas encore de lettre d'informations."
 msgid "Not yet sent."
 msgstr "Pas encore envoyé."
 
-msgid "Your ticket has been closed"
-msgstr "Votre ticket a été fermé"
+msgid "Your ticket has been closed."
+msgstr ""
+
+msgid "Your ticket's timeline has been archived for future reference:"
+msgstr ""
+
+msgid "Ticket Timeline"
+msgstr ""
+
+msgid "Thank you for your request."
+msgstr ""
 
 msgid "External link"
 msgstr "Lien externe"
@@ -2975,6 +3052,9 @@ msgstr ""
 "Le paiement associé à cette réservation doit être remboursé avant qu'elle "
 "puisse être rejetée"
 
+msgid "The following reservations were rejected"
+msgstr "Les réservations suivantes ont été rejetées"
+
 msgid "The reservations were rejected"
 msgstr "Les réservations ont été rejetées"
 
@@ -2987,23 +3067,20 @@ msgstr "heure"
 msgid "Your payment could not be processed"
 msgstr "Votre paiement n'a pas pu être traité"
 
-msgid "The following reservations were rejected"
-msgstr "Les réservations suivantes ont été rejetées"
-
-msgid "hours"
-msgstr "heures"
+msgid "Your ticket has been opened"
+msgstr "Votre ticket a été ouvert"
 
 msgid "Your reservations were accepted"
 msgstr "Vos réservations ont été acceptées"
+
+msgid "hours"
+msgstr "heures"
 
 msgid "day"
 msgstr "jour"
 
 msgid "Pay Online and Complete"
 msgstr "Payer en ligne et compléter"
-
-msgid "A ticket has been opened"
-msgstr "Un ticket a été ouvert"
 
 msgid "days"
 msgstr "jours"
@@ -3026,11 +3103,11 @@ msgstr ""
 msgid "You have accepted the event ${title}"
 msgstr "Vous avez accepté l'événement ${title}"
 
-msgid "Thank you for your submission!"
-msgstr "Merci pour votre contribution !"
-
 msgid "Your event was accepted"
 msgstr "Votre événement a été accepté"
+
+msgid "Thank you for your submission!"
+msgstr "Merci pour votre contribution !"
 
 msgid "Your event was rejected"
 msgstr "Votre événement a été rejeté"
@@ -3052,20 +3129,26 @@ msgstr "Vous avez désactivé les e-mails pour le ticket ${number}"
 msgid "You have enabled e-mails for ticket ${number}"
 msgstr "Vous avez activé les e-mails pour le ticket ${number}"
 
+#, python-format
+msgid ""
+"The following message will be sent to ${address} and it will be recorded for "
+"future reference."
+msgstr ""
+
 msgid "Your request has been submitted"
 msgstr "Votre demande a été envoyée"
 
 msgid "Mark as unpaid"
 msgstr "Marquer comme non payé"
 
+msgid "Your ticket has a new message"
+msgstr ""
+
 msgid "Your note was added"
 msgstr "Votre note a été ajoutée"
 
 msgid "Your request is currently pending"
 msgstr "Votre demande est actuellement en attente"
-
-msgid "Ticket Status"
-msgstr "Statut du ticket"
 
 msgid "Mark as paid"
 msgstr "Marquer comme payé"
@@ -3097,8 +3180,17 @@ msgstr "Le ticket ne peut pas être réouvert car il n'est pas clôturé"
 msgid "You have reopened ticket ${number}"
 msgstr "Vous avez réouvert ${number} ticket(s)"
 
+msgid "The ticket has already been closed"
+msgstr ""
+
+msgid "Your message has been sent"
+msgstr ""
+
 msgid "Your request has been processed"
 msgstr "Votre demande a été traitée"
+
+msgid "Your message has been received"
+msgstr ""
 
 msgid "All"
 msgstr "Tout"
@@ -3106,8 +3198,8 @@ msgstr "Tout"
 msgid "All Tickets"
 msgstr "Tous les tickets"
 
-msgid "Your ticket has been repoened"
-msgstr "Votre ticket a été réouvert"
+msgid "Your ticket has been closed"
+msgstr "Votre ticket a été fermé"
 
 msgid "All Users"
 msgstr "Tous les utilisateurs"
@@ -3604,6 +3696,18 @@ msgstr "Le paiement a été saisi"
 
 msgid "The payment was refunded"
 msgstr "Le paiement a été remboursé"
+
+#~ msgid "Dear Sir or Madam,"
+#~ msgstr "Cher Monsieur, chère Madame,"
+
+#~ msgid "The payment amount is"
+#~ msgstr "Le montant du paiement est"
+
+#~ msgid "A new ticket has been opened"
+#~ msgstr "Un nouveau ticket a été ouvert"
+
+#~ msgid "Your ticket has been repoened"
+#~ msgstr "Votre ticket a été réouvert"
 
 #~ msgid "Attachments are optional."
 #~ msgstr "Les pièces jointes sont facultatives."

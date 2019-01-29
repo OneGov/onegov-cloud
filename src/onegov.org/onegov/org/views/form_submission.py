@@ -12,7 +12,7 @@ from onegov.form import (
 )
 from onegov.org import _, OrgApp
 from onegov.org.layout import FormSubmissionLayout
-from onegov.org.mail import send_transactional_html_mail
+from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage, SubmissionMessage
 from onegov.pay import Price
 from purl import URL
@@ -266,18 +266,18 @@ def handle_complete_submission(self, request):
                 )
                 TicketMessage.create(ticket, request, 'opened')
 
-            if self.email != request.current_username and not ticket.muted:
-                send_transactional_html_mail(
-                    request=request,
-                    template='mail_ticket_opened.pt',
-                    subject=_("A ticket has been opened"),
-                    receivers=(self.email, ),
-                    content={
-                        'model': ticket,
-                        'form': form,
-                        'show_submission': self.meta['show_submission']
-                    }
-                )
+            send_ticket_mail(
+                request=request,
+                template='mail_ticket_opened.pt',
+                subject=_("Your ticket has been opened"),
+                ticket=ticket,
+                receivers=(self.email, ),
+                content={
+                    'model': ticket,
+                    'form': form,
+                    'show_submission': self.meta['show_submission']
+                }
+            )
 
             request.success(_("Thank you for your submission!"))
 
@@ -341,20 +341,20 @@ def handle_submission_action(self, request, action):
     if execute():
         ticket = TicketCollection(request.session).by_handler_id(self.id.hex)
 
-        if self.email != request.current_username and not ticket.muted:
-            send_transactional_html_mail(
-                request=request,
-                template='mail_registration_action.pt',
-                receivers=(self.email, ),
-                content={
-                    'model': self,
-                    'action': action,
-                    'ticket': ticket,
-                    'form': self.form_obj,
-                    'show_submission': self.meta.get('show_submission')
-                },
-                subject=subject
-            )
+        send_ticket_mail(
+            request=request,
+            template='mail_registration_action.pt',
+            receivers=(self.email, ),
+            ticket=ticket,
+            content={
+                'model': self,
+                'action': action,
+                'ticket': ticket,
+                'form': self.form_obj,
+                'show_submission': self.meta.get('show_submission')
+            },
+            subject=subject
+        )
 
         SubmissionMessage.create(ticket, request, action)
 

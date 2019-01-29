@@ -3,9 +3,15 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="body">
-        <p i18n:translate>Dear Sir or Madam,</p>
-        <p i18n:translate>Your ticket has been closed</p>
+        <p i18n:translate>Hello!</p>
+        <p i18n:translate>Your ticket has been closed.</p>
 
-        <p><span i18n:translate>The ticket number is</span>: <span class="ticket-number">${model.number}</span></p>
+        <p>
+            <span i18n:translate>Your ticket's timeline has been archived for future reference:</span>
+            <br>
+            <a href="${request.link(model, 'status')}" i18n:translate>Ticket Timeline</a>
+        </p>
+
+        <p i18n:translate>Thank you for your request.</p>
     </tal:b>
 </div>

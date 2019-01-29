@@ -7,6 +7,8 @@
     * CSS styles must always be inlined.
     * Content is always contained in tables.
     * The template is based on https://github.com/leemunroe/responsive-html-email-template.
+    * Use 'background-color', not 'background'
+    * Use 'Margin', not 'margin' (uppercase helps with some Outlook versions).
 
 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -21,19 +23,10 @@
     <meta name="viewport" content="width=device-width" />
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
     <title><div metal:define-slot="title"></div></title>
+    <!--! WARNING: Do not use comments in the styles below, some e-mail clients do not like it -->
     <style tal:define="primary_color layout.primary_color">
-    /*csslint
-        important:false,
-        universal-selector:false,
-        unique-headings:false,
-        box-model:false
-    */
-
-    /*
-        Global
-    */
     * {
-        margin: 0;
+        Margin: 0;
         padding: 0;
         font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
         font-size: 100%;
@@ -53,9 +46,6 @@
         font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
     }
 
-    /*
-        Elements
-    */
     a {
         color: <tal:b replace="primary_color" />;
     }
@@ -68,8 +58,8 @@
         border-width: 10px 20px;
         line-height: 2;
         font-weight: bold;
-        margin-right: 10px;
-        margin-top: 10px;
+        Margin-right: 10px;
+        Margin-top: 10px;
         text-align: center;
         cursor: pointer;
         display: inline-block;
@@ -84,7 +74,7 @@
         border-width: 10px 20px;
         line-height: 2;
         font-weight: bold;
-        margin-right: 10px;
+        Margin-right: 10px;
         text-align: center;
         cursor: pointer;
         display: inline-block;
@@ -92,11 +82,11 @@
     }
 
     .last {
-        margin-bottom: 0;
+        Margin-bottom: 0;
     }
 
     .first {
-        margin-top: 0;
+        Margin-top: 0;
     }
 
     .padding {
@@ -108,9 +98,10 @@
         font-weight: bold;
     }
 
-    /*
-        Body
-    */
+    table {
+        width: 100% !important;
+    }
+
     table.body-wrap {
         width: 100%;
         padding: 20px;
@@ -120,9 +111,6 @@
         border: 1px solid #f0f0f0;
     }
 
-    /*
-        Footer
-    */
     table.footer-wrap {
         width: 100%;
         clear: both!important;
@@ -138,13 +126,10 @@
         color: #999;
     }
 
-    /*
-        Typography
-    */
     h1, h2, h3 {
         font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
         color: #000;
-        margin: 40px 0 10px;
+        Margin: 40px 0 10px;
         line-height: 1.2;
         font-weight: 200;
     }
@@ -160,61 +145,58 @@
     }
 
     a, p, ul, ol, dt, dd {
-        margin-bottom: 10px;
+        Margin-bottom: 10px;
         font-weight: normal;
+        font-size: 14px;
+    }
+
+    td {
         font-size: 14px;
     }
 
     dt {
-        margin-bottom: 0;
+        Margin-bottom: 0;
         font-weight: bold;
     }
 
     .fieldset {
-        background: #efefef;
+        background-color: #efefef;
         font-size: 14px;
         font-weight: normal;
-        margin-bottom: 10px;
+        Margin-bottom: 10px;
         text-transform: uppercase;
     }
 
     ul li, ol li {
-        margin-left: 5px;
+        Margin-left: 5px;
         list-style-position: inside;
     }
 
     ul.flat,
     ul.flat li {
         list-style: none;
-        margin: 0;
+        Margin: 0;
         padding: 0;
     }
 
     ul.flat {
-        margin-bottom: 10px;
+        Margin-bottom: 10px;
     }
 
-    /*
-        Rulers
-    */
     hr {
         border: 1px solid #ddd;
         border-width: 1px 0 0 0;
-        margin-bottom: 20px;
+        Margin-bottom: 20px;
     }
 
     hr.large {
-        margin-top: 20px;
+        Margin-top: 20px;
     }
-
-    /*
-        Reservations
-    */
 
     .reservation {
         border: 1px solid #eee;
         color: #222;
-        margin-bottom: 10px;
+        Margin-bottom: 10px;
         padding: 0;
     }
 
@@ -227,31 +209,63 @@
         padding: 0 10px;
     }
 
-    /*
-        Responsiveness
-    */
+    .inline-message {
+        padding: 10px 10px 5px;
+        background-color: #f5f5f5;
+        border-left: 4px solid #ddd;
+    }
 
-    /* Set a max-width, and make it display as block so it will automatically stretch to that width, but will also shrink down on a phone or something */
+    .inline-message + br {
+        content: "";
+        height: 20px;
+        display: block;
+    }
+
+    .message-owner, .message-owner a {
+        font-size: .8rem;
+        color: #666;
+    }
+
+    .message-owner {
+        display: block;
+        position: relative;
+        top: -5px;
+    }
+
+    .previous-message {
+        border-left: 4px solid #ddd;
+    }
+
+    .current-message {
+        Margin-bottom: 10px;
+        border-left: 4px solid <tal:b replace="primary_color" />;
+    }
+
+    .inline-message p:last-child {
+        Margin-bottom: 5px;
+    }
+
+    .inline-message br {
+        line-height: 0.5;
+    }
+
     .container {
         display: block!important;
         max-width: 600px!important;
-        margin: 0 auto!important; /* makes it centered */
+        Margin: 0 auto!important;
         clear: both!important;
     }
 
-    /* Set the padding on the td rather than the div for Outlook compatibility */
     .body-wrap .container {
         padding: 20px;
     }
 
-    /* This should also be a block element, so that it will fill 100% of the .container */
     .content {
         max-width: 600px;
-        margin: 0 auto;
+        Margin: 0 auto;
         display: block;
     }
 
-    /* Let's make sure tables in the content area are 100% wide */
     .content table {
         width: 100%;
     }

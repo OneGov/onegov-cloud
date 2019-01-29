@@ -111,7 +111,20 @@ var TimelineMessages = React.createClass({
                             {
                                 showDate(ix) && <div className="date"><span>{m.date}</span></div>
                             }
-                            <div className={'message message-' + m.type + ' ' + (showDate(ix) && 'first-of-day' || '')}
+                            <div className={(function() {
+                                classes = ['message'];
+                                classes.push('message-' + m.type);
+
+                                if (showDate(ix)) {
+                                    classes.push('first-of-day');
+                                }
+
+                                if (m.subtype !== "") {
+                                    classes.push('message-' + m.type + '-' + m.subtype);
+                                }
+
+                                return classes.join(" ");
+                            })()}
                                 dangerouslySetInnerHTML={{__html: m.html}}
                             />
                         </li>

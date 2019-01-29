@@ -27,6 +27,7 @@ from onegov.org.models.message import EventMessage
 from onegov.org.models.message import PaymentMessage
 from onegov.org.models.message import ReservationMessage
 from onegov.org.models.message import SubmissionMessage
+from onegov.org.models.message import TicketChatMessage
 from onegov.org.models.message import TicketMessage
 from onegov.org.models.message import TicketNote
 from onegov.org.models.organisation import Organisation
@@ -91,6 +92,7 @@ __all__ = [
     'SiteCollection',
     'SubmissionMessage',
     'SwissHolidays',
+    'TicketChatMessage',
     'TicketMessage',
     'TicketNote',
     'Topic',

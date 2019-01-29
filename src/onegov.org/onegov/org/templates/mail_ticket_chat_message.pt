@@ -1,0 +1,36 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="body">
+        <p i18n:translate>Hello!</p>
+        <p i18n:translate>A message has been sent regarding <span class="ticket-number" i18n:name="ref">${model.reference(request)}</span>:</p>
+
+        <tal:b repeat="previous thread">
+            <table class="inline-message previous-message" bgcolor="#f5f5f5"><tr><td>
+                <span class="message-owner" i18n:translate tal:condition="repeat.previous.index in (0, 1)">
+                    <a href="mailto:${previous.owner}" i18n:name="author">${previous.owner}</a> wrote
+                </span>
+
+                <tal:b content="structure previous.formatted_text" />
+            </td></tr></table>
+            <br tal:condition="repeat.previous.index == 0">
+        </tal:b>
+
+        <table class="inline-message current-message" bgcolor="#f5f5f5"><tr><td>
+            <span class="message-owner" i18n:translate tal:condition="len(thread) <= 1">
+                <a href="mailto:${message.owner}" i18n:name="author">${message.owner}</a> wrote
+            </span>
+
+            <tal:b content="structure message.formatted_text" />
+        </td></tr></table>
+
+        <p i18n:translate tal:condition="message.meta.origin == 'internal'">
+            Please <a href="${request.link(model, 'status')}" i18n:name="link" i18n:translate>visit the ticket status page</a> to reply.
+        </p>
+
+        <p i18n:translate tal:condition="message.meta.origin == 'external'">
+            Please <a href="${request.link(model)}" i18n:name="link" i18n:translate>visit the ticket page</a> to reply.
+        </p>
+    </tal:b>
+</div>

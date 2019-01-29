@@ -16,9 +16,36 @@
                     ${ticket.number}
                 </tal:b>
             </div>
+            <div class="field-display-label" i18n:translate>Subject</div>
+            <div class="field-display-data ticket-title">
+                ${ticket.reference_group(request)}
+            </div>
             <div class="field-display-label" i18n:translate>State</div>
             <div class="field-display-data ticket-state">
                 <tal:b metal:use-macro="layout.macros['ticket_status']" />
+            </div>
+
+            <div class="status-chat">
+                <h2>Timeline</h2>
+
+                <div tal:condition="feed_data"
+                    class="timeline"
+                        data-feed-data="${feed_data}"
+                        data-feed-order="asc"
+                        data-feed='static'>
+                </div>
+
+                <tal:b condition="ticket.state != 'closed'">
+                    <div class="panel" i18n:translate>
+                        Forgot something or have a special request? Add a message to the ticket.
+                    </div>
+                    <div metal:use-macro="layout.macros['form']" />
+                </tal:b>
+
+                <p class="panel" tal:condition="ticket.state == 'closed'" i18n:translate style="text-align: center;">
+                    New messages have been disabled because the ticket has been closed.
+                </p>
+
             </div>
         </div>
     </tal:b>
