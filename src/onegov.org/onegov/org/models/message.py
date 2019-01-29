@@ -3,7 +3,7 @@ from onegov.chat import Message
 from onegov.core.utils import paragraphify, linkify
 from onegov.event import Event
 from onegov.org import _
-from onegov.org.new_elements import Link, Confirm, Intercooler
+from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.ticket import Ticket, TicketCollection
 from sqlalchemy.orm import object_session
 
@@ -74,7 +74,8 @@ class TicketNote(Message, TicketMessageMixin):
                 Confirm(
                     _("Do you really want to delete this note?"),
                     _("This cannot be undone."),
-                    _("Delete Note")
+                    _("Delete Note"),
+                    _("Cancel")
                 ),
                 Intercooler(
                     request_method="DELETE",

@@ -9,7 +9,7 @@ from onegov.org import _
 from onegov.org import OrgApp
 from onegov.org.forms import FormSubmissionsExport
 from onegov.org.layout import FormSubmissionLayout
-from onegov.org.new_elements import Link
+from onegov.core.elements import Link
 from onegov.org.utils import keywords_first
 from onegov.ticket import Ticket
 from sedate import align_range_to_day, as_datetime, standardize_date

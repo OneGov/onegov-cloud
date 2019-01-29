@@ -6,7 +6,7 @@ from onegov.form import FormSubmission
 from onegov.org import OrgApp, _
 from onegov.org.forms import FormRegistrationWindowForm
 from onegov.org.layout import FormSubmissionLayout
-from onegov.org.new_elements import Link, Confirm, Intercooler
+from onegov.core.elements import Link, Confirm, Intercooler
 from sqlalchemy import desc
 
 
@@ -72,7 +72,8 @@ def view_registration_window(self, request):
                         "this registration window?"
                     ),
                     _("Existing submissions will be disassociated."),
-                    _("Delete registration window")
+                    _("Delete registration window"),
+                    _("Cancel")
                 ),
                 Intercooler(
                     request_method='DELETE',

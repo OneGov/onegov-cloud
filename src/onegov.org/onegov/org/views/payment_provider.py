@@ -5,7 +5,7 @@ from onegov.form import Form
 from onegov.org import _
 from onegov.org.app import OrgApp
 from onegov.org.layout import PaymentProviderLayout
-from onegov.org.new_elements import Link, Confirm, Intercooler
+from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.pay import PaymentCollection
 from onegov.pay import PaymentProvider
 from onegov.pay import PaymentProviderCollection
@@ -32,7 +32,8 @@ def view_payment_providers(self, request):
                     Confirm(
                         _("Should this provider really be the new default?"),
                         _("All future payments will be redirected."),
-                        _("Make Default"), _("Cancel")
+                        _("Make Default"),
+                        _("Cancel")
                     ),
                     Intercooler(
                         request_method='POST',
@@ -53,7 +54,8 @@ def view_payment_providers(self, request):
                 Confirm(
                     _("Do you really want to delete this provider?"),
                     _("This cannot be undone."),
-                    _("Delete"), _("Cancel")
+                    _("Delete"),
+                    _("Cancel")
                 ),
                 Intercooler(
                     request_method='DELETE',

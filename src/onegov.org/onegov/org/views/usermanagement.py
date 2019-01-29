@@ -10,7 +10,7 @@ from onegov.org.forms import ManageUserForm, NewUserForm
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.layout import UserLayout
 from onegov.org.layout import UserManagementLayout
-from onegov.org.new_elements import Link, LinkGroup
+from onegov.core.elements import Link, LinkGroup
 from onegov.ticket import TicketCollection, Ticket
 from onegov.user import Auth, User, UserCollection
 from onegov.user.errors import ExistingUserError

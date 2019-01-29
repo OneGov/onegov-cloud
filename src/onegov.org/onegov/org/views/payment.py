@@ -7,7 +7,7 @@ from onegov.org.forms import DateRangeForm, ExportForm
 from onegov.org.layout import PaymentCollectionLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import PaymentMessage
-from onegov.org.new_elements import Link
+from onegov.core.elements import Link
 from sedate import align_range_to_day, standardize_date, as_datetime
 from onegov.pay import Payment
 from onegov.pay import PaymentCollection

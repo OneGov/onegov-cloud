@@ -5,7 +5,7 @@ import pytest
 from onegov.org import OrgApp
 from onegov.org.initial_content import create_new_organisation
 from onegov.org.layout import DefaultLayout
-from onegov.org.new_elements import Element
+from onegov.core.elements import Element
 from onegov.user import User
 from onegov_testing import Client as BaseClient
 from onegov_testing.utils import create_app

@@ -15,7 +15,7 @@ from onegov.org.forms import RoomAllocationForm
 from onegov.org.layout import AllocationEditFormLayout
 from onegov.org.layout import AllocationRulesLayout
 from onegov.org.layout import ResourceLayout
-from onegov.org.new_elements import Link, Confirm, Intercooler
+from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.reservation import Allocation
 from onegov.reservation import Reservation
 from onegov.reservation import Resource
@@ -103,7 +103,8 @@ def view_allocation_rules(self, request):
                         "The rule will be removed without affecting "
                         "existing allocations."
                     ),
-                    _("Stop rule")
+                    _("Stop rule"),
+                    _("Cancel")
                 ),
                 Intercooler(
                     request_method="POST",
@@ -125,7 +126,8 @@ def view_allocation_rules(self, request):
                         "All allocations created by the rule will be removed, "
                         "if they haven't been reserved yet."
                     ),
-                    _("Delete rule")
+                    _("Delete rule"),
+                    _("Cancel")
                 ),
                 Intercooler(
                     request_method="POST",

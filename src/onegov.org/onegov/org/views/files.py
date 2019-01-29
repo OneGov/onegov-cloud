@@ -17,7 +17,7 @@ from onegov.file import File, FileCollection
 from onegov.file.utils import extension_for_content_type
 from onegov.file.errors import AlreadySignedError, InvalidTokenError
 from onegov.org import _, OrgApp
-from onegov.org.new_elements import Link
+from onegov.core.elements import Link
 from onegov.org.layout import DefaultLayout
 from onegov.org.models import (
     GeneralFile,

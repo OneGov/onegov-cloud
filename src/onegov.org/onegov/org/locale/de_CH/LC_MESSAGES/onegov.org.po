@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-01-29 13:01+0100\n"
-"PO-Revision-Date: 2019-01-25 13:43+0100\n"
+"POT-Creation-Date: 2019-01-29 13:59+0100\n"
+"PO-Revision-Date: 2018-12-08 11:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -230,6 +230,9 @@ msgstr "Dies kann nicht rückgängig gemacht werden."
 msgid "Delete form"
 msgstr "Formular löschen"
 
+msgid "Cancel"
+msgstr "Abbrechen"
+
 msgid "Accept ticket"
 msgstr "Ticket annehmen"
 
@@ -343,9 +346,6 @@ msgstr "Verzeichnis löschen"
 
 msgid "Entry"
 msgstr "Eintrag"
-
-msgid "Cancel"
-msgstr "Abbrechen"
 
 msgid "This site is hidden from the general public"
 msgstr "Diese Seite ist nicht öffentlich."

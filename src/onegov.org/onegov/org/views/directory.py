@@ -24,7 +24,7 @@ from onegov.org.layout import DirectoryEntryCollectionLayout
 from onegov.org.layout import DirectoryEntryLayout
 from onegov.org.models import DirectorySubmissionAction
 from onegov.org.models import ExtendedDirectory, ExtendedDirectoryEntry
-from onegov.org.new_elements import Link
+from onegov.core.elements import Link
 from purl import URL
 from tempfile import NamedTemporaryFile
 from webob.exc import HTTPForbidden

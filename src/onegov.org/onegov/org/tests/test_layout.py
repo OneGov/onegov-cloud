@@ -7,7 +7,7 @@ import more.webassets
 from datetime import datetime
 from onegov.core.utils import Bunch
 from onegov.org import OrgApp
-from onegov.org.new_elements import Link
+from onegov.core.elements import Link
 from onegov.org.layout import (
     EventBaseLayout,
     DefaultLayout,

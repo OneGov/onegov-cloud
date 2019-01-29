@@ -1,6 +1,6 @@
 from onegov.core.utils import Bunch
 from onegov.org import _
-from onegov.org.new_elements import Link, Confirm, Intercooler
+from onegov.core.elements import Link, Confirm, Intercooler
 
 
 def test_link(render_element):

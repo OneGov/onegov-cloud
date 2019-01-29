@@ -6,7 +6,7 @@ from onegov.org import OrgApp, _
 from onegov.org.layout import PublicationLayout
 from onegov.org.models import GeneralFileCollection
 from onegov.org.models import PublicationCollection
-from onegov.org.new_elements import Link
+from onegov.core.elements import Link
 from sqlalchemy import desc, literal
 
 
