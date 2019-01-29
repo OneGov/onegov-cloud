@@ -91,6 +91,7 @@ setup(
             'freezegun',
             'onegov_testing',
             'openpyxl',
+            'pyquery',
             'pytest-localserver',
             'pytest-rerunfailures',
             'requests'
