@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds compatibility with latest onegov.core release.
+  [msom]
+
 0.3.2 (2018-12-03)
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -180,4 +183,3 @@ Changelog
 
 - Initial Release.
   [href]
-

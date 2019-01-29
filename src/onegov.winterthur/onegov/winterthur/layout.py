@@ -1,6 +1,6 @@
 from cached_property import cached_property
 from onegov.org.layout import DefaultLayout
-from onegov.org.new_elements import Link, Intercooler
+from onegov.core.elements import Link, Intercooler
 from onegov.winterthur import _
 from onegov.winterthur.collections import AddressCollection
 
