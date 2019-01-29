@@ -101,6 +101,9 @@ msgstr "Sie werden erneut die Publikation beantragen müssen"
 msgid "Provide Again"
 msgstr "Erneut anbieten"
 
+msgid "Cancel"
+msgstr "Abbrechen"
+
 msgid "Submit Activity"
 msgstr "Angebot erfassen"
 

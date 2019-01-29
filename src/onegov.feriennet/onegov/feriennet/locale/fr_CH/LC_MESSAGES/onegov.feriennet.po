@@ -102,6 +102,9 @@ msgstr "Vous devrez à nouveau demander la publication"
 msgid "Provide Again"
 msgstr "Proposer l’activité de nouveau"
 
+msgid "Cancel"
+msgstr "Annuler"
+
 msgid "Submit Activity"
 msgstr "Saisir nouvelle activité"
 
