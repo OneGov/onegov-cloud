@@ -74,8 +74,8 @@ def create_app(app_class, request, use_elasticsearch=False,
     signing_services = (temporary_path / 'signing-services')
     signing_services.mkdir()
 
-    cert_file = module_path('onegov.file', 'tests/fixtures/test.crt')
-    cert_key = module_path('onegov.file', 'tests/fixtures/test.crt')
+    cert_file = module_path('onegov_testing', 'tests/fixtures/test.crt')
+    cert_key = module_path('onegov_testing', 'tests/fixtures/test.crt')
 
     with (signing_services / '__default__.yml').open('w') as f:
         f.write(textwrap.dedent(f"""
