@@ -6,7 +6,7 @@ from onegov.core.templates import render_macro
 from onegov.feriennet import _
 from onegov.org.new_elements import Link, Confirm, Intercooler
 from onegov.org.models.extensions import CoordinatesExtension
-from onegov.org.models.ticket import OrgTicketExtraText
+from onegov.org.models.ticket import OrgTicketMixin
 from onegov.search import ORMSearchable
 from onegov.ticket import handlers, Handler, Ticket
 
@@ -86,9 +86,12 @@ class VacationActivity(Activity, CoordinatesExtension, ORMSearchable):
         return sorted(tags)
 
 
-class ActivityTicket(OrgTicketExtraText, Ticket):
+class ActivityTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'FER'}
     es_type_name = 'activity_tickets'
+
+    def reference_group(self, request):
+        return self.handler.title
 
 
 @handlers.registered_handler('FER')

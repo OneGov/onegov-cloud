@@ -9,8 +9,10 @@ from onegov.feriennet.request import FeriennetRequest
 from onegov.feriennet.sponsors import load_sponsors
 from onegov.feriennet.theme import FeriennetTheme
 from onegov.org import OrgApp
-from onegov.org.app import get_common_asset as get_org_common_asset
-from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
+from onegov.org.app import get_common_asset as default_common_asset
+from onegov.org.app import get_i18n_localedirs as default_i18n_localedirs
+from onegov.org.app import get_public_ticket_messages \
+    as default_public_ticket_messages
 from onegov.user import UserCollection
 
 
@@ -127,6 +129,11 @@ def get_ticket_manager_roles():
     return ('admin', )
 
 
+@FeriennetApp.setting(section='org', name='public_ticket_messages')
+def get_public_ticket_messages():
+    return (*default_public_ticket_messages(), 'activity')
+
+
 @FeriennetApp.setting(section='org', name='require_complete_userprofile')
 def get_require_complete_userprofile():
     return True
@@ -158,7 +165,7 @@ def get_is_complete_userprofile_handler():
 @FeriennetApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs():
     return [utils.module_path('onegov.feriennet', 'locale')] \
-        + get_org_i18n_localedirs()
+        + default_i18n_localedirs()
 
 
 @FeriennetApp.setting(section='core', name='theme')
@@ -178,7 +185,7 @@ def get_js_path():
 
 @FeriennetApp.webasset('common')
 def get_common_asset():
-    yield from get_org_common_asset()
+    yield from default_common_asset()
     yield 'reloadfrom.js'
     yield 'printthis.js'
     yield 'print.js'

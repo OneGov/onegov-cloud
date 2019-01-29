@@ -19,7 +19,7 @@ from onegov.feriennet.layout import VacationActivityFormLayout
 from onegov.feriennet.layout import VacationActivityLayout
 from onegov.feriennet.models import ActivityMessage
 from onegov.feriennet.models import VacationActivity
-from onegov.org.mail import send_transactional_html_mail
+from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage
 from onegov.org.new_elements import Link, Confirm, Intercooler
 from onegov.ticket import TicketCollection
@@ -528,16 +528,17 @@ def propose_activity(self, request):
         )
         TicketMessage.create(ticket, request, 'opened')
 
-    if request.is_organiser_only or request.current_username != self.username:
-        send_transactional_html_mail(
-            request=request,
-            template='mail_ticket_opened.pt',
-            subject=_("A ticket has been opened"),
-            receivers=(self.username, ),
-            content={
-                'model': ticket
-            }
+    send_ticket_mail(
+        request=request,
+        template='mail_ticket_opened.pt',
+        subject=_("Your ticket has been opened"),
+        receivers=(self.username, ),
+        ticket=ticket,
+        force=(
+            request.is_organiser_only
+            or request.current_username != self.username
         )
+    )
 
     request.success(_("Thank you for your proposal!"))
 
@@ -610,17 +611,17 @@ def administer_activity(model, request, action, template, subject):
     # execute state change
     getattr(model, action)()
 
-    if request.current_username != model.username and not ticket.muted:
-        send_transactional_html_mail(
-            request=request,
-            template=template,
-            subject=subject,
-            receivers=(model.username, ),
-            content={
-                'model': model,
-                'ticket': ticket
-            }
-        )
+    send_ticket_mail(
+        request=request,
+        template=template,
+        subject=subject,
+        receivers=(model.username, ),
+        ticket=ticket,
+        content={
+            'model': model,
+            'ticket': ticket
+        }
+    )
 
     ActivityMessage.create(ticket, request, action)
 

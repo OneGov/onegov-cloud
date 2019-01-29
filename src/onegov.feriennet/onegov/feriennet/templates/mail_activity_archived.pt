@@ -3,16 +3,13 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="body">
-        <p i18n:translate>Dear Sir or Madam,</p>
+        <p i18n:translate>Hello!</p>
         <p i18n:translate>Your activity has been archived:</p>
-        <br>
         <p><b>${model.title}</b></p>
         <p>${model.lead}</p>
 
-        <tal:b tal:condition="ticket">
-            <p>&nbsp;</p>
-            <p><span i18n:translate>The ticket number is</span>: <span class="ticket-number">${ticket.number}</span></p>
+        <p>
             <a href="${request.link(ticket, 'status')}" i18n:translate>Check ticket status</a>
-        </tal:b>
+        </p>
     </tal:b>
 </div>

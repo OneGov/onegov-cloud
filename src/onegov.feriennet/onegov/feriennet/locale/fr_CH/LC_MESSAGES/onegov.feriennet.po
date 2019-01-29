@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-01-09 14:41+0100\n"
+"POT-Creation-Date: 2019-01-28 14:05+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1177,14 +1177,11 @@ msgstr "Le paiement a déjà été importé."
 msgid "Could not match the payment to a bill."
 msgstr "N'a pas pu trouver de facture correspondant au paiement."
 
-msgid "Dear Sir or Madam,"
-msgstr "Cher Monsieur, chère Madame,"
+msgid "Hello!"
+msgstr "Bonjour!"
 
 msgid "Your activity has been archived:"
 msgstr "Votre activité a été archivée:"
-
-msgid "The ticket number is"
-msgstr "Le numéro du ticket est"
 
 msgid "Check ticket status"
 msgstr "Vérifier l'état du ticket"
@@ -1909,14 +1906,14 @@ msgstr "L'offre a été refusée"
 msgid "Thank you for your proposal!"
 msgstr "Merci de votre proposition !"
 
+msgid "Your ticket has been opened"
+msgstr "Votre ticket a été ouvert"
+
 msgid "Your activity has been published"
 msgstr "Votre offre a été publiée"
 
 msgid "Your activity has been archived"
 msgstr "Votre offre a été archivée"
-
-msgid "A ticket has been opened"
-msgstr "Un ticket a été ouvert"
 
 msgid "Clone"
 msgstr "Copier"
@@ -2232,6 +2229,12 @@ msgstr "Voulez-vous vraiment supprimer la réservation de ${attendee} ?"
 #, python-format
 msgid "Do you really want to cancel ${attendee}'s booking?"
 msgstr "Voulez-vous vraiment annuler la réservation de ${attendee} ?"
+
+#~ msgid "Dear Sir or Madam,"
+#~ msgstr "Cher Monsieur, chère Madame,"
+
+#~ msgid "The ticket number is"
+#~ msgstr "Le numéro du ticket est"
 
 #~ msgid "Feriennet Settings"
 #~ msgstr "Paramètres Feriennet"
