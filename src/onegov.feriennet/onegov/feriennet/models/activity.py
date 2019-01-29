@@ -4,7 +4,7 @@ from onegov.activity import PublicationRequestCollection
 from onegov.activity.models import DAYS
 from onegov.core.templates import render_macro
 from onegov.feriennet import _
-from onegov.org.new_elements import Link, Confirm, Intercooler
+from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.ticket import OrgTicketMixin
 from onegov.search import ORMSearchable
@@ -164,6 +164,7 @@ class VacationActivityHandler(Handler):
                         _("Do you really want to publish this activity?"),
                         _("This cannot be undone."),
                         _("Publish Activity"),
+                        _("Cancel")
                     ),
                     Intercooler(
                         request_method='POST',
@@ -185,6 +186,7 @@ class VacationActivityHandler(Handler):
                             "The activity will be made private as a result."
                         ),
                         _("Archive Activity"),
+                        _("Cancel")
                     ),
                     Intercooler(
                         request_method='POST',

@@ -8,7 +8,7 @@ from onegov.feriennet.collections import NotificationTemplateCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.layout import DefaultLayout
 from onegov.org.custom import get_global_tools as get_base_tools
-from onegov.org.new_elements import Link, LinkGroup
+from onegov.core.elements import Link, LinkGroup
 from onegov.org.models import ExportCollection
 
 

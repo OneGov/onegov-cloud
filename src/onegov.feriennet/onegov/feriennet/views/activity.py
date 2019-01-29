@@ -21,7 +21,7 @@ from onegov.feriennet.models import ActivityMessage
 from onegov.feriennet.models import VacationActivity
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage
-from onegov.org.new_elements import Link, Confirm, Intercooler
+from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.ticket import TicketCollection
 from sqlalchemy import desc
 from sqlalchemy.orm import contains_eager
@@ -335,6 +335,7 @@ def view_activity(self, request):
                         ),
                         _("Previous attendees need to re-apply"),
                         _("Reinstate Occasion"),
+                        _("Cancel")
                     ),
                     Intercooler(
                         request_method="POST",
@@ -358,6 +359,9 @@ def view_activity(self, request):
                         ),
                         _(
                             "Rescind Occasion"
+                        ),
+                        _(
+                            "Cancel"
                         )
                     ),
                     Intercooler(
@@ -380,7 +384,8 @@ def view_activity(self, request):
                             "this occasion, though there might be "
                             "cancelled/blocked bookings which will be deleted."
                         )),
-                        _("Delete Occasion")
+                        _("Delete Occasion"),
+                        _("Cancel")
                     ),
                     Intercooler(
                         request_method="DELETE",

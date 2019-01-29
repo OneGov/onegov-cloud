@@ -4,7 +4,7 @@ from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.forms import PeriodForm
 from onegov.feriennet.layout import PeriodCollectionLayout
 from onegov.feriennet.layout import PeriodFormLayout
-from onegov.org.new_elements import Link, Confirm, Intercooler, Block
+from onegov.core.elements import Link, Confirm, Intercooler, Block
 from onegov.feriennet.models import PeriodMessage
 from sqlalchemy import desc
 from sqlalchemy.exc import IntegrityError
@@ -32,7 +32,8 @@ def view_periods(self, request):
                             mapping={'title': period.title}
                         ),
                         _("This will hide all associated occasions"),
-                        _("Deactivate Period")
+                        _("Deactivate Period"),
+                        _("Cancel")
                     ),
                     Intercooler(
                         request_method="POST",
@@ -57,7 +58,8 @@ def view_periods(self, request):
                             "period. All associated occasions will be made "
                             "public"
                         ),
-                        _("Activate Period")
+                        _("Activate Period"),
+                        _("Cancel")
                     ),
                     Intercooler(
                         request_method="POST",
@@ -87,7 +89,8 @@ def view_periods(self, request):
                                 "period. To publish archived activities again "
                                 "a new publication request needs to be filed."
                             ),
-                            _("Archive Period")
+                            _("Archive Period"),
+                            _("Cancel")
                         ),
                         Intercooler(
                             request_method="POST",
@@ -109,7 +112,8 @@ def view_periods(self, request):
                                 "A period can only be archived once the "
                                 "bookings have been made and the bills have "
                                 "been compiled."
-                            )
+                            ),
+                            _("Cancel")
                         )
                     )
                 )
@@ -124,7 +128,8 @@ def view_periods(self, request):
                         mapping={'title': period.title}
                     ),
                     _("This cannot be undone."),
-                    _("Delete Period")
+                    _("Delete Period"),
+                    _("Cancel")
                 ),
                 Intercooler(
                     request_method="DELETE",

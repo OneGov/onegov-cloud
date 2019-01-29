@@ -8,8 +8,8 @@ from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.const import OWNER_EDITABLE_STATES
 from onegov.feriennet.models import InvoiceAction, VacationActivity
-from onegov.org.new_elements import Link, Confirm, Intercooler, Block
-from onegov.org.new_elements import LinkGroup
+from onegov.core.elements import Link, Confirm, Intercooler, Block
+from onegov.core.elements import LinkGroup
 from onegov.org.layout import DefaultLayout as BaseLayout
 from onegov.pay import PaymentProviderCollection
 from onegov.ticket import TicketCollection
@@ -52,7 +52,8 @@ class DefaultLayout(BaseLayout):
                         mapping={'title': activity.title}
                     ),
                     _("You will have to request publication again"),
-                    _("Provide Again")
+                    _("Provide Again"),
+                    _("Cancel")
                 ),
                 Intercooler(
                     request_method="POST",
@@ -247,7 +248,8 @@ class VacationActivityLayout(DefaultLayout):
                                     "There is currently no active period. "
                                     "Please retry once a period has been "
                                     "activated."
-                                )
+                                ),
+                                no=_("Cancel")
                             ),
                         )
                     ))
@@ -281,7 +283,8 @@ class VacationActivityLayout(DefaultLayout):
                                 _(
                                     "Please add at least one occasion "
                                     "before requesting publication."
-                                )
+                                ),
+                                no=_("Cancel")
                             ),
                         )
                     ))
@@ -300,7 +303,9 @@ class VacationActivityLayout(DefaultLayout):
                             ), _(
                                 "This cannot be undone."
                             ), _(
-                                "Discard Activity")
+                                "Discard Activity"
+                            ), _(
+                                "Cancel")
                             ),
                             Intercooler(
                                 request_method="DELETE",
@@ -329,7 +334,8 @@ class VacationActivityLayout(DefaultLayout):
                                 "There are no periods defined yet. At least "
                                 "one period needs to be defined before "
                                 "occasions can be created"
-                            )
+                            ),
+                            _("Cancel")
                         )
                     )
                 ))
@@ -476,7 +482,8 @@ class BillingCollectionLayout(DefaultLayout):
                         ),
                         _(
                             "You may remove the bookings manually one by one."
-                        )
+                        ),
+                        _("Cancel")
                     ),
                 )
             else:
@@ -490,7 +497,8 @@ class BillingCollectionLayout(DefaultLayout):
                         }),
                         _("Remove ${count} bookings", mapping={
                             'count': record.count
-                        })
+                        }),
+                        _("Cancel")
                     ),
                     Intercooler(request_method='POST')
                 )
@@ -537,7 +545,7 @@ class BillingCollectionLayout(DefaultLayout):
                             Block(_(
                                 "Manual bookings can only be added "
                                 "once the billing has been confirmed"
-                            )),
+                            ), no=_("Cancel")),
                         ) if not self.model.period.finalized else tuple()
                     ),
                     *self.family_removal_links

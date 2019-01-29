@@ -4,7 +4,7 @@ from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.models import VacationActivity
-from onegov.org.new_elements import Link, LinkGroup
+from onegov.core.elements import Link, LinkGroup
 
 
 @FeriennetApp.userlinks()

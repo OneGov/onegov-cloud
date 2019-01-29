@@ -9,10 +9,10 @@ from onegov.feriennet.collections import MatchCollection
 from onegov.feriennet.forms import MatchForm
 from onegov.feriennet.layout import DefaultLayout, MatchCollectionLayout
 from onegov.feriennet.models import PeriodMessage
-from onegov.org.new_elements import Block
-from onegov.org.new_elements import Confirm
-from onegov.org.new_elements import Intercooler
-from onegov.org.new_elements import Link
+from onegov.core.elements import Block
+from onegov.core.elements import Confirm
+from onegov.core.elements import Intercooler
+from onegov.core.elements import Link
 from onegov.user import User, UserCollection
 from sqlalchemy import and_
 from sqlalchemy.orm import joinedload
@@ -115,7 +115,7 @@ def view_occasion_bookings_table(self, request):
                     Block(_(
                         "The period has already been finalized. No new "
                         "attendees may be added."
-                    )),
+                    ), no=_("Cancel")),
                 )
             )
         else:
@@ -169,7 +169,7 @@ def view_occasion_bookings_table(self, request):
                         mapping={
                             'attendee': booking.attendee.name
                         }
-                    ), yes=_("Remove Wish")),
+                    ), yes=_("Remove Wish"), no=_("Cancel")),
                     Intercooler(
                         request_method='DELETE',
                         target='#{}'.format(booking.id)
@@ -189,7 +189,7 @@ def view_occasion_bookings_table(self, request):
                         mapping={
                             'attendee': booking.attendee.name
                         }
-                    ), yes=_("Remove Booking")),
+                    ), yes=_("Remove Booking"), no=_("Cancel")),
                     Intercooler(
                         request_method='DELETE',
                         target='#{}'.format(booking.id)
@@ -205,12 +205,18 @@ def view_occasion_bookings_table(self, request):
                     )
                 ),
                 traits=(
-                    Confirm(_(
-                        "Do you really want to cancel ${attendee}'s booking?",
-                        mapping={
-                            'attendee': booking.attendee.name
-                        }
-                    ), _("This cannot be undone."), yes=_("Cancel Booking")),
+                    Confirm(
+                        _(
+                            "Do you really want to cancel ${attendee}'s "
+                            "booking?",
+                            mapping={
+                                'attendee': booking.attendee.name
+                            }
+                        ),
+                        _("This cannot be undone."),
+                        _("Cancel Booking"),
+                        _("Cancel")
+                    ),
                     Intercooler(
                         request_method='POST',
                     )

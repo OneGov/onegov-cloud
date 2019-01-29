@@ -15,7 +15,7 @@ from onegov.feriennet.layout import BillingCollectionLayout
 from onegov.feriennet.layout import BillingCollectionManualBookingLayout
 from onegov.feriennet.layout import OnlinePaymentsLayout
 from onegov.feriennet.models import InvoiceAction, PeriodMessage
-from onegov.org.new_elements import Link, Confirm, Intercooler, Block
+from onegov.core.elements import Link, Confirm, Intercooler, Block
 from onegov.pay import Payment
 from onegov.pay import PaymentProviderCollection
 from onegov.pay import payments_association_table_for
@@ -93,16 +93,21 @@ def view_billing(self, request, form):
                     "This bill or parts of it have been paid online. "
                     "To change the state of the bill the payment "
                     "needs to be charged back."
-                )),
+                ), no=_("Cancel")),
             )
 
         elif details.discourage_changes:
             traits = (
-                Confirm(_(
-                    "This bill or parts of it have been confirmed by "
-                    "the bank, do you really want to change the "
-                    "payment status?"
-                )),
+                Confirm(
+                    _(
+                        "This bill or parts of it have been confirmed by "
+                        "the bank, do you really want to change the "
+                        "payment status?"
+                    ),
+                    None,
+                    _("Yes"),
+                    _("Cancel")
+                ),
             )
         else:
             traits = None
@@ -119,15 +124,20 @@ def view_billing(self, request, form):
                     "This position has been paid online. To change "
                     "the state of the position the payment needs to "
                     "be charged back."
-                )),
+                ), no=_("Cancel")),
             )
 
         elif item.changes == 'discouraged':
             traits = (
-                Confirm(_(
-                    "This position has been confirmed by the bank, do "
-                    "you really want to change the payment status?"
-                )),
+                Confirm(
+                    _(
+                        "This position has been confirmed by the bank, do "
+                        "you really want to change the payment status?"
+                    ),
+                    None,
+                    _("Yes"),
+                    _("Cancel")
+                ),
             )
         else:
             traits = None
@@ -261,7 +271,8 @@ def view_online_payments(self, request):
                         _("This cannot be undone."),
                         _("Refund ${amount}", mapping={
                             'amount': amount
-                        })
+                        }),
+                        _("Cancel")
                     ),
                     Intercooler(
                         request_method='POST',
