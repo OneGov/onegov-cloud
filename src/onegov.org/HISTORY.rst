@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.0.0 (2019-01-29)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to add chat messages to tickets.
   [href]
 
