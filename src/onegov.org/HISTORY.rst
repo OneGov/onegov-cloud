@@ -1,8 +1,8 @@
 Changelog
 ---------
 
-- Adds compatibility with latest onegov.core release.
-  [msom]
+- Adds missing translation.
+  [href]
 
 1.0.0 (2019-01-29)
 ~~~~~~~~~~~~~~~~~~~

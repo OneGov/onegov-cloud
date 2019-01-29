@@ -26,7 +26,7 @@
             </div>
 
             <div class="status-chat">
-                <h2>Timeline</h2>
+                <h2 i18n:translate>Timeline</h2>
 
                 <div tal:condition="feed_data"
                     class="timeline"
