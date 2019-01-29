@@ -5,20 +5,26 @@ from onegov.agency.layouts import AgencyLayout
 from onegov.agency.layouts import ExtendedPersonLayout
 from onegov.core.templates import render_macro
 from onegov.org import _
-from onegov.org.models.ticket import OrgTicketExtraText
+from onegov.org.models.ticket import OrgTicketMixin
 from onegov.ticket import Handler
 from onegov.ticket import handlers
 from onegov.ticket import Ticket
 
 
-class AgencyMutationTicket(OrgTicketExtraText, Ticket):
+class AgencyMutationTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'AGN'}
     es_type_name = 'agency_tickets'
 
+    def reference_group(self, request):
+        return self.title
 
-class PersonMutationTicket(OrgTicketExtraText, Ticket):
+
+class PersonMutationTicket(OrgTicketMixin, Ticket):
     __mapper_args__ = {'polymorphic_identity': 'PER'}
     es_type_name = 'person_tickets'
+
+    def reference_group(self, request):
+        return self.title
 
 
 @handlers.registered_handler('AGN')

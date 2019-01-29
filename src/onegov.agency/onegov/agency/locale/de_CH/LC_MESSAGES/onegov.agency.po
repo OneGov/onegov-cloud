@@ -271,8 +271,8 @@ msgstr "PDF erstellt"
 msgid "Thank you for your submission!"
 msgstr "Vielen Dank für Ihre Eingabe!"
 
-msgid "A ticket has been opened"
-msgstr "Ein neues Ticket wurde für Sie eröffnet"
+msgid "Your ticket has been opened"
+msgstr "Ihr Ticket wurde eröffnet"
 
 msgid "New person"
 msgstr "Neue Person"

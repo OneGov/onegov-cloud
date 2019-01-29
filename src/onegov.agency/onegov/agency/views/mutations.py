@@ -8,7 +8,7 @@ from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedPerson
 from onegov.core.security import Public
 from onegov.org.elements import Link
-from onegov.org.mail import send_transactional_html_mail
+from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage
 from onegov.ticket import TicketCollection
 from uuid import uuid4
@@ -36,17 +36,15 @@ def report_agency_change(self, request, form):
             )
             TicketMessage.create(ticket, request, 'opened')
             ticket.create_snapshot(request)
-        if form.email.data != request.current_username:
-            if not ticket.muted:
-                send_transactional_html_mail(
-                    request=request,
-                    template='mail_ticket_opened.pt',
-                    subject=_("A ticket has been opened"),
-                    receivers=(form.email.data, ),
-                    content={
-                        'model': ticket
-                    }
-                )
+
+        send_ticket_mail(
+            request=request,
+            template='mail_ticket_opened.pt',
+            subject=_("Your ticket has been opened"),
+            receivers=(form.email.data, ),
+            ticket=ticket
+        )
+
         request.success(_("Thank you for your submission!"))
         return redirect(request.link(ticket, 'status'))
 
@@ -83,17 +81,15 @@ def report_person_change(self, request, form):
             )
             TicketMessage.create(ticket, request, 'opened')
             ticket.create_snapshot(request)
-        if form.email.data != request.current_username:
-            if not ticket.muted:
-                send_transactional_html_mail(
-                    request=request,
-                    template='mail_ticket_opened.pt',
-                    subject=_("A ticket has been opened"),
-                    receivers=(form.email.data, ),
-                    content={
-                        'model': ticket
-                    }
-                )
+
+        send_ticket_mail(
+            request=request,
+            template='mail_ticket_opened.pt',
+            subject=_("Your ticket has been opened"),
+            receivers=(form.email.data, ),
+            ticket=ticket
+        )
+
         request.success(_("Thank you for your submission!"))
         return redirect(request.link(ticket, 'status'))
 

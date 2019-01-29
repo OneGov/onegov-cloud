@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds support for ticket chats.
+  [href]
+
 1.6.0 (2019-01-08)
 ~~~~~~~~~~~~~~~~~~~~
 
