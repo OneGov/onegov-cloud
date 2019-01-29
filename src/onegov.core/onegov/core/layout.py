@@ -6,6 +6,7 @@ import numbers
 import sedate
 
 from cached_property import cached_property
+from chameleon import PageTemplate
 from datetime import datetime
 from functools import lru_cache
 from onegov.core import utils
@@ -215,5 +216,24 @@ class ChameleonLayout(Layout):
         See ``templates/macros.pt``.
 
         """
-
         return self.template_loader.macros
+
+    @cached_property
+    def elements(self):
+        """ The templates used by the elements. Overwrite this with your
+        own ``templates/elements.pt`` if neccessary.
+
+        """
+        try:
+            return self.template_loader['elements.pt']
+        except ValueError:
+            return PageTemplate(
+                """<xml xmlns="http://www.w3.org/1999/xhtml">
+                    <metal:b define-macro="link">
+                        <a tal:attributes="e.attrs">${e.text or ''}</a>
+                    </metal:b>
+                    <metal:b define-macro="img">
+                        <img tal:attributes="e.attrs" />
+                    </metal:b>
+                </xml>"""
+            )

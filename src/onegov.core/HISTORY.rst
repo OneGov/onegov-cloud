@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Moves the elements to the core (from onegov.org).
+  [msom]
+
 0.76.0 (2019-01-23)
 ~~~~~~~~~~~~~~~~~~~
 

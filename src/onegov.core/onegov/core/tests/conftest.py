@@ -1,8 +1,14 @@
-import pytest
 import os.path
+import pytest
+import transaction
 import yaml
 
+from onegov_testing import Client
+from onegov_testing.utils import create_app
 from onegov.core.cli import command_group
+from onegov.core.elements import Element
+from onegov.core.framework import Framework
+from onegov.core.layout import ChameleonLayout
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -49,3 +55,28 @@ def cli_config(postgres_dsn, redis_url, temporary_directory):
         f.write(yaml.dump(cfg))
 
     return path
+
+
+@pytest.fixture(scope='function')
+def render_element(request):
+    class App(Framework):
+        pass
+
+    @App.path(path='/element', model=Element)
+    def get_element(app):
+        return app.element
+
+    @App.html(model=Element)
+    def render_element(self, request):
+        return self(ChameleonLayout(getattr(self, 'model', None), request))
+
+    app = create_app(App, request, use_elasticsearch=False)
+    transaction.commit()
+
+    client = Client(app)
+
+    def render(element):
+        app.element = element
+        return client.get('/element')
+
+    return render
