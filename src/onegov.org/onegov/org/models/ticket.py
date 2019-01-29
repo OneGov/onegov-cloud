@@ -5,7 +5,7 @@ from onegov.event import EventCollection
 from onegov.form import FormSubmissionCollection
 from onegov.org import _
 from onegov.org.layout import DefaultLayout, EventLayout
-from onegov.org.models.message import TicketNote
+from onegov.chat import Message
 from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler
 from onegov.reservation import Allocation, Resource, Reservation
 from onegov.ticket import Ticket, Handler, handlers

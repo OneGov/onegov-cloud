@@ -4,6 +4,12 @@ Changelog
 - Adds compatibility with latest onegov.core release.
   [msom]
 
+1.0.0 (2019-01-29)
+~~~~~~~~~~~~~~~~~~~
+
+- Adds the ability to add chat messages to tickets.
+  [href]
+
 0.50.1 (2019-01-25)
 ~~~~~~~~~~~~~~~~~~~
 
