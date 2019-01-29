@@ -1779,7 +1779,7 @@ msgstr "Verändert:"
 msgid "Confirm"
 msgstr "Bestätigen"
 
-msgid "Hello"
+msgid "Hello!"
 msgstr "Guten Tag"
 
 msgid "A message has been sent regarding ${ref}:"
