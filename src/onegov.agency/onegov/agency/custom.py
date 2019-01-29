@@ -3,7 +3,7 @@ from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.org.custom import get_global_tools as get_global_tools_base
 from onegov.org.models import Organisation
-from onegov.org.new_elements import Link
+from onegov.core.elements import Link
 
 
 def get_global_tools(request):

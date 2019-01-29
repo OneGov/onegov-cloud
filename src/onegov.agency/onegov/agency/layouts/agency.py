@@ -2,13 +2,13 @@ from cached_property import cached_property
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.models import AgencyMembershipMove
 from onegov.agency.models import AgencyMove
+from onegov.core.elements import Confirm
+from onegov.core.elements import Intercooler
+from onegov.core.elements import Link
+from onegov.core.elements import LinkGroup
 from onegov.org import _
 from onegov.org.layout import AdjacencyListLayout
 from onegov.org.layout import DefaultLayout
-from onegov.org.new_elements import Confirm
-from onegov.org.new_elements import Intercooler
-from onegov.org.new_elements import Link
-from onegov.org.new_elements import LinkGroup
 
 
 class MoveAgencyMixin(object):

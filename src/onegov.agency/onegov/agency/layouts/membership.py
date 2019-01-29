@@ -2,9 +2,9 @@ from cached_property import cached_property
 from onegov.agency.layouts.agency import AgencyLayout
 from onegov.org import _
 from onegov.org.layout import DefaultLayout
-from onegov.org.new_elements import Confirm
-from onegov.org.new_elements import Intercooler
-from onegov.org.new_elements import Link
+from onegov.core.elements import Confirm
+from onegov.core.elements import Intercooler
+from onegov.core.elements import Link
 
 
 class MembershipLayout(DefaultLayout):
@@ -34,7 +34,8 @@ class MembershipLayout(DefaultLayout):
                         Confirm(
                             _("Do you really want to delete this membership?"),
                             _("This cannot be undone."),
-                            _("Delete membership")
+                            _("Delete membership"),
+                            _("Cancel")
                         ),
                         Intercooler(
                             request_method='DELETE',

@@ -4,8 +4,8 @@ from onegov.agency.custom import get_top_navigation
 from onegov.agency.pdf import AgencyPdfAr
 from onegov.agency.pdf import AgencyPdfDefault
 from onegov.agency.pdf import AgencyPdfZg
-from onegov.org.new_elements import Link
-from onegov.org.new_elements import LinkGroup
+from onegov.core.elements import Link
+from onegov.core.elements import LinkGroup
 
 
 class DummyRequest():
