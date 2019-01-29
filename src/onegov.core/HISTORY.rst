@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Exclude redis 3.1.0.
+  [href]
+
 - Moves the elements to the core (from onegov.org).
   [msom]
 

@@ -69,7 +69,7 @@ setup(
         'pyreact',
         'pytz',
         'purl',
-        'redis',
+        'redis!=3.1.0',
         'rcssmin',
         'sedate',
         'sqlalchemy>=1.2.4',
