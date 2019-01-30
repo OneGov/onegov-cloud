@@ -116,8 +116,8 @@ def test_municipality_layouts():
     assert layout.title == 'Municipalities'
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == 'DummyPrincipal/MunicipalityCollection'
-    assert layout.cancel_url is ''
-    assert layout.success_url is ''
+    assert layout.cancel_url == ''
+    assert layout.success_url == ''
 
     layout = MunicipalitiesLayout(model, request_admin)
     assert list(hrefs(layout.editbar_links)) == ['MunicipalityCollection/add']
@@ -143,8 +143,8 @@ def test_municipality_layouts():
     assert path(layout.breadcrumbs) == (
         'DummyPrincipal/MunicipalityCollection/#'
     )
-    assert layout.cancel_url is ''
-    assert layout.success_url is ''
+    assert layout.cancel_url == ''
+    assert layout.success_url == ''
 
     layout = MunicipalityLayout(model, request_admin)
     assert list(hrefs(layout.editbar_links)) == [
