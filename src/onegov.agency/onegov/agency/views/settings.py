@@ -8,25 +8,24 @@ from wtforms import RadioField
 
 
 class PDFLayoutForm(Form):
+    pdf_layout = RadioField(
+        label=_("PDF Layout"),
+        fieldset=_("Agencies"),
+        default='default',
+        choices=[
+            ('default', _("Default")),
+            ('ar', "Kanton Appenzell Ausserrhoden"),
+            ('zg', "Kanton Zug"),
+        ],
+    )
 
-        pdf_layout = RadioField(
-            label=_("PDF Layout"),
-            fieldset=_("Agencies"),
-            default='default',
-            choices=[
-                ('default', _("Default")),
-                ('ar', "Kanton Appenzell Ausserrhoden"),
-                ('zg', "Kanton Zug"),
-            ],
-        )
+    def process_obj(self, obj):
+        super().process_obj(obj)
+        self.pdf_layout.data = obj.meta.get('pdf_layout', 'default')
 
-        def process_obj(self, obj):
-            super().process_obj(obj)
-            self.pdf_layout.data = obj.meta.get('pdf_layout', 'default')
-
-        def populate_obj(self, obj, *args, **kwargs):
-            super().populate_obj(obj, *args, **kwargs)
-            obj.meta['pdf_layout'] = self.pdf_layout.data
+    def populate_obj(self, obj, *args, **kwargs):
+        super().populate_obj(obj, *args, **kwargs)
+        obj.meta['pdf_layout'] = self.pdf_layout.data
 
 
 @AgencyApp.form(
