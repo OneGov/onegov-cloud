@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.6.2 (2019-01-30)
+~~~~~~~~~~~~~~~~~~~~
 
 - Adds compatibility with latest onegov.core release.
   [msom]
