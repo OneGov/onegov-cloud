@@ -29,11 +29,25 @@
     </metal:navigation>
 
     <metal:editbar define-macro="editbar">
-        <div tal:condition="layout.editbar_links">
-            <div class="edit-bar">
-                <tal:block repeat="link layout.editbar_links">
-                    <a href="${link[1]}" class="button tiny ${link[2]}">${link[0]}</a>
-                </tal:block>
+        <div class="row" tal:condition="layout.editbar_links">
+            <div class="small-12 columns">
+                <div class="edit-bar clearfix">
+                    <tal:b repeat="group layout.editbar_links">
+                        <tal:b condition="group.links|nothing" define="dropdown_id 'editbar-dropdown-{}'.format(repeat.group.number)">
+                            <button href="#" data-dropdown="${dropdown_id}" class="${group.right_side and 'right-side'} tiny button dropdown">
+                                ${group.title}
+                            </button>
+                            <ul id="${dropdown_id}" data-dropdown-content class="f-dropdown disable-scroll">
+                                <li tal:repeat="link group.links">
+                                    <tal:b replace="structure link(layout)" />
+                                </li>
+                            </ul>
+                        </tal:b>
+                        <tal:b condition="group.url|group.attrs|nothing" define="link group">
+                            <tal:b replace="structure link(layout, ('tiny', 'button'))" />
+                        </tal:b>
+                    </tal:b>
+                </div>
             </div>
         </div>
     </metal:editbar>
@@ -41,9 +55,11 @@
     <metal:breadcrumbs define-macro="breadcrumbs">
         <nav role="navigation" aria-label="You are here" i18n:attributes="aria-label">
             <ul class="breadcrumbs" tal:condition="layout.breadcrumbs">
-                <tal:block repeat="breadcrumb layout.breadcrumbs">
-                    <li class="${breadcrumb[2]}"><a href="${breadcrumb[1]}">${breadcrumb[0]}</a></li>
-                </tal:block>
+                <tal:b repeat="link layout.breadcrumbs">
+                    <li tal:attributes="class repeat.link.end and 'current' or ''"
+                        tal:content="structure link(layout)">
+                    </li>
+                </tal:b>
             </ul>
         </nav>
     </metal:breadcrumbs>

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-28 15:07+0100\n"
-"PO-Revision-Date: 2018-12-11 16:14+0100\n"
+"POT-Creation-Date: 2019-01-30 08:54+0100\n"
+"PO-Revision-Date: 2019-01-30 08:54+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -12,10 +12,40 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.2\n"
+"X-Generator: Poedit 2.2.1\n"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "BFS Number"
+msgstr "BFS Nummer"
+
+msgid "Municipalities"
+msgstr "Gemeinden"
+
+msgid "Add"
+msgstr "Hinzufügen"
+
+msgid "Edit"
+msgstr "Bearbeiten"
 
 msgid "Homepage"
 msgstr "Startseite"
+
+msgid "Delete"
+msgstr "Löschen"
+
+msgid "Do you really want to delete this municipality?"
+msgstr "Diese Gemeinde wirklich löschen?"
+
+msgid "This cannot be undone."
+msgstr "Dies kann nicht rückgängig gemacht werden."
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid "Municipality"
+msgstr "Gemeinde"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
@@ -29,9 +59,6 @@ msgstr "Vorherige Seite"
 
 msgid "Next Page"
 msgstr "Nächste Seite"
-
-msgid "Cancel"
-msgstr "Abbrechen"
 
 msgid "Submit"
 msgstr "Absenden"
@@ -89,6 +116,18 @@ msgstr "Passwort geändert."
 
 msgid "Password reset"
 msgstr "Passwort zurücksetzen"
+
+msgid "Save"
+msgstr "Speichern"
+
+msgid "Municipality deleted."
+msgstr "Gemeinde gelöscht."
+
+msgid "Municipality added."
+msgstr "Gemeinde hinzugefügt."
+
+msgid "Municipality modified."
+msgstr "Gemeinde geändert."
 
 msgid "Access Denied"
 msgstr "Zugriff verweigert"

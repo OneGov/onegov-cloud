@@ -101,7 +101,7 @@ def handle_password_reset_request(self, request, form):
             mapping={'email': form.email.data}
         )
         request.message(message, 'success')
-        return request.redirect(layout.login_link)
+        return request.redirect(layout.login_url)
 
     return {
         'layout': layout,
@@ -125,7 +125,7 @@ def handle_password_reset(self, request, form):
     if form.submitted(request):
         if form.update_password(request):
             request.message(_("Password changed."), 'success')
-            return request.redirect(layout.login_link)
+            return request.redirect(layout.login_url)
         else:
             form.error_message = _(
                 "Wrong username or password reset link not valid any more."

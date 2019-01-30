@@ -15,7 +15,7 @@ def view_home(self, request):
     layout = DefaultLayout(self, request)
 
     if not request.is_logged_in:
-        return request.redirect(layout.login_link)
+        return request.redirect(layout.login_url)
 
     return {
         'layout': layout

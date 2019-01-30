@@ -11,12 +11,10 @@ def test_view_permissions():
     )
 
 
-def test_view_login_logout(wtfs_app):
-    client = Client(wtfs_app)
-
+def test_view_login_logout(client):
     error = "Unbekannter Benutzername oder falsches Passwort"
 
-    for user in ('admin', 'editor', 'publisher'):
+    for user in ('admin', 'editor', 'member'):
         login = client.get('/').maybe_follow().click('Anmelden')
         login.form['username'] = f'{user}@example.org'
         login.form['password'] = 'hunter1'

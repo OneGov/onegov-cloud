@@ -122,10 +122,9 @@ header {
             width: 15px;
         }
 
+        .municipality-icon::before { @include icon('\f0c0'); }
         .delete-icon::before { @include icon('\f014'); }
         .edit-icon::before { @include icon('\f040'); }
-        .export-icon::before { @include icon('\f019'); }
-        .upload-icon::before { @include icon('\f0ee'); }
     }
 
     .breadcrumbs {

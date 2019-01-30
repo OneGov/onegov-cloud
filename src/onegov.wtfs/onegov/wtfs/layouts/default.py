@@ -1,7 +1,9 @@
 from cached_property import cached_property
+from onegov.core.elements import Link
 from onegov.core.layout import ChameleonLayout
-from onegov.wtfs import _
 from onegov.user import Auth
+from onegov.wtfs import _
+from onegov.wtfs.collections import MunicipalityCollection
 
 
 class DefaultLayout(ChameleonLayout):
@@ -30,7 +32,7 @@ class DefaultLayout(ChameleonLayout):
 
     @cached_property
     def breadcrumbs(self):
-        return [(_("Homepage"), self.homepage_link, 'current')]
+        return [Link(_("Homepage"), self.homepage_url)]
 
     @cached_property
     def app_version(self):
@@ -41,24 +43,36 @@ class DefaultLayout(ChameleonLayout):
         return self.request.link(self.app.principal, 'static')
 
     @cached_property
-    def homepage_link(self):
+    def homepage_url(self):
         return self.request.link(self.app.principal)
 
     @cached_property
-    def login_link(self):
+    def login_url(self):
         if not self.request.is_logged_in:
             return self.request.link(
-                Auth.from_request(self.request, to=self.homepage_link),
+                Auth.from_request(self.request, to=self.homepage_url),
                 name='login'
             )
 
     @cached_property
-    def logout_link(self):
+    def logout_url(self):
         if self.request.is_logged_in:
             return self.request.link(
-                Auth.from_request(self.request, to=self.homepage_link),
+                Auth.from_request(self.request, to=self.homepage_url),
                 name='logout'
             )
+
+    @cached_property
+    def municipalities_url(self):
+        return self.request.link(MunicipalityCollection(self.request.session))
+
+    @cached_property
+    def cancel_url(self):
+        return ''
+
+    @cached_property
+    def success_url(self):
+        return ''
 
     @cached_property
     def sentry_js(self):

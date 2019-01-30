@@ -90,12 +90,12 @@ def get_frameworks_asset():
     yield 'tablesaw-create.js'
     yield 'tablesaw-init.js'
     yield 'foundation.js'
+    yield 'intercooler.js'
     yield 'underscore.js'
     yield 'react.js'
     yield 'react-dom.js'
-    yield 'react-dropdown-tree-select.js'
-    yield 'react-dropdown-tree-select.css'
     yield 'form_dependencies.js'
+    yield 'confirm.jsx'
 
 
 @WtfsApp.webasset('common')
