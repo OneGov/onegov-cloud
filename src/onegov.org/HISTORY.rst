@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.0.1 (2019-01-30)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds missing translation.
   [href]
 
