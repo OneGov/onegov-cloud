@@ -287,7 +287,7 @@ def handle_file_upload(self, request):
         content=request.params['file'].file
     )
 
-    if self.supported_content_types is not 'all':
+    if self.supported_content_types != 'all':
         if file.reference.content_type not in self.supported_content_types:
             raise exc.HTTPUnsupportedMediaType()
 
