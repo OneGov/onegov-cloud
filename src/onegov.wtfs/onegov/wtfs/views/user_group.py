@@ -66,7 +66,7 @@ def add_user_group(self, request, form):
     permission=Secret
 )
 def view_user_group(self, request):
-    """ View the a single user group.
+    """ View a single user group.
 
     This view is only visible by an admin.
 

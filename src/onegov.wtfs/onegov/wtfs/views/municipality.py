@@ -65,7 +65,7 @@ def add_municipality(self, request, form):
     permission=Secret
 )
 def view_municipality(self, request):
-    """ View the a single municipality.
+    """ View a single municipality.
 
     This view is only visible by an admin.
 
