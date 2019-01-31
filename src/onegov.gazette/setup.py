@@ -39,7 +39,7 @@ setup(
         'onegov.chat',
         'onegov.core>=0.74.3',
         'onegov.file',
-        'onegov.form>=0.40.0',
+        'onegov.form>=0.43.0',
         'onegov.foundation',
         'onegov.notice>=0.10.0',
         'onegov.pdf>=0.5.0',

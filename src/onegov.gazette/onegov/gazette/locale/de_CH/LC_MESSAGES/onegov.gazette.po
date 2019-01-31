@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-25 14:39+0100\n"
+"POT-Creation-Date: 2019-01-31 08:34+0100\n"
 "PO-Revision-Date: 2018-11-25 14:40+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -58,9 +58,6 @@ msgstr "Offene Meldungen"
 msgid "Published Official Notices"
 msgstr "Veröffentlichte Meldungen"
 
-msgid "This value already exists."
-msgstr "Dieser Wert ist bereits vorhanden."
-
 msgid "This value is in use."
 msgstr "Dieser Wert wird verwendet."
 
@@ -71,13 +68,10 @@ msgstr ""
 msgid "Gazette"
 msgstr "Amtsblatt"
 
-#, python-format
 msgid ""
-"One notice is not published online and therefore not included in this "
-"PDF."
+"One notice is not published online and therefore not included in this PDF."
 msgstr ""
-"Eine Meldung ist online nicht verfügbar und nicht in diesem PDF "
-"enthalten."
+"Eine Meldung ist online nicht verfügbar und nicht in diesem PDF enthalten."
 
 #, python-format
 msgid ""
@@ -797,6 +791,3 @@ msgstr "Seite nicht gefunden"
 
 msgid "The page you are looking for could not be found."
 msgstr "Die angeforderte Seite konnte nicht gefunden werden."
-
-#~ msgid "Not a valid phone number."
-#~ msgstr "Keine gültige Telefonnummer."

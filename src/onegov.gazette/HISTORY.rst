@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Uses latest onegov.form.
+  [msom]
+
 1.22.1 (2019-01-07)
 ~~~~~~~~~~~~~~~~~~~~
 

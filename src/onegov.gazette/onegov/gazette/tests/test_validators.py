@@ -1,10 +1,7 @@
 from onegov.gazette.collections import CategoryCollection
-from onegov.gazette.validators import UniqueColumnValue
 from onegov.gazette.validators import UnusedColumnKeyValue
 from onegov.notice import OfficialNotice
 from onegov.notice import OfficialNoticeCollection
-from onegov.user import User
-from onegov.user import UserCollection
 from pytest import raises
 from wtforms.validators import ValidationError
 
@@ -32,24 +29,6 @@ class DummyField(object):
     def __init__(self, name, data):
         self.name = name
         self.data = data
-
-
-def test_unique_column_value_validator(session):
-    # new item
-    form = DummyForm(session)
-    field = DummyField('username', 'a@example.org')
-    validator = UniqueColumnValue(User)
-    validator(form, field)
-
-    # existing value
-    user = UserCollection(session).add('a@example.org', 'pwd', 'editor')
-    with raises(ValidationError) as excinfo:
-        validator(form, field)
-    assert str(excinfo.value) == 'This value already exists.'
-
-    # provide a default
-    form.model = user
-    validator(form, field)
 
 
 def test_unused_column_key_value_validator(session):
