@@ -219,3 +219,37 @@ class ValidPhoneNumber(object):
             )
             if not valid:
                 raise ValidationError(self.message)
+
+
+class UniqueColumnValue(object):
+    """ Test if the given table does not already have a value in the column
+    (identified by the field name).
+
+    If the form provides a model with such an attribute, we allow this
+    value, too.
+
+    Expects an :class:`wtforms.StringField` instance.
+
+    Usage::
+
+        username = StringField(validators=[UniqueColumnValue(User)])
+
+    """
+
+    def __init__(self, table):
+        self.table = table
+
+    def __call__(self, form, field):
+        if field.name not in self.table.__table__.columns:
+            raise RuntimeError("The field name must match a column!")
+
+        if hasattr(form, 'model'):
+            if hasattr(form.model, field.name):
+                if getattr(form.model, field.name) == field.data:
+                    return
+
+        column = getattr(self.table, field.name)
+        query = form.request.session.query(column)
+        query = query.filter(column == field.data)
+        if query.first():
+            raise ValidationError(_("This value already exists."))

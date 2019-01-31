@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a unique column value validator.
+  [msom]
+
 0.42.0 (2019-01-28)
 ~~~~~~~~~~~~~~~~~~~
 
