@@ -36,7 +36,11 @@ class MunicipalityForm(Form):
 
         used_groups = session.query(Municipality.group_id)
         used_groups = used_groups.filter(Municipality.group_id.isnot(None))
-        used_groups = used_groups.all()
+        used_groups = {r.group_id for r in used_groups}
+
+        model = getattr(self, 'model', None)
+        if model and getattr(model, 'group_id', None):
+            used_groups -= {model.group_id}
 
         groups = session.query(func.cast(UserGroup.id, String), UserGroup.name)
         if used_groups:
@@ -44,10 +48,6 @@ class MunicipalityForm(Form):
         groups = groups.order_by(UserGroup.name)
         self.group_id.choices = groups.all()
         self.group_id.choices.insert(0, ('', ''))
-
-    def add_group(self, group):
-        if group and (str(group.id), group.name) not in self.group_id.choices:
-            self.group_id.choices.insert(0, (str(group.id), group.name))
 
     def update_model(self, model):
         model.name = self.name.data

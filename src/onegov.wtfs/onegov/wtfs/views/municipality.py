@@ -93,7 +93,6 @@ def edit_municipality(self, request, form):
 
     layout = EditMunicipalityLayout(self, request)
 
-    form.add_group(self.group)
     if form.submitted(request):
         form.update_model(self)
         request.message(_("Municipality modified."), 'success')

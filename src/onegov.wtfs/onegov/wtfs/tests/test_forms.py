@@ -65,14 +65,14 @@ def test_municipality_form(session):
     form.on_request()
     assert [c[1] for c in form.group_id.choices] == ["", "Gruppe Aesch"]
 
-    form.add_group(group)
-    assert [c[1] for c in form.group_id.choices] == [
-        "Gruppe Winterthur", "", "Gruppe Aesch"
-    ]
+    form.model = municipalities
+    form.on_request()
+    assert [c[1] for c in form.group_id.choices] == ["", "Gruppe Aesch"]
 
-    form.add_group(group)
+    form.model = municipality
+    form.on_request()
     assert [c[1] for c in form.group_id.choices] == [
-        "Gruppe Winterthur", "", "Gruppe Aesch"
+        "", "Gruppe Aesch", "Gruppe Winterthur"
     ]
 
     # Test apply / update
