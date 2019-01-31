@@ -741,13 +741,15 @@ class Framework(
         See also: :mod:`onegov.core.static`. """
         return False
 
-    def application_bound_identity(self, userid, role):
-        """ Returns a new morepath identity for the given userid and role,
-        bound to this application.
+    def application_bound_identity(self, userid, groupid, role):
+        """ Returns a new morepath identity for the given userid, group and
+        role, bound to this application.
 
         """
         return morepath.authentication.Identity(
-            userid, role=role, application_id=self.application_id_hash)
+            userid, groupid=groupid, role=role,
+            application_id=self.application_id_hash
+        )
 
     @property
     def filestorage(self):

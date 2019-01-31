@@ -51,8 +51,11 @@ def spawn_basic_permissions_app(redis_url):
     )
     def login(self, request):
         userid = request.params.get('userid')
+        groupid = request.params.get('groupid')
         role = request.params.get('role')
-        identity = request.app.application_bound_identity(userid, role)
+        identity = request.app.application_bound_identity(
+            userid, groupid, role
+        )
 
         @request.after
         def remember(response):
@@ -90,7 +93,10 @@ def test_anonymous_access(redis_url):
 def test_personal_access(redis_url):
     client = Client(spawn_basic_permissions_app(redis_url))
     # use the userid 'admin' to be sure that we don't let it matter
-    client.post('/login', {'userid': 'admin', 'role': 'member'})
+    client.post(
+        '/login',
+        {'userid': 'admin', 'groupid': 'admins', 'role': 'member'}
+    )
 
     assert client.get('/public').text == 'public'
     assert client.get('/personal').text == 'personal'
@@ -103,7 +109,10 @@ def test_personal_access(redis_url):
 def test_private_access(redis_url):
     client = Client(spawn_basic_permissions_app(redis_url))
     # use the userid 'admin' to be sure that we don't let it matter
-    client.post('/login', {'userid': 'admin', 'role': 'editor'})
+    client.post(
+        '/login',
+        {'userid': 'admin', 'groupid': 'admins', 'role': 'editor'}
+    )
 
     assert client.get('/public').text == 'public'
     assert client.get('/personal').text == 'personal'
@@ -124,7 +133,10 @@ def test_private_access(redis_url):
 def test_secret_access(redis_url):
     client = Client(spawn_basic_permissions_app(redis_url))
     # use the userid 'editor' to be sure that we don't let it matter
-    client.post('/login', {'userid': 'editor', 'role': 'admin'})
+    client.post(
+        '/login',
+        {'userid': 'editor', 'groupid': 'editors', 'role': 'admin'}
+    )
 
     assert client.get('/public').text == 'public'
     assert client.get('/personal').text == 'personal'
@@ -148,7 +160,7 @@ def test_secure_cookie(redis_url):
 
     client = Client(app)
     client.post(
-        '/login', {'userid': 'editor', 'role': 'admin'},
+        '/login', {'userid': 'editor', 'groupid': 'editors', 'role': 'admin'},
         extra_environ={'wsgi.url_scheme': 'http'}
     )
 
@@ -159,7 +171,10 @@ def test_secure_cookie(redis_url):
 def test_forget(redis_url):
     app = spawn_basic_permissions_app(redis_url)
     client = Client(app)
-    response = client.post('/login', {'userid': 'user', 'role': 'admin'})
+    response = client.post(
+        '/login',
+        {'userid': 'user', 'groupid': 'users', 'role': 'admin'}
+    )
 
     session_id = app.unsign(response.request.cookies['session_id'])
     assert remembered(app, session_id)

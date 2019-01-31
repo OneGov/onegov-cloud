@@ -8,7 +8,7 @@ class IdentityPolicy(object):
 
     """
 
-    required_keys = {'userid', 'role', 'application_id'}
+    required_keys = {'userid', 'groupid', 'role', 'application_id'}
 
     def identify(self, request):
         try:

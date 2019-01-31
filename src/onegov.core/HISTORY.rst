@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds the user group ID to the identity policy.
+  [msom]
+
 0.77.0 (2019-01-30)
 ~~~~~~~~~~~~~~~~~~~
 
