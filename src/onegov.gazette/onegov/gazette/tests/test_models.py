@@ -490,7 +490,7 @@ def test_notice_organization(session):
     session.flush()
     assert notice.organization_id == 'xxx'
     assert notice.organization_object == organization
-    assert notice.organization is 'Organization'  # through title observer
+    assert notice.organization == 'Organization'  # through title observer
 
 
 def test_notice_category(session):
@@ -507,7 +507,7 @@ def test_notice_category(session):
     session.flush()
     assert notice.category_id == 'xxx'
     assert notice.category_object == category
-    assert notice.category is 'Category'  # through title observer
+    assert notice.category == 'Category'  # through title observer
 
 
 def test_notice_issues(session):
