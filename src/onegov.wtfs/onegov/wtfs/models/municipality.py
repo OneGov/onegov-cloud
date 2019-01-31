@@ -1,8 +1,13 @@
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.types import UUID
+from onegov.user import UserGroup
 from sqlalchemy import Column
+from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Text
+from sqlalchemy.orm import backref
+from sqlalchemy.orm import relationship
 
 
 class Municipality(Base, TimestampMixin):
@@ -18,3 +23,9 @@ class Municipality(Base, TimestampMixin):
 
     #: The name of the municipality.
     bfs_number = Column(Integer, nullable=False)
+
+    #: The group that holds all users of this municipality.
+    group_id = Column(UUID, ForeignKey(UserGroup.id), nullable=True)
+    group = relationship(
+        UserGroup, backref=backref('municipality', uselist=False)
+    )

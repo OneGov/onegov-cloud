@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-30 08:54+0100\n"
-"PO-Revision-Date: 2019-01-30 08:54+0100\n"
+"POT-Creation-Date: 2019-01-30 16:51+0100\n"
+"PO-Revision-Date: 2019-01-30 16:43+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -17,11 +17,14 @@ msgstr ""
 msgid "Name"
 msgstr "Name"
 
-msgid "BFS Number"
+msgid "BFS number"
 msgstr "BFS Nummer"
 
-msgid "Municipalities"
-msgstr "Gemeinden"
+msgid "User group"
+msgstr "Benutzergruppe"
+
+msgid "User groups"
+msgstr "Benutzergruppen"
 
 msgid "Add"
 msgstr "Hinzufügen"
@@ -32,17 +35,29 @@ msgstr "Bearbeiten"
 msgid "Homepage"
 msgstr "Startseite"
 
-msgid "Delete"
-msgstr "Löschen"
+msgid "This user group can not be deleted"
+msgstr "Diese Benutzergruppe kann nicht gelöscht werden"
 
-msgid "Do you really want to delete this municipality?"
-msgstr "Diese Gemeinde wirklich löschen?"
+msgid "Delete the linked municipality first."
+msgstr "Löschen Sie zuerst die dazugehörige Gemeinde."
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid "Do you really want to delete this user group?"
+msgstr "Diese Benutzergruppe wirklich löschen?"
 
 msgid "This cannot be undone."
 msgstr "Dies kann nicht rückgängig gemacht werden."
 
-msgid "Cancel"
-msgstr "Abbrechen"
+msgid "Delete"
+msgstr "Löschen"
+
+msgid "Municipalities"
+msgstr "Gemeinden"
+
+msgid "Do you really want to delete this municipality?"
+msgstr "Diese Gemeinde wirklich löschen?"
 
 msgid "Municipality"
 msgstr "Gemeinde"
@@ -120,6 +135,15 @@ msgstr "Passwort zurücksetzen"
 msgid "Save"
 msgstr "Speichern"
 
+msgid "User group deleted."
+msgstr "Benutzergruppe gelöscht."
+
+msgid "User group added."
+msgstr "Benutzergruppe hinzugefügt."
+
+msgid "User group modified."
+msgstr "Benutzergruppe geändert."
+
 msgid "Municipality deleted."
 msgstr "Gemeinde gelöscht."
 
@@ -141,3 +165,9 @@ msgstr "Seite nicht gefunden"
 
 msgid "The page you are looking for could not be found."
 msgstr "Die angeforderte Seite konnte nicht gefunden werden."
+
+#~ msgid "There are municipalities linked to it."
+#~ msgstr "Es gibt Gemeinden, die damit verbunden sind."
+
+#~ msgid "BFS Number"
+#~ msgstr "BFS Nummer"

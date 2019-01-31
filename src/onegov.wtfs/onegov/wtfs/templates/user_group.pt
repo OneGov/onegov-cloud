@@ -4,13 +4,11 @@
         <div class="row">
             <div class="columns small-12">
                 <h1>${layout.title}</h1>
-                <dl>
-                    <dt i18n:translate>BFS number</dt>
-                    <dd>${layout.model.bfs_number}</dd>
 
-                    <dt i18n:translate>User group</dt>
+                <dl>
+                    <dt i18n:translate>Municipality</dt>
                     <dd>
-                        <a tal:condition="layout.model.group" href="${request.link(layout.model.group)}">${layout.model.group.name}</a>
+                        <a tal:condition="layout.model.municipality" href="${request.link(layout.model.municipality)}">${layout.model.municipality.name}</a>
                     </dd>
                 </dl>
             </div>

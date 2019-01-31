@@ -92,6 +92,8 @@ def edit_municipality(self, request, form):
     """
 
     layout = EditMunicipalityLayout(self, request)
+
+    form.add_group(self.group)
     if form.submitted(request):
         form.update_model(self)
         request.message(_("Municipality modified."), 'success')
@@ -113,7 +115,7 @@ def edit_municipality(self, request, form):
     request_method='DELETE',
     permission=Secret
 )
-def delete_agency(self, request):
+def delete_municipality(self, request):
     """ Delete a municipality.
 
     This view is only visible by an admin.

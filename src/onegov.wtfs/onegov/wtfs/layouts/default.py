@@ -4,6 +4,7 @@ from onegov.core.layout import ChameleonLayout
 from onegov.user import Auth
 from onegov.wtfs import _
 from onegov.wtfs.collections import MunicipalityCollection
+from onegov.user import UserGroupCollection
 
 
 class DefaultLayout(ChameleonLayout):
@@ -61,6 +62,10 @@ class DefaultLayout(ChameleonLayout):
                 Auth.from_request(self.request, to=self.homepage_url),
                 name='logout'
             )
+
+    @cached_property
+    def user_groups_url(self):
+        return self.request.link(UserGroupCollection(self.request.session))
 
     @cached_property
     def municipalities_url(self):

@@ -1,10 +1,16 @@
+from onegov.user import UserGroup
+from onegov.user import UserGroupCollection
 from onegov.wtfs.collections import MunicipalityCollection
 from onegov.wtfs.layouts import AddMunicipalityLayout
+from onegov.wtfs.layouts import AddUserGroupLayout
 from onegov.wtfs.layouts import DefaultLayout
 from onegov.wtfs.layouts import EditMunicipalityLayout
+from onegov.wtfs.layouts import EditUserGroupLayout
 from onegov.wtfs.layouts import MailLayout
 from onegov.wtfs.layouts import MunicipalitiesLayout
 from onegov.wtfs.layouts import MunicipalityLayout
+from onegov.wtfs.layouts import UserGroupLayout
+from onegov.wtfs.layouts import UserGroupsLayout
 from onegov.wtfs.models import Municipality
 
 
@@ -89,6 +95,7 @@ def test_default_layout(wtfs_app):
     assert layout.homepage_url == 'Principal/'
     assert layout.login_url == 'Auth/login'
     assert layout.logout_url is None
+    assert layout.user_groups_url == 'UserGroupCollection/'
     assert layout.municipalities_url == 'MunicipalityCollection/'
 
     # Login
@@ -163,4 +170,64 @@ def test_municipality_layouts():
     assert layout.success_url == 'MunicipalityCollection/'
 
     layout = EditMunicipalityLayout(model, request_admin)
+    assert list(hrefs(layout.editbar_links)) == []
+
+
+def test_user_group_layouts():
+    request = DummyRequest()
+    request_admin = DummyRequest(roles=['admin'])
+
+    # User group collection
+    model = UserGroupCollection(None)
+    layout = UserGroupsLayout(model, request)
+    assert layout.title == 'User groups'
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/UserGroupCollection'
+    assert layout.cancel_url == ''
+    assert layout.success_url == ''
+
+    layout = UserGroupsLayout(model, request_admin)
+    assert list(hrefs(layout.editbar_links)) == ['UserGroupCollection/add']
+
+    # .. add
+    layout = AddUserGroupLayout(model, request)
+    assert layout.title == 'Add'
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == (
+        'DummyPrincipal/UserGroupCollection/#'
+    )
+    assert layout.cancel_url == 'UserGroupCollection/'
+    assert layout.success_url == 'UserGroupCollection/'
+
+    layout = AddUserGroupLayout(model, request_admin)
+    assert list(hrefs(layout.editbar_links)) == []
+
+    # User group
+    model = UserGroup(name='Winterthur')
+    layout = UserGroupLayout(model, request)
+    assert layout.title == 'Winterthur'
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == (
+        'DummyPrincipal/UserGroupCollection/#'
+    )
+    assert layout.cancel_url == ''
+    assert layout.success_url == ''
+
+    layout = UserGroupLayout(model, request_admin)
+    assert list(hrefs(layout.editbar_links)) == [
+        'UserGroup/edit',
+        'UserGroup/?csrf-token=x'
+    ]
+
+    # ... edit
+    layout = EditUserGroupLayout(model, request)
+    assert layout.title == 'Edit'
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == (
+        'DummyPrincipal/UserGroupCollection/UserGroup/#'
+    )
+    assert layout.cancel_url == 'UserGroup/'
+    assert layout.success_url == 'UserGroupCollection/'
+
+    layout = EditUserGroupLayout(model, request_admin)
     assert list(hrefs(layout.editbar_links)) == []
