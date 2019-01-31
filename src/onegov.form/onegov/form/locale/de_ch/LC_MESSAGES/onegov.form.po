@@ -7,9 +7,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-10-24 09:08+0200\n"
-"PO-Revision-Date: 2015-10-15 09:43+0200\n"
-"Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
+"POT-Creation-Date: 2019-01-31 08:29+0100\n"
+"PO-Revision-Date: 2019-01-31 08:31+0100\n"
+"Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
 "MIME-Version: 1.0\n"
@@ -17,15 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.11\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-msgid "Select an Option"
-msgstr "Eine Option auswählen"
-
-msgid "No results match"
-msgstr "Keine Ergebnisse gefunden:"
-
-msgid "Select Some Options"
-msgstr "Mehrere Optionen auswählen"
+"X-Generator: Poedit 2.2.1\n"
 
 #, python-format
 msgid "The file is too large, please provide a file smaller than {}."
@@ -38,8 +30,7 @@ msgid "The form could not be parsed."
 msgstr "Das Formular ist nicht gültig."
 
 msgid "Define at least one required e-mail field ('E-Mail * = @@@')"
-msgstr ""
-"Definieren Sie mindestens ein benötigtes E-Mail Feld (z.B. 'E-Mail * = @@@')"
+msgstr "Definieren Sie mindestens ein benötigtes E-Mail Feld (z.B. 'E-Mail * = @@@')"
 
 #, python-format
 msgid "The syntax on line {line} is not valid."
@@ -51,17 +42,28 @@ msgstr "Das Feld '{label}' kommt doppelt vor."
 
 #, python-format
 msgid "'{label}' is a reserved name. Please use a different name."
-msgstr ""
-"'{label}' ist ein reservierter Name. Bitte verwenden Sie einen anderen Namen."
+msgstr "'{label}' ist ein reservierter Name. Bitte verwenden Sie einen anderen Namen."
 
 msgid "Not a valid phone number."
 msgstr "Ungültige Telefonnummer."
+
+msgid "This value already exists."
+msgstr "Dieser Wert ist bereits vorhanden."
 
 msgid "Required"
 msgstr "Pflicht"
 
 msgid "Optional"
 msgstr "Optional"
+
+msgid "Select an Option"
+msgstr "Eine Option auswählen"
+
+msgid "No results match"
+msgstr "Keine Ergebnisse gefunden:"
+
+msgid "Select Some Options"
+msgstr "Mehrere Optionen auswählen"
 
 msgid "Uploaded file"
 msgstr "Hochgeladene Datei"
@@ -145,4 +147,4 @@ msgid "Swiss vat number"
 msgstr "MWST Nummer"
 
 msgid "Markdown"
-msgstr ""
+msgstr "Markdown"

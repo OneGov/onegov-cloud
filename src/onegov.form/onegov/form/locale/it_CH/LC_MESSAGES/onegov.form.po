@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-10-24 09:08+0200\n"
-"PO-Revision-Date: 2018-09-18 15:45+0200\n"
+"POT-Creation-Date: 2019-01-31 08:29+0100\n"
+"PO-Revision-Date: 2019-01-31 08:33+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Italian\n"
 "Language: it_CH\n"
@@ -15,15 +15,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-msgid "Select an Option"
-msgstr ""
-
-msgid "No results match"
-msgstr ""
-
-msgid "Select Some Options"
-msgstr ""
+"X-Generator: Poedit 2.2.1\n"
 
 #, python-format
 msgid "The file is too large, please provide a file smaller than {}."
@@ -53,11 +45,23 @@ msgstr ""
 msgid "Not a valid phone number."
 msgstr "Non è un numero di telefono valido."
 
+msgid "This value already exists."
+msgstr "Questo valore esiste già."
+
 msgid "Required"
 msgstr ""
 
 msgid "Optional"
 msgstr ""
+
+msgid "Select an Option"
+msgstr "Selezionare un'opzione"
+
+msgid "No results match"
+msgstr "Nessun risultato corrisponde"
+
+msgid "Select Some Options"
+msgstr "Seleziona alcune opzioni"
 
 msgid "Uploaded file"
 msgstr ""

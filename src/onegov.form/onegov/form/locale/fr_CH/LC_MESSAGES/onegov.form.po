@@ -6,9 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2018-10-24 09:08+0200\n"
-"PO-Revision-Date: 2015-10-15 09:43+0200\n"
-"Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
+"POT-Creation-Date: 2019-01-31 08:29+0100\n"
+"PO-Revision-Date: 2019-01-31 08:31+0100\n"
+"Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
 "Language: fr_CH\n"
 "MIME-Version: 1.0\n"
@@ -16,20 +16,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.11\n"
-
-msgid "Select an Option"
-msgstr ""
-
-msgid "No results match"
-msgstr ""
-
-msgid "Select Some Options"
-msgstr ""
+"X-Generator: Poedit 2.2.1\n"
 
 #, python-format
 msgid "The file is too large, please provide a file smaller than {}."
-msgstr ""
-"Le fichier est trop volumineux, veuillez fournir un fichier de moins de {}."
+msgstr "Le fichier est trop volumineux, veuillez fournir un fichier de moins de {}."
 
 msgid "Files of this type are not supported."
 msgstr "Les fichiers de ce type ne sont pas pris en charge."
@@ -55,11 +46,23 @@ msgstr "'{label}' est un nom réservé. Veuillez utiliser un nom différent."
 msgid "Not a valid phone number."
 msgstr "N'est pas un numéro de téléphone valide."
 
+msgid "This value already exists."
+msgstr "Cette valeur existe déjà."
+
 msgid "Required"
 msgstr "Requis"
 
 msgid "Optional"
 msgstr "Optionnel"
+
+msgid "Select an Option"
+msgstr "Sélectionnez une option"
+
+msgid "No results match"
+msgstr "Aucun résultat ne correspond"
+
+msgid "Select Some Options"
+msgstr "Sélectionner quelques options"
 
 msgid "Uploaded file"
 msgstr "Fichier téléchargé"
@@ -143,4 +146,4 @@ msgid "Swiss vat number"
 msgstr "Numéro de TVA suisse"
 
 msgid "Markdown"
-msgstr ""
+msgstr "Markdown"
