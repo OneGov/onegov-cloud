@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a InputRequiredIf validator.
+  [msom]
+
 0.43.0 (2019-01-31)
 ~~~~~~~~~~~~~~~~~~~
 

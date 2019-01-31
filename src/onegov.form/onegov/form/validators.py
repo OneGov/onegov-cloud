@@ -10,7 +10,7 @@ from onegov.form.errors import InvalidFormSyntax, DuplicateLabelError
 from stdnum.exceptions import ValidationError as StdnumValidationError
 from wtforms import ValidationError
 from wtforms.fields import SelectField
-from wtforms.validators import StopValidation, Optional
+from wtforms.validators import InputRequired, Optional, StopValidation
 from wtforms.compat import string_types
 
 
@@ -228,8 +228,6 @@ class UniqueColumnValue(object):
     If the form provides a model with such an attribute, we allow this
     value, too.
 
-    Expects an :class:`wtforms.StringField` instance.
-
     Usage::
 
         username = StringField(validators=[UniqueColumnValue(User)])
@@ -253,3 +251,31 @@ class UniqueColumnValue(object):
         query = query.filter(column == field.data)
         if query.first():
             raise ValidationError(_("This value already exists."))
+
+
+class InputRequiredIf(InputRequired):
+    """ Validator which makes a field required if another field is set and has
+    the given value.
+
+    """
+
+    def __init__(self, field_name, field_data, message=None, **kwargs):
+        self.field_name = field_name
+        self.field_data = field_data
+        self.message = message
+
+    def __call__(self, form, field):
+        if not hasattr(form, self.field_name):
+            raise RuntimeError("No field named '{}' not in form").format(
+                self.field_name
+            )
+
+        values = (getattr(form, self.field_name).data, self.field_data)
+        if any([isinstance(x, bool) or x is None for x in values]):
+            required = values[0] is values[1]
+        else:
+            required = values[0] == values[1]
+        if required:
+            super(InputRequiredIf, self).__call__(form, field)
+        else:
+            Optional().__call__(form, field)
