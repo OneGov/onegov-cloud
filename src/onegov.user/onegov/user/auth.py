@@ -154,7 +154,7 @@ class Auth(object):
 
         return self.identity_class(
             userid=user.username,
-            groupid=str(user.group_id) if user.group_id else '',
+            groupid=user.group_id.hex if user.group_id else '',
             role=user.role,
             application_id=self.application_id
         )
