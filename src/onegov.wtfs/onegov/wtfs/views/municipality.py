@@ -1,5 +1,4 @@
 from morepath import redirect
-from onegov.core.security import Secret
 from onegov.wtfs import _
 from onegov.wtfs import WtfsApp
 from onegov.wtfs.collections import MunicipalityCollection
@@ -9,12 +8,16 @@ from onegov.wtfs.layouts import EditMunicipalityLayout
 from onegov.wtfs.layouts import MunicipalitiesLayout
 from onegov.wtfs.layouts import MunicipalityLayout
 from onegov.wtfs.models import Municipality
+from onegov.wtfs.security import AddModel
+from onegov.wtfs.security import DeleteModel
+from onegov.wtfs.security import EditModel
+from onegov.wtfs.security import ViewModel
 
 
 @WtfsApp.html(
     model=MunicipalityCollection,
     template='municipalities.pt',
-    permission=Secret
+    permission=ViewModel
 )
 def view_municipalities(self, request):
     """ View the list of municipalities.
@@ -33,7 +36,7 @@ def view_municipalities(self, request):
     model=MunicipalityCollection,
     name='add',
     template='form.pt',
-    permission=Secret,
+    permission=AddModel,
     form=MunicipalityForm
 )
 def add_municipality(self, request, form):
@@ -62,7 +65,7 @@ def add_municipality(self, request, form):
 @WtfsApp.html(
     model=Municipality,
     template='municipality.pt',
-    permission=Secret
+    permission=ViewModel
 )
 def view_municipality(self, request):
     """ View a single municipality.
@@ -81,7 +84,7 @@ def view_municipality(self, request):
     model=Municipality,
     name='edit',
     template='form.pt',
-    permission=Secret,
+    permission=EditModel,
     form=MunicipalityForm
 )
 def edit_municipality(self, request, form):
@@ -112,7 +115,7 @@ def edit_municipality(self, request, form):
 @WtfsApp.view(
     model=Municipality,
     request_method='DELETE',
-    permission=Secret
+    permission=DeleteModel
 )
 def delete_municipality(self, request):
     """ Delete a municipality.

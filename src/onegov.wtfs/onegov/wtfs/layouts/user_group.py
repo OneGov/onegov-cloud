@@ -1,11 +1,13 @@
 from cached_property import cached_property
-from onegov.core.elements import Block
 from onegov.core.elements import Confirm
 from onegov.core.elements import Intercooler
 from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
 from onegov.wtfs import _
 from onegov.wtfs.layouts.default import DefaultLayout
+from onegov.wtfs.security import AddModel
+from onegov.wtfs.security import DeleteModel
+from onegov.wtfs.security import EditModel
 
 
 class UserGroupsLayout(DefaultLayout):
@@ -16,8 +18,9 @@ class UserGroupsLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.has_role('admin'):
-            return [
+        result = []
+        if self.request.has_permission(self.model, AddModel):
+            result.append(
                 LinkGroup(
                     title=_("Add"),
                     links=[
@@ -31,8 +34,8 @@ class UserGroupsLayout(DefaultLayout):
                         )
                     ]
                 ),
-            ]
-        return []
+            )
+        return result
 
     @cached_property
     def breadcrumbs(self):
@@ -50,13 +53,17 @@ class UserGroupLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.has_role('admin'):
-            return [
+        result = []
+        if self.request.has_permission(self.model, EditModel):
+            result.append(
                 Link(
                     text=_("Edit"),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-icon'}
-                ),
+                )
+            )
+        if self.request.has_permission(self.model, DeleteModel):
+            result.append(
                 Link(
                     text=_("Delete"),
                     url=self.csrf_protected_url(
@@ -64,12 +71,6 @@ class UserGroupLayout(DefaultLayout):
                     ),
                     attrs={'class': 'delete-icon'},
                     traits=(
-                        Block(
-                            _("This user group can not be deleted"),
-                            _("Delete the linked municipality first."),
-                            _("Cancel")
-                        )
-                    ) if self.model.municipality else (
                         Confirm(
                             _(
                                 "Do you really want to delete this user group?"
@@ -83,9 +84,9 @@ class UserGroupLayout(DefaultLayout):
                             redirect_after=self.user_groups_url
                         )
                     )
-                ),
-            ]
-        return []
+                )
+            )
+        return result
 
     @cached_property
     def breadcrumbs(self):

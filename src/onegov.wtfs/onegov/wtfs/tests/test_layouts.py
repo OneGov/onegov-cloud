@@ -12,6 +12,10 @@ from onegov.wtfs.layouts import MunicipalityLayout
 from onegov.wtfs.layouts import UserGroupLayout
 from onegov.wtfs.layouts import UserGroupsLayout
 from onegov.wtfs.models import Municipality
+from onegov.wtfs.security import AddModel
+from onegov.wtfs.security import DeleteModel
+from onegov.wtfs.security import EditModel
+from onegov.wtfs.security import ViewModel
 
 
 class DummyPrincipal(object):
@@ -29,13 +33,19 @@ class DummyRequest(object):
     locale = 'de_CH'
     url = ''
 
-    def __init__(self, session=None, roles=[], includes=[]):
+    def __init__(self, session=None, roles=[], includes=[], permissions=[]):
         self.session = session
         self.roles = roles
+        self.permissions = permissions
         self.includes = includes
 
     def has_role(self, *roles):
         return any((role in self.roles for role in roles))
+
+    def has_permission(self, model, permission):
+        if self.has_role('admin'):
+            return permission in {AddModel, DeleteModel, EditModel, ViewModel}
+        return permission in self.permissions
 
     def translate(self, text):
         return str(text)

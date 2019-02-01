@@ -5,6 +5,9 @@ from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
 from onegov.wtfs import _
 from onegov.wtfs.layouts.default import DefaultLayout
+from onegov.wtfs.security import AddModel
+from onegov.wtfs.security import DeleteModel
+from onegov.wtfs.security import EditModel
 
 
 class MunicipalitiesLayout(DefaultLayout):
@@ -15,8 +18,9 @@ class MunicipalitiesLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.has_role('admin'):
-            return [
+        result = []
+        if self.request.has_permission(self.model, AddModel):
+            result.append(
                 LinkGroup(
                     title=_("Add"),
                     links=[
@@ -29,9 +33,9 @@ class MunicipalitiesLayout(DefaultLayout):
                             attrs={'class': 'municipality-icon'}
                         )
                     ]
-                ),
-            ]
-        return []
+                )
+            )
+        return result
 
     @cached_property
     def breadcrumbs(self):
@@ -49,13 +53,17 @@ class MunicipalityLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.has_role('admin'):
-            return [
+        result = []
+        if self.request.has_permission(self.model, EditModel):
+            result.append(
                 Link(
                     text=_("Edit"),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-icon'}
-                ),
+                )
+            )
+        if self.request.has_permission(self.model, DeleteModel):
+            result.append(
                 Link(
                     text=_("Delete"),
                     url=self.csrf_protected_url(
@@ -77,9 +85,9 @@ class MunicipalityLayout(DefaultLayout):
                             redirect_after=self.municipalities_url
                         )
                     )
-                ),
-            ]
-        return []
+                )
+            )
+        return result
 
     @cached_property
     def breadcrumbs(self):

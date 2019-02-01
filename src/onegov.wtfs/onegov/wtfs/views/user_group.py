@@ -1,5 +1,4 @@
 from morepath import redirect
-from onegov.core.security import Secret
 from onegov.user import UserGroup
 from onegov.user import UserGroupCollection
 from onegov.wtfs import _
@@ -9,13 +8,16 @@ from onegov.wtfs.layouts import AddUserGroupLayout
 from onegov.wtfs.layouts import EditUserGroupLayout
 from onegov.wtfs.layouts import UserGroupLayout
 from onegov.wtfs.layouts import UserGroupsLayout
-from webob.exc import HTTPConflict
+from onegov.wtfs.security import AddModel
+from onegov.wtfs.security import DeleteModel
+from onegov.wtfs.security import EditModel
+from onegov.wtfs.security import ViewModel
 
 
 @WtfsApp.html(
     model=UserGroupCollection,
     template='user_groups.pt',
-    permission=Secret
+    permission=ViewModel
 )
 def view_user_groups(self, request):
     """ View the list of user groups.
@@ -34,7 +36,7 @@ def view_user_groups(self, request):
     model=UserGroupCollection,
     name='add',
     template='form.pt',
-    permission=Secret,
+    permission=AddModel,
     form=UserGroupForm
 )
 def add_user_group(self, request, form):
@@ -63,7 +65,7 @@ def add_user_group(self, request, form):
 @WtfsApp.html(
     model=UserGroup,
     template='user_group.pt',
-    permission=Secret
+    permission=ViewModel
 )
 def view_user_group(self, request):
     """ View a single user group.
@@ -82,7 +84,7 @@ def view_user_group(self, request):
     model=UserGroup,
     name='edit',
     template='form.pt',
-    permission=Secret,
+    permission=EditModel,
     form=UserGroupForm
 )
 def edit_user_group(self, request, form):
@@ -113,7 +115,7 @@ def edit_user_group(self, request, form):
 @WtfsApp.view(
     model=UserGroup,
     request_method='DELETE',
-    permission=Secret
+    permission=DeleteModel
 )
 def delete_user_group(self, request):
     """ Delete a user group.
@@ -123,7 +125,5 @@ def delete_user_group(self, request):
     """
 
     request.assert_valid_csrf_token()
-    if self.municipality:
-        raise HTTPConflict()
     UserGroupCollection(request.session).delete(self)
     request.message(_("User group deleted."), 'success')
