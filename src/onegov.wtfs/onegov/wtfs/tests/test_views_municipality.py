@@ -1,3 +1,6 @@
+from onegov.core.request import CoreRequest
+from unittest.mock import patch
+
 
 def test_views_municipality(client):
     client.login_admin()
@@ -20,14 +23,14 @@ def test_views_municipality(client):
     assert "Gemeinde geändert." in edited
     assert "Gemeinde Aesch" in edited
 
-    deleted = client.get('/municipalities').click("Gemeinde Aesch")
-    deleted = deleted.click("Löschen")
+    deleted = client.get('/municipalities').click("Gemeinde Aesch")\
+        .click("Löschen")
     assert deleted.status_int == 200
-
     assert "Gemeinde Aesch" not in client.get('/municipalities')
 
 
-def test_views_municipality_permissions(client):
+@patch.object(CoreRequest, 'assert_valid_csrf_token')
+def test_views_municipality_permissions(mock_method, client):
     client.login_admin()
 
     add = client.get('/municipalities').click(href='add')
@@ -40,27 +43,30 @@ def test_views_municipality_permissions(client):
     urls = [
         '/municipalities',
         '/municipalities/add',
-        '/municipalities/municipality/1',
-        '/municipalities/municipality/1/edit',
-        '/municipalities/municipality/1/delete'
+        '/municipality/1',
+        '/municipality/1/edit'
     ]
 
     for url in urls:
-        client.get('/municipalities', status=403)
+        client.get(url, status=403)
+    client.delete('/municipality/1', status=403)
 
     client.login_member()
     for url in urls:
-        client.get('/municipalities', status=403)
+        client.get(url, status=403)
+    client.delete('/municipality/1', status=403)
     client.logout()
 
     client.login_editor()
     for url in urls:
-        client.get('/municipalities', status=403)
+        client.get(url, status=403)
+    client.delete('/municipality/1', status=403)
     client.logout()
 
     client.login_admin()
     for url in urls:
-        client.get('/municipalities')
+        client.get(url)
+    client.delete('/municipality/1')
     client.logout()
 
 

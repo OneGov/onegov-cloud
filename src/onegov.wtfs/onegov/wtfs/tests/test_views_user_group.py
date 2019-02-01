@@ -1,3 +1,6 @@
+from onegov.core.request import CoreRequest
+from unittest.mock import patch
+
 
 def test_views_user_groups(client):
     client.login_admin()
@@ -10,7 +13,6 @@ def test_views_user_groups(client):
 
     view = client.get('/user-groups').click("Gruppe Adlikon")
     assert "Gruppe Adlikon" in view
-    # link to municipalities is tested in test_views_municipality_group
 
     edit = view.click("Bearbeiten")
     edit.form['name'] = "Gruppe Aesch"
@@ -20,41 +22,46 @@ def test_views_user_groups(client):
 
     deleted = client.get('/user-groups').click("Gruppe Aesch").click("Löschen")
     assert deleted.status_int == 200
-
     assert "Gruppe Aesch" not in client.get('/user-groups')
 
 
-def test_views_user_groups_permissions(client):
+@patch.object(CoreRequest, 'assert_valid_csrf_token')
+def test_views_user_groups_permissions(mock_method, client):
     client.login_admin()
 
     add = client.get('/user-groups').click(href='add')
     add.form['name'] = "Gruppe Adlikon"
     assert "Benutzergruppe hinzugefügt." in add.form.submit().follow()
+    id = client.get('/user-groups')\
+        .click("Gruppe Adlikon").request.url.split('/')[-1]
 
     client.logout()
 
     urls = [
         '/user-groups',
         '/user-groups/add',
-        '/user-groups/municipality/1',
-        '/user-groups/municipality/1/edit',
-        '/user-groups/municipality/1/delete'
+        f'/user-group/{id}',
+        f'/user-group/{id}/edit',
     ]
 
     for url in urls:
-        client.get('/user-groups', status=403)
+        client.get(url, status=403)
+    client.delete(f'/user-group/{id}', status=403)
 
     client.login_member()
     for url in urls:
-        client.get('/user-groups', status=403)
+        client.get(url, status=403)
+    client.delete(f'/user-group/{id}', status=403)
     client.logout()
 
     client.login_editor()
     for url in urls:
-        client.get('/user-groups', status=403)
+        client.get(url, status=403)
+    client.delete(f'/user-group/{id}', status=403)
     client.logout()
 
     client.login_admin()
     for url in urls:
-        client.get('/user-groups')
+        client.get(url)
+    client.delete(f'/user-group/{id}')
     client.logout()
