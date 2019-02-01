@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.20.0 (2019-02-01)
+~~~~~~~~~~~~~~~~~~~
 
 - Remembers the ID of the user group when logging in.
   [msom]
