@@ -36,7 +36,7 @@ setup(
         'click',
         'furl',
         'itsdangerous',
-        'onegov.core>=0.50.0',
+        'onegov.core>=0.78.0',
         'onegov.form',
         'sqlalchemy'
     ],
