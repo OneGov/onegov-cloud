@@ -630,6 +630,8 @@ def test_page_fn_header_logo(path):
     module_path('onegov.pdf', 'tests/fixtures/onegov.svg'),
 ])
 def test_page_fn_header_logo_and_footer(path):
+    year = date.today().year
+
     with open(path) as file:
         logo = file.read()
 
@@ -641,4 +643,6 @@ def test_page_fn_header_logo_and_footer(path):
     file.seek(0)
     reader = PdfFileReader(file)
     assert reader.getNumPages() == 1
-    assert reader.getPage(0).extractText() == 'onegov.ch\n© 2018 author\n1\n'
+    assert reader.getPage(0).extractText() == (
+        f'onegov.ch\n© {year} author\n1\n'
+    )
