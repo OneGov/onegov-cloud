@@ -1,0 +1,164 @@
+from onegov.core.request import CoreRequest
+from unittest.mock import patch
+
+
+def test_views_user(client):
+    client.login_admin()
+
+    add = client.get('/user-groups').click(href='add')
+    add.form['name'] = "Gruppe Winterthur"
+    assert "Benutzergruppe hinzugefügt." in add.form.submit().follow()
+
+    add = client.get('/users').click(href='add')
+    add.form['realname'] = "Hans Muster"
+    add.form['username'] = "hans.muster@winterthur.ch"
+    add.form['role'].select('editor')
+    add.form['group_id'].select(text="Gruppe Winterthur")
+    add.form['contact'] = True
+    added = add.form.submit().follow()
+    assert "Benutzer hinzugefügt." in added
+    assert "Hans Muster" in added
+
+    add = client.get('/users').click(href='add')
+    add.form['realname'] = "Optimo"
+    add.form['username'] = "info@optimo.info"
+    add.form['role'].select('member')
+    added = add.form.submit().follow()
+    assert "Benutzer hinzugefügt." in added
+    assert "Optimo" in added
+
+    view = client.get('/users').click("Hans Muster")
+    assert "Gemeindeadministrator" in view
+    assert "hans.muster@winterthur.ch" in view
+    assert "✔︎" in view
+    assert "Gruppe Winterthur" in view
+
+    view = client.get('/users').click("Optimo")
+    assert "Benutzer" in view
+    assert "info@optimo.info" in view
+    assert "✘︎" in view
+
+    edit = client.get('/users').click("Hans Muster").click("Bearbeiten")
+    edit.form['realname'] = "Hans-Peter Muster"
+    edit.form['username'] = "hans-peter.muster@winterthur.ch"
+    edit.form['role'].select('member')
+    assert "Benutzer geändert." in edit.form.submit().follow()
+    view = client.get('/users').click("Hans-Peter Muster")
+    assert "Hans-Peter Muster" in view
+    assert "Benutzer" in view
+    assert "hans-peter.muster@winterthur.ch" in view
+    assert "✔︎" in view
+    assert "Gruppe Winterthur" in view
+
+    deleted = client.get('/users').click("Hans-Peter Muster").click("Löschen")
+    assert deleted.status_int == 200
+    deleted = client.get('/users').click("Optimo").click("Löschen")
+    assert deleted.status_int == 200
+    assert "Hans-Peter Muster" not in client.get('/users')
+    assert "Optimo" not in client.get('/users')
+
+
+def test_views_user_editor(client):
+    client.login_editor()
+
+    add = client.get('/users').click(href='add')
+    add.form['realname'] = "Hans Muster"
+    add.form['username'] = "hans.muster@winterthur.ch"
+    add.form['contact'] = True
+    added = add.form.submit().follow()
+    assert "Benutzer hinzugefügt." in added
+    assert "Hans Muster" in added
+
+    view = client.get('/users').click("Hans Muster")
+    assert "Benutzer" in view
+    assert "hans.muster@winterthur.ch" in view
+    assert "✔︎" in view
+    assert "My Group" in view
+
+    edit = client.get('/users').click("Hans Muster").click("Bearbeiten")
+    edit.form['realname'] = "Hans-Peter Muster"
+    edit.form['username'] = "hans-peter.muster@winterthur.ch"
+    edit.form['contact'] = False
+    assert "Benutzer geändert." in edit.form.submit().follow()
+    view = client.get('/users').click("Hans-Peter Muster")
+    assert "Hans-Peter Muster" in view
+    assert "Benutzer" in view
+    assert "hans-peter.muster@winterthur.ch" in view
+    assert "✘︎" in view
+    assert "My Group" in view
+
+    deleted = client.get('/users').click("Hans-Peter Muster").click("Löschen")
+    assert deleted.status_int == 200
+    assert "Hans-Peter Muster" not in client.get('/users')
+
+
+@patch.object(CoreRequest, 'assert_valid_csrf_token')
+def test_views_users_permissions(mock_method, client):
+    client.login_admin()
+
+    add = client.get('/users').click(href='add')
+    add.form['realname'] = "Optimo"
+    add.form['username'] = "info@optimo.info"
+    add.form['role'].select('member')
+    assert "Benutzer hinzugefügt." in add.form.submit().follow()
+
+    client.logout()
+
+    urls = [
+        '/users',
+        '/users/add',
+        '/users/add-unrestricted'
+    ]
+    users = [
+        'member%40example.org',
+        'editor%40example.org',
+        'info%40optimo.info',
+        'admin%40example.org',
+    ]
+
+    for url in urls:
+        client.get(url, status=403)
+    for user in users:
+        client.get(f'/user/{user}', status=403)
+        client.get(f'/user/{user}/edit', status=403)
+        client.get(f'/user/{user}/edit-unrestricted', status=403)
+        client.delete(f'/user/{user}', status=403)
+
+    client.login_member()
+    for url in urls:
+        client.get(url, status=403)
+    for user in users:
+        client.get(f'/user/{user}', status=403)
+        client.get(f'/user/{user}/edit', status=403)
+        client.get(f'/user/{user}/edit-unrestricted', status=403)
+        client.delete(f'/user/{user}', status=403)
+    client.logout()
+
+    client.login_editor()
+    client.get('/users')
+    client.get('/users/add')
+    client.get('/users/add-unrestricted', status=403)
+    for user in users[:1]:
+        client.get(f'/user/{user}')
+        client.get(f'/user/{user}/edit')
+        client.get(f'/user/{user}/edit-unrestricted', status=403)
+        client.delete(f'/user/{user}')
+    for user in users[1:]:
+        client.get(f'/user/{user}', status=403)
+        client.get(f'/user/{user}/edit', status=403)
+        client.get(f'/user/{user}/edit-unrestricted', status=403)
+        client.delete(f'/user/{user}', status=403)
+    client.logout()
+
+    client.login_admin()
+    for user in users[1:-1]:
+        client.get(f'/user/{user}')
+        client.get(f'/user/{user}/edit', status=403)
+        client.get(f'/user/{user}/edit-unrestricted')
+        client.delete(f'/user/{user}')
+    for user in users[-1:]:
+        client.get(f'/user/{user}', status=403)
+        client.get(f'/user/{user}/edit', status=403)
+        client.get(f'/user/{user}/edit-unrestricted', status=403)
+        client.delete(f'/user/{user}', status=403)
+    client.logout()

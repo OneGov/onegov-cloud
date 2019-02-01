@@ -2,9 +2,10 @@ from cached_property import cached_property
 from onegov.core.elements import Link
 from onegov.core.layout import ChameleonLayout
 from onegov.user import Auth
+from onegov.user import UserCollection
+from onegov.user import UserGroupCollection
 from onegov.wtfs import _
 from onegov.wtfs.collections import MunicipalityCollection
-from onegov.user import UserGroupCollection
 
 
 class DefaultLayout(ChameleonLayout):
@@ -66,6 +67,10 @@ class DefaultLayout(ChameleonLayout):
     @cached_property
     def user_groups_url(self):
         return self.request.link(UserGroupCollection(self.request.session))
+
+    @cached_property
+    def users_url(self):
+        return self.request.link(UserCollection(self.request.session))
 
     @cached_property
     def municipalities_url(self):

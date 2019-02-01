@@ -2,10 +2,12 @@ from onegov_testing import Client as BaseClient
 from onegov_testing.utils import create_app
 from onegov.core.crypto import hash_password
 from onegov.user import User
+from onegov.user import UserGroup
 from onegov.wtfs import WtfsApp
 from onegov.wtfs.models import Principal
 from pytest import fixture
 from transaction import commit
+from uuid import uuid4
 
 
 class Client(BaseClient):
@@ -27,6 +29,8 @@ def create_wtfs_app(request, temporary_path):
     app.session_manager.set_locale('de_CH', 'de_CH')
 
     session = app.session()
+    group_id = uuid4()
+    session.add(UserGroup(id=group_id, name='My Group'))
     session.add(User(
         realname='Admin',
         username='admin@example.org',
@@ -37,13 +41,15 @@ def create_wtfs_app(request, temporary_path):
         realname='Editor',
         username='editor@example.org',
         password_hash=request.getfixturevalue('wtfs_password'),
-        role='editor'
+        role='editor',
+        group_id=group_id
     ))
     session.add(User(
         realname='Member',
         username='member@example.org',
         password_hash=request.getfixturevalue('wtfs_password'),
-        role='member'
+        role='member',
+        group_id=group_id
     ))
 
     commit()

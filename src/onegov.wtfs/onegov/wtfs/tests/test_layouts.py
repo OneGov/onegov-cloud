@@ -1,21 +1,31 @@
+from onegov.user import User
+from onegov.user import UserCollection
 from onegov.user import UserGroup
 from onegov.user import UserGroupCollection
 from onegov.wtfs.collections import MunicipalityCollection
 from onegov.wtfs.layouts import AddMunicipalityLayout
 from onegov.wtfs.layouts import AddUserGroupLayout
+from onegov.wtfs.layouts import AddUserLayout
 from onegov.wtfs.layouts import DefaultLayout
 from onegov.wtfs.layouts import EditMunicipalityLayout
 from onegov.wtfs.layouts import EditUserGroupLayout
+from onegov.wtfs.layouts import EditUserLayout
 from onegov.wtfs.layouts import MailLayout
 from onegov.wtfs.layouts import MunicipalitiesLayout
 from onegov.wtfs.layouts import MunicipalityLayout
 from onegov.wtfs.layouts import UserGroupLayout
 from onegov.wtfs.layouts import UserGroupsLayout
+from onegov.wtfs.layouts import UserLayout
+from onegov.wtfs.layouts import UsersLayout
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.security import AddModel
+from onegov.wtfs.security import AddModelSameGroup
 from onegov.wtfs.security import DeleteModel
+from onegov.wtfs.security import DeleteModelSameGroup
 from onegov.wtfs.security import EditModel
+from onegov.wtfs.security import EditModelSameGroup
 from onegov.wtfs.security import ViewModel
+from onegov.wtfs.security import ViewModelSameGroup
 
 
 class DummyPrincipal(object):
@@ -44,7 +54,19 @@ class DummyRequest(object):
 
     def has_permission(self, model, permission):
         if self.has_role('admin'):
-            return permission in {AddModel, DeleteModel, EditModel, ViewModel}
+            return permission in {
+                AddModel,
+                DeleteModel,
+                EditModel,
+                ViewModel
+            }
+        if self.has_role('editor'):
+            return permission in {
+                AddModelSameGroup,
+                EditModelSameGroup,
+                DeleteModelSameGroup,
+                ViewModelSameGroup
+            }
         return permission in self.permissions
 
     def translate(self, text):
@@ -106,6 +128,7 @@ def test_default_layout(wtfs_app):
     assert layout.login_url == 'Auth/login'
     assert layout.logout_url is None
     assert layout.user_groups_url == 'UserGroupCollection/'
+    assert layout.users_url == 'UserCollection/'
     assert layout.municipalities_url == 'MunicipalityCollection/'
 
     # Login
@@ -240,4 +263,83 @@ def test_user_group_layouts():
     assert layout.success_url == 'UserGroupCollection/'
 
     layout = EditUserGroupLayout(model, request_admin)
+    assert list(hrefs(layout.editbar_links)) == []
+
+
+def test_user_layouts():
+    request = DummyRequest()
+    request_admin = DummyRequest(roles=['admin'])
+    request_editor = DummyRequest(roles=['editor'])
+
+    # User collection
+    model = UserCollection(None)
+    layout = UsersLayout(model, request)
+    assert layout.title == 'Users'
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/UserCollection'
+    assert layout.cancel_url == ''
+    assert layout.success_url == ''
+
+    layout = UsersLayout(model, request_admin)
+    assert list(hrefs(layout.editbar_links)) == [
+        'UserCollection/add-unrestricted'
+    ]
+
+    layout = UsersLayout(model, request_editor)
+    assert list(hrefs(layout.editbar_links)) == ['UserCollection/add']
+
+    # .. add
+    layout = AddUserLayout(model, request)
+    assert layout.title == 'Add'
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == (
+        'DummyPrincipal/UserCollection/#'
+    )
+    assert layout.cancel_url == 'UserCollection/'
+    assert layout.success_url == 'UserCollection/'
+
+    layout = AddUserLayout(model, request_admin)
+    assert list(hrefs(layout.editbar_links)) == []
+
+    layout = AddUserLayout(model, request_editor)
+    assert list(hrefs(layout.editbar_links)) == []
+
+    # User
+    model = User(
+        realname='Hans Muster',
+        username="hans.muster@winterthur.ch",
+        role='member',
+        password='1234'
+    )
+    layout = UserLayout(model, request)
+    assert layout.title == 'Hans Muster'
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/UserCollection/#'
+    assert layout.cancel_url == ''
+    assert layout.success_url == ''
+
+    layout = UserLayout(model, request_admin)
+    assert list(hrefs(layout.editbar_links)) == [
+        'User/edit-unrestricted',
+        'User/?csrf-token=x'
+    ]
+
+    layout = UserLayout(model, request_editor)
+    assert list(hrefs(layout.editbar_links)) == [
+        'User/edit',
+        'User/?csrf-token=x'
+    ]
+
+    # ... edit
+    layout = EditUserLayout(model, request)
+    assert layout.title == 'Edit'
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/UserCollection/User/#'
+    assert layout.cancel_url == 'User/'
+    assert layout.success_url == 'UserCollection/'
+
+    layout = EditUserLayout(model, request_admin)
+    assert list(hrefs(layout.editbar_links)) == []
+
+    layout = EditUserLayout(model, request_editor)
     assert list(hrefs(layout.editbar_links)) == []

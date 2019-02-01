@@ -1,13 +1,13 @@
 from onegov.form import Form
-from onegov.wtfs import _
-from wtforms import IntegerField
-from wtforms import SelectField
-from wtforms import StringField
-from wtforms.validators import InputRequired
-from onegov.wtfs.models import Municipality
+from onegov.form.fields import ChosenSelectField
 from onegov.user import UserGroup
+from onegov.wtfs import _
+from onegov.wtfs.models import Municipality
 from sqlalchemy import func
 from sqlalchemy import String
+from wtforms import IntegerField
+from wtforms import StringField
+from wtforms.validators import InputRequired
 
 
 class MunicipalityForm(Form):
@@ -26,7 +26,7 @@ class MunicipalityForm(Form):
         ]
     )
 
-    group_id = SelectField(
+    group_id = ChosenSelectField(
         label=_("User group"),
         choices=[],
     )

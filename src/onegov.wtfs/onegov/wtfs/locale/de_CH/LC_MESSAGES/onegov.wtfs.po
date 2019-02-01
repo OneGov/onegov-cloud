@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-30 16:51+0100\n"
-"PO-Revision-Date: 2019-01-30 16:43+0100\n"
+"POT-Creation-Date: 2019-02-01 12:57+0100\n"
+"PO-Revision-Date: 2019-02-01 10:51+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -17,11 +17,29 @@ msgstr ""
 msgid "Name"
 msgstr "Name"
 
-msgid "BFS number"
-msgstr "BFS Nummer"
+msgid "E-Mail"
+msgstr "E-Mail"
+
+msgid "Contact"
+msgstr "Kontaktperson"
+
+msgid "Role"
+msgstr "Rolle"
 
 msgid "User group"
 msgstr "Benutzergruppe"
+
+msgid "Editor"
+msgstr "Gemeindeadministrator"
+
+msgid "Member"
+msgstr "Benutzer"
+
+msgid "- none -"
+msgstr "- keine -"
+
+msgid "BFS number"
+msgstr "BFS Nummer"
 
 msgid "User groups"
 msgstr "Benutzergruppen"
@@ -35,14 +53,8 @@ msgstr "Bearbeiten"
 msgid "Homepage"
 msgstr "Startseite"
 
-msgid "This user group can not be deleted"
-msgstr "Diese Benutzergruppe kann nicht gelöscht werden"
-
-msgid "Delete the linked municipality first."
-msgstr "Löschen Sie zuerst die dazugehörige Gemeinde."
-
-msgid "Cancel"
-msgstr "Abbrechen"
+msgid "Delete"
+msgstr "Löschen"
 
 msgid "Do you really want to delete this user group?"
 msgstr "Diese Benutzergruppe wirklich löschen?"
@@ -50,8 +62,17 @@ msgstr "Diese Benutzergruppe wirklich löschen?"
 msgid "This cannot be undone."
 msgstr "Dies kann nicht rückgängig gemacht werden."
 
-msgid "Delete"
-msgstr "Löschen"
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid "Users"
+msgstr "Benutzer"
+
+msgid "Do you really want to delete this user?"
+msgstr "Diesen Benutzer wirklich löschen?"
+
+msgid "User"
+msgstr "Benutzer"
 
 msgid "Municipalities"
 msgstr "Gemeinden"
@@ -144,6 +165,15 @@ msgstr "Benutzergruppe hinzugefügt."
 msgid "User group modified."
 msgstr "Benutzergruppe geändert."
 
+msgid "User deleted."
+msgstr "Benutzer gelöscht."
+
+msgid "User added."
+msgstr "Benutzer hinzugefügt."
+
+msgid "User modified."
+msgstr "Benutzer geändert."
+
 msgid "Municipality deleted."
 msgstr "Gemeinde gelöscht."
 
@@ -165,9 +195,3 @@ msgstr "Seite nicht gefunden"
 
 msgid "The page you are looking for could not be found."
 msgstr "Die angeforderte Seite konnte nicht gefunden werden."
-
-#~ msgid "There are municipalities linked to it."
-#~ msgstr "Es gibt Gemeinden, die damit verbunden sind."
-
-#~ msgid "BFS Number"
-#~ msgstr "BFS Nummer"

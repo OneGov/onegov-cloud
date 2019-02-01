@@ -1,0 +1,31 @@
+.chosen-container {
+    margin: 0 0 1rem;
+}
+
+.chosen-single {
+    background: $input-focus-bg-color !important;
+    border: {
+        color: $input-border-color !important;
+        radius: 0 !important;
+        style: $input-border-style !important;
+        width: $input-border-width !important;
+    }
+    box-shadow: $input-box-shadow !important;
+    color: $input-font-color  !important;
+    font-family: $input-font-family !important;
+    font-size: $input-font-size !important;
+    height: ($input-font-size + ($form-spacing * 1.5) - rem-calc(1)) !important;
+    padding: ($form-spacing / 3) ($form-spacing / 2) !important;
+}
+
+.chosen-drop {
+    * {
+        font-family: $input-font-family !important;
+        font-size: $input-font-size !important;
+    }
+}
+
+.chosen-container-single .chosen-single div {
+    top: 5px !important;
+    width: 16px !important;
+}

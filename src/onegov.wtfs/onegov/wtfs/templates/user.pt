@@ -1,0 +1,28 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.wtfs">
+    <tal:block metal:fill-slot="title">${layout.title}</tal:block>
+    <tal:block metal:fill-slot="content">
+        <div class="row">
+            <div class="columns small-12">
+                <h1>${layout.title}</h1>
+
+                <dl>
+                    <dt i18n:translate>Role</dt>
+                    <dd i18n:translate>${layout.model.role.capitalize()}</dd>
+
+                    <dt i18n:translate>E-Mail</dt>
+                    <dd>${layout.model.username}</dd>
+
+                    <dt i18n:translate>Contact</dt>
+                    <dd tal:condition="layout.model.data['contact']|False">✔︎</dd>
+                    <dd tal:condition="not:layout.model.data['contact']|False">✘︎</dd>
+
+                    <dt i18n:translate>User group</dt>
+                    <dd>
+                        <a tal:condition="layout.model.group" href="${request.link(layout.model.group)}">${layout.model.group.name}</a>
+                    </dd>
+
+                </dl>
+            </div>
+        </div>
+    </tal:block>
+</div>

@@ -1,10 +1,12 @@
 from onegov.user import Auth
+from onegov.user import User
+from onegov.user import UserCollection
+from onegov.user import UserGroup
+from onegov.user import UserGroupCollection
 from onegov.wtfs.app import WtfsApp
 from onegov.wtfs.collections import MunicipalityCollection
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import Principal
-from onegov.user import UserGroup
-from onegov.user import UserGroupCollection
 
 
 @WtfsApp.path(
@@ -37,6 +39,22 @@ def get_user_groups(request):
 )
 def get_user_group(request, id):
     return UserGroupCollection(request.session).by_id(id)
+
+
+@WtfsApp.path(
+    model=UserCollection,
+    path='/users'
+)
+def get_users(request):
+    return UserCollection(request.session)
+
+
+@WtfsApp.path(
+    model=User,
+    path='/user/{username}'
+)
+def get_user(request, username):
+    return UserCollection(request.session).by_username(username)
 
 
 @WtfsApp.path(

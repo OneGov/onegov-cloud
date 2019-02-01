@@ -122,10 +122,11 @@ header {
             width: 15px;
         }
 
-        .user-group-icon::before { @include icon('\f0c0'); }
-        .municipality-icon::before { @include icon('\f0c0'); }
         .delete-icon::before { @include icon('\f014'); }
         .edit-icon::before { @include icon('\f040'); }
+        .municipality-icon::before { @include icon('\f0c0'); }
+        .user-group-icon::before { @include icon('\f0c0'); }
+        .user-icon::before { @include icon('\f007'); }
     }
 
     .breadcrumbs {

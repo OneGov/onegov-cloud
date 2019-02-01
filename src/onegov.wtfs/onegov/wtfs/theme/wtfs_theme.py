@@ -17,6 +17,7 @@ class WtfsTheme(BaseTheme):
             'header',
             'footer',
             'form',
+            'chosen',
             'table',
             'alert',
             'wtfs'
