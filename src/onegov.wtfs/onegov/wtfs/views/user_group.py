@@ -20,11 +20,8 @@ from onegov.wtfs.security import ViewModel
     permission=ViewModel
 )
 def view_user_groups(self, request):
-    """ View the list of user groups.
+    """ View the list of user groups. """
 
-    This view is only visible by an admin.
-
-    """
     layout = UserGroupsLayout(self, request)
 
     return {
@@ -40,11 +37,8 @@ def view_user_groups(self, request):
     form=UserGroupForm
 )
 def add_user_group(self, request, form):
-    """ Create a new user group.
+    """ Create a new user group. """
 
-    This view is only visible by an admin.
-
-    """
     layout = AddUserGroupLayout(self, request)
 
     if form.submitted(request):
@@ -68,11 +62,8 @@ def add_user_group(self, request, form):
     permission=ViewModel
 )
 def view_user_group(self, request):
-    """ View a single user group.
+    """ View a single user group. """
 
-    This view is only visible by an admin.
-
-    """
     layout = UserGroupLayout(self, request)
 
     return {
@@ -88,11 +79,7 @@ def view_user_group(self, request):
     form=UserGroupForm
 )
 def edit_user_group(self, request, form):
-    """ Edit a user group.
-
-    This view is only visible by an admin.
-
-    """
+    """ Edit a user group. """
 
     layout = EditUserGroupLayout(self, request)
 
@@ -118,11 +105,7 @@ def edit_user_group(self, request, form):
     permission=DeleteModel
 )
 def delete_user_group(self, request):
-    """ Delete a user group.
-
-    This view is only visible by an admin.
-
-    """
+    """ Delete a user group. """
 
     request.assert_valid_csrf_token()
     UserGroupCollection(request.session).delete(self)

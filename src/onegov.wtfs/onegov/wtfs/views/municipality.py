@@ -20,11 +20,8 @@ from onegov.wtfs.security import ViewModel
     permission=ViewModel
 )
 def view_municipalities(self, request):
-    """ View the list of municipalities.
+    """ View the list of municipalities. """
 
-    This view is only visible by an admin.
-
-    """
     layout = MunicipalitiesLayout(self, request)
 
     return {
@@ -40,11 +37,8 @@ def view_municipalities(self, request):
     form=MunicipalityForm
 )
 def add_municipality(self, request, form):
-    """ Create a new municipality.
+    """ Create a new municipality. """
 
-    This view is only visible by an admin.
-
-    """
     layout = AddMunicipalityLayout(self, request)
 
     if form.submitted(request):
@@ -68,11 +62,8 @@ def add_municipality(self, request, form):
     permission=ViewModel
 )
 def view_municipality(self, request):
-    """ View a single municipality.
+    """ View a single municipality. """
 
-    This view is only visible by an admin.
-
-    """
     layout = MunicipalityLayout(self, request)
 
     return {
@@ -88,11 +79,7 @@ def view_municipality(self, request):
     form=MunicipalityForm
 )
 def edit_municipality(self, request, form):
-    """ Edit a municipality.
-
-    This view is only visible by an admin.
-
-    """
+    """ Edit a municipality. """
 
     layout = EditMunicipalityLayout(self, request)
 
@@ -118,11 +105,7 @@ def edit_municipality(self, request, form):
     permission=DeleteModel
 )
 def delete_municipality(self, request):
-    """ Delete a municipality.
-
-    This view is only visible by an admin.
-
-    """
+    """ Delete a municipality. """
 
     request.assert_valid_csrf_token()
     MunicipalityCollection(request.session).delete(self)
