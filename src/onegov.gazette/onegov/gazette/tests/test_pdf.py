@@ -283,22 +283,54 @@ def test_issues_pdf_excluded_notices_note(gazette_app):
 
     pdf = IssuePdf(BytesIO())
     pdf.init_a4_portrait()
-
     pdf.excluded_notices_note(0, request)
-    assert extract_pdf_story(pdf) == []
-
-    pdf.excluded_notices_note(1, request)
     assert extract_pdf_story(pdf) == [
-        'One notice is not published online and therefore not included '
-        'in this PDF.'
+        'The electronic official gazette is available at www.amtsblattzug.ch.'
     ]
 
-    pdf.excluded_notices_note(10, request)
+    pdf = IssuePdf(BytesIO())
+    pdf.init_a4_portrait()
+    pdf.excluded_notices_note(1, request)
     assert extract_pdf_story(pdf) == [
-        'One notice is not published online and therefore not included '
-        'in this PDF.',
-        '10 notices are not published online and therefore not included in '
-        'this PDF.'
+        'The electronic official gazette is available at www.amtsblattzug.ch.',
+        '1 publication(s) with particularly sensitive data are not available '
+        'online. They are available in paper form from the State Chancellery, '
+        'Seestrasse 2, 6300 Zug, or can be subscribed to at amtsblatt@zg.ch.'
+    ]
+
+    pdf = IssuePdf(BytesIO())
+    pdf.init_a4_portrait()
+    pdf.excluded_notices_note(9, request)
+    assert extract_pdf_story(pdf) == [
+        'The electronic official gazette is available at www.amtsblattzug.ch.',
+        '9 publication(s) with particularly sensitive data are not available '
+        'online. They are available in paper form from the State Chancellery, '
+        'Seestrasse 2, 6300 Zug, or can be subscribed to at amtsblatt@zg.ch.'
+    ]
+
+    pdf = IssuePrintOnlyPdf((BytesIO))
+    pdf.init_a4_portrait()
+    pdf.excluded_notices_note(0, request)
+    assert extract_pdf_story(pdf) == [
+        'The electronic official gazette is available at www.amtsblattzug.ch.'
+    ]
+
+    pdf = IssuePrintOnlyPdf((BytesIO))
+    pdf.init_a4_portrait()
+    pdf.excluded_notices_note(1, request)
+    assert extract_pdf_story(pdf) == [
+        '1 publication(s) with particularly sensitive data according to '
+        'BGS 152.3 §7 Abs. 2.',
+        'The electronic official gazette is available at www.amtsblattzug.ch.'
+    ]
+
+    pdf = IssuePrintOnlyPdf((BytesIO))
+    pdf.init_a4_portrait()
+    pdf.excluded_notices_note(9, request)
+    assert extract_pdf_story(pdf) == [
+        '9 publication(s) with particularly sensitive data according to '
+        'BGS 152.3 §7 Abs. 2.',
+        'The electronic official gazette is available at www.amtsblattzug.ch.'
     ]
 
 
@@ -563,8 +595,12 @@ def test_issues_pdf_from_issue(gazette_app):
         assert [page.extractText() for page in reader.pages] == [
             # page 1
             'onegov.ch\n© 2017 Govikon\n1\nGazette No. 40, 06.10.2017\n'
-            'One notice is not published online and therefore not included '
-            'in this PDF.\n'
+            'The electronic official gazette is available at '
+            'www.amtsblattzug.ch.\n'
+            '1 publication(s) with particularly sensitive data are not '
+            'available online. They are available in\npaper form from the '
+            'State Chancellery, Seestrasse 2, 6300 Zug, or can be subscribed '
+            'to at\namtsblatt@zg.ch.\n'
             'State Chancellery\n'
             'Complaints\n'
             '5\n100-10\n2017-40-1, 2017-41-4\n'
@@ -589,11 +625,16 @@ def test_issues_pdf_from_issue(gazette_app):
         issue = session.query(Issue).filter_by(number=41).one()
         file = IssuePdf.from_issue(issue, DummyRequest(session, principal), 5)
         reader = PdfFileReader(file)
+        test_issues_pdf_from_issue
         assert [page.extractText() for page in reader.pages] == [
             # page 1
             'onegov.ch\n© 2017 Govikon\n1\nGazette No. 41, 13.10.2017\n'
-            'One notice is not published online and therefore not included '
-            'in this PDF.\n'
+            'The electronic official gazette is available at '
+            'www.amtsblattzug.ch.\n'
+            '1 publication(s) with particularly sensitive data are not '
+            'available online. They are available in\npaper form from the '
+            'State Chancellery, Seestrasse 2, 6300 Zug, or can be subscribed '
+            'to at\namtsblatt@zg.ch.\n'
             'State Chancellery\n'
             'Complaints\n'
             '5\nThis official notice is only available in the print version.\n'
@@ -624,8 +665,11 @@ def test_issues_pdf_from_issue(gazette_app):
         issue = session.query(Issue).filter_by(number=42).one()
         file = IssuePdf.from_issue(issue, DummyRequest(session, principal), 5)
         reader = PdfFileReader(file)
+        test_issues_pdf_from_issue
         assert [page.extractText() for page in reader.pages] == [
             'onegov.ch\n© 2018 Govikon\n1\nGazette No. 42, 20.10.2017\n'
+            'The electronic official gazette is available at '
+            'www.amtsblattzug.ch.\n'
             'Churches\n'
             'Sikh Community\n'
             'Education\n'
@@ -766,6 +810,10 @@ def test_issues_po_pdf_from_issue(gazette_app):
         assert [page.extractText() for page in reader.pages] == [
             # page 1
             'onegov.ch\n© 2017 Govikon\n1\nGazette No. 40, 06.10.2017\n'
+            '1 publication(s) with particularly sensitive data according '
+            'to BGS 152.3 §7 Abs. 2.\n'
+            'The electronic official gazette is available at '
+            'www.amtsblattzug.ch.\n'
             'State Chancellery\n'
             'Complaints\n'
             '3\n100-10\n2017-40-3, 2017-41-2\n'
@@ -779,6 +827,10 @@ def test_issues_po_pdf_from_issue(gazette_app):
         assert [page.extractText() for page in reader.pages] == [
             # page 1
             'onegov.ch\n© 2017 Govikon\n1\nGazette No. 41, 13.10.2017\n'
+            '1 publication(s) with particularly sensitive data according '
+            'to BGS 152.3 §7 Abs. 2.\n'
+            'The electronic official gazette is available at '
+            'www.amtsblattzug.ch.\n'
             'State Chancellery\n'
             'Complaints\n'
             '2\n100-10\n2017-40-3, 2017-41-2\n'
@@ -792,4 +844,6 @@ def test_issues_po_pdf_from_issue(gazette_app):
         reader = PdfFileReader(file)
         assert [page.extractText() for page in reader.pages] == [
             'onegov.ch\n© 2018 Govikon\n1\nGazette No. 42, 20.10.2017\n'
+            'The electronic official gazette is available at '
+            'www.amtsblattzug.ch.\n'
         ]

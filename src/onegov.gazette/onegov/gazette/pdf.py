@@ -278,19 +278,21 @@ class IssuePdf(NoticesPdf):
         """ Adds a paragraph with the number of excluded (print only) notices.
 
         """
-        note = ""
-        if number == 1:
+
+        note = _(
+            "The electronic official gazette is available at "
+            "www.amtsblattzug.ch."
+        )
+        self.p_markup(request.translate(note), style=self.style.paragraph)
+
+        if number:
             note = _(
-                "One notice is not published online and "
-                "therefore not included in this PDF.",
-            )
-        if number > 1:
-            note = _(
-                "${number} notices are not published online and "
-                "therefore not included in this PDF.",
+                "${number} publication(s) with particularly sensitive data "
+                "are not available online. They are available in paper form "
+                "from the State Chancellery, Seestrasse 2, 6300 Zug, or can "
+                "be subscribed to at amtsblatt@zg.ch.",
                 mapping={'number': number}
             )
-        if note:
             self.p_markup(request.translate(note), style=self.style.paragraph)
 
     def unfold_data(
@@ -480,6 +482,25 @@ class IssuePrintOnlyPdf(IssuePdf):
         if notice.print_only:
             super(IssuePdf, self).notice(notice, layout, publication_number)
 
+    def excluded_notices_note(self, number, request):
+        """ Adds a paragraph with the number of excluded (print only) notices.
+
+        """
+
+        if number:
+            note = _(
+                "${number} publication(s) with particularly sensitive data "
+                "according to BGS 152.3 §7 Abs. 2.",
+                mapping={'number': number}
+            )
+            self.p_markup(request.translate(note), style=self.style.paragraph)
+
+        note = _(
+            "The electronic official gazette is available at "
+            "www.amtsblattzug.ch."
+        )
+        self.p_markup(request.translate(note), style=self.style.paragraph)
+
     @staticmethod
     def query_notices(session, issue, organization, category):
         """ Queries all notices with the given values, ordered by publication
@@ -522,10 +543,6 @@ class IssuePrintOnlyPdf(IssuePdf):
             bool_is(GazetteNotice.meta['print_only'], True)
         )
         return set([result[0][0] for result in query if result[0]])
-
-    @classmethod
-    def query_excluded_notices_count(cls, session, issue):
-        return 0
 
     @classmethod
     def from_issue(cls, issue, request):

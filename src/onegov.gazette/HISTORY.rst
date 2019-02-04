@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adjusts PDFs introductory paragraphs.
+  [msom]
+
 1.22.2 (2019-01-31)
 ~~~~~~~~~~~~~~~~~~~~
 
