@@ -250,6 +250,67 @@ def test_agency_polymorphism(session):
     assert session.query(MyOtherAgency).one().title == 'other'
 
 
+def test_agency_sort_children(session):
+    parent = Agency(id=1, name='parent', title='agency')
+    session.add(Agency(id=2, name='child_1', parent=parent, order=10,
+                       title="Bjorm Guomundsdóttir's"))
+    session.add(Agency(id=3, name='child_2', parent=parent, order=11,
+                       title="Björn Guðmundsdóttir's"))
+    session.add(Agency(id=4, name='child_3', parent=parent, order=11,
+                       title="Björk Guomundsdottir's"))
+    session.flush()
+    assert [c.title for c in parent.children] == [
+        "Bjorm Guomundsdóttir's",
+        "Björn Guðmundsdóttir's",
+        "Björk Guomundsdottir's"
+    ]
+
+    parent.sort_children()
+    session.flush()
+    session.expire_all()
+    assert [c.title for c in parent.children] == [
+        "Björk Guomundsdottir's",  # ö=oe
+        "Björn Guðmundsdóttir's",
+        "Bjorm Guomundsdóttir's",
+    ]
+
+
+def test_agency_sort_memberships(session):
+    agency = Agency(title='agency', name='agency')
+    bjork = Person(first_name="Björn", last_name="Guðmundsdóttir")
+    bjorm = Person(first_name="Björk", last_name="Guomundsdottir")
+    bjorn = Person(first_name="Bjorm", last_name="Guomundsdóttir")
+    session.add(agency)
+    session.add(bjork)
+    session.add(bjorm)
+    session.add(bjorn)
+    session.flush()
+
+    for order, person in enumerate((bjorm, bjork, bjorn)):
+        session.add(
+            AgencyMembership(
+                title="Member",
+                order=order,
+                since="2012",
+                agency_id=agency.id,
+                person_id=person.id
+            )
+        )
+    session.flush()
+    assert [m.person.title for m in agency.memberships] == [
+        'Guomundsdottir Björk',
+        'Guðmundsdóttir Björn',
+        'Guomundsdóttir Bjorm'
+    ]
+
+    agency.sort_relationships()
+    assert [m.person.title for m in agency.memberships] == [
+        'Guðmundsdóttir Björn',  # ð=d
+        'Guomundsdottir Björk',  # ö=oe
+        'Guomundsdóttir Bjorm'
+    ]
+
+
 def test_membership(session):
     agency = Agency(title='agency', name='agency')
     person = Person(first_name='a', last_name='person')

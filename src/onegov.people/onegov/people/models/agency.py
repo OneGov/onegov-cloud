@@ -75,7 +75,7 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable):
             self.organigram = organigram
 
     def add_person(self, person_id, title, **kwargs):
-        """ Append a person to the agency with the given title. """
+        """ Appends a person to the agency with the given title. """
 
         order = kwargs.pop('order', 2 ** 16)
 
@@ -91,15 +91,30 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable):
         for order, membership in enumerate(self.memberships):
             membership.order = order
 
-    def default_sortkey(self, membership):
-        """ Sort by last name, first name. """
+    def sort_children(self, sortkey=None):
+        """ Sorts the suborganizations.
 
-        return normalize_for_url(membership.person.title)
+        Sorts by the agency title by default.
+        """
+
+        def default_sortkey(agency):
+            return normalize_for_url(agency.title)
+
+        sortkey = sortkey or default_sortkey
+        children = sorted(self.children, key=sortkey)
+        for order, child in enumerate(children):
+            child.order = order
 
     def sort_relationships(self, sortkey=None):
-        """ Sort the relationships. Sorts by the person name by default. """
+        """ Sorts the relationships.
 
-        sortkey = sortkey or self.default_sortkey
+        Sorts by last name, first name.by default.
+        """
+
+        def default_sortkey(membership):
+            return normalize_for_url(membership.person.title)
+
+        sortkey = sortkey or default_sortkey
         memberships = sorted(self.memberships.all(), key=sortkey)
         for order, membership in enumerate(memberships):
             membership.order = order

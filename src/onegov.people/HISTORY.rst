@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to sort suborganizations.
+  [msom]
+
 0.7.1 (2018-11-23)
 ~~~~~~~~~~~~~~~~~~~
 
