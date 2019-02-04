@@ -2104,7 +2104,7 @@ msgid "Booking Limit of ${name}"
 msgstr "Limite de réservation de ${name}"
 
 msgid "Feriennet"
-msgstr "Feriennet"
+msgstr "Réseau Vacances"
 
 msgid "Payment"
 msgstr "Paiement"
