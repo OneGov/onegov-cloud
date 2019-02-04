@@ -86,7 +86,7 @@ def has_permission_user(app, identity, model, permission):
     # There is only one view/delete user, give admin this permission, too
     if identity.role == 'admin':
         if permission in {ViewModelSameGroup, DeleteModelSameGroup}:
-                return True
+            return True
 
     # Editors may view, edit and delete a user within the same group
     if identity.role == 'editor':
