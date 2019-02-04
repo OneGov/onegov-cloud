@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.13.2 (2019-02-04)
+~~~~~~~~~~~~~~~~~~~
+
 - Removes dept files clean-up for assocations: Fixed upstream.
   [href]
 
