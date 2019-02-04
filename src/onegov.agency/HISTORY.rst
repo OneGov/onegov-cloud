@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.7.0 (2019-02-04)
+~~~~~~~~~~~~~~~~~~~~
 
 - Allows to sort suborganizations by name.
   [msom]
