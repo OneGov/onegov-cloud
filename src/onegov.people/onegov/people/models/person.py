@@ -150,10 +150,10 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable):
             result.add('note').value = self.notes
 
         for membership in self.memberships:
-                result.add('org').value = [
-                    membership.agency.title,
-                    membership.title
-                ]
+            result.add('org').value = [
+                membership.agency.title,
+                membership.title
+            ]
 
         return result.serialize()
 
