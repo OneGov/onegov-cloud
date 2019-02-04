@@ -34,7 +34,7 @@ setup(
     python_requires='>=3.6',
     install_requires=[
         'AIS.py>=0.2.2',
-        'filedepot>=0.4.1',
+        'filedepot>=0.6.0',
         'isodate',
         'lxml',
         'more.transaction',
