@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-01-29 13:50+0100\n"
-"PO-Revision-Date: 2019-01-29 13:50+0100\n"
+"POT-Creation-Date: 2019-02-04 09:24+0100\n"
+"PO-Revision-Date: 2019-02-04 09:25+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -127,8 +127,8 @@ msgstr "Verschieben"
 msgid "Delete"
 msgstr "Löschen"
 
-msgid "Sort relationships"
-msgstr "Mitgliedschaften sortieren"
+msgid "Sort"
+msgstr "Sortieren"
 
 msgid "Do you really want to delete this agency?"
 msgstr "Möchten Sie die Organisation wirklich löschen?"
@@ -139,6 +139,25 @@ msgstr "Dies kann nicht rückgängig gemacht werden."
 msgid "Delete agency"
 msgstr "Organisation löschen"
 
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid "Membership"
+msgstr "Mitgliedschaft"
+
+msgid "Suborganizations"
+msgstr "Unterorganisationen"
+
+msgid "Relationships"
+msgstr "Mitgliedschaften"
+
+msgid ""
+"Do you really want to sort the suborganizations alphabetically by title?"
+msgstr "Möchten Sie die Unterorganisationen alphabetisch nach Titel sortieren?"
+
+msgid "Sort suborganizations"
+msgstr "Unterorganisationen sortieren"
+
 msgid ""
 "Do you really want to sort the relationships alphabetically by last name and "
 "first name?"
@@ -146,20 +165,14 @@ msgstr ""
 "Möchten Sie die Mitgliedschaften alphabetisch nach Nachname und Vornamen "
 "sortieren?"
 
-msgid "Membership"
-msgstr "Mitgliedschaft"
+msgid "Sort relationships"
+msgstr "Mitgliedschaften sortieren"
 
 msgid "Do you really want to delete this membership?"
 msgstr "Möchten Sie die Mitgliedschaft wirklich löschen?"
 
 msgid "Delete membership"
 msgstr "Mitgliedschaft löschen"
-
-msgid "Cancel"
-msgstr "Abbrechen"
-
-msgid "Suborganizations"
-msgstr "Unterorganisationen"
 
 msgid "Salutation"
 msgstr "Anrede"
@@ -288,6 +301,3 @@ msgstr "PDF Layout"
 
 msgid "Default"
 msgstr "Standard"
-
-#~ msgid "Settings"
-#~ msgstr "Einstellungen"

@@ -151,6 +151,17 @@ def sort_relationships(self, request):
     self.sort_relationships()
 
 
+@AgencyApp.view(
+    model=ExtendedAgency,
+    name='sort-children',
+    request_method='POST',
+    permission=Private,
+)
+def sort_children(self, request):
+    request.assert_valid_csrf_token()
+    self.sort_children()
+
+
 @AgencyApp.form(
     model=ExtendedAgency,
     name='edit',

@@ -104,10 +104,11 @@ def test_agency_layout():
         'AgencyProxy/edit',
         'AgencyProxy/move',
         'ExtendedAgency/?csrf-token=x',
-        'AgencyProxy/sort-relationships?csrf-token=x',
         'AgencyProxy/create-pdf',
         'AgencyProxy/new',
-        'AgencyProxy/new-membership'
+        'AgencyProxy/new-membership',
+        'AgencyProxy/sort-children?csrf-token=x',
+        'AgencyProxy/sort-relationships?csrf-token=x',
     ]
 
 

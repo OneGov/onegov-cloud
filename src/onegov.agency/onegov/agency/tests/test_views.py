@@ -112,6 +112,26 @@ def test_views(client):
 
     assert 'Ständerat' in sr
 
+    # ... sort agencies
+    bund = client.get('/organizations').click('Bundesbehörden')
+    url = bund.pyquery('ul.children').attr('data-sortable-url')
+    url = url.replace('%7Bsubject_id%7D', '2')
+    url = url.replace('%7Bdirection%7D', 'below')
+    url = url.replace('%7Btarget_id%7D', '3')
+    client.put(url)
+
+    bund = client.get('/organizations').click('Bundesbehörden')
+    assert [a.text for a in bund.pyquery('ul.children li a')] == [
+        'Ständerat', 'Nationalrat',
+    ]
+
+    bund.click("Unterorganisationen", href='sort')
+
+    bund = client.get('/organizations').click('Bundesbehörden')
+    assert [a.text for a in bund.pyquery('ul.children li a')] == [
+        'Nationalrat', 'Ständerat',
+    ]
+
     # ... add memberships
     new_membership = nr.click("Mitgliedschaft", href='new')
     new_membership.form['title'] = "Mitglied von Zug"
@@ -161,7 +181,7 @@ def test_views(client):
         'Zweiter Ständerat für Zug', 'Aeschi Thomas',
     ]
 
-    agency.click("Mitgliedschaften sortieren")
+    agency.click("Mitgliedschaften", href='sort')
     agency = client.get(agency.request.url)
     assert [a.text for a in agency.pyquery('ul.memberships li a')] == [
         'Zweiter Ständerat für Zug', 'Aeschi Thomas',

@@ -91,34 +91,12 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
                         Confirm(
                             _("Do you really want to delete this agency?"),
                             _("This cannot be undone."),
-                            _("Delete agency")
+                            _("Delete agency"),
+                            _("Cancel")
                         ),
                         Intercooler(
                             request_method='DELETE',
                             redirect_after=self.request.link(self.collection)
-                        )
-                    )
-                ),
-                Link(
-                    text=_("Sort relationships"),
-                    url=self.csrf_protected_url(
-                        self.request.link(
-                            self.model.proxy(), 'sort-relationships'
-                        )
-                    ),
-                    attrs={'class': 'sort-alphabetically'},
-                    traits=(
-                        Confirm(
-                            _(
-                                "Do you really want to sort the relationships "
-                                "alphabetically by last name and first name?"
-                            ),
-                            _("This cannot be undone."),
-                            _("Sort relationships")
-                        ),
-                        Intercooler(
-                            request_method='POST',
-                            redirect_after=self.request.link(self.model)
                         )
                     )
                 ),
@@ -145,6 +123,65 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
                                 name='new-membership'
                             ),
                             attrs={'class': 'new-person'}
+                        ),
+                    ]
+                ),
+                LinkGroup(
+                    title=_("Sort"),
+                    links=[
+                        Link(
+                            text=_("Suborganizations"),
+                            url=self.csrf_protected_url(
+                                self.request.link(
+                                    self.model.proxy(), 'sort-children'
+                                )
+                            ),
+                            attrs={'class': 'sort-alphabetically'},
+                            traits=(
+                                Confirm(
+                                    _(
+                                        "Do you really want to sort the "
+                                        "suborganizations alphabetically by "
+                                        "title?"
+                                    ),
+                                    _("This cannot be undone."),
+                                    _("Sort suborganizations"),
+                                    _("Cancel")
+                                ),
+                                Intercooler(
+                                    request_method='POST',
+                                    redirect_after=self.request.link(
+                                        self.model
+                                    )
+                                )
+                            )
+                        ),
+                        Link(
+                            text=_("Relationships"),
+                            url=self.csrf_protected_url(
+                                self.request.link(
+                                    self.model.proxy(), 'sort-relationships'
+                                )
+                            ),
+                            attrs={'class': 'sort-alphabetically'},
+                            traits=(
+                                Confirm(
+                                    _(
+                                        "Do you really want to sort the "
+                                        "relationships alphabetically by "
+                                        "last name and first name?"
+                                    ),
+                                    _("This cannot be undone."),
+                                    _("Sort relationships"),
+                                    _("Cancel")
+                                ),
+                                Intercooler(
+                                    request_method='POST',
+                                    redirect_after=self.request.link(
+                                        self.model
+                                    )
+                                )
+                            )
                         ),
                     ]
                 ),
