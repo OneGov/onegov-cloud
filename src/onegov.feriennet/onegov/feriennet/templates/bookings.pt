@@ -107,7 +107,7 @@
 
                                     <tal:b tal:define="toggled state in ('open', 'accepted')">
 
-                                        <div class="state-title ${toggled and 'toggled'}" data-toggle=".state-${state} ul">
+                                        <div class="state-title ${toggled and 'toggled'}" data-toggle="#attendee-${attendee.id.hex} .state-${state} ul">
                                             <tal:b switch="state">
                                                 <h4 tal:case="'open'">
                                                     <tal:b i18n:translate>Open</tal:b>

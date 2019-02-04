@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes booking details toggle targeting too many elements.
+  [href]
+
 1.4.16 (2019-01-30)
 ~~~~~~~~~~~~~~~~~~~
 
