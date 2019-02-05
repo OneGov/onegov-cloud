@@ -7,6 +7,9 @@ Changelog
 - Allows to import the function of the person.
   [msom]
 
+- Opens the export files (PDF, vCard) in a new window or tab.
+  [msom]
+
 1.7.0 (2019-02-04)
 ~~~~~~~~~~~~~~~~~~~~
 

@@ -29,7 +29,7 @@
                     <h2 i18n:translate>Exports</h2>
                     <ul class="agency-export-list">
                         <li tal:condition="pdf_link" class="agency-export-pdf">
-                            <a href="${pdf_link}" i18n:translate>
+                            <a href="${pdf_link}" target="_blank" i18n:translate>
                                 Export all organisations as PDF
                             </a>
                         </li>

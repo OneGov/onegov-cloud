@@ -18,7 +18,7 @@
                     <h2 i18n:translate>Exports</h2>
                     <ul class="agency-export-list">
                         <li>
-                            <a href="${request.link(agency.pdf)}" i18n:translate>
+                            <a href="${request.link(agency.pdf)}" target="_blank"  i18n:translate>
                                 Export this agency and its children as a PDF
                             </a>
                         </li>

@@ -20,7 +20,7 @@
                     <h2 i18n:translate>Exports</h2>
                     <ul class="person-export-list">
                         <li>
-                            <a href="${request.link(person, 'vcard')}" i18n:translate>
+                            <a href="${request.link(person, 'vcard')}" target="_blank"  i18n:translate>
                                 Export a vCard of this person
                             </a>
                         </li>
