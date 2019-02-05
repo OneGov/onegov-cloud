@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes vCard with special characters not working on Windows.
+  [msom]
+
 1.8.0 (2019-02-05)
 ~~~~~~~~~~~~~~~~~~~~
 
