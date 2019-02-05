@@ -202,19 +202,19 @@ def test_agency_pdf_ar(session):
         for page in range(reader.getNumPages())
     ])
     assert pdf == (
-        f'© 2018 Kanton Appenzell Ausserrhoden\n1\n'
+        f'Druckdatum: {date.today():%d.%m.%Y}\n1\n'
         f'Staatskalender\n'
         f'2\n1 Bundesbehörden\n'
         f'2\n1.1 Nationalrat\n'
         f'3\n1.2 Ständerat\n\n'
-        f'Staatskalender\n{date.today():%d.%m.%Y}\n'
-        f'© 2018 Kanton Appenzell Ausserrhoden\n2\n'
+        f'Staatskalender Kanton Appenzell Ausserrhoden\n'
+        f'Druckdatum: {date.today():%d.%m.%Y}\n2\n'
         f'1 Bundesbehörden\n'
         f'1.1 Nationalrat\n'
         f'2016/2019\n'
         f'Mitglied von AR\nAeschi Thomas\n\n'
-        f'Staatskalender\n{date.today():%d.%m.%Y}\n'
-        f'© 2018 Kanton Appenzell Ausserrhoden\n3\n'
+        f'Staatskalender Kanton Appenzell Ausserrhoden\n'
+        f'Druckdatum: {date.today():%d.%m.%Y}\n3\n'
         f'1.2 Ständerat\n'
         f'Joachim, Eder, FDP\n'
     )

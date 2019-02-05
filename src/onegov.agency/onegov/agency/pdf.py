@@ -4,7 +4,6 @@ from onegov.core.utils import module_path
 from onegov.pdf import page_fn_footer
 from onegov.pdf import page_fn_header_and_footer
 from onegov.pdf import page_fn_header_logo
-from onegov.pdf import page_fn_header_logo_and_footer
 from onegov.pdf import Pdf
 from os import path
 from reportlab.lib.units import cm
@@ -136,11 +135,12 @@ class AgencyPdfZg(AgencyPdfDefault):
     @staticmethod
     def page_fn_footer(canvas, doc):
         """ A footer with the title and print date on the left and the page
-        numbers on the right. """
+        numbers on the right.
+
+        """
 
         canvas.saveState()
         canvas.setFont('Helvetica', 9)
-
         canvas.drawString(
             doc.leftMargin,
             doc.bottomMargin / 2 + 12,
@@ -181,9 +181,62 @@ class AgencyPdfZg(AgencyPdfDefault):
 class AgencyPdfAr(AgencyPdfDefault):
     """ A PDF with the CI of the canton of AR. """
 
+    @staticmethod
+    def page_fn_footer(canvas, doc):
+        """ A footer with the print date on the left and the page numbers
+        on the right.
+
+        """
+
+        canvas.saveState()
+        canvas.setFont('Helvetica', 9)
+        canvas.drawString(
+            doc.leftMargin,
+            doc.bottomMargin / 2,
+            f'Druckdatum: {doc.created}'
+        )
+        canvas.drawRightString(
+            doc.pagesize[0] - doc.rightMargin,
+            doc.bottomMargin / 2,
+            f'{canvas._pageNumber}'
+        )
+        canvas.restoreState()
+
+    @staticmethod
+    def page_fn_header_logo_and_footer(canvas, doc):
+        """ A header with the logo, a footer with the print date and page
+        numbers.
+
+        """
+
+        page_fn_header_logo(canvas, doc)
+        AgencyPdfAr.page_fn_footer(canvas, doc)
+
+    @staticmethod
+    def page_fn_header_and_footer(canvas, doc):
+        """ A header with the title and author, a footer with the print date
+        and page numbers.
+
+        """
+
+        canvas.saveState()
+        canvas.setFont('Helvetica', 9)
+        canvas.drawString(
+            doc.leftMargin,
+            doc.pagesize[1] - doc.topMargin * 2 / 3,
+            f'{doc.title} {doc.author}'
+        )
+        canvas.restoreState()
+
+        AgencyPdfAr.page_fn_footer(canvas, doc)
+
     @property
     def page_fn(self):
-        return page_fn_header_logo_and_footer
+        return self.page_fn_header_logo_and_footer
+
+    @property
+    def page_fn_later(self):
+        return self.page_fn_header_and_footer
 
     def __init__(self, *args, **kwargs):
         filename = path.join(

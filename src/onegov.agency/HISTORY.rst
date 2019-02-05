@@ -10,6 +10,9 @@ Changelog
 - Opens the export files (PDF, vCard) in a new window or tab.
   [msom]
 
+- Adjusts the AR PDF layout.
+  [msom]
+
 1.7.0 (2019-02-04)
 ~~~~~~~~~~~~~~~~~~~~
 
