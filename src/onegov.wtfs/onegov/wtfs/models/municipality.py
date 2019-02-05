@@ -8,6 +8,7 @@ from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
+from uuid import uuid4
 
 
 class Municipality(Base, TimestampMixin):
@@ -16,7 +17,7 @@ class Municipality(Base, TimestampMixin):
     __tablename__ = 'wtfs_municipalities'
 
     #: the id of the db record (only relevant internally)
-    id = Column(Integer, primary_key=True)
+    id = Column(UUID, primary_key=True, default=uuid4)
 
     #: The name of the municipality.
     name = Column(Text, nullable=False)

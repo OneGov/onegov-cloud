@@ -37,36 +37,38 @@ def test_views_municipality_permissions(mock_method, client):
     add.form['name'] = "Gemeinde Adlikon"
     add.form['bfs_number'] = '21'
     assert "Gemeinde hinzugefügt." in add.form.submit().follow()
+    id = client.get('/municipalities')\
+        .click("Gemeinde Adlikon").request.url.split('/')[-1]
 
     client.logout()
 
     urls = [
         '/municipalities',
         '/municipalities/add',
-        '/municipality/1',
-        '/municipality/1/edit'
+        f'/municipality/{id}',
+        f'/municipality/{id}/edit'
     ]
 
     for url in urls:
         client.get(url, status=403)
-    client.delete('/municipality/1', status=403)
+    client.delete(f'/municipality/{id}', status=403)
 
     client.login_member()
     for url in urls:
         client.get(url, status=403)
-    client.delete('/municipality/1', status=403)
+    client.delete(f'/municipality/{id}', status=403)
     client.logout()
 
     client.login_editor()
     for url in urls:
         client.get(url, status=403)
-    client.delete('/municipality/1', status=403)
+    client.delete(f'/municipality/{id}', status=403)
     client.logout()
 
     client.login_admin()
     for url in urls:
         client.get(url)
-    client.delete('/municipality/1')
+    client.delete(f'/municipality/{id}')
     client.logout()
 
 
