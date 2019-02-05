@@ -178,6 +178,10 @@ def import_agencies(group_context, file, clear, skip_root, skip_download,
             person = people.add(
                 academic_title=sheet.cell_value(row, 0).strip(),
                 profession=sheet.cell_value(row, 1).strip(),
+                function=(
+                    sheet.cell_value(row, 17).strip()
+                    if sheet.ncols > 17 else ''
+                ),
                 first_name=sheet.cell_value(row, 2).strip(),
                 last_name=sheet.cell_value(row, 3).strip(),
                 political_party=sheet.cell_value(row, 4).strip(),

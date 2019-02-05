@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Allows to import functions of people.
+  [msom]
+
 1.7.0 (2019-02-04)
 ~~~~~~~~~~~~~~~~~~~~
 
