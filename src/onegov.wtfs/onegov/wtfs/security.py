@@ -2,7 +2,12 @@ from onegov.core.security.roles import get_roles_setting as _get_roles_setting
 from onegov.user import User
 from onegov.user import UserCollection
 from onegov.user import UserGroup
+from onegov.user import UserGroupCollection
 from onegov.wtfs import WtfsApp
+
+
+# todo: change to AddUnrestricted, EditUnrestricted (ViewUnrestricted?)
+# todo: remove Private, Protected, Secret, Public
 
 
 class AddModel(object):
@@ -50,8 +55,21 @@ def get_roles_setting():
     return roles
 
 
+@WtfsApp.permission_rule(model=UserGroupCollection, permission=object)
+def has_permission_user_groups(app, identity, model, permission):
+    # Only admins may manage user groups
+    if identity.role != 'admin':
+        return False
+
+    return permission in getattr(app.settings.roles, identity.role)
+
+
 @WtfsApp.permission_rule(model=UserGroup, permission=object)
 def has_permission_user_group(app, identity, model, permission):
+    # Only admins may manage user groups
+    if identity.role != 'admin':
+        return False
+
     # User groups linked to municipalities and users cannot be deleted
     if permission in {DeleteModel}:
         if model.municipality:
@@ -74,12 +92,18 @@ def has_permission_users(app, identity, model, permission):
     if identity.role == 'editor':
         if permission in {ViewModelSameGroup, AddModelSameGroup}:
             return True
+        return False
+
+    # Members are not allowed to do anything
+    if identity.role == 'member':
+        return False
 
     return permission in getattr(app.settings.roles, identity.role)
 
 
 @WtfsApp.permission_rule(model=User, permission=object)
 def has_permission_user(app, identity, model, permission):
+    # Admins can not be managed through the web
     if model.role == 'admin':
         return False
 
@@ -95,5 +119,10 @@ def has_permission_user(app, identity, model, permission):
             if model.role == 'member':
                 if same_group(model, identity):
                     return True
+        return False
+
+    # Members are not allowed to do anything
+    if identity.role == 'member':
+        return False
 
     return permission in getattr(app.settings.roles, identity.role)
