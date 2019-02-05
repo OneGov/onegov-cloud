@@ -153,7 +153,7 @@ def test_views_users_permissions(mock_method, client):
     client.login_admin()
     for user in users[1:-1]:
         client.get(f'/user/{user}')
-        client.get(f'/user/{user}/edit', status=403)
+        client.get(f'/user/{user}/edit')
         client.get(f'/user/{user}/edit-unrestricted')
         client.delete(f'/user/{user}')
     for user in users[-1:]:

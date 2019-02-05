@@ -10,17 +10,17 @@ from onegov.wtfs.layouts import EditUserLayout
 from onegov.wtfs.layouts import UserLayout
 from onegov.wtfs.layouts import UsersLayout
 from onegov.wtfs.security import AddModel
-from onegov.wtfs.security import AddModelSameGroup
-from onegov.wtfs.security import DeleteModelSameGroup
+from onegov.wtfs.security import AddModelUnrestricted
+from onegov.wtfs.security import DeleteModel
 from onegov.wtfs.security import EditModel
-from onegov.wtfs.security import EditModelSameGroup
-from onegov.wtfs.security import ViewModelSameGroup
+from onegov.wtfs.security import EditModelUnrestricted
+from onegov.wtfs.security import ViewModel
 
 
 @WtfsApp.html(
     model=UserCollection,
     template='users.pt',
-    permission=ViewModelSameGroup
+    permission=ViewModel
 )
 def view_users(self, request):
     """ View the list of users. """
@@ -28,7 +28,7 @@ def view_users(self, request):
 
     return {
         'layout': layout,
-        'permission': ViewModelSameGroup
+        'permission': ViewModel
     }
 
 
@@ -36,7 +36,7 @@ def view_users(self, request):
     model=UserCollection,
     name='add-unrestricted',
     template='form.pt',
-    permission=AddModel,
+    permission=AddModelUnrestricted,
     form=UnrestrictedUserForm
 )
 def add_user_unrestricted(self, request, form):
@@ -62,7 +62,7 @@ def add_user_unrestricted(self, request, form):
     model=UserCollection,
     name='add',
     template='form.pt',
-    permission=AddModelSameGroup,
+    permission=AddModel,
     form=UserForm
 )
 def add_user(self, request, form):
@@ -87,7 +87,7 @@ def add_user(self, request, form):
 @WtfsApp.html(
     model=User,
     template='user.pt',
-    permission=ViewModelSameGroup
+    permission=ViewModel
 )
 def view_user(self, request):
     """ View a single user. """
@@ -102,7 +102,7 @@ def view_user(self, request):
     model=User,
     name='edit-unrestricted',
     template='form.pt',
-    permission=EditModel,
+    permission=EditModelUnrestricted,
     form=UnrestrictedUserForm
 )
 def edit_user_unrestricted(self, request, form):
@@ -130,7 +130,7 @@ def edit_user_unrestricted(self, request, form):
     model=User,
     name='edit',
     template='form.pt',
-    permission=EditModelSameGroup,
+    permission=EditModel,
     form=UserForm
 )
 def edit_user(self, request, form):
@@ -157,7 +157,7 @@ def edit_user(self, request, form):
 @WtfsApp.view(
     model=User,
     request_method='DELETE',
-    permission=DeleteModelSameGroup
+    permission=DeleteModel
 )
 def delete_user(self, request):
     """ Delete a user. """

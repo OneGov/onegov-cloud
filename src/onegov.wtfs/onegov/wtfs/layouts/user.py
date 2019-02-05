@@ -6,11 +6,10 @@ from onegov.core.elements import LinkGroup
 from onegov.wtfs import _
 from onegov.wtfs.layouts.default import DefaultLayout
 from onegov.wtfs.security import AddModel
-from onegov.wtfs.security import AddModelSameGroup
+from onegov.wtfs.security import AddModelUnrestricted
 from onegov.wtfs.security import DeleteModel
-from onegov.wtfs.security import DeleteModelSameGroup
 from onegov.wtfs.security import EditModel
-from onegov.wtfs.security import EditModelSameGroup
+from onegov.wtfs.security import EditModelUnrestricted
 
 
 class UsersLayout(DefaultLayout):
@@ -22,7 +21,7 @@ class UsersLayout(DefaultLayout):
     @cached_property
     def editbar_links(self):
         result = []
-        if self.request.has_permission(self.model, AddModel):
+        if self.request.has_permission(self.model, AddModelUnrestricted):
             result.append(
                 LinkGroup(
                     title=_("Add"),
@@ -38,7 +37,7 @@ class UsersLayout(DefaultLayout):
                     ]
                 ),
             )
-        if self.request.has_permission(self.model, AddModelSameGroup):
+        elif self.request.has_permission(self.model, AddModel):
             result.append(
                 LinkGroup(
                     title=_("Add"),
@@ -73,7 +72,7 @@ class UserLayout(DefaultLayout):
     @cached_property
     def editbar_links(self):
         result = []
-        if self.request.has_permission(self.model, EditModel):
+        if self.request.has_permission(self.model, EditModelUnrestricted):
             result.append(
                 Link(
                     text=_("Edit"),
@@ -81,7 +80,7 @@ class UserLayout(DefaultLayout):
                     attrs={'class': 'edit-icon'}
                 )
             )
-        if self.request.has_permission(self.model, EditModelSameGroup):
+        elif self.request.has_permission(self.model, EditModel):
             result.append(
                 Link(
                     text=_("Edit"),
@@ -89,10 +88,7 @@ class UserLayout(DefaultLayout):
                     attrs={'class': 'edit-icon'}
                 )
             )
-        if (
-            self.request.has_permission(self.model, DeleteModel)
-            or self.request.has_permission(self.model, DeleteModelSameGroup)
-        ):
+        if self.request.has_permission(self.model, DeleteModel):
             result.append(
                 Link(
                     text=_("Delete"),

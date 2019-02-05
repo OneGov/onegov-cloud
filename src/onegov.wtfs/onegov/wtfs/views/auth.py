@@ -1,4 +1,3 @@
-from onegov.core.security import Personal
 from onegov.core.security import Public
 from onegov.core.templates import render_template
 from onegov.wtfs import _
@@ -43,7 +42,7 @@ def handle_login(self, request, form):
 @WtfsApp.html(
     model=Auth,
     name='logout',
-    permission=Personal
+    permission=Public
 )
 def view_logout(self, request):
     """ Handles the logout requests. """

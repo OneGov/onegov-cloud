@@ -19,13 +19,11 @@ from onegov.wtfs.layouts import UserLayout
 from onegov.wtfs.layouts import UsersLayout
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.security import AddModel
-from onegov.wtfs.security import AddModelSameGroup
+from onegov.wtfs.security import AddModelUnrestricted
 from onegov.wtfs.security import DeleteModel
-from onegov.wtfs.security import DeleteModelSameGroup
 from onegov.wtfs.security import EditModel
-from onegov.wtfs.security import EditModelSameGroup
+from onegov.wtfs.security import EditModelUnrestricted
 from onegov.wtfs.security import ViewModel
-from onegov.wtfs.security import ViewModelSameGroup
 
 
 class DummyPrincipal(object):
@@ -56,16 +54,18 @@ class DummyRequest(object):
         if self.has_role('admin'):
             return permission in {
                 AddModel,
+                AddModelUnrestricted,
                 DeleteModel,
                 EditModel,
+                EditModelUnrestricted,
                 ViewModel
             }
         if self.has_role('editor'):
             return permission in {
-                AddModelSameGroup,
-                EditModelSameGroup,
-                DeleteModelSameGroup,
-                ViewModelSameGroup
+                AddModel,
+                DeleteModel,
+                EditModel,
+                ViewModel
             }
         return permission in self.permissions
 
