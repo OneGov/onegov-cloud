@@ -761,8 +761,8 @@ def test_people_view(client):
     assert 'Hero' in person
 
     vcard = person.click('Elektronische Visitenkarte').text
-    assert 'FN:Dr. Flash Gordon' in vcard
-    assert 'N:Gordon;Flash;;Dr.;' in vcard
+    assert 'FN;CHARSET=utf-8:Dr. Flash Gordon' in vcard
+    assert 'N;CHARSET=utf-8:Gordon;Flash;;Dr.;' in vcard
 
     client.logout()
     people = client.get('/people')
@@ -774,8 +774,8 @@ def test_people_view(client):
     assert 'Hero' not in person
 
     vcard = person.click('Elektronische Visitenkarte').text
-    assert 'FN:Flash Gordon' in vcard
-    assert 'N:Gordon;Flash;;;' in vcard
+    assert 'FN;CHARSET=utf-8:Flash Gordon' in vcard
+    assert 'N;CHARSET=utf-8:Gordon;Flash;;;' in vcard
 
     client.login_editor()
 
