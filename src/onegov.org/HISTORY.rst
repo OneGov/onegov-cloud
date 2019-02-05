@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.0.2 (2019-02-05)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a pre-title slot.
   [msom]
 
