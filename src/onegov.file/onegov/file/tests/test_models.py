@@ -395,7 +395,6 @@ def test_associated_files_cleanup(session):
     assert sum(1 for p in folder.iterdir()) == 1
 
 
-@pytest.mark.xfail
 def test_1n1_associated_file_cleanup(session):
 
     item = MediaItem(description="Foo")

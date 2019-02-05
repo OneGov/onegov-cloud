@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Marks the test that tests the associated file cleanup as no longer failing.
+  [msom]
+
 0.13.2 (2019-02-04)
 ~~~~~~~~~~~~~~~~~~~
 
