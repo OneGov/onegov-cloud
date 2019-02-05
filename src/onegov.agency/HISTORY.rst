@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.8.0 (2019-02-05)
+~~~~~~~~~~~~~~~~~~~~
 
 - Shows the function of the person.
   [msom]
