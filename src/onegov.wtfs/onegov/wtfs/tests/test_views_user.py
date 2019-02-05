@@ -18,6 +18,8 @@ def test_views_user(client):
     added = add.form.submit().follow()
     assert "Benutzer hinzugefügt." in added
     assert "Hans Muster" in added
+    assert "Hans Muster" in client.get('/user-groups').\
+        click("Gruppe Winterthur")
 
     add = client.get('/users').click(href='add')
     add.form['realname'] = "Optimo"

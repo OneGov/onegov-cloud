@@ -10,6 +10,11 @@
                     <dd>
                         <a tal:condition="layout.model.municipality" href="${request.link(layout.model.municipality)}">${layout.model.municipality.name}</a>
                     </dd>
+
+                    <dt i18n:translate>Users</dt>
+                    <dd tal:repeat="user layout.model.users">
+                        <a href="${request.link(user)}">${user.title}</a>
+                    </dd>
                 </dl>
             </div>
         </div>
