@@ -122,38 +122,63 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable):
             prefix = self.academic_title
 
         # mandatory fields
-        result.add('n').value = Name(
+        line = result.add('n')
+        line.value = Name(
             prefix=prefix,
             given=self.first_name,
             family=self.last_name,
         )
-        result.add('fn').value = " ".join((
+        line.charset_param = 'utf-8'
+
+        line = result.add('fn')
+        line.value = " ".join((
             prefix, self.first_name, self.last_name
         )).strip()
+        line.charset_param = 'utf-8'
 
         # optional fields
         if 'function' not in exclude and self.function:
-            result.add('title').value = self.function
+            line = result.add('title')
+            line.value = self.function
+            line.charset_param = 'utf-8'
+
         if 'picture_url' not in exclude and self.picture_url:
-            result.add('photo').value = self.picture_url
+            line = result.add('photo')
+            line.value = self.picture_url
+
         if 'email' not in exclude and self.email:
-            result.add('email').value = self.email
+            line = result.add('email')
+            line.value = self.email
+
         if 'phone' not in exclude and self.phone:
-            result.add('tel').value = self.phone
+            line = result.add('tel')
+            line.value = self.phone
+
         if 'phone_direct' not in exclude and self.phone_direct:
-            result.add('tel').value = self.phone_direct
+            line = result.add('tel')
+            line.value = self.phone_direct
+
         if 'website' not in exclude and self.website:
-            result.add('url').value = self.website
+            line = result.add('url')
+            line.value = self.website
+
         if 'address' not in exclude and self.address:
-            result.add('adr').value = Address(street=self.address)
+            line = result.add('adr')
+            line.value = Address(street=self.address)
+            line.charset_param = 'utf-8'
+
         if 'notes' not in exclude and self.notes:
-            result.add('note').value = self.notes
+            line = result.add('note')
+            line.value = self.notes
+            line.charset_param = 'utf-8'
 
         for membership in self.memberships:
-            result.add('org').value = [
+            line = result.add('org')
+            line.value = [
                 membership.agency.title,
                 membership.title
             ]
+            line.charset_param = 'utf-8'
 
         return result.serialize()
 

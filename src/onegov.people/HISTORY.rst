@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Specifies the charset for certain fields in the vCard export.
+  [msom]
+
 0.8.0 (2019-02-04)
 ~~~~~~~~~~~~~~~~~~~
 

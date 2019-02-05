@@ -77,17 +77,17 @@ def test_person_vcard(session):
     vcard = person.vcard()
     assert "BEGIN:VCARD" in vcard
     assert "VERSION:3.0" in vcard
-    assert "ADR:;;Fakestreet 1\\, Springfield;;;;" in vcard
+    assert "ADR;CHARSET=utf-8:;;Fakestreet 1\\, Springfield;;;;" in vcard
     assert "EMAIL:han.maulwurf@springfield.com" in vcard
-    assert "FN:Dr. Hans Maulwurf" in vcard
-    assert "N:Maulwurf;Hans;;Dr.;" in vcard
-    assert "ORG:Agency;Membership" in vcard
+    assert "FN;CHARSET=utf-8:Dr. Hans Maulwurf" in vcard
+    assert "N;CHARSET=utf-8:Maulwurf;Hans;;Dr.;" in vcard
+    assert "ORG;CHARSET=utf-8:Agency;Membership" in vcard
     assert "PHOTO:https://thats.me/hans-maulwurf/picture" in vcard
     assert "TEL:11122334455" in vcard
     assert "TEL:11122334456" in vcard
-    assert "TITLE:Director" in vcard
+    assert "TITLE;CHARSET=utf-8:Director" in vcard
     assert "URL:https://thats.me/hans-maulwurf" in vcard
-    assert "NOTE:" not in vcard
+    assert "NOTE;CHARSET=utf-8:" not in vcard
     assert "END:VCARD" in vcard
 
     vcard = person.vcard((
@@ -100,17 +100,17 @@ def test_person_vcard(session):
     ))
     assert "BEGIN:VCARD" in vcard
     assert "VERSION:3.0" in vcard
-    assert "ADR:" not in vcard
+    assert "ADR;CHARSET=utf-8:" not in vcard
     assert "EMAIL:han.maulwurf@springfield.com" in vcard
-    assert "FN:Hans Maulwurf" in vcard
-    assert "N:Maulwurf;Hans;;;" in vcard
-    assert "ORG:Agency;Membership" in vcard
+    assert "FN;CHARSET=utf-8:Hans Maulwurf" in vcard
+    assert "N;CHARSET=utf-8:Maulwurf;Hans;;;" in vcard
+    assert "ORG;CHARSET=utf-8:Agency;Membership" in vcard
     assert "PHOTO:" not in vcard
     assert "TEL:11122334455" in vcard
     assert "TEL:11122334456" not in vcard
-    assert "TITLE:" not in vcard
+    assert "TITLE;CHARSET=utf-8:" not in vcard
     assert "URL:" not in vcard
-    assert "NOTE:Has bad vision." in vcard
+    assert "NOTE;CHARSET=utf-8:Has bad vision." in vcard
     assert "END:VCARD" in vcard
 
 
