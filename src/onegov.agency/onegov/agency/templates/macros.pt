@@ -51,6 +51,9 @@
                 <li class="person-card-title">
                     <a href="${request.link(person)}">${person.title}</a>
                 </li>
+                <li tal:condition="person.function and 'function' not in exclude" class="person-card-function">
+                    <em>${person.function}</em>
+                </li>
                 <tal:block tal:repeat="membership person.memberships_by_agency">
                     <li tal:condition="not membership.is_hidden_from_public or request.is_logged_in" class="person-card-function">
                         <em title="${layout.agency_path(membership.agency)|None}">${membership.title} ${membership.agency.title}</em>

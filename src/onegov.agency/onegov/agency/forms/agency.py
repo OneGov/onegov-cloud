@@ -48,6 +48,7 @@ class ExtendedAgencyForm(Form):
             ('membership.since', _("Membership: Since")),
             ('membership.addition', _("Membership: Addition")),
             ('person.title', _("Person: Title")),
+            ('person.function', _("Person: Function")),
             ('person.last_name', _("Person: Last Name")),
             ('person.first_name', _("Person: First Name")),
             ('person.born', _("Person: Born")),

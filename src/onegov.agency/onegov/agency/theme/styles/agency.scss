@@ -68,3 +68,8 @@ ul.sortable-multi-checkbox li label {
 .globals .hidden-contents::before {
     @include icon('\f070');
 }
+
+h1 small::after {
+    content: '\A';
+    white-space: pre;
+}

@@ -1,7 +1,10 @@
 Changelog
 ---------
 
-- Allows to import functions of people.
+- Shows the function of the person.
+  [msom]
+
+- Allows to import the function of the person.
   [msom]
 
 1.7.0 (2019-02-04)
