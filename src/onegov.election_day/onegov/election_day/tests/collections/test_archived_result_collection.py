@@ -292,8 +292,8 @@ def test_archived_result_collection_updates(session):
     assert result.last_modified is not None
     assert result.last_result_change is None
     assert result.type == 'election_compound'
-    assert result.counted_entities is 0
-    assert result.total_entities is 1
+    assert result.counted_entities == 0
+    assert result.total_entities == 1
     assert result.progress == (0, 1)
     assert result.external_id == 'elections-2001'
     assert result.elections == ['Election/election-2001']
@@ -320,8 +320,8 @@ def test_archived_result_collection_updates(session):
     assert result.last_modified is not None
     assert result.last_result_change is None
     assert result.type == 'election'
-    assert result.counted_entities is 0
-    assert result.total_entities is 0
+    assert result.counted_entities == 0
+    assert result.total_entities == 0
     assert result.progress == (0, 0)
     assert result.external_id == 'election-2001'
     assert result.elected_candidates == []
@@ -366,8 +366,8 @@ def test_archived_result_collection_updates(session):
     assert result.last_modified is not None
     assert result.last_result_change is not None
     assert result.type == 'election_compound'
-    assert result.counted_entities is 1
-    assert result.total_entities is 1
+    assert result.counted_entities == 1
+    assert result.total_entities == 1
     assert result.progress == (1, 1)
     assert result.external_id == 'elections-2001'
     assert result.elections == ['Election/election-2001']
