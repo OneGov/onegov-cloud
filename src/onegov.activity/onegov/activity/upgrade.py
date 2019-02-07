@@ -6,13 +6,16 @@ import hashlib
 
 from onegov.activity import ActivityCollection
 from onegov.activity import Booking
+from onegov.activity import InvoiceCollection
 from onegov.activity import InvoiceItem
 from onegov.activity import Occasion
 from onegov.activity import Period
 from onegov.activity import PeriodCollection
 from onegov.core.crypto import random_token
+from onegov.core.orm.sql import as_selectable
 from onegov.core.orm.types import UUID, JSON
 from onegov.core.upgrade import upgrade_task
+from onegov.core.utils import Bunch
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Date
@@ -21,6 +24,7 @@ from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
+from sqlalchemy import select
 from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import joinedload
@@ -486,3 +490,55 @@ def remove_activity_aggregates(context):
     context.operations.drop_column('activities', 'period_ids')
     context.operations.drop_column('activities', 'active_days')
     context.operations.drop_column('activities', 'weekdays')
+
+
+@upgrade_task('Add invoices')
+def add_invoices(context):
+    if not context.has_column('invoice_items', 'code'):
+        return
+
+    stmt = as_selectable("""
+        SELECT
+            invoice_items.id,           -- UUID
+            code,                       -- Text
+            invoice::uuid AS period_id, -- UUID
+            users.id AS user_id         -- UUID
+        FROM invoice_items
+        LEFT JOIN users ON invoice_items.username = users.username
+    """)
+
+    invoices = InvoiceCollection(context.session)
+
+    mapping = {
+        r.id: Bunch(record=r, invoice=None)
+        for r in context.session.execute(select(stmt.c))
+    }
+
+    created = {}
+
+    for m in mapping.values():
+        id = (m.record.period_id, m.record.user_id)
+
+        if id in created:
+            m.invoice = created[id]
+            continue
+
+        created[id] = m.invoice = invoices.add(
+            period_id=m.record.period_id,
+            user_id=m.record.user_id,
+            code=m.record.code)
+
+    def invoice_id(item):
+        return mapping[item.id].invoice.id
+
+    context.add_column_with_defaults(
+        table='invoice_items',
+        column=Column('invoice_id', UUID, ForeignKey('invoices.id')),
+        default=invoice_id
+    )
+
+    context.session.flush()
+
+    context.operations.drop_column('invoice_items', 'username')
+    context.operations.drop_column('invoice_items', 'code')
+    context.operations.drop_column('invoice_items', 'invoice')

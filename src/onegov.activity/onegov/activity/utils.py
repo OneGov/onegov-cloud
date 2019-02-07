@@ -1,5 +1,6 @@
 import hashlib
 import lxml
+import secrets
 import sedate
 import string
 import re
@@ -147,6 +148,15 @@ def is_valid_checksum(number):
 
     number = str(number)
     return number[-1] == str(generate_checksum(number[:-1]))
+
+
+def random_invoice_code():
+    """ Generates a random invoice code. Should be short-lived during
+    refactoring.
+
+    """
+
+    return f'q{secrets.token_hex(5)}'
 
 
 def as_invoice_code(invoice, username):

@@ -9,7 +9,7 @@ from onegov.activity import ActivityFilter
 from onegov.activity import Attendee
 from onegov.activity import AttendeeCollection
 from onegov.activity import Booking, BookingCollection
-from onegov.activity import InvoiceItemCollection
+from onegov.activity import Invoice, InvoiceCollection
 from onegov.activity import Occasion, OccasionDate
 from onegov.activity import OccasionCollection
 from onegov.activity import Period
@@ -17,6 +17,7 @@ from onegov.activity import PeriodCollection
 from onegov.activity import PublicationRequestCollection
 from onegov.activity.models import DAYS
 from onegov.core.utils import Bunch
+from sqlalchemy import func
 from psycopg2.extras import NumericRange
 from pytz import utc
 from uuid import uuid4
@@ -1839,24 +1840,74 @@ def test_period_phases(session):
         assert period.phase == 'archive'
 
 
-def test_invoice_items(session, owner):
-    items = InvoiceItemCollection(session)
-    items.add(owner, "Ferienpass 2016", "Malcolm", "Camp", 100.0, 1.0)
-    items.add(owner, "Ferienpass 2016", "Malcolm", "Pass", 25.0, 1.0)
-    items.add(owner, "Ferienpass 2016", "Dewey", "Football", 100.0, 1.0)
-    items.add(owner, "Ferienpass 2016", "Dewey", "Pass", 25.0, 1.0)
-    items.add(owner, "Ferienpass 2016", "Discount", "8%", 250, -0.05)
+def test_invoices(session, owner, prebooking_period, inactive_period):
+    p1 = prebooking_period
+    p2 = inactive_period
 
-    assert items.total == 237.5
+    invoices = InvoiceCollection(session, user_id=owner.id)
 
-    items.add(owner, "Ferienpass 2017", "Malcolm", "Camp", 100, 1 / 3)
+    assert invoices.total_amount == 0
+    assert invoices.outstanding_amount == 0
+    assert invoices.paid_amount == 0
 
-    assert items.for_invoice("Ferienpass 2017").total == 33
-    assert items.for_invoice("asdf").total is None
-    assert items.total == 270.5
+    i1 = invoices.add(period_id=p1.id)
+    i1.add("Malcolm", "Camp", 100.0, 1.0)
+    i1.add("Malcolm", "Pass", 25.0, 1.0)
+    i1.add("Dewey", "Football", 100.0, 1.0)
+    i1.add("Dewey", "Pass", 25.0, 1.0)
+    i1.add("Discount", "8%", 250, -0.05)
 
-    items.query().first().paid = True
-    assert items.outstanding == 270.5 - 100.0
+    assert i1.total_amount == 237.5
+    assert i1.outstanding_amount == 237.5
+    assert i1.paid_amount == 0
+    assert InvoiceCollection(session).total_amount == 237.5
+
+    i2 = invoices.add(period_id=p2.id)
+    i2.add("Malcolm", "Camp", 100, 1 / 3)
+
+    # this is 33, not 33.33 because both unit and quantity are truncated
+    # to two decimals after the point. So when we added 1 / 3 above, we really
+    # added 0.33 to the database (100 * 0.33 = 33)
+    assert InvoiceCollection(session, period_id=p2.id).total_amount == 33
+    assert i2.total_amount == 33
+    assert i2.outstanding_amount == 33
+    assert i2.paid_amount == 0
+
+    assert InvoiceCollection(session, period_id=p1.id).total_amount == 237.5
+    assert InvoiceCollection(session, period_id=p2.id).total_amount == 33
+    assert InvoiceCollection(session).total_amount == 270.5
+
+    # pay part of the first invoice
+    i1.items[0].paid = True
+    assert i1.total_amount == 237.5
+    assert i1.outstanding_amount == 137.5
+    assert i1.paid_amount == 100.0
+    assert i1.paid == False
+
+    assert session.query(func.sum(Invoice.total_amount))\
+        .first()[0] == 270.5
+    assert session.query(func.sum(Invoice.outstanding_amount))\
+        .first()[0] == 170.5
+    assert session.query(func.sum(Invoice.paid_amount))\
+        .first()[0] == 100
+
+    assert InvoiceCollection(session, period_id=p1.id)\
+        .outstanding_amount == 137.5
+    assert InvoiceCollection(session, period_id=p2.id)\
+        .outstanding_amount == 33
+
+    assert InvoiceCollection(session).unpaid_count() == 2
+    assert InvoiceCollection(session).unpaid_count(
+        excluded_period_ids=(p1.id, )) == 1
+
+    # pay all of the second invoice
+    i2.items[0].paid = True
+    assert i2.total_amount == 33
+    assert i2.outstanding_amount == 0
+    assert i2.paid_amount == 33
+    assert i2.paid == True
+
+    assert InvoiceCollection(session).unpaid_count() == 1
 
 
 def test_confirm_period(session, owner):

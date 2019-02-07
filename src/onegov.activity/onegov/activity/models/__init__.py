@@ -1,6 +1,7 @@
 from onegov.activity.models.activity import Activity, ACTIVITY_STATES
 from onegov.activity.models.attendee import Attendee
 from onegov.activity.models.booking import Booking
+from onegov.activity.models.invoice import Invoice
 from onegov.activity.models.invoice_item import InvoiceItem
 from onegov.activity.models.occasion import Occasion
 from onegov.activity.models.occasion_date import OccasionDate, DAYS
@@ -11,6 +12,7 @@ __all__ = [
     'Activity',
     'Attendee',
     'Booking',
+    'Invoice',
     'InvoiceItem',
     'Occasion',
     'OccasionDate',
