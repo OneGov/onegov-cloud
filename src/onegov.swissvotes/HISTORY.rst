@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Removes the login link.
+  [msom]
+
 0.0.29 (2019-01-16)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -1,6 +1,7 @@
 from onegov.core.security import Personal
 from onegov.core.security import Public
 from onegov.core.templates import render_template
+from onegov.core.utils import relative_url
 from onegov.swissvotes import _
 from onegov.swissvotes import log
 from onegov.swissvotes import SwissvotesApp
@@ -23,15 +24,17 @@ from onegov.user.utils import password_reset_url
 )
 def handle_login(self, request, form):
     """ Handles the login requests. """
+    layout = DefaultLayout(self, request)
 
     if form.submitted(request):
+        self.to = relative_url(layout.homepage_link)
         response = self.login_to(request=request, **form.login_data)
         form.error_message = _("Wrong username or password")
     else:
         response = None
 
     return response or {
-        'layout': DefaultLayout(self, request),
+        'layout': layout,
         'title': _("Login"),
         'form': form,
         'password_reset_link': request.link(

@@ -18,34 +18,29 @@ def test_view_login_logout(swissvotes_app):
     error = "Unbekannter Benutzername oder falsches Passwort"
 
     for user in ('admin', 'editor', 'publisher'):
-        login = client.get('/').maybe_follow().click('Anmelden')
+        login = client.get('/auth/login')
         login.form['username'] = f'{user}@example.org'
         login.form['password'] = 'hunter1'
         page = login.form.submit().maybe_follow()
         assert error in page
         assert 'Abmelden' not in page
-        assert 'Anmelden' in page
 
-        login = client.get('/').maybe_follow().click('Anmelden')
+        login = client.get('/auth/login')
         login.form['username'] = f'{user}@example.org'
         login.form['password'] = 'hunter2'
         page = login.form.submit().maybe_follow()
         assert error not in page
         assert 'Abmelden' in page
-        assert 'Anmelden' not in page
 
         page = page.click('Abmelden').maybe_follow()
         assert 'Abmelden' not in page
-        assert 'Anmelden' in page
 
 
 def test_view_reset_password(swissvotes_app):
     client = Client(swissvotes_app)
     client.get('/locale/de_CH').follow()
 
-    home = client.get('/').maybe_follow()
-
-    request_page = home.click('Anmelden').click('Passwort zurücksetzen')
+    request_page = client.get('/auth/login').click('Passwort zurücksetzen')
     request_page.form['email'] = 'someone@example.org'
     request_page.form.submit()
     assert len(swissvotes_app.smtp.outbox) == 0

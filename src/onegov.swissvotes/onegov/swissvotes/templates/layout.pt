@@ -100,7 +100,10 @@
                         <a href="${link[1]}">${link[0]}</a>
                     </div>
                     <div class="small-12 medium-4 columns small-only-text-center medium-text-right manage-links">
-                        <a tal:condition="layout.login_link" href="${layout.login_link}" i18n:translate>Login</a>
+                    </div>
+                </div>
+                 <div class="row">
+                    <div class="small-12 columns small-only-text-center medium-text-right manage-links">
                         <a tal:condition="layout.logout_link" href="${layout.logout_link}" i18n:translate>Logout</a>
                     </div>
                 </div>
