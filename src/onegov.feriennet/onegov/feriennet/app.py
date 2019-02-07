@@ -14,7 +14,6 @@ from onegov.org.app import get_i18n_localedirs as default_i18n_localedirs
 from onegov.org.app import get_public_ticket_messages \
     as default_public_ticket_messages
 from onegov.user import User, UserCollection
-from sqlalchemy.orm import undefer
 
 
 BANNER_TEMPLATE = """
