@@ -117,12 +117,14 @@ def get_frameworks_asset():
     yield 'd3.js'
     yield 'd3.chart.bar.js'
     yield 'foundation.js'
+    yield 'intercooler.js'
     yield 'underscore.js'
     yield 'react.js'
     yield 'react-dom.js'
     yield 'react-dropdown-tree-select.js'
     yield 'react-dropdown-tree-select.css'
     yield 'form_dependencies.js'
+    yield 'confirm.jsx'
 
 
 @SwissvotesApp.webasset('common')

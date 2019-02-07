@@ -1,5 +1,6 @@
 from babel import Locale
 from cached_property import cached_property
+from onegov.core.elements import Link
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
 from onegov.core.utils import groupbylist
@@ -29,12 +30,12 @@ class DefaultLayout(ChameleonLayout):
 
     @cached_property
     def top_navigation(self):
-        result = [(_("Votes"), self.votes_link)]
+        result = [Link(_("Votes"), self.votes_url)]
 
         for page in ('dataset', 'about', 'contact'):
             page = self.pages.by_id(page)
             if page:
-                result.append((page.title, self.request.link(page)))
+                result.append(Link(page.title, self.request.link(page)))
 
         return result
 
@@ -44,7 +45,7 @@ class DefaultLayout(ChameleonLayout):
 
     @cached_property
     def breadcrumbs(self):
-        return [(_("Homepage"), self.homepage_link, 'current')]
+        return [Link(_("Homepage"), self.homepage_url)]
 
     @cached_property
     def app_version(self):
@@ -55,40 +56,38 @@ class DefaultLayout(ChameleonLayout):
         return self.request.link(self.app.principal, 'static')
 
     @cached_property
-    def homepage_link(self):
+    def homepage_url(self):
         return self.request.link(self.app.principal)
 
     @cached_property
     def disclaimer_link(self):
         page = self.pages.by_id('disclaimer')
         if page:
-            return page.title, self.request.link(page)
-        return '', ''
+            return Link(page.title, self.request.link(page))
 
     @cached_property
     def imprint_link(self):
         page = self.pages.by_id('imprint')
         if page:
-            return page.title, self.request.link(page)
-        return '', ''
+            return Link(page.title, self.request.link(page))
 
     @cached_property
-    def votes_link(self):
+    def votes_url(self):
         return self.request.link(SwissVoteCollection(self.request.session))
 
     @cached_property
-    def login_link(self):
+    def login_url(self):
         if not self.request.is_logged_in:
             return self.request.link(
-                Auth.from_request(self.request, to=self.homepage_link),
+                Auth.from_request(self.request, to=self.homepage_url),
                 name='login'
             )
 
     @cached_property
-    def logout_link(self):
+    def logout_url(self):
         if self.request.is_logged_in:
             return self.request.link(
-                Auth.from_request(self.request, to=self.homepage_link),
+                Auth.from_request(self.request, to=self.homepage_url),
                 name='logout'
             )
 

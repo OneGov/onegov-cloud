@@ -27,7 +27,7 @@ def handle_login(self, request, form):
     layout = DefaultLayout(self, request)
 
     if form.submitted(request):
-        self.to = relative_url(layout.homepage_link)
+        self.to = relative_url(layout.homepage_url)
         response = self.login_to(request=request, **form.login_data)
         form.error_message = _("Wrong username or password")
     else:
@@ -104,7 +104,7 @@ def handle_password_reset_request(self, request, form):
             mapping={'email': form.email.data}
         )
         request.message(message, 'success')
-        return request.redirect(layout.login_link)
+        return request.redirect(layout.homepage_url)
 
     return {
         'layout': layout,
@@ -128,7 +128,7 @@ def handle_password_reset(self, request, form):
     if form.submitted(request):
         if form.update_password(request):
             request.message(_("Password changed."), 'success')
-            return request.redirect(layout.login_link)
+            return request.redirect(layout.login_url)
         else:
             form.error_message = _(
                 "Wrong username or password reset link not valid any more."

@@ -69,7 +69,7 @@ def update_votes(self, request, form):
                 'warning'
             )
 
-        return request.redirect(layout.votes_link)
+        return request.redirect(layout.votes_url)
 
     return {
         'layout': layout,
@@ -128,7 +128,7 @@ def delete_votes(self, request, form):
         for vote in self.query():
             request.session.delete(vote)
         request.message(_("All votes deleted"), 'success')
-        return request.redirect(layout.votes_link)
+        return request.redirect(layout.votes_url)
 
     return {
         'layout': layout,

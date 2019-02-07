@@ -1,4 +1,5 @@
 from cached_property import cached_property
+from onegov.core.elements import Link
 from onegov.swissvotes import _
 from onegov.swissvotes.layouts.default import DefaultLayout
 
@@ -11,27 +12,30 @@ class VoteLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if not self.request.has_role('admin', 'editor'):
-            return []
-        return [
-            (
-                _("Manage attachments"),
-                self.request.link(self.model, name='upload'),
-                'upload-icon'
-            ),
-            (
-                _("Delete vote"),
-                self.request.link(self.model, name='delete'),
-                'delete-icon'
+        result = []
+        if self.request.has_role('admin', 'editor'):
+            result.append(
+                Link(
+                    text=_("Manage attachments"),
+                    url=self.request.link(self.model, name='upload'),
+                    attrs={'class': 'upload-icon'}
+                )
             )
-        ]
+            result.append(
+                Link(
+                    text=_("Delete vote"),
+                    url=self.request.link(self.model, name='delete'),
+                    attrs={'class': 'delete-icon'}
+                )
+            )
+        return result
 
     @cached_property
     def breadcrumbs(self):
         return [
-            (_("Homepage"), self.homepage_link, ''),
-            (_("Votes"), self.votes_link, ''),
-            (self.title, '#', 'current'),
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Votes"), self.votes_url),
+            Link(self.title, '#'),
         ]
 
 
@@ -44,10 +48,10 @@ class VoteStrengthsLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self):
         return [
-            (_("Homepage"), self.homepage_link, ''),
-            (_("Votes"), self.votes_link, ''),
-            (self.model.title, self.request.link(self.model), ''),
-            (self.title, '#', 'current'),
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Votes"), self.votes_url),
+            Link(self.model.title, self.request.link(self.model)),
+            Link(self.title, '#'),
         ]
 
 
@@ -60,10 +64,10 @@ class UploadVoteAttachemtsLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self):
         return [
-            (_("Homepage"), self.homepage_link, ''),
-            (_("Votes"), self.votes_link, ''),
-            (self.model.title, self.request.link(self.model), ''),
-            (self.title, '#', 'current'),
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Votes"), self.votes_url),
+            Link(self.model.title, self.request.link(self.model)),
+            Link(self.title, '#'),
         ]
 
 
@@ -76,8 +80,8 @@ class DeleteVoteLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self):
         return [
-            (_("Homepage"), self.homepage_link, ''),
-            (_("Votes"), self.votes_link, ''),
-            (self.model.title, self.request.link(self.model), ''),
-            (self.title, '#', 'current'),
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Votes"), self.votes_url),
+            Link(self.model.title, self.request.link(self.model)),
+            Link(self.title, '#'),
         ]

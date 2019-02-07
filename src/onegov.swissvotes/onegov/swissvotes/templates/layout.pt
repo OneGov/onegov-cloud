@@ -47,7 +47,7 @@
         <div class="title">
             <div class="row">
                 <div class="columns small-12 small-only-text-center">
-                    <a href="${layout.homepage_link}"><img src="${layout.static_path}/images/logo.svg" height="100" alt="Swissvotes"></a>
+                    <a href="${layout.homepage_url}"><img src="${layout.static_path}/images/logo.svg" height="100" alt="Swissvotes"></a>
                     <a href="http://unibe.ch"><img class="right hide-for-small" src="${layout.static_path}/images/logo_unibe.svg" height="100" alt="Universität Basel"></a>
                     <a href="https://anneepolitique.swiss"><img class="right hide-for-small" src="${layout.static_path}/images/logo_aps.svg" height="100" alt="année politique suisse"></a>
                     <div class="clearfix"></div>
@@ -93,18 +93,18 @@
         <div class="columns small-12">
             <div class="links">
                  <div class="row">
-                    <div class="small-12 medium-4 columns small-only-text-center" tal:define="link layout.disclaimer_link">
-                        <a href="${link[1]}">${link[0]}</a>
+                    <div class="small-12 medium-4 columns small-only-text-center">
+                        <tal:block replace="structure layout.disclaimer_link(layout)" />
                     </div>
-                    <div class="small-12 medium-4 columns text-center" tal:define="link layout.imprint_link">
-                        <a href="${link[1]}">${link[0]}</a>
+                    <div class="small-12 medium-4 columns text-center">
+                        <tal:block replace="structure layout.imprint_link(layout)" />
                     </div>
                     <div class="small-12 medium-4 columns small-only-text-center medium-text-right manage-links">
                     </div>
                 </div>
                  <div class="row">
                     <div class="small-12 columns small-only-text-center medium-text-right manage-links">
-                        <a tal:condition="layout.logout_link" href="${layout.logout_link}" i18n:translate>Logout</a>
+                        <a tal:condition="layout.logout_url" href="${layout.logout_url}" i18n:translate>Logout</a>
                     </div>
                 </div>
             </div>

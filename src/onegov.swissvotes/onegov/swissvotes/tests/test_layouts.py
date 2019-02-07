@@ -55,6 +55,27 @@ class DummyRequest(object):
         return 'x'
 
 
+def path(links):
+    return '/'.join([link.attrs['href'].strip('/') for link in links])
+
+
+def hrefs(items):
+    for item in items:
+        if hasattr(item, 'links'):
+            for ln in item.links:
+                yield (
+                    ln.attrs.get('href')
+                    or ln.attrs.get('ic-delete-from')
+                    or ln.attrs.get('ic-post-to')
+                )
+        else:
+            yield (
+                item.attrs.get('href')
+                or item.attrs.get('ic-delete-from')
+                or item.attrs.get('ic-post-to')
+            )
+
+
 def test_layout_default(swissvotes_app):
     request = DummyRequest()
     request.app = swissvotes_app
@@ -64,7 +85,7 @@ def test_layout_default(swissvotes_app):
     layout = DefaultLayout(model, request)
     assert layout.title == ""
     assert layout.editbar_links == []
-    assert layout.breadcrumbs == [('Homepage', 'Principal/', 'current')]
+    assert path(layout.breadcrumbs) == 'Principal'
     assert layout.static_path == 'Principal/static'
     assert layout.app_version
     assert layout.locales == [
@@ -79,12 +100,12 @@ def test_layout_default(swissvotes_app):
         ('Über uns', 'TranslatablePage/'),
         ('Kontakt', 'TranslatablePage/')
     ]
-    assert layout.homepage_link == 'Principal/'
-    assert layout.disclaimer_link == ('Disclaimer', 'TranslatablePage/')
-    assert layout.imprint_link == ('Impressum', 'TranslatablePage/')
-    assert layout.votes_link == 'SwissVoteCollection/'
-    assert layout.login_link == 'Auth/login'
-    assert layout.logout_link is None
+    assert layout.homepage_url == 'Principal/'
+    assert layout.votes_url == 'SwissVoteCollection/'
+    assert layout.login_url == 'Auth/login'
+    assert layout.logout_url is None
+    assert path([layout.disclaimer_link]) == 'TranslatablePage'
+    assert path([layout.imprint_link]) == 'TranslatablePage'
 
     assert layout.format_bfs_number(Decimal('100')) == '100'
     assert layout.format_bfs_number(Decimal('100.1')) == '100.1'
@@ -107,14 +128,14 @@ def test_layout_default(swissvotes_app):
     # Login
     request.is_logged_in = True
     layout = DefaultLayout(model, request)
-    assert layout.login_link is None
-    assert layout.logout_link == 'Auth/logout'
+    assert layout.login_url is None
+    assert layout.logout_url == 'Auth/logout'
 
     # Remove initial content
     layout.pages.query().delete()
     assert layout.top_navigation == [('Votes', 'SwissVoteCollection/')]
-    assert layout.disclaimer_link == ('', '')
-    assert layout.imprint_link == ('', '')
+    assert layout.disclaimer_link is None
+    assert layout.imprint_link is None
 
     assert layout.format_policy_areas(SwissVote()) == ''
 
@@ -166,23 +187,20 @@ def test_layout_page(session):
     layout = PageLayout(model, request)
     assert layout.title == "Seite"
     assert layout.editbar_links == []
-    assert layout.breadcrumbs == [
-        ('Homepage', 'DummyPrincipal/', ''),
-        ('Seite', '#', 'current')
-    ]
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/#'
 
     # Log in as editor
     request.roles = ['editor']
     layout = PageLayout(model, request)
-    assert layout.editbar_links == [
-        ('Edit page', 'TranslatablePage/edit', 'edit-icon')
+    assert list(hrefs(layout.editbar_links)) == [
+        'TranslatablePage/edit'
     ]
 
     # Log in as admin
     request.roles = ['admin']
     layout = PageLayout(model, request)
-    assert layout.editbar_links == [
-        ('Edit page', 'TranslatablePage/edit', 'edit-icon')
+    assert list(hrefs(layout.editbar_links)) == [
+        'TranslatablePage/edit',
     ]
 
 
@@ -199,11 +217,7 @@ def test_layout_edit_page(session):
     layout = EditPageLayout(model, request)
     assert layout.title == "Edit page"
     assert layout.editbar_links == []
-    assert layout.breadcrumbs == [
-        ('Homepage', 'DummyPrincipal/', ''),
-        ('Seite', 'TranslatablePage/', ''),
-        ('Edit page', '#', 'current')
-    ]
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/TranslatablePage/#'
 
     # Log in as editor
     request.roles = ['editor']
@@ -223,26 +237,22 @@ def test_layout_vote():
     layout = VoteLayout(model, request)
     assert layout.title == "Vote"
     assert layout.editbar_links == []
-    assert layout.breadcrumbs == [
-        ('Homepage', 'DummyPrincipal/', ''),
-        ('Votes', 'SwissVoteCollection/', ''),
-        ('Vote', '#', 'current')
-    ]
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/SwissVoteCollection/#'
 
     # Log in as editor
     request.roles = ['editor']
     layout = VoteLayout(model, request)
-    assert layout.editbar_links == [
-        ('Manage attachments', 'SwissVote/upload', 'upload-icon'),
-        ('Delete vote', 'SwissVote/delete', 'delete-icon')
+    assert list(hrefs(layout.editbar_links)) == [
+        'SwissVote/upload',
+        'SwissVote/delete',
     ]
 
     # Log in as admin
     request.roles = ['admin']
     layout = VoteLayout(model, request)
-    assert layout.editbar_links == [
-        ('Manage attachments', 'SwissVote/upload', 'upload-icon'),
-        ('Delete vote', 'SwissVote/delete', 'delete-icon')
+    assert list(hrefs(layout.editbar_links)) == [
+        'SwissVote/upload',
+        'SwissVote/delete',
     ]
 
 
@@ -253,12 +263,9 @@ def test_layout_vote_strengths():
     layout = VoteStrengthsLayout(model, request)
     assert layout.title == _("Voter strengths")
     assert layout.editbar_links == []
-    assert layout.breadcrumbs == [
-        ('Homepage', 'DummyPrincipal/', ''),
-        ('Votes', 'SwissVoteCollection/', ''),
-        ('Vote', 'SwissVote/', ''),
-        ('Voter strengths', '#', 'current'),
-    ]
+    assert path(layout.breadcrumbs) == (
+        'DummyPrincipal/SwissVoteCollection/SwissVote/#'
+    )
 
     # Log in as editor
     request.roles = ['editor']
@@ -278,12 +285,9 @@ def test_layout_upload_vote_attachemts():
     layout = UploadVoteAttachemtsLayout(model, request)
     assert layout.title == _("Manage attachments")
     assert layout.editbar_links == []
-    assert layout.breadcrumbs == [
-        ('Homepage', 'DummyPrincipal/', ''),
-        ('Votes', 'SwissVoteCollection/', ''),
-        ('Vote', 'SwissVote/', ''),
-        ('Manage attachments', '#', 'current'),
-    ]
+    assert path(layout.breadcrumbs) == (
+        'DummyPrincipal/SwissVoteCollection/SwissVote/#'
+    )
 
     # Log in as editor
     request.roles = ['editor']
@@ -303,12 +307,9 @@ def test_layout_delete_vote():
     layout = DeleteVoteLayout(model, request)
     assert layout.title == _("Delete vote")
     assert layout.editbar_links == []
-    assert layout.breadcrumbs == [
-        ('Homepage', 'DummyPrincipal/', ''),
-        ('Votes', 'SwissVoteCollection/', ''),
-        ('Vote', 'SwissVote/', ''),
-        ('Delete vote', '#', 'current'),
-    ]
+    assert path(layout.breadcrumbs) == (
+        'DummyPrincipal/SwissVoteCollection/SwissVote/#'
+    )
 
     # Log in as editor
     request.roles = ['editor']
@@ -328,28 +329,25 @@ def test_layout_votes():
     layout = VotesLayout(model, request)
     assert layout.title == _("Votes")
     assert layout.editbar_links == []
-    assert layout.breadcrumbs == [
-        ('Homepage', 'DummyPrincipal/', ''),
-        ('Votes', 'SwissVoteCollection/', 'current')
-    ]
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/SwissVoteCollection'
 
     # Log in as editor
     request.roles = ['editor']
     layout = VotesLayout(model, request)
-    assert layout.editbar_links == [
-        ('Update dataset', 'SwissVoteCollection/update', 'upload-icon'),
-        ('Download dataset (CSV)', 'SwissVoteCollection/csv', 'export-icon'),
-        ('Download dataset (XLSX)', 'SwissVoteCollection/xlsx', 'export-icon')
+    assert list(hrefs(layout.editbar_links)) == [
+        'SwissVoteCollection/update',
+        'SwissVoteCollection/csv',
+        'SwissVoteCollection/xlsx'
     ]
 
     # Log in as admin
     request.roles = ['admin']
     layout = VotesLayout(model, request)
-    assert layout.editbar_links == [
-        ('Update dataset', 'SwissVoteCollection/update', 'upload-icon'),
-        ('Download dataset (CSV)', 'SwissVoteCollection/csv', 'export-icon'),
-        ('Download dataset (XLSX)', 'SwissVoteCollection/xlsx', 'export-icon'),
-        ('Delete all votes', 'SwissVoteCollection/delete', 'delete-icon')
+    assert list(hrefs(layout.editbar_links)) == [
+        'SwissVoteCollection/update',
+        'SwissVoteCollection/csv',
+        'SwissVoteCollection/xlsx',
+        'SwissVoteCollection/delete',
     ]
 
 
@@ -360,11 +358,7 @@ def test_layout_update_votes():
     layout = UpdateVotesLayout(model, request)
     assert layout.title == _("Update dataset")
     assert layout.editbar_links == []
-    assert layout.breadcrumbs == [
-        ('Homepage', 'DummyPrincipal/', ''),
-        ('Votes', 'SwissVoteCollection/', ''),
-        ('Update dataset', '#', 'current')
-    ]
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/SwissVoteCollection/#'
 
     # Log in as editor
     request.roles = ['editor']
@@ -384,11 +378,7 @@ def test_layout_delete_votes():
     layout = DeleteVotesLayout(model, request)
     assert layout.title == _("Delete all votes")
     assert layout.editbar_links == []
-    assert layout.breadcrumbs == [
-        ('Homepage', 'DummyPrincipal/', ''),
-        ('Votes', 'SwissVoteCollection/', ''),
-        ('Delete all votes', '#', 'current')
-    ]
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/SwissVoteCollection/#'
 
     # Log in as editor
     request.roles = ['editor']

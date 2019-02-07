@@ -1,4 +1,5 @@
 from cached_property import cached_property
+from onegov.core.elements import Link
 from onegov.swissvotes import _
 from onegov.swissvotes.layouts.default import DefaultLayout
 
@@ -11,39 +12,44 @@ class VotesLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if not self.request.has_role('admin', 'editor'):
-            return []
-
-        result = [
-            (
-                _("Update dataset"),
-                self.request.link(self.model.default(), name='update'),
-                'upload-icon'
-            ),
-            (
-                _("Download dataset (CSV)"),
-                self.request.link(self.model.default(), name='csv'),
-                'export-icon'
-            ),
-            (
-                _("Download dataset (XLSX)"),
-                self.request.link(self.model.default(), name='xlsx'),
-                'export-icon'
+        result = []
+        if self.request.has_role('admin', 'editor'):
+            result.append(
+                Link(
+                    text=_("Update dataset"),
+                    url=self.request.link(self.model.default(), name='update'),
+                    attrs={'class': 'upload-icon'}
+                )
             )
-        ]
+            result.append(
+                Link(
+                    text=_("Download dataset (CSV)"),
+                    url=self.request.link(self.model.default(), name='csv'),
+                    attrs={'class': 'export-icon'}
+                )
+            )
+            result.append(
+                Link(
+                    text=_("Download dataset (XLSX)"),
+                    url=self.request.link(self.model.default(), name='xlsx'),
+                    attrs={'class': 'export-icon'}
+                )
+            )
         if self.request.has_role('admin'):
-            result.append((
-                _("Delete all votes"),
-                self.request.link(self.model.default(), name='delete'),
-                'delete-icon'
-            ))
+            result.append(
+                Link(
+                    text=_("Delete all votes"),
+                    url=self.request.link(self.model.default(), name='delete'),
+                    attrs={'class': 'delete-icon'}
+                )
+            )
         return result
 
     @cached_property
     def breadcrumbs(self):
         return [
-            (_("Homepage"), self.homepage_link, ''),
-            (self.title, self.votes_link, 'current'),
+            Link(_("Homepage"), self.homepage_url),
+            Link(self.title, self.votes_url),
         ]
 
 
@@ -56,9 +62,9 @@ class UpdateVotesLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self):
         return [
-            (_("Homepage"), self.homepage_link, ''),
-            (_("Votes"), self.votes_link, ''),
-            (self.title, '#', 'current'),
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Votes"), self.votes_url),
+            Link(self.title, '#'),
         ]
 
 
@@ -71,7 +77,7 @@ class DeleteVotesLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self):
         return [
-            (_("Homepage"), self.homepage_link, ''),
-            (_("Votes"), self.votes_link, ''),
-            (self.title, '#', 'current'),
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Votes"), self.votes_url),
+            Link(self.title, '#'),
         ]

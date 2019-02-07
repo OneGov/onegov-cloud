@@ -101,7 +101,7 @@ def delete_vote(self, request, form):
     if form.submitted(request):
         request.session.delete(self)
         request.message(_("Vote deleted"), 'success')
-        return request.redirect(layout.votes_link)
+        return request.redirect(layout.votes_url)
 
     return {
         'layout': layout,
