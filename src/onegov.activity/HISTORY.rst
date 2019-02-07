@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.11.0 (2019-02-07)
+~~~~~~~~~~~~~~~~~~~
 
 - Groups invoice items under an invoice record.
   [href]
