@@ -1,5 +1,5 @@
 from cached_property import cached_property
-from onegov.activity import InvoiceItem, InvoiceItemCollection
+from onegov.activity import InvoiceItem
 
 
 class InvoiceAction(object):
@@ -12,12 +12,8 @@ class InvoiceAction(object):
         self.text = text
 
     @cached_property
-    def invoice_items(self):
-        return InvoiceItemCollection(self.session)
-
-    @cached_property
     def item(self):
-        return self.invoice_items.by_id(self.id)
+        return self.session.query(InvoiceItem).filter_by(id=self.id).first()
 
     @property
     def valid(self):
@@ -43,15 +39,14 @@ class InvoiceAction(object):
             yield item
 
             if self.extend_to == 'invoice':
-                q = self.invoice_items.query()
+                q = self.session.query(InvoiceItem)
                 q = q.filter(InvoiceItem.id != item.id)
-                q = q.filter(InvoiceItem.username == item.username)
-                q = q.filter(InvoiceItem.invoice == item.invoice)
+                q = q.filter(InvoiceItem.invoice_id == item.invoice_id)
 
                 yield from q
 
             if self.extend_to == 'family':
-                q = self.invoice_items.query()
+                q = self.session.query(InvoiceItem)
                 q = q.filter(InvoiceItem.id != item.id)
                 q = q.filter(InvoiceItem.family == item.family)
 
@@ -74,17 +69,17 @@ class InvoiceAction(object):
     def execute_mark_paid(self, targets):
         for target in targets:
             target.paid = True
-            assert not target.disable_changes, "item was paid online"
+            assert not target.invoice.disable_changes, "item was paid online"
 
     def execute_mark_unpaid(self, targets):
         for target in targets:
             target.paid = False
             target.tid = None
             target.source = None
-            assert not target.disable_changes, "item was paid online"
+            assert not target.invoice.disable_changes, "item was paid online"
 
     def execute_remove_manual(self, targets):
         for target in targets:
             assert target.family and target.family.startswith('manual-')
-            assert not target.disable_changes, "item was paid online"
+            assert not target.invoice.disable_changes, "item was paid online"
             self.session.delete(target)

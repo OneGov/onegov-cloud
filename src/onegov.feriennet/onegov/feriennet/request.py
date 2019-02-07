@@ -1,6 +1,6 @@
 from cached_property import cached_property
 from onegov.org.request import OrgRequest
-from onegov.user import UserCollection
+from onegov.user import User
 
 
 class FeriennetRequest(OrgRequest):
@@ -39,5 +39,5 @@ class FeriennetRequest(OrgRequest):
     @cached_property
     def current_user(self):
         if self.identity:
-            return UserCollection(self.app.session()).by_username(
-                self.identity.userid)
+            return self.session.query(User)\
+                .filter_by(username=self.identity.userid).first()

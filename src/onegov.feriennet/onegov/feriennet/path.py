@@ -1,7 +1,7 @@
 from onegov.activity import ActivityFilter
 from onegov.activity import Attendee, AttendeeCollection
 from onegov.activity import Booking, BookingCollection
-from onegov.activity import InvoiceItemCollection, InvoiceItem
+from onegov.activity import InvoiceCollection, InvoiceItem
 from onegov.activity import Occasion, OccasionCollection
 from onegov.activity import Period, PeriodCollection
 from onegov.feriennet import FeriennetApp
@@ -136,7 +136,7 @@ def get_billing(request, app, period_id, username=None, expand=False):
     if not period:
         return None
 
-    return BillingCollection(app.session(), period, username, expand)
+    return BillingCollection(request, period, username, expand)
 
 
 @FeriennetApp.path(
@@ -154,27 +154,30 @@ def get_invoice_action(request, app, id, action, extend_to=None):
 
 
 @FeriennetApp.path(
-    model=InvoiceItemCollection,
+    model=InvoiceCollection,
     path='/my-bills')
 def get_my_invoies(request, app, username=None, invoice=None):
-
-    # only admins can actually specify the username and/or invoice
+    # only admins can actually specify the username/invoice
     if not request.is_admin:
-        username = request.current_username
-        invoice = None
+        username, invoice = None, None
 
     # the default username is the current user
     if not username:
         username = request.current_username
 
-    return InvoiceItemCollection(app.session(), username, invoice)
+    # XXX username should be user_id, invoice should be period_id
+    # this should be changed, but needs to be changed by replacing
+    # the username everywhere
+    return InvoiceCollection(
+        app.session(), period_id=invoice,
+        user_id=request.app.user_ids_by_name[username])
 
 
 @FeriennetApp.path(
     model=InvoiceItem,
     path='/invoice-item/{id}')
 def get_my_invoice_item(request, app, id):
-    return InvoiceItemCollection(app.session()).by_id(id)
+    return request.session.query(InvoiceItem).filter_by(id=id).first()
 
 
 @FeriennetApp.path(

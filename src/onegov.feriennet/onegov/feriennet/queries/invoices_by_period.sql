@@ -6,14 +6,15 @@ WITH
 -- the invoice item rows
 details AS (
     SELECT
-        id,
-        username,
+        invoice_items.id,
+        invoice_items.invoice_id,
+        users.username,
         "group",
         "text",
         "family",
         paid as paid,
         unit * quantity as amount,
-        invoice::uuid as period_id,
+        invoices.period_id,
         source,
         ARRAY_LENGTH(payment.states, 1) > 0 AS has_online_payments,
         CASE
@@ -32,6 +33,8 @@ details AS (
         END AS changes
     FROM
         invoice_items
+    LEFT JOIN invoices ON invoice_items.invoice_id = invoices.id
+    LEFT JOIN users ON invoices.user_id = users.id
     LEFT JOIN (
         SELECT
             payments_for_invoice_items_payments.invoice_items_id,
@@ -41,7 +44,7 @@ details AS (
         LEFT JOIN payments
             ON payments_for_invoice_items_payments.payment_id = payments.id
         GROUP BY invoice_items_id
-    ) AS payment ON invoice_items_id = id
+    ) AS payment ON invoice_items_id = invoice_items.id
 ),
 
 -- the totals
@@ -75,7 +78,7 @@ invoices AS (
         details.changes,
         details.source,
         details.has_online_payments,
-        MD5(replace(details.period_id::text, '-', '') || details.username) as invoice_id,
+        details.invoice_id,
         totals.paid as invoice_paid,
         totals.amount as invoice_amount,
         totals.outstanding as invoice_outstanding,

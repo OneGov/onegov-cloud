@@ -1,17 +1,15 @@
-from itertools import groupby
-from onegov.activity import InvoiceItem, InvoiceItemCollection
+from onegov.activity import Period, Invoice, InvoiceItem, InvoiceCollection
 from onegov.core.security import Personal, Secret
 from onegov.core.templates import render_macro
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.collections import BillingCollection
-from onegov.feriennet.collections import BillingDetails
 from onegov.feriennet.layout import InvoiceLayout
-from onegov.feriennet.views.shared import all_users
+from onegov.feriennet.views.shared import users_for_select_element
 from onegov.pay import process_payment
-from sortedcontainers import SortedDict
+from onegov.user import User
 from stdnum import iban
 from sqlalchemy import nullsfirst
-from uuid import UUID
+from sqlalchemy.orm import contains_eager
 
 
 @FeriennetApp.view(
@@ -19,11 +17,15 @@ from uuid import UUID
     permission=Personal,
 )
 def redirect_to_invoice_view(self, request):
-    return request.redirect(request.link(
-        InvoiceItemCollection(
-            request.session, username=self.username, invoice=self.invoice
+    return request.redirect(
+        request.link(
+            InvoiceCollection(
+                request.session,
+                user_id=self.invoice.user_id,
+                period_id=self.invoice.period_id
+            )
         )
-    ))
+    )
 
 
 @FeriennetApp.view(
@@ -35,39 +37,38 @@ def view_creditcard_payments(self, request):
     return request.redirect(request.class_link(
         BillingCollection,
         {
-            'username': self.username,
-            'period_id': UUID(self.invoice)
+            'username': self.invoice.user.username,
+            'period_id': self.invoice.period_id
         }, name='online-payments'
     ))
 
 
 @FeriennetApp.html(
-    model=InvoiceItemCollection,
+    model=InvoiceCollection,
     template='invoices.pt',
     permission=Personal)
 def view_my_invoices(self, request):
-
     periods = {p.id.hex: p for p in request.app.periods if p.finalized}
-    bills = SortedDict(lambda period: period.execution_start)
 
-    if periods:
-        q = self.query()
-        q = q.order_by(
-            InvoiceItem.invoice,
-            nullsfirst(InvoiceItem.family),
-            InvoiceItem.group,
-            InvoiceItem.text
-        )
-        q = q.filter(InvoiceItem.invoice.in_(periods.keys()))
+    q = self.query()
+    q = q.filter(Invoice.period_id.in_(periods.keys()))
+    q = q.outerjoin(Period)
+    q = q.outerjoin(InvoiceItem)
+    q = q.options(contains_eager(Invoice.items))
+    q = q.order_by(
+        Period.execution_start,
+        Invoice.id,
+        nullsfirst(InvoiceItem.family),
+        InvoiceItem.group,
+        InvoiceItem.text
+    )
 
-        for period_hex, items in groupby(q, lambda i: i.invoice):
-            billing_period = periods[period_hex]
-            bills[billing_period] = BillingDetails(billing_period.title, items)
+    invoices = tuple(q)
 
-    users = all_users(request)
-    user = next(u for u in users if u.username == self.username)
+    users = users_for_select_element(request)
+    user = request.session.query(User).filter_by(id=self.user_id).first()
 
-    if request.current_username == self.username:
+    if request.current_user.id == self.user_id:
         title = _("Invoices")
     else:
         title = _("Invoices of ${user}", mapping={
@@ -100,16 +101,22 @@ def view_my_invoices(self, request):
             button_label=label,
             title=title,
             price=price,
-            email=self.username,
+            email=user.username,
             locale=request.locale
         )
+
+    def user_select_link(user):
+        return request.class_link(InvoiceCollection, {
+            'username': user.username,
+        })
 
     return {
         'title': title,
         'layout': layout,
         'users': users,
         'user': user,
-        'bills': bills,
+        'user_select_link': user_select_link,
+        'invoices': invoices,
         'model': self,
         'account': account,
         'payment_provider': payment_provider,
@@ -119,7 +126,7 @@ def view_my_invoices(self, request):
 
 
 @FeriennetApp.view(
-    model=InvoiceItemCollection,
+    model=InvoiceCollection,
     template='invoices.pt',
     permission=Personal,
     request_method='POST')
@@ -128,23 +135,24 @@ def handle_payment(self, request):
     token = request.params.get('payment_token')
     period = request.params.get('period')
 
-    q = self.query()
-    q = q.filter(InvoiceItem.invoice == period)
-    q = q.filter(InvoiceItem.paid == False)
+    invoice = self.for_period_id(period_id=period).query()\
+        .outerjoin(InvoiceItem)\
+        .one()
 
-    items = tuple(q)
-    bill = BillingDetails(period, items)
-    price = request.app.default_payment_provider.adjust_price(bill.price)
+    price = request.app.default_payment_provider.adjust_price(invoice.price)
     payment = process_payment('cc', price, provider, token)
 
     if not payment:
         request.alert(_("Your payment could not be processed"))
     else:
+        for item in invoice.items:
 
-        for item in items:
+            if item.paid:
+                continue
+
             item.payments.append(payment)
-            item.paid = True
             item.source = provider.type
+            item.paid = True
 
         request.success(_("Your payment has been received. Thank you!"))
 

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for latest onegov.activity.
+  [href]
+
 - Fixes booking details toggle targeting too many elements.
   [href]
 

@@ -1,4 +1,4 @@
-from onegov.activity import BookingCollection, InvoiceItemCollection
+from onegov.activity import BookingCollection, InvoiceCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
@@ -107,7 +107,7 @@ class TemplateVariables(object):
 
     def invoices_link(self):
         return '<a href="{}">{}</a>'.format(
-            self.request.class_link(InvoiceItemCollection),
+            self.request.class_link(InvoiceCollection),
             self.request.translate(_("Invoices"))
         )
 

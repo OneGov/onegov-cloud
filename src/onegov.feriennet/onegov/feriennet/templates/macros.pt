@@ -503,7 +503,7 @@
             <tal:b repeat="u users">
                 <option tal:condition="u.username == request.current_username or u.realname"
                         tal:attributes="selected u.id == user.id"
-                        value="${request.link(model.for_username(u.username))}">
+                        value="${user_select_link(u)}">
                     ${u.title}
                 </option>
             </tal:b>
@@ -547,10 +547,10 @@
         <tal:b case="'invoice_items'">
             <div tal:condition="repeat.link.start">
                 <a href="${request.link(link)}">
-                    <strong>${request.app.users_by_username[link.username].title}</strong>
+                    <strong>${request.app.user_titles_by_name[link.invoice.user.username]}</strong>
                 </a>
                 <div>
-                    ${request.app.periods_by_id[link.invoice].title}
+                    ${request.app.periods_by_id[link.invoice.period_id.hex].title}
                 </div>
             </div>
         </tal:b>

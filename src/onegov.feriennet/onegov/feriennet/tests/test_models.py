@@ -39,7 +39,7 @@ def test_template_variables():
 
     assert t.render("Welcome to [PERIOD]") == "Welcome to Foobar Pass"
     assert t.render("Go to [INVOICES]") \
-        == 'Go to <a href="InvoiceItemCollection">INVOICES</a>'
+        == 'Go to <a href="InvoiceCollection">INVOICES</a>'
     assert t.render("Go to [BOOKINGS]") \
         == 'Go to <a href="BookingCollection">BOOKINGS</a>'
     assert t.render("Go to [ACTIVITIES]") \

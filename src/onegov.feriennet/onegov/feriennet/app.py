@@ -13,7 +13,8 @@ from onegov.org.app import get_common_asset as default_common_asset
 from onegov.org.app import get_i18n_localedirs as default_i18n_localedirs
 from onegov.org.app import get_public_ticket_messages \
     as default_public_ticket_messages
-from onegov.user import UserCollection
+from onegov.user import User, UserCollection
+from sqlalchemy.orm import undefer
 
 
 BANNER_TEMPLATE = """
@@ -64,10 +65,14 @@ class FeriennetApp(OrgApp):
         }
 
     @orm_cached(policy='on-table-change:users')
-    def users_by_username(self):
-        return {
-            u.username: u for u in UserCollection(self.session()).query()
-        }
+    def user_titles_by_name(self):
+        return dict(UserCollection(self.session()).query().with_entities(
+            User.username, User.title))
+
+    @orm_cached(policy='on-table-change:users')
+    def user_ids_by_name(self):
+        return dict(UserCollection(self.session()).query().with_entities(
+            User.username, User.id))
 
     @cached_property
     def sponsors(self):

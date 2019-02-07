@@ -206,7 +206,7 @@ class NotificationTemplateSendForm(Form):
 
     def recipients_with_unpaid_bills(self):
         period = self.request.app.active_period
-        billing = BillingCollection(self.request.session, period)
+        billing = BillingCollection(self.request, period)
 
         return {
             username for username, bill in billing.bills.items()

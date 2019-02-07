@@ -1,12 +1,12 @@
 from base64 import b64decode
 from gzip import GzipFile
 from io import BytesIO
-from onegov.activity import InvoiceItem, InvoiceItemCollection
+from onegov.activity import Invoice, InvoiceItem, InvoiceCollection
 from onegov.activity.iso20022 import match_iso_20022_to_usernames
 from onegov.core.custom import json
 from onegov.core.security import Secret
 from onegov.feriennet import FeriennetApp, _
-from onegov.feriennet.collections import BillingCollection, BillingDetails
+from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.forms import BillingForm
 from onegov.feriennet.forms import BankStatementImportForm
 from onegov.feriennet.forms import ManualBookingForm
@@ -22,6 +22,7 @@ from onegov.pay import payments_association_table_for
 from onegov.user import UserCollection, User
 from purl import URL
 from sqlalchemy import desc
+from sqlalchemy.orm import joinedload
 
 
 @FeriennetApp.form(
@@ -70,7 +71,7 @@ def view_billing(self, request, form):
             _("Show invoice"),
             attrs={'class': 'show-invoice'},
             url=request.class_link(
-                InvoiceItemCollection, {
+                InvoiceCollection, {
                     'username': details.first.username,
                     'invoice': self.period.id.hex
                 }
@@ -230,7 +231,7 @@ def view_online_payments(self, request):
     table = payments_association_table_for(InvoiceItem)
     session = request.session
 
-    invoice_item_ids = self.invoice_items.query()
+    invoice_item_ids = self.invoices.query_items()
     invoice_item_ids = invoice_item_ids.with_entities(InvoiceItem.id)
 
     payment_ids = session.query(table.c.payment_id)
@@ -248,7 +249,7 @@ def view_online_payments(self, request):
     }
 
     title = _("Online Payments by ${name}", mapping={
-        'name': self.invoice_items.query().first().user.title
+        'name': request.app.user_titles_by_name[self.username]
     })
 
     layout = OnlinePaymentsLayout(self, request, title=title)
@@ -307,7 +308,7 @@ def execute_invoice_action(self, request):
         else:
             response.headers.add('X-IC-Trigger', 'reload-from')
             response.headers.add('X-IC-Trigger-Data', json.dumps({
-                'selector': '#' + BillingDetails.invoice_id(self.item)
+                'selector': f'#{self.item.invoice_id}'
             }))
 
 
@@ -325,25 +326,27 @@ def view_execute_import(self, request):
     xml = xml.decode('utf-8')
 
     invoice = cache['invoice']
-    invoices = InvoiceItemCollection(request.session)
+    invoices = InvoiceCollection(request.session)
 
     transactions = list(
-        match_iso_20022_to_usernames(xml, invoices, invoice))
+        match_iso_20022_to_usernames(xml, request.session, period_id=invoice))
+
+    users = dict(
+        request.session.query(User).with_entities(User.username, User.id))
 
     payments = {
-        t.username: t for t in transactions if t.state == 'success'
-    }
+        users[t.username]: t for t in transactions if t.state == 'success'}
 
     if payments:
-        invoices = InvoiceItemCollection(request.session)
-        invoices = invoices.for_invoice(cache['invoice'])
+        invoices = InvoiceCollection(request.session, period_id=invoice)
         invoices = invoices.query()
-        invoices = invoices.filter(InvoiceItem.username.in_(payments.keys()))
+        invoices = invoices.filter(Invoice.user_id.in_(payments.keys()))
 
-        for invoice in invoices:
-            invoice.tid = payments[invoice.username].tid
-            invoice.source = 'xml'
-            invoice.paid = True
+        for invoice in invoices.options(joinedload(Invoice.items)):
+            for item in invoice.items:
+                item.tid = payments[invoice.user_id].tid
+                item.source = 'xml'
+                item.paid = True
 
         request.success(_("Imported ${count} payments", mapping={
             'count': len(payments)
@@ -385,11 +388,9 @@ def view_billing_import(self, request, form):
         xml = GzipFile(filename='', mode='r', fileobj=binary).read()
         xml = xml.decode('utf-8')
 
-        invoice = cache['invoice']
-        invoices = InvoiceItemCollection(request.session)
-
         transactions = list(
-            match_iso_20022_to_usernames(xml, invoices, invoice))
+            match_iso_20022_to_usernames(
+                xml, request.session, period_id=cache['invoice']))
 
         if not transactions:
             del request.browser_session['account-statement']
@@ -418,7 +419,7 @@ def view_billing_import(self, request, form):
         'uploaded': uploaded,
         'users': users,
         'user_link': lambda u: request.class_link(
-            InvoiceItemCollection, {'username': u}
+            InvoiceCollection, {'username': u}
         ),
         'success_count': transactions and sum(
             1 for t in transactions if t.state == 'success'

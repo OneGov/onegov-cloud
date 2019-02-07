@@ -266,7 +266,10 @@ def test_notification_template_send_form(session):
     assert len(form.recipients_with_unpaid_bills()) == 0
 
     period = periods.query().one()
-    billing = BillingCollection(session, period)
+    billing = BillingCollection(request=Bunch(
+        session=session,
+        app=Bunch()
+    ), period=period)
     billing.create_invoices()
     transaction.commit()
 

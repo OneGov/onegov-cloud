@@ -14,11 +14,12 @@ from onegov.core.utils import normalize_for_url, module_path
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.layout import BookingCollectionLayout
 from onegov.feriennet.models import AttendeeCalendar
-from onegov.feriennet.views.shared import all_users
+from onegov.feriennet.views.shared import users_for_select_element
 from onegov.org.elements import ConfirmLink, DeleteLink
 from sqlalchemy import select, and_
 from sqlalchemy.orm import contains_eager
 from sortedcontainers import SortedList
+from onegov.user import User
 from uuid import UUID
 
 
@@ -216,8 +217,9 @@ def view_my_bookings(self, request):
         related = None
 
     if request.is_admin:
-        users = all_users(request)
-        user = next(u for u in users if u.username == self.username)
+        users = users_for_select_element(request)
+        user = request.session.query(User)\
+            .filter_by(username=self.username).first()
     else:
         users, user = None, request.current_user
 
@@ -248,6 +250,12 @@ def view_my_bookings(self, request):
 
     layout = BookingCollectionLayout(self, request, user)
 
+    def user_select_link(user):
+        return request.class_link(BookingCollection, {
+            'username': user.username,
+            'period_id': period and period.id or None
+        })
+
     return {
         'actions_by_booking': lambda b: actions_by_booking(layout, period, b),
         'attendees': attendees,
@@ -263,6 +271,7 @@ def view_my_bookings(self, request):
         'related': related,
         'user': user,
         'users': users,
+        'user_select_link': user_select_link,
         'title': layout.title,
         'has_emergency_contact': has_emergency_contact,
         'show_emergency_info': show_emergency_info
