@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-05 16:02+0100\n"
-"PO-Revision-Date: 2019-02-05 16:02+0100\n"
+"POT-Creation-Date: 2019-02-07 10:47+0100\n"
+"PO-Revision-Date: 2019-02-06 11:04+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -41,6 +41,15 @@ msgstr "- keine -"
 msgid "BFS number"
 msgstr "BFS Nummer"
 
+msgid "File"
+msgstr "Datei"
+
+msgid "Start date"
+msgstr "Startdatum"
+
+msgid "End date"
+msgstr "Enddatum"
+
 msgid "User groups"
 msgstr "Benutzergruppen"
 
@@ -76,6 +85,12 @@ msgstr "Benutzer"
 
 msgid "Municipalities"
 msgstr "Gemeinden"
+
+msgid "Import data"
+msgstr "Daten importieren"
+
+msgid "Delete pick-up dates"
+msgstr "Abholtermine löschen"
 
 msgid "Do you really want to delete this municipality?"
 msgstr "Diese Gemeinde wirklich löschen?"
@@ -120,6 +135,9 @@ msgstr "Passwort zurücksetzen"
 msgid "Number of users"
 msgstr "Anzahl Benutzer"
 
+msgid "Pick-up dates"
+msgstr "Abholtermine"
+
 msgid "Dear Sir or Madam,"
 msgstr "Sehr geehrte Damen und Herren,"
 
@@ -136,6 +154,31 @@ msgstr "Anmelden"
 
 msgid "Logout"
 msgstr "Abmelden"
+
+#, python-format
+msgid "Some rows contain invalid values: ${errors}."
+msgstr "Einige Zeilen enthalten ungültige Werte: ${errors}."
+
+msgid "Some columns are missing."
+msgstr "Einige Spalten fehlen."
+
+msgid "Some column names are ambigous."
+msgstr "Einige Spaltennamen sind zweideutig."
+
+msgid "Some column names appear twice."
+msgstr "Einige Spaltennamen erscheinen doppelt."
+
+msgid "The file is empty."
+msgstr "Die Datei ist leer."
+
+msgid "The file contains an empty line."
+msgstr "Die Datei enthält eine leere Zeile."
+
+msgid "Invalid encoding."
+msgstr "Ungültige Kodierung."
+
+msgid "Not a valid CSV file."
+msgstr "Keine gültige CSV-Datei."
 
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"
@@ -177,14 +220,23 @@ msgstr "Benutzer hinzugefügt."
 msgid "User modified."
 msgstr "Benutzer geändert."
 
+msgid "Import"
+msgstr "Importieren"
+
 msgid "Municipality deleted."
 msgstr "Gemeinde gelöscht."
+
+msgid "Municipality data imported."
+msgstr "Gemeindedaten importiert."
 
 msgid "Municipality added."
 msgstr "Gemeinde hinzugefügt."
 
 msgid "Municipality modified."
 msgstr "Gemeinde geändert."
+
+msgid "Pick-up dates deleted."
+msgstr "Abholtermine gelöscht."
 
 msgid "Access Denied"
 msgstr "Zugriff verweigert"

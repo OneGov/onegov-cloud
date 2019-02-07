@@ -1,12 +1,18 @@
+from cgi import FieldStorage
+from datetime import date
+from io import BytesIO
 from mock import MagicMock
 from onegov.user import User
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
 from onegov.wtfs.collections import MunicipalityCollection
+from onegov.wtfs.forms import DeleteMunicipalityDatesForm
+from onegov.wtfs.forms import ImportMunicipalityDataForm
 from onegov.wtfs.forms import MunicipalityForm
 from onegov.wtfs.forms import UnrestrictedUserForm
 from onegov.wtfs.forms import UserForm
 from onegov.wtfs.forms import UserGroupForm
+from onegov.wtfs.models import PickupDate
 
 
 class App(object):
@@ -120,6 +126,108 @@ def test_municipality_form(session):
     )
     form.request = Request(session)
     form.on_request()
+    assert form.validate()
+
+
+def test_import_municipality_data_form(session):
+    municipalities = MunicipalityCollection(session)
+    municipalities.add(name="Gemeinde Winterthur", bfs_number=230)
+    municipalities.add(name="Gemeinde Adlikon", bfs_number=21)
+
+    # Test apply
+    form = ImportMunicipalityDataForm()
+    form.request = Request(session)
+
+    form.file.data = {
+        21: {
+            'name': 'Adikon',
+            'dates': [date(2019, 1, 1), date(2019, 1, 7)]
+        },
+        211: {
+            'name': 'Altikon',
+            'dates': [date(2019, 1, 2), date(2019, 1, 8)]
+        },
+        241: {
+            'name': 'Aesch',
+            'dates': [date(2019, 1, 3), date(2019, 1, 9)]
+        },
+        230: {
+            'name': 'Winterthur',
+            'dates': [date(2019, 1, 4), date(2019, 1, 10)]
+        }
+    }
+    form.update_model(municipalities)
+    assert [
+        (m.name, m.bfs_number, [d.date for d in m.pickup_dates])
+        for m in municipalities.query()
+    ] == [
+        ('Adikon', 21, [date(2019, 1, 1), date(2019, 1, 7)]),
+        ('Aesch', 241, [date(2019, 1, 3), date(2019, 1, 9)]),
+        ('Altikon', 211, [date(2019, 1, 2), date(2019, 1, 8)]),
+        ('Winterthur', 230, [date(2019, 1, 4), date(2019, 1, 10)])
+    ]
+
+    # Test validation
+    form = ImportMunicipalityDataForm()
+    form.request = Request(session)
+    assert not form.validate()
+
+    field_storage = FieldStorage()
+    field_storage.file = BytesIO(
+        (
+            "Gemeinde,Gemeinde-Nr,Vordefinierte Termine\n"
+            "Adlikon,21,12.2.2015"
+        ).encode('utf-8')
+    )
+    field_storage.type = 'text/csv'
+    field_storage.filename = 'test.csv'
+    form.file.process(PostData({'file': field_storage}))
+
+    assert form.validate()
+
+
+def test_delete_municipality_dates_form(session):
+    municipalities = MunicipalityCollection(session)
+    municipality = municipalities.add(
+        name="Gemeinde Winterthur",
+        bfs_number=230,
+    )
+
+    # Test apply / update
+    form = DeleteMunicipalityDatesForm()
+    form.request = Request(session)
+    form.apply_model(municipality)
+    assert form.start.data is None
+    assert form.end.data is None
+
+    form.start.data = date(2019, 1, 1)
+    form.end.data = date(2019, 12, 31)
+    form.update_model(municipality)
+
+    municipality.pickup_dates.append(PickupDate(date=date(2018, 12, 31)))
+    municipality.pickup_dates.append(PickupDate(date=date(2019, 1, 1)))
+    municipality.pickup_dates.append(PickupDate(date=date(2019, 6, 6)))
+    municipality.pickup_dates.append(PickupDate(date=date(2019, 12, 31)))
+    municipality.pickup_dates.append(PickupDate(date=date(2020, 1, 1)))
+
+    form.apply_model(municipality)
+    assert form.start.data == date(2018, 12, 31)
+    assert form.end.data == date(2020, 1, 1)
+
+    form.start.data = date(2019, 1, 1)
+    form.end.data = date(2019, 12, 31)
+    form.update_model(municipality)
+    assert [d.date for d in municipality.pickup_dates] == [
+        date(2018, 12, 31), date(2020, 1, 1)
+    ]
+
+    # Test validation
+    form = DeleteMunicipalityDatesForm()
+    assert not form.validate()
+
+    form = DeleteMunicipalityDatesForm(
+        PostData({'start': "2019-01-01", 'end': "2019-12-31"})
+    )
     assert form.validate()
 
 

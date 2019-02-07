@@ -12,6 +12,11 @@
                     <dd>
                         <a tal:condition="layout.model.group" href="${request.link(layout.model.group)}">${layout.model.group.name}</a>
                     </dd>
+
+                    <dt i18n:translate>Pick-up dates</dt>
+                    <dd tal:repeat="date layout.model.pickup_dates">
+                        <a>${layout.format_date(date.date, 'date')}</a>
+                    </dd>
                 </dl>
             </div>
         </div>

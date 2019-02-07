@@ -7,9 +7,11 @@ from onegov.wtfs.layouts import AddMunicipalityLayout
 from onegov.wtfs.layouts import AddUserGroupLayout
 from onegov.wtfs.layouts import AddUserLayout
 from onegov.wtfs.layouts import DefaultLayout
+from onegov.wtfs.layouts import DeleteMunicipalityDatesLayout
 from onegov.wtfs.layouts import EditMunicipalityLayout
 from onegov.wtfs.layouts import EditUserGroupLayout
 from onegov.wtfs.layouts import EditUserLayout
+from onegov.wtfs.layouts import ImportMunicipalityDataLayout
 from onegov.wtfs.layouts import MailLayout
 from onegov.wtfs.layouts import MunicipalitiesLayout
 from onegov.wtfs.layouts import MunicipalityLayout
@@ -160,9 +162,12 @@ def test_municipality_layouts():
     assert layout.success_url == ''
 
     layout = MunicipalitiesLayout(model, request_admin)
-    assert list(hrefs(layout.editbar_links)) == ['MunicipalityCollection/add']
+    assert list(hrefs(layout.editbar_links)) == [
+        'MunicipalityCollection/import-data',
+        'MunicipalityCollection/add'
+    ]
 
-    # .. add
+    # ... add
     layout = AddMunicipalityLayout(model, request)
     assert layout.title == 'Add'
     assert layout.editbar_links == []
@@ -173,6 +178,19 @@ def test_municipality_layouts():
     assert layout.success_url == 'MunicipalityCollection/'
 
     layout = AddMunicipalityLayout(model, request_admin)
+    assert list(hrefs(layout.editbar_links)) == []
+
+    # ... import data
+    layout = ImportMunicipalityDataLayout(model, request)
+    assert layout.title == 'Import data'
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == (
+        'DummyPrincipal/MunicipalityCollection/#'
+    )
+    assert layout.cancel_url == 'MunicipalityCollection/'
+    assert layout.success_url == 'MunicipalityCollection/'
+
+    layout = ImportMunicipalityDataLayout(model, request_admin)
     assert list(hrefs(layout.editbar_links)) == []
 
     # Municipality
@@ -189,6 +207,7 @@ def test_municipality_layouts():
     layout = MunicipalityLayout(model, request_admin)
     assert list(hrefs(layout.editbar_links)) == [
         'Municipality/edit',
+        'Municipality/delete-dates',
         'Municipality/?csrf-token=x'
     ]
 
@@ -203,6 +222,19 @@ def test_municipality_layouts():
     assert layout.success_url == 'MunicipalityCollection/'
 
     layout = EditMunicipalityLayout(model, request_admin)
+    assert list(hrefs(layout.editbar_links)) == []
+
+    # ... delete dates
+    layout = DeleteMunicipalityDatesLayout(model, request)
+    assert layout.title == 'Delete pick-up dates'
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == (
+        'DummyPrincipal/MunicipalityCollection/Municipality/#'
+    )
+    assert layout.cancel_url == 'Municipality/'
+    assert layout.success_url == 'Municipality/'
+
+    layout = DeleteMunicipalityDatesLayout(model, request_admin)
     assert list(hrefs(layout.editbar_links)) == []
 
 

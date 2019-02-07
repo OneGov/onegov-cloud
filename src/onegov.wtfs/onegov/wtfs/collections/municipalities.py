@@ -1,5 +1,6 @@
 from onegov.core.collection import GenericCollection
 from onegov.wtfs.models import Municipality
+from onegov.wtfs.models import PickupDate
 
 
 class MunicipalityCollection(GenericCollection):
@@ -12,3 +13,20 @@ class MunicipalityCollection(GenericCollection):
         query = super(MunicipalityCollection, self).query()
         query = query.order_by(None).order_by(Municipality.name)
         return query
+
+    def import_data(self, data):
+        for bfs_number, values in data.items():
+            query = self.query().filter(Municipality.bfs_number == bfs_number)
+            municipality = query.first()
+            if not municipality:
+                municipality = self.add(
+                    bfs_number=bfs_number,
+                    name=values['name']
+                )
+
+            municipality.name = values['name']
+
+            dates = set(values['dates'])
+            dates -= {d.date for d in municipality.pickup_dates}
+            for date in dates:
+                municipality.pickup_dates.append(PickupDate(date=date))

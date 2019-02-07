@@ -19,6 +19,14 @@ class MunicipalitiesLayout(DefaultLayout):
     @cached_property
     def editbar_links(self):
         result = []
+        if self.request.has_permission(self.model, EditModel):
+            result.append(
+                Link(
+                    text=_("Import data"),
+                    url=self.request.link(self.model, 'import-data'),
+                    attrs={'class': 'upload-icon'}
+                )
+            )
         if self.request.has_permission(self.model, AddModel):
             result.append(
                 LinkGroup(
@@ -45,6 +53,29 @@ class MunicipalitiesLayout(DefaultLayout):
         ]
 
 
+class ImportMunicipalityDataLayout(DefaultLayout):
+
+    @cached_property
+    def title(self):
+        return _("Import data")
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Municipalities"), self.municipalities_url),
+            Link(self.title, '#')
+        ]
+
+    @cached_property
+    def cancel_url(self):
+        return self.municipalities_url
+
+    @cached_property
+    def success_url(self):
+        return self.municipalities_url
+
+
 class MunicipalityLayout(DefaultLayout):
 
     @cached_property
@@ -60,6 +91,13 @@ class MunicipalityLayout(DefaultLayout):
                     text=_("Edit"),
                     url=self.request.link(self.model, 'edit'),
                     attrs={'class': 'edit-icon'}
+                )
+            )
+            result.append(
+                Link(
+                    text=_("Delete pick-up dates"),
+                    url=self.request.link(self.model, 'delete-dates'),
+                    attrs={'class': 'delete-icon'}
                 )
             )
         if self.request.has_permission(self.model, DeleteModel):
@@ -143,3 +181,27 @@ class EditMunicipalityLayout(DefaultLayout):
     @cached_property
     def success_url(self):
         return self.municipalities_url
+
+
+class DeleteMunicipalityDatesLayout(DefaultLayout):
+
+    @cached_property
+    def title(self):
+        return _("Delete pick-up dates")
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Municipalities"), self.municipalities_url),
+            Link(self.model.name, self.request.link(self.model)),
+            Link(self.title, '#')
+        ]
+
+    @cached_property
+    def cancel_url(self):
+        return self.request.link(self.model)
+
+    @cached_property
+    def success_url(self):
+        return self.request.link(self.model)

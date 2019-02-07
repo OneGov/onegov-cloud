@@ -3,6 +3,7 @@ from onegov.user import User
 from onegov.user import UserCollection
 from onegov.user import UserGroup
 from onegov.wtfs import WtfsApp
+from onegov.wtfs.models import Municipality
 
 
 class AddModel(object):
@@ -77,6 +78,16 @@ def has_permission_users(app, identity, model, permission):
     if identity.role == 'editor':
         if permission in {ViewModel, AddModel}:
             return True
+
+    return permission in getattr(app.settings.roles, identity.role)
+
+
+@WtfsApp.permission_rule(model=Municipality, permission=object)
+def has_permission_municipality(app, identity, model, permission):
+    # Municipalities with data canot not be deleted
+    if permission in {DeleteModel}:
+        if model.pickup_dates.first():
+            return False
 
     return permission in getattr(app.settings.roles, identity.role)
 

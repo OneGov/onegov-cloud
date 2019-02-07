@@ -1,5 +1,6 @@
 from onegov.core.request import CoreRequest
 from unittest.mock import patch
+from webtest.forms import Upload
 
 
 def test_views_municipality(client):
@@ -22,6 +23,27 @@ def test_views_municipality(client):
     edited = edit.form.submit().follow()
     assert "Gemeinde geändert." in edited
     assert "Gemeinde Aesch" in edited
+
+    upload = client.get('/municipalities').click("Daten importieren")
+    upload.form['file'] = Upload(
+        'test.csv',
+        (
+            "Gemeinde,Gemeinde-Nr,Vordefinierte Termine\n"
+            "Gemeinde Aesch,241,12.2.2015"
+        ).encode('utf-8'),
+        'text/csv'
+    )
+    uploaded = upload.form.submit().follow()
+    assert "Gemeindedaten importiert." in uploaded
+    assert "12.02.2015" in client.get('/municipalities')\
+        .click("Gemeinde Aesch")
+
+    clear = client.get('/municipalities').click("Gemeinde Aesch")\
+        .click("Abholtermine löschen")
+    cleared = clear.form.submit().follow()
+    assert "Abholtermine gelöscht." in cleared
+    assert "12.02.2015" not in client.get('/municipalities')\
+        .click("Gemeinde Aesch")
 
     deleted = client.get('/municipalities').click("Gemeinde Aesch")\
         .click("Löschen")

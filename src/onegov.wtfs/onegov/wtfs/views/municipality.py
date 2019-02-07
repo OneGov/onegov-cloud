@@ -2,9 +2,13 @@ from morepath import redirect
 from onegov.wtfs import _
 from onegov.wtfs import WtfsApp
 from onegov.wtfs.collections import MunicipalityCollection
+from onegov.wtfs.forms import DeleteMunicipalityDatesForm
+from onegov.wtfs.forms import ImportMunicipalityDataForm
 from onegov.wtfs.forms import MunicipalityForm
 from onegov.wtfs.layouts import AddMunicipalityLayout
+from onegov.wtfs.layouts import DeleteMunicipalityDatesLayout
 from onegov.wtfs.layouts import EditMunicipalityLayout
+from onegov.wtfs.layouts import ImportMunicipalityDataLayout
 from onegov.wtfs.layouts import MunicipalitiesLayout
 from onegov.wtfs.layouts import MunicipalityLayout
 from onegov.wtfs.models import Municipality
@@ -26,6 +30,31 @@ def view_municipalities(self, request):
 
     return {
         'layout': layout,
+    }
+
+
+@WtfsApp.form(
+    model=MunicipalityCollection,
+    name='import-data',
+    template='form.pt',
+    permission=EditModel,
+    form=ImportMunicipalityDataForm
+)
+def import_municipality_data(self, request, form):
+    """ Import municipality data. """
+
+    layout = ImportMunicipalityDataLayout(self, request)
+
+    if form.submitted(request):
+        form.update_model(self)
+        request.message(_("Municipality data imported."), 'success')
+        return redirect(layout.success_url)
+
+    return {
+        'layout': layout,
+        'form': form,
+        'button_text': _("Import"),
+        'cancel': layout.cancel_url
     }
 
 
@@ -95,6 +124,34 @@ def edit_municipality(self, request, form):
         'layout': layout,
         'form': form,
         'button_text': _("Save"),
+        'cancel': layout.cancel_url,
+    }
+
+
+@WtfsApp.form(
+    model=Municipality,
+    name='delete-dates',
+    template='form.pt',
+    permission=EditModel,
+    form=DeleteMunicipalityDatesForm
+)
+def delete_municipality_dates(self, request, form):
+    """ Delete a range of pick-up dates of a municipality. """
+
+    layout = DeleteMunicipalityDatesLayout(self, request)
+
+    if form.submitted(request):
+        form.update_model(self)
+        request.message(_("Pick-up dates deleted."), 'success')
+        return redirect(layout.success_url)
+
+    if not form.errors:
+        form.apply_model(self)
+
+    return {
+        'layout': layout,
+        'form': form,
+        'button_text': _("Delete"),
         'cancel': layout.cancel_url,
     }
 
