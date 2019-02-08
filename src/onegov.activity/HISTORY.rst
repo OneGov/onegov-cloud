@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.12.0 (2019-02-08)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds invoice references to support more banks.
   [href]
