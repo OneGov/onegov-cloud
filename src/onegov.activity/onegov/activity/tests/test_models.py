@@ -10,6 +10,8 @@ from onegov.activity import Attendee
 from onegov.activity import AttendeeCollection
 from onegov.activity import Booking, BookingCollection
 from onegov.activity import Invoice, InvoiceCollection
+from onegov.activity.models.invoice_reference import FeriennetSchema
+from onegov.activity.models.invoice_reference import ESRSchema
 from onegov.activity import Occasion, OccasionDate
 from onegov.activity import OccasionCollection
 from onegov.activity import Period
@@ -18,6 +20,7 @@ from onegov.activity import PublicationRequestCollection
 from onegov.activity.models import DAYS
 from onegov.core.utils import Bunch
 from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
 from psycopg2.extras import NumericRange
 from pytz import utc
 from uuid import uuid4
@@ -1908,6 +1911,81 @@ def test_invoices(session, owner, prebooking_period, inactive_period):
     assert i2.paid == True
 
     assert InvoiceCollection(session).unpaid_count() == 1
+
+
+def test_invoice_reference(session, owner, prebooking_period):
+    invoices = InvoiceCollection(
+        session, user_id=owner.id, period_id=prebooking_period.id)
+
+    # DEFAULT SCHEMA
+    # --------------
+    i1 = invoices.add()
+    assert len(i1.references) == 1
+    assert i1.references[0].reference.startswith('q')
+    assert i1.references[0].readable.startswith('Q')
+
+    # make sure linking to the same schema is idempotent
+    invoices.schema.link(session, i1)
+    session.refresh(i1)
+    assert len(i1.references) == 1
+
+    # ESR
+    # ---
+    invoices = invoices.for_schema('esr-v1')
+    invoices.schema.link(session, i1)
+    session.refresh(i1)
+    assert len(i1.references) == 2
+    assert len(i1.references[1].reference) == 27
+    assert ' ' in i1.references[1].readable
+
+    # make sure linking to the same schema is idempotent
+    invoices.schema.link(session, i1)
+    session.refresh(i1)
+
+    assert len(i1.references) == 2
+
+
+def test_invoice_reference_format_esr():
+
+    schema = ESRSchema()
+
+    assert schema.format('000127131108141601011502061')\
+        == '1271 31108 14160 10115 02061'
+
+    assert schema.format('127131108141601011502061')\
+        == '1271 31108 14160 10115 02061'
+
+    assert schema.checksum('96111690000000660000000928') == '4'
+    assert schema.checksum('12000000000023447894321689') == '9'
+
+
+def test_invoice_reference_format_feriennet():
+    assert FeriennetSchema().format('qeb3afd0e43') == 'Q-EB3AF-D0E43'
+
+
+def test_invoice_reference_extract_feriennet_schema():
+    extract_code = FeriennetSchema().extract
+
+    assert extract_code('') is None
+    assert extract_code('\n asdf') is None
+    assert extract_code('Q-70171-292FA') == 'q70171292fa'
+    assert extract_code('B-70171-292FA') is None
+    assert extract_code('Q-7o171-292FA') == 'q70171292fa'
+    assert extract_code('Q-7o171-292FA') == 'q70171292fa'
+    assert extract_code('Q-   7o171292FA') == 'q70171292fa'
+    assert extract_code('Q-   7o171  29  ---- 2FA') == 'q70171292fa'
+    assert extract_code('Q\n7o171\n292FA') == 'q70171292fa'
+    assert extract_code('Code: q-70171-292fa') == 'q70171292fa'
+
+
+def test_invoice_reference_uniqueness(session, owner, prebooking_period):
+    invoices = InvoiceCollection(
+        session, user_id=owner.id, period_id=prebooking_period.id)
+
+    i1 = invoices.add()
+
+    with pytest.raises(IntegrityError):
+        invoices.schema.link(session, i1, optimistic=True)
 
 
 def test_confirm_period(session, owner):

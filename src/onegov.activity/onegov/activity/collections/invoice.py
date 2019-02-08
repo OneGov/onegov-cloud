@@ -1,18 +1,30 @@
 from cached_property import cached_property
 from decimal import Decimal
 from onegov.activity.models import Invoice, InvoiceItem
+from onegov.activity.models.invoice_reference import KNOWN_SCHEMAS
 from onegov.core.collection import GenericCollection
-from onegov.activity.utils import random_invoice_code
 from sqlalchemy import func, and_, not_
 from onegov.user import User
+from uuid import uuid4
 
 
 class InvoiceCollection(GenericCollection):
 
-    def __init__(self, session, period_id=None, user_id=None):
+    def __init__(self, session, period_id=None, user_id=None,
+                 schema='feriennet-v1', schema_config=None):
         super().__init__(session)
         self.user_id = user_id
         self.period_id = period_id
+
+        if schema not in KNOWN_SCHEMAS:
+            raise RuntimeError("Unknown schema: {schema}")
+
+        self.schema_name = schema
+        self.schema_config = (schema_config or {})
+
+    @cached_property
+    def schema(self):
+        return KNOWN_SCHEMAS[self.schema_name](**self.schema_config)
 
     def query(self):
         q = super().query()
@@ -32,10 +44,16 @@ class InvoiceCollection(GenericCollection):
             ))
 
     def for_user_id(self, user_id):
-        return self.__class__(self.session, self.period_id, user_id)
+        return self.__class__(self.session, self.period_id, user_id,
+                              self.schema_name, self.schema_config)
 
     def for_period_id(self, period_id):
-        return self.__class__(self.session, period_id, self.user_id)
+        return self.__class__(self.session, period_id, self.user_id,
+                              self.schema_name, self.schema_config)
+
+    def for_schema(self, schema, schema_config=None):
+        return self.__class__(self.session, self.period_id, self.user_id,
+                              schema, schema_config)
 
     @cached_property
     def invoice(self):
@@ -98,13 +116,14 @@ class InvoiceCollection(GenericCollection):
         for invoice in self.query():
             invoice.sync()
 
-    def add(self, period_id=None, user_id=None, code=None):
-        period_id = period_id or self.period_id
-        user_id = user_id or self.user_id
-        code = code or random_invoice_code()
+    def add(self, period_id=None, user_id=None):
+        invoice = Invoice(
+            id=uuid4(),
+            period_id=period_id or self.period_id,
+            user_id=user_id or self.user_id)
 
-        invoice = Invoice(period_id=period_id, user_id=user_id, code=code)
         self.session.add(invoice)
+        self.schema.link(self.session, invoice)
         self.session.flush()
 
         return invoice

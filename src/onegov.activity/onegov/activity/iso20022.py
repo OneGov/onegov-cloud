@@ -1,21 +1,20 @@
 import re
 
-from collections import defaultdict, namedtuple, Counter
+from cached_property import cached_property
+from collections import defaultdict
 from datetime import date
 from decimal import Decimal
-from itertools import groupby
 from lxml import etree
-from onegov.activity.models import InvoiceItem
-from onegov.activity.models import Invoice
 from onegov.activity.collections import InvoiceCollection
-from onegov.activity.utils import encode_invoice_code
-from pprint import pformat
+from onegov.activity.models import Invoice
+from onegov.activity.models import InvoiceItem
+from onegov.activity.models import InvoiceReference
+from onegov.activity.models.invoice_reference import FeriennetSchema
 from onegov.user import User
+from sqlalchemy import distinct, func
 
 
 DOCUMENT_NS_EX = re.compile(r'.*<Document [^>]+>(.*)')
-INVALID_CODE_CHARS_EX = re.compile(r'[^Q0-9A-F]+')
-CODE_EX = re.compile(r'Q{1}[A-F0-9]{10}')
 
 
 def normalize_xml(xml):
@@ -24,24 +23,6 @@ def normalize_xml(xml):
 
 
 class Transaction(object):
-
-    __slots__ = (
-        'amount',
-        'booking_date',
-        'booking_text',
-        'confidence',
-        'credit',
-        'currency',
-        'debitor',
-        'debitor_account',
-        'duplicate',
-        'note',
-        'paid',
-        'reference',
-        'tid',
-        'username',
-        'valuta_date',
-    )
 
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
@@ -53,11 +34,27 @@ class Transaction(object):
         self.paid = False
 
     def __repr__(self):
-        return pformat({key: getattr(self, key) for key in self.__slots__})
+        return repr(self.__dict__)
 
-    @property
-    def code(self):
-        return extract_code(self.booking_text) or extract_code(self.note)
+    @cached_property
+    def references(self):
+        return set(self.extract_references())
+
+    def extract_references(self):
+        if self.reference:
+            yield self.reference
+
+        # currently only one schema supports text extraction, the others are
+        # stored in the designated reference field
+        schema = FeriennetSchema()
+
+        ref = schema.extract(self.booking_text)
+        if ref:
+            yield ref
+
+        ref = schema.extract(self.note)
+        if ref:
+            yield ref
 
     @property
     def order(self):
@@ -158,46 +155,6 @@ def extract_transactions(xml):
             )
 
 
-def extract_code(text):
-    """ Takes a bunch of text and tries to extract a code from it.
-
-    :return: The code without formatting and in lowercase or None
-
-    """
-
-    if text is None:
-        return None
-
-    text = text.replace('\n', '').strip()
-
-    if not text:
-        return None
-
-    # ENTER A WORLD WITHOUT LOWERCASE
-    text = text.upper()
-
-    # replace all O-s (as in OMG) with 0.
-    text = text.replace('O', '0')
-
-    # normalize the text by removing all invalid characters.
-    text = INVALID_CODE_CHARS_EX.sub('', text)
-
-    # try to fetch the code
-    match = CODE_EX.search(text)
-
-    if match:
-        return match.group().lower()
-    else:
-        return None
-
-
-def encode(code):
-    try:
-        return encode_invoice_code(code)
-    except (RuntimeError, ValueError):
-        return None
-
-
 def match_iso_20022_to_usernames(xml, session, period_id, currency='CHF'):
     """ Takes an ISO20022 camt.053 file and matches it with the invoice
     items in the database.
@@ -226,129 +183,86 @@ def match_iso_20022_to_usernames(xml, session, period_id, currency='CHF'):
 
     paid_transaction_ids = {i.tid: i.username for i in q}
 
-    # Get a list of known ref/code username matches to be used as a last resort
-    q = items()
-    q = q.with_entities(Invoice.code, User.username)
-    q = q.group_by(Invoice.code, User.username)
-    q = q.filter(
-        InvoiceItem.paid == True,
-        InvoiceItem.source == None
-    )
+    # Get a list of reference/username pairs as fallback
+    q = session.query(InvoiceReference).outerjoin(Invoice).outerjoin(User)
+    q = q.with_entities(InvoiceReference.reference, User.username)
 
-    known_codes, known_refs = {}, {}
-    for i in q:
-        known_codes[i.code] = i.username
-        known_refs[encode(i.code)] = i.username
+    username_by_ref = dict(q)
 
     # Get the items matching the given period
-    q = items(period_id=period_id)
+    q = items(period_id=period_id).outerjoin(InvoiceReference)
     q = q.with_entities(
         User.username,
-        Invoice.code,
-        InvoiceItem.amount
-    )
-    q = q.filter(
-        InvoiceItem.paid == False
-    )
-    q = q.order_by(
-        User.username
-    )
+        func.sum(InvoiceItem.amount).label('amount'),
+        func.array_agg(
+            distinct(InvoiceReference.reference)).label('references'))
+    q = q.group_by(User.username)
+    q = q.filter(InvoiceItem.paid == False)
+    q = q.order_by(User.username)
 
-    # Sum up the items to virtual invoices
-    invoices = []
-    VirtualInvoice = namedtuple('Invoice', (
-        'username', 'code', 'ref', 'amount'))
-
-    for username, items in groupby(q, key=lambda i: i.username):
-        amount = Decimal('0.00')
-
-        for item in items:
-            amount += item.amount
-
-        invoices.append(VirtualInvoice(
-            username=username,
-            code=item.code,
-            ref=encode(item.code),
-            amount=amount
-        ))
-
-    # Hash the invoices by code (duplicates are technically possible)
-    by_code = defaultdict(list)
-
-    # hash the references as well
+    # Hash the invoices by reference (duplicates possible)
     by_ref = defaultdict(list)
 
-    # Hash the invoices by amount (dpulicates are probable)
+    # Hash the invoices by amount (duplicates probable)
     by_amount = defaultdict(list)
 
-    for invoice in invoices:
-        by_code[invoice.code].append(invoice)
-        by_amount[invoice.amount].append(invoice)
-        by_ref[invoice.ref].append(invoice)
+    for record in q:
+        for reference in record.references:
+            by_ref[reference].append(record)
+
+        by_amount[record.amount].append(record)
 
     # go through the transactions, comparing amount and code for a match
     transactions = tuple(extract_transactions(xml))
 
-    codes = Counter(
-        t.code for t in transactions
-        if t.code and t.tid not in paid_transaction_ids
-    )
-    refs = Counter(
-        t.reference for t in transactions
-        if t.reference and t.tid not in paid_transaction_ids
-    )
+    # mark duplicate transactions
+    seen = {}
 
-    for transaction in transactions:
+    for t in transactions:
+        for ref in t.references:
+            if ref in seen:
+                t.duplicate = seen[ref].duplicate = True
+
+            seen[ref] = t
+
+    for t in transactions:
 
         # credit transactions are completely irrelevant for us
-        if not transaction.credit:
+        if not t.credit:
             continue
 
-        if transaction.currency != currency:
-            yield transaction
+        if t.currency != currency:
+            yield t
             continue
 
-        if transaction.tid in paid_transaction_ids:
-            transaction.paid = True
-            transaction.username = paid_transaction_ids[transaction.tid]
-            transaction.confidence = 1
-            yield transaction
+        if t.tid in paid_transaction_ids:
+            t.paid = True
+            t.username = paid_transaction_ids[t.tid]
+            t.confidence = 1
+            yield t
             continue
 
-        # duplicate codes/references are marked as such, but not matched
-        if codes[transaction.code] > 1 or refs[transaction.reference] > 1:
-            transaction.duplicate = True
+        if t.credit and t.currency == currency:
+            amnt_usernames = {i.username for i in by_amount[t.amount]}
+            ref_usernames = {
+                i.username for ref in t.references for i in by_ref[ref]}
 
-        if transaction.credit and transaction.currency == currency:
-            code = transaction.code
-            amnt = transaction.amount
-            ref = transaction.reference
-
-            code_usernames = {i.username for i in by_code.get(code, tuple())}
-            amnt_usernames = {i.username for i in by_amount.get(amnt, tuple())}
-            ref_usernames = {i.username for i in by_ref.get(ref, tuple())}
-
-            combined = amnt_usernames & (code_usernames | ref_usernames)
+            combined = amnt_usernames & ref_usernames
 
             if len(combined) == 1:
-                transaction.username = next(u for u in combined)
-                transaction.confidence = 1.0
-            elif len(code_usernames) == 1:
-                transaction.username = next(u for u in code_usernames)
-                transaction.confidence = 0.5
+                t.username = next(u for u in combined)
+                t.confidence = 1.0
             elif len(ref_usernames) == 1:
-                transaction.username = next(u for u in ref_usernames)
-                transaction.confidence = 0.5
+                t.username = next(u for u in ref_usernames)
+                t.confidence = 0.5
             elif len(amnt_usernames) == 1:
-                transaction.username = next(u for u in amnt_usernames)
-                transaction.confidence = 0.5
+                t.username = next(u for u in amnt_usernames)
+                t.confidence = 0.5
 
-            if not transaction.confidence:
-                if ref in known_refs:
-                    transaction.username = known_refs[ref]
-                    transaction.confidence = 0.5
-                elif code in known_codes:
-                    transaction.username = known_codes[code]
-                    transaction.confidence = 0.5
+            if not t.confidence:
+                for ref in t.references:
+                    if ref in username_by_ref:
+                        t.username = username_by_ref[ref]
+                        t.confidence = 0.5
 
-        yield transaction
+        yield t

@@ -1,4 +1,3 @@
-from onegov.activity import utils
 from onegov.activity.models.period import Period
 from onegov.activity.models.invoice_item import InvoiceItem, SCALE
 from onegov.core.orm import Base
@@ -11,7 +10,6 @@ from sqlalchemy import select
 from sqlalchemy import func
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
-from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import object_session, relationship
 from uuid import uuid4
@@ -33,9 +31,6 @@ class Invoice(Base, TimestampMixin):
     user_id = Column(UUID, ForeignKey('users.id'), nullable=False)
     user = relationship(User, backref='invoices')
 
-    #: the code of the invoice used to identify the invoice through e-banking
-    code = Column(Text, nullable=False)
-
     #: the specific items linked with this invoice
     items = relationship(InvoiceItem, backref='invoice')
 
@@ -43,20 +38,19 @@ class Invoice(Base, TimestampMixin):
     def price(self):
         return Price(self.outstanding_amount, 'CHF')
 
-    @property
-    def display_code(self):
-        """ The invoice code, formatted in a human readable format. """
-        return utils.format_invoice_code(self.code)
+    def reference_by_schema(self, schema):
+        for ref in self.references:
+            if ref.schema == schema:
+                return ref.reference
 
-    @property
-    def esr_code(self):
-        """ The invoice code, formatted as ESR. """
-        return utils.encode_invoice_code(self.code)
+        return None
 
-    @property
-    def display_esr_code(self):
-        """ The invoice ESR formatted in a human readable format. """
-        return utils.format_esr_reference(self.esr_code)
+    def readable_by_schema(self, schema):
+        for ref in self.references:
+            if ref.schema == schema:
+                return ref.readable
+
+        return None
 
     def sync(self):
         items = object_session(self).query(InvoiceItem).filter(and_(

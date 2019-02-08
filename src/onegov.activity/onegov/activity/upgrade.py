@@ -3,11 +3,14 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
 import hashlib
+import string
 
+from itertools import chain
 from onegov.activity import ActivityCollection
 from onegov.activity import Booking
 from onegov.activity import InvoiceCollection
 from onegov.activity import InvoiceItem
+from onegov.activity import InvoiceReference
 from onegov.activity import Occasion
 from onegov.activity import Period
 from onegov.activity import PeriodCollection
@@ -542,3 +545,72 @@ def add_invoices(context):
     context.operations.drop_column('invoice_items', 'username')
     context.operations.drop_column('invoice_items', 'code')
     context.operations.drop_column('invoice_items', 'invoice')
+
+
+@upgrade_task('Add invoice references')
+def add_invoice_references(context):
+    if not context.has_column('invoices', 'code'):
+        return
+
+    # legacy functions obsolete after this migration
+    CODE_TO_ESR_MAPPING = {
+        character: '{:02d}'.format(value) for value, character in chain(
+            enumerate(string.digits, start=1),
+            enumerate(string.ascii_lowercase, start=11)
+        )
+    }
+
+    def generate_checksum(number):
+        table = (0, 9, 4, 6, 8, 2, 7, 1, 3, 5)
+        carry = 0
+
+        for n in str(number):
+            carry = table[(carry + int(n)) % 10]
+
+        return (10 - carry) % 10
+
+    def append_checksum(number):
+        number = str(number)
+        return number + str(generate_checksum(number))
+
+    def encode_invoice_code(code):
+        version = '1'
+
+        blocks = [version]
+
+        for char in code:
+            if char in CODE_TO_ESR_MAPPING:
+                blocks.append(CODE_TO_ESR_MAPPING[char])
+            else:
+                raise RuntimeError(
+                    "Invalid character {} in {}".format(char, code))
+
+        return append_checksum('{:0>26}'.format(''.join(blocks)))
+
+    stmt = as_selectable("""
+        SELECT
+            invoices.id,           -- UUID
+            invoices.code          -- Text
+        FROM invoices
+    """)
+
+    invoices = context.session.execute(select(stmt.c))
+
+    for invoice in invoices:
+        context.session.add(
+            InvoiceReference(
+                invoice_id=invoice.id,
+                reference=invoice.code,
+                schema='feriennet-v1'
+            )
+        )
+
+        context.session.add(
+            InvoiceReference(
+                invoice_id=invoice.id,
+                reference=encode_invoice_code(invoice.code),
+                schema='esr-v1'
+            )
+        )
+
+    context.operations.drop_column('invoices', 'code')
