@@ -272,3 +272,16 @@ class ESRSchema(Schema, name='esr-v1'):
             blocks.append(''.join(reversed(values)))
 
         return ' '.join(reversed(blocks))
+
+
+class RaiffeisenSchema(ESRSchema, name='raiffeisen-v1'):
+    """ Customised ESR for Raiffeisen. """
+
+    def new(self):
+        assert hasattr(self, 'esr_identification_number')
+        assert len(self.esr_identification_number) == 6
+
+        random = ''.join(secrets.choice(string.digits) for _ in range(0, 20))
+        number = f'{self.esr_identification_number}{random}'
+
+        return number + self.checksum(number)
