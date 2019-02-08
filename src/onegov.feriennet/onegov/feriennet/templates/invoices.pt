@@ -121,11 +121,11 @@
                                     <tal:b switch="layout.org.bank_payment_order_type">
                                         <li tal:case="string:esr">
                                             <span i18n:translate>Reference Number</span>
-                                            <span>${invoice.display_esr_code}</span>
+                                            <span>${invoice.readable_by_schema('esr-v1')}</span>
                                         </li>
                                         <li tal:case="default">
                                             <span i18n:translate>Notice</span>
-                                            <span>${invoice.display_code}</span>
+                                            <span>${invoice.readable_by_schema('feriennet-v1')}</span>
                                         </li>
                                     </tal:b>
                                 </ul>
