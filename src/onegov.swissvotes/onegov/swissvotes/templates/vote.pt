@@ -267,7 +267,7 @@
                         <td>
                             <span class="result-cantons-accepted">
                                 ${vote.result_cantons_accepted}
-                                <tal:block tal:condition="vote.result_cantons_yeas and vote.result_cantons_nays and vote._result_cantons_accepted != 3">
+                                <tal:block tal:condition="vote.result_cantons_yeas is not None and vote.result_cantons_nays is not None">
                                     (${layout.format_number(vote.result_cantons_yeas, 1)} <tal:block i18n:translate>Yea</tal:block>, ${layout.format_number(vote.result_cantons_nays, 1)} <tal:block i18n:translate>Nay</tal:block>)
                                 </tal:block>
                             </span>

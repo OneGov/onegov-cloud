@@ -10,6 +10,9 @@ Changelog
 - Removes the login link.
   [msom]
 
+- Always display the number of cantons voted yeas/nays.
+  [msom]
+
 0.0.29 (2019-01-16)
 ~~~~~~~~~~~~~~~~~~~
 
