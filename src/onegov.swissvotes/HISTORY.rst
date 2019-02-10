@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.30 (2019-02-10)
+~~~~~~~~~~~~~~~~~~~
 
 - Allows to add and remove content pages.
   [msom]
