@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.9.1 (2019-02-10)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes CSV templates.
   [msom]
