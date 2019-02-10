@@ -13,6 +13,9 @@ Changelog
 - Always display the number of cantons voted yeas/nays.
   [msom]
 
+- Opens external links and files in a new window/tab.
+  [msom]
+
 0.0.29 (2019-01-16)
 ~~~~~~~~~~~~~~~~~~~
 

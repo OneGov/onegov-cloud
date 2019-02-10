@@ -60,11 +60,11 @@
                     </tr>
                     <tr>
                         <th class="column-30" i18n:translate>Description Année Politique Suisse</th>
-                        <td><a href="${vote.anneepolitique}" tal:condition="vote.anneepolitique" i18n:translate>Link</a></td>
+                        <td><a href="${vote.anneepolitique}" target="_blank" tal:condition="vote.anneepolitique" i18n:translate>Link</a></td>
                     </tr>
                     <tr>
                         <th class="column-30" i18n:translate>Voting text</th>
-                        <td><a tal:condition="voting_text" href="${request.link(voting_text)}" class="voting-text">PDF</a></td>
+                        <td><a href="${request.link(voting_text)}" target="_blank" tal:condition="voting_text" class="voting-text">PDF</a></td>
                     </tr>
                     <tr>
                         <th class="column-30" i18n:translate>Vote number</th>
@@ -101,7 +101,7 @@
                     </tr>
                     <tr>
                         <th class="column-30" i18n:translate>Realization</th>
-                        <td><a tal:condition="realization" href="${request.link(realization)}" class="realization">PDF</a></td>
+                        <td><a href="${request.link(realization)}" target="_blank" tal:condition="realization" class="realization">PDF</a></td>
                     </tr>
                 </tbody>
             </table>
@@ -113,7 +113,7 @@
                 <tbody>
                     <tr>
                         <th class="column-30" i18n:translate>Federal council message</th>
-                        <td><a tal:condition="federal_council_message" href="${request.link(federal_council_message)}" class="federal-council-message">PDF</a></td>
+                        <td><a href="${request.link(federal_council_message)}" target="_blank" tal:condition="federal_council_message" class="federal-council-message">PDF</a></td>
                     </tr>
                     <tr>
                         <th class="column-30" i18n:translate>Position of the Federal Council</th>
@@ -133,7 +133,7 @@
                     </tr>
                     <tr>
                         <th class="column-30" i18n:translate>Parliamentary debate</th>
-                        <td><a tal:condition="parliamentary_debate" href="${request.link(parliamentary_debate)}" class="parliamentary-debate">PDF</a></td>
+                        <td><a href="${request.link(parliamentary_debate)}" target="_blank" tal:condition="parliamentary_debate" class="parliamentary-debate">PDF</a></td>
                     </tr>
                     <tr>
                         <th class="column-30" i18n:translate>Duration in Parliament</th>
@@ -192,7 +192,7 @@
                     </tr>
                     <tr>
                         <th class="column-30" i18n:translate>Realization</th>
-                        <td><a tal:condition="realization" href="${request.link(realization)}" class="realization">PDF</a></td>
+                        <td><a href="${request.link(realization)}" target="_blank" class="realization" tal:condition="realization">PDF</a></td>
                     </tr>
                 </tbody>
             </table>
@@ -204,7 +204,7 @@
                 <tbody>
                     <tr>
                         <th class="column-30" i18n:translate>Voting booklet</th>
-                        <td><a tal:condition="voting_booklet" href="${request.link(voting_booklet)}" class="voting-booklet">PDF</a></td>
+                        <td><a href="${request.link(voting_booklet)}" target="_blank" tal:condition="voting_booklet" class="voting-booklet">PDF</a></td>
                     </tr>
                     <tr>
                         <th class="column-30" i18n:translate>Recommendations of the Parties</th>
@@ -283,7 +283,7 @@
                     </tr>
                     <tr>
                         <th class="column-30" i18n:translate>Resolution</th>
-                        <td><a tal:condition="resolution" href="${request.link(resolution)}" class="resolution">PDF</a></td>
+                        <td><a href="${request.link(resolution)}" target="_blank" tal:condition="resolution" class="resolution">PDF</a></td>
                     </tr>
                     <tr>
                         <th class="column-30" i18n:translate>Result by canton, district and municipality</th>
