@@ -30,23 +30,23 @@
                     <tr><th colspan="2" i18n:translate>General</th></tr>
                 </thead>
                 <tbody>
-                    <tr>
+                    <tr tal:condition="vote.title">
                         <th class="column-30" i18n:translate>Title</th>
                         <td>${vote.title}</td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="vote.keyword">
                         <th class="column-30" i18n:translate>Keyword</th>
                         <td>${vote.keyword}</td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="vote.date">
                         <th class="column-30" i18n:translate>Vote date</th>
                         <td>${layout.format_date(vote.date, 'date')}</td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="vote.legal_form is not None">
                         <th class="column-30" i18n:translate>Legal form</th>
                         <td>${vote.legal_form}</td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="vote.policy_areas">
                         <th class="column-30" i18n:translate>Policy area</th>
                         <td>
                             <tal:block tal:repeat="area vote.policy_areas">
@@ -54,23 +54,23 @@
                             </tal:block>
                         </td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="False">
                         <th class="column-30" i18n:translate>Brief description Swissvotes</th>
                         <td></td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="vote.anneepolitique">
                         <th class="column-30" i18n:translate>Description Année Politique Suisse</th>
-                        <td><a href="${vote.anneepolitique}" target="_blank" tal:condition="vote.anneepolitique" i18n:translate>Link</a></td>
+                        <td><a href="${vote.anneepolitique}" target="_blank" i18n:translate>Link</a></td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="voting_text">
                         <th class="column-30" i18n:translate>Voting text</th>
-                        <td><a href="${request.link(voting_text)}" target="_blank" tal:condition="voting_text" class="voting-text">PDF</a></td>
+                        <td><a href="${request.link(voting_text)}" target="_blank" class="voting-text">PDF</a></td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="vote.bfs_number is not None">
                         <th class="column-30" i18n:translate>Vote number</th>
                         <td>${layout.format_bfs_number(vote.bfs_number)}</td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="False">
                         <th class="column-30" i18n:translate>Related votes</th>
                         <td></td>
                     </tr>
@@ -83,25 +83,21 @@
                     <tr><th colspan="2" i18n:translate>Submission</th></tr>
                 </thead>
                 <tbody>
-                    <tr>
+                    <tr tal:condition="vote.initiator">
                         <th class="column-30" i18n:translate>Initiator</th>
                         <td>${vote.initiator}</td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="vote.signatures_valid is not None">
                         <th class="column-30" i18n:translate>Signatures</th>
                         <td>${layout.format_number(vote.signatures_valid)}</td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="vote.duration_initative_collection is not None">
                         <th class="column-30" i18n:translate>Collection duration</th>
-                        <td>
-                            <tal:block tal:condition="vote.duration_initative_collection">
-                                ${layout.format_number(vote.duration_initative_collection)} <tal:block i18n:translate>Days</tal:block>
-                            </tal:block>
-                        </td>
+                        <td>${layout.format_number(vote.duration_initative_collection)} <tal:block i18n:translate>Days</tal:block></td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="realization">
                         <th class="column-30" i18n:translate>Realization</th>
-                        <td><a href="${request.link(realization)}" target="_blank" tal:condition="realization" class="realization">PDF</a></td>
+                        <td><a href="${request.link(realization)}" target="_blank" class="realization">PDF</a></td>
                     </tr>
                 </tbody>
             </table>
@@ -111,11 +107,11 @@
                     <tr><th colspan="2" i18n:translate>Pre-parliamentary phase</th></tr>
                 </thead>
                 <tbody>
-                    <tr>
+                    <tr tal:condition="federal_council_message">
                         <th class="column-30" i18n:translate>Federal council message</th>
-                        <td><a href="${request.link(federal_council_message)}" target="_blank" tal:condition="federal_council_message" class="federal-council-message">PDF</a></td>
+                        <td><a href="${request.link(federal_council_message)}" target="_blank" class="federal-council-message">PDF</a></td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="vote.position_federal_council">
                         <th class="column-30" i18n:translate>Position of the Federal Council</th>
                         <td>${vote.position_federal_council}</td>
                     </tr>
@@ -127,27 +123,23 @@
                     <tr><th colspan="2" i18n:translate>Parliamentary phase</th></tr>
                 </thead>
                 <tbody>
-                    <tr>
+                    <tr tal:condition="vote.procedure_number is not None">
                         <th class="column-30" i18n:translate>Procedure number</th>
                         <td>${layout.format_procedure_number(vote.procedure_number)}</td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="parliamentary_debate">
                         <th class="column-30" i18n:translate>Parliamentary debate</th>
-                        <td><a href="${request.link(parliamentary_debate)}" target="_blank" tal:condition="parliamentary_debate" class="parliamentary-debate">PDF</a></td>
+                        <td><a href="${request.link(parliamentary_debate)}" target="_blank" class="parliamentary-debate">PDF</a></td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="vote.duration_federal_assembly is not None">
                         <th class="column-30" i18n:translate>Duration in Parliament</th>
-                        <td>
-                            <tal:block tal:condition="vote.duration_federal_assembly">
-                                ${layout.format_number(vote.duration_federal_assembly)} <tal:block i18n:translate>Days</tal:block>
-                            </tal:block>
-                        </td>
+                        <td>${layout.format_number(vote.duration_federal_assembly)} <tal:block i18n:translate>Days</tal:block></td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="vote.position_parliament">
                         <th class="column-30" i18n:translate>Parliament's position</th>
                         <td>${vote.position_parliament}</td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="vote.position_national_council">
                         <th class="column-30" i18n:translate>Position of the National Council</th>
                         <td>
                             ${vote.position_national_council}
@@ -156,7 +148,7 @@
                             </tal:block>
                         </td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="vote.position_council_of_states">
                         <th class="column-30" i18n:translate>Position of the Council of States</th>
                         <td>
                             ${vote.position_council_of_states}
@@ -174,25 +166,21 @@
                     <tr><th colspan="2" i18n:translate>Submission</th></tr>
                 </thead>
                 <tbody>
-                    <tr>
+                    <tr tal:condition="vote.initiator">
                         <th class="column-30" i18n:translate>Initiator</th>
                         <td>${vote.initiator}</td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="vote.signatures_valid is not None">
                         <th class="column-30" i18n:translate>Signatures</th>
                         <td>${layout.format_number(vote.signatures_valid)}</td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="vote.duration_referendum_collection is not None">
                         <th class="column-30" i18n:translate>Collection duration</th>
-                        <td>
-                            <tal:block tal:condition="vote.duration_referendum_collection">
-                                ${layout.format_number(vote.duration_referendum_collection)} <tal:block i18n:translate>Days</tal:block>
-                            </tal:block>
-                        </td>
+                        <td>${layout.format_number(vote.duration_referendum_collection)} <tal:block i18n:translate>Days</tal:block></td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="realization">
                         <th class="column-30" i18n:translate>Realization</th>
-                        <td><a href="${request.link(realization)}" target="_blank" class="realization" tal:condition="realization">PDF</a></td>
+                        <td><a href="${request.link(realization)}" target="_blank" class="realization">PDF</a></td>
                     </tr>
                 </tbody>
             </table>
@@ -202,11 +190,11 @@
                     <tr><th colspan="2" i18n:translate>Voting campaign</th></tr>
                 </thead>
                 <tbody>
-                    <tr>
+                    <tr tal:condition="voting_booklet">
                         <th class="column-30" i18n:translate>Voting booklet</th>
-                        <td><a href="${request.link(voting_booklet)}" target="_blank" tal:condition="voting_booklet" class="voting-booklet">PDF</a></td>
+                        <td><a href="${request.link(voting_booklet)}" target="_blank" class="voting-booklet">PDF</a></td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="vote.recommendations_parties">
                         <th class="column-30" i18n:translate>Recommendations of the Parties</th>
                         <td>
                             <dl tal:repeat="(recommendation, parties) vote.recommendations_parties.items()">
@@ -215,7 +203,7 @@
                             </dl>
                         </td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="vote.national_council_share_yeas is not None or vote.has_national_council_share_data">
                         <th class="column-30" i18n:translate>Voter share of yes camp</th>
                         <td>
                             <tal:block tal:condition="vote.has_national_council_share_data">
@@ -232,7 +220,7 @@
                             </tal:block>
                         </td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="vote.recommendations_associations">
                         <th class="column-30" i18n:translate>Further Recommendations</th>
                         <td>
                             <dl tal:repeat="(recommendation, associations) vote.recommendations_associations.items()">
@@ -249,11 +237,11 @@
                     <tr><th colspan="2" i18n:translate>Vote</th></tr>
                 </thead>
                 <tbody>
-                    <tr>
+                    <tr tal:condition="vote.result">
                         <th class="column-30" i18n:translate>Voting result</th>
                         <td>${vote.result}</td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="vote.result_people_accepted">
                         <th class="column-30" i18n:translate>People</th>
                         <td>
                             ${vote.result_people_accepted}
@@ -262,7 +250,7 @@
                             </tal:block>
                         </td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="vote.result_cantons_accepted">
                         <th class="column-30" i18n:translate>Cantons</th>
                         <td>
                             <span class="result-cantons-accepted">
@@ -277,20 +265,16 @@
                             </dl>
                         </td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="vote.result_turnout is not None">
                         <th class="column-30" i18n:translate>Turnout</th>
-                        <td><tal:block tal:condition="vote.result_turnout">${layout.format_number(vote.result_turnout, 2)}%</tal:block></td>
+                        <td>${layout.format_number(vote.result_turnout, 2)}%</td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="resolution">
                         <th class="column-30" i18n:translate>Resolution</th>
-                        <td><a href="${request.link(resolution)}" target="_blank" tal:condition="resolution" class="resolution">PDF</a></td>
+                        <td><a href="${request.link(resolution)}" target="_blank" class="resolution">PDF</a></td>
                     </tr>
-                    <tr>
+                    <tr tal:condition="False">
                         <th class="column-30" i18n:translate>Result by canton, district and municipality</th>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <th class="column-30" i18n:translate>Interactive map</th>
                         <td></td>
                     </tr>
                 </tbody>
