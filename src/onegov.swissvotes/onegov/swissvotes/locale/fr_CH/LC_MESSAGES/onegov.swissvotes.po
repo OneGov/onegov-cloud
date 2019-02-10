@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-07 14:20+0100\n"
+"POT-Creation-Date: 2019-02-10 14:13+0100\n"
 "PO-Revision-Date: 2018-09-18 11:29+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -1279,7 +1279,7 @@ msgstr ""
 msgid "Voting campaign"
 msgstr ""
 
-msgid "Position"
+msgid "Recommendation"
 msgstr ""
 
 msgid "Percentage of voters in the National Council elections"
@@ -1387,9 +1387,6 @@ msgid "Turnout"
 msgstr "Participation électorale"
 
 msgid "Result by canton, district and municipality"
-msgstr ""
-
-msgid "Interactive map"
 msgstr ""
 
 msgid "You are here"

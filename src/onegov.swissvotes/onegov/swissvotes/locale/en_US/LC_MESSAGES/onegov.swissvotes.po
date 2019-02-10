@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-02-07 14:20+0100\n"
+"POT-Creation-Date: 2019-02-10 14:13+0100\n"
 "PO-Revision-Date: 2018-09-18 15:04+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: English\n"
@@ -1274,8 +1274,8 @@ msgstr "Download dataset (XLSX)"
 msgid "Voting campaign"
 msgstr "Voting campaign"
 
-msgid "Position"
-msgstr "Position"
+msgid "Recommendation"
+msgstr ""
 
 msgid "Percentage of voters in the National Council elections"
 msgstr "Percentage of voters in the National Council elections"
@@ -1380,9 +1380,6 @@ msgid "Turnout"
 msgstr "Turnout"
 
 msgid "Result by canton, district and municipality"
-msgstr ""
-
-msgid "Interactive map"
 msgstr ""
 
 msgid "You are here"
