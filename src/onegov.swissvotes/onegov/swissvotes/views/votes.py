@@ -134,7 +134,7 @@ def delete_votes(self, request, form):
         'layout': layout,
         'form': form,
         'message': _("Do you really want to delete all votes?!"),
-        'button_text': _("Delete all votes"),
+        'button_text': _("Delete"),
         'button_class': 'alert',
         'cancel': request.link(self)
     }

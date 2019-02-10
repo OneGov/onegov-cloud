@@ -3,7 +3,9 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
 from onegov.core.upgrade import upgrade_task
+from onegov.swissvotes.collections import TranslatablePageCollection
 from onegov.swissvotes.models import SwissVote
+from onegov.swissvotes.models import TranslatablePage
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
@@ -88,3 +90,29 @@ def add_cantonal_result_columns(context):
                 context.operations.add_column(
                     'swissvotes', Column(column, Numeric(13, 10))
                 )
+
+
+@upgrade_task('Add order column to pages', always_run=True)
+def add_order_column_to_pagess(context):
+    if context.has_column('swissvotes_page', 'order'):
+        context.operations.drop_column(
+            'swissvotes_page', 'order'
+        )
+    if not context.has_column('swissvotes_page', 'order'):
+        context.operations.add_column(
+            'swissvotes_page',
+            Column('order', Integer, default=2 ** 16)
+        )
+
+        default = (
+            'home', 'disclaimer', 'imprint', 'data-protection', 'dataset',
+            'about', 'contact'
+        )
+        pages = TranslatablePageCollection(context.app.session())
+        for id in default:
+            pages.setdefault(id)
+        for order, id in enumerate(default):
+            pages.by_id(id).order = order
+        for page in pages.query().filter(TranslatablePage.id.notin_(default)):
+            order += 1
+            page.order = order

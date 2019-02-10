@@ -29,7 +29,6 @@ def add(group_context):
 
     def add_instance(request, app):
         app.cache.invalidate()
-        app.add_initial_content()
         click.echo("Instance was created successfully")
 
     return add_instance

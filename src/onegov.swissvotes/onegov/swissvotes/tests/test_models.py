@@ -4,6 +4,7 @@ from onegov.swissvotes.models.actor import Actor
 from onegov.swissvotes.models.canton import Canton
 from onegov.swissvotes.models.localized_file import LocalizedFile
 from onegov.swissvotes.models.page import TranslatablePage
+from onegov.swissvotes.models.page import TranslatablePageMove
 from onegov.swissvotes.models.policy_area import PolicyArea
 from onegov.swissvotes.models.principal import Principal
 from onegov.swissvotes.models.vote import SwissVote
@@ -123,6 +124,68 @@ def test_page(session):
     assert page.id == 'page'
     assert page.title_translations == {'de_CH': "Titel", 'en': "Title"}
     assert page.content_translations == {'de_CH': "Inhalt", 'en': "Content"}
+    assert page.order == 65536
+
+    session.add(
+        TranslatablePage(
+            id='page-1',
+            title_translations={'de_CH': "Titel", 'en': "Title"},
+            content_translations={'de_CH': "Inhalt", 'en': "Content"},
+            order=2
+        )
+    )
+    session.add(
+        TranslatablePage(
+            id='page-2',
+            title_translations={'de_CH': "Titel", 'en': "Title"},
+            content_translations={'de_CH': "Inhalt", 'en': "Content"},
+            order=1
+        )
+    )
+    assert [page.id for page in page.siblings] == ['page-2', 'page-1', 'page']
+
+
+def test_page_move(session):
+    # test URL template
+    move = TranslatablePageMove(None, None, None, None).for_url_template()
+    assert move.direction == '{direction}'
+    assert move.subject_id == '{subject_id}'
+    assert move.target_id == '{target_id}'
+
+    # test execute
+    for order, id in enumerate(('about', 'contact', 'dataset')):
+        session.add(
+            TranslatablePage(
+                id=id, order=order,
+                title_translations={'en': id}, content_translations={'en': id}
+            )
+        )
+
+    def ordering():
+        query = session.query(TranslatablePage.id)
+        query = query.order_by(TranslatablePage.order)
+        return [r.id for r in query.all()]
+
+    assert ordering() == ['about', 'contact', 'dataset']
+
+    TranslatablePageMove(session, 'about', 'contact', 'below').execute()
+    assert ordering() == ['contact', 'about', 'dataset']
+
+    TranslatablePageMove(session, 'dataset', 'contact', 'above').execute()
+    assert ordering() == ['dataset', 'contact', 'about']
+
+    TranslatablePageMove(session, 'contact', 'dataset', 'above').execute()
+    assert ordering() == ['contact', 'dataset', 'about']
+
+    # invalid
+    TranslatablePageMove(session, 'contact', 'contact', 'above').execute()
+    assert ordering() == ['contact', 'dataset', 'about']
+
+    TranslatablePageMove(session, 'kontact', 'about', 'above').execute()
+    assert ordering() == ['contact', 'dataset', 'about']
+
+    TranslatablePageMove(session, 'about', 'kontact', 'above').execute()
+    assert ordering() == ['contact', 'dataset', 'about']
 
 
 def test_policy_area(session):

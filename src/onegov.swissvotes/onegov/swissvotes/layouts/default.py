@@ -7,6 +7,7 @@ from onegov.core.utils import groupbylist
 from onegov.swissvotes import _
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.collections import TranslatablePageCollection
+from onegov.swissvotes.models import TranslatablePageMove
 from onegov.user import Auth
 
 
@@ -31,12 +32,15 @@ class DefaultLayout(ChameleonLayout):
     @cached_property
     def top_navigation(self):
         result = [Link(_("Votes"), self.votes_url)]
-
-        for page in ('dataset', 'about', 'contact'):
-            page = self.pages.by_id(page)
-            if page:
-                result.append(Link(page.title, self.request.link(page)))
-
+        for page in self.pages.query():
+            if page.id not in self.request.app.static_content_pages:
+                result.append(
+                    Link(
+                        page.title,
+                        self.request.link(page),
+                        sortable_id=page.id,
+                    )
+                )
         return result
 
     @cached_property
@@ -61,15 +65,18 @@ class DefaultLayout(ChameleonLayout):
 
     @cached_property
     def disclaimer_link(self):
-        page = self.pages.by_id('disclaimer')
-        if page:
-            return Link(page.title, self.request.link(page))
+        page = self.pages.setdefault('disclaimer')
+        return Link(page.title, self.request.link(page))
 
     @cached_property
     def imprint_link(self):
-        page = self.pages.by_id('imprint')
-        if page:
-            return Link(page.title, self.request.link(page))
+        page = self.pages.setdefault('imprint')
+        return Link(page.title, self.request.link(page))
+
+    @cached_property
+    def data_protection_link(self):
+        page = self.pages.setdefault('data-protection')
+        return Link(page.title, self.request.link(page))
 
     @cached_property
     def votes_url(self):
@@ -90,6 +97,12 @@ class DefaultLayout(ChameleonLayout):
                 Auth.from_request(self.request, to=self.homepage_url),
                 name='logout'
             )
+
+    @cached_property
+    def move_page_url_template(self):
+        return self.csrf_protected_url(
+            self.request.link(TranslatablePageMove.for_url_template())
+        )
 
     @cached_property
     def locales(self):

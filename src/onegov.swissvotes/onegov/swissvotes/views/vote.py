@@ -111,7 +111,7 @@ def delete_vote(self, request, form):
             'Do you really want to delete "${item}"?',
             mapping={'item': self.title}
         ),
-        'button_text': _("Delete vote"),
+        'button_text': _("Delete"),
         'button_class': 'alert',
         'cancel': request.link(self)
     }

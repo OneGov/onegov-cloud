@@ -9,6 +9,7 @@ from onegov.swissvotes.forms import AttachmentsForm
 from onegov.swissvotes.forms import PageForm
 from onegov.swissvotes.forms import SearchForm
 from onegov.swissvotes.forms import UpdateDatasetForm
+from onegov.swissvotes.models import TranslatablePage
 from psycopg2.extras import NumericRange
 from xlsxwriter.workbook import Workbook
 
@@ -201,6 +202,7 @@ def test_page_form(session):
 
     assert page.title_translations == {'de_CH': 'A', 'en_US': 'Title'}
     assert page.content_translations == {'de_CH': 'B', 'en_US': 'Content'}
+    assert page.id == 'page'
 
     # ... en_US
     page.session_manager.current_locale = 'en_US'
@@ -216,6 +218,7 @@ def test_page_form(session):
 
     assert page.title_translations == {'de_CH': 'A', 'en_US': 'C'}
     assert page.content_translations == {'de_CH': 'B', 'en_US': 'D'}
+    assert page.id == 'page'
 
     # ... fr_CH
     page.session_manager.current_locale = 'fr_CH'
@@ -235,6 +238,23 @@ def test_page_form(session):
     assert page.content_translations == {
         'de_CH': 'B', 'en_US': 'D', 'fr_CH': 'F'
     }
+    assert page.id == 'page'
+
+    # Test ID generation
+    form = PageForm()
+    form.request = DummyRequest(session, DummyPrincipal())
+
+    assert form.id == 'page-1'
+
+    form.title.data = ' Über uns '
+    assert form.id == 'uber-uns'
+
+    form.update_model(page)
+    assert page.id == 'page'
+
+    page = TranslatablePage()
+    form.update_model(page)
+    assert page.id == 'uber-uns'
 
     # Test validation
     form = PageForm()

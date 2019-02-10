@@ -6,6 +6,7 @@ from onegov.swissvotes.collections import TranslatablePageCollection
 from onegov.swissvotes.models import Principal
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import TranslatablePage
+from onegov.swissvotes.models import TranslatablePageMove
 from onegov.user import Auth
 
 
@@ -96,8 +97,26 @@ def get_vote(app, bfs_number):
 
 
 @SwissvotesApp.path(
+    model=TranslatablePageCollection,
+    path='/pages'
+)
+def get_pages(app):
+    return TranslatablePageCollection(app.session())
+
+
+@SwissvotesApp.path(
     model=TranslatablePage,
     path='/page/{id}'
 )
 def get_page(app, id):
     return TranslatablePageCollection(app.session()).by_id(id)
+
+
+@SwissvotesApp.path(
+    model=TranslatablePageMove,
+    path='/move/page/{subject_id}/{direction}/{target_id}',
+)
+def get_page_move(app, subject_id, direction, target_id):
+    return TranslatablePageMove(
+        app.session(), subject_id, target_id, direction
+    )

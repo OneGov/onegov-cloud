@@ -3,6 +3,7 @@ from datetime import date
 from decimal import Decimal
 from io import BytesIO
 from io import StringIO
+from onegov.core.orm.abstract import MoveDirection
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.collections import TranslatablePageCollection
 from onegov.swissvotes.models import SwissVote
@@ -13,17 +14,46 @@ from xlrd import open_workbook
 
 def test_pages(session):
     pages = TranslatablePageCollection(session)
-    page = pages.add(
+
+    # setdefault
+    static = ['home', 'disclaimer', 'imprint', 'data-protection']
+    for id in reversed(static):
+        pages.setdefault(id)
+    assert [page.id for page in pages.query()] == static
+
+    # add
+    about = pages.add(
         id='about',
         title_translations={'en': "About", 'de': "Über"},
         content_translations={'en': "Placeholder", 'de': "Platzhalter"}
     )
-
-    assert page.id == 'about'
-    assert page.title_translations == {'en': "About", 'de': "Über"}
-    assert page.content_translations == {
+    assert about.id == 'about'
+    assert about.title_translations == {'en': "About", 'de': "Über"}
+    assert about.content_translations == {
         'en': "Placeholder", 'de': "Platzhalter"
     }
+    assert [page.id for page in pages.query()] == static + ['about']
+
+    contact = pages.add(
+        id='contact',
+        title_translations={'en': "Contact", 'de': "Kontakt"},
+        content_translations={'en': "Placeholder", 'de': "Platzhalter"}
+    )
+    dataset = pages.add(
+        id='dataset',
+        title_translations={'en': "Dataset", 'de': "Datensatz"},
+        content_translations={'en': "Placeholder", 'de': "Platzhalter"}
+    )
+    assert [page.id for page in pages.query()] == static + [
+        'about', 'contact', 'dataset'
+    ]
+
+    # move
+    pages.move(dataset, about, MoveDirection.above)
+    pages.move(about, contact, MoveDirection.below)
+    assert [page.id for page in pages.query()] == static + [
+        'dataset', 'contact', 'about'
+    ]
 
 
 def test_votes(session):

@@ -4,9 +4,7 @@ from onegov.core import utils
 from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.quill import QuillApp
-from onegov.swissvotes import _
 from onegov.swissvotes.models import Principal
-from onegov.swissvotes.models import TranslatablePage
 from onegov.swissvotes.theme import SwissvotesTheme
 
 
@@ -25,30 +23,9 @@ class SwissvotesApp(Framework, FormApp, QuillApp, DepotApp):
     def principal(self):
         return Principal()
 
-    def add_initial_content(self):
-        translators = {
-            locale: self.translations.get(locale) for locale in self.locales
-        }
-        session = self.session()
-        for page, title in (
-            ('home', _("Homepage")),
-            ('dataset', _("Dataset")),
-            ('about', _("About")),
-            ('contact', _("Contact")),
-            ('disclaimer', _("Disclaimer")),
-            ('imprint', _("Imprint")),
-        ):
-            translations = {
-                locale: title.interpolate(translators[locale].gettext(title))
-                for locale in self.locales
-            }
-            session.add(
-                TranslatablePage(
-                    id=page,
-                    title_translations=translations,
-                    content_translations=translations
-                )
-            )
+    @cached_property
+    def static_content_pages(self):
+        return {'home', 'disclaimer', 'imprint', 'data-protection'}
 
 
 @SwissvotesApp.static_directory()
@@ -119,6 +96,8 @@ def get_frameworks_asset():
     yield 'foundation.js'
     yield 'intercooler.js'
     yield 'underscore.js'
+    yield 'sortable.js'
+    yield 'sortable_custom.js'
     yield 'react.js'
     yield 'react-dom.js'
     yield 'react-dropdown-tree-select.js'

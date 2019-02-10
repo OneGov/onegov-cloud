@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-01-15 10:53+0100\n"
+"POT-Creation-Date: 2019-02-07 14:20+0100\n"
 "PO-Revision-Date: 2018-09-18 15:04+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: English\n"
@@ -15,24 +15,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-msgid "Homepage"
-msgstr "Homepage"
-
-msgid "Dataset"
-msgstr "Dataset"
-
-msgid "About"
-msgstr "About"
-
-msgid "Contact"
-msgstr "Contact"
-
-msgid "Disclaimer"
-msgstr "Disclaimer"
-
-msgid "Imprint"
-msgstr "Imprint"
 
 msgid "Title"
 msgstr "Title"
@@ -57,6 +39,9 @@ msgstr ""
 
 msgid "Realization"
 msgstr ""
+
+msgid "Dataset"
+msgstr "Dataset"
 
 msgid "From date"
 msgstr "From date"
@@ -1262,8 +1247,23 @@ msgstr ""
 msgid "canton-zh-label"
 msgstr ""
 
+msgid "Add page"
+msgstr ""
+
 msgid "Edit page"
 msgstr "Edit page"
+
+msgid "Delete page"
+msgstr ""
+
+msgid "Homepage"
+msgstr "Homepage"
+
+msgid "Add"
+msgstr ""
+
+msgid "Page"
+msgstr ""
 
 msgid "Download dataset (CSV)"
 msgstr "Download dataset (CSV)"
@@ -1427,9 +1427,6 @@ msgstr "Click the following link to set a new password:"
 msgid "If you don't want to change your password, you can ignore this email."
 msgstr "If you don't want to change your password, you can ignore this email."
 
-msgid "Login"
-msgstr "Login"
-
 msgid "Logout"
 msgstr "Logout"
 
@@ -1476,6 +1473,9 @@ msgstr ""
 "A password reset link has been sent to ${email}, provided an account exists "
 "for this email address."
 
+msgid "Login"
+msgstr "Login"
+
 msgid "Wrong username or password reset link not valid any more."
 msgstr "Wrong username or password reset link not valid any more."
 
@@ -1485,8 +1485,21 @@ msgstr "Password changed."
 msgid "Password reset"
 msgstr "Password reset"
 
+#, python-format
+msgid "Do you really want to delete \"${item}\"?"
+msgstr "Do you really want to delete \"${item}\"?"
+
+msgid "Delete"
+msgstr ""
+
+msgid "Page added."
+msgstr ""
+
 msgid "Page modified."
 msgstr "Page modified."
+
+msgid "Page deleted"
+msgstr ""
 
 msgid "Do you really want to delete all votes?!"
 msgstr "Do you really want to delete all votes?!"
@@ -1501,10 +1514,6 @@ msgstr "All votes deleted"
 #, python-format
 msgid "The dataset contains unknown descriptors: ${items}."
 msgstr "The dataset contains unknown descriptors: ${items}."
-
-#, python-format
-msgid "Do you really want to delete \"${item}\"?"
-msgstr "Do you really want to delete \"${item}\"?"
 
 msgid "Attachments updated"
 msgstr "Attachments updated"

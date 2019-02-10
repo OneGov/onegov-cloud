@@ -1,18 +1,6 @@
-from onegov.swissvotes.collections import TranslatablePageCollection
 
-
-def test_app_principal(swissvotes_app):
+def test_app(swissvotes_app):
     assert swissvotes_app.principal
-
-
-def test_app_initial_content(swissvotes_app):
-    pages = TranslatablePageCollection(swissvotes_app.session())
-
-    assert {page.title for page in pages.query()} == {
-        'Startseite',
-        'Datensatz',
-        'Über uns',
-        'Kontakt',
-        'Disclaimer',
-        'Impressum'
+    assert swissvotes_app.static_content_pages == {
+        'home', 'disclaimer', 'imprint', 'data-protection'
     }

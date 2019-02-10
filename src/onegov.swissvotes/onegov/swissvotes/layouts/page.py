@@ -1,5 +1,6 @@
 from cached_property import cached_property
 from onegov.core.elements import Link
+from onegov.core.elements import LinkGroup
 from onegov.swissvotes import _
 from onegov.swissvotes.layouts.default import DefaultLayout
 
@@ -21,6 +22,26 @@ class PageLayout(DefaultLayout):
                     attrs={'class': 'edit-icon'}
                 )
             )
+            if self.model.id not in self.app.static_content_pages:
+                result.append(
+                    Link(
+                        text=_("Delete page"),
+                        url=self.request.link(self.model, name='delete'),
+                        attrs={'class': 'delete-icon'}
+                    )
+                )
+            result.append(
+                LinkGroup(
+                    title=_("Add"),
+                    links=[
+                        Link(
+                            text=_("Page"),
+                            url=self.request.link(self.pages, name='add'),
+                            attrs={'class': 'page-icon'}
+                        )
+                    ]
+                ),
+            )
         return result
 
     @cached_property
@@ -34,11 +55,40 @@ class PageLayout(DefaultLayout):
         ]
 
 
+class AddPageLayout(DefaultLayout):
+
+    @cached_property
+    def title(self):
+        return _("Add page")
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(self.title, '#'),
+        ]
+
+
 class EditPageLayout(DefaultLayout):
 
     @cached_property
     def title(self):
         return _("Edit page")
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(self.model.title, self.request.link(self.model)),
+            Link(self.title, '#'),
+        ]
+
+
+class DeletePageLayout(DefaultLayout):
+
+    @cached_property
+    def title(self):
+        return _("Delete page")
 
     @cached_property
     def breadcrumbs(self):

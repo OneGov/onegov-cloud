@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Allows to add and remove content pages.
+  [msom]
+
+- Adds a static data protection content page.
+  [msom]
+
 - Removes the login link.
   [msom]
 

@@ -17,9 +17,12 @@
                     </li>
                 </ul>
                 <section class="top-bar-section">
-                    <ul class="left">
+                    <ul class="left" data-sortable data-sortable-url="${layout.move_page_url_template}">
                         <tal:block repeat="link links">
-                            <li><tal:b replace="structure link(layout)" /></li>
+                            <li tal:attributes="data-sortable-id link.sortable_id|None;
+                                                class python: 'draggable' if getattr(link, 'sortable_id', None) else None">
+                                <tal:b replace="structure link(layout)" />
+                            </li>
                         </tal:block>
                     </ul>
                 </section>

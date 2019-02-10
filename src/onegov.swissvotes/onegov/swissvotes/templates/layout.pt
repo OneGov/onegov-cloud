@@ -100,6 +100,7 @@
                         <tal:block replace="structure layout.imprint_link(layout)" />
                     </div>
                     <div class="small-12 medium-4 columns small-only-text-center medium-text-right manage-links">
+                        <tal:block replace="structure layout.data_protection_link(layout)" />
                     </div>
                 </div>
                  <div class="row">

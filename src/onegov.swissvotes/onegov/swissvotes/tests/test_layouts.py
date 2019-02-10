@@ -1,7 +1,10 @@
 from decimal import Decimal
 from onegov.swissvotes import _
 from onegov.swissvotes.collections import SwissVoteCollection
+from onegov.swissvotes.collections import TranslatablePageCollection
+from onegov.swissvotes.layouts import AddPageLayout
 from onegov.swissvotes.layouts import DefaultLayout
+from onegov.swissvotes.layouts import DeletePageLayout
 from onegov.swissvotes.layouts import DeleteVoteLayout
 from onegov.swissvotes.layouts import DeleteVotesLayout
 from onegov.swissvotes.layouts import EditPageLayout
@@ -23,6 +26,7 @@ class DummyPrincipal(object):
 class DummyApp(object):
     principal = DummyPrincipal()
     theme_options = {}
+    static_content_pages = {'home'}
 
 
 class DummyRequest(object):
@@ -77,9 +81,11 @@ def hrefs(items):
 
 
 def test_layout_default(swissvotes_app):
+    session = swissvotes_app.session()
+
     request = DummyRequest()
     request.app = swissvotes_app
-    request.session = swissvotes_app.session()
+    request.session = session
     model = None
 
     layout = DefaultLayout(model, request)
@@ -94,18 +100,50 @@ def test_layout_default(swissvotes_app):
         ('en_US', 'en', 'English', 'SiteLocale/')
     ]
     assert layout.request.includes == ['frameworks', 'chosen', 'common']
-    assert layout.top_navigation == [
-        ('Votes', 'SwissVoteCollection/'),
-        ('Datensatz', 'TranslatablePage/'),
-        ('Über uns', 'TranslatablePage/'),
-        ('Kontakt', 'TranslatablePage/')
-    ]
+    assert list(hrefs(layout.top_navigation)) == ['SwissVoteCollection/']
     assert layout.homepage_url == 'Principal/'
     assert layout.votes_url == 'SwissVoteCollection/'
     assert layout.login_url == 'Auth/login'
     assert layout.logout_url is None
+    assert layout.move_page_url_template == (
+        'TranslatablePageMove/?csrf-token=x'
+    )
     assert path([layout.disclaimer_link]) == 'TranslatablePage'
+    layout.disclaimer_link.text == 'disclaimer'
     assert path([layout.imprint_link]) == 'TranslatablePage'
+    layout.imprint_link.text == 'imprint'
+    assert path([layout.data_protection_link]) == 'TranslatablePage'
+    layout.data_protection_link.text == 'data-protection'
+
+    # Login
+    request.is_logged_in = True
+    layout = DefaultLayout(model, request)
+    assert layout.login_url is None
+    assert layout.logout_url == 'Auth/logout'
+
+    # Add some pages
+    pages = TranslatablePageCollection(session)
+    pages.add(
+        id='dataset',
+        title_translations={'de_CH': 'Datensatz', 'en_US': 'Dataset'},
+        content_translations={'de_CH': 'Datensatz', 'en_US': 'Dataset'}
+    )
+    pages.add(
+        id='about',
+        title_translations={'de_CH': 'Über uns', 'en_US': 'About'},
+        content_translations={'de_CH': 'Über uns', 'en_US': 'About'}
+    )
+    pages.add(
+        id='contact',
+        title_translations={'de_CH': 'Kontakt', 'en_US': 'Contact'},
+        content_translations={'de_CH': 'Kontakt', 'en_US': 'Contact'}
+    )
+    assert [item.text for item in layout.top_navigation] == [
+        'Votes',
+        'Datensatz',
+        'Über uns',
+        'Kontakt'
+    ]
 
     assert layout.format_bfs_number(Decimal('100')) == '100'
     assert layout.format_bfs_number(Decimal('100.1')) == '100.1'
@@ -124,19 +162,6 @@ def test_layout_default(swissvotes_app):
     assert layout.format_procedure_number(Decimal('9309.0')) == '9309'
     assert layout.format_procedure_number(Decimal('12239')) == '12239'
     assert layout.format_procedure_number(Decimal('12239.0')) == '12239'
-
-    # Login
-    request.is_logged_in = True
-    layout = DefaultLayout(model, request)
-    assert layout.login_url is None
-    assert layout.logout_url == 'Auth/logout'
-
-    # Remove initial content
-    layout.pages.query().delete()
-    assert layout.top_navigation == [('Votes', 'SwissVoteCollection/')]
-    assert layout.disclaimer_link is None
-    assert layout.imprint_link is None
-
     assert layout.format_policy_areas(SwissVote()) == ''
 
     vote = SwissVote(
@@ -193,7 +218,9 @@ def test_layout_page(session):
     request.roles = ['editor']
     layout = PageLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
-        'TranslatablePage/edit'
+        'TranslatablePage/edit',
+        'TranslatablePage/delete',
+        'TranslatablePageCollection/add'
     ]
 
     # Log in as admin
@@ -201,7 +228,37 @@ def test_layout_page(session):
     layout = PageLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
         'TranslatablePage/edit',
+        'TranslatablePage/delete',
+        'TranslatablePageCollection/add'
     ]
+
+    # Static page
+    model.id = 'home'
+    layout = PageLayout(model, request)
+    assert list(hrefs(layout.editbar_links)) == [
+        'TranslatablePage/edit',
+        'TranslatablePageCollection/add'
+    ]
+
+
+def test_layout_add_page(session):
+    request = DummyRequest()
+    model = TranslatablePageCollection(session)
+
+    layout = AddPageLayout(model, request)
+    assert layout.title == "Add page"
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/#'
+
+    # Log in as editor
+    request.roles = ['editor']
+    layout = AddPageLayout(model, request)
+    assert layout.editbar_links == []
+
+    # Log in as admin
+    request.roles = ['admin']
+    layout = AddPageLayout(model, request)
+    assert layout.editbar_links == []
 
 
 def test_layout_edit_page(session):
@@ -227,6 +284,32 @@ def test_layout_edit_page(session):
     # Log in as admin
     request.roles = ['admin']
     layout = EditPageLayout(model, request)
+    assert layout.editbar_links == []
+
+
+def test_layout_delete_page(session):
+    request = DummyRequest()
+    model = TranslatablePage(
+        id='page',
+        title_translations={'en_US': "Page", 'de_CH': "Seite"},
+        content_translations={'en_US': "Content", 'de_CH': "Inhalt"}
+    )
+    session.add(model)
+    session.flush()
+
+    layout = DeletePageLayout(model, request)
+    assert layout.title == "Delete page"
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/TranslatablePage/#'
+
+    # Log in as editor
+    request.roles = ['editor']
+    layout = DeletePageLayout(model, request)
+    assert layout.editbar_links == []
+
+    # Log in as admin
+    request.roles = ['admin']
+    layout = DeletePageLayout(model, request)
     assert layout.editbar_links == []
 
 
