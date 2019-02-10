@@ -1328,7 +1328,7 @@ msgid "Vote number"
 msgstr "Abstimmungsnummer"
 
 msgid "Related votes"
-msgstr "Verwandte Vorlagen "
+msgstr "Verwandte Vorlagen"
 
 msgid "Submission"
 msgstr "Einreichung"
