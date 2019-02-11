@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Removes Feriennet-specific bank configuration.
+  [href]
+
 - Fixes inconsistent ticket greeting.
   [href]
 
