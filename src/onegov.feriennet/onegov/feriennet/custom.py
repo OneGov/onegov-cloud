@@ -1,5 +1,4 @@
 from onegov.activity import BookingCollection
-from onegov.activity import InvoiceCollection
 from onegov.activity import PeriodCollection
 from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.collections import BillingCollection
@@ -101,7 +100,9 @@ def get_personal_tools(request):
         period = request.app.active_period
         periods = request.app.periods
 
-        invoices = InvoiceCollection(session, user_id=request.current_user.id)
+        invoices = request.app.invoice_collection(
+            user_id=request.current_user.id)
+
         unpaid = invoices.unpaid_count(excluded_period_ids={
             p.id for p in periods if not p.finalized})
 

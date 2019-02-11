@@ -3,11 +3,11 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="panel" tal:condition="not:layout.app.org.bank_account" i18n:translate>
+        <div class="panel" tal:condition="not:layout.app.org.meta.get('bank_account', None)" i18n:translate>
             No bank account defined. Please define a bank account in the <a href="${request.return_here('/settings')}" i18n:name="link" i18n:translate>settings</a> first.
         </div>
 
-        <div class="row" tal:condition="layout.app.org.bank_account and not uploaded">
+        <div class="row" tal:condition="layout.app.org.meta.get('bank_account', None) and not uploaded">
             <div class="columns small-12 medium-8">
                 <div metal:use-macro="layout.macros['form']"/>
             </div>

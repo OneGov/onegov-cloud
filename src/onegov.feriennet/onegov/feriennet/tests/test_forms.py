@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, date
 from onegov.activity import ActivityCollection
 from onegov.activity import AttendeeCollection
 from onegov.activity import BookingCollection
+from onegov.activity import InvoiceCollection
 from onegov.activity import OccasionCollection
 from onegov.activity import PeriodCollection
 from onegov.core.utils import Bunch
@@ -135,11 +136,15 @@ def test_notification_template_send_form(session):
     transaction.commit()
 
     # create a mock request
+    def invoice_collection(user_id=None, period_id=None):
+        return InvoiceCollection(session, user_id=user_id, period_id=period_id)
+
     def request(admin):
         return Bunch(
             app=Bunch(
                 active_period=periods.active(),
-                org=Bunch(geo_provider='geo-mapbox')
+                org=Bunch(geo_provider='geo-mapbox'),
+                invoice_collection=invoice_collection,
             ),
             session=session,
             include=lambda *args: None,
@@ -268,7 +273,7 @@ def test_notification_template_send_form(session):
     period = periods.query().one()
     billing = BillingCollection(request=Bunch(
         session=session,
-        app=Bunch()
+        app=Bunch(invoice_collection=invoice_collection)
     ), period=period)
     billing.create_invoices()
     transaction.commit()

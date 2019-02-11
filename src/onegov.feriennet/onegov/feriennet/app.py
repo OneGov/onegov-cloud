@@ -1,7 +1,8 @@
 import random
 
 from cached_property import cached_property
-from onegov.activity import Period, PeriodCollection
+from onegov.activity import Period, PeriodCollection, InvoiceCollection
+from onegov.activity.models.invoice_reference import Schema
 from onegov.core import utils
 from onegov.core.orm import orm_cached
 from onegov.feriennet.initial_content import create_new_organisation
@@ -111,6 +112,42 @@ class FeriennetApp(OrgApp):
         cfg.setdefault('enable_user_registration', True)
         cfg.setdefault('enable_yubikey', False)
         super().configure_organisation(**cfg)
+
+    def invoice_schema_config(self):
+        """ Returns the currently active schema_name and it's config. """
+        schema_name = self.org.meta.get(
+            'bank_reference_schema', 'feriennet-v1')
+
+        if schema_name == 'raiffeisen-v1':
+            schema_config = {
+                'esr_identification_number': self.org.meta.get(
+                    'bank_esr_identification_number'
+                )
+            }
+        else:
+            schema_config = None
+
+        return schema_name, schema_config
+
+    def invoice_collection(self, period_id=None, user_id=None):
+        """ Returns the invoice collection guaranteed to be configured
+        according to the organisation's settings.
+
+        """
+        schema_name, schema_config = self.invoice_schema_config()
+
+        return InvoiceCollection(
+            self.session(),
+            period_id=period_id,
+            user_id=user_id,
+            schema=schema_name,
+            schema_config=schema_config
+        )
+
+    def invoice_bucket(self):
+        """ Returns the active invoice reference bucket. """
+
+        return Schema.render_bucket(*self.invoice_schema_config())
 
 
 @FeriennetApp.template_directory()

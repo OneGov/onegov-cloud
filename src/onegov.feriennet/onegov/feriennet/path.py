@@ -168,8 +168,8 @@ def get_my_invoies(request, app, username=None, invoice=None):
     # XXX username should be user_id, invoice should be period_id
     # this should be changed, but needs to be changed by replacing
     # the username everywhere
-    return InvoiceCollection(
-        app.session(), period_id=invoice,
+    return app.invoice_collection(
+        period_id=invoice,
         user_id=request.app.user_ids_by_name[username])
 
 

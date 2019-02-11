@@ -2,7 +2,7 @@ from collections import OrderedDict
 from decimal import Decimal
 from itertools import groupby
 from onegov.activity import Activity, Attendee, Booking, Occasion
-from onegov.activity import BookingCollection, InvoiceCollection
+from onegov.activity import BookingCollection
 from onegov.core.orm import as_selectable_from_path
 from onegov.core.utils import module_path, Bunch
 from onegov.user import User
@@ -19,8 +19,7 @@ class BillingCollection(object):
         self.period = period
         self.username = username
         self.expand = expand
-        self.invoices = InvoiceCollection(
-            session=self.session,
+        self.invoices = request.app.invoice_collection(
             user_id=self.user_id,
             period_id=self.period.id
         )

@@ -115,3 +115,23 @@ def fix_contact_link(context):
 
     org.meta['homepage_structure'] = org.meta['homepage_structure'].replace(
         './forms/', './form/')
+
+
+@upgrade_task('Migrate bank payment rder type to reference schema')
+def migrate_bank_settings(context):
+    org = context.session.query(Organisation).first()
+
+    if org is None:
+        return
+
+    # not a feriennet
+    if '<registration />' not in org.meta['homepage_structure']:
+        return
+
+    if org.meta.get('bank_payment_order_type', 'basic') == 'basic':
+        org.meta['bank_reference_schema'] = 'feriennet-v1'
+    else:
+        org.meta['bank_reference_schema'] = 'esr-v1'
+
+    if 'bank_payment_order_type' in org.meta:
+        del org.meta['bank_payment_order_type']

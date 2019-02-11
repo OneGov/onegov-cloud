@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for ESR by Raiffeisen.
+  [href]
+
 - Adds support for latest onegov.activity.
   [href]
 

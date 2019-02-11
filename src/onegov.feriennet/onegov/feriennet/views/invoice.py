@@ -75,13 +75,21 @@ def view_my_invoices(self, request):
             'user': user.title
         })
 
-    if request.app.org.bank_payment_order_type == 'esr':
-        account = request.app.org.bank_esr_participant_number
-    else:
-        account = request.app.org.bank_account
-        account = account and iban.format(account)
+    # make sure the invoice is set up with the latest configured reference,
+    # which may result in a new reference record being added - this is done
+    # ad-hoc on an invoice to invoice basis since we do not need a new
+    # reference for an invoice that is never looked at
+    for invoice in invoices:
+        if not invoice.paid:
+            self.schema.link(request.session, invoice)
 
-    beneficiary = request.app.org.bank_beneficiary
+    if self.schema.name == 'feriennet-v1':
+        account = request.app.org.meta.get('bank_account')
+        account = account and iban.format(account)
+    else:
+        account = request.app.org.meta.get('bank_esr_participant_number')
+
+    beneficiary = request.app.org.meta.get('bank_beneficiary')
     payment_provider = request.app.default_payment_provider
     layout = InvoiceLayout(self, request, title)
 
@@ -121,7 +129,8 @@ def view_my_invoices(self, request):
         'account': account,
         'payment_provider': payment_provider,
         'payment_button': payment_button,
-        'beneficiary': beneficiary
+        'beneficiary': beneficiary,
+        'invoice_bucket': request.app.invoice_bucket()
     }
 
 

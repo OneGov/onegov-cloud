@@ -23,21 +23,29 @@ class FeriennetSettingsForm(Form):
         fieldset=_("Payment"),
     )
 
-    bank_payment_order_type = RadioField(
+    bank_reference_schema = RadioField(
         label=_("Payment Order"),
         fieldset=_("Payment"),
         choices=[
-            ('basic', _("Basic")),
-            ('esr', _("With reference number (ESR)")),
+            ('feriennet-v1', _("Basic")),
+            ('esr-v1', _("ESR (General)")),
+            ('raiffeisen-v1', _("ESR (Raiffeisen)"))
         ],
-        default='basic'
+        default='feriennet-v1'
     )
 
     bank_esr_participant_number = StringField(
         label=_("ESR participant number"),
         fieldset=_("Payment"),
         validators=[InputRequired()],
-        depends_on=('bank_payment_order_type', 'esr')
+        depends_on=('bank_reference_schema', '!feriennet-v1')
+    )
+
+    bank_esr_identification_number = StringField(
+        label=_("ESR identification number"),
+        fieldset=_("Payment"),
+        validators=[InputRequired()],
+        depends_on=('bank_reference_schema', 'raiffeisen-v1')
     )
 
     show_political_municipality = BooleanField(
@@ -71,29 +79,49 @@ class FeriennetSettingsForm(Form):
             ))
             return False
 
+    def ensure_valid_esr_identification_number(self):
+        if self.bank_reference_schema.data == 'raiffeisen-v1':
+            ident = self.bank_esr_identification_number.data
+
+            if len(ident.replace('-', ' ').strip()) != 6:
+                self.bank_esr_identification_number.errors.append(_(
+                    "The ESR identification number must be 6 characters long"
+                ))
+                return False
+
     def process_obj(self, obj):
         super().process_obj(obj)
 
-        self.show_political_municipality.data = obj.meta.get(
-            'show_political_municipality', False)
+        attributes = (
+            ('show_political_municipality', False),
+            ('show_related_contacts', False),
+            ('public_organiser_data', self.request.app.public_organiser_data),
+            ('bank_account', ''),
+            ('bank_beneficiary', ''),
+            ('bank_reference_schema', 'feriennet-v1'),
+            ('bank_esr_participant_number', ''),
+            ('bank_esr_identification_number', '')
+        )
 
-        self.show_related_contacts.data = obj.meta.get(
-            'show_related_contacts', False)
-
-        self.public_organiser_data.data = obj.meta.get(
-            'public_organiser_data', self.request.app.public_organiser_data)
+        for attr, default in attributes:
+            getattr(self, attr).data = obj.meta.get(attr, default)
 
     def populate_obj(self, obj, *args, **kwargs):
         super().populate_obj(obj, *args, **kwargs)
 
-        obj.meta['show_political_municipality']\
-            = self.show_political_municipality.data
+        attributes = (
+            'show_political_municipality',
+            'show_related_contacts',
+            'public_organiser_data',
+            'bank_account',
+            'bank_beneficiary',
+            'bank_reference_schema',
+            'bank_esr_participant_number',
+            'bank_esr_identification_number',
+        )
 
-        obj.meta['show_related_contacts']\
-            = self.show_related_contacts.data
-
-        obj.meta['public_organiser_data']\
-            = self.public_organiser_data.data
+        for attr in attributes:
+            obj.meta[attr] = getattr(self, attr).data
 
 
 @FeriennetApp.form(model=Organisation, name='feriennet-settings',

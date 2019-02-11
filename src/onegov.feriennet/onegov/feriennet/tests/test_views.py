@@ -1,4 +1,5 @@
 import onegov.feriennet
+import re
 import requests_mock
 
 from datetime import datetime, timedelta, date, time
@@ -1795,3 +1796,83 @@ def test_no_state_before_wishlist_phase_starts(client, scenario):
     page = client.get('/activity/marathon')
     assert 'Plätze frei' not in page
     assert not page.pyquery('.state')
+
+
+def test_invoice_references(client, scenario):
+
+    scenario.add_period(title="2019", confirmed=True, finalized=False)
+    scenario.add_activity(title="Fishing", state='accepted')
+    scenario.add_occasion(cost=100)
+    scenario.add_attendee(name="Dustin")
+    scenario.add_booking(state='accepted', cost=100)
+    scenario.commit()
+
+    client.login_admin()
+
+    settings = client.get('/feriennet-settings')
+    settings.form['bank_account'] = 'CH6309000000250097798'
+    settings.form['bank_beneficiary'] = 'Initech'
+    settings.form.submit()
+
+    page = client.get('/billing')
+    page.form['confirm'] = 'yes'
+    page.form['sure'] = 'yes'
+    page.form.submit()
+
+    def reference():
+        return client.get('/my-bills')\
+            .pyquery('.reference-number').text().strip()
+
+    default_reference = reference()
+    assert re.match(r'Q-[0-9A-Z]{5}-[0-9A-Z]{5}', default_reference)
+
+    settings = client.get('/feriennet-settings')
+    settings.form['bank_reference_schema'] = 'esr-v1'
+    settings.form['bank_esr_participant_number'] = '1337'
+    settings.form.submit()
+
+    # each change of schema/config leads to new references
+    esr_reference = reference()
+    assert re.match(r'[0-9 ]+', esr_reference)
+
+    settings = client.get('/feriennet-settings')
+    settings.form['bank_reference_schema'] = 'raiffeisen-v1'
+    settings.form['bank_esr_identification_number'] = '999999'
+    page = settings.form.submit()
+
+    raiffeisen_reference_1 = reference()
+    assert re.match(r'99 9999[0-9 ]+', raiffeisen_reference_1)
+
+    settings = client.get('/feriennet-settings')
+    settings.form['bank_reference_schema'] = 'raiffeisen-v1'
+    settings.form['bank_esr_identification_number'] = '111111'
+    settings.form.submit()
+
+    raiffeisen_reference_2 = reference()
+    assert re.match(r'11 1111[0-9 ]+', raiffeisen_reference_2)
+
+    # returning to old schemas doesn't result in new references
+    settings = client.get('/feriennet-settings')
+    settings.form['bank_reference_schema'] = 'esr-v1'
+    settings.form.submit()
+
+    assert reference() == esr_reference
+
+    settings = client.get('/feriennet-settings')
+    settings.form['bank_reference_schema'] = 'raiffeisen-v1'
+    settings.form.submit()
+
+    assert reference() == raiffeisen_reference_2
+
+    settings = client.get('/feriennet-settings')
+    settings.form['bank_reference_schema'] = 'raiffeisen-v1'
+    settings.form['bank_esr_identification_number'] = '999999'
+    settings.form.submit()
+
+    assert reference() == raiffeisen_reference_1
+
+    settings = client.get('/feriennet-settings')
+    settings.form['bank_reference_schema'] = 'feriennet-v1'
+    settings.form.submit()
+
+    assert reference() == default_reference

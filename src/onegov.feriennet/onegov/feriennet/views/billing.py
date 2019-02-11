@@ -326,7 +326,6 @@ def view_execute_import(self, request):
     xml = xml.decode('utf-8')
 
     invoice = cache['invoice']
-    invoices = InvoiceCollection(request.session)
 
     transactions = list(
         match_iso_20022_to_usernames(xml, request.session, period_id=invoice))
@@ -338,7 +337,7 @@ def view_execute_import(self, request):
         users[t.username]: t for t in transactions if t.state == 'success'}
 
     if payments:
-        invoices = InvoiceCollection(request.session, period_id=invoice)
+        invoices = request.app.invoice_collection(period_id=invoice)
         invoices = invoices.query()
         invoices = invoices.filter(Invoice.user_id.in_(payments.keys()))
 

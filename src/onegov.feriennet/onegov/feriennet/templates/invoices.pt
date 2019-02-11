@@ -118,14 +118,18 @@
                                         <span i18n:translate>Amount</span>
                                         <span>${'{:.2f}'.format(invoice.outstanding_amount)} CHF</span>
                                     </li>
-                                    <tal:b switch="layout.org.bank_payment_order_type">
-                                        <li tal:case="string:esr">
+                                    <tal:b switch="layout.org.meta.get('bank_reference_schema')">
+                                        <li tal:case="string:esr-v1">
                                             <span i18n:translate>Reference Number</span>
-                                            <span>${invoice.readable_by_schema('esr-v1')}</span>
+                                            <span class="reference-number">${invoice.readable_by_bucket(invoice_bucket)}</span>
+                                        </li>
+                                        <li tal:case="string:raiffeisen-v1">
+                                            <span i18n:translate>Reference Number</span>
+                                            <span class="reference-number">${invoice.readable_by_bucket(invoice_bucket)}</span>
                                         </li>
                                         <li tal:case="default">
                                             <span i18n:translate>Notice</span>
-                                            <span>${invoice.readable_by_schema('feriennet-v1')}</span>
+                                            <span class="reference-number">${invoice.readable_by_bucket(invoice_bucket)}</span>
                                         </li>
                                     </tal:b>
                                 </ul>

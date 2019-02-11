@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-01-28 14:05+0100\n"
+"POT-Creation-Date: 2019-02-11 15:02+0100\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1172,7 +1172,7 @@ msgid "Could not match the payment to a bill."
 msgstr "Die Zahlung konnte keiner Rechnung zugewiesen werden."
 
 msgid "Hello!"
-msgstr "Guten Tag!"
+msgstr "Guten Tag"
 
 msgid "Your activity has been archived:"
 msgstr "Ihr Angebot wurde archiviert:"
@@ -2096,6 +2096,9 @@ msgstr "Einzahlungsschein"
 msgid "ESR participant number"
 msgstr "ESR Teilnehmernummer"
 
+msgid "ESR identification number"
+msgstr "ESR Identifikationsnummer"
+
 msgid "Require the political municipality in the userprofile"
 msgstr "Verlange die politische Gemeinde im Benutzerprofil"
 
@@ -2115,11 +2118,17 @@ msgstr "Öffentliche Veranstalterdaten"
 msgid "Basic"
 msgstr "Einfach"
 
-msgid "With reference number (ESR)"
-msgstr "Mit Referenznummer (ESR)"
+msgid "ESR (General)"
+msgstr "ESR (Generell)"
+
+msgid "ESR (Raiffeisen)"
+msgstr "ESR (Raiffeisen)"
 
 msgid "E-Mail"
 msgstr "E-Mail"
+
+msgid "The ESR identification number must be 6 characters long"
+msgstr "Die ESR Identifikationsnummer muss 6 Zeichen lang sein"
 
 msgid "Mailing"
 msgstr "Versand"
@@ -2214,6 +2223,9 @@ msgstr "Möchten Sie ${attendee}s Buchung wirklich löschen?"
 #, python-format
 msgid "Do you really want to cancel ${attendee}'s booking?"
 msgstr "Möchten Sie ${attendee}s Buchung wirklich absagen?"
+
+#~ msgid "With reference number (ESR)"
+#~ msgstr "Mit Referenznummer (ESR)"
 
 #~ msgid "Dear Sir or Madam,"
 #~ msgstr "Sehr geehrte Damen und Herren,"
