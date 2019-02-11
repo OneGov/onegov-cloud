@@ -3,6 +3,8 @@ from onegov.core import Framework
 from onegov.core import utils
 from onegov.file import DepotApp
 from onegov.form import FormApp
+from onegov.user import UserGroupCollection
+from onegov.wtfs.collections import MunicipalityCollection
 from onegov.wtfs.models import Principal
 from onegov.wtfs.theme import WtfsTheme
 
@@ -23,7 +25,36 @@ class WtfsApp(Framework, FormApp, DepotApp):
         return Principal()
 
     def add_initial_content(self):
-        pass
+        session = self.session()
+        groups = UserGroupCollection(session)
+        municipalities = MunicipalityCollection(session)
+        for name, bfs_number in (
+            ('Winterthur', 230),
+            ('Adlikon', 21),
+            ('Aesch', 241),
+            ('Aeugst am Albis', 1),
+            ('Altikon', 211),
+            ('Andelfingen', 30),
+            ('Bachenbülach', 51),
+            ('Bachs', 81),
+            ('Bäretswil', 111),
+            ('Bauma', 171),
+            ('Benken', 22),
+            ('Berg am Irchel', 23),
+            ('Bertschikon', 212),
+            ('Birmensdorf', 242),
+            ('Bonstetten', 3),
+            ('Boppelsen', 82),
+            ('Brütten', 213),
+            ('Buch am Irchel', 24),
+            ('Dachsen', 25),
+            ('Dägerlen', 214)
+        ):
+            municipalities.add(
+                name=name,
+                bfs_number=bfs_number,
+                group_id=groups.add(name=name).id
+            )
 
 
 @WtfsApp.static_directory()
