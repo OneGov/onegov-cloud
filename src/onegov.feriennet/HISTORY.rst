@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.5.0 (2019-02-11)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds support for ESR by Raiffeisen.
   [href]
