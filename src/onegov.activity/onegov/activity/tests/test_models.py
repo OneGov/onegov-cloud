@@ -1923,6 +1923,8 @@ def test_invoice_reference(session, owner, prebooking_period):
     assert len(i1.references) == 1
     assert i1.references[0].reference.startswith('q')
     assert i1.references[0].readable.startswith('Q')
+    assert i1.references[0].schema == 'feriennet-v1'
+    assert i1.references[0].bucket == 'feriennet-v1'
 
     # make sure linking to the same schema is idempotent
     invoices.schema.link(session, i1)
@@ -1937,12 +1939,44 @@ def test_invoice_reference(session, owner, prebooking_period):
     assert len(i1.references) == 2
     assert len(i1.references[1].reference) == 27
     assert ' ' in i1.references[1].readable
+    assert i1.references[1].schema == 'esr-v1'
+    assert i1.references[1].bucket == 'esr-v1'
 
     # make sure linking to the same schema is idempotent
     invoices.schema.link(session, i1)
     session.refresh(i1)
-
     assert len(i1.references) == 2
+
+    # Raiffeisen
+    # ----------
+    invoices = invoices.for_schema('raiffeisen-v1', schema_config=dict(
+        esr_identification_number='123123'
+    ))
+    invoices.schema.link(session, i1)
+    session.refresh(i1)
+    assert len(i1.references) == 3
+    assert len(i1.references[2].reference) == 27
+    assert i1.references[2].reference.startswith('123123')
+    assert i1.references[2].schema == 'raiffeisen-v1'
+    assert i1.references[2].bucket.startswith('raiffeisen-v1-')
+
+    # make sure linking the same schema is idempotent
+    invoices.schema.link(session, i1)
+    session.refresh(i1)
+    assert len(i1.references) == 3
+
+    # unless we change the config
+    invoices = invoices.for_schema('raiffeisen-v1', schema_config=dict(
+        esr_identification_number='321321'
+    ))
+
+    invoices.schema.link(session, i1)
+    session.refresh(i1)
+    assert len(i1.references) == 4
+    assert i1.references[3].reference.startswith('321321')
+    assert i1.references[3].schema == 'raiffeisen-v1'
+    assert i1.references[3].bucket.startswith('raiffeisen-v1-')
+    assert i1.references[2].bucket != i1.references[3].bucket
 
 
 def test_invoice_reference_format_esr():

@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes a number of issues with the invoice reference implementation.
+  [href]
+
 1.12.0 (2019-02-08)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -5,7 +5,7 @@ import string
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from onegov.core.utils import chunks
+from onegov.core.utils import chunks, hash_dictionary
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Text
@@ -61,9 +61,13 @@ class InvoiceReference(Base, TimestampMixin):
     #: the schema used to generate the invoice
     schema = Column(Text, nullable=False)
 
+    #: groups schema name and its config to identify records created by a
+    #: given schema and config
+    bucket = Column(Text, nullable=False)
+
     __table_args__ = (
         UniqueConstraint(
-            'schema', 'invoice_id', name='unique_schema_invoice_id'),
+            'bucket', 'invoice_id', name='unique_bucket_invoice_id'),
     )
 
     @validates
@@ -106,9 +110,23 @@ class Schema(object):
         is not passed in.
 
         """
-
         for k, v in config.items():
             setattr(self, k, v)
+
+        self.config = config
+
+    @property
+    def bucket(self):
+        """ Generates a unique identifer for the current schema and config. """
+
+        return self.render_bucket(self.name, self.config)
+
+    @classmethod
+    def render_bucket(cls, schema_name, schema_config=None):
+        if schema_config:
+            return f'{schema_name}-{hash_dictionary(schema_config)}'
+
+        return schema_name
 
     def link(self, session, invoice, optimistic=False, flush=True):
         """ Creates a new :class:`InvoiceReference` for the given invoice.
@@ -137,7 +155,7 @@ class Schema(object):
 
         # check if we are already linked
         if not optimistic:
-            if q.filter_by(schema=self.name, invoice_id=invoice.id).first():
+            if q.filter_by(bucket=self.bucket, invoice_id=invoice.id).first():
                 return
 
         # find an unused reference
@@ -155,7 +173,8 @@ class Schema(object):
         reference = InvoiceReference(
             invoice_id=invoice.id,
             reference=candidate,
-            schema=self.name
+            schema=self.name,
+            bucket=self.bucket,
         )
 
         session.add(reference)
@@ -278,10 +297,11 @@ class RaiffeisenSchema(ESRSchema, name='raiffeisen-v1'):
     """ Customised ESR for Raiffeisen. """
 
     def new(self):
-        assert hasattr(self, 'esr_identification_number')
-        assert len(self.esr_identification_number) == 6
+        ident = self.esr_identification_number.replace('-', '').strip()
+        assert 6 <= len(ident) <= 7
 
-        random = ''.join(secrets.choice(string.digits) for _ in range(0, 20))
+        rest = 26 - len(ident)
+        random = ''.join(secrets.choice(string.digits) for _ in range(0, rest))
         number = f'{self.esr_identification_number}{random}'
 
         return number + self.checksum(number)

@@ -500,6 +500,11 @@ def add_invoices(context):
     if not context.has_column('invoice_items', 'code'):
         return
 
+    if not context.has_column('invoices', 'code'):
+        context.operations.add_column('invoices', Column(
+            'code', Text, nullable=True
+        ))
+
     stmt = as_selectable("""
         SELECT
             invoice_items.id,           -- UUID
@@ -596,12 +601,17 @@ def add_invoice_references(context):
 
     invoices = context.session.execute(select(stmt.c))
 
+    # the references might have been created already in the previous upgrade
+    # step, if it was executed with the latest release
+    context.session.execute('DELETE FROM invoice_references')
+
     for invoice in invoices:
         context.session.add(
             InvoiceReference(
                 invoice_id=invoice.id,
                 reference=invoice.code,
-                schema='feriennet-v1'
+                schema='feriennet-v1',
+                bucket='feriennet-v1'
             )
         )
 
@@ -609,8 +619,29 @@ def add_invoice_references(context):
             InvoiceReference(
                 invoice_id=invoice.id,
                 reference=encode_invoice_code(invoice.code),
-                schema='esr-v1'
+                schema='esr-v1',
+                bucket='esr-v1'
             )
         )
 
     context.operations.drop_column('invoices', 'code')
+
+
+@upgrade_task('Add invoice reference bucket')
+def add_invoice_reference_bucket(context):
+    if context.has_column('invoice_references', 'bucket'):
+        return
+
+    context.add_column_with_defaults(
+        table='invoice_references',
+        column=Column('bucket', Text),
+        default=lambda r: r.schema
+    )
+
+    context.operations.drop_constraint(
+        'unique_schema_invoice_id', 'invoice_references')
+
+    context.operations.create_unique_constraint(
+        'unique_bucket_invoice_id', 'invoice_references', (
+            'bucket', 'invoice_id'
+        ))

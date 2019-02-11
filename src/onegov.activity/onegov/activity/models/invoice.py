@@ -9,9 +9,10 @@ from sqlalchemy import and_
 from sqlalchemy import select
 from sqlalchemy import func
 from sqlalchemy import Column
+from sqlalchemy import Text
 from sqlalchemy import ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import object_session, relationship
+from sqlalchemy.orm import deferred, object_session, relationship
 from uuid import uuid4
 
 
@@ -31,6 +32,9 @@ class Invoice(Base, TimestampMixin):
     user_id = Column(UUID, ForeignKey('users.id'), nullable=False)
     user = relationship(User, backref='invoices')
 
+    #: deprecated reference field -> remove in Feriennet 1.6
+    code = deferred(Column(Text, nullable=True))
+
     #: the specific items linked with this invoice
     items = relationship(InvoiceItem, backref='invoice')
 
@@ -38,16 +42,9 @@ class Invoice(Base, TimestampMixin):
     def price(self):
         return Price(self.outstanding_amount, 'CHF')
 
-    def reference_by_schema(self, schema):
+    def readable_by_bucket(self, bucket):
         for ref in self.references:
-            if ref.schema == schema:
-                return ref.reference
-
-        return None
-
-    def readable_by_schema(self, schema):
-        for ref in self.references:
-            if ref.schema == schema:
+            if ref.bucket == bucket:
                 return ref.readable
 
         return None
