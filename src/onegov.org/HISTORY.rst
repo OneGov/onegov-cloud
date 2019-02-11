@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.0.4 (2019-02-11)
+~~~~~~~~~~~~~~~~~~~
+
 - Removes Feriennet-specific bank configuration.
   [href]
 
