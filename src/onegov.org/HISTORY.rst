@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes inconsistent ticket greeting.
+  [href]
+
 1.0.3 (2019-02-05)
 ~~~~~~~~~~~~~~~~~~~
 

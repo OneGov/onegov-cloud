@@ -3,7 +3,7 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="body">
-        <p i18n:translate>Hi!</p>
+        <p i18n:translate>Hello!</p>
         <p i18n:translate>Your directory submission has unfortunately been rejected:</p>
 
         <p><b>${ticket.group} - ${ticket.title}</b></p>

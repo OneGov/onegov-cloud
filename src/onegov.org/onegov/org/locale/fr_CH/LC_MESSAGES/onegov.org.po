@@ -2345,7 +2345,7 @@ msgid "This album does not contain any images yet."
 msgstr "Cet album ne contient pas encore d'images."
 
 msgid "Hi!"
-msgstr "Bonjour !"
+msgstr "Bonjour"
 
 msgid "Your directory submission has unfortunately been rejected:"
 msgstr "Votre proposition de répertoire a malheureusement été rejetée :"
