@@ -66,16 +66,16 @@ def test_municipality_form(session):
     form = MunicipalityForm()
     form.request = Request(session)
     form.on_request()
-    assert [c[1] for c in form.group_id.choices] == ["", "Gruppe Aesch"]
+    assert [c[1] for c in form.group_id.choices] == ["Gruppe Aesch"]
 
     form.model = municipalities
     form.on_request()
-    assert [c[1] for c in form.group_id.choices] == ["", "Gruppe Aesch"]
+    assert [c[1] for c in form.group_id.choices] == ["Gruppe Aesch"]
 
     form.model = municipality
     form.on_request()
     assert [c[1] for c in form.group_id.choices] == [
-        "", "Gruppe Aesch", "Gruppe Winterthur"
+        "Gruppe Aesch", "Gruppe Winterthur"
     ]
 
     # Test apply / update
@@ -93,13 +93,6 @@ def test_municipality_form(session):
     assert municipality.bfs_number == 21
     assert municipality.group.name == "Gruppe Adlikon"
 
-    form.group_id.data = ''
-    form.update_model(municipality)
-    session.flush()
-    session.expire_all()
-    assert municipality.group_id is None
-    assert municipality.group is None
-
     # Test validation
     form = MunicipalityForm()
     form.request = Request(session)
@@ -115,7 +108,7 @@ def test_municipality_form(session):
     )
     form.request = Request(session)
     form.on_request()
-    assert form.validate()
+    assert not form.validate()
 
     form = MunicipalityForm(
         PostData({
@@ -130,41 +123,35 @@ def test_municipality_form(session):
 
 
 def test_import_municipality_data_form(session):
+    groups = UserGroupCollection(session)
     municipalities = MunicipalityCollection(session)
-    municipalities.add(name="Gemeinde Winterthur", bfs_number=230)
-    municipalities.add(name="Gemeinde Adlikon", bfs_number=21)
+    municipalities.add(
+        name="Winterthur",
+        bfs_number=230,
+        group_id=groups.add(name="Winterthur").id
+    )
+    municipalities.add(
+        name="Adlikon",
+        bfs_number=21,
+        group_id=groups.add(name="Adlikon").id
+    )
 
     # Test apply
     form = ImportMunicipalityDataForm()
     form.request = Request(session)
 
     form.file.data = {
-        21: {
-            'name': 'Adikon',
-            'dates': [date(2019, 1, 1), date(2019, 1, 7)]
-        },
-        211: {
-            'name': 'Altikon',
-            'dates': [date(2019, 1, 2), date(2019, 1, 8)]
-        },
-        241: {
-            'name': 'Aesch',
-            'dates': [date(2019, 1, 3), date(2019, 1, 9)]
-        },
-        230: {
-            'name': 'Winterthur',
-            'dates': [date(2019, 1, 4), date(2019, 1, 10)]
-        }
+        21: {'dates': [date(2019, 1, 1), date(2019, 1, 7)]},
+        241: {'dates': [date(2019, 1, 3), date(2019, 1, 9)]},
+        230: {'dates': [date(2019, 1, 4), date(2019, 1, 10)]}
     }
     form.update_model(municipalities)
     assert [
-        (m.name, m.bfs_number, [d.date for d in m.pickup_dates])
+        (m.bfs_number, [d.date for d in m.pickup_dates])
         for m in municipalities.query()
     ] == [
-        ('Adikon', 21, [date(2019, 1, 1), date(2019, 1, 7)]),
-        ('Aesch', 241, [date(2019, 1, 3), date(2019, 1, 9)]),
-        ('Altikon', 211, [date(2019, 1, 2), date(2019, 1, 8)]),
-        ('Winterthur', 230, [date(2019, 1, 4), date(2019, 1, 10)])
+        (21, [date(2019, 1, 1), date(2019, 1, 7)]),
+        (230, [date(2019, 1, 4), date(2019, 1, 10)])
     ]
 
     # Test validation
@@ -174,10 +161,7 @@ def test_import_municipality_data_form(session):
 
     field_storage = FieldStorage()
     field_storage.file = BytesIO(
-        (
-            "Gemeinde,Gemeinde-Nr,Vordefinierte Termine\n"
-            "Adlikon,21,12.2.2015"
-        ).encode('utf-8')
+        "Gemeinde-Nr,Vordefinierte Termine\n21,12.2.2015".encode('utf-8')
     )
     field_storage.type = 'text/csv'
     field_storage.filename = 'test.csv'
@@ -187,10 +171,12 @@ def test_import_municipality_data_form(session):
 
 
 def test_delete_municipality_dates_form(session):
+    groups = UserGroupCollection(session)
     municipalities = MunicipalityCollection(session)
     municipality = municipalities.add(
-        name="Gemeinde Winterthur",
+        name="Winterthur",
         bfs_number=230,
+        group_id=groups.add(name="Winterthur").id
     )
 
     # Test apply / update

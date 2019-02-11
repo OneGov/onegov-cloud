@@ -1,11 +1,22 @@
 from datetime import date
+from onegov.user import UserGroupCollection
 from onegov.wtfs.collections import MunicipalityCollection
 
 
 def test_municipalities(session):
+    groups = UserGroupCollection(session)
+
     municipalities = MunicipalityCollection(session)
-    municipalities.add(name='Winterthur', bfs_number=230)
-    municipalities.add(name='Adlikon', bfs_number=21)
+    municipalities.add(
+        name='Winterthur',
+        bfs_number=230,
+        group_id=groups.add(name='Winterthur').id
+    )
+    municipalities.add(
+        name='Adlikon',
+        bfs_number=21,
+        group_id=groups.add(name='Adlikon').id
+    )
 
     assert [(m.name, m.bfs_number) for m in municipalities.query()] == [
         ('Adlikon', 21),
@@ -14,52 +25,35 @@ def test_municipalities(session):
 
     # Import data
     data = {
-        21: {
-            'name': 'Adikon',
-            'dates': [date(2019, 1, 1), date(2019, 1, 7)]
-        },
-        211: {
-            'name': 'Altikon',
-            'dates': [date(2019, 1, 2), date(2019, 1, 8)]
-        },
-        241: {
-            'name': 'Aesch',
-            'dates': [date(2019, 1, 3), date(2019, 1, 9)]
-        },
-        230: {
-            'name': 'Winterthur',
-            'dates': [date(2019, 1, 4), date(2019, 1, 10)]
-        }
+        21: {'dates': [date(2019, 1, 1), date(2019, 1, 7)]},
+        241: {'dates': [date(2019, 1, 2), date(2019, 1, 8)]},
+        230: {'dates': [date(2019, 1, 4), date(2019, 1, 10)]}
     }
     municipalities.import_data(data)
-
     assert [
-        (m.name, m.bfs_number, [d.date for d in m.pickup_dates])
+        (m.bfs_number, [d.date for d in m.pickup_dates])
         for m in municipalities.query()
     ] == [
-        ('Adikon', 21, [date(2019, 1, 1), date(2019, 1, 7)]),
-        ('Aesch', 241, [date(2019, 1, 3), date(2019, 1, 9)]),
-        ('Altikon', 211, [date(2019, 1, 2), date(2019, 1, 8)]),
-        ('Winterthur', 230, [date(2019, 1, 4), date(2019, 1, 10)])
+        (21, [date(2019, 1, 1), date(2019, 1, 7)]),
+        (230, [date(2019, 1, 4), date(2019, 1, 10)])
     ]
 
+    municipalities.add(
+        name='Aesch',
+        bfs_number=241,
+        group_id=groups.add(name='Aesch').id
+    )
     data = {
-        241: {
-            'name': 'Aesch',
-            'dates': [date(2019, 1, 9), date(2019, 1, 8)]
-        },
-        230: {
-            'name': 'Winterthur',
-            'dates': []
-        }
+        21: {'dates': [date(2019, 1, 7), date(2019, 1, 8)]},
+        241: {'dates': [date(2019, 1, 2), date(2019, 1, 8)]},
+        230: {'dates': []}
     }
     municipalities.import_data(data)
     assert [
-        (m.name, m.bfs_number, [d.date for d in m.pickup_dates])
+        (m.bfs_number, [d.date for d in m.pickup_dates])
         for m in municipalities.query()
     ] == [
-        ('Adikon', 21, [date(2019, 1, 1), date(2019, 1, 7)]),
-        ('Aesch', 241, [date(2019, 1, 3), date(2019, 1, 8), date(2019, 1, 9)]),
-        ('Altikon', 211, [date(2019, 1, 2), date(2019, 1, 8)]),
-        ('Winterthur', 230, [date(2019, 1, 4), date(2019, 1, 10)])
+        (21, [date(2019, 1, 1), date(2019, 1, 7), date(2019, 1, 8)]),
+        (241, [date(2019, 1, 2), date(2019, 1, 8)]),
+        (230, [date(2019, 1, 4), date(2019, 1, 10)])
     ]

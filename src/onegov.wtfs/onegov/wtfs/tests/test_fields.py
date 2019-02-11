@@ -88,24 +88,16 @@ def test_municipality_data_upload_field():
 
     # Invalid
     field = process(
-        b'Gemeinde,Gemeinde-Nr,Vordefinierte Termine\n'
-        b',21,\n'
+        b'Gemeinde-Nr,Vordefinierte Termine\n'
+        b'Adlikon,\n'
     )
     assert not field.validate(form)
     errors = [error.interpolate() for error in field.errors]
     assert "Some rows contain invalid values: 2." in errors
 
     field = process(
-        b'Gemeinde,Gemeinde-Nr,Vordefinierte Termine\n'
-        b'Adlikon,Adlikon,\n'
-    )
-    assert not field.validate(form)
-    errors = [error.interpolate() for error in field.errors]
-    assert "Some rows contain invalid values: 2." in errors
-
-    field = process(
-        b'Gemeinde,Gemeinde-Nr,Vordefinierte Termine\n'
-        b'Adlikon,21,Test\n'
+        b'Gemeinde-Nr,Vordefinierte Termine\n'
+        b'21,Test\n'
     )
     assert not field.validate(form)
     errors = [error.interpolate() for error in field.errors]
@@ -113,17 +105,17 @@ def test_municipality_data_upload_field():
 
     # Valid
     field = process(
-        b'Gemeinde,Gemeinde-Nr,Vordefinierte Termine\n'
-        b'Adlikon,21,\n'
+        b'Gemeinde-Nr,Vordefinierte Termine\n'
+        b'21,\n'
     )
     assert field.validate(form)
-    assert field.data == {21: {'name': 'Adlikon', 'dates': []}}
+    assert field.data == {21: {'dates': []}}
 
     field = process(
-        b'Gemeinde,Gemeinde-Nr,Vordefinierte Termine,Vordefinierte Termine\n'
-        b'Adlikon,21,01.01.2019,07.01.2019\n'
+        b'Gemeinde-Nr,Vordefinierte Termine,Vordefinierte Termine\n'
+        b'21,01.01.2019,07.01.2019\n'
     )
     assert field.validate(form)
     assert field.data == {
-        21: {'name': 'Adlikon', 'dates': [date(2019, 1, 1), date(2019, 1, 7)]}
+        21: {'dates': [date(2019, 1, 1), date(2019, 1, 7)]}
     }

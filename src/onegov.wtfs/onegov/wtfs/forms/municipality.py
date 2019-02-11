@@ -33,6 +33,9 @@ class MunicipalityForm(Form):
     group_id = ChosenSelectField(
         label=_("User group"),
         choices=[],
+        validators=[
+            InputRequired()
+        ]
     )
 
     def on_request(self):
@@ -51,7 +54,6 @@ class MunicipalityForm(Form):
             groups = groups.filter(UserGroup.id.notin_(used_groups))
         groups = groups.order_by(UserGroup.name)
         self.group_id.choices = groups.all()
-        self.group_id.choices.insert(0, ('', ''))
 
     def update_model(self, model):
         model.name = self.name.data

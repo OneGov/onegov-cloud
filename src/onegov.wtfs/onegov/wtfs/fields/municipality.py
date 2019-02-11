@@ -13,7 +13,6 @@ class MunicipalityDataUploadField(CsvUploadField):
             *args,
             **kwargs,
             expected_headers=[
-                'Gemeinde',
                 'Gemeinde-Nr',
                 'Vordefinierte Termine',
             ],
@@ -34,18 +33,13 @@ class MunicipalityDataUploadField(CsvUploadField):
         data = {}
         for line in self.data.lines:
             try:
-                assert line.gemeinde
-                name = line.gemeinde
                 bfs_number = int(line.gemeinde_nr)
                 dates = [getattr(line, column) for column in date_columns]
                 dates = [parse(d, dayfirst=True).date() for d in dates if d]
             except (AssertionError, TypeError, ValueError):
                 errors.append(line.rownumber)
             else:
-                data[bfs_number] = {
-                    'name': name,
-                    'dates': dates,
-                }
+                data[bfs_number] = {'dates': dates}
 
         if errors:
             raise ValueError(_(

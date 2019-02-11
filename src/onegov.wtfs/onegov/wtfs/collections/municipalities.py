@@ -19,12 +19,7 @@ class MunicipalityCollection(GenericCollection):
             query = self.query().filter(Municipality.bfs_number == bfs_number)
             municipality = query.first()
             if not municipality:
-                municipality = self.add(
-                    bfs_number=bfs_number,
-                    name=values['name']
-                )
-
-            municipality.name = values['name']
+                continue
 
             dates = set(values['dates'])
             dates -= {d.date for d in municipality.pickup_dates}

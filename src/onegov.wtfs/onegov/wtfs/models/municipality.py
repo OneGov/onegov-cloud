@@ -26,7 +26,7 @@ class Municipality(Base, TimestampMixin):
     bfs_number = Column(Integer, nullable=False)
 
     #: The group that holds all users of this municipality.
-    group_id = Column(UUID, ForeignKey(UserGroup.id), nullable=True)
+    group_id = Column(UUID, ForeignKey(UserGroup.id), nullable=False)
     group = relationship(
         UserGroup, backref=backref('municipality', uselist=False)
     )

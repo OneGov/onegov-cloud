@@ -5,10 +5,12 @@ from unittest.mock import patch
 def test_views_user(client):
     client.login_admin()
 
+    # Add a group
     add = client.get('/user-groups').click(href='add')
     add.form['name'] = "Gruppe Winterthur"
     assert "Benutzergruppe hinzugefügt." in add.form.submit().follow()
 
+    # Add a user
     add = client.get('/users').click(href='add')
     add.form['realname'] = "Hans Muster"
     add.form['username'] = "hans.muster@winterthur.ch"
@@ -21,6 +23,7 @@ def test_views_user(client):
     assert "Hans Muster" in client.get('/user-groups').\
         click("Gruppe Winterthur")
 
+    # Add a user without a group
     add = client.get('/users').click(href='add')
     add.form['realname'] = "Optimo"
     add.form['username'] = "info@optimo.info"
@@ -29,6 +32,7 @@ def test_views_user(client):
     assert "Benutzer hinzugefügt." in added
     assert "Optimo" in added
 
+    # View users
     view = client.get('/users').click("Hans Muster")
     assert "Gemeindeadministrator" in view
     assert "hans.muster@winterthur.ch" in view
@@ -40,6 +44,7 @@ def test_views_user(client):
     assert "info@optimo.info" in view
     assert "✘︎" in view
 
+    # Edit user
     edit = client.get('/users').click("Hans Muster").click("Bearbeiten")
     edit.form['realname'] = "Hans-Peter Muster"
     edit.form['username'] = "hans-peter.muster@winterthur.ch"
@@ -52,6 +57,7 @@ def test_views_user(client):
     assert "✔︎" in view
     assert "Gruppe Winterthur" in view
 
+    # Delete user
     deleted = client.get('/users').click("Hans-Peter Muster").click("Löschen")
     assert deleted.status_int == 200
     deleted = client.get('/users').click("Optimo").click("Löschen")
@@ -63,6 +69,7 @@ def test_views_user(client):
 def test_views_user_editor(client):
     client.login_editor()
 
+    # Add a user
     add = client.get('/users').click(href='add')
     add.form['realname'] = "Hans Muster"
     add.form['username'] = "hans.muster@winterthur.ch"
@@ -71,12 +78,14 @@ def test_views_user_editor(client):
     assert "Benutzer hinzugefügt." in added
     assert "Hans Muster" in added
 
+    # View the user
     view = client.get('/users').click("Hans Muster")
     assert "Benutzer" in view
     assert "hans.muster@winterthur.ch" in view
     assert "✔︎" in view
     assert "My Group" in view
 
+    # Edit the user
     edit = client.get('/users').click("Hans Muster").click("Bearbeiten")
     edit.form['realname'] = "Hans-Peter Muster"
     edit.form['username'] = "hans-peter.muster@winterthur.ch"
@@ -89,6 +98,7 @@ def test_views_user_editor(client):
     assert "✘︎" in view
     assert "My Group" in view
 
+    # Delete the user
     deleted = client.get('/users').click("Hans-Peter Muster").click("Löschen")
     assert deleted.status_int == 200
     assert "Hans-Peter Muster" not in client.get('/users')
