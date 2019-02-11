@@ -92,7 +92,7 @@ def add_cantonal_result_columns(context):
                 )
 
 
-@upgrade_task('Add order column to pages', always_run=True)
+@upgrade_task('Add order column to pages')
 def add_order_column_to_pagess(context):
     if context.has_column('swissvotes_page', 'order'):
         context.operations.drop_column(
