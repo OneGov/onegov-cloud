@@ -1,6 +1,7 @@
 import morepath
 
 from collections import defaultdict, OrderedDict
+from datetime import date
 from decimal import Decimal
 from onegov.activity import Activity, AttendeeCollection
 from onegov.activity import Booking
@@ -163,22 +164,29 @@ def actions_by_booking(layout, period, booking):
             classes=('confirm', ),
             target='#booking-{}'.format(booking.id)
         ))
-    elif layout.request.is_admin \
-            and period.booking_phase and booking.state == 'accepted':
 
-        actions.append(ConfirmLink(
-            text=_("Cancel Booking"),
-            url=layout.csrf_protected_url(
-                layout.request.link(booking, 'cancel')
-            ),
-            confirm=_('Do you really want to cancel "${title}"?', mapping={
-                'title': get_booking_title(layout, booking)
-            }),
-            extra_information=_("This cannot be undone."),
-            yes_button_text=_("Cancel Booking"),
-            redirect_after=layout.request.link(layout.model),
-            classes=('confirm', )
-        ))
+    if period.booking_phase and booking.state == 'accepted':
+        if layout.request.is_admin:
+            may_cancel = True
+        elif not booking.occasion.is_past_cancellation(layout.today()):
+            may_cancel = True
+        else:
+            may_cancel = False
+
+        if may_cancel:
+            actions.append(ConfirmLink(
+                text=_("Cancel Booking"),
+                url=layout.csrf_protected_url(
+                    layout.request.link(booking, 'cancel')
+                ),
+                confirm=_('Do you really want to cancel "${title}"?', mapping={
+                    'title': get_booking_title(layout, booking)
+                }),
+                extra_information=_("This cannot be undone."),
+                yes_button_text=_("Cancel Booking"),
+                redirect_after=layout.request.link(layout.model),
+                classes=('confirm', )
+            ))
 
     return actions
 
@@ -306,7 +314,14 @@ def delete_booking(self, request):
 def cancel_booking(self, request):
     request.assert_valid_csrf_token()
 
-    assert self.period.wishlist_phase or request.is_admin
+    if not self.period.wishlist_phase:
+        if not request.is_admin:
+            if self.occasion.is_past_cancellation(date.today()):
+                request.alert(_(
+                    "Only admins may cancel bookings at this point"
+                ))
+
+                return
 
     BookingCollection(request.session).cancel_booking(
         booking=self,

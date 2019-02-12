@@ -397,6 +397,7 @@ ul.tags {
     .hint-finalized::before { @include icon('\f256'); }
     .hint-minutes::before { @include icon('\f017'); }
     .hint-deadline::before { @include icon('\f05a'); }
+    .hint-cancellation::before { @include icon('\f1da'); }
 }
 
 /*

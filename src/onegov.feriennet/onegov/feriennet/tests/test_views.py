@@ -1340,6 +1340,53 @@ def test_deadline(client, scenario):
     assert "Der Anmeldeschluss wurde erreicht" in page.form.submit()
 
 
+def test_cancellation_deadline(client, scenario):
+    scenario.add_period(confirmed=True)
+    scenario.add_activity(title="Foo", state='accepted')
+    scenario.add_occasion()
+    scenario.add_user(
+        username='member@example.org',
+        role='member',
+        complete_profile=True
+    )
+    scenario.add_attendee(name="Dustin")
+    scenario.add_booking(state='accepted', cost=100)
+    scenario.commit()
+
+    # without a deadline, no cancellation
+    client.login('member@example.org', 'hunter2')
+    assert "Stornieren" not in client.get('/my-bookings')
+
+    # before the deadline, cancellation
+    with scenario.update():
+        scenario.latest_period.cancellation_date\
+            = datetime.utcnow().date() + timedelta(days=1)
+
+    page = client.get('/my-bookings')
+    assert "Stornieren" in page
+
+    cancel = page.pyquery('a:contains("Stornieren")').attr('ic-post-to')
+
+    # after the deadline, no cancellation
+    with scenario.update():
+        scenario.latest_period.cancellation_date\
+            = datetime.utcnow().date() - timedelta(days=1)
+
+    assert "Stornieren" not in client.get('/my-bookings')
+
+    # even if one knows the link
+    client.post(cancel)
+    assert "Nur Administratoren" in client.get('/my-bookings')
+
+    # which succeeds if the deadline is changed
+    with scenario.update():
+        scenario.latest_period.cancellation_date\
+            = datetime.utcnow().date() + timedelta(days=1)
+
+    client.post(cancel)
+    assert "Buchung wurde erfolgreich abgesagt" in client.get('/my-bookings')
+
+
 def test_userprofile_login(client):
     page = client.get('/auth/login?to=/settings')
     page.form['username'] = 'admin@example.org'

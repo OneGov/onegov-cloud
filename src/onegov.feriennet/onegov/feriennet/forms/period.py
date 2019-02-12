@@ -192,6 +192,34 @@ class PeriodForm(Form):
         depends_on=('deadline', 'rel')
     )
 
+    cancellation = RadioField(
+        label=_("Allow members to cancel confirmed bookings"),
+        fieldset=_("Cancellation Deadline"),
+        choices=[
+            ('no', _("No, only allow admins")),
+            ('fix', _("Until a fixed day")),
+            ('rel', _("Up to X days before each occasion")),
+        ],
+        default='no',
+    )
+
+    cancellation_date = DateField(
+        label=_("Fixed day"),
+        fieldset=_("Cancellation Deadline"),
+        validators=[InputRequired()],
+        depends_on=('cancellation', 'fix')
+    )
+
+    cancellation_days = IntegerField(
+        label=_("X Days Before"),
+        fieldset=_("Cancellation Deadline"),
+        validators=[
+            InputRequired(),
+            NumberRange(0, 360),
+        ],
+        depends_on=('cancellation', 'rel')
+    )
+
     @property
     def prebooking(self):
         return (self.prebooking_start.data, self.prebooking_end.data)
@@ -207,7 +235,9 @@ class PeriodForm(Form):
             'deadline_days',
             'deadline_date',
             'one_booking_per_day',
-            'pay_organiser_directly'
+            'pay_organiser_directly',
+            'cancellation_date',
+            'cancellation_days',
         })
 
         if self.pass_system.data == 'yes':
@@ -225,6 +255,16 @@ class PeriodForm(Form):
         else:
             model.deadline_days = self.deadline_days.data or None
             model.deadline_date = None
+
+        if self.cancellation.data == 'no':
+            model.cancellation_date = None
+            model.cancellation_days = None
+        elif self.cancellation.data == 'fix':
+            model.cancellation_date = self.cancellation_date.data
+            model.cancellation_days = None
+        elif self.cancellation.data == 'rel':
+            model.cancellation_days = self.cancellation_days.data
+            model.cancellation_data = None
 
         if self.one_booking_per_day.data == 'yes':
             model.alignment = 'day'
@@ -251,6 +291,15 @@ class PeriodForm(Form):
             self.deadline.data = 'fix'
         else:
             self.deadline.data = 'rel'
+
+        if model.cancellation_days is None and model.cancellation_date is None:
+            self.cancellation.data = 'no'
+        elif model.cancellation_days is not None:
+            self.cancellation.data = 'rel'
+            self.cancellation_days.data = model.cancellation_days
+        else:
+            self.cancellation.data = 'fix'
+            self.cancellation_date.data = model.cancellation_date
 
         if model.alignment is None:
             self.one_booking_per_day.data = 'no'
