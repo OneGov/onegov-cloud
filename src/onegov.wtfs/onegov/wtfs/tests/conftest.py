@@ -25,7 +25,6 @@ def create_wtfs_app(request, temporary_path):
         depot_backend='depot.io.local.LocalFileStorage',
         depot_storage_path=str(temporary_path),
     )
-    app.add_initial_content()
     app.session_manager.set_locale('de_CH', 'de_CH')
 
     session = app.session()
