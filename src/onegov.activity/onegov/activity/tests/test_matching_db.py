@@ -22,9 +22,10 @@ match = partial(
 
 
 def new_occasion(collections, period, offset, length,
-                 activity_name="foobar", username="owner@example.org",
+                 activity_name=None, username="owner@example.org",
                  spots=(0, 10), age=(0, 10)):
 
+    activity_name = activity_name or uuid4().hex
     activity = collections.activities.by_name(activity_name)
 
     if not activity:
@@ -288,5 +289,21 @@ def test_alignment(session, owner, collections, prebooking_period):
     prebooking_period.alignment = 'day'
 
     match(session, prebooking_period.id)
+    assert b1.state == 'accepted'
+    assert b2.state == 'blocked'
+
+
+def test_activity_one_occasion(session, owner, collections, prebooking_period):
+
+    o1 = new_occasion(collections, prebooking_period, 0, 1, activity_name='x')
+    o2 = new_occasion(collections, prebooking_period, 0, 1, activity_name='x')
+
+    a1 = new_attendee(collections, user=owner)
+
+    b1 = collections.bookings.add(owner, a1, o1, priority=1)
+    b2 = collections.bookings.add(owner, a1, o2, priority=0)
+
+    match(session, prebooking_period.id)
+
     assert b1.state == 'accepted'
     assert b2.state == 'blocked'

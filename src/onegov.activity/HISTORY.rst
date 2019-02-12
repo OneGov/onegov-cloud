@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to book multiple occasions from one activity.
+  [href]
+
 - Adds a cancellation deadline to the period.
   [href]
 

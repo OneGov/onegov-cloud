@@ -85,10 +85,12 @@ class Booking(MatchableBooking):
 
 class Occasion(MatchableOccasion):
 
-    def __init__(self, name, dates, max_spots=10, no_overlap_check=False):
+    def __init__(self, name, dates, max_spots=10, no_overlap_check=False,
+                 anti_affinity_group=None):
         self.name = name
         self._max_spots = max_spots
         self._no_overlap_check = no_overlap_check
+        self._anti_affinity_group = anti_affinity_group
 
         def standardize(dt):
             if isinstance(dt, datetime):
@@ -115,6 +117,10 @@ class Occasion(MatchableOccasion):
     @property
     def exclude_from_overlap_check(self):
         return self._no_overlap_check
+
+    @property
+    def anti_affinity_group(self):
+        return self._anti_affinity_group
 
 
 def test_overlapping_bookings():
@@ -687,3 +693,34 @@ def test_unblockable_regression():
     }
 
     assert not unblockable(accepted, blocked)
+
+
+def test_anti_affinity_groups():
+    foo = Occasion("foo", [
+        (datetime(2019, 2, 12, 8), datetime(2019, 2, 12, 16))
+    ])
+    bar = Occasion("bar", [
+        (datetime(2019, 2, 13, 8), datetime(2019, 2, 13, 16))
+    ])
+
+    bookings = [
+        foo.booking("Tom", 'open', 0),
+        bar.booking("Tom", 'open', 1)
+    ]
+
+    foo._anti_affinity_group = None
+    bar._anti_affinity_group = None
+    assert len(match(bookings, (foo, bar)).accepted) == 2
+
+    foo._anti_affinity_group = 'xyz'
+    bar._anti_affinity_group = 'zyx'
+    assert len(match(bookings, (foo, bar)).accepted) == 2
+
+    foo._anti_affinity_group = 'xyz'
+    bar._anti_affinity_group = 'xyz'
+    assert len(match(bookings, (foo, bar)).accepted) == 1
+
+    # the overlap check is less important than the anti-affinity
+    foo._no_overlap_check = True
+    bar._no_overlap_check = True
+    assert len(match(bookings, (foo, bar)).accepted) == 1

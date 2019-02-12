@@ -27,6 +27,19 @@ class MatchableOccasion(metaclass=ABCMeta):
 
         """
 
+    @property
+    @abstractmethod
+    def anti_affinity_group(self):
+        """ Forces the occasion to not be accept an attendee that has an
+        occasion of the same anti-affinity-group.
+
+        Note that the anti-affinity-group is ignored if the occasion
+        is excluded from overlap checks.
+
+        See :meth:`exclude_from_overlap_check`.
+
+        """
+
 
 class MatchableBooking(metaclass=ABCMeta):
     """ Describes the interface required by the booking class used by

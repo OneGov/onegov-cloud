@@ -126,6 +126,19 @@ class Occasion(Base, TimestampMixin):
         """
         self.observe_dates(self.dates)
 
+    @property
+    def anti_affinity_group(self):
+        """ Uses the activity_id/period_id as an anti-affinity group to ensure
+        that an attendee is never given two occasions of the same activity
+        in a single period.
+
+        If that is wanted, the attendee is meant to do this after the
+        matching has been done, with a direct booking.
+
+        """
+
+        return (self.activity_id.hex, self.period_id.hex)
+
     def compute_duration(self, dates):
         if not dates:
             return 0

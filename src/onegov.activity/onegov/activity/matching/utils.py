@@ -8,6 +8,11 @@ def overlaps(booking, other, minutes_between=0, alignment=None):
 
     assert booking != other
 
+    if booking.occasion.anti_affinity_group is not None:
+        if booking.occasion.anti_affinity_group == \
+                other.occasion.anti_affinity_group:
+            return True
+
     if booking.occasion.exclude_from_overlap_check:
         return False
 
