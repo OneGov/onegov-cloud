@@ -19,7 +19,9 @@
                 <section class="top-bar-section">
                     <ul class="left">
                         <tal:block repeat="link links">
-                            <li><a href="${link[1]}">${link[0]}</a></li>
+                            <li>
+                                <tal:block replace="structure link(layout)" />
+                            </li>
                         </tal:block>
                     </ul>
                 </section>
@@ -32,21 +34,21 @@
         <div class="row" tal:condition="layout.editbar_links">
             <div class="small-12 columns">
                 <div class="edit-bar clearfix">
-                    <tal:b repeat="group layout.editbar_links">
-                        <tal:b condition="group.links|nothing" define="dropdown_id 'editbar-dropdown-{}'.format(repeat.group.number)">
+                    <tal:block repeat="group layout.editbar_links">
+                        <tal:block condition="group.links|nothing" define="dropdown_id 'editbar-dropdown-{}'.format(repeat.group.number)">
                             <button href="#" data-dropdown="${dropdown_id}" class="${group.right_side and 'right-side'} tiny button dropdown">
                                 ${group.title}
                             </button>
                             <ul id="${dropdown_id}" data-dropdown-content class="f-dropdown disable-scroll">
                                 <li tal:repeat="link group.links">
-                                    <tal:b replace="structure link(layout)" />
+                                    <tal:block replace="structure link(layout)" />
                                 </li>
                             </ul>
-                        </tal:b>
-                        <tal:b condition="group.url|group.attrs|nothing" define="link group">
-                            <tal:b replace="structure link(layout, ('tiny', 'button'))" />
-                        </tal:b>
-                    </tal:b>
+                        </tal:block>
+                        <tal:block condition="group.url|group.attrs|nothing" define="link group">
+                            <tal:block replace="structure link(layout, ('tiny', 'button'))" />
+                        </tal:block>
+                    </tal:block>
                 </div>
             </div>
         </div>
@@ -55,11 +57,11 @@
     <metal:breadcrumbs define-macro="breadcrumbs">
         <nav role="navigation" aria-label="You are here" i18n:attributes="aria-label">
             <ul class="breadcrumbs" tal:condition="layout.breadcrumbs">
-                <tal:b repeat="link layout.breadcrumbs">
+                <tal:block repeat="link layout.breadcrumbs">
                     <li tal:attributes="class repeat.link.end and 'current' or ''"
                         tal:content="structure link(layout)">
                     </li>
-                </tal:b>
+                </tal:block>
             </ul>
         </nav>
     </metal:breadcrumbs>
