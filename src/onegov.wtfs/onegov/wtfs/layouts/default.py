@@ -6,6 +6,7 @@ from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
 from onegov.wtfs import _
 from onegov.wtfs.collections import MunicipalityCollection
+from onegov.wtfs.security import ViewModel
 
 
 class DefaultLayout(ChameleonLayout):
@@ -26,7 +27,16 @@ class DefaultLayout(ChameleonLayout):
 
     @cached_property
     def top_navigation(self):
-        return []
+        has_permission = self.request.has_permission
+        session = self.request.session
+        result = []
+        if has_permission(UserCollection(session), ViewModel):
+            result.append(Link(_("Users"), self.users_url))
+        if has_permission(UserGroupCollection(session), ViewModel):
+            result.append(Link(_("User groups"), self.user_groups_url))
+        if has_permission(MunicipalityCollection(session), ViewModel):
+            result.append(Link(_("Municipalities"), self.municipalities_url))
+        return result
 
     @cached_property
     def editbar_links(self):

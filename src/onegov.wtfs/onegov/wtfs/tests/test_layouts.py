@@ -135,9 +135,24 @@ def test_default_layout(wtfs_app):
 
     # Login
     request.is_logged_in = True
+    request.roles = ['admin']
     layout = DefaultLayout(model, request)
     assert layout.login_url is None
     assert layout.logout_url == 'Auth/logout'
+    assert list(hrefs(layout.top_navigation)) == [
+        'UserCollection/',
+        'UserGroupCollection/',
+        'MunicipalityCollection/'
+    ]
+
+    request.roles = ['editor']
+    assert list(hrefs(layout.top_navigation)) == [
+        'UserCollection/',
+    ]
+
+    request.roles = ['member']
+    assert list(hrefs(layout.top_navigation)) == [
+    ]
 
 
 def test_mail_layout():
