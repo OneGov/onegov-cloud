@@ -200,6 +200,10 @@ class Occasion(Base, TimestampMixin):
     def is_past_deadline(self, date):
         return date > self.deadline
 
+    def is_past_cancellation(self, date):
+        cancellation = self.cancellation_deadline
+        return cancellation is None or date > cancellation
+
     @property
     def deadline(self):
         """ The date until which this occasion may be booked (inclusive). """
@@ -214,6 +218,25 @@ class Occasion(Base, TimestampMixin):
             return (min_date - timedelta(days=period.deadline_days + 1)).date()
 
         return min_date.date()
+
+    @property
+    def cancellation_deadline(self):
+        """ The date until which bookings of this occasion may be cancelled
+        by a mere member (inclusive).
+
+        If mere members are not allowed to do that, the deadline returns None.
+
+        """
+        period = self.period
+
+        if period.cancellation_date is not None:
+            return period.cancellation_date
+
+        if period.cancellation_days is None:
+            return None
+
+        min_date = min(d.start for d in self.dates)
+        return (min_date - timedelta(days=period.cancellation_days + 1)).date()
 
     def cancel(self):
         from onegov.activity.collections import BookingCollection

@@ -89,6 +89,13 @@ class Period(Base, TimestampMixin):
     #: the deadline_date)
     deadline_days = Column(Integer, nullable=True)
 
+    #: Date after which no bookings can be canceled by a mere member
+    cancellation_date = Column(Date, nullable=True)
+
+    #: Days between the occasion and the cancellation (an alternative to
+    #: the cancellation_date)
+    cancellation_days = Column(Integer, nullable=True)
+
     __table_args__ = (
         CheckConstraint((
             '"prebooking_start" <= "prebooking_end" AND '

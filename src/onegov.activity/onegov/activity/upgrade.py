@@ -645,3 +645,15 @@ def add_invoice_reference_bucket(context):
         'unique_bucket_invoice_id', 'invoice_references', (
             'bucket', 'invoice_id'
         ))
+
+
+@upgrade_task('Adds cancellation deadlines to period')
+def adds_cancellation_deadlines_to_period(context):
+    if not context.has_column('periods', 'cancellation_date'):
+        context.operations.add_column('periods', Column(
+            'cancellation_date', Date, nullable=True
+        ))
+    if not context.has_column('periods', 'cancellation_days'):
+        context.operations.add_column('periods', Column(
+            'cancellation_days', Integer, nullable=True
+        ))

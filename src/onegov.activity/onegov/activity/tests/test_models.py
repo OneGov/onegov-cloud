@@ -2287,6 +2287,28 @@ def test_deadline(session, collections, prebooking_period, owner):
     assert occasion.deadline == date(2017, 2, 23)
 
 
+def test_cancellation_deadline(session, collections, prebooking_period, owner):
+    period = prebooking_period
+
+    start, end = period.execution_start,\
+        period.execution_start + timedelta(hours=2)
+
+    occasion = collections.occasions.add(
+        start=start,
+        end=end,
+        timezone="Europe/Zurich",
+        activity=collections.activities.add("Sport", username=owner.username),
+        period=period
+    )
+    assert occasion.cancellation_deadline is None
+
+    period.cancellation_days = 1
+    assert occasion.cancellation_deadline == (start - timedelta(days=2)).date()
+
+    period.cancellation_date = date(2017, 2, 23)
+    assert occasion.cancellation_deadline == date(2017, 2, 23)
+
+
 def test_prebooking_phases():
     period = Period()
 

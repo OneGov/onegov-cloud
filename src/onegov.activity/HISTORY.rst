@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a cancellation deadline to the period.
+  [href]
+
 1.12.1 (2019-02-11)
 ~~~~~~~~~~~~~~~~~~~
 
