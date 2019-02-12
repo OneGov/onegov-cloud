@@ -9,7 +9,6 @@ from onegov.feriennet.forms import AttendeeSignupForm, OccasionForm
 from onegov.feriennet.layout import OccasionFormLayout
 from onegov.feriennet.models import VacationActivity
 from onegov.user import User, UserCollection
-from sqlalchemy import or_
 
 
 @FeriennetApp.view(
@@ -188,33 +187,23 @@ def book_occasion(self, request, form):
 
         bookings = BookingCollection(request.session)
 
-        # if there's a cancelled/denied booking blocking the way, reactivate it
+        # if there's a canceled/denied booking blocking the way, reactivate it
         booking = None
 
         if not form.is_new_attendee:
-            o = OccasionCollection(request.session).query()
-            o = o.with_entities(Occasion.id)
-            o = o.filter(Occasion.activity_id == self.activity_id)
-            o = o.filter(Occasion.period_id == self.period_id)
-
-            q = bookings.query()
-            q = q.filter(Booking.username == user.username)
-            q = q.filter(Booking.attendee == attendee)
-            q = q.filter(Booking.occasion_id.in_(o.subquery()))
-            q = q.filter(or_(
-                Booking.state == 'cancelled',
-                Booking.state == 'denied',
-                Booking.state == 'blocked'
-            ))
-
-            # somewhat unnecessary, but let's be extra sure
-            q = q.filter(Booking.period_id == self.period_id)
-
-            booking = q.first()
+            booking = bookings.query()\
+                .filter(Booking.occasion_id == self.id)\
+                .filter(Booking.username == user.username)\
+                .filter(Booking.attendee == attendee)\
+                .filter(Booking.state.in_((
+                    'cancelled',
+                    'denied',
+                    'blocked',
+                )))\
+                .first()
 
             if booking:
                 booking.state = 'open'
-                booking.occasion_id = self.id
 
         if booking is None:
             booking = bookings.add(

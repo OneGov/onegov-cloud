@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds the ability to book multiple occasions from one activity.
+  [href]
+
 1.5.0 (2019-02-11)
 ~~~~~~~~~~~~~~~~~~~
 

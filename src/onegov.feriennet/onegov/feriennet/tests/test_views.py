@@ -726,21 +726,6 @@ def test_enroll_child(client, scenario):
 
     assert "maximale Anzahl von 1 Buchungen" in enroll.form.submit()
 
-    # prevent booking one activity more than once
-    with scenario.update():
-        scenario.latest_period.all_inclusive = False
-        scenario.latest_period.max_bookings_per_attendee = None
-        scenario.latest_period.confirmed = False
-        scenario.add_occasion()
-
-    enroll = client.get('/activity/another-retreat').click("Anmelden", index=0)
-    enroll = enroll.form.submit()
-
-    enroll = client.get('/activity/another-retreat').click("Anmelden", index=1)
-    enroll = enroll.form.submit()
-
-    assert "bereits eine andere Durchführung dieses Angebots gebucht" in enroll
-
 
 def test_enroll_age_mismatch(client, scenario):
     scenario.add_period()
@@ -1083,11 +1068,6 @@ def test_reactivate_cancelled_booking(client, scenario):
         spots=(0, 2),
         cost=100
     )
-    scenario.add_occasion(
-        age=(0, 10),
-        spots=(0, 2),
-        cost=1000
-    )
     scenario.add_attendee(
         name="Dustin",
         birth_date=(datetime.today() - timedelta(days=5 * 360))
@@ -1098,36 +1078,33 @@ def test_reactivate_cancelled_booking(client, scenario):
     client.fill_out_profile()
 
     # by default we block conflicting bookings
-    page = client.get('/activity/foobar').click('Anmelden', index=0)
+    page = client.get('/activity/foobar').click('Anmelden')
     page = page.form.submit().follow()
 
     assert "Wunschliste hinzugefügt" in page
 
-    page = client.get('/activity/foobar').click('Anmelden', index=0)
+    page = client.get('/activity/foobar').click('Anmelden')
     assert "bereits für diese Durchführung angemeldet" in page.form.submit()
-
-    page = client.get('/activity/foobar').click('Anmelden', index=1)
-    assert "eine andere Durchführung" in page.form.submit()
 
     # unless they are cancelled
     scenario.c.bookings.query().first().state = 'cancelled'
     scenario.commit()  # can be done by cancelling the whole event in UI
 
-    page = client.get('/activity/foobar').click('Anmelden', index=0)
+    page = client.get('/activity/foobar').click('Anmelden')
     assert "Wunschliste hinzugefügt" in page.form.submit().follow()
 
     # this also works between multiple occasions of the same activity
     scenario.c.bookings.query().first().state = 'cancelled'
     scenario.commit()  # can be done by cancelling the whole event in UI
 
-    page = client.get('/activity/foobar').click('Anmelden', index=1)
+    page = client.get('/activity/foobar').click('Anmelden')
     assert "Wunschliste hinzugefügt" in page.form.submit().follow()
 
     # including denied bookings
     scenario.c.bookings.query().first().state = 'denied'
     scenario.commit()  # can be done by cancelling the whole event in UI
 
-    page = client.get('/activity/foobar').click('Anmelden', index=1)
+    page = client.get('/activity/foobar').click('Anmelden')
     assert "Wunschliste hinzugefügt" in page.form.submit().follow()
 
     # and even if we confirm the period
@@ -1137,11 +1114,7 @@ def test_reactivate_cancelled_booking(client, scenario):
     page.form.submit()
 
     client.get('/my-bookings').click("Stornieren")
-    page = client.get('/activity/foobar').click('Anmelden', index=0)
-    assert "war erfolgreich" in page.form.submit().follow()
-
-    page = client.get('/my-bookings').click("Stornieren")
-    page = client.get('/activity/foobar').click('Anmelden', index=1)
+    page = client.get('/activity/foobar').click('Anmelden')
     assert "war erfolgreich" in page.form.submit().follow()
 
 
@@ -1641,41 +1614,6 @@ def test_fill_out_contact_form(client):
     assert "Anfrage eingereicht" in page
 
     assert len(client.app.smtp.outbox) == 1
-
-
-def test_book_alternate_occasion(client, scenario):
-    scenario.add_period(title="Ferienpass 2018")
-    scenario.add_activity(title="Fishing", state='accepted')
-    scenario.add_occasion()
-    scenario.add_attendee(birth_date=date.today() - timedelta(days=8 * 360))
-    scenario.add_booking(state='blocked')
-    scenario.add_occasion()
-    scenario.commit()
-
-    scenario.refresh()
-    assert scenario.latest_booking.occasion == scenario.occasions[0]
-
-    client.login_admin()
-    client.fill_out_profile()
-
-    # before period confirmation, the blocked booking must remain
-    page = client.get('/activity/fishing').click('Anmelden', index=1)
-    page = page.form.submit()
-
-    assert "bereits eine andere Durchführung dieses Angebots" in page
-
-    with scenario.update():
-        scenario.latest_period.confirmed = True
-
-    # we should be able to directly book occasion two,
-    # which should remove occasion one's booking
-    page = client.get('/activity/fishing').click('Anmelden', index=1)
-    page = page.form.submit().follow()
-
-    assert "bereits eine andere Durchführung dieses Angebots" not in page
-
-    scenario.refresh()
-    assert scenario.latest_booking.occasion == scenario.occasions[1]
 
 
 def test_occasion_number(client, scenario):

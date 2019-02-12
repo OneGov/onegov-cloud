@@ -2,7 +2,6 @@ from cached_property import cached_property
 from datetime import date
 from onegov.activity import Attendee, AttendeeCollection
 from onegov.activity import Booking, BookingCollection
-from onegov.activity import Occasion
 from onegov.feriennet import _
 from onegov.feriennet.utils import encode_name, decode_name
 from onegov.form import Form
@@ -285,34 +284,6 @@ class AttendeeSignupForm(AttendeeBase):
                 }))
 
                 return False
-
-    def ensure_one_booking_per_activity(self):
-        if self.is_new_attendee:
-            return True
-
-        bookings = self.booking_collection
-
-        query = bookings.query().with_entities(Booking.id)
-        query = query.filter(Booking.occasion_id.in_(
-            self.request.session.query(Occasion.id)
-            .filter(Occasion.activity_id == self.model.activity_id)
-            .subquery()
-        ))
-        query = query.filter(Booking.attendee_id == self.attendee.data)
-        query = query.filter(Booking.period_id == self.model.period_id)
-        query = query.filter(Booking.occasion_id != self.model.id)
-
-        if not self.model.period.confirmed:
-            query = query.filter(Booking.state != 'cancelled')
-        else:
-            query = query.filter(Booking.state == 'accepted')
-
-        if query.first():
-            self.attendee.errors.append(
-                _("The attendee already has a booking for this activity")
-            )
-
-            return False
 
     def ensure_no_conflict(self):
         if not self.is_new_attendee and self.model.period.confirmed:
