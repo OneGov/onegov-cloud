@@ -27,6 +27,32 @@ class SwissvotesApp(Framework, FormApp, QuillApp, DepotApp):
     def static_content_pages(self):
         return {'home', 'disclaimer', 'imprint', 'data-protection'}
 
+    def get_cached_dataset(self, format):
+        """ Gets or creates the dataset in the requested format.
+
+        We store the dataset using the last modified timestamp - this way, we
+        have a version of past datasets. Note that we don't delete any old
+        datasets.
+
+        """
+        from onegov.swissvotes.collections import SwissVoteCollection
+
+        assert format in ('csv', 'xlsx')
+
+        votes = SwissVoteCollection(self.session())
+        last_modified = votes.last_modified
+        last_modified = last_modified.timestamp() if last_modified else ''
+        filename = f'dataset-{last_modified}.{format}'
+        mode = 'b' if format == 'xlsx' else ''
+
+        if not self.filestorage.exists(filename):
+            with self.filestorage.open(filename, f'w{mode}') as file:
+                getattr(votes, f'export_{format}')(file)
+
+        with self.filestorage.open(filename, f'r{mode}') as file:
+            result = file.read()
+        return result
+
 
 @SwissvotesApp.static_directory()
 def get_static_directory():

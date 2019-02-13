@@ -1,6 +1,8 @@
 from csv import DictReader
 from datetime import date
+from datetime import datetime
 from decimal import Decimal
+from freezegun import freeze_time
 from io import BytesIO
 from io import StringIO
 from onegov.core.orm.abstract import MoveDirection
@@ -10,6 +12,7 @@ from onegov.swissvotes.models import SwissVote
 from psycopg2.extras import NumericRange
 from pytest import skip
 from xlrd import open_workbook
+from pytz import utc
 
 
 def test_pages(session):
@@ -58,17 +61,20 @@ def test_pages(session):
 
 def test_votes(session):
     votes = SwissVoteCollection(session)
-    vote = votes.add(
-        id=1,
-        bfs_number=Decimal('100.1'),
-        date=date(1990, 6, 2),
-        decade=NumericRange(1990, 1999),
-        legislation_number=4,
-        legislation_decade=NumericRange(1990, 1994),
-        title="Vote",
-        votes_on_same_day=2,
-        _legal_form=1
-    )
+    assert votes.last_modified is None
+
+    with freeze_time(datetime(2019, 1, 1, 10, tzinfo=utc)):
+        vote = votes.add(
+            id=1,
+            bfs_number=Decimal('100.1'),
+            date=date(1990, 6, 2),
+            decade=NumericRange(1990, 1999),
+            legislation_number=4,
+            legislation_decade=NumericRange(1990, 1994),
+            title="Vote",
+            votes_on_same_day=2,
+            _legal_form=1
+        )
 
     assert vote.id == 1
     assert vote.bfs_number == Decimal('100.1')
@@ -80,6 +86,7 @@ def test_votes(session):
     assert vote.votes_on_same_day == 2
     assert vote.legal_form == "Mandatory referendum"
 
+    assert votes.last_modified == datetime(2019, 1, 1, 10, tzinfo=utc)
     assert votes.by_bfs_number('100.1') == vote
     assert votes.by_bfs_number(Decimal('100.1')) == vote
 

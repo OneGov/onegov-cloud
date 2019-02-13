@@ -439,6 +439,11 @@ class SwissVoteCollection(Pagination):
 
         return added, updated
 
+    @property
+    def last_modified(self):
+        """ Returns the last change of any votes. """
+        return self.session.query(func.max(SwissVote.last_change)).scalar()
+
     def export_csv(self, file):
         """ Exports all votes according to the code book. """
 

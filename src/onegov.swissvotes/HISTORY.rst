@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Caches the datasets.
+  [msom]
+
 0.0.30 (2019-02-10)
 ~~~~~~~~~~~~~~~~~~~
 
