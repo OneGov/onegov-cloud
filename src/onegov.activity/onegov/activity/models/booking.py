@@ -1,5 +1,5 @@
 from onegov.activity.models.occasion import Occasion
-from onegov.activity.utils import random_group_code, dates_overlap
+from onegov.activity.utils import dates_overlap
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -48,8 +48,8 @@ class Booking(Base, TimestampMixin):
     #: the priority of the booking, a higher number = a higher priority
     priority = Column(Integer, nullable=False, default=0)
 
-    #: the group code of the booking
-    group_code = Column(Text, nullable=False, default=random_group_code)
+    #: the group code of the booking, if missing the booking is not in a group
+    group_code = Column(Text, nullable=True)
 
     #: the attendee behind this booking
     attendee_id = Column(UUID, ForeignKey("attendees.id"), nullable=False)

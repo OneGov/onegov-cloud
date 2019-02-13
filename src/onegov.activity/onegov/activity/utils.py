@@ -1,16 +1,10 @@
 import lxml
 import sedate
-import string
 import re
 
 from datetime import date, timedelta
 from functools import partial
 from pyquery import PyQuery as pq
-from random import SystemRandom
-
-
-GROUP_CODE_CHARS = string.ascii_uppercase + string.digits
-GROUP_CODE_LENGTH = 10
 
 INTERNAL_IMAGE_EX = re.compile(r'.*/storage/[0-9a-z]{64}')
 
@@ -22,15 +16,6 @@ MUNICIPALITY_EX = re.compile(r"""
     \s+
     (?P<municipality>[\w\s\(\)\.\-]+)
 """, re.VERBOSE)
-
-
-def random_group_code():
-    random = SystemRandom()
-
-    return ''.join(
-        random.choice(GROUP_CODE_CHARS)
-        for _ in range(GROUP_CODE_LENGTH)
-    )
 
 
 def overlaps(range_a, range_b):

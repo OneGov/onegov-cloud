@@ -1,5 +1,8 @@
-from onegov.activity.models import Activity, Attendee, Occasion
+import hashlib
+
+from onegov.activity.models import Activity, Attendee, Booking, Occasion
 from onegov.user import User
+from sqlalchemy import func
 
 
 class Scoring(object):
@@ -19,6 +22,9 @@ class Scoring(object):
     @classmethod
     def from_settings(cls, settings, session):
         scoring = cls()
+
+        # always prefer groups
+        scoring.criteria.append(PreferGroups.from_session(session))
 
         if settings.get('prefer_in_age_bracket'):
             scoring.criteria.append(
@@ -187,3 +193,68 @@ class PreferAdminChildren(object):
 
     def __call__(self, booking):
         return self.get_is_association_child(booking) and 1.0 or 0.0
+
+
+class PreferGroups(object):
+    """ Scores group bookings higher than other bookings. Groups get a boost
+    by size:
+
+    - 2 people: 1.0
+    - 3 people: 0.8
+    - 4 people: 0.6
+    - more people: 0.5
+
+    This preference gives an extra boost to unprioritised bookings, to somewhat
+    level out bookings in groups that used no star (otherwise a group
+    might be split up because someone didn't star the booking).
+
+    Additionally a unique boost between 0.010000000 to 0.099999999 is given to
+    each group depending on the group name. This should ensure that competing
+    groups generally do not have the same score. So an occasion will generally
+    prefer the members of one group over members of another group.
+
+    """
+
+    def __init__(self, get_group_score):
+        self.get_group_score = get_group_score
+
+    @classmethod
+    def from_session(cls, session):
+        group_scores = None
+
+        def unique_score_modifier(group_code):
+            digest = hashlib.sha1(group_code.encode('utf-8')).hexdigest()[:8]
+            number = int(digest, 16)
+
+            return float('0.0' + str(number)[:8])
+
+        def get_group_score(booking):
+            nonlocal group_scores
+
+            if group_scores is None:
+                query = session.query(Booking).with_entities(
+                    Booking.group_code,
+                    func.count(Booking.group_code).label('count')
+                ).filter(
+                    Booking.group_code != None
+                ).group_by(
+                    Booking.group_code
+                ).having(
+                    func.count(Booking.group_code) > 1
+                )
+
+                group_scores = {
+                    r.group_code:
+                    max(.5, 1.0 - 0.2 * (r.count - 2))
+                    + unique_score_modifier(r.group_code)
+
+                    for r in query
+                }
+
+            return group_scores.get(booking.group_code, 0)
+
+        return get_group_score
+
+    def __call__(self, booking):
+        offset = 0 if booking.priority else 1
+        return self.get_group_score(booking) + offset

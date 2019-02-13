@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Prefers groups in the matching algorithm.
+  [href]
+
 - Adds the ability to book multiple occasions from one activity.
   [href]
 

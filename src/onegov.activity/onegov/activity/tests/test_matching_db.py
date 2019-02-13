@@ -4,10 +4,11 @@ from datetime import date, timedelta
 from freezegun import freeze_time
 from functools import partial
 from onegov.activity.matching import deferred_acceptance_from_database
-from onegov.activity.matching import Scoring
 from onegov.activity.matching import PreferAdminChildren
-from onegov.activity.matching import PreferOrganiserChildren
+from onegov.activity.matching import PreferGroups
 from onegov.activity.matching import PreferInAgeBracket
+from onegov.activity.matching import PreferOrganiserChildren
+from onegov.activity.matching import Scoring
 from onegov.core.utils import Bunch
 from psycopg2.extras import NumericRange
 from uuid import uuid4
@@ -307,3 +308,93 @@ def test_activity_one_occasion(session, owner, collections, prebooking_period):
 
     assert b1.state == 'accepted'
     assert b2.state == 'blocked'
+
+
+def test_prefer_groups(session, owner, collections, prebooking_period):
+    o = new_occasion(collections, prebooking_period, 0, 1, spots=(0, 2))
+
+    a1 = new_attendee(collections, user=owner)
+    a2 = new_attendee(collections, user=owner)
+    a3 = new_attendee(collections, user=owner)
+
+    b1 = collections.bookings.add(owner, a1, o, priority=0)
+    b2 = collections.bookings.add(owner, a2, o, priority=0)
+    b3 = collections.bookings.add(owner, a3, o, priority=1)
+
+    b1.group_code = b2.group_code = 'foo'
+
+    match(session, prebooking_period.id, score_function=Scoring(
+        criteria=[PreferGroups.from_session(session)]
+    ))
+
+    assert b1.state == 'accepted'
+    assert b2.state == 'accepted'
+    assert b3.state == 'open'
+
+
+def test_prefer_small_groups(session, owner, collections, prebooking_period):
+    o = new_occasion(collections, prebooking_period, 0, 1, spots=(0, 2))
+
+    a1 = new_attendee(collections, user=owner)
+    a2 = new_attendee(collections, user=owner)
+    a3 = new_attendee(collections, user=owner)
+    a4 = new_attendee(collections, user=owner)
+    a5 = new_attendee(collections, user=owner)
+
+    b1 = collections.bookings.add(owner, a1, o, priority=0)
+    b2 = collections.bookings.add(owner, a2, o, priority=0)
+    b3 = collections.bookings.add(owner, a3, o, priority=1)
+    b4 = collections.bookings.add(owner, a4, o, priority=1)
+    b5 = collections.bookings.add(owner, a5, o, priority=1)
+
+    b1.group_code = b2.group_code = 'foo'
+    b3.group_code = b4.group_code = b5.group_code = 'bar'
+
+    match(session, prebooking_period.id, score_function=Scoring(
+        criteria=[PreferGroups.from_session(session)]
+    ))
+
+    assert b1.state == 'accepted'
+    assert b2.state == 'accepted'
+    assert b3.state == 'open'
+    assert b4.state == 'open'
+    assert b5.state == 'open'
+
+
+def test_keep_groups_together(session, owner, collections, prebooking_period):
+    # all things being equal, groups are kept together
+    o = new_occasion(collections, prebooking_period, 0, 1, spots=(0, 2))
+
+    a1 = new_attendee(collections, user=owner)
+    a2 = new_attendee(collections, user=owner)
+    a3 = new_attendee(collections, user=owner)
+    a4 = new_attendee(collections, user=owner)
+
+    b1 = collections.bookings.add(owner, a1, o, priority=0)
+    b2 = collections.bookings.add(owner, a2, o, priority=0)
+    b3 = collections.bookings.add(owner, a3, o, priority=0)
+    b4 = collections.bookings.add(owner, a4, o, priority=0)
+
+    b1.group_code = b2.group_code = 'foo'
+    b3.group_code = b4.group_code = 'bar'
+
+    match(session, prebooking_period.id, score_function=Scoring(
+        criteria=[PreferGroups.from_session(session)]
+    ))
+
+    assert b1.state == 'accepted'
+    assert b2.state == 'accepted'
+    assert b3.state == 'open'
+    assert b4.state == 'open'
+
+    b1.group_code = b2.group_code = 'bar'
+    b3.group_code = b4.group_code = 'foo'
+
+    match(session, prebooking_period.id, score_function=Scoring(
+        criteria=[PreferGroups.from_session(session)]
+    ))
+
+    assert b1.state == 'open'
+    assert b2.state == 'open'
+    assert b3.state == 'accepted'
+    assert b4.state == 'accepted'

@@ -310,9 +310,6 @@ def deferred_acceptance_from_database(session, period_id, **kwargs):
     b = b.filter(Booking.period_id == period_id)
     b = b.filter(Booking.state != 'cancelled')
     b = b.order_by(Booking.attendee_id)
-    b = b.options(
-        defer('group_code'),
-    )
 
     o = session.query(Occasion)
     o = o.filter(Occasion.period_id == period_id)

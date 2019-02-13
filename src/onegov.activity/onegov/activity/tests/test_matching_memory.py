@@ -16,6 +16,7 @@ from onegov.activity.matching.core import is_stable, OccasionAgent
 from onegov.activity.matching.utils import unblockable
 from onegov.core.utils import Bunch
 from sedate import standardize_date
+from uuid import uuid4
 
 
 today = date.today
@@ -68,6 +69,10 @@ class Booking(MatchableBooking):
     @property
     def priority(self):
         return self._priority
+
+    @property
+    def group_code(self):
+        return uuid4().hex
 
     @property
     def dates(self):
@@ -499,7 +504,7 @@ def test_serialize_scoring(session):
 
     scoring = Scoring.from_settings(scoring.settings, session)
 
-    assert len(scoring.criteria) == 4
+    assert len(scoring.criteria) == 5
 
 
 def test_booking_limit():

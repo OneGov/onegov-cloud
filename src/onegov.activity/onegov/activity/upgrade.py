@@ -657,3 +657,11 @@ def adds_cancellation_deadlines_to_period(context):
         context.operations.add_column('periods', Column(
             'cancellation_days', Integer, nullable=True
         ))
+
+
+@upgrade_task('Make group_code nullable')
+def make_group_code_nullable(context):
+    context.operations.alter_column('bookings', 'group_code', nullable=True)
+
+    # nobody uses groups yet, so we can safely reset it all to NULL
+    context.operations.execute("UPDATE bookings SET group_code = NULL")

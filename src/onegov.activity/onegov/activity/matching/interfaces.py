@@ -98,3 +98,11 @@ class MatchableBooking(metaclass=ABCMeta):
     @abstractmethod
     def dates(self):
         """ Returns the dates of the booking. """
+
+    @property
+    @abstractmethod
+    def group_code(self):
+        """ A code holding groups together. Grouped bookings are preferred
+        over other bookings (so that groups may stay together).
+
+        """
