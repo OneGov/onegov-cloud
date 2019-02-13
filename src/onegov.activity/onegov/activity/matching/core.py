@@ -168,61 +168,6 @@ def eager_score(bookings, score_function):
     return scores.get
 
 
-def deferred_acceptance_from_database(session, period_id, **kwargs):
-    b = session.query(Booking)
-    b = b.options(joinedload(Booking.occasion))
-    b = b.filter(Booking.period_id == period_id)
-    b = b.filter(Booking.state != 'cancelled')
-    b = b.order_by(Booking.attendee_id)
-    b = b.options(
-        defer('group_code'),
-    )
-
-    o = session.query(Occasion)
-    o = o.filter(Occasion.period_id == period_id)
-    o = o.options(
-        defer('meeting_point'),
-        defer('note'),
-        defer('cost')
-    )
-
-    period = session.query(Period).filter(Period.id == period_id).one()
-    if period.all_inclusive and period.max_bookings_per_attendee:
-        default_limit = period.max_bookings_per_attendee
-        attendee_limits = None
-    else:
-        default_limit = None
-        attendee_limits = {
-            a.id: a.limit for a in
-            session.query(Attendee.id, Attendee.limit)
-        }
-
-    # fetch it here as it'll be reused multiple times
-    bookings = list(b)
-
-    results = deferred_acceptance(
-        bookings=bookings, occasions=o,
-        default_limit=default_limit, attendee_limits=attendee_limits,
-        minutes_between=period.minutes_between, alignment=period.alignment,
-        sort_bookings=False, **kwargs)
-
-    # write the changes to the database
-    def update_bookings(targets, state):
-        q = session.query(Booking)
-        q = q.filter(Booking.state != state)
-        q = q.filter(Booking.state != 'cancelled')
-        q = q.filter(Booking.period_id == period_id)
-        q = q.filter(Booking.id.in_(t.id for t in targets))
-
-        for booking in q:
-            booking.state = state
-
-    with session.no_autoflush:
-        update_bookings(results.open, 'open')
-        update_bookings(results.accepted, 'accepted')
-        update_bookings(results.blocked, 'blocked')
-
-
 def deferred_acceptance(bookings, occasions,
                         score_function=None,
                         validity_check=True,
@@ -357,6 +302,61 @@ def deferred_acceptance(bookings, occasions,
         accepted=set(b for a in attendees.values() for b in a.accepted),
         blocked=set(b for a in attendees.values() for b in a.blocked)
     )
+
+
+def deferred_acceptance_from_database(session, period_id, **kwargs):
+    b = session.query(Booking)
+    b = b.options(joinedload(Booking.occasion))
+    b = b.filter(Booking.period_id == period_id)
+    b = b.filter(Booking.state != 'cancelled')
+    b = b.order_by(Booking.attendee_id)
+    b = b.options(
+        defer('group_code'),
+    )
+
+    o = session.query(Occasion)
+    o = o.filter(Occasion.period_id == period_id)
+    o = o.options(
+        defer('meeting_point'),
+        defer('note'),
+        defer('cost')
+    )
+
+    period = session.query(Period).filter(Period.id == period_id).one()
+    if period.all_inclusive and period.max_bookings_per_attendee:
+        default_limit = period.max_bookings_per_attendee
+        attendee_limits = None
+    else:
+        default_limit = None
+        attendee_limits = {
+            a.id: a.limit for a in
+            session.query(Attendee.id, Attendee.limit)
+        }
+
+    # fetch it here as it'll be reused multiple times
+    bookings = list(b)
+
+    results = deferred_acceptance(
+        bookings=bookings, occasions=o,
+        default_limit=default_limit, attendee_limits=attendee_limits,
+        minutes_between=period.minutes_between, alignment=period.alignment,
+        sort_bookings=False, **kwargs)
+
+    # write the changes to the database
+    def update_bookings(targets, state):
+        q = session.query(Booking)
+        q = q.filter(Booking.state != state)
+        q = q.filter(Booking.state != 'cancelled')
+        q = q.filter(Booking.period_id == period_id)
+        q = q.filter(Booking.id.in_(t.id for t in targets))
+
+        for booking in q:
+            booking.state = state
+
+    with session.no_autoflush:
+        update_bookings(results.open, 'open')
+        update_bookings(results.accepted, 'accepted')
+        update_bookings(results.blocked, 'blocked')
 
 
 def is_stable(attendees, occasions):
