@@ -1679,10 +1679,10 @@ msgstr "Keine Buchungslimite"
 msgid "Booked"
 msgstr "Gebucht"
 
-msgid "These wishes overlap accepted bookings and are therefore blocked"
+msgid "These wishes overlap accepted bookings and are therefore blocked."
 msgstr ""
 "Diese Wünsche überschneiden sich mit angenommenen Buchungen und sind daher "
-"blockiert"
+"blockiert."
 
 msgid "This occasion does not have enough attendees yet."
 msgstr "Diese Durchführung hat noch nicht genügend Teilnehmer."

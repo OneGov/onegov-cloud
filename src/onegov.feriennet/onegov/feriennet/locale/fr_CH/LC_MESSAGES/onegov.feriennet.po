@@ -1700,7 +1700,7 @@ msgstr "Réservations illimitées"
 msgid "Booked"
 msgstr "Réservé"
 
-msgid "These wishes overlap accepted bookings and are therefore blocked"
+msgid "These wishes overlap accepted bookings and are therefore blocked."
 msgstr ""
 "Ces demandes coïncident avec des réservations acceptées et sont par "
 "conséquent bloquées."
