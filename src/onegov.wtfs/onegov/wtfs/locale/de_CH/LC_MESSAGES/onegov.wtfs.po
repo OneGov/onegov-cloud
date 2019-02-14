@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-07 10:47+0100\n"
-"PO-Revision-Date: 2019-02-06 11:04+0100\n"
+"POT-Creation-Date: 2019-02-12 15:44+0100\n"
+"PO-Revision-Date: 2019-02-12 13:45+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -50,6 +50,73 @@ msgstr "Startdatum"
 msgid "End date"
 msgstr "Enddatum"
 
+msgid "Municipality"
+msgstr "Gemeinde"
+
+msgid "Type"
+msgstr "Auftragsart"
+
+msgid "Dispatch date"
+msgstr "Versanddatum"
+
+msgid "Boxes"
+msgstr "Boxen"
+
+msgid "Dispatch to the tax office"
+msgstr "Lieferung an das Steueramt Winterthur"
+
+msgid "Tax forms"
+msgstr "Steuererklärungen"
+
+msgid "Tax forms (previous year)"
+msgstr "Steuererklärungen (letztes Jahr)"
+
+msgid "Tax forms (older)"
+msgstr "Steuererklärungen (älter)"
+
+msgid "Single documents"
+msgstr "Einzelbelege"
+
+msgid "Note"
+msgstr "Bemerkung"
+
+msgid "Headquarters"
+msgstr "Bändliweg"
+
+msgid "Dispatch to the cantonal tax office"
+msgstr "Lieferung an das kantonale Steueramt"
+
+msgid "Scan center"
+msgstr "Kantonales Scan Center"
+
+msgid "Return date"
+msgstr "Rücksendedatum"
+
+msgid "Return to the municipality"
+msgstr "Rücksendung an die Gemeinde"
+
+msgid "Unscanned tax forms"
+msgstr "Nicht gescannte Steuererklärungen"
+
+msgid "Unscanned tax forms (previous year)"
+msgstr "Nicht gescannte Steuererklärungen (letztes Jahr)"
+
+msgid "Unscanned tax forms (older)"
+msgstr "Nicht gescannte Steuererklärungen (älter)"
+
+msgid "Unscanned single documents"
+msgstr "Nicht gescannte Einzelbelege"
+
+msgid "Regular shipment"
+msgstr "Normale Sendung"
+
+msgid "Express shipment"
+msgstr "Expresssendung"
+
+#, python-format
+msgid "Scan job ${number}: ${municipality}, ${date}"
+msgstr "Scan-Aufrag ${number}: ${municipality}, ${date}"
+
 msgid "User groups"
 msgstr "Benutzergruppen"
 
@@ -95,12 +162,36 @@ msgstr "Abholtermine löschen"
 msgid "Do you really want to delete this municipality?"
 msgstr "Diese Gemeinde wirklich löschen?"
 
-msgid "Municipality"
-msgstr "Gemeinde"
+msgid "Scan jobs"
+msgstr "Scan-Aufträge"
+
+msgid "Do you really want to delete this scan job?"
+msgstr "Diese Scanauftrag wirklich löschen?"
+
+msgid "Scan job"
+msgstr "Scan-Auftrag"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
+
+msgid "until"
+msgstr "bis"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Dispatch to the tax office on ${date}"
+msgstr "Lieferung an das Steueramt Winterthur am ${date}"
+
+msgid "Dispatch to the cantonal tax office on ${date}"
+msgstr "Lieferung an das kantonale Steueramt am ${date}"
+
+msgid "Return to ${municipality} on ${date}"
+msgstr "Rücksendung an ${municipality} am ${date}"
+
+msgid "Unscanned"
+msgstr "Nicht gescannt"
 
 msgid "You are here"
 msgstr "Aktuelle Seite"
@@ -134,6 +225,9 @@ msgstr "Passwort zurücksetzen"
 
 msgid "Number of users"
 msgstr "Anzahl Benutzer"
+
+msgid "Delivery number"
+msgstr "Lieferscheinnummer"
 
 msgid "Pick-up dates"
 msgstr "Abholtermine"
@@ -237,6 +331,15 @@ msgstr "Gemeinde geändert."
 
 msgid "Pick-up dates deleted."
 msgstr "Abholtermine gelöscht."
+
+msgid "Scan job deleted."
+msgstr "Scan-Auftrag gelöscht."
+
+msgid "Scan job added."
+msgstr "Scan-Auftrag hinzugefügt."
+
+msgid "Scan job modified."
+msgstr "Scan-Auftrag geändert."
 
 msgid "Access Denied"
 msgstr "Zugriff verweigert"

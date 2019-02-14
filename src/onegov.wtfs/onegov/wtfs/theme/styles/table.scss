@@ -20,10 +20,23 @@ table {
     td,
     th {
         border-bottom: 1px solid $table-border-color;
+
+        &.right {
+            float: none !important;
+            text-align: right;
+        }
+
+        &.total {
+            font-style: italic;
+        }
     }
 
     thead {
         background-color: $table-border-color;
+
+        tr {
+            background-color: $table-border-color !important;
+        }
     }
 
     th {
@@ -43,8 +56,12 @@ table {
         &.sort-descending a {
             @include sort($descending);
         }
-    }
 
+        &.subtitle {
+            font-style: italic;
+            font-weight: normal;
+        }
+    }
 
     dl {
         font-size: .875rem;

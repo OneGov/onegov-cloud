@@ -5,8 +5,10 @@ from onegov.user import UserGroup
 from onegov.user import UserGroupCollection
 from onegov.wtfs.app import WtfsApp
 from onegov.wtfs.collections import MunicipalityCollection
+from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import Principal
+from onegov.wtfs.models import ScanJob
 
 
 @WtfsApp.path(
@@ -71,3 +73,19 @@ def get_municipalities(request):
 )
 def get_municipality(request, id):
     return MunicipalityCollection(request.session).by_id(id)
+
+
+@WtfsApp.path(
+    model=ScanJobCollection,
+    path='/scan-jobs'
+)
+def get_scan_jobs(request):
+    return ScanJobCollection(request.session)
+
+
+@WtfsApp.path(
+    model=ScanJob,
+    path='/scan-job/{id}'
+)
+def get_scan_job(request, id):
+    return ScanJobCollection(request.session).by_id(id)

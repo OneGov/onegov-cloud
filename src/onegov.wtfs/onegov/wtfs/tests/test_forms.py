@@ -1,18 +1,24 @@
 from cgi import FieldStorage
 from datetime import date
+from freezegun import freeze_time
 from io import BytesIO
 from mock import MagicMock
 from onegov.user import User
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
 from onegov.wtfs.collections import MunicipalityCollection
+from onegov.wtfs.forms import AddScanJobForm
 from onegov.wtfs.forms import DeleteMunicipalityDatesForm
+from onegov.wtfs.forms import EditScanJobForm
 from onegov.wtfs.forms import ImportMunicipalityDataForm
 from onegov.wtfs.forms import MunicipalityForm
+from onegov.wtfs.forms import UnrestrictedAddScanJobForm
+from onegov.wtfs.forms import UnrestrictedEditScanJobForm
 from onegov.wtfs.forms import UnrestrictedUserForm
 from onegov.wtfs.forms import UserForm
 from onegov.wtfs.forms import UserGroupForm
 from onegov.wtfs.models import PickupDate
+from onegov.wtfs.models import ScanJob
 
 
 class App(object):
@@ -30,13 +36,17 @@ class Identity(object):
 
 
 class Request(object):
-    def __init__(self, session, principal=None, groupid=None):
+    def __init__(self, session, principal=None, groupid=None, roles=[]):
         self.app = App(session, principal)
         self.session = session
         self.identity = Identity(groupid)
+        self.roles = roles
 
     def include(self, resource):
         pass
+
+    def has_role(self, role):
+        return role in self.roles
 
     def translate(self, text):
         return text.interpolate()
@@ -412,4 +422,505 @@ def test_unrestricted_user_form(session):
     }))
     form.request = Request(session, groupid=group_1.id.hex)
     form.on_request()
+    assert form.validate()
+
+
+def test_add_scan_job_form(session):
+    groups = UserGroupCollection(session)
+    group = groups.add(name="Winterthur")
+
+    municipalities = MunicipalityCollection(session)
+    municipality = municipalities.add(
+        name="Winterthur",
+        bfs_number=230,
+        group_id=group.id
+    )
+    municipality.pickup_dates.append(PickupDate(date=date(2019, 1, 7)))
+    municipality.pickup_dates.append(PickupDate(date=date(2019, 1, 8)))
+
+    # Test on request
+    form = AddScanJobForm()
+    form.request = Request(session, groupid=group.id.hex)
+    with freeze_time("2019-01-05"):
+        form.on_request()
+        assert form.type.choices == [
+            ('normal', 'Regular shipment')
+        ]
+        assert form.municipality_id.choices == [
+            (municipality.id.hex, 'Winterthur')
+        ]
+        assert form.dispatch_date.choices == [
+            ('2019-01-07', '07.01.2019'),
+            ('2019-01-08', '08.01.2019')
+        ]
+    form.request = Request(session, groupid=group.id.hex, roles=['editor'])
+    with freeze_time("2019-01-05"):
+        form.on_request()
+        assert form.type.choices == [
+            ('normal', 'Regular shipment'),
+            ('express', 'Express shipment')
+        ]
+        assert form.municipality_id.choices == [
+            (municipality.id.hex, 'Winterthur')
+        ]
+        assert form.dispatch_date.choices == [
+            ('2019-01-07', '07.01.2019'),
+            ('2019-01-08', '08.01.2019')
+        ]
+
+    # Test update
+    form.type.data = 'normal'
+    form.municipality_id.data = form.municipality_id.choices[0][0]
+    form.dispatch_date.data = '2019-01-08'
+    form.dispatch_date_express.data = '2019-01-06'
+    form.dispatch_boxes.data = 1
+    form.dispatch_tax_forms_current_year.data = 2
+    form.dispatch_tax_forms_last_year.data = 3
+    form.dispatch_tax_forms_older.data = 4
+    form.dispatch_single_documents.data = 5
+    form.dispatch_note.data = 'Note on dispatch'
+    form.dispatch_cantonal_tax_office.data = 6
+    form.dispatch_cantonal_scan_center.data = 7
+
+    model = ScanJob()
+    form.update_model(model)
+    assert model.municipality_id == municipality.id.hex
+    assert model.group_id == group.id
+    assert model.type == 'normal'
+    assert model.dispatch_date == '2019-01-08'
+    assert model.dispatch_boxes == 1
+    assert model.dispatch_tax_forms_current_year == 2
+    assert model.dispatch_tax_forms_last_year == 3
+    assert model.dispatch_tax_forms_older == 4
+    assert model.dispatch_single_documents == 5
+    assert model.dispatch_note == 'Note on dispatch'
+    assert model.dispatch_cantonal_tax_office == 6
+    assert model.dispatch_cantonal_scan_center == 7
+
+    form.type.data = 'express'
+    form.update_model(model)
+    assert model.dispatch_date == '2019-01-06'
+
+    # Test validation
+    form = AddScanJobForm()
+    form.request = Request(session, groupid=group.id.hex)
+    with freeze_time("2019-01-05"):
+        form.on_request()
+    assert not form.validate()
+
+    form = AddScanJobForm(PostData({
+        'municipality_id': municipality.id.hex,
+        'type': 'normal',
+        'dispatch_date': '2019-01-08'
+    }))
+    form.request = Request(session, groupid=group.id.hex)
+    with freeze_time("2019-01-05"):
+        form.on_request()
+    assert form.validate()
+
+
+def test_edit_scan_job_form(session):
+    groups = UserGroupCollection(session)
+    group = groups.add(name="Winterthur")
+
+    municipalities = MunicipalityCollection(session)
+    municipality = municipalities.add(
+        name="Winterthur",
+        bfs_number=230,
+        group_id=group.id
+    )
+    municipality.pickup_dates.append(PickupDate(date=date(2019, 1, 7)))
+    municipality.pickup_dates.append(PickupDate(date=date(2019, 1, 8)))
+
+    # Test on request
+    form = EditScanJobForm()
+    form.request = Request(session, groupid=group.id.hex)
+    with freeze_time("2019-01-05"):
+        form.on_request()
+        assert form.type.choices == [
+            ('normal', 'Regular shipment')
+        ]
+        assert form.municipality_id.choices == [
+            (municipality.id.hex, 'Winterthur')
+        ]
+        assert form.dispatch_date.choices == [
+            ('2019-01-07', '07.01.2019'),
+            ('2019-01-08', '08.01.2019')
+        ]
+    form.request = Request(session, groupid=group.id.hex, roles=['editor'])
+    with freeze_time("2019-01-05"):
+        form.on_request()
+        assert form.type.choices == [
+            ('normal', 'Regular shipment'),
+            ('express', 'Express shipment')
+        ]
+        assert form.municipality_id.choices == [
+            (municipality.id.hex, 'Winterthur')
+        ]
+        assert form.dispatch_date.choices == [
+            ('2019-01-07', '07.01.2019'),
+            ('2019-01-08', '08.01.2019')
+        ]
+
+    # Test apply / update
+    model = ScanJob()
+    model.municipality_id = municipality.id
+    model.type = 'normal'
+    model.dispatch_date = '2019-01-08'
+    model.dispatch_boxes = 1
+    model.dispatch_tax_forms_current_year = 2
+    model.dispatch_tax_forms_last_year = 3
+    model.dispatch_tax_forms_older = 4
+    model.dispatch_single_documents = 5
+    model.dispatch_note = 'Note on dispatch'
+    model.dispatch_cantonal_tax_office = 6
+    model.dispatch_cantonal_scan_center = 7
+    model.return_date = '2019-01-10'
+    model.return_boxes = 8
+    model.return_scanned_tax_forms_current_year = 9
+    model.return_scanned_tax_forms_last_year = 10
+    model.return_scanned_tax_forms_older = 11
+    model.return_scanned_single_documents = 12
+    model.return_unscanned_tax_forms_current_year = 13
+    model.return_unscanned_tax_forms_last_year = 14
+    model.return_unscanned_tax_forms_older = 15
+    model.return_unscanned_single_documents = 16
+    model.return_note = 'Note on return'
+
+    form.apply_model(model)
+    assert form.type.data == 'normal'
+    assert form.municipality_id.data == form.municipality_id.choices[0][0]
+    assert form.dispatch_date.data == '2019-01-08'
+    assert form.dispatch_boxes.data == 1
+    assert form.dispatch_tax_forms_current_year.data == 2
+    assert form.dispatch_tax_forms_last_year.data == 3
+    assert form.dispatch_tax_forms_older.data == 4
+    assert form.dispatch_single_documents.data == 5
+    assert form.dispatch_note.data == 'Note on dispatch'
+    assert form.dispatch_cantonal_tax_office.data == 6
+    assert form.dispatch_cantonal_scan_center.data == 7
+    assert form.return_date.data == '2019-01-10'
+    assert form.return_boxes.data == 8
+    assert form.return_scanned_tax_forms_current_year.data == 9
+    assert form.return_scanned_tax_forms_last_year.data == 10
+    assert form.return_scanned_tax_forms_older.data == 11
+    assert form.return_scanned_single_documents.data == 12
+    assert form.return_unscanned_tax_forms_current_year.data == 13
+    assert form.return_unscanned_tax_forms_last_year.data == 14
+    assert form.return_unscanned_tax_forms_older.data == 15
+    assert form.return_unscanned_single_documents.data == 16
+    assert form.return_note.data == 'Note on return'
+
+    form.type.data = 'express'
+    form.municipality_id.data = form.municipality_id.choices[0][0]
+    form.dispatch_date.data = '2019-01-08'
+    form.dispatch_date_express.data = '2019-01-06'
+    form.dispatch_boxes.data = 10
+    form.dispatch_tax_forms_current_year.data = 20
+    form.dispatch_tax_forms_last_year.data = 30
+    form.dispatch_tax_forms_older.data = 40
+    form.dispatch_single_documents.data = 50
+    form.dispatch_note.data = 'A note on the dispatch'
+    form.dispatch_cantonal_tax_office.data = 60
+    form.dispatch_cantonal_scan_center.data = 70
+    form.return_date.data = '2019-01-10'
+    form.return_boxes.data = 80
+    form.return_scanned_tax_forms_current_year.data = 90
+    form.return_scanned_tax_forms_last_year.data = 100
+    form.return_scanned_tax_forms_older.data = 110
+    form.return_scanned_single_documents.data = 120
+    form.return_unscanned_tax_forms_current_year.data = 130
+    form.return_unscanned_tax_forms_last_year.data = 140
+    form.return_unscanned_tax_forms_older.data = 150
+    form.return_unscanned_single_documents.data = 160
+    form.return_note.data = 'A note on the return'
+
+    form.update_model(model)
+    assert model.municipality_id == municipality.id.hex
+    assert model.group_id == group.id
+    assert model.type == 'express'
+    assert model.dispatch_date == '2019-01-06'
+    assert model.dispatch_boxes == 10
+    assert model.dispatch_tax_forms_current_year == 20
+    assert model.dispatch_tax_forms_last_year == 30
+    assert model.dispatch_tax_forms_older == 40
+    assert model.dispatch_single_documents == 50
+    assert model.dispatch_note == 'A note on the dispatch'
+    assert model.dispatch_cantonal_tax_office == 60
+    assert model.dispatch_cantonal_scan_center == 70
+    assert model.return_date == '2019-01-10'
+    assert model.return_boxes == 80
+    assert model.return_scanned_tax_forms_current_year == 90
+    assert model.return_scanned_tax_forms_last_year == 100
+    assert model.return_scanned_tax_forms_older == 110
+    assert model.return_scanned_single_documents == 120
+    assert model.return_unscanned_tax_forms_current_year == 130
+    assert model.return_unscanned_tax_forms_last_year == 140
+    assert model.return_unscanned_tax_forms_older == 150
+    assert model.return_unscanned_single_documents == 160
+    assert model.return_note == 'A note on the return'
+
+    # Test validation
+    form = EditScanJobForm()
+    form.request = Request(session, groupid=group.id.hex)
+    with freeze_time("2019-01-05"):
+        form.on_request()
+    assert not form.validate()
+
+    form = EditScanJobForm(PostData({
+        'municipality_id': municipality.id.hex,
+        'type': 'normal',
+        'dispatch_date': '2019-01-08'
+    }))
+    form.request = Request(session, groupid=group.id.hex)
+    with freeze_time("2019-01-05"):
+        form.on_request()
+    assert form.validate()
+
+
+def test_unrestricted_add_scan_job_form(session):
+    groups = UserGroupCollection(session)
+    municipalities = MunicipalityCollection(session)
+
+    group_1 = groups.add(name="Winterthur")
+    municipality_1 = municipalities.add(
+        name="Winterthur",
+        bfs_number=230,
+        group_id=group_1.id
+    )
+    municipality_1.pickup_dates.append(PickupDate(date=date(2019, 1, 7)))
+    municipality_1.pickup_dates.append(PickupDate(date=date(2019, 1, 8)))
+
+    group_2 = groups.add(name="Adlikon")
+    municipality_2 = municipalities.add(
+        name="Adlikon",
+        bfs_number=21,
+        group_id=group_2.id
+    )
+    municipality_2.pickup_dates.append(PickupDate(date=date(2019, 1, 17)))
+    municipality_2.pickup_dates.append(PickupDate(date=date(2019, 1, 18)))
+
+    # Test on request
+    form = UnrestrictedAddScanJobForm()
+    form.request = Request(session, groupid=group_1.id.hex)
+    with freeze_time("2019-01-05"):
+        form.on_request()
+        assert form.type.choices == [
+            ('normal', 'Regular shipment'),
+            ('express', 'Express shipment')
+        ]
+        assert form.municipality_id.choices == [
+            (municipality_2.id.hex, 'Adlikon'),
+            (municipality_1.id.hex, 'Winterthur')
+        ]
+        assert form.dispatch_date.choices == [
+            ('2019-01-17', '17.01.2019'),
+            ('2019-01-18', '18.01.2019')
+        ]
+
+    # Test update
+    form.type.data = 'normal'
+    form.municipality_id.data = form.municipality_id.choices[0][0]
+    form.dispatch_date.data = '2019-01-08'
+    form.dispatch_date_express.data = '2019-01-06'
+    form.dispatch_boxes.data = 1
+    form.dispatch_tax_forms_current_year.data = 2
+    form.dispatch_tax_forms_last_year.data = 3
+    form.dispatch_tax_forms_older.data = 4
+    form.dispatch_single_documents.data = 5
+    form.dispatch_note.data = 'Note on dispatch'
+    form.dispatch_cantonal_tax_office.data = 6
+    form.dispatch_cantonal_scan_center.data = 7
+
+    model = ScanJob()
+    form.update_model(model)
+    assert model.municipality_id == municipality_2.id.hex
+    assert model.group_id == group_2.id
+    assert model.type == 'normal'
+    assert model.dispatch_date == '2019-01-08'
+    assert model.dispatch_boxes == 1
+    assert model.dispatch_tax_forms_current_year == 2
+    assert model.dispatch_tax_forms_last_year == 3
+    assert model.dispatch_tax_forms_older == 4
+    assert model.dispatch_single_documents == 5
+    assert model.dispatch_note == 'Note on dispatch'
+    assert model.dispatch_cantonal_tax_office == 6
+    assert model.dispatch_cantonal_scan_center == 7
+
+    form.type.data = 'express'
+    form.update_model(model)
+    assert model.dispatch_date == '2019-01-06'
+
+    # Test validation
+    form = UnrestrictedAddScanJobForm()
+    form.request = Request(session, groupid=group_1.id.hex)
+    with freeze_time("2019-01-05"):
+        form.on_request()
+    assert not form.validate()
+
+    form = AddScanJobForm(PostData({
+        'municipality_id': municipality_1.id.hex,
+        'type': 'normal',
+        'dispatch_date': '2019-01-08'
+    }))
+    form.request = Request(session, groupid=group_1.id.hex)
+    with freeze_time("2019-01-05"):
+        form.on_request()
+    assert form.validate()
+
+
+def test_unrestricted_edit_scan_job_form(session):
+    groups = UserGroupCollection(session)
+    municipalities = MunicipalityCollection(session)
+
+    group_1 = groups.add(name="Winterthur")
+    municipality_1 = municipalities.add(
+        name="Winterthur",
+        bfs_number=230,
+        group_id=group_1.id
+    )
+    municipality_1.pickup_dates.append(PickupDate(date=date(2019, 1, 7)))
+    municipality_1.pickup_dates.append(PickupDate(date=date(2019, 1, 8)))
+
+    group_2 = groups.add(name="Adlikon")
+    municipality_2 = municipalities.add(
+        name="Adlikon",
+        bfs_number=21,
+        group_id=group_2.id
+    )
+    municipality_2.pickup_dates.append(PickupDate(date=date(2019, 1, 17)))
+    municipality_2.pickup_dates.append(PickupDate(date=date(2019, 1, 18)))
+
+    # Test on request
+    form = UnrestrictedEditScanJobForm()
+    form.request = Request(session, groupid=group_1.id.hex)
+    with freeze_time("2019-01-05"):
+        form.on_request()
+        assert form.type.choices == [
+            ('normal', 'Regular shipment'),
+            ('express', 'Express shipment')
+        ]
+        assert form.municipality_id.choices == [
+            (municipality_2.id.hex, 'Adlikon'),
+            (municipality_1.id.hex, 'Winterthur')
+        ]
+        assert form.dispatch_date.choices == [
+            ('2019-01-17', '17.01.2019'),
+            ('2019-01-18', '18.01.2019')
+        ]
+
+    # Test apply / update
+    model = ScanJob()
+    model.municipality_id = municipality_1.id
+    model.group_id = group_1.id
+    model.type = 'normal'
+    model.dispatch_date = '2019-01-08'
+    model.dispatch_boxes = 1
+    model.dispatch_tax_forms_current_year = 2
+    model.dispatch_tax_forms_last_year = 3
+    model.dispatch_tax_forms_older = 4
+    model.dispatch_single_documents = 5
+    model.dispatch_note = 'Note on dispatch'
+    model.dispatch_cantonal_tax_office = 6
+    model.dispatch_cantonal_scan_center = 7
+    model.return_date = '2019-01-10'
+    model.return_boxes = 8
+    model.return_scanned_tax_forms_current_year = 9
+    model.return_scanned_tax_forms_last_year = 10
+    model.return_scanned_tax_forms_older = 11
+    model.return_scanned_single_documents = 12
+    model.return_unscanned_tax_forms_current_year = 13
+    model.return_unscanned_tax_forms_last_year = 14
+    model.return_unscanned_tax_forms_older = 15
+    model.return_unscanned_single_documents = 16
+    model.return_note = 'Note on return'
+
+    form.apply_model(model)
+    assert form.type.data == 'normal'
+    assert form.municipality_id.data == municipality_1.id.hex
+    assert form.dispatch_date.data == '2019-01-08'
+    assert form.dispatch_boxes.data == 1
+    assert form.dispatch_tax_forms_current_year.data == 2
+    assert form.dispatch_tax_forms_last_year.data == 3
+    assert form.dispatch_tax_forms_older.data == 4
+    assert form.dispatch_single_documents.data == 5
+    assert form.dispatch_note.data == 'Note on dispatch'
+    assert form.dispatch_cantonal_tax_office.data == 6
+    assert form.dispatch_cantonal_scan_center.data == 7
+    assert form.return_date.data == '2019-01-10'
+    assert form.return_boxes.data == 8
+    assert form.return_scanned_tax_forms_current_year.data == 9
+    assert form.return_scanned_tax_forms_last_year.data == 10
+    assert form.return_scanned_tax_forms_older.data == 11
+    assert form.return_scanned_single_documents.data == 12
+    assert form.return_unscanned_tax_forms_current_year.data == 13
+    assert form.return_unscanned_tax_forms_last_year.data == 14
+    assert form.return_unscanned_tax_forms_older.data == 15
+    assert form.return_unscanned_single_documents.data == 16
+    assert form.return_note.data == 'Note on return'
+
+    form.type.data = 'express'
+    form.municipality_id.data = municipality_2.id.hex
+    form.dispatch_date.data = '2019-01-18'
+    form.dispatch_date_express.data = '2019-01-06'
+    form.dispatch_boxes.data = 10
+    form.dispatch_tax_forms_current_year.data = 20
+    form.dispatch_tax_forms_last_year.data = 30
+    form.dispatch_tax_forms_older.data = 40
+    form.dispatch_single_documents.data = 50
+    form.dispatch_note.data = 'A note on the dispatch'
+    form.dispatch_cantonal_tax_office.data = 60
+    form.dispatch_cantonal_scan_center.data = 70
+    form.return_date.data = '2019-01-10'
+    form.return_boxes.data = 80
+    form.return_scanned_tax_forms_current_year.data = 90
+    form.return_scanned_tax_forms_last_year.data = 100
+    form.return_scanned_tax_forms_older.data = 110
+    form.return_scanned_single_documents.data = 120
+    form.return_unscanned_tax_forms_current_year.data = 130
+    form.return_unscanned_tax_forms_last_year.data = 140
+    form.return_unscanned_tax_forms_older.data = 150
+    form.return_unscanned_single_documents.data = 160
+    form.return_note.data = 'A note on the return'
+
+    form.update_model(model)
+    assert model.municipality_id == municipality_2.id.hex
+    assert model.group_id == group_2.id
+    assert model.type == 'express'
+    assert model.dispatch_date == '2019-01-06'
+    assert model.dispatch_boxes == 10
+    assert model.dispatch_tax_forms_current_year == 20
+    assert model.dispatch_tax_forms_last_year == 30
+    assert model.dispatch_tax_forms_older == 40
+    assert model.dispatch_single_documents == 50
+    assert model.dispatch_note == 'A note on the dispatch'
+    assert model.dispatch_cantonal_tax_office == 60
+    assert model.dispatch_cantonal_scan_center == 70
+    assert model.return_date == '2019-01-10'
+    assert model.return_boxes == 80
+    assert model.return_scanned_tax_forms_current_year == 90
+    assert model.return_scanned_tax_forms_last_year == 100
+    assert model.return_scanned_tax_forms_older == 110
+    assert model.return_scanned_single_documents == 120
+    assert model.return_unscanned_tax_forms_current_year == 130
+    assert model.return_unscanned_tax_forms_last_year == 140
+    assert model.return_unscanned_tax_forms_older == 150
+    assert model.return_unscanned_single_documents == 160
+    assert model.return_note == 'A note on the return'
+
+    # Test validation
+    form = UnrestrictedEditScanJobForm()
+    form.request = Request(session, groupid=group_1.id.hex)
+    with freeze_time("2019-01-05"):
+        form.on_request()
+    assert not form.validate()
+
+    form = UnrestrictedEditScanJobForm(PostData({
+        'municipality_id': municipality_1.id.hex,
+        'type': 'normal',
+        'dispatch_date': '2019-01-18'
+    }))
+    form.request = Request(session, groupid=group_1.id.hex)
+    with freeze_time("2019-01-05"):
+        form.on_request()
     assert form.validate()

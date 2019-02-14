@@ -3,7 +3,9 @@ from onegov.user import User
 from onegov.user import UserCollection
 from onegov.user import UserGroup
 from onegov.wtfs import WtfsApp
+from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.models import Municipality
+from onegov.wtfs.models import ScanJob
 
 
 class AddModel(object):
@@ -72,22 +74,22 @@ def has_permission_user_group(app, identity, model, permission):
     return permission in getattr(app.settings.roles, identity.role)
 
 
+@WtfsApp.permission_rule(model=Municipality, permission=object)
+def has_permission_municipality(app, identity, model, permission):
+    # Municipalities with data canot not be deleted
+    if permission in {DeleteModel}:
+        if model.pickup_dates.first() or model.scan_jobs.first():
+            return False
+
+    return permission in getattr(app.settings.roles, identity.role)
+
+
 @WtfsApp.permission_rule(model=UserCollection, permission=object)
 def has_permission_users(app, identity, model, permission):
     # Editors may view and add users
     if identity.role == 'editor':
         if permission in {ViewModel, AddModel}:
             return True
-
-    return permission in getattr(app.settings.roles, identity.role)
-
-
-@WtfsApp.permission_rule(model=Municipality, permission=object)
-def has_permission_municipality(app, identity, model, permission):
-    # Municipalities with data canot not be deleted
-    if permission in {DeleteModel}:
-        if model.pickup_dates.first():
-            return False
 
     return permission in getattr(app.settings.roles, identity.role)
 
@@ -103,6 +105,30 @@ def has_permission_user(app, identity, model, permission):
     if identity.role == 'editor':
         if permission in {ViewModel, EditModel, DeleteModel}:
             if model.role == 'member':
+                if same_group(model, identity):
+                    return True
+
+    return permission in getattr(app.settings.roles, identity.role)
+
+
+@WtfsApp.permission_rule(model=ScanJobCollection, permission=object)
+def has_permission_scan_jobs(app, identity, model, permission):
+    # Editors and members of groups may view and add scan jobs
+    if identity.role in ('editor', 'member'):
+        if identity.groupid:
+            if permission in {ViewModel, AddModel}:
+                return True
+
+    return permission in getattr(app.settings.roles, identity.role)
+
+
+@WtfsApp.permission_rule(model=ScanJob, permission=object)
+def has_permission_scan_job(app, identity, model, permission):
+    # Editors and members of groups may view and edit scan jobs within
+    # the same group
+    if identity.role in ('editor', 'member'):
+        if identity.groupid:
+            if permission in {ViewModel, EditModel}:
                 if same_group(model, identity):
                     return True
 

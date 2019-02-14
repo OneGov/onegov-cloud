@@ -1,6 +1,7 @@
 from datetime import date
 from onegov.user import UserGroupCollection
 from onegov.wtfs.collections import MunicipalityCollection
+from onegov.wtfs.collections import ScanJobCollection
 
 
 def test_municipalities(session):
@@ -57,3 +58,24 @@ def test_municipalities(session):
         (241, [date(2019, 1, 2), date(2019, 1, 8)]),
         (230, [date(2019, 1, 4), date(2019, 1, 10)])
     ]
+
+
+def test_scan_jobs(session):
+    groups = UserGroupCollection(session)
+    group = groups.add(name='Winterthur')
+
+    municipalities = MunicipalityCollection(session)
+    municipality = municipalities.add(
+        name='Winterthur', bfs_number=230, group_id=group.id
+    )
+
+    scan_jobs = ScanJobCollection(session)
+    for day in (2, 1, 4, 3):
+        scan_jobs.add(
+            type='normal',
+            group_id=group.id,
+            municipality_id=municipality.id,
+            dispatch_date=date(2019, 1, day)
+        )
+
+    assert [s.dispatch_date.day for s in scan_jobs.query()] == [1, 2, 3, 4]

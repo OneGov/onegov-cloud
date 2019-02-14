@@ -1,4 +1,5 @@
 from cached_property import cached_property
+from datetime import date
 from onegov.core.elements import Link
 from onegov.core.layout import ChameleonLayout
 from onegov.user import Auth
@@ -6,6 +7,7 @@ from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
 from onegov.wtfs import _
 from onegov.wtfs.collections import MunicipalityCollection
+from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.security import ViewModel
 
 
@@ -30,6 +32,8 @@ class DefaultLayout(ChameleonLayout):
         has_permission = self.request.has_permission
         session = self.request.session
         result = []
+        if has_permission(ScanJobCollection(session), ViewModel):
+            result.append(Link(_("Scan jobs"), self.scan_jobs_url))
         if has_permission(UserCollection(session), ViewModel):
             result.append(Link(_("Users"), self.users_url))
         if has_permission(UserGroupCollection(session), ViewModel):
@@ -87,6 +91,10 @@ class DefaultLayout(ChameleonLayout):
         return self.request.link(MunicipalityCollection(self.request.session))
 
     @cached_property
+    def scan_jobs_url(self):
+        return self.request.link(ScanJobCollection(self.request.session))
+
+    @cached_property
     def cancel_url(self):
         return ''
 
@@ -97,3 +105,7 @@ class DefaultLayout(ChameleonLayout):
     @cached_property
     def sentry_js(self):
         return self.app.sentry_js
+
+    @cached_property
+    def current_year(self):
+        return date.today().year

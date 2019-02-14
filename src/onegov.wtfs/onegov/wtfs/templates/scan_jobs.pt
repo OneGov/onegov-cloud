@@ -1,0 +1,30 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.wtfs">
+    <tal:block metal:fill-slot="title">${layout.title}</tal:block>
+    <tal:block metal:fill-slot="content">
+        <div class="row">
+            <div class="columns small-12">
+                <h1>${layout.title}</h1>
+                <table class="scan-jobs">
+                    <thead>
+                        <tr>
+                            <th i18n:translate>Dispatch date</th>
+                            <th i18n:translate>Delivery number</th>
+                            <th i18n:translate>Type</th>
+                            <th i18n:translate>Municipality</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tal:block tal:repeat="scan_job layout.model.query()">
+                            <tr tal:condition="request.has_permission(scan_job, permission)">
+                                <td><a href="${request.link(scan_job)}">${layout.format_date(scan_job.dispatch_date, 'date')}</a></td>
+                                <td>${layout.format_number(scan_job.delivery_number)}</td>
+                                <td>${scan_job.type}</td>
+                                <td>${scan_job.municipality.name}</td>
+                            </tr>
+                        </tal:block>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </tal:block>
+</div>

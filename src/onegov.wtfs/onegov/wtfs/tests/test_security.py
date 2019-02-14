@@ -6,8 +6,10 @@ from onegov.user import UserCollection
 from onegov.user import UserGroup
 from onegov.user import UserGroupCollection
 from onegov.wtfs.collections import MunicipalityCollection
+from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import PickupDate
+from onegov.wtfs.models import ScanJob
 from onegov.wtfs.security import AddModel
 from onegov.wtfs.security import AddModelUnrestricted
 from onegov.wtfs.security import DeleteModel
@@ -74,19 +76,23 @@ def test_permissions(wtfs_app, wtfs_password):
         group_id=group_b_id
     ))
 
-    group_m_id = uuid4()
     municipality_id = uuid4()
-    session.add(UserGroup(id=group_m_id, name="Group M"))
     session.add(Municipality(
         id=municipality_id,
         name='Municipality A',
         bfs_number=10,
-        group_id=group_m_id
+        group_id=group_a_id
     ))
     session.add(PickupDate(
         date=date.today(),
         municipality_id=municipality_id,
     ))
+    session.add(ScanJob(
+        type='normal',
+        group_id=group_a_id,
+        municipality_id=municipality_id,
+        dispatch_date=date(2019, 1, 1))
+    )
 
     admin = session.query(User).filter_by(realname='Admin').one()
     admin_a = session.query(User).filter_by(realname='Admin A').one()
@@ -100,8 +106,8 @@ def test_permissions(wtfs_app, wtfs_password):
     group = UserGroup()
     group_a = session.query(UserGroup).filter_by(name='Group A').one()
     group_b = session.query(UserGroup).filter_by(name='Group B').one()
-    group_m = session.query(UserGroup).filter_by(name='Group M').one()
     municipality = session.query(Municipality).one()
+    scan_job = session.query(ScanJob).one()
 
     def permits(user, model, permission):
         return wtfs_app._permits(
@@ -155,7 +161,7 @@ def test_permissions(wtfs_app, wtfs_password):
 
     # UserGroup
     for user in (admin, admin_a, admin_b):
-        for model in (group_a, group_b, group_m):
+        for model in (group_a, group_b):
             assert permits(user, model, Public)
             assert permits(user, model, AddModel)
             assert permits(user, model, AddModelUnrestricted)
@@ -172,7 +178,7 @@ def test_permissions(wtfs_app, wtfs_password):
             assert permits(user, model, DeleteModel)
             assert permits(user, model, ViewModel)
     for user in (editor, editor_a, editor_b, member, member_a, member_b):
-        for model in (group_a, group_b, group_m, group):
+        for model in (group_a, group_b, group):
             assert permits(user, model, Public)
             assert not permits(user, model, AddModel)
             assert not permits(user, model, AddModelUnrestricted)
@@ -329,3 +335,57 @@ def test_permissions(wtfs_app, wtfs_password):
             assert not permits(user, model, EditModelUnrestricted)
             assert not permits(user, model, DeleteModel)
             assert not permits(user, model, ViewModel)
+
+    # ScanJobCollection
+    model = ScanJobCollection(session)
+    for user in (admin, admin_a, admin_b):
+        assert permits(user, model, Public)
+        assert permits(user, model, AddModel)
+        assert permits(user, model, AddModelUnrestricted)
+        assert permits(user, model, EditModel)
+        assert permits(user, model, EditModelUnrestricted)
+        assert permits(user, model, DeleteModel)
+        assert permits(user, model, ViewModel)
+    for user in (editor_a, editor_b, member_a, member_b):
+        assert permits(user, model, Public)
+        assert permits(user, model, AddModel)
+        assert not permits(user, model, AddModelUnrestricted)
+        assert not permits(user, model, EditModel)
+        assert not permits(user, model, EditModelUnrestricted)
+        assert not permits(user, model, DeleteModel)
+        assert permits(user, model, ViewModel)
+    for user in (editor, member):
+        assert permits(user, model, Public)
+        assert not permits(user, model, AddModel)
+        assert not permits(user, model, AddModelUnrestricted)
+        assert not permits(user, model, EditModel)
+        assert not permits(user, model, EditModelUnrestricted)
+        assert not permits(user, model, DeleteModel)
+        assert not permits(user, model, ViewModel)
+
+    # ScanJob
+    model = scan_job
+    for user in (admin, admin_a, admin_b):
+        assert permits(user, model, Public)
+        assert permits(user, model, AddModel)
+        assert permits(user, model, AddModelUnrestricted)
+        assert permits(user, model, EditModel)
+        assert permits(user, model, EditModelUnrestricted)
+        assert permits(user, model, DeleteModel)
+        assert permits(user, model, ViewModel)
+    for user in (editor, editor_b, member, member_b):
+        assert permits(user, model, Public)
+        assert not permits(user, model, AddModel)
+        assert not permits(user, model, AddModelUnrestricted)
+        assert not permits(user, model, EditModel)
+        assert not permits(user, model, EditModelUnrestricted)
+        assert not permits(user, model, DeleteModel)
+        assert not permits(user, model, ViewModel)
+    for user in (editor_a, member_a):
+        assert permits(user, model, Public)
+        assert not permits(user, model, AddModel)
+        assert not permits(user, model, AddModelUnrestricted)
+        assert permits(user, model, EditModel)
+        assert not permits(user, model, EditModelUnrestricted)
+        assert not permits(user, model, DeleteModel)
+        assert permits(user, model, ViewModel)
