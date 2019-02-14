@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds ad analysis.
+  [msom]
+
 - Caches the datasets.
   [msom]
 

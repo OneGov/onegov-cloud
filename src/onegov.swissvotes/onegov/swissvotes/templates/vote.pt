@@ -229,6 +229,10 @@
                             </dl>
                         </td>
                     </tr>
+                    <tr tal:condition="ad_analysis">
+                        <th class="column-30" i18n:translate>Analysis of the advertising campaign</th>
+                        <td><a href="${request.link(ad_analysis)}" target="_blank" class="ad-analysis">PDF</a></td>
+                    </tr>
                 </tbody>
             </table>
 

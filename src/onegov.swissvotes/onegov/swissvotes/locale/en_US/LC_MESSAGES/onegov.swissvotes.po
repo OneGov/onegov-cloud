@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-02-10 14:13+0100\n"
+"POT-Creation-Date: 2019-02-14 13:58+0100\n"
 "PO-Revision-Date: 2018-09-18 15:04+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: English\n"
@@ -38,6 +38,9 @@ msgid "Resolution"
 msgstr ""
 
 msgid "Realization"
+msgstr ""
+
+msgid "Advertisment analysis"
 msgstr ""
 
 msgid "Dataset"
@@ -1368,6 +1371,9 @@ msgid "Details"
 msgstr "Details"
 
 msgid "Further Recommendations"
+msgstr ""
+
+msgid "Analysis of the advertising campaign"
 msgstr ""
 
 msgid "Vote"

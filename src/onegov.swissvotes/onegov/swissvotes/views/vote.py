@@ -31,6 +31,7 @@ def view_vote(self, request):
         'voting_booklet': self.get_file('voting_booklet'),
         'resolution': self.get_file('resolution'),
         'realization': self.get_file('realization'),
+        'ad_analysis': self.get_file('ad_analysis'),
         'prev': prev,
         'next': next,
     }

@@ -613,6 +613,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     voting_booklet = LocalizedFile()
     resolution = LocalizedFile()
     realization = LocalizedFile()
+    ad_analysis = LocalizedFile()
 
     # searchable attachment texts
     searchable_text_de_CH = Column(TSVECTOR)
@@ -622,8 +623,8 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
         'voting_text',
         'federal_council_message',
         'parliamentary_debate',
-        # we don't include the voting_booklet and the resolution, they might
-        # contain other votes from the same day!
+        # we don't include the voting booklet, resolution and ad analysis
+        # - they might contain other votes from the same day!
         'realization'
     }
 

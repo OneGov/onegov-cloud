@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-10 14:13+0100\n"
-"PO-Revision-Date: 2019-02-10 14:13+0100\n"
+"POT-Creation-Date: 2019-02-14 13:58+0100\n"
+"PO-Revision-Date: 2019-02-14 13:58+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -37,6 +37,9 @@ msgstr "Erwahrungsbeschluss"
 
 msgid "Realization"
 msgstr "Zustandekommen"
+
+msgid "Advertisment analysis"
+msgstr "Inserateanalyse"
 
 msgid "Dataset"
 msgstr "Datensatz"
@@ -1371,6 +1374,9 @@ msgstr "Details"
 
 msgid "Further Recommendations"
 msgstr "Weitere Parolen"
+
+msgid "Analysis of the advertising campaign"
+msgstr "Analyse der Inseratekampagne"
 
 msgid "Vote"
 msgstr "Abstimmung"

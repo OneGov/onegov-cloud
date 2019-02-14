@@ -114,11 +114,10 @@ def test_attachments_form(swissvotes_app, attachments):
     form.update_model(vote)
 
     for name in names:
-        assert getattr(vote, name) == attachments[name]
-        assert data['data']
-        assert data['size']
-        assert data['filename'] == 'voting_text'
-        assert data['mimetype'] == 'application/pdf'
+        file = getattr(vote, name)
+        assert file == attachments[name]
+        assert file.reference.filename == name
+        assert file.reference.content_type == 'application/pdf'
 
     # ... replace all de_CH
     for name in names:

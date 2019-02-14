@@ -72,6 +72,7 @@ def attachments(swissvotes_app):
         ('resolution', "Resolution"),
         ('voting_booklet', "Voting booklet"),
         ('voting_text', "Abstimmungstext"),
+        ('ad_analysis', "Inserateanalyse"),
     ):
         file = BytesIO()
         pdf = Pdf(file)

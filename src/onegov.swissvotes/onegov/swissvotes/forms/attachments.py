@@ -60,6 +60,14 @@ class AttachmentsForm(Form):
         ]
     )
 
+    ad_analysis = UploadField(
+        label=_("Advertisment analysis"),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(25 * 1024 * 1024)
+        ]
+    )
+
     def update_model(self, model):
         locale = self.request.locale
 
