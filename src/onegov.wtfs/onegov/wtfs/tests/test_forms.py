@@ -485,7 +485,7 @@ def test_add_scan_job_form(session):
     model = ScanJob()
     form.update_model(model)
     assert model.municipality_id == municipality.id.hex
-    assert model.group_id == group.id
+    assert model.group_id == group.id.hex
     assert model.type == 'normal'
     assert model.dispatch_date == '2019-01-08'
     assert model.dispatch_boxes == 1
@@ -637,7 +637,7 @@ def test_edit_scan_job_form(session):
 
     form.update_model(model)
     assert model.municipality_id == municipality.id.hex
-    assert model.group_id == group.id
+    assert model.group_id == group.id.hex
     assert model.type == 'express'
     assert model.dispatch_date == '2019-01-06'
     assert model.dispatch_boxes == 10
