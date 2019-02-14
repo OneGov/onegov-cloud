@@ -1,0 +1,20 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.wtfs">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="body">
+        <p i18n:translate>
+            Your order has been accepted. The transport company will pick up
+            your shipment on <span tal:replace="layout.format_date(layout.model.dispatch_date, 'date')" i18n:name="date" />.
+            Please have the container(s) ready from 8 a.m. onwards.
+            Thank you very much for your cooperation.
+        </p>
+        <p i18n:translate>Yours sincerely</p>
+        <p>
+            <span i18n:translate>Tax office Winterthur</span><br>
+            <span i18n:translate>Scan Center</span><br>
+            <span i18n:translate>Phone: 052 267 53 47</span><br>
+            <span i18n:translate>E-mail: steuramt.scancenter@win.ch</span>
+        </p>
+    </tal:block>
+</div>

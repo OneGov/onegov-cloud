@@ -41,6 +41,14 @@ def test_views_scan_job(client):
         assert "Scan-Auftrag hinzugefügt." in added
         assert "05.01.2019" in added
 
+        message = client.app.smtp.outbox.pop()
+        assert message['From'] == 'mails@govikon.ch'
+        assert message['To'] == 'member@example.org'
+        assert message['Reply-To'] == 'mails@govikon.ch'
+        payload = message.get_payload(1).get_payload(decode=True)
+        payload = payload.decode('utf-8')
+        assert "am 05.01.2019 Ihre Sendung abholen" in payload
+
     # View scan job
     view = client.get('/scan-jobs').click("05.01.2019")
     assert "Scan-Aufrag 1: My Municipality, 05.01.2019" in view

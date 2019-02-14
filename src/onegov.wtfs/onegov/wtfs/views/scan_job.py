@@ -10,6 +10,7 @@ from onegov.wtfs.layouts import AddScanJobLayout
 from onegov.wtfs.layouts import EditScanJobLayout
 from onegov.wtfs.layouts import ScanJobLayout
 from onegov.wtfs.layouts import ScanJobsLayout
+from onegov.wtfs.layouts import MailLayout
 from onegov.wtfs.models import ScanJob
 from onegov.wtfs.security import AddModel
 from onegov.wtfs.security import AddModelUnrestricted
@@ -17,6 +18,7 @@ from onegov.wtfs.security import DeleteModel
 from onegov.wtfs.security import EditModel
 from onegov.wtfs.security import EditModelUnrestricted
 from onegov.wtfs.security import ViewModel
+from onegov.core.templates import render_template
 
 
 @WtfsApp.html(
@@ -76,6 +78,25 @@ def add_scan_job(self, request, form):
         form.update_model(scan_job)
         request.session.add(scan_job)
         request.message(_("Scan job added."), 'success')
+
+        subject = request.translate(
+            _("Order confirmation for scanning your tax returns")
+        )
+        request.app.send_transactional_email(
+            subject=subject,
+            receivers=(request.identity.userid, ),
+            reply_to=request.app.mail['transactional']['sender'],
+            content=render_template(
+                'mail_confirm.pt',
+                request,
+                {
+                    'title': subject,
+                    'model': scan_job,
+                    'layout': MailLayout(scan_job, request)
+                }
+            ),
+        )
+
         return redirect(layout.success_url)
 
     return {

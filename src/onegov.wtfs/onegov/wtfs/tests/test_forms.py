@@ -471,8 +471,8 @@ def test_add_scan_job_form(session):
     # Test update
     form.type.data = 'normal'
     form.municipality_id.data = form.municipality_id.choices[0][0]
-    form.dispatch_date.data = '2019-01-08'
-    form.dispatch_date_express.data = '2019-01-06'
+    form.dispatch_date.data = date(2019, 1, 8).isoformat()
+    form.dispatch_date_express.data = date(2019, 1, 6)
     form.dispatch_boxes.data = 1
     form.dispatch_tax_forms_current_year.data = 2
     form.dispatch_tax_forms_last_year.data = 3
@@ -487,7 +487,7 @@ def test_add_scan_job_form(session):
     assert model.municipality_id == municipality.id.hex
     assert model.group_id == group.id.hex
     assert model.type == 'normal'
-    assert model.dispatch_date == '2019-01-08'
+    assert model.dispatch_date == date(2019, 1, 8)
     assert model.dispatch_boxes == 1
     assert model.dispatch_tax_forms_current_year == 2
     assert model.dispatch_tax_forms_last_year == 3
@@ -499,7 +499,7 @@ def test_add_scan_job_form(session):
 
     form.type.data = 'express'
     form.update_model(model)
-    assert model.dispatch_date == '2019-01-06'
+    assert model.dispatch_date == date(2019, 1, 6)
 
     # Test validation
     form = AddScanJobForm()
@@ -566,7 +566,7 @@ def test_edit_scan_job_form(session):
     model = ScanJob()
     model.municipality_id = municipality.id
     model.type = 'normal'
-    model.dispatch_date = '2019-01-08'
+    model.dispatch_date = date(2019, 1, 8)
     model.dispatch_boxes = 1
     model.dispatch_tax_forms_current_year = 2
     model.dispatch_tax_forms_last_year = 3
@@ -575,7 +575,7 @@ def test_edit_scan_job_form(session):
     model.dispatch_note = 'Note on dispatch'
     model.dispatch_cantonal_tax_office = 6
     model.dispatch_cantonal_scan_center = 7
-    model.return_date = '2019-01-10'
+    model.return_date = date(2019, 1, 10)
     model.return_boxes = 8
     model.return_scanned_tax_forms_current_year = 9
     model.return_scanned_tax_forms_last_year = 10
@@ -590,7 +590,7 @@ def test_edit_scan_job_form(session):
     form.apply_model(model)
     assert form.type.data == 'normal'
     assert form.municipality_id.data == form.municipality_id.choices[0][0]
-    assert form.dispatch_date.data == '2019-01-08'
+    assert form.dispatch_date.data == date(2019, 1, 8).isoformat()
     assert form.dispatch_boxes.data == 1
     assert form.dispatch_tax_forms_current_year.data == 2
     assert form.dispatch_tax_forms_last_year.data == 3
@@ -599,7 +599,7 @@ def test_edit_scan_job_form(session):
     assert form.dispatch_note.data == 'Note on dispatch'
     assert form.dispatch_cantonal_tax_office.data == 6
     assert form.dispatch_cantonal_scan_center.data == 7
-    assert form.return_date.data == '2019-01-10'
+    assert form.return_date.data == date(2019, 1, 10)
     assert form.return_boxes.data == 8
     assert form.return_scanned_tax_forms_current_year.data == 9
     assert form.return_scanned_tax_forms_last_year.data == 10
@@ -613,8 +613,8 @@ def test_edit_scan_job_form(session):
 
     form.type.data = 'express'
     form.municipality_id.data = form.municipality_id.choices[0][0]
-    form.dispatch_date.data = '2019-01-08'
-    form.dispatch_date_express.data = '2019-01-06'
+    form.dispatch_date.data = date(2019, 1, 8).isoformat()
+    form.dispatch_date_express.data = date(2019, 1, 6)
     form.dispatch_boxes.data = 10
     form.dispatch_tax_forms_current_year.data = 20
     form.dispatch_tax_forms_last_year.data = 30
@@ -623,7 +623,7 @@ def test_edit_scan_job_form(session):
     form.dispatch_note.data = 'A note on the dispatch'
     form.dispatch_cantonal_tax_office.data = 60
     form.dispatch_cantonal_scan_center.data = 70
-    form.return_date.data = '2019-01-10'
+    form.return_date.data = date(2019, 1, 10)
     form.return_boxes.data = 80
     form.return_scanned_tax_forms_current_year.data = 90
     form.return_scanned_tax_forms_last_year.data = 100
@@ -639,7 +639,7 @@ def test_edit_scan_job_form(session):
     assert model.municipality_id == municipality.id.hex
     assert model.group_id == group.id.hex
     assert model.type == 'express'
-    assert model.dispatch_date == '2019-01-06'
+    assert model.dispatch_date == date(2019, 1, 6)
     assert model.dispatch_boxes == 10
     assert model.dispatch_tax_forms_current_year == 20
     assert model.dispatch_tax_forms_last_year == 30
@@ -648,7 +648,7 @@ def test_edit_scan_job_form(session):
     assert model.dispatch_note == 'A note on the dispatch'
     assert model.dispatch_cantonal_tax_office == 60
     assert model.dispatch_cantonal_scan_center == 70
-    assert model.return_date == '2019-01-10'
+    assert model.return_date == date(2019, 1, 10)
     assert model.return_boxes == 80
     assert model.return_scanned_tax_forms_current_year == 90
     assert model.return_scanned_tax_forms_last_year == 100
@@ -721,8 +721,8 @@ def test_unrestricted_add_scan_job_form(session):
     # Test update
     form.type.data = 'normal'
     form.municipality_id.data = form.municipality_id.choices[0][0]
-    form.dispatch_date.data = '2019-01-08'
-    form.dispatch_date_express.data = '2019-01-06'
+    form.dispatch_date.data = date(2019, 1, 8).isoformat()
+    form.dispatch_date_express.data = date(2019, 1, 6)
     form.dispatch_boxes.data = 1
     form.dispatch_tax_forms_current_year.data = 2
     form.dispatch_tax_forms_last_year.data = 3
@@ -737,7 +737,7 @@ def test_unrestricted_add_scan_job_form(session):
     assert model.municipality_id == municipality_2.id.hex
     assert model.group_id == group_2.id
     assert model.type == 'normal'
-    assert model.dispatch_date == '2019-01-08'
+    assert model.dispatch_date == date(2019, 1, 8)
     assert model.dispatch_boxes == 1
     assert model.dispatch_tax_forms_current_year == 2
     assert model.dispatch_tax_forms_last_year == 3
@@ -749,7 +749,7 @@ def test_unrestricted_add_scan_job_form(session):
 
     form.type.data = 'express'
     form.update_model(model)
-    assert model.dispatch_date == '2019-01-06'
+    assert model.dispatch_date == date(2019, 1, 6)
 
     # Test validation
     form = UnrestrictedAddScanJobForm()
@@ -814,7 +814,7 @@ def test_unrestricted_edit_scan_job_form(session):
     model.municipality_id = municipality_1.id
     model.group_id = group_1.id
     model.type = 'normal'
-    model.dispatch_date = '2019-01-08'
+    model.dispatch_date = date(2019, 1, 8)
     model.dispatch_boxes = 1
     model.dispatch_tax_forms_current_year = 2
     model.dispatch_tax_forms_last_year = 3
@@ -823,7 +823,7 @@ def test_unrestricted_edit_scan_job_form(session):
     model.dispatch_note = 'Note on dispatch'
     model.dispatch_cantonal_tax_office = 6
     model.dispatch_cantonal_scan_center = 7
-    model.return_date = '2019-01-10'
+    model.return_date = date(2019, 1, 10)
     model.return_boxes = 8
     model.return_scanned_tax_forms_current_year = 9
     model.return_scanned_tax_forms_last_year = 10
@@ -838,7 +838,7 @@ def test_unrestricted_edit_scan_job_form(session):
     form.apply_model(model)
     assert form.type.data == 'normal'
     assert form.municipality_id.data == municipality_1.id.hex
-    assert form.dispatch_date.data == '2019-01-08'
+    assert form.dispatch_date.data == date(2019, 1, 8).isoformat()
     assert form.dispatch_boxes.data == 1
     assert form.dispatch_tax_forms_current_year.data == 2
     assert form.dispatch_tax_forms_last_year.data == 3
@@ -847,7 +847,7 @@ def test_unrestricted_edit_scan_job_form(session):
     assert form.dispatch_note.data == 'Note on dispatch'
     assert form.dispatch_cantonal_tax_office.data == 6
     assert form.dispatch_cantonal_scan_center.data == 7
-    assert form.return_date.data == '2019-01-10'
+    assert form.return_date.data == date(2019, 1, 10)
     assert form.return_boxes.data == 8
     assert form.return_scanned_tax_forms_current_year.data == 9
     assert form.return_scanned_tax_forms_last_year.data == 10
@@ -861,8 +861,8 @@ def test_unrestricted_edit_scan_job_form(session):
 
     form.type.data = 'express'
     form.municipality_id.data = municipality_2.id.hex
-    form.dispatch_date.data = '2019-01-18'
-    form.dispatch_date_express.data = '2019-01-06'
+    form.dispatch_date.data = date(2019, 1, 18).isoformat()
+    form.dispatch_date_express.data = date(2019, 1, 6)
     form.dispatch_boxes.data = 10
     form.dispatch_tax_forms_current_year.data = 20
     form.dispatch_tax_forms_last_year.data = 30
@@ -871,7 +871,7 @@ def test_unrestricted_edit_scan_job_form(session):
     form.dispatch_note.data = 'A note on the dispatch'
     form.dispatch_cantonal_tax_office.data = 60
     form.dispatch_cantonal_scan_center.data = 70
-    form.return_date.data = '2019-01-10'
+    form.return_date.data = date(2019, 1, 10)
     form.return_boxes.data = 80
     form.return_scanned_tax_forms_current_year.data = 90
     form.return_scanned_tax_forms_last_year.data = 100
@@ -887,7 +887,7 @@ def test_unrestricted_edit_scan_job_form(session):
     assert model.municipality_id == municipality_2.id.hex
     assert model.group_id == group_2.id
     assert model.type == 'express'
-    assert model.dispatch_date == '2019-01-06'
+    assert model.dispatch_date == date(2019, 1, 6)
     assert model.dispatch_boxes == 10
     assert model.dispatch_tax_forms_current_year == 20
     assert model.dispatch_tax_forms_last_year == 30
@@ -896,7 +896,7 @@ def test_unrestricted_edit_scan_job_form(session):
     assert model.dispatch_note == 'A note on the dispatch'
     assert model.dispatch_cantonal_tax_office == 60
     assert model.dispatch_cantonal_scan_center == 70
-    assert model.return_date == '2019-01-10'
+    assert model.return_date == date(2019, 1, 10)
     assert model.return_boxes == 80
     assert model.return_scanned_tax_forms_current_year == 90
     assert model.return_scanned_tax_forms_last_year == 100

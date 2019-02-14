@@ -1,5 +1,6 @@
 from datetime import date
 from datetime import timedelta
+from dateutil.parser import parse
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.wtfs import _
@@ -139,7 +140,7 @@ class AddScanJobForm(Form):
         model.type = self.type.data
         model.dispatch_date = (
             self.dispatch_date_express.data if self.type.data == 'express' else
-            self.dispatch_date.data
+            parse(self.dispatch_date.data).date()
         )
         model.dispatch_boxes = self.dispatch_boxes.data
         model.dispatch_tax_forms_current_year = \
@@ -247,7 +248,7 @@ class EditScanJobForm(AddScanJobForm):
     def apply_model(self, model):
         self.municipality_id.data = model.municipality_id.hex
         self.type.data = model.type
-        self.dispatch_date.data = model.dispatch_date
+        self.dispatch_date.data = model.dispatch_date.isoformat()
         self.dispatch_date_express.data = model.dispatch_date
         self.dispatch_boxes.data = model.dispatch_boxes
         self.dispatch_tax_forms_current_year.data = \
