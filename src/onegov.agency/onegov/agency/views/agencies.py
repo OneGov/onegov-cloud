@@ -1,3 +1,5 @@
+from datetime import datetime
+from datetime import timedelta
 from morepath import redirect
 from morepath.request import Response
 from onegov.agency import _
@@ -229,6 +231,19 @@ def get_root_pdf(self, request):
 
     if not request.app.root_pdf_exists:
         return Response(status='503 Service Unavailable')
+
+    @request.after
+    def cache_headers(response):
+        last_modified = request.app.root_pdf_modified
+        if last_modified:
+            max_age = 1 * 24 * 60 * 60
+            expires = datetime.now() + timedelta(seconds=max_age)
+            fmt = '%a, %d %b %Y %H:%M:%S GMT'
+
+            response.headers.add('Cache-Control', f'max-age={max_age}, public')
+            response.headers.add('ETag', last_modified.isoformat())
+            response.headers.add('Expires', expires.strftime(fmt))
+            response.headers.add('Last-Modified', last_modified.strftime(fmt))
 
     return Response(
         request.app.root_pdf,

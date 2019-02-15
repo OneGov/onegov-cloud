@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds cache headers to the root PDF.
+  [msom]
+
 1.8.1 (2019-02-05)
 ~~~~~~~~~~~~~~~~~~~~
 
