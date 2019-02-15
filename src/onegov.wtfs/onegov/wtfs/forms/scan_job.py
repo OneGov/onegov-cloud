@@ -10,6 +10,7 @@ from wtforms import IntegerField
 from wtforms import RadioField
 from wtforms import SelectField
 from wtforms import TextAreaField
+from wtforms_components import DateRange
 from wtforms.fields.html5 import DateField
 from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
@@ -18,6 +19,12 @@ from wtforms.validators import Optional
 
 def tomorrow():
     return date.today() + timedelta(days=1)
+
+
+def coerce_date(value):
+    if isinstance(value, str):
+        return parse(value).date()
+    return value
 
 
 class AddScanJobForm(Form):
@@ -39,13 +46,20 @@ class AddScanJobForm(Form):
         label=_("Dispatch date"),
         choices=[],
         depends_on=('type', 'normal'),
-        validators=[InputRequired()]
+        validators=[
+            InputRequired(),
+            DateRange(min=tomorrow, message=_("Date must be in the future."))
+        ],
+        coerce=coerce_date
     )
 
     dispatch_date_express = DateField(
         label=_("Dispatch date"),
         depends_on=('type', 'express'),
-        validators=[InputRequired()],
+        validators=[
+            InputRequired(),
+            DateRange(min=tomorrow, message=_("Date must be in the future."))
+        ],
         default=tomorrow
     )
 
@@ -121,7 +135,7 @@ class AddScanJobForm(Form):
         query = query.filter(PickupDate.municipality_id == municipality_id)
         query = query.filter(PickupDate.date > date.today())
         self.dispatch_date.choices = [
-            (r.date.isoformat(), f"{r.date:%d.%m.%Y}") for r in query
+            (r.date, f"{r.date:%d.%m.%Y}") for r in query
         ]
 
     def on_request(self):
@@ -140,7 +154,7 @@ class AddScanJobForm(Form):
         model.type = self.type.data
         model.dispatch_date = (
             self.dispatch_date_express.data if self.type.data == 'express' else
-            parse(self.dispatch_date.data).date()
+            self.dispatch_date.data
         )
         model.dispatch_boxes = self.dispatch_boxes.data
         model.dispatch_tax_forms_current_year = \
@@ -248,7 +262,7 @@ class EditScanJobForm(AddScanJobForm):
     def apply_model(self, model):
         self.municipality_id.data = model.municipality_id.hex
         self.type.data = model.type
-        self.dispatch_date.data = model.dispatch_date.isoformat()
+        self.dispatch_date.data = model.dispatch_date
         self.dispatch_date_express.data = model.dispatch_date
         self.dispatch_boxes.data = model.dispatch_boxes
         self.dispatch_tax_forms_current_year.data = \

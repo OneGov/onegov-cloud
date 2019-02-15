@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-14 15:19+0100\n"
-"PO-Revision-Date: 2019-02-14 15:19+0100\n"
+"POT-Creation-Date: 2019-02-15 08:53+0100\n"
+"PO-Revision-Date: 2019-02-15 08:53+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -112,6 +112,9 @@ msgstr "Normale Sendung"
 
 msgid "Express shipment"
 msgstr "Expresssendung"
+
+msgid "Date must be in the future."
+msgstr "Datum muss in der Zukunft liegen."
 
 #, python-format
 msgid "Scan job ${number}: ${municipality}, ${date}"
@@ -362,11 +365,11 @@ msgstr "Scan-Auftrag gelöscht."
 msgid "Scan job added."
 msgstr "Scan-Auftrag hinzugefügt."
 
-msgid "Scan job modified."
-msgstr "Scan-Auftrag geändert."
-
 msgid "Order confirmation for scanning your tax returns"
 msgstr "Auftragsbestätigung für das Scannen Ihrer Steuererklärungen"
+
+msgid "Scan job modified."
+msgstr "Scan-Auftrag geändert."
 
 msgid "Access Denied"
 msgstr "Zugriff verweigert"
