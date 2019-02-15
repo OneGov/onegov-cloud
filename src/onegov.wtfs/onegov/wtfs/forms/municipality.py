@@ -8,6 +8,7 @@ from onegov.wtfs.models import PickupDate
 from sqlalchemy import func
 from sqlalchemy import String
 from wtforms import IntegerField
+from wtforms import SelectField
 from wtforms import StringField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired
@@ -109,3 +110,29 @@ class DeleteMunicipalityDatesForm(Form):
         end = model.pickup_dates.order_by(None)
         end = end.order_by(PickupDate.date.desc()).first()
         self.end.data = end.date if end else None
+
+
+class MunicipalityIdSelectionForm(Form):
+
+    municipality_id = SelectField(
+        label=_("Municipality"),
+        choices=[],
+        validators=[
+            InputRequired()
+        ]
+    )
+
+    def on_request(self):
+        query = self.request.session.query(
+            Municipality.id.label('id'),
+            Municipality.name.label('name')
+        )
+        query = query.order_by(Municipality.name)
+        self.municipality_id.choices = [(r.id.hex, r.name) for r in query]
+
+    @property
+    def municipality(self):
+        if self.municipality_id.data:
+            query = self.request.session.query(Municipality)
+            query = query.filter(Municipality.id == self.municipality_id.data)
+            return query.first()

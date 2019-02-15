@@ -71,6 +71,10 @@ def add_scan_job_unrestricted(self, request, form):
 )
 def add_scan_job(self, request, form):
     """ Create a new scan job. """
+
+    if request.has_permission(self, AddModelUnrestricted):
+        return redirect(request.link(self, name='add-unrestricted'))
+
     layout = AddScanJobLayout(self, request)
 
     if form.submitted(request):
@@ -158,6 +162,9 @@ def edit_scan_job_unrestricted(self, request, form):
 )
 def edit_scan_job(self, request, form):
     """ Edit a scan job. """
+
+    if request.has_permission(self, EditModelUnrestricted):
+        return redirect(request.link(self, name='edit-unrestricted'))
 
     layout = EditScanJobLayout(self, request)
 

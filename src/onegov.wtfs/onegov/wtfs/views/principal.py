@@ -1,7 +1,13 @@
+from datetime import date
+from morepath import Response
 from onegov.core.security import Public
+from onegov.core.templates import render_macro
 from onegov.wtfs import WtfsApp
+from onegov.wtfs.forms import MunicipalityIdSelectionForm
 from onegov.wtfs.layouts import DefaultLayout
 from onegov.wtfs.models import Principal
+from onegov.wtfs.models import PickupDate
+from onegov.wtfs.security import ViewModel
 
 
 @WtfsApp.html(
@@ -20,3 +26,26 @@ def view_home(self, request):
     return {
         'layout': layout
     }
+
+
+@WtfsApp.form(
+    model=Principal,
+    permission=ViewModel,
+    name='dispatch-dates',
+    form=MunicipalityIdSelectionForm
+)
+def view_dispatch_dates(self, request, form):
+    if form.submitted(request):
+        layout = DefaultLayout(self, request)
+        dates = [
+            r.date for r in form.municipality.pickup_dates.filter(
+                PickupDate.date > date.today()
+            )
+        ]
+        return render_macro(
+            layout.macros['dispatch_dates'],
+            request,
+            {'dates': dates, 'layout': layout}
+        )
+
+    return Response()

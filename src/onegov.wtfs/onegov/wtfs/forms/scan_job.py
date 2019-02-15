@@ -2,7 +2,7 @@ from datetime import date
 from datetime import timedelta
 from dateutil.parser import parse
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import PreviewField
 from onegov.wtfs import _
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import PickupDate
@@ -29,12 +29,6 @@ def coerce_date(value):
 
 class AddScanJobForm(Form):
 
-    municipality_id = ChosenSelectField(
-        label=_("Municipality"),
-        choices=[],
-        validators=[InputRequired()]
-    )
-
     type = RadioField(
         label=_("Type"),
         choices=[('normal', _("Regular shipment"))],
@@ -42,7 +36,7 @@ class AddScanJobForm(Form):
         default='normal'
     )
 
-    dispatch_date = SelectField(
+    dispatch_date_normal = SelectField(
         label=_("Dispatch date"),
         choices=[],
         depends_on=('type', 'normal'),
@@ -105,76 +99,108 @@ class AddScanJobForm(Form):
         validators=[Optional(), NumberRange(min=0)]
     )
 
-    def set_municipality_id_choices(self, group_id=None):
-        """ Queries and sets the list of municipalities for the given group
-        or all groups.
+    @property
+    def group_id(self):
+        return self.request.identity.groupid
 
-        """
-        query = self.request.session.query(
-            Municipality.id.label('id'),
-            Municipality.name.label('name')
-        )
-        if group_id:
-            query = query.filter(Municipality.group_id == group_id)
-        query = query.order_by(Municipality.name)
-        self.municipality_id.choices = [(r.id.hex, r.name) for r in query]
+    @property
+    def municipality_id(self):
+        if not self.group_id:
+            return
+        query = self.request.session.query(Municipality)
+        query = query.filter_by(group_id=self.group_id)
+        return query.one().id
 
-    def set_dispatch_date_choices(self, municipality_id=None):
-        """ Queries and sets the dispatch dates for the given municipality or
-        the first selectable municipality.
-
-        """
-        if municipality_id is None:
-            choices = self.municipality_id.choices
-            if not choices or not choices[0]:
-                self.dispatch_date.choices = []
-                return
-            municipality_id = choices[0][0]
-
-        query = self.request.session.query(PickupDate.date.label('date'))
-        query = query.filter(PickupDate.municipality_id == municipality_id)
-        query = query.filter(PickupDate.date > date.today())
-        self.dispatch_date.choices = [
-            (r.date, f"{r.date:%d.%m.%Y}") for r in query
-        ]
+    @property
+    def dispatch_date(self):
+        if self.type.data == 'express':
+            return self.dispatch_date_express.data
+        return self.dispatch_date_normal.data
 
     def on_request(self):
+        # Shipment types
         if self.request.has_role('editor'):
             self.type.choices = [
                 ('normal', _("Regular shipment")),
                 ('express', _("Express shipment"))
             ]
 
-        self.set_municipality_id_choices(self.request.identity.groupid)
-        self.set_dispatch_date_choices()
+        # Dispatch dates
+        query = self.request.session.query(PickupDate.date.label('date'))
+        query = query.filter(
+            PickupDate.municipality_id == self.municipality_id
+        )
+        query = query.filter(PickupDate.date > date.today())
+        self.dispatch_date_normal.choices = [
+            (r.date, f"{r.date:%d.%m.%Y}") for r in query
+        ]
 
     def update_model(self, model):
-        model.municipality_id = self.municipality_id.data
-        model.group_id = self.request.identity.groupid
+        model.municipality_id = self.municipality_id
+        model.group_id = self.group_id
         model.type = self.type.data
-        model.dispatch_date = (
-            self.dispatch_date_express.data if self.type.data == 'express' else
-            self.dispatch_date.data
-        )
-        model.dispatch_boxes = self.dispatch_boxes.data
-        model.dispatch_tax_forms_current_year = \
-            self.dispatch_tax_forms_current_year.data
-        model.dispatch_tax_forms_last_year = \
-            self.dispatch_tax_forms_last_year.data
-        model.dispatch_tax_forms_older = self.dispatch_tax_forms_older.data
-        model.dispatch_single_documents = self.dispatch_single_documents.data
-        model.dispatch_note = self.dispatch_note.data
-        model.dispatch_cantonal_tax_office = \
-            self.dispatch_cantonal_tax_office.data
-        model.dispatch_cantonal_scan_center = \
-            self.dispatch_cantonal_scan_center.data
+        model.dispatch_date = self.dispatch_date
+        for name in (
+            'dispatch_boxes',
+            'dispatch_tax_forms_current_year',
+            'dispatch_tax_forms_last_year',
+            'dispatch_tax_forms_older',
+            'dispatch_single_documents',
+            'dispatch_note',
+            'dispatch_cantonal_tax_office',
+            'dispatch_cantonal_scan_center',
+        ):
+            setattr(model, name, getattr(self, name).data)
 
 
-class EditScanJobForm(AddScanJobForm):
+class EditScanJobForm(Form):
+
+    dispatch_boxes = IntegerField(
+        label=_("Boxes"),
+        fieldset=_("Dispatch to the tax office"),
+        validators=[Optional(), NumberRange(min=0)]
+    )
+    dispatch_tax_forms_current_year = IntegerField(
+        label=_("Tax forms"),
+        fieldset=_("Dispatch to the tax office"),
+        validators=[Optional(), NumberRange(min=0)]
+    )
+    dispatch_tax_forms_last_year = IntegerField(
+        label=_("Tax forms (previous year)"),
+        fieldset=_("Dispatch to the tax office"),
+        validators=[Optional(), NumberRange(min=0)]
+    )
+    dispatch_tax_forms_older = IntegerField(
+        label=_("Tax forms (older)"),
+        fieldset=_("Dispatch to the tax office"),
+        validators=[Optional(), NumberRange(min=0)]
+    )
+    dispatch_single_documents = IntegerField(
+        label=_("Single documents"),
+        fieldset=_("Dispatch to the tax office"),
+        validators=[Optional(), NumberRange(min=0)]
+    )
+    dispatch_note = TextAreaField(
+        label=_("Note"),
+        fieldset=_("Dispatch to the tax office"),
+        render_kw={'rows': 5},
+    )
+
+    dispatch_cantonal_tax_office = IntegerField(
+        label=_("Headquarters"),
+        fieldset=_("Dispatch to the cantonal tax office"),
+        validators=[Optional(), NumberRange(min=0)]
+    )
+    dispatch_cantonal_scan_center = IntegerField(
+        label=_("Scan center"),
+        fieldset=_("Dispatch to the cantonal tax office"),
+        validators=[Optional(), NumberRange(min=0)]
+    )
 
     return_date = DateField(
         label=_("Return date"),
-        default=tomorrow
+        default=tomorrow,
+        validators=[Optional()]
     )
 
     return_boxes = IntegerField(
@@ -238,104 +264,380 @@ class EditScanJobForm(AddScanJobForm):
     )
 
     def update_model(self, model):
-        super().update_model(model)
-        model.return_date = self.return_date.data
-        model.return_boxes = self.return_boxes.data
-        model.return_scanned_tax_forms_current_year = \
-            self.return_scanned_tax_forms_current_year.data
-        model.return_scanned_tax_forms_last_year = \
-            self.return_scanned_tax_forms_last_year.data
-        model.return_scanned_tax_forms_older = \
-            self.return_scanned_tax_forms_older.data
-        model.return_scanned_single_documents = \
-            self.return_scanned_single_documents.data
-        model.return_unscanned_tax_forms_current_year = \
-            self.return_unscanned_tax_forms_current_year.data
-        model.return_unscanned_tax_forms_last_year = \
-            self.return_unscanned_tax_forms_last_year.data
-        model.return_unscanned_tax_forms_older = \
-            self.return_unscanned_tax_forms_older.data
-        model.return_unscanned_single_documents = \
-            self.return_unscanned_single_documents.data
-        model.return_note = self.return_note.data
+        for name in (
+            'dispatch_boxes',
+            'dispatch_tax_forms_current_year',
+            'dispatch_tax_forms_last_year',
+            'dispatch_tax_forms_older',
+            'dispatch_single_documents',
+            'dispatch_note',
+            'dispatch_cantonal_tax_office',
+            'dispatch_cantonal_scan_center',
+            'return_date',
+            'return_boxes',
+            'return_scanned_tax_forms_current_year',
+            'return_scanned_tax_forms_last_year',
+            'return_scanned_tax_forms_older',
+            'return_scanned_single_documents',
+            'return_unscanned_tax_forms_current_year',
+            'return_unscanned_tax_forms_last_year',
+            'return_unscanned_tax_forms_older',
+            'return_unscanned_single_documents',
+            'return_note',
+        ):
+            setattr(model, name, getattr(self, name).data)
+
+    def apply_model(self, model):
+        for name in (
+            'dispatch_boxes',
+            'dispatch_tax_forms_current_year',
+            'dispatch_tax_forms_last_year',
+            'dispatch_tax_forms_older',
+            'dispatch_single_documents',
+            'dispatch_note',
+            'dispatch_cantonal_tax_office',
+            'dispatch_cantonal_scan_center',
+            'return_date',
+            'return_boxes',
+            'return_scanned_tax_forms_current_year',
+            'return_scanned_tax_forms_last_year',
+            'return_scanned_tax_forms_older',
+            'return_scanned_single_documents',
+            'return_unscanned_tax_forms_current_year',
+            'return_unscanned_tax_forms_last_year',
+            'return_unscanned_tax_forms_older',
+            'return_unscanned_single_documents',
+            'return_note',
+        ):
+            getattr(self, name).data = getattr(model, name)
+
+
+class UnrestrictedAddScanJobForm(Form):
+
+    municipality_id = SelectField(
+        label=_("Municipality"),
+        choices=[],
+        validators=[InputRequired()]
+    )
+
+    type = RadioField(
+        label=_("Type"),
+        choices=[
+            ('normal', _("Regular shipment")),
+            ('express', _("Express shipment"))
+        ],
+        validators=[InputRequired()],
+        default='normal'
+    )
+
+    dispatch_date = DateField(
+        label=_("Dispatch date"),
+        validators=[
+            InputRequired(),
+            DateRange(min=tomorrow, message=_("Date must be in the future."))
+        ],
+        default=tomorrow
+    )
+
+    dispatch_date_hint = PreviewField(
+        label=_("Regular dispatch dates"),
+        fields=('municipality_id',),
+        events=('change',),
+        url=lambda meta: meta.request.link(
+            meta.request.app.principal,
+            name='dispatch-dates'
+        )
+    )
+
+    dispatch_boxes = IntegerField(
+        label=_("Boxes"),
+        fieldset=_("Dispatch to the tax office"),
+        validators=[Optional(), NumberRange(min=0)]
+    )
+    dispatch_tax_forms_current_year = IntegerField(
+        label=_("Tax forms"),
+        fieldset=_("Dispatch to the tax office"),
+        validators=[Optional(), NumberRange(min=0)]
+    )
+    dispatch_tax_forms_last_year = IntegerField(
+        label=_("Tax forms (previous year)"),
+        fieldset=_("Dispatch to the tax office"),
+        validators=[Optional(), NumberRange(min=0)]
+    )
+    dispatch_tax_forms_older = IntegerField(
+        label=_("Tax forms (older)"),
+        fieldset=_("Dispatch to the tax office"),
+        validators=[Optional(), NumberRange(min=0)]
+    )
+    dispatch_single_documents = IntegerField(
+        label=_("Single documents"),
+        fieldset=_("Dispatch to the tax office"),
+        validators=[Optional(), NumberRange(min=0)]
+    )
+    dispatch_note = TextAreaField(
+        label=_("Note"),
+        fieldset=_("Dispatch to the tax office"),
+        render_kw={'rows': 5},
+    )
+
+    dispatch_cantonal_tax_office = IntegerField(
+        label=_("Headquarters"),
+        fieldset=_("Dispatch to the cantonal tax office"),
+        validators=[Optional(), NumberRange(min=0)]
+    )
+    dispatch_cantonal_scan_center = IntegerField(
+        label=_("Scan center"),
+        fieldset=_("Dispatch to the cantonal tax office"),
+        validators=[Optional(), NumberRange(min=0)]
+    )
+
+    @property
+    def group_id(self):
+        session = self.request.session
+        with session.no_autoflush:
+            query = session.query(Municipality)
+            query = query.filter_by(id=self.municipality_id.data)
+            return query.one().group_id
+
+    def on_request(self):
+        query = self.request.session.query(
+            Municipality.id.label('id'),
+            Municipality.name.label('name')
+        )
+        query = query.order_by(Municipality.name)
+        self.municipality_id.choices = [(r.id.hex, r.name) for r in query]
+
+    def update_model(self, model):
+        model.group_id = self.group_id
+
+        for name in (
+            'municipality_id',
+            'type',
+            'dispatch_date',
+            'dispatch_boxes',
+            'dispatch_tax_forms_current_year',
+            'dispatch_tax_forms_last_year',
+            'dispatch_tax_forms_older',
+            'dispatch_single_documents',
+            'dispatch_note',
+            'dispatch_cantonal_tax_office',
+            'dispatch_cantonal_scan_center',
+        ):
+            setattr(model, name, getattr(self, name).data)
+
+
+class UnrestrictedEditScanJobForm(Form):
+
+    municipality_id = SelectField(
+        label=_("Municipality"),
+        choices=[],
+        validators=[InputRequired()]
+    )
+
+    type = RadioField(
+        label=_("Type"),
+        choices=[
+            ('normal', _("Regular shipment")),
+            ('express', _("Express shipment"))
+        ],
+        validators=[InputRequired()],
+        default='normal'
+    )
+
+    dispatch_date = DateField(
+        label=_("Dispatch date"),
+        validators=[
+            InputRequired(),
+            DateRange(min=tomorrow, message=_("Date must be in the future."))
+        ],
+        default=tomorrow
+    )
+
+    dispatch_date_hint = PreviewField(
+        label=_("Regular dispatch dates"),
+        fields=('municipality_id',),
+        events=('change',),
+        url=lambda meta: meta.request.link(
+            meta.request.app.principal,
+            name='dispatch-dates'
+        )
+    )
+
+    dispatch_boxes = IntegerField(
+        label=_("Boxes"),
+        fieldset=_("Dispatch to the tax office"),
+        validators=[Optional(), NumberRange(min=0)]
+    )
+    dispatch_tax_forms_current_year = IntegerField(
+        label=_("Tax forms"),
+        fieldset=_("Dispatch to the tax office"),
+        validators=[Optional(), NumberRange(min=0)]
+    )
+    dispatch_tax_forms_last_year = IntegerField(
+        label=_("Tax forms (previous year)"),
+        fieldset=_("Dispatch to the tax office"),
+        validators=[Optional(), NumberRange(min=0)]
+    )
+    dispatch_tax_forms_older = IntegerField(
+        label=_("Tax forms (older)"),
+        fieldset=_("Dispatch to the tax office"),
+        validators=[Optional(), NumberRange(min=0)]
+    )
+    dispatch_single_documents = IntegerField(
+        label=_("Single documents"),
+        fieldset=_("Dispatch to the tax office"),
+        validators=[Optional(), NumberRange(min=0)]
+    )
+    dispatch_note = TextAreaField(
+        label=_("Note"),
+        fieldset=_("Dispatch to the tax office"),
+        render_kw={'rows': 5},
+    )
+
+    dispatch_cantonal_tax_office = IntegerField(
+        label=_("Headquarters"),
+        fieldset=_("Dispatch to the cantonal tax office"),
+        validators=[Optional(), NumberRange(min=0)]
+    )
+    dispatch_cantonal_scan_center = IntegerField(
+        label=_("Scan center"),
+        fieldset=_("Dispatch to the cantonal tax office"),
+        validators=[Optional(), NumberRange(min=0)]
+    )
+
+    return_date = DateField(
+        label=_("Return date"),
+        default=tomorrow,
+        validators=[Optional()]
+    )
+
+    return_boxes = IntegerField(
+        label=_("Boxes"),
+        fieldset=_("Return to the municipality"),
+        validators=[Optional(), NumberRange(min=0)]
+
+    )
+    return_scanned_tax_forms_current_year = IntegerField(
+        label=_("Tax forms"),
+        fieldset=_("Return to the municipality"),
+        validators=[Optional(), NumberRange(min=0)]
+
+    )
+    return_scanned_tax_forms_last_year = IntegerField(
+        label=_("Tax forms (previous year)"),
+        fieldset=_("Return to the municipality"),
+        validators=[Optional(), NumberRange(min=0)]
+
+    )
+    return_scanned_tax_forms_older = IntegerField(
+        label=_("Tax forms (older)"),
+        fieldset=_("Return to the municipality"),
+        validators=[Optional(), NumberRange(min=0)]
+
+    )
+    return_scanned_single_documents = IntegerField(
+        label=_("Single documents"),
+        fieldset=_("Return to the municipality"),
+        validators=[Optional(), NumberRange(min=0)]
+
+    )
+    return_unscanned_tax_forms_current_year = IntegerField(
+        label=_("Unscanned tax forms"),
+        fieldset=_("Return to the municipality"),
+        validators=[Optional(), NumberRange(min=0)]
+
+    )
+    return_unscanned_tax_forms_last_year = IntegerField(
+        label=_("Unscanned tax forms (previous year)"),
+        fieldset=_("Return to the municipality"),
+        validators=[Optional(), NumberRange(min=0)]
+
+    )
+    return_unscanned_tax_forms_older = IntegerField(
+        label=_("Unscanned tax forms (older)"),
+        fieldset=_("Return to the municipality"),
+        validators=[Optional(), NumberRange(min=0)]
+
+    )
+    return_unscanned_single_documents = IntegerField(
+        label=_("Unscanned single documents"),
+        fieldset=_("Return to the municipality"),
+        validators=[Optional(), NumberRange(min=0)]
+
+    )
+    return_note = TextAreaField(
+        label=_("Note"),
+        fieldset=_("Return to the municipality"),
+        render_kw={'rows': 5},
+    )
+
+    @property
+    def group_id(self):
+        session = self.request.session
+        with session.no_autoflush:
+            query = session.query(Municipality)
+            query = query.filter_by(id=self.municipality_id.data)
+            return query.one().group_id
+
+    def on_request(self):
+        query = self.request.session.query(
+            Municipality.id.label('id'),
+            Municipality.name.label('name')
+        )
+        query = query.order_by(Municipality.name)
+        self.municipality_id.choices = [(r.id.hex, r.name) for r in query]
+
+    def update_model(self, model):
+        model.group_id = self.group_id
+        for name in (
+            'municipality_id',
+            'type',
+            'dispatch_date',
+            'dispatch_boxes',
+            'dispatch_tax_forms_current_year',
+            'dispatch_tax_forms_last_year',
+            'dispatch_tax_forms_older',
+            'dispatch_single_documents',
+            'dispatch_note',
+            'dispatch_cantonal_tax_office',
+            'dispatch_cantonal_scan_center',
+            'return_date',
+            'return_boxes',
+            'return_scanned_tax_forms_current_year',
+            'return_scanned_tax_forms_last_year',
+            'return_scanned_tax_forms_older',
+            'return_scanned_single_documents',
+            'return_unscanned_tax_forms_current_year',
+            'return_unscanned_tax_forms_last_year',
+            'return_unscanned_tax_forms_older',
+            'return_unscanned_single_documents',
+            'return_note',
+        ):
+            setattr(model, name, getattr(self, name).data)
 
     def apply_model(self, model):
         self.municipality_id.data = model.municipality_id.hex
-        self.type.data = model.type
-        self.dispatch_date.data = model.dispatch_date
-        self.dispatch_date_express.data = model.dispatch_date
-        self.dispatch_boxes.data = model.dispatch_boxes
-        self.dispatch_tax_forms_current_year.data = \
-            model.dispatch_tax_forms_current_year
-        self.dispatch_tax_forms_last_year.data = \
-            model.dispatch_tax_forms_last_year
-        self.dispatch_tax_forms_older.data = model.dispatch_tax_forms_older
-        self.dispatch_single_documents.data = model.dispatch_single_documents
-        self.dispatch_note.data = model.dispatch_note
-        self.dispatch_cantonal_tax_office.data = \
-            model.dispatch_cantonal_tax_office
-        self.dispatch_cantonal_scan_center.data = \
-            model.dispatch_cantonal_scan_center
-        self.return_date.data = model.return_date
-        self.return_boxes.data = model.return_boxes
-        self.return_scanned_tax_forms_current_year.data = \
-            model.return_scanned_tax_forms_current_year
-        self.return_scanned_tax_forms_last_year.data = \
-            model.return_scanned_tax_forms_last_year
-        self.return_scanned_tax_forms_older.data = \
-            model.return_scanned_tax_forms_older
-        self.return_scanned_single_documents.data = \
-            model.return_scanned_single_documents
-        self.return_unscanned_tax_forms_current_year.data = \
-            model.return_unscanned_tax_forms_current_year
-        self.return_unscanned_tax_forms_last_year.data = \
-            model.return_unscanned_tax_forms_last_year
-        self.return_unscanned_tax_forms_older.data = \
-            model.return_unscanned_tax_forms_older
-        self.return_unscanned_single_documents.data = \
-            model.return_unscanned_single_documents
-        self.return_note.data = model.return_note
-
-
-class UnrestrictedAddScanJobForm(AddScanJobForm):
-
-    def on_request(self):
-        self.type.choices = [
-            ('normal', _("Regular shipment")),
-            ('express', _("Express shipment"))
-        ]
-        self.set_municipality_id_choices()
-        self.set_dispatch_date_choices()
-
-    def update_model(self, model):
-        super().update_model(model)
-
-        session = self.request.session
-        with session.no_autoflush:
-            query = session.query(Municipality)
-            query = query.filter_by(id=self.municipality_id.data)
-            model.group_id = query.one().group_id
-
-
-class UnrestrictedEditScanJobForm(EditScanJobForm):
-
-    def on_request(self):
-        self.type.choices = [
-            ('normal', _("Regular shipment")),
-            ('express', _("Express shipment"))
-        ]
-        self.set_municipality_id_choices()
-        self.set_dispatch_date_choices()
-
-    def apply_model(self, model):
-        super().apply_model(model)
-        self.set_dispatch_date_choices(self.municipality_id.data)
-
-    def update_model(self, model):
-        super().update_model(model)
-
-        session = self.request.session
-        with session.no_autoflush:
-            query = session.query(Municipality)
-            query = query.filter_by(id=self.municipality_id.data)
-            model.group_id = query.one().group_id
+        for name in (
+            'type',
+            'dispatch_date',
+            'dispatch_boxes',
+            'dispatch_tax_forms_current_year',
+            'dispatch_tax_forms_last_year',
+            'dispatch_tax_forms_older',
+            'dispatch_single_documents',
+            'dispatch_note',
+            'dispatch_cantonal_tax_office',
+            'dispatch_cantonal_scan_center',
+            'return_date',
+            'return_boxes',
+            'return_scanned_tax_forms_current_year',
+            'return_scanned_tax_forms_last_year',
+            'return_scanned_tax_forms_older',
+            'return_scanned_single_documents',
+            'return_unscanned_tax_forms_current_year',
+            'return_unscanned_tax_forms_last_year',
+            'return_unscanned_tax_forms_older',
+            'return_unscanned_single_documents',
+            'return_note',
+        ):
+            getattr(self, name).data = getattr(model, name)

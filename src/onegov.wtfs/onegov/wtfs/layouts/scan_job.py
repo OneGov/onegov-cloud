@@ -168,4 +168,4 @@ class EditScanJobLayout(DefaultLayout):
 
     @cached_property
     def success_url(self):
-        return self.scan_jobs_url
+        return self.request.link(self.model)

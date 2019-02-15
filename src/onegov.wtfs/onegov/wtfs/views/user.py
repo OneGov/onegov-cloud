@@ -67,6 +67,10 @@ def add_user_unrestricted(self, request, form):
 )
 def add_user(self, request, form):
     """ Create a new user. """
+
+    if request.has_permission(self, AddModelUnrestricted):
+        return redirect(request.link(self, name='add-unrestricted'))
+
     layout = AddUserLayout(self, request)
 
     if form.submitted(request):
@@ -135,6 +139,9 @@ def edit_user_unrestricted(self, request, form):
 )
 def edit_user(self, request, form):
     """ Edit a user. """
+
+    if request.has_permission(self, EditModelUnrestricted):
+        return redirect(request.link(self, name='edit-unrestricted'))
 
     layout = EditUserLayout(self, request)
 

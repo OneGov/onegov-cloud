@@ -470,7 +470,7 @@ def test_scan_job_layouts(session):
         'DummyPrincipal/ScanJobCollection/ScanJob/#'
     )
     assert layout.cancel_url == 'ScanJob/'
-    assert layout.success_url == 'ScanJobCollection/'
+    assert layout.success_url == 'ScanJob/'
 
     layout = EditScanJobLayout(model, request_admin)
     assert list(hrefs(layout.editbar_links)) == []

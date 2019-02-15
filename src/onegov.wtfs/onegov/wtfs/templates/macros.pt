@@ -182,4 +182,10 @@
         </script>
     </metal:tablesaw_translations>
 
+    <metal:dispatch_dates define-macro="dispatch_dates" i18n:domain="onegov.org">
+        <ul class="dispatch-dates">
+            <li tal:repeat="date dates">${layout.format_date(date, 'date')}</li>
+        </ul>
+    </metal:dispatch_dates>
+
 </body>

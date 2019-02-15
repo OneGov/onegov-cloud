@@ -1,6 +1,7 @@
 from onegov.wtfs.forms.municipality import DeleteMunicipalityDatesForm
 from onegov.wtfs.forms.municipality import ImportMunicipalityDataForm
 from onegov.wtfs.forms.municipality import MunicipalityForm
+from onegov.wtfs.forms.municipality import MunicipalityIdSelectionForm
 from onegov.wtfs.forms.scan_job import AddScanJobForm
 from onegov.wtfs.forms.scan_job import EditScanJobForm
 from onegov.wtfs.forms.scan_job import UnrestrictedAddScanJobForm
@@ -16,6 +17,7 @@ __all__ = (
     'EditScanJobForm',
     'ImportMunicipalityDataForm',
     'MunicipalityForm',
+    'MunicipalityIdSelectionForm',
     'UnrestrictedAddScanJobForm',
     'UnrestrictedEditScanJobForm',
     'UnrestrictedUserForm',

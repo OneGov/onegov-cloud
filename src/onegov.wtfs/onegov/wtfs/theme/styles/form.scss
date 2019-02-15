@@ -173,26 +173,7 @@ form {
         min-height: 30em;
     }
 
-    /*
-    Make the search filters toggable
-    */
-    #fieldset-other-filters {
-        cursor: pointer;
-
-        legend::before,
-        legend::after {
-            @include icon('\f077');
-            margin-left: .75rem;
-            margin-right: .75rem;
-        }
-
-        &.collapsed {
-            legend::before,
-            legend::after {
-                @include icon('\f078');
-                margin-left: .75rem;
-                margin-right: .75rem;
-            }
-        }
+    ul.dispatch-dates li {
+        font-size: .875rem;
     }
 }

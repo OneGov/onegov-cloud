@@ -12,6 +12,7 @@ from onegov.wtfs.forms import DeleteMunicipalityDatesForm
 from onegov.wtfs.forms import EditScanJobForm
 from onegov.wtfs.forms import ImportMunicipalityDataForm
 from onegov.wtfs.forms import MunicipalityForm
+from onegov.wtfs.forms import MunicipalityIdSelectionForm
 from onegov.wtfs.forms import UnrestrictedAddScanJobForm
 from onegov.wtfs.forms import UnrestrictedEditScanJobForm
 from onegov.wtfs.forms import UnrestrictedUserForm
@@ -225,6 +226,28 @@ def test_delete_municipality_dates_form(session):
         PostData({'start': "2019-01-01", 'end': "2019-12-31"})
     )
     assert form.validate()
+
+
+def test_municipality_selection_form(session):
+    groups = UserGroupCollection(session)
+    group = groups.add(name="Gruppe Winterthur")
+    groups.add(name="Gruppe Aesch")
+
+    municipalities = MunicipalityCollection(session)
+    municipality = municipalities.add(
+        name="Gemeinde Aesch",
+        bfs_number=230,
+        group_id=group.id
+    )
+
+    # Test choices
+    form = MunicipalityIdSelectionForm()
+    form.request = Request(session)
+    form.on_request()
+    assert [c[1] for c in form.municipality_id.choices] == ["Gemeinde Aesch"]
+
+    form.municipality_id.data = municipality.id
+    assert form.municipality == municipality
 
 
 def test_user_group_form(session):
@@ -441,15 +464,12 @@ def test_add_scan_job_form(session):
     # Test on request
     form = AddScanJobForm()
     form.request = Request(session, groupid=group.id.hex)
+    assert form.group_id == group.id.hex
+    assert form.municipality_id == municipality.id
     with freeze_time("2019-01-05"):
         form.on_request()
-        assert form.type.choices == [
-            ('normal', 'Regular shipment')
-        ]
-        assert form.municipality_id.choices == [
-            (municipality.id.hex, 'Winterthur')
-        ]
-        assert form.dispatch_date.choices == [
+        assert form.type.choices == [('normal', 'Regular shipment')]
+        assert form.dispatch_date_normal.choices == [
             (date(2019, 1, 7), '07.01.2019'),
             (date(2019, 1, 8), '08.01.2019')
         ]
@@ -460,18 +480,14 @@ def test_add_scan_job_form(session):
             ('normal', 'Regular shipment'),
             ('express', 'Express shipment')
         ]
-        assert form.municipality_id.choices == [
-            (municipality.id.hex, 'Winterthur')
-        ]
-        assert form.dispatch_date.choices == [
+        assert form.dispatch_date_normal.choices == [
             (date(2019, 1, 7), '07.01.2019'),
             (date(2019, 1, 8), '08.01.2019')
         ]
 
     # Test update
     form.type.data = 'normal'
-    form.municipality_id.data = form.municipality_id.choices[0][0]
-    form.dispatch_date.data = date(2019, 1, 8)
+    form.dispatch_date_normal.data = date(2019, 1, 8)
     form.dispatch_date_express.data = date(2019, 1, 6)
     form.dispatch_boxes.data = 1
     form.dispatch_tax_forms_current_year.data = 2
@@ -484,7 +500,7 @@ def test_add_scan_job_form(session):
 
     model = ScanJob()
     form.update_model(model)
-    assert model.municipality_id == municipality.id.hex
+    assert model.municipality_id == municipality.id
     assert model.group_id == group.id.hex
     assert model.type == 'normal'
     assert model.dispatch_date == date(2019, 1, 8)
@@ -511,7 +527,7 @@ def test_add_scan_job_form(session):
         form = AddScanJobForm(PostData({
             'municipality_id': municipality.id.hex,
             'type': 'normal',
-            'dispatch_date': '2019-01-08'
+            'dispatch_date_normal': '2019-01-08'
         }))
         form.request = Request(session, groupid=group.id.hex)
         form.on_request()
@@ -531,39 +547,10 @@ def test_edit_scan_job_form(session):
     municipality.pickup_dates.append(PickupDate(date=date(2019, 1, 7)))
     municipality.pickup_dates.append(PickupDate(date=date(2019, 1, 8)))
 
-    # Test on request
-    form = EditScanJobForm()
-    form.request = Request(session, groupid=group.id.hex)
-    with freeze_time("2019-01-05"):
-        form.on_request()
-        assert form.type.choices == [
-            ('normal', 'Regular shipment')
-        ]
-        assert form.municipality_id.choices == [
-            (municipality.id.hex, 'Winterthur')
-        ]
-        assert form.dispatch_date.choices == [
-            (date(2019, 1, 7), '07.01.2019'),
-            (date(2019, 1, 8), '08.01.2019')
-        ]
-    form.request = Request(session, groupid=group.id.hex, roles=['editor'])
-    with freeze_time("2019-01-05"):
-        form.on_request()
-        assert form.type.choices == [
-            ('normal', 'Regular shipment'),
-            ('express', 'Express shipment')
-        ]
-        assert form.municipality_id.choices == [
-            (municipality.id.hex, 'Winterthur')
-        ]
-        assert form.dispatch_date.choices == [
-            (date(2019, 1, 7), '07.01.2019'),
-            (date(2019, 1, 8), '08.01.2019')
-        ]
-
     # Test apply / update
     model = ScanJob()
     model.municipality_id = municipality.id
+    model.group_id = group.id
     model.type = 'normal'
     model.dispatch_date = date(2019, 1, 8)
     model.dispatch_boxes = 1
@@ -586,10 +573,9 @@ def test_edit_scan_job_form(session):
     model.return_unscanned_single_documents = 16
     model.return_note = 'Note on return'
 
+    form = EditScanJobForm()
+    form.request = Request(session, groupid=group.id.hex)
     form.apply_model(model)
-    assert form.type.data == 'normal'
-    assert form.municipality_id.data == form.municipality_id.choices[0][0]
-    assert form.dispatch_date.data == date(2019, 1, 8)
     assert form.dispatch_boxes.data == 1
     assert form.dispatch_tax_forms_current_year.data == 2
     assert form.dispatch_tax_forms_last_year.data == 3
@@ -610,10 +596,6 @@ def test_edit_scan_job_form(session):
     assert form.return_unscanned_single_documents.data == 16
     assert form.return_note.data == 'Note on return'
 
-    form.type.data = 'express'
-    form.municipality_id.data = form.municipality_id.choices[0][0]
-    form.dispatch_date.data = date(2019, 1, 8)
-    form.dispatch_date_express.data = date(2019, 1, 6)
     form.dispatch_boxes.data = 10
     form.dispatch_tax_forms_current_year.data = 20
     form.dispatch_tax_forms_last_year.data = 30
@@ -635,10 +617,10 @@ def test_edit_scan_job_form(session):
     form.return_note.data = 'A note on the return'
 
     form.update_model(model)
-    assert model.municipality_id == municipality.id.hex
-    assert model.group_id == group.id.hex
-    assert model.type == 'express'
-    assert model.dispatch_date == date(2019, 1, 6)
+    assert model.municipality_id == municipality.id
+    assert model.group_id == group.id
+    assert model.type == 'normal'
+    assert model.dispatch_date == date(2019, 1, 8)
     assert model.dispatch_boxes == 10
     assert model.dispatch_tax_forms_current_year == 20
     assert model.dispatch_tax_forms_last_year == 30
@@ -660,20 +642,9 @@ def test_edit_scan_job_form(session):
     assert model.return_note == 'A note on the return'
 
     # Test validation
-    with freeze_time("2019-01-05"):
-        form = EditScanJobForm()
-        form.request = Request(session, groupid=group.id.hex)
-        form.on_request()
-        assert not form.validate()
-
-        form = EditScanJobForm(PostData({
-            'municipality_id': municipality.id.hex,
-            'type': 'normal',
-            'dispatch_date': '2019-01-08'
-        }))
-        form.request = Request(session, groupid=group.id.hex)
-        form.on_request()
-        assert form.validate()
+    form = EditScanJobForm()
+    form.request = Request(session, groupid=group.id.hex)
+    assert form.validate()
 
 
 def test_unrestricted_add_scan_job_form(session):
@@ -711,16 +682,11 @@ def test_unrestricted_add_scan_job_form(session):
             (municipality_2.id.hex, 'Adlikon'),
             (municipality_1.id.hex, 'Winterthur')
         ]
-        assert form.dispatch_date.choices == [
-            (date(2019, 1, 17), '17.01.2019'),
-            (date(2019, 1, 18), '18.01.2019')
-        ]
 
     # Test update
     form.type.data = 'normal'
     form.municipality_id.data = form.municipality_id.choices[0][0]
     form.dispatch_date.data = date(2019, 1, 8)
-    form.dispatch_date_express.data = date(2019, 1, 6)
     form.dispatch_boxes.data = 1
     form.dispatch_tax_forms_current_year.data = 2
     form.dispatch_tax_forms_last_year.data = 3
@@ -746,7 +712,9 @@ def test_unrestricted_add_scan_job_form(session):
     assert model.dispatch_cantonal_scan_center == 7
 
     form.type.data = 'express'
+    form.dispatch_date.data = date(2019, 1, 6)
     form.update_model(model)
+    assert model.type == 'express'
     assert model.dispatch_date == date(2019, 1, 6)
 
     # Test validation
@@ -756,7 +724,7 @@ def test_unrestricted_add_scan_job_form(session):
         form.on_request()
         assert not form.validate()
 
-        form = AddScanJobForm(PostData({
+        form = UnrestrictedAddScanJobForm(PostData({
             'municipality_id': municipality_1.id.hex,
             'type': 'normal',
             'dispatch_date': '2019-01-08'
@@ -800,10 +768,6 @@ def test_unrestricted_edit_scan_job_form(session):
         assert form.municipality_id.choices == [
             (municipality_2.id.hex, 'Adlikon'),
             (municipality_1.id.hex, 'Winterthur')
-        ]
-        assert form.dispatch_date.choices == [
-            (date(2019, 1, 17), '17.01.2019'),
-            (date(2019, 1, 18), '18.01.2019')
         ]
 
     # Test apply / update
@@ -858,8 +822,7 @@ def test_unrestricted_edit_scan_job_form(session):
 
     form.type.data = 'express'
     form.municipality_id.data = municipality_2.id.hex
-    form.dispatch_date.data = date(2019, 1, 18)
-    form.dispatch_date_express.data = date(2019, 1, 6)
+    form.dispatch_date.data = date(2019, 1, 6)
     form.dispatch_boxes.data = 10
     form.dispatch_tax_forms_current_year.data = 20
     form.dispatch_tax_forms_last_year.data = 30
