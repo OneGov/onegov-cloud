@@ -130,7 +130,7 @@ $(document).on('show-alert', function(_, data) {
 });
 
 // handle intercooler errors generically
-$(document).ajaxError(function(_e, xhr, _settings, error) {
+$(document).ajaxError(function(e, xhr, _settings, error) {
     if (xhr.status === 502) {
         showAlertMessage(locale(
             "The server could not be reached. Please try again."
@@ -145,7 +145,15 @@ $(document).ajaxError(function(_e, xhr, _settings, error) {
             "The server responded with an error. We have been informed " +
             "and will investigate the problem."
         ));
-    } else if (500 <= xhr.status && xhr.status <= 599) {
+    } else if (xhr.status === 404) {
+        showAlertMessage(locale(
+            "The site could not be found."
+        ));
+    } else if (xhr.status === 403) {
+        showAlertMessage(locale(
+            "Access denied. Please log in before continuing."
+        ));
+    } else if (400 <= xhr.status && xhr.status <= 599) {
         // a generic error messages is better than nothing
         showAlertMessage(error || xhr.statusText);
     }

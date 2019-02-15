@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Reports fewer irrelevant errors to Sentry.
+  [href]
+
 1.0.4 (2019-02-11)
 ~~~~~~~~~~~~~~~~~~~
 
