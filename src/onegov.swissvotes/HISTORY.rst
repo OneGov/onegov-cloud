@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds datetime picker.
+  [msom]
+
 0.0.31 (2019-02-14)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -73,12 +73,10 @@ var processCommonNodes = function(elements, out_of_band) {
         $(this).parent('table').toggleClass('collapsed');
     });
 
-    // force all dropdowns to be rendered in the direction specified in the
-    // options of said dropdown (so if we say align:left, *always* align left)
-    // todo:? Foundation.libs.dropdown.small = function() { return false; };
-
-    // make sure files open in another window
-    // todo:? targets.find('.page-text a[href*="/datei/"]').attr('target', '_blank');
+    // set the language of the date picker
+    jQuery.datetimepicker.setLocale(
+        targets.find('html').attr('lang').split('-')[0]
+    );
 
     // sort tables wishing to be sorted (when not using tablesaw)
     targets.find('table:not(.tablesaw).sortable').tablesorter();
