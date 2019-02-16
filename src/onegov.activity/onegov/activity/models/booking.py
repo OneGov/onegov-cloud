@@ -96,6 +96,14 @@ class Booking(Base, TimestampMixin):
     #: access the user linked to this booking
     user = relationship('User')
 
+    def group_code_count(self):
+        """ Returns the number of bookings with the same group code. """
+        return object_session(self)\
+            .query(Booking)\
+            .with_entities(func.count(Booking.id))\
+            .filter(Booking.group_code == self.group_code)\
+            .scalar()
+
     def period_bound_booking_state(self, period):
         """ During pre-booking we don't show the actual state of the booking,
         unless the occasion was cancelled, otherwise the user might see

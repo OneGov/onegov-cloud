@@ -1,6 +1,8 @@
 import lxml
-import sedate
+import random
 import re
+import sedate
+import string
 
 from datetime import date, timedelta
 from functools import partial
@@ -16,6 +18,21 @@ MUNICIPALITY_EX = re.compile(r"""
     \s+
     (?P<municipality>[\w\s\(\)\.\-]+)
 """, re.VERBOSE)
+
+
+GROUP_CODE_EX = re.compile(r'[A-Z]{3}-?[A-Z]{3}-?[A-Z]{3}')
+
+
+def random_group_code():
+    # 26^9 should be a decent amount of codes to randomly chose, without
+    # having to check their uniqueness
+    raw = ''.join(random.choice(string.ascii_uppercase) for x in range(9))
+
+    return '-'.join((raw[:3], raw[3:6], raw[-3:]))
+
+
+def is_valid_group_code(code):
+    return GROUP_CODE_EX.match(code) and True or False
 
 
 def overlaps(range_a, range_b):
