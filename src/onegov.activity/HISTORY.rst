@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Supports smaller Raiffeisen ESR identifications.
+  [href]
+
 - Prefers groups in the matching algorithm.
   [href]
 

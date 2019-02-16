@@ -298,7 +298,7 @@ class RaiffeisenSchema(ESRSchema, name='raiffeisen-v1'):
 
     def new(self):
         ident = self.esr_identification_number.replace('-', '').strip()
-        assert 6 <= len(ident) <= 7
+        assert 3 <= len(ident) <= 7
 
         rest = 26 - len(ident)
         random = ''.join(secrets.choice(string.digits) for _ in range(0, rest))

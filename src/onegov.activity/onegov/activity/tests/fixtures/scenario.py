@@ -215,14 +215,15 @@ class Scenario(object):
 
         if complete_profile:
             user = self.latest_user
+            user.realname = \
+                f'{self.faker.first_name()}\u00A0{self.faker.last_name()}'
             user.data = user.data or {}
             user.data['salutation'] = self.faker.random_element(('mr', 'ms'))
-            user.data['first_name'] = self.faker.first_name()
-            user.data['last_name'] = self.faker.last_name()
             user.data['address'] = self.faker.address()
             user.data['zip_code'] = self.faker.zipcode()
             user.data['place'] = self.faker.city()
-            user.data['emergency'] = f'123456 ({self.faker.name()})'
+            user.data['political_municipality'] = self.faker.city()
+            user.data['emergency'] = f'123 456 789 ({self.faker.name()})'
 
         return self.latest_user
 
