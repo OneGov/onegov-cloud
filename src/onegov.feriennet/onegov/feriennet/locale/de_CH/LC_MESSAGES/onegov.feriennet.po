@@ -2239,8 +2239,8 @@ msgstr "ESR (Raiffeisen)"
 msgid "E-Mail"
 msgstr "E-Mail"
 
-msgid "The ESR identification number must be 6 characters long"
-msgstr "Die ESR Identifikationsnummer muss 6 Zeichen lang sein"
+msgid "The ESR identification number must be 3-6 characters long"
+msgstr "Die ESR Identifikationsnummer muss 3-6 Zeichen lang sein"
 
 msgid "Mailing"
 msgstr "Versand"

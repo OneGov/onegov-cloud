@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Supports smaller Raiffeisen ESR identifications.
+  [href]
+
 - Adds the ability to invite companions to join activities as a group.
   [href]
 

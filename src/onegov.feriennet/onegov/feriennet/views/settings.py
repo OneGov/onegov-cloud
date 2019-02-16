@@ -83,9 +83,9 @@ class FeriennetSettingsForm(Form):
         if self.bank_reference_schema.data == 'raiffeisen-v1':
             ident = self.bank_esr_identification_number.data
 
-            if len(ident.replace('-', ' ').strip()) != 6:
+            if not 3 <= len(ident.replace('-', ' ').strip()) <= 6:
                 self.bank_esr_identification_number.errors.append(_(
-                    "The ESR identification number must be 6 characters long"
+                    "The ESR identification number must be 3-6 characters long"
                 ))
                 return False
 
