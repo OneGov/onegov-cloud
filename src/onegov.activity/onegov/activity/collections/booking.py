@@ -184,6 +184,7 @@ class BookingCollection(GenericCollection):
         # if the booking wasn't accepted or if we don't cascade, this is quick
         if not cascade or booking.state != 'accepted':
             booking.state = 'cancelled'
+            booking.group_code = None
             return
 
         bookings = tuple(
@@ -194,6 +195,7 @@ class BookingCollection(GenericCollection):
                 .filter(Booking.id != booking.id))
 
         booking.state = 'cancelled'
+        booking.group_code = None
 
         # mark the no-longer blocked bookings as denied
         accepted = {b for b in bookings if b.state == 'accepted'}

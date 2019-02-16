@@ -236,7 +236,8 @@ class PreferGroups(object):
                     Booking.group_code,
                     func.count(Booking.group_code).label('count')
                 ).filter(
-                    Booking.group_code != None
+                    Booking.group_code != None,
+                    Booking.period_id == booking.period_id
                 ).group_by(
                     Booking.group_code
                 ).having(

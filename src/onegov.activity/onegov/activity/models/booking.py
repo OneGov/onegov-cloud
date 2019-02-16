@@ -96,12 +96,13 @@ class Booking(Base, TimestampMixin):
     #: access the user linked to this booking
     user = relationship('User')
 
-    def group_code_count(self):
+    def group_code_count(self, states=('open', 'accepted')):
         """ Returns the number of bookings with the same group code. """
         return object_session(self)\
             .query(Booking)\
             .with_entities(func.count(Booking.id))\
             .filter(Booking.group_code == self.group_code)\
+            .filter(Booking.state.in_(states))\
             .scalar()
 
     def period_bound_booking_state(self, period):
