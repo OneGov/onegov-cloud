@@ -4,6 +4,7 @@ import requests_mock
 
 from datetime import datetime, timedelta, date, time
 from freezegun import freeze_time
+from onegov.activity import Booking
 from onegov.activity.utils import generate_xml
 from onegov.core.custom import json
 from onegov.pay import Payment
@@ -1861,3 +1862,128 @@ def test_invoice_references(client, scenario):
     settings.form.submit()
 
     assert reference() == default_reference
+
+
+def test_group_codes(client, scenario):
+    scenario.add_period(title="2019", confirmed=False)
+    scenario.add_activity(title="Fishing", state='accepted')
+
+    # an occasion with two spots
+    scenario.add_occasion(spots=(0, 2), age=(0, 99999))
+
+    # first user
+    scenario.add_user(
+        username='foobar@example.org',
+        role='member',
+        complete_profile=True
+    )
+
+    # an attendee without a booking
+    scenario.add_attendee(name="Foo")
+
+    # an attendee with a booking
+    scenario.add_attendee(name="Bar")
+    scenario.add_booking(state='open')
+
+    # second user
+    scenario.add_user(
+        username='qux@example.org',
+        role='member',
+        complete_profile=True
+    )
+
+    # an attendee without a booking
+    scenario.add_attendee(name="Qux")
+
+    scenario.commit()
+    scenario.refresh()
+
+    # the first user opens the group sharing section
+    usr1 = client.spawn()
+    usr1.login('foobar@example.org', 'hunter2')
+
+    page = usr1.get('/my-bookings').click("Gspänli einladen").follow()
+
+    # bar is in the group as it was the target of aboves link
+    assert "Bar" in page.pyquery('.members-in-group').text()
+    assert "Foo" in page.pyquery('.members-outside-group').text()
+    assert "Nicht angemeldet" in page.pyquery('.members-outside-group').text()
+
+    # we can sign-up foo
+    page = page.click("Anmelden")
+    page.form['attendee'] = scenario.attendees[0].id.hex
+    page = page.form.submit().follow()
+
+    # we end up at the group view again, where nothing has changed yet
+    assert "Bar" in page.pyquery('.members-in-group').text()
+    assert "Foo" in page.pyquery('.members-outside-group').text()
+
+    # we can now join foo however
+    group_url = page.request.url
+    page.click("Gruppe beitreten")
+    page = usr1.get(group_url)
+
+    assert "Bar" in page.pyquery('.members-in-group').text()
+    assert "Foo" in page.pyquery('.members-in-group').text()
+
+    # we can remove bar from the group
+    page = page.click("Gruppe verlassen", index=0)
+    page = usr1.get(group_url)
+
+    assert "Bar" in page.pyquery('.members-outside-group').text()
+    assert "Foo" in page.pyquery('.members-in-group').text()
+
+    # other users can see the group view, but cannot execute actions and
+    # they only see the active attendees
+    usr2 = client.spawn()
+
+    page = usr2.get(group_url)
+    assert "Foo" in page
+    assert "Bar" not in page
+    assert "Qux" not in page
+    assert "Gruppe verlassen" not in page.pyquery('a').text()
+    assert "Gruppe beitreten" not in page.pyquery('a').text()
+
+    usr2.login('qux@example.org', 'hunter2')
+
+    page = usr2.get(group_url)
+    assert "Foo" in page
+    assert "Bar" not in page
+    assert "Gruppe verlassen" not in page.pyquery('a').text()
+    assert "Gruppe beitreten" not in page.pyquery('a').text()
+
+    # the second user's child should be listed now
+    assert "Qux" in page
+    assert "Qux" not in usr1.get(group_url)
+    assert "Qux" in page.pyquery('.members-outside-group').text()
+    assert "Nicht angemeldet" in page
+
+    # let's join the group
+    page = page.click("Anmelden")
+    page.form['attendee'] = scenario.attendees[2].id.hex
+    page = page.form.submit().follow()
+
+    page.click("Gruppe beitreten")
+
+    # now we can do the matching, and we should have Foo and Qux in the group
+    admin = client.spawn()
+    admin.login_admin()
+
+    page = admin.get('/activities').click('Zuteilung')
+    page.form['confirm'] = 'yes'
+    page.form['sure'] = 'yes'
+    page = page.form.submit()
+
+    bookings = scenario.session.query(Booking).all()
+    bookings.sort(key=lambda b: b.attendee.name)
+
+    b1, b2, b3 = bookings
+
+    assert b1.attendee.name == 'Bar'
+    assert b1.state == 'denied'
+
+    assert b2.attendee.name == 'Foo'
+    assert b2.state == 'accepted'
+
+    assert b3.attendee.name == 'Qux'
+    assert b3.state == 'accepted'

@@ -5,6 +5,7 @@
                 <th></th>
                 <th i18n:translate>Name</th>
                 <th i18n:translate>Age</th>
+                <th i18n:translate>Group</th>
                 <th i18n:translate>State</th>
                 <th>
                     <tal:b
@@ -33,6 +34,7 @@
                     </td>
                     <td><span>${booking.attendee.name}</span></td>
                     <td><span>${booking.attendee.age}</span></td>
+                    <td><span class="group-code" tal:condition="booking.group_code">${booking.group_code}</span></td>
                     <td>
                         <tal:b
                             define="state booking.state"

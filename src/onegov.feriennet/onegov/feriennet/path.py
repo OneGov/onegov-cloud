@@ -4,6 +4,7 @@ from onegov.activity import Booking, BookingCollection
 from onegov.activity import InvoiceCollection, InvoiceItem
 from onegov.activity import Occasion, OccasionCollection
 from onegov.activity import Period, PeriodCollection
+from onegov.activity.utils import is_valid_group_code
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.collections import MatchCollection
@@ -11,6 +12,7 @@ from onegov.feriennet.collections import NotificationTemplateCollection
 from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.models import Calendar
+from onegov.feriennet.models import GroupInvite
 from onegov.feriennet.models import InvoiceAction, VacationActivity
 from onegov.feriennet.models import NotificationTemplate
 from onegov.org.converters import keywords_converter
@@ -232,3 +234,16 @@ def get_notification_template(request, app, id):
     path='/calendar/{name}/{token}')
 def get_calendar(request, name, token):
     return Calendar.from_name_and_token(request.session, name, token)
+
+
+@FeriennetApp.path(
+    model=GroupInvite,
+    path='/join/{group_code}')
+def get_group_invite(app, request, group_code):
+    group_code = group_code.upper()
+
+    if not is_valid_group_code(group_code):
+        return None
+
+    invite = GroupInvite(request.session, group_code)
+    return invite.exists and invite or None

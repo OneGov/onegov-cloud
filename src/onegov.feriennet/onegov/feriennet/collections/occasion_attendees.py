@@ -1,9 +1,10 @@
-from collections import namedtuple, OrderedDict
+from collections import namedtuple, OrderedDict, Counter
 from onegov.activity import Activity, Attendee, Occasion, OccasionCollection
 from onegov.user import User
 
 
-OccasionAttendee = namedtuple('OccasionAttendee', ('attendee', 'info'))
+OccasionAttendee = namedtuple(
+    'OccasionAttendee', ('attendee', 'info', 'group_code'))
 
 
 class OccasionAttendeeCollection(OccasionCollection):
@@ -52,7 +53,7 @@ class OccasionAttendeeCollection(OccasionCollection):
             u.username: {
                 'emergency': u.data and u.data.get('emergency'),
                 'email': u.data and u.data.get('email') or u.username,
-                'place': u.data and u.data.get('place')
+                'place': u.data and u.data.get('place'),
             }
             for u in self.session.query(
                 User.username, User.data
@@ -60,10 +61,15 @@ class OccasionAttendeeCollection(OccasionCollection):
         }
 
         for o in self.query():
+            group_codes = Counter(b.group_code for b in o.accepted)
+
             occasions[o] = [
                 OccasionAttendee(
                     attendee=attendees[b.attendee_id],
-                    info=contacts[b.username]
+                    info=contacts[b.username],
+                    group_code=(
+                        group_codes[b.group_code] > 1 and b.group_code or None
+                    )
                 ) for b in sorted(
                     o.accepted,
                     key=lambda b: attendees[b.attendee_id].name

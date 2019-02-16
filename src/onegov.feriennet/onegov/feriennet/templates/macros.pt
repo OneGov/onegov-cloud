@@ -266,7 +266,8 @@
     <div class="occasion" tal:define="
         show_enroll show_enroll|nothing;
         show_links show_links|nothing;
-        period occasion.period">
+        period occasion.period;
+        wrap_occasion_link wrap_occasion_link|lambda url: url">
 
         <div class="state" tal:condition="period.phase not in ('inactive', 'wishlist')">
             <div class="full" tal:condition="not occasion.cancelled and occasion.full">
@@ -381,8 +382,8 @@
             </span>
 
             <tal:b switch="request.is_logged_in">
-                <a tal:case="True" class="button" href="${request.link(occasion, 'book')}" i18n:translate>Enroll</a>
-                <a tal:case="False" class="button" href="${layout.login_to_url(request.link(occasion, 'book'), skip=True)}" i18n:translate>Enroll</a>
+                <a tal:case="True" class="button" href="${wrap_occasion_link(request.link(occasion, 'book'))}" i18n:translate>Enroll</a>
+                <a tal:case="False" class="button" href="${layout.login_to_url(wrap_occasion_link(request.link(occasion, 'book')), skip=True)}" i18n:translate>Enroll</a>
             </tal:b>
         </div>
 

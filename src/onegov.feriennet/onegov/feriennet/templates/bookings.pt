@@ -174,7 +174,7 @@
                                                     </div>
                                                     <div class="actions" tal:define="actions actions_by_booking(booking)">
                                                         <ul tal:condition="actions">
-                                                            <li tal:repeat="action actions" tal:content="structure action(request)" />
+                                                            <li tal:repeat="action actions" tal:content="structure action(layout)" />
                                                         </ul>
                                                     </div>
                                                 </div>

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-02-12 13:42+0100\n"
+"POT-Creation-Date: 2019-02-16 14:53+0100\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -84,6 +84,9 @@ msgstr "Teilnehmer"
 
 msgid "Notification Templates"
 msgstr "Mitteilungs-Vorlagen"
+
+msgid "Group"
+msgstr ""
 
 msgid "Accounting"
 msgstr "Buchhaltung"
@@ -677,10 +680,6 @@ msgstr "Diese Durchführung ist bereits ausgebucht"
 
 msgid "This is an unapproved activity"
 msgstr "Dies ist ein unbestätigtes Angebot"
-
-msgid "The attendee already has a booking for this activity"
-msgstr ""
-"Der Teilnehmer hat bereits eine andere Durchführung dieses Angebots gebucht"
 
 msgid "The attendee is too old"
 msgstr "Der Teilnehmer ist zu alt"
@@ -1706,6 +1705,55 @@ msgid "Passport"
 msgstr "Ferienpass"
 
 msgid ""
+"Attendees can join their companions in a group to go to activities together."
+msgstr ""
+"Teilnehmer können mit Ihren Gspänli eine Gruppe bilden um gemeinsam an "
+"Angeboten teilzunehmen."
+
+msgid "This group is from an inactive period."
+msgstr "Dies ist eine Gruppe eines inaktiven Zeitraums"
+
+msgid "Not in Group"
+msgstr "Nicht in der Gruppe"
+
+msgid "Booking Blocked"
+msgstr "Buchung blockiert"
+
+msgid "Booking Cancelled"
+msgstr "Buchung storniert"
+
+msgid "Booking Denied"
+msgstr "Buchung abgelehnt"
+
+msgid "Not signed up"
+msgstr "Nicht angemeldet"
+
+msgid "All your children are already part of this group."
+msgstr "Alle Ihre Kinder sind Teil dieser Gruppe."
+
+msgid "Information"
+msgstr "Information"
+
+msgid ""
+"We will try our best to keep groups together, but there are no guarantees. "
+"It is possible that only parts of the group are accepted for an activity, "
+"but it should be fairly rare."
+msgstr ""
+"Wir tun unser bestes um Gruppen zusammen zu halten, können aber nichts "
+"garantieren. Es ist möglich dass nur ein Teil der Gruppe einem Angebot "
+"zugeteilt wird, aber das sollte relativ selten vorkommen."
+
+msgid ""
+"You can join your own children to this group or you can share this link with "
+"other parents so they can join their children:"
+msgstr ""
+"Sie können Ihre eigenen Kinder zu dieser Gruppe hinzufügen, oder den Link "
+"mit anderen Eltern teilen, damit diese Ihre Kinder hinzufügen können:"
+
+msgid "Children need to have a booking before they can join the group."
+msgstr "Kinder benötigen eine Buchung, bevor sie der Gruppe beitreten können."
+
+msgid ""
 "This is a preview. Please edit it until you are satisifed with the result "
 "and then press \"Request Publication\". An administrator will then review "
 "your proposal."
@@ -1859,6 +1907,16 @@ msgstr "Die Durchführung wurde zu ${name}s Wunschliste hinzugefügt"
 msgid "The booking was cancelled successfully"
 msgstr "Die Buchung wurde erfolgreich abgesagt"
 
+#, python-format
+msgid "Group for \"${title}\""
+msgstr "Gruppe für \"${title}\""
+
+msgid "Successfully joined the group"
+msgstr "Erfolgreich der Gruppe beigetreten"
+
+msgid "Successfully left the group"
+msgstr "Erfolgreich die Gruppe verlassen"
+
 msgid "Only open, cancelled, denied or blocked bookings may be deleted"
 msgstr ""
 "Nur offene, abgesagte, abgelehnte und blockierte Buchungen können gelöscht "
@@ -1867,12 +1925,14 @@ msgstr ""
 msgid "The period is not in the wishlist-phase"
 msgstr "Der Zeitraum befindet sich nicht in der Wunschphase"
 
-#, python-format
-msgid "Do you really want to remove \"${title}\"?"
-msgstr "Möchten Sie \"${title}\" wirklich entfernen?"
+msgid "The booking does not exist"
+msgstr "Diese Buchung existiert nicht"
 
-msgid "Remove Booking"
-msgstr "Buchung entfernen"
+msgid "Not permitted to join this attendee to the group"
+msgstr ""
+
+msgid "Not permitted to evict this attendee from the group"
+msgstr ""
 
 msgid "Only admins may cancel bookings at this point"
 msgstr ""
@@ -1881,12 +1941,35 @@ msgstr ""
 msgid "Cannot select more than three favorites per child"
 msgstr "Pro Kind können maximal drei Favoriten gewählt werden"
 
+msgid "Leave Group"
+msgstr "Gruppe verlassen"
+
 msgid "Cancel Booking"
 msgstr "Stornieren"
+
+msgid "Join Group"
+msgstr "Gruppe beitreten"
+
+msgid "Invite a companion"
+msgstr "Gspänli einladen"
+
+#, python-format
+msgid "Do you really want to remove \"${title}\"?"
+msgstr "Möchten Sie \"${title}\" wirklich entfernen?"
+
+msgid "Remove Booking"
+msgstr "Buchung entfernen"
 
 #, python-format
 msgid "Do you really want to cancel \"${title}\"?"
 msgstr "Möchten Sie \"${title}\" wirklich stornieren?"
+
+msgid "With 1 companion in a group"
+msgstr "Mit 1 Gspänli in einer Gruppe"
+
+#, python-format
+msgid "With ${n} companions in a group"
+msgstr "Mit ${n} Gspänli in einer Gruppe"
 
 msgid "Mo"
 msgstr "Mo"
@@ -2252,6 +2335,17 @@ msgstr "Möchten Sie ${attendee}s Buchung wirklich löschen?"
 #, python-format
 msgid "Do you really want to cancel ${attendee}'s booking?"
 msgstr "Möchten Sie ${attendee}s Buchung wirklich stornieren?"
+
+#~ msgid "Invite"
+#~ msgstr "Einladung"
+
+#~ msgid "Current Members"
+#~ msgstr "Aktuelle Mitglieder"
+
+#~ msgid "The attendee already has a booking for this activity"
+#~ msgstr ""
+#~ "Der Teilnehmer hat bereits eine andere Durchführung dieses Angebots "
+#~ "gebucht"
 
 #~ msgid "Only admins may cancel confirmed bookings"
 #~ msgstr "Nur Administratoren können bestätigte Buchungen absagen"

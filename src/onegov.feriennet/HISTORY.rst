@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to invite companions to join activities as a group.
+  [href]
+
 - Adds the ability to book multiple occasions from one activity.
   [href]
 

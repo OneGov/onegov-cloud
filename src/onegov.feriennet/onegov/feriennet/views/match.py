@@ -8,7 +8,7 @@ from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.collections import MatchCollection
 from onegov.feriennet.forms import MatchForm
 from onegov.feriennet.layout import DefaultLayout, MatchCollectionLayout
-from onegov.feriennet.models import PeriodMessage
+from onegov.feriennet.models import PeriodMessage, GroupInvite
 from onegov.core.elements import Block
 from onegov.core.elements import Confirm
 from onegov.core.elements import Intercooler
@@ -152,10 +152,21 @@ def view_occasion_bookings_table(self, request):
             )
         )
 
+    @lru_cache(maxsize=10)
+    def group_link(group_code):
+        return request.class_link(
+            GroupInvite, {
+                'group_code': group_code
+            }
+        )
+
     def booking_links(booking):
         yield Link(_("User"), user_link(booking.attendee.username))
         yield Link(_("Attendee"), attendee_link(booking.attendee_id))
         yield Link(phase_title, bookings_link(booking.attendee.username))
+
+        if booking.group_code:
+            yield Link(_("Group"), group_link(booking.group_code))
 
         if wishlist_phase:
             yield Link(

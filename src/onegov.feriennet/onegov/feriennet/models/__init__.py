@@ -1,5 +1,6 @@
 from onegov.feriennet.models.activity import VacationActivity
 from onegov.feriennet.models.calendar import Calendar, AttendeeCalendar
+from onegov.feriennet.models.group_invite import GroupInvite
 from onegov.feriennet.models.invoice_action import InvoiceAction
 from onegov.feriennet.models.message import ActivityMessage
 from onegov.feriennet.models.message import PeriodMessage
@@ -9,8 +10,9 @@ __all__ = [
     'ActivityMessage',
     'AttendeeCalendar',
     'Calendar',
+    'GroupInvite',
     'InvoiceAction',
     'NotificationTemplate',
     'PeriodMessage',
-    'VacationActivity'
+    'VacationActivity',
 ]

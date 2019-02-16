@@ -1,5 +1,6 @@
 from onegov.activity.matching.score import PreferAdminChildren
 from onegov.activity.matching.score import PreferOrganiserChildren
+from onegov.activity.matching.score import PreferGroups
 from onegov.activity.matching.score import Scoring
 from onegov.feriennet import _
 from onegov.form import Form
@@ -35,6 +36,9 @@ class MatchForm(Form):
 
     def scoring(self, session):
         scoring = Scoring()
+
+        # always prefer groups
+        scoring.criteria.append(PreferGroups.from_session(session))
 
         if self.prefer_organiser.data:
             scoring.criteria.append(
