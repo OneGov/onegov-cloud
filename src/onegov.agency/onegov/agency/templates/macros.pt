@@ -102,6 +102,11 @@
                             <dd>${person.political_party}</dd>
                         </tal:block>
 
+                        <tal:block tal:condition="person.parliamentary_group and 'parliamentary_group' not in exclude">
+                            <dt i18n:translate>Parliamentary Group</dt>
+                            <dd>${person.parliamentary_group}</dd>
+                        </tal:block>
+
                         <tal:block tal:condition="person.born and 'born' not in exclude">
                             <dt i18n:translate>Born</dt>
                             <dd>${person.born}</dd>

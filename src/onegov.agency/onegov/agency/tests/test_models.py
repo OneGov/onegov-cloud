@@ -71,6 +71,7 @@ def test_extended_person(session):
         academic_title="Dr.",
         profession="Politican",
         political_party="Democratic Party",
+        parliamentary_group="Democrats",
         born="2000",
         phone="+1 234 56 78",
         phone_direct="+1 234 56 79",
@@ -88,6 +89,7 @@ def test_extended_person(session):
     assert person.academic_title == "Dr."
     assert person.profession == "Politican"
     assert person.political_party == "Democratic Party"
+    assert person.parliamentary_group == "Democrats"
     assert person.born == "2000"
     assert person.phone == "+1 234 56 78"
     assert person.phone_direct == "+1 234 56 79"

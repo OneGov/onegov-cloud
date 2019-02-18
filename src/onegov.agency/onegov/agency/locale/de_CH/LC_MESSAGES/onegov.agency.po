@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-02-05 10:58+0100\n"
-"PO-Revision-Date: 2019-02-05 11:16+0100\n"
+"POT-Creation-Date: 2019-02-18 06:55+0100\n"
+"PO-Revision-Date: 2019-02-18 06:56+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -75,6 +75,9 @@ msgstr "Person: Adresse"
 
 msgid "Person: Political Party"
 msgstr "Person: politische Partei"
+
+msgid "Person: Parliamentary Group"
+msgstr "Person: Fraktion"
 
 msgid "Person: Phone"
 msgstr "Person: Telefon"
@@ -188,6 +191,9 @@ msgstr "Beruf"
 
 msgid "Political Party"
 msgstr "Politische Partei"
+
+msgid "Parliamentary Group"
+msgstr "Fraktion"
 
 msgid "Born"
 msgstr "Jahrgang"
