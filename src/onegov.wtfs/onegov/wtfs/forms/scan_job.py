@@ -446,10 +446,7 @@ class UnrestrictedEditScanJobForm(Form):
 
     dispatch_date = DateField(
         label=_("Dispatch date"),
-        validators=[
-            InputRequired(),
-            DateRange(min=tomorrow, message=_("Date must be in the future."))
-        ],
+        validators=[InputRequired()],
         default=tomorrow
     )
 
