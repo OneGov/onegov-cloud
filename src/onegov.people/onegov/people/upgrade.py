@@ -73,3 +73,12 @@ def add_additional_person_columns(context):
             'people',
             Column('phone_direct', Text, nullable=True)
         )
+
+
+@upgrade_task('Add parliamentary group column')
+def add_parliamentary_group_column(context):
+    if not context.has_column('people', 'parliamentary_group'):
+        context.operations.add_column(
+            'people',
+            Column('parliamentary_group', Text, nullable=True)
+        )

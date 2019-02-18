@@ -85,6 +85,9 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable):
     #: the political party the person belongs to
     political_party = Column(Text, nullable=True)
 
+    #: the parliamentary group the person belongs to
+    parliamentary_group = Column(Text, nullable=True)
+
     #: an URL leading to a picture of the person
     picture_url = Column(Text, nullable=True)
 

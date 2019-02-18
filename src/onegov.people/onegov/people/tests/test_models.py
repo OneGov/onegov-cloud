@@ -17,6 +17,7 @@ def test_person(session):
             profession="Truck Driver",
             function="Director",
             political_party="Democratic Party",
+            parliamentary_group="Democrats",
             picture_url="https://thats.me/hans-maulwurf/picture",
             email="han.maulwurf@springfield.com",
             phone="11122334455",
@@ -37,6 +38,7 @@ def test_person(session):
     assert person.profession == "Truck Driver"
     assert person.function == "Director"
     assert person.political_party == "Democratic Party"
+    assert person.parliamentary_group == "Democrats"
     assert person.picture_url == "https://thats.me/hans-maulwurf/picture"
     assert person.email == "han.maulwurf@springfield.com"
     assert person.phone == "11122334455"
