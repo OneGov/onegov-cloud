@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.5.1 (2019-02-18)
+~~~~~~~~~~~~~~~~~~~
 
 - Supports smaller Raiffeisen ESR identifications.
   [href]
