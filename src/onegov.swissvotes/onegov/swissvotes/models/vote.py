@@ -113,7 +113,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
                 (1, _("Accepting")),
                 (2, _("Rejecting")),
             ))
-        if attribute == 'recommendation':
+        if attribute.startswith('recommendation'):
             return OrderedDict((
                 (1, _("Yea")),
                 (2, _("Nay")),
@@ -514,6 +514,26 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     _recommendation_glp = Column('recommendation_glp', Integer)
     _recommendation_bdp = Column('recommendation_bdp', Integer)
     _recommendation_mcg = Column('recommendation_mcg', Integer)
+    recommendation_fdp = encoded_property()
+    recommendation_cvp = encoded_property()
+    recommendation_sps = encoded_property()
+    recommendation_svp = encoded_property()
+    recommendation_lps = encoded_property()
+    recommendation_ldu = encoded_property()
+    recommendation_evp = encoded_property()
+    recommendation_csp = encoded_property()
+    recommendation_pda = encoded_property()
+    recommendation_poch = encoded_property()
+    recommendation_gps = encoded_property()
+    recommendation_sd = encoded_property()
+    recommendation_rep = encoded_property()
+    recommendation_edu = encoded_property()
+    recommendation_fps = encoded_property()
+    recommendation_lega = encoded_property()
+    recommendation_kvp = encoded_property()
+    recommendation_glp = encoded_property()
+    recommendation_bdp = encoded_property()
+    recommendation_mcg = encoded_property()
 
     def group_recommendations(self, recommendations):
         result = {}

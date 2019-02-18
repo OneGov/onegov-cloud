@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Shows party's recommendations in the strengths view.
+  [msom]
+
 - Adds datetime picker.
   [msom]
 
