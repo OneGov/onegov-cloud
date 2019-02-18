@@ -9,6 +9,7 @@ from onegov.wtfs.layouts import AddMunicipalityLayout
 from onegov.wtfs.layouts import AddScanJobLayout
 from onegov.wtfs.layouts import AddUserGroupLayout
 from onegov.wtfs.layouts import AddUserLayout
+from onegov.wtfs.layouts import DailyListLayout
 from onegov.wtfs.layouts import DefaultLayout
 from onegov.wtfs.layouts import DeleteMunicipalityDatesLayout
 from onegov.wtfs.layouts import EditMunicipalityLayout
@@ -25,6 +26,7 @@ from onegov.wtfs.layouts import UserGroupLayout
 from onegov.wtfs.layouts import UserGroupsLayout
 from onegov.wtfs.layouts import UserLayout
 from onegov.wtfs.layouts import UsersLayout
+from onegov.wtfs.models import DailyList
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.security import AddModel
 from onegov.wtfs.security import AddModelUnrestricted
@@ -149,6 +151,7 @@ def test_default_layout(wtfs_app):
     assert layout.logout_url == 'Auth/logout'
     assert list(hrefs(layout.top_navigation)) == [
         'ScanJobCollection/',
+        'DailyList/',
         'UserCollection/',
         'UserGroupCollection/',
         'MunicipalityCollection/'
@@ -477,3 +480,14 @@ def test_scan_job_layouts(session):
 
     layout = EditScanJobLayout(model, request_editor)
     assert list(hrefs(layout.editbar_links)) == []
+
+
+def test_daily_list_layouts(session):
+    request = DummyRequest()
+    model = DailyList(session, date_=date(2019, 1, 1))
+    layout = DailyListLayout(model, request)
+    assert layout.title.interpolate() == 'Daily list Dienstag 01. Januar 2019'
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/DailyList'
+    assert layout.cancel_url == ''
+    assert layout.success_url == ''

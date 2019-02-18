@@ -9,17 +9,17 @@
                     <thead>
                         <tr>
                             <th></th>
-                            <th colspan="2" i18n:translate>Boxes</th>
-                            <th colspan="4" i18n:translate>Tax forms</th>
+                            <th class="center" colspan="2" i18n:translate>Boxes</th>
+                            <th class="center" colspan="4" i18n:translate>Tax forms</th>
                             <th i18n:translate>Single documents</th>
                         </tr>
                         <tr>
                             <th></th>
                             <th colspan="2"></th>
-                            <th class="subtitle"><tal:block i18n:translate>until</tal:block> ${layout.current_year-2}</th>
-                            <th class="subtitle">${layout.current_year-1}</th>
-                            <th class="subtitle">${layout.current_year}</th>
-                            <th class="subtitle" i18n:translate>Total</th>
+                            <th class="right subtitle"><tal:block i18n:translate>until</tal:block> ${layout.current_year-2}</th>
+                            <th class="right subtitle">${layout.current_year-1}</th>
+                            <th class="right subtitle">${layout.current_year}</th>
+                            <th class="right subtitle" i18n:translate>Total</th>
                             <th></th>
                         </tr>
                     </thead>

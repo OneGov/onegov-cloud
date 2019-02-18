@@ -16,6 +16,9 @@ class Client(BaseClient):
     def login_member(self, to=None):
         return self.login('member@example.org', 'hunter2', to)
 
+    def login_optimo(self, to=None):
+        return self.login('optimo@example.org', 'hunter2', to)
+
 
 def create_wtfs_app(request, temporary_path):
     app = create_app(
@@ -49,6 +52,12 @@ def create_wtfs_app(request, temporary_path):
         password_hash=request.getfixturevalue('wtfs_password'),
         role='member',
         group_id=group_id
+    ))
+    session.add(User(
+        realname='Optimo',
+        username='optimo@example.org',
+        password_hash=request.getfixturevalue('wtfs_password'),
+        role='member'
     ))
 
     commit()

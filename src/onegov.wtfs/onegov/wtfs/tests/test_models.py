@@ -1,9 +1,11 @@
 from datetime import date
 from onegov.user import UserGroup
+from onegov.wtfs.models import DailyList
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import PickupDate
 from onegov.wtfs.models import Principal
 from onegov.wtfs.models import ScanJob
+from uuid import uuid4
 
 
 def test_principal():
@@ -129,3 +131,108 @@ def test_scan_job(session):
 
     assert municipality.scan_jobs.one() == scan_job
     assert group.scan_jobs.one() == scan_job
+
+
+def test_daily_list(session):
+    daily_list = DailyList(session, date_=date.today())
+    assert daily_list.jobs.all() == []
+    assert daily_list.total == (0, 0, 0, 0)
+
+    data = {
+        'Adlikon': {
+            'municipality_id': uuid4(),
+            'group_id': uuid4(),
+            'bfs_number': 21,
+            'jobs': [
+                [date(2019, 1, 1), 1, 2, 3, date(2019, 1, 2), 4],
+                [date(2019, 1, 2), 3, 2, 1, date(2019, 1, 3), 1],
+            ]
+        },
+        'Aesch': {
+            'municipality_id': uuid4(),
+            'group_id': uuid4(),
+            'bfs_number': 241,
+            'jobs': [
+                [date(2019, 1, 1), 1, 2, 3, date(2019, 1, 2), 4],
+                [date(2019, 1, 3), 0, 10, None, date(2019, 1, 4), None],
+            ]
+        },
+        'Altikon': {
+            'municipality_id': uuid4(),
+            'group_id': uuid4(),
+            'bfs_number': 211,
+            'jobs': [
+                [date(2019, 1, 2), 1, 2, 3, date(2019, 1, 2), 4],
+            ]
+        },
+        'Andelfingen': {
+            'municipality_id': uuid4(),
+            'group_id': uuid4(),
+            'bfs_number': 30,
+            'jobs': [
+                [date(2019, 1, 2), 1, 2, 3, date(2019, 1, 4), 4],
+            ]
+        },
+    }
+
+    for name, values in data.items():
+        session.add(UserGroup(
+            name=name,
+            id=values['group_id']
+        ))
+        session.add(Municipality(
+            name=name,
+            id=values['municipality_id'],
+            bfs_number=values['bfs_number'],
+            group_id=values['group_id'])
+        )
+        for job in values['jobs']:
+            session.add(
+                ScanJob(
+                    type='normal',
+                    group_id=values['group_id'],
+                    municipality_id=values['municipality_id'],
+                    dispatch_date=job[0],
+                    dispatch_boxes=job[1],
+                    dispatch_cantonal_tax_office=job[2],
+                    dispatch_cantonal_scan_center=job[3],
+                    return_date=job[4],
+                    return_boxes=job[5],
+                )
+            )
+        session.flush()
+    session.flush()
+
+    daily_list = DailyList(session, date_=date(2019, 1, 1))
+    assert daily_list.jobs.all() == [
+        ('Adlikon', 1, 2, 3, 0),
+        ('Aesch', 1, 2, 3, 0)
+    ]
+    assert daily_list.total == (2, 4, 6, 0)
+
+    daily_list = DailyList(session, date_=date(2019, 1, 2))
+    assert daily_list.jobs.all() == [
+        ('Adlikon', 3, 2, 1, 4),
+        ('Aesch', 0, 0, 0, 4),
+        ('Altikon', 1, 2, 3, 4),
+        ('Andelfingen', 1, 2, 3, 0)
+    ]
+    assert daily_list.total == (5, 6, 7, 12)
+
+    daily_list = DailyList(session, date_=date(2019, 1, 3))
+    assert daily_list.jobs.all() == [
+        ('Adlikon', 0, 0, 0, 1),
+        ('Aesch', 0, 10, 0, 0)
+    ]
+    assert daily_list.total == (0, 10, 0, 1)
+
+    daily_list = DailyList(session, date_=date(2019, 1, 4))
+    assert daily_list.jobs.all() == [
+        ('Aesch', 0, 0, 0, 0),
+        ('Andelfingen', 0, 0, 0, 4)
+    ]
+    assert daily_list.total == (0, 0, 0, 4)
+
+    daily_list = DailyList(session, date_=date(2019, 1, 5))
+    assert daily_list.jobs.all() == []
+    assert daily_list.total == (0, 0, 0, 0)

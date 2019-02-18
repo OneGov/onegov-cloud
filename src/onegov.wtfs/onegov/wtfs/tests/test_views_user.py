@@ -25,12 +25,12 @@ def test_views_user(client):
 
     # Add a user without a group
     add = client.get('/users').click(href='add')
-    add.form['realname'] = "Optimo"
+    add.form['realname'] = "Optimo X"
     add.form['username'] = "info@optimo.info"
     add.form['role'].select('member')
     added = add.form.submit().follow()
     assert "Benutzer hinzugefügt." in added
-    assert "Optimo" in added
+    assert "Optimo X" in added
 
     # View users
     view = client.get('/users').click("Hans Muster")
@@ -39,7 +39,7 @@ def test_views_user(client):
     assert "✔︎" in view
     assert "Gruppe Winterthur" in view
 
-    view = client.get('/users').click("Optimo")
+    view = client.get('/users').click("Optimo X")
     assert "Benutzer" in view
     assert "info@optimo.info" in view
     assert "✘︎" in view
@@ -60,10 +60,10 @@ def test_views_user(client):
     # Delete user
     deleted = client.get('/users').click("Hans-Peter Muster").click("Löschen")
     assert deleted.status_int == 200
-    deleted = client.get('/users').click("Optimo").click("Löschen")
+    deleted = client.get('/users').click("Optimo X").click("Löschen")
     assert deleted.status_int == 200
     assert "Hans-Peter Muster" not in client.get('/users')
-    assert "Optimo" not in client.get('/users')
+    assert "Optimo X" not in client.get('/users')
 
 
 def test_views_user_editor(client):
@@ -109,7 +109,7 @@ def test_views_users_permissions(mock_method, client):
     client.login_admin()
 
     add = client.get('/users').click(href='add')
-    add.form['realname'] = "Optimo"
+    add.form['realname'] = "Optimo X"
     add.form['username'] = "info@optimo.info"
     add.form['role'].select('member')
     assert "Benutzer hinzugefügt." in add.form.submit().follow()

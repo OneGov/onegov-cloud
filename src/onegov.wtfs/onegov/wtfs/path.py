@@ -1,3 +1,4 @@
+from onegov.core.converters import extended_date_converter
 from onegov.user import Auth
 from onegov.user import User
 from onegov.user import UserCollection
@@ -6,9 +7,11 @@ from onegov.user import UserGroupCollection
 from onegov.wtfs.app import WtfsApp
 from onegov.wtfs.collections import MunicipalityCollection
 from onegov.wtfs.collections import ScanJobCollection
+from onegov.wtfs.models import DailyList
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import Principal
 from onegov.wtfs.models import ScanJob
+from webob.exc import HTTPNotFound
 
 
 @WtfsApp.path(
@@ -89,3 +92,16 @@ def get_scan_jobs(request):
 )
 def get_scan_job(request, id):
     return ScanJobCollection(request.session).by_id(id)
+
+
+@WtfsApp.path(
+    model=DailyList,
+    path='/daily-list/{type}/{date}',
+    converters=dict(
+        date=extended_date_converter,
+    )
+)
+def get_daily_list(request, type, date):
+    if type not in DailyList.types:
+        raise HTTPNotFound()
+    return DailyList(request.session, type, date)

@@ -4,6 +4,7 @@ from onegov.user import UserCollection
 from onegov.user import UserGroup
 from onegov.wtfs import WtfsApp
 from onegov.wtfs.collections import ScanJobCollection
+from onegov.wtfs.models import DailyList
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import ScanJob
 
@@ -130,6 +131,19 @@ def has_permission_scan_job(app, identity, model, permission):
         if identity.groupid:
             if permission in {ViewModel, EditModel}:
                 if same_group(model, identity):
+                    return True
+
+    return permission in getattr(app.settings.roles, identity.role)
+
+
+@WtfsApp.permission_rule(model=DailyList, permission=object)
+def has_permission_daily_list(app, identity, model, permission):
+    # Members without groups (transport company) may view one sort of daily
+    # lists
+    if identity.role == 'member':
+        if not identity.groupid:
+            if permission in {ViewModel}:
+                if model.type == 'boxes':
                     return True
 
     return permission in getattr(app.settings.roles, identity.role)

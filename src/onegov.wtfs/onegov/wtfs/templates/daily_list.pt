@@ -1,0 +1,72 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.wtfs">
+    <tal:block metal:fill-slot="title">${layout.title}</tal:block>
+    <tal:block metal:fill-slot="content">
+        <div class="row">
+            <div class="columns small-12">
+                <h1>${layout.title}</h1>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th class="center" colspan="7" i18n:translate>Dispatch to the tax office</th>
+                            <th class="center" colspan="3" i18n:translate>Dispatch to the cantonal tax office</th>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th class="right" i18n:translate>In</th>
+                            <th class="center" colspan="5" i18n:translate>Internally tax office</th>
+                            <th class="right" i18n:translate>Out</th>
+                            <th colspan="2"></th>
+                            <th class="center" i18n:translate>Internally dispatch</th>
+                        </tr>
+                        <tr>
+                            <th i18n:translate>Municipality</th>
+                            <th></th>
+                            <th class="right subtitle">EG</th>
+                            <th class="right subtitle">SC</th>
+                            <th class="right subtitle">NB</th>
+                            <th class="right subtitle">SN</th>
+                            <th class="right subtitle">VS</th>
+                            <th></th>
+                            <th class="right subtitle" i18n:translate>Scan Center</th>
+                            <th class="right subtitle" i18n:translate>Headquarters</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr tal:repeat="job layout.model.jobs">
+                            <th>${job.name}</th>
+                            <td class="right">${job.dispatch_boxes}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td class="right">${job.return_boxes}</td>
+                            <td class="right">${job.dispatch_cantonal_scan_center}</td>
+                            <td class="right">${job.dispatch_cantonal_tax_office}</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr tal:define="total layout.model.total">
+                            <th i18n:translate>Total</th>
+                            <td class="right">${total.dispatch_boxes}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td class="right">${total.return_boxes}</td>
+                            <td class="right">${total.dispatch_cantonal_scan_center}</td>
+                            <td class="right">${total.dispatch_cantonal_tax_office}</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+            </div>
+        </div>
+    </tal:block>
+</div>

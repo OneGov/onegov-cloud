@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-15 13:40+0100\n"
-"PO-Revision-Date: 2019-02-15 13:41+0100\n"
+"POT-Creation-Date: 2019-02-18 11:06+0100\n"
+"PO-Revision-Date: 2019-02-18 10:39+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -156,6 +156,10 @@ msgstr "Diesen Benutzer wirklich löschen?"
 msgid "User"
 msgstr "Benutzer"
 
+#, python-format
+msgid "Daily list ${date}"
+msgstr "Tagesliste ${date}"
+
 msgid "Municipalities"
 msgstr "Gemeinden"
 
@@ -170,6 +174,9 @@ msgstr "Diese Gemeinde wirklich löschen?"
 
 msgid "Scan jobs"
 msgstr "Scan-Aufträge"
+
+msgid "Daily list"
+msgstr "Tagesliste"
 
 msgid "Do you really want to delete this scan job?"
 msgstr "Diese Scanauftrag wirklich löschen?"
@@ -232,6 +239,21 @@ msgstr "Passwort zurücksetzen"
 msgid "Number of users"
 msgstr "Anzahl Benutzer"
 
+msgid "In"
+msgstr "Eingang"
+
+msgid "Internally tax office"
+msgstr "Intern Steueramt"
+
+msgid "Out"
+msgstr "Ausgang"
+
+msgid "Internally dispatch"
+msgstr "Intern Optimo"
+
+msgid "Scan Center"
+msgstr "Scan Center"
+
 msgid "Delivery number"
 msgstr "Lieferscheinnummer"
 
@@ -269,9 +291,6 @@ msgstr "Freundliche Grüsse"
 
 msgid "Tax office Winterthur"
 msgstr "Steuramt Winterthur"
-
-msgid "Scan Center"
-msgstr "Scan Center"
 
 msgid "Phone: 052 267 53 47"
 msgstr "Telefon: 052 267 53 47"
