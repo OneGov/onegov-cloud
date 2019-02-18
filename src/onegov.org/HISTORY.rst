@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds parliamentary groups to people.
+  [msom]
+
 1.0.5 (2019-02-15)
 ~~~~~~~~~~~~~~~~~~~
 

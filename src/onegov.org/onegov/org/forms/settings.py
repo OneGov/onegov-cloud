@@ -244,6 +244,7 @@ class ModuleSettingsForm(Form):
             ('born', _("Born")),
             ('profession', _("Profession")),
             ('political_party', _("Political Party")),
+            ('parliamentary_group', _("Parliamentary Group")),
             ('email', _("E-Mail")),
             ('phone', _("Phone")),
             ('phone_direct', _("Direct Phone Number")),

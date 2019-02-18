@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-01-29 13:59+0100\n"
-"PO-Revision-Date: 2018-12-08 11:01+0100\n"
+"POT-Creation-Date: 2019-02-18 06:38+0100\n"
+"PO-Revision-Date: 2019-02-18 06:39+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -188,6 +188,9 @@ msgstr ""
 "Es existieren Eingaben die mit diesem Formular verknüpft sind. Löschen Sie "
 "diese Eingaben bevor Sie das Formular löschen."
 
+msgid "Cancel"
+msgstr "Abbrechen"
+
 msgid "New Note"
 msgstr "Neue Notiz"
 
@@ -229,9 +232,6 @@ msgstr "Dies kann nicht rückgängig gemacht werden."
 
 msgid "Delete form"
 msgstr "Formular löschen"
-
-msgid "Cancel"
-msgstr "Abbrechen"
 
 msgid "Accept ticket"
 msgstr "Ticket annehmen"
@@ -749,6 +749,9 @@ msgstr "Beruf"
 
 msgid "Political Party"
 msgstr "Politische Partei"
+
+msgid "Parliamentary Group"
+msgstr "Fraktion"
 
 msgid "Website"
 msgstr "Webseite"
@@ -2335,9 +2338,6 @@ msgstr "Klicken Sie hier um sich abzumelden."
 
 msgid "This album does not contain any images yet."
 msgstr "Dieses Fotoalbum enthält noch keine Bilder."
-
-msgid "Hi!"
-msgstr ""
 
 msgid "Your directory submission has unfortunately been rejected:"
 msgstr "Ihre Verzeichniseintrag Eingabe wurde leider abgelehnt:"

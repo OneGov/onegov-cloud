@@ -22,6 +22,7 @@ class PersonForm(Form):
     born = StringField(_("Born"))
     profession = StringField(_("Profession"))
     political_party = StringField(_("Political Party"))
+    parliamentary_group = StringField(_("Parliamentary Group"))
     website = StringField(_("Website"), filters=(ensure_scheme, ))
 
     address = TextAreaField(

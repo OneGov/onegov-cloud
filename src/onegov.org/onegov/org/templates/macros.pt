@@ -491,6 +491,7 @@
                         <span tal:condition="person.academic_title and 'academic_title' not in exclude">${person.academic_title}</span>
                         <span tal:condition="person.profession and 'profession' not in exclude">${person.profession}</span>
                         <span tal:condition="person.political_party and 'political_party' not in exclude">${person.political_party}</span>
+                        <span tal:condition="person.parliamentary_group and 'parliamentary_group' not in exclude">${person.parliamentary_group}</span>
                     </li>
                     <li tal:condition="person.address and 'address' not in exclude" class="person-card-address">
                         <span>${person.address}</span>
