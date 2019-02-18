@@ -862,7 +862,7 @@ def test_booking_view(client, scenario):
     admin.login_admin()
 
     page = admin.get('/').click('Wunschliste')
-    url = page.pyquery('select:last option:nth-child(3)').val()
+    url = page.pyquery('select:last option[value*="m1"]').val()
 
     m1_bookings = admin.get(url)
 
