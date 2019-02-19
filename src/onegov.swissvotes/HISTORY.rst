@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.32 (2019-02-19)
+~~~~~~~~~~~~~~~~~~~
 
 - Shows party's recommendations in the strengths view.
   [msom]
