@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes faulty release.
+  [href]
+
 1.14.0 (2019-02-19)
 ~~~~~~~~~~~~~~~~~~~
 
