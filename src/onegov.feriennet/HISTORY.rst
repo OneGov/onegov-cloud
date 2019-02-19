@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to click on activity thumbnails.
+  [href]
+
 - Adds the ability to define needs for occasions.
   [href]
 

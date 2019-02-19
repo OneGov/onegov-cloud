@@ -12,10 +12,10 @@
                 <div class="activity-list-item" tal:repeat="activity activities">
                     <div class="row collapse">
                         <div class="columns small-2 thumbnail-column">
-                            <div class="thumbnail">
+                            <a class="thumbnail" href="${request.link(activity)}">
                                 <div tal:condition="activity.thumbnail|nothing"
                                      style="background-image: url('${activity.thumbnail}');"></div>
-                            </div>
+                            </a>
                         </div>
 
                         <div class="columns small-10">
