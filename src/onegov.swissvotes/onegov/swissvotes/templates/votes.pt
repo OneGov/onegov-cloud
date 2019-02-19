@@ -43,7 +43,9 @@
                             <th data-tablesaw-priority="4" class="right-aligned sort-${votes.sort_order_by_key('result_people_yeas_p')}" >
                                 <a href="${request.link(votes.by_order('result_people_yeas_p'))}" i18n:translate>Yeas Percentage People</a>
                             </th>
-                            <th data-tablesaw-priority="0" i18n:translate>Turnout</th>
+                            <th data-tablesaw-priority="0" class="right-aligned sort-${votes.sort_order_by_key('result_turnout')}" >
+                                <a href="${request.link(votes.by_order('result_turnout'))}" i18n:translate>Turnout</a>
+                            </th>
                             <th data-tablesaw-priority="persist" class="left-aligned" i18n:translate>Details</th>
                         </tr>
                     </thead>

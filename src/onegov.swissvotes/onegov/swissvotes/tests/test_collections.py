@@ -488,13 +488,15 @@ def test_votes_order(session):
             votes_on_same_day=1,
             _legal_form=index,
             _result=index,
-            result_people_yeas_p=index / 10
+            result_people_yeas_p=index / 10,
+            result_turnout=index / 10
         )
 
     assert votes.sort_order_by_key('date') == 'descending'
     assert votes.sort_order_by_key('legal_form') == 'unsorted'
     assert votes.sort_order_by_key('result') == 'unsorted'
     assert votes.sort_order_by_key('result_people_yeas_p') == 'unsorted'
+    assert votes.sort_order_by_key('result_turnout') == 'unsorted'
     assert votes.sort_order_by_key('title') == 'unsorted'
     assert votes.sort_order_by_key('invalid') == 'unsorted'
 
@@ -567,6 +569,19 @@ def test_votes_order(session):
     assert votes.current_sort_by == 'result_people_yeas_p'
     assert votes.current_sort_order == 'descending'
     assert 'result_people_yeas_p' in str(votes.order_by)
+    assert 'DESC' in str(votes.order_by)
+    assert [vote.id for vote in votes.query()] == [3, 2, 1]
+
+    votes = votes.by_order('result_turnout')
+    assert votes.current_sort_by == 'result_turnout'
+    assert votes.current_sort_order == 'ascending'
+    assert 'result_turnout' in str(votes.order_by)
+    assert [vote.id for vote in votes.query()] == [1, 2, 3]
+
+    votes = votes.by_order('result_turnout')
+    assert votes.current_sort_by == 'result_turnout'
+    assert votes.current_sort_order == 'descending'
+    assert 'result_turnout' in str(votes.order_by)
     assert 'DESC' in str(votes.order_by)
     assert [vote.id for vote in votes.query()] == [3, 2, 1]
 

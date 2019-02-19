@@ -24,7 +24,8 @@ class SwissVoteCollection(Pagination):
         'legal_form',
         'result',
         'result_people_yeas_p',
-        'title'
+        'title',
+        'result_turnout'
     )
     SORT_ORDERS = ('ascending', 'descending')
 
