@@ -143,7 +143,6 @@ def has_permission_daily_list(app, identity, model, permission):
     if identity.role == 'member':
         if not identity.groupid:
             if permission in {ViewModel}:
-                if model.type == 'boxes':
-                    return True
+                return True
 
     return permission in getattr(app.settings.roles, identity.role)

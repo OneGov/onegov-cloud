@@ -65,6 +65,7 @@ def test_views_daily_jobs_permissions(mock_method, client):
     client.get(f'/daily-list/boxes/2019-01-10', status=403)
     client.logout()
 
+    client.login_editor()
     client.get(f'/daily-list/boxes/2019-01-10', status=403)
     client.logout()
 

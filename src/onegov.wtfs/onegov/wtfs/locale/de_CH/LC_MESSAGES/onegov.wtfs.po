@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-18 11:06+0100\n"
-"PO-Revision-Date: 2019-02-18 10:39+0100\n"
+"POT-Creation-Date: 2019-02-19 13:15+0100\n"
+"PO-Revision-Date: 2019-02-19 10:29+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -118,6 +118,21 @@ msgstr "Expresssendung"
 
 msgid "Date must be in the future."
 msgstr "Datum muss in der Zukunft liegen."
+
+msgid "Report"
+msgstr "Auswertung"
+
+msgid "Report boxes"
+msgstr "Behälter aller Gemeinden"
+
+msgid "Report boxes and forms"
+msgstr "Behälter und Steuererklärungen aller Gemeinden"
+
+msgid "Report forms"
+msgstr "Total Steuererklärungen pro Gemeinde"
+
+msgid "Regular and express shipment"
+msgstr "Alle Sendungen"
 
 #, python-format
 msgid "Scan job ${number}: ${municipality}, ${date}"
@@ -242,17 +257,17 @@ msgstr "Anzahl Benutzer"
 msgid "In"
 msgstr "Eingang"
 
-msgid "Internally tax office"
-msgstr "Intern Steueramt"
-
 msgid "Out"
 msgstr "Ausgang"
 
-msgid "Internally dispatch"
-msgstr "Intern Optimo"
-
 msgid "Scan Center"
 msgstr "Scan Center"
+
+msgid "Internally tax office"
+msgstr "Intern Steueramt"
+
+msgid "Internally dispatch"
+msgstr "Intern Optimo"
 
 msgid "Delivery number"
 msgstr "Lieferscheinnummer"
@@ -405,3 +420,6 @@ msgstr "Seite nicht gefunden"
 
 msgid "The page you are looking for could not be found."
 msgstr "Die angeforderte Seite konnte nicht gefunden werden."
+
+msgid "Show"
+msgstr "Anzeigen"

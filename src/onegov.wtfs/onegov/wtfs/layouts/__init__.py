@@ -7,6 +7,10 @@ from onegov.wtfs.layouts.municipality import EditMunicipalityLayout
 from onegov.wtfs.layouts.municipality import ImportMunicipalityDataLayout
 from onegov.wtfs.layouts.municipality import MunicipalitiesLayout
 from onegov.wtfs.layouts.municipality import MunicipalityLayout
+from onegov.wtfs.layouts.report import ReportBoxesAndFormsLayout
+from onegov.wtfs.layouts.report import ReportBoxesLayout
+from onegov.wtfs.layouts.report import ReportFormsByMunicipalityLayout
+from onegov.wtfs.layouts.report import ReportLayout
 from onegov.wtfs.layouts.scan_job import AddScanJobLayout
 from onegov.wtfs.layouts.scan_job import EditScanJobLayout
 from onegov.wtfs.layouts.scan_job import ScanJobLayout
@@ -37,6 +41,10 @@ __all__ = (
     'MailLayout',
     'MunicipalitiesLayout',
     'MunicipalityLayout',
+    'ReportBoxesAndFormsLayout',
+    'ReportBoxesLayout',
+    'ReportFormsByMunicipalityLayout',
+    'ReportLayout',
     'ScanJobLayout',
     'ScanJobsLayout',
     'UserGroupLayout',

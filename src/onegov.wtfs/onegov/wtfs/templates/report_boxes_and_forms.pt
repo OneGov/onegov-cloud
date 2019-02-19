@@ -1,0 +1,60 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.wtfs">
+    <tal:block metal:fill-slot="title">${layout.title}</tal:block>
+    <tal:block metal:fill-slot="content">
+        <div class="row">
+            <div class="columns small-12">
+                <h1>
+                    ${layout.title}
+                    <br><small>${layout.format_date(layout.model.start, 'date')}-${layout.format_date(layout.model.end, 'date')}</small>
+                </h1>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th class="center" colspan="6" i18n:translate>Dispatch to the tax office</th>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th class="right" i18n:translate>Out</th>
+                            <th class="center" colspan="4" i18n:translate>Tax forms</th>
+                            <th class="right" i18n:translate>Single documents</th>
+                        </tr>
+                        <tr>
+                            <th i18n:translate>Municipality</th>
+                            <th class="right subtitle" i18n:translate>Boxes</th>
+                            <th class="right subtitle"><tal:block i18n:translate>until</tal:block> ${layout.current_year-2}</th>
+                            <th class="right subtitle">${layout.current_year-1}</th>
+                            <th class="right subtitle">${layout.current_year}</th>
+                            <th class="right subtitle" i18n:translate>Total</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr tal:repeat="result layout.model.query">
+                            <th>${result.name}</th>
+                            <td class="right">${result.return_boxes}</td>
+                            <td class="right">${result.dispatch_tax_forms_older}</td>
+                            <td class="right">${result.dispatch_tax_forms_last_year}</td>
+                            <td class="right">${result.dispatch_tax_forms_current_year}</td>
+                            <td class="right">${(result.dispatch_tax_forms_older + result.dispatch_tax_forms_last_year + result.dispatch_tax_forms_current_year)}</td>
+                            <td class="right">${result.dispatch_single_documents}</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr tal:define="total layout.model.total">
+                            <th i18n:translate>Total</th>
+                            <td class="right">${total.return_boxes}</td>
+                            <td class="right">${total.dispatch_tax_forms_older}</td>
+                            <td class="right">${total.dispatch_tax_forms_last_year}</td>
+                            <td class="right">${total.dispatch_tax_forms_current_year}</td>
+                            <td class="right">${(total.dispatch_tax_forms_older + total.dispatch_tax_forms_last_year + total.dispatch_tax_forms_current_year)}</td>
+                            <td class="right">${total.dispatch_single_documents}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+            </div>
+        </div>
+    </tal:block>
+</div>

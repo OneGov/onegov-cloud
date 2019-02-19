@@ -13,6 +13,7 @@ from onegov.wtfs.forms import EditScanJobForm
 from onegov.wtfs.forms import ImportMunicipalityDataForm
 from onegov.wtfs.forms import MunicipalityForm
 from onegov.wtfs.forms import MunicipalityIdSelectionForm
+from onegov.wtfs.forms import ReportSelectionForm
 from onegov.wtfs.forms import UnrestrictedAddScanJobForm
 from onegov.wtfs.forms import UnrestrictedEditScanJobForm
 from onegov.wtfs.forms import UnrestrictedUserForm
@@ -882,3 +883,54 @@ def test_unrestricted_edit_scan_job_form(session):
         }))
         form.request = Request(session, groupid=group_1.id.hex)
         form.on_request()
+
+
+def test_report_selection_form(session):
+    groups = UserGroupCollection(session)
+    municipalities = MunicipalityCollection(session)
+    municipalities.add(
+        name="Adlikon",
+        bfs_number=21,
+        group_id=groups.add(name="Winterthur").id
+    )
+    municipalities.add(
+        name="Aesch",
+        bfs_number=241,
+        group_id=groups.add(name="Aesch").id
+    )
+
+    # Test choices
+    form = ReportSelectionForm()
+    form.request = Request(session)
+    form.on_request()
+    assert form.municipality.choices == [
+        ('Adlikon', 'Adlikon'),
+        ('Aesch', 'Aesch')
+    ]
+
+    # Test get model
+    form.start.data = date(2019, 1, 1)
+    form.end.data = date(2019, 1, 31)
+    form.scan_job_type.data = 'express'
+    form.municipality.data = 'Aesch'
+
+    form.report_type.data = 'boxes'
+    model = form.get_model()
+    assert model.__class__.__name__ == 'ReportBoxes'
+    assert model.start == date(2019, 1, 1)
+    assert model.end == date(2019, 1, 31)
+
+    form.report_type.data = 'boxes_and_forms'
+    model = form.get_model()
+    assert model.__class__.__name__ == 'ReportBoxesAndForms'
+    assert model.start == date(2019, 1, 1)
+    assert model.end == date(2019, 1, 31)
+    assert model.type == 'express'
+
+    form.report_type.data = 'forms'
+    model = form.get_model()
+    assert model.__class__.__name__ == 'ReportFormsByMunicipality'
+    assert model.start == date(2019, 1, 1)
+    assert model.end == date(2019, 1, 31)
+    assert model.type == 'express'
+    assert model.municipality == 'Aesch'

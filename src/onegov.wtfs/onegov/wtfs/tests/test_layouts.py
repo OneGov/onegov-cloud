@@ -20,6 +20,10 @@ from onegov.wtfs.layouts import ImportMunicipalityDataLayout
 from onegov.wtfs.layouts import MailLayout
 from onegov.wtfs.layouts import MunicipalitiesLayout
 from onegov.wtfs.layouts import MunicipalityLayout
+from onegov.wtfs.layouts import ReportBoxesAndFormsLayout
+from onegov.wtfs.layouts import ReportBoxesLayout
+from onegov.wtfs.layouts import ReportFormsByMunicipalityLayout
+from onegov.wtfs.layouts import ReportLayout
 from onegov.wtfs.layouts import ScanJobLayout
 from onegov.wtfs.layouts import ScanJobsLayout
 from onegov.wtfs.layouts import UserGroupLayout
@@ -28,6 +32,10 @@ from onegov.wtfs.layouts import UserLayout
 from onegov.wtfs.layouts import UsersLayout
 from onegov.wtfs.models import DailyList
 from onegov.wtfs.models import Municipality
+from onegov.wtfs.models import Report
+from onegov.wtfs.models import ReportBoxes
+from onegov.wtfs.models import ReportBoxesAndForms
+from onegov.wtfs.models import ReportFormsByMunicipality
 from onegov.wtfs.security import AddModel
 from onegov.wtfs.security import AddModelUnrestricted
 from onegov.wtfs.security import DeleteModel
@@ -152,6 +160,7 @@ def test_default_layout(wtfs_app):
     assert list(hrefs(layout.top_navigation)) == [
         'ScanJobCollection/',
         'DailyList/',
+        'Report/',
         'UserCollection/',
         'UserGroupCollection/',
         'MunicipalityCollection/'
@@ -489,5 +498,61 @@ def test_daily_list_layouts(session):
     assert layout.title.interpolate() == 'Daily list Dienstag 01. Januar 2019'
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == 'DummyPrincipal/DailyList'
+    assert layout.cancel_url == ''
+    assert layout.success_url == ''
+
+
+def test_report_layouts(session):
+    request = DummyRequest()
+
+    model = Report(session)
+    layout = ReportLayout(model, request)
+    assert layout.title == 'Report'
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/Report'
+    assert layout.cancel_url == ''
+    assert layout.success_url == ''
+
+    model = ReportBoxes(
+        session,
+        start=date(2019, 1, 1),
+        end=date(2019, 1, 31)
+    )
+    layout = ReportBoxesLayout(model, request)
+    assert layout.title == 'Report boxes'
+    assert layout.subtitle == '01.01.2019-31.01.2019'
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/Report/#/ReportBoxes'
+    assert layout.cancel_url == ''
+    assert layout.success_url == ''
+
+    model = ReportBoxesAndForms(
+        session,
+        start=date(2019, 1, 1),
+        end=date(2019, 1, 31)
+    )
+    layout = ReportBoxesAndFormsLayout(model, request)
+    assert layout.title == 'Report boxes and forms'
+    assert layout.subtitle == '01.01.2019-31.01.2019'
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == (
+        'DummyPrincipal/Report/#/ReportBoxesAndForms'
+    )
+    assert layout.cancel_url == ''
+    assert layout.success_url == ''
+
+    model = ReportFormsByMunicipality(
+        session,
+        start=date(2019, 1, 1),
+        end=date(2019, 1, 31),
+        municipality='Adlikon'
+    )
+    layout = ReportFormsByMunicipalityLayout(model, request)
+    assert layout.title == 'Report forms'
+    assert layout.subtitle == 'Adlikon 01.01.2019-31.01.2019'
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == (
+        'DummyPrincipal/Report/#/ReportFormsByMunicipality'
+    )
     assert layout.cancel_url == ''
     assert layout.success_url == ''

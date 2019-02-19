@@ -10,8 +10,11 @@ from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.models import DailyList
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import Principal
+from onegov.wtfs.models import Report
+from onegov.wtfs.models import ReportBoxes
+from onegov.wtfs.models import ReportBoxesAndForms
+from onegov.wtfs.models import ReportFormsByMunicipality
 from onegov.wtfs.models import ScanJob
-from webob.exc import HTTPNotFound
 
 
 @WtfsApp.path(
@@ -96,12 +99,56 @@ def get_scan_job(request, id):
 
 @WtfsApp.path(
     model=DailyList,
-    path='/daily-list/{type}/{date}',
+    path='/daily-list/boxes/{date}',
     converters=dict(
         date=extended_date_converter,
     )
 )
-def get_daily_list(request, type, date):
-    if type not in DailyList.types:
-        raise HTTPNotFound()
-    return DailyList(request.session, type, date)
+def get_daily_list(request, date):
+    return DailyList(request.session, date)
+
+
+@WtfsApp.path(
+    model=Report,
+    path='/report',
+)
+def get_report(request):
+    return Report(request.session)
+
+
+@WtfsApp.path(
+    model=ReportBoxes,
+    path='/report/boxes/{start}/{end}',
+    converters=dict(
+        start=extended_date_converter,
+        end=extended_date_converter,
+    )
+)
+def get_report_boxes(request, start, end):
+    return ReportBoxes(request.session, start, end)
+
+
+@WtfsApp.path(
+    model=ReportBoxesAndForms,
+    path='/report/boxes-and-forms/{start}/{end}/{type}',
+    converters=dict(
+        start=extended_date_converter,
+        end=extended_date_converter,
+    )
+)
+def get_report_boxes_and_forms(request, start, end, type):
+    return ReportBoxesAndForms(request.session, start, end, type)
+
+
+@WtfsApp.path(
+    model=ReportFormsByMunicipality,
+    path='/report/forms/{start}/{end}/{type}/{municipality}',
+    converters=dict(
+        start=extended_date_converter,
+        end=extended_date_converter,
+    )
+)
+def get_report_forms(request, start, end, type, municipality):
+    return ReportFormsByMunicipality(
+        request.session, start, end, type, municipality
+    )

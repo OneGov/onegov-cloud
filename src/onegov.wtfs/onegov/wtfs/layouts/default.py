@@ -9,6 +9,7 @@ from onegov.wtfs import _
 from onegov.wtfs.collections import MunicipalityCollection
 from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.models import DailyList
+from onegov.wtfs.models import Report
 from onegov.wtfs.security import ViewModel
 
 
@@ -37,6 +38,8 @@ class DefaultLayout(ChameleonLayout):
             result.append(Link(_("Scan jobs"), self.scan_jobs_url))
         if has_permission(DailyList(session), ViewModel):
             result.append(Link(_("Daily list"), self.daily_list_url))
+        if has_permission(Report(session), ViewModel):
+            result.append(Link(_("Report"), self.report_url))
         if has_permission(UserCollection(session), ViewModel):
             result.append(Link(_("Users"), self.users_url))
         if has_permission(UserGroupCollection(session), ViewModel):
@@ -101,6 +104,10 @@ class DefaultLayout(ChameleonLayout):
     @cached_property
     def daily_list_url(self):
         return self.request.link(DailyList(self.request.session))
+
+    @cached_property
+    def report_url(self):
+        return self.request.link(Report(self.request.session))
 
     @cached_property
     def cancel_url(self):
