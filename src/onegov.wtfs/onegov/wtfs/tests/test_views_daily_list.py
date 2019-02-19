@@ -39,14 +39,20 @@ def test_views_daily_job(client):
         edit.form['return_boxes'] = "28891238"
         assert "Scan-Auftrag geändert." in edit.form.submit().follow()
 
+    def get_daily_list(type, date_):
+        select = client.get('/daily-list')
+        select.form['type'].select(type)
+        select.form['date'] = date_
+        return select.form.submit().follow()
+
     # View daily list
-    view = client.get('/daily-list/boxes/2019-01-05')
+    view = get_daily_list('boxes', '2019-01-05')
     assert "10034550" in view
     assert "62388304" in view
     assert "712283912" in view
     assert "28891238" not in view
 
-    view = client.get('/daily-list/boxes/2019-01-10')
+    view = get_daily_list('boxes', '2019-01-10')
     assert "10034550" not in view
     assert "62388304" not in view
     assert "712283912" not in view

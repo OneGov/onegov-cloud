@@ -43,28 +43,38 @@ def test_views_report(client):
         edit.form['return_boxes'] = "8888"
         assert "Scan-Auftrag geändert." in edit.form.submit().follow()
 
+    def get_report(report_type, start, end, scan_job_type='all'):
+        select = client.get('/report')
+        select.form['start'] = start
+        select.form['end'] = end
+        select.form['report_type'].select(report_type)
+        select.form['scan_job_type'].select(scan_job_type)
+        select.form['municipality'].select('Adlikon')
+        return select.form.submit().follow()
+
     # Boxes
-    view = client.get('/report/boxes/2019-01-01/2019-01-05')
+    view = get_report('boxes', '2019-01-01', '2019-01-05')
     assert "1111" in view
     assert "2222" in view
     assert "3333" in view
     assert "8888" not in view
 
-    view = client.get('/report/boxes/2019-01-06/2019-01-10')
+    view = get_report('boxes', '2019-01-06', '2019-01-10')
+    # view = client.get('/report/boxes/2019-01-06/2019-01-10')
     assert "1111" not in view
     assert "2222" not in view
     assert "3333" not in view
     assert "8888" in view
 
     # Boxes and forms
-    view = client.get('/report/boxes-and-forms/2019-01-01/2019-01-05/all')
+    view = get_report('boxes_and_forms', '2019-01-01', '2019-01-05')
     assert "4444" in view
     assert "5555" in view
     assert "6666" in view
     assert "7777" in view
     assert "8888" not in view
 
-    view = client.get('/report/boxes-and-forms/2019-01-06/2019-01-10/all')
+    view = get_report('boxes_and_forms', '2019-01-06', '2019-01-10')
     assert "4444" not in view
     assert "5555" not in view
     assert "6666" not in view
@@ -72,12 +82,12 @@ def test_views_report(client):
     assert "8888" in view
 
     # Forms
-    view = client.get('/report/forms/2019-01-01/2019-01-05/all/Adlikon')
+    view = get_report('forms', '2019-01-01', '2019-01-05')
     assert "4444" in view
     assert "5555" in view
     assert "6666" in view
 
-    view = client.get('/report/forms/2019-01-06/2019-01-10/all/Adlikon')
+    view = get_report('forms', '2019-01-06', '2019-01-10')
     assert "4444" not in view
     assert "5555" not in view
     assert "6666" not in view
