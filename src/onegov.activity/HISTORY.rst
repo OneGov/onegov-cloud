@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds the ability to define needs for occasions.
+  [href]
+
 1.13.0 (2019-02-16)
 ~~~~~~~~~~~~~~~~~~~
 

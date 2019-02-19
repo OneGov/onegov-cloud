@@ -116,6 +116,14 @@ class Occasion(Base, TimestampMixin):
         viewonly=True
     )
 
+    #: The needs associated with this occasion
+    needs = relationship(
+        'OccasionNeed',
+        cascade='all,delete',
+        order_by='OccasionNeed.name',
+        backref='occasion',
+    )
+
     def on_date_change(self):
         """ Date changes are not properly propagated to the observer for
         some reason, so we do this manually with a hook.

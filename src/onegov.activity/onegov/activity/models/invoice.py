@@ -1,18 +1,19 @@
-from onegov.activity.models.period import Period
 from onegov.activity.models.invoice_item import InvoiceItem, SCALE
+from onegov.activity.models.period import Period
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from onegov.user import User
 from onegov.pay import Price
+from onegov.user import User
 from sqlalchemy import and_
-from sqlalchemy import select
-from sqlalchemy import func
 from sqlalchemy import Column
-from sqlalchemy import Text
 from sqlalchemy import ForeignKey
+from sqlalchemy import func
+from sqlalchemy import select
+from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import deferred, object_session, relationship
+from sqlalchemy.schema import FetchedValue
 from uuid import uuid4
 
 
@@ -33,7 +34,7 @@ class Invoice(Base, TimestampMixin):
     user = relationship(User, backref='invoices')
 
     #: deprecated reference field -> remove in Feriennet 1.6
-    code = deferred(Column(Text, nullable=True))
+    code = deferred(Column(Text, FetchedValue(), nullable=True))
 
     #: the specific items linked with this invoice
     items = relationship(InvoiceItem, backref='invoice')

@@ -11,6 +11,7 @@ from onegov.activity.models import (
     InvoiceReference,
     Occasion,
     OccasionDate,
+    OccasionNeed,
     Period,
     PublicationRequest
 )
@@ -36,6 +37,7 @@ __all__ = [
     'InvoiceReference',
     'Occasion',
     'OccasionDate',
+    'OccasionNeed',
     'Period',
     'ActivityCollection',
     'AttendeeCollection',
