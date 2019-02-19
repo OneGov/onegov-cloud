@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.5.3 (2019-02-19)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to click on activity thumbnails.
   [href]
