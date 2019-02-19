@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-02-16 14:53+0100\n"
+"POT-Creation-Date: 2019-02-19 09:38+0100\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -86,7 +86,7 @@ msgid "Notification Templates"
 msgstr "Mitteilungs-Vorlagen"
 
 msgid "Group"
-msgstr ""
+msgstr "Gruppe"
 
 msgid "Accounting"
 msgstr "Buchhaltung"
@@ -327,6 +327,27 @@ msgstr "Ja, Fakturierung abschliessen"
 
 msgid "For users with tags"
 msgstr "Für Benutzer einer bestimmten Kategorie"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Chaperones, Cars, Meals"
+msgstr "Begleitpersonen, Fahrzeuge, Verpflegung"
+
+msgid "Description"
+msgstr "Beschreibung"
+
+msgid "Need at least"
+msgstr "Benötige mindestens"
+
+msgid "Need up to"
+msgstr "Benötige bis zu"
+
+msgid "Minimum is larger than maximum"
+msgstr "Das Minimum ist grösser als das Maximum"
+
+msgid "This name has already been used for this occasion"
+msgstr "Dieser Name wurde bereits für diese Durchführung verwendet"
 
 msgid "Period"
 msgstr "Zeitraum"
@@ -876,6 +897,12 @@ msgstr "Durchführungen"
 msgid "Exports activities with an occasion in the given period."
 msgstr "Exportiert Angebote mit Durchführungen im gewählten Zeitraum."
 
+msgid "Needs"
+msgstr "Bedarf"
+
+msgid "Exports occasion needs."
+msgstr "Exportiert den Bedarf von Durchführungen."
+
 msgid "Invoice Items"
 msgstr "Rechungspositionen"
 
@@ -959,6 +986,15 @@ msgstr "Durchführung Treffpunkt"
 
 msgid "Occasion May Overlap"
 msgstr "Durchführung darf überlappen"
+
+msgid "Need Number"
+msgstr "Bedarf Anzahl"
+
+msgid "Need Name"
+msgstr "Bedarf Name"
+
+msgid "Need Description"
+msgstr "Bedarf Beschreibung"
 
 msgid "User Login"
 msgstr "Benutzer Login"
@@ -1306,6 +1342,21 @@ msgstr "Unabhängig von anderen Durchführungen"
 msgid "Please bring ${cost} CHF in cash."
 msgstr "Bitte CHF ${cost} dem Veranstalter vor Ort bezahlen."
 
+msgid "Enter a need"
+msgstr "Bedarf erfassen"
+
+msgid "Keep track of required resources by adding needs."
+msgstr "Behalten Sie die Übersicht über benötigte Ressourcen indem Sie Bedarf erfassen."
+
+msgid "Do you really want to delete this need?"
+msgstr "Möchten Sie diesen Bedarf wirklich löschen?"
+
+msgid "Delete need"
+msgstr "Bedarf löschen"
+
+msgid "Delete"
+msgstr "Löschen"
+
 msgid "Enroll your child now."
 msgstr "Melden Sie Ihr Kind jetzt an."
 
@@ -1473,9 +1524,6 @@ msgstr "Bank-Überweisung"
 msgid "Notice"
 msgstr "Mitteilung"
 
-msgid "Name"
-msgstr "Name"
-
 msgid "State"
 msgstr "Status"
 
@@ -1621,6 +1669,9 @@ msgstr "E-Mail:"
 
 msgid "Place:"
 msgstr "Ort:"
+
+msgid "Group:"
+msgstr "Gruppe:"
 
 msgid "Your activity has been published:"
 msgstr "Ihr Angebot wurde veröffentlicht:"
@@ -1893,8 +1944,14 @@ msgstr ""
 msgid "Edit Occasion"
 msgstr "Durchführung bearbeiten"
 
+msgid "New need"
+msgstr "Neuer Bedarf"
+
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
+
+msgid "Edit need"
+msgstr "Bedarf bearbeiten"
 
 #, python-format
 msgid "The booking for ${name} was succesfull"
@@ -1929,10 +1986,10 @@ msgid "The booking does not exist"
 msgstr "Diese Buchung existiert nicht"
 
 msgid "Not permitted to join this attendee to the group"
-msgstr ""
+msgstr "Keine Berechtigung um diesen Teilnehmer zu der Gruppe hinzuzufügen"
 
 msgid "Not permitted to evict this attendee from the group"
-msgstr ""
+msgstr "Keine Berechtigung um diesen Teilnehmer von der Gruppe zu entfernen"
 
 msgid "Only admins may cancel bookings at this point"
 msgstr ""
@@ -2079,9 +2136,6 @@ msgstr "Vorherige Teilnehmer müssen sich neu anmelden"
 
 msgid "Reinstate Occasion"
 msgstr "Durchführung reaktivieren"
-
-msgid "Delete"
-msgstr "Löschen"
 
 #, python-format
 msgid "Do you really want to rescind \"${title}\"?"
@@ -2335,53 +2389,3 @@ msgstr "Möchten Sie ${attendee}s Buchung wirklich löschen?"
 #, python-format
 msgid "Do you really want to cancel ${attendee}'s booking?"
 msgstr "Möchten Sie ${attendee}s Buchung wirklich stornieren?"
-
-#~ msgid "Invite"
-#~ msgstr "Einladung"
-
-#~ msgid "Current Members"
-#~ msgstr "Aktuelle Mitglieder"
-
-#~ msgid "The attendee already has a booking for this activity"
-#~ msgstr ""
-#~ "Der Teilnehmer hat bereits eine andere Durchführung dieses Angebots "
-#~ "gebucht"
-
-#~ msgid "Only admins may cancel confirmed bookings"
-#~ msgstr "Nur Administratoren können bestätigte Buchungen absagen"
-
-#~ msgid "With reference number (ESR)"
-#~ msgstr "Mit Referenznummer (ESR)"
-
-#~ msgid "Dear Sir or Madam,"
-#~ msgstr "Sehr geehrte Damen und Herren,"
-
-#~ msgid "The ticket number is"
-#~ msgstr "Die Ticket Nummer ist"
-
-#~ msgid "Feriennet Settings"
-#~ msgstr "Feriennet Einstellungen"
-
-#~ msgid "Settings"
-#~ msgstr "Einstellungen"
-
-#~ msgid "Edit contact info"
-#~ msgstr "Kontakt ändern"
-
-#~ msgid "Print All"
-#~ msgstr "Alle drucken"
-
-#~ msgid "Edit Activity"
-#~ msgstr "Angebot bearbeiten"
-
-#~ msgid "The period was successfully reset"
-#~ msgstr "Der Zeitraum wurde erfolgreich zurückgesetzt"
-
-#~ msgid "Remove manual bookings of this kind"
-#~ msgstr "Manuelle Buchungen dieser Art entfernen"
-
-#~ msgid "Rebate"
-#~ msgstr "Rabatt"
-
-#~ msgid "Description"
-#~ msgstr "Beschreibung"

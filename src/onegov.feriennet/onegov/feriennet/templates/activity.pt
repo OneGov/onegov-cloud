@@ -56,7 +56,7 @@
                             <ul class="occasions">
                                 <li tal:repeat="occasion occasions">
                                     <h4><tal:b>${repeat.occasion.number}.</tal:b> <tal:b i18n:translate>Occasion</tal:b></h4>
-                                    <tal:b metal:use-macro="layout.macros.occasion" tal:define="show_links True; show_enroll show_enroll(occasion)" />
+                                    <tal:b metal:use-macro="layout.macros.occasion" tal:define="show_links True; show_enroll show_enroll(occasion); show_needs request.is_admin" />
                                 </li>
                             </ul>
                         </div>

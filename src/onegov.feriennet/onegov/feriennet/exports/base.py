@@ -20,6 +20,9 @@ def remove_duplicate_spaces(text):
 
 
 def html_to_text(html):
+    if not html:
+        return ''
+
     return remove_duplicate_spaces(mail.html_to_text(
         unescape(html),
         ul_item_mark='•',
@@ -78,6 +81,12 @@ class FeriennetExport(Export):
         yield _("Occasion Cost"), cost
         yield _("Occasion Meeting Point"), occasion.meeting_point
         yield _("Occasion May Overlap"), occasion.exclude_from_overlap_check
+
+    def occasion_need_fields(self, need):
+        yield _("Need Number"), '{} - {}'.format(
+            need.number.lower, need.number.upper - 1)
+        yield _("Need Name"), need.name
+        yield _("Need Description"), need.description
 
     def user_fields(self, user):
         user_data = user.data or {}

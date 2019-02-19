@@ -1,11 +1,13 @@
 from onegov.activity import AttendeeCollection
 from onegov.activity import Booking, BookingCollection
-from onegov.activity import Occasion, OccasionCollection
+from onegov.activity import Occasion, OccasionCollection, OccasionNeed
 from onegov.activity import PeriodCollection
 from onegov.core.security import Private, Personal, Public
 from onegov.feriennet import _
 from onegov.feriennet import FeriennetApp
-from onegov.feriennet.forms import AttendeeSignupForm, OccasionForm
+from onegov.feriennet.forms import AttendeeSignupForm
+from onegov.feriennet.forms import OccasionForm
+from onegov.feriennet.forms import OccasionNeedForm
 from onegov.feriennet.layout import OccasionFormLayout
 from onegov.feriennet.models import VacationActivity
 from onegov.user import User, UserCollection
@@ -247,3 +249,63 @@ def book_occasion(self, request, form):
         'button_text': _("Enroll"),
         'number': number,
     }
+
+
+@FeriennetApp.form(
+    model=Occasion,
+    permission=Private,
+    form=OccasionNeedForm,
+    template='form.pt',
+    name='add-need')
+def handle_new_occasion_need(self, request, form):
+
+    if form.submitted(request):
+        self.needs.append(OccasionNeed(
+            occasion_id=self.id,
+            name=form.name.data,
+            description=form.description.data,
+            number=form.number
+        ))
+
+        request.success(_("Your changes were saved"))
+        return request.redirect(request.link(self))
+
+    return {
+        'layout': OccasionFormLayout(
+            self.activity, request, _("New need")),
+        'title': _("New need"),
+        'form': form
+    }
+
+
+@FeriennetApp.form(
+    model=OccasionNeed,
+    permission=Private,
+    form=OccasionNeedForm,
+    template='form.pt',
+    name='edit')
+def handle_occasion_need(self, request, form):
+
+    if form.submitted(request):
+        form.populate_obj(self)
+        request.success(_("Your changes were saved"))
+        return request.redirect(request.link(self.occasion))
+
+    elif not request.POST:
+        form.process(obj=self)
+
+    return {
+        'layout': OccasionFormLayout(
+            self.occasion.activity, request, _("Edit need")),
+        'title': self.name,
+        'form': form
+    }
+
+
+@FeriennetApp.view(
+    model=OccasionNeed,
+    permission=Private,
+    request_method='DELETE')
+def delete_occasion_need(self, request):
+    request.assert_valid_csrf_token()
+    request.session.delete(self)

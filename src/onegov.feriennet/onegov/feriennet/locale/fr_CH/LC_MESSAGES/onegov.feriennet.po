@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-02-16 14:53+0100\n"
+"POT-Creation-Date: 2019-02-19 09:38+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -328,6 +328,27 @@ msgstr "Oui, confirmer la facturation"
 
 msgid "For users with tags"
 msgstr "Pour les utilisateurs avec des tags"
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "Chaperones, Cars, Meals"
+msgstr "Chaperons, voitures, repas"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Need at least"
+msgstr "Besoin d'au moins"
+
+msgid "Need up to"
+msgstr "Besoin jusqu'à"
+
+msgid "Minimum is larger than maximum"
+msgstr "Le minimum est plus grand que le maximum"
+
+msgid "This name has already been used for this occasion"
+msgstr "Ce nom a déjà été utilisé pour cette occasion"
 
 msgid "Period"
 msgstr "Période"
@@ -885,6 +906,12 @@ msgstr "Evénements"
 msgid "Exports activities with an occasion in the given period."
 msgstr "Exporte les activités qui ont lieu sur une période définie."
 
+msgid "Needs"
+msgstr "Besoins"
+
+msgid "Exports occasion needs."
+msgstr "Les exportations génèrent des besoins."
+
 msgid "Invoice Items"
 msgstr "Éléments de la facture"
 
@@ -969,6 +996,15 @@ msgstr "Lieu de rendez-vous pour l'activité"
 
 msgid "Occasion May Overlap"
 msgstr "L'événement peut se prolonger"
+
+msgid "Need Number"
+msgstr "Numéro de besoin"
+
+msgid "Need Name"
+msgstr "Nom du besoin "
+
+msgid "Need Description"
+msgstr "Description du besoin"
 
 msgid "User Login"
 msgstr "Identifiant de l'utilisateur"
@@ -1317,6 +1353,21 @@ msgstr "Indépendant d'autres événements"
 msgid "Please bring ${cost} CHF in cash."
 msgstr "Veuillez apporter ${cost} CHF en liquide."
 
+msgid "Enter a need"
+msgstr "Entrez un besoin"
+
+msgid "Keep track of required resources by adding needs."
+msgstr "Gardez une trace des ressources requises en ajoutant des besoins."
+
+msgid "Do you really want to delete this need?"
+msgstr "Voulez-vous vraiment supprimer ce besoin ?"
+
+msgid "Delete need"
+msgstr "Supprimer le besoin"
+
+msgid "Delete"
+msgstr "Supprimer"
+
 msgid "Enroll your child now."
 msgstr "Inscrivez votre enfant dès maintenant."
 
@@ -1490,9 +1541,6 @@ msgstr "Virement bancaire"
 msgid "Notice"
 msgstr "Notification"
 
-msgid "Name"
-msgstr "Nom"
-
 msgid "State"
 msgstr "Etat"
 
@@ -1640,6 +1688,9 @@ msgstr "E-Mail:"
 
 msgid "Place:"
 msgstr "Lieu:"
+
+msgid "Group:"
+msgstr "Groupe :"
 
 msgid "Your activity has been published:"
 msgstr "Votre offre a été publiée :"
@@ -1919,8 +1970,14 @@ msgstr ""
 msgid "Edit Occasion"
 msgstr "Modifier l'événement"
 
+msgid "New need"
+msgstr "Nouveau besoin"
+
 msgid "Your changes were saved"
 msgstr "Vos modifications ont été enregistrées"
+
+msgid "Edit need"
+msgstr "Modifier le besoin"
 
 #, python-format
 msgid "The booking for ${name} was succesfull"
@@ -2107,9 +2164,6 @@ msgstr "Les participants précédents doivent s'inscrire à nouveau"
 
 msgid "Reinstate Occasion"
 msgstr "Réactiver l'événement"
-
-msgid "Delete"
-msgstr "Supprimer"
 
 #, python-format
 msgid "Do you really want to rescind \"${title}\"?"

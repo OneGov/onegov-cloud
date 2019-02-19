@@ -2,7 +2,7 @@ from onegov.activity import ActivityFilter
 from onegov.activity import Attendee, AttendeeCollection
 from onegov.activity import Booking, BookingCollection
 from onegov.activity import InvoiceCollection, InvoiceItem
-from onegov.activity import Occasion, OccasionCollection
+from onegov.activity import Occasion, OccasionCollection, OccasionNeed
 from onegov.activity import Period, PeriodCollection
 from onegov.activity.utils import is_valid_group_code
 from onegov.feriennet import FeriennetApp
@@ -247,3 +247,11 @@ def get_group_invite(app, request, group_code):
 
     invite = GroupInvite(request.session, group_code)
     return invite.exists and invite or None
+
+
+@FeriennetApp.path(
+    model=OccasionNeed,
+    path='/occasion-need/{id}',
+    converters=dict(id=UUID))
+def get_occasion_need(request, id):
+    return request.session.query(OccasionNeed).filter_by(id=id).first()

@@ -1,6 +1,9 @@
 from cached_property import cached_property
 from onegov.activity import Activity, PeriodCollection, Occasion
 from onegov.activity import BookingCollection
+from onegov.core.elements import Link, Confirm, Intercooler, Block
+from onegov.core.elements import LinkGroup
+from onegov.core.utils import linkify, paragraphify
 from onegov.feriennet import _
 from onegov.feriennet import security
 from onegov.feriennet.collections import BillingCollection
@@ -9,8 +12,6 @@ from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.const import OWNER_EDITABLE_STATES
 from onegov.feriennet.models import InvoiceAction, VacationActivity
-from onegov.core.elements import Link, Confirm, Intercooler, Block
-from onegov.core.elements import LinkGroup
 from onegov.org.layout import DefaultLayout as BaseLayout
 from onegov.pay import PaymentProviderCollection
 from onegov.ticket import TicketCollection
@@ -65,6 +66,12 @@ class DefaultLayout(BaseLayout):
             ),
             attrs={'class': 'offer-again'}
         )
+
+    def linkify(self, text):
+        return linkify(text)
+
+    def paragraphify(self, text):
+        return paragraphify(text)
 
 
 class VacationActivityCollectionLayout(DefaultLayout):

@@ -1987,3 +1987,102 @@ def test_group_codes(client, scenario):
 
     assert b3.attendee.name == 'Qux'
     assert b3.state == 'accepted'
+
+
+def test_needs(client, scenario):
+    scenario.add_period(title="2019", confirmed=False)
+    scenario.add_activity(title="Fishing", state='accepted')
+    scenario.add_occasion(spots=(0, 2), age=(0, 99999))
+    scenario.commit()
+
+    assert "Bedarf" not in client.get('/activity/fishing')
+
+    client.login_admin()
+    page = client.get('/activity/fishing')
+
+    assert "Bedarf" in page
+    assert "Behalten Sie die Übersicht" in page
+
+    page = page.click("Bedarf erfassen")
+    page.form['name'] = "Chaperones"
+    page.form['description'] = "Watch children for their own safety"
+    page.form['min_number'] = 5
+    page.form['max_number'] = 10
+    page = page.form.submit().follow().follow()
+
+    assert "Bedarf" in page
+    assert "Behalten Sie die Übersicht" not in page
+    assert "Chaperones" in page
+    assert "5 - 10" in page
+    assert "Watch children for their own safety" in page
+
+    page = page.click("Bearbeiten", index=2)
+    page.form['description'] = ""
+    page = page.form.submit().follow().follow()
+
+    assert "Chaperones" in page
+    assert "Watch children for their own safety" not in page
+
+    page = client.get('/export/bedarf')
+    page.form['file_format'] = 'json'
+    data = page.form.submit().json
+
+    assert data[0]['Bedarf Anzahl'] == '5 - 10'
+    assert data[0]['Bedarf Name'] == 'Chaperones'
+
+    page = client.get('/activity/fishing')
+    page = page.click("Löschen", index=1)
+
+    page = client.get('/activity/fishing')
+    assert "Chaperones" not in page
+    assert "Behalten Sie die Übersicht" in page
+
+    page = client.get('/export/bedarf')
+    page.form['file_format'] = 'json'
+    data = page.form.submit().json
+
+    assert data == []
+
+
+def test_needs_export_by_period(client, scenario):
+    scenario.add_activity(title="Fishing", state='accepted')
+
+    scenario.add_period(title="2018", confirmed=False, active=False)
+    scenario.add_occasion(spots=(0, 2), age=(0, 99999))
+
+    scenario.add_period(title="2019", confirmed=False, active=False)
+    scenario.add_occasion(spots=(0, 2), age=(0, 99999))
+
+    scenario.commit()
+
+    client.login_admin()
+
+    page = client.get('/activity/fishing').click("Bedarf erfassen", index=0)
+    page.form['name'] = "Foo"
+    page.form['min_number'] = 1
+    page.form['max_number'] = 1
+    page.form.submit().follow()
+
+    page = client.get('/activity/fishing').click("Bedarf erfassen", index=1)
+    page.form['name'] = "Foo"
+    page.form['min_number'] = 2
+    page.form['max_number'] = 2
+    page.form.submit().follow()
+
+    scenario.refresh()
+
+    page = client.get('/export/bedarf')
+    page.form['period'] = scenario.periods[0].id.hex
+    page.form['file_format'] = 'json'
+    one = page.form.submit().json
+
+    page = client.get('/export/bedarf')
+    page.form['period'] = scenario.periods[1].id.hex
+    page.form['file_format'] = 'json'
+    two = page.form.submit().json
+
+    assert len(one) == 1
+    assert len(two) == 1
+
+    assert one[0]['Bedarf Anzahl'] == '1 - 1'
+    assert two[0]['Bedarf Anzahl'] == '2 - 2'

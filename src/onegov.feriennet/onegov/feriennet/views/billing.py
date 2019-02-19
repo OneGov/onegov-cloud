@@ -215,9 +215,8 @@ def reset_billing(self, request):
     invoice = self.period.id.hex
     session = request.session
 
-    for item in self.invoice_items.query():
-        assert item.invoice == invoice
-        session.delete(item)
+    for invoice in self.invoices.query():
+        session.delete(invoice)
 
     request.success(_("The billing was successfully reset"))
 

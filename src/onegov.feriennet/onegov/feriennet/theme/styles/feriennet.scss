@@ -150,8 +150,8 @@ ul.single-line {
 */
 @mixin group-code {
     background: $yellow-pastel;
-    border-radius: 2px;
     border: 1px solid $yellow-light;
+    border-radius: 2px;
     font-family: $font-family-monospace;
     padding: 0 4px;
 }
@@ -516,7 +516,7 @@ ul.tags {
     h4 {
         font-size: 1.2rem;
         font-weight: bold;
-        margin: 0 0 .5rem;
+        margin: 0 0 1rem;
     }
 
     h3 {
@@ -693,7 +693,9 @@ ul.tags {
         }
 
         @media #{$small-only} {
-            width: 40%;
+            float: none;
+            margin-top: 1rem;
+            width: 100%;
         }
     }
 }
@@ -2463,5 +2465,123 @@ $booking-left-margin: 2rem;
         color: $charcoal;
         font-size: 1rem;
         text-transform: uppercase;
+    }
+}
+
+/*
+    Occasion Needs
+*/
+.occasion-needs {
+    $gray: $silver;
+    $grayer: $gainsboro;
+    $grayest: $steel;
+
+    margin: 1.25rem 0 1.75rem;
+    position: relative;
+
+    .need-info span {
+        font-style: italic;
+    }
+
+    .need-info .fa {
+        margin-left: .1rem;
+        margin-right: .4rem;
+    }
+
+    .need-add {
+        color: $grayest;
+        display: block;
+        font-size: .8rem;
+        font-style: normal;
+        font-weight: bold;
+        margin-top: .75rem;
+        padding-bottom: .75rem;
+        padding-right: 1.25rem;
+        position: absolute;
+        right: 0;
+        text-align: right;
+        top: -.75rem;
+    }
+
+    h5 {
+        border-bottom: 1px solid $gray;
+        padding-bottom: .5rem;
+    }
+
+    > ul {
+        font-size: .8rem;
+        margin: 0;
+        padding: 0 1.25rem 0 .75rem;
+
+        li {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 1rem 0 0;
+
+            &:hover {
+                background: $gray;
+                outline: .5rem solid $gray;
+            }
+        }
+    }
+
+    .need-number {
+        background: $gray;
+        border: 1px solid $grayer;
+        border-radius: 2px;
+        flex: 1 0 8ex;
+        text-align: center;
+    }
+
+    .need-name {
+        flex: 1 0 calc(70% - 10ex);
+        font-weight: bold;
+        margin-left: 2ex;
+    }
+
+    .need-description {
+        flex: 1 0 100%;
+        margin-left: 10ex;
+
+        p,
+        p * {
+            font-size: .8rem !important;
+            font-style: normal;
+            margin-bottom: 0 !important;
+        }
+    }
+
+    .need-actions {
+        flex: 1 0 30%;
+        text-align: right;
+
+        a {
+            font-size: .8rem;
+        }
+    }
+
+    .need-description p:last-child {
+        margin-bottom: 0;
+    }
+
+    @media #{$small-only} {
+        .need-name {
+            flex: 1 0 calc(100% - 10ex);
+        }
+
+        .need-actions {
+            flex: 1 0 100%;
+            margin-top: .5rem;
+            text-align: left;
+
+            a::before {
+                content: '';
+            }
+        }
+
+        .need-description {
+            margin-left: 0;
+            margin-top: .5rem;
+        }
     }
 }

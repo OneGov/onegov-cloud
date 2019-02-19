@@ -266,6 +266,7 @@
     <div class="occasion" tal:define="
         show_enroll show_enroll|nothing;
         show_links show_links|nothing;
+        show_needs show_needs|nothing;
         period occasion.period;
         wrap_occasion_link wrap_occasion_link|lambda url: url">
 
@@ -374,6 +375,39 @@
                     </div>
                 </tal:b>
             </tal:b>
+        </div>
+
+        <div class="occasion-needs" tal:condition="show_needs">
+            <h5 i18n:translate>Needs</h5>
+
+            <div class="need-add">
+                <a href="${request.link(occasion, 'add-need')}" i18n:translate>Enter a need</a>
+            </div>
+
+            <div tal:condition="not:occasion.needs" class="need-info">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                <span i18n:translate>Keep track of required resources by adding needs.</span>
+            </div>
+
+            <ul tal:condition="occasion.needs">
+                <li tal:repeat="need occasion.needs">
+                    <span class="need-number">
+                        ${need.number.lower} - ${need.number.upper - 1}
+                    </span>
+                    <span class="need-name">
+                        ${need.name}
+                    </span>
+                    <span class="need-actions text-links" tal:condition="request.is_admin">
+                        <a href="${request.link(need, 'edit')}" i18n:translate>Edit</a>
+                        <a class="confirm" data-confirm="Do you really want to delete this need?" data-confirm-yes="Delete need" data-confirm-no="Cancel" ic-delete-from="${layout.csrf_protected_url(request.link(need))}" ic-verb="DELETE" redirect-after="${request.link(occasion)}" i18n:translate i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no">
+                            Delete
+                        </a>
+                    </span>
+                    <span class="need-description">
+                        <tal:b replace="structure layout.paragraphify(layout.linkify(need.description))" />
+                    </span>
+                </li>
+            </ul>
         </div>
 
         <div class="call-to-action" tal:condition="show_enroll">
