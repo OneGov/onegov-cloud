@@ -1,6 +1,6 @@
 from datetime import date
 from onegov.user import UserGroup
-from onegov.wtfs.models import DailyList
+from onegov.wtfs.models import DailyListBoxes
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import PickupDate
 from onegov.wtfs.models import Principal
@@ -208,20 +208,20 @@ def add_report_data(session):
 
 
 def test_daily_list(session):
-    daily_list = DailyList(session, date_=date.today())
+    daily_list = DailyListBoxes(session, date_=date.today())
     assert daily_list.query.all() == []
     assert daily_list.total == (0, 0, 0, 0)
 
     add_report_data(session)
 
-    daily_list = DailyList(session, date_=date(2019, 1, 1))
+    daily_list = DailyListBoxes(session, date_=date(2019, 1, 1))
     assert daily_list.query.all() == [
         ('Adlikon', 1, 2, 3, 0),
         ('Aesch', 1, 2, 3, 0)
     ]
     assert daily_list.total == (2, 4, 6, 0)
 
-    daily_list = DailyList(session, date_=date(2019, 1, 2))
+    daily_list = DailyListBoxes(session, date_=date(2019, 1, 2))
     assert daily_list.query.all() == [
         ('Adlikon', 3, 2, 1, 4),
         ('Aesch', 0, 0, 0, 4),
@@ -230,21 +230,21 @@ def test_daily_list(session):
     ]
     assert daily_list.total == (5, 6, 7, 12)
 
-    daily_list = DailyList(session, date_=date(2019, 1, 3))
+    daily_list = DailyListBoxes(session, date_=date(2019, 1, 3))
     assert daily_list.query.all() == [
         ('Adlikon', 0, 0, 0, 1),
         ('Aesch', 0, 10, 0, 0)
     ]
     assert daily_list.total == (0, 10, 0, 1)
 
-    daily_list = DailyList(session, date_=date(2019, 1, 4))
+    daily_list = DailyListBoxes(session, date_=date(2019, 1, 4))
     assert daily_list.query.all() == [
         ('Aesch', 0, 0, 0, 0),
         ('Andelfingen', 0, 0, 0, 4)
     ]
     assert daily_list.total == (0, 0, 0, 4)
 
-    daily_list = DailyList(session, date_=date(2019, 1, 5))
+    daily_list = DailyListBoxes(session, date_=date(2019, 1, 5))
     assert daily_list.query.all() == []
     assert daily_list.total == (0, 0, 0, 0)
 

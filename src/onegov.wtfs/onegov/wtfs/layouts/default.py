@@ -36,7 +36,7 @@ class DefaultLayout(ChameleonLayout):
         result = []
         if has_permission(ScanJobCollection(session), ViewModel):
             result.append(Link(_("Scan jobs"), self.scan_jobs_url))
-        if has_permission(DailyList(session), ViewModel):
+        if has_permission(DailyList(), ViewModel):
             result.append(Link(_("Daily list"), self.daily_list_url))
         if has_permission(Report(session), ViewModel):
             result.append(Link(_("Report"), self.report_url))
@@ -103,7 +103,7 @@ class DefaultLayout(ChameleonLayout):
 
     @cached_property
     def daily_list_url(self):
-        return self.request.link(DailyList(self.request.session))
+        return self.request.link(DailyList())
 
     @cached_property
     def report_url(self):

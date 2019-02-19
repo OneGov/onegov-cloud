@@ -1,3 +1,4 @@
+from onegov.wtfs.layouts.daily_list import DailyListBoxesLayout
 from onegov.wtfs.layouts.daily_list import DailyListLayout
 from onegov.wtfs.layouts.default import DefaultLayout
 from onegov.wtfs.layouts.mail import MailLayout
@@ -30,6 +31,7 @@ __all__ = (
     'AddScanJobLayout',
     'AddUserGroupLayout',
     'AddUserLayout',
+    'DailyListBoxesLayout',
     'DailyListLayout',
     'DefaultLayout',
     'DeleteMunicipalityDatesLayout',

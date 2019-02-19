@@ -8,6 +8,7 @@ from onegov.user import UserGroupCollection
 from onegov.wtfs.collections import MunicipalityCollection
 from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.models import DailyList
+from onegov.wtfs.models import DailyListBoxes
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import PickupDate
 from onegov.wtfs.models import Report
@@ -396,31 +397,31 @@ def test_permissions(wtfs_app, wtfs_password):
         assert permits(user, model, ViewModel)
 
     # DailyList
-    model = DailyList(session)
-    for user in (admin, admin_a, admin_b):
-        assert permits(user, model, Public)
-        assert permits(user, model, AddModel)
-        assert permits(user, model, AddModelUnrestricted)
-        assert permits(user, model, EditModel)
-        assert permits(user, model, EditModelUnrestricted)
-        assert permits(user, model, DeleteModel)
-        assert permits(user, model, ViewModel)
-    for user in (editor, editor_a, editor_b, member_a, member_b):
-        assert permits(user, model, Public)
-        assert not permits(user, model, AddModel)
-        assert not permits(user, model, AddModelUnrestricted)
-        assert not permits(user, model, EditModel)
-        assert not permits(user, model, EditModelUnrestricted)
-        assert not permits(user, model, DeleteModel)
-        assert not permits(user, model, ViewModel)
-    for user in (member,):
-        assert permits(user, model, Public)
-        assert not permits(user, model, AddModel)
-        assert not permits(user, model, AddModelUnrestricted)
-        assert not permits(user, model, EditModel)
-        assert not permits(user, model, EditModelUnrestricted)
-        assert not permits(user, model, DeleteModel)
-        assert permits(user, model, ViewModel)
+    for model in (DailyList(), DailyListBoxes(session)):
+        for user in (admin, admin_a, admin_b):
+            assert permits(user, model, Public)
+            assert permits(user, model, AddModel)
+            assert permits(user, model, AddModelUnrestricted)
+            assert permits(user, model, EditModel)
+            assert permits(user, model, EditModelUnrestricted)
+            assert permits(user, model, DeleteModel)
+            assert permits(user, model, ViewModel)
+        for user in (editor, editor_a, editor_b, member_a, member_b):
+            assert permits(user, model, Public)
+            assert not permits(user, model, AddModel)
+            assert not permits(user, model, AddModelUnrestricted)
+            assert not permits(user, model, EditModel)
+            assert not permits(user, model, EditModelUnrestricted)
+            assert not permits(user, model, DeleteModel)
+            assert not permits(user, model, ViewModel)
+        for user in (member,):
+            assert permits(user, model, Public)
+            assert not permits(user, model, AddModel)
+            assert not permits(user, model, AddModelUnrestricted)
+            assert not permits(user, model, EditModel)
+            assert not permits(user, model, EditModelUnrestricted)
+            assert not permits(user, model, DeleteModel)
+            assert permits(user, model, ViewModel)
 
     # Report
     for model in (

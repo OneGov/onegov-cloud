@@ -8,6 +8,7 @@ from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
 from onegov.wtfs.collections import MunicipalityCollection
 from onegov.wtfs.forms import AddScanJobForm
+from onegov.wtfs.forms import DailyListSelectionForm
 from onegov.wtfs.forms import DeleteMunicipalityDatesForm
 from onegov.wtfs.forms import EditScanJobForm
 from onegov.wtfs.forms import ImportMunicipalityDataForm
@@ -883,6 +884,18 @@ def test_unrestricted_edit_scan_job_form(session):
         }))
         form.request = Request(session, groupid=group_1.id.hex)
         form.on_request()
+
+
+def test_daily_list_selection_form(session):
+    form = DailyListSelectionForm()
+    form.request = Request(session)
+
+    # Test get model
+    form.date.data = date(2019, 1, 1)
+    form.type.data = 'boxes'
+    model = form.get_model()
+    assert model.__class__.__name__ == 'DailyListBoxes'
+    assert model.date == date(2019, 1, 1)
 
 
 def test_report_selection_form(session):

@@ -8,6 +8,7 @@ from onegov.wtfs.app import WtfsApp
 from onegov.wtfs.collections import MunicipalityCollection
 from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.models import DailyList
+from onegov.wtfs.models import DailyListBoxes
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import Principal
 from onegov.wtfs.models import Report
@@ -99,13 +100,21 @@ def get_scan_job(request, id):
 
 @WtfsApp.path(
     model=DailyList,
+    path='/daily-list',
+)
+def get_daily_list(request):
+    return DailyList()
+
+
+@WtfsApp.path(
+    model=DailyListBoxes,
     path='/daily-list/boxes/{date}',
     converters=dict(
         date=extended_date_converter,
     )
 )
-def get_daily_list(request, date):
-    return DailyList(request.session, date)
+def get_daily_list_boxes(request, date):
+    return DailyListBoxes(request.session, date)
 
 
 @WtfsApp.path(
