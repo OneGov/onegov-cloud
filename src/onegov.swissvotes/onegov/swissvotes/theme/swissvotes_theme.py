@@ -19,6 +19,7 @@ class SwissvotesTheme(BaseTheme):
             'form',
             'table',
             'alert',
+            'dropzone',
             'swissvotes'
         ]
 

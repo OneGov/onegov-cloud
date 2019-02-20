@@ -1,0 +1,76 @@
+/*
+    dropzone styling
+*/
+.dropzone {
+    background-color: $topbar-bg-color;
+    border: 1px dashed $primary-color;
+    margin-bottom: 1rem;
+    padding: 1rem;
+
+    .dz-message {
+        margin-bottom: 1em;
+    }
+
+    .dz-preview {
+        float: left;
+        margin-right: 1rem;
+    }
+
+    .dz-success-mark,
+    .dz-error-mark {
+        display: none;
+    }
+
+    .dz-progress {
+        display: block;
+        height: 5px;
+        width: 100%;
+
+        > span {
+            background-color: $info-color;
+            display: block;
+            height: 5px;
+        }
+    }
+
+    .dz-success {
+        .dz-progress span {
+            background-color: $success-color;
+        }
+
+        .dz-size::after {
+            content: ' \f00c';
+            font-family: 'FontAwesome';
+        }
+    }
+
+    .dz-error {
+        .dz-progress span {
+            background-color: $alert-color;
+        }
+
+        .dz-size::after {
+            content: ' \f071';
+            font-family: 'FontAwesome';
+        }
+    }
+
+    .dz-error-message {
+        color: $steel;
+        font-size: rem-calc(12);
+        margin: 1em 0;
+    }
+
+    .dz-filename {
+        font-size: rem-calc(12);
+        margin-bottom: .5em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 125px;
+    }
+
+    > div:last-child {
+        margin-bottom: 0;
+    }
+}

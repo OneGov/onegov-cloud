@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Allows to add attachments to pages.
+  [msom]
+
 0.0.32 (2019-02-19)
 ~~~~~~~~~~~~~~~~~~~
 

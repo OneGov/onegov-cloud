@@ -22,6 +22,13 @@ class PageLayout(DefaultLayout):
                     attrs={'class': 'edit-icon'}
                 )
             )
+            result.append(
+                Link(
+                    text=_("Manage attachments"),
+                    url=self.request.link(self.model, name='attachments'),
+                    attrs={'class': 'upload-icon'}
+                )
+            )
             if self.model.id not in self.app.static_content_pages:
                 result.append(
                     Link(
@@ -95,5 +102,35 @@ class DeletePageLayout(DefaultLayout):
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(self.model.title, self.request.link(self.model)),
+            Link(self.title, '#'),
+        ]
+
+
+class PageAttachmentsLayout(DefaultLayout):
+
+    @cached_property
+    def title(self):
+        return _("Manage attachments")
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(self.model.title, self.request.link(self.model)),
+            Link(self.title, '#'),
+        ]
+
+
+class DeletePageAttachmentLayout(DefaultLayout):
+
+    @cached_property
+    def title(self):
+        return _("Delete attachment")
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(self.model.filename, self.request.link(self.model)),
             Link(self.title, '#'),
         ]

@@ -181,8 +181,16 @@ h2 small {
 /*
     Content pages
 */
-.page-content p {
-    margin-bottom: 0;
+.page-content {
+    p {
+        margin-bottom: 0;
+    }
+
+    ul.attachments {
+        list-style: none;
+        margin-left: 0;
+        margin-top: 2em;
+    }
 }
 
 /*

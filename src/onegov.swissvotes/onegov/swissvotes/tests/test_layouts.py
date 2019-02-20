@@ -1,14 +1,19 @@
 from decimal import Decimal
+from io import BytesIO
+from onegov.core.crypto import random_token
+from onegov.file.utils import as_fileintent
 from onegov.swissvotes import _
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.collections import TranslatablePageCollection
 from onegov.swissvotes.layouts import AddPageLayout
 from onegov.swissvotes.layouts import DefaultLayout
+from onegov.swissvotes.layouts import DeletePageAttachmentLayout
 from onegov.swissvotes.layouts import DeletePageLayout
 from onegov.swissvotes.layouts import DeleteVoteLayout
 from onegov.swissvotes.layouts import DeleteVotesLayout
 from onegov.swissvotes.layouts import EditPageLayout
 from onegov.swissvotes.layouts import MailLayout
+from onegov.swissvotes.layouts import PageAttachmentsLayout
 from onegov.swissvotes.layouts import PageLayout
 from onegov.swissvotes.layouts import UpdateVotesLayout
 from onegov.swissvotes.layouts import UploadVoteAttachemtsLayout
@@ -17,6 +22,7 @@ from onegov.swissvotes.layouts import VotesLayout
 from onegov.swissvotes.layouts import VoteStrengthsLayout
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import TranslatablePage
+from onegov.swissvotes.models import TranslatablePageFile
 
 
 class DummyPrincipal(object):
@@ -219,6 +225,7 @@ def test_layout_page(session):
     layout = PageLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
         'TranslatablePage/edit',
+        'TranslatablePage/attachments',
         'TranslatablePage/delete',
         'TranslatablePageCollection/add'
     ]
@@ -228,6 +235,7 @@ def test_layout_page(session):
     layout = PageLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
         'TranslatablePage/edit',
+        'TranslatablePage/attachments',
         'TranslatablePage/delete',
         'TranslatablePageCollection/add'
     ]
@@ -237,6 +245,7 @@ def test_layout_page(session):
     layout = PageLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
         'TranslatablePage/edit',
+        'TranslatablePage/attachments',
         'TranslatablePageCollection/add'
     ]
 
@@ -310,6 +319,55 @@ def test_layout_delete_page(session):
     # Log in as admin
     request.roles = ['admin']
     layout = DeletePageLayout(model, request)
+    assert layout.editbar_links == []
+
+
+def test_layout_page_attachments(session):
+    request = DummyRequest()
+    model = TranslatablePage(
+        id='page',
+        title_translations={'en_US': "Page", 'de_CH': "Seite"},
+        content_translations={'en_US': "Content", 'de_CH': "Inhalt"}
+    )
+    session.add(model)
+    session.flush()
+
+    layout = PageAttachmentsLayout(model, request)
+    assert layout.title == "Manage attachments"
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/TranslatablePage/#'
+
+    # Log in as editor
+    request.roles = ['editor']
+    layout = EditPageLayout(model, request)
+    assert layout.editbar_links == []
+
+    # Log in as admin
+    request.roles = ['admin']
+    layout = EditPageLayout(model, request)
+    assert layout.editbar_links == []
+
+
+def test_layout_delete_page_attachment(swissvotes_app):
+    request = DummyRequest()
+
+    model = TranslatablePageFile(id=random_token())
+    model.name = 'attachment-name'
+    model.reference = as_fileintent(BytesIO(b'test'), 'filename')
+
+    layout = DeletePageAttachmentLayout(model, request)
+    assert layout.title == "Delete attachment"
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/TranslatablePageFile/#'
+
+    # Log in as editor
+    request.roles = ['editor']
+    layout = DeletePageAttachmentLayout(model, request)
+    assert layout.editbar_links == []
+
+    # Log in as admin
+    request.roles = ['admin']
+    layout = DeletePageAttachmentLayout(model, request)
     assert layout.editbar_links == []
 
 

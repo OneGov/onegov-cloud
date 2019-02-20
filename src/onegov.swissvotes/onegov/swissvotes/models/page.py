@@ -3,13 +3,27 @@ from onegov.core.orm import translation_hybrid
 from onegov.core.orm.abstract import MoveDirection
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE
+from onegov.file import AssociatedFiles
+from onegov.file import File
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy.orm import object_session
 
 
-class TranslatablePage(Base, TimestampMixin):
+class TranslatablePageFile(File):
+    __mapper_args__ = {'polymorphic_identity': 'swissvotes_page'}
+
+    @property
+    def locale(self):
+        return self.name.split('-')[0]
+
+    @property
+    def filename(self):
+        return self.reference.filename
+
+
+class TranslatablePage(Base, TimestampMixin, AssociatedFiles):
     """ A page containing translatable content. """
 
     __tablename__ = 'swissvotes_page'

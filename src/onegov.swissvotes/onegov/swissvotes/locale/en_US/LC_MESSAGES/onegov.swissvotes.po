@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-02-14 13:58+0100\n"
+"POT-Creation-Date: 2019-02-20 08:25+0100\n"
 "PO-Revision-Date: 2018-09-18 15:04+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: English\n"
@@ -1259,6 +1259,9 @@ msgstr "Edit page"
 msgid "Delete page"
 msgstr ""
 
+msgid "Delete attachment"
+msgstr ""
+
 msgid "Homepage"
 msgstr "Homepage"
 
@@ -1294,6 +1297,24 @@ msgstr "Party"
 
 msgid "Others"
 msgstr "Others"
+
+msgid "Attachment"
+msgstr ""
+
+msgid "Actions"
+msgstr ""
+
+msgid "No attachments."
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Drop files to upload"
+msgstr ""
+
+msgid "Upload"
+msgstr ""
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr "The form contains errors. Please check the fields marked in red."
@@ -1492,7 +1513,10 @@ msgstr "Password reset"
 msgid "Do you really want to delete \"${item}\"?"
 msgstr "Do you really want to delete \"${item}\"?"
 
-msgid "Delete"
+msgid "Attachments"
+msgstr ""
+
+msgid "Attachment added."
 msgstr ""
 
 msgid "Page added."
@@ -1502,6 +1526,9 @@ msgid "Page modified."
 msgstr "Page modified."
 
 msgid "Page deleted"
+msgstr ""
+
+msgid "Attachment deleted."
 msgstr ""
 
 msgid "Do you really want to delete all votes?!"

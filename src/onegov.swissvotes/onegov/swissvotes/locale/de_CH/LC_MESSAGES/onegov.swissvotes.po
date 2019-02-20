@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-14 13:58+0100\n"
-"PO-Revision-Date: 2019-02-14 13:58+0100\n"
+"POT-Creation-Date: 2019-02-20 08:25+0100\n"
+"PO-Revision-Date: 2019-02-20 08:26+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -1260,6 +1260,9 @@ msgstr "Seite bearbeiten"
 msgid "Delete page"
 msgstr "Seite löschen"
 
+msgid "Delete attachment"
+msgstr "Anhang löschen"
+
 msgid "Homepage"
 msgstr "Startseite"
 
@@ -1295,6 +1298,24 @@ msgstr "Partei"
 
 msgid "Others"
 msgstr "Übrige"
+
+msgid "Attachment"
+msgstr "Anhang"
+
+msgid "Actions"
+msgstr "Aktionen"
+
+msgid "No attachments."
+msgstr "Keine Anhänge."
+
+msgid "Delete"
+msgstr "Löschen"
+
+msgid "Drop files to upload"
+msgstr "Dateien hierhin ziehen, um sie hochzuladen"
+
+msgid "Upload"
+msgstr "Hochladen"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
@@ -1495,8 +1516,11 @@ msgstr "Passwort zurücksetzen"
 msgid "Do you really want to delete \"${item}\"?"
 msgstr "Möchten Sie \"${item}\" wirklich löschen?"
 
-msgid "Delete"
-msgstr "Löschen"
+msgid "Attachments"
+msgstr "Anhänge"
+
+msgid "Attachment added."
+msgstr "Anhang hinzugefügt."
 
 msgid "Page added."
 msgstr "Seite hinzugefügt."
@@ -1506,6 +1530,9 @@ msgstr "Seite geändert."
 
 msgid "Page deleted"
 msgstr "Seite gelöscht"
+
+msgid "Attachment deleted."
+msgstr "Anhang gelöscht."
 
 msgid "Do you really want to delete all votes?!"
 msgstr "Möchten Sie wirklich alle Abstimmungen löschen?!"

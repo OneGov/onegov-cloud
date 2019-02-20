@@ -1,6 +1,7 @@
 from onegov.swissvotes.models.actor import Actor
 from onegov.swissvotes.models.canton import Canton
 from onegov.swissvotes.models.page import TranslatablePage
+from onegov.swissvotes.models.page import TranslatablePageFile
 from onegov.swissvotes.models.page import TranslatablePageMove
 from onegov.swissvotes.models.policy_area import PolicyArea
 from onegov.swissvotes.models.principal import Principal
@@ -16,5 +17,6 @@ __all__ = (
     'SwissVote',
     'SwissVoteFile',
     'TranslatablePage',
+    'TranslatablePageFile',
     'TranslatablePageMove',
 )

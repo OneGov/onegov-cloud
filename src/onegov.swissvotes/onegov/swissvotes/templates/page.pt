@@ -4,6 +4,11 @@
         <h2>${layout.title}</h2>
         <div class="page-content">
             <tal:block tal:content="structure: layout.model.content"></tal:block>
+            <ul class="attachments" tal:condition="files">
+                <li tal:repeat="file files">
+                    <a href="${request.link(file)}">${file.filename}</a>
+                </li>
+            </ul>
         </div>
     </tal:block>
 </div>

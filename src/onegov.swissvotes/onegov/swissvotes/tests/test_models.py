@@ -1,9 +1,13 @@
 from datetime import date
 from decimal import Decimal
+from io import BytesIO
+from onegov.core.crypto import random_token
+from onegov.file.utils import as_fileintent
 from onegov.swissvotes.models.actor import Actor
 from onegov.swissvotes.models.canton import Canton
 from onegov.swissvotes.models.localized_file import LocalizedFile
 from onegov.swissvotes.models.page import TranslatablePage
+from onegov.swissvotes.models.page import TranslatablePageFile
 from onegov.swissvotes.models.page import TranslatablePageMove
 from onegov.swissvotes.models.policy_area import PolicyArea
 from onegov.swissvotes.models.principal import Principal
@@ -186,6 +190,31 @@ def test_page_move(session):
 
     TranslatablePageMove(session, 'about', 'kontact', 'above').execute()
     assert ordering() == ['contact', 'dataset', 'about']
+
+
+def test_page_file(swissvotes_app):
+    session = swissvotes_app.session()
+
+    page = TranslatablePage(
+        id='page',
+        title_translations={'de_CH': "Titel", 'en': "Title"},
+        content_translations={'de_CH': "Inhalt", 'en': "Content"}
+    )
+    session.add(page)
+    session.flush()
+
+    assert page.files == []
+
+    attachment = TranslatablePageFile(id=random_token())
+    attachment.name = 'de_CH-test.txt'
+    attachment.reference = as_fileintent(BytesIO(b'test'), 'test.txt')
+    page.files.append(attachment)
+    session.flush()
+
+    file = session.query(TranslatablePage).one().files[0]
+    assert file.name == 'de_CH-test.txt'
+    assert file.filename == 'test.txt'
+    assert file.locale == 'de_CH'
 
 
 def test_policy_area(session):
