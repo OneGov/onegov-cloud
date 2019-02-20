@@ -4,7 +4,7 @@ from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.exports.base import FeriennetExport
 from onegov.feriennet.forms import PeriodExportForm
 from onegov.user import User
-from sqlalchemy.orm import contains_eager, undefer
+from sqlalchemy.orm import contains_eager
 
 
 @FeriennetApp.export(

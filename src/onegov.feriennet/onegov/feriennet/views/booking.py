@@ -255,7 +255,8 @@ def actions_by_booking(layout, period, booking):
                         _('Do you really want to cancel "${title}"?', mapping={
                             'title': get_booking_title(layout, booking)
                         }),
-                        _("This cannot be undone.")
+                        _("This cannot be undone."),
+                        _("Cancel Booking")
                     ),
                     Intercooler(
                         request_method='POST',
