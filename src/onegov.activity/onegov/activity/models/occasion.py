@@ -77,6 +77,10 @@ class Occasion(Base, TimestampMixin):
     #: Pretend like this occasion doesn't use any time
     exclude_from_overlap_check = Column(Boolean, nullable=False, default=False)
 
+    #: This occasion can be booked, even if the booking limit has been reached
+    #: (does not currently apply to the matching, only to confirmed periods)
+    exempt_from_booking_limit = Column(Boolean, nullable=False, default=False)
+
     #: Days on which this occasion is active
     active_days = Column(ARRAY(Integer), nullable=False, default=list)
 

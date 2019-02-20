@@ -116,8 +116,11 @@ class BookingCollection(GenericCollection):
 
         limit = booking.attendee.limit or booking.period.booking_limit
 
-        if limit:
-            accepted = sum(1 for b in bookings if b.state == 'accepted')
+        if limit and not booking.occasion.exempt_from_booking_limit:
+            accepted = sum(
+                1 for b in bookings if b.state == 'accepted'
+                and not b.occasion.exempt_from_booking_limit
+            )
 
             if accepted >= limit:
                 raise BookingLimitReached()
@@ -142,6 +145,9 @@ class BookingCollection(GenericCollection):
         if block_rest:
             for b in bookings:
                 if b.state in ('cancelled', 'accepted'):
+                    continue
+
+                if b.occasion.exempt_from_booking_limit:
                     continue
 
                 b.state = 'blocked'

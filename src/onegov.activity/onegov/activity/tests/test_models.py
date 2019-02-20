@@ -1569,6 +1569,80 @@ def test_accept_booking(session, owner):
     assert b2.state == 'blocked'
 
 
+def test_booking_limit_exemption(session, owner):
+    activities = ActivityCollection(session)
+    attendees = AttendeeCollection(session)
+    periods = PeriodCollection(session)
+    occasions = OccasionCollection(session)
+    bookings = BookingCollection(session)
+
+    period = periods.add(
+        title="Autumn 2016",
+        prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
+        active=True,
+    )
+    period.confirmed = True
+
+    sport = activities.add("Sport", username=owner.username)
+
+    o1 = occasions.add(
+        start=datetime(2016, 10, 4, 13),
+        end=datetime(2016, 10, 4, 14),
+        timezone="Europe/Zurich",
+        activity=sport,
+        period=period,
+        spots=(0, 2)
+    )
+    o1.exempt_from_booking_limit = True
+
+    o2 = occasions.add(
+        start=datetime(2016, 11, 4, 13),
+        end=datetime(2016, 11, 4, 14),
+        timezone="Europe/Zurich",
+        activity=sport,
+        period=period,
+        spots=(0, 2)
+    )
+    o2.exempt_from_booking_limit = False
+
+    a1 = attendees.add(
+        user=owner,
+        name="Dustin Henderson",
+        birth_date=date(2000, 1, 1),
+        gender='male'
+    )
+
+    a2 = attendees.add(
+        user=owner,
+        name="Mike Wheeler",
+        birth_date=date(2000, 1, 1),
+        gender='male'
+    )
+
+    transaction.commit()
+
+    # 1st case, get the exempt booking, then the non-exempt one
+    b1 = bookings.add(owner, a1, o1)
+    b2 = bookings.add(owner, a1, o2)
+    b1.state = 'open'
+    b2.state = 'open'
+
+    bookings.accept_booking(b1)
+    bookings.accept_booking(b2)
+
+    # 2nd case, get the non-exempt booking, then the exempt one
+    b3 = bookings.add(owner, a2, o1)
+    b4 = bookings.add(owner, a2, o2)
+    b3.state = 'open'
+    b4.state = 'open'
+
+    bookings.accept_booking(b3)
+    bookings.accept_booking(b4)
+
+    # none of these methods should throw an error, then we're good
+
+
 def test_cancel_booking(session, owner):
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)

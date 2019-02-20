@@ -665,3 +665,12 @@ def make_group_code_nullable(context):
 
     # nobody uses groups yet, so we can safely reset it all to NULL
     context.operations.execute("UPDATE bookings SET group_code = NULL")
+
+
+@upgrade_task('Adds exempt_from_booking_limit to occasion')
+def adds_exempt_from_booking_limit_to_occasion(context):
+    context.add_column_with_defaults(
+        table='occasions',
+        column=Column('exempt_from_booking_limit', Boolean, nullable=False),
+        default=False
+    )
