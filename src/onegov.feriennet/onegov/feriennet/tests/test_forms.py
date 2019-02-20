@@ -145,6 +145,7 @@ def test_notification_template_send_form(session):
                 active_period=periods.active(),
                 org=Bunch(geo_provider='geo-mapbox'),
                 invoice_collection=invoice_collection,
+                periods=periods.query().all(),
             ),
             session=session,
             include=lambda *args: None,

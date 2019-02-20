@@ -13,7 +13,7 @@ from onegov.form.fields import MultiCheckboxField
 from onegov.user import User, UserCollection
 from sqlalchemy import distinct, or_, func, and_, select, exists
 from uuid import uuid4
-from wtforms.fields import StringField, TextAreaField, RadioField
+from wtforms.fields import StringField, TextAreaField, RadioField, SelectField
 from wtforms.validators import InputRequired
 
 
@@ -75,6 +75,12 @@ class NotificationTemplateSendForm(Form):
         default='by_role'
     )
 
+    period = SelectField(
+        label=_("Period"),
+        choices=None,
+        depends_on=('send_to', 'with_unpaid_bills'),
+    )
+
     roles = MultiCheckboxField(
         label=_("Role"),
         choices=[
@@ -102,6 +108,7 @@ class NotificationTemplateSendForm(Form):
 
     def on_request(self):
         self.populate_occasion()
+        self.populate_periods()
 
     @property
     def has_choices(self):
@@ -205,8 +212,12 @@ class NotificationTemplateSendForm(Form):
         return {o.username for o in q}
 
     def recipients_with_unpaid_bills(self):
-        period = self.request.app.active_period
-        billing = BillingCollection(self.request, period)
+        period = next((
+            p for p in self.request.app.periods
+            if p.id.hex == self.period.data
+        ), None) or self.request.app.active_period
+
+        billing = BillingCollection(self.request, period=period)
 
         return {
             username for username, bill in billing.bills.items()
@@ -299,6 +310,12 @@ class NotificationTemplateSendForm(Form):
             }))
 
             yield record.occasion_id.hex, label
+
+    def populate_periods(self):
+        periods = [p for p in self.request.app.periods]
+        periods.sort(key=lambda p: not p.active)
+
+        self.period.choices = [(p.id.hex, p.title) for p in periods]
 
     def populate_occasion(self):
         self.occasion.choices = list(self.occasion_choices)

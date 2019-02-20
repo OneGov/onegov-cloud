@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to send notifications for outstanding bills in other periods.
+  [href]
+
 - Adds the ability to exempt occasions from booking limits.
   [href]
 
