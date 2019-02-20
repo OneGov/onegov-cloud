@@ -1,13 +1,14 @@
+import secrets
 import sedate
 
 from copy import copy
 from enum import IntEnum
 from onegov.activity.models import Activity, Occasion, OccasionDate, Period
-from onegov.activity.utils import num_range_decode
-from onegov.activity.utils import num_range_encode
 from onegov.activity.utils import date_range_decode
 from onegov.activity.utils import date_range_encode
 from onegov.activity.utils import merge_ranges
+from onegov.activity.utils import num_range_decode
+from onegov.activity.utils import num_range_encode
 from onegov.activity.utils import overlaps
 from onegov.core.collection import Pagination
 from onegov.core.utils import increment_name
@@ -15,10 +16,11 @@ from onegov.core.utils import is_uuid
 from onegov.core.utils import normalize_for_url
 from onegov.core.utils import toggle
 from sedate import utcnow
+from sqlalchemy import and_, or_, not_
 from sqlalchemy import column
 from sqlalchemy import distinct
+from sqlalchemy import exists
 from sqlalchemy import func
-from sqlalchemy import and_, or_, not_
 from sqlalchemy import select
 from sqlalchemy import text
 from sqlalchemy.dialects.postgresql import array
@@ -404,15 +406,18 @@ class ActivityCollection(Pagination):
         """
         name = normalize_for_url(name)
 
-        existing = self.session.query(self.model_class)
-        existing = existing.filter(Activity.name.like('{}%'.format(name)))
-        existing = existing.with_entities(Activity.name)
-        existing = set(r[0] for r in existing.all())
+        def name_exists(name):
+            return self.session.query(exists().where(
+                Activity.name == name
+            )).scalar()
 
-        while name in existing:
+        for i in range(25):
+            if not name_exists(name):
+                return name
+
             name = increment_name(name)
 
-        return name
+        return secrets.token_hex(8)
 
     def add(self, title, username, lead=None, text=None, tags=None, name=None):
 
