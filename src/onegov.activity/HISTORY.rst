@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.15.1 (2019-02-20)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes activity names with numbers leading to errors.
   [href]
