@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.15.0 (2019-02-20)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to exempt occasions from booking limits.
   [href]
