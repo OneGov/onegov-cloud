@@ -792,7 +792,7 @@ ul.tags {
         padding: 2px 9px;
         position: absolute;
         right: 1.25rem;
-        top: -2.25rem;
+        top: -2.75rem;
 
         &::before {
             @include icon('\f05a');
@@ -2584,5 +2584,23 @@ $booking-left-margin: 2rem;
             margin-left: 0;
             margin-top: .5rem;
         }
+    }
+}
+
+/*
+    Hide advanced occasion toggles from non-admins, show warning for admins
+*/
+.occasion-form-layout {
+    #fieldset-advanced {
+        display: none;
+
+        .label-text::after {
+            @include icon('\f071');
+            margin-left: 1ex;
+        }
+    }
+
+    &.role-admin #fieldset-advanced {
+        display: block;
     }
 }

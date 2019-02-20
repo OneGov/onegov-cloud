@@ -87,7 +87,23 @@ class OccasionForm(Form):
     )
 
     exclude_from_overlap_check = BooleanField(
-        label=_("Bookings to this occasion may overlap with other bookings"),
+        label=_("Allow overlap"),
+        description=_(
+            "Allows bookings to this occasion to overlap with other bookings. "
+            "You can ignore this setting "
+            "unless otherwise instructed by support."
+        ),
+        fieldset=_("Advanced"),
+        default=False
+    )
+
+    exempt_from_booking_limit = BooleanField(
+        label=_("Exempt from booking limit"),
+        description=_(
+            "Allows bookings to this occasion to be excempt from booking "
+            "limits. Does not apply to matching. You can ignore this "
+            "setting unless otherwise instructed by support."
+        ),
         fieldset=_("Advanced"),
         default=False
     )

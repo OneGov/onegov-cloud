@@ -1,7 +1,7 @@
 from cached_property import cached_property
 from datetime import date
 from onegov.activity import Attendee, AttendeeCollection
-from onegov.activity import Booking, BookingCollection
+from onegov.activity import Booking, BookingCollection, Occasion
 from onegov.feriennet import _
 from onegov.feriennet.utils import encode_name, decode_name
 from onegov.form import Form
@@ -257,7 +257,9 @@ class AttendeeSignupForm(AttendeeBase):
             return True
 
         if self.model.period.confirmed:
-            if self.model.period.booking_limit:
+            if self.model.exempt_from_booking_limit:
+                limit = None
+            elif self.model.period.booking_limit:
                 limit = self.model.period.booking_limit
             else:
                 limit = self.request.session.query(Attendee.limit)\
@@ -270,9 +272,10 @@ class AttendeeSignupForm(AttendeeBase):
         if limit:
             bookings = self.booking_collection
 
-            query = bookings.query().with_entities(Booking.id)
+            query = bookings.query().with_entities(Booking.id).join(Occasion)
             query = query.filter(Booking.attendee_id == self.attendee.data)
             query = query.filter(Booking.state == 'accepted')
+            query = query.filter(Occasion.exempt_from_booking_limit == False)
             count = query.count()
 
             if count >= limit:
