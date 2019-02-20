@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.44.1 (2019-02-20)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes string field display chocking on non-string values.
   [href]
