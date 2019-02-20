@@ -118,11 +118,13 @@ class FeriennetExport(Export):
     def invoice_item_fields(self, item):
         yield _("Invoice Item Group"), item.group
         yield _("Invoice Item Text"), item.text
-        yield _("Invoice Item Code"), item.display_code
-        yield _("Invoice Item ESR"), item.display_esr_code
         yield _("Invoice Item Paid"), item.paid
         yield _("Invoice Item Transaction ID"), item.tid or ''
         yield _("Invoice Item Source"), item.source or ''
         yield _("Invoice Item Unit"), item.unit
         yield _("Invoice Item Quantity"), item.quantity
         yield _("Invoice Item Amount"), item.amount
+
+        yield _("Invoice Item References"), '\n'.join(
+            r.readable for r in item.invoice.references
+        )

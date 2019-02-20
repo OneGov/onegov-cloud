@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes invoice items export.
+  [href]
+
 - Adds the ability to send notifications for outstanding bills in other periods.
   [href]
 

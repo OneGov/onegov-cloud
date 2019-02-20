@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-02-20 11:48+0100\n"
+"POT-Creation-Date: 2019-02-20 15:50+0100\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -343,11 +343,11 @@ msgstr "Benötige mindestens"
 msgid "Need up to"
 msgstr "Benötige bis zu"
 
-msgid "Minimum is larger than maximum"
-msgstr "Das Minimum ist grösser als das Maximum"
-
 msgid "This name has already been used for this occasion"
 msgstr "Dieser Name wurde bereits für diese Durchführung verwendet"
+
+msgid "Minimum is larger than maximum"
+msgstr "Das Minimum ist grösser als das Maximum"
 
 msgid "Period"
 msgstr "Zeitraum"
@@ -1078,12 +1078,6 @@ msgstr "Rechungsposition Gruppe"
 msgid "Invoice Item Text"
 msgstr "Rechungsposition Text"
 
-msgid "Invoice Item Code"
-msgstr "Rechnungsposition Code"
-
-msgid "Invoice Item ESR"
-msgstr "Rechnungsposition ESR"
-
 msgid "Invoice Item Paid"
 msgstr "Rechnungsposition Bezahlt"
 
@@ -1101,6 +1095,9 @@ msgstr "Rechnungsposition Menge"
 
 msgid "Invoice Item Amount"
 msgstr "Rechnungsposition Betrag"
+
+msgid "Invoice Item References"
+msgstr "Rechnungsposition Referenzen"
 
 msgid "Accepted"
 msgstr "Angenommen"
@@ -2410,6 +2407,12 @@ msgstr "Möchten Sie ${attendee}s Buchung wirklich löschen?"
 #, python-format
 msgid "Do you really want to cancel ${attendee}'s booking?"
 msgstr "Möchten Sie ${attendee}s Buchung wirklich stornieren?"
+
+#~ msgid "Invoice Item Code"
+#~ msgstr "Rechnungsposition Code"
+
+#~ msgid "Invoice Item ESR"
+#~ msgstr "Rechnungsposition ESR"
 
 #~ msgid "Bookings to this occasion may overlap with other bookings"
 #~ msgstr ""
