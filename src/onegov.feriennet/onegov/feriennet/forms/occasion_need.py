@@ -54,11 +54,12 @@ class OccasionNeedForm(Form):
         self.max_number.data = upper - 1
 
     def ensure_valid_range(self):
-        if self.min_number.data > self.max_number.data:
-            self.min_number.errors.append(_(
-                "Minimum is larger than maximum"
-            ))
-            return False
+        if self.min_number.data and self.max_number.data:
+            if self.min_number.data > self.max_number.data:
+                self.min_number.errors.append(_(
+                    "Minimum is larger than maximum"
+                ))
+                return False
 
     def ensure_unique_name(self):
         occasion_id = getattr(self.model, 'occasion_id', None) or self.model.id
