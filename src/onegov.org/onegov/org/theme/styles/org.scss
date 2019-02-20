@@ -660,6 +660,12 @@ form {
         max-width: 90%;
     }
 
+    .field-help {
+        color: $steel;
+        font-size: .8rem;
+        margin-left: 1.25rem;
+    }
+
     .group-label {
         color: $form-label-font-color;
         font-size: $form-label-font-size;
