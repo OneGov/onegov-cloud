@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.1.1 (2019-02-20)
+~~~~~~~~~~~~~~~~~~~
+
 - Shows placeholder information on boolean form fields.
   [href]
 
