@@ -79,7 +79,7 @@
                                                 <td colspan="4" tal:condition="not:item.family">${item.group}</td>
                                                 <td colspan="4" tal:condition="item.family" i18n:translate>Discounts / Surcharges</td>
                                             </tr>
-                                            <tr class="${item.paid and 'paid' or 'unpaid'}" tal:define="groupid hash(str(item.group) + str(repeat.item.index))">
+                                            <tr class="${(details.outstanding == 0 or item.paid) and 'paid' or 'unpaid'}" tal:define="groupid hash(str(item.group) + str(repeat.item.index))">
                                                 <td>${item.text}</td>
                                                 <td class="amount">${'{:.2f}'.format(item.amount)}</td>
                                                 <td class="payment-status" tal:condition="not item.paid">
