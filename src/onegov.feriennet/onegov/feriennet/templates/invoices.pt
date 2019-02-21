@@ -67,7 +67,7 @@
                                     <strong tal:condition="item.group != 'manual'">${item.group}</strong>
                                     <strong tal:condition="item.group == 'manual'" i18n:translate>Discounts / Surcharges</strong>
                                 </li>
-                                <li class="${item.paid and 'paid' or 'unpaid'} ${item.source and item.source or ''}">
+                                <li class="${(invoice.paid or item.paid) and 'paid' or 'unpaid'} ${item.source and item.source or ''}">
                                     <span class="item-text">${item.text}</span>
                                     <span class="item-amount" tal:content="'{:.2f}'.format(item.amount)"></span>
                                 </li>

@@ -173,14 +173,14 @@ class BillingCollection(object):
         for booking in q:
             actual_attendees.add(booking.attendee_id)
 
-            if period.pay_organiser_directly or not booking.cost:
-                continue
-
             if booking.username not in created_invoices:
                 created_invoices[booking.username] = invoices.add(
                     period_id=period.id,
                     user_id=users[booking.username]
                 )
+
+            if period.pay_organiser_directly or not booking.cost:
+                continue
 
             created_invoices[booking.username].add(
                 group=attendees[booking.attendee_id][0],
