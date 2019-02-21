@@ -5,8 +5,8 @@ from onegov.core.templates import render_macro
 from onegov.wtfs import WtfsApp
 from onegov.wtfs.forms import MunicipalityIdSelectionForm
 from onegov.wtfs.layouts import DefaultLayout
-from onegov.wtfs.models import Principal
 from onegov.wtfs.models import PickupDate
+from onegov.wtfs.models import Principal
 from onegov.wtfs.security import ViewModel
 
 
@@ -23,9 +23,10 @@ def view_home(self, request):
     if not request.is_logged_in:
         return request.redirect(layout.login_url)
 
-    return {
-        'layout': layout
-    }
+    if not layout.notifications.query().first():
+        return request.redirect(layout.scan_jobs_url)
+
+    return {'layout': layout}
 
 
 @WtfsApp.form(

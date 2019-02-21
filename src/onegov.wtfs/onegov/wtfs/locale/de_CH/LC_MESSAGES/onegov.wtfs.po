@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-19 14:24+0100\n"
-"PO-Revision-Date: 2019-02-19 14:24+0100\n"
+"POT-Creation-Date: 2019-02-21 11:20+0100\n"
+"PO-Revision-Date: 2019-02-21 11:20+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -41,8 +41,8 @@ msgstr "- keine -"
 msgid "Date"
 msgstr "Datum"
 
-msgid "Report"
-msgstr "Auswertung"
+msgid "Daily list"
+msgstr "Tagesliste"
 
 msgid "Daily list boxes"
 msgstr "Boxen"
@@ -61,6 +61,12 @@ msgstr "Enddatum"
 
 msgid "Municipality"
 msgstr "Gemeinde"
+
+msgid "Title"
+msgstr "Titel"
+
+msgid "Text"
+msgstr "Text"
 
 msgid "Type"
 msgstr "Auftragsart"
@@ -128,6 +134,9 @@ msgstr "Expresssendung"
 msgid "Date must be in the future."
 msgstr "Datum muss in der Zukunft liegen."
 
+msgid "Report"
+msgstr "Auswertung"
+
 msgid "Report boxes"
 msgstr "Boxen aller Gemeinden"
 
@@ -177,9 +186,6 @@ msgstr "Diesen Benutzer wirklich löschen?"
 msgid "User"
 msgstr "Benutzer"
 
-msgid "Daily list"
-msgstr "Tagesliste"
-
 msgid "Municipalities"
 msgstr "Gemeinden"
 
@@ -191,6 +197,15 @@ msgstr "Abholtermine löschen"
 
 msgid "Do you really want to delete this municipality?"
 msgstr "Diese Gemeinde wirklich löschen?"
+
+msgid "Notifications"
+msgstr "Benachrichtigungen"
+
+msgid "Do you really want to delete this notification?"
+msgstr "Diese Benachrichtigung wirklich löschen?"
+
+msgid "Notification"
+msgstr "Benachrichtigung"
 
 msgid "Scan jobs"
 msgstr "Scan-Aufträge"
@@ -426,5 +441,11 @@ msgstr "Seite nicht gefunden"
 msgid "The page you are looking for could not be found."
 msgstr "Die angeforderte Seite konnte nicht gefunden werden."
 
-#~ msgid "Daily list ${date}"
-#~ msgstr "Tagesliste ${date}"
+msgid "Notification deleted."
+msgstr "Benachrichtigung gelöscht."
+
+msgid "Notification added."
+msgstr "Benachrichtigung hinzugefügt."
+
+msgid "Notification modified."
+msgstr "Benachrichtigung geändert."

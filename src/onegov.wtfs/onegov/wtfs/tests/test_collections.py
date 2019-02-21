@@ -1,7 +1,8 @@
-from datetime import date
-from onegov.user import UserGroupCollection
-from onegov.wtfs.collections import MunicipalityCollection
 from onegov.wtfs.collections import ScanJobCollection
+from onegov.wtfs.collections import NotificationCollection
+from onegov.wtfs.collections import MunicipalityCollection
+from onegov.user import UserGroupCollection
+from datetime import date
 
 
 def test_municipalities(session):
@@ -79,3 +80,19 @@ def test_scan_jobs(session):
         )
 
     assert [s.dispatch_date.day for s in scan_jobs.query()] == [1, 2, 3, 4]
+
+
+def test_notifications(session):
+    notifications = NotificationCollection(session)
+    notification = notifications.add(
+        title="Lorem ipsum",
+        text="Lorem ipsum dolor sit amet.",
+        channel_id="wtfs",
+        owner="admin"
+    )
+
+    assert notification.title == "Lorem ipsum"
+    assert notification.text == "Lorem ipsum dolor sit amet."
+    assert notification.channel_id == "wtfs"
+    assert notification.owner == "admin"
+    assert notification.type == "wtfs_notification"

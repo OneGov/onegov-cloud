@@ -125,6 +125,7 @@ header {
         .delete-icon::before { @include icon('\f014'); }
         .edit-icon::before { @include icon('\f040'); }
         .municipality-icon::before { @include icon('\f0c0'); }
+        .notification-icon::before { @include icon('\f071'); }
         .scan-job-icon::before { @include icon('\f0c5'); }
         .upload-icon::before { @include icon('\f093'); }
         .user-group-icon::before { @include icon('\f0c0'); }

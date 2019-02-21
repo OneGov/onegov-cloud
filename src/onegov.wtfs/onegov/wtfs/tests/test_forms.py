@@ -14,12 +14,14 @@ from onegov.wtfs.forms import EditScanJobForm
 from onegov.wtfs.forms import ImportMunicipalityDataForm
 from onegov.wtfs.forms import MunicipalityForm
 from onegov.wtfs.forms import MunicipalityIdSelectionForm
+from onegov.wtfs.forms import NotificationForm
 from onegov.wtfs.forms import ReportSelectionForm
 from onegov.wtfs.forms import UnrestrictedAddScanJobForm
 from onegov.wtfs.forms import UnrestrictedEditScanJobForm
 from onegov.wtfs.forms import UnrestrictedUserForm
 from onegov.wtfs.forms import UserForm
 from onegov.wtfs.forms import UserGroupForm
+from onegov.wtfs.models import Notification
 from onegov.wtfs.models import PickupDate
 from onegov.wtfs.models import ScanJob
 
@@ -972,3 +974,29 @@ def test_report_selection_form(session):
     assert model.end == date(2019, 1, 31)
     assert model.type == 'express'
     assert model.municipality == 'Aesch'
+
+
+def test_notification_form():
+    # Test apply / update
+    form = NotificationForm()
+    notification = Notification(title="Title", text="Text")
+
+    form.apply_model(notification)
+    assert form.title.data == "Title"
+    assert form.text.data == "Text"
+
+    form.title.data = "Title"
+    form.text.data = "Text"
+    form.update_model(notification)
+    assert notification.title == "Title"
+    assert notification.text == "Text"
+
+    # Test validation
+    form = NotificationForm()
+    assert not form.validate()
+
+    form = NotificationForm(PostData({
+        'title': "Title",
+        'text': "Text"
+    }))
+    assert form.validate()

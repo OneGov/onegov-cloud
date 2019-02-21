@@ -6,10 +6,12 @@ from onegov.user import UserGroup
 from onegov.user import UserGroupCollection
 from onegov.wtfs.app import WtfsApp
 from onegov.wtfs.collections import MunicipalityCollection
+from onegov.wtfs.collections import NotificationCollection
 from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.models import DailyList
 from onegov.wtfs.models import DailyListBoxes
 from onegov.wtfs.models import Municipality
+from onegov.wtfs.models import Notification
 from onegov.wtfs.models import Principal
 from onegov.wtfs.models import Report
 from onegov.wtfs.models import ReportBoxes
@@ -161,3 +163,19 @@ def get_report_forms(request, start, end, type, municipality):
     return ReportFormsByMunicipality(
         request.session, start, end, type, municipality
     )
+
+
+@WtfsApp.path(
+    model=NotificationCollection,
+    path='/notifications'
+)
+def get_notifications(request):
+    return NotificationCollection(request.session)
+
+
+@WtfsApp.path(
+    model=Notification,
+    path='/notification/{id}'
+)
+def get_notification(request, id):
+    return NotificationCollection(request.session).by_id(id)

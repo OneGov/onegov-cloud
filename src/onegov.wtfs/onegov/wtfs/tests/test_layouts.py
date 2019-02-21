@@ -4,8 +4,10 @@ from onegov.user import UserCollection
 from onegov.user import UserGroup
 from onegov.user import UserGroupCollection
 from onegov.wtfs.collections import MunicipalityCollection
+from onegov.wtfs.collections import NotificationCollection
 from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.layouts import AddMunicipalityLayout
+from onegov.wtfs.layouts import AddNotificationLayout
 from onegov.wtfs.layouts import AddScanJobLayout
 from onegov.wtfs.layouts import AddUserGroupLayout
 from onegov.wtfs.layouts import AddUserLayout
@@ -14,6 +16,7 @@ from onegov.wtfs.layouts import DailyListLayout
 from onegov.wtfs.layouts import DefaultLayout
 from onegov.wtfs.layouts import DeleteMunicipalityDatesLayout
 from onegov.wtfs.layouts import EditMunicipalityLayout
+from onegov.wtfs.layouts import EditNotificationLayout
 from onegov.wtfs.layouts import EditScanJobLayout
 from onegov.wtfs.layouts import EditUserGroupLayout
 from onegov.wtfs.layouts import EditUserLayout
@@ -21,6 +24,8 @@ from onegov.wtfs.layouts import ImportMunicipalityDataLayout
 from onegov.wtfs.layouts import MailLayout
 from onegov.wtfs.layouts import MunicipalitiesLayout
 from onegov.wtfs.layouts import MunicipalityLayout
+from onegov.wtfs.layouts import NotificationLayout
+from onegov.wtfs.layouts import NotificationsLayout
 from onegov.wtfs.layouts import ReportBoxesAndFormsLayout
 from onegov.wtfs.layouts import ReportBoxesLayout
 from onegov.wtfs.layouts import ReportFormsByMunicipalityLayout
@@ -34,6 +39,7 @@ from onegov.wtfs.layouts import UsersLayout
 from onegov.wtfs.models import DailyList
 from onegov.wtfs.models import DailyListBoxes
 from onegov.wtfs.models import Municipality
+from onegov.wtfs.models import Notification
 from onegov.wtfs.models import Report
 from onegov.wtfs.models import ReportBoxes
 from onegov.wtfs.models import ReportBoxesAndForms
@@ -165,7 +171,8 @@ def test_default_layout(wtfs_app):
         'Report/',
         'UserCollection/',
         'UserGroupCollection/',
-        'MunicipalityCollection/'
+        'MunicipalityCollection/',
+        'NotificationCollection/'
     ]
 
 
@@ -570,3 +577,63 @@ def test_report_layouts(session):
     )
     assert layout.cancel_url == ''
     assert layout.success_url == ''
+
+
+def test_notification_layouts():
+    request = DummyRequest()
+    request_admin = DummyRequest(roles=['admin'])
+
+    # Notification collection
+    model = NotificationCollection(None)
+    layout = NotificationsLayout(model, request)
+    assert layout.title == 'Notifications'
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/NotificationCollection'
+    assert layout.cancel_url == ''
+    assert layout.success_url == ''
+
+    layout = NotificationsLayout(model, request_admin)
+    assert list(hrefs(layout.editbar_links)) == ['NotificationCollection/add']
+
+    # .. add
+    layout = AddNotificationLayout(model, request)
+    assert layout.title == 'Add'
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == (
+        'DummyPrincipal/NotificationCollection/#'
+    )
+    assert layout.cancel_url == 'NotificationCollection/'
+    assert layout.success_url == 'NotificationCollection/'
+
+    layout = AddNotificationLayout(model, request_admin)
+    assert list(hrefs(layout.editbar_links)) == []
+
+    # Notification
+    model = Notification(title="Title")
+    layout = NotificationLayout(model, request)
+    assert layout.title == 'Title'
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == (
+        'DummyPrincipal/NotificationCollection/#'
+    )
+    assert layout.cancel_url == ''
+    assert layout.success_url == ''
+
+    layout = NotificationLayout(model, request_admin)
+    assert list(hrefs(layout.editbar_links)) == [
+        'Notification/edit',
+        'Notification/?csrf-token=x'
+    ]
+
+    # ... edit
+    layout = EditNotificationLayout(model, request)
+    assert layout.title == 'Edit'
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == (
+        'DummyPrincipal/NotificationCollection/Notification/#'
+    )
+    assert layout.cancel_url == 'Notification/'
+    assert layout.success_url == 'Notification/'
+
+    layout = EditNotificationLayout(model, request_admin)
+    assert list(hrefs(layout.editbar_links)) == []

@@ -2,6 +2,7 @@ from datetime import date
 from onegov.user import UserGroup
 from onegov.wtfs.models import DailyListBoxes
 from onegov.wtfs.models import Municipality
+from onegov.wtfs.models import Notification
 from onegov.wtfs.models import PickupDate
 from onegov.wtfs.models import Principal
 from onegov.wtfs.models import ReportBoxes
@@ -350,3 +351,28 @@ def test_report_forms_by_municipality(session):
     assert report.query.all() == [('Aesch', 0, 0, 0)]
     report = _report(date(2019, 1, 4), date(2019, 1, 5), 'Andelfingen')
     assert report.query.all() == [('Andelfingen', 0, 0, 0)]
+
+
+def test_notification(session):
+
+    class Identity():
+        application_id = 'wtfs'
+        userid = 'admin'
+
+    class Request():
+        def __init__(self, session):
+            self.identity = Identity()
+            self.session = session
+
+    notification = Notification.create(
+        Request(session),
+        title="Lorem ipsum",
+        text="Lorem ipsum dolor sit amet."
+    )
+
+    notification = session.query(Notification).one()
+    assert notification.title == "Lorem ipsum"
+    assert notification.text == "Lorem ipsum dolor sit amet."
+    assert notification.channel_id == "wtfs"
+    assert notification.owner == "admin"
+    assert notification.type == "wtfs_notification"

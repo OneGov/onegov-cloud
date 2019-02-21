@@ -1,5 +1,10 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.wtfs">
     <tal:block metal:fill-slot="content">
 
+        <div tal:repeat="notification layout.notifications.query()" class="panel callout">
+            <h4>${notification.title}</h4>
+            <p>${notification.text}</p>
+        </div>
+
     </tal:block>
 </div>

@@ -7,6 +7,7 @@ from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
 from onegov.wtfs import _
 from onegov.wtfs.collections import MunicipalityCollection
+from onegov.wtfs.collections import NotificationCollection
 from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.models import DailyList
 from onegov.wtfs.models import Report
@@ -46,6 +47,8 @@ class DefaultLayout(ChameleonLayout):
             result.append(Link(_("User groups"), self.user_groups_url))
         if has_permission(MunicipalityCollection(session), ViewModel):
             result.append(Link(_("Municipalities"), self.municipalities_url))
+        if has_permission(NotificationCollection(session), ViewModel):
+            result.append(Link(_("Notifications"), self.notifications_url))
 
         return result
 
@@ -110,6 +113,10 @@ class DefaultLayout(ChameleonLayout):
         return self.request.link(Report(self.request.session))
 
     @cached_property
+    def notifications_url(self):
+        return self.request.link(NotificationCollection(self.request.session))
+
+    @cached_property
     def cancel_url(self):
         return ''
 
@@ -124,3 +131,7 @@ class DefaultLayout(ChameleonLayout):
     @cached_property
     def current_year(self):
         return date.today().year
+
+    @property
+    def notifications(self):
+        return NotificationCollection(self.request.session)

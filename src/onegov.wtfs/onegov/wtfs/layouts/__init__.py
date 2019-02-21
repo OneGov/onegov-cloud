@@ -8,6 +8,10 @@ from onegov.wtfs.layouts.municipality import EditMunicipalityLayout
 from onegov.wtfs.layouts.municipality import ImportMunicipalityDataLayout
 from onegov.wtfs.layouts.municipality import MunicipalitiesLayout
 from onegov.wtfs.layouts.municipality import MunicipalityLayout
+from onegov.wtfs.layouts.notification import AddNotificationLayout
+from onegov.wtfs.layouts.notification import EditNotificationLayout
+from onegov.wtfs.layouts.notification import NotificationLayout
+from onegov.wtfs.layouts.notification import NotificationsLayout
 from onegov.wtfs.layouts.report import ReportBoxesAndFormsLayout
 from onegov.wtfs.layouts.report import ReportBoxesLayout
 from onegov.wtfs.layouts.report import ReportFormsByMunicipalityLayout
@@ -25,9 +29,9 @@ from onegov.wtfs.layouts.user_group import EditUserGroupLayout
 from onegov.wtfs.layouts.user_group import UserGroupLayout
 from onegov.wtfs.layouts.user_group import UserGroupsLayout
 
-
 __all__ = (
     'AddMunicipalityLayout',
+    'AddNotificationLayout',
     'AddScanJobLayout',
     'AddUserGroupLayout',
     'AddUserLayout',
@@ -36,6 +40,7 @@ __all__ = (
     'DefaultLayout',
     'DeleteMunicipalityDatesLayout',
     'EditMunicipalityLayout',
+    'EditNotificationLayout',
     'EditScanJobLayout',
     'EditUserGroupLayout',
     'EditUserLayout',
@@ -43,6 +48,8 @@ __all__ = (
     'MailLayout',
     'MunicipalitiesLayout',
     'MunicipalityLayout',
+    'NotificationLayout',
+    'NotificationsLayout',
     'ReportBoxesAndFormsLayout',
     'ReportBoxesLayout',
     'ReportFormsByMunicipalityLayout',
