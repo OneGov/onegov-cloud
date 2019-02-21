@@ -43,7 +43,7 @@
                         />
                     </td>
                     <td>
-                        <span class="booking-score">${'%.9f' % booking.score}</span>
+                        <span class="booking-score">${'%.4f' % booking.score}</span>
                     </td>
                     <td>
                         <tal:b
