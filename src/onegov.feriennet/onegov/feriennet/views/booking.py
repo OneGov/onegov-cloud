@@ -229,6 +229,7 @@ def actions_by_booking(layout, period, booking):
                     }),
                     None,
                     _("Remove Booking"),
+                    _("Cancel"),
                 ),
                 Intercooler(
                     request_method='DELETE',
@@ -261,7 +262,8 @@ def actions_by_booking(layout, period, booking):
                             'title': get_booking_title(layout, booking)
                         }),
                         _("This cannot be undone."),
-                        _("Cancel Booking")
+                        _("Cancel Booking"),
+                        _("Cancel"),
                     ),
                     Intercooler(
                         request_method='POST',
