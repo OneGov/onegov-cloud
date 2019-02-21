@@ -18,4 +18,4 @@ WHERE
     "status" = 'approved'
     AND (("data"::jsonb)->>'accepted')::boolean = TRUE
 
-ORDER BY start;
+ORDER BY start
