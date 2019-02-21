@@ -33,9 +33,18 @@
         fr: sponsors/concordia-banner-fr.jpg
         it: sponsors/concordia-banner-it.jpg
       url:
-        de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner|feriennet18f|0|0|fnet|de'
-        fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner|feriennet18f|0|0|fnet|fr'
-        it: 'https://www.concordia.ch/it/microsites/feriennet.html?cocid=banner|feriennet18f|0|0|fnet|it'
+        de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner-fn191hj-0-0-fnet-de'
+        fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-fn191hj-0-0-fnet-fr'
+        it: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-fn191hj-0-0-fnet-fr'
+    invoices:
+      src:
+        de: sponsors/concordia-banner-de.jpg
+        fr: sponsors/concordia-banner-fr.jpg
+        it: sponsors/concordia-banner-it.jpg
+      url:
+        de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner-rgfn191hj-0-0-fnet-de'
+        fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-rgfn191hj-0-0-fnet-fr'
+        it: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-rgfn191hj-0-0-fnet-fr'
 
 - name: CREDIT SUISSE
   logo_url:
@@ -53,6 +62,16 @@
   top: -7px
   banners:
     bookings:
+      src: sponsors/credit-suisse-banner.png
+      url:
+        de: 'https://ad.doubleclick.net/ddm/trackclk/N8394.3080457PROJUVENTUTE/B20111643.205375159;dc_trk_aid=405205282;dc_trk_cid=91028232;dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
+        fr: 'https://ad.doubleclick.net/ddm/trackclk/N8394.3080457PROJUVENTUTE/B20111643.205375156;dc_trk_aid=405218298;dc_trk_cid=91028232;dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
+        it: 'https://ad.doubleclick.net/ddm/trackclk/N8394.3080457PROJUVENTUTE/B20111643.205375153;dc_trk_aid=405204988;dc_trk_cid=91028232;dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
+      tracker:
+        de: 'https://ad.doubleclick.net/ddm/trackimp/N8394.3080457PROJUVENTUTE/B20111643.205375159;dc_trk_aid=405205282;dc_trk_cid=91028232;ord={timestamp};dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
+        fr: 'https://ad.doubleclick.net/ddm/trackimp/N8394.3080457PROJUVENTUTE/B20111643.205375156;dc_trk_aid=405218298;dc_trk_cid=91028232;ord={timestamp};dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
+        it: 'https://ad.doubleclick.net/ddm/trackimp/N8394.3080457PROJUVENTUTE/B20111643.205375153;dc_trk_aid=405204988;dc_trk_cid=91028232;ord={timestamp};dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
+    invoices:
       src: sponsors/credit-suisse-banner.png
       url:
         de: 'https://ad.doubleclick.net/ddm/trackclk/N8394.3080457PROJUVENTUTE/B20111643.205375159;dc_trk_aid=405205282;dc_trk_cid=91028232;dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
