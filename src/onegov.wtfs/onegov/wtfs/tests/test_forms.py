@@ -80,16 +80,32 @@ def test_municipality_form(session):
     form.request = Request(session)
     form.on_request()
     assert [c[1] for c in form.group_id.choices] == ["Gruppe Aesch"]
+    assert not (form.group_id.render_kw or {}).get('disabled', False)
 
+    # ... collection
     form.model = municipalities
     form.on_request()
     assert [c[1] for c in form.group_id.choices] == ["Gruppe Aesch"]
+    assert not (form.group_id.render_kw or {}).get('disabled', False)
 
+    # ... municipality with no data
     form.model = municipality
     form.on_request()
     assert [c[1] for c in form.group_id.choices] == [
         "Gruppe Aesch", "Gruppe Winterthur"
     ]
+    assert not (form.group_id.render_kw or {}).get('disabled', False)
+
+    # ... municipality with data
+    scan_job = ScanJob(
+        group_id=group.id,
+        type='normal',
+        dispatch_date=date(2019, 1, 1)
+    )
+    municipality.scan_jobs.append(scan_job)
+    session.flush()
+    form.on_request()
+    assert (form.group_id.render_kw or {}).get('disabled', False)
 
     # Test apply / update
     form = MunicipalityForm()
@@ -98,12 +114,21 @@ def test_municipality_form(session):
     assert form.bfs_number.data == 230
     assert form.group_id.data == str(group.id)
 
+    # ... municipality with data
     form.name.data = "Gemeinde Adlikon"
     form.bfs_number.data = 21
     form.group_id.data = groups.add(name="Gruppe Adlikon").id
     form.update_model(municipality)
     assert municipality.name == "Gemeinde Adlikon"
     assert municipality.bfs_number == 21
+    assert municipality.group.name == "Gruppe Winterthur"
+
+    # ... municipality with no data
+    session.delete(scan_job)
+    session.flush()
+    form.update_model(municipality)
+    session.flush()
+    session.expire_all()
     assert municipality.group.name == "Gruppe Adlikon"
 
     # Test validation

@@ -49,6 +49,9 @@ class MunicipalityForm(Form):
         model = getattr(self, 'model', None)
         if model and getattr(model, 'group_id', None):
             used_groups -= {model.group_id}
+            if model.has_data:
+                self.group_id.render_kw = {'disabled': True}
+                self.group_id.validators = []
 
         groups = session.query(func.cast(UserGroup.id, String), UserGroup.name)
         if used_groups:
@@ -59,7 +62,8 @@ class MunicipalityForm(Form):
     def update_model(self, model):
         model.name = self.name.data
         model.bfs_number = self.bfs_number.data
-        model.group_id = self.group_id.data or None
+        if not model.has_data:
+            model.group_id = self.group_id.data or None
 
     def apply_model(self, model):
         self.name.data = model.name

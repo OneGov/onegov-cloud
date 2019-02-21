@@ -78,9 +78,9 @@ def has_permission_user_group(app, identity, model, permission):
 
 @WtfsApp.permission_rule(model=Municipality, permission=object)
 def has_permission_municipality(app, identity, model, permission):
-    # Municipalities with data canot not be deleted
+    # Municipalities with data cannot not be deleted
     if permission in {DeleteModel}:
-        if model.pickup_dates.first() or model.scan_jobs.first():
+        if model.has_data:
             return False
 
     return permission in getattr(app.settings.roles, identity.role)

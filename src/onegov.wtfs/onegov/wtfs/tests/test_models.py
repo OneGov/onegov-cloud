@@ -35,6 +35,7 @@ def test_municipality(session):
     assert municipality.bfs_number == 230
     assert municipality.group == group
     assert group.municipality == municipality
+    assert not municipality.has_data
 
     # PickupDate
     session.add(
@@ -53,6 +54,7 @@ def test_municipality(session):
         date(2019, 1, 1), date(2019, 1, 7), date(2019, 1, 14)
     ]
     assert session.query(PickupDate).first().municipality == municipality
+    assert municipality.has_data
 
 
 def test_scan_job(session):
@@ -134,6 +136,7 @@ def test_scan_job(session):
 
     assert municipality.scan_jobs.one() == scan_job
     assert group.scan_jobs.one() == scan_job
+    assert municipality.has_data
 
 
 def add_report_data(session):

@@ -30,3 +30,9 @@ class Municipality(Base, TimestampMixin):
     group = relationship(
         UserGroup, backref=backref('municipality', uselist=False)
     )
+
+    @property
+    def has_data(self):
+        if self.pickup_dates.first() or self.scan_jobs.first():
+            return True
+        return False
