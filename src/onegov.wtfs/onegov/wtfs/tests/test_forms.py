@@ -924,6 +924,13 @@ def test_daily_list_selection_form(session):
     assert model.__class__.__name__ == 'DailyListBoxes'
     assert model.date == date(2019, 1, 1)
 
+    # Test get model
+    form.date.data = date(2019, 1, 1)
+    form.type.data = 'boxes_and_forms'
+    model = form.get_model()
+    assert model.__class__.__name__ == 'DailyListBoxesAndForms'
+    assert model.date == date(2019, 1, 1)
+
 
 def test_report_selection_form(session):
     groups = UserGroupCollection(session)

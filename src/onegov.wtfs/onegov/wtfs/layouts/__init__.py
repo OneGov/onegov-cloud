@@ -1,3 +1,4 @@
+from onegov.wtfs.layouts.daily_list import DailyListBoxesAndFormsLayout
 from onegov.wtfs.layouts.daily_list import DailyListBoxesLayout
 from onegov.wtfs.layouts.daily_list import DailyListLayout
 from onegov.wtfs.layouts.default import DefaultLayout
@@ -35,6 +36,7 @@ __all__ = (
     'AddScanJobLayout',
     'AddUserGroupLayout',
     'AddUserLayout',
+    'DailyListBoxesAndFormsLayout',
     'DailyListBoxesLayout',
     'DailyListLayout',
     'DefaultLayout',

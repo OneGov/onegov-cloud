@@ -1,6 +1,7 @@
 from datetime import date
 from onegov.user import UserGroup
 from onegov.wtfs.models import DailyListBoxes
+from onegov.wtfs.models import DailyListBoxesAndForms
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import Notification
 from onegov.wtfs.models import PickupDate
@@ -211,7 +212,7 @@ def add_report_data(session):
     session.flush()
 
 
-def test_daily_list(session):
+def test_daily_list_boxes(session):
     daily_list = DailyListBoxes(session, date_=date.today())
     assert daily_list.query.all() == []
     assert daily_list.total == (0, 0, 0, 0)
@@ -251,6 +252,58 @@ def test_daily_list(session):
     daily_list = DailyListBoxes(session, date_=date(2019, 1, 5))
     assert daily_list.query.all() == []
     assert daily_list.total == (0, 0, 0, 0)
+
+
+def test_daily_list_boxes_and_forms(session):
+    daily_list = DailyListBoxesAndForms(session, date_=date.today())
+    assert daily_list.query.all() == []
+    assert daily_list.total == (0, 0, 0, 0, 0, 0, 0)
+
+    add_report_data(session)
+
+    # 'dispatch_boxes',
+    #   'dispatch_tax_forms_older',
+    #   'dispatch_tax_forms_last_year',
+    #   'dispatch_tax_forms_current_year',
+    #   'dispatch_single_documents',
+    # 'dispatch_cantonal_tax_office',
+    # 'dispatch_cantonal_scan_center',
+    # -
+
+    daily_list = DailyListBoxesAndForms(session, date_=date(2019, 1, 1))
+    assert daily_list.query.all() == [
+        ('Adlikon', 1, 1, 2, 3, 4, 2, 3),
+        ('Aesch', 1, 1, 2, 3, 4, 2, 3)
+    ]
+    assert daily_list.total == (2, 2, 4, 6, 8, 4, 6)
+
+    daily_list = DailyListBoxesAndForms(session, date_=date(2019, 1, 2))
+
+    assert daily_list.query.all() == [
+        ('Adlikon', 3, 3, 2, 1, 1, 2, 1),
+        ('Aesch', 0, 0, 0, 0, 0, 0, 0),
+        ('Altikon', 1, 1, 2, 3, 4, 2, 3),
+        ('Andelfingen', 1, 1, 2, 3, 4, 2, 3)
+    ]
+    assert daily_list.total == (5, 5, 6, 7, 9, 6, 7)
+
+    daily_list = DailyListBoxesAndForms(session, date_=date(2019, 1, 3))
+    assert daily_list.query.all() == [
+        ('Adlikon', 0, 0, 0, 0, 0, 0, 0),
+        ('Aesch', 0, 0, 10, 0, 0, 10, 0)
+    ]
+    assert daily_list.total == (0, 0, 10, 0, 0, 10, 0)
+
+    daily_list = DailyListBoxesAndForms(session, date_=date(2019, 1, 4))
+    assert daily_list.query.all() == [
+        ('Aesch', 0, 0, 0, 0, 0, 0, 0),
+        ('Andelfingen', 0, 0, 0, 0, 0, 0, 0)
+    ]
+    assert daily_list.total == (0, 0, 0, 0, 0, 0, 0)
+
+    daily_list = DailyListBoxesAndForms(session, date_=date(2019, 1, 5))
+    assert daily_list.query.all() == []
+    assert daily_list.total == (0, 0, 0, 0, 0, 0, 0)
 
 
 def test_report_boxes(session):

@@ -28,15 +28,19 @@ def test_views_daily_job(client):
         add.form['type'].select("normal")
         add.form['municipality_id'].select(text="My Municipality")
         add.form['dispatch_date'] = "2019-01-05"
-        add.form['dispatch_boxes'] = "10034550"
-        add.form['dispatch_cantonal_tax_office'] = "62388304"
-        add.form['dispatch_cantonal_scan_center'] = "712283912"
+        add.form['dispatch_boxes'] = "1111"
+        add.form['dispatch_cantonal_tax_office'] = "2222"
+        add.form['dispatch_cantonal_scan_center'] = "3333"
+        add.form['dispatch_tax_forms_older'] = "4444"
+        add.form['dispatch_tax_forms_last_year'] = "5555"
+        add.form['dispatch_tax_forms_current_year'] = "6666"
+        add.form['dispatch_single_documents'] = "7777"
         added = add.form.submit().follow()
         assert "Scan-Auftrag hinzugefügt." in added
 
         edit = client.get('/scan-jobs').click("05.01.2019").click("Bearbeiten")
         edit.form['return_date'] = "2019-01-10"
-        edit.form['return_boxes'] = "28891238"
+        edit.form['return_boxes'] = "8888"
         assert "Scan-Auftrag geändert." in edit.form.submit().follow()
 
     def get_daily_list(type, date_):
@@ -45,36 +49,58 @@ def test_views_daily_job(client):
         select.form['date'] = date_
         return select.form.submit().follow()
 
-    # View daily list
+    # View daily list boxes
     view = get_daily_list('boxes', '2019-01-05')
-    assert "10034550" in view
-    assert "62388304" in view
-    assert "712283912" in view
-    assert "28891238" not in view
+    assert "1111" in view
+    assert "2222" in view
+    assert "3333" in view
+    assert "8888" not in view
 
     view = get_daily_list('boxes', '2019-01-10')
-    assert "10034550" not in view
-    assert "62388304" not in view
-    assert "712283912" not in view
-    assert "28891238" in view
+    assert "1111" not in view
+    assert "2222" not in view
+    assert "3333" not in view
+    assert "8888" in view
+
+    # View daily list boxes and forms
+    view = get_daily_list('boxes_and_forms', '2019-01-05')
+    assert "1111" in view
+    assert "2222" in view
+    assert "3333" in view
+    assert "4444" in view
+    assert "5555" in view
+    assert "6666" in view
+
+    view = get_daily_list('boxes_and_forms', '2019-01-10')
+    assert "1111" not in view
+    assert "2222" not in view
+    assert "3333" not in view
+    assert "4444" not in view
+    assert "5555" not in view
+    assert "6666" not in view
 
 
 @patch.object(CoreRequest, 'assert_valid_csrf_token')
 def test_views_daily_jobs_permissions(mock_method, client):
     client.get(f'/daily-list/boxes/2019-01-10', status=403)
+    client.get(f'/daily-list/boxes-and-forms/2019-01-10', status=403)
 
     client.login_optimo()
     client.get(f'/daily-list/boxes/2019-01-10')
+    client.get(f'/daily-list/boxes-and-forms/2019-01-10', status=403)
     client.logout()
 
     client.login_member()
     client.get(f'/daily-list/boxes/2019-01-10', status=403)
+    client.get(f'/daily-list/boxes-and-forms/2019-01-10', status=403)
     client.logout()
 
     client.login_editor()
     client.get(f'/daily-list/boxes/2019-01-10', status=403)
+    client.get(f'/daily-list/boxes-and-forms/2019-01-10', status=403)
     client.logout()
 
     client.login_admin()
     client.get(f'/daily-list/boxes/2019-01-10')
+    client.get(f'/daily-list/boxes-and-forms/2019-01-10')
     client.logout()

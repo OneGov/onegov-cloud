@@ -34,15 +34,11 @@ class Report(object):
 
     @cached_property
     def columns_in(self):
-        return [
-            'dispatch_boxes',
-            'dispatch_cantonal_tax_office',
-            'dispatch_cantonal_scan_center',
-        ]
+        raise NotImplementedError()
 
     @cached_property
     def columns_out(self):
-        return ['return_boxes']
+        raise NotImplementedError()
 
     @cached_property
     def columns(self):
@@ -111,6 +107,18 @@ class ReportBoxes(Report):
     def __init__(self, session, start=None, end=None):
         super().__init__(session, start, end, ['normal'])
 
+    @cached_property
+    def columns_in(self):
+        return [
+            'dispatch_boxes',
+            'dispatch_cantonal_tax_office',
+            'dispatch_cantonal_scan_center',
+        ]
+
+    @cached_property
+    def columns_out(self):
+        return ['return_boxes']
+
 
 class ReportBoxesAndForms(Report):
     """ A Report containing all boxes, tax forms and single documents. """
@@ -124,13 +132,13 @@ class ReportBoxesAndForms(Report):
             'dispatch_single_documents',
         ]
 
+    @cached_property
+    def columns_out(self):
+        return ['return_boxes']
+
 
 class ReportFormsByMunicipality(Report):
     """ A Report containing all tax forms of a single municipality. """
-
-    @cached_property
-    def columns_out(self):
-        return []
 
     @cached_property
     def columns_in(self):
@@ -139,3 +147,7 @@ class ReportFormsByMunicipality(Report):
             'dispatch_tax_forms_last_year',
             'dispatch_tax_forms_current_year',
         ]
+
+    @cached_property
+    def columns_out(self):
+        return []

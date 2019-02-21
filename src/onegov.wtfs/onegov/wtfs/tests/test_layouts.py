@@ -11,6 +11,7 @@ from onegov.wtfs.layouts import AddNotificationLayout
 from onegov.wtfs.layouts import AddScanJobLayout
 from onegov.wtfs.layouts import AddUserGroupLayout
 from onegov.wtfs.layouts import AddUserLayout
+from onegov.wtfs.layouts import DailyListBoxesAndFormsLayout
 from onegov.wtfs.layouts import DailyListBoxesLayout
 from onegov.wtfs.layouts import DailyListLayout
 from onegov.wtfs.layouts import DefaultLayout
@@ -38,6 +39,7 @@ from onegov.wtfs.layouts import UserLayout
 from onegov.wtfs.layouts import UsersLayout
 from onegov.wtfs.models import DailyList
 from onegov.wtfs.models import DailyListBoxes
+from onegov.wtfs.models import DailyListBoxesAndForms
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import Notification
 from onegov.wtfs.models import Report
@@ -518,6 +520,17 @@ def test_daily_list_layouts(session):
     assert list(hrefs(layout.editbar_links)) == ['#']
     assert path(layout.breadcrumbs) == (
         'DummyPrincipal/DailyList/#/DailyListBoxes'
+    )
+    assert layout.cancel_url == ''
+    assert layout.success_url == ''
+
+    model = DailyListBoxesAndForms(session, date_=date(2019, 1, 1))
+    layout = DailyListBoxesAndFormsLayout(model, request)
+    assert layout.title == 'Daily list boxes and forms'
+    assert layout.subtitle == 'Dienstag 01. Januar 2019'
+    assert list(hrefs(layout.editbar_links)) == ['#']
+    assert path(layout.breadcrumbs) == (
+        'DummyPrincipal/DailyList/#/DailyListBoxesAndForms'
     )
     assert layout.cancel_url == ''
     assert layout.success_url == ''

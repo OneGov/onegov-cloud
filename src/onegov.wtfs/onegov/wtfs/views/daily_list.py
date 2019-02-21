@@ -3,9 +3,11 @@ from onegov.wtfs import _
 from onegov.wtfs import WtfsApp
 from onegov.wtfs.forms import DailyListSelectionForm
 from onegov.wtfs.layouts import DailyListBoxesLayout
+from onegov.wtfs.layouts import DailyListBoxesAndFormsLayout
 from onegov.wtfs.layouts import DailyListLayout
 from onegov.wtfs.models import DailyList
 from onegov.wtfs.models import DailyListBoxes
+from onegov.wtfs.models import DailyListBoxesAndForms
 from onegov.wtfs.security import ViewModel
 
 
@@ -30,13 +32,17 @@ def view_select_report(self, request, form):
 
 @WtfsApp.html(
     model=DailyListBoxes,
-    template='daily_list.pt',
+    template='daily_list_boxes.pt',
     permission=ViewModel
 )
-def view_daily_list(self, request):
-    """ View a single daily list. """
-    layout = DailyListBoxesLayout(self, request)
+def view_daily_list_boxes(self, request):
+    return {'layout': DailyListBoxesLayout(self, request)}
 
-    return {
-        'layout': layout,
-    }
+
+@WtfsApp.html(
+    model=DailyListBoxesAndForms,
+    template='daily_list_boxes_and_forms.pt',
+    permission=ViewModel
+)
+def view_daily_list_boxes_and_forms(self, request):
+    return {'layout': DailyListBoxesAndFormsLayout(self, request)}

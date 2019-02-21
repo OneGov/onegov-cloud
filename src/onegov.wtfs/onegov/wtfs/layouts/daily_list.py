@@ -18,13 +18,9 @@ class DailyListLayout(DefaultLayout):
         ]
 
 
-class DailyListBoxesLayout(DefaultLayout):
+class SpecificDailyListBaseLayout(DefaultLayout):
 
     date_custom_format = 'EEEE dd. MMMM yyyy'
-
-    @cached_property
-    def title(self):
-        return _("Daily list boxes")
 
     @cached_property
     def subtitle(self):
@@ -53,3 +49,17 @@ class DailyListBoxesLayout(DefaultLayout):
             Link(self.title, "#"),
             Link(self.subtitle, self.request.link(self.model)),
         ]
+
+
+class DailyListBoxesLayout(SpecificDailyListBaseLayout):
+
+    @cached_property
+    def title(self):
+        return _("Daily list boxes")
+
+
+class DailyListBoxesAndFormsLayout(SpecificDailyListBaseLayout):
+
+    @cached_property
+    def title(self):
+        return _("Daily list boxes and forms")

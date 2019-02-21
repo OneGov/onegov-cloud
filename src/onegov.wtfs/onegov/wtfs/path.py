@@ -10,6 +10,7 @@ from onegov.wtfs.collections import NotificationCollection
 from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.models import DailyList
 from onegov.wtfs.models import DailyListBoxes
+from onegov.wtfs.models import DailyListBoxesAndForms
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import Notification
 from onegov.wtfs.models import Principal
@@ -117,6 +118,17 @@ def get_daily_list(request):
 )
 def get_daily_list_boxes(request, date):
     return DailyListBoxes(request.session, date)
+
+
+@WtfsApp.path(
+    model=DailyListBoxesAndForms,
+    path='/daily-list/boxes-and-forms/{date}',
+    converters=dict(
+        date=extended_date_converter,
+    )
+)
+def get_daily_list_boxes_and_forms(request, date):
+    return DailyListBoxesAndForms(request.session, date)
 
 
 @WtfsApp.path(
