@@ -515,7 +515,7 @@ def test_daily_list_layouts(session):
     layout = DailyListBoxesLayout(model, request)
     assert layout.title == 'Daily list boxes'
     assert layout.subtitle == 'Dienstag 01. Januar 2019'
-    assert layout.editbar_links == []
+    assert list(hrefs(layout.editbar_links)) == ['#']
     assert path(layout.breadcrumbs) == (
         'DummyPrincipal/DailyList/#/DailyListBoxes'
     )
@@ -542,7 +542,7 @@ def test_report_layouts(session):
     layout = ReportBoxesLayout(model, request)
     assert layout.title == 'Report boxes'
     assert layout.subtitle == '01.01.2019-31.01.2019'
-    assert layout.editbar_links == []
+    assert list(hrefs(layout.editbar_links)) == ['#']
     assert path(layout.breadcrumbs) == 'DummyPrincipal/Report/#/ReportBoxes'
     assert layout.cancel_url == ''
     assert layout.success_url == ''
@@ -555,7 +555,7 @@ def test_report_layouts(session):
     layout = ReportBoxesAndFormsLayout(model, request)
     assert layout.title == 'Report boxes and forms'
     assert layout.subtitle == '01.01.2019-31.01.2019'
-    assert layout.editbar_links == []
+    assert list(hrefs(layout.editbar_links)) == ['#']
     assert path(layout.breadcrumbs) == (
         'DummyPrincipal/Report/#/ReportBoxesAndForms'
     )
@@ -571,7 +571,7 @@ def test_report_layouts(session):
     layout = ReportFormsByMunicipalityLayout(model, request)
     assert layout.title == 'Report forms'
     assert layout.subtitle == 'Adlikon 01.01.2019-31.01.2019'
-    assert layout.editbar_links == []
+    assert list(hrefs(layout.editbar_links)) == ['#']
     assert path(layout.breadcrumbs) == (
         'DummyPrincipal/Report/#/ReportFormsByMunicipality'
     )

@@ -31,6 +31,21 @@ class DailyListBoxesLayout(DefaultLayout):
         return self.format_date(self.model.date, 'date_custom')
 
     @cached_property
+    def editbar_links(self):
+        result = []
+        result.append(
+            Link(
+                text=_("Print"),
+                url='#',
+                attrs={
+                    'class': 'print-icon',
+                    'onclick': 'window.print();return false;'
+                }
+            )
+        )
+        return result
+
+    @cached_property
     def breadcrumbs(self):
         return [
             Link(_("Homepage"), self.homepage_url),
