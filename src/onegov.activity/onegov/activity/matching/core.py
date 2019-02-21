@@ -100,12 +100,12 @@ class OccasionAgent(hashable('id')):
 
     __slots__ = ('occasion', 'bookings', 'attendees', 'score_function')
 
-    def __init__(self, occasion, score_function):
+    def __init__(self, occasion, score_function=None):
         self.id = occasion.id
         self.occasion = occasion
         self.bookings = set()
         self.attendees = {}
-        self.score_function = score_function
+        self.score_function = score_function or (lambda b: b.score)
 
     @property
     def full(self):
@@ -156,16 +156,6 @@ class OccasionAgent(hashable('id')):
             return True
 
         return False
-
-
-def eager_score(bookings, score_function):
-    """ Eagerly caches the booking scores by calculating them in advance.
-
-    Returns a new score_function which uses those precomupted values.
-
-    """
-    scores = {b: score_function(b) for b in bookings}
-    return scores.get
 
 
 def deferred_acceptance(bookings, occasions,
@@ -245,11 +235,18 @@ def deferred_acceptance(bookings, occasions,
         bookings = sorted(bookings, key=lambda b: b.attendee_id)
 
     attendee_limits = attendee_limits or {}
-    score_function = eager_score(bookings, score_function or Scoring())
 
-    occasions = {
-        o.id: OccasionAgent(o, score_function) for o in occasions
-    }
+    # pre-calculate the booking scores
+    score_function = score_function or Scoring()
+
+    for booking in bookings:
+        booking.score = score_function(booking)
+
+    # after the booking score has been calculated, the scoring function
+    # should no longer be used for performance reasons
+    score_function = None
+
+    occasions = {o.id: OccasionAgent(o) for o in occasions}
 
     attendees = {
         aid: AttendeeAgent(

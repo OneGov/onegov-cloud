@@ -36,13 +36,14 @@ def days(n):
 
 class Booking(MatchableBooking):
 
-    def __init__(self, occasion, attendee, state, priority, dates):
+    def __init__(self, occasion, attendee, state, priority, dates, score=0):
         self.occasion = occasion
         self.attendee = attendee
         self._id = next(keycount)
         self._state = state
         self._priority = priority
         self._dates = dates
+        self.score = score
 
     def __eq__(self, other):
         return self._id == other._id

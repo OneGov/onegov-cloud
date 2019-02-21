@@ -60,6 +60,9 @@ class Booking(Base, TimestampMixin):
     #: the cost of the booking
     cost = Column(Numeric(precision=8, scale=2), nullable=True)
 
+    #: the calculated score of the booking
+    score = Column(Numeric(precision=14, scale=9), nullable=False, default=0)
+
     #: the period this booking belongs to
     @aggregated('occasion', Column(
         UUID, ForeignKey("periods.id"), nullable=False)
@@ -98,12 +101,15 @@ class Booking(Base, TimestampMixin):
 
     def group_code_count(self, states=('open', 'accepted')):
         """ Returns the number of bookings with the same group code. """
-        return object_session(self)\
+        query = object_session(self)\
             .query(Booking)\
             .with_entities(func.count(Booking.id))\
-            .filter(Booking.group_code == self.group_code)\
-            .filter(Booking.state.in_(states))\
-            .scalar()
+            .filter(Booking.group_code == self.group_code)
+
+        if states != '*':
+            query = query.filter(Booking.state.in_(states))\
+
+        return query.scalar()
 
     def period_bound_booking_state(self, period):
         """ During pre-booking we don't show the actual state of the booking,

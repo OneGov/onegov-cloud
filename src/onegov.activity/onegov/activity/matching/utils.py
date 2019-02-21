@@ -75,7 +75,7 @@ def booking_order(booking):
 
     """
 
-    return booking.priority * -1, booking.id
+    return booking.score * - 1, booking.priority * -1, booking.id
 
 
 def unblockable(accepted, blocked, key=booking_order):

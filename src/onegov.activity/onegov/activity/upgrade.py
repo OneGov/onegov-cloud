@@ -674,3 +674,12 @@ def adds_exempt_from_booking_limit_to_occasion(context):
         column=Column('exempt_from_booking_limit', Boolean, nullable=False),
         default=False
     )
+
+
+@upgrade_task('Adds score to bookings')
+def adds_score_to_bookings(context):
+    context.add_column_with_defaults(
+        table='bookings',
+        column=Column('score', Numeric(precision=14, scale=9), nullable=False),
+        default=0
+    )

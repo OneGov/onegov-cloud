@@ -398,3 +398,29 @@ def test_keep_groups_together(session, owner, collections, prebooking_period):
     assert b2.state == 'open'
     assert b3.state == 'accepted'
     assert b4.state == 'accepted'
+
+
+def test_prefer_groups_equal(session, owner, collections, prebooking_period):
+    # make sure that given an equal choice between two occasions we prefer
+    # the group joining an occasion over joining another as a non-group
+    o1 = new_occasion(collections, prebooking_period, 0, 1)
+    o2 = new_occasion(collections, prebooking_period, 0, 1)
+
+    a1 = new_attendee(collections, user=owner)
+    a2 = new_attendee(collections, user=owner)
+
+    b1 = collections.bookings.add(owner, a1, o1, priority=0)
+    b2 = collections.bookings.add(owner, a2, o1, priority=0)
+    b3 = collections.bookings.add(owner, a1, o2, priority=0)
+    b4 = collections.bookings.add(owner, a2, o2, priority=0)
+
+    b1.group_code = b2.group_code = 'foo'
+
+    match(session, prebooking_period.id, score_function=Scoring(
+        criteria=[PreferGroups.from_session(session)]
+    ))
+
+    assert b1.state == 'accepted'
+    assert b2.state == 'accepted'
+    assert b3.state == 'blocked'
+    assert b4.state == 'blocked'
