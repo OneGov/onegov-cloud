@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.5.4 (2019-02-21)
+~~~~~~~~~~~~~~~~~~~
 
 - Shows the calculated store on each booking.
   [href]
