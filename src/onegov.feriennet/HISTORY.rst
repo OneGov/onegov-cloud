@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Reduces wiggle-room of age checks to 0.
+  [href]
+
 - Updates Concordia banner urls.
   [href]
 
