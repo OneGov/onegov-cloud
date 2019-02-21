@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Shows the calculated store on each booking.
+  [href]
+
+- Fixes some issues with group codes.
+  [href]
+
 - Fixes invoice items export.
   [href]
 

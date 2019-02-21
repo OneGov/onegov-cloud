@@ -154,7 +154,7 @@ def actions_by_booking(layout, period, booking):
     if not period:
         return actions
 
-    if booking.state in ('accepted', 'open'):
+    if period.wishlist_phase or booking.state in ('accepted', 'open'):
         if period.wishlist_phase or period.booking_phase:
             if not booking.group_code:
                 actions.append(
@@ -168,7 +168,12 @@ def actions_by_booking(layout, period, booking):
                 )
             else:
                 # XXX this is not too efficient as there might be many queries
-                count = booking.group_code_count() - 1
+                if period.wishlist_phase:
+                    states = '*'
+                else:
+                    states = ('open', 'accepted')
+
+                count = booking.group_code_count(states) - 1
 
                 invite = GroupInvite(
                     layout.request.session, booking.group_code)
@@ -178,7 +183,7 @@ def actions_by_booking(layout, period, booking):
                     # the group code is not shown if the attendee is alone
                     actions.append(
                         Link(
-                            text=_("Invite a companion"),
+                            text=_("Invite a companion ⚠️"),
                             url=layout.request.link(invite),
                             attrs={
                                 'class': 'invite-link',

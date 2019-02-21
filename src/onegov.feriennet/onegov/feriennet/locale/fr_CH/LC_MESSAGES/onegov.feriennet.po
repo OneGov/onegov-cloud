@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-02-20 15:50+0100\n"
+"POT-Creation-Date: 2019-02-21 11:38+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1107,8 +1107,8 @@ msgstr "Quantité d'articles de la facture"
 msgid "Invoice Item Amount"
 msgstr "Montant facture"
 
-msgid "Invoice References"
-msgstr "Références facture"
+msgid "Invoice Item References"
+msgstr ""
 
 msgid "Accepted"
 msgstr "Accepté"
@@ -1558,6 +1558,9 @@ msgstr "Notification"
 
 msgid "State"
 msgstr "Etat"
+
+msgid "Score"
+msgstr "Score"
 
 msgid "No bookings."
 msgstr "Pas de réservations."
@@ -2057,6 +2060,9 @@ msgstr "Voulez-vous vraiment supprimer « ${title} » ?"
 msgid "Remove Booking"
 msgstr "Supprimer la réservation"
 
+msgid "Invite a companion ⚠️"
+msgstr ""
+
 #, python-format
 msgid "Do you really want to cancel \"${title}\"?"
 msgstr "Voulez-vous vraiment annuler « ${title} » ?"
@@ -2427,6 +2433,9 @@ msgstr "Voulez-vous vraiment supprimer la réservation de ${attendee} ?"
 #, python-format
 msgid "Do you really want to cancel ${attendee}'s booking?"
 msgstr "Voulez-vous vraiment annuler la réservation de ${attendee} ?"
+
+#~ msgid "Invoice References"
+#~ msgstr "Références facture"
 
 #~ msgid "Invoice Item Code"
 #~ msgstr "Code de l'article de la facture"

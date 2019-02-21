@@ -1,7 +1,7 @@
 from cached_property import cached_property
-from onegov.activity.models import Attendee, Booking, Occasion
+from onegov.activity.models import Attendee, Booking, Occasion, Period
 from onegov.activity.utils import random_group_code
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from sqlalchemy.orm import joinedload
 
 
@@ -35,10 +35,12 @@ class GroupInvite(object):
         return self.session.query(Booking)\
             .options(joinedload(Booking.attendee))\
             .options(joinedload(Booking.occasion))\
+            .options(joinedload(Booking.period))\
             .filter_by(group_code=self.group_code)\
-            .filter(Booking.state.in_((
-                'open', 'accepted'
-            )))
+            .filter(or_(
+                Booking.state.in_(('open', 'accepted')),
+                Period.confirmed == False
+            ))
 
     @cached_property
     def occasion(self):

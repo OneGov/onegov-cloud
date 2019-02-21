@@ -272,5 +272,6 @@ def reset_matching(self, request):
 
     for booking in bookings:
         booking.state = 'open'
+        booking.score = 0
 
     request.success(_("The matching was successfully reset"))

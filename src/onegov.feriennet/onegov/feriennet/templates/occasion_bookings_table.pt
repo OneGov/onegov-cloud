@@ -7,6 +7,7 @@
                 <th i18n:translate>Age</th>
                 <th i18n:translate>Group</th>
                 <th i18n:translate>State</th>
+                <th i18n:translate>Score</th>
                 <th>
                     <tal:b
                         define="
@@ -35,11 +36,14 @@
                     <td><span>${booking.attendee.name}</span></td>
                     <td><span>${booking.attendee.age}</span></td>
                     <td><span class="group-code" tal:condition="booking.group_code">${booking.group_code}</span></td>
-                    <td>
+                    <td style="position: relative;">
                         <tal:b
                             define="state booking.state"
                             metal:use-macro="layout.macros.booking_state"
                         />
+                    </td>
+                    <td>
+                        <span class="booking-score">${'%.9f' % booking.score}</span>
                     </td>
                     <td>
                         <tal:b

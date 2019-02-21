@@ -160,6 +160,16 @@ ul.single-line {
     @include group-code;
 }
 
+/*
+    Booking score
+*/
+.booking-score {
+    @include group-code;
+    background: rgba(250, 250, 250, .4);
+    border-color: rgba(220, 220, 220, .1);
+    font-size: .8rem;
+}
+
 .fixed-width::before,
 .fixed-width::after {
     display: inline-block;
@@ -1313,24 +1323,39 @@ $booking-left-margin: 2rem;
     table {
         width: 100%;
 
+        td:nth-child(1),
+        th:nth-child(1) {
+            width: 2.5%;
+        }
+
         td:nth-child(2),
         th:nth-child(2) {
-            width: 30%;
+            width: auto;
         }
 
         td:nth-child(3),
         th:nth-child(3) {
-            width: 5%;
+            width: 2.5%;
         }
 
         td:nth-child(4),
         th:nth-child(4) {
-            width: 20.5%;
+            width: 18.5%;
+        }
+
+        td:nth-child(5),
+        th:nth-child(5) {
+            width: 17.5%;
         }
 
         td:nth-child(6),
         th:nth-child(6) {
-            width: 5%;
+            width: 17.5%;
+        }
+
+        td:nth-child(7),
+        th:nth-child(7) {
+            width: 2.5%;
         }
 
         td {
@@ -1403,7 +1428,7 @@ $booking-left-margin: 2rem;
 
     .matching-details {
         display: inline-block;
-        width: 90%;
+        width: 100%;
 
         > button {
             float: right;
