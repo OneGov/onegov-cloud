@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.16.0 (2019-02-21)
+~~~~~~~~~~~~~~~~~~~
 
 - Stores the calculate score on each booking.
   [href]
