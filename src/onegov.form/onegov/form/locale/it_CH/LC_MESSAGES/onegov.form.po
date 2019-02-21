@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-01-31 08:29+0100\n"
+"POT-Creation-Date: 2019-02-21 09:38+0100\n"
 "PO-Revision-Date: 2019-01-31 08:33+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Italian\n"
@@ -40,6 +40,9 @@ msgstr ""
 
 #, python-format
 msgid "'{label}' is a reserved name. Please use a different name."
+msgstr ""
+
+msgid "Define at least one required field"
 msgstr ""
 
 msgid "Not a valid phone number."

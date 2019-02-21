@@ -8,6 +8,7 @@ from onegov.form.validators import StrictOptional
 from onegov.pay import Price
 from operator import itemgetter
 from wtforms import Form as BaseForm
+from wtforms import StringField, TextAreaField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import InputRequired, DataRequired
 from wtforms_components import If, Chain
@@ -351,6 +352,17 @@ class Form(BaseForm):
         )
 
         return matches and True or False
+
+    @property
+    def title_fields(self):
+        """ Fields used to generate a title. """
+
+        return self.match_fields(
+            include_classes=(StringField, ),
+            exclude_classes=(TextAreaField, ),
+            required=True,
+            limit=3
+        )
 
     def match_fields(self, include_classes=None, exclude_classes=None,
                      required=None, limit=None):

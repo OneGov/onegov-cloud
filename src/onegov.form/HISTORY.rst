@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds the ability to enforce a required field on a form definition.
+  [href]
+
 0.44.1 (2019-02-20)
 ~~~~~~~~~~~~~~~~~~~
 

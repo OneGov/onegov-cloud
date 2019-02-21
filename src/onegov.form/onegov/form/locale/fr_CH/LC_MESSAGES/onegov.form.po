@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-01-31 08:29+0100\n"
+"POT-Creation-Date: 2019-02-21 09:38+0100\n"
 "PO-Revision-Date: 2019-01-31 08:31+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -20,7 +20,8 @@ msgstr ""
 
 #, python-format
 msgid "The file is too large, please provide a file smaller than {}."
-msgstr "Le fichier est trop volumineux, veuillez fournir un fichier de moins de {}."
+msgstr ""
+"Le fichier est trop volumineux, veuillez fournir un fichier de moins de {}."
 
 msgid "Files of this type are not supported."
 msgstr "Les fichiers de ce type ne sont pas pris en charge."
@@ -42,6 +43,9 @@ msgstr "Le champ '{label}' existe plus d'une fois."
 #, python-format
 msgid "'{label}' is a reserved name. Please use a different name."
 msgstr "'{label}' est un nom réservé. Veuillez utiliser un nom différent."
+
+msgid "Define at least one required field"
+msgstr "Définissez au moins un champs requis"
 
 msgid "Not a valid phone number."
 msgstr "N'est pas un numéro de téléphone valide."

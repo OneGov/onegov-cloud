@@ -22,7 +22,6 @@ from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils import observes
 from uuid import uuid4
-from wtforms import StringField, TextAreaField
 from wtforms.fields.html5 import EmailField
 
 
@@ -169,13 +168,7 @@ class FormSubmission(Base, TimestampMixin, Payable, AssociatedFiles,
         if self.state == 'complete':
             form = self.form_class(data=self.data)
 
-            title_fields = form.match_fields(
-                include_classes=(StringField, ),
-                exclude_classes=(TextAreaField, ),
-                required=True,
-                limit=3
-            )
-
+            title_fields = form.title_fields
             if title_fields:
                 self.title = extract_text_from_html(', '.join(
                     html.unescape(render_field(form._fields[id]))
