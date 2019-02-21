@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Enforces at least one required field on directories.
+  [href]
+
 1.1.1 (2019-02-20)
 ~~~~~~~~~~~~~~~~~~~
 

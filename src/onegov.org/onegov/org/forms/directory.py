@@ -53,7 +53,10 @@ class DirectoryBaseForm(Form):
         fieldset=_("General"),
         validators=[
             validators.InputRequired(),
-            ValidFormDefinition(require_email_field=False)
+            ValidFormDefinition(
+                require_email_field=False,
+                require_title_fields=True
+            )
         ],
         render_kw={'rows': 32, 'data-editor': 'form'})
 
