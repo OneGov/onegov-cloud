@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Renames party recommendation columns.
+  [msom]
+
 0.0.33 (2019-02-20)
 ~~~~~~~~~~~~~~~~~~~
 
