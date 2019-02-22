@@ -87,10 +87,41 @@ def get_municipality(request, id):
 
 @WtfsApp.path(
     model=ScanJobCollection,
-    path='/scan-jobs'
+    path='/scan-jobs',
+    converters=dict(
+        page=int,
+        from_date=extended_date_converter,
+        to_date=extended_date_converter,
+        type=[str],
+        municipality_id=[str],
+        sort_by=str,
+        sort_order=str
+    )
 )
-def get_scan_jobs(request):
-    return ScanJobCollection(request.session)
+def get_scan_jobs(
+    request,
+    page=None,
+    from_date=None,
+    to_date=None,
+    type=None,
+    municipality_id=None,
+    sort_by=None,
+    sort_order=None
+):
+    return ScanJobCollection(
+        request.session,
+        page=page,
+        group_id=(
+            None if request.has_role('admin')
+            else getattr(request.identity, 'groupid', 'nogroup')
+        ),
+        from_date=from_date,
+        to_date=to_date,
+        type=type,
+        municipality_id=municipality_id,
+        sort_by=sort_by,
+        sort_order=sort_order
+    )
 
 
 @WtfsApp.path(

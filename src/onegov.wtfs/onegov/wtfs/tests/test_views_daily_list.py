@@ -24,7 +24,7 @@ def test_views_daily_job(client):
 
     # Add a scan job
     with freeze_time("2019-01-01"):
-        add = client.get('/scan-jobs').click(href='add')
+        add = client.get('/scan-jobs/unrestricted').click(href='add')
         add.form['type'].select("normal")
         add.form['municipality_id'].select(text="My Municipality")
         add.form['dispatch_date'] = "2019-01-05"
@@ -35,13 +35,13 @@ def test_views_daily_job(client):
         add.form['dispatch_tax_forms_last_year'] = "5555"
         add.form['dispatch_tax_forms_current_year'] = "6666"
         add.form['dispatch_single_documents'] = "7777"
-        added = add.form.submit().follow()
-        assert "Scan-Auftrag hinzugefügt." in added
+        assert "Scan-Auftrag hinzugefügt." in add.form.submit().maybe_follow()
 
-        edit = client.get('/scan-jobs').click("05.01.2019").click("Bearbeiten")
+        edit = client.get('/scan-jobs/unrestricted')\
+            .click("05.01.2019").click("Bearbeiten")
         edit.form['return_date'] = "2019-01-10"
         edit.form['return_boxes'] = "8888"
-        assert "Scan-Auftrag geändert." in edit.form.submit().follow()
+        assert "Scan-Auftrag geändert." in edit.form.submit().maybe_follow()
 
     def get_daily_list(type, date_):
         select = client.get('/daily-list')

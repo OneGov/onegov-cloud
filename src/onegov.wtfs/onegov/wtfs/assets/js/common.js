@@ -11,6 +11,31 @@ var setupRedirectAfter = function(elements) {
     });
 };
 
+
+// Make the filters of the search collapsible and store the current
+// state in the browser
+var initSearchFilters = function() {
+    var fieldsetLegend = $('#fieldset-filter legend');
+    var key = 'fieldset-filter-hidden';
+
+    fieldsetLegend.click(function() {
+        var fieldset = $(this).parent('fieldset');
+        localStorage.setItem(key, fieldset.hasClass('collapsed') ? 'visible' : 'hidden');
+        fieldset.toggleClass('collapsed').children('.formfields').toggle();
+        $(this).parents('form').children('.button').toggle();
+    });
+
+    if (key in localStorage) {
+        var value = localStorage.getItem(key);
+        if (value == 'hidden') {
+            fieldsetLegend.click();
+        }
+    } else {
+        fieldsetLegend.click();
+    }
+};
+
+
 // sets up the given nodes with the functionality provided by common.js
 // this is done at document.ready and can be repeated for out of band content
 var processCommonNodes = function(elements, out_of_band) {
@@ -29,6 +54,9 @@ var processCommonNodes = function(elements, out_of_band) {
 
     // initialise zurb foundation (only works on the document level)
     $(document).foundation();
+
+    // make the extended filters of the search collapsible
+    initSearchFilters();
 
     // Make sure files open in another window
     targets.find('.page-text a[href*="/datei/"]').attr('target', '_blank');

@@ -7,6 +7,7 @@ from onegov.user import User
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
 from onegov.wtfs.collections import MunicipalityCollection
+from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.forms import AddScanJobForm
 from onegov.wtfs.forms import DailyListSelectionForm
 from onegov.wtfs.forms import DeleteMunicipalityDatesForm
@@ -16,8 +17,10 @@ from onegov.wtfs.forms import MunicipalityForm
 from onegov.wtfs.forms import MunicipalityIdSelectionForm
 from onegov.wtfs.forms import NotificationForm
 from onegov.wtfs.forms import ReportSelectionForm
+from onegov.wtfs.forms import ScanJobsForm
 from onegov.wtfs.forms import UnrestrictedAddScanJobForm
 from onegov.wtfs.forms import UnrestrictedEditScanJobForm
+from onegov.wtfs.forms import UnrestrictedScanJobsForm
 from onegov.wtfs.forms import UnrestrictedUserForm
 from onegov.wtfs.forms import UserForm
 from onegov.wtfs.forms import UserGroupForm
@@ -1006,4 +1009,86 @@ def test_notification_form():
         'title': "Title",
         'text': "Text"
     }))
+    assert form.validate()
+
+
+def test_scan_jobs_form(session):
+    scan_jobs = ScanJobCollection(session)
+
+    # Test apply
+    form = ScanJobsForm()
+    form.apply_model(scan_jobs)
+    assert form.sort_by.data is None
+    assert form.sort_order.data is None
+    assert form.from_date.data is None
+    assert form.to_date.data is None
+    assert form.type.data == ['normal', 'express']
+
+    scan_jobs.sort_by = 'delivery_number'
+    scan_jobs.sort_order = 'ascending'
+    scan_jobs.from_date = date(2010, 1, 1)
+    scan_jobs.to_date = date(2010, 12, 31)
+    scan_jobs.type = ['express']
+
+    form.apply_model(scan_jobs)
+
+    assert form.sort_by.data == 'delivery_number'
+    assert form.sort_order.data == 'ascending'
+    assert form.from_date.data == date(2010, 1, 1)
+    assert form.to_date.data == date(2010, 12, 31)
+    assert form.type.data == ['express']
+
+    # Test validation
+    form = ScanJobsForm()
+    assert form.validate()
+
+
+def test_unrestricted_scan_jobs_form(session):
+    scan_jobs = ScanJobCollection(session)
+    groups = UserGroupCollection(session)
+    municipalities = MunicipalityCollection(session)
+    municipalities.add(
+        name="Adlikon",
+        bfs_number=21,
+        group_id=groups.add(name="Adlikon").id
+    )
+    municipalities.add(
+        name="Aesch",
+        bfs_number=241,
+        group_id=groups.add(name="Aesch").id
+    )
+
+    # Test on request / popluate
+    form = UnrestrictedScanJobsForm()
+    form.request = Request(session)
+    form.on_request()
+    assert [m[1] for m in form.municipality_id.choices] == ['Adlikon', 'Aesch']
+
+    # Test apply
+    form.apply_model(scan_jobs)
+    assert form.sort_by.data is None
+    assert form.sort_order.data is None
+    assert form.from_date.data is None
+    assert form.to_date.data is None
+    assert form.type.data == ['normal', 'express']
+    assert form.municipality_id.data is None
+
+    scan_jobs.sort_by = 'delivery_number'
+    scan_jobs.sort_order = 'ascending'
+    scan_jobs.from_date = date(2010, 1, 1)
+    scan_jobs.to_date = date(2010, 12, 31)
+    scan_jobs.type = ['express']
+    scan_jobs.municipality_id = [municipalities.query().first().id]
+
+    form.apply_model(scan_jobs)
+
+    assert form.sort_by.data == 'delivery_number'
+    assert form.sort_order.data == 'ascending'
+    assert form.from_date.data == date(2010, 1, 1)
+    assert form.to_date.data == date(2010, 12, 31)
+    assert form.type.data == ['express']
+    assert form.municipality_id.data == [municipalities.query().first().id]
+
+    # Test validation
+    form = UnrestrictedScanJobsForm()
     assert form.validate()

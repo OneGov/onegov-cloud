@@ -1,4 +1,5 @@
 from datetime import date
+from onegov.core.orm.func import unaccent
 from onegov.form import Form
 from onegov.wtfs import _
 from onegov.wtfs.models import Municipality
@@ -57,7 +58,7 @@ class ReportSelectionForm(Form):
 
     def on_request(self):
         query = self.request.session.query(Municipality.name.label('name'))
-        query = query.order_by(Municipality.name)
+        query = query.order_by(unaccent(Municipality.name))
         self.municipality.choices = [(r.name, r.name) for r in query]
 
     def get_model(self):

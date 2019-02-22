@@ -1,11 +1,15 @@
 from datetime import date
 from datetime import timedelta
 from dateutil.parser import parse
+from onegov.core.orm.func import unaccent
 from onegov.form import Form
+from onegov.form.fields import ChosenSelectMultipleField
+from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
 from onegov.wtfs import _
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import PickupDate
+from wtforms import HiddenField
 from wtforms import IntegerField
 from wtforms import RadioField
 from wtforms import SelectField
@@ -404,7 +408,7 @@ class UnrestrictedAddScanJobForm(Form):
             Municipality.id.label('id'),
             Municipality.name.label('name')
         )
-        query = query.order_by(Municipality.name)
+        query = query.order_by(unaccent(Municipality.name))
         self.municipality_id.choices = [(r.id.hex, r.name) for r in query]
 
     def update_model(self, model):
@@ -581,7 +585,7 @@ class UnrestrictedEditScanJobForm(Form):
             Municipality.id.label('id'),
             Municipality.name.label('name')
         )
-        query = query.order_by(Municipality.name)
+        query = query.order_by(unaccent(Municipality.name))
         self.municipality_id.choices = [(r.id.hex, r.name) for r in query]
 
     def update_model(self, model):
@@ -638,3 +642,68 @@ class UnrestrictedEditScanJobForm(Form):
             'return_note',
         ):
             getattr(self, name).data = getattr(model, name)
+
+
+class ScanJobsForm(Form):
+
+    sort_by = HiddenField()
+    sort_order = HiddenField()
+
+    from_date = DateField(
+        label=_("Start date"),
+        fieldset=_("Filter")
+    )
+
+    to_date = DateField(
+        label=_("End date"),
+        fieldset=_("Filter")
+    )
+
+    type = MultiCheckboxField(
+        label=_("Type"),
+        fieldset=_("Filter"),
+        choices=[
+            ('normal', _("Regular shipment")),
+            ('express', _("Express shipment"))
+        ]
+    )
+
+    def on_request(self):
+        if hasattr(self, 'csrf_token'):
+            self.delete_field('csrf_token')
+
+    def select_all(self, name):
+        field = getattr(self, name)
+        if not field.data:
+            field.data = list(next(zip(*field.choices)))
+
+    def apply_model(self, model):
+        self.from_date.data = model.from_date
+        self.to_date.data = model.to_date
+        self.type.data = model.type
+        self.sort_by.data = model.sort_by
+        self.sort_order.data = model.sort_order
+
+        # default unselected checkboxes to all choices
+        self.select_all('type')
+
+
+class UnrestrictedScanJobsForm(ScanJobsForm):
+
+    municipality_id = ChosenSelectMultipleField(
+        label=_("Municipality"),
+        fieldset=_("Filter")
+    )
+
+    def on_request(self):
+        super().on_request()
+        query = self.request.session.query(
+            Municipality.id.label('id'),
+            Municipality.name.label('name')
+        )
+        query = query.order_by(unaccent(Municipality.name))
+        self.municipality_id.choices = [(r.id.hex, r.name) for r in query]
+
+    def apply_model(self, model):
+        super().apply_model(model)
+        self.municipality_id.data = model.municipality_id

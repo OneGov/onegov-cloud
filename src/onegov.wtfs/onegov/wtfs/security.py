@@ -35,6 +35,10 @@ class ViewModel(object):
     """ The permission to view a given model. """
 
 
+class ViewModelUnrestricted(object):
+    """ The permission to view a given model without any restrictions. """
+
+
 def same_group(model, identity):
     if model.group_id and identity.groupid:
         return model.group_id.hex == identity.groupid
@@ -51,6 +55,7 @@ def get_roles_setting():
             EditModelUnrestricted,
             DeleteModel,
             ViewModel,
+            ViewModelUnrestricted,
             Public,
         )),
         'editor': set((

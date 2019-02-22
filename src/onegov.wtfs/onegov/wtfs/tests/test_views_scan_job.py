@@ -87,7 +87,8 @@ def test_views_scan_job(client):
 
     # Check the date hints
     with freeze_time("2019-01-01"):
-        edit = client.get('/scan-jobs').click("05.01.2019").click("Bearbeiten")
+        edit = client.get('/scan-jobs/unrestricted')\
+            .click("05.01.2019").click("Bearbeiten")
         dates = client.post(
             '/dispatch-dates',
             {
@@ -98,9 +99,79 @@ def test_views_scan_job(client):
         assert "05.01.2019" in dates
 
     # Delete scan job
-    deleted = client.get('/scan-jobs').click("05.01.2019").click("Löschen")
+    deleted = client.get('/scan-jobs/unrestricted')\
+        .click("05.01.2019").click("Löschen")
     assert deleted.status_int == 200
     assert "05.01.2019" not in client.get('/scan-jobs')
+
+
+def test_views_scan_jobs_filter(client):
+    # Add a municipality with dates
+    client.login_admin()
+
+    add = client.get('/municipalities').click(href='add')
+    add.form['name'] = "My Municipality"
+    add.form['bfs_number'] = '1'
+    add.form['group_id'].select(text="My Group")
+    assert "My Municipality" in add.form.submit().follow()
+
+    upload = client.get('/municipalities').click("Daten importieren")
+    upload.form['file'] = Upload(
+        'test.csv',
+        "Gemeinde-Nr,Vordefinierte Termine\n1,5.1.2019".encode('utf-8'),
+        'text/csv'
+    )
+    assert "Gemeindedaten importiert." in upload.form.submit().follow()
+
+    # Add scan jobs
+    client.logout()
+    client.login_member()
+    with freeze_time("2019-01-01"):
+        add = client.get('/scan-jobs').click(href='add')
+        add.form['type'].select('normal')
+        add.form['dispatch_date_normal'].select("2019-01-05")
+        assert "Scan-Auftrag hinzugefügt." in add.form.submit().follow()
+
+        client.logout()
+        client.login_editor()
+        add = client.get('/scan-jobs').click(href='add')
+        add.form['type'].select('express')
+        add.form['dispatch_date_express'] = "2019-01-04"
+        assert "Scan-Auftrag hinzugefügt." in add.form.submit().follow()
+
+        add.form['type'].select('express')
+        add.form['dispatch_date_express'] = "2019-01-06"
+        assert "Scan-Auftrag hinzugefügt." in add.form.submit().follow()
+
+    # View scan jobs
+    view = client.get('/scan-jobs')
+    assert view.pyquery('table.scan-jobs td').text() == (
+        '06.01.2019 3 express '
+        '05.01.2019 1 normal '
+        '04.01.2019 2 express'
+    )
+
+    view.form.get('type', index=0).checked = False
+    view = view.form.submit()
+    assert view.pyquery('table.scan-jobs td').text() == (
+        '06.01.2019 3 express '
+        '04.01.2019 2 express'
+    )
+
+    view = view.click("Lieferscheinnummer")
+    assert view.pyquery('table.scan-jobs td').text() == (
+        '04.01.2019 2 express '
+        '06.01.2019 3 express'
+    )
+
+    client.logout()
+    client.login_admin()
+    view = client.get('/scan-jobs/unrestricted')
+    assert view.pyquery('table.scan-jobs td').text() == (
+        '06.01.2019 3 express My Municipality '
+        '05.01.2019 1 normal My Municipality '
+        '04.01.2019 2 express My Municipality'
+    )
 
 
 @patch.object(CoreRequest, 'assert_valid_csrf_token')
@@ -114,11 +185,11 @@ def test_views_scan_jobs_permissions(mock_method, client):
     assert "My Municipality" in add.form.submit().follow()
 
     with freeze_time("2019-01-01"):
-        add = client.get('/scan-jobs').click(href='add')
+        add = client.get('/scan-jobs/unrestricted').click(href='add')
         add.form['type'].select("express")
         add.form['dispatch_date'] = "2019-01-05"
-        assert "Scan-Auftrag hinzugefügt." in add.form.submit().follow()
-        id = client.get('/scan-jobs').click("05.01.2019")\
+        assert "Scan-Auftrag hinzugefügt." in add.form.submit().maybe_follow()
+        id = client.get('/scan-jobs/unrestricted').click("05.01.2019")\
             .request.url.split('/')[-1]
 
     client.logout()
@@ -127,6 +198,7 @@ def test_views_scan_jobs_permissions(mock_method, client):
     client.get('/scan-jobs/add', status=403)
     client.get(f'/scan-job/{id}', status=403)
     client.get(f'/scan-job/{id}/edit', status=403)
+    client.get('/scan-jobs/unrestricted', status=403)
     client.get('/scan-jobs/add-unrestricted', status=403)
     client.get(f'/scan-job/{id}/edit-unrestricted', status=403)
     client.delete(f'/scan-job/{id}', status=403)
@@ -136,6 +208,7 @@ def test_views_scan_jobs_permissions(mock_method, client):
     client.get('/scan-jobs/add')
     client.get(f'/scan-job/{id}')
     client.get(f'/scan-job/{id}/edit')
+    client.get('/scan-jobs/unrestricted', status=403)
     client.get('/scan-jobs/add-unrestricted', status=403)
     client.get(f'/scan-job/{id}/edit-unrestricted', status=403)
     client.delete(f'/scan-job/{id}', status=403)
@@ -146,6 +219,7 @@ def test_views_scan_jobs_permissions(mock_method, client):
     client.get('/scan-jobs/add')
     client.get(f'/scan-job/{id}')
     client.get(f'/scan-job/{id}/edit')
+    client.get('/scan-jobs/unrestricted', status=403)
     client.get('/scan-jobs/add-unrestricted', status=403)
     client.get(f'/scan-job/{id}/edit-unrestricted', status=403)
     client.delete(f'/scan-job/{id}', status=403)
@@ -156,6 +230,7 @@ def test_views_scan_jobs_permissions(mock_method, client):
     client.get('/scan-jobs/add')
     client.get(f'/scan-job/{id}')
     client.get(f'/scan-job/{id}/edit')
+    client.get('/scan-jobs/unrestricted')
     client.get('/scan-jobs/add-unrestricted')
     client.get(f'/scan-job/{id}/edit-unrestricted')
     client.delete(f'/scan-job/{id}')

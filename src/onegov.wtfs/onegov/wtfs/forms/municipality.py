@@ -1,3 +1,4 @@
+from onegov.core.orm.func import unaccent
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.user import UserGroup
@@ -131,7 +132,7 @@ class MunicipalityIdSelectionForm(Form):
             Municipality.id.label('id'),
             Municipality.name.label('name')
         )
-        query = query.order_by(Municipality.name)
+        query = query.order_by(unaccent(Municipality.name))
         self.municipality_id.choices = [(r.id.hex, r.name) for r in query]
 
     @property

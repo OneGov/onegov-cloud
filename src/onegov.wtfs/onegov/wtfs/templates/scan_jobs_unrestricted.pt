@@ -23,14 +23,20 @@
                                 <a href="${request.link(layout.model.by_order('delivery_number'))}" i18n:translate>Delivery number</a>
                             </th>
                             <th i18n:translate>Type</th>
+                            <th class="sort-${layout.model.sort_order_by_key('municipality_id')}">
+                                <a href="${request.link(layout.model.by_order('municipality_id'))}" i18n:translate>Municipality</a>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr tal:repeat="scan_job layout.model.batch">
-                            <td><a href="${request.link(scan_job)}">${layout.format_date(scan_job.dispatch_date, 'date')}</a></td>
-                            <td>${layout.format_number(scan_job.delivery_number)}</td>
-                            <td>${scan_job.type}</td>
-                        </tr>
+                        <tal:block tal:repeat="scan_job layout.model.batch">
+                            <tr tal:condition="request.has_permission(scan_job, permission)">
+                                <td><a href="${request.link(scan_job)}">${layout.format_date(scan_job.dispatch_date, 'date')}</a></td>
+                                <td>${layout.format_number(scan_job.delivery_number)}</td>
+                                <td>${scan_job.type}</td>
+                                <td>${scan_job.municipality.name}</td>
+                            </tr>
+                        </tal:block>
                     </tbody>
                 </table>
 

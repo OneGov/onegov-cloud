@@ -1,4 +1,5 @@
 from onegov.core.collection import GenericCollection
+from onegov.core.orm.func import unaccent
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import PickupDate
 
@@ -11,7 +12,7 @@ class MunicipalityCollection(GenericCollection):
 
     def query(self):
         query = super(MunicipalityCollection, self).query()
-        query = query.order_by(None).order_by(Municipality.name)
+        query = query.order_by(None).order_by(unaccent(Municipality.name))
         return query
 
     def import_data(self, data):

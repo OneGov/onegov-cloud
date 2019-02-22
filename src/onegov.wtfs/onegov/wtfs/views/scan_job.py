@@ -1,16 +1,19 @@
 from morepath import redirect
+from onegov.core.templates import render_template
 from onegov.wtfs import _
 from onegov.wtfs import WtfsApp
 from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.forms import AddScanJobForm
 from onegov.wtfs.forms import EditScanJobForm
+from onegov.wtfs.forms import ScanJobsForm
 from onegov.wtfs.forms import UnrestrictedAddScanJobForm
 from onegov.wtfs.forms import UnrestrictedEditScanJobForm
+from onegov.wtfs.forms import UnrestrictedScanJobsForm
 from onegov.wtfs.layouts import AddScanJobLayout
 from onegov.wtfs.layouts import EditScanJobLayout
+from onegov.wtfs.layouts import MailLayout
 from onegov.wtfs.layouts import ScanJobLayout
 from onegov.wtfs.layouts import ScanJobsLayout
-from onegov.wtfs.layouts import MailLayout
 from onegov.wtfs.models import ScanJob
 from onegov.wtfs.security import AddModel
 from onegov.wtfs.security import AddModelUnrestricted
@@ -18,20 +21,43 @@ from onegov.wtfs.security import DeleteModel
 from onegov.wtfs.security import EditModel
 from onegov.wtfs.security import EditModelUnrestricted
 from onegov.wtfs.security import ViewModel
-from onegov.core.templates import render_template
+from onegov.wtfs.security import ViewModelUnrestricted
 
 
-@WtfsApp.html(
+@WtfsApp.form(
     model=ScanJobCollection,
-    template='scan_jobs.pt',
-    permission=ViewModel
+    permission=ViewModel,
+    form=ScanJobsForm,
+    template='scan_jobs.pt'
 )
-def view_scan_jobs(self, request):
-    """ View the list of scan jobs. """
-    layout = ScanJobsLayout(self, request)
+def view_votes(self, request, form):
+    if request.has_permission(self, ViewModelUnrestricted):
+        return redirect(request.link(self, 'unrestricted'))
+
+    if not form.errors:
+        form.apply_model(self)
 
     return {
-        'layout': layout,
+        'layout': ScanJobsLayout(self, request),
+        'form': form,
+        'permission': ViewModel
+    }
+
+
+@WtfsApp.form(
+    model=ScanJobCollection,
+    name='unrestricted',
+    permission=ViewModelUnrestricted,
+    form=UnrestrictedScanJobsForm,
+    template='scan_jobs_unrestricted.pt'
+)
+def view_votes_unrestricted(self, request, form):
+    if not form.errors:
+        form.apply_model(self)
+
+    return {
+        'layout': ScanJobsLayout(self, request),
+        'form': form,
         'permission': ViewModel
     }
 
