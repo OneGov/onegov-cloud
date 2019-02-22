@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Disables test on Travis.
+  [href]
+
 0.3.3 (2019-01-30)
 ~~~~~~~~~~~~~~~~~~~~~
 
