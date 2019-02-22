@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.5.5 (2019-02-22)
+~~~~~~~~~~~~~~~~~~~
 
 - Replaces activity pagination with a click-to-load button.
   [href]
