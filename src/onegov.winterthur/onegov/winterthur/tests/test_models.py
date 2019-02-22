@@ -12,6 +12,7 @@ def test_download_addresses(session):
     assert addresses.query().count() >= 18_000
 
 
+@pytest.mark.xfail(reason="the remote host providing the csv might be down")
 def test_update_addresses(session, streets_csv, addresses_csv):
     addresses = AddressCollection(session)
     addresses.import_from_csv(streets_csv, addresses_csv)
