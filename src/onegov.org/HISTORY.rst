@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.1.4 (2019-02-22)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes ajax errors being shown too eagerly.
   [href]
 
