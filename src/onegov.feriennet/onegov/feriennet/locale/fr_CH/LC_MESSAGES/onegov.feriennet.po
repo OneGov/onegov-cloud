@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-02-21 15:37+0100\n"
+"POT-Creation-Date: 2019-02-22 14:35+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1100,7 +1100,7 @@ msgid "Invoice Item Amount"
 msgstr "Montant facture"
 
 msgid "Invoice Item References"
-msgstr ""
+msgstr "Références du poste de facture"
 
 msgid "Accepted"
 msgstr "Accepté"
@@ -1560,8 +1560,11 @@ msgstr "Pas de réservations."
 msgid "Variables"
 msgstr "Variables"
 
-msgid "No activites found."
+msgid "No activities found."
 msgstr "Aucune activité trouvée."
+
+msgid "Reset filter."
+msgstr "Réinitialiser le filtre."
 
 msgid "starting at ${price} CHF"
 msgstr "à partir de ${price} CHF"
@@ -1577,6 +1580,12 @@ msgstr "1 place disponible"
 
 msgid "${count} free spots"
 msgstr "${count} places disponibles"
+
+msgid "Show more"
+msgstr "Afficher davantage"
+
+msgid "Navigate up"
+msgstr "Naviguer vers le haut"
 
 msgid "States"
 msgstr "États"
@@ -2051,9 +2060,6 @@ msgstr "Voulez-vous vraiment supprimer « ${title} » ?"
 
 msgid "Remove Booking"
 msgstr "Supprimer la réservation"
-
-msgid "Invite a companion ⚠️"
-msgstr ""
 
 #, python-format
 msgid "Do you really want to cancel \"${title}\"?"

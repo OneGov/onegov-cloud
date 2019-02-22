@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Replaces activity pagination with a click-to-load button.
+  [href]
+
 - Reduces wiggle-room of age checks to 0.
   [href]
 

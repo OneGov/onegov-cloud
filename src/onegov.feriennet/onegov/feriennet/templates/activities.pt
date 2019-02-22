@@ -5,80 +5,94 @@
     <tal:b metal:fill-slot="content">
         <div class="row">
             <div class="columns medium-8">
-                <div class="activity-list-item" tal:condition="not:activities" i18n:translate>
-                    No activites found.
+                <div class="activity-list-item" tal:condition="not:activities">
+                    <span i18n:translate>No activities found.</span>
+                    <b><a tal:condition="filtered" href="${request.class_link(layout.model.__class__)}" i18n:translate>Reset filter.</a></b>
                 </div>
 
-                <div class="activity-list-item" tal:repeat="activity activities">
-                    <div class="row collapse">
-                        <div class="columns small-2 thumbnail-column">
-                            <a class="thumbnail" href="${request.link(activity)}">
-                                <div tal:condition="activity.thumbnail|nothing"
-                                     style="background-image: url('${activity.thumbnail}');"></div>
-                            </a>
-                        </div>
+                <div class="activities-list" tal:condition="activities">
+                    <div class="activity-list-item" tal:repeat="activity activities">
+                        <div class="row collapse">
+                            <div class="columns small-2 thumbnail-column">
+                                <a class="thumbnail" href="${request.link(activity)}">
+                                    <div tal:condition="activity.thumbnail|nothing"
+                                         style="background-image: url('${activity.thumbnail}');"></div>
+                                </a>
+                            </div>
 
-                        <div class="columns small-10">
-                            <h3><a href="${request.link(activity)}">${activity.title}</a></h3>
-                            <p class="page-lead">${activity.lead}</p>
+                            <div class="columns small-10">
+                                <h3><a href="${request.link(activity)}">${activity.title}</a></h3>
+                                <p class="page-lead">${activity.lead}</p>
 
-                            <div class="row collapse" tal:define="
-                                ages get_ages(activity);
-                                min_cost get_min_cost(activity);
-                                available_spots get_available_spots(activity);
-                            ">
-                                <div class="small-12 columns factoids activities-list">
-                                    <tal:b condition="ages">
-                                        <span class="age" tal:define="
-                                            min_age min(age.lower for age in ages);
-                                            max_age max(age.upper - 1 for age in ages);
-                                        ">
-                                            <span i18n:translate class="show-for-sr">Age</span>
-                                            <span i18n:translate>
-                                                <tal:b replace="min_age" i18n:name='min_age' />
-                                                -
-                                                <tal:b replace="max_age" i18n:name='max_age' />
-                                                years
+                                <div class="row collapse" tal:define="
+                                    ages get_ages(activity);
+                                    min_cost get_min_cost(activity);
+                                    available_spots get_available_spots(activity);
+                                ">
+                                    <div class="small-12 columns factoids">
+                                        <tal:b condition="ages">
+                                            <span class="age" tal:define="
+                                                min_age min(age.lower for age in ages);
+                                                max_age max(age.upper - 1 for age in ages);
+                                            ">
+                                                <span i18n:translate class="show-for-sr">Age</span>
+                                                <span i18n:translate>
+                                                    <tal:b replace="min_age" i18n:name='min_age' />
+                                                    -
+                                                    <tal:b replace="max_age" i18n:name='max_age' />
+                                                    years
+                                                </span>
                                             </span>
-                                        </span>
-                                    </tal:b>
-                                    <tal:b condition="min_cost is not None">
-                                        <span class="cost">
-                                            <span i18n:translate class="show-for-sr">Cost</span>
+                                        </tal:b>
+                                        <tal:b condition="min_cost is not None">
+                                            <span class="cost">
+                                                <span i18n:translate class="show-for-sr">Cost</span>
 
-                                            <span i18n:translate>
-                                                starting at <tal:b i18n:name='price'>${'{:.2f}'.format(min_cost)}</tal:b> CHF
+                                                <span i18n:translate>
+                                                    starting at <tal:b i18n:name='price'>${'{:.2f}'.format(min_cost)}</tal:b> CHF
+                                                </span>
                                             </span>
-                                        </span>
-                                    </tal:b>
-                                    <tal:b>
-                                        <span class="${available_spots and 'available-spots' or 'full'}">
-                                            <span i18n:translate class="show-for-sr">Free Spots</span>
+                                        </tal:b>
+                                        <tal:b>
+                                            <span class="${available_spots and 'available-spots' or 'full'}">
+                                                <span i18n:translate class="show-for-sr">Free Spots</span>
 
-                                            <span i18n:translate tal:condition="not available_spots">
-                                                No free spots
+                                                <span i18n:translate tal:condition="not available_spots">
+                                                    No free spots
+                                                </span>
+                                                <span i18n:translate tal:condition="available_spots == 1">
+                                                    1 free spot
+                                                </span>
+                                                <span i18n:translate tal:condition="available_spots > 1">
+                                                    <tal:b i18n:name="count">${available_spots}</tal:b> free spots
+                                                </span>
                                             </span>
-                                            <span i18n:translate tal:condition="available_spots == 1">
-                                                1 free spot
-                                            </span>
-                                            <span i18n:translate tal:condition="available_spots > 1">
-                                                <tal:b i18n:name="count">${available_spots}</tal:b> free spots
-                                            </span>
-                                        </span>
-                                    </tal:b>
+                                        </tal:b>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="pagination-centered" tal:condition="activities">
-                    <div metal:use-macro="layout.macros['pagination']" tal:define="
-                    collection layout.model; current_page layout.model;" />
+                <div id="click-to-load-target"></div>
+
+                <div class="show-more" tal:condition="activities">
+                    <tal:b define="next_page layout.model.next" condition="next_page">
+                        <a class="click-to-load" id="click-to-load"
+                            href="${request.link(next_page)}"
+                            data-source="${request.link(next_page)} .activities-list"
+                            data-target="#click-to-load-target"
+                            i18n:translate>
+                                Show more
+                        </a>
+                    </tal:b>
+
+                    <a href="#content" class="navigate-up" i18n:translate>Navigate up</a>
                 </div>
             </div>
 
-            <div class="columns medium-4 filter-panel" ic-target="#content" ic-push-url="true" ic-select-from-response="#content">
+            <div class="columns medium-4 filter-panel" ic-target="#content" ic-push-url="true" ic-select-from-response="#content" ic-scroll-to-target="true">
                 <div tal:condition="filters['periods']|nothing" class="filter-periods">
                     <h2 class="filter-title" i18n:translate>Periods</h2>
                     <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['periods']" />

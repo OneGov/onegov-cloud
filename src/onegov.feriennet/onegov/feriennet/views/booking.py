@@ -183,7 +183,7 @@ def actions_by_booking(layout, period, booking):
                     # the group code is not shown if the attendee is alone
                     actions.append(
                         Link(
-                            text=_("Invite a companion ⚠️"),
+                            text=_("Invite a companion"),
                             url=layout.request.link(invite),
                             attrs={
                                 'class': 'invite-link',

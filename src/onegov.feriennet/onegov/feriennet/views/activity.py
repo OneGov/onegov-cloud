@@ -279,11 +279,21 @@ def view_activities(self, request):
 
         return min((o.cost or 0) + extra for o in occasions)
 
+    filtered = next(
+        (
+            True
+            for links in filters.values()
+            for link in links
+            if link.active
+        ), False
+    )
+
     return {
         'activities': self.batch if show_activities else None,
         'layout': layout,
         'title': _("Activities"),
         'filters': filters,
+        'filtered': filtered,
         'period': active_period,
         'get_ages': get_ages,
         'get_min_cost': get_min_cost,
