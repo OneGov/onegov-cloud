@@ -2113,7 +2113,7 @@ def test_send_email_with_attachment(client, scenario):
     page.form.submit().follow()
 
     # Plaintext version
-    assert "[Test.txt](http" in client.get_email(0, 0)
+    assert "[Test](http" in client.get_email(0, 0)
 
     # HTML version
-    assert ">Test.txt</a>" in client.get_email(0, 1)
+    assert ">Test</a>" in client.get_email(0, 1)
