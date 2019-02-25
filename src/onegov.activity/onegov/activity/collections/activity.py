@@ -465,3 +465,20 @@ class ActivityCollection(Pagination):
         for start, end in weeks:
             if sedate.weeknumber(start) in weeknumbers:
                 yield start, end
+
+    def available_ages(self):
+
+        # look at all periods because in the filter view where this is used,
+        # we cannot differentiate between the periods unless we make
+        # filters interdependent
+        query = text("""
+            SELECT
+                COALESCE(MIN(LOWER(age)), 0),
+                COALESCE(MAX(UPPER(age)), 100)
+            FROM
+                occasions
+        """)
+
+        ages = self.session.execute(query).first()
+
+        return ages and ages or None

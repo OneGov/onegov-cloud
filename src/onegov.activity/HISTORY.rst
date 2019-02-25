@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds the ability to show the available ages for all activities.
+  [href]
+
 1.16.0 (2019-02-21)
 ~~~~~~~~~~~~~~~~~~~
 
