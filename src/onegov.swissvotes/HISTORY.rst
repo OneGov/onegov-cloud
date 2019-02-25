@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.35 (2019-02-25)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds additional association recommendations.
   [msom]
