@@ -34,6 +34,8 @@ def coerce_date(value):
 
 class AddScanJobForm(Form):
 
+    callout = _("Fill in until 17.00 o'clock the evening before.")
+
     type = RadioField(
         label=_("Type"),
         choices=[('normal', _("Regular shipment"))],
@@ -159,6 +161,8 @@ class AddScanJobForm(Form):
 
 
 class EditScanJobForm(Form):
+
+    callout = _("Fill in until 17.00 o'clock the evening before.")
 
     dispatch_boxes = IntegerField(
         label=_("Boxes"),

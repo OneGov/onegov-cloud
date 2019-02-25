@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-21 14:10+0100\n"
-"PO-Revision-Date: 2019-02-21 14:10+0100\n"
+"POT-Creation-Date: 2019-02-25 15:05+0100\n"
+"PO-Revision-Date: 2019-02-25 15:05+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -71,6 +71,9 @@ msgstr "Titel"
 msgid "Text"
 msgstr "Text"
 
+msgid "Fill in until 17.00 o'clock the evening before."
+msgstr "Ausfüllen bis 17.00 Uhr Vorabend."
+
 msgid "Type"
 msgstr "Auftragsart"
 
@@ -127,6 +130,12 @@ msgstr "Nicht gescannte Einzelbelege"
 
 msgid "Regular dispatch dates"
 msgstr "Reguläre Versanddaten"
+
+msgid "Filter"
+msgstr ""
+
+msgid "Term"
+msgstr ""
 
 msgid "Regular shipment"
 msgstr "Normale Sendung"
@@ -222,15 +231,30 @@ msgstr "Diese Scanauftrag wirklich löschen?"
 msgid "Scan job"
 msgstr "Scan-Auftrag"
 
+msgid "In"
+msgstr "Eingang"
+
+msgid "Internally tax office"
+msgstr "Intern Steueramt"
+
+msgid "Out"
+msgstr "Ausgang"
+
+msgid "Internally dispatch"
+msgstr "Intern Optimo"
+
+msgid "Scan Center"
+msgstr "Scan Center"
+
+msgid "Total"
+msgstr "Total"
+
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
 
 msgid "until"
 msgstr "bis"
-
-msgid "Total"
-msgstr "Total"
 
 msgid "Dispatch to the tax office on ${date}"
 msgstr "Lieferung an das Steueramt Winterthur am ${date}"
@@ -276,21 +300,6 @@ msgstr "Passwort zurücksetzen"
 
 msgid "Number of users"
 msgstr "Anzahl Benutzer"
-
-msgid "In"
-msgstr "Eingang"
-
-msgid "Out"
-msgstr "Ausgang"
-
-msgid "Scan Center"
-msgstr "Scan Center"
-
-msgid "Internally tax office"
-msgstr "Intern Steueramt"
-
-msgid "Internally dispatch"
-msgstr "Intern Optimo"
 
 msgid "Delivery number"
 msgstr "Lieferscheinnummer"
