@@ -1027,6 +1027,24 @@ def test_votes_export(session):
     vote._recommendation_sgb = 3
     vote._recommendation_travs = 3
     vote._recommendation_vsa = 9999
+    vote._recommendation_vpod = 9999
+    vote._recommendation_ssv = 9999
+    vote._recommendation_gem = 9999
+    vote._recommendation_kdk = 9999
+    vote._recommendation_vdk = 9999
+    vote._recommendation_endk = 9999
+    vote._recommendation_fdk = 9999
+    vote._recommendation_edk = 9999
+    vote._recommendation_gdk = 9999
+    vote._recommendation_ldk = 9999
+    vote._recommendation_sodk = 9999
+    vote._recommendation_kkjpd = 9999
+    vote._recommendation_bpuk = 9999
+    vote._recommendation_sbk = 9999
+    vote._recommendation_acs = 9999
+    vote._recommendation_tcs = 9999
+    vote._recommendation_vcs = 9999
+    vote._recommendation_voev = 9999
     vote.national_council_election_year = 1990
     vote.national_council_share_fdp = Decimal('01.10')
     vote.national_council_share_cvp = Decimal('02.10')
@@ -1350,6 +1368,24 @@ def test_votes_export(session):
         'p-sgb': '3',
         'p-travs': '3',
         'p-vsa': '9999',
+        'p-vpod': '9999',
+        'p-ssv': '9999',
+        'p-gem': '9999',
+        'p-kdk': '9999',
+        'p-vdk': '9999',
+        'p-endk': '9999',
+        'p-fdk': '9999',
+        'p-edk': '9999',
+        'p-gdk': '9999',
+        'p-ldk': '9999',
+        'p-sodk': '9999',
+        'p-kkjpd': '9999',
+        'p-bpuk': '9999',
+        'p-sbk': '9999',
+        'p-acs': '9999',
+        'p-tcs': '9999',
+        'p-vcs': '9999',
+        'p-voev': '9999',
         'nr-wahl': '1990',
         'w-fdp': '1,1',
         'w-cvp': '2,1',
@@ -1685,6 +1721,25 @@ def test_votes_export(session):
         'p-sgb': 3.0,
         'p-travs': 3.0,
         'p-vsa': 9999.0,
+        'p-vsa': 9999.0,
+        'p-vpod': 9999.0,
+        'p-ssv': 9999.0,
+        'p-gem': 9999.0,
+        'p-kdk': 9999.0,
+        'p-vdk': 9999.0,
+        'p-endk': 9999.0,
+        'p-fdk': 9999.0,
+        'p-edk': 9999.0,
+        'p-gdk': 9999.0,
+        'p-ldk': 9999.0,
+        'p-sodk': 9999.0,
+        'p-kkjpd': 9999.0,
+        'p-bpuk': 9999.0,
+        'p-sbk': 9999.0,
+        'p-acs': 9999.0,
+        'p-tcs': 9999.0,
+        'p-vcs': 9999.0,
+        'p-voev': 9999.0,
         'nr-wahl': 1990.0,
         'w-fdp': 1.1,
         'w-cvp': 2.1,

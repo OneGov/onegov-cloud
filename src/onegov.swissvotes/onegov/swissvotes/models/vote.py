@@ -502,46 +502,46 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
 
     # Voting recommendations
     recommendations = Column(JSON, nullable=False, default=dict)
-    _recommendation_fdp = recommendation_property('fdp')
-    _recommendation_cvp = recommendation_property('cvp')
-    _recommendation_sps = recommendation_property('sps')
-    _recommendation_svp = recommendation_property('svp')
-    _recommendation_lps = recommendation_property('lps')
-    _recommendation_ldu = recommendation_property('ldu')
-    _recommendation_evp = recommendation_property('evp')
+    _recommendation_bdp = recommendation_property('bdp')
     _recommendation_csp = recommendation_property('csp')
+    _recommendation_cvp = recommendation_property('cvp')
+    _recommendation_edu = recommendation_property('edu')
+    _recommendation_evp = recommendation_property('evp')
+    _recommendation_fdp = recommendation_property('fdp')
+    _recommendation_fps = recommendation_property('fps')
+    _recommendation_glp = recommendation_property('glp')
+    _recommendation_gps = recommendation_property('gps')
+    _recommendation_kvp = recommendation_property('kvp')
+    _recommendation_ldu = recommendation_property('ldu')
+    _recommendation_lega = recommendation_property('lega')
+    _recommendation_lps = recommendation_property('lps')
+    _recommendation_mcg = recommendation_property('mcg')
     _recommendation_pda = recommendation_property('pda')
     _recommendation_poch = recommendation_property('poch')
-    _recommendation_gps = recommendation_property('gps')
-    _recommendation_sd = recommendation_property('sd')
     _recommendation_rep = recommendation_property('rep')
-    _recommendation_edu = recommendation_property('edu')
-    _recommendation_fps = recommendation_property('fps')
-    _recommendation_lega = recommendation_property('lega')
-    _recommendation_kvp = recommendation_property('kvp')
-    _recommendation_glp = recommendation_property('glp')
-    _recommendation_bdp = recommendation_property('bdp')
-    _recommendation_mcg = recommendation_property('mcg')
-    recommendation_fdp = encoded_property()
-    recommendation_cvp = encoded_property()
-    recommendation_sps = encoded_property()
-    recommendation_svp = encoded_property()
-    recommendation_lps = encoded_property()
-    recommendation_ldu = encoded_property()
-    recommendation_evp = encoded_property()
+    _recommendation_sd = recommendation_property('sd')
+    _recommendation_sps = recommendation_property('sps')
+    _recommendation_svp = recommendation_property('svp')
+    recommendation_bdp = encoded_property()
     recommendation_csp = encoded_property()
+    recommendation_cvp = encoded_property()
+    recommendation_edu = encoded_property()
+    recommendation_evp = encoded_property()
+    recommendation_fdp = encoded_property()
+    recommendation_fps = encoded_property()
+    recommendation_glp = encoded_property()
+    recommendation_gps = encoded_property()
+    recommendation_kvp = encoded_property()
+    recommendation_ldu = encoded_property()
+    recommendation_lega = encoded_property()
+    recommendation_lps = encoded_property()
+    recommendation_mcg = encoded_property()
     recommendation_pda = encoded_property()
     recommendation_poch = encoded_property()
-    recommendation_gps = encoded_property()
-    recommendation_sd = encoded_property()
     recommendation_rep = encoded_property()
-    recommendation_edu = encoded_property()
-    recommendation_fps = encoded_property()
-    recommendation_lega = encoded_property()
-    recommendation_kvp = encoded_property()
-    recommendation_glp = encoded_property()
-    recommendation_bdp = encoded_property()
-    recommendation_mcg = encoded_property()
+    recommendation_sd = encoded_property()
+    recommendation_sps = encoded_property()
+    recommendation_svp = encoded_property()
 
     def group_recommendations(self, recommendations):
         result = {}
@@ -580,32 +580,86 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
             (Actor('svp'), self._recommendation_svp),
         ))
 
-    _recommendation_sav = recommendation_property('sav')
+    _recommendation_acs = recommendation_property('acs')
+    _recommendation_bpuk = recommendation_property('bpuk')
     _recommendation_eco = recommendation_property('eco')
-    _recommendation_sgv = recommendation_property('sgv')
+    _recommendation_edk = recommendation_property('edk')
+    _recommendation_endk = recommendation_property('endk')
+    _recommendation_fdk = recommendation_property('fdk')
+    _recommendation_gdk = recommendation_property('gdk')
+    _recommendation_gem = recommendation_property('gem')
+    _recommendation_kdk = recommendation_property('kdk')
+    _recommendation_kkjpd = recommendation_property('kkjpd')
+    _recommendation_ldk = recommendation_property('ldk')
+    _recommendation_sav = recommendation_property('sav')
+    _recommendation_sbk = recommendation_property('sbk')
     _recommendation_sbv_usp = recommendation_property('sbv_usp')
     _recommendation_sgb = recommendation_property('sgb')
+    _recommendation_sgv = recommendation_property('sgv')
+    _recommendation_sodk = recommendation_property('sodk')
+    _recommendation_ssv = recommendation_property('ssv')
+    _recommendation_tcs = recommendation_property('tcs')
     _recommendation_travs = recommendation_property('travs')
+    _recommendation_vcs = recommendation_property('vcs')
+    _recommendation_vdk = recommendation_property('vdk')
+    _recommendation_voev = recommendation_property('voev')
+    _recommendation_vpod = recommendation_property('vpod')
     _recommendation_vsa = recommendation_property('vsa')
 
-    recommendation_sav = encoded_property()
+    recommendation_acs = encoded_property()
+    recommendation_bpuk = encoded_property()
     recommendation_eco = encoded_property()
-    recommendation_sgv = encoded_property()
+    recommendation_edk = encoded_property()
+    recommendation_endk = encoded_property()
+    recommendation_fdk = encoded_property()
+    recommendation_gdk = encoded_property()
+    recommendation_gem = encoded_property()
+    recommendation_kdk = encoded_property()
+    recommendation_kkjpd = encoded_property()
+    recommendation_ldk = encoded_property()
+    recommendation_sav = encoded_property()
+    recommendation_sbk = encoded_property()
     recommendation_sbv_usp = encoded_property()
     recommendation_sgb = encoded_property()
+    recommendation_sgv = encoded_property()
+    recommendation_sodk = encoded_property()
+    recommendation_ssv = encoded_property()
+    recommendation_tcs = encoded_property()
     recommendation_travs = encoded_property()
+    recommendation_vcs = encoded_property()
+    recommendation_vdk = encoded_property()
+    recommendation_voev = encoded_property()
+    recommendation_vpod = encoded_property()
     recommendation_vsa = encoded_property()
 
     @cached_property
     def recommendations_associations(self):
         return self.group_recommendations((
+            (Actor('acs'), self._recommendation_acs),
+            (Actor('bpuk'), self._recommendation_bpuk),
             (Actor('eco'), self._recommendation_eco),
+            (Actor('edk'), self._recommendation_edk),
+            (Actor('endk'), self._recommendation_endk),
+            (Actor('fdk'), self._recommendation_fdk),
+            (Actor('gdk'), self._recommendation_gdk),
+            (Actor('gem'), self._recommendation_gem),
+            (Actor('kdk'), self._recommendation_kdk),
+            (Actor('kkjpd'), self._recommendation_kkjpd),
+            (Actor('ldk'), self._recommendation_ldk),
+            (Actor('sav'), self._recommendation_sav),
+            (Actor('sbk'), self._recommendation_sbk),
             (Actor('sbv-usp'), self._recommendation_sbv_usp),
             (Actor('sgb'), self._recommendation_sgb),
             (Actor('sgv'), self._recommendation_sgv),
+            (Actor('sodk'), self._recommendation_sodk),
+            (Actor('ssv'), self._recommendation_ssv),
+            (Actor('tcs'), self._recommendation_tcs),
             (Actor('travs'), self._recommendation_travs),
+            (Actor('vcs'), self._recommendation_vcs),
+            (Actor('vdk'), self._recommendation_vdk),
+            (Actor('voev'), self._recommendation_voev),
+            (Actor('vpod'), self._recommendation_vpod),
             (Actor('vsa'), self._recommendation_vsa),
-            (Actor('sav'), self._recommendation_sav),
         ))
 
     # Electoral strength

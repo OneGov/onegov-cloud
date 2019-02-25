@@ -560,6 +560,24 @@ def test_vote(session):
     vote._recommendation_sgb = 3
     vote._recommendation_travs = 3
     vote._recommendation_vsa = 9999
+    vote._recommendation_vpod = 1
+    vote._recommendation_ssv = 1
+    vote._recommendation_gem = 1
+    vote._recommendation_kdk = 1
+    vote._recommendation_vdk = 1
+    vote._recommendation_endk = 1
+    vote._recommendation_fdk = 1
+    vote._recommendation_edk = 1
+    vote._recommendation_gdk = 1
+    vote._recommendation_ldk = 1
+    vote._recommendation_sodk = 1
+    vote._recommendation_kkjpd = 1
+    vote._recommendation_bpuk = 1
+    vote._recommendation_sbk = 1
+    vote._recommendation_acs = 1
+    vote._recommendation_tcs = 1
+    vote._recommendation_vcs = 1
+    vote._recommendation_voev = 1
     vote.national_council_election_year = 1990
     vote.national_council_share_fdp = Decimal('01.10')
     vote.national_council_share_cvp = Decimal('02.10')
@@ -916,6 +934,24 @@ def test_vote(session):
     assert vote._recommendation_sgb == 3
     assert vote._recommendation_travs == 3
     assert vote._recommendation_vsa == 9999
+    assert vote._recommendation_vpod == 1
+    assert vote._recommendation_ssv == 1
+    assert vote._recommendation_gem == 1
+    assert vote._recommendation_kdk == 1
+    assert vote._recommendation_vdk == 1
+    assert vote._recommendation_endk == 1
+    assert vote._recommendation_fdk == 1
+    assert vote._recommendation_edk == 1
+    assert vote._recommendation_gdk == 1
+    assert vote._recommendation_ldk == 1
+    assert vote._recommendation_sodk == 1
+    assert vote._recommendation_kkjpd == 1
+    assert vote._recommendation_bpuk == 1
+    assert vote._recommendation_sbk == 1
+    assert vote._recommendation_acs == 1
+    assert vote._recommendation_tcs == 1
+    assert vote._recommendation_vcs == 1
+    assert vote._recommendation_voev == 1
     assert vote.national_council_election_year == 1990
     assert vote.national_council_share_fdp == Decimal('01.10')
     assert vote.national_council_share_cvp == Decimal('02.10')
@@ -1017,7 +1053,27 @@ def test_vote(session):
     assert list(vote.recommendations_associations.keys()) == [
         'Yea', 'Nay', 'None'
     ]
-    assert vote.recommendations_associations['Yea'] == [Actor('sav')]
+    assert vote.recommendations_associations['Yea'] == [
+        Actor('acs'),
+        Actor('bpuk'),
+        Actor('edk'),
+        Actor('endk'),
+        Actor('fdk'),
+        Actor('gdk'),
+        Actor('gem'),
+        Actor('kdk'),
+        Actor('kkjpd'),
+        Actor('ldk'),
+        Actor('sav'),
+        Actor('sbk'),
+        Actor('sodk'),
+        Actor('ssv'),
+        Actor('tcs'),
+        Actor('vcs'),
+        Actor('vdk'),
+        Actor('voev'),
+        Actor('vpod'),
+    ]
     assert vote.recommendations_associations['Nay'] == [Actor('eco')]
     assert vote.recommendations_associations['None'] == [
         Actor('sbv-usp'),
