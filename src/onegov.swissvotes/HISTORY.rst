@@ -1,7 +1,10 @@
 Changelog
 ---------
 
-- Renames party recommendation columns.
+- Uses a single JSON column for all recommendations.
+  [msom]
+
+- Renames party recommendation dataset columns.
   [msom]
 
 0.0.33 (2019-02-20)

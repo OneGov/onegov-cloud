@@ -1,7 +1,9 @@
 from cached_property import cached_property
 from collections import OrderedDict
+from onegov.core.orm.mixins.content import dict_property_factory
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.types import JSON
 from onegov.file import AssociatedFiles
 from onegov.file import File
 from onegov.swissvotes import _
@@ -41,12 +43,17 @@ class encoded_property(object):
 
     """
 
-    def __set_name__(self, owner, name):
+    def __set_name__(self, owner, name, type='INTEGER', nullable=True):
         self.name = name
+        self.type = type
+        self.nullable = nullable
 
     def __get__(self, instance, owner):
         value = getattr(instance, f'_{self.name}')
         return instance.codes(self.name).get(value)
+
+
+recommendation_property = dict_property_factory('recommendations')
 
 
 class SwissVote(Base, TimestampMixin, AssociatedFiles):
@@ -494,26 +501,27 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     signatures_invalid = Column(Integer)
 
     # Voting recommendations
-    _recommendation_fdp = Column('recommendation_fdp', Integer)
-    _recommendation_cvp = Column('recommendation_cvp', Integer)
-    _recommendation_sps = Column('recommendation_sps', Integer)
-    _recommendation_svp = Column('recommendation_svp', Integer)
-    _recommendation_lps = Column('recommendation_lps', Integer)
-    _recommendation_ldu = Column('recommendation_ldu', Integer)
-    _recommendation_evp = Column('recommendation_evp', Integer)
-    _recommendation_csp = Column('recommendation_csp', Integer)
-    _recommendation_pda = Column('recommendation_pda', Integer)
-    _recommendation_poch = Column('recommendation_poch', Integer)
-    _recommendation_gps = Column('recommendation_gps', Integer)
-    _recommendation_sd = Column('recommendation_sd', Integer)
-    _recommendation_rep = Column('recommendation_rep', Integer)
-    _recommendation_edu = Column('recommendation_edu', Integer)
-    _recommendation_fps = Column('recommendation_fps', Integer)
-    _recommendation_lega = Column('recommendation_lega', Integer)
-    _recommendation_kvp = Column('recommendation_kvp', Integer)
-    _recommendation_glp = Column('recommendation_glp', Integer)
-    _recommendation_bdp = Column('recommendation_bdp', Integer)
-    _recommendation_mcg = Column('recommendation_mcg', Integer)
+    recommendations = Column(JSON, nullable=False, default=dict)
+    _recommendation_fdp = recommendation_property('fdp')
+    _recommendation_cvp = recommendation_property('cvp')
+    _recommendation_sps = recommendation_property('sps')
+    _recommendation_svp = recommendation_property('svp')
+    _recommendation_lps = recommendation_property('lps')
+    _recommendation_ldu = recommendation_property('ldu')
+    _recommendation_evp = recommendation_property('evp')
+    _recommendation_csp = recommendation_property('csp')
+    _recommendation_pda = recommendation_property('pda')
+    _recommendation_poch = recommendation_property('poch')
+    _recommendation_gps = recommendation_property('gps')
+    _recommendation_sd = recommendation_property('sd')
+    _recommendation_rep = recommendation_property('rep')
+    _recommendation_edu = recommendation_property('edu')
+    _recommendation_fps = recommendation_property('fps')
+    _recommendation_lega = recommendation_property('lega')
+    _recommendation_kvp = recommendation_property('kvp')
+    _recommendation_glp = recommendation_property('glp')
+    _recommendation_bdp = recommendation_property('bdp')
+    _recommendation_mcg = recommendation_property('mcg')
     recommendation_fdp = encoded_property()
     recommendation_cvp = encoded_property()
     recommendation_sps = encoded_property()
@@ -572,13 +580,21 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
             (Actor('svp'), self._recommendation_svp),
         ))
 
-    _recommendation_sav = Column('recommendation_sav', Integer)
-    _recommendation_eco = Column('recommendation_eco', Integer)
-    _recommendation_sgv = Column('recommendation_sgv', Integer)
-    _recommendation_sbv_usp = Column('recommendation_sbv_usp', Integer)
-    _recommendation_sgb = Column('recommendation_sgb', Integer)
-    _recommendation_travs = Column('recommendation_travs', Integer)
-    _recommendation_vsa = Column('recommendation_vsa', Integer)
+    _recommendation_sav = recommendation_property('sav')
+    _recommendation_eco = recommendation_property('eco')
+    _recommendation_sgv = recommendation_property('sgv')
+    _recommendation_sbv_usp = recommendation_property('sbv_usp')
+    _recommendation_sgb = recommendation_property('sgb')
+    _recommendation_travs = recommendation_property('travs')
+    _recommendation_vsa = recommendation_property('vsa')
+
+    recommendation_sav = encoded_property()
+    recommendation_eco = encoded_property()
+    recommendation_sgv = encoded_property()
+    recommendation_sbv_usp = encoded_property()
+    recommendation_sgb = encoded_property()
+    recommendation_travs = encoded_property()
+    recommendation_vsa = encoded_property()
 
     @cached_property
     def recommendations_associations(self):

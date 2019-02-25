@@ -2,6 +2,8 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from onegov.core.orm import as_selectable
+from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
 from onegov.swissvotes.collections import TranslatablePageCollection
 from onegov.swissvotes.models import SwissVote
@@ -9,6 +11,7 @@ from onegov.swissvotes.models import TranslatablePage
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
+from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import TSVECTOR
 
 
@@ -116,3 +119,110 @@ def add_order_column_to_pagess(context):
         for page in pages.query().filter(TranslatablePage.id.notin_(default)):
             order += 1
             page.order = order
+
+
+@upgrade_task('Add recommendations column')
+def add_recommendations_column(context):
+    if not context.has_column('swissvotes', 'recommendations'):
+        context.operations.add_column(
+            'swissvotes',
+            Column('recommendations', JSON())
+        )
+
+        query = as_selectable("""
+            SELECT
+                id,  -- Integer
+                recommendation_fdp,  -- Integer
+                recommendation_cvp,  -- Integer
+                recommendation_sps,  -- Integer
+                recommendation_svp,  -- Integer
+                recommendation_lps,  -- Integer
+                recommendation_ldu,  -- Integer
+                recommendation_evp,  -- Integer
+                recommendation_csp,  -- Integer
+                recommendation_pda,  -- Integer
+                recommendation_poch,  -- Integer
+                recommendation_gps,  -- Integer
+                recommendation_sd,  -- Integer
+                recommendation_rep,  -- Integer
+                recommendation_edu,  -- Integer
+                recommendation_fps,  -- Integer
+                recommendation_lega,  -- Integer
+                recommendation_kvp,  -- Integer
+                recommendation_glp,  -- Integer
+                recommendation_bdp,  -- Integer
+                recommendation_mcg,  -- Integer
+                recommendation_sav,  -- Integer
+                recommendation_eco,  -- Integer
+                recommendation_sgv,  -- Integer
+                recommendation_sbv_usp,  -- Integer
+                recommendation_sgb,  -- Integer
+                recommendation_travs,  -- Integer
+                recommendation_vsa  -- Integer
+            FROM
+                swissvotes
+        """)
+        session = context.app.session_manager.session()
+        for result in session.execute(select(query.c)):
+            vote = session.query(SwissVote).filter_by(id=result.id).one()
+            vote.recommendations = {
+                'fdp': result.recommendation_fdp,
+                'cvp': result.recommendation_cvp,
+                'sps': result.recommendation_sps,
+                'svp': result.recommendation_svp,
+                'lps': result.recommendation_lps,
+                'ldu': result.recommendation_ldu,
+                'evp': result.recommendation_evp,
+                'csp': result.recommendation_csp,
+                'pda': result.recommendation_pda,
+                'poch': result.recommendation_poch,
+                'gps': result.recommendation_gps,
+                'sd': result.recommendation_sd,
+                'rep': result.recommendation_rep,
+                'edu': result.recommendation_edu,
+                'fps': result.recommendation_fps,
+                'lega': result.recommendation_lega,
+                'kvp': result.recommendation_kvp,
+                'glp': result.recommendation_glp,
+                'bdp': result.recommendation_bdp,
+                'mcg': result.recommendation_mcg,
+                'sav': result.recommendation_sav,
+                'eco': result.recommendation_eco,
+                'sgv': result.recommendation_sgv,
+                'sbv_usp': result.recommendation_sbv_usp,
+                'sgb': result.recommendation_sgb,
+                'travs': result.recommendation_travs,
+                'vsa': result.recommendation_vsa,
+            }
+
+    for column in (
+        'recommendation_fdp',
+        'recommendation_cvp',
+        'recommendation_sps',
+        'recommendation_svp',
+        'recommendation_lps',
+        'recommendation_ldu',
+        'recommendation_evp',
+        'recommendation_csp',
+        'recommendation_pda',
+        'recommendation_poch',
+        'recommendation_gps',
+        'recommendation_sd',
+        'recommendation_rep',
+        'recommendation_edu',
+        'recommendation_fps',
+        'recommendation_lega',
+        'recommendation_kvp',
+        'recommendation_glp',
+        'recommendation_bdp',
+        'recommendation_mcg',
+        'recommendation_sav',
+        'recommendation_eco',
+        'recommendation_sgv',
+        'recommendation_sbv_usp',
+        'recommendation_sgb',
+        'recommendation_travs',
+        'recommendation_vsa'
+    ):
+        if context.has_column('swissvotes', column):
+            context.operations.drop_column('swissvotes', column)

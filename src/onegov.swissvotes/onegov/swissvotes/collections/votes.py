@@ -6,6 +6,7 @@ from onegov.core.collection import Pagination
 from onegov.swissvotes.fields.dataset import COLUMNS
 from onegov.swissvotes.models import PolicyArea
 from onegov.swissvotes.models import SwissVote
+from onegov.swissvotes.utils import get_table_column
 from sqlalchemy import func
 from sqlalchemy import or_
 from sqlalchemy.orm import undefer_group
@@ -457,8 +458,8 @@ class SwissVoteCollection(Pagination):
         for vote in query:
             row = []
             for attribute in COLUMNS.keys():
+                type_ = str(get_table_column(vote, attribute).type)
                 value = getattr(vote, attribute)
-                type_ = str(vote.__table__.columns[attribute.lstrip('_')].type)
                 if value is None:
                     row.append('.')
                 elif type_ == 'TEXT':
@@ -490,7 +491,7 @@ class SwissVoteCollection(Pagination):
             row += 1
             for column_, attribute in enumerate(COLUMNS.keys()):
                 value = getattr(vote, attribute)
-                type_ = str(vote.__table__.columns[attribute.lstrip('_')].type)
+                type_ = str(get_table_column(vote, attribute).type)
                 if value is None:
                     pass
                 elif type_ == 'TEXT':

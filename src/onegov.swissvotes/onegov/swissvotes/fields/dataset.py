@@ -6,6 +6,7 @@ from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
 from onegov.swissvotes import _
 from onegov.swissvotes.models import SwissVote
+from onegov.swissvotes.utils import get_table_column
 from psycopg2.extras import NumericRange
 from xlrd import open_workbook
 from xlrd import XL_CELL_EMPTY
@@ -393,7 +394,7 @@ class SwissvoteDatasetField(UploadField):
             vote = SwissVote()
             for attribute, column in COLUMNS.items():
                 cell = row[headers.index(column)]
-                table_column = vote.__table__.columns[attribute.lstrip('_')]
+                table_column = get_table_column(vote, attribute)
                 type_ = str(table_column.type)
                 nullable = table_column.nullable
                 try:
