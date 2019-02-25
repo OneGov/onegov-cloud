@@ -338,10 +338,10 @@ msgid "Description"
 msgstr "Description"
 
 msgid "Need at least"
-msgstr "Besoin d'au moins"
+msgstr "Nombre minimum"
 
 msgid "Need up to"
-msgstr "Besoin jusqu'à"
+msgstr "Nombre maximum"
 
 msgid "This name has already been used for this occasion"
 msgstr "Ce nom a déjà été utilisé pour cette occasion"
@@ -1010,7 +1010,7 @@ msgid "Occasion May Overlap"
 msgstr "L'événement peut se prolonger"
 
 msgid "Need Number"
-msgstr "Numéro de besoin"
+msgstr "Nombre requis besoins"
 
 msgid "Need Name"
 msgstr "Nom du besoin "
@@ -1362,7 +1362,7 @@ msgid "Please bring ${cost} CHF in cash."
 msgstr "Veuillez apporter ${cost} CHF en liquide."
 
 msgid "Enter a need"
-msgstr "Entrez un besoin"
+msgstr "Saisir un besoin"
 
 msgid "Keep track of required resources by adding needs."
 msgstr "Gardez une trace des ressources requises en ajoutant des besoins."
