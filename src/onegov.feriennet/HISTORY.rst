@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.5.6 (2019-02-25)
+~~~~~~~~~~~~~~~~~~~
 
 - Changes age filters to include each year from 0-16+ if available.
   [href]
