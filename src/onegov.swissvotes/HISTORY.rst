@@ -7,6 +7,9 @@ Changelog
 - Renames party recommendation dataset columns.
   [msom]
 
+- Increases the maximum size of attachments to 50 MB.
+  [msom]
+
 0.0.33 (2019-02-20)
 ~~~~~~~~~~~~~~~~~~~
 

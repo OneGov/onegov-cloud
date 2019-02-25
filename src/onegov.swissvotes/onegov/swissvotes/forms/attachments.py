@@ -16,7 +16,7 @@ class AttachmentsForm(Form):
         label=_("Voting text"),
         validators=[
             WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(25 * 1024 * 1024)
+            FileSizeLimit(50 * 1024 * 1024)
         ]
     )
 
@@ -24,7 +24,7 @@ class AttachmentsForm(Form):
         label=_("Federal council message"),
         validators=[
             WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(25 * 1024 * 1024)
+            FileSizeLimit(50 * 1024 * 1024)
         ]
     )
 
@@ -32,7 +32,7 @@ class AttachmentsForm(Form):
         label=_("Parliamentary debate"),
         validators=[
             WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(25 * 1024 * 1024)
+            FileSizeLimit(50 * 1024 * 1024)
         ]
     )
 
@@ -40,7 +40,7 @@ class AttachmentsForm(Form):
         label=_("Voting booklet"),
         validators=[
             WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(25 * 1024 * 1024)
+            FileSizeLimit(50 * 1024 * 1024)
         ]
     )
 
@@ -48,7 +48,7 @@ class AttachmentsForm(Form):
         label=_("Resolution"),
         validators=[
             WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(25 * 1024 * 1024)
+            FileSizeLimit(50 * 1024 * 1024)
         ]
     )
 
@@ -56,7 +56,7 @@ class AttachmentsForm(Form):
         label=_("Realization"),
         validators=[
             WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(25 * 1024 * 1024)
+            FileSizeLimit(50 * 1024 * 1024)
         ]
     )
 
@@ -64,7 +64,7 @@ class AttachmentsForm(Form):
         label=_("Advertisment analysis"),
         validators=[
             WhitelistedMimeType({'application/pdf'}),
-            FileSizeLimit(25 * 1024 * 1024)
+            FileSizeLimit(50 * 1024 * 1024)
         ]
     )
 
