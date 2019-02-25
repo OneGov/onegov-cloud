@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.34 (2019-02-25)
+~~~~~~~~~~~~~~~~~~~
 
 - Uses a single JSON column for all recommendations.
   [msom]
