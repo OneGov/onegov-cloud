@@ -335,6 +335,20 @@ ul.single-line {
     }
 }
 
+.filter-ages ul {
+    display: flex;
+    flex-wrap: wrap;
+
+    li {
+        margin-right: .5ex;
+
+        span {
+            min-width: 45px;
+            text-align: center !important;
+        }
+    }
+}
+
 /*
     Activity thumbnails
 */

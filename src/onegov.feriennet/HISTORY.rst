@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Changes age filters to include each year from 0-16+ if available.
+  [href]
+
 - Shows the file-name for storage links in notifications.
   [href]
 

@@ -141,18 +141,24 @@ def view_activities(self, request):
             )
         )
 
-        filters['ages'] = tuple(
-            link(
-                text=request.translate(text),
-                active=self.filter.contains_age_range(age_range),
-                url=request.link(self.for_filter(age_range=age_range))
-            ) for text, age_range in (
-                (_(" 3 - 6 years"), (3, 6)),
-                (_(" 7 - 10 years"), (7, 10)),
-                (_("11 - 13 years"), (11, 13)),
-                (_("14 - 17 years"), (14, 17))
+        ages = self.available_ages()
+        if ages:
+
+            def age_filters():
+                for age in range(*ages):
+                    if age < 16:
+                        yield str(age), (age, age)
+                    else:
+                        yield "16+", (16, 99)
+                        break
+
+            filters['ages'] = tuple(
+                link(
+                    text=request.translate(text),
+                    active=self.filter.contains_age_range(age_range),
+                    url=request.link(self.for_filter(age_range=age_range))
+                ) for text, age_range in age_filters()
             )
-        )
 
         filters['price_range'] = tuple(
             link(

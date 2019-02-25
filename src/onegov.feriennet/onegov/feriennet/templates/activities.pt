@@ -88,7 +88,7 @@
                         </a>
                     </tal:b>
 
-                    <a href="#content" class="navigate-up" i18n:translate>Navigate up</a>
+                    <a href="#" class="navigate-up" i18n:translate>Navigate up</a>
                 </div>
             </div>
 

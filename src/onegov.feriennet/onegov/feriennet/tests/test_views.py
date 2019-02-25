@@ -305,8 +305,10 @@ def test_activity_filter_age_ranges(client, scenario):
 
     scenario.commit()
 
-    preschool = client.get('/activities').click('3 - 6 Jahre')
-    highschool = client.get('/activities').click('14 - 17 Jahre')
+    preschool = client.get('/activities').click(
+        '5', href='filter=age', index=0)
+    highschool = client.get('/activities').click(
+        '15', href='filter=age', index=0)
 
     assert "Retreat" in preschool
     assert "Meeting" in preschool
@@ -318,7 +320,8 @@ def test_activity_filter_age_ranges(client, scenario):
     with scenario.update():
         scenario.occasions[1].age = NumericRange(15, 20)
 
-    preschool = client.get('/activities').click('3 - 6 Jahre')
+    preschool = client.get('/activities').click(
+        '5', href='filter=age', index=0)
 
     assert "Retreat" in preschool
     assert "Meeting" not in preschool
