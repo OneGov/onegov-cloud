@@ -2,6 +2,7 @@ from onegov.core.collection import Pagination
 from onegov.core.orm.func import unaccent
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import ScanJob
+from sqlalchemy import or_
 
 
 class ScanJobCollection(Pagination):
@@ -27,6 +28,7 @@ class ScanJobCollection(Pagination):
         to_date=None,
         type=None,
         municipality_id=None,
+        term=None,
         sort_by=None,
         sort_order=None
     ):
@@ -37,6 +39,7 @@ class ScanJobCollection(Pagination):
         self.to_date = to_date
         self.type = type
         self.municipality_id = municipality_id
+        self.term = term
         self.sort_by = sort_by
         self.sort_order = sort_order
 
@@ -62,6 +65,7 @@ class ScanJobCollection(Pagination):
                 set(self.municipality_id or [])
                 == set(other.municipality_id or [])
             )
+            and (self.term or None) == (other.term or None)
             and (self.sort_by or None) == (other.sort_by or None)
             and (self.sort_order or None) == (other.sort_order or None)
         )
@@ -88,6 +92,7 @@ class ScanJobCollection(Pagination):
             to_date=self.to_date,
             type=self.type,
             municipality_id=self.municipality_id,
+            term=self.term,
             sort_by=self.sort_by,
             sort_order=self.sort_order
         )
@@ -151,6 +156,7 @@ class ScanJobCollection(Pagination):
             to_date=self.to_date,
             type=self.type,
             municipality_id=self.municipality_id,
+            term=self.term,
             sort_by=sort_by,
             sort_order=sort_order
         )
@@ -211,6 +217,13 @@ class ScanJobCollection(Pagination):
         if self.municipality_id:
             query = query.filter(
                 ScanJob.municipality_id.in_(self.municipality_id)
+            )
+        if self.term:
+            query = query.filter(
+                or_(*[
+                    ScanJob.dispatch_note.ilike(f'%{self.term}%'),
+                    ScanJob.return_note.ilike(f'%{self.term}%')
+                ])
             )
 
         query = query.order_by(self.order_by)

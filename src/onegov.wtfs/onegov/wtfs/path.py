@@ -105,6 +105,7 @@ def get_scan_jobs(
     to_date=None,
     type=None,
     municipality_id=None,
+    term=None,
     sort_by=None,
     sort_order=None
 ):
@@ -119,6 +120,7 @@ def get_scan_jobs(
         to_date=to_date,
         type=type,
         municipality_id=municipality_id,
+        term=term,
         sort_by=sort_by,
         sort_order=sort_order
     )

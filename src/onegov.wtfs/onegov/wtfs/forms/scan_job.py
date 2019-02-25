@@ -13,6 +13,7 @@ from wtforms import HiddenField
 from wtforms import IntegerField
 from wtforms import RadioField
 from wtforms import SelectField
+from wtforms import StringField
 from wtforms import TextAreaField
 from wtforms_components import DateRange
 from wtforms.fields.html5 import DateField
@@ -668,6 +669,11 @@ class ScanJobsForm(Form):
         ]
     )
 
+    term = StringField(
+        label=_("Term"),
+        fieldset=_("Filter")
+    )
+
     def on_request(self):
         if hasattr(self, 'csrf_token'):
             self.delete_field('csrf_token')
@@ -681,6 +687,7 @@ class ScanJobsForm(Form):
         self.from_date.data = model.from_date
         self.to_date.data = model.to_date
         self.type.data = model.type
+        self.term.data = model.term
         self.sort_by.data = model.sort_by
         self.sort_order.data = model.sort_order
 

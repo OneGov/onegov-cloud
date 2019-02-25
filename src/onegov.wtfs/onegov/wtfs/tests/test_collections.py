@@ -200,20 +200,22 @@ def test_scan_jobs_query(session):
         )
     }
 
-    def add(name, dispatch_date, type):
+    def add(name, dispatch_date, type, dispatch_note, return_note):
         ScanJobCollection(session).add(
             dispatch_date=dispatch_date,
             type=type,
             municipality_id=municipalities[name].id,
             group_id=groups[name].id,
+            dispatch_note=dispatch_note,
+            return_note=return_note,
         )
 
-    add('Adlikon', date(2019, 1, 6), 'normal')
-    add('Adlikon', date(2019, 1, 5), 'express')
-    add('Adlikon', date(2019, 1, 4), 'express')
-    add('Aesch', date(2019, 1, 4), 'normal')
-    add('Aesch', date(2019, 1, 3), 'express')
-    add('Aesch', date(2019, 1, 2), 'express')
+    add('Adlikon', date(2019, 1, 6), 'normal', None, 'bc')
+    add('Adlikon', date(2019, 1, 5), 'express', 'abc', None)
+    add('Adlikon', date(2019, 1, 4), 'express', '', '')
+    add('Aesch', date(2019, 1, 4), 'normal', None, 'Lorem ipsum')
+    add('Aesch', date(2019, 1, 3), 'express', 'Lorem Ipsum', None)
+    add('Aesch', date(2019, 1, 2), 'express', None, 'loremipsum')
 
     def count(**kwargs):
         return ScanJobCollection(session, **kwargs).query().count()
@@ -251,10 +253,17 @@ def test_scan_jobs_query(session):
     assert count(municipality_id=[municipalities['Adlikon'].id,
                                   municipalities['Aesch'].id]) == 6
 
+    assert count(term='abc') == 1
+    assert count(term='bc') == 2
+    assert count(term='C') == 2
+    assert count(term='LOREM IPSUM') == 2
+    assert count(term='ips') == 3
+
     assert count(
         municipality_id=[municipalities['Adlikon'].id],
         type=['express'],
-        from_date=date(2019, 1, 5)
+        from_date=date(2019, 1, 4),
+        term='a'
     ) == 1
 
 

@@ -1023,12 +1023,14 @@ def test_scan_jobs_form(session):
     assert form.from_date.data is None
     assert form.to_date.data is None
     assert form.type.data == ['normal', 'express']
+    assert form.term.data is None
 
     scan_jobs.sort_by = 'delivery_number'
     scan_jobs.sort_order = 'ascending'
     scan_jobs.from_date = date(2010, 1, 1)
     scan_jobs.to_date = date(2010, 12, 31)
     scan_jobs.type = ['express']
+    scan_jobs.term = 'term'
 
     form.apply_model(scan_jobs)
 
@@ -1037,6 +1039,7 @@ def test_scan_jobs_form(session):
     assert form.from_date.data == date(2010, 1, 1)
     assert form.to_date.data == date(2010, 12, 31)
     assert form.type.data == ['express']
+    assert form.term.data == 'term'
 
     # Test validation
     form = ScanJobsForm()
@@ -1072,12 +1075,14 @@ def test_unrestricted_scan_jobs_form(session):
     assert form.to_date.data is None
     assert form.type.data == ['normal', 'express']
     assert form.municipality_id.data is None
+    assert form.term.data is None
 
     scan_jobs.sort_by = 'delivery_number'
     scan_jobs.sort_order = 'ascending'
     scan_jobs.from_date = date(2010, 1, 1)
     scan_jobs.to_date = date(2010, 12, 31)
     scan_jobs.type = ['express']
+    scan_jobs.term = 'term'
     scan_jobs.municipality_id = [municipalities.query().first().id]
 
     form.apply_model(scan_jobs)
@@ -1087,6 +1092,7 @@ def test_unrestricted_scan_jobs_form(session):
     assert form.from_date.data == date(2010, 1, 1)
     assert form.to_date.data == date(2010, 12, 31)
     assert form.type.data == ['express']
+    assert form.term.data == 'term'
     assert form.municipality_id.data == [municipalities.query().first().id]
 
     # Test validation
