@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Shows the file-name for storage links in notifications.
+  [href]
+
 1.5.5 (2019-02-22)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -1,9 +1,13 @@
+import re
+
 from onegov.activity import BookingCollection, InvoiceCollection
-from onegov.feriennet.collections import VacationActivityCollection
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.feriennet import _
+from onegov.feriennet.collections import VacationActivityCollection
+from onegov.file import File
+from onegov.file.utils import name_without_extension
 from sqlalchemy import Column, Text
 from uuid import uuid4
 
@@ -49,6 +53,7 @@ class TemplateVariables(object):
     def __init__(self, request, period):
         self.request = request
         self.period = period
+        self.expanded = {}
 
         self.bound = {}
         self.bind(
@@ -90,9 +95,42 @@ class TemplateVariables(object):
         paragraphs = tuple(as_paragraphs(text))
 
         if len(paragraphs) <= 1:
-            return text
+            result = text
         else:
-            return '\n'.join(as_paragraphs(text))
+            result = '\n'.join(as_paragraphs(text))
+
+        return self.expand_storage_links(result)
+
+    def expand_storage_links(self, text):
+        """ Searches the text for storage links /storage/0w8dj98rgn93... and
+        uses the title of the referenced files to improve the readability of
+        the link.
+
+        """
+
+        ex = self.request.class_link(File, {'id': '0xdeadbeef'})
+        ex = ex.replace('0xdeadbeef', r'(?P<id>[0-9A-Za-z]+)')
+
+        def expand(match):
+            return self.expand_with_cache(match, match.group('id'))
+
+        return re.sub(ex, expand, text)
+
+    def expand_with_cache(self, match, id):
+
+        if id not in self.expanded:
+            record = self.request.session.query(File)\
+                .with_entities(File.name)\
+                .filter_by(id=match.group('id'))\
+                .first()
+
+            if record:
+                name = name_without_extension(record.name)
+                self.expanded[id] = f'<a href="{match.group()}">{name}</a>'
+            else:
+                self.expanded[id] = match.group()
+
+        return self.expanded[id]
 
     def period_title(self):
         return self.period.title

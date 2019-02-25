@@ -7,6 +7,7 @@ from freezegun import freeze_time
 from onegov.activity import Booking
 from onegov.activity.utils import generate_xml
 from onegov.core.custom import json
+from onegov.file import FileCollection
 from onegov.pay import Payment
 from onegov_testing import utils
 from psycopg2.extras import NumericRange
@@ -2086,3 +2087,33 @@ def test_needs_export_by_period(client, scenario):
 
     assert one[0]['Bedarf Anzahl'] == '1 - 1'
     assert two[0]['Bedarf Anzahl'] == '2 - 2'
+
+
+def test_send_email_with_attachment(client, scenario):
+    scenario.add_period(title="Ferienpass 2016")
+    scenario.commit()
+
+    client.login_admin()
+
+    page = client.get('/files')
+    page.form['file'] = Upload('Test.txt', b'File content.')
+    page.form.submit()
+
+    file_id = FileCollection(scenario.session).query().one().id
+
+    page = client.get('/notifications').click('Neue Mitteilungs-Vorlage')
+    page.form['subject'] = 'File'
+    page.form['text'] = f'http://localhost/storage/{file_id}'
+    page = page.form.submit().follow()
+
+    page = page.click('Versand')
+    assert "Test" in page
+    assert "Test.txt" not in page
+    page.form['roles'] = ['admin', 'editor']
+    page.form.submit().follow()
+
+    # Plaintext version
+    assert "[Test.txt](http" in client.get_email(0, 0)
+
+    # HTML version
+    assert ">Test.txt</a>" in client.get_email(0, 1)
