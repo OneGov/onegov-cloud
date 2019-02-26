@@ -221,31 +221,31 @@ def test_daily_list_boxes(session):
 
     daily_list = DailyListBoxes(session, date_=date(2019, 1, 1))
     assert daily_list.query.all() == [
-        ('Adlikon', 1, 2, 3, 0),
-        ('Aesch', 1, 2, 3, 0)
+        ('Adlikon', 21, 1, 2, 3, 0),
+        ('Aesch', 241, 1, 2, 3, 0)
     ]
     assert daily_list.total == (2, 4, 6, 0)
 
     daily_list = DailyListBoxes(session, date_=date(2019, 1, 2))
     assert daily_list.query.all() == [
-        ('Adlikon', 3, 2, 1, 4),
-        ('Aesch', 0, 0, 0, 4),
-        ('Altikon', 1, 2, 3, 4),
-        ('Andelfingen', 1, 2, 3, 0)
+        ('Adlikon', 21, 3, 2, 1, 4),
+        ('Aesch', 241, 0, 0, 0, 4),
+        ('Altikon', 211, 1, 2, 3, 4),
+        ('Andelfingen', 30, 1, 2, 3, 0)
     ]
     assert daily_list.total == (5, 6, 7, 12)
 
     daily_list = DailyListBoxes(session, date_=date(2019, 1, 3))
     assert daily_list.query.all() == [
-        ('Adlikon', 0, 0, 0, 1),
-        ('Aesch', 0, 10, 0, 0)
+        ('Adlikon', 21, 0, 0, 0, 1),
+        ('Aesch', 241, 0, 10, 0, 0)
     ]
     assert daily_list.total == (0, 10, 0, 1)
 
     daily_list = DailyListBoxes(session, date_=date(2019, 1, 4))
     assert daily_list.query.all() == [
-        ('Aesch', 0, 0, 0, 0),
-        ('Andelfingen', 0, 0, 0, 4)
+        ('Aesch', 241, 0, 0, 0, 0),
+        ('Andelfingen', 30, 0, 0, 0, 4)
     ]
     assert daily_list.total == (0, 0, 0, 4)
 
@@ -261,43 +261,34 @@ def test_daily_list_boxes_and_forms(session):
 
     add_report_data(session)
 
-    # 'dispatch_boxes',
-    #   'dispatch_tax_forms_older',
-    #   'dispatch_tax_forms_last_year',
-    #   'dispatch_tax_forms_current_year',
-    #   'dispatch_single_documents',
-    # 'dispatch_cantonal_tax_office',
-    # 'dispatch_cantonal_scan_center',
-    # -
-
     daily_list = DailyListBoxesAndForms(session, date_=date(2019, 1, 1))
     assert daily_list.query.all() == [
-        ('Adlikon', 1, 1, 2, 3, 4, 2, 3),
-        ('Aesch', 1, 1, 2, 3, 4, 2, 3)
+        ('Adlikon', 21, 1, 1, 2, 3, 4, 2, 3),
+        ('Aesch', 241, 1, 1, 2, 3, 4, 2, 3)
     ]
     assert daily_list.total == (2, 2, 4, 6, 8, 4, 6)
 
     daily_list = DailyListBoxesAndForms(session, date_=date(2019, 1, 2))
 
     assert daily_list.query.all() == [
-        ('Adlikon', 3, 3, 2, 1, 1, 2, 1),
-        ('Aesch', 0, 0, 0, 0, 0, 0, 0),
-        ('Altikon', 1, 1, 2, 3, 4, 2, 3),
-        ('Andelfingen', 1, 1, 2, 3, 4, 2, 3)
+        ('Adlikon', 21, 3, 3, 2, 1, 1, 2, 1),
+        ('Aesch', 241, 0, 0, 0, 0, 0, 0, 0),
+        ('Altikon', 211, 1, 1, 2, 3, 4, 2, 3),
+        ('Andelfingen', 30, 1, 1, 2, 3, 4, 2, 3)
     ]
     assert daily_list.total == (5, 5, 6, 7, 9, 6, 7)
 
     daily_list = DailyListBoxesAndForms(session, date_=date(2019, 1, 3))
     assert daily_list.query.all() == [
-        ('Adlikon', 0, 0, 0, 0, 0, 0, 0),
-        ('Aesch', 0, 0, 10, 0, 0, 10, 0)
+        ('Adlikon', 21, 0, 0, 0, 0, 0, 0, 0),
+        ('Aesch', 241, 0, 0, 10, 0, 0, 10, 0)
     ]
     assert daily_list.total == (0, 0, 10, 0, 0, 10, 0)
 
     daily_list = DailyListBoxesAndForms(session, date_=date(2019, 1, 4))
     assert daily_list.query.all() == [
-        ('Aesch', 0, 0, 0, 0, 0, 0, 0),
-        ('Andelfingen', 0, 0, 0, 0, 0, 0, 0)
+        ('Aesch', 241, 0, 0, 0, 0, 0, 0, 0),
+        ('Andelfingen', 30, 0, 0, 0, 0, 0, 0, 0)
     ]
     assert daily_list.total == (0, 0, 0, 0, 0, 0, 0)
 
@@ -318,24 +309,24 @@ def test_report_boxes(session):
 
     report = _report(date(2019, 1, 1), date(2019, 1, 1))
     assert report.query.all() == [
-        ('Adlikon', 1, 2, 3, 0),
-        ('Aesch', 1, 2, 3, 0)
+        ('Adlikon', 21, 1, 2, 3, 0),
+        ('Aesch', 241, 1, 2, 3, 0)
     ]
     assert report.total == (2, 4, 6, 0)
 
     report = _report(date(2019, 1, 2), date(2019, 1, 3))
     assert report.query.all() == [
-        ('Adlikon', 3, 2, 1, 5),
-        ('Aesch', 0, 10, 0, 4),
-        ('Altikon', 1, 2, 3, 4),
-        ('Andelfingen', 1, 2, 3, 0)
+        ('Adlikon', 21, 3, 2, 1, 5),
+        ('Aesch', 241, 0, 10, 0, 4),
+        ('Altikon', 211, 1, 2, 3, 4),
+        ('Andelfingen', 30, 1, 2, 3, 0)
     ]
     assert report.total == (5, 16, 7, 13)
 
     report = _report(date(2019, 1, 4), date(2019, 1, 5))
     assert report.query.all() == [
-        ('Aesch', 0, 0, 0, 0),
-        ('Andelfingen', 0, 0, 0, 4)
+        ('Aesch', 241, 0, 0, 0, 0),
+        ('Andelfingen', 30, 0, 0, 0, 4)
     ]
     assert report.total == (0, 0, 0, 4)
 
@@ -352,24 +343,24 @@ def test_report_boxes_and_forms(session):
 
     report = _report(date(2019, 1, 1), date(2019, 1, 1))
     assert report.query.all() == [
-        ('Adlikon', 1, 2, 3, 4, 0),
-        ('Aesch', 1, 2, 3, 4, 0)
+        ('Adlikon', 21, 1, 2, 3, 4, 0),
+        ('Aesch', 241, 1, 2, 3, 4, 0)
     ]
     assert report.total == (2, 4, 6, 8, 0)
 
     report = _report(date(2019, 1, 2), date(2019, 1, 3))
     assert report.query.all() == [
-        ('Adlikon', 3, 2, 1, 1, 5),
-        ('Aesch', 0, 10, 0, 0, 4),
-        ('Altikon', 1, 2, 3, 4, 4),
-        ('Andelfingen', 1, 2, 3, 4, 0)
+        ('Adlikon', 21, 3, 2, 1, 1, 5),
+        ('Aesch', 241, 0, 10, 0, 0, 4),
+        ('Altikon', 211, 1, 2, 3, 4, 4),
+        ('Andelfingen', 30, 1, 2, 3, 4, 0)
     ]
     assert report.total == (5, 16, 7, 9, 13)
 
     report = _report(date(2019, 1, 4), date(2019, 1, 5))
     assert report.query.all() == [
-        ('Aesch', 0, 0, 0, 0, 0),
-        ('Andelfingen', 0, 0, 0, 0, 4)
+        ('Aesch', 241, 0, 0, 0, 0, 0),
+        ('Andelfingen', 30, 0, 0, 0, 0, 4)
     ]
     assert report.total == (0, 0, 0, 0, 4)
 
@@ -387,23 +378,23 @@ def test_report_forms_by_municipality(session):
     add_report_data(session)
 
     report = _report(date(2019, 1, 1), date(2019, 1, 1), 'Adlikon')
-    assert report.query.all() == [('Adlikon', 1, 2, 3)]
+    assert report.query.all() == [('Adlikon', 21, 1, 2, 3)]
     report = _report(date(2019, 1, 1), date(2019, 1, 1), 'Aesch')
-    assert report.query.all() == [('Aesch', 1, 2, 3)]
+    assert report.query.all() == [('Aesch', 241, 1, 2, 3)]
 
     report = _report(date(2019, 1, 2), date(2019, 1, 3), 'Adlikon')
-    assert report.query.all() == [('Adlikon', 3, 2, 1)]
+    assert report.query.all() == [('Adlikon', 21, 3, 2, 1)]
     report = _report(date(2019, 1, 2), date(2019, 1, 3), 'Aesch')
-    assert report.query.all() == [('Aesch', 0, 10, 0)]
+    assert report.query.all() == [('Aesch', 241, 0, 10, 0)]
     report = _report(date(2019, 1, 2), date(2019, 1, 3), 'Altikon')
-    assert report.query.all() == [('Altikon', 1, 2, 3)]
+    assert report.query.all() == [('Altikon', 211, 1, 2, 3)]
     report = _report(date(2019, 1, 2), date(2019, 1, 3), 'Andelfingen')
-    assert report.query.all() == [('Andelfingen', 1, 2, 3)]
+    assert report.query.all() == [('Andelfingen', 30, 1, 2, 3)]
 
     report = _report(date(2019, 1, 4), date(2019, 1, 5), 'Aesch')
-    assert report.query.all() == [('Aesch', 0, 0, 0)]
+    assert report.query.all() == [('Aesch', 241, 0, 0, 0)]
     report = _report(date(2019, 1, 4), date(2019, 1, 5), 'Andelfingen')
-    assert report.query.all() == [('Andelfingen', 0, 0, 0)]
+    assert report.query.all() == [('Andelfingen', 30, 0, 0, 0)]
 
 
 def test_notification(session):

@@ -8,12 +8,13 @@
                 <table>
                     <thead>
                         <tr>
-                            <th></th>
+                            <th class="center" colspan="2" i18n:translate>Municipality</th>
                             <th class="center" colspan="2" i18n:translate>Dispatch to the tax office</th>
                             <th class="center" colspan="2" i18n:translate>Dispatch to the cantonal tax office</th>
                         </tr>
                         <tr>
-                            <th i18n:translate>Municipality</th>
+                            <th class="subtitle" i18n:translate>Name</th>
+                            <th class="right subtitle" i18n:translate>BFS number</th>
                             <th class="right subtitle" i18n:translate>In</th>
                             <th class="right subtitle" i18n:translate>Out</th>
                             <th class="right subtitle" i18n:translate>Scan Center</th>
@@ -22,7 +23,8 @@
                     </thead>
                     <tbody>
                         <tr tal:repeat="result layout.model.query">
-                            <th>${result.name}</th>
+                            <td>${result.name}</td>
+                            <td class="right">${result.bfs_number}</td>
                             <td class="right">${result.dispatch_boxes}</td>
                             <td class="right">${result.return_boxes}</td>
                             <td class="right">${result.dispatch_cantonal_scan_center}</td>
@@ -31,7 +33,7 @@
                     </tbody>
                     <tfoot>
                         <tr tal:define="total layout.model.total">
-                            <th i18n:translate>Total</th>
+                            <th colspan="2" i18n:translate>Total</th>
                             <td class="right">${total.dispatch_boxes}</td>
                             <td class="right">${total.return_boxes}</td>
                             <td class="right">${total.dispatch_cantonal_scan_center}</td>

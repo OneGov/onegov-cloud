@@ -50,6 +50,7 @@ class Report(object):
         query_in = self.session.query(ScanJob).join(Municipality)
         query_in = query_in.with_entities(
             Municipality.name.label('name'),
+            Municipality.bfs_number.label('bfs_number'),
             *[sum(ScanJob, column) for column in self.columns_in],
             *[zero(column) for column in self.columns_out],
         )
@@ -61,12 +62,16 @@ class Report(object):
             query_in = query_in.filter(ScanJob.type == self.type)
         if self.municipality:
             query_in = query_in.filter(Municipality.name == self.municipality)
-        query_in = query_in.group_by(Municipality.name)
+        query_in = query_in.group_by(
+            Municipality.name,
+            Municipality.bfs_number
+        )
 
         # out / return date
         query_out = self.session.query(ScanJob).join(Municipality)
         query_out = query_out.with_entities(
             Municipality.name.label('name'),
+            Municipality.bfs_number.label('bfs_number'),
             *[zero(column) for column in self.columns_in],
             *[sum(ScanJob, column) for column in self.columns_out],
         )
@@ -80,15 +85,19 @@ class Report(object):
             query_out = query_out.filter(
                 Municipality.name == self.municipality
             )
-        query_out = query_out.group_by(Municipality.name)
+        query_out = query_out.group_by(
+            Municipality.name,
+            Municipality.bfs_number
+        )
 
         # join in / out
         union = query_in.union_all(query_out).subquery('union')
         query = self.session.query(
             union.c.name,
+            union.c.bfs_number,
             *[sum(union.c, column) for column in self.columns]
         )
-        query = query.group_by(union.c.name)
+        query = query.group_by(union.c.name, union.c.bfs_number)
         query = query.order_by(union.c.name)
         return query
 
