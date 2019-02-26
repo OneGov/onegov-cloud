@@ -177,6 +177,18 @@ form {
         font-size: .875rem;
     }
 
+    .express-shipment-hint {
+        margin-bottom: 1rem;
+
+        * {
+            font-size: .875rem;
+        }
+
+        ul {
+            margin-bottom: 0;
+        }
+    }
+
     /*
     Make the search filters toggable
     */

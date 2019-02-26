@@ -182,10 +182,29 @@
         </script>
     </metal:tablesaw_translations>
 
-    <metal:dispatch_dates define-macro="dispatch_dates" i18n:domain="onegov.org">
+    <metal:dispatch_dates define-macro="dispatch_dates" i18n:domain="onegov.wtfs">
         <ul class="dispatch-dates">
             <li tal:repeat="date dates">${layout.format_date(date, 'date')}</li>
         </ul>
     </metal:dispatch_dates>
+
+    <metal:express_shipment_hint define-macro="express_shipment_hint" i18n:domain="onegov.wtfs">
+        <div class="express-shipment-hint">
+            <p i18n:translate>
+                We offer express processing with postal delivery for urgent
+                scan jobs, e.g. in the event of death or emigration.
+                The date is freely selectable.
+            </p>
+            <span i18n:translate>A maximum of</span>
+            <ul>
+                <li><strong i18n:translate>one shipment a day</strong></li>
+                <li><strong i18n:translate>two tax returns</strong></li>
+                <li><strong i18n:translate>two single documents</strong></li>
+            </ul>
+            <span i18n:translate>is allowed</span>
+        </div>
+    </metal:express_shipment_hint>
+
+
 
 </body>

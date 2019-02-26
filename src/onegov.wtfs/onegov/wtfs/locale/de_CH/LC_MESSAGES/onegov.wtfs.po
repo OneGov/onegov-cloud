@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-25 15:05+0100\n"
-"PO-Revision-Date: 2019-02-25 15:05+0100\n"
+"POT-Creation-Date: 2019-02-26 06:23+0100\n"
+"PO-Revision-Date: 2019-02-25 17:17+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -74,6 +74,10 @@ msgstr "Text"
 msgid "Fill in until 17.00 o'clock the evening before."
 msgstr "Ausfüllen bis 17.00 Uhr Vorabend."
 
+#, python-format
+msgid "Fill in until 17.00 o'clock the evening before ${date}."
+msgstr "Ausfüllen bis 17.00 Uhr Vorabend des ${date}."
+
 msgid "Type"
 msgstr "Auftragsart"
 
@@ -132,10 +136,10 @@ msgid "Regular dispatch dates"
 msgstr "Reguläre Versanddaten"
 
 msgid "Filter"
-msgstr ""
+msgstr "Filtern"
 
 msgid "Term"
-msgstr ""
+msgstr "Suchbegriff"
 
 msgid "Regular shipment"
 msgstr "Normale Sendung"
@@ -291,6 +295,29 @@ msgstr "Auswahl"
 
 msgid "Columns"
 msgstr "Spalten"
+
+msgid ""
+"We offer express processing with postal delivery for urgent scan jobs, e.g. "
+"in the event of death or emigration. The date is freely selectable."
+msgstr ""
+"Für dringende Scan-Aufträge, wie z.B. bei Todesfällen oder Auslandwegzügen, "
+"bieten wir die Expressverarbeitung mit Postzustellung an. Das Datum ist frei "
+"wählbar."
+
+msgid "A maximum of"
+msgstr "Es dürfen maximal"
+
+msgid "one shipment a day"
+msgstr "eine Sendung pro Tag"
+
+msgid "two tax returns"
+msgstr "zwei Steuererklärungen"
+
+msgid "two single documents"
+msgstr "zwei Einzelbelege"
+
+msgid "is allowed"
+msgstr "erfasst werden"
 
 msgid "Forgot your password?"
 msgstr "Passwort vergessen?"

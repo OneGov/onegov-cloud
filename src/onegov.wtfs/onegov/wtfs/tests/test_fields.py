@@ -1,8 +1,10 @@
 from cgi import FieldStorage
 from datetime import date
 from io import BytesIO
+from onegov.core.utils import Bunch
 from onegov.form import Form
 from onegov.wtfs.fields import CsvUploadField
+from onegov.wtfs.fields import HintField
 from onegov.wtfs.fields import MunicipalityDataUploadField
 
 
@@ -119,3 +121,16 @@ def test_municipality_data_upload_field():
     assert field.data == {
         21: {'dates': [date(2019, 1, 1), date(2019, 1, 7)]}
     }
+
+
+def test_hint_field(wtfs_app):
+    def get_translate(for_chameleon):
+        return wtfs_app.chameleon_translations.get('de_CH')
+
+    form = Form()
+    field = HintField(macro='express_shipment_hint')
+    field = field.bind(form, 'hint')
+    field.meta.request = Bunch(app=wtfs_app, get_translate=get_translate)
+
+    assert field.validate(form)
+    assert "Für dringende Scan-Aufträge" in field()

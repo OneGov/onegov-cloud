@@ -7,6 +7,7 @@ from onegov.form.fields import ChosenSelectMultipleField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import PreviewField
 from onegov.wtfs import _
+from onegov.wtfs.fields import HintField
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import PickupDate
 from wtforms import HiddenField
@@ -41,6 +42,12 @@ class AddScanJobForm(Form):
         choices=[('normal', _("Regular shipment"))],
         validators=[InputRequired()],
         default='normal'
+    )
+
+    type_hint = HintField(
+        label="",
+        macro='express_shipment_hint',
+        depends_on=('type', 'express')
     )
 
     dispatch_date_normal = SelectField(
@@ -319,6 +326,11 @@ class EditScanJobForm(Form):
             'return_note',
         ):
             getattr(self, name).data = getattr(model, name)
+
+        self.callout = _(
+            "Fill in until 17.00 o'clock the evening before ${date}.",
+            mapping={'date': f"{model.dispatch_date:%d.%m.%Y}"}
+        )
 
 
 class UnrestrictedAddScanJobForm(Form):
