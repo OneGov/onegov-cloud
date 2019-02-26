@@ -529,7 +529,7 @@ class UnrestrictedScanJobForm(Form):
         label=_("Unscanned tax forms (older)"),
         fieldset=_("Return to the municipality"),
         validators=[Optional(), NumberRange(min=0)],
-        render_kw={'size': 2, 'clear': False},
+        render_kw={'offset': 3, 'size': 2, 'clear': False},
     )
     return_unscanned_tax_forms_last_year = IntegerField(
         label=_("Unscanned tax forms (previous year)"),
@@ -541,7 +541,8 @@ class UnrestrictedScanJobForm(Form):
         label=_("Unscanned tax forms"),
         fieldset=_("Return to the municipality"),
         validators=[Optional(), NumberRange(min=0)],
-        render_kw={'offset': 3, 'size': 2, 'clear': False},
+        render_kw={'size': 2, 'clear': False},
+
     )
     return_unscanned_single_documents = IntegerField(
         label=_("Unscanned single documents"),
