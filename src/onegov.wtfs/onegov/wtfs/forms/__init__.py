@@ -8,8 +8,7 @@ from onegov.wtfs.forms.report import ReportSelectionForm
 from onegov.wtfs.forms.scan_job import AddScanJobForm
 from onegov.wtfs.forms.scan_job import EditScanJobForm
 from onegov.wtfs.forms.scan_job import ScanJobsForm
-from onegov.wtfs.forms.scan_job import UnrestrictedAddScanJobForm
-from onegov.wtfs.forms.scan_job import UnrestrictedEditScanJobForm
+from onegov.wtfs.forms.scan_job import UnrestrictedScanJobForm
 from onegov.wtfs.forms.scan_job import UnrestrictedScanJobsForm
 from onegov.wtfs.forms.user import UnrestrictedUserForm
 from onegov.wtfs.forms.user import UserForm
@@ -27,8 +26,7 @@ __all__ = (
     'NotificationForm',
     'ReportSelectionForm',
     'ScanJobsForm',
-    'UnrestrictedAddScanJobForm',
-    'UnrestrictedEditScanJobForm',
+    'UnrestrictedScanJobForm',
     'UnrestrictedScanJobsForm',
     'UnrestrictedUserForm',
     'UserForm',

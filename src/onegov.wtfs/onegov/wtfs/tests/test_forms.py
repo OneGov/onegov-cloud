@@ -18,8 +18,7 @@ from onegov.wtfs.forms import MunicipalityIdSelectionForm
 from onegov.wtfs.forms import NotificationForm
 from onegov.wtfs.forms import ReportSelectionForm
 from onegov.wtfs.forms import ScanJobsForm
-from onegov.wtfs.forms import UnrestrictedAddScanJobForm
-from onegov.wtfs.forms import UnrestrictedEditScanJobForm
+from onegov.wtfs.forms import UnrestrictedScanJobForm
 from onegov.wtfs.forms import UnrestrictedScanJobsForm
 from onegov.wtfs.forms import UnrestrictedUserForm
 from onegov.wtfs.forms import UserForm
@@ -679,7 +678,7 @@ def test_edit_scan_job_form(session):
     assert form.validate()
 
 
-def test_unrestricted_add_scan_job_form(session):
+def test_unrestricted_scan_job_form(session):
     groups = UserGroupCollection(session)
     municipalities = MunicipalityCollection(session)
 
@@ -702,94 +701,7 @@ def test_unrestricted_add_scan_job_form(session):
     municipality_2.pickup_dates.append(PickupDate(date=date(2019, 1, 18)))
 
     # Test on request
-    form = UnrestrictedAddScanJobForm()
-    form.request = Request(session, groupid=group_1.id.hex)
-    with freeze_time("2019-01-05"):
-        form.on_request()
-        assert form.type.choices == [
-            ('normal', 'Regular shipment'),
-            ('express', 'Express shipment')
-        ]
-        assert form.municipality_id.choices == [
-            (municipality_2.id.hex, 'Adlikon'),
-            (municipality_1.id.hex, 'Winterthur')
-        ]
-
-    # Test update
-    form.type.data = 'normal'
-    form.municipality_id.data = form.municipality_id.choices[0][0]
-    form.dispatch_date.data = date(2019, 1, 8)
-    form.dispatch_boxes.data = 1
-    form.dispatch_tax_forms_current_year.data = 2
-    form.dispatch_tax_forms_last_year.data = 3
-    form.dispatch_tax_forms_older.data = 4
-    form.dispatch_single_documents.data = 5
-    form.dispatch_note.data = 'Note on dispatch'
-    form.dispatch_cantonal_tax_office.data = 6
-    form.dispatch_cantonal_scan_center.data = 7
-
-    model = ScanJob()
-    form.update_model(model)
-    assert model.municipality_id == municipality_2.id.hex
-    assert model.group_id == group_2.id
-    assert model.type == 'normal'
-    assert model.dispatch_date == date(2019, 1, 8)
-    assert model.dispatch_boxes == 1
-    assert model.dispatch_tax_forms_current_year == 2
-    assert model.dispatch_tax_forms_last_year == 3
-    assert model.dispatch_tax_forms_older == 4
-    assert model.dispatch_single_documents == 5
-    assert model.dispatch_note == 'Note on dispatch'
-    assert model.dispatch_cantonal_tax_office == 6
-    assert model.dispatch_cantonal_scan_center == 7
-
-    form.type.data = 'express'
-    form.dispatch_date.data = date(2019, 1, 6)
-    form.update_model(model)
-    assert model.type == 'express'
-    assert model.dispatch_date == date(2019, 1, 6)
-
-    # Test validation
-    with freeze_time("2019-01-05"):
-        form = UnrestrictedAddScanJobForm()
-        form.request = Request(session, groupid=group_1.id.hex)
-        form.on_request()
-        assert not form.validate()
-
-        form = UnrestrictedAddScanJobForm(PostData({
-            'municipality_id': municipality_1.id.hex,
-            'type': 'normal',
-            'dispatch_date': '2019-01-08'
-        }))
-        form.request = Request(session, groupid=group_1.id.hex)
-        form.on_request()
-        assert form.validate()
-
-
-def test_unrestricted_edit_scan_job_form(session):
-    groups = UserGroupCollection(session)
-    municipalities = MunicipalityCollection(session)
-
-    group_1 = groups.add(name="Winterthur")
-    municipality_1 = municipalities.add(
-        name="Winterthur",
-        bfs_number=230,
-        group_id=group_1.id
-    )
-    municipality_1.pickup_dates.append(PickupDate(date=date(2019, 1, 7)))
-    municipality_1.pickup_dates.append(PickupDate(date=date(2019, 1, 8)))
-
-    group_2 = groups.add(name="Adlikon")
-    municipality_2 = municipalities.add(
-        name="Adlikon",
-        bfs_number=21,
-        group_id=group_2.id
-    )
-    municipality_2.pickup_dates.append(PickupDate(date=date(2019, 1, 17)))
-    municipality_2.pickup_dates.append(PickupDate(date=date(2019, 1, 18)))
-
-    # Test on request
-    form = UnrestrictedEditScanJobForm()
+    form = UnrestrictedScanJobForm()
     form.request = Request(session, groupid=group_1.id.hex)
     with freeze_time("2019-01-05"):
         form.on_request()
@@ -902,12 +814,12 @@ def test_unrestricted_edit_scan_job_form(session):
 
     # Test validation
     with freeze_time("2019-01-05"):
-        form = UnrestrictedEditScanJobForm()
+        form = UnrestrictedScanJobForm()
         form.request = Request(session, groupid=group_1.id.hex)
         form.on_request()
         assert not form.validate()
 
-        form = UnrestrictedEditScanJobForm(PostData({
+        form = UnrestrictedScanJobForm(PostData({
             'municipality_id': municipality_1.id.hex,
             'type': 'normal',
             'dispatch_date': '2019-01-18'

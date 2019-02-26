@@ -6,8 +6,7 @@ from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.forms import AddScanJobForm
 from onegov.wtfs.forms import EditScanJobForm
 from onegov.wtfs.forms import ScanJobsForm
-from onegov.wtfs.forms import UnrestrictedAddScanJobForm
-from onegov.wtfs.forms import UnrestrictedEditScanJobForm
+from onegov.wtfs.forms import UnrestrictedScanJobForm
 from onegov.wtfs.forms import UnrestrictedScanJobsForm
 from onegov.wtfs.layouts import AddScanJobLayout
 from onegov.wtfs.layouts import EditScanJobLayout
@@ -67,7 +66,7 @@ def view_votes_unrestricted(self, request, form):
     name='add-unrestricted',
     template='form.pt',
     permission=AddModelUnrestricted,
-    form=UnrestrictedAddScanJobForm
+    form=UnrestrictedScanJobForm
 )
 def add_scan_job_unrestricted(self, request, form):
     """ Create a new scan job. """
@@ -156,7 +155,7 @@ def view_scan_job(self, request):
     name='edit-unrestricted',
     template='form.pt',
     permission=EditModelUnrestricted,
-    form=UnrestrictedEditScanJobForm
+    form=UnrestrictedScanJobForm
 )
 def edit_scan_job_unrestricted(self, request, form):
     """ Edit a scan job. """
