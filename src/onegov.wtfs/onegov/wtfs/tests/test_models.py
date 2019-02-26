@@ -367,13 +367,10 @@ def test_report_boxes_and_forms(session):
 
 def test_report_forms_by_municipality(session):
     def _report(start, end, municipality):
+        query = session.query(Municipality).filter_by(name=municipality)
         return ReportFormsByMunicipality(
-            session, start=start, end=end, municipality=municipality
+            session, start=start, end=end, municipality_id=query.one().id
         )
-
-    report = _report(date.today(), date.today(), 'Adlikon')
-    assert report.query.all() == []
-    assert report.total == (0, 0, 0)
 
     add_report_data(session)
 

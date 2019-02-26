@@ -82,7 +82,7 @@ class ReportFormsByMunicipalityLayout(SpecificReportBaseLayout):
     @cached_property
     def subtitle(self):
         return "{} {}-{}".format(
-            self.model.municipality,
+            self.model.municipality_name,
             self.format_date(self.model.start, 'date'),
             self.format_date(self.model.end, 'date')
         )

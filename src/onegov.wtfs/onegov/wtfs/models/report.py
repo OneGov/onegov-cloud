@@ -24,13 +24,20 @@ class Report(object):
     """
 
     def __init__(
-        self, session, start=None, end=None, type=None, municipality=None
+        self, session, start=None, end=None, type=None, municipality_id=None
     ):
         self.session = session
         self.start = start or date.today()
         self.end = end or date.today()
         self.type = type
-        self.municipality = municipality
+        self.municipality_id = municipality_id
+
+    @cached_property
+    def municipality_name(self):
+        if self.municipality_id:
+            query = self.session.query(Municipality.name)
+            query = query.filter_by(id=self.municipality_id)
+            return query.scalar()
 
     @cached_property
     def columns_in(self):
@@ -60,8 +67,10 @@ class Report(object):
         )
         if self.type in ('normal', 'express'):
             query_in = query_in.filter(ScanJob.type == self.type)
-        if self.municipality:
-            query_in = query_in.filter(Municipality.name == self.municipality)
+        if self.municipality_id:
+            query_in = query_in.filter(
+                Municipality.id == self.municipality_id
+            )
         query_in = query_in.group_by(
             Municipality.name,
             Municipality.bfs_number
@@ -81,9 +90,9 @@ class Report(object):
         )
         if self.type in ('normal', 'express'):
             query_out = query_out.filter(ScanJob.type == self.type)
-        if self.municipality:
+        if self.municipality_id:
             query_out = query_out.filter(
-                Municipality.name == self.municipality
+                Municipality.id == self.municipality_id
             )
         query_out = query_out.group_by(
             Municipality.name,

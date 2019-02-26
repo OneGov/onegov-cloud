@@ -850,12 +850,12 @@ def test_daily_list_selection_form(session):
 def test_report_selection_form(session):
     groups = UserGroupCollection(session)
     municipalities = MunicipalityCollection(session)
-    municipalities.add(
+    adlikon = municipalities.add(
         name="Adlikon",
         bfs_number=21,
         group_id=groups.add(name="Winterthur").id
     )
-    municipalities.add(
+    aesch = municipalities.add(
         name="Aesch",
         bfs_number=241,
         group_id=groups.add(name="Aesch").id
@@ -865,16 +865,16 @@ def test_report_selection_form(session):
     form = ReportSelectionForm()
     form.request = Request(session)
     form.on_request()
-    assert form.municipality.choices == [
-        ('Adlikon', 'Adlikon (21)'),
-        ('Aesch', 'Aesch (241)')
+    assert form.municipality_id.choices == [
+        (adlikon.id.hex, 'Adlikon (21)'),
+        (aesch.id.hex, 'Aesch (241)')
     ]
 
     # Test get model
     form.start.data = date(2019, 1, 1)
     form.end.data = date(2019, 1, 31)
     form.scan_job_type.data = 'express'
-    form.municipality.data = 'Aesch'
+    form.municipality_id.data = aesch.id.hex
 
     form.report_type.data = 'boxes'
     model = form.get_model()
@@ -895,7 +895,7 @@ def test_report_selection_form(session):
     assert model.start == date(2019, 1, 1)
     assert model.end == date(2019, 1, 31)
     assert model.type == 'express'
-    assert model.municipality == 'Aesch'
+    assert model.municipality_id == aesch.id.hex
 
 
 def test_notification_form():

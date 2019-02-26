@@ -1,4 +1,5 @@
 from onegov.core.converters import extended_date_converter
+from onegov.core.converters import uuid_converter
 from onegov.user import Auth
 from onegov.user import User
 from onegov.user import UserCollection
@@ -19,6 +20,7 @@ from onegov.wtfs.models import ReportBoxes
 from onegov.wtfs.models import ReportBoxesAndForms
 from onegov.wtfs.models import ReportFormsByMunicipality
 from onegov.wtfs.models import ScanJob
+from webob.exc import HTTPNotFound
 
 
 @WtfsApp.path(
@@ -47,7 +49,10 @@ def get_user_groups(request):
 
 @WtfsApp.path(
     model=UserGroup,
-    path='/user-group/{id}'
+    path='/user-group/{id}',
+    converters=dict(
+        id=uuid_converter
+    )
 )
 def get_user_group(request, id):
     return UserGroupCollection(request.session).by_id(id)
@@ -79,7 +84,10 @@ def get_municipalities(request):
 
 @WtfsApp.path(
     model=Municipality,
-    path='/municipality/{id}'
+    path='/municipality/{id}',
+    converters=dict(
+        id=uuid_converter
+    )
 )
 def get_municipality(request, id):
     return MunicipalityCollection(request.session).by_id(id)
@@ -128,7 +136,10 @@ def get_scan_jobs(
 
 @WtfsApp.path(
     model=ScanJob,
-    path='/scan-job/{id}'
+    path='/scan-job/{id}',
+    converters=dict(
+        id=uuid_converter
+    )
 )
 def get_scan_job(request, id):
     return ScanJobCollection(request.session).by_id(id)
@@ -198,15 +209,18 @@ def get_report_boxes_and_forms(request, start, end, type):
 
 @WtfsApp.path(
     model=ReportFormsByMunicipality,
-    path='/report/forms/{start}/{end}/{type}/{municipality}',
+    path='/report/forms/{start}/{end}/{type}/{municipality_id}',
     converters=dict(
         start=extended_date_converter,
         end=extended_date_converter,
+        municipality_id=uuid_converter
     )
 )
-def get_report_forms(request, start, end, type, municipality):
+def get_report_forms(request, start, end, type, municipality_id):
+    if not municipality_id:
+        raise HTTPNotFound()
     return ReportFormsByMunicipality(
-        request.session, start, end, type, municipality
+        request.session, start, end, type, municipality_id
     )
 
 

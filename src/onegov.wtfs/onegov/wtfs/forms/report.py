@@ -49,7 +49,7 @@ class ReportSelectionForm(Form):
         default='all'
     )
 
-    municipality = SelectField(
+    municipality_id = SelectField(
         label=_("Municipality"),
         choices=[],
         validators=[InputRequired()],
@@ -58,12 +58,13 @@ class ReportSelectionForm(Form):
 
     def on_request(self):
         query = self.request.session.query(
+            Municipality.id.label('id'),
             Municipality.name.label('name'),
             Municipality.bfs_number.label('bfs_number')
         )
         query = query.order_by(unaccent(Municipality.name))
-        self.municipality.choices = [
-            (r.name, f"{r.name} ({r.bfs_number})") for r in query
+        self.municipality_id.choices = [
+            (r.id.hex, f"{r.name} ({r.bfs_number})") for r in query
         ]
 
     def get_model(self):
@@ -86,5 +87,5 @@ class ReportSelectionForm(Form):
                 start=self.start.data,
                 end=self.end.data,
                 type=self.scan_job_type.data,
-                municipality=self.municipality.data
+                municipality_id=self.municipality_id.data
             )

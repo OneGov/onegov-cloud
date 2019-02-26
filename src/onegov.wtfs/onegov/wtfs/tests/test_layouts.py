@@ -537,6 +537,12 @@ def test_daily_list_layouts(session):
 
 
 def test_report_layouts(session):
+    municipality = MunicipalityCollection(session).add(
+        name="Adlikon",
+        bfs_number=21,
+        group_id=UserGroupCollection(session).add(name="Adlikon").id
+    )
+
     request = DummyRequest()
 
     model = Report(session)
@@ -579,7 +585,7 @@ def test_report_layouts(session):
         session,
         start=date(2019, 1, 1),
         end=date(2019, 1, 31),
-        municipality='Adlikon'
+        municipality_id=municipality.id
     )
     layout = ReportFormsByMunicipalityLayout(model, request)
     assert layout.title == 'Report forms'

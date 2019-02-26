@@ -49,7 +49,7 @@ def test_views_report(client):
         select.form['end'] = end
         select.form['report_type'].select(report_type)
         select.form['scan_job_type'].select(scan_job_type)
-        select.form['municipality'].select(text='Adlikon (1)')
+        select.form['municipality_id'].select(text='Adlikon (1)')
         return select.form.submit().follow()
 
     # Boxes
@@ -94,10 +94,20 @@ def test_views_report(client):
 
 @patch.object(CoreRequest, 'assert_valid_csrf_token')
 def test_views_report_permissions(mock_method, client):
+    client.login_admin()
+    add = client.get('/municipalities').click(href='add')
+    add.form['name'] = "Adlikon"
+    add.form['bfs_number'] = '1'
+    add.form['group_id'].select(text="My Group")
+    added = add.form.submit().follow()
+    assert "Adlikon" in added
+    id = added.click("Adlikon").request.url.split('/')[-1]
+    client.logout()
+
     urls = (
         '/report/boxes/2019-02-19/2019-02-19',
         '/report/boxes-and-forms/2019-02-19/2019-02-19/all',
-        '/report/forms/2019-02-19/2019-02-19/all/Adlikon',
+        f'/report/forms/2019-02-19/2019-02-19/all/{id}',
     )
 
     for url in urls:
