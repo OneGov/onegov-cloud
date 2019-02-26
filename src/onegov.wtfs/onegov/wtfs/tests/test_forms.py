@@ -710,8 +710,8 @@ def test_unrestricted_scan_job_form(session):
             ('express', 'Express shipment')
         ]
         assert form.municipality_id.choices == [
-            (municipality_2.id.hex, 'Adlikon'),
-            (municipality_1.id.hex, 'Winterthur')
+            (municipality_2.id.hex, 'Adlikon (21)'),
+            (municipality_1.id.hex, 'Winterthur (230)')
         ]
 
     # Test apply / update
@@ -866,8 +866,8 @@ def test_report_selection_form(session):
     form.request = Request(session)
     form.on_request()
     assert form.municipality.choices == [
-        ('Adlikon', 'Adlikon'),
-        ('Aesch', 'Aesch')
+        ('Adlikon', 'Adlikon (21)'),
+        ('Aesch', 'Aesch (241)')
     ]
 
     # Test get model
@@ -977,7 +977,10 @@ def test_unrestricted_scan_jobs_form(session):
     form = UnrestrictedScanJobsForm()
     form.request = Request(session)
     form.on_request()
-    assert [m[1] for m in form.municipality_id.choices] == ['Adlikon', 'Aesch']
+    assert [m[1] for m in form.municipality_id.choices] == [
+        'Adlikon (21)',
+        'Aesch (241)'
+    ]
 
     # Test apply
     form.apply_model(scan_jobs)

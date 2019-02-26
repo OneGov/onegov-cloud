@@ -57,9 +57,14 @@ class ReportSelectionForm(Form):
     )
 
     def on_request(self):
-        query = self.request.session.query(Municipality.name.label('name'))
+        query = self.request.session.query(
+            Municipality.name.label('name'),
+            Municipality.bfs_number.label('bfs_number')
+        )
         query = query.order_by(unaccent(Municipality.name))
-        self.municipality.choices = [(r.name, r.name) for r in query]
+        self.municipality.choices = [
+            (r.name, f"{r.name} ({r.bfs_number})") for r in query
+        ]
 
     def get_model(self):
         if self.report_type.data == 'boxes':

@@ -26,7 +26,7 @@ def test_views_daily_job(client):
     with freeze_time("2019-01-01"):
         add = client.get('/scan-jobs/unrestricted').click(href='add')
         add.form['type'].select("normal")
-        add.form['municipality_id'].select(text="My Municipality")
+        add.form['municipality_id'].select(text="My Municipality (1)")
         add.form['dispatch_date'] = "2019-01-05"
         add.form['dispatch_boxes'] = "1111"
         add.form['dispatch_cantonal_tax_office'] = "2222"

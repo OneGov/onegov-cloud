@@ -597,10 +597,13 @@ class UnrestrictedScanJobForm(Form):
     def on_request(self):
         query = self.request.session.query(
             Municipality.id.label('id'),
-            Municipality.name.label('name')
+            Municipality.name.label('name'),
+            Municipality.bfs_number.label('bfs_number'),
         )
         query = query.order_by(unaccent(Municipality.name))
-        self.municipality_id.choices = [(r.id.hex, r.name) for r in query]
+        self.municipality_id.choices = [
+            (r.id.hex, f"{r.name} ({r.bfs_number})") for r in query
+        ]
 
         self.update_labels()
 
@@ -721,10 +724,13 @@ class UnrestrictedScanJobsForm(ScanJobsForm):
         super().on_request()
         query = self.request.session.query(
             Municipality.id.label('id'),
-            Municipality.name.label('name')
+            Municipality.name.label('name'),
+            Municipality.bfs_number.label('bfs_number')
         )
         query = query.order_by(unaccent(Municipality.name))
-        self.municipality_id.choices = [(r.id.hex, r.name) for r in query]
+        self.municipality_id.choices = [
+            (r.id.hex, f"{r.name} ({r.bfs_number})") for r in query
+        ]
 
     def apply_model(self, model):
         super().apply_model(model)

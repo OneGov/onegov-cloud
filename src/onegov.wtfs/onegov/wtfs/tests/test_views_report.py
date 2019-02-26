@@ -26,7 +26,7 @@ def test_views_report(client):
     with freeze_time("2019-01-01"):
         add = client.get('/scan-jobs/unrestricted').click(href='add')
         add.form['type'].select("normal")
-        add.form['municipality_id'].select(text="Adlikon")
+        add.form['municipality_id'].select(text="Adlikon (1)")
         add.form['dispatch_date'] = "2019-01-05"
         add.form['dispatch_boxes'] = "1111"
         add.form['dispatch_cantonal_tax_office'] = "2222"
@@ -49,7 +49,7 @@ def test_views_report(client):
         select.form['end'] = end
         select.form['report_type'].select(report_type)
         select.form['scan_job_type'].select(scan_job_type)
-        select.form['municipality'].select('Adlikon')
+        select.form['municipality'].select(text='Adlikon (1)')
         return select.form.submit().follow()
 
     # Boxes
@@ -60,7 +60,6 @@ def test_views_report(client):
     assert "8888" not in view
 
     view = get_report('boxes', '2019-01-06', '2019-01-10')
-    # view = client.get('/report/boxes/2019-01-06/2019-01-10')
     assert "1111" not in view
     assert "2222" not in view
     assert "3333" not in view
