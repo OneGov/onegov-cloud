@@ -74,27 +74,32 @@ class AddScanJobForm(Form):
     dispatch_boxes = IntegerField(
         label=_("Boxes"),
         fieldset=_("Dispatch to the tax office"),
-        validators=[Optional(), NumberRange(min=0)]
-    )
-    dispatch_tax_forms_current_year = IntegerField(
-        label=_("Tax forms"),
-        fieldset=_("Dispatch to the tax office"),
-        validators=[Optional(), NumberRange(min=0)]
-    )
-    dispatch_tax_forms_last_year = IntegerField(
-        label=_("Tax forms (previous year)"),
-        fieldset=_("Dispatch to the tax office"),
-        validators=[Optional(), NumberRange(min=0)]
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 3, 'clear': False},
     )
     dispatch_tax_forms_older = IntegerField(
         label=_("Tax forms (older)"),
         fieldset=_("Dispatch to the tax office"),
-        validators=[Optional(), NumberRange(min=0)]
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 2, 'clear': False},
+    )
+    dispatch_tax_forms_last_year = IntegerField(
+        label=_("Tax forms (previous year)"),
+        fieldset=_("Dispatch to the tax office"),
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 2, 'clear': False},
+    )
+    dispatch_tax_forms_current_year = IntegerField(
+        label=_("Tax forms"),
+        fieldset=_("Dispatch to the tax office"),
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 2, 'clear': False},
     )
     dispatch_single_documents = IntegerField(
         label=_("Single documents"),
         fieldset=_("Dispatch to the tax office"),
-        validators=[Optional(), NumberRange(min=0)]
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 3},
     )
     dispatch_note = TextAreaField(
         label=_("Note"),
@@ -105,12 +110,14 @@ class AddScanJobForm(Form):
     dispatch_cantonal_tax_office = IntegerField(
         label=_("Headquarters"),
         fieldset=_("Dispatch to the cantonal tax office"),
-        validators=[Optional(), NumberRange(min=0)]
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 6, 'clear': False},
     )
     dispatch_cantonal_scan_center = IntegerField(
         label=_("Scan center"),
         fieldset=_("Dispatch to the cantonal tax office"),
-        validators=[Optional(), NumberRange(min=0)]
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 6, 'clear': False},
     )
 
     @property
@@ -131,6 +138,18 @@ class AddScanJobForm(Form):
             return self.dispatch_date_express.data
         return self.dispatch_date_normal.data
 
+    def update_labels(self):
+        year = date.today().year
+        self.dispatch_tax_forms_older.label.text = _(
+            "Tax forms until ${year}", mapping={'year': year - 2}
+        )
+        self.dispatch_tax_forms_last_year.label.text = _(
+            "Tax forms ${year}", mapping={'year': year - 1}
+        )
+        self.dispatch_tax_forms_current_year.label.text = _(
+            "Tax forms ${year}", mapping={'year': year}
+        )
+
     def on_request(self):
         # Shipment types
         if self.request.has_role('editor'):
@@ -148,6 +167,9 @@ class AddScanJobForm(Form):
         self.dispatch_date_normal.choices = [
             (r.date, f"{r.date:%d.%m.%Y}") for r in query
         ]
+
+        # Labels
+        self.update_labels()
 
     def update_model(self, model):
         model.municipality_id = self.municipality_id
@@ -174,27 +196,32 @@ class EditScanJobForm(Form):
     dispatch_boxes = IntegerField(
         label=_("Boxes"),
         fieldset=_("Dispatch to the tax office"),
-        validators=[Optional(), NumberRange(min=0)]
-    )
-    dispatch_tax_forms_current_year = IntegerField(
-        label=_("Tax forms"),
-        fieldset=_("Dispatch to the tax office"),
-        validators=[Optional(), NumberRange(min=0)]
-    )
-    dispatch_tax_forms_last_year = IntegerField(
-        label=_("Tax forms (previous year)"),
-        fieldset=_("Dispatch to the tax office"),
-        validators=[Optional(), NumberRange(min=0)]
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 3, 'clear': False},
     )
     dispatch_tax_forms_older = IntegerField(
         label=_("Tax forms (older)"),
         fieldset=_("Dispatch to the tax office"),
-        validators=[Optional(), NumberRange(min=0)]
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 2, 'clear': False},
+    )
+    dispatch_tax_forms_last_year = IntegerField(
+        label=_("Tax forms (previous year)"),
+        fieldset=_("Dispatch to the tax office"),
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 2, 'clear': False},
+    )
+    dispatch_tax_forms_current_year = IntegerField(
+        label=_("Tax forms"),
+        fieldset=_("Dispatch to the tax office"),
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 2, 'clear': False},
     )
     dispatch_single_documents = IntegerField(
         label=_("Single documents"),
         fieldset=_("Dispatch to the tax office"),
-        validators=[Optional(), NumberRange(min=0)]
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 3},
     )
     dispatch_note = TextAreaField(
         label=_("Note"),
@@ -205,16 +232,19 @@ class EditScanJobForm(Form):
     dispatch_cantonal_tax_office = IntegerField(
         label=_("Headquarters"),
         fieldset=_("Dispatch to the cantonal tax office"),
-        validators=[Optional(), NumberRange(min=0)]
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 6, 'clear': False},
     )
     dispatch_cantonal_scan_center = IntegerField(
         label=_("Scan center"),
         fieldset=_("Dispatch to the cantonal tax office"),
-        validators=[Optional(), NumberRange(min=0)]
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 6},
     )
 
     return_date = DateField(
         label=_("Return date"),
+        fieldset=_("Return to the municipality"),
         default=tomorrow,
         validators=[Optional()]
     )
@@ -222,55 +252,63 @@ class EditScanJobForm(Form):
     return_boxes = IntegerField(
         label=_("Boxes"),
         fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)]
-
-    )
-    return_scanned_tax_forms_current_year = IntegerField(
-        label=_("Tax forms"),
-        fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)]
-
-    )
-    return_scanned_tax_forms_last_year = IntegerField(
-        label=_("Tax forms (previous year)"),
-        fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)]
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 3, 'clear': False},
 
     )
     return_scanned_tax_forms_older = IntegerField(
         label=_("Tax forms (older)"),
         fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)]
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 2, 'clear': False},
+
+    )
+    return_scanned_tax_forms_last_year = IntegerField(
+        label=_("Tax forms (previous year)"),
+        fieldset=_("Return to the municipality"),
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 2, 'clear': False},
+
+    )
+    return_scanned_tax_forms_current_year = IntegerField(
+        label=_("Tax forms"),
+        fieldset=_("Return to the municipality"),
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 2, 'clear': False},
 
     )
     return_scanned_single_documents = IntegerField(
         label=_("Single documents"),
         fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)]
-
-    )
-    return_unscanned_tax_forms_current_year = IntegerField(
-        label=_("Unscanned tax forms"),
-        fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)]
-
-    )
-    return_unscanned_tax_forms_last_year = IntegerField(
-        label=_("Unscanned tax forms (previous year)"),
-        fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)]
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 3},
 
     )
     return_unscanned_tax_forms_older = IntegerField(
         label=_("Unscanned tax forms (older)"),
         fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)]
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'offset': 3, 'size': 2, 'clear': False},
+    )
+    return_unscanned_tax_forms_last_year = IntegerField(
+        label=_("Unscanned tax forms (previous year)"),
+        fieldset=_("Return to the municipality"),
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 2, 'clear': False},
+
+    )
+    return_unscanned_tax_forms_current_year = IntegerField(
+        label=_("Unscanned tax forms"),
+        fieldset=_("Return to the municipality"),
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 2, 'clear': False},
 
     )
     return_unscanned_single_documents = IntegerField(
         label=_("Unscanned single documents"),
         fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)]
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 3},
 
     )
     return_note = TextAreaField(
@@ -278,6 +316,39 @@ class EditScanJobForm(Form):
         fieldset=_("Return to the municipality"),
         render_kw={'rows': 5},
     )
+
+    def update_labels(self):
+        year = date.today().year
+        self.dispatch_tax_forms_older.label.text = _(
+            "Tax forms until ${year}", mapping={'year': year - 2}
+        )
+        self.dispatch_tax_forms_last_year.label.text = _(
+            "Tax forms ${year}", mapping={'year': year - 1}
+        )
+        self.dispatch_tax_forms_current_year.label.text = _(
+            "Tax forms ${year}", mapping={'year': year}
+        )
+        self.return_scanned_tax_forms_older.label.text = _(
+            "Tax forms until ${year}", mapping={'year': year - 2}
+        )
+        self.return_scanned_tax_forms_last_year.label.text = _(
+            "Tax forms ${year}", mapping={'year': year - 1}
+        )
+        self.return_scanned_tax_forms_current_year.label.text = _(
+            "Tax forms ${year}", mapping={'year': year}
+        )
+        self.return_unscanned_tax_forms_older.label.text = _(
+            "Unscanned tax forms until ${year}", mapping={'year': year - 2}
+        )
+        self.return_unscanned_tax_forms_last_year.label.text = _(
+            "Unscanned tax forms ${year}", mapping={'year': year - 1}
+        )
+        self.return_unscanned_tax_forms_current_year.label.text = _(
+            "Unscanned tax forms ${year}", mapping={'year': year}
+        )
+
+    def on_request(self):
+        self.update_labels()
 
     def update_model(self, model):
         for name in (
@@ -370,27 +441,32 @@ class UnrestrictedScanJobForm(Form):
     dispatch_boxes = IntegerField(
         label=_("Boxes"),
         fieldset=_("Dispatch to the tax office"),
-        validators=[Optional(), NumberRange(min=0)]
-    )
-    dispatch_tax_forms_current_year = IntegerField(
-        label=_("Tax forms"),
-        fieldset=_("Dispatch to the tax office"),
-        validators=[Optional(), NumberRange(min=0)]
-    )
-    dispatch_tax_forms_last_year = IntegerField(
-        label=_("Tax forms (previous year)"),
-        fieldset=_("Dispatch to the tax office"),
-        validators=[Optional(), NumberRange(min=0)]
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 3, 'clear': False},
     )
     dispatch_tax_forms_older = IntegerField(
         label=_("Tax forms (older)"),
         fieldset=_("Dispatch to the tax office"),
-        validators=[Optional(), NumberRange(min=0)]
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 2, 'clear': False},
+    )
+    dispatch_tax_forms_last_year = IntegerField(
+        label=_("Tax forms (previous year)"),
+        fieldset=_("Dispatch to the tax office"),
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 2, 'clear': False},
+    )
+    dispatch_tax_forms_current_year = IntegerField(
+        label=_("Tax forms"),
+        fieldset=_("Dispatch to the tax office"),
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 2, 'clear': False},
     )
     dispatch_single_documents = IntegerField(
         label=_("Single documents"),
         fieldset=_("Dispatch to the tax office"),
-        validators=[Optional(), NumberRange(min=0)]
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 3},
     )
     dispatch_note = TextAreaField(
         label=_("Note"),
@@ -401,16 +477,19 @@ class UnrestrictedScanJobForm(Form):
     dispatch_cantonal_tax_office = IntegerField(
         label=_("Headquarters"),
         fieldset=_("Dispatch to the cantonal tax office"),
-        validators=[Optional(), NumberRange(min=0)]
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 6, 'clear': False},
     )
     dispatch_cantonal_scan_center = IntegerField(
         label=_("Scan center"),
         fieldset=_("Dispatch to the cantonal tax office"),
-        validators=[Optional(), NumberRange(min=0)]
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 6},
     )
 
     return_date = DateField(
         label=_("Return date"),
+        fieldset=_("Return to the municipality"),
         default=tomorrow,
         validators=[Optional()]
     )
@@ -418,62 +497,93 @@ class UnrestrictedScanJobForm(Form):
     return_boxes = IntegerField(
         label=_("Boxes"),
         fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)]
-
-    )
-    return_scanned_tax_forms_current_year = IntegerField(
-        label=_("Tax forms"),
-        fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)]
-
-    )
-    return_scanned_tax_forms_last_year = IntegerField(
-        label=_("Tax forms (previous year)"),
-        fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)]
-
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 3, 'clear': False},
     )
     return_scanned_tax_forms_older = IntegerField(
         label=_("Tax forms (older)"),
         fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)]
-
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 2, 'clear': False},
+    )
+    return_scanned_tax_forms_last_year = IntegerField(
+        label=_("Tax forms (previous year)"),
+        fieldset=_("Return to the municipality"),
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 2, 'clear': False},
+    )
+    return_scanned_tax_forms_current_year = IntegerField(
+        label=_("Tax forms"),
+        fieldset=_("Return to the municipality"),
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 2, 'clear': False},
     )
     return_scanned_single_documents = IntegerField(
         label=_("Single documents"),
         fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)]
-
-    )
-    return_unscanned_tax_forms_current_year = IntegerField(
-        label=_("Unscanned tax forms"),
-        fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)]
-
-    )
-    return_unscanned_tax_forms_last_year = IntegerField(
-        label=_("Unscanned tax forms (previous year)"),
-        fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)]
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 3},
 
     )
     return_unscanned_tax_forms_older = IntegerField(
         label=_("Unscanned tax forms (older)"),
         fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)]
-
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 2, 'clear': False},
+    )
+    return_unscanned_tax_forms_last_year = IntegerField(
+        label=_("Unscanned tax forms (previous year)"),
+        fieldset=_("Return to the municipality"),
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 2, 'clear': False},
+    )
+    return_unscanned_tax_forms_current_year = IntegerField(
+        label=_("Unscanned tax forms"),
+        fieldset=_("Return to the municipality"),
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'offset': 3, 'size': 2, 'clear': False},
     )
     return_unscanned_single_documents = IntegerField(
         label=_("Unscanned single documents"),
         fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)]
-
+        validators=[Optional(), NumberRange(min=0)],
+        render_kw={'size': 3},
     )
     return_note = TextAreaField(
         label=_("Note"),
         fieldset=_("Return to the municipality"),
         render_kw={'rows': 5},
     )
+
+    def update_labels(self):
+        year = date.today().year
+        self.dispatch_tax_forms_older.label.text = _(
+            "Tax forms until ${year}", mapping={'year': year - 2}
+        )
+        self.dispatch_tax_forms_last_year.label.text = _(
+            "Tax forms ${year}", mapping={'year': year - 1}
+        )
+        self.dispatch_tax_forms_current_year.label.text = _(
+            "Tax forms ${year}", mapping={'year': year}
+        )
+        self.return_scanned_tax_forms_older.label.text = _(
+            "Tax forms until ${year}", mapping={'year': year - 2}
+        )
+        self.return_scanned_tax_forms_last_year.label.text = _(
+            "Tax forms ${year}", mapping={'year': year - 1}
+        )
+        self.return_scanned_tax_forms_current_year.label.text = _(
+            "Tax forms ${year}", mapping={'year': year}
+        )
+        self.return_unscanned_tax_forms_older.label.text = _(
+            "Unscanned tax forms until ${year}", mapping={'year': year - 2}
+        )
+        self.return_unscanned_tax_forms_last_year.label.text = _(
+            "Unscanned tax forms ${year}", mapping={'year': year - 1}
+        )
+        self.return_unscanned_tax_forms_current_year.label.text = _(
+            "Unscanned tax forms ${year}", mapping={'year': year}
+        )
 
     @property
     def group_id(self):
@@ -490,6 +600,8 @@ class UnrestrictedScanJobForm(Form):
         )
         query = query.order_by(unaccent(Municipality.name))
         self.municipality_id.choices = [(r.id.hex, r.name) for r in query]
+
+        self.update_labels()
 
     def update_model(self, model):
         model.group_id = self.group_id

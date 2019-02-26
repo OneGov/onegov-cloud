@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-26 07:37+0100\n"
-"PO-Revision-Date: 2019-02-26 07:38+0100\n"
+"POT-Creation-Date: 2019-02-26 10:22+0100\n"
+"PO-Revision-Date: 2019-02-26 10:22+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -75,6 +75,22 @@ msgid "Fill in until 17.00 o'clock the evening before."
 msgstr "Ausfüllen bis 17.00 Uhr Vorabend."
 
 #, python-format
+msgid "Tax forms until ${year}"
+msgstr "StE bis ${year}"
+
+#, python-format
+msgid "Tax forms ${year}"
+msgstr "StE ${year}"
+
+#, python-format
+msgid "Unscanned tax forms until ${year}"
+msgstr "S̶t̶E̶ bis ${year}"
+
+#, python-format
+msgid "Unscanned tax forms ${year}"
+msgstr "S̶t̶E̶ ${year}"
+
+#, python-format
 msgid "Fill in until 17.00 o'clock the evening before ${date}."
 msgstr "Ausfüllen bis 17.00 Uhr Vorabend des ${date}."
 
@@ -87,14 +103,14 @@ msgstr "Versanddatum"
 msgid "Dispatch to the tax office"
 msgstr "Lieferung an das Steueramt Winterthur"
 
-msgid "Tax forms"
-msgstr "Steuererklärungen"
+msgid "Tax forms (older)"
+msgstr "Steuererklärungen (älter)"
 
 msgid "Tax forms (previous year)"
 msgstr "Steuererklärungen (letztes Jahr)"
 
-msgid "Tax forms (older)"
-msgstr "Steuererklärungen (älter)"
+msgid "Tax forms"
+msgstr "Steuererklärungen"
 
 msgid "Single documents"
 msgstr "Einzelbelege"
@@ -117,17 +133,17 @@ msgstr "Rücksendedatum"
 msgid "Return to the municipality"
 msgstr "Rücksendung an die Gemeinde"
 
-msgid "Unscanned tax forms"
-msgstr "Nicht gescannte Steuererklärungen"
+msgid "Unscanned tax forms (older)"
+msgstr "Nicht gescannte Steuererklärungen (älter)"
 
 msgid "Unscanned tax forms (previous year)"
 msgstr "Nicht gescannte Steuererklärungen (letztes Jahr)"
 
-msgid "Unscanned tax forms (older)"
-msgstr "Nicht gescannte Steuererklärungen (älter)"
+msgid "Unscanned tax forms"
+msgstr "Nicht gescannte StE"
 
 msgid "Unscanned single documents"
-msgstr "Nicht gescannte Einzelbelege"
+msgstr "E̶i̶n̶z̶e̶l̶b̶e̶l̶e̶g̶e̶"
 
 msgid "Regular dispatch dates"
 msgstr "Reguläre Versanddaten"
@@ -284,9 +300,6 @@ msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
 
-msgid "Scan-job"
-msgstr "Scan-Auftrag"
-
 msgid "until"
 msgstr "bis"
 
@@ -325,6 +338,9 @@ msgstr "Auswahl"
 
 msgid "Columns"
 msgstr "Spalten"
+
+msgid "There are no upcoming regular dispatch dates defined!"
+msgstr "Es sind keine kommenden regulären Versanddaten definiert!"
 
 msgid ""
 "We offer express processing with postal delivery for urgent scan jobs, e.g. "
@@ -521,3 +537,6 @@ msgstr "Benachrichtigung hinzugefügt."
 
 msgid "Notification modified."
 msgstr "Benachrichtigung geändert."
+
+#~ msgid "Scan-job"
+#~ msgstr "Scan-Auftrag"

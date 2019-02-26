@@ -130,7 +130,7 @@
     <metal:fields define-macro="fields" i18n:domain="onegov.wtfs">
         <div class="row">
             <tal:block repeat="field fields">
-                <div class="columns medium-${field.render_kw['size']|12} small-12 field-type-${field.type.lower()}">
+                <div class="columns medium-offset-${field.render_kw['offset']|0} medium-${field.render_kw['size']|12} small-12 field-type-${field.type.lower()}">
                     <metal:field use-macro="layout.macros['field']" />
                 </div>
                 <div class="clearfix" tal:condition="field.render_kw['clear']|True"></div>
@@ -183,6 +183,7 @@
     </metal:tablesaw_translations>
 
     <metal:dispatch_dates define-macro="dispatch_dates" i18n:domain="onegov.wtfs">
+        <i tal:condition="not: dates" i18n:translate>There are no upcoming regular dispatch dates defined!</i>
         <ul class="dispatch-dates">
             <li tal:repeat="date dates">${layout.format_date(date, 'date')}</li>
         </ul>
