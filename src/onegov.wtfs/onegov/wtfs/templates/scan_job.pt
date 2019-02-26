@@ -63,7 +63,7 @@
                             <td class="right">${layout.model.return_unscanned_single_documents}</td>
                         </tr>
                         <tr>
-                            <th class="right subtitle" i18n:translate>Total</th>
+                            <th class="right subtitle" i18n:translate>Total processed</th>
                             <td class="right" colspan="2"></td>
                             <td class="right total">${layout.model.return_tax_forms_older}</td>
                             <td class="right total">${layout.model.return_tax_forms_last_year}</td>

@@ -120,35 +120,35 @@ class ScanJob(Base, TimestampMixin, ContentMixin):
     def return_tax_forms_current_year(self):
         return _sum(
             self.return_scanned_tax_forms_current_year,
-            self.return_unscanned_tax_forms_current_year
+            -(self.return_unscanned_tax_forms_current_year or 0)
         )
 
     @property
     def return_tax_forms_last_year(self):
         return _sum(
             self.return_scanned_tax_forms_last_year,
-            self.return_unscanned_tax_forms_last_year
+            -(self.return_unscanned_tax_forms_last_year or 0)
         )
 
     @property
     def return_tax_forms_older(self):
         return _sum(
             self.return_scanned_tax_forms_older,
-            self.return_unscanned_tax_forms_older
+            -(self.return_unscanned_tax_forms_older or 0)
         )
 
     @property
     def return_tax_forms(self):
         return _sum(
             self.return_scanned_tax_forms,
-            self.return_unscanned_tax_forms
+            -(self.return_unscanned_tax_forms or 0)
         )
 
     @property
     def return_single_documents(self):
         return _sum(
             self.return_scanned_single_documents,
-            self.return_unscanned_single_documents
+            -(self.return_unscanned_single_documents or 0)
         )
 
     @property

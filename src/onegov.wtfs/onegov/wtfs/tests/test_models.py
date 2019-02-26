@@ -91,10 +91,10 @@ def test_scan_job(session):
             return_scanned_tax_forms_last_year=10,
             return_scanned_tax_forms_older=11,
             return_scanned_single_documents=12,
-            return_unscanned_tax_forms_current_year=13,
-            return_unscanned_tax_forms_last_year=14,
-            return_unscanned_tax_forms_older=15,
-            return_unscanned_single_documents=16,
+            return_unscanned_tax_forms_current_year=16,
+            return_unscanned_tax_forms_last_year=15,
+            return_unscanned_tax_forms_older=14,
+            return_unscanned_single_documents=13,
         )
     )
     session.flush()
@@ -125,16 +125,16 @@ def test_scan_job(session):
     assert scan_job.return_scanned_tax_forms_older == 11
     assert scan_job.return_scanned_tax_forms == 9 + 10 + 11
     assert scan_job.return_scanned_single_documents == 12
-    assert scan_job.return_unscanned_tax_forms_current_year == 13
-    assert scan_job.return_unscanned_tax_forms_last_year == 14
-    assert scan_job.return_unscanned_tax_forms_older == 15
-    assert scan_job.return_unscanned_tax_forms == 13 + 14 + 15
-    assert scan_job.return_unscanned_single_documents == 16
-    assert scan_job.return_tax_forms_current_year == 9 + 13
-    assert scan_job.return_tax_forms_last_year == 10 + 14
-    assert scan_job.return_tax_forms_older == 11 + 15
-    assert scan_job.return_tax_forms == 9 + 10 + 11 + 13 + 14 + 15
-    assert scan_job.return_single_documents == 12 + 16
+    assert scan_job.return_unscanned_tax_forms_current_year == 16
+    assert scan_job.return_unscanned_tax_forms_last_year == 15
+    assert scan_job.return_unscanned_tax_forms_older == 14
+    assert scan_job.return_unscanned_tax_forms == 16 + 15 + 14
+    assert scan_job.return_unscanned_single_documents == 13
+    assert scan_job.return_tax_forms_current_year == 9 - 16
+    assert scan_job.return_tax_forms_last_year == 10 - 15
+    assert scan_job.return_tax_forms_older == 11 - 14
+    assert scan_job.return_tax_forms == 9 + 10 + 11 - 16 - 15 - 14
+    assert scan_job.return_single_documents == 12 - 13
 
     assert municipality.scan_jobs.one() == scan_job
     assert group.scan_jobs.one() == scan_job
