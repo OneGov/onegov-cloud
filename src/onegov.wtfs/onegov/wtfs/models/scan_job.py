@@ -154,10 +154,6 @@ class ScanJob(Base, TimestampMixin, ContentMixin):
     @property
     def title(self):
         return _(
-            "Scan job ${number}: ${municipality}, ${date}",
-            mapping={
-                'number': self.delivery_number,
-                'municipality': self.municipality.name,
-                'date': f"{self.dispatch_date:%d.%m.%Y}"
-            }
+            "Scan job no. ${number}",
+            mapping={'number': self.delivery_number}
         )

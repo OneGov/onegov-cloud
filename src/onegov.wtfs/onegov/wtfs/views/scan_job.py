@@ -205,6 +205,7 @@ def edit_scan_job(self, request, form):
     return {
         'layout': layout,
         'form': form,
+        'subtitle': layout.format_date(self.dispatch_date, 'date'),
         'button_text': _("Save"),
         'cancel': layout.cancel_url,
     }

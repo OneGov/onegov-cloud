@@ -70,6 +70,13 @@ class ScanJobLayout(DefaultLayout):
         return self.model.title
 
     @cached_property
+    def subtitle(self):
+        return "{}, {}".format(
+            self.model.municipality.name,
+            self.format_date(self.model.dispatch_date, 'date'),
+        )
+
+    @cached_property
     def editbar_links(self):
         result = []
         if self.request.has_permission(self.model, EditModelUnrestricted):
@@ -120,7 +127,7 @@ class ScanJobLayout(DefaultLayout):
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Scan jobs"), self.scan_jobs_url),
-            Link(self.title, '#')
+            Link(self.model.delivery_number, '#')
         ]
 
 
@@ -128,14 +135,14 @@ class AddScanJobLayout(DefaultLayout):
 
     @cached_property
     def title(self):
-        return _("Add")
+        return _("Add scan job")
 
     @cached_property
     def breadcrumbs(self):
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Scan jobs"), self.scan_jobs_url),
-            Link(self.title, '#')
+            Link(_("Add"), '#')
         ]
 
     @cached_property
@@ -151,7 +158,7 @@ class EditScanJobLayout(DefaultLayout):
 
     @cached_property
     def title(self):
-        return _("Edit")
+        return _("Edit scan job")
 
     @cached_property
     def breadcrumbs(self):
@@ -159,7 +166,7 @@ class EditScanJobLayout(DefaultLayout):
             Link(_("Homepage"), self.homepage_url),
             Link(_("Scan jobs"), self.scan_jobs_url),
             Link(self.model.delivery_number, self.request.link(self.model)),
-            Link(self.title, '#')
+            Link(_("Edit"), '#')
         ]
 
     @cached_property

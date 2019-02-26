@@ -127,14 +127,14 @@ class AddUserLayout(DefaultLayout):
 
     @cached_property
     def title(self):
-        return _("Add")
+        return _("Add user")
 
     @cached_property
     def breadcrumbs(self):
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Users"), self.users_url),
-            Link(self.title, '#')
+            Link(_("Add"), '#')
         ]
 
     @cached_property
@@ -150,7 +150,7 @@ class EditUserLayout(DefaultLayout):
 
     @cached_property
     def title(self):
-        return _("Edit")
+        return _("Edit user")
 
     @cached_property
     def breadcrumbs(self):
@@ -158,7 +158,7 @@ class EditUserLayout(DefaultLayout):
             Link(_("Homepage"), self.homepage_url),
             Link(_("Users"), self.users_url),
             Link(self.model.title, self.request.link(self.model)),
-            Link(self.title, '#')
+            Link(_("Edit"), '#')
         ]
 
     @cached_property

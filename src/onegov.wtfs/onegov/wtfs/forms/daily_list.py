@@ -19,8 +19,8 @@ class DailyListSelectionForm(Form):
     type = RadioField(
         label=_("Daily list"),
         choices=[
-            ('boxes', _("Daily list boxes")),
-            ('boxes_and_forms', _("Daily list boxes and forms")),
+            ('boxes', _("Boxes")),
+            ('boxes_and_forms', _("Boxes and forms")),
         ],
         validators=[InputRequired()],
         default='boxes'

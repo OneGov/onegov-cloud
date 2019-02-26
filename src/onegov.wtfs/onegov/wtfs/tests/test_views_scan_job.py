@@ -51,7 +51,9 @@ def test_views_scan_job(client):
 
     # View scan job
     view = client.get('/scan-jobs').click("05.01.2019")
-    assert "Scan-Aufrag 1: My Municipality, 05.01.2019" in view
+    assert "Scan-Auftrag Nr. 1" in view
+    assert "My Municipality" in view
+    assert "05.01.2019" in view
     assert all([f">{number}<" in view for number in range(1, 7 + 1)])
     assert "Lieferung an das Steueramt Winterthur am 05.01.2019" in view
     assert "Bemerkung zur Abholung" in view
@@ -75,7 +77,9 @@ def test_views_scan_job(client):
         assert "Scan-Auftrag geändert." in edit.form.submit().follow()
 
     view = client.get('/scan-jobs').click("05.01.2019")
-    assert "Scan-Aufrag 1: My Municipality, 05.01.2019" in view
+    assert "Scan-Auftrag Nr. 1" in view
+    assert "My Municipality" in view
+    assert "05.01.2019" in view
     assert all([f">{number}<" in view for number in range(1, 16 + 1)])
     assert "Lieferung an das Steueramt Winterthur am 05.01.2019" in view
     assert "Rücksendung an My Municipality am 10.01.2019" in view

@@ -101,14 +101,14 @@ class AddUserGroupLayout(DefaultLayout):
 
     @cached_property
     def title(self):
-        return _("Add")
+        return _("Add user group")
 
     @cached_property
     def breadcrumbs(self):
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("User groups"), self.user_groups_url),
-            Link(self.title, '#')
+            Link(_("Add"), '#')
         ]
 
     @cached_property
@@ -124,7 +124,7 @@ class EditUserGroupLayout(DefaultLayout):
 
     @cached_property
     def title(self):
-        return _("Edit")
+        return _("Edit user group")
 
     @cached_property
     def breadcrumbs(self):
@@ -132,7 +132,7 @@ class EditUserGroupLayout(DefaultLayout):
             Link(_("Homepage"), self.homepage_url),
             Link(_("User groups"), self.user_groups_url),
             Link(self.model.name, self.request.link(self.model)),
-            Link(self.title, '#')
+            Link(_("Edit"), '#')
         ]
 
     @cached_property

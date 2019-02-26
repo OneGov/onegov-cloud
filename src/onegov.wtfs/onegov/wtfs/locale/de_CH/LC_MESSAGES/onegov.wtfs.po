@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-26 06:23+0100\n"
-"PO-Revision-Date: 2019-02-25 17:17+0100\n"
+"POT-Creation-Date: 2019-02-26 07:37+0100\n"
+"PO-Revision-Date: 2019-02-26 07:38+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -44,10 +44,10 @@ msgstr "Datum"
 msgid "Daily list"
 msgstr "Tagesliste"
 
-msgid "Daily list boxes"
+msgid "Boxes"
 msgstr "Boxen"
 
-msgid "Daily list boxes and forms"
+msgid "Boxes and forms"
 msgstr "Boxen und Steuererklärungen"
 
 msgid "BFS number"
@@ -83,9 +83,6 @@ msgstr "Auftragsart"
 
 msgid "Dispatch date"
 msgstr "Versanddatum"
-
-msgid "Boxes"
-msgstr "Boxen"
 
 msgid "Dispatch to the tax office"
 msgstr "Lieferung an das Steueramt Winterthur"
@@ -166,20 +163,26 @@ msgid "Regular and express shipment"
 msgstr "Alle Sendungen"
 
 #, python-format
-msgid "Scan job ${number}: ${municipality}, ${date}"
-msgstr "Scan-Aufrag ${number}: ${municipality}, ${date}"
+msgid "Scan job no. ${number}"
+msgstr "Scan-Auftrag Nr. ${number}"
 
 msgid "User groups"
 msgstr "Benutzergruppen"
+
+msgid "Add user group"
+msgstr "Benutzergruppe hinzufügen"
+
+msgid "Edit user group"
+msgstr "Benutzergruppe bearbeiten"
+
+msgid "Homepage"
+msgstr "Startseite"
 
 msgid "Add"
 msgstr "Hinzufügen"
 
 msgid "Edit"
 msgstr "Bearbeiten"
-
-msgid "Homepage"
-msgstr "Startseite"
 
 msgid "Delete"
 msgstr "Löschen"
@@ -196,6 +199,12 @@ msgstr "Abbrechen"
 msgid "Users"
 msgstr "Benutzer"
 
+msgid "Add user"
+msgstr "Benutzer hinzufügen"
+
+msgid "Edit user"
+msgstr "Benutzer bearbeiten"
+
 msgid "Do you really want to delete this user?"
 msgstr "Diesen Benutzer wirklich löschen?"
 
@@ -211,6 +220,12 @@ msgstr "Gemeinden"
 msgid "Import data"
 msgstr "Daten importieren"
 
+msgid "Add municipality"
+msgstr "Gemeinde hinzugeben"
+
+msgid "Edit municipality"
+msgstr "Gemeinde bearbeiten"
+
 msgid "Delete pick-up dates"
 msgstr "Abholtermine löschen"
 
@@ -220,6 +235,12 @@ msgstr "Diese Gemeinde wirklich löschen?"
 msgid "Notifications"
 msgstr "Benachrichtigungen"
 
+msgid "Add notification"
+msgstr "Benachrichtigung hinzufügen"
+
+msgid "Edit notification"
+msgstr "Benachrichtigung bearbeiten"
+
 msgid "Do you really want to delete this notification?"
 msgstr "Diese Benachrichtigung wirklich löschen?"
 
@@ -228,6 +249,12 @@ msgstr "Benachrichtigung"
 
 msgid "Scan jobs"
 msgstr "Scan-Aufträge"
+
+msgid "Add scan job"
+msgstr "Scan-Auftrag hinzufügen"
+
+msgid "Edit scan job"
+msgstr "Scan-Auftrag bearbeiten"
 
 msgid "Do you really want to delete this scan job?"
 msgstr "Diese Scanauftrag wirklich löschen?"
@@ -256,6 +283,9 @@ msgstr "Total"
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
+
+msgid "Scan-job"
+msgstr "Scan-Auftrag"
 
 msgid "until"
 msgstr "bis"

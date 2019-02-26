@@ -103,7 +103,7 @@ def test_scan_job(session):
     assert scan_job.municipality == municipality
     assert scan_job.group == group
     assert scan_job.delivery_number == 1
-    assert scan_job.title.interpolate() == 'Scan job 1: Winterthur, 01.01.2019'
+    assert scan_job.title.interpolate() == 'Scan job no. 1'
     assert scan_job.type == 'normal'
     assert scan_job.group_id == group.id
     assert scan_job.municipality_id == municipality.id

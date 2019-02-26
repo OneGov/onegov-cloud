@@ -55,11 +55,11 @@ class DailyListBoxesLayout(SpecificDailyListBaseLayout):
 
     @cached_property
     def title(self):
-        return _("Daily list boxes")
+        return _("Boxes")
 
 
 class DailyListBoxesAndFormsLayout(SpecificDailyListBaseLayout):
 
     @cached_property
     def title(self):
-        return _("Daily list boxes and forms")
+        return _("Boxes and forms")

@@ -102,14 +102,14 @@ class AddNotificationLayout(DefaultLayout):
 
     @cached_property
     def title(self):
-        return _("Add")
+        return _("Add notification")
 
     @cached_property
     def breadcrumbs(self):
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Notifications"), self.notifications_url),
-            Link(self.title, '#')
+            Link(_("Add"), '#')
         ]
 
     @cached_property
@@ -125,7 +125,7 @@ class EditNotificationLayout(DefaultLayout):
 
     @cached_property
     def title(self):
-        return _("Edit")
+        return _("Edit notification")
 
     @cached_property
     def breadcrumbs(self):
@@ -133,7 +133,7 @@ class EditNotificationLayout(DefaultLayout):
             Link(_("Homepage"), self.homepage_url),
             Link(_("Notifications"), self.notifications_url),
             Link(self.model.title, self.request.link(self.model)),
-            Link(self.title, '#')
+            Link(_("Edit"), '#')
         ]
 
     @cached_property

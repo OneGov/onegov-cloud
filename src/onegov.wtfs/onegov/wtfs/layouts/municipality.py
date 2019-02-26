@@ -140,14 +140,14 @@ class AddMunicipalityLayout(DefaultLayout):
 
     @cached_property
     def title(self):
-        return _("Add")
+        return _("Add municipality")
 
     @cached_property
     def breadcrumbs(self):
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Municipalities"), self.municipalities_url),
-            Link(self.title, '#')
+            Link(_("Add"), '#')
         ]
 
     @cached_property
@@ -163,7 +163,7 @@ class EditMunicipalityLayout(DefaultLayout):
 
     @cached_property
     def title(self):
-        return _("Edit")
+        return _("Edit municipality")
 
     @cached_property
     def breadcrumbs(self):
@@ -171,7 +171,7 @@ class EditMunicipalityLayout(DefaultLayout):
             Link(_("Homepage"), self.homepage_url),
             Link(_("Municipalities"), self.municipalities_url),
             Link(self.model.name, self.request.link(self.model)),
-            Link(self.title, '#')
+            Link(_("Edit"), '#')
         ]
 
     @cached_property

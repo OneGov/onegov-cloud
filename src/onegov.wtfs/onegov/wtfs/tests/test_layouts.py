@@ -207,7 +207,7 @@ def test_municipality_layouts():
 
     # ... add
     layout = AddMunicipalityLayout(model, request)
-    assert layout.title == 'Add'
+    assert layout.title == 'Add municipality'
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == (
         'DummyPrincipal/MunicipalityCollection/#'
@@ -251,7 +251,7 @@ def test_municipality_layouts():
 
     # ... edit
     layout = EditMunicipalityLayout(model, request)
-    assert layout.title == 'Edit'
+    assert layout.title == 'Edit municipality'
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == (
         'DummyPrincipal/MunicipalityCollection/Municipality/#'
@@ -294,7 +294,7 @@ def test_user_group_layouts():
 
     # .. add
     layout = AddUserGroupLayout(model, request)
-    assert layout.title == 'Add'
+    assert layout.title == 'Add user group'
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == (
         'DummyPrincipal/UserGroupCollection/#'
@@ -324,7 +324,7 @@ def test_user_group_layouts():
 
     # ... edit
     layout = EditUserGroupLayout(model, request)
-    assert layout.title == 'Edit'
+    assert layout.title == 'Edit user group'
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == (
         'DummyPrincipal/UserGroupCollection/UserGroup/#'
@@ -360,7 +360,7 @@ def test_user_layouts():
 
     # .. add
     layout = AddUserLayout(model, request)
-    assert layout.title == 'Add'
+    assert layout.title == 'Add user'
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == (
         'DummyPrincipal/UserCollection/#'
@@ -402,7 +402,7 @@ def test_user_layouts():
 
     # ... edit
     layout = EditUserLayout(model, request)
-    assert layout.title == 'Edit'
+    assert layout.title == 'Edit user'
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == 'DummyPrincipal/UserCollection/User/#'
     assert layout.cancel_url == 'User/'
@@ -447,7 +447,7 @@ def test_scan_job_layouts(session):
 
     # .. add
     layout = AddScanJobLayout(model, request)
-    assert layout.title == 'Add'
+    assert layout.title == 'Add scan job'
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == 'DummyPrincipal/ScanJobCollection/#'
     assert layout.cancel_url == 'ScanJobCollection/'
@@ -467,7 +467,7 @@ def test_scan_job_layouts(session):
         municipality_id=municipality.id
     )
     layout = ScanJobLayout(model, request)
-    assert layout.title.interpolate() == 'Scan job 1: Winterthur, 01.01.2019'
+    assert layout.title.interpolate() == 'Scan job no. 1'
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == 'DummyPrincipal/ScanJobCollection/#'
     assert layout.cancel_url == ''
@@ -487,7 +487,7 @@ def test_scan_job_layouts(session):
 
     # ... edit
     layout = EditScanJobLayout(model, request)
-    assert layout.title == 'Edit'
+    assert layout.title == 'Edit scan job'
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == (
         'DummyPrincipal/ScanJobCollection/ScanJob/#'
@@ -515,7 +515,7 @@ def test_daily_list_layouts(session):
 
     model = DailyListBoxes(session, date_=date(2019, 1, 1))
     layout = DailyListBoxesLayout(model, request)
-    assert layout.title == 'Daily list boxes'
+    assert layout.title == 'Boxes'
     assert layout.subtitle == 'Dienstag 01. Januar 2019'
     assert list(hrefs(layout.editbar_links)) == ['#']
     assert path(layout.breadcrumbs) == (
@@ -526,7 +526,7 @@ def test_daily_list_layouts(session):
 
     model = DailyListBoxesAndForms(session, date_=date(2019, 1, 1))
     layout = DailyListBoxesAndFormsLayout(model, request)
-    assert layout.title == 'Daily list boxes and forms'
+    assert layout.title == 'Boxes and forms'
     assert layout.subtitle == 'Dienstag 01. Januar 2019'
     assert list(hrefs(layout.editbar_links)) == ['#']
     assert path(layout.breadcrumbs) == (
@@ -610,7 +610,7 @@ def test_notification_layouts():
 
     # .. add
     layout = AddNotificationLayout(model, request)
-    assert layout.title == 'Add'
+    assert layout.title == 'Add notification'
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == (
         'DummyPrincipal/NotificationCollection/#'
@@ -640,7 +640,7 @@ def test_notification_layouts():
 
     # ... edit
     layout = EditNotificationLayout(model, request)
-    assert layout.title == 'Edit'
+    assert layout.title == 'Edit notification'
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == (
         'DummyPrincipal/NotificationCollection/Notification/#'
