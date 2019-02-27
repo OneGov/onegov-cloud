@@ -54,7 +54,11 @@ class SearchForm(Form):
             (0, _("No")),
         ),
         coerce=bool,
-        render_kw={'size': 2}
+        render_kw={'size': 2},
+        description=_(
+            "Searches all text fields and attachments. Select «No» to limit "
+            "the search to title, keyword, vote number, and procedure number."
+        )
     )
 
     position_federal_council = MultiCheckboxField(

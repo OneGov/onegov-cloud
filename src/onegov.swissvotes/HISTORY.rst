@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a fulltext search hint.
+  [msom]
+
 0.0.37 (2019-02-27)
 ~~~~~~~~~~~~~~~~~~~
 
