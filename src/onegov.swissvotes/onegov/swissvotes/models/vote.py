@@ -1,8 +1,8 @@
 from cached_property import cached_property
 from collections import OrderedDict
-from onegov.core.orm.mixins.content import dict_property_factory
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.mixins.content import dict_property_factory
 from onegov.core.orm.types import JSON
 from onegov.file import AssociatedFiles
 from onegov.file import File
@@ -21,6 +21,8 @@ from sqlalchemy_utils import observes
 from sqlalchemy.dialects.postgresql import INT4RANGE
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import deferred
+from urllib.parse import urlparse
+from urllib.parse import urlunparse
 
 
 class SwissVoteFile(File):
@@ -148,6 +150,19 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     legal_form = encoded_property()
     initiator = Column(Text)
     anneepolitique = Column(Text)
+    bfs_map_de = Column(Text)
+    bfs_map_fr = Column(Text)
+
+    def bfs_map(self, locale):
+        return self.bfs_map_fr if locale == 'fr_CH' else self.bfs_map_de
+
+    def bfs_map_host(self, locale):
+        try:
+            return urlunparse(
+                list(urlparse(self.bfs_map(locale))[:2]) + ['', '', '', '']
+            )
+        except ValueError:
+            pass
 
     # Descriptor
     descriptor_1_level_1 = Column(Numeric(8, 4))

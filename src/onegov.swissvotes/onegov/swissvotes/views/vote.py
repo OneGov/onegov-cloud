@@ -26,6 +26,11 @@ def view_vote(self, request):
     next = query.order_by(SwissVote.bfs_number.asc())
     next = next.filter(SwissVote.bfs_number > self.bfs_number).first()
 
+    bfs_map = self.bfs_map(request.locale)
+    bfs_map_host = self.bfs_map_host(request.locale)
+    if bfs_map_host:
+        request.content_security_policy.default_src |= {bfs_map_host}
+
     return {
         'layout': VoteLayout(self, request),
         'voting_text': self.get_file('voting_text'),
@@ -36,6 +41,7 @@ def view_vote(self, request):
         'realization': self.get_file('realization'),
         'ad_analysis': self.get_file('ad_analysis'),
         'results_by_domain': self.get_file('results_by_domain'),
+        'bfs_map': bfs_map,
         'prev': prev,
         'next': next,
     }

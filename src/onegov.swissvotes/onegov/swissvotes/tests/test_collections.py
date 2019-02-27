@@ -1071,6 +1071,8 @@ def test_votes_export(session):
     vote.national_council_share_nays = Decimal('23.20')
     vote.national_council_share_neutral = Decimal('24.20')
     vote.national_council_share_vague = Decimal('25.10')
+    vote.bfs_map_de = 'map de'
+    vote.bfs_map_fr = 'map fr'
     session.flush()
     session.expire_all()
 
@@ -1413,7 +1415,9 @@ def test_votes_export(session):
         'neutral': '24,2',
         'unbestimmt': '25,1',
         'urheber': 'Initiator',
-        'anneepolitique': 'anneepolitique'
+        'anneepolitique': 'anneepolitique',
+        'bfsmap-de': 'map de',
+        'bfsmap-fr': 'map fr'
     }
 
     file = BytesIO()
@@ -1768,6 +1772,8 @@ def test_votes_export(session):
         'unbestimmt': 25.1,
         'urheber': 'Initiator',
         'anneepolitique': 'anneepolitique',
+        'bfsmap-de': 'map de',
+        'bfsmap-fr': 'map fr'
     }
 
     assert csv.keys() == xlsx.keys()

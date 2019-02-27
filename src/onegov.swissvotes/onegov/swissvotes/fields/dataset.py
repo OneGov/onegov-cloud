@@ -347,6 +347,8 @@ COLUMNS = OrderedDict((
     ('national_council_share_vague', 'unbestimmt'),
     ('initiator', 'urheber'),
     ('anneepolitique', 'anneepolitique'),
+    ('bfs_map_de', 'bfsmap-de'),
+    ('bfs_map_fr', 'bfsmap-fr'),
 ))
 
 

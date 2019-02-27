@@ -283,6 +283,10 @@ def test_vote(session):
     vote._legal_form = 1
     vote.initiator = "Initiator"
     vote.anneepolitique = "anneepolitique"
+    vote.bfs_map_de = (
+        "https://www.atlas.bfs.admin.ch/maps/12/map/mapIdOnly/1815_de.html"
+    )
+    vote.bfs_map_fr = "htt(ps://www.ap/mapIdOnly/1815[e.html}"
     vote.descriptor_1_level_1 = Decimal('4')
     vote.descriptor_1_level_2 = Decimal('4.2')
     vote.descriptor_1_level_3 = Decimal('4.21')
@@ -621,6 +625,24 @@ def test_vote(session):
     assert vote.legal_form == "Mandatory referendum"
     assert vote.initiator == "Initiator"
     assert vote.anneepolitique == "anneepolitique"
+    assert vote.bfs_map_de == (
+        "https://www.atlas.bfs.admin.ch/maps/12/map/mapIdOnly/1815_de.html"
+    )
+    assert vote.bfs_map_fr == "htt(ps://www.ap/mapIdOnly/1815[e.html}"
+    assert vote.bfs_map('xxx') == (
+        "https://www.atlas.bfs.admin.ch/maps/12/map/mapIdOnly/1815_de.html"
+    )
+    assert vote.bfs_map('de_CH') == (
+        "https://www.atlas.bfs.admin.ch/maps/12/map/mapIdOnly/1815_de.html"
+    )
+    assert vote.bfs_map('en_US') == (
+        "https://www.atlas.bfs.admin.ch/maps/12/map/mapIdOnly/1815_de.html"
+    )
+    assert vote.bfs_map('fr_CH') == "htt(ps://www.ap/mapIdOnly/1815[e.html}"
+    assert vote.bfs_map_host('xxx') == "https://www.atlas.bfs.admin.ch"
+    assert vote.bfs_map_host('de_CH') == "https://www.atlas.bfs.admin.ch"
+    assert vote.bfs_map_host('en_US') == "https://www.atlas.bfs.admin.ch"
+    assert vote.bfs_map_host('fr_CH') == ""
     assert vote.descriptor_1_level_1 == Decimal('4')
     assert vote.descriptor_1_level_2 == Decimal('4.2')
     assert vote.descriptor_1_level_3 == Decimal('4.21')

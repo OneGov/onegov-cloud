@@ -12,6 +12,7 @@ from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
 from sqlalchemy import select
+from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import TSVECTOR
 
 
@@ -226,3 +227,11 @@ def add_recommendations_column(context):
     ):
         if context.has_column('swissvotes', column):
             context.operations.drop_column('swissvotes', column)
+
+
+@upgrade_task('Add BFS map link columns')
+def add_bfs_map_columns(context):
+    if not context.has_column('swissvotes', 'bfs_map_de'):
+        context.operations.add_column('swissvotes', Column('bfs_map_de', Text))
+    if not context.has_column('swissvotes', 'bfs_map_fr'):
+        context.operations.add_column('swissvotes', Column('bfs_map_fr', Text))
