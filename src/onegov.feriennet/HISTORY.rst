@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.5.8 (2019-02-27)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes style issue on group invite page.
   [href]
