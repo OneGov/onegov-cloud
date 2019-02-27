@@ -2436,14 +2436,14 @@ $booking-left-margin: 2rem;
         margin-top: .75rem;
 
         .state {
-            .available-spots {
+            > div {
                 display: inline-block;
                 margin-bottom: 1rem;
                 position: static;
             }
         }
 
-        .factoids.right-align {
+        .state + .factoids + .factoids.right-align {
             top: 2.35rem;
         }
     }
