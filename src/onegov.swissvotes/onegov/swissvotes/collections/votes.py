@@ -240,6 +240,23 @@ class SwissVoteCollection(Pagination):
             return self.page_by_index((self.page or 0) + 1)
 
     @property
+    def term_expression(self):
+        """ Returns the current search term transformed to use within
+        Postgres ``to_tsquery`` function.
+
+
+        Removes all unwanted characters, replaces prefix matching, joins
+        word together using FOLLOWED BY.
+        """
+
+        def cleanup(text):
+            result = ''.join((c for c in text if c.isalnum() or c in ',.'))
+            return f'{result}:*' if text.endswith('*') else result
+
+        parts = [cleanup(part) for part in (self.term or '').split()]
+        return ' <-> '.join([part for part in parts if part])
+
+    @property
     def term_filter_numeric(self):
         """ Returns a list of SqlAlchemy filter statements matching possible
         numeric attributes based on the term.
@@ -262,13 +279,10 @@ class SwissVoteCollection(Pagination):
         fulltext attributes based on the term.
 
         """
+        term = self.term_expression
 
-        if not self.term:
+        if not term:
             return []
-
-        # Once we upgrade to PostgreSql 11, we can use websearch_to_tsquery
-        term = ''.join((c for c in self.term if c.isalnum() or c in ',. '))
-        term = ' <-> '.join([part for part in term.split()])
 
         def match(column, language='german'):
             return column.op('@@')(func.to_tsquery('german', term))

@@ -180,7 +180,16 @@ def test_votes_pagination(session):
     assert votes.next.previous == votes
 
 
-def test_vote_term_filter():
+def test_votes_term_expression():
+    def term_expression(term):
+        return SwissVoteCollection(None, term=term).term_expression
+
+    assert term_expression(None) == ''
+    assert term_expression('') == ''
+    assert term_expression('a,1.$b !c*d*') == 'a,1.b <-> cd:*'
+
+
+def test_votes_term_filter():
     assert SwissVoteCollection(None).term_filter == []
     assert SwissVoteCollection(None, term='').term_filter == []
     assert SwissVoteCollection(None, term='', full_text=True).term_filter == []
@@ -450,6 +459,7 @@ def test_votes_query_attachments(session, attachments, postgres_version):
 
     assert count(term='Abstimmungstext') == 0
     assert count(term='Abstimmungstext', full_text=True) == 1
+    assert count(term='Abst*', full_text=True) == 1
     assert count(term='council message', full_text=True) == 1
     assert count(term='Parlamentdebatte', full_text=True) == 1
     assert count(term='Réalisation', full_text=True) == 1
