@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.39 (2019-02-27)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds wildcard search.
   [msom]
