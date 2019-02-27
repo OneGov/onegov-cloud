@@ -287,6 +287,9 @@ def test_vote_upload(swissvotes_app, attachments):
         page = client.get(manage.pyquery(f'a.{name}')[0].attrib['href'])
         assert page.content_type in (
             'application/pdf',
+            'application/zip',
+            'application/vnd.ms-office',
+            'application/octet-stream',
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
         assert page.content_length
@@ -302,6 +305,9 @@ def test_vote_upload(swissvotes_app, attachments):
         page = client.get(manage.pyquery(f'a.{name}')[0].attrib['href'])
         assert page.content_type in (
             'application/pdf',
+            'application/zip',
+            'application/vnd.ms-office',
+            'application/octet-stream',
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
         assert page.content_length

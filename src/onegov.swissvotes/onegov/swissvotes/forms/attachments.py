@@ -10,6 +10,14 @@ from onegov.swissvotes import _
 from onegov.swissvotes.models import SwissVoteFile
 
 
+XLSX_MIME_TYPES = {
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-office',
+    'application/octet-stream',
+    'application/zip'
+}
+
+
 class AttachmentsForm(Form):
 
     voting_text = UploadField(
@@ -71,10 +79,7 @@ class AttachmentsForm(Form):
     results_by_domain = UploadField(
         label=_("Result by canton, district and municipality"),
         validators=[
-            WhitelistedMimeType({
-                'application/vnd.openxmlformats-officedocument'
-                '.spreadsheetml.sheet'
-            }),
+            WhitelistedMimeType(XLSX_MIME_TYPES),
             FileSizeLimit(50 * 1024 * 1024)
         ]
     )

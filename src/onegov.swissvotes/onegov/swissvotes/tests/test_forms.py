@@ -111,6 +111,9 @@ def test_attachments_form(swissvotes_app, attachments):
         assert data['filename'] == name
         assert data['mimetype'] in (
             'application/pdf',
+            'application/zip',
+            'application/vnd.ms-office',
+            'application/octet-stream',
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
 
@@ -122,6 +125,9 @@ def test_attachments_form(swissvotes_app, attachments):
         assert file.reference.filename == name
         assert file.reference.content_type in (
             'application/pdf',
+            'application/zip',
+            'application/vnd.ms-office',
+            'application/octet-stream',
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
 
