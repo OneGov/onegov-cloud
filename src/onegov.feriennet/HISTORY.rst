@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.5.7 (2019-02-27)
+~~~~~~~~~~~~~~~~~~~
 
 - Reorganizes the group invite page.
   [href]
