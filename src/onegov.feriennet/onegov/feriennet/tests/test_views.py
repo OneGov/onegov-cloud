@@ -1344,7 +1344,8 @@ def test_cancellation_deadline(client, scenario):
     page = client.get('/my-bookings')
     assert "Buchung stornieren" in page
 
-    cancel = page.pyquery('a:contains("Buchung stornieren")').attr('ic-post-to')
+    cancel = page.pyquery('a:contains("Buchung stornieren")')\
+        .attr('ic-post-to')
 
     # after the deadline, no cancellation
     with scenario.update():
