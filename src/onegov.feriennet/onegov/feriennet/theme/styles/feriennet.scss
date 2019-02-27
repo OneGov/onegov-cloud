@@ -2434,6 +2434,18 @@ $booking-left-margin: 2rem;
     .occasion {
         margin-bottom: 0;
         margin-top: .75rem;
+
+        .state {
+            .available-spots {
+                display: inline-block;
+                margin-bottom: 1rem;
+                position: static;
+            }
+        }
+
+        .factoids.right-align {
+            top: 2.35rem;
+        }
     }
 }
 
@@ -2480,8 +2492,8 @@ $booking-left-margin: 2rem;
         }
 
         &:first-child {
-            background: $white;
-            border: 4px solid $gainsboro;
+            background: $green-pastel;
+            border: 4px solid $green-light;
 
             .group-action {
                 &::after {
@@ -2491,6 +2503,11 @@ $booking-left-margin: 2rem;
         }
 
         &:last-child {
+            &.has-prospects {
+                background: $red-pastel;
+                border: 4px solid $red-light;
+            }
+
             .group-action {
                 font-weight: bold;
 

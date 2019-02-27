@@ -216,8 +216,14 @@ def actions_by_booking(layout, period, booking):
                     )
 
     if period.wishlist_phase or booking.state in DELETABLE_STATES:
+        label = (
+            period.wishlist_phase
+            and _("Remove wish")
+            or _("Remove booking")
+        )
+
         actions.append(Link(
-            text=_("Remove"),
+            text=label,
             url=layout.csrf_protected_url(layout.request.link(booking)),
             attrs={
                 'class': 'delete-link',
@@ -228,7 +234,7 @@ def actions_by_booking(layout, period, booking):
                         'title': get_booking_title(layout, booking)
                     }),
                     None,
-                    _("Remove Booking"),
+                    label,
                     _("Cancel"),
                 ),
                 Intercooler(

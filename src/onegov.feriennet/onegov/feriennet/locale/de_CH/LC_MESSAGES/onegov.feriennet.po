@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-02-22 14:35+0100\n"
+"POT-Creation-Date: 2019-02-27 14:18+0100\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1789,6 +1789,33 @@ msgstr ""
 msgid "This group is from an inactive period."
 msgstr "Dies ist eine Gruppe eines inaktiven Zeitraums"
 
+msgid "Sign Up for Activity"
+msgstr "Für das Angebot anmelden"
+
+msgid ""
+"Children need to be signed up to the activity to join the group. In case "
+"they are not, they can do that here."
+msgstr "Kinder müssen für das Angebot angemeldet sein, um der Gruppe beitreten zu können. Falls das noch nicht der Fall ist, können Sie das gleich hier tun."
+
+msgid "Children can join the group under \"Manage group\" after sign-up."
+msgstr "Nach der Anmeldung kann das Kind unter \"Gruppe verwalten\" der Gruppe hinzugefügt werden.
+
+msgid "Manage Group"
+msgstr "Gruppe verwalten"
+
+msgid ""
+"The formation of a group increases the chance of joining an activity "
+"together."
+msgstr "Die Bildung einer Gruppe erhöht die Wahrscheinlichkeit, Angebot gemeinsam besuchen zu können."
+
+msgid ""
+"You can add your own children to the group here or share the following link "
+"with other parents for them to sign up their own children:"
+msgstr "Sie können Ihre eigenen Kinder hier zu dieser Gruppe hinzufügen oder den folgenden Link mit anderen Eltern teilen, damit diese ihre Kinder hinzufügen können:"
+
+msgid "In Group"
+msgstr "In der Gruppe"
+
 msgid "Not in Group"
 msgstr "Nicht in der Gruppe"
 
@@ -1806,28 +1833,6 @@ msgstr "Nicht angemeldet"
 
 msgid "All your children are already part of this group."
 msgstr "Alle Ihre Kinder sind Teil dieser Gruppe."
-
-msgid "Information"
-msgstr "Information"
-
-msgid ""
-"We will try our best to keep groups together, but there are no guarantees. "
-"It is possible that only parts of the group are accepted for an activity, "
-"but it should be fairly rare."
-msgstr ""
-"Wir tun unser bestes um Gruppen zusammen zu halten, können aber nichts "
-"garantieren. Es ist möglich dass nur ein Teil der Gruppe einem Angebot "
-"zugeteilt wird, aber das sollte relativ selten vorkommen."
-
-msgid ""
-"You can join your own children to this group or you can share this link with "
-"other parents so they can join their children:"
-msgstr ""
-"Sie können Ihre eigenen Kinder zu dieser Gruppe hinzufügen, oder den Link "
-"mit anderen Eltern teilen, damit diese Ihre Kinder hinzufügen können:"
-
-msgid "Children need to have a booking before they can join the group."
-msgstr "Kinder benötigen eine Buchung, bevor sie der Gruppe beitreten können."
 
 msgid ""
 "This is a preview. Please edit it until you are satisifed with the result "
@@ -1999,6 +2004,9 @@ msgstr "Erfolgreich der Gruppe beigetreten"
 msgid "Successfully left the group"
 msgstr "Erfolgreich die Gruppe verlassen"
 
+msgid "Remove booking"
+msgstr "Buchung entfernen"
+
 msgid "Only open, cancelled, denied or blocked bookings may be deleted"
 msgstr ""
 "Nur offene, abgesagte, abgelehnte und blockierte Buchungen können gelöscht "
@@ -2016,6 +2024,9 @@ msgstr "Keine Berechtigung um diesen Teilnehmer zu der Gruppe hinzuzufügen"
 msgid "Not permitted to evict this attendee from the group"
 msgstr "Keine Berechtigung um diesen Teilnehmer von der Gruppe zu entfernen"
 
+msgid "Remove wish"
+msgstr "Wunsch entfernen"
+
 msgid "Only admins may cancel bookings at this point"
 msgstr ""
 "Nur Administratoren können Buchungen zu diesem Zeitpunkt noch stornieren"
@@ -2027,7 +2038,7 @@ msgid "Leave Group"
 msgstr "Gruppe verlassen"
 
 msgid "Cancel Booking"
-msgstr "Stornieren"
+msgstr "Buchung stornieren"
 
 msgid "Join Group"
 msgstr "Gruppe beitreten"
@@ -2038,9 +2049,6 @@ msgstr "Gspänli einladen"
 #, python-format
 msgid "Do you really want to remove \"${title}\"?"
 msgstr "Möchten Sie \"${title}\" wirklich entfernen?"
-
-msgid "Remove Booking"
-msgstr "Buchung entfernen"
 
 #, python-format
 msgid "Do you really want to cancel \"${title}\"?"
@@ -2109,18 +2117,6 @@ msgstr "Reaktivieren"
 
 msgid "Without"
 msgstr "Ohne"
-
-msgid " 3 - 6 years"
-msgstr " 3 - 6 Jahre"
-
-msgid " 7 - 10 years"
-msgstr " 7 - 10 Jahre"
-
-msgid "11 - 13 years"
-msgstr "11 - 13 Jahre"
-
-msgid "14 - 17 years"
-msgstr "14 - 17 Jahre"
 
 msgid "Free of Charge"
 msgstr "Kostenlos"
@@ -2398,6 +2394,9 @@ msgstr "Teilnehmer anmelden"
 msgid "Remove Wish"
 msgstr "Wunsch entfernen"
 
+msgid "Remove Booking"
+msgstr "Buchung entfernen"
+
 msgid "The period has already been finalized. No new attendees may be added."
 msgstr ""
 "Der Zeitraum wurde bereits abgeschlossen. Es können keine neuen Teilnehmer "
@@ -2414,6 +2413,41 @@ msgstr "Möchten Sie ${attendee}s Buchung wirklich löschen?"
 #, python-format
 msgid "Do you really want to cancel ${attendee}'s booking?"
 msgstr "Möchten Sie ${attendee}s Buchung wirklich stornieren?"
+
+#~ msgid "Information"
+#~ msgstr "Information"
+
+#~ msgid ""
+#~ "We will try our best to keep groups together, but there are no "
+#~ "guarantees. It is possible that only parts of the group are accepted for "
+#~ "an activity, but it should be fairly rare."
+#~ msgstr ""
+#~ "Wir tun unser bestes um Gruppen zusammen zu halten, können aber nichts "
+#~ "garantieren. Es ist möglich dass nur ein Teil der Gruppe einem Angebot "
+#~ "zugeteilt wird, aber das sollte relativ selten vorkommen."
+
+#~ msgid ""
+#~ "You can join your own children to this group or you can share this link "
+#~ "with other parents so they can join their children:"
+#~ msgstr ""
+#~ "Sie können Ihre eigenen Kinder zu dieser Gruppe hinzufügen, oder den Link "
+#~ "mit anderen Eltern teilen, damit diese Ihre Kinder hinzufügen können:"
+
+#~ msgid "Children need to have a booking before they can join the group."
+#~ msgstr ""
+#~ "Kinder benötigen eine Buchung, bevor sie der Gruppe beitreten können."
+
+#~ msgid " 3 - 6 years"
+#~ msgstr " 3 - 6 Jahre"
+
+#~ msgid " 7 - 10 years"
+#~ msgstr " 7 - 10 Jahre"
+
+#~ msgid "11 - 13 years"
+#~ msgstr "11 - 13 Jahre"
+
+#~ msgid "14 - 17 years"
+#~ msgstr "14 - 17 Jahre"
 
 #~ msgid "Invoice Item Code"
 #~ msgstr "Rechnungsposition Code"

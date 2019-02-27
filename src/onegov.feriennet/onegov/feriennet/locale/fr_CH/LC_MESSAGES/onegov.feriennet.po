@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-02-22 14:35+0100\n"
+"POT-Creation-Date: 2019-02-27 14:18+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1798,11 +1798,38 @@ msgstr "Passeport"
 msgid ""
 "Attendees can join their companions in a group to go to activities together."
 msgstr ""
-"Les participants peuvent rejoindre leurs compagnons dans un groupe pour "
+"Les participants peuvent rejoindre leurs amies dans un groupe pour "
 "participer à des activités."
 
 msgid "This group is from an inactive period."
 msgstr "Ce groupe est issu d'une période d'inactivité."
+
+msgid "Sign Up for Activity"
+msgstr "S’inscrire pour cette activité"
+
+msgid ""
+"Children need to be signed up to the activity to join the group. In case "
+"they are not, they can do that here."
+msgstr "Un enfant doit être inscrit à cette activité avant de le sélectionner pour le groupe de personnes. Si ce n’est pas déjà fait vous pouvez l’inscrire ici."
+
+msgid "Children can join the group under \"Manage group\" after sign-up."
+msgstr "Une fois l’inscription enregistrée vous pouvez l’affecter au groupe dans \"Gérer un groupe\""
+
+msgid "Manage Group"
+msgstr "Gérer un groupe"
+
+msgid ""
+"The formation of a group increases the chance of joining an activity "
+"together."
+msgstr "La création d’un groupe augmente la probabilité que les enfants sont affectés à la même activité pour la même date."
+
+msgid ""
+"You can add your own children to the group here or share the following link "
+"with other parents for them to sign up their own children."
+msgstr "Vous pouvez ajouter votre enfant à un groupe existant ici ou vous pouvez partager le lien ci-après avec d’autres parents qui ajoutent leur enfant au groupe :"
+
+msgid "In Group"
+msgstr "En Groupe"
 
 msgid "Not in Group"
 msgstr "Pas en groupe"
@@ -1821,30 +1848,6 @@ msgstr "Non inscrit"
 
 msgid "All your children are already part of this group."
 msgstr "Tous vos enfants font déjà partie de ce groupe."
-
-msgid "Information"
-msgstr "Information"
-
-msgid ""
-"We will try our best to keep groups together, but there are no guarantees. "
-"It is possible that only parts of the group are accepted for an activity, "
-"but it should be fairly rare."
-msgstr ""
-"Nous ferons de notre mieux pour maintenir les groupes ensemble, mais rien ne "
-"garantit. Il est possible que seules des parties du groupe soient acceptées "
-"pour une activité, mais cela devrait être assez rare."
-
-msgid ""
-"You can join your own children to this group or you can share this link with "
-"other parents so they can join their children:"
-msgstr ""
-"Vous pouvez rejoindre vos propres enfants dans ce groupe ou partager ce lien "
-"avec d'autres parents afin qu'ils puissent rejoindre leurs enfants :"
-
-msgid "Children need to have a booking before they can join the group."
-msgstr ""
-"Les enfants doivent avoir une réservation avant de pouvoir rejoindre le "
-"groupe."
 
 msgid ""
 "This is a preview. Please edit it until you are satisifed with the result "
@@ -2009,13 +2012,16 @@ msgstr "La réservation a été annulée avec succès"
 
 #, python-format
 msgid "Group for \"${title}\""
-msgstr "Groupe pour \"${titre}\""
+msgstr "Groupe pour \"${title}\""
 
 msgid "Successfully joined the group"
 msgstr "A rejoint le groupe avec succès"
 
 msgid "Successfully left the group"
 msgstr "Quitté le groupe avec succès"
+
+msgid "Remove booking"
+msgstr "Supprimer la réservation"
 
 msgid "Only open, cancelled, denied or blocked bookings may be deleted"
 msgstr ""
@@ -2036,6 +2042,9 @@ msgstr "Non autorisé à rejoindre ce participant au groupe"
 msgid "Not permitted to evict this attendee from the group"
 msgstr "Non autorisé à expulser ce participant du groupe"
 
+msgid "Remove wish"
+msgstr "Supprimer le souhait"
+
 msgid "Only admins may cancel bookings at this point"
 msgstr "Seuls les administrateurs peuvent annuler les réservations à ce stade."
 
@@ -2052,25 +2061,22 @@ msgid "Join Group"
 msgstr "Rejoindre le groupe"
 
 msgid "Invite a companion"
-msgstr "Inviter un compagnon"
+msgstr "Inviter un(e) ami(e)"
 
 #, python-format
 msgid "Do you really want to remove \"${title}\"?"
 msgstr "Voulez-vous vraiment supprimer « ${title} » ?"
-
-msgid "Remove Booking"
-msgstr "Supprimer la réservation"
 
 #, python-format
 msgid "Do you really want to cancel \"${title}\"?"
 msgstr "Voulez-vous vraiment annuler « ${title} » ?"
 
 msgid "With 1 companion in a group"
-msgstr "Avec 1 compagnon dans un groupe"
+msgstr "Avec 1 ami(e) dans un groupe"
 
 #, python-format
-msgid "With ${n} companions in a group"
-msgstr "Avec ${n} compagnons dans un groupe"
+msgid "With ${n} ami(e) in a group"
+msgstr "Avec ${n} ami(e) dans un groupe"
 
 msgid "Mo"
 msgstr "Lu"
@@ -2128,18 +2134,6 @@ msgstr "Rétablir"
 
 msgid "Without"
 msgstr "Sans"
-
-msgid " 3 - 6 years"
-msgstr " de 3 à 6 ans"
-
-msgid " 7 - 10 years"
-msgstr " de 7 à 10 ans"
-
-msgid "11 - 13 years"
-msgstr "De 11 à 13 ans"
-
-msgid "14 - 17 years"
-msgstr "De 14 à 17 ans"
 
 msgid "Free of Charge"
 msgstr "Gratuit"
@@ -2416,6 +2410,9 @@ msgstr "Inscrire participant"
 msgid "Remove Wish"
 msgstr "Supprimer le souhait"
 
+msgid "Remove Booking"
+msgstr "Supprimer la réservation"
+
 msgid "The period has already been finalized. No new attendees may be added."
 msgstr ""
 "La période a déjà été fermée. Aucun nouveau participant ne peut être ajouté."
@@ -2431,6 +2428,42 @@ msgstr "Voulez-vous vraiment supprimer la réservation de ${attendee} ?"
 #, python-format
 msgid "Do you really want to cancel ${attendee}'s booking?"
 msgstr "Voulez-vous vraiment annuler la réservation de ${attendee} ?"
+
+#~ msgid "Information"
+#~ msgstr "Information"
+
+#~ msgid ""
+#~ "We will try our best to keep groups together, but there are no "
+#~ "guarantees. It is possible that only parts of the group are accepted for "
+#~ "an activity, but it should be fairly rare."
+#~ msgstr ""
+#~ "Nous ferons de notre mieux pour maintenir les groupes ensemble, mais rien "
+#~ "ne garantit. Il est possible que seules des parties du groupe soient "
+#~ "acceptées pour une activité, mais cela devrait être assez rare."
+
+#~ msgid ""
+#~ "You can join your own children to this group or you can share this link "
+#~ "with other parents so they can join their children:"
+#~ msgstr ""
+#~ "Vous pouvez rejoindre vos propres enfants dans ce groupe ou partager ce "
+#~ "lien avec d'autres parents afin qu'ils puissent rejoindre leurs enfants :"
+
+#~ msgid "Children need to have a booking before they can join the group."
+#~ msgstr ""
+#~ "Les enfants doivent avoir une réservation avant de pouvoir rejoindre le "
+#~ "groupe."
+
+#~ msgid " 3 - 6 years"
+#~ msgstr " de 3 à 6 ans"
+
+#~ msgid " 7 - 10 years"
+#~ msgstr " de 7 à 10 ans"
+
+#~ msgid "11 - 13 years"
+#~ msgstr "De 11 à 13 ans"
+
+#~ msgid "14 - 17 years"
+#~ msgstr "De 14 à 17 ans"
 
 #~ msgid "Invoice References"
 #~ msgstr "Références facture"

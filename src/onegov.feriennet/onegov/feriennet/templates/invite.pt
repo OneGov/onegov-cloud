@@ -13,6 +13,17 @@
             This group is from an inactive period.
         </div>
 
+        <h3 i18n:translate>Sign Up for Activity</h3>
+
+        <ul class="limit-line-width">
+            <li i18n:translate>
+                Children need to be signed up to the activity to join the group. In case they are not, they can do that here.
+            </li>
+            <li i18n:translate>
+                Children can join the group under "Manage group" after sign-up.
+            </li>
+        </ul>
+
         <div class="occasion-panel">
             <h3>
                 <a href="${request.link(model.occasion.activity)}">
@@ -25,9 +36,24 @@
             </div>
         </div>
 
-        <div class="group-membership">
+        <h3 i18n:translate>Manage Group</h3>
+
+        <ul class="limit-line-width">
+            <li i18n:translate>
+                The formation of a group increases the chance of joining an activity together.
+            </li>
+            <li>
+                <tal:b i18n:translate>
+                    You can add your own children to the group here or share the following link with other parents for them
+                    to sign up their own children:
+                </tal:b>
+                <a href="${request.link(model)}"><b>${request.link(model)}</b></a>
+            </li>
+        </ul>
+
+        <div class="group-membership" tal:define="prospects request.is_logged_in and tuple(model.prospects(request.current_username))">
             <div>
-                <h3 i18n:translate>Members</h3>
+                <h3 i18n:translate>In Group</h3>
                 <ul class="members-in-group">
                     <li tal:repeat="(attendee, booking) model.attendees">
                         <div class="group-attendee">${attendee.name} ${attendee.gender == 'male' and '👦' or '👧'}</div>
@@ -35,10 +61,10 @@
                     </li>
                 </ul>
             </div>
-            <div>
+            <div class="${prospects and 'has-prospects'}">
                 <tal:b condition="request.is_logged_in">
                     <h3 i18n:translate>Not in Group</h3>
-                    <tal:b define="prospects tuple(model.prospects(request.current_username))">
+                    <tal:b>
                         <ul class="members-outside-group" tal:condition="prospects">
                             <li tal:repeat="(attendee, booking) prospects">
                                 <div class="group-attendee">${attendee.name} ${attendee.gender == 'male' and '👦' or '👧'}</div>
@@ -56,27 +82,6 @@
                 </tal:b>
             </div>
         </div>
-
-        <h3 i18n:translate>Information</h3>
-
-        <p i18n:translate class="limit-line-width">
-            We will try our best to keep groups together, but there are no guarantees.
-            It is possible that only parts of the group are accepted for an activity,
-            but it should be fairly rare.
-        </p>
-
-        <p i18n:translate class="limit-line-width">
-            You can join your own children to this group or you can share this
-            link with other parents so they can join their children:
-        </p>
-
-        <p>
-            <a href="${request.link(model)}"><b>${request.link(model)}</b></a>
-        </p>
-
-        <p i18n:translate class="limit-line-width">
-            Children need to have a booking before they can join the group.
-        </p>
 
     </tal:b>
 </div>

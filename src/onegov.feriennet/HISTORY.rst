@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Reorganizes the group invite page.
+  [href]
+
 - Changes button color of 'more' button.
   [href]
 

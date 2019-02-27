@@ -891,8 +891,8 @@ def test_confirmed_booking_view(scenario, client):
 
     page = client.get('/my-bookings')
     assert "Offen" in page
-    assert "Stornieren" not in page
-    assert "Entfernen" in page
+    assert "Buchung stornieren" not in page
+    assert "Wunsch entfernen" in page
     assert "Gebucht" not in page
 
     # Related contacts are hidden at this point
@@ -910,8 +910,9 @@ def test_confirmed_booking_view(scenario, client):
 
     page = client.get('/my-bookings')
     assert "Gebucht" in page
-    assert "Stornieren" in page
-    assert "Entfernen" not in page
+    assert "Buchung stornieren" in page
+    assert "Wunsch entfernen" not in page
+    assert "Buchung entfernen" not in page
     assert "nicht genügend Teilnehmer" not in page
 
     # Related contacts are now visible
@@ -993,7 +994,7 @@ def test_direct_booking_and_storno(client, scenario):
     assert "bereits für diese Durchführung angemeldet" in page
 
     # cancel the booking
-    client.get('/my-bookings').click("Stornieren")
+    client.get('/my-bookings').click("Buchung stornieren")
 
     page = client.get('/activity/foobar')
     assert "1 Plätze frei" in page
@@ -1056,7 +1057,7 @@ def test_cancel_occasion(client, scenario):
     assert "Absagen" in page
     assert "Reaktivieren" not in page
 
-    client.get('/my-bookings').click("Entfernen")
+    client.get('/my-bookings').click("Buchung entfernen")
     page = client.get('/activity/foobar')
     assert "Löschen" in page
     assert "Absagen" not in page
@@ -1118,7 +1119,7 @@ def test_reactivate_cancelled_booking(client, scenario):
     page.form['sure'] = 'yes'
     page.form.submit()
 
-    client.get('/my-bookings').click("Stornieren")
+    client.get('/my-bookings').click("Buchung stornieren")
     page = client.get('/activity/foobar').click('Anmelden')
     assert "war erfolgreich" in page.form.submit().follow()
 
@@ -1333,7 +1334,7 @@ def test_cancellation_deadline(client, scenario):
 
     # without a deadline, no cancellation
     client.login('member@example.org', 'hunter2')
-    assert "Stornieren" not in client.get('/my-bookings')
+    assert "Buchung stornieren" not in client.get('/my-bookings')
 
     # before the deadline, cancellation
     with scenario.update():
@@ -1341,16 +1342,16 @@ def test_cancellation_deadline(client, scenario):
             = datetime.utcnow().date() + timedelta(days=1)
 
     page = client.get('/my-bookings')
-    assert "Stornieren" in page
+    assert "Buchung stornieren" in page
 
-    cancel = page.pyquery('a:contains("Stornieren")').attr('ic-post-to')
+    cancel = page.pyquery('a:contains("Buchung stornieren")').attr('ic-post-to')
 
     # after the deadline, no cancellation
     with scenario.update():
         scenario.latest_period.cancellation_date\
             = datetime.utcnow().date() - timedelta(days=1)
 
-    assert "Stornieren" not in client.get('/my-bookings')
+    assert "Buchung stornieren" not in client.get('/my-bookings')
 
     # even if one knows the link
     client.post(cancel)
@@ -1683,7 +1684,7 @@ def test_book_alternate_occasion_regression(client, scenario):
     client.login_admin()
     client.fill_out_profile()
 
-    client.get('/my-bookings').click("Stornieren")
+    client.get('/my-bookings').click("Buchung stornieren")
 
     page = client.get('/activity/hunting').click("Anmelden")
     page = page.form.submit()
