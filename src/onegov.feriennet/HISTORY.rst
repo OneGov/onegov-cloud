@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Changes button color of 'more' button.
+  [href]
+
 1.5.6 (2019-02-25)
 ~~~~~~~~~~~~~~~~~~~
 

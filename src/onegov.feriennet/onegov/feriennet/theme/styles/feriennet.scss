@@ -2652,8 +2652,7 @@ $booking-left-margin: 2rem;
     text-align: center;
 
     .click-to-load {
-        @include button($bg: $white, $bg-hover: $primary-color);
-        border: 1px solid $primary-color;
+        @include button;
         border-radius: 2px;
         display: inline-block;
         margin: 0 auto 1rem;
@@ -2661,6 +2660,7 @@ $booking-left-margin: 2rem;
 
     .navigate-up {
         display: block;
+        font-size: .875rem;
         margin-bottom: 1rem;
 
         &::before {
