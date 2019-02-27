@@ -109,7 +109,10 @@ def test_attachments_form(swissvotes_app, attachments):
         assert data['data']
         assert data['size']
         assert data['filename'] == name
-        assert data['mimetype'] == 'application/pdf'
+        assert data['mimetype'] in (
+            'application/pdf',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
 
     form.update_model(vote)
 
@@ -117,14 +120,17 @@ def test_attachments_form(swissvotes_app, attachments):
         file = getattr(vote, name)
         assert file == attachments[name]
         assert file.reference.filename == name
-        assert file.reference.content_type == 'application/pdf'
+        assert file.reference.content_type in (
+            'application/pdf',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
 
     # ... replace all de_CH
     for name in names:
         field_storage = FieldStorage()
         field_storage.file = BytesIO(f'{name}-1'.encode())
-        field_storage.type = 'application/excel'
-        field_storage.filename = f'{name}.pdf'
+        field_storage.type = 'image/png'  # ignored
+        field_storage.filename = f'{name}.png'  # extension removed
 
         getattr(form, name).process(DummyPostData({name: field_storage}))
 
@@ -141,8 +147,8 @@ def test_attachments_form(swissvotes_app, attachments):
     for name in names:
         field_storage = FieldStorage()
         field_storage.file = BytesIO(f'{name}-fr'.encode())
-        field_storage.type = 'application/excel'
-        field_storage.filename = f'{name}.pdf'
+        field_storage.type = 'image/png'  # ignored
+        field_storage.filename = f'{name}.png'  # extension removed
 
         getattr(form, name).process(DummyPostData({name: field_storage}))
 

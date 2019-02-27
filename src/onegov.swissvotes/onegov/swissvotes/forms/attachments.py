@@ -68,6 +68,17 @@ class AttachmentsForm(Form):
         ]
     )
 
+    results_by_domain = UploadField(
+        label=_("Result by canton, district and municipality"),
+        validators=[
+            WhitelistedMimeType({
+                'application/vnd.openxmlformats-officedocument'
+                '.spreadsheetml.sheet'
+            }),
+            FileSizeLimit(50 * 1024 * 1024)
+        ]
+    )
+
     def update_model(self, model):
         locale = self.request.locale
 

@@ -1124,6 +1124,7 @@ def test_vote_attachments(swissvotes_app, attachments):
     assert vote.voting_booklet is None
     assert vote.resolution is None
     assert vote.realization is None
+    assert vote.results_by_domain is None
     assert vote.files == []
     assert vote.searchable_text_de_CH is None
     assert vote.searchable_text_fr_CH is None

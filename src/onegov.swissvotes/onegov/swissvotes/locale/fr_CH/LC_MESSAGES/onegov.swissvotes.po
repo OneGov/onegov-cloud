@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-20 08:25+0100\n"
+"POT-Creation-Date: 2019-02-27 07:33+0100\n"
 "PO-Revision-Date: 2018-09-18 11:29+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -39,6 +39,9 @@ msgid "Realization"
 msgstr ""
 
 msgid "Advertisment analysis"
+msgstr ""
+
+msgid "Result by canton, district and municipality"
 msgstr ""
 
 msgid "Dataset"
@@ -1412,9 +1415,6 @@ msgstr "Oui"
 
 msgid "Turnout"
 msgstr "Participation électorale"
-
-msgid "Result by canton, district and municipality"
-msgstr ""
 
 msgid "You are here"
 msgstr "Vous êtes ici"

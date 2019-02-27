@@ -275,9 +275,9 @@ def test_vote_upload(swissvotes_app, attachments):
     manage = manage.click("Details").click("Anhänge verwalten")
     for name in names:
         manage.form[name] = Upload(
-            f'{name}.pdf',
+            f'{name}.png',  # ignored
             attachments[name].reference.file.read(),
-            'application/pdf'
+            'image/png'  # ignored
         )
     manage = manage.form.submit().follow()
     assert "Anhänge aktualisiert" in manage
@@ -285,9 +285,13 @@ def test_vote_upload(swissvotes_app, attachments):
     for name in names:
         name = name.replace('_', '-')
         page = client.get(manage.pyquery(f'a.{name}')[0].attrib['href'])
-        assert page.content_type == 'application/pdf'
+        assert page.content_type in (
+            'application/pdf',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
         assert page.content_length
         assert page.body
+        assert page.content_disposition.startswith('inline; filename=100.1')
 
     # Fallback
     client.get('/locale/en_US').follow()
@@ -296,9 +300,13 @@ def test_vote_upload(swissvotes_app, attachments):
     for name in names:
         name = name.replace('_', '-')
         page = client.get(manage.pyquery(f'a.{name}')[0].attrib['href'])
-        assert page.content_type == 'application/pdf'
+        assert page.content_type in (
+            'application/pdf',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
         assert page.content_length
         assert page.body
+        assert page.content_disposition.startswith('inline; filename=100.1')
 
 
 def test_vote_pagination(swissvotes_app):

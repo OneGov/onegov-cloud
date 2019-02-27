@@ -1,5 +1,7 @@
 from onegov.core.security import Private
 from onegov.core.security import Public
+from onegov.core.utils import normalize_for_url
+from onegov.file.integration import render_depot_file
 from onegov.form import Form
 from onegov.swissvotes import _
 from onegov.swissvotes import SwissvotesApp
@@ -9,6 +11,7 @@ from onegov.swissvotes.layouts import UploadVoteAttachemtsLayout
 from onegov.swissvotes.layouts import VoteLayout
 from onegov.swissvotes.layouts import VoteStrengthsLayout
 from onegov.swissvotes.models import SwissVote
+from onegov.swissvotes.models import SwissVoteFile
 
 
 @SwissvotesApp.html(
@@ -32,6 +35,7 @@ def view_vote(self, request):
         'resolution': self.get_file('resolution'),
         'realization': self.get_file('realization'),
         'ad_analysis': self.get_file('ad_analysis'),
+        'results_by_domain': self.get_file('results_by_domain'),
         'prev': prev,
         'next': next,
     }
@@ -116,3 +120,34 @@ def delete_vote(self, request, form):
         'button_class': 'alert',
         'cancel': request.link(self)
     }
+
+
+@SwissvotesApp.view(
+    model=SwissVoteFile,
+    render=render_depot_file,
+    permission=Public
+)
+def view_file(self, request):
+    @request.after
+    def set_filename(response):
+        bfs_number = self.linked_swissvotes[0].bfs_number
+        name = self.name.split('-')[0]
+        extension = {'results_by_domain': 'xlsx'}.get(name, 'pdf')
+        title = {
+            'voting_text': _("Voting text"),
+            'realization': _("Realization"),
+            'federal_council_message': _("Federal council message"),
+            'parliamentary_debate': _("Parliamentary debate"),
+            'voting_booklet': _("Voting booklet"),
+            'ad_analysis': _("Analysis of the advertising campaign"),
+            'resolution': _("Resolution"),
+            'results_by_domain': _(
+                "Result by canton, district and municipality"
+            )
+        }.get(name, '')
+        title = normalize_for_url(request.translate(title))
+        response.headers['Content-Disposition'] = (
+            f'inline; filename={bfs_number}-{title}.{extension}'
+        )
+
+    return self.reference.file

@@ -112,7 +112,7 @@ def import_attachments(group_context, folder):
 
             for locale, locale_folder in locales.items():
                 for name in sorted(os.listdir(locale_folder)):
-                    if not name.endswith('.pdf'):
+                    if not (name.endswith('.pdf') or name.endswith('.xlsx')):
                         click.secho(
                             f"Ignoring {attachment}/{locale}/{name}",
                             fg='yellow'
@@ -120,7 +120,9 @@ def import_attachments(group_context, folder):
                         continue
 
                     try:
-                        bfs_number = Decimal(name.replace('.pdf', ''))
+                        bfs_number = Decimal(
+                            name.replace('.pdf', '').replace('.xlsx', '')
+                        )
                     except InvalidOperation:
                         click.secho(
                             f"Invalid name {attachment}/{locale}/{name}",

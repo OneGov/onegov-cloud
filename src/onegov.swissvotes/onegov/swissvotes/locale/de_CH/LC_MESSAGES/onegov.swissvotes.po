@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-20 08:25+0100\n"
-"PO-Revision-Date: 2019-02-20 08:26+0100\n"
+"POT-Creation-Date: 2019-02-27 07:33+0100\n"
+"PO-Revision-Date: 2019-02-27 07:32+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -40,6 +40,9 @@ msgstr "Zustandekommen"
 
 msgid "Advertisment analysis"
 msgstr "Inserateanalyse"
+
+msgid "Result by canton, district and municipality"
+msgstr "Ergebnis nach Kantonen, Bezirken und Gemeinden"
 
 msgid "Dataset"
 msgstr "Datensatz"
@@ -1407,9 +1410,6 @@ msgstr "Jastimmen"
 
 msgid "Turnout"
 msgstr "Stimmbeteiligung"
-
-msgid "Result by canton, district and municipality"
-msgstr "Abstimmungsergebnis pro Kanton, Bezirk und Gemeinde"
 
 msgid "You are here"
 msgstr "Aktuelle Seite"

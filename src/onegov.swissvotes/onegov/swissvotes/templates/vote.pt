@@ -277,9 +277,9 @@
                         <th class="column-30" i18n:translate>Resolution</th>
                         <td><a href="${request.link(resolution)}" target="_blank" class="resolution">PDF</a></td>
                     </tr>
-                    <tr tal:condition="False">
+                    <tr tal:condition="results_by_domain">
                         <th class="column-30" i18n:translate>Result by canton, district and municipality</th>
-                        <td></td>
+                        <td><a href="${request.link(results_by_domain)}" target="_blank" class="results-by-domain">Excel</a></td>
                     </tr>
                 </tbody>
             </table>

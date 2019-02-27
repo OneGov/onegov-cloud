@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds results by domain attachments.
+  [msom]
+
 0.0.35 (2019-02-25)
 ~~~~~~~~~~~~~~~~~~~
 

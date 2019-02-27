@@ -10,6 +10,7 @@ from onegov.swissvotes.models import SwissVoteFile
 from onegov.user import User
 from pytest import fixture
 from transaction import commit
+from xlsxwriter.workbook import Workbook
 
 
 def create_swissvotes_app(request, temporary_path):
@@ -79,6 +80,21 @@ def attachments(swissvotes_app):
         pdf.init_report()
         pdf.p(content)
         pdf.generate()
+        file.seek(0)
+
+        attachment = SwissVoteFile(id=random_token())
+        attachment.reference = as_fileintent(file, name)
+        result[name] = attachment
+
+    for name in (
+        'results_by_domain',
+    ):
+        file = BytesIO()
+        workbook = Workbook(file)
+        worksheet = workbook.add_worksheet()
+        worksheet.write_row(0, 0, ['a', 'b'])
+        worksheet.write_row(1, 0, [100, 200])
+        workbook.close()
         file.seek(0)
 
         attachment = SwissVoteFile(id=random_token())

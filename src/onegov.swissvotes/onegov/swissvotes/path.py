@@ -1,10 +1,12 @@
 from onegov.core.converters import extended_date_converter
 from onegov.core.i18n import SiteLocale
+from onegov.file import FileCollection
 from onegov.swissvotes.app import SwissvotesApp
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.collections import TranslatablePageCollection
 from onegov.swissvotes.models import Principal
 from onegov.swissvotes.models import SwissVote
+from onegov.swissvotes.models import SwissVoteFile
 from onegov.swissvotes.models import TranslatablePage
 from onegov.swissvotes.models import TranslatablePageMove
 from onegov.user import Auth
@@ -94,6 +96,14 @@ def get_votes(
 )
 def get_vote(app, bfs_number):
     return SwissVoteCollection(app.session()).by_bfs_number(bfs_number)
+
+
+@SwissvotesApp.path(
+    model=SwissVoteFile,
+    path='/attachments/{id}'
+)
+def get_attachment(app, id):
+    return FileCollection(app.session()).by_id(id)
 
 
 @SwissvotesApp.path(

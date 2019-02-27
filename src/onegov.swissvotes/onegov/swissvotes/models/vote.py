@@ -704,6 +704,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     resolution = LocalizedFile()
     realization = LocalizedFile()
     ad_analysis = LocalizedFile()
+    results_by_domain = LocalizedFile()
 
     # searchable attachment texts
     searchable_text_de_CH = Column(TSVECTOR)
