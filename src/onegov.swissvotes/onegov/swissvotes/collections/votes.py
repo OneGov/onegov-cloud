@@ -270,12 +270,11 @@ class SwissVoteCollection(Pagination):
         term = ''.join((c for c in self.term if c.isalnum() or c in ',. '))
         term = ' <-> '.join([part for part in term.split()])
 
-        def match_convert(column, language='german'):
-            return func.to_tsvector(language, column).\
-                match(term, postgresql_regconfig='german')
-
         def match(column, language='german'):
-            return column.match(term, postgresql_regconfig='german')
+            return column.op('@@')(func.to_tsquery('german', term))
+
+        def match_convert(column, language='german'):
+            return match(func.to_tsvector(language, column), language)
 
         if not self.full_text:
             return [

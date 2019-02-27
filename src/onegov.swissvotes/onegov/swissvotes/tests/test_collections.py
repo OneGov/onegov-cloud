@@ -185,95 +185,78 @@ def test_vote_term_filter():
     assert SwissVoteCollection(None, term='').term_filter == []
     assert SwissVoteCollection(None, term='', full_text=True).term_filter == []
 
-    def compiled(list_):
+    def compiled(**kwargs):
+        list_ = SwissVoteCollection(None, **kwargs).term_filter
         return [
             str(statement.compile(compile_kwargs={"literal_binds": True}))
             for statement in list_
         ]
 
-    assert compiled(
-        SwissVoteCollection(None, term='100').term_filter
-    ) == [
+    c_title = "to_tsvector('german', swissvotes.title)"
+    c_keyword = "to_tsvector('german', swissvotes.keyword)"
+    c_initiator = "to_tsvector('german', swissvotes.initiator)"
+    c_text_de = 'swissvotes."searchable_text_de_CH"'
+    c_text_fr = 'swissvotes."searchable_text_fr_CH"'
+
+    assert compiled(term='100') == [
         'swissvotes.bfs_number = 100',
         'swissvotes.procedure_number = 100',
-        """to_tsvector('german', swissvotes.title) MATCH '100'""",
-        """to_tsvector('german', swissvotes.keyword) MATCH '100'""",
+        f"{c_title} @@ to_tsquery('german', '100')",
+        f"{c_keyword} @@ to_tsquery('german', '100')",
     ]
 
-    assert compiled(
-        SwissVoteCollection(None, term='100.1').term_filter
-    ) == [
+    assert compiled(term='100.1') == [
         'swissvotes.bfs_number = 100.1',
         'swissvotes.procedure_number = 100.1',
-        """to_tsvector('german', swissvotes.title) MATCH '100.1'""",
-        """to_tsvector('german', swissvotes.keyword) MATCH '100.1'""",
+        f"{c_title} @@ to_tsquery('german', '100.1')",
+        f"{c_keyword} @@ to_tsquery('german', '100.1')",
     ]
 
-    assert compiled(
-        SwissVoteCollection(None, term='abc').term_filter
-    ) == [
-        """to_tsvector('german', swissvotes.title) MATCH 'abc'""",
-        """to_tsvector('german', swissvotes.keyword) MATCH 'abc'""",
+    assert compiled(term='abc') == [
+        f"{c_title} @@ to_tsquery('german', 'abc')",
+        f"{c_keyword} @@ to_tsquery('german', 'abc')",
     ]
-    assert compiled(
-        SwissVoteCollection(None, term='abc', full_text=True).term_filter
-    ) == [
-        """to_tsvector('german', swissvotes.title) MATCH 'abc'""",
-        """to_tsvector('german', swissvotes.keyword) MATCH 'abc'""",
-        """to_tsvector('german', swissvotes.initiator) MATCH 'abc'""",
-        """swissvotes."searchable_text_de_CH" MATCH 'abc'""",
-        """swissvotes."searchable_text_fr_CH" MATCH 'abc'""",
+    assert compiled(term='abc', full_text=True) == [
+        f"{c_title} @@ to_tsquery('german', 'abc')",
+        f"{c_keyword} @@ to_tsquery('german', 'abc')",
+        f"{c_initiator} @@ to_tsquery('german', 'abc')",
+        f"{c_text_de} @@ to_tsquery('german', 'abc')",
+        f"{c_text_fr} @@ to_tsquery('german', 'abc')",
     ]
 
-    assert compiled(
-        SwissVoteCollection(None, term='Müller').term_filter
-    ) == [
-        "to_tsvector('german', swissvotes.title) MATCH 'Müller'",
-        "to_tsvector('german', swissvotes.keyword) MATCH 'Müller'",
+    assert compiled(term='Müller') == [
+        f"{c_title} @@ to_tsquery('german', 'Müller')",
+        f"{c_keyword} @@ to_tsquery('german', 'Müller')",
     ]
 
-    assert compiled(
-        SwissVoteCollection(None, term='20,20').term_filter
-    ) == [
-        "to_tsvector('german', swissvotes.title) MATCH '20,20'",
-        "to_tsvector('german', swissvotes.keyword) MATCH '20,20'",
+    assert compiled(term='20,20') == [
+        f"{c_title} @@ to_tsquery('german', '20,20')",
+        f"{c_keyword} @@ to_tsquery('german', '20,20')",
     ]
 
-    assert compiled(
-        SwissVoteCollection(None, term='Neu!').term_filter
-    ) == [
-        "to_tsvector('german', swissvotes.title) MATCH 'Neu'",
-        "to_tsvector('german', swissvotes.keyword) MATCH 'Neu'",
+    assert compiled(term='Neu!') == [
+        f"{c_title} @@ to_tsquery('german', 'Neu')",
+        f"{c_keyword} @@ to_tsquery('german', 'Neu')",
     ]
 
-    assert compiled(
-        SwissVoteCollection(None, term='Hans Peter Müller').term_filter
-    ) == [
-        "to_tsvector('german', swissvotes.title) MATCH "
-        "'Hans <-> Peter <-> Müller'",
-        "to_tsvector('german', swissvotes.keyword) MATCH "
-        "'Hans <-> Peter <-> Müller'",
+    assert compiled(term='Hans Peter Müller') == [
+        f"{c_title} @@ to_tsquery('german', 'Hans <-> Peter <-> Müller')",
+        f"{c_keyword} @@ to_tsquery('german', 'Hans <-> Peter <-> Müller')",
     ]
 
-    assert compiled(
-        SwissVoteCollection(None, term='x AND y').term_filter
-    ) == [
-        "to_tsvector('german', swissvotes.title) MATCH 'x <-> AND <-> y'",
-        "to_tsvector('german', swissvotes.keyword) MATCH 'x <-> AND <-> y'",
+    assert compiled(term='x AND y') == [
+        f"{c_title} @@ to_tsquery('german', 'x <-> AND <-> y')",
+        f"{c_keyword} @@ to_tsquery('german', 'x <-> AND <-> y')",
     ]
 
-    assert compiled(
-        SwissVoteCollection(None, term='x | y').term_filter
-    ) == [
-        "to_tsvector('german', swissvotes.title) MATCH 'x <-> y'",
-        "to_tsvector('german', swissvotes.keyword) MATCH 'x <-> y'",
+    assert compiled(term='x | y') == [
+        f"{c_title} @@ to_tsquery('german', 'x <-> y')",
+        f"{c_keyword} @@ to_tsquery('german', 'x <-> y')",
     ]
 
-    assert compiled(
-        SwissVoteCollection(None, term='y ! y').term_filter
-    ) == [
-        "to_tsvector('german', swissvotes.title) MATCH 'y <-> y'",
-        "to_tsvector('german', swissvotes.keyword) MATCH 'y <-> y'",
+    assert compiled(term='y ! y') == [
+        f"{c_title} @@ to_tsquery('german', 'y <-> y')",
+        f"{c_keyword} @@ to_tsquery('german', 'y <-> y')",
     ]
 
 
