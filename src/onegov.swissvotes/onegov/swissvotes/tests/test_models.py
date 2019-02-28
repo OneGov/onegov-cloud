@@ -1290,5 +1290,5 @@ def test_column_mapper():
         ('_legal_form', 'rechtsform', 'INTEGER', False, None, None)
     ]
     assert list(mapper.items())[300] == (
-        '!recommendations!sbk', 'p-sbk', 'INTEGER', True, None, None
+        '!recommendations!sodk', 'p-sodk', 'INTEGER', True, None, None
     )

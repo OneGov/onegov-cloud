@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Rearranges the dataset columns.
+  [msom]
+
 0.0.41 (2019-02-28)
 ~~~~~~~~~~~~~~~~~~~
 
