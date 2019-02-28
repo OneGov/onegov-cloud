@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.40 (2019-02-28)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds other recommendations.
   [msom]
