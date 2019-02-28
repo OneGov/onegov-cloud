@@ -237,14 +237,6 @@ def add_bfs_map_columns(context):
         context.operations.add_column('swissvotes', Column('bfs_map_fr', Text))
 
 
-@upgrade_task('Rename sbv-usp column')
-def rename_sbv_usp_column(context):
-    for vote in context.app.session().query(SwissVote):
-        if 'sbv_usp' in vote.recommendations:
-            vote.recommendations['sbv-usp'] = vote.recommendations['sbv_usp']
-            del vote.recommendations['sbv_usp']
-
-
 @upgrade_task('Add other recommendation columns')
 def add_other_recommendation_columns(context):
     for name in ('yes', 'no', 'free'):
@@ -260,3 +252,11 @@ def add_divergent_recommendations_column(context):
             'swissvotes',
             Column('recommendations_divergent', JSON())
         )
+
+
+@upgrade_task('Rename sbv-usp column')
+def rename_sbv_usp_column(context):
+    for vote in context.app.session().query(SwissVote):
+        if 'sbv_usp' in vote.recommendations:
+            vote.recommendations['sbv-usp'] = vote.recommendations['sbv_usp']
+            del vote.recommendations['sbv_usp']
