@@ -1016,7 +1016,7 @@ def test_votes_export(session):
     vote.recommendations['sav'] = 1
     vote.recommendations['eco'] = 2
     vote.recommendations['sgv'] = 3
-    vote.recommendations['sbv_usp'] = 3
+    vote.recommendations['sbv-usp'] = 3
     vote.recommendations['sgb'] = 3
     vote.recommendations['travs'] = 3
     vote.recommendations['vsa'] = 9999

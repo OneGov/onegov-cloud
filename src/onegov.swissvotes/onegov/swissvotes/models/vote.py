@@ -532,57 +532,16 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     def recommendations_parties(self):
         recommendations = self.recommendations or {}
         return self.group_recommendations((
-            (Actor('bdp'), recommendations.get('bdp')),
-            (Actor('csp'), recommendations.get('csp')),
-            (Actor('cvp'), recommendations.get('cvp')),
-            (Actor('edu'), recommendations.get('edu')),
-            (Actor('evp'), recommendations.get('evp')),
-            (Actor('fdp'), recommendations.get('fdp')),
-            (Actor('fps'), recommendations.get('fps')),
-            (Actor('glp'), recommendations.get('glp')),
-            (Actor('gps'), recommendations.get('gps')),
-            (Actor('kvp'), recommendations.get('kvp')),
-            (Actor('ldu'), recommendations.get('ldu')),
-            (Actor('lega'), recommendations.get('lega')),
-            (Actor('lps'), recommendations.get('lps')),
-            (Actor('mcg'), recommendations.get('mcg')),
-            (Actor('pda'), recommendations.get('pda')),
-            (Actor('poch'), recommendations.get('poch')),
-            (Actor('rep'), recommendations.get('rep')),
-            (Actor('sd'), recommendations.get('sd')),
-            (Actor('sps'), recommendations.get('sps')),
-            (Actor('svp'), recommendations.get('svp')),
+            (Actor(name), recommendations.get(name))
+            for name in Actor('').parties
         ))
 
     @cached_property
     def recommendations_associations(self):
         recommendations = self.recommendations or {}
         return self.group_recommendations((
-            (Actor('acs'), recommendations.get('acs')),
-            (Actor('bpuk'), recommendations.get('bpuk')),
-            (Actor('eco'), recommendations.get('eco')),
-            (Actor('edk'), recommendations.get('edk')),
-            (Actor('endk'), recommendations.get('endk')),
-            (Actor('fdk'), recommendations.get('fdk')),
-            (Actor('gdk'), recommendations.get('gdk')),
-            (Actor('gem'), recommendations.get('gem')),
-            (Actor('kdk'), recommendations.get('kdk')),
-            (Actor('kkjpd'), recommendations.get('kkjpd')),
-            (Actor('ldk'), recommendations.get('ldk')),
-            (Actor('sav'), recommendations.get('sav')),
-            (Actor('sbk'), recommendations.get('sbk')),
-            (Actor('sbv-usp'), recommendations.get('sbv_usp')),  # todo:
-            (Actor('sgb'), recommendations.get('sgb')),
-            (Actor('sgv'), recommendations.get('sgv')),
-            (Actor('sodk'), recommendations.get('sodk')),
-            (Actor('ssv'), recommendations.get('ssv')),
-            (Actor('tcs'), recommendations.get('tcs')),
-            (Actor('travs'), recommendations.get('travs')),
-            (Actor('vcs'), recommendations.get('vcs')),
-            (Actor('vdk'), recommendations.get('vdk')),
-            (Actor('voev'), recommendations.get('voev')),
-            (Actor('vpod'), recommendations.get('vpod')),
-            (Actor('vsa'), recommendations.get('vsa')),
+            (Actor(name), recommendations.get(name))
+            for name in Actor('').associations
         ))
 
     # Electoral strength

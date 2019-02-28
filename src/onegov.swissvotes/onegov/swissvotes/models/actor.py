@@ -1,3 +1,4 @@
+from cached_property import cached_property
 from onegov.swissvotes import _
 
 
@@ -10,7 +11,23 @@ class Actor(object):
     def __eq__(self, other):
         return self.name == other.name
 
-    @property
+    @cached_property
+    def parties(self):
+        return (
+            'bdp', 'csp', 'cvp', 'edu', 'evp', 'fdp', 'fps', 'glp', 'gps',
+            'kvp', 'ldu', 'lega', 'lps', 'mcg', 'pda', 'poch', 'rep', 'sd',
+            'sps', 'svp'
+        )
+
+    @cached_property
+    def associations(self):
+        return (
+            'acs', 'bpuk', 'eco', 'edk', 'endk', 'fdk', 'gdk', 'gem', 'kdk',
+            'kkjpd', 'ldk', 'sav', 'sbk', 'sbv-usp', 'sgb', 'sgv', 'sodk',
+            'ssv', 'tcs', 'travs', 'vcs', 'vdk', 'voev', 'vpod', 'vsa'
+        )
+
+    @cached_property
     def abbreviation(self):
         return {
             'acs': _("actor-acs-abbreviation"),
@@ -89,7 +106,7 @@ class Actor(object):
             'vsa': _("actor-vsa-abbreviation"),
         }.get(self.name, self.name.upper())
 
-    @property
+    @cached_property
     def label(self):
         return {
             'acs': _("actor-acs-label"),

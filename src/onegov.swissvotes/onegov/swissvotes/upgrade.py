@@ -235,3 +235,11 @@ def add_bfs_map_columns(context):
         context.operations.add_column('swissvotes', Column('bfs_map_de', Text))
     if not context.has_column('swissvotes', 'bfs_map_fr'):
         context.operations.add_column('swissvotes', Column('bfs_map_fr', Text))
+
+
+@upgrade_task('Rename sbv-usp column')
+def rename_sbv_usp_column(context):
+    for vote in context.app.session().query(SwissVote):
+        if 'sbv_usp' in vote.recommendations:
+            vote.recommendations['sbv-usp'] = vote.recommendations['sbv_usp']
+            del vote.recommendations['sbv_usp']

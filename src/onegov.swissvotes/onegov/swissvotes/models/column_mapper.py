@@ -299,7 +299,7 @@ class ColumnMapper(object):
             ('!recommendations!sav', 'p-sav'),
             ('!recommendations!eco', 'p-eco'),
             ('!recommendations!sgv', 'p-sgv'),
-            ('!recommendations!sbv_usp', 'p-sbv'),
+            ('!recommendations!sbv-usp', 'p-sbv'),
             ('!recommendations!sgb', 'p-sgb'),
             ('!recommendations!travs', 'p-travs'),
             ('!recommendations!vsa', 'p-vsa'),

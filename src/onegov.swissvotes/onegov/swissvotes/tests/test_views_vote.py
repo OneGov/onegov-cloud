@@ -88,7 +88,7 @@ def test_view_vote(swissvotes_app):
                 'sav': 1,
                 'eco': 2,
                 'sgv': 3,
-                'sbv_usp': 3,
+                'sbv-usp': 3,
                 'sgb': 3,
                 'travs': 3,
                 'vsa': 9999,
