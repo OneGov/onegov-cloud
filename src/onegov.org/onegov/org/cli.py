@@ -4,21 +4,33 @@ import click
 import html
 import isodate
 import re
+import requests
 import shutil
 import textwrap
 
+from cached_property import cached_property
 from collections import defaultdict
 from datetime import date, datetime, timedelta
+from libres.db.models import ReservedSlot
 from libres.modules.errors import InvalidEmailAddress, AlreadyReservedError
+from onegov.core.custom import json
+from onegov.core.cache import lru_cache
 from onegov.core.cli import command_group, pass_group_context, abort
+from onegov.core.csv import CSVFile
 from onegov.form import FormCollection
 from onegov.org.formats import DigirezDB
-from onegov.org.models import Organisation
+from onegov.org.models import Organisation, TicketNote
+from onegov.org.forms import ReservationForm
+from onegov.reservation import Allocation, Reservation
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
+from onegov.form import as_internal_id, parse_form
 from onegov.user import UserCollection, User
-from sqlalchemy import create_engine
-from uuid import uuid4
+from purl import URL
+from sedate import replace_timezone, utcnow
+from sqlalchemy import create_engine, event, text
+from sqlalchemy.orm import Session
+from uuid import UUID, uuid4
 
 
 cli = command_group()
@@ -408,3 +420,387 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
             ))
 
     return run_import
+
+
+@cli.command(name='import-reservations', context_settings={'singular': True})
+@click.option('--dsn', required=True, help="DSN to the source database")
+@click.option('--map', required=True, help="CSV map between resources")
+def import_reservations(dsn, map):
+    """ Imports reservations from a legacy seantis.reservation system.
+
+    WARNING: Existing reservations and all associated tickets/submissions
+    are deleted during the migration.
+
+    Pending reservations are ignored. The expectation is that the old system
+    is stopped, then migrated, then never started again.
+
+    Example:
+
+    onegov-org --select '/orgs/govikon' import-reservations\
+        --dsn postgresql://localhost:5432/legacy\
+        --map ressource-map.csv
+
+    The ressource map is a simple CSV file with the following columns:
+
+    * Legacy URL (the URL pointing to the legacy ressource/room)
+    * OGC URL (the URL pointing to the associated ressource in the OGC)
+    * Type ('daypass' or 'room')
+
+    The first row is expected to be the header row.
+
+    """
+
+    # establish the connection and ensure it cannot be written to
+    engine = create_engine(dsn).connect()
+
+    @event.listens_for(engine, 'begin')
+    def receive_begin(conn):
+        conn.execute('SET TRANSACTION READ ONLY')
+
+    remote = Session(bind=engine)
+
+    # define the mapping between old/new resources
+    class Mapping(object):
+
+        def __init__(self, libres_context, old_url, new_url, type):
+            self.resources = ResourceCollection(libres_context)
+            self.old_url = old_url
+            self.new_url = new_url
+            self.type = type
+
+            if type != 'room':
+                raise NotImplementedError(
+                    "Room migration has not been tested yet")
+
+        @property
+        def name(self):
+            return URL(self.new_url).path().rstrip('/').split('/')[-1]
+
+        @cached_property
+        def resource(self):
+            return self.resources.by_name(name=self.name)
+
+        @cached_property
+        def old_uuid(self):
+            return UUID(requests.get(f'{self.old_url}/@@uuid').text.strip())
+
+        @property
+        def new_uuid(self):
+            return self.resource.id
+
+    # read mapping
+    records = CSVFile(open(map, 'rb'), ('Old URL', 'New URL', 'Type')).lines
+
+    # XXX limit for testing
+    records = list(records)[:1]
+
+    # generate forms from the form-data found in the external system
+    def get_form_class_and_data(data):
+
+        def exclude(value):
+            return as_internal_id(value['desc']) == 'email'
+
+        @lru_cache()
+        def generate_form_class(formcode):
+            return parse_form(formcode, ReservationForm)
+
+        def separate_code_from_data(data):
+            fields = []
+            values = {}
+
+            for form in sorted(data.values(), key=lambda f: f['desc']):
+                fieldset = form['desc']
+                fields.append(f"# {fieldset}")
+
+                for v in sorted(form['values'], key=lambda r: r['sortkey']):
+                    label = v['desc']
+                    id = as_internal_id(f"{fieldset} {label}")
+
+                    # defined on the reservation form
+                    if id == 'email':
+                        continue
+
+                    fields.append(f"{label} = ___")
+                    values[id] = v['value']
+
+            return '\n'.join(fields), values
+
+        formcode, formdata = separate_code_from_data(data)
+
+        return generate_form_class(formcode), formdata
+
+    def handle_import(request, app):
+        session = app.session()
+
+        # map the old UUIDs to the resources
+        mapping = {m.old_uuid: m for m in (
+            Mapping(request.app.libres_context, r.old_url, r.new_url, r.type)
+            for r in records
+        )}
+
+        # remove existing records
+        session.execute(text("""
+            DELETE FROM submissions
+             WHERE submissions.meta->>'origin' IN :resources
+        """), {
+            'resources': tuple(m.old_uuid.hex for m in mapping.values())
+        })
+
+        # XXX delete associated chat messages
+        session.execute(text("""
+            DELETE from messages
+             WHERE channel_id IN (
+                SELECT number
+                  FROM tickets
+                 WHERE tickets.handler_data->>'origin' IN :resources
+             )
+        """), {
+            'resources': tuple(m.old_uuid.hex for m in mapping.values())
+        })
+
+        session.execute(text("""
+            DELETE FROM tickets
+             WHERE tickets.handler_data->>'origin' IN :resources
+        """), {
+            'resources': tuple(m.old_uuid.hex for m in mapping.values())
+        })
+
+        payment_ids = tuple(session.execute(text("""
+            SELECT payment_id
+            FROM payments_for_reservations_payment
+            WHERE reservations_id IN (
+                SELECT id
+                FROM reservations
+                WHERE resource IN :resources
+            )
+        """), {
+            'resources': tuple(m.resource.id for m in mapping.values())
+        }))
+
+        if payment_ids:
+            session.execute(text("""
+                DELETE FROM payments_for_reservations_payment
+                WHERE payment_id IN :payments
+            """), {
+                'payments': payment_ids
+            })
+
+            session.execute(text("""
+                DELETE FROM payments
+                WHERE id IN :payments
+            """), {
+                'payments': payment_ids
+            })
+
+        for m in mapping.values():
+            m.resource.scheduler.extinguish_managed_records()
+
+        # fetch the migrations that should be migrated
+        rows = remote.execute(text("""
+            SELECT * FROM allocations
+            WHERE mirror_of IN :resources
+            ORDER BY allocations.resource
+        """), {
+            'resources': tuple(mapping.keys())
+        })
+
+        # we use a separate id space, so we need to keep track
+        allocation_ids = {}
+
+        # the resource might be mapped, but it is not a given
+        def row_resource(row):
+            if row['resource'] not in mapping:
+                return row['resource']
+
+            return mapping[row['resource']].new_uuid
+
+        # create the new allocations
+        for row in rows:
+            resource_type = mapping[row['mirror_of']].type
+
+            if row['partly_available'] and resource_type != 'room':
+                raise RuntimeError((
+                    f"Cannot migrate partly_available allocation "
+                    f"to a {resource_type} resource"
+                ))
+
+            if row['approve_manually']:
+                raise RuntimeError((
+                    f"Manually approved allocation found (id: {row['id']}), "
+                    f"manually approved allocations are not supported"
+                ))
+
+            allocation = Allocation(
+                resource=row_resource(row),
+                mirror_of=mapping[row['mirror_of']].new_uuid,
+                group=row['group'],
+                quota=row['quota'],
+                quota_limit=row['quota_limit'],
+                partly_available=row['partly_available'],
+                approve_manually=row['approve_manually'],
+
+                # the timezone was ignored in seantis.reservation
+                timezone='Europe/Zurich',
+                _start=replace_timezone(row['_start'], 'Europe/Zurich'),
+                _end=replace_timezone(row['_end'], 'Europe/Zurich'),
+
+                data=json.loads(row['data']),
+                _raster=row['_raster'],
+                created=replace_timezone(row['created'], 'UTC'),
+                modified=utcnow(),
+                type='custom',
+            )
+
+            session.add(allocation)
+            session.flush()
+
+            allocation_ids[row['id']] = allocation.id
+
+        # fetch the reserved slots that should be migrated
+        rows = remote.execute(text("""
+            SELECT * FROM reserved_slots WHERE allocation_id IN (
+                SELECT id FROM allocations WHERE mirror_of IN :resources
+            )
+        """), {
+            'resources': tuple(mapping.keys())
+        })
+
+        # create the reserved slots with the mapped values
+        for row in rows:
+            session.add(ReservedSlot(
+                resource=mapping[row['resource']].new_uuid,
+                start=replace_timezone(row['start'], 'Europe/Zurich'),
+                end=replace_timezone(row['end'], 'Europe/Zurich'),
+                allocation_id=allocation_ids[row['allocation_id']],
+                reservation_token=row['reservation_token']
+            ))
+
+        session.flush()
+
+        # fetch the reservations that should be migrated
+        rows = remote.execute(text("""
+            SELECT * FROM reservations
+            WHERE resource IN :resources
+              AND status = 'approved'
+            ORDER BY resource
+        """), {
+            'resources': tuple(mapping.keys())
+        })
+
+        def targeted_allocations(group):
+            return session.query(Allocation).filter_by(group=group)
+
+        # keep track of custom reservation data, for the creation of tickets
+        reservation_data = {}
+
+        for row in rows:
+            reservation_data[row['token']] = {
+                'data': json.loads(row['data']),
+                'email': row['email'],
+                'origin': row['resource'],
+                'origin_url': mapping[row['resource']].old_url,
+                'created': replace_timezone(row['created'], 'UTC'),
+                'modified': replace_timezone(row['modified'], 'UTC'),
+            }
+
+            if row['quota'] > 1:
+                raise NotImplementedError((
+                    "Reservations with a quota > 1 are not supported yet"
+                ))
+
+            # onegov.reservation does not support group targets, so we
+            # translate those into normal allocations and create multiple
+            # reservations with a shared token
+            shared = dict(
+                token=row['token'],
+                target_type='allocation',
+                resource=mapping[row['resource']].new_uuid,
+                timezone='Europe/Zurich',
+                status=row['status'],
+                data={"accepted": True, "migrated": True},
+                email=row['email'],
+                quota=row['quota'],
+                created=replace_timezone(row['created'], 'UTC'),
+                modified=replace_timezone(row['modified'], 'UTC'),
+                type='custom',
+            )
+
+            if row['target_type'] == 'group':
+                for allocation in targeted_allocations(group=row['target']):
+                    allocation.group = uuid4()
+
+                    session.add(Reservation(
+                        target=allocation.group,
+                        start=allocation.start,
+                        end=allocation.end,
+                        **shared
+                    ))
+
+            else:
+                session.add(Reservation(
+                    target=row['target'],
+                    start=replace_timezone(row['start'], 'Europe/Zurich'),
+                    end=replace_timezone(row['end'], 'Europe/Zurich'),
+                    **shared
+                ))
+
+        session.flush()
+
+        # tie reservations to tickets/submissions
+        tickets = TicketCollection(session)
+        forms = FormCollection(session)
+
+        # the responsible user is the first admin that was added
+        user = session.query(User)\
+            .filter_by(role='admin')\
+            .order_by(User.created).first()
+
+        for token, data in reservation_data.items():
+            form_class, form_data = get_form_class_and_data(data['data'])
+            form_data['email'] = data['email']
+            form = form_class(data=form_data)
+
+            # wtforms requires raw_data for some validators
+            for key, value in form_data.items():
+                getattr(form, key).raw_data = [value]
+
+            submission = forms.submissions.add_external(
+                form=form,
+                state='complete',
+                id=token
+            )
+
+            submission.meta['migrated'] = True
+            submission.meta['origin'] = data['origin'].hex
+
+            with session.no_autoflush:
+                ticket = tickets.open_ticket(
+                    handler_code='RSV', handler_id=token.hex)
+
+                ticket.handler_data['migrated'] = True
+                ticket.handler_data['origin'] = data['origin'].hex
+                ticket.handler_data['origin_url'] = data['origin_url']
+                ticket.muted = True
+                ticket.state = 'closed'
+                ticket.last_state_change = ticket.timestamp()
+                ticket.reaction_time = 0
+                ticket.user = user
+                ticket.created = data['created']
+                ticket.modified = data['modified']
+
+                TicketNote.create(ticket, request, "\n".join((
+                    f"Migriert von {data['origin_url']}",
+                )), owner=user.username)
+
+    def post_mortem(request, app):
+        # XXX remove
+        try:
+            return handle_import(request, app)
+        except Exception:
+            import traceback
+            traceback.print_exc()
+
+            import pdb
+            pdb.post_mortem()
+
+    return post_mortem

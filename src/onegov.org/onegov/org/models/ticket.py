@@ -338,7 +338,7 @@ class ReservationHandler(Handler):
             tokens = tokens.filter(
                 Reservation.target.in_(allocations.subquery()))
 
-            handler_ids = tuple(t[0].hex for t in tokens.all())
+            handler_ids = tuple(t[0].hex for t in tokens)
 
             if handler_ids:
                 query = query.filter(Ticket.handler_id.in_(handler_ids))

@@ -56,8 +56,8 @@ class TicketNote(Message, TicketMessageMixin):
     }
 
     @classmethod
-    def create(cls, ticket, request, text, file=None):
-        note = super().create(ticket, request, text=text)
+    def create(cls, ticket, request, text, file=None, owner=None):
+        note = super().create(ticket, request, text=text, owner=None)
         note.file = file
 
         return note
