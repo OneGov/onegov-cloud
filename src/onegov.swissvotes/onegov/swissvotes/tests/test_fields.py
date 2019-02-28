@@ -5,7 +5,7 @@ from io import BytesIO
 from onegov.form import Form
 from onegov.swissvotes.fields import PolicyAreaField
 from onegov.swissvotes.fields import SwissvoteDatasetField
-from onegov.swissvotes.fields.dataset import COLUMNS
+from onegov.swissvotes.models import ColumnMapper
 from psycopg2.extras import NumericRange
 from xlsxwriter.workbook import Workbook
 
@@ -54,7 +54,8 @@ def test_swissvotes_dataset_field():
     assert "No data." in field.errors
 
     # Missing columns
-    columns = [value for value in COLUMNS.values() if value != 'anzahl']
+    mapper = ColumnMapper()
+    columns = [value for value in mapper.columns.values() if value != 'anzahl']
 
     file = BytesIO()
     workbook = Workbook(file)
@@ -79,7 +80,7 @@ def test_swissvotes_dataset_field():
     file = BytesIO()
     workbook = Workbook(file)
     worksheet = workbook.add_worksheet()
-    worksheet.write_row(0, 0, COLUMNS.values())
+    worksheet.write_row(0, 0, mapper.columns.values())
     worksheet.write_row(1, 0, [
         '',  # anr / NUMERIC
         '',  # datum / DATE
@@ -174,7 +175,7 @@ def test_swissvotes_dataset_field():
     file = BytesIO()
     workbook = Workbook(file)
     worksheet = workbook.add_worksheet()
-    worksheet.write_row(0, 0, COLUMNS.values())
+    worksheet.write_row(0, 0, mapper.columns.values())
     worksheet.write_row(1, 0, [
         '100.1',  # anr / NUMERIC
         '1.2.2008',  # datum / DATE

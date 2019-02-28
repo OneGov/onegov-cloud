@@ -1,6 +1,6 @@
 from io import BytesIO
 from onegov.core.utils import module_path
-from onegov.swissvotes.fields.dataset import COLUMNS
+from onegov.swissvotes.models import ColumnMapper
 from onegov.swissvotes.models import SwissVote
 from pytest import mark
 from webtest import TestApp as Client
@@ -98,7 +98,7 @@ def test_update_votes_unknown_descriptors(swissvotes_app):
     file = BytesIO()
     workbook = Workbook(file)
     worksheet = workbook.add_worksheet()
-    worksheet.write_row(0, 0, COLUMNS.values())
+    worksheet.write_row(0, 0, ColumnMapper().columns.values())
     worksheet.write_row(1, 0, [
         '100.1',  # anr
         '1.2.2008',  # datum

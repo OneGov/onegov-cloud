@@ -3,15 +3,16 @@ from decimal import Decimal
 from io import BytesIO
 from onegov.core.crypto import random_token
 from onegov.file.utils import as_fileintent
-from onegov.swissvotes.models.actor import Actor
-from onegov.swissvotes.models.canton import Canton
+from onegov.swissvotes.models import Actor
+from onegov.swissvotes.models import Canton
+from onegov.swissvotes.models import ColumnMapper
+from onegov.swissvotes.models import PolicyArea
+from onegov.swissvotes.models import Principal
+from onegov.swissvotes.models import SwissVote
+from onegov.swissvotes.models import TranslatablePage
+from onegov.swissvotes.models import TranslatablePageFile
+from onegov.swissvotes.models import TranslatablePageMove
 from onegov.swissvotes.models.localized_file import LocalizedFile
-from onegov.swissvotes.models.page import TranslatablePage
-from onegov.swissvotes.models.page import TranslatablePageFile
-from onegov.swissvotes.models.page import TranslatablePageMove
-from onegov.swissvotes.models.policy_area import PolicyArea
-from onegov.swissvotes.models.principal import Principal
-from onegov.swissvotes.models.vote import SwissVote
 from psycopg2.extras import NumericRange
 from translationstring import TranslationString
 
@@ -537,51 +538,53 @@ def test_vote(session):
     vote.duration_referendum_total = 36
     vote.signatures_valid = 40
     vote.signatures_invalid = 41
-    vote._recommendation_fdp = 1
-    vote._recommendation_cvp = 1
-    vote._recommendation_sps = 1
-    vote._recommendation_svp = 1
-    vote._recommendation_lps = 2
-    vote._recommendation_ldu = 2
-    vote._recommendation_evp = 2
-    vote._recommendation_csp = 3
-    vote._recommendation_pda = 3
-    vote._recommendation_poch = 3
-    vote._recommendation_gps = 4
-    vote._recommendation_sd = 4
-    vote._recommendation_rep = 4
-    vote._recommendation_edu = 5
-    vote._recommendation_fps = 5
-    vote._recommendation_lega = 5
-    vote._recommendation_kvp = 66
-    vote._recommendation_glp = 66
-    vote._recommendation_bdp = None
-    vote._recommendation_mcg = 9999
-    vote._recommendation_sav = 1
-    vote._recommendation_eco = 2
-    vote._recommendation_sgv = 3
-    vote._recommendation_sbv_usp = 3
-    vote._recommendation_sgb = 3
-    vote._recommendation_travs = 3
-    vote._recommendation_vsa = 9999
-    vote._recommendation_vpod = 1
-    vote._recommendation_ssv = 1
-    vote._recommendation_gem = 1
-    vote._recommendation_kdk = 1
-    vote._recommendation_vdk = 1
-    vote._recommendation_endk = 1
-    vote._recommendation_fdk = 1
-    vote._recommendation_edk = 1
-    vote._recommendation_gdk = 1
-    vote._recommendation_ldk = 1
-    vote._recommendation_sodk = 1
-    vote._recommendation_kkjpd = 1
-    vote._recommendation_bpuk = 1
-    vote._recommendation_sbk = 1
-    vote._recommendation_acs = 1
-    vote._recommendation_tcs = 1
-    vote._recommendation_vcs = 1
-    vote._recommendation_voev = 1
+    vote.recommendations = {
+        'fdp': 1,
+        'cvp': 1,
+        'sps': 1,
+        'svp': 1,
+        'lps': 2,
+        'ldu': 2,
+        'evp': 2,
+        'csp': 3,
+        'pda': 3,
+        'poch': 3,
+        'gps': 4,
+        'sd': 4,
+        'rep': 4,
+        'edu': 5,
+        'fps': 5,
+        'lega': 5,
+        'kvp': 66,
+        'glp': 66,
+        'bdp': None,
+        'mcg': 9999,
+        'sav': 1,
+        'eco': 2,
+        'sgv': 3,
+        'sbv_usp': 3,
+        'sgb': 3,
+        'travs': 3,
+        'vsa': 9999,
+        'vpod': 1,
+        'ssv': 1,
+        'gem': 1,
+        'kdk': 1,
+        'vdk': 1,
+        'endk': 1,
+        'fdk': 1,
+        'edk': 1,
+        'gdk': 1,
+        'ldk': 1,
+        'sodk': 1,
+        'kkjpd': 1,
+        'bpuk': 1,
+        'sbk': 1,
+        'acs': 1,
+        'tcs': 1,
+        'vcs': 1,
+        'voev': 1
+    }
     vote.national_council_election_year = 1990
     vote.national_council_share_fdp = Decimal('01.10')
     vote.national_council_share_cvp = Decimal('02.10')
@@ -929,51 +932,53 @@ def test_vote(session):
     assert vote.duration_referendum_total == 36
     assert vote.signatures_valid == 40
     assert vote.signatures_invalid == 41
-    assert vote._recommendation_fdp == 1
-    assert vote._recommendation_cvp == 1
-    assert vote._recommendation_sps == 1
-    assert vote._recommendation_svp == 1
-    assert vote._recommendation_lps == 2
-    assert vote._recommendation_ldu == 2
-    assert vote._recommendation_evp == 2
-    assert vote._recommendation_csp == 3
-    assert vote._recommendation_pda == 3
-    assert vote._recommendation_poch == 3
-    assert vote._recommendation_gps == 4
-    assert vote._recommendation_sd == 4
-    assert vote._recommendation_rep == 4
-    assert vote._recommendation_edu == 5
-    assert vote._recommendation_fps == 5
-    assert vote._recommendation_lega == 5
-    assert vote._recommendation_kvp == 66
-    assert vote._recommendation_glp == 66
-    assert vote._recommendation_bdp is None
-    assert vote._recommendation_mcg == 9999
-    assert vote._recommendation_sav == 1
-    assert vote._recommendation_eco == 2
-    assert vote._recommendation_sgv == 3
-    assert vote._recommendation_sbv_usp == 3
-    assert vote._recommendation_sgb == 3
-    assert vote._recommendation_travs == 3
-    assert vote._recommendation_vsa == 9999
-    assert vote._recommendation_vpod == 1
-    assert vote._recommendation_ssv == 1
-    assert vote._recommendation_gem == 1
-    assert vote._recommendation_kdk == 1
-    assert vote._recommendation_vdk == 1
-    assert vote._recommendation_endk == 1
-    assert vote._recommendation_fdk == 1
-    assert vote._recommendation_edk == 1
-    assert vote._recommendation_gdk == 1
-    assert vote._recommendation_ldk == 1
-    assert vote._recommendation_sodk == 1
-    assert vote._recommendation_kkjpd == 1
-    assert vote._recommendation_bpuk == 1
-    assert vote._recommendation_sbk == 1
-    assert vote._recommendation_acs == 1
-    assert vote._recommendation_tcs == 1
-    assert vote._recommendation_vcs == 1
-    assert vote._recommendation_voev == 1
+    assert vote.recommendations == {
+        'fdp': 1,
+        'cvp': 1,
+        'sps': 1,
+        'svp': 1,
+        'lps': 2,
+        'ldu': 2,
+        'evp': 2,
+        'csp': 3,
+        'pda': 3,
+        'poch': 3,
+        'gps': 4,
+        'sd': 4,
+        'rep': 4,
+        'edu': 5,
+        'fps': 5,
+        'lega': 5,
+        'kvp': 66,
+        'glp': 66,
+        'bdp': None,
+        'mcg': 9999,
+        'sav': 1,
+        'eco': 2,
+        'sgv': 3,
+        'sbv_usp': 3,
+        'sgb': 3,
+        'travs': 3,
+        'vsa': 9999,
+        'vpod': 1,
+        'ssv': 1,
+        'gem': 1,
+        'kdk': 1,
+        'vdk': 1,
+        'endk': 1,
+        'fdk': 1,
+        'edk': 1,
+        'gdk': 1,
+        'ldk': 1,
+        'sodk': 1,
+        'kkjpd': 1,
+        'bpuk': 1,
+        'sbk': 1,
+        'acs': 1,
+        'tcs': 1,
+        'vcs': 1,
+        'voev': 1
+    }
     assert vote.national_council_election_year == 1990
     assert vote.national_council_share_fdp == Decimal('01.10')
     assert vote.national_council_share_cvp == Decimal('02.10')
@@ -1180,3 +1185,73 @@ def test_vote_attachments(swissvotes_app, attachments):
 def test_vote_percentages():
     # todo:
     pass
+
+
+def test_column_mapper():
+    mapper = ColumnMapper()
+    vote = SwissVote()
+
+    mapper.set_value(vote, 'bfs_number', Decimal('100.1'))
+    mapper.set_value(vote, 'date', date(2019, 1, 1))
+    mapper.set_value(vote, 'legislation_number', 10)
+    mapper.set_value(vote, 'legislation_decade', NumericRange(1990, 1999))
+    mapper.set_value(vote, 'title', 'title')
+    mapper.set_value(vote, 'keyword', 'keyword')
+    mapper.set_value(vote, '_legal_form', 4)
+    mapper.set_value(vote, '!recommendations!fdp', 66)
+
+    assert vote.bfs_number == Decimal('100.1')
+    assert vote.date == date(2019, 1, 1)
+    assert vote.legislation_number == 10
+    assert vote.legislation_decade == NumericRange(1990, 1999)
+    assert vote.title == 'title'
+    assert vote.keyword == 'keyword'
+    assert vote.legal_form == 'Direct counter-proposal'
+    assert vote.get_recommendation('fdp') == 'Neutral'
+
+    assert mapper.get_value(vote, 'bfs_number'), Decimal('100.1')
+    assert mapper.get_value(vote, 'date') == date(2019, 1, 1)
+    assert mapper.get_value(vote, 'legislation_number') == 10
+    assert mapper.get_value(vote, 'legislation_decade') == NumericRange(1990,
+                                                                        1999)
+    assert mapper.get_value(vote, 'title') == 'title'
+    assert mapper.get_value(vote, 'keyword') == 'keyword'
+    assert mapper.get_value(vote, '_legal_form') == 4
+    assert mapper.get_value(vote, '!recommendations!fdp') == 66
+
+    assert list(mapper.get_values(vote))[:9] == [
+        Decimal('100.1'),
+        date(2019, 1, 1),
+        10,
+        NumericRange(1990, 1999, '[)'),
+        None,
+        'title',
+        'keyword',
+        None,
+        4
+    ]
+    assert list(mapper.get_items(vote))[:9] == [
+        ('bfs_number', Decimal('100.1')),
+        ('date', date(2019, 1, 1)),
+        ('legislation_number', 10),
+        ('legislation_decade', NumericRange(1990, 1999)),
+        ('decade', None),
+        ('title', 'title'),
+        ('keyword', 'keyword'),
+        ('votes_on_same_day', None),
+        ('_legal_form', 4)
+    ]
+    assert list(mapper.items())[:9] == [
+        ('bfs_number', 'anr', 'NUMERIC(8, 2)', False, 8, 2),
+        ('date', 'datum', 'DATE', False, None, None),
+        ('legislation_number', 'legislatur', 'INTEGER', False, None, None),
+        ('legislation_decade', 'legisjahr', 'INT4RANGE', False, None, None),
+        ('decade', 'jahrzehnt', 'INT4RANGE', False, None, None),
+        ('title', 'titel', 'TEXT', False, None, None),
+        ('keyword', 'stichwort', 'TEXT', True, None, None),
+        ('votes_on_same_day', 'anzahl', 'INTEGER', False, None, None),
+        ('_legal_form', 'rechtsform', 'INTEGER', False, None, None)
+    ]
+    assert list(mapper.items())[300] == (
+        '!recommendations!sbk', 'p-sbk', 'INTEGER', True, None, None
+    )

@@ -48,102 +48,102 @@
                 <tbody>
                     <tr tal:condition="vote.national_council_share_bdp">
                         <td>BDP</td>
-                        <td>${vote.recommendation_bdp}</td>
+                        <td>${vote.get_recommendation('bdp')}</td>
                         <td>${layout.format_number(vote.national_council_share_bdp, 1)}%</td>
                     </tr>
                     <tr tal:condition="vote.national_council_share_csp">
                         <td>CSP</td>
-                        <td>${vote.recommendation_csp}</td>
+                        <td>${vote.get_recommendation('csp')}</td>
                         <td>${layout.format_number(vote.national_council_share_csp, 1)}%</td>
                     </tr>
                     <tr tal:condition="vote.national_council_share_cvp">
                         <td>CVP</td>
-                        <td>${vote.recommendation_cvp}</td>
+                        <td>${vote.get_recommendation('cvp')}</td>
                         <td>${layout.format_number(vote.national_council_share_cvp, 1)}%</td>
                     </tr>
                     <tr tal:condition="vote.national_council_share_edu">
                         <td>EDU</td>
-                        <td>${vote.recommendation_edu}</td>
+                        <td>${vote.get_recommendation('edu')}</td>
                         <td>${layout.format_number(vote.national_council_share_edu, 1)}%</td>
                     </tr>
                     <tr tal:condition="vote.national_council_share_evp">
                         <td>EVP</td>
-                        <td>${vote.recommendation_evp}</td>
+                        <td>${vote.get_recommendation('evp')}</td>
                         <td>${layout.format_number(vote.national_council_share_evp, 1)}%</td>
                     </tr>
                     <tr tal:condition="vote.national_council_share_fdp">
                         <td>FDP</td>
-                        <td>${vote.recommendation_fdp}</td>
+                        <td>${vote.get_recommendation('fdp')}</td>
                         <td>${layout.format_number(vote.national_council_share_fdp, 1)}%</td>
                     </tr>
                     <tr tal:condition="vote.national_council_share_fps">
                         <td>FPS</td>
-                        <td>${vote.recommendation_fps}</td>
+                        <td>${vote.get_recommendation('fps')}</td>
                         <td>${layout.format_number(vote.national_council_share_fps, 1)}%</td>
                     </tr>
                     <tr tal:condition="vote.national_council_share_glp">
                         <td>GLP</td>
-                        <td>${vote.recommendation_glp}</td>
+                        <td>${vote.get_recommendation('glp')}</td>
                         <td>${layout.format_number(vote.national_council_share_glp, 1)}%</td>
                     </tr>
                     <tr tal:condition="vote.national_council_share_gps">
                         <td>GPS</td>
-                        <td>${vote.recommendation_gps}</td>
+                        <td>${vote.get_recommendation('gps')}</td>
                         <td>${layout.format_number(vote.national_council_share_gps, 1)}%</td>
                     </tr>
                     <tr tal:condition="vote.national_council_share_kvp">
                         <td>KVP</td>
-                        <td>${vote.recommendation_kvp}</td>
+                        <td>${vote.get_recommendation('kvp')}</td>
                         <td>${layout.format_number(vote.national_council_share_kvp, 1)}%</td>
                     </tr>
                     <tr tal:condition="vote.national_council_share_ldu">
                         <td>LDU</td>
-                        <td>${vote.recommendation_ldu}</td>
+                        <td>${vote.get_recommendation('ldu')}</td>
                         <td>${layout.format_number(vote.national_council_share_ldu, 1)}%</td>
                     </tr>
                     <tr tal:condition="vote.national_council_share_lega">
                         <td>Lega</td>
-                        <td>${vote.recommendation_lega}</td>
+                        <td>${vote.get_recommendation('lega')}</td>
                         <td>${layout.format_number(vote.national_council_share_lega, 1)}%</td>
                     </tr>
                     <tr tal:condition="vote.national_council_share_lps">
                         <td>LPS</td>
-                        <td>${vote.recommendation_lps}</td>
+                        <td>${vote.get_recommendation('lps')}</td>
                         <td>${layout.format_number(vote.national_council_share_lps, 1)}%</td>
                     </tr>
                     <tr tal:condition="vote.national_council_share_mcg">
                         <td>MCG</td>
-                        <td>${vote.recommendation_mcg}</td>
+                        <td>${vote.get_recommendation('mcg')}</td>
                         <td>${layout.format_number(vote.national_council_share_mcg, 1)}%</td>
                     </tr>
                     <tr tal:condition="vote.national_council_share_pda">
                         <td>PDA</td>
-                        <td>${vote.recommendation_pda}</td>
+                        <td>${vote.get_recommendation('pda')}</td>
                         <td>${layout.format_number(vote.national_council_share_pda, 1)}%</td>
                     </tr>
                     <tr tal:condition="vote.national_council_share_poch">
                         <td>POCH</td>
-                        <td>${vote.recommendation_poch}</td>
+                        <td>${vote.get_recommendation('poch')}</td>
                         <td>${layout.format_number(vote.national_council_share_poch, 1)}%</td>
                     </tr>
                     <tr tal:condition="vote.national_council_share_rep">
                         <td>REP</td>
-                        <td>${vote.recommendation_rep}</td>
+                        <td>${vote.get_recommendation('rep')}</td>
                         <td>${layout.format_number(vote.national_council_share_rep, 1)}%</td>
                     </tr>
                     <tr tal:condition="vote.national_council_share_sd">
                         <td>SD</td>
-                        <td>${vote.recommendation_sd}</td>
+                        <td>${vote.get_recommendation('sd')}</td>
                         <td>${layout.format_number(vote.national_council_share_sd, 1)}%</td>
                     </tr>
                     <tr tal:condition="vote.national_council_share_sp">
                         <td>SP</td>
-                        <td>${vote.recommendation_sps}</td>
+                        <td>${vote.get_recommendation('sps')}</td>
                         <td>${layout.format_number(vote.national_council_share_sp, 1)}%</td>
                     </tr>
                     <tr tal:condition="vote.national_council_share_svp">
                         <td>SVP</td>
-                        <td>${vote.recommendation_svp}</td>
+                        <td>${vote.get_recommendation('svp')}</td>
                         <td>${layout.format_number(vote.national_council_share_svp, 1)}%</td>
                     </tr>
                     <tr tal:condition="vote.national_council_share_ubrige">

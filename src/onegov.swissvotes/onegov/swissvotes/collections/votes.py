@@ -1,12 +1,13 @@
 from cached_property import cached_property
 from csv import writer
+from datetime import date
 from decimal import Decimal
 from decimal import InvalidOperation
 from onegov.core.collection import Pagination
-from onegov.swissvotes.fields.dataset import COLUMNS
+from onegov.swissvotes.models import ColumnMapper
 from onegov.swissvotes.models import PolicyArea
 from onegov.swissvotes.models import SwissVote
-from onegov.swissvotes.utils import get_table_column
+from psycopg2.extras import NumericRange
 from sqlalchemy import func
 from sqlalchemy import or_
 from sqlalchemy.orm import undefer_group
@@ -436,14 +437,14 @@ class SwissVoteCollection(Pagination):
         updated = 0
         query = self.session.query(SwissVote).options(undefer_group("dataset"))
         existing = {vote.bfs_number: vote for vote in query}
+        mapper = ColumnMapper()
         for vote in votes:
             old = existing.get(vote.bfs_number)
             if old:
                 changed = False
-                for attribute in COLUMNS.keys():
-                    value = getattr(vote, attribute)
-                    if getattr(old, attribute) != value:
-                        setattr(old, attribute, value)
+                for attribute, value in mapper.get_items(vote):
+                    if mapper.get_value(old, attribute) != value:
+                        mapper.set_value(old, attribute, value)
                         changed = True
 
                 if changed:
@@ -461,29 +462,28 @@ class SwissVoteCollection(Pagination):
 
     def export_csv(self, file):
         """ Exports all votes according to the code book. """
+        mapper = ColumnMapper()
 
         csv = writer(file)
-        csv.writerow(COLUMNS.values())
+        csv.writerow(mapper.columns.values())
 
         query = self.query().options(undefer_group("dataset"))
         query = query.order_by(None).order_by(SwissVote.bfs_number)
 
         for vote in query:
             row = []
-            for attribute in COLUMNS.keys():
-                type_ = str(get_table_column(vote, attribute).type)
-                value = getattr(vote, attribute)
+            for value in mapper.get_values(vote):
                 if value is None:
                     row.append('.')
-                elif type_ == 'TEXT':
+                elif isinstance(value, str):
                     row.append(value)
-                elif type_ == 'DATE':
+                elif isinstance(value, date):
                     row.append(f'{value:%d.%m.%Y}')
-                elif type_ == 'INTEGER':
+                elif isinstance(value, int):
                     row.append(str(value))
-                elif type_ == 'INT4RANGE':
+                elif isinstance(value, NumericRange):
                     row.append(f'{value.lower}-{value.upper}')
-                elif type_.startswith('NUMERIC'):
+                elif isinstance(value, Decimal):
                     row.append(
                         f'{value:f}'.replace('.', ',').rstrip('0').rstrip(',')
                     )
@@ -491,10 +491,11 @@ class SwissVoteCollection(Pagination):
 
     def export_xlsx(self, file):
         """ Exports all votes according to the code book. """
+        mapper = ColumnMapper()
 
         workbook = Workbook(file, {'default_date_format': 'dd.mm.yyyy'})
         worksheet = workbook.add_worksheet()
-        worksheet.write_row(0, 0, COLUMNS.values())
+        worksheet.write_row(0, 0, mapper.columns.values())
 
         query = self.query().options(undefer_group("dataset"))
         query = query.order_by(None).order_by(SwissVote.bfs_number)
@@ -502,18 +503,16 @@ class SwissVoteCollection(Pagination):
         row = 0
         for vote in query:
             row += 1
-            for column_, attribute in enumerate(COLUMNS.keys()):
-                value = getattr(vote, attribute)
-                type_ = str(get_table_column(vote, attribute).type)
+            for column_, value in enumerate(mapper.get_values(vote)):
                 if value is None:
                     pass
-                elif type_ == 'TEXT':
+                elif isinstance(value, str):
                     worksheet.write_string(row, column_, value)
-                elif type_ == 'DATE':
+                elif isinstance(value, date):
                     worksheet.write_datetime(row, column_, value)
-                elif type_ == 'INTEGER' or type_.startswith('NUMERIC'):
+                elif isinstance(value, int) or isinstance(value, Decimal):
                     worksheet.write_number(row, column_, value)
-                elif type_ == 'INT4RANGE':
+                elif isinstance(value, NumericRange):
                     worksheet.write_string(
                         row, column_, f'{value.lower}-{value.upper}'
                     )

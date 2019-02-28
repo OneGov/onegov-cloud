@@ -4,11 +4,11 @@ from decimal import Decimal
 from io import BytesIO
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.collections import TranslatablePageCollection
-from onegov.swissvotes.fields.dataset import COLUMNS
 from onegov.swissvotes.forms import AttachmentsForm
 from onegov.swissvotes.forms import PageForm
 from onegov.swissvotes.forms import SearchForm
 from onegov.swissvotes.forms import UpdateDatasetForm
+from onegov.swissvotes.models import ColumnMapper
 from onegov.swissvotes.models import TranslatablePage
 from psycopg2.extras import NumericRange
 from xlsxwriter.workbook import Workbook
@@ -435,7 +435,7 @@ def test_update_dataset_form(session):
     file = BytesIO()
     workbook = Workbook(file)
     worksheet = workbook.add_worksheet()
-    worksheet.write_row(0, 0, COLUMNS.values())
+    worksheet.write_row(0, 0, ColumnMapper().columns.values())
     worksheet.write_row(1, 0, [
         100.1,  # anr / NUMERIC
         '1.2.2008',  # datum / DATE
