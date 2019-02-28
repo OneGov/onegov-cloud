@@ -68,6 +68,7 @@ setup(
         'rjsmin',
         'sedate',
         'translationstring',
+        'tqdm',
         'webtest',
     ],
     extras_require=dict(

@@ -30,6 +30,7 @@ from purl import URL
 from sedate import replace_timezone, utcnow
 from sqlalchemy import create_engine, event, text
 from sqlalchemy.orm import Session
+from tqdm import tqdm
 from uuid import UUID, uuid4
 
 
@@ -434,6 +435,9 @@ def import_reservations(dsn, map):
     Pending reservations are ignored. The expectation is that the old system
     is stopped, then migrated, then never started again.
 
+    Also note that search reindexing is disabled during import. A manual
+    reindex is necessary afterwards.
+
     Example:
 
     onegov-org --select '/orgs/govikon' import-reservations\
@@ -450,7 +454,7 @@ def import_reservations(dsn, map):
 
     """
 
-    # establish the connection and ensure it cannot be written to
+    print(f"Connecting to remote")
     engine = create_engine(dsn).connect()
 
     @event.listens_for(engine, 'begin')
@@ -488,14 +492,29 @@ def import_reservations(dsn, map):
         def new_uuid(self):
             return self.resource.id
 
-    # read mapping
-    records = CSVFile(open(map, 'rb'), ('Old URL', 'New URL', 'Type')).lines
+    # run the given query returning the query and a count (if possible)
+    def select_with_count(session, query, **params):
+        query = query.strip(' \n')
+        assert query.startswith("SELECT *")
 
-    # XXX limit for testing
-    records = list(records)[:1]
+        count = text(
+            query
+            .replace("SELECT *", "SELECT COUNT(*)", 1)
+            .split('ORDER BY')[0]
+        )
+        count = session.execute(count, params).scalar()
+
+        return count, session.execute(text(query), params)
+
+    print(f"Reading map")
+    records = CSVFile(open(map, 'rb'), ('Old URL', 'New URL', 'Type')).lines
+    records = tuple(records)
 
     # generate forms from the form-data found in the external system
     def get_form_class_and_data(data):
+
+        if not data:
+            return ReservationForm, {}
 
         def exclude(value):
             return as_internal_id(value['desc']) == 'email'
@@ -520,25 +539,47 @@ def import_reservations(dsn, map):
                     if id == 'email':
                         continue
 
-                    fields.append(f"{label} = ___")
-                    values[id] = v['value']
+                    if isinstance(v['value'], bool):
+                        fields.append(f"{label} = ___")
+                        values[id] = v['value'] and "Ja" or "Nein"
+                    elif isinstance(v['value'], str):
+                        fields.append(f"{label} = ___")
+                        values[id] = v['value']
+                    elif isinstance(v['value'], datetime):
+                        fields.append(f"{label} = YYYY.MM.DD HH:MM")
+                        values[id] = v['value']
+                    elif isinstance(v['value'], date):
+                        fields.append(f"{label} = YYYY.MM.DD")
+                        values[id] = v['value']
+                    elif isinstance(v['value'], int):
+                        fields.append(f"{label} = ___")
+                        values[id] = str(v['value'])
+                    else:
+                        raise NotImplementedError((
+                            f"No conversion for {v['value']} "
+                            f" ({type(v['value'])}"
+                        ))
 
             return '\n'.join(fields), values
 
         formcode, formdata = separate_code_from_data(data)
-
         return generate_form_class(formcode), formdata
 
     def handle_import(request, app):
         session = app.session()
 
+        # disable search indexing during import
+        if hasattr(app, 'es_orm_events'):
+            app.es_orm_events.stopped = True
+
         # map the old UUIDs to the resources
+        print("Mapping resources")
         mapping = {m.old_uuid: m for m in (
             Mapping(request.app.libres_context, r.old_url, r.new_url, r.type)
-            for r in records
+            for r in tqdm(records, unit=' resources')
         )}
 
-        # remove existing records
+        print("Clearing existing submissions")
         session.execute(text("""
             DELETE FROM submissions
              WHERE submissions.meta->>'origin' IN :resources
@@ -546,7 +587,7 @@ def import_reservations(dsn, map):
             'resources': tuple(m.old_uuid.hex for m in mapping.values())
         })
 
-        # XXX delete associated chat messages
+        print("Clearing existing ticket messages")
         session.execute(text("""
             DELETE from messages
              WHERE channel_id IN (
@@ -558,6 +599,7 @@ def import_reservations(dsn, map):
             'resources': tuple(m.old_uuid.hex for m in mapping.values())
         })
 
+        print("Clearing existing tickets")
         session.execute(text("""
             DELETE FROM tickets
              WHERE tickets.handler_data->>'origin' IN :resources
@@ -578,6 +620,7 @@ def import_reservations(dsn, map):
         }))
 
         if payment_ids:
+            print("Clearing existing payments")
             session.execute(text("""
                 DELETE FROM payments_for_reservations_payment
                 WHERE payment_id IN :payments
@@ -592,17 +635,41 @@ def import_reservations(dsn, map):
                 'payments': payment_ids
             })
 
-        for m in mapping.values():
-            m.resource.scheduler.extinguish_managed_records()
+        print("Clearing existing reservations")
+        session.execute(text("""
+            DELETE FROM reservations
+            WHERE resource IN :resources
+        """), {
+            'resources': tuple(m.resource.id for m in mapping.values())
+        })
 
-        # fetch the migrations that should be migrated
-        rows = remote.execute(text("""
+        print("Clearing existing reserved slots")
+        session.execute(text("""
+            DELETE FROM reserved_slots
+             WHERE allocation_id IN (
+                SELECT id FROM allocations
+                 WHERE allocations.mirror_of IN :resources
+             )
+        """), {
+            'resources': tuple(m.resource.id for m in mapping.values())
+        })
+
+        print("Clearing existing allocations")
+        session.execute(text("""
+            DELETE FROM allocations
+             WHERE allocations.mirror_of IN :resources
+        """), {
+            'resources': tuple(m.resource.id for m in mapping.values())
+        })
+
+        session.flush()
+
+        print("Fetching remote allocations")
+        count, rows = select_with_count(remote, """
             SELECT * FROM allocations
             WHERE mirror_of IN :resources
             ORDER BY allocations.resource
-        """), {
-            'resources': tuple(mapping.keys())
-        })
+        """, resources=tuple(mapping.keys()))
 
         # we use a separate id space, so we need to keep track
         allocation_ids = {}
@@ -615,7 +682,8 @@ def import_reservations(dsn, map):
             return mapping[row['resource']].new_uuid
 
         # create the new allocations
-        for row in rows:
+        print("Writing allocations")
+        for row in tqdm(rows, unit=' allocations', total=count):
             resource_type = mapping[row['mirror_of']].type
 
             if row['partly_available'] and resource_type != 'room':
@@ -657,16 +725,15 @@ def import_reservations(dsn, map):
             allocation_ids[row['id']] = allocation.id
 
         # fetch the reserved slots that should be migrated
-        rows = remote.execute(text("""
+        count, rows = select_with_count(remote, """
             SELECT * FROM reserved_slots WHERE allocation_id IN (
                 SELECT id FROM allocations WHERE mirror_of IN :resources
             )
-        """), {
-            'resources': tuple(mapping.keys())
-        })
+        """, resources=tuple(mapping.keys()))
 
         # create the reserved slots with the mapped values
-        for row in rows:
+        print("Writing reserved slots")
+        for row in tqdm(rows, unit=" slots", total=count):
             session.add(ReservedSlot(
                 resource=mapping[row['resource']].new_uuid,
                 start=replace_timezone(row['start'], 'Europe/Zurich'),
@@ -678,14 +745,12 @@ def import_reservations(dsn, map):
         session.flush()
 
         # fetch the reservations that should be migrated
-        rows = remote.execute(text("""
+        count, rows = select_with_count(remote, """
             SELECT * FROM reservations
             WHERE resource IN :resources
               AND status = 'approved'
             ORDER BY resource
-        """), {
-            'resources': tuple(mapping.keys())
-        })
+        """, resources=tuple(mapping.keys()))
 
         def targeted_allocations(group):
             return session.query(Allocation).filter_by(group=group)
@@ -693,7 +758,9 @@ def import_reservations(dsn, map):
         # keep track of custom reservation data, for the creation of tickets
         reservation_data = {}
 
-        for row in rows:
+        print("Writing reservations")
+        for row in tqdm(rows, unit=' reservations', total=count):
+
             reservation_data[row['token']] = {
                 'data': json.loads(row['data']),
                 'email': row['email'],
@@ -755,23 +822,26 @@ def import_reservations(dsn, map):
             .filter_by(role='admin')\
             .order_by(User.created).first()
 
-        for token, data in reservation_data.items():
+        print("Writing tickets")
+        for token, data in tqdm(reservation_data.items(), unit=" tickets"):
             form_class, form_data = get_form_class_and_data(data['data'])
-            form_data['email'] = data['email']
-            form = form_class(data=form_data)
 
-            # wtforms requires raw_data for some validators
-            for key, value in form_data.items():
-                getattr(form, key).raw_data = [value]
+            if form_data:
+                form_data['email'] = data['email']
+                form = form_class(data=form_data)
 
-            submission = forms.submissions.add_external(
-                form=form,
-                state='complete',
-                id=token
-            )
+                # wtforms requires raw_data for some validators
+                for key, value in form_data.items():
+                    getattr(form, key).raw_data = [value]
 
-            submission.meta['migrated'] = True
-            submission.meta['origin'] = data['origin'].hex
+                submission = forms.submissions.add_external(
+                    form=form,
+                    state='complete',
+                    id=token
+                )
+
+                submission.meta['migrated'] = True
+                submission.meta['origin'] = data['origin'].hex
 
             with session.no_autoflush:
                 ticket = tickets.open_ticket(
@@ -788,19 +858,9 @@ def import_reservations(dsn, map):
                 ticket.created = data['created']
                 ticket.modified = data['modified']
 
-                TicketNote.create(ticket, request, "\n".join((
-                    f"Migriert von {data['origin_url']}",
-                )), owner=user.username)
+                TicketNote.create(ticket, request, (
+                    f"Migriert von {data['origin_url']}"
+                    f"/reservations?token={token}",
+                ), owner=user.username)
 
-    def post_mortem(request, app):
-        # XXX remove
-        try:
-            return handle_import(request, app)
-        except Exception:
-            import traceback
-            traceback.print_exc()
-
-            import pdb
-            pdb.post_mortem()
-
-    return post_mortem
+    return handle_import
