@@ -37,11 +37,11 @@ def test_actor():
 
     actor = Actor('xxx')
     assert actor.name == 'xxx'
-    assert actor.abbreviation == 'XXX'
+    assert actor.abbreviation == 'xxx'
     assert not isinstance(actor.abbreviation, TranslationString)
-    assert actor.label == 'XXX'
+    assert actor.label == 'xxx'
     assert not isinstance(actor.label, TranslationString)
-    assert actor.html(DummyRequest()) == '<span title="XXX">XXX</span>'
+    assert actor.html(DummyRequest()) == '<span title="xxx">xxx</span>'
 
     assert Actor('csp') == Actor('csp')
     assert Actor('csp') != Actor('xxx')
@@ -585,6 +585,9 @@ def test_vote(session):
         'vcs': 1,
         'voev': 1
     }
+    vote.recommendations_other_yes = "Pro Velo"
+    vote.recommendations_other_no = None
+    vote.recommendations_other_free = "Pro Natura, Greenpeace"
     vote.national_council_election_year = 1990
     vote.national_council_share_fdp = Decimal('01.10')
     vote.national_council_share_cvp = Decimal('02.10')
@@ -979,6 +982,9 @@ def test_vote(session):
         'vcs': 1,
         'voev': 1
     }
+    assert vote.recommendations_other_yes == "Pro Velo"
+    assert vote.recommendations_other_no is None
+    assert vote.recommendations_other_free == "Pro Natura, Greenpeace"
     assert vote.national_council_election_year == 1990
     assert vote.national_council_share_fdp == Decimal('01.10')
     assert vote.national_council_share_cvp == Decimal('02.10')
@@ -1078,7 +1084,7 @@ def test_vote(session):
     ]
 
     assert list(vote.recommendations_associations.keys()) == [
-        'Yea', 'Nay', 'None'
+        'Yea', 'Nay', 'None', 'Free vote'
     ]
     assert vote.recommendations_associations['Yea'] == [
         Actor('acs'),
@@ -1100,6 +1106,7 @@ def test_vote(session):
         Actor('vdk'),
         Actor('voev'),
         Actor('vpod'),
+        Actor('Pro Velo')
     ]
     assert vote.recommendations_associations['Nay'] == [Actor('eco')]
     assert vote.recommendations_associations['None'] == [
@@ -1108,7 +1115,10 @@ def test_vote(session):
         Actor('sgv'),
         Actor('travs'),
     ]
-
+    assert vote.recommendations_associations['Free vote'] == [
+        Actor('Pro Natura'),
+        Actor('Greenpeace'),
+    ]
     assert vote.has_national_council_share_data is True
 
 

@@ -243,3 +243,11 @@ def rename_sbv_usp_column(context):
         if 'sbv_usp' in vote.recommendations:
             vote.recommendations['sbv-usp'] = vote.recommendations['sbv_usp']
             del vote.recommendations['sbv_usp']
+
+
+@upgrade_task('Add other recommendation columns')
+def add_other_recommendation_columns(context):
+    for name in ('yes', 'no', 'free'):
+        column = f'recommendations_other_{name}'
+        if not context.has_column('swissvotes', column):
+            context.operations.add_column('swissvotes', Column(column, Text))

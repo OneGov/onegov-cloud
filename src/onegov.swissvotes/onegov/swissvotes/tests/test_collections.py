@@ -1038,6 +1038,9 @@ def test_votes_export(session):
     vote.recommendations['tcs'] = 9999
     vote.recommendations['vcs'] = 9999
     vote.recommendations['voev'] = 9999
+    vote.recommendations_other_yes = "Pro Velo"
+    vote.recommendations_other_no = "Biosuisse"
+    vote.recommendations_other_free = "Pro Natura, Greenpeace"
     vote.national_council_election_year = 1990
     vote.national_council_share_fdp = Decimal('01.10')
     vote.national_council_share_cvp = Decimal('02.10')
@@ -1381,6 +1384,9 @@ def test_votes_export(session):
         'p-tcs': '9999',
         'p-vcs': '9999',
         'p-voev': '9999',
+        'p-others_yes': 'Pro Velo',
+        'p-others_no': 'Biosuisse',
+        'p-others_free': 'Pro Natura, Greenpeace',
         'nr-wahl': '1990',
         'w-fdp': '1,1',
         'w-cvp': '2,1',
@@ -1737,6 +1743,9 @@ def test_votes_export(session):
         'p-tcs': 9999.0,
         'p-vcs': 9999.0,
         'p-voev': 9999.0,
+        'p-others_yes': 'Pro Velo',
+        'p-others_no': 'Biosuisse',
+        'p-others_free': 'Pro Natura, Greenpeace',
         'nr-wahl': 1990.0,
         'w-fdp': 1.1,
         'w-cvp': 2.1,

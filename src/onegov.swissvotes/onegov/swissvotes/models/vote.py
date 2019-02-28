@@ -511,6 +511,9 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
 
     # Voting recommendations
     recommendations = Column(JSON, nullable=False, default=dict)
+    recommendations_other_yes = Column(Text)
+    recommendations_other_no = Column(Text)
+    recommendations_other_free = Column(Text)
 
     def get_recommendation(self, name):
         recommendations = self.recommendations or {}
@@ -538,11 +541,22 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
 
     @cached_property
     def recommendations_associations(self):
+        def as_list(value, code):
+            return [
+                (Actor(name.strip()), code)
+                for name in (value or '').split(',')
+                if name.strip()
+            ]
+
         recommendations = self.recommendations or {}
-        return self.group_recommendations((
+        recommendations = [
             (Actor(name), recommendations.get(name))
             for name in Actor('').associations
-        ))
+        ]
+        recommendations.extend(as_list(self.recommendations_other_yes, 1))
+        recommendations.extend(as_list(self.recommendations_other_no, 2))
+        recommendations.extend(as_list(self.recommendations_other_free, 5))
+        return self.group_recommendations(recommendations)
 
     # Electoral strength
     national_council_election_year = Column(Integer)

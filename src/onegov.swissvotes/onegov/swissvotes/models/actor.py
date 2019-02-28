@@ -104,7 +104,7 @@ class Actor(object):
             'voev': _("actor-voev-abbreviation"),
             'vpod': _("actor-vpod-abbreviation"),
             'vsa': _("actor-vsa-abbreviation"),
-        }.get(self.name, self.name.upper())
+        }.get(self.name, self.name)
 
     @cached_property
     def label(self):
@@ -183,7 +183,7 @@ class Actor(object):
             'voev': _("actor-voev-label"),
             'vpod': _("actor-vpod-label"),
             'vsa': _("actor-vsa-label"),
-        }.get(self.name, self.name.upper())
+        }.get(self.name, self.name)
 
     def html(self, request):
         return '<span title="{}">{}</span>'.format(

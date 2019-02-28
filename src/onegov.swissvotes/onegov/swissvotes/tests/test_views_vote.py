@@ -93,6 +93,9 @@ def test_view_vote(swissvotes_app):
                 'travs': 3,
                 'vsa': 9999,
             },
+            recommendations_other_yes="Pro Velo",
+            recommendations_other_no=None,
+            recommendations_other_free="Pro Natura, Greenpeace",
             national_council_election_year=1990,
             national_council_share_fdp=Decimal('01.10'),
             national_council_share_cvp=Decimal('02.10'),
@@ -174,6 +177,9 @@ def test_view_vote(swissvotes_app):
     assert "SGB" in page
     assert "SGV" in page
     assert "TravS" in page
+    assert "Pro Velo" in page
+    assert "Pro Natura" in page
+    assert "Greenpeace" in page
     assert "22.2%" in page
     assert "Details" in page
     assert "Angenommen" in page
