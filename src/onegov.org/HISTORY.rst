@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.1.5 (2019-02-28)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a migration script for legacy seantis.reservation instances.
   [href]
 
