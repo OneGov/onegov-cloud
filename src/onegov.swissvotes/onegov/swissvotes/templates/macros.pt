@@ -157,12 +157,12 @@
                     <tal:block condition="field.type == 'BooleanField'">
                         ${field(placeholder=request.translate(field.description))}
                         <span class="label-text">${field.label.text}</span>
-                        <span tal:condition="field.description|nothing" data-tooltip aria-haspopup="true" class="has-tip" i18n:attributes="title" title="${field.description}"><i class="fa fa-info" aria-hidden="true"></i></span>
+                        <span tal:condition="field.description|nothing" data-tooltip aria-haspopup="true" class="has-tip" title="${field.description}"><i class="fa fa-info" aria-hidden="true"></i></span>
                         <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
                     </tal:block>
                     <tal:block condition="field.type != 'BooleanField'">
                         <span class="label-text">${field.label.text}</span>
-                        <span tal:condition="field.description|nothing" data-tooltip aria-haspopup="true" class="has-tip" i18n:attributes="title" title="${field.description}"><i class="fa fa-info" aria-hidden="true"></i></span>
+                        <span tal:condition="field.description|nothing" data-tooltip aria-haspopup="true" class="has-tip" title="${field.description}"><i class="fa fa-info" aria-hidden="true"></i></span>
                         <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
                         ${field(placeholder=request.translate(field.description))}
                     </tal:block>

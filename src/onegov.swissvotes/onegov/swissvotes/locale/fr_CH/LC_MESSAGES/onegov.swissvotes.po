@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-27 10:23+0100\n"
+"POT-Creation-Date: 2019-02-28 12:57+0100\n"
 "PO-Revision-Date: 2018-09-18 11:29+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -66,6 +66,11 @@ msgid "Text Search"
 msgstr ""
 
 msgid "Full Text"
+msgstr ""
+
+msgid ""
+"Searches all text fields and attachments. Select «No» to limit the search to "
+"title, keyword, vote number, and procedure number."
 msgstr ""
 
 msgid "Position of the Federal Council"
@@ -813,8 +818,14 @@ msgstr "GSsA"
 msgid "actor-hev-abbreviation"
 msgstr "HEV"
 
+msgid "actor-jbdp-abbreviation"
+msgstr ""
+
 msgid "actor-jcvp-abbreviation"
 msgstr "JDC"
+
+msgid "actor-jevp-abbreviation"
+msgstr ""
 
 msgid "actor-jfdp-abbreviation"
 msgstr "JR"
@@ -829,6 +840,12 @@ msgid "actor-jlps-abbreviation"
 msgstr "JL"
 
 msgid "actor-jna-abbreviation"
+msgstr "JDS"
+
+msgid "actor-jpda-abbreviation"
+msgstr ""
+
+msgid "actor-jsd-abbreviation"
 msgstr "JDS"
 
 msgid "actor-jsvp-abbreviation"
@@ -1039,8 +1056,14 @@ msgstr "Groupe pour une Suisse sans armée"
 msgid "actor-hev-label"
 msgstr "Hauseigentümerverband"
 
+msgid "actor-jbdp-label"
+msgstr ""
+
 msgid "actor-jcvp-label"
 msgstr "Jeunes démocrates-chrétiens suisses"
+
+msgid "actor-jevp-label"
+msgstr ""
 
 msgid "actor-jfdp-label"
 msgstr "Jeunesse radical"
@@ -1055,6 +1078,12 @@ msgid "actor-jlps-label"
 msgstr "Junge LPS"
 
 msgid "actor-jna-label"
+msgstr "Jeunes Democrates Suisses"
+
+msgid "actor-jpda-label"
+msgstr ""
+
+msgid "actor-jsd-label"
 msgstr "Jeunes Democrates Suisses"
 
 msgid "actor-jsvp-label"
@@ -1258,6 +1287,15 @@ msgstr "Zoug"
 msgid "canton-zh-label"
 msgstr "Zurich"
 
+msgid "canton-ch-label"
+msgstr ""
+
+msgid "canton-vso-label"
+msgstr ""
+
+msgid "canton-vsr-label"
+msgstr ""
+
 msgid "Add page"
 msgstr ""
 
@@ -1401,6 +1439,9 @@ msgstr ""
 msgid "Details"
 msgstr ""
 
+msgid "Divergent branches"
+msgstr ""
+
 msgid "Further Recommendations"
 msgstr ""
 
@@ -1464,11 +1505,6 @@ msgid "Logout"
 msgstr "Se déconnecter"
 
 msgid "Filter"
-msgstr ""
-
-msgid ""
-"Searches all text fields and attachments. Select «No» to limit the search to "
-"title, keyword, vote number, and procedure number."
 msgstr ""
 
 msgid "Results"

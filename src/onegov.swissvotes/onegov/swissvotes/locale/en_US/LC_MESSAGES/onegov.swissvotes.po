@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-02-27 10:23+0100\n"
+"POT-Creation-Date: 2019-02-28 12:57+0100\n"
 "PO-Revision-Date: 2018-09-18 15:04+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: English\n"
@@ -68,6 +68,11 @@ msgid "Text Search"
 msgstr ""
 
 msgid "Full Text"
+msgstr ""
+
+msgid ""
+"Searches all text fields and attachments. Select «No» to limit the search to "
+"title, keyword, vote number, and procedure number."
 msgstr ""
 
 msgid "Position of the Federal Council"
@@ -812,8 +817,14 @@ msgstr "actor-gsoa-abbreviation"
 msgid "actor-hev-abbreviation"
 msgstr "actor-hev-abbreviation"
 
+msgid "actor-jbdp-abbreviation"
+msgstr ""
+
 msgid "actor-jcvp-abbreviation"
 msgstr "actor-jcvp-abbreviation"
+
+msgid "actor-jevp-abbreviation"
+msgstr ""
 
 msgid "actor-jfdp-abbreviation"
 msgstr "actor-jfdp-abbreviation"
@@ -829,6 +840,12 @@ msgstr "actor-jlps-abbreviation"
 
 msgid "actor-jna-abbreviation"
 msgstr "actor-jna-abbreviation"
+
+msgid "actor-jpda-abbreviation"
+msgstr ""
+
+msgid "actor-jsd-abbreviation"
+msgstr ""
 
 msgid "actor-jsvp-abbreviation"
 msgstr "actor-jsvp-abbreviation"
@@ -1034,8 +1051,14 @@ msgstr "actor-gsoa-label"
 msgid "actor-hev-label"
 msgstr "actor-hev-label"
 
+msgid "actor-jbdp-label"
+msgstr ""
+
 msgid "actor-jcvp-label"
 msgstr "actor-jcvp-label"
+
+msgid "actor-jevp-label"
+msgstr ""
 
 msgid "actor-jfdp-label"
 msgstr "actor-jfdp-label"
@@ -1051,6 +1074,12 @@ msgstr "actor-jlps-label"
 
 msgid "actor-jna-label"
 msgstr "actor-jna-label"
+
+msgid "actor-jpda-label"
+msgstr ""
+
+msgid "actor-jsd-label"
+msgstr ""
 
 msgid "actor-jsvp-label"
 msgstr "actor-jsvp-label"
@@ -1253,6 +1282,15 @@ msgstr ""
 msgid "canton-zh-label"
 msgstr ""
 
+msgid "canton-ch-label"
+msgstr ""
+
+msgid "canton-vso-label"
+msgstr ""
+
+msgid "canton-vsr-label"
+msgstr ""
+
 msgid "Add page"
 msgstr ""
 
@@ -1394,6 +1432,9 @@ msgstr ""
 msgid "Details"
 msgstr "Details"
 
+msgid "Divergent branches"
+msgstr ""
+
 msgid "Further Recommendations"
 msgstr ""
 
@@ -1456,11 +1497,6 @@ msgstr "Logout"
 
 msgid "Filter"
 msgstr "Filter"
-
-msgid ""
-"Searches all text fields and attachments. Select «No» to limit the search to "
-"title, keyword, vote number, and procedure number."
-msgstr ""
 
 msgid "Results"
 msgstr "Results"

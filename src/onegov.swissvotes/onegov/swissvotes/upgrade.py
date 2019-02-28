@@ -251,3 +251,12 @@ def add_other_recommendation_columns(context):
         column = f'recommendations_other_{name}'
         if not context.has_column('swissvotes', column):
             context.operations.add_column('swissvotes', Column(column, Text))
+
+
+@upgrade_task('Add divergent recommendations column')
+def add_divergent_recommendations_column(context):
+    if not context.has_column('swissvotes', 'recommendations_divergent'):
+        context.operations.add_column(
+            'swissvotes',
+            Column('recommendations_divergent', JSON())
+        )

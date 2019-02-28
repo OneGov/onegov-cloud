@@ -4,11 +4,11 @@ from onegov.swissvotes import _
 class Canton(object):
     """ A helper class to translate cantons. """
 
-    def __init__(self, abbreviation):
-        self.abbreviation = abbreviation
+    def __init__(self, name):
+        self.name = name
 
     def __eq__(self, other):
-        return self.abbreviation == other.abbreviation
+        return self.name == other.name
 
     @staticmethod
     def abbreviations():
@@ -17,6 +17,40 @@ class Canton(object):
             'lu', 'ne', 'nw', 'ow', 'sg', 'sh', 'so', 'sz', 'tg', 'ti', 'ur',
             'vd', 'vs', 'zg', 'zh'
         )
+
+    @property
+    def abbreviation(self):
+        return {
+            'ag': 'AG',
+            'ai': 'AI',
+            'ar': 'AR',
+            'be': 'BE',
+            'bl': 'BL',
+            'bs': 'BS',
+            'fr': 'FR',
+            'ge': 'GE',
+            'gl': 'GL',
+            'gr': 'GR',
+            'ju': 'JU',
+            'lu': 'LU',
+            'ne': 'NE',
+            'nw': 'NW',
+            'ow': 'OW',
+            'sg': 'SG',
+            'sh': 'SH',
+            'so': 'SO',
+            'sz': 'SZ',
+            'tg': 'TG',
+            'ti': 'TI',
+            'ur': 'UR',
+            'vd': 'VD',
+            'vs': 'VS',
+            'zg': 'ZG',
+            'zh': 'ZH',
+            'ch': 'CH',
+            'vso': 'VSo',
+            'vsr': 'VSr',
+        }.get(self.name, self.name)
 
     @property
     def label(self):
@@ -47,10 +81,13 @@ class Canton(object):
             'vs': _("canton-vs-label"),
             'zg': _("canton-zg-label"),
             'zh': _("canton-zh-label"),
-        }.get(self.abbreviation, self.abbreviation.upper())
+            'ch': _("canton-ch-label"),
+            'vso': _("canton-vso-label"),
+            'vsr': _("canton-vsr-label"),
+        }.get(self.name, self.name)
 
     def html(self, request):
         return '<span title="{}">{}</span>'.format(
             request.translate(self.label),
-            request.translate(self.abbreviation.upper())
+            request.translate(self.abbreviation)
         )

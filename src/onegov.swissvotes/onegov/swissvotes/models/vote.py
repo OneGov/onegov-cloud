@@ -514,6 +514,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     recommendations_other_yes = Column(Text)
     recommendations_other_no = Column(Text)
     recommendations_other_free = Column(Text)
+    recommendations_divergent = Column(JSON, nullable=False, default=dict)
 
     def get_recommendation(self, name):
         recommendations = self.recommendations or {}
@@ -537,6 +538,17 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
         return self.group_recommendations((
             (Actor(name), recommendations.get(name))
             for name in Actor('').parties
+        ))
+
+    @cached_property
+    def recommendations_divergent_parties(self):
+        recommendations = self.recommendations_divergent or {}
+        return self.group_recommendations((
+            (
+                (Actor(name.split('_')[0]), Canton(name.split('_')[1])),
+                recommendation,
+            )
+            for name, recommendation in sorted(recommendations.items())
         ))
 
     @cached_property

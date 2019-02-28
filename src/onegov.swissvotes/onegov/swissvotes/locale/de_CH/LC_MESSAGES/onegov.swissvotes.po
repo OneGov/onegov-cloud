@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-27 10:23+0100\n"
-"PO-Revision-Date: 2019-02-27 10:23+0100\n"
+"POT-Creation-Date: 2019-02-28 12:57+0100\n"
+"PO-Revision-Date: 2019-02-28 13:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -67,6 +67,13 @@ msgstr "Textsuche"
 
 msgid "Full Text"
 msgstr "Volltext"
+
+msgid ""
+"Searches all text fields and attachments. Select «No» to limit the search to "
+"title, keyword, vote number, and procedure number."
+msgstr ""
+"Sucht in allen Textfeldern und Anhängen. Wählen Sie «Nein», um die Suche auf "
+"Titel, Kurzbezeichnung, Abstimmungs- und Geschäftsnummer zu beschränken."
 
 msgid "Position of the Federal Council"
 msgstr "Position des Bundesrats"
@@ -813,8 +820,14 @@ msgstr "GSoA"
 msgid "actor-hev-abbreviation"
 msgstr "HEV"
 
+msgid "actor-jbdp-abbreviation"
+msgstr "JBDP"
+
 msgid "actor-jcvp-abbreviation"
 msgstr "JCVP"
+
+msgid "actor-jevp-abbreviation"
+msgstr ""
 
 msgid "actor-jfdp-abbreviation"
 msgstr "JFDP"
@@ -830,6 +843,12 @@ msgstr "JLPS"
 
 msgid "actor-jna-abbreviation"
 msgstr "JNA"
+
+msgid "actor-jpda-abbreviation"
+msgstr ""
+
+msgid "actor-jsd-abbreviation"
+msgstr "JSD"
 
 msgid "actor-jsvp-abbreviation"
 msgstr "JSVP"
@@ -1035,8 +1054,14 @@ msgstr "Gruppe für eine Schweiz ohne Armee"
 msgid "actor-hev-label"
 msgstr "Hauseigentümerverband"
 
+msgid "actor-jbdp-label"
+msgstr "Junge BDP"
+
 msgid "actor-jcvp-label"
 msgstr "Junge CVP"
+
+msgid "actor-jevp-label"
+msgstr ""
 
 msgid "actor-jfdp-label"
 msgstr "Junge FDP"
@@ -1052,6 +1077,12 @@ msgstr "Junge LPS"
 
 msgid "actor-jna-label"
 msgstr "Junge NA"
+
+msgid "actor-jpda-label"
+msgstr ""
+
+msgid "actor-jsd-label"
+msgstr "Junge Schweizer Demokraten"
 
 msgid "actor-jsvp-label"
 msgstr "Junge SVP"
@@ -1254,6 +1285,15 @@ msgstr "Zug"
 msgid "canton-zh-label"
 msgstr "Zürich"
 
+msgid "canton-ch-label"
+msgstr "Schweiz"
+
+msgid "canton-vso-label"
+msgstr "Oberwallis"
+
+msgid "canton-vsr-label"
+msgstr "Unterwallis"
+
 msgid "Add page"
 msgstr "Seite hinzufügen"
 
@@ -1396,6 +1436,9 @@ msgstr "Wähleranteil des Ja-Lagers"
 msgid "Details"
 msgstr "Details"
 
+msgid "Divergent branches"
+msgstr "Abweichende Sektionen"
+
 msgid "Further Recommendations"
 msgstr "Weitere Parolen"
 
@@ -1460,13 +1503,6 @@ msgstr "Abmelden"
 
 msgid "Filter"
 msgstr "Filtern"
-
-msgid ""
-"Searches all text fields and attachments. Select «No» to limit the search to "
-"title, keyword, vote number, and procedure number."
-msgstr ""
-"Sucht in allen Textfeldern und Anhängen. Wählen Sie «Nein», um die Suche auf "
-"Titel, Kurzbezeichnung, Abstimmungs- und Geschäftsnummer zu beschränken."
 
 msgid "Results"
 msgstr "Resultate"

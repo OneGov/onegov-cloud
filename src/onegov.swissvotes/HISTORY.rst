@@ -4,6 +4,9 @@ Changelog
 - Adds other recommendations.
   [msom]
 
+- Adds divergent recommendations.
+  [msom]
+
 0.0.39 (2019-02-27)
 ~~~~~~~~~~~~~~~~~~~
 

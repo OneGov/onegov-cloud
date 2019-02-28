@@ -51,7 +51,8 @@ def test_canton():
     assert len(Canton.abbreviations()) == 26
 
     canton = Canton('lu')
-    assert canton.abbreviation == 'lu'
+    assert canton.name == 'lu'
+    assert canton.abbreviation == 'LU'
     assert not isinstance(canton.abbreviation, TranslationString)
     assert canton.label == 'canton-lu-label'
     assert isinstance(canton.label, TranslationString)
@@ -60,11 +61,12 @@ def test_canton():
     )
 
     canton = Canton('xxx')
+    assert canton.name == 'xxx'
     assert canton.abbreviation == 'xxx'
     assert not isinstance(canton.abbreviation, TranslationString)
-    assert canton.label == 'XXX'
+    assert canton.label == 'xxx'
     assert not isinstance(canton.label, TranslationString)
-    assert canton.html(DummyRequest()) == '<span title="XXX">XXX</span>'
+    assert canton.html(DummyRequest()) == '<span title="xxx">xxx</span>'
 
     assert Canton('lu') == Canton('lu')
     assert Canton('lu') != Canton('xxx')
@@ -588,6 +590,12 @@ def test_vote(session):
     vote.recommendations_other_yes = "Pro Velo"
     vote.recommendations_other_no = None
     vote.recommendations_other_free = "Pro Natura, Greenpeace"
+    vote.recommendations_divergent = {
+        'edu_vso': 1,
+        'fdp_ti': 1,
+        'fdp-fr_ch': 2,
+        'jcvp_ch': 2,
+    }
     vote.national_council_election_year = 1990
     vote.national_council_share_fdp = Decimal('01.10')
     vote.national_council_share_cvp = Decimal('02.10')
@@ -985,6 +993,12 @@ def test_vote(session):
     assert vote.recommendations_other_yes == "Pro Velo"
     assert vote.recommendations_other_no is None
     assert vote.recommendations_other_free == "Pro Natura, Greenpeace"
+    assert vote.recommendations_divergent == {
+        'edu_vso': 1,
+        'fdp_ti': 1,
+        'fdp-fr_ch': 2,
+        'jcvp_ch': 2,
+    }
     assert vote.national_council_election_year == 1990
     assert vote.national_council_share_fdp == Decimal('01.10')
     assert vote.national_council_share_cvp == Decimal('02.10')
@@ -1119,6 +1133,19 @@ def test_vote(session):
         Actor('Pro Natura'),
         Actor('Greenpeace'),
     ]
+
+    assert list(vote.recommendations_divergent_parties.keys()) == [
+        'Yea', 'Nay'
+    ]
+    assert vote.recommendations_divergent_parties['Yea'] == [
+        (Actor('edu'), Canton('vso')),
+        (Actor('fdp'), Canton('ti')),
+    ]
+    assert vote.recommendations_divergent_parties['Nay'] == [
+        (Actor('fdp-fr'), Canton('ch')),
+        (Actor('jcvp'), Canton('ch')),
+    ]
+
     assert vote.has_national_council_share_data is True
 
 
