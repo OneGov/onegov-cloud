@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes external links not targeting "_top".
+  [href]
+
 0.3.4 (2019-02-22)
 ~~~~~~~~~~~~~~~~~~~~~
 
