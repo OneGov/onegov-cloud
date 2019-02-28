@@ -607,7 +607,7 @@ def import_reservations(dsn, map):
             'resources': tuple(m.old_uuid.hex for m in mapping.values())
         })
 
-        payment_ids = tuple(session.execute(text("""
+        payment_ids = tuple(r[0] for r in session.execute(text("""
             SELECT payment_id
             FROM payments_for_reservations_payment
             WHERE reservations_id IN (
