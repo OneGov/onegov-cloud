@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes being able to enter empty messages.
+  [href]
+
 1.1.5 (2019-02-28)
 ~~~~~~~~~~~~~~~~~~~
 

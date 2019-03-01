@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-02-18 06:38+0100\n"
+"POT-Creation-Date: 2019-03-01 08:39+0100\n"
 "PO-Revision-Date: 2019-02-18 06:40+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -715,6 +715,9 @@ msgstr "Votre message"
 
 msgid "Notify me about replies"
 msgstr "M'avertir des réponses"
+
+msgid "The message is empty"
+msgstr "Le message est vide"
 
 msgid "E-Mail Address"
 msgstr "Adresse e-mail"

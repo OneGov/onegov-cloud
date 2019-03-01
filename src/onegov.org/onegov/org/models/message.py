@@ -115,7 +115,7 @@ class TicketChatMessage(Message, TicketMessageMixin):
 
     @property
     def formatted_text(self):
-        return paragraphify(linkify(self.text))
+        return self.text and paragraphify(linkify(self.text)) or ''
 
     @property
     def subtype(self):

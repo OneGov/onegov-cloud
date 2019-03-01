@@ -5,7 +5,7 @@ from onegov.form.filters import strip_whitespace
 from onegov.form.validators import FileSizeLimit
 from onegov.org import _
 from wtforms import BooleanField, TextAreaField
-from wtforms import validators
+from wtforms import validators, ValidationError
 
 
 class TicketNoteForm(Form):
@@ -34,6 +34,10 @@ class TicketChatMessageForm(Form):
         validators=[validators.InputRequired()],
         filters=(strip_whitespace, ),
         render_kw={'rows': 5})
+
+    def validate_text(self, field):
+        if not self.text.data or not self.text.data.strip():
+            raise ValidationError(_("The message is empty"))
 
 
 class InternalTicketChatMessageForm(TicketChatMessageForm):
