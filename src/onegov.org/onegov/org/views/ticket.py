@@ -441,7 +441,7 @@ def unmute_ticket(self, request):
 @OrgApp.form(model=Ticket, name='message-to-submitter', permission=Private,
              form=InternalTicketChatMessageForm, template='form.pt')
 def message_to_submitter(self, request, form):
-    recipient = self.handler.email
+    recipient = self.snapshot.get('email') or self.handler.email
 
     if form.submitted(request):
         if self.state == 'closed':

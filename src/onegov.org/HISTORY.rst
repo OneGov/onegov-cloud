@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes being unable to send a message for tickets with deleted records.
+  [href]
+
 - Fixes excel export of resources failing in certain instances.
   [href]
 

@@ -32,7 +32,7 @@
 
                     <div class="ticket-submitter-address">
                         <i class="fa fa-fw fa-envelope-o" aria-hidden="true"></i>
-                        <a tal:define="submitter handler.email|ticket.snapshot.email"
+                        <a tal:define="submitter ticket.snapshot.email|handler.email"
                         href="mailto:${submitter}">${submitter}</a>
                     </div>
 
