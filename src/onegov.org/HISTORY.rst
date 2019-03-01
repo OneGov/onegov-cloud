@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.1.6 (2019-03-01)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes being unable to send a message for tickets with deleted records.
   [href]
 
