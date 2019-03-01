@@ -8,6 +8,9 @@ from dateutil import rrule
 from dateutil.rrule import rrulestr
 from decimal import Decimal
 from onegov.core.crypto import RANDOM_TOKEN_LENGTH
+from onegov.core.custom import json
+from onegov.core.elements import Block, Confirm, Intercooler
+from onegov.core.elements import Link, LinkGroup
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
@@ -33,8 +36,6 @@ from onegov.org.models import ResourceRecipientCollection
 from onegov.org.models import Search
 from onegov.org.models import SiteCollection
 from onegov.org.models.extensions import PersonLinkExtension
-from onegov.core.elements import Block, Confirm, Intercooler
-from onegov.core.elements import Link, LinkGroup
 from onegov.org.theme.org_theme import user_options
 from onegov.pay import PaymentCollection, PaymentProviderCollection
 from onegov.people import PersonCollection
@@ -326,6 +327,8 @@ class Layout(ChameleonLayout):
                     return '\n'.join(formatter(v) for v in value)
                 if isinstance(value, bool):
                     value = value and _("Yes") or _("No")
+                if isinstance(value, dict):
+                    return value and json.dumps(value) or None
                 return default(value)
         else:
             formatter = default

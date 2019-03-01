@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes excel export of resources failing in certain instances.
+  [href]
+
 - Fixes being able to enter empty messages.
   [href]
 
