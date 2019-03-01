@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.5.9 (2019-03-01)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes small translation issues.
   [href]
