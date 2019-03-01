@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes small translation issues.
+  [href]
+
 1.5.8 (2019-02-27)
 ~~~~~~~~~~~~~~~~~~~
 
