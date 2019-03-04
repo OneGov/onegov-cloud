@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes CLI parameter.
+  [msom]
+
 1.9.0 (2019-02-18)
 ~~~~~~~~~~~~~~~~~~~~
 

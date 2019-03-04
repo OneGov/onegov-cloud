@@ -246,7 +246,7 @@ def import_agencies(group_context, file, clear, skip_root, skip_download,
 
 @cli.command('create-pdf')
 @pass_group_context
-@click.option('--root/--no-recursive', default=True)
+@click.option('--root/--no-root', default=True)
 @click.option('--recursive/--no-recursive', default=True)
 def create_pdf(group_context, root, recursive):
 
