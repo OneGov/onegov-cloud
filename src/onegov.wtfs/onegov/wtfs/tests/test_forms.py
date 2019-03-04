@@ -592,17 +592,6 @@ def test_edit_scan_job_form(session):
     model.dispatch_note = 'Note on dispatch'
     model.dispatch_cantonal_tax_office = 6
     model.dispatch_cantonal_scan_center = 7
-    model.return_date = date(2019, 1, 10)
-    model.return_boxes = 8
-    model.return_scanned_tax_forms_current_year = 9
-    model.return_scanned_tax_forms_last_year = 10
-    model.return_scanned_tax_forms_older = 11
-    model.return_scanned_single_documents = 12
-    model.return_unscanned_tax_forms_current_year = 13
-    model.return_unscanned_tax_forms_last_year = 14
-    model.return_unscanned_tax_forms_older = 15
-    model.return_unscanned_single_documents = 16
-    model.return_note = 'Note on return'
 
     form = EditScanJobForm()
     form.request = Request(session, groupid=group.id.hex)
@@ -615,17 +604,6 @@ def test_edit_scan_job_form(session):
     assert form.dispatch_note.data == 'Note on dispatch'
     assert form.dispatch_cantonal_tax_office.data == 6
     assert form.dispatch_cantonal_scan_center.data == 7
-    assert form.return_date.data == date(2019, 1, 10)
-    assert form.return_boxes.data == 8
-    assert form.return_scanned_tax_forms_current_year.data == 9
-    assert form.return_scanned_tax_forms_last_year.data == 10
-    assert form.return_scanned_tax_forms_older.data == 11
-    assert form.return_scanned_single_documents.data == 12
-    assert form.return_unscanned_tax_forms_current_year.data == 13
-    assert form.return_unscanned_tax_forms_last_year.data == 14
-    assert form.return_unscanned_tax_forms_older.data == 15
-    assert form.return_unscanned_single_documents.data == 16
-    assert form.return_note.data == 'Note on return'
 
     form.dispatch_boxes.data = 10
     form.dispatch_tax_forms_current_year.data = 20
@@ -635,17 +613,6 @@ def test_edit_scan_job_form(session):
     form.dispatch_note.data = 'A note on the dispatch'
     form.dispatch_cantonal_tax_office.data = 60
     form.dispatch_cantonal_scan_center.data = 70
-    form.return_date.data = date(2019, 1, 10)
-    form.return_boxes.data = 80
-    form.return_scanned_tax_forms_current_year.data = 90
-    form.return_scanned_tax_forms_last_year.data = 100
-    form.return_scanned_tax_forms_older.data = 110
-    form.return_scanned_single_documents.data = 120
-    form.return_unscanned_tax_forms_current_year.data = 130
-    form.return_unscanned_tax_forms_last_year.data = 140
-    form.return_unscanned_tax_forms_older.data = 150
-    form.return_unscanned_single_documents.data = 160
-    form.return_note.data = 'A note on the return'
 
     form.update_model(model)
     assert model.municipality_id == municipality.id
@@ -660,17 +627,6 @@ def test_edit_scan_job_form(session):
     assert model.dispatch_note == 'A note on the dispatch'
     assert model.dispatch_cantonal_tax_office == 60
     assert model.dispatch_cantonal_scan_center == 70
-    assert model.return_date == date(2019, 1, 10)
-    assert model.return_boxes == 80
-    assert model.return_scanned_tax_forms_current_year == 90
-    assert model.return_scanned_tax_forms_last_year == 100
-    assert model.return_scanned_tax_forms_older == 110
-    assert model.return_scanned_single_documents == 120
-    assert model.return_unscanned_tax_forms_current_year == 130
-    assert model.return_unscanned_tax_forms_last_year == 140
-    assert model.return_unscanned_tax_forms_older == 150
-    assert model.return_unscanned_single_documents == 160
-    assert model.return_note == 'A note on the return'
 
     # Test validation
     form = EditScanJobForm()

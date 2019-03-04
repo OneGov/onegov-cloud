@@ -242,81 +242,6 @@ class EditScanJobForm(Form):
         render_kw={'size': 6},
     )
 
-    return_date = DateField(
-        label=_("Return date"),
-        fieldset=_("Return to the municipality"),
-        default=tomorrow,
-        validators=[Optional()]
-    )
-
-    return_boxes = IntegerField(
-        label=_("Boxes"),
-        fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)],
-        render_kw={'size': 3, 'clear': False},
-
-    )
-    return_scanned_tax_forms_older = IntegerField(
-        label=_("Tax forms (older)"),
-        fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)],
-        render_kw={'size': 2, 'clear': False},
-
-    )
-    return_scanned_tax_forms_last_year = IntegerField(
-        label=_("Tax forms (previous year)"),
-        fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)],
-        render_kw={'size': 2, 'clear': False},
-
-    )
-    return_scanned_tax_forms_current_year = IntegerField(
-        label=_("Tax forms"),
-        fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)],
-        render_kw={'size': 2, 'clear': False},
-
-    )
-    return_scanned_single_documents = IntegerField(
-        label=_("Single documents"),
-        fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)],
-        render_kw={'size': 3},
-
-    )
-    return_unscanned_tax_forms_older = IntegerField(
-        label=_("Unscanned tax forms (older)"),
-        fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)],
-        render_kw={'offset': 3, 'size': 2, 'clear': False},
-    )
-    return_unscanned_tax_forms_last_year = IntegerField(
-        label=_("Unscanned tax forms (previous year)"),
-        fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)],
-        render_kw={'size': 2, 'clear': False},
-
-    )
-    return_unscanned_tax_forms_current_year = IntegerField(
-        label=_("Unscanned tax forms"),
-        fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)],
-        render_kw={'size': 2, 'clear': False},
-
-    )
-    return_unscanned_single_documents = IntegerField(
-        label=_("Unscanned single documents"),
-        fieldset=_("Return to the municipality"),
-        validators=[Optional(), NumberRange(min=0)],
-        render_kw={'size': 3},
-
-    )
-    return_note = TextAreaField(
-        label=_("Note"),
-        fieldset=_("Return to the municipality"),
-        render_kw={'rows': 5},
-    )
-
     def update_labels(self):
         year = date.today().year
         self.dispatch_tax_forms_older.label.text = _(
@@ -327,24 +252,6 @@ class EditScanJobForm(Form):
         )
         self.dispatch_tax_forms_current_year.label.text = _(
             "Tax forms ${year}", mapping={'year': year}
-        )
-        self.return_scanned_tax_forms_older.label.text = _(
-            "Tax forms until ${year}", mapping={'year': year - 2}
-        )
-        self.return_scanned_tax_forms_last_year.label.text = _(
-            "Tax forms ${year}", mapping={'year': year - 1}
-        )
-        self.return_scanned_tax_forms_current_year.label.text = _(
-            "Tax forms ${year}", mapping={'year': year}
-        )
-        self.return_unscanned_tax_forms_older.label.text = _(
-            "Unscanned tax forms until ${year}", mapping={'year': year - 2}
-        )
-        self.return_unscanned_tax_forms_last_year.label.text = _(
-            "Unscanned tax forms ${year}", mapping={'year': year - 1}
-        )
-        self.return_unscanned_tax_forms_current_year.label.text = _(
-            "Unscanned tax forms ${year}", mapping={'year': year}
         )
 
     def on_request(self):
@@ -360,17 +267,6 @@ class EditScanJobForm(Form):
             'dispatch_note',
             'dispatch_cantonal_tax_office',
             'dispatch_cantonal_scan_center',
-            'return_date',
-            'return_boxes',
-            'return_scanned_tax_forms_current_year',
-            'return_scanned_tax_forms_last_year',
-            'return_scanned_tax_forms_older',
-            'return_scanned_single_documents',
-            'return_unscanned_tax_forms_current_year',
-            'return_unscanned_tax_forms_last_year',
-            'return_unscanned_tax_forms_older',
-            'return_unscanned_single_documents',
-            'return_note',
         ):
             setattr(model, name, getattr(self, name).data)
 
@@ -384,17 +280,6 @@ class EditScanJobForm(Form):
             'dispatch_note',
             'dispatch_cantonal_tax_office',
             'dispatch_cantonal_scan_center',
-            'return_date',
-            'return_boxes',
-            'return_scanned_tax_forms_current_year',
-            'return_scanned_tax_forms_last_year',
-            'return_scanned_tax_forms_older',
-            'return_scanned_single_documents',
-            'return_unscanned_tax_forms_current_year',
-            'return_unscanned_tax_forms_last_year',
-            'return_unscanned_tax_forms_older',
-            'return_unscanned_single_documents',
-            'return_note',
         ):
             getattr(self, name).data = getattr(model, name)
 

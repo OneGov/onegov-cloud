@@ -61,8 +61,24 @@ def test_views_scan_job(client):
     # Edit scan job
     client.logout()
     client.login_editor()
+    edit = client.get('/scan-jobs').click("05.01.2019").click("Bearbeiten")
+    edit.form['dispatch_note'] = "Eine Bemerkung zur Abholung"
+    assert "Scan-Auftrag geändert." in edit.form.submit().follow()
+
+    view = client.get('/scan-jobs').click("05.01.2019")
+    assert "Scan-Auftrag Nr. 1" in view
+    assert "My Municipality" in view
+    assert "05.01.2019" in view
+    assert all([f">{number}<" in view for number in range(1, 7 + 1)])
+    assert "Lieferung an das Steueramt Winterthur am 05.01.2019" in view
+    assert "Eine Bemerkung zur Abholung" in view
+
+    client.logout()
+    client.login_admin()
+
     with freeze_time("2019-01-02"):
-        edit = client.get('/scan-jobs').click("05.01.2019").click("Bearbeiten")
+        edit = client.get('/scan-jobs/unrestricted')\
+            .click("05.01.2019").click("Bearbeiten")
         edit.form['return_date'] = "2019-01-10"
         edit.form['return_boxes'] = "8"
         edit.form['return_scanned_tax_forms_current_year'] = "9"
@@ -76,7 +92,7 @@ def test_views_scan_job(client):
         edit.form['return_note'] = "Bemerkung zur Rücksendung"
         assert "Scan-Auftrag geändert." in edit.form.submit().follow()
 
-    view = client.get('/scan-jobs').click("05.01.2019")
+    view = client.get('/scan-jobs/unrestricted').click("05.01.2019")
     assert "Scan-Auftrag Nr. 1" in view
     assert "My Municipality" in view
     assert "05.01.2019" in view
@@ -85,9 +101,6 @@ def test_views_scan_job(client):
     assert "Rücksendung an My Municipality am 10.01.2019" in view
     assert "Bemerkung zur Abholung" in view
     assert "Bemerkung zur Rücksendung" in view
-
-    client.logout()
-    client.login_admin()
 
     # Check the date hints
     with freeze_time("2019-01-01"):
