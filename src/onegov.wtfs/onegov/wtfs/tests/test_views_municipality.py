@@ -29,16 +29,23 @@ def test_views_municipality(client):
     assert "Gemeinde Adlikon" in view
     assert "21" in view
     assert "Gruppe Adlikon" in view
+    assert "7.0" in view
 
     # Edit the municipality
     edit = view.click("Bearbeiten")
     edit.form['name'] = "Gemeinde Aesch"
     edit.form['bfs_number'] = '241'
     edit.form['group_id'].select(text="Gruppe Aesch")
+    edit.form['price_per_quantity'] = '21.25'
+    edit.form['address_supplement'] = "Zusatz"
+    edit.form['gpn_number'] = "12321"
     edited = edit.form.submit().follow()
     assert "Gemeinde geändert." in edited
     assert "Gemeinde Aesch" in edited
-    assert "Gruppe Aesch" in edited.click("Gemeinde Aesch")
+    view = edited.click("Gemeinde Aesch")
+    assert "Gruppe Aesch" in view
+    assert "21.25" in view
+    assert "12321" in view
 
     # Upload some dates
     upload = client.get('/municipalities').click("Daten importieren")

@@ -8,12 +8,14 @@ from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import PickupDate
 from sqlalchemy import func
 from sqlalchemy import String
+from wtforms import FloatField
 from wtforms import IntegerField
 from wtforms import SelectField
 from wtforms import StringField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
+from wtforms.validators import Optional
 
 
 class MunicipalityForm(Form):
@@ -40,22 +42,38 @@ class MunicipalityForm(Form):
         ]
     )
 
+    address_supplement = StringField(
+        label=_("Address supplement"),
+    )
+
+    gpn_number = IntegerField(
+        label=_("GPN number"),
+        validators=[
+            Optional()
+        ]
+    )
+
+    price_per_quantity = FloatField(
+        label=_("Price per quantity"),
+        default=7.0,
+        validators=[
+            InputRequired()
+        ]
+    )
+
     def on_request(self):
-        session = self.request.session
-
-        used_groups = session.query(Municipality.group_id)
-        used_groups = used_groups.filter(Municipality.group_id.isnot(None))
-        used_groups = {r.group_id for r in used_groups}
-
         model = getattr(self, 'model', None)
-        if model and getattr(model, 'group_id', None):
-            used_groups -= {model.group_id}
-            if model.has_data:
-                self.group_id.render_kw = {'disabled': True}
-                self.group_id.validators = []
 
+        session = self.request.session
         groups = session.query(func.cast(UserGroup.id, String), UserGroup.name)
-        if used_groups:
+        if getattr(model, 'has_data', False):
+            groups = groups.filter(UserGroup.id == model.group_id)
+        else:
+            used_groups = session.query(Municipality.group_id)
+            used_groups = used_groups.filter(Municipality.group_id.isnot(None))
+            used_groups = {r.group_id for r in used_groups}
+            if getattr(model, 'group_id', None):
+                used_groups -= {model.group_id}
             groups = groups.filter(UserGroup.id.notin_(used_groups))
         groups = groups.order_by(UserGroup.name)
         self.group_id.choices = groups.all()
@@ -63,12 +81,18 @@ class MunicipalityForm(Form):
     def update_model(self, model):
         model.name = self.name.data
         model.bfs_number = self.bfs_number.data
+        model.address_supplement = self.address_supplement.data
+        model.gpn_number = self.gpn_number.data
+        model.price_per_quantity = self.price_per_quantity.data
         if not model.has_data:
             model.group_id = self.group_id.data or None
 
     def apply_model(self, model):
         self.name.data = model.name
         self.bfs_number.data = model.bfs_number
+        self.address_supplement.data = model.address_supplement
+        self.gpn_number.data = model.gpn_number
+        self.price_per_quantity.data = model.price_per_quantity
         self.group_id.data = str(model.group_id) if model.group_id else ''
 
 

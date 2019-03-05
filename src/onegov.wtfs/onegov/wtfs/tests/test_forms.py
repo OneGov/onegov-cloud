@@ -84,13 +84,11 @@ def test_municipality_form(session):
     form.request = Request(session)
     form.on_request()
     assert [c[1] for c in form.group_id.choices] == ["Gruppe Aesch"]
-    assert not (form.group_id.render_kw or {}).get('disabled', False)
 
     # ... collection
     form.model = municipalities
     form.on_request()
     assert [c[1] for c in form.group_id.choices] == ["Gruppe Aesch"]
-    assert not (form.group_id.render_kw or {}).get('disabled', False)
 
     # ... municipality with no data
     form.model = municipality
@@ -98,7 +96,6 @@ def test_municipality_form(session):
     assert [c[1] for c in form.group_id.choices] == [
         "Gruppe Aesch", "Gruppe Winterthur"
     ]
-    assert not (form.group_id.render_kw or {}).get('disabled', False)
 
     # ... municipality with data
     scan_job = ScanJob(
@@ -109,7 +106,7 @@ def test_municipality_form(session):
     municipality.scan_jobs.append(scan_job)
     session.flush()
     form.on_request()
-    assert (form.group_id.render_kw or {}).get('disabled', False)
+    assert [c[1] for c in form.group_id.choices] == ["Gruppe Winterthur"]
 
     # Test apply / update
     form = MunicipalityForm()
@@ -117,15 +114,25 @@ def test_municipality_form(session):
     assert form.name.data == "Gemeinde Winterthur"
     assert form.bfs_number.data == 230
     assert form.group_id.data == str(group.id)
+    assert form.address_supplement.data is None
+    assert form.gpn_number.data is None
+    assert form.price_per_quantity.data == 7.0
 
-    # ... municipality with data
+    # ... municipality with data (group_id is ignored)
     form.name.data = "Gemeinde Adlikon"
     form.bfs_number.data = 21
     form.group_id.data = groups.add(name="Gruppe Adlikon").id
+    form.address_supplement.data = "Zusatz"
+    form.gpn_number.data = 1122
+    form.price_per_quantity.data = 8.5
+
     form.update_model(municipality)
     assert municipality.name == "Gemeinde Adlikon"
     assert municipality.bfs_number == 21
     assert municipality.group.name == "Gruppe Winterthur"
+    assert municipality.address_supplement == "Zusatz"
+    assert municipality.gpn_number == 1122
+    assert municipality.price_per_quantity == 8.5
 
     # ... municipality with no data
     session.delete(scan_job)
@@ -156,7 +163,8 @@ def test_municipality_form(session):
         PostData({
             'name': "Gemeinde Winterthur",
             'bfs_number': '230',
-            'group_id': group.id
+            'group_id': group.id,
+            'price_per_quantity': 5.0
         })
     )
     form.request = Request(session)

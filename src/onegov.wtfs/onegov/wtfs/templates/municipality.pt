@@ -8,6 +8,15 @@
                     <dt i18n:translate>BFS number</dt>
                     <dd>${layout.model.bfs_number}</dd>
 
+                    <dt i18n:translate>Address supplement</dt>
+                    <dd>${layout.model.address_supplement}</dd>
+
+                    <dt i18n:translate>GPN number</dt>
+                    <dd>${layout.model.gpn_number}</dd>
+
+                    <dt i18n:translate>Price per quantity</dt>
+                    <dd>${layout.model.price_per_quantity or ''}</dd>
+
                     <dt i18n:translate>User group</dt>
                     <dd>
                         <a tal:condition="layout.model.group" href="${request.link(layout.model.group)}">${layout.model.group.name}</a>

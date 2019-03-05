@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-26 11:19+0100\n"
-"PO-Revision-Date: 2019-02-26 11:19+0100\n"
+"POT-Creation-Date: 2019-03-05 08:05+0100\n"
+"PO-Revision-Date: 2019-03-05 08:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -53,6 +53,15 @@ msgstr "Boxen und Steuererklärungen"
 msgid "BFS number"
 msgstr "BFS Nummer"
 
+msgid "Address supplement"
+msgstr "Adresszusatz"
+
+msgid "GPN number"
+msgstr "GPN-Nummer"
+
+msgid "Price per quantity"
+msgstr "Preis pro Menge"
+
 msgid "File"
 msgstr "Datei"
 
@@ -83,16 +92,16 @@ msgid "Tax forms ${year}"
 msgstr "StE ${year}"
 
 #, python-format
+msgid "Fill in until 17.00 o'clock the evening before ${date}."
+msgstr "Ausfüllen bis 17.00 Uhr Vorabend des ${date}."
+
+#, python-format
 msgid "Unscanned tax forms until ${year}"
 msgstr "S̶t̶E̶ bis ${year}"
 
 #, python-format
 msgid "Unscanned tax forms ${year}"
 msgstr "S̶t̶E̶ ${year}"
-
-#, python-format
-msgid "Fill in until 17.00 o'clock the evening before ${date}."
-msgstr "Ausfüllen bis 17.00 Uhr Vorabend des ${date}."
 
 msgid "Type"
 msgstr "Auftragsart"
@@ -127,6 +136,9 @@ msgstr "Lieferung an das kantonale Steueramt"
 msgid "Scan center"
 msgstr "Kantonales Scan Center"
 
+msgid "Regular dispatch dates"
+msgstr "Reguläre Versanddaten"
+
 msgid "Return date"
 msgstr "Rücksendedatum"
 
@@ -144,9 +156,6 @@ msgstr "Nicht gescannte StE"
 
 msgid "Unscanned single documents"
 msgstr "E̶i̶n̶z̶e̶l̶b̶e̶l̶e̶g̶e̶"
-
-msgid "Regular dispatch dates"
-msgstr "Reguläre Versanddaten"
 
 msgid "Filter"
 msgstr "Filtern"

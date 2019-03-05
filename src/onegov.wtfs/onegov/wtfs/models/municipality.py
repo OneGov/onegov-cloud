@@ -31,6 +31,26 @@ class Municipality(Base, TimestampMixin):
         UserGroup, backref=backref('municipality', uselist=False)
     )
 
+    #: The address supplement, used for invoices.
+    address_supplement = Column(Text, nullable=True)
+
+    #: The GPN number, used for invoices.
+    gpn_number = Column(Integer, nullable=True)
+
+    #: The price per quantity times hundred, used for invoices. Typically
+    #: 700 (normal) or 850 (special).
+    _price_per_quantity = Column(
+        'price_per_quantity', Integer, nullable=False, server_default='700'
+    )
+
+    @property
+    def price_per_quantity(self):
+        return (self._price_per_quantity or 0) / 100
+
+    @price_per_quantity.setter
+    def price_per_quantity(self, value):
+        self._price_per_quantity = (value or 0) * 100
+
     @property
     def has_data(self):
         if self.pickup_dates.first() or self.scan_jobs.first():

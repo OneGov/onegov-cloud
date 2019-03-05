@@ -27,7 +27,9 @@ def test_municipality(session):
         Municipality(
             name='Winterthur',
             bfs_number=230,
-            group_id=group.id
+            group_id=group.id,
+            address_supplement='Zusatz',
+            gpn_number=1120
         )
     )
     session.flush()
@@ -36,8 +38,16 @@ def test_municipality(session):
     assert municipality.name == 'Winterthur'
     assert municipality.bfs_number == 230
     assert municipality.group == group
+    assert municipality.address_supplement == 'Zusatz'
+    assert municipality.gpn_number == 1120
+    assert municipality._price_per_quantity == 700
+    assert municipality.price_per_quantity == 7.0
     assert group.municipality == municipality
     assert not municipality.has_data
+
+    municipality.price_per_quantity = 8.5
+    assert municipality._price_per_quantity == 850
+    assert municipality.price_per_quantity == 8.5
 
     # PickupDate
     session.add(
