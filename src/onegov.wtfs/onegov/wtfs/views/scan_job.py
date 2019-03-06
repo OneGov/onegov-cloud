@@ -9,6 +9,7 @@ from onegov.wtfs.forms import ScanJobsForm
 from onegov.wtfs.forms import UnrestrictedScanJobForm
 from onegov.wtfs.forms import UnrestrictedScanJobsForm
 from onegov.wtfs.layouts import AddScanJobLayout
+from onegov.wtfs.layouts import DeliveryNoteLayout
 from onegov.wtfs.layouts import EditScanJobLayout
 from onegov.wtfs.layouts import MailLayout
 from onegov.wtfs.layouts import ScanJobLayout
@@ -221,3 +222,18 @@ def delete_scan_job(self, request):
     request.assert_valid_csrf_token()
     ScanJobCollection(request.session).delete(self)
     request.message(_("Scan job deleted."), 'success')
+
+
+@WtfsApp.html(
+    model=ScanJob,
+    template='delivery_note.pt',
+    name='delivery-note',
+    permission=ViewModel
+)
+def view_scan_job_delivery_note(self, request):
+    """ View a single scan job. """
+    layout = DeliveryNoteLayout(self, request)
+
+    return {
+        'layout': layout,
+    }

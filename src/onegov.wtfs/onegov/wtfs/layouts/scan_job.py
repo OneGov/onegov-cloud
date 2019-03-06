@@ -79,6 +79,13 @@ class ScanJobLayout(DefaultLayout):
     @cached_property
     def editbar_links(self):
         result = []
+        result.append(
+            Link(
+                text=_("Print delivery note"),
+                url=self.request.link(self.model, 'delivery-note'),
+                attrs={'class': 'print-icon'}
+            )
+        )
         if self.request.has_permission(self.model, EditModelUnrestricted):
             result.append(
                 Link(
@@ -176,3 +183,34 @@ class EditScanJobLayout(DefaultLayout):
     @cached_property
     def success_url(self):
         return self.request.link(self.model)
+
+
+class DeliveryNoteLayout(DefaultLayout):
+
+    @cached_property
+    def title(self):
+        return _("Delivery note")
+
+    @cached_property
+    def editbar_links(self):
+        result = []
+        result.append(
+            Link(
+                text=_("Print"),
+                url='#',
+                attrs={
+                    'class': 'print-icon',
+                    'onclick': 'window.print();return false;'
+                }
+            )
+        )
+        return result
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Scan jobs"), self.scan_jobs_url),
+            Link(self.model.delivery_number, self.request.link(self.model)),
+            Link(self.title, '#')
+        ]

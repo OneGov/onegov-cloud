@@ -14,7 +14,7 @@
             <span i18n:translate>Tax office Winterthur</span><br>
             <span i18n:translate>Scan Center</span><br>
             <span i18n:translate>Phone: 052 267 53 47</span><br>
-            <span i18n:translate>E-mail: steuramt.scancenter@win.ch</span>
+            <span i18n:translate>E-mail: steueramt.scancenter@win.ch</span>
         </p>
     </tal:block>
 </div>

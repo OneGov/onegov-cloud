@@ -16,6 +16,7 @@ from onegov.wtfs.layouts import DailyListBoxesLayout
 from onegov.wtfs.layouts import DailyListLayout
 from onegov.wtfs.layouts import DefaultLayout
 from onegov.wtfs.layouts import DeleteMunicipalityDatesLayout
+from onegov.wtfs.layouts import DeliveryNoteLayout
 from onegov.wtfs.layouts import EditMunicipalityLayout
 from onegov.wtfs.layouts import EditNotificationLayout
 from onegov.wtfs.layouts import EditScanJobLayout
@@ -468,19 +469,21 @@ def test_scan_job_layouts(session):
     )
     layout = ScanJobLayout(model, request)
     assert layout.title.interpolate() == 'Scan job no. 1'
-    assert layout.editbar_links == []
+    assert list(hrefs(layout.editbar_links)) == ['ScanJob/delivery-note']
     assert path(layout.breadcrumbs) == 'DummyPrincipal/ScanJobCollection/#'
     assert layout.cancel_url == ''
     assert layout.success_url == ''
 
     layout = ScanJobLayout(model, request_admin)
     assert list(hrefs(layout.editbar_links)) == [
+        'ScanJob/delivery-note',
         'ScanJob/edit-unrestricted',
         'ScanJob/?csrf-token=x'
     ]
 
     layout = ScanJobLayout(model, request_editor)
     assert list(hrefs(layout.editbar_links)) == [
+        'ScanJob/delivery-note',
         'ScanJob/edit',
         'ScanJob/?csrf-token=x'
     ]
@@ -500,6 +503,14 @@ def test_scan_job_layouts(session):
 
     layout = EditScanJobLayout(model, request_editor)
     assert list(hrefs(layout.editbar_links)) == []
+
+    # ... delivery note
+    layout = DeliveryNoteLayout(model, request)
+    assert layout.title == 'Delivery note'
+    assert list(hrefs(layout.editbar_links)) == ['#']
+    assert path(layout.breadcrumbs) == (
+        'DummyPrincipal/ScanJobCollection/ScanJob/#'
+    )
 
 
 def test_daily_list_layouts(session):

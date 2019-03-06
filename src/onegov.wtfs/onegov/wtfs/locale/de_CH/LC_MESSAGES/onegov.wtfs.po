@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-05 08:05+0100\n"
-"PO-Revision-Date: 2019-03-05 08:07+0100\n"
+"POT-Creation-Date: 2019-03-06 08:07+0100\n"
+"PO-Revision-Date: 2019-03-06 08:08+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -281,6 +281,12 @@ msgstr "Scan-Auftrag hinzufügen"
 msgid "Edit scan job"
 msgstr "Scan-Auftrag bearbeiten"
 
+msgid "Delivery note"
+msgstr "Lieferschein"
+
+msgid "Print delivery note"
+msgstr "Lieferschein drucken"
+
 msgid "Do you really want to delete this scan job?"
 msgstr "Diese Scanauftrag wirklich löschen?"
 
@@ -422,13 +428,24 @@ msgid "Yours sincerely"
 msgstr "Freundliche Grüsse"
 
 msgid "Tax office Winterthur"
-msgstr "Steuramt Winterthur"
+msgstr "Steueramt Winterthur"
 
 msgid "Phone: 052 267 53 47"
 msgstr "Telefon: 052 267 53 47"
 
-msgid "E-mail: steuramt.scancenter@win.ch"
-msgstr "E-Mail: steuramt.scancenter@win.ch"
+msgid "E-mail: steueramt.scancenter@win.ch"
+msgstr "E-Mail: steueramt.scancenter@win.ch"
+
+msgid "Quantity"
+msgstr "Anzahl"
+
+msgid "Signature"
+msgstr "Unterschrift"
+
+msgid "The lower area is filled out for the return by the tax office."
+msgstr ""
+"Der untere Bereich wird für die Rücksendung durch das Scan Center Winterthur "
+"ausgefüllt."
 
 #, python-format
 msgid "Some rows contain invalid values: ${errors}."

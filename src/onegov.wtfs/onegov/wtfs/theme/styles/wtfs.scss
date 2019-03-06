@@ -123,3 +123,35 @@ h2 small {
     display: block;
     line-height: 1.25;
 }
+
+.delivery-note {
+    table {
+        border-collapse: collapse;
+
+        th,
+        td {
+            background-color: $white;
+            border: 1px solid $black;
+
+            &.orange {
+                background-color: #f93;
+            }
+
+            &.red {
+                background-color: #ff9f9f;
+            }
+
+            &.blue {
+                background-color: #9cc;
+            }
+
+            &.yellow {
+                background-color: #ff6;
+            }
+
+            &.green {
+                background-color: #9c9;
+            }
+        }
+    }
+}

@@ -18,6 +18,7 @@ from onegov.wtfs.layouts.report import ReportBoxesLayout
 from onegov.wtfs.layouts.report import ReportFormsByMunicipalityLayout
 from onegov.wtfs.layouts.report import ReportLayout
 from onegov.wtfs.layouts.scan_job import AddScanJobLayout
+from onegov.wtfs.layouts.scan_job import DeliveryNoteLayout
 from onegov.wtfs.layouts.scan_job import EditScanJobLayout
 from onegov.wtfs.layouts.scan_job import ScanJobLayout
 from onegov.wtfs.layouts.scan_job import ScanJobsLayout
@@ -41,6 +42,7 @@ __all__ = (
     'DailyListLayout',
     'DefaultLayout',
     'DeleteMunicipalityDatesLayout',
+    'DeliveryNoteLayout',
     'EditMunicipalityLayout',
     'EditNotificationLayout',
     'EditScanJobLayout',

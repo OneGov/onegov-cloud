@@ -33,6 +33,14 @@ table {
         &.total {
             font-style: italic;
         }
+
+        &.top {
+            vertical-align: top;
+        }
+
+        &.bottom {
+            vertical-align: bottom;
+        }
     }
 
     thead {

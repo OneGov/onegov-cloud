@@ -58,6 +58,13 @@ def test_views_scan_job(client):
     assert "Lieferung an das Steueramt Winterthur am 05.01.2019" in view
     assert "Bemerkung zur Abholung" in view
 
+    # Delivery note
+    view = view.click("Lieferschein")
+    assert "My Municipality" in view
+    assert "05.01.2019" in view
+    assert all([f">{number}<" in view for number in range(1, 5 + 1)])
+    assert "Lieferung an das Steueramt Winterthur" in view
+
     # Edit scan job
     client.logout()
     client.login_editor()
