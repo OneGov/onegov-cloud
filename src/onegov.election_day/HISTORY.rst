@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.9.2 (2019-03-06)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes outer join ambiguity in SQL statement.
   [href]
