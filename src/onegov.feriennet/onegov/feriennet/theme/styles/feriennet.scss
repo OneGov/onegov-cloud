@@ -1143,16 +1143,12 @@ $booking-left-margin: 2rem;
                     }
                 }
 
-                .invite-link {
-                    font-weight: bold;
-
-                    &[data-group]::after {
-                        @include group-code;
-                        content: attr(data-group);
-                        font-size: .8rem;
-                        font-weight: normal;
-                        margin-left: 1ex;
-                    }
+                .invite-link[data-group]::after {
+                    @include group-code;
+                    content: attr(data-group);
+                    font-size: .8rem;
+                    font-weight: normal;
+                    margin-left: 1ex;
                 }
 
                 .cancel-link::before {

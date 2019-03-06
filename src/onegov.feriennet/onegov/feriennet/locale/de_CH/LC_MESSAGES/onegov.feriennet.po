@@ -1811,7 +1811,7 @@ msgid ""
 "The formation of a group increases the chance of joining an activity "
 "together."
 msgstr ""
-"Die Bildung einer Gruppe erhöht die Wahrscheinlichkeit, Angebot gemeinsam "
+"Die Bildung einer Gruppe erhöht die Wahrscheinlichkeit, ein Angebot gemeinsam "
 "besuchen zu können."
 
 msgid ""
