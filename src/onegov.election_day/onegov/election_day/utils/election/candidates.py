@@ -88,7 +88,7 @@ def get_elected_candidates(election_compound, session):
         List.list_id,
         Election.id
     )
-    elected = elected.outerjoin(List)
+    elected = elected.outerjoin(List, Candidate.list_id == List.id)
     elected = elected.outerjoin(Election)
     elected = elected.order_by(
         Election.shortcode,
