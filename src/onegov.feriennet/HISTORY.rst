@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.5.10 (2019-03-06)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes small styling/translation issues.
   [href]
