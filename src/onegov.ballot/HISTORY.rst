@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.7.5 (2019-03-06)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes incompatibility with SQLAlchemy 1.3.0.
   [href]
