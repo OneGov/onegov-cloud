@@ -8,6 +8,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import select
 from sqlalchemy import Text
+from sqlalchemy import text
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
@@ -76,7 +77,7 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
         # A bit of a hack :|
         number_of_mandates = select(
             [Election.number_of_mandates],
-            whereclause='elections.id = election_results.election_id'
+            whereclause=text('elections.id = election_results.election_id')
         )
         return (
             number_of_mandates * (

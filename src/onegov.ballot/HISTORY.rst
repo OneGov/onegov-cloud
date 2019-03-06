@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes incompatibility with SQLAlchemy 1.3.0.
+  [href]
+
 3.7.4 (2019-01-18)
 ~~~~~~~~~~~~~~~~~~~
 
