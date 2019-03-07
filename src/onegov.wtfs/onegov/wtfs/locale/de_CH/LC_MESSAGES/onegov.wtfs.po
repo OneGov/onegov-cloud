@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-06 08:07+0100\n"
-"PO-Revision-Date: 2019-03-06 08:08+0100\n"
+"POT-Creation-Date: 2019-03-07 13:30+0100\n"
+"PO-Revision-Date: 2019-03-07 13:31+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -187,6 +187,30 @@ msgstr "Total Steuererklärungen pro Gemeinde"
 msgid "Regular and express shipment"
 msgstr "Alle Sendungen"
 
+msgid "From date"
+msgstr "Von"
+
+msgid "CS2 User"
+msgstr "CS2 Benutzer"
+
+msgid "Subject"
+msgstr "Betreff"
+
+msgid "Accounting unit"
+msgstr "Kostenstelle"
+
+msgid "Revenue account"
+msgstr "Erlöskonto"
+
+msgid "VAT"
+msgstr "MWST"
+
+msgid "Without VAT"
+msgstr "Ohne Mehrwertsteuer"
+
+msgid "With VAT"
+msgstr "Mit Mehrwertsteuer"
+
 #, python-format
 msgid "Scan job no. ${number}"
 msgstr "Scan-Auftrag Nr. ${number}"
@@ -275,6 +299,9 @@ msgstr "Benachrichtigung"
 msgid "Scan jobs"
 msgstr "Scan-Aufträge"
 
+msgid "Invoices"
+msgstr "Rechnungen"
+
 msgid "Add scan job"
 msgstr "Scan-Auftrag hinzufügen"
 
@@ -292,6 +319,9 @@ msgstr "Diese Scanauftrag wirklich löschen?"
 
 msgid "Scan job"
 msgstr "Scan-Auftrag"
+
+msgid "Create invoice"
+msgstr "Rechnung erzeugen"
 
 msgid "In"
 msgstr "Eingang"
@@ -391,6 +421,20 @@ msgstr "Passwort zurücksetzen"
 
 msgid "Number of users"
 msgstr "Anzahl Benutzer"
+
+msgid "${count} invoice(s) have been created."
+msgstr "Es wurde(n) ${count} Rechnung(en) erstellt."
+
+msgid "Total without VAT: CHF ${total}."
+msgstr "Total exkl. MWST: CHF ${total}."
+
+msgid "Download file"
+msgstr "Datei herunterladen"
+
+msgid "Right-click on the link and select \"Save target as\" to save the file."
+msgstr ""
+"Klicken Sie mit der rechten Maustaste auf den Link und wähle Sie \"Ziel "
+"speichern unter\", um die Datei zu speichern."
 
 msgid "Delivery number"
 msgstr "Lieferscheinnummer"
@@ -566,6 +610,3 @@ msgstr "Benachrichtigung hinzugefügt."
 
 msgid "Notification modified."
 msgstr "Benachrichtigung geändert."
-
-#~ msgid "Scan-job"
-#~ msgstr "Scan-Auftrag"

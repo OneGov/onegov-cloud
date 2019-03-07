@@ -12,6 +12,7 @@ from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.models import DailyList
 from onegov.wtfs.models import DailyListBoxes
 from onegov.wtfs.models import DailyListBoxesAndForms
+from onegov.wtfs.models import Invoice
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import Notification
 from onegov.wtfs.models import Principal
@@ -238,3 +239,11 @@ def get_notifications(request):
 )
 def get_notification(request, id):
     return NotificationCollection(request.session).by_id(id)
+
+
+@WtfsApp.path(
+    model=Invoice,
+    path='/invoice',
+)
+def get_invoice(request):
+    return Invoice(request.session)

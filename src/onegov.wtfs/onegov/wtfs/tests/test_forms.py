@@ -9,6 +9,7 @@ from onegov.user import UserGroupCollection
 from onegov.wtfs.collections import MunicipalityCollection
 from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.forms import AddScanJobForm
+from onegov.wtfs.forms import CreateInvoicesForm
 from onegov.wtfs.forms import DailyListSelectionForm
 from onegov.wtfs.forms import DeleteMunicipalityDatesForm
 from onegov.wtfs.forms import EditScanJobForm
@@ -23,6 +24,7 @@ from onegov.wtfs.forms import UnrestrictedScanJobsForm
 from onegov.wtfs.forms import UnrestrictedUserForm
 from onegov.wtfs.forms import UserForm
 from onegov.wtfs.forms import UserGroupForm
+from onegov.wtfs.models import Invoice
 from onegov.wtfs.models import Notification
 from onegov.wtfs.models import PickupDate
 from onegov.wtfs.models import ScanJob
@@ -977,3 +979,52 @@ def test_unrestricted_scan_jobs_form(session):
     # Test validation
     form = UnrestrictedScanJobsForm()
     assert form.validate()
+
+
+def test_create_invoices_form(session):
+    groups = UserGroupCollection(session)
+    municipalities = MunicipalityCollection(session)
+    adlikon = municipalities.add(
+        name="Adlikon",
+        bfs_number=21,
+        group_id=groups.add(name="Winterthur").id
+    )
+    aesch = municipalities.add(
+        name="Aesch",
+        bfs_number=241,
+        group_id=groups.add(name="Aesch").id
+    )
+
+    # Test choices
+    form = CreateInvoicesForm()
+    form.request = Request(session)
+    form.on_request()
+    assert form.vat.choices == [
+        ('without_vat', 'Without VAT'),
+        ('with_vat', 'With VAT')
+    ]
+    assert form.municipality_id.choices == [
+        (adlikon.id.hex, 'Adlikon (21)'),
+        (aesch.id.hex, 'Aesch (241)')
+    ]
+
+    # Test update model
+    form.from_date.data = date(2019, 1, 1)
+    form.to_date.data = date(2019, 1, 31)
+    form.cs2_user.data = '123456'
+    form.subject.data = 'Rechnungen'
+    form.municipality_id.data = aesch.id.hex
+    form.accounting_unit.data = '99999'
+    form.revenue_account.data = '987654321'
+    form.vat.data = 'with_vat'
+
+    model = Invoice(session)
+    form.update_model(model)
+    assert model.from_date == date(2019, 1, 1)
+    assert model.to_date == date(2019, 1, 31)
+    assert model.cs2_user == '123456'
+    assert model.subject == 'Rechnungen'
+    assert model.municipality_id == aesch.id.hex
+    assert model.accounting_unit == '99999'
+    assert model.revenue_account == '987654321'
+    assert model.vat == 'with_vat'

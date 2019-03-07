@@ -1,4 +1,5 @@
 from onegov.wtfs.forms.daily_list import DailyListSelectionForm
+from onegov.wtfs.forms.invoice import CreateInvoicesForm
 from onegov.wtfs.forms.municipality import DeleteMunicipalityDatesForm
 from onegov.wtfs.forms.municipality import ImportMunicipalityDataForm
 from onegov.wtfs.forms.municipality import MunicipalityForm
@@ -17,6 +18,7 @@ from onegov.wtfs.forms.user_group import UserGroupForm
 
 __all__ = (
     'AddScanJobForm',
+    'CreateInvoicesForm',
     'DailyListSelectionForm',
     'DeleteMunicipalityDatesForm',
     'EditScanJobForm',

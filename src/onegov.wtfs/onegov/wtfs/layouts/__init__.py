@@ -2,6 +2,7 @@ from onegov.wtfs.layouts.daily_list import DailyListBoxesAndFormsLayout
 from onegov.wtfs.layouts.daily_list import DailyListBoxesLayout
 from onegov.wtfs.layouts.daily_list import DailyListLayout
 from onegov.wtfs.layouts.default import DefaultLayout
+from onegov.wtfs.layouts.invoice import InvoiceLayout
 from onegov.wtfs.layouts.mail import MailLayout
 from onegov.wtfs.layouts.municipality import AddMunicipalityLayout
 from onegov.wtfs.layouts.municipality import DeleteMunicipalityDatesLayout
@@ -31,6 +32,7 @@ from onegov.wtfs.layouts.user_group import EditUserGroupLayout
 from onegov.wtfs.layouts.user_group import UserGroupLayout
 from onegov.wtfs.layouts.user_group import UserGroupsLayout
 
+
 __all__ = (
     'AddMunicipalityLayout',
     'AddNotificationLayout',
@@ -49,6 +51,7 @@ __all__ = (
     'EditUserGroupLayout',
     'EditUserLayout',
     'ImportMunicipalityDataLayout',
+    'InvoiceLayout',
     'MailLayout',
     'MunicipalitiesLayout',
     'MunicipalityLayout',

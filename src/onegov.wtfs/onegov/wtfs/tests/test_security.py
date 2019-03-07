@@ -10,6 +10,7 @@ from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.models import DailyList
 from onegov.wtfs.models import DailyListBoxes
 from onegov.wtfs.models import DailyListBoxesAndForms
+from onegov.wtfs.models import Invoice
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import Notification
 from onegov.wtfs.models import PickupDate
@@ -522,4 +523,25 @@ def test_permissions(wtfs_app, wtfs_password):
         assert not permits(user, model, EditModelUnrestricted)
         assert not permits(user, model, DeleteModel)
         assert permits(user, model, ViewModel)
+        assert not permits(user, model, ViewModelUnrestricted)
+
+    # Report
+    model = Invoice(session)
+    for user in (admin, admin_a, admin_b):
+        assert permits(user, model, Public)
+        assert permits(user, model, AddModel)
+        assert permits(user, model, AddModelUnrestricted)
+        assert permits(user, model, EditModel)
+        assert permits(user, model, EditModelUnrestricted)
+        assert permits(user, model, DeleteModel)
+        assert permits(user, model, ViewModel)
+        assert permits(user, model, ViewModelUnrestricted)
+    for user in (editor, editor_a, editor_b, member, member_a, member_b):
+        assert permits(user, model, Public)
+        assert not permits(user, model, AddModel)
+        assert not permits(user, model, AddModelUnrestricted)
+        assert not permits(user, model, EditModel)
+        assert not permits(user, model, EditModelUnrestricted)
+        assert not permits(user, model, DeleteModel)
+        assert not permits(user, model, ViewModel)
         assert not permits(user, model, ViewModelUnrestricted)

@@ -189,6 +189,10 @@
         </ul>
     </metal:dispatch_dates>
 
+    <metal:price_per_quantity define-macro="price_per_quantity" i18n:domain="onegov.wtfs">
+        ${layout.format_number(price_per_quantity)}
+    </metal:price_per_quantity>
+
     <metal:express_shipment_hint define-macro="express_shipment_hint" i18n:domain="onegov.wtfs">
         <div class="express-shipment-hint">
             <p i18n:translate>

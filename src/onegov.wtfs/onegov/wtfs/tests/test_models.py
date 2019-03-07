@@ -1,7 +1,10 @@
+from base64 import b64decode
 from datetime import date
+from freezegun import freeze_time
 from onegov.user import UserGroup
 from onegov.wtfs.models import DailyListBoxes
 from onegov.wtfs.models import DailyListBoxesAndForms
+from onegov.wtfs.models import Invoice
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import Notification
 from onegov.wtfs.models import PickupDate
@@ -427,3 +430,100 @@ def test_notification(session):
     assert notification.channel_id == "wtfs"
     assert notification.owner == "admin"
     assert notification.type == "wtfs_notification"
+
+
+def test_invoice(session):
+    session.add(UserGroup(name='Adlikon'))
+    session.flush()
+    group = session.query(UserGroup).one()
+
+    session.add(
+        Municipality(
+            name='Adlikon',
+            address_supplement='Finkenweg',
+            gpn_number=8882255,
+            bfs_number=21,
+            group_id=group.id
+        )
+    )
+    session.flush()
+    municipality = session.query(Municipality).one()
+
+    session.add(
+        ScanJob(
+            type='normal',
+            group_id=group.id,
+            municipality_id=municipality.id,
+            dispatch_date=date(2019, 1, 10),
+            dispatch_boxes=1,
+            dispatch_tax_forms_current_year=10,
+            dispatch_tax_forms_last_year=20,
+            dispatch_tax_forms_older=30,
+            dispatch_single_documents=40,
+            dispatch_cantonal_tax_office=5,
+            dispatch_cantonal_scan_center=4,
+            return_date=date(2019, 2, 2),
+            return_boxes=1,
+            return_scanned_tax_forms_current_year=9,
+            return_scanned_tax_forms_last_year=18,
+            return_scanned_tax_forms_older=27,
+            return_scanned_single_documents=36,
+            return_unscanned_tax_forms_current_year=1,
+            return_unscanned_tax_forms_last_year=2,
+            return_unscanned_tax_forms_older=3,
+            return_unscanned_single_documents=4,
+        )
+    )
+    session.flush()
+
+    with freeze_time("2019-12-31 08:07:06"):
+        invoice = Invoice(session)
+
+        assert invoice.municipality is None
+        assert invoice.export() == ('', 0, 0.0)
+
+        invoice.municipality_id = municipality.id
+        assert invoice.municipality == municipality
+        assert invoice.export() == ('', 0, 0.0)
+
+        invoice.from_date = date(2019, 1, 1)
+        invoice.to_date = date(2019, 1, 7)
+        invoice.cs2_user = '123456'
+        invoice.subject = 'Rechnungen 1.1-7.1'
+        invoice.accounting_unit = '99999'
+        invoice.revenue_account = '987654321'
+        invoice.vat = None
+        data, count, total = invoice.export()
+        assert count == 0
+        assert total == 0.0
+        assert b64decode(data).decode()
+
+        invoice.from_date = date(2019, 1, 7)
+        invoice.to_date = date(2019, 1, 14)
+        data, count, total = invoice.export()
+        assert count == 1
+        assert total == (10 + 20 + 30 - 1 - 2 - 3) * 7.0
+        assert b64decode(data).decode().split('\r\n')[1].split(',') == [
+            '201912311',
+            '31.12.2019',
+            '08.07.06',
+            '8882255',
+            '1',
+            '8882255',
+            'Rechnungen 1.1-7.1',
+            '1',
+            '31.12.2019',
+            '31.12.2019',
+            '31.12.2019',
+            '8882255',
+            '54000',
+            '1',
+            '70000000',
+            '70000000',
+            '1',
+            '31.12.2019',
+            'Finkenweg',
+            '123456',
+            '99999',
+            '987654321'
+        ]

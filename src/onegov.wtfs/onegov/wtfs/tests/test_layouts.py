@@ -23,6 +23,7 @@ from onegov.wtfs.layouts import EditScanJobLayout
 from onegov.wtfs.layouts import EditUserGroupLayout
 from onegov.wtfs.layouts import EditUserLayout
 from onegov.wtfs.layouts import ImportMunicipalityDataLayout
+from onegov.wtfs.layouts import InvoiceLayout
 from onegov.wtfs.layouts import MailLayout
 from onegov.wtfs.layouts import MunicipalitiesLayout
 from onegov.wtfs.layouts import MunicipalityLayout
@@ -41,6 +42,7 @@ from onegov.wtfs.layouts import UsersLayout
 from onegov.wtfs.models import DailyList
 from onegov.wtfs.models import DailyListBoxes
 from onegov.wtfs.models import DailyListBoxesAndForms
+from onegov.wtfs.models import Invoice
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import Notification
 from onegov.wtfs.models import Report
@@ -172,6 +174,7 @@ def test_default_layout(wtfs_app):
         'ScanJobCollection/',
         'DailyList/',
         'Report/',
+        'Invoice/',
         'UserCollection/',
         'UserGroupCollection/',
         'MunicipalityCollection/',
@@ -667,3 +670,15 @@ def test_notification_layouts():
 
     layout = EditNotificationLayout(model, request_admin)
     assert list(hrefs(layout.editbar_links)) == []
+
+
+def test_invoice_layouts(session):
+    request = DummyRequest()
+
+    model = Invoice(session)
+    layout = InvoiceLayout(model, request)
+    assert layout.title == 'Create invoice'
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/Invoice'
+    assert layout.cancel_url == 'Invoice/'
+    assert layout.success_url == 'Invoice/'

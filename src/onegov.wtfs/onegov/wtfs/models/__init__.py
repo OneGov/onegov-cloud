@@ -1,6 +1,7 @@
 from onegov.wtfs.models.daily_list import DailyList
 from onegov.wtfs.models.daily_list import DailyListBoxes
 from onegov.wtfs.models.daily_list import DailyListBoxesAndForms
+from onegov.wtfs.models.invoice import Invoice
 from onegov.wtfs.models.municipality import Municipality
 from onegov.wtfs.models.notification import Notification
 from onegov.wtfs.models.pickup_date import PickupDate
@@ -16,6 +17,7 @@ __all__ = (
     'DailyList',
     'DailyListBoxes',
     'DailyListBoxesAndForms',
+    'Invoice',
     'Municipality',
     'Notification',
     'PickupDate',
