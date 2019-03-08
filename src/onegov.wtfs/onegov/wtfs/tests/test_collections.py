@@ -8,8 +8,8 @@ from uuid import uuid4
 def test_municipalities(session):
     municipalities = MunicipalityCollection(session)
     municipalities.add(
-        name='Winterthur',
-        bfs_number=230,
+        name='Boppelsen',
+        bfs_number=82,
     )
     municipalities.add(
         name='Adlikon',
@@ -18,14 +18,14 @@ def test_municipalities(session):
 
     assert [(m.name, m.bfs_number) for m in municipalities.query()] == [
         ('Adlikon', 21),
-        ('Winterthur', 230)
+        ('Boppelsen', 82)
     ]
 
     # Import data
     data = {
         21: {'dates': [date(2019, 1, 1), date(2019, 1, 7)]},
         241: {'dates': [date(2019, 1, 2), date(2019, 1, 8)]},
-        230: {'dates': [date(2019, 1, 4), date(2019, 1, 10)]}
+        82: {'dates': [date(2019, 1, 4), date(2019, 1, 10)]}
     }
     municipalities.import_data(data)
     assert [
@@ -33,7 +33,7 @@ def test_municipalities(session):
         for m in municipalities.query()
     ] == [
         (21, [date(2019, 1, 1), date(2019, 1, 7)]),
-        (230, [date(2019, 1, 4), date(2019, 1, 10)])
+        (82, [date(2019, 1, 4), date(2019, 1, 10)])
     ]
 
     municipalities.add(
@@ -43,7 +43,7 @@ def test_municipalities(session):
     data = {
         21: {'dates': [date(2019, 1, 7), date(2019, 1, 8)]},
         241: {'dates': [date(2019, 1, 2), date(2019, 1, 8)]},
-        230: {'dates': []}
+        82: {'dates': []}
     }
     municipalities.import_data(data)
     assert [
@@ -52,7 +52,7 @@ def test_municipalities(session):
     ] == [
         (21, [date(2019, 1, 1), date(2019, 1, 7), date(2019, 1, 8)]),
         (241, [date(2019, 1, 2), date(2019, 1, 8)]),
-        (230, [date(2019, 1, 4), date(2019, 1, 10)])
+        (82, [date(2019, 1, 4), date(2019, 1, 10)])
     ]
 
 
@@ -74,7 +74,7 @@ def test_notifications(session):
 
 def test_scan_jobs(session):
     municipalities = MunicipalityCollection(session)
-    municipality = municipalities.add(name='Winterthur', bfs_number=230)
+    municipality = municipalities.add(name='Boppelsen', bfs_number=82)
 
     scan_jobs = ScanJobCollection(session)
     for day in (2, 1, 4, 3):

@@ -27,7 +27,6 @@ class WtfsApp(Framework, FormApp, DepotApp):
         session = self.session()
         municipalities = MunicipalityCollection(session)
         for name, bfs_number in (
-            ('Winterthur', 230),
             ('Adlikon', 21),
             ('Aesch', 241),
             ('Aeugst am Albis', 1),

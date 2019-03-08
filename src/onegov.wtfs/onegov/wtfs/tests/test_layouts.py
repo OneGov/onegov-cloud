@@ -228,9 +228,9 @@ def test_municipality_layouts():
     assert list(hrefs(layout.editbar_links)) == []
 
     # Municipality
-    model = Municipality(name='Winterthur')
+    model = Municipality(name='Boppelsen')
     layout = MunicipalityLayout(model, request)
-    assert layout.title == 'Winterthur'
+    assert layout.title == 'Boppelsen'
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == (
         'DummyPrincipal/MunicipalityCollection/#'
@@ -357,7 +357,7 @@ def test_scan_job_layouts(session):
     request_editor = DummyRequest(roles=['editor'])
 
     municipalities = MunicipalityCollection(session)
-    municipality = municipalities.add(name='Winterthur', bfs_number=230)
+    municipality = municipalities.add(name='Boppelsen', bfs_number=82)
 
     # ScanJob collection
     model = ScanJobCollection(None)

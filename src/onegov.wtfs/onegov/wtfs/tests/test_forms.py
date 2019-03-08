@@ -69,13 +69,13 @@ class PostData(dict):
 
 def test_municipality_form(session):
     municipalities = MunicipalityCollection(session)
-    municipality = municipalities.add(name="Winterthur", bfs_number=230)
+    municipality = municipalities.add(name="Boppelsen", bfs_number=82)
 
     # Test apply / update
     form = MunicipalityForm()
     form.apply_model(municipality)
-    assert form.name.data == "Winterthur"
-    assert form.bfs_number.data == 230
+    assert form.name.data == "Boppelsen"
+    assert form.bfs_number.data == 82
     assert form.address_supplement.data is None
     assert form.gpn_number.data is None
     assert form.price_per_quantity.data == 7.0
@@ -100,7 +100,7 @@ def test_municipality_form(session):
 
     form = MunicipalityForm(
         PostData({
-            'bfs_number': '230',
+            'bfs_number': '82',
         })
     )
     form.request = Request(session)
@@ -108,8 +108,8 @@ def test_municipality_form(session):
 
     form = MunicipalityForm(
         PostData({
-            'name': "Winterthur",
-            'bfs_number': '230',
+            'name': "Boppelsen",
+            'bfs_number': '82',
             'price_per_quantity': 5.0
         })
     )
@@ -119,7 +119,7 @@ def test_municipality_form(session):
 
 def test_import_municipality_data_form(session):
     municipalities = MunicipalityCollection(session)
-    municipalities.add(name="Winterthur", bfs_number=230)
+    municipalities.add(name="Boppelsen", bfs_number=82)
     municipalities.add(name="Adlikon", bfs_number=21)
 
     # Test apply
@@ -129,7 +129,7 @@ def test_import_municipality_data_form(session):
     form.file.data = {
         21: {'dates': [date(2019, 1, 1), date(2019, 1, 7)]},
         241: {'dates': [date(2019, 1, 3), date(2019, 1, 9)]},
-        230: {'dates': [date(2019, 1, 4), date(2019, 1, 10)]}
+        82: {'dates': [date(2019, 1, 4), date(2019, 1, 10)]}
     }
     form.update_model(municipalities)
     assert [
@@ -137,7 +137,7 @@ def test_import_municipality_data_form(session):
         for m in municipalities.query()
     ] == [
         (21, [date(2019, 1, 1), date(2019, 1, 7)]),
-        (230, [date(2019, 1, 4), date(2019, 1, 10)])
+        (82, [date(2019, 1, 4), date(2019, 1, 10)])
     ]
 
     # Test validation
@@ -158,7 +158,7 @@ def test_import_municipality_data_form(session):
 
 def test_delete_municipality_dates_form(session):
     municipalities = MunicipalityCollection(session)
-    municipality = municipalities.add(name="Winterthur", bfs_number=230)
+    municipality = municipalities.add(name="Boppelsen", bfs_number=82)
 
     # Test apply / update
     form = DeleteMunicipalityDatesForm()
@@ -200,7 +200,7 @@ def test_delete_municipality_dates_form(session):
 
 def test_municipality_selection_form(session):
     municipalities = MunicipalityCollection(session)
-    municipality = municipalities.add(name="Aesch", bfs_number=230)
+    municipality = municipalities.add(name="Aesch", bfs_number=82)
 
     # Test choices
     form = MunicipalityIdSelectionForm()
@@ -214,7 +214,7 @@ def test_municipality_selection_form(session):
 
 def test_user_form(session):
     municipalities = MunicipalityCollection(session)
-    municipality = municipalities.add(name="Aesch", bfs_number=230)
+    municipality = municipalities.add(name="Aesch", bfs_number=82)
 
     # Test apply / update
     form = UserForm()
@@ -281,7 +281,7 @@ def test_user_form(session):
 
 def test_unrestricted_user_form(session):
     municipalities = MunicipalityCollection(session)
-    municipality_1 = municipalities.add(name="Aesch", bfs_number=230)
+    municipality_1 = municipalities.add(name="Aesch", bfs_number=82)
     municipality_2 = municipalities.add(name="Adlikon", bfs_number=21)
 
     # Test choices
@@ -289,7 +289,7 @@ def test_unrestricted_user_form(session):
     form.request = Request(session)
     form.on_request()
     assert [c[1] for c in form.municipality_id.choices] == [
-        "- none -", "Adlikon (21)", "Aesch (230)"
+        "- none -", "Adlikon (21)", "Aesch (82)"
     ]
     assert form.role.choices == [
         ('editor', "Editor"),
@@ -391,7 +391,7 @@ def test_unrestricted_user_form(session):
 
 def test_add_scan_job_form(session):
     municipalities = MunicipalityCollection(session)
-    municipality = municipalities.add(name="Winterthur", bfs_number=230)
+    municipality = municipalities.add(name="Boppelsen", bfs_number=82)
     municipality.pickup_dates.append(PickupDate(date=date(2019, 1, 7)))
     municipality.pickup_dates.append(PickupDate(date=date(2019, 1, 8)))
 
@@ -469,7 +469,7 @@ def test_add_scan_job_form(session):
 
 def test_edit_scan_job_form(session):
     municipalities = MunicipalityCollection(session)
-    municipality = municipalities.add(name="Winterthur", bfs_number=230)
+    municipality = municipalities.add(name="Boppelsen", bfs_number=82)
     municipality.pickup_dates.append(PickupDate(date=date(2019, 1, 7)))
     municipality.pickup_dates.append(PickupDate(date=date(2019, 1, 8)))
 
@@ -529,7 +529,7 @@ def test_edit_scan_job_form(session):
 
 def test_unrestricted_scan_job_form(session):
     municipalities = MunicipalityCollection(session)
-    municipality_1 = municipalities.add(name="Winterthur", bfs_number=230)
+    municipality_1 = municipalities.add(name="Boppelsen", bfs_number=82)
     municipality_1.pickup_dates.append(PickupDate(date=date(2019, 1, 7)))
     municipality_1.pickup_dates.append(PickupDate(date=date(2019, 1, 8)))
 
@@ -548,7 +548,7 @@ def test_unrestricted_scan_job_form(session):
         ]
         assert form.municipality_id.choices == [
             (municipality_2.id.hex, 'Adlikon (21)'),
-            (municipality_1.id.hex, 'Winterthur (230)')
+            (municipality_1.id.hex, 'Boppelsen (82)')
         ]
 
     # Test apply / update
