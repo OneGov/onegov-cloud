@@ -71,7 +71,7 @@ class ScanJobCollection(Pagination):
         )
 
     def default(self):
-        """ Returns the votes unfiltered and ordered by default. """
+        """ Returns the jobs unfiltered and ordered by default. """
 
         return self.__class__(self.session, group_id=self.group_id)
 
@@ -139,7 +139,7 @@ class ScanJobCollection(Pagination):
         return 'unsorted'
 
     def by_order(self, sort_by):
-        """ Returns the votes ordered by the given key. """
+        """ Returns the jobs ordered by the given key. """
 
         sort_order = self.default_sort_order
         if sort_by == self.current_sort_by:
@@ -201,23 +201,23 @@ class ScanJobCollection(Pagination):
             return self.page_by_index((self.page or 0) + 1)
 
     def query(self):
-        """ Returns the votes matching to the current filters and order. """
+        """ Returns the jobs matching to the current filters and order. """
 
         query = self.session.query(ScanJob)
         query = query.join(Municipality)
 
         if self.group_id:
             query = query.filter(ScanJob.municipality_id == self.group_id)
+        elif self.municipality_id:
+            query = query.filter(
+                ScanJob.municipality_id.in_(self.municipality_id)
+            )
         if self.from_date:
             query = query.filter(ScanJob.dispatch_date >= self.from_date)
         if self.to_date:
             query = query.filter(ScanJob.dispatch_date <= self.to_date)
         if self.type:
             query = query.filter(ScanJob.type.in_(self.type))
-        if self.municipality_id:
-            query = query.filter(
-                ScanJob.municipality_id.in_(self.municipality_id)
-            )
         if self.term:
             query = query.filter(
                 or_(*[

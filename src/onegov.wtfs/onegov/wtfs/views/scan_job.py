@@ -30,7 +30,7 @@ from onegov.wtfs.security import ViewModelUnrestricted
     form=ScanJobsForm,
     template='scan_jobs.pt'
 )
-def view_votes(self, request, form):
+def view_scan_jobs(self, request, form):
     if request.has_permission(self, ViewModelUnrestricted):
         return redirect(request.link(self, 'unrestricted'))
 
@@ -51,7 +51,7 @@ def view_votes(self, request, form):
     form=UnrestrictedScanJobsForm,
     template='scan_jobs_unrestricted.pt'
 )
-def view_votes_unrestricted(self, request, form):
+def view_scan_jobs_unrestricted(self, request, form):
     if not form.errors:
         form.apply_model(self)
 
