@@ -40,6 +40,14 @@ def test_views_report(client):
             .click("05.01.2019").click("Bearbeiten")
         edit.form['return_date'] = "2019-01-10"
         edit.form['return_boxes'] = "8888"
+        edit.form['return_scanned_tax_forms_older'] = "9600"
+        edit.form['return_scanned_tax_forms_last_year'] = "9700"
+        edit.form['return_scanned_tax_forms_current_year'] = "9800"
+        edit.form['return_scanned_single_documents'] = "9900"
+        edit.form['return_unscanned_tax_forms_older'] = "96"
+        edit.form['return_unscanned_tax_forms_last_year'] = "97"
+        edit.form['return_unscanned_tax_forms_current_year'] = "98"
+        edit.form['return_unscanned_single_documents'] = "99"
         assert "Scan-Auftrag geändert." in edit.form.submit().maybe_follow()
 
     def get_report(report_type, start, end, scan_job_type='all'):
@@ -56,39 +64,39 @@ def test_views_report(client):
     assert "1111" in view
     assert "2222" in view
     assert "3333" in view
-    assert "8888" not in view
+    assert "8888" in view
 
     view = get_report('boxes', '2019-01-06', '2019-01-10')
     assert "1111" not in view
     assert "2222" not in view
     assert "3333" not in view
-    assert "8888" in view
+    assert "8888" not in view
 
     # Boxes and forms
     view = get_report('boxes_and_forms', '2019-01-01', '2019-01-05')
-    assert "4444" in view
-    assert "5555" in view
-    assert "6666" in view
-    assert "7777" in view
-    assert "8888" not in view
+    assert "8888" in view
+    assert "9504" in view
+    assert "9603" in view
+    assert "9702" in view
+    assert "9801" in view
 
     view = get_report('boxes_and_forms', '2019-01-06', '2019-01-10')
-    assert "4444" not in view
-    assert "5555" not in view
-    assert "6666" not in view
-    assert "7777" not in view
-    assert "8888" in view
+    assert "8888" not in view
+    assert "9504" not in view
+    assert "9603" not in view
+    assert "9702" not in view
+    assert "9801" not in view
 
     # Forms
     view = get_report('forms', '2019-01-01', '2019-01-05')
-    assert "4444" in view
-    assert "5555" in view
-    assert "6666" in view
+    assert "9504" in view
+    assert "9603" in view
+    assert "9702" in view
 
     view = get_report('forms', '2019-01-06', '2019-01-10')
-    assert "4444" not in view
-    assert "5555" not in view
-    assert "6666" not in view
+    assert "9504" not in view
+    assert "9603" not in view
+    assert "9702" not in view
 
 
 @patch.object(CoreRequest, 'assert_valid_csrf_token')

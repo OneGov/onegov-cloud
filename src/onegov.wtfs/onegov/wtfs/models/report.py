@@ -3,11 +3,13 @@ from datetime import date
 from onegov.wtfs.models.municipality import Municipality
 from onegov.wtfs.models.scan_job import ScanJob
 from sqlalchemy import func
+from sqlalchemy import Integer
 from sqlalchemy.sql.expression import literal_column
 
 
 def sum(table, attribute):
     result = func.coalesce(func.sum(getattr(table, attribute)), 0)
+    result = func.cast(result, Integer)
     return result.label(attribute)
 
 
@@ -18,8 +20,10 @@ def zero(attribute):
 class Report(object):
     """ The base class for the reports.
 
-    Aggregates the ``columns_in`` on the dispatch date and ``columns_out`` on
-    the return date. Allows to filter by date range and scan job type.
+    Aggregates the ``columns_dispatch`` on the dispatch date and
+    ``columns_return`` on the return date.
+
+    Allows to filter by date range and scan job type.
 
     """
 
@@ -40,26 +44,26 @@ class Report(object):
             return query.scalar()
 
     @cached_property
-    def columns_in(self):
-        raise NotImplementedError()
+    def columns_dispatch(self):
+        return []
 
     @cached_property
-    def columns_out(self):
-        raise NotImplementedError()
+    def columns_return(self):
+        return []
 
     @cached_property
     def columns(self):
-        return self.columns_in + self.columns_out
+        return self.columns_dispatch + self.columns_return
 
     @property
     def query(self):
-        # in / dispatch date
+        # aggregate on dispatch date
         query_in = self.session.query(ScanJob).join(Municipality)
         query_in = query_in.with_entities(
             Municipality.name.label('name'),
             Municipality.meta['bfs_number'].label('bfs_number'),
-            *[sum(ScanJob, column) for column in self.columns_in],
-            *[zero(column) for column in self.columns_out],
+            *[sum(ScanJob, column) for column in self.columns_dispatch],
+            *[zero(column) for column in self.columns_return],
         )
         query_in = query_in.filter(
             ScanJob.dispatch_date >= self.start,
@@ -76,13 +80,13 @@ class Report(object):
             Municipality.meta['bfs_number'].label('bfs_number')
         )
 
-        # out / return date
+        # aggregate on return date
         query_out = self.session.query(ScanJob).join(Municipality)
         query_out = query_out.with_entities(
             Municipality.name.label('name'),
             Municipality.meta['bfs_number'].label('bfs_number'),
-            *[zero(column) for column in self.columns_in],
-            *[sum(ScanJob, column) for column in self.columns_out],
+            *[zero(column) for column in self.columns_dispatch],
+            *[sum(ScanJob, column) for column in self.columns_return],
         )
         query_out = query_out.filter(
             ScanJob.return_date >= self.start,
@@ -99,7 +103,7 @@ class Report(object):
             Municipality.meta['bfs_number'].label('bfs_number')
         )
 
-        # join in / out
+        # join
         union = query_in.union_all(query_out).subquery('union')
         query = self.session.query(
             union.c.name,
@@ -112,60 +116,53 @@ class Report(object):
 
     @property
     def total(self):
-        query = self.query.subquery()
+        subquery = self.query.subquery()
         query = self.session.query(
-            *[sum(query.c, column) for column in self.columns],
+            *[sum(subquery.c, column) for column in self.columns],
         )
         return query.one()
 
 
 class ReportBoxes(Report):
-    """ A Report containing all boxes of normal scan jobs. """
+    """ A Report containing all boxes from the municipalities of normal scan
+    jobs. """
 
     def __init__(self, session, start=None, end=None):
         super().__init__(session, start, end, ['normal'])
 
     @cached_property
-    def columns_in(self):
+    def columns_dispatch(self):
         return [
             'dispatch_boxes',
             'dispatch_cantonal_tax_office',
             'dispatch_cantonal_scan_center',
+            'return_boxes'
         ]
-
-    @cached_property
-    def columns_out(self):
-        return ['return_boxes']
 
 
 class ReportBoxesAndForms(Report):
     """ A Report containing all boxes, tax forms and single documents. """
 
     @cached_property
-    def columns_in(self):
+    def columns_dispatch(self):
         return [
-            'dispatch_tax_forms_older',
-            'dispatch_tax_forms_last_year',
-            'dispatch_tax_forms_current_year',
-            'dispatch_single_documents',
+            'return_tax_forms_older',
+            'return_tax_forms_last_year',
+            'return_tax_forms_current_year',
+            'return_tax_forms',
+            'return_single_documents',
+            'return_boxes'
         ]
-
-    @cached_property
-    def columns_out(self):
-        return ['return_boxes']
 
 
 class ReportFormsByMunicipality(Report):
     """ A Report containing all tax forms of a single municipality. """
 
     @cached_property
-    def columns_in(self):
+    def columns_dispatch(self):
         return [
-            'dispatch_tax_forms_older',
-            'dispatch_tax_forms_last_year',
-            'dispatch_tax_forms_current_year',
+            'return_tax_forms_older',
+            'return_tax_forms_last_year',
+            'return_tax_forms_current_year',
+            'return_tax_forms',
         ]
-
-    @cached_property
-    def columns_out(self):
-        return []
