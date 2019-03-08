@@ -32,92 +32,94 @@ from uuid import uuid4
 def test_permissions(wtfs_app, wtfs_password):
     session = wtfs_app.session()
 
-    # Remove existing group
+    # Remove existing users and group
     session.query(User).filter_by(realname='Editor').one().group_id = None
     session.query(User).filter_by(realname='Member').one().group_id = None
-    session.query(UserGroup).delete()
+    session.query(Municipality).delete()
 
     # Add new
-    group_a_id = uuid4()
-    session.add(UserGroup(id=group_a_id, name="Group A"))
+    municipality_a_id = uuid4()
+    session.add(Municipality(
+        id=municipality_a_id,
+        name='Municipality A',
+        bfs_number=10,
+    ))
+    session.add(PickupDate(
+        date=date.today(),
+        municipality_id=municipality_a_id,
+    ))
+    session.add(ScanJob(
+        type='normal',
+        municipality_id=municipality_a_id,
+        dispatch_date=date(2019, 1, 1))
+    )
     session.add(User(
         realname='Admin A',
         username='admin-a@example.org',
         password_hash=wtfs_password,
         role='admin',
-        group_id=group_a_id
+        group_id=municipality_a_id
     ))
     session.add(User(
         realname='Editor A',
         username='editor-a@example.org',
         password_hash=wtfs_password,
         role='editor',
-        group_id=group_a_id
+        group_id=municipality_a_id
     ))
     session.add(User(
         realname='Member A',
         username='member-a@example.org',
         password_hash=wtfs_password,
         role='member',
-        group_id=group_a_id
+        group_id=municipality_a_id
     ))
 
-    group_b_id = uuid4()
-    session.add(UserGroup(id=group_b_id, name="Group B"))
+    municipality_b_id = uuid4()
+    session.add(Municipality(
+        id=municipality_b_id,
+        name='Municipality B',
+        bfs_number=20,
+    ))
     session.add(User(
         realname='Admin B',
         username='admin-b@example.org',
         password_hash=wtfs_password,
         role='admin',
-        group_id=group_b_id
+        group_id=municipality_b_id
     ))
     session.add(User(
         realname='Editor B',
         username='editor-b@example.org',
         password_hash=wtfs_password,
         role='editor',
-        group_id=group_b_id
+        group_id=municipality_b_id
     ))
     session.add(User(
         realname='Member B',
         username='member-b@example.org',
         password_hash=wtfs_password,
         role='member',
-        group_id=group_b_id
+        group_id=municipality_b_id
     ))
 
-    municipality_id = uuid4()
-    session.add(Municipality(
-        id=municipality_id,
-        name='Municipality A',
-        bfs_number=10,
-        group_id=group_a_id
-    ))
-    session.add(PickupDate(
-        date=date.today(),
-        municipality_id=municipality_id,
-    ))
-    session.add(ScanJob(
-        type='normal',
-        group_id=group_a_id,
-        municipality_id=municipality_id,
-        dispatch_date=date(2019, 1, 1))
-    )
-
-    admin = session.query(User).filter_by(realname='Admin').one()
-    admin_a = session.query(User).filter_by(realname='Admin A').one()
-    admin_b = session.query(User).filter_by(realname='Admin B').one()
-    editor = session.query(User).filter_by(realname='Editor').one()
-    editor_a = session.query(User).filter_by(realname='Editor A').one()
-    editor_b = session.query(User).filter_by(realname='Editor B').one()
-    member = session.query(User).filter_by(realname='Member').one()
-    member_a = session.query(User).filter_by(realname='Member A').one()
-    member_b = session.query(User).filter_by(realname='Member B').one()
+    query = session.query
+    admin = query(User).filter_by(realname='Admin').one()
+    admin_a = query(User).filter_by(realname='Admin A').one()
+    admin_b = query(User).filter_by(realname='Admin B').one()
+    editor = query(User).filter_by(realname='Editor').one()
+    editor_a = query(User).filter_by(realname='Editor A').one()
+    editor_b = query(User).filter_by(realname='Editor B').one()
+    member = query(User).filter_by(realname='Member').one()
+    member_a = query(User).filter_by(realname='Member A').one()
+    member_b = query(User).filter_by(realname='Member B').one()
     group = UserGroup()
-    group_a = session.query(UserGroup).filter_by(name='Group A').one()
-    group_b = session.query(UserGroup).filter_by(name='Group B').one()
-    municipality = session.query(Municipality).one()
-    scan_job = session.query(ScanJob).one()
+    group_a = query(UserGroup).filter_by(name='Municipality A').one()
+    group_b = query(UserGroup).filter_by(name='Municipality B').one()
+    municipality = Municipality()
+    municipality_a = query(Municipality).filter_by(name='Municipality A').one()
+    municipality_b = query(Municipality).filter_by(name='Municipality B').one()
+    scan_job = query(ScanJob).one()
 
     def permits(user, model, permission):
         return wtfs_app._permits(
@@ -152,30 +154,34 @@ def test_permissions(wtfs_app, wtfs_password):
         assert not permits(user, model, ViewModel)
         assert not permits(user, model, ViewModelUnrestricted)
 
-    # UserGroupCollection
-    model = UserGroupCollection(session)
-    for user in (admin, admin_a, admin_b):
-        assert permits(user, model, Public)
-        assert permits(user, model, AddModel)
-        assert permits(user, model, AddModelUnrestricted)
-        assert permits(user, model, EditModel)
-        assert permits(user, model, EditModelUnrestricted)
-        assert permits(user, model, DeleteModel)
-        assert permits(user, model, ViewModel)
-        assert permits(user, model, ViewModelUnrestricted)
-    for user in (editor, editor_a, editor_b, member, member_a, member_b):
-        assert permits(user, model, Public)
-        assert not permits(user, model, AddModel)
-        assert not permits(user, model, AddModelUnrestricted)
-        assert not permits(user, model, EditModel)
-        assert not permits(user, model, EditModelUnrestricted)
-        assert not permits(user, model, DeleteModel)
-        assert not permits(user, model, ViewModel)
-        assert not permits(user, model, ViewModelUnrestricted)
+    # UserGroupCollection / MunicipalityCollection
+    # MunicipalityCollection
+    for model in (
+        MunicipalityCollection(session),
+        UserGroupCollection(session)
+    ):
+        for user in (admin, admin_a, admin_b):
+            assert permits(user, model, Public)
+            assert permits(user, model, AddModel)
+            assert permits(user, model, AddModelUnrestricted)
+            assert permits(user, model, EditModel)
+            assert permits(user, model, EditModelUnrestricted)
+            assert permits(user, model, DeleteModel)
+            assert permits(user, model, ViewModel)
+            assert permits(user, model, ViewModelUnrestricted)
+        for user in (editor, editor_a, editor_b, member, member_a, member_b):
+            assert permits(user, model, Public)
+            assert not permits(user, model, AddModel)
+            assert not permits(user, model, AddModelUnrestricted)
+            assert not permits(user, model, EditModel)
+            assert not permits(user, model, EditModelUnrestricted)
+            assert not permits(user, model, DeleteModel)
+            assert not permits(user, model, ViewModel)
+            assert not permits(user, model, ViewModelUnrestricted)
 
-    # UserGroup
+    # UserGroup / Municipality
     for user in (admin, admin_a, admin_b):
-        for model in (group_a, group_b):
+        for model in (group_a, group_b, municipality_a, municipality_b):
             assert permits(user, model, Public)
             assert permits(user, model, AddModel)
             assert permits(user, model, AddModelUnrestricted)
@@ -184,7 +190,7 @@ def test_permissions(wtfs_app, wtfs_password):
             assert not permits(user, model, DeleteModel)
             assert permits(user, model, ViewModel)
             assert permits(user, model, ViewModelUnrestricted)
-        for model in (group, ):
+        for model in (group, municipality):
             assert permits(user, model, Public)
             assert permits(user, model, AddModel)
             assert permits(user, model, AddModelUnrestricted)
@@ -194,7 +200,10 @@ def test_permissions(wtfs_app, wtfs_password):
             assert permits(user, model, ViewModel)
             assert permits(user, model, ViewModelUnrestricted)
     for user in (editor, editor_a, editor_b, member, member_a, member_b):
-        for model in (group_a, group_b, group):
+        for model in (
+            group_a, group_b, group,
+            municipality_a, municipality_b, municipality
+        ):
             assert permits(user, model, Public)
             assert not permits(user, model, AddModel)
             assert not permits(user, model, AddModelUnrestricted)
@@ -308,58 +317,6 @@ def test_permissions(wtfs_app, wtfs_password):
     for user in (member, member_a, member_b):
         for model in (admin, admin_a, admin_b, editor, editor_a, editor_b,
                       member, member_a, member_b):
-            assert permits(user, model, Public)
-            assert not permits(user, model, AddModel)
-            assert not permits(user, model, AddModelUnrestricted)
-            assert not permits(user, model, EditModel)
-            assert not permits(user, model, EditModelUnrestricted)
-            assert not permits(user, model, DeleteModel)
-            assert not permits(user, model, ViewModel)
-            assert not permits(user, model, ViewModelUnrestricted)
-
-    # MunicipalityCollection
-    model = MunicipalityCollection(session)
-    for user in (admin, admin_a, admin_b):
-        assert permits(user, model, Public)
-        assert permits(user, model, AddModel)
-        assert permits(user, model, AddModelUnrestricted)
-        assert permits(user, model, EditModel)
-        assert permits(user, model, EditModelUnrestricted)
-        assert permits(user, model, DeleteModel)
-        assert permits(user, model, ViewModel)
-        assert permits(user, model, ViewModelUnrestricted)
-    for user in (editor, editor_a, editor_b, member, member_a, member_b):
-        assert permits(user, model, Public)
-        assert not permits(user, model, AddModel)
-        assert not permits(user, model, AddModelUnrestricted)
-        assert not permits(user, model, EditModel)
-        assert not permits(user, model, EditModelUnrestricted)
-        assert not permits(user, model, DeleteModel)
-        assert not permits(user, model, ViewModel)
-        assert not permits(user, model, ViewModelUnrestricted)
-
-    # Municipality
-    for user in (admin, admin_a, admin_b):
-        for model in (municipality,):
-            assert permits(user, model, Public)
-            assert permits(user, model, AddModel)
-            assert permits(user, model, AddModelUnrestricted)
-            assert permits(user, model, EditModel)
-            assert permits(user, model, EditModelUnrestricted)
-            assert not permits(user, model, DeleteModel)
-            assert permits(user, model, ViewModel)
-            assert permits(user, model, ViewModelUnrestricted)
-        for model in (Municipality(),):
-            assert permits(user, model, Public)
-            assert permits(user, model, AddModel)
-            assert permits(user, model, AddModelUnrestricted)
-            assert permits(user, model, EditModel)
-            assert permits(user, model, EditModelUnrestricted)
-            assert permits(user, model, DeleteModel)
-            assert permits(user, model, ViewModel)
-            assert permits(user, model, ViewModelUnrestricted)
-    for user in (editor, editor_a, editor_b, member, member_a, member_b):
-        for model in (municipality, Municipality()):
             assert permits(user, model, Public)
             assert not permits(user, model, AddModel)
             assert not permits(user, model, AddModelUnrestricted)

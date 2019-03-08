@@ -1,7 +1,6 @@
 from base64 import b64decode
 from datetime import date
 from freezegun import freeze_time
-from onegov.user import UserGroup
 from onegov.wtfs.models import DailyListBoxes
 from onegov.wtfs.models import DailyListBoxesAndForms
 from onegov.wtfs.models import Invoice
@@ -22,15 +21,10 @@ def test_principal():
 
 
 def test_municipality(session):
-    session.add(UserGroup(name='Benutzer'))
-    session.flush()
-    group = session.query(UserGroup).one()
-
     session.add(
         Municipality(
             name='Winterthur',
             bfs_number=230,
-            group_id=group.id,
             address_supplement='Zusatz',
             gpn_number=1120
         )
@@ -40,12 +34,10 @@ def test_municipality(session):
     municipality = session.query(Municipality).one()
     assert municipality.name == 'Winterthur'
     assert municipality.bfs_number == 230
-    assert municipality.group == group
     assert municipality.address_supplement == 'Zusatz'
     assert municipality.gpn_number == 1120
     assert municipality._price_per_quantity == 700
     assert municipality.price_per_quantity == 7.0
-    assert group.municipality == municipality
     assert not municipality.has_data
 
     municipality.price_per_quantity = 8.5
@@ -73,20 +65,13 @@ def test_municipality(session):
 
 
 def test_scan_job(session):
-    session.add(UserGroup(name='Benutzer'))
-    session.flush()
-    group = session.query(UserGroup).one()
-
-    session.add(
-        Municipality(name='Winterthur', bfs_number=230, group_id=group.id)
-    )
+    session.add(Municipality(name='Winterthur', bfs_number=230))
     session.flush()
     municipality = session.query(Municipality).one()
 
     session.add(
         ScanJob(
             type='normal',
-            group_id=group.id,
             municipality_id=municipality.id,
             dispatch_date=date(2019, 1, 1),
             dispatch_note='Dispatch note',
@@ -114,11 +99,9 @@ def test_scan_job(session):
 
     scan_job = session.query(ScanJob).one()
     assert scan_job.municipality == municipality
-    assert scan_job.group == group
     assert scan_job.delivery_number == 1
     assert scan_job.title.interpolate() == 'Scan job no. 1'
     assert scan_job.type == 'normal'
-    assert scan_job.group_id == group.id
     assert scan_job.municipality_id == municipality.id
     assert scan_job.dispatch_date == date(2019, 1, 1)
     assert scan_job.dispatch_note == 'Dispatch note'
@@ -150,7 +133,6 @@ def test_scan_job(session):
     assert scan_job.return_single_documents == 12 - 13
 
     assert municipality.scan_jobs.one() == scan_job
-    assert group.scan_jobs.one() == scan_job
     assert municipality.has_data
 
 
@@ -158,7 +140,6 @@ def add_report_data(session):
     data = {
         'Adlikon': {
             'municipality_id': uuid4(),
-            'group_id': uuid4(),
             'bfs_number': 21,
             'jobs': [
                 [date(2019, 1, 1), 1, 2, 3, date(2019, 1, 2), 4],
@@ -167,7 +148,6 @@ def add_report_data(session):
         },
         'Aesch': {
             'municipality_id': uuid4(),
-            'group_id': uuid4(),
             'bfs_number': 241,
             'jobs': [
                 [date(2019, 1, 1), 1, 2, 3, date(2019, 1, 2), 4],
@@ -176,7 +156,6 @@ def add_report_data(session):
         },
         'Altikon': {
             'municipality_id': uuid4(),
-            'group_id': uuid4(),
             'bfs_number': 211,
             'jobs': [
                 [date(2019, 1, 2), 1, 2, 3, date(2019, 1, 2), 4],
@@ -184,7 +163,6 @@ def add_report_data(session):
         },
         'Andelfingen': {
             'municipality_id': uuid4(),
-            'group_id': uuid4(),
             'bfs_number': 30,
             'jobs': [
                 [date(2019, 1, 2), 1, 2, 3, date(2019, 1, 4), 4],
@@ -193,21 +171,15 @@ def add_report_data(session):
     }
 
     for name, values in data.items():
-        session.add(UserGroup(
-            name=name,
-            id=values['group_id']
-        ))
         session.add(Municipality(
             name=name,
             id=values['municipality_id'],
-            bfs_number=values['bfs_number'],
-            group_id=values['group_id'])
-        )
+            bfs_number=values['bfs_number']
+        ))
         for job in values['jobs']:
             session.add(
                 ScanJob(
                     type='normal',
-                    group_id=values['group_id'],
                     municipality_id=values['municipality_id'],
                     dispatch_date=job[0],
                     dispatch_boxes=job[1],
@@ -433,17 +405,12 @@ def test_notification(session):
 
 
 def test_invoice(session):
-    session.add(UserGroup(name='Adlikon'))
-    session.flush()
-    group = session.query(UserGroup).one()
-
     session.add(
         Municipality(
             name='Adlikon',
             address_supplement='Finkenweg',
             gpn_number=8882255,
             bfs_number=21,
-            group_id=group.id
         )
     )
     session.flush()
@@ -452,7 +419,6 @@ def test_invoice(session):
     session.add(
         ScanJob(
             type='normal',
-            group_id=group.id,
             municipality_id=municipality.id,
             dispatch_date=date(2019, 1, 10),
             dispatch_boxes=1,

@@ -2,8 +2,8 @@ from onegov_testing import Client as BaseClient
 from onegov_testing.utils import create_app
 from onegov.core.crypto import hash_password
 from onegov.user import User
-from onegov.user import UserGroup
 from onegov.wtfs import WtfsApp
+from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import Principal
 from pytest import fixture
 from transaction import commit
@@ -32,7 +32,11 @@ def create_wtfs_app(request, temporary_path):
 
     session = app.session()
     group_id = uuid4()
-    session.add(UserGroup(id=group_id, name='My Group'))
+    session.add(Municipality(
+        id=group_id,
+        name='My Municipality',
+        bfs_number=1
+    ))
     session.add(User(
         realname='Admin',
         username='admin@example.org',

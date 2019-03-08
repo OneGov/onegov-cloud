@@ -1,7 +1,6 @@
 from onegov.core.security import Public
 from onegov.user import User
 from onegov.user import UserCollection
-from onegov.user import UserGroup
 from onegov.wtfs import WtfsApp
 from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.models import DailyList
@@ -40,8 +39,16 @@ class ViewModelUnrestricted(object):
 
 
 def same_group(model, identity):
-    if model.group_id and identity.groupid:
-        return model.group_id.hex == identity.groupid
+    """ Returns True, if the given model is in the same user group/municipality
+    as the given identy.
+
+    """
+    if hasattr(model, 'group_id'):
+        if model.group_id and identity.groupid:
+            return model.group_id.hex == identity.groupid
+    elif hasattr(model, 'municipality_id'):
+        if model.municipality_id and identity.groupid:
+            return model.municipality_id.hex == identity.groupid
     return False
 
 
@@ -70,22 +77,12 @@ def get_roles_setting():
     }
 
 
-@WtfsApp.permission_rule(model=UserGroup, permission=object)
-def has_permission_user_group(app, identity, model, permission):
-    # User groups linked to municipalities and users cannot be deleted
-    if permission in {DeleteModel}:
-        if model.municipality:
-            return False
-        if model.users.first():
-            return False
-
-    return permission in getattr(app.settings.roles, identity.role)
-
-
 @WtfsApp.permission_rule(model=Municipality, permission=object)
 def has_permission_municipality(app, identity, model, permission):
-    # Municipalities with data cannot not be deleted
+    # Municipalities with data and/or users cannot not be deleted
     if permission in {DeleteModel}:
+        if model.users.first():
+            return False
         if model.has_data:
             return False
 

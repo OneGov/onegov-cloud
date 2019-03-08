@@ -2,7 +2,6 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from onegov.user import UserGroup
 from onegov.wtfs import _
 from onegov.wtfs.models.municipality import Municipality
 from sqlalchemy import Column
@@ -28,17 +27,6 @@ class ScanJob(Base, TimestampMixin, ContentMixin):
 
     #: the id of the db record (only relevant internally)
     id = Column(UUID, primary_key=True, default=uuid4)
-
-    #: The group that owns the scan job.
-    group_id = Column(UUID, ForeignKey(UserGroup.id), nullable=False)
-    group = relationship(
-        UserGroup,
-        backref=backref(
-            'scan_jobs',
-            lazy='dynamic',
-            order_by='ScanJob.dispatch_date'
-        )
-    )
 
     #: The municipality that owns the scan job.
     municipality_id = Column(UUID, ForeignKey(Municipality.id), nullable=False)

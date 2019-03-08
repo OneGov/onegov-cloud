@@ -57,7 +57,7 @@ class Report(object):
         query_in = self.session.query(ScanJob).join(Municipality)
         query_in = query_in.with_entities(
             Municipality.name.label('name'),
-            Municipality.bfs_number.label('bfs_number'),
+            Municipality.meta['bfs_number'].label('bfs_number'),
             *[sum(ScanJob, column) for column in self.columns_in],
             *[zero(column) for column in self.columns_out],
         )
@@ -73,14 +73,14 @@ class Report(object):
             )
         query_in = query_in.group_by(
             Municipality.name,
-            Municipality.bfs_number
+            Municipality.meta['bfs_number'].label('bfs_number')
         )
 
         # out / return date
         query_out = self.session.query(ScanJob).join(Municipality)
         query_out = query_out.with_entities(
             Municipality.name.label('name'),
-            Municipality.bfs_number.label('bfs_number'),
+            Municipality.meta['bfs_number'].label('bfs_number'),
             *[zero(column) for column in self.columns_in],
             *[sum(ScanJob, column) for column in self.columns_out],
         )
@@ -96,7 +96,7 @@ class Report(object):
             )
         query_out = query_out.group_by(
             Municipality.name,
-            Municipality.bfs_number
+            Municipality.meta['bfs_number'].label('bfs_number')
         )
 
         # join in / out

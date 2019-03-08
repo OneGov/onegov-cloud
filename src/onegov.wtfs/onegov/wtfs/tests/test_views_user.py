@@ -5,23 +5,23 @@ from unittest.mock import patch
 def test_views_user(client):
     client.login_admin()
 
-    # Add a group
-    add = client.get('/user-groups').click(href='add')
-    add.form['name'] = "Gruppe Winterthur"
-    assert "Benutzergruppe hinzugefügt." in add.form.submit().follow()
+    # Add a municipality
+    add = client.get('/municipalities').click(href='add')
+    add.form['name'] = "Adlikon"
+    add.form['bfs_number'] = '1'
+    assert "Adlikon" in add.form.submit().follow()
 
     # Add a user
     add = client.get('/users').click(href='add')
     add.form['realname'] = "Hans Muster"
     add.form['username'] = "hans.muster@winterthur.ch"
     add.form['role'].select('editor')
-    add.form['group_id'].select(text="Gruppe Winterthur")
+    add.form['municipality_id'].select(text="Adlikon (1)")
     add.form['contact'] = True
     added = add.form.submit().follow()
     assert "Benutzer hinzugefügt." in added
     assert "Hans Muster" in added
-    assert "Hans Muster" in client.get('/user-groups').\
-        click("Gruppe Winterthur")
+    assert "Hans Muster" in client.get('/municipalities').click("Adlikon")
 
     # Add a user without a group
     add = client.get('/users').click(href='add')
@@ -37,7 +37,7 @@ def test_views_user(client):
     assert "Gemeindeadministrator" in view
     assert "hans.muster@winterthur.ch" in view
     assert "✔︎" in view
-    assert "Gruppe Winterthur" in view
+    assert "Adlikon" in view
 
     view = client.get('/users').click("Optimo X")
     assert "Benutzer" in view
@@ -55,7 +55,7 @@ def test_views_user(client):
     assert "Benutzer" in view
     assert "hans-peter.muster@winterthur.ch" in view
     assert "✔︎" in view
-    assert "Gruppe Winterthur" in view
+    assert "Adlikon" in view
 
     # Delete user
     deleted = client.get('/users').click("Hans-Peter Muster").click("Löschen")
@@ -83,7 +83,7 @@ def test_views_user_editor(client):
     assert "Benutzer" in view
     assert "hans.muster@winterthur.ch" in view
     assert "✔︎" in view
-    assert "My Group" in view
+    assert "My Municipality" in view
 
     # Edit the user
     edit = client.get('/users').click("Hans Muster").click("Bearbeiten")
@@ -96,7 +96,7 @@ def test_views_user_editor(client):
     assert "Benutzer" in view
     assert "hans-peter.muster@winterthur.ch" in view
     assert "✘︎" in view
-    assert "My Group" in view
+    assert "My Municipality" in view
 
     # Delete the user
     deleted = client.get('/users').click("Hans-Peter Muster").click("Löschen")

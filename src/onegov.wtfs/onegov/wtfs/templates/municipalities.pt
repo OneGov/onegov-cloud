@@ -8,11 +8,15 @@
                     <thead>
                         <tr>
                             <th i18n:translate>Name</th>
+                            <th i18n:translate>BFS number</th>
+                            <th i18n:translate>Number of users</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr tal:repeat="municipality layout.model.query()">
                             <td><a href="${request.link(municipality)}">${municipality.name}</a></td>
+                            <td>${municipality.bfs_number}</td>
+                            <td>${municipality.users.count()}</td>
                         </tr>
                     </tbody>
                 </table>

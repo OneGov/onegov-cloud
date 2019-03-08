@@ -1,13 +1,9 @@
 from onegov.core.orm.func import unaccent
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectField
-from onegov.user import UserGroup
 from onegov.wtfs import _
 from onegov.wtfs.fields import MunicipalityDataUploadField
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import PickupDate
-from sqlalchemy import func
-from sqlalchemy import String
 from wtforms import FloatField
 from wtforms import IntegerField
 from wtforms import SelectField
@@ -34,14 +30,6 @@ class MunicipalityForm(Form):
         ]
     )
 
-    group_id = ChosenSelectField(
-        label=_("User group"),
-        choices=[],
-        validators=[
-            InputRequired()
-        ]
-    )
-
     address_supplement = StringField(
         label=_("Address supplement"),
     )
@@ -61,31 +49,12 @@ class MunicipalityForm(Form):
         ]
     )
 
-    def on_request(self):
-        model = getattr(self, 'model', None)
-
-        session = self.request.session
-        groups = session.query(func.cast(UserGroup.id, String), UserGroup.name)
-        if getattr(model, 'has_data', False):
-            groups = groups.filter(UserGroup.id == model.group_id)
-        else:
-            used_groups = session.query(Municipality.group_id)
-            used_groups = used_groups.filter(Municipality.group_id.isnot(None))
-            used_groups = {r.group_id for r in used_groups}
-            if getattr(model, 'group_id', None):
-                used_groups -= {model.group_id}
-            groups = groups.filter(UserGroup.id.notin_(used_groups))
-        groups = groups.order_by(UserGroup.name)
-        self.group_id.choices = groups.all()
-
     def update_model(self, model):
         model.name = self.name.data
         model.bfs_number = self.bfs_number.data
         model.address_supplement = self.address_supplement.data
         model.gpn_number = self.gpn_number.data
         model.price_per_quantity = self.price_per_quantity.data
-        if not model.has_data:
-            model.group_id = self.group_id.data or None
 
     def apply_model(self, model):
         self.name.data = model.name
@@ -93,7 +62,6 @@ class MunicipalityForm(Form):
         self.address_supplement.data = model.address_supplement
         self.gpn_number.data = model.gpn_number
         self.price_per_quantity.data = model.price_per_quantity
-        self.group_id.data = str(model.group_id) if model.group_id else ''
 
 
 class ImportMunicipalityDataForm(Form):

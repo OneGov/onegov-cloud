@@ -13,7 +13,6 @@ def test_views_invoices(client):
     add.form['name'] = "Adlikon"
     add.form['bfs_number'] = '1'
     add.form['gpn_number'] = '11223344'
-    add.form['group_id'].select(text="My Group")
     assert "Adlikon" in add.form.submit().follow()
 
     upload = client.get('/municipalities').click("Daten importieren")

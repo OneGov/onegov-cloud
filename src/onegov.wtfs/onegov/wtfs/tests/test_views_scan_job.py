@@ -5,14 +5,8 @@ from webtest.forms import Upload
 
 
 def test_views_scan_job(client):
-    # Add a municipality with dates
+    # Add municipality dates
     client.login_admin()
-
-    add = client.get('/municipalities').click(href='add')
-    add.form['name'] = "My Municipality"
-    add.form['bfs_number'] = '1'
-    add.form['group_id'].select(text="My Group")
-    assert "My Municipality" in add.form.submit().follow()
 
     upload = client.get('/municipalities').click("Daten importieren")
     upload.form['file'] = Upload(
@@ -130,14 +124,8 @@ def test_views_scan_job(client):
 
 
 def test_views_scan_jobs_filter(client):
-    # Add a municipality with dates
+    # Add municipality dates
     client.login_admin()
-
-    add = client.get('/municipalities').click(href='add')
-    add.form['name'] = "My Municipality"
-    add.form['bfs_number'] = '1'
-    add.form['group_id'].select(text="My Group")
-    assert "My Municipality" in add.form.submit().follow()
 
     upload = client.get('/municipalities').click("Daten importieren")
     upload.form['file'] = Upload(
@@ -205,7 +193,6 @@ def test_views_scan_jobs_permissions(mock_method, client):
     add = client.get('/municipalities').click(href='add')
     add.form['name'] = "My Municipality"
     add.form['bfs_number'] = '1'
-    add.form['group_id'].select(text="My Group")
     assert "My Municipality" in add.form.submit().follow()
 
     with freeze_time("2019-01-01"):

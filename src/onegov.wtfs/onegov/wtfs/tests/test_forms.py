@@ -5,7 +5,6 @@ from io import BytesIO
 from mock import MagicMock
 from onegov.user import User
 from onegov.user import UserCollection
-from onegov.user import UserGroupCollection
 from onegov.wtfs.collections import MunicipalityCollection
 from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.forms import AddScanJobForm
@@ -23,7 +22,6 @@ from onegov.wtfs.forms import UnrestrictedScanJobForm
 from onegov.wtfs.forms import UnrestrictedScanJobsForm
 from onegov.wtfs.forms import UnrestrictedUserForm
 from onegov.wtfs.forms import UserForm
-from onegov.wtfs.forms import UserGroupForm
 from onegov.wtfs.models import Invoice
 from onegov.wtfs.models import Notification
 from onegov.wtfs.models import PickupDate
@@ -70,123 +68,59 @@ class PostData(dict):
 
 
 def test_municipality_form(session):
-    groups = UserGroupCollection(session)
-    group = groups.add(name="Gruppe Winterthur")
-    groups.add(name="Gruppe Aesch")
-
     municipalities = MunicipalityCollection(session)
-    municipality = municipalities.add(
-        name="Gemeinde Winterthur",
-        bfs_number=230,
-        group_id=group.id
-    )
-
-    # Test choices
-    form = MunicipalityForm()
-    form.request = Request(session)
-    form.on_request()
-    assert [c[1] for c in form.group_id.choices] == ["Gruppe Aesch"]
-
-    # ... collection
-    form.model = municipalities
-    form.on_request()
-    assert [c[1] for c in form.group_id.choices] == ["Gruppe Aesch"]
-
-    # ... municipality with no data
-    form.model = municipality
-    form.on_request()
-    assert [c[1] for c in form.group_id.choices] == [
-        "Gruppe Aesch", "Gruppe Winterthur"
-    ]
-
-    # ... municipality with data
-    scan_job = ScanJob(
-        group_id=group.id,
-        type='normal',
-        dispatch_date=date(2019, 1, 1)
-    )
-    municipality.scan_jobs.append(scan_job)
-    session.flush()
-    form.on_request()
-    assert [c[1] for c in form.group_id.choices] == ["Gruppe Winterthur"]
+    municipality = municipalities.add(name="Winterthur", bfs_number=230)
 
     # Test apply / update
     form = MunicipalityForm()
     form.apply_model(municipality)
-    assert form.name.data == "Gemeinde Winterthur"
+    assert form.name.data == "Winterthur"
     assert form.bfs_number.data == 230
-    assert form.group_id.data == str(group.id)
     assert form.address_supplement.data is None
     assert form.gpn_number.data is None
     assert form.price_per_quantity.data == 7.0
 
-    # ... municipality with data (group_id is ignored)
-    form.name.data = "Gemeinde Adlikon"
+    form.name.data = "Adlikon"
     form.bfs_number.data = 21
-    form.group_id.data = groups.add(name="Gruppe Adlikon").id
     form.address_supplement.data = "Zusatz"
     form.gpn_number.data = 1122
     form.price_per_quantity.data = 8.5
 
     form.update_model(municipality)
-    assert municipality.name == "Gemeinde Adlikon"
+    assert municipality.name == "Adlikon"
     assert municipality.bfs_number == 21
-    assert municipality.group.name == "Gruppe Winterthur"
     assert municipality.address_supplement == "Zusatz"
     assert municipality.gpn_number == 1122
     assert municipality.price_per_quantity == 8.5
 
-    # ... municipality with no data
-    session.delete(scan_job)
-    session.flush()
-    form.update_model(municipality)
-    session.flush()
-    session.expire_all()
-    assert municipality.group.name == "Gruppe Adlikon"
-
     # Test validation
     form = MunicipalityForm()
     form.request = Request(session)
-    form.on_request()
     assert not form.validate()
 
     form = MunicipalityForm(
         PostData({
-            'name': "Gemeinde Winterthur",
             'bfs_number': '230',
-            'group_id': ''
         })
     )
     form.request = Request(session)
-    form.on_request()
     assert not form.validate()
 
     form = MunicipalityForm(
         PostData({
-            'name': "Gemeinde Winterthur",
+            'name': "Winterthur",
             'bfs_number': '230',
-            'group_id': group.id,
             'price_per_quantity': 5.0
         })
     )
     form.request = Request(session)
-    form.on_request()
     assert form.validate()
 
 
 def test_import_municipality_data_form(session):
-    groups = UserGroupCollection(session)
     municipalities = MunicipalityCollection(session)
-    municipalities.add(
-        name="Winterthur",
-        bfs_number=230,
-        group_id=groups.add(name="Winterthur").id
-    )
-    municipalities.add(
-        name="Adlikon",
-        bfs_number=21,
-        group_id=groups.add(name="Adlikon").id
-    )
+    municipalities.add(name="Winterthur", bfs_number=230)
+    municipalities.add(name="Adlikon", bfs_number=21)
 
     # Test apply
     form = ImportMunicipalityDataForm()
@@ -223,13 +157,8 @@ def test_import_municipality_data_form(session):
 
 
 def test_delete_municipality_dates_form(session):
-    groups = UserGroupCollection(session)
     municipalities = MunicipalityCollection(session)
-    municipality = municipalities.add(
-        name="Winterthur",
-        bfs_number=230,
-        group_id=groups.add(name="Winterthur").id
-    )
+    municipality = municipalities.add(name="Winterthur", bfs_number=230)
 
     # Test apply / update
     form = DeleteMunicipalityDatesForm()
@@ -270,55 +199,26 @@ def test_delete_municipality_dates_form(session):
 
 
 def test_municipality_selection_form(session):
-    groups = UserGroupCollection(session)
-    group = groups.add(name="Gruppe Winterthur")
-    groups.add(name="Gruppe Aesch")
-
     municipalities = MunicipalityCollection(session)
-    municipality = municipalities.add(
-        name="Gemeinde Aesch",
-        bfs_number=230,
-        group_id=group.id
-    )
+    municipality = municipalities.add(name="Aesch", bfs_number=230)
 
     # Test choices
     form = MunicipalityIdSelectionForm()
     form.request = Request(session)
     form.on_request()
-    assert [c[1] for c in form.municipality_id.choices] == ["Gemeinde Aesch"]
+    assert [c[1] for c in form.municipality_id.choices] == ["Aesch"]
 
     form.municipality_id.data = municipality.id
     assert form.municipality == municipality
 
 
-def test_user_group_form(session):
-    # Test apply / update
-    groups = UserGroupCollection(session)
-    group = groups.add(name="Gruppe Winterthur")
-
-    form = UserGroupForm()
-    form.apply_model(group)
-    assert form.name.data == "Gruppe Winterthur"
-
-    form.name.data = "Gruppe Adlikon"
-    form.update_model(group)
-    assert group.name == "Gruppe Adlikon"
-
-    # Test validation
-    form = UserGroupForm()
-    assert not form.validate()
-
-    form = UserGroupForm(PostData({'name': "Gruppe Winterthur"}))
-    assert form.validate()
-
-
 def test_user_form(session):
-    groups = UserGroupCollection(session)
-    group = groups.add(name="Gruppe Winterthur")
+    municipalities = MunicipalityCollection(session)
+    municipality = municipalities.add(name="Aesch", bfs_number=230)
 
     # Test apply / update
     form = UserForm()
-    form.request = Request(session, groupid=group.id.hex)
+    form.request = Request(session, groupid=municipality.id.hex)
 
     user = User()
     form.realname.data = "Petra Muster"
@@ -327,7 +227,7 @@ def test_user_form(session):
     form.update_model(user)
     assert user.realname == "Petra Muster"
     assert user.username == "petra.muster@winterthur.ch"
-    assert user.group_id == group.id.hex
+    assert user.group_id == municipality.id.hex
     assert user.data['contact'] is False
     assert user.password_hash
     assert user.modified
@@ -353,21 +253,21 @@ def test_user_form(session):
     form.update_model(user)
     assert user.realname == "Hans-Peter Muster"
     assert user.username == "hans-peter.muster@winterthur.ch"
-    assert user.group_id == group.id.hex
+    assert user.group_id == municipality.id.hex
     assert user.data['contact'] is True
     assert user.password_hash == password_hash
     assert user.logout_all_sessions.called is True
 
     # Test validation
     form = UserForm()
-    form.request = Request(session, groupid=group.id.hex)
+    form.request = Request(session, groupid=municipality.id.hex)
     assert not form.validate()
 
     form = UserForm(PostData({
         'realname': "Hans-Peter Muster",
         'username': "hans-peter.muster@winterthur.ch"
     }))
-    form.request = Request(session, groupid=group.id.hex)
+    form.request = Request(session, groupid=municipality.id.hex)
     assert not form.validate()
     assert form.errors == {'username': ['This value already exists.']}
 
@@ -375,21 +275,21 @@ def test_user_form(session):
         'realname': "Hans Muster",
         'username': "hans.muster@winterthur.ch"
     }))
-    form.request = Request(session, groupid=group.id.hex)
+    form.request = Request(session, groupid=municipality.id.hex)
     assert form.validate()
 
 
 def test_unrestricted_user_form(session):
-    groups = UserGroupCollection(session)
-    group_1 = groups.add(name="Gruppe Winterthur")
-    group_2 = groups.add(name="Gruppe Aesch")
+    municipalities = MunicipalityCollection(session)
+    municipality_1 = municipalities.add(name="Aesch", bfs_number=230)
+    municipality_2 = municipalities.add(name="Adlikon", bfs_number=21)
 
     # Test choices
     form = UnrestrictedUserForm()
-    form.request = Request(session, groupid=group_1.id.hex)
+    form.request = Request(session)
     form.on_request()
-    assert [c[1] for c in form.group_id.choices] == [
-        "- none -", "Gruppe Winterthur", "Gruppe Aesch"
+    assert [c[1] for c in form.municipality_id.choices] == [
+        "- none -", "Adlikon (21)", "Aesch (230)"
     ]
     assert form.role.choices == [
         ('editor', "Editor"),
@@ -399,7 +299,7 @@ def test_unrestricted_user_form(session):
     # Test apply / update
     user = User()
     form.role.data = "member"
-    form.group_id.data = None
+    form.municipality_id.data = None
     form.realname.data = "Petra Muster"
     form.username.data = "petra.muster@winterthur.ch"
     form.contact.data = False
@@ -419,33 +319,33 @@ def test_unrestricted_user_form(session):
         role='member',
         password='abcd',
     )
-    user.group_id = group_1.id
+    user.group_id = municipality_1.id
     user.logout_all_sessions = MagicMock()
     password_hash = user.password_hash
 
     form.apply_model(user)
     assert form.role.data == 'member'
-    assert form.group_id.data == str(group_1.id)
+    assert form.municipality_id.data == municipality_1.id.hex
     assert form.realname.data == "Hans Muster"
     assert form.username.data == "hans.muster@winterthur.ch"
     assert form.contact.data is False
 
     form.role.data = 'admin'
-    form.group_id.data = str(group_2.id)
+    form.municipality_id.data = municipality_2.id.hex
     form.realname.data = "Hans-Peter Muster"
     form.username.data = "hans-peter.muster@winterthur.ch"
     form.contact.data = True
     form.update_model(user)
     assert user.realname == "Hans-Peter Muster"
     assert user.username == "hans-peter.muster@winterthur.ch"
-    assert user.group_id == str(group_2.id)
+    assert user.group_id == municipality_2.id.hex
     assert user.data['contact'] is True
     assert user.password_hash == password_hash
     assert user.logout_all_sessions.called is True
 
     # Test validation
     form = UnrestrictedUserForm()
-    form.request = Request(session, groupid=group_1.id.hex)
+    form.request = Request(session, groupid=municipality_1.id.hex)
     form.on_request()
     assert not form.validate()
 
@@ -454,7 +354,7 @@ def test_unrestricted_user_form(session):
         'realname': "Hans-Peter Muster",
         'username': "hans-peter.muster@winterthur.ch"
     }))
-    form.request = Request(session, groupid=group_1.id.hex)
+    form.request = Request(session, groupid=municipality_1.id.hex)
     form.on_request()
     assert not form.validate()
     assert form.errors == {'username': ['This value already exists.']}
@@ -464,7 +364,7 @@ def test_unrestricted_user_form(session):
         'realname': "Hans Muster",
         'username': "hans.muster@winterthur.ch"
     }))
-    form.request = Request(session, groupid=group_1.id.hex)
+    form.request = Request(session, groupid=municipality_1.id.hex)
     form.on_request()
     assert not form.validate()
     assert form.errors == {'role': ['Not a valid choice']}
@@ -474,39 +374,31 @@ def test_unrestricted_user_form(session):
         'realname': "Hans Muster",
         'username': "hans.muster@winterthur.ch"
     }))
-    form.request = Request(session, groupid=group_1.id.hex)
+    form.request = Request(session, groupid=municipality_1.id.hex)
     form.on_request()
     assert form.validate()
 
     form = UnrestrictedUserForm(PostData({
         'role': 'editor',
-        'group_id': str(group_2.id),
+        'municipality_id': municipality_2.id.hex,
         'realname': "Hans Muster",
         'username': "hans.muster@winterthur.ch"
     }))
-    form.request = Request(session, groupid=group_1.id.hex)
+    form.request = Request(session, groupid=municipality_1.id.hex)
     form.on_request()
     assert form.validate()
 
 
 def test_add_scan_job_form(session):
-    groups = UserGroupCollection(session)
-    group = groups.add(name="Winterthur")
-
     municipalities = MunicipalityCollection(session)
-    municipality = municipalities.add(
-        name="Winterthur",
-        bfs_number=230,
-        group_id=group.id
-    )
+    municipality = municipalities.add(name="Winterthur", bfs_number=230)
     municipality.pickup_dates.append(PickupDate(date=date(2019, 1, 7)))
     municipality.pickup_dates.append(PickupDate(date=date(2019, 1, 8)))
 
     # Test on request
     form = AddScanJobForm()
-    form.request = Request(session, groupid=group.id.hex)
-    assert form.group_id == group.id.hex
-    assert form.municipality_id == municipality.id
+    form.request = Request(session, groupid=municipality.id.hex)
+    assert form.municipality_id == municipality.id.hex
     with freeze_time("2019-01-05"):
         form.on_request()
         assert form.type.choices == [('normal', 'Regular shipment')]
@@ -514,7 +406,8 @@ def test_add_scan_job_form(session):
             (date(2019, 1, 7), '07.01.2019'),
             (date(2019, 1, 8), '08.01.2019')
         ]
-    form.request = Request(session, groupid=group.id.hex, roles=['editor'])
+    form.request = Request(session, groupid=municipality.id.hex,
+                           roles=['editor'])
     with freeze_time("2019-01-05"):
         form.on_request()
         assert form.type.choices == [
@@ -541,8 +434,7 @@ def test_add_scan_job_form(session):
 
     model = ScanJob()
     form.update_model(model)
-    assert model.municipality_id == municipality.id
-    assert model.group_id == group.id.hex
+    assert model.municipality_id == municipality.id.hex
     assert model.type == 'normal'
     assert model.dispatch_date == date(2019, 1, 8)
     assert model.dispatch_boxes == 1
@@ -561,7 +453,7 @@ def test_add_scan_job_form(session):
     # Test validation
     with freeze_time("2019-01-05"):
         form = AddScanJobForm()
-        form.request = Request(session, groupid=group.id.hex)
+        form.request = Request(session, groupid=municipality.id.hex)
         form.on_request()
         assert not form.validate()
 
@@ -570,28 +462,20 @@ def test_add_scan_job_form(session):
             'type': 'normal',
             'dispatch_date_normal': '2019-01-08'
         }))
-        form.request = Request(session, groupid=group.id.hex)
+        form.request = Request(session, groupid=municipality.id.hex)
         form.on_request()
         assert form.validate()
 
 
 def test_edit_scan_job_form(session):
-    groups = UserGroupCollection(session)
-    group = groups.add(name="Winterthur")
-
     municipalities = MunicipalityCollection(session)
-    municipality = municipalities.add(
-        name="Winterthur",
-        bfs_number=230,
-        group_id=group.id
-    )
+    municipality = municipalities.add(name="Winterthur", bfs_number=230)
     municipality.pickup_dates.append(PickupDate(date=date(2019, 1, 7)))
     municipality.pickup_dates.append(PickupDate(date=date(2019, 1, 8)))
 
     # Test apply / update
     model = ScanJob()
     model.municipality_id = municipality.id
-    model.group_id = group.id
     model.type = 'normal'
     model.dispatch_date = date(2019, 1, 8)
     model.dispatch_boxes = 1
@@ -604,7 +488,7 @@ def test_edit_scan_job_form(session):
     model.dispatch_cantonal_scan_center = 7
 
     form = EditScanJobForm()
-    form.request = Request(session, groupid=group.id.hex)
+    form.request = Request(session, groupid=municipality.id.hex)
     form.apply_model(model)
     assert form.dispatch_boxes.data == 1
     assert form.dispatch_tax_forms_current_year.data == 2
@@ -626,7 +510,6 @@ def test_edit_scan_job_form(session):
 
     form.update_model(model)
     assert model.municipality_id == municipality.id
-    assert model.group_id == group.id
     assert model.type == 'normal'
     assert model.dispatch_date == date(2019, 1, 8)
     assert model.dispatch_boxes == 10
@@ -640,35 +523,23 @@ def test_edit_scan_job_form(session):
 
     # Test validation
     form = EditScanJobForm()
-    form.request = Request(session, groupid=group.id.hex)
+    form.request = Request(session, groupid=municipality.id.hex)
     assert form.validate()
 
 
 def test_unrestricted_scan_job_form(session):
-    groups = UserGroupCollection(session)
     municipalities = MunicipalityCollection(session)
-
-    group_1 = groups.add(name="Winterthur")
-    municipality_1 = municipalities.add(
-        name="Winterthur",
-        bfs_number=230,
-        group_id=group_1.id
-    )
+    municipality_1 = municipalities.add(name="Winterthur", bfs_number=230)
     municipality_1.pickup_dates.append(PickupDate(date=date(2019, 1, 7)))
     municipality_1.pickup_dates.append(PickupDate(date=date(2019, 1, 8)))
 
-    group_2 = groups.add(name="Adlikon")
-    municipality_2 = municipalities.add(
-        name="Adlikon",
-        bfs_number=21,
-        group_id=group_2.id
-    )
+    municipality_2 = municipalities.add(name="Adlikon", bfs_number=21)
     municipality_2.pickup_dates.append(PickupDate(date=date(2019, 1, 17)))
     municipality_2.pickup_dates.append(PickupDate(date=date(2019, 1, 18)))
 
     # Test on request
     form = UnrestrictedScanJobForm()
-    form.request = Request(session, groupid=group_1.id.hex)
+    form.request = Request(session, groupid=municipality_1.id.hex)
     with freeze_time("2019-01-05"):
         form.on_request()
         assert form.type.choices == [
@@ -683,7 +554,6 @@ def test_unrestricted_scan_job_form(session):
     # Test apply / update
     model = ScanJob()
     model.municipality_id = municipality_1.id
-    model.group_id = group_1.id
     model.type = 'normal'
     model.dispatch_date = date(2019, 1, 8)
     model.dispatch_boxes = 1
@@ -755,7 +625,6 @@ def test_unrestricted_scan_job_form(session):
 
     form.update_model(model)
     assert model.municipality_id == municipality_2.id.hex
-    assert model.group_id == group_2.id
     assert model.type == 'express'
     assert model.dispatch_date == date(2019, 1, 6)
     assert model.dispatch_boxes == 10
@@ -781,7 +650,7 @@ def test_unrestricted_scan_job_form(session):
     # Test validation
     with freeze_time("2019-01-05"):
         form = UnrestrictedScanJobForm()
-        form.request = Request(session, groupid=group_1.id.hex)
+        form.request = Request(session, groupid=municipality_1.id.hex)
         form.on_request()
         assert not form.validate()
 
@@ -790,7 +659,7 @@ def test_unrestricted_scan_job_form(session):
             'type': 'normal',
             'dispatch_date': '2019-01-18'
         }))
-        form.request = Request(session, groupid=group_1.id.hex)
+        form.request = Request(session, groupid=municipality_1.id.hex)
         form.on_request()
 
 
@@ -814,18 +683,9 @@ def test_daily_list_selection_form(session):
 
 
 def test_report_selection_form(session):
-    groups = UserGroupCollection(session)
     municipalities = MunicipalityCollection(session)
-    adlikon = municipalities.add(
-        name="Adlikon",
-        bfs_number=21,
-        group_id=groups.add(name="Winterthur").id
-    )
-    aesch = municipalities.add(
-        name="Aesch",
-        bfs_number=241,
-        group_id=groups.add(name="Aesch").id
-    )
+    adlikon = municipalities.add(name="Adlikon", bfs_number=21)
+    aesch = municipalities.add(name="Aesch", bfs_number=241)
 
     # Test choices
     form = ReportSelectionForm()
@@ -926,18 +786,9 @@ def test_scan_jobs_form(session):
 
 def test_unrestricted_scan_jobs_form(session):
     scan_jobs = ScanJobCollection(session)
-    groups = UserGroupCollection(session)
     municipalities = MunicipalityCollection(session)
-    municipalities.add(
-        name="Adlikon",
-        bfs_number=21,
-        group_id=groups.add(name="Adlikon").id
-    )
-    municipalities.add(
-        name="Aesch",
-        bfs_number=241,
-        group_id=groups.add(name="Aesch").id
-    )
+    municipalities.add(name="Adlikon", bfs_number=21)
+    municipalities.add(name="Aesch", bfs_number=241)
 
     # Test on request / popluate
     form = UnrestrictedScanJobsForm()
@@ -982,18 +833,9 @@ def test_unrestricted_scan_jobs_form(session):
 
 
 def test_create_invoices_form(session):
-    groups = UserGroupCollection(session)
     municipalities = MunicipalityCollection(session)
-    adlikon = municipalities.add(
-        name="Adlikon",
-        bfs_number=21,
-        group_id=groups.add(name="Winterthur").id
-    )
-    aesch = municipalities.add(
-        name="Aesch",
-        bfs_number=241,
-        group_id=groups.add(name="Aesch").id
-    )
+    adlikon = municipalities.add(name="Adlikon", bfs_number=21)
+    aesch = municipalities.add(name="Aesch", bfs_number=241)
 
     # Test choices
     form = CreateInvoicesForm()

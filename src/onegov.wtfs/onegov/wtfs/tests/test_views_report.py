@@ -11,7 +11,6 @@ def test_views_report(client):
     add = client.get('/municipalities').click(href='add')
     add.form['name'] = "Adlikon"
     add.form['bfs_number'] = '1'
-    add.form['group_id'].select(text="My Group")
     assert "Adlikon" in add.form.submit().follow()
 
     upload = client.get('/municipalities').click("Daten importieren")
@@ -98,7 +97,6 @@ def test_views_report_permissions(mock_method, client):
     add = client.get('/municipalities').click(href='add')
     add.form['name'] = "Adlikon"
     add.form['bfs_number'] = '1'
-    add.form['group_id'].select(text="My Group")
     added = add.form.submit().follow()
     assert "Adlikon" in added
     id = added.click("Adlikon").request.url.split('/')[-1]

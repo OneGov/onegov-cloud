@@ -3,7 +3,6 @@ from onegov.core import Framework
 from onegov.core import utils
 from onegov.file import DepotApp
 from onegov.form import FormApp
-from onegov.user import UserGroupCollection
 from onegov.wtfs.collections import MunicipalityCollection
 from onegov.wtfs.models import Principal
 from onegov.wtfs.theme import WtfsTheme
@@ -26,7 +25,6 @@ class WtfsApp(Framework, FormApp, DepotApp):
 
     def add_initial_content(self):
         session = self.session()
-        groups = UserGroupCollection(session)
         municipalities = MunicipalityCollection(session)
         for name, bfs_number in (
             ('Winterthur', 230),
@@ -52,8 +50,7 @@ class WtfsApp(Framework, FormApp, DepotApp):
         ):
             municipalities.add(
                 name=name,
-                bfs_number=bfs_number,
-                group_id=groups.add(name=name).id
+                bfs_number=bfs_number
             )
 
 

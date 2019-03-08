@@ -207,7 +207,7 @@ class ScanJobCollection(Pagination):
         query = query.join(Municipality)
 
         if self.group_id:
-            query = query.filter(ScanJob.group_id == self.group_id)
+            query = query.filter(ScanJob.municipality_id == self.group_id)
         if self.from_date:
             query = query.filter(ScanJob.dispatch_date >= self.from_date)
         if self.to_date:

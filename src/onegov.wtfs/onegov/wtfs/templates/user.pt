@@ -16,7 +16,7 @@
                     <dd tal:condition="layout.model.data['contact']|False">✔︎</dd>
                     <dd tal:condition="not:layout.model.data['contact']|False">✘︎</dd>
 
-                    <dt i18n:translate>User group</dt>
+                    <dt i18n:translate>Municipality</dt>
                     <dd>
                         <a tal:condition="layout.model.group" href="${request.link(layout.model.group)}">${layout.model.group.name}</a>
                     </dd>

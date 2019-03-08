@@ -17,7 +17,8 @@ class MunicipalityCollection(GenericCollection):
 
     def import_data(self, data):
         for bfs_number, values in data.items():
-            query = self.query().filter(Municipality.bfs_number == bfs_number)
+            query = self.query()
+            query = query.filter(Municipality.meta['bfs_number'] == bfs_number)
             municipality = query.first()
             if not municipality:
                 continue

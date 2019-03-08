@@ -60,7 +60,7 @@ class ReportSelectionForm(Form):
         query = self.request.session.query(
             Municipality.id.label('id'),
             Municipality.name.label('name'),
-            Municipality.bfs_number.label('bfs_number')
+            Municipality.meta['bfs_number'].label('bfs_number')
         )
         query = query.order_by(unaccent(Municipality.name))
         self.municipality_id.choices = [

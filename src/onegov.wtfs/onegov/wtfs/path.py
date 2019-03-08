@@ -3,8 +3,6 @@ from onegov.core.converters import uuid_converter
 from onegov.user import Auth
 from onegov.user import User
 from onegov.user import UserCollection
-from onegov.user import UserGroup
-from onegov.user import UserGroupCollection
 from onegov.wtfs.app import WtfsApp
 from onegov.wtfs.collections import MunicipalityCollection
 from onegov.wtfs.collections import NotificationCollection
@@ -38,25 +36,6 @@ def get_principal(app):
 )
 def get_auth(request, to='/'):
     return Auth.from_request(request, to)
-
-
-@WtfsApp.path(
-    model=UserGroupCollection,
-    path='/user-groups'
-)
-def get_user_groups(request):
-    return UserGroupCollection(request.session)
-
-
-@WtfsApp.path(
-    model=UserGroup,
-    path='/user-group/{id}',
-    converters=dict(
-        id=uuid_converter
-    )
-)
-def get_user_group(request, id):
-    return UserGroupCollection(request.session).by_id(id)
 
 
 @WtfsApp.path(

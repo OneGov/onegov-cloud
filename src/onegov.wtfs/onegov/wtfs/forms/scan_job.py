@@ -121,16 +121,8 @@ class AddScanJobForm(Form):
     )
 
     @property
-    def group_id(self):
-        return self.request.identity.groupid
-
-    @property
     def municipality_id(self):
-        if not self.group_id:
-            return
-        query = self.request.session.query(Municipality)
-        query = query.filter_by(group_id=self.group_id)
-        return query.one().id
+        return self.request.identity.groupid or None
 
     @property
     def dispatch_date(self):
@@ -172,8 +164,7 @@ class AddScanJobForm(Form):
         self.update_labels()
 
     def update_model(self, model):
-        model.municipality_id = self.municipality_id
-        model.group_id = self.group_id
+        model.municipality_id = self.request.identity.groupid
         model.type = self.type.data
         model.dispatch_date = self.dispatch_date
         for name in (
@@ -471,19 +462,11 @@ class UnrestrictedScanJobForm(Form):
             "Unscanned tax forms ${year}", mapping={'year': year}
         )
 
-    @property
-    def group_id(self):
-        session = self.request.session
-        with session.no_autoflush:
-            query = session.query(Municipality)
-            query = query.filter_by(id=self.municipality_id.data)
-            return query.one().group_id
-
     def on_request(self):
         query = self.request.session.query(
             Municipality.id.label('id'),
             Municipality.name.label('name'),
-            Municipality.bfs_number.label('bfs_number'),
+            Municipality.meta['bfs_number'].label('bfs_number'),
         )
         query = query.order_by(unaccent(Municipality.name))
         self.municipality_id.choices = [
@@ -493,7 +476,6 @@ class UnrestrictedScanJobForm(Form):
         self.update_labels()
 
     def update_model(self, model):
-        model.group_id = self.group_id
         for name in (
             'municipality_id',
             'type',
@@ -610,7 +592,7 @@ class UnrestrictedScanJobsForm(ScanJobsForm):
         query = self.request.session.query(
             Municipality.id.label('id'),
             Municipality.name.label('name'),
-            Municipality.bfs_number.label('bfs_number')
+            Municipality.meta['bfs_number'].label('bfs_number')
         )
         query = query.order_by(unaccent(Municipality.name))
         self.municipality_id.choices = [

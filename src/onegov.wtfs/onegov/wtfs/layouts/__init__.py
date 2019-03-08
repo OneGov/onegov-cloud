@@ -27,17 +27,13 @@ from onegov.wtfs.layouts.user import AddUserLayout
 from onegov.wtfs.layouts.user import EditUserLayout
 from onegov.wtfs.layouts.user import UserLayout
 from onegov.wtfs.layouts.user import UsersLayout
-from onegov.wtfs.layouts.user_group import AddUserGroupLayout
-from onegov.wtfs.layouts.user_group import EditUserGroupLayout
-from onegov.wtfs.layouts.user_group import UserGroupLayout
-from onegov.wtfs.layouts.user_group import UserGroupsLayout
 
 
 __all__ = (
     'AddMunicipalityLayout',
     'AddNotificationLayout',
     'AddScanJobLayout',
-    'AddUserGroupLayout',
+
     'AddUserLayout',
     'DailyListBoxesAndFormsLayout',
     'DailyListBoxesLayout',
@@ -48,7 +44,6 @@ __all__ = (
     'EditMunicipalityLayout',
     'EditNotificationLayout',
     'EditScanJobLayout',
-    'EditUserGroupLayout',
     'EditUserLayout',
     'ImportMunicipalityDataLayout',
     'InvoiceLayout',
@@ -63,8 +58,6 @@ __all__ = (
     'ReportLayout',
     'ScanJobLayout',
     'ScanJobsLayout',
-    'UserGroupLayout',
-    'UserGroupsLayout',
     'UserLayout',
     'UsersLayout',
 )

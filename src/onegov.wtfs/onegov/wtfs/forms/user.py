@@ -1,13 +1,12 @@
 from onegov.core.crypto import random_password
+from onegov.core.orm.func import unaccent
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.form.validators import InputRequiredIf
 from onegov.form.validators import UniqueColumnValue
 from onegov.user import User
-from onegov.user import UserGroup
 from onegov.wtfs import _
-from sqlalchemy import cast
-from sqlalchemy import String
+from onegov.wtfs.models import Municipality
 from wtforms import BooleanField
 from wtforms import RadioField
 from wtforms import StringField
@@ -73,8 +72,8 @@ class UnrestrictedUserForm(UserForm):
         ]
     )
 
-    group_id = ChosenSelectField(
-        label=_("User group"),
+    municipality_id = ChosenSelectField(
+        label=_("Municipality"),
         choices=[],
         validators=[
             InputRequiredIf('role', 'editor')
@@ -82,19 +81,27 @@ class UnrestrictedUserForm(UserForm):
     )
 
     def on_request(self):
-        self.group_id.choices = self.request.session.query(
-            cast(UserGroup.id, String), UserGroup.name
-        ).all()
-        self.group_id.choices.insert(
+        query = self.request.session.query(
+            Municipality.id.label('id'),
+            Municipality.name.label('name'),
+            Municipality.meta['bfs_number'].label('bfs_number')
+        )
+        query = query.order_by(unaccent(Municipality.name))
+        self.municipality_id.choices = [
+            (r.id.hex, f"{r.name} ({r.bfs_number})") for r in query
+        ]
+        self.municipality_id.choices.insert(
             0, ('', self.request.translate(_("- none -")))
         )
 
     def update_model(self, model):
         super().update_model(model)
         model.role = self.role.data
-        model.group_id = self.group_id.data or None
+        model.group_id = self.municipality_id.data or None
 
     def apply_model(self, model):
         super().apply_model(model)
         self.role.data = model.role
-        self.group_id.data = str(model.group_id or '')
+        self.municipality_id.data = (
+            model.group_id.hex if model.group_id else ''
+        )

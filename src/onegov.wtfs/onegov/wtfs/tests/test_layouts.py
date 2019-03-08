@@ -1,15 +1,12 @@
 from datetime import date
 from onegov.user import User
 from onegov.user import UserCollection
-from onegov.user import UserGroup
-from onegov.user import UserGroupCollection
 from onegov.wtfs.collections import MunicipalityCollection
 from onegov.wtfs.collections import NotificationCollection
 from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.layouts import AddMunicipalityLayout
 from onegov.wtfs.layouts import AddNotificationLayout
 from onegov.wtfs.layouts import AddScanJobLayout
-from onegov.wtfs.layouts import AddUserGroupLayout
 from onegov.wtfs.layouts import AddUserLayout
 from onegov.wtfs.layouts import DailyListBoxesAndFormsLayout
 from onegov.wtfs.layouts import DailyListBoxesLayout
@@ -20,7 +17,6 @@ from onegov.wtfs.layouts import DeliveryNoteLayout
 from onegov.wtfs.layouts import EditMunicipalityLayout
 from onegov.wtfs.layouts import EditNotificationLayout
 from onegov.wtfs.layouts import EditScanJobLayout
-from onegov.wtfs.layouts import EditUserGroupLayout
 from onegov.wtfs.layouts import EditUserLayout
 from onegov.wtfs.layouts import ImportMunicipalityDataLayout
 from onegov.wtfs.layouts import InvoiceLayout
@@ -35,8 +31,6 @@ from onegov.wtfs.layouts import ReportFormsByMunicipalityLayout
 from onegov.wtfs.layouts import ReportLayout
 from onegov.wtfs.layouts import ScanJobLayout
 from onegov.wtfs.layouts import ScanJobsLayout
-from onegov.wtfs.layouts import UserGroupLayout
-from onegov.wtfs.layouts import UserGroupsLayout
 from onegov.wtfs.layouts import UserLayout
 from onegov.wtfs.layouts import UsersLayout
 from onegov.wtfs.models import DailyList
@@ -158,7 +152,6 @@ def test_default_layout(wtfs_app):
     assert layout.homepage_url == 'Principal/'
     assert layout.login_url == 'Auth/login'
     assert layout.logout_url is None
-    assert layout.user_groups_url == 'UserGroupCollection/'
     assert layout.users_url == 'UserCollection/'
     assert layout.municipalities_url == 'MunicipalityCollection/'
     assert layout.scan_jobs_url == 'ScanJobCollection/'
@@ -176,7 +169,6 @@ def test_default_layout(wtfs_app):
         'Report/',
         'Invoice/',
         'UserCollection/',
-        'UserGroupCollection/',
         'MunicipalityCollection/',
         'NotificationCollection/'
     ]
@@ -280,66 +272,6 @@ def test_municipality_layouts():
     assert list(hrefs(layout.editbar_links)) == []
 
 
-def test_user_group_layouts():
-    request = DummyRequest()
-    request_admin = DummyRequest(roles=['admin'])
-
-    # User group collection
-    model = UserGroupCollection(None)
-    layout = UserGroupsLayout(model, request)
-    assert layout.title == 'User groups'
-    assert layout.editbar_links == []
-    assert path(layout.breadcrumbs) == 'DummyPrincipal/UserGroupCollection'
-    assert layout.cancel_url == ''
-    assert layout.success_url == ''
-
-    layout = UserGroupsLayout(model, request_admin)
-    assert list(hrefs(layout.editbar_links)) == ['UserGroupCollection/add']
-
-    # .. add
-    layout = AddUserGroupLayout(model, request)
-    assert layout.title == 'Add user group'
-    assert layout.editbar_links == []
-    assert path(layout.breadcrumbs) == (
-        'DummyPrincipal/UserGroupCollection/#'
-    )
-    assert layout.cancel_url == 'UserGroupCollection/'
-    assert layout.success_url == 'UserGroupCollection/'
-
-    layout = AddUserGroupLayout(model, request_admin)
-    assert list(hrefs(layout.editbar_links)) == []
-
-    # User group
-    model = UserGroup(name='Winterthur')
-    layout = UserGroupLayout(model, request)
-    assert layout.title == 'Winterthur'
-    assert layout.editbar_links == []
-    assert path(layout.breadcrumbs) == (
-        'DummyPrincipal/UserGroupCollection/#'
-    )
-    assert layout.cancel_url == ''
-    assert layout.success_url == ''
-
-    layout = UserGroupLayout(model, request_admin)
-    assert list(hrefs(layout.editbar_links)) == [
-        'UserGroup/edit',
-        'UserGroup/?csrf-token=x'
-    ]
-
-    # ... edit
-    layout = EditUserGroupLayout(model, request)
-    assert layout.title == 'Edit user group'
-    assert layout.editbar_links == []
-    assert path(layout.breadcrumbs) == (
-        'DummyPrincipal/UserGroupCollection/UserGroup/#'
-    )
-    assert layout.cancel_url == 'UserGroup/'
-    assert layout.success_url == 'UserGroupCollection/'
-
-    layout = EditUserGroupLayout(model, request_admin)
-    assert list(hrefs(layout.editbar_links)) == []
-
-
 def test_user_layouts():
     request = DummyRequest()
     request_admin = DummyRequest(roles=['admin'])
@@ -424,13 +356,8 @@ def test_scan_job_layouts(session):
     request_admin = DummyRequest(roles=['admin'])
     request_editor = DummyRequest(roles=['editor'])
 
-    groups = UserGroupCollection(session)
-    group = groups.add(name='Winterthur')
-
     municipalities = MunicipalityCollection(session)
-    municipality = municipalities.add(
-        name='Winterthur', bfs_number=230, group_id=group.id
-    )
+    municipality = municipalities.add(name='Winterthur', bfs_number=230)
 
     # ScanJob collection
     model = ScanJobCollection(None)
@@ -467,7 +394,6 @@ def test_scan_job_layouts(session):
     model = ScanJobCollection(session).add(
         type='normal',
         dispatch_date=date(2019, 1, 1),
-        group_id=group.id,
         municipality_id=municipality.id
     )
     layout = ScanJobLayout(model, request)
@@ -554,7 +480,6 @@ def test_report_layouts(session):
     municipality = MunicipalityCollection(session).add(
         name="Adlikon",
         bfs_number=21,
-        group_id=UserGroupCollection(session).add(name="Adlikon").id
     )
 
     request = DummyRequest()

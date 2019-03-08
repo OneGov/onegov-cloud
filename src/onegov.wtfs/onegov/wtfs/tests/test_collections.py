@@ -1,5 +1,4 @@
 from datetime import date
-from onegov.user import UserGroupCollection
 from onegov.wtfs.collections import MunicipalityCollection
 from onegov.wtfs.collections import NotificationCollection
 from onegov.wtfs.collections import ScanJobCollection
@@ -7,18 +6,14 @@ from uuid import uuid4
 
 
 def test_municipalities(session):
-    groups = UserGroupCollection(session)
-
     municipalities = MunicipalityCollection(session)
     municipalities.add(
         name='Winterthur',
         bfs_number=230,
-        group_id=groups.add(name='Winterthur').id
     )
     municipalities.add(
         name='Adlikon',
         bfs_number=21,
-        group_id=groups.add(name='Adlikon').id
     )
 
     assert [(m.name, m.bfs_number) for m in municipalities.query()] == [
@@ -44,7 +39,6 @@ def test_municipalities(session):
     municipalities.add(
         name='Aesch',
         bfs_number=241,
-        group_id=groups.add(name='Aesch').id
     )
     data = {
         21: {'dates': [date(2019, 1, 7), date(2019, 1, 8)]},
@@ -79,19 +73,13 @@ def test_notifications(session):
 
 
 def test_scan_jobs(session):
-    groups = UserGroupCollection(session)
-    group = groups.add(name='Winterthur')
-
     municipalities = MunicipalityCollection(session)
-    municipality = municipalities.add(
-        name='Winterthur', bfs_number=230, group_id=group.id
-    )
+    municipality = municipalities.add(name='Winterthur', bfs_number=230)
 
     scan_jobs = ScanJobCollection(session)
     for day in (2, 1, 4, 3):
         scan_jobs.add(
             type='normal',
-            group_id=group.id,
             municipality_id=municipality.id,
             dispatch_date=date(2019, 1, day)
         )
@@ -102,7 +90,6 @@ def test_scan_jobs(session):
 def test_scan_jobs_default():
     scan_jobs = ScanJobCollection(
         session=1,
-        group_id=2,
         page=3,
         from_date=4,
         to_date=5,
@@ -112,7 +99,6 @@ def test_scan_jobs_default():
         sort_order=9
     )
     assert scan_jobs.session == 1
-    assert scan_jobs.group_id == 2
     assert scan_jobs.page == 3
     assert scan_jobs.from_date == 4
     assert scan_jobs.to_date == 5
@@ -123,7 +109,6 @@ def test_scan_jobs_default():
 
     scan_jobs = scan_jobs.default()
     assert scan_jobs.session == 1
-    assert scan_jobs.group_id == 2
     assert scan_jobs.page is None
     assert scan_jobs.from_date is None
     assert scan_jobs.to_date is None
@@ -134,13 +119,9 @@ def test_scan_jobs_default():
 
 
 def test_scan_jobs_pagination(session):
-    group_id = uuid4()
-    UserGroupCollection(session).add(id=group_id, name='Adlikon')
-
     municipality_id = uuid4()
     MunicipalityCollection(session).add(
         id=municipality_id,
-        group_id=group_id,
         name='Adlikon',
         bfs_number=21
     )
@@ -159,7 +140,6 @@ def test_scan_jobs_pagination(session):
         scan_jobs.add(
             type='express',
             dispatch_date=date(2019, 1, day),
-            group_id=group_id,
             municipality_id=municipality_id,
         )
 
@@ -180,24 +160,10 @@ def test_scan_jobs_pagination(session):
 
 
 def test_scan_jobs_query(session):
-    groups = UserGroupCollection(session)
-    groups = {
-        'Adlikon': groups.add(name='Adlikon'),
-        'Aesch': groups.add(name='Aesch')
-    }
-
     municipalities = MunicipalityCollection(session)
     municipalities = {
-        'Adlikon': municipalities.add(
-            name='Adlikon',
-            bfs_number=21,
-            group_id=groups['Adlikon'].id
-        ),
-        'Aesch': municipalities.add(
-            name='Aesch',
-            bfs_number=241,
-            group_id=groups['Aesch'].id,
-        )
+        'Adlikon': municipalities.add(name='Adlikon', bfs_number=21),
+        'Aesch': municipalities.add(name='Aesch', bfs_number=241)
     }
 
     def add(name, dispatch_date, type, dispatch_note, return_note):
@@ -205,7 +171,6 @@ def test_scan_jobs_query(session):
             dispatch_date=dispatch_date,
             type=type,
             municipality_id=municipalities[name].id,
-            group_id=groups[name].id,
             dispatch_note=dispatch_note,
             return_note=return_note,
         )
@@ -244,10 +209,6 @@ def test_scan_jobs_query(session):
     assert count(type=['express']) == 4
     assert count(type=['normal', 'express']) == 6
 
-    assert count(group_id=None) == 6
-    assert count(group_id=groups['Adlikon'].id) == 3
-    assert count(group_id=groups['Aesch'].id) == 3
-
     assert count(municipality_id=[]) == 6
     assert count(municipality_id=[municipalities['Adlikon'].id]) == 3
     assert count(municipality_id=[municipalities['Adlikon'].id,
@@ -269,17 +230,14 @@ def test_scan_jobs_query(session):
 
 def test_scan_jobs_order(session):
     for day, name in ((3, 'First'), (1, 'Śecond'), (2, 'Phirrrrd')):
-        group = UserGroupCollection(session).add(name=name)
         municipality = MunicipalityCollection(session).add(
             name=name,
             bfs_number=day,
-            group_id=group.id
         )
         ScanJobCollection(session).add(
             dispatch_date=date(2019, 1, day),
             type='normal',
             municipality_id=municipality.id,
-            group_id=group.id,
         )
 
     def collection(sort_by=None, sort_order=None):
