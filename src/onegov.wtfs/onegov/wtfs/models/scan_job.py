@@ -82,27 +82,27 @@ class ScanJob(Base, TimestampMixin, ContentMixin):
     return_note = Column(Text, nullable=True)
     return_boxes = Column(Integer, nullable=True)
 
-    return_scanned_tax_forms_current_year = Column(Integer, nullable=True)
-    return_scanned_tax_forms_last_year = Column(Integer, nullable=True)
-    return_scanned_tax_forms_older = Column(Integer, nullable=True)
+    return_tax_forms_current_year = Column(Integer, nullable=True)
+    return_tax_forms_last_year = Column(Integer, nullable=True)
+    return_tax_forms_older = Column(Integer, nullable=True)
 
     @hybrid_property
-    def return_scanned_tax_forms(self):
+    def return_tax_forms(self):
         return (
-            (self.return_scanned_tax_forms_current_year or 0)
-            + (self.return_scanned_tax_forms_last_year or 0)
-            + (self.return_scanned_tax_forms_older or 0)
+            (self.return_tax_forms_current_year or 0)
+            + (self.return_tax_forms_last_year or 0)
+            + (self.return_tax_forms_older or 0)
         ) or None
 
-    @return_scanned_tax_forms.expression
-    def return_scanned_tax_forms(cls):
+    @return_tax_forms.expression
+    def return_tax_forms(cls):
         return (
-            func.coalesce(cls.return_scanned_tax_forms_current_year, 0)
-            + func.coalesce(cls.return_scanned_tax_forms_last_year, 0)
-            + func.coalesce(cls.return_scanned_tax_forms_older, 0)
+            func.coalesce(cls.return_tax_forms_current_year, 0)
+            + func.coalesce(cls.return_tax_forms_last_year, 0)
+            + func.coalesce(cls.return_tax_forms_older, 0)
         )
 
-    return_scanned_single_documents = Column(Integer, nullable=True)
+    return_single_documents = Column(Integer, nullable=True)
 
     return_unscanned_tax_forms_current_year = Column(Integer, nullable=True)
     return_unscanned_tax_forms_last_year = Column(Integer, nullable=True)
@@ -127,72 +127,72 @@ class ScanJob(Base, TimestampMixin, ContentMixin):
     return_unscanned_single_documents = Column(Integer, nullable=True)
 
     @hybrid_property
-    def return_tax_forms_current_year(self):
+    def return_scanned_tax_forms_current_year(self):
         return (
-            (self.return_scanned_tax_forms_current_year or 0)
+            (self.return_tax_forms_current_year or 0)
             - (self.return_unscanned_tax_forms_current_year or 0)
         ) or None
 
-    @return_tax_forms_current_year.expression
-    def return_tax_forms_current_year(cls):
+    @return_scanned_tax_forms_current_year.expression
+    def return_scanned_tax_forms_current_year(cls):
         return (
-            func.coalesce(cls.return_scanned_tax_forms_current_year, 0)
+            func.coalesce(cls.return_tax_forms_current_year, 0)
             - func.coalesce(cls.return_unscanned_tax_forms_current_year, 0)
         )
 
     @hybrid_property
-    def return_tax_forms_last_year(self):
+    def return_scanned_tax_forms_last_year(self):
         return (
-            (self.return_scanned_tax_forms_last_year or 0)
+            (self.return_tax_forms_last_year or 0)
             - (self.return_unscanned_tax_forms_last_year or 0)
         ) or None
 
-    @return_tax_forms_last_year.expression
-    def return_tax_forms_last_year(cls):
+    @return_scanned_tax_forms_last_year.expression
+    def return_scanned_tax_forms_last_year(cls):
         return (
-            func.coalesce(cls.return_scanned_tax_forms_last_year, 0)
+            func.coalesce(cls.return_tax_forms_last_year, 0)
             - func.coalesce(cls.return_unscanned_tax_forms_last_year, 0)
         )
 
     @hybrid_property
-    def return_tax_forms_older(self):
+    def return_scanned_tax_forms_older(self):
         return (
-            (self.return_scanned_tax_forms_older or 0)
+            (self.return_tax_forms_older or 0)
             - (self.return_unscanned_tax_forms_older or 0)
         ) or None
 
-    @return_tax_forms_older.expression
-    def return_tax_forms_older(cls):
+    @return_scanned_tax_forms_older.expression
+    def return_scanned_tax_forms_older(cls):
         return (
-            func.coalesce(cls.return_scanned_tax_forms_older, 0)
+            func.coalesce(cls.return_tax_forms_older, 0)
             - func.coalesce(cls.return_unscanned_tax_forms_older, 0)
         )
 
     @hybrid_property
-    def return_tax_forms(self):
+    def return_scanned_tax_forms(self):
         return (
-            (self.return_scanned_tax_forms or 0)
+            (self.return_tax_forms or 0)
             - (self.return_unscanned_tax_forms or 0)
         ) or None
 
-    @return_tax_forms.expression
-    def return_tax_forms(cls):
+    @return_scanned_tax_forms.expression
+    def return_scanned_tax_forms(cls):
         return (
-            func.coalesce(cls.return_scanned_tax_forms, 0)
+            func.coalesce(cls.return_tax_forms, 0)
             - func.coalesce(cls.return_unscanned_tax_forms, 0)
         )
 
     @hybrid_property
-    def return_single_documents(self):
+    def return_scanned_single_documents(self):
         return (
-            (self.return_scanned_single_documents or 0)
+            (self.return_single_documents or 0)
             - (self.return_unscanned_single_documents or 0)
         ) or None
 
-    @return_single_documents.expression
-    def return_single_documents(cls):
+    @return_scanned_single_documents.expression
+    def return_scanned_single_documents(cls):
         return (
-            func.coalesce(cls.return_scanned_single_documents, 0)
+            func.coalesce(cls.return_single_documents, 0)
             - func.coalesce(cls.return_unscanned_single_documents, 0)
         )
 

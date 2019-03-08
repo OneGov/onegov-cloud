@@ -28,10 +28,10 @@
                         <tr tal:repeat="result layout.model.query">
                             <td>${result.name}</td>
                             <td class="right">${result.bfs_number}</td>
-                            <td class="right">${result.return_tax_forms_older}</td>
-                            <td class="right">${result.return_tax_forms_last_year}</td>
-                            <td class="right">${result.return_tax_forms_current_year}</td>
-                            <td class="right">${result.return_tax_forms}</td>
+                            <td class="right">${result.return_scanned_tax_forms_older}</td>
+                            <td class="right">${result.return_scanned_tax_forms_last_year}</td>
+                            <td class="right">${result.return_scanned_tax_forms_current_year}</td>
+                            <td class="right">${result.return_scanned_tax_forms}</td>
                         </tr>
                     </tbody>
                 </table>

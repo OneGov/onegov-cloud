@@ -376,25 +376,25 @@ class UnrestrictedScanJobForm(Form):
         validators=[Optional(), NumberRange(min=0)],
         render_kw={'size': 3, 'clear': False},
     )
-    return_scanned_tax_forms_older = IntegerField(
+    return_tax_forms_older = IntegerField(
         label=_("Tax forms (older)"),
         fieldset=_("Return to the municipality"),
         validators=[Optional(), NumberRange(min=0)],
         render_kw={'size': 2, 'clear': False},
     )
-    return_scanned_tax_forms_last_year = IntegerField(
+    return_tax_forms_last_year = IntegerField(
         label=_("Tax forms (previous year)"),
         fieldset=_("Return to the municipality"),
         validators=[Optional(), NumberRange(min=0)],
         render_kw={'size': 2, 'clear': False},
     )
-    return_scanned_tax_forms_current_year = IntegerField(
+    return_tax_forms_current_year = IntegerField(
         label=_("Tax forms"),
         fieldset=_("Return to the municipality"),
         validators=[Optional(), NumberRange(min=0)],
         render_kw={'size': 2, 'clear': False},
     )
-    return_scanned_single_documents = IntegerField(
+    return_single_documents = IntegerField(
         label=_("Single documents"),
         fieldset=_("Return to the municipality"),
         validators=[Optional(), NumberRange(min=0)],
@@ -443,13 +443,13 @@ class UnrestrictedScanJobForm(Form):
         self.dispatch_tax_forms_current_year.label.text = _(
             "Tax forms ${year}", mapping={'year': year}
         )
-        self.return_scanned_tax_forms_older.label.text = _(
+        self.return_tax_forms_older.label.text = _(
             "Tax forms until ${year}", mapping={'year': year - 2}
         )
-        self.return_scanned_tax_forms_last_year.label.text = _(
+        self.return_tax_forms_last_year.label.text = _(
             "Tax forms ${year}", mapping={'year': year - 1}
         )
-        self.return_scanned_tax_forms_current_year.label.text = _(
+        self.return_tax_forms_current_year.label.text = _(
             "Tax forms ${year}", mapping={'year': year}
         )
         self.return_unscanned_tax_forms_older.label.text = _(
@@ -490,10 +490,10 @@ class UnrestrictedScanJobForm(Form):
             'dispatch_cantonal_scan_center',
             'return_date',
             'return_boxes',
-            'return_scanned_tax_forms_current_year',
-            'return_scanned_tax_forms_last_year',
-            'return_scanned_tax_forms_older',
-            'return_scanned_single_documents',
+            'return_tax_forms_current_year',
+            'return_tax_forms_last_year',
+            'return_tax_forms_older',
+            'return_single_documents',
             'return_unscanned_tax_forms_current_year',
             'return_unscanned_tax_forms_last_year',
             'return_unscanned_tax_forms_older',
@@ -517,10 +517,10 @@ class UnrestrictedScanJobForm(Form):
             'dispatch_cantonal_scan_center',
             'return_date',
             'return_boxes',
-            'return_scanned_tax_forms_current_year',
-            'return_scanned_tax_forms_last_year',
-            'return_scanned_tax_forms_older',
-            'return_scanned_single_documents',
+            'return_tax_forms_current_year',
+            'return_tax_forms_last_year',
+            'return_tax_forms_older',
+            'return_single_documents',
             'return_unscanned_tax_forms_current_year',
             'return_unscanned_tax_forms_last_year',
             'return_unscanned_tax_forms_older',

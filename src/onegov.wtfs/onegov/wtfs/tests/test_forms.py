@@ -566,10 +566,10 @@ def test_unrestricted_scan_job_form(session):
     model.dispatch_cantonal_scan_center = 7
     model.return_date = date(2019, 1, 10)
     model.return_boxes = 8
-    model.return_scanned_tax_forms_current_year = 9
-    model.return_scanned_tax_forms_last_year = 10
-    model.return_scanned_tax_forms_older = 11
-    model.return_scanned_single_documents = 12
+    model.return_tax_forms_current_year = 9
+    model.return_tax_forms_last_year = 10
+    model.return_tax_forms_older = 11
+    model.return_single_documents = 12
     model.return_unscanned_tax_forms_current_year = 13
     model.return_unscanned_tax_forms_last_year = 14
     model.return_unscanned_tax_forms_older = 15
@@ -590,10 +590,10 @@ def test_unrestricted_scan_job_form(session):
     assert form.dispatch_cantonal_scan_center.data == 7
     assert form.return_date.data == date(2019, 1, 10)
     assert form.return_boxes.data == 8
-    assert form.return_scanned_tax_forms_current_year.data == 9
-    assert form.return_scanned_tax_forms_last_year.data == 10
-    assert form.return_scanned_tax_forms_older.data == 11
-    assert form.return_scanned_single_documents.data == 12
+    assert form.return_tax_forms_current_year.data == 9
+    assert form.return_tax_forms_last_year.data == 10
+    assert form.return_tax_forms_older.data == 11
+    assert form.return_single_documents.data == 12
     assert form.return_unscanned_tax_forms_current_year.data == 13
     assert form.return_unscanned_tax_forms_last_year.data == 14
     assert form.return_unscanned_tax_forms_older.data == 15
@@ -613,10 +613,10 @@ def test_unrestricted_scan_job_form(session):
     form.dispatch_cantonal_scan_center.data = 70
     form.return_date.data = date(2019, 1, 10)
     form.return_boxes.data = 80
-    form.return_scanned_tax_forms_current_year.data = 90
-    form.return_scanned_tax_forms_last_year.data = 100
-    form.return_scanned_tax_forms_older.data = 110
-    form.return_scanned_single_documents.data = 120
+    form.return_tax_forms_current_year.data = 90
+    form.return_tax_forms_last_year.data = 100
+    form.return_tax_forms_older.data = 110
+    form.return_single_documents.data = 120
     form.return_unscanned_tax_forms_current_year.data = 130
     form.return_unscanned_tax_forms_last_year.data = 140
     form.return_unscanned_tax_forms_older.data = 150
@@ -637,10 +637,10 @@ def test_unrestricted_scan_job_form(session):
     assert model.dispatch_cantonal_scan_center == 70
     assert model.return_date == date(2019, 1, 10)
     assert model.return_boxes == 80
-    assert model.return_scanned_tax_forms_current_year == 90
-    assert model.return_scanned_tax_forms_last_year == 100
-    assert model.return_scanned_tax_forms_older == 110
-    assert model.return_scanned_single_documents == 120
+    assert model.return_tax_forms_current_year == 90
+    assert model.return_tax_forms_last_year == 100
+    assert model.return_tax_forms_older == 110
+    assert model.return_single_documents == 120
     assert model.return_unscanned_tax_forms_current_year == 130
     assert model.return_unscanned_tax_forms_last_year == 140
     assert model.return_unscanned_tax_forms_older == 150

@@ -47,11 +47,11 @@
                         <tr>
                             <th class="right" i18n:translate>Return to <span tal:replace="layout.model.municipality.name" i18n:name="municipality" /> on <span tal:replace="layout.format_date(layout.model.return_date, 'date')" i18n:name="date" /></th>
                             <td class="right" colspan="2">${layout.model.return_boxes}</td>
-                            <td class="right">${layout.model.return_scanned_tax_forms_older}</td>
-                            <td class="right">${layout.model.return_scanned_tax_forms_last_year}</td>
-                            <td class="right">${layout.model.return_scanned_tax_forms_current_year}</td>
-                            <td class="right total">${layout.model.return_scanned_tax_forms}</td>
-                            <td class="right">${layout.model.return_scanned_single_documents}</td>
+                            <td class="right">${layout.model.return_tax_forms_older}</td>
+                            <td class="right">${layout.model.return_tax_forms_last_year}</td>
+                            <td class="right">${layout.model.return_tax_forms_current_year}</td>
+                            <td class="right total">${layout.model.return_tax_forms}</td>
+                            <td class="right">${layout.model.return_single_documents}</td>
                         </tr>
                         <tr>
                             <th class="right subtitle" i18n:translate>Unscanned</th>
@@ -65,11 +65,11 @@
                         <tr>
                             <th class="right subtitle" i18n:translate>Total processed</th>
                             <td class="right" colspan="2"></td>
-                            <td class="right total">${layout.model.return_tax_forms_older}</td>
-                            <td class="right total">${layout.model.return_tax_forms_last_year}</td>
-                            <td class="right total">${layout.model.return_tax_forms_current_year}</td>
-                            <td class="right total">${layout.model.return_tax_forms}</td>
-                            <td class="right total">${layout.model.return_single_documents}</td>
+                            <td class="right total">${layout.model.return_scanned_tax_forms_older}</td>
+                            <td class="right total">${layout.model.return_scanned_tax_forms_last_year}</td>
+                            <td class="right total">${layout.model.return_scanned_tax_forms_current_year}</td>
+                            <td class="right total">${layout.model.return_scanned_tax_forms}</td>
+                            <td class="right total">${layout.model.return_scanned_single_documents}</td>
                         </tr>
                         <tr>
                             <th class="right subtitle" i18n:translate>Note</th>

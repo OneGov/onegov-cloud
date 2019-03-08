@@ -146,11 +146,11 @@ class ReportBoxesAndForms(Report):
     @cached_property
     def columns_dispatch(self):
         return [
-            'return_tax_forms_older',
-            'return_tax_forms_last_year',
-            'return_tax_forms_current_year',
-            'return_tax_forms',
-            'return_single_documents',
+            'return_scanned_tax_forms_older',
+            'return_scanned_tax_forms_last_year',
+            'return_scanned_tax_forms_current_year',
+            'return_scanned_tax_forms',
+            'return_scanned_single_documents',
             'return_boxes'
         ]
 
@@ -161,8 +161,8 @@ class ReportFormsByMunicipality(Report):
     @cached_property
     def columns_dispatch(self):
         return [
-            'return_tax_forms_older',
-            'return_tax_forms_last_year',
-            'return_tax_forms_current_year',
-            'return_tax_forms',
+            'return_scanned_tax_forms_older',
+            'return_scanned_tax_forms_last_year',
+            'return_scanned_tax_forms_current_year',
+            'return_scanned_tax_forms',
         ]

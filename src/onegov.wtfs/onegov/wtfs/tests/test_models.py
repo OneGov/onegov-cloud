@@ -85,10 +85,10 @@ def test_scan_job(session):
             return_date=date(2019, 2, 2),
             return_note='Return note',
             return_boxes=8,
-            return_scanned_tax_forms_current_year=9,
-            return_scanned_tax_forms_last_year=10,
-            return_scanned_tax_forms_older=11,
-            return_scanned_single_documents=12,
+            return_tax_forms_current_year=9,
+            return_tax_forms_last_year=10,
+            return_tax_forms_older=11,
+            return_single_documents=12,
             return_unscanned_tax_forms_current_year=16,
             return_unscanned_tax_forms_last_year=15,
             return_unscanned_tax_forms_older=14,
@@ -116,21 +116,21 @@ def test_scan_job(session):
     assert scan_job.return_date == date(2019, 2, 2)
     assert scan_job.return_note == 'Return note'
     assert scan_job.return_boxes == 8
-    assert scan_job.return_scanned_tax_forms_current_year == 9
-    assert scan_job.return_scanned_tax_forms_last_year == 10
-    assert scan_job.return_scanned_tax_forms_older == 11
-    assert scan_job.return_scanned_tax_forms == 9 + 10 + 11
-    assert scan_job.return_scanned_single_documents == 12
+    assert scan_job.return_tax_forms_current_year == 9
+    assert scan_job.return_tax_forms_last_year == 10
+    assert scan_job.return_tax_forms_older == 11
+    assert scan_job.return_tax_forms == 9 + 10 + 11
+    assert scan_job.return_single_documents == 12
     assert scan_job.return_unscanned_tax_forms_current_year == 16
     assert scan_job.return_unscanned_tax_forms_last_year == 15
     assert scan_job.return_unscanned_tax_forms_older == 14
     assert scan_job.return_unscanned_tax_forms == 16 + 15 + 14
     assert scan_job.return_unscanned_single_documents == 13
-    assert scan_job.return_tax_forms_current_year == 9 - 16
-    assert scan_job.return_tax_forms_last_year == 10 - 15
-    assert scan_job.return_tax_forms_older == 11 - 14
-    assert scan_job.return_tax_forms == 9 + 10 + 11 - 16 - 15 - 14
-    assert scan_job.return_single_documents == 12 - 13
+    assert scan_job.return_scanned_tax_forms_current_year == 9 - 16
+    assert scan_job.return_scanned_tax_forms_last_year == 10 - 15
+    assert scan_job.return_scanned_tax_forms_older == 11 - 14
+    assert scan_job.return_scanned_tax_forms == 9 + 10 + 11 - 16 - 15 - 14
+    assert scan_job.return_scanned_single_documents == 12 - 13
 
     assert session.query(
         ScanJob.dispatch_boxes,
@@ -142,21 +142,21 @@ def test_scan_job(session):
         ScanJob.dispatch_cantonal_tax_office,
         ScanJob.dispatch_cantonal_scan_center,
         ScanJob.return_boxes,
-        ScanJob.return_scanned_tax_forms_current_year,
-        ScanJob.return_scanned_tax_forms_last_year,
-        ScanJob.return_scanned_tax_forms_older,
-        ScanJob.return_scanned_tax_forms,
-        ScanJob.return_scanned_single_documents,
-        ScanJob.return_unscanned_tax_forms_current_year,
-        ScanJob.return_unscanned_tax_forms_last_year,
-        ScanJob.return_unscanned_tax_forms_older,
-        ScanJob.return_unscanned_tax_forms,
-        ScanJob.return_unscanned_single_documents,
         ScanJob.return_tax_forms_current_year,
         ScanJob.return_tax_forms_last_year,
         ScanJob.return_tax_forms_older,
         ScanJob.return_tax_forms,
         ScanJob.return_single_documents,
+        ScanJob.return_unscanned_tax_forms_current_year,
+        ScanJob.return_unscanned_tax_forms_last_year,
+        ScanJob.return_unscanned_tax_forms_older,
+        ScanJob.return_unscanned_tax_forms,
+        ScanJob.return_unscanned_single_documents,
+        ScanJob.return_scanned_tax_forms_current_year,
+        ScanJob.return_scanned_tax_forms_last_year,
+        ScanJob.return_scanned_tax_forms_older,
+        ScanJob.return_scanned_tax_forms,
+        ScanJob.return_scanned_single_documents,
     ).one() == (
         1,
         2,
@@ -242,10 +242,10 @@ def add_report_data(session):
                     dispatch_tax_forms_last_year=job[2],
                     dispatch_tax_forms_current_year=job[3],
                     dispatch_single_documents=job[5],
-                    return_scanned_tax_forms_older=double[1],
-                    return_scanned_tax_forms_last_year=double[2],
-                    return_scanned_tax_forms_current_year=double[3],
-                    return_scanned_single_documents=double[5],
+                    return_tax_forms_older=double[1],
+                    return_tax_forms_last_year=double[2],
+                    return_tax_forms_current_year=double[3],
+                    return_single_documents=double[5],
                     return_unscanned_tax_forms_older=job[1],
                     return_unscanned_tax_forms_last_year=job[2],
                     return_unscanned_tax_forms_current_year=job[3],
@@ -491,10 +491,10 @@ def test_invoice(session):
             dispatch_cantonal_scan_center=4,
             return_date=date(2019, 2, 2),
             return_boxes=1,
-            return_scanned_tax_forms_current_year=9,
-            return_scanned_tax_forms_last_year=18,
-            return_scanned_tax_forms_older=27,
-            return_scanned_single_documents=36,
+            return_tax_forms_current_year=9,
+            return_tax_forms_last_year=18,
+            return_tax_forms_older=27,
+            return_single_documents=36,
             return_unscanned_tax_forms_current_year=1,
             return_unscanned_tax_forms_last_year=2,
             return_unscanned_tax_forms_older=3,
