@@ -6,7 +6,7 @@ def test_views_notifications(client):
     client.login_admin()
 
     # Add a notification
-    add = client.get('/notifications').click(href='add')
+    add = client.get('/notifications').click(href='/add')
     add.form['title'] = "Systemunterbruch"
     add.form['text'] = "Am 23. Februar 2017, finden Wartungsarbeiten statt."
     added = add.form.submit().follow()
@@ -42,7 +42,7 @@ def test_views_notifications(client):
 def test_views_notifications_permissions(mock_method, client):
     client.login_admin()
 
-    add = client.get('/notifications').click(href='add')
+    add = client.get('/notifications').click(href='/add')
     add.form['title'] = "Systemunterbruch"
     add.form['text'] = "Am 23. Februar 2017, finden Wartungsarbeiten statt."
     assert "Benachrichtigung hinzugefügt." in add.form.submit().follow()

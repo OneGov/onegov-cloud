@@ -6,7 +6,7 @@ def test_view_home(client):
 
     assert "/scan-jobs" in client.get('/').follow().request.url
 
-    add = client.get('/notifications').click(href='add')
+    add = client.get('/notifications').click(href='/add')
     add.form['title'] = "Systemunterbruch"
     add.form['text'] = "Am 23. Februar 2017, finden Wartungsarbeiten statt."
     assert "Benachrichtigung hinzugefügt." in add.form.submit().follow()

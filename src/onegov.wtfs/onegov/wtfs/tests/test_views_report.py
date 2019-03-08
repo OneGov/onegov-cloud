@@ -8,7 +8,7 @@ def test_views_report(client):
     # Add a municipality with dates
     client.login_admin()
 
-    add = client.get('/municipalities').click(href='add')
+    add = client.get('/municipalities').click(href='/add')
     add.form['name'] = "Adlikon"
     add.form['bfs_number'] = '1'
     assert "Adlikon" in add.form.submit().follow()
@@ -23,7 +23,7 @@ def test_views_report(client):
 
     # Add a scan job
     with freeze_time("2019-01-01"):
-        add = client.get('/scan-jobs/unrestricted').click(href='add')
+        add = client.get('/scan-jobs/unrestricted').click(href='/add')
         add.form['type'].select("normal")
         add.form['municipality_id'].select(text="Adlikon (1)")
         add.form['dispatch_date'] = "2019-01-05"
@@ -94,7 +94,7 @@ def test_views_report(client):
 @patch.object(CoreRequest, 'assert_valid_csrf_token')
 def test_views_report_permissions(mock_method, client):
     client.login_admin()
-    add = client.get('/municipalities').click(href='add')
+    add = client.get('/municipalities').click(href='/add')
     add.form['name'] = "Adlikon"
     add.form['bfs_number'] = '1'
     added = add.form.submit().follow()

@@ -7,7 +7,7 @@ def test_views_municipality(client):
     client.login_admin()
 
     # Add a municipality
-    add = client.get('/municipalities').click(href='add')
+    add = client.get('/municipalities').click(href='/add')
     add.form['name'] = "Adlikon"
     add.form['bfs_number'] = '21'
     added = add.form.submit().follow()
@@ -62,7 +62,7 @@ def test_views_municipality(client):
 def test_views_municipality_permissions(mock_method, client):
     client.login_admin()
 
-    add = client.get('/municipalities').click(href='add')
+    add = client.get('/municipalities').click(href='/add')
     add.form['name'] = "Adlikon"
     add.form['bfs_number'] = '21'
     assert "hinzugefügt." in add.form.submit().follow()

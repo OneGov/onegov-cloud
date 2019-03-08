@@ -20,7 +20,7 @@ def test_views_scan_job(client):
     client.logout()
     client.login_member()
     with freeze_time("2019-01-01"):
-        add = client.get('/scan-jobs').click(href='add')
+        add = client.get('/scan-jobs').click(href='/add')
         add.form['type'].select("normal")
         add.form['dispatch_date_normal'].select("2019-01-05")
         add.form['dispatch_boxes'] = "1"
@@ -139,14 +139,14 @@ def test_views_scan_jobs_filter(client):
     client.logout()
     client.login_member()
     with freeze_time("2019-01-01"):
-        add = client.get('/scan-jobs').click(href='add')
+        add = client.get('/scan-jobs').click(href='/add')
         add.form['type'].select('normal')
         add.form['dispatch_date_normal'].select("2019-01-05")
         assert "Scan-Auftrag hinzugefügt." in add.form.submit().follow()
 
         client.logout()
         client.login_editor()
-        add = client.get('/scan-jobs').click(href='add')
+        add = client.get('/scan-jobs').click(href='/add')
         add.form['type'].select('express')
         add.form['dispatch_date_express'] = "2019-01-04"
         assert "Scan-Auftrag hinzugefügt." in add.form.submit().follow()
@@ -190,13 +190,13 @@ def test_views_scan_jobs_filter(client):
 def test_views_scan_jobs_permissions(mock_method, client):
     client.login_admin()
 
-    add = client.get('/municipalities').click(href='add')
+    add = client.get('/municipalities').click(href='/add')
     add.form['name'] = "My Municipality"
     add.form['bfs_number'] = '1'
     assert "My Municipality" in add.form.submit().follow()
 
     with freeze_time("2019-01-01"):
-        add = client.get('/scan-jobs/unrestricted').click(href='add')
+        add = client.get('/scan-jobs/unrestricted').click(href='/add')
         add.form['type'].select("express")
         add.form['dispatch_date'] = "2019-01-05"
         assert "Scan-Auftrag hinzugefügt." in add.form.submit().maybe_follow()
