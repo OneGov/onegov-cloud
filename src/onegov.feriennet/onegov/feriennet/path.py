@@ -16,7 +16,7 @@ from onegov.feriennet.models import GroupInvite
 from onegov.feriennet.models import InvoiceAction, VacationActivity
 from onegov.feriennet.models import NotificationTemplate
 from onegov.org.converters import keywords_converter
-from uuid import UUID
+from uuid import UUID, uuid4
 
 
 @FeriennetApp.path(
@@ -167,12 +167,18 @@ def get_my_invoies(request, app, username=None, invoice=None):
     if not username:
         username = request.current_username
 
+    # create an inexistent user_id if not logged in - our security rules
+    # should prohibit any access anyway, but by selecting a user that does
+    # not exist we can be extra sure that nothing is leaked
+    if not username:
+        user_id = uuid4().hex
+    else:
+        user_id = request.app.user_ids_by_name[username]
+
     # XXX username should be user_id, invoice should be period_id
     # this should be changed, but needs to be changed by replacing
     # the username everywhere
-    return app.invoice_collection(
-        period_id=invoice,
-        user_id=request.app.user_ids_by_name[username])
+    return app.invoice_collection(period_id=invoice, user_id=user_id)
 
 
 @FeriennetApp.path(

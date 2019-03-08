@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes /my-bills raising an error for anonymous users.
+  [href]
+
 1.5.10 (2019-03-06)
 ~~~~~~~~~~~~~~~~~~~
 
