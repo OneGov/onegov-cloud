@@ -4,6 +4,9 @@ Changelog
 - Fixes JavaScript race conditions.
   [msom]
 
+- Updates JavaScript libraries.
+  [msom]
+
 3.9.2 (2019-03-06)
 ~~~~~~~~~~~~~~~~~~~
 
