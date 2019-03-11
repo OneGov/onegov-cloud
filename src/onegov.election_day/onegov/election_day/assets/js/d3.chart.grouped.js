@@ -67,7 +67,7 @@
             var canvas = svg.append('g')
                 .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-            if (data.results) {
+            if (data && data.results) {
 
                 // Define 4 scales to position the bars:
                 // - one to get the x-center of a group

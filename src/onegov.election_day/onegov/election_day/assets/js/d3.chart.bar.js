@@ -59,7 +59,7 @@
                 width = $(container).width() - margin.left - margin.right;
             }
 
-            if (data.results) {
+            if (data && data.results) {
 
                 height = options.barHeight * data.results.length;
 

@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes JavaScript race conditions.
+  [msom]
+
 3.9.2 (2019-03-06)
 ~~~~~~~~~~~~~~~~~~~
 
