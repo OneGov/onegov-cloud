@@ -220,21 +220,21 @@
                             </tal:block>
                         </td>
                     </tr>
-                    <tr tal:condition="vote.recommendations_divergent_parties">
-                        <th class="column-30" i18n:translate>Divergent branches</th>
-                        <td>
-                            <dl tal:repeat="(recommendation, branches) vote.recommendations_divergent_parties.items()">
-                                <dt>${recommendation}</dt>
-                                <dd tal:repeat="(actor, canton) branches"><tal:block tal:content="structure actor.html(request)" /> <tal:block tal:content="structure canton.html(request)" /></dd>
-                            </dl>
-                        </td>
-                    </tr>
                     <tr tal:condition="vote.recommendations_associations">
                         <th class="column-30" i18n:translate>Further Recommendations</th>
                         <td>
                             <dl tal:repeat="(recommendation, associations) vote.recommendations_associations.items()">
                                 <dt>${recommendation}</dt>
                                 <dd tal:repeat="association associations"><tal:block tal:content="structure association.html(request)" /></dd>
+                            </dl>
+                        </td>
+                    </tr>
+                    <tr tal:condition="vote.recommendations_divergent_parties">
+                        <th class="column-30" i18n:translate>Divergent branches</th>
+                        <td>
+                            <dl tal:repeat="(recommendation, branches) vote.recommendations_divergent_parties.items()">
+                                <dt>${recommendation}</dt>
+                                <dd tal:repeat="(actor, canton) branches"><tal:block tal:content="structure actor.html(request)" /> <tal:block tal:content="structure canton.html(request)" /></dd>
                             </dl>
                         </td>
                     </tr>

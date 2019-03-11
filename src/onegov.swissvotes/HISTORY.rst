@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Moves divergent branches further down.
+  [msom]
+
 - Updates JavaScript libraries.
   [msom]
 
