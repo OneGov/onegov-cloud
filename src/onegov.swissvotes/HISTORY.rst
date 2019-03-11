@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.43 (2019-03-11)
+~~~~~~~~~~~~~~~~~~~
 
 - Moves divergent branches further down.
   [msom]
