@@ -1,5 +1,6 @@
 from cached_property import cached_property
 from datetime import date
+from onegov.core.orm.func import unaccent
 from onegov.wtfs.models.municipality import Municipality
 from onegov.wtfs.models.scan_job import ScanJob
 from sqlalchemy import func
@@ -55,7 +56,6 @@ class Report(object):
     def columns(self):
         return self.columns_dispatch + self.columns_return
 
-    @property
     def query(self):
         # aggregate on dispatch date
         query_in = self.session.query(ScanJob).join(Municipality)
@@ -111,12 +111,11 @@ class Report(object):
             *[sum(union.c, column) for column in self.columns]
         )
         query = query.group_by(union.c.name, union.c.bfs_number)
-        query = query.order_by(union.c.name)
+        query = query.order_by(unaccent(union.c.name))
         return query
 
-    @property
     def total(self):
-        subquery = self.query.subquery()
+        subquery = self.query().subquery()
         query = self.session.query(
             *[sum(subquery.c, column) for column in self.columns],
         )
@@ -124,7 +123,7 @@ class Report(object):
 
 
 class ReportBoxes(Report):
-    """ A Report containing all boxes from the municipalities of normal scan
+    """ A report containing all boxes from the municipalities of normal scan
     jobs. """
 
     def __init__(self, session, start=None, end=None):
@@ -141,7 +140,7 @@ class ReportBoxes(Report):
 
 
 class ReportBoxesAndForms(Report):
-    """ A Report containing all boxes, tax forms and single documents. """
+    """ A report containing all boxes, tax forms and single documents. """
 
     @cached_property
     def columns_dispatch(self):
@@ -156,7 +155,7 @@ class ReportBoxesAndForms(Report):
 
 
 class ReportFormsByMunicipality(Report):
-    """ A Report containing all tax forms of a single municipality. """
+    """ A report containing all tax forms of a single municipality. """
 
     @cached_property
     def columns_dispatch(self):

@@ -22,7 +22,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr tal:repeat="result layout.model.query">
+                        <tr tal:repeat="result layout.model.query()">
                             <td>${result.name}</td>
                             <td class="right">${result.bfs_number}</td>
                             <td class="right">${result.dispatch_boxes}</td>
@@ -32,7 +32,7 @@
                         </tr>
                     </tbody>
                     <tfoot>
-                        <tr tal:define="total layout.model.total">
+                        <tr tal:define="total layout.model.total()">
                             <th colspan="2" i18n:translate>Total</th>
                             <td class="right">${total.dispatch_boxes}</td>
                             <td class="right">${total.return_boxes}</td>

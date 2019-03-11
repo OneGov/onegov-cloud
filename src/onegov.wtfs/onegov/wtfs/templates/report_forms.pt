@@ -25,7 +25,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr tal:repeat="result layout.model.query">
+                        <tr tal:repeat="result layout.model.query()">
                             <td>${result.name}</td>
                             <td class="right">${result.bfs_number}</td>
                             <td class="right">${result.return_scanned_tax_forms_older}</td>
