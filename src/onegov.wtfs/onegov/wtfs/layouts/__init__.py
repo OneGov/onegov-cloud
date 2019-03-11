@@ -14,6 +14,7 @@ from onegov.wtfs.layouts.notification import AddNotificationLayout
 from onegov.wtfs.layouts.notification import EditNotificationLayout
 from onegov.wtfs.layouts.notification import NotificationLayout
 from onegov.wtfs.layouts.notification import NotificationsLayout
+from onegov.wtfs.layouts.report import ReportBoxesAndFormsByDeliveryLayout
 from onegov.wtfs.layouts.report import ReportBoxesAndFormsLayout
 from onegov.wtfs.layouts.report import ReportBoxesLayout
 from onegov.wtfs.layouts.report import ReportFormsByMunicipalityLayout
@@ -52,6 +53,7 @@ __all__ = (
     'MunicipalityLayout',
     'NotificationLayout',
     'NotificationsLayout',
+    'ReportBoxesAndFormsByDeliveryLayout',
     'ReportBoxesAndFormsLayout',
     'ReportBoxesLayout',
     'ReportFormsByMunicipalityLayout',

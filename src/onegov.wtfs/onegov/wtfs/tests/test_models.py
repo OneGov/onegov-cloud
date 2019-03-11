@@ -10,6 +10,7 @@ from onegov.wtfs.models import PickupDate
 from onegov.wtfs.models import Principal
 from onegov.wtfs.models import ReportBoxes
 from onegov.wtfs.models import ReportBoxesAndForms
+from onegov.wtfs.models import ReportBoxesAndFormsByDelivery
 from onegov.wtfs.models import ReportFormsByMunicipality
 from onegov.wtfs.models import ScanJob
 from uuid import uuid4
@@ -438,6 +439,61 @@ def test_report_forms_by_municipality(session):
     assert report.query().all() == [('Aesch', 241, 0, 0, 0, 0)]
     report = _report(date(2019, 1, 4), date(2019, 1, 5), 'Andelfingen')
     assert report.query().all() == [('Andelfingen', 30, 0, 0, 0, 0)]
+
+
+def test_report_delivery(session):
+    def _report(start, end, municipality):
+        query = session.query(Municipality).filter_by(name=municipality)
+        return ReportBoxesAndFormsByDelivery(
+            session, start=start, end=end, type=None,
+            municipality_id=query.one().id
+        )
+
+    add_report_data(session)
+
+    # 2019-01-01
+    report = _report(date(2019, 1, 1), date(2019, 1, 1), 'Adlikon')
+    assert report.query().all() == [(date(2019, 1, 1), 1, 1, 2, 3, 6, 4, 4)]
+    assert report.total() == (0, 0, 1, 2, 3, 6, 4, 4)
+
+    report = _report(date(2019, 1, 1), date(2019, 1, 1), 'Aesch')
+    assert report.query().all() == [(date(2019, 1, 1), 3, 1, 2, 3, 6, 4, 4)]
+    assert report.total() == (0, 0, 1, 2, 3, 6, 4, 4)
+
+    report = _report(date(2019, 1, 1), date(2019, 1, 1), 'Altikon')
+    assert report.query().all() == []
+    assert report.total() == (0, 0, 0, 0, 0, 0, 0, 0)
+
+    report = _report(date(2019, 1, 1), date(2019, 1, 1), 'Andelfingen')
+    assert report.query().all() == []
+    assert report.total() == (0, 0, 0, 0, 0, 0, 0, 0)
+
+    # 2019-01-01 ... 2019-01-05
+    report = _report(date(2019, 1, 1), date(2019, 1, 5), 'Adlikon')
+    assert report.query().all() == [
+        (date(2019, 1, 1), 1, 1, 2, 3, 6, 4, 4),
+        (date(2019, 1, 2), 2, 3, 2, 1, 6, 1, 1)
+    ]
+    assert report.total() == (0, 0, 4, 4, 4, 12, 5, 5)
+
+    report = _report(date(2019, 1, 1), date(2019, 1, 5), 'Aesch')
+    assert report.query().all() == [
+        (date(2019, 1, 1), 3, 1, 2, 3, 6, 4, 4),
+        (date(2019, 1, 3), 4, 0, 10, 0, 10, 0, None)
+    ]
+    assert report.total() == (0, 0, 1, 12, 3, 16, 4, 4)
+
+    report = _report(date(2019, 1, 1), date(2019, 1, 5), 'Altikon')
+    assert report.query().all() == [
+        (date(2019, 1, 2), 5, 1, 2, 3, 6, 4, 4)
+    ]
+    assert report.total() == (0, 0, 1, 2, 3, 6, 4, 4)
+
+    report = _report(date(2019, 1, 1), date(2019, 1, 5), 'Andelfingen')
+    assert report.query().all() == [
+        (date(2019, 1, 2), 6, 1, 2, 3, 6, 4, 4)
+    ]
+    assert report.total() == (0, 0, 1, 2, 3, 6, 4, 4)
 
 
 def test_notification(session):

@@ -86,3 +86,19 @@ class ReportFormsByMunicipalityLayout(SpecificReportBaseLayout):
             self.format_date(self.model.start, 'date'),
             self.format_date(self.model.end, 'date')
         )
+
+
+class ReportBoxesAndFormsByDeliveryLayout(SpecificReportBaseLayout):
+
+    @cached_property
+    def title(self):
+        return _("Report boxes and forms by delivery")
+
+    @cached_property
+    def subtitle(self):
+        return "{} ({}) {}-{}".format(
+            self.model.municipality.name,
+            self.model.municipality.bfs_number,
+            self.format_date(self.model.start, 'date'),
+            self.format_date(self.model.end, 'date')
+        )

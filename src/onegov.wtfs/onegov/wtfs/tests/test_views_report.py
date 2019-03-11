@@ -98,6 +98,21 @@ def test_views_report(client):
     assert "9603" not in view
     assert "9702" not in view
 
+    # By delivery
+    view = get_report('delivery', '2019-01-01', '2019-01-05')
+    assert "8888" in view
+    assert "9504" in view
+    assert "9603" in view
+    assert "9702" in view
+    assert "9801" in view
+
+    view = get_report('delivery', '2019-01-06', '2019-01-10')
+    assert "8888" not in view
+    assert "9504" not in view
+    assert "9603" not in view
+    assert "9702" not in view
+    assert "9801" not in view
+
 
 @patch.object(CoreRequest, 'assert_valid_csrf_token')
 def test_views_report_permissions(mock_method, client):

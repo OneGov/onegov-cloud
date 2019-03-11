@@ -17,6 +17,7 @@ from onegov.wtfs.models import Principal
 from onegov.wtfs.models import Report
 from onegov.wtfs.models import ReportBoxes
 from onegov.wtfs.models import ReportBoxesAndForms
+from onegov.wtfs.models import ReportBoxesAndFormsByDelivery
 from onegov.wtfs.models import ReportFormsByMunicipality
 from onegov.wtfs.models import ScanJob
 from webob.exc import HTTPNotFound
@@ -200,6 +201,23 @@ def get_report_forms(request, start, end, type, municipality_id):
     if not municipality_id:
         raise HTTPNotFound()
     return ReportFormsByMunicipality(
+        request.session, start, end, type, municipality_id
+    )
+
+
+@WtfsApp.path(
+    model=ReportBoxesAndFormsByDelivery,
+    path='/report/delivery/{start}/{end}/{type}/{municipality_id}',
+    converters=dict(
+        start=extended_date_converter,
+        end=extended_date_converter,
+        municipality_id=uuid_converter
+    )
+)
+def get_report_delivery(request, start, end, type, municipality_id):
+    if not municipality_id:
+        raise HTTPNotFound()
+    return ReportBoxesAndFormsByDelivery(
         request.session, start, end, type, municipality_id
     )
 

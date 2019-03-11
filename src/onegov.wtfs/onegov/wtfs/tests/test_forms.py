@@ -723,6 +723,14 @@ def test_report_selection_form(session):
     assert model.type == 'express'
     assert model.municipality_id == aesch.id.hex
 
+    form.report_type.data = 'delivery'
+    model = form.get_model()
+    assert model.__class__.__name__ == 'ReportBoxesAndFormsByDelivery'
+    assert model.start == date(2019, 1, 1)
+    assert model.end == date(2019, 1, 31)
+    assert model.type == 'express'
+    assert model.municipality_id == aesch.id.hex
+
 
 def test_notification_form():
     # Test apply / update

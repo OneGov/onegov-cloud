@@ -25,6 +25,7 @@ from onegov.wtfs.layouts import MunicipalitiesLayout
 from onegov.wtfs.layouts import MunicipalityLayout
 from onegov.wtfs.layouts import NotificationLayout
 from onegov.wtfs.layouts import NotificationsLayout
+from onegov.wtfs.layouts import ReportBoxesAndFormsByDeliveryLayout
 from onegov.wtfs.layouts import ReportBoxesAndFormsLayout
 from onegov.wtfs.layouts import ReportBoxesLayout
 from onegov.wtfs.layouts import ReportFormsByMunicipalityLayout
@@ -42,6 +43,7 @@ from onegov.wtfs.models import Notification
 from onegov.wtfs.models import Report
 from onegov.wtfs.models import ReportBoxes
 from onegov.wtfs.models import ReportBoxesAndForms
+from onegov.wtfs.models import ReportBoxesAndFormsByDelivery
 from onegov.wtfs.models import ReportFormsByMunicipality
 from onegov.wtfs.security import AddModel
 from onegov.wtfs.security import AddModelUnrestricted
@@ -532,6 +534,23 @@ def test_report_layouts(session):
     assert list(hrefs(layout.editbar_links)) == ['#']
     assert path(layout.breadcrumbs) == (
         'DummyPrincipal/Report/#/ReportFormsByMunicipality'
+    )
+    assert layout.cancel_url == ''
+    assert layout.success_url == ''
+
+    model = ReportBoxesAndFormsByDelivery(
+        session,
+        start=date(2019, 1, 1),
+        end=date(2019, 1, 31),
+        type='normal',
+        municipality_id=municipality.id
+    )
+    layout = ReportBoxesAndFormsByDeliveryLayout(model, request)
+    assert layout.title == 'Report boxes and forms by delivery'
+    assert layout.subtitle == 'Adlikon (21) 01.01.2019-31.01.2019'
+    assert list(hrefs(layout.editbar_links)) == ['#']
+    assert path(layout.breadcrumbs) == (
+        'DummyPrincipal/Report/#/ReportBoxesAndFormsByDelivery'
     )
     assert layout.cancel_url == ''
     assert layout.success_url == ''

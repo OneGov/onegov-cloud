@@ -165,3 +165,63 @@ class ReportFormsByMunicipality(Report):
             'return_scanned_tax_forms_current_year',
             'return_scanned_tax_forms',
         ]
+
+
+class ReportBoxesAndFormsByDelivery(object):
+    """ A report containing all boxes, tax forms and single documents of a
+    single municipality by delivery.
+
+    """
+
+    def __init__(self, session, start, end, type, municipality_id):
+        self.session = session
+        self.start = start
+        self.end = end
+        self.type = type
+        self.municipality_id = municipality_id
+
+    @property
+    def municipality(self):
+        query = self.session.query(Municipality)
+        query = query.filter_by(id=self.municipality_id)
+        return query.one()
+
+    @cached_property
+    def columns(self):
+        return [
+            'dispatch_date',
+            'delivery_number',
+            'return_scanned_tax_forms_older',
+            'return_scanned_tax_forms_last_year',
+            'return_scanned_tax_forms_current_year',
+            'return_scanned_tax_forms',
+            'return_scanned_single_documents',
+            'return_boxes'
+
+        ]
+
+    def query(self):
+        query = self.session.query(
+            *[getattr(ScanJob, column) for column in self.columns]
+        )
+        query = query.filter(
+            ScanJob.dispatch_date >= self.start,
+            ScanJob.dispatch_date <= self.end,
+            ScanJob.municipality_id == self.municipality_id
+        )
+        if self.type in ('normal', 'express'):
+            query = query.filter(ScanJob.type == self.type)
+        query = query.order_by(
+            ScanJob.dispatch_date,
+            ScanJob.delivery_number
+        )
+        return query
+
+    def total(self):
+        subquery = self.query().subquery()
+        query = self.session.query(
+            zero('dispatch_date'),
+            zero('delivery_number'),
+            *[sum(subquery.c, column) for column in self.columns[2:]],
+        )
+        return query.one()

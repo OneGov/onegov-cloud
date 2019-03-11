@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-07 13:30+0100\n"
-"PO-Revision-Date: 2019-03-07 13:31+0100\n"
+"POT-Creation-Date: 2019-03-11 09:49+0100\n"
+"PO-Revision-Date: 2019-03-11 09:49+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -26,8 +26,8 @@ msgstr "Kontaktperson"
 msgid "Role"
 msgstr "Rolle"
 
-msgid "User group"
-msgstr "Benutzergruppe"
+msgid "Municipality"
+msgstr "Gemeinde"
 
 msgid "Editor"
 msgstr "Gemeindeadministrator"
@@ -70,9 +70,6 @@ msgstr "Startdatum"
 
 msgid "End date"
 msgstr "Enddatum"
-
-msgid "Municipality"
-msgstr "Gemeinde"
 
 msgid "Title"
 msgstr "Titel"
@@ -184,6 +181,9 @@ msgstr "Boxen und Steuererklärungen aller Gemeinden"
 msgid "Report forms"
 msgstr "Total Steuererklärungen pro Gemeinde"
 
+msgid "Report boxes and forms by delivery"
+msgstr "Boxen und Steuererklärungen nach Lieferschein"
+
 msgid "Regular and express shipment"
 msgstr "Alle Sendungen"
 
@@ -215,14 +215,14 @@ msgstr "Mit Mehrwertsteuer"
 msgid "Scan job no. ${number}"
 msgstr "Scan-Auftrag Nr. ${number}"
 
-msgid "User groups"
-msgstr "Benutzergruppen"
+msgid "Users"
+msgstr "Benutzer"
 
-msgid "Add user group"
-msgstr "Benutzergruppe hinzufügen"
+msgid "Add user"
+msgstr "Benutzer hinzufügen"
 
-msgid "Edit user group"
-msgstr "Benutzergruppe bearbeiten"
+msgid "Edit user"
+msgstr "Benutzer bearbeiten"
 
 msgid "Homepage"
 msgstr "Startseite"
@@ -236,26 +236,14 @@ msgstr "Bearbeiten"
 msgid "Delete"
 msgstr "Löschen"
 
-msgid "Do you really want to delete this user group?"
-msgstr "Diese Benutzergruppe wirklich löschen?"
+msgid "Do you really want to delete this user?"
+msgstr "Diesen Benutzer wirklich löschen?"
 
 msgid "This cannot be undone."
 msgstr "Dies kann nicht rückgängig gemacht werden."
 
 msgid "Cancel"
 msgstr "Abbrechen"
-
-msgid "Users"
-msgstr "Benutzer"
-
-msgid "Add user"
-msgstr "Benutzer hinzufügen"
-
-msgid "Edit user"
-msgstr "Benutzer bearbeiten"
-
-msgid "Do you really want to delete this user?"
-msgstr "Diesen Benutzer wirklich löschen?"
 
 msgid "User"
 msgstr "Benutzer"
@@ -345,8 +333,17 @@ msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
 
+msgid "Delivery"
+msgstr "Versand"
+
+msgid "Delivery number"
+msgstr "Lieferscheinnummer"
+
 msgid "until"
 msgstr "bis"
+
+msgid "Number of users"
+msgstr "Anzahl Benutzer"
 
 msgid "Dispatch to the tax office on ${date}"
 msgstr "Lieferung an das Steueramt Winterthur am ${date}"
@@ -419,9 +416,6 @@ msgstr "Passwort vergessen?"
 msgid "Reset password"
 msgstr "Passwort zurücksetzen"
 
-msgid "Number of users"
-msgstr "Anzahl Benutzer"
-
 msgid "${count} invoice(s) have been created."
 msgstr "Es wurde(n) ${count} Rechnung(en) erstellt."
 
@@ -436,11 +430,11 @@ msgstr ""
 "Klicken Sie mit der rechten Maustaste auf den Link und wähle Sie \"Ziel "
 "speichern unter\", um die Datei zu speichern."
 
-msgid "Delivery number"
-msgstr "Lieferscheinnummer"
-
 msgid "Pick-up dates"
 msgstr "Abholtermine"
+
+msgid "User group"
+msgstr "Benutzergruppe"
 
 msgid "Dear Sir or Madam,"
 msgstr "Sehr geehrte Damen und Herren,"
@@ -537,15 +531,6 @@ msgstr "Passwort zurücksetzen"
 
 msgid "Save"
 msgstr "Speichern"
-
-msgid "User group deleted."
-msgstr "Benutzergruppe gelöscht."
-
-msgid "User group added."
-msgstr "Benutzergruppe hinzugefügt."
-
-msgid "User group modified."
-msgstr "Benutzergruppe geändert."
 
 msgid "User deleted."
 msgstr "Benutzer gelöscht."
