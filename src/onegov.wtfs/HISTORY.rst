@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.3 (2019-03-11)
+~~~~~~~~~~~~~~~~~~~
 
 - Update deploy keys.
   [msom]
