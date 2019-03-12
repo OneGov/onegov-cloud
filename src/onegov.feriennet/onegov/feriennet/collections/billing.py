@@ -193,7 +193,7 @@ class BillingCollection(object):
         if period.all_inclusive and period.booking_cost:
             for id, (attendee, username) in attendees.items():
                 if id in actual_attendees:
-                    created_invoices[booking.username].add(
+                    created_invoices[username].add(
                         group=attendee,
                         text=all_inclusive_booking_text,
                         unit=period.booking_cost,

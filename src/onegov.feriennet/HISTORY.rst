@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes billing error in all-inclusive periods.
+  [href]
+
 1.5.11 (2019-03-08)
 ~~~~~~~~~~~~~~~~~~~
 
