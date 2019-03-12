@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.5.12 (2019-03-12)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes max-age not being inclusive.
   [href]
