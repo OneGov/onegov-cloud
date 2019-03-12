@@ -11,7 +11,7 @@ from onegov.activity.models import InvoiceItem
 from onegov.activity.models import InvoiceReference
 from onegov.activity.models.invoice_reference import FeriennetSchema
 from onegov.user import User
-from sqlalchemy import distinct, func
+from sqlalchemy import func
 
 
 DOCUMENT_NS_EX = re.compile(r'.*<Document [^>]+>(.*)')
