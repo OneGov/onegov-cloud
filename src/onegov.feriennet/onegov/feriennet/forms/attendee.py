@@ -323,7 +323,10 @@ class AttendeeSignupForm(AttendeeBase):
             self.attendee.errors.append(_("The attendee is too old"))
             return False
 
-        if self.model.is_too_young(birth_date, wiggle_room=0):
+        # the attendee can be 1 year too old (otherwise, the day the attende
+        # is a day older than the max age, he'll be rejected - in other word
+        # the min age is exclusive, the max age is inclusive)
+        if self.model.is_too_young(birth_date, wiggle_room=365):
             self.attendee.errors.append(_("The attendee is too young"))
             return False
 

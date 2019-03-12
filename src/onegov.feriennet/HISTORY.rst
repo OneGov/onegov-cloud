@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes max-age not being inclusive.
+  [href]
+
 - Tweaks group invite page.
   [href]
 
