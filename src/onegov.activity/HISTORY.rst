@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes 'free occasions' price filter not working as intended.
+  [href]
+
 - Fixes ISO20022 matching not working in some cases.
   [href]
 
