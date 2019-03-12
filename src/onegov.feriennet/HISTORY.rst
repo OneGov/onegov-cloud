@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Tweaks group invite page.
+  [href]
+
 - Fixes billing error in all-inclusive periods.
   [href]
 

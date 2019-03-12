@@ -15,14 +15,14 @@
 
         <h3 i18n:translate>Sign Up for Activity</h3>
 
-        <ul class="limit-line-width">
-            <li i18n:translate>
+        <div class="limit-line-width">
+            <p class="tight" i18n:translate>
                 Children need to be signed up to the activity to join the group. In case they are not, they can do that here.
-            </li>
-            <li i18n:translate>
+            </p>
+            <p class="tight" i18n:translate>
                 Children can join the group under "Manage group" after sign-up.
-            </li>
-        </ul>
+            </p>
+        </div>
 
         <div class="occasion-panel">
             <h3>
@@ -38,18 +38,19 @@
 
         <h3 i18n:translate>Manage Group</h3>
 
-        <ul class="limit-line-width">
-            <li i18n:translate>
+        <div class="limit-line-width">
+            <p class="tight" i18n:translate>
                 The formation of a group increases the chance of joining an activity together.
-            </li>
-            <li>
-                <tal:b i18n:translate>
-                    You can add your own children to the group here or share the following link with other parents for them
-                    to sign up their own children:
-                </tal:b>
-                <a href="${request.link(model)}"><b>${request.link(model)}</b></a>
-            </li>
-        </ul>
+            </p>
+            <p class="tight" i18n:translate>
+                You can add your own children to the group here or share the following link with other parents for them
+                to sign up their own children:
+            </p>
+        </div>
+
+        <div class="panel limit-line-width" style="text-align: center;">
+            <strong>${request.link(model)}</strong>
+        </div>
 
         <div class="group-membership" tal:define="prospects request.is_logged_in and tuple(model.prospects(request.current_username))">
             <div>
