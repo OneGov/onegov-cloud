@@ -194,9 +194,9 @@ def match_iso_20022_to_usernames(xml, session, period_id, currency='CHF'):
     q = q.with_entities(
         User.username,
         func.sum(InvoiceItem.amount).label('amount'),
-        func.array_agg(
-            distinct(InvoiceReference.reference)).label('references'))
-    q = q.group_by(User.username)
+        InvoiceReference.reference,
+    )
+    q = q.group_by(User.username, InvoiceReference.reference)
     q = q.filter(InvoiceItem.paid == False)
     q = q.order_by(User.username)
 
@@ -206,11 +206,14 @@ def match_iso_20022_to_usernames(xml, session, period_id, currency='CHF'):
     # Hash the invoices by amount (duplicates probable)
     by_amount = defaultdict(list)
 
-    for record in q:
-        for reference in record.references:
-            by_ref[reference].append(record)
+    last_username = None
 
-        by_amount[record.amount].append(record)
+    for record in q:
+        by_ref[record.reference].append(record)
+
+        if last_username != record.username:
+            by_amount[record.amount].append(record)
+            last_username = record.username
 
     # go through the transactions, comparing amount and code for a match
     transactions = tuple(extract_transactions(xml))

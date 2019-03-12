@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes ISO20022 matching not working in some cases.
+  [href]
+
 1.17.0 (2019-02-25)
 ~~~~~~~~~~~~~~~~~~~
 

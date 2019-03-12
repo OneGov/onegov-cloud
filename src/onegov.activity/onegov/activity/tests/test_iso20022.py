@@ -380,7 +380,7 @@ def test_invoice_matching_multischema(session, owner, prebooking_period):
     # make sure we can match against both
     xml = generate_xml([
         dict(
-            amount='500.00 CHF',
+            amount='250.00 CHF',
             note=i.references[0].reference
         ),
     ])
@@ -388,13 +388,13 @@ def test_invoice_matching_multischema(session, owner, prebooking_period):
     transactions = list(match_iso_20022_to_usernames(xml, session, period.id))
 
     assert len(transactions) == 1
-    assert transactions[0].amount == Decimal(500)
+    assert transactions[0].amount == Decimal(250)
     assert transactions[0].username == owner.username
     assert transactions[0].confidence == 1.0
 
     xml = generate_xml([
         dict(
-            amount='500.00 CHF',
+            amount='250.00 CHF',
             reference=i.references[1].reference
         ),
     ])
@@ -402,6 +402,6 @@ def test_invoice_matching_multischema(session, owner, prebooking_period):
     transactions = list(match_iso_20022_to_usernames(xml, session, period.id))
 
     assert len(transactions) == 1
-    assert transactions[0].amount == Decimal(500)
+    assert transactions[0].amount == Decimal(250)
     assert transactions[0].username == owner.username
     assert transactions[0].confidence == 1.0
