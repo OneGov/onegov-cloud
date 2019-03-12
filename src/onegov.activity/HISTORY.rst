@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.17.1 (2019-03-12)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes 'free occasions' price filter not working as intended.
   [href]
