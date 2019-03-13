@@ -10,6 +10,7 @@ from onegov.swissvotes.layouts import DeleteVoteLayout
 from onegov.swissvotes.layouts import UploadVoteAttachemtsLayout
 from onegov.swissvotes.layouts import VoteLayout
 from onegov.swissvotes.layouts import VoteStrengthsLayout
+from onegov.swissvotes.models import Actor
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import SwissVoteFile
 
@@ -71,7 +72,8 @@ def view_vote_percentages(self, request):
 )
 def view_vote_strengths(self, request):
     return {
-        'layout': VoteStrengthsLayout(self, request)
+        'layout': VoteStrengthsLayout(self, request),
+        'Actor': Actor
     }
 
 
