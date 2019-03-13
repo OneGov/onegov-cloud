@@ -69,10 +69,10 @@
                         <ul class="members-outside-group" tal:condition="prospects">
                             <li tal:repeat="(attendee, booking) prospects">
                                 <div class="group-attendee">${attendee.name} ${attendee.gender == 'male' and '👦' or '👧'}</div>
-                                <div class="group-action" tal:condition="booking and booking.state in ('open', 'accepted') and may_execute_action(booking)" tal:content="structure group_action(booking, 'join')(layout)"></div>
-                                <div class="group-disabled-action" i18n:translate tal:condition="booking and booking.state == 'blocked'">Booking Blocked</div>
-                                <div class="group-disabled-action" i18n:translate tal:condition="booking and booking.state == 'cancelled'">Booking Cancelled</div>
-                                <div class="group-disabled-action" i18n:translate tal:condition="booking and booking.state == 'denied'">Booking Denied</div>
+                                <div class="group-action" tal:condition="booking and (booking.period.wishlist_phase or booking.state in ('open', 'accepted')) and may_execute_action(booking)" tal:content="structure group_action(booking, 'join')(layout)"></div>
+                                <div class="group-disabled-action" i18n:translate tal:condition="booking and not booking.period.wishlist_phase and booking.state == 'blocked'">Booking Blocked</div>
+                                <div class="group-disabled-action" i18n:translate tal:condition="booking and not booking.period.wishlist_phase and booking.state == 'cancelled'">Booking Cancelled</div>
+                                <div class="group-disabled-action" i18n:translate tal:condition="booking and not booking.period.wishlist_phase and booking.state == 'denied'">Booking Denied</div>
                                 <div class="group-disabled-action" i18n:translate tal:condition="not:booking">Not signed up</div>
                             </li>
                         </ul>

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes group invites becoming blocked during wishlist phase.
+  [href]
+
 - Fixes being able to use 'pay organiser directly' without pass system.
   [href]
 
