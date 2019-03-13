@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.4 (2019-03-13)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes municipality and users templates.
   [msom]
