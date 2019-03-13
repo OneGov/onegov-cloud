@@ -37,7 +37,7 @@
             </table>
 
             <h3 i18n:translate>Parties</h3>
-            <table class="sortable voter-strengths" data-sortlist="[[1,1]]">
+            <table class="sortable voter-strengths" data-sortlist="[[1,1], [2,1]]">
                 <thead>
                     <tr>
                         <th i18n:translate class="column-25">Party</th>
