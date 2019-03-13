@@ -154,3 +154,16 @@ def import_attachments(group_context, folder):
                     )
 
     return _import
+
+
+@cli.command('reindex')
+@pass_group_context
+def reindex_attachments(group_context):
+    """ Reindexes the attachments. """
+
+    def _reindex(request, app):
+        votes = SwissVoteCollection(app.session())
+        for vote in votes.query():
+            vote.vectorize_files()
+
+    return _reindex

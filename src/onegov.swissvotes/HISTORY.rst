@@ -4,6 +4,9 @@ Changelog
 - Adds brief description attachments.
   [msom]
 
+- Adds a reindex command.
+  [msom]
+
 - Fixes PDF attachments not getting indexed when uploaded together.
   [msom]
 

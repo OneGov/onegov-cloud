@@ -4,9 +4,13 @@ import yaml
 from click.testing import CliRunner
 from datetime import date
 from decimal import Decimal
+from io import BytesIO
+from onegov.core.crypto import random_token
+from onegov.file.utils import as_fileintent
 from onegov.pdf import Pdf
 from onegov.swissvotes.cli import cli
 from onegov.swissvotes.models import SwissVote
+from onegov.swissvotes.models import SwissVoteFile
 from pathlib import Path
 from psycopg2.extras import NumericRange
 from transaction import commit
@@ -22,7 +26,9 @@ def write_config(path, postgres_dsn, temporary_directory, redis_url):
                 'configuration': {
                     'dsn': postgres_dsn,
                     'redis_url': redis_url,
-                    'depot_backend': 'depot.io.memory.MemoryFileStorage',
+                    'depot_backend': 'depot.io.local.LocalFileStorage',
+                    'depot_storage_path': temporary_directory,
+                    # 'depot_backend': 'depot.io.memory.MemoryFileStorage',
                     'filestorage': 'fs.osfs.OSFS',
                     'filestorage_options': {
                         'root_path': '{}/file-storage'.format(
@@ -215,3 +221,68 @@ def test_import_attachments(session_manager, temporary_directory, redis_url):
                 'voting_text',
             ):
                 assert f'{number}{name}{lang}' in getattr(vote, name).extract
+
+
+def test_reindex(session_manager, temporary_directory, redis_url):
+
+    cfg_path = os.path.join(temporary_directory, 'onegov.yml')
+    write_config(cfg_path, session_manager.dsn, temporary_directory, redis_url)
+
+    result = run_command(cfg_path, 'govikon', ['add'])
+    assert result.exit_code == 0
+    assert "Instance was created successfully" in result.output
+
+    result = run_command(cfg_path, 'govikon', ['reindex'])
+    assert result.exit_code == 0
+
+    # Add vote
+    vote = SwissVote(
+        id=1,
+        bfs_number=Decimal(1),
+        date=date(1990, 6, 2),
+        decade=NumericRange(1990, 1999),
+        legislation_number=4,
+        legislation_decade=NumericRange(1990, 1994),
+        title="Vote",
+        votes_on_same_day=3,
+        _legal_form=1,
+    )
+
+    file = BytesIO()
+    pdf = Pdf(file)
+    pdf.init_report()
+    pdf.p("Abstimmungstext")
+    pdf.generate()
+    file.seek(0)
+
+    attachment = SwissVoteFile(id=random_token())
+    attachment.reference = as_fileintent(file, 'voting_text')
+    vote.voting_text = attachment
+
+    session_manager.ensure_schema_exists('onegov_swissvotes-govikon')
+    session_manager.set_current_schema('onegov_swissvotes-govikon')
+    session = session_manager.session()
+    session.add(vote)
+    session.flush()
+    commit()
+
+    result = run_command(cfg_path, 'govikon', ['reindex'])
+    assert result.exit_code == 0
+
+    vote = session.query(SwissVote).one()
+    assert "abstimmungstext" in vote.searchable_text_de_CH
+
+    with open(vote.voting_text.reference.file._file_path, 'wb') as file:
+        pdf = Pdf(file)
+        pdf.init_report()
+        pdf.p("Realisation")
+        pdf.generate()
+
+    vote = session.query(SwissVote).one()
+    assert "abstimmungstext" in vote.searchable_text_de_CH
+
+    result = run_command(cfg_path, 'govikon', ['reindex'])
+    assert result.exit_code == 0
+
+    vote = session.query(SwissVote).one()
+    assert "realisation" in vote.searchable_text_de_CH
