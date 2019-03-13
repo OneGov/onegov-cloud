@@ -7,6 +7,9 @@ Changelog
 - Orders pickup dates when creating scan jobs as regular users.
   [msom]
 
+- Fixes home page redirection for users without a municipality.
+  [msom]
+
 0.0.3 (2019-03-11)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -24,7 +24,7 @@ def view_home(self, request):
         return request.redirect(layout.login_url)
 
     if not layout.notifications.query().first():
-        return request.redirect(layout.scan_jobs_url)
+        return request.redirect(layout.top_navigation[0].attrs['href'])
 
     return {'layout': layout}
 
