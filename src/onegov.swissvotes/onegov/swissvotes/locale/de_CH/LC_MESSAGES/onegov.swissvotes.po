@@ -1,3 +1,4 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
@@ -10,8 +11,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: Lingua 3.12\n"
 "X-Generator: Poedit 2.2.1\n"
 
 msgid "Title"
@@ -42,7 +43,7 @@ msgid "Advertisment analysis"
 msgstr "Inserateanalyse"
 
 msgid "Result by canton, district and municipality"
-msgstr "Ergebnis nach Kantonen, Bezirken und Gemeinden"
+msgstr "Abstimmungsergebnis pro Kanton, Bezirk und Gemeinde"
 
 msgid "Dataset"
 msgstr "Datensatz"
@@ -69,11 +70,11 @@ msgid "Full Text"
 msgstr "Volltext"
 
 msgid ""
-"Searches all text fields and attachments. Select «No» to limit the search to "
-"title, keyword, vote number, and procedure number."
+"Searches all text fields and attachments. Select «No» to limit the search to"
+" title, keyword, vote number, and procedure number."
 msgstr ""
-"Sucht in allen Textfeldern und Anhängen. Wählen Sie «Nein», um die Suche auf "
-"Titel, Kurzbezeichnung, Abstimmungs- und Geschäftsnummer zu beschränken."
+"Sucht in allen Textfeldern und Anhängen. Wählen Sie «Nein», um die Suche auf"
+" Titel, Kurzbezeichnung, Abstimmungs- und Geschäftsnummer zu beschränken."
 
 msgid "Position of the Federal Council"
 msgstr "Position des Bundesrats"
@@ -565,7 +566,7 @@ msgid "d-3-1011"
 msgstr "Gesundheitspolitik"
 
 msgid "d-3-1012"
-msgstr "Medizin"
+msgstr "Medizinforschung und -technik"
 
 msgid "d-3-1013"
 msgstr "Medikamente"
@@ -731,7 +732,7 @@ msgid "None"
 msgstr "Keine"
 
 msgid "Empty"
-msgstr "Leer"
+msgstr "Leer einlegen"
 
 msgid "Free vote"
 msgstr "Stimmfreigabe"
@@ -1028,7 +1029,7 @@ msgid "actor-fmh-label"
 msgstr "Verbindung Schweizer Ärztinnen und Ärzte"
 
 msgid "actor-fps-label"
-msgstr "Freiheits-Partei der Schweiz"
+msgstr "Autopartei"
 
 msgid "actor-frap-label"
 msgstr "Frauen macht Politik!"
@@ -1064,7 +1065,7 @@ msgid "actor-jevp-label"
 msgstr ""
 
 msgid "actor-jfdp-label"
-msgstr "Junge FDP"
+msgstr "Jungfreisinnige"
 
 msgid "actor-jgps-label"
 msgstr "Junge Grüne"
@@ -1112,7 +1113,7 @@ msgid "actor-lps-label"
 msgstr "Liberale Partei der Schweiz"
 
 msgid "actor-mcg-label"
-msgstr "Mouvement Citoyens Genevois"
+msgstr "Mouvement citoyens genevois"
 
 msgid "actor-pda-label"
 msgstr "Partei der Arbeit"
@@ -1175,7 +1176,7 @@ msgid "actor-sodk-label"
 msgstr "Sozialdirektorenkonferenz"
 
 msgid "actor-sol-label"
-msgstr "Solidarität"
+msgstr "solidaritéS"
 
 msgid "actor-sps-label"
 msgstr "Sozialdemokratische Partei der Schweiz"
@@ -1377,7 +1378,7 @@ msgid "General"
 msgstr "Allgemeines"
 
 msgid "Keyword"
-msgstr "Stichwort"
+msgstr "Kurzbezeichnung"
 
 msgid "Vote date"
 msgstr "Abstimmungsdatum"
