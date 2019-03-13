@@ -4,6 +4,9 @@ Changelog
 - Fixes municipality and users templates.
   [msom]
 
+- Orders pickup dates when creating scan jobs as regular users.
+  [msom]
+
 0.0.3 (2019-03-11)
 ~~~~~~~~~~~~~~~~~~~
 

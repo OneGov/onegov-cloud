@@ -156,6 +156,7 @@ class AddScanJobForm(Form):
             PickupDate.municipality_id == self.municipality_id
         )
         query = query.filter(PickupDate.date > date.today())
+        query = query.order_by(PickupDate.date)
         self.dispatch_date_normal.choices = [
             (r.date, f"{r.date:%d.%m.%Y}") for r in query
         ]
