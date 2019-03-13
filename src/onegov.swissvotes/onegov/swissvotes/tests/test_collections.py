@@ -450,7 +450,7 @@ def test_votes_query_attachments(session, attachments, postgres_version):
     )
     for name, attachment in attachments.items():
         setattr(vote, name, attachment)
-        session.flush()
+    session.flush()
 
     def count(**kwargs):
         return SwissVoteCollection(session, **kwargs).query().count()
@@ -460,7 +460,7 @@ def test_votes_query_attachments(session, attachments, postgres_version):
     assert count(term='Abstimmungstext') == 0
     assert count(term='Abstimmungstext', full_text=True) == 1
     assert count(term='Abst*', full_text=True) == 1
-    assert count(term='council message', full_text=True) == 1
+    assert count(term='conseil', full_text=True) == 1
     assert count(term='Parlamentdebatte', full_text=True) == 1
     assert count(term='Réalisation', full_text=True) == 1
     assert count(term='booklet', full_text=True) == 0

@@ -69,11 +69,11 @@ def attachments(swissvotes_app):
     for name, content in (
         ('ad_analysis', "Inserateanalyse"),
         ('brief_description', "Kurschbeschreibung"),
-        ('federal_council_message', "Federal council message"),
+        ('federal_council_message', "Message du Conseil fédéral"),
         ('parliamentary_debate', "Parlamentdebatte"),
         ('realization', "Réalisation"),
-        ('resolution', "Resolution"),
-        ('voting_booklet', "Voting booklet"),
+        ('resolution', "Arrêté constatant le résultat"),
+        ('voting_booklet', "Brochure explicative"),
         ('voting_text', "Abstimmungstext"),
     ):
         file = BytesIO()

@@ -5,6 +5,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON
 from onegov.file import AssociatedFiles
 from onegov.file import File
+from onegov.file.attachments import extract_pdf_info
 from onegov.swissvotes import _
 from onegov.swissvotes.models.actor import Actor
 from onegov.swissvotes.models.canton import Canton
@@ -635,13 +636,15 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
                 SwissVote.__dict__[file].__get_by_locale__(self, locale)
                 for file in self.indexed_files
             ]
-            text = ' '.join([f.extract or '' for f in files if f]).strip()
-            if text:
-                setattr(
-                    self,
-                    f'searchable_text_{locale}',
-                    func.to_tsvector(language, text)
-                )
+            text = ' '.join([
+                extract_pdf_info(file.reference.file)[1] or ''
+                for file in files if file
+            ]).strip()
+            setattr(
+                self,
+                f'searchable_text_{locale}',
+                func.to_tsvector(language, text)
+            )
 
     @observes('files')
     def files_observer(self, files):

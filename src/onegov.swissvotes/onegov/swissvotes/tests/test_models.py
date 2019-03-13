@@ -1194,29 +1194,59 @@ def test_vote_attachments(swissvotes_app, attachments):
     assert vote.searchable_text_fr_CH is None
 
     assert vote.indexed_files == {
+        'brief_description',
         'federal_council_message',
         'parliamentary_debate',
         'realization',
         'voting_text',
     }
 
+    vote.ad_analysis = attachments['ad_analysis']
+    vote.brief_description = attachments['brief_description']
+    vote.parliamentary_debate = attachments['parliamentary_debate']
     vote.voting_text = attachments['voting_text']
     session.flush()
 
-    assert len(vote.files) == 1
+    assert len(vote.files) == 4
+    assert vote.ad_analysis.name == 'ad_analysis-de_CH'
+    assert vote.brief_description.name == 'brief_description-de_CH'
+    assert vote.parliamentary_debate.name == 'parliamentary_debate-de_CH'
     assert vote.voting_text.name == 'voting_text-de_CH'
     assert "abstimmungstex" in vote.searchable_text_de_CH
-    assert vote.searchable_text_fr_CH is None
+    assert "kurschbeschreib" in vote.searchable_text_de_CH
+    assert "parlamentdebatt" in vote.searchable_text_de_CH
+    assert vote.searchable_text_fr_CH == ''
 
     swissvotes_app.session_manager.current_locale = 'fr_CH'
 
     vote.realization = attachments['realization']
     session.flush()
 
-    assert len(vote.files) == 2
+    assert len(vote.files) == 5
     assert vote.voting_text is None
     assert vote.realization.name == 'realization-fr_CH'
+    assert "abstimmungstex" in vote.searchable_text_de_CH
+    assert "kurschbeschreib" in vote.searchable_text_de_CH
+    assert "parlamentdebatt" in vote.searchable_text_de_CH
     assert "réalis" in vote.searchable_text_fr_CH
+
+    del vote.realization
+    vote.federal_council_message = attachments['federal_council_message']
+    vote.resolution = attachments['resolution']
+    vote.voting_booklet = attachments['voting_booklet']
+    session.flush()
+
+    assert len(vote.files) == 7
+    assert vote.voting_text is None
+    assert vote.federal_council_message.name == 'federal_council_message-fr_CH'
+    assert vote.resolution.name == 'resolution-fr_CH'
+    assert vote.voting_booklet.name == 'voting_booklet-fr_CH'
+    assert "abstimmungstex" in vote.searchable_text_de_CH
+    assert "kurschbeschreib" in vote.searchable_text_de_CH
+    assert "parlamentdebatt" in vote.searchable_text_de_CH
+    assert "réalis" not in vote.searchable_text_fr_CH
+    assert "conseil" in vote.searchable_text_fr_CH
+    assert "fédéral" in vote.searchable_text_fr_CH
 
 
 def test_vote_percentages():
