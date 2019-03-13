@@ -94,11 +94,11 @@ msgstr "Ausfüllen bis 17.00 Uhr Vorabend des ${date}."
 
 #, python-format
 msgid "Unscanned tax forms until ${year}"
-msgstr "S̶t̶E̶ bis ${year}"
+msgstr "NG StE bis ${year}"
 
 #, python-format
 msgid "Unscanned tax forms ${year}"
-msgstr "S̶t̶E̶ ${year}"
+msgstr "NG StE ${year}"
 
 msgid "Type"
 msgstr "Auftragsart"
@@ -152,7 +152,7 @@ msgid "Unscanned tax forms"
 msgstr "Nicht gescannte StE"
 
 msgid "Unscanned single documents"
-msgstr "E̶i̶n̶z̶e̶l̶b̶e̶l̶e̶g̶e̶"
+msgstr "NG Einzelbelege"
 
 msgid "Filter"
 msgstr "Filtern"
