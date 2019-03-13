@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.44 (2019-03-13)
+~~~~~~~~~~~~~~~~~~~
 
 - Updates translations.
   [msom]
