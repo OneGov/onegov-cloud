@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.46 (2019-03-13)
+~~~~~~~~~~~~~~~~~~~
 
 - Uses proper rendering of actors in party strengths view.
   [msom]
