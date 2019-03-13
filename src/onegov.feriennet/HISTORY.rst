@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes being able to use 'pay organiser directly' without pass system.
+  [href]
+
 1.5.12 (2019-03-12)
 ~~~~~~~~~~~~~~~~~~~
 
