@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.5.13 (2019-03-13)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes group invites becoming blocked during wishlist phase.
   [href]
