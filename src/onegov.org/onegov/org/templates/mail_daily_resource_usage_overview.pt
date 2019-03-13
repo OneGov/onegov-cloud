@@ -28,23 +28,24 @@
                     </p>
                     <div class="body">
                         <p>
-                            <tal:b i18n:translate>E-Mail</tal:b><br>
+                            <span class="descreet"><tal:b i18n:translate>E-Mail</tal:b></span><br>
                             ${reservation.email}
                         </p>
                         <p>
-                            <tal:b i18n:translate>Quota</tal:b><br>
+                            <span class="descreet"><tal:b i18n:translate>Quota</tal:b></span><br>
                             ${reservation.quota}
                         </p>
-                        <tal:b condition="resource_id in forms">
-                            <tal:b define="form forms[resource_id](data=reservation.submission.data)">
-                                <div tal:repeat="fieldset form.fieldsets" tal:condition="reservation.submission" class="fieldset">
+
+                        <tal:b condition="reservation.submission">
+                            <tal:b define="form parse_form(reservation.submission.definition)(data=reservation.submission.data)">
+                                <div tal:repeat="fieldset form.fieldsets" class="fieldset">
                                     <tal:b define="fields fieldset.non_empty_fields" condition="fields">
                                         <p>
-                                            <u tal:condition="fieldset.is_visible">${fieldset.label}</u>
+                                            <u tal:condition="fieldset.is_visible"><b>${fieldset.label}</b></u>
                                         </p>
 
                                         <p tal:repeat="field fields.values()">
-                                            ${field.label.text}<br>
+                                            <span class="descreet">${field.label.text}</span><br>
                                             ${layout.render_field(field)}
                                         </p>
                                     </tal:b>

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes issues with daily resource e-mail.
+  [href]
+
 1.1.7 (2019-03-08)
 ~~~~~~~~~~~~~~~~~~~
 

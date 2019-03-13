@@ -160,11 +160,13 @@
     }
 
     .fieldset {
-        background-color: #efefef;
         font-size: 14px;
         font-weight: normal;
         Margin-bottom: 10px;
-        text-transform: uppercase;
+    }
+
+    .descreet {
+        color: #555;
     }
 
     ul li, ol li {

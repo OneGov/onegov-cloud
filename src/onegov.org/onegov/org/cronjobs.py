@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from itertools import groupby
+from onegov.core.cache import lru_cache
 from onegov.core.templates import render_template
 from onegov.file import FileCollection
 from onegov.form import FormSubmission, parse_form
@@ -8,11 +9,11 @@ from onegov.newsletter import Newsletter, NewsletterCollection
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.models import ResourceRecipient, ResourceRecipientCollection
+from onegov.org.views.allocation import handle_rules_cronjob
 from onegov.org.views.newsletter import send_newsletter
 from onegov.reservation import Reservation, Resource, ResourceCollection
 from onegov.ticket import Ticket, TicketCollection
 from onegov.user import User, UserCollection
-from onegov.org.views.allocation import handle_rules_cronjob
 from sedate import replace_timezone, to_timezone, utcnow, align_date_to_day
 from sqlalchemy import and_
 from sqlalchemy.orm import undefer
@@ -197,10 +198,9 @@ def send_daily_resource_usage_overview(request):
         )) for r in all_resources
     )
 
-    forms = {
-        resource.id.hex: parse_form(resource.definition)
-        for resource in all_resources if resource.definition
-    }
+    @lru_cache(maxsize=128)
+    def form(definition):
+        return parse_form(definition)
 
     # get the reservations of this day
     start = align_date_to_day(today, 'Europe/Zurich', 'down')
@@ -245,7 +245,7 @@ def send_daily_resource_usage_overview(request):
         ),
         'organisation': request.app.org.title,
         'resources': resources,
-        'forms': forms
+        'parse_form': form
     }
 
     for address, included_resources in recipients:
