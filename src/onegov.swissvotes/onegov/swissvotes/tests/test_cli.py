@@ -270,7 +270,7 @@ def test_reindex(session_manager, temporary_directory, redis_url):
     assert result.exit_code == 0
 
     vote = session.query(SwissVote).one()
-    assert "abstimmungstext" in vote.searchable_text_de_CH
+    assert "abstimmungstex" in vote.searchable_text_de_CH
 
     with open(vote.voting_text.reference.file._file_path, 'wb') as file:
         pdf = Pdf(file)
@@ -279,10 +279,10 @@ def test_reindex(session_manager, temporary_directory, redis_url):
         pdf.generate()
 
     vote = session.query(SwissVote).one()
-    assert "abstimmungstext" in vote.searchable_text_de_CH
+    assert "abstimmungstex" in vote.searchable_text_de_CH
 
     result = run_command(cfg_path, 'govikon', ['reindex'])
     assert result.exit_code == 0
 
     vote = session.query(SwissVote).one()
-    assert "realisation" in vote.searchable_text_de_CH
+    assert "realisa" in vote.searchable_text_de_CH
