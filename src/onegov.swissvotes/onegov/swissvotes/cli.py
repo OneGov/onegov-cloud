@@ -165,5 +165,6 @@ def reindex_attachments(group_context):
         votes = SwissVoteCollection(app.session())
         for vote in votes.query():
             vote.vectorize_files()
+            click.secho(f"Reindexed vote {vote.bfs_number}", fg='green')
 
     return _reindex

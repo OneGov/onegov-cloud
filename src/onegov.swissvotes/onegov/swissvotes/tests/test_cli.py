@@ -268,6 +268,7 @@ def test_reindex(session_manager, temporary_directory, redis_url):
 
     result = run_command(cfg_path, 'govikon', ['reindex'])
     assert result.exit_code == 0
+    assert "Reindexed vote 1.00" in result.output
 
     vote = session.query(SwissVote).one()
     assert "abstimmungstex" in vote.searchable_text_de_CH
@@ -283,6 +284,7 @@ def test_reindex(session_manager, temporary_directory, redis_url):
 
     result = run_command(cfg_path, 'govikon', ['reindex'])
     assert result.exit_code == 0
+    assert "Reindexed vote 1.00" in result.output
 
     vote = session.query(SwissVote).one()
     assert "realisa" in vote.searchable_text_de_CH
