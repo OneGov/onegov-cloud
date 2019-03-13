@@ -17,14 +17,14 @@
                     <dt i18n:translate>Price per quantity</dt>
                     <dd>${layout.model.price_per_quantity or ''}</dd>
 
-                    <dt i18n:translate>Pick-up dates</dt>
-                    <dd tal:repeat="date layout.model.pickup_dates">
-                        <a>${layout.format_date(date.date, 'date')}</a>
-                    </dd>
-
                     <dt i18n:translate>Users</dt>
                     <dd tal:repeat="user layout.model.users">
                         <a href="${request.link(user)}">${user.title}</a>
+                    </dd>
+
+                    <dt i18n:translate>Pick-up dates</dt>
+                    <dd tal:repeat="date layout.model.pickup_dates">
+                        ${layout.format_date(date.date, 'date')}
                     </dd>
                 </dl>
             </div>

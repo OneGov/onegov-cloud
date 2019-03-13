@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-11 09:49+0100\n"
+"POT-Creation-Date: 2019-03-13 10:20+0100\n"
 "PO-Revision-Date: 2019-03-11 09:49+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -432,9 +432,6 @@ msgstr ""
 
 msgid "Pick-up dates"
 msgstr "Abholtermine"
-
-msgid "User group"
-msgstr "Benutzergruppe"
 
 msgid "Dear Sir or Madam,"
 msgstr "Sehr geehrte Damen und Herren,"

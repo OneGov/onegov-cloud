@@ -8,7 +8,7 @@
                     <thead>
                         <tr>
                             <th i18n:translate>Name</th>
-                            <th i18n:translate>User group</th>
+                            <th i18n:translate>Municipality</th>
                             <th i18n:translate>Role</th>
                         </tr>
                     </thead>
