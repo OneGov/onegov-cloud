@@ -33,6 +33,7 @@ def view_vote(self, request):
 
     return {
         'layout': VoteLayout(self, request),
+        'brief_description': self.get_file('brief_description'),
         'voting_text': self.get_file('voting_text'),
         'federal_council_message': self.get_file('federal_council_message'),
         'parliamentary_debate': self.get_file('parliamentary_debate'),
@@ -141,6 +142,7 @@ def view_file(self, request):
         extension = {'results_by_domain': 'xlsx'}.get(name, 'pdf')
         title = {
             'voting_text': _("Voting text"),
+            'brief_description': _("Brief description Swissvotes"),
             'realization': _("Realization"),
             'federal_council_message': _("Federal council message"),
             'parliamentary_debate': _("Parliamentary debate"),

@@ -67,13 +67,14 @@ def swissvotes_app(request, temporary_path):
 def attachments(swissvotes_app):
     result = {}
     for name, content in (
+        ('ad_analysis', "Inserateanalyse"),
+        ('brief_description', "Kurschbeschreibung"),
         ('federal_council_message', "Federal council message"),
         ('parliamentary_debate', "Parlamentdebatte"),
         ('realization', "Réalisation"),
         ('resolution', "Resolution"),
         ('voting_booklet', "Voting booklet"),
         ('voting_text', "Abstimmungstext"),
-        ('ad_analysis', "Inserateanalyse"),
     ):
         file = BytesIO()
         pdf = Pdf(file)

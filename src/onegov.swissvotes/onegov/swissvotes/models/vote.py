@@ -606,6 +606,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
 
     # attachments
     voting_text = LocalizedFile()
+    brief_description = LocalizedFile()
     federal_council_message = LocalizedFile()
     parliamentary_debate = LocalizedFile()
     voting_booklet = LocalizedFile()
@@ -620,6 +621,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
 
     indexed_files = {
         'voting_text',
+        'brief_description',
         'federal_council_message',
         'parliamentary_debate',
         # we don't include the voting booklet, resolution and ad analysis

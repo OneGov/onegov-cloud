@@ -28,6 +28,14 @@ class AttachmentsForm(Form):
         ]
     )
 
+    brief_description = UploadField(
+        label=_("Brief description Swissvotes"),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(50 * 1024 * 1024)
+        ]
+    )
+
     federal_council_message = UploadField(
         label=_("Federal council message"),
         validators=[

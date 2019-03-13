@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds brief description attachments.
+  [msom]
+
 0.0.44 (2019-03-13)
 ~~~~~~~~~~~~~~~~~~~
 
