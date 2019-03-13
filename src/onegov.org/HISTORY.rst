@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.1.8 (2019-03-13)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes issues with daily resource e-mail.
   [href]
 
