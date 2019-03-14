@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Defers full text search columns.
+  [msom]
+
 0.0.46 (2019-03-13)
 ~~~~~~~~~~~~~~~~~~~
 

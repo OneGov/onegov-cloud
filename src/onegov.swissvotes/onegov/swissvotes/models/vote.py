@@ -617,8 +617,8 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     results_by_domain = LocalizedFile()
 
     # searchable attachment texts
-    searchable_text_de_CH = Column(TSVECTOR)
-    searchable_text_fr_CH = Column(TSVECTOR)
+    searchable_text_de_CH = deferred(Column(TSVECTOR))
+    searchable_text_fr_CH = deferred(Column(TSVECTOR))
 
     indexed_files = {
         'voting_text',
