@@ -1,4 +1,4 @@
-from yaml import load
+from yaml import safe_load
 
 
 class Principal(object):
@@ -51,4 +51,4 @@ class Principal(object):
 
     @classmethod
     def from_yaml(cls, yaml_source):
-        return cls(**load(yaml_source))
+        return cls(**safe_load(yaml_source))

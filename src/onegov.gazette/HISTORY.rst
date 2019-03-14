@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Uses yamls safe load function.
+  [msom]
+
 1.22.3 (2019-02-04)
 ~~~~~~~~~~~~~~~~~~~~
 
