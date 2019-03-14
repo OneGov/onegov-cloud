@@ -4,6 +4,9 @@ Changelog
 - Defers full text search columns.
   [msom]
 
+- Fixes logo color.
+  [msom]
+
 0.0.46 (2019-03-13)
 ~~~~~~~~~~~~~~~~~~~
 
