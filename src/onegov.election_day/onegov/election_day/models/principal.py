@@ -1,6 +1,4 @@
 import onegov.election_day
-import yaml
-
 
 from cached_property import cached_property
 from collections import OrderedDict
@@ -10,6 +8,7 @@ from onegov.core.custom import json
 from onegov.election_day import _
 from pathlib import Path
 from urllib.parse import urlsplit
+from yaml import safe_load
 
 
 class Principal(object):
@@ -77,7 +76,7 @@ class Principal(object):
 
     @classmethod
     def from_yaml(cls, yaml_source):
-        kwargs = yaml.load(yaml_source)
+        kwargs = safe_load(yaml_source)
         assert 'canton' in kwargs or 'municipality' in kwargs
         assert not ('canton' in kwargs and 'municipality' in kwargs)
         if 'canton' in kwargs:
