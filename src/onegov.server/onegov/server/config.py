@@ -34,7 +34,7 @@ class Config(object):
 
         """
         with open(yaml_file, 'r') as f:
-            return cls(yaml.load(f.read()))
+            return cls(yaml.safe_load(f.read()))
 
     @classmethod
     def from_yaml_string(cls, yaml_string):
@@ -42,7 +42,7 @@ class Config(object):
         with the configuration values found in the yaml string.
 
         """
-        return cls(yaml.load(yaml_string))
+        return cls(yaml.safe_load(yaml_string))
 
 
 class ApplicationConfig(object):
