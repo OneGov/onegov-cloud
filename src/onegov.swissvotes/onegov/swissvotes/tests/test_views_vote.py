@@ -241,7 +241,7 @@ def test_view_vote(swissvotes_app):
                 'text': 'Volk', 'text_label': '', 'empty': False,
                 'yea': 40.0, 'yea_label': '40.0% Ja',
                 'none': 0.0, 'none_label': '',
-                'nay': 60.0, 'nay_label': 'Keine',
+                'nay': 60.0, 'nay_label': '60.0% Nein',
             },
             {
                 'text': 'Stände', 'text_label': '', 'empty': False,
