@@ -78,9 +78,6 @@
                     .style('font-size', options.fontSize)
                     .style('font-family', options.fontFamily)
                     .style('text-anchor', 'end');
-                name.filter(function(d) { return d.text_label ? true : false; })
-                    .append('title')
-                    .text(function(d) { return d.text_label; });
 
                 // Adjust the offset & scale to give the text enough space
                 var offset = d3.max(name.nodes(), function(d) {return d.getBBox().width;});
@@ -90,6 +87,11 @@
                     .domain([0, 100])
                     .range([0, width - offset - 8]);
                 name.attr('x', offset);
+
+                // Add title/hovers to texts (*after* calculating the offset!)
+                name.filter(function(d) { return d.text_label ? true : false; })
+                    .append('title')
+                    .text(function(d) { return d.text_label; });
 
                 // ... the bars on the right
                 var bar_yea = line
@@ -121,7 +123,7 @@
                 var bar_nay = line
                     .filter(function(d) { return scale(d.nay) > 0; })
                     .append('rect')
-                    .attr('x', function(d) { return offset + 5 + scale(d.yea + d.none); })
+                    .attr('x', function(d) { return offset + 5 + scale(d.yea) + scale(d.none); })
                     .attr('width', function(d) { return scale(d.nay); })
                     .attr('height', options.barHeight - options.barMargin)
                     .attr('class', 'bar nay')
