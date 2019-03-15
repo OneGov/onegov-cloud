@@ -57,7 +57,6 @@ var processCommonNodes = function(elements, out_of_band) {
     initSearchFilters();
 
     // initalize the bar charts
-    // todo: test
     targets.find('.bar-chart').each(function(ix, el) {
         var dataurl = $(el).data('dataurl');
         $.ajax({url: dataurl}).done(function(data) {

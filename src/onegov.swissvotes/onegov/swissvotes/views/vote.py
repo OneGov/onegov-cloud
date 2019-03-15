@@ -77,7 +77,7 @@ def view_vote_percentages(self, request):
             yea = round(float(percentage), 1)
             nay = round(float(100 - percentage), 1)
             yea_label = yea_label or _("${x}% yea")
-            yea_label = yea_label or _("${x}% nay")
+            nay_label = nay_label or _("${x}% nay")
             result.update({
                 'yea': yea,
                 'nay': nay,

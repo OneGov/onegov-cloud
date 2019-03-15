@@ -1,10 +1,12 @@
 from datetime import date
 from decimal import Decimal
 from onegov.swissvotes.models import SwissVote
+from onegov.swissvotes.views.vote import view_vote_percentages
 from psycopg2.extras import NumericRange
 from transaction import commit
 from webtest import TestApp as Client
 from webtest.forms import Upload
+from translationstring import TranslationString
 
 
 def test_view_vote(swissvotes_app):
@@ -435,3 +437,129 @@ def test_vote_pagination(swissvotes_app):
     # 102
     page = page.click("Nächste Abstimmung")
     assert "<td>102</td>" in page
+
+
+def test_vote_chart(session):
+    class Request(object):
+        def translate(self, text):
+            if isinstance(text, TranslationString):
+                return text.interpolate()
+            return text
+
+    empty = {
+        'empty': True, 'text': '', 'text_label': '',
+        'nay': 0.0, 'nay_label': '',
+        'none': 0.0, 'none_label': '',
+        'yea': 0.0, 'yea_label': ''
+    }
+
+    model = SwissVote()
+    request = Request()
+    assert view_vote_percentages(model, request) == {
+        'results': [empty],
+        'title': None
+    }
+
+    model.title = "Vote"
+    model._result_people_accepted = 0
+    model._result_cantons_accepted = 3
+    model._position_federal_council = 33
+    model._position_national_council = 1
+    model._position_council_of_states = 2
+    assert view_vote_percentages(model, request) == {
+        'results': [
+            {
+                'empty': False,
+                'text': 'People', 'text_label': '',
+                'yea': 0.0, 'yea_label': '',
+                'none': 0.0, 'none_label': '',
+                'nay': True, 'nay_label': 'Rejected',
+            },
+            {
+                'empty': False,
+                'text': 'Cantons', 'text_label': '',
+                'yea': 0.0, 'yea_label': '',
+                'none': True,
+                'none_label': 'Majority of the cantons not necessary',
+                'nay': 0.0, 'nay_label': '',
+            },
+            empty,
+            {
+                'empty': False,
+                'text': 'National Council', 'text_label': '',
+                'yea': True, 'yea_label': 'Accepting',
+                'none': 0.0, 'none_label': '',
+                'nay': 0.0, 'nay_label': '',
+            },
+            {
+                'empty': False,
+                'text': 'Council of States', 'text_label': '',
+                'yea': 0.0, 'yea_label': '',
+                'none': 0.0, 'none_label': '',
+                'nay': True, 'nay_label': 'Rejecting',
+            }
+        ],
+        'title': 'Vote'
+    }
+
+    model.result_people_yeas_p = Decimal('10.2')
+    model.result_cantons_yeas = Decimal('23.5')
+    model.result_cantons_nays = Decimal('2.5')
+    model.position_national_council_yeas = Decimal('149')
+    model.position_national_council_nays = Decimal('51')
+    model.position_council_of_states_yeas = Decimal('43')
+    model.position_council_of_states_nays = Decimal('3')
+    model.national_council_share_yeas = Decimal('1.0')
+    model.national_council_share_nays = Decimal('3.4')
+    assert view_vote_percentages(model, request) == {
+        'results': [
+            {
+                'empty': False,
+                'text': 'People', 'text_label': '',
+                'yea': 10.2, 'yea_label': '10.2% yea',
+                'none': 0.0, 'none_label': '',
+                'nay': 89.8, 'nay_label': '89.8% nay',
+            },
+            {
+                'empty': False,
+                'text': 'Cantons', 'text_label': '',
+                'yea': 90.4, 'yea_label': '23.5 yea',
+                'none': 0.0, 'none_label': '',
+                'nay': 9.6, 'nay_label': '2.5 nay',
+            },
+            empty,
+            {
+                'empty': False,
+                'text': 'National Council', 'text_label': '',
+                'yea': 74.5, 'yea_label': '149 yea',
+                'none': 0.0, 'none_label': '',
+                'nay': 25.5, 'nay_label': '51 nay',
+            },
+            {
+                'empty': False,
+                'text': 'Council of States', 'text_label': '',
+                'yea': 93.5, 'yea_label': '43 yea',
+                'none': 0.0, 'none_label': '',
+                'nay': 6.5, 'nay_label': '3 nay',
+            },
+            {
+                'empty': False,
+                'text': 'Party slogans',
+                'text_label': 'Recommendations by political parties',
+                'yea': 1.0,
+                'yea_label': (
+                    'Electoral shares of parties: '
+                    'Parties recommending Yes 1.0%'
+                ),
+                'none': 95.6,
+                'none_label': (
+                    'Electoral shares of parties: neutral/unknown 95.6%'
+                ),
+                'nay': 3.4,
+                'nay_label': (
+                    'Electoral shares of parties: Parties recommending No 3.4%'
+                ),
+            }
+        ],
+        'title': 'Vote'
+    }

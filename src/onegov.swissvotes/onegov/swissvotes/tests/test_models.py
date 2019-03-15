@@ -1249,11 +1249,6 @@ def test_vote_attachments(swissvotes_app, attachments):
     assert "fédéral" in vote.searchable_text_fr_CH
 
 
-def test_vote_percentages():
-    # todo:
-    pass
-
-
 def test_column_mapper():
     mapper = ColumnMapper()
     vote = SwissVote()
