@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-28 12:57+0100\n"
+"POT-Creation-Date: 2019-03-15 11:25+0100\n"
 "PO-Revision-Date: 2019-02-28 13:01+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -23,6 +23,9 @@ msgstr "Inhalt"
 
 msgid "Voting text"
 msgstr "Abstimmungstext"
+
+msgid "Brief description Swissvotes"
+msgstr "Kurzbeschreibung Swissvotes"
 
 msgid "Federal council message"
 msgstr "Botschaft des Bundesrats"
@@ -70,11 +73,11 @@ msgid "Full Text"
 msgstr "Volltext"
 
 msgid ""
-"Searches all text fields and attachments. Select «No» to limit the search to"
-" title, keyword, vote number, and procedure number."
+"Searches all text fields and attachments. Select «No» to limit the search to "
+"title, keyword, vote number, and procedure number."
 msgstr ""
-"Sucht in allen Textfeldern und Anhängen. Wählen Sie «Nein», um die Suche auf"
-" Titel, Kurzbezeichnung, Abstimmungs- und Geschäftsnummer zu beschränken."
+"Sucht in allen Textfeldern und Anhängen. Wählen Sie «Nein», um die Suche auf "
+"Titel, Kurzbezeichnung, Abstimmungs- und Geschäftsnummer zu beschränken."
 
 msgid "Position of the Federal Council"
 msgstr "Position des Bundesrats"
@@ -642,24 +645,6 @@ msgstr "Radio, Fernsehen, Elektronische Medien"
 
 msgid "d-3-1254"
 msgstr "Medienfreiheit"
-
-msgid "Federal Council"
-msgstr "Bundesrat"
-
-msgid "National Council"
-msgstr "Nationalrat"
-
-msgid "Council of States"
-msgstr "Ständerat"
-
-msgid "Yes Camp"
-msgstr "Ja-Lager"
-
-msgid "People"
-msgstr "Volk"
-
-msgid "Cantons"
-msgstr "Stände"
 
 msgid "Mandatory referendum"
 msgstr "Obligatorisches Referendum"
@@ -1383,9 +1368,6 @@ msgstr "Kurzbezeichnung"
 msgid "Vote date"
 msgstr "Abstimmungsdatum"
 
-msgid "Brief description Swissvotes"
-msgstr "Kurzbeschreibung Swissvotes"
-
 msgid "Description Année Politique Suisse"
 msgstr "Beschreibung Année Politique Suisse"
 
@@ -1437,11 +1419,11 @@ msgstr "Wähleranteil des Ja-Lagers"
 msgid "Details"
 msgstr "Details"
 
-msgid "Divergent branches"
-msgstr "Abweichende Sektionen"
-
 msgid "Further Recommendations"
 msgstr "Weitere Parolen"
+
+msgid "Divergent branches"
+msgstr "Abweichende Sektionen"
 
 msgid "Analysis of the advertising campaign"
 msgstr "Analyse der Inseratekampagne"
@@ -1449,8 +1431,14 @@ msgstr "Analyse der Inseratekampagne"
 msgid "Vote"
 msgstr "Abstimmung"
 
+msgid "People"
+msgstr "Volk"
+
 msgid "Yeas"
 msgstr "Jastimmen"
+
+msgid "Cantons"
+msgstr "Stände"
 
 msgid "Turnout"
 msgstr "Stimmbeteiligung"
@@ -1597,6 +1585,53 @@ msgstr "Anhänge aktualisiert"
 
 msgid "Vote deleted"
 msgstr "Abstimmung gelöscht."
+
+#, python-format
+msgid "${x}% yea"
+msgstr "${x}% Ja"
+
+#, python-format
+msgid "${x}% nay"
+msgstr "${x}% Nein"
+
+msgid "Federal Council"
+msgstr "Bundesrat"
+
+msgid "National Council"
+msgstr "Nationalrat"
+
+msgid "Council of States"
+msgstr "Ständerat"
+
+msgid "Party slogans"
+msgstr "Parteiparolen"
+
+#, python-format
+msgid "${x}% none"
+msgstr "${x}% Neutral/unbekannt"
+
+msgid "Recommendations by political parties"
+msgstr "Empfehlungen der politischen Parteien"
+
+#, python-format
+msgid "Electoral shares of parties: Parties recommending Yes ${x}%"
+msgstr "Wähleranteile der Parteien: Befürwortende Parteien ${x}%"
+
+#, python-format
+msgid "Electoral shares of parties: Parties recommending No ${x}%"
+msgstr "Wähleranteile der Parteien: Ablendende Parteien ${x}%"
+
+#, python-format
+msgid "Electoral shares of parties: neutral/unknown ${x}%"
+msgstr "Wähleranteile der Parteien: Neutral/unbekannt ${x}%"
+
+#, python-format
+msgid "${x} yea"
+msgstr "${x} Ja"
+
+#, python-format
+msgid "${x} nay"
+msgstr "${x} Nein"
 
 msgid "Access Denied"
 msgstr "Zugriff verweigert"

@@ -1,5 +1,5 @@
 //
-// A bar chart with horizontal yea/nay bars.
+// A bar chart with horizontal yea/none/nay bars.
 //
 (function(root, factory) {
   if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
@@ -15,14 +15,14 @@
         var width = 0;
         var interactive = false;
         var options = {
-            barHeight: 24,
-            barMargin: 2,
+            barHeight: 26,
+            barMargin: 4,
             fontSize: '14px',
-            fontSizeSmall: '12px',
             fontFamily: 'sans-serif',
-            colorYea: '#457439',
+            colorYea: '#428bca', // == link
             colorNay: '#a4112e', // == logo color
-            colorOpacity: 0.7
+            colorNone: '#ccc',
+            colorOpacity: 1
         };
 
         if (params) {
@@ -54,9 +54,17 @@
                 var canvas = svg.append('g')
                     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
+                // Replace all True values with NaNs so we can use scales 'unknown'
+                results = data.results.map(function(d) {
+                    d.yea = d.yea === true ? NaN : d.yea;
+                    d.nay = d.nay === true ? NaN : d.nay;
+                    d.none = d.none === true ? NaN : d.none;
+                    return d;
+                });
+
                 // Add a container for each line, which contains ...
                 var line = canvas.selectAll('g')
-                    .data(data.results)
+                    .data(results)
                     .enter().append('g')
                     .attr('class', 'line')
                     .attr('transform', function(d, i) {return 'translate(0,' + i * options.barHeight + ')';});
@@ -70,35 +78,58 @@
                     .style('font-size', options.fontSize)
                     .style('font-family', options.fontFamily)
                     .style('text-anchor', 'end');
+                name.filter(function(d) { return d.text_label ? true : false; })
+                    .append('title')
+                    .text(function(d) { return d.text_label; });
 
                 // Adjust the offset & scale to give the text enough space
-                var offset = d3.max(name[0], function(d) {return d.getBBox().width;});
-                var scale = d3.scale.linear()
+                var offset = d3.max(name.nodes(), function(d) {return d.getBBox().width;});
+                var scale = d3.scaleLinear()
                     .clamp(true)
+                    .unknown(options.barHeight - options.barMargin)
                     .domain([0, 100])
                     .range([0, width - offset - 8]);
                 name.attr('x', offset);
 
                 // ... the bars on the right
-                var bar_yea = line.append('rect')
+                var bar_yea = line
+                    .filter(function(d) { return scale(d.yea) > 0; })
+                    .append('rect')
                     .attr('x', offset + 5)
-                    .attr('width', function(d) { return scale(d.value); })
+                    .attr('width', function(d) { return scale(d.yea); })
                     .attr('height', options.barHeight - options.barMargin)
                     .attr('class', 'bar yea')
                     .style('fill', options.colorYea)
                     .style('opacity', options.colorOpacity);
-                bar_yea.append('title')
-                    .text(function(d) { return d.value + '%'; });
+                bar_yea.filter(function(d) { return d.yea_label ? true : false; })
+                    .append('title')
+                    .text(function(d) { return d.yea_label; });
 
-                var bar_nay = line.append('rect')
-                    .attr('x', function(d) { return offset + 5 + scale(d.value); })
-                    .attr('width', function(d) { return scale(100 - d.value); })
+                var bar_none = line
+                    .filter(function(d) { return scale(d.none) > 0; })
+                    .append('rect')
+                    .attr('x', function(d) { return offset + 5 + scale(d.yea); })
+                    .attr('width', function(d) { return scale(d.none); })
+                    .attr('height', options.barHeight - options.barMargin)
+                    .attr('class', 'bar none')
+                    .style('fill', options.colorNone)
+                    .style('opacity', options.colorOpacity);
+                bar_none.filter(function(d) { return d.none_label ? true : false; })
+                    .append('title')
+                    .text(function(d) { return d.none_label; });
+
+                var bar_nay = line
+                    .filter(function(d) { return scale(d.nay) > 0; })
+                    .append('rect')
+                    .attr('x', function(d) { return offset + 5 + scale(d.yea + d.none); })
+                    .attr('width', function(d) { return scale(d.nay); })
                     .attr('height', options.barHeight - options.barMargin)
                     .attr('class', 'bar nay')
                     .style('fill', options.colorNay)
                     .style('opacity', options.colorOpacity);
-                bar_nay.append('title')
-                    .text(function(d) { return (Math.round(10 * (100 - d.value)) / 10) + '%'; });
+                bar_nay.filter(function(d) { return d.nay_label ? true : false; })
+                    .append('title')
+                    .text(function(d) { return d.nay_label; });
 
                 var bar = canvas.selectAll('rect.bar');
 
@@ -122,6 +153,21 @@
                         bar_nay.transition()
                             .duration(700)
                     		    .style('opacity', 0.1);
+                        bar_none.transition()
+                            .duration(700)
+                    		    .style('opacity', 0.1);
+                    });
+                    bar_none.on('mouseover', function(d) {
+                        bar_none.filter(function(s) { return s != d; })
+                            .transition()
+                            .duration(700)
+                    		    .style('opacity', 0.1);
+                        bar_yea.transition()
+                            .duration(700)
+                    		    .style('opacity', 0.1);
+                        bar_nay.transition()
+                            .duration(700)
+                    		    .style('opacity', 0.1);
                     });
                     bar_nay.on('mouseover', function(d) {
                         bar_nay.filter(function(s) { return s != d; })
@@ -129,6 +175,9 @@
                             .duration(700)
                     		    .style('opacity', 0.1);
                         bar_yea.transition()
+                            .duration(700)
+                            .style('opacity', 0.1);
+                        bar_none.transition()
                             .duration(700)
                             .style('opacity', 0.1);
                     });
@@ -149,9 +198,11 @@
                             scale.range([0, width - offset - 8]);
 
                             svg.attr('width', width + margin.left + margin.right);
-                            bar_yea.attr('width', function(d) { return scale(d.value); });
-                            bar_nay.attr('x', function(d) { return offset + 5 + scale(d.value); });
-                            bar_nay.attr('width', function(d) { return scale(100 - d.value); });
+                            bar_yea.attr('width', function(d) { return scale(d.yea); });
+                            bar_none.attr('x', function(d) { return offset + 5 + scale(d.yea); });
+                            bar_none.attr('width', function(d) { return scale(d.none); });
+                            bar_nay.attr('x', function(d) { return offset + 5 + scale(d.yea + d.none); });
+                            bar_nay.attr('width', function(d) { return scale(d.nay); });
                             middle_line.attr('x1', offset + 5 + scale(50));
                             middle_line.attr('x2', offset + 5 + scale(50));
                         }

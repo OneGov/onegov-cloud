@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Reworks the bar chart.
+  [msom]
+
 0.0.47 (2019-03-14)
 ~~~~~~~~~~~~~~~~~~~
 

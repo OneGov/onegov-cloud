@@ -55,11 +55,141 @@ def view_vote(self, request):
     name='percentages'
 )
 def view_vote_percentages(self, request):
+    def create(text, text_label=None, percentage=None,
+               yeas_p=None, nays_p=None, yeas=None, nays=None, code=None,
+               yea_label=None, nay_label=None, none_label=None,
+               empty=False):
+
+        translate = request.translate
+        result = {
+            'text': translate(text),
+            'text_label': translate(text_label) if text_label else '',
+            'yea': 0.0,
+            'nay': 0.0,
+            'none': 0.0,
+            'yea_label': '',
+            'nay_label': '',
+            'none_label': '',
+            'empty': empty
+        }
+
+        if percentage is not None:
+            yea = round(float(percentage), 1)
+            nay = round(float(100 - percentage), 1)
+            yea_label = yea_label or _("${x}% yea")
+            yea_label = yea_label or _("${x}% nay")
+            result.update({
+                'yea': yea,
+                'nay': nay,
+                'yea_label': translate(_(yea_label, mapping={'x': yea})),
+                'nay_label': translate(_(nay_label, mapping={'x': nay})),
+            })
+
+        elif yeas_p is not None and nays_p is not None:
+            yea = round(float(yeas_p), 1)
+            nay = round(float(nays_p), 1)
+            none = round(float(100 - yeas_p - nays_p), 1)
+            yea_label = yea_label or _("${x}% yea")
+            nay_label = nay_label or _("${x}% nay")
+            none_label = none_label or _("${x}% none")
+            result.update({
+                'yea': yea,
+                'nay': nay,
+                'none': none,
+                'yea_label': translate(_(yea_label, mapping={'x': yea})),
+                'nay_label': translate(_(nay_label, mapping={'x': nay})),
+                'none_label': translate(_(none_label, mapping={'x': none}))
+            })
+
+        elif yeas is not None and nays is not None:
+            yea = round(float(100 * (yeas / (yeas + nays))), 1)
+            nay = round(float(100 * (nays / (yeas + nays))), 1)
+            yea_label = yea_label or _("${x} yea")
+            nay_label = nay_label or _("${x} nay")
+            result.update({
+                'yea': yea,
+                'nay': nay,
+                'yea_label': translate(_(yea_label, mapping={'x': yeas})),
+                'nay_label': translate(_(nay_label, mapping={'x': nays})),
+            })
+
+        elif code is not None:
+            value = getattr(self, f'_{code}')
+            label = getattr(self, code)
+            if value == 1:
+                result.update({
+                    'yea': True,
+                    'yea_label': translate(label)
+                })
+            if value == 0 or value == 2:
+                result.update({
+                    'nay': True,
+                    'nay_label': translate(label)
+                })
+            if value == 3:
+                result.update({
+                    'none': True,
+                    'none_label': translate(label)
+                })
+
+        return result
+
+    results = [
+        create(
+            _("People"),
+            percentage=self.result_people_yeas_p,
+            code='result_people_accepted'
+        ),
+        create(
+            _("Cantons"),
+            yeas=self.result_cantons_yeas,
+            nays=self.result_cantons_nays,
+            code='result_cantons_accepted'
+        ),
+        create("", empty=True),
+        create(
+            _("Federal Council"),
+            text_label=_("Position of the Federal Council"),
+            code='position_federal_council'
+        ),
+        create(
+            _("National Council"),
+            yeas=self.position_national_council_yeas,
+            nays=self.position_national_council_nays,
+            code='position_national_council'
+        ),
+        create(
+            _("Council of States"),
+            yeas=self.position_council_of_states_yeas,
+            nays=self.position_council_of_states_nays,
+            code='position_council_of_states'
+        ),
+        create(
+            _("Party slogans"),
+            text_label=_("Recommendations by political parties"),
+            yeas_p=self.national_council_share_yeas,
+            nays_p=self.national_council_share_nays,
+            yea_label=_(
+                "Electoral shares of parties: "
+                "Parties recommending Yes ${x}%"
+            ),
+            nay_label=_(
+                "Electoral shares of parties: "
+                "Parties recommending No ${x}%"
+            ),
+            none_label=_(
+                "Electoral shares of parties: neutral/unknown ${x}%"
+            )
+        )
+    ]
+    results = [
+        result for result in results if any((
+            result['yea'], result['nay'], result['none'], result['empty']
+        ))
+    ]
+
     return {
-        'results': [
-            {'text': request.translate(text), 'value': value}
-            for text, value in self.percentages.items() if value is not None
-        ],
+        'results': results,
         'title': self.title
     }
 

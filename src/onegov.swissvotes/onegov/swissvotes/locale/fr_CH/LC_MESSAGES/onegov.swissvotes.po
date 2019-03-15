@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-28 12:57+0100\n"
+"POT-Creation-Date: 2019-03-15 11:25+0100\n"
 "PO-Revision-Date: 2018-09-18 11:29+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -22,6 +22,9 @@ msgstr "Contenu"
 
 msgid "Voting text"
 msgstr "Texte soumis au vote"
+
+msgid "Brief description Swissvotes"
+msgstr "Résumé Swissvotes"
 
 msgid "Federal council message"
 msgstr "Message du Conseil fédéral"
@@ -69,8 +72,8 @@ msgid "Full Text"
 msgstr "Texte intégral"
 
 msgid ""
-"Searches all text fields and attachments. Select «No» to limit the search to"
-" title, keyword, vote number, and procedure number."
+"Searches all text fields and attachments. Select «No» to limit the search to "
+"title, keyword, vote number, and procedure number."
 msgstr ""
 
 msgid "Position of the Federal Council"
@@ -640,24 +643,6 @@ msgstr "Radio et télévision, nouvelles technologies"
 msgid "d-3-1254"
 msgstr "Liberté de la presse"
 
-msgid "Federal Council"
-msgstr ""
-
-msgid "National Council"
-msgstr ""
-
-msgid "Council of States"
-msgstr ""
-
-msgid "Yes Camp"
-msgstr ""
-
-msgid "People"
-msgstr "Peuple"
-
-msgid "Cantons"
-msgstr "Cantons"
-
 msgid "Mandatory referendum"
 msgstr "Référendum obligatoire"
 
@@ -1200,8 +1185,7 @@ msgid "actor-vcs-label"
 msgstr "Association transports et environnement"
 
 msgid "actor-vdk-label"
-msgstr ""
-"Conférence des chefs des départements cantonaux de l'économie publique"
+msgstr "Conférence des chefs des départements cantonaux de l'économie publique"
 
 msgid "actor-voev-label"
 msgstr "Union des transports publics"
@@ -1388,9 +1372,6 @@ msgstr "Mot-clé"
 msgid "Vote date"
 msgstr "Date de la votation"
 
-msgid "Brief description Swissvotes"
-msgstr "Résumé Swissvotes"
-
 msgid "Description Année Politique Suisse"
 msgstr "Résumé Année Politique Suisse"
 
@@ -1442,11 +1423,11 @@ msgstr "Poids électoral des partis en faveur de oui"
 msgid "Details"
 msgstr "Détails"
 
-msgid "Divergent branches"
-msgstr ""
-
 msgid "Further Recommendations"
 msgstr "Autres mots d'ordre"
+
+msgid "Divergent branches"
+msgstr ""
 
 msgid "Analysis of the advertising campaign"
 msgstr ""
@@ -1454,8 +1435,14 @@ msgstr ""
 msgid "Vote"
 msgstr "Votation"
 
+msgid "People"
+msgstr "Peuple"
+
 msgid "Yeas"
 msgstr "Oui"
+
+msgid "Cantons"
+msgstr "Cantons"
 
 msgid "Turnout"
 msgstr "Participation"
@@ -1501,8 +1488,8 @@ msgstr "Cliquez sur le lien suivant pour définir un nouveau mot de passe :"
 
 msgid "If you don't want to change your password, you can ignore this email."
 msgstr ""
-"Si vous ne souhaitez pas modifier votre mot de passe, vous pouvez ignorer ce"
-" message."
+"Si vous ne souhaitez pas modifier votre mot de passe, vous pouvez ignorer ce "
+"message."
 
 msgid "Logout"
 msgstr "Se déconnecter"
@@ -1603,6 +1590,53 @@ msgstr "Pièces jointes mises à jour"
 
 msgid "Vote deleted"
 msgstr "Votation supprimée"
+
+#, python-format
+msgid "${x}% yea"
+msgstr "${x}% Oui"
+
+#, python-format
+msgid "${x}% nay"
+msgstr "${x}% Non"
+
+msgid "Federal Council"
+msgstr "Conseil fédéral"
+
+msgid "National Council"
+msgstr "Conseil national"
+
+msgid "Council of States"
+msgstr "Conseil des Etats"
+
+msgid "Party slogans"
+msgstr "Partis"
+
+#, python-format
+msgid "${x}% none"
+msgstr "${x}% neutres/inconnus"
+
+msgid "Recommendations by political parties"
+msgstr "Mots d'ordre des partis"
+
+#, python-format
+msgid "Electoral shares of parties: Parties recommending Yes ${x}%"
+msgstr "Poids électoraux des partis: Partis en faveur de oui ${x}%"
+
+#, python-format
+msgid "Electoral shares of parties: Parties recommending No ${x}%"
+msgstr "Poids électoraux des partis: Partis en faveur de non ${x}%"
+
+#, python-format
+msgid "Electoral shares of parties: neutral/unknown ${x}%"
+msgstr "Poids électoraux des partis: neutres/inconnus ${x}%"
+
+#, python-format
+msgid "${x} yea"
+msgstr "${x} Qui"
+
+#, python-format
+msgid "${x} nay"
+msgstr "${x} Non"
 
 msgid "Access Denied"
 msgstr "Accès refusé"

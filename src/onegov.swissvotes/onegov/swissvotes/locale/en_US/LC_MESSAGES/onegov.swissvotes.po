@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-02-28 12:57+0100\n"
+"POT-Creation-Date: 2019-03-15 11:25+0100\n"
 "PO-Revision-Date: 2018-09-18 15:04+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: English\n"
@@ -23,6 +23,9 @@ msgstr "Content"
 
 msgid "Voting text"
 msgstr "Text subject to vote"
+
+msgid "Brief description Swissvotes"
+msgstr "Brief description by Swissvotes"
 
 msgid "Federal council message"
 msgstr "Federal Council dispatch"
@@ -70,8 +73,8 @@ msgid "Full Text"
 msgstr "Full-text"
 
 msgid ""
-"Searches all text fields and attachments. Select «No» to limit the search to"
-" title, keyword, vote number, and procedure number."
+"Searches all text fields and attachments. Select «No» to limit the search to "
+"title, keyword, vote number, and procedure number."
 msgstr ""
 
 msgid "Position of the Federal Council"
@@ -640,24 +643,6 @@ msgstr "Radio, Fernsehen, Elektronische Medien"
 
 msgid "d-3-1254"
 msgstr "Medienfreiheit"
-
-msgid "Federal Council"
-msgstr ""
-
-msgid "National Council"
-msgstr ""
-
-msgid "Council of States"
-msgstr ""
-
-msgid "Yes Camp"
-msgstr ""
-
-msgid "People"
-msgstr "People"
-
-msgid "Cantons"
-msgstr "Cantons"
 
 msgid "Mandatory referendum"
 msgstr "Mandatory referendum"
@@ -1377,9 +1362,6 @@ msgstr "Keyword"
 msgid "Vote date"
 msgstr "Voting day"
 
-msgid "Brief description Swissvotes"
-msgstr "Brief description by Swissvotes"
-
 msgid "Description Année Politique Suisse"
 msgstr "Description by Année Politique Suisse"
 
@@ -1431,11 +1413,11 @@ msgstr "Electoral share of 'yes' camp"
 msgid "Details"
 msgstr "Details"
 
-msgid "Divergent branches"
-msgstr ""
-
 msgid "Further Recommendations"
 msgstr "Recommendations by others"
+
+msgid "Divergent branches"
+msgstr ""
 
 msgid "Analysis of the advertising campaign"
 msgstr ""
@@ -1443,8 +1425,14 @@ msgstr ""
 msgid "Vote"
 msgstr "Vote"
 
+msgid "People"
+msgstr "People"
+
 msgid "Yeas"
 msgstr "Yes"
+
+msgid "Cantons"
+msgstr "Cantons"
 
 msgid "Turnout"
 msgstr "Turnout"
@@ -1590,6 +1578,53 @@ msgstr "Attachments updated"
 
 msgid "Vote deleted"
 msgstr "Vote deleted"
+
+#, python-format
+msgid "${x}% yea"
+msgstr "${x}% Yes"
+
+#, python-format
+msgid "${x}% nay"
+msgstr "${x}% No"
+
+msgid "Federal Council"
+msgstr "Federal Council"
+
+msgid "National Council"
+msgstr "National Council"
+
+msgid "Council of States"
+msgstr "Council of States"
+
+msgid "Party slogans"
+msgstr "Parties"
+
+#, python-format
+msgid "${x}% none"
+msgstr "${x}% neutral/unknown"
+
+msgid "Recommendations by political parties"
+msgstr "Recommendations by political parties"
+
+#, python-format
+msgid "Electoral shares of parties: Parties recommending Yes ${x}%"
+msgstr "Electoral shares of parties: Parties recommending Yes ${x}%"
+
+#, python-format
+msgid "Electoral shares of parties: Parties recommending No ${x}%"
+msgstr "Electoral shares of parties: Parties recommending No ${x}%"
+
+#, python-format
+msgid "Electoral shares of parties: neutral/unknown ${x}%"
+msgstr "Electoral shares of parties: neutral/unknown ${x}%"
+
+#, python-format
+msgid "${x} yea"
+msgstr "${x} Yes"
+
+#, python-format
+msgid "${x} nay"
+msgstr "${x} No"
 
 msgid "Access Denied"
 msgstr "Access denied"
