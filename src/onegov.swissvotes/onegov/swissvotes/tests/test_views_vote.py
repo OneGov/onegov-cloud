@@ -235,12 +235,61 @@ def test_view_vote(swissvotes_app):
     page = client.get(page.request.url.replace('/strengths', '/percentages'))
     assert page.json == {
         'results': [
-            {'text': 'Bundesrat', 'value': 100.0},
-            {'text': 'Nationalrat', 'value': 33.3},
-            {'text': 'Ständerat', 'value': 42.9},
-            {'text': 'Ja-Lager', 'value': 22.2},
-            {'text': 'Volk', 'value': 40.0},
-            {'text': 'Stände', 'value': 60.0}
+            {
+                'text': 'Volk', 'text_label': '', 'empty': False,
+                'yea': 40.0, 'yea_label': '40.0% Ja',
+                'none': 0.0, 'none_label': '',
+                'nay': 60.0, 'nay_label': 'Keine',
+            },
+            {
+                'text': 'Stände', 'text_label': '', 'empty': False,
+                'yea': 5.8, 'yea_label': '1.5 Ja',
+                'none': 0.0, 'none_label': '',
+                'nay': 94.2, 'nay_label': '24.5 Nein',
+            },
+            {
+                'text': '', 'text_label': '', 'empty': True,
+                'yea': 0.0, 'yea_label': '',
+                'none': 0.0, 'none_label': '',
+                'nay': 0.0, 'nay_label': '',
+            },
+            {
+                'text': 'Bundesrat', 'text_label': 'Position des Bundesrats',
+                'empty': False,
+                'yea': True, 'yea_label': 'Befürwortend',
+                'none': 0.0, 'none_label': '',
+                'nay': 0.0, 'nay_label': '',
+            },
+            {
+                'text': 'Nationalrat', 'text_label': '', 'empty': False,
+                'yea': 33.3, 'yea_label': '10 Ja',
+                'none': 0.0, 'none_label': '',
+                'nay': 66.7, 'nay_label': '20 Nein',
+            },
+            {
+                'text': 'Ständerat', 'text_label': '', 'empty': False,
+                'yea': 42.9, 'yea_label': '30 Ja',
+                'none': 0.0, 'none_label': '',
+                'nay': 57.1, 'nay_label': '40 Nein',
+            },
+            {
+                'text': 'Parteiparolen',
+                'text_label': 'Empfehlungen der politischen Parteien',
+                'empty': False,
+                'yea': 22.2,
+                'yea_label': (
+                    'Wähleranteile der Parteien: Befürwortende Parteien 22.2%'
+                ),
+                'none': 54.6,
+                'none_label': (
+                    'Wähleranteile der Parteien: Neutral/unbekannt 54.6%'
+                ),
+                'nay': 23.2,
+                'nay_label': (
+                    'Wähleranteile der Parteien: Ablendende Parteien 23.2%'
+                ),
+            }
+
         ],
         'title': 'Vote'
     }
