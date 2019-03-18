@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes party results possibly not being downloadable.
+  [msom]
+
 3.9.4 (2019-03-14)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -21,7 +21,7 @@
 
             <div metal:use-macro="layout.macros['open_data_download']" tal:define="model election_compound"/>
 
-            <tal:block tal:condition="layout.tab_visible('party-strengths')">
+            <tal:block tal:condition="layout.has_party_results">
                 <h4 i18n:translate="">Party results</h4>
                 <p>
                     <span i18n:translate="">The raw data is available as:</span> <a href="${request.link(election_compound, 'data-parties')}">CSV</a>.

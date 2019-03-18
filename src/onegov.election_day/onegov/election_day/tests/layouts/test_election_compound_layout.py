@@ -39,6 +39,7 @@ def test_election_compound_layout(session):
     assert layout.main_view == 'ElectionCompound/districts'
     assert layout.majorz is False
     assert layout.proporz is False
+    assert layout.has_party_results is False
 
     compound.elections = [majorz]
     layout = ElectionCompoundLayout(compound, DummyRequest())
@@ -49,6 +50,17 @@ def test_election_compound_layout(session):
     layout = ElectionCompoundLayout(compound, DummyRequest())
     assert layout.majorz is False
     assert layout.proporz is True
+
+    compound.party_results.append(
+        PartyResult(
+            year=2017,
+            number_of_mandates=0,
+            votes=0,
+            total_votes=100,
+            name='A',
+        )
+    )
+    assert layout.has_party_results is True
 
     with freeze_time("2014-01-01 12:00"):
         compound = ElectionCompound(
