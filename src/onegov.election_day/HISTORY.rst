@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.10.0 (2019-03-18)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds mandate allocation view to election compound.
   [msom]
