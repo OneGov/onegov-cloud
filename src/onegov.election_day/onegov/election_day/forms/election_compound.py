@@ -69,7 +69,7 @@ class ElectionCompoundForm(Form):
         label=_("Related link")
     )
 
-    party_strengths = BooleanField(
+    show_party_strengths = BooleanField(
         label=_("Party strengths"),
         render_kw=dict(force_simple=True)
     )
@@ -117,7 +117,7 @@ class ElectionCompoundForm(Form):
         model.date = self.date.data
         model.shortcode = self.shortcode.data
         model.related_link = self.related_link.data
-        model.party_strengths = self.party_strengths.data
+        model.show_party_strengths = self.show_party_strengths.data
 
         elections = self.request.session.query(Election)
         elections = elections.filter(Election.id.in_(self.elections.data))
@@ -145,5 +145,5 @@ class ElectionCompoundForm(Form):
         self.date.data = model.date
         self.shortcode.data = model.shortcode
         self.related_link.data = model.related_link
-        self.party_strengths.data = model.party_strengths
+        self.show_party_strengths.data = model.show_party_strengths
         self.elections.data = [election.id for election in model.elections]

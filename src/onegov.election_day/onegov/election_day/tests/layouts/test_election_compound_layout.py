@@ -186,7 +186,7 @@ def test_election_compound_layout_menu_proporz(session):
         ('Downloads', 'ElectionCompound/data', False, [])
     ]
 
-    compound.party_strengths = True
+    compound.show_party_strengths = True
 
     assert ElectionCompoundLayout(compound, request).menu == [
         ('__districts', 'ElectionCompound/districts', False, []),

@@ -143,7 +143,7 @@ def test_election_compound_form_model(session):
     model.domain = 'canton'
     model.shortcode = 'xy'
     model.related_link = 'http://u.rl'
-    model.party_strengths = True
+    model.show_party_strengths = True
     model.elections = [e1, e2]
     session.add(model)
 
@@ -158,7 +158,7 @@ def test_election_compound_form_model(session):
     assert form.domain.data == 'canton'
     assert form.shortcode.data == 'xy'
     assert form.related_link.data == 'http://u.rl'
-    assert form.party_strengths.data is True
+    assert form.show_party_strengths.data is True
     assert form.elections.data == ['e-1', 'e-2']
 
     form.election_de.data = 'Some Elections (DE)'
@@ -169,7 +169,7 @@ def test_election_compound_form_model(session):
     form.domain.data = 'canton'
     form.shortcode.data = 'yz'
     form.related_link.data = 'http://ur.l'
-    form.party_strengths.data = False
+    form.show_party_strengths.data = False
     form.elections.data = ['e-1', 'e-3', 'e-4']
 
     form.request = DummyRequest(session=session)
@@ -185,5 +185,5 @@ def test_election_compound_form_model(session):
     assert model.domain == 'canton'
     assert model.shortcode == 'yz'
     assert model.related_link == 'http://ur.l'
-    assert form.party_strengths.data is False
+    assert form.show_party_strengths.data is False
     assert sorted([e.id for e in model.elections]) == ['e-1', 'e-3']

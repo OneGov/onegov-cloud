@@ -43,7 +43,7 @@ class ElectionCompoundLayout(DetailLayout):
             return False
         if tab == 'party-strengths':
             return (
-                self.model.party_strengths is True
+                self.model.show_party_strengths is True
                 and self.model.party_results.first() is not None
             )
         if tab == 'parties-panachage':

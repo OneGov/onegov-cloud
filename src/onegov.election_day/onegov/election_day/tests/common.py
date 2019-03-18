@@ -373,7 +373,7 @@ def create_election_compound(client):
     new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'canton'
     new.form['elections'] = ['regional-election-a', 'regional-election-b']
-    new.form['party_strengths'] = True
+    new.form['show_party_strengths'] = True
     new.form.submit()
 
 
@@ -405,7 +405,7 @@ def upload_election_compound(client, create=True, canton='gr'):
         new.form['domain'] = 'canton'
         new.form['elections'] = ['regional-election-a', 'regional-election-b']
         new.form['elections'] = ['regional-election-a', 'regional-election-b']
-        new.form['party_strengths'] = True
+        new.form['show_party_strengths'] = True
         new.form.submit()
 
     for index, slug in enumerate((
