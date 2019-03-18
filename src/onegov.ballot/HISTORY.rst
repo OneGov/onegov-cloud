@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.7.6 (2019-03-18)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a configuration option to show/hide mandate allocation view of election
   compounds.
