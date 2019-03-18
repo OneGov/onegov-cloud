@@ -586,7 +586,7 @@ class PdfGenerator():
 
         # Parties
         chart = self.renderer.get_party_strengths_chart(compound, 'pdf')
-        if chart:
+        if compound.show_party_strengths and chart:
             pdf.h2(_('Party strengths'))
             pdf.pdf(chart)
             pdf.figcaption(_('figcaption_party_strengths'))

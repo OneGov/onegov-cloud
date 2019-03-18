@@ -457,8 +457,8 @@
                 <ul class="left tabs" data-tab>
                     <tal:block tal:repeat="year sorted(years, reverse=True)">
                         <li tal:attributes="class 'active' if repeat.year.start else ''"><a href="#panel_${year}">${year}</a></li>
-                    </tal:block>                </ul>
-
+                    </tal:block>
+                </ul>
             </section>
         </nav>
     </div>

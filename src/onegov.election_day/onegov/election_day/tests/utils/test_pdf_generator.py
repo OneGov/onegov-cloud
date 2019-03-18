@@ -62,6 +62,7 @@ def test_generate_pdf_election_compound(session, election_day_app):
     generator = PatchedPdfGenerator(election_day_app)
 
     compound = add_election_compound(session)
+    compound.show_party_strengths = True
     for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
         generator.generate_pdf(compound, 'election.pdf', locale)
         with election_day_app.filestorage.open('election.pdf', 'rb') as f:
