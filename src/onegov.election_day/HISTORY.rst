@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds mandate allocation view to election compound.
+  [msom]
+
 - Fixes party results possibly not being downloadable.
   [msom]
 

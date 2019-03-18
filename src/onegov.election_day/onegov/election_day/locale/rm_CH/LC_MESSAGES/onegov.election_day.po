@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-05 09:12+0100\n"
+"POT-Creation-Date: 2019-03-18 07:52+0100\n"
 "PO-Revision-Date: 2018-11-05 12:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -39,6 +39,9 @@ msgstr "Maioritad absoluta"
 
 msgid "Tacit election"
 msgstr "Elecziun taciturna"
+
+msgid "Expats"
+msgstr "Svizzers a l'exteriur"
 
 msgid "Distinct district"
 msgstr "Clera regiun"
@@ -87,6 +90,15 @@ msgstr "Relativ"
 
 msgid "Elections"
 msgstr "Elecziuns"
+
+msgid "Party strengths"
+msgstr "Forza da las partidas"
+
+msgid "Views"
+msgstr ""
+
+msgid "Mandate allocation"
+msgstr ""
 
 msgid "Cantonal"
 msgstr "Sin plaun chantunal"
@@ -324,9 +336,6 @@ msgstr ""
 "travs e da las colliaziuns è proporziunala a las vuschs, las travs blauas "
 "cuntegnan il dumber da mandats."
 
-msgid "Party strengths"
-msgstr "Forza da las partidas"
-
 #.
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
@@ -358,9 +367,6 @@ msgstr "Statistica da panaschar (glistas)"
 
 msgid "Mandates"
 msgstr "Mandats"
-
-msgid "Expats"
-msgstr "Svizzers a l'exteriur"
 
 msgid "Proposal and counter proposal rejected"
 msgstr "Refusà l'iniziativa e la cuntraproposta"

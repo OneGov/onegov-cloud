@@ -591,6 +591,9 @@ class PdfGenerator():
             pdf.pdf(chart)
             pdf.figcaption(_('figcaption_party_strengths'))
             pdf.spacer()
+        if compound.show_mandate_allocation:
+            pdf.h2(_('Mandate allocation'))
+        if compound.show_party_strengths or compound.show_mandate_allocation:
             years, parties = get_party_results(compound)
             deltas, results = get_party_results_deltas(
                 compound, years, parties

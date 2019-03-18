@@ -17,6 +17,7 @@ class ElectionCompoundLayout(DetailLayout):
         return (
             'districts',
             'candidates',
+            'mandate-allocation',
             'party-strengths',
             'parties-panachage',
             'data'
@@ -29,6 +30,8 @@ class ElectionCompoundLayout(DetailLayout):
             return self.request.app.principal.label('districts')
         if tab == 'candidates':
             return _("Elected candidates")
+        if tab == 'mandate-allocation':
+            return _("Mandate allocation")
         if tab == 'party-strengths':
             return _("Party strengths")
         if tab == 'parties-panachage':
@@ -41,6 +44,11 @@ class ElectionCompoundLayout(DetailLayout):
     def tab_visible(self, tab):
         if not self.has_results:
             return False
+        if tab == 'mandate-allocation':
+            return (
+                self.model.show_mandate_allocation is True
+                and self.model.party_results.first() is not None
+            )
         if tab == 'party-strengths':
             return (
                 self.model.show_party_strengths is True

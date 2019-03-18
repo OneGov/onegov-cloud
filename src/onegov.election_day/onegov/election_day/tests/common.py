@@ -374,6 +374,7 @@ def create_election_compound(client):
     new.form['domain'] = 'canton'
     new.form['elections'] = ['regional-election-a', 'regional-election-b']
     new.form['show_party_strengths'] = True
+    new.form['show_mandate_allocation'] = True
     new.form.submit()
 
 

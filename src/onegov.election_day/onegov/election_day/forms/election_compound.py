@@ -71,6 +71,13 @@ class ElectionCompoundForm(Form):
 
     show_party_strengths = BooleanField(
         label=_("Party strengths"),
+        fieldset=_("Views"),
+        render_kw=dict(force_simple=True)
+    )
+
+    show_mandate_allocation = BooleanField(
+        label=_("Mandate allocation"),
+        fieldset=_("Views"),
         render_kw=dict(force_simple=True)
     )
 
@@ -118,6 +125,7 @@ class ElectionCompoundForm(Form):
         model.shortcode = self.shortcode.data
         model.related_link = self.related_link.data
         model.show_party_strengths = self.show_party_strengths.data
+        model.show_mandate_allocation = self.show_mandate_allocation.data
 
         elections = self.request.session.query(Election)
         elections = elections.filter(Election.id.in_(self.elections.data))
@@ -146,4 +154,5 @@ class ElectionCompoundForm(Form):
         self.shortcode.data = model.shortcode
         self.related_link.data = model.related_link
         self.show_party_strengths.data = model.show_party_strengths
+        self.show_mandate_allocation.data = model.show_mandate_allocation
         self.elections.data = [election.id for election in model.elections]

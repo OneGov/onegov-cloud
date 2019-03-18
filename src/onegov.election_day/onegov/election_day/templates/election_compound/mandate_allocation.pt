@@ -1,0 +1,27 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
+    <tal:block metal:fill-slot="title">${election_compound.title}</tal:block>
+    <tal:block metal:fill-slot="before-content">
+        <div metal:use-macro="layout.macros['election_header']" tal:define="election election_compound" />
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+
+        <div metal:use-macro="layout.macros['status_callout']" />
+
+        <tal:block tal:condition="layout.visible">
+
+            <h2 i18n:translate="">Results</h2>
+
+            <div metal:use-macro="layout.macros['election_compound_factoids']" />
+
+            <div metal:use-macro="layout.macros['tab_menu']" />
+
+            <h3 tal:content="layout.title()" />
+
+            <div metal:use-macro="layout.macros['party_strengths']" />
+
+        </tal:block>
+
+        <div metal:use-macro="layout.macros['related_link']" />
+
+    </tal:block>
+</div>

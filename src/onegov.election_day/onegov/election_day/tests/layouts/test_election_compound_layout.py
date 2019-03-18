@@ -25,6 +25,7 @@ def test_election_compound_layout(session):
     assert layout.all_tabs == (
         'districts',
         'candidates',
+        'mandate-allocation',
         'party-strengths',
         'parties-panachage',
         'data'
@@ -33,6 +34,7 @@ def test_election_compound_layout(session):
     assert layout.title('undefined') == ''
     assert layout.title('districts') == '__districts'
     assert layout.title('candidates') == 'Elected candidates'
+    assert layout.title('mandate-allocation') == 'Mandate allocation'
     assert layout.title('party-strengths') == 'Party strengths'
     assert layout.title('parties-panachage') == 'Panachage'
     assert layout.title('data') == 'Downloads'
@@ -204,6 +206,20 @@ def test_election_compound_layout_menu_proporz(session):
         ('__districts', 'ElectionCompound/districts', False, []),
         ('Elected candidates', 'ElectionCompound/candidates', False, []),
         ('Party strengths', 'ElectionCompound/party-strengths', False, []),
+        ('Panachage', 'ElectionCompound/parties-panachage', False, []),
+        ('Downloads', 'ElectionCompound/data', False, [])
+    ]
+
+    compound.show_party_strengths = False
+    compound.show_mandate_allocation = True
+
+    assert ElectionCompoundLayout(compound, request).menu == [
+        ('__districts', 'ElectionCompound/districts', False, []),
+        ('Elected candidates', 'ElectionCompound/candidates', False, []),
+        (
+            'Mandate allocation', 'ElectionCompound/mandate-allocation', False,
+            []
+        ),
         ('Panachage', 'ElectionCompound/parties-panachage', False, []),
         ('Downloads', 'ElectionCompound/data', False, [])
     ]

@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-05 09:12+0100\n"
-"PO-Revision-Date: 2018-11-05 09:16+0100\n"
+"POT-Creation-Date: 2019-03-18 07:52+0100\n"
+"PO-Revision-Date: 2019-03-18 07:56+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 2.2\n"
+"X-Generator: Poedit 2.2.1\n"
 
 msgid "Last change"
 msgstr "Aggiornato"
@@ -40,6 +40,9 @@ msgstr "Maggioranza assoluta"
 
 msgid "Tacit election"
 msgstr "Elezione tacita"
+
+msgid "Expats"
+msgstr "Svizzeri all'estero"
 
 msgid "Distinct district"
 msgstr "Distretto Unico"
@@ -88,6 +91,15 @@ msgstr "Relativo"
 
 msgid "Elections"
 msgstr "Elezioni"
+
+msgid "Party strengths"
+msgstr "Forza delle parti"
+
+msgid "Views"
+msgstr "Visualizzazioni"
+
+msgid "Mandate allocation"
+msgstr "Ripartizione dei seggi"
 
 msgid "Cantonal"
 msgstr "Cantonale"
@@ -323,9 +335,6 @@ msgstr ""
 "liste. L'ampiezza delle barre e delle connessioni è proporzionale ai voti, "
 "le barre colorate di blu contengono i numeri dei mandati."
 
-msgid "Party strengths"
-msgstr "Forza delle parti"
-
 #.
 #. Default: The diagram shows the votes and mandates of the parties. The rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
@@ -356,9 +365,6 @@ msgstr "Panachage (liste)"
 
 msgid "Mandates"
 msgstr "Mandati"
-
-msgid "Expats"
-msgstr "Svizzeri all'estero"
 
 msgid "Proposal and counter proposal rejected"
 msgstr "Iniziativa e controprogetto sono state rifiutate"
