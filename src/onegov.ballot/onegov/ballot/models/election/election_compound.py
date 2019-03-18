@@ -295,8 +295,11 @@ class ElectionCompound(
     #: may be used to store a link related to this election
     related_link = meta_property('related_link')
 
-    #: may be used to enable/disable the visibility party strengths
-    party_strengths = meta_property('party_strengths')
+    #: may be used to enable/disable the visibility of party strengths
+    show_party_strengths = meta_property('party_strengths')
+
+    #: may be used to enable/disable the visibility of mandate allocation
+    show_mandate_allocation = meta_property('mandate_allocation')
 
     def clear_results(self):
         """ Clears all own results. """

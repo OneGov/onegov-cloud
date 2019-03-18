@@ -1,5 +1,10 @@
 Changelog
 ---------
+
+- Adds a configuration option to show/hide mandate allocation view of election
+  compounds.
+  [msom]
+
 3.7.5 (2019-03-06)
 ~~~~~~~~~~~~~~~~~~~
 
