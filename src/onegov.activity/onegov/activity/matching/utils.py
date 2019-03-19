@@ -1,4 +1,4 @@
-from onegov.activity import log, Booking
+from onegov.activity import log
 from onegov.activity.utils import dates_overlap
 from sortedcontainers import SortedSet
 
