@@ -1,25 +1,33 @@
-from onegov.activity import log
+from onegov.activity import log, Booking
 from onegov.activity.utils import dates_overlap
 from sortedcontainers import SortedSet
 
 
 def overlaps(booking, other, minutes_between=0, alignment=None):
-    """ Returns true if the two given bookings overlap. """
+    """ Returns true if the given booking overlaps with the given booking
+    or occasion.
+
+    """
 
     # even if exclude_from_overlap_check is active we consider a booking
     # to overlap itself (this protects against double bookings)
     if booking.id == other.id:
         return True
 
-    if booking.occasion.anti_affinity_group is not None:
-        if booking.occasion.anti_affinity_group == \
-                other.occasion.anti_affinity_group:
+    if hasattr(other, 'occasion'):
+        other_occasion = other.occasion
+    else:
+        other_occasion = other
+
+    if other_occasion.anti_affinity_group is not None:
+        if booking.occasion.anti_affinity_group \
+                == other_occasion.anti_affinity_group:
             return True
 
     if booking.occasion.exclude_from_overlap_check:
         return False
 
-    if other.occasion.exclude_from_overlap_check:
+    if other_occasion.exclude_from_overlap_check:
         return False
 
     return dates_overlap(
