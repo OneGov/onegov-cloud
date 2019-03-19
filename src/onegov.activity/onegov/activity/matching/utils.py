@@ -6,7 +6,10 @@ from sortedcontainers import SortedSet
 def overlaps(booking, other, minutes_between=0, alignment=None):
     """ Returns true if the two given bookings overlap. """
 
-    assert booking != other
+    # even if exclude_from_overlap_check is active we consider a booking
+    # to overlap itself (this protects against double bookings)
+    if booking.id == other.id:
+        return True
 
     if booking.occasion.anti_affinity_group is not None:
         if booking.occasion.anti_affinity_group == \

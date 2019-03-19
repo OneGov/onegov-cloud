@@ -1385,13 +1385,11 @@ def test_accept_booking(session, owner):
         active=True,
     )
 
-    sport = activities.add("Sport", username=owner.username)
-
     o1 = occasions.add(
         start=datetime(2016, 10, 4, 13),
         end=datetime(2016, 10, 4, 14),
         timezone="Europe/Zurich",
-        activity=sport,
+        activity=activities.add("Activity 1", username=owner.username),
         period=period,
         spots=(0, 2)
     )
@@ -1400,7 +1398,7 @@ def test_accept_booking(session, owner):
         start=datetime(2016, 10, 4, 13),
         end=datetime(2016, 10, 4, 14),
         timezone="Europe/Zurich",
-        activity=sport,
+        activity=activities.add("Activity 2", username=owner.username),
         period=period,
         spots=(0, 2)
     )
@@ -1409,7 +1407,7 @@ def test_accept_booking(session, owner):
         start=datetime(2016, 10, 5, 13),
         end=datetime(2016, 10, 5, 14),
         timezone="Europe/Zurich",
-        activity=sport,
+        activity=activities.add("Activity 3", username=owner.username),
         period=period,
         spots=(0, 2)
     )
@@ -1418,7 +1416,7 @@ def test_accept_booking(session, owner):
         start=datetime(2016, 10, 5, 15),
         end=datetime(2016, 10, 5, 16),
         timezone="Europe/Zurich",
-        activity=sport,
+        activity=activities.add("Activity 4", username=owner.username),
         period=period,
         spots=(0, 2)
     )
@@ -1584,13 +1582,11 @@ def test_booking_limit_exemption(session, owner):
     )
     period.confirmed = True
 
-    sport = activities.add("Sport", username=owner.username)
-
     o1 = occasions.add(
         start=datetime(2016, 10, 4, 13),
         end=datetime(2016, 10, 4, 14),
         timezone="Europe/Zurich",
-        activity=sport,
+        activity=activities.add("Activity 1", username=owner.username),
         period=period,
         spots=(0, 2)
     )
@@ -1600,7 +1596,7 @@ def test_booking_limit_exemption(session, owner):
         start=datetime(2016, 11, 4, 13),
         end=datetime(2016, 11, 4, 14),
         timezone="Europe/Zurich",
-        activity=sport,
+        activity=activities.add("Activity 2", username=owner.username),
         period=period,
         spots=(0, 2)
     )
@@ -1657,13 +1653,11 @@ def test_cancel_booking(session, owner):
         active=True,
     )
 
-    sport = activities.add("Sport", username=owner.username)
-
     o1 = occasions.add(
         start=datetime(2016, 10, 4, 9),
         end=datetime(2016, 10, 4, 12),
         timezone="Europe/Zurich",
-        activity=sport,
+        activity=activities.add("Activity 1", username=owner.username),
         period=period,
         spots=(0, 2)
     )
@@ -1672,7 +1666,7 @@ def test_cancel_booking(session, owner):
         start=datetime(2016, 10, 4, 11),
         end=datetime(2016, 10, 4, 14),
         timezone="Europe/Zurich",
-        activity=sport,
+        activity=activities.add("Activity 2", username=owner.username),
         period=period,
         spots=(0, 2)
     )
@@ -1681,7 +1675,7 @@ def test_cancel_booking(session, owner):
         start=datetime(2016, 10, 4, 13),
         end=datetime(2016, 10, 4, 16),
         timezone="Europe/Zurich",
-        activity=sport,
+        activity=activities.add("Activity 3", username=owner.username),
         period=period,
         spots=(0, 2)
     )
@@ -1690,7 +1684,7 @@ def test_cancel_booking(session, owner):
         start=datetime(2016, 10, 4, 15),
         end=datetime(2016, 10, 4, 18),
         timezone="Europe/Zurich",
-        activity=sport,
+        activity=activities.add("Activity 4", username=owner.username),
         period=period,
         spots=(0, 1)
     )

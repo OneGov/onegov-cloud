@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes matching with affinity groups leading to invalid outcomes.
+  [href]
+
 1.17.1 (2019-03-12)
 ~~~~~~~~~~~~~~~~~~~
 
