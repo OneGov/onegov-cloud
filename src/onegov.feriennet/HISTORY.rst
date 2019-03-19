@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes age check being inclusive towards young- instead of old age.
+  [href]
+
 1.5.13 (2019-03-13)
 ~~~~~~~~~~~~~~~~~~~
 
