@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Uses latest onegov.people release.
+  [msom]
+
 1.9.1 (2019-03-04)
 ~~~~~~~~~~~~~~~~~~~~
 
