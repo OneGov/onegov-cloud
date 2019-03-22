@@ -36,7 +36,7 @@ setup(
         'onegov.core',
         'onegov.form',
         'onegov.file',
-        'onegov.org>=1.1.0',
+        'onegov.org>=1.1.10',
         'onegov.people>=0.9.1',
         'onegov.pdf>=0.4.0',
         'pyyaml',
