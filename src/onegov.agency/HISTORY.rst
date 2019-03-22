@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.9.3 (2019-03-22)
+~~~~~~~~~~~~~~~~~~~~
 
 - Uses latest onegov.org release.
   [msom]
