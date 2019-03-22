@@ -83,7 +83,7 @@ def test_person_vcard(session):
     assert "EMAIL:han.maulwurf@springfield.com" in vcard
     assert "FN;CHARSET=utf-8:Dr. Hans Maulwurf" in vcard
     assert "N;CHARSET=utf-8:Maulwurf;Hans;;Dr.;" in vcard
-    assert "ORG;CHARSET=utf-8:Agency;Membership" in vcard
+    assert "ORG;CHARSET=utf-8:Agency\\, Membership" in vcard
     assert "PHOTO:https://thats.me/hans-maulwurf/picture" in vcard
     assert "TEL:11122334455" in vcard
     assert "TEL:11122334456" in vcard
@@ -106,7 +106,7 @@ def test_person_vcard(session):
     assert "EMAIL:han.maulwurf@springfield.com" in vcard
     assert "FN;CHARSET=utf-8:Hans Maulwurf" in vcard
     assert "N;CHARSET=utf-8:Maulwurf;Hans;;;" in vcard
-    assert "ORG;CHARSET=utf-8:Agency;Membership" in vcard
+    assert "ORG;CHARSET=utf-8:Agency\\, Membership" in vcard
     assert "PHOTO:" not in vcard
     assert "TEL:11122334455" in vcard
     assert "TEL:11122334456" not in vcard

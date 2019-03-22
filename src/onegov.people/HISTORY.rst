@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes organization fields in the vCard export.
+  [msom]
+
 0.9.0 (2019-02-18)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -175,12 +175,12 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable):
             line.value = self.notes
             line.charset_param = 'utf-8'
 
-        for membership in self.memberships:
+        memberships = [
+            ', '.join((m.agency.title, m.title)) for m in self.memberships
+        ]
+        if memberships:
             line = result.add('org')
-            line.value = [
-                membership.agency.title,
-                membership.title
-            ]
+            line.value = memberships
             line.charset_param = 'utf-8'
 
         return result.serialize()
