@@ -79,7 +79,7 @@ class StoredConfiguration(object):
 
     @classmethod
     def from_yaml(cls, text):
-        return cls(**yaml.load(text))
+        return cls(**yaml.safe_load(text))
 
 
 class DirectoryConfiguration(Mutable, StoredConfiguration):
