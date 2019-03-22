@@ -19,7 +19,7 @@ from sedate import as_datetime
 @lru_cache(maxsize=1)
 def load_content(path):
     with open(path, 'r', encoding='utf-8') as f:
-        return yaml.load(f)
+        return yaml.safe_load(f)
 
 
 def absolute_path(path, base):
