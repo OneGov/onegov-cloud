@@ -297,7 +297,7 @@ class DepotApp(App):
         for path in paths:
             if path.exists():
                 with path.open('r') as f:
-                    return yaml.load(f.read())
+                    return yaml.safe_load(f.read())
 
         raise RuntimeError(
             f"No service config found at {self.signing_services}")
