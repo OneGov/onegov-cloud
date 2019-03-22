@@ -16,7 +16,7 @@ class OrgTheme(BaseTheme):
 
     # don't touch this number, it's incremented using bumpversion, so every
     # release will automatically trigger a rebuild of the theme
-    version = '1.1.9'
+    version = '1.1.10'
 
     @property
     def default_options(self):
