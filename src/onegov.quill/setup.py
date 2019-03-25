@@ -4,7 +4,7 @@ name = 'onegov.quill'
 description = (
     'Quill rich text editor integration for OneGov.'
 )
-version = '0.4.0'
+version = '0.5.0'
 
 
 def get_long_description():
