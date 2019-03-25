@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.22.5 (2019-03-25)
+~~~~~~~~~~~~~~~~~~~~
 
 - Requires real input in notice form fields.
   [msom]
