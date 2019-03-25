@@ -283,10 +283,10 @@ class UnrestrictedNoticeForm(NoticeForm):
         model.author_place = self.author_place.data
         model.author_date = self.author_date_utc
         model.author_name = self.author_name.data
-        model.at_cost = self.at_cost.data
+        model.at_cost = self.at_cost.data == 'yes'
+        model.billing_address = self.billing_address.data
         if model.state != 'published':
             model.issues = self.issues.data
         if self.phone_number.data and model.user:
             model.user.phone_number = self.phone_number.formatted_data
-
         model.apply_meta(self.request.session)
