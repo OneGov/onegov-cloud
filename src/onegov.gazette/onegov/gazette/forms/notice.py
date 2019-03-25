@@ -18,6 +18,7 @@ from wtforms import StringField
 from wtforms import TextAreaField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import InputRequired
+from wtforms.validators import DataRequired
 from wtforms.validators import Length
 
 
@@ -34,6 +35,7 @@ class NoticeForm(Form):
         label=_("Title (maximum 60 characters)"),
         validators=[
             InputRequired(),
+            DataRequired(),
             Length(max=60)
         ],
         render_kw={'maxlength': 60},
@@ -74,7 +76,8 @@ class NoticeForm(Form):
         render_kw={'rows': 3},
         depends_on=('at_cost', 'yes'),
         validators=[
-            InputRequired()
+            InputRequired(),
+            DataRequired(),
         ]
     )
 
@@ -90,14 +93,16 @@ class NoticeForm(Form):
         label=_("Text"),
         tags=('strong', 'ol', 'ul'),
         validators=[
-            InputRequired()
+            InputRequired(),
+            DataRequired(),
         ]
     )
 
     author_place = StringField(
         label=_("Place"),
         validators=[
-            InputRequired()
+            InputRequired(),
+            DataRequired(),
         ]
     )
 
@@ -116,7 +121,8 @@ class NoticeForm(Form):
     author_name = TextAreaField(
         label=_("Author"),
         validators=[
-            InputRequired()
+            InputRequired(),
+            DataRequired(),
         ],
         render_kw={'rows': 4},
     )
