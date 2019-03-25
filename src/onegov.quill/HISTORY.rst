@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a DataRequired validator for HTML.
+  [msom]
+
 0.4.0 (2018-08-31)
 ~~~~~~~~~~~~~~~~~~~~~
 
