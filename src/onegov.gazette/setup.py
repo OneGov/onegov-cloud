@@ -43,7 +43,7 @@ setup(
         'onegov.foundation',
         'onegov.notice>=0.10.0',
         'onegov.pdf>=0.5.0',
-        'onegov.quill>=0.3.2',
+        'onegov.quill>=0.5.0',
         'onegov.shared',
         'onegov.user>=0.18.0',
         'python-dateutil',

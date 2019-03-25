@@ -9,6 +9,7 @@ from onegov.gazette.models import Category
 from onegov.gazette.models import Issue
 from onegov.gazette.models import Organization
 from onegov.quill import QuillField
+from onegov.quill.validators import HtmlDataRequired
 from sedate import as_datetime
 from sedate import standardize_date
 from sedate import utcnow
@@ -94,7 +95,7 @@ class NoticeForm(Form):
         tags=('strong', 'ol', 'ul'),
         validators=[
             InputRequired(),
-            DataRequired(),
+            HtmlDataRequired(),
         ]
     )
 
