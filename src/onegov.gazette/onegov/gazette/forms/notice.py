@@ -286,7 +286,7 @@ class UnrestrictedNoticeForm(NoticeForm):
         model.at_cost = self.at_cost.data
         if model.state != 'published':
             model.issues = self.issues.data
-        if self.phone_number.data:
+        if self.phone_number.data and model.user:
             model.user.phone_number = self.phone_number.formatted_data
 
         model.apply_meta(self.request.session)

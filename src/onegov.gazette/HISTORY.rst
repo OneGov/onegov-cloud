@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes unrestricted edit notice form trying to edit deleted users.
+  [msom]
+
 1.22.5 (2019-03-25)
 ~~~~~~~~~~~~~~~~~~~~
 
