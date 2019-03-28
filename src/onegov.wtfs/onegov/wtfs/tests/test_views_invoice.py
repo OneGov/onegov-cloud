@@ -1,4 +1,3 @@
-from base64 import b64decode
 from freezegun import freeze_time
 from onegov.core.request import CoreRequest
 from unittest.mock import patch
@@ -53,13 +52,12 @@ def test_views_invoices(client):
         create.form['accounting_unit'] = "456"
         create.form['revenue_account'] = "789"
         created = create.form.submit()
+        assert created.headers['Content-Type'] == 'text/csv; charset=UTF-8'
+        assert created.headers['Content-Disposition'] == (
+            'inline; filename=rechnungen.csv'
+        )
 
-        assert "Es wurde(n) 1 Rechnung(en) erstellt." in created
-        assert "Total exkl. MWST: CHF 378.00." in created
-
-        invoice = created.pyquery('a.invoice').attr('href')
-        invoice = invoice.split('data:text/plain;base64,')[1]
-        invoice = b64decode(invoice).decode()
+        invoice = created.text
         assert "11223344" in invoice
         assert "Rechnungen" in invoice
         assert "123" in invoice

@@ -1,7 +1,5 @@
-from base64 import b64encode
 from csv import writer
 from datetime import datetime
-from io import StringIO
 from onegov.wtfs.models.municipality import Municipality
 from onegov.wtfs.models.scan_job import ScanJob
 
@@ -26,11 +24,7 @@ class Invoice(object):
             query = query.filter(Municipality.id == self.municipality_id)
             return query.one()
 
-    def export(self):
-        if not self.municipality or not self.from_date or not self.to_date:
-            return '', 0, 0.0
-
-        file = StringIO()
+    def export(self, file):
         csv = writer(file)
         csv.writerow((
             'Aktuelles Datum (YYYYMMDD1)',
@@ -57,6 +51,9 @@ class Invoice(object):
             'Erlöskonto',
         ))
 
+        if not self.municipality or not self.from_date or not self.to_date:
+            return
+
         municipality = self.municipality
         gpn_number = municipality.gpn_number
         gpn_number = str(gpn_number) if gpn_number is not None else ''
@@ -76,11 +73,10 @@ class Invoice(object):
             ScanJob.municipality_id == self.municipality_id
         )
         total_tax_forms = 0
-        count = 0
         for count, scan_job in enumerate(query, start=1):
             tax_forms = (
-                scan_job.dispatch_tax_forms
-                - scan_job.return_unscanned_tax_forms
+                (scan_job.dispatch_tax_forms or 0)
+                - (scan_job.return_unscanned_tax_forms or 0)
             )
             total_tax_forms += tax_forms
             csv.writerow((
@@ -107,10 +103,3 @@ class Invoice(object):
                 self.accounting_unit,
                 self.revenue_account,
             ))
-
-        file.seek(0)
-
-        # todo: how is self.vat used?
-        # todo: is the total calculation correct?
-        total = total_tax_forms * municipality.price_per_quantity
-        return b64encode(file.read().encode()), count, total

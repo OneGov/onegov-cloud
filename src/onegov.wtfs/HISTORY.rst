@@ -4,6 +4,9 @@ Changelog
 - Adds datetime picker.
   [msom]
 
+- Directly returns the invoices CSV.
+  [msom]
+
 0.0.4 (2019-03-13)
 ~~~~~~~~~~~~~~~~~~~
 

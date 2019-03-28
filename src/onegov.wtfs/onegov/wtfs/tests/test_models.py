@@ -1,6 +1,6 @@
-from base64 import b64decode
 from datetime import date
 from freezegun import freeze_time
+from io import StringIO
 from onegov.wtfs.models import DailyListBoxes
 from onegov.wtfs.models import DailyListBoxesAndForms
 from onegov.wtfs.models import Invoice
@@ -560,15 +560,49 @@ def test_invoice(session):
     session.flush()
 
     with freeze_time("2019-12-31 08:07:06"):
+        header = (
+            'Aktuelles Datum (YYYYMMDD1),'
+            'Aktuelles Datum (DD.MM.YYYY),'
+            'Download Zeitpunkt (HH.MIN.SEK),'
+            'GPN-Nr.,'
+            'Positionsnummer (Hochgezählt),'
+            'GPN-Nr.,'
+            'Betreff,'
+            'Positionsnummer (Hochgezählt),'
+            'Erstellungsdatum,'
+            'Erstellungsdatum,'
+            'Erstellungsdatum,'
+            'GPN-Nr.,'
+            'Total StE,'
+            'Lieferscheinnummer,'
+            'Preis pro Menge exkl. MWST,'
+            'Preis pro Menge exkl. MWST,'
+            'Fixe Preiseiheit (immer „1“),'
+            'Erstellungsdatum,'
+            'Adressszusatz der Gemeinde,'
+            'CS2 Benutzer,'
+            'Kostenstelle,'
+            'Erlöskonto'
+            '\r\n'
+        )
+
         invoice = Invoice(session)
 
+        def export():
+            file = StringIO()
+            invoice.export(file)
+            file.seek(0)
+            return file.read()
+
+        # Invalid parameters
+        assert export() == header
         assert invoice.municipality is None
-        assert invoice.export() == ('', 0, 0.0)
 
         invoice.municipality_id = municipality.id
         assert invoice.municipality == municipality
-        assert invoice.export() == ('', 0, 0.0)
+        assert export() == header
 
+        # No invoices
         invoice.from_date = date(2019, 1, 1)
         invoice.to_date = date(2019, 1, 7)
         invoice.cs2_user = '123456'
@@ -576,37 +610,33 @@ def test_invoice(session):
         invoice.accounting_unit = '99999'
         invoice.revenue_account = '987654321'
         invoice.vat = None
-        data, count, total = invoice.export()
-        assert count == 0
-        assert total == 0.0
-        assert b64decode(data).decode()
+        assert export() == header
 
+        # Invoices
         invoice.from_date = date(2019, 1, 7)
         invoice.to_date = date(2019, 1, 14)
-        data, count, total = invoice.export()
-        assert count == 1
-        assert total == (10 + 20 + 30 - 1 - 2 - 3) * 7.0
-        assert b64decode(data).decode().split('\r\n')[1].split(',') == [
-            '201912311',
-            '31.12.2019',
-            '08.07.06',
-            '8882255',
-            '1',
-            '8882255',
-            'Rechnungen 1.1-7.1',
-            '1',
-            '31.12.2019',
-            '31.12.2019',
-            '31.12.2019',
-            '8882255',
-            '54000',
-            '1',
-            '70000000',
-            '70000000',
-            '1',
-            '31.12.2019',
-            'Finkenweg',
-            '123456',
-            '99999',
+        assert export() == header + (
+            '201912311,'
+            '31.12.2019,'
+            '08.07.06,'
+            '8882255,'
+            '1,'
+            '8882255,'
+            'Rechnungen 1.1-7.1,'
+            '1,'
+            '31.12.2019,'
+            '31.12.2019,'
+            '31.12.2019,'
+            '8882255,'
+            '54000,'
+            '1,'
+            '70000000,'
+            '70000000,'
+            '1,'
+            '31.12.2019,'
+            'Finkenweg,'
+            '123456,'
+            '99999,'
             '987654321'
-        ]
+            '\r\n'
+        )
