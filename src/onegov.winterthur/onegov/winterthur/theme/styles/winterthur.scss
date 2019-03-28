@@ -273,3 +273,49 @@ input[data-street-search]::placeholder {
         }
     }
 }
+
+/*
+    Roadworks List
+*/
+.roadwork-list {
+    display: flex;
+    flex-wrap: wrap;
+
+    > dt,
+    > dd {
+        flex: 0 0 100%;
+    }
+
+    > dd {
+        border-bottom: 1px solid $gray-light;
+        padding-bottom: 15px;
+    }
+
+    > dd:last-of-type {
+        border-bottom: 0;
+    }
+
+    .date-label {
+        color: darken($secondary-color, 40%);
+        display: inline-block;
+        width: 4ex;
+    }
+}
+
+.roadwork-sections {
+    padding-left: 4.5ex;
+
+    h2 {
+        font-size: .875rem;
+        margin-top: 15px;
+    }
+
+    dl {
+        font-size: .875rem;
+        margin-bottom: -5px;
+
+        a {
+            font-weight: normal;
+        }
+    }
+}

@@ -1,11 +1,14 @@
 import re
 
+from cached_property import cached_property
 from onegov.core import utils
 from onegov.org import OrgApp
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 from onegov.org.app import get_common_asset as default_common_asset
 from onegov.winterthur.initial_content import create_new_organisation
 from onegov.winterthur.theme import WinterthurTheme
+from onegov.winterthur.roadwork import RoadworkConfig
+from onegov.winterthur.roadwork import RoadworkClient
 
 
 class WinterthurApp(OrgApp):
@@ -26,6 +29,24 @@ class WinterthurApp(OrgApp):
     def enable_iframes(self, request):
         request.content_security_policy.frame_ancestors |= self.frame_ancestors
         request.include('iframe-resizer')
+
+    @property
+    def roadwork_cache(self):
+        # the expiration time is high here, as the expiration is more closely
+        # managed by the roadwork client
+        return self.get_cache('roadwork', expiration_time=60 * 60 * 24)
+
+    @cached_property
+    def roadwork_client(self):
+        config = RoadworkConfig.lookup()
+
+        return RoadworkClient(
+            cache=self.roadwork_cache,
+            hostname=config.hostname,
+            endpoint=config.endpoint,
+            username=config.username,
+            password=config.password
+        )
 
 
 @WinterthurApp.tween_factory()

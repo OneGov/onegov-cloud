@@ -1,0 +1,10 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.winterthur">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <p i18n:translate>
+            Failed to connect to Projektdatenbank.
+        </p>
+    </tal:b>
+</div>

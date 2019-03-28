@@ -1,0 +1,90 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.winterthur">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="row reverse-on-mobile">
+            <div class="columns medium-8 small-12">
+                <dl class="roadwork-list">
+                    <tal:b repeat="roadwork model.roadwork">
+                        <dt>
+                            <a href="${request.link(roadwork)}">
+                                ${roadwork.title}
+                            </a>
+                        </dt>
+                        <dd tal:define="sections roadwork.sections">
+                            <div>
+                                <span class="date-label" i18n:translate>Start</span>
+                                ${layout.format_date(roadwork["DauerVon"], 'weekday_long')},
+                                ${layout.format_date(roadwork["DauerVon"], 'date_long')}
+                            </div>
+
+                            <div>
+                                <span class="date-label" i18n:translate>End</span>
+                                ${layout.format_date(roadwork["DauerBis"], 'weekday_long')},
+                                ${layout.format_date(roadwork["DauerBis"], 'date_long')}
+                            </div>
+
+                            <div tal:condition='sections' class="roadwork-sections">
+                                <h2 i18n:translate>Current Traffic Provisions</h2>
+
+                                <dl>
+                                    <tal:b repeat="section sections">
+                                        <dt>
+                                            <a href="${request.link(section)}">${section.title}</a>
+                                        </dt>
+                                        <dd>
+                                            <div>
+                                                <span class="date-label" i18n:translate>Start</span>
+                                                ${layout.format_date(roadwork["DauerVon"], 'weekday_long')},
+                                                ${layout.format_date(roadwork["DauerVon"], 'date_long')}
+                                            </div>
+
+                                            <div>
+                                                <span class="date-label" i18n:translate>End</span>
+                                                ${layout.format_date(roadwork["DauerBis"], 'weekday_long')},
+                                                ${layout.format_date(roadwork["DauerBis"], 'date_long')}
+                                            </div>
+                                        </dd>
+                                    </tal:b>
+                                </dl>
+                            </div>
+                        </dd>
+                    </tal:b>
+                </dl>
+            </div>
+            <div class="columns medium-4 small-12">
+                <div class="filter-panel">
+                    <h2 class="filter-title" i18n:translate>Search</h2>
+
+                    <form id="inline-search" class="searchbox" action="${request.link(model.by_letter(None))}" method="GET">
+                        <div class="row collapse">
+                            <div class="columns small-10">
+                                <input id="search-term" name="query" type="text" required="" autocomplete="off" autocorrect="off" value="${model.query and model.query or ''}">
+                                <button type="reset" class="reset-button" tabindex="-1"></button>
+                            </div>
+                            <div class="columns small-2">
+                                <button type="submit" class="button postfix" aria-label="Search" i18n:attributes="aria-label">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="filter-panel">
+                    <h2 class="filter-title" i18n:translate>A to Z</h2>
+
+                    <ul class="tags">
+                        <li tal:repeat="letter model.letters" class="click-through">
+                            <span class="blank-label rounded ${letter == model.letter and 'active'}">
+                                <a href="${request.link(model.by_letter(letter=(letter != model.letter and letter or None)))}">${letter.upper()}</a>
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </tal:b>
+</div>

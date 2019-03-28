@@ -1,0 +1,43 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.winterthur">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <dl class="limit-line-width">
+            <dt i18n:translate>Start</dt>
+            <dd>
+                ${layout.format_date(model["DauerVon"], 'weekday_long')},
+                ${layout.format_date(model["DauerVon"], 'date_long')}
+            </dd>
+
+            <dt i18n:translate>End</dt>
+            <dd>
+                ${layout.format_date(model["DauerBis"], 'weekday_long')},
+                ${layout.format_date(model["DauerBis"], 'date_long')}
+            </dd>
+
+            <tal:b tal:condition='"SachbearbeiterBau" in model'>
+                <dt i18n:translate>Responsible Official Construction Site</dt>
+                <dd>
+                    ${model["SachbearbeiterBau"]}<tal:b condition='model["SachbearbeiterBauZusatz"]'>, ${model["SachbearbeiterBauZusatz"]}</tal:b>
+                </dd>
+            </tal:b>
+
+            <tal:b tal:condition='"SachbearbeiterVerkehr" in model'>
+                <dt i18n:translate>Responsible Official Traffic</dt>
+                <dd>
+                    ${model["SachbearbeiterVerkehr"]}<tal:b condition='model["SachbearbeiterVerkehrZusatz"]'>, ${model["SachbearbeiterVerkehrZusatz"]}</tal:b>
+                </dd>
+            </tal:b>
+
+            <dt i18n:translate>Provisions / Restrictions</dt>
+            <dd>
+                ${model["Massnahmen"] or ''}
+            </dd>
+        </dl>
+
+        <p>
+            <a href="${back}" i18n:translate>Back</a>
+        </p>
+    </tal:b>
+</div>
