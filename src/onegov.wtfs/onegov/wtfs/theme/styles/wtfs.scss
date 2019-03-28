@@ -58,6 +58,87 @@ body {
 }
 
 /*
+    Subtitles
+*/
+h2 small {
+    display: block;
+    line-height: 1.25;
+}
+
+.delivery-note {
+    table {
+        border-collapse: collapse;
+
+        th,
+        td {
+            background-color: $white;
+            border: 1px solid $black;
+
+            &.orange {
+                background-color: #f93;
+            }
+
+            &.red {
+                background-color: #ff9f9f;
+            }
+
+            &.blue {
+                background-color: #9cc;
+            }
+
+            &.yellow {
+                background-color: #ff6;
+            }
+
+            &.green {
+                background-color: #9c9;
+            }
+        }
+    }
+}
+
+.daily-list-boxes {
+    table {
+        border-collapse: collapse;
+
+        th,
+        td {
+            background-color: $white;
+            border: 1px solid $black;
+
+            &.red {
+                background-color: #ff9f9f;
+            }
+
+            &.blue {
+                background-color: #39c;
+            }
+
+            &.dark-blue {
+                background-color: #36f;
+            }
+
+            &.light-blue {
+                background-color: #cff;
+            }
+
+            &.green {
+                background-color: #7a1;
+            }
+
+            &.dark-green {
+                background-color: #396;
+            }
+
+            &.light-green {
+                background-color: #9f9;
+            }
+        }
+    }
+}
+
+
+/*
     Print Styles
 */
 @media print {
@@ -112,46 +193,6 @@ body {
 
         * {
             font-size: 9px;
-        }
-    }
-}
-
-/*
-    Subtitles
-*/
-h2 small {
-    display: block;
-    line-height: 1.25;
-}
-
-.delivery-note {
-    table {
-        border-collapse: collapse;
-
-        th,
-        td {
-            background-color: $white;
-            border: 1px solid $black;
-
-            &.orange {
-                background-color: #f93;
-            }
-
-            &.red {
-                background-color: #ff9f9f;
-            }
-
-            &.blue {
-                background-color: #9cc;
-            }
-
-            &.yellow {
-                background-color: #ff6;
-            }
-
-            &.green {
-                background-color: #9c9;
-            }
         }
     }
 }

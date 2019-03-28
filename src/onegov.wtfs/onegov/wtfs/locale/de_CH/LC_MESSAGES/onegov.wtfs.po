@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-13 10:20+0100\n"
-"PO-Revision-Date: 2019-03-28 08:59+0100\n"
+"POT-Creation-Date: 2019-03-28 11:02+0100\n"
+"PO-Revision-Date: 2019-03-28 11:02+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -311,6 +311,9 @@ msgstr "Scan-Auftrag"
 msgid "Create invoice"
 msgstr "Rechnung erzeugen"
 
+msgid "Filled in by the municipality until 17.00 the evening before."
+msgstr "Durch die Gemeinde ausgefüllt bis 17.00 Uhr am Vorabend."
+
 msgid "In"
 msgstr "Eingang"
 
@@ -415,20 +418,6 @@ msgstr "Passwort vergessen?"
 
 msgid "Reset password"
 msgstr "Passwort zurücksetzen"
-
-msgid "${count} invoice(s) have been created."
-msgstr "Es wurde(n) ${count} Rechnung(en) erstellt."
-
-msgid "Total without VAT: CHF ${total}."
-msgstr "Total exkl. MWST: CHF ${total}."
-
-msgid "Download file"
-msgstr "Datei herunterladen"
-
-msgid "Right-click on the link and select \"Save target as\" to save the file."
-msgstr ""
-"Klicken Sie mit der rechten Maustaste auf den Link und wähle Sie \"Ziel "
-"speichern unter\", um die Datei zu speichern."
 
 msgid "Pick-up dates"
 msgstr "Abholtermine"

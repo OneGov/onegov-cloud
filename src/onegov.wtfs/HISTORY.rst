@@ -10,6 +10,9 @@ Changelog
 - Allows to create invoices for all municipalities.
   [msom]
 
+- Colorizes the daily list boxes view.
+  [msom]
+
 0.0.4 (2019-03-13)
 ~~~~~~~~~~~~~~~~~~~
 
