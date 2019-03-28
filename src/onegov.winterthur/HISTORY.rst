@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.0 (2019-03-28)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Adds a roadworks directory.
   [href]
 
