@@ -7,6 +7,9 @@ Changelog
 - Directly returns the invoices CSV.
   [msom]
 
+- Allows to create invoices for all municipalities.
+  [msom]
+
 0.0.4 (2019-03-13)
 ~~~~~~~~~~~~~~~~~~~
 

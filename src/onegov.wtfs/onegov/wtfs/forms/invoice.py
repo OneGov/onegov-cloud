@@ -93,7 +93,8 @@ class CreateInvoicesForm(Form):
             Municipality.meta['bfs_number'].label('bfs_number'),
         )
         query = query.order_by(unaccent(Municipality.name))
-        self.municipality_id.choices = [
+        self.municipality_id.choices = [('-', '-')]
+        self.municipality_id.choices += [
             (r.id.hex, f"{r.name} ({r.bfs_number})") for r in query
         ]
 
@@ -102,7 +103,9 @@ class CreateInvoicesForm(Form):
         model.to_date = self.to_date.data
         model.cs2_user = self.cs2_user.data
         model.subject = self.subject.data
-        model.municipality_id = self.municipality_id.data
+        model.municipality_id = None
+        if self.municipality_id.data != '-':
+            model.municipality_id = self.municipality_id.data
         model.accounting_unit = self.accounting_unit.data
         model.revenue_account = self.revenue_account.data
         model.vat = self.vat.data

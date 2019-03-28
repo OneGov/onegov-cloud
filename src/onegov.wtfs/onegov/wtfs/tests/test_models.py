@@ -530,14 +530,23 @@ def test_invoice(session):
             bfs_number=21,
         )
     )
+    session.add(
+        Municipality(
+            name='Aesch',
+            address_supplement='Meisenweg',
+            gpn_number=9993344,
+            bfs_number=241,
+        )
+    )
     session.flush()
-    municipality = session.query(Municipality).one()
+    adlikon = session.query(Municipality).filter_by(name='Adlikon').one()
+    aesch = session.query(Municipality).filter_by(name='Aesch').one()
 
     session.add(
         ScanJob(
             type='normal',
-            municipality_id=municipality.id,
-            dispatch_date=date(2019, 1, 10),
+            municipality_id=adlikon.id,
+            dispatch_date=date(2018, 12, 10),
             dispatch_boxes=1,
             dispatch_tax_forms_current_year=10,
             dispatch_tax_forms_last_year=20,
@@ -545,7 +554,7 @@ def test_invoice(session):
             dispatch_single_documents=40,
             dispatch_cantonal_tax_office=5,
             dispatch_cantonal_scan_center=4,
-            return_date=date(2019, 2, 2),
+            return_date=date(2018, 12, 20),
             return_boxes=1,
             return_tax_forms_current_year=9,
             return_tax_forms_last_year=18,
@@ -555,6 +564,54 @@ def test_invoice(session):
             return_unscanned_tax_forms_last_year=2,
             return_unscanned_tax_forms_older=3,
             return_unscanned_single_documents=4,
+        )
+    )
+    session.add(
+        ScanJob(
+            type='normal',
+            municipality_id=adlikon.id,
+            dispatch_date=date(2019, 1, 10),
+            dispatch_boxes=2,
+            dispatch_tax_forms_current_year=5,
+            dispatch_tax_forms_last_year=5,
+            dispatch_tax_forms_older=0,
+            dispatch_single_documents=2,
+            dispatch_cantonal_tax_office=0,
+            dispatch_cantonal_scan_center=0,
+            return_date=date(2019, 2, 2),
+            return_boxes=2,
+            return_tax_forms_current_year=5,
+            return_tax_forms_last_year=5,
+            return_tax_forms_older=0,
+            return_single_documents=2,
+            return_unscanned_tax_forms_current_year=0,
+            return_unscanned_tax_forms_last_year=0,
+            return_unscanned_tax_forms_older=0,
+            return_unscanned_single_documents=0,
+        )
+    )
+    session.add(
+        ScanJob(
+            type='normal',
+            municipality_id=aesch.id,
+            dispatch_date=date(2019, 1, 7),
+            dispatch_boxes=1,
+            dispatch_tax_forms_current_year=10,
+            dispatch_tax_forms_last_year=10,
+            dispatch_tax_forms_older=10,
+            dispatch_single_documents=10,
+            dispatch_cantonal_tax_office=1,
+            dispatch_cantonal_scan_center=1,
+            return_date=date(2019, 1, 10),
+            return_boxes=1,
+            return_tax_forms_current_year=7,
+            return_tax_forms_last_year=7,
+            return_tax_forms_older=7,
+            return_single_documents=7,
+            return_unscanned_tax_forms_current_year=3,
+            return_unscanned_tax_forms_last_year=3,
+            return_unscanned_tax_forms_older=3,
+            return_unscanned_single_documents=3,
         )
     )
     session.flush()
@@ -569,14 +626,11 @@ def test_invoice(session):
             'GPN-Nr.,'
             'Betreff,'
             'Positionsnummer (Hochgezählt),'
-            'Erstellungsdatum,'
-            'Erstellungsdatum,'
-            'Erstellungsdatum,'
+            'Erstellungsdatum,Erstellungsdatum,Erstellungsdatum,'
             'GPN-Nr.,'
             'Total StE,'
             'Lieferscheinnummer,'
-            'Preis pro Menge exkl. MWST,'
-            'Preis pro Menge exkl. MWST,'
+            'Preis pro Menge exkl. MWST,Preis pro Menge exkl. MWST,'
             'Fixe Preiseiheit (immer „1“),'
             'Erstellungsdatum,'
             'Adressszusatz der Gemeinde,'
@@ -594,15 +648,76 @@ def test_invoice(session):
             file.seek(0)
             return file.read()
 
-        # Invalid parameters
-        assert export() == header
-        assert invoice.municipality is None
+        # All
+        invoice.municipality_id = None
+        invoice.from_date = None
+        invoice.to_date = None
+        invoice.cs2_user = '123456'
+        invoice.subject = 'Rechnungen'
+        invoice.accounting_unit = '99999'
+        invoice.revenue_account = '987654321'
+        invoice.vat = None
+        assert export() == header + (
+            '201912311,31.12.2019,08.07.06,'
+            '8882255,'
+            '1,'
+            '8882255,'
+            'Rechnungen,'
+            '1,'
+            '31.12.2019,31.12.2019,31.12.2019,'
+            '8882255,'
+            '54000,'
+            '1,'
+            '70000000,70000000,'
+            '1,'
+            '31.12.2019,'
+            'Finkenweg,'
+            '123456,'
+            '99999,'
+            '987654321'
+            '\r\n'
+        ) + (
+            '201912311,31.12.2019,08.07.06,'
+            '9993344,'
+            '2,'
+            '9993344,'
+            'Rechnungen,'
+            '2,'
+            '31.12.2019,31.12.2019,31.12.2019,'
+            '9993344,'
+            '21000,'
+            '3,'
+            '70000000,70000000,'
+            '1,'
+            '31.12.2019,'
+            'Meisenweg,'
+            '123456,'
+            '99999,'
+            '987654321'
+            '\r\n'
+        ) + (
+            '201912311,31.12.2019,08.07.06,'
+            '8882255,'
+            '3,'
+            '8882255,'
+            'Rechnungen,'
+            '3,'
+            '31.12.2019,31.12.2019,31.12.2019,'
+            '8882255,'
+            '10000,'
+            '2,'
+            '70000000,70000000,'
+            '1,'
+            '31.12.2019,'
+            'Finkenweg,'
+            '123456,'
+            '99999,'
+            '987654321'
+            '\r\n'
+        )
 
-        invoice.municipality_id = municipality.id
-        assert invoice.municipality == municipality
-        assert export() == header
-
-        # No invoices
+        # Filter
+        invoice.municipality_id = adlikon.id
         invoice.from_date = date(2019, 1, 1)
         invoice.to_date = date(2019, 1, 7)
         invoice.cs2_user = '123456'
@@ -612,26 +727,20 @@ def test_invoice(session):
         invoice.vat = None
         assert export() == header
 
-        # Invoices
         invoice.from_date = date(2019, 1, 7)
         invoice.to_date = date(2019, 1, 14)
         assert export() == header + (
-            '201912311,'
-            '31.12.2019,'
-            '08.07.06,'
+            '201912311,31.12.2019,08.07.06,'
             '8882255,'
             '1,'
             '8882255,'
             'Rechnungen 1.1-7.1,'
             '1,'
-            '31.12.2019,'
-            '31.12.2019,'
-            '31.12.2019,'
+            '31.12.2019,31.12.2019,31.12.2019,'
             '8882255,'
-            '54000,'
-            '1,'
-            '70000000,'
-            '70000000,'
+            '10000,'
+            '2,'
+            '70000000,70000000,'
             '1,'
             '31.12.2019,'
             'Finkenweg,'

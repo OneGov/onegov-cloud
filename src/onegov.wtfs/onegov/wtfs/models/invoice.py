@@ -1,6 +1,5 @@
 from csv import writer
 from datetime import datetime
-from onegov.wtfs.models.municipality import Municipality
 from onegov.wtfs.models.scan_job import ScanJob
 
 
@@ -16,13 +15,6 @@ class Invoice(object):
         self.accounting_unit = None
         self.revenue_account = None
         self.vat = None
-
-    @property
-    def municipality(self):
-        if self.municipality_id:
-            query = self.session.query(Municipality)
-            query = query.filter(Municipality.id == self.municipality_id)
-            return query.one()
 
     def export(self, file):
         csv = writer(file)
@@ -51,34 +43,32 @@ class Invoice(object):
             'Erlöskonto',
         ))
 
-        if not self.municipality or not self.from_date or not self.to_date:
-            return
-
-        municipality = self.municipality
-        gpn_number = municipality.gpn_number
-        gpn_number = str(gpn_number) if gpn_number is not None else ''
-        address_supplement = municipality.address_supplement or ''
-        price_per_quantity = municipality.price_per_quantity
-        price_per_quantity = str(int(price_per_quantity * 10000000))
-
         now = datetime.now()
         current_date_1 = f'{now:%Y%m%d}1'
         current_date = f'{now:%d.%m.%Y}'
         current_time = f'{now:%H.%M.%S}'
 
         query = self.session.query(ScanJob)
-        query = query.filter(
-            ScanJob.dispatch_date >= self.from_date,
-            ScanJob.dispatch_date <= self.to_date,
-            ScanJob.municipality_id == self.municipality_id
-        )
-        total_tax_forms = 0
+        if self.from_date:
+            query = query.filter(ScanJob.dispatch_date >= self.from_date)
+        if self.to_date:
+            query = query.filter(ScanJob.dispatch_date <= self.to_date)
+        if self.municipality_id:
+            query = query.filter(
+                ScanJob.municipality_id == self.municipality_id
+            )
+        query = query.order_by(ScanJob.dispatch_date)
         for count, scan_job in enumerate(query, start=1):
+            municipality = scan_job.municipality
+            gpn_number = municipality.gpn_number
+            gpn_number = str(gpn_number) if gpn_number is not None else ''
+            address_supplement = municipality.address_supplement or ''
+            price_per_quantity = municipality.price_per_quantity
+            price_per_quantity = str(int(price_per_quantity * 10000000))
             tax_forms = (
                 (scan_job.dispatch_tax_forms or 0)
                 - (scan_job.return_unscanned_tax_forms or 0)
             )
-            total_tax_forms += tax_forms
             csv.writerow((
                 current_date_1,
                 current_date,
