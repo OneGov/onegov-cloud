@@ -123,6 +123,9 @@ def get_frameworks_asset():
     yield 'react-dom.js'
     yield 'form_dependencies.js'
     yield 'confirm.jsx'
+    yield 'jquery.datetimepicker.css'
+    yield 'jquery.datetimepicker.js'
+    yield 'datetimepicker.js'
 
 
 @WtfsApp.webasset('common')

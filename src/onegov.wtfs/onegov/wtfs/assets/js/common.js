@@ -61,6 +61,11 @@ var processCommonNodes = function(elements, out_of_band) {
     // Make sure files open in another window
     targets.find('.page-text a[href*="/datei/"]').attr('target', '_blank');
 
+    // set the language of the date picker
+    jQuery.datetimepicker.setLocale(
+        targets.find('html').attr('lang').split('-')[0]
+    );
+
     // sort tables wishing to be sorted (when not using tablesaw)
     targets.find('table:not(.tablesaw).sortable').tablesorter();
 
