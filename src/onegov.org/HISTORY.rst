@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Downgrades raven.js to 3.26.2.
+  [href]
+
 1.1.10 (2019-03-22)
 ~~~~~~~~~~~~~~~~~~~
 
