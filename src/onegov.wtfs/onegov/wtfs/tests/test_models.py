@@ -6,6 +6,7 @@ from onegov.wtfs.models import DailyListBoxesAndForms
 from onegov.wtfs.models import Invoice
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import Notification
+from onegov.wtfs.models import PaymentType
 from onegov.wtfs.models import PickupDate
 from onegov.wtfs.models import Principal
 from onegov.wtfs.models import ReportBoxes
@@ -21,13 +22,31 @@ def test_principal():
     assert principal
 
 
+def test_payment_type(session):
+    session.add(PaymentType(name='normal', _price_per_quantity=700))
+    session.flush()
+
+    payment_type = session.query(PaymentType).one()
+    assert payment_type.name == 'normal'
+    assert payment_type._price_per_quantity == 700
+    assert payment_type.price_per_quantity == 7.0
+
+    payment_type.price_per_quantity = 8.5
+    assert payment_type._price_per_quantity == 850
+    assert payment_type.price_per_quantity == 8.5
+
+
 def test_municipality(session):
+    session.add(PaymentType(name='normal', _price_per_quantity=700))
+    session.add(PaymentType(name='spezial', _price_per_quantity=850))
+
     session.add(
         Municipality(
             name='Winterthur',
             bfs_number=230,
             address_supplement='Zusatz',
-            gpn_number=1120
+            gpn_number=1120,
+            payment_type='normal'
         )
     )
     session.flush()
@@ -37,13 +56,14 @@ def test_municipality(session):
     assert municipality.bfs_number == 230
     assert municipality.address_supplement == 'Zusatz'
     assert municipality.gpn_number == 1120
-    assert municipality._price_per_quantity == 700
     assert municipality.price_per_quantity == 7.0
     assert not municipality.has_data
 
-    municipality.price_per_quantity = 8.5
-    assert municipality._price_per_quantity == 850
+    municipality.payment_type = 'spezial'
     assert municipality.price_per_quantity == 8.5
+
+    municipality.payment_type = 'invalid'
+    assert municipality.price_per_quantity == 0
 
     # PickupDate
     session.add(
@@ -522,12 +542,16 @@ def test_notification(session):
 
 
 def test_invoice(session):
+    session.add(PaymentType(name='normal', _price_per_quantity=700))
+    session.add(PaymentType(name='spezial', _price_per_quantity=850))
+
     session.add(
         Municipality(
             name='Adlikon',
             address_supplement='Finkenweg',
             gpn_number=8882255,
             bfs_number=21,
+            payment_type='normal'
         )
     )
     session.add(
@@ -536,6 +560,7 @@ def test_invoice(session):
             address_supplement='Meisenweg',
             gpn_number=9993344,
             bfs_number=241,
+            payment_type='spezial'
         )
     )
     session.flush()
@@ -687,7 +712,7 @@ def test_invoice(session):
             '9993344,'
             '21000,'
             '3,'
-            '70000000,70000000,'
+            '85000000,85000000,'
             '1,'
             '31.12.2019,'
             'Meisenweg,'

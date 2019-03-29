@@ -10,6 +10,7 @@ def test_views_municipality(client):
     add = client.get('/municipalities').click(href='/add')
     add.form['name'] = "Adlikon"
     add.form['bfs_number'] = '21'
+    add.form['payment_type'] = 'normal'
     added = add.form.submit().follow()
     assert "hinzugefügt." in added
     assert "Adlikon" in added
@@ -18,20 +19,22 @@ def test_views_municipality(client):
     view = client.get('/municipalities').click("Adlikon")
     assert "Adlikon" in view
     assert "21" in view
-    assert "7.0" in view
+    assert "Normal" in view
+    assert "7.00" in view
 
     # Edit the municipality
     edit = view.click("Bearbeiten")
     edit.form['name'] = "Aesch"
     edit.form['bfs_number'] = '241'
-    edit.form['price_per_quantity'] = '21.25'
+    edit.form['payment_type'] = 'spezial'
     edit.form['address_supplement'] = "Zusatz"
     edit.form['gpn_number'] = "12321"
     edited = edit.form.submit().follow()
     assert "geändert." in edited
     assert "Aesch" in edited
     view = edited.click("Aesch")
-    assert "21.25" in view
+    assert "Spezial" in view
+    assert "8.50" in view
     assert "12321" in view
 
     # Upload some dates
@@ -65,6 +68,7 @@ def test_views_municipality_permissions(mock_method, client):
     add = client.get('/municipalities').click(href='/add')
     add.form['name'] = "Adlikon"
     add.form['bfs_number'] = '21'
+    add.form['payment_type'] = 'normal'
     assert "hinzugefügt." in add.form.submit().follow()
     id = client.get('/municipalities')\
         .click("Adlikon").request.url.split('/')[-1]

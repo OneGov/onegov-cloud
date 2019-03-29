@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-28 11:02+0100\n"
-"PO-Revision-Date: 2019-03-28 11:02+0100\n"
+"POT-Creation-Date: 2019-03-29 13:33+0100\n"
+"PO-Revision-Date: 2019-03-29 13:33+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -59,8 +59,8 @@ msgstr "Adresszusatz"
 msgid "GPN number"
 msgstr "GPN-Nummer"
 
-msgid "Price per quantity"
-msgstr "Preis pro Menge"
+msgid "Payment type"
+msgstr "Zahlungsart"
 
 msgid "File"
 msgstr "Datei"
@@ -196,6 +196,9 @@ msgstr "CS2 Benutzer"
 msgid "Subject"
 msgstr "Betreff"
 
+msgid "Price per quantity"
+msgstr "Preis pro Menge"
+
 msgid "Accounting unit"
 msgstr "Kostenstelle"
 
@@ -289,6 +292,9 @@ msgstr "Scan-Aufträge"
 
 msgid "Invoices"
 msgstr "Rechnungen"
+
+msgid "Manage payment types"
+msgstr "Zahlungsarten verwalten"
 
 msgid "Add scan job"
 msgstr "Scan-Auftrag hinzufügen"
@@ -547,6 +553,9 @@ msgstr "Gemeinde geändert."
 
 msgid "Pick-up dates deleted."
 msgstr "Abholtermine gelöscht."
+
+msgid "Payment types modified."
+msgstr "Zahlungsarten geändert."
 
 msgid "Scan job deleted."
 msgstr "Scan-Auftrag gelöscht."

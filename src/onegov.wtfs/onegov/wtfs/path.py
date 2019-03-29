@@ -6,6 +6,7 @@ from onegov.user import UserCollection
 from onegov.wtfs.app import WtfsApp
 from onegov.wtfs.collections import MunicipalityCollection
 from onegov.wtfs.collections import NotificationCollection
+from onegov.wtfs.collections import PaymentTypeCollection
 from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.models import DailyList
 from onegov.wtfs.models import DailyListBoxes
@@ -244,3 +245,11 @@ def get_notification(request, id):
 )
 def get_invoice(request):
     return Invoice(request.session)
+
+
+@WtfsApp.path(
+    model=PaymentTypeCollection,
+    path='/payment-types'
+)
+def get_payment_types(request):
+    return PaymentTypeCollection(request.session)

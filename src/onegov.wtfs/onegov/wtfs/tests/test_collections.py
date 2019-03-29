@@ -1,8 +1,21 @@
 from datetime import date
 from onegov.wtfs.collections import MunicipalityCollection
 from onegov.wtfs.collections import NotificationCollection
+from onegov.wtfs.collections import PaymentTypeCollection
 from onegov.wtfs.collections import ScanJobCollection
 from uuid import uuid4
+
+
+def test_payment_types(session):
+    payment_types = PaymentTypeCollection(session)
+    payment_type = payment_types.add(
+        name='normal',
+        _price_per_quantity=700
+    )
+
+    assert payment_type.name == 'normal'
+    assert payment_type._price_per_quantity == 700
+    assert payment_type.price_per_quantity == 7.0
 
 
 def test_municipalities(session):

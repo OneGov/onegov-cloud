@@ -14,6 +14,7 @@ from onegov.wtfs.layouts.notification import AddNotificationLayout
 from onegov.wtfs.layouts.notification import EditNotificationLayout
 from onegov.wtfs.layouts.notification import NotificationLayout
 from onegov.wtfs.layouts.notification import NotificationsLayout
+from onegov.wtfs.layouts.payment_type import PaymentTypesLayout
 from onegov.wtfs.layouts.report import ReportBoxesAndFormsByDeliveryLayout
 from onegov.wtfs.layouts.report import ReportBoxesAndFormsLayout
 from onegov.wtfs.layouts.report import ReportBoxesLayout
@@ -34,7 +35,6 @@ __all__ = (
     'AddMunicipalityLayout',
     'AddNotificationLayout',
     'AddScanJobLayout',
-
     'AddUserLayout',
     'DailyListBoxesAndFormsLayout',
     'DailyListBoxesLayout',
@@ -53,6 +53,7 @@ __all__ = (
     'MunicipalityLayout',
     'NotificationLayout',
     'NotificationsLayout',
+    'PaymentTypesLayout',
     'ReportBoxesAndFormsByDeliveryLayout',
     'ReportBoxesAndFormsLayout',
     'ReportBoxesLayout',

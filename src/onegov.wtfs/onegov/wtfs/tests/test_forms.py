@@ -6,6 +6,7 @@ from mock import MagicMock
 from onegov.user import User
 from onegov.user import UserCollection
 from onegov.wtfs.collections import MunicipalityCollection
+from onegov.wtfs.collections import PaymentTypeCollection
 from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.forms import AddScanJobForm
 from onegov.wtfs.forms import CreateInvoicesForm
@@ -16,6 +17,7 @@ from onegov.wtfs.forms import ImportMunicipalityDataForm
 from onegov.wtfs.forms import MunicipalityForm
 from onegov.wtfs.forms import MunicipalityIdSelectionForm
 from onegov.wtfs.forms import NotificationForm
+from onegov.wtfs.forms import PaymentTypesForm
 from onegov.wtfs.forms import ReportSelectionForm
 from onegov.wtfs.forms import ScanJobsForm
 from onegov.wtfs.forms import UnrestrictedScanJobForm
@@ -67,35 +69,89 @@ class PostData(dict):
         return v
 
 
-def test_municipality_form(session):
-    municipalities = MunicipalityCollection(session)
-    municipality = municipalities.add(name="Boppelsen", bfs_number=82)
+def test_payments_form(session):
+    model = PaymentTypeCollection(session)
+    request = Request(session)
+
+    form = PaymentTypesForm.get_form_class(model, request)()
+    assert [field for field in form] == []
+
+    model.add(name='normal', _price_per_quantity=700)
+    model.add(name='spezial', _price_per_quantity=850)
+    form = PaymentTypesForm.get_form_class(model, request)()
+    assert [(field.name, field.type) for field in form] == [
+        ('normal', 'FloatField'), ('spezial', 'FloatField')
+    ]
 
     # Test apply / update
+    form.apply_model(model)
+    assert form.normal.data == 7.0
+    assert form.spezial.data == 8.5
+
+    form.normal.data = 8.0
+    form.spezial.data = 9
+
+    form.update_model(model)
+    assert {r.name: r.price_per_quantity for r in model.query()} == {
+        'normal': 8.0, 'spezial': 9.0
+    }
+
+    # Test validation
+    form = PaymentTypesForm.get_form_class(model, request)(
+        PostData({
+            'normal': 10.0,
+            'spezial': 12.6,
+        })
+    )
+    form.request = Request(session)
+    assert form.validate()
+
+
+def test_municipality_form(session):
+    payment_types = PaymentTypeCollection(session)
+    payment_types.add(name='normal', _price_per_quantity=700)
+    payment_types.add(name='spezial', _price_per_quantity=850)
+
+    municipalities = MunicipalityCollection(session)
+    municipality = municipalities.add(
+        name="Boppelsen",
+        bfs_number=82,
+        payment_type='normal'
+    )
+
+    # Test choices
     form = MunicipalityForm()
+    form.request = Request(session)
+    form.on_request()
+    assert form.payment_type.choices == [
+        ('normal', 'Normal'), ('spezial', 'Spezial')
+    ]
+
+    # Test apply / update
     form.apply_model(municipality)
     assert form.name.data == "Boppelsen"
     assert form.bfs_number.data == 82
     assert form.address_supplement.data is None
     assert form.gpn_number.data is None
-    assert form.price_per_quantity.data == 7.0
+    assert form.payment_type.data == 'normal'
 
     form.name.data = "Adlikon"
     form.bfs_number.data = 21
     form.address_supplement.data = "Zusatz"
     form.gpn_number.data = 1122
-    form.price_per_quantity.data = 8.5
+    form.payment_type.data = 'spezial'
 
     form.update_model(municipality)
     assert municipality.name == "Adlikon"
     assert municipality.bfs_number == 21
     assert municipality.address_supplement == "Zusatz"
     assert municipality.gpn_number == 1122
-    assert municipality.price_per_quantity == 8.5
+    assert municipality.payment_type == 'spezial'
 
     # Test validation
     form = MunicipalityForm()
     form.request = Request(session)
+    form.on_request()
     assert not form.validate()
 
     form = MunicipalityForm(
@@ -104,16 +160,18 @@ def test_municipality_form(session):
         })
     )
     form.request = Request(session)
+    form.on_request()
     assert not form.validate()
 
     form = MunicipalityForm(
         PostData({
             'name': "Boppelsen",
             'bfs_number': '82',
-            'price_per_quantity': 5.0
+            'payment_type': 'normal'
         })
     )
     form.request = Request(session)
+    form.on_request()
     assert form.validate()
 
 

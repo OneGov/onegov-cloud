@@ -4,6 +4,7 @@ from onegov.wtfs.models.daily_list import DailyListBoxesAndForms
 from onegov.wtfs.models.invoice import Invoice
 from onegov.wtfs.models.municipality import Municipality
 from onegov.wtfs.models.notification import Notification
+from onegov.wtfs.models.payment_type import PaymentType
 from onegov.wtfs.models.pickup_date import PickupDate
 from onegov.wtfs.models.principal import Principal
 from onegov.wtfs.models.report import Report
@@ -21,6 +22,7 @@ __all__ = (
     'Invoice',
     'Municipality',
     'Notification',
+    'PaymentType',
     'PickupDate',
     'Principal',
     'Report',

@@ -5,6 +5,7 @@ from onegov.wtfs.forms.municipality import ImportMunicipalityDataForm
 from onegov.wtfs.forms.municipality import MunicipalityForm
 from onegov.wtfs.forms.municipality import MunicipalityIdSelectionForm
 from onegov.wtfs.forms.notification import NotificationForm
+from onegov.wtfs.forms.payment_type import PaymentTypesForm
 from onegov.wtfs.forms.report import ReportSelectionForm
 from onegov.wtfs.forms.scan_job import AddScanJobForm
 from onegov.wtfs.forms.scan_job import EditScanJobForm
@@ -25,11 +26,11 @@ __all__ = (
     'MunicipalityForm',
     'MunicipalityIdSelectionForm',
     'NotificationForm',
+    'PaymentTypesForm',
     'ReportSelectionForm',
     'ScanJobsForm',
     'UnrestrictedScanJobForm',
     'UnrestrictedScanJobsForm',
     'UnrestrictedUserForm',
     'UserForm',
-
 )

@@ -4,6 +4,7 @@ from onegov.core.crypto import hash_password
 from onegov.user import User
 from onegov.wtfs import WtfsApp
 from onegov.wtfs.models import Municipality
+from onegov.wtfs.models import PaymentType
 from onegov.wtfs.models import Principal
 from pytest import fixture
 from transaction import commit
@@ -32,10 +33,13 @@ def create_wtfs_app(request, temporary_path):
 
     session = app.session()
     group_id = uuid4()
+    session.add(PaymentType(name='normal', _price_per_quantity=700))
+    session.add(PaymentType(name='spezial', _price_per_quantity=850))
     session.add(Municipality(
         id=group_id,
         name='My Municipality',
-        bfs_number=1
+        bfs_number=1,
+        payment_type='normal'
     ))
     session.add(User(
         realname='Admin',

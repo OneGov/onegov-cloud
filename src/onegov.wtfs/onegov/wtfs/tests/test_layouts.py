@@ -3,6 +3,7 @@ from onegov.user import User
 from onegov.user import UserCollection
 from onegov.wtfs.collections import MunicipalityCollection
 from onegov.wtfs.collections import NotificationCollection
+from onegov.wtfs.collections import PaymentTypeCollection
 from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.layouts import AddMunicipalityLayout
 from onegov.wtfs.layouts import AddNotificationLayout
@@ -25,6 +26,7 @@ from onegov.wtfs.layouts import MunicipalitiesLayout
 from onegov.wtfs.layouts import MunicipalityLayout
 from onegov.wtfs.layouts import NotificationLayout
 from onegov.wtfs.layouts import NotificationsLayout
+from onegov.wtfs.layouts import PaymentTypesLayout
 from onegov.wtfs.layouts import ReportBoxesAndFormsByDeliveryLayout
 from onegov.wtfs.layouts import ReportBoxesAndFormsLayout
 from onegov.wtfs.layouts import ReportBoxesLayout
@@ -157,6 +159,7 @@ def test_default_layout(wtfs_app):
     assert layout.users_url == 'UserCollection/'
     assert layout.municipalities_url == 'MunicipalityCollection/'
     assert layout.scan_jobs_url == 'ScanJobCollection/'
+    assert layout.payment_types_url == 'PaymentTypeCollection/'
     assert layout.current_year == date.today().year
 
     # Login
@@ -618,6 +621,7 @@ def test_notification_layouts():
 
 def test_invoice_layouts(session):
     request = DummyRequest()
+    request_admin = DummyRequest(roles=['admin'])
 
     model = Invoice(session)
     layout = InvoiceLayout(model, request)
@@ -626,3 +630,24 @@ def test_invoice_layouts(session):
     assert path(layout.breadcrumbs) == 'DummyPrincipal/Invoice'
     assert layout.cancel_url == 'Invoice/'
     assert layout.success_url == 'Invoice/'
+
+    layout = InvoiceLayout(model, request_admin)
+    assert list(hrefs(layout.editbar_links)) == [
+        'PaymentTypeCollection/',
+    ]
+
+
+def test_payments_type_layouts(session):
+    request = DummyRequest()
+    request_admin = DummyRequest(roles=['admin'])
+
+    model = PaymentTypeCollection(session)
+    layout = PaymentTypesLayout(model, request)
+    assert layout.title == 'Manage payment types'
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/PaymentTypeCollection'
+    assert layout.cancel_url == 'Invoice/'
+    assert layout.success_url == 'Invoice/'
+
+    layout = PaymentTypesLayout(model, request_admin)
+    assert layout.editbar_links == []

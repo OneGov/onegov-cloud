@@ -11,6 +11,7 @@ def test_views_daily_job(client):
     add = client.get('/municipalities').click(href='/add')
     add.form['name'] = "My Municipality"
     add.form['bfs_number'] = '1'
+    add.form['payment_type'] = 'normal'
     assert "My Municipality" in add.form.submit().follow()
 
     upload = client.get('/municipalities').click("Daten importieren")

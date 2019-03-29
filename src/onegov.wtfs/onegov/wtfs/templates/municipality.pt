@@ -14,8 +14,11 @@
                     <dt i18n:translate>GPN number</dt>
                     <dd>${layout.model.gpn_number}</dd>
 
+                    <dt i18n:translate>Payment type</dt>
+                    <dd>${(layout.model.payment_type or '').capitalize()}</dd>
+
                     <dt i18n:translate>Price per quantity</dt>
-                    <dd>${layout.model.price_per_quantity or ''}</dd>
+                    <dd>${layout.format_number(layout.model.price_per_quantity or 0)}</dd>
 
                     <dt i18n:translate>Users</dt>
                     <dd tal:repeat="user layout.model.users">

@@ -7,6 +7,7 @@ from onegov.user import UserCollection
 from onegov.wtfs import _
 from onegov.wtfs.collections import MunicipalityCollection
 from onegov.wtfs.collections import NotificationCollection
+from onegov.wtfs.collections import PaymentTypeCollection
 from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.models import DailyList
 from onegov.wtfs.models import Invoice
@@ -115,6 +116,10 @@ class DefaultLayout(ChameleonLayout):
     @cached_property
     def notifications_url(self):
         return self.request.link(NotificationCollection(self.request.session))
+
+    @cached_property
+    def payment_types_url(self):
+        return self.request.link(PaymentTypeCollection(self.request.session))
 
     @cached_property
     def cancel_url(self):

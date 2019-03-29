@@ -9,6 +9,7 @@ def test_views_user(client):
     add = client.get('/municipalities').click(href='/add')
     add.form['name'] = "Adlikon"
     add.form['bfs_number'] = '1'
+    add.form['payment_type'] = 'normal'
     assert "Adlikon" in add.form.submit().follow()
 
     # Add a user

@@ -126,6 +126,7 @@ header {
         .edit-icon::before { @include icon('\f040'); }
         .municipality-icon::before { @include icon('\f0c0'); }
         .notification-icon::before { @include icon('\f071'); }
+        .payment-icon::before { @include icon('\f0d6'); }
         .print-icon::before { @include icon('\f02f'); }
         .scan-job-icon::before { @include icon('\f0c5'); }
         .upload-icon::before { @include icon('\f093'); }

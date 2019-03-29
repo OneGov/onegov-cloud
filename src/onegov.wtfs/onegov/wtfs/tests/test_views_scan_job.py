@@ -193,6 +193,7 @@ def test_views_scan_jobs_permissions(mock_method, client):
     add = client.get('/municipalities').click(href='/add')
     add.form['name'] = "My Municipality"
     add.form['bfs_number'] = '1'
+    add.form['payment_type'] = 'normal'
     assert "My Municipality" in add.form.submit().follow()
 
     with freeze_time("2019-01-01"):

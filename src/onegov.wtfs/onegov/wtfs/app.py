@@ -5,6 +5,7 @@ from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.wtfs.collections import MunicipalityCollection
 from onegov.wtfs.models import Principal
+from onegov.wtfs.models import PaymentType
 from onegov.wtfs.theme import WtfsTheme
 
 
@@ -51,6 +52,8 @@ class WtfsApp(Framework, FormApp, DepotApp):
                 name=name,
                 bfs_number=bfs_number
             )
+        session.add(PaymentType(name='normal', _price_per_quantity=700))
+        session.add(PaymentType(name='spezial', _price_per_quantity=850))
 
 
 @WtfsApp.static_directory()
