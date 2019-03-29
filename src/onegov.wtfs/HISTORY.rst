@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.6 (2019-03-29)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds payment types.
   [msom]
