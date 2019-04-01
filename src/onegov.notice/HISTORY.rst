@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds notes to notices.
+  [msom]
+
 0.10.0 (2018-12-04)
 ~~~~~~~~~~~~~~~~~~~
 

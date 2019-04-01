@@ -86,6 +86,9 @@ class OfficialNotice(Base, ContentMixin, TimestampMixin):
     #: The date (part of the signature)
     author_date = Column(UTCDateTime, nullable=True)
 
+    #: A note to the notice.
+    note = Column(Text, nullable=True)
+
     #: The issues this notice appears in.
     _issues = Column(
         MutableDict.as_mutable(HSTORE), name='issues', nullable=True

@@ -85,3 +85,12 @@ def add_expiry_date_column_to_notices(context):
             'official_notices',
             Column('expiry_date', UTCDateTime, nullable=True)
         )
+
+
+@upgrade_task('Add note column to official notices')
+def add_note_to_notices(context):
+    if not context.has_column('official_notices', 'note'):
+        context.operations.add_column(
+            'official_notices',
+            Column('note', Text, nullable=True)
+        )
