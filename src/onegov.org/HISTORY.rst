@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes date-error when returning to a datetime-picker on Safari.
+  [href]
+
 1.1.12 (2019-04-01)
 ~~~~~~~~~~~~~~~~~~~
 

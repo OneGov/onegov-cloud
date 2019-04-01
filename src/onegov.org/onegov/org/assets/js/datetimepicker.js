@@ -238,7 +238,7 @@ var setup_datetimepicker = function(type, selector, onChange, extraOptions) {
                 // the back button (Safari)
                 _.defer(function() {
                     field.val(oldval);
-                    form.data('submitted', false);
+                    form.data('submitted-' + selector, false);
                 });
 
                 return true;
