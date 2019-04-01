@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.10.0 (2019-04-01)
+~~~~~~~~~~~~~~~~~~~~
 
 - Adds vCards for memberships.
   [msom]
