@@ -228,6 +228,11 @@ class UnrestrictedNoticeForm(NoticeForm):
 
     """
 
+    note = TextAreaField(
+        label=_("Note"),
+        render_kw={'rows': 3},
+    )
+
     def on_request(self):
         session = self.request.session
         layout = Layout(None, self.request)
@@ -285,8 +290,13 @@ class UnrestrictedNoticeForm(NoticeForm):
         model.author_name = self.author_name.data
         model.at_cost = self.at_cost.data == 'yes'
         model.billing_address = self.billing_address.data
+        model.note = self.note.data
         if model.state != 'published':
             model.issues = self.issues.data
         if self.phone_number.data and model.user:
             model.user.phone_number = self.phone_number.formatted_data
         model.apply_meta(self.request.session)
+
+    def apply_model(self, model):
+        super().apply_model(model)
+        self.note.data = model.note

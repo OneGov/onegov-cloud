@@ -635,6 +635,7 @@ def test_unrestricted_notice_form(session, categories, organizations, issues):
     notice = GazetteNotice(title='Title', text='A <b>text</b>.')
     notice.organization_id = '200'
     notice.category_id = '13'
+    notice.note = 'note'
     notice.issues = ['2017-43']
     notice.user = user
 
@@ -649,6 +650,7 @@ def test_unrestricted_notice_form(session, categories, organizations, issues):
     assert form.text.data == 'A <b>text</b>.'
     assert form.issues.data == ['2017-43']
     assert form.phone_number.data == '+41415554433'
+    assert form.note.data == 'note'
 
     form.title.data = 'Notice'
     form.organization.data = '300'
@@ -656,6 +658,7 @@ def test_unrestricted_notice_form(session, categories, organizations, issues):
     form.text.data = 'A <b>notice</b>.'
     form.issues.data = ['2017-44']
     form.phone_number.data = '796662211'
+    form.note.data = 'A note'
 
     form.update_model(notice)
     assert notice.title == 'Notice'
@@ -664,6 +667,7 @@ def test_unrestricted_notice_form(session, categories, organizations, issues):
     assert notice.text == 'A <b>notice</b>.'
     assert notice.issues == {'2017-44': None}
     assert notice.first_issue == standardize_date(datetime(2017, 11, 3), 'UTC')
+    assert notice.note == 'A note'
     assert user.phone_number == '+41796662211'
 
     notice.state = 'published'

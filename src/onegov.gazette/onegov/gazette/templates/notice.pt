@@ -87,6 +87,11 @@
                     </div>
                 </div>
 
+                <tal:block tal:condition="publisher and notice.note">
+                    <h3 i18n:translate>Note</h3>
+                    <p tal:content="structure layout.format_text(notice.note)"></p>
+                </tal:block>
+
                 <h3 i18n:translate>Changes</h3>
                 <table class="changes stackable">
                     <thead>

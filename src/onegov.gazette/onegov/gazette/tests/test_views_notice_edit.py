@@ -239,11 +239,14 @@ def test_view_notice_edit_unrestricted(gazette_app):
         accept_notice(publisher, 'notice')
     with freeze_time(future):
         edit_notice_unrestricted(editor_1, 'notice', forbidden=True)
-        edit_notice_unrestricted(publisher, 'notice', author_name='No one')
+        edit_notice_unrestricted(publisher, 'notice', author_name='No one',
+                                 note='A note.')
         edit_notice_unrestricted(admin, 'notice', title='unres_accepted')
-        notice = editor_1.get('/notice/notice')
-        assert 'No one' in notice
-        assert 'unres_accepted' in notice
+
+        assert 'No one' in editor_1.get('/notice/notice')
+        assert 'unres_accepted' in editor_1.get('/notice/notice')
+        assert 'A note.' not in editor_1.get('/notice/notice')
+        assert 'A note.' in publisher.get('/notice/notice')
 
         for user in (publisher, admin):
             manage = user.get('/notice/notice/edit-unrestricted')

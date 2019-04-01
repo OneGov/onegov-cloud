@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a note to notices for publishers for when editing unrestricted.
+  [msom]
+
 1.22.6 (2019-03-25)
 ~~~~~~~~~~~~~~~~~~~~
 
