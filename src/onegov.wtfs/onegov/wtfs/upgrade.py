@@ -5,7 +5,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 from onegov.core.upgrade import upgrade_task
 
 
-@upgrade_task('Add payment types', always_run=True)
+@upgrade_task('Add payment types')
 def add_payment_types(context):
     session = context.session
 
