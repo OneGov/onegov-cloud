@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.1.12 (2019-04-01)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes image upload in events not working.
   [href]
 
