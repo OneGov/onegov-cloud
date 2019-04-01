@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.1 (2019-04-01)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Adds GIS information to roadworks directory.
   [href]
 
