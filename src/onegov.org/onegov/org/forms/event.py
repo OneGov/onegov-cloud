@@ -158,6 +158,37 @@ class EventForm(Form):
         render_kw={'class_': 'many many-dates'},
     )
 
+    @property
+    def start(self):
+        return replace_timezone(
+            datetime(
+                self.start_date.data.year,
+                self.start_date.data.month,
+                self.start_date.data.day,
+                self.start_time.data.hour,
+                self.start_time.data.minute
+            ),
+            self.timezone
+        )
+
+    @property
+    def end(self):
+        end_date = self.start_date.data
+
+        if self.end_time.data <= self.start_time.data:
+            end_date += timedelta(days=1)
+
+        return replace_timezone(
+            datetime(
+                end_date.year,
+                end_date.month,
+                end_date.day,
+                self.end_time.data.hour,
+                self.end_time.data.minute
+            ),
+            self.timezone
+        )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.date_errors = {}
@@ -225,32 +256,9 @@ class EventForm(Form):
 
         model.meta = model.meta or {}
         model.meta['submitter_email'] = self.email.data
-        model.timezone = 'Europe/Zurich'
-
-        model.start = replace_timezone(
-            datetime(
-                self.start_date.data.year,
-                self.start_date.data.month,
-                self.start_date.data.day,
-                self.start_time.data.hour,
-                self.start_time.data.minute
-            ),
-            model.timezone
-        )
-        end_date = self.start_date.data
-        if self.end_time.data <= self.start_time.data:
-            end_date += timedelta(days=1)
-
-        model.end = replace_timezone(
-            datetime(
-                end_date.year,
-                end_date.month,
-                end_date.day,
-                self.end_time.data.hour,
-                self.end_time.data.minute
-            ),
-            model.timezone
-        )
+        model.timezone = self.timezone
+        model.start = self.start
+        model.end = self.end
 
         if self.repeat.data == 'without':
             self.recurrence = None

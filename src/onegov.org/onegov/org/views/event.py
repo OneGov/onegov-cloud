@@ -108,23 +108,15 @@ def handle_new_event(self, request, form):
     )
 
     if form.submitted(request):
-        model = Event()
-        form.populate_obj(model)
-
-        model.meta.update({'session_id': get_session_id(request)})
-
         event = EventCollection(self.session).add(
-            title=model.title,
-            start=model.start,
-            end=model.end,
-            timezone=model.timezone,
-            recurrence=model.recurrence,
-            tags=model.tags,
-            location=model.location,
-            content=model.content,
-            coordinates=model.coordinates,
-            meta=model.meta
+            title=form.title.data,
+            start=form.start,
+            end=form.end,
+            timezone=form.timezone,
         )
+
+        event.meta.update({'session_id': get_session_id(request)})
+        form.populate_obj(event)
 
         return morepath.redirect(request.link(event))
 
