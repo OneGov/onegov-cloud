@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.11.0 (2019-04-01)
+~~~~~~~~~~~~~~~~~~~
 
 - Use a minor release for the latest changes.
   [msom]
