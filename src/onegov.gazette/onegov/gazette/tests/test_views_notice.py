@@ -3,6 +3,7 @@ from io import BytesIO
 from onegov.gazette.models import GazetteNotice
 from onegov.gazette.tests.common import accept_notice
 from onegov.gazette.tests.common import edit_notice
+from onegov.gazette.tests.common import edit_notice_unrestricted
 from onegov.gazette.tests.common import login_users
 from onegov.gazette.tests.common import publish_issue
 from onegov.gazette.tests.common import reject_notice
@@ -745,6 +746,9 @@ def test_view_notice_copy(gazette_app):
         submit_notice(editor_1, 'erneuerungswahlen')
         accept_notice(publisher, 'erneuerungswahlen')
 
+    with freeze_time("2017-10-01 12:00"):
+        edit_notice_unrestricted(publisher, 'erneuerungswahlen', note='NOTE!')
+
     with freeze_time("2018-01-01 12:00"):
         for user in (editor_1, editor_2, editor_3, publisher):
             manage = user.get('/notice/erneuerungswahlen').click("Kopieren")
@@ -759,3 +763,8 @@ def test_view_notice_copy(gazette_app):
 
             assert "Erneuerungswahlen" in user.get('/dashboard')
             assert "Erneuerungswahlen" in user.get('/notices/drafted')
+
+        "NOTE!" in publisher.get('/notice/erneuerungswahlen-1')
+        "NOTE!" in publisher.get('/notice/erneuerungswahlen-2')
+        "NOTE!" in publisher.get('/notice/erneuerungswahlen-3')
+        "NOTE!" in publisher.get('/notice/erneuerungswahlen-4')
