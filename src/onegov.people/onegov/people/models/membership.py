@@ -87,3 +87,22 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable):
         query = query.order_by(self.__class__.order)
         query = query.filter(self.__class__.agency == self.agency)
         return query
+
+    def vcard(self, exclude=None):
+        """ Returns the person as vCard (3.0).
+
+        Allows to specify the included attributes, provides a reasonable
+        default if none are specified. Always includes the first and last
+        name.
+
+        """
+        if not self.person:
+            return ''
+
+        result = self.person.vcard_object(exclude, include_memberships=False)
+
+        line = result.add('org')
+        line.value = [f"{self.agency.title}, {self.title}"]
+        line.charset_param = 'utf-8'
+
+        return result.serialize()

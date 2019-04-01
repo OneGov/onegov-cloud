@@ -109,8 +109,8 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable):
     #: some remarks about the person
     notes = Column(Text, nullable=True)
 
-    def vcard(self, exclude=None):
-        """ Returns the person as vCard (3.0).
+    def vcard_object(self, exclude=None, include_memberships=True):
+        """ Returns the person as vCard (3.0) object.
 
         Allows to specify the included attributes, provides a reasonable
         default if none are specified. Always includes the first and last
@@ -178,12 +178,23 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable):
         memberships = [
             ', '.join((m.agency.title, m.title)) for m in self.memberships
         ]
-        if memberships:
+        if memberships and include_memberships:
             line = result.add('org')
             line.value = memberships
             line.charset_param = 'utf-8'
 
-        return result.serialize()
+        return result
+
+    def vcard(self, exclude=None):
+        """ Returns the person as vCard (3.0).
+
+        Allows to specify the included attributes, provides a reasonable
+        default if none are specified. Always includes the first and last
+        name.
+
+        """
+
+        return self.vcard_object(exclude).serialize()
 
     @property
     def memberships_by_agency(self):

@@ -53,7 +53,7 @@ def test_person(session):
     assert person.spoken_title == "Hans Maulwurf"
 
 
-def test_person_vcard(session):
+def test_vcard(session):
     person = Person(
         salutation="Mr.",
         academic_title="Dr.",
@@ -92,7 +92,10 @@ def test_person_vcard(session):
     assert "NOTE;CHARSET=utf-8:" not in vcard
     assert "END:VCARD" in vcard
 
-    vcard = person.vcard((
+    vcard = person.vcard_object(include_memberships=False).serialize()
+    assert "ORG;CHARSET=utf-8:Agency\\, Membership" not in vcard
+
+    vcard = person.vcard(exclude=(
         'academic_title',
         'function',
         'picture_url',
@@ -113,6 +116,22 @@ def test_person_vcard(session):
     assert "TITLE;CHARSET=utf-8:" not in vcard
     assert "URL:" not in vcard
     assert "NOTE;CHARSET=utf-8:Has bad vision." in vcard
+    assert "END:VCARD" in vcard
+
+    vcard = person.memberships[0].vcard()
+    assert "BEGIN:VCARD" in vcard
+    assert "VERSION:3.0" in vcard
+    assert "ADR;CHARSET=utf-8:;;Fakestreet 1\\, Springfield;;;;" in vcard
+    assert "EMAIL:han.maulwurf@springfield.com" in vcard
+    assert "FN;CHARSET=utf-8:Dr. Hans Maulwurf" in vcard
+    assert "N;CHARSET=utf-8:Maulwurf;Hans;;Dr.;" in vcard
+    assert "ORG;CHARSET=utf-8:Agency\\, Membership" in vcard
+    assert "PHOTO:https://thats.me/hans-maulwurf/picture" in vcard
+    assert "TEL:11122334455" in vcard
+    assert "TEL:11122334456" in vcard
+    assert "TITLE;CHARSET=utf-8:Director" in vcard
+    assert "URL:https://thats.me/hans-maulwurf" in vcard
+    assert "NOTE;CHARSET=utf-8:" not in vcard
     assert "END:VCARD" in vcard
 
 
