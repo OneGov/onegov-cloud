@@ -16,17 +16,6 @@
             </div>
             <div class="columns medium-4">
 
-                <div tal:condition="True" class="person-exports borderless-side-panel">
-                    <h2 i18n:translate>Exports</h2>
-                    <ul class="person-export-list">
-                        <li>
-                            <a href="${request.link(person, 'vcard')}" target="_blank"  i18n:translate>
-                                Export a vCard of this person
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-
                 <div class="submit-yours">
                    <dl>
                        <dt>

@@ -6,6 +6,27 @@
 
         <metal:hint use-macro="layout.macros['hidden_from_public_hint_long']" tal:define="item membership"/>
 
-        <div metal:use-macro="layout.macros['membership_card']" />
+        <div class="row">
+
+            <div class="columns medium-8">
+
+                <div metal:use-macro="layout.macros['membership_card']" />
+
+            </div>
+            <div class="columns medium-4">
+
+                <div class="membership-exports borderless-side-panel">
+                    <h2 i18n:translate>Exports</h2>
+                    <ul class="membership-export-list">
+                        <li>
+                            <a href="${request.link(membership, 'vcard')}" target="_blank"  i18n:translate>
+                                Export a vCard of this person
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
     </tal:block>
 </div>

@@ -146,7 +146,8 @@
 
                         <tal:block tal:repeat="membership memberships">
                             <dd tal:condition="not membership.is_hidden_from_public or request.is_logged_in" class="person-card-membership">
-                                <a href="${request.link(membership.agency)}" title="${layout.agency_path(membership.agency)|None}">${membership.agency.title}</a> - ${membership.title}
+                                <a href="${request.link(membership.agency)}" title="${layout.agency_path(membership.agency)|None}">${membership.agency.title}</a> -
+                                <a href="${request.link(membership)}">${membership.title}</a>
                             </dd>
                         </tal:block>
                     </dl>

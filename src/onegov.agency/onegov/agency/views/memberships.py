@@ -1,4 +1,5 @@
 from morepath import redirect
+from morepath.request import Response
 from onegov.agency import _
 from onegov.agency import AgencyApp
 from onegov.agency.forms import MembershipForm
@@ -74,3 +75,20 @@ def delete_membership(self, request):
 def move_membership(self, request):
     request.assert_valid_csrf_token()
     self.execute()
+
+
+@AgencyApp.view(
+    model=AgencyMembership,
+    name='vcard',
+    permission=Public
+)
+def vcard_export_membership(self, request):
+    """ Returns the memberships vCard. """
+
+    exclude = request.app.org.excluded_person_fields(request) + ['notes']
+
+    return Response(
+        self.vcard(exclude),
+        content_type='text/vcard',
+        content_disposition='inline; filename=card.vcf'
+    )

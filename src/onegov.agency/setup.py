@@ -37,7 +37,7 @@ setup(
         'onegov.form',
         'onegov.file',
         'onegov.org>=1.1.10',
-        'onegov.people>=0.9.1',
+        'onegov.people>=0.10.0',
         'onegov.pdf>=0.4.0',
         'pyyaml',
         'xlrd',
