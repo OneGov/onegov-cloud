@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.7 (2019-04-01)
+~~~~~~~~~~~~~~~~~~~
 
 - Removes always run option on upgrade step.
   [msom]
