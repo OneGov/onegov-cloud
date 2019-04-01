@@ -229,7 +229,9 @@ class RoadworkCollection(object):
 
         return letters
 
-    def roadwork_by_filter(self, filter):
+    def by_filter(self, filter):
+
+        # note: addGisLink doesn't work here
         url = URL('odata/Baustellen')\
             .query_param('addGisLink', 'False')\
             .query_param('$filter', filter)
@@ -246,7 +248,7 @@ class RoadworkCollection(object):
     def roadwork(self):
         date = datetime.today()
 
-        roadwork = self.roadwork_by_filter(filter=' and '.join((
+        roadwork = self.by_filter(filter=' and '.join((
             f'DauerVon le {date.strftime("%Y-%m-%d")}',
             f'DauerBis ge {date.strftime("%Y-%m-%d")}',
         )))
@@ -269,13 +271,15 @@ class RoadworkCollection(object):
         return roadwork
 
     def by_id(self, id):
+        url = URL(f'odata/Baustellen({int(id)})')\
+            .query_param('addGisLink', 'True')
 
-        # we can search this by id on the backend as well, but this way we
-        # once reuse the local cache, increasing cache-hits, which is
-        # preferable as long as we look at a small dataset
-        for r in self.roadwork:
-            if r.id == id:
-                return r
+        work = tuple(
+            Roadwork(r) for r in self.client.get(
+                url.as_string()).get('value', ()))
+
+        if work:
+            return work[0]
 
         # secondary lookup is against the subsections.. this probably calls
         # for an index eventually
@@ -294,8 +298,8 @@ class Roadwork(object):
         self.data = data
 
         self.convertors = {
-            'DauerVon': isodate.parse_datetime,
-            'DauerBis': isodate.parse_datetime,
+            'DauerVon': lambda v: v and isodate.parse_datetime(v),
+            'DauerBis': lambda v: v and isodate.parse_datetime(v),
         }
 
     @property

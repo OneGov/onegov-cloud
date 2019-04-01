@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-03-28 10:55+0100\n"
+"POT-Creation-Date: 2019-04-01 13:24+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -54,6 +54,12 @@ msgstr "Zuständiger Sachbearbeiter Verkehr"
 
 msgid "Provisions / Restrictions"
 msgstr "Massnahmen / Einschränkungen"
+
+msgid "Roadwork on City Map"
+msgstr "Baustelle im Stadtplan"
+
+msgid "Open GIS-Information"
+msgstr "GIS-Information öffnen"
 
 msgid "Back"
 msgstr "Zurück"
