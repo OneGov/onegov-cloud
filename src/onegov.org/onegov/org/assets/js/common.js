@@ -86,6 +86,14 @@ $('.page-text a[href*="/datei/"]').attr('target', '_blank');
 // Turn video links into clickable thumbnails
 $('.page-text a.has-video').videoframe();
 
+// Turn hashtags into links
+$('.has-hashtag').each(function() {
+    this.innerHTML = this.innerHTML.replace(
+        /(#[0-9a-zA-Zöäüéèà]{3,})/gi, function(match) {
+            return '<a class="hashtag" href="/search?q=' + encodeURIComponent(match) + '">' + match + '</a>';
+        });
+});
+
 // Disable scroll on elements which wish it disabled
 $('.disable-scroll').on('mouseover', function() {
     var el = $(this);
@@ -130,7 +138,7 @@ $(document).on('show-alert', function(_, data) {
 });
 
 // handle intercooler errors generically
-$(document).ajaxError(function(e, xhr, _settings, error) {
+$(document).ajaxError(function(_e, xhr, _settings, error) {
     if (xhr.status === 502) {
         showAlertMessage(locale(
             "The server could not be reached. Please try again."

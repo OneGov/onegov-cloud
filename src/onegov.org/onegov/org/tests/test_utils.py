@@ -40,6 +40,14 @@ def test_annotate_html():
     assert '<p class="has-img has-video">' in utils.annotate_html(html)
     assert 'class="has-video"></a>' in utils.annotate_html(html)
 
+    html = (
+        '<p># foo, #bar, #baz qux</p>'
+    )
+
+    assert "has-hashtag" in utils.annotate_html('<p>#foo</p>')
+    assert "has-hashtag" in utils.annotate_html('<p>#bar</p>')
+    assert "has-hashtag" not in utils.annotate_html('<p>#xy</p>')
+
 
 def test_remove_empty_paragraphs():
     html = "<p><br></p>"

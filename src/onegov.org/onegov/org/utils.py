@@ -22,6 +22,8 @@ from purl import URL
 # since we only remove a very limited set of paragraphs
 EMPTY_PARAGRAPHS = re.compile(r'<p>\s*<br>\s*</p>')
 
+HASHTAG = re.compile(r'#\w{3,}')
+
 
 def djb2_hash(text, size):
     """ Implementation of the djb2 hash, a simple hash function with a
@@ -100,6 +102,8 @@ def annotate_html(html, request=None):
           link itself as well as the surrounding paragraph is marked
           with the `has-video` class
 
+        * If a hashtag is found, the paragraph gets the 'has-hashtag' class.
+
     """
 
     if not html:
@@ -144,6 +148,11 @@ def annotate_html(html, request=None):
         for img in element.xpath('//img'):
             img.set('class', 'lazyload-alt')
             images.append(img)
+
+    # for the hashtag lookup we need all elements, as we do not use xpath
+    for element in fragments:
+        if element.text and HASHTAG.search(element.text):
+            add_class_to_node(element, 'has-hashtag')
 
     if request:
         set_image_sizes(images, request)
