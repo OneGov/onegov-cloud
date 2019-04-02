@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Sort roadwork by title.
+  [href]
+
 - Use _blank for GIS links.
   [href]
 

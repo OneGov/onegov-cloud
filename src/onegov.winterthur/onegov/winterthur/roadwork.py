@@ -240,7 +240,7 @@ class RoadworkCollection(object):
         records = (r for r in records if r['Internet'])
 
         work = [Roadwork(r) for r in records]
-        work.sort(key=lambda r: r['DauerBis'])
+        work.sort(key=lambda r: r.title)
 
         return work
 
