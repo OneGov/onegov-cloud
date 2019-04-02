@@ -325,12 +325,15 @@ class Roadwork(object):
 
     @property
     def sections(self):
+        horizon = datetime.utcnow() + timedelta(days=5)
+
         return [
             self.__class__({
                 'Id': r['TeilbaustelleId'],
                 'Teilbaustellen': [],
                 **r
             }) for r in self['Teilbaustellen']
+            if r.get('DauerBis', datetime.min) < horizon
         ]
 
     def __getitem__(self, key):

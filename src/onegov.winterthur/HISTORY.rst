@@ -1,10 +1,13 @@
 Changelog
 ---------
 
-- Sort roadwork by title.
+- Excludes roadwork sections in the past.
   [href]
 
-- Use _blank for GIS links.
+- Sorts roadwork by title.
+  [href]
+
+- Uses _blank for GIS links.
   [href]
 
 0.4.1 (2019-04-01)
