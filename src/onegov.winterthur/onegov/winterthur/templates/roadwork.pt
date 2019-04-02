@@ -44,7 +44,7 @@
             <tal:b condition='model["UrlStadtplan"]|nothing'>
                 <dt i18n:translate>Roadwork on City Map</dt>
                 <dd>
-                    <a href='${model["UrlStadtplan"]}' i18n:translate>Open GIS-Information</a>
+                    <a href='${model["UrlStadtplan"]}' target="_blank" i18n:translate>Open GIS-Information</a>
                 </dd>
             </tal:b>
         </dl>

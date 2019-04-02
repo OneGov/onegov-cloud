@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Use _blank for GIS links.
+  [href]
+
 0.4.1 (2019-04-01)
 ~~~~~~~~~~~~~~~~~~~~~
 
