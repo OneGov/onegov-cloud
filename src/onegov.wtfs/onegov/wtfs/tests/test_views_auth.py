@@ -15,7 +15,7 @@ def test_view_login_logout(client):
     error = "Unbekannter Benutzername oder falsches Passwort"
 
     for user in ('admin', 'editor', 'member'):
-        login = client.get('/').maybe_follow().click('Anmelden')
+        login = client.get('/').maybe_follow()
         login.form['username'] = f'{user}@example.org'
         login.form['password'] = 'hunter1'
         page = login.form.submit().maybe_follow()
@@ -23,7 +23,7 @@ def test_view_login_logout(client):
         assert 'Abmelden' not in page
         assert 'Anmelden' in page
 
-        login = client.get('/').maybe_follow().click('Anmelden')
+        login = client.get('/').maybe_follow()
         login.form['username'] = f'{user}@example.org'
         login.form['password'] = 'hunter2'
         page = login.form.submit().maybe_follow()
@@ -41,7 +41,7 @@ def test_view_reset_password(wtfs_app):
 
     home = client.get('/').maybe_follow()
 
-    request_page = home.click('Anmelden').click('Passwort zurücksetzen')
+    request_page = home.click('Passwort zurücksetzen')
     request_page.form['email'] = 'someone@example.org'
     request_page.form.submit()
     assert len(wtfs_app.smtp.outbox) == 0

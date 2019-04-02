@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Allows the application to be displayed within an iFrame.
+  [msom]
+
 0.0.7 (2019-04-01)
 ~~~~~~~~~~~~~~~~~~~
 

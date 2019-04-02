@@ -30,21 +30,16 @@
     <link rel="stylesheet" type="text/css" href="${request.theme_link}">
 </head>
 <body>
-    <header>
-        <div class="auth">
-            <div class="row">
-                <div class="columns small-12">
-                    <a class="login pull-right" tal:condition="layout.login_url" href="${layout.login_url}" i18n:translate>Login</a>
-                    <a class="logout pull-right" tal:condition="layout.logout_url" href="${layout.logout_url}" i18n:translate>Logout</a>
-                </div>
-            </div>
-        </div>
+    <div class="top-bar"></div>
 
+    <header>
         <div class="title">
             <div class="row">
-                <div class="columns small-12 small-only-text-center">
-                    <a href="${layout.homepage_url}"><img src="${layout.static_path}/images/logo.svg" height="100" alt="Stadt Winterthur"></a>
-                    <div class="clearfix"></div>
+                <div class="columns small-8 medium-9">
+                    <h1 i18n:translate>Scan job application</h1>
+                </div>
+                <div class="columns small-4 medium-3">
+                    <a class="logout pull-right" tal:condition="layout.logout_url" href="${layout.logout_url}" i18n:translate>Logout</a>
                 </div>
             </div>
         </div>
