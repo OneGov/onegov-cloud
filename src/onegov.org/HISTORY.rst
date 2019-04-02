@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves person portrait display on mobile devices.
+  [href]
+
 - Fixes date-error when returning to a datetime-picker on Safari.
   [href]
 

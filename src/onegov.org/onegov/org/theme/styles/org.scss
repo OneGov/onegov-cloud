@@ -2188,6 +2188,8 @@ $person-email-icon: '\f003';
         .person-card-portrait {
             float: none;
             margin-bottom: 1em;
+            width: calc(100vw - 3rem);
+            height: calc(100vw - 3rem);
         }
     }
 }
@@ -2197,10 +2199,10 @@ $person-email-icon: '\f003';
 */
 
 .person-list-card {
-    .person-card-portrait {
-        @include circle;
+    display: flex;
 
-        height: 5rem; // enough to show three lines of text
+    .person-card-portrait {
+        height: 5rem;
         text-align: center;
         width: 5rem;
 
@@ -2210,15 +2212,15 @@ $person-email-icon: '\f003';
     }
 
     > a {
-        float: left;
         margin-right: 1em;
     }
 
     ul {
-        float: left;
-
         > li {
             font-size: .875rem;
+            max-width: calc(100vw - 7.5rem);
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     }
 
@@ -3350,6 +3352,11 @@ ul.search-results {
 .atoz-block {
     h2 {
         border-bottom: 1px solid $gray-pastel;
+    }
+
+    ul {
+        margin-left: 0;
+        list-style: none;
     }
 }
 
