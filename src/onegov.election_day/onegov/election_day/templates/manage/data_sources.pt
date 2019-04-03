@@ -19,6 +19,12 @@
                     </div>
                 </div>
 
+                <div class="panel">
+                    <i class="fa fa-info-circle"></i>
+                    <span i18n:translate="">A description of the WabstiCExport interface can be found here:</span>
+                    <a href="https://github.com/OneGov/onegov.election_day/tree/master/docs#wabsticexport">WabstiCExport</a>.
+                </div>
+
                 <p tal:condition="not:data_sources" i18n:translate>
                     No data sources yet.
                 </p>

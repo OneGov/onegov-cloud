@@ -26,7 +26,7 @@ def view_data_sources(self, request):
 
     return {
         'layout': ManageDataSourcesLayout(self, request),
-        'title': _("Data sources"),
+        'title': _("Wabsti data sources"),
         'data_sources': self.batch,
         'new_source': request.link(self, 'new-source'),
         'labels': dict(UPLOAD_TYPE_LABELS)

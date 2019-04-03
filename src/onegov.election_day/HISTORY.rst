@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Allows to manage upload tokens using the web UI.
+  [msom]
+
 - Uses a dropdown for the election and election compound manage menu entries.
   [msom]
 

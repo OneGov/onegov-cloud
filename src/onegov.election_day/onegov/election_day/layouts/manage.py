@@ -8,6 +8,7 @@ from onegov.election_day.collections import DataSourceItemCollection
 from onegov.election_day.collections import EmailSubscriberCollection
 from onegov.election_day.collections import SmsSubscriberCollection
 from onegov.election_day.collections import SubscriberCollection
+from onegov.election_day.collections import UploadTokenCollection
 from onegov.election_day.layouts.default import DefaultLayout
 from onegov.election_day.models import EmailSubscriber
 from onegov.election_day.models import Principal
@@ -56,9 +57,16 @@ class ManageLayout(DefaultLayout):
             submenu
         ))
 
+        submenu = []
+        submenu.append((
+            _("Upload tokens"),
+            self.request.link(UploadTokenCollection(session)),
+            isinstance(self.model, UploadTokenCollection),
+            []
+        ))
         if principal.wabsti_import:
-            result.append((
-                _("Data sources"),
+            submenu.append((
+                _("Wabsti data sources"),
                 self.request.link(DataSourceCollection(session)),
                 (
                     isinstance(self.model, DataSourceCollection)
@@ -66,6 +74,16 @@ class ManageLayout(DefaultLayout):
                 ),
                 []
             ))
+        result.append((
+            _("Import configuration"),
+            '',
+            (
+                isinstance(self.model, UploadTokenCollection)
+                or isinstance(self.model, DataSourceCollection)
+                or isinstance(self.model, DataSourceItemCollection)
+            ),
+            submenu
+        ))
 
         if self.principal.notifications:
             submenu = []
@@ -197,6 +215,21 @@ class ManageSubscribersLayout(ManageLayout):
             )
 
 
+class ManageUploadTokensLayout(ManageLayout):
+
+    @cached_property
+    def manage_model_link(self):
+        return self.request.link(
+            UploadTokenCollection(self.request.session)
+        )
+
+    def __init__(self, model, request):
+        super().__init__(model, request)
+        self.breadcrumbs.append(
+            (_("Upload tokens"), request.link(self.model), ''),
+        )
+
+
 class ManageDataSourcesLayout(ManageLayout):
 
     @cached_property
@@ -208,7 +241,7 @@ class ManageDataSourcesLayout(ManageLayout):
     def __init__(self, model, request):
         super().__init__(model, request)
         self.breadcrumbs.append(
-            (_("Data sources"), request.link(self.model), ''),
+            (_("Wabsti data sources"), request.link(self.model), ''),
         )
 
 
@@ -227,7 +260,7 @@ class ManageDataSourceItemsLayout(ManageLayout):
         super().__init__(model, request)
         self.breadcrumbs.append(
             (
-                _("Data sources"),
+                _("Wabsti data sources"),
                 self.request.link(
                     DataSourceCollection(self.request.session)
                 ),

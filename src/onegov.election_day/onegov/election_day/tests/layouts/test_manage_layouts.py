@@ -5,11 +5,13 @@ from onegov.election_day.collections import DataSourceCollection
 from onegov.election_day.collections import DataSourceItemCollection
 from onegov.election_day.collections import EmailSubscriberCollection
 from onegov.election_day.collections import SmsSubscriberCollection
+from onegov.election_day.collections import UploadTokenCollection
 from onegov.election_day.layouts import ManageDataSourceItemsLayout
 from onegov.election_day.layouts import ManageDataSourcesLayout
 from onegov.election_day.layouts import ManageElectionCompoundsLayout
 from onegov.election_day.layouts import ManageElectionsLayout
 from onegov.election_day.layouts import ManageSubscribersLayout
+from onegov.election_day.layouts import ManageUploadTokensLayout
 from onegov.election_day.layouts import ManageVotesLayout
 from onegov.election_day.tests.common import DummyRequest
 
@@ -31,6 +33,9 @@ def test_manage_layouts(session):
                 False,
                 []
             )
+        ]),
+        ('Import configuration', '', False, [
+            ('Upload tokens', 'UploadTokenCollection/archive', False, []),
         ])
     ]
     assert layout.breadcrumbs == [
@@ -57,7 +62,10 @@ def test_manage_layouts(session):
                 []
             )
         ]),
-        ('Data sources', 'DataSourceCollection/archive', False, []),
+        ('Import configuration', '', False, [
+            ('Upload tokens', 'UploadTokenCollection/archive', False, []),
+            ('Wabsti data sources', 'DataSourceCollection/archive', False, []),
+        ]),
         ('Subscribers', '', False, [
             ('SMS subscribers', 'SmsSubscriberCollection/archive', False, []),
             (
@@ -95,6 +103,9 @@ def test_manage_layouts(session):
                 False,
                 []
             )
+        ]),
+        ('Import configuration', '', False, [
+            ('Upload tokens', 'UploadTokenCollection/archive', False, []),
         ])
     ]
     assert layout.breadcrumbs == [
@@ -118,6 +129,9 @@ def test_manage_layouts(session):
                 True,
                 []
             )
+        ]),
+        ('Import configuration', '', False, [
+            ('Upload tokens', 'UploadTokenCollection/archive', False, []),
         ])
     ]
     assert layout.breadcrumbs == [
@@ -125,7 +139,33 @@ def test_manage_layouts(session):
         ('Compounds of elections', 'ElectionCompoundCollection/archive', '')
     ]
 
-    # Data sources
+    # Upload tokens
+    layout = ManageUploadTokensLayout(
+        UploadTokenCollection(session),
+        DummyRequest()
+    )
+    assert layout.manage_model_link == 'UploadTokenCollection/archive'
+    assert layout.menu == [
+        ('Votes', 'VoteCollection/archive', False, []),
+        ('Elections', '', False, [
+            ('Elections', 'ElectionCollection/archive', False, []),
+            (
+                'Compounds of elections',
+                'ElectionCompoundCollection/archive',
+                False,
+                []
+            )
+        ]),
+        ('Import configuration', '', True, [
+            ('Upload tokens', 'UploadTokenCollection/archive', True, []),
+        ])
+    ]
+    assert layout.breadcrumbs == [
+        ('Manage', 'VoteCollection/archive', 'unavailable'),
+        ('Upload tokens', 'UploadTokenCollection/archive', '')
+    ]
+
+    # Wabsti data sources
     layout = ManageDataSourcesLayout(
         DataSourceCollection(session),
         DummyRequest()
@@ -143,11 +183,14 @@ def test_manage_layouts(session):
                 []
             )
         ]),
-        ('Data sources', 'DataSourceCollection/archive', True, []),
+        ('Import configuration', '', True, [
+            ('Upload tokens', 'UploadTokenCollection/archive', False, []),
+            ('Wabsti data sources', 'DataSourceCollection/archive', True, []),
+        ])
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
-        ('Data sources', 'DataSourceCollection/archive', '')
+        ('Wabsti data sources', 'DataSourceCollection/archive', '')
     ]
 
     # Data source items
@@ -168,11 +211,14 @@ def test_manage_layouts(session):
                 []
             )
         ]),
-        ('Data sources', 'DataSourceCollection/archive', True, []),
+        ('Import configuration', '', True, [
+            ('Upload tokens', 'UploadTokenCollection/archive', False, []),
+            ('Wabsti data sources', 'DataSourceCollection/archive', True, []),
+        ])
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
-        ('Data sources', 'DataSourceCollection/archive', ''),
+        ('Wabsti data sources', 'DataSourceCollection/archive', ''),
         ('Mappings', 'DataSourceItemCollection/source', '')
     ]
 
@@ -193,6 +239,9 @@ def test_manage_layouts(session):
                 False,
                 []
             )
+        ]),
+        ('Import configuration', '', False, [
+            ('Upload tokens', 'UploadTokenCollection/archive', False, []),
         ]),
         ('Subscribers', '', True, [
             (
@@ -231,6 +280,9 @@ def test_manage_layouts(session):
                 False,
                 []
             )
+        ]),
+        ('Import configuration', '', False, [
+            ('Upload tokens', 'UploadTokenCollection/archive', False, []),
         ]),
         ('Subscribers', '', True, [
             ('SMS subscribers', 'SmsSubscriberCollection/archive', True, []),

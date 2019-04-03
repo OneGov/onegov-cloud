@@ -3,11 +3,9 @@
 import click
 import os
 
-from onegov.core.cli import abort
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.election_day import log
-from onegov.election_day.collections import UploadTokenCollection
 from onegov.election_day.models import ArchivedResult
 from onegov.election_day.utils import add_local_results
 from onegov.election_day.utils.d3_renderer import D3Renderer
@@ -167,78 +165,3 @@ def generate_media(sentry):
             lockfile.unlink()
 
     return generate
-
-
-@cli.command('list-upload-tokens')
-def list_upload_tokens():
-    """ Lists all tokens usable for uploading using the REST interface.
-
-        onegov-election-day --select '/onegov_election_day/zg'
-            list-upload-tokens
-
-    """
-
-    def create_token(request, app):
-        tokens = UploadTokenCollection(app.session()).list()
-        if tokens:
-            click.echo('Tokens:')
-            for token in tokens:
-                click.secho('  {}'.format(token), fg='green')
-        else:
-            click.echo('No tokens yet.')
-
-    return create_token
-
-
-@cli.command('create-upload-token')
-@click.option('--token')
-def create_upload_token(token):
-    """ Creates a token for uploading using the REST interface.
-
-        onegov-election-day --select '/onegov_election_day/zg'
-            list-pdf-signing-reasons
-
-    """
-    def create_token(request, app):
-        result = UploadTokenCollection(app.session()).create(token)
-        click.echo('Token created:')
-        click.secho('  {}'.format(result), fg='green')
-
-    return create_token
-
-
-@cli.command('delete-upload-token')
-@click.argument('token')
-def delete_upload_token(token):
-    """ Creates a token for uploading using the REST interface.
-
-        onegov-election-day --select '/onegov_election_day/zg'
-            delete-upload-token
-
-    """
-    def create_token(request, app):
-        UploadTokenCollection(app.session()).delete(token)
-        click.echo('Token deleted.')
-
-    return create_token
-
-
-@cli.command('clear-upload-tokens')
-@click.option('--confirm/--no-confirm', default=True,
-              help="Ask for confirmation (disabling this is dangerous!)")
-def clear_tokens(confirm):
-    """ Deletes all tokens usable for uploading using the REST interface.
-
-        onegov-election-day --select '/onegov_election_day/zg'
-            clear-upload-tokens
-
-    """
-    def clear_tokens(request, app):
-        if confirm:
-            if not click.confirm('Do you really want to remove all tokens?'):
-                abort("Canceled")
-
-        click.echo(UploadTokenCollection(app.session()).clear())
-        click.echo('All tokens removed')
-
-    return clear_tokens

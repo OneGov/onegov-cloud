@@ -215,6 +215,21 @@ def test_view_clear_results(election_day_app):
     assert all((marker not in client.get(url) for url in urls))
 
 
+def test_view_manage_upload_tokens(election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+    login(client)
+
+    assert "Noch keine Token." in client.get('/manage/upload-tokens')
+
+    client.get('/manage/upload-tokens/create-token').form.submit()
+    assert "Noch keine Token." not in client.get('/manage/upload-tokens')
+
+    client.get('/manage/upload-tokens').click("Löschen").form.submit()
+
+    assert "Noch keine Token." in client.get('/manage/upload-tokens')
+
+
 def test_view_manage_data_sources(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()

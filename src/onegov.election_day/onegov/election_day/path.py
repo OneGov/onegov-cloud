@@ -18,10 +18,12 @@ from onegov.election_day.collections import DataSourceItemCollection
 from onegov.election_day.collections import EmailSubscriberCollection
 from onegov.election_day.collections import SmsSubscriberCollection
 from onegov.election_day.collections import SubscriberCollection
+from onegov.election_day.collections import UploadTokenCollection
 from onegov.election_day.models import DataSource
 from onegov.election_day.models import DataSourceItem
 from onegov.election_day.models import Principal
 from onegov.election_day.models import Subscriber
+from onegov.election_day.models import UploadToken
 from onegov.user import Auth
 
 
@@ -64,6 +66,12 @@ def get_manage_sms_subscribers(app, page=0, term=None):
 )
 def get_manage_email_subscribers(app, page=0, term=None):
     return EmailSubscriberCollection(app.session(), page=page, term=term)
+
+
+@ElectionDayApp.path(model=UploadTokenCollection,
+                     path='/manage/upload-tokens')
+def get_manage_upload_tokens(app):
+    return UploadTokenCollection(app.session())
 
 
 @ElectionDayApp.path(model=DataSourceCollection,
@@ -111,6 +119,11 @@ def get_ballot(app, id):
 @ElectionDayApp.path(model=Subscriber, path='/subscriber/{id}')
 def get_subscriber(app, id):
     return SubscriberCollection(app.session()).by_id(id)
+
+
+@ElectionDayApp.path(model=UploadToken, path='/upload-token/{id}')
+def get_upload_token(app, id):
+    return UploadTokenCollection(app.session()).by_id(id)
 
 
 @ElectionDayApp.path(model=DataSource, path='/data-source/{id}')

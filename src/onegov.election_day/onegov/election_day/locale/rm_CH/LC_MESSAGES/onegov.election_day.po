@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-18 07:52+0100\n"
+"POT-Creation-Date: 2019-04-03 09:49+0200\n"
 "PO-Revision-Date: 2018-11-05 12:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -537,11 +537,17 @@ msgstr "Statistica da panaschar"
 msgid "Compounds of elections"
 msgstr "Elecziuns colliadas"
 
+msgid "Upload tokens"
+msgstr ""
+
+msgid "Import configuration"
+msgstr ""
+
 msgid "Manage"
 msgstr "Administrar"
 
-msgid "Data sources"
-msgstr "Funtaunas da datas"
+msgid "Wabsti data sources"
+msgstr ""
 
 msgid "Mappings"
 msgstr "Attribuziuns"
@@ -894,6 +900,9 @@ msgstr "Nova elecziun"
 msgid "New data source"
 msgstr "Nova funtauna da datas"
 
+msgid "A description of the WabstiCExport interface can be found here:"
+msgstr ""
+
 msgid "No data sources yet."
 msgstr "Anc naginas funtaunas da datas."
 
@@ -914,6 +923,18 @@ msgstr "Anc nagins abunents."
 
 msgid "Locale"
 msgstr "Regiun linguistica"
+
+msgid "Create token"
+msgstr ""
+
+msgid "A description of the REST interface can be found here:"
+msgstr ""
+
+msgid "No tokens yet."
+msgstr ""
+
+msgid "Created"
+msgstr ""
 
 msgid "New vote"
 msgstr "Nova votaziun"
@@ -1043,16 +1064,31 @@ msgstr ""
 "Resultats finals da l'elecziun federala \"${title}\", ${date}, ${principal}, "
 "resultats da tut las candidatas e da tut ils candidats tenor vischnancas."
 
+msgid "Create a new upload token?"
+msgstr ""
+
+msgid "Create"
+msgstr ""
+
+#, python-format
+msgid "Do you really want to delete \"${item}\"?"
+msgstr "Vulais Vus propi stizzar \"${item}\"?"
+
+msgid "Delete upload token"
+msgstr ""
+
+msgid "Upload token created."
+msgstr ""
+
+msgid "Upload token deleted."
+msgstr ""
+
 msgid "Edit vote"
 msgstr "Modifitgar la votaziun"
 
 #, python-format
 msgid "Do you really want to clear all results of \"${item}\"?"
 msgstr "Vulais Vus propi stizzar tut ils resultats da \"${item}\"?"
-
-#, python-format
-msgid "Do you really want to delete \"${item}\"?"
-msgstr "Vulais Vus propi stizzar \"${item}\"?"
 
 msgid "Delete vote"
 msgstr "Stizzar la votaziun"
@@ -1167,3 +1203,6 @@ msgstr "Nagina elecziun da proporz"
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "L'onn ${year} na vegn anc betg sustegnì"
+
+#~ msgid "Data sources"
+#~ msgstr "Funtaunas da datas"

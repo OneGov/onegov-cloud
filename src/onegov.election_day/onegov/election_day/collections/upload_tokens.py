@@ -1,5 +1,4 @@
 from onegov.election_day.models import UploadToken
-from uuid import uuid4
 
 
 class UploadTokenCollection(object):
@@ -8,37 +7,23 @@ class UploadTokenCollection(object):
         self.session = session
 
     def query(self):
-        return self.session.query(UploadToken)
+        return self.session.query(UploadToken).order_by(UploadToken.created)
 
-    def list(self):
-        """ Lists all available tokens. """
-
-        return [str(token.token) for token in self.query()]
-
-    def create(self, token=None):
+    def create(self):
         """ Creates a new token. """
 
-        if token:
-            if not self.query().filter_by(token=token).first():
-                self.session.add(UploadToken(token=token))
-                self.session.flush()
-        else:
-            token = uuid4()
-            self.session.add(UploadToken(token=token))
-            self.session.flush()
+        token = UploadToken()
+        self.session.add(token)
+        self.session.flush()
+        return token
 
-        return str(token)
-
-    def delete(self, token):
+    def delete(self, item):
         """ Deletes the given token. """
 
-        for item in self.query().filter_by(token=token):
-            self.session.delete(item)
+        self.session.delete(item)
         self.session.flush()
 
-    def clear(self):
-        """ Removes all tokens. """
+    def by_id(self, id):
+        """ Returns the token by its id. """
 
-        for item in self.query():
-            self.session.delete(item)
-        self.session.flush()
+        return self.query().filter_by(id=id).first()

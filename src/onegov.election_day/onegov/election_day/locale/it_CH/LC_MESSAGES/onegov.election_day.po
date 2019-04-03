@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-18 07:52+0100\n"
-"PO-Revision-Date: 2019-03-18 07:56+0100\n"
+"POT-Creation-Date: 2019-04-03 09:49+0200\n"
+"PO-Revision-Date: 2019-04-03 09:57+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -535,11 +535,17 @@ msgstr "Panachage"
 msgid "Compounds of elections"
 msgstr "Componenti delle elezioni"
 
+msgid "Upload tokens"
+msgstr "Carica token"
+
+msgid "Import configuration"
+msgstr "Configurazione dell'importazione"
+
 msgid "Manage"
 msgstr "Amministrare"
 
-msgid "Data sources"
-msgstr "Origini dati"
+msgid "Wabsti data sources"
+msgstr "Origini dati Wabsti"
 
 msgid "Mappings"
 msgstr "Mapping"
@@ -852,6 +858,10 @@ msgstr "Nuova elezione"
 msgid "New data source"
 msgstr "Nuova origine dati"
 
+msgid "A description of the WabstiCExport interface can be found here:"
+msgstr ""
+"Una descrizione dell'interfaccia di WabstiCExport può essere trovata qui:"
+
 msgid "No data sources yet."
 msgstr "Nessuna origine dati per il momento."
 
@@ -872,6 +882,18 @@ msgstr "Non ci sono ancora degli iscritti."
 
 msgid "Locale"
 msgstr "Località"
+
+msgid "Create token"
+msgstr "Crea token"
+
+msgid "A description of the REST interface can be found here:"
+msgstr "Una descrizione dell'interfaccia REST può essere trovata qui:"
+
+msgid "No tokens yet."
+msgstr "Ancora nessun token."
+
+msgid "Created"
+msgstr "Creato"
 
 msgid "New vote"
 msgstr "Nuova votazione"
@@ -999,16 +1021,31 @@ msgstr ""
 "Risultati finali della elezione federale \"${title}\", ${date}, "
 "${principal}, suddivisi per municipalit e candidati."
 
+msgid "Create a new upload token?"
+msgstr "Creare un nuovo token?"
+
+msgid "Create"
+msgstr "Creare"
+
+#, python-format
+msgid "Do you really want to delete \"${item}\"?"
+msgstr "Sei sicuro/a di voler eliminare \"${item}\"?"
+
+msgid "Delete upload token"
+msgstr "Elimina token"
+
+msgid "Upload token created."
+msgstr "Carica il token creato."
+
+msgid "Upload token deleted."
+msgstr "Token cancellato."
+
 msgid "Edit vote"
 msgstr "Modifica votazione"
 
 #, python-format
 msgid "Do you really want to clear all results of \"${item}\"?"
 msgstr "Sicuro di voler eliminare tutti i risultati di \"${item}\"?"
-
-#, python-format
-msgid "Do you really want to delete \"${item}\"?"
-msgstr "Sei sicuro/a di voler eliminare \"${item}\"?"
 
 msgid "Delete vote"
 msgstr "Elimina votazione"

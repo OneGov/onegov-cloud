@@ -43,20 +43,22 @@ def test_view_rest_authenticate(election_day_app):
     client.post('/upload', status=401)
 
     collection = UploadTokenCollection(election_day_app.session())
-    token = collection.create()
+    token = str(collection.create().token)
     transaction.commit()
     client.post('/upload', status=401)
 
     client.authorization = ('Basic', ('', token))
     client.post('/upload', status=400)
 
-    collection.clear()
+    for token in collection.query():
+        collection.delete(token)
     transaction.commit()
     client.post('/upload', status=401)
 
 
 def test_view_rest_validation(election_day_app):
     token = UploadTokenCollection(election_day_app.session()).create()
+    token = str(token.token)
     transaction.commit()
 
     client = Client(election_day_app)
@@ -108,6 +110,7 @@ def test_view_rest_validation(election_day_app):
 
 def test_view_rest_translations(election_day_app):
     token = UploadTokenCollection(election_day_app.session()).create()
+    token = str(token.token)
     transaction.commit()
 
     client = Client(election_day_app)
@@ -147,6 +150,7 @@ def test_view_rest_translations(election_day_app):
 
 def test_view_rest_vote(election_day_app):
     token = UploadTokenCollection(election_day_app.session()).create()
+    token = str(token.token)
     transaction.commit()
 
     client = Client(election_day_app)
@@ -176,6 +180,7 @@ def test_view_rest_vote(election_day_app):
 
 def test_view_rest_majorz(election_day_app):
     token = UploadTokenCollection(election_day_app.session()).create()
+    token = str(token.token)
     transaction.commit()
 
     client = Client(election_day_app)
@@ -208,6 +213,7 @@ def test_view_rest_majorz(election_day_app):
 
 def test_view_rest_proporz(election_day_app):
     token = UploadTokenCollection(election_day_app.session()).create()
+    token = str(token.token)
     transaction.commit()
 
     client = Client(election_day_app)
@@ -240,6 +246,7 @@ def test_view_rest_proporz(election_day_app):
 
 def test_view_rest_parties(election_day_app):
     token = UploadTokenCollection(election_day_app.session()).create()
+    token = str(token.token)
     transaction.commit()
 
     client = Client(election_day_app)

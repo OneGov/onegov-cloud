@@ -67,7 +67,7 @@ multipart-POST-request to `[base_url]/upload` containing the following fields:
 
 A token must be provided using the passwort part of HTTP basic authentication.
 An invalid authentication returns a `HTTP 401 Unauthorized`. The token can be
-generated using the command line interface (`create-upload-token`).
+generated using the web interface.
 
 Valid requests return a `HTTP 200 OK` together with the JSON body:
 
