@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Uses a dropdown for the election and election compound manage menu entries.
+  [msom]
+
 3.10.0 (2019-03-18)
 ~~~~~~~~~~~~~~~~~~~
 

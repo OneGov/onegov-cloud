@@ -32,18 +32,30 @@ class ManageLayout(DefaultLayout):
             isinstance(self.model, VoteCollection),
             []
         ))
-        result.append((
+
+        submenu = []
+        submenu.append((
             _("Elections"),
             self.request.link(ElectionCollection(session)),
             isinstance(self.model, ElectionCollection),
             []
         ))
-        result.append((
+        submenu.append((
             _("Compounds of elections"),
             self.request.link(ElectionCompoundCollection(session)),
             isinstance(self.model, ElectionCompoundCollection),
             []
         ))
+        result.append((
+            _("Elections"),
+            '',
+            (
+                isinstance(self.model, ElectionCollection)
+                or isinstance(self.model, ElectionCompoundCollection)
+            ),
+            submenu
+        ))
+
         if principal.wabsti_import:
             result.append((
                 _("Data sources"),

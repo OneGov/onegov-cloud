@@ -23,13 +23,15 @@ def test_manage_layouts(session):
     assert layout.manage_model_link == 'VoteCollection/archive'
     assert layout.menu == [
         ('Votes', 'VoteCollection/archive', True, []),
-        ('Elections', 'ElectionCollection/archive', False, []),
-        (
-            'Compounds of elections',
-            'ElectionCompoundCollection/archive',
-            False,
-            []
-        )
+        ('Elections', '', False, [
+            ('Elections', 'ElectionCollection/archive', False, []),
+            (
+                'Compounds of elections',
+                'ElectionCompoundCollection/archive',
+                False,
+                []
+            )
+        ])
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
@@ -46,13 +48,15 @@ def test_manage_layouts(session):
     layout.principal.wabsti_import = True
     assert layout.menu == [
         ('Votes', 'VoteCollection/archive', True, []),
-        ('Elections', 'ElectionCollection/archive', False, []),
-        (
-            'Compounds of elections',
-            'ElectionCompoundCollection/archive',
-            False,
-            []
-        ),
+        ('Elections', '', False, [
+            ('Elections', 'ElectionCollection/archive', False, []),
+            (
+                'Compounds of elections',
+                'ElectionCompoundCollection/archive',
+                False,
+                []
+            )
+        ]),
         ('Data sources', 'DataSourceCollection/archive', False, []),
         ('Subscribers', '', False, [
             ('SMS subscribers', 'SmsSubscriberCollection/archive', False, []),
@@ -83,13 +87,15 @@ def test_manage_layouts(session):
     assert layout.manage_model_link == 'ElectionCollection/archive'
     assert layout.menu == [
         ('Votes', 'VoteCollection/archive', False, []),
-        ('Elections', 'ElectionCollection/archive', True, []),
-        (
-            'Compounds of elections',
-            'ElectionCompoundCollection/archive',
-            False,
-            []
-        )
+        ('Elections', '', True, [
+            ('Elections', 'ElectionCollection/archive', True, []),
+            (
+                'Compounds of elections',
+                'ElectionCompoundCollection/archive',
+                False,
+                []
+            )
+        ])
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
@@ -104,13 +110,15 @@ def test_manage_layouts(session):
     assert layout.manage_model_link == 'ElectionCompoundCollection/archive'
     assert layout.menu == [
         ('Votes', 'VoteCollection/archive', False, []),
-        ('Elections', 'ElectionCollection/archive', False, []),
-        (
-            'Compounds of elections',
-            'ElectionCompoundCollection/archive',
-            True,
-            []
-        )
+        ('Elections', '', True, [
+            ('Elections', 'ElectionCollection/archive', False, []),
+            (
+                'Compounds of elections',
+                'ElectionCompoundCollection/archive',
+                True,
+                []
+            )
+        ])
     ]
     assert layout.breadcrumbs == [
         ('Manage', 'VoteCollection/archive', 'unavailable'),
@@ -126,13 +134,15 @@ def test_manage_layouts(session):
     assert layout.manage_model_link == 'DataSourceCollection/archive'
     assert layout.menu == [
         ('Votes', 'VoteCollection/archive', False, []),
-        ('Elections', 'ElectionCollection/archive', False, []),
-        (
-            'Compounds of elections',
-            'ElectionCompoundCollection/archive',
-            False,
-            []
-        ),
+        ('Elections', '', False, [
+            ('Elections', 'ElectionCollection/archive', False, []),
+            (
+                'Compounds of elections',
+                'ElectionCompoundCollection/archive',
+                False,
+                []
+            )
+        ]),
         ('Data sources', 'DataSourceCollection/archive', True, []),
     ]
     assert layout.breadcrumbs == [
@@ -149,13 +159,15 @@ def test_manage_layouts(session):
     assert layout.manage_model_link == 'DataSourceItemCollection/source'
     assert layout.menu == [
         ('Votes', 'VoteCollection/archive', False, []),
-        ('Elections', 'ElectionCollection/archive', False, []),
-        (
-            'Compounds of elections',
-            'ElectionCompoundCollection/archive',
-            False,
-            []
-        ),
+        ('Elections', '', False, [
+            ('Elections', 'ElectionCollection/archive', False, []),
+            (
+                'Compounds of elections',
+                'ElectionCompoundCollection/archive',
+                False,
+                []
+            )
+        ]),
         ('Data sources', 'DataSourceCollection/archive', True, []),
     ]
     assert layout.breadcrumbs == [
@@ -173,13 +185,15 @@ def test_manage_layouts(session):
     assert layout.manage_model_link == 'EmailSubscriberCollection/archive'
     assert layout.menu == [
         ('Votes', 'VoteCollection/archive', False, []),
-        ('Elections', 'ElectionCollection/archive', False, []),
-        (
-            'Compounds of elections',
-            'ElectionCompoundCollection/archive',
-            False,
-            []
-        ),
+        ('Elections', '', False, [
+            ('Elections', 'ElectionCollection/archive', False, []),
+            (
+                'Compounds of elections',
+                'ElectionCompoundCollection/archive',
+                False,
+                []
+            )
+        ]),
         ('Subscribers', '', True, [
             (
                 'Email subscribers',
@@ -209,13 +223,15 @@ def test_manage_layouts(session):
     assert layout.manage_model_link == 'SmsSubscriberCollection/archive'
     assert layout.menu == [
         ('Votes', 'VoteCollection/archive', False, []),
-        ('Elections', 'ElectionCollection/archive', False, []),
-        (
-            'Compounds of elections',
-            'ElectionCompoundCollection/archive',
-            False,
-            []
-        ),
+        ('Elections', '', False, [
+            ('Elections', 'ElectionCollection/archive', False, []),
+            (
+                'Compounds of elections',
+                'ElectionCompoundCollection/archive',
+                False,
+                []
+            )
+        ]),
         ('Subscribers', '', True, [
             ('SMS subscribers', 'SmsSubscriberCollection/archive', True, []),
             (
