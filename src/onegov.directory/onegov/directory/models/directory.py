@@ -13,11 +13,11 @@ from onegov.directory.types import DirectoryConfigurationStorage
 from onegov.file import File
 from onegov.file.utils import as_fileintent
 from onegov.form import flatten_fieldsets, parse_formcode, parse_form
-from onegov.search import ORMSearchable
+from onegov.search import SearchableContent
 from sqlalchemy import Column
+from sqlalchemy import func, exists, and_
 from sqlalchemy import Integer
 from sqlalchemy import Text
-from sqlalchemy import func, exists, and_
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.attributes import InstrumentedAttribute
@@ -32,7 +32,7 @@ class DirectoryFile(File):
     __mapper_args__ = {'polymorphic_identity': 'directory'}
 
 
-class Directory(Base, ContentMixin, TimestampMixin, ORMSearchable):
+class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
     """ A directory of entries that share a common data structure. For example,
     a directory of people, of emergency services or playgrounds.
 

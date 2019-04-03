@@ -4,7 +4,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.file import AssociatedFiles
 from onegov.gis import CoordinatesMixin
-from onegov.search import ORMSearchable
+from onegov.search import SearchableContent
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Index
@@ -15,7 +15,7 @@ from uuid import uuid4
 
 
 class DirectoryEntry(Base, ContentMixin, CoordinatesMixin, TimestampMixin,
-                     ORMSearchable, AssociatedFiles):
+                     SearchableContent, AssociatedFiles):
     """ A single entry of a directory. """
 
     __tablename__ = 'directory_entries'

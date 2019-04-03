@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Support latest onegov.search release.
+  [href]
+
 0.4.5 (2019-03-22)
 ~~~~~~~~~~~~~~~~~~~~~
 
