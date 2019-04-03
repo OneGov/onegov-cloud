@@ -1,9 +1,10 @@
 from cached_property import cached_property
 from onegov.chat import Message
+from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.core.utils import paragraphify, linkify
 from onegov.event import Event
 from onegov.org import _
-from onegov.core.elements import Link, Confirm, Intercooler
+from onegov.org.utils import hashtag_elements
 from onegov.ticket import Ticket, TicketCollection
 from sqlalchemy.orm import object_session
 
@@ -62,9 +63,9 @@ class TicketNote(Message, TicketMessageMixin):
 
         return note
 
-    @property
-    def formatted_text(self):
-        return paragraphify(linkify(self.text))
+    def formatted_text(self, layout):
+        return hashtag_elements(
+            layout.request, paragraphify(linkify(self.text)))
 
     def links(self, layout):
         yield Link(_("Edit"), layout.request.link(self, 'edit'))
@@ -113,9 +114,9 @@ class TicketChatMessage(Message, TicketMessageMixin):
             ticket, request, text=text, owner=owner, origin=origin,
             notify=notify, recipient=recipient)
 
-    @property
-    def formatted_text(self):
-        return self.text and paragraphify(linkify(self.text)) or ''
+    def formatted_text(self, layout):
+        return self.text and hashtag_elements(
+            layout.request, paragraphify(linkify(self.text))) or ''
 
     @property
     def subtype(self):

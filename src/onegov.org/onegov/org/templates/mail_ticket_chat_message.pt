@@ -12,7 +12,7 @@
                     <a href="mailto:${previous.owner}" i18n:name="author">${previous.owner}</a> wrote
                 </span>
 
-                <tal:b content="structure previous.formatted_text" />
+                <tal:b content="structure previous.formatted_text(layout)" />
             </td></tr></table>
             <br tal:condition="repeat.previous.index == 0">
         </tal:b>
@@ -22,7 +22,7 @@
                 <a href="mailto:${message.owner}" i18n:name="author">${message.owner}</a> wrote
             </span>
 
-            <tal:b content="structure message.formatted_text" />
+            <tal:b content="structure message.formatted_text(layout)" />
         </td></tr></table>
 
         <p i18n:translate tal:condition="message.meta.origin == 'internal'">

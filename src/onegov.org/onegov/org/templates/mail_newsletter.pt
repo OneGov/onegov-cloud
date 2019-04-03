@@ -12,7 +12,7 @@
             <tal:b repeat="item news">
                 <strong><a href="${request.link(item)}">${item.title}</a></strong>
                 <p>
-                    ${item.lead}
+                    ${layout.with_hashtags(item.lead)}
                 </p>
             </tal:b>
         </tal:b>

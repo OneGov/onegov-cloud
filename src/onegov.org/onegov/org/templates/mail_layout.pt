@@ -50,6 +50,10 @@
         color: <tal:b replace="primary_color" />;
     }
 
+    a.hashtag {
+        text-decoration: none;
+    }
+
     .btn-primary {
         text-decoration: none;
         color: #FFF;

@@ -1,31 +1,24 @@
 from onegov.form.models import FormDefinition
-from onegov.org.models.extensions import (
-    ContactExtension,
-    CoordinatesExtension,
-    HiddenFromPublicExtension,
-    PersonLinkExtension,
-)
+from onegov.org.models.extensions import ContactExtension
+from onegov.org.models.extensions import CoordinatesExtension
+from onegov.org.models.extensions import HiddenFromPublicExtension
+from onegov.org.models.extensions import PersonLinkExtension
+from onegov.search import SearchableContent
 
 
 class BuiltinFormDefinition(FormDefinition, HiddenFromPublicExtension,
                             ContactExtension, PersonLinkExtension,
-                            CoordinatesExtension):
+                            CoordinatesExtension, SearchableContent):
     __mapper_args__ = {'polymorphic_identity': 'builtin'}
 
     es_type_name = 'builtin_forms'
-
-    @property
-    def es_public(self):
-        return not self.is_hidden_from_public
+    es_id = 'name'
 
 
 class CustomFormDefinition(FormDefinition, HiddenFromPublicExtension,
                            ContactExtension, PersonLinkExtension,
-                           CoordinatesExtension):
+                           CoordinatesExtension, SearchableContent):
     __mapper_args__ = {'polymorphic_identity': 'custom'}
 
     es_type_name = 'custom_forms'
-
-    @property
-    def es_public(self):
-        return not self.is_hidden_from_public
+    es_id = 'name'

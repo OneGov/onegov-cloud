@@ -9,6 +9,7 @@ from onegov.chat import Message
 from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler
 from onegov.reservation import Allocation, Resource, Reservation
 from onegov.ticket import Ticket, Handler, handlers
+from onegov.search.utils import extract_hashtags
 from purl import URL
 from sqlalchemy.orm import object_session
 
@@ -35,7 +36,7 @@ class OrgTicketMixin(object):
     def reference_group(self, request):
         return request.translate(self.group)
 
-    @property
+    @cached_property
     def extra_localized_text(self):
 
         # extracts of attachments are currently not searchable - if they were
@@ -57,6 +58,15 @@ class OrgTicketMixin(object):
         q = q.with_entities(Message.text)
 
         return ' '.join(n.text for n in q if n.text)
+
+    @property
+    def es_tags(self):
+        if self.extra_localized_text:
+            return [
+                tag.lstrip('#') for tag in extract_hashtags(
+                    self.extra_localized_text
+                )
+            ]
 
 
 class FormSubmissionTicket(OrgTicketMixin, Ticket):

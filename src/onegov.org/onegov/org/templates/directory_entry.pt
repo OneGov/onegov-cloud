@@ -11,14 +11,16 @@
             </div>
 
             <div metal:fill-slot="after-lead">
-                <metal:b
-                    use-macro="layout.macros['display_fields']"
-                    tal:define="
-                        fields entry.content_fields;
-                        allow_downloads True;
-                        allow_views True;
-                    "
-                />
+                <div class="directory-fields">
+                    <metal:b
+                        use-macro="layout.macros['display_fields']"
+                        tal:define="
+                            fields entry.content_fields;
+                            allow_downloads True;
+                            allow_views True;
+                        "
+                    />
+                </div>
 
                 <dl tal:define="link entry.external_link_visible and entry.external_link" tal:condition="link" class="field-display">
                     <dt i18n:translate>External link</dt>

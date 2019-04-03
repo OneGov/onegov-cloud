@@ -9,45 +9,26 @@ from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models.extensions import VisibleOnHomepageExtension
 from onegov.org.models.traitinfo import TraitInfo
 from onegov.page import Page
-from onegov.search import ORMSearchable
+from onegov.search import SearchableContent
 from sqlalchemy import desc, func
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.orm import undefer, object_session
 
 
-class SearchablePage(ORMSearchable):
+class Topic(Page, TraitInfo, SearchableContent, HiddenFromPublicExtension,
+            VisibleOnHomepageExtension, ContactExtension, PersonLinkExtension,
+            CoordinatesExtension):
+    __mapper_args__ = {'polymorphic_identity': 'topic'}
 
-    es_properties = {
-        'title': {'type': 'localized'},
-        'lead': {'type': 'localized'},
-        'text': {'type': 'localized_html'}
-    }
+    es_type_name = 'topics'
 
     lead = content_property()
     text = content_property()
     url = content_property()
 
     @property
-    def es_public(self):
-        return not self.is_hidden_from_public
-
-    @property
     def es_skip(self):
         return self.meta.get('trait') == 'link'  # do not index links
-
-    @property
-    def es_suggestions(self):
-        return {
-            "input": [self.title.lower()]
-        }
-
-
-class Topic(Page, TraitInfo, SearchablePage, HiddenFromPublicExtension,
-            VisibleOnHomepageExtension, ContactExtension, PersonLinkExtension,
-            CoordinatesExtension):
-    __mapper_args__ = {'polymorphic_identity': 'topic'}
-
-    es_type_name = 'topics'
 
     @property
     def deletable(self):
@@ -94,12 +75,16 @@ class Topic(Page, TraitInfo, SearchablePage, HiddenFromPublicExtension,
         raise NotImplementedError
 
 
-class News(Page, TraitInfo, SearchablePage, HiddenFromPublicExtension,
+class News(Page, TraitInfo, SearchableContent, HiddenFromPublicExtension,
            VisibleOnHomepageExtension, ContactExtension, PersonLinkExtension,
            CoordinatesExtension):
     __mapper_args__ = {'polymorphic_identity': 'news'}
 
     es_type_name = 'news'
+
+    lead = content_property()
+    text = content_property()
+    url = content_property()
 
     @property
     def absorb(self):

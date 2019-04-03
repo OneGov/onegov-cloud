@@ -2,6 +2,7 @@ import babel.dates
 import re
 
 from babel import Locale
+from chameleon.utils import Markup
 from cached_property import cached_property
 from datetime import date, datetime, time, timedelta
 from dateutil import rrule
@@ -122,6 +123,12 @@ class Layout(ChameleonLayout):
 
     def static_file_path(self, path):
         return self.request.link(StaticFile(path, version=self.app.version))
+
+    def with_hashtags(self, text):
+        if not text:
+            return text
+
+        return Markup(utils.hashtag_elements(self.request, text))
 
     @cached_property
     def page_id(self):

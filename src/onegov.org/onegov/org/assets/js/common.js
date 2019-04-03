@@ -86,13 +86,31 @@ $('.page-text a[href*="/datei/"]').attr('target', '_blank');
 // Turn video links into clickable thumbnails
 $('.page-text a.has-video').videoframe();
 
-// Turn hashtags into links
-$('.has-hashtag').each(function() {
-    this.innerHTML = this.innerHTML.replace(
-        /(#[0-9a-zA-Zöäüéèà]{3,})/gi, function(match) {
-            return '<a class="hashtag" href="/search?q=' + encodeURIComponent(match) + '">' + match + '</a>';
-        });
-});
+// Turn hashtags into links (happens in the backend at times, this should).
+// This could be done in the templates (and it is done for the e-mail newsletter),
+// but this way we can keep the code very simple.
+var tagselectors = [
+    '.has-hashtag',
+    '.page-lead',
+    '.news-lead',
+    '.list-lead',
+    '.occurrence-description',
+    '.search-results > li',
+    '.directory-fields .field-display dd',
+    '.message .text'
+];
+var tagexpr = new RegExp('(#[0-9a-zA-Zöäüéèà]{3,})', 'gi');
+
+var highlightTags = function(target) {
+    $(target).find(tagselectors.join(',')).each(function() {
+        this.innerHTML = this.innerHTML.replace(
+            tagexpr, function(match) {
+                return '<a class="hashtag" href="/search?q=' + encodeURIComponent(match) + '">' + match + '</a>';
+            });
+    });
+};
+
+highlightTags('#content');
 
 // Disable scroll on elements which wish it disabled
 $('.disable-scroll').on('mouseover', function() {

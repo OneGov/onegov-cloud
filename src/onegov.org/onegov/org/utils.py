@@ -4,24 +4,32 @@ import sedate
 
 from collections import defaultdict, Counter, OrderedDict
 from datetime import datetime, time
-from onegov.core.cache import lru_cache
 from isodate import parse_date, parse_datetime
 from itertools import groupby
 from libres.modules import errors as libres_errors
 from lxml.html import fragments_fromstring, tostring
+from onegov.core.cache import lru_cache
 from onegov.file import File, FileCollection
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
+from onegov.org.models.search import Search
 from onegov.ticket import TicketCollection
 from operator import attrgetter
-from sqlalchemy import nullsfirst
 from purl import URL
+from sqlalchemy import nullsfirst
 
 
 # for our empty paragraphs approach we don't need a full-blown xml parser
 # since we only remove a very limited set of paragraphs
 EMPTY_PARAGRAPHS = re.compile(r'<p>\s*<br>\s*</p>')
 
+# XXX this is doubly defined in onegov.search.utils, maybe move to a common
+# regex module in in onegov.core
+#
+# additionally it is used in onegov.org's common.js in javascript variant
+#
+# note that this tag should be safe - i.e. it may not accept '<' or the like
+# to avoid js script injection further down the line
 HASHTAG = re.compile(r'#\w{3,}')
 
 
@@ -658,3 +666,21 @@ def keywords_first(keywords):
             return keywords.index(v) - len(keywords), ''
         except ValueError:
             return 0, v
+
+
+def hashtag_elements(request, text):
+    """ Takes a text and adds html around the hashtags found inside.
+
+    The safety of this hinges on the HASHTAG regex not allowing any
+    dangerous characters like '<'
+
+    """
+
+    def link(tag):
+        return request.link(Search(request, query=tag, page=0))
+
+    def replace_tag(match):
+        tag = match.group()
+        return f'<a class="hashtag" href="{link(tag)}">{tag}</a>'
+
+    return HASHTAG.sub(replace_tag, text)

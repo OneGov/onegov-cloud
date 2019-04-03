@@ -1,6 +1,9 @@
 from cached_property import cached_property
-from elasticsearch_dsl.query import MultiMatch, MatchPhrase, FunctionScore
 from elasticsearch_dsl.function import SF
+from elasticsearch_dsl.query import FunctionScore
+from elasticsearch_dsl.query import Match
+from elasticsearch_dsl.query import MatchPhrase
+from elasticsearch_dsl.query import MultiMatch
 from onegov.core.collection import Pagination
 
 
@@ -54,6 +57,15 @@ class Search(Pagination):
         # pushing the elasticsearch cluster to the brink
         query = self.query[:self.max_query_length]
 
+        if query.startswith('#'):
+            search = self.hashtag_search(search, query)
+        else:
+            search = self.generic_search(search, query)
+
+        return search[self.offset:self.offset + self.batch_size].execute()
+
+    def generic_search(self, search, query):
+
         # make sure the title matches with a higher priority, otherwise the
         # "get lucky" functionality is not so lucky after all
         match_title = MatchPhrase(title={"query": query, "boost": 3})
@@ -77,8 +89,10 @@ class Search(Pagination):
             })
         ])
 
-        search = search[self.offset:self.offset + self.batch_size]
-        return search.execute()
+        return search
+
+    def hashtag_search(self, search, query):
+        return search.query(Match(es_tags=query.lstrip('#')))
 
     def feeling_lucky(self):
         if self.batch:

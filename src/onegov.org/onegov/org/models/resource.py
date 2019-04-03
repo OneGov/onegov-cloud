@@ -3,18 +3,16 @@ import sedate
 from datetime import datetime
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.orm.types import UUID
-from onegov.reservation import Resource, Reservation
 from onegov.form.models import FormSubmission
-from onegov.org.models.extensions import (
-    ContactExtension,
-    CoordinatesExtension,
-    HiddenFromPublicExtension,
-    PersonLinkExtension,
-)
-from onegov.search import ORMSearchable
+from onegov.org.models.extensions import ContactExtension
+from onegov.org.models.extensions import CoordinatesExtension
+from onegov.org.models.extensions import HiddenFromPublicExtension
+from onegov.org.models.extensions import PersonLinkExtension
+from onegov.reservation import Resource, Reservation
+from onegov.search import SearchableContent
 from onegov.ticket import Ticket
-from sqlalchemy.sql.expression import cast
 from sqlalchemy.orm import undefer
+from sqlalchemy.sql.expression import cast
 from uuid import uuid4, uuid5
 
 
@@ -125,20 +123,7 @@ class SharedMethods(object):
         return title
 
 
-class SearchableResource(ORMSearchable):
-
-    es_properties = {
-        'title': {'type': 'localized'},
-        'lead': {'type': 'localized'},
-        'text': {'type': 'localized_html'}
-    }
-
-    @property
-    def es_public(self):
-        return not self.is_hidden_from_public
-
-
-class DaypassResource(Resource, HiddenFromPublicExtension, SearchableResource,
+class DaypassResource(Resource, HiddenFromPublicExtension, SearchableContent,
                       ContactExtension, PersonLinkExtension,
                       CoordinatesExtension, SharedMethods):
     __mapper_args__ = {'polymorphic_identity': 'daypass'}
@@ -155,7 +140,7 @@ class DaypassResource(Resource, HiddenFromPublicExtension, SearchableResource,
     title_template = '{start:%d.%m.%Y} ({quota})'
 
 
-class RoomResource(Resource, HiddenFromPublicExtension, SearchableResource,
+class RoomResource(Resource, HiddenFromPublicExtension, SearchableContent,
                    ContactExtension, PersonLinkExtension,
                    CoordinatesExtension, SharedMethods):
     __mapper_args__ = {'polymorphic_identity': 'room'}
