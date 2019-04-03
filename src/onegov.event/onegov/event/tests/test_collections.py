@@ -408,7 +408,7 @@ def test_occurrence_collection_for_filter():
     assert occurrences.locations == ['A', 'B']
 
     occurrences = occurrences.for_filter(tag='c', location='C', range='today')
-    assert occurrences.range is 'today'
+    assert occurrences.range == 'today'
     assert occurrences.start == date.today()
     assert occurrences.end == date.today()
     assert occurrences.outdated is True
@@ -416,7 +416,7 @@ def test_occurrence_collection_for_filter():
     assert occurrences.locations == ['A', 'B', 'C']
 
     occurrences = occurrences.for_filter(tag='a', location='A')
-    assert occurrences.range is 'today'
+    assert occurrences.range == 'today'
     assert occurrences.start == date.today()
     assert occurrences.end == date.today()
     assert occurrences.outdated is True
@@ -424,7 +424,7 @@ def test_occurrence_collection_for_filter():
     assert occurrences.locations == ['B', 'C']
 
     occurrences = occurrences.for_filter(range='today', start=date(2010, 5, 1))
-    assert occurrences.range is 'today'
+    assert occurrences.range == 'today'
     assert occurrences.start == date.today()
     assert occurrences.end == date.today()
     assert occurrences.outdated is True
