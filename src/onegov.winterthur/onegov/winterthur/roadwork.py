@@ -1,5 +1,6 @@
 import isodate
 import pycurl
+import sedate
 
 from cached_property import cached_property
 from datetime import datetime, timedelta
@@ -325,15 +326,19 @@ class Roadwork(object):
 
     @property
     def sections(self):
-        horizon = datetime.utcnow() + timedelta(days=5)
+        horizon = sedate.utcnow() + timedelta(days=5)
 
-        return [
+        sections = (
             self.__class__({
                 'Id': r['TeilbaustelleId'],
                 'Teilbaustellen': [],
                 **r
             }) for r in self['Teilbaustellen']
-            if r.get('DauerBis', datetime.min) < horizon
+        )
+
+        return [
+            s for s in sections
+            if (s['DauerBis'] and s['DauerBis'] < horizon) or not s['DauerBis']
         ]
 
     def __getitem__(self, key):
