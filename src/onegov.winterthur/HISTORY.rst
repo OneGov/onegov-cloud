@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.3 (2019-04-03)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Fixes GIS link target=_blank not working in iFrame.
   [href]
 
