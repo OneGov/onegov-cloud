@@ -3,7 +3,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UTCDateTime, UUID
 from onegov.core.utils import normalize_for_url
-from onegov.search import ORMSearchable
+from onegov.search import SearchableContent
 from sqlalchemy import and_
 from sqlalchemy import Boolean
 from sqlalchemy import column
@@ -27,7 +27,7 @@ newsletter_recipients = Table(
 )
 
 
-class Newsletter(Base, ContentMixin, TimestampMixin, ORMSearchable):
+class Newsletter(Base, ContentMixin, TimestampMixin, SearchableContent):
     """ Represents a newsletter before and after it is sent.
 
     A newsletter basically consists of a title/subject, a content and a
