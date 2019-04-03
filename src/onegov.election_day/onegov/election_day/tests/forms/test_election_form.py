@@ -141,14 +141,15 @@ def test_election_form_relations(session):
     form.request = DummyRequest(session=session)
     form.on_request()
     assert form.related_elections.choices == [
-        ('first-election', 'First Election'),
-        ('second-election', 'Second Election')
+        ('second-election', '02.01.2011 Second Election'),
+        ('first-election', '01.01.2011 First Election'),
     ]
 
     form.election_de.data = 'Third Election'
     form.date.data = date(2011, 1, 3)
     form.domain.data = 'federation'
     form.mandates.data = 1
+    form.shortcode.data = 'SC'
     form.related_elections.data = ['first-election', 'second-election']
     form.update_model(election)
     session.add(election)
@@ -161,9 +162,9 @@ def test_election_form_relations(session):
     form.request = DummyRequest(session=session)
     form.on_request()
     assert form.related_elections.choices == [
-        ('first-election', 'First Election'),
-        ('second-election', 'Second Election'),
-        ('third-election', 'Third Election')
+        ('third-election', '03.01.2011 SC Third Election'),
+        ('second-election', '02.01.2011 Second Election'),
+        ('first-election', '01.01.2011 First Election'),
     ]
     form.apply_model(election)
     assert form.related_elections.data == ['third-election']

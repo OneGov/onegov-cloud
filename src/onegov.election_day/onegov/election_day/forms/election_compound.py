@@ -1,6 +1,7 @@
 from datetime import date
 from onegov.ballot import Election
 from onegov.election_day import _
+from onegov.election_day.layouts import DefaultLayout
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from wtforms import BooleanField
@@ -111,12 +112,21 @@ class ElectionCompoundForm(Form):
         if default_locale.startswith('rm'):
             self.election_de.validators.append(InputRequired())
 
+        layout = DefaultLayout(None, self.request)
+
         query = self.request.session.query(Election)
-        query = query.order_by(Election.date, Election.shortcode)
+        query = query.order_by(Election.date.desc(), Election.shortcode)
         query = query.filter(Election.domain == 'region')
         self.elections.choices = [
-            (item.id, '{} ({})'.format(item.title, item.type))
-            for item in query
+            (
+                item.id,
+                '{} {} {} ({})'.format(
+                    layout.format_date(item.date, 'date'),
+                    item.shortcode or '',
+                    item.title,
+                    item.type
+                ).replace("  ", " ")
+            ) for item in query
         ]
 
     def update_model(self, model):

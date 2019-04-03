@@ -45,9 +45,9 @@ def test_election_compound_form_populate(session):
 
     form.on_request()
     assert form.elections.choices == [
-        ('election-3', 'election-3 (majorz)'),
-        ('election-2', 'election-2 (majorz)'),
-        ('election-1', 'election-1 (proporz)')
+        ('election-2', '01.01.2001 1 election-2 (majorz)'),
+        ('election-1', '01.01.2001 2 election-1 (proporz)'),
+        ('election-3', '01.01.2000 election-3 (majorz)'),
     ]
 
 

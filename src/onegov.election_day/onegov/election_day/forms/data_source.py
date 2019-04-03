@@ -1,4 +1,5 @@
 from onegov.election_day import _
+from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.models.data_source import UPLOAD_TYPE_LABELS
 from onegov.form import Form
 from wtforms import RadioField
@@ -59,10 +60,19 @@ class DataSourceItemForm(Form):
     callout = ''
 
     def populate(self, source):
+        layout = DefaultLayout(None, self.request)
+
         self.type = source.type
         self.item.label.text = dict(UPLOAD_TYPE_LABELS).get(self.type)
         self.item.choices = [
-            (item.id, item.title) for item in source.query_candidates()
+            (
+                item.id,
+                "{} {} {}".format(
+                    layout.format_date(item.date, 'date'),
+                    item.shortcode or '',
+                    item.title
+                ).replace("  ", " ")
+            ) for item in source.query_candidates()
         ]
         self.callout = ''
         if not self.item.choices:

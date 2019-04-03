@@ -2,6 +2,7 @@ from datetime import date
 from onegov.ballot import Election
 from onegov.ballot import ElectionAssociation
 from onegov.election_day import _
+from onegov.election_day.layouts import DefaultLayout
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from sqlalchemy import or_
@@ -141,10 +142,20 @@ class ElectionForm(Form):
         if default_locale.startswith('rm'):
             self.election_de.validators.append(InputRequired())
 
+        layout = DefaultLayout(None, self.request)
+
         query = self.request.session.query(Election)
-        query = query.order_by(Election.date, Election.shortcode)
-        choices = [(election.id, election.title) for election in query]
-        self.related_elections.choices = choices
+        query = query.order_by(Election.date.desc(), Election.shortcode)
+        self.related_elections.choices = [
+            (
+                election.id,
+                "{} {} {}".format(
+                    layout.format_date(election.date, 'date'),
+                    election.shortcode or '',
+                    election.title,
+                ).strip().replace("  ", " ")
+            ) for election in query
+        ]
 
     def set_domain(self, principal):
         self.domain.choices = [

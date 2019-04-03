@@ -6,6 +6,7 @@ from onegov.election_day.forms import DataSourceItemForm
 from onegov.election_day.models import DataSource
 from onegov.election_day.models import DataSourceItem
 from onegov.election_day.tests.common import DummyPostData
+from onegov.election_day.tests.common import DummyRequest
 
 
 def test_data_source_form():
@@ -81,6 +82,7 @@ def test_data_source_item_form():
 
 def test_data_source_item_form_populate(session):
     form = DataSourceItemForm()
+    form.request = DummyRequest(session=session)
 
     session.add(DataSource(type='vote', name='dsv'))
     session.add(DataSource(type='majorz', name='dsm'))
@@ -104,18 +106,18 @@ def test_data_source_item_form_populate(session):
     assert not form.item.choices
 
     dt = date(2015, 6, 14)
-    session.add(Vote(title='v', domain='canton', date=dt))
+    session.add(Vote(title='v', domain='canton', date=dt, shortcode='SC'))
     session.add(Election(title='m', type='majorz', domain='canton', date=dt))
     session.add(Election(title='p', type='proporz', domain='canton', date=dt))
 
     form.populate(dsv)
     assert not form.callout
-    assert form.item.choices == [('v', 'v')]
+    assert form.item.choices == [('v', '14.06.2015 SC v')]
 
     form.populate(dsm)
     assert not form.callout
-    assert form.item.choices == [('m', 'm')]
+    assert form.item.choices == [('m', '14.06.2015 m')]
 
     form.populate(dsp)
     assert not form.callout
-    assert form.item.choices == [('p', 'p')]
+    assert form.item.choices == [('p', '14.06.2015 p')]
