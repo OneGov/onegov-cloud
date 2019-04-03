@@ -7,31 +7,12 @@ from onegov.form.models.registration_window import FormRegistrationWindow
 from onegov.form.parser import parse_form
 from onegov.form.utils import hash_definition
 from onegov.form.extensions import Extendable
-from onegov.search import ORMSearchable
 from sqlalchemy import Column, Text
 from sqlalchemy.orm import object_session, relationship
 from sqlalchemy_utils import observes
 
 
-class SearchableDefinition(ORMSearchable):
-    """ Defines how the definitions are searchable. For now, submissions are
-    not searched as they are usually accessed through the ticket, at least in
-    onegov.town. If other modules need this, it can be added here and
-    onegov.town can decied not to search for submissions.
-
-    """
-    es_id = 'name'
-    es_public = True
-
-    es_properties = {
-        'title': {'type': 'localized'},
-        'lead': {'type': 'localized'},
-        'text': {'type': 'localized_html'}
-    }
-
-
-class FormDefinition(Base, ContentMixin, TimestampMixin, SearchableDefinition,
-                     Extendable):
+class FormDefinition(Base, ContentMixin, TimestampMixin, Extendable):
     """ Defines a form stored in the database. """
 
     __tablename__ = 'forms'

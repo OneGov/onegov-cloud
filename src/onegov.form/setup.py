@@ -43,7 +43,6 @@ setup(
         'onegov.core>=0.70.5',
         'onegov.file',
         'onegov.pay',
-        'onegov.search',
         'phonenumbers',
         'pyparsing>=2.3.1',
         'pyyaml',
