@@ -39,7 +39,7 @@ $(document).ready(function() {
     $('a[href^="http"]').each(function() {
         var a = $(this);
 
-        if (!a.attr('href').match(internal)) {
+        if (!a.attr('href').match(internal) && !a.is('[target]')) {
             a.attr('target', '_top');
         }
     });
