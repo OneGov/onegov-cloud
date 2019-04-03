@@ -7,11 +7,11 @@ from onegov.feriennet import _
 from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.ticket import OrgTicketMixin
-from onegov.search import ORMSearchable
+from onegov.search import SearchableContent
 from onegov.ticket import handlers, Handler, Ticket
 
 
-class VacationActivity(Activity, CoordinatesExtension, ORMSearchable):
+class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
 
     __mapper_args__ = {'polymorphic_identity': 'vacation'}
 
