@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Support latest onegov.search release.
+  [href]
+
 - Improves person portrait display on mobile devices.
   [href]
 
