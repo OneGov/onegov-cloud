@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.2 (2019-04-03)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Excludes roadwork sections in the past.
   [href]
 

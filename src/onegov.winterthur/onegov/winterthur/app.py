@@ -14,7 +14,7 @@ from onegov.winterthur.roadwork import RoadworkClient
 class WinterthurApp(OrgApp):
 
     #: the version of this application (do not change manually!)
-    version = '0.4.1'
+    version = '0.4.2'
 
     frame_ancestors = {
         'https://winterthur.ch',
