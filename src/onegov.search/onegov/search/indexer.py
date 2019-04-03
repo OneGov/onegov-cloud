@@ -108,7 +108,12 @@ ANALYSIS_CONFIG = {
             "char_filter": ["html_strip"],
             "tokenizer": "standard",
             "filter": ["lowercase"]
-        }
+        },
+        "tags": {
+            "type": "custom",
+            "tokenizer": "keyword",
+            "filter": ["lowercase"]
+        },
     }
 }
 
@@ -334,6 +339,12 @@ class TypeMapping(object):
                 }
             ]
         }
+
+        mapping['es_tags'] = {
+            'analyzer': 'tags',
+            'type': 'text',
+        }
+
         return mapping
 
     def for_language(self, language):

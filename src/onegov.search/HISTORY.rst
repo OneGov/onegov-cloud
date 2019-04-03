@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds tags support.
+  [href]
+
 1.6.2 (2019-01-14)
 ~~~~~~~~~~~~~~~~~~~
 

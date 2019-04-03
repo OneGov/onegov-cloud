@@ -193,6 +193,10 @@ def test_mapping_for_language():
                 }
             ],
             'type': 'completion'
+        },
+        'es_tags': {
+            'type': 'text',
+            'analyzer': 'tags',
         }
     }
 
@@ -216,6 +220,10 @@ def test_mapping_for_language():
                 }
             ],
             'type': 'completion'
+        },
+        'es_tags': {
+            'type': 'text',
+            'analyzer': 'tags',
         }
     }
 
@@ -249,6 +257,10 @@ def test_mapping_for_language():
                 }
             ],
             'type': 'completion'
+        },
+        'es_tags': {
+            'type': 'text',
+            'analyzer': 'tags',
         }
     }
 
@@ -282,6 +294,10 @@ def test_mapping_for_language():
                 }
             ],
             'type': 'completion'
+        },
+        'es_tags': {
+            'type': 'text',
+            'analyzer': 'tags',
         }
     }
 
@@ -295,7 +311,6 @@ def test_orm_event_translator_properties():
         es_properties = {
             'title': {'type': 'localized'},
             'body': {'type': 'localized'},
-            'tags': {'type': 'text'},
             'date': {'type': 'date'},
             'published': {'type': 'boolean'},
             'likes': {'type': 'long'}
@@ -325,6 +340,10 @@ def test_orm_event_translator_properties():
         def es_last_change(self):
             return self.date
 
+        @property
+        def es_tags(self):
+            return self.tags
+
     mappings = TypeMappingRegistry()
     mappings.register_type('page', Page.es_properties)
 
@@ -349,10 +368,10 @@ def test_orm_event_translator_properties():
         'properties': {
             'title': 'About',
             'body': 'We are Pied Piper',
-            'tags': ['aboutus', 'company'],
             'date': '2015-09-11T00:00:00',
             'likes': 1000,
             'published': True,
+            'es_tags': ['aboutus', 'company'],
             'es_public': True,
             'es_last_change': '2015-09-11T00:00:00',
             'es_suggestion': {
@@ -392,10 +411,10 @@ def test_orm_event_translator_properties():
         'properties': {
             'title': 'About',
             'body': 'We are Pied Piper',
-            'tags': ['aboutus', 'company'],
             'date': '2015-09-11T00:00:00',
             'likes': 1000,
             'published': True,
+            'es_tags': ['aboutus', 'company'],
             'es_public': True,
             'es_last_change': '2015-09-11T00:00:00',
             'es_suggestion': {
@@ -487,7 +506,12 @@ def test_type_mapping_registry():
         registry.register_type('page', {})
 
     assert registry.registered_fields == {
-        'title', 'comment', 'es_suggestion', 'es_public', 'es_last_change'
+        'title',
+        'comment',
+        'es_suggestion',
+        'es_public',
+        'es_last_change',
+        'es_tags',
     }
 
 
@@ -587,6 +611,51 @@ def test_extra_analyzers(es_client):
     assert [v['token'] for v in result['tokens']] == [
         'mocht', 'wirklich', 'weiterfahr'
     ]
+
+
+def test_tags(es_client):
+
+    mappings = TypeMappingRegistry()
+    mappings.register_type('page', {
+        'tags': {'type': 'text', 'analyzer': 'tags'}
+    })
+
+    index = "foo-bar-en-page"
+    indexer = Indexer(mappings, Queue(), hostname='foo', es_client=es_client)
+
+    indexer.queue.put({
+        'action': 'index',
+        'schema': 'bar',
+        'type_name': 'page',
+        'id': 1,
+        'language': 'en',
+        'properties': {
+            'tags': ['foo', 'BAR', 'baz'],
+            'es_public': True
+        }
+    })
+
+    assert indexer.process()
+
+    es_client.indices.refresh(index=index)
+    search = es_client.search(index=index)
+
+    assert search['hits']['total'] == 1
+
+    search = es_client.search(
+        index=index, body={'query': {'match': {'tags': 'foo'}}})
+
+    assert search['hits']['total'] == 1
+
+    search = es_client.search(
+        index=index, body={'query': {'match': {'tags': 'bar'}}})
+
+    assert search['hits']['total'] == 1
+
+    search = es_client.search(
+        index=index, body={'query': {'match': {'tags': 'bad'}}})
+
+    assert search['hits']['total'] == 0
 
 
 def test_elasticsearch_outage(es_client, es_url):

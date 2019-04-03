@@ -1,4 +1,5 @@
 import hashlib
+import html
 import os
 import re
 
@@ -6,6 +7,11 @@ from onegov.core.custom import json
 from langdetect import DetectorFactory, PROFILES_DIRECTORY
 from langdetect.utils.lang_profile import LangProfile
 from onegov.core.orm import find_models
+
+
+# XXX this is doubly defined in onegov.org.utils, maybe move to a common
+# regex module in in onegov.core
+HASHTAG = re.compile(r'#\w{3,}')
 
 
 def searchable_sqlalchemy_models(base):
@@ -60,6 +66,10 @@ def normalize_index_segment(segment, allow_wildcards):
 def hash_mapping(mapping):
     dump = json.dumps(mapping, sort_keys=True).encode('utf-8')
     return hashlib.sha1(dump).hexdigest()
+
+
+def extract_hashtags(text):
+    return HASHTAG.findall(html.unescape(text))
 
 
 class classproperty(object):

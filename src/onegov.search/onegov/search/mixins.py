@@ -1,4 +1,5 @@
 from onegov.search.utils import classproperty
+from onegov.search.utils import extract_hashtags
 
 
 class Searchable(object):
@@ -128,6 +129,11 @@ class Searchable(object):
         """ Returns the date the document was created/last modified. """
         return None
 
+    @property
+    def es_tags(self):
+        """ Returns a list of tags associated with this content. """
+        return None
+
 
 class ORMSearchable(Searchable):
     """ Extends the default :class:`Searchable` class with sensible defaults
@@ -146,3 +152,38 @@ class ORMSearchable(Searchable):
     @property
     def es_last_change(self):
         return getattr(self, 'last_change', None)
+
+
+class SearchableContent(ORMSearchable):
+    """ Adds search to all classes using the core's content mixin:
+    :class:`onegov.core.orm.mixins.content.ContentMixin`
+
+    """
+
+    es_properties = {
+        'title': {'type': 'localized'},
+        'lead': {'type': 'localized'},
+        'text': {'type': 'localized_html'}
+    }
+
+    @property
+    def es_public(self):
+        return not self.is_hidden_from_public
+
+    @property
+    def es_suggestions(self):
+        return {
+            "input": [self.title.lower()]
+        }
+
+    @property
+    def es_tags(self):
+        tags = []
+
+        for field in ('lead', 'text', 'description'):
+            text = getattr(self, field, None)
+
+            if text:
+                tags.extend(tag.lstrip('#') for tag in extract_hashtags(text))
+
+        return tags or None

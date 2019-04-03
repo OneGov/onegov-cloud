@@ -165,6 +165,15 @@ def test_orm_integration(es_url, postgres_dsn, redis_url):
         def es_suggestion(self):
             return self.title
 
+        @property
+        def es_tags(self):
+            if not isinstance(self.body, str):
+                body = ''.join(self.body)
+            else:
+                body = self.body
+
+            return [word for word in body.split(' ') if len(word) > 3]
+
         es_public = True
         es_language = 'en'
         es_properties = {
@@ -184,14 +193,23 @@ def test_orm_integration(es_url, postgres_dsn, redis_url):
 
         query = request.params.get('q')
         if query:
-            return request.app.es_client.search(index='_all', body={
-                'query': {
-                    'multi_match': {
-                        'query': query,
-                        'fields': ['title', 'body']
+            if query.startswith('#'):
+                return request.app.es_client.search(index='_all', body={
+                    'query': {
+                        'match': {
+                            'es_tags': query.lstrip('#'),
+                        }
                     }
-                }
-            })
+                })
+            else:
+                return request.app.es_client.search(index='_all', body={
+                    'query': {
+                        'multi_match': {
+                            'query': query,
+                            'fields': ['title', 'body']
+                        }
+                    }
+                })
         else:
             return request.app.es_client.search(index='_all')
 
@@ -248,6 +266,13 @@ def test_orm_integration(es_url, postgres_dsn, redis_url):
 
     documents = client.get('/?q=company').json
     assert documents['hits']['total'] == 1
+
+    # %23 = #
+    documents = client.get('/?q=%23company').json
+    assert documents['hits']['total'] == 1
+
+    documents = client.get('/?q=%23companx').json
+    assert documents['hits']['total'] == 0
 
     client.get('/delete?id=3')
 
