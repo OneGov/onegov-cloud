@@ -16,7 +16,7 @@ from onegov.event.models.occurrence import Occurrence
 from onegov.file import File
 from onegov.file.utils import as_fileintent
 from onegov.gis import CoordinatesMixin
-from onegov.search import ORMSearchable
+from onegov.search import SearchableContent
 from pytz import UTC
 from sedate import standardize_date
 from sedate import to_timezone
@@ -38,7 +38,7 @@ class EventFile(File):
 
 
 class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
-            ORMSearchable, CoordinatesMixin):
+            SearchableContent, CoordinatesMixin):
     """ Defines an event.
 
     Occurrences are stored in a seperate table containing only a minimal set
