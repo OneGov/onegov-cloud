@@ -31,7 +31,7 @@ The structure of the folder is expected to be in the form::
   [folder]/[attribute]/[locale]/[bfs_number].pdf
 
 The attribute may be any
-`LocalizedFile attribute<https://github.com/OneGov/onegov.swissvotes/blob/master/onegov/swissvotes/models/vote.py#L608>`_
+`LocalizedFile attribute <https://github.com/OneGov/onegov.swissvotes/blob/master/onegov/swissvotes/models/vote.py#L608>`_
 of the SwissVote model.
 
 
