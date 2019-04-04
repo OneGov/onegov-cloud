@@ -43,7 +43,7 @@ def test_extended_people_filter(session):
     people = ExtendedPersonCollection(session)
     people.add(first_name="Hans", last_name="Maulwurf")
     people.add(first_name="Waylon", last_name="Śmithers")
-    people.add(first_name="Lenny", last_name="Leonard")
+    people.add(first_name="Lenny", last_name="leonard")
     people.add(first_name="Carl", last_name="Çarlson")
     ned = people.add(first_name="Ned", last_name="Flanders")
 
@@ -53,14 +53,17 @@ def test_extended_people_filter(session):
     agencies.add_root(title="Moe's Tavern")
 
     assert [p.last_name for p in people.query()] == [
-        "Çarlson", "Flanders", "Leonard", "Maulwurf", "Śmithers"
+        "Çarlson", "Flanders", "leonard", "Maulwurf", "Śmithers"
     ]
 
     people = people.for_filter(letter="C")
     assert [p.last_name for p in people.query()] == ['Çarlson']
 
+    people = people.for_filter(letter="c")
+    assert [p.last_name for p in people.query()] == ['Çarlson']
+
     people = people.for_filter(letter="L")
-    assert [p.last_name for p in people.query()] == ['Leonard']
+    assert [p.last_name for p in people.query()] == ['leonard']
 
     people = people.for_filter(agency="Police")
     assert [p.last_name for p in people.query()] == []
@@ -75,7 +78,7 @@ def test_extended_people_used_letters(session):
     people = ExtendedPersonCollection(session)
     people.add(first_name="Hans", last_name="Maulwurf")
     people.add(first_name="Waylon", last_name="Śmithers")
-    people.add(first_name="Lenny", last_name="Leonard")
+    people.add(first_name="Lenny", last_name="leonard")
     people.add(first_name="Carl", last_name="Çarlson")
     people.add(first_name="Ned", last_name="Flanders")
 

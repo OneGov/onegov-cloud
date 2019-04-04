@@ -23,7 +23,7 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
     def __init__(self, session, page=0, letter=None, agency=None):
         self.session = session
         self.page = page
-        self.letter = letter
+        self.letter = letter.upper() if letter else None
         self.agency = agency
         self.exclude_hidden = False
 
@@ -63,15 +63,17 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
             )
         if self.letter:
             query = query.filter(
-                func.unaccent(ExtendedPerson.last_name).startswith(self.letter)
+                func.upper(
+                    func.unaccent(ExtendedPerson.last_name)
+                ).startswith(self.letter)
             )
         if self.agency:
             query = query.join(ExtendedPerson.memberships)
             query = query.join(AgencyMembership.agency)
             query = query.filter(Agency.title == self.agency)
         query = query.order_by(
-            func.unaccent(ExtendedPerson.last_name),
-            func.unaccent(ExtendedPerson.first_name)
+            func.upper(func.unaccent(ExtendedPerson.last_name)),
+            func.upper(func.unaccent(ExtendedPerson.first_name))
         )
         return query
 

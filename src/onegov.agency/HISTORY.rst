@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes letter filter being case sensitive.
+  [msom]
+
 1.10.0 (2019-04-01)
 ~~~~~~~~~~~~~~~~~~~~
 
