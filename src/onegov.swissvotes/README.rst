@@ -26,9 +26,14 @@ There is a command line command for batch-uploading and indexing attachments::
 
   onegov-swissvotes import [folder]
 
-The strucutre of the folder is expected to be in the form::
+The structure of the folder is expected to be in the form::
 
   [folder]/[attribute]/[locale]/[bfs_number].pdf
+
+The attribute may be any
+`LocalizedFile <https://github.com/OneGov/onegov.swissvotes/blob/master/onegov/swissvotes/models/vote.py#L608>`_
+attribute of the SwissVote model.
+
 
 Run the Tests
 -------------
