@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-03-01 08:39+0100\n"
+"POT-Creation-Date: 2019-04-04 09:55+0200\n"
 "PO-Revision-Date: 2019-02-18 06:39+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -3021,6 +3021,9 @@ msgstr "Bestätigen Sie Ihre Reservation"
 #, python-format
 msgid "Reservations must be made ${n} ${unit} in advance"
 msgstr "Reservationen müssen ${n} ${unit} im Voraus gemacht werden"
+
+msgid "This date lies in the past"
+msgstr "Dieses Datum liegt in der Vergangenheit"
 
 msgid "Reserve"
 msgstr "Reservieren"

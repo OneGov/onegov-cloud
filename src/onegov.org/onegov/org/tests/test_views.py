@@ -1056,19 +1056,19 @@ def test_resource_slots(client):
 
     assert result[0]['start'] == '2015-08-04T00:00:00+02:00'
     assert result[0]['end'] == '2015-08-05T00:00:00+02:00'
-    assert result[0]['className'] == 'event-available'
+    assert result[0]['className'] == 'event-in-past event-available'
     assert result[0]['title'] == "Ganztägig \nVerfügbar"
 
     assert result[1]['start'] == '2015-08-05T00:00:00+02:00'
     assert result[1]['end'] == '2015-08-06T00:00:00+02:00'
-    assert result[1]['className'] == 'event-available'
+    assert result[1]['className'] == 'event-in-past event-available'
     assert result[1]['title'] == "Ganztägig \nVerfügbar"
 
     url = '/resource/foo/slots?start=2015-08-06&end=2015-08-06'
     result = client.get(url).json
 
     assert len(result) == 1
-    assert result[0]['className'] == 'event-unavailable'
+    assert result[0]['className'] == 'event-in-past event-unavailable'
     assert result[0]['title'] == "12:00 - 16:00 \nBesetzt"
 
 
@@ -1384,6 +1384,7 @@ def test_allocation_holidays(client):
     assert slots.json[2]['start'].startswith('2019-08-02')
 
 
+@freeze_time("2015-08-28")
 def test_reserve_allocation(client):
 
     # prepate the required data
@@ -1504,6 +1505,7 @@ def test_reserve_allocation(client):
     assert len(client.app.smtp.outbox) == 4
 
 
+@freeze_time("2015-08-28")
 def test_reserve_allocation_partially(client):
 
     # prepate the required data
@@ -1559,6 +1561,7 @@ def test_reserve_allocation_partially(client):
     assert slots[0]['partitions'] == [[50.0, True], [50.0, False]]
 
 
+@freeze_time("2015-08-28")
 def test_reserve_no_definition(client):
 
     # prepate the required data
@@ -1590,6 +1593,44 @@ def test_reserve_no_definition(client):
     assert len(client.app.smtp.outbox) == 1
 
 
+def test_reserve_in_past(client):
+
+    admin = client.spawn()
+    admin.login_admin()
+
+    editor = client.spawn()
+    editor.login_editor()
+
+    transaction.begin()
+
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2019, 4, 3), datetime(2019, 4, 3)),
+        whole_day=True,
+        quota=4,
+        quota_limit=4
+    )
+
+    reserve_as_anonymous = client.bound_reserve(allocations[0])
+    reserve_as_admin = admin.bound_reserve(allocations[0])
+    reserve_as_editor = editor.bound_reserve(allocations[0])
+
+    transaction.commit()
+
+    # create a reservation
+    assert reserve_as_anonymous().json == {
+        'message': "Dieses Datum liegt in der Vergangenheit",
+        'success': False
+    }
+
+    assert reserve_as_admin().json == {'success': True}
+    assert reserve_as_editor().json == {'success': True}
+
+
+@freeze_time("2015-08-28")
 def test_reserve_confirmation_no_definition(client):
 
     resources = ResourceCollection(client.app.libres_context)
@@ -1631,6 +1672,7 @@ def test_reserve_confirmation_no_definition(client):
     assert "changed@example.org" in confirmation
 
 
+@freeze_time("2015-08-28")
 def test_reserve_confirmation_with_definition(client):
 
     resources = ResourceCollection(client.app.libres_context)
@@ -1674,6 +1716,7 @@ def test_reserve_confirmation_with_definition(client):
     assert "Alderson" in confirmation
 
 
+@freeze_time("2015-08-28")
 def test_reserve_session_bound(client):
 
     # prepate the required data
@@ -1707,6 +1750,7 @@ def test_reserve_session_bound(client):
     assert client.post(complete_url).follow().status_code == 200
 
 
+@freeze_time("2015-08-28")
 def test_delete_reservation_anonymous(client):
 
     # prepate the required data
@@ -1745,6 +1789,7 @@ def test_delete_reservation_anonymous(client):
     assert len(client.get(reservations_url).json['reservations']) == 0
 
 
+@freeze_time("2015-08-28")
 def test_reserve_in_parallel(client):
 
     # prepate the required data
@@ -1782,6 +1827,7 @@ def test_reserve_in_parallel(client):
         in f2.form.submit().follow()
 
 
+@freeze_time("2015-08-28")
 def test_occupancy_view(client):
 
     # prepate the required data
@@ -1817,6 +1863,7 @@ def test_occupancy_view(client):
     assert len(occupancy.pyquery('.occupancy-block')) == 1
 
 
+@freeze_time("2015-08-28")
 def test_reservation_export_view(client):
 
     # prepate the required data
@@ -1866,6 +1913,7 @@ def test_reservation_export_view(client):
     assert charlie['form'] == {'vorname': 'Charlie', 'nachname': 'Carson'}
 
 
+@freeze_time("2016-04-28")
 def test_reserve_session_separation(client):
     c1 = client.spawn()
     c1.login_admin()
@@ -3620,6 +3668,7 @@ def test_manual_form_payment(client):
     assert "Offen" in payments
 
 
+@freeze_time("2017-07-09")
 def test_manual_reservation_payment_with_extra(client):
 
     # prepate the required data
@@ -3686,6 +3735,7 @@ def test_manual_reservation_payment_with_extra(client):
     assert "Offen" in payments
 
 
+@freeze_time("2017-07-09")
 def test_manual_reservation_payment_without_extra(client):
 
     # prepate the required data

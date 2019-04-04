@@ -384,21 +384,24 @@ class AllocationEventInfo(object):
         return '\n'.join((self.event_time + ' ', available))
 
     @property
-    def event_class(self):
+    def event_classes(self):
+        if self.allocation.end < sedate.utcnow():
+            yield 'event-in-past'
+
         if self.quota > 1:
             if self.quota_left == self.quota:
-                return 'event-available'
+                yield 'event-available'
             elif self.quota_left > 0:
-                return 'event-partly-available'
+                yield 'event-partly-available'
             else:
-                return 'event-unavailable'
+                yield 'event-unavailable'
         else:
             if self.availability >= 80.0:
-                return 'event-available'
-            if self.availability >= 20.0:
-                return 'event-partly-available'
+                yield 'event-available'
+            elif self.availability >= 20.0:
+                yield 'event-partly-available'
             else:
-                return 'event-unavailable'
+                yield 'event-unavailable'
 
     @property
     def event_actions(self):
@@ -452,7 +455,7 @@ class AllocationEventInfo(object):
             'partlyAvailable': self.allocation.partly_available,
             'quota': self.allocation.quota,
             'quotaLeft': self.quota_left,
-            'className': self.event_class,
+            'className': ' '.join(self.event_classes),
             'partitions': self.allocation.availability_partitions(),
             'actions': [
                 link(self.request).decode('utf-8')

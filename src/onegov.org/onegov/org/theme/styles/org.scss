@@ -2701,7 +2701,21 @@ button {
         }
 
         .fc-today {
-            background: $yellow-pastel;
+            background: $yellow-pastel !important;
+
+            &.fc-day {
+                background: $yellow-pastel !important;
+            }
+
+            &.fc-day-top,
+            &.fc-day-header, {
+                background: $yellow-light !important;
+                opacity: 1;
+            }
+        }
+
+        .event-in-past {
+            filter: grayscale(1);
         }
 
         .fc-day-header,

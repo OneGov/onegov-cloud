@@ -105,7 +105,7 @@ def reserve_allocation(self, request):
             sedate.to_timezone(self.start, self.timezone), start, end
         )
     else:
-        start = self.start, self.end
+        start, end = self.start, self.end
 
     resource = request.app.libres_resources.by_allocation(self)
 
@@ -134,6 +134,12 @@ def reserve_allocation(self, request):
                 'unit': unit
             })
         )
+
+        return respond_with_error(request, err)
+
+    # if the allocation is in the past, disable it for anonymous users...
+    if not request.is_manager and end < sedate.utcnow():
+        err = request.translate(_("This date lies in the past"))
 
         return respond_with_error(request, err)
 

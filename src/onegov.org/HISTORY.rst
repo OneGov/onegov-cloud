@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves handling of allocations in the past.
+  [href]
+
 - Support latest onegov.search release.
   [href]
 
