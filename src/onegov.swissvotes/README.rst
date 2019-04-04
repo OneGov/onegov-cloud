@@ -3,6 +3,26 @@ Onegov Swissvotes
 
 Database for federal votes.
 
+Full Text Search
+----------------
+
+Onegov Swissvotes uses Poppler + Postgres for full text search of attached PDFs.
+
+If you want to reindex the attachments, you can run::
+
+    onegov-swissvotes reindex
+
+Batch Upload Attachemnts
+------------------------
+
+There is a command line command for batch-uploading and indexing attachments::
+
+  onegov-swissvotes import [folder]
+
+The strucutre of the folder is expected to be in the form::
+
+  [folder]/[attribute]/[locale]/[bfs_number].pdf
+
 Run the Tests
 -------------
 
