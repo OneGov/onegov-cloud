@@ -52,10 +52,11 @@ Additional informations
 -----------------------
 
 Informations intended for the end user of a Onegov Election Day instance
-(upload and downlad format specifications, available JSON and embedded views,
-headerless mode, REST interface, WabstiCExport) are found [here](docs/README.md).
+(such as upload and downlad format specifications, available JSON and embedded views,
+headerless mode, REST interface and WabstiCExport interface) can be found
+`here <docs/README.md>`_.
 
-There are also some information regarding testing the application [here](docs/testing.md).
+There are also some information regarding `testing the application <docs/testing.md>`_.
 
 
 Build Status
