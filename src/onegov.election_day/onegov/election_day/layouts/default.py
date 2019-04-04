@@ -20,6 +20,7 @@ class DefaultLayout(ChameleonLayout):
         super().__init__(model, request)
 
         self.request.include('common')
+        self.request.include('chosen')
         self.request.include('custom')
 
         if 'headerless' in request.params:

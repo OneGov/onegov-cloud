@@ -3,7 +3,7 @@ from onegov.ballot import Election
 from onegov.election_day import _
 from onegov.election_day.layouts import DefaultLayout
 from onegov.form import Form
-from onegov.form.fields import MultiCheckboxField
+from onegov.form.fields import ChosenSelectMultipleField
 from wtforms import BooleanField
 from wtforms import RadioField
 from wtforms import StringField
@@ -58,7 +58,7 @@ class ElectionCompoundForm(Form):
         render_kw={'lang': 'rm'}
     )
 
-    elections = MultiCheckboxField(
+    elections = ChosenSelectMultipleField(
         label=_("Elections"),
         choices=[],
         validators=[

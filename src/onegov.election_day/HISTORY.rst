@@ -10,6 +10,9 @@ Changelog
 - Shows more infos about elections and votes in forms.
   [msom]
 
+- Uses the chosen select widgets in various forms.
+  [msom]
+
 3.10.0 (2019-03-18)
 ~~~~~~~~~~~~~~~~~~~
 

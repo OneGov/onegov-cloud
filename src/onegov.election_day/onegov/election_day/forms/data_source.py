@@ -2,6 +2,7 @@ from onegov.election_day import _
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.models.data_source import UPLOAD_TYPE_LABELS
 from onegov.form import Form
+from onegov.form.fields import ChosenSelectField
 from wtforms import RadioField
 from wtforms import StringField
 from wtforms.validators import InputRequired
@@ -36,7 +37,7 @@ class DataSourceForm(Form):
 
 class DataSourceItemForm(Form):
 
-    item = RadioField(
+    item = ChosenSelectField(
         label="",
         choices=[],
         validators=[

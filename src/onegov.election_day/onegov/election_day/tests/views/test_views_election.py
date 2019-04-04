@@ -629,7 +629,7 @@ def test_view_election_relations(election_day_app_gr):
     new.form['mandates'] = 2
     new.form['election_type'] = 'majorz'
     new.form['domain'] = 'federation'
-    new.form['related_elections'] = 'first-election'
+    new.form['related_elections'] = ['first-election']
     new.form.submit()
 
     csv = MAJORZ_HEADER

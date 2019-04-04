@@ -4,7 +4,7 @@ from onegov.ballot import ElectionAssociation
 from onegov.election_day import _
 from onegov.election_day.layouts import DefaultLayout
 from onegov.form import Form
-from onegov.form.fields import MultiCheckboxField
+from onegov.form.fields import ChosenSelectMultipleField
 from sqlalchemy import or_
 from wtforms import BooleanField
 from wtforms import IntegerField
@@ -117,13 +117,13 @@ class ElectionForm(Form):
         render_kw={'lang': 'rm'}
     )
 
-    related_link = URLField(
-        label=_("Related link")
-    )
-
-    related_elections = MultiCheckboxField(
+    related_elections = ChosenSelectMultipleField(
         label=_("Related elections"),
         choices=[]
+    )
+
+    related_link = URLField(
+        label=_("Related link")
     )
 
     def on_request(self):
