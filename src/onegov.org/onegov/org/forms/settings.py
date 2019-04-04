@@ -120,6 +120,11 @@ class FooterSettingsForm(Form):
         fieldset=_("Information"),
         render_kw={'class_': 'internal-url'})
 
+    about_url = URLField(
+        label=_("About"),
+        description=_("URL pointing to an about page"),
+        fieldset=_("Information"))
+
     facebook_url = URLField(
         label=_("Facebook"),
         description=_("URL pointing to the facebook site"),

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-04-04 11:32+0200\n"
+"POT-Creation-Date: 2019-04-04 13:31+0200\n"
 "PO-Revision-Date: 2019-02-18 06:40+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -973,6 +973,12 @@ msgstr "Lien vers les horaires d'ouvertures"
 
 msgid "URL pointing to an opening hours page"
 msgstr "URL pointant vers une page d'horaires d'ouverture"
+
+msgid "About"
+msgstr "Impressum"
+
+msgid "URL pointing to an about page"
+msgstr "URL pointant vers mentions légales"
 
 msgid "Facebook"
 msgstr "Facebook"

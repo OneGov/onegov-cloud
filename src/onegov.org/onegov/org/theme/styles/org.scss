@@ -457,23 +457,13 @@ $footer-border-width: 0;
 
     .footer-links {
         padding: .5rem 0;
-        text-align: center;
-    }
-
-    .onegovcloud-footer {
-        background: $gray;
-        border-radius: 5px 5px 0 0;
-        display: inline-block;
-        padding: 0 6px;
         position: relative;
-        top: .51rem;
+        text-align: center;
 
-        * {
-            background: $gray;
-        }
-
-        span + span::before {
-            content: '•'
+        .columns {
+            span + span::before {
+                content: '•';
+            }
         }
     }
 }

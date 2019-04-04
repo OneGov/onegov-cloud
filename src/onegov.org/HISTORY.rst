@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to link to an about page (Impressum).
+  [href]
+
 - Adds a privacy protection link to the footer.
   [href]
 

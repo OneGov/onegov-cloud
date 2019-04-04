@@ -38,6 +38,7 @@ class Organisation(Base, TimestampMixin):
     contact_url = meta_property()
     opening_hours = meta_property()
     opening_hours_url = meta_property()
+    about_url = meta_property()
     reply_to = meta_property()
     facebook_url = meta_property()
     twitter_url = meta_property()
