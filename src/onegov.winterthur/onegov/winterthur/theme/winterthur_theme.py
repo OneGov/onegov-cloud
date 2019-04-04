@@ -5,7 +5,6 @@ from onegov.org.theme import OrgTheme
 # options editable by the user
 user_options = {
     'primary-color': '#e33521',
-    'footer-height': '38px'
 }
 
 

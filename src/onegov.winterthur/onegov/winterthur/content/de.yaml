@@ -36,7 +36,6 @@ pages:
 
 organisation:
   theme_options:
-    footer-height: 235px
     primary-color: '#e33521'
   meta:
     homepage_structure: |
