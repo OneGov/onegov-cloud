@@ -43,9 +43,10 @@ a > h6 {
 }
 
 /*
-    hide the map provider
+    hide some settings
 */
-.field-geo_provider {
+.field-geo_provider,
+.field-about_url {
     display: none;
 }
 
