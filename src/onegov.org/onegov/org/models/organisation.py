@@ -3,7 +3,7 @@
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import meta_property, TimestampMixin
 from onegov.core.orm.types import JSON, UUID
-from onegov.core.utils import linkify
+from onegov.core.utils import linkify, paragraphify
 from onegov.org.theme import user_options
 from onegov.org.models.swiss_holidays import SwissHolidays
 from sqlalchemy import Column, Text
@@ -73,12 +73,12 @@ class Organisation(Base, TimestampMixin):
     @contact.setter
     def contact(self, value):
         self.meta['contact'] = value
-        self.meta['contact_html'] = linkify(value).replace('\n', '<br>')
+        self.meta['contact_html'] = paragraphify(value)
 
     @opening_hours.setter
     def opening_hours(self, value):
         self.meta['opening_hours'] = value
-        self.meta['opening_hours_html'] = linkify(value).replace('\n', '<br>')
+        self.meta['opening_hours_html'] = paragraphify(linkify(value))
 
     @property
     def title(self):
