@@ -1,5 +1,5 @@
-ongov.election_day
-==================
+Onegov Election Day
+===================
 
 Upload Formats
 --------------
@@ -193,9 +193,3 @@ It is possible to set the language used for the error messages by setting the
       --form "wp_wahl=@WP_Wahl.csv" \
       --form "wpstatic_gemeinden=@WPStatic_Gemeinden.csv" \
       --form "wpstatic_kandidaten=@WPStatic_Kandidaten.csv"
-
-
-Testing
--------
-
-See [here](testing.md)

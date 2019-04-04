@@ -48,6 +48,16 @@ And generate the PDFs or SVGs using the CLI::
     onegov-election-day --select /onegov_election_day/* generate-media
 
 
+Additional informations
+-----------------------
+
+Informations intended for the end user of a Onegov Election Day instance
+(upload and downlad format specifications, available JSON and embedded views,
+headerless mode, REST interface, WabstiCExport) are found [here](docs/README.md).
+
+There are also some information regarding testing the application [here](docs/testing.md).
+
+
 Build Status
 ------------
 
