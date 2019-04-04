@@ -4570,6 +4570,25 @@ def test_search_signed_files(client_with_es):
     assert 'Sample' in client.spawn().get('/search?q=Adobe')
 
 
+def test_search_hashtags(client_with_es):
+
+    client = client_with_es
+    client.login_admin()
+
+    page = client.get('/news').click("Nachricht")
+    page.form['title'] = "We have a new homepage"
+    page.form['lead'] = "It is very good"
+    page.form['text'] = "It is lots of fun #newhomepage"
+
+    page = page.form.submit().follow()
+
+    client.app.es_indexer.process()
+    client.app.es_client.indices.refresh(index='_all')
+
+    assert 'We have a new homepage' in client.get('/search?q=%23newhomepage')
+    assert 'We have a new homepage' not in client.get('/search?q=%23newhomepa')
+
+
 def test_sign_document(client):
     client.login_admin()
 
