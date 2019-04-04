@@ -3,7 +3,7 @@ Onegov Gazette
 
 OneGov official notices website.
 
-Used the model from `Onegov Notice <https://github.com/OneGov/onegov.notice>`_.
+Ongeov Gazette uses the model from `Onegov Notice <https://github.com/OneGov/onegov.notice>`_.
 
 Configuration Options
 ---------------------
