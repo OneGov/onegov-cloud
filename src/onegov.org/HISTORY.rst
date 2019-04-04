@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a privacy protection link to the footer.
+  [href]
+
 - Improves handling of allocations in the past.
   [href]
 

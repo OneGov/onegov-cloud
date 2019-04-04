@@ -128,12 +128,21 @@
     </tal:b>
 </metal:footer_columns>
 
-<metal:footer_links define-macro="footer_links">
+<metal:footer_links define-macro="footer_links" i18n:domain="onegov.org">
     <div class="row footer-links">
       <div class="small-12 columns">
-        <a href="https://www.onegovcloud.ch">OneGov Cloud</a>
-        by
-        <a href="https://www.seantis.ch">Seantis GmbH</a>
+        <div class="onegovcloud-footer">
+            <span>
+                <a href="https://www.onegovcloud.ch">OneGov Cloud</a>
+                by
+                <a href="https://www.seantis.ch">Seantis GmbH</a>
+            </span>
+            <span>
+                <a href="https://www.onegovcloud.ch/datenschutz" i18n:translate>
+                    Privacy Protection
+                </a>
+            </span>
+        </div>
       </div>
     </div>
 </metal:footer_links>
