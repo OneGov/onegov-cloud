@@ -77,9 +77,6 @@ $('.show-new-content-placeholder')
         $('.new-content-placeholder').remove();
     });
 
-// get the footer height and write it to the footer_height setting if possible
-$(document).find('#footer_height').val($('footer > div').height() + 'px');
-
 // Make sure files open in another window
 $('.page-text a[href*="/datei/"]').attr('target', '_blank');
 

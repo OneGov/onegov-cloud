@@ -134,21 +134,42 @@ html {
 }
 
 /*
-    our footer is sticky, which is no easy feat, since variable length
-    sticky footers don't work with anything but the latest browsers (flex)
-
-    however, sticky footers work just fine if you know the height of the footer
-
-    since we have semi-variable content in the footer (it can change, but not
-    often), we read the height of the footer if the settings page is open
-    and write the footer height into the custom theme variables
-
-    see common.js for the oneliner that does that (look for footer_height)
+    Our footer is kept at the bottom without being "sticky", thanks to this
+    approach: https://dev.to/domysee/keeping-the-footer-at-the-bottom-with-css-flexbox-5h5f
 */
-
 html,
 body {
     height: 100%;
+    width: 100%;
+}
+
+footer {
+    margin-top: .5rem;
+}
+
+.ie-11-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 100%;
+}
+
+main {
+    align-items: stretch;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+article {
+    background: $white;
+    flex-grow: 1;
+}
+
+header,
+article,
+footer {
+    flex-shrink: 0;
 }
 
 /*
@@ -335,14 +356,6 @@ $globals-height: 2.5rem;
     }
 }
 
-#inner-body {
-    margin: 0 auto (-$footer-height);
-
-    @media not print {
-        min-height: 100%;
-    }
-}
-
 .header {
     // the header is fixed and the logo in it tries to fill it out
     // therefore an svg logo should be used!
@@ -368,14 +381,6 @@ $globals-height: 2.5rem;
 
     img {
         height: 7em;
-    }
-}
-
-@media not print {
-    footer,
-    .push {
-        @include prefix(animation-duration, 3s);
-        height: $footer-height; /* .push must be the same height as .footer */
     }
 }
 
@@ -2200,9 +2205,9 @@ $person-email-icon: '\f003';
     .person-card {
         .person-card-portrait {
             float: none;
+            height: calc(100vw - 3rem);
             margin-bottom: 1em;
             width: calc(100vw - 3rem);
-            height: calc(100vw - 3rem);
         }
     }
 }
@@ -3382,8 +3387,8 @@ ul.search-results {
     }
 
     ul {
-        margin-left: 0;
         list-style: none;
+        margin-left: 0;
     }
 }
 

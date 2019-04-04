@@ -7,7 +7,6 @@ from onegov.core.utils import module_path
 # options editable by the user
 user_options = {
     'primary-color': '#006fba',
-    'footer-height': '38px'
 }
 
 

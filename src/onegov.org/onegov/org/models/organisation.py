@@ -73,7 +73,7 @@ class Organisation(Base, TimestampMixin):
     @contact.setter
     def contact(self, value):
         self.meta['contact'] = value
-        self.meta['contact_html'] = paragraphify(value)
+        self.meta['contact_html'] = paragraphify(linkify(value))
 
     @opening_hours.setter
     def opening_hours(self, value):

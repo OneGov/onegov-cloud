@@ -11,7 +11,7 @@ from onegov.org.forms.fields import HtmlField
 from onegov.org.homepage_widgets import transform_homepage_structure
 from onegov.org.homepage_widgets import XML_LINE_OFFSET
 from onegov.org.theme import user_options
-from wtforms import HiddenField, StringField, TextAreaField, RadioField
+from wtforms import StringField, TextAreaField, RadioField
 from wtforms import ValidationError
 from wtforms import validators
 from wtforms.fields.html5 import EmailField, URLField
@@ -53,14 +53,9 @@ class GeneralSettingsForm(Form):
         ),
         validators=[validators.InputRequired()])
 
-    # the footer height is determined by javascript, see org.scss and
-    # common.js for more information (search for footer)
-    footer_height = HiddenField()
-
     @property
     def theme_options(self):
         options = self.model.theme_options
-        options['footer-height'] = self.footer_height.data
 
         try:
             options['primary-color'] = self.primary_color.data.get_hex()
@@ -77,7 +72,6 @@ class GeneralSettingsForm(Form):
     @theme_options.setter
     def theme_options(self, options):
         self.primary_color.data = options.get('primary-color')
-        self.footer_height.data = options.get('footer-height')
 
     def populate_obj(self, model):
         super().populate_obj(model)

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Removes the need for a calculated footer height.
+  [href]
+
 - Adds the ability to link to an about page (Impressum).
   [href]
 
