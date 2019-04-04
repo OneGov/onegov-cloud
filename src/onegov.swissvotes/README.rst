@@ -3,6 +3,13 @@ Onegov Swissvotes
 
 Database for federal votes.
 
+Dataset (CSV, XLSX)
+-------------------
+
+The CSV and XLSX version of the dataset are cached on application level and
+regenerated only after updating the votes. The files are saved in the root of
+the filestorage. Old files are not deleted.
+
 Full Text Search
 ----------------
 
