@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.2.0 (2019-04-05)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to define partner logos in the footer.
   [href]
 
