@@ -326,7 +326,7 @@ class Roadwork(object):
 
     @property
     def sections(self):
-        horizon = sedate.utcnow() + timedelta(days=5)
+        now = sedate.utcnow()
 
         sections = (
             self.__class__({
@@ -336,10 +336,11 @@ class Roadwork(object):
             }) for r in self['Teilbaustellen']
         )
 
-        return [
-            s for s in sections
-            if (s['DauerBis'] and s['DauerBis'] < horizon) or not s['DauerBis']
-        ]
+        sections = (s for s in sections if s['DauerVon'])
+        sections = (s for s in sections if s['DauerVon'] <= now)
+        sections = (s for s in sections if now <= (s['DauerBis'] or now))
+
+        return list(sections)
 
     def __getitem__(self, key):
         value = self.data[key]

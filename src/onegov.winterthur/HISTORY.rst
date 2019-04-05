@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes section filter not working as expected.
+  [href]
+
 0.4.3 (2019-04-03)
 ~~~~~~~~~~~~~~~~~~~~~
 

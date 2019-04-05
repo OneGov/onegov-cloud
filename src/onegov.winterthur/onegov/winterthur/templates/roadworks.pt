@@ -36,14 +36,14 @@
                                         <dd>
                                             <div>
                                                 <span class="date-label" i18n:translate>Start</span>
-                                                ${layout.format_date(roadwork["DauerVon"], 'weekday_long')},
-                                                ${layout.format_date(roadwork["DauerVon"], 'date_long')}
+                                                ${layout.format_date(section["DauerVon"], 'weekday_long')},
+                                                ${layout.format_date(section["DauerVon"], 'date_long')}
                                             </div>
 
                                             <div>
                                                 <span class="date-label" i18n:translate>End</span>
-                                                ${layout.format_date(roadwork["DauerBis"], 'weekday_long')},
-                                                ${layout.format_date(roadwork["DauerBis"], 'date_long')}
+                                                ${layout.format_date(section["DauerBis"], 'weekday_long')},
+                                                ${layout.format_date(section["DauerBis"], 'date_long')}
                                             </div>
                                         </dd>
                                     </tal:b>
