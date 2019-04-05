@@ -92,6 +92,7 @@
         <div class="row footer-content">
             <div class="small-12 columns">
                 <metal:b use-macro="layout.macros['footer_columns']" />
+                <metal:b use-macro="layout.macros['footer_partner']" />
                 <metal:b use-macro="layout.macros['footer_links']" />
             </div>
         </div>
@@ -147,6 +148,50 @@
       </div>
     </div>
 </metal:footer_links>
+
+<metal:footer_partner define-macro="footer_partner" i18n:domain="onegov.org">
+    <div tal:define="org layout.org" tal:condition="org.partner_1_img or org.partner_2_img or org.partner_3_img or org.partner_4_img|nothing" class="footer-partner">
+        <h2 i18n:translate>Partner</h2>
+        <ul>
+            <li class="${not org.partner_1_img and 'empty'}">
+               <a tal:attributes="href org.partner_1_url"
+                  tal:condition="org.partner_1_img"
+                  style="background-image: url(${org.partner_1_img})">
+                    <span class="show-for-sr">
+                      ${org.partner_1_name or ''}
+                    </span>
+                  </a>
+            </li>
+            <li class="${not org.partner_2_img and 'empty'}">
+               <a tal:attributes="href org.partner_2_url"
+                  tal:condition="org.partner_2_img"
+                  style="background-image: url(${org.partner_2_img})">
+                      <span class="show-for-sr">
+                        ${org.partner_2_name or ''}
+                      </span>
+                  </a>
+            </li>
+            <li class="${not org.partner_3_img and 'empty'}">
+               <a tal:attributes="href org.partner_3_url"
+                  tal:condition="org.partner_3_img"
+                  style="background-image: url(${org.partner_3_img})">
+                      <span class="show-for-sr">
+                        ${org.partner_3_name or ''}
+                      </span>
+                  </a>
+            </li>
+            <li class="${not org.partner_4_img and 'empty'}">
+               <a tal:attributes="href org.partner_4_url"
+                  tal:condition="org.partner_4_img"
+                  style="background-image: url(${org.partner_4_img})">
+                      <span class="show-for-sr">
+                        ${org.partner_4_name or ''}
+                      </span>
+                  </a>
+            </li>
+        </ul>
+    </div>
+</metal:footer_partner>
 
 <metal:footer_contact define-macro="footer_contact" i18n:domain="onegov.org">
     <h2 i18n:translate tal:condition="contact or contact_url">Contact</h2>

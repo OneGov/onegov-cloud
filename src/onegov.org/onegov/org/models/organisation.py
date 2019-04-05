@@ -59,6 +59,22 @@ class Organisation(Base, TimestampMixin):
     geo_provider = meta_property(default='geo-mapbox')
     holiday_settings = meta_property(default=dict)
 
+    partner_1_img = meta_property()
+    partner_1_url = meta_property()
+    partner_1_name = meta_property()
+
+    partner_2_img = meta_property()
+    partner_2_url = meta_property()
+    partner_2_name = meta_property()
+
+    partner_3_img = meta_property()
+    partner_3_url = meta_property()
+    partner_3_name = meta_property()
+
+    partner_4_img = meta_property()
+    partner_4_url = meta_property()
+    partner_4_name = meta_property()
+
     @property
     def holidays(self):
         """ Returns a SwissHolidays instance, as configured by the

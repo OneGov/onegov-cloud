@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-04-04 13:31+0200\n"
+"POT-Creation-Date: 2019-04-05 14:58+0200\n"
 "PO-Revision-Date: 2019-02-18 06:39+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -973,12 +973,6 @@ msgstr "Öffnungszeiten Link"
 msgid "URL pointing to an opening hours page"
 msgstr "Link zur Öffnungszeiten Seite"
 
-msgid "About"
-msgstr "Impressum"
-
-msgid "URL pointing to an about page"
-msgstr "Link zum Impressum"
-
 msgid "Facebook"
 msgstr "Facebook"
 
@@ -993,6 +987,27 @@ msgstr "Twitter"
 
 msgid "URL pointing to the twitter site"
 msgstr "URL zu Twitter"
+
+msgid "Name of the partner"
+msgstr "Name des Partners"
+
+msgid "First Partner"
+msgstr "Erster Partner"
+
+msgid "Logo of the partner"
+msgstr "Logo des Partners"
+
+msgid "The partner's website"
+msgstr "Die Website des Partners"
+
+msgid "Second Partner"
+msgstr "Zweiter Partner"
+
+msgid "Third Partner"
+msgstr "Dritter Partner"
+
+msgid "Fourth Partner"
+msgstr "Vierter Partner"
 
 msgid "Homepage Image #1"
 msgstr "Startseiten Bild #1"
@@ -1927,6 +1942,12 @@ msgstr "Sie sind hier"
 
 msgid "Privacy Protection"
 msgstr "Datenschutz"
+
+msgid "About"
+msgstr "Impressum"
+
+msgid "Partner"
+msgstr "Partner"
 
 msgid "more…"
 msgstr "mehr…"
@@ -3697,6 +3718,12 @@ msgstr "Die Zahlung wurde eingenommen"
 
 msgid "The payment was refunded"
 msgstr "Die Zahlung wurde rückerstattet"
+
+#~ msgid "URL pointing to the partner site"
+#~ msgstr "Webseite des Partners"
+
+#~ msgid "URL pointing to an about page"
+#~ msgstr "Link zum Impressum"
 
 #~ msgid "by"
 #~ msgstr "von"

@@ -5594,3 +5594,58 @@ h2 + div.timeline {
 .page-lead .hashtag {
     font-size: 1rem;
 }
+
+/*
+    Footer partner
+*/
+.footer-partner {
+    margin: 0 auto;
+    max-width: $row-width;
+    padding: 0 $column-gutter / 2;
+
+    ul {
+        display: flex;
+        flex-wrap: wrap;
+        list-style: none;
+        margin: 0;
+
+        li {
+            background-color: $white;
+            border: 1px solid #efefef;
+            margin-right: $column-gutter / 2;
+            padding: $column-gutter / 2;
+            width: calc(25% - #{$column-gutter} / 8 * 3);
+        }
+
+        li:last-child {
+            margin-right: 0;
+        }
+
+        @media #{$small-only} {
+            li {
+                margin-bottom: $column-gutter / 2;
+                margin-right: 0;
+                width: 100%;
+            }
+        }
+
+        li.empty {
+            background: transparent;
+            border-color: transparent;
+            height: 0;
+            margin-bottom: 0;
+            padding: 0;
+        }
+    }
+
+    a {
+        background-color: $white;
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: contain;
+        display: block;
+        height: 0;
+        padding-top: 50%;
+        width: 100%;
+    }
+}

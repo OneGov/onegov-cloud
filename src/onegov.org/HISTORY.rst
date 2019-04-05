@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to define partner logos in the footer.
+  [href]
+
 - Removes the need for a calculated footer height.
   [href]
 

@@ -124,6 +124,70 @@ class FooterSettingsForm(Form):
         description=_("URL pointing to the twitter site"),
         fieldset=_("Social Media"))
 
+    partner_1_name = StringField(
+        label=_("Name"),
+        description=_("Name of the partner"),
+        fieldset=_("First Partner"))
+
+    partner_1_img = StringField(
+        label=_("Image"),
+        description=_("Logo of the partner"),
+        render_kw={'class_': 'image-url'},
+        fieldset=_("First Partner"))
+
+    partner_1_url = URLField(
+        label=_("Website"),
+        description=_("The partner's website"),
+        fieldset=_("First Partner"))
+
+    partner_2_name = StringField(
+        label=_("Name"),
+        description=_("Name of the partner"),
+        fieldset=_("Second Partner"))
+
+    partner_2_img = StringField(
+        label=_("Image"),
+        description=_("Logo of the partner"),
+        render_kw={'class_': 'image-url'},
+        fieldset=_("Second Partner"))
+
+    partner_2_url = URLField(
+        label=_("Website"),
+        description=_("The partner's website"),
+        fieldset=_("Second Partner"))
+
+    partner_3_name = StringField(
+        label=_("Name"),
+        description=_("Name of the partner"),
+        fieldset=_("Third Partner"))
+
+    partner_3_img = StringField(
+        label=_("Image"),
+        description=_("Logo of the partner"),
+        render_kw={'class_': 'image-url'},
+        fieldset=_("Third Partner"))
+
+    partner_3_url = URLField(
+        label=_("Website"),
+        description=_("The partner's website"),
+        fieldset=_("Third Partner"))
+
+    partner_4_name = StringField(
+        label=_("Name"),
+        description=_("Name of the partner"),
+        fieldset=_("Fourth Partner"))
+
+    partner_4_img = StringField(
+        label=_("Image"),
+        description=_("Logo of the partner"),
+        render_kw={'class_': 'image-url'},
+        fieldset=_("Fourth Partner"))
+
+    partner_4_url = URLField(
+        label=_("Website"),
+        description=_("The partner's website"),
+        fieldset=_("Fourth Partner"))
+
 
 class HomepageSettingsForm(Form):
 
