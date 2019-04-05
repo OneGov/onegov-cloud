@@ -1,7 +1,5 @@
 Changelog
 ---------
-3.10.1 (2019-04-05)
-~~~~~~~~~~~~~~~~~~~
 
 - Allows to manage upload tokens using the web UI.
   [msom]
