@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.10.2 (2019-04-06)
+~~~~~~~~~~~~~~~~~~~~
 
 - Fixes sorting of people.
   [msom]
