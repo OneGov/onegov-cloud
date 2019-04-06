@@ -1,4 +1,6 @@
 from collections import namedtuple
+from collections import OrderedDict
+from itertools import groupby
 from morepath import redirect
 from onegov.agency import _
 from onegov.agency import AgencyApp
@@ -11,6 +13,7 @@ from onegov.core.security import Public
 from onegov.org.elements import Link
 from onegov.org.forms import PersonForm
 from onegov.org.models import AtoZ
+from unidecode import unidecode
 
 
 def get_person_form_class(model, request):
@@ -70,6 +73,12 @@ def view_people(self, request):
 
         def get_items(self):
             return people
+
+        def get_items_by_letter(self):
+            items_by_letter = OrderedDict()
+            for letter, items in groupby(self.get_items(), self.sortkey):
+                items_by_letter[unidecode(letter)] = tuple(items)
+            return items_by_letter
 
     people = AtoZPeople(request).get_items_by_letter()
 
