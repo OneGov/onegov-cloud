@@ -36,6 +36,14 @@ class SwissvoteDatasetField(UploadField):
         super().__init__(*args, **kwargs)
 
     def post_validate(self, form, validation_stopped):
+        """ Make sure the given XLSX is valid (all expected columns are
+        present all cells contain reasonable values).
+
+        Converts the XLSX to a list of SwissVote objects, available as
+        ``data``.
+
+        """
+
         super(SwissvoteDatasetField, self).post_validate(
             form,
             validation_stopped

@@ -16,6 +16,13 @@ from xlsxwriter.workbook import Workbook
 
 class SwissVoteCollection(Pagination):
 
+    """ A collection of votes.
+
+    Supports pagination, filtering, sorting, exporting (CSV/XLSX) and batch
+    adding/updating.
+
+    """
+
     batch_size = 20
     initial_sort_by = 'date'
     initial_sort_order = 'descending'

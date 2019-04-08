@@ -6,6 +6,8 @@ from onegov.swissvotes.models import TranslatablePage
 
 class TranslatablePageCollection(GenericCollection):
 
+    """ A collection of translatable content pages. """
+
     @property
     def model_class(self):
         return TranslatablePage
