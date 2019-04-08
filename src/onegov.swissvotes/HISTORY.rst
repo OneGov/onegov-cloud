@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.49 (2019-04-08)
+~~~~~~~~~~~~~~~~~~~
 
 - Improves attachments form.
   [msom]
