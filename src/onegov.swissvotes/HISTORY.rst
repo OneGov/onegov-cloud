@@ -4,6 +4,9 @@ Changelog
 - Improves attachments form.
   [msom]
 
+- Adds hints to slow forms.
+  [msom]
+
 0.0.48 (2019-03-15)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-15 11:25+0100\n"
+"POT-Creation-Date: 2019-04-08 11:30+0200\n"
 "PO-Revision-Date: 2018-09-18 11:29+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -19,6 +19,9 @@ msgstr "Titre"
 
 msgid "Content"
 msgstr "Contenu"
+
+msgid "Uploading attachments may take some time due to full-text indexing."
+msgstr ""
 
 msgid "Voting text"
 msgstr "Texte soumis au vote"
@@ -46,6 +49,9 @@ msgstr ""
 
 msgid "Result by canton, district and municipality"
 msgstr "Résultats par canton, district, commune"
+
+msgid "Updating the dataset may take some time."
+msgstr ""
 
 msgid "Dataset"
 msgstr "Base de données"
@@ -114,6 +120,93 @@ msgstr "Actualiser la base de données"
 
 msgid "Delete all votes"
 msgstr "Supprimer toutes les votations"
+
+msgid "canton-ag-label"
+msgstr "Argovie"
+
+msgid "canton-ai-label"
+msgstr "Appenzell Rhodes-Intérieures"
+
+msgid "canton-ar-label"
+msgstr "Appenzell Rhodes-Extérieures"
+
+msgid "canton-be-label"
+msgstr "Berne"
+
+msgid "canton-bl-label"
+msgstr "Bâle-Campagne"
+
+msgid "canton-bs-label"
+msgstr "Bâle-Ville"
+
+msgid "canton-fr-label"
+msgstr "Fribourg"
+
+msgid "canton-ge-label"
+msgstr "Genève"
+
+msgid "canton-gl-label"
+msgstr "Glaris"
+
+msgid "canton-gr-label"
+msgstr "Grisons"
+
+msgid "canton-ju-label"
+msgstr "Jura"
+
+msgid "canton-lu-label"
+msgstr "Lucerne"
+
+msgid "canton-ne-label"
+msgstr "Neuchâtel"
+
+msgid "canton-nw-label"
+msgstr "Nidwald"
+
+msgid "canton-ow-label"
+msgstr "Obwald"
+
+msgid "canton-sg-label"
+msgstr "Saint-Gall"
+
+msgid "canton-sh-label"
+msgstr "Schaffhouse"
+
+msgid "canton-so-label"
+msgstr "Soleure"
+
+msgid "canton-sz-label"
+msgstr "Schwytz"
+
+msgid "canton-tg-label"
+msgstr "Thurgovie"
+
+msgid "canton-ti-label"
+msgstr "Tessin"
+
+msgid "canton-ur-label"
+msgstr "Uri"
+
+msgid "canton-vd-label"
+msgstr "Vaud"
+
+msgid "canton-vs-label"
+msgstr "Valais"
+
+msgid "canton-zg-label"
+msgstr "Zoug"
+
+msgid "canton-zh-label"
+msgstr "Zurich"
+
+msgid "canton-ch-label"
+msgstr ""
+
+msgid "canton-vso-label"
+msgstr ""
+
+msgid "canton-vsr-label"
+msgstr ""
 
 msgid "d-1-1"
 msgstr "Ordre public"
@@ -1196,93 +1289,6 @@ msgstr "Syndicat des services publics"
 msgid "actor-vsa-label"
 msgstr "Fédération des sociétés suisses d'employés"
 
-msgid "canton-ag-label"
-msgstr "Argovie"
-
-msgid "canton-ai-label"
-msgstr "Appenzell Rhodes-Intérieures"
-
-msgid "canton-ar-label"
-msgstr "Appenzell Rhodes-Extérieures"
-
-msgid "canton-be-label"
-msgstr "Berne"
-
-msgid "canton-bl-label"
-msgstr "Bâle-Campagne"
-
-msgid "canton-bs-label"
-msgstr "Bâle-Ville"
-
-msgid "canton-fr-label"
-msgstr "Fribourg"
-
-msgid "canton-ge-label"
-msgstr "Genève"
-
-msgid "canton-gl-label"
-msgstr "Glaris"
-
-msgid "canton-gr-label"
-msgstr "Grisons"
-
-msgid "canton-ju-label"
-msgstr "Jura"
-
-msgid "canton-lu-label"
-msgstr "Lucerne"
-
-msgid "canton-ne-label"
-msgstr "Neuchâtel"
-
-msgid "canton-nw-label"
-msgstr "Nidwald"
-
-msgid "canton-ow-label"
-msgstr "Obwald"
-
-msgid "canton-sg-label"
-msgstr "Saint-Gall"
-
-msgid "canton-sh-label"
-msgstr "Schaffhouse"
-
-msgid "canton-so-label"
-msgstr "Soleure"
-
-msgid "canton-sz-label"
-msgstr "Schwytz"
-
-msgid "canton-tg-label"
-msgstr "Thurgovie"
-
-msgid "canton-ti-label"
-msgstr "Tessin"
-
-msgid "canton-ur-label"
-msgstr "Uri"
-
-msgid "canton-vd-label"
-msgstr "Vaud"
-
-msgid "canton-vs-label"
-msgstr "Valais"
-
-msgid "canton-zg-label"
-msgstr "Zoug"
-
-msgid "canton-zh-label"
-msgstr "Zurich"
-
-msgid "canton-ch-label"
-msgstr ""
-
-msgid "canton-vso-label"
-msgstr ""
-
-msgid "canton-vsr-label"
-msgstr ""
-
 msgid "Add page"
 msgstr ""
 
@@ -1585,6 +1591,18 @@ msgstr "Toutes les votations ont été supprimées."
 msgid "The dataset contains unknown descriptors: ${items}."
 msgstr "La base de données contient des codes inconnus."
 
+msgid "Federal Council"
+msgstr "Conseil fédéral"
+
+msgid "National Council"
+msgstr "Conseil national"
+
+msgid "Council of States"
+msgstr "Conseil des Etats"
+
+msgid "Party slogans"
+msgstr "Partis"
+
 msgid "Attachments updated"
 msgstr "Pièces jointes mises à jour"
 
@@ -1598,22 +1616,6 @@ msgstr "${x}% Oui"
 #, python-format
 msgid "${x}% nay"
 msgstr "${x}% Non"
-
-msgid "Federal Council"
-msgstr "Conseil fédéral"
-
-msgid "National Council"
-msgstr "Conseil national"
-
-msgid "Council of States"
-msgstr "Conseil des Etats"
-
-msgid "Party slogans"
-msgstr "Partis"
-
-#, python-format
-msgid "${x}% none"
-msgstr "${x}% neutres/inconnus"
 
 msgid "Recommendations by political parties"
 msgstr "Mots d'ordre des partis"
@@ -1629,6 +1631,10 @@ msgstr "Poids électoraux des partis: Partis en faveur de non ${x}%"
 #, python-format
 msgid "Electoral shares of parties: neutral/unknown ${x}%"
 msgstr "Poids électoraux des partis: neutres/inconnus ${x}%"
+
+#, python-format
+msgid "${x}% none"
+msgstr "${x}% neutres/inconnus"
 
 #, python-format
 msgid "${x} yea"

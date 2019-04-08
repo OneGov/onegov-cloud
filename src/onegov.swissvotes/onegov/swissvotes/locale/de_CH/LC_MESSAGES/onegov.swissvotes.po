@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-15 11:25+0100\n"
-"PO-Revision-Date: 2019-02-28 13:01+0100\n"
+"POT-Creation-Date: 2019-04-08 11:30+0200\n"
+"PO-Revision-Date: 2019-04-08 11:31+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -20,6 +20,11 @@ msgstr "Titel"
 
 msgid "Content"
 msgstr "Inhalt"
+
+msgid "Uploading attachments may take some time due to full-text indexing."
+msgstr ""
+"Das Hochladen von Anhängen kann aufgrund der Volltextindizierung einige Zeit "
+"in Anspruch nehmen."
 
 msgid "Voting text"
 msgstr "Abstimmungstext"
@@ -47,6 +52,10 @@ msgstr "Inserateanalyse"
 
 msgid "Result by canton, district and municipality"
 msgstr "Abstimmungsergebnis pro Kanton, Bezirk und Gemeinde"
+
+msgid "Updating the dataset may take some time."
+msgstr ""
+"Die Aktualisierung des Datensatzes kann einige Zeit in Anspruch nehmen."
 
 msgid "Dataset"
 msgstr "Datensatz"
@@ -117,6 +126,93 @@ msgstr "Datensatz aktualisieren"
 
 msgid "Delete all votes"
 msgstr "Alle Abstimmungen löschen"
+
+msgid "canton-ag-label"
+msgstr "Aargau"
+
+msgid "canton-ai-label"
+msgstr "Appenzell Innerrhoden"
+
+msgid "canton-ar-label"
+msgstr "Appenzell Ausserrhoden"
+
+msgid "canton-be-label"
+msgstr "Bern"
+
+msgid "canton-bl-label"
+msgstr "Basel-Landschaft"
+
+msgid "canton-bs-label"
+msgstr "Basel-Stadt"
+
+msgid "canton-fr-label"
+msgstr "Freiburg"
+
+msgid "canton-ge-label"
+msgstr "Genf"
+
+msgid "canton-gl-label"
+msgstr "Glarus"
+
+msgid "canton-gr-label"
+msgstr "Graubünden"
+
+msgid "canton-ju-label"
+msgstr "Jura"
+
+msgid "canton-lu-label"
+msgstr "Luzern"
+
+msgid "canton-ne-label"
+msgstr "Neuenburg"
+
+msgid "canton-nw-label"
+msgstr "Nidwalden"
+
+msgid "canton-ow-label"
+msgstr "Obwalden"
+
+msgid "canton-sg-label"
+msgstr "St. Gallen"
+
+msgid "canton-sh-label"
+msgstr "Schaffhausen"
+
+msgid "canton-so-label"
+msgstr "Solothurn"
+
+msgid "canton-sz-label"
+msgstr "Schwyz"
+
+msgid "canton-tg-label"
+msgstr "Thurgau"
+
+msgid "canton-ti-label"
+msgstr "Tessin"
+
+msgid "canton-ur-label"
+msgstr "Uri"
+
+msgid "canton-vd-label"
+msgstr "Waadt"
+
+msgid "canton-vs-label"
+msgstr "Wallis"
+
+msgid "canton-zg-label"
+msgstr "Zug"
+
+msgid "canton-zh-label"
+msgstr "Zürich"
+
+msgid "canton-ch-label"
+msgstr "Schweiz"
+
+msgid "canton-vso-label"
+msgstr "Oberwallis"
+
+msgid "canton-vsr-label"
+msgstr "Unterwallis"
 
 msgid "d-1-1"
 msgstr "Staatsordnung"
@@ -1193,93 +1289,6 @@ msgstr "Verband des Personals öffentlicher Dienste"
 msgid "actor-vsa-label"
 msgstr "Vereinigung schweizerischer Angestelltenverbände"
 
-msgid "canton-ag-label"
-msgstr "Aargau"
-
-msgid "canton-ai-label"
-msgstr "Appenzell Innerrhoden"
-
-msgid "canton-ar-label"
-msgstr "Appenzell Ausserrhoden"
-
-msgid "canton-be-label"
-msgstr "Bern"
-
-msgid "canton-bl-label"
-msgstr "Basel-Landschaft"
-
-msgid "canton-bs-label"
-msgstr "Basel-Stadt"
-
-msgid "canton-fr-label"
-msgstr "Freiburg"
-
-msgid "canton-ge-label"
-msgstr "Genf"
-
-msgid "canton-gl-label"
-msgstr "Glarus"
-
-msgid "canton-gr-label"
-msgstr "Graubünden"
-
-msgid "canton-ju-label"
-msgstr "Jura"
-
-msgid "canton-lu-label"
-msgstr "Luzern"
-
-msgid "canton-ne-label"
-msgstr "Neuenburg"
-
-msgid "canton-nw-label"
-msgstr "Nidwalden"
-
-msgid "canton-ow-label"
-msgstr "Obwalden"
-
-msgid "canton-sg-label"
-msgstr "St. Gallen"
-
-msgid "canton-sh-label"
-msgstr "Schaffhausen"
-
-msgid "canton-so-label"
-msgstr "Solothurn"
-
-msgid "canton-sz-label"
-msgstr "Schwyz"
-
-msgid "canton-tg-label"
-msgstr "Thurgau"
-
-msgid "canton-ti-label"
-msgstr "Tessin"
-
-msgid "canton-ur-label"
-msgstr "Uri"
-
-msgid "canton-vd-label"
-msgstr "Waadt"
-
-msgid "canton-vs-label"
-msgstr "Wallis"
-
-msgid "canton-zg-label"
-msgstr "Zug"
-
-msgid "canton-zh-label"
-msgstr "Zürich"
-
-msgid "canton-ch-label"
-msgstr "Schweiz"
-
-msgid "canton-vso-label"
-msgstr "Oberwallis"
-
-msgid "canton-vsr-label"
-msgstr "Unterwallis"
-
 msgid "Add page"
 msgstr "Seite hinzufügen"
 
@@ -1580,6 +1589,18 @@ msgstr "Alle Abstimmungen gelöscht"
 msgid "The dataset contains unknown descriptors: ${items}."
 msgstr "Der Datensatz enthält unbekannte Deskriptoren: ${items}."
 
+msgid "Federal Council"
+msgstr "Bundesrat"
+
+msgid "National Council"
+msgstr "Nationalrat"
+
+msgid "Council of States"
+msgstr "Ständerat"
+
+msgid "Party slogans"
+msgstr "Parteiparolen"
+
 msgid "Attachments updated"
 msgstr "Anhänge aktualisiert"
 
@@ -1593,22 +1614,6 @@ msgstr "${x}% Ja"
 #, python-format
 msgid "${x}% nay"
 msgstr "${x}% Nein"
-
-msgid "Federal Council"
-msgstr "Bundesrat"
-
-msgid "National Council"
-msgstr "Nationalrat"
-
-msgid "Council of States"
-msgstr "Ständerat"
-
-msgid "Party slogans"
-msgstr "Parteiparolen"
-
-#, python-format
-msgid "${x}% none"
-msgstr "${x}% Neutral/unbekannt"
 
 msgid "Recommendations by political parties"
 msgstr "Empfehlungen der politischen Parteien"
@@ -1624,6 +1629,10 @@ msgstr "Wähleranteile der Parteien: Ablendende Parteien ${x}%"
 #, python-format
 msgid "Electoral shares of parties: neutral/unknown ${x}%"
 msgstr "Wähleranteile der Parteien: Neutral/unbekannt ${x}%"
+
+#, python-format
+msgid "${x}% none"
+msgstr "${x}% Neutral/unbekannt"
 
 #, python-format
 msgid "${x} yea"

@@ -18,6 +18,10 @@ XLSX_MIME_TYPES = {
 
 class AttachmentsForm(Form):
 
+    callout = _(
+        "Uploading attachments may take some time due to full-text indexing."
+    )
+
     voting_text = UploadField(
         label=_("Voting text"),
         validators=[

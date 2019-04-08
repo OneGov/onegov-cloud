@@ -6,6 +6,8 @@ from wtforms.validators import DataRequired
 
 class UpdateDatasetForm(Form):
 
+    callout = _("Updating the dataset may take some time.")
+
     dataset = SwissvoteDatasetField(
         label=_("Dataset"),
         validators=[

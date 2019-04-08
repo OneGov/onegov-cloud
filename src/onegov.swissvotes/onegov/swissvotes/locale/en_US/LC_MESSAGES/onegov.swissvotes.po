@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-03-15 11:25+0100\n"
+"POT-Creation-Date: 2019-04-08 11:30+0200\n"
 "PO-Revision-Date: 2018-09-18 15:04+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: English\n"
@@ -20,6 +20,9 @@ msgstr "Title"
 
 msgid "Content"
 msgstr "Content"
+
+msgid "Uploading attachments may take some time due to full-text indexing."
+msgstr ""
 
 msgid "Voting text"
 msgstr "Text subject to vote"
@@ -47,6 +50,9 @@ msgstr ""
 
 msgid "Result by canton, district and municipality"
 msgstr "Result by canton, district and municipality"
+
+msgid "Updating the dataset may take some time."
+msgstr ""
 
 msgid "Dataset"
 msgstr "Dataset"
@@ -115,6 +121,93 @@ msgstr "Update dataset"
 
 msgid "Delete all votes"
 msgstr "Delete all votes"
+
+msgid "canton-ag-label"
+msgstr ""
+
+msgid "canton-ai-label"
+msgstr ""
+
+msgid "canton-ar-label"
+msgstr ""
+
+msgid "canton-be-label"
+msgstr ""
+
+msgid "canton-bl-label"
+msgstr ""
+
+msgid "canton-bs-label"
+msgstr ""
+
+msgid "canton-fr-label"
+msgstr ""
+
+msgid "canton-ge-label"
+msgstr ""
+
+msgid "canton-gl-label"
+msgstr ""
+
+msgid "canton-gr-label"
+msgstr ""
+
+msgid "canton-ju-label"
+msgstr ""
+
+msgid "canton-lu-label"
+msgstr ""
+
+msgid "canton-ne-label"
+msgstr ""
+
+msgid "canton-nw-label"
+msgstr ""
+
+msgid "canton-ow-label"
+msgstr ""
+
+msgid "canton-sg-label"
+msgstr ""
+
+msgid "canton-sh-label"
+msgstr ""
+
+msgid "canton-so-label"
+msgstr ""
+
+msgid "canton-sz-label"
+msgstr ""
+
+msgid "canton-tg-label"
+msgstr ""
+
+msgid "canton-ti-label"
+msgstr ""
+
+msgid "canton-ur-label"
+msgstr ""
+
+msgid "canton-vd-label"
+msgstr ""
+
+msgid "canton-vs-label"
+msgstr ""
+
+msgid "canton-zg-label"
+msgstr ""
+
+msgid "canton-zh-label"
+msgstr ""
+
+msgid "canton-ch-label"
+msgstr ""
+
+msgid "canton-vso-label"
+msgstr ""
+
+msgid "canton-vsr-label"
+msgstr ""
 
 msgid "d-1-1"
 msgstr "Staatsordnung"
@@ -1188,93 +1281,6 @@ msgstr "Verband des Personals öffentlicher Dienste"
 msgid "actor-vsa-label"
 msgstr "Vereinigung schweizerischer Angestelltenverbände"
 
-msgid "canton-ag-label"
-msgstr ""
-
-msgid "canton-ai-label"
-msgstr ""
-
-msgid "canton-ar-label"
-msgstr ""
-
-msgid "canton-be-label"
-msgstr ""
-
-msgid "canton-bl-label"
-msgstr ""
-
-msgid "canton-bs-label"
-msgstr ""
-
-msgid "canton-fr-label"
-msgstr ""
-
-msgid "canton-ge-label"
-msgstr ""
-
-msgid "canton-gl-label"
-msgstr ""
-
-msgid "canton-gr-label"
-msgstr ""
-
-msgid "canton-ju-label"
-msgstr ""
-
-msgid "canton-lu-label"
-msgstr ""
-
-msgid "canton-ne-label"
-msgstr ""
-
-msgid "canton-nw-label"
-msgstr ""
-
-msgid "canton-ow-label"
-msgstr ""
-
-msgid "canton-sg-label"
-msgstr ""
-
-msgid "canton-sh-label"
-msgstr ""
-
-msgid "canton-so-label"
-msgstr ""
-
-msgid "canton-sz-label"
-msgstr ""
-
-msgid "canton-tg-label"
-msgstr ""
-
-msgid "canton-ti-label"
-msgstr ""
-
-msgid "canton-ur-label"
-msgstr ""
-
-msgid "canton-vd-label"
-msgstr ""
-
-msgid "canton-vs-label"
-msgstr ""
-
-msgid "canton-zg-label"
-msgstr ""
-
-msgid "canton-zh-label"
-msgstr ""
-
-msgid "canton-ch-label"
-msgstr ""
-
-msgid "canton-vso-label"
-msgstr ""
-
-msgid "canton-vsr-label"
-msgstr ""
-
 msgid "Add page"
 msgstr ""
 
@@ -1573,6 +1579,18 @@ msgstr "All votes have been deleted"
 msgid "The dataset contains unknown descriptors: ${items}."
 msgstr "The dataset contains unknown descriptors: ${items}."
 
+msgid "Federal Council"
+msgstr "Federal Council"
+
+msgid "National Council"
+msgstr "National Council"
+
+msgid "Council of States"
+msgstr "Council of States"
+
+msgid "Party slogans"
+msgstr "Parties"
+
 msgid "Attachments updated"
 msgstr "Attachments updated"
 
@@ -1586,22 +1604,6 @@ msgstr "${x}% Yes"
 #, python-format
 msgid "${x}% nay"
 msgstr "${x}% No"
-
-msgid "Federal Council"
-msgstr "Federal Council"
-
-msgid "National Council"
-msgstr "National Council"
-
-msgid "Council of States"
-msgstr "Council of States"
-
-msgid "Party slogans"
-msgstr "Parties"
-
-#, python-format
-msgid "${x}% none"
-msgstr "${x}% neutral/unknown"
 
 msgid "Recommendations by political parties"
 msgstr "Recommendations by political parties"
@@ -1617,6 +1619,10 @@ msgstr "Electoral shares of parties: Parties recommending No ${x}%"
 #, python-format
 msgid "Electoral shares of parties: neutral/unknown ${x}%"
 msgstr "Electoral shares of parties: neutral/unknown ${x}%"
+
+#, python-format
+msgid "${x}% none"
+msgstr "${x}% neutral/unknown"
 
 #, python-format
 msgid "${x} yea"
