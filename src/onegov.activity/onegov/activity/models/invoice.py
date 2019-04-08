@@ -10,10 +10,8 @@ from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import select
-from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import deferred, object_session, relationship
-from sqlalchemy.schema import FetchedValue
+from sqlalchemy.orm import object_session, relationship
 from uuid import uuid4
 
 
