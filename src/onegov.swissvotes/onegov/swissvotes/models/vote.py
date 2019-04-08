@@ -8,9 +8,9 @@ from onegov.file import File
 from onegov.file.attachments import extract_pdf_info
 from onegov.swissvotes import _
 from onegov.swissvotes.models.actor import Actor
-from onegov.swissvotes.models.canton import Canton
 from onegov.swissvotes.models.localized_file import LocalizedFile
 from onegov.swissvotes.models.policy_area import PolicyArea
+from onegov.swissvotes.models.region import Region
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import func
@@ -26,6 +26,8 @@ from urllib.parse import urlunparse
 
 
 class SwissVoteFile(File):
+    """ An attachment to a vote. """
+
     __mapper_args__ = {'polymorphic_identity': 'swissvote'}
 
 
@@ -57,8 +59,21 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
 
     """ A single vote as defined by the code book.
 
-    Some columns are only used when importing/exporting the dataset and are
-    lazy loaded.
+    There are a lot of columns:
+    - Some general, ready to be used attributes (bfs_number, ...)
+    - Encoded attributes, where the raw integer value is stored prefixed with
+      an underline and the attribute returns a translatable label by using the
+      ``codes`` function, e.g.  ``_legal_form``, ``legal_form`` and
+      ``codes(' _legal_form')``.
+    - Descriptors, easily accessible by using ``policy_areas``.
+    - A lot of lazy loaded, cantonal results only used when importing/exporting
+      the dataset.
+    - Recommendations from different parties and assocciations. Internally
+      stored as JSON and easily accessible and group by slogan with
+      ``recommendations_parties``, ``recommendations_divergent_parties`` and
+      ``recommendations_associations``.
+    - Different localized attachments, some of them indexed for full text
+      search.
 
     """
 
@@ -149,9 +164,13 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     bfs_map_fr = Column(Text)
 
     def bfs_map(self, locale):
+        """ Returns the link to the BFS map for the given locale. """
+
         return self.bfs_map_fr if locale == 'fr_CH' else self.bfs_map_de
 
     def bfs_map_host(self, locale):
+        """ Returns the Host of the BFS Map link for CSP. """
+
         try:
             return urlunparse(
                 list(urlparse(self.bfs_map(locale))[:2]) + ['', '', '', '']
@@ -172,6 +191,8 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
 
     @cached_property
     def policy_areas(self):
+        """ Returns the policy areas / descriptors of the vote. """
+
         def get_level(number, level):
             value = getattr(self, f'descriptor_{number}_level_{level}')
             if value is not None:
@@ -470,11 +491,13 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
 
     @cached_property
     def results_cantons(self):
+        """ Returns the results of all cantons. """
+
         result = {}
-        for canton in Canton.abbreviations():
+        for canton in Region.cantons():
             value = getattr(self, f'_result_{canton}_accepted')
             if value is not None:
-                result.setdefault(value, []).append(Canton(canton))
+                result.setdefault(value, []).append(Region(canton))
 
         codes = self.codes('result_accepted')
         return OrderedDict([
@@ -518,10 +541,14 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     recommendations_divergent = Column(JSON, nullable=False, default=dict)
 
     def get_recommendation(self, name):
+        """ Get the recommendations by name. """
+
         recommendations = self.recommendations or {}
         return self.codes('recommendation').get(recommendations.get(name))
 
     def group_recommendations(self, recommendations):
+        """ Group the given recommendations by slogan. """
+
         result = {}
         for actor, recommendation in recommendations:
             if recommendation is not None and recommendation != 9999:
@@ -535,18 +562,24 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
 
     @cached_property
     def recommendations_parties(self):
+        """ The recommendations of the parties grouped by slogans. """
+
         recommendations = self.recommendations or {}
         return self.group_recommendations((
             (Actor(name), recommendations.get(name))
-            for name in Actor('').parties
+            for name in Actor.parties()
         ))
 
     @cached_property
     def recommendations_divergent_parties(self):
+        """ The divergent recommendations of the parties grouped by slogans.
+
+        """
+
         recommendations = self.recommendations_divergent or {}
         return self.group_recommendations((
             (
-                (Actor(name.split('_')[0]), Canton(name.split('_')[1])),
+                (Actor(name.split('_')[0]), Region(name.split('_')[1])),
                 recommendation,
             )
             for name, recommendation in sorted(recommendations.items())
@@ -554,6 +587,8 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
 
     @cached_property
     def recommendations_associations(self):
+        """ The recommendations of the associations grouped by slogans. """
+
         def as_list(value, code):
             return [
                 (Actor(name.strip()), code)
@@ -564,7 +599,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
         recommendations = self.recommendations or {}
         recommendations = [
             (Actor(name), recommendations.get(name))
-            for name in Actor('').associations
+            for name in Actor.associations()
         ]
         recommendations.extend(as_list(self.recommendations_other_yes, 1))
         recommendations.extend(as_list(self.recommendations_other_no, 2))
@@ -631,6 +666,8 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     }
 
     def vectorize_files(self):
+        """ Extract the text from the indexed files and store it. """
+
         for locale, language in (('de_CH', 'german'), ('fr_CH', 'french')):
             files = [
                 SwissVote.__dict__[file].__get_by_locale__(self, locale)

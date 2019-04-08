@@ -4,10 +4,10 @@ from io import BytesIO
 from onegov.core.crypto import random_token
 from onegov.file.utils import as_fileintent
 from onegov.swissvotes.models import Actor
-from onegov.swissvotes.models import Canton
 from onegov.swissvotes.models import ColumnMapper
 from onegov.swissvotes.models import PolicyArea
 from onegov.swissvotes.models import Principal
+from onegov.swissvotes.models import Region
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import TranslatablePage
 from onegov.swissvotes.models import TranslatablePageFile
@@ -48,9 +48,9 @@ def test_actor():
 
 
 def test_canton():
-    assert len(Canton.abbreviations()) == 26
+    assert len(Region.cantons()) == 26
 
-    canton = Canton('lu')
+    canton = Region('lu')
     assert canton.name == 'lu'
     assert canton.abbreviation == 'LU'
     assert not isinstance(canton.abbreviation, TranslationString)
@@ -60,7 +60,7 @@ def test_canton():
         '<span title="canton-lu-label">LU</span>'
     )
 
-    canton = Canton('xxx')
+    canton = Region('xxx')
     assert canton.name == 'xxx'
     assert canton.abbreviation == 'xxx'
     assert not isinstance(canton.abbreviation, TranslationString)
@@ -68,8 +68,8 @@ def test_canton():
     assert not isinstance(canton.label, TranslationString)
     assert canton.html(DummyRequest()) == '<span title="xxx">xxx</span>'
 
-    assert Canton('lu') == Canton('lu')
-    assert Canton('lu') != Canton('xxx')
+    assert Region('lu') == Region('lu')
+    assert Region('lu') != Region('xxx')
 
 
 def test_localized_file():
@@ -1033,34 +1033,34 @@ def test_vote(session):
     ]
 
     assert vote.results_cantons['Rejected'] == [
-        Canton('ag'),
-        Canton('ai'),
-        Canton('ar'),
-        Canton('be'),
-        Canton('bl'),
-        Canton('bs'),
-        Canton('fr'),
-        Canton('ge'),
-        Canton('gl'),
-        Canton('gr'),
-        Canton('ju'),
-        Canton('lu'),
-        Canton('ne'),
-        Canton('nw'),
-        Canton('ow'),
-        Canton('sg'),
-        Canton('sh'),
-        Canton('so'),
-        Canton('sz'),
-        Canton('tg'),
-        Canton('ti'),
-        Canton('ur'),
-        Canton('zg'),
-        # Canton('zh'),
+        Region('ag'),
+        Region('ai'),
+        Region('ar'),
+        Region('be'),
+        Region('bl'),
+        Region('bs'),
+        Region('fr'),
+        Region('ge'),
+        Region('gl'),
+        Region('gr'),
+        Region('ju'),
+        Region('lu'),
+        Region('ne'),
+        Region('nw'),
+        Region('ow'),
+        Region('sg'),
+        Region('sh'),
+        Region('so'),
+        Region('sz'),
+        Region('tg'),
+        Region('ti'),
+        Region('ur'),
+        Region('zg'),
+        # Region('zh'),
     ]
     assert vote.results_cantons['Accepted'] == [
-        Canton('vd'),
-        Canton('vs'),
+        Region('vd'),
+        Region('vs'),
     ]
 
     assert list(vote.recommendations_parties.keys()) == [
@@ -1138,12 +1138,12 @@ def test_vote(session):
         'Yea', 'Nay'
     ]
     assert vote.recommendations_divergent_parties['Yea'] == [
-        (Actor('edu'), Canton('vso')),
-        (Actor('fdp'), Canton('ti')),
+        (Actor('edu'), Region('vso')),
+        (Actor('fdp'), Region('ti')),
     ]
     assert vote.recommendations_divergent_parties['Nay'] == [
-        (Actor('fdp-fr'), Canton('ch')),
-        (Actor('jcvp'), Canton('ch')),
+        (Actor('fdp-fr'), Region('ch')),
+        (Actor('jcvp'), Region('ch')),
     ]
 
     assert vote.has_national_council_share_data is True

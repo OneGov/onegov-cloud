@@ -4,7 +4,7 @@ from onegov.swissvotes import _
 from onegov.swissvotes.collections import SwissVoteCollection
 from onegov.swissvotes.fields import PolicyAreaField
 from onegov.swissvotes.models import PolicyArea
-from onegov.swissvotes.models.policy_area import POLICY_AREA
+from onegov.swissvotes.models import PolicyAreaDefinition
 from onegov.swissvotes.models.vote import SwissVote
 from wtforms import HiddenField
 from wtforms import RadioField
@@ -103,7 +103,7 @@ class SearchForm(Form):
                 "children": children
             }
 
-        self.policy_area.tree = serialize(POLICY_AREA)
+        self.policy_area.tree = serialize(PolicyAreaDefinition.all())
 
     def populate_choice(self, name, add_none=False):
         field = getattr(self, name)

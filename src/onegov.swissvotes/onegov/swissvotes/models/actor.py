@@ -3,7 +3,12 @@ from onegov.swissvotes import _
 
 
 class Actor(object):
-    """ A helper class to translate political actors. """
+    """ A helper class to translate political actors (parties, associations).
+
+    Each actor consists of an abbreviation and a label, and might be rendered
+    as a html span.
+
+    """
 
     def __init__(self, name):
         self.name = name
@@ -11,16 +16,20 @@ class Actor(object):
     def __eq__(self, other):
         return self.name == other.name
 
-    @cached_property
-    def parties(self):
+    @staticmethod
+    def parties():
+        """ All known parties. """
+
         return (
             'bdp', 'csp', 'cvp', 'edu', 'evp', 'fdp', 'fps', 'glp', 'gps',
             'kvp', 'ldu', 'lega', 'lps', 'mcg', 'pda', 'poch', 'rep', 'sd',
             'sps', 'svp'
         )
 
-    @cached_property
-    def associations(self):
+    @staticmethod
+    def associations():
+        """ All known associations. """
+
         return (
             'acs', 'bpuk', 'eco', 'edk', 'endk', 'fdk', 'gdk', 'gem', 'kdk',
             'kkjpd', 'ldk', 'sav', 'sbk', 'sbv-usp', 'sgb', 'sgv', 'sodk',

@@ -1,8 +1,13 @@
 from onegov.swissvotes import _
 
 
-class Canton(object):
-    """ A helper class to translate cantons. """
+class Region(object):
+    """ A helper class to translate geographical cantons.
+
+    Each canton consists of an abbreviation and a label, and might be rendered
+    as a html span.
+
+    """
 
     def __init__(self, name):
         self.name = name
@@ -11,7 +16,9 @@ class Canton(object):
         return self.name == other.name
 
     @staticmethod
-    def abbreviations():
+    def cantons():
+        """ All known cantons. """
+
         return (
             'ag', 'ai', 'ar', 'be', 'bl', 'bs', 'fr', 'ge', 'gl', 'gr', 'ju',
             'lu', 'ne', 'nw', 'ow', 'sg', 'sh', 'so', 'sz', 'tg', 'ti', 'ur',

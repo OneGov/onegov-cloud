@@ -6,6 +6,10 @@ from onegov.swissvotes.models.vote import SwissVote
 class ColumnMapper(object):
     """ Defines the columns used in the dataset and provides helper functions.
 
+    Typically, you want to iterate over all attributes of a vote (``columns``,
+    ``items``, ``get_values``, ``get_items``) and set/get them (``set_value``,
+    ``get_value``).
+
     """
 
     @cached_property
@@ -15,6 +19,7 @@ class ColumnMapper(object):
         Attribute names starting with an ``!`` are used to indicate JSON
         attributes.
         """
+
         return OrderedDict((
             ('bfs_number', 'anr'),
             ('date', 'datum'),
@@ -741,6 +746,7 @@ class ColumnMapper(object):
 
     def set_value(self, vote, attribute, value):
         """ Set the given value of a vote. """
+
         if attribute.startswith('!'):
             unused, attribute, key = attribute.split('!')
             if getattr(vote, attribute) is None:
@@ -751,6 +757,7 @@ class ColumnMapper(object):
 
     def get_value(self, vote, attribute):
         """ Get the given value of a vote. """
+
         if attribute.startswith('!'):
             unused, attribute, key = attribute.split('!')
             return (getattr(vote, attribute) or {}).get(key)
@@ -758,11 +765,13 @@ class ColumnMapper(object):
 
     def get_values(self, vote):
         """ Get all values of a vote in order. """
+
         for attribute in self.columns.keys():
             yield self.get_value(vote, attribute)
 
     def get_items(self, vote):
         """ Get all names and values of a vote in order. """
+
         for attribute in self.columns.keys():
             yield attribute, self.get_value(vote, attribute)
 
@@ -771,6 +780,7 @@ class ColumnMapper(object):
         information (type, nullable, precision, scale).
 
         """
+
         for attribute, column in self.columns.items():
             if attribute.startswith('!'):
                 type_ = 'INTEGER'

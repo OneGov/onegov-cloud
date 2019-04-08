@@ -12,6 +12,8 @@ from sqlalchemy.orm import object_session
 
 
 class TranslatablePageFile(File):
+    """ An attachment to a translatable content page. """
+
     __mapper_args__ = {'polymorphic_identity': 'swissvotes_page'}
 
     @property
