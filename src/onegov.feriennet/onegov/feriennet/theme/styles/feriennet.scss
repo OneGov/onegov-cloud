@@ -38,15 +38,13 @@ a > h6 {
     hide certain settings
 */
 .homepage-settings,
-.holiday-settings {
-    display: none;
-}
-
-/*
-    hide some settings
-*/
+.holiday-settings,
 .field-geo_provider,
-.field-about_url {
+.field-about_url,
+#fieldset-first-partner,
+#fieldset-second-partner,
+#fieldset-third-partner,
+#fieldset-fourth-partner {
     display: none;
 }
 
