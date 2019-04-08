@@ -106,7 +106,6 @@ def test_attachments_form(swissvotes_app, attachments):
 
     for name in names:
         data = getattr(form, name).data
-        assert data['data']
         assert data['size']
         assert data['filename'] == name
         assert data['mimetype'] in (

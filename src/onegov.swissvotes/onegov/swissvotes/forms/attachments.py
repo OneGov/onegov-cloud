@@ -1,5 +1,3 @@
-from cgi import FieldStorage
-from io import BytesIO
 from onegov.core.crypto import random_token
 from onegov.file.utils import as_fileintent
 from onegov.form import Form
@@ -114,8 +112,8 @@ class AttachmentsForm(Form):
             name = field.name
             file = getattr(model, name, None)
             if file:
-                fs = FieldStorage()
-                fs.file = BytesIO(file.reference.file.read())
-                fs.type = file.reference.content_type
-                fs.filename = file.reference.filename
-                field.data = field.process_fieldstorage(fs)
+                field.data = {
+                    'filename': file.reference.filename,
+                    'size': file.reference.file.content_length,
+                    'mimetype': file.reference.content_type
+                }
