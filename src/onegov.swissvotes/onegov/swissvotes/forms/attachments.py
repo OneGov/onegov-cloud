@@ -95,8 +95,8 @@ class AttachmentsForm(Form):
     def update_model(self, model):
         locale = self.request.locale
 
-        for name in self._fields.keys():
-            field = getattr(self, name)
+        for field in self:
+            name = field.name
             action = getattr(field, 'action', '')
             if action == 'delete':
                 delattr(model, name)
@@ -110,8 +110,8 @@ class AttachmentsForm(Form):
                     setattr(model, name, file)
 
     def apply_model(self, model):
-        for name in self._fields.keys():
-            field = getattr(self, name)
+        for field in self:
+            name = field.name
             file = getattr(model, name, None)
             if file:
                 fs = FieldStorage()
