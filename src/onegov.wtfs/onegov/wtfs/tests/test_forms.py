@@ -907,10 +907,6 @@ def test_create_invoices_form(session):
     form = CreateInvoicesForm()
     form.request = Request(session)
     form.on_request()
-    assert form.vat.choices == [
-        ('without_vat', 'Without VAT'),
-        ('with_vat', 'With VAT')
-    ]
     assert form.municipality_id.choices == [
         ('-', '-'),
         (adlikon.id.hex, 'Adlikon (21)'),
@@ -925,7 +921,6 @@ def test_create_invoices_form(session):
     form.municipality_id.data = aesch.id.hex
     form.accounting_unit.data = '99999'
     form.revenue_account.data = '987654321'
-    form.vat.data = 'with_vat'
 
     model = Invoice(session)
     form.update_model(model)
@@ -936,7 +931,6 @@ def test_create_invoices_form(session):
     assert model.municipality_id == aesch.id.hex
     assert model.accounting_unit == '99999'
     assert model.revenue_account == '987654321'
-    assert model.vat == 'with_vat'
 
     form.municipality_id.data = '-'
     form.update_model(model)

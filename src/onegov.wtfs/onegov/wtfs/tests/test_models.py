@@ -681,7 +681,6 @@ def test_invoice(session):
         invoice.subject = 'Rechnungen'
         invoice.accounting_unit = '99999'
         invoice.revenue_account = '987654321'
-        invoice.vat = None
         assert export() == header + (
             '201912311,31.12.2019,08.07.06,'
             '8882255,'
@@ -749,7 +748,6 @@ def test_invoice(session):
         invoice.subject = 'Rechnungen 1.1-7.1'
         invoice.accounting_unit = '99999'
         invoice.revenue_account = '987654321'
-        invoice.vat = None
         assert export() == header
 
         invoice.from_date = date(2019, 1, 7)

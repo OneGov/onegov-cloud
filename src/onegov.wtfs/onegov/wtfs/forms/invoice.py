@@ -69,24 +69,7 @@ class CreateInvoicesForm(Form):
         ]
     )
 
-    vat = SelectField(
-        label=_("VAT"),
-        choices=[
-            ('without_vat', _("Without VAT")),
-            ('with_vat', _("With VAT")),
-        ],
-        validators=[
-            InputRequired()
-        ],
-        default='without_vat'
-    )
-
     def on_request(self):
-        self.vat.choices = [
-            (name, self.request.translate(label))
-            for name, label in self.vat.choices
-        ]
-
         query = self.request.session.query(
             Municipality.id.label('id'),
             Municipality.name.label('name'),
@@ -108,4 +91,3 @@ class CreateInvoicesForm(Form):
             model.municipality_id = self.municipality_id.data
         model.accounting_unit = self.accounting_unit.data
         model.revenue_account = self.revenue_account.data
-        model.vat = self.vat.data

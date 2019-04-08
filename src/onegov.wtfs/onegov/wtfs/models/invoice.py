@@ -14,7 +14,6 @@ class Invoice(object):
         self.municipality_id = None
         self.accounting_unit = None
         self.revenue_account = None
-        self.vat = None
 
     def export(self, file):
         csv = writer(file)

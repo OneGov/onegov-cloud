@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Removes VAT from invoices.
+  [msom]
+
 0.0.8 (2019-04-02)
 ~~~~~~~~~~~~~~~~~~~
 
