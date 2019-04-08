@@ -20,8 +20,14 @@ class CandidateResult(Base, TimestampMixin):
 
     #: the election result this result belongs to
     election_result_id = Column(
-        UUID, ForeignKey('election_results.id'), nullable=False
+        UUID,
+        ForeignKey('election_results.id', ondelete='CASCADE'),
+        nullable=False
     )
 
     #: the candidate this result belongs to
-    candidate_id = Column(UUID, ForeignKey('candidates.id'), nullable=False)
+    candidate_id = Column(
+        UUID,
+        ForeignKey('candidates.id', ondelete='CASCADE'),
+        nullable=False
+    )

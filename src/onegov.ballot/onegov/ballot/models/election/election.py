@@ -269,10 +269,12 @@ class Election(Base, ContentMixin, TimestampMixin,
         self.status = None
 
         session = object_session(self)
-        for candidate in self.candidates:
-            session.delete(candidate)
-        for result in self.results:
-            session.delete(result)
+        session.query(Candidate).filter(
+            Candidate.election_id == self.id
+        ).delete()
+        session.query(ElectionResult).filter(
+            ElectionResult.election_id == self.id
+        ).delete()
 
     def export(self):
         """ Returns all data connected to this election as list with dicts.

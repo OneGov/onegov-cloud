@@ -765,6 +765,10 @@ def test_election_clear_results(session):
     assert election.candidates.all() == []
     assert election.results.all() == []
 
+    assert session.query(Candidate).count() == 0
+    assert session.query(CandidateResult).count() == 0
+    assert session.query(ElectionResult).count() == 0
+
 
 def test_election_has_results(session):
     election = Election(

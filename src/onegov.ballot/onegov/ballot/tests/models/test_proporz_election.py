@@ -1242,6 +1242,16 @@ def test_proporz_election_clear_results(session):
     assert election.candidates.all() == []
     assert election.results.all() == []
     assert election.party_results.all() == []
+    assert election.panachage_results.all() == []
+
+    assert session.query(Candidate).count() == 0
+    assert session.query(CandidateResult).count() == 0
+    assert session.query(ElectionResult).count() == 0
+    assert session.query(List).count() == 0
+    assert session.query(ListConnection).count() == 0
+    assert session.query(ListResult).count() == 0
+    assert session.query(PanachageResult).count() == 0
+    assert session.query(PartyResult).count() == 0
 
 
 def test_proporz_election_rename(session):

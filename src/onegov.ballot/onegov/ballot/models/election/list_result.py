@@ -20,8 +20,14 @@ class ListResult(Base, TimestampMixin):
 
     #: the election result this result belongs to
     election_result_id = Column(
-        UUID, ForeignKey('election_results.id'), nullable=False
+        UUID,
+        ForeignKey('election_results.id', ondelete='CASCADE'),
+        nullable=False
     )
 
     #: the list this result belongs to
-    list_id = Column(UUID, ForeignKey('lists.id'), nullable=False)
+    list_id = Column(
+        UUID,
+        ForeignKey('lists.id', ondelete='CASCADE'),
+        nullable=False
+    )

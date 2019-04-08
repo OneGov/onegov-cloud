@@ -149,12 +149,16 @@ class ProporzElection(Election, PartyResultExportMixin):
         super(ProporzElection, self).clear_results()
 
         session = object_session(self)
-        for connection in self.list_connections:
-            session.delete(connection)
-        for list_ in self.lists:
-            session.delete(list_)
-        for result in self.party_results:
-            session.delete(result)
+        session.query(List).filter(List.election_id == self.id).delete()
+        session.query(ListConnection).filter(
+            ListConnection.election_id == self.id
+        ).delete()
+        session.query(PartyResult).filter(
+            PartyResult.owner == self.id
+        ).delete()
+        session.query(PanachageResult).filter(
+            PanachageResult.owner == self.id
+        ).delete()
 
     def export(self):
         """ Returns all data connected to this election as list with dicts.

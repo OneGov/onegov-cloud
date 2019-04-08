@@ -457,3 +457,66 @@ def add_default_majority_type(context):
     for election in context.session.query(Election).all():
         if not election.majority_type:
             election.majority_type = 'absolute'
+
+
+@upgrade_task('Add delete contraints')
+def add_delete_contraints(context):
+    # We use SQL (rather than operations.xxx) so that we can drop and add
+    # the constraints in one statement
+    for table, ref, update, delete in (
+        # ('candidate_results', 'candidate', False, True),  # see below
+        # ('candidate_results', 'election_result', False, True),  # see below
+        ('candidates', 'election', True, True),
+        # ('candidates', 'list', False, True),  # see below
+        ('election_results', 'election', True, True),
+        ('list_connections', 'election', True, True),
+        ('list_results', 'election_result', False, True),
+        ('list_results', 'list', False, True),
+        # ('lists', 'connection', False, True),  # see below
+        ('lists', 'election', True, True),
+    ):
+        update = 'ON UPDATE CASCADE' if update else ''
+        delete = 'ON DELETE CASCADE' if delete else ''
+        context.operations.execute(
+            f'ALTER TABLE {table} '
+            f'DROP CONSTRAINT {table}_{ref}_id_fkey, '
+            f'ADD CONSTRAINT {table}_{ref}_id_fkey'
+            f' FOREIGN KEY ({ref}_id) REFERENCES {ref}s (id) {update} {delete}'
+        )
+
+    # there was a typo
+    context.operations.execute(
+        f'ALTER TABLE candidate_results '
+        f'DROP CONSTRAINT IF EXISTS candiate_results_candiate_id_fkey, '
+        f'DROP CONSTRAINT IF EXISTS candiate_results_candidate_id_fkey, '
+        f'DROP CONSTRAINT IF EXISTS candidate_results_candiate_id_fkey, '
+        f'DROP CONSTRAINT IF EXISTS candidate_results_candidate_id_fkey, '
+        f'ADD CONSTRAINT candidate_results_candidate_id_fkey'
+        f' FOREIGN KEY (candidate_id) REFERENCES candidates (id)'
+        f' ON DELETE CASCADE'
+    )
+    context.operations.execute(
+        f'ALTER TABLE candidate_results '
+        f'DROP CONSTRAINT IF EXISTS candiate_results_election_result_id_fkey, '
+        f'DROP CONSTRAINT IF EXISTS candidate_results_election_result_id_fkey,'
+        f' ADD CONSTRAINT candidate_results_election_result_id_fkey'
+        f' FOREIGN KEY (election_result_id) REFERENCES election_results (id)'
+        f' ON DELETE CASCADE'
+    )
+    context.operations.execute(
+        f'ALTER TABLE candidates '
+        f'DROP CONSTRAINT IF EXISTS candiates_list_id_fkey, '
+        f'DROP CONSTRAINT IF EXISTS candidates_list_id_fkey,'
+        f' ADD CONSTRAINT candidates_list_id_fkey'
+        f' FOREIGN KEY (list_id) REFERENCES lists (id)'
+        f' ON DELETE CASCADE'
+    )
+
+    # this one does not fit the schema
+    context.operations.execute(
+        f'ALTER TABLE lists '
+        f'DROP CONSTRAINT IF EXISTS lists_connection_id_fkey,'
+        f' ADD CONSTRAINT lists_connection_id_fkey'
+        f' FOREIGN KEY (connection_id) REFERENCES list_connections (id)'
+        f' ON DELETE CASCADE'
+    )

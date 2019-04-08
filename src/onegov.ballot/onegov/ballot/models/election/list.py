@@ -34,12 +34,16 @@ class List(Base, TimestampMixin):
 
     #: the election this result belongs to
     election_id = Column(
-        Text, ForeignKey('elections.id', onupdate='CASCADE'), nullable=False
+        Text,
+        ForeignKey('elections.id', onupdate='CASCADE', ondelete='CASCADE'),
+        nullable=False
     )
 
     #: the list connection id
     connection_id = Column(
-        UUID, ForeignKey('list_connections.id'), nullable=True
+        UUID,
+        ForeignKey('list_connections.id', ondelete='CASCADE'),
+        nullable=True
     )
 
     #: a list contains n candidates

@@ -27,7 +27,9 @@ class ListConnection(Base, TimestampMixin):
 
     #: the election this result belongs to
     election_id = Column(
-        Text, ForeignKey('elections.id', onupdate='CASCADE'), nullable=True
+        Text,
+        ForeignKey('elections.id', onupdate='CASCADE', ondelete='CASCADE'),
+        nullable=True
     )
 
     #: ID of the parent list connection

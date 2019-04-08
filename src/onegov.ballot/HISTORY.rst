@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Speeds up clearing election results.
+  [msom]
+
 3.7.6 (2019-03-18)
 ~~~~~~~~~~~~~~~~~~~
 
