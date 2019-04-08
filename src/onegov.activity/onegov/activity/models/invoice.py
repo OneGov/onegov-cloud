@@ -33,9 +33,6 @@ class Invoice(Base, TimestampMixin):
     user_id = Column(UUID, ForeignKey('users.id'), nullable=False)
     user = relationship(User, backref='invoices')
 
-    #: deprecated reference field -> remove in Feriennet 1.6
-    code = deferred(Column(Text, FetchedValue(), nullable=True))
-
     #: the specific items linked with this invoice
     items = relationship(InvoiceItem, backref='invoice')
 

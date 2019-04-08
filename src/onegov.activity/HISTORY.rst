@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Removes invoice.code.
+  [href]
+
 1.17.2 (2019-03-19)
 ~~~~~~~~~~~~~~~~~~~
 
