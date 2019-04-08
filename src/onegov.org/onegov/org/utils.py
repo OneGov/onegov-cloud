@@ -159,8 +159,10 @@ def annotate_html(html, request=None):
 
     # for the hashtag lookup we need all elements, as we do not use xpath
     for element in fragments:
-        if element.text and HASHTAG.search(element.text):
-            add_class_to_node(element, 'has-hashtag')
+        for text in element.itertext():
+            if text and HASHTAG.search(text):
+                add_class_to_node(element, 'has-hashtag')
+                break
 
     if request:
         set_image_sizes(images, request)

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes hashtags not getting marked as such in some cases.
+  [href]
+
 1.2.0 (2019-04-05)
 ~~~~~~~~~~~~~~~~~~~
 
