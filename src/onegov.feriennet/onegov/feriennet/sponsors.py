@@ -9,7 +9,7 @@ def load_sponsors(sponsors_path):
     root = Path(sponsors_path)
 
     with (root / 'sponsors.yml').open('r') as f:
-        return [Sponsor(**sponsor) for sponsor in yaml.load(f)]
+        return [Sponsor(**sponsor) for sponsor in yaml.safe_load(f)]
 
 
 class Sponsor(object):
