@@ -33,12 +33,6 @@ class VacationActivity(Activity, CoordinatesExtension, SearchableContent):
         return self.state == 'preview'
 
     @property
-    def es_sugggestions(self):
-        return {
-            'input': (self.title.lower(), )
-        }
-
-    @property
     def organiser(self):
         organiser = [
             self.user.username,
