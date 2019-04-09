@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Make activity proposals idempotent.
+  [href]
+
 - Fixes being able to enter invalid occasion needs.
   [href]
 

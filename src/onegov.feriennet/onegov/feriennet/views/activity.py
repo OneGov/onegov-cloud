@@ -1,4 +1,6 @@
-from datetime import date
+import sedate
+
+from datetime import date, timedelta
 from itertools import groupby
 from onegov.activity import Booking
 from onegov.activity import Occasion
@@ -535,6 +537,13 @@ def discard_activity(self, request):
     request_method='POST')
 def propose_activity(self, request):
     assert request.app.active_period, "An active period is required"
+
+    # if the latest request has been done in the last minute, this is a
+    # duplicate and should be ignored
+    latest = self.latest_request
+
+    if latest and (sedate.utcnow() - timedelta(seconds=60)) < latest.created:
+        return
 
     session = request.session
 
