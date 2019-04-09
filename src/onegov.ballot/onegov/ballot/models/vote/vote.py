@@ -22,6 +22,7 @@ from sqlalchemy_utils import observes
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
+from uuid import uuid4
 
 
 class Vote(Base, ContentMixin, TimestampMixin,
@@ -85,7 +86,7 @@ class Vote(Base, ContentMixin, TimestampMixin,
         result = result[0] if result else None
 
         if not result and create:
-            result = Ballot(type=ballot_type)
+            result = Ballot(id=uuid4(), type=ballot_type)
             self.ballots.append(result)
 
         return result
