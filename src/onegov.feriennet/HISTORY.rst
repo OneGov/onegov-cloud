@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes being able to enter invalid occasion needs.
+  [href]
+
 - Support latest onegov.search release.
   [href]
 
