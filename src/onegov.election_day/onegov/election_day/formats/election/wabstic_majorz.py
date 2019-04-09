@@ -378,6 +378,7 @@ def import_election_wabstic_majorz(
         for candidate_id, votes in added_results[entity_id].items():
             result.candidate_results.append(
                 CandidateResult(
+                    id=uuid4(),
                     votes=votes,
                     candidate_id=added_candidates[candidate_id].id
                 )

@@ -5,6 +5,8 @@ from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from re import match
 from sqlalchemy.orm import object_session
+from uuid import uuid4
+
 
 HEADERS = [
     'year',
@@ -43,6 +45,7 @@ def parse_party_result(line, errors, results, totals, parties, election_year):
             errors.append(_("${name} was found twice", mapping={'name': key}))
         else:
             results[key] = PartyResult(
+                id=uuid4(),
                 year=year,
                 total_votes=total_votes,
                 name=name,
@@ -141,6 +144,7 @@ def import_party_results(election, file, mimetype):
                 if source in parties or source == 999:
                     election.panachage_results.append(
                         PanachageResult(
+                            id=uuid4(),
                             source=parties.get(source, ''),
                             target=parties[target],
                             votes=votes

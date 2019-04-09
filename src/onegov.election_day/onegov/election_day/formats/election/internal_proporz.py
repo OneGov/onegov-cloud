@@ -333,7 +333,11 @@ def import_election_internal_proporz(election, principal, file, mimetype):
         if list_.list_id in panachage:
             for source, votes in panachage[list_.list_id].items():
                 list_.panachage_results.append(
-                    PanachageResult(source=source, votes=votes)
+                    PanachageResult(
+                        id=uuid4(),
+                        source=source,
+                        votes=votes
+                    )
                 )
 
     for candidate in candidates.values():

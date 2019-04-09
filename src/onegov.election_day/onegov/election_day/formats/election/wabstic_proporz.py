@@ -582,6 +582,7 @@ def import_election_wabstic_proporz(
         for candidate_id, votes in added_results[entity_id].items():
             result.candidate_results.append(
                 CandidateResult(
+                    id=uuid4(),
                     votes=votes,
                     candidate_id=added_candidates[candidate_id].id
                 )
@@ -590,6 +591,7 @@ def import_election_wabstic_proporz(
         for list_id, votes in added_list_results[entity_id].items():
             if list_id != '999':
                 result.list_results.append(ListResult(
+                    id=uuid4(),
                     votes=votes,
                     list_id=added_lists[list_id].id
                 ))
