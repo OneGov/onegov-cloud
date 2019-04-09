@@ -491,7 +491,17 @@ def new_activity(self, request, form):
 def edit_activity(self, request, form):
 
     if form.submitted(request):
+        old_username = self.username
         form.populate_obj(self)
+        new_username = self.username
+
+        if old_username != new_username:
+            ticket = relevant_ticket(self, request)
+
+            ActivityMessage.create(ticket, request, 'reassign', {
+                'old_username': old_username,
+                'new_username': new_username,
+            })
 
         request.success(_("Your changes were saved"))
 
@@ -626,17 +636,15 @@ def offer_activity_again(self, request):
         response.headers.add('X-IC-Redirect', request.link(self, 'edit'))
 
 
+def relevant_ticket(activity, request):
+    pr = activity.request_by_period(request.app.active_period) \
+        or activity.latest_request
+
+    return TicketCollection(request.session).by_handler_id(pr.id.hex)
+
+
 def administer_activity(model, request, action, template, subject):
-    session = request.session
-
-    # publish the request from the current period, or the latest
-    publication_request = (
-        model.request_by_period(request.app.active_period)
-        or model.latest_request
-    )
-
-    tickets = TicketCollection(session)
-    ticket = tickets.by_handler_id(publication_request.id.hex)
+    ticket = relevant_ticket(model, request)
 
     # execute state change
     getattr(model, action)()

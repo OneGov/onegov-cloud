@@ -80,7 +80,7 @@
                     <tal:b condition="request.locale.startswith('de')">
 
                         <div>
-                            <a href="https://feriennet.projuventute.ch" i18n:translate>
+                            <a href="https://feriennet.projuventute.ch">
                                 Feriennet ist die Buchungsplattform von Pro Juventute für betreute Ferienangebote.
                             </a>
                             <span>
@@ -101,7 +101,7 @@
                     <tal:b condition="request.locale.startswith('fr')">
 
                         <div>
-                            <a href="https://reseauvacances.projuventute.ch" i18n:translate>
+                            <a href="https://reseauvacances.projuventute.ch">
                                 Feriennet est la plateforme de réservation mise sur pieds par Pro Juventute pour les offres de vacances encadrées.
                             </a>
                             <span>

@@ -11,6 +11,16 @@
                 <tal:b case="'archive'" i18n:translate>
                     Activity archived.
                 </tal:b>
+                <tal:b case="'reassign'" i18n:translate>
+                    Activity reassigned from
+                    <a i18n:name="old_username"
+                        href="mailto:${model.meta['extra_meta']['old_username']}">
+                        ${model.meta['extra_meta']['old_username']}</a>
+                    to
+                    <a i18n:name="new_username"
+                        href="mailto:${model.meta['extra_meta']['new_username']}">
+                        ${model.meta['extra_meta']['new_username']}</a>.
+                </tal:b>
             </tal:b>
         </metal:b>
     </metal:b>

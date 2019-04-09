@@ -33,5 +33,6 @@ class ActivityMessage(Message, TicketMessageMixin):
     }
 
     @classmethod
-    def create(cls, ticket, request, action):
-        return super().create(ticket, request, action=action)
+    def create(cls, ticket, request, action, extra_meta=None):
+        return super().create(
+            ticket, request, action=action, extra_meta=extra_meta)

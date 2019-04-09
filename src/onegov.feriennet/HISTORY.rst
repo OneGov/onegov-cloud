@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Reassigns the ticket as well if the organiser is reassigned on the activity.
+  [href]
+
 - Updates Pro Juventute's footer.
   [href]
 
