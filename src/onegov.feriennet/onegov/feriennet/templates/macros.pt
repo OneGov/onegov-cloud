@@ -52,40 +52,72 @@
 
             <div class="row">
                 <div class="columns small-12 medium-3">
-                    <a href="https://feriennet.projuventute.ch/" class="pro-juventute-logo">
-                        <img src="${layout.static_file_path('projuventute.svg')}"
-                             alt="Pro Juventute Logo"
-                             i18n:attributes="alt"
-                             height="175px"
-                             width="151px"
-                        >
-                    </a>
+                    <tal:b condition="request.locale.startswith('de')">
+                        <a href="https://feriennet.projuventute.ch/" class="pro-juventute-logo">
+                            <img src="${layout.static_file_path('projuventute.svg')}"
+                                 alt="Pro Juventute Logo"
+                                 i18n:attributes="alt"
+                                 height="175px"
+                                 width="151px"
+                            >
+                        </a>
+                    </tal:b>
+                    <tal:b condition="request.locale.startswith('fr')">
+                        <a href="https://reseauvacances.projuventute.ch/" class="pro-juventute-logo">
+                            <img src="${layout.static_file_path('projuventute.svg')}"
+                                 alt="Pro Juventute Logo"
+                                 i18n:attributes="alt"
+                                 height="175px"
+                                 width="151px"
+                            >
+                        </a>
+                    </tal:b>
                 </div>
                 <div class="columns small-12 medium-9 pro-juventute-ad-text">
-                    <div>
-                        <a href="https://feriennet.projuventute.ch" i18n:translate>
-                            Feriennet is Pro Juventute's booking platform for
-                            supervised vacation activities.
-                        </a>
-                    </div>
+                    <!--! This is not being translated with our translation machinery as we the content
+                          and structure of this is very explicitly specified. -->
 
-                    <div i18n:translate>
-                        This platform was developed by <a i18n:name="seantis" href="https://www.seantis.ch">Seantis GmbH</a> with <a i18n:name="onegovcloud" href="https://www.onegovcloud.ch">OneGov Cloud</a>, supported by <a i18n:name="netcetera" href="https://www.netcetera.com">Netcetera AG</a>.
-                    </div>
+                    <tal:b condition="request.locale.startswith('de')">
 
-                    <div>
-                        <div i18n:translate>
-                            You can find additional Pro Juventute offers
-                            <a href="https://www.projuventute.ch" i18n:name="here" i18n:translate>here</a>.
+                        <div>
+                            <a href="https://feriennet.projuventute.ch" i18n:translate>
+                                Feriennet ist die Buchungsplattform von Pro Juventute für betreute Ferienangebote.
+                            </a>
+                            <span>
+                                Weitere Angebote der Stiftung finden Sie <a href="https://www.projuventute.ch/Programme.3232.0.html">hier</a>.
+                            </span>
                         </div>
-                    </div>
 
-                    <div>
-                        <div i18n:translate>
-                            Pro Juventute Feriennet could only be realised thanks to the
-                            generous support of our <a i18n:name="partners" i18n:translate href="https://www.projuventute.ch/Unsere-Partner.3789.0.html">partners</a>.
+                        <div>
+                            Sie möchten unsere Arbeit für Kinder und Jugendliche in der Schweiz unterstützen? Dann können Sie hier <a href="https://www.projuventute.ch/Spenden.3233.0.html">spenden</a>. Herzlichen Dank.
                         </div>
-                    </div>
+
+                        <div>
+                            Diese Plattform wurde dank der grosszügigen Unterstützung unserer <a href="https://www.projuventute.ch/Unsere-Partner.3789.0.html">Partner</a> realisiert und von <a href="https://www.seantis.ch">Seantis GmbH</a> mit <a href="https://www.onegovcloud.ch">Onegov Cloud</a>, unterstützt von <a href="https://www.netcetera.com">Netcetera AG</a> entwickelt.
+                        </div>
+
+                    </tal:b>
+
+                    <tal:b condition="request.locale.startswith('fr')">
+
+                        <div>
+                            <a href="https://reseauvacances.projuventute.ch" i18n:translate>
+                                Feriennet est la plateforme de réservation mise sur pieds par Pro Juventute pour les offres de vacances encadrées.
+                            </a>
+                            <span>
+                                Pour de plus amples informations sur les offres de la Fondation Pro Juventute : <a href="https://www.projuventute.ch/Programme.3232.0.html?L=1">Programmes</a>.
+                            </span>
+                        </div>
+
+                        <div>
+                            Vous souhaitez soutenir notre travail auprès des enfants et des jeunes en Suisse? Pour faire un don : <a href="https://www.projuventute.ch/Dons.1720.0.html?&L=1">Dons</a>. Nous vous remercions.
+                        </div>
+
+                        <div>
+                            Cette plateforme a été réalisée grâce au soutien généreux de nos <a href="https://www.projuventute.ch/Unsere-Partner.3789.0.html?L=1">partenaires</a> et développée par <a href="https://www.seantis.ch">Seantis GmbH</a> et <a href="https://www.onegovcloud.ch">Onegov Cloud</a>, avec le soutien de <a href="https://www.netcetera.com">Netcetera SA</a>.
+                        </div>
+
+                    </tal:b>
                 </div>
             </div>
         </div>

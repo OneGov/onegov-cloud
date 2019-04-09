@@ -1,7 +1,10 @@
 Changelog
 ---------
 
-- Make activity proposals idempotent.
+- Updates Pro Juventute's footer.
+  [href]
+
+- Makes activity proposals idempotent.
   [href]
 
 - Fixes being able to enter invalid occasion needs.
