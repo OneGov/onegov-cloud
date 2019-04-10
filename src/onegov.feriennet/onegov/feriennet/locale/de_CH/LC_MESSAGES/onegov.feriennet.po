@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-04-09 11:31+0200\n"
+"POT-Creation-Date: 2019-04-10 14:29+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -692,6 +692,14 @@ msgstr "Teilnehmer"
 msgid "Ignore Age Restriction"
 msgstr "Altersbeschränkung ignorieren"
 
+msgid "Accept TOS"
+msgstr "AGB akzeptieren"
+
+#.
+#. Used in sentence: "I have read the ${tos} and accept them."
+msgid "TOS"
+msgstr "AGB"
+
 msgid "Maximum number of bookings per period"
 msgstr "Maximale Anzahl Buchungen pro Zeitraum"
 
@@ -730,6 +738,9 @@ msgstr "Mädchen"
 
 msgid "Boy"
 msgstr "Junge"
+
+msgid "The TOS must be accepted to create a booking."
+msgstr "Die AGB müssen akzeptiert werden, bevor Buchung gemacht werden können."
 
 msgid ""
 "Your userprofile is not complete. It needs to be complete before signing up "
@@ -1067,6 +1078,9 @@ msgstr "Benutzer Begünstigter"
 msgid "User Status E-Mail"
 msgstr "Benutzer Status E-Mail"
 
+msgid "User TOS Accepted"
+msgstr "Benutzer AGB akzeptiert"
+
 msgid "Invoice Item Group"
 msgstr "Rechungsposition Gruppe"
 
@@ -1247,16 +1261,6 @@ msgstr "Pro Juventute Feriennet"
 msgid "Pro Juventute Logo"
 msgstr "Pro Juventute Logo"
 
-msgid ""
-"Feriennet ist die Buchungsplattform von Pro Juventute für betreute "
-"Ferienangebote."
-msgstr ""
-
-msgid ""
-"Feriennet est la plateforme de réservation mise sur pieds par Pro Juventute "
-"pour les offres de vacances encadrées."
-msgstr ""
-
 msgid "Feriennet Partner"
 msgstr "Feriennet Partner"
 
@@ -1426,6 +1430,10 @@ msgstr ""
 
 msgid "Your request has been completed."
 msgstr "Ihr Anliegen wurde erfolgreich abgeschlossen."
+
+#. Canonical text for ${tos} is: "TOS"
+msgid "I have read the ${tos} and accept them."
+msgstr "Ich habe die ${tos} gelesen und stimme diesen zu."
 
 msgid "No periods defined."
 msgstr "Keine Zeiträume definiert."
@@ -2272,6 +2280,12 @@ msgstr "ESR Teilnehmernummer"
 
 msgid "ESR identification number"
 msgstr "ESR Identifikationsnummer"
+
+msgid "Link to the TOS"
+msgstr "Link zu den AGB"
+
+msgid "Require users to accept the TOS before booking"
+msgstr "Zwingt Benutzer dazu, die AGB vor dem Buchen zu akzeptieren"
 
 msgid "Require the political municipality in the userprofile"
 msgstr "Verlange die politische Gemeinde im Benutzerprofil"

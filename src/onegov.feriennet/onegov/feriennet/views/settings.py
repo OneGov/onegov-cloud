@@ -8,6 +8,7 @@ from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_generic_settings
 from wtforms.validators import InputRequired
 from wtforms.fields import BooleanField, StringField, RadioField
+from wtforms.fields.html5 import URLField
 
 
 class FeriennetSettingsForm(Form):
@@ -72,6 +73,13 @@ class FeriennetSettingsForm(Form):
         fieldset=_("Organiser")
     )
 
+    tos_url = URLField(
+        label=_("Link to the TOS"),
+        description=_("Require users to accept the TOS before booking"),
+        fieldset=_("TOS")
+    )
+
+
     def ensure_beneificary_if_bank_account(self):
         if self.bank_account.data and not self.bank_beneficiary.data:
             self.bank_beneficiary.errors.append(_(
@@ -100,7 +108,8 @@ class FeriennetSettingsForm(Form):
             ('bank_beneficiary', ''),
             ('bank_reference_schema', 'feriennet-v1'),
             ('bank_esr_participant_number', ''),
-            ('bank_esr_identification_number', '')
+            ('bank_esr_identification_number', ''),
+            ('tos_url', ''),
         )
 
         for attr, default in attributes:
@@ -118,6 +127,7 @@ class FeriennetSettingsForm(Form):
             'bank_reference_schema',
             'bank_esr_participant_number',
             'bank_esr_identification_number',
+            'tos_url',
         )
 
         for attr in attributes:

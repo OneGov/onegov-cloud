@@ -214,6 +214,11 @@ def book_occasion(self, request, form):
                 occasion=self
             )
 
+        # if the TOS have been accepted, record this now
+        if hasattr(form, 'accept_tos') and form.accept_tos:
+            if form.accept_tos.data:
+                request.current_user.data['tos_accepted'] = True
+
         if self.period.confirmed:
             bookings.accept_booking(booking)
             request.success(

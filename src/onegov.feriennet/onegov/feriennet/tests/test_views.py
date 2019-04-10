@@ -2183,3 +2183,42 @@ def test_max_age(client, scenario):
         page.form['birth_date'] = "2007-01-02"
         page.form['gender'] = 'male'
         assert "zu alt" not in page.form.submit()
+
+
+def test_accept_tos(client, scenario):
+    scenario.add_period(confirmed=True)
+    scenario.add_activity(title="Foobar", state='accepted')
+    scenario.add_occasion(age=(0, 100))
+    scenario.add_attendee(birth_date=date.today() - timedelta(days=10 * 360))
+    scenario.commit()
+
+    client.login_admin()
+    client.fill_out_profile()
+
+    page = client.get('/activity/foobar').click("Anmelden")
+    assert "AGB" not in page
+
+    page = client.get('/feriennet-settings')
+    page.form['tos_url'] = 'https://example.org/tos'
+    page.form.submit()
+
+    page = client.get('/activity/foobar').click("Anmelden")
+    assert "AGB"
+
+    page = page.form.submit()
+    assert "Die AGB müssen akzeptiert werden" in page
+
+    page.form['accept_tos'] = True
+    page = page.form.submit().follow()
+
+    assert "AGB" not in page
+    assert "erfolgreich" in page
+
+    page = client.get('/activity/foobar').click("Anmelden")
+    assert "AGB" not in page
+
+    page = client.get('/export/benutzer')
+    page.form['file_format'] = 'json'
+    data = page.form.submit().json
+    assert data[0]['Benutzer AGB akzeptiert']
+    assert not data[1]['Benutzer AGB akzeptiert']

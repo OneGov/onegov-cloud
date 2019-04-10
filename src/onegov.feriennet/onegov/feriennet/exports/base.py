@@ -114,6 +114,7 @@ class FeriennetExport(Export):
         yield _("User Bank Account"), user_data.get('bank_account', '')
         yield _("User Beneficiary"), user_data.get('bank_beneficiary', '')
         yield _("User Status E-Mail"), daily_email
+        yield _("User TOS Accepted"), user_data.get('tos_accepted', False)
 
     def invoice_item_fields(self, item):
         yield _("Invoice Item Group"), item.group

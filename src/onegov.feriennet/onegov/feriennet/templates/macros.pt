@@ -633,3 +633,10 @@
         </tal:b>
     </tal:b>
 </metal:payment_link_fallback>
+
+
+<metal:accept_tos define-macro="accept_tos" i18n:domain="onegov.feriennet">
+    <div class="accept-tos" i18n:translate style="margin-bottom: .5rem">
+        I have read the <a href="${url}" i18n:name="tos" i18n:translate>TOS</a> and accept them.
+    </div>
+</metal:accept_tos>

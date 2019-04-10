@@ -1,8 +1,11 @@
 from cached_property import cached_property
+from chameleon.utils import Markup
 from datetime import date
 from onegov.activity import Attendee, AttendeeCollection
 from onegov.activity import Booking, BookingCollection, Occasion
+from onegov.core.templates import render_macro
 from onegov.feriennet import _
+from onegov.feriennet.layout import DefaultLayout
 from onegov.feriennet.utils import encode_name, decode_name
 from onegov.form import Form
 from onegov.user import UserCollection
@@ -128,6 +131,12 @@ class AttendeeSignupForm(AttendeeBase):
         default=False
     )
 
+    accept_tos = BooleanField(
+        label=_("Accept TOS"),
+        fieldset=_("TOS"),
+        default=False,
+    )
+
     @property
     def is_new_attendee(self):
         return self.attendee.data == 'other'
@@ -169,11 +178,31 @@ class AttendeeSignupForm(AttendeeBase):
         if self.attendee.data == '0xdeadbeef':
             self.attendee.data = self.attendee.choices[0][0]
 
+    def populate_tos(self):
+        url = self.request.app.org.meta.get('tos_url', None)
+
+        if not url or self.request.current_user.data.get('tos_accepted', None):
+            self.delete_field('accept_tos')
+            return
+
+        layout = DefaultLayout(self.model, self.request)
+
+        self.accept_tos.description = Markup(render_macro(
+            layout.macros['accept_tos'], self.request, {'url': url}))
+
     def on_request(self):
         self.populate_attendees()
+        self.populate_tos()
 
         if not self.request.is_admin:
             self.delete_field('ignore_age')
+
+    def ensure_tos_accepted(self):
+        if hasattr(self, 'accept_tos') and self.accept_tos is not None:
+            if not self.accept_tos.data:
+                self.accept_tos.errors.append(
+                    _("The TOS must be accepted to create a booking."))
+                return False
 
     def ensure_complete_userprofile(self):
         if not self.is_complete_userprofile:

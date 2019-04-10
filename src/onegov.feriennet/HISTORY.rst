@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to force the user to accept the terms of service.
+  [href]
+
 - Improves the billing performance.
   [href]
 
