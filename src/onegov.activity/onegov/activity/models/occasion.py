@@ -8,7 +8,6 @@ from onegov.activity.models.occasion_date import DAYS
 from psycopg2.extras import NumericRange
 from sqlalchemy import Boolean
 from sqlalchemy import case
-from sqlalchemy import column
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import func

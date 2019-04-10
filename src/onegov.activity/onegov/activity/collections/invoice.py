@@ -116,14 +116,17 @@ class InvoiceCollection(GenericCollection):
         for invoice in self.query():
             invoice.sync()
 
-    def add(self, period_id=None, user_id=None):
+    def add(self, period_id=None, user_id=None, flush=True, optimistic=False):
         invoice = Invoice(
             id=uuid4(),
             period_id=period_id or self.period_id,
             user_id=user_id or self.user_id)
 
         self.session.add(invoice)
-        self.schema.link(self.session, invoice)
-        self.session.flush()
+        self.schema.link(
+            self.session, invoice, flush=flush, optimistic=optimistic)
+
+        if flush:
+            self.session.flush()
 
         return invoice

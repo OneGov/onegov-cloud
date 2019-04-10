@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves control over invoice session flushing.
+  [href]
+
 - Removes occasion.active.
   [href]
 

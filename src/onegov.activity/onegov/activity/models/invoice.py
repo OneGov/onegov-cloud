@@ -63,7 +63,7 @@ class Invoice(Base, TimestampMixin):
             # the last payment is the relevant one
             item.paid = item.payments[-1].state == 'paid'
 
-    def add(self, group, text, unit, quantity, **kwargs):
+    def add(self, group, text, unit, quantity, flush=True, **kwargs):
         item = InvoiceItem(
             group=group,
             text=text,
@@ -74,7 +74,9 @@ class Invoice(Base, TimestampMixin):
         )
 
         self.items.append(item)
-        object_session(self).flush()
+
+        if flush:
+            object_session(self).flush()
 
         return item
 
