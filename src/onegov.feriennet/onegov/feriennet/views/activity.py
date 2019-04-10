@@ -64,7 +64,7 @@ def occasions_by_period(session, activity, show_inactive, show_archived):
     query = query.options(contains_eager(Occasion.period))
 
     if not show_inactive:
-        query = query.filter(Occasion.active == True)
+        query = query.filter(Period.active == True)
 
     if not show_archived:
         query = query.filter(Period.archived == False)
@@ -416,7 +416,7 @@ def view_activity(self, request):
         if self.state != 'accepted':
             return False
 
-        if not occasion.active:
+        if not occasion.period.active:
             return False
 
         if occasion.cancelled:
