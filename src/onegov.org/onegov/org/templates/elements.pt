@@ -2,8 +2,7 @@
 
 <!--! A generic link element -->
 <metal:b define-macro="link">
-    <a tal:attributes="e.attrs">
-        ${e.text or ''}
+    <a tal:attributes="e.attrs" tal:content="e.text or ''">
         <tal:b condition="e.is_hidden_from_public">
             <metal:b
                 tal:define="item e.model"
