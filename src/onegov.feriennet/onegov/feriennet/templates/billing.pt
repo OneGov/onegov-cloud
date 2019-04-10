@@ -125,7 +125,7 @@
                     </div>
                 </div>
             </div>
-            <div class="columns small-12 medium-4" tal:condition="not: model.expand">
+            <div class="columns small-12 medium-4">
                 <div class="side-panel form-panel">
                     <h4 i18n:translate>Billing</h4>
 
@@ -167,7 +167,7 @@
                     </div>
                 </div>
 
-                <tal:b condition="not: model.expand" metal:use-macro="layout.macros.periods" />
+                <tal:b metal:use-macro="layout.macros.periods" />
             </div>
         </div>
     </tal:b>
