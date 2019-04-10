@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Removes occasion.active.
+  [href]
+
 - Removes invoice.code.
   [href]
 

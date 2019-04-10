@@ -180,9 +180,8 @@ def test_occasions(session, owner):
     assert tournament.note == "Bring game-face"
     assert tournament.activity_id == activities.query().first().id
     assert tournament.period_id == periods.query().first().id
-    assert tournament.active
 
-    # postgres ranges are coeced into half-open intervals
+    # postgres ranges are coerced into half-open intervals
     assert tournament.age.lower == 6
     assert tournament.age.upper == 10
     assert tournament.spots.lower == 2
@@ -195,15 +194,6 @@ def test_occasions(session, owner):
     assert tournament.age.upper == 10
     assert tournament.spots.lower == 2
     assert tournament.spots.upper == 11
-
-    # the occasions active flag is bound to the period's activity
-    periods.query().first().deactivate()
-    transaction.commit()
-    assert not occasions.query().first().active
-
-    periods.query().first().activate()
-    transaction.commit()
-    assert occasions.query().first().active
 
 
 def test_activity_date_ranges(session, owner, collections):

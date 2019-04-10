@@ -87,10 +87,6 @@ class Occasion(Base, TimestampMixin):
     #: Weekdays on which this occasion is active
     weekdays = Column(ARRAY(Integer), nullable=False, default=list)
 
-    @aggregated('period', Column(Boolean, default=False))
-    def active(self):
-        return column('active')
-
     @aggregated('accepted', Column(Integer, default=0))
     def attendee_count(self):
         return func.count('1')

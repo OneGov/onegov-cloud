@@ -683,3 +683,8 @@ def adds_score_to_bookings(context):
         column=Column('score', Numeric(precision=14, scale=9), nullable=False),
         default=0
     )
+
+
+@upgrade_task('Drop occasion.active column')
+def drop_occasion_active_column(context):
+    context.operations.drop_column('occasions', 'active')
