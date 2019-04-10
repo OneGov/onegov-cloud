@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Improves parser import times.
+  [href]
+
 0.45.1 (2019-04-03)
 ~~~~~~~~~~~~~~~~~~~
 

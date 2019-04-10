@@ -10,6 +10,7 @@ from pyparsing import (
     Literal,
     MatchFirst,
     nums,
+    pyparsing_unicode,
     OneOrMore,
     Optional,
     ParserElement,
@@ -23,15 +24,14 @@ from pyparsing import (
 # we want newlines to be significant
 ParserElement.setDefaultWhitespaceChars(' \t')
 
-unicode_characters = ''.join(
-    chr(c) for c in range(65536) if not chr(c).isspace())
-text = Word(unicode_characters)
+printables = pyparsing_unicode.Latin1.printables
+text = Word(printables)
 numeric = Word(nums)
 
 
 def text_without(characters):
     """ Returns all printable text without the given characters. """
-    return Word(unicode_characters, excludeChars=characters)
+    return Word(printables, excludeChars=characters)
 
 
 def matches(character):
@@ -165,7 +165,7 @@ def textfield():
     """
     length = number_enclosed_in('[]')('length')
 
-    regex = Word(unicode_characters).setParseAction(as_regex)('regex')
+    regex = Word(printables).setParseAction(as_regex)('regex')
     regex = Suppress('/') + regex
 
     textfield = Suppress('___') + Optional(length) + Optional(regex)

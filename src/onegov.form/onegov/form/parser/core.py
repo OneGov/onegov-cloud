@@ -381,7 +381,26 @@ def create_parser_elements():
     return elements
 
 
-ELEMENTS = create_parser_elements()
+# lazy loads the parser elements and stores them as attributes on itself
+class LazyElements(object):
+
+    def __init__(self):
+        self.loaded = False
+
+    def __getattr__(self, name):
+        if not self.loaded:
+            for k, v in create_parser_elements().__dict__.items():
+                setattr(self, k, v)
+
+            self.loaded = True
+
+        if name in self.__dict__:
+            return self.__dict__[name]
+
+        return super().__getattr__(name)
+
+
+ELEMENTS = LazyElements()
 
 
 class CustomLoader(yaml.SafeLoader):
