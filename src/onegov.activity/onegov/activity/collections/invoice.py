@@ -116,15 +116,11 @@ class InvoiceCollection(GenericCollection):
         for invoice in self.query():
             invoice.sync()
 
-    def add(self, period_id=None, user_id=None, code=None):
+    def add(self, period_id=None, user_id=None):
         invoice = Invoice(
             id=uuid4(),
             period_id=period_id or self.period_id,
             user_id=user_id or self.user_id)
-
-        # deprecated -> remove in Feriennet 1.6
-        if code is not None:
-            invoice.code = code
 
         self.session.add(invoice)
         self.schema.link(self.session, invoice)
