@@ -195,9 +195,7 @@ def view_billing(self, request, form):
         'model': self,
         'period': self.period,
         'periods': request.app.periods,
-        'total': self.total,
         'form': form,
-        'outstanding': self.outstanding,
         'button_text': _("Create Bills"),
         'invoice_links': invoice_links,
         'item_links': item_links

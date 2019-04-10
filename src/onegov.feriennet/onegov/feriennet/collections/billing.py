@@ -2,6 +2,7 @@ from collections import OrderedDict
 from decimal import Decimal
 from itertools import groupby
 from onegov.activity import Activity, Attendee, Booking, Occasion
+from onegov.activity import Invoice, InvoiceItem, InvoiceReference
 from onegov.activity import BookingCollection
 from onegov.core.orm import as_selectable_from_path
 from onegov.core.utils import module_path, Bunch
@@ -130,9 +131,19 @@ class BillingCollection(object):
         invoices = self.invoices
 
         # delete all existing invoices
-        for invoice in self.invoices.query():
-            assert invoice.period_id == self.period.id
-            session.delete(invoice)
+        invoice_ids = invoices.query().with_entities(Invoice.id).subquery()
+
+        def delete_queries():
+            yield session.query(InvoiceReference).filter(
+                InvoiceReference.invoice_id.in_(invoice_ids))
+
+            yield session.query(InvoiceItem).filter(
+                InvoiceItem.invoice_id.in_(invoice_ids))
+
+            yield invoices.query()
+
+        for q in delete_queries():
+            q.delete('fetch')
 
         # preload data to avoid more expensive joins
         activities = {
@@ -176,7 +187,9 @@ class BillingCollection(object):
             if booking.username not in created_invoices:
                 created_invoices[booking.username] = invoices.add(
                     period_id=period.id,
-                    user_id=users[booking.username]
+                    user_id=users[booking.username],
+                    flush=False,
+                    optimistic=True
                 )
 
             if period.pay_organiser_directly or not booking.cost:
@@ -186,7 +199,8 @@ class BillingCollection(object):
                 group=attendees[booking.attendee_id][0],
                 text=activities[booking.occasion_id],
                 unit=booking.cost,
-                quantity=1
+                quantity=1,
+                flush=False
             )
 
         # add the all inclusive booking costs if necessary
@@ -197,5 +211,6 @@ class BillingCollection(object):
                         group=attendee,
                         text=all_inclusive_booking_text,
                         unit=period.booking_cost,
-                        quantity=1
+                        quantity=1,
+                        flush=False
                     )

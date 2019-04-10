@@ -4,16 +4,16 @@
     </tal:b>
     <tal:b metal:fill-slot="content" tal:define="bills model.bills">
 
-        <div class="callout panel">
+        <div class="callout panel" tal:condition="not:model.expand">
             <div class="hints">
                 <tal:b metal:use-macro="layout.macros.period_hints" />
 
                 <div class="hint hint-costs" i18n:translate tal:condition="bills">
-                    The total amount is <strong tal:content="'{:.2f}'.format(total)" i18n:name="amount" /> CHF.
+                    The total amount is <strong tal:content="'{:.2f}'.format(model.total)" i18n:name="amount" /> CHF.
                 </div>
 
                 <div class="hint hint-outstanding" i18n:translate tal:condition="bills">
-                    The outstanding amount is <strong tal:content="'{:.2f}'.format(outstanding)" i18n:name="amount" /> CHF.
+                    The outstanding amount is <strong tal:content="'{:.2f}'.format(model.outstanding)" i18n:name="amount" /> CHF.
                 </div>
             </div>
         </div>
@@ -125,7 +125,7 @@
                     </div>
                 </div>
             </div>
-            <div class="columns small-12 medium-4">
+            <div class="columns small-12 medium-4" tal:condition="not: model.expand">
                 <div class="side-panel form-panel">
                     <h4 i18n:translate>Billing</h4>
 
@@ -167,7 +167,7 @@
                     </div>
                 </div>
 
-                <tal:b metal:use-macro="layout.macros.periods" />
+                <tal:b condition="not: model.expand" metal:use-macro="layout.macros.periods" />
             </div>
         </div>
     </tal:b>

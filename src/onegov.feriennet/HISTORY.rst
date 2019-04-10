@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves the billing performance.
+  [href]
+
 - Reassigns the ticket as well if the organiser is reassigned on the activity.
   [href]
 
