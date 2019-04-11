@@ -1,7 +1,10 @@
 Changelog
 ---------
 
-- Speeds up clearing election results.
+- Adds ON DELETE CASCADE constraints to various models.
+  [msom]
+
+- Improves the performance of deleting election and vote results.
   [msom]
 
 - Presets ballot ids.

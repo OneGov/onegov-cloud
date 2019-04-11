@@ -1244,14 +1244,14 @@ def test_proporz_election_clear_results(session):
     assert election.party_results.all() == []
     assert election.panachage_results.all() == []
 
-    assert session.query(Candidate).count() == 0
-    assert session.query(CandidateResult).count() == 0
-    assert session.query(ElectionResult).count() == 0
-    assert session.query(List).count() == 0
-    assert session.query(ListConnection).count() == 0
-    assert session.query(ListResult).count() == 0
-    assert session.query(PanachageResult).count() == 0
-    assert session.query(PartyResult).count() == 0
+    assert session.query(Candidate).first() is None
+    assert session.query(CandidateResult).first() is None
+    assert session.query(ElectionResult).first() is None
+    assert session.query(List).first() is None
+    assert session.query(ListConnection).first() is None
+    assert session.query(ListResult).first() is None
+    assert session.query(PanachageResult).first() is None
+    assert session.query(PartyResult).first() is None
 
 
 def test_proporz_election_rename(session):

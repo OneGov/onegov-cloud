@@ -54,4 +54,8 @@ class BallotResult(Base, TimestampMixin, DerivedAttributesMixin,
     eligible_voters = Column(Integer, nullable=False, default=lambda: 0)
 
     #: the ballot this result belongs to
-    ballot_id = Column(UUID, ForeignKey('ballots.id'), nullable=False)
+    ballot_id = Column(
+        UUID,
+        ForeignKey('ballots.id', ondelete='CASCADE'),
+        nullable=False
+    )

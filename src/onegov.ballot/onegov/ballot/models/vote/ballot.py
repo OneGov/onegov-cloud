@@ -188,5 +188,6 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
         """ Clear all the results. """
 
         session = object_session(self)
-        for result in self.results:
-            session.delete(result)
+        session.query(BallotResult).filter(
+            BallotResult.ballot_id == self.id
+        ).delete()

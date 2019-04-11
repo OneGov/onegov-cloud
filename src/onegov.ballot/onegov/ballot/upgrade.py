@@ -474,6 +474,7 @@ def add_delete_contraints(context):
         ('list_results', 'list', False, True),
         # ('lists', 'connection', False, True),  # see below
         ('lists', 'election', True, True),
+        ('ballot_results', 'ballot', False, True),
     ):
         update = 'ON UPDATE CASCADE' if update else ''
         delete = 'ON DELETE CASCADE' if delete else ''

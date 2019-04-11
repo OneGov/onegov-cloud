@@ -979,6 +979,7 @@ def test_clear_ballot(session):
     vote.proposal.clear_results()
 
     assert vote.proposal.results.first() is None
+    assert session.query(BallotResult).first() is None
 
 
 def test_clear_vote(session):
