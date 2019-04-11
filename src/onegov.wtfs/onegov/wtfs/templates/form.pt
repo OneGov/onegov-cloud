@@ -1,8 +1,8 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.wtfs">
     <tal:block metal:fill-slot="title">${layout.title}</tal:block>
     <tal:block metal:fill-slot="content">
-        <h2>${layout.title}</h2>
-        <h3 tal:condition="subtitle|nothing" class="subheader">${subtitle}</h3>
+        <h1>${layout.title}</h1>
+        <h2 tal:condition="subtitle|nothing" class="subheader">${subtitle}</h2>
         <div class="panel callout" tal:condition="callout|form.callout|nothing">
              <p>${callout|form.callout}</p>
         </div>

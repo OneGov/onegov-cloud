@@ -1,14 +1,35 @@
 header {
     margin-bottom: .75rem;
 
-    a.logout::before {
-        @include icon('\f08b');
-        margin-right: .75rem;
+    .auth {
+        background-color: $primary-color;
+        color: $white;
+
+        a {
+            color: $white;
+            height: 2.5rem;
+            line-height: 2.5rem;
+            padding: 0 .5rem;
+
+            &.login::before {
+                @include icon('\f090');
+                margin-right: .75rem;
+            }
+
+            &.logout::before {
+                @include icon('\f08b');
+                margin-right: .75rem;
+            }
+        }
     }
 
     .title {
-        a {
-            margin-top: 1em;
+        img {
+            margin: 1.75rem 0;
+
+            &.right {
+                margin-left: 1rem;
+            }
         }
 
     }

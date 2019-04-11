@@ -3,7 +3,7 @@
     <tal:block metal:fill-slot="content">
         <div class="row">
             <div class="columns small-12">
-                <h2><tal:block i18n:translate>Daily list</tal:block><br><small>${layout.subtitle}</small></h2>
+                <h1><tal:block i18n:translate>Daily list</tal:block><br><small>${layout.subtitle}</small></h1>
 
                 <table>
                     <thead>

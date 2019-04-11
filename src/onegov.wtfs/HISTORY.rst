@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Removes iFrame support.
+  [msom]
+
 0.0.9 (2019-04-08)
 ~~~~~~~~~~~~~~~~~~~
 

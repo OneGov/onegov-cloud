@@ -1,12 +1,11 @@
 from cached_property import cached_property
 from onegov.core import Framework
 from onegov.core import utils
-from onegov.core.framework import default_content_security_policy
 from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.wtfs.collections import MunicipalityCollection
-from onegov.wtfs.models import PaymentType
 from onegov.wtfs.models import Principal
+from onegov.wtfs.models import PaymentType
 from onegov.wtfs.theme import WtfsTheme
 
 
@@ -60,16 +59,6 @@ class WtfsApp(Framework, FormApp, DepotApp):
 @WtfsApp.static_directory()
 def get_static_directory():
     return 'static'
-
-
-@WtfsApp.setting(section='content_security_policy', name='default')
-def wtfs_content_security_policy():
-    policy = default_content_security_policy()
-    policy.frame_ancestors |= {
-        'https://winterthur.ch',
-        'https://*.winterthur.ch',
-    }
-    return policy
 
 
 @WtfsApp.template_directory()
@@ -140,8 +129,6 @@ def get_frameworks_asset():
     yield 'jquery.datetimepicker.css'
     yield 'jquery.datetimepicker.js'
     yield 'datetimepicker.js'
-    yield 'iframe-resizer-options.js'
-    yield 'iframe-resizer-contentwindow.js'
 
 
 @WtfsApp.webasset('common')
