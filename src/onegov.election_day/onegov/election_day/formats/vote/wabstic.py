@@ -3,6 +3,7 @@ from onegov.election_day import _
 from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
+from sqlalchemy.orm import object_session
 
 
 HEADERS_SG_GESCHAEFTE = (
@@ -54,9 +55,10 @@ def line_is_relevant(line, domain, district, number):
 def import_vote_wabstic(vote, principal, number, district,
                         file_sg_geschaefte, mimetype_sg_geschaefte,
                         file_sg_gemeinden, mimetype_sg_gemeinden):
-    """ Tries to import the files in the given folder.
+    """ Tries to import the given CSV files from a WabstiCExport.
 
-    We assume that the file has been generate using WabstiCExport 2.1.
+    This function is typically called automatically every few minutes during
+    an election day - we use bulk inserts to speed up the import.
 
     :return:
         A list containing errors.
@@ -210,7 +212,7 @@ def import_vote_wabstic(vote, principal, number, district,
             for ballot_type in used_ballot_types:
                 entity = entities.get(entity_id, {})
                 ballot_results[ballot_type].append(
-                    BallotResult(
+                    dict(
                         entity_id=entity_id,
                         name=entity.get('name', ''),
                         district=entity.get('district', ''),
@@ -226,24 +228,17 @@ def import_vote_wabstic(vote, principal, number, district,
     if errors:
         return errors
 
-    vote.clear_results()
-
-    vote.status = 'unknown'
-    if complete == 1:
-        vote.status = 'interim'
-    if complete == 2:
-        vote.status = 'final'
-
+    # Add the missing entities
     for ballot_type in used_ballot_types:
-        # Add the missing entities
         remaining = (
-            entities.keys()
-            - set(result.entity_id for result in ballot_results[ballot_type])
+            entities.keys() - set(
+                result['entity_id'] for result in ballot_results[ballot_type]
+            )
         )
         for entity_id in remaining:
             entity = entities[entity_id]
             ballot_results[ballot_type].append(
-                BallotResult(
+                dict(
                     entity_id=entity_id,
                     name=entity.get('name', ''),
                     district=entity.get('district', ''),
@@ -251,9 +246,25 @@ def import_vote_wabstic(vote, principal, number, district,
                 )
             )
 
-        if ballot_results[ballot_type]:
-            ballot = vote.ballot(ballot_type, create=True)
-            for result in ballot_results[ballot_type]:
-                ballot.results.append(result)
+    # Add the results to the DB
+    vote.clear_results()
+    vote.status = 'unknown'
+    if complete == 1:
+        vote.status = 'interim'
+    if complete == 2:
+        vote.status = 'final'
+
+    ballot_ids = {b: vote.ballot(b, create=True).id for b in used_ballot_types}
+
+    session = object_session(vote)
+    session.flush()
+    session.bulk_insert_mappings(
+        BallotResult,
+        (
+            dict(**result, ballot_id=ballot_ids[ballot_type])
+            for ballot_type in used_ballot_types
+            for result in ballot_results[ballot_type]
+        )
+    )
 
     return []

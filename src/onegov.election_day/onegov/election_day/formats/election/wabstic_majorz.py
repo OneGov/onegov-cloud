@@ -5,7 +5,9 @@ from onegov.election_day import _
 from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
+from sqlalchemy.orm import object_session
 from uuid import uuid4
+
 
 HEADERS_WM_WAHL = (
     'sortgeschaeft',  # provides the link to the election
@@ -64,14 +66,18 @@ def import_election_wabstic_majorz(
     file_wm_kandidaten, mimetype_wm_kandidaten,
     file_wm_kandidatengde, mimetype_wm_kandidatengde
 ):
-    """ Tries to import the files in the given folder.
+    """ Tries to import the given CSV files from a WabstiCExport.
 
-    We assume that the files there have been uploaded using the WabstiCExport
-    2.1.
+    This function is typically called automatically every few minutes during
+    an election day - we use bulk inserts to speed up the import.
+
+    :return:
+        A list containing errors.
 
     """
     errors = []
     entities = principal.entities[election.date.year]
+    election_id = election.id
 
     # Read the files
     wm_wahl, error = load_csv(
@@ -278,8 +284,9 @@ def import_election_wabstic_majorz(
         except ValueError:
             line_errors.append(_("Invalid candidate values"))
         else:
-            added_candidates[candidate_id] = Candidate(
+            added_candidates[candidate_id] = dict(
                 id=uuid4(),
+                election_id=election_id,
                 candidate_id=candidate_id,
                 family_name=family_name,
                 first_name=first_name,
@@ -348,8 +355,8 @@ def import_election_wabstic_majorz(
     if errors:
         return errors
 
+    # Add the results to the DB
     election.clear_results()
-
     election.absolute_majority = absolute_majority
     election.status = 'unknown'
     if complete == 1:
@@ -357,35 +364,46 @@ def import_election_wabstic_majorz(
     if complete == 2:
         election.status = 'final'
 
-    for candidate in added_candidates.values():
-        election.candidates.append(candidate)
+    result_uids = {entity_id: uuid4() for entity_id in added_results}
 
-    for entity_id in added_results.keys():
-        entity = added_entities[entity_id]
-        result = ElectionResult(
-            id=uuid4(),
-            name=entity['name'],
-            district=entity['district'],
-            entity_id=entity_id,
-            counted=entity['counted'],
-            eligible_voters=entity['eligible_voters'],
-            received_ballots=entity['received_ballots'],
-            blank_ballots=entity['blank_ballots'],
-            invalid_ballots=entity['invalid_ballots'],
-            blank_votes=entity['blank_votes'],
-            invalid_votes=entity['invalid_votes']
-        )
-        for candidate_id, votes in added_results[entity_id].items():
-            result.candidate_results.append(
-                CandidateResult(
-                    id=uuid4(),
-                    votes=votes,
-                    candidate_id=added_candidates[candidate_id].id
-                )
+    session = object_session(election)
+    session.bulk_insert_mappings(Candidate, added_candidates.values())
+    session.bulk_insert_mappings(
+        ElectionResult,
+        (
+            dict(
+                id=result_uids[entity_id],
+                election_id=election_id,
+                name=added_entities[entity_id]['name'],
+                district=added_entities[entity_id]['district'],
+                entity_id=entity_id,
+                counted=added_entities[entity_id]['counted'],
+                eligible_voters=added_entities[entity_id]['eligible_voters'],
+                received_ballots=added_entities[entity_id]['received_ballots'],
+                blank_ballots=added_entities[entity_id]['blank_ballots'],
+                invalid_ballots=added_entities[entity_id]['invalid_ballots'],
+                blank_votes=added_entities[entity_id]['blank_votes'],
+                invalid_votes=added_entities[entity_id]['invalid_votes']
             )
-        election.results.append(result)
+            for entity_id in added_results.keys()
+        )
+    )
+    session.bulk_insert_mappings(
+        CandidateResult,
+        (
+            dict(
+                id=uuid4(),
+                election_result_id=result_uids[entity_id],
+                votes=votes,
+                candidate_id=added_candidates[candidate_id]['id']
+            )
+            for entity_id in added_results
+            for candidate_id, votes in added_results[entity_id].items()
+        )
+    )
 
     # Add the missing entities
+    result_inserts = []
     remaining = entities.keys() - added_results.keys()
     for entity_id in remaining:
         entity = entities[entity_id]
@@ -397,14 +415,16 @@ def import_election_wabstic_majorz(
                 continue
             if district not in districts:
                 continue
-        election.results.append(
-            ElectionResult(
+        result_inserts.append(
+            dict(
                 id=uuid4(),
+                election_id=election_id,
                 name=entity.get('name', ''),
                 district=entity.get('district', ''),
                 entity_id=entity_id,
                 counted=False
             )
         )
+    session.bulk_insert_mappings(ElectionResult, result_inserts)
 
     return []

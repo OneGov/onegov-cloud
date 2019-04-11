@@ -6,6 +6,7 @@ from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import STATI
+from sqlalchemy.orm import object_session
 from uuid import uuid4
 
 
@@ -44,7 +45,7 @@ def parse_election(line, errors):
     return majority, status
 
 
-def parse_election_result(line, errors, entities):
+def parse_election_result(line, errors, entities, election_id):
     try:
         entity_id = int(line.entity_id or 0)
         counted = line.entity_counted.strip().lower() == 'true'
@@ -68,8 +69,9 @@ def parse_election_result(line, errors, entities):
             ))
         else:
             entity = entities.get(entity_id, {})
-            return ElectionResult(
+            return dict(
                 id=uuid4(),
+                election_id=election_id,
                 name=entity.get('name', ''),
                 district=entity.get('district', ''),
                 entity_id=entity_id,
@@ -83,7 +85,7 @@ def parse_election_result(line, errors, entities):
             )
 
 
-def parse_candidate(line, errors):
+def parse_candidate(line, errors, election_id):
     try:
         id = int(line.candidate_id or 0)
         family_name = line.candidate_family_name
@@ -94,9 +96,10 @@ def parse_candidate(line, errors):
     except ValueError:
         errors.append(_("Invalid candidate values"))
     else:
-        return Candidate(
+        return dict(
             id=uuid4(),
             candidate_id=id,
+            election_id=election_id,
             family_name=family_name,
             first_name=first_name,
             elected=elected,
@@ -110,7 +113,7 @@ def parse_candidate_result(line, errors):
     except ValueError:
         errors.append(_("Invalid candidate results"))
     else:
-        return CandidateResult(
+        return dict(
             id=uuid4(),
             votes=votes,
         )
@@ -120,6 +123,9 @@ def import_election_internal_majorz(election, principal, file, mimetype):
     """ Tries to import the given file (internal format).
 
     This is the format used by onegov.ballot.Election.export().
+
+    This function is typically called automatically every few minutes during
+    an election day - we use bulk inserts to speed up the import.
 
     :return:
         A list containing errors.
@@ -135,8 +141,10 @@ def import_election_internal_majorz(election, principal, file, mimetype):
 
     errors = []
     candidates = {}
+    candidate_results = []
     results = {}
     entities = principal.entities[election.date.year]
+    election_id = election.id
 
     # This format has one candiate per entity per line
     absolute_majority = None
@@ -146,12 +154,14 @@ def import_election_internal_majorz(election, principal, file, mimetype):
 
         # Parse the line
         absolute_majority, status = parse_election(line, line_errors)
-        result = parse_election_result(line, line_errors, entities)
-        candidate = parse_candidate(line, line_errors)
+        result = parse_election_result(
+            line, line_errors, entities, election_id
+        )
+        candidate = parse_candidate(line, line_errors, election_id)
         candidate_result = parse_candidate_result(line, line_errors)
 
         # Skip expats if not enabled
-        if result and result.entity_id == 0 and not election.expats:
+        if result and result['entity_id'] == 0 and not election.expats:
             continue
 
         # Pass the errors and continue to next line
@@ -165,17 +175,18 @@ def import_election_internal_majorz(election, principal, file, mimetype):
             continue
 
         # Add the data
-        result = results.setdefault(result.entity_id, result)
+        result = results.setdefault(result['entity_id'], result)
 
-        candidate = candidates.setdefault(candidate.candidate_id, candidate)
-        candidate_result.candidate_id = candidate.id
-        result.candidate_results.append(candidate_result)
+        candidate = candidates.setdefault(candidate['candidate_id'], candidate)
+        candidate_result['candidate_id'] = candidate['id']
+        candidate_result['election_result_id'] = result['id']
+        candidate_results.append(candidate_result)
 
     if not errors and not results:
         errors.append(FileImportError(_("No data found")))
 
     # Check if all results are from the same district if regional election
-    districts = set([result.district for result in results.values()])
+    districts = set([result['district'] for result in results.values()])
     if election.domain == 'region' and election.distinct:
         if principal.has_districts:
             if len(districts) != 1:
@@ -199,23 +210,23 @@ def import_election_internal_majorz(election, principal, file, mimetype):
                 continue
             if district not in districts:
                 continue
-        results[entity_id] = ElectionResult(
+        results[entity_id] = dict(
             id=uuid4(),
+            election_id=election_id,
             name=entity.get('name', ''),
             district=district,
             entity_id=entity_id,
             counted=False
         )
 
+    # Add the results to the DB
     election.clear_results()
-
     election.absolute_majority = absolute_majority
     election.status = status
 
-    for candidate in candidates.values():
-        election.candidates.append(candidate)
-
-    for result in results.values():
-        election.results.append(result)
+    session = object_session(election)
+    session.bulk_insert_mappings(Candidate, candidates.values())
+    session.bulk_insert_mappings(ElectionResult, results.values())
+    session.bulk_insert_mappings(CandidateResult, candidate_results)
 
     return []

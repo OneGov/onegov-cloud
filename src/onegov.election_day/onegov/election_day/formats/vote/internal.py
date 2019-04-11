@@ -5,6 +5,8 @@ from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import STATI
+from sqlalchemy.orm import object_session
+
 
 HEADERS = [
     'status',
@@ -23,6 +25,9 @@ def import_vote_internal(vote, principal, file, mimetype):
     """ Tries to import the given csv, xls or xlsx file.
 
     This is the format used by onegov.ballot.Vote.export().
+
+    This function is typically called automatically every few minutes during
+    an election day - we use bulk inserts to speed up the import.
 
     :return:
         A list containing errors.
@@ -138,7 +143,7 @@ def import_vote_internal(vote, principal, file, mimetype):
         if not errors:
             entity = entities.get(entity_id, {})
             ballot_results[ballot_type].append(
-                BallotResult(
+                dict(
                     name=entity.get('name', ''),
                     district=entity.get('district', ''),
                     counted=counted,
@@ -157,18 +162,13 @@ def import_vote_internal(vote, principal, file, mimetype):
     if not any((len(results) for results in ballot_results.values())):
         return [FileImportError(_("No data found"))]
 
-    vote.clear_results()
-
-    vote.status = status
-
+    # Add the missing entities
     for ballot_type in ballot_types:
-        remaining = (
-            entities.keys() - added_entity_ids[ballot_type]
-        )
+        remaining = (entities.keys() - added_entity_ids[ballot_type])
         for entity_id in remaining:
             entity = entities[entity_id]
             ballot_results[ballot_type].append(
-                BallotResult(
+                dict(
                     name=entity.get('name', ''),
                     district=entity.get('district', ''),
                     counted=False,
@@ -176,9 +176,21 @@ def import_vote_internal(vote, principal, file, mimetype):
                 )
             )
 
-        if ballot_results[ballot_type]:
-            ballot = vote.ballot(ballot_type, create=True)
-            for result in ballot_results[ballot_type]:
-                ballot.results.append(result)
+    # Add the results to the DB
+    vote.clear_results()
+    vote.status = status
+
+    ballot_ids = {b: vote.ballot(b, create=True).id for b in ballot_types}
+
+    session = object_session(vote)
+    session.flush()
+    session.bulk_insert_mappings(
+        BallotResult,
+        (
+            dict(**result, ballot_id=ballot_ids[ballot_type])
+            for ballot_type in ballot_types
+            for result in ballot_results[ballot_type]
+        )
+    )
 
     return []

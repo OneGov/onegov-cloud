@@ -10,6 +10,7 @@ from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import STATI
+from sqlalchemy.orm import object_session
 from uuid import uuid4
 
 
@@ -49,7 +50,7 @@ def parse_election(line, errors):
     return status
 
 
-def parse_election_result(line, errors, entities):
+def parse_election_result(line, errors, entities, election_id):
     try:
         entity_id = int(line.entity_id or 0)
         counted = line.entity_counted.strip().lower() == 'true'
@@ -73,8 +74,9 @@ def parse_election_result(line, errors, entities):
             ))
         else:
             entity = entities.get(entity_id, {})
-            return ElectionResult(
+            return dict(
                 id=uuid4(),
+                election_id=election_id,
                 name=entity.get('name', ''),
                 district=entity.get('district', ''),
                 counted=counted,
@@ -88,7 +90,7 @@ def parse_election_result(line, errors, entities):
             )
 
 
-def parse_list(line, errors):
+def parse_list(line, errors, election_id):
     try:
         id = int(line.list_id or 0)
         name = line.list_name
@@ -96,8 +98,9 @@ def parse_list(line, errors):
     except ValueError:
         errors.append(_("Invalid list values"))
     else:
-        return List(
+        return dict(
             id=uuid4(),
+            election_id=election_id,
             list_id=id,
             number_of_mandates=mandates,
             name=name,
@@ -110,7 +113,7 @@ def parse_list_result(line, errors):
     except ValueError:
         errors.append(_("Invalid list results"))
     else:
-        return ListResult(
+        return dict(
             id=uuid4(),
             votes=votes
         )
@@ -142,7 +145,7 @@ def parse_panachage_results(line, errors, panachage):
         errors.append(_("Invalid list results"))
 
 
-def parse_candidate(line, errors):
+def parse_candidate(line, errors, election_id):
     try:
         id = int(line.candidate_id or 0)
         family_name = line.candidate_family_name
@@ -153,8 +156,9 @@ def parse_candidate(line, errors):
     except ValueError:
         errors.append(_("Invalid candidate values"))
     else:
-        return Candidate(
+        return dict(
             id=uuid4(),
+            election_id=election_id,
             candidate_id=id,
             family_name=family_name,
             first_name=first_name,
@@ -169,13 +173,13 @@ def parse_candidate_result(line, errors):
     except ValueError:
         errors.append(_("Invalid candidate results"))
     else:
-        return CandidateResult(
+        return dict(
             id=uuid4(),
             votes=votes,
         )
 
 
-def parse_connection(line, errors):
+def parse_connection(line, errors, election_id):
     subconnection_id = None
     try:
         connection_id = line.list_connection
@@ -186,12 +190,14 @@ def parse_connection(line, errors):
     except ValueError:
         errors.append(_("Invalid list connection values"))
     else:
-        connection = ListConnection(
+        connection = dict(
             id=uuid4(),
+            election_id=election_id,
             connection_id=connection_id,
         ) if connection_id else None
-        subconnection = ListConnection(
+        subconnection = dict(
             id=uuid4(),
+            election_id=election_id,
             connection_id=subconnection_id,
         ) if subconnection_id else None
         return connection, subconnection
@@ -201,6 +207,9 @@ def import_election_internal_proporz(election, principal, file, mimetype):
     """ Tries to import the given file (internal format).
 
     This is the format used by onegov.ballot.Election.export().
+
+    This function is typically called automatically every few minutes during
+    an election day - we use bulk inserts to speed up the import.
 
     :return:
         A list containing errors.
@@ -217,6 +226,7 @@ def import_election_internal_proporz(election, principal, file, mimetype):
     errors = []
 
     candidates = {}
+    candidate_results = []
     lists = {}
     list_results = {}
     connections = {}
@@ -224,6 +234,7 @@ def import_election_internal_proporz(election, principal, file, mimetype):
     results = {}
     panachage = {'headers': parse_panachage_headers(csv)}
     entities = principal.entities[election.date.year]
+    election_id = election.id
 
     # This format has one candiate per entity per line
     status = None
@@ -232,16 +243,20 @@ def import_election_internal_proporz(election, principal, file, mimetype):
 
         # Parse the line
         status = parse_election(line, line_errors)
-        result = parse_election_result(line, line_errors, entities)
-        candidate = parse_candidate(line, line_errors)
+        result = parse_election_result(
+            line, line_errors, entities, election_id
+        )
+        candidate = parse_candidate(line, line_errors, election_id)
         candidate_result = parse_candidate_result(line, line_errors)
-        list_ = parse_list(line, line_errors)
+        list_ = parse_list(line, line_errors, election_id)
         list_result = parse_list_result(line, line_errors)
-        connection, subconnection = parse_connection(line, line_errors)
+        connection, subconnection = parse_connection(
+            line, line_errors, election_id
+        )
         parse_panachage_results(line, line_errors, panachage)
 
         # Skip expats if not enabled
-        if result and result.entity_id == 0 and not election.expats:
+        if result and result['entity_id'] == 0 and not election.expats:
             continue
 
         # Pass the errors and continue to next line
@@ -255,39 +270,41 @@ def import_election_internal_proporz(election, principal, file, mimetype):
             continue
 
         # Add the data
-        result = results.setdefault(result.entity_id, result)
+        result = results.setdefault(result['entity_id'], result)
 
-        list_ = lists.setdefault(list_.list_id, list_)
+        list_ = lists.setdefault(list_['list_id'], list_)
 
         if connection:
             connection = connections.setdefault(
-                connection.connection_id, connection
+                connection['connection_id'], connection
             )
-            list_.connection_id = connection.id
+            list_['connection_id'] = connection['id']
             if subconnection:
                 subconnection = subconnections.setdefault(
-                    subconnection.connection_id, subconnection
+                    subconnection['connection_id'], subconnection
                 )
-                subconnection.parent_id = connection.id
-                list_.connection_id = subconnection.id
+                subconnection['parent_id'] = connection['id']
+                list_['connection_id'] = subconnection['id']
 
-        list_results.setdefault(result.entity_id, {})
-        list_result = list_results[result.entity_id].setdefault(
-            list_.list_id, list_result
+        list_results.setdefault(result['entity_id'], {})
+        list_result = list_results[result['entity_id']].setdefault(
+            list_['list_id'], list_result
         )
-        list_result.list_id = list_.id
+        list_result['list_id'] = list_['id']
 
-        candidate = candidates.setdefault(candidate.candidate_id, candidate)
-        candidate_result.candidate_id = candidate.id
-        result.candidate_results.append(candidate_result)
+        candidate = candidates.setdefault(candidate['candidate_id'], candidate)
 
-        candidate.list_id = list_.id
+        candidate_result['candidate_id'] = candidate['id']
+        candidate_result['election_result_id'] = result['id']
+        candidate_results.append(candidate_result)
+
+        candidate['list_id'] = list_['id']
 
     if not errors and not results:
         errors.append(FileImportError(_("No data found")))
 
     # Check if all results are from the same district if regional election
-    districts = set([result.district for result in results.values()])
+    districts = set([result['district'] for result in results.values()])
     if election.domain == 'region' and election.distinct:
         if principal.has_districts:
             if len(districts) != 1:
@@ -311,42 +328,42 @@ def import_election_internal_proporz(election, principal, file, mimetype):
                 continue
             if district not in districts:
                 continue
-        results[entity_id] = ElectionResult(
+        results[entity_id] = dict(
             id=uuid4(),
+            election_id=election_id,
             name=entity.get('name', ''),
             district=district,
             entity_id=entity_id,
             counted=False
         )
 
+    # Add the results to the DB
     election.clear_results()
-
     election.status = status
+    result_uids = {r['entity_id']: r['id'] for r in results.values()}
+    list_uids = {r['list_id']: r['id'] for r in lists.values()}
 
-    for connection in connections.values():
-        election.list_connections.append(connection)
-    for connection in subconnections.values():
-        election.list_connections.append(connection)
-
-    for list_ in lists.values():
-        election.lists.append(list_)
-        if list_.list_id in panachage:
-            for source, votes in panachage[list_.list_id].items():
-                list_.panachage_results.append(
-                    PanachageResult(
-                        id=uuid4(),
-                        source=source,
-                        votes=votes
-                    )
-                )
-
-    for candidate in candidates.values():
-        election.candidates.append(candidate)
-
-    for result in results.values():
-        id = result.entity_id
-        for list_result in list_results.get(id, {}).values():
-            result.list_results.append(list_result)
-        election.results.append(result)
+    session = object_session(election)
+    session.bulk_insert_mappings(ListConnection, connections.values())
+    session.bulk_insert_mappings(ListConnection, subconnections.values())
+    session.bulk_insert_mappings(List, lists.values())
+    session.bulk_insert_mappings(PanachageResult, (
+        dict(
+            id=uuid4(),
+            source=source,
+            target=str(list_uids[list_id]),
+            votes=votes
+        )
+        for list_id in filter(lambda x: x != 'headers', panachage)
+        for source, votes in panachage[list_id].items()
+    ))
+    session.bulk_insert_mappings(Candidate, candidates.values())
+    session.bulk_insert_mappings(ElectionResult, results.values())
+    session.bulk_insert_mappings(ListResult, (
+        dict(**list_result, election_result_id=result_uids[entity_id])
+        for entity_id, values in list_results.items()
+        for list_result in values.values()
+    ))
+    session.bulk_insert_mappings(CandidateResult, candidate_results)
 
     return []

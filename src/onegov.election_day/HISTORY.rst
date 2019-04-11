@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Optimizes interal and WabstiC imports.
+  [msom]
+
 3.11.0 (2019-04-05)
 ~~~~~~~~~~~~~~~~~~~
 
