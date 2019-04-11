@@ -1,26 +1,19 @@
 from setuptools import setup, find_packages
 
 name = 'onegov.election_day'
-description = (
-    'OneGov ballot results website used on election day.'
-)
 version = '3.11.0'
 
 
 def get_long_description():
     readme = open('README.rst').read()
     history = open('HISTORY.rst').read()
-
-    # cut the part before the description to avoid repetition on pypi
-    readme = readme[readme.index(description) + len(description):]
-
     return '\n'.join((readme, history))
 
 
 setup(
     name=name,
     version=version,
-    description=description,
+    description='OneGov ballot results website used on election day.',
     long_description=get_long_description(),
     url='http://github.com/onegov/onegov.election_day',
     author='Seantis GmbH',
@@ -38,7 +31,7 @@ setup(
         'cached_property',
         'cssmin',
         'onegov.core>=0.64',
-        'onegov.ballot>=3.7.6',
+        'onegov.ballot>=3.8.0',
         'onegov.form>=0.37.0',
         'onegov.foundation>=0.0.4',
         'onegov.pdf>=0.2.0',
