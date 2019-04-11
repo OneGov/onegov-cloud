@@ -31,16 +31,17 @@
     <tal:b metal:use-macro="layout.macros.favicon" />
 
     <tal:b define="sentry_js layout.app.sentry_js" condition="sentry_js">
-      <script src="https://cdn.ravenjs.com/3.26.2/raven.min.js" crossorigin="anonymous"></script>
+      <script src="https://browser.sentry-cdn.com/5.0.7/bundle.min.js" crossorigin="anonymous"></script>
       <script>
-        Raven.config('${sentry_js}', {
+        Sentry.init({
+            dsn: '${sentry_js}',
             release: '${request.app.version}',
             username: '${request.current_username}',
             role: '${request.current_role}',
             ignoreUrls: [/\/(gtm|ga|analytics)\.js/i],
             ignoreErrors: [/data-".+"-alert/],
             shouldSendCallback: function(data) {
-                var crumbs = data.breadcrumbs.values;
+                var crumbs = (data.breadcrumbs && data.breadcrumbs.values || []);
                 var errors = data.exception.values;
 
                 if (crumbs.length > 0 && errors.length > 0) {
@@ -58,7 +59,7 @@
 
                 return true;
             }
-        }).install();
+        });
       </script>
     </tal:b>
 </head>

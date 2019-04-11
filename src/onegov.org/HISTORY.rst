@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Upgrades javascript sentry integration.
+  [href]
+
 1.2.1 (2019-04-08)
 ~~~~~~~~~~~~~~~~~~~
 
