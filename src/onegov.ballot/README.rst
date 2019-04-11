@@ -1,10 +1,30 @@
 Onegov Ballot
 =============
 
-Models ballot results for OneGov.
+Votes and elections for OneGov.
+
+Models
+------
 
 .. image:: https://raw.githubusercontent.com/OneGov/onegov.ballot/master/docs/onegov.ballot.election.png
 .. image:: https://raw.githubusercontent.com/OneGov/onegov.ballot/master/docs/onegov.ballot.vote.png
+
+
+Domain of Influcence
+--------------------
+
+The domain of influence is based on the ``eCH-0155`` standard and used in
+``onegov.ballot`` elections/votes and in ``onegov.election_day`` principals.
+
+============== ====================== ============ ======================
+eCH-0155       DomainOfInfluenceMixin Principal    Identifier
+============== ====================== ============ ======================
+CH: Bund       federation
+CT: Kanton     canton                 Canton       Shortcut (``be``, ...)
+BZ: Bezirk     region
+MU: Gemeinde   municipality           Municipality BFS number
+SK: Stadtkreis                                     District ID
+============== ====================== ============ ======================
 
 Run the Tests
 -------------

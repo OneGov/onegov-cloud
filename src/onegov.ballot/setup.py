@@ -1,26 +1,19 @@
 from setuptools import setup, find_packages
 
 name = 'onegov.ballot'
-description = (
-    'Models ballot results for OneGov.'
-)
 version = '3.7.6'
 
 
 def get_long_description():
     readme = open('README.rst').read()
     history = open('HISTORY.rst').read()
-
-    # cut the part before the description to avoid repetition on pypi
-    readme = readme[readme.index(description) + len(description):]
-
     return '\n'.join((readme, history))
 
 
 setup(
     name=name,
     version=version,
-    description=description,
+    description='Votes and elections for OneGov.',
     long_description=get_long_description(),
     url='http://github.com/onegov/onegov.ballot',
     author='Seantis GmbH',
