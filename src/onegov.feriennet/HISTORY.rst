@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Extracts street name and number of users on export.
+  [href]
+
 - Adds the ability to force the user to accept the terms of service.
   [href]
 

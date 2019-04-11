@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-04-10 14:29+0200\n"
+"POT-Creation-Date: 2019-04-11 13:44+0200\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1056,6 +1056,12 @@ msgstr "Organisation utilisateur"
 
 msgid "User Address"
 msgstr "Adresse utilisateur"
+
+msgid "User Street"
+msgstr "Rue utilisateur"
+
+msgid "User Street Number"
+msgstr "Numéro de rue utilisateur"
 
 msgid "User Zipcode"
 msgstr "Code postal utilisateur"
@@ -2298,14 +2304,6 @@ msgstr "Numéro de participant BVR"
 msgid "ESR identification number"
 msgstr "Numéro d'identification BVR"
 
-msgid "Link to the TOS"
-msgstr "Lien vers les termes et conditions"
-
-msgid "Require users to accept the TOS before booking"
-msgstr ""
-"Demander aux utilisateurs d'accepter les termes et conditions avant de "
-"réserver"
-
 msgid "Require the political municipality in the userprofile"
 msgstr "Commune politique requise dans le profil de l'utilisateur"
 
@@ -2321,6 +2319,14 @@ msgstr "Confidentialité"
 
 msgid "Public organiser data"
 msgstr "Données publiques de l'organisateur"
+
+msgid "Link to the TOS"
+msgstr "Lien vers les termes et conditions"
+
+msgid "Require users to accept the TOS before booking"
+msgstr ""
+"Demander aux utilisateurs d'accepter les termes et conditions avant de "
+"réserver"
 
 msgid "Basic"
 msgstr "Simple"

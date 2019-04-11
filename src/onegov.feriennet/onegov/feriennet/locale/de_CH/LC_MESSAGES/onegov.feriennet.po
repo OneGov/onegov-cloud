@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-04-10 14:29+0200\n"
+"POT-Creation-Date: 2019-04-11 13:44+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1047,6 +1047,12 @@ msgstr "Benutzer Organisation"
 
 msgid "User Address"
 msgstr "Benutzer Adresse"
+
+msgid "User Street"
+msgstr "Benutzer Strasse"
+
+msgid "User Street Number"
+msgstr ""
 
 msgid "User Zipcode"
 msgstr "Benutzer PLZ"
@@ -2281,12 +2287,6 @@ msgstr "ESR Teilnehmernummer"
 msgid "ESR identification number"
 msgstr "ESR Identifikationsnummer"
 
-msgid "Link to the TOS"
-msgstr "Link zu den AGB"
-
-msgid "Require users to accept the TOS before booking"
-msgstr "Zwingt Benutzer dazu, die AGB vor dem Buchen zu akzeptieren"
-
 msgid "Require the political municipality in the userprofile"
 msgstr "Verlange die politische Gemeinde im Benutzerprofil"
 
@@ -2302,6 +2302,12 @@ msgstr "Privatsphäre"
 
 msgid "Public organiser data"
 msgstr "Öffentliche Veranstalterdaten"
+
+msgid "Link to the TOS"
+msgstr "Link zu den AGB"
+
+msgid "Require users to accept the TOS before booking"
+msgstr "Zwingt Benutzer dazu, die AGB vor dem Buchen zu akzeptieren"
 
 msgid "Basic"
 msgstr "Einfach"
@@ -2414,6 +2420,9 @@ msgstr "Möchten Sie ${attendee}s Buchung wirklich löschen?"
 #, python-format
 msgid "Do you really want to cancel ${attendee}'s booking?"
 msgstr "Möchten Sie ${attendee}s Buchung wirklich stornieren?"
+
+#~ msgid "User Streetnumber"
+#~ msgstr "Benutzer Strassennummer"
 
 #~ msgid ""
 #~ "Feriennet is Pro Juventute's booking platform for supervised vacation "

@@ -1,5 +1,6 @@
 import re
 
+from itertools import chain
 from html import unescape
 from onegov.core import mail
 from onegov.feriennet import _
@@ -13,6 +14,57 @@ from onegov.org.models import Export
 
 
 SPACES = re.compile(r'[ ]+')
+
+STREET = re.compile(r"""
+    # street name
+    (?P<street>[\D\-\.\s]+)
+
+    # punctuation between
+    [\s,]*
+
+    # street number
+    (?P<number>[0-9]{1}[0-9]*\s?[\w]?)?
+    """, re.UNICODE | re.VERBOSE)
+
+
+class Street(object):
+
+    __slots__ = ('name', 'number')
+
+    def __init__(self, name, number):
+        self.name = name and name.strip(' \n,').title()
+        self.number = number and number.strip(' \n,').lower().replace(' ', '')
+
+
+def score_street_match(match):
+    score = 0
+
+    if match:
+        if match.group('street'):
+            score += 1
+
+        if match.group('street') and 'strasse' in match.group('street'):
+            score += 1
+
+        if match.group('number'):
+            score += 1
+
+    return score
+
+
+def extract_street(address):
+    if not address or not address.strip():
+        return Street(None, None)
+
+    lines = chain(address.splitlines(), (address.replace('\n', ' '), ))
+
+    matches = [STREET.match(l) for l in lines]
+    match = max(matches, key=score_street_match)
+
+    if match:
+        return Street(match.group('street'), match.group('number'))
+
+    return Street(name=address.replace('\n', ''), number=None)
 
 
 def remove_duplicate_spaces(text):
@@ -93,6 +145,7 @@ class FeriennetExport(Export):
         salutation = user_data.get('salutation')
         first_name, last_name = decode_name(user.realname)
         daily_email = bool(user_data.get('daily_ticket_statistics'))
+        street = extract_street(user_data.get('address', None))
 
         yield _("User Login"), user.username
         yield _("User Role"), ROLES[user.role]
@@ -103,6 +156,8 @@ class FeriennetExport(Export):
         yield _("User Last Name"), last_name or ''
         yield _("User Organisation"), user_data.get('organisation', '')
         yield _("User Address"), user_data.get('address', '')
+        yield _("User Street"), street.name or ''
+        yield _("User Street Number"), street.number or ''
         yield _("User Zipcode"), user_data.get('zip_code', '')
         yield _("User Location"), user_data.get('place', '')
         yield _("User Political Municipality"), \
