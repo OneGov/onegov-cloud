@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.8.0 (2019-04-11)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds ON DELETE CASCADE constraints to various models.
   [msom]
