@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.6.1 (2019-04-12)
+~~~~~~~~~~~~~~~~~~~
 
 - Removes accidentally left-in test-code.
   [href]
