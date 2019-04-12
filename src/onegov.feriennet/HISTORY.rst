@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.6.0 (2019-04-12)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a donation page.
   [href]
