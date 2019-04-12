@@ -1,6 +1,7 @@
 from cgi import FieldStorage
 from io import BytesIO
 from onegov.agency import _
+from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.models import ExtendedAgency
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
@@ -136,9 +137,16 @@ class MoveAgencyForm(Form):
         )
 
     def update_model(self, model):
-        model.parent_id = (
-            int(self.parent_id.data) if self.parent_id.data.isdigit() else None
-        )
+        session = self.request.session
+        agencies = ExtendedAgencyCollection(session)
+
+        parent_id = None
+        parent = None
+        if self.parent_id.data.isdigit():
+            parent_id = int(self.parent_id.data)
+            parent = agencies.by_id(parent_id)
+        model.name = agencies.get_unique_child_name(model.title, parent)
+        model.parent_id = parent_id
 
     def apply_model(self, model):
         def remove(item):

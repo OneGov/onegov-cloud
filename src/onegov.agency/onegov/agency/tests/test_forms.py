@@ -160,16 +160,26 @@ def test_move_agency_form(session):
     # update
     model = ExtendedAgency(title="Agency")
     form = MoveAgencyForm()
+    form.request = DummyRequest(session)
     form.update_model(model)
     assert model.parent_id == None
 
     form = MoveAgencyForm(DummyPostData({'parent_id': 'root'}))
+    form.request = DummyRequest(session)
     form.update_model(model)
     assert model.parent_id == None
 
     form = MoveAgencyForm(DummyPostData({'parent_id': '10'}))
+    form.request = DummyRequest(session)
     form.update_model(model)
     assert model.parent_id == 10
+
+    # update with rename
+    agency_a_2_2 = agencies.add(title="a.2", parent=agency_a_2)
+    form = MoveAgencyForm(DummyPostData({'parent_id': agency_a_2.parent_id}))
+    form.request = DummyRequest(session)
+    form.update_model(agency_a_2_2)
+    session.flush()
 
 
 def test_membership_form(session):

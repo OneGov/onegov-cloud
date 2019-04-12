@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes moving an agency throwing an UniqueViolation exception.
+  [msom]
+
 1.10.2 (2019-04-06)
 ~~~~~~~~~~~~~~~~~~~~
 
