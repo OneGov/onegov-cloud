@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.18.0 (2019-04-12)
+~~~~~~~~~~~~~~~~~~~
 
 - Improves control over invoice session flushing.
   [href]
