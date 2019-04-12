@@ -7,10 +7,10 @@ dist: trusty
 
 addons:
   postgresql: "9.6"
+  chrome: stable
   apt:
     packages:
       - oracle-java8-set-default
-      - google-chrome-stable
       - ghostscript
       - libpoppler-cpp-dev
 
