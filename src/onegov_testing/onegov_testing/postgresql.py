@@ -38,6 +38,8 @@ class Snapshot(object):
 class Postgresql(Base):
     """ Adds snapshot support to the testing postgresql. """
 
+    DEFAULT_KILL_TIMEOUT = 30.0
+
     def __init__(self, *args, **kwargs):
         self.preferred_versions = kwargs.pop('preferred_versions', [])
         super().__init__(*args, **kwargs)
