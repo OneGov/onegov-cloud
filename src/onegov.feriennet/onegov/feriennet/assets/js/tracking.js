@@ -41,7 +41,7 @@ var trackClicks = function() {
         definition.targets.toArray().forEach(function(target) {
             var url = new Url($(target).attr('href'));
 
-            Object.keys-test(definition.params).forEach(function(key) {
+            Object.keys(definition.params).forEach(function(key) {
                 url.query[key] = definition.params[key];
             });
 
