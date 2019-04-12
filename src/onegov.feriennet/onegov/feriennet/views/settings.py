@@ -79,7 +79,6 @@ class FeriennetSettingsForm(Form):
         fieldset=_("TOS")
     )
 
-
     def ensure_beneificary_if_bank_account(self):
         if self.bank_account.data and not self.bank_beneficiary.data:
             self.bank_beneficiary.errors.append(_(
