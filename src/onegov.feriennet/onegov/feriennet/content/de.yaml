@@ -45,6 +45,15 @@ pages:
       lead: >
         In diesem Bereich der Website werden bestehende Sponsoren genannt und
         mögliche neue Sponsoren informiert.
+  - title: Spende
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        In diesem Bereich der Website besteht die Möglichkeit einen
+        Spendenaufruf zu tätigen oder Mitglieder für den Verein anzuwerben.
   - title: Aktuelles
     type: news
     name: news

@@ -231,3 +231,4 @@ def get_common_asset():
     yield 'printthis.js'
     yield 'print.js'
     yield 'click-to-load.js'
+    yield 'tracking.js'

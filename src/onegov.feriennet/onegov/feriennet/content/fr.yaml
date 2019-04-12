@@ -46,6 +46,15 @@ pages:
       <<: *lorem-ipsum
       lead: >
         Cette partie du site internet nomme les sponsors et informe les sponsors à venir.
+  - title: Dons
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Dans cette section du site, vous avez la possibilité d'appeler des dons
+        ou de recruter des membres pour l'association.
   - title: Nouvelles
     type: news
     name: news

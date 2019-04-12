@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Adds a donation page.
+  [href]
+
+- Adds custom tracking.
+  [href]
+
 - Extracts street name and number of users on export.
   [href]
 

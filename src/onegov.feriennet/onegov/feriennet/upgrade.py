@@ -5,9 +5,12 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 import textwrap
 
 from onegov.core.upgrade import upgrade_task
+from onegov.core.utils import module_path
 from onegov.feriennet.models import NotificationTemplate
 from onegov.feriennet.utils import NAME_SEPARATOR
+from onegov.org.initial_content import load_content
 from onegov.org.models import Organisation
+from onegov.page import PageCollection
 from onegov.user import UserCollection, User
 
 
@@ -135,3 +138,42 @@ def migrate_bank_settings(context):
 
     if 'bank_payment_order_type' in org.meta:
         del org.meta['bank_payment_order_type']
+
+
+@upgrade_task('Add donation page')
+def add_donation_page(context):
+
+    org = context.session.query(Organisation).first()
+
+    if org is None:
+        return
+
+    # not a feriennet
+    if '<registration />' not in org.meta['homepage_structure']:
+        return
+
+    if org.locales == 'fr_CH':
+        path = module_path('onegov.feriennet', 'content/fr.yaml')
+    else:
+        path = module_path('onegov.feriennet', 'content/de.yaml')
+
+    page = next(
+        p for p in load_content(path)['pages']
+        if p['title'] in ('Spende', 'Dons')
+    )
+
+    pages = PageCollection(context.session)
+    order = max(p.order for p in pages.roots) + 1
+
+    meta = page.get('meta', {})
+    meta['is_hidden_from_public'] = True
+
+    pages.add(
+        parent=None,
+        title=page['title'],
+        type=page['type'],
+        name=page.get('name', None),
+        meta=meta,
+        content=page.get('content', None),
+        order=order
+    )
