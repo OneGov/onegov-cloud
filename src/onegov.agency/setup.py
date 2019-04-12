@@ -10,7 +10,6 @@ version = '1.10.2'
 def get_long_description():
     readme = open('README.rst').read()
     history = open('HISTORY.rst').read()
-    readme = readme[readme.index(description) + len(description):]
     return '\n'.join((readme, history))
 
 
