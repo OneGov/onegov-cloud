@@ -61,7 +61,10 @@ class ActivityFilter(object):
                 values = set(keywords[key]) if keywords[key] else set()
 
                 if values and hasattr(self, f'adapt_{key}'):
-                    values = getattr(self, f'adapt_{key}')(values)
+                    try:
+                        values = getattr(self, f'adapt_{key}')(values)
+                    except ValueError:
+                        values = set()
 
                 setattr(self, key, values)
             else:

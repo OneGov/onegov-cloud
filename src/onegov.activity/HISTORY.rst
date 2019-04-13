@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Improves robustness of activity filters when facing invalid parameters.
+  [href]
+
 1.18.0 (2019-04-12)
 ~~~~~~~~~~~~~~~~~~~
 
