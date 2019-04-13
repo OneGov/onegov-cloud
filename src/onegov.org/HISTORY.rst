@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+
+- Fixes asynchronously loaded hashtags not getting highlighted.
+  [href]
+
 - Upgrades javascript sentry integration.
   [href]
 

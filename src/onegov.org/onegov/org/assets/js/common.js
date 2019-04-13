@@ -109,6 +109,10 @@ var highlightTags = function(target) {
 
 highlightTags('#content');
 
+$(document).on('process-common-nodes', function(_e, elements) {
+    highlightTags(elements);
+});
+
 // Disable scroll on elements which wish it disabled
 $('.disable-scroll').on('mouseover', function() {
     var el = $(this);
