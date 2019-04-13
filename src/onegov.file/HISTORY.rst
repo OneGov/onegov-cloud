@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.13.4 (2019-04-13)
+~~~~~~~~~~~~~~~~~~~
+
 - Treats PNG zip-bombs as empty files and set a custom content type.
   [href]
 
