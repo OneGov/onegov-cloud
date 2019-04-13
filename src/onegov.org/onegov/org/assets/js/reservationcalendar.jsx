@@ -351,7 +351,7 @@ rc.showPopup = function(calendar, element, content, position, extraClasses) {
         onopen: function() {
             rc.onPopupOpen.call(this, calendar);
             setTimeout(function() {
-                window.dispatchEvent(new Event('resize'));
+                $(window).trigger('resize');
             }, 0);
         },
         onclose: function() {

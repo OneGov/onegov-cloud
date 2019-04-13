@@ -1,6 +1,8 @@
 Changelog
 ---------
 
+- Fixes an IE11 issue in the reservations calendar.
+  [href]
 
 - Fixes asynchronously loaded hashtags not getting highlighted.
   [href]
