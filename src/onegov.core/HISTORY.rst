@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes is_uuid falsely identifying certain strings as UUID.
+  [href]
+
 0.78.0 (2019-02-01)
 ~~~~~~~~~~~~~~~~~~~
 

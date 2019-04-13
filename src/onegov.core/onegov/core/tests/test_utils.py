@@ -109,6 +109,7 @@ def test_is_uuid():
     assert not utils.is_uuid(None)
     assert not utils.is_uuid('')
     assert not utils.is_uuid('asdf')
+    assert not utils.is_uuid(uuid4().hex + 'x')
     assert utils.is_uuid(uuid4())
     assert utils.is_uuid(str(uuid4()))
     assert utils.is_uuid(uuid4().hex)

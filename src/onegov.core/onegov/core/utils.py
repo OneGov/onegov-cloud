@@ -40,7 +40,7 @@ _double_dash = re.compile(r'[-]+')
 _number_suffix = re.compile(r'-([0-9]+)$')
 _repeated_spaces = re.compile(r'\s\s+')
 _uuid = re.compile(
-    r'[a-f0-9]{8}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{12}')
+    r'^[a-f0-9]{8}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{12}$')
 
 # only temporary until bleach has a release > 1.4.1 -
 _email_regex = re.compile((
@@ -360,7 +360,7 @@ def is_uuid(value):
     or of type UUID. If it's a string, the uuid is checked with a regex.
     """
     if isinstance(value, str):
-        return _uuid.match(str(value))
+        return _uuid.match(str(value)) and True or False
 
     return isinstance(value, UUID)
 
