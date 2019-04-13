@@ -628,8 +628,10 @@ def archive_activity(self, request):
     name='offer-again',
     request_method='POST')
 def offer_activity_again(self, request):
-    assert self.state == 'archived'
-    self.state = 'preview'
+    assert self.state in ('archived', 'preview')
+
+    if self.state == 'archived':
+        self.state = 'preview'
 
     @request.after
     def redirect_intercooler(response):

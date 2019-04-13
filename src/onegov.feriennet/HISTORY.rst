@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Makes 'offer activity' idempotent.
+  [href]
+
 1.6.1 (2019-04-12)
 ~~~~~~~~~~~~~~~~~~~
 
