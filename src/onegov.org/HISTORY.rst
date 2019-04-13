@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.2.2 (2019-04-13)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes an IE11 issue in the reservations calendar.
   [href]
 
