@@ -94,8 +94,15 @@ class ProcessedUploadedFile(UploadedFile):
         filename, content_type = FileStorage.fileinfo(content)[1:]
         content = utils.file_from_content(content)
 
-        for processor in self.processors:
-            content = processor(self, content, content_type) or content
-            content.seek(0)
+        try:
+            for processor in self.processors:
+                content = processor(self, content, content_type) or content
+                content.seek(0)
+        except Image.DecompressionBombError:
+            # not a real content type - but useful for us to be able to rely
+            # on anything uploaded having a content type, even though that
+            # content is discarded soon afterwards
+            content = b''
+            content_type = 'application/malicious'
 
         super().process_content(content, filename, content_type)

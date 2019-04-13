@@ -145,6 +145,18 @@ def test_thumbnail_creation(session):
     assert 'thumbnail_small' in small.reference
 
 
+def test_save_png_zipbomb(session):
+    path = module_path('onegov.file', 'tests/fixtures/bomb.png')
+
+    with open(path, 'rb') as f:
+        session.add(File(name='zipbomb.png', reference=f))
+
+    transaction.commit()
+    file = session.query(File).one()
+    assert file.reference.file.read() == b''
+    assert file.reference.content_type == 'application/malicious'
+
+
 def test_pdf_preview_creation(session):
     path = module_path('onegov.file', 'tests/fixtures/example.pdf')
 
