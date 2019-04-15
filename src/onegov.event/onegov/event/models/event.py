@@ -17,6 +17,7 @@ from onegov.file import File
 from onegov.file.utils import as_fileintent
 from onegov.gis import CoordinatesMixin
 from onegov.search import SearchableContent
+from PIL.Image import DecompressionBombError
 from pytz import UTC
 from sedate import standardize_date
 from sedate import to_timezone
@@ -88,10 +89,13 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
             if self.image:
                 self.image.reference = as_fileintent(content, filename)
             else:
-                self.image = EventFile(
-                    name=filename,
-                    reference=as_fileintent(content, filename)
-                )
+                try:
+                    self.image = EventFile(
+                        name=filename,
+                        reference=as_fileintent(content, filename)
+                    )
+                except DecompressionBombError:
+                    self.image = None
         else:
             self.image = None
 

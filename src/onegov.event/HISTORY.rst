@@ -4,6 +4,9 @@ Changelog
 - Support latest onegov.search release.
   [href]
 
+- Ignores decompression bombs and super large images.
+  [msom]
+
 1.1.1 (2019-01-07)
 ~~~~~~~~~~~~~~~~~~~
 
