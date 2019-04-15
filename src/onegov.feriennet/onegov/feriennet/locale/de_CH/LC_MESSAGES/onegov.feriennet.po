@@ -1052,7 +1052,7 @@ msgid "User Street"
 msgstr "Benutzer Strasse"
 
 msgid "User Street Number"
-msgstr ""
+msgstr "Benutzer Strassennummer"
 
 msgid "User Zipcode"
 msgstr "Benutzer PLZ"
