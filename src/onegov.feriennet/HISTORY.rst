@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Hides inactive users in dropdown.
+  [href]
+
 1.6.2 (2019-04-13)
 ~~~~~~~~~~~~~~~~~~~
 
