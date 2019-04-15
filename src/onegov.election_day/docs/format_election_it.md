@@ -4,37 +4,36 @@ Sono accettati come formati di file CSV, XLS o XLSX generati dai "Wabsti elezion
 
 ## Contenuto
 
-<!-- TOC START min:1 max:4 link:true update:true -->
+<!-- TOC START min:1 max:4 link:true asterisk:false update:true -->
 - [Specifica Formato Elezioni](#specifica-formato-elezioni)
-  - [Contenuto](#contenuto)
-  - [Prefazione](#prefazione)
-    - [Enti](#enti)
-    - [Elezioni tacite](#elezioni-tacite)
-    - [Elezioni regionali](#elezioni-regionali)
-  - [Formati](#formati)
-    - [Onegov](#onegov)
-      - [Colonne](#colonne)
-      - [Risultati panachage](#risultati-panachage)
-      - [Risultati temporanei](#risultati-temporanei)
-      - [Modello](#modello)
-    - [Wabsti Sistema Maggioritario](#wabsti-sistema-maggioritario)
-      - [Esportazione delle colonne dati](#esportazione-delle-colonne-dati)
-      - [Colonne risultati candidati](#colonne-risultati-candidati)
-      - [Risultati temporanei](#risultati-temporanei-1)
-      - [Modelli](#modelli)
-    - [Wabsti Sistema Proporzionale](#wabsti-sistema-proporzionale)
-      - [Colonne esportazione dei dati dei risultati](#colonne-esportazione-dei-dati-dei-risultati)
-      - [Risultati panachage](#risultati-panachage-1)
-      - [Colonne esportazione di dati di statistica](#colonne-esportazione-di-dati-di-statistica)
-      - [Colonne apparentamenti delle liste](#colonne-apparentamenti-delle-liste)
-      - [Colonne risultati candidati](#colonne-risultati-candidati-1)
-      - [Risultati temporanei](#risultati-temporanei-2)
-      - [Modelli](#modelli-1)
-    - [WabstiCExport Sistema Maggioritario](#wabsticexport-sistema-maggioritario)
-    - [WabstiCExport Sistema Proporzionale](#wabsticexport-sistema-proporzionale)
-    - [Risultati dei partiti](#risultati-dei-partiti)
-      - [Modelli](#modelli-2)
-
+    - [Contenuto](#contenuto)
+    - [Prefazione](#prefazione)
+        - [Enti](#enti)
+        - [Elezioni tacite](#elezioni-tacite)
+        - [Elezioni regionali](#elezioni-regionali)
+    - [Formati](#formati)
+        - [Onegov](#onegov)
+            - [Colonne](#colonne)
+            - [Risultati panachage](#risultati-panachage)
+            - [Risultati temporanei](#risultati-temporanei)
+            - [Modello](#modello)
+        - [Wabsti Sistema Maggioritario](#wabsti-sistema-maggioritario)
+            - [Esportazione delle colonne dati](#esportazione-delle-colonne-dati)
+            - [Colonne risultati candidati](#colonne-risultati-candidati)
+            - [Risultati temporanei](#risultati-temporanei-1)
+            - [Modelli](#modelli)
+        - [Wabsti Sistema Proporzionale](#wabsti-sistema-proporzionale)
+            - [Colonne esportazione dei dati dei risultati](#colonne-esportazione-dei-dati-dei-risultati)
+            - [Risultati panachage](#risultati-panachage-1)
+            - [Colonne esportazione di dati di statistica](#colonne-esportazione-di-dati-di-statistica)
+            - [Colonne apparentamenti delle liste](#colonne-apparentamenti-delle-liste)
+            - [Colonne risultati candidati](#colonne-risultati-candidati-1)
+            - [Risultati temporanei](#risultati-temporanei-2)
+            - [Modelli](#modelli-1)
+        - [WabstiCExport Sistema Maggioritario](#wabsticexport-sistema-maggioritario)
+        - [WabstiCExport Sistema Proporzionale](#wabsticexport-sistema-proporzionale)
+        - [Risultati dei partiti](#risultati-dei-partiti)
+            - [Modelli](#modelli-2)
 <!-- TOC END -->
 
 ## Prefazione
@@ -49,7 +48,7 @@ Si possono caricare delle elezioni tacite usando il formato OneGov con ogni voto
 
 ### Elezioni regionali
 
-Quando si caricano i risultati di un'elezione regionale, solo gli enti di un distretto devono essere presenti.
+Quando si caricano i risultati di un'elezione regionale, solo gli enti di un distretto devono essere presenti, se l'opzione corrispondente è impostata sull'elezione.
 
 ## Formati
 

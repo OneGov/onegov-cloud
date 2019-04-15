@@ -4,37 +4,36 @@ Sco formats da datoteca vegnan acceptadas datotecas CSV, XLS u XLSX che vegnan g
 
 ## Cuntegn
 
-<!-- TOC START min:1 max:4 link:true update:true -->
+<!-- TOC START min:1 max:4 link:true asterisk:false update:true -->
 - [Format Specificaziun Elecziuns](#format-specificaziun-elecziuns)
-  - [Cuntegn](#cuntegn)
-  - [Remartgas preliminaras](#remartgas-preliminaras)
-    - [Unitads](#unitads)
-    - [Elecziun taciturnas](#elecziun-taciturnas)
-    - [Elecziuns regiunalas](#elecziuns-regiunalas)
-  - [Formats](#formats)
-    - [Onegov](#onegov)
-      - [Colonnas](#colonnas)
-      - [Panachage results](#panachage-results)
-      - [Resultats temporars](#resultats-temporars)
-      - [Project](#project)
-    - [Wabsti Maiorz](#wabsti-maiorz)
-      - [Colonnas "Export da datas"](#colonnas-export-da-datas)
-      - [Colonnas "Resultats da las candidatas e dals candidats"](#colonnas-resultats-da-las-candidatas-e-dals-candidats)
-      - [Resultats temporars](#resultats-temporars-1)
-      - [Projects](#projects)
-    - [Wabsti Proporz](#wabsti-proporz)
-      - [Colonnas "Export da datas dals resultats"](#colonnas-export-da-datas-dals-resultats)
-      - [Resultats pon cuntegnair datas panaschadas](#resultats-pon-cuntegnair-datas-panaschadas)
-      - [Colonnas "Export da datas da la statistica"](#colonnas-export-da-datas-da-la-statistica)
-      - [Colonnas "Colliaziuns da glistas"](#colonnas-colliaziuns-da-glistas)
-      - [Colonnas "Resultats da las candidatas e dals candidats"](#colonnas-resultats-da-las-candidatas-e-dals-candidats-1)
-      - [Resultats temporars](#resultats-temporars-2)
-      - [Projects](#projects-1)
-    - [WabstiCExport Maiorz](#wabsticexport-maiorz)
-    - [WabstiCExport Proporz](#wabsticexport-proporz)
-    - [Resultats da la(s) partida(s)](#resultats-da-las-partidas)
-      - [Projects](#projects-2)
-
+    - [Cuntegn](#cuntegn)
+    - [Remartgas preliminaras](#remartgas-preliminaras)
+        - [Unitads](#unitads)
+        - [Elecziun taciturnas](#elecziun-taciturnas)
+        - [Elecziuns regiunalas](#elecziuns-regiunalas)
+    - [Formats](#formats)
+        - [Onegov](#onegov)
+            - [Colonnas](#colonnas)
+            - [Panachage results](#panachage-results)
+            - [Resultats temporars](#resultats-temporars)
+            - [Project](#project)
+        - [Wabsti Maiorz](#wabsti-maiorz)
+            - [Colonnas "Export da datas"](#colonnas-export-da-datas)
+            - [Colonnas "Resultats da las candidatas e dals candidats"](#colonnas-resultats-da-las-candidatas-e-dals-candidats)
+            - [Resultats temporars](#resultats-temporars-1)
+            - [Projects](#projects)
+        - [Wabsti Proporz](#wabsti-proporz)
+            - [Colonnas "Export da datas dals resultats"](#colonnas-export-da-datas-dals-resultats)
+            - [Resultats pon cuntegnair datas panaschadas](#resultats-pon-cuntegnair-datas-panaschadas)
+            - [Colonnas "Export da datas da la statistica"](#colonnas-export-da-datas-da-la-statistica)
+            - [Colonnas "Colliaziuns da glistas"](#colonnas-colliaziuns-da-glistas)
+            - [Colonnas "Resultats da las candidatas e dals candidats"](#colonnas-resultats-da-las-candidatas-e-dals-candidats-1)
+            - [Resultats temporars](#resultats-temporars-2)
+            - [Projects](#projects-1)
+        - [WabstiCExport Maiorz](#wabsticexport-maiorz)
+        - [WabstiCExport Proporz](#wabsticexport-proporz)
+        - [Resultats da la(s) partida(s)](#resultats-da-las-partidas)
+            - [Projects](#projects-2)
 <!-- TOC END -->
 
 ## Remartgas preliminaras
@@ -49,7 +48,7 @@ Per elecziuns taciturnas po vegnir duvrà il format OneGov. En quest cas vegnan 
 
 ### Elecziuns regiunalas
 
-En cas d'elecziuns regiunalas vegnan spetgads mo ils resultats da l'elecziun da las unitads d'in circul electoral.
+En cas d'elecziuns regiunalas vegnan spetgads mo ils resultats da l'elecziun da las unitads d'in circul electoral, if the corresponding option is set on the election.
 
 ## Formats
 

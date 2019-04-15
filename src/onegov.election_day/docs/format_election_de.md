@@ -4,37 +4,36 @@ Als Dateiformate werden CSV, XLS oder XLSX Dateien akzeptiert, welche von "Wabst
 
 ## Inhalt
 
-<!-- TOC START min:1 max:4 link:true update:true -->
+<!-- TOC START min:1 max:4 link:true asterisk:false update:true -->
 - [Format Spezifikation Wahlen](#format-spezifikation-wahlen)
-  - [Inhalt](#inhalt)
-  - [Vorbemerkungen](#vorbemerkungen)
-    - [Einheiten](#einheiten)
-    - [Stille Wahlen](#stille-wahlen)
-    - [Regionale Wahlen](#regionale-wahlen)
-  - [Formate](#formate)
-    - [OneGov](#onegov)
-      - [Spalten](#spalten)
-      - [Panaschierdaten](#panaschierdaten)
-      - [Temporäre Resultate](#temporre-resultate)
-      - [Vorlage](#vorlage)
-    - [Wabsti Majorz](#wabsti-majorz)
-      - [Spalten Datenexport](#spalten-datenexport)
-      - [Spalten Kandidatenresultate](#spalten-kandidatenresultate)
-      - [Temporäre Resultate](#temporre-resultate-1)
-      - [Vorlagen](#vorlagen)
-    - [Wabsti Proporz](#wabsti-proporz)
-      - [Spalten Datenexport der Resultate](#spalten-datenexport-der-resultate)
-      - [Panaschierdaten](#panaschierdaten-1)
-      - [Spalten Datenexport der Statistik](#spalten-datenexport-der-statistik)
-      - [Spalten Listenverbindungen](#spalten-listenverbindungen)
-      - [Spalten Kandidatenresultate](#spalten-kandidatenresultate-1)
-      - [Temporäre Resultate](#temporre-resultate-2)
-      - [Vorlagen](#vorlagen-1)
-    - [WabstiCExport Majorz](#wabsticexport-majorz)
-    - [WabstiCExport Proporz](#wabsticexport-proporz)
-    - [Parteiresultate](#parteiresultate)
-      - [Vorlagen](#vorlagen-2)
-
+    - [Inhalt](#inhalt)
+    - [Vorbemerkungen](#vorbemerkungen)
+        - [Einheiten](#einheiten)
+        - [Stille Wahlen](#stille-wahlen)
+        - [Regionale Wahlen](#regionale-wahlen)
+    - [Formate](#formate)
+        - [OneGov](#onegov)
+            - [Spalten](#spalten)
+            - [Panaschierdaten](#panaschierdaten)
+            - [Temporäre Resultate](#temporäre-resultate)
+            - [Vorlage](#vorlage)
+        - [Wabsti Majorz](#wabsti-majorz)
+            - [Spalten Datenexport](#spalten-datenexport)
+            - [Spalten Kandidatenresultate](#spalten-kandidatenresultate)
+            - [Temporäre Resultate](#temporäre-resultate-1)
+            - [Vorlagen](#vorlagen)
+        - [Wabsti Proporz](#wabsti-proporz)
+            - [Spalten Datenexport der Resultate](#spalten-datenexport-der-resultate)
+            - [Panaschierdaten](#panaschierdaten-1)
+            - [Spalten Datenexport der Statistik](#spalten-datenexport-der-statistik)
+            - [Spalten Listenverbindungen](#spalten-listenverbindungen)
+            - [Spalten Kandidatenresultate](#spalten-kandidatenresultate-1)
+            - [Temporäre Resultate](#temporäre-resultate-2)
+            - [Vorlagen](#vorlagen-1)
+        - [WabstiCExport Majorz](#wabsticexport-majorz)
+        - [WabstiCExport Proporz](#wabsticexport-proporz)
+        - [Parteiresultate](#parteiresultate)
+            - [Vorlagen](#vorlagen-2)
 <!-- TOC END -->
 
 ## Vorbemerkungen
@@ -49,7 +48,7 @@ Für stille Wahlen kann das OneGov Format verwendet werden. Alle Stimmen werden 
 
 ### Regionale Wahlen
 
-Bei regionalen Wahlen werden nur Wahlresultate der Einheiten eines Wahlkreises erwartet.
+Bei regionalen Wahlen werden nur Wahlresultate der Einheiten eines Wahlkreises erwartet, falls die entsprechende Option gesetzt ist auf der Wahl.
 
 ## Formate
 

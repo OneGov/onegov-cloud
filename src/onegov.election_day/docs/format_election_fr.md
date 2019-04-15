@@ -4,37 +4,36 @@ En ce qui concerne les formats de fichiers, les fichiers XLS et XLSX sont accept
 
 ## Contenu
 
-<!-- TOC START min:1 max:4 link:true update:true -->
-- [Spécifications de format des élections](#spcifications-de-format-des-lections)
-  - [Contenu](#contenu)
-  - [Avant-propos](#avant-propos)
-    - [Entités](#entits)
-    - [Élections tacites](#lections-tacites)
-    - [Élections régionales](#lections-rgionales)
-  - [Formats](#formats)
-    - [Onegov](#onegov)
-      - [Colonnes](#colonnes)
-      - [Résultats du panachage](#rsultats-du-panachage)
-      - [Résultats temporaires](#rsultats-temporaires)
-      - [Modèle](#modle)
-    - [Wabsti Majorz](#wabsti-majorz)
-      - [Exportation des données de colonnes](#exportation-des-donnes-de-colonnes)
-      - [Résultats des candidats de colonnes](#rsultats-des-candidats-de-colonnes)
-      - [Résultats temporaires](#rsultats-temporaires-1)
-      - [Modèles](#modles)
-    - [Wabsti Proporz](#wabsti-proporz)
-      - [Exportation des données de résultats pour les colonnes](#exportation-des-donnes-de-rsultats-pour-les-colonnes)
-      - [Résultats du panachage](#rsultats-du-panachage-1)
-      - [Exportation des données de statistiques pour les colonnes](#exportation-des-donnes-de-statistiques-pour-les-colonnes)
-      - [Connexions de liste des colonnes](#connexions-de-liste-des-colonnes)
-      - [Résultats de candidats des colonnes](#rsultats-de-candidats-des-colonnes)
-      - [Résultats temporaires](#rsultats-temporaires-2)
-      - [Modèles](#modles-1)
-    - [WabstiCExport Majorz](#wabsticexport-majorz)
-    - [WabstiCExport Proporz](#wabsticexport-proporz)
-    - [Résultats du parti](#rsultats-du-parti)
-      - [Modèles](#modles-2)
-
+<!-- TOC START min:1 max:4 link:true asterisk:false update:true -->
+- [Spécifications de format des élections](#spécifications-de-format-des-élections)
+    - [Contenu](#contenu)
+    - [Avant-propos](#avant-propos)
+        - [Entités](#entités)
+        - [Élections tacites](#élections-tacites)
+        - [Élections régionales](#élections-régionales)
+    - [Formats](#formats)
+        - [Onegov](#onegov)
+            - [Colonnes](#colonnes)
+            - [Résultats du panachage](#résultats-du-panachage)
+            - [Résultats temporaires](#résultats-temporaires)
+            - [Modèle](#modèle)
+        - [Wabsti Majorz](#wabsti-majorz)
+            - [Exportation des données de colonnes](#exportation-des-données-de-colonnes)
+            - [Résultats des candidats de colonnes](#résultats-des-candidats-de-colonnes)
+            - [Résultats temporaires](#résultats-temporaires-1)
+            - [Modèles](#modèles)
+        - [Wabsti Proporz](#wabsti-proporz)
+            - [Exportation des données de résultats pour les colonnes](#exportation-des-données-de-résultats-pour-les-colonnes)
+            - [Résultats du panachage](#résultats-du-panachage-1)
+            - [Exportation des données de statistiques pour les colonnes](#exportation-des-données-de-statistiques-pour-les-colonnes)
+            - [Connexions de liste des colonnes](#connexions-de-liste-des-colonnes)
+            - [Résultats de candidats des colonnes](#résultats-de-candidats-des-colonnes)
+            - [Résultats temporaires](#résultats-temporaires-2)
+            - [Modèles](#modèles-1)
+        - [WabstiCExport Majorz](#wabsticexport-majorz)
+        - [WabstiCExport Proporz](#wabsticexport-proporz)
+        - [Résultats du parti](#résultats-du-parti)
+            - [Modèles](#modèles-2)
 <!-- TOC END -->
 
 ## Avant-propos
@@ -49,7 +48,7 @@ Les élections tacites peuvent être mises en ligne en utilisant le format OneGo
 
 ### Élections régionales
 
-Lors du téléchargement des résultats d'une élection régionale, seules les entités d'une circonscription sont exemptées d'être présentes.
+Lors du téléchargement des résultats d'une élection régionale, seules les entités d'une circonscription sont exemptées d'être présentes, si l'option correspondante est définie sur l'élection.
 
 ## Formats
 
