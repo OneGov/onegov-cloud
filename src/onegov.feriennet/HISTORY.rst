@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes cancellation dates not being cleared when cancellation days were set.
+  [href]
+
 - Hides inactive users in dropdown.
   [href]
 

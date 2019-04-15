@@ -264,7 +264,7 @@ class PeriodForm(Form):
             model.cancellation_days = None
         elif self.cancellation.data == 'rel':
             model.cancellation_days = self.cancellation_days.data
-            model.cancellation_data = None
+            model.cancellation_date = None
 
         if self.one_booking_per_day.data == 'yes':
             model.alignment = 'day'

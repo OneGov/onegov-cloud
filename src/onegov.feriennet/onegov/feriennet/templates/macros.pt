@@ -516,7 +516,7 @@
             The deadline for last-minute cancellations is the <tal:b i18n:name="date">${layout.format_date(period.cancellation_date, 'date')}</tal:b>.
     </div>
 
-    <div tal:condition="not period.finalized and period.confirmed and period.deadline_days"
+    <div tal:condition="not period.finalized and period.confirmed and period.cancellation_days"
          class="hint hint-cancellation" i18n:translate>
             Last-minute cancellations are possible up to <tal:b i18n:name="days">${period.cancellation_days}</tal:b> days before each occasion.
     </div>
