@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-03 09:49+0200\n"
+"POT-Creation-Date: 2019-04-15 11:40+0200\n"
 "PO-Revision-Date: 2019-04-03 09:53+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -71,11 +71,11 @@ msgstr "Italian"
 msgid "Romansh"
 msgstr "Roumain"
 
-msgid "Related link"
-msgstr "Informations complémentaires"
-
 msgid "Related elections"
 msgstr "Élections connexes"
+
+msgid "Related link"
+msgstr "Informations complémentaires"
 
 msgid "Election based on the simple majority system"
 msgstr "Election selon le système majoritaire"

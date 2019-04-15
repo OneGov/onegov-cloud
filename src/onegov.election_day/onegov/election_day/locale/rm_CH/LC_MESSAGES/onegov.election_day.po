@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-03 09:49+0200\n"
+"POT-Creation-Date: 2019-04-15 11:40+0200\n"
 "PO-Revision-Date: 2018-11-05 12:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -70,11 +70,11 @@ msgstr "Talian"
 msgid "Romansh"
 msgstr "Rumantsch"
 
-msgid "Related link"
-msgstr "Ulteriuras infurmaziuns"
-
 msgid "Related elections"
 msgstr "Elecziuns appartegnentas"
+
+msgid "Related link"
+msgstr "Ulteriuras infurmaziuns"
 
 msgid "Election based on the simple majority system"
 msgstr "Elecziun da maiorz"
@@ -1203,6 +1203,3 @@ msgstr "Nagina elecziun da proporz"
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "L'onn ${year} na vegn anc betg sustegnì"
-
-#~ msgid "Data sources"
-#~ msgstr "Funtaunas da datas"
