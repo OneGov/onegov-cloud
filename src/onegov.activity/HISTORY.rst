@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds helper methods to check for disabled/discouraged changes on invoice items.
+  [href]
+
 1.18.1 (2019-04-13)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -82,15 +82,25 @@ class Invoice(Base, TimestampMixin):
 
     @hybrid_property
     def discourage_changes(self):
-        for item in self.items:
+        return self.discourage_changes_for_items(self.items)
+
+    @hybrid_property
+    def disable_changes(self):
+        return self.disable_changes_for_items(self.items)
+
+    @hybrid_property
+    def has_online_payments(self):
+        return self.has_online_payments_for_items(self.items)
+
+    def discourage_changes_for_items(self, items):
+        for item in items:
             if item.source == 'xml':
                 return True
 
         return False
 
-    @hybrid_property
-    def disable_changes(self):
-        for item in self.items:
+    def disable_changes_for_items(self, items):
+        for item in items:
             if not item.source:
                 continue
 
@@ -102,13 +112,12 @@ class Invoice(Base, TimestampMixin):
             if 'open' in states or 'paid' in states:
                 return True
 
-    @hybrid_property
-    def has_online_payments(self):
-        for item in self.items:
+    def has_online_payments_for_items(self, items):
+        for item in items:
             if not item.source or item.source == 'xml':
                 continue
 
-            True
+            return True
 
     # paid or not
     @hybrid_property
