@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes possible exception in Sentry JS code.
+  [href]
+
 1.2.2 (2019-04-13)
 ~~~~~~~~~~~~~~~~~~~
 

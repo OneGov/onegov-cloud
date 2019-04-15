@@ -42,7 +42,7 @@
             ignoreErrors: [/data-".+"-alert/],
             shouldSendCallback: function(data) {
                 var crumbs = (data.breadcrumbs && data.breadcrumbs.values || []);
-                var errors = data.exception.values;
+                var errors = (data.exception.values && data.exception.values || []);
 
                 if (crumbs.length > 0 && errors.length > 0) {
 
@@ -50,7 +50,7 @@
                   // and the error itself is by intercooler we can ignore it
                   // as we would see the error in the backend and we will
                   // have informed the user in the frontend
-                  if (crumbs[crumbs.length - 1].category == 'xhr') {
+                  if (crumbs[crumbs.length - 1].category === 'xhr') {
                     if ((errors[errors.length - 1].value || {}).namespace === 'ic') {
                         return false;
                     }
