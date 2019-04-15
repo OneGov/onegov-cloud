@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.6.3 (2019-04-15)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds Lidl sponsorship.
   [href]
