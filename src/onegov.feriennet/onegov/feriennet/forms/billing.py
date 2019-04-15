@@ -33,7 +33,6 @@ class ManualBookingForm(Form):
 
     target = RadioField(
         label=_("Target"),
-        default='all',
         choices=tuple()
     )
 
@@ -118,6 +117,10 @@ class ManualBookingForm(Form):
         if self.tags.choices:
             self.target.choices.append(
                 ('for-users-with-tags', _("For users with tags")))
+
+        if self.request.params.get('for-user'):
+            self.target.data = 'for-user'
+            self.username.data = self.request.params['for-user']
 
     @property
     def usercollection(self):

@@ -4,18 +4,18 @@ from io import BytesIO
 from onegov.activity import Invoice, InvoiceItem, InvoiceCollection
 from onegov.activity.iso20022 import match_iso_20022_to_usernames
 from onegov.core.custom import json
+from onegov.core.elements import Link, Confirm, Intercooler, Block
 from onegov.core.security import Secret
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.collections import BillingCollection
-from onegov.feriennet.forms import BillingForm
 from onegov.feriennet.forms import BankStatementImportForm
+from onegov.feriennet.forms import BillingForm
 from onegov.feriennet.forms import ManualBookingForm
 from onegov.feriennet.layout import BillingCollectionImportLayout
 from onegov.feriennet.layout import BillingCollectionLayout
 from onegov.feriennet.layout import BillingCollectionManualBookingLayout
 from onegov.feriennet.layout import OnlinePaymentsLayout
 from onegov.feriennet.models import InvoiceAction, PeriodMessage
-from onegov.core.elements import Link, Confirm, Intercooler, Block
 from onegov.pay import Payment
 from onegov.pay import PaymentProviderCollection
 from onegov.pay import payments_association_table_for
@@ -23,6 +23,7 @@ from onegov.user import UserCollection, User
 from purl import URL
 from sqlalchemy import desc
 from sqlalchemy.orm import joinedload
+from urllib.parse import quote_plus
 
 
 @FeriennetApp.form(
@@ -63,6 +64,16 @@ def view_billing(self, request, form):
             traits=traits
         )
 
+    def manual_booking_link(username):
+        url = request.link(self, name='booking')
+        url = f'{url}&for-user={quote_plus(username)}'
+
+        return Link(
+            _("Add manual booking"),
+            attrs={'class': 'new-booking'},
+            url=url
+        )
+
     def invoice_links(details):
         if not self.period.finalized:
             return
@@ -87,6 +98,8 @@ def view_billing(self, request, form):
                     name='online-payments'
                 )
             )
+
+        yield manual_booking_link(details.first.username)
 
         if details.disable_changes:
             traits = (

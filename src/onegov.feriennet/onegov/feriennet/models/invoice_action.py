@@ -54,32 +54,40 @@ class InvoiceAction(object):
 
     def execute(self):
         if self.action == 'mark-paid':
-            self.execute_mark_paid(self.targets)
+            self.execute_mark_paid(tuple(self.targets))
 
         elif self.action == 'mark-unpaid':
-            self.execute_mark_unpaid(self.targets)
+            self.execute_mark_unpaid(tuple(self.targets))
 
         elif self.action == 'remove-manual':
             assert self.extend_to in (None, 'family')
-            self.execute_remove_manual(self.targets)
+            self.execute_remove_manual(tuple(self.targets))
 
         else:
             raise NotImplementedError()
 
+    def assert_safe_to_change(self, targets):
+        for target in targets:
+            if target.invoice.disable_changes_for_items((target, )):
+                raise RuntimeError("Item was paid online")
+
     def execute_mark_paid(self, targets):
+        self.assert_safe_to_change(targets)
+
         for target in targets:
             target.paid = True
-            assert not target.invoice.disable_changes, "item was paid online"
 
     def execute_mark_unpaid(self, targets):
+        self.assert_safe_to_change(targets)
+
         for target in targets:
             target.paid = False
             target.tid = None
             target.source = None
-            assert not target.invoice.disable_changes, "item was paid online"
 
     def execute_remove_manual(self, targets):
+        self.assert_safe_to_change(targets)
+
         for target in targets:
             assert target.family and target.family.startswith('manual-')
-            assert not target.invoice.disable_changes, "item was paid online"
             self.session.delete(target)

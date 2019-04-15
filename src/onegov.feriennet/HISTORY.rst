@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to directly add a specific booking for a user.
+  [href]
+
 - Fixes cancellation dates not being cleared when cancellation days were set.
   [href]
 

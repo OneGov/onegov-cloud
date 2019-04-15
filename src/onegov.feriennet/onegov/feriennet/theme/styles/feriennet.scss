@@ -1740,32 +1740,37 @@ $booking-left-margin: 2rem;
 
     .mark-paid::before {
         @include icon('\f058');
-        margin-right: 1ex;
+        margin-right: 1.25ex;
     }
 
     .mark-unpaid::before {
         @include icon('\f071');
-        margin-right: 1ex;
+        margin-right: 1.25ex;
     }
 
     .show-online-payments::before {
         @include icon('\f283');
-        margin-right: 1ex;
+        margin-right: 1.25ex;
     }
 
     .remove-manual::before {
         @include icon('\f014');
-        margin-right: 1ex;
+        margin-right: 1.25ex;
     }
 
     .remove-manual.extend-to-family::before {
         @include icon('\f1f8');
-        margin-right: 1ex;
+        margin-right: 1.25ex;
     }
 
     .show-invoice::before {
         @include icon('\f002');
-        margin-right: 1ex;
+        margin-right: 1.25ex;
+    }
+
+    .new-booking::before {
+        @include icon('\f1ec');
+        margin-right: 1.25ex;
     }
 
     @mixin payment-state-color($pastel, $light, $dark) {
