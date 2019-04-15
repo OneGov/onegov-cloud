@@ -81,3 +81,41 @@
         de: 'https://ad.doubleclick.net/ddm/trackimp/N8394.3080457PROJUVENTUTE/B20111643.205375159;dc_trk_aid=405205282;dc_trk_cid=91028232;ord={timestamp};dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
         fr: 'https://ad.doubleclick.net/ddm/trackimp/N8394.3080457PROJUVENTUTE/B20111643.205375156;dc_trk_aid=405218298;dc_trk_cid=91028232;ord={timestamp};dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
         it: 'https://ad.doubleclick.net/ddm/trackimp/N8394.3080457PROJUVENTUTE/B20111643.205375153;dc_trk_aid=405204988;dc_trk_cid=91028232;ord={timestamp};dc_lat=;dc_rdid=;tag_for_child_directed_treatment='
+
+
+- name:
+    de: LIDL SCHWEIZ
+    fr: LIDL SUISSE
+    it: LIDL SUISSE
+  logo_url:
+    de: 'https://family.lidl.ch/?utm_source=ferienet&utm_medium=online&utm_campaign=pro_juventude&utm_content=family_generic'
+    fr: 'https://family.lidl.ch/fr/startseite-fr/?utm_source=ferienet&utm_medium=online&utm_campaign=pro_juventude&utm_content=family_generic'
+    it: 'https://family.lidl.ch/fr/startseite-fr/?utm_source=ferienet&utm_medium=online&utm_campaign=pro_juventude&utm_content=family_generic'
+  mail_url:
+    de: 'https://family.lidl.ch/?utm_source=ferienet&utm_medium=online&utm_campaign=pro_juventude&utm_content=family_generic'
+    fr: 'https://family.lidl.ch/fr/startseite-fr/?utm_source=ferienet&utm_medium=online&utm_campaign=pro_juventude&utm_content=family_generic'
+    it: 'https://family.lidl.ch/fr/startseite-fr/?utm_source=ferienet&utm_medium=online&utm_campaign=pro_juventude&utm_content=family_generic'
+  logo: sponsors/lidl.svg
+  background: '#fff'
+  width: 100px
+  height: 48px
+  top: -5px
+  banners:
+    bookings:
+      src:
+        de: sponsors/lidl-banner-de.png
+        fr: sponsors/lidl-banner-fr.png
+        it: sponsors/lidl-banner-it.png
+      url:
+        de: 'https://family.lidl.ch/?utm_source=ferienet&utm_medium=online&utm_campaign=pro_juventude&utm_content=family_generic'
+        fr: 'https://family.lidl.ch/fr/startseite-fr/?utm_source=ferienet&utm_medium=online&utm_campaign=pro_juventude&utm_content=family_generic'
+        it: 'https://family.lidl.ch/fr/startseite-fr/?utm_source=ferienet&utm_medium=online&utm_campaign=pro_juventude&utm_content=family_generic'
+    invoices:
+      src:
+        de: sponsors/lidl-banner-de.png
+        fr: sponsors/lidl-banner-fr.png
+        it: sponsors/lidl-banner-it.png
+      url:
+        de: 'https://family.lidl.ch/?utm_source=ferienet&utm_medium=online&utm_campaign=pro_juventude&utm_content=family_generic'
+        fr: 'https://family.lidl.ch/fr/startseite-fr/?utm_source=ferienet&utm_medium=online&utm_campaign=pro_juventude&utm_content=family_generic'
+        it: 'https://family.lidl.ch/fr/startseite-fr/?utm_source=ferienet&utm_medium=online&utm_campaign=pro_juventude&utm_content=family_generic'

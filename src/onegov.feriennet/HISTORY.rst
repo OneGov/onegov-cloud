@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds Lidl sponsorship.
+  [href]
+
 - Adds the ability to directly add a specific booking for a user.
   [href]
 
