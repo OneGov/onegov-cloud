@@ -6,26 +6,25 @@ Eine "Gemeinde" kann auch ein Bezirk, ein Wahlkreis etc. sein.
 
 ## Inhalt
 
-<!-- TOC START min:1 max:4 link:true update:true -->
+<!-- TOC START min:1 max:4 link:true asterisk:false update:true -->
 - [Format Spezifikation Abstimmungen](#format-spezifikation-abstimmungen)
-  - [Inhalt](#inhalt)
-  - [Vorbemerkungen](#vorbemerkungen)
-    - [Einheiten](#einheiten)
-  - [Formate](#formate)
-    - [Standardformat](#standardformat)
-      - [Spalten](#spalten)
-      - [Temporäre Resultate](#temporre-resultate)
-      - [Vorlage](#vorlage)
-    - [OneGov](#onegov)
-      - [Spalten](#spalten-1)
-      - [Temporäre Resultate](#temporre-resultate-1)
-      - [Vorlage](#vorlage-1)
-    - [Wabsti](#wabsti)
-      - [Spalten](#spalten-2)
-      - [Temporäre Resultate](#temporre-resultate-2)
-      - [Vorlage](#vorlage-2)
-    - [WabstiCExport](#wabsticexport)
-
+    - [Inhalt](#inhalt)
+    - [Vorbemerkungen](#vorbemerkungen)
+        - [Einheiten](#einheiten)
+    - [Formate](#formate)
+        - [Standardformat](#standardformat)
+            - [Spalten](#spalten)
+            - [Temporäre Resultate](#temporäre-resultate)
+            - [Vorlage](#vorlage)
+        - [OneGov](#onegov)
+            - [Spalten](#spalten-1)
+            - [Temporäre Resultate](#temporäre-resultate-1)
+            - [Vorlage](#vorlage-1)
+        - [Wabsti](#wabsti)
+            - [Spalten](#spalten-2)
+            - [Temporäre Resultate](#temporäre-resultate-2)
+            - [Vorlage](#vorlage-2)
+        - [WabstiCExport](#wabsticexport)
 <!-- TOC END -->
 
 
@@ -49,11 +48,11 @@ Jede Zeile enthält das Resultat einer einzelnen Gemeinde, sofern diese vollstä
 Name|Beschreibung
 ---|---
 `ID`|Die BFS-Nummer der Gemeinde zum Zeitpunkt der Abstimmung. Der Wert `0` kann für Auslandslebende verwendet werden.
-`Ja Stimmen`|Die Anzahl Ja Stimmen zu der Abstimmung. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
-`Nein Stimmen`|Die Anzahl Nein Stimmen der Abstimmung. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
-`Stimmberechtigte`|Die Anzahl Stimmberechtigter. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
-`Leere Stimmzettel`|Die Anzahl leer eingelegter Stimmzettel. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
-`Ungültige Stimmzettel`|Die Anzahl ungültiger Stimmzettel. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
+`Ja Stimmen`|Die Anzahl Ja Stimmen zu der Abstimmung. Ist der Text `unbekannt`/`unknown` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
+`Nein Stimmen`|Die Anzahl Nein Stimmen der Abstimmung. Ist der Text `unbekannt`/`unknown` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
+`Stimmberechtigte`|Die Anzahl Stimmberechtigter. Ist der Text `unbekannt`/`unknown` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
+`Leere Stimmzettel`|Die Anzahl leer eingelegter Stimmzettel. Ist der Text `unbekannt`/`unknown` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
+`Ungültige Stimmzettel`|Die Anzahl ungültiger Stimmzettel. Ist der Text `unbekannt`/`unknown` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
 
 #### Temporäre Resultate
 

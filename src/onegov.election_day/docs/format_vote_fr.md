@@ -4,26 +4,25 @@ Les formats de fichier acceptés sont les fichiers générés à la main par le 
 
 ## Contenu
 
-<!-- TOC START min:1 max:4 link:true update:true -->
-- [Spécifications de format des votes](#spcifications-de-format-des-votes)
-  - [Contenu](#contenu)
-  - [Avant-propos](#avant-propos)
-    - [Entités](#entits)
-  - [Formats](#formats)
-    - [Format standard](#format-standard)
-      - [Colonnes](#colonnes)
-      - [Résultats temporaires](#rsultats-temporaires)
-      - [Modèle](#modle)
-    - [OneGov](#onegov)
-      - [Colonnes](#colonnes-1)
-      - [Résultats temporaires](#rsultats-temporaires-1)
-      - [Modèle](#modle-1)
-    - [Wabsti](#wabsti)
-      - [Colonnes](#colonnes-2)
-      - [Résultats temporaires](#rsultats-temporaires-2)
-      - [Modèle](#modle-2)
-    - [WabstiCExport](#wabsticexport)
-
+<!-- TOC START min:1 max:4 link:true asterisk:false update:true -->
+- [Spécifications de format des votes](#spécifications-de-format-des-votes)
+    - [Contenu](#contenu)
+    - [Avant-propos](#avant-propos)
+        - [Entités](#entités)
+    - [Formats](#formats)
+        - [Format standard](#format-standard)
+            - [Colonnes](#colonnes)
+            - [Résultats temporaires](#résultats-temporaires)
+            - [Modèle](#modèle)
+        - [OneGov](#onegov)
+            - [Colonnes](#colonnes-1)
+            - [Résultats temporaires](#résultats-temporaires-1)
+            - [Modèle](#modèle-1)
+        - [Wabsti](#wabsti)
+            - [Colonnes](#colonnes-2)
+            - [Résultats temporaires](#résultats-temporaires-2)
+            - [Modèle](#modèle-2)
+        - [WabstiCExport](#wabsticexport)
 <!-- TOC END -->
 
 
@@ -46,11 +45,11 @@ Chaque ligne contient les résultats d'une municipalité unique, à condition qu
 Nom|Description
 ---|---
 `ID`|Le nombre de municipalités (nombre de BFS) au moment du vote. Une valeur de `0` peut être utilisée pour les expatriés.
-`Ja Stimmen`|Le nombre de votes « oui ». Si le mot `unbekannt` est saisi, la ligne sera ignorée (pas encore décompté).
-`Nein Stimmen`|Le nombre de votes « non ». Si le mot `unbekannt` est saisi, la ligne sera ignorée (pas encore décompté).
-`Stimmberechtigte`|Le nombre de personnes habilitées à voter. Si le mot `unbekannt` est saisi, la ligne sera ignorée (pas encore décompté).
-`Leere Stimmzettel`|Le nombre de bulletins de vote blancs. Si le mot `unbekannt` est saisi, la ligne sera ignorée (pas encore décompté).
-`Ungültige Stimmzettel`|Le nombre de bulletins de vote nuls. Si le mot `unbekannt` est saisi, la ligne sera ignorée (pas encore décompté).
+`Ja Stimmen`|Le nombre de votes « oui ». Si le mot `unknown`/`unbekannt` est saisi, la ligne sera ignorée (pas encore décompté).
+`Nein Stimmen`|Le nombre de votes « non ». Si le mot `unknown`/`unbekannt` est saisi, la ligne sera ignorée (pas encore décompté).
+`Stimmberechtigte`|Le nombre de personnes habilitées à voter. Si le mot `unknown`/`unbekannt` est saisi, la ligne sera ignorée (pas encore décompté).
+`Leere Stimmzettel`|Le nombre de bulletins de vote blancs. Si le mot `unknown`/`unbekannt` est saisi, la ligne sera ignorée (pas encore décompté).
+`Ungültige Stimmzettel`|Le nombre de bulletins de vote nuls. Si le mot `unknown`/`unbekannt` est saisi, la ligne sera ignorée (pas encore décompté).
 
 #### Résultats temporaires
 

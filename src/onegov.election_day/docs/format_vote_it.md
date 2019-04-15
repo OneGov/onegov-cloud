@@ -4,26 +4,25 @@ I formati di file accettabili sono file generati manualmente, dal software elett
 
 ## Contenuto
 
-<!-- TOC START min:1 max:4 link:true update:true -->
+<!-- TOC START min:1 max:4 link:true asterisk:false update:true -->
 - [Specifica Formato Voti](#specifica-formato-voti)
-  - [Contenuto](#contenuto)
-  - [Prefazione](#prefazione)
-    - [Enti](#enti)
-  - [Formati](#formati)
-    - [Formato standard](#formato-standard)
-      - [Colonne](#colonne)
-      - [Risultati temporanei](#risultati-temporanei)
-      - [Modello](#modello)
-    - [OneGov](#onegov)
-      - [Colonne](#colonne-1)
-      - [Risultati temporanei](#risultati-temporanei-1)
-      - [Modello](#modello-1)
-    - [Wabsti](#wabsti)
-      - [Colonne](#colonne-2)
-      - [Risultati temporanei](#risultati-temporanei-2)
-      - [Modello](#modello-2)
-    - [WabstiCExport](#wabsticexport)
-
+    - [Contenuto](#contenuto)
+    - [Prefazione](#prefazione)
+        - [Enti](#enti)
+    - [Formati](#formati)
+        - [Formato standard](#formato-standard)
+            - [Colonne](#colonne)
+            - [Risultati temporanei](#risultati-temporanei)
+            - [Modello](#modello)
+        - [OneGov](#onegov)
+            - [Colonne](#colonne-1)
+            - [Risultati temporanei](#risultati-temporanei-1)
+            - [Modello](#modello-1)
+        - [Wabsti](#wabsti)
+            - [Colonne](#colonne-2)
+            - [Risultati temporanei](#risultati-temporanei-2)
+            - [Modello](#modello-2)
+        - [WabstiCExport](#wabsticexport)
 <!-- TOC END -->
 
 ## Prefazione
@@ -45,11 +44,11 @@ Ogni riga contiene il risultato di un singolo comune, purché questo sia stato c
 Nome|Descrizione
 ---|---
 `ID`|Il numero del comune (numero BFS) al momento del voto. Un valore di `0` può essere usato per gli espatriati.
-`Ja Stimmen`|Il numero di voti "si". Se viene inserita la parola `unbekannt`, la riga verrà ignorata (non ancora conteggiata).
-`Nein Stimmen`|Il numero di voti "no". Se viene inserita la parola `unbekannt`, la riga verrà ignorata (non ancora conteggiata).
-`Stimmberechtigte`|Il numero di persone idonee a votare. Se viene inserita la parola `unbekannt`, la riga verrà ignorata (non ancora conteggiata).
-`Leere Stimmzettel`|Il numero delle schede bianche. Se viene inserita la parola `unbekannt`, la riga verrà ignorata (non ancora conteggiata).
-`Ungültige Stimmzettel`|Il numero delle schede nulle. Se viene inserita la parola `unbekannt`, la riga verrà ignorata (non ancora conteggiata).
+`Ja Stimmen`|Il numero di voti "si". Se viene inserita la parola `unknown`/`unbekannt`, la riga verrà ignorata (non ancora conteggiata).
+`Nein Stimmen`|Il numero di voti "no". Se viene inserita la parola `unknown`/`unbekannt`, la riga verrà ignorata (non ancora conteggiata).
+`Stimmberechtigte`|Il numero di persone idonee a votare. Se viene inserita la parola `unknown`/`unbekannt`, la riga verrà ignorata (non ancora conteggiata).
+`Leere Stimmzettel`|Il numero delle schede bianche. Se viene inserita la parola `unknown`/`unbekannt`, la riga verrà ignorata (non ancora conteggiata).
+`Ungültige Stimmzettel`|Il numero delle schede nulle. Se viene inserita la parola `unknown`/`unbekannt`, la riga verrà ignorata (non ancora conteggiata).
 
 #### Risultati temporanei
 
