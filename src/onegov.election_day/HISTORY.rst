@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Update translations.
+  [msom]
+
 3.12.0 (2019-04-12)
 ~~~~~~~~~~~~~~~~~~~
 

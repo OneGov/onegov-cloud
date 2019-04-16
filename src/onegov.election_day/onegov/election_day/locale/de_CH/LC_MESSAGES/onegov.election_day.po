@@ -1,3 +1,4 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
@@ -10,8 +11,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: Lingua 3.12\n"
 "X-Generator: Poedit 2.2.1\n"
 
 msgid "Last change"
@@ -321,36 +322,35 @@ msgstr "Abgegebene Wahlzettel"
 msgid "Lists"
 msgstr "Listen"
 
-#.
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
 #. bars in the middle to the sublists, the bars to the right to the lists. The
-#. width of the bars and connections is proportional to the votes, blue colored
+#. width of the bars and connections is proportional to the votes, blue
+#. colored
 #. bars contain the number of mandates.
 msgid "figcaption_connections"
 msgstr ""
 "Das Diagramm zeigt die Verteilung der Stimmen und der Mandate auf die "
 "Listen- und Unterlistenverbindungen. Die Balken auf der linken Seite "
-"entsprechen den Listenverbindungen, die Balken in der Mitte den Unterlisten, "
-"die Balken rechts den Listen. Die Breite der Balken und der Verbindungen ist "
-"proportional zu den Stimmen, blau eingefärbte Balken enthalten die Anzahl "
-"der Mandate."
+"entsprechen den Listenverbindungen, die Balken in der Mitte den Unterlisten,"
+" die Balken rechts den Listen. Die Breite der Balken und der Verbindungen "
+"ist proportional zu den Stimmen, blau eingefärbte Balken enthalten die "
+"Anzahl der Mandate."
 
-#.
-#. Default: The diagram shows the votes and mandates of the parties. The rimmed
+#. Default: The diagram shows the votes and mandates of the parties. The
+#. rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
 #. (right scale) to the voices (percentages).
 msgid "figcaption_party_strengths"
 msgstr ""
 "Das Diagramm zeigt die Anzahl erhaltener Stimmen und die Anzahl erhaltener "
 "Mandate einer Partei. Die Anzahl schwarz umrandeter Kästchen entspricht der "
-"Anzahl Mandate (linke Skala), die eingefärbten Balken geben die Stimmanteile "
-"in Prozent wieder (rechte Skala)."
+"Anzahl Mandate (linke Skala), die eingefärbten Balken geben die Stimmanteile"
+" in Prozent wieder (rechte Skala)."
 
 msgid "Panachage (parties)"
 msgstr "Panaschierstatistik (Parteien)"
 
-#.
 #. Default: The diagram shows the origin of the votes. The bars on the left
 #. correspond to the unchanged votes (including the blank list), the bars on
 #. the right side to the final results. The width of the bars and connections
@@ -359,8 +359,8 @@ msgid "figcaption_panachage"
 msgstr ""
 "Das Diagramm zeigt die Herkunft der gewonnenen und verlorenen Stimmen durch "
 "Panaschieren. Auf der linken Seite sind die unveränderten Stimmen inklusive "
-"Blankoliste, auf der rechten Seite die panaschierten Stimmen. Die Breite der "
-"Balken und der Verbindungen ist proportional zu den Stimmen."
+"Blankoliste, auf der rechten Seite die panaschierten Stimmen. Die Breite der"
+" Balken und der Verbindungen ist proportional zu den Stimmen."
 
 msgid "Panachage (lists)"
 msgstr "Panaschierstatistik (Listen)"
@@ -383,7 +383,6 @@ msgstr "Sitze"
 msgid "List"
 msgstr "Liste"
 
-#.
 #. Default: Votes
 msgid "single_votes"
 msgstr "Stimmen"
@@ -400,12 +399,10 @@ msgstr "Stichfrage zugunsten der Initiative"
 msgid "Tie breaker in favor of the counter proposal"
 msgstr "Stichfrage zugunsten des Gegenentwurfs"
 
-#.
 #. Default: Voter turnout
 msgid "turnout_vote"
 msgstr "Stimmbeteiligung"
 
-#.
 #. Default: eligible Voters
 msgid "eligible_voters_vote"
 msgstr "Stimmberechtigte"
@@ -637,8 +634,8 @@ msgid ""
 "The email service provides free information on the publication of new "
 "results (intermediate results, final results):"
 msgstr ""
-"Der E-Mail-Service informiert kostenlos über die Publikation neuer Resultate "
-"(Zwischenresultate, Schlussresultate):"
+"Der E-Mail-Service informiert kostenlos über die Publikation neuer Resultate"
+" (Zwischenresultate, Schlussresultate):"
 
 msgid ""
 "The SMS service provides free information on the publication of new results "
@@ -660,7 +657,6 @@ msgid "Stop SMS subscription"
 msgstr "SMS-Abonnement beenden"
 
 #. Default: Start
-#.
 msgid "homepage"
 msgstr "Startseite"
 
@@ -804,8 +800,8 @@ msgid ""
 "Successfully subscribed to the email service. You will receive an email "
 "every time new results are published."
 msgstr ""
-"Die E-Mail-Benachrichtigung wurde abonniert. Sie erhalten in Zukunft eine E-"
-"Mail, sobald neue Resultate publiziert wurden."
+"Die E-Mail-Benachrichtigung wurde abonniert. Sie erhalten in Zukunft eine "
+"E-Mail, sobald neue Resultate publiziert wurden."
 
 msgid "Not yet counted"
 msgstr "Noch nicht ausgezählt"
@@ -963,8 +959,8 @@ msgid ""
 "Successfully unsubscribed from the email services. You will no longer "
 "receive an email when new results are published."
 msgstr ""
-"Die E-Mail-Benachrichtigung wurde beendet. Sie erhalten in Zukunft keine E-"
-"Mails mehr."
+"Die E-Mail-Benachrichtigung wurde beendet. Sie erhalten in Zukunft keine "
+"E-Mails mehr."
 
 msgid ""
 "You will receive a SMS as soon as new results have been published. The SMS "

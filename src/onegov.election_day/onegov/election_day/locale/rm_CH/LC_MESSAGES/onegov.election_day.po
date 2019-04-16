@@ -1,3 +1,4 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
@@ -95,10 +96,10 @@ msgid "Party strengths"
 msgstr "Forza da las partidas"
 
 msgid "Views"
-msgstr ""
+msgstr "Vistas"
 
 msgid "Mandate allocation"
-msgstr ""
+msgstr "Repartiziun dals sezs"
 
 msgid "Cantonal"
 msgstr "Sin plaun chantunal"
@@ -196,8 +197,8 @@ msgid ""
 "and that there are no extra columns."
 msgstr ""
 "Las colonnas necessarias n'èn betg vegnidas chattadas. Controllai per "
-"plaschair che las colonnas existian e che naginas colonnas supplementaras na "
-"sajan avant maun."
+"plaschair che las colonnas existian e che naginas colonnas supplementaras na"
+" sajan avant maun."
 
 msgid "Some column names appear twice."
 msgstr "In pèr nums da colonnas vegnan duvrads duas giadas."
@@ -321,11 +322,11 @@ msgstr "Cedels electorals consegnads"
 msgid "Lists"
 msgstr "Glistas"
 
-#.
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
 #. bars in the middle to the sublists, the bars to the right to the lists. The
-#. width of the bars and connections is proportional to the votes, blue colored
+#. width of the bars and connections is proportional to the votes, blue
+#. colored
 #. bars contain the number of mandates.
 msgid "figcaption_connections"
 msgstr ""
@@ -336,8 +337,8 @@ msgstr ""
 "travs e da las colliaziuns è proporziunala a las vuschs, las travs blauas "
 "cuntegnan il dumber da mandats."
 
-#.
-#. Default: The diagram shows the votes and mandates of the parties. The rimmed
+#. Default: The diagram shows the votes and mandates of the parties. The
+#. rimmed
 #. bars (left scale) correspond to the number of mandates, the colored bars
 #. (right scale) to the voices (percentages).
 msgid "figcaption_party_strengths"
@@ -349,7 +350,6 @@ msgstr ""
 msgid "Panachage (parties)"
 msgstr "Statistica da panaschar (partidas)"
 
-#.
 #. Default: The diagram shows the origin of the votes. The bars on the left
 #. correspond to the unchanged votes (including the blank list), the bars on
 #. the right side to the final results. The width of the bars and connections
@@ -359,8 +359,8 @@ msgstr ""
 "Il diagram mussa la derivanza da las vuschs da glista gudagnadas e perdidas "
 "pervia dal panaschar. Da la vart sanestra vegnan mussadas las vuschs betg "
 "midadas da las glistas inclusiv la glista en blanco, da la vart dretga las "
-"vuschs da glista panaschadas. La ladezza da las travs e da las colliaziuns è "
-"proporziunala a las vuschs."
+"vuschs da glista panaschadas. La ladezza da las travs e da las colliaziuns è"
+" proporziunala a las vuschs."
 
 msgid "Panachage (lists)"
 msgstr "Statistica da panaschar (glistas)"
@@ -383,7 +383,6 @@ msgstr "sezs"
 msgid "List"
 msgstr "Glista"
 
-#.
 #. Default: Votes
 msgid "single_votes"
 msgstr "Vuschs"
@@ -400,12 +399,10 @@ msgstr "Dumonda decisiva a favur da l'iniziativa"
 msgid "Tie breaker in favor of the counter proposal"
 msgstr "Dumonda decisiva a favur da la cuntraproposta"
 
-#.
 #. Default: Voter turnout
 msgid "turnout_vote"
 msgstr "Participaziun a la votaziun"
 
-#.
 #. Default: eligible Voters
 msgid "eligible_voters_vote"
 msgstr "Persunas cun dretg da votar"
@@ -538,16 +535,16 @@ msgid "Compounds of elections"
 msgstr "Elecziuns colliadas"
 
 msgid "Upload tokens"
-msgstr ""
+msgstr "Chargiar si tokens"
 
 msgid "Import configuration"
-msgstr ""
+msgstr "Configuraziun da l'import"
 
 msgid "Manage"
 msgstr "Administrar"
 
 msgid "Wabsti data sources"
-msgstr ""
+msgstr "Funtaunas da datas Wabsti"
 
 msgid "Mappings"
 msgstr "Attribuziuns"
@@ -581,8 +578,8 @@ msgstr "Cliccai qua per mussar la pagina cun ils resultats actualisads."
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
-"Il formular cuntegna sbagls. Controllai per plaschair ils champs marcads cun "
-"cotschen."
+"Il formular cuntegna sbagls. Controllai per plaschair ils champs marcads cun"
+" cotschen."
 
 msgid "Please use the following format:"
 msgstr "Duvrai per plaschair il suandant format:"
@@ -696,7 +693,6 @@ msgid "Stop SMS subscription"
 msgstr "Terminar l'abunament dad SMS"
 
 #. Default: Start
-#.
 msgid "homepage"
 msgstr "Pagina iniziala"
 
@@ -719,8 +715,8 @@ msgid ""
 "The raw data used to display the results is available in the following "
 "formats:"
 msgstr ""
-"Las datas nunelavuradas che vegnan duvradas per mussar ils resultats stattan "
-"a disposiziun en ils suandants formats:"
+"Las datas nunelavuradas che vegnan duvradas per mussar ils resultats stattan"
+" a disposiziun en ils suandants formats:"
 
 msgid "The format of the data is described here:"
 msgstr "Il format da las datas è descrit qua:"
@@ -740,11 +736,12 @@ msgstr "Vus dastgais duvrar questa unitad da datas per intents commerzials."
 
 msgid "You must provide the source (author, title and link to the dataset)."
 msgstr ""
-"La funtauna sto vegnir inditgada (autura u autur, titel e link a l'unitad da "
-"datas)."
+"La funtauna sto vegnir inditgada (autura u autur, titel e link a l'unitad da"
+" datas)."
 
 msgid "Your results could not be uploaded."
-msgstr "Voss resultats n'han displaschaivlamain betg pudì vegnir chargiads si."
+msgstr ""
+"Voss resultats n'han displaschaivlamain betg pudì vegnir chargiads si."
 
 msgid "Line"
 msgstr "Lingia"
@@ -844,7 +841,8 @@ msgid ""
 "every time new results are published."
 msgstr ""
 "Las communicaziuns per e-mail èn vegnidas abunadas. A partir d'ussa "
-"survegnis Vus in e-mail, uschespert che novs resultats èn vegnids publitgads."
+"survegnis Vus in e-mail, uschespert che novs resultats èn vegnids "
+"publitgads."
 
 msgid "Not yet counted"
 msgstr "Anc betg eruì il resultat"
@@ -901,7 +899,7 @@ msgid "New data source"
 msgstr "Nova funtauna da datas"
 
 msgid "A description of the WabstiCExport interface can be found here:"
-msgstr ""
+msgstr "Ina descripziun da l'interfatscha WabstiCExport chattais Vus qua:"
 
 msgid "No data sources yet."
 msgstr "Anc naginas funtaunas da datas."
@@ -925,16 +923,16 @@ msgid "Locale"
 msgstr "Regiun linguistica"
 
 msgid "Create token"
-msgstr ""
+msgstr "Crear in token"
 
 msgid "A description of the REST interface can be found here:"
-msgstr ""
+msgstr "Ina descripziun da l'interfatscha REST chattais Vus qua:"
 
 msgid "No tokens yet."
-msgstr ""
+msgstr "Anc nagins tokens."
 
 msgid "Created"
-msgstr ""
+msgstr "Creà"
 
 msgid "New vote"
 msgstr "Nova votaziun"
@@ -953,8 +951,8 @@ msgid ""
 "Successfully subscribed to the SMS service. You will receive a SMS every "
 "time new results are published."
 msgstr ""
-"La communicaziun per SMS è vegnida abunada. A partir d'ussa survegnis Vus in "
-"SMS, uschespert che novs resultats èn vegnids publitgads."
+"La communicaziun per SMS è vegnida abunada. A partir d'ussa survegnis Vus in"
+" SMS, uschespert che novs resultats èn vegnids publitgads."
 
 msgid "Successfully subscribed to the email service"
 msgstr "Abunà las communicaziuns per e-mail"
@@ -1061,27 +1059,27 @@ msgid ""
 "Final results of the federal election \"${title}\", ${date}, ${principal}, "
 "broken down by candidates and municipalities."
 msgstr ""
-"Resultats finals da l'elecziun federala \"${title}\", ${date}, ${principal}, "
-"resultats da tut las candidatas e da tut ils candidats tenor vischnancas."
+"Resultats finals da l'elecziun federala \"${title}\", ${date}, ${principal},"
+" resultats da tut las candidatas e da tut ils candidats tenor vischnancas."
 
 msgid "Create a new upload token?"
-msgstr ""
+msgstr "Crear in nov token?"
 
 msgid "Create"
-msgstr ""
+msgstr "Crear"
 
 #, python-format
 msgid "Do you really want to delete \"${item}\"?"
 msgstr "Vulais Vus propi stizzar \"${item}\"?"
 
 msgid "Delete upload token"
-msgstr ""
+msgstr "Stizzar il token"
 
 msgid "Upload token created."
-msgstr ""
+msgstr "Creà il token."
 
 msgid "Upload token deleted."
-msgstr ""
+msgstr "Stizzà il token."
 
 msgid "Edit vote"
 msgstr "Modifitgar la votaziun"
