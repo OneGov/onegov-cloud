@@ -5300,16 +5300,15 @@ h2 + div.timeline {
         > div:nth-child(6),
         > div:nth-child(7) {
             background: $white-smoke;
-            z-index: -2;
         }
 
         > [aria-selected="true"] {
-            color: $white;
+            font-weight: bold;
         }
 
         > [aria-selected="true"]::after {
-            background: $primary-color;
-            border-radius: 50%;
+            background-blend-mode: difference;
+            border-bottom: 3px solid $primary-color;
             bottom: 0;
             color: $primary-fg-color;
             content: '';
@@ -5321,7 +5320,6 @@ h2 + div.timeline {
             right: 0;
             top: 0;
             width: 1.75rem;
-            z-index: -1;
         }
     }
 

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes selected dates on events view not working.
+  [href]
+
 1.2.3 (2019-04-15)
 ~~~~~~~~~~~~~~~~~~~
 
