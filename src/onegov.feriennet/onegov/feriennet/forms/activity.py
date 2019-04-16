@@ -9,6 +9,7 @@ from wtforms.validators import InputRequired
 
 
 TAGS = tuple((tag, tag) for tag in (
+    _("Accessible"),
     _("Adventure"),
     _("Animals"),
     _("Baking"),

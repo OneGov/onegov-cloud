@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-04-11 13:44+0200\n"
+"POT-Creation-Date: 2019-04-16 11:23+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -471,6 +471,9 @@ msgstr "Ort"
 
 msgid "Map"
 msgstr "Karte"
+
+msgid "Accessible"
+msgstr "Behindertenfreundlich"
 
 msgid "Adventure"
 msgstr "Abenteuer"
