@@ -8,6 +8,7 @@ from onegov.core.orm import as_selectable_from_path
 from onegov.core.utils import module_path, Bunch
 from onegov.user import User
 from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 from ulid import ulid
 
 
@@ -95,21 +96,21 @@ class BillingCollection(object):
         zero = Decimal("0.00")
         return max(zero, self.invoices.outstanding_amount or zero)
 
-    def add_manual_position(self, users, text, amount):
+    def add_position(self, users, text, amount, group):
 
         # only add these positions to people who actually have an invoice
         invoices = self.invoices.query()\
             .outerjoin(User)\
             .filter(User.username.in_(users))
 
-        # each time we add a manual position, we group it using a family
-        family = f"manual-{ulid()}"
+        # each time we add a position, we group it uniquely using a family
+        family = f"{group}-{ulid()}"
         count = 0
 
         for invoice in invoices:
             count += 1
             invoice.add(
-                group='manual',
+                group=group,
                 text=text,
                 unit=amount,
                 quantity=1,
@@ -118,6 +119,60 @@ class BillingCollection(object):
             )
 
         return count
+
+    def add_manual_position(self, users, text, amount):
+        return self.add_position(users, text, amount, group='manual')
+
+    def include_donation(self, text, user_id, amount):
+        """ Includes a donation for the given user and period.
+
+        Unlike manual positions, donations are supposed to be off/on per
+        period. Therefore this interface is somewhat different and has an
+        exclude_donation counterpart.
+
+        """
+
+        # an invoice is required
+        invoice = self.invoices.query()\
+            .outerjoin(User)\
+            .filter(User.id == user_id)\
+            .options(joinedload(Invoice.items))\
+            .one()
+
+        # if there's an existing donation, update it
+        for item in invoice.items:
+            if item.group == 'donation':
+                assert not item.paid
+
+                item.unit = amount
+                item.text = text
+                return
+
+        # if there's no donation, add it
+        return invoice.add(
+            group='donation',
+            text=text,
+            unit=amount,
+            quantity=1,
+            paid=False
+        )
+
+    def exclude_donation(self, user_id):
+        invoice = self.invoices.query()\
+            .outerjoin(User)\
+            .filter(User.id == user_id)\
+            .options(joinedload(Invoice.items))\
+            .first()
+
+        if not invoice:
+            return
+
+        donations = (i for i in invoice.items if i.group == 'donation')
+        donation = next(donations, None)
+
+        if donation:
+            assert not donation.paid
+            self.session.delete(donation)
 
     def create_invoices(self, all_inclusive_booking_text=None):
         assert not self.period.finalized
