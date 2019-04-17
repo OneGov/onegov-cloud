@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves onegov-core transfer command.
+  [href]
+
 - Fixes is_uuid falsely identifying certain strings as UUID.
   [href]
 
