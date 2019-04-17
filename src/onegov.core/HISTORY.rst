@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.78.1 (2019-04-17)
+~~~~~~~~~~~~~~~~~~~
 
 - Improves onegov-core transfer command.
   [href]
