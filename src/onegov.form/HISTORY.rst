@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.46.1 (2019-04-22)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes chosen selects not working properly with dependencies.
   [msom]
