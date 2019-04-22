@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.0 (2019-04-22)
+~~~~~~~~~~~~~~~~~~~
+
 - Triggers show/hide events when changing the visibility through dependencies.
   [msom]
 
