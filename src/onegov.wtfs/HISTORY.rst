@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.1.0 (2019-04-22)
+~~~~~~~~~~~~~~~~~~~
 
 - Allows to manage admins.
   [msom]
