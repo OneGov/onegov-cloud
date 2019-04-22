@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Allows to manage admins.
+  [msom]
+
 - Makes municipality list sortable.
   [msom]
 

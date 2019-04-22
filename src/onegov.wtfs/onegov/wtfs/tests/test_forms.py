@@ -350,6 +350,7 @@ def test_unrestricted_user_form(session):
         "- none -", "Adlikon (21)", "Aesch (82)"
     ]
     assert form.role.choices == [
+        ('admin', "Admin"),
         ('editor', "Editor"),
         ('member', "Member")
     ]
@@ -416,16 +417,6 @@ def test_unrestricted_user_form(session):
     form.on_request()
     assert not form.validate()
     assert form.errors == {'username': ['This value already exists.']}
-
-    form = UnrestrictedUserForm(PostData({
-        'role': 'admin',
-        'realname': "Hans Muster",
-        'username': "hans.muster@winterthur.ch"
-    }))
-    form.request = Request(session, groupid=municipality_1.id.hex)
-    form.on_request()
-    assert not form.validate()
-    assert form.errors == {'role': ['Not a valid choice']}
 
     form = UnrestrictedUserForm(PostData({
         'role': 'member',

@@ -101,9 +101,9 @@ def has_permission_users(app, identity, model, permission):
 
 @WtfsApp.permission_rule(model=User, permission=object)
 def has_permission_user(app, identity, model, permission):
-    # Admins can not be managed through the web
-    if model.role == 'admin':
-        if permission not in {Public}:
+    # One may not delete himself
+    if model.username == identity.userid:
+        if permission in {DeleteModel}:
             return False
 
     # Editors may view, edit and delete members within the same group

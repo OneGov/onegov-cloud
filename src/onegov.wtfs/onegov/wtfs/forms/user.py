@@ -34,6 +34,7 @@ class UserForm(Form):
 
     contact = BooleanField(
         label=_("Contact"),
+        depends_on=('role', '!admin'),
     )
 
     def update_model(self, model):
@@ -63,6 +64,7 @@ class UnrestrictedUserForm(UserForm):
     role = RadioField(
         label=_("Role"),
         choices=[
+            ('admin', _("Admin")),
             ('editor', _("Editor")),
             ('member', _("Member"))
         ],
@@ -77,7 +79,8 @@ class UnrestrictedUserForm(UserForm):
         choices=[],
         validators=[
             InputRequiredIf('role', 'editor')
-        ]
+        ],
+        depends_on=('role', '!admin'),
     )
 
     def on_request(self):
