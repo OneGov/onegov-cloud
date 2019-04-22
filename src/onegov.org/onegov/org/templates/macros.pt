@@ -1503,6 +1503,7 @@
         </div>
         <tal:b condition="not file.signed and may_sign">
             <a tal:condition="not:file.signed" class="is-not-signed signature-status"
+                role="button"
                 data-prompt="Please enter your yubikey to digitally sign this file"
                 data-prompt-ok="Sign"
                 data-prompt-cancel="Cancel"
