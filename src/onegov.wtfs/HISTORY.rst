@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Makes municipality list sortable.
+  [msom]
+
 - Makes user list sortable.
   [msom]
 
