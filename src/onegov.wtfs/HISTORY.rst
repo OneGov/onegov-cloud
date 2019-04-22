@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Makes user list sortable.
+  [msom]
+
 1.0.0 (2019-04-11)
 ~~~~~~~~~~~~~~~~~~~
 

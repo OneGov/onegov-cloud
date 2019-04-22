@@ -4,7 +4,7 @@
         <div class="row">
             <div class="columns small-12">
                 <h1>${layout.title}</h1>
-                <table class="user-groups">
+                <table class="user-groups sortable">
                     <thead>
                         <tr>
                             <th i18n:translate>Name</th>
