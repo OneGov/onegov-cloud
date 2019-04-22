@@ -895,6 +895,10 @@ def test_from_import(session):
     ], 'import-1') == (0, 1, 1)
     assert events.subset_count == 2
 
+    # Don't purge
+    assert events.from_import(['import-1-A'], 'import-1') == (0, 0, 0)
+    assert events.subset_count == 2
+
     # Withdraw
     events.by_name('title-c').withdraw()
     assert events.from_import([

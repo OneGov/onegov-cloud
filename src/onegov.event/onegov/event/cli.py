@@ -312,19 +312,9 @@ def import_guidle(group_context, url, tagmap):
                 for offer in GuidleExportData(root).offers():
                     source = f'{prefix}-{offer.uid}.0'
                     if offer.last_update == updated.get(source):
-                        # Do not download the images and parse all the fields
-                        # if nothing has changed since the last import. Only
-                        # provide some dummy events with the source set so
-                        # that the purging will work!
-                        for index, schedule in enumerate(offer.schedules()):
-                            yield EventImportItem(
-                                event=Event(
-                                    source=f'{prefix}-{offer.uid}.{index}',
-                                    source_updated=offer.last_update
-                                ),
-                                image=None,
-                                filename=None
-                            )
+                        # Nothing has changed, just provide the source prefix
+                        # to prevent the related events from being purged
+                        yield f'{prefix}-{offer.uid}'
                         continue
 
                     tags, unknown = offer.tags(tagmap)

@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Improves performance of guidle import.
+  [msom]
+
 1.1.2 (2019-04-15)
 ~~~~~~~~~~~~~~~~~~~
 

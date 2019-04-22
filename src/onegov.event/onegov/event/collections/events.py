@@ -152,11 +152,12 @@ class EventCollection(Pagination):
         Doesn't change the states of events allowing to permanently withdraw
         imported events.
 
-        Optionally removes all events with the given meta-source-prefix not
-        present in the given events.
+        :items:
+            A list of `EventImportItem`s or event sources to keep from purging.
 
-        Images for the given items should be provided seperately to avoid
-        overhead due to the depot storage, see `EventImportItem`.
+        :purge:
+            Optionally removes all events with the given meta-source-prefix not
+            present in the given events.
 
         """
 
@@ -169,6 +170,10 @@ class EventCollection(Pagination):
         updated = 0
 
         for item in items:
+            if isinstance(item, str):
+                purge = {x for x in purge if not x.startswith(item)}
+                continue
+
             event = item.event
             existing = self.session.query(Event).filter(
                 Event.meta['source'] == event.meta['source']
