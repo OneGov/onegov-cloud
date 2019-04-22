@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Triggers show/hide events when changing the visibility through dependencies.
+  [msom]
+
 - Requires Python 3.6.
   [href]
 
@@ -11,7 +14,7 @@ Changelog
   [href]
 
 0.2.1 (2016-12-27)
-~~~~~~~~~~~~~~~~~~~ 
+~~~~~~~~~~~~~~~~~~~
 
 - Adds support for group-labels.
   [href]
