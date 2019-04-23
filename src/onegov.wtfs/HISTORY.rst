@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Removes the YubiKey field from the login form.
+  [msom]
+
 1.1.0 (2019-04-22)
 ~~~~~~~~~~~~~~~~~~~
 

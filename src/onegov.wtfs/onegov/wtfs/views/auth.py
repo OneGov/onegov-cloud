@@ -23,6 +23,8 @@ from onegov.user.utils import password_reset_url
 def handle_login(self, request, form):
     """ Handles the login requests. """
 
+    form.delete_field('yubikey')
+
     if form.submitted(request):
         response = self.login_to(request=request, **form.login_data)
         form.error_message = _("Wrong username or password")
