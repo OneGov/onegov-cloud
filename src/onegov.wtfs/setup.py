@@ -33,7 +33,7 @@ setup(
         'cached_property',
         'cssmin',
         'onegov.chat',
-        'onegov.core',
+        'onegov.core>=v0.78.2',
         'onegov.file',
         'onegov.form>=0.46.1',
         'onegov.foundation',
