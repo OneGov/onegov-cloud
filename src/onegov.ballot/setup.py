@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 name = 'onegov.ballot'
-version = '3.8.0'
+version = '3.9.0'
 
 
 def get_long_description():
