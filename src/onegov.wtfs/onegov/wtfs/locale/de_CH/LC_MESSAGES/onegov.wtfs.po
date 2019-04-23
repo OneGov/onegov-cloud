@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-22 11:29+0200\n"
-"PO-Revision-Date: 2019-04-22 11:29+0200\n"
+"POT-Creation-Date: 2019-04-23 14:56+0200\n"
+"PO-Revision-Date: 2019-04-23 15:05+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -311,6 +311,9 @@ msgstr "Scan-Auftrag"
 msgid "Create invoice"
 msgstr "Rechnung erzeugen"
 
+msgid "Daily list boxes"
+msgstr "Tagesliste Behälter"
+
 msgid "Filled in by the municipality until 17.00 the evening before."
 msgstr "Durch die Gemeinde ausgefüllt bis 17.00 Uhr am Vorabend."
 
@@ -322,6 +325,9 @@ msgstr "Intern Steueramt"
 
 msgid "Out"
 msgstr "Ausgang"
+
+msgid "Number of bundles/packages"
+msgstr "Anzahl Bündel/Pakete"
 
 msgid "Internally dispatch"
 msgstr "Intern Optimo"

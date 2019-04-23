@@ -8,7 +8,7 @@
                         <tr>
                             <th i18n:translate>Scan jobs</th>
                             <th class="red">${layout.format_date(layout.model.date, 'date')}</th>
-                            <th class="right" i18n:translate>Daily list</th>
+                            <th class="right" i18n:translate>Daily list boxes</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -29,7 +29,7 @@
                             <th class="right blue" i18n:translate>In</th>
                             <th class="center light-blue" colspan="5" i18n:translate>Internally tax office</th>
                             <th class="right light-blue" i18n:translate>Out</th>
-                            <th class="green" colspan="2"></th>
+                            <th class="center green" colspan="2" i18n:translate>Number of bundles/packages</th>
                             <th class="center light-green" i18n:translate>Internally dispatch</th>
                         </tr>
                         <tr>
@@ -48,7 +48,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tal:block tal:repeat="x python: range(35)">
                         <tr tal:repeat="result layout.model.query()">
                             <td>${result.name}</td>
                             <td class="right">${result.bfs_number}</td>
@@ -63,7 +62,6 @@
                             <td class="right green">${result.dispatch_cantonal_tax_office}</td>
                             <td class="light-green"></td>
                         </tr>
-                        </tal:block>
                         <tr>
                             <td></td>
                             <td></td>
