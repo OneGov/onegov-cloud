@@ -84,9 +84,9 @@ def get_elected_candidates(election_compound, session):
         Candidate.family_name,
         Candidate.first_name,
         Candidate.party,
-        List.name,
+        List.name.label('list'),
         List.list_id,
-        Election.id
+        Election.id.label('election_id')
     )
     elected = elected.outerjoin(List, Candidate.list_id == List.id)
     elected = elected.outerjoin(Election)

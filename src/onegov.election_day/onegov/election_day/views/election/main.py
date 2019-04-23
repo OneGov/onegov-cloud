@@ -10,6 +10,7 @@ from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_election_summary
 from onegov.election_day.utils.election import get_candidates_results
 from onegov.election_day.utils.election import get_connection_results
+from onegov.election_day.utils.election import get_party_results
 from onegov.election_day.utils.election.lists import get_list_results
 from sqlalchemy.orm import object_session
 
@@ -64,6 +65,8 @@ def view_election_json(self, request):
             embed[tab] = request.link(self, f'{tab}-chart')
         if layout.svg_path:
             media['charts'][tab] = request.link(self, f'{tab}-svg')
+
+    years, parties = get_party_results(self)
 
     data = {
         'completed': self.completed,
@@ -178,6 +181,8 @@ def view_election_json(self, request):
                 ],
             } for connection in get_connection_results(self, session)
         ]
+
+        data['parties'] = parties
 
     return data
 

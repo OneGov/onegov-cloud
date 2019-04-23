@@ -33,10 +33,10 @@
                 </thead>
                 <tbody>
                     <tr tal:repeat="candidate elected_candidates">
-                        <td>${candidate[0]} ${candidate[1]}</td>
-                        <td class="right-aligned" tal:condition="layout.majorz">${candidate[2]}</td>
-                        <td class="right-aligned" tal:condition="layout.proporz">${candidate[3]}</td>
-                        <td class="right-aligned" tal:define="district districts.get(candidate[5], None)">
+                        <td>${candidate.family_name} ${candidate.first_name}</td>
+                        <td class="right-aligned" tal:condition="layout.majorz">${candidate.party}</td>
+                        <td class="right-aligned" tal:condition="layout.proporz">${candidate.list}</td>
+                        <td class="right-aligned" tal:define="district districts.get(candidate.election_id, None)">
                             <a tal:condition="district" tal:attributes="href district[1]">${district[0]}</a>
                         </td>
                     </tr>

@@ -8,6 +8,8 @@ from onegov.election_day.layouts import ElectionCompoundLayout
 from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_election_compound_summary
+from onegov.election_day.utils.election import get_elected_candidates
+from onegov.election_day.utils.election import get_party_results
 
 
 @ElectionDayApp.html(
@@ -50,6 +52,24 @@ def view_election_compound_json(self, request):
         if layout.svg_path:
             media['charts'][tab] = request.link(self, '{}-svg'.format(tab))
 
+    elected_candidates = get_elected_candidates(self, request.app.session())
+    districts = {
+        election.id: {
+            'name': election.district,
+            'mandates': {
+                'allocated': election.allocated_mandates or 0,
+                'total': election.number_of_mandates or 0,
+            },
+            'progress': {
+                'counted': election.progress[0] or 0,
+                'total': election.progress[1] or 0
+            },
+        }
+        for election in self.elections
+    }
+
+    years, parties = get_party_results(self)
+
     return {
         'completed': self.completed,
         'date': self.date.isoformat(),
@@ -62,10 +82,20 @@ def view_election_compound_json(self, request):
             'counted': self.progress[0] or 0,
             'total': self.progress[1] or 0
         },
+        'districts': list(districts.values()),
         'elections': [
             request.link(election) for election in self.elections
         ],
-        'elected_candidates': self.elected_candidates,
+        'elected_candidates': [
+            {
+                'first_name': candidate.first_name,
+                'family_name': candidate.family_name,
+                'party': candidate.party,
+                'list': candidate.list,
+                'district': districts[candidate.election_id]['name']
+            } for candidate in elected_candidates
+        ],
+        'parties': parties,
         'related_link': self.related_link,
         'title': self.title_translations,
         'type': 'election_compound',

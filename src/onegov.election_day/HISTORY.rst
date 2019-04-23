@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds more informations to the election and election compound JSON views.
+  [msom]
+
 - Shows the districts instead of the election titles in all election compound
   views.
   [msom]
