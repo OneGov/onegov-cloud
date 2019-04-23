@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Uses static URLs for embedded ballot views.
+  [msom]
+
 3.12.1 (2019-04-16)
 ~~~~~~~~~~~~~~~~~~~
 

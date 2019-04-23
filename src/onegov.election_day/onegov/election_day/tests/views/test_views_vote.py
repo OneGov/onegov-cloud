@@ -48,7 +48,7 @@ def test_view_vote_entities(election_day_app):
         assert client.get(data_url).json['1701']['counted'] is True
 
         url = response.pyquery('.entities-map')[0].attrib['data-embed-source']
-        assert data_url in client.get(url)
+        assert data_url in client.get(url).follow()
 
 
 def test_view_vote_districts(election_day_app_gr):
@@ -75,7 +75,7 @@ def test_view_vote_districts(election_day_app_gr):
         assert client.get(data_url).json['Landquart']['counted'] is False
 
         url = response.pyquery('.districts-map')[0].attrib['data-embed-source']
-        assert data_url in client.get(url)
+        assert data_url in client.get(url).follow()
 
 
 def test_view_vote_json(election_day_app):

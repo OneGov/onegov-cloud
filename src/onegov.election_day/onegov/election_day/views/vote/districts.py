@@ -1,3 +1,4 @@
+from morepath import redirect
 from morepath.request import Response
 from onegov.ballot import Ballot
 from onegov.ballot import Vote
@@ -80,6 +81,42 @@ def view_vote_districts_tie_breaker(self, request):
         'vote': self,
         'layout': layout
     }
+
+
+@ElectionDayApp.html(
+    model=Vote,
+    name='proposal-by-districts-map',
+    permission=Public
+)
+def view_vote_districts_map_proposal(self, request):
+
+    """ A static link to the map of the proposal. """
+
+    return redirect(request.link(self.proposal, name='districts-map'))
+
+
+@ElectionDayApp.html(
+    model=Vote,
+    name='counter-proposal-by-districts-map',
+    permission=Public
+)
+def view_vote_districts_map_counter_proposal(self, request):
+
+    """ A static link to the map of the counter proposal. """
+
+    return redirect(request.link(self.counter_proposal, name='districts-map'))
+
+
+@ElectionDayApp.html(
+    model=Vote,
+    name='tie-breaker-by-districts-map',
+    permission=Public
+)
+def view_vote_districts_map_tie_breaker(self, request):
+
+    """ A static link to the map of the tie breaker. """
+
+    return redirect(request.link(self.tie_breaker, name='districts-map'))
 
 
 @ElectionDayApp.json(

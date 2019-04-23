@@ -27,7 +27,7 @@
                         data-mapurl="${layout.get_topojson_link(layout.principal.id, vote.date.year)}"
                         data-dataurl="${request.link(ballot, name='by-entity')}"
                         data-embed-link="Embed"
-                        data-embed-source="${request.link(ballot, name='entities-map')}"
+                        data-embed-source="${layout.entities_map_link}"
                         data-thumbs="true"
                         data-color-scale="rb"
                         data-label-left-hand="Nay"

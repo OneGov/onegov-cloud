@@ -27,7 +27,7 @@
                         data-mapurl="${layout.get_topojson_link(layout.app.principal.id, vote.date.year)}"
                         data-dataurl="${request.link(ballot, name='by-district')}"
                         data-embed-link="Embed"
-                        data-embed-source="${request.link(ballot, name='districts-map')}"
+                        data-embed-source="${layout.districts_map_link}"
                         data-thumbs="true"
                         data-color-scale="rb"
                         data-label-left-hand="Nay"

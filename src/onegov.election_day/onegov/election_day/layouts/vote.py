@@ -95,6 +95,18 @@ class VoteLayout(DetailLayout):
         return self.model.proposal
 
     @cached_property
+    def entities_map_link(self):
+        return self.request.link(
+            self.model, f'{self.ballot.type}-by-entities-map'
+        )
+
+    @cached_property
+    def districts_map_link(self):
+        return self.request.link(
+            self.model, f'{self.ballot.type}-by-districts-map'
+        )
+
+    @cached_property
     def summarize(self):
         return self.ballot.results.count() != 1
 
