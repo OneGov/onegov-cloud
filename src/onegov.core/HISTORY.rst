@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Improves CSV handling.
+  [msom]
+
 0.78.1 (2019-04-17)
 ~~~~~~~~~~~~~~~~~~~
 
