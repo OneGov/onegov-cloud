@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.13.0 (2019-04-23)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds more informations to the election and election compound JSON views.
   [msom]
