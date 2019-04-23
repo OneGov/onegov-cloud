@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Visually equalizes daily lists.
+  [msom]
+
 - Fixes daily list boxes view.
   [msom]
 
