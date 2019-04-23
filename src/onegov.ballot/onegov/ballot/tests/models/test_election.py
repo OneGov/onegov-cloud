@@ -875,3 +875,14 @@ def test_election_rename(session):
 
     session.query(Candidate).one().election_id == 'elerction'
     session.query(ElectionResult).one().election_id == 'elerction'
+
+
+def test_election_district():
+    election = Election()
+    assert election.district is None
+
+    election.results.append(ElectionResult(name='name'))
+    assert election.district == 'name'
+
+    election.results.first().district = 'district'
+    assert election.district == 'district'

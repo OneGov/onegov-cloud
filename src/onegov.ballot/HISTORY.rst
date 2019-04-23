@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a helper for getting the district of a distinct election.
+  [msom]
+
 3.8.0 (2019-04-11)
 ~~~~~~~~~~~~~~~~~~~
 

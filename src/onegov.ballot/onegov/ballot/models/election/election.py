@@ -262,6 +262,16 @@ class Election(Base, ContentMixin, TimestampMixin,
     #: containing only the municipalities of one district of a canton.
     distinct = meta_property('distinct', default=True)
 
+    @property
+    def district(self):
+        """ Returns the district name, if this is a `distinct` election.
+        Requires results to be present.
+
+        """
+        result = self.results.first()
+        if result:
+            return result.district or result.name
+
     def clear_results(self):
         """ Clears all the results. """
 
