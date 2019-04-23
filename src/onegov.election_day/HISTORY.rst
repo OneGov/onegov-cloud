@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Shows the districts instead of the election titles in all election compound
+  views.
+  [msom]
+
 - Uses static URLs for embedded ballot views.
   [msom]
 
