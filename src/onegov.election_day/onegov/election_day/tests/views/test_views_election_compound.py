@@ -27,8 +27,8 @@ def test_view_election_compound_districts(election_day_app_gr):
     upload_election_compound(client)
 
     districts = client.get('/elections/elections/districts')
-    assert "Regional Election A" in districts
-    assert "Regional Election B" in districts
+    assert "Hinterrhein" in districts
+    assert "Albula" in districts
     assert "1 von 10" in districts  # mandates A
     assert "1 von 5" in districts  # mandates B
     assert "2 von 15" in districts  # overall mandates

@@ -20,10 +20,7 @@ def view_election_compound_candidates(self, request):
     session = request.app.session()
     elected_candidates = get_elected_candidates(self, session)
     districts = {
-        election.id: (
-            election.results.first().district or election.results.first().name,
-            request.link(election)
-        )
+        election.id: (election.district, request.link(election))
         for election in self.elections if election.results.first()
     }
 
