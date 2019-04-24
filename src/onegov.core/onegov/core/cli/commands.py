@@ -8,10 +8,10 @@ import subprocess
 import sys
 
 from cached_property import cached_property
-from mailthon.middleware import TLS, Auth
 from fnmatch import fnmatch
-from onegov.core.cli.core import command_group, pass_group_context
+from mailthon.middleware import TLS, Auth
 from onegov.core.cache import lru_cache
+from onegov.core.cli.core import command_group, pass_group_context
 from onegov.core.mail import Postman
 from onegov.core.orm import Base, SessionManager
 from onegov.core.upgrade import get_tasks
@@ -195,26 +195,35 @@ def transfer(group_context,
 
     def transfer_database(remote_db, local_db, schema_glob='*'):
         send = f"ssh {server} sudo -u postgres nice -n 10 pg_dump {remote_db}"
-        send = f"{send} --no-owner --no-privileges --clean --if-exists"
+        send = f"{send} --no-owner --no-privileges"
         send = f"{send} --quote-all-identifiers --no-sync"
 
         recv = f"psql -d {local_db} -v ON_ERROR_STOP=1"
 
-        if schema_glob != '*':
-            query = 'SELECT schema_name FROM information_schema.schemata'
+        query = 'SELECT schema_name FROM information_schema.schemata'
 
-            lst = f'sudo -u postgres psql {remote_db} -t -c "{query}"'
-            lst = f"ssh {server} '{lst}'"
+        lst = f'sudo -u postgres psql {remote_db} -t -c "{query}"'
+        lst = f"ssh {server} '{lst}'"
 
-            schemas = subprocess.check_output(lst, shell=True)
-            schemas = (s.strip() for s in schemas.decode('utf-8').splitlines())
-            schemas = (s for s in schemas if s)
-            schemas = (s for s in schemas if fnmatch(s, schema_glob))
+        schemas = subprocess.check_output(lst, shell=True)
+        schemas = (s.strip() for s in schemas.decode('utf-8').splitlines())
+        schemas = (s for s in schemas if s)
+        schemas = (s for s in schemas if fnmatch(s, schema_glob))
+        schemas = tuple(schemas)
 
-            send = f'{send} --schema {" --schema ".join(schemas)}'
+        send = f'{send} --schema {" --schema ".join(schemas)}'
 
         if platform.system() == 'Linux':
             recv = f"sudo -u postgres {recv}"
+
+        for schema in schemas:
+            drop = f'DROP SCHEMA IF EXISTS "{schema}" CASCADE'
+            drop = f"echo '{drop}' | {recv}"
+
+            subprocess.check_call(
+                drop, shell=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL)
 
         if shutil.which('pv'):
             recv = f'pv --name "{remote_db}@postgres" -r -b | {recv}'
