@@ -4,6 +4,9 @@ Changelog
 - Adjusts invoice export.
   [msom]
 
+- Uses the year of the end date from the filter as column header reference.
+  [msom]
+
 - Visually equalizes daily lists.
   [msom]
 

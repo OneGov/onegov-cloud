@@ -18,9 +18,9 @@
                         <tr>
                             <th class="subtitle" i18n:translate>Name</th>
                             <th class="right subtitle" i18n:translate>BFS number</th>
-                            <th class="right subtitle"><tal:block i18n:translate>until</tal:block> ${layout.current_year-2}</th>
-                            <th class="right subtitle">${layout.current_year-1}</th>
-                            <th class="right subtitle">${layout.current_year}</th>
+                            <th class="right subtitle"><tal:block i18n:translate>until</tal:block> ${layout.model.end.year-2}</th>
+                            <th class="right subtitle">${layout.model.end.year-1}</th>
+                            <th class="right subtitle">${layout.model.end.year}</th>
                             <th class="right subtitle" i18n:translate>Total</th>
                         </tr>
                     </thead>
