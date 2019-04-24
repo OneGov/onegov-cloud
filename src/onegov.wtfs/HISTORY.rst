@@ -13,6 +13,9 @@ Changelog
 - Fixes daily list boxes view.
   [msom]
 
+- Fixes delivery note totals.
+  [msom]
+
 1.1.2 (2019-04-23)
 ~~~~~~~~~~~~~~~~~~~
 
