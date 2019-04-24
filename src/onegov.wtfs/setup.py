@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 name = 'onegov.wtfs'
 description = 'Tax form scanning app for the city of Winterthur'
-version = '1.1.2'
+version = '1.1.3'
 
 
 def get_long_description():
