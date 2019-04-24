@@ -1,6 +1,5 @@
 from onegov.core.orm.func import unaccent
 from onegov.form import Form
-from onegov.form.fields import PreviewField
 from onegov.wtfs import _
 from onegov.wtfs.models import Municipality
 from wtforms import SelectField
@@ -19,7 +18,7 @@ class CreateInvoicesForm(Form):
     )
 
     to_date = DateField(
-        label=_("From date"),
+        label=_("To date"),
         validators=[
             InputRequired(),
         ]
@@ -43,16 +42,6 @@ class CreateInvoicesForm(Form):
         label=_("Municipality"),
         choices=[],
         validators=[InputRequired()]
-    )
-
-    price_per_quantity = PreviewField(
-        label=_("Price per quantity"),
-        fields=('municipality_id',),
-        events=('change',),
-        url=lambda meta: meta.request.link(
-            meta.request.app.principal,
-            name='price-per-quantity'
-        )
     )
 
     accounting_unit = StringField(

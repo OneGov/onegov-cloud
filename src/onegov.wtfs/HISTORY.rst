@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adjusts invoice export.
+  [msom]
+
 - Visually equalizes daily lists.
   [msom]
 

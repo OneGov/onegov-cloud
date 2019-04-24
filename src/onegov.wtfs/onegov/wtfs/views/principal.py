@@ -50,22 +50,3 @@ def view_dispatch_dates(self, request, form):
         )
 
     return Response()
-
-
-@WtfsApp.form(
-    model=Principal,
-    permission=ViewModel,
-    name='price-per-quantity',
-    form=MunicipalityIdSelectionForm
-)
-def view_price_per_quantity(self, request, form):
-    if form.submitted(request):
-        layout = DefaultLayout(self, request)
-        price_per_quantity = form.municipality.price_per_quantity
-        return render_macro(
-            layout.macros['price_per_quantity'],
-            request,
-            {'price_per_quantity': price_per_quantity, 'layout': layout}
-        )
-
-    return Response()

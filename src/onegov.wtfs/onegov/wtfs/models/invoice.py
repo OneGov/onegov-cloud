@@ -1,5 +1,6 @@
 from csv import writer
 from datetime import datetime
+from onegov.wtfs.models.municipality import Municipality
 from onegov.wtfs.models.scan_job import ScanJob
 
 
@@ -17,37 +18,13 @@ class Invoice(object):
 
     def export(self, file):
         csv = writer(file)
-        csv.writerow((
-            'Aktuelles Datum (YYYYMMDD1)',
-            'Aktuelles Datum (DD.MM.YYYY)',
-            'Download Zeitpunkt (HH.MIN.SEK)',
-            'GPN-Nr.',
-            'Positionsnummer (Hochgezählt)',
-            'GPN-Nr.',
-            'Betreff',
-            'Positionsnummer (Hochgezählt)',
-            'Erstellungsdatum',
-            'Erstellungsdatum',
-            'Erstellungsdatum',
-            'GPN-Nr.',
-            'Total StE',
-            'Lieferscheinnummer',
-            'Preis pro Menge exkl. MWST',
-            'Preis pro Menge exkl. MWST',
-            'Fixe Preiseiheit (immer „1“)',
-            'Erstellungsdatum',
-            'Adressszusatz der Gemeinde',
-            'CS2 Benutzer',
-            'Kostenstelle',
-            'Erlöskonto',
-        ))
-
         now = datetime.now()
         current_date_1 = f'{now:%Y%m%d}1'
-        current_date = f'{now:%d.%m.%Y}'
+        current_date = f'{now:%Y-%m-%d}'
         current_time = f'{now:%H.%M.%S}'
 
         query = self.session.query(ScanJob)
+        query = query.join(Municipality)
         if self.from_date:
             query = query.filter(ScanJob.dispatch_date >= self.from_date)
         if self.to_date:
@@ -56,14 +33,23 @@ class Invoice(object):
             query = query.filter(
                 ScanJob.municipality_id == self.municipality_id
             )
-        query = query.order_by(ScanJob.dispatch_date)
-        for count, scan_job in enumerate(query, start=1):
+        query = query.order_by(
+            Municipality.meta['gpn_number'],
+            ScanJob.delivery_number
+        )
+
+        count = 1
+        last_gpn_number = None
+        for scan_job in query:
             municipality = scan_job.municipality
             gpn_number = municipality.gpn_number
             gpn_number = str(gpn_number) if gpn_number is not None else ''
+            count = count + 1 if gpn_number == last_gpn_number else 1
+            last_gpn_number = gpn_number
             address_supplement = municipality.address_supplement or ''
             price_per_quantity = municipality.price_per_quantity
             price_per_quantity = str(int(price_per_quantity * 10000000))
+            # todo: this seems to be wrong
             tax_forms = (
                 (scan_job.dispatch_tax_forms or 0)
                 - (scan_job.return_unscanned_tax_forms or 0)
@@ -82,7 +68,7 @@ class Invoice(object):
                 current_date,
                 gpn_number,
                 str(tax_forms * 1000),
-                str(scan_job.delivery_number),
+                f'Lieferscheinnummer {scan_job.delivery_number}',
                 price_per_quantity,
                 price_per_quantity,
                 '1',

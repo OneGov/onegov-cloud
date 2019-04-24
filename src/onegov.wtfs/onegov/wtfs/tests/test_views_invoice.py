@@ -64,7 +64,7 @@ def test_views_invoices(client):
         assert "123" in invoice
         assert "456" in invoice
         assert "789" in invoice
-        assert "02.01.2019" in invoice
+        assert "2019-01-02" in invoice
         assert "54000" in invoice
         assert "70000000" in invoice
 
