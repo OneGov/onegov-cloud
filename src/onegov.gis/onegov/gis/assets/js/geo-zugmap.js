@@ -29,17 +29,59 @@ var asInt = function(text) {
     return parseInt(text, 10);
 };
 
+var splitTag = function(tag) {
+    var parts = tag.split(':', 2);
+
+    if (parts.length === 1) {
+        return ['*', tag];
+    }
+
+    return parts;
+};
+
+var getElement = function(root, tag) {
+    var parts = splitTag(tag);
+    var ns = parts[0];
+    var name = parts[1];
+
+    var elements = [];
+
+    // about every browser and browser version handles this differently, so
+    // we need to check a number of ways and fall back step by step
+    elements = root.getElementsByTagName(tag);
+    if (elements.length > 0) {
+        return elements;
+    }
+
+    elements = root.getElementsByTagNameNS(ns, name);
+    if (elements.length > 0) {
+        return elements;
+    }
+
+    elements = root.getElementsByTagNameNS('*', name);
+    if (elements.length > 0) {
+        return elements;
+    }
+
+    elements = root.getElementsByTagName(name);
+    if (elements.length > 0) {
+        return elements;
+    }
+
+    return elements;
+};
+
 var Lookup = function(element) {
     var self = this;
 
     self.element = element;
 
     self.one = function(tag) {
-        return self.element.getElementsByTagName(tag)[0];
+        return getElement(self.element, tag)[0];
     };
 
     self.all = function(tag) {
-        return self.element.getElementsByTagName(tag);
+        return getElement(self.element, tag);
     };
 
     self.get = function(tag) {
@@ -55,13 +97,15 @@ var Capabilities = function(url) {
     self.loaded = false;
 
     var get = function(xml, tag) {
-        return xml.getElementsByTagName(tag)[0].textContent;
+        return getElement(xml, tag)[0].textContent;
     };
 
     var extractMatrix = function(xml) {
         var tms = new Lookup(
-            firstMatch(xml.getElementsByTagName('TileMatrixSet'), function(element) {
-                return element.children.length !== 0;
+            firstMatch(getElement(xml, 'TileMatrixSet'), function(element) {
+                return (element.children && element.children.length !== 0) ||
+                // childNodes include text nodes (usually 1)
+                (element.childNodes && element.childNodes.length > 1);
             })
         );
 

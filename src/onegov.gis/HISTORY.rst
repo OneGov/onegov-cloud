@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes browser issues in ZugMap.
+  [href]
+
 0.8.1 (2018-12-04)
 ~~~~~~~~~~~~~~~~~~~
 
