@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.6.4 (2019-04-24)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds "accessible" tag to activities.
   [href]
