@@ -25,6 +25,7 @@ from onegov.org.layout import DirectoryEntryLayout
 from onegov.org.models import DirectorySubmissionAction
 from onegov.org.models import ExtendedDirectory, ExtendedDirectoryEntry
 from onegov.core.elements import Link
+from sqlalchemy import or_, not_
 from purl import URL
 from tempfile import NamedTemporaryFile
 from webob.exc import HTTPForbidden
@@ -247,9 +248,13 @@ def view_geojson(self, request):
         DirectoryEntry.title,
         DirectoryEntry.lead,
         DirectoryEntry.content["coordinates"]["lat"].label('lat'),
-        DirectoryEntry.content["coordinates"]["lon"].label('lon')
+        DirectoryEntry.content["coordinates"]["lon"].label('lon'),
+        DirectoryEntry.meta["is_hidden_from_public"].label('is_hidden')
     )
     q = q.filter(DirectoryEntry.content["coordinates"]["lat"] != None)
+
+    # this could be done using a query, but that seems to be more verbose
+    entries = (c for c in q if request.is_manager or not c.is_hidden)
 
     url_prefix = request.class_link(DirectoryEntry, {
         'directory_name': self.directory.name,
@@ -268,7 +273,7 @@ def view_geojson(self, request):
             'coordinates': [e.lon, e.lat],
             'type': "Point"
         }
-    } for e in q)
+    } for e in entries)
 
 
 @OrgApp.form(

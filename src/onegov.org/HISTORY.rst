@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes hidden directory entries being shown in the map.
+  [href]
+
 1.2.4 (2019-04-22)
 ~~~~~~~~~~~~~~~~~~~
 
