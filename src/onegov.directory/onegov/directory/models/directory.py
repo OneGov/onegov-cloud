@@ -122,13 +122,18 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
         updated = {f.id: values[f.id] for f in self.basic_fields}
 
         # treat file fields differently
+        known_file_ids = {f.id for f in self.file_fields}
+
         if self.file_fields:
 
             # files which are not given or whose value is {} are removed
             # (this is in line with onegov.form's file upload field+widget)
             for f in entry.files:
 
-                # migration
+                # this indicates that the file has been renamed
+                if f.note not in known_file_ids:
+                    continue
+
                 if isinstance(values[f.note], dict):
                     continue
 

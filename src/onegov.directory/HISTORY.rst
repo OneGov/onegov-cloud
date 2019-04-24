@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes error when renaming a file field.
+  [href]
+
 0.4.6 (2019-04-03)
 ~~~~~~~~~~~~~~~~~~~~~
 
