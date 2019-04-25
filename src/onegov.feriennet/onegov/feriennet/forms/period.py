@@ -271,7 +271,7 @@ class PeriodForm(Form):
         else:
             model.alignment = None
 
-        if self.pass_system.data == 'yes':
+        if self.pass_system.data == 'no':
             model.pay_organiser_directly = False
         elif self.pay_organiser_directly.data == 'direct':
             model.pay_organiser_directly = True

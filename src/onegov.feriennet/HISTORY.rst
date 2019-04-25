@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Resolves being unable to switch to paying the organizer directly.
+  [href]
+
 1.6.4 (2019-04-24)
 ~~~~~~~~~~~~~~~~~~~
 
