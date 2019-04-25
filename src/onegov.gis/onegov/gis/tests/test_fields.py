@@ -42,7 +42,7 @@ def test_coordinates_field():
 
     assert coordinate.lat == 47.05183585
     assert coordinate.lon == 8.30576869173879
-    assert coordinate.zoom is 10
+    assert coordinate.zoom == 10
 
     # when we process a dictionary coordinates are created
     field.process_data({
