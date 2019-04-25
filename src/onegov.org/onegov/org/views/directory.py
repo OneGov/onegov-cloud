@@ -25,7 +25,6 @@ from onegov.org.layout import DirectoryEntryLayout
 from onegov.org.models import DirectorySubmissionAction
 from onegov.org.models import ExtendedDirectory, ExtendedDirectoryEntry
 from onegov.core.elements import Link
-from sqlalchemy import or_, not_
 from purl import URL
 from tempfile import NamedTemporaryFile
 from webob.exc import HTTPForbidden
