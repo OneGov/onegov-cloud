@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes news archive not getting linked correctly.
+  [href]
+
 1.2.5 (2019-04-25)
 ~~~~~~~~~~~~~~~~~~~
 

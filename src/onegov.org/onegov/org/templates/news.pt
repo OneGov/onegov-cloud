@@ -11,7 +11,7 @@
                     <strong>${year}</strong>
                 </li>
                 <li tal:condition="year != current_year">
-                    <a href="${request.url}?year=${year}">${year}</a>
+                    <a href="${request.link(page)}?year=${year}">${year}</a>
                 </li>
             </tal:b>
         </ul>
