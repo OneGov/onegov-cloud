@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.8.2 (2019-04-25)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes browser issues in ZugMap.
   [href]
 
