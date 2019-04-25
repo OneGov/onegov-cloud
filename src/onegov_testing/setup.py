@@ -38,6 +38,7 @@ setup(
         'port-for',
         'pytest>=3.0.6',
         'pytest-redis',
+        'urllib3<1.25',
         'splinter',
         'webdriver-manager',
         'testing.postgresql',
