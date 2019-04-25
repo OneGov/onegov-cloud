@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Hides inactive users in manual billing form.
+  [href]
+
 - Resolves being unable to switch to paying the organizer directly.
   [href]
 

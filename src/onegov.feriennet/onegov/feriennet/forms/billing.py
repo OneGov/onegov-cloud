@@ -1,7 +1,8 @@
 from onegov.feriennet import _
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
-from onegov.user import UserCollection
+from onegov.user import User, UserCollection
+from sqlalchemy import func
 from wtforms.fields import BooleanField, RadioField, SelectField, StringField
 from wtforms.fields.html5 import DecimalField
 from wtforms.validators import InputRequired
@@ -89,12 +90,17 @@ class ManualBookingForm(Form):
         return self.booking_text.data
 
     @property
+    def available_usernames(self):
+        return self.usercollection.query()\
+            .with_entities(User.username, User.realname)\
+            .filter(func.trim(func.coalesce(User.realname, "")) != "")\
+            .filter(User.active == True)\
+            .order_by(func.unaccent(func.lower(User.realname)))
+
+    @property
     def users(self):
         if self.target.data == 'all':
-            return tuple(
-                username for (username, realname)
-                in self.usercollection.usernames if realname
-            )
+            return tuple(u.username for u in self.available_usernames)
 
         elif self.target.data == 'for-user':
             return (self.username.data, )
@@ -131,9 +137,6 @@ class ManualBookingForm(Form):
             (t, t) for t in self.usercollection.tags)
 
     def load_usernames(self):
-        # non-realname accounts cannot have invoices
         self.username.choices = tuple(
-            (username, realname) for username, realname
-            in self.usercollection.usernames
-            if realname
+            (u.username, u.realname) for u in self.available_usernames
         )
