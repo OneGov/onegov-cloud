@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.6.5 (2019-04-25)
+~~~~~~~~~~~~~~~~~~~
 
 - Hides inactive users in manual billing form.
   [href]
