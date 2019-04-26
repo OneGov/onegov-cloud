@@ -65,7 +65,9 @@ class CreateInvoicesForm(Form):
             Municipality.meta['bfs_number'].label('bfs_number'),
         )
         query = query.order_by(unaccent(Municipality.name))
-        self.municipality_id.choices = [('-', '-')]
+        self.municipality_id.choices = [
+            ('-', self.request.translate(_("For all municipalities")))
+        ]
         self.municipality_id.choices += [
             (r.id.hex, f"{r.name} ({r.bfs_number})") for r in query
         ]

@@ -65,8 +65,8 @@ def test_views_invoices(client):
         assert "456" in invoice
         assert "789" in invoice
         assert "2019-01-02" in invoice
-        assert "54000" in invoice
-        assert "70000000" in invoice
+        assert "-00000000000006000" in invoice
+        assert "+00000000070000000" in invoice
 
 
 @patch.object(CoreRequest, 'assert_valid_csrf_token')

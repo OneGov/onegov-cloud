@@ -17,9 +17,8 @@ class Invoice(object):
         self.revenue_account = None
 
     def export(self, file):
-        csv = writer(file)
+        csv = writer(file, delimiter=';')
         now = datetime.now()
-        current_date_1 = f'{now:%Y%m%d}1'
         current_date = f'{now:%Y-%m-%d}'
         current_time = f'{now:%H.%M.%S}'
 
@@ -38,43 +37,42 @@ class Invoice(object):
             ScanJob.delivery_number
         )
 
-        count = 1
-        last_gpn_number = None
+        item_number = 1
+        municipality_count = 0
+        last_municipality = None
         for scan_job in query:
             municipality = scan_job.municipality
-            gpn_number = municipality.gpn_number
-            gpn_number = str(gpn_number) if gpn_number is not None else ''
-            count = count + 1 if gpn_number == last_gpn_number else 1
-            last_gpn_number = gpn_number
-            address_supplement = municipality.address_supplement or ''
-            price_per_quantity = municipality.price_per_quantity
-            price_per_quantity = str(int(price_per_quantity * 10000000))
-            # todo: this seems to be wrong
-            tax_forms = (
-                (scan_job.dispatch_tax_forms or 0)
-                - (scan_job.return_unscanned_tax_forms or 0)
-            )
+            if municipality == last_municipality:
+                item_number += 1
+            else:
+                item_number = 1
+                municipality_count += 1
+
             csv.writerow((
-                current_date_1,
+                f'{now:%Y%m%d}{municipality_count}',
                 current_date,
                 current_time,
-                gpn_number,
-                str(count),
-                gpn_number,
+                f'{municipality.gpn_number:08}',
+                f'{item_number:05}',
+                f'{municipality.gpn_number:08}',
                 self.subject,
-                str(count),
+                f'{item_number:05}',
+                f'{item_number:03}',
                 current_date,
                 current_date,
                 current_date,
-                gpn_number,
-                str(tax_forms * 1000),
+                f'{municipality.gpn_number:08}',
+                f'{int((scan_job.return_scanned_tax_forms or 0) * 1000):+018}',
                 f'Lieferscheinnummer {scan_job.delivery_number}',
-                price_per_quantity,
-                price_per_quantity,
+                f'{int(municipality.price_per_quantity * 10000000):+018}',
+                f'{int(municipality.price_per_quantity * 10000000):+018}',
                 '1',
                 current_date,
-                address_supplement,
+                municipality.address_supplement or '',
                 self.cs2_user,
+                '000',
                 self.accounting_unit,
                 self.revenue_account,
             ))
+
+            last_municipality = municipality

@@ -899,7 +899,7 @@ def test_create_invoices_form(session):
     form.request = Request(session)
     form.on_request()
     assert form.municipality_id.choices == [
-        ('-', '-'),
+        ('-', 'For all municipalities'),
         (adlikon.id.hex, 'Adlikon (21)'),
         (aesch.id.hex, 'Aesch (241)')
     ]

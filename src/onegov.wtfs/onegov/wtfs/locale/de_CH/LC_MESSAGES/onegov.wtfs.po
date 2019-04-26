@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-23 17:06+0200\n"
-"PO-Revision-Date: 2019-04-23 17:06+0200\n"
+"POT-Creation-Date: 2019-04-26 10:33+0200\n"
+"PO-Revision-Date: 2019-04-26 10:33+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -202,14 +202,14 @@ msgstr "CS2 Benutzer"
 msgid "Subject"
 msgstr "Betreff"
 
-msgid "Price per quantity"
-msgstr "Preis pro Menge"
-
 msgid "Accounting unit"
 msgstr "Kostenstelle"
 
 msgid "Revenue account"
 msgstr "Erlöskonto"
+
+msgid "For all municipalities"
+msgstr "Für alle Gemeinden"
 
 #, python-format
 msgid "Scan job no. ${number}"
@@ -427,6 +427,9 @@ msgstr "Passwort vergessen?"
 
 msgid "Reset password"
 msgstr "Passwort zurücksetzen"
+
+msgid "Price per quantity"
+msgstr "Preis pro Menge"
 
 msgid "Pick-up dates"
 msgstr "Abholtermine"
