@@ -75,7 +75,7 @@ Name|Beschreibung
 `list_name`|Name der Liste des Kandidierenden. Nur bei Proporzwahlen.
 `list_id`|ID der Liste des Kandidierenden. Nur bei Proporzwahlen.
 `list_number_of_mandates`|Gesamte Anzahl der Mandate der Liste. Nur bei Proporzwahlen.
-`list_votes`|Gesamte Anzahl der Listenstimmen. Nur bei Proporzwahlen.
+`list_votes`|Anzahl der Listenstimmen pro Gemeinde. Nur bei Proporzwahlen.
 `list_connection`|ID der Listenverbindung. Nur bei Proporzwahlen.
 `list_connection_parent`|ID der übergeordneten Listenverbidnung. Nur bei Proporzwahlen und falls es sich um eine Unterlistenverbindung handelt.
 `candidate_id`|ID des Kandidierenden.

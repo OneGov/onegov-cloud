@@ -75,7 +75,7 @@ Nome|Descrizione
 `list_name`|Nome della lista di candidati. Solo con elezioni con sistema proporzionale.
 `list_id`|ID della lista del candidato. Solo con elezioni con sistema proporzionale.
 `list_number_of_mandates`|Numero totale di mandati della lista. Solo con elezioni con sistema proporzionale.
-`list_votes`|Numero totale di voti di lista. Solo con elezioni con sistema proporzionale.
+`list_votes`|Numero di voti di lista per comune. Solo con elezioni con sistema proporzionale.
 `list_connection`|ID dell'apparentamento della lista. Solo con elezioni con sistema proporzionale.
 `list_connection_parent`|ID dell'apparentamento della lista di livello superiore. Solo con elezioni con sistema proporzionale e se è un apparentamento con una sottolista.
 `candidate_id`|ID del candidato.

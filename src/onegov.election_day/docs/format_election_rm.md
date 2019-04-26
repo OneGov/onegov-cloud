@@ -75,7 +75,7 @@ Num|Descripziun
 `list_name`|Num da la glista da la candidata u dal candidat. Mo tar elecziuns da proporz.
 `list_id`|ID da la glista da la candidata u dal candidat. Mo tar elecziuns da proporz.
 `list_number_of_mandates`|Dumber total da mandats da la glista. Mo tar elecziuns da proporz.
-`list_votes`|Dumber total da vuschs da la glista. Mo tar elecziuns da proporz.
+`list_votes`|Dumber a vuschs da la glista. Mo tar elecziuns da proporz.
 `list_connection`|ID da la colliaziun da glistas. Mo tar elecziuns da proporz.
 `list_connection_parent`|ID da la colliaziun da glistas surordinada. Mo tar elecziuns da proporz e sch'i sa tracta d'ina sutcolliaziun da glistas.
 `candidate_id`|La ID da la candidata u dal candidat.
