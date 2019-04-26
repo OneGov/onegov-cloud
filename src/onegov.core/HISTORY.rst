@@ -1,5 +1,12 @@
 Changelog
 ---------
+
+- Fixes transfer not working in certain cases.
+  [href]
+
+- Improves CSV handling.
+  [msom]
+
 0.78.2 (2019-04-23)
 ~~~~~~~~~~~~~~~~~~~
 
