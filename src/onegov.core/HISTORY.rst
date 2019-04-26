@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.78.3 (2019-04-26)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes transfer not working in certain cases.
   [href]
