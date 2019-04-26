@@ -26,9 +26,9 @@
                     </dd>
 
                     <dt i18n:translate>Pick-up dates</dt>
-                    <dd tal:repeat="date layout.model.pickup_dates">
-                        ${layout.format_date(date.date, 'date')}
-                    </dd>
+                    <tal:block tal:repeat="date layout.model.pickup_dates">
+                        <dd tal:condition="(layout.current_year-date.date.year)<2">${layout.format_date(date.date, 'date')}</dd>
+                    </tal:block>
                 </dl>
             </div>
         </div>

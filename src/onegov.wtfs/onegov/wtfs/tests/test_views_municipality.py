@@ -1,6 +1,7 @@
 from onegov.core.request import CoreRequest
 from unittest.mock import patch
 from webtest.forms import Upload
+from freezegun import freeze_time
 
 
 def test_views_municipality(client):
@@ -46,14 +47,18 @@ def test_views_municipality(client):
     )
     uploaded = upload.form.submit().follow()
     assert "Gemeindedaten importiert." in uploaded
-    assert "12.02.2015" in client.get('/municipalities').click("Aesch")
+    with freeze_time("2016-01-01"):
+        assert "12.02.2015" in client.get('/municipalities').click("Aesch")
+    with freeze_time("2018-01-01"):
+        assert "12.02.2015" not in client.get('/municipalities').click("Aesch")
 
     # Delete some dates
     clear = client.get('/municipalities').click("Aesch")\
         .click("Abholtermine löschen")
     cleared = clear.form.submit().follow()
     assert "Abholtermine gelöscht." in cleared
-    assert "12.02.2015" not in client.get('/municipalities').click("Aesch")
+    with freeze_time("2016-01-01"):
+        assert "12.02.2015" not in client.get('/municipalities').click("Aesch")
 
     # Delete the municipality
     deleted = client.get('/municipalities').click("Aesch").click("Löschen")

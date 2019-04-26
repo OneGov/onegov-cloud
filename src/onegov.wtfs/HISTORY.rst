@@ -4,6 +4,9 @@ Changelog
 - Adjusts invoice export.
   [msom]
 
+- Hides old pickup dates in the municipality view.
+  [msom]
+
 1.1.3 (2019-04-24)
 ~~~~~~~~~~~~~~~~~~~
 
