@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.1.4 (2019-04-26)
+~~~~~~~~~~~~~~~~~~~
 
 - Adjusts invoice export.
   [msom]
