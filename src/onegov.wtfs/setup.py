@@ -40,7 +40,6 @@ setup(
         'onegov.shared>=0.3.0',
         'onegov.user',
         'python-dateutil',
-        'raven',
         'requests',
         'rjsmin',
     ],
