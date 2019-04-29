@@ -5,7 +5,6 @@ import os
 
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
-from onegov.election_day import log
 from onegov.election_day.models import ArchivedResult
 from onegov.election_day.utils import add_local_results
 from onegov.election_day.utils.d3_renderer import D3Renderer
@@ -13,7 +12,6 @@ from onegov.election_day.utils.pdf_generator import PdfGenerator
 from onegov.election_day.utils.sms_processor import SmsQueueProcessor
 from onegov.election_day.utils.svg_generator import SvgGenerator
 from pathlib import Path
-from raven import Client
 
 
 cli = command_group()
@@ -40,8 +38,7 @@ def add(group_context):
 
 @cli.command()
 @pass_group_context
-@click.option('--sentry')
-def fetch(group_context, sentry):
+def fetch(group_context):
     """ Fetches the results from other instances as defined in the
         principal.yml. Only fetches results from the same namespace.
 
@@ -53,41 +50,31 @@ def fetch(group_context, sentry):
         if not app.principal:
             return
 
-        try:
-            local_session = app.session()
-            assert local_session.info['schema'] == app.schema
+        local_session = app.session()
+        assert local_session.info['schema'] == app.schema
 
-            for key in app.principal.fetch:
-                schema = '{}-{}'.format(app.namespace, key)
-                assert schema in app.session_manager.list_schemas()
-                app.session_manager.set_current_schema(schema)
-                remote_session = app.session_manager.session()
-                assert remote_session.info['schema'] == schema
+        for key in app.principal.fetch:
+            schema = '{}-{}'.format(app.namespace, key)
+            assert schema in app.session_manager.list_schemas()
+            app.session_manager.set_current_schema(schema)
+            remote_session = app.session_manager.session()
+            assert remote_session.info['schema'] == schema
 
-                items = local_session.query(ArchivedResult)
-                items = items.filter_by(schema=schema)
+            items = local_session.query(ArchivedResult)
+            items = items.filter_by(schema=schema)
+            for item in items:
+                local_session.delete(item)
+
+            for domain in app.principal.fetch[key]:
+                items = remote_session.query(ArchivedResult)
+                items = items.filter_by(schema=schema, domain=domain)
                 for item in items:
-                    local_session.delete(item)
-
-                for domain in app.principal.fetch[key]:
-                    items = remote_session.query(ArchivedResult)
-                    items = items.filter_by(schema=schema, domain=domain)
-                    for item in items:
-                        new_item = ArchivedResult()
-                        new_item.copy_from(item)
-                        add_local_results(
-                            item, new_item, app.principal, remote_session
-                        )
-                        local_session.add(new_item)
-
-        except Exception as e:
-            log.error(
-                "An exception happened while fetching results",
-                exc_info=True
-            )
-            if sentry:
-                Client(sentry).captureException()
-            raise(e)
+                    new_item = ArchivedResult()
+                    new_item.copy_from(item)
+                    add_local_results(
+                        item, new_item, app.principal, remote_session
+                    )
+                    local_session.add(new_item)
 
     return fetch_results
 
@@ -96,9 +83,8 @@ def fetch(group_context, sentry):
 @click.argument('username')
 @click.argument('password')
 @click.option('--originator')
-@click.option('--sentry')
 @pass_group_context
-def send_sms(group_context, username, password, originator, sentry):
+def send_sms(group_context, username, password, originator):
     """ Sends the SMS in the smsdir for a given instance. For example:
 
         onegov-election-day --select '/onegov_election_day/zg' send_sms
@@ -120,15 +106,13 @@ def send_sms(group_context, username, password, originator, sentry):
                         path,
                         username,
                         password,
-                        sentry,
                         originator
                     )
                     qp.send_messages()
 
 
 @cli.command('generate-media')
-@click.option('--sentry')
-def generate_media(sentry):
+def generate_media():
     """ Generates the PDF and/or SVGs for the selected instances. For example:
 
         onegov-election-day --select '/onegov_election_day/zg' generate-media
@@ -149,18 +133,9 @@ def generate_media(sentry):
         except FileExistsError:
             return
         else:
-            try:
-                renderer = D3Renderer(app)
-                SvgGenerator(app, renderer).create_svgs()
-                PdfGenerator(app, renderer).create_pdfs()
-            except Exception as e:
-                log.error(
-                    "An exception happened while generating media files",
-                    exc_info=True
-                )
-                if sentry:
-                    Client(sentry).captureException()
-                raise(e)
+            renderer = D3Renderer(app)
+            SvgGenerator(app, renderer).create_svgs()
+            PdfGenerator(app, renderer).create_pdfs()
         finally:
             lockfile.unlink()
 

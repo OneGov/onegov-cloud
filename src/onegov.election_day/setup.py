@@ -38,7 +38,6 @@ setup(
         'onegov.shared>=0.2.0',
         'onegov.user>=0.17.1',
         'pyyaml',
-        'raven',
         'requests',
         'rjsmin'
     ],

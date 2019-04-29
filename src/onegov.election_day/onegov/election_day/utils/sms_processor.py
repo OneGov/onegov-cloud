@@ -14,7 +14,6 @@ import os
 import stat
 import time
 
-from raven import Client
 from requests import post
 
 
@@ -83,12 +82,10 @@ MAX_SEND_TIME = 60 * 60 * 3
 
 class SmsQueueProcessor(object):
 
-    def __init__(self, path, username, password, sentry_dsn=None,
-                 originator=None):
+    def __init__(self, path, username, password, originator=None):
         self.path = path
         self.username = username
         self.password = password
-        self.sentry_client = Client(sentry_dsn) if sentry_dsn else None
         self.originator = originator or "OneGov"
 
     def _send(self, number, content):
@@ -142,126 +139,116 @@ class SmsQueueProcessor(object):
         head, tail = os.path.split(filename)
         tmp_filename = os.path.join(head, '.sending-' + tail)
         rejected_filename = os.path.join(head, '.rejected-' + tail)
+
+        # perform a series of operations in an attempt to ensure
+        # that no two threads/processes send this message
+        # simultaneously as well as attempting to not generate
+        # spurious failure messages in the log; a diagram that
+        # represents these operations is included in a
+        # comment above this class
         try:
-            # perform a series of operations in an attempt to ensure
-            # that no two threads/processes send this message
-            # simultaneously as well as attempting to not generate
-            # spurious failure messages in the log; a diagram that
-            # represents these operations is included in a
-            # comment above this class
-            try:
-                # find the age of the tmp file (if it exists)
-                mtime = os.stat(tmp_filename)[stat.ST_MTIME]
-            except OSError as e:
-                if e.errno == errno.ENOENT:
-                    # file does not exist
-                    # the tmp file could not be stated because it
-                    # doesn't exist, that's fine, keep going
-                    age = None
-                else:
-                    # the tmp file could not be stated for some reason
-                    # other than not existing; we'll report the error
-                    raise
+            # find the age of the tmp file (if it exists)
+            mtime = os.stat(tmp_filename)[stat.ST_MTIME]
+        except OSError as e:
+            if e.errno == errno.ENOENT:
+                # file does not exist
+                # the tmp file could not be stated because it
+                # doesn't exist, that's fine, keep going
+                age = None
             else:
-                age = time.time() - mtime
+                # the tmp file could not be stated for some reason
+                # other than not existing; we'll report the error
+                raise
+        else:
+            age = time.time() - mtime
 
-            # if the tmp file exists, check it's age
-            if age is not None:
-                try:
-                    if age > MAX_SEND_TIME:
-                        # the tmp file is "too old"; this suggests
-                        # that during an attemt to send it, the
-                        # process died; remove the tmp file so we
-                        # can try again
-                        os.remove(tmp_filename)
-                    else:
-                        # the tmp file is "new", so someone else may
-                        # be sending this message, try again later
-                        return
-                    # if we get here, the file existed, but was too
-                    # old, so it was unlinked
-                except OSError as e:
-                    if e.errno == errno.ENOENT:
-                        # file does not exist
-                        # it looks like someone else removed the tmp
-                        # file, that's fine, we'll try to deliver the
-                        # message again later
-                        return
-
-            # now we know that the tmp file doesn't exist, we need to
-            # "touch" the message before we create the tmp file so the
-            # mtime will reflect the fact that the file is being
-            # processed (there is a race here, but it's OK for two or
-            # more processes to touch the file "simultaneously")
+        # if the tmp file exists, check it's age
+        if age is not None:
             try:
-                os.utime(filename, None)
-            except OSError as e:
-                if e.errno == errno.ENOENT:
-                    # file does not exist
-                    # someone removed the message before we could
-                    # touch it, no need to complain, we'll just keep
-                    # going
+                if age > MAX_SEND_TIME:
+                    # the tmp file is "too old"; this suggests
+                    # that during an attemt to send it, the
+                    # process died; remove the tmp file so we
+                    # can try again
+                    os.remove(tmp_filename)
+                else:
+                    # the tmp file is "new", so someone else may
+                    # be sending this message, try again later
                     return
-                else:
-                    # Some other error, propogate it
-                    raise
-
-            # creating this hard link will fail if another process is
-            # also sending this message
-            try:
-                os.link(filename, tmp_filename)
+                # if we get here, the file existed, but was too
+                # old, so it was unlinked
             except OSError as e:
-                if e.errno == errno.EEXIST:
-                    # file exists, *nix
-                    # it looks like someone else is sending this
-                    # message too; we'll try again later
+                if e.errno == errno.ENOENT:
+                    # file does not exist
+                    # it looks like someone else removed the tmp
+                    # file, that's fine, we'll try to deliver the
+                    # message again later
                     return
-                else:
-                    # Some other error, propogate it
-                    raise
 
-            # read message file and send contents
-            number, message = self._parseMessage(filename)
-            if number and message:
-                self._send(number, message)
+        # now we know that the tmp file doesn't exist, we need to
+        # "touch" the message before we create the tmp file so the
+        # mtime will reflect the fact that the file is being
+        # processed (there is a race here, but it's OK for two or
+        # more processes to touch the file "simultaneously")
+        try:
+            os.utime(filename, None)
+        except OSError as e:
+            if e.errno == errno.ENOENT:
+                # file does not exist
+                # someone removed the message before we could
+                # touch it, no need to complain, we'll just keep
+                # going
+                return
             else:
-                log.error(
-                    "Discarding SMS {} due to invalid content/number".format(
-                        filename
-                    )
-                )
-                os.link(filename, rejected_filename)
+                # Some other error, propogate it
+                raise
 
-            try:
-                os.remove(filename)
-            except OSError as e:
-                if e.errno == errno.ENOENT:
-                    # file does not exist
-                    # someone else unlinked the file; oh well
-                    pass
-                else:
-                    # something bad happend, log it
-                    raise
-
-            try:
-                os.remove(tmp_filename)
-            except OSError as e:
-                if e.errno == errno.ENOENT:
-                    # file does not exist
-                    # someone else unlinked the file; oh well
-                    pass
-                else:
-                    # something bad happened, log it
-                    raise
-
-            log.info("SMS to {} sent.".format(number))
-
-        # Catch errors and log them here
-        except Exception:
-            if self.sentry_client:
-                self.sentry_client.captureException()
+        # creating this hard link will fail if another process is
+        # also sending this message
+        try:
+            os.link(filename, tmp_filename)
+        except OSError as e:
+            if e.errno == errno.EEXIST:
+                # file exists, *nix
+                # it looks like someone else is sending this
+                # message too; we'll try again later
+                return
             else:
-                log.error(
-                    "Error while sending SMS {}".format(filename),
-                    exc_info=True
+                # Some other error, propogate it
+                raise
+
+        # read message file and send contents
+        number, message = self._parseMessage(filename)
+        if number and message:
+            self._send(number, message)
+        else:
+            log.error(
+                "Discarding SMS {} due to invalid content/number".format(
+                    filename
                 )
+            )
+            os.link(filename, rejected_filename)
+
+        try:
+            os.remove(filename)
+        except OSError as e:
+            if e.errno == errno.ENOENT:
+                # file does not exist
+                # someone else unlinked the file; oh well
+                pass
+            else:
+                # something bad happend, log it
+                raise
+
+        try:
+            os.remove(tmp_filename)
+        except OSError as e:
+            if e.errno == errno.ENOENT:
+                # file does not exist
+                # someone else unlinked the file; oh well
+                pass
+            else:
+                # something bad happened, log it
+                raise
+
+        log.info("SMS to {} sent.".format(number))

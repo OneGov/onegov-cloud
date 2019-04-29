@@ -283,6 +283,13 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager, redis_url):
 
 def test_send_sms(postgres_dsn, temporary_directory, redis_url):
 
+    class DummyResponse(object):
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {'StatusInfo': 'OK', 'StatusCode': '1'}
+
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
     write_config(cfg_path, postgres_dsn, temporary_directory, redis_url)
     write_principal(temporary_directory, 'Govikon')
@@ -293,14 +300,18 @@ def test_send_sms(postgres_dsn, temporary_directory, redis_url):
     )
     os.makedirs(sms_path)
 
-    # no sms yet
+    # no SMS yet
     send_sms = ['send-sms', 'username', 'password']
     assert run_command(cfg_path, 'govikon', send_sms).exit_code == 0
 
+    # add a SMS
     with open(os.path.join(sms_path, '+417772211.000000'), 'w') as f:
         f.write('Fancy new results!')
 
-    with patch('onegov.election_day.utils.sms_processor.post') as post:
+    with patch(
+        'onegov.election_day.utils.sms_processor.post',
+        return_value=DummyResponse()
+    ) as post:
         assert run_command(cfg_path, 'govikon', send_sms).exit_code == 0
         assert post.called
         assert post.call_args[0] == (
