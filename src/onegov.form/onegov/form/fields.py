@@ -1,5 +1,6 @@
 import inspect
 import phonenumbers
+import sedate
 
 from onegov.core.html import sanitize_html
 from onegov.core.utils import binary_to_dictionary
@@ -22,6 +23,7 @@ from wtforms import widgets
 from wtforms.fields import Field
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
+from wtforms.fields.html5 import DateTimeField
 
 
 class MultiCheckboxField(SelectMultipleField):
@@ -246,3 +248,29 @@ class PreviewField(Field):
 
     def populate_obj(self, obj, name):
         pass
+
+
+class TimezoneDateTimeField(DateTimeField):
+    """ A datetime field data returns the date with the given timezone
+    and expects dateime values with a timezone.
+
+    Used together with :class:`onegov.core.orm.types.UTCDateTime`.
+
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.timezone = kwargs.pop('timezone')
+        super().__init__(*args, **kwargs)
+
+    def process_data(self, value):
+        if value:
+            value = sedate.to_timezone(value, self.timezone)
+            value.replace(tzinfo=None)
+
+        super().process_data(value)
+
+    def process_formdata(self, valuelist):
+        super().process_formdata(valuelist)
+
+        if self.data:
+            self.data = sedate.replace_timezone(self.data, self.timezone)

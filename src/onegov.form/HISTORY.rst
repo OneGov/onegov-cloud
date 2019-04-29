@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a timezone-aware datetime field.
+  [href]
+
 0.46.1 (2019-04-22)
 ~~~~~~~~~~~~~~~~~~~
 
