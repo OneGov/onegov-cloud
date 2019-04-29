@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.13.2 (2019-04-29)
+~~~~~~~~~~~~~~~~~~~
 
 - Refactors send SMS command.
   [msom]
