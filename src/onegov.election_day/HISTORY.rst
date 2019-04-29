@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.13.1 (2019-04-29)
+~~~~~~~~~~~~~~~~~~~
 
 - Removes sentry integration.
   [msom]

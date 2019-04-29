@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 name = 'onegov.election_day'
-version = '3.13.0'
+version = '3.13.1'
 
 
 def get_long_description():
