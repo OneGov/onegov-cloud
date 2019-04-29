@@ -92,23 +92,19 @@ def send_sms(group_context, username, password, originator):
 
     """
 
-    schemas = list(group_context.matches)
-    for appcfg in group_context.appcfgs:
-        sms_dir = appcfg.configuration.get('sms_directory')
-        if not sms_dir:
-            continue
+    def send(request, app):
+        if 'sms_directory' in app.configuration:
+            path = os.path.join(app.configuration['sms_directory'], app.schema)
+            if os.path.exists(path):
+                qp = SmsQueueProcessor(
+                    path,
+                    username,
+                    password,
+                    originator
+                )
+                qp.send_messages()
 
-        for schema in group_context.available_schemas(appcfg):
-            if '/' + schema.replace('-', '/') in schemas:
-                path = os.path.join(sms_dir, schema)
-                if os.path.exists(path):
-                    qp = SmsQueueProcessor(
-                        path,
-                        username,
-                        password,
-                        originator
-                    )
-                    qp.send_messages()
+    return send
 
 
 @cli.command('generate-media')
