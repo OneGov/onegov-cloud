@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Removes unused depdency.
+  [msom]
+
 0.0.49 (2019-04-08)
 ~~~~~~~~~~~~~~~~~~~
 
