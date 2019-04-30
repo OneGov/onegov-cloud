@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.51 (2019-04-30)
+~~~~~~~~~~~~~~~~~~~
 
 - Enables sentry in CLI commands.
   [msom]
