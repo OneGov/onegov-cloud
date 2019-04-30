@@ -2,6 +2,7 @@ from onegov.core.collection import Pagination
 from onegov.core.orm.func import unaccent
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import ScanJob
+from sqlalchemy import func
 from sqlalchemy import or_
 
 
@@ -43,8 +44,19 @@ class ScanJobCollection(Pagination):
         self.sort_by = sort_by
         self.sort_order = sort_order
 
+    def next_delivery_number(self, municipality_id):
+        """ Returns the next delivery number for the given municipality. """
+        query = self.session.query(func.max(ScanJob.delivery_number))
+        query = query.filter_by(municipality_id=municipality_id)
+        return (query.scalar() or 0) + 1
+
     def add(self, **kwargs):
         """ Adds a new scan job. """
+
+        if 'delivery_number' not in kwargs:
+            kwargs['delivery_number'] = self.next_delivery_number(
+                kwargs.get('municipality_id')
+            )
 
         scan_job = ScanJob(**kwargs)
         self.session.add(scan_job)

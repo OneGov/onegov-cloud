@@ -98,6 +98,18 @@ def test_scan_jobs(session):
         )
 
     assert [s.dispatch_date.day for s in scan_jobs.query()] == [4, 3, 2, 1]
+    assert [s.delivery_number for s in scan_jobs.query()] == [3, 4, 1, 2]
+
+    municipality = municipalities.add(name='Adlikon', bfs_number=21)
+    scan_jobs.add(
+        type='normal',
+        municipality_id=municipality.id,
+        dispatch_date=date(2019, 1, 5)
+    )
+    assert [s.delivery_number for s in scan_jobs.query()] == [1, 3, 4, 1, 2]
+
+    assert scan_jobs.next_delivery_number(None) == 1
+    assert scan_jobs.next_delivery_number(municipality.id) == 2
 
 
 def test_scan_jobs_default():
@@ -242,16 +254,22 @@ def test_scan_jobs_query(session):
 
 
 def test_scan_jobs_order(session):
+    scan_jobs = ScanJobCollection(session)
     for day, name in ((3, 'First'), (1, 'Śecond'), (2, 'Phirrrrd')):
         municipality = MunicipalityCollection(session).add(
             name=name,
             bfs_number=day,
         )
-        ScanJobCollection(session).add(
+        scan_jobs.add(
             dispatch_date=date(2019, 1, day),
             type='normal',
             municipality_id=municipality.id,
         )
+    scan_jobs.add(
+        dispatch_date=date(2019, 1, 4),
+        type='normal',
+        municipality_id=municipality.id,
+    )
 
     def collection(sort_by=None, sort_order=None):
         return ScanJobCollection(
@@ -289,33 +307,33 @@ def test_scan_jobs_order(session):
     assert scan_jobs.current_sort_order == 'descending'
     assert 'dispatch_date' in str(scan_jobs.order_by)
     assert 'DESC' in str(scan_jobs.order_by)
-    assert [s.dispatch_date.day for s in scan_jobs.query()] == [3, 2, 1]
+    assert [s.dispatch_date.day for s in scan_jobs.query()] == [4, 3, 2, 1]
 
     scan_jobs = scan_jobs.by_order('dispatch_date')
     assert scan_jobs.current_sort_by == 'dispatch_date'
     assert scan_jobs.current_sort_order == 'ascending'
     assert 'dispatch_date' in str(scan_jobs.order_by)
-    assert [s.dispatch_date.day for s in scan_jobs.query()] == [1, 2, 3]
+    assert [s.dispatch_date.day for s in scan_jobs.query()] == [1, 2, 3, 4]
 
     scan_jobs = scan_jobs.by_order('delivery_number')
     assert scan_jobs.current_sort_by == 'delivery_number'
     assert scan_jobs.current_sort_order == 'ascending'
     assert 'delivery_number' in str(scan_jobs.order_by)
-    assert [s.delivery_number for s in scan_jobs.query()] == [1, 2, 3]
+    assert [s.delivery_number for s in scan_jobs.query()] == [1, 1, 1, 2]
 
     scan_jobs = scan_jobs.by_order('delivery_number')
     assert scan_jobs.current_sort_by == 'delivery_number'
     assert scan_jobs.current_sort_order == 'descending'
     assert 'delivery_number' in str(scan_jobs.order_by)
     assert 'DESC' in str(scan_jobs.order_by)
-    assert [s.delivery_number for s in scan_jobs.query()] == [3, 2, 1]
+    assert [s.delivery_number for s in scan_jobs.query()] == [2, 1, 1, 1]
 
     scan_jobs = scan_jobs.by_order('municipality_id')
     assert scan_jobs.current_sort_by == 'municipality_id'
     assert scan_jobs.current_sort_order == 'ascending'
     assert 'name' in str(scan_jobs.order_by)
     assert [s.municipality.name for s in scan_jobs.query()] == [
-        'First', 'Phirrrrd', 'Śecond'
+        'First', 'Phirrrrd', 'Phirrrrd', 'Śecond'
     ]
 
     scan_jobs = scan_jobs.by_order('municipality_id')
@@ -324,7 +342,7 @@ def test_scan_jobs_order(session):
     assert 'name' in str(scan_jobs.order_by)
     assert 'DESC' in str(scan_jobs.order_by)
     assert [s.municipality.name for s in scan_jobs.query()] == [
-        'Śecond', 'Phirrrrd', 'First'
+        'Śecond', 'Phirrrrd', 'Phirrrrd', 'First'
     ]
 
     scan_jobs = scan_jobs.by_order(None)

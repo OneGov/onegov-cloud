@@ -76,6 +76,9 @@ def add_scan_job_unrestricted(self, request, form):
     if form.submitted(request):
         scan_job = ScanJob()
         form.update_model(scan_job)
+        scan_job.delivery_number = self.next_delivery_number(
+            scan_job.municipality_id
+        )
         request.session.add(scan_job)
         request.message(_("Scan job added."), 'success')
         return redirect(layout.success_url)
@@ -106,6 +109,9 @@ def add_scan_job(self, request, form):
     if form.submitted(request):
         scan_job = ScanJob()
         form.update_model(scan_job)
+        scan_job.delivery_number = self.next_delivery_number(
+            scan_job.municipality_id
+        )
         request.session.add(scan_job)
         request.message(_("Scan job added."), 'success')
 

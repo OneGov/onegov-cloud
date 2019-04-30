@@ -10,7 +10,6 @@ from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import Integer
-from sqlalchemy import Sequence
 from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref
@@ -46,7 +45,6 @@ class ScanJob(Base, TimestampMixin, ContentMixin):
     #: The delivery number.
     delivery_number = Column(
         Integer,
-        Sequence('delivery_number_seq', metadata=Base.metadata),
         nullable=False
     )
 

@@ -7,6 +7,9 @@ Changelog
 - Fixes dispatch and return note not present in delivery note.
   [msom]
 
+- Increments delivery numbers by municipality, not globally.
+  [msom]
+
 1.1.6 (2019-04-30)
 ~~~~~~~~~~~~~~~~~~~
 

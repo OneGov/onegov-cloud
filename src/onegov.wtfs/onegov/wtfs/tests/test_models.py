@@ -94,6 +94,7 @@ def test_scan_job(session):
         ScanJob(
             type='normal',
             municipality_id=municipality.id,
+            delivery_number=1,
             dispatch_date=date(2019, 1, 1),
             dispatch_note='Dispatch note',
             dispatch_boxes=1,
@@ -243,6 +244,7 @@ def add_report_data(session):
         },
     }
 
+    delivery_number = 1
     for name, values in data.items():
         session.add(Municipality(
             name=name,
@@ -255,6 +257,7 @@ def add_report_data(session):
                 ScanJob(
                     type='normal',
                     municipality_id=values['municipality_id'],
+                    delivery_number=delivery_number,
                     dispatch_date=job[0],
                     dispatch_boxes=job[1],
                     dispatch_cantonal_tax_office=job[2],
@@ -275,6 +278,7 @@ def add_report_data(session):
                     return_boxes=job[5],
                 )
             )
+            delivery_number += 1
         session.flush()
     session.flush()
 
@@ -571,6 +575,7 @@ def test_invoice(session):
         ScanJob(
             type='normal',
             municipality_id=adlikon.id,
+            delivery_number=1,
             dispatch_date=date(2018, 12, 10),
             dispatch_boxes=1,
             dispatch_tax_forms_current_year=10,
@@ -595,6 +600,7 @@ def test_invoice(session):
         ScanJob(
             type='normal',
             municipality_id=adlikon.id,
+            delivery_number=2,
             dispatch_date=date(2019, 1, 10),
             dispatch_boxes=2,
             dispatch_tax_forms_current_year=5,
@@ -619,6 +625,7 @@ def test_invoice(session):
         ScanJob(
             type='normal',
             municipality_id=aesch.id,
+            delivery_number=3,
             dispatch_date=date(2019, 1, 7),
             dispatch_boxes=1,
             dispatch_tax_forms_current_year=10,

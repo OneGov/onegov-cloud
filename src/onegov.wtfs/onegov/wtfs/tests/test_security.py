@@ -53,6 +53,7 @@ def test_permissions(wtfs_app, wtfs_password):
     session.add(ScanJob(
         type='normal',
         municipality_id=municipality_a_id,
+        delivery_number=1,
         dispatch_date=date(2019, 1, 1))
     )
     session.add(User(
