@@ -545,9 +545,15 @@ def command_group():
                     pass
 
                 def configure_sentry(self, **cfg):
-                    sentry_js = cfg.get('sentry_js')
-                    if sentry_js:
-                        sentry_sdk.init(sentry_js)
+                    sentry_dsn = cfg.get('sentry_dsn')
+                    sentry_version = cfg.get('sentry_version')
+                    sentry_environment = cfg.get('sentry_environment')
+                    if sentry_dsn and sentry_version and sentry_environment:
+                        sentry_sdk.init(
+                            dsn=sentry_dsn,
+                            release=sentry_version,
+                            environment=sentry_environment,
+                        )
 
             @CliApplication.path(path=view_path)
             class Model(object):
