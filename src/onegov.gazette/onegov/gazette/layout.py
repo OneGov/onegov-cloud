@@ -64,10 +64,6 @@ class Layout(ChameleonLayout):
         return datetime.utcnow().year
 
     @cached_property
-    def sentry_js(self):
-        return self.app.sentry_js
-
-    @cached_property
     def homepage_link(self):
         return self.request.link(self.principal)
 

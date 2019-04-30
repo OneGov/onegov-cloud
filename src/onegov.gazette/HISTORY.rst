@@ -1,5 +1,12 @@
 Changelog
 ---------
+
+- Enables sentry in CLI commands.
+  [msom]
+
+- Replaces Raven JS with Sentry.
+  [msom]
+
 1.23.0 (2019-04-01)
 ~~~~~~~~~~~~~~~~~~~~
 

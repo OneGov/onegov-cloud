@@ -80,9 +80,6 @@ class GazetteApp(Framework, DepotApp, QuillApp, FormApp):
             'primary-color': self.principal.color
         }
 
-    def configure_sentry(self, **cfg):
-        self.sentry_js = cfg.get('sentry_js')
-
 
 @GazetteApp.static_directory()
 def get_static_directory():
