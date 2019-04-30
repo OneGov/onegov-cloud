@@ -186,6 +186,7 @@ is not executed.
 
 import click
 import inspect
+import sentry_sdk
 import sys
 
 from fnmatch import fnmatch
@@ -527,6 +528,7 @@ def command_group():
         # load all applications into the server
         view_path = uuid4().hex
         applications = []
+        # import pdb; pdb.set_trace()
 
         for appcfg in group_context.appcfgs:
 
@@ -542,6 +544,11 @@ def command_group():
                 def configure_debug(self, **cfg):
                     # disable debug options in cli (like query output)
                     pass
+
+                def configure_sentry(self, **cfg):
+                    sentry_js = cfg.get('sentry_js')
+                    if sentry_js:
+                        sentry_sdk.init(sentry_js)
 
             @CliApplication.path(path=view_path)
             class Model(object):

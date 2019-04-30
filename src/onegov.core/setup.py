@@ -72,6 +72,7 @@ setup(
         'redis!=3.1.0',
         'rcssmin',
         'sedate',
+        'sentry_sdk',
         'sqlalchemy>=1.2.4',
         'sqlalchemy-utils',
         'sqlparse',
