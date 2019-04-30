@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Enables sentry in CLI commands.
+  [msom]
+
 - Replaces Raven JS with Sentry.
   [msom]
 
