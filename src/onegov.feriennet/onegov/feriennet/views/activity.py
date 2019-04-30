@@ -496,12 +496,17 @@ def edit_activity(self, request, form):
         new_username = self.username
 
         if old_username != new_username:
+
+            # if there is already a ticket..
             ticket = relevant_ticket(self, request)
 
-            ActivityMessage.create(ticket, request, 'reassign', {
-                'old_username': old_username,
-                'new_username': new_username,
-            })
+            if ticket:
+
+                # ..note the change
+                ActivityMessage.create(ticket, request, 'reassign', {
+                    'old_username': old_username,
+                    'new_username': new_username,
+                })
 
         request.success(_("Your changes were saved"))
 
@@ -642,11 +647,16 @@ def relevant_ticket(activity, request):
     pr = activity.request_by_period(request.app.active_period) \
         or activity.latest_request
 
-    return TicketCollection(request.session).by_handler_id(pr.id.hex)
+    if pr:
+        return TicketCollection(request.session).by_handler_id(pr.id.hex)
 
 
 def administer_activity(model, request, action, template, subject):
     ticket = relevant_ticket(model, request)
+
+    if not ticket:
+        raise RuntimeError(
+            f"No ticket found for {model.name}, when performing {action}")
 
     # execute state change
     getattr(model, action)()
