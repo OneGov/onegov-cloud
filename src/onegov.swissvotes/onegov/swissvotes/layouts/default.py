@@ -118,10 +118,6 @@ class DefaultLayout(ChameleonLayout):
             ))
         return result
 
-    @cached_property
-    def sentry_js(self):
-        return self.app.sentry_js
-
     def format_policy_areas(self, vote):
         paths = [area.label_path for area in vote.policy_areas]
         paths = groupbylist(sorted(paths), key=lambda x: x[0])

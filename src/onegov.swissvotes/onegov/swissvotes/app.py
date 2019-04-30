@@ -16,9 +16,6 @@ class SwissvotesApp(Framework, FormApp, QuillApp, DepotApp):
 
     serve_static_files = True
 
-    def configure_sentry(self, **cfg):
-        self.sentry_js = cfg.get('sentry_js')
-
     @cached_property
     def principal(self):
         return Principal()
