@@ -4,6 +4,9 @@ Changelog
 - Reworks municipality data import.
   [msom]
 
+- Fixes dispatch and return note not present in delivery note.
+  [msom]
+
 1.1.6 (2019-04-30)
 ~~~~~~~~~~~~~~~~~~~
 

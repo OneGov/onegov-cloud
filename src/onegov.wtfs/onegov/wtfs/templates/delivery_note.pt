@@ -56,7 +56,7 @@
                             <td class="center">${layout.model.dispatch_single_documents}</td>
                         </tr>
                         <tr>
-                            <td colspan="5"><span i18n:translate>Note</span>:<br><br><br><br></td>
+                            <td colspan="5" class="top"><span i18n:translate>Note</span>:<br>${layout.model.dispatch_note}</td>
                             <td colspan="3"><span i18n:translate>Signature</span>:<br><br><br><br></td>
                         </tr>
                     </body>
@@ -135,7 +135,7 @@
                             <td class="center">${layout.model.return_scanned_single_documents}</td>
                         </tr>
                         <tr>
-                            <td colspan="4"><span i18n:translate>Note</span>:<br><br><br><br></td>
+                            <td colspan="4" class="top"><span i18n:translate>Note</span>:<br>${layout.model.return_note}</td>
                             <td colspan="3"><span i18n:translate>Signature</span>:<br><br><br><br></td>
                         </tr>
                     </body>
