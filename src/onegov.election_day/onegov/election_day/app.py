@@ -108,12 +108,6 @@ class ElectionDayApp(Framework, FormApp):
         """ A five minute cache for pages. """
         return self.get_cache('pages', expiration_time=300)
 
-    def configure_sentry(self, **cfg):
-        self.sentry_js = cfg.get('sentry_js')
-        self.sentry_dsn = cfg.get('sentry_dsn')
-        self.sentry_version = cfg.get('sentry_version')
-        self.sentry_environment = cfg.get('sentry_environment')
-
 
 @ElectionDayApp.static_directory()
 def get_static_directory():
