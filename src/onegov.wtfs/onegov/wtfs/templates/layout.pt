@@ -25,8 +25,14 @@
     -->
 
     <link rel="stylesheet" type="text/css" href="${layout.static_path}/font-awesome/css/font-awesome.min.css">
-    <script tal:condition="layout.sentry_js" src="https://cdn.ravenjs.com/3.26.1/raven.min.js"></script>
-    <script tal:condition="layout.sentry_js">Raven.config('${layout.sentry_js}').install()</script>
+    <script tal:condition="layout.app.sentry_js" src="https://browser.sentry-cdn.com/5.0.7/bundle.min.js" crossorigin="anonymous"></script>
+    <script tal:condition="layout.app.sentry_js">
+        Sentry.init({
+            dsn: '${layout.app.sentry_js}',
+            release: '${layout.app.sentry_version}',
+            environment: '${layout.app.sentry_environment}',
+        });
+    </script>
     <link rel="stylesheet" type="text/css" href="${request.theme_link}">
 </head>
 <body>

@@ -130,10 +130,6 @@ class DefaultLayout(ChameleonLayout):
         return ''
 
     @cached_property
-    def sentry_js(self):
-        return self.app.sentry_js
-
-    @cached_property
     def current_year(self):
         return date.today().year
 
