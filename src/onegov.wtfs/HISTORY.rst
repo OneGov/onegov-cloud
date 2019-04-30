@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Removes legacy sentry parameter.
+  [msom]
+
 - Enables sentry in CLI commands.
   [msom]
 
