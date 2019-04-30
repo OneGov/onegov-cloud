@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.6.6 (2019-04-30)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes ticket reassignments not working before requesting a publication.
   [href]
