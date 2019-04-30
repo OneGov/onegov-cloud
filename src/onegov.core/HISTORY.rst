@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds sentry configuration setup.
+  [msom]
+
 0.79.0 (2019-04-30)
 ~~~~~~~~~~~~~~~~~~~
 

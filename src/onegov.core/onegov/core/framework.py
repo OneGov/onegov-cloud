@@ -429,6 +429,16 @@ class Framework(
         self.content_security_policy_report_sample_rate\
             = cfg.get('content_security_policy_report_sample_rate', 0.001)
 
+    def configure_sentry(self, **cfg):
+        self.sentry_dsn = cfg.get('sentry_dsn')
+        self.sentry_version = cfg.get('sentry_version')
+        self.sentry_environment = cfg.get('sentry_environment')
+
+        # This is a legacy parameter and should now be the same as sentry_dsn
+        # (sentry_dsn used to include the private key) - it should be removed
+        # in the future.
+        self.sentry_js = cfg.get('sentry_js')
+
     def set_application_id(self, application_id):
         """ Set before the request is handled. Gets the schema from the
         application id and makes sure it exists, *if* a database connection
