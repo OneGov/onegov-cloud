@@ -137,7 +137,3 @@ class DefaultLayout(ChameleonLayout):
         if hasattr(item, 'entity_id'):
             return item.name if item.entity_id else _("Expats")
         return item.name or _("Expats")
-
-    @cached_property
-    def sentry_js(self):
-        return self.app.sentry_js

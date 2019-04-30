@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Replaces Raven JS with Sentry.
+  [msom]
+
 3.13.2 (2019-04-29)
 ~~~~~~~~~~~~~~~~~~~
 

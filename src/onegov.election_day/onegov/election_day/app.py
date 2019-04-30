@@ -110,6 +110,9 @@ class ElectionDayApp(Framework, FormApp):
 
     def configure_sentry(self, **cfg):
         self.sentry_js = cfg.get('sentry_js')
+        self.sentry_dsn = cfg.get('sentry_dsn')
+        self.sentry_version = cfg.get('sentry_version')
+        self.sentry_environment = cfg.get('sentry_environment')
 
 
 @ElectionDayApp.static_directory()
