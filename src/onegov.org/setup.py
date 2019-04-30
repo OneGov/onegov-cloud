@@ -39,7 +39,7 @@ setup(
         'isodate',
         'lxml',
         'onegov.chat',
-        'onegov.core>=0.41.0',
+        'onegov.core>=0.79.1',
         'onegov.directory>=0.4.1',
         'onegov.event>=1.1.0',
         'onegov.file>=0.2.1',
