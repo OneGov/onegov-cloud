@@ -19,7 +19,6 @@ from onegov.gazette.utils import SogcImporter
 from onegov.user import User
 from onegov.user import UserCollection
 from onegov.user import UserGroupCollection
-from raven import Client
 from sedate import standardize_date
 
 
@@ -329,9 +328,8 @@ def import_issues(ctx, file, clear, dry_run, locale, timezone):
 @cli.command(name='import-sogc')
 @click.option('--clear/--no-clear', default=False)
 @click.option('--dry-run/--no-dry-run', default=False)
-@click.option('--sentry')
 @pass_group_context
-def import_sogc(ctx, clear, dry_run, sentry):
+def import_sogc(ctx, clear, dry_run):
     """ Imports from the SOGC. For example:
 
         onegov-gazette --select '/onegov_gazette/zug' import-sogc
@@ -352,12 +350,7 @@ def import_sogc(ctx, clear, dry_run, sentry):
             existing = existing.filter(GazetteNotice.source.isnot(None))
             existing.delete()
 
-        try:
-            count = SogcImporter(session, request.app.principal.sogc_import)()
-        except Exception as e:
-            if sentry:
-                Client(sentry).captureException()
-            raise(e)
+        count = SogcImporter(session, request.app.principal.sogc_import)()
 
         click.secho(f"{count} notice(s) imported", fg='green')
 

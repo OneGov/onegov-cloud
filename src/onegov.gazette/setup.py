@@ -48,7 +48,6 @@ setup(
         'onegov.user>=0.18.0',
         'python-dateutil',
         'pyyaml',
-        'raven',
         'rjsmin',
         'sedate',
         'xlrd',
