@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Reworks municipality data import.
+  [msom]
+
 1.1.6 (2019-04-30)
 ~~~~~~~~~~~~~~~~~~~
 

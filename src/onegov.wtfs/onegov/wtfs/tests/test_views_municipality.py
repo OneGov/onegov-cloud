@@ -42,7 +42,7 @@ def test_views_municipality(client):
     upload = client.get('/municipalities').click("Daten importieren")
     upload.form['file'] = Upload(
         'test.csv',
-        "Gemeinde-Nr,Vordefinierte Termine\n241,12.2.2015".encode('utf-8'),
+        "Gemeinde;241;-1;Normal;12.2.2015".encode('cp1252'),
         'text/csv'
     )
     uploaded = upload.form.submit().follow()

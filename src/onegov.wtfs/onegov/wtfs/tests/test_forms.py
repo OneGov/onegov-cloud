@@ -205,7 +205,7 @@ def test_import_municipality_data_form(session):
 
     field_storage = FieldStorage()
     field_storage.file = BytesIO(
-        "Gemeinde-Nr,Vordefinierte Termine\n21,12.2.2015".encode('utf-8')
+        "Adlikon;21;-1;Normal;12.2.2015".encode('cp1252')
     )
     field_storage.type = 'text/csv'
     field_storage.filename = 'test.csv'

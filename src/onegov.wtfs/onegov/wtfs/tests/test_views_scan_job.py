@@ -11,7 +11,7 @@ def test_views_scan_job(client):
     upload = client.get('/municipalities').click("Daten importieren")
     upload.form['file'] = Upload(
         'test.csv',
-        "Gemeinde-Nr,Vordefinierte Termine\n1,5.1.2019".encode('utf-8'),
+        "Gemeinde;1;-1;Normal;5.1.2019".encode('cp1252'),
         'text/csv'
     )
     assert "Gemeindedaten importiert." in upload.form.submit().follow()
@@ -130,7 +130,7 @@ def test_views_scan_jobs_filter(client):
     upload = client.get('/municipalities').click("Daten importieren")
     upload.form['file'] = Upload(
         'test.csv',
-        "Gemeinde-Nr,Vordefinierte Termine\n1,5.1.2019".encode('utf-8'),
+        "Gemeinde;1;-1;Normal;5.1.2019".encode('cp1252'),
         'text/csv'
     )
     assert "Gemeindedaten importiert." in upload.form.submit().follow()

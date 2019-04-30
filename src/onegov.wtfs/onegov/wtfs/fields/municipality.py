@@ -1,43 +1,41 @@
 from dateutil.parser import parse
+from onegov.form.fields import UploadField
+from onegov.form.validators import FileSizeLimit
+from onegov.form.validators import WhitelistedMimeType
 from onegov.wtfs import _
-from onegov.wtfs.fields.csv import CsvUploadField
 
 
-class MunicipalityDataUploadField(CsvUploadField):
+class MunicipalityDataUploadField(UploadField):
     """ An upload field containg municipality data. """
 
     def __init__(self, *args, **kwargs):
-        kwargs.pop('expected_headers', None)
-        kwargs.pop('rename_duplicate_column_names', None)
-        super().__init__(
-            *args,
-            **kwargs,
-            expected_headers=[
-                'Gemeinde-Nr.',
-                'Vordefinierte Termine',
-            ],
-            rename_duplicate_column_names=True,
-        )
+        kwargs.setdefault('validators', [])
+        kwargs['validators'].append(WhitelistedMimeType({'text/plain', }))
+        kwargs['validators'].append(FileSizeLimit(10 * 1024 * 1024))
+
+        kwargs.setdefault('render_kw', {})
+        kwargs['render_kw']['force_simple'] = True
+
+        super().__init__(*args, **kwargs)
 
     def post_validate(self, form, validation_stopped):
-        super().post_validate(form, validation_stopped)
-        if validation_stopped:
-            return
-
-        date_columns = [
-            self.data.as_valid_identifier(name)
-            for name in self.data.headers.keys() if 'definiert' in name
-        ]
-
         errors = []
         data = {}
-        for line in self.data.lines:
+
+        if not self.raw_data:
+            raise ValueError(_("No data"))
+
+        lines = self.raw_data[0].file.read().decode('cp1252').split('\r\n')
+        for line_number, line in enumerate(lines):
+            if not line.strip():
+                continue
             try:
-                bfs_number = int(line.gemeinde_nr_)
-                dates = [getattr(line, column) for column in date_columns]
-                dates = [parse(d, dayfirst=True).date() for d in dates if d]
-            except (AssertionError, TypeError, ValueError):
-                errors.append(line.rownumber)
+                parts = [part.strip() for part in line.split(';')]
+                parts = [part for part in parts if part]
+                bfs_number = int(parts[1])
+                dates = [parse(d, dayfirst=True).date() for d in parts[4:]]
+            except (IndexError, TypeError, ValueError):
+                errors.append(line_number)
             else:
                 data[bfs_number] = {'dates': dates}
 
