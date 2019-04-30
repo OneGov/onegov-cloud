@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Removes legacy sentry parameter.
+  [msom]
+
 0.0.51 (2019-04-30)
 ~~~~~~~~~~~~~~~~~~~
 
