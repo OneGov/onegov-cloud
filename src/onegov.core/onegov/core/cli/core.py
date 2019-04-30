@@ -528,7 +528,6 @@ def command_group():
         # load all applications into the server
         view_path = uuid4().hex
         applications = []
-        # import pdb; pdb.set_trace()
 
         for appcfg in group_context.appcfgs:
 
