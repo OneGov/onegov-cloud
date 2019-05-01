@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.2.7 (2019-05-01)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds compatibility with latest onegov.core release.
   [msom]
 
