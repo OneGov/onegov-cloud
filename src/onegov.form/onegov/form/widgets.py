@@ -2,6 +2,9 @@ import chameleon
 import humanize
 
 from cgi import escape
+from contextlib import suppress
+from morepath.error import LinkError
+from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import _
 from wtforms.widgets import FileInput
 from wtforms.widgets import ListWidget
@@ -79,6 +82,31 @@ class UploadWidget(FileInput):
 
     """
 
+    def image_source(self, field):
+        """ Returns the image source url if the field points to an image and
+        if it can be done (it looks like it's possible, but I'm not super
+        sure this is always possible).
+
+        """
+
+        if not hasattr(field.meta, 'request'):
+            return
+
+        if not field.data:
+            return
+
+        if not field.data.get('mimetype', None) in IMAGE_MIME_TYPES_AND_SVG:
+            return
+
+        if not hasattr(field, 'object_data'):
+            return
+
+        if not field.object_data:
+            return
+
+        with suppress(LinkError, AttributeError):
+            return field.meta.request.link(field.object_data)
+
     def __call__(self, field, **kwargs):
         force_simple = kwargs.pop('force_simple', False)
         input_html = super().__call__(field, **kwargs)
@@ -90,9 +118,21 @@ class UploadWidget(FileInput):
                 </div>
             """.format(input_html))
         else:
+            src = self.image_source(field)
+
+            if not src:
+                preview = ''
+            else:
+                preview = f"""
+                    <div class="uploaded-image"><img src="{src}"></div>
+                """
+
             return HTMLString("""
                 <div class="upload-widget with-data">
                     <p>{existing_file_label}: {filename} ({filesize}) ✓</p>
+
+                    {preview}
+
                     <ul>
                         <li>
                             <input type="radio" id="{name}-0" name="{name}"
@@ -130,7 +170,8 @@ class UploadWidget(FileInput):
                 existing_file_label=field.gettext(_('Uploaded file')),
                 keep_label=field.gettext(_('Keep file')),
                 delete_label=field.gettext(_('Delete file')),
-                replace_label=field.gettext(_('Replace file'))
+                replace_label=field.gettext(_('Replace file')),
+                preview=preview,
             ))
 
 

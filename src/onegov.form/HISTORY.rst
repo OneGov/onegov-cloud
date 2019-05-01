@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds image preview support to the file upload widget.
+  [href] 
+
 - Adds a timezone-aware datetime field.
   [href]
 
