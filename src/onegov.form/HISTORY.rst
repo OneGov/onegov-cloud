@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.46.2 (2019-05-01)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds image preview support to the file upload widget.
   [href] 
