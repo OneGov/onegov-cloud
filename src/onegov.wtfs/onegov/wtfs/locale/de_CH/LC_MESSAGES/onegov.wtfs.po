@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-26 10:33+0200\n"
-"PO-Revision-Date: 2019-04-26 10:33+0200\n"
+"POT-Creation-Date: 2019-05-01 11:04+0200\n"
+"PO-Revision-Date: 2019-05-01 11:04+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -172,6 +172,9 @@ msgstr "Expresssendung"
 msgid "Date must be in the future."
 msgstr "Datum muss in der Zukunft liegen."
 
+msgid "PDF"
+msgstr "PDF"
+
 msgid "Report"
 msgstr "Auswertung"
 
@@ -290,6 +293,9 @@ msgstr "Scan-Aufträge"
 msgid "Invoices"
 msgstr "Rechnungen"
 
+msgid "User manual"
+msgstr "Benutzerhandbuch"
+
 msgid "Manage payment types"
 msgstr "Zahlungsarten verwalten"
 
@@ -310,6 +316,9 @@ msgstr "Diese Scanauftrag wirklich löschen?"
 
 msgid "Scan job"
 msgstr "Scan-Auftrag"
+
+msgid "Edit user manual"
+msgstr "Benutzerhandbuch bearbeiten"
 
 msgid "Create invoice"
 msgstr "Rechnung erzeugen"
@@ -428,6 +437,9 @@ msgstr "Passwort vergessen?"
 msgid "Reset password"
 msgstr "Passwort zurücksetzen"
 
+msgid "No user manual available yet."
+msgstr "Noch kein Benutzerhandbuch vorhanden."
+
 msgid "Price per quantity"
 msgstr "Preis pro Menge"
 
@@ -486,30 +498,12 @@ msgstr ""
 msgid "Daily list boxes and forms"
 msgstr "Tagesliste Behälter und StE"
 
+msgid "No data"
+msgstr "Keine Daten"
+
 #, python-format
 msgid "Some rows contain invalid values: ${errors}."
 msgstr "Einige Zeilen enthalten ungültige Werte: ${errors}."
-
-msgid "Some columns are missing."
-msgstr "Einige Spalten fehlen."
-
-msgid "Some column names are ambigous."
-msgstr "Einige Spaltennamen sind zweideutig."
-
-msgid "Some column names appear twice."
-msgstr "Einige Spaltennamen erscheinen doppelt."
-
-msgid "The file is empty."
-msgstr "Die Datei ist leer."
-
-msgid "The file contains an empty line."
-msgstr "Die Datei enthält eine leere Zeile."
-
-msgid "Invalid encoding."
-msgstr "Ungültige Kodierung."
-
-msgid "Not a valid CSV file."
-msgstr "Keine gültige CSV-Datei."
 
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"
@@ -590,6 +584,9 @@ msgstr "Seite nicht gefunden"
 
 msgid "The page you are looking for could not be found."
 msgstr "Die angeforderte Seite konnte nicht gefunden werden."
+
+msgid "User manual modified."
+msgstr "Benutzerhandbuch geändert."
 
 msgid "Notification deleted."
 msgstr "Benachrichtigung gelöscht."

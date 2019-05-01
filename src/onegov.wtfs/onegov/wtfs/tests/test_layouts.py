@@ -175,7 +175,8 @@ def test_default_layout(wtfs_app):
         'Invoice/',
         'UserCollection/',
         'MunicipalityCollection/',
-        'NotificationCollection/'
+        'NotificationCollection/',
+        'UserManual/'
     ]
 
 

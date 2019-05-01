@@ -36,6 +36,8 @@ def view_home(self, request):
     form=MunicipalityIdSelectionForm
 )
 def view_dispatch_dates(self, request, form):
+    """ Show dispatches dates for a given municipality. """
+
     if form.submitted(request):
         layout = DefaultLayout(self, request)
         dates = [

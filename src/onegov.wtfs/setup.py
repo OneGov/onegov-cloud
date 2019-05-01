@@ -32,6 +32,7 @@ setup(
         'babel>=2.6.0',
         'cached_property',
         'cssmin',
+        'humanize',
         'onegov.chat',
         'onegov.core>=v0.79.1',
         'onegov.file',

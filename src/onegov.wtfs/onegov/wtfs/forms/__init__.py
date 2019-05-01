@@ -14,6 +14,7 @@ from onegov.wtfs.forms.scan_job import UnrestrictedScanJobForm
 from onegov.wtfs.forms.scan_job import UnrestrictedScanJobsForm
 from onegov.wtfs.forms.user import UnrestrictedUserForm
 from onegov.wtfs.forms.user import UserForm
+from onegov.wtfs.forms.user_manual import UserManualForm
 
 
 __all__ = (
@@ -33,4 +34,5 @@ __all__ = (
     'UnrestrictedScanJobsForm',
     'UnrestrictedUserForm',
     'UserForm',
+    'UserManualForm',
 )

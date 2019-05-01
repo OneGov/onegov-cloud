@@ -29,6 +29,8 @@ from onegov.wtfs.layouts.user import AddUserLayout
 from onegov.wtfs.layouts.user import EditUserLayout
 from onegov.wtfs.layouts.user import UserLayout
 from onegov.wtfs.layouts.user import UsersLayout
+from onegov.wtfs.layouts.user_manual import EditUserManualLayout
+from onegov.wtfs.layouts.user_manual import UserManualLayout
 
 
 __all__ = (
@@ -46,6 +48,7 @@ __all__ = (
     'EditNotificationLayout',
     'EditScanJobLayout',
     'EditUserLayout',
+    'EditUserManualLayout',
     'ImportMunicipalityDataLayout',
     'InvoiceLayout',
     'MailLayout',
@@ -62,5 +65,6 @@ __all__ = (
     'ScanJobLayout',
     'ScanJobsLayout',
     'UserLayout',
+    'UserManualLayout',
     'UsersLayout',
 )

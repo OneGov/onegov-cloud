@@ -12,6 +12,7 @@ from onegov.wtfs.collections import ScanJobCollection
 from onegov.wtfs.models import DailyList
 from onegov.wtfs.models import Invoice
 from onegov.wtfs.models import Report
+from onegov.wtfs.models import UserManual
 from onegov.wtfs.security import ViewModel
 
 
@@ -50,6 +51,8 @@ class DefaultLayout(ChameleonLayout):
             result.append(Link(_("Municipalities"), self.municipalities_url))
         if has_permission(NotificationCollection(session), ViewModel):
             result.append(Link(_("Notifications"), self.notifications_url))
+        if has_permission(UserManual(self.app), ViewModel):
+            result.append(Link(_("User manual"), self.user_manual_url))
 
         return result
 
@@ -120,6 +123,10 @@ class DefaultLayout(ChameleonLayout):
     @cached_property
     def payment_types_url(self):
         return self.request.link(PaymentTypeCollection(self.request.session))
+
+    @cached_property
+    def user_manual_url(self):
+        return self.request.link(UserManual(self.app))
 
     @cached_property
     def cancel_url(self):

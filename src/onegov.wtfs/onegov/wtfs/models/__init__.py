@@ -13,6 +13,7 @@ from onegov.wtfs.models.report import ReportBoxesAndForms
 from onegov.wtfs.models.report import ReportBoxesAndFormsByDelivery
 from onegov.wtfs.models.report import ReportFormsByMunicipality
 from onegov.wtfs.models.scan_job import ScanJob
+from onegov.wtfs.models.user_manual import UserManual
 
 
 __all__ = (
@@ -31,4 +32,5 @@ __all__ = (
     'ReportBoxesAndFormsByDelivery',
     'ReportFormsByMunicipality',
     'ScanJob',
+    'UserManual',
 )

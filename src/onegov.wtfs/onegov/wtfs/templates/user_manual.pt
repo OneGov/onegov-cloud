@@ -1,0 +1,14 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.wtfs">
+    <tal:block metal:fill-slot="title">${layout.title}</tal:block>
+    <tal:block metal:fill-slot="content">
+        <div class="row">
+            <div class="columns small-12">
+                <h1>${layout.title}</h1>
+                <p tal:condition="not layout.model.exists" i18n:translate>No user manual available yet.</p>
+                <p tal:condition="layout.model.exists">
+                    <a href="${request.link(layout.model, 'pdf')}"><tal:block i18n:translate>User manual</tal:block> (PDF, ${filesize}).</a>
+                </p>
+            </div>
+        </div>
+    </tal:block>
+</div>

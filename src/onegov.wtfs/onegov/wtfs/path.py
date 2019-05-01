@@ -21,6 +21,7 @@ from onegov.wtfs.models import ReportBoxesAndForms
 from onegov.wtfs.models import ReportBoxesAndFormsByDelivery
 from onegov.wtfs.models import ReportFormsByMunicipality
 from onegov.wtfs.models import ScanJob
+from onegov.wtfs.models import UserManual
 from webob.exc import HTTPNotFound
 
 
@@ -253,3 +254,11 @@ def get_invoice(request):
 )
 def get_payment_types(request):
     return PaymentTypeCollection(request.session)
+
+
+@WtfsApp.path(
+    model=UserManual,
+    path='/user-manual',
+)
+def get_user_manual(request):
+    return UserManual(request.app)
