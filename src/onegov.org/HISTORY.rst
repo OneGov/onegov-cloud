@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.2.8 (2019-05-01)
+~~~~~~~~~~~~~~~~~~~
+
 - Updates styles for onegov.form input widget.
   [href]
 
