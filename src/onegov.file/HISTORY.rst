@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes signing-service picking up the wrong application-id specific config.
+  [href]
+
 0.13.4 (2019-04-13)
 ~~~~~~~~~~~~~~~~~~~
 

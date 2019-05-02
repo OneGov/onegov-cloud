@@ -108,10 +108,10 @@ class DepotApp(App):
             service class is configured using a single yaml file which is
             stored in the signature config path.
 
-            By default we use the '__default__.yaml' config. Alternatively
+            By default we use the '__default__.yml' config. Alternatively
             we can create separate configs for various application ids.
 
-            For example, we might create a `onegov_town-govikon.yaml`, which
+            For example, we might create a `onegov_town-govikon.yml`, which
             would take precedence over the default config, if the application
             with the id `onegov_town-govikon` would use the signing service.
 
@@ -285,12 +285,16 @@ class DepotApp(App):
         session.flush()
 
     @property
+    def signing_service_id(self):
+        return self.application_id.replace('/', '-')
+
+    @property
     def signing_service_config(self):
         if not self.signing_services:
             raise RuntimeError("No signing service config path set")
 
         paths = (
-            self.signing_services / f'{self.application_id}.yml',
+            self.signing_services / f'{self.signing_service_id}.yml',
             self.signing_services / f'__default__.yml',
         )
 
@@ -308,14 +312,14 @@ class DepotApp(App):
         # it is somewhat inefficient to keep multiple instances of the same
         # service around as many services can have the same config - however
         # it prevents accidental leaks of state between applications
-        if self.application_id not in self.spawned_signing_services:
+        if self.signing_service_id not in self.spawned_signing_services:
             config = self.signing_service_config
 
             with current_dir(self.signing_services):
-                self.spawned_signing_services[self.application_id] \
+                self.spawned_signing_services[self.signing_service_id] \
                     = SigningService.for_config(config)
 
-        return self.spawned_signing_services[self.application_id]
+        return self.spawned_signing_services[self.signing_service_id]
 
     def clear_depot_cache(self):
         DepotManager._aliases.clear()
