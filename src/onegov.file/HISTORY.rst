@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.13.5 (2019-05-02)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes signing-service picking up the wrong application-id specific config.
   [href]
 
