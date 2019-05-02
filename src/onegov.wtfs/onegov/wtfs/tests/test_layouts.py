@@ -19,6 +19,7 @@ from onegov.wtfs.layouts import EditMunicipalityLayout
 from onegov.wtfs.layouts import EditNotificationLayout
 from onegov.wtfs.layouts import EditScanJobLayout
 from onegov.wtfs.layouts import EditUserLayout
+from onegov.wtfs.layouts import EditUserManualLayout
 from onegov.wtfs.layouts import ImportMunicipalityDataLayout
 from onegov.wtfs.layouts import InvoiceLayout
 from onegov.wtfs.layouts import MailLayout
@@ -35,6 +36,7 @@ from onegov.wtfs.layouts import ReportLayout
 from onegov.wtfs.layouts import ScanJobLayout
 from onegov.wtfs.layouts import ScanJobsLayout
 from onegov.wtfs.layouts import UserLayout
+from onegov.wtfs.layouts import UserManualLayout
 from onegov.wtfs.layouts import UsersLayout
 from onegov.wtfs.models import DailyList
 from onegov.wtfs.models import DailyListBoxes
@@ -47,6 +49,7 @@ from onegov.wtfs.models import ReportBoxes
 from onegov.wtfs.models import ReportBoxesAndForms
 from onegov.wtfs.models import ReportBoxesAndFormsByDelivery
 from onegov.wtfs.models import ReportFormsByMunicipality
+from onegov.wtfs.models import UserManual
 from onegov.wtfs.security import AddModel
 from onegov.wtfs.security import AddModelUnrestricted
 from onegov.wtfs.security import DeleteModel
@@ -652,3 +655,33 @@ def test_payments_type_layouts(session):
 
     layout = PaymentTypesLayout(model, request_admin)
     assert layout.editbar_links == []
+
+
+def test_user_manual_layouts():
+    request = DummyRequest()
+    request_admin = DummyRequest(roles=['admin'])
+
+    # UserManualLayout
+    model = UserManual(object)
+    layout = UserManualLayout(None, request)
+    assert layout.title == 'User manual'
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/#'
+    assert layout.cancel_url == ''
+    assert layout.success_url == ''
+
+    layout = UserManualLayout(model, request_admin)
+    assert list(hrefs(layout.editbar_links)) == [
+        'UserManual/edit',
+    ]
+
+    # ... edit
+    layout = EditUserManualLayout(model, request)
+    assert layout.title == 'Edit user manual'
+    assert layout.editbar_links == []
+    assert path(layout.breadcrumbs) == 'DummyPrincipal/UserManual/#'
+    assert layout.cancel_url == 'UserManual/'
+    assert layout.success_url == 'UserManual/'
+
+    layout = EditUserManualLayout(model, request_admin)
+    assert list(hrefs(layout.editbar_links)) == []

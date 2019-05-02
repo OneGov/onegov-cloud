@@ -14,6 +14,7 @@ from onegov.wtfs.models import ReportBoxesAndForms
 from onegov.wtfs.models import ReportBoxesAndFormsByDelivery
 from onegov.wtfs.models import ReportFormsByMunicipality
 from onegov.wtfs.models import ScanJob
+from onegov.wtfs.models import UserManual
 from uuid import uuid4
 
 
@@ -760,3 +761,25 @@ def test_invoice(session):
             '987654321'
             '\r\n'
         )
+
+
+def test_user_manual(wtfs_app):
+    user_manual = UserManual(wtfs_app)
+    assert user_manual.filename == 'user_manual.pdf'
+    assert user_manual.content_type == 'application/pdf'
+
+    assert not user_manual.exists
+    assert user_manual.pdf is None
+    assert user_manual.content_length is None
+
+    user_manual.pdf = b'Test'
+
+    assert user_manual.exists
+    assert user_manual.pdf == b'Test'
+    assert user_manual.content_length == 4
+
+    del user_manual.pdf
+
+    assert not user_manual.exists
+    assert user_manual.pdf is None
+    assert user_manual.content_length is None

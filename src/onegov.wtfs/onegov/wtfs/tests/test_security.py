@@ -21,6 +21,7 @@ from onegov.wtfs.models import ReportBoxes
 from onegov.wtfs.models import ReportBoxesAndForms
 from onegov.wtfs.models import ReportFormsByMunicipality
 from onegov.wtfs.models import ScanJob
+from onegov.wtfs.models import UserManual
 from onegov.wtfs.security import AddModel
 from onegov.wtfs.security import AddModelUnrestricted
 from onegov.wtfs.security import DeleteModel
@@ -549,4 +550,25 @@ def test_permissions(wtfs_app, wtfs_password):
         assert not permits(user, model, EditModelUnrestricted)
         assert not permits(user, model, DeleteModel)
         assert not permits(user, model, ViewModel)
+        assert not permits(user, model, ViewModelUnrestricted)
+
+    # UserManual
+    model = UserManual(wtfs_app)
+    for user in (admin, admin_a, admin_b):
+        assert permits(user, model, Public)
+        assert permits(user, model, AddModel)
+        assert permits(user, model, AddModelUnrestricted)
+        assert permits(user, model, EditModel)
+        assert permits(user, model, EditModelUnrestricted)
+        assert permits(user, model, DeleteModel)
+        assert permits(user, model, ViewModel)
+        assert permits(user, model, ViewModelUnrestricted)
+    for user in (editor, editor_a, editor_b, member, member_a, member_b):
+        assert permits(user, model, Public)
+        assert not permits(user, model, AddModel)
+        assert not permits(user, model, AddModelUnrestricted)
+        assert not permits(user, model, EditModel)
+        assert not permits(user, model, EditModelUnrestricted)
+        assert not permits(user, model, DeleteModel)
+        assert permits(user, model, ViewModel)
         assert not permits(user, model, ViewModelUnrestricted)

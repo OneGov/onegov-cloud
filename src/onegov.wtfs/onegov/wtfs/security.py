@@ -8,6 +8,7 @@ from onegov.wtfs.models import DailyListBoxes
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import Notification
 from onegov.wtfs.models import ScanJob
+from onegov.wtfs.models import UserManual
 
 
 class AddModel(object):
@@ -164,8 +165,17 @@ def has_permission_daily_list_boxes(app, identity, model, permission):
 
 
 @WtfsApp.permission_rule(model=Notification, permission=object)
-def has_permission_notificastion(app, identity, model, permission):
+def has_permission_notification(app, identity, model, permission):
     # Everybody may view notifications
+    if permission in {ViewModel}:
+        return True
+
+    return permission in getattr(app.settings.roles, identity.role)
+
+
+@WtfsApp.permission_rule(model=UserManual, permission=object)
+def has_permission_user_manual(app, identity, model, permission):
+    # Everybody may view the user manual
     if permission in {ViewModel}:
         return True
 

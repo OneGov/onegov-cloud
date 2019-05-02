@@ -3,6 +3,7 @@ from datetime import date
 from freezegun import freeze_time
 from io import BytesIO
 from mock import MagicMock
+from onegov.core.utils import module_path
 from onegov.user import User
 from onegov.user import UserCollection
 from onegov.wtfs.collections import MunicipalityCollection
@@ -24,10 +25,13 @@ from onegov.wtfs.forms import UnrestrictedScanJobForm
 from onegov.wtfs.forms import UnrestrictedScanJobsForm
 from onegov.wtfs.forms import UnrestrictedUserForm
 from onegov.wtfs.forms import UserForm
+from onegov.wtfs.forms import UserManualForm
 from onegov.wtfs.models import Invoice
 from onegov.wtfs.models import Notification
 from onegov.wtfs.models import PickupDate
 from onegov.wtfs.models import ScanJob
+from onegov.wtfs.models import UserManual
+from pytest import mark
 
 
 class App(object):
@@ -926,3 +930,57 @@ def test_create_invoices_form(session):
     form.municipality_id.data = '-'
     form.update_model(model)
     assert model.municipality_id is None
+
+
+@mark.parametrize("pdf_1, pdf_2", [(
+    module_path('onegov.wtfs', 'tests/fixtures/example_1.pdf'),
+    module_path('onegov.wtfs', 'tests/fixtures/example_2.pdf')
+)])
+def test_user_manual_form(wtfs_app, pdf_1, pdf_2):
+    with open(pdf_1, 'rb') as file:
+        pdf_1 = BytesIO(file.read())
+    with open(pdf_2, 'rb') as file:
+        pdf_2 = BytesIO(file.read())
+
+    user_manual = UserManual(wtfs_app)
+
+    form = UserManualForm()
+    form.apply_model(user_manual)
+    assert form.pdf.data is None
+
+    # Add
+    field_storage = FieldStorage()
+    field_storage.file = pdf_1
+    field_storage.type = 'application/pdf'
+    field_storage.filename = 'example_1.pdf'
+    form.pdf.process(PostData({'pdf': field_storage}))
+    form.update_model(user_manual)
+    pdf_1.seek(0)
+    assert user_manual.pdf == pdf_1.read()
+    form.apply_model(user_manual)
+    assert form.pdf.data == {
+        'filename': 'user_manual.pdf',
+        'size': 8130,
+        'mimetype': 'application/pdf'
+    }
+
+    # Replace
+    field_storage = FieldStorage()
+    field_storage.file = pdf_2
+    field_storage.type = 'application/pdf'
+    field_storage.filename = 'example_2.pdf'
+    form.pdf.process(PostData({'pdf': field_storage}))
+    form.update_model(user_manual)
+    pdf_2.seek(0)
+    assert user_manual.pdf == pdf_2.read()
+    form.apply_model(user_manual)
+    assert form.pdf.data == {
+        'filename': 'user_manual.pdf',
+        'size': 9115,
+        'mimetype': 'application/pdf'
+    }
+
+    # Delete
+    form.pdf.action = 'delete'
+    form.update_model(user_manual)
+    assert not user_manual.exists
