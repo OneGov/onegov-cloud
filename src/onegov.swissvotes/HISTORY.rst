@@ -1,7 +1,15 @@
 Changelog
 ---------
+
+- Moves the BFS map into the table.
+  [msom]
+
 0.0.53 (2019-04-30)
 ~~~~~~~~~~~~~~~~~~~
+
+- Nothing.
+  [msom]
+
 0.0.52 (2019-04-30)
 ~~~~~~~~~~~~~~~~~~~
 

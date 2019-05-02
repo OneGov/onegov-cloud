@@ -290,26 +290,30 @@
                         <th class="column-30" i18n:translate>Result by canton, district and municipality</th>
                         <td><a href="${request.link(results_by_domain)}" target="_blank" class="results-by-domain">Excel</a></td>
                     </tr>
+                    <tr tal:condition="bfs_map">
+                        <td colspan="2">
+                            <div><strong i18n:translate>Interactive map of the Swiss Federal Statistical Office</strong></div>
+                            <div class="row" tal:condition="bfs_map">
+                                <div class="small-12 small-centered large-10 columns">
+                                    <iframe src="${bfs_map}"
+                                            frameborder="0"
+                                            marginheight="0"
+                                            marginwidth="0"
+                                            scrolling="no"
+                                            style="
+                                                width: 100%;
+                                                height: 600px;
+                                                margin: auto 0;
+                                                padding: 0;
+                                                cursor: auto;
+                                            ">
+                                    </iframe>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
-
-            <div class="row" tal:condition="bfs_map">
-                <div class="small-12 small-centered large-10 columns">
-                    <iframe src="${bfs_map}"
-                    		frameborder="0"
-                    		marginheight="0"
-                    		marginwidth="0"
-                    		scrolling="no"
-                    		style="
-                    			width: 100%;
-                    			height: 600px;
-                    			margin: auto 0;
-                    			padding: 0;
-                    			cursor: auto;
-                    		">
-                    </iframe>
-                </div>
-            </div>
 
         </div>
     </tal:block>
