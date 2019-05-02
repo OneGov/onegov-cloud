@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.2.1 (2019-05-02)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes permission settings of user manual.
   [msom]
