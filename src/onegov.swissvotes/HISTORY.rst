@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.0.54 (2019-05-02)
+~~~~~~~~~~~~~~~~~~~
 
 - Moves the BFS map into the table.
   [msom]
