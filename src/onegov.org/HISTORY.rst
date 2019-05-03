@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.2.9 (2019-05-03)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds minimal HTML changes to help downstream styling.
   [href]
 
