@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Turns CSVFile into an iterator.
+  [href]
+
 0.79.2 (2019-05-01)
 ~~~~~~~~~~~~~~~~~~~
 

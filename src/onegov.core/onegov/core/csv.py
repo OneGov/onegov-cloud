@@ -143,6 +143,9 @@ class CSVFile(object):
             result = result[1:]
         return result
 
+    def __iter__(self):
+        yield from self.lines
+
     @property
     def lines(self):
         self.csvfile.seek(0)
