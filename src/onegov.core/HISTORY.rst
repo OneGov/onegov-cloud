@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.80.0 (2019-05-03)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to override the same site cookie policy.
   [href]
