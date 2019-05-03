@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to override the same site cookie policy.
+  [href]
+
 - Turns CSVFile into an iterator.
   [href]
 

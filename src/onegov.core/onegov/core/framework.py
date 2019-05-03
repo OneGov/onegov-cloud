@@ -83,6 +83,9 @@ class Framework(
     static_directory = directive(directives.StaticDirectoryAction)
     template_variables = directive(directives.TemplateVariablesAction)
 
+    #: sets the same-site cookie directive, (may need removal inside iframes)
+    same_site_cookie_policy = 'lax'
+
     #: the request cache is initialised/emptied before each request
     request_cache = None
 

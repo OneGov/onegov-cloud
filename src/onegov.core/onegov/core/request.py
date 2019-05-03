@@ -256,7 +256,7 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
                         self.cookies['session_id'],
                         secure=self.app.identity_secure,
                         httponly=True,
-                        samesite='Lax'
+                        samesite=self.app.same_site_cookie_policy
                     )
 
         return self.app.modules.browser_session.BrowserSession(
