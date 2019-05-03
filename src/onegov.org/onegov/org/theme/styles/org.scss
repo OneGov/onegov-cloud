@@ -97,6 +97,7 @@ a:not([href]):not([role]) {
 .confirm,
 .fc-event,
 a[ic-verb],
+a[onclick],
 .partition-occupied {
     cursor: pointer !important;
 }

@@ -43,7 +43,7 @@
 </metal:navigation>
 
 <metal:editbar define-macro="editbar">
-    <div class="row" tal:condition="layout.editbar_links">
+    <div class="row sub-navigation" tal:condition="layout.editbar_links">
         <div class="small-12 columns">
             <div class="edit-bar clearfix">
                 <tal:b repeat="group layout.editbar_links">
