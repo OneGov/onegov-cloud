@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds sentry environment to javascript.
+  [href]
+
 - Fixes settings.sticky_class javascript error when navigating on Mobile Safari.
   [href]
 

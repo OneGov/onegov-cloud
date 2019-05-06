@@ -30,13 +30,14 @@
 
     <tal:b metal:use-macro="layout.macros.favicon" />
 
-    <tal:b define="sentry_dsn layout.app.sentry_dsn" condition="sentry_dsn">
+    <tal:b condition="layout.app.sentry_dsn">
       <script src="https://browser.sentry-cdn.com/5.0.7/bundle.min.js" crossorigin="anonymous"></script>
       <script>
         Sentry.init({
-            dsn: '${sentry_dsn}',
-            release: '${request.app.version}',
+            dsn: '${layout.app.sentry_dsn}',
+            release: '${layout.app.sentry_version}',
             username: '${request.current_username}',
+            environment: '${layout.app.sentry_environment}',
             role: '${request.current_role}',
             ignoreUrls: [/\/(gtm|ga|analytics)\.js/i],
             ignoreErrors: [/data-".+"-alert/],
