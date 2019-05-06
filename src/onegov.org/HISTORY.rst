@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes settings.sticky_class javascript error when navigating on Mobile Safari.
+  [href]
+
 1.2.9 (2019-05-03)
 ~~~~~~~~~~~~~~~~~~~
 

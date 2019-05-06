@@ -61,7 +61,9 @@ var processCommonNodes = function(elements, out_of_band) {
 };
 
 // setup common nodes
-processCommonNodes($(document), false);
+$(document).ready(function() {
+    processCommonNodes($(document), false);
+})
 
 // show the new content placeholder when hovering over the add content dropdown
 $('.show-new-content-placeholder')
