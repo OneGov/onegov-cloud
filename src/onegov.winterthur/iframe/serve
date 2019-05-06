@@ -1,0 +1,60 @@
+#!/usr/bin/env python
+
+import click
+import webbrowser
+
+from http.server import BaseHTTPRequestHandler, HTTPServer as BaseHTTPServer
+from threading import Thread
+from pathlib import Path
+
+
+HOST = 'localhost'
+PORT = 8000
+
+
+class HTTPServer(BaseHTTPServer):
+
+    def serve_threaded(self):
+        thread = Thread(target=self.serve_forever)
+        thread.start()
+
+        return thread
+
+
+class IFrameHandler(BaseHTTPRequestHandler):
+
+    content = None
+
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+
+        self.wfile.write(self.content)
+
+
+@click.command()
+@click.argument('source')
+@click.option('--host', default='localhost')
+@click.option('--port', default=8000)
+def serve(source, host, port):
+    source = source.encode('utf-8')
+
+    with (Path(__file__).parent / 'iframe.html').open('rb') as f:
+        IFrameHandler.content = f.read().replace(b'|||source|||', source)
+
+    httpd = HTTPServer((HOST, PORT), IFrameHandler)
+
+    try:
+        thread = httpd.serve_threaded()
+        print(f"Serving {source} in an iFrame on http://{HOST}:{PORT}")
+
+        webbrowser.open(f'http://{HOST}:{PORT}/')
+
+        thread.join()
+    except KeyboardInterrupt:
+        httpd.shutdown()
+
+
+if __name__ == '__main__':
+    serve()

@@ -34,6 +34,24 @@ input[data-street-search]::placeholder {
 }
 
 /*
+    Edit bar
+*/
+.edit-bar {
+    .new-report::before {
+        @include icon('\f0f6');
+    }
+
+    .vehicles::before,
+    .new-vehicle::before {
+        @include icon('\f0f9');
+    }
+
+    .upload-images::before {
+        @include icon('\f083');
+    }
+}
+
+/*
     Sidepanel
 */
 .side-panel.highlighted {
@@ -247,15 +265,11 @@ input[data-street-search]::placeholder {
 
     .globals,
     .header,
-    .locals,
+    .main-navigation,
     .main-title,
-    .push,
+    nav,
     footer {
         display: none;
-    }
-
-    .directory-back-button {
-        display: block !important;
     }
 
     &.directory-entry-layout .main-title {
@@ -270,6 +284,26 @@ input[data-street-search]::placeholder {
 
         > .columns {
             padding: 0;
+        }
+    }
+
+    .alerts > .columns {
+        padding: 0;
+    }
+
+    .sub-navigation {
+        > .columns {
+            margin-bottom: .75rem;
+            padding: 0;
+        }
+
+        .edit-bar,
+        .edit-bar .button {
+            background: $gray-pastel;
+        }
+
+        .edit-bar .button:hover {
+            background: $primary-color;
         }
     }
 }
@@ -317,5 +351,155 @@ input[data-street-search]::placeholder {
         a {
             font-weight: normal;
         }
+    }
+}
+
+/*
+    Datetime Picker
+*/
+
+.datetimepicker {
+    background: $primary-color !important;
+    border: 0;
+    color: $white !important;
+
+    &:hover {
+        background: darken($primary-color, 10%) !important;
+    }
+}
+
+/*
+    Mission report list
+*/
+.total-missions {
+    @include label($text-size: .875rem, $bg: $gray-pastel, $radius: true);
+
+    font-size: .875rem;
+    margin-bottom: 1rem;
+}
+
+/*
+    Tables
+*/
+.min-width-column {
+    white-space: nowrap;
+    width: 1%;
+}
+
+.valign-top {
+    th,
+    td {
+        vertical-align: top;
+    }
+}
+
+table.two-column {
+    td:first-child {
+        font-weight: bold;
+    }
+
+    td,
+    tr {
+        border: 0;
+    }
+}
+
+table.responsive {
+    @media #{$small-only} {
+        thead {
+            display: none;
+        }
+
+        tr {
+            display: block;
+            padding: 1.2em 0;
+            position: relative;
+        }
+
+        tr:first-of-type {
+            border-top: 1px solid $gray;
+        }
+
+        td {
+            display: table-row;
+
+            &::before {
+                content: attr(data-label);
+                display: table-cell;
+                font-weight: bold;
+                padding: .2em .6em .2em 0;
+                text-align: right;
+            }
+
+            &:last-child::after {
+                border-bottom: 1px solid $gray;
+                bottom: 0;
+                content: "";
+                left: 0;
+                position: absolute;
+                right: 0;
+            }
+        }
+    }
+}
+
+/*
+    Vehicles
+*/
+.vehicle-icon {
+    color: $body-font-color !important;
+    max-height: 50px;
+    max-width: 50px;
+}
+
+.civil-defence-icon {
+    margin-top: 5px;
+    max-height: 22px;
+    max-width: 22px;
+}
+
+.used-vehicles {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+        margin-right: 5px;
+    }
+
+    li:last-child {
+        margin-right: 0;
+    }
+}
+
+/*
+    Mission report images
+*/
+.mission-report-layout .orbit-container {
+    margin: 0 auto;
+    width: calc(100% - 2vw);
+}
+
+.mission-report-layout .slider,
+.mission-report-layout .slider li {
+    height: 45vw !important;
+}
+
+/*
+    Mission reports legend
+*/
+.mission-report-legend {
+    background: $gray-pastel;
+    padding: 1rem 1rem .5rem;
+
+    * {
+        font-size: .8rem;
+    }
+
+    p {
+        margin-bottom: .5rem;
+        max-width: $max-line-width;
     }
 }

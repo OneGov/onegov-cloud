@@ -1,7 +1,13 @@
 from onegov.winterthur.app import WinterthurApp
 from onegov.winterthur.collections import AddressCollection
 from onegov.winterthur.collections import AddressSubsetCollection
+from onegov.winterthur.collections import MissionReportCollection
+from onegov.winterthur.collections import MissionReportFileCollection
+from onegov.winterthur.collections import MissionReportVehicleCollection
+from onegov.winterthur.models import MissionReport
+from onegov.winterthur.models import MissionReportVehicle
 from onegov.winterthur.roadwork import RoadworkCollection, Roadwork
+from uuid import UUID
 
 
 @WinterthurApp.path(
@@ -32,3 +38,45 @@ def get_roadwork_collection(app, letter=None, query=None):
     converters=dict(id=int))
 def get_roadwork(app, id):
     return RoadworkCollection(app.roadwork_client).by_id(id)
+
+
+@WinterthurApp.path(
+    model=MissionReportCollection,
+    path='/mission-reports')
+def get_mission_reports(request, page=0):
+    return MissionReportCollection(
+        request.session, page=page, include_hidden=request.is_manager)
+
+
+@WinterthurApp.path(
+    model=MissionReportVehicleCollection,
+    path='/mission-reports/vehicles')
+def get_mission_report_vehicles(request):
+    return MissionReportVehicleCollection(request.session)
+
+
+@WinterthurApp.path(
+    model=MissionReport,
+    path='/mission-reports/report/{id}',
+    converters=dict(id=UUID))
+def get_mission_report(request, id):
+    return get_mission_reports(request).by_id(id)
+
+
+@WinterthurApp.path(
+    model=MissionReportFileCollection,
+    path='/mission-reports/report/{id}/images',
+    converters=dict(id=UUID))
+def get_mission_report_files(request, id):
+    report = get_mission_report(request, id)
+
+    if report:
+        return MissionReportFileCollection(request.session, report)
+
+
+@WinterthurApp.path(
+    model=MissionReportVehicle,
+    path='/mission-reports/vehicle/{id}',
+    converters=dict(id=UUID))
+def get_mission_report_vehicle(request, id):
+    return get_mission_report_vehicles(request).by_id(id)

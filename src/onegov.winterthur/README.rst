@@ -5,7 +5,7 @@ OneGov Cloud for the City of Winterthur
 
 Run the Tests
 -------------
-    
+
 Install tox and run it::
 
     pip install tox
@@ -14,6 +14,15 @@ Install tox and run it::
 Limit the tests to a specific python version::
 
     tox -e py27
+
+Run in an iFrame
+----------------
+
+Winterthur deployments are often run inside iframes on stadt.winterthur.ch.
+
+You can use a helper script to simulate that environment:
+
+    iframe/serve http://host-of-local-onegovcloud-instance/path
 
 Conventions
 -----------

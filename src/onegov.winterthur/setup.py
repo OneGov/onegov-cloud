@@ -47,6 +47,9 @@ setup(
     entry_points={
         'onegov': [
             'upgrade = onegov.winterthur.upgrade'
+        ],
+        'console_scripts': [
+            'onegov-winterthur=onegov.winterthur.cli:cli'
         ]
     },
     classifiers=[

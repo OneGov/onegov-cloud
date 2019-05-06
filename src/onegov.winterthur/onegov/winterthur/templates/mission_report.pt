@@ -1,0 +1,63 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.winterthur">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <table style="width: 100%;" class="two-column valign-top">
+            <tbody>
+                <tr>
+                    <td class="min-width-column" i18n:translate>Date</td>
+                    <td>${model.date.strftime('%d.%m.%Y')}</td>
+                </tr>
+                <tr>
+                    <td class="min-width-column" i18n:translate>Alarm</td>
+                    <td>${model.date.strftime('%H:%M')}</td>
+                </tr>
+                <tr>
+                    <td class="min-width-column" i18n:translate>Location</td>
+                    <td>${model.location}</td>
+                </tr>
+                <tr>
+                    <td class="min-width-column" i18n:translate>Mission nature</td>
+                    <td>${model.nature}</td>
+                </tr>
+                <tr>
+                    <td class="min-width-column" i18n:translate>Mission duration</td>
+                    <td>${model.readable_duration}</td>
+                </tr>
+                <tr>
+                    <td class="min-width-column" i18n:translate>Mission personnel</td>
+                    <td>${model.personnel}</td>
+                </tr>
+                <tr>
+                    <td class="min-width-column" i18n:translate>Backup personnel</td>
+                    <td>${model.backup}</td>
+                </tr>
+                <tr>
+                    <td class="min-width-column" i18n:translate>Civil Defence involvement</td>
+                    <td>
+                        <tal:b condition="model.civil_defence" i18n:translate>
+                            Yes
+                        </tal:b>
+
+                        <tal:b condition="not:model.civil_defence" i18n:translate>
+                            No
+                        </tal:b>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="min-width-column" i18n:translate>Vehicles</td>
+                    <td tal:define="used_vehicles model.used_vehicles">
+
+                        <tal:b condition="not:used_vehicles" i18n:translate>
+                            None
+                        </tal:b>
+
+                        <tal:b condition="used_vehicles" metal:use-macro="layout.macros.used_vehicles" />
+                    </td>
+            </tbody>
+        </table>
+
+        <metal:b use-macro="layout.macros.slider" tal:define="images python:tuple({'note': p.note, 'src': request.link(p)} for p in model.pictures)" tal:condition="images" />
+    </tal:b>
+</div>

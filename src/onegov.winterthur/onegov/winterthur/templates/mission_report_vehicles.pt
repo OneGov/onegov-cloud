@@ -1,0 +1,51 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.winterthur">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div tal:condition="not:vehicles">
+            <p i18n:translate>No vehicles found.</p>
+        </div>
+
+        <table tal:condition="vehicles" style="width=100%;" class="valign-top">
+            <thead>
+                <tr>
+                    <th class="min-width-column" i18n:translate>Name</th>
+                    <th i18n:translate>Description</th>
+                    <th i18n:translate>Website</th>
+                    <th class="min-width-column" i18n:translate>Symbol</th>
+                    <th class="min-width-column" i18n:translate>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr tal:repeat="vehicle vehicles">
+                    <td class="min-width-column">
+                        ${vehicle.name}
+                    </td>
+                    <td>
+                        <a href="${request.link(vehicle, name='edit')}">
+                            ${vehicle.description}
+                        </a>
+                    </td>
+                    <td>
+                        <a href="${vehicle.website}">
+                            ${vehicle.readable_website}
+                        </a>
+                    </td>
+                    <td>
+                        <metal:b use-macro="layout.macros.vehicle_icon" />
+                    </td>
+                    <td>
+                        <tal:b condition="vehicle.is_hidden_from_public" i18n:translate>
+                            Hidden
+                        </tal:b>
+                        <tal:b condition="not:vehicle.is_hidden_from_public" i18n:translate>
+                            Visible
+                        </tal:b>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </tal:b>
+</div>

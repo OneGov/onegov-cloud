@@ -51,7 +51,6 @@
 
 </metal:inline_search>
 
-
 <metal:inline_search_entry_lead define-macro="inline_search_entry_lead" i18n:domain="onegov.winterthur">
     <dl>
         <tal:b repeat="(name, lines) fragments">
@@ -64,3 +63,26 @@
         </tal:b>
     </dl>
 </metal:inline_search_entry_lead>
+
+<metal:used_vehicles define-macro="used_vehicles" i18n:domain="onegov.winterthur">
+    <ul class="used-vehicles">
+        <tal:b repeat="use python: sorted(used_vehicles, key=lambda u: u.vehicle.name)">
+            <li tal:repeat="n range(0, max(min(use.count, 10), 1))">
+                <metal:b use-macro="layout.macros.vehicle_icon" tal:define="vehicle use.vehicle" />
+            </li>
+        </tal:b>
+    </ul>
+</metal:used_vehicles>
+
+
+<metal:vehicle_icon define-macro="vehicle_icon" i18n:domain="onegov.winterthur">
+    <a tal:attributes="href vehicle.website or None">
+        <img tal:condition="vehicle.symbol"
+             title="${vehicle.title}" class="vehicle-icon"
+             src="${request.link(vehicle.symbol)}">
+
+        <i tal:condition="not:vehicle.symbol"
+           title="${vehicle.title}" class="vehicle-icon fa fa-ambulance"
+           aria-hidden="true"></i>
+    </a>
+</metal:vehicle_icon>
