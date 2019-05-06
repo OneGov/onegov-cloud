@@ -147,7 +147,10 @@ def test_swissvotes_dataset_field():
     assert "1:legislatur ∅" in error
     assert "1:legisjahr ∅" in error
     assert "1:jahrzehnt ∅" in error
-    assert "1:titel ∅" in error
+    assert "1:titel_off_d ∅" in error
+    assert "1:titel_off_f ∅" in error
+    assert "1:titel_kurz_d ∅" in error
+    assert "1:titel_kurz_f ∅" in error
 
     assert "1:anzahl ∅" in error
     assert "1:rechtsform ∅" in error
@@ -157,7 +160,10 @@ def test_swissvotes_dataset_field():
     assert "2:legislatur ∅" in error
     assert "2:legisjahr ∅" in error
     assert "2:jahrzehnt ∅" in error
-    assert "2:titel ∅" in error
+    assert "2:titel_off_d ∅" in error
+    assert "2:titel_off_f ∅" in error
+    assert "2:titel_kurz_d ∅" in error
+    assert "2:titel_kurz_f ∅" in error
 
     assert "3:anr 'x' ≠ numeric(8, 2)" in error
     assert "3:datum 'x' ≠ date" in error
@@ -182,7 +188,10 @@ def test_swissvotes_dataset_field():
         '1',  # legislatur / INTEGER
         '2004-2008',  # legisjahr / INT4RANGE
         '2000-2009',  # jahrzent / INT4RANGE
-        'titel',  # titel / TEXT
+        'titel_kurz_d',  # short_title_de / TEXT
+        'titel_kurz_f',  # short_title_fr / TEXT
+        'titel_off_d',  # title_de / TEXT
+        'titel_off_f',  # title_fr / TEXT
         'stichwort',  # stichwort / TEXT
         '2',  # anzahl / INTEGER
         '3',  # rechtsform
@@ -193,7 +202,10 @@ def test_swissvotes_dataset_field():
         1,  # legislatur / INTEGER
         '2004-2008',  # legisjahr / INT4RANGE
         '2000-2009',  # jahrzent / INT4RANGE
-        'titel',  # titel / TEXT
+        'titel_kurz_d',  # short_title_de / TEXT
+        'titel_kurz_f',  # short_title_fr / TEXT
+        'titel_off_d',  # title_de / TEXT
+        'titel_off_f',  # title_fr / TEXT
         'stichwort',  # stichwort / TEXT
         2,  # anzahl / INTEGER
         3,  # rechtsform
@@ -216,7 +228,10 @@ def test_swissvotes_dataset_field():
     assert field.data[0].legislation_number == 1
     assert field.data[0].legislation_decade == NumericRange(2004, 2008)
     assert field.data[0].decade == NumericRange(2000, 2009)
-    assert field.data[0].title == 'titel'
+    assert field.data[0].title_de == 'titel_off_d'
+    assert field.data[0].title_fr == 'titel_off_f'
+    assert field.data[0].short_title_de == 'titel_kurz_d'
+    assert field.data[0].short_title_fr == 'titel_kurz_f'
     assert field.data[0].keyword == 'stichwort'
     assert field.data[0].votes_on_same_day == 2
     assert field.data[0]._legal_form == 3
@@ -226,7 +241,10 @@ def test_swissvotes_dataset_field():
     assert field.data[1].legislation_number == 1
     assert field.data[1].legislation_decade == NumericRange(2004, 2008)
     assert field.data[1].decade == NumericRange(2000, 2009)
-    assert field.data[1].title == 'titel'
+    assert field.data[1].title_de == 'titel_off_d'
+    assert field.data[1].title_fr == 'titel_off_f'
+    assert field.data[1].short_title_de == 'titel_kurz_d'
+    assert field.data[1].short_title_fr == 'titel_kurz_f'
     assert field.data[1].keyword == 'stichwort'
     assert field.data[1].votes_on_same_day == 2
     assert field.data[1]._legal_form == 3

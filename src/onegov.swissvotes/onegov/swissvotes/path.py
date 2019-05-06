@@ -73,7 +73,7 @@ def get_votes(
     sort_order=None
 ):
     return SwissVoteCollection(
-        app.session(),
+        app,
         page=page,
         from_date=from_date,
         to_date=to_date,
@@ -95,7 +95,7 @@ def get_votes(
     path='/vote/{bfs_number}'
 )
 def get_vote(app, bfs_number):
-    return SwissVoteCollection(app.session()).by_bfs_number(bfs_number)
+    return SwissVoteCollection(app).by_bfs_number(bfs_number)
 
 
 @SwissvotesApp.path(

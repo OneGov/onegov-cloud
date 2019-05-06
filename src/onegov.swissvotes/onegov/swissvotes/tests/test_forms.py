@@ -62,7 +62,7 @@ def test_attachments_form(swissvotes_app, attachments):
     names = list(attachments.keys())
 
     # Test apply / update
-    votes = SwissVoteCollection(session)
+    votes = SwissVoteCollection(swissvotes_app)
     vote = votes.add(
         id=1,
         bfs_number=Decimal('1'),
@@ -70,7 +70,10 @@ def test_attachments_form(swissvotes_app, attachments):
         decade=NumericRange(1990, 1999),
         legislation_number=4,
         legislation_decade=NumericRange(1990, 1994),
-        title="Vote",
+        title_de="Vote DE",
+        title_fr="Vote FR",
+        short_title_de="V D",
+        short_title_fr="V F",
         votes_on_same_day=2,
         _legal_form=1,
     )
@@ -274,10 +277,10 @@ def test_page_form(session):
     assert form.validate()
 
 
-def test_search_form(session):
+def test_search_form(swissvotes_app):
     # Test on request / popluate
     form = SearchForm()
-    form.request = DummyRequest(session, DummyPrincipal())
+    form.request = DummyRequest(swissvotes_app.session(), DummyPrincipal())
     form.on_request()
 
     assert form.legal_form.choices == [
@@ -309,13 +312,16 @@ def test_search_form(session):
     assert form.policy_area.choices == []
 
     # ... descriptors available
-    votes = SwissVoteCollection(session)
+    votes = SwissVoteCollection(swissvotes_app)
     kwargs = {
         'date': date(1990, 6, 2),
         'decade': NumericRange(1990, 1999),
         'legislation_number': 4,
         'legislation_decade': NumericRange(1990, 1994),
-        'title': "Vote",
+        'title_de': "Vote DE",
+        'title_fr': "Vote FR",
+        'short_title_de': "V D",
+        'short_title_fr': "V F",
         'votes_on_same_day': 2,
         '_legal_form': 1,
     }
@@ -441,7 +447,10 @@ def test_update_dataset_form(session):
         1,  # legislatur / INTEGER
         '2004-2008',  # legisjahr / INT4RANGE
         '2000-2009',  # jahrzent / INT4RANGE
-        'titel',  # titel / TEXT
+        'kurztitel de',  # titel_kurz_d
+        'kurztitel fr',  # titel_kurz_f
+        'titel de',  # titel_off_d
+        'titel fr',  # titel_off_f
         'stichwort',  # stichwort / TEXT
         2,  # anzahl / INTEGER
         3,  # rechtsform

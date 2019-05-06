@@ -153,7 +153,10 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     decade = Column(INT4RANGE, nullable=False)
     legislation_number = Column(Integer, nullable=False)
     legislation_decade = Column(INT4RANGE, nullable=False)
-    title = Column(Text, nullable=False)
+    title_de = Column(Text, nullable=False)
+    title_fr = Column(Text, nullable=False)
+    short_title_de = Column(Text, nullable=False)
+    short_title_fr = Column(Text, nullable=False)
     keyword = Column(Text)
     votes_on_same_day = Column(Integer, nullable=False)
     _legal_form = Column('legal_form', Integer, nullable=False)
@@ -162,6 +165,20 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     anneepolitique = Column(Text)
     bfs_map_de = Column(Text)
     bfs_map_fr = Column(Text)
+
+    @property
+    def title(self):
+        if self.session_manager.current_locale == 'fr_CH':
+            return self.title_fr
+        else:
+            return self.title_de
+
+    @property
+    def short_title(self):
+        if self.session_manager.current_locale == 'fr_CH':
+            return self.short_title_fr
+        else:
+            return self.short_title_de
 
     def bfs_map(self, locale):
         """ Returns the link to the BFS map for the given locale. """

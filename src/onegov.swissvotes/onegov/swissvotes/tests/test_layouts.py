@@ -1,3 +1,4 @@
+from datetime import date
 from decimal import Decimal
 from io import BytesIO
 from onegov.core.crypto import random_token
@@ -23,6 +24,7 @@ from onegov.swissvotes.layouts import VoteStrengthsLayout
 from onegov.swissvotes.models import SwissVote
 from onegov.swissvotes.models import TranslatablePage
 from onegov.swissvotes.models import TranslatablePageFile
+from psycopg2.extras import NumericRange
 
 
 class DummyPrincipal(object):
@@ -371,14 +373,40 @@ def test_layout_delete_page_attachment(swissvotes_app):
     assert layout.editbar_links == []
 
 
-def test_layout_vote():
+def test_layout_vote(swissvotes_app):
+    session = swissvotes_app.session()
     request = DummyRequest()
-    model = SwissVote(title="Vote")
+    request.app = swissvotes_app
+    session.add(SwissVote(
+        title_de="Vote DE",
+        title_fr="Vote FR",
+        short_title_de="Vote D",
+        short_title_fr="Vote F",
+        bfs_number=Decimal('100'),
+        date=date(1990, 6, 2),
+        decade=NumericRange(1990, 1999),
+        legislation_number=10,
+        legislation_decade=NumericRange(1990, 1994),
+        votes_on_same_day=2,
+        _legal_form=1
+    ))
+    session.flush()
+    model = session.query(SwissVote).one()
 
     layout = VoteLayout(model, request)
-    assert layout.title == "Vote"
+    assert layout.title == "Vote D"
     assert layout.editbar_links == []
-    assert path(layout.breadcrumbs) == 'DummyPrincipal/SwissVoteCollection/#'
+    assert path(layout.breadcrumbs) == 'Principal/SwissVoteCollection/#'
+
+    swissvotes_app.session_manager.current_locale = 'fr_CH'
+    model = swissvotes_app.session().query(SwissVote).one()
+    layout = VoteLayout(model, request)
+    assert layout.title == "Vote F"
+
+    swissvotes_app.session_manager.current_locale = 'en_US'
+    model = swissvotes_app.session().query(SwissVote).one()
+    layout = VoteLayout(model, request)
+    assert layout.title == "Vote D"
 
     # Log in as editor
     request.roles = ['editor']
@@ -397,15 +425,21 @@ def test_layout_vote():
     ]
 
 
-def test_layout_vote_strengths():
+def test_layout_vote_strengths(swissvotes_app):
     request = DummyRequest()
-    model = SwissVote(title="Vote")
+    request.app = swissvotes_app
+    model = SwissVote(
+        title_de="Vote",
+        title_fr="Vote",
+        short_title_de="Vote",
+        short_title_fr="Vote",
+    )
 
     layout = VoteStrengthsLayout(model, request)
     assert layout.title == _("Voter strengths")
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == (
-        'DummyPrincipal/SwissVoteCollection/SwissVote/#'
+        'Principal/SwissVoteCollection/SwissVote/#'
     )
 
     # Log in as editor
@@ -419,15 +453,21 @@ def test_layout_vote_strengths():
     assert layout.editbar_links == []
 
 
-def test_layout_upload_vote_attachemts():
+def test_layout_upload_vote_attachemts(swissvotes_app):
     request = DummyRequest()
-    model = SwissVote(title="Vote")
+    request.app = swissvotes_app
+    model = SwissVote(
+        title_de="Vote",
+        title_fr="Vote",
+        short_title_de="Vote",
+        short_title_fr="Vote",
+    )
 
     layout = UploadVoteAttachemtsLayout(model, request)
     assert layout.title == _("Manage attachments")
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == (
-        'DummyPrincipal/SwissVoteCollection/SwissVote/#'
+        'Principal/SwissVoteCollection/SwissVote/#'
     )
 
     # Log in as editor
@@ -441,15 +481,21 @@ def test_layout_upload_vote_attachemts():
     assert layout.editbar_links == []
 
 
-def test_layout_delete_vote():
+def test_layout_delete_vote(swissvotes_app):
     request = DummyRequest()
-    model = SwissVote(title="Vote")
+    request.app = swissvotes_app
+    model = SwissVote(
+        title_de="Vote",
+        title_fr="Vote",
+        short_title_de="Vote",
+        short_title_fr="Vote",
+    )
 
     layout = DeleteVoteLayout(model, request)
     assert layout.title == _("Delete vote")
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == (
-        'DummyPrincipal/SwissVoteCollection/SwissVote/#'
+        'Principal/SwissVoteCollection/SwissVote/#'
     )
 
     # Log in as editor
@@ -463,14 +509,15 @@ def test_layout_delete_vote():
     assert layout.editbar_links == []
 
 
-def test_layout_votes():
+def test_layout_votes(swissvotes_app):
     request = DummyRequest()
-    model = SwissVoteCollection(None)
+    request.app = swissvotes_app
+    model = SwissVoteCollection(swissvotes_app)
 
     layout = VotesLayout(model, request)
     assert layout.title == _("Votes")
     assert layout.editbar_links == []
-    assert path(layout.breadcrumbs) == 'DummyPrincipal/SwissVoteCollection'
+    assert path(layout.breadcrumbs) == 'Principal/SwissVoteCollection'
 
     # Log in as editor
     request.roles = ['editor']
@@ -492,14 +539,15 @@ def test_layout_votes():
     ]
 
 
-def test_layout_update_votes():
+def test_layout_update_votes(swissvotes_app):
     request = DummyRequest()
-    model = SwissVoteCollection(None)
+    request.app = swissvotes_app
+    model = SwissVoteCollection(swissvotes_app)
 
     layout = UpdateVotesLayout(model, request)
     assert layout.title == _("Update dataset")
     assert layout.editbar_links == []
-    assert path(layout.breadcrumbs) == 'DummyPrincipal/SwissVoteCollection/#'
+    assert path(layout.breadcrumbs) == 'Principal/SwissVoteCollection/#'
 
     # Log in as editor
     request.roles = ['editor']
@@ -512,14 +560,15 @@ def test_layout_update_votes():
     assert layout.editbar_links == []
 
 
-def test_layout_delete_votes():
+def test_layout_delete_votes(swissvotes_app):
     request = DummyRequest()
-    model = SwissVoteCollection(None)
+    request.app = swissvotes_app
+    model = SwissVoteCollection(swissvotes_app)
 
     layout = DeleteVotesLayout(model, request)
     assert layout.title == _("Delete all votes")
     assert layout.editbar_links == []
-    assert path(layout.breadcrumbs) == 'DummyPrincipal/SwissVoteCollection/#'
+    assert path(layout.breadcrumbs) == 'Principal/SwissVoteCollection/#'
 
     # Log in as editor
     request.roles = ['editor']

@@ -80,7 +80,7 @@ class DefaultLayout(ChameleonLayout):
 
     @cached_property
     def votes_url(self):
-        return self.request.link(SwissVoteCollection(self.request.session))
+        return self.request.link(SwissVoteCollection(self.request.app))
 
     @cached_property
     def login_url(self):

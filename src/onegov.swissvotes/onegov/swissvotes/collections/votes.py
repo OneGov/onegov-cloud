@@ -40,7 +40,7 @@ class SwissVoteCollection(Pagination):
 
     def __init__(
         self,
-        session,
+        app,
         page=None,
         from_date=None,
         to_date=None,
@@ -55,7 +55,8 @@ class SwissVoteCollection(Pagination):
         sort_by=None,
         sort_order=None
     ):
-        self.session = session
+        self.app = app
+        self.session = app.session()
         self.page = page
         self.from_date = from_date
         self.to_date = to_date
@@ -108,7 +109,7 @@ class SwissVoteCollection(Pagination):
     def default(self):
         """ Returns the votes unfiltered and ordered by default. """
 
-        return self.__class__(self.session)
+        return self.__class__(self.app)
 
     @property
     def page_index(self):
@@ -120,7 +121,7 @@ class SwissVoteCollection(Pagination):
         """ Returns the requested page. """
 
         return self.__class__(
-            self.session,
+            self.app,
             page=page,
             from_date=self.from_date,
             to_date=self.to_date,
@@ -188,7 +189,7 @@ class SwissVoteCollection(Pagination):
                 sort_order = 'ascending'
 
         return self.__class__(
-            self.session,
+            self.app,
             page=None,
             from_date=self.from_date,
             to_date=self.to_date,
@@ -213,7 +214,10 @@ class SwissVoteCollection(Pagination):
 
         if self.current_sort_by == 'title':
             from onegov.core.orm.func import unaccent
-            result = unaccent(SwissVote.title)
+            if self.app.session_manager.current_locale == 'fr_CH':
+                result = unaccent(SwissVote.short_title_fr)
+            else:
+                result = unaccent(SwissVote.short_title_de)
         else:
             result = (
                 getattr(SwissVote, f'_{self.current_sort_by}', None)
@@ -293,18 +297,24 @@ class SwissVoteCollection(Pagination):
             return []
 
         def match(column, language='german'):
-            return column.op('@@')(func.to_tsquery('german', term))
+            return column.op('@@')(func.to_tsquery(language, term))
 
         def match_convert(column, language='german'):
             return match(func.to_tsvector(language, column), language)
 
         if not self.full_text:
             return [
-                match_convert(SwissVote.title),
+                match_convert(SwissVote.title_de),
+                match_convert(SwissVote.title_fr, 'french'),
+                match_convert(SwissVote.short_title_de),
+                match_convert(SwissVote.short_title_fr, 'french'),
                 match_convert(SwissVote.keyword),
             ]
         return [
-            match_convert(SwissVote.title),
+            match_convert(SwissVote.title_de),
+            match_convert(SwissVote.title_fr, 'french'),
+            match_convert(SwissVote.short_title_de),
+            match_convert(SwissVote.short_title_fr, 'french'),
             match_convert(SwissVote.keyword),
             match_convert(SwissVote.initiator),
             match(SwissVote.searchable_text_de_CH),

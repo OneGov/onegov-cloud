@@ -17,7 +17,10 @@ def test_view_vote(swissvotes_app):
             decade=NumericRange(1990, 1999),
             legislation_number=4,
             legislation_decade=NumericRange(1990, 1994),
-            title="Vote",
+            title_de="Vote DE",
+            title_fr="Vote FR",
+            short_title_de="V D",
+            short_title_fr="V F",
             keyword="Keyword",
             votes_on_same_day=2,
             _legal_form=1,
@@ -138,7 +141,8 @@ def test_view_vote(swissvotes_app):
     page = client.get('/').maybe_follow().click("Abstimmungen")
     page = page.click("Details")
     assert "100.1" in page
-    assert "Vote" in page
+    assert "Vote DE" in page
+    assert "V D" in page
     assert "Keyword" in page
     assert "02.06.1990" in page
     assert "Obligatorisches Referendum" in page
@@ -293,7 +297,7 @@ def test_view_vote(swissvotes_app):
             }
 
         ],
-        'title': 'Vote'
+        'title': 'Vote DE'
     }
 
     # Delete vote
@@ -319,7 +323,10 @@ def test_vote_upload(swissvotes_app, attachments):
             decade=NumericRange(1990, 1999),
             legislation_number=4,
             legislation_decade=NumericRange(1990, 1994),
-            title="Vote",
+            title_de="Vote DE",
+            title_fr="Vote FR",
+            short_title_de="V D",
+            short_title_fr="V F",
             keyword="Keyword",
             votes_on_same_day=2,
             _legal_form=3,
@@ -389,7 +396,10 @@ def test_vote_pagination(swissvotes_app):
                 decade=NumericRange(1990, 1999),
                 legislation_number=4,
                 legislation_decade=NumericRange(1990, 1994),
-                title="Vote",
+                title_de="Vote DE",
+                title_fr="Vote FR",
+                short_title_de="V D",
+                short_title_fr="V F",
                 keyword="Keyword",
                 votes_on_same_day=2,
                 _legal_form=3,
@@ -460,7 +470,10 @@ def test_vote_chart(session):
         'title': None
     }
 
-    model.title = "Vote"
+    model.title_de = "Vote DE"
+    model.title_fr = "Vote FR"
+    model.short_title_de = "V D"
+    model.short_title_fr = "V F"
     model._result_people_accepted = 0
     model._result_cantons_accepted = 3
     model._position_federal_council = 33
@@ -499,7 +512,7 @@ def test_vote_chart(session):
                 'nay': True, 'nay_label': 'Rejecting',
             }
         ],
-        'title': 'Vote'
+        'title': 'Vote DE'
     }
 
     model.result_people_yeas_p = Decimal('10.2')
@@ -561,5 +574,5 @@ def test_vote_chart(session):
                 ),
             }
         ],
-        'title': 'Vote'
+        'title': 'Vote DE'
     }

@@ -59,8 +59,8 @@ def test_pages(session):
     ]
 
 
-def test_votes(session):
-    votes = SwissVoteCollection(session)
+def test_votes(swissvotes_app):
+    votes = SwissVoteCollection(swissvotes_app)
     assert votes.last_modified is None
 
     with freeze_time(datetime(2019, 1, 1, 10, tzinfo=utc)):
@@ -71,7 +71,10 @@ def test_votes(session):
             decade=NumericRange(1990, 1999),
             legislation_number=4,
             legislation_decade=NumericRange(1990, 1994),
-            title="Vote",
+            title_de="Vote DE",
+            title_fr="Vote FR",
+            short_title_de="V D",
+            short_title_fr="V F",
             votes_on_same_day=2,
             _legal_form=1
         )
@@ -82,7 +85,10 @@ def test_votes(session):
     assert vote.decade == NumericRange(1990, 1999)
     assert vote.legislation_number == 4
     assert vote.legislation_decade == NumericRange(1990, 1994)
-    assert vote.title == "Vote"
+    assert vote.title_de == "Vote DE"
+    assert vote.title_fr == "Vote FR"
+    assert vote.short_title_de == "V D"
+    assert vote.short_title_fr == "V F"
     assert vote.votes_on_same_day == 2
     assert vote.legal_form == "Mandatory referendum"
 
@@ -91,9 +97,9 @@ def test_votes(session):
     assert votes.by_bfs_number(Decimal('100.1')) == vote
 
 
-def test_votes_default():
+def test_votes_default(swissvotes_app):
     votes = SwissVoteCollection(
-        session=1,
+        swissvotes_app,
         page=2,
         from_date=3,
         to_date=4,
@@ -108,7 +114,6 @@ def test_votes_default():
         sort_by=13,
         sort_order=14
     )
-    assert votes.session == 1
     assert votes.page == 2
     assert votes.from_date == 3
     assert votes.to_date == 4
@@ -124,7 +129,6 @@ def test_votes_default():
     assert votes.sort_order == 14
 
     votes = votes.default()
-    assert votes.session == 1
     assert votes.page is None
     assert votes.from_date is None
     assert votes.to_date is None
@@ -140,8 +144,8 @@ def test_votes_default():
     assert votes.sort_order is None
 
 
-def test_votes_pagination(session):
-    votes = SwissVoteCollection(session)
+def test_votes_pagination(swissvotes_app):
+    votes = SwissVoteCollection(swissvotes_app)
 
     assert votes.pages_count == 0
     assert votes.batch == []
@@ -159,12 +163,15 @@ def test_votes_pagination(session):
             decade=NumericRange(1990, 1999),
             legislation_number=4,
             legislation_decade=NumericRange(1990, 1994),
-            title="Vote",
+            title_de="Vote",
+            title_fr="Vote",
+            short_title_de="Vote",
+            short_title_fr="Vote",
             votes_on_same_day=2,
             _legal_form=1
         )
 
-    votes = SwissVoteCollection(session)
+    votes = SwissVoteCollection(swissvotes_app)
     assert votes.query().count() == 26
     assert votes.subset_count == 26
     assert votes.pages_count == 2
@@ -180,28 +187,32 @@ def test_votes_pagination(session):
     assert votes.next.previous == votes
 
 
-def test_votes_term_expression():
+def test_votes_term_expression(swissvotes_app):
     def term_expression(term):
-        return SwissVoteCollection(None, term=term).term_expression
+        return SwissVoteCollection(swissvotes_app, term=term).term_expression
 
     assert term_expression(None) == ''
     assert term_expression('') == ''
     assert term_expression('a,1.$b !c*d*') == 'a,1.b <-> cd:*'
 
 
-def test_votes_term_filter():
-    assert SwissVoteCollection(None).term_filter == []
-    assert SwissVoteCollection(None, term='').term_filter == []
-    assert SwissVoteCollection(None, term='', full_text=True).term_filter == []
+def test_votes_term_filter(swissvotes_app):
+    assert SwissVoteCollection(swissvotes_app).term_filter == []
+    assert SwissVoteCollection(swissvotes_app, term='').term_filter == []
+    assert SwissVoteCollection(swissvotes_app, term='', full_text=True)\
+        .term_filter == []
 
     def compiled(**kwargs):
-        list_ = SwissVoteCollection(None, **kwargs).term_filter
+        list_ = SwissVoteCollection(swissvotes_app, **kwargs).term_filter
         return [
             str(statement.compile(compile_kwargs={"literal_binds": True}))
             for statement in list_
         ]
 
-    c_title = "to_tsvector('german', swissvotes.title)"
+    c_title_de = "to_tsvector('german', swissvotes.title_de)"
+    c_title_fr = "to_tsvector('french', swissvotes.title_fr)"
+    c_short_title_de = "to_tsvector('german', swissvotes.short_title_de)"
+    c_short_title_fr = "to_tsvector('french', swissvotes.short_title_fr)"
     c_keyword = "to_tsvector('german', swissvotes.keyword)"
     c_initiator = "to_tsvector('german', swissvotes.initiator)"
     c_text_de = 'swissvotes."searchable_text_de_CH"'
@@ -210,67 +221,100 @@ def test_votes_term_filter():
     assert compiled(term='100') == [
         'swissvotes.bfs_number = 100',
         'swissvotes.procedure_number = 100',
-        f"{c_title} @@ to_tsquery('german', '100')",
+        f"{c_title_de} @@ to_tsquery('german', '100')",
+        f"{c_title_fr} @@ to_tsquery('french', '100')",
+        f"{c_short_title_de} @@ to_tsquery('german', '100')",
+        f"{c_short_title_fr} @@ to_tsquery('french', '100')",
         f"{c_keyword} @@ to_tsquery('german', '100')",
     ]
 
     assert compiled(term='100.1') == [
         'swissvotes.bfs_number = 100.1',
         'swissvotes.procedure_number = 100.1',
-        f"{c_title} @@ to_tsquery('german', '100.1')",
+        f"{c_title_de} @@ to_tsquery('german', '100.1')",
+        f"{c_title_fr} @@ to_tsquery('french', '100.1')",
+        f"{c_short_title_de} @@ to_tsquery('german', '100.1')",
+        f"{c_short_title_fr} @@ to_tsquery('french', '100.1')",
         f"{c_keyword} @@ to_tsquery('german', '100.1')",
     ]
 
     assert compiled(term='abc') == [
-        f"{c_title} @@ to_tsquery('german', 'abc')",
+        f"{c_title_de} @@ to_tsquery('german', 'abc')",
+        f"{c_title_fr} @@ to_tsquery('french', 'abc')",
+        f"{c_short_title_de} @@ to_tsquery('german', 'abc')",
+        f"{c_short_title_fr} @@ to_tsquery('french', 'abc')",
         f"{c_keyword} @@ to_tsquery('german', 'abc')",
     ]
     assert compiled(term='abc', full_text=True) == [
-        f"{c_title} @@ to_tsquery('german', 'abc')",
+        f"{c_title_de} @@ to_tsquery('german', 'abc')",
+        f"{c_title_fr} @@ to_tsquery('french', 'abc')",
+        f"{c_short_title_de} @@ to_tsquery('german', 'abc')",
+        f"{c_short_title_fr} @@ to_tsquery('french', 'abc')",
         f"{c_keyword} @@ to_tsquery('german', 'abc')",
         f"{c_initiator} @@ to_tsquery('german', 'abc')",
         f"{c_text_de} @@ to_tsquery('german', 'abc')",
-        f"{c_text_fr} @@ to_tsquery('german', 'abc')",
+        f"{c_text_fr} @@ to_tsquery('french', 'abc')",
     ]
 
     assert compiled(term='Müller') == [
-        f"{c_title} @@ to_tsquery('german', 'Müller')",
+        f"{c_title_de} @@ to_tsquery('german', 'Müller')",
+        f"{c_title_fr} @@ to_tsquery('french', 'Müller')",
+        f"{c_short_title_de} @@ to_tsquery('german', 'Müller')",
+        f"{c_short_title_fr} @@ to_tsquery('french', 'Müller')",
         f"{c_keyword} @@ to_tsquery('german', 'Müller')",
     ]
 
     assert compiled(term='20,20') == [
-        f"{c_title} @@ to_tsquery('german', '20,20')",
+        f"{c_title_de} @@ to_tsquery('german', '20,20')",
+        f"{c_title_fr} @@ to_tsquery('french', '20,20')",
+        f"{c_short_title_de} @@ to_tsquery('german', '20,20')",
+        f"{c_short_title_fr} @@ to_tsquery('french', '20,20')",
         f"{c_keyword} @@ to_tsquery('german', '20,20')",
     ]
 
     assert compiled(term='Neu!') == [
-        f"{c_title} @@ to_tsquery('german', 'Neu')",
+        f"{c_title_de} @@ to_tsquery('german', 'Neu')",
+        f"{c_title_fr} @@ to_tsquery('french', 'Neu')",
+        f"{c_short_title_de} @@ to_tsquery('german', 'Neu')",
+        f"{c_short_title_fr} @@ to_tsquery('french', 'Neu')",
         f"{c_keyword} @@ to_tsquery('german', 'Neu')",
     ]
 
-    assert compiled(term='Hans Peter Müller') == [
-        f"{c_title} @@ to_tsquery('german', 'Hans <-> Peter <-> Müller')",
-        f"{c_keyword} @@ to_tsquery('german', 'Hans <-> Peter <-> Müller')",
+    assert compiled(term='H P Müller') == [
+        f"{c_title_de} @@ to_tsquery('german', 'H <-> P <-> Müller')",
+        f"{c_title_fr} @@ to_tsquery('french', 'H <-> P <-> Müller')",
+        f"{c_short_title_de} @@ to_tsquery('german', 'H <-> P <-> Müller')",
+        f"{c_short_title_fr} @@ to_tsquery('french', 'H <-> P <-> Müller')",
+        f"{c_keyword} @@ to_tsquery('german', 'H <-> P <-> Müller')",
     ]
 
     assert compiled(term='x AND y') == [
-        f"{c_title} @@ to_tsquery('german', 'x <-> AND <-> y')",
+        f"{c_title_de} @@ to_tsquery('german', 'x <-> AND <-> y')",
+        f"{c_title_fr} @@ to_tsquery('french', 'x <-> AND <-> y')",
+        f"{c_short_title_de} @@ to_tsquery('german', 'x <-> AND <-> y')",
+        f"{c_short_title_fr} @@ to_tsquery('french', 'x <-> AND <-> y')",
         f"{c_keyword} @@ to_tsquery('german', 'x <-> AND <-> y')",
     ]
 
     assert compiled(term='x | y') == [
-        f"{c_title} @@ to_tsquery('german', 'x <-> y')",
+        f"{c_title_de} @@ to_tsquery('german', 'x <-> y')",
+        f"{c_title_fr} @@ to_tsquery('french', 'x <-> y')",
+        f"{c_short_title_de} @@ to_tsquery('german', 'x <-> y')",
+        f"{c_short_title_fr} @@ to_tsquery('french', 'x <-> y')",
         f"{c_keyword} @@ to_tsquery('german', 'x <-> y')",
     ]
 
     assert compiled(term='y ! y') == [
-        f"{c_title} @@ to_tsquery('german', 'y <-> y')",
+        f"{c_title_de} @@ to_tsquery('german', 'y <-> y')",
+        f"{c_title_fr} @@ to_tsquery('french', 'y <-> y')",
+        f"{c_short_title_de} @@ to_tsquery('german', 'y <-> y')",
+        f"{c_short_title_fr} @@ to_tsquery('french', 'y <-> y')",
         f"{c_keyword} @@ to_tsquery('german', 'y <-> y')",
     ]
 
 
-def test_votes_query(session):
-    votes = SwissVoteCollection(session)
+def test_votes_query(swissvotes_app):
+    votes = SwissVoteCollection(swissvotes_app)
     votes.add(
         id=1,
         bfs_number=Decimal('100'),
@@ -278,7 +322,10 @@ def test_votes_query(session):
         decade=NumericRange(1990, 1999),
         legislation_number=4,
         legislation_decade=NumericRange(1990, 1994),
-        title="Vote on that one thing",
+        title_de="Abstimmung über diese Sache",
+        title_fr="Vote sur cette question",
+        short_title_de="diese Sache",
+        short_title_fr="cette question",
         votes_on_same_day=1,
         _legal_form=1,
         descriptor_1_level_1=Decimal('4'),
@@ -302,7 +349,10 @@ def test_votes_query(session):
         decade=NumericRange(1990, 1999),
         legislation_number=4,
         legislation_decade=NumericRange(1990, 1994),
-        title="We want this version the thing",
+        title_de="Wir wollen diese Version die Sache",
+        title_fr="Nous voulons cette version de la chose",
+        short_title_de="diese Version",
+        short_title_fr="cette version",
         keyword="Variant A of X",
         initiator="The group that wants something",
         votes_on_same_day=1,
@@ -325,7 +375,10 @@ def test_votes_query(session):
         decade=NumericRange(1990, 1999),
         legislation_number=4,
         legislation_decade=NumericRange(1990, 1994),
-        title="We want that version of the thing",
+        title_de="Wir wollen nochmal etwas anderes",
+        title_fr="Nous voulons encore une autre version de la chose",
+        short_title_de="Nochmals etwas anderes",
+        short_title_fr="encore une autre version",
         keyword="Variant B of X",
         votes_on_same_day=1,
         _legal_form=2,
@@ -338,7 +391,7 @@ def test_votes_query(session):
     )
 
     def count(**kwargs):
-        return SwissVoteCollection(session, **kwargs).query().count()
+        return SwissVoteCollection(swissvotes_app, **kwargs).query().count()
 
     assert count() == 3
 
@@ -399,10 +452,10 @@ def test_votes_query(session):
     assert count(policy_area=['4.42.421', '10.103.1033']) == 1
     assert count(policy_area=['4.42.421', '10.103.1035']) == 2
 
-    assert count(term='thing') == 3
-    assert count(term='that one thing') == 1
+    assert count(term='Abstimmung') == 1
+    assert count(term='cette question') == 1
     assert count(term='version') == 2
-    assert count(term='variant') == 2
+    assert count(term='encore') == 1
     assert count(term='riant') == 0
     assert count(term='A of X') == 1
     assert count(term='group') == 0
@@ -410,11 +463,12 @@ def test_votes_query(session):
     assert count(term='The group that wants something', full_text=True) == 1
 
 
-def test_votes_query_attachments(session, attachments, postgres_version):
+def test_votes_query_attachments(swissvotes_app, attachments,
+                                 postgres_version):
     if int(postgres_version.split('.')[0]) < 10:
         skip("PostgreSQL 10+")
 
-    votes = SwissVoteCollection(session)
+    votes = SwissVoteCollection(swissvotes_app)
     votes.add(
         id=1,
         bfs_number=Decimal('100'),
@@ -422,7 +476,10 @@ def test_votes_query_attachments(session, attachments, postgres_version):
         decade=NumericRange(1990, 1999),
         legislation_number=4,
         legislation_decade=NumericRange(1990, 1994),
-        title="Vote on that one thing",
+        title_de="Vote on that one thing",
+        title_fr="Vote on that one thing",
+        short_title_de="Vote on that one thing",
+        short_title_fr="Vote on that one thing",
         votes_on_same_day=1,
         _legal_form=1,
     )
@@ -433,7 +490,10 @@ def test_votes_query_attachments(session, attachments, postgres_version):
         decade=NumericRange(1990, 1999),
         legislation_number=4,
         legislation_decade=NumericRange(1990, 1994),
-        title="We want this version the thing",
+        title_de="We want this version the thing",
+        title_fr="We want this version the thing",
+        short_title_de="We want this version the thing",
+        short_title_fr="We want this version the thing",
         votes_on_same_day=1,
         _legal_form=2,
     )
@@ -444,16 +504,19 @@ def test_votes_query_attachments(session, attachments, postgres_version):
         decade=NumericRange(1990, 1999),
         legislation_number=4,
         legislation_decade=NumericRange(1990, 1994),
-        title="We want that version of the thing",
+        title_de="We want that version of the thing",
+        title_fr="We want that version of the thing",
+        short_title_de="We want that version of the thing",
+        short_title_fr="We want that version of the thing",
         votes_on_same_day=1,
         _legal_form=2,
     )
     for name, attachment in attachments.items():
         setattr(vote, name, attachment)
-    session.flush()
+    votes.session.flush()
 
     def count(**kwargs):
-        return SwissVoteCollection(session, **kwargs).query().count()
+        return SwissVoteCollection(swissvotes_app, **kwargs).query().count()
 
     assert count() == 3
 
@@ -466,10 +529,10 @@ def test_votes_query_attachments(session, attachments, postgres_version):
     assert count(term='booklet', full_text=True) == 0
 
 
-def test_votes_order(session):
-    votes = SwissVoteCollection(session)
+def test_votes_order(swissvotes_app):
+    votes = SwissVoteCollection(swissvotes_app)
 
-    for index, title in enumerate(('First', 'Śecond', 'Third'), start=1):
+    for index, title in enumerate(('Firsţ', 'Śecond', 'Thirḓ'), start=1):
         votes.add(
             id=index,
             bfs_number=Decimal(str(index)),
@@ -477,7 +540,10 @@ def test_votes_order(session):
             decade=NumericRange(1990, 1999),
             legislation_number=1,
             legislation_decade=NumericRange(1990, 1994),
-            title=title,
+            title_de=title,
+            title_fr=''.join(reversed(title)),
+            short_title_de=title,
+            short_title_fr=''.join(reversed(title)),
             votes_on_same_day=1,
             _legal_form=index,
             _result=index,
@@ -493,27 +559,30 @@ def test_votes_order(session):
     assert votes.sort_order_by_key('title') == 'unsorted'
     assert votes.sort_order_by_key('invalid') == 'unsorted'
 
-    votes = SwissVoteCollection(session, sort_by='', sort_order='')
+    votes = SwissVoteCollection(swissvotes_app, sort_by='', sort_order='')
     assert votes.current_sort_by == 'date'
     assert votes.current_sort_order == 'descending'
 
-    votes = SwissVoteCollection(session, sort_by='xx', sort_order='yy')
+    votes = SwissVoteCollection(swissvotes_app, sort_by='xx', sort_order='yy')
     assert votes.current_sort_by == 'date'
     assert votes.current_sort_order == 'descending'
 
-    votes = SwissVoteCollection(session, sort_by='date', sort_order='yy')
+    votes = SwissVoteCollection(swissvotes_app, sort_by='date',
+                                sort_order='yy')
     assert votes.current_sort_by == 'date'
     assert votes.current_sort_order == 'descending'
 
-    votes = SwissVoteCollection(session, sort_by='xx', sort_order='ascending')
+    votes = SwissVoteCollection(swissvotes_app, sort_by='xx',
+                                sort_order='ascending')
     assert votes.current_sort_by == 'date'
     assert votes.current_sort_order == 'descending'
 
-    votes = SwissVoteCollection(session, sort_by='result', sort_order='yy')
+    votes = SwissVoteCollection(swissvotes_app, sort_by='result',
+                                sort_order='yy')
     assert votes.current_sort_by == 'result'
     assert votes.current_sort_order == 'ascending'
 
-    votes = SwissVoteCollection(session)
+    votes = SwissVoteCollection(swissvotes_app)
     assert votes.current_sort_by == 'date'
     assert votes.current_sort_order == 'descending'
     assert 'date' in str(votes.order_by)
@@ -591,6 +660,9 @@ def test_votes_order(session):
     assert 'DESC' in str(votes.order_by)
     assert [vote.id for vote in votes.query()] == [3, 2, 1]
 
+    votes.app.session_manager.current_locale = 'fr_CH'
+    assert [vote.id for vote in votes.query()] == [1, 3, 2]
+
     votes = votes.by_order(None)
     assert votes.current_sort_by == 'date'
     assert votes.current_sort_order == 'descending'
@@ -604,8 +676,8 @@ def test_votes_order(session):
     assert votes.current_sort_order == 'descending'
 
 
-def test_votes_available_descriptors(session):
-    votes = SwissVoteCollection(session)
+def test_votes_available_descriptors(swissvotes_app):
+    votes = SwissVoteCollection(swissvotes_app)
     assert votes.available_descriptors == [set(), set(), set()]
 
     votes.add(
@@ -615,7 +687,10 @@ def test_votes_available_descriptors(session):
         decade=NumericRange(1990, 1999),
         legislation_number=4,
         legislation_decade=NumericRange(1990, 1994),
-        title="Vote",
+        title_de="Vote",
+        title_fr="Vote",
+        short_title_de="Vote",
+        short_title_fr="Vote",
         votes_on_same_day=2,
         _legal_form=1,
         descriptor_1_level_1=Decimal('4'),
@@ -635,7 +710,10 @@ def test_votes_available_descriptors(session):
         decade=NumericRange(1990, 1999),
         legislation_number=4,
         legislation_decade=NumericRange(1990, 1994),
-        title="Vote",
+        title_de="Vote",
+        title_fr="Vote",
+        short_title_de="Vote",
+        short_title_fr="Vote",
         votes_on_same_day=2,
         _legal_form=1,
         descriptor_1_level_1=Decimal('10'),
@@ -652,22 +730,25 @@ def test_votes_available_descriptors(session):
         decade=NumericRange(1990, 1999),
         legislation_number=4,
         legislation_decade=NumericRange(1990, 1994),
-        title="Vote",
+        title_de="Vote",
+        title_fr="Vote",
+        short_title_de="Vote",
+        short_title_fr="Vote",
         votes_on_same_day=2,
         _legal_form=1,
         descriptor_3_level_1=Decimal('8'),
         descriptor_3_level_2=Decimal('8.3'),
     )
 
-    assert SwissVoteCollection(session).available_descriptors == [
+    assert SwissVoteCollection(swissvotes_app).available_descriptors == [
         {Decimal('1.00'), Decimal('4.00'), Decimal('8.00'), Decimal('10.00')},
         {Decimal('1.60'), Decimal('4.20'), Decimal('8.30'), Decimal('10.30')},
         {Decimal('1.62'), Decimal('4.21'), Decimal('10.33'), Decimal('10.35')}
     ]
 
 
-def test_votes_update(session):
-    votes = SwissVoteCollection(session)
+def test_votes_update(swissvotes_app):
+    votes = SwissVoteCollection(swissvotes_app)
 
     added, updated = votes.update([
         SwissVote(
@@ -676,7 +757,10 @@ def test_votes_update(session):
             decade=NumericRange(1990, 1999),
             legislation_number=1,
             legislation_decade=NumericRange(1990, 1994),
-            title="First",
+            title_de="First",
+            title_fr="First",
+            short_title_de="First",
+            short_title_fr="First",
             votes_on_same_day=2,
             _legal_form=1,
         ),
@@ -686,7 +770,10 @@ def test_votes_update(session):
             decade=NumericRange(1990, 1999),
             legislation_number=2,
             legislation_decade=NumericRange(1990, 1994),
-            title="Second",
+            title_de="Second",
+            title_fr="Second",
+            short_title_de="Second",
+            short_title_fr="Second",
             votes_on_same_day=2,
             _legal_form=1,
         )
@@ -702,7 +789,10 @@ def test_votes_update(session):
             decade=NumericRange(1990, 1999),
             legislation_number=1,
             legislation_decade=NumericRange(1990, 1994),
-            title="First",
+            title_de="First",
+            title_fr="First",
+            short_title_de="First",
+            short_title_fr="First",
             votes_on_same_day=2,
             _legal_form=1,
         )
@@ -717,7 +807,10 @@ def test_votes_update(session):
             decade=NumericRange(1990, 1999),
             legislation_number=1,
             legislation_decade=NumericRange(1990, 1994),
-            title="First vote",
+            title_de="First vote",
+            title_fr="First vote",
+            short_title_de="First vote",
+            short_title_fr="First vote",
             votes_on_same_day=2,
             _legal_form=1,
         )
@@ -727,15 +820,18 @@ def test_votes_update(session):
     assert votes.by_bfs_number(Decimal('1')).title == 'First vote'
 
 
-def test_votes_export(session):
-    votes = SwissVoteCollection(session)
+def test_votes_export(swissvotes_app):
+    votes = SwissVoteCollection(swissvotes_app)
     vote = votes.add(
         bfs_number=Decimal('100.1'),
         date=date(1990, 6, 2),
         decade=NumericRange(1990, 1999),
         legislation_number=4,
         legislation_decade=NumericRange(1990, 1994),
-        title="Vote",
+        title_de="Vote DE",
+        title_fr="Vote FR",
+        short_title_de="V D",
+        short_title_fr="V F",
         keyword="Keyword",
         votes_on_same_day=2,
         _legal_form=1,
@@ -1456,8 +1552,8 @@ def test_votes_export(session):
     vote.national_council_share_vague = Decimal('25.10')
     vote.bfs_map_de = 'map de'
     vote.bfs_map_fr = 'map fr'
-    session.flush()
-    session.expire_all()
+    votes.session.flush()
+    votes.session.expire_all()
 
     file = StringIO()
     votes.export_csv(file)
@@ -1471,7 +1567,10 @@ def test_votes_export(session):
         'legislatur': '4',
         'legisjahr': '1990-1994',
         'jahrzehnt': '1990-1999',
-        'titel': 'Vote',
+        'titel_off_d': 'Vote DE',
+        'titel_off_f': 'Vote FR',
+        'titel_kurz_d': 'V D',
+        'titel_kurz_f': 'V F',
         'stichwort': 'Keyword',
         'anzahl': '2',
         'rechtsform': '1',
@@ -2212,7 +2311,10 @@ def test_votes_export(session):
         'legislatur': 4.0,
         'legisjahr': '1990-1994',
         'jahrzehnt': '1990-1999',
-        'titel': 'Vote',
+        'titel_off_d': 'Vote DE',
+        'titel_off_f': 'Vote FR',
+        'titel_kurz_d': 'V D',
+        'titel_kurz_f': 'V F',
         'stichwort': 'Keyword',
         'anzahl': 2.0,
         'rechtsform': 1.0,

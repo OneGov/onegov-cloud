@@ -173,7 +173,10 @@ def test_import_attachments(session_manager, temporary_directory, redis_url):
                 decade=NumericRange(1990, 1999),
                 legislation_number=4,
                 legislation_decade=NumericRange(1990, 1994),
-                title=f"Vote {number}",
+                title_de=f"Vote {number}",
+                title_fr=f"Vote {number}",
+                short_title_de=f"Vote {number}",
+                short_title_fr=f"Vote {number}",
                 votes_on_same_day=3,
                 _legal_form=1,
             )
@@ -243,7 +246,10 @@ def test_reindex(session_manager, temporary_directory, redis_url):
         decade=NumericRange(1990, 1999),
         legislation_number=4,
         legislation_decade=NumericRange(1990, 1994),
-        title="Vote",
+        title_de="Vote",
+        title_fr="Vote",
+        short_title_de="Vote",
+        short_title_fr="Vote",
         votes_on_same_day=3,
         _legal_form=1,
     )

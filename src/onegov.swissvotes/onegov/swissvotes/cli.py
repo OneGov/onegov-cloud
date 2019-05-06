@@ -87,7 +87,7 @@ def import_attachments(group_context, folder):
     """
 
     def _import(request, app):
-        votes = SwissVoteCollection(app.session())
+        votes = SwissVoteCollection(app)
 
         attachments = {}
         for name in os.listdir(folder):
@@ -162,7 +162,7 @@ def reindex_attachments(group_context):
     """ Reindexes the attachments. """
 
     def _reindex(request, app):
-        votes = SwissVoteCollection(app.session())
+        votes = SwissVoteCollection(app)
         for vote in votes.query():
             vote.vectorize_files()
             click.secho(f"Reindexed vote {vote.bfs_number}", fg='green')

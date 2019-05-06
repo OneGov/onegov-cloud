@@ -260,3 +260,12 @@ def rename_sbv_usp_column(context):
         if 'sbv_usp' in vote.recommendations:
             vote.recommendations['sbv-usp'] = vote.recommendations['sbv_usp']
             del vote.recommendations['sbv_usp']
+
+
+@upgrade_task('Adds french and short titles')
+def add_french_and_short_title_columns(context):
+    for column in ('title_de', 'title_fr', 'short_title_de', 'short_title_fr'):
+        if not context.has_column('swissvotes', column):
+            context.operations.add_column('swissvotes', Column(column, Text()))
+    if context.has_column('swissvotes', 'title'):
+        context.operations.drop_column('swissvotes', 'title')

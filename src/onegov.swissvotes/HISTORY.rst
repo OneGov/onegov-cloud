@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds short and french titles.
+  [msom]
+
 0.0.55 (2019-05-06)
 ~~~~~~~~~~~~~~~~~~~
 

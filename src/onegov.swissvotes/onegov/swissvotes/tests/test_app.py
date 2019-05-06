@@ -15,7 +15,7 @@ def test_app(swissvotes_app):
 
 
 def test_app_dataset_caches(swissvotes_app):
-    votes = SwissVoteCollection(swissvotes_app.session())
+    votes = SwissVoteCollection(swissvotes_app)
 
     csv = [swissvotes_app.get_cached_dataset('csv')]
     xlsx = [swissvotes_app.get_cached_dataset('xlsx')]
@@ -28,7 +28,10 @@ def test_app_dataset_caches(swissvotes_app):
             decade=NumericRange(1990, 1999),
             legislation_number=4,
             legislation_decade=NumericRange(1990, 1994),
-            title="Vote",
+            title_de="Vote",
+            title_fr="Vote",
+            short_title_de="Vote",
+            short_title_fr="Vote",
             votes_on_same_day=2,
             _legal_form=1
         )
@@ -44,7 +47,10 @@ def test_app_dataset_caches(swissvotes_app):
             decade=NumericRange(1990, 1999),
             legislation_number=4,
             legislation_decade=NumericRange(1990, 1994),
-            title="Vote",
+            title_de="Vote",
+            title_fr="Vote",
+            short_title_de="Vote",
+            short_title_fr="Vote",
             votes_on_same_day=2,
             _legal_form=1
         )

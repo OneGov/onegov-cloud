@@ -36,7 +36,7 @@ class SwissvotesApp(Framework, FormApp, QuillApp, DepotApp):
 
         assert format in ('csv', 'xlsx')
 
-        votes = SwissVoteCollection(self.session())
+        votes = SwissVoteCollection(self)
         last_modified = votes.last_modified
         last_modified = last_modified.timestamp() if last_modified else ''
         filename = f'dataset-{last_modified}.{format}'

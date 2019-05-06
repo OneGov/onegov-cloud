@@ -45,6 +45,7 @@ def test_update_votes(swissvotes_app, file):
         "Gegenentwurf zur Volksinitiative "
         "«für ein Verbot der Errichtung von Spielbanken»"
     )
+    assert vote.short_title_de == "Gegenentwurf zur Spielbanken-Initiative"
     assert [str(pa) for pa in vote.policy_areas] == ['4.41.413', '4.44.443']
     assert str(vote.result_turnout) == '60.2323410000'
     assert vote.recommendations_parties['Nay'][0].name == 'sps'
@@ -105,7 +106,10 @@ def test_update_votes_unknown_descriptors(swissvotes_app):
         '1',  # legislatur
         '2004-2008',  # legisjahr
         '2000-2009',  # jahrzent
-        'titel',  # titel
+        'kurztitel de',  # titel_kurz_d
+        'kurztitel fr',  # titel_kurz_f
+        'titel de',  # titel_off_d
+        'titel fr',  # titel_off_f
         'stichwort',  # stichwort
         '2',  # anzahl
         '3',  # rechtsform

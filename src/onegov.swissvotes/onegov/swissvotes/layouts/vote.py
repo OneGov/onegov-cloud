@@ -8,7 +8,7 @@ class VoteLayout(DefaultLayout):
 
     @cached_property
     def title(self):
-        return self.model.title
+        return self.model.short_title
 
     @cached_property
     def editbar_links(self):

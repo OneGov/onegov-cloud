@@ -51,7 +51,7 @@
                     </thead>
                     <tbody>
                         <tr tal:repeat="vote votes.batch">
-                            <td class="left-aligned">${vote.title} <a href="${request.link(votes.by_order('title'))}" class="sort-title-fix sort-${votes.sort_order_by_key('title')}"></a></td>
+                            <td class="left-aligned"><span title="${vote.title}">${vote.short_title}</span> <a href="${request.link(votes.by_order('title'))}" class="sort-title-fix sort-${votes.sort_order_by_key('title')}"></a></td>
                             <td class="left-aligned sort-${votes.sort_order_by_key('date')}">${layout.format_date(vote.date, 'date')}</td>
                             <td class="left-aligned sort-${votes.sort_order_by_key('legal_form')}">${vote.legal_form}</td>
                             <td class="left-aligned" tal:content="structure layout.format_policy_areas(vote)"></td>

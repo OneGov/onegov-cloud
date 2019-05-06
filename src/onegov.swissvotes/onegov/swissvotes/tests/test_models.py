@@ -280,8 +280,11 @@ def test_vote(session):
     vote.decade = NumericRange(1990, 1999)
     vote.legislation_number = 4
     vote.legislation_decade = NumericRange(1990, 1994)
-    vote.title = "Vote"
-    vote.keyword = "Keyowrd"
+    vote.title_de = "Vote DE"
+    vote.title_fr = "Vote FR"
+    vote.short_title_de = "V D"
+    vote.short_title_fr = "V F"
+    vote.keyword = "Keyword"
     vote.votes_on_same_day = 2
     vote._legal_form = 1
     vote.initiator = "Initiator"
@@ -632,8 +635,23 @@ def test_vote(session):
     assert vote.decade == NumericRange(1990, 1999)
     assert vote.legislation_number == 4
     assert vote.legislation_decade == NumericRange(1990, 1994)
-    assert vote.title == "Vote"
-    assert vote.keyword == "Keyowrd"
+    assert vote.title_de == "Vote DE"
+    assert vote.title_fr == "Vote FR"
+    assert vote.short_title_de == "V D"
+    assert vote.short_title_fr == "V F"
+    assert vote.short_title == "V D"
+
+    assert vote.title == "Vote DE"
+    assert vote.short_title == "V D"
+    vote.session_manager.current_locale = 'fr_CH'
+    assert vote.title == "Vote FR"
+    assert vote.short_title == "V F"
+    vote.session_manager.current_locale = 'en_US'
+    assert vote.title == "Vote DE"
+    assert vote.short_title == "V D"
+    vote.session_manager.current_locale = 'de_CH'
+
+    assert vote.keyword == "Keyword"
     assert vote.votes_on_same_day == 2
     assert vote._legal_form == 1
     assert vote.legal_form == "Mandatory referendum"
@@ -1173,8 +1191,11 @@ def test_vote_attachments(swissvotes_app, attachments):
             decade=NumericRange(1990, 1999),
             legislation_number=4,
             legislation_decade=NumericRange(1990, 1994),
-            title="Vote",
-            keyword="Keyowrd",
+            title_de="Vote DE",
+            title_fr="Vote FR",
+            short_title_de="V D",
+            short_title_fr="V F",
+            keyword="Keyword",
             votes_on_same_day=2,
             _legal_form=1,
         )
@@ -1257,7 +1278,10 @@ def test_column_mapper():
     mapper.set_value(vote, 'date', date(2019, 1, 1))
     mapper.set_value(vote, 'legislation_number', 10)
     mapper.set_value(vote, 'legislation_decade', NumericRange(1990, 1999))
-    mapper.set_value(vote, 'title', 'title')
+    mapper.set_value(vote, 'title_de', 'title de')
+    mapper.set_value(vote, 'title_fr', 'title fr')
+    mapper.set_value(vote, 'short_title_de', 'short title de')
+    mapper.set_value(vote, 'short_title_fr', 'short title fr')
     mapper.set_value(vote, 'keyword', 'keyword')
     mapper.set_value(vote, '_legal_form', 4)
     mapper.set_value(vote, '!recommendations!fdp', 66)
@@ -1266,7 +1290,10 @@ def test_column_mapper():
     assert vote.date == date(2019, 1, 1)
     assert vote.legislation_number == 10
     assert vote.legislation_decade == NumericRange(1990, 1999)
-    assert vote.title == 'title'
+    assert vote.title_de == 'title de'
+    assert vote.title_fr == 'title fr'
+    assert vote.short_title_de == 'short title de'
+    assert vote.short_title_fr == 'short title fr'
     assert vote.keyword == 'keyword'
     assert vote.legal_form == 'Direct counter-proposal'
     assert vote.get_recommendation('fdp') == 'Neutral'
@@ -1276,44 +1303,56 @@ def test_column_mapper():
     assert mapper.get_value(vote, 'legislation_number') == 10
     assert mapper.get_value(vote, 'legislation_decade') == NumericRange(1990,
                                                                         1999)
-    assert mapper.get_value(vote, 'title') == 'title'
+    assert mapper.get_value(vote, 'title_de') == 'title de'
+    assert mapper.get_value(vote, 'title_fr') == 'title fr'
+    assert mapper.get_value(vote, 'short_title_de') == 'short title de'
+    assert mapper.get_value(vote, 'short_title_fr') == 'short title fr'
     assert mapper.get_value(vote, 'keyword') == 'keyword'
     assert mapper.get_value(vote, '_legal_form') == 4
     assert mapper.get_value(vote, '!recommendations!fdp') == 66
 
-    assert list(mapper.get_values(vote))[:9] == [
+    assert list(mapper.get_values(vote))[:12] == [
         Decimal('100.1'),
         date(2019, 1, 1),
         10,
         NumericRange(1990, 1999, '[)'),
         None,
-        'title',
+        'short title de',
+        'short title fr',
+        'title de',
+        'title fr',
         'keyword',
         None,
         4
     ]
-    assert list(mapper.get_items(vote))[:9] == [
+    assert list(mapper.get_items(vote))[:12] == [
         ('bfs_number', Decimal('100.1')),
         ('date', date(2019, 1, 1)),
         ('legislation_number', 10),
         ('legislation_decade', NumericRange(1990, 1999)),
         ('decade', None),
-        ('title', 'title'),
+        ('short_title_de', 'short title de'),
+        ('short_title_fr', 'short title fr'),
+        ('title_de', 'title de'),
+        ('title_fr', 'title fr'),
         ('keyword', 'keyword'),
         ('votes_on_same_day', None),
         ('_legal_form', 4)
     ]
-    assert list(mapper.items())[:9] == [
+    assert list(mapper.items())[:12] == [
         ('bfs_number', 'anr', 'NUMERIC(8, 2)', False, 8, 2),
         ('date', 'datum', 'DATE', False, None, None),
         ('legislation_number', 'legislatur', 'INTEGER', False, None, None),
         ('legislation_decade', 'legisjahr', 'INT4RANGE', False, None, None),
         ('decade', 'jahrzehnt', 'INT4RANGE', False, None, None),
-        ('title', 'titel', 'TEXT', False, None, None),
+        ('short_title_de', 'titel_kurz_d', 'TEXT', False, None, None),
+        ('short_title_fr', 'titel_kurz_f', 'TEXT', False, None, None),
+        ('title_de', 'titel_off_d', 'TEXT', False, None, None),
+        ('title_fr', 'titel_off_f', 'TEXT', False, None, None),
         ('keyword', 'stichwort', 'TEXT', True, None, None),
         ('votes_on_same_day', 'anzahl', 'INTEGER', False, None, None),
         ('_legal_form', 'rechtsform', 'INTEGER', False, None, None)
     ]
-    assert list(mapper.items())[300] == (
+    assert list(mapper.items())[303] == (
         '!recommendations!sodk', 'p-sodk', 'INTEGER', True, None, None
     )
