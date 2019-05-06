@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.5.0 (2019-05-06)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Adds mission-reports.
   [href]
 
