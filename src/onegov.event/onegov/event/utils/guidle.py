@@ -188,13 +188,13 @@ class GuidleScheduleDate(GuidleBase):
                 recurrence = (
                     f'RRULE:FREQ=WEEKLY;'
                     f'BYDAY=MO,TU,WE,TH,FR,SA,SU;'
-                    f'UNTIL={until:%Y%m%dT%H%MZ}'
+                    f'UNTIL={until:%Y%m%dT%H%M00Z}'
                 )
                 end = start
         else:
             if recurrence:
                 until = end + timedelta(days=1)
-                recurrence += f';UNTIL={until:%Y%m%dT%H%MZ}'
+                recurrence += f';UNTIL={until:%Y%m%dT%H%M00Z}'
             end = start
 
         # Parse start and end times

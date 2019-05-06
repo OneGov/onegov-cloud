@@ -58,7 +58,7 @@ def test_import_guidle(session, xml):
     assert schedules[0].start == tzdatetime(2018, 10, 26, 20, 0)
     assert schedules[0].end == tzdatetime(2018, 10, 26, 22, 30)
     assert schedules[0].recurrence == (
-        'RRULE:FREQ=WEEKLY;BYDAY=TU,FR,SA;UNTIL=20181104T0000Z'
+        'RRULE:FREQ=WEEKLY;BYDAY=TU,FR,SA;UNTIL=20181104T000000Z'
     )
 
     assert schedules[1].start == tzdatetime(2018, 10, 28, 17, 0)
@@ -68,13 +68,13 @@ def test_import_guidle(session, xml):
     assert schedules[2].start == tzdatetime(2018, 6, 15, 8, 0)
     assert schedules[2].end == tzdatetime(2018, 6, 15, 23, 59, 59, 999999)
     assert schedules[2].recurrence == (
-        'RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU;UNTIL=20181016T0000Z'
+        'RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU;UNTIL=20181016T000000Z'
     )
 
     assert schedules[3].start == tzdatetime(2018, 8, 18, 0, 0)
     assert schedules[3].end == tzdatetime(2018, 8, 18, 23, 59, 59, 999999)
     assert schedules[3].recurrence == (
-        'RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU;UNTIL=20181101T0000Z'
+        'RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU;UNTIL=20181101T000000Z'
     )
 
 

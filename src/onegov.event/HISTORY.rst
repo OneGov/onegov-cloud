@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes RRULE in Guidle import.
+  [msom]
+
 1.1.3 (2019-04-22)
 ~~~~~~~~~~~~~~~~~~~
 
