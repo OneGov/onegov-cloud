@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.2.10 (2019-05-06)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds sentry environment to javascript.
   [href]
 
