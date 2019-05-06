@@ -288,7 +288,7 @@ def test_view_vote(swissvotes_app):
                 ),
                 'nay': 23.2,
                 'nay_label': (
-                    'Wähleranteile der Parteien: Ablendende Parteien 23.2%'
+                    'Wähleranteile der Parteien: Ablehnende Parteien 23.2%'
                 ),
             }
 

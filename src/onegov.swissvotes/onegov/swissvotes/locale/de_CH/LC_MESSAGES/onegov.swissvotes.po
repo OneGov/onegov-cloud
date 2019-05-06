@@ -1627,7 +1627,7 @@ msgstr "Wähleranteile der Parteien: Befürwortende Parteien ${x}%"
 
 #, python-format
 msgid "Electoral shares of parties: Parties recommending No ${x}%"
-msgstr "Wähleranteile der Parteien: Ablendende Parteien ${x}%"
+msgstr "Wähleranteile der Parteien: Ablehnende Parteien ${x}%"
 
 #, python-format
 msgid "Electoral shares of parties: neutral/unknown ${x}%"
