@@ -162,6 +162,24 @@ class OccasionForm(Form):
             self.dates.errors = [_("Must specify at least one date")]
             return False
 
+    def ensure_safe_period_change(self):
+        # the period may only be changed if there are no booking associated
+        # with the occasion, otherwise this is unsafe and results in
+        # bookings being moved from one period to another without the
+        # ability to undo that!
+        if not hasattr(self.model, 'period_id'):
+            return
+
+        if str(self.model.period_id) != self.period_id.data:
+            if self.model.bookings:
+                self.period_id.errors = [
+                    _(
+                        "Cannot adjust period, there are bookings "
+                        "linked to this occassion"
+                    )
+                ]
+                return False
+
     def ensure_valid_dates(self):
         valid = True
 

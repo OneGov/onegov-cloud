@@ -30,6 +30,8 @@ def handle_matches(self, request, form):
     if form.submitted(request):
         assert self.period.active and not self.period.confirmed
 
+        reset_matching(self, request)
+
         deferred_acceptance_from_database(
             session=request.session,
             period_id=self.period_id,
@@ -261,7 +263,7 @@ def view_occasion_bookings_table(self, request):
     name='reset',
     permission=Secret,
     request_method="POST")
-def reset_matching(self, request):
+def reset_matching(self, request, quiet=False):
     assert self.period.active and not self.period.confirmed
 
     bookings = BookingCollection(request.session, self.period_id)
@@ -274,4 +276,5 @@ def reset_matching(self, request):
         booking.state = 'open'
         booking.score = 0
 
-    request.success(_("The matching was successfully reset"))
+    if not quiet:
+        request.success(_("The matching was successfully reset"))
