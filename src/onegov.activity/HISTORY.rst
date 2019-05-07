@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.18.3 (2019-05-07)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a stop-gap measure to the occasion-period-change regression.
 
