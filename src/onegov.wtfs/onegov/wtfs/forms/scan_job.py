@@ -35,7 +35,11 @@ def coerce_date(value):
 
 class AddScanJobForm(Form):
 
-    callout = _("Fill in until 17.00 o'clock the evening before.")
+    type_hint1 = HintField(
+        label="",
+        macro='deadline_hint',
+        depends_on=('type', 'normal')
+    )
 
     type = RadioField(
         label=_("Type"),

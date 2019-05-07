@@ -210,6 +210,10 @@
         </div>
     </metal:express_shipment_hint>
 
-
+    <metal:deadline_hint define-macro="deadline_hint" i18n:domain="onegov.wtfs">
+        <div class="panel callout">
+             <p i18n:translate>Fill in until 17.00 o'clock the evening before.</p>
+        </div>
+    </metal:deadline_hint>
 
 </body>
