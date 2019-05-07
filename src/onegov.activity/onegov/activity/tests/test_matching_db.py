@@ -113,14 +113,15 @@ def test_changing_priorities(session, owner, collections, prebooking_period):
     assert b2.state == 'accepted'
 
 
-@freeze_time("2016-11-22")
 def test_prefer_in_age_bracket(session, owner, collections, prebooking_period):
     o = new_occasion(
         collections, prebooking_period, 0, 1, spots=(0, 1), age=(10, 20))
 
+    base = prebooking_period.prebooking_start.date()
+
     # two attendees, one is inside the age bracket, the other is outside
-    a1 = new_attendee(collections, birth_date=date(1980, 11, 22))
-    a2 = new_attendee(collections, birth_date=date(2000, 11, 22))
+    a1 = new_attendee(collections, birth_date=base - timedelta(days=360 * 30))
+    a2 = new_attendee(collections, birth_date=base - timedelta(days=360 * 15))
 
     b1 = collections.bookings.add(owner, a1, o)
     b2 = collections.bookings.add(owner, a2, o)

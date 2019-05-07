@@ -302,10 +302,13 @@ def deferred_acceptance(bookings, occasions,
 
 
 def deferred_acceptance_from_database(session, period_id, **kwargs):
+    period = session.query(Period).filter(Period.id == period_id).one()
+
     b = session.query(Booking)
     b = b.options(joinedload(Booking.occasion))
     b = b.filter(Booking.period_id == period_id)
     b = b.filter(Booking.state != 'cancelled')
+    b = b.filter(Booking.created >= period.created)
     b = b.order_by(Booking.attendee_id)
 
     o = session.query(Occasion)
@@ -316,7 +319,6 @@ def deferred_acceptance_from_database(session, period_id, **kwargs):
         defer('cost')
     )
 
-    period = session.query(Period).filter(Period.id == period_id).one()
     if period.all_inclusive and period.max_bookings_per_attendee:
         default_limit = period.max_bookings_per_attendee
         attendee_limits = None

@@ -1,5 +1,12 @@
 Changelog
 ---------
+
+- Adds a stop-gap measure to the occasion-period-change regression.
+
+  In this regression it was possible to reassign occasions to different periods
+  even if bookings have already been made. This stop gap excludes all such
+  bookings from matching that can be reliably detected as such.
+
 1.18.2 (2019-04-15)
 ~~~~~~~~~~~~~~~~~~~
 
