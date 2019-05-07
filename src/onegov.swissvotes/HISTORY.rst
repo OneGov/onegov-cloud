@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds more national council share paroles.
+  [msom]
+
 - Adds short and french titles.
   [msom]
 

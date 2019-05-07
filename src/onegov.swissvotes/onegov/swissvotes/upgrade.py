@@ -269,3 +269,22 @@ def add_french_and_short_title_columns(context):
             context.operations.add_column('swissvotes', Column(column, Text()))
     if context.has_column('swissvotes', 'title'):
         context.operations.drop_column('swissvotes', 'title')
+
+
+@upgrade_task('Adds national council share parole columns')
+def add_national_council_share_parole_columns(context):
+    for column in (
+        'national_council_share_none',
+        'national_council_share_empty',
+        'national_council_share_free_vote',
+        'national_council_share_unknown',
+    ):
+        if not context.has_column('swissvotes', column):
+            context.operations.add_column(
+                'swissvotes', Column(column, Numeric(13, 10))
+            )
+
+    if context.has_column('swissvotes', 'national_council_share_vague'):
+        context.operations.drop_column(
+            'swissvotes', 'national_council_share_vague'
+        )

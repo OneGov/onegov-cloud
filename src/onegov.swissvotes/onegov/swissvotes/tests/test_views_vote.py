@@ -130,7 +130,10 @@ def test_view_vote(swissvotes_app):
             national_council_share_yeas=Decimal('22.20'),
             national_council_share_nays=Decimal('23.20'),
             national_council_share_neutral=Decimal('24.20'),
-            national_council_share_vague=Decimal('25.10'),
+            national_council_share_none=Decimal('25.20'),
+            national_council_share_empty=Decimal('26.20'),
+            national_council_share_free_vote=Decimal('27.20'),
+            national_council_share_unknown=Decimal('28.20'),
         )
     )
     commit()
@@ -215,7 +218,10 @@ def test_view_vote(swissvotes_app):
     assert "22.2%" in page
     assert "23.2%" in page
     assert "24.2%" in page
-    assert "25.1%" in page
+    assert "25.2%" in page
+    assert "26.2%" in page
+    assert "27.2%" in page
+    assert "28.2%" in page
     assert "1.1%" in page
     assert "2.1%" in page
     assert "3.1%" in page

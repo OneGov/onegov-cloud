@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-05-06 12:47+0200\n"
+"POT-Creation-Date: 2019-05-07 08:53+0200\n"
 "PO-Revision-Date: 2018-09-18 15:04+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: English\n"
@@ -1308,8 +1308,8 @@ msgstr "Download dataset (CSV)"
 msgid "Download dataset (XLSX)"
 msgstr "Download dataset (XLSX)"
 
-msgid "Voting campaign"
-msgstr "Public campaign"
+msgid "Cumulated electoral shares"
+msgstr ""
 
 msgid "Recommendation"
 msgstr ""
@@ -1317,8 +1317,8 @@ msgstr ""
 msgid "Percentage of voters in the National Council elections"
 msgstr "Electoral share in the National Council elections"
 
-msgid "Vague"
-msgstr "Vague"
+msgid "Unknown"
+msgstr ""
 
 msgid "Parties"
 msgstr "Parties"
@@ -1412,6 +1412,9 @@ msgstr "Duration of proceedings"
 
 msgid "Parliament's position"
 msgstr "Parliament's position"
+
+msgid "Voting campaign"
+msgstr "Public campaign"
 
 msgid "Recommendations of the Parties"
 msgstr "Recommendations by parties"

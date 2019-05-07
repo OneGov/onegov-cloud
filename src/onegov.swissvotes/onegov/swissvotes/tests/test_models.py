@@ -624,9 +624,14 @@ def test_vote(session):
     vote.national_council_share_yeas = Decimal('22.20')
     vote.national_council_share_nays = Decimal('23.20')
     vote.national_council_share_neutral = Decimal('24.20')
-    vote.national_council_share_vague = Decimal('25.10')
+    vote.national_council_share_none = Decimal('25.20')
+    vote.national_council_share_empty = Decimal('26.20')
+    vote.national_council_share_free_vote = Decimal('27.20')
+    vote.national_council_share_unknown = Decimal('28.20')
+    vote.national_council_share_vague = Decimal('28.20')
     session.add(vote)
     session.flush()
+    session.expunge_all()
 
     vote = session.query(SwissVote).one()
     assert vote.id == 1
@@ -1042,7 +1047,10 @@ def test_vote(session):
     assert vote.national_council_share_yeas == Decimal('22.20')
     assert vote.national_council_share_nays == Decimal('23.20')
     assert vote.national_council_share_neutral == Decimal('24.20')
-    assert vote.national_council_share_vague == Decimal('25.10')
+    assert vote.national_council_share_none == Decimal('25.20')
+    assert vote.national_council_share_empty == Decimal('26.20')
+    assert vote.national_council_share_free_vote == Decimal('27.20')
+    assert vote.national_council_share_unknown == Decimal('28.20')
 
     assert vote.policy_areas == [
         PolicyArea('4.42.421'),

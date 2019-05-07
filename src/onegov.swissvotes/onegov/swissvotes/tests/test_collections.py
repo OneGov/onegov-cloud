@@ -1549,7 +1549,10 @@ def test_votes_export(swissvotes_app):
     vote.national_council_share_yeas = Decimal('22.20')
     vote.national_council_share_nays = Decimal('23.20')
     vote.national_council_share_neutral = Decimal('24.20')
-    vote.national_council_share_vague = Decimal('25.10')
+    vote.national_council_share_none = Decimal('25.20')
+    vote.national_council_share_empty = Decimal('26.20')
+    vote.national_council_share_free_vote = Decimal('27.20')
+    vote.national_council_share_unknown = Decimal('28.20')
     vote.bfs_map_de = 'map de'
     vote.bfs_map_fr = 'map fr'
     votes.session.flush()
@@ -2280,8 +2283,11 @@ def test_votes_export(swissvotes_app):
         'w-ubrige': '21,2',
         'ja-lager': '22,2',
         'nein-lager': '23,2',
-        'neutral': '24,2',
-        'unbestimmt': '25,1',
+        'keinepar-summe': '25,2',
+        'leer-summe': '26,2',
+        'freigabe-summe': '27,2',
+        'neutral-summe': '24,2',
+        'unbekannt-summe': '28,2',
         'urheber': 'Initiator',
         'anneepolitique': 'anneepolitique',
         'bfsmap-de': 'map de',
@@ -3025,8 +3031,11 @@ def test_votes_export(swissvotes_app):
         'w-ubrige': 21.2,
         'ja-lager': 22.2,
         'nein-lager': 23.2,
-        'neutral': 24.2,
-        'unbestimmt': 25.1,
+        'keinepar-summe': 25.2,
+        'leer-summe': 26.2,
+        'freigabe-summe': 27.2,
+        'neutral-summe': 24.2,
+        'unbekannt-summe': 28.2,
         'urheber': 'Initiator',
         'anneepolitique': 'anneepolitique',
         'bfsmap-de': 'map de',

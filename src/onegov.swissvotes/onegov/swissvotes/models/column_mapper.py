@@ -737,10 +737,13 @@ class ColumnMapper(object):
             ('national_council_share_bdp', 'w-bdp'),
             ('national_council_share_mcg', 'w-mcg'),
             ('national_council_share_ubrige', 'w-ubrige'),
-            ('national_council_share_yeas', 'ja-lager'),
-            ('national_council_share_nays', 'nein-lager'),
-            ('national_council_share_neutral', 'neutral'),
-            ('national_council_share_vague', 'unbestimmt'),
+            ('national_council_share_yeas', 'ja-lager'),  # 1
+            ('national_council_share_nays', 'nein-lager'),  # 2
+            ('national_council_share_none', 'keinepar-summe'),  # 3
+            ('national_council_share_empty', 'leer-summe'),  # 4
+            ('national_council_share_free_vote', 'freigabe-summe'),  # 5
+            ('national_council_share_neutral', 'neutral-summe'),  # 66
+            ('national_council_share_unknown', 'unbekannt-summe'),
             ('initiator', 'urheber'),
             ('anneepolitique', 'anneepolitique'),
             ('bfs_map_de', 'bfsmap-de'),

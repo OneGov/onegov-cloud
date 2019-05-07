@@ -648,8 +648,11 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     national_council_share_ubrige = Column(Numeric(13, 10))
     national_council_share_yeas = Column(Numeric(13, 10))
     national_council_share_nays = Column(Numeric(13, 10))
+    national_council_share_none = Column(Numeric(13, 10))
+    national_council_share_empty = Column(Numeric(13, 10))
+    national_council_share_free_vote = Column(Numeric(13, 10))
     national_council_share_neutral = Column(Numeric(13, 10))
-    national_council_share_vague = Column(Numeric(13, 10))
+    national_council_share_unknown = Column(Numeric(13, 10))
 
     @cached_property
     def has_national_council_share_data(self):
