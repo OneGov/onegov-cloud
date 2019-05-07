@@ -69,20 +69,18 @@
                             <td class="right green"></td>
                             <td class="right green"></td>
                         </tr>
-                    </tbody>
-                    <tfoot>
                         <tr tal:define="total layout.model.total()">
                             <th colspan="2" i18n:translate>Total</th>
-                            <td class="right blue">${total.dispatch_boxes}</td>
-                            <td class="right light-blue">${total.dispatch_tax_forms_older}</td>
-                            <td class="right light-blue">${total.dispatch_tax_forms_last_year}</td>
-                            <td class="right light-blue">${total.dispatch_tax_forms_current_year}</td>
-                            <td class="right light-blue">${(total.dispatch_tax_forms_older + total.dispatch_tax_forms_last_year + total.dispatch_tax_forms_current_year)}</td>
-                            <td class="right light-blue">${total.dispatch_single_documents}</td>
-                            <td class="right green">${total.dispatch_cantonal_scan_center}</td>
-                            <td class="right green">${total.dispatch_cantonal_tax_office}</td>
+                            <td class="right blue"><strong>${total.dispatch_boxes}</strong></td>
+                            <td class="right light-blue"><strong>${total.dispatch_tax_forms_older}</strong></td>
+                            <td class="right light-blue"><strong>${total.dispatch_tax_forms_last_year}</strong></td>
+                            <td class="right light-blue"><strong>${total.dispatch_tax_forms_current_year}</strong></td>
+                            <td class="right light-blue"><strong>${(total.dispatch_tax_forms_older + total.dispatch_tax_forms_last_year + total.dispatch_tax_forms_current_year)}</strong></td>
+                            <td class="right light-blue"><strong>${total.dispatch_single_documents}</strong></td>
+                            <td class="right green"><strong>${total.dispatch_cantonal_scan_center}</strong></td>
+                            <td class="right green"><strong>${total.dispatch_cantonal_tax_office}</strong></td>
                         </tr>
-                    </tfoot>
+                    </tbody>
                 </table>
 
             </div>

@@ -76,22 +76,20 @@
                             <td class="green"></td>
                             <td class="light-green"></td>
                         </tr>
-                    </tbody>
-                    <tfoot>
                         <tr tal:define="total layout.model.total()">
                             <th colspan="2" i18n:translate>Total</th>
-                            <td class="right blue">${total.dispatch_boxes}</td>
+                            <td class="right blue"><strong>${total.dispatch_boxes}</strong></td>
                             <td class="light-blue"></td>
                             <td class="light-blue"></td>
                             <td class="light-blue"></td>
                             <td class="light-blue"></td>
                             <td class="light-blue"></td>
-                            <td class="right light-blue">${total.return_boxes}</td>
-                            <td class="right green">${total.dispatch_cantonal_scan_center}</td>
-                            <td class="right green">${total.dispatch_cantonal_tax_office}</td>
+                            <td class="right light-blue"><strong>${total.return_boxes}</strong></td>
+                            <td class="right green"><strong>${total.dispatch_cantonal_scan_center}</strong></td>
+                            <td class="right green"><strong>${total.dispatch_cantonal_tax_office}</strong></td>
                             <td class="light-green"></td>
                         </tr>
-                    </tfoot>
+                    </tbody>
                 </table>
 
             </div>
