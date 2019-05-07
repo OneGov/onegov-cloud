@@ -3,11 +3,15 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="body">
-        <p i18n:translate>
+        <p i18n:translate tal:condition="model.type == 'normal'">
             Your order has been accepted. The transport company will pick up
             your shipment on <span tal:replace="layout.format_date(layout.model.dispatch_date, 'date')" i18n:name="date" />.
             Please have the container(s) ready from 8 a.m. onwards.
             Thank you very much for your cooperation.
+        </p>
+        <p i18n:translate tal:condition="model.type == 'express'">
+            Your express order has been accepted. Please send us your tax
+            return(s) in an envelope with A Mail.
         </p>
         <p i18n:translate>Yours sincerely</p>
         <p>

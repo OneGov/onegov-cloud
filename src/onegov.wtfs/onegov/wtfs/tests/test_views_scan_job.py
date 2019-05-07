@@ -16,7 +16,7 @@ def test_views_scan_job(client):
     )
     assert "Gemeindedaten importiert." in upload.form.submit().follow()
 
-    # Add a scan job
+    # Add a normal scan job
     client.logout()
     client.login_member()
     with freeze_time("2019-01-01"):
@@ -121,6 +121,27 @@ def test_views_scan_job(client):
         .click("05.01.2019").click("Löschen")
     assert deleted.status_int == 200
     assert "05.01.2019" not in client.get('/scan-jobs')
+
+    # Check the mail of the express scan job
+    client.logout()
+    client.login_editor()
+    with freeze_time("2019-01-01"):
+        add = client.get('/scan-jobs').click(href='/add')
+        add.form['type'].select("express")
+        add.form['dispatch_date_express'] = "2019-01-02"
+        add.form['dispatch_boxes'] = "1"
+        add.form['dispatch_tax_forms_current_year'] = "1"
+        added = add.form.submit().follow()
+        assert "Scan-Auftrag hinzugefügt." in added
+        assert "02.01.2019" in added
+
+        message = client.app.smtp.outbox.pop()
+        assert message['From'] == 'mails@govikon.ch'
+        assert message['To'] == 'editor@example.org'
+        assert message['Reply-To'] == 'mails@govikon.ch'
+        payload = message.get_payload(1).get_payload(decode=True)
+        payload = payload.decode('utf-8')
+        assert "Ihr Express-Auftrag wurde entgegengenommen" in payload
 
 
 def test_views_scan_jobs_filter(client):

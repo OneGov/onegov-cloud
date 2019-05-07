@@ -10,6 +10,9 @@ Changelog
 - Allows editors to manage themselves.
   [msom]
 
+- Uses a mail separate text for express scan jobs.
+  [msom]
+
 1.2.1 (2019-05-02)
 ~~~~~~~~~~~~~~~~~~~
 
