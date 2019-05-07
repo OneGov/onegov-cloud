@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Centers vote title.
+  [msom]
+
 0.0.57 (2019-05-07)
 ~~~~~~~~~~~~~~~~~~~
 
