@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.2.2 (2019-05-07)
+~~~~~~~~~~~~~~~~~~~
 
 - Shows the totals in the daily lists in the table body instead of the footer.
   [msom]
