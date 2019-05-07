@@ -317,9 +317,12 @@ def import_election_internal_proporz(election, principal, file, mimetype):
         return errors
 
     # Add the missing entities
-    remaining = entities.keys() - results.keys()
+    remaining = set(entities.keys())
+    if election.expats:
+        remaining.add(0)
+    remaining -= set(results.keys())
     for entity_id in remaining:
-        entity = entities[entity_id]
+        entity = entities.get(entity_id, {})
         district = entity.get('district', '')
         if election.domain == 'region':
             if not election.distinct:

@@ -230,13 +230,12 @@ def import_vote_wabstic(vote, principal, number, district,
 
     # Add the missing entities
     for ballot_type in used_ballot_types:
-        remaining = (
-            entities.keys() - set(
-                result['entity_id'] for result in ballot_results[ballot_type]
-            )
-        )
+        remaining = set(entities.keys())
+        if vote.expats:
+            remaining.add(0)
+        remaining -= set(r['entity_id'] for r in ballot_results[ballot_type])
         for entity_id in remaining:
-            entity = entities[entity_id]
+            entity = entities.get(entity_id, {})
             ballot_results[ballot_type].append(
                 dict(
                     entity_id=entity_id,

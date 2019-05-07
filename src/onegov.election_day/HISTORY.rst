@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes expats not displayed for temporary results.
+  [msom]
+
 3.13.4 (2019-04-30)
 ~~~~~~~~~~~~~~~~~~~
 

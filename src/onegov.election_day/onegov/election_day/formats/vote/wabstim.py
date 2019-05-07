@@ -170,11 +170,12 @@ def import_vote_wabstim(vote, principal, file, mimetype):
     vote.clear_results()
 
     for ballot_type in used_ballot_types:
-        remaining = (
-            entities.keys() - added_entity_ids
-        )
+        remaining = set(entities.keys())
+        if vote.expats:
+            remaining.add(0)
+        remaining -= added_entity_ids
         for id in remaining:
-            entity = entities[id]
+            entity = entities.get(entity_id, {})
             ballot_results[ballot_type].append(
                 BallotResult(
                     name=entity.get('name', ''),

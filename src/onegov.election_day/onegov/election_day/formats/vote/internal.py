@@ -164,9 +164,12 @@ def import_vote_internal(vote, principal, file, mimetype):
 
     # Add the missing entities
     for ballot_type in ballot_types:
-        remaining = (entities.keys() - added_entity_ids[ballot_type])
+        remaining = set(entities.keys())
+        if vote.expats:
+            remaining.add(0)
+        remaining -= added_entity_ids[ballot_type]
         for entity_id in remaining:
-            entity = entities[entity_id]
+            entity = entities.get(entity_id, {})
             ballot_results[ballot_type].append(
                 dict(
                     name=entity.get('name', ''),

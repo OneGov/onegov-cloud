@@ -176,8 +176,12 @@ def import_vote_default(vote, principal, ballot_type, file, mimetype):
 
     if not errors:
         # Add the missing entities as uncounted results
-        for entity_id in (entities.keys() - added_entity_ids):
-            entity = entities[entity_id]
+        remaining = set(entities.keys())
+        if vote.expats:
+            remaining.add(0)
+        remaining -= added_entity_ids
+        for entity_id in remaining:
+            entity = entities.get(entity_id, {})
             ballot_results.append(
                 BallotResult(
                     name=entity.get('name', ''),
