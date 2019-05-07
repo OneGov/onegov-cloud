@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.6.7 (2019-05-07)
+~~~~~~~~~~~~~~~~~~~
 
 - Removes ability to change the period of an occasion that has bookings.
   [href]
