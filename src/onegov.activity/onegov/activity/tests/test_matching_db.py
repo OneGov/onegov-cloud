@@ -1,7 +1,6 @@
 import random
 
 from datetime import date, timedelta
-from freezegun import freeze_time
 from functools import partial
 from onegov.activity.matching import deferred_acceptance_from_database
 from onegov.activity.matching import PreferAdminChildren
