@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Reorders the votes columns.
+  [msom]
+
 0.0.56 (2019-05-07)
 ~~~~~~~~~~~~~~~~~~~
 
