@@ -44,8 +44,9 @@ class App(object):
 
 
 class Identity(object):
-    def __init__(self, groupid):
+    def __init__(self, groupid, userid=None, role=None):
         self.groupid = groupid
+        self.userid = userid
 
 
 class Request(object):
@@ -290,6 +291,7 @@ def test_user_form(session):
     assert user.realname == "Petra Muster"
     assert user.username == "petra.muster@winterthur.ch"
     assert user.group_id == municipality.id.hex
+    assert user.role == 'member'
     assert user.data['contact'] is False
     assert user.password_hash
     assert user.modified
@@ -316,6 +318,18 @@ def test_user_form(session):
     assert user.realname == "Hans-Peter Muster"
     assert user.username == "hans-peter.muster@winterthur.ch"
     assert user.group_id == municipality.id.hex
+    assert user.role == 'member'
+    assert user.data['contact'] is True
+    assert user.password_hash == password_hash
+    assert user.logout_all_sessions.called is True
+
+    form.request.identity.userid = "hans-peter.muster@winterthur.ch"
+    form.request.identity.role = 'editor'
+    form.update_model(user)
+    assert user.realname == "Hans-Peter Muster"
+    assert user.username == "hans-peter.muster@winterthur.ch"
+    assert user.group_id == municipality.id.hex
+    assert user.role == 'editor'
     assert user.data['contact'] is True
     assert user.password_hash == password_hash
     assert user.logout_all_sessions.called is True

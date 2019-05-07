@@ -7,6 +7,9 @@ Changelog
 - Hides the deadline callout for express scan jobs.
   [msom]
 
+- Allows editors to manage themselves.
+  [msom]
+
 1.2.1 (2019-05-02)
 ~~~~~~~~~~~~~~~~~~~
 

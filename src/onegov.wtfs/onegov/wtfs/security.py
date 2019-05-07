@@ -107,12 +107,16 @@ def has_permission_user(app, identity, model, permission):
         if permission in {DeleteModel}:
             return False
 
-    # Editors may view, edit and delete members within the same group
+    # Editors may view, edit and delete members within the same group or
+    # view and edit themselves
     if identity.role == 'editor':
         if permission in {ViewModel, EditModel, DeleteModel}:
             if model.role == 'member':
                 if same_group(model, identity):
                     return True
+        if permission in {ViewModel, EditModel}:
+            if model.username == identity.userid:
+                return True
 
     return permission in getattr(app.settings.roles, identity.role)
 

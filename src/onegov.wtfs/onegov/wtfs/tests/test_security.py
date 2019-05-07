@@ -271,7 +271,7 @@ def test_permissions(wtfs_app, wtfs_password):
             assert permits(user, model, ViewModel)
             assert permits(user, model, ViewModelUnrestricted)
     for user in (editor, ):
-        for model in (admin, admin_a, admin_b, editor, editor_a, editor_b,
+        for model in (admin, admin_a, admin_b, editor_a, editor_b,
                       member, member_a, member_b):
             assert permits(user, model, Public)
             assert not permits(user, model, AddModel)
@@ -281,8 +281,18 @@ def test_permissions(wtfs_app, wtfs_password):
             assert not permits(user, model, DeleteModel)
             assert not permits(user, model, ViewModel)
             assert not permits(user, model, ViewModelUnrestricted)
+    for user in (editor, ):
+        for model in (editor, ):
+            assert permits(user, model, Public)
+            assert not permits(user, model, AddModel)
+            assert not permits(user, model, AddModelUnrestricted)
+            assert permits(user, model, EditModel)
+            assert not permits(user, model, EditModelUnrestricted)
+            assert not permits(user, model, DeleteModel)
+            assert permits(user, model, ViewModel)
+            assert not permits(user, model, ViewModelUnrestricted)
     for user in (editor_a, ):
-        for model in (admin, admin_a, admin_b, editor, editor_a, editor_b,
+        for model in (admin, admin_a, admin_b, editor, editor_b,
                       member, member_b):
             assert permits(user, model, Public)
             assert not permits(user, model, AddModel)
@@ -291,6 +301,15 @@ def test_permissions(wtfs_app, wtfs_password):
             assert not permits(user, model, EditModelUnrestricted)
             assert not permits(user, model, DeleteModel)
             assert not permits(user, model, ViewModel)
+            assert not permits(user, model, ViewModelUnrestricted)
+        for model in (editor_a, ):
+            assert permits(user, model, Public)
+            assert not permits(user, model, AddModel)
+            assert not permits(user, model, AddModelUnrestricted)
+            assert permits(user, model, EditModel)
+            assert not permits(user, model, EditModelUnrestricted)
+            assert not permits(user, model, DeleteModel)
+            assert permits(user, model, ViewModel)
             assert not permits(user, model, ViewModelUnrestricted)
         for model in (member_a,):
             assert permits(user, model, Public)
@@ -302,7 +321,7 @@ def test_permissions(wtfs_app, wtfs_password):
             assert permits(user, model, ViewModel)
             assert not permits(user, model, ViewModelUnrestricted)
     for user in (editor_b, ):
-        for model in (admin, admin_a, admin_b, editor, editor_a, editor_b,
+        for model in (admin, admin_a, admin_b, editor, editor_a,
                       member, member_a):
             assert permits(user, model, Public)
             assert not permits(user, model, AddModel)
@@ -311,6 +330,15 @@ def test_permissions(wtfs_app, wtfs_password):
             assert not permits(user, model, EditModelUnrestricted)
             assert not permits(user, model, DeleteModel)
             assert not permits(user, model, ViewModel)
+            assert not permits(user, model, ViewModelUnrestricted)
+        for model in (editor_b, ):
+            assert permits(user, model, Public)
+            assert not permits(user, model, AddModel)
+            assert not permits(user, model, AddModelUnrestricted)
+            assert permits(user, model, EditModel)
+            assert not permits(user, model, EditModelUnrestricted)
+            assert not permits(user, model, DeleteModel)
+            assert permits(user, model, ViewModel)
             assert not permits(user, model, ViewModelUnrestricted)
         for model in (member_b,):
             assert permits(user, model, Public)

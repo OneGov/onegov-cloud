@@ -43,6 +43,9 @@ class UserForm(Form):
         model.data = model.data or {}
         model.data['contact'] = self.contact.data or False
         model.role = 'member'
+        if self.request.identity.userid == model.username:
+            if self.request.identity.role == 'editor':
+                model.role = 'editor'
         model.group_id = self.request.identity.groupid
 
         # set some initial values if we create this user

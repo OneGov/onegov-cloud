@@ -156,7 +156,12 @@ def test_views_users_permissions(mock_method, client):
         client.get(f'/user/{user}/edit')
         client.get(f'/user/{user}/edit-unrestricted', status=403)
         client.delete(f'/user/{user}')
-    for user in users[1:]:
+    for user in users[1:2]:
+        client.get(f'/user/{user}')
+        client.get(f'/user/{user}/edit')
+        client.get(f'/user/{user}/edit-unrestricted', status=403)
+        client.delete(f'/user/{user}', status=403)
+    for user in users[2:]:
         client.get(f'/user/{user}', status=403)
         client.get(f'/user/{user}/edit', status=403)
         client.get(f'/user/{user}/edit-unrestricted', status=403)
