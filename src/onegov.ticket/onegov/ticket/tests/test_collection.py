@@ -89,7 +89,7 @@ class BarTicket(Ticket):
 
 class EcoTicket(Ticket):
     __mapper_args__ = {'polymorphic_identity': 'ECO'}
-    es_type_name = 'bar_tickets'
+    es_type_name = 'eco_tickets'
 
 
 class LtdTicket(Ticket):
