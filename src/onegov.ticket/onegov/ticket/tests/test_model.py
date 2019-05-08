@@ -74,14 +74,14 @@ def test_process_time(session):
 
         assert ticket.reaction_time is None
         assert ticket.process_time is None
-        assert ticket.current_process_time is 0
+        assert ticket.current_process_time == 0
         assert ticket.last_state_change is None
 
         frozen.tick(delta=timedelta(seconds=10))
 
         assert ticket.reaction_time is None
         assert ticket.process_time is None
-        assert ticket.current_process_time is 10
+        assert ticket.current_process_time == 10
         assert ticket.last_state_change is None
 
         ticket.accept_ticket(user)
