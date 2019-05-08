@@ -69,20 +69,40 @@ def get_upgrade_modules():
     upgrades like this::
 
         entry_points={
-            'onegov.core': [
+            'onegov': [
                 'upgrade = onegov.mypackage.upgrade'
             ]
         }
 
+    To add multiple upgrades in a single setup.py file, the following syntax
+    may be used. This will become the default in the future:
+
+        entry_points= {
+            'onegov_upgrades': [
+                'onegov.mypackage = onegov.mypackage.upgrade'
+            ]
+        }
+
+    Note that the part before the '='-sign should be kept the same, even if
+    the location changes. Otherwise completed updates may be run again!
+
     """
     yield 'onegov.core', importlib.import_module('onegov.core.upgrades')
 
-    for distribution, entry_map in get_distributions_with_entry_map('onegov'):
+    distributions = get_distributions_with_entry_map('onegov')
+
+    for distribution, entry_map in distributions:
         if 'upgrade' in entry_map:
             yield (
                 '.'.join(entry_map['upgrade'].module_name.split('.')[:2]),
                 importlib.import_module(entry_map['upgrade'].module_name)
             )
+
+    distributions = get_distributions_with_entry_map('onegov_upgrades')
+
+    for distribution, entry_map in distributions:
+        for entry in entry_map.values():
+            yield entry.name, importlib.import_module(entry.module_name)
 
 
 class upgrade_task(object):

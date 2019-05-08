@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds the ability to define multiple onegov.core upgrade entry points.
+  [href]
+
 0.80.0 (2019-05-03)
 ~~~~~~~~~~~~~~~~~~~
 
