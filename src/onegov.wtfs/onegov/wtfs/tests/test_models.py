@@ -1,6 +1,7 @@
 from datetime import date
 from freezegun import freeze_time
 from io import StringIO
+from onegov.user import User
 from onegov.wtfs.models import DailyListBoxes
 from onegov.wtfs.models import DailyListBoxesAndForms
 from onegov.wtfs.models import Invoice
@@ -84,6 +85,29 @@ def test_municipality(session):
     ]
     assert session.query(PickupDate).first().municipality == municipality
     assert municipality.has_data
+
+    # Contacts
+    assert municipality.contacts == []
+    for name, group_id, data in (
+        ('a', municipality.id, None),
+        ('b', municipality.id, {}),
+        ('c', municipality.id, {'contact': None}),
+        ('d', municipality.id, {'contact': False}),
+        ('e', municipality.id, {'contact': True}),
+        ('f', municipality.id, {'contact': True}),
+        ('g', None, {'contact': True}),
+    ):
+        session.add(
+            User(
+                realname=name,
+                username=f'{name}@example.org',
+                password_hash='abcd',
+                role='editor',
+                group_id=group_id,
+                data=data
+            )
+        )
+    assert municipality.contacts == ['e@example.org', 'f@example.org']
 
 
 def test_scan_job(session):

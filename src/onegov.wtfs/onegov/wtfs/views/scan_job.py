@@ -80,7 +80,29 @@ def add_scan_job_unrestricted(self, request, form):
             scan_job.municipality_id
         )
         request.session.add(scan_job)
+        request.session.flush()
         request.message(_("Scan job added."), 'success')
+
+        receivers = scan_job.municipality.contacts
+        if receivers:
+            subject = request.translate(
+                _("Order confirmation for scanning your tax returns")
+            )
+            request.app.send_transactional_email(
+                subject=subject,
+                receivers=receivers,
+                reply_to=request.app.mail['transactional']['sender'],
+                content=render_template(
+                    'mail_confirm.pt',
+                    request,
+                    {
+                        'title': subject,
+                        'model': scan_job,
+                        'layout': MailLayout(scan_job, request)
+                    }
+                ),
+            )
+
         return redirect(layout.success_url)
 
     return {

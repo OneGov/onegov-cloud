@@ -52,7 +52,8 @@ def create_wtfs_app(request, temporary_path):
         username='editor@example.org',
         password_hash=request.getfixturevalue('wtfs_password'),
         role='editor',
-        group_id=group_id
+        group_id=group_id,
+        data={'contact': True}
     ))
     session.add(User(
         realname='Member',

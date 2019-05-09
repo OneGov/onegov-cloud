@@ -38,3 +38,10 @@ class Municipality(UserGroup, TimestampMixin):
         if self.pickup_dates.first() or self.scan_jobs.first():
             return True
         return False
+
+    @property
+    def contacts(self):
+        return [
+            user.username for user in self.users
+            if (user.data or {}).get('contact', False)
+        ]

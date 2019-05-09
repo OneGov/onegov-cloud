@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Sends an email to contacts if an admin creates a scan job.
+  [msom]
+
 1.2.2 (2019-05-07)
 ~~~~~~~~~~~~~~~~~~~
 

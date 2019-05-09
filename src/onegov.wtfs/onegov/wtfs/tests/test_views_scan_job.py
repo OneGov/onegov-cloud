@@ -122,18 +122,57 @@ def test_views_scan_job(client):
     assert deleted.status_int == 200
     assert "05.01.2019" not in client.get('/scan-jobs')
 
-    # Check the mail of the express scan job
+    # Check more mails...
+    # ... contacts gets an email (normal) if admins add scan jobs
+    with freeze_time("2019-01-01"):
+        add = client.get('/scan-jobs').follow().click(href='/add-unrestricted')
+        add.form['type'].select("normal")
+        add.form['dispatch_date'] = "2019-01-01"
+        add.form['dispatch_boxes'] = "1"
+        add.form['dispatch_tax_forms_current_year'] = "1"
+        added = add.form.submit().follow().follow()
+        assert "Scan-Auftrag hinzugefügt." in added
+        assert "01.01.2019" in added
+
+        message = client.app.smtp.outbox.pop()
+        assert message['From'] == 'mails@govikon.ch'
+        assert message['To'] == 'editor@example.org'
+        assert message['Reply-To'] == 'mails@govikon.ch'
+        payload = message.get_payload(1).get_payload(decode=True)
+        payload = payload.decode('utf-8')
+        assert "Ihre Sendung abholen" in payload
+
+    # ... contacts gets an email (express) if admins add scan jobs
+    with freeze_time("2019-01-02"):
+        add = client.get('/scan-jobs').follow().click(href='/add-unrestricted')
+        add.form['type'].select("express")
+        add.form['dispatch_date'] = "2019-01-02"
+        add.form['dispatch_boxes'] = "1"
+        add.form['dispatch_tax_forms_current_year'] = "1"
+        added = add.form.submit().follow().follow()
+        assert "Scan-Auftrag hinzugefügt." in added
+        assert "02.01.2019" in added
+
+        message = client.app.smtp.outbox.pop()
+        assert message['From'] == 'mails@govikon.ch'
+        assert message['To'] == 'editor@example.org'
+        assert message['Reply-To'] == 'mails@govikon.ch'
+        payload = message.get_payload(1).get_payload(decode=True)
+        payload = payload.decode('utf-8')
+        assert "Ihr Express-Auftrag wurde entgegengenommen" in payload
+
+    # ... express mails are different for normal users, too
     client.logout()
     client.login_editor()
     with freeze_time("2019-01-01"):
         add = client.get('/scan-jobs').click(href='/add')
         add.form['type'].select("express")
-        add.form['dispatch_date_express'] = "2019-01-02"
+        add.form['dispatch_date_express'] = "2019-01-03"
         add.form['dispatch_boxes'] = "1"
         add.form['dispatch_tax_forms_current_year'] = "1"
         added = add.form.submit().follow()
         assert "Scan-Auftrag hinzugefügt." in added
-        assert "02.01.2019" in added
+        assert "03.01.2019" in added
 
         message = client.app.smtp.outbox.pop()
         assert message['From'] == 'mails@govikon.ch'
