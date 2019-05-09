@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.2.4 (2019-05-09)
+~~~~~~~~~~~~~~~~~~~
 
 - Presets the return date to the next dispatch date when adding a scan job
   (unrestricted).
