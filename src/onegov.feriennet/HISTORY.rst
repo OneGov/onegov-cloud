@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.6.8 (2019-05-09)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes inability to clone occasions due to a regression introduced in 1.6.7.
   [href]
