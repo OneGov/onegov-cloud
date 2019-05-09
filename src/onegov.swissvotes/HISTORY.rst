@@ -1,9 +1,13 @@
 Changelog
 ---------
+
+- Aligns the vote title left, again.
+  [msom]
+
 0.0.58 (2019-05-07)
 ~~~~~~~~~~~~~~~~~~~
 
-- Centers vote title.
+- Centers the vote title.
   [msom]
 
 0.0.57 (2019-05-07)
