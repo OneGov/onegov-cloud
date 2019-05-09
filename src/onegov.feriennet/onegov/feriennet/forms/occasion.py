@@ -170,6 +170,9 @@ class OccasionForm(Form):
         if not hasattr(self.model, 'period_id'):
             return
 
+        if self.request.view_name == 'clone':
+            return
+
         if str(self.model.period_id) != self.period_id.data:
             if self.model.bookings:
                 self.period_id.errors = [
@@ -239,13 +242,18 @@ class OccasionForm(Form):
                 return False
 
     def ensure_max_spots_higher_than_accepted_bookings(self):
-        if isinstance(self.model, Occasion):
-            if len(self.model.accepted) > self.max_spots.data:
-                self.max_spots.errors.append(_(
-                    "The maximum number of spots is lower than the number "
-                    "of already accepted bookings."
-                ))
-                return False
+        if not isinstance(self.model, Occasion):
+            return
+
+        if self.request.view_name == 'clone':
+            return
+
+        if len(self.model.accepted) > self.max_spots.data:
+            self.max_spots.errors.append(_(
+                "The maximum number of spots is lower than the number "
+                "of already accepted bookings."
+            ))
+            return False
 
     def dates_to_json(self, dates=None):
         dates = dates or []
