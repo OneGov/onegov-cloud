@@ -134,6 +134,15 @@ class AddScanJobForm(Form):
             return self.dispatch_date_express.data
         return self.dispatch_date_normal.data
 
+    def dispatch_dates(self, after):
+        query = self.request.session.query(PickupDate.date.label('date'))
+        query = query.filter(
+            PickupDate.municipality_id == self.municipality_id
+        )
+        query = query.filter(PickupDate.date > after)
+        query = query.order_by(PickupDate.date)
+        return [r.date for r in query]
+
     def update_labels(self):
         year = date.today().year
         self.dispatch_tax_forms_older.label.text = _(
@@ -155,14 +164,8 @@ class AddScanJobForm(Form):
             ]
 
         # Dispatch dates
-        query = self.request.session.query(PickupDate.date.label('date'))
-        query = query.filter(
-            PickupDate.municipality_id == self.municipality_id
-        )
-        query = query.filter(PickupDate.date > date.today())
-        query = query.order_by(PickupDate.date)
         self.dispatch_date_normal.choices = [
-            (r.date, f"{r.date:%d.%m.%Y}") for r in query
+            (r, f"{r:%d.%m.%Y}") for r in self.dispatch_dates(date.today())
         ]
 
         # Labels
@@ -172,6 +175,9 @@ class AddScanJobForm(Form):
         model.municipality_id = self.request.identity.groupid
         model.type = self.type.data
         model.dispatch_date = self.dispatch_date
+        model.return_date = (
+            self.dispatch_dates(model.dispatch_date) or [None]
+        )[0]
         for name in (
             'dispatch_boxes',
             'dispatch_tax_forms_current_year',

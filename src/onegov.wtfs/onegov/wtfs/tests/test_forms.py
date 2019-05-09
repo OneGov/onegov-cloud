@@ -459,8 +459,9 @@ def test_unrestricted_user_form(session):
 def test_add_scan_job_form(session):
     municipalities = MunicipalityCollection(session)
     municipality = municipalities.add(name="Boppelsen", bfs_number=82)
-    municipality.pickup_dates.append(PickupDate(date=date(2019, 1, 7)))
+    municipality.pickup_dates.append(PickupDate(date=date(2019, 1, 1)))
     municipality.pickup_dates.append(PickupDate(date=date(2019, 1, 8)))
+    municipality.pickup_dates.append(PickupDate(date=date(2019, 1, 15)))
 
     # Test on request
     form = AddScanJobForm()
@@ -470,8 +471,8 @@ def test_add_scan_job_form(session):
         form.on_request()
         assert form.type.choices == [('normal', 'Regular shipment')]
         assert form.dispatch_date_normal.choices == [
-            (date(2019, 1, 7), '07.01.2019'),
-            (date(2019, 1, 8), '08.01.2019')
+            (date(2019, 1, 8), '08.01.2019'),
+            (date(2019, 1, 15), '15.01.2019')
         ]
     form.request = Request(session, groupid=municipality.id.hex,
                            roles=['editor'])
@@ -482,8 +483,8 @@ def test_add_scan_job_form(session):
             ('express', 'Express shipment')
         ]
         assert form.dispatch_date_normal.choices == [
-            (date(2019, 1, 7), '07.01.2019'),
-            (date(2019, 1, 8), '08.01.2019')
+            (date(2019, 1, 8), '08.01.2019'),
+            (date(2019, 1, 15), '15.01.2019')
         ]
 
     # Test update
@@ -504,6 +505,7 @@ def test_add_scan_job_form(session):
     assert model.municipality_id == municipality.id.hex
     assert model.type == 'normal'
     assert model.dispatch_date == date(2019, 1, 8)
+    assert model.return_date == date(2019, 1, 15)
     assert model.dispatch_boxes == 1
     assert model.dispatch_tax_forms_current_year == 2
     assert model.dispatch_tax_forms_last_year == 3
@@ -516,6 +518,7 @@ def test_add_scan_job_form(session):
     form.type.data = 'express'
     form.update_model(model)
     assert model.dispatch_date == date(2019, 1, 6)
+    assert model.return_date == date(2019, 1, 8)
 
     # Test validation
     with freeze_time("2019-01-05"):

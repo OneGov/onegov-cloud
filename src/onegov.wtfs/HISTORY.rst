@@ -1,5 +1,10 @@
 Changelog
 ---------
+
+- Presets the return date to the next dispatch date when adding a scan job
+  (unrestricted).
+  [msom]
+
 1.2.3 (2019-05-09)
 ~~~~~~~~~~~~~~~~~~~
 
