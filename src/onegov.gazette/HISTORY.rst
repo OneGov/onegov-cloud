@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Searches also in notes of notices.
+  [msom]
+
 1.23.1 (2019-04-30)
 ~~~~~~~~~~~~~~~~~~~~
 
