@@ -1647,7 +1647,7 @@ msgstr "${x}% neutres/inconnus"
 
 #, python-format
 msgid "${x} yea"
-msgstr "${x} Qui"
+msgstr "${x} Oui"
 
 #, python-format
 msgid "${x} nay"
