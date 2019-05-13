@@ -263,6 +263,7 @@
                 </div>
             </tal:b>
         </tal:b>
+        <metal:b define-slot="before-submit" />
         <tal:b condition="cancel|nothing">
             <a class="button secondary cancel-button" href="${cancel}" i18n:translate="" role="button">
                 <tal:b condition="not:cancel_text|nothing">
