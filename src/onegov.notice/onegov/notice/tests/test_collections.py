@@ -110,6 +110,7 @@ def test_notice_collection_search(session):
         title='Sixt',
         text='<p>Six</p>',
         author_name='Cysat',
+        note='Papanikolaou',
         user=user_b,
         group=group_a
     )
@@ -152,6 +153,8 @@ def test_notice_collection_search(session):
     assert notices.for_term('Cysat').query().count() == 1
 
     assert notices.for_term('Wynmärkt').query().count() == 1
+
+    assert notices.for_term('Papanikolaou').query().count() == 1
 
     assert notices.for_term(str(notice.id).split('-')[0]).query().count() == 1
 

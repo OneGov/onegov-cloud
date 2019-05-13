@@ -205,6 +205,7 @@ class OfficialNoticeCollection(OfficialNoticeCollectionPagination):
             self.model_class.author_place,
             self.model_class.category,
             self.model_class.organization,
+            self.model_class.note,
             UserGroup.name,
             User.realname,
             User.username
