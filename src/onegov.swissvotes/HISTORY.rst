@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.0.2 (2019-05-13)
+~~~~~~~~~~~~~~~~~~~
 
 - Updates party recommendations presentation.
   [msom]
