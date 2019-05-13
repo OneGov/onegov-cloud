@@ -141,7 +141,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
                 (5, _("Free vote")),
                 (66, _("Neutral")),
                 (9999, _("Organization no longer exists")),
-                (None, _("Unknown"))
+                (None, _("unknown"))
             ))
 
         raise RuntimeError(f"No codes avaible for '{attribute}'")

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-07 08:53+0200\n"
+"POT-Creation-Date: 2019-05-13 10:57+0200\n"
 "PO-Revision-Date: 2019-05-07 08:51+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -815,6 +815,9 @@ msgstr "Liberté de vote"
 msgid "Organization no longer exists"
 msgstr "Cette formation n'existe plus."
 
+msgid "unknown"
+msgstr "inconnue"
+
 msgid "actor-acs-abbreviation"
 msgstr "ACS"
 
@@ -1324,9 +1327,6 @@ msgstr ""
 
 msgid "Percentage of voters in the National Council elections"
 msgstr "Force des partis aux élections du Conseil national"
-
-msgid "Unknown"
-msgstr "Inconnue"
 
 msgid "Parties"
 msgstr "Partis"

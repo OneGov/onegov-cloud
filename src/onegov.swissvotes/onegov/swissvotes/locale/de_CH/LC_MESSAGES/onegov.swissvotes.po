@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-07 08:53+0200\n"
+"POT-Creation-Date: 2019-05-13 10:57+0200\n"
 "PO-Revision-Date: 2019-05-07 08:50+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -821,6 +821,9 @@ msgstr "Stimmfreigabe"
 msgid "Organization no longer exists"
 msgstr "Organisation existiert nicht mehr"
 
+msgid "unknown"
+msgstr "unbekannt"
+
 msgid "actor-acs-abbreviation"
 msgstr "ACS"
 
@@ -1324,9 +1327,6 @@ msgstr "Parole"
 
 msgid "Percentage of voters in the National Council elections"
 msgstr "Wähleranteil bei der Nationalratswahl"
-
-msgid "Unknown"
-msgstr "Unbekannt"
 
 msgid "Parties"
 msgstr "Parteien"

@@ -42,7 +42,7 @@
                         <td>${layout.format_number(vote.national_council_share_neutral, 1)}%</td>
                     </tr>
                     <tr tal:condition="vote.national_council_share_unknown">
-                        <td i18n:translate>Unknown</td>
+                        <td i18n:translate>unknown</td>
                         <td>${layout.format_number(vote.national_council_share_unknown, 1)}%</td>
                     </tr>
                 </tbody>
@@ -160,7 +160,7 @@
                     </tr>
                     <tr tal:condition="vote.national_council_share_ubrige">
                         <td i18n:translate>Others</td>
-                        <td></td>
+                        <td i18n:translate>unknown</td>
                         <td>${layout.format_number(vote.national_council_share_ubrige, 1)}%</td>
                     </tr>
                 </tbody>
