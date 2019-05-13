@@ -25,7 +25,6 @@ class ColumnMapper(object):
             ('date', 'datum'),
             ('legislation_number', 'legislatur'),
             ('legislation_decade', 'legisjahr'),
-            ('decade', 'jahrzehnt'),
             ('short_title_de', 'titel_kurz_d'),
             ('short_title_fr', 'titel_kurz_f'),
             ('title_de', 'titel_off_d'),

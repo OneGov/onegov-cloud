@@ -288,3 +288,9 @@ def add_national_council_share_parole_columns(context):
         context.operations.drop_column(
             'swissvotes', 'national_council_share_vague'
         )
+
+
+@upgrade_task('Removes decade column')
+def remove_decade_column(context):
+    if context.has_column('swissvotes', 'decade'):
+        context.operations.drop_column('swissvotes', 'decade')

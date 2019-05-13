@@ -384,7 +384,6 @@ def test_layout_vote(swissvotes_app):
         short_title_fr="Vote F",
         bfs_number=Decimal('100'),
         date=date(1990, 6, 2),
-        decade=NumericRange(1990, 1999),
         legislation_number=10,
         legislation_decade=NumericRange(1990, 1994),
         votes_on_same_day=2,

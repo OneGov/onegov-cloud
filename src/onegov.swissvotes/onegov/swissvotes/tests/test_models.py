@@ -277,7 +277,6 @@ def test_vote(session):
     vote = SwissVote()
     vote.bfs_number = Decimal('100.1')
     vote.date = date(1990, 6, 2)
-    vote.decade = NumericRange(1990, 1999)
     vote.legislation_number = 4
     vote.legislation_decade = NumericRange(1990, 1994)
     vote.title_de = "Vote DE"
@@ -637,7 +636,6 @@ def test_vote(session):
     assert vote.id == 1
     assert vote.bfs_number == Decimal('100.10')
     assert vote.date == date(1990, 6, 2)
-    assert vote.decade == NumericRange(1990, 1999)
     assert vote.legislation_number == 4
     assert vote.legislation_decade == NumericRange(1990, 1994)
     assert vote.title_de == "Vote DE"
@@ -1196,7 +1194,6 @@ def test_vote_attachments(swissvotes_app, attachments):
         SwissVote(
             bfs_number=Decimal('100.1'),
             date=date(1990, 6, 2),
-            decade=NumericRange(1990, 1999),
             legislation_number=4,
             legislation_decade=NumericRange(1990, 1994),
             title_de="Vote DE",
@@ -1319,12 +1316,11 @@ def test_column_mapper():
     assert mapper.get_value(vote, '_legal_form') == 4
     assert mapper.get_value(vote, '!recommendations!fdp') == 66
 
-    assert list(mapper.get_values(vote))[:12] == [
+    assert list(mapper.get_values(vote))[:11] == [
         Decimal('100.1'),
         date(2019, 1, 1),
         10,
         NumericRange(1990, 1999, '[)'),
-        None,
         'short title de',
         'short title fr',
         'title de',
@@ -1333,12 +1329,11 @@ def test_column_mapper():
         None,
         4
     ]
-    assert list(mapper.get_items(vote))[:12] == [
+    assert list(mapper.get_items(vote))[:11] == [
         ('bfs_number', Decimal('100.1')),
         ('date', date(2019, 1, 1)),
         ('legislation_number', 10),
         ('legislation_decade', NumericRange(1990, 1999)),
-        ('decade', None),
         ('short_title_de', 'short title de'),
         ('short_title_fr', 'short title fr'),
         ('title_de', 'title de'),
@@ -1347,12 +1342,11 @@ def test_column_mapper():
         ('votes_on_same_day', None),
         ('_legal_form', 4)
     ]
-    assert list(mapper.items())[:12] == [
+    assert list(mapper.items())[:11] == [
         ('bfs_number', 'anr', 'NUMERIC(8, 2)', False, 8, 2),
         ('date', 'datum', 'DATE', False, None, None),
         ('legislation_number', 'legislatur', 'INTEGER', False, None, None),
         ('legislation_decade', 'legisjahr', 'INT4RANGE', False, None, None),
-        ('decade', 'jahrzehnt', 'INT4RANGE', False, None, None),
         ('short_title_de', 'titel_kurz_d', 'TEXT', False, None, None),
         ('short_title_fr', 'titel_kurz_f', 'TEXT', False, None, None),
         ('title_de', 'titel_off_d', 'TEXT', False, None, None),
@@ -1361,6 +1355,6 @@ def test_column_mapper():
         ('votes_on_same_day', 'anzahl', 'INTEGER', False, None, None),
         ('_legal_form', 'rechtsform', 'INTEGER', False, None, None)
     ]
-    assert list(mapper.items())[303] == (
+    assert list(mapper.items())[302] == (
         '!recommendations!sodk', 'p-sodk', 'INTEGER', True, None, None
     )

@@ -151,7 +151,6 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     # Formal description
     bfs_number = Column(Numeric(8, 2), nullable=False)
     date = Column(Date, nullable=False)
-    decade = Column(INT4RANGE, nullable=False)
     legislation_number = Column(Integer, nullable=False)
     legislation_decade = Column(INT4RANGE, nullable=False)
     title_de = Column(Text, nullable=False)

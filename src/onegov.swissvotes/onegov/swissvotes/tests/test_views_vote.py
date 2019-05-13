@@ -14,7 +14,6 @@ def test_view_vote(swissvotes_app):
         SwissVote(
             bfs_number=Decimal('100.1'),
             date=date(1990, 6, 2),
-            decade=NumericRange(1990, 1999),
             legislation_number=4,
             legislation_decade=NumericRange(1990, 1994),
             title_de="Vote DE",
@@ -326,7 +325,6 @@ def test_vote_upload(swissvotes_app, attachments):
         SwissVote(
             bfs_number=Decimal('100.1'),
             date=date(1990, 6, 2),
-            decade=NumericRange(1990, 1999),
             legislation_number=4,
             legislation_decade=NumericRange(1990, 1994),
             title_de="Vote DE",
@@ -399,7 +397,6 @@ def test_vote_pagination(swissvotes_app):
             SwissVote(
                 bfs_number=Decimal(number),
                 date=date(1990, 6, day),
-                decade=NumericRange(1990, 1999),
                 legislation_number=4,
                 legislation_decade=NumericRange(1990, 1994),
                 title_de="Vote DE",

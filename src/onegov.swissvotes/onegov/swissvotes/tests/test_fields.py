@@ -86,7 +86,6 @@ def test_swissvotes_dataset_field():
         '',  # datum / DATE
         '',  # legislatur / INTEGER
         '',  # legisjahr / INT4RANGE
-        '',  # jahrzent / INT4RANGE
         '',  # titel / TEXT
     ])
     worksheet.write_row(2, 0, [
@@ -94,7 +93,6 @@ def test_swissvotes_dataset_field():
         None,  # datum / DATE
         None,  # legislatur / INTEGER
         None,  # legisjahr / INT4RANGE
-        None,  # jahrzent / INT4RANGE
         None,  # titel / TEXT
     ])
     worksheet.write_row(3, 0, [
@@ -102,7 +100,6 @@ def test_swissvotes_dataset_field():
         'x',  # datum / DATE
         'x',  # legislatur / INTEGER
         'x',  # legisjahr / INT4RANGE
-        'x',  # jahrzent / INT4RANGE
         'x',  # titel / TEXT
     ])
     worksheet.write_row(4, 0, [
@@ -110,7 +107,6 @@ def test_swissvotes_dataset_field():
         1,  # datum / DATE
         1,  # legislatur / INTEGER
         1,  # legisjahr / INT4RANGE
-        1,  # jahrzent / INT4RANGE
         1,  # titel / TEXT
     ])
     worksheet.write_row(5, 0, [
@@ -118,7 +114,6 @@ def test_swissvotes_dataset_field():
         1.1,  # datum / DATE
         1.1,  # legislatur / INTEGER
         1.1,  # legisjahr / INT4RANGE
-        1.1,  # jahrzent / INT4RANGE
         1.1,  # titel / TEXT
     ])
     worksheet.write_row(5, 0, [
@@ -126,7 +121,6 @@ def test_swissvotes_dataset_field():
         date(2018, 12, 12),  # datum / DATE
         date(2018, 12, 12),  # legislatur / INTEGER
         date(2018, 12, 12),  # legisjahr / INT4RANGE
-        date(2018, 12, 12),  # jahrzent / INT4RANGE
         date(2018, 12, 12),  # titel / TEXT
     ])
     workbook.close()
@@ -146,7 +140,6 @@ def test_swissvotes_dataset_field():
     assert "1:datum ∅" in error
     assert "1:legislatur ∅" in error
     assert "1:legisjahr ∅" in error
-    assert "1:jahrzehnt ∅" in error
     assert "1:titel_off_d ∅" in error
     assert "1:titel_off_f ∅" in error
     assert "1:titel_kurz_d ∅" in error
@@ -159,7 +152,6 @@ def test_swissvotes_dataset_field():
     assert "2:datum ∅" in error
     assert "2:legislatur ∅" in error
     assert "2:legisjahr ∅" in error
-    assert "2:jahrzehnt ∅" in error
     assert "2:titel_off_d ∅" in error
     assert "2:titel_off_f ∅" in error
     assert "2:titel_kurz_d ∅" in error
@@ -169,13 +161,10 @@ def test_swissvotes_dataset_field():
     assert "3:datum 'x' ≠ date" in error
     assert "3:legislatur 'x' ≠ integer" in error
     assert "3:legisjahr 'x' ≠ int4range" in error
-    assert "3:jahrzehnt 'x' ≠ int4range" in error
 
     assert "4:legisjahr '1' ≠ int4range" in error
-    assert "4:jahrzehnt '1' ≠ int4range" in error
 
     assert "5:legisjahr '43446' ≠ int4range" in error
-    assert "5:jahrzehnt '43446' ≠ int4range" in error
 
     # OK
     file = BytesIO()
@@ -187,7 +176,6 @@ def test_swissvotes_dataset_field():
         '1.2.2008',  # datum / DATE
         '1',  # legislatur / INTEGER
         '2004-2008',  # legisjahr / INT4RANGE
-        '2000-2009',  # jahrzent / INT4RANGE
         'titel_kurz_d',  # short_title_de / TEXT
         'titel_kurz_f',  # short_title_fr / TEXT
         'titel_off_d',  # title_de / TEXT
@@ -201,7 +189,6 @@ def test_swissvotes_dataset_field():
         date(2008, 2, 1),  # datum / DATE
         1,  # legislatur / INTEGER
         '2004-2008',  # legisjahr / INT4RANGE
-        '2000-2009',  # jahrzent / INT4RANGE
         'titel_kurz_d',  # short_title_de / TEXT
         'titel_kurz_f',  # short_title_fr / TEXT
         'titel_off_d',  # title_de / TEXT
@@ -227,7 +214,6 @@ def test_swissvotes_dataset_field():
     assert field.data[0].date == date(2008, 2, 1)
     assert field.data[0].legislation_number == 1
     assert field.data[0].legislation_decade == NumericRange(2004, 2008)
-    assert field.data[0].decade == NumericRange(2000, 2009)
     assert field.data[0].title_de == 'titel_off_d'
     assert field.data[0].title_fr == 'titel_off_f'
     assert field.data[0].short_title_de == 'titel_kurz_d'
@@ -240,7 +226,6 @@ def test_swissvotes_dataset_field():
     assert field.data[1].date == date(2008, 2, 1)
     assert field.data[1].legislation_number == 1
     assert field.data[1].legislation_decade == NumericRange(2004, 2008)
-    assert field.data[1].decade == NumericRange(2000, 2009)
     assert field.data[1].title_de == 'titel_off_d'
     assert field.data[1].title_fr == 'titel_off_f'
     assert field.data[1].short_title_de == 'titel_kurz_d'

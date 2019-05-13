@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Removes the decade from the votes.
+  [msom]
+
 1.0.2 (2019-05-13)
 ~~~~~~~~~~~~~~~~~~~
 
