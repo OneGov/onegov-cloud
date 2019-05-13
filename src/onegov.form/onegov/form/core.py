@@ -192,6 +192,12 @@ class Form(BaseForm):
         """ Processes the depends_on parameter on the fields, which adds the
         ability to have fields depend on values of other fields.
 
+        Supported are dependencies to boolean fields and choices. Search
+        the source code for depends_on for plenty of examples.
+
+        For checkboxes, note that the value is 'true' (string) or '!true' for
+        the inverse.
+
         In the process the fields are altered so that wtforms recognizes them
         again (that is, attributes only known to us are removed).
 
@@ -586,7 +592,8 @@ class FieldDependency(object):
         self.dependencies = []
         for index in range(len(kwargs) // 2):
             choice = kwargs[2 * index + 1]
-            invert = choice.startswith('!')
+            invert = bool(isinstance(choice, str) and choice.startswith('!'))
+
             self.dependencies.append({
                 'field_id': kwargs[2 * index],
                 'raw_choice': choice,
@@ -612,10 +619,9 @@ class FieldDependency(object):
 
     @property
     def html_data(self):
-        value = ';'.join((
-            '/'.join((dep['field_id'], dep['raw_choice']))
-            for dep in self.dependencies
-        ))
+        value = ';'.join(
+            f"{d['field_id']}/{d['raw_choice']}" for d in self.dependencies)
+
         return {'data-depends-on': value}
 
 
