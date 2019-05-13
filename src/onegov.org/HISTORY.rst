@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.2.11 (2019-05-13)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a before-submit slot to the form macro.
   [href]
 
