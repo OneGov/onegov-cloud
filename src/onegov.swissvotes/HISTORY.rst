@@ -4,6 +4,9 @@ Changelog
 - Fixes typo.
   [msom]
 
+- Adds label for unknown party recommendations.
+  [msom]
+
 1.0.0 (2019-05-09)
 ~~~~~~~~~~~~~~~~~~~
 
