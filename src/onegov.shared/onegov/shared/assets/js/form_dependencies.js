@@ -34,7 +34,15 @@ var get_choices = function(form, field_name) {
         return null;
     }
 
-    return _.map($(fields), function(f) { return $(f).val(); });
+    return _.map($(fields), function(f) {
+        var field = $(f);
+
+        if (field.attr('type') === 'checkbox') {
+            return 'true';
+        } else {
+            return field.val();
+        }
+    });
 };
 
 /*
@@ -59,6 +67,7 @@ var get_dependencies = function(input) {
         var name = dependency.split('/')[0];
         var value = dependency.substring(name.length + 1);
         var invert = value.indexOf('!') === 0;
+
         if (invert) {
             value = value.substring(1);
         }
