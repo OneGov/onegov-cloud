@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.1 (2019-05-13)
+~~~~~~~~~~~~~~~~~~~
+
 - Improves handling of checkboxes in form dependencies.
 
 0.3.0 (2019-04-22)
