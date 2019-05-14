@@ -1,3 +1,4 @@
+from datetime import date
 from onegov.core.orm.func import unaccent
 from onegov.form import Form
 from onegov.wtfs import _
@@ -5,6 +6,7 @@ from onegov.wtfs.fields import MunicipalityDataUploadField
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import PaymentType
 from onegov.wtfs.models import PickupDate
+from sqlalchemy import func
 from wtforms import IntegerField
 from wtforms import RadioField
 from wtforms import SelectField
@@ -101,11 +103,13 @@ class DeleteMunicipalityDatesForm(Form):
         dates = model.pickup_dates
         dates = dates.filter(PickupDate.date >= self.start.data)
         dates = dates.filter(PickupDate.date <= self.end.data)
-        for date in dates:
-            self.request.session.delete(date)
+        for date_ in dates:
+            self.request.session.delete(date_)
 
     def apply_model(self, model):
-        start = model.pickup_dates.first()
+        start = model.pickup_dates.filter(
+            func.extract('year', PickupDate.date) == date.today().year
+        ).first()
         self.start.data = start.date if start else None
 
         end = model.pickup_dates.order_by(None)

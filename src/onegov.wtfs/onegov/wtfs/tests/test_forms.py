@@ -240,9 +240,15 @@ def test_delete_municipality_dates_form(session):
     municipality.pickup_dates.append(PickupDate(date=date(2019, 12, 31)))
     municipality.pickup_dates.append(PickupDate(date=date(2020, 1, 1)))
 
-    form.apply_model(municipality)
-    assert form.start.data == date(2018, 12, 31)
-    assert form.end.data == date(2020, 1, 1)
+    with freeze_time("2018-01-05"):
+        form.apply_model(municipality)
+        assert form.start.data == date(2018, 12, 31)
+        assert form.end.data == date(2020, 1, 1)
+
+    with freeze_time("2019-01-05"):
+        form.apply_model(municipality)
+        assert form.start.data == date(2019, 1, 1)
+        assert form.end.data == date(2020, 1, 1)
 
     form.start.data = date(2019, 1, 1)
     form.end.data = date(2019, 12, 31)

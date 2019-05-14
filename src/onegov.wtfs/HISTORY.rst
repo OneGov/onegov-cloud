@@ -4,6 +4,9 @@ Changelog
 - Uses plain buttons instead of dropdowns to add elements.
   [msom]
 
+- Presets the first pickup date of the current year when deleting.
+  [msom]
+
 1.2.4 (2019-05-09)
 ~~~~~~~~~~~~~~~~~~~
 

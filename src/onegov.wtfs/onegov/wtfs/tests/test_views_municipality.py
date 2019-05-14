@@ -53,9 +53,10 @@ def test_views_municipality(client):
         assert "12.02.2015" not in client.get('/municipalities').click("Aesch")
 
     # Delete some dates
-    clear = client.get('/municipalities').click("Aesch")\
-        .click("Abholtermine löschen")
-    cleared = clear.form.submit().follow()
+    with freeze_time("2015-01-01"):
+        clear = client.get('/municipalities').click("Aesch")\
+            .click("Abholtermine löschen")
+        cleared = clear.form.submit().follow()
     assert "Abholtermine gelöscht." in cleared
     with freeze_time("2016-01-01"):
         assert "12.02.2015" not in client.get('/municipalities').click("Aesch")
