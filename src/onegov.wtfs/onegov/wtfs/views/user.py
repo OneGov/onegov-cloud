@@ -115,8 +115,10 @@ def edit_user_unrestricted(self, request, form):
     layout = EditUserLayout(self, request)
 
     if form.submitted(request):
-        form.update_model(self)
+        logged_out = form.update_model(self)
         request.message(_("User modified."), 'success')
+        if logged_out:
+            return redirect(layout.login_to_url(layout.success_url))
         return redirect(layout.success_url)
 
     if not form.errors:
@@ -146,8 +148,10 @@ def edit_user(self, request, form):
     layout = EditUserLayout(self, request)
 
     if form.submitted(request):
-        form.update_model(self)
+        logged_out = form.update_model(self)
         request.message(_("User modified."), 'success')
+        if logged_out:
+            return redirect(layout.login_to_url(layout.success_url))
         return redirect(layout.success_url)
 
     if not form.errors:

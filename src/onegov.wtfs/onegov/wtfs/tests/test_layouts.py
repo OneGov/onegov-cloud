@@ -158,6 +158,7 @@ def test_default_layout(wtfs_app):
     assert layout.success_url == ''
     assert layout.homepage_url == 'Principal/'
     assert layout.login_url == 'Auth/login'
+    assert layout.login_to_url(layout.logout_url) == 'Auth/login'
     assert layout.logout_url is None
     assert layout.users_url == 'UserCollection/'
     assert layout.municipalities_url == 'MunicipalityCollection/'

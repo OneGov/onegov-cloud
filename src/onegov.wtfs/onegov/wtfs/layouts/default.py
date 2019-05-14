@@ -76,6 +76,12 @@ class DefaultLayout(ChameleonLayout):
     def homepage_url(self):
         return self.request.link(self.app.principal)
 
+    def login_to_url(self, to):
+        return self.request.link(
+            Auth.from_request(self.request, to=to),
+            name='login'
+        )
+
     @cached_property
     def login_url(self):
         if not self.request.is_logged_in:

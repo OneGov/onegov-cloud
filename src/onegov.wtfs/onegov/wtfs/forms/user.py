@@ -38,12 +38,14 @@ class UserForm(Form):
     )
 
     def update_model(self, model):
+        logged_out = self.request.identity.userid == model.username
+
         model.realname = self.realname.data
         model.username = self.username.data
         model.data = model.data or {}
         model.data['contact'] = self.contact.data or False
         model.role = 'member'
-        if self.request.identity.userid == model.username:
+        if logged_out:
             if self.request.identity.role == 'editor':
                 model.role = 'editor'
         model.group_id = self.request.identity.groupid
@@ -55,6 +57,8 @@ class UserForm(Form):
             model.modified = model.timestamp()
 
         model.logout_all_sessions(self.request)
+
+        return logged_out
 
     def apply_model(self, model):
         self.realname.data = model.realname
@@ -101,9 +105,10 @@ class UnrestrictedUserForm(UserForm):
         )
 
     def update_model(self, model):
-        super().update_model(model)
+        logged_out = super().update_model(model)
         model.role = self.role.data
         model.group_id = self.municipality_id.data or None
+        return logged_out
 
     def apply_model(self, model):
         super().apply_model(model)

@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Redirect to the login form if an admin/editor modifies itself.
+  [msom]
+
 1.2.5 (2019-05-14)
 ~~~~~~~~~~~~~~~~~~~
 

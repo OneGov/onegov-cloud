@@ -66,6 +66,17 @@ def test_views_user(client):
     assert "Hans-Peter Muster" not in client.get('/users')
     assert "Optimo X" not in client.get('/users')
 
+    # Edit ourself
+    edit = client.get('/users').click("Admin").click("Bearbeiten")
+    edit.form['realname'] = "Administrator"
+    edit.form['username'] = "administrator@winterthur.ch"
+    edited = edit.form.submit().follow()
+    assert "Benutzer geändert." in edited
+    assert "Passwort vergessen?" in edited
+    edited.form['username'] = "administrator@winterthur.ch"
+    edited.form['password'] = "hunter2"
+    assert "Administrator" in edited.form.submit().follow()
+
 
 def test_views_user_editor(client):
     client.login_editor()
@@ -103,6 +114,17 @@ def test_views_user_editor(client):
     deleted = client.get('/users').click("Hans-Peter Muster").click("Löschen")
     assert deleted.status_int == 200
     assert "Hans-Peter Muster" not in client.get('/users')
+
+    # Edit ourself
+    edit = client.get('/users').click("Editor").click("Bearbeiten")
+    edit.form['realname'] = "Gemeinde-Administrator"
+    edit.form['username'] = "administrator@gemeinde.ch"
+    edited = edit.form.submit().follow()
+    assert "Benutzer geändert." in edited
+    assert "Passwort vergessen?" in edited
+    edited.form['username'] = "administrator@gemeinde.ch"
+    edited.form['password'] = "hunter2"
+    assert "Gemeinde-Administrator" in edited.form.submit().follow()
 
 
 @patch.object(CoreRequest, 'assert_valid_csrf_token')

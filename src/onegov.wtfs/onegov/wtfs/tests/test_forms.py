@@ -288,12 +288,14 @@ def test_user_form(session):
     # Test apply / update
     form = UserForm()
     form.request = Request(session, groupid=municipality.id.hex)
+    form.request.identity.userid = 'editor@winterthur.ch'
+    form.request.identity.role = 'editor'
 
     user = User()
     form.realname.data = "Petra Muster"
     form.username.data = "petra.muster@winterthur.ch"
     form.contact.data = False
-    form.update_model(user)
+    logged_out = form.update_model(user)
     assert user.realname == "Petra Muster"
     assert user.username == "petra.muster@winterthur.ch"
     assert user.group_id == municipality.id.hex
@@ -301,6 +303,7 @@ def test_user_form(session):
     assert user.data['contact'] is False
     assert user.password_hash
     assert user.modified
+    assert logged_out is False
 
     users = UserCollection(session)
     user = users.add(
@@ -320,7 +323,7 @@ def test_user_form(session):
     form.realname.data = "Hans-Peter Muster"
     form.username.data = "hans-peter.muster@winterthur.ch"
     form.contact.data = True
-    form.update_model(user)
+    logged_out = form.update_model(user)
     assert user.realname == "Hans-Peter Muster"
     assert user.username == "hans-peter.muster@winterthur.ch"
     assert user.group_id == municipality.id.hex
@@ -328,10 +331,10 @@ def test_user_form(session):
     assert user.data['contact'] is True
     assert user.password_hash == password_hash
     assert user.logout_all_sessions.called is True
+    assert logged_out is False
 
     form.request.identity.userid = "hans-peter.muster@winterthur.ch"
-    form.request.identity.role = 'editor'
-    form.update_model(user)
+    logged_out = form.update_model(user)
     assert user.realname == "Hans-Peter Muster"
     assert user.username == "hans-peter.muster@winterthur.ch"
     assert user.group_id == municipality.id.hex
@@ -339,6 +342,7 @@ def test_user_form(session):
     assert user.data['contact'] is True
     assert user.password_hash == password_hash
     assert user.logout_all_sessions.called is True
+    assert logged_out is True
 
     # Test validation
     form = UserForm()
@@ -369,6 +373,8 @@ def test_unrestricted_user_form(session):
     # Test choices
     form = UnrestrictedUserForm()
     form.request = Request(session)
+    form.request.identity.userid = 'admin@winterthur.ch'
+    form.request.identity.role = 'admin'
     form.on_request()
     assert [c[1] for c in form.municipality_id.choices] == [
         "- none -", "Adlikon (21)", "Aesch (82)"
@@ -386,7 +392,7 @@ def test_unrestricted_user_form(session):
     form.realname.data = "Petra Muster"
     form.username.data = "petra.muster@winterthur.ch"
     form.contact.data = False
-    form.update_model(user)
+    logged_out = form.update_model(user)
     assert user.role == 'member'
     assert user.realname == "Petra Muster"
     assert user.username == "petra.muster@winterthur.ch"
@@ -394,6 +400,7 @@ def test_unrestricted_user_form(session):
     assert user.data['contact'] is False
     assert user.password_hash
     assert user.modified
+    assert logged_out is False
 
     users = UserCollection(session)
     user = users.add(
@@ -418,13 +425,24 @@ def test_unrestricted_user_form(session):
     form.realname.data = "Hans-Peter Muster"
     form.username.data = "hans-peter.muster@winterthur.ch"
     form.contact.data = True
-    form.update_model(user)
+    logged_out = form.update_model(user)
     assert user.realname == "Hans-Peter Muster"
     assert user.username == "hans-peter.muster@winterthur.ch"
     assert user.group_id == municipality_2.id.hex
     assert user.data['contact'] is True
     assert user.password_hash == password_hash
     assert user.logout_all_sessions.called is True
+    assert logged_out is False
+
+    form.request.identity.userid = "hans-peter.muster@winterthur.ch"
+    logged_out = form.update_model(user)
+    assert user.realname == "Hans-Peter Muster"
+    assert user.username == "hans-peter.muster@winterthur.ch"
+    assert user.group_id == municipality_2.id.hex
+    assert user.data['contact'] is True
+    assert user.password_hash == password_hash
+    assert user.logout_all_sessions.called is True
+    assert logged_out is True
 
     # Test validation
     form = UnrestrictedUserForm()
