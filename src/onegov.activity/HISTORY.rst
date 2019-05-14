@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.18.4 (2019-05-14)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to check if an invoice has a donation or not.
   [href]
