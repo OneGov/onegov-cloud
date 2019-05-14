@@ -10,6 +10,9 @@ Changelog
 - Changes the scan jobs filter button labels.
   [msom]
 
+- Changes colum titles of the boxes and form daily list.
+  [msom]
+
 1.2.4 (2019-05-09)
 ~~~~~~~~~~~~~~~~~~~
 

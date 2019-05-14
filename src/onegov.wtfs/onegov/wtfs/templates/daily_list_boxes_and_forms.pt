@@ -28,7 +28,7 @@
                         <tr>
                             <th class="right blue" i18n:translate>In</th>
                             <th class="center light-blue" colspan="4" i18n:translate>Tax forms</th>
-                            <th class="right light-blue" i18n:translate>Single documents</th>
+                            <th class="right light-blue">EBV</th>
                             <th class="center green" colspan="2" i18n:translate>Number of bundles/packages</th>
                         </tr>
                         <tr>
