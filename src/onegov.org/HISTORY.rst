@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Increases surface area of form labels.
+  [href]
+
 1.2.11 (2019-05-13)
 ~~~~~~~~~~~~~~~~~~~
 

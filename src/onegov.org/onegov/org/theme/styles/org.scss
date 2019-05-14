@@ -645,6 +645,10 @@ table {
     form style customizations
 */
 form {
+    label {
+        min-width: 75%;
+    }
+
     label > ul,
     .upload-widget > ul,
     .group-label > ul {
