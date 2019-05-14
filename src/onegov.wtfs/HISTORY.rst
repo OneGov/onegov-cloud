@@ -7,6 +7,9 @@ Changelog
 - Fixes express return date.
   [msom]
 
+- Improves the unrestricted scan job form.
+  [msom]
+
 1.2.6 (2019-05-14)
 ~~~~~~~~~~~~~~~~~~~
 

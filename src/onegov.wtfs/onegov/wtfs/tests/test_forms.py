@@ -729,7 +729,7 @@ def test_unrestricted_scan_job_form(session):
     assert model.dispatch_note == 'A note on the dispatch'
     assert model.dispatch_cantonal_tax_office == 60
     assert model.dispatch_cantonal_scan_center == 70
-    assert model.return_date == date(2019, 1, 10)
+    assert model.return_date is None
     assert model.return_boxes == 80
     assert model.return_tax_forms_current_year == 90
     assert model.return_tax_forms_last_year == 100

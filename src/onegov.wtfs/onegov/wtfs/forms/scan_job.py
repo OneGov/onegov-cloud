@@ -1,5 +1,4 @@
 from datetime import date
-from datetime import timedelta
 from dateutil.parser import parse
 from onegov.core.orm.func import unaccent
 from onegov.form import Form
@@ -21,10 +20,6 @@ from wtforms.fields.html5 import DateField
 from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
 from wtforms.validators import Optional
-
-
-def tomorrow():
-    return date.today() + timedelta(days=1)
 
 
 def coerce_date(value):
@@ -58,10 +53,7 @@ class AddScanJobForm(Form):
         label=_("Dispatch date"),
         choices=[],
         depends_on=('type', 'normal'),
-        validators=[
-            InputRequired(),
-            DateRange(min=tomorrow, message=_("Date must be in the future."))
-        ],
+        validators=[InputRequired()],
         coerce=coerce_date
     )
 
@@ -315,8 +307,11 @@ class UnrestrictedScanJobForm(Form):
 
     dispatch_date = DateField(
         label=_("Dispatch date"),
-        validators=[InputRequired()],
-        default=tomorrow
+        validators=[
+            InputRequired(),
+            DateRange(min=date.today, message=_("Date can't be in the past."))
+        ],
+        default=date.today,
     )
 
     dispatch_date_hint = PreviewField(
@@ -381,8 +376,8 @@ class UnrestrictedScanJobForm(Form):
     return_date = DateField(
         label=_("Return date"),
         fieldset=_("Return to the municipality"),
-        default=tomorrow,
-        validators=[Optional()]
+        validators=[Optional()],
+        depends_on=('type', 'normal')
     )
 
     return_boxes = IntegerField(
@@ -491,6 +486,9 @@ class UnrestrictedScanJobForm(Form):
         self.update_labels()
 
     def update_model(self, model):
+        model.return_date = (
+            None if self.type.data == 'express' else self.return_date.data
+        )
         for name in (
             'municipality_id',
             'type',
@@ -503,7 +501,6 @@ class UnrestrictedScanJobForm(Form):
             'dispatch_note',
             'dispatch_cantonal_tax_office',
             'dispatch_cantonal_scan_center',
-            'return_date',
             'return_boxes',
             'return_tax_forms_current_year',
             'return_tax_forms_last_year',
