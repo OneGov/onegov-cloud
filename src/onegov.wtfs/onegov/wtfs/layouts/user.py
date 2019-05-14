@@ -2,7 +2,6 @@ from cached_property import cached_property
 from onegov.core.elements import Confirm
 from onegov.core.elements import Intercooler
 from onegov.core.elements import Link
-from onegov.core.elements import LinkGroup
 from onegov.wtfs import _
 from onegov.wtfs.layouts.default import DefaultLayout
 from onegov.wtfs.security import AddModel
@@ -23,35 +22,25 @@ class UsersLayout(DefaultLayout):
         result = []
         if self.request.has_permission(self.model, AddModelUnrestricted):
             result.append(
-                LinkGroup(
-                    title=_("Add"),
-                    links=[
-                        Link(
-                            text=_("User"),
-                            url=self.request.link(
-                                self.model,
-                                name='add-unrestricted'
-                            ),
-                            attrs={'class': 'user-icon'}
-                        )
-                    ]
-                ),
+                Link(
+                    text=_("Add"),
+                    url=self.request.link(
+                        self.model,
+                        name='add-unrestricted'
+                    ),
+                    attrs={'class': 'add-icon'}
+                )
             )
         elif self.request.has_permission(self.model, AddModel):
             result.append(
-                LinkGroup(
-                    title=_("Add"),
-                    links=[
-                        Link(
-                            text=_("User"),
-                            url=self.request.link(
-                                self.model,
-                                name='add'
-                            ),
-                            attrs={'class': 'user-icon'}
-                        )
-                    ]
-                ),
+                Link(
+                    text=_("Add"),
+                    url=self.request.link(
+                        self.model,
+                        name='add'
+                    ),
+                    attrs={'class': 'add-icon'}
+                )
             )
         return result
 

@@ -2,7 +2,6 @@ from cached_property import cached_property
 from onegov.core.elements import Confirm
 from onegov.core.elements import Intercooler
 from onegov.core.elements import Link
-from onegov.core.elements import LinkGroup
 from onegov.wtfs import _
 from onegov.wtfs.layouts.default import DefaultLayout
 from onegov.wtfs.security import AddModel
@@ -29,18 +28,13 @@ class MunicipalitiesLayout(DefaultLayout):
             )
         if self.request.has_permission(self.model, AddModel):
             result.append(
-                LinkGroup(
-                    title=_("Add"),
-                    links=[
-                        Link(
-                            text=_("Municipality"),
-                            url=self.request.link(
-                                self.model,
-                                name='add'
-                            ),
-                            attrs={'class': 'municipality-icon'}
-                        )
-                    ]
+                Link(
+                    text=_("Add"),
+                    url=self.request.link(
+                        self.model,
+                        name='add'
+                    ),
+                    attrs={'class': 'add-icon'}
                 )
             )
         return result

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-07 15:11+0200\n"
+"POT-Creation-Date: 2019-05-14 07:19+0200\n"
 "PO-Revision-Date: 2019-05-07 15:11+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -248,9 +248,6 @@ msgstr "Dies kann nicht rückgängig gemacht werden."
 msgid "Cancel"
 msgstr "Abbrechen"
 
-msgid "User"
-msgstr "Benutzer"
-
 msgid "Print"
 msgstr "Drucken"
 
@@ -284,9 +281,6 @@ msgstr "Benachrichtigung bearbeiten"
 msgid "Do you really want to delete this notification?"
 msgstr "Diese Benachrichtigung wirklich löschen?"
 
-msgid "Notification"
-msgstr "Benachrichtigung"
-
 msgid "Scan jobs"
 msgstr "Scan-Aufträge"
 
@@ -313,9 +307,6 @@ msgstr "Lieferschein drucken"
 
 msgid "Do you really want to delete this scan job?"
 msgstr "Diese Scanauftrag wirklich löschen?"
-
-msgid "Scan job"
-msgstr "Scan-Auftrag"
 
 msgid "Edit user manual"
 msgstr "Benutzerhandbuch bearbeiten"
@@ -430,6 +421,9 @@ msgstr "zwei Einzelbelege"
 
 msgid "is allowed"
 msgstr "erfasst werden"
+
+msgid "Notification"
+msgstr "Benachrichtigung"
 
 msgid "Forgot your password?"
 msgstr "Passwort vergessen?"

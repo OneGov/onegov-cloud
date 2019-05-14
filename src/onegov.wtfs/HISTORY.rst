@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Uses plain buttons instead of dropdowns to add elements.
+  [msom]
+
 1.2.4 (2019-05-09)
 ~~~~~~~~~~~~~~~~~~~
 

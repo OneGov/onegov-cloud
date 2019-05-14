@@ -122,6 +122,7 @@ header {
             width: 15px;
         }
 
+        .add-icon::before { @include icon('\f067'); }
         .delete-icon::before { @include icon('\f014'); }
         .edit-icon::before { @include icon('\f040'); }
         .municipality-icon::before { @include icon('\f0c0'); }
