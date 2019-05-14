@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.5.1 (2019-05-14)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Adds roadwork to iFrame paths.
   [href]
 
