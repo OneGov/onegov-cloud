@@ -67,6 +67,7 @@ def enable_iframes_tween_factory(app, handler):
         r'/director(y|ies|y-submission/.*)',
         r'/ticket/.*',
         r'/mission-report.*',
+        r'/roadwork.*'
     )
 
     iframe_paths = re.compile(rf"({'|'.join(iframe_paths)})")
