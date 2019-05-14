@@ -40,6 +40,8 @@ def view_scan_jobs(self, request, form):
     return {
         'layout': ScanJobsLayout(self, request),
         'form': form,
+        'button_text': _("Apply filter"),
+        'reset_text': _("Reset filter"),
         'permission': ViewModel
     }
 
@@ -58,6 +60,8 @@ def view_scan_jobs_unrestricted(self, request, form):
     return {
         'layout': ScanJobsLayout(self, request),
         'form': form,
+        'button_text': _("Apply filter"),
+        'reset_text': _("Reset filter"),
         'permission': ViewModel
     }
 

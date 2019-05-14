@@ -7,6 +7,9 @@ Changelog
 - Presets the first pickup date of the current year when deleting.
   [msom]
 
+- Changes the scan jobs filter button labels.
+  [msom]
+
 1.2.4 (2019-05-09)
 ~~~~~~~~~~~~~~~~~~~
 
