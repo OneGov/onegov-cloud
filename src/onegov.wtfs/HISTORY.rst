@@ -1,5 +1,12 @@
 Changelog
 ---------
+
+- Fixes default express dispatch date.
+  [msom]
+
+- Fixes express return date.
+  [msom]
+
 1.2.6 (2019-05-14)
 ~~~~~~~~~~~~~~~~~~~
 

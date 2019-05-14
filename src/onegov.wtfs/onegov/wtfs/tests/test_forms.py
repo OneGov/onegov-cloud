@@ -542,7 +542,7 @@ def test_add_scan_job_form(session):
     form.type.data = 'express'
     form.update_model(model)
     assert model.dispatch_date == date(2019, 1, 6)
-    assert model.return_date == date(2019, 1, 8)
+    assert model.return_date is None
 
     # Test validation
     with freeze_time("2019-01-05"):

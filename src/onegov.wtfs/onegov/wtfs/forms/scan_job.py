@@ -70,9 +70,9 @@ class AddScanJobForm(Form):
         depends_on=('type', 'express'),
         validators=[
             InputRequired(),
-            DateRange(min=tomorrow, message=_("Date must be in the future."))
+            DateRange(min=date.today, message=_("Date can't be in the past."))
         ],
-        default=tomorrow
+        default=date.today
     )
 
     dispatch_boxes = IntegerField(
@@ -143,6 +143,12 @@ class AddScanJobForm(Form):
         query = query.order_by(PickupDate.date)
         return [r.date for r in query]
 
+    @property
+    def return_date(self):
+        if self.type.data == 'express':
+            return None
+        return (self.dispatch_dates(self.dispatch_date) or [None])[0]
+
     def update_labels(self):
         year = date.today().year
         self.dispatch_tax_forms_older.label.text = _(
@@ -175,9 +181,7 @@ class AddScanJobForm(Form):
         model.municipality_id = self.request.identity.groupid
         model.type = self.type.data
         model.dispatch_date = self.dispatch_date
-        model.return_date = (
-            self.dispatch_dates(model.dispatch_date) or [None]
-        )[0]
+        model.return_date = self.return_date
         for name in (
             'dispatch_boxes',
             'dispatch_tax_forms_current_year',
