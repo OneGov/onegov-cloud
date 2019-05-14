@@ -38,6 +38,12 @@ class Invoice(Base, TimestampMixin):
     def price(self):
         return Price(self.outstanding_amount, 'CHF')
 
+    @property
+    def has_donation(self):
+        for item in self.items:
+            if item.group == 'donation':
+                return True
+
     def readable_by_bucket(self, bucket):
         for ref in self.references:
             if ref.bucket == bucket:
