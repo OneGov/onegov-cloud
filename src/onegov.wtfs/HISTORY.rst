@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.0 (2019-05-15)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a report for all forms of all municipalities.
   [msom]
