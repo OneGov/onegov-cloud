@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.19.0 (2019-05-15)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a more flexible age-barrier check system.
   [href]
