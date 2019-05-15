@@ -11,6 +11,7 @@ from onegov.wtfs.models.report import Report
 from onegov.wtfs.models.report import ReportBoxes
 from onegov.wtfs.models.report import ReportBoxesAndForms
 from onegov.wtfs.models.report import ReportBoxesAndFormsByDelivery
+from onegov.wtfs.models.report import ReportFormsAllMunicipalities
 from onegov.wtfs.models.report import ReportFormsByMunicipality
 from onegov.wtfs.models.scan_job import ScanJob
 from onegov.wtfs.models.user_manual import UserManual
@@ -30,6 +31,7 @@ __all__ = (
     'ReportBoxes',
     'ReportBoxesAndForms',
     'ReportBoxesAndFormsByDelivery',
+    'ReportFormsAllMunicipalities',
     'ReportFormsByMunicipality',
     'ScanJob',
     'UserManual',

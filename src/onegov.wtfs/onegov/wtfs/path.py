@@ -19,6 +19,7 @@ from onegov.wtfs.models import Report
 from onegov.wtfs.models import ReportBoxes
 from onegov.wtfs.models import ReportBoxesAndForms
 from onegov.wtfs.models import ReportBoxesAndFormsByDelivery
+from onegov.wtfs.models import ReportFormsAllMunicipalities
 from onegov.wtfs.models import ReportFormsByMunicipality
 from onegov.wtfs.models import ScanJob
 from onegov.wtfs.models import UserManual
@@ -188,6 +189,18 @@ def get_report_boxes(request, start, end):
 )
 def get_report_boxes_and_forms(request, start, end, type):
     return ReportBoxesAndForms(request.session, start, end, type)
+
+
+@WtfsApp.path(
+    model=ReportFormsAllMunicipalities,
+    path='/report/all-forms/{start}/{end}/{type}',
+    converters=dict(
+        start=extended_date_converter,
+        end=extended_date_converter,
+    )
+)
+def get_report_all_forms(request, start, end, type):
+    return ReportFormsAllMunicipalities(request.session, start, end, type)
 
 
 @WtfsApp.path(

@@ -1,6 +1,7 @@
 from cached_property import cached_property
 from datetime import date
 from onegov.core.orm.func import unaccent
+from onegov.wtfs import _
 from onegov.wtfs.models.municipality import Municipality
 from onegov.wtfs.models.scan_job import ScanJob
 from sqlalchemy import func
@@ -165,6 +166,14 @@ class ReportFormsByMunicipality(Report):
             'return_scanned_tax_forms_current_year',
             'return_scanned_tax_forms',
         ]
+
+
+class ReportFormsAllMunicipalities(ReportFormsByMunicipality):
+    """ A report containing all tax forms of all municipalities. """
+
+    @cached_property
+    def municipality_name(self):
+        return _("Report forms of all municipalities")
 
 
 class ReportBoxesAndFormsByDelivery(object):

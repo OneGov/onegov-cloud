@@ -809,6 +809,13 @@ def test_report_selection_form(session):
     assert model.end == date(2019, 1, 31)
     assert model.type == 'express'
 
+    form.report_type.data = 'all_forms'
+    model = form.get_model()
+    assert model.__class__.__name__ == 'ReportFormsAllMunicipalities'
+    assert model.start == date(2019, 1, 1)
+    assert model.end == date(2019, 1, 31)
+    assert model.type == 'express'
+
     form.report_type.data = 'forms'
     model = form.get_model()
     assert model.__class__.__name__ == 'ReportFormsByMunicipality'

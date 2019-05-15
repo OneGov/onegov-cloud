@@ -6,6 +6,7 @@ from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import ReportBoxes
 from onegov.wtfs.models import ReportBoxesAndForms
 from onegov.wtfs.models import ReportBoxesAndFormsByDelivery
+from onegov.wtfs.models import ReportFormsAllMunicipalities
 from onegov.wtfs.models import ReportFormsByMunicipality
 from wtforms import RadioField
 from wtforms import SelectField
@@ -32,6 +33,7 @@ class ReportSelectionForm(Form):
         choices=[
             ('boxes', _("Report boxes")),
             ('boxes_and_forms', _("Report boxes and forms")),
+            ('all_forms', _("Report forms of all municipalities")),
             ('forms', _("Report forms")),
             ('delivery', _("Report boxes and forms by delivery")),
         ],
@@ -57,7 +59,8 @@ class ReportSelectionForm(Form):
         validators=[InputRequired()],
         depends_on=(
             'report_type', '!boxes',
-            'report_type', '!boxes_and_forms'
+            'report_type', '!boxes_and_forms',
+            'report_type', '!all_forms'
         ),
     )
 
@@ -93,6 +96,13 @@ class ReportSelectionForm(Form):
                 end=self.end.data,
                 type=self.scan_job_type.data,
                 municipality_id=self.municipality_id.data
+            )
+        if self.report_type.data == 'all_forms':
+            return ReportFormsAllMunicipalities(
+                self.request.session,
+                start=self.start.data,
+                end=self.end.data,
+                type=self.scan_job_type.data,
             )
         if self.report_type.data == 'delivery':
             return ReportBoxesAndFormsByDelivery(

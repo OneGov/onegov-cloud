@@ -5,12 +5,14 @@ from onegov.wtfs.forms import ReportSelectionForm
 from onegov.wtfs.layouts import ReportBoxesAndFormsByDeliveryLayout
 from onegov.wtfs.layouts import ReportBoxesAndFormsLayout
 from onegov.wtfs.layouts import ReportBoxesLayout
+from onegov.wtfs.layouts import ReportFormsAllMunicipalitiesLayout
 from onegov.wtfs.layouts import ReportFormsByMunicipalityLayout
 from onegov.wtfs.layouts import ReportLayout
 from onegov.wtfs.models import Report
 from onegov.wtfs.models import ReportBoxes
 from onegov.wtfs.models import ReportBoxesAndForms
 from onegov.wtfs.models import ReportBoxesAndFormsByDelivery
+from onegov.wtfs.models import ReportFormsAllMunicipalities
 from onegov.wtfs.models import ReportFormsByMunicipality
 from onegov.wtfs.security import ViewModel
 
@@ -59,6 +61,15 @@ def view_report_boxes_and_forms(self, request):
 )
 def view_report_forms(self, request):
     return {'layout': ReportFormsByMunicipalityLayout(self, request)}
+
+
+@WtfsApp.html(
+    model=ReportFormsAllMunicipalities,
+    template='report_forms_all.pt',
+    permission=ViewModel
+)
+def view_report_forms_all(self, request):
+    return {'layout': ReportFormsAllMunicipalitiesLayout(self, request)}
 
 
 @WtfsApp.html(

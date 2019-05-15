@@ -31,6 +31,7 @@ from onegov.wtfs.layouts import PaymentTypesLayout
 from onegov.wtfs.layouts import ReportBoxesAndFormsByDeliveryLayout
 from onegov.wtfs.layouts import ReportBoxesAndFormsLayout
 from onegov.wtfs.layouts import ReportBoxesLayout
+from onegov.wtfs.layouts import ReportFormsAllMunicipalitiesLayout
 from onegov.wtfs.layouts import ReportFormsByMunicipalityLayout
 from onegov.wtfs.layouts import ReportLayout
 from onegov.wtfs.layouts import ScanJobLayout
@@ -48,6 +49,7 @@ from onegov.wtfs.models import Report
 from onegov.wtfs.models import ReportBoxes
 from onegov.wtfs.models import ReportBoxesAndForms
 from onegov.wtfs.models import ReportBoxesAndFormsByDelivery
+from onegov.wtfs.models import ReportFormsAllMunicipalities
 from onegov.wtfs.models import ReportFormsByMunicipality
 from onegov.wtfs.models import UserManual
 from onegov.wtfs.security import AddModel
@@ -526,6 +528,21 @@ def test_report_layouts(session):
     assert list(hrefs(layout.editbar_links)) == ['#']
     assert path(layout.breadcrumbs) == (
         'DummyPrincipal/Report/#/ReportBoxesAndForms'
+    )
+    assert layout.cancel_url == ''
+    assert layout.success_url == ''
+
+    model = ReportFormsAllMunicipalities(
+        session,
+        start=date(2019, 1, 1),
+        end=date(2019, 1, 31),
+    )
+    layout = ReportFormsAllMunicipalitiesLayout(model, request)
+    assert layout.title == 'Report forms of all municipalities'
+    assert layout.subtitle == '01.01.2019-31.01.2019'
+    assert list(hrefs(layout.editbar_links)) == ['#']
+    assert path(layout.breadcrumbs) == (
+        'DummyPrincipal/Report/#/ReportFormsAllMunicipalities'
     )
     assert layout.cancel_url == ''
     assert layout.success_url == ''

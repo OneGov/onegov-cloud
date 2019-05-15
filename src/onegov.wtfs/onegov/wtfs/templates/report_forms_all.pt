@@ -1,0 +1,51 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.wtfs">
+    <tal:block metal:fill-slot="title">${layout.title}</tal:block>
+    <tal:block metal:fill-slot="content">
+        <div class="row">
+            <div class="columns small-12">
+                <h1>${layout.title}<br><small>${layout.subtitle}</small></h1>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th colspan="2"></th>
+                            <th class="center" colspan="4" i18n:translate>Dispatch to the tax office</th>
+                        </tr>
+                        <tr>
+                            <th class="center" colspan="2" i18n:translate>Municipality</th>
+                            <th class="center" colspan="4" i18n:translate>Tax forms</th>
+                        </tr>
+                        <tr>
+                            <th class="subtitle" i18n:translate>Name</th>
+                            <th class="right subtitle" i18n:translate>BFS number</th>
+                            <th class="right subtitle"><tal:block i18n:translate>until</tal:block> ${layout.model.end.year-2}</th>
+                            <th class="right subtitle">${layout.model.end.year-1}</th>
+                            <th class="right subtitle">${layout.model.end.year}</th>
+                            <th class="right subtitle" i18n:translate>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr tal:repeat="result layout.model.query()">
+                            <td>${result.name}</td>
+                            <td class="right">${result.bfs_number}</td>
+                            <td class="right">${result.return_scanned_tax_forms_older}</td>
+                            <td class="right">${result.return_scanned_tax_forms_last_year}</td>
+                            <td class="right">${result.return_scanned_tax_forms_current_year}</td>
+                            <td class="right">${result.return_scanned_tax_forms}</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr tal:define="total layout.model.total()">
+                            <th colspan="2" i18n:translate>Total</th>
+                            <td class="right">${total.return_scanned_tax_forms_older}</td>
+                            <td class="right">${total.return_scanned_tax_forms_last_year}</td>
+                            <td class="right">${total.return_scanned_tax_forms_current_year}</td>
+                            <td class="right">${total.return_scanned_tax_forms}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+            </div>
+        </div>
+    </tal:block>
+</div>

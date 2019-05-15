@@ -99,6 +99,17 @@ def test_views_report(client):
     assert "9603" not in view
     assert "9702" not in view
 
+    # All forms
+    view = get_report('all_forms', '2019-01-01', '2019-01-05')
+    assert "9504" in view
+    assert "9603" in view
+    assert "9702" in view
+
+    view = get_report('all_forms', '2019-01-06', '2019-01-10')
+    assert "9504" not in view
+    assert "9603" not in view
+    assert "9702" not in view
+
     # By delivery
     view = get_report('delivery', '2019-01-01', '2019-01-05')
     assert "8888" in view

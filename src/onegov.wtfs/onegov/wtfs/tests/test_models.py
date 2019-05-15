@@ -13,6 +13,7 @@ from onegov.wtfs.models import Principal
 from onegov.wtfs.models import ReportBoxes
 from onegov.wtfs.models import ReportBoxesAndForms
 from onegov.wtfs.models import ReportBoxesAndFormsByDelivery
+from onegov.wtfs.models import ReportFormsAllMunicipalities
 from onegov.wtfs.models import ReportFormsByMunicipality
 from onegov.wtfs.models import ScanJob
 from onegov.wtfs.models import UserManual
@@ -488,6 +489,33 @@ def test_report_forms_by_municipality(session):
     assert report.query().all() == [('Aesch', 241, 0, 0, 0, 0)]
     report = _report(date(2019, 1, 4), date(2019, 1, 5), 'Andelfingen')
     assert report.query().all() == [('Andelfingen', 30, 0, 0, 0, 0)]
+
+
+def test_report_forms_all_municipalities(session):
+    def _report(start, end):
+        return ReportFormsAllMunicipalities(session, start=start, end=end)
+
+    add_report_data(session)
+
+    report = _report(date(2019, 1, 1), date(2019, 1, 1))
+    assert report.query().all() == [
+        ('Adlikon', 21, 1, 2, 3, 6),
+        ('Aesch', 241, 1, 2, 3, 6)
+    ]
+
+    report = _report(date(2019, 1, 2), date(2019, 1, 3))
+    assert report.query().all() == [
+        ('Adlikon', 21, 3, 2, 1, 6),
+        ('Aesch', 241, 0, 10, 0, 10),
+        ('Altikon', 211, 1, 2, 3, 6),
+        ('Andelfingen', 30, 1, 2, 3, 6)
+    ]
+
+    report = _report(date(2019, 1, 4), date(2019, 1, 5))
+    assert report.query().all() == [
+        ('Aesch', 241, 0, 0, 0, 0),
+        ('Andelfingen', 30, 0, 0, 0, 0)
+    ]
 
 
 def test_report_delivery(session):

@@ -88,6 +88,13 @@ class ReportFormsByMunicipalityLayout(SpecificReportBaseLayout):
         )
 
 
+class ReportFormsAllMunicipalitiesLayout(SpecificReportBaseLayout):
+
+    @cached_property
+    def title(self):
+        return _("Report forms of all municipalities")
+
+
 class ReportBoxesAndFormsByDeliveryLayout(SpecificReportBaseLayout):
 
     @cached_property

@@ -18,6 +18,7 @@ from onegov.wtfs.layouts.payment_type import PaymentTypesLayout
 from onegov.wtfs.layouts.report import ReportBoxesAndFormsByDeliveryLayout
 from onegov.wtfs.layouts.report import ReportBoxesAndFormsLayout
 from onegov.wtfs.layouts.report import ReportBoxesLayout
+from onegov.wtfs.layouts.report import ReportFormsAllMunicipalitiesLayout
 from onegov.wtfs.layouts.report import ReportFormsByMunicipalityLayout
 from onegov.wtfs.layouts.report import ReportLayout
 from onegov.wtfs.layouts.scan_job import AddScanJobLayout
@@ -60,6 +61,7 @@ __all__ = (
     'ReportBoxesAndFormsByDeliveryLayout',
     'ReportBoxesAndFormsLayout',
     'ReportBoxesLayout',
+    'ReportFormsAllMunicipalitiesLayout',
     'ReportFormsByMunicipalityLayout',
     'ReportLayout',
     'ScanJobLayout',
