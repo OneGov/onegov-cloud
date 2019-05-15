@@ -1,12 +1,14 @@
 import sedate
 
 from datetime import date, datetime
+from onegov.activity.models.age_barrier import AgeBarrier
 from onegov.activity.models.booking import Booking
 from onegov.activity.models.occasion import Occasion
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID, JSON
 from sqlalchemy import Boolean
+from sqlalchemy import case, desc, not_, distinct, func
 from sqlalchemy import CheckConstraint
 from sqlalchemy import column
 from sqlalchemy import Column
@@ -15,9 +17,9 @@ from sqlalchemy import Index
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
 from sqlalchemy import Text
-from sqlalchemy import case, desc, not_, distinct, func
-from sqlalchemy.orm import object_session, relationship, joinedload, defer
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import object_session, relationship, joinedload, defer
+from sqlalchemy.orm import validates
 from uuid import uuid4
 
 
@@ -96,6 +98,9 @@ class Period(Base, TimestampMixin):
     #: the cancellation_date)
     cancellation_days = Column(Integer, nullable=True)
 
+    #: The age barrier implementation in use
+    age_barrier_type = Column(Text, nullable=False, default='exact')
+
     __table_args__ = (
         CheckConstraint((
             '"prebooking_start" <= "prebooking_end" AND '
@@ -140,6 +145,15 @@ class Period(Base, TimestampMixin):
                 Period.booking_cost, 0
             ))
         ])
+
+    @validates('age_barrier_type')
+    def validate_age_barrier_type(self, key, age_barrier_type):
+        assert age_barrier_type in AgeBarrier.registry
+        return age_barrier_type
+
+    @property
+    def age_barrier(self):
+        return AgeBarrier.from_name(self.age_barrier_type)
 
     def activate(self):
         """ Activates the current period, causing all occasions and activites

@@ -2296,8 +2296,10 @@ def test_date_changes(session, collections, prebooking_period, owner):
     assert not DAYS.has(o.duration, DAYS.many)
 
 
-def test_is_permitted_birth_date():
-    o = Occasion(age=NumericRange(6, 9), dates=[
+def test_age_barriers(prebooking_period):
+    period = prebooking_period
+
+    o = Occasion(age=NumericRange(6, 9), period=period, dates=[
         OccasionDate(
             start=datetime(2017, 7, 26, 10),
             end=datetime(2017, 7, 26, 16),
@@ -2307,20 +2309,34 @@ def test_is_permitted_birth_date():
             start=datetime(2017, 7, 26, 17),
             end=datetime(2017, 7, 26, 20),
             timezone='Europe/Zurich'
-        )
+        ),
     ])
 
-    assert o.is_permitted_birth_date(date(2012, 7, 26), wiggle_room=366)
-    assert not o.is_permitted_birth_date(date(2012, 7, 26), wiggle_room=365)
+    period.age_barrier_type = 'exact'
 
-    assert not o.is_too_young(date(2012, 7, 26), wiggle_room=366)
-    assert o.is_too_young(date(2012, 7, 26), wiggle_room=365)
+    assert not o.is_too_young(date(2011, 7, 25))
+    assert not o.is_too_young(date(2011, 7, 26))
+    assert o.is_too_young(date(2011, 7, 27))
+    assert o.is_too_young(date(2011, 7, 28))
 
-    assert o.is_permitted_birth_date(date(2008, 7, 26), wiggle_room=365)
-    assert not o.is_permitted_birth_date(date(2008, 7, 26), wiggle_room=364)
+    assert o.is_too_old(date(2008, 7, 25))
+    assert o.is_too_old(date(2008, 7, 26))
+    assert not o.is_too_old(date(2008, 7, 27))
+    assert not o.is_too_old(date(2008, 7, 28))
 
-    assert not o.is_too_old(date(2008, 7, 26), wiggle_room=365)
-    assert o.is_too_old(date(2008, 7, 26), wiggle_room=364)
+    period.age_barrier_type = 'year'
+
+    assert not o.is_too_young(date(2011, 1, 1))
+    assert not o.is_too_young(date(2011, 12, 31))
+
+    assert o.is_too_young(date(2012, 1, 1))
+    assert o.is_too_young(date(2012, 12, 31))
+
+    assert not o.is_too_young(date(2008, 1, 1))
+    assert not o.is_too_young(date(2008, 12, 31))
+
+    assert o.is_too_old(date(2007, 1, 1))
+    assert o.is_too_old(date(2007, 12, 31))
 
 
 def test_deadline(session, collections, prebooking_period, owner):
