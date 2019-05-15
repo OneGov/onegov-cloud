@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.24.0 (2019-05-15)
+~~~~~~~~~~~~~~~~~~~~
 
 - Searches also in notes of notices.
   [msom]
