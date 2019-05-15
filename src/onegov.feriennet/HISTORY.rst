@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to select different age checking methods.
+  [href]
+
 - Gives users the ability to add a donation to their invoice.
   [href]
 

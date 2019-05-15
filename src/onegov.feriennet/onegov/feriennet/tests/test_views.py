@@ -2125,7 +2125,7 @@ def test_send_email_with_attachment(client, scenario):
     assert ">Test</a>" in client.get_email(0, 1)
 
 
-def test_max_age(client, scenario):
+def test_max_age_exact(client, scenario):
     scenario.add_period(
         title="2018",
         confirmed=False,
@@ -2134,6 +2134,7 @@ def test_max_age(client, scenario):
         prebooking_end=date(2018, 1, 31),
         execution_start=date(2018, 2, 1),
         execution_end=date(2018, 2, 28),
+        age_barrier_type='exact',
     )
 
     scenario.add_activity(title="Fishing", state='accepted')
@@ -2158,14 +2159,14 @@ def test_max_age(client, scenario):
         page = client.get('/activity/fishing').click("Anmelden")
         page.form['first_name'] = "Tom"
         page.form['last_name'] = "Sawyer"
-        page.form['birth_date'] = "2013-01-01"
+        page.form['birth_date'] = "2013-01-02"
         page.form['gender'] = 'male'
         assert "zu jung" in page.form.submit()
 
         page = client.get('/activity/fishing').click("Anmelden")
         page.form['first_name'] = "Tom"
         page.form['last_name'] = "Sawyer"
-        page.form['birth_date'] = "2012-12-31"
+        page.form['birth_date'] = "2013-01-01"
         page.form['gender'] = 'male'
         assert "zu jung" not in page.form.submit()
 
@@ -2182,6 +2183,94 @@ def test_max_age(client, scenario):
         page.form['first_name'] = "Huckleberry"
         page.form['last_name'] = "Finn"
         page.form['birth_date'] = "2007-01-02"
+        page.form['gender'] = 'male'
+        assert "zu alt" not in page.form.submit()
+
+
+def test_max_age_year(client, scenario):
+    scenario.add_period(
+        title="2018",
+        confirmed=False,
+        active=True,
+        prebooking_start=date(2018, 5, 1),
+        prebooking_end=date(2018, 5, 31),
+        execution_start=date(2018, 6, 1),
+        execution_end=date(2018, 6, 30),
+        age_barrier_type='year',
+    )
+
+    scenario.add_activity(title="Fishing", state='accepted')
+
+    scenario.add_occasion(
+        age=(5, 10),
+        start=datetime(2018, 5, 1, 10),
+        end=datetime(2018, 5, 1, 12)
+    )
+
+    scenario.add_user(
+        username='member@example.org',
+        role='member',
+        complete_profile=False
+    )
+
+    scenario.commit()
+
+    client.login('member@example.org', 'hunter2')
+
+    with freeze_time('2018-05-01'):
+        page = client.get('/activity/fishing').click("Anmelden")
+        page.form['first_name'] = "Tom"
+        page.form['last_name'] = "Sawyer"
+        page.form['birth_date'] = "2014-01-01"
+        page.form['gender'] = 'male'
+        assert "zu jung" in page.form.submit()
+
+        page = client.get('/activity/fishing').click("Anmelden")
+        page.form['first_name'] = "Tom"
+        page.form['last_name'] = "Sawyer"
+        page.form['birth_date'] = "2014-12-31"
+        page.form['gender'] = 'male'
+        assert "zu jung" in page.form.submit()
+
+        page = client.get('/activity/fishing').click("Anmelden")
+        page.form['first_name'] = "Tom"
+        page.form['last_name'] = "Sawyer"
+        page.form['birth_date'] = "2013-01-01"
+        page.form['gender'] = 'male'
+        assert "zu jung" not in page.form.submit()
+
+        page = client.get('/activity/fishing').click("Anmelden")
+        page.form['first_name'] = "Tom"
+        page.form['last_name'] = "Sawyer"
+        page.form['birth_date'] = "2013-12-31"
+        page.form['gender'] = 'male'
+        assert "zu jung" not in page.form.submit()
+
+        page = client.get('/activity/fishing').click("Anmelden")
+        page.form['first_name'] = "Tom"
+        page.form['last_name'] = "Sawyer"
+        page.form['birth_date'] = "2007-01-01"
+        page.form['gender'] = 'male'
+        assert "zu alt" in page.form.submit()
+
+        page = client.get('/activity/fishing').click("Anmelden")
+        page.form['first_name'] = "Tom"
+        page.form['last_name'] = "Sawyer"
+        page.form['birth_date'] = "2007-12-31"
+        page.form['gender'] = 'male'
+        assert "zu alt" in page.form.submit()
+
+        page = client.get('/activity/fishing').click("Anmelden")
+        page.form['first_name'] = "Tom"
+        page.form['last_name'] = "Sawyer"
+        page.form['birth_date'] = "2008-01-01"
+        page.form['gender'] = 'male'
+        assert "zu alt" not in page.form.submit()
+
+        page = client.get('/activity/fishing').click("Anmelden")
+        page.form['first_name'] = "Tom"
+        page.form['last_name'] = "Sawyer"
+        page.form['birth_date'] = "2008-12-31"
         page.form['gender'] = 'male'
         assert "zu alt" not in page.form.submit()
 

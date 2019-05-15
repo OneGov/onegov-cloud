@@ -220,6 +220,22 @@ class PeriodForm(Form):
         depends_on=('cancellation', 'rel')
     )
 
+    age_barrier_type = RadioField(
+        label=_("Method"),
+        fieldset=_("Age check"),
+        choices=[
+            ('exact', _(
+                "<b>Exact</b> - the attendees need to be of the expected age "
+                "at the beginning of the occasion"
+            )),
+            ('year', _(
+                "<b>Age group</b> - The attendees need to be of the expected "
+                "age sometime during the year of the occasion"
+            )),
+        ],
+        default='exact'
+    )
+
     @property
     def prebooking(self):
         return (self.prebooking_start.data, self.prebooking_end.data)
