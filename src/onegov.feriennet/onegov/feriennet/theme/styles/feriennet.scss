@@ -278,7 +278,7 @@ ul.single-line {
     }
 
     .sponsor img {
-       background: $white;
+        background: $white;
     }
 }
 
@@ -1852,6 +1852,13 @@ $booking-left-margin: 2rem;
         margin: 0;
     }
 
+    .donation-button {
+        margin: 0;
+        position: absolute;
+        right: -.5rem;
+        top: -1rem;
+    }
+
     .item-group,
     .item-total {
         margin-top: 1rem;
@@ -2696,4 +2703,49 @@ $booking-left-margin: 2rem;
             @include icon('\f176');
         }
     }
+}
+
+
+/*
+    Donation button
+*/
+.donation-button {
+    @include button($bg: $green-pastel, $padding: .4rem);
+
+    border: 1px solid $green-light;
+    border-radius: 4px;
+    color: $green-dark;
+    font-size: 1rem;
+    font-weight: bold;
+
+    &:hover {
+        color: $green-dark;
+    }
+
+    span::after {
+        @include icon('\f08a');
+        margin-left: .75ex;
+    }
+
+    &:hover span::after {
+        content: '\f004';
+    }
+}
+
+
+/*
+    SVG Icon
+*/
+.svg-icon {
+    display: inline-block;
+}
+
+.svg-icon-small {
+    height: 16px;
+    width: 16px;
+}
+
+.svg-icon-medium {
+    height: 32px;
+    width: 32px;
 }

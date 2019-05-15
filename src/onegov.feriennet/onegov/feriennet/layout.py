@@ -663,6 +663,22 @@ class InvoiceLayout(DefaultLayout):
         )
 
 
+class DonationLayout(DefaultLayout):
+
+    def __init__(self, model, request, title):
+        super().__init__(model, request)
+        self.title = title
+        self.request.include('donation')
+
+    @cached_property
+    def breadcrumbs(self):
+        return (
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Invoices"), self.request.link(self.model)),
+            Link(_("Donation"), self.title)
+        )
+
+
 class OccasionAttendeeLayout(DefaultLayout):
 
     @cached_property

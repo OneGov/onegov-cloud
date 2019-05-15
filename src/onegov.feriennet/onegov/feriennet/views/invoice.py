@@ -1,15 +1,18 @@
+from decimal import Decimal
 from onegov.activity import Period, Invoice, InvoiceItem, InvoiceCollection
 from onegov.core.security import Personal, Secret
 from onegov.core.templates import render_macro
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.collections import BillingCollection
+from onegov.feriennet.forms import DonationForm
+from onegov.feriennet.layout import DonationLayout
 from onegov.feriennet.layout import InvoiceLayout
 from onegov.feriennet.views.shared import users_for_select_element
 from onegov.pay import process_payment
 from onegov.user import User
-from stdnum import iban
-from sqlalchemy import nullsfirst
 from sqlalchemy.orm import contains_eager
+from sqlalchemy.sql.expression import case
+from stdnum import iban
 
 
 @FeriennetApp.view(
@@ -58,7 +61,13 @@ def view_my_invoices(self, request):
     q = q.order_by(
         Period.execution_start,
         Invoice.id,
-        nullsfirst(InvoiceItem.family),
+        case(
+            [
+                (InvoiceItem.group == 'donation', 2),
+                (InvoiceItem.family != None, 1),
+            ],
+            else_=0
+        ),
         InvoiceItem.group,
         InvoiceItem.text
     )
@@ -166,3 +175,77 @@ def handle_payment(self, request):
         request.success(_("Your payment has been received. Thank you!"))
 
     return request.redirect(request.link(self))
+
+
+@FeriennetApp.form(
+    model=InvoiceCollection,
+    form=DonationForm,
+    template='donation.pt',
+    permission=Personal,
+    name='donation')
+def handle_donation(self, request, form):
+    assert self.user_id and self.period_id
+
+    if request.current_user.id == self.user_id:
+        title = _("Donation")
+    else:
+        user = request.session.query(User).filter_by(id=self.user_id).first()
+        title = _("Donation of ${user}", mapping={'user': user.title})
+
+    period = request.app.periods_by_id[self.period_id.hex]
+    bills = BillingCollection(request, period)
+
+    if form.submitted(request):
+
+        bills.include_donation(
+            user_id=self.user_id,
+            amount=Decimal(form.amount.data),
+            text=request.translate(_("Donation")))
+
+        request.success(_("Thank you for your generosity ❤"))
+        return request.redirect(request.link(self))
+
+    elif not request.POST:
+
+        donation = \
+            request.session.query(InvoiceItem)\
+            .filter(InvoiceItem.group == 'donation')\
+            .filter(
+                InvoiceItem.invoice_id.in_(
+                    request.session.query(Invoice.id)
+                    .filter(Invoice.period_id == self.period_id)
+                    .filter(Invoice.user_id == self.user_id)
+                )
+            ).first()
+
+        if donation:
+            amount = f'{donation.amount:.2f}'
+
+            for key, value in form.amount.choices:
+                if key == amount:
+                    form.amount.data = amount
+                    break
+
+    return {
+        'title': title,
+        'layout': DonationLayout(self, request, title),
+        'form': form,
+    }
+
+
+@FeriennetApp.view(
+    model=InvoiceCollection,
+    permission=Personal,
+    name='donation',
+    request_method='DELETE')
+def handle_delete_donation(self, request):
+    assert self.user_id and self.period_id
+    request.assert_valid_csrf_token()
+
+    period = request.app.periods_by_id[self.period_id.hex]
+    bills = BillingCollection(request, period)
+
+    if bills.exclude_donation(self.user_id):
+        request.success(_("Your donation was removed"))
+    else:
+        request.alert(_("This donation has already been paid"))

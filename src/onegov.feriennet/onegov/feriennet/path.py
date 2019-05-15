@@ -157,7 +157,8 @@ def get_invoice_action(request, app, id, action, extend_to=None):
 
 @FeriennetApp.path(
     model=InvoiceCollection,
-    path='/my-bills')
+    path='/my-bills',
+    converters=dict(invoice=UUID))
 def get_my_invoies(request, app, username=None, invoice=None):
     # only admins can actually specify the username/invoice
     if not request.is_admin:

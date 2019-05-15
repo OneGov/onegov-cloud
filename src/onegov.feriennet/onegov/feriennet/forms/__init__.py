@@ -5,6 +5,7 @@ from onegov.feriennet.forms.attendee import AttendeeSignupForm
 from onegov.feriennet.forms.bank_statement import BankStatementImportForm
 from onegov.feriennet.forms.billing import BillingForm
 from onegov.feriennet.forms.billing import ManualBookingForm
+from onegov.feriennet.forms.donation import DonationForm
 from onegov.feriennet.forms.match import MatchForm
 from onegov.feriennet.forms.occasion import OccasionForm
 from onegov.feriennet.forms.occasion_need import OccasionNeedForm
@@ -24,6 +25,7 @@ __all__ = [
     'AttendeeSignupForm',
     'BankStatementImportForm',
     'BillingForm',
+    'DonationForm',
     'ManualBookingForm',
     'MatchForm',
     'NotificationTemplateForm',

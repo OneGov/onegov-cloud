@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Gives users the ability to add a donation to their invoice.
+  [href]
+
 1.6.8 (2019-05-09)
 ~~~~~~~~~~~~~~~~~~~
 

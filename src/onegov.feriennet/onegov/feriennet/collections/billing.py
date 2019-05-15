@@ -170,9 +170,11 @@ class BillingCollection(object):
         donations = (i for i in invoice.items if i.group == 'donation')
         donation = next(donations, None)
 
-        if donation:
-            assert not donation.paid
+        if donation and not donation.paid:
             self.session.delete(donation)
+            return True
+
+        return False
 
     def create_invoices(self, all_inclusive_booking_text=None):
         assert not self.period.finalized

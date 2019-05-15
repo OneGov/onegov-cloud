@@ -1,10 +1,11 @@
 import onegov.feriennet
 import re
 import requests_mock
+import transaction
 
 from datetime import datetime, timedelta, date, time
 from freezegun import freeze_time
-from onegov.activity import Booking
+from onegov.activity import Booking, InvoiceItem
 from onegov.activity.utils import generate_xml
 from onegov.core.custom import json
 from onegov.file import FileCollection
@@ -2222,3 +2223,76 @@ def test_accept_tos(client, scenario):
     data = page.form.submit().json
     assert data[0]['Benutzer AGB akzeptiert']
     assert not data[1]['Benutzer AGB akzeptiert']
+
+
+def test_donations(client, scenario):
+    scenario.add_period(title="2019", confirmed=True, finalized=False)
+    scenario.add_activity(title="Fishing", state='accepted')
+    scenario.add_occasion(cost=100)
+    scenario.add_attendee(name="Dustin")
+    scenario.add_booking(state='accepted', cost=100)
+    scenario.commit()
+
+    client.login_admin()
+
+    # toggle donations
+    page = client.get('/billing')
+    page.form['confirm'] = 'yes'
+    page.form['sure'] = 'yes'
+    page = page.form.submit()
+
+    assert "Ich spende" in client.get('/my-bills')
+
+    page = client.get('/feriennet-settings')
+    page.form['donation'] = False
+    page.form.submit()
+
+    assert "Ich spende" not in client.get('/my-bills')
+
+    page = client.get('/feriennet-settings')
+    page.form['donation'] = True
+    page.form.submit()
+
+    # try a donation
+    page = client.get('/my-bills')
+
+    assert "Unterstützen Sie" in page
+
+    page = page.click('Ich spende')
+    page.form['amount'] = '10.00'
+    page = page.form.submit().follow()
+
+    assert "Vielen Dank" in page
+    assert "Sie unterstützen" in page
+    assert "10" in page
+
+    # try to adjust it
+    page = page.click('Anpassen')
+    page.form['amount'] = '30.00'
+    page = page.form.submit().follow()
+
+    assert "Vielen Dank" in page
+    assert "Sie unterstützen" in page
+    assert "30" in page
+
+    # mark it as paid to disable changes
+    for item in scenario.session.query(InvoiceItem):
+        item.paid = True
+
+    transaction.commit()
+
+    # this should lead to an error now
+    page.click("Entfernen")
+    assert "Die Spende wurde bereits bezahlt" in client.get('/my-bills')
+
+    # until we mark it as unpaid again
+    for item in scenario.session.query(InvoiceItem):
+        item.paid = False
+
+    transaction.commit()
+
+    client.get('/my-bills').click("Entfernen")
+    assert "Ihre Spende wurde entfernt" in client.get('/my-bills')
+
+    # the link should no longer show up
+    assert "Entfernen" not in client.get('/my-bills')

@@ -64,12 +64,62 @@
                         <ul>
                             <tal:b repeat="item invoice.items">
                                 <li class="item-group" tal:condition="repeat.item.index == 0 or invoice.items[repeat.item.index - 1].group != item.group">
-                                    <strong tal:condition="item.group != 'manual'">${item.group}</strong>
-                                    <strong tal:condition="item.group == 'manual'" i18n:translate>Discounts / Surcharges</strong>
+                                    <tal:b switch="item.group">
+                                        <strong tal:case="'donation'">
+                                            <tal:b i18n:translate>Donation</tal:b>
+                                            <span class="svg-icon svg-icon-small">
+                                                <metal:b use-macro="layout.svg['heart']" />
+                                            </span>
+                                        </strong>
+                                        <strong tal:case="'manual'" i18n:translate>Discounts / Surcharges</strong>
+                                        <strong tal:case="default">${item.group}</strong>
+                                    </tal:b>
                                 </li>
                                 <li class="${(invoice.paid or item.paid) and 'paid' or 'unpaid'} ${item.source and item.source or ''}">
-                                    <span class="item-text">${item.text}</span>
+                                    <span class="item-text">
+                                        <tal:b switch="item.group">
+                                            <tal:b case="'donation'">
+                                                <tal:b i18n:translate>
+                                                    You support our work
+                                                </tal:b>
+                                            </tal:b>
+                                            <tal:b case='default'>
+                                                ${item.text}
+                                            </tal:b>
+                                        </tal:b>
+                                    </span>
                                     <span class="item-amount" tal:content="'{:.2f}'.format(item.amount)"></span>
+                                    <div class="text-links" style="font-size: .875rem" tal:condition="not item.paid and item.group=='donation'">
+                                        <a href="${request.link(layout.model.for_period_id(invoice.period_id), name='donation')}" i18n:translate>
+                                            Adjust
+                                        </a>
+                                        <a class="confirm"
+                                            data-confirm="Do you really want to remove your donation?"
+                                            data-confirm-extra=""
+                                            data-confirm-yes="Remove donation"
+                                            data-confirm-no="Cancel"
+                                            ic-delete-from="${layout.csrf_protected_url(request.link(layout.model.for_period_id(invoice.period_id), name='donation'))}"
+                                            redirect-after="${request.url}"
+                                            i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"
+                                            i18n:translate>
+                                            Remove
+                                        </a>
+                                    </div>
+                                </li>
+                            </tal:b>
+                            <tal:b condition="layout.org.meta.get('donation', True) and invoice.period.active and invoice.period.confirmed and not invoice.period.archived and not invoice.has_donation">
+                                <li class="item-group">
+                                    <strong i18n:translate>Donation</strong>
+                                </li>
+                                <li class="row">
+                                    <div class="small-8 columns">
+                                        <span class="item-text" i18n:translate>Support our work with a donation.</span>
+                                    </div>
+                                    <div class="small-4 columns">
+                                        <a class="donation-button" href="${request.link(layout.model.for_period_id(invoice.period_id), name='donation')}">
+                                            <span i18n:translate>I donate</span>
+                                        </a>
+                                    </div>
                                 </li>
                             </tal:b>
                             <li class="item-total ${invoice.paid and 'paid' or 'unpaid'}">

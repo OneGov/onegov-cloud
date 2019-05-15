@@ -5,6 +5,7 @@ from onegov.activity import Period, PeriodCollection, InvoiceCollection
 from onegov.activity.models.invoice_reference import Schema
 from onegov.core import utils
 from onegov.core.orm import orm_cached
+from onegov.feriennet.const import DEFAULT_DONATION_AMOUNTS
 from onegov.feriennet.initial_content import create_new_organisation
 from onegov.feriennet.request import FeriennetRequest
 from onegov.feriennet.sponsors import load_sponsors
@@ -149,6 +150,14 @@ class FeriennetApp(OrgApp):
 
         return Schema.render_bucket(*self.invoice_schema_config())
 
+    @property
+    def show_donate(self):
+        return self.meta.get('donate', True)
+
+    @property
+    def donation_amounts(self):
+        return self.meta.get('donation_amounts', DEFAULT_DONATION_AMOUNTS)
+
 
 @FeriennetApp.template_directory()
 def get_template_directory():
@@ -222,6 +231,11 @@ def get_static_directory():
 @FeriennetApp.webasset_path()
 def get_js_path():
     return 'assets/js'
+
+
+@FeriennetApp.webasset('donation')
+def get_donation_asset():
+    yield 'donation.js'
 
 
 @FeriennetApp.webasset('common')

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-05-07 15:01+0200\n"
+"POT-Creation-Date: 2019-05-14 16:20+0200\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -79,6 +79,9 @@ msgstr "Synchroniser les paiements en ligne"
 
 msgid "Manual Booking"
 msgstr "Réservation manuelle"
+
+msgid "Donation"
+msgstr "Don"
 
 msgid "Attendees"
 msgstr "Participants"
@@ -410,6 +413,13 @@ msgstr "Vous devez saisir au moins une date"
 msgid "Date validation failed"
 msgstr "Échec, la date n'est pas validée"
 
+msgid ""
+"The maximum number of spots is lower than the number of already accepted "
+"bookings."
+msgstr ""
+"Le nombre maximum de places est inférieur au nombre de réservations déjà "
+"acceptées."
+
 msgid "Cannot adjust period, there are bookings linked to this occassion"
 msgstr ""
 "Impossible de modifier la période, il y a des réservations liées à cette "
@@ -430,13 +440,6 @@ msgid ""
 msgstr ""
 "Le nombre minimum de participants ne peut être supérieur au nombre maximum "
 "de participants"
-
-msgid ""
-"The maximum number of spots is lower than the number of already accepted "
-"bookings."
-msgstr ""
-"Le nombre maximum de places est inférieur au nombre de réservations déjà "
-"acceptées."
 
 msgid "Start"
 msgstr "Début"
@@ -785,6 +788,12 @@ msgid "This occasion overlaps with another booking"
 msgstr ""
 "Cette activité a le même créneau horaire qu'une autre réservation déjà "
 "effectuée"
+
+msgid "My donation"
+msgstr "Mon don"
+
+msgid "Invalid amount"
+msgstr "Montant invalide"
 
 msgid "ISO 20022 XML"
 msgstr "ISO 20022 XML"
@@ -1279,6 +1288,13 @@ msgstr "Votre activité a été archivée:"
 msgid "Check ticket status"
 msgstr "Vérifier l'état du ticket"
 
+msgid ""
+"Your donation will be added to your invoice and can be removed or adjusted "
+"at any time, until the payment has been made."
+msgstr ""
+"Votre don sera ajouté à votre facture et pourra être supprimé ou ajusté à "
+"tout moment jusqu'à ce que le paiement soit effectué."
+
 msgid "Pro Juventute Feriennet"
 msgstr "Réseau Vacances de Pro Juventute"
 
@@ -1535,6 +1551,24 @@ msgstr "Afficher les détails"
 
 msgid "Discounts / Surcharges"
 msgstr "Remises / Surcharges"
+
+msgid "You support our work"
+msgstr "Vous soutenez notre travail"
+
+msgid "Adjust"
+msgstr "Ajuster"
+
+msgid "Do you really want to remove your donation?"
+msgstr "Voulez-vous vraiment supprimer votre don ?"
+
+msgid "Remove donation"
+msgstr "Supprimer le don"
+
+msgid "Support our work with a donation."
+msgstr "Soutenez notre travail avec un don."
+
+msgid "I donate"
+msgstr "Je donne"
 
 msgid "Total"
 msgstr "Total"
@@ -2342,6 +2376,18 @@ msgstr ""
 "Demander aux utilisateurs d'accepter les termes et conditions avant de "
 "réserver"
 
+msgid "Donations"
+msgstr "Dons"
+
+msgid "Show a donation button in the invoice view"
+msgstr "Afficher un bouton de don dans l'espace de consultation de la facture"
+
+msgid "Donation Amounts"
+msgstr "Montants du don"
+
+msgid "One amount per line"
+msgstr "Un montant par ligne"
+
 msgid "Basic"
 msgstr "Simple"
 
@@ -2388,11 +2434,24 @@ msgstr "Facturation pour ${period}"
 msgid "Invoices of ${user}"
 msgstr "Factures de ${user}"
 
+#, python-format
+msgid "Donation of ${user}"
+msgstr "Don de $ {user}"
+
 msgid "Your payment could not be processed"
 msgstr "Votre paiement n'a pas pu être traité"
 
 msgid "Your payment has been received. Thank you!"
 msgstr "Votre paiement a été enregistré. Merci !"
+
+msgid "Thank you for your generosity ❤"
+msgstr "Nous vous remercions de votre générosité ❤"
+
+msgid "Your donation was removed"
+msgstr "Votre don a été supprimé"
+
+msgid "This donation has already been paid"
+msgstr "Ce don a déjà été payé"
 
 msgid "Pay Online Now"
 msgstr "Payer en ligne maintenant"

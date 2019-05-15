@@ -30,7 +30,14 @@ details AS (
             WHEN "source" = 'stripe_connect' AND NOT payment.states && ARRAY['open', 'paid']
                 THEN 'possible'
             ELSE 'impossible'
-        END AS changes
+        END AS changes,
+        CASE
+            WHEN "group" = 'donation'
+                THEN 2
+            WHEN family is NOT NULL
+                THEN 1
+            ELSE 0
+        END as order
     FROM
         invoice_items
     LEFT JOIN invoices ON invoice_items.invoice_id = invoices.id
@@ -102,7 +109,7 @@ invoices AS (
             LOWER(users.realname),
             '[\u00A0]+', ' ', 'g'
         ),
-        details.family NULLS FIRST,
+        details.order,
         lower(details."group"),
         lower(details."text")
 )

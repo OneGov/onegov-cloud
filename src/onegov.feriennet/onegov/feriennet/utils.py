@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 NAME_SEPARATOR = '\u00A0'  # non-breaking space
 
 
@@ -19,3 +21,29 @@ def decode_name(fullname):
         return names[0], None
     else:
         return names
+
+
+def parse_donation_amounts(text):
+    lines = (l.strip() for l in text.splitlines())
+    lines = (l for l in lines if l)
+
+    def amounts():
+        for line in lines:
+            with suppress(ValueError):
+                amount = float(line)
+                amount = round(.05 * round(amount / .05), 2)
+
+                yield amount
+
+    return tuple(amounts())
+
+
+def format_donation_amounts(amounts):
+    def lines():
+        for amount in amounts:
+            if float(amount).is_integer():
+                yield f'{int(amount):d}'
+            else:
+                yield f'{amount:.2f}'
+
+    return '\n'.join(lines())

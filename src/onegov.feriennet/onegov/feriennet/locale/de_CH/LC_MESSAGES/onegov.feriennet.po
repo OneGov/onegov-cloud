@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-05-07 15:01+0200\n"
+"POT-Creation-Date: 2019-05-14 16:20+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -78,6 +78,9 @@ msgstr "Online Zahlungen synchronisieren"
 
 msgid "Manual Booking"
 msgstr "Manuelle Buchung"
+
+msgid "Donation"
+msgstr "Spende"
 
 msgid "Attendees"
 msgstr "Teilnehmer"
@@ -409,8 +412,16 @@ msgstr "Bitte spezifizieren Sie mindestens ein Datum"
 msgid "Date validation failed"
 msgstr "Datums-Validierung fehlgeschlagen"
 
+msgid ""
+"The maximum number of spots is lower than the number of already accepted "
+"bookings."
+msgstr ""
+"Die Anzahl Plätze ist tiefer als die Anzahl bereits angenommener Buchungen."
+
 msgid "Cannot adjust period, there are bookings linked to this occassion"
-msgstr "Der Zeitraum kann nicht angepasst werden, bestehende Buchungen wären betroffen"
+msgstr ""
+"Der Zeitraum kann nicht angepasst werden, bestehende Buchungen wären "
+"betroffen"
 
 msgid "The end date must be after the start date"
 msgstr "Das End-Datum muss nach dem Start-Datum liegen"
@@ -426,12 +437,6 @@ msgid ""
 "of participants"
 msgstr ""
 "The Mindestteilnehmerzahl darf nicht grösser als die Anzahl Plätze sein"
-
-msgid ""
-"The maximum number of spots is lower than the number of already accepted "
-"bookings."
-msgstr ""
-"Die Anzahl Plätze ist tiefer als die Anzahl bereits angenommener Buchungen."
 
 msgid "Start"
 msgstr "Start"
@@ -776,6 +781,12 @@ msgstr ""
 
 msgid "This occasion overlaps with another booking"
 msgstr "Diese Durchführung wird von einer bestehenden Buchung überlappt"
+
+msgid "My donation"
+msgstr "Meine Spende"
+
+msgid "Invalid amount"
+msgstr "Ungültiger Betrag"
 
 msgid "ISO 20022 XML"
 msgstr "ISO 20022 XML"
@@ -1267,6 +1278,13 @@ msgstr "Ihr Angebot wurde archiviert:"
 msgid "Check ticket status"
 msgstr "Ticket Status anzeigen"
 
+msgid ""
+"Your donation will be added to your invoice and can be removed or adjusted "
+"at any time, until the payment has been made."
+msgstr ""
+"Ihre Spende wird Ihrer Rechnung hinzugefügt und kann bis zur Bezahlung der "
+"Rechnung jederzeit angepasst oder entfernt werden"
+
 msgid "Pro Juventute Feriennet"
 msgstr "Pro Juventute Feriennet"
 
@@ -1519,6 +1537,24 @@ msgstr "Details anzeigen"
 
 msgid "Discounts / Surcharges"
 msgstr "Abzüge / Zuschläge"
+
+msgid "You support our work"
+msgstr "Sie unterstützen unsere Arbeit"
+
+msgid "Adjust"
+msgstr "Anpassen"
+
+msgid "Do you really want to remove your donation?"
+msgstr "Möchten Sie Ihre Spende wirklich entfernen?"
+
+msgid "Remove donation"
+msgstr "Spende entfernen"
+
+msgid "Support our work with a donation."
+msgstr "Unterstützen Sie unsere Arbeit mit einer Spende."
+
+msgid "I donate"
+msgstr "Ich spende"
 
 msgid "Total"
 msgstr "Total"
@@ -2315,6 +2351,18 @@ msgstr "Link zu den AGB"
 msgid "Require users to accept the TOS before booking"
 msgstr "Zwingt Benutzer dazu, die AGB vor dem Buchen zu akzeptieren"
 
+msgid "Donations"
+msgstr "Spenden"
+
+msgid "Show a donation button in the invoice view"
+msgstr "Erlaube dem Benutzer eine Spende zu der Rechnung hinzuzufügen"
+
+msgid "Donation Amounts"
+msgstr "Spenden-Beträge"
+
+msgid "One amount per line"
+msgstr "Ein Betrag pro Zeile"
+
 msgid "Basic"
 msgstr "Einfach"
 
@@ -2361,11 +2409,24 @@ msgstr "Fakturierung ${period}"
 msgid "Invoices of ${user}"
 msgstr "Rechnungen von ${user}"
 
+#, python-format
+msgid "Donation of ${user}"
+msgstr "Spende von ${user}"
+
 msgid "Your payment could not be processed"
 msgstr "Ihre Zahlung konnte nicht verarbeitet werden"
 
 msgid "Your payment has been received. Thank you!"
 msgstr "Ihre Zahlung war erfolgreich. Vielen Dank!"
+
+msgid "Thank you for your generosity ❤"
+msgstr "Vielen Dank für Ihre Grosszügigkeit ❤"
+
+msgid "Your donation was removed"
+msgstr "Ihre Spende wurde entfernt"
+
+msgid "This donation has already been paid"
+msgstr "Die Spende wurde bereits bezahlt"
 
 msgid "Pay Online Now"
 msgstr "Jetzt online bezahlen"
@@ -2426,82 +2487,3 @@ msgstr "Möchten Sie ${attendee}s Buchung wirklich löschen?"
 #, python-format
 msgid "Do you really want to cancel ${attendee}'s booking?"
 msgstr "Möchten Sie ${attendee}s Buchung wirklich stornieren?"
-
-#~ msgid "User Streetnumber"
-#~ msgstr "Benutzer Strassennummer"
-
-#~ msgid ""
-#~ "Feriennet is Pro Juventute's booking platform for supervised vacation "
-#~ "activities."
-#~ msgstr ""
-#~ "Feriennet ist die Buchungsplattform von Pro Juventute für betreute "
-#~ "Ferienangebote."
-
-#~ msgid ""
-#~ "This platform was developed by ${seantis} with ${onegovcloud}, supported "
-#~ "by ${netcetera}."
-#~ msgstr ""
-#~ "Diese Plattform wurde entwickelt von ${seantis} mit ${onegovcloud}, "
-#~ "unterstützt von ${netcetera}."
-
-#~ msgid "here"
-#~ msgstr "hier"
-
-#~ msgid "You can find additional Pro Juventute offers ${here}."
-#~ msgstr "Weitere Angebote von Pro Juventute finden Sie ${here}."
-
-#~ msgid "partners"
-#~ msgstr "Partner"
-
-#~ msgid ""
-#~ "Pro Juventute Feriennet could only be realised thanks to the generous "
-#~ "support of our ${partners}."
-#~ msgstr ""
-#~ "Pro Juventute Feriennet konnte nur dank der grosszügigen Unterstützung "
-#~ "unserer ${partners} realisiert werden."
-
-#~ msgid "Information"
-#~ msgstr "Information"
-
-#~ msgid ""
-#~ "We will try our best to keep groups together, but there are no "
-#~ "guarantees. It is possible that only parts of the group are accepted for "
-#~ "an activity, but it should be fairly rare."
-#~ msgstr ""
-#~ "Wir tun unser bestes um Gruppen zusammen zu halten, können aber nichts "
-#~ "garantieren. Es ist möglich dass nur ein Teil der Gruppe einem Angebot "
-#~ "zugeteilt wird, aber das sollte relativ selten vorkommen."
-
-#~ msgid ""
-#~ "You can join your own children to this group or you can share this link "
-#~ "with other parents so they can join their children:"
-#~ msgstr ""
-#~ "Sie können Ihre eigenen Kinder zu dieser Gruppe hinzufügen, oder den Link "
-#~ "mit anderen Eltern teilen, damit diese Ihre Kinder hinzufügen können:"
-
-#~ msgid "Children need to have a booking before they can join the group."
-#~ msgstr ""
-#~ "Kinder benötigen eine Buchung, bevor sie der Gruppe beitreten können."
-
-#~ msgid " 3 - 6 years"
-#~ msgstr " 3 - 6 Jahre"
-
-#~ msgid " 7 - 10 years"
-#~ msgstr " 7 - 10 Jahre"
-
-#~ msgid "11 - 13 years"
-#~ msgstr "11 - 13 Jahre"
-
-#~ msgid "14 - 17 years"
-#~ msgstr "14 - 17 Jahre"
-
-#~ msgid "Invoice Item Code"
-#~ msgstr "Rechnungsposition Code"
-
-#~ msgid "Invoice Item ESR"
-#~ msgstr "Rechnungsposition ESR"
-
-#~ msgid "Bookings to this occasion may overlap with other bookings"
-#~ msgstr ""
-#~ "Buchungen dieser Durchführung dürfen sich mit anderen Buchungen "
-#~ "überschneiden"

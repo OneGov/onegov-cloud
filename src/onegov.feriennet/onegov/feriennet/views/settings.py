@@ -1,14 +1,17 @@
 from onegov.core.security import Secret
 from onegov.feriennet import _
 from onegov.feriennet.app import FeriennetApp
+from onegov.feriennet.const import DEFAULT_DONATION_AMOUNTS
+from onegov.feriennet.utils import format_donation_amounts
+from onegov.feriennet.utils import parse_donation_amounts
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.validators import Stdnum
 from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_generic_settings
-from wtforms.validators import InputRequired
-from wtforms.fields import BooleanField, StringField, RadioField
+from wtforms.fields import BooleanField, StringField, RadioField, TextAreaField
 from wtforms.fields.html5 import URLField
+from wtforms.validators import InputRequired
 
 
 class FeriennetSettingsForm(Form):
@@ -79,6 +82,19 @@ class FeriennetSettingsForm(Form):
         fieldset=_("TOS")
     )
 
+    donation = BooleanField(
+        label=_("Donations"),
+        description=_("Show a donation button in the invoice view"),
+        default=True,
+        fieldset=_("Donation"))
+
+    donation_amounts = TextAreaField(
+        label=_("Donation Amounts"),
+        description=_("One amount per line"),
+        depends_on=('donation', 'true'),
+        render_kw={'rows': 3},
+        fieldset=_("Donation"))
+
     def ensure_beneificary_if_bank_account(self):
         if self.bank_account.data and not self.bank_beneficiary.data:
             self.bank_beneficiary.errors.append(_(
@@ -109,10 +125,17 @@ class FeriennetSettingsForm(Form):
             ('bank_esr_participant_number', ''),
             ('bank_esr_identification_number', ''),
             ('tos_url', ''),
+            ('donation', True),
+            ('donation_amounts', DEFAULT_DONATION_AMOUNTS)
         )
 
         for attr, default in attributes:
-            getattr(self, attr).data = obj.meta.get(attr, default)
+            value = obj.meta.get(attr, default)
+
+            if attr == 'donation_amounts':
+                value = format_donation_amounts(value)
+
+            getattr(self, attr).data = value
 
     def populate_obj(self, obj, *args, **kwargs):
         super().populate_obj(obj, *args, **kwargs)
@@ -127,10 +150,17 @@ class FeriennetSettingsForm(Form):
             'bank_esr_participant_number',
             'bank_esr_identification_number',
             'tos_url',
+            'donation',
+            'donation_amounts',
         )
 
         for attr in attributes:
-            obj.meta[attr] = getattr(self, attr).data
+            value = getattr(self, attr).data
+
+            if attr == 'donation_amounts':
+                value = parse_donation_amounts(value)
+
+            obj.meta[attr] = value
 
 
 @FeriennetApp.form(model=Organisation, name='feriennet-settings',

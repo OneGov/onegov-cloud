@@ -21,3 +21,7 @@ VISIBLE_ACTIVITY_STATES = {
 
 #: Describes the states an owner editor can edit
 OWNER_EDITABLE_STATES = ('preview', 'proposed')
+
+
+#: Default donation amounts
+DEFAULT_DONATION_AMOUNTS = (10, 30, 50)
