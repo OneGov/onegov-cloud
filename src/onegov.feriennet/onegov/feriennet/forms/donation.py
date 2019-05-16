@@ -2,13 +2,13 @@ from onegov.feriennet import _
 from onegov.form import Form
 from onegov.feriennet.const import DEFAULT_DONATION_AMOUNTS
 from onegov.feriennet.utils import format_donation_amounts
-from wtforms.fields import RadioField
+from wtforms.fields import SelectField
 from wtforms.validators import InputRequired
 
 
 class DonationForm(Form):
 
-    amount = RadioField(
+    amount = SelectField(
         label=_("My donation"),
         choices=(),
         validators=[InputRequired()]

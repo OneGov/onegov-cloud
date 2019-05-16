@@ -226,10 +226,14 @@ def handle_donation(self, request, form):
                     form.amount.data = amount
                     break
 
+    description = request.app.org.meta.get('donation_description', '').strip()
+
     return {
         'title': title,
         'layout': DonationLayout(self, request, title),
         'form': form,
+        'button_text': _("Donate"),
+        'description': description,
     }
 
 

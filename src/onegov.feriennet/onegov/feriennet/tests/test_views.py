@@ -2330,13 +2330,13 @@ def test_donations(client, scenario):
     page.form['sure'] = 'yes'
     page = page.form.submit()
 
-    assert "Ich spende" in client.get('/my-bills')
+    assert "Jetzt spenden" in client.get('/my-bills')
 
     page = client.get('/feriennet-settings')
     page.form['donation'] = False
     page.form.submit()
 
-    assert "Ich spende" not in client.get('/my-bills')
+    assert "Jetzt spenden" not in client.get('/my-bills')
 
     page = client.get('/feriennet-settings')
     page.form['donation'] = True
@@ -2345,14 +2345,14 @@ def test_donations(client, scenario):
     # try a donation
     page = client.get('/my-bills')
 
-    assert "Unterstützen Sie" in page
+    assert "Ich möchte einen zusätzlichen Betrag" in page
 
-    page = page.click('Ich spende')
+    page = page.click('Jetzt spenden')
     page.form['amount'] = '10.00'
     page = page.form.submit().follow()
 
     assert "Vielen Dank" in page
-    assert "Sie unterstützen" in page
+    assert "Ihre Spende" in page
     assert "10" in page
 
     # try to adjust it
@@ -2361,7 +2361,7 @@ def test_donations(client, scenario):
     page = page.form.submit().follow()
 
     assert "Vielen Dank" in page
-    assert "Sie unterstützen" in page
+    assert "Ihre Spende" in page
     assert "30" in page
 
     # mark it as paid to disable changes

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-05-15 17:17+0200\n"
+"POT-Creation-Date: 2019-05-16 16:37+0200\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -678,15 +678,15 @@ msgid ""
 "<b>Exact</b> - the attendees need to be of the expected age at the beginning"
 " of the occasion"
 msgstr ""
-"<b>Exact</b> - les participants doivent avoir atteint l'âge prévu au "
-"début de l'événement"
+"<b>Exact</b> - les participants doivent avoir atteint l'âge prévu au début "
+"de l'événement"
 
 msgid ""
 "<b>Age group</b> - The attendees need to be of the expected age sometime "
 "during the year of the occasion"
 msgstr ""
-"<b>Groupe d'âge</b> - Les participants doivent atteindre l'âge "
-"prévu au cours de l'année de l'événement"
+"<b>Groupe d'âge</b> - Les participants doivent atteindre l'âge prévu au "
+"cours de l'année de l'événement"
 
 msgid ""
 "The prebooking period must start before the exeuction period and each period"
@@ -1308,6 +1308,9 @@ msgstr "Votre activité a été archivée:"
 msgid "Check ticket status"
 msgstr "Vérifier l'état du ticket"
 
+msgid "We thank you for your support!"
+msgstr ""
+
 msgid ""
 "Your donation will be added to your invoice and can be removed or adjusted "
 "at any time, until the payment has been made."
@@ -1572,8 +1575,8 @@ msgstr "Afficher les détails"
 msgid "Discounts / Surcharges"
 msgstr "Remises / Surcharges"
 
-msgid "You support our work"
-msgstr "Vous soutenez notre travail"
+msgid "Your donation"
+msgstr "Votre don"
 
 msgid "Adjust"
 msgstr "Ajuster"
@@ -1584,11 +1587,11 @@ msgstr "Voulez-vous vraiment supprimer votre don ?"
 msgid "Remove donation"
 msgstr "Supprimer le don"
 
-msgid "Support our work with a donation."
-msgstr "Soutenez notre travail avec un don."
+msgid "I would like to make a donation to support children and teenagers."
+msgstr "J'aimerais faire un don pour soutenir les enfants et les adolescents."
 
-msgid "I donate"
-msgstr "Je donne"
+msgid "Donate now"
+msgstr "Faire un don maintenant"
 
 msgid "Total"
 msgstr "Total"
@@ -2408,6 +2411,9 @@ msgstr "Montants du don"
 msgid "One amount per line"
 msgstr "Un montant par ligne"
 
+msgid "Donation Description"
+msgstr ""
+
 msgid "Basic"
 msgstr "Simple"
 
@@ -2457,6 +2463,9 @@ msgstr "Factures de ${user}"
 #, python-format
 msgid "Donation of ${user}"
 msgstr "Don de $ {user}"
+
+msgid "Donate"
+msgstr "Faire un don"
 
 msgid "Your payment could not be processed"
 msgstr "Votre paiement n'a pas pu être traité"
@@ -2531,6 +2540,15 @@ msgstr "Voulez-vous vraiment supprimer la réservation de ${attendee} ?"
 #, python-format
 msgid "Do you really want to cancel ${attendee}'s booking?"
 msgstr "Voulez-vous vraiment annuler la réservation de ${attendee} ?"
+
+#~ msgid "You support our work"
+#~ msgstr "Vous soutenez notre travail"
+
+#~ msgid "Support our work with a donation."
+#~ msgstr "Soutenez notre travail avec un don."
+
+#~ msgid "I donate"
+#~ msgstr "Je donne"
 
 #~ msgid ""
 #~ "Feriennet ist die Buchungsplattform von Pro Juventute für betreute "

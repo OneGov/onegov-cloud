@@ -80,7 +80,7 @@
                                         <tal:b switch="item.group">
                                             <tal:b case="'donation'">
                                                 <tal:b i18n:translate>
-                                                    You support our work
+                                                    Your donation
                                                 </tal:b>
                                             </tal:b>
                                             <tal:b case='default'>
@@ -113,11 +113,11 @@
                                 </li>
                                 <li class="row">
                                     <div class="small-8 columns">
-                                        <span class="item-text" i18n:translate>Support our work with a donation.</span>
+                                        <span class="item-text" i18n:translate>I would like to make a donation to support children and teenagers.</span>
                                     </div>
                                     <div class="small-4 columns">
                                         <a class="donation-button" href="${request.link(layout.model.for_period_id(invoice.period_id), name='donation')}">
-                                            <span i18n:translate>I donate</span>
+                                            <span i18n:translate>Donate now</span>
                                         </a>
                                     </div>
                                 </li>

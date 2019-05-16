@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-05-15 17:17+0200\n"
+"POT-Creation-Date: 2019-05-16 16:37+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -681,8 +681,8 @@ msgid ""
 "<b>Age group</b> - The attendees need to be of the expected age sometime "
 "during the year of the occasion"
 msgstr ""
-"<b>Jahrgang</b> - Die Teilnehmer müssen irgendwann im Jahr der Durchführung das "
-"erwartete Alter haben"
+"<b>Jahrgang</b> - Die Teilnehmer müssen irgendwann im Jahr der Durchführung "
+"das erwartete Alter haben"
 
 msgid ""
 "The prebooking period must start before the exeuction period and each period "
@@ -1298,6 +1298,9 @@ msgstr "Ihr Angebot wurde archiviert:"
 msgid "Check ticket status"
 msgstr "Ticket Status anzeigen"
 
+msgid "We thank you for your support!"
+msgstr "Wir danken herzlich für Ihre Unterstützung."
+
 msgid ""
 "Your donation will be added to your invoice and can be removed or adjusted "
 "at any time, until the payment has been made."
@@ -1558,8 +1561,8 @@ msgstr "Details anzeigen"
 msgid "Discounts / Surcharges"
 msgstr "Abzüge / Zuschläge"
 
-msgid "You support our work"
-msgstr "Sie unterstützen unsere Arbeit"
+msgid "Your donation"
+msgstr "Ihre Spende"
 
 msgid "Adjust"
 msgstr "Anpassen"
@@ -1570,11 +1573,12 @@ msgstr "Möchten Sie Ihre Spende wirklich entfernen?"
 msgid "Remove donation"
 msgstr "Spende entfernen"
 
-msgid "Support our work with a donation."
-msgstr "Unterstützen Sie unsere Arbeit mit einer Spende."
+msgid "I would like to make a donation to support children and teenagers."
+msgstr ""
+"Ich möchte einen zusätzlichen Betrag für Kinder und Jugendliche spenden."
 
-msgid "I donate"
-msgstr "Ich spende"
+msgid "Donate now"
+msgstr "Jetzt spenden"
 
 msgid "Total"
 msgstr "Total"
@@ -2383,6 +2387,9 @@ msgstr "Spenden-Beträge"
 msgid "One amount per line"
 msgstr "Ein Betrag pro Zeile"
 
+msgid "Donation Description"
+msgstr "Beschreibung Spende"
+
 msgid "Basic"
 msgstr "Einfach"
 
@@ -2432,6 +2439,9 @@ msgstr "Rechnungen von ${user}"
 #, python-format
 msgid "Donation of ${user}"
 msgstr "Spende von ${user}"
+
+msgid "Donate"
+msgstr "Spenden"
 
 msgid "Your payment could not be processed"
 msgstr "Ihre Zahlung konnte nicht verarbeitet werden"
@@ -2507,3 +2517,12 @@ msgstr "Möchten Sie ${attendee}s Buchung wirklich löschen?"
 #, python-format
 msgid "Do you really want to cancel ${attendee}'s booking?"
 msgstr "Möchten Sie ${attendee}s Buchung wirklich stornieren?"
+
+#~ msgid "You support our work"
+#~ msgstr "Sie unterstützen unsere Arbeit"
+
+#~ msgid "Support our work with a donation."
+#~ msgstr "Unterstützen Sie unsere Arbeit mit einer Spende."
+
+#~ msgid "I donate"
+#~ msgstr "Ich spende"

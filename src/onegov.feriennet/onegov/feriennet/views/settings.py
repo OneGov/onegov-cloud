@@ -7,6 +7,7 @@ from onegov.feriennet.utils import parse_donation_amounts
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.validators import Stdnum
+from onegov.org.forms.fields import HtmlField
 from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_generic_settings
 from wtforms.fields import BooleanField, StringField, RadioField, TextAreaField
@@ -95,6 +96,12 @@ class FeriennetSettingsForm(Form):
         render_kw={'rows': 3},
         fieldset=_("Donation"))
 
+    donation_description = HtmlField(
+        label=_("Description"),
+        depends_on=('donation', 'true'),
+        fieldset=_("Donation"),
+        render_kw={'rows': 10})
+
     def ensure_beneificary_if_bank_account(self):
         if self.bank_account.data and not self.bank_beneficiary.data:
             self.bank_beneficiary.errors.append(_(
@@ -126,7 +133,8 @@ class FeriennetSettingsForm(Form):
             ('bank_esr_identification_number', ''),
             ('tos_url', ''),
             ('donation', True),
-            ('donation_amounts', DEFAULT_DONATION_AMOUNTS)
+            ('donation_amounts', DEFAULT_DONATION_AMOUNTS),
+            ('donation_description', ''),
         )
 
         for attr, default in attributes:
@@ -152,6 +160,7 @@ class FeriennetSettingsForm(Form):
             'tos_url',
             'donation',
             'donation_amounts',
+            'donation_description',
         )
 
         for attr in attributes:
