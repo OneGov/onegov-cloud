@@ -265,10 +265,10 @@ msgid "Delete person"
 msgstr "Supprimer la personne"
 
 msgid "Do you really want to close this ticket?"
-msgstr "Voulez-vous vraiment fermer ce billet?"
+msgstr "Voulez-vous vraiment fermer ce ticket?"
 
 msgid "This ticket requires a decision, but no decision has been made yet."
-msgstr "Ce billet nécessite une décision, mais aucune n'a encore été prise."
+msgstr "Ce ticket nécessite une décision, mais aucune n'a encore été prise."
 
 msgid "Close ticket"
 msgstr "Fermer le ticket"
