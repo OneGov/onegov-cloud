@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.6.9 (2019-05-16)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to select different age checking methods.
   [href]
