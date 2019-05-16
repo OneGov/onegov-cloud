@@ -156,7 +156,7 @@
             <div class="row">
                 <div class="small-12 columns">
                   <section role="main" id="content">
-                    <h1 class="main-title"><div metal:define-slot="pre-title"></div><div metal:define-slot="title"></div></h1>
+                    <h1 class="main-title"><div metal:define-slot="pre-title"></div><div metal:define-slot="title"></div><div metal:define-slot="post-title"></div></h1>
                     <div metal:define-slot="content"></div>
                   </section>
                 </div>
@@ -169,7 +169,7 @@
             <div class="row">
                 <div class="small-12 columns">
                   <section role="main" id="content">
-                    <h1 class="main-title"><div metal:define-slot="pre-title"></div><div metal:define-slot="title"></div></h1>
+                    <h1 class="main-title"><div metal:define-slot="pre-title"></div><div metal:define-slot="title"></div><div metal:define-slot="post-title"></div></h1>
                     <div metal:define-slot="content"></div>
                   </section>
                 </div>
