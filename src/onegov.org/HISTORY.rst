@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.3.1 (2019-05-16)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes inconsistent French translation.
   [href]
 
