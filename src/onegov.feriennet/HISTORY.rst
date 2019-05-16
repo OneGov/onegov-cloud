@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.6.10 (2019-05-16)
+~~~~~~~~~~~~~~~~~~~
 
 - Changes donation texts and adds a customizable description.
   [href]
