@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-04-05 14:58+0200\n"
+"POT-Creation-Date: 2019-05-16 10:39+0200\n"
 "PO-Revision-Date: 2019-02-18 06:39+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -425,8 +425,8 @@ msgid "${percent}% Available"
 msgstr "${percent}% Verfügbar"
 
 #, python-format
-msgid "${num}/${max} Available"
-msgstr "${num}/${max} Verfügbar"
+msgid "${num} Available"
+msgstr "${num} Verfügbar"
 
 msgid "Available"
 msgstr "Verfügbar"
@@ -3718,108 +3718,3 @@ msgstr "Die Zahlung wurde eingenommen"
 
 msgid "The payment was refunded"
 msgstr "Die Zahlung wurde rückerstattet"
-
-#~ msgid "URL pointing to the partner site"
-#~ msgstr "Webseite des Partners"
-
-#~ msgid "URL pointing to an about page"
-#~ msgstr "Link zum Impressum"
-
-#~ msgid "by"
-#~ msgstr "von"
-
-#~ msgid "${count} notes created"
-#~ msgstr "${count} Notizen erstellt"
-
-#~ msgid "${count} messages sent"
-#~ msgstr "${count} Nachrichten gesendet"
-
-#~ msgid "${count} messages received"
-#~ msgstr "${count} Nachrichten empfangen"
-
-#~ msgid "Dear Sir or Madam,"
-#~ msgstr "Guten Tag"
-
-#~ msgid "Your ticket has been repoened"
-#~ msgstr "Das Ticket wurde wieder geöffnet"
-
-#~ msgid "Attachments are optional."
-#~ msgstr "Anhänge sind optional."
-
-#~ msgid "Attachments are optional. Supported file types:"
-#~ msgstr "Anhänge sind optional. Unterstütze Datei-Typen:"
-
-#~ msgid "New File"
-#~ msgstr "Neue Datei"
-
-#~ msgid "Ticket State"
-#~ msgstr "Ticket Status"
-
-#~ msgid "Payment Amount"
-#~ msgstr "Zahlungsbetrag"
-
-#~ msgid "Payment State"
-#~ msgstr "Zahlungsstatus"
-
-#~ msgid "Payment Source"
-#~ msgstr "Zahlungsherkunft"
-
-#~ msgid "No e-mails will be sent for this ticket."
-#~ msgstr "Zu diesem Ticket werden keine E-Mails versendet."
-
-#~ msgid "Selected News / Events"
-#~ msgstr "Ausgewählte Nachrichten und Veranstaltungen"
-
-#~ msgid "Bank Account (IBAN)"
-#~ msgstr "Bankkonto (IBAN)"
-
-#~ msgid "Beneficiary"
-#~ msgstr "Begünstigter"
-
-#~ msgid "Payment Order"
-#~ msgstr "Einzahlungsschein"
-
-#~ msgid "ESR participant number"
-#~ msgstr "ESR Teilnehmernummer"
-
-#~ msgid "Maps"
-#~ msgstr "Karten"
-
-#~ msgid "A beneficiary is required if a bank account is given."
-#~ msgstr "Ein Begünstigter ist nötig wenn ein Bank Konto angegeben wird."
-
-#~ msgid "Basic"
-#~ msgstr "Einfach"
-
-#~ msgid "With reference number (ESR)"
-#~ msgstr "Mit Referenznummer (ESR)"
-
-#~ msgid "None"
-#~ msgstr "Keines"
-
-#~ msgid "uploaded on ${date}"
-#~ msgstr "hochgeladen am ${date}"
-
-#~ msgid "Signed"
-#~ msgstr "Signiert"
-
-#~ msgid "Directory entries may have coordinates"
-#~ msgstr "Zu Verzeichnis-Einträgen können Koordinaten erfasst werden"
-
-#~ msgid "Publication Date"
-#~ msgstr "Publikationsdatum"
-
-#~ msgid "Hour"
-#~ msgstr "Stunde"
-
-#~ msgid "Not Public"
-#~ msgstr "Nicht öffentlich"
-
-#~ msgid "Will be made public on ${date}"
-#~ msgstr "Wird am ${date} veröffentlicht"
-
-#~ msgid "Adjust"
-#~ msgstr "Anpassen"
-
-#~ msgid "All Images"
-#~ msgstr "Alle Bilder"

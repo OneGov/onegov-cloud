@@ -1213,7 +1213,7 @@ def test_allocations(client):
     ))
 
     assert len(slots.json) == 1
-    assert slots.json[0]['title'] == "Ganztägig \n2/2 Verfügbar"
+    assert slots.json[0]['title'] == "Ganztägig \n2 Verfügbar"
 
     # try to create a new allocation over an existing one
     new = client.get((

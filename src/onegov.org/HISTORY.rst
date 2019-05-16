@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Changes the cards reservation view to only show the available cards.
+  [href]
+
 1.2.12 (2019-05-16)
 ~~~~~~~~~~~~~~~~~~~
 

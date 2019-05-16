@@ -374,9 +374,8 @@ class AllocationEventInfo(object):
                     available = self.translate(_("Unavailable"))
             else:
                 available = self.translate(
-                    _("${num}/${max} Available", mapping={
-                        'num': quota_left,
-                        'max': quota
+                    _("${num} Available", mapping={
+                        'num': quota_left
                     })
                 )
 
