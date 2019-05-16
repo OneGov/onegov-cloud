@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes another instance of the settings.sticky_class error on Mobile Safari.
+  [href]
+
 - Increases surface area of form labels.
   [href]
 

@@ -11,6 +11,12 @@ var setupRedirectAfter = function(elements) {
     });
 };
 
+var initFoundation = function() {
+    $(document).on('ready page:load', function() {
+        $(document).foundation();
+    });
+};
+
 // sets up the given nodes with the functionality provided by common.js
 // this is done at document.ready and can be repeated for out of band content
 var processCommonNodes = function(elements, out_of_band) {
@@ -28,7 +34,7 @@ var processCommonNodes = function(elements, out_of_band) {
     setupRedirectAfter(targets.find('a'));
 
     // initialise zurb foundation (only works on the document level)
-    $(document).foundation();
+    initFoundation();
 
     // Make sure files open in another window
     targets.find('.page-text a[href*="/datei/"]').attr('target', '_blank');
@@ -61,9 +67,7 @@ var processCommonNodes = function(elements, out_of_band) {
 };
 
 // setup common nodes
-$(document).ready(function() {
-    processCommonNodes($(document), false);
-})
+processCommonNodes($(document), false);
 
 // show the new content placeholder when hovering over the add content dropdown
 $('.show-new-content-placeholder')
@@ -151,7 +155,7 @@ function showAlertMessage(message, type, target) {
         .append($('<a href="#" class="close">&times;</a>'));
 
     $(target || '#alert-boxes').append(alert);
-    $(document).foundation();
+    initFoundation();
 }
 
 $(document).on('show-alert', function(_, data) {
