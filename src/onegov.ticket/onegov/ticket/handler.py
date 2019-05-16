@@ -104,6 +104,28 @@ class Handler(object):
 
         return None
 
+    @property
+    def undecided(self):
+        """ Returns true if there has been no decision about the subject
+        of this handler.
+
+        For example, if a reservation ticket has been accepted, but the
+        reservation has been neither confirmed nor cancelled, the ticket
+        can be seen as undecided.
+
+        This is an optional flag that may be implemented by handlers. If
+        a ticket is undecided, the UI might show a special icon and it might
+        warn the user if he closes the ticket without making a decision.
+
+        By default, the ticket is assumed to be decided for backwards
+        compatibility and for tickets where this does not make sense (a simple
+        form submission may not have any way of knowing if there has been
+        a decision or not).
+
+        """
+
+        return False
+
     @classmethod
     def handle_extra_parameters(self, session, query, extra_parameters):
         """ Takes a dictionary of extra parameters and uses it to optionally

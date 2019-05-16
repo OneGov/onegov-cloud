@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a 'undecided' property on the ticket handler.
+  [href]
+
 - Requires Python 3.6.
   [href]
 
