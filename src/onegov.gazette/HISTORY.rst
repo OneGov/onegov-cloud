@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes print only option not being saved when editing unrestricted.
+  [msom]
+
 1.24.0 (2019-05-15)
 ~~~~~~~~~~~~~~~~~~~~
 

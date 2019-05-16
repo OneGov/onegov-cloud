@@ -291,6 +291,7 @@ class UnrestrictedNoticeForm(NoticeForm):
         model.at_cost = self.at_cost.data == 'yes'
         model.billing_address = self.billing_address.data
         model.note = self.note.data
+        model.print_only = self.print_only.data
         if model.state != 'published':
             model.issues = self.issues.data
         if self.phone_number.data and model.user:
