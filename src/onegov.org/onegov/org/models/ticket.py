@@ -140,6 +140,18 @@ class FormSubmissionHandler(Handler):
             if isinstance(v, str)
         ]
 
+    @property
+    def undecided(self):
+
+        # submissions without registration window do not present a decision
+        if not self.submission.registration_window:
+            return False
+
+        if self.submission.claimed is None:
+            return True
+
+        return False
+
     def get_summary(self, request):
         layout = DefaultLayout(self.submission, request)
         return render_macro(layout.macros['display_form'], request, {
@@ -281,7 +293,7 @@ class ReservationHandler(Handler):
         query = query.filter(Reservation.token == self.id)
         query = query.order_by(Reservation.start)
 
-        return query.all()
+        return tuple(query)
 
     @cached_property
     def submission(self):
@@ -306,6 +318,19 @@ class ReservationHandler(Handler):
     def email(self):
         # the e-mail is the same over all reservations
         return self.reservations[0].email
+
+    @property
+    def undecided(self):
+        # if there is no reservation with an 'accept' marker, the user
+        # has not yet made a decision
+        if self.deleted:
+            return False
+
+        for r in self.reservations:
+            if r.data and r.data.get('accepted'):
+                return False
+
+        return True
 
     @property
     def title(self):
@@ -520,6 +545,10 @@ class EventSubmissionHandler(Handler):
             self.event.location
         ]
 
+    @property
+    def undecided(self):
+        return self.event and self.event.state == 'submitted'
+
     @cached_property
     def group(self):
         return _("Event")
@@ -641,6 +670,13 @@ class DirectoryEntryHandler(Handler):
             v for v in self.submission.data.values()
             if isinstance(v, str)
         ]
+
+    @property
+    def undecided(self):
+        if not self.directory or self.deleted:
+            return False
+
+        return self.state is None
 
     def get_summary(self, request):
         layout = DefaultLayout(self.submission, request)

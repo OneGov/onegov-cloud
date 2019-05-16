@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Warns users about to close a ticket without making a decision.
+  [href]
+
 - Changes the cards reservation view to only show the available cards.
   [href]
 

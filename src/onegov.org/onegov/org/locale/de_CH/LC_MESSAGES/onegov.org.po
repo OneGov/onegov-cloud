@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-05-16 10:39+0200\n"
+"POT-Creation-Date: 2019-05-16 14:53+0200\n"
 "PO-Revision-Date: 2019-02-18 06:39+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -264,6 +264,12 @@ msgstr "Möchten Sie die Person wirklich löschen?"
 
 msgid "Delete person"
 msgstr "Person löschen"
+
+msgid "Do you really want to close this ticket?"
+msgstr "Möchten Sie dieses Ticket wirklich schliessen?"
+
+msgid "This ticket requires a decision, but no decision has been made yet."
+msgstr "Dieses Ticket verlangt nach einer Entscheidung, aber bisher wurde keine Entscheidung gefällt."
 
 msgid "Close ticket"
 msgstr "Ticket abschliessen"

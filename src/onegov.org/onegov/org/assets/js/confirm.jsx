@@ -125,6 +125,13 @@ var intercept = function(element, event, handler) {
         var that = $(this);
 
         var on_confirm = function() {
+
+            // no associated handler => follow the href
+            if (existing_handlers.length === 0 && typeof el.attr('href') !== 'undefined') {
+                window.location = el.attr('href');
+            }
+
+            // associated handlers -> trigger them
             _.each(existing_handlers, function(existing_handler) {
                 existing_handler.call(that, e);
             });

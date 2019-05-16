@@ -898,10 +898,26 @@ class TicketLayout(DefaultLayout):
                 ))
 
             elif self.model.state == 'pending':
+                traits = ()
+
+                if self.model.handler.undecided:
+                    traits = (
+                        Confirm(
+                            _("Do you really want to close this ticket?"),
+                            _(
+                                "This ticket requires a decision, but no "
+                                "decision has been made yet."
+                            ),
+                            _("Close ticket"),
+                            _("Cancel")
+                        ),
+                    )
+
                 links.append(Link(
                     text=_("Close ticket"),
                     url=self.request.link(self.model, 'close'),
-                    attrs={'class': ('ticket-button', 'ticket-close')}
+                    attrs={'class': ('ticket-button', 'ticket-close')},
+                    traits=traits
                 ))
 
             elif self.model.state == 'closed':
