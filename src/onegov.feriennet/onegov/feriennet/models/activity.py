@@ -129,6 +129,13 @@ class VacationActivityHandler(Handler):
     def extra_data(self):
         return None
 
+    @property
+    def undecided(self):
+        if self.deleted:
+            return False
+
+        return self.activity.state == 'proposed'
+
     def get_summary(self, request):
         from onegov.feriennet.layout import DefaultLayout
         layout = DefaultLayout(self.activity, request)
