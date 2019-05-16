@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.2.12 (2019-05-16)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes another instance of the settings.sticky_class error on Mobile Safari.
   [href]
 
