@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.11.0 (2019-05-17)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a 'undecided' property on the ticket handler.
   [href]
 
