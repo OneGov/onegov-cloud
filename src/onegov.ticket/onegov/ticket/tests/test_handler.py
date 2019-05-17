@@ -6,13 +6,16 @@ from onegov.ticket.errors import DuplicateHandlerError
 
 def test_invalid_handler_code(handlers):
 
+    # it's possible for the registry to not be empty due to other tests
+    count = len(handlers.registry)
+
     with pytest.raises(AssertionError):
         handlers.register('abc', Handler)
 
     with pytest.raises(AssertionError):
         handlers.register('AB', Handler)
 
-    assert len(handlers.registry) == 0
+    assert len(handlers.registry) == count
 
 
 def test_register_handler(handlers):
