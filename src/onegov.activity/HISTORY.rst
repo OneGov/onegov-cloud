@@ -1,5 +1,11 @@
 Changelog
 ---------
+
+- Fixes anti-affinity group being checked by default.
+
+  It is only necessary to do so during matching.
+  [href]
+
 1.19.0 (2019-05-15)
 ~~~~~~~~~~~~~~~~~~~
 

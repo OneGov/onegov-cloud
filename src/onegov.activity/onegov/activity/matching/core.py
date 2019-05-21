@@ -40,7 +40,9 @@ class AttendeeAgent(hashable('id')):
         self.alignment = alignment
 
     def blocks(self, subject, other):
-        return overlaps(subject, other, self.minutes_between, self.alignment)
+        return overlaps(
+            subject, other, self.minutes_between, self.alignment,
+            with_anti_affinity_check=True)
 
     def accept(self, booking):
         """ Accepts the given booking. """
