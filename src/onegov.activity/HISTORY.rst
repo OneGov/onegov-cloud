@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.19.1 (2019-05-21)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes anti-affinity group being checked by default.
 
