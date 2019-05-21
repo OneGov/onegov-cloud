@@ -226,12 +226,13 @@ class Booking(Base, TimestampMixin):
     def order(self):
         return self.occasion.order
 
-    def overlaps(self, other):
+    def overlaps(self, other, with_anti_affinity_check=False):
         # XXX circular import
         from onegov.activity.matching import utils
 
         return utils.overlaps(
             self, other,
             minutes_between=self.period.minutes_between,
-            alignment=self.period.alignment
+            alignment=self.period.alignment,
+            with_anti_affinity_check=with_anti_affinity_check,
         )

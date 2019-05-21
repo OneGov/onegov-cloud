@@ -79,7 +79,7 @@ class Booking(MatchableBooking):
     def dates(self):
         return [Bunch(start=s, end=e) for s, e in self._dates]
 
-    def overlaps(self, other):
+    def overlaps(self, other, with_anti_affinity_check=False):
         if self.id == other.id:
             return True
 

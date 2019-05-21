@@ -66,7 +66,9 @@ class AttendeeAgent(hashable('id')):
         self.accepted.remove(booking)
 
         # remove bookings from the blocked list which are not blocked anymore
-        for booking in unblockable(self.accepted, self.blocked):
+        for booking in unblockable(
+                self.accepted, self.blocked, with_anti_affinity_check=True):
+
             if self.limit and len(self.wishlist) >= self.limit:
                 break
 

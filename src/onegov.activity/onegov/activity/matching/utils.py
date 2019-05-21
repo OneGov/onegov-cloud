@@ -91,7 +91,8 @@ def booking_order(booking):
     return booking.score * - 1, booking.priority * -1, booking.id
 
 
-def unblockable(accepted, blocked, key=booking_order):
+def unblockable(
+        accepted, blocked, key=booking_order, with_anti_affinity_check=False):
     """ Returns a set of items in the blocked set which do not block
     with anything. The set is ordered using :func:`booking_order`.
 
@@ -101,7 +102,8 @@ def unblockable(accepted, blocked, key=booking_order):
 
     for a in accepted:
         for b in blocked:
-            if a.overlaps(b):
+            if a.overlaps(
+                    b, with_anti_affinity_check=with_anti_affinity_check):
                 unblockable.discard(b)
 
     return unblockable
