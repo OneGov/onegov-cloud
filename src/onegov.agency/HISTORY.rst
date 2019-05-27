@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.11.0 (2019-05-27)
+~~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to disable user suggestions.
   [href]
