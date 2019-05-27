@@ -324,12 +324,12 @@ def test_view_pdf_settings(client):
 
     client.login_admin()
 
-    assert client.get('/pdf-layout-settings')\
+    assert client.get('/agency-settings')\
         .form['pdf_layout'].value == 'default'
 
     assert get_pdf() == '1\nGovikon\n0\nPlaceholder for table of contents\n'
 
-    settings = client.get('/pdf-layout-settings')
+    settings = client.get('/agency-settings')
     settings.form['pdf_layout'] = 'zg'
     settings.form.submit()
 
@@ -403,3 +403,28 @@ def test_view_report_change(client):
     assert "Rivera Nick" in ticket
     assert "Dr. Rivera's retired." in ticket
     assert "info@hospital-springfield.com" in ticket
+
+
+def test_disable_report_changes(client):
+    client.login_admin()
+
+    page = client.get('/people').click("Person", href='new')
+    page.form['academic_title'] = "Dr."
+    page.form['first_name'] = "Nick"
+    page.form['last_name'] = "Rivera"
+    page = page.form.submit().follow()
+
+    assert "Mutation melden" in page
+    person_url = page.request.url
+
+    page = client.get('/settings').click("Organisationen", index=1)
+    page.form['report_changes'] = False
+    page.form.submit()
+
+    assert "Mutation melden" not in client.get(person_url)
+
+    page = client.get('/settings').click("Organisationen", index=1)
+    page.form['report_changes'] = True
+    page.form.submit()
+
+    assert "Mutation melden" in client.get(person_url)

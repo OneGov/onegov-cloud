@@ -16,7 +16,7 @@
             </div>
             <div class="columns medium-4">
 
-                <div class="submit-yours">
+                <div class="submit-yours" tal:condition="request.app.org.meta.report_changes|True">
                    <dl>
                        <dt>
                            <a href="${request.link(person, 'report-change')}">
