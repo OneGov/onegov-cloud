@@ -7,6 +7,9 @@ log.addHandler(logging.NullHandler())  # noqa
 ignored_warnings = (
     # we will keep using psycopg2 instead of psycogp2-binary
     "The psycopg2 wheel package will be renamed from release 2.8",
+
+    # SQLAlchemy-Utils installs its own array_agg function, which seems fine
+    "The GenericFunction 'array_agg' is already registered"
 )
 
 for message in ignored_warnings:

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Ignores SQLAlchemy function registration warnings.
+  [href]
+
 - Adds the ability to define multiple onegov.core upgrade entry points.
   [href]
 
