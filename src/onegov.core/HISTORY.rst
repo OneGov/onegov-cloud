@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.80.1 (2019-05-28)
+~~~~~~~~~~~~~~~~~~~
 
 - Ignores SQLAlchemy function registration warnings.
   [href]
