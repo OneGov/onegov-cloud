@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.13.6 (2019-05-28)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes tests failing with latest babel release.
   [href]
