@@ -2473,8 +2473,8 @@ msgstr "Votre paiement n'a pas pu être traité"
 msgid "Your payment has been received. Thank you!"
 msgstr "Votre paiement a été enregistré. Merci !"
 
-msgid "Thank you for your generosity ❤"
-msgstr "Nous vous remercions de votre générosité ❤"
+msgid "Thank you for your generosity"
+msgstr "Nous vous remercions de votre générosité"
 
 msgid "Your donation was removed"
 msgstr "Votre don a été supprimé"

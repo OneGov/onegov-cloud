@@ -233,11 +233,6 @@ def get_js_path():
     return 'assets/js'
 
 
-@FeriennetApp.webasset('donation')
-def get_donation_asset():
-    yield 'donation.js'
-
-
 @FeriennetApp.webasset('common')
 def get_common_asset():
     yield from default_common_asset()

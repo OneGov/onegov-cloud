@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Decreases donation cuteness.
+  [href]
+
 1.6.10 (2019-05-16)
 ~~~~~~~~~~~~~~~~~~~
 

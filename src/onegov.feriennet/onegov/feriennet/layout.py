@@ -668,7 +668,6 @@ class DonationLayout(DefaultLayout):
     def __init__(self, model, request, title):
         super().__init__(model, request)
         self.title = title
-        self.request.include('donation')
 
     @cached_property
     def breadcrumbs(self):
