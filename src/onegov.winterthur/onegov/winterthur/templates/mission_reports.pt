@@ -32,10 +32,15 @@
                         <td data-label="Duration" i18n:attributes="data-label" class="min-width-column">
                             ${report.readable_duration}
                         </td>
-                        <td data-label="Mission nature" i18n:attributes="data-label">
+                        <td class="mission-nature" data-label="Mission nature" i18n:attributes="data-label">
                             <div><a href="${request.link(report)}">${report.nature}</a></div>
                             <tal:b define="used_vehicles report.used_vehicles" condition="report.used_vehicles">
                                 <metal:b use-macro="layout.macros.used_vehicles" />
+                            </tal:b>
+                            <tal:b condition="report.pictures">
+                                <a class="pictures-link" href="${request.link(report)}#pictures" aria-label="Pictures" i18n:attributes="aria-label">
+                                    <i class="fa fa-camera-retro" aria-hidden="true"></i>
+                                </a>
                             </tal:b>
                         </td>
                         <td data-label="Location" i18n:attributes="data-label" class="min-width-column">

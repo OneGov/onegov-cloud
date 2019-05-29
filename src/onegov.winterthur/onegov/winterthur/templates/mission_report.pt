@@ -58,6 +58,8 @@
             </tbody>
         </table>
 
-        <metal:b use-macro="layout.macros.slider" tal:define="images python:tuple({'note': p.note, 'src': request.link(p)} for p in model.pictures)" tal:condition="images" />
+        <div id="pictures">
+            <metal:b use-macro="layout.macros.slider" tal:define="images python:tuple({'note': p.note, 'src': request.link(p)} for p in model.pictures)" tal:condition="images" />
+        </div>
     </tal:b>
 </div>

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Shows a camera icon on mission-reports with pictures.
+  [href]
+
 0.5.1 (2019-05-14)
 ~~~~~~~~~~~~~~~~~~~~~
 

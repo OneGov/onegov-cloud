@@ -378,6 +378,22 @@ input[data-street-search]::placeholder {
     margin-bottom: 1rem;
 }
 
+td.mission-nature {
+    padding-right: 2.25rem;
+    position: relative;
+
+    .pictures-link {
+        color: $body-font-color;
+        position: absolute;
+        right: 1rem;
+        top: 1.75rem;
+
+        &:hover {
+            color: $anchor-font-color;
+        }
+    }
+}
+
 /*
     Tables
 */
