@@ -2449,8 +2449,8 @@ msgstr "Ihre Zahlung konnte nicht verarbeitet werden"
 msgid "Your payment has been received. Thank you!"
 msgstr "Ihre Zahlung war erfolgreich. Vielen Dank!"
 
-msgid "Thank you for your generosity"
-msgstr "Vielen Dank für Ihre Grosszügigkeit"
+msgid "Thank you for your donation"
+msgstr "Vielen Dank für Ihre Spende"
 
 msgid "Your donation was removed"
 msgstr "Ihre Spende wurde entfernt"

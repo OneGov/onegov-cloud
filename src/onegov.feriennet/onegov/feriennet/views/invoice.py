@@ -202,7 +202,7 @@ def handle_donation(self, request, form):
             amount=Decimal(form.amount.data),
             text=request.translate(_("Donation")))
 
-        request.success(_("Thank you for your generosity"))
+        request.success(_("Thank you for your donation"))
         return request.redirect(request.link(self))
 
     elif not request.POST:
