@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.6.12 (2019-05-31)
+~~~~~~~~~~~~~~~~~~~
 
 - Changes donation wording slightly.
   [href]
