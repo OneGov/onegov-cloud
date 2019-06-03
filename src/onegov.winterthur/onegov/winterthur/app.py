@@ -15,7 +15,7 @@ from onegov.winterthur.theme import WinterthurTheme
 class WinterthurApp(OrgApp):
 
     #: the version of this application (do not change manually!)
-    version = '0.5.1'
+    version = '0.5.2'
 
     serve_static_files = True
 

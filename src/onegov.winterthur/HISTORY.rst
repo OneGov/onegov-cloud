@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.5.2 (2019-06-03)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Adds link to Zivilschutz in mission reports.
   [href]
 
