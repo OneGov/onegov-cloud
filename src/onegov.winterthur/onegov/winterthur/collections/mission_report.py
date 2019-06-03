@@ -80,12 +80,14 @@ class MissionReportCollection(GenericCollection, Pagination):
         return self.__class__(self.session, page=index)
 
     def mission_count(self, year):
+        """ The mission count, including hidden missions. """
+
         timezone = 'Europe/Zurich'
 
         start = sedate.replace_timezone(datetime(year, 1, 1), timezone)
         end = sedate.replace_timezone(datetime(year + 1, 1, 1), timezone)
 
-        return self.query().filter(and_(
+        return super().query().filter(and_(
             start <= MissionReport.date, MissionReport.date < end
         )).count()
 

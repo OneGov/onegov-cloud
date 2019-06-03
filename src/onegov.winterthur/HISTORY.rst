@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Adds link to Zivilschutz in mission reports.
+  [href]
+
+- Includes hidden missions in mission reports.
+  [href]
+
 - Shows a camera icon on mission-reports with pictures.
   [href]
 
