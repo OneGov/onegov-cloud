@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.6.13 (2019-06-05)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes the wrong number of attendees in the notification form.
   [href]
