@@ -14,6 +14,9 @@ SELECT
 
 FROM occasions
 
+JOIN periods
+  ON occasions.period_id = periods.id
+
 JOIN activities
   ON occasions.activity_id = activities.id
 
@@ -21,6 +24,11 @@ JOIN LATERAL (
     SELECT COUNT(*) as count
     FROM bookings
     WHERE bookings.occasion_id = occasions.id
+       AND (
+            periods.confirmed = False
+            OR
+            bookings.state = 'accepted'
+       )
 ) AS participants ON TRUE
 
 ORDER BY
