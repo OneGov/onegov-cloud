@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.5.3 (2019-06-05)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Adjusts the Zivilschutz link.
   [href]
 
