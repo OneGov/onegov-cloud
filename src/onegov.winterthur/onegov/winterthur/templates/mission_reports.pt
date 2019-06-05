@@ -48,7 +48,7 @@
                         </td>
                         <td data-label="Pers*" i18n:attributes="data-label" class="min-width-column">
                             <div>${report.personnel} / ${report.backup}</div>
-                            <a href="https://stadt.winterthur.ch/gemeinde/verwaltung/sicherheit-und-umwelt/schutz-und-intervention/zivilschutz" target="_top">
+                            <a href="https://stadt.winterthur.ch/gemeinde/verwaltung/sicherheit-und-umwelt/schutz-und-intervention/einsaetze/zivilschutz-einsaetze" target="_top">
                                 <img i18n:attributes="title" title="Civil Defence involvement"
                                  tal:condition="report.civil_defence"
                                  src="${request.link(request.app.static_file('civil-defence.svg'))}"
