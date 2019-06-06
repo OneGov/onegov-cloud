@@ -168,13 +168,11 @@ def get_my_invoies(request, app, username=None, invoice=None):
     if not username:
         username = request.current_username
 
-    # create an inexistent user_id if not logged in - our security rules
-    # should prohibit any access anyway, but by selecting a user that does
-    # not exist we can be extra sure that nothing is leaked
-    if not username:
-        user_id = uuid4().hex
-    else:
-        user_id = request.app.user_ids_by_name[username]
+    # at this point the username has to exist
+    user_id = request.app.user_ids_by_name.get(username)
+
+    if not user_id:
+        return None
 
     # XXX username should be user_id, invoice should be period_id
     # this should be changed, but needs to be changed by replacing

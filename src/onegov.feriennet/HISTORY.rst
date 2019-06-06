@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Improves resilience of donation views/paths.
+  [href]
+
 1.6.13 (2019-06-05)
 ~~~~~~~~~~~~~~~~~~~
 

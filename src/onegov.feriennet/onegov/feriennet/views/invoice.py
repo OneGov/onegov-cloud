@@ -11,6 +11,7 @@ from onegov.feriennet.views.shared import users_for_select_element
 from onegov.pay import process_payment
 from onegov.user import User
 from sqlalchemy.orm import contains_eager
+from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.expression import case
 from stdnum import iban
 
@@ -184,7 +185,17 @@ def handle_payment(self, request):
     permission=Personal,
     name='donation')
 def handle_donation(self, request, form):
-    assert self.user_id and self.period_id
+    if not self.user_id:
+        return request.redirect(request.link(
+            self.for_user_id(request.current_user.id),
+            name='donation'
+        ))
+
+    if not self.period_id:
+        return request.redirect(request.link(
+            self.for_period_id(request.app.active_period.id),
+            name='donation'
+        ))
 
     if request.current_user.id == self.user_id:
         title = _("Donation")
@@ -197,13 +208,16 @@ def handle_donation(self, request, form):
 
     if form.submitted(request):
 
-        bills.include_donation(
-            user_id=self.user_id,
-            amount=Decimal(form.amount.data),
-            text=request.translate(_("Donation")))
-
-        request.success(_("Thank you for your donation"))
-        return request.redirect(request.link(self))
+        try:
+            bills.include_donation(
+                user_id=self.user_id,
+                amount=Decimal(form.amount.data),
+                text=request.translate(_("Donation")))
+        except NoResultFound:
+            request.alert(_("No invoice found"))
+        else:
+            request.success(_("Thank you for your donation"))
+            return request.redirect(request.link(self))
 
     elif not request.POST:
 
