@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.3.2 (2019-06-06)
+~~~~~~~~~~~~~~~~~~~
+
 - Improves display of directory thumbnails.
   [href]
 
