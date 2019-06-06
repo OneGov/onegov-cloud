@@ -16,7 +16,7 @@ from onegov.feriennet.models import GroupInvite
 from onegov.feriennet.models import InvoiceAction, VacationActivity
 from onegov.feriennet.models import NotificationTemplate
 from onegov.org.converters import keywords_converter
-from uuid import UUID, uuid4
+from uuid import UUID
 
 
 @FeriennetApp.path(
