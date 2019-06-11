@@ -1,12 +1,20 @@
 import click
+import json
 import sedate
+import shutil
 
 from datetime import datetime
 from onegov.core.cli import command_group
+from onegov.core.crypto import random_token
 from onegov.core.csv import CSVFile
+from onegov.file.utils import as_fileintent
 from onegov.winterthur.models import MissionReport
+from onegov.winterthur.models import MissionReportFile
 from onegov.winterthur.models import MissionReportVehicle
 from onegov.winterthur.models import MissionReportVehicleUse
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from zipfile import ZipFile
 
 
 cli = command_group()
@@ -17,7 +25,7 @@ cli = command_group()
 @click.option('--vehicles-file', type=click.Path(exists=True), required=True)
 @click.option('--missions-file', type=click.Path(exists=True), required=True)
 @click.option('--no-confirm', is_flag=True, default=False)
-def generate_activities(vehicles_file, missions_file, no_confirm):
+def import_mission_reports(vehicles_file, missions_file, no_confirm):
     """ Imports the existing mission reports. """
 
     if not no_confirm:
@@ -136,5 +144,105 @@ def generate_activities(vehicles_file, missions_file, no_confirm):
             request.session.add(created)
 
         request.session.flush()
+
+    return handle_import
+
+
+@cli.command(
+    name='export-mission-vehicles', context_settings={'singular': True})
+@click.option('--export-file', type=click.Path(exists=False), required=True)
+def export_mission_vehicles(export_file):
+    """ Exports the mission vehicles (with symbols, but without usage) into
+    a ZIP file for consumption with the 'import-mission-vehicles' command.
+
+    """
+
+    def handle_export(request, app):
+        temp = TemporaryDirectory()
+        path = Path(temp.name)
+        data = {}
+
+        for vehicle in request.session.query(MissionReportVehicle):
+            record = data[str(vehicle.id)] = {
+                'name': vehicle.name,
+                'description': vehicle.description,
+                'website': vehicle.website,
+                'filename': None
+            }
+
+            if vehicle.symbol:
+                symbols = (path / 'symbols')
+                symbols.mkdir(exist_ok=True)
+
+                record['filename'] = vehicle.symbol.name
+
+                with (symbols / str(vehicle.id)).open('wb') as f:
+                    shutil.copyfileobj(vehicle.symbol.reference.file, f)
+
+        with (path / 'data.json').open('w') as f:
+            json.dump(data, f, sort_keys=True, indent=4)
+
+        shutil.make_archive(export_file.rstrip('.zip'), 'zip', path)
+
+    return handle_export
+
+
+@cli.command(
+    name='import-mission-vehicles', context_settings={'singular': True})
+@click.option('--import-file', type=click.Path(exists=True), required=True)
+@click.option('--replace', is_flag=True, default=False)
+def import_mission_vehicles(import_file, replace):
+    """ Imports the mission vehicles created by the export-mission-vehicles
+    command.
+
+    """
+
+    def handle_import(request, app):
+        temp = TemporaryDirectory()
+        path = Path(temp.name)
+        data = {}
+
+        zip = ZipFile(import_file)
+        zip.extractall(path)
+
+        with (path / 'data.json').open('r') as f:
+            data = json.load(f)
+
+        existing = {
+            str(v.id): v for v in request.session.query(MissionReportVehicle)
+        }
+
+        for id in data:
+
+            if id in existing and replace:
+                request.session.delete(existing[id])
+                request.session.flush()
+
+            if id in existing and not replace:
+                continue
+
+            vehicle = MissionReportVehicle(
+                id=id,
+                name=data[id]['name'],
+                description=data[id]['description'],
+                website=data[id]['website'],
+            )
+
+            symbol_path = path / 'symbols' / str(id)
+
+            if symbol_path.exists():
+                filename = data[id]['filename']
+
+                with symbol_path.open('rb') as f:
+                    vehicle.symbol = MissionReportFile(
+                        id=random_token(),
+                        name=filename,
+                        reference=as_fileintent(
+                            content=f,
+                            filename=filename
+                        )
+                    )
+
+            request.session.add(vehicle)
 
     return handle_import

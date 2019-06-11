@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds import/export commands for mission vehicles.
+  [href]
+
 0.5.3 (2019-06-05)
 ~~~~~~~~~~~~~~~~~~~~~
 
