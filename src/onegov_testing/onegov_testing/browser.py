@@ -32,6 +32,8 @@ class InjectedBrowserExtension(object):
                 browser = browser_factory(*args, **kwargs)
                 break
             sleep(0.5)
+        else:
+            browser = browser_factory(*args, **kwargs)
 
         class LeechedExtendedBrowser(cls, browser.__class__):
 
