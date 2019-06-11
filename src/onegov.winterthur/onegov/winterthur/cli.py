@@ -222,12 +222,14 @@ def import_mission_vehicles(import_file, replace, match):
             if id in existing and not replace:
                 continue
 
+            vehicle = None
+
             if match:
                 vehicle = request.session.query(MissionReportVehicle)\
                     .filter_by(name=data[id]['name'])\
-                    .one()
+                    .first()
 
-            else:
+            if not vehicle:
                 vehicle = MissionReportVehicle(id=id)
 
             vehicle.name = data[id]['name']

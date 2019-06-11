@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes import matching not working in some cases.
+  [href]
+
 0.6.3 (2019-06-11)
 ~~~~~~~~~~~~~~~~~~~~~
 
