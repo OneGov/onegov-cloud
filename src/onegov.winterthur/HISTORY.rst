@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.6.1 (2019-06-11)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to update existing vehicles with vehicle import.
   [href]
 
