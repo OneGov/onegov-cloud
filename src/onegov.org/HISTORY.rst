@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes failing tests.
+  [href]
+
 1.3.2 (2019-06-06)
 ~~~~~~~~~~~~~~~~~~~
 
