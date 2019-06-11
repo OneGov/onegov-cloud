@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.3.3 (2019-06-11)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes failing tests.
   [href]
 
