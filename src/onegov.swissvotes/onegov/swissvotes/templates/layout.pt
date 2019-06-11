@@ -95,23 +95,25 @@
         </div>
     </main>
 
-    <footer class="row">
-        <div class="columns small-12">
-            <div class="links">
-                 <div class="row">
-                    <div class="small-12 medium-4 columns small-only-text-center">
-                        <tal:block replace="structure layout.disclaimer_link(layout)" />
+    <footer>
+        <div class="row">
+            <div class="columns small-12">
+                <div class="links">
+                     <div class="row">
+                        <div class="small-12 medium-4 columns small-only-text-center">
+                            <tal:block replace="structure layout.disclaimer_link(layout)" />
+                        </div>
+                        <div class="small-12 medium-4 columns text-center">
+                            <tal:block replace="structure layout.imprint_link(layout)" />
+                        </div>
+                        <div class="small-12 medium-4 columns small-only-text-center medium-text-right manage-links">
+                            <tal:block replace="structure layout.data_protection_link(layout)" />
+                        </div>
                     </div>
-                    <div class="small-12 medium-4 columns text-center">
-                        <tal:block replace="structure layout.imprint_link(layout)" />
-                    </div>
-                    <div class="small-12 medium-4 columns small-only-text-center medium-text-right manage-links">
-                        <tal:block replace="structure layout.data_protection_link(layout)" />
-                    </div>
-                </div>
-                 <div class="row">
-                    <div class="small-12 columns small-only-text-center medium-text-right manage-links">
-                        <a tal:condition="layout.logout_url" href="${layout.logout_url}" i18n:translate>Logout</a>
+                     <div class="row">
+                        <div class="small-12 columns small-only-text-center medium-text-right manage-links">
+                            <a tal:condition="layout.logout_url" href="${layout.logout_url}" i18n:translate>Logout</a>
+                        </div>
                     </div>
                 </div>
             </div>
