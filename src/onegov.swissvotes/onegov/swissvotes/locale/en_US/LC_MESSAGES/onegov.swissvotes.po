@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: 2019-06-11 15:57+0200\n"
-"PO-Revision-Date: 2019-06-11 16:01+0200\n"
+"PO-Revision-Date: 2019-06-11 17:16+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -20,7 +20,7 @@ msgid "Content"
 msgstr "Content"
 
 msgid "Uploading attachments may take some time due to full-text indexing."
-msgstr ""
+msgstr "Uploading attachments may take some time due to full-text indexing."
 
 msgid "Voting text"
 msgstr "Text subject to vote"
@@ -50,7 +50,7 @@ msgid "Result by canton, district and municipality"
 msgstr "Result by canton, district and municipality"
 
 msgid "Updating the dataset may take some time."
-msgstr ""
+msgstr "Updating the dataset may take some time."
 
 msgid "Dataset"
 msgstr "Dataset"
@@ -814,7 +814,7 @@ msgid "Organization no longer exists"
 msgstr "Organization no longer exists"
 
 msgid "unknown"
-msgstr ""
+msgstr "unknown"
 
 msgid "actor-acs-abbreviation"
 msgstr "ACS"
@@ -1312,7 +1312,7 @@ msgid "Download dataset (XLSX)"
 msgstr "Download dataset (XLSX)"
 
 msgid "Cumulated electoral shares"
-msgstr ""
+msgstr "Cumulated electoral shares"
 
 msgid "Recommendation"
 msgstr "Recommendation"
@@ -1363,7 +1363,7 @@ msgid "General"
 msgstr "General information"
 
 msgid "Official title"
-msgstr ""
+msgstr "Official title"
 
 msgid "Keyword"
 msgstr "Keyword"
@@ -1598,7 +1598,7 @@ msgid "Council of States"
 msgstr "Council of States"
 
 msgid "Party slogans"
-msgstr ""
+msgstr "Party slogans"
 
 msgid "Attachments updated"
 msgstr "Attachments updated"
@@ -1608,38 +1608,38 @@ msgstr "Vote deleted"
 
 #, python-format
 msgid "${x}% yea"
-msgstr ""
+msgstr "${x}% yea"
 
 #, python-format
 msgid "${x}% nay"
-msgstr ""
+msgstr "${x}% nay"
 
 msgid "Recommendations by political parties"
-msgstr ""
+msgstr "Recommendations by political parties"
 
 #, python-format
 msgid "Electoral shares of parties: Parties recommending Yes ${x}%"
-msgstr ""
+msgstr "Electoral shares of parties: Parties recommending Yes ${x}%"
 
 #, python-format
 msgid "Electoral shares of parties: Parties recommending No ${x}%"
-msgstr ""
+msgstr "Electoral shares of parties: Parties recommending No ${x}%"
 
 #, python-format
 msgid "Electoral shares of parties: neutral/unknown ${x}%"
-msgstr ""
+msgstr "Electoral shares of parties: neutral/unknown ${x}%"
 
 #, python-format
 msgid "${x}% none"
-msgstr ""
+msgstr "${x}% none"
 
 #, python-format
 msgid "${x} yea"
-msgstr ""
+msgstr "${x} yea"
 
 #, python-format
 msgid "${x} nay"
-msgstr ""
+msgstr "${x} nay"
 
 msgid "Access Denied"
 msgstr "Access denied"

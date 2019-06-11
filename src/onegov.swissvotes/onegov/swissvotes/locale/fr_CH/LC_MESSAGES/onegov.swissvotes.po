@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: 2019-06-11 15:57+0200\n"
-"PO-Revision-Date: 2019-06-11 16:02+0200\n"
+"PO-Revision-Date: 2019-06-11 17:13+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -21,6 +21,8 @@ msgstr "Contenu"
 
 msgid "Uploading attachments may take some time due to full-text indexing."
 msgstr ""
+"Le téléchargement des pièces jointes peut prendre un certain temps en raison "
+"de l’indexation en texte intégral."
 
 msgid "Voting text"
 msgstr "Texte soumis au vote"
@@ -50,7 +52,7 @@ msgid "Result by canton, district and municipality"
 msgstr "Résultats par canton, district, commune"
 
 msgid "Updating the dataset may take some time."
-msgstr ""
+msgstr "La mise à jour de l’ensemble de données peut prendre un certain temps."
 
 msgid "Dataset"
 msgstr "Base de données"
@@ -82,7 +84,7 @@ msgid ""
 msgstr ""
 "Recherche dans l'intégralité du texte, pièces jointes comprises. "
 "Sélectionnez \"non\" si vous souhaitez limiter la recherche au titre, mot-"
-"clé, numéro de vote et numéro de procédure. "
+"clé, numéro de vote et numéro de procédure."
 
 msgid "Position of the Federal Council"
 msgstr "Position du Conseil fédéral"
@@ -818,7 +820,7 @@ msgid "Organization no longer exists"
 msgstr "Cette formation n'existe plus."
 
 msgid "unknown"
-msgstr ""
+msgstr "inconnu"
 
 msgid "actor-acs-abbreviation"
 msgstr "ACS"
@@ -1322,7 +1324,7 @@ msgid "Download dataset (XLSX)"
 msgstr "Télécharger le fichier de données (XLSX)"
 
 msgid "Cumulated electoral shares"
-msgstr ""
+msgstr "Poids électoraux cumulés"
 
 msgid "Recommendation"
 msgstr "Mot d'ordre"
@@ -1375,7 +1377,7 @@ msgid "General"
 msgstr "Informations générales"
 
 msgid "Official title"
-msgstr ""
+msgstr "Titre officiel"
 
 msgid "Keyword"
 msgstr "Mot-clé"
@@ -1570,7 +1572,7 @@ msgid "Do you really want to delete \"${item}\"?"
 msgstr "Voulez-vous vraiment supprimer \"${item}\" ?"
 
 msgid "Attachments"
-msgstr "Pièces jointes "
+msgstr "Pièces jointes"
 
 msgid "Attachment added."
 msgstr "Pièce jointe ajoutée"
@@ -1612,7 +1614,7 @@ msgid "Council of States"
 msgstr "Conseil des Etats"
 
 msgid "Party slogans"
-msgstr ""
+msgstr "Slogans partisans"
 
 msgid "Attachments updated"
 msgstr "Pièces jointes mises à jour"
@@ -1622,38 +1624,38 @@ msgstr "Votation supprimée"
 
 #, python-format
 msgid "${x}% yea"
-msgstr ""
+msgstr "${x}% Oui"
 
 #, python-format
 msgid "${x}% nay"
-msgstr ""
+msgstr "${x}% Non"
 
 msgid "Recommendations by political parties"
-msgstr ""
+msgstr "Mots d’ordre des partis"
 
 #, python-format
 msgid "Electoral shares of parties: Parties recommending Yes ${x}%"
-msgstr ""
+msgstr "Poids électoraux des partis: Partis en faveur de oui ${x}%"
 
 #, python-format
 msgid "Electoral shares of parties: Parties recommending No ${x}%"
-msgstr ""
+msgstr "Poids électoraux des partis: Partis en faveur de non ${x}%"
 
 #, python-format
 msgid "Electoral shares of parties: neutral/unknown ${x}%"
-msgstr ""
+msgstr "Poids électoraux des partis: neutres/inconnus ${x}"
 
 #, python-format
 msgid "${x}% none"
-msgstr ""
+msgstr "${x}% neutres/inconnus"
 
 #, python-format
 msgid "${x} yea"
-msgstr ""
+msgstr "${x} Oui"
 
 #, python-format
 msgid "${x} nay"
-msgstr ""
+msgstr "${x} Non"
 
 msgid "Access Denied"
 msgstr "Accès refusé"
