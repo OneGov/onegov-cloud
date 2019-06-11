@@ -23,7 +23,7 @@ cli = command_group()
 @cli.command(
     name='import-mission-reports', context_settings={'singular': True})
 @click.option('--vehicles-file', type=click.Path(exists=True), required=True)
-@click.option('--missions-file', type=click.Path(exists=True), required=True)
+@click.option('--missions-file', type=click.Path(exists=True), required=False)
 @click.option('--no-confirm', is_flag=True, default=False)
 def import_mission_reports(vehicles_file, missions_file, no_confirm):
     """ Imports the existing mission reports. """
@@ -191,7 +191,8 @@ def export_mission_vehicles(export_file):
     name='import-mission-vehicles', context_settings={'singular': True})
 @click.option('--import-file', type=click.Path(exists=True), required=True)
 @click.option('--replace', is_flag=True, default=False)
-def import_mission_vehicles(import_file, replace):
+@click.option('--match', is_flag=True, default=False)
+def import_mission_vehicles(import_file, replace, match):
     """ Imports the mission vehicles created by the export-mission-vehicles
     command.
 
@@ -221,12 +222,17 @@ def import_mission_vehicles(import_file, replace):
             if id in existing and not replace:
                 continue
 
-            vehicle = MissionReportVehicle(
-                id=id,
-                name=data[id]['name'],
-                description=data[id]['description'],
-                website=data[id]['website'],
-            )
+            if match:
+                vehicle = request.session.query(MissionReportVehicle)\
+                    .filter_by(name=data[id]['name'])\
+                    .one()
+
+            else:
+                vehicle = MissionReportVehicle(id=id)
+
+            vehicle.name = data[id]['name']
+            vehicle.description = data[id]['description']
+            vehicle.website = data[id]['website']
 
             symbol_path = path / 'symbols' / str(id)
 
