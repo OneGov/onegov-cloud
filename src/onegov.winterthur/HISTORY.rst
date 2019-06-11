@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.6.3 (2019-06-11)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Adds year parameter to mission report overview.
   [href]
 
