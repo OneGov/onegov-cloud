@@ -386,11 +386,15 @@ td.mission-nature {
         color: $body-font-color;
         position: absolute;
         right: 1rem;
-        top: 1.75rem;
+        top: .5rem;
 
         &:hover {
             color: $anchor-font-color;
         }
+    }
+
+    .used-vehicles + .pictures-link {
+        top: 1.75rem;
     }
 }
 

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes picture icon position.
+  [href]
+
 0.6.1 (2019-06-11)
 ~~~~~~~~~~~~~~~~~~~~~
 
