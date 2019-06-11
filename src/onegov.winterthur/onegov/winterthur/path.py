@@ -1,3 +1,4 @@
+from datetime import date
 from onegov.winterthur.app import WinterthurApp
 from onegov.winterthur.collections import AddressCollection
 from onegov.winterthur.collections import AddressSubsetCollection
@@ -43,9 +44,13 @@ def get_roadwork(app, id):
 @WinterthurApp.path(
     model=MissionReportCollection,
     path='/mission-reports')
-def get_mission_reports(request, page=0):
+def get_mission_reports(request, page=0, year=date.today().year):
+    year = str(year).isdigit() and int(year) or date.today().year
+
     return MissionReportCollection(
-        request.session, page=page, include_hidden=request.is_manager)
+        request.session, page=page,
+        include_hidden=request.is_manager,
+        year=year)
 
 
 @WinterthurApp.path(

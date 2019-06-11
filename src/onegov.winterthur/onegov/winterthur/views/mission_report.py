@@ -117,14 +117,12 @@ def mission_report_vehicle_form(model, request):
     permission=Public,
     template='mission_reports.pt')
 def view_mission_reports(self, request):
-    year = date.today().year
-
     return {
         'layout': MissionReportLayout(self, request),
         'title': _("Mission Reports"),
         'reports': self.batch,
-        'year': year,
-        'count': self.mission_count(year)
+        'count': self.mission_count(),
+        'year': self.year,
     }
 
 

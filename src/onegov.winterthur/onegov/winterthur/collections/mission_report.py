@@ -1,12 +1,12 @@
 import sedate
 
-from datetime import datetime
+from datetime import datetime, date
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.org.models.file import ImageFileCollection
 from onegov.winterthur.models import MissionReport
 from onegov.winterthur.models import MissionReportFile
 from onegov.winterthur.models import MissionReportVehicle
-from sqlalchemy import and_, or_, desc
+from sqlalchemy import and_, or_, desc, extract
 
 
 class MissionReportFileCollection(ImageFileCollection):
@@ -46,10 +46,11 @@ class MissionReportFileCollection(ImageFileCollection):
 
 class MissionReportCollection(GenericCollection, Pagination):
 
-    def __init__(self, session, page=0, include_hidden=False):
+    def __init__(self, session, page=0, include_hidden=False, year=None):
         self.session = session
         self.page = page
         self.include_hidden = include_hidden
+        self.year = year or date.today().year
 
     @property
     def model_class(self):
@@ -67,6 +68,8 @@ class MissionReportCollection(GenericCollection, Pagination):
                 MissionReport.meta['is_hidden_from_public'] == None
             ))
 
+        query = self.filter_by_year(query)
+
         return query.order_by(desc(MissionReport.date))
 
     def subset(self):
@@ -77,19 +80,22 @@ class MissionReportCollection(GenericCollection, Pagination):
         return self.page
 
     def page_by_index(self, index):
-        return self.__class__(self.session, page=index)
+        return self.__class__(self.session, page=index, year=self.year)
 
-    def mission_count(self, year):
-        """ The mission count, including hidden missions. """
-
+    def filter_by_year(self, query):
         timezone = 'Europe/Zurich'
 
-        start = sedate.replace_timezone(datetime(year, 1, 1), timezone)
-        end = sedate.replace_timezone(datetime(year + 1, 1, 1), timezone)
+        start = sedate.replace_timezone(datetime(self.year, 1, 1), timezone)
+        end = sedate.replace_timezone(datetime(self.year + 1, 1, 1), timezone)
 
-        return super().query().filter(and_(
+        return query.filter(and_(
             start <= MissionReport.date, MissionReport.date < end
-        )).count()
+        ))
+
+    def mission_count(self):
+        """ The mission count, including hidden missions. """
+
+        return self.filter_by_year(super().query()).count()
 
 
 class MissionReportVehicleCollection(GenericCollection):
