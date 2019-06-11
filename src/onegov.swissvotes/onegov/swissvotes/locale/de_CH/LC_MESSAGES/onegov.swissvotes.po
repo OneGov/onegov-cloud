@@ -1,16 +1,16 @@
 # This file was generated from translations/Uebersetzungstabelle 2019-05-24.xlsx
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2019-06-11 15:36+0200\n"
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2019-06-11 15:57+0200\n"
+"PO-Revision-Date: 2019-06-11 16:01+0200\n"
+"Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
+"Language-Team: \n"
 "Language: de_CH\n"
+"MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"Project-Id-Version: \n"
-"POT-Creation-Date: \n"
-"Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
-"Language-Team: \n"
-"MIME-Version: 1.0\n"
 "X-Generator: Poedit 2.2\n"
 
 msgid "Title"
@@ -19,8 +19,14 @@ msgstr "Titel"
 msgid "Content"
 msgstr "Inhalt"
 
+msgid "Uploading attachments may take some time due to full-text indexing."
+msgstr ""
+
 msgid "Voting text"
 msgstr "Abstimmungstext"
+
+msgid "Brief description Swissvotes"
+msgstr "Kurzbeschreibung Swissvotes"
 
 msgid "Federal council message"
 msgstr "Botschaft des Bundesrats"
@@ -42,6 +48,9 @@ msgstr "Inserateanalyse"
 
 msgid "Result by canton, district and municipality"
 msgstr "Abstimmungsergebnis pro Kanton, Bezirk und Gemeinde"
+
+msgid "Updating the dataset may take some time."
+msgstr ""
 
 msgid "Dataset"
 msgstr "Datensatz"
@@ -68,11 +77,11 @@ msgid "Full Text"
 msgstr "Volltext"
 
 msgid ""
-"Searches all text fields and attachments. Select «No» to limit the search "
-"to title, keyword, vote number, and procedure number."
+"Searches all text fields and attachments. Select «No» to limit the search to "
+"title, keyword, vote number, and procedure number."
 msgstr ""
-"Sucht in allen Textfeldern und Anhängen. Wählen Sie «Nein», um die Suche "
-"auf Titel, Kurzbezeichnung, Abstimmungs- und Geschäftsnummer zu beschränken."
+"Sucht in allen Textfeldern und Anhängen. Wählen Sie «Nein», um die Suche auf "
+"Titel, Kurzbezeichnung, Abstimmungs- und Geschäftsnummer zu beschränken."
 
 msgid "Position of the Federal Council"
 msgstr "Position des Bundesrats"
@@ -112,6 +121,93 @@ msgstr "Datensatz aktualisieren"
 
 msgid "Delete all votes"
 msgstr "Alle Abstimmungen löschen"
+
+msgid "canton-ag-label"
+msgstr "Aargau"
+
+msgid "canton-ai-label"
+msgstr "Appenzell Innerrhoden"
+
+msgid "canton-ar-label"
+msgstr "Appenzell Ausserrhoden"
+
+msgid "canton-be-label"
+msgstr "Bern"
+
+msgid "canton-bl-label"
+msgstr "Basel-Landschaft"
+
+msgid "canton-bs-label"
+msgstr "Basel-Stadt"
+
+msgid "canton-fr-label"
+msgstr "Freiburg"
+
+msgid "canton-ge-label"
+msgstr "Genf"
+
+msgid "canton-gl-label"
+msgstr "Glarus"
+
+msgid "canton-gr-label"
+msgstr "Graubünden"
+
+msgid "canton-ju-label"
+msgstr "Jura"
+
+msgid "canton-lu-label"
+msgstr "Luzern"
+
+msgid "canton-ne-label"
+msgstr "Neuenburg"
+
+msgid "canton-nw-label"
+msgstr "Nidwalden"
+
+msgid "canton-ow-label"
+msgstr "Obwalden"
+
+msgid "canton-sg-label"
+msgstr "St. Gallen"
+
+msgid "canton-sh-label"
+msgstr "Schaffhausen"
+
+msgid "canton-so-label"
+msgstr "Solothurn"
+
+msgid "canton-sz-label"
+msgstr "Schwyz"
+
+msgid "canton-tg-label"
+msgstr "Thurgau"
+
+msgid "canton-ti-label"
+msgstr "Tessin"
+
+msgid "canton-ur-label"
+msgstr "Uri"
+
+msgid "canton-vd-label"
+msgstr "Waadt"
+
+msgid "canton-vs-label"
+msgstr "Wallis"
+
+msgid "canton-zg-label"
+msgstr "Zug"
+
+msgid "canton-zh-label"
+msgstr "Zürich"
+
+msgid "canton-ch-label"
+msgstr "Schweiz"
+
+msgid "canton-vso-label"
+msgstr "Oberwallis"
+
+msgid "canton-vsr-label"
+msgstr "Unterwallis"
 
 msgid "d-1-1"
 msgstr "Staatsordnung"
@@ -641,24 +737,6 @@ msgstr "Radio, Fernsehen, Elektronische Medien"
 msgid "d-3-1254"
 msgstr "Medienfreiheit"
 
-msgid "Federal Council"
-msgstr "Bundesrat"
-
-msgid "National Council"
-msgstr "Nationalrat"
-
-msgid "Council of States"
-msgstr "Ständerat"
-
-msgid "Yes Camp"
-msgstr "Ja-Lager"
-
-msgid "People"
-msgstr "Volk"
-
-msgid "Cantons"
-msgstr "Stände"
-
 msgid "Mandatory referendum"
 msgstr "Obligatorisches Referendum"
 
@@ -737,6 +815,9 @@ msgstr "Stimmfreigabe"
 
 msgid "Organization no longer exists"
 msgstr "Organisation existiert nicht mehr"
+
+msgid "unknown"
+msgstr ""
 
 msgid "actor-acs-abbreviation"
 msgstr "ACS"
@@ -1206,93 +1287,6 @@ msgstr "Verband des Personals öffentlicher Dienste"
 msgid "actor-vsa-label"
 msgstr "Vereinigung schweizerischer Angestelltenverbände"
 
-msgid "canton-ag-label"
-msgstr "Aargau"
-
-msgid "canton-ai-label"
-msgstr "Appenzell Innerrhoden"
-
-msgid "canton-ar-label"
-msgstr "Appenzell Ausserrhoden"
-
-msgid "canton-be-label"
-msgstr "Bern"
-
-msgid "canton-bl-label"
-msgstr "Basel-Landschaft"
-
-msgid "canton-bs-label"
-msgstr "Basel-Stadt"
-
-msgid "canton-fr-label"
-msgstr "Freiburg"
-
-msgid "canton-ge-label"
-msgstr "Genf"
-
-msgid "canton-gl-label"
-msgstr "Glarus"
-
-msgid "canton-gr-label"
-msgstr "Graubünden"
-
-msgid "canton-ju-label"
-msgstr "Jura"
-
-msgid "canton-lu-label"
-msgstr "Luzern"
-
-msgid "canton-ne-label"
-msgstr "Neuenburg"
-
-msgid "canton-nw-label"
-msgstr "Nidwalden"
-
-msgid "canton-ow-label"
-msgstr "Obwalden"
-
-msgid "canton-sg-label"
-msgstr "St. Gallen"
-
-msgid "canton-sh-label"
-msgstr "Schaffhausen"
-
-msgid "canton-so-label"
-msgstr "Solothurn"
-
-msgid "canton-sz-label"
-msgstr "Schwyz"
-
-msgid "canton-tg-label"
-msgstr "Thurgau"
-
-msgid "canton-ti-label"
-msgstr "Tessin"
-
-msgid "canton-ur-label"
-msgstr "Uri"
-
-msgid "canton-vd-label"
-msgstr "Waadt"
-
-msgid "canton-vs-label"
-msgstr "Wallis"
-
-msgid "canton-zg-label"
-msgstr "Zug"
-
-msgid "canton-zh-label"
-msgstr "Zürich"
-
-msgid "canton-ch-label"
-msgstr "Schweiz"
-
-msgid "canton-vso-label"
-msgstr "Oberwallis"
-
-msgid "canton-vsr-label"
-msgstr "Unterwallis"
-
 msgid "Add page"
 msgstr "Seite hinzufügen"
 
@@ -1320,17 +1314,14 @@ msgstr "Datensatz herunterladen (CSV)"
 msgid "Download dataset (XLSX)"
 msgstr "Datensatz herunterladen (XLSX)"
 
-msgid "Voting campaign"
-msgstr "Abstimmungskampf"
+msgid "Cumulated electoral shares"
+msgstr ""
 
 msgid "Recommendation"
 msgstr "Parole"
 
 msgid "Percentage of voters in the National Council elections"
 msgstr "Wähleranteil bei der Nationalratswahl"
-
-msgid "Vague"
-msgstr "Unbestimmt"
 
 msgid "Parties"
 msgstr "Parteien"
@@ -1375,14 +1366,14 @@ msgstr "Nächste Abstimmung"
 msgid "General"
 msgstr "Allgemeines"
 
+msgid "Official title"
+msgstr ""
+
 msgid "Keyword"
 msgstr "Kurzbezeichnung"
 
 msgid "Vote date"
 msgstr "Abstimmungsdatum"
-
-msgid "Brief description Swissvotes"
-msgstr "Kurzbeschreibung Swissvotes"
 
 msgid "Description Année Politique Suisse"
 msgstr "Beschreibung Année Politique Suisse"
@@ -1426,6 +1417,9 @@ msgstr "Behandlungsdauer Parlament"
 msgid "Parliament's position"
 msgstr "Position des Parlaments"
 
+msgid "Voting campaign"
+msgstr "Abstimmungskampf"
+
 msgid "Recommendations of the Parties"
 msgstr "Parteiparolen"
 
@@ -1435,11 +1429,11 @@ msgstr "Wähleranteil des Ja-Lagers"
 msgid "Details"
 msgstr "Details"
 
-msgid "Divergent branches"
-msgstr "Abweichende Sektionen"
-
 msgid "Further Recommendations"
 msgstr "Weitere Parolen"
+
+msgid "Divergent branches"
+msgstr "Abweichende Sektionen"
 
 msgid "Analysis of the advertising campaign"
 msgstr "Analyse der Inseratekampagne"
@@ -1447,11 +1441,20 @@ msgstr "Analyse der Inseratekampagne"
 msgid "Vote"
 msgstr "Abstimmung"
 
+msgid "People"
+msgstr "Volk"
+
 msgid "Yeas"
 msgstr "Jastimmen"
 
+msgid "Cantons"
+msgstr "Stände"
+
 msgid "Turnout"
 msgstr "Stimmbeteiligung"
+
+msgid "Interactive map of the Swiss Federal Statistical Office"
+msgstr "Interaktive Karte des Bundesamts für Statistik"
 
 msgid "You are here"
 msgstr "Aktuelle Seite"
@@ -1515,9 +1518,11 @@ msgstr "Ja-Anteil Volk"
 msgid "No data."
 msgstr "Keine Daten."
 
+#, python-format
 msgid "Some columns are missing: ${columns}."
 msgstr "Einige Spalten fehlen: ${columns}."
 
+#, python-format
 msgid "Some cells contain invalid values: ${errors}."
 msgstr "Einige Zellen enthalten ungültige Werte: ${errors}."
 
@@ -1533,6 +1538,7 @@ msgstr "Keine Ergebnisse gefunden"
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"
 
+#, python-format
 msgid ""
 "A password reset link has been sent to ${email}, provided an account exists "
 "for this email address."
@@ -1551,6 +1557,7 @@ msgstr "Passwort geändert."
 msgid "Password reset"
 msgstr "Passwort zurücksetzen"
 
+#, python-format
 msgid "Do you really want to delete \"${item}\"?"
 msgstr "Möchten Sie \"${item}\" wirklich löschen?"
 
@@ -1575,20 +1582,69 @@ msgstr "Anhang gelöscht."
 msgid "Do you really want to delete all votes?!"
 msgstr "Möchten Sie wirklich alle Abstimmungen löschen?!"
 
+#, python-format
 msgid "Dataset updated (${added} added, ${updated} updated)"
 msgstr "Datensatz aktualisiert (${added} hinzugefügt, ${updated} geändert)"
 
 msgid "All votes deleted"
 msgstr "Alle Abstimmungen gelöscht"
 
+#, python-format
 msgid "The dataset contains unknown descriptors: ${items}."
 msgstr "Der Datensatz enthält unbekannte Deskriptoren: ${items}."
+
+msgid "Federal Council"
+msgstr "Bundesrat"
+
+msgid "National Council"
+msgstr "Nationalrat"
+
+msgid "Council of States"
+msgstr "Ständerat"
+
+msgid "Party slogans"
+msgstr ""
 
 msgid "Attachments updated"
 msgstr "Anhänge aktualisiert"
 
 msgid "Vote deleted"
 msgstr "Abstimmung gelöscht."
+
+#, python-format
+msgid "${x}% yea"
+msgstr ""
+
+#, python-format
+msgid "${x}% nay"
+msgstr ""
+
+msgid "Recommendations by political parties"
+msgstr ""
+
+#, python-format
+msgid "Electoral shares of parties: Parties recommending Yes ${x}%"
+msgstr ""
+
+#, python-format
+msgid "Electoral shares of parties: Parties recommending No ${x}%"
+msgstr ""
+
+#, python-format
+msgid "Electoral shares of parties: neutral/unknown ${x}%"
+msgstr ""
+
+#, python-format
+msgid "${x}% none"
+msgstr ""
+
+#, python-format
+msgid "${x} yea"
+msgstr ""
+
+#, python-format
+msgid "${x} nay"
+msgstr ""
 
 msgid "Access Denied"
 msgstr "Zugriff verweigert"
@@ -1602,3 +1658,9 @@ msgstr "Seite nicht gefunden"
 
 msgid "The page you are looking for could not be found."
 msgstr "Die angeforderte Seite konnte nicht gefunden werden."
+
+#~ msgid "Yes Camp"
+#~ msgstr "Ja-Lager"
+
+#~ msgid "Vague"
+#~ msgstr "Unbestimmt"
