@@ -4,6 +4,7 @@ from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.file import File
 from onegov.org.models import HiddenFromPublicExtension
+from sedate import to_timezone
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
@@ -61,6 +62,10 @@ class MissionReport(Base, ContentMixin, HiddenFromPublicExtension):
     @property
     def readable_duration(self):
         return str(self.duration).rstrip('.0') + 'h'
+
+    @property
+    def local_date(self):
+        return to_timezone(self.date, 'Europe/Zurich')
 
 
 class MissionReportVehicle(Base, ContentMixin, HiddenFromPublicExtension):

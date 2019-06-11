@@ -54,7 +54,7 @@ def import_mission_reports(vehicles_file, missions_file, no_confirm):
 
     def extract_date(mission):
         d = datetime.utcfromtimestamp(int(mission.date))
-        d = sedate.replace_timezone(d, 'UTC')
+        d = sedate.replace_timezone(d, 'Europe/Zurich')
 
         time = mission.alert_time.replace('.', ':')
         time = time.replace(';', ':')
@@ -69,7 +69,7 @@ def import_mission_reports(vehicles_file, missions_file, no_confirm):
         d = d.replace(hour=h)
         d = d.replace(minute=m)
 
-        return sedate.to_timezone(d, 'Europe/Zurich')
+        return d
 
     def extract_duration(mission):
         d = mission.duration

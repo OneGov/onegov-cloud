@@ -24,10 +24,10 @@
                 <tbody>
                     <tr tal:repeat="report reports">
                         <td data-label="Date" i18n:attributes="data-label" class="min-width-column">
-                            ${report.date.strftime('%d.%m.%Y')}
+                            ${report.local_date.strftime('%d.%m.%Y')}
                         </td>
                         <td data-label="Alarm" i18n:attributes="data-label" class="min-width-column">
-                            ${report.date.strftime('%H:%M')}
+                            ${report.local_date.strftime('%H:%M')}
                         </td>
                         <td data-label="Duration" i18n:attributes="data-label" class="min-width-column">
                             ${report.readable_duration}

@@ -7,11 +7,11 @@
             <tbody>
                 <tr>
                     <td class="min-width-column" i18n:translate>Date</td>
-                    <td>${model.date.strftime('%d.%m.%Y')}</td>
+                    <td>${model.local_date.strftime('%d.%m.%Y')}</td>
                 </tr>
                 <tr>
                     <td class="min-width-column" i18n:translate>Alarm</td>
-                    <td>${model.date.strftime('%H:%M')}</td>
+                    <td>${model.local_date.strftime('%H:%M')}</td>
                 </tr>
                 <tr>
                     <td class="min-width-column" i18n:translate>Location</td>

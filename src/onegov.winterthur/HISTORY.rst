@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes date/time not being rendered in the right timezone.
+  [href]
+
 - Fixes picture icon position.
   [href]
 
