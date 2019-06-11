@@ -1,4 +1,3 @@
-from datetime import date
 from onegov.core.elements import Link
 from onegov.core.security import Public, Private
 from onegov.form import FieldDependency, WTFormsClassBuilder, move_fields
