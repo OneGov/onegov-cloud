@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.6.2 (2019-06-11)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Fixes date/time not being rendered in the right timezone.
   [href]
 
