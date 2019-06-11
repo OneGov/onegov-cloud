@@ -146,7 +146,6 @@ def test_upload_image_with_error(browser, org_app):
     assert not browser.is_element_present_by_css('.field-display img')
 
 
-@pytest.mark.flaky(reruns=3)
 def test_browse_directory_editor(browser, org_app):
     browser.login_admin()
     browser.visit('/directories/+new')
@@ -156,14 +155,20 @@ def test_browse_directory_editor(browser, org_app):
     browser.fill('title', "Restaurants")
 
     # add a title through the dropdown menu
+    browser.find_by_css('.formcode-toolbar-element').scroll_to()
     browser.find_by_css('.formcode-toolbar-element').click()
+
+    browser.find_by_css('.formcode-snippet-name')[0].scroll_to()
     browser.find_by_css('.formcode-snippet-name')[0].click()
 
     # add a text through the dropdown menu
+    browser.find_by_css('.formcode-toolbar-element').scroll_to()
     browser.find_by_css('.formcode-toolbar-element').click()
-    sleep(0.1)
+    sleep(.25)
+    browser.find_by_css('.formcode-snippet-name')[1].scroll_to()
     browser.find_by_css('.formcode-snippet-name')[1].mouse_over()
-    sleep(0.1)
+    sleep(.25)
+    browser.find_by_css('.formcode-snippet-required')[0].scroll_to()
     browser.find_by_css('.formcode-snippet-required')[0].click()
 
     assert browser.find_by_css('#structure').value == (
