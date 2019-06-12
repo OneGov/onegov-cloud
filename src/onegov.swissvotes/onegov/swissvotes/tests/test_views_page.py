@@ -71,12 +71,6 @@ def test_view_page_attachments(swissvotes_app, temporary_path, pdf_1, pdf_2):
     manage = client.get('/page/about').click("Manage attachments")
     assert "No attachments." in manage
 
-    # Try to upload an invalid file
-    manage.form['file'] = Upload(
-        'fake.pdf', 'PDF'.encode('utf-8'), 'application/pdf'
-    )
-    manage.form.submit(status=415)
-
     # Upload two attachment (en_US, de_CH)
     with open(pdf_1, 'rb') as file:
         content_1 = file.read()

@@ -170,9 +170,6 @@ def upload_page_attachment(self, request):
         request.params['file'].filename
     )
 
-    if attachment.reference.content_type != 'application/pdf':
-        raise exc.HTTPUnsupportedMediaType()
-
     self.files.append(attachment)
     request.message(_("Attachment added."), 'success')
     return redirect(request.link(self, 'attachments'))
