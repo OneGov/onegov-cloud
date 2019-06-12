@@ -5,7 +5,7 @@
     <tal:b metal:fill-slot="content">
         <div class="row">
 
-            <div class="large-8 medium-8 columns">
+            <div class="large-8 medium-8 columns date-range-selector-target">
                 <div class="row">
                     <div class="large-12 columns">
                         <div metal:use-macro="layout.macros['occurrences']" />

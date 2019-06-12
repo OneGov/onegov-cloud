@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves UX of date-time range filters.
+  [href]
+
 - Removes check contrast meter, users mostly ignore it.
   [href]
 

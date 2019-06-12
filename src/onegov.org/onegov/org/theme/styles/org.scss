@@ -201,6 +201,15 @@ footer {
 }
 
 /*
+    Chrome shows a little up/down arrow on date fields which takes quite
+    a bit of space, without being useful
+*/
+input[type=date]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    display: none;
+}
+
+/*
     Apply on a row to flip the order of columns on mobile
 */
 @media #{$small-only} {
@@ -818,7 +827,6 @@ form {
     /*
         One line checkboxes
     */
-
     .oneline-checkboxes {
         li {
             display: inline-block;

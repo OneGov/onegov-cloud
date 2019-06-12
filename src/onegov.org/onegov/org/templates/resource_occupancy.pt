@@ -3,17 +3,17 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <span class="page-lead">
-            <tal:b condition="start != end">
-                ${layout.format_date(start, 'date_long')} - ${layout.format_date(end, 'date_long')}
-            </tal:b>
-            <tal:b condition="start == end">
-                ${layout.format_date(start, 'date_long')}
-            </tal:b>
-        </span>
-
         <div class="row">
-            <div class="small-12 medium-8 columns">
+            <div class="small-12 medium-8 columns date-range-selector-target">
+                <span class="page-lead">
+                    <tal:b condition="start != end">
+                        ${layout.format_date(start, 'date_long')} - ${layout.format_date(end, 'date_long')}
+                    </tal:b>
+                    <tal:b condition="start == end">
+                        ${layout.format_date(start, 'date_long')}
+                    </tal:b>
+                </span>
+
                 <div class="row occupancy-block" tal:repeat="date occupancy">
                     <tal:b define="entries occupancy[date]">
                         <div class="columns medium-12 large-3">
