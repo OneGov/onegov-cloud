@@ -1,10 +1,11 @@
 Changelog
 ---------
 
-1.1.1 (unreleased)
-~~~~~~~~~~~~~~~~~~~
 - Updates the translations
+  [freinhard]
+
 - Styling the footer
+  [freinhard]
 
 1.1.0 (2019-05-13)
 ~~~~~~~~~~~~~~~~~~~
