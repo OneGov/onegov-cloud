@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Increases resilience of date converter.
+  [href]
+
 0.80.1 (2019-05-28)
 ~~~~~~~~~~~~~~~~~~~
 
