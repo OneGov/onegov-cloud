@@ -1,5 +1,11 @@
 Changelog
 ---------
+
+1.1.1 (unreleased)
+~~~~~~~~~~~~~~~~~~~
+- Updates the translations
+- Styling the footer
+
 1.1.0 (2019-05-13)
 ~~~~~~~~~~~~~~~~~~~
 
