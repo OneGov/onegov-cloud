@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Content security: Adds api.mapbox.com to connect-src.
+  [href]
+
 - Improves UX of multi-date entry on Chrome/Firefox.
   [href]
 
