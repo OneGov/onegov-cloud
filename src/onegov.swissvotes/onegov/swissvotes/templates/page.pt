@@ -3,12 +3,21 @@
     <tal:block metal:fill-slot="content">
         <h2>${layout.title}</h2>
         <div class="page-content">
-            <tal:block tal:content="structure: layout.model.content"></tal:block>
-            <ul class="attachments" tal:condition="files">
-                <li tal:repeat="file files">
-                    <a href="${request.link(file)}">${file.filename}</a>
-                </li>
-            </ul>
+            <div class="row">
+                <div class="columns large-6 small-12">
+                    <tal:block tal:content="structure: layout.model.content"></tal:block>
+                </div>
+                <div class="columns large-5 large-offset-1 small-12">
+                    <div class="side-panel">
+                        <h5>Dateien</h5>
+                        <ul class="attachments" tal:condition="files">
+                            <li tal:repeat="file files">
+                                <a href="${request.link(file)}">${file.filename}</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
     </tal:block>
 </div>

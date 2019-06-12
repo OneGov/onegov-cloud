@@ -67,6 +67,13 @@ main {
     }
 }
 
+.side-panel {
+    border-radius: 2px;
+    border-color: $white;
+    border: 1px solid $table-border-color;
+    padding: 2em;
+}
+
 /*
     Links
 */
