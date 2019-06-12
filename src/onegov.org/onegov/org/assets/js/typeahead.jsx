@@ -111,21 +111,6 @@ var TypeAhead = function(form) {
         });
     }, 100);
 
-    $(document).on('keydown', function(event) {
-        if (event.ctrlKey || event.metaKey || event.altKey) {
-            return;
-        }
-
-        if (event.keyCode <= 48) {
-            return;
-        }
-
-        if ($(':focus').is('a') || !$(':focus').length) {
-            $(subject).val('');
-            $(subject)[0].focus();
-        }
-    });
-
     $(subject).on('keydown', function(event) {
         // enter
         if (event.keyCode === 13) {

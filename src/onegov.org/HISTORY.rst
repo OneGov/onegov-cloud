@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+- No longer captures key-input to search from anywhere.
+  
+  Hardly anyone knew this feature and it sometimes lead to unexpected
+  behavior.
+
+  [href]
+
 1.3.3 (2019-06-11)
 ~~~~~~~~~~~~~~~~~~~
 
