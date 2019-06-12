@@ -338,11 +338,6 @@ def get_fullcalendar_asset():
     yield 'reservationcalendar_custom.js'
 
 
-@OrgApp.webasset('check_contrast')
-def get_check_contrast_asset():
-    yield 'check_contrast.js'
-
-
 @OrgApp.webasset('code_editor')
 def get_code_editor_asset():
     yield 'ace.js'

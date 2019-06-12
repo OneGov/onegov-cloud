@@ -574,7 +574,6 @@ class SettingsLayout(DefaultLayout):
 
         self.include_editor()
         self.include_code_editor()
-        self.request.include('check_contrast')
         self.request.include('tags-input')
 
         self.setting = setting

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Removes check contrast meter, users mostly ignore it.
+  [href]
+
 - No longer captures key-input to search from anywhere.
   
   Hardly anyone knew this feature and it sometimes lead to unexpected
