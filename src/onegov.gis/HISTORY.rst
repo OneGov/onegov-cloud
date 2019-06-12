@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.9.0 (2019-06-12)
+~~~~~~~~~~~~~~~~~~~
+
 - Improves the location search on the map.
 
   We now use Mapbox for geocoding. The search and the results are in the
