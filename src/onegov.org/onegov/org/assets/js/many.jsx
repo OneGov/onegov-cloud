@@ -58,11 +58,9 @@ var ManyDates = React.createClass({
     },
     handleInputChange: function(index, name, e) {
         var state = JSON.parse(JSON.stringify(this.state));
+        var date = moment(e.target.value, $(e.target).data('dateformat'), true);
 
-        state.values[index][name] = moment(
-            e.target.value, $(e.target).data('dateformat')
-        ).toDate().dateFormat('Y-m-d');
-
+        state.values[index][name] = date.toDate().dateFormat('Y-m-d');
         this.setState(state);
 
         e.preventDefault();
@@ -82,7 +80,7 @@ var ManyDates = React.createClass({
                     var onAdd = self.handleAdd.bind(self, index);
 
                     return (
-                        <div key={_.uniqueId('foo')}>
+                        <div key={'date-' + index}>
                             <div className={"row " + (value.error && 'error' || '')}>
                                 <div className="small-10 columns">
                                     <DateTimePickerField required

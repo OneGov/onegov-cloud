@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves UX of multi-date entry on Chrome/Firefox.
+  [href]
+
 - Improves UX of date-time range filters.
   [href]
 
