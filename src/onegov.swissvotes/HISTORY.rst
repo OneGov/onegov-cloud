@@ -1,5 +1,10 @@
 Changelog
 ---------
+
+- Styling the page incl. attachments listing. [freinhard]
+
+- Removes file type restriction for page attachments. [freinhard]
+
 1.1.1 (2019-06-12)
 ~~~~~~~~~~~~~~~~~~~
 
