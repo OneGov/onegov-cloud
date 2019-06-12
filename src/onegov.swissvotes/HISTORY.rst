@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.1.1 (2019-06-12)
+~~~~~~~~~~~~~~~~~~~
 
 - Updates the translations
   [freinhard]
