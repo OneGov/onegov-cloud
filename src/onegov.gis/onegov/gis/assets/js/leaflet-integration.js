@@ -242,19 +242,45 @@ function addExternalLinkButton(map) {
     }).addTo(map);
 }
 
-function addGeocoder(map) {
-    L.Control.geocoder({
-        position: 'topleft',
-        placeholder: '',
-        errorMessage: '',
-        defaultMarkGeocode: false
-    }).on('markgeocode', function(e) {
-        map.panTo(new L.LatLng(e.geocode.center.lat, e.geocode.center.lng));
-    }).addTo(map);
-}
-
 function getMapboxToken() {
     return $('body').data('mapbox-token') || false;
+}
+
+function getLanguage() {
+    return ($('html').attr('lang') || 'de').substring(0, 2);
+}
+
+function addGeocoder(map) {
+    var lang = getLanguage();
+
+    // there's no translation layer for onegov.gis yet and this lone string
+    // is not enough to justify adding one
+    var placeholder = {
+        'de': _("Nach Adresse suchen"),
+        'fr': _("Rechercher une adresse"),
+        'en': _("Lookup address")
+    };
+
+    L.Control.geocoder({
+        position: 'topleft',
+        placeholder: placeholder[lang] || placeholder.de,
+        errorMessage: '',
+        defaultMarkGeocode: false,
+        collapsed: false,
+        showResultIcons: true,
+        geocoder: (new L.Control.Geocoder.Mapbox(getMapboxToken(), {
+            geocodingQueryParams: {
+                'language': getLanguage(),
+                // this is the geographical center of Switzerland, which gets
+                // mapbox to prefer Switzerland results, without a limit
+                'proximity': [8.2318, 46.7985],
+                'limit': 3
+            }
+        }))
+    }).on('markgeocode', function(e) {
+        map.panTo(new L.LatLng(e.geocode.center.lat, e.geocode.center.lng));
+        this._clearResults();
+    }).addTo(map);
 }
 
 function getMapboxTiles() {

@@ -1,6 +1,14 @@
 Changelog
 ---------
 
+- Improves the location search on the map.
+
+  We now use Mapbox for geocoding. The search and the results are in the
+  site's language and results in Switzerland are preferred.
+
+  Found results are shown in a list and can be selected.
+  [href]
+
 0.8.2 (2019-04-25)
 ~~~~~~~~~~~~~~~~~~~
 
