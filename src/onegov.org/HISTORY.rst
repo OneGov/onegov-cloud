@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.4.0 (2019-06-13)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a list preview to the event submission process.
   [href]
 
