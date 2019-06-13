@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a list preview to the event submission process.
+  [href]
+
 - Fades out daypicker days that lie in the past.
   [href]
 

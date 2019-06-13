@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-05-16 14:53+0200\n"
+"POT-Creation-Date: 2019-06-13 10:51+0200\n"
 "PO-Revision-Date: 2019-02-18 06:40+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2033,6 +2033,9 @@ msgstr "Publié"
 msgid "Withdrawn"
 msgstr "Retiré"
 
+msgid "List Preview"
+msgstr "Aperçu de la liste"
+
 msgid "Location"
 msgstr "Localisation"
 
@@ -2637,6 +2640,13 @@ msgstr "Mot de passe"
 
 msgid "There was an error while importing your directory!"
 msgstr "Une erreur est survenue lors de l'importation de votre dossier !"
+
+msgid ""
+"The image shown in the list view is a square. To have your image shown fully"
+" in the list view, you need to use a square image."
+msgstr ""
+"L'image affichée dans la liste est un carré. Pour que votre image s'affiche "
+"entièrement dans la liste, vous devez utiliser une image carrée."
 
 msgid "Ticket opened."
 msgstr "Ticket ouvert."

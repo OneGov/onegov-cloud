@@ -4,14 +4,18 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
         <div class="panel callout" tal:condition="completable">
-            <p i18n:translate="">
+            <p i18n:translate class="limit-line-width">
                 Please review your data and press "Complete" to finalize the process.
                 If there's anything you'd like to change, click on "Edit" to return
                 to the filled-out form.
             </p>
+            <p i18n:translate class="limit-line-width">
+                The image shown in the list view is a square. To have your image shown
+                fully in the list view, you need to use a square image.
+            </p>
         </div>
 
-        <div class="row collapse">
+        <div class="row collapse event-preview">
             <div class="large-8 medium-8 columns">
                 <tal:b metal:use-macro="layout.macros['display_event']" tal:define="event event"/>
             </div>

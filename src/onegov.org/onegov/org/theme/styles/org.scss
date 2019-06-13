@@ -204,7 +204,7 @@ footer {
     Chrome shows a little up/down arrow on date fields which takes quite
     a bit of space, without being useful
 */
-input[type=date]::-webkit-inner-spin-button {
+input[type="date"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     display: none;
 }
@@ -2884,7 +2884,9 @@ button {
 /*
     Calendar day display
 */
-.calendar-day {
+
+// raise the importance a bit by double-selecting
+.calendar-day.calendar-day {
     $border-radius: 4px;
     $icon-size: 3rem;
 
@@ -3025,7 +3027,8 @@ button {
     }
 }
 
-.occurrence {
+// raise importance a bit by double-selecting
+.occurrence.occurrence {
     margin-bottom: 2.25rem;
 
     h3 {
@@ -3047,6 +3050,16 @@ button {
 
     .occurrence-time {
         margin-bottom: .6rem;
+    }
+}
+
+.event-preview {
+    .occurrence {
+        margin-bottom: 0;
+    }
+
+    .occurrence > div:first-child {
+        margin-left: -($column-gutter / 2);
     }
 }
 
@@ -3739,6 +3752,10 @@ ul.search-results {
         li {
             margin-bottom: .5rem;
         }
+    }
+
+    .occurrence.occurrence {
+        margin-bottom: 0;
     }
 }
 
