@@ -1,3 +1,5 @@
+import warnings
+
 from datetime import datetime
 from dateutil import rrule
 from dateutil.rrule import rrulestr
@@ -268,6 +270,46 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
 
         return dates
 
+    def spawn_occurrence(self, start):
+        """ Create an occurrence at the given date, without storing it. """
+
+        end = start + (self.end - self.start)
+        name = '{0}-{1}'.format(self.name, start.date().isoformat())
+
+        return Occurrence(
+            title=self.title,
+            name=name,
+            location=self.location,
+            tags=self.tags,
+            start=start,
+            end=end,
+            timezone=self.timezone,
+        )
+
+    @property
+    def virtual_occurrence(self):
+        """ Before the event is accepted, there are no real occurrences stored
+        in the database.
+
+        At this time it is useful to be able to generate the latest occurence
+        without storing it.
+
+        """
+
+        for start in self.occurrence_dates():
+            occurrence = self.spawn_occurrence(start)
+            occurrence.event = self
+
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    'ignore', 'Object of type <Occurrence> not in session')
+
+                session = object_session(self)
+                session.expunge(occurrence)
+                session.flush()
+
+            return occurrence
+
     def _update_occurrences(self):
         """ Updates the occurrences.
 
@@ -289,19 +331,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
 
         # create all occurrences for this and next year
         for start in self.occurrence_dates():
-            end = start + (self.end - self.start)
-            name = '{0}-{1}'.format(self.name, start.date().isoformat())
-            self.occurrences.append(
-                Occurrence(
-                    title=self.title,
-                    name=name,
-                    location=self.location,
-                    tags=self.tags,
-                    start=start,
-                    end=end,
-                    timezone=self.timezone
-                )
-            )
+            self.occurrences.append(self.spawn_occurrence(start))
 
     def submit(self):
         """ Submit the event. """
