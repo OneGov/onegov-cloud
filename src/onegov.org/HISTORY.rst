@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fades out daypicker days that lie in the past.
+  [href]
+
 - Content security: Adds api.mapbox.com to connect-src.
   [href]
 

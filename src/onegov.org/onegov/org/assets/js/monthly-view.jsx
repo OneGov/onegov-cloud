@@ -86,6 +86,11 @@ var MonthlyView = React.createClass({
                 selectedDays={this.props.selectedDays}
                 fromMonth={this.props.selectedDays[0]}
                 toMonth={this.props.selectedDays[this.props.selectedDays.length - 1]}
+                modifiers={{
+                    past: {
+                        before: new Date()
+                    }
+                }}
             />
         );
     }

@@ -5283,9 +5283,8 @@ h2 + div.timeline {
         outline: none;
     }
 
-    .DayPicker-Day--today {
-        @include prefix(text-decoration-style, dotted);
-        text-decoration: underline;
+    .DayPicker-Day--past {
+        color: $base;
     }
 
     [role="rowgroup"] {
