@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.2.0 (2019-06-13)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to get a virtual occasion before accepting the event.
   [href]
