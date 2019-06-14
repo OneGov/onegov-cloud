@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes imported missions not being hidden in some cases.
+  [href]
+
 - Fixes import matching not working in some cases.
   [href]
 

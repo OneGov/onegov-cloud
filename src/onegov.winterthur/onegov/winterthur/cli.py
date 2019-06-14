@@ -92,6 +92,21 @@ def import_mission_reports(vehicles_file, missions_file, no_confirm):
 
         return int(''.join(digits()))
 
+    def is_hidden(mission):
+        if mission.public == '0':
+            return True
+
+        if mission.hidden == '1':
+            return True
+
+        if mission.hide == '1':
+            return True
+
+        if "nicht freischalten" in mission.type.lower():
+            return True
+
+        return False
+
     def handle_import(request, app):
 
         for mission in request.session.query(MissionReport):
@@ -124,6 +139,7 @@ def import_mission_reports(vehicles_file, missions_file, no_confirm):
                 location=mission.location,
                 personnel=extract_personnel(mission.personnel),
                 backup=extract_personnel(mission.personnel_hq),
+                meta={'is_hidden_from_public': is_hidden(mission)}
             )
 
             vehicle_uids = mission.vehicles.split(',')
@@ -134,12 +150,6 @@ def import_mission_reports(vehicles_file, missions_file, no_confirm):
                 created.used_vehicles.append(MissionReportVehicleUse(
                     vehicle=created_vehicles[uid]
                 ))
-
-            if mission.public == '0' or mission.hidden == '1':
-                created.is_hidden_from_public = True
-
-            if "nicht freischalten" in mission.type.lower():
-                created.is_hidden_from_public = True
 
             request.session.add(created)
 
