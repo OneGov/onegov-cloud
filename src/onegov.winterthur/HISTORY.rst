@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.6.4 (2019-06-14)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Fixes imported missions not being hidden in some cases.
   [href]
 
