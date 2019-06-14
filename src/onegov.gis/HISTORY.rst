@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Automatically marks points in the map when selecting a geocode search result.
+  [href]
+
 0.9.0 (2019-06-12)
 ~~~~~~~~~~~~~~~~~~~
 

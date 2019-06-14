@@ -184,12 +184,25 @@ function asMarkerMap(map, input) {
         }]
     });
 
+    var hasMarker = function() {
+        return pointButton._currentState.stateName === 'remove-point';
+    };
+
     pointButton.addTo(map);
 
     if (coordinates.lat && coordinates.lon) {
         addMarker(coordinatesToMap(coordinates), coordinates.zoom);
         pointButton.state('remove-point');
     }
+
+    map.on('geocode-marked', function() {
+        if (hasMarker()) {
+            removeMarker();
+        }
+
+        addMarker();
+        pointButton.state('remove-point');
+    });
 
     map.on('zoomend', function() {
         var c = getCoordinates(input);
@@ -279,6 +292,7 @@ function addGeocoder(map) {
         }))
     }).on('markgeocode', function(e) {
         map.panTo(new L.LatLng(e.geocode.center.lat, e.geocode.center.lng));
+        map.fire('geocode-marked', e);
         this._clearResults();
     }).addTo(map);
 }
