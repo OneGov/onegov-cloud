@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Makes sure the title is always shown on small screens.
+  [freinhard]
+
 - Styling the page incl. attachments listing.
   [freinhard]
 
