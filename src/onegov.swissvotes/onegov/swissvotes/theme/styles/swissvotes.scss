@@ -70,7 +70,6 @@ main {
 .side-panel {
     border-radius: 2px;
     border-color: $white;
-    margin-top: 40px;
     border: 1px solid $table-border-color;
     padding: 2em;
 }
@@ -209,6 +208,10 @@ h2 small {
         margin-left: 0;
         margin-top: 2em;
     }
+}
+
+#page-text {
+    margin-bottom: 40px
 }
 
 /*
