@@ -27,10 +27,10 @@
                     >
                     <thead>
                         <tr>
-                            <th data-tablesaw-priority="2" class="left-aligned sort-${votes.sort_order_by_key('title')}">
+                            <th data-tablesaw-priority="persist" class="left-aligned sort-${votes.sort_order_by_key('title')}">
                                 <a href="${request.link(votes.by_order('title'))}" i18n:translate>Title</a>
                             </th>
-                            <th data-tablesaw-priority="1" class="left-aligned sort-${votes.sort_order_by_key('date')}" >
+                            <th data-tablesaw-priority="2" class="left-aligned sort-${votes.sort_order_by_key('date')}" >
                                 <a href="${request.link(votes.by_order('date'))}" i18n:translate>Date</a>
                             </th>
                             <th data-tablesaw-priority="5" class="left-aligned sort-${votes.sort_order_by_key('legal_form')}">
