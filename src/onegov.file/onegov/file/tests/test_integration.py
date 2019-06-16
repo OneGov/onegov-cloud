@@ -31,7 +31,7 @@ def app(request, postgres_dsn, temporary_path, redis_url):
 
     with (temporary_path / 'bust').open('w') as f:
         f.write('\n'.join((
-            f'#!/bin/bash',
+            f'#!/usr/bin/env sh',
             f'touch {temporary_path}/$1'
         )))
 
@@ -214,7 +214,7 @@ def test_bust_cache(app, temporary_path):
     assert not (temporary_path / 'foobar').exists()
 
     # wait for it to complete
-    sleep(0.2)
+    sleep(0.5)
     assert (temporary_path / 'foobar').exists()
 
 
