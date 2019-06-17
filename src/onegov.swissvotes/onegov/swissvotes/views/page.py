@@ -17,7 +17,6 @@ from onegov.swissvotes.layouts import PageLayout
 from onegov.swissvotes.models import TranslatablePage
 from onegov.swissvotes.models import TranslatablePageFile
 from onegov.swissvotes.models import TranslatablePageMove
-from webob import exc
 
 
 @SwissvotesApp.html(
