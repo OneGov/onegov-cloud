@@ -117,7 +117,7 @@
                 <a class="button secondary cancel-button" href="${cancel}" i18n:translate="">Cancel</a>
             </tal:block>
             <tal:block condition="not: button_text|nothing">
-                <input type="submit" value="Submit" class="button ${button_class|nothing}" i18n:attributes="value">
+                <input type="submit" value="Search" class="button ${button_class|nothing}" i18n:attributes="value">
             </tal:block>
             <tal:block condition="button_text|nothing">
                 <input type="submit" value="${button_text}" class="button ${button_class|nothing}">

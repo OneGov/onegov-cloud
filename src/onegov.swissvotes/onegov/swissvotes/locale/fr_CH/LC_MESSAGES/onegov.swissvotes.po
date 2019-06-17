@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2019-06-17 21:26+0200\n"
-"PO-Revision-Date: 2019-06-17 21:29+0200\n"
+"POT-Creation-Date: 2019-06-17 22:07+0200\n"
+"PO-Revision-Date: 2019-06-17 22:08+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -1478,8 +1478,8 @@ msgstr "Page suivante"
 msgid "Cancel"
 msgstr "Annuler"
 
-msgid "Submit"
-msgstr "Soumettre"
+msgid "Search"
+msgstr "Rechercher"
 
 msgid "Reset"
 msgstr "Réinitialiser"
@@ -1671,6 +1671,9 @@ msgstr "Page introuvable"
 
 msgid "The page you are looking for could not be found."
 msgstr "La page que vous cherchez n’a pas pu être trouvée."
+
+#~ msgid "Submit"
+#~ msgstr "Soumettre"
 
 #~ msgid "Yes Camp"
 #~ msgstr "Camp du oui"

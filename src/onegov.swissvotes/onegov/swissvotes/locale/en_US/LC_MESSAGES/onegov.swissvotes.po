@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2019-06-17 21:26+0200\n"
+"POT-Creation-Date: 2019-06-17 22:07+0200\n"
 "PO-Revision-Date: 2019-06-11 17:16+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -1464,8 +1464,8 @@ msgstr "Next Page"
 msgid "Cancel"
 msgstr "Cancel"
 
-msgid "Submit"
-msgstr "Submit"
+msgid "Search"
+msgstr ""
 
 msgid "Reset"
 msgstr "Reset"
@@ -1655,6 +1655,9 @@ msgstr "Page not found"
 
 msgid "The page you are looking for could not be found."
 msgstr "The page you are looking for could not be found."
+
+#~ msgid "Submit"
+#~ msgstr "Submit"
 
 #~ msgid "Yes Camp"
 #~ msgstr "\"Yes\" camp"
