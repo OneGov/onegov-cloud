@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.1.2 (2019-06-17)
+~~~~~~~~~~~~~~~~~~~
 
 - Makes sure the title is always shown on small screens.
   [freinhard]

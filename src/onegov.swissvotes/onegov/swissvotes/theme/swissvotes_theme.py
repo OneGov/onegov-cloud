@@ -4,7 +4,7 @@ from onegov.foundation import BaseTheme
 
 class SwissvotesTheme(BaseTheme):
     name = 'onegov.swissvotes.foundation'
-    version = '1.1.1'
+    version = '1.1.2'
 
     @property
     def pre_imports(self):
