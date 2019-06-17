@@ -4,10 +4,10 @@
         <h2>${layout.title}</h2>
         <div class="page-content">
             <div class="row">
-                <div class="columns large-6 small-12" id="page-text">
+                <div class="columns large-7 small-12" id="page-text">
                     <tal:block tal:content="structure: layout.model.content"></tal:block>
                 </div>
-                <div class="columns large-5 large-offset-1 small-12">
+                <div class="columns large-4 large-offset-1 small-12">
                     <div class="side-panel" tal:condition="files">
                         <h5>Dateien</h5>
                         <ul class="attachments">
