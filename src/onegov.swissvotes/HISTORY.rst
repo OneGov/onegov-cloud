@@ -1,5 +1,18 @@
 Changelog
 ---------
+
+- Adds logos of sponsors.
+  [freinhard]
+
+- Improves some translations.
+  [freinhard]
+
+- Removes formatting for offical vote number.
+  [freinhard]
+
+- Renames the filter search button.
+  [freinhard]
+
 1.1.2 (2019-06-17)
 ~~~~~~~~~~~~~~~~~~~
 
@@ -15,10 +28,10 @@ Changelog
 1.1.1 (2019-06-12)
 ~~~~~~~~~~~~~~~~~~~
 
-- Updates the translations
+- Updates the translations.
   [freinhard]
 
-- Styling the footer
+- Styling the footer.
   [freinhard]
 
 1.1.0 (2019-05-13)
