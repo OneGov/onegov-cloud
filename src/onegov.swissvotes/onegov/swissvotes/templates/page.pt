@@ -16,6 +16,14 @@
                             </li>
                         </ul>
                     </div>
+
+                    <div id="patrons">
+                        <h5 i18n:translate>Patrons</h5>
+                        <div class="patron"><a href="http://sagw.ch/"><img src="${layout.static_path}/images/logo_sagw.svg" alt="Schweizerische Akademie für Geistes- und Sozialwissenschaften"></a></div>
+                        <div class="patron"><a href="https://www.pom.be.ch/pom/de/index/lotteriefonds/lotteriefonds/Lotteriefonds.html"><img src="${layout.static_path}/images/logo_lotteriefonds_be.png" alt="Lotteriefonds des Kantons Bern"></a></div>
+                        <div class="patron"><a href="http://www.ernst-goehner-stiftung.ch"><img src="${layout.static_path}/images/logo_ernst_goehner.jpg" alt="Ernst Göhner Stiftung"></a></div>
+                    </div>
+
                 </div>
             </div>
         </div>

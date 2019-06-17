@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2019-06-11 15:57+0200\n"
+"POT-Creation-Date: 2019-06-17 21:26+0200\n"
 "PO-Revision-Date: 2019-06-11 17:16+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -1496,6 +1496,9 @@ msgstr "If you don't want to change your password, you can ignore this email."
 
 msgid "Logout"
 msgstr "Logout"
+
+msgid "Patrons"
+msgstr ""
 
 msgid "Filter"
 msgstr "Filter"

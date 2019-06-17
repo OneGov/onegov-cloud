@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2019-06-11 15:57+0200\n"
-"PO-Revision-Date: 2019-06-11 17:13+0200\n"
+"POT-Creation-Date: 2019-06-17 21:26+0200\n"
+"PO-Revision-Date: 2019-06-17 21:29+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -1512,6 +1512,9 @@ msgstr ""
 
 msgid "Logout"
 msgstr "Se déconnecter"
+
+msgid "Patrons"
+msgstr "Sponsors"
 
 msgid "Filter"
 msgstr "Filtre de recherche"

@@ -220,3 +220,21 @@ h2 small {
 svg text {
     font-family: "Apercu", Helvetica, Roboto, Arial, sans-serif !important;
 }
+
+#patrons {
+    margin-top: 30px;
+    .patron {
+        border-radius: 2px;
+        border-color: $white;
+        border: 1px solid $table-border-color;
+        height: 100px;
+        margin: 15px 0;
+        text-align: center;
+
+        img {
+            max-height: 50px;
+            margin: 20px;
+            max-width: 80%
+        }
+    }
+}
