@@ -4,7 +4,7 @@ from onegov.foundation import BaseTheme
 
 class WtfsTheme(BaseTheme):
     name = 'onegov.wtfs.foundation'
-    version = '1.3.1'
+    version = '1.3.2'
 
     @property
     def pre_imports(self):
