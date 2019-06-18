@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Updates translations.
+  [freinhard]
+
 1.2.0 (2019-06-18)
 ~~~~~~~~~~~~~~~~~~~
 
@@ -15,7 +19,7 @@ Changelog
 - Improves some translations.
   [freinhard]
 
-- Removes formatting for offical vote number.
+- Removes formatting for official vote number.
   [freinhard]
 
 - Renames the filter search button.
