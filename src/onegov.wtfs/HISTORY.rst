@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes Travis build error.
+  [href]
+
 1.3.1 (2019-06-18)
 ~~~~~~~~~~~~~~~~~~~
 
