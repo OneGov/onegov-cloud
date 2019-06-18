@@ -15,7 +15,7 @@ from wtforms import RadioField
 from wtforms import SelectField
 from wtforms import StringField
 from wtforms import TextAreaField
-from wtforms_components import DateRange
+from wtforms_components import DateRange, If, Chain
 from wtforms.fields.html5 import DateField
 from wtforms.validators import InputRequired
 from wtforms.validators import NumberRange
@@ -70,7 +70,16 @@ class AddScanJobForm(Form):
     dispatch_boxes = IntegerField(
         label=_("Boxes"),
         fieldset=_("Dispatch to the tax office"),
-        validators=[Optional(), NumberRange(min=0)],
+        validators=[
+            If(
+                lambda form, field: form.type.data == 'normal',
+                NumberRange(min=1)
+            ),
+            If(
+                lambda form, field: form.type.data != 'normal',
+                Chain([Optional(), NumberRange(min=0)])
+            ),
+        ],
         render_kw={'size': 3, 'clear': False},
     )
     dispatch_tax_forms_older = IntegerField(

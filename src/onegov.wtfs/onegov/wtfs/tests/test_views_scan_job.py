@@ -201,6 +201,7 @@ def test_views_scan_jobs_filter(client):
     with freeze_time("2019-01-01"):
         add = client.get('/scan-jobs').click(href='/add')
         add.form['type'].select('normal')
+        add.form['dispatch_boxes'] = 1
         add.form['dispatch_date_normal'].select("2019-01-05")
         assert "Scan-Auftrag hinzugefügt." in add.form.submit().follow()
 

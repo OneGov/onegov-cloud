@@ -554,7 +554,8 @@ def test_add_scan_job_form(session):
         form = AddScanJobForm(PostData({
             'municipality_id': municipality.id.hex,
             'type': 'normal',
-            'dispatch_date_normal': '2019-01-08'
+            'dispatch_date_normal': '2019-01-08',
+            'dispatch_boxes': 1,
         }))
         form.request = Request(session, groupid=municipality.id.hex)
         form.on_request()

@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Forces a box count of 1 for restricted, normal jobs.
+  [href]
+
 1.3.0 (2019-05-15)
 ~~~~~~~~~~~~~~~~~~~
 
