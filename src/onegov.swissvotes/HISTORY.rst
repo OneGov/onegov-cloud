@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds percentage sign to yeas and turnout in overview.
+  [href]
+
 - Adds logos of sponsors.
   [freinhard]
 

@@ -56,8 +56,8 @@
                             <td class="left-aligned sort-${votes.sort_order_by_key('legal_form')}">${vote.legal_form}</td>
                             <td class="left-aligned" tal:content="structure layout.format_policy_areas(vote)"></td>
                             <td class="left-aligned sort-${votes.sort_order_by_key('result')}">${vote.result}</td>
-                            <td class="right-aligned sort-${votes.sort_order_by_key('result_people_yeas_p')}">${layout.format_number(vote.result_people_yeas_p)}</td>
-                            <td class="left-aligned sort-${votes.sort_order_by_key('result')}">${layout.format_number(vote.result_turnout)}</td>
+                            <td class="right-aligned sort-${votes.sort_order_by_key('result_people_yeas_p')}">${layout.format_number(vote.result_people_yeas_p)}%</td>
+                            <td class="left-aligned sort-${votes.sort_order_by_key('result')}">${layout.format_number(vote.result_turnout)}%</td>
                             <td class="left-aligned"><a href="${request.link(vote)}" i18n:translate>Details</a></td>
                         </tr>
                     </tbody>
