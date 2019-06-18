@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Hides BFS map behind a button.
+  [href]
+
 - Adds percentage sign to yeas and turnout in overview.
   [href]
 

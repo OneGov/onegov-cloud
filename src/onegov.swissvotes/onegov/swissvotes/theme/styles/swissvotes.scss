@@ -46,13 +46,13 @@ body {
 }
 
 body {
-  display: flex;
-  min-height: 100vh;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 main {
-  flex: 1;
+    flex: 1;
 }
 
 /*
@@ -68,9 +68,9 @@ main {
 }
 
 .side-panel {
-    border-radius: 2px;
-    border-color: $white;
     border: 1px solid $table-border-color;
+    border-color: $white;
+    border-radius: 2px;
     padding: 2em;
 }
 
@@ -211,7 +211,7 @@ h2 small {
 }
 
 #page-text {
-    margin-bottom: 40px
+    margin-bottom: 40px;
 }
 
 /*
@@ -223,18 +223,37 @@ svg text {
 
 #patrons {
     margin-top: 30px;
+
     .patron {
-        border-radius: 2px;
-        border-color: $white;
         border: 1px solid $table-border-color;
+        border-color: $white;
+        border-radius: 2px;
         height: 100px;
         margin: 15px 0;
         text-align: center;
 
         img {
-            max-height: 50px;
             margin: 20px;
-            max-width: 80%
+            max-height: 50px;
+            max-width: 80%;
         }
+    }
+}
+
+/*
+    BFS Map
+*/
+.bfs-map {
+    &.button {
+        display: block;
+        margin: 0 auto;
+        max-width: 50%;
+    }
+
+    iframe {
+        border: 0;
+        margin-top: .5rem;
+        min-height: 600px;
+        width: 100%;
     }
 }

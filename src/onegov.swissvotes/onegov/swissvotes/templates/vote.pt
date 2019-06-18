@@ -292,24 +292,12 @@
                     </tr>
                     <tr tal:condition="bfs_map">
                         <td colspan="2">
-                            <div><strong i18n:translate>Interactive map of the Swiss Federal Statistical Office</strong></div>
-                            <div class="row" tal:condition="bfs_map">
-                                <div class="small-12 small-centered large-10 columns">
-                                    <iframe src="${bfs_map}"
-                                            frameborder="0"
-                                            marginheight="0"
-                                            marginwidth="0"
-                                            scrolling="no"
-                                            style="
-                                                width: 100%;
-                                                height: 600px;
-                                                margin: auto 0;
-                                                padding: 0;
-                                                cursor: auto;
-                                            ">
-                                    </iframe>
-                                </div>
-                            </div>
+                            <a class="button secondary bfs-map" aria-role="button" i18n:translate
+                                href="${bfs_map}"
+                                data-title="Interactive map of the Swiss Federal Statistical Office"
+                                i18n:attributes="data-title">
+                                Interactive map of the Swiss Federal Statistical Office
+                            </a>
                         </td>
                     </tr>
                 </tbody>

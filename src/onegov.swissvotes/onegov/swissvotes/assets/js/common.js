@@ -11,7 +11,6 @@ var setupRedirectAfter = function(elements) {
     });
 };
 
-
 // Make the extended filters of the search collapsible and store the current
 // state in the browser
 var initSearchFilters = function() {
@@ -26,7 +25,7 @@ var initSearchFilters = function() {
 
     if (key in localStorage) {
         var value = localStorage.getItem(key);
-        if (value == 'hidden') {
+        if (value === 'hidden') {
             fieldsetLegend.click();
         }
     } else {
@@ -57,10 +56,10 @@ var processCommonNodes = function(elements, out_of_band) {
     initSearchFilters();
 
     // initalize the bar charts
-    targets.find('.bar-chart').each(function(ix, el) {
+    targets.find('.bar-chart').each(function(_, el) {
         var dataurl = $(el).data('dataurl');
         $.ajax({url: dataurl}).done(function(data) {
-            var chart = barChart({
+            barChart({
                 data: data,
                 interactive: true
             })(el);
@@ -140,4 +139,20 @@ Intercooler.ready(function(element) {
     }
 
     processCommonNodes(el, true);
+});
+
+// lazy-loaded BFS map
+$(document).ready(function() {
+    $('.bfs-map.button').click(function(e) {
+        var btn = $(this);
+        var url = btn.attr('href');
+
+        var title = $('<strong></strong>').text(btn.data('title'));
+        var map = $('<iframe />');
+        map.attr('src', url);
+
+        var container = $('<div class="bfs-map" />').append(title, map);
+        btn.replaceWith(container);
+        e.preventDefault();
+    });
 });
