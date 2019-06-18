@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.1 (2019-06-18)
+~~~~~~~~~~~~~~~~~~~
 
 - Changes the return date to only be available on unrestricted, express jobs.
   [href]
