@@ -386,7 +386,7 @@ class UnrestrictedScanJobForm(Form):
         label=_("Return date"),
         fieldset=_("Return to the municipality"),
         validators=[Optional()],
-        depends_on=('type', 'normal')
+        depends_on=('type', 'express'),
     )
 
     return_boxes = IntegerField(
@@ -495,9 +495,6 @@ class UnrestrictedScanJobForm(Form):
         self.update_labels()
 
     def update_model(self, model):
-        model.return_date = (
-            None if self.type.data == 'express' else self.return_date.data
-        )
         for name in (
             'municipality_id',
             'type',
@@ -515,6 +512,7 @@ class UnrestrictedScanJobForm(Form):
             'return_tax_forms_last_year',
             'return_tax_forms_older',
             'return_single_documents',
+            'return_date',
             'return_unscanned_tax_forms_current_year',
             'return_unscanned_tax_forms_last_year',
             'return_unscanned_tax_forms_older',

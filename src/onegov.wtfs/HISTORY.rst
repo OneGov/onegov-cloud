@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Changes the return date to only be available on unrestricted, express jobs.
+  [href]
+
 - Forces a box count of 1 for restricted, normal jobs.
   [href]
 
