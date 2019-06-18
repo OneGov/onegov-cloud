@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.2.0 (2019-06-18)
+~~~~~~~~~~~~~~~~~~~
 
 - Hides BFS map behind a button.
   [href]
