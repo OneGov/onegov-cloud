@@ -1,3 +1,4 @@
+from onegov.core.metadata import PublicMetadata
 from onegov.core.security import Public, Private, Personal, Secret
 from onegov.core.static import StaticFile
 from onegov.core.theme import ThemeFile
@@ -87,4 +88,13 @@ def may_view_theme_files_not_logged_in(app, identity, model, permission):
     identity=None)
 def may_view_auth_not_logged_in(app, identity, model, permission):
     """ Anonymous needs to be able to log in. """
+    return True
+
+
+@IntranetApp.permission_rule(
+    model=PublicMetadata,
+    permission=Public,
+    identity=None)
+def may_view_public_identity(app, identity, model, permission):
+    """ Even anonymous may view the public metadata of the instance. """
     return True

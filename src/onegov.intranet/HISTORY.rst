@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for public metadata.
+  [href]
+
 - Requires Python 3.6.
   [href]
 
