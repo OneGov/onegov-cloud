@@ -8,6 +8,7 @@ import inspect
 import magic
 import mimetypes
 import morepath
+import operator
 import os.path
 import re
 import sqlalchemy
@@ -17,6 +18,7 @@ from collections import Iterable
 from contextlib import contextmanager
 from cProfile import Profile
 from datetime import datetime
+from functools import reduce
 from importlib import import_module
 from io import BytesIO, StringIO
 from itertools import groupby, tee, zip_longest
@@ -807,3 +809,18 @@ def yubikey_public_id(otp):
     """ Returns the yubikey identity given a token. """
 
     return otp[:12]
+
+
+def dict_path(dictionary, path):
+    """ Gets the value of the given dictionary at the given path. For example:
+
+        >>> data = {'foo': {'bar': True}}
+        >>> dict_path(data, 'foo.bar')
+        True
+
+    """
+
+    if not dictionary:
+        raise KeyError()
+
+    return reduce(operator.getitem, path.split('.'), dictionary)

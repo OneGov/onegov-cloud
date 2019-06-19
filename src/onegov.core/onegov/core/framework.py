@@ -160,6 +160,7 @@ class Framework(
         from onegov.core import cronjobs
         from onegov.core import filestorage
         from onegov.core import i18n
+        from onegov.core import metadata
         from onegov.core import security
         from onegov.core import theme
         from onegov.core.security import rules
@@ -171,8 +172,13 @@ class Framework(
             i18n=i18n,
             security=security,
             rules=rules,
-            theme=theme
+            theme=theme,
+            metadata=metadata,
         )
+
+    @property
+    def metadata(self):
+        return self.modules.metadata.Metadata(self)
 
     @property
     def has_database_connection(self):
