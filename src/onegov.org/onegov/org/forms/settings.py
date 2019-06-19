@@ -11,6 +11,7 @@ from onegov.org.forms.fields import HtmlField
 from onegov.org.homepage_widgets import transform_homepage_structure
 from onegov.org.homepage_widgets import XML_LINE_OFFSET
 from onegov.org.theme import user_options
+from purl import URL
 from wtforms import StringField, TextAreaField, RadioField
 from wtforms import ValidationError
 from wtforms import validators
@@ -235,7 +236,23 @@ class HomepageSettingsForm(Form):
             ('forms', _("Yes, to forms")),
             ('publications', _("Yes, to publications")),
             ('reservations', _("Yes, to reservations")),
+            ('path', _("Yes, to a non-listed path")),
         ])
+
+    redirect_path = StringField(
+        label=_("Path"),
+        validators=[validators.InputRequired()],
+        depends_on=('redirect_homepage_to', 'path'))
+
+    def validate_redirect_path(self, field):
+        if not field.data:
+            return
+
+        url = URL(field.data)
+
+        if url.scheme() or url.host():
+            raise ValidationError(
+                _("Please enter a path without schema or host"))
 
     def validate_homepage_structure(self, field):
         if field.data:

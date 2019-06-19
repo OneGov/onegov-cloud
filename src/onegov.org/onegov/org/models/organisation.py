@@ -1,5 +1,6 @@
 """ Contains the model describing the organisation proper. """
 
+from hashlib import sha256
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import meta_property, TimestampMixin
 from onegov.core.orm.types import JSON, UUID
@@ -54,6 +55,7 @@ class Organisation(Base, TimestampMixin):
     square_logo_url = meta_property()
     locales = meta_property()
     redirect_homepage_to = meta_property()
+    redirect_path = meta_property()
     hidden_people_fields = meta_property(default=list)
     event_locations = meta_property(default=list)
     geo_provider = meta_property(default='geo-mapbox')
@@ -74,6 +76,19 @@ class Organisation(Base, TimestampMixin):
     partner_4_img = meta_property()
     partner_4_url = meta_property()
     partner_4_name = meta_property()
+
+    @property
+    def public_identity(self):
+        """ The public identity is a globally unique SHA 256 hash of the
+        current organisation.
+
+        Basically, this is the database record of the database, but mangled
+        for security and because it is cooler 😎.
+
+        This value can be accessed through /identity.
+
+        """
+        return sha256(self.id.hex.encode('utf-8')).hexdigest()
 
     @property
     def holidays(self):

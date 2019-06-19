@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-06-13 10:51+0200\n"
+"POT-Creation-Date: 2019-06-19 16:52+0200\n"
 "PO-Revision-Date: 2019-02-18 06:39+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1047,6 +1047,9 @@ msgstr "Die Struktur der Homepage"
 msgid "Homepage redirect"
 msgstr "Startseiten Weiterleitung"
 
+msgid "Path"
+msgstr "Pfad"
+
 msgid "Hide these fields for non-logged-in users"
 msgstr "Diese Felder für nicht angemeldete Benutzer ausblenden"
 
@@ -1074,6 +1077,9 @@ msgstr "Andere Feiertage"
 msgid "Preview"
 msgstr "Vorschau"
 
+msgid "Please enter a path without schema or host"
+msgstr "Bitte geben Sie einen Pfad ohne Schema oder Hostname an"
+
 msgid "German"
 msgstr "Deutsch"
 
@@ -1094,6 +1100,9 @@ msgstr "Ja, zu den Publikationen"
 
 msgid "Yes, to reservations"
 msgstr "Ja, zu den Reservationen"
+
+msgid "Yes, to a non-listed path"
+msgstr "Ja, ein nicht gelisteter Pfad"
 
 msgid "Mapbox (Default)"
 msgstr "Mapbox (Standard)"
@@ -2634,7 +2643,10 @@ msgstr "Beim Verzeichnisimport ist ein Fehler aufgetreten!"
 msgid ""
 "The image shown in the list view is a square. To have your image shown fully "
 "in the list view, you need to use a square image."
-msgstr "Ihr Bild wird in der Listen-Vorschau in ein Quadrat eingepasst. Falls Sie in der Übersicht das ganze Bild darstellen möchten, müssen Sie ein quadratisches Bild hochladen."
+msgstr ""
+"Ihr Bild wird in der Listen-Vorschau in ein Quadrat eingepasst. Falls Sie in "
+"der Übersicht das ganze Bild darstellen möchten, müssen Sie ein "
+"quadratisches Bild hochladen."
 
 msgid "Ticket opened."
 msgstr "Ticket eröffnet."

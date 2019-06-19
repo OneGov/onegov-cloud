@@ -13,7 +13,7 @@ from onegov.org.models import PublicationCollection
 from onegov.reservation import ResourceCollection
 
 
-def redirect_to(request, target):
+def redirect_to(request, target, path):
     if target == 'directories':
         return redirect(request.class_link(DirectoryCollection))
 
@@ -29,6 +29,9 @@ def redirect_to(request, target):
     if target == 'reservations':
         return redirect(request.class_link(ResourceCollection))
 
+    if target == 'path' and path:
+        return redirect(request.class_link(Organisation) + path.lstrip('/'))
+
 
 @OrgApp.html(model=Organisation, template='homepage.pt', permission=Public)
 def view_org(self, request):
@@ -37,7 +40,10 @@ def view_org(self, request):
     # the homepage can optionally be used as a jump-pad to redirect to
     # sub-part of the organisation -> this is useful if only one specific
     # module is used (e.g. only reservations)
-    redirect = redirect_to(request, request.app.org.redirect_homepage_to)
+    redirect = redirect_to(
+        request,
+        request.app.org.redirect_homepage_to,
+        request.app.org.redirect_path)
 
     if redirect:
         return redirect

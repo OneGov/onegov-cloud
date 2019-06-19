@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-06-13 10:51+0200\n"
+"POT-Creation-Date: 2019-06-19 16:53+0200\n"
 "PO-Revision-Date: 2019-02-18 06:40+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1049,6 +1049,9 @@ msgstr "La structure de la page d'accueil"
 msgid "Homepage redirect"
 msgstr "Redirection vers la page d'accueil"
 
+msgid "Path"
+msgstr "Chemin"
+
 msgid "Hide these fields for non-logged-in users"
 msgstr "Masquer ces champs pour les utilisateurs non connectés"
 
@@ -1076,6 +1079,9 @@ msgstr "Autres jours fériés"
 msgid "Preview"
 msgstr "Preview"
 
+msgid "Please enter a path without schema or host"
+msgstr "Veuillez entrer un chemin d'accès sans schéma ou hôte"
+
 msgid "German"
 msgstr "Allemand"
 
@@ -1096,6 +1102,9 @@ msgstr "Oui, aux publications"
 
 msgid "Yes, to reservations"
 msgstr "Oui, aux réservations"
+
+msgid "Yes, to a non-listed path"
+msgstr "Oui, vers un chemin non listé"
 
 msgid "Mapbox (Default)"
 msgstr "Mapbox (défaut)"

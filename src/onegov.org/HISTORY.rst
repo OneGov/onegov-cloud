@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to redirect the hompeage to custom paths.
+  [href]
+
 1.4.0 (2019-06-13)
 ~~~~~~~~~~~~~~~~~~~
 
