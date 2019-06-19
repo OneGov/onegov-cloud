@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.81.0 (2019-06-19)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds public and secret metadata to all OneGov instances.
   [href]
