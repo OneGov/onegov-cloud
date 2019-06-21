@@ -1498,7 +1498,7 @@ msgid "Logout"
 msgstr "Logout"
 
 msgid "Patrons"
-msgstr ""
+msgstr "Sponsors"
 
 msgid "Filter"
 msgstr "Filter"
