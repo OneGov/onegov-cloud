@@ -1,5 +1,6 @@
 from onegov.core.security import Private
 from onegov.core.security import Public
+from onegov.core.static import StaticFile
 from onegov.core.utils import normalize_for_url
 from onegov.file.integration import render_depot_file
 from onegov.form import Form
@@ -46,6 +47,7 @@ def view_vote(self, request):
         'bfs_map': bfs_map,
         'prev': prev,
         'next': next,
+        'map_preview': request.link(StaticFile('images/map-preview.png')),
     }
 
 

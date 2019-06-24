@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adjusts map button design.
+  [href]
+
 - Updates translations.
   [freinhard]
 

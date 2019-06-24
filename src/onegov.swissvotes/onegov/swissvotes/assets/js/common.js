@@ -147,11 +147,10 @@ $(document).ready(function() {
         var btn = $(this);
         var url = btn.attr('href');
 
-        var title = $('<strong></strong>').text(btn.data('title'));
         var map = $('<iframe />');
         map.attr('src', url);
 
-        var container = $('<div class="bfs-map" />').append(title, map);
+        var container = $('<div class="bfs-map" />').append(map);
         btn.replaceWith(container);
         e.preventDefault();
     });

@@ -292,11 +292,10 @@
                     </tr>
                     <tr tal:condition="bfs_map">
                         <td colspan="2">
+                            <div style="margin-bottom: .5rem;"><strong i18n:translate>Interactive map of the Swiss Federal Statistical Office</strong></div>
                             <a class="button secondary bfs-map" aria-role="button" i18n:translate
-                                href="${bfs_map}"
-                                data-title="Interactive map of the Swiss Federal Statistical Office"
-                                i18n:attributes="data-title">
-                                Interactive map of the Swiss Federal Statistical Office
+                                href="${bfs_map}">
+                                <span i18n:translate>Display the map</span>
                             </a>
                         </td>
                     </tr>

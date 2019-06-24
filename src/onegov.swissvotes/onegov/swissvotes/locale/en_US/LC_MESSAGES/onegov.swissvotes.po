@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2019-06-17 22:07+0200\n"
+"POT-Creation-Date: 2019-06-24 10:06+0200\n"
 "PO-Revision-Date: 2019-06-18 17:27+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -1451,6 +1451,9 @@ msgstr "Turnout"
 
 msgid "Interactive map of the Swiss Federal Statistical Office"
 msgstr "Interactive map by the Swiss Federal Statistical Office"
+
+msgid "Display the map"
+msgstr ""
 
 msgid "You are here"
 msgstr "You are here"
