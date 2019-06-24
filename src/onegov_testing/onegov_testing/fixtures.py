@@ -13,9 +13,9 @@ from _pytest.monkeypatch import MonkeyPatch
 from distutils.spawn import find_executable
 from fs.tempfs import TempFS
 from functools import lru_cache
+from http.client import HTTPConnection, HTTPException
 from mirakuru import HTTPExecutor as HTTPExecutorBase
 from mirakuru import TCPExecutor
-from mirakuru.compat import HTTPConnection, HTTPException
 from onegov.core.crypto import hash_password
 from onegov.core.orm import Base, SessionManager
 from onegov_testing.browser import ExtendedBrowser
