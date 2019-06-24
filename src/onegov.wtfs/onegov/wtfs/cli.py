@@ -1,8 +1,12 @@
 import click
+import sys
 
 from onegov.core.cli import abort
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
+from onegov.core.crypto import random_password
+from onegov.core.csv import CSVFile
+from onegov.user import UserCollection, UserGroupCollection
 from sqlalchemy import create_engine
 
 
@@ -57,3 +61,60 @@ def delete(group_context):
         click.echo("Instance was deleted successfully")
 
     return delete_instance
+
+
+@cli.command(name='import-users', context_settings={'singular': True})
+@click.option('--users', type=click.Path(exists=True), required=True)
+def import_users(users):
+    """ Imports the wtfs users for migration. For example:
+
+        onegov-twfs --select '/onegov_wtfs/wtfs' import-users --users users.csv
+
+    This should be done after importing the towns and other data.
+
+    """
+
+    roles = {
+        'Admin': 'admin',
+        'Gemeinde Admin': 'editor',
+        'Benutzer': 'member',
+    }
+
+    csv = CSVFile(open(users, 'rb'), expected_headers=(
+        'bfs',
+        'gemeindename',
+        'name',
+        'email',
+        'kontakt',
+        'rolle'
+    ))
+
+    def handle_import(request, app):
+        users = UserCollection(request.session)
+        groups = UserGroupCollection(request.session).query()
+        existing = {name for name, real in users.usernames}
+
+        missing = (r for r in csv if r.email not in existing)
+
+        for record in missing:
+            if record.gemeindename:
+                group = groups.filter_by(name=record.gemeindename).first()
+
+                if group is None:
+                    print(f"Unknown user group: '{record.gemeindename}'")
+                    print(f"Please use on of the following:")
+                    for g in sorted([g.name for g in groups]):
+                        print(f"- {g}")
+                    sys.exit(1)
+            else:
+                group = None
+
+            users.add(
+                username=record.email.strip(),
+                password=random_password(16),
+                role=roles[record.rolle.strip()],
+                realname=record.name.strip(),
+                group=group,
+                data={'contact': record.kontakt.strip() == 'j'})
+
+    return handle_import
