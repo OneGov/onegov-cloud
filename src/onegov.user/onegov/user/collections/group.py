@@ -12,10 +12,14 @@ class UserGroupCollection(GenericCollection):
 
     """
 
+    def __init__(self, session, type='*'):
+        self.session = session
+        self.type = type
+
     @property
     def model_class(self):
-        return UserGroup
+        return UserGroup.get_polymorphic_class(self.type, default=UserGroup)
 
     def query(self):
         query = super(UserGroupCollection, self).query()
-        return query.order_by(UserGroup.name)
+        return query.order_by(self.model_class.name)

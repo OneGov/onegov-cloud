@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds polymorphy support to the user groups collection.
+  [href]
+
 0.20.0 (2019-02-01)
 ~~~~~~~~~~~~~~~~~~~
 
