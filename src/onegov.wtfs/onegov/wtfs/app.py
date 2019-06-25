@@ -3,7 +3,6 @@ from onegov.core import Framework
 from onegov.core import utils
 from onegov.file import DepotApp
 from onegov.form import FormApp
-from onegov.wtfs.collections import MunicipalityCollection
 from onegov.wtfs.models import Principal
 from onegov.wtfs.models import PaymentType
 from onegov.wtfs.theme import WtfsTheme
@@ -23,32 +22,6 @@ class WtfsApp(Framework, FormApp, DepotApp):
 
     def add_initial_content(self):
         session = self.session()
-        municipalities = MunicipalityCollection(session)
-        for name, bfs_number in (
-            ('Adlikon', 21),
-            ('Aesch', 241),
-            ('Aeugst am Albis', 1),
-            ('Altikon', 211),
-            ('Andelfingen', 30),
-            ('Bachenbülach', 51),
-            ('Bachs', 81),
-            ('Bäretswil', 111),
-            ('Bauma', 171),
-            ('Benken', 22),
-            ('Berg am Irchel', 23),
-            ('Bertschikon', 212),
-            ('Birmensdorf', 242),
-            ('Bonstetten', 3),
-            ('Boppelsen', 82),
-            ('Brütten', 213),
-            ('Buch am Irchel', 24),
-            ('Dachsen', 25),
-            ('Dägerlen', 214)
-        ):
-            municipalities.add(
-                name=name,
-                bfs_number=bfs_number
-            )
         session.add(PaymentType(name='normal', _price_per_quantity=700))
         session.add(PaymentType(name='spezial', _price_per_quantity=850))
 

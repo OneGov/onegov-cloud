@@ -1,12 +1,15 @@
 import click
-import sys
 
+from cached_property import cached_property
+from io import BytesIO
 from onegov.core.cli import abort
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.core.crypto import random_password
-from onegov.core.csv import CSVFile
+from onegov.core.csv import CSVFile, convert_xls_to_csv
+from onegov.core.utils import Bunch
 from onegov.user import UserCollection, UserGroupCollection
+from pathlib import Path
 from sqlalchemy import create_engine
 
 
@@ -63,16 +66,10 @@ def delete(group_context):
     return delete_instance
 
 
-@cli.command(name='import-users', context_settings={'singular': True})
-@click.option('--users', type=click.Path(exists=True), required=True)
-def import_users(users):
-    """ Imports the wtfs users for migration. For example:
-
-        onegov-twfs --select '/onegov_wtfs/wtfs' import-users --users users.csv
-
-    This should be done after importing the towns and other data.
-
-    """
+@cli.command(name='import', context_settings={'singular': True})
+@click.option('--path', type=click.Path(exists=True), required=True)
+def import_users(path):
+    """ Imports the wtfs live data from the legacy system. """
 
     roles = {
         'Admin': 'admin',
@@ -80,41 +77,88 @@ def import_users(users):
         'Benutzer': 'member',
     }
 
-    csv = CSVFile(open(users, 'rb'), expected_headers=(
-        'bfs',
-        'gemeindename',
-        'name',
-        'email',
-        'kontakt',
-        'rolle'
-    ))
+    path = Path(path)
+
+    def slurp(file):
+        return BytesIO(file.read())
+
+    def as_csv(path):
+        if path.name.endswith('xlsx'):
+            adapt = convert_xls_to_csv
+        else:
+            adapt = slurp
+
+        with open(path, 'rb') as f:
+            return CSVFile(adapt(f))
+
+    def load_files(path):
+
+        prefix = 'tx_winscan_domain_model'
+
+        files = Bunch()
+        files.users = as_csv(path / 'users.xlsx')
+        files.bill = as_csv(path / f'{prefix}_bill.csv')
+        files.date = as_csv(path / f'{prefix}_date.csv')
+        files.paymenttype = as_csv(path / f'{prefix}_paymenttype.csv')
+        files.township = as_csv(path / f'{prefix}_township.csv')
+        files.transportorder = as_csv(path / f'{prefix}_transportorder.csv')
+        files.transporttype = as_csv(path / f'{prefix}_transporttype.csv')
+
+        return files
+
+    files = load_files(path)
+
+    class Context(object):
+
+        def __init__(self, session):
+            self.session = session
+
+        @cached_property
+        def users(self):
+            return UserCollection(self.session)
+
+        @cached_property
+        def groups(self):
+            return UserGroupCollection(self.session, type='wtfs')
+
+    def town_name(town):
+        name = town.name.rstrip(' 123456789')
+        name = f'{name} ({town.bfs_nr})'
+
+    def town_payment_type(town):
+        return town.payment_type == '1' and 'normal' or 'spezial'
 
     def handle_import(request, app):
-        users = UserCollection(request.session)
-        groups = UserGroupCollection(request.session).query()
-        existing = {name for name, real in users.usernames}
+        context = Context(request.session)
+        created = Bunch(towns={}, users=[])
 
-        missing = (r for r in csv if r.email not in existing)
+        print("* Importing towns")
+        for town in files.township:
 
-        for record in missing:
-            if record.gemeindename:
-                group = groups.filter_by(name=record.gemeindename).first()
+            if town.deleted == '1':
+                continue
 
-                if group is None:
-                    print(f"Unknown user group: '{record.gemeindename}'")
-                    print(f"Please use on of the following:")
-                    for g in sorted([g.name for g in groups]):
-                        print(f"- {g}")
-                    sys.exit(1)
-            else:
-                group = None
+            # towns double as user groups
+            group = context.groups.add(
+                name=town.name,
+                bfs_number=town.bfs_nr,
+                address_supplement=town.address_extension,
+                gpn_number=town.gp_nr,
+                payment_type=town_payment_type(town),
+                type='wtfs')
 
-            users.add(
-                username=record.email.strip(),
+            assert group.bfs_number not in created.towns
+            created.towns[group.bfs_number] = group
+
+        print("* Importing users")
+        for user in files.users:
+
+            created.users.append(context.users.add(
+                username=user.email,
                 password=random_password(16),
-                role=roles[record.rolle.strip()],
-                realname=record.name.strip(),
-                group=group,
-                data={'contact': record.kontakt.strip() == 'j'})
+                role=roles[user.rolle],
+                realname=user.name,
+                group=user.bfs and created.towns[user.bfs],
+                data={'contact': user.kontakt == 'j'}))
 
     return handle_import
