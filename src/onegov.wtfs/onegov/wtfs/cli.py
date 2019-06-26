@@ -211,13 +211,12 @@ def import_users(path):
             if record.township in deleted:
                 continue
 
+            if record.deleted == '1' or record.township == '0':
+                continue
+
             dt = parse_datetime(record.date).date()
 
             if dt < horizon:
-                continue
-
-            if record.township not in townids:
-                print(f"Skipping record #{record.rownumber}")
                 continue
 
             pickup_date = PickupDate(
@@ -236,7 +235,7 @@ def import_users(path):
             if return_date < horizon:
                 continue
 
-            if record.deleted == '1':
+            if record.deleted == '1' or record.township == '0':
                 continue
 
             if record.township in deleted:
