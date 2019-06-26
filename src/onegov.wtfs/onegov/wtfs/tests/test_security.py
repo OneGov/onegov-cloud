@@ -1,4 +1,6 @@
-from datetime import date
+import sedate
+
+from datetime import date, datetime
 from freezegun import freeze_time
 from morepath import Identity
 from onegov.core.security import Public
@@ -702,14 +704,16 @@ def test_editor_delete_day_before(wtfs_app, wtfs_password):
     bar_editor = fetch_user('bar-editor@example.org')
     bar_member = fetch_user('bar-member@example.org')
 
-    with freeze_time('2018-12-31 17:00:00 CET'):
+    dt = sedate.replace_timezone(datetime(2018, 12, 31), 'Europe/Zurich')
+
+    with freeze_time(dt.replace(hour=17, minute=0)):
         assert permits(admin, job, DeleteModel)
         assert permits(foo_editor, job, DeleteModel)
         assert not permits(foo_member, job, DeleteModel)
         assert not permits(bar_editor, job, DeleteModel)
         assert not permits(bar_member, job, DeleteModel)
 
-    with freeze_time('2018-12-31 17:01:00 CET'):
+    with freeze_time(dt.replace(hour=17, minute=1)):
         assert permits(admin, job, DeleteModel)
         assert not permits(foo_editor, job, DeleteModel)
         assert not permits(foo_member, job, DeleteModel)
