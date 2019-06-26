@@ -96,7 +96,7 @@ def import_users(path):
         prefix = 'tx_winscan_domain_model'
 
         files = Bunch()
-        files.users = as_csv(path / 'users.xlsx')
+        files.users = as_csv(path / 'User_Scanauftrag_neu.xlsx')
         files.bill = as_csv(path / f'{prefix}_bill.csv')
         files.date = as_csv(path / f'{prefix}_date.csv')
         files.paymenttype = as_csv(path / f'{prefix}_paymenttype.csv')
