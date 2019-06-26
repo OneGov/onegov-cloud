@@ -36,67 +36,73 @@
     <link rel="stylesheet" type="text/css" href="${request.theme_link}">
 </head>
 <body>
-    <header>
-        <div class="auth">
-            <div class="row">
-                <div class="columns small-12">
-                    <a class="login pull-right" tal:condition="layout.login_url" href="${layout.login_url}" i18n:translate>Login</a>
-                    <a class="logout pull-right" tal:condition="layout.logout_url" href="${layout.logout_url}" i18n:translate>Logout</a>
-                </div>
-            </div>
-        </div>
 
-        <div class="title">
-            <div class="row">
-                <div class="columns small-12 small-only-text-center">
-                    <a href="${layout.homepage_url}"><img src="${layout.static_path}/images/logo.svg" height="100" alt="Stadt Winterthur"></a>
-                    <div class="clearfix"></div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="columns small-12">
-                <div metal:use-macro="layout.macros['top_navigation']"></div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="columns small-12">
-                <div metal:use-macro="layout.macros['editbar']"></div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="columns small-12">
-                <div metal:use-macro="layout.macros['breadcrumbs']"></div>
-            </div>
-        </div>
-    </header>
+    <div class="ie-11-wrapper">
+        <main>
 
-    <main class="row">
-        <div class="columns small-12">
-            <div class="row">
-                <div class="small-12 columns" id="alert-boxes">
-                    <div tal:repeat="message request.consume_messages()" data-alert class="alert-box ${message.type}">
-                        <tal:block tal:content="structure message.text" />
-                        <a href="#" class="close">&times;</a>
+            <header>
+                <div class="auth">
+                    <div class="row">
+                        <div class="columns small-12">
+                            <a class="login pull-right" tal:condition="layout.login_url" href="${layout.login_url}" i18n:translate>Login</a>
+                            <a class="logout pull-right" tal:condition="layout.logout_url" href="${layout.logout_url}" i18n:translate>Logout</a>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="columns small-12">
-                    <div metal:define-slot="content"></div>
-                </div>
-            </div>
-        </div>
-    </main>
 
-    <footer>
-        <div class="row">
-            <div class="small-12 text-center">
-                <a href="https://www.onegovcloud.ch">OneGov Cloud</a>
-                by
-                <a href="https://www.seantis.ch">Seantis GmbH</a>
-            </div>
-        </div>
-    </footer>
+                <div class="title">
+                    <div class="row">
+                        <div class="columns small-12 small-only-text-center">
+                            <a href="${layout.homepage_url}"><img src="${layout.static_path}/images/logo.svg" height="100" alt="Stadt Winterthur"></a>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="columns small-12">
+                        <div metal:use-macro="layout.macros['top_navigation']"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="columns small-12">
+                        <div metal:use-macro="layout.macros['editbar']"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="columns small-12">
+                        <div metal:use-macro="layout.macros['breadcrumbs']"></div>
+                    </div>
+                </div>
+            </header>
+
+            <article class="row">
+                <div class="columns small-12">
+                    <div class="row">
+                        <div class="small-12 columns" id="alert-boxes">
+                            <div tal:repeat="message request.consume_messages()" data-alert class="alert-box ${message.type}">
+                                <tal:block tal:content="structure message.text" />
+                                <a href="#" class="close">&times;</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="columns small-12">
+                            <div metal:define-slot="content"></div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <footer>
+                <div class="row">
+                    <div class="small-12 text-center">
+                        <a href="https://www.onegovcloud.ch">OneGov Cloud</a>
+                        by
+                        <a href="https://www.seantis.ch">Seantis GmbH</a>
+                    </div>
+                </div>
+            </footer>
+        </main>
+    </div>
 </body>
 </html>

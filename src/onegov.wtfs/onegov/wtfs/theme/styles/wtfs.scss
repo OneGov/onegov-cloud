@@ -65,6 +65,69 @@ h2 small {
     line-height: 1.25;
 }
 
+/*
+    Improve main navigation
+*/
+
+header .main-navigation {
+    margin: 0;
+
+    .top-bar ul li a {
+        padding: 0 .75rem !important;
+
+        &:hover {
+            background: $primary-color !important;
+        }
+    }
+}
+
+/*
+    Our footer is kept at the bottom without being "sticky", thanks to this
+    approach: https://dev.to/domysee/keeping-the-footer-at-the-bottom-with-css-flexbox-5h5f
+*/
+html,
+body {
+    height: 100%;
+    width: 100%;
+}
+
+footer {
+    margin-top: .5rem;
+    padding: .5rem 0;
+}
+
+.ie-11-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 100%;
+}
+
+main {
+    align-items: stretch;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+article {
+    background: $white;
+    flex-grow: 1;
+}
+
+header,
+article,
+footer {
+    flex-shrink: 0;
+}
+
+.auth {
+    .logout,
+    .login {
+        font-size: .875rem;
+    }
+}
+
 .delivery-note {
     table {
         border-collapse: collapse;
