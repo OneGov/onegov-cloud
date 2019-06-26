@@ -11,7 +11,7 @@ from onegov.core.crypto import hash_password, random_password
 from onegov.core.csv import CSVFile, convert_xls_to_csv
 from onegov.core.utils import Bunch
 from onegov.user import User, UserGroupCollection
-from onegov.wtfs.models import PickupDate
+from onegov.wtfs.models import PickupDate, ScanJob
 from pathlib import Path
 from sqlalchemy import create_engine
 
@@ -88,12 +88,26 @@ def import_users(path):
         'Benutzer': 'member',
     }
 
+    types = {
+        '1': 'normal',
+        '2': 'express',
+    }
+
     path = Path(path)
 
+    def fix(string):
+        # one of the CSV files has a line that seems to elude our parser,
+        # so we just fix it up
+        return string.replace(
+            b'""violett; Def. an Scan-Center""',
+            b"'violett; Def. an Scan-Center'"
+        )
+
     def slurp(file):
-        return BytesIO(file.read())
+        return BytesIO(fix(file.read()))
 
     def as_csv(path):
+
         if path.name.endswith('xlsx'):
             adapt = convert_xls_to_csv
         else:
@@ -144,7 +158,7 @@ def import_users(path):
 
     def handle_import(request, app):
         context = Context(request.session)
-        created = Bunch(towns={}, users=[], dates=[])
+        created = Bunch(towns={}, users=[], dates=[], jobs=[])
         townids = {}
         horizon = date.today().replace(day=1)
 
@@ -189,9 +203,6 @@ def import_users(path):
 
         for record in files.date:
 
-            if record.township not in townids:
-                continue
-
             dt = parse_datetime(record.date).date()
 
             if dt < horizon:
@@ -205,5 +216,28 @@ def import_users(path):
             created.dates.append(pickup_date)
 
         print(f"✓ Imported {len(created.dates)} dates")
+
+        for record in files.transportorder:
+            dispatch_date = parse_datetime(record.distribution_date).date()
+            return_date = parse_datetime(record.return_date).date()
+
+            if return_date < horizon:
+                continue
+
+            if record.township not in townids:
+                import pdb; pdb.set_trace()
+
+            job = ScanJob(
+                municipality_id=created.towns[townids[record.township]].id,
+                type=types[record.transport_type],
+                delivery_number=record.delivery_bill_number,
+                dispatch_date=dispatch_date,
+                return_date=return_date
+            )
+
+            context.session.add(job)
+            created.jobs.append(job)
+
+        print(f"✓ Imported {len(created.jobs)} jobs")
 
     return handle_import
