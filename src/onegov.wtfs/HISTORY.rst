@@ -1,7 +1,10 @@
 Changelog
 ---------
 
-- Adds user import script.
+- Gives town admins the ability to delete jobs up to 17:00 the day before.
+  [href] 
+
+- Adds live-data import script.
   [href]
 
 1.3.2 (2019-06-18)

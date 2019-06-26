@@ -1,3 +1,6 @@
+import sedate
+
+from datetime import datetime, timedelta
 from onegov.core.security import Public
 from onegov.user import User
 from onegov.user import UserCollection
@@ -138,9 +141,24 @@ def has_permission_scan_job(app, identity, model, permission):
     # the same group
     if identity.role in ('editor', 'member'):
         if identity.groupid:
+
             if permission in {ViewModel, EditModel}:
                 if same_group(model, identity):
                     return True
+
+            if permission is DeleteModel and identity.role == 'editor':
+                if same_group(model, identity):
+                    dt = model.dispatch_date
+
+                    # editors of the same group may delete scan jobs up until
+                    # 17:00 on the day before the dispatch
+                    horizon = datetime(dt.year, dt.month, dt.day, 17)
+                    horizon -= timedelta(days=1)
+                    horizon = sedate.replace_timezone(horizon, 'Europe/Zurich')
+
+                    now = sedate.utcnow()
+
+                    return now <= horizon
 
     return permission in getattr(app.settings.roles, identity.role)
 

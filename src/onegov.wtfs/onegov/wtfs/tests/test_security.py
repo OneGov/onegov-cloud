@@ -1,4 +1,5 @@
 from datetime import date
+from freezegun import freeze_time
 from morepath import Identity
 from onegov.core.security import Public
 from onegov.user import User
@@ -32,8 +33,24 @@ from onegov.wtfs.security import ViewModelUnrestricted
 from uuid import uuid4
 
 
+def permits_by_app(app, user, model, permission):
+    return app._permits(
+        Identity(
+            userid=user.username,
+            groupid=user.group_id.hex if user.group_id else '',
+            role=user.role,
+            application_id=app.application_id
+        ),
+        model,
+        permission
+    )
+
+
 def test_permissions(wtfs_app, wtfs_password):
     session = wtfs_app.session()
+
+    def permits(user, model, permission):
+        return permits_by_app(wtfs_app, user, model, permission)
 
     # Remove existing users and group
     session.query(User).filter_by(realname='Editor').one().group_id = None
@@ -124,18 +141,6 @@ def test_permissions(wtfs_app, wtfs_password):
     municipality_a = query(Municipality).filter_by(name='Municipality A').one()
     municipality_b = query(Municipality).filter_by(name='Municipality B').one()
     scan_job = query(ScanJob).one()
-
-    def permits(user, model, permission):
-        return wtfs_app._permits(
-            Identity(
-                userid=user.username,
-                groupid=user.group_id.hex if user.group_id else '',
-                role=user.role,
-                application_id=wtfs_app.application_id
-            ),
-            model,
-            permission
-        )
 
     # General
     model = object()
@@ -600,3 +605,113 @@ def test_permissions(wtfs_app, wtfs_password):
         assert not permits(user, model, DeleteModel)
         assert permits(user, model, ViewModel)
         assert not permits(user, model, ViewModelUnrestricted)
+
+
+def test_editor_delete_day_before(wtfs_app, wtfs_password):
+    session = wtfs_app.session()
+
+    def permits(user, model, permission):
+        return permits_by_app(wtfs_app, user, model, permission)
+
+    # Remove existing users and group
+    session.query(User).delete()
+    session.query(Municipality).delete()
+
+    # Add two towns
+    foo = uuid4()
+
+    session.add(Municipality(
+        id=foo,
+        name='Foo',
+        bfs_number=1,
+    ))
+    session.add(PickupDate(
+        date=date.today(),
+        municipality_id=foo,
+    ))
+
+    bar = uuid4()
+
+    session.add(Municipality(
+        id=bar,
+        name='Bar',
+        bfs_number=1,
+    ))
+    session.add(PickupDate(
+        date=date.today(),
+        municipality_id=bar,
+    ))
+
+    # add a single scan job to foo
+    session.add(ScanJob(
+        type='normal',
+        municipality_id=foo,
+        delivery_number=1,
+        dispatch_date=date(2019, 1, 1))
+    )
+
+    # an admin with access to all of it
+    session.add(User(
+        username='admin@example.org',
+        password_hash=wtfs_password,
+        role='admin'
+    ))
+
+    # an editor with access to foo
+    session.add(User(
+        username='foo-editor@example.org',
+        password_hash=wtfs_password,
+        role='editor',
+        group_id=foo
+    ))
+
+    # a member with access to foo
+    session.add(User(
+        username='foo-member@example.org',
+        password_hash=wtfs_password,
+        role='member',
+        group_id=foo
+    ))
+
+    # an editor with access to bar
+    session.add(User(
+        username='bar-editor@example.org',
+        password_hash=wtfs_password,
+        role='editor',
+        group_id=bar
+    ))
+
+    # a member with access to bar
+    session.add(User(
+        username='bar-member@example.org',
+        password_hash=wtfs_password,
+        role='member',
+        group_id=bar
+    ))
+
+    session.flush()
+
+    def fetch_user(username):
+        return session.query(User).filter_by(username=username).one()
+
+    job = session.query(ScanJob).one()
+
+    admin = fetch_user('admin@example.org')
+    foo_editor = fetch_user('foo-editor@example.org')
+    foo_member = fetch_user('foo-member@example.org')
+    bar_editor = fetch_user('bar-editor@example.org')
+    bar_member = fetch_user('bar-member@example.org')
+
+    with freeze_time('2018-12-31 17:00:00 CET'):
+        assert permits(admin, job, DeleteModel)
+        assert permits(foo_editor, job, DeleteModel)
+        assert not permits(foo_member, job, DeleteModel)
+        assert not permits(bar_editor, job, DeleteModel)
+        assert not permits(bar_member, job, DeleteModel)
+
+    with freeze_time('2018-12-31 17:01:00 CET'):
+        assert permits(admin, job, DeleteModel)
+        assert not permits(foo_editor, job, DeleteModel)
+        assert not permits(foo_member, job, DeleteModel)
+        assert not permits(bar_editor, job, DeleteModel)
+        assert not permits(bar_member, job, DeleteModel)
