@@ -69,14 +69,28 @@ h2 small {
     Improve main navigation
 */
 
-header .main-navigation {
-    margin: 0;
+@media #{$medium-up} {
+    header .main-navigation {
+        margin: 0;
 
-    .top-bar ul li a {
-        padding: 0 .75rem !important;
+        .top-bar-section ul {
+            display: flex;
+            flex-wrap: wrap;
+            width: 100%;
 
-        &:hover {
-            background: $primary-color !important;
+            li {
+                flex: 1 1 auto;
+                text-align: center;
+                float: none !important;
+
+                a {
+                    padding: 0 .5rem !important;
+                    white-space: nowrap;
+                    &:hover {
+                        background: $primary-color !important;
+                    }
+                }
+            }
         }
     }
 }
