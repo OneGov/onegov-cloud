@@ -1,14 +1,17 @@
 import click
+import sedate
 
 from cached_property import cached_property
+from datetime import datetime, date
 from io import BytesIO
 from onegov.core.cli import abort
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
-from onegov.core.crypto import random_password
+from onegov.core.crypto import hash_password, random_password
 from onegov.core.csv import CSVFile, convert_xls_to_csv
 from onegov.core.utils import Bunch
-from onegov.user import UserCollection, UserGroupCollection
+from onegov.user import User, UserGroupCollection
+from onegov.wtfs.models import PickupDate
 from pathlib import Path
 from sqlalchemy import create_engine
 
@@ -71,6 +74,14 @@ def delete(group_context):
 def import_users(path):
     """ Imports the wtfs live data from the legacy system. """
 
+    # we use a single random password for all accounts, which is known to
+    # nobody (users are meant to request a new password after import)
+    #
+    # this speeds up the user import by an order of magnitude
+    #
+    # don't blindly copy this!
+    password_hash = hash_password(random_password(128))
+
     roles = {
         'Admin': 'admin',
         'Gemeinde Admin': 'editor',
@@ -114,10 +125,6 @@ def import_users(path):
             self.session = session
 
         @cached_property
-        def users(self):
-            return UserCollection(self.session)
-
-        @cached_property
         def groups(self):
             return UserGroupCollection(self.session, type='wtfs')
 
@@ -128,37 +135,75 @@ def import_users(path):
     def town_payment_type(town):
         return town.payment_type == '1' and 'normal' or 'spezial'
 
+    def parse_datetime(dt):
+        d = datetime.utcfromtimestamp(int(dt))
+        d = sedate.replace_timezone(d, 'UTC')
+        d = sedate.to_timezone(d, 'Europe/Zurich')
+
+        return d
+
     def handle_import(request, app):
         context = Context(request.session)
-        created = Bunch(towns={}, users=[])
+        created = Bunch(towns={}, users=[], dates=[])
+        townids = {}
+        horizon = date.today().replace(day=1)
 
-        print("* Importing towns")
-        for town in files.township:
+        for record in files.township:
 
-            if town.deleted == '1':
+            if record.deleted == '1':
                 continue
 
             # towns double as user groups
             group = context.groups.add(
-                name=town.name,
-                bfs_number=town.bfs_nr,
-                address_supplement=town.address_extension,
-                gpn_number=town.gp_nr,
-                payment_type=town_payment_type(town),
+                name=record.name,
+                bfs_number=record.bfs_nr,
+                address_supplement=record.address_extension,
+                gpn_number=record.gp_nr,
+                payment_type=town_payment_type(record),
                 type='wtfs')
+
+            townids[record.uid] = record.bfs_nr
 
             assert group.bfs_number not in created.towns
             created.towns[group.bfs_number] = group
 
-        print("* Importing users")
-        for user in files.users:
+        print(f"✓ Imported {len(created.towns)} towns")
 
-            created.users.append(context.users.add(
-                username=user.email,
-                password=random_password(16),
-                role=roles[user.rolle],
-                realname=user.name,
-                group=user.bfs and created.towns[user.bfs],
-                data={'contact': user.kontakt == 'j'}))
+        for record in files.users:
+
+            user = User(
+                username=record.email,
+                role=roles[record.rolle],
+                realname=record.name,
+                active=True,
+                second_factor=None,
+                signup_token=None,
+                password_hash=password_hash,
+                group_id=record.bfs and created.towns[record.bfs].id or None,
+                data={'contact': record.kontakt == 'j'})
+
+            context.session.add(user)
+            created.users.append(user)
+
+        print(f"✓ Imported {len(created.users)} users")
+
+        for record in files.date:
+
+            if record.township not in townids:
+                continue
+
+            dt = parse_datetime(record.date).date()
+
+            if dt < horizon:
+                continue
+
+            pickup_date = PickupDate(
+                date=dt,
+                municipality_id=created.towns[townids[record.township]].id)
+
+            context.session.add(pickup_date)
+            created.dates.append(pickup_date)
+
+        print(f"✓ Imported {len(created.dates)} dates")
 
     return handle_import
