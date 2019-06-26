@@ -160,11 +160,16 @@ def import_users(path):
         context = Context(request.session)
         created = Bunch(towns={}, users=[], dates=[], jobs=[])
         townids = {}
-        horizon = date.today().replace(day=1)
+        deleted = set()
+
+        # include all data for this and the previous year
+        horizon = date.today().replace(day=1, month=1)
+        horizon = horizon.replace(year=horizon.year - 1)
 
         for record in files.township:
 
             if record.deleted == '1':
+                deleted.add(record.uid)
                 continue
 
             # towns double as user groups
@@ -172,7 +177,7 @@ def import_users(path):
                 name=record.name,
                 bfs_number=record.bfs_nr,
                 address_supplement=record.address_extension,
-                gpn_number=record.gp_nr,
+                gpn_number=record.gp_nr.isdigit() and int(record.gp_nr),
                 payment_type=town_payment_type(record),
                 type='wtfs')
 
@@ -203,9 +208,16 @@ def import_users(path):
 
         for record in files.date:
 
+            if record.township in deleted:
+                continue
+
             dt = parse_datetime(record.date).date()
 
             if dt < horizon:
+                continue
+
+            if record.township not in townids:
+                print(f"Skipping record #{record.rownumber}")
                 continue
 
             pickup_date = PickupDate(
@@ -224,15 +236,54 @@ def import_users(path):
             if return_date < horizon:
                 continue
 
-            if record.township not in townids:
-                import pdb; pdb.set_trace()
+            if record.deleted == '1':
+                continue
+
+            if record.township in deleted:
+                continue
 
             job = ScanJob(
                 municipality_id=created.towns[townids[record.township]].id,
                 type=types[record.transport_type],
                 delivery_number=record.delivery_bill_number,
+
+                # dispatch (out)
                 dispatch_date=dispatch_date,
-                return_date=return_date
+                dispatch_note=record.comment_delivery,
+                dispatch_boxes=int(record.box_out),
+                dispatch_tax_forms_current_year=int(
+                    record.tax_current_year_out),
+                dispatch_tax_forms_last_year=int(
+                    record.tax_last_year_out),
+                dispatch_tax_forms_older=int(
+                    record.tax_old_out),
+                dispatch_single_documents=int(
+                    record.single_voucher_out),
+                dispatch_cantonal_tax_office=int(
+                    record.ribbon_out),
+                dispatch_cantonal_scan_center=int(
+                    record.cantonal_scan_center),
+
+                # return (in)
+                return_date=return_date,
+                return_note=record.comment_handover,
+                return_boxes=record.box_out,
+                return_tax_forms_current_year=int(
+                    record.tax_current_year_in),
+                return_tax_forms_last_year=int(
+                    record.tax_last_year_in),
+                return_tax_forms_older=int(
+                    record.tax_old_in),
+                return_single_documents=int(
+                    record.single_voucher_in),
+                return_unscanned_tax_forms_current_year=int(
+                    record.not_scanned_current_year),
+                return_unscanned_tax_forms_last_year=int(
+                    record.not_scanned_last_year),
+                return_unscanned_tax_forms_older=int(
+                    record.not_scanned_old),
+                return_unscanned_single_documents=int(
+                    record.not_scanned_voucher)
             )
 
             context.session.add(job)
