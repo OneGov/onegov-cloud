@@ -3,7 +3,6 @@ import port_for
 import pytest
 import shlex
 import shutil
-import socket
 import subprocess
 import tempfile
 import transaction
@@ -13,9 +12,7 @@ from _pytest.monkeypatch import MonkeyPatch
 from distutils.spawn import find_executable
 from fs.tempfs import TempFS
 from functools import lru_cache
-from http.client import HTTPConnection, HTTPException
-from mirakuru import HTTPExecutor as HTTPExecutorBase
-from mirakuru import TCPExecutor
+from mirakuru import HTTPExecutor, TCPExecutor
 from onegov.core.crypto import hash_password
 from onegov.core.orm import Base, SessionManager
 from onegov_testing.browser import ExtendedBrowser
@@ -39,35 +36,6 @@ except ImportError:
 
 redis_path = find_executable('redis-server')
 redis_server = factories.redis_proc(host='127.0.0.1', executable=redis_path)
-
-
-class HTTPExecutor(HTTPExecutorBase):
-
-    # Ipmlements https://github.com/ClearcodeHQ/mirakuru/issues/181
-    def __init__(self, *args, **kwargs):
-        self.method = kwargs.pop('method', 'HEAD')
-        super().__init__(*args, **kwargs)
-
-    def after_start_check(self):
-        """Check if defined URL returns expected status to a HEAD request."""
-        try:
-            conn = HTTPConnection(self.host, self.port)
-
-            conn.request(self.method, self.url.path)
-            status = str(conn.getresponse().status)
-
-            if status == self.status or self.status_re.match(status):
-                conn.close()
-                return True
-
-        except (HTTPException, socket.timeout, socket.error):
-            return False
-
-    def __del__(self):
-        try:
-            super().__del__()
-        except Exception:
-            pass
 
 
 @pytest.fixture(scope='session')
