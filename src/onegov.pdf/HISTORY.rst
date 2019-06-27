@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.5.3 (2019-06-27)
+~~~~~~~~~~~~~~~~~~~~~
 
 - Fixes error with latest svglib release.
   [href]
