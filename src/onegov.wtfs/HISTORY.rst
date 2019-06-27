@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.4.0 (2019-06-27)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes boxes report not being limited to normal delivery.
   [href]
