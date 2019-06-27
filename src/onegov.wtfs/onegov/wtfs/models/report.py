@@ -128,7 +128,7 @@ class ReportBoxes(Report):
     jobs. """
 
     def __init__(self, session, start=None, end=None):
-        super().__init__(session, start, end, ['normal'])
+        super().__init__(session, start, end, 'normal')
 
     @cached_property
     def columns_dispatch(self):

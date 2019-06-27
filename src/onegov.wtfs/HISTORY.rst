@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes boxes report not being limited to normal delivery.
+  [href]
+
 - Gives town admins the ability to delete jobs up to 17:00 the day before.
   [href] 
 
