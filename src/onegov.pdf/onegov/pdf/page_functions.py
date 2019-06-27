@@ -95,7 +95,7 @@ def page_fn_header_logo(canvas, doc):
     if doc.logo:
         parser = etree.XMLParser(remove_comments=True, recover=True)
         svg = etree.fromstring(doc.logo.encode('utf-8'), parser=parser)
-        drawing = SvgRenderer().render(svg)
+        drawing = SvgRenderer(path=None).render(svg)
         renderPDF.draw(
             drawing,
             canvas,
