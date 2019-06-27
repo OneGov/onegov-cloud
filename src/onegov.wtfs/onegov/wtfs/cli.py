@@ -2,7 +2,7 @@ import click
 import sedate
 
 from cached_property import cached_property
-from datetime import datetime, date
+from datetime import datetime
 from io import BytesIO
 from onegov.core.cli import abort
 from onegov.core.cli import command_group
@@ -162,10 +162,6 @@ def import_users(path):
         townids = {}
         deleted = set()
 
-        # include all data for this and the previous year
-        horizon = date.today().replace(day=1, month=1)
-        horizon = horizon.replace(year=horizon.year - 1)
-
         for record in files.township:
 
             if record.deleted == '1':
@@ -216,9 +212,6 @@ def import_users(path):
 
             dt = parse_datetime(record.date).date()
 
-            if dt < horizon:
-                continue
-
             pickup_date = PickupDate(
                 date=dt,
                 municipality_id=created.towns[townids[record.township]].id)
@@ -232,9 +225,6 @@ def import_users(path):
             dispatch_date = parse_datetime(record.distribution_date).date()
             return_date = parse_datetime(record.return_date).date()
 
-            if return_date < horizon:
-                continue
-
             if record.deleted == '1' or record.township == '0':
                 continue
 
@@ -246,35 +236,37 @@ def import_users(path):
                 type=types[record.transport_type],
                 delivery_number=record.delivery_bill_number,
 
-                # dispatch (out)
+                # dispatch (in)
                 dispatch_date=dispatch_date,
                 dispatch_note=record.comment_delivery,
-                dispatch_boxes=int(record.box_out),
+                dispatch_boxes=int(record.box_in),
                 dispatch_tax_forms_current_year=int(
-                    record.tax_current_year_out),
+                    record.tax_current_year_in),
                 dispatch_tax_forms_last_year=int(
-                    record.tax_last_year_out),
+                    record.tax_last_year_in),
                 dispatch_tax_forms_older=int(
-                    record.tax_old_out),
+                    record.tax_old_in),
                 dispatch_single_documents=int(
-                    record.single_voucher_out),
+                    record.single_voucher_in),
+
+                # targets (ribbon stands for "Bändliweg" I think)
                 dispatch_cantonal_tax_office=int(
                     record.ribbon_out),
                 dispatch_cantonal_scan_center=int(
                     record.cantonal_scan_center),
 
-                # return (in)
+                # return (out)
                 return_date=return_date,
                 return_note=record.comment_handover,
                 return_boxes=record.box_out,
                 return_tax_forms_current_year=int(
-                    record.tax_current_year_in),
+                    record.tax_current_year_out),
                 return_tax_forms_last_year=int(
-                    record.tax_last_year_in),
+                    record.tax_last_year_out),
                 return_tax_forms_older=int(
-                    record.tax_old_in),
+                    record.tax_old_out),
                 return_single_documents=int(
-                    record.single_voucher_in),
+                    record.single_voucher_out),
                 return_unscanned_tax_forms_current_year=int(
                     record.not_scanned_current_year),
                 return_unscanned_tax_forms_last_year=int(
