@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.7.0 (2019-06-28)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Adds a daycare calculator.
   [href]
 
