@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.4.2 (2019-06-28)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to provide an alt-text to toggles.
   [href]
 
