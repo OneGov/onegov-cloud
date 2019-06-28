@@ -72,6 +72,19 @@ class RoadworkLayout(DefaultLayout):
         ]
 
 
+class DaycareSubsidyCalculatorLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return (
+            Link(_("Homepage"), self.homepage_url),
+            Link(
+                _("Daycare Subsidy Calculator"),
+                self.request.link(self.model)
+            )
+        )
+
+
 class MissionReportLayout(DefaultLayout):
 
     def __init__(self, model, request, *suffixes):

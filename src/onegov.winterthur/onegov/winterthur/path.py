@@ -5,6 +5,7 @@ from onegov.winterthur.collections import AddressSubsetCollection
 from onegov.winterthur.collections import MissionReportCollection
 from onegov.winterthur.collections import MissionReportFileCollection
 from onegov.winterthur.collections import MissionReportVehicleCollection
+from onegov.winterthur.daycare import DaycareSubsidyCalculator
 from onegov.winterthur.models import MissionReport
 from onegov.winterthur.models import MissionReportVehicle
 from onegov.winterthur.roadwork import RoadworkCollection, Roadwork
@@ -85,3 +86,10 @@ def get_mission_report_files(request, id):
     converters=dict(id=UUID))
 def get_mission_report_vehicle(request, id):
     return get_mission_report_vehicles(request).by_id(id)
+
+
+@WinterthurApp.path(
+    model=DaycareSubsidyCalculator,
+    path='/daycare-subsidy-calculator')
+def get_daycare_subsidy_calculator(request):
+    return DaycareSubsidyCalculator(request.session)
