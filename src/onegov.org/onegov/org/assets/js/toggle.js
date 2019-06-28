@@ -28,6 +28,12 @@
         <div data-toggle="#details" class="toggled">Show Details</div>
         <div id="#details"></div>
 
+    You can have an alternative text in the toggled/untoggled state by
+    providing an alt text. The alt text is used if the button changes from
+    the initial state to the next:
+
+        <div data-toggle="#details" data-alt-text="Hide">Show</div>
+        <div id="#details"></div>
 */
 
 var isToggled = function(target) {
@@ -42,6 +48,21 @@ var ensureToggled = function(button, target, toggled) {
     } else {
         button.attr('aria-pressed', 'false');
     }
+
+    if (typeof button.attr('data-toggle-initialised') !== 'undefined') {
+        if (typeof button.attr('data-original-text') !== 'undefined') {
+            button.attr('data-alt-text', button.text());
+            button.text(button.attr('data-original-text'));
+            button.removeAttr('data-original-text');
+        }
+        else if (typeof button.attr('data-alt-text') !== 'undefined') {
+            button.attr('data-original-text', button.text());
+            button.text(button.attr('data-alt-text'));
+            button.removeAttr('data-alt-text');
+        }
+    }
+
+    button.attr('data-toggle-initialised', true);
 
     if (target.is(':visible') !== toggled) {
         if (toggled) {
