@@ -1,11 +1,9 @@
 import os.path
 
-from datetime import datetime
 from dectate import Action, Query
 from inspect import isclass
 from morepath.directive import HtmlAction
 from onegov.core.utils import Bunch
-from sedate import to_timezone, replace_timezone
 
 
 class HtmlHandleFormAction(HtmlAction):
@@ -128,39 +126,28 @@ class CronjobAction(Action):
         'cronjob_registry': Bunch
     }
 
-    def __init__(self, hour, minute, timezone):
+    counter = iter(range(1, 123456789))
+
+    def __init__(self, hour, minute, timezone, once=False):
         self.hour = hour
         self.minute = minute
         self.timezone = timezone
-
-    def identifier_by_hour_and_minute(self, hour, minute):
-        return to_timezone(
-            replace_timezone(
-                datetime(2016, 1, 1, hour, minute),
-                self.timezone
-            ), 'UTC'
-        )
+        self.name = next(self.counter)
+        self.once = once
 
     def identifier(self, **kw):
-        # return a key to the hour/minute on a fixed day, this way it's
-        # impossible to have two cronjobs running at the exact same time.
-        hour = 0 if self.hour == '*' else self.hour
-        return self.identifier_by_hour_and_minute(hour, self.minute)
-
-    def discriminators(self, **kw):
-        if self.hour != '*':
-            return ()
-
-        return tuple(
-            self.identifier_by_hour_and_minute(hour, self.minute)
-            for hour in range(0, 24) if hour != 0  # already in identifier
-        )
+        return self.name
 
     def perform(self, func, cronjob_registry):
         from onegov.core.cronjobs import register_cronjob
 
         register_cronjob(
-            cronjob_registry, func, self.hour, self.minute, self.timezone)
+            registry=cronjob_registry,
+            function=func,
+            hour=self.hour,
+            minute=self.minute,
+            timezone=self.timezone,
+            once=self.once)
 
 
 class StaticDirectoryAction(Action):

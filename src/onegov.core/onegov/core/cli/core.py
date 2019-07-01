@@ -186,7 +186,6 @@ is not executed.
 
 import click
 import inspect
-import sentry_sdk
 import sys
 
 from fnmatch import fnmatch
@@ -543,17 +542,6 @@ def command_group():
                 def configure_debug(self, **cfg):
                     # disable debug options in cli (like query output)
                     pass
-
-                def configure_sentry(self, **cfg):
-                    sentry_dsn = cfg.get('sentry_dsn')
-                    sentry_version = cfg.get('sentry_version')
-                    sentry_environment = cfg.get('sentry_environment')
-                    if sentry_dsn and sentry_version and sentry_environment:
-                        sentry_sdk.init(
-                            dsn=sentry_dsn,
-                            release=sentry_version,
-                            environment=sentry_environment,
-                        )
 
             @CliApplication.path(path=view_path)
             class Model(object):

@@ -54,6 +54,10 @@ from translationstring import Translator
 # will fail to deal with our langauges correctly if they differ in case
 VALID_LANGUAGE_EXPRESSION = re.compile(r'^[a-z]{2}(_[A-Z]{2})?$')
 
+# to keep the log output short
+POFILE_PATH_EXPRESSION = re.compile(
+    r'.*/(?P<locale>[a-zA-Z_]+)/LC_MESSAGES/(?P<module>[a-zA-Z_\.]+)')
+
 
 @Framework.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs():
@@ -130,7 +134,12 @@ def pofiles(localedir):
 
 @lru_cache(maxsize=32)
 def compile_translation(pofile_path):
-    log.info("Compiling pofile {}".format(pofile_path))
+    po = POFILE_PATH_EXPRESSION.match(pofile_path)
+
+    locale = po.group('locale').lower()
+    module = po.group('module').lower()
+
+    log.info(f"Compiling locale {locale} for {module}")
 
     mofile = BytesIO()
     mofile.write(polib.pofile(pofile_path).to_binary())

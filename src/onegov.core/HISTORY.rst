@@ -1,5 +1,14 @@
 Changelog
 ---------
+
+- Rewrites parts of the cronjobs system.
+
+  The cronjobs system now supports running every minute (not just every 5) and
+  it is possible to have overlapping cronjobs (though not encouraged).
+
+  Errors inside the cronjob-threads are now also reported using Sentry.
+  [href]
+
 0.81.0 (2019-06-19)
 ~~~~~~~~~~~~~~~~~~~
 

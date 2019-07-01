@@ -50,7 +50,7 @@ def test_raw_task_requirement():
     with pytest.raises(AssertionError) as e:
         get_tasks([('one', MyUpgradeModule)])
 
-    assert "Raw tasks cannot be required" in str(e)
+    assert "Raw tasks cannot be required" in str(e.value)
 
 
 def test_upgrade_task_requirements():

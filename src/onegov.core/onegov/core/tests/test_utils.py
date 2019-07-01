@@ -238,22 +238,22 @@ def test_safe_format():
     with pytest.raises(RuntimeError) as e:
         fmt('[foo[bar]]', {'foo[bar]': 'baz'})
 
-    assert 'bracket inside bracket' in str(e)
+    assert 'bracket inside bracket' in str(e.value)
 
     with pytest.raises(RuntimeError) as e:
         fmt('[secret]', {'secret': object()})
 
-    assert 'type' in str(e)
+    assert 'type' in str(e.value)
 
     with pytest.raises(RuntimeError) as e:
         fmt('[asdf', {})
 
-    assert 'Uneven' in str(e)
+    assert 'Uneven' in str(e.value)
 
     with pytest.raises(RuntimeError) as e:
         fmt('[foo]', {}, raise_on_missing=True)
 
-    assert 'is unknown' in str(e)
+    assert 'is unknown' in str(e.value)
 
 
 def test_local_lock():
