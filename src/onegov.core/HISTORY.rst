@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.82.0 (2019-07-01)
+~~~~~~~~~~~~~~~~~~~
 
 - Rewrites parts of the cronjobs system.
 
