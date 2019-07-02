@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.46.3 (2019-07-02)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes missing fields being submitted to the backend after field selection.
   [href]
