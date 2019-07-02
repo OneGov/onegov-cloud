@@ -70,7 +70,7 @@ def test_form_extensions(session):
     with pytest.raises(AssertionError) as e:
         collection.submissions.add('newsletter', form, state='complete')
 
-    assert "the given form doesn't validate" in str(e)
+    assert "the given form doesn't validate" in str(e.value)
 
     # now it should work
     data = MultiDict([
@@ -112,7 +112,7 @@ def test_registration_window_adjacent(session):
     with pytest.raises(IntegrityError) as e:
         session.flush()
 
-    assert 'no_adjacent_registration_windows' in str(e)
+    assert 'no_adjacent_registration_windows' in str(e.value)
 
 
 def test_registration_window_overlaps(session):
@@ -132,7 +132,7 @@ def test_registration_window_overlaps(session):
     with pytest.raises(IntegrityError) as e:
         session.flush()
 
-    assert 'no_overlapping_registration_windows' in str(e)
+    assert 'no_overlapping_registration_windows' in str(e.value)
 
 
 def test_registration_window_end_before_start(session):
@@ -144,7 +144,7 @@ def test_registration_window_end_before_start(session):
     with pytest.raises(IntegrityError) as e:
         session.flush()
 
-    assert 'start_smaller_than_end' in str(e)
+    assert 'start_smaller_than_end' in str(e.value)
 
 
 def test_current_registration_window_bound_to_form(session):
