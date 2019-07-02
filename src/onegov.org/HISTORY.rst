@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.4.3 (2019-07-02)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes a display issue in the form-field select input.
   [href]
 
