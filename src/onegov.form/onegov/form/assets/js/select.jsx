@@ -11,6 +11,7 @@ var FormcodeSelect = React.createClass({
 
         return {
             fields: [],
+            missing: {},
             selected: selected
         };
     },
@@ -34,9 +35,38 @@ var FormcodeSelect = React.createClass({
     cloneState: function() {
         return JSON.parse(JSON.stringify(this.state));
     },
+    isKnownField: function(fields, attribute, value) {
+        for (var i = 0; i < fields.length; i++) {
+            if (fields[i][attribute] === value) {
+                return true;
+            }
+        }
+        return false;
+    },
     onUpdateFields: function(fields) {
+        var self = this;
+
         var state = this.cloneState();
         state.fields = fields;
+
+        // fields which are selected but missing are kept around to select them
+        // again later if the field reappears - if it doesn't, the selection
+        // isn't submitted to the backend
+        Object.keys(state.selected).forEach(function(field) {
+            if (! self.isKnownField(fields, 'human_id', field)) {
+                state.missing[field] = true;
+                delete state.selected[field];
+            }
+        });
+
+        // fields which reappear are selected again
+        fields.forEach(function(field) {
+            if (state.missing[field.human_id] === true) {
+                state.selected[field.human_id] = true;
+                delete state.missing[field.human_id];
+            }
+        });
+
         this.setState(state);
         this.getTarget().value = this.getSelectionAsText(state.seleted);
     },
