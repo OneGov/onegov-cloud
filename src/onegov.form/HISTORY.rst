@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.46.4 (2019-07-02)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds compatibility with py.test 5.x.
   [href]
