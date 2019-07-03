@@ -1,6 +1,8 @@
 import hashlib
 import secrets
 
+from pathlib import Path
+
 
 # for external reference, update if the hashing function ever changes
 RANDOM_TOKEN_LENGTH = 64
@@ -37,3 +39,33 @@ def random_token(nbytes=512):
     """
     assert nbytes >= 512
     return hashlib.sha256(secrets.token_bytes(nbytes)).hexdigest()
+
+
+def stored_random_token(namespace, name):
+    """ A random token that is only created once per boot of the host
+    (assuming the host deletes all files in the /tmp folder).
+
+    This method should only be used for development and is not meant for
+    general use!
+
+    """
+    container = Path('/tmp/onegov-secrets')
+    container.mkdir(mode=0o700, exist_ok=True)
+
+    namespace = container / namespace
+    namespace.mkdir(mode=0o700, exist_ok=True)
+
+    path = container / namespace / name
+
+    if path.exists():
+        with path.open('r') as f:
+            return f.read()
+
+    token = random_token()
+
+    with path.open('w') as f:
+        f.write(token)
+
+    path.chmod(0o400)
+
+    return token

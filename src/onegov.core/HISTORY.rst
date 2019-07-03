@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Automatically generates csrf/identity tokens in development.
+  [href]
+
 0.82.0 (2019-07-01)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -44,6 +44,7 @@ from more.webassets.tweens import METHODS, CONTENT_TYPES
 from onegov.core import cache, log, utils
 from onegov.core import directives
 from onegov.core.cache import lru_cache
+from onegov.core.crypto import stored_random_token
 from onegov.core.datamanager import MailDataManager
 from onegov.core.mail import email, Postman, MaildirPostman
 from onegov.core.orm import Base, SessionManager, debug, DB_CONNECTION_ERRORS
@@ -55,7 +56,6 @@ from onegov.server.utils import load_class
 from psycopg2.extensions import TransactionRollbackError
 from purl import URL
 from sqlalchemy.exc import OperationalError
-from uuid import uuid4 as new_uuid
 from urllib.parse import urlencode
 from webob.exc import HTTPConflict, HTTPServiceUnavailable
 
@@ -358,11 +358,13 @@ class Framework(
         # the identity secret is shared between tennants, so we name it
         # accordingly - use self.identity_secret to get a secret limited to
         # the current tennant
-        self.unsafe_identity_secret = cfg.get(
-            'identity_secret', new_uuid().hex)
+        self.unsafe_identity_secret = cfg.get('identity_secret') \
+            or stored_random_token(self.__class__.__name__, 'identity_secret')
 
         # same goes for the csrf_secret
-        self.unsafe_csrf_secret = cfg.get('csrf_secret', new_uuid().hex)
+        self.unsafe_csrf_secret = cfg.get('csrf_secret') \
+            or stored_random_token(self.__class__.__name__, 'csrf_secret')
+
         self.csrf_time_limit = int(cfg.get('csrf_time_limit', 1200))
 
         # you don't want these keys to be the same, see docstring above
