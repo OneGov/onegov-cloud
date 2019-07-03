@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fix for uppercase in hostnames leading to error.
+  [dadadamotha]
+
 1.7.0 (2019-04-03)
 ~~~~~~~~~~~~~~~~~~~
 

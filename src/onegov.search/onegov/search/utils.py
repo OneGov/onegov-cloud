@@ -55,7 +55,7 @@ def is_valid_type_name(name):
 
 
 def normalize_index_segment(segment, allow_wildcards):
-    valid = _invalid_index_characters.sub('_', segment).lower()
+    valid = _invalid_index_characters.sub('_', segment.lower())
 
     if not allow_wildcards:
         valid = valid.replace('*', '_')
