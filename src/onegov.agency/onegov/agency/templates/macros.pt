@@ -41,7 +41,6 @@
                     </tal:block>
                 </ul>
             </tal:block>
-
         </div>
     </metal:agency_card>
 
@@ -56,7 +55,7 @@
                 </li>
                 <tal:block tal:repeat="membership person.memberships_by_agency">
                     <li tal:condition="not membership.is_hidden_from_public or request.is_logged_in" class="person-card-function">
-                        <em title="${layout.agency_path(membership.agency)|None}">${membership.title} ${membership.agency.title}</em>
+                        <em title="${layout.agency_path(membership.agency)|None}">${membership.title} - ${membership.agency.title}</em>
                     </li>
                 </tal:block>
                 <li tal:condition="person.email and 'email' not in exclude" class="person-card-email">
