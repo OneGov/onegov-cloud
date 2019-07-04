@@ -159,6 +159,14 @@ def transfer(group_context,
 
     """
 
+    if not shutil.which('pv'):
+        print("")
+        print("Core transfer requires 'pv', please install as follows:")
+        print("* brew install pv")
+        print("* apt-get install pv")
+        print("")
+        sys.exit(1)
+
     if confirm:
         click.confirm(
             "Do you really want override all your local data?",
@@ -189,7 +197,7 @@ def transfer(group_context,
         recv = f"tar xz  --strip-components {remote.count('/') + 1} -C {local}"
 
         if shutil.which('pv'):
-            recv = f'pv --name "{remote}/{glob}" -r -b | {recv}'
+            recv = f'pv -L 5m --name "{remote}/{glob}" -r -b | {recv}'
 
         subprocess.check_output(f'{send} | {recv}', shell=True)
 
@@ -301,12 +309,6 @@ def transfer(group_context,
 
         if not no_database:
             transfer_database_of_app(local_cfg, remote_cfg)
-
-    if not shutil.which('pv'):
-        print("")
-        print("TIP: To get better output with transfer rates, install pv:")
-        print("brew install pv")
-        print("")
 
 
 @cli.command(context_settings={'default_selector': '*'})
