@@ -194,7 +194,7 @@ def transfer(group_context,
     def transfer_storage(remote, local, glob='*'):
         tar = "cd / && sudo nice -n 10 tar cz {remote}/{glob}"
         send = f"ssh {server} -C '{tar}'"
-        recv = f"tar xz  --strip-components {remote.count('/') + 1} -C {local}"
+        recv = f"tar xz  --strip-components {remote.count('/')} -C {local}"
 
         if shutil.which('pv'):
             recv = f'pv -L 5m --name "{remote}/{glob}" -r -b | {recv}'
