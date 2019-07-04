@@ -192,7 +192,7 @@ def transfer(group_context,
     # share folders in certain configurations
     @lru_cache(maxsize=None)
     def transfer_storage(remote, local, glob='*'):
-        tar = "cd / && sudo nice -n 10 tar cz {remote}/{glob}"
+        tar = f"cd / && sudo nice -n 10 tar cz {remote}/{glob}"
         send = f"ssh {server} -C '{tar}'"
         recv = f"tar xz  --strip-components {remote.count('/')} -C {local}"
 
