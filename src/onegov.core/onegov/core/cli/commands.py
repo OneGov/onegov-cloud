@@ -192,13 +192,14 @@ def transfer(group_context,
     # share folders in certain configurations
     @lru_cache(maxsize=None)
     def transfer_storage(remote, local, glob='*'):
-        send = f"ssh {server} -C 'sudo nice -n 10 tar cz {remote}/{glob}'"
-        send = f"{send} --absolute-names"
+        tar = "cd / && sudo nice -n 10 tar cz {remote}/{glob}"
+        send = f"ssh {server} -C '{tar}'"
         recv = f"tar xz  --strip-components {remote.count('/') + 1} -C {local}"
 
         if shutil.which('pv'):
             recv = f'pv -L 5m --name "{remote}/{glob}" -r -b | {recv}'
 
+        print(f'{send} | {recv}')
         subprocess.check_output(f'{send} | {recv}', shell=True)
 
     def transfer_database(remote_db, local_db, schema_glob='*'):
