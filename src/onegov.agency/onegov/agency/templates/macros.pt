@@ -34,9 +34,9 @@
                 <ul class="memberships" data-sortable data-sortable-url="${layout.move_membership_url_template}">
                     <tal:block tal:repeat="membership memberships">
                         <li tal:condition="(not membership.is_hidden_from_public and not membership.person.is_hidden_from_public) or request.is_logged_in" data-sortable-id="${membership.id}">
-                            <strong><a style="text" href="${request.link(membership)}">${membership.title}</a></strong>
+                            <strong><a href="${request.link(membership.person)}">${membership.person.title}</a></strong>,
+                            <a style="text" href="${request.link(membership)}">${membership.title}</a>
                             <span tal:condition="membership.prefix|None">${membership.prefix}</span>
-                            <a href="${request.link(membership.person)}">${membership.person.title}</a>
                         </li>
                     </tal:block>
                 </ul>
