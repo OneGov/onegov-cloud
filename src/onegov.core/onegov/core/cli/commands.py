@@ -192,9 +192,17 @@ def transfer(group_context,
     # share folders in certain configurations
     @lru_cache(maxsize=None)
     def transfer_storage(remote, local, glob='*'):
-        tar = f"cd / && sudo nice -n 10 tar cz {remote}/{glob}"
-        send = f"ssh {server} -C '{tar}'"
-        recv = f"tar xz  --strip-components {remote.count('/')} -C {local}"
+
+        # GNUtar differs from MacOS's version somewhat and the combination
+        # of parameters leads to a different strip components count. It seems
+        # as if GNUtar will count the components after stripping, while MacOS
+        # counts them before stripping
+        count = remote.count('/')
+        count += platform.system() == 'Darwin' and 1 or 0
+
+        send = f"ssh {server} -C 'sudo nice -n 10 tar cz {remote}/{glob}'"
+        send = f"{send} --absolute-names"
+        recv = f"tar xz  --strip-components {count} -C {local}"
 
         if shutil.which('pv'):
             recv = f'pv -L 5m --name "{remote}/{glob}" -r -b | {recv}'
