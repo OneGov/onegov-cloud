@@ -199,7 +199,6 @@ def transfer(group_context,
         if shutil.which('pv'):
             recv = f'pv -L 5m --name "{remote}/{glob}" -r -b | {recv}'
 
-        print(f'{send} | {recv}')
         subprocess.check_output(f'{send} | {recv}', shell=True)
 
     def transfer_database(remote_db, local_db, schema_glob='*'):
