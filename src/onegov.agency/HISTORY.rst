@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.12.0 (2019-07-05)
+~~~~~~~~~~~~~~~~~~~~
 
 - Minor UI improvements and fixed test.
   [dadadamotha]
