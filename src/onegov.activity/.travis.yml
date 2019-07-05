@@ -15,6 +15,7 @@ addons:
   apt:
     packages:
       - libpoppler-cpp-dev
+      - libgnutls28-dev
 
 install:
     - pip install tox
