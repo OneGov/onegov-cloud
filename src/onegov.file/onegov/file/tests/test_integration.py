@@ -368,7 +368,7 @@ def test_sign_file(app):
             with pytest.raises(RuntimeError) as e:
                 app.sign_file(pdf, signee='admin@example.org', token=token)
 
-            assert "already been signed" in str(e)
+            assert "already been signed" in str(e.value)
 
 
 def test_sign_transaction(app, temporary_path):
