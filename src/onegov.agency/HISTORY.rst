@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Minor UI improvements.
+- Minor UI improvements and fixed test.
   [dadadamotha]
 
 1.11.0 (2019-05-27)
