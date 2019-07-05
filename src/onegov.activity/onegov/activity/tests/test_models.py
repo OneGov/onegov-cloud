@@ -1438,7 +1438,7 @@ def test_accept_booking(session, owner):
     with pytest.raises(RuntimeError) as e:
         bookings.accept_booking(bookings.add(owner, a1, o1))
 
-    assert "The period has not yet been confirmed" in str(e)
+    assert "The period has not yet been confirmed" in str(e.value)
     transaction.abort()
 
     periods.active().confirmed = True
@@ -1451,7 +1451,7 @@ def test_accept_booking(session, owner):
     with pytest.raises(RuntimeError) as e:
         bookings.accept_booking(bookings.add(owner, a3, o1))
 
-    assert "The occasion is already full" in str(e)
+    assert "The occasion is already full" in str(e.value)
     transaction.abort()
 
     # only open/denied bookings can be accepted this way
@@ -1471,7 +1471,7 @@ def test_accept_booking(session, owner):
     with pytest.raises(RuntimeError) as e:
         bookings.accept_booking(bookings.add(owner, a1, o2))
 
-    assert "Conflict with booking" in str(e)
+    assert "Conflict with booking" in str(e.value)
     transaction.abort()
 
     # other conflicting bookings are marked as blocked
@@ -1504,7 +1504,7 @@ def test_accept_booking(session, owner):
     with pytest.raises(RuntimeError) as e:
         bookings.accept_booking(bookings.add(owner, a1, o3))
 
-    assert "The booking limit has been reached" in str(e)
+    assert "The booking limit has been reached" in str(e.value)
 
     transaction.abort()
 
@@ -1522,7 +1522,7 @@ def test_accept_booking(session, owner):
     with pytest.raises(RuntimeError) as e:
         bookings.accept_booking(bookings.add(owner, a1, o4))
 
-    assert "The booking limit has been reached" in str(e)
+    assert "The booking limit has been reached" in str(e.value)
 
     transaction.abort()
 
@@ -1538,7 +1538,7 @@ def test_accept_booking(session, owner):
     with pytest.raises(RuntimeError) as e:
         bookings.accept_booking(bookings.add(owner, a1, o3))
 
-    assert "The booking limit has been reached" in str(e)
+    assert "The booking limit has been reached" in str(e.value)
 
     transaction.abort()
 
@@ -1706,7 +1706,7 @@ def test_cancel_booking(session, owner):
     with pytest.raises(RuntimeError) as e:
         bookings.cancel_booking(bookings.add(owner, a1, o1))
 
-    assert "The period has not yet been confirmed" in str(e)
+    assert "The period has not yet been confirmed" in str(e.value)
     transaction.abort()
 
     periods.active().confirmed = True
