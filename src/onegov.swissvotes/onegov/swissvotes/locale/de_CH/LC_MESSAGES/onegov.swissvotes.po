@@ -750,7 +750,7 @@ msgid "Popular initiative"
 msgstr "Volksinitiative"
 
 msgid "Direct counter-proposal"
-msgstr "Direkter Gegenvorschlag"
+msgstr "Direkter Gegenentwurf"
 
 msgid "Rejected"
 msgstr "Abgelehnt"
