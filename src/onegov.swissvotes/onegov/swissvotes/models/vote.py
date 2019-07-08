@@ -144,7 +144,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
                 (None, _("unknown"))
             ))
 
-        raise RuntimeError(f"No codes avaible for '{attribute}'")
+        raise RuntimeError(f"No codes available for '{attribute}'")
 
     id = Column(Integer, nullable=False, primary_key=True)
 
