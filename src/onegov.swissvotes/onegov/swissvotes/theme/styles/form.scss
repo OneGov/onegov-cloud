@@ -178,7 +178,6 @@ form {
     */
     #fieldset-other-filters {
         cursor: pointer;
-
         legend::before,
         legend::after {
             @include icon('\f077');
@@ -194,5 +193,11 @@ form {
                 margin-right: .75rem;
             }
         }
+    }
+     /*
+    Center "More Filters" in Firefox and Chrome
+    */
+    #fieldset-other-filters legend {
+     margin: 0 auto;
     }
 }
