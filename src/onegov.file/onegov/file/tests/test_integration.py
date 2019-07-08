@@ -214,8 +214,13 @@ def test_bust_cache(app, temporary_path):
     assert not (temporary_path / 'foobar').exists()
 
     # wait for it to complete
-    sleep(0.5)
-    assert (temporary_path / 'foobar').exists()
+    for _ in range(0, 10):
+        if (temporary_path / 'foobar').exists():
+            break
+        else:
+            sleep(0.5)
+    else:
+        assert (temporary_path / 'foobar').exists()
 
 
 def test_bust_cache_via_events(app, temporary_path):
