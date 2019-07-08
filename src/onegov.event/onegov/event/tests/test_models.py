@@ -257,7 +257,7 @@ def test_occurrence_dates_dst(session):
             f'BYDAY=MO,TU,WE,TH,FR,SA,SU'
         )
 
-    assert 'UNTIL is not timezone-aware' in str(e)
+    assert 'UNTIL is not timezone-aware' in str(e.value)
 
     event.recurrence = (
         f'RRULE:FREQ=WEEKLY;'
