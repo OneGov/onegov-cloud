@@ -273,7 +273,7 @@ def test_principal(session):
     assert principal
 
 
-def test_vote(session):
+def test_vote(session, vote_recommendations):
     vote = SwissVote()
     vote.bfs_number = Decimal('100.1')
     vote.date = date(1990, 6, 2)
@@ -542,53 +542,7 @@ def test_vote(session):
     vote.duration_referendum_total = 36
     vote.signatures_valid = 40
     vote.signatures_invalid = 41
-    vote.recommendations = {
-        'fdp': 1,
-        'cvp': 1,
-        'sps': 1,
-        'svp': 1,
-        'lps': 2,
-        'ldu': 2,
-        'evp': 2,
-        'csp': 3,
-        'pda': 3,
-        'poch': 3,
-        'gps': 4,
-        'sd': 4,
-        'rep': 4,
-        'edu': 5,
-        'fps': 5,
-        'lega': 5,
-        'kvp': 66,
-        'glp': 66,
-        'bdp': None,
-        'mcg': 9999,
-        'sav': 1,
-        'eco': 2,
-        'sgv': 3,
-        'sbv-usp': 3,
-        'sgb': 3,
-        'travs': 3,
-        'vsa': 9999,
-        'vpod': 1,
-        'ssv': 1,
-        'gem': 1,
-        'kdk': 1,
-        'vdk': 1,
-        'endk': 1,
-        'fdk': 1,
-        'edk': 1,
-        'gdk': 1,
-        'ldk': 1,
-        'sodk': 1,
-        'kkjpd': 1,
-        'bpuk': 1,
-        'sbk': 1,
-        'acs': 1,
-        'tcs': 1,
-        'vcs': 1,
-        'voev': 1
-    }
+    vote.recommendations = vote_recommendations
     vote.recommendations_other_yes = "Pro Velo"
     vote.recommendations_other_no = None
     vote.recommendations_other_free = "Pro Natura, Greenpeace"

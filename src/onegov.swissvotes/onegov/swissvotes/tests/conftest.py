@@ -109,3 +109,53 @@ def attachments(swissvotes_app):
 def postgres_version(session):
     connection = session.connection()
     yield connection.execute('show server_version;').fetchone()[0]
+
+@fixture(scope="function")
+def vote_recommendations():
+    return {
+        'fdp': 1,
+        'cvp': 1,
+        'sps': 1,
+        'svp': 1,
+        'lps': 2,
+        'ldu': 2,
+        'evp': 2,
+        'csp': 3,
+        'pda': 3,
+        'poch': 3,
+        'gps': 4,
+        'sd': 4,
+        'rep': 4,
+        'edu': 5,
+        'fps': 5,
+        'lega': 5,
+        'kvp': 66,
+        'glp': 66,
+        'bdp': None,
+        'mcg': 9999,
+        'sav': 1,
+        'eco': 2,
+        'sgv': 3,
+        'sbv-usp': 3,
+        'sgb': 3,
+        'travs': 3,
+        'vsa': 9999,
+        'vpod': 1,
+        'ssv': 1,
+        'gem': 1,
+        'kdk': 1,
+        'vdk': 1,
+        'endk': 1,
+        'fdk': 1,
+        'edk': 1,
+        'gdk': 1,
+        'ldk': 1,
+        'sodk': 1,
+        'kkjpd': 1,
+        'bpuk': 1,
+        'sbk': 1,
+        'acs': 1,
+        'tcs': 1,
+        'vcs': 1,
+        'voev': 1
+    }
