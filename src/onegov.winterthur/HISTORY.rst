@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds iFrame support to the daycare calculator.
+  [href]
+
 0.7.0 (2019-06-28)
 ~~~~~~~~~~~~~~~~~~~~~
 
