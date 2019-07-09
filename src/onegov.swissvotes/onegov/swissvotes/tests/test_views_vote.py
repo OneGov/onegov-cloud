@@ -240,7 +240,7 @@ def test_view_vote(swissvotes_app):
     assert "17.1%" in page
     assert "18.1%" in page
     assert "19.1%" in page
-    assert "20.2%" in page
+    assert "20.2%" not in page      # this is actor mcg which does not exist anymore, has code 9999
 
     # Percentages
     page = client.get(page.request.url.replace('/strengths', '/percentages'))
