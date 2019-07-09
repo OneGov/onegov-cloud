@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes max income notice showing the wrong amount.
+  [href]
+
 - Adds iFrame support to the daycare calculator.
   [href]
 
