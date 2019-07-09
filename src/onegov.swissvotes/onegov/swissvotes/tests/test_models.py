@@ -1004,3 +1004,20 @@ def test_column_mapper():
     assert list(mapper.items())[302] == (
         '!recommendations!sodk', 'p-sodk', 'INTEGER', True, None, None
     )
+
+
+def test_recommendation_order():
+    recommendations = SwissVote.codes('recommendation')
+    assert list(recommendations.keys()) == [1, 2, 4, 5, 3, 66, 9999, None]
+
+
+def test_recommendations_parties(sample_vote):
+    grouped = sample_vote.recommendations_parties
+    codes = SwissVote.codes('recommendation')
+    # Remove entries in codes for unknown and actor no longer exists
+    del codes[9999]
+    del codes[None]
+    print(grouped.keys())
+    print(codes.values())
+    # Make sure the order follows the recommendations order
+    assert list(grouped.keys()) == list(codes.values())
