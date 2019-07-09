@@ -732,9 +732,8 @@ def test_vote(session, sample_vote):
         Region('vd'),
         Region('vs'),
     ]
-
     assert list(vote.recommendations_parties.keys()) == [
-        'Yea', 'Nay', 'None', 'Empty', 'Free vote', 'Neutral'
+        'Yea', 'Nay', 'Empty', 'Free vote', 'None', 'Neutral', 'unknown'
     ]
     assert vote.recommendations_parties['Yea'] == [
         Actor('cvp'),
@@ -766,9 +765,8 @@ def test_vote(session, sample_vote):
         Actor('glp'),
         Actor('kvp')
     ]
-
     assert list(vote.recommendations_associations.keys()) == [
-        'Yea', 'Nay', 'None', 'Free vote'
+        'Yea', 'Nay', 'Free vote', 'None',
     ]
     assert vote.recommendations_associations['Yea'] == [
         Actor('acs'),
@@ -1016,7 +1014,7 @@ def test_recommendations_parties(sample_vote):
     codes = SwissVote.codes('recommendation')
     # Remove entries in codes for unknown and actor no longer exists
     del codes[9999]
-    del codes[None]
+    # del codes[None]
     # print(grouped.keys())
     # print(codes.values())
     assert list(grouped.keys()) == list(codes.values())
