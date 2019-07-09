@@ -564,18 +564,29 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
         recommendations = self.recommendations or {}
         return self.codes('recommendation').get(recommendations.get(name))
 
+    def get_recommendation_of_existing_parties(self):
+        """ Get only the existing parties as when this vote was conducted """
+        if not self.recommendations:
+            return {}
+        return {k: v for k, v in self.recommendations.items() if v != 9999}
+
     def group_recommendations(self, recommendations):
         """ Group the given recommendations by slogan. """
+
+        codes = self.codes('recommendation')
+        recommendation_codes = list(codes.keys())
+
+        def by_recommendation(reco):
+            return recommendation_codes.index(reco)
 
         result = {}
         for actor, recommendation in recommendations:
             if recommendation is not None and recommendation != 9999:
                 result.setdefault(recommendation, []).append(actor)
 
-        codes = self.codes('recommendation')
         return OrderedDict([
             (codes[key], result[key])
-            for key in sorted(result.keys())
+            for key in sorted(result.keys(), key=by_recommendation)
         ])
 
     @cached_property
