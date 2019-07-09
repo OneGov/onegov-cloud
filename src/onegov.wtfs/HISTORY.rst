@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.4.1 (2019-07-09)
+~~~~~~~~~~~~~~~~~~~
 
 - Gives admins the ability to set return dates in the past.
   [href]
