@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Changes the style to better match Winterthur's CI.
+  [href]
+
 1.4.0 (2019-06-27)
 ~~~~~~~~~~~~~~~~~~~
 
@@ -7,7 +11,7 @@ Changelog
   [href]
 
 - Gives town admins the ability to delete jobs up to 17:00 the day before.
-  [href] 
+  [href]
 
 - Adds live-data import script.
   [href]

@@ -316,10 +316,7 @@ class UnrestrictedScanJobForm(Form):
 
     dispatch_date = DateField(
         label=_("Dispatch date"),
-        validators=[
-            InputRequired(),
-            DateRange(min=date.today, message=_("Date can't be in the past."))
-        ],
+        validators=[InputRequired()],
         default=date.today,
     )
 

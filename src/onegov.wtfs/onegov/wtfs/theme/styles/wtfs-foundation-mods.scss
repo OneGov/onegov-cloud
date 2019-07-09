@@ -33,6 +33,14 @@ $yellow-light: #ffe480;
 $yellow-pastel: #fff4cc;
 
 /*
+    Custom fonts
+*/
+$base-font-size: 125%;
+$body-font-color: $gray-dark;
+$small-font-size: 17px;
+$font-family-sans-serif: "NewsGot", Verdana, Arial, sans-serif;
+
+/*
     Main colors
 */
 
@@ -123,3 +131,57 @@ $button-font-color: $primary-fg-color;
     $crumb-font-color: scale-color($crumb-font-color, $lightness: -45%, $saturation: +10%);
     $side-nav-link-color: scale-color($side-nav-link-color, $lightness: -45%, $saturation: +10%);
 }
+
+/*
+    Custom colors
+*/
+$gray-ultra-light: #f6f6f5;
+$gray-light: #ececea;
+$gray: #dadad6;
+$gray-dark: #44443f;
+$red: #ff1900;
+
+$secondary-color: $gray;
+$panel-bg: $gray-light;
+$f-dropdown-list-hover-bg: $gray;
+$topbar-bg-color: $gray-light;
+$topbar-link-bg-hover: $gray;
+
+$anchor-font-color-hover: #44443f;
+$anchor-font-color: #ff1900;
+$input-bg-color: #ececea;
+$input-border-color: #dadad6;
+$input-box-shadow: inset 0 2px 4px 3px rgba(218, 218, 214, 1);
+$input-placeholder-color: #999;
+$table-border-color: #999;
+$table-even-bg-color: #e9e9ea;
+$table-head-bg-color: #e9e9ea;
+$table-head-border-color: #999;
+
+/*
+    Custom fonts
+*/
+$base-font-size: 125%;
+$body-font-color: $gray-dark;
+$small-font-size: 17px;
+$font-family-sans-serif: "NewsGot", Verdana, Arial, sans-serif;
+
+/*
+    Headings
+*/
+$header-font-weight: bold;
+
+$h1-font-size: rem-calc(32);
+$h2-font-size: rem-calc(18);
+$h3-font-size: rem-calc(16);
+$h4-font-size: rem-calc(14);
+
+$h1-font-reduction: 0;
+$h2-font-reduction: 0;
+$h3-font-reduction: 0;
+$h4-font-reduction: 0;
+
+/*
+    Tables
+*/
+$table-border-color: $gray-light;

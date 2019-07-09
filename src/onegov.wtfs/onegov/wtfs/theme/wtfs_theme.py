@@ -8,7 +8,7 @@ class WtfsTheme(BaseTheme):
 
     @property
     def pre_imports(self):
-        return ['wtfs-foundation-mods']
+        return ['font-newsgot', 'wtfs-foundation-mods']
 
     @property
     def post_imports(self):

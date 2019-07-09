@@ -93,12 +93,17 @@
                 </div>
             </article>
 
-            <footer>
-                <div class="row">
-                    <div class="small-12 text-center">
-                        <a href="https://www.onegovcloud.ch">OneGov Cloud</a>
-                        by
-                        <a href="https://www.seantis.ch">Seantis GmbH</a>
+            <footer class="footer-content">
+                <div class="row footer-links">
+                    <div class="small-12 columns">
+                        <span>
+                            <a href="https://www.onegovcloud.ch">OneGov Cloud</a>
+                        </span>
+                        <span>
+                            <a href="https://www.onegovcloud.ch/datenschutz" i18n:translate>
+                                Privacy Protection
+                            </a>
+                        </span>
                     </div>
                 </div>
             </footer>
