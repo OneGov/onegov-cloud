@@ -62,7 +62,11 @@
                         <td tal:content="structure Actor(actor).html(request)" />
                         <td>${vote.get_recommendation(actor)}</td>
                         <td>${layout.format_number(vote.get_actors_share(actor), 1)}%</td>
-
+                    </tr>
+                    <tr tal:condition="vote.national_council_share_ubrige">
+                        <td i18n:translate>Others</td>
+                        <td i18n:translate>unknown</td>
+                        <td>${layout.format_number(vote.national_council_share_ubrige, 1)}%</td>
                     </tr>
                 </tbody>
             </table>
