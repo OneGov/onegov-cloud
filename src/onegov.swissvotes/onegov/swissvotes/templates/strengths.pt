@@ -52,116 +52,17 @@
             <table class="sortable voter-strengths" data-sortlist="[[1,1], [2,1]]">
                 <thead>
                     <tr>
-                        <th i18n:translate class="column-25">Party</th>
+                        <th i18n:translate class="colmn-25">Party</th>
                         <th i18n:translate class="column-25">Recommendation</th>
                         <th><tal:block i18n:translate>Percentage of voters in the National Council elections </tal:block> ${vote.national_council_election_year}</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr tal:condition="vote.national_council_share_bdp">
-                        <td tal:content="structure Actor('bdp').html(request)" />
-                        <td>${vote.get_recommendation('bdp')}</td>
-                        <td>${layout.format_number(vote.national_council_share_bdp, 1)}%</td>
-                    </tr>
-                    <tr tal:condition="vote.national_council_share_csp">
-                        <td tal:content="structure Actor('csp').html(request)" />
-                        <td>${vote.get_recommendation('csp')}</td>
-                        <td>${layout.format_number(vote.national_council_share_csp, 1)}%</td>
-                    </tr>
-                    <tr tal:condition="vote.national_council_share_cvp">
-                        <td tal:content="structure Actor('cvp').html(request)" />
-                        <td>${vote.get_recommendation('cvp')}</td>
-                        <td>${layout.format_number(vote.national_council_share_cvp, 1)}%</td>
-                    </tr>
-                    <tr tal:condition="vote.national_council_share_edu">
-                        <td tal:content="structure Actor('edu').html(request)" />
-                        <td>${vote.get_recommendation('edu')}</td>
-                        <td>${layout.format_number(vote.national_council_share_edu, 1)}%</td>
-                    </tr>
-                    <tr tal:condition="vote.national_council_share_evp">
-                        <td tal:content="structure Actor('evp').html(request)" />
-                        <td>${vote.get_recommendation('evp')}</td>
-                        <td>${layout.format_number(vote.national_council_share_evp, 1)}%</td>
-                    </tr>
-                    <tr tal:condition="vote.national_council_share_fdp">
-                        <td tal:content="structure Actor('fdp').html(request)" />
-                        <td>${vote.get_recommendation('fdp')}</td>
-                        <td>${layout.format_number(vote.national_council_share_fdp, 1)}%</td>
-                    </tr>
-                    <tr tal:condition="vote.national_council_share_fps">
-                        <td tal:content="structure Actor('fps').html(request)" />
-                        <td>${vote.get_recommendation('fps')}</td>
-                        <td>${layout.format_number(vote.national_council_share_fps, 1)}%</td>
-                    </tr>
-                    <tr tal:condition="vote.national_council_share_glp">
-                        <td tal:content="structure Actor('glp').html(request)" />
-                        <td>${vote.get_recommendation('glp')}</td>
-                        <td>${layout.format_number(vote.national_council_share_glp, 1)}%</td>
-                    </tr>
-                    <tr tal:condition="vote.national_council_share_gps">
-                        <td tal:content="structure Actor('gps').html(request)" />
-                        <td>${vote.get_recommendation('gps')}</td>
-                        <td>${layout.format_number(vote.national_council_share_gps, 1)}%</td>
-                    </tr>
-                    <tr tal:condition="vote.national_council_share_kvp">
-                        <td tal:content="structure Actor('kvp').html(request)" />
-                        <td>${vote.get_recommendation('kvp')}</td>
-                        <td>${layout.format_number(vote.national_council_share_kvp, 1)}%</td>
-                    </tr>
-                    <tr tal:condition="vote.national_council_share_ldu">
-                        <td tal:content="structure Actor('ldu').html(request)" />
-                        <td>${vote.get_recommendation('ldu')}</td>
-                        <td>${layout.format_number(vote.national_council_share_ldu, 1)}%</td>
-                    </tr>
-                    <tr tal:condition="vote.national_council_share_lega">
-                        <td tal:content="structure Actor('lega').html(request)" />
-                        <td>${vote.get_recommendation('lega')}</td>
-                        <td>${layout.format_number(vote.national_council_share_lega, 1)}%</td>
-                    </tr>
-                    <tr tal:condition="vote.national_council_share_lps">
-                        <td tal:content="structure Actor('lps').html(request)" />
-                        <td>${vote.get_recommendation('lps')}</td>
-                        <td>${layout.format_number(vote.national_council_share_lps, 1)}%</td>
-                    </tr>
-                    <tr tal:condition="vote.national_council_share_mcg">
-                        <td tal:content="structure Actor('mcg').html(request)" />
-                        <td>${vote.get_recommendation('mcg')}</td>
-                        <td>${layout.format_number(vote.national_council_share_mcg, 1)}%</td>
-                    </tr>
-                    <tr tal:condition="vote.national_council_share_pda">
-                        <td tal:content="structure Actor('pda').html(request)" />
-                        <td>${vote.get_recommendation('pda')}</td>
-                        <td>${layout.format_number(vote.national_council_share_pda, 1)}%</td>
-                    </tr>
-                    <tr tal:condition="vote.national_council_share_poch">
-                        <td tal:content="structure Actor('poch').html(request)" />
-                        <td>${vote.get_recommendation('poch')}</td>
-                        <td>${layout.format_number(vote.national_council_share_poch, 1)}%</td>
-                    </tr>
-                    <tr tal:condition="vote.national_council_share_rep">
-                        <td tal:content="structure Actor('rep').html(request)" />
-                        <td>${vote.get_recommendation('rep')}</td>
-                        <td>${layout.format_number(vote.national_council_share_rep, 1)}%</td>
-                    </tr>
-                    <tr tal:condition="vote.national_council_share_sd">
-                        <td tal:content="structure Actor('sd').html(request)" />
-                        <td>${vote.get_recommendation('sd')}</td>
-                        <td>${layout.format_number(vote.national_council_share_sd, 1)}%</td>
-                    </tr>
-                    <tr tal:condition="vote.national_council_share_sp">
-                        <td tal:content="structure Actor('sps').html(request)" />
-                        <td>${vote.get_recommendation('sps')}</td>
-                        <td>${layout.format_number(vote.national_council_share_sp, 1)}%</td>
-                    </tr>
-                    <tr tal:condition="vote.national_council_share_svp">
-                        <td tal:content="structure Actor('svp').html(request)" />
-                        <td>${vote.get_recommendation('svp')}</td>
-                        <td>${layout.format_number(vote.national_council_share_svp, 1)}%</td>
-                    </tr>
-                    <tr tal:condition="vote.national_council_share_ubrige">
-                        <td i18n:translate>Others</td>
-                        <td i18n:translate>unknown</td>
-                        <td>${layout.format_number(vote.national_council_share_ubrige, 1)}%</td>
+                <tbody tal:define="actors vote.sorted_actors_list">
+                    <tr tal:repeat="actor actors">
+                        <td tal:content="structure Actor(actor).html(request)" />
+                        <td>${vote.get_recommendation(actor)}</td>
+                        <td>${layout.format_number(vote.get_actors_share(actor), 1)}%</td>
+
                     </tr>
                 </tbody>
             </table>

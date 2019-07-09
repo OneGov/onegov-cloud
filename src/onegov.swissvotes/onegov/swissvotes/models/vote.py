@@ -560,9 +560,11 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
 
     def get_recommendation(self, name):
         """ Get the recommendations by name. """
-
-        recommendations = self.recommendations or {}
-        return self.codes('recommendation').get(recommendations.get(name))
+        # Todo: remove inconsistencies in table name
+        name_ = name
+        return self.codes('recommendation').get(
+            self.recommendations.get(name_)
+        )
 
     def get_recommendation_of_existing_parties(self):
         """ Get only the existing parties as when this vote was conducted """
@@ -588,6 +590,36 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
             (codes[key], result[key])
             for key in sorted(result.keys(), key=by_recommendation)
         ])
+
+    def get_actors_share(self, actor):
+        assert isinstance(actor, str), 'Actor must be a string'
+        actor_ = actor
+        # Todo: remove inconsistency in table names
+        if actor == 'sps':
+            actor_ = 'sp'
+        return getattr(self, 'national_council_share_' + actor_, 0) or 0
+
+    @cached_property
+    def sorted_actors_list(self):
+        """
+         Returns a list of actors of the current vote sorted by:
+
+        1. codes for recommendations (strength table)
+        2. by electoral share (descending)
+
+        It filtes out those parties who have no electoral share
+
+        """
+        result = []
+        recommendation_by_slogan = self.recommendations_parties
+        for slogan, actor_list in recommendation_by_slogan.items():
+            actors = map(lambda d: d.name, actor_list)
+            # Filter out those who have None as share
+
+            result.extend(
+                sorted(actors, key=self.get_actors_share, reverse=True)
+            )
+        return result
 
     @cached_property
     def recommendations_parties(self):

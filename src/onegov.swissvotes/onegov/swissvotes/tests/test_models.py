@@ -1017,7 +1017,23 @@ def test_recommendations_parties(sample_vote):
     # Remove entries in codes for unknown and actor no longer exists
     del codes[9999]
     del codes[None]
-    print(grouped.keys())
-    print(codes.values())
-    # Make sure the order follows the recommendations order
+    # print(grouped.keys())
+    # print(codes.values())
     assert list(grouped.keys()) == list(codes.values())
+
+
+def test_sorted_actors_list(sample_vote):
+    sorted_actors = sample_vote.sorted_actors_list
+    print(sorted_actors)
+    assert sorted_actors
+    for i in range(len(sorted_actors) - 2):
+        actor = sorted_actors[i]
+        next_actor = sorted_actors[i + 1]
+        actor_ = actor
+        if actor_ == 'sps':
+            actor_ = 'sp'
+        actual_rec = sample_vote.get_recommendation(actor)
+        next_rec = sample_vote.get_recommendation(next_actor)
+        if actual_rec == next_rec:
+            assert sample_vote.get_actors_share(actor) > \
+                sample_vote.get_actors_share(next_actor)
