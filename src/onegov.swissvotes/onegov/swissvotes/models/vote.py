@@ -133,12 +133,13 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
                 (2, _("Rejecting")),
             ))
         if attribute == 'recommendation':
+            # Added ordering how it should be displayed in strengths table
             return OrderedDict((
                 (1, _("Yea")),
                 (2, _("Nay")),
-                (3, _("None")),
                 (4, _("Empty")),
                 (5, _("Free vote")),
+                (3, _("None")),
                 (66, _("Neutral")),
                 (9999, _("Organization no longer exists")),
                 (None, _("unknown"))
