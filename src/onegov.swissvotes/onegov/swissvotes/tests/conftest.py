@@ -113,6 +113,7 @@ def postgres_version(session):
     connection = session.connection()
     yield connection.execute('show server_version;').fetchone()[0]
 
+
 @fixture(scope="function")
 def sample_vote():
     vote = SwissVote()
