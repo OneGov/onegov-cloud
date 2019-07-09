@@ -583,7 +583,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
 
         result = {}
         for actor, recommendation in recommendations:
-            if recommendation is not None and recommendation != 9999:
+            if recommendation != 9999:
                 result.setdefault(recommendation, []).append(actor)
 
         return OrderedDict([
@@ -607,7 +607,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
         1. codes for recommendations (strength table)
         2. by electoral share (descending)
 
-        It filtes out those parties who have no electoral share
+        It filters out those parties who have no electoral share
 
         """
         result = []
