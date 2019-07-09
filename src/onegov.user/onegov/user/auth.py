@@ -9,6 +9,43 @@ from onegov.user.collections import UserCollection
 from onegov.user.errors import ExpiredSignupLinkError
 
 
+class AuthFactor(object):
+    """ A registry of auth factors. """
+
+    registry = {}
+
+    def __init_subclass__(cls, type, **kwargs):
+        assert type not in cls.registry
+        cls.registry[type] = cls
+        super().__init_subclass__(**kwargs)
+
+
+class YubikeyFactor(AuthFactor, type='yubikey'):
+    """ Implements a yubikey factor for the :class:`Auth` class. """
+
+    def __init__(self, **kwargs):
+        self.yubikey_client_id = kwargs.pop('yubikey_client_id', None)
+        self.yubikey_secret_key = kwargs.pop('yubikey_secret_key', None)
+
+    @classmethod
+    def args_from_app(cls, app):
+        return {
+            'yubikey_client_id': getattr(app, 'yubikey_client_id', None),
+            'yubikey_secret_key': getattr(app, 'yubikey_secret_key', None)
+        }
+
+    def is_configured(self):
+        return self.yubikey_client_id and self.yubikey_secret_key
+
+    def is_valid(self, user_specific_config, factor):
+        return is_valid_yubikey(
+            client_id=self.yubikey_client_id,
+            secret_key=self.yubikey_secret_key,
+            expected_yubikey_id=user_specific_config,
+            yubikey=factor
+        )
+
+
 class Auth(object):
     """ Defines a model for authentication methods like login/logout.
     Applications should use this model to implement authentication views.
@@ -18,8 +55,7 @@ class Auth(object):
     identity_class = morepath.Identity
 
     def __init__(self, session, application_id, to='/', skip=False,
-                 yubikey_client_id=None, yubikey_secret_key=None,
-                 signup_token=None, signup_token_secret=None):
+                 signup_token=None, signup_token_secret=None, **kwargs):
         assert application_id  # may not be empty!
 
         self.session = session
@@ -30,24 +66,34 @@ class Auth(object):
 
         # never redirect to an external page, this might potentially be used
         # to trick the user into thinking he's on our page after entering his
-        # password and being redirected to a phising site.
+        # password and being redirected to a phishing site.
         self.to = relative_url(to)
         self.skip = skip
 
-        self.yubikey_client_id = yubikey_client_id
-        self.yubikey_secret_key = yubikey_secret_key
+        # initialize nth factors
+        self.factors = {}
+
+        for type, cls in AuthFactor.registry.items():
+            obj = cls(**kwargs)
+
+            if obj.is_configured():
+                self.factors[type] = obj
 
     @classmethod
     def from_app(cls, app, to='/', skip=False, signup_token=None):
+        kwargs = {}
+
+        for factor in AuthFactor.registry.values():
+            kwargs.update(factor.args_from_app(app))
+
         return cls(
             session=app.session(),
             application_id=app.application_id,
-            yubikey_client_id=getattr(app, 'yubikey_client_id', None),
-            yubikey_secret_key=getattr(app, 'yubikey_secret_key', None),
             to=to,
             skip=skip,
             signup_token=signup_token,
-            signup_token_secret=getattr(app, 'identity_secret', None)
+            signup_token_secret=getattr(app, 'identity_secret', None),
+            **kwargs,
         )
 
     @classmethod
@@ -96,7 +142,7 @@ class Auth(object):
         if not self.skip:
             return False
 
-        # this is the default paramter, we won't skip to it in any case
+        # this is the default parameter, we won't skip to it in any case
         if self.to == '/':
             return False
 
@@ -112,12 +158,10 @@ class Auth(object):
         if not second_factor_value:
             return False
 
-        if user.second_factor['type'] == 'yubikey':
-            return is_valid_yubikey(
-                client_id=self.yubikey_client_id,
-                secret_key=self.yubikey_secret_key,
-                expected_yubikey_id=user.second_factor['data'],
-                yubikey=second_factor_value
+        if user.second_factor['type'] in self.factors:
+            return self.factors[user.second_factor['type']].is_valid(
+                user_specific_config=user.second_factor['data'],
+                factor=second_factor_value
             )
         else:
             raise NotImplementedError
