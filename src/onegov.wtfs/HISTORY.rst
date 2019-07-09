@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Gives admins the ability to set return dates in the past.
+  [href]
+
 - Changes the style to better match Winterthur's CI.
   [href]
 
