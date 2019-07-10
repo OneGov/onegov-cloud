@@ -575,7 +575,7 @@ table.responsive {
         }
     }
 
-    .privacy-notice {
+    .privacy-notice .panel {
         font-size: .875rem;
     }
 }
@@ -685,6 +685,28 @@ table.responsive {
         border: 0;
         font-size: 1rem;
         padding: .75rem;
+    }
+
+    .summary-header {
+        display: flex;
+        justify-content: space-between;
+
+        h2 {
+            flex: 0 0 50%;
+        }
+
+        a {
+            display: inline-block;
+            font-size: .875rem;
+            line-height: 1.75rem;
+            padding: 4px;
+            right: 0;
+
+            &::before {
+                @include icon('\f02f');
+                margin-right: 1ex;
+            }
+        }
     }
 
     .summary {
@@ -850,6 +872,85 @@ table.responsive {
 
         thead + tbody tr th {
             padding-top: 0 !important;
+        }
+    }
+}
+
+/*
+    Daycare calculator print output
+*/
+@media print {
+    .daycare-subsidy-calculator-layout {
+        .summary-amounts > div {
+            font-size: .875rem !important;
+            padding: 0 !important;
+        }
+
+        .daycare-calculator-result {
+            max-width: 100%;
+        }
+
+        table tr td,
+        table tr th {
+            font-size: .8rem;
+            padding: .2rem;
+        }
+
+        h2 {
+            border: 0;
+        }
+
+        .daycare-calculator form * {
+            font-size: .8rem !important;
+        }
+
+        .show-details {
+            display: none !important;
+        }
+
+        .daycare-services .show-for-small-only {
+            display: none;
+        }
+
+        .calculation-details {
+            border: 0 !important;
+            padding: 0 !important;
+        }
+
+        .calculation-explanation {
+            display: none;
+        }
+
+        input {
+            background: none !important;
+            border: 0 !important;
+            box-shadow: none !important;
+            font-size: 1rem !important;
+            font-weight: bold;
+            padding: 0 !important;
+        }
+
+        /* Hide HTML5 Up and Down arrows. */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        .button {
+            display: none;
+        }
+
+        .summary-header a {
+            display: none;
+        }
+
+        .privacy-notice {
+            display: none;
         }
     }
 }

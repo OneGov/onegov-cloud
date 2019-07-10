@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds print button to daycare calculator.
+  [href]
+
 - Fixes max income notice showing the wrong amount.
   [href]
 

@@ -5,7 +5,12 @@
     <tal:b metal:fill-slot="content">
         <div class="daycare-calculator-result ${eligible and 'eligible' or 'not-eligible'}" tal:condition="calculation">
 
-            <h2 i18n:translate>Summary</h2>
+            <div class="summary-header">
+                <h2 i18n:translate>Summary</h2>
+                <a href="#" i18n:translate onclick="window.print()">
+                    Print
+                </a>
+            </div>
             <div class="summary">
                 <dl class="summary-amounts">
                     <div class="info">
@@ -94,14 +99,16 @@
             <h2 i18n:translate>Your details</h2>
             <div metal:use-macro="layout.macros['form']" />
 
-            <h2 i18n:translate>Privacy Notice</h2>
-            <div class="panel privacy-notice">
-                Die Stadt Winterthur speichert Ihre persönlichen Angaben aus
-                dem Formular nur zur Bearbeitung des erforderlichen Zweckes.
-                Die Daten werden nicht an Dritte weitergegeben und nach der
-                Bearbeitung wieder gelöscht. Mit der Verwendung des Formulars
-                erklären Sie sich mit der Bearbeitung Ihrer Daten
-                einverstanden.
+            <div class="privacy-notice">
+                <h2 i18n:translate>Privacy Notice</h2>
+                <div class="panel">
+                    Die Stadt Winterthur speichert Ihre persönlichen Angaben aus
+                    dem Formular nur zur Bearbeitung des erforderlichen Zweckes.
+                    Die Daten werden nicht an Dritte weitergegeben und nach der
+                    Bearbeitung wieder gelöscht. Mit der Verwendung des Formulars
+                    erklären Sie sich mit der Bearbeitung Ihrer Daten
+                    einverstanden.
+                </div>
             </div>
         </div>
     </tal:b>
