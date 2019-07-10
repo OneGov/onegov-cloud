@@ -595,7 +595,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
         ])
 
     @staticmethod
-    def normalize_actor_share_sufix(actor):
+    def normalize_actor_share_suffix(actor):
         """
         One actor is called sps, but the table name is called
         national_council_share_sp.
@@ -608,7 +608,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     def get_actors_share(self, actor):
         assert isinstance(actor, str), 'Actor must be a string'
         attr = 'national_council_share_' + \
-               self.normalize_actor_share_sufix(actor)
+               self.normalize_actor_share_suffix(actor)
         return getattr(self, attr, 0) or 0
 
     @cached_property
