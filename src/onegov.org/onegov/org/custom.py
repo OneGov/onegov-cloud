@@ -4,7 +4,7 @@ from onegov.org.models import GeneralFileCollection, ImageFileCollection
 from onegov.core.elements import Link, LinkGroup
 from onegov.pay import PaymentProviderCollection, PaymentCollection
 from onegov.ticket import TicketCollection
-from onegov.user.auth import Auth, UserCollection
+from onegov.user import Auth, UserCollection
 
 
 @OrgApp.template_variables()

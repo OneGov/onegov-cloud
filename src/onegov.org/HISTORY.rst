@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds compatibility with future onegov.user changes.
+  [href]
+
 1.4.3 (2019-07-02)
 ~~~~~~~~~~~~~~~~~~~
 
