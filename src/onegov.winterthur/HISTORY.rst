@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.7.1 (2019-07-10)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Adds print button to daycare calculator.
   [href]
 
