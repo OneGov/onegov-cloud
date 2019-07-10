@@ -1027,9 +1027,6 @@ def test_sorted_actors_list(sample_vote):
     for i in range(len(sorted_actors) - 2):
         actor = sorted_actors[i]
         next_actor = sorted_actors[i + 1]
-        actor_ = actor
-        if actor_ == 'sps':
-            actor_ = 'sp'
         actual_rec = sample_vote.get_recommendation(actor)
         next_rec = sample_vote.get_recommendation(next_actor)
         if actual_rec == next_rec:

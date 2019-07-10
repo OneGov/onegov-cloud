@@ -79,6 +79,8 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
 
     __tablename__ = 'swissvotes'
 
+    ORGANIZATION_NO_LONGER_EXISTS = 9999
+
     @staticmethod
     def codes(attribute):
         """ Returns the codes for the given attribute as defined in the code
@@ -560,17 +562,18 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
 
     def get_recommendation(self, name):
         """ Get the recommendations by name. """
-        # Todo: remove inconsistencies in table name
-        name_ = name
         return self.codes('recommendation').get(
-            self.recommendations.get(name_)
+            self.recommendations.get(name)
         )
 
     def get_recommendation_of_existing_parties(self):
         """ Get only the existing parties as when this vote was conducted """
         if not self.recommendations:
             return {}
-        return {k: v for k, v in self.recommendations.items() if v != 9999}
+        return {
+            k: v for k, v in self.recommendations.items()
+            if v != self.ORGANIZATION_NO_LONGER_EXISTS
+        }
 
     def group_recommendations(self, recommendations):
         """ Group the given recommendations by slogan. """
@@ -583,7 +586,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
 
         result = {}
         for actor, recommendation in recommendations:
-            if recommendation != 9999:
+            if recommendation != self.ORGANIZATION_NO_LONGER_EXISTS:
                 result.setdefault(recommendation, []).append(actor)
 
         return OrderedDict([
@@ -591,13 +594,22 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
             for key in sorted(result.keys(), key=by_recommendation)
         ])
 
+    @staticmethod
+    def normalize_actor_share_sufix(actor):
+        """
+        One actor is called sps, but the table name is called
+        national_council_share_sp.
+        TODO: As soon as the table name is adjusted, this can be removed.
+        """
+        if actor == 'sps':
+            return 'sp'
+        return actor
+
     def get_actors_share(self, actor):
         assert isinstance(actor, str), 'Actor must be a string'
-        actor_ = actor
-        # Todo: remove inconsistency in table names
-        if actor == 'sps':
-            actor_ = 'sp'
-        return getattr(self, 'national_council_share_' + actor_, 0) or 0
+        attr = 'national_council_share_' + \
+               self.normalize_actor_share_sufix(actor)
+        return getattr(self, attr, 0) or 0
 
     @cached_property
     def sorted_actors_list(self):
@@ -611,9 +623,8 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
 
         """
         result = []
-        recommendation_by_slogan = self.recommendations_parties
-        for slogan, actor_list in recommendation_by_slogan.items():
-            actors = map(lambda d: d.name, actor_list)
+        for slogan, actor_list in self.recommendations_parties.items():
+            actors = (d.name for d in actor_list)
             # Filter out those who have None as share
 
             result.extend(
