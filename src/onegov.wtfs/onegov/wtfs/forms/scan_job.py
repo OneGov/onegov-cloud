@@ -382,8 +382,7 @@ class UnrestrictedScanJobForm(Form):
     return_date = DateField(
         label=_("Return date"),
         fieldset=_("Return to the municipality"),
-        validators=[Optional()],
-        depends_on=('type', 'express'),
+        validators=[Optional()]
     )
 
     return_boxes = IntegerField(
