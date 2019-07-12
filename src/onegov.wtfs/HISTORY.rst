@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.4.2 (2019-07-12)
+~~~~~~~~~~~~~~~~~~~
 
 - Shows return date on normal jobs for admins.
   [href]
