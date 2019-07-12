@@ -195,7 +195,7 @@ class Form(BaseForm):
         Supported are dependencies to boolean fields and choices. Search
         the source code for depends_on for plenty of examples.
 
-        For checkboxes, note that the value is 'true' (string) or '!true' for
+        For checkboxes, note that the value is 'y' (string) or '!y' for
         the inverse.
 
         In the process the fields are altered so that wtforms recognizes them
