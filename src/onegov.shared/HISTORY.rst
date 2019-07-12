@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes Travis build.
+  [href]
+
 0.3.2 (2019-07-12)
 ~~~~~~~~~~~~~~~~~~~
 
