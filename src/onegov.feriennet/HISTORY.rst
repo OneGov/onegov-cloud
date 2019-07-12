@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.6.14 (2019-07-12)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds compatibility with latest onegov.form release.
   [href]
