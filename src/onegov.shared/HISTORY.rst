@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.2 (2019-07-12)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes checkboxes not triggering form dependencies.
   [href]
 
