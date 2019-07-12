@@ -35,13 +35,7 @@ var get_choices = function(form, field_name) {
     }
 
     return _.map($(fields), function(f) {
-        var field = $(f);
-
-        if (field.attr('type') === 'checkbox') {
-            return 'true';
-        } else {
-            return field.val();
-        }
+        return $(f).val();
     });
 };
 
