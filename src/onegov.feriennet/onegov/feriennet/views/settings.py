@@ -92,13 +92,13 @@ class FeriennetSettingsForm(Form):
     donation_amounts = TextAreaField(
         label=_("Donation Amounts"),
         description=_("One amount per line"),
-        depends_on=('donation', 'true'),
+        depends_on=('donation', 'y'),
         render_kw={'rows': 3},
         fieldset=_("Donation"))
 
     donation_description = HtmlField(
         label=_("Description"),
-        depends_on=('donation', 'true'),
+        depends_on=('donation', 'y'),
         fieldset=_("Donation"),
         render_kw={'rows': 10})
 

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds compatibility with latest onegov.form release.
+  [href]
+
 - Improves resilience of donation views/paths.
   [href]
 
