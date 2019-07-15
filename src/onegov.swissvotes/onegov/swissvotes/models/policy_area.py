@@ -210,7 +210,6 @@ class PolicyAreaDefinition(object):
                     PolicyAreaDefinition([3, 32, 326], _("d-3-326")),
                     PolicyAreaDefinition([3, 32, 327], _("d-3-327")),
                     PolicyAreaDefinition([3, 32, 328], _("d-3-328")),
-                    PolicyAreaDefinition([3, 32, 329], _("d-3-329")),
                 ]),
                 PolicyAreaDefinition([3, 33], _("d-2-33")),
             ]),

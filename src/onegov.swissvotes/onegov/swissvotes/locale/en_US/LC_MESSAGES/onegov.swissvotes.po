@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2019-07-15 12:43+0200\n"
+"POT-Creation-Date: 2019-07-15 14:53+0200\n"
 "PO-Revision-Date: 2019-06-18 17:27+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -882,13 +882,13 @@ msgstr "Militäranlagen"
 msgid "d-3-325"
 msgstr "Dienstverweigerung – Zivildienst"
 
-msgid "d-3-327"
-msgstr "Armeeabschaffung"
+msgid "d-3-326"
+msgstr "Armeebeschaffung"
 
-msgid "d-3-328"
+msgid "d-3-327"
 msgstr "Militärische Ausbildung"
 
-msgid "d-3-329"
+msgid "d-3-328"
 msgstr "Internationale Einsätze"
 
 msgid "d-3-411"

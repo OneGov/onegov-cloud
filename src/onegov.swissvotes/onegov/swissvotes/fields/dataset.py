@@ -65,11 +65,12 @@ class SwissvoteDatasetField(UploadField):
         if workbook.nsheets < 1:
             raise ValueError(_("No data."))
 
+        data_sheet_name = 'DATA'
         if workbook.nsheets > 1:
-            assert 'DATASHEET' in workbook.sheet_names()
+            assert data_sheet_name in workbook.sheet_names()
             assert 'CITATION' in workbook.sheet_names()
 
-        sheet = workbook.sheet_by_name('DATASHEET')
+        sheet = workbook.sheet_by_name(data_sheet_name)
 
         if sheet.nrows <= 1:
             raise ValueError(_("No data."))
