@@ -136,6 +136,7 @@
                 var bar = canvas.selectAll('rect.bar');
 
                 // Add a 50% line
+                var fade_duration = 500;
                 var middle_line = canvas.append('line')
                     .attr('x1', offset + 5 + scale(50))
                     .attr('x2', offset + 5 + scale(50))
@@ -150,42 +151,42 @@
                     bar_yea.on('mouseover', function(d) {
                         bar_yea.filter(function(s) { return s != d; })
                             .transition()
-                            .duration(700)
+                            .duration(fade_duration)
                     		    .style('opacity', 0.1);
                         bar_nay.transition()
-                            .duration(700)
+                            .duration(fade_duration)
                     		    .style('opacity', 0.1);
                         bar_none.transition()
-                            .duration(700)
+                            .duration(fade_duration)
                     		    .style('opacity', 0.1);
                     });
                     bar_none.on('mouseover', function(d) {
                         bar_none.filter(function(s) { return s != d; })
                             .transition()
-                            .duration(700)
+                            .duration(fade_duration)
                     		    .style('opacity', 0.1);
                         bar_yea.transition()
-                            .duration(700)
+                            .duration(fade_duration)
                     		    .style('opacity', 0.1);
                         bar_nay.transition()
-                            .duration(700)
+                            .duration(fade_duration)
                     		    .style('opacity', 0.1);
                     });
                     bar_nay.on('mouseover', function(d) {
                         bar_nay.filter(function(s) { return s != d; })
                             .transition()
-                            .duration(700)
+                            .duration(fade_duration)
                     		    .style('opacity', 0.1);
                         bar_yea.transition()
-                            .duration(700)
+                            .duration(fade_duration)
                             .style('opacity', 0.1);
                         bar_none.transition()
-                            .duration(700)
+                            .duration(fade_duration)
                             .style('opacity', 0.1);
                     });
                     bar.on('mouseout', function(d) {
                         bar.transition()
-                            .duration(700)
+                            .duration(fade_duration)
                     		    .style('opacity', options.colorOpacity);
                     });
                 }
