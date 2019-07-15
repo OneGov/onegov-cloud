@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2019-06-24 10:06+0200\n"
+"POT-Creation-Date: 2019-07-15 10:06+0200\n"
 "PO-Revision-Date: 2019-06-17 22:08+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -13,8 +13,489 @@ msgstr ""
 "Generated-By: xls-to-po 1.0\n"
 "X-Generator: Poedit 2.2\n"
 
+msgid "Select Some Options"
+msgstr "Optionen auswählen"
+
+msgid "No results match"
+msgstr "Keine Ergebnisse gefunden"
+
+msgid "No data."
+msgstr "Keine Daten."
+
+#, python-format
+msgid "Some columns are missing: ${columns}."
+msgstr "Einige Spalten fehlen: ${columns}."
+
+#, python-format
+msgid "Some cells contain invalid values: ${errors}."
+msgstr "Einige Zellen enthalten ungültige Werte: ${errors}."
+
+msgid "Not a valid XLSX file."
+msgstr "Keine gültige XLSX-Datei."
+
+msgid "Votes"
+msgstr "Abstimmungen"
+
+msgid "Homepage"
+msgstr "Startseite"
+
+msgid "Update dataset"
+msgstr "Datensatz aktualisieren"
+
+msgid "Delete all votes"
+msgstr "Alle Abstimmungen löschen"
+
+msgid "Download dataset (CSV)"
+msgstr "Datensatz herunterladen (CSV)"
+
+msgid "Download dataset (XLSX)"
+msgstr "Datensatz herunterladen (XLSX)"
+
+msgid "Add page"
+msgstr "Seite hinzufügen"
+
+msgid "Edit page"
+msgstr "Seite bearbeiten"
+
+msgid "Delete page"
+msgstr "Seite löschen"
+
+msgid "Manage attachments"
+msgstr "Anhänge verwalten"
+
+msgid "Delete attachment"
+msgstr "Anhang löschen"
+
+msgid "Add"
+msgstr "Hinzufügen"
+
+msgid "Page"
+msgstr "Seite"
+
+msgid "Voter strengths"
+msgstr "Wählerstärken"
+
+msgid "Delete vote"
+msgstr "Abstimmung löschen"
+
+msgid "You are here"
+msgstr "Aktuelle Seite"
+
+msgid "Previous Page"
+msgstr "Vorherige Seite"
+
+msgid "Next Page"
+msgstr "Nächste Seite"
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid "Search"
+msgstr "Suchen"
+
+msgid "Reset"
+msgstr "Zurücksetzen"
+
+msgid "Stack"
+msgstr "Gestapelt"
+
+msgid "Toggle"
+msgstr "Auswahl"
+
+msgid "Columns"
+msgstr "Spalten"
+
+msgid "The form contains errors. Please check the fields marked in red."
+msgstr ""
+"Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
+
+msgid "Forgot your password?"
+msgstr "Passwort vergessen?"
+
+msgid "Reset password"
+msgstr "Passwort zurücksetzen"
+
+msgid "Filter"
+msgstr "Filtern"
+
+msgid "Results"
+msgstr "Resultate"
+
 msgid "Title"
 msgstr "Titel"
+
+msgid "Date"
+msgstr "Datum"
+
+msgid "Legal form"
+msgstr "Rechtsform"
+
+msgid "Policy area"
+msgstr "Politikbereich"
+
+msgid "Voting result"
+msgstr "Abstimmungsergebnis"
+
+msgid "Yeas Percentage People"
+msgstr "Ja-Anteil Volk"
+
+msgid "Turnout"
+msgstr "Stimmbeteiligung"
+
+msgid "Details"
+msgstr "Details"
+
+msgid "Pagination"
+msgstr "Paginierung"
+
+msgid "Previous vote"
+msgstr "Vorherige Abstimmung"
+
+msgid "Next vote"
+msgstr "Nächste Abstimmung"
+
+msgid "General"
+msgstr "Allgemeines"
+
+msgid "Official title"
+msgstr "Offizieller Titel"
+
+msgid "Keyword"
+msgstr "Kurzbezeichnung"
+
+msgid "Vote date"
+msgstr "Abstimmungsdatum"
+
+msgid "Brief description Swissvotes"
+msgstr "Kurzbeschreibung Swissvotes"
+
+msgid "Description Année Politique Suisse"
+msgstr "Beschreibung Année Politique Suisse"
+
+msgid "Link"
+msgstr "Link"
+
+msgid "Voting text"
+msgstr "Abstimmungstext"
+
+msgid "Vote number"
+msgstr "Abstimmungsnummer"
+
+msgid "Related votes"
+msgstr "Verwandte Vorlagen"
+
+msgid "Submission"
+msgstr "Einreichung"
+
+msgid "Initiator"
+msgstr "Urheber"
+
+msgid "Signatures"
+msgstr "Unterschriften"
+
+msgid "Collection duration"
+msgstr "Sammeldauer"
+
+msgid ""
+"Number of days between the start of collecting signatures and their filing "
+"by the initiators."
+msgstr "Anzahl Tage vom Sammelbeginn bis zur Einreichung."
+
+msgid "Days"
+msgstr "Tage"
+
+msgid "Realization"
+msgstr "Zustandekommen"
+
+msgid "Pre-parliamentary phase"
+msgstr "Vorparlamentarische Phase"
+
+msgid "Federal council message"
+msgstr "Botschaft des Bundesrats"
+
+msgid "Position of the Federal Council"
+msgstr "Position des Bundesrats"
+
+msgid "Parliamentary phase"
+msgstr "Im Parlament"
+
+msgid "Procedure number"
+msgstr "Geschäftsnummer"
+
+msgid "Parliamentary debate"
+msgstr "Parlamentsberatung"
+
+msgid "Duration in Parliament"
+msgstr "Behandlungsdauer Parlament"
+
+msgid ""
+"Number of days between the Federal Council dispatch and the Parliament’s "
+"final vote."
+msgstr "Anzahl Tage von der Verabschiedung der bundesrätlichen Botschaft bis zum Parlamentsbeschluss."
+
+msgid "Parliament's position"
+msgstr "Position des Parlaments"
+
+msgid "Position of the National Council"
+msgstr "Position des Nationalrats"
+
+msgid "Yea"
+msgstr "Ja"
+
+msgid "Nay"
+msgstr "Nein"
+
+msgid "Position of the Council of States"
+msgstr "Position des Ständerats"
+
+msgid ""
+"Number of days between the Parliament’s final vote and the decree to declare "
+"the success of the referendum."
+msgstr "Anzahl Tage vom Parlamentsbeschluss bis zum Beschluss über das Zustandekommen."
+
+msgid "Voting campaign"
+msgstr "Abstimmungskampf"
+
+msgid "Voting booklet"
+msgstr "Abstimmungsbüchlein"
+
+msgid "Recommendations of the Parties"
+msgstr "Parteiparolen"
+
+msgid "Voter share of yes camp"
+msgstr "Wähleranteil des Ja-Lagers"
+
+msgid "Cumulated electoral share of the parties which recommend to vote Yes."
+msgstr "Kumulierter Wähleranteil der Parteien, die die Ja-Parole zur Vorlage gefasst haben."
+
+msgid "Further Recommendations"
+msgstr "Weitere Parolen"
+
+msgid "Divergent branches"
+msgstr "Abweichende Sektionen"
+
+msgid "Analysis of the advertising campaign"
+msgstr "Analyse der Inseratekampagne"
+
+msgid "Vote"
+msgstr "Abstimmung"
+
+msgid "People"
+msgstr "Volk"
+
+msgid "Yeas"
+msgstr "Jastimmen"
+
+msgid "Cantons"
+msgstr "Stände"
+
+msgid "Resolution"
+msgstr "Erwahrungsbeschluss"
+
+msgid "Result by canton, district and municipality"
+msgstr "Abstimmungsergebnis pro Kanton, Bezirk und Gemeinde"
+
+msgid "Interactive map of the Swiss Federal Statistical Office"
+msgstr "Interaktive Karte des Bundesamts für Statistik"
+
+#. Used in sentence: "<dynamic element>"
+msgid "Display the map"
+msgstr "Karte anzeigen"
+
+msgid "<dynamic element>"
+msgstr ""
+
+msgid "Cumulated electoral shares"
+msgstr "Kumulierte Wählerstärken"
+
+msgid "Recommendation"
+msgstr "Parole"
+
+msgid "Percentage of voters in the National Council elections"
+msgstr "Wähleranteil bei der Nationalratswahl"
+
+msgid "None"
+msgstr "Keine"
+
+msgid "Empty"
+msgstr "Leer einlegen"
+
+msgid "Free vote"
+msgstr "Stimmfreigabe"
+
+msgid "Neutral"
+msgstr "Neutral"
+
+msgid "unknown"
+msgstr "unbekannt"
+
+msgid "Parties"
+msgstr "Parteien"
+
+msgid "Party"
+msgstr "Partei"
+
+msgid "Others"
+msgstr "Übrige"
+
+msgid "Patrons"
+msgstr "Gönner"
+
+msgid "Attachment"
+msgstr "Anhang"
+
+msgid "Actions"
+msgstr "Aktionen"
+
+msgid "No attachments."
+msgstr "Keine Anhänge."
+
+msgid "Delete"
+msgstr "Löschen"
+
+msgid "Drop files to upload"
+msgstr "Dateien hierhin ziehen, um sie hochzuladen"
+
+msgid "Upload"
+msgstr "Hochladen"
+
+msgid "Logout"
+msgstr "Abmelden"
+
+msgid "Dear Sir or Madam,"
+msgstr "Sehr geehrte Damen und Herren,"
+
+msgid "Click the following link to set a new password:"
+msgstr "Klicken Sie auf den folgenden Link, um ein neues Passwort zu setzen:"
+
+msgid "If you don't want to change your password, you can ignore this email."
+msgstr ""
+"Sie können dieses E-Mail ignorieren, falls Sie Ihr Passwort nicht ändern "
+"möchten."
+
+msgid "Do you really want to delete all votes?!"
+msgstr "Möchten Sie wirklich alle Abstimmungen löschen?!"
+
+#, python-format
+msgid "Dataset updated (${added} added, ${updated} updated)"
+msgstr "Datensatz aktualisiert (${added} hinzugefügt, ${updated} geändert)"
+
+msgid "All votes deleted"
+msgstr "Alle Abstimmungen gelöscht"
+
+#, python-format
+msgid "The dataset contains unknown descriptors: ${items}."
+msgstr "Der Datensatz enthält unbekannte Deskriptoren: ${items}."
+
+#, python-format
+msgid "Do you really want to delete \"${item}\"?"
+msgstr "Möchten Sie \"${item}\" wirklich löschen?"
+
+msgid "Attachments"
+msgstr "Anhänge"
+
+msgid "Attachment added."
+msgstr "Anhang hinzugefügt."
+
+msgid "Page added."
+msgstr "Seite hinzugefügt."
+
+msgid "Page modified."
+msgstr "Seite geändert."
+
+msgid "Page deleted"
+msgstr "Seite gelöscht"
+
+msgid "Attachment deleted."
+msgstr "Anhang gelöscht."
+
+msgid "Wrong username or password"
+msgstr "Unbekannter Benutzername oder falsches Passwort"
+
+#, python-format
+msgid ""
+"A password reset link has been sent to ${email}, provided an account exists "
+"for this email address."
+msgstr ""
+"Eine E-Mail wurde an ${email} gesendet (sofern die Adresse gültig ist)."
+
+msgid "Login"
+msgstr "Anmelden"
+
+msgid "Wrong username or password reset link not valid any more."
+msgstr "Ungültige E-Mail oder abgelaufener Link."
+
+msgid "Password changed."
+msgstr "Passwort geändert."
+
+msgid "Password reset"
+msgstr "Passwort zurücksetzen"
+
+msgid "Access Denied"
+msgstr "Zugriff verweigert"
+
+msgid "You are trying to open a page for which you are not authorized."
+msgstr ""
+"Sie versuchen eine Seite zu öffnen, für die Sie nicht autorisiert sind."
+
+msgid "Page not Found"
+msgstr "Seite nicht gefunden"
+
+msgid "The page you are looking for could not be found."
+msgstr "Die angeforderte Seite konnte nicht gefunden werden."
+
+msgid "Federal Council"
+msgstr "Bundesrat"
+
+msgid "National Council"
+msgstr "Nationalrat"
+
+msgid "Council of States"
+msgstr "Ständerat"
+
+msgid "Party slogans"
+msgstr "Parteiparolen"
+
+msgid "Attachments updated"
+msgstr "Anhänge aktualisiert"
+
+msgid "Vote deleted"
+msgstr "Abstimmung gelöscht."
+
+#, python-format
+msgid "${x}% yea"
+msgstr "${x}% Ja"
+
+#, python-format
+msgid "${x}% nay"
+msgstr "${x}% Nein"
+
+msgid "Recommendations by political parties"
+msgstr "Empfehlungen der politischen Parteien"
+
+#, python-format
+msgid "Electoral shares of parties: Parties recommending Yes ${x}%"
+msgstr "Wähleranteile der Parteien: Befürwortende Parteien ${x}%"
+
+#, python-format
+msgid "Electoral shares of parties: Parties recommending No ${x}%"
+msgstr "Wähleranteile der Parteien: Ablehnende Parteien ${x}%"
+
+#, python-format
+msgid "Electoral shares of parties: neutral/unknown ${x}%"
+msgstr "Wähleranteile der Parteien: Neutral/unbekannt ${x}%"
+
+#, python-format
+msgid "${x}% none"
+msgstr "${x}% Neutral/unbekannt"
+
+#, python-format
+msgid "${x} yea"
+msgstr "${x} Ja"
+
+#, python-format
+msgid "${x} nay"
+msgstr "${x} Nein"
 
 msgid "Content"
 msgstr "Inhalt"
@@ -24,32 +505,8 @@ msgstr ""
 "Das Hochladen von Anhängen kann aufgrund der Volltextindizierung einige Zeit "
 "in Anspruch nehmen."
 
-msgid "Voting text"
-msgstr "Abstimmungstext"
-
-msgid "Brief description Swissvotes"
-msgstr "Kurzbeschreibung Swissvotes"
-
-msgid "Federal council message"
-msgstr "Botschaft des Bundesrats"
-
-msgid "Parliamentary debate"
-msgstr "Parlamentsberatung"
-
-msgid "Voting booklet"
-msgstr "Abstimmungsbüchlein"
-
-msgid "Resolution"
-msgstr "Erwahrungsbeschluss"
-
-msgid "Realization"
-msgstr "Zustandekommen"
-
 msgid "Advertisment analysis"
 msgstr "Inserateanalyse"
-
-msgid "Result by canton, district and municipality"
-msgstr "Abstimmungsergebnis pro Kanton, Bezirk und Gemeinde"
 
 msgid "Updating the dataset may take some time."
 msgstr ""
@@ -64,15 +521,6 @@ msgstr "Von"
 msgid "To date"
 msgstr "Bis"
 
-msgid "Legal form"
-msgstr "Rechtsform"
-
-msgid "Voting result"
-msgstr "Abstimmungsergebnis"
-
-msgid "Policy area"
-msgstr "Politikbereich"
-
 msgid "Text Search"
 msgstr "Textsuche"
 
@@ -86,17 +534,8 @@ msgstr ""
 "Sucht in allen Textfeldern und Anhängen. Wählen Sie «Nein», um die Suche auf "
 "Titel, Kurzbezeichnung, Abstimmungs- und Geschäftsnummer zu beschränken."
 
-msgid "Position of the Federal Council"
-msgstr "Position des Bundesrats"
-
 msgid "Other Filters"
 msgstr "Weitere Filter"
-
-msgid "Position of the National Council"
-msgstr "Position des Nationalrats"
-
-msgid "Position of the Council of States"
-msgstr "Position des Ständerats"
 
 msgid "Yes"
 msgstr "Ja"
@@ -106,111 +545,6 @@ msgstr "Nein"
 
 msgid "Without / Unknown"
 msgstr "Ohne / Unbekannt"
-
-msgid "Voter strengths"
-msgstr "Wählerstärken"
-
-msgid "Manage attachments"
-msgstr "Anhänge verwalten"
-
-msgid "Delete vote"
-msgstr "Abstimmung löschen"
-
-msgid "Votes"
-msgstr "Abstimmungen"
-
-msgid "Update dataset"
-msgstr "Datensatz aktualisieren"
-
-msgid "Delete all votes"
-msgstr "Alle Abstimmungen löschen"
-
-msgid "canton-ag-label"
-msgstr "Aargau"
-
-msgid "canton-ai-label"
-msgstr "Appenzell Innerrhoden"
-
-msgid "canton-ar-label"
-msgstr "Appenzell Ausserrhoden"
-
-msgid "canton-be-label"
-msgstr "Bern"
-
-msgid "canton-bl-label"
-msgstr "Basel-Landschaft"
-
-msgid "canton-bs-label"
-msgstr "Basel-Stadt"
-
-msgid "canton-fr-label"
-msgstr "Freiburg"
-
-msgid "canton-ge-label"
-msgstr "Genf"
-
-msgid "canton-gl-label"
-msgstr "Glarus"
-
-msgid "canton-gr-label"
-msgstr "Graubünden"
-
-msgid "canton-ju-label"
-msgstr "Jura"
-
-msgid "canton-lu-label"
-msgstr "Luzern"
-
-msgid "canton-ne-label"
-msgstr "Neuenburg"
-
-msgid "canton-nw-label"
-msgstr "Nidwalden"
-
-msgid "canton-ow-label"
-msgstr "Obwalden"
-
-msgid "canton-sg-label"
-msgstr "St. Gallen"
-
-msgid "canton-sh-label"
-msgstr "Schaffhausen"
-
-msgid "canton-so-label"
-msgstr "Solothurn"
-
-msgid "canton-sz-label"
-msgstr "Schwyz"
-
-msgid "canton-tg-label"
-msgstr "Thurgau"
-
-msgid "canton-ti-label"
-msgstr "Tessin"
-
-msgid "canton-ur-label"
-msgstr "Uri"
-
-msgid "canton-vd-label"
-msgstr "Waadt"
-
-msgid "canton-vs-label"
-msgstr "Wallis"
-
-msgid "canton-zg-label"
-msgstr "Zug"
-
-msgid "canton-zh-label"
-msgstr "Zürich"
-
-msgid "canton-ch-label"
-msgstr "Schweiz"
-
-msgid "canton-vso-label"
-msgstr "Oberwallis"
-
-msgid "canton-vsr-label"
-msgstr "Unterwallis"
 
 msgid "d-1-1"
 msgstr "Staatsordnung"
@@ -740,88 +1074,6 @@ msgstr "Radio, Fernsehen, Elektronische Medien"
 msgid "d-3-1254"
 msgstr "Medienfreiheit"
 
-msgid "Mandatory referendum"
-msgstr "Obligatorisches Referendum"
-
-msgid "Optional referendum"
-msgstr "Fakultatives Referendum"
-
-msgid "Popular initiative"
-msgstr "Volksinitiative"
-
-msgid "Direct counter-proposal"
-msgstr "Direkter Gegenentwurf"
-
-msgid "Rejected"
-msgstr "Abgelehnt"
-
-msgid "Accepted"
-msgstr "Angenommen"
-
-msgid "Majority of the cantons not necessary"
-msgstr "Ständemehr nicht notwendig"
-
-msgid "Federal Department of Foreign Affairs (FDFA)"
-msgstr "Eidgenössisches Departement für auswärtige Angelegenheiten (EDA)"
-
-msgid "Federal Department of Home Affairs (FDHA)"
-msgstr "Eidgenössisches Departement des Innern (EDI)"
-
-msgid "Federal Department of Justice and Police (FDJP)"
-msgstr "Eidgenössisches Justiz- und Polizeidepartement (EJPD)"
-
-msgid "Federal Department of Defence, Civil Protection and Sport (DDPS)"
-msgstr ""
-"Eidgenössisches Departement für Verteidigung, Bevölkerungsschutz und Sport "
-"(VBS)"
-
-msgid "Federal Department of Finance (FDF)"
-msgstr "Eidgenössisches Finanzdepartement (EFD)"
-
-msgid "Federal Department of Economic Affairs, Education and Research (EAER)"
-msgstr ""
-"Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF)"
-
-msgid ""
-"Federal Department of the Environment, Transport, Energy and Communications "
-"(DETEC)"
-msgstr ""
-"Eidgenössisches Departement für Umwelt, Verkehr, Energie und Kommunikation "
-"(UVEK)"
-
-msgid "Federal Chancellery (FCh)"
-msgstr "Bundeskanzlei (BK)"
-
-msgid "Accepting"
-msgstr "Befürwortend"
-
-msgid "Rejecting"
-msgstr "Ablehnend"
-
-msgid "Neutral"
-msgstr "Neutral"
-
-msgid "Yea"
-msgstr "Ja"
-
-msgid "Nay"
-msgstr "Nein"
-
-msgid "None"
-msgstr "Keine"
-
-msgid "Empty"
-msgstr "Leer einlegen"
-
-msgid "Free vote"
-msgstr "Stimmfreigabe"
-
-msgid "Organization no longer exists"
-msgstr "Organisation existiert nicht mehr"
-
-msgid "unknown"
-msgstr "unbekannt"
-
 msgid "actor-acs-abbreviation"
 msgstr "ACS"
 
@@ -1290,383 +1542,153 @@ msgstr "Verband des Personals öffentlicher Dienste"
 msgid "actor-vsa-label"
 msgstr "Vereinigung schweizerischer Angestelltenverbände"
 
-msgid "Add page"
-msgstr "Seite hinzufügen"
+msgid "canton-ag-label"
+msgstr "Aargau"
 
-msgid "Edit page"
-msgstr "Seite bearbeiten"
+msgid "canton-ai-label"
+msgstr "Appenzell Innerrhoden"
 
-msgid "Delete page"
-msgstr "Seite löschen"
+msgid "canton-ar-label"
+msgstr "Appenzell Ausserrhoden"
 
-msgid "Delete attachment"
-msgstr "Anhang löschen"
+msgid "canton-be-label"
+msgstr "Bern"
 
-msgid "Homepage"
-msgstr "Startseite"
+msgid "canton-bl-label"
+msgstr "Basel-Landschaft"
 
-msgid "Add"
-msgstr "Hinzufügen"
+msgid "canton-bs-label"
+msgstr "Basel-Stadt"
 
-msgid "Page"
-msgstr "Seite"
+msgid "canton-fr-label"
+msgstr "Freiburg"
 
-msgid "Download dataset (CSV)"
-msgstr "Datensatz herunterladen (CSV)"
+msgid "canton-ge-label"
+msgstr "Genf"
 
-msgid "Download dataset (XLSX)"
-msgstr "Datensatz herunterladen (XLSX)"
+msgid "canton-gl-label"
+msgstr "Glarus"
 
-msgid "Cumulated electoral shares"
-msgstr "Kumulierte Wählerstärken"
+msgid "canton-gr-label"
+msgstr "Graubünden"
 
-msgid "Recommendation"
-msgstr "Parole"
+msgid "canton-ju-label"
+msgstr "Jura"
 
-msgid "Percentage of voters in the National Council elections"
-msgstr "Wähleranteil bei der Nationalratswahl"
+msgid "canton-lu-label"
+msgstr "Luzern"
 
-msgid "Parties"
-msgstr "Parteien"
+msgid "canton-ne-label"
+msgstr "Neuenburg"
 
-msgid "Party"
-msgstr "Partei"
+msgid "canton-nw-label"
+msgstr "Nidwalden"
 
-msgid "Others"
-msgstr "Übrige"
+msgid "canton-ow-label"
+msgstr "Obwalden"
 
-msgid "Attachment"
-msgstr "Anhang"
+msgid "canton-sg-label"
+msgstr "St. Gallen"
 
-msgid "Actions"
-msgstr "Aktionen"
+msgid "canton-sh-label"
+msgstr "Schaffhausen"
 
-msgid "No attachments."
-msgstr "Keine Anhänge."
+msgid "canton-so-label"
+msgstr "Solothurn"
 
-msgid "Delete"
-msgstr "Löschen"
+msgid "canton-sz-label"
+msgstr "Schwyz"
 
-msgid "Drop files to upload"
-msgstr "Dateien hierhin ziehen, um sie hochzuladen"
+msgid "canton-tg-label"
+msgstr "Thurgau"
 
-msgid "Upload"
-msgstr "Hochladen"
+msgid "canton-ti-label"
+msgstr "Tessin"
 
-msgid "The form contains errors. Please check the fields marked in red."
+msgid "canton-ur-label"
+msgstr "Uri"
+
+msgid "canton-vd-label"
+msgstr "Waadt"
+
+msgid "canton-vs-label"
+msgstr "Wallis"
+
+msgid "canton-zg-label"
+msgstr "Zug"
+
+msgid "canton-zh-label"
+msgstr "Zürich"
+
+msgid "canton-ch-label"
+msgstr "Schweiz"
+
+msgid "canton-vso-label"
+msgstr "Oberwallis"
+
+msgid "canton-vsr-label"
+msgstr "Unterwallis"
+
+msgid "Mandatory referendum"
+msgstr "Obligatorisches Referendum"
+
+msgid "Optional referendum"
+msgstr "Fakultatives Referendum"
+
+msgid "Popular initiative"
+msgstr "Volksinitiative"
+
+msgid "Direct counter-proposal"
+msgstr "Direkter Gegenentwurf"
+
+msgid "Rejected"
+msgstr "Abgelehnt"
+
+msgid "Accepted"
+msgstr "Angenommen"
+
+msgid "Majority of the cantons not necessary"
+msgstr "Ständemehr nicht notwendig"
+
+msgid "Federal Department of Foreign Affairs (FDFA)"
+msgstr "Eidgenössisches Departement für auswärtige Angelegenheiten (EDA)"
+
+msgid "Federal Department of Home Affairs (FDHA)"
+msgstr "Eidgenössisches Departement des Innern (EDI)"
+
+msgid "Federal Department of Justice and Police (FDJP)"
+msgstr "Eidgenössisches Justiz- und Polizeidepartement (EJPD)"
+
+msgid "Federal Department of Defence, Civil Protection and Sport (DDPS)"
 msgstr ""
-"Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
+"Eidgenössisches Departement für Verteidigung, Bevölkerungsschutz und Sport "
+"(VBS)"
 
-msgid "Pagination"
-msgstr "Paginierung"
+msgid "Federal Department of Finance (FDF)"
+msgstr "Eidgenössisches Finanzdepartement (EFD)"
 
-msgid "Previous vote"
-msgstr "Vorherige Abstimmung"
-
-msgid "Next vote"
-msgstr "Nächste Abstimmung"
-
-msgid "General"
-msgstr "Allgemeines"
-
-msgid "Official title"
-msgstr "Offizieller Titel"
-
-msgid "Keyword"
-msgstr "Kurzbezeichnung"
-
-msgid "Vote date"
-msgstr "Abstimmungsdatum"
-
-msgid "Description Année Politique Suisse"
-msgstr "Beschreibung Année Politique Suisse"
-
-msgid "Link"
-msgstr "Link"
-
-msgid "Vote number"
-msgstr "Abstimmungsnummer"
-
-msgid "Related votes"
-msgstr "Verwandte Vorlagen"
-
-msgid "Submission"
-msgstr "Einreichung"
-
-msgid "Initiator"
-msgstr "Urheber"
-
-msgid "Signatures"
-msgstr "Unterschriften"
-
-msgid "Collection duration"
-msgstr "Sammeldauer"
-
-msgid "Days"
-msgstr "Tage"
-
-msgid "Pre-parliamentary phase"
-msgstr "Vorparlamentarische Phase"
-
-msgid "Parliamentary phase"
-msgstr "Im Parlament"
-
-msgid "Procedure number"
-msgstr "Geschäftsnummer"
-
-msgid "Duration in Parliament"
-msgstr "Behandlungsdauer Parlament"
-
-msgid "Parliament's position"
-msgstr "Position des Parlaments"
-
-msgid "Voting campaign"
-msgstr "Abstimmungskampf"
-
-msgid "Recommendations of the Parties"
-msgstr "Parteiparolen"
-
-msgid "Voter share of yes camp"
-msgstr "Wähleranteil des Ja-Lagers"
-
-msgid "Details"
-msgstr "Details"
-
-msgid "Further Recommendations"
-msgstr "Weitere Parolen"
-
-msgid "Divergent branches"
-msgstr "Abweichende Sektionen"
-
-msgid "Analysis of the advertising campaign"
-msgstr "Analyse der Inseratekampagne"
-
-msgid "Vote"
-msgstr "Abstimmung"
-
-msgid "People"
-msgstr "Volk"
-
-msgid "Yeas"
-msgstr "Jastimmen"
-
-msgid "Cantons"
-msgstr "Stände"
-
-msgid "Turnout"
-msgstr "Stimmbeteiligung"
-
-msgid "Interactive map of the Swiss Federal Statistical Office"
-msgstr "Interaktive Karte des Bundesamts für Statistik"
-
-msgid "Display the map"
-msgstr "Karte anzeigen"
-
-msgid "You are here"
-msgstr "Aktuelle Seite"
-
-msgid "Previous Page"
-msgstr "Vorherige Seite"
-
-msgid "Next Page"
-msgstr "Nächste Seite"
-
-msgid "Cancel"
-msgstr "Abbrechen"
-
-msgid "Search"
-msgstr "Suchen"
-
-msgid "Reset"
-msgstr "Zurücksetzen"
-
-msgid "Stack"
-msgstr "Gestapelt"
-
-msgid "Toggle"
-msgstr "Auswahl"
-
-msgid "Columns"
-msgstr "Spalten"
-
-msgid "Forgot your password?"
-msgstr "Passwort vergessen?"
-
-msgid "Reset password"
-msgstr "Passwort zurücksetzen"
-
-msgid "Dear Sir or Madam,"
-msgstr "Sehr geehrte Damen und Herren,"
-
-msgid "Click the following link to set a new password:"
-msgstr "Klicken Sie auf den folgenden Link, um ein neues Passwort zu setzen:"
-
-msgid "If you don't want to change your password, you can ignore this email."
+msgid "Federal Department of Economic Affairs, Education and Research (EAER)"
 msgstr ""
-"Sie können dieses E-Mail ignorieren, falls Sie Ihr Passwort nicht ändern "
-"möchten."
+"Eidgenössisches Departement für Wirtschaft, Bildung und Forschung (WBF)"
 
-msgid "Logout"
-msgstr "Abmelden"
-
-msgid "Patrons"
-msgstr "Gönner"
-
-msgid "Filter"
-msgstr "Filtern"
-
-msgid "Results"
-msgstr "Resultate"
-
-msgid "Date"
-msgstr "Datum"
-
-msgid "Yeas Percentage People"
-msgstr "Ja-Anteil Volk"
-
-msgid "No data."
-msgstr "Keine Daten."
-
-#, python-format
-msgid "Some columns are missing: ${columns}."
-msgstr "Einige Spalten fehlen: ${columns}."
-
-#, python-format
-msgid "Some cells contain invalid values: ${errors}."
-msgstr "Einige Zellen enthalten ungültige Werte: ${errors}."
-
-msgid "Not a valid XLSX file."
-msgstr "Keine gültige XLSX-Datei."
-
-msgid "Select Some Options"
-msgstr "Optionen auswählen"
-
-msgid "No results match"
-msgstr "Keine Ergebnisse gefunden"
-
-msgid "Wrong username or password"
-msgstr "Unbekannter Benutzername oder falsches Passwort"
-
-#, python-format
 msgid ""
-"A password reset link has been sent to ${email}, provided an account exists "
-"for this email address."
+"Federal Department of the Environment, Transport, Energy and Communications "
+"(DETEC)"
 msgstr ""
-"Eine E-Mail wurde an ${email} gesendet (sofern die Adresse gültig ist)."
+"Eidgenössisches Departement für Umwelt, Verkehr, Energie und Kommunikation "
+"(UVEK)"
 
-msgid "Login"
-msgstr "Anmelden"
+msgid "Federal Chancellery (FCh)"
+msgstr "Bundeskanzlei (BK)"
 
-msgid "Wrong username or password reset link not valid any more."
-msgstr "Ungültige E-Mail oder abgelaufener Link."
+msgid "Accepting"
+msgstr "Befürwortend"
 
-msgid "Password changed."
-msgstr "Passwort geändert."
+msgid "Rejecting"
+msgstr "Ablehnend"
 
-msgid "Password reset"
-msgstr "Passwort zurücksetzen"
-
-#, python-format
-msgid "Do you really want to delete \"${item}\"?"
-msgstr "Möchten Sie \"${item}\" wirklich löschen?"
-
-msgid "Attachments"
-msgstr "Anhänge"
-
-msgid "Attachment added."
-msgstr "Anhang hinzugefügt."
-
-msgid "Page added."
-msgstr "Seite hinzugefügt."
-
-msgid "Page modified."
-msgstr "Seite geändert."
-
-msgid "Page deleted"
-msgstr "Seite gelöscht"
-
-msgid "Attachment deleted."
-msgstr "Anhang gelöscht."
-
-msgid "Do you really want to delete all votes?!"
-msgstr "Möchten Sie wirklich alle Abstimmungen löschen?!"
-
-#, python-format
-msgid "Dataset updated (${added} added, ${updated} updated)"
-msgstr "Datensatz aktualisiert (${added} hinzugefügt, ${updated} geändert)"
-
-msgid "All votes deleted"
-msgstr "Alle Abstimmungen gelöscht"
-
-#, python-format
-msgid "The dataset contains unknown descriptors: ${items}."
-msgstr "Der Datensatz enthält unbekannte Deskriptoren: ${items}."
-
-msgid "Federal Council"
-msgstr "Bundesrat"
-
-msgid "National Council"
-msgstr "Nationalrat"
-
-msgid "Council of States"
-msgstr "Ständerat"
-
-msgid "Party slogans"
-msgstr "Parteiparolen"
-
-msgid "Attachments updated"
-msgstr "Anhänge aktualisiert"
-
-msgid "Vote deleted"
-msgstr "Abstimmung gelöscht."
-
-#, python-format
-msgid "${x}% yea"
-msgstr "${x}% Ja"
-
-#, python-format
-msgid "${x}% nay"
-msgstr "${x}% Nein"
-
-msgid "Recommendations by political parties"
-msgstr "Empfehlungen der politischen Parteien"
-
-#, python-format
-msgid "Electoral shares of parties: Parties recommending Yes ${x}%"
-msgstr "Wähleranteile der Parteien: Befürwortende Parteien ${x}%"
-
-#, python-format
-msgid "Electoral shares of parties: Parties recommending No ${x}%"
-msgstr "Wähleranteile der Parteien: Ablehnende Parteien ${x}%"
-
-#, python-format
-msgid "Electoral shares of parties: neutral/unknown ${x}%"
-msgstr "Wähleranteile der Parteien: Neutral/unbekannt ${x}%"
-
-#, python-format
-msgid "${x}% none"
-msgstr "${x}% Neutral/unbekannt"
-
-#, python-format
-msgid "${x} yea"
-msgstr "${x} Ja"
-
-#, python-format
-msgid "${x} nay"
-msgstr "${x} Nein"
-
-msgid "Access Denied"
-msgstr "Zugriff verweigert"
-
-msgid "You are trying to open a page for which you are not authorized."
-msgstr ""
-"Sie versuchen eine Seite zu öffnen, für die Sie nicht autorisiert sind."
-
-msgid "Page not Found"
-msgstr "Seite nicht gefunden"
-
-msgid "The page you are looking for could not be found."
-msgstr "Die angeforderte Seite konnte nicht gefunden werden."
+msgid "Organization no longer exists"
+msgstr "Organisation existiert nicht mehr"
 
 #~ msgid "Submit"
 #~ msgstr "Absenden"

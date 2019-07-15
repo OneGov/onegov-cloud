@@ -215,7 +215,7 @@
                     <tr tal:condition="vote.national_council_share_yeas is not None or vote.has_national_council_share_data">
                         <th class="column-30">
                             <span i18n:translate>Voter share of yes camp</span>
-                            <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="Cumulated electoral share of the parties which recommend to vote Yes"><i class="fa fa-info" aria-hidden="true"></i></span>
+                            <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="Cumulated electoral share of the parties which recommend to vote Yes."><i class="fa fa-info" aria-hidden="true"></i></span>
                         </th>
                         <td>
                             <tal:block tal:condition="vote.has_national_council_share_data">
