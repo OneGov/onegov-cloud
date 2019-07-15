@@ -511,7 +511,7 @@ class SwissVoteCollection(Pagination):
         mapper = ColumnMapper()
 
         workbook = Workbook(file, {'default_date_format': 'dd.mm.yyyy'})
-        worksheet = workbook.add_worksheet()
+        worksheet = workbook.add_worksheet('DATA')
         worksheet.write_row(0, 0, mapper.columns.values())
 
         query = self.query().options(undefer_group("dataset"))

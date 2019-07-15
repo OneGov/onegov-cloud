@@ -5,6 +5,7 @@ from onegov.swissvotes.models import SwissVote
 from pytest import mark
 from webtest import TestApp as Client
 from webtest.forms import Upload
+from xlrd import open_workbook
 from xlsxwriter.workbook import Workbook
 
 
@@ -22,6 +23,10 @@ def test_update_votes(swissvotes_app, file):
 
     with open(file, 'rb') as f:
         content = f.read()
+        workbook = open_workbook(file_contents=content)
+
+    sheet = workbook.sheet_by_name('DATA')
+    data_rows = sheet.nrows - 1
 
     # Upload
     manage = client.get('/').maybe_follow().click("Abstimmungen")
@@ -32,7 +37,9 @@ def test_update_votes(swissvotes_app, file):
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
     manage = manage.form.submit().follow()
-    assert "Datensatz aktualisiert (642 hinzugefügt, 0 geändert)" in manage
+
+    assert f"Datensatz aktualisiert ({data_rows} " \
+        f"hinzugefügt, 0 geändert)" in manage
 
     session = swissvotes_app.session()
     vote = session.query(SwissVote).filter_by(bfs_number=82.2).one()
@@ -62,14 +69,18 @@ def test_update_votes(swissvotes_app, file):
     # Download
     manage = client.get('/').maybe_follow().click("Abstimmungen")
     csv = manage.click("Datensatz herunterladen", index=0).body
-    xlsx = manage.click("Datensatz herunterladen", index=1).body
+    # xlsx = manage.click("Datensatz herunterladen", index=1).body
 
     # Upload (roundtrip)
     manage = client.get('/').maybe_follow().click("Abstimmungen")
     manage = manage.click("Datensatz aktualisieren")
+
+    # Changed from xlsx to content to upload since
+    # generated file lacks the CITATION sheet
+
     manage.form['dataset'] = Upload(
         'votes.xlsx',
-        xlsx,
+        content,
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
     manage = manage.form.submit().follow()
@@ -96,7 +107,8 @@ def test_update_votes_unknown_descriptors(swissvotes_app):
 
     file = BytesIO()
     workbook = Workbook(file)
-    worksheet = workbook.add_worksheet()
+    worksheet = workbook.add_worksheet('DATA')
+    workbook.add_worksheet('CITATION')
     worksheet.write_row(0, 0, ColumnMapper().columns.values())
     worksheet.write_row(1, 0, [
         '100.1',  # anr

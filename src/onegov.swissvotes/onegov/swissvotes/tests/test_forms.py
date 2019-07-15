@@ -437,7 +437,8 @@ def test_update_dataset_form(session):
 
     file = BytesIO()
     workbook = Workbook(file)
-    worksheet = workbook.add_worksheet()
+    worksheet = workbook.add_worksheet('DATA')
+    workbook.add_worksheet('CITATION')
     worksheet.write_row(0, 0, ColumnMapper().columns.values())
     worksheet.write_row(1, 0, [
         100.1,  # anr / NUMERIC

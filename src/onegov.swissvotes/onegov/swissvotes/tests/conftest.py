@@ -95,7 +95,7 @@ def attachments(swissvotes_app):
     ):
         file = BytesIO()
         workbook = Workbook(file)
-        worksheet = workbook.add_worksheet()
+        worksheet = workbook.add_worksheet('DATA')
         worksheet.write_row(0, 0, ['a', 'b'])
         worksheet.write_row(1, 0, [100, 200])
         workbook.close()
