@@ -77,7 +77,8 @@ def edit_page(self, request, form):
 
     return {
         'layout': EditPageLayout(self, request),
-        'form': form
+        'form': form,
+        'button_text': _("Update"),
     }
 
 

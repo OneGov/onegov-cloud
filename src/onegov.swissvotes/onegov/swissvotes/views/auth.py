@@ -40,6 +40,7 @@ def handle_login(self, request, form):
         'password_reset_link': request.link(
             Auth.from_request(request), name='request-password'
         ),
+        'button_text': _("Submit"),
     }
 
 
@@ -110,6 +111,7 @@ def handle_password_reset_request(self, request, form):
         'layout': layout,
         'title': _('Reset password'),
         'form': form,
+        'button_text': _("Submit"),
     }
 
 
@@ -146,4 +148,5 @@ def handle_password_reset(self, request, form):
         'layout': layout,
         'title': _('Reset password'),
         'form': form,
+        'button_text': _("Submit"),
     }

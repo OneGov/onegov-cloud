@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2019-07-15 10:06+0200\n"
+"POT-Creation-Date: 2019-07-15 12:43+0200\n"
 "PO-Revision-Date: 2019-06-18 17:27+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -343,6 +343,9 @@ msgstr "Party"
 msgid "Others"
 msgstr "Others"
 
+msgid "Files"
+msgstr ""
+
 msgid "Patrons"
 msgstr "Sponsors"
 
@@ -375,6 +378,9 @@ msgstr "Click the following link to set a new password:"
 
 msgid "If you don't want to change your password, you can ignore this email."
 msgstr "If you don't want to change your password, you can ignore this email."
+
+msgid "Update"
+msgstr ""
 
 msgid "Do you really want to delete all votes?!"
 msgstr "Do you really want to delete all votes?!"
@@ -422,6 +428,9 @@ msgid ""
 msgstr ""
 "A password reset link has been sent to ${email}, provided an account exists "
 "for this email address."
+
+msgid "Submit"
+msgstr "Submit"
 
 msgid "Login"
 msgstr "Login"
@@ -1686,9 +1695,6 @@ msgstr "Reject"
 
 msgid "Organization no longer exists"
 msgstr "Organization no longer exists"
-
-#~ msgid "Submit"
-#~ msgstr "Submit"
 
 #~ msgid "Yes Camp"
 #~ msgstr "\"Yes\" camp"

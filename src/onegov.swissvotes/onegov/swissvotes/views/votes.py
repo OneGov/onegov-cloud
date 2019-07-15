@@ -74,7 +74,8 @@ def update_votes(self, request, form):
     return {
         'layout': layout,
         'form': form,
-        'cancel': request.link(self)
+        'cancel': request.link(self),
+        'button_text': _("Update"),
     }
 
 
