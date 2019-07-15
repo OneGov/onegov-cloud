@@ -10,7 +10,7 @@ class PolicyArea(object):
     given category.
 
     Policy areas are internally represented as a string value containing the
-    descriptor of all three levels seperated by a comma, e.g. "1.12.121".
+    descriptor of all three levels separated by a comma, e.g. "1.12.121".
 
     Policy areas are stored in the dataset as float, with the pre-decimal part
     refering to the first level category and the decimal part to the category
@@ -207,6 +207,7 @@ class PolicyAreaDefinition(object):
                     PolicyAreaDefinition([3, 32, 323], _("d-3-323")),
                     PolicyAreaDefinition([3, 32, 324], _("d-3-324")),
                     PolicyAreaDefinition([3, 32, 325], _("d-3-325")),
+                    PolicyAreaDefinition([3, 32, 326], _("d-3-326")),
                     PolicyAreaDefinition([3, 32, 327], _("d-3-327")),
                     PolicyAreaDefinition([3, 32, 328], _("d-3-328")),
                     PolicyAreaDefinition([3, 32, 329], _("d-3-329")),
