@@ -9,7 +9,7 @@
                 </div>
                 <div class="columns large-4 large-offset-1 small-12">
                     <div class="side-panel" tal:condition="files">
-                        <h5>Dateien</h5>
+                        <h5 i18n:translate>Files</h5>
                         <ul class="attachments">
                             <li tal:repeat="file files">
                                 <a href="${request.link(file)}">${file.filename}</a>
