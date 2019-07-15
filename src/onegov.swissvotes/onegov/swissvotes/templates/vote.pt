@@ -92,7 +92,10 @@
                         <td>${layout.format_number(vote.signatures_valid)}</td>
                     </tr>
                     <tr tal:condition="vote.duration_initative_collection is not None">
-                        <th class="column-30" i18n:translate>Collection duration</th>
+                        <th class="column-30">
+                        <span i18n:translate>Collection duration</span>
+                        <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="Number of days between the start of collecting signatures and their filing by the initiators."><i class="fa fa-info" aria-hidden="true"></i></span>
+                        </th>
                         <td>${layout.format_number(vote.duration_initative_collection)} <tal:block i18n:translate>Days</tal:block></td>
                     </tr>
                     <tr tal:condition="realization">
@@ -132,7 +135,10 @@
                         <td><a href="${request.link(parliamentary_debate)}" target="_blank" class="parliamentary-debate">PDF</a></td>
                     </tr>
                     <tr tal:condition="vote.duration_federal_assembly is not None">
-                        <th class="column-30" i18n:translate>Duration in Parliament</th>
+                        <th class="column-30">
+                        <span i18n:translate>Duration in Parliament</span>
+                        <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="Number of days between the Federal Council dispatch and the Parliament’s final vote."><i class="fa fa-info" aria-hidden="true"></i></span>
+                        </th>
                         <td>${layout.format_number(vote.duration_federal_assembly)} <tal:block i18n:translate>Days</tal:block></td>
                     </tr>
                     <tr tal:condition="vote.position_parliament">
@@ -175,7 +181,10 @@
                         <td>${layout.format_number(vote.signatures_valid)}</td>
                     </tr>
                     <tr tal:condition="vote.duration_referendum_collection is not None">
-                        <th class="column-30" i18n:translate>Collection duration</th>
+                        <th class="column-30">
+                        <span i18n:translate>Collection duration</span>
+                        <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="Number of days between the Parliament’s final vote and the decree to declare the success of the referendum."><i class="fa fa-info" aria-hidden="true"></i></span>
+                        </th>
                         <td>${layout.format_number(vote.duration_referendum_collection)} <tal:block i18n:translate>Days</tal:block></td>
                     </tr>
                     <tr tal:condition="realization">
@@ -204,7 +213,10 @@
                         </td>
                     </tr>
                     <tr tal:condition="vote.national_council_share_yeas is not None or vote.has_national_council_share_data">
-                        <th class="column-30" i18n:translate>Voter share of yes camp</th>
+                        <th class="column-30">
+                            <span i18n:translate>Voter share of yes camp</span>
+                            <span i18n:attributes="title" data-tooltip aria-haspopup="true" class="has-tip" title="Cumulated electoral share of the parties which recommend to vote Yes"><i class="fa fa-info" aria-hidden="true"></i></span>
+                        </th>
                         <td>
                             <tal:block tal:condition="vote.has_national_council_share_data">
                                 <tal:block tal:condition="vote.national_council_share_yeas is not None">
