@@ -575,7 +575,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
             if v != self.ORGANIZATION_NO_LONGER_EXISTS
         }
 
-    def group_recommendations(self, recommendations):
+    def group_recommendations(self, recommendations, ignore_unknown=False):
         """ Group the given recommendations by slogan. """
 
         codes = self.codes('recommendation')
@@ -586,8 +586,12 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
 
         result = {}
         for actor, recommendation in recommendations:
-            if recommendation != self.ORGANIZATION_NO_LONGER_EXISTS:
-                result.setdefault(recommendation, []).append(actor)
+            if recommendation == self.ORGANIZATION_NO_LONGER_EXISTS:
+                continue
+            if ignore_unknown and recommendation is None:
+                continue
+
+            result.setdefault(recommendation, []).append(actor)
 
         return OrderedDict([
             (codes[key], result[key])
@@ -643,7 +647,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
         ))
 
     @cached_property
-    def recommendations_divergent_parties(self):
+    def recommendations_divergent_parties(self, ignore_unknown=True):
         """ The divergent recommendations of the parties grouped by slogans.
 
         """
@@ -655,7 +659,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
                 recommendation,
             )
             for name, recommendation in sorted(recommendations.items())
-        ))
+        ), ignore_unknown=ignore_unknown)
 
     @cached_property
     def recommendations_associations(self):
