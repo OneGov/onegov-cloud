@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Changes the server CLI multiprocessing model from 'fork' to 'forkserver'.
+
+  This fixes some issues with shared libraries causing hangs.
+
 0.7.1 (2019-03-14)
 ~~~~~~~~~~~~~~~~~~~
 

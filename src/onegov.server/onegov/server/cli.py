@@ -60,6 +60,7 @@ import traceback
 import tracemalloc
 
 from datetime import datetime
+from functools import partial
 from onegov.server import Server
 from onegov.server import Config
 from onegov.server.tracker import ResourceTracker
@@ -119,13 +120,20 @@ def run(config_file, port, pdb, tracemalloc):
     # because click does not play well with sphinx yet
     # see https://github.com/mitsuhiko/click/issues/127
 
-    global RESOURCE_TRACKER
-    RESOURCE_TRACKER = ResourceTracker(enable_tracemalloc=tracemalloc)
+    # We do not use process forking for Python's multiprocessing here, as some
+    # shared libraries (namely kerberos) do not work well with forks (i.e.
+    # there are hangs).
+    #
+    # It is also cleaner to use 'forkserver' as we get a new process spawned
+    # from a clean process each time, which ensures that there is no residual
+    # state around that might cause the first run of onegov-server to be
+    # different than any subsequent runs through automated reloads.
+    #
+    # 'spawn' would be another possible mode, but that is slower.
+    multiprocessing.set_start_method('forkserver')
 
-    def wsgi_factory():
-        return Server(Config.from_yaml_file(config_file), post_mortem=pdb)
-
-    server = WsgiServer(wsgi_factory, port=port)
+    factory = partial(wsgi_factory, config_file=config_file, pdb=pdb)
+    server = WsgiServer(factory, port=port)
     server.start()
 
     observer = Observer()
@@ -143,6 +151,10 @@ def run(config_file, port, pdb, tracemalloc):
 
     observer.join()
     server.join()
+
+
+def wsgi_factory(config_file, pdb):
+    return Server(Config.from_yaml_file(config_file), post_mortem=pdb)
 
 
 class CustomWSGIRequestHandler(WSGIRequestHandler):
@@ -209,7 +221,6 @@ class WsgiProcess(multiprocessing.Process):
     """
 
     def __init__(self, app_factory, host='127.0.0.1', port=8080, env={}):
-
         multiprocessing.Process.__init__(self)
         self.app_factory = app_factory
 
@@ -275,6 +286,9 @@ class WsgiProcess(multiprocessing.Process):
         try:
             if sys.platform == 'darwin':
                 self.disable_systemwide_darwin_proxies()
+
+            global RESOURCE_TRACKER
+            RESOURCE_TRACKER = ResourceTracker(enable_tracemalloc=tracemalloc)
 
             server = make_server(
                 self.host, self.port, self.app_factory(),
