@@ -56,15 +56,25 @@
                     </tr>
                     <tr tal:condition="brief_description">
                         <th class="column-30" i18n:translate>Brief description Swissvotes</th>
-                        <td><a href="${request.link(brief_description)}" target="_blank" class="brief-description">PDF</a></td>
+                        <td><a href="${request.link(brief_description)}" target="_blank" class="brief-description">
+                            PDF
+                            <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                            <span tal:condition="request.html_lang == 'fr-CH'">(en allemand)</span>
+                            </a></td>
                     </tr>
                     <tr tal:condition="vote.anneepolitique">
                         <th class="column-30" i18n:translate>Description Année Politique Suisse</th>
-                        <td><a href="${vote.anneepolitique}" target="_blank" i18n:translate>Link</a></td>
+                        <td><a href="${vote.anneepolitique}" target="_blank" i18n:translate>
+                            Link
+                            <span tal:condition="request.html_lang == 'en-US'">(in German / French)</span>
+                        </a></td>
                     </tr>
                     <tr tal:condition="voting_text">
                         <th class="column-30" i18n:translate>Voting text</th>
-                        <td><a href="${request.link(voting_text)}" target="_blank" class="voting-text">PDF</a></td>
+                        <td><a href="${request.link(voting_text)}" target="_blank" class="voting-text">
+                        PDF
+                        <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                        </a></td>
                     </tr>
                     <tr tal:condition="vote.bfs_number is not None">
                         <th class="column-30" i18n:translate>Vote number</th>
@@ -112,7 +122,10 @@
                 <tbody>
                     <tr tal:condition="federal_council_message">
                         <th class="column-30" i18n:translate>Federal council message</th>
-                        <td><a href="${request.link(federal_council_message)}" target="_blank" class="federal-council-message">PDF</a></td>
+                        <td><a href="${request.link(federal_council_message)}" target="_blank" class="federal-council-message">
+                        PDF
+                        <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                        </a></td>
                     </tr>
                     <tr tal:condition="vote.position_federal_council">
                         <th class="column-30" i18n:translate>Position of the Federal Council</th>
@@ -132,7 +145,10 @@
                     </tr>
                     <tr tal:condition="parliamentary_debate">
                         <th class="column-30" i18n:translate>Parliamentary debate</th>
-                        <td><a href="${request.link(parliamentary_debate)}" target="_blank" class="parliamentary-debate">PDF</a></td>
+                        <td><a href="${request.link(parliamentary_debate)}" target="_blank" class="parliamentary-debate">
+                        PDF
+                        <span tal:condition="request.html_lang == 'en-US'">(in German / French)</span>
+                        </a></td>
                     </tr>
                     <tr tal:condition="vote.duration_federal_assembly is not None">
                         <th class="column-30">
@@ -201,7 +217,10 @@
                 <tbody>
                     <tr tal:condition="voting_booklet">
                         <th class="column-30" i18n:translate>Voting booklet</th>
-                        <td><a href="${request.link(voting_booklet)}" target="_blank" class="voting-booklet">PDF</a></td>
+                        <td><a href="${request.link(voting_booklet)}" target="_blank" class="voting-booklet">
+                        PDF
+                        <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                        </a></td>
                     </tr>
                     <tr tal:condition="vote.recommendations_parties">
                         <th class="column-30" i18n:translate>Recommendations of the Parties</th>
@@ -252,7 +271,11 @@
                     </tr>
                     <tr tal:condition="ad_analysis">
                         <th class="column-30" i18n:translate>Analysis of the advertising campaign</th>
-                        <td><a href="${request.link(ad_analysis)}" target="_blank" class="ad-analysis">PDF</a></td>
+                        <td><a href="${request.link(ad_analysis)}" target="_blank" class="ad-analysis">
+                            PDF
+                            <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                            <span tal:condition="request.html_lang == 'fr-CH'">(en allemand)</span>
+                            </a></td>
                     </tr>
                 </tbody>
             </table>
@@ -296,11 +319,18 @@
                     </tr>
                     <tr tal:condition="resolution">
                         <th class="column-30" i18n:translate>Resolution</th>
-                        <td><a href="${request.link(resolution)}" target="_blank" class="resolution">PDF</a></td>
+                        <td><a href="${request.link(resolution)}" target="_blank" class="resolution">
+                        PDF
+                        <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                        </a></td>
                     </tr>
                     <tr tal:condition="results_by_domain">
                         <th class="column-30" i18n:translate>Result by canton, district and municipality</th>
-                        <td><a href="${request.link(results_by_domain)}" target="_blank" class="results-by-domain">Excel</a></td>
+                        <td><a href="${request.link(results_by_domain)}" target="_blank" class="results-by-domain">
+                            Excel
+                            <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                            <span tal:condition="request.html_lang == 'fr-CH'">(en allemand)</span>
+                            </a></td>
                     </tr>
                     <tr tal:condition="bfs_map">
                         <td colspan="2">
