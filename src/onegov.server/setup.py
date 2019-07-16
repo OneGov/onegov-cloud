@@ -43,10 +43,11 @@ setup(
         test=[
             'coverage',
             'morepath',
+            'port-for',
             'psutil',
             'pytest',
             'requests',
-            'webtest'
+            'webtest',
         ],
     ),
     entry_points="""
