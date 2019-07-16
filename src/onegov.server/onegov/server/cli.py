@@ -49,6 +49,7 @@ A onegov.yml file looks like this:
         handlers: [console]
 """
 
+import bjoern
 import click
 import multiprocessing
 import os
@@ -61,12 +62,11 @@ import tracemalloc
 
 from datetime import datetime
 from functools import partial
-from onegov.server import Server
 from onegov.server import Config
+from onegov.server import Server
 from onegov.server.tracker import ResourceTracker
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
-from wsgiref.simple_server import make_server, WSGIRequestHandler
 from xtermcolor import colorize
 
 
@@ -124,16 +124,14 @@ def run(config_file, port, pdb, tracemalloc):
     # shared libraries (namely kerberos) do not work well with forks (i.e.
     # there are hangs).
     #
-    # It is also cleaner to use 'forkserver' as we get a new process spawned
-    # from a clean process each time, which ensures that there is no residual
-    # state around that might cause the first run of onegov-server to be
-    # different than any subsequent runs through automated reloads.
-    #
-    # 'spawn' would be another possible mode, but that is slower.
-    multiprocessing.set_start_method('forkserver')
+    # It is also cleaner to use 'spawn' as we get a new process spawned each
+    # time, which ensures that there is no residual state around that might
+    # cause the first run of onegov-server to be different than any subsequent
+    # runs through automated reloads.
+    multiprocessing.set_start_method('spawn')
 
     factory = partial(wsgi_factory, config_file=config_file, pdb=pdb)
-    server = WsgiServer(factory, port=port)
+    server = WsgiServer(factory, port=port, enable_tracemalloc=tracemalloc)
     server.start()
 
     observer = Observer()
@@ -157,25 +155,37 @@ def wsgi_factory(config_file, pdb):
     return Server(Config.from_yaml_file(config_file), post_mortem=pdb)
 
 
-class CustomWSGIRequestHandler(WSGIRequestHandler):
+class WSGIRequestMonitorMiddleware(object):
     """ Measures the time it takes to respond to a request and prints it
     at the end of the request.
 
     """
 
-    def parse_request(self):
-        self._started = datetime.utcnow()
+    def __init__(self, app):
+        self.app = app
 
-        return WSGIRequestHandler.parse_request(self)
+    def __call__(self, environ, start_response):
+        received = datetime.utcnow()
+        received_status = None
 
-    def log_request(self, status, bytes):
-        status = int(status)
+        def local_start_response(status, headers):
+            nonlocal received_status
+            received_status = status
 
-        duration = datetime.utcnow() - self._started
+            start_response(status, headers)
+
+        response = self.app.__call__(environ, local_start_response)
+
+        self.log(environ, received_status, received)
+        return response
+
+    def log(self, environ, status, received):
+        duration = datetime.utcnow() - received
         duration = int(round(duration.total_seconds() * 1000, 0))
 
-        method = self.command
-        path = self.path
+        status = status.split(' ', 1)[0]
+        path = f"{environ['SCRIPT_NAME']}{environ['PATH_INFO']}"
+        method = environ['REQUEST_METHOD']
 
         template = (
             "{status} - {duration} - {method} {path} - {c:.3f} MiB ({d:+.3f})"
@@ -220,15 +230,14 @@ class WsgiProcess(multiprocessing.Process):
 
     """
 
-    def __init__(self, app_factory, host='127.0.0.1', port=8080, env={}):
+    def __init__(self, app_factory, host='127.0.0.1', port=8080, env={},
+                 enable_tracemalloc=False):
         multiprocessing.Process.__init__(self)
         self.app_factory = app_factory
-
         self.host = host
+        self.port = port
+        self.enable_tracemalloc = enable_tracemalloc
 
-        # if the port is set to 0, a random port will be selected by the os
-        self._port = port
-        self._actual_port = multiprocessing.Value('i', port)
         self._ready = multiprocessing.Value('i', 0)
 
         # hook up environment variables
@@ -243,10 +252,6 @@ class WsgiProcess(multiprocessing.Process):
     @property
     def ready(self):
         return self._ready.value == 1
-
-    @property
-    def port(self):
-        return self._actual_port.value
 
     def print_memory_stats(self, signum, frame):
         print("-" * shutil.get_terminal_size((80, 20)).columns)
@@ -288,11 +293,11 @@ class WsgiProcess(multiprocessing.Process):
                 self.disable_systemwide_darwin_proxies()
 
             global RESOURCE_TRACKER
-            RESOURCE_TRACKER = ResourceTracker(enable_tracemalloc=tracemalloc)
+            RESOURCE_TRACKER = ResourceTracker(
+                enable_tracemalloc=self.enable_tracemalloc)
 
-            server = make_server(
-                self.host, self.port, self.app_factory(),
-                handler_class=CustomWSGIRequestHandler)
+            wsgi_application = WSGIRequestMonitorMiddleware(self.app_factory())
+            bjoern.listen(wsgi_application, self.host, self.port)
         except Exception:
             # if there's an error, print it
             print(traceback.format_exc())
@@ -304,13 +309,10 @@ class WsgiProcess(multiprocessing.Process):
             while True:
                 time.sleep(10.0)
 
-        self._actual_port.value = server.socket.getsockname()[1]
         self._ready.value = 1
 
-        print("started onegov server on http://{}:{}".format(
-            self.host, self.port))
-
-        server.serve_forever()
+        print(f"started onegov server on http://{self.host}:{self.port}")
+        bjoern.run()
 
 
 class WsgiServer(FileSystemEventHandler):
@@ -319,15 +321,16 @@ class WsgiServer(FileSystemEventHandler):
 
     """
 
-    def __init__(self, app_factory, host='127.0.0.1', port=8080):
+    def __init__(self, app_factory, host='127.0.0.1', port=8080, **kwargs):
         self.app_factory = app_factory
         self._host = host
         self._port = port
+        self.kwargs = kwargs
 
     def spawn(self):
         return WsgiProcess(self.app_factory, self._host, self._port, {
             'ONEGOV_DEVELOPMENT': '1'
-        })
+        }, **self.kwargs)
 
     def join(self, timeout=None):
         if self.process.is_alive():
@@ -345,7 +348,7 @@ class WsgiServer(FileSystemEventHandler):
         self.start()
 
     def stop(self):
-        self.process.terminate()
+        self.process.kill()
 
     def on_any_event(self, event):
         """ If anything of significance changed, restart the process. """

@@ -1,9 +1,13 @@
 Changelog
 ---------
 
-- Changes the server CLI multiprocessing model from 'fork' to 'forkserver'.
+- Replaces the built-in WSGI server with Bjoern, to be closer to production.
+  [href]
+
+- Changes the server CLI multiprocessing model from 'fork' to 'spawn'.
 
   This fixes some issues with shared libraries causing hangs.
+  [href]
 
 0.7.1 (2019-03-14)
 ~~~~~~~~~~~~~~~~~~~

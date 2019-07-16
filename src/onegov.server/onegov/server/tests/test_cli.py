@@ -1,3 +1,4 @@
+import port_for
 import requests
 import time
 
@@ -6,13 +7,15 @@ from wsgiref.simple_server import demo_app
 
 
 def test_wsgi_process():
-    process = WsgiProcess(lambda: demo_app, port=0)
+    port = port_for.select_random()
+
+    process = WsgiProcess(lambda: demo_app, port=port)
     process.start()
 
     while not process.ready:
         time.sleep(0.1)
 
-    response = requests.get('http://127.0.0.1:{}'.format(process.port))
+    response = requests.get(f'http://127.0.0.1:{port}')
     assert response.status_code == 200
     assert "Hello world!" in response.content.decode('utf-8')
 
@@ -20,7 +23,9 @@ def test_wsgi_process():
 
 
 def test_wsgi_server():
-    server = WsgiServer(lambda: demo_app, port=0)
+    port = port_for.select_random()
+
+    server = WsgiServer(lambda: demo_app, port=port)
     server.start()
 
     while not server.process.ready:
@@ -28,7 +33,7 @@ def test_wsgi_server():
 
     original_pid = server.process.pid
 
-    response = requests.get('http://127.0.0.1:{}'.format(server.process.port))
+    response = requests.get(f'http://127.0.0.1:{port}')
     assert response.status_code == 200
     assert "Hello world!" in response.content.decode('utf-8')
 
@@ -45,7 +50,7 @@ def test_wsgi_server():
 
     assert server.process.pid != original_pid
 
-    response = requests.get('http://127.0.0.1:{}'.format(server.process.port))
+    response = requests.get(f'http://127.0.0.1:{port}')
     assert response.status_code == 200
     assert "Hello world!" in response.content.decode('utf-8')
 

@@ -33,6 +33,7 @@ setup(
     install_requires=[
         'cached_property',
         'click',
+        'bjoern',
         'PyYAML',
         'watchdog',
         'webob',
