@@ -116,9 +116,9 @@ class SearchForm(Form):
             self.delete_field('csrf_token')
         self.populate_choice('legal_form')
         self.populate_choice('result')
-        self.populate_choice('position_federal_council', True)
-        self.populate_choice('position_national_council', True)
-        self.populate_choice('position_council_of_states', True)
+        self.populate_choice('position_federal_council')
+        self.populate_choice('position_national_council')
+        self.populate_choice('position_council_of_states')
         self.populate_policy_area()
 
     def select_all(self, name):

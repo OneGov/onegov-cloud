@@ -119,17 +119,15 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
                       "Energy and Communications (DETEC)")),
                 (8, _("Federal Chancellery (FCh)")),
             ))
-        if attribute == 'position_federal_council':
+        if (attribute == 'position_federal_council'
+                or attribute == 'position_national_council'
+                or attribute == 'position_council_of_states'):
             return OrderedDict((
                 (1, _("Accepting")),
                 (2, _("Rejecting")),
-                (3, _("Neutral"))
+                (3, _("None"))
             ))
-        if (
-            attribute == 'position_parliament'
-            or attribute == 'position_national_council'
-            or attribute == 'position_council_of_states'
-        ):
+        if attribute == 'position_parliament':
             return OrderedDict((
                 (1, _("Accepting")),
                 (2, _("Rejecting")),

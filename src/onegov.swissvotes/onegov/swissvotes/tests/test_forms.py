@@ -295,18 +295,17 @@ def test_search_form(swissvotes_app):
     assert form.position_federal_council.choices == [
         (1, 'Accepting'),
         (2, 'Rejecting'),
-        (3, 'Neutral'),
-        (-1, 'Without / Unknown')
+        (3, 'None'),
     ]
     assert form.position_national_council.choices == [
         (1, 'Accepting'),
         (2, 'Rejecting'),
-        (-1, 'Without / Unknown')
+        (3, 'None'),
     ]
     assert form.position_council_of_states.choices == [
         (1, 'Accepting'),
         (2, 'Rejecting'),
-        (-1, 'Without / Unknown')
+        (3, 'None'),
     ]
     assert form.policy_area.choices == []
 
@@ -388,9 +387,9 @@ def test_search_form(swissvotes_app):
     assert form.policy_area.data is None
     assert form.term.data is None
     assert form.full_text.data == 1
-    assert form.position_federal_council.data == [1, 2, 3, -1]
-    assert form.position_national_council.data == [1, 2, -1]
-    assert form.position_council_of_states.data == [1, 2, - 1]
+    assert form.position_federal_council.data == [1, 2, 3]
+    assert form.position_national_council.data == [1, 2, 3]
+    assert form.position_council_of_states.data == [1, 2, 3]
     assert form.sort_by.data is None
     assert form.sort_order.data is None
 
@@ -402,8 +401,8 @@ def test_search_form(swissvotes_app):
     votes.term = 'term'
     votes.full_text = False
     votes.position_federal_council = [2, 3]
-    votes.position_national_council = [-1]
-    votes.position_council_of_states = [-1, 1, 2]
+    votes.position_national_council = [3]
+    votes.position_council_of_states = [3, 1, 2]
     votes.sort_by = 'title'
     votes.sort_order = 'ascending'
 
@@ -417,8 +416,8 @@ def test_search_form(swissvotes_app):
     assert form.term.data == 'term'
     assert form.full_text.data == 0
     assert form.position_federal_council.data == [2, 3]
-    assert form.position_national_council.data == [-1]
-    assert form.position_council_of_states.data == [-1, 1, 2]
+    assert form.position_national_council.data == [3]
+    assert form.position_council_of_states.data == [3, 1, 2]
     assert form.sort_by.data == 'title'
     assert form.sort_order.data == 'ascending'
 

@@ -825,7 +825,7 @@ def test_vote_codes():
     assert SwissVote.codes('result_ai_accepted')[1] == "Accepted"
     assert SwissVote.codes('department_in_charge')[8] == \
         "Federal Chancellery (FCh)"
-    assert SwissVote.codes('position_federal_council')[3] == "Neutral"
+    assert SwissVote.codes('position_federal_council')[3] == "None"
     assert SwissVote.codes('position_parliament')[2] == "Rejecting"
     assert SwissVote.codes('position_national_council')[2] == "Rejecting"
     assert SwissVote.codes('position_council_of_states')[2] == "Rejecting"
