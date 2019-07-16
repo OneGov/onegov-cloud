@@ -1,6 +1,36 @@
 Changelog
 ---------
 
+- Fixes Button-Text "Search" where something else makes sense
+  [dadadamotha]
+
+- Adds avail. language hints for links and pdf's
+  [dadadamotha]
+
+- Re-add formatting for official vote number.
+  [dadadamotha]
+
+- Changes active / focused links.
+  [dadadamotha]
+
+- Accounts for new codes for br-pos, sr-pos and nr-pos (0 becomes 3).
+  [dadadamotha]
+
+- Adds short title to breadcrumbs in strengths view.
+  [dadadamotha]
+
+- Adds IButtons in vote table.
+  [dadadamotha]
+
+- Changes order of parties voting recommendations.
+  [dadadamotha]
+
+- Centers "More Filters" for Edge and Firefox.
+  [dadadamotha]
+
+- Changes active / focused links.
+  [dadadamotha]
+
 - Adjusts map button design.
   [href]
 
