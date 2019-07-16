@@ -511,6 +511,7 @@ class SwissVoteCollection(Pagination):
         mapper = ColumnMapper()
 
         workbook = Workbook(file, {'default_date_format': 'dd.mm.yyyy'})
+        workbook.add_worksheet('CITATION')
         worksheet = workbook.add_worksheet('DATA')
         worksheet.write_row(0, 0, mapper.columns.values())
 
