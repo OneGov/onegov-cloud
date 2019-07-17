@@ -1,6 +1,12 @@
 cache: pip
 dist: xenial
 
+addons:
+  apt:
+    packages:
+      - libgnutls28-dev
+      - libev-dev
+
 matrix:
   include:
     - language: python
