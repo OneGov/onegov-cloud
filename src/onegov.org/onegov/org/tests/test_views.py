@@ -121,7 +121,7 @@ def test_view_images(client):
 
 def test_login(client):
     links = client.get('/').pyquery('.globals a.login')
-    assert links.text() == 'Login'
+    assert links.text() == 'Anmelden'
 
     login_page = client.get(links.attr('href'))
     login_page.form['username'] = 'admin@example.org'
@@ -144,16 +144,16 @@ def test_login(client):
     assert "Sie wurden angemeldet" in index_page.text
 
     links = index_page.pyquery('.globals a.logout')
-    assert links.text() == 'Logout'
+    assert links.text() == 'Abmelden'
 
     index_page = client.get(links.attr('href')).follow()
     links = index_page.pyquery('.globals a.login')
-    assert links.text() == 'Login'
+    assert links.text() == 'Anmelden'
 
 
 def test_reset_password(client):
     links = client.get('/').pyquery('.globals a.login')
-    assert links.text() == 'Login'
+    assert links.text() == 'Anmelden'
     login_page = client.get(links.attr('href'))
 
     request_page = login_page.click('Passwort zurücksetzen')
