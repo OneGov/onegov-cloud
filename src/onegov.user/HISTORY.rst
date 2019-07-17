@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes provider usermanagement form not storing certain values.
+  [href]
+
 0.22.0 (2019-07-17)
 ~~~~~~~~~~~~~~~~~~~
 

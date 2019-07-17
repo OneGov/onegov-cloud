@@ -78,7 +78,7 @@ def include_provider_form_fields(providers, form_class):
             provider = provider_by_name(providers, self.provider.data)
 
             if not provider:
-                raise ValueError(f"Invalid provider: {self.provider.data}")
+                return None
 
             fields = {}
 
@@ -94,9 +94,6 @@ def include_provider_form_fields(providers, form_class):
 
         @authentication_provider.setter
         def authentication_provider(self, data):
-            if not data or not providers:
-                return
-
             self.provider.data = data['name']
             self.provider_required.data = data['required']
 
@@ -107,7 +104,7 @@ def include_provider_form_fields(providers, form_class):
         def populate_obj(self, model):
             super().populate_obj(model)
 
-            if providers and self.provider.data != 'none':
+            if providers:
                 model.authentication_provider = self.authentication_provider
 
         def process_obj(self, model):
