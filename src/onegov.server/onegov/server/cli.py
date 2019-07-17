@@ -348,7 +348,7 @@ class WsgiServer(FileSystemEventHandler):
         self.start()
 
     def stop(self):
-        self.process.kill()
+        self.process.terminate()
 
     def on_any_event(self, event):
         """ If anything of significance changed, restart the process. """
