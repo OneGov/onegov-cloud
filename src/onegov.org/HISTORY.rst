@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.5.0 (2019-07-17)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds Kerberos integration.
   [href]
 
