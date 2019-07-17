@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-06-22 10:38+0200\n"
+"POT-Creation-Date: 2019-07-16 13:44+0200\n"
 "PO-Revision-Date: 2017-06-28 12:03+0200\n"
 "Last-Translator: Marc Sommerhalder <info@seantis.ch>\n"
 "Language-Team: Romansh\n"
@@ -22,12 +22,6 @@ msgstr "E-Mail"
 msgid "Password"
 msgstr "Pled-clav"
 
-msgid "YubiKey"
-msgstr "YubiKey"
-
-msgid "Plug your YubiKey into a USB slot and press it."
-msgstr "Endatar la YubiKey e smatgar il buttun."
-
 msgid "Password Confirmation"
 msgstr "Confermar il pled-clav"
 
@@ -43,8 +37,8 @@ msgstr "Il pled-clav sto correspunder al pled-clav precedent"
 msgid "The field is not empty"
 msgstr "Il champ n'è betg vid"
 
-msgid "New Password"
-msgstr "Nov pled-clav"
+msgid "Name"
+msgstr ""
 
 msgid "Role"
 msgstr ""
@@ -71,4 +65,36 @@ msgid "7 days"
 msgstr ""
 
 msgid "30 days"
+msgstr ""
+
+msgid "YubiKey"
+msgstr "YubiKey"
+
+msgid "Plug your YubiKey into a USB slot and press it."
+msgstr "Endatar la YubiKey e smatgar il buttun."
+
+msgid "New Password"
+msgstr "Nov pled-clav"
+
+msgid "Third-Party Authentication"
+msgstr ""
+
+msgid "None"
+msgstr ""
+
+msgid "Provider"
+msgstr ""
+
+msgid "Force login through provider"
+msgstr ""
+
+msgid ""
+"Forces the user to use this provider. Regular username/password "
+"authentication will be disabled!"
+msgstr ""
+
+msgid "Kerberos (v5)"
+msgstr ""
+
+msgid "Kerberos username"
 msgstr ""

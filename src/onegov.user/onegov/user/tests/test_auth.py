@@ -25,10 +25,12 @@ def test_auth_login(session):
     UserCollection(session).add('AzureDiamond', 'hunter2', 'irc-user')
     auth = Auth(session=session, application_id='my-app')
 
-    assert not auth.login(username='AzureDiamond', password='hunter1')
-    assert not auth.login(username='AzureDiamonb', password='hunter2')
+    assert not auth.authenticate(username='AzureDiamond', password='hunter1')
+    assert not auth.authenticate(username='AzureDiamonb', password='hunter2')
 
-    identity = auth.login(username='AzureDiamond', password='hunter2')
+    user = auth.authenticate(username='AzureDiamond', password='hunter2')
+
+    identity = auth.as_identity(user)
     assert identity.userid == 'azurediamond'
     assert identity.role == 'irc-user'
     assert identity.application_id == 'my-app'
@@ -40,12 +42,12 @@ def test_auth_login_inactive(session):
 
     auth = Auth(session=session, application_id='my-app')
 
-    assert not auth.login(username='AzureDiamond', password='hunter2')
+    assert not auth.authenticate(username='AzureDiamond', password='hunter2')
 
     user.active = True
     transaction.commit()
 
-    assert auth.login(username='AzureDiamond', password='hunter2')
+    assert auth.authenticate(username='AzureDiamond', password='hunter2')
 
 
 def test_auth_login_yubikey(session):
@@ -66,8 +68,9 @@ def test_auth_login_yubikey(session):
         yubikey_secret_key='dGhlIHdvcmxkIGlzIGNvbnRyb2xsZWQgYnkgbGl6YXJkcyE='
     )
 
-    assert not auth.login(username='admin@example.org', password='p@ssw0rd')
-    assert not auth.login(
+    assert not auth.authenticate(
+        username='admin@example.org', password='p@ssw0rd')
+    assert not auth.authenticate(
         username='admin@example.org',
         password='p@ssw0rd',
         second_factor='xxxxxxbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
@@ -76,7 +79,7 @@ def test_auth_login_yubikey(session):
     with patch.object(Yubico, 'verify') as verify:
         verify.return_value = False
 
-        assert not auth.login(
+        assert not auth.authenticate(
             username='admin@example.org',
             password='p@ssw0rd',
             second_factor='ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
@@ -85,12 +88,13 @@ def test_auth_login_yubikey(session):
     with patch.object(Yubico, 'verify') as verify:
         verify.return_value = True
 
-        identity = auth.login(
+        user = auth.authenticate(
             username='admin@example.org',
             password='p@ssw0rd',
             second_factor='ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
         )
 
+    identity = auth.as_identity(user)
     assert identity.userid == 'admin@example.org'
     assert identity.role == 'admin'
     assert identity.application_id == 'my-app'
@@ -109,7 +113,7 @@ def test_auth_login_unnecessary_yubikey(session):
     )
 
     # simply ignore the second factor
-    assert auth.login(
+    assert auth.authenticate(
         username='admin@example.org',
         password='p@ssw0rd',
         second_factor='ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
@@ -120,15 +124,19 @@ def test_auth_logging(session, capturelog):
     UserCollection(session).add('AzureDiamond', 'hunter2', 'irc-user')
     auth = Auth(session=session, application_id='my-app')
 
-    auth.login(username='AzureDiamond', password='hunter1')
+    # XXX do not change the following messages, as they are used that way in
+    # fail2ban already and should remain exactly the same
+    auth.authenticate(username='AzureDiamond', password='hunter1')
     assert capturelog.records()[0].message \
         == "Failed login by unknown (AzureDiamond)"
 
-    auth.login(username='AzureDiamond', password='hunter1', client='127.0.0.1')
+    auth.authenticate(
+        username='AzureDiamond', password='hunter1', client='127.0.0.1')
     assert capturelog.records()[1].message \
         == "Failed login by 127.0.0.1 (AzureDiamond)"
 
-    auth.login(username='AzureDiamond', password='hunter2', client='127.0.0.1')
+    auth.authenticate(
+        username='AzureDiamond', password='hunter2', client='127.0.0.1')
     assert capturelog.records()[2].message \
         == "Successful login by 127.0.0.1 (AzureDiamond)"
 

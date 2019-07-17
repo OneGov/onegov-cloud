@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds experimental support for Kerberos.
+  [href]
+
 0.21.0 (2019-06-25)
 ~~~~~~~~~~~~~~~~~~~
 

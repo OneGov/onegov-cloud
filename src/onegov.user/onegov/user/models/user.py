@@ -100,6 +100,34 @@ class User(Base, TimestampMixin, ORMSearchable):
     #:
     second_factor = Column(JSON, nullable=True)
 
+    #: Third-party authentication provider data if enabled. Users are only
+    #: ever associated with one authentication provider at once.
+    #:
+    #: Additionally, authentication may be either required or optional, if it
+    #: is configured at all. If the configured authentication is optional, the
+    #: user may login using it, but may also fall back to username/password.
+    #:
+    #: If the configured authentication is required, then the user may only
+    #: authenticate trough the required authentication. The username/password
+    #: combination won't work in this case.
+    #:
+    #: This allows for regular users registered with a third-party provider to
+    #: be forced to use it, while some admin may have an optional login with
+    #: an escape hatch, should the third-party provider be down or faulty.
+    #:
+    #: Example content::
+    #:
+    #:      {
+    #:          'name': 'kerberos',
+    #:          'fields': {'username': 'user@EXAMPLE.ORG'},
+    #:          'required': True
+    #:      }
+    #:
+    #: Note that the authentication provider is configured once per application
+    #: instance, there cannot be multiple auth providers of the same type one
+    #: a single application.
+    authentication_provider = Column(JSON, nullable=True)
+
     #: true if the user is active
     active = Column(Boolean, nullable=False, default=True)
 

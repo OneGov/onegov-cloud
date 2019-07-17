@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-06-28 10:44+0200\n"
+"POT-Creation-Date: 2019-07-16 13:44+0200\n"
 "PO-Revision-Date: 2017-06-22 08:50+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -25,12 +25,6 @@ msgstr "E-Mail Adresse"
 msgid "Password"
 msgstr "Passwort"
 
-msgid "YubiKey"
-msgstr "YubiKey"
-
-msgid "Plug your YubiKey into a USB slot and press it."
-msgstr "YubiKey anschliessen und Knopf drücken."
-
 msgid "Password Confirmation"
 msgstr "Passwort Bestätigung"
 
@@ -46,8 +40,8 @@ msgstr "Das Passwort muss mit dem vorgehenden übereinstimmen"
 msgid "The field is not empty"
 msgstr "Das Feld ist nicht leer"
 
-msgid "New Password"
-msgstr "Neues Passwort"
+msgid "Name"
+msgstr "Name"
 
 msgid "Role"
 msgstr "Rolle"
@@ -75,3 +69,35 @@ msgstr "7 Tage"
 
 msgid "30 days"
 msgstr "30 Tage"
+
+msgid "YubiKey"
+msgstr "YubiKey"
+
+msgid "Plug your YubiKey into a USB slot and press it."
+msgstr "YubiKey anschliessen und Knopf drücken."
+
+msgid "New Password"
+msgstr "Neues Passwort"
+
+msgid "Third-Party Authentication"
+msgstr "Authentifizierung über Dritte"
+
+msgid "None"
+msgstr "Keine"
+
+msgid "Provider"
+msgstr "Anbieter"
+
+msgid "Force login through provider"
+msgstr "Anmeldung muss über Anbieter geschehen"
+
+msgid ""
+"Forces the user to use this provider. Regular username/password "
+"authentication will be disabled!"
+msgstr "Zwingt den Benutzer sich über den Anbieter anzumelden. Die reguläre Anmeldung über Benutzername/Passwort wird deaktiviert!"
+
+msgid "Kerberos (v5)"
+msgstr "Kerberos (v5)"
+
+msgid "Kerberos username"
+msgstr "Kerberos Benutzername"

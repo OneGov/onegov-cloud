@@ -1,4 +1,5 @@
 cache: pip
+dist: xenial
 
 matrix:
   include:
@@ -16,6 +17,8 @@ addons:
       packages:
         - ghostscript
         - libpoppler-cpp-dev
+        - libgnutls28-dev
+        - libev-dev
 
 install:
     - pip install tox

@@ -198,3 +198,9 @@ def add_type_column(context):
             'users',
             Column('type', Text, nullable=True)
         )
+
+
+@upgrade_task('Add authentication_provider column')
+def add_authentication_provider_column(context):
+    context.operations.add_column(
+        'users', Column('authentication_provider', JSON, nullable=True))
