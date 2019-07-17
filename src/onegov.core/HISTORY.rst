@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.83.0 (2019-07-17)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes field label translation being too eager.
   [href]
