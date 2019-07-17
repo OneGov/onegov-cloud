@@ -16,6 +16,7 @@ addons:
     apt:
       packages:
         - libgnutls28-dev
+        - libev-dev
 
 install:
     - pip install tox
