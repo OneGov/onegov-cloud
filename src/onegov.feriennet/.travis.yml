@@ -1,6 +1,7 @@
 language: python
 python: "3.6"
 cache: pip
+dist: xenial
 
 addons:
   postgresql: "9.6"
