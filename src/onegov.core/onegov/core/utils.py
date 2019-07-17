@@ -289,6 +289,43 @@ def groupbylist(*args, **kwargs):
     return [(k, list(g)) for k, g in groupby(*args, **kwargs)]
 
 
+# regex pattern for swiss phone numbers
+phone_ch_country_code = r"(\+41|0041|[^\+]?0)"
+phone_ch_regex = phone_ch_country_code + r'([\s\d]+)'
+PHONE_RGX = re.compile(phone_ch_regex)
+
+
+def linkify_phone(text):
+    """
+    Takes a string and replaces valid phone numbers with
+    html links. If a phone number is matched, it will be replaced by the result
+    of a callback function, that does further checks on the regex match.
+    If these checks do not pass, the matched number will remain unchanged.
+    """
+    def _check_length(number):
+        if number.startswith('00'):
+            return len(number) == 13
+        elif number.startswith('0'):
+            return len(number) == 10
+        elif number.startswith('+'):
+            return len(number) == 12
+        return False
+
+    def _link(match):
+        """ Receives a re.Match object """
+        number = match.group(0)
+        stripped = number.replace(' ', '')
+
+        if _check_length(stripped):
+            while '  ' in number:
+                number = number.replace('  ', ' ')
+            return f'<a href="tel:{number}">{number}</a>'
+        return number
+
+    r = PHONE_RGX.sub(_link, text)
+    return r
+
+
 def linkify(text, escape=True):
     """ Takes plain text and injects html links for urls and email addresses.
 

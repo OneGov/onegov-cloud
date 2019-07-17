@@ -1,3 +1,5 @@
+import re
+
 import onegov.core
 import os.path
 import pytest
@@ -8,6 +10,7 @@ from onegov.core.custom import json
 from onegov.core.errors import AlreadyLockedError
 from onegov.core.orm import SessionManager
 from onegov.core.orm.types import HSTORE
+from onegov.core.utils import linkify_phone, phone_ch_regex
 from sqlalchemy import Column, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from unittest.mock import patch
@@ -69,6 +72,55 @@ def test_module_path():
 
     with pytest.raises(AssertionError):
         utils.module_path(onegov.core, '../passwd')
+
+
+valid_test_phone_numbers = [
+    '+41 44 453 45 45',
+    '+41 79434 3254',
+    '+41     79434     3254',
+    '+4179434 3254',
+    '004179434 3254',
+    '044 302 35 87',
+    '079 720 55 03',
+    '0797205503',
+    '0413025643',
+    '041 324 4321',
+]
+
+# +041 324 4321 will treat + like a normal text around
+
+invalid_test_phone_numbers = [
+    'some text',
+    '+31 654 32 54',
+    '+0041 543 44 44',
+    '0041-24400321',
+    '0043 555 32 43'
+]
+
+
+@pytest.mark.parametrize("number", valid_test_phone_numbers)
+def test_phone_regex_groups_valid(number):
+    gr = re.search(phone_ch_regex, number)
+    print(gr)
+    assert gr.group(0)
+    assert gr.group(1)
+    assert gr.group(2)
+
+
+@pytest.mark.parametrize("number", valid_test_phone_numbers)
+def test_linkify_phone_valid(number):
+    r = linkify_phone(number)
+    assert r != number
+    while '  ' in number:
+        number = number.replace('  ', ' ')
+    wanted = f'<a href="tel:{number}">{number}</a>'
+    assert r == wanted
+
+
+@pytest.mark.parametrize("number", invalid_test_phone_numbers)
+def test_linkify_phone_invalid(number):
+    r = linkify_phone(number)
+    assert r == number
 
 
 def test_linkify():
