@@ -2,9 +2,6 @@ language: python
 python: "3.6"
 cache: pip
 
-# required for google chrome
-dist: trusty
-
 addons:
   postgresql: "9.6"
   chrome: stable
@@ -13,6 +10,8 @@ addons:
       - openjdk-8-jre-headless
       - ghostscript
       - libpoppler-cpp-dev
+      - libgnutls28-dev
+      - libev-dev
 
 env:
     - TOXENV=py36 DEPLOY=yes
