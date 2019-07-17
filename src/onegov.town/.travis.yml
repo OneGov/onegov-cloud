@@ -16,9 +16,11 @@ addons:
     postgresql: "9.6"
     apt:
         packages:
-            - oracle-java8-set-default
+            - openjdk-8-jre-headless
             - ghostscript
             - libpoppler-cpp-dev
+            - libgnutls28-dev
+            - libev-dev
 
 script:
     - tox -e $TOXENV
