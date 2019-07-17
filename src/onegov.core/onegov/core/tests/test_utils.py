@@ -10,7 +10,7 @@ from onegov.core.custom import json
 from onegov.core.errors import AlreadyLockedError
 from onegov.core.orm import SessionManager
 from onegov.core.orm.types import HSTORE
-from onegov.core.utils import linkify_phone, phone_ch_regex
+from onegov.core.utils import linkify_phone, _phone_ch
 from sqlalchemy import Column, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from unittest.mock import patch
@@ -100,25 +100,23 @@ invalid_test_phone_numbers = [
 
 @pytest.mark.parametrize("number", valid_test_phone_numbers)
 def test_phone_regex_groups_valid(number):
-    gr = re.search(phone_ch_regex, number)
-    print(gr)
+    gr = re.search(_phone_ch, number)
     assert gr.group(0)
     assert gr.group(1)
     assert gr.group(2)
 
 
 @pytest.mark.parametrize("number", valid_test_phone_numbers)
-def test_linkify_phone_valid(number):
+def test_phone_linkify_valid(number):
     r = linkify_phone(number)
     assert r != number
-    while '  ' in number:
-        number = number.replace('  ', ' ')
+    number = utils.remove_duplicate_whitespace(number)
     wanted = f'<a href="tel:{number}">{number}</a>'
     assert r == wanted
 
 
 @pytest.mark.parametrize("number", invalid_test_phone_numbers)
-def test_linkify_phone_invalid(number):
+def test_phone_linkify_invalid(number):
     r = linkify_phone(number)
     assert r == number
 
@@ -155,6 +153,12 @@ def test_ensure_scheme():
         == 'http://google.ch?q=onegov.cloud'
 
     assert utils.ensure_scheme('https://abc.xyz') == 'https://abc.xyz'
+
+
+def test_remove_duplicate_whitespace():
+    assert utils.remove_duplicate_whitespace('foo  bar') == 'foo bar'
+    assert utils.remove_duplicate_whitespace('  foo  bar  ') == ' foo bar '
+    assert utils.remove_duplicate_whitespace('       foo    bar') == ' foo bar'
 
 
 def test_is_uuid():

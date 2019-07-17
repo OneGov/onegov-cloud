@@ -54,6 +54,13 @@ _email_regex = re.compile((
 # detects multiple successive newlines
 _multiple_newlines = re.compile(r'\n{2,}', re.MULTILINE)
 
+# matches duplicate whitespace
+_duplicate_whitespace = re.compile(r'\s+')
+
+# regex pattern for swiss phone numbers
+_phone_ch_country_code = r"(\+41|0041|[^\+]?0)"
+_phone_ch = re.compile(_phone_ch_country_code + r'([\s\d]+)')
+
 # for yubikeys
 ALPHABET = 'cbdefghijklnrtuv'
 ALPHABET_RE = re.compile(r'^[cbdefghijklnrtuv]{12,44}$')
@@ -289,20 +296,15 @@ def groupbylist(*args, **kwargs):
     return [(k, list(g)) for k, g in groupby(*args, **kwargs)]
 
 
-# regex pattern for swiss phone numbers
-phone_ch_country_code = r"(\+41|0041|[^\+]?0)"
-phone_ch_regex = phone_ch_country_code + r'([\s\d]+)'
-PHONE_RGX = re.compile(phone_ch_regex)
-
-
 def linkify_phone(text):
+    """ Takes a string and replaces valid phone numbers with html links. If a
+    phone number is matched, it will be replaced by the result of a callback
+    function, that does further checks on the regex match. If these checks do
+    not pass, the matched number will remain unchanged.
+
     """
-    Takes a string and replaces valid phone numbers with
-    html links. If a phone number is matched, it will be replaced by the result
-    of a callback function, that does further checks on the regex match.
-    If these checks do not pass, the matched number will remain unchanged.
-    """
-    def _check_length(number):
+
+    def is_valid_length(number):
         if number.startswith('00'):
             return len(number) == 13
         elif number.startswith('0'):
@@ -311,19 +313,16 @@ def linkify_phone(text):
             return len(number) == 12
         return False
 
-    def _link(match):
-        """ Receives a re.Match object """
+    def handle_match(match):
         number = match.group(0)
-        stripped = number.replace(' ', '')
 
-        if _check_length(stripped):
-            while '  ' in number:
-                number = number.replace('  ', ' ')
+        if is_valid_length(number.replace(' ', '')):
+            number = remove_duplicate_whitespace(number).strip()
             return f'<a href="tel:{number}">{number}</a>'
+
         return number
 
-    r = PHONE_RGX.sub(_link, text)
-    return r
+    return _phone_ch.sub(handle_match, text)
 
 
 def linkify(text, escape=True):
@@ -351,6 +350,16 @@ def linkify(text, escape=True):
 
     return bleach.clean(
         linkified, tags=['a'], attributes={'a': ['href', 'rel']})
+
+
+def remove_duplicate_whitespace(text):
+    """ Removes whitespace that is duplicated.
+
+    For example: 'foo  bar' becomes 'foo bar'.
+
+    """
+
+    return _duplicate_whitespace.sub(' ', text)
 
 
 def paragraphify(text):
