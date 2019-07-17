@@ -18,6 +18,7 @@ addons:
             - ghostscript
             - libpoppler-cpp-dev
             - libgnutls28-dev
+            - libev-dev
 
 install:
     - pip install tox
