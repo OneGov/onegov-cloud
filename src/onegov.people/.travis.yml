@@ -16,6 +16,7 @@ addons:
     apt:
         packages:
             - ghostscript
+            - libgnutls28-dev
             - libpoppler-cpp-dev
             - libev-dev
 
