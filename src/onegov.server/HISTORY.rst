@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.8.0 (2019-07-17)
+~~~~~~~~~~~~~~~~~~~
+
 - Replaces the built-in WSGI server with Bjoern, to be closer to production.
   [href]
 
