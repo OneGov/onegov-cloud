@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.22.2 (2019-07-17)
+~~~~~~~~~~~~~~~~~~~
 
 - Updates translations.
   [href]
