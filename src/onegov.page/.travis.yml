@@ -12,6 +12,10 @@ matrix:
 
 addons:
     postgresql: "9.6"
+    apt:
+      packages:
+        - libgnutls28-dev
+        - libev-dev
 
 install:
     - pip install tox
