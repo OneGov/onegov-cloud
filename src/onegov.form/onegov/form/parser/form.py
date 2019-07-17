@@ -345,7 +345,7 @@ class WTFormsClassBuilder(object):
         # https://github.com/wtforms/wtforms/issues/315
         # -> quotes are allowed because the label is rendered between tags,
         # not as part of the attributes
-        label = escape(label, quote=False)
+        label = type(label)(escape(label, quote=False))
 
         self.validators_extend(validators, required, dependency)
 

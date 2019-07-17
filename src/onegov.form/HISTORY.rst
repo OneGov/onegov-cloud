@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes label escapes turning translatable into untranslatable strings.
+  [href]
+
 0.46.4 (2019-07-02)
 ~~~~~~~~~~~~~~~~~~~
 
