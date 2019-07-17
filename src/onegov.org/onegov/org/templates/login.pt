@@ -32,5 +32,16 @@
                 </span>
             </div>
         </div>
+        <div class="row" tal:condition="providers">
+            <div class="small-12 medium-7 large-5 columns alternatives">
+                <h2 i18n:translate>Alternatives</h2>
+
+                <div tal:repeat="provider providers" class="provider-login">
+                    <a href="${provider_login(provider)}" class="button">
+                        <tal:b replace="structure render_untrusted_markdown(request.translate(provider.button_text(request)))" />
+                    </a>
+                </div>
+            </div>
+        </div>
     </tal:b>
 </div>

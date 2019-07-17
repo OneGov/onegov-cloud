@@ -400,6 +400,49 @@ $globals-height: 2.5rem;
 }
 
 /*
+    Login page
+*/
+#page-auth-login {
+    .alternatives {
+        margin-top: 1.5rem;
+    }
+
+    h2 {
+        font-size: $h3-font-size;
+    }
+
+    input[type="submit"] {
+        width: 100%;
+    }
+
+    a.button {
+        display: block;
+        width: 100%;
+
+        p {
+            margin: 0;
+            padding: 0;
+        }
+    }
+
+    .provider-login {
+        $first-color: #ffc56c;
+        $first-hover: darken($first-color, 10%);
+
+        @for $i from 1 through 4 {
+            a:nth-child(#{$i}) {
+                background: lighten($first-color, ($i - 1) * 5%);
+                color: $body-font-color;
+
+                &:hover {
+                    background: lighten($first-hover, ($i - 1) * 5%);
+                }
+            }
+        }
+    }
+}
+
+/*
     blank (uncolored) labels
 */
 .blank-label {
@@ -3836,13 +3879,17 @@ ul.search-results {
 /*
     Usermanagement
 */
-
 .user-inactive td {
-    color: $base;
+    color: lighten($body-font-color, 25%);
 }
 
 .usermanagement {
     width: 100%;
+
+    td:last-child {
+        text-align: right;
+        width: 1%;
+    }
 
     td.text-links {
         white-space: nowrap;

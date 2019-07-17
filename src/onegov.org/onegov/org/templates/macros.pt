@@ -334,9 +334,20 @@
         </div>
     </tal:b>
     <tal:b condition="field.type != 'BooleanField'">
-        <span class="label-text">${field.label.text}</span>
-        <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
-        ${field(placeholder=request.translate(field.description))}
+        <!--!
+            Note how the field is rendered *first* in the 'define' step,
+            before the label is accessed. This is due to the field call
+            setting up translatable labels as a side-effect.
+
+            See onegov.core.i18n.get_translation_bound_meta.render_field
+        -->
+        <tal:b define="content field(placeholder=request.translate(field.description))">
+            <span class="label-text">${field.label.text}</span>
+            <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+
+            <!--! The field is placed here -->
+            <tal:b replace="structure content" />
+        </tal:b>
     </tal:b>
 </metal:single_field>
 

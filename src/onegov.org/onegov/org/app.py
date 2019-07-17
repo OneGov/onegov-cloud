@@ -22,11 +22,12 @@ from onegov.pay import PayApp
 from onegov.reservation import LibresIntegration
 from onegov.search import ElasticsearchApp
 from onegov.ticket import TicketCollection
+from onegov.user import UserApp
 from sqlalchemy import desc
 
 
 class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
-             DepotApp, PayApp, FormApp):
+             DepotApp, PayApp, FormApp, UserApp):
 
     serve_static_files = True
     request_class = OrgRequest

@@ -2,6 +2,7 @@
 
 import morepath
 
+from onegov.core.markdown import render_untrusted_markdown
 from onegov.core.security import Public, Personal
 from onegov.org import _, OrgApp
 from onegov.org import log
@@ -70,11 +71,19 @@ def handle_login(self, request, form):
         Link(_("Login"), request.link(self, name='login'))
     ]
 
+    def provider_login(provider):
+        provider.to = self.to
+        return request.link(provider)
+
     return {
         'layout': layout,
         'password_reset_link': request.link(self, name='request-password'),
         'register_link': request.link(self, name='register'),
         'may_register': request.app.enable_user_registration,
+        'button_text': _("Login"),
+        'providers': request.app.providers,
+        'provider_login': provider_login,
+        'render_untrusted_markdown': render_untrusted_markdown,
         'title': _('Login to ${org}', mapping={
             'org': request.app.org.title
         }),

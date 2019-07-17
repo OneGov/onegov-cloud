@@ -1,4 +1,5 @@
 cache: pip
+dist: xenial
 
 matrix:
   include:

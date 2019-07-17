@@ -9,24 +9,54 @@
                     <tal:b repeat="role ('admin', 'editor', 'member')">
                         <tbody tal:condition="users.get(role)" tal:define="enable_yubikey request.app.enable_yubikey">
                             <tr class="subheader">
-                                <td colspan="${enable_yubikey and '3' or '4'}">
+                                <td>
                                     <tal:b metal:use-macro="layout.macros['role-plural']" />
                                     (${len(users.get(role))})
                                 </td>
-                                <td colspan="2" tal:condition="enable_yubikey" i18n:translate>
+                                <td></td>
+                                <td tal:condition="enable_yubikey" i18n:translate>
                                     Yubikey
                                 </td>
+                                <td tal:condition="request.app.providers" i18n:translate>
+                                    Provider
+                                </td>
+                                <td></td>
                             </tr>
                             <tr tal:repeat="user users[role]" class="${user.active and 'user-active' or 'user-inactive'}">
-                                <td><a href="${request.link(user)}">${user.username}</a></td>
+                                <td>
+                                    <tal:b condition="user.active">
+                                        <i class="fa fa-user-o" aria-hidden="true" title="Active" i18n:attributes="title"></i>
+                                    </tal:b>
+                                    <tal:b condition="not:user.active">
+                                        <i class="fa fa-ban" aria-hidden="true" title="Inactive" i18n:attributes="title"></i>
+                                    </tal:b>
+                                    &nbsp;
+                                    <span>${user.username}</span>
+                                </td>
+
                                 <td>${user.realname}</td>
-                                <td i18n:translate tal:condition="user.active">Active</td>
-                                <td i18n:translate tal:condition="not:user.active">Inactive</td>
 
                                 <tal:b define="serial user.yubikey_serial" condition="enable_yubikey">
-                                    <td tal:condition="serial"><span class="yubikey">${serial}</span></td>
+                                    <td tal:condition="serial">
+                                        <span class="yubikey">
+                                            <i class="fa fa-key" aria-hidden="true"></i>
+                                            ${serial}
+                                        </span>
+                                    </td>
                                     <td tal:condition="not:serial" i18n:translate></td>
                                 </tal:b>
+
+                                <td tal:condition="request.app.providers">
+                                    <span class="yubikey" tal:condition="user.authentication_provider">
+                                        <tal:b condition="user.authentication_provider.required">
+                                            <i class="fa fa-toggle-on" aria-hidden="true"></i>
+                                        </tal:b>
+                                        <tal:b condition="not:user.authentication_provider.required">
+                                            <i class="fa fa-toggle-off" aria-hidden="true"></i>
+                                        </tal:b>
+                                        ${request.app.provider(user.authentication_provider.name).metadata.title}
+                                    </span>
+                                </td>
 
                                 <td class="text-links">
                                     <a href="${request.link(user)}" i18n:translate>View</a>&nbsp;<a href="${request.link(user, 'edit')}" i18n:translate>Edit</a>
@@ -48,6 +78,10 @@
                 <div tal:condition="filters['tag']|nothing" class="filter-tags">
                     <h2 class="filter-title" i18n:translate>Tags</h2>
                     <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['tag']" />
+                </div>
+                <div tal:condition="filters['provider']|nothing" class="filter-providers">
+                    <h2 class="filter-title" i18n:translate>Providers</h2>
+                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['provider']" />
                 </div>
             </div>
         </div>

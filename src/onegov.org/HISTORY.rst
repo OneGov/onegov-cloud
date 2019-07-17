@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds Kerberos integration.
+  [href]
+
 - Adds compatibility with future onegov.user changes.
   [href]
 
