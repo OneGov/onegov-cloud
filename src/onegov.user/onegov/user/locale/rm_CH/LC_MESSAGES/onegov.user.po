@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-07-16 13:44+0200\n"
+"POT-Creation-Date: 2019-07-17 14:51+0200\n"
 "PO-Revision-Date: 2017-06-28 12:03+0200\n"
 "Last-Translator: Marc Sommerhalder <info@seantis.ch>\n"
 "Language-Team: Romansh\n"
@@ -79,6 +79,10 @@ msgstr "Nov pled-clav"
 msgid "Third-Party Authentication"
 msgstr ""
 
+#, python-format
+msgid "Login with **${operating_system}**"
+msgstr ""
+
 msgid "None"
 msgstr ""
 
@@ -94,6 +98,9 @@ msgid ""
 msgstr ""
 
 msgid "Kerberos (v5)"
+msgstr ""
+
+msgid "Login with operating system"
 msgstr ""
 
 msgid "Kerberos username"

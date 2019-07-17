@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-07-16 13:44+0200\n"
+"POT-Creation-Date: 2019-07-17 14:51+0200\n"
 "PO-Revision-Date: 2017-06-22 08:50+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -82,6 +82,10 @@ msgstr "Neues Passwort"
 msgid "Third-Party Authentication"
 msgstr "Authentifizierung über Dritte"
 
+#, python-format
+msgid "Login with **${operating_system}**"
+msgstr "Mit **${operating_system}** anmelden"
+
 msgid "None"
 msgstr "Keine"
 
@@ -94,10 +98,15 @@ msgstr "Anmeldung muss über Anbieter geschehen"
 msgid ""
 "Forces the user to use this provider. Regular username/password "
 "authentication will be disabled!"
-msgstr "Zwingt den Benutzer sich über den Anbieter anzumelden. Die reguläre Anmeldung über Benutzername/Passwort wird deaktiviert!"
+msgstr ""
+"Zwingt den Benutzer sich über den Anbieter anzumelden. Die reguläre "
+"Anmeldung über Benutzername/Passwort wird deaktiviert!"
 
 msgid "Kerberos (v5)"
 msgstr "Kerberos (v5)"
+
+msgid "Login with operating system"
+msgstr "Mit Betriebssystem anmelden"
 
 msgid "Kerberos username"
 msgstr "Kerberos Benutzername"
