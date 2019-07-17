@@ -1,8 +1,5 @@
 cache: pip
 
-# required for google chrome
-dist: trusty
-
 matrix:
   include:
     - language: python
@@ -18,9 +15,11 @@ addons:
     chrome: stable
     apt:
         packages:
-            - oracle-java9-set-default
+            - openjdk-8-jre-headless
             - ghostscript
             - libpoppler-cpp-dev
+            - libgnutls28-dev
+            - libev-dev
 
 install: ./.travis-install.sh
 
