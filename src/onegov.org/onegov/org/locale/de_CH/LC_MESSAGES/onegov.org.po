@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-07-17 10:50+0200\n"
+"POT-Creation-Date: 2019-07-17 14:52+0200\n"
 "PO-Revision-Date: 2019-02-18 06:39+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -14,7 +14,7 @@ msgstr ""
 "X-Generator: Poedit 2.2.1\n"
 
 msgid "Login"
-msgstr "Login"
+msgstr "Anmelden"
 
 msgid "Timeline"
 msgstr "Aktivität"
@@ -62,7 +62,7 @@ msgid "User Profile"
 msgstr "Benutzerprofil"
 
 msgid "Logout"
-msgstr "Logout"
+msgstr "Abmelden"
 
 #, python-format
 msgid "${org} OneGov Cloud Status"
