@@ -646,7 +646,7 @@ def test_enroll_child(client, scenario):
 
     activity = client.get('/activity/retreat')
 
-    login = activity.click("Anmelden")
+    login = activity.click("Anmelden", index=1)
     assert "Login" in login
 
     login.form['username'] = 'member@example.org'
@@ -655,7 +655,7 @@ def test_enroll_child(client, scenario):
     assert "Ihr Benutzerprofil ist unvollständig" in enroll
 
     # now that we're logged in, the login link automatically skips ahead
-    enroll = activity.click("Anmelden").follow()
+    enroll = activity.click("Anmelden", index=1).follow()
     assert "Teilnehmer anmelden" in enroll
 
     # the link changes, but the result stays the same
@@ -1301,13 +1301,16 @@ def test_deadline(client, scenario):
     scenario.commit()
 
     # show no 'enroll' for ordinary users past the deadline
-    assert "Anmelden" not in client.get('/activity/foo')
+    # (there is one login link, for the ordinary login)
+    assert str(client.get('/activity/foo')).count("Anmelden") == 1
 
     # do show it for admins though and allow signups
     admin = client.spawn()
     admin.login_admin()
 
-    assert "Anmelden" in admin.get('/activity/foo')
+    # the ordinary login link vanishes
+    assert str(admin.get('/activity/foo')).count("Abmelden") == 1
+    assert str(admin.get('/activity/foo')).count("Anmelden") == 1
 
     page = admin.get('/activity/foo').click("Anmelden")
     assert "Der Anmeldeschluss wurde erreicht" not in page.form.submit()
