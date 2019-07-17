@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes field label translation being too eager.
+  [href]
+
 - Automatically generates csrf/identity tokens in development.
   [href]
 

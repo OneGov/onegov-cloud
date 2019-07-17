@@ -47,6 +47,7 @@ from onegov.core.framework import Framework, log
 from onegov.core.utils import pairwise
 from translationstring import ChameleonTranslate
 from translationstring import Translator
+from translationstring import TranslationString
 
 
 # the language codes must be written thusly: de_CH, en_GB, en, fr and so on
@@ -288,7 +289,9 @@ def get_translation_bound_meta(meta_class, translations):
 
             """
             if hasattr(field, 'label'):
-                field.label.text = self._translations.gettext(field.label.text)
+                if isinstance(field.label.text, TranslationString):
+                    field.label.text = self._translations.gettext(
+                        field.label.text)
 
             return super().render_field(
                 field, render_kw)

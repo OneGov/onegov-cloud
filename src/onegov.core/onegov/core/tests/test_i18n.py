@@ -7,6 +7,7 @@ from gettext import GNUTranslations
 from onegov.core import i18n, utils
 from webob import Request
 from wtforms import Label
+from translationstring import TranslationString
 
 # compatibility shim for webob 1.8 before its release
 try:
@@ -173,7 +174,12 @@ def test_get_translation_bound_form():
 
         Meta = MockMeta
 
-    class MockField(object):
+    class TranslatedMockField(object):
+
+        def __init__(self, label):
+            self.label = Label('x', TranslationString(label))
+
+    class UntranslatedMockField(object):
 
         def __init__(self, label):
             self.label = Label('x', label)
@@ -185,4 +191,5 @@ def test_get_translation_bound_form():
 
     meta = form_class.Meta()
     meta.get_translations(None)
-    assert meta.render_field(MockField('Yes'), {}) == 'seY'
+    assert meta.render_field(TranslatedMockField('Yes'), {}) == 'seY'
+    assert meta.render_field(UntranslatedMockField('Yes'), {}) == 'Yes'
