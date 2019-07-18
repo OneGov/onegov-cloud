@@ -10,70 +10,70 @@ from onegov.election_day.formats import import_election_wabstic_proporz
 from onegov.election_day.models import Canton
 from pytest import mark
 
-# @mark.parametrize("tar_file", [
-#     module_path('onegov.election_day',
-#                 'tests/fixtures/wabstic_proporz_v2.3.tar.gz'),
-# ])
-# def test_import_wabstic_proporz_v23(session, tar_file):
-#     session.add(
-#         ProporzElection(
-#             title='election',
-#             domain='canton',
-#             date=date(2015, 10, 18),
-#             number_of_mandates=12,
-#         )
-#     )
-#     session.flush()
-#     election = session.query(Election).one()
-#
-#     principal = Canton(canton='sg')
-#
-#     # The tar file contains a test dataset
-#
-#     with tarfile.open(tar_file, 'r:gz') as f:
-#         regional_wp_gemeinden = f.extractfile('WP_Gemeinden.csv').read()
-#         regional_wp_kandidaten = f.extractfile('WP_Kandidaten.csv').read()
-#         regional_wp_kandidatengde = f.extractfile('WP_KandidatenGde.csv').read()
-#         regional_wp_listen = f.extractfile('WP_Listen.csv').read()
-#         regional_wp_listengde = f.extractfile('WP_ListenGde.csv').read()
-#         regional_wpstatic_gemeinden = f.extractfile('WPStatic_Gemeinden.csv').read()
-#         regional_wpstatic_kandidaten = f.extractfile('WPStatic_Kandidaten.csv').read()
-#         regional_wp_wahl = f.extractfile('WP_Wahl.csv').read()
-#
-#     # Test regional elections
-#     election.domain = 'region'
-#     election.date = date(2016, 2, 28)
-#     election.expats = False
-#
-#     for number, district, mandates, entities, votes, turnout in (
-#             ('1', '1', 29, 9, 949454, 44.45),  # SG
-#             ('2', '2', 10, 9, 105959, 43.07),  # RO
-#             ('3', '3', 17, 13, 318662, 46.86),  # RH
-#             ('4', '5', 9, 6, 83098, 43.94),  # WE
-#             ('5', '6', 10, 8, 119157, 48.10),  # SA
-#             ('6', '7', 16, 10, 301843, 44.65),  # SE
-#             ('7', '8', 11, 12, 159038, 49.15),  # TO
-#             ('8', '13', 18, 10, 352595, 43.94),  # WI
-#     ):
-#         election.number_of_mandates = mandates
-#
-#         errors = import_election_wabstic_proporz(
-#             election, principal, number, district,
-#             BytesIO(regional_wp_wahl), 'text/plain',
-#             BytesIO(regional_wpstatic_gemeinden), 'text/plain',
-#             BytesIO(regional_wp_gemeinden), 'text/plain',
-#             BytesIO(regional_wp_listen), 'text/plain',
-#             BytesIO(regional_wp_listengde), 'text/plain',
-#             BytesIO(regional_wpstatic_kandidaten), 'text/plain',
-#             BytesIO(regional_wp_kandidaten), 'text/plain',
-#             BytesIO(regional_wp_kandidatengde), 'text/plain',
-#         )
-#         i=0
-#         while i < 20:
-#             err = errors[i]
-#             print('error in ', err.filename, ':', err.line, '-', err.error)
-#             i += 1
-#         assert not errors
+@mark.parametrize("tar_file", [
+    module_path('onegov.election_day',
+                'tests/fixtures/wabstic_proporz_v2.3.tar.gz'),
+])
+def test_import_wabstic_proporz_v23(session, tar_file):
+    session.add(
+        ProporzElection(
+            title='test cantonal election',
+            domain='canton',
+            date=date(2016, 2, 28),
+            number_of_mandates=12,
+        )
+    )
+    session.flush()
+    election = session.query(Election).one()
+
+    principal = Canton(canton='sg')
+
+    # The tar file contains a test dataset
+
+    with tarfile.open(tar_file, 'r:gz') as f:
+        regional_wp_gemeinden = f.extractfile('WP_Gemeinden.csv').read()
+        regional_wp_kandidaten = f.extractfile('WP_Kandidaten.csv').read()
+        regional_wp_kandidatengde = f.extractfile('WP_KandidatenGde.csv').read()
+        regional_wp_listen = f.extractfile('WP_Listen.csv').read()
+        regional_wp_listengde = f.extractfile('WP_ListenGde.csv').read()
+        regional_wpstatic_gemeinden = f.extractfile('WPStatic_Gemeinden.csv').read()
+        regional_wpstatic_kandidaten = f.extractfile('WPStatic_Kandidaten.csv').read()
+        regional_wp_wahl = f.extractfile('WP_Wahl.csv').read()
+
+    # Test cantonal elections
+    election.expats = False
+
+    errors = import_election_wabstic_proporz(
+        election, principal, '1', None,
+        BytesIO(regional_wp_wahl), 'text/plain',
+        BytesIO(regional_wpstatic_gemeinden), 'text/plain',
+        BytesIO(regional_wp_gemeinden), 'text/plain',
+        BytesIO(regional_wp_listen), 'text/plain',
+        BytesIO(regional_wp_listengde), 'text/plain',
+        BytesIO(regional_wpstatic_kandidaten), 'text/plain',
+        BytesIO(regional_wp_kandidaten), 'text/plain',
+        BytesIO(regional_wp_kandidatengde), 'text/plain',
+    )
+
+    i = 0
+    while i < 20:
+        try:
+            err = errors[i]
+            print('error in ', err.filename, ':', err.line, '-', err.error.interpolate())
+            i += 1
+        except Exception:
+            break
+
+    assert not errors
+
+    assert not errors
+    assert election.completed
+    # assert election.progress == (78, 78)
+    # assert election.absolute_majority is None
+    # assert election.eligible_voters == 317969
+    # assert election.accounted_ballots == 145631
+    # assert election.accounted_votes == 1732456
+    # assert election.allocated_mandates == 12
 
 
 @mark.parametrize("tar_file", [
@@ -129,8 +129,14 @@ def test_import_wabstic_proporz1(session, tar_file):
         BytesIO(cantonal_wp_kandidatengde), 'text/plain',
     )
 
-    for err in errors:
-        print('error in ', err.filename, ':', err.line)
+    i = 0
+    try:
+        while i < 20:
+            err = errors[i]
+            print('error in ', err.filename, ':', err.line, '-', err.error.interpolate())
+            i += 1
+    except:
+        pass
 
     assert not errors
     assert election.completed
@@ -452,14 +458,14 @@ def test_import_wabstic_proporz_invalid_values(session):
     ]) == [
         ('wp_gemeinden', 2, 'Invalid entity values'),
         ('wp_gemeinden', 2, 'Invalid entity values'),
-        ('wp_gemeinden', 2, 'Invalid entity values'),
+        ('wp_gemeinden', 2, 'Value in Column stimmberechtige is not a valid integer'),
         ('wp_kandidatengde', 2, 'Invalid candidate results'),
-        ('wp_listen', 2, 'Invalid list values'),
-        ('wp_listengde', 2, 'Invalid list results'),
-        ('wp_wahl', 2, 'Invalid values'),
+        ('wp_listen', 2, 'Value mandates is not a valid integer'),
+        ('wp_listengde', 2, 'Value stimmentotal is not a valid integer'),
+        ('wp_wahl', 2, 'Value ausmittlungsstand is not between 0 and 3'),
         ('wpstatic_gemeinden', 2, '100 is unknown'),
         ('wpstatic_kandidaten', 2, 'Invalid candidate values'),
-        ('wpstatic_kandidaten', 2, 'Invalid candidate values')
+        ('wpstatic_kandidaten', 2, 'Unknown derived list id')
     ]
 
 

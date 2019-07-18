@@ -71,41 +71,89 @@ def line_is_relevant(line, number, district=None):
         return line.sortgeschaeft == number
 
 
-def get_entity_id(line, entities):
-    entity_id = int(line.bfsnrgemeinde or 0)
-    return 0 if entity_id in EXPATS else entity_id
+def get_number_of_mandates(line):
+    if not hasattr(line, 'sitze'):
+        raise ValueError(_('Entry sitze is missing'))
+    try:
+        return int(line.sitze or 0)
+    except ValueError:
+        raise ValueError(_('Value mandates is not a valid integer'))
+
+
+def get_ausmittlungsstand(line):
+    try:
+        t = int(line.ausmittlungsstand or 0)
+        assert 0 <= t <= 3
+    except ValueError:
+        raise ValueError(_('Value ausmittlungsstand is not a valid integer.'))
+    except AssertionError:
+        raise AssertionError(_('Value ausmittlungsstand is not between 0 and 3'))
+
+
+def get_stimmberechtigte(line):
+    if not hasattr(line, 'stimmberechtigte'):
+        raise ValueError(_('Entry stimmberechtigte is missing'))
+    try:
+        return int(line.stimmberechtigte or 0)
+    except ValueError:
+        raise ValueError(
+            _('Value in Column stimmberechtige is not a valid integer'))
+
+def get_stimmentotal(line):
+    if not hasattr(line, 'stimmentotal'):
+        raise ValueError(_('Entry stimmentotal is missing'))
+    try:
+        return int(line.stimmentotal)
+    except ValueError:
+        raise ValueError(_('Value stimmentotal is not a valid integer'))
+
+
+def get_entity_id(line, expats):
+    if not hasattr(line, 'bfsnrgemeinde'):
+        raise ValueError(
+            _('Invalid entity id: The entry bfsnrgemeinde is missing.'))
+    try:
+        entity_id = int(line.bfsnrgemeinde or 0)
+    except ValueError:
+        raise ValueError(
+            _('Value bfsnrgemeinde is not a valid integer.'
+              ' Can not extract entity_id.'))
+    return 0 if entity_id in expats else entity_id
 
 
 def get_list_id_from_knr(line):
     """
-    Takes a line with a candidate number (knr) in it and
-    return the abstracted listnr for this candidate
+    Takes a line from csv file with a candidate number (knr) in it and
+    returns the derived listnr for this candidate. Will also handle the new
+    WabstiC Standard 2018.
     """
     if not hasattr(line, 'knr'):
         raise ValueError(_('Line does not contain candidate number knr.'))
     if '.' in line.knr:
         return line.knr.split('.')[0]
+    # replaces int(int(line.knr) / 100))
     return line.knr[0:-2]
 
 
 def get_list_id(line):
-    # FIXME: Adapt to WabstiCExport-Version 2.30e (2018)
-    if hasattr(line, 'listnr'):
-        number = line.listnr or '0'
+    if not hasattr(line, 'listnr'):
+        raise ValueError(_('The entry listnr is missing.'))
+    number = line.listnr or '0'
     number = '999' if number == '99' else number  # blank list
     return number
 
 
 def import_election_wabstic_proporz(
-    election, principal, number, district,
-    file_wp_wahl, mimetype_wp_wahl,
-    file_wpstatic_gemeinden, mimetype_wpstatic_gemeinden,
-    file_wp_gemeinden, mimetype_wp_gemeinden,
-    file_wp_listen, mimetype_wp_listen,
-    file_wp_listengde, mimetype_wp_listengde,
-    file_wpstatic_kandidaten, mimetype_wpstatic_kandidaten,
-    file_wp_kandidaten, mimetype_wp_kandidaten,
-    file_wp_kandidatengde, mimetype_wp_kandidatengde
+    election=None, principal=None, number=None, district=None,
+    file_wp_wahl=None, mimetype_wp_wahl=None,
+    file_wpstatic_gemeinden=None,
+    mimetype_wpstatic_gemeinden=None,
+    file_wp_gemeinden=None, mimetype_wp_gemeinden=None,
+    file_wp_listen=None, mimetype_wp_listen=None,
+    file_wp_listengde=None, mimetype_wp_listengde=None,
+    file_wpstatic_kandidaten=None, mimetype_wpstatic_kandidaten=None,
+    file_wp_kandidaten=None, mimetype_wp_kandidaten=None,
+    file_wp_kandidatengde=None, mimetype_wp_kandidatengde=None
 ):
     """ Tries to import the given CSV files from a WabstiCExport.
 
@@ -198,10 +246,9 @@ def import_election_wabstic_proporz(
             continue
 
         try:
-            complete = int(line.ausmittlungsstand or 0)
-            assert 0 <= complete <= 3
-        except (ValueError, AssertionError):
-            line_errors.append(_("Invalid values"))
+            complete = get_ausmittlungsstand(line)
+        except (ValueError, AssertionError) as e:
+            line_errors.append(e.args[0])
 
         # Pass the errors and continue to next line
         if line_errors:
@@ -223,11 +270,11 @@ def import_election_wabstic_proporz(
 
         # Parse the id of the entity
         try:
-            entity_id = get_entity_id(line, entities)
+            entity_id = get_entity_id(line, EXPATS)
             if entity_id == 3251:
                 pass
-        except ValueError:
-            line_errors.append(_("Invalid id"))
+        except ValueError as e:
+            line_errors.append(e.args[0])
         else:
             if entity_id and entity_id not in entities:
                 line_errors.append(
@@ -239,9 +286,9 @@ def import_election_wabstic_proporz(
 
         # Parse the eligible voters
         try:
-            eligible_voters = int(line.stimmberechtigte or 0)
-        except ValueError:
-            line_errors.append(_("Could not read the eligible voters"))
+            eligible_voters = get_stimmberechtigte(line)
+        except ValueError as e:
+            line_errors.append(e.args[0])
 
         # Skip expats if not enabled
         if entity_id == 0 and not election.expats:
@@ -270,9 +317,9 @@ def import_election_wabstic_proporz(
 
         # Parse the id of the entity
         try:
-            entity_id = get_entity_id(line, entities)
-        except ValueError:
-            line_errors.append(_("Invalid id"))
+            entity_id = get_entity_id(line, EXPATS)
+        except ValueError as e:
+            line_errors.append(e.args[0])
         else:
             if entity_id and entity_id not in entities:
                 line_errors.append(
@@ -293,9 +340,9 @@ def import_election_wabstic_proporz(
 
         # Parse the eligible voters
         try:
-            eligible_voters = int(line.stimmberechtigte or 0)
-        except ValueError:
-            line_errors.append(_("Invalid entity values"))
+            eligible_voters = get_stimmberechtigte(line)
+        except ValueError as e:
+            line_errors.append(e.args[0])
         else:
             eligible_voters = (
                 eligible_voters
@@ -338,13 +385,14 @@ def import_election_wabstic_proporz(
         try:
             list_id = get_list_id(line)
             name = line.listcode
-            number_of_mandates = int(line.sitze or 0)
+            number_of_mandates = get_number_of_mandates(line)
             connection = line.listverb or None
             subconnection = line.listuntverb or None
             if subconnection:
-                assert connection
-        except (ValueError, AssertionError):
-            line_errors.append(_("Invalid list values"))
+                assert connection, _('${var} is missing.',
+                                     mapping={'var': 'connection'})
+        except (ValueError, AssertionError) as e:
+            line_errors.append(e.args[0])
         else:
             if list_id in added_lists:
                 line_errors.append(
@@ -397,11 +445,11 @@ def import_election_wabstic_proporz(
         line_errors = []
 
         try:
-            entity_id = get_entity_id(line, entities)
+            entity_id = get_entity_id(line, EXPATS)
             list_id = get_list_id(line)
-            votes = int(line.stimmentotal)
-        except ValueError:
-            line_errors.append(_("Invalid list results"))
+            votes = get_stimmentotal(line)
+        except ValueError as e:
+            line_errors.append(e.args[0])
         else:
             if entity_id not in added_entities:
                 # Only add the list result if the entity is present (there is
@@ -460,7 +508,7 @@ def import_election_wabstic_proporz(
                       mapping={'name': candidate_id}))
 
             if list_id not in added_lists:
-                line_errors.append(_("Invalid list values"))
+                line_errors.append(_("Unknown derived list id"))
 
         # Pass the errors and continue to next line
         if line_errors:
@@ -513,7 +561,7 @@ def import_election_wabstic_proporz(
         line_errors = []
 
         try:
-            entity_id = get_entity_id(line, entities)
+            entity_id = get_entity_id(line, EXPATS)
             candidate_id = line.knr
             votes = int(line.stimmen)
         except ValueError:
@@ -558,6 +606,7 @@ def import_election_wabstic_proporz(
     if election.domain == 'region' and districts and election.distinct:
         if principal.has_districts:
             if len(districts) != 1:
+                # FIXME: better error messages
                 errors.append(FileImportError(_("No clear district")))
         else:
             if len(added_results) != 1:
