@@ -343,7 +343,7 @@ def linkify(text, escape=True):
     if not text:
         return text
 
-    linkified = bleach.linkify(text, parse_email=True)
+    linkified = linkify_phone(bleach.linkify(text, parse_email=True))
 
     if not escape:
         return linkified

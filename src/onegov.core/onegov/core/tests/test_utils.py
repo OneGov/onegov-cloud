@@ -137,6 +137,14 @@ def test_linkify():
         == '<a href="mailto:info@example.org">info@example.org</a><br>'
 
 
+def test_linkify_with_phone():
+    tel = 'Tel. +41 41 728 33 11'
+    assert utils.linkify(tel, escape=False)\
+        == f'Tel. <a href="tel:+41 41 728 33 11">+41 41 728 33 11</a>'
+    assert utils.linkify(tel, escape=True)\
+        == 'Tel. <a>+41 41 728 33 11</a>'
+
+
 def test_increment_name():
     assert utils.increment_name('test') == 'test-1'
     assert utils.increment_name('test-2') == 'test-3'
