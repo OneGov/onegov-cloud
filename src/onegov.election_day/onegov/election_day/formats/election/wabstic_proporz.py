@@ -71,12 +71,12 @@ def line_is_relevant(line, number, district=None):
 
 def get_number_of_mandates(line):
     if not hasattr(line, 'sitze'):
-        raise ValueError(_('Entry sitze is missing'))
+        raise ValueError(_('Missing column: sitze'))
     try:
         return int(line.sitze or 0)
     except ValueError:
         raise ValueError(
-            _('Value mandates is not a valid integer'))
+            _('Invalid integer: mandates'))
 
 
 def get_ausmittlungsstand(line):
@@ -85,7 +85,7 @@ def get_ausmittlungsstand(line):
         assert 0 <= t <= 3
     except ValueError:
         raise ValueError(
-            _('Value ausmittlungsstand is not a valid integer.'))
+            _('Invalid integer: ausmittlungsstand'))
     except AssertionError:
         raise AssertionError(
             _('Value ausmittlungsstand is not between 0 and 3'))
@@ -93,12 +93,12 @@ def get_ausmittlungsstand(line):
 
 def get_stimmberechtigte(line):
     if not hasattr(line, 'stimmberechtigte'):
-        raise ValueError(_('Entry stimmberechtigte is missing'))
+        raise ValueError(_('Missing column: stimmberechtigte'))
     try:
         return int(line.stimmberechtigte or 0)
     except ValueError:
         raise ValueError(
-            _('Value in Column stimmberechtige is not a valid integer'))
+            _('Invalid integer: stimmberechtige'))
 
 
 def get_stimmentotal(line):
@@ -107,18 +107,18 @@ def get_stimmentotal(line):
     try:
         return int(line.stimmentotal)
     except ValueError:
-        raise ValueError(_('Value stimmentotal is not a valid integer'))
+        raise ValueError(_('Invalid integer: stimmentotal'))
 
 
 def get_entity_id(line, expats):
     if not hasattr(line, 'bfsnrgemeinde'):
         raise ValueError(
-            _('Invalid entity id: The entry bfsnrgemeinde is missing.'))
+            _('Missing column: bfsnrgemeinde'))
     try:
         entity_id = int(line.bfsnrgemeinde or 0)
     except ValueError:
         raise ValueError(
-            _('Value bfsnrgemeinde is not a valid integer.'
+            _('Invalid integer: bfsnrgemeinde'
               ' Can not extract entity_id.'))
     return 0 if entity_id in expats else entity_id
 
@@ -130,7 +130,7 @@ def get_list_id_from_knr(line):
     WabstiC Standard 2018.
     """
     if not hasattr(line, 'knr'):
-        raise ValueError(_('Line does not contain candidate number knr.'))
+        raise ValueError(_('Missing column: knr'))
     if '.' in line.knr:
         return line.knr.split('.')[0]
     # replaces int(int(line.knr) / 100))
@@ -139,7 +139,7 @@ def get_list_id_from_knr(line):
 
 def get_list_id(line):
     if not hasattr(line, 'listnr'):
-        raise ValueError(_('The entry listnr is missing.'))
+        raise ValueError(_('Missing column: listnr'))
     number = line.listnr or '0'
     number = '999' if number == '99' else number  # blank list
     return number
