@@ -82,7 +82,9 @@ def get_list_id(line):
     if hasattr(line, 'listnr'):
         number = int(line.listnr or 0)
     else:
-        number = int(int(get_candidate_id(line)) / 100)
+        # candidate_id knr relates to his position in the list and the list_id
+        # from version 2.30e: knr = 02a.01 and list_nr = 02a
+        number = get_candidate_id(line)[0:-2]
     number = 999 if number == 99 else number  # blank list
     return str(number)
 
