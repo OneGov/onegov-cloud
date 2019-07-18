@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Shows the found user in the response if the authentication fails.
+  [href]
+
 - Fixes Kerberos provider not being able to authenticate valid requests.
   [href]
 

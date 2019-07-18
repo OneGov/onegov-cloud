@@ -5,6 +5,7 @@ from onegov.user.auth.core import Auth
 from onegov.user.auth.provider import AUTHENTICATION_PROVIDERS
 from onegov.user.auth.provider import AuthenticationProvider
 from onegov.user.auth.provider import provider_by_name
+from onegov.user.auth.provider import Conclusion
 from onegov.user.models.user import User
 from webob.exc import HTTPForbidden
 from webob.response import Response
@@ -75,19 +76,20 @@ def authentication_provider(app, name, to='/'):
 def handle_authentication(self, request):
     response = self.authenticate_request(request)
 
-    # the provider failed to authenticate
-    if response is None:
-        return HTTPForbidden()
-
-    # the provider returned its own response
+    # the provider returned its own HTTP response
     if isinstance(response, Response):
         return response
 
-    # the provider authenticated a user
-    if isinstance(response, User):
-        return Auth.from_request(request, to=self.to)\
-            .complete_login(user=response, request=request)
+    # the provider reached a conclusion
+    if isinstance(response, Conclusion):
+        if response:
+            request.success(request.translate(response.note))
+
+            return Auth.from_request(request, to=self.to)\
+                .complete_login(user=response.user, request=request)
+
+        else:
+            return HTTPForbidden(request.translate(response.note))
 
     # the provider returned something illegal
-    raise RuntimeError(
-        f"Invalid response from {self.metadata.name}: {response}")
+    raise RuntimeError(f"Invalid response from {self.name}: {response}")

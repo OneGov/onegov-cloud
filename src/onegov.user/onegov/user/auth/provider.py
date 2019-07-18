@@ -22,6 +22,31 @@ def provider_by_name(providers, name):
     return next((p for p in providers if p.metadata.name == name), None)
 
 
+class Conclusion(object):
+    """ A final answer of :meth:`AuthenticationProvider`. """
+
+
+@attrs(slots=True, frozen=True)
+class Success(Conclusion):
+    """ Indicates a sucessful authentication. """
+
+    user: User = attrib()
+    note: TranslationString = attrib()
+
+    def __bool__(self):
+        return True
+
+
+@attrs(slots=True, frozen=True)
+class Failure(Conclusion):
+    """ Indicates a failed authentication. """
+
+    note: TranslationString = attrib()
+
+    def __bool__(self):
+        return False
+
+
 @attrs(slots=True, frozen=True)
 class ProviderMetadata(object):
     """ Holds provider-specific metadata. """
@@ -390,6 +415,22 @@ class KerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
             username = kerberos.authGSSServerUserName(state)
             selector = User.authentication_provider['fields']['username']
 
-            return self.available_users(request)\
+            user = self.available_users(request)\
                 .filter(selector == username)\
                 .first()
+
+            if user:
+                return Success(
+                    user=user,
+                    note=_(
+                        "You have been logged in as {user} (via {identity})",
+                        mapping={'user': user.username, 'identity': username}
+                    )
+                )
+
+            return Failure(
+                note=_(
+                    "You were identified as {identity}, "
+                    "but there is no record of you",
+                    mapping={'identity': username}
+                ))
