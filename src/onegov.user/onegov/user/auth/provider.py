@@ -470,14 +470,13 @@ class KerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
                 return Success(
                     user=user,
                     note=_(
-                        "You have been logged in as {user} (via {identity})",
+                        "You have been logged in as ${user} (via ${identity})",
                         mapping={'user': user.username, 'identity': username}
                     )
                 )
 
             return Failure(
                 note=_(
-                    "You were identified as {identity}, "
-                    "but there is no record of you",
+                    "Your identity ${identity} is not authorized",
                     mapping={'identity': username}
                 ))

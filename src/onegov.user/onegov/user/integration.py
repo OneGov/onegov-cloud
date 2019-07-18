@@ -6,7 +6,6 @@ from onegov.user.auth.provider import AUTHENTICATION_PROVIDERS
 from onegov.user.auth.provider import AuthenticationProvider
 from onegov.user.auth.provider import provider_by_name
 from onegov.user.auth.provider import Conclusion
-from webob.exc import HTTPForbidden
 from webob.response import Response
 
 
@@ -81,6 +80,7 @@ def handle_authentication(self, request):
 
     # the provider reached a conclusion
     if isinstance(response, Conclusion):
+
         if response:
             request.success(request.translate(response.note))
 
@@ -88,7 +88,16 @@ def handle_authentication(self, request):
                 .complete_login(user=response.user, request=request)
 
         else:
-            return HTTPForbidden(request.translate(response.note))
+            request.alert(request.translate(response.note))
+
+            # Answering with a plain 403 would be more correct, but some
+            # frontend-web-servers will not show our content in this case and
+            # that means we cannot help the user much.
+            #
+            # So we deliberately chose to be less correct, but more user
+            # friendly here. Unfortunately we do not always control the
+            # frontend-web-servers to mitigate this (on-premise deployments).
+            return request.redirect(request.class_link(Auth, name='login'))
 
     # the provider returned something illegal
     raise RuntimeError(f"Invalid response from {self.name}: {response}")

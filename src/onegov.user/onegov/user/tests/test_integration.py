@@ -47,6 +47,11 @@ def app(request, postgres_dsn, temporary_path, redis_url, keytab):
     class App(Framework, UserApp):
         pass
 
+    # Auth needs to be linkable
+    @App.path(model=Auth, path='/auth')
+    def get_auth(request):
+        return None
+
     scan_morepath_modules(App)
     morepath.commit(App)
 
@@ -124,8 +129,8 @@ def test_kerberos_auth(client, app):
         methods['authGSSServerUserName'].return_value = 'foo@EXAMPLE.ORG'
         r = auth({'Authorization': 'Negotiate foobar'})
 
-        assert r.status_code == 403
-        assert 'WWW-Authenticate' not in r.headers
+        assert r.status_code == 302
+        assert r.location.endswith('/auth/login')
 
         # associate a user, but keep it inactive
         user = UserCollection(app.session()).add(
@@ -144,7 +149,8 @@ def test_kerberos_auth(client, app):
         transaction.commit()
 
         r = auth({'Authorization': 'Negotiate foobar'})
-        assert r.status_code == 403
+        assert r.status_code == 302
+        assert r.location.endswith('/auth/login')
 
         # now activate the user
         user = UserCollection(app.session()).by_username('foo@bar.org')

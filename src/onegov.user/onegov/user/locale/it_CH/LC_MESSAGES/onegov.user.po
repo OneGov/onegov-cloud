@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-07-18 14:20+0200\n"
+"POT-Creation-Date: 2019-07-18 16:13+0200\n"
 "PO-Revision-Date: 2017-06-22 16:08+0200\n"
 "Last-Translator: Marc Sommerhalder <info@seantis.ch>\n"
 "Language-Team: Italian\n"
@@ -115,9 +115,9 @@ msgid ""
 msgstr ""
 
 #, python-format
-msgid "You were identified as {identity}, but there is no record of you"
+msgid "Your identity ${identity} is not authorized"
 msgstr ""
 
 #, python-format
-msgid "You have been logged in as {user} (via {identity})"
+msgid "You have been logged in as ${user} (via ${identity})"
 msgstr ""

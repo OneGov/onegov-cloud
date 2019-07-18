@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-07-18 14:20+0200\n"
+"POT-Creation-Date: 2019-07-18 16:13+0200\n"
 "PO-Revision-Date: 2017-06-22 08:50+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -114,14 +114,14 @@ msgstr "Kerberos Benutzername"
 msgid ""
 "The provider configuration of this user conflicts with the configuration of "
 "another user."
-msgstr "Die Anbieter-Konfiguration dieses Benutzer steht in Konflikt mit der Konfiguration eines anderen Benutzers."
-
-#, python-format
-msgid "You were identified as {identity}, but there is no record of you"
 msgstr ""
-"Sie konnten als {identity} identifiziert werden, aber es besteht kein "
-"Eintrag zu ihrem Benutzer"
+"Die Anbieter-Konfiguration dieses Benutzer steht in Konflikt mit der "
+"Konfiguration eines anderen Benutzers."
 
 #, python-format
-msgid "You have been logged in as {user} (via {identity})"
-msgstr "Sie wurden angemeldet als {user} (via {identity})"
+msgid "Your identity ${identity} is not authorized"
+msgstr "Ihre Identität ${identity} ist nicht berechtigt"
+
+#, python-format
+msgid "You have been logged in as ${user} (via ${identity})"
+msgstr "Sie wurden angemeldet als ${user} (via ${identity})"

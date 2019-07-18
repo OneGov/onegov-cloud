@@ -1,5 +1,12 @@
 Changelog
 ---------
+
+- Redirect to login, instead of showing a 403, when Kerberos auth fails.
+  [href]
+
+- Fixes string translations.
+  [href]
+
 0.22.4 (2019-07-18)
 ~~~~~~~~~~~~~~~~~~~
 
