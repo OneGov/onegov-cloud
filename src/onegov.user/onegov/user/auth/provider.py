@@ -100,6 +100,9 @@ def include_provider_form_fields(providers, form_class):
 
         @property
         def authentication_provider(self):
+            if not providers:
+                return None
+
             provider = provider_by_name(providers, self.provider.data)
 
             if not provider:
@@ -127,6 +130,9 @@ def include_provider_form_fields(providers, form_class):
                 getattr(self, form_field).data = value
 
         def ensure_no_conflict(self):
+            if not providers:
+                return
+
             provider = provider_by_name(providers, self.provider.data)
 
             if not provider:
