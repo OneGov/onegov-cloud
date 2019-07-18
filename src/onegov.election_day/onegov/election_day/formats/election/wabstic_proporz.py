@@ -103,7 +103,7 @@ def get_stimmberechtigte(line):
 
 def get_stimmentotal(line):
     if not hasattr(line, 'stimmentotal'):
-        raise ValueError(_('Entry stimmentotal is missing'))
+        raise ValueError(_('Missing column: stimmentotal'))
     try:
         return int(line.stimmentotal)
     except ValueError:
