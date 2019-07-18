@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.22.3 (2019-07-18)
+~~~~~~~~~~~~~~~~~~~
 
 - Enforces unique configurations for providers.
   [href]
