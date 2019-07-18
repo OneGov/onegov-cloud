@@ -135,7 +135,7 @@ def test_kerberos_auth(client, app):
             active=False,
             authentication_provider={
                 'name': 'kerberos',
-                'data': {
+                'fields': {
                     'username': 'foo@EXAMPLE.ORG'
                 },
                 'required': True

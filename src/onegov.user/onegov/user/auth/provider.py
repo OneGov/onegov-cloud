@@ -388,7 +388,7 @@ class KerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
 
             # extract the user if possible
             username = kerberos.authGSSServerUserName(state)
-            selector = User.authentication_provider['data']['username']
+            selector = User.authentication_provider['fields']['username']
 
             return self.available_users(request)\
                 .filter(selector == username)\

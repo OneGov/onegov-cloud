@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes Kerberos provider not being able to authenticate valid requests.
+  [href]
+
 0.22.2 (2019-07-17)
 ~~~~~~~~~~~~~~~~~~~
 
