@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-07-17 14:51+0200\n"
+"POT-Creation-Date: 2019-07-18 13:52+0200\n"
 "PO-Revision-Date: 2017-06-22 08:50+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -110,3 +110,11 @@ msgstr "Mit Betriebssystem anmelden"
 
 msgid "Kerberos username"
 msgstr "Kerberos Benutzername"
+
+#, python-format
+msgid "You were identified as {identity}, but there is no record of you"
+msgstr "Sie konnten als {identity} identifiziert werden, aber es besteht kein Eintrag zu ihrem Benutzer"
+
+#, python-format
+msgid "You have been logged in as {user} (via {identity})"
+msgstr "Sie wurden angemeldet als {user} (via {identity})"
