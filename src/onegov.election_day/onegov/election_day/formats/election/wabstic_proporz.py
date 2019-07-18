@@ -1,3 +1,5 @@
+import re
+
 from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
 from onegov.ballot import ElectionResult
@@ -74,11 +76,8 @@ def get_entity_id(line, entities):
     return 0 if entity_id in EXPATS else entity_id
 
 
-def get_candidate_id(line):
-    return str(int(line.knr))
-
-
 def get_list_id(line):
+    # FIXME: Adapt to WabstiCExport-Version 2.30e (2018)
     if hasattr(line, 'listnr'):
         number = int(line.listnr or 0)
     else:
@@ -440,7 +439,7 @@ def import_election_wabstic_proporz(
             continue
 
         try:
-            candidate_id = get_candidate_id(line)
+            candidate_id = line.knr
             list_id = get_list_id(line)
             family_name = line.nachname
             first_name = line.vorname
@@ -482,7 +481,7 @@ def import_election_wabstic_proporz(
             continue
 
         try:
-            candidate_id = get_candidate_id(line)
+            candidate_id = line.knr
             assert candidate_id in added_candidates
             elected = True if line.gewahlt == '1' else False
         except (ValueError, AssertionError):
@@ -507,7 +506,7 @@ def import_election_wabstic_proporz(
 
         try:
             entity_id = get_entity_id(line, entities)
-            candidate_id = get_candidate_id(line)
+            candidate_id = line.knr
             votes = int(line.stimmen)
         except ValueError:
             line_errors.append(_("Invalid candidate results"))
