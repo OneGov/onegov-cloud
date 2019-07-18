@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.22.4 (2019-07-18)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes auth provider form failing without configured providers.
   [href]
