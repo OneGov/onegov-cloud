@@ -647,8 +647,6 @@ def test_enroll_child(client, scenario):
     activity = client.get('/activity/retreat')
 
     login = activity.click("Anmelden", index=1)
-    assert "Login" in login
-
     login.form['username'] = 'member@example.org'
     login.form['password'] = 'hunter2'
     enroll = login.form.submit().follow()
