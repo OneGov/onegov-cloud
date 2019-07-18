@@ -192,7 +192,7 @@ def test_reset_password(client):
     reset_page.form['password'] = 'new_password'
     homepage = reset_page.form.submit().follow().text
     assert "Passwort geändert" in homepage
-    assert "Login" in homepage  # do not automatically log in the user
+    assert "Anmelden" in homepage  # do not automatically log in the user
 
     reset_page.form['email'] = 'admin@example.org'
     reset_page.form['password'] = 'new_password'
