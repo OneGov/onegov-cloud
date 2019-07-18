@@ -2942,7 +2942,7 @@ msgstr "Ihre Veranstaltung musste leider abgelehnt werden:"
 
 #, python-format
 msgid "Login to ${org}"
-msgstr "${org} Login"
+msgstr "${org} Anmeldung"
 
 msgid "Account Registration"
 msgstr "Benutzerkonto Registration"
