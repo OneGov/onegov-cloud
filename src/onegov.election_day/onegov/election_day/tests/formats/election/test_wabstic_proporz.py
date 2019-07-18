@@ -10,6 +10,19 @@ from onegov.election_day.formats import import_election_wabstic_proporz
 from onegov.election_day.models import Canton
 from pytest import mark
 
+
+def help_print_errors(errors_list, max=20):
+    i = 0
+    while i < max:
+        try:
+            err = errors_list[i]
+            print('error in ', err.filename, ':',
+                  err.line, '-', err.error.interpolate())
+            i += 1
+        except Exception:
+            break
+
+
 @mark.parametrize("tar_file", [
     module_path('onegov.election_day',
                 'tests/fixtures/wabstic_proporz_v2.3.tar.gz'),
@@ -32,12 +45,16 @@ def test_import_wabstic_proporz_v23(session, tar_file):
 
     with tarfile.open(tar_file, 'r:gz') as f:
         regional_wp_gemeinden = f.extractfile('WP_Gemeinden.csv').read()
-        regional_wp_kandidaten = f.extractfile('WP_Kandidaten.csv').read()
-        regional_wp_kandidatengde = f.extractfile('WP_KandidatenGde.csv').read()
+        regional_wp_kandidaten = f.extractfile(
+            'WP_Kandidaten.csv').read()
+        regional_wp_kandidatengde = f.extractfile(
+            'WP_KandidatenGde.csv').read()
         regional_wp_listen = f.extractfile('WP_Listen.csv').read()
         regional_wp_listengde = f.extractfile('WP_ListenGde.csv').read()
-        regional_wpstatic_gemeinden = f.extractfile('WPStatic_Gemeinden.csv').read()
-        regional_wpstatic_kandidaten = f.extractfile('WPStatic_Kandidaten.csv').read()
+        regional_wpstatic_gemeinden = f.extractfile(
+            'WPStatic_Gemeinden.csv').read()
+        regional_wpstatic_kandidaten = f.extractfile(
+            'WPStatic_Kandidaten.csv').read()
         regional_wp_wahl = f.extractfile('WP_Wahl.csv').read()
 
     # Test cantonal elections
@@ -54,17 +71,6 @@ def test_import_wabstic_proporz_v23(session, tar_file):
         BytesIO(regional_wp_kandidaten), 'text/plain',
         BytesIO(regional_wp_kandidatengde), 'text/plain',
     )
-
-    i = 0
-    while i < 20:
-        try:
-            err = errors[i]
-            print('error in ', err.filename, ':', err.line, '-', err.error.interpolate())
-            i += 1
-        except Exception:
-            break
-
-    assert not errors
 
     assert not errors
     assert election.completed
@@ -128,15 +134,6 @@ def test_import_wabstic_proporz1(session, tar_file):
         BytesIO(cantonal_wp_kandidaten), 'text/plain',
         BytesIO(cantonal_wp_kandidatengde), 'text/plain',
     )
-
-    i = 0
-    try:
-        while i < 20:
-            err = errors[i]
-            print('error in ', err.filename, ':', err.line, '-', err.error.interpolate())
-            i += 1
-    except:
-        pass
 
     assert not errors
     assert election.completed
@@ -458,7 +455,8 @@ def test_import_wabstic_proporz_invalid_values(session):
     ]) == [
         ('wp_gemeinden', 2, 'Invalid entity values'),
         ('wp_gemeinden', 2, 'Invalid entity values'),
-        ('wp_gemeinden', 2, 'Value in Column stimmberechtige is not a valid integer'),
+        ('wp_gemeinden', 2,
+            'Value in Column stimmberechtige is not a valid integer'),
         ('wp_kandidatengde', 2, 'Invalid candidate results'),
         ('wp_listen', 2, 'Value mandates is not a valid integer'),
         ('wp_listengde', 2, 'Value stimmentotal is not a valid integer'),

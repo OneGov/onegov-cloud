@@ -1,5 +1,3 @@
-import re
-
 from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
 from onegov.ballot import ElectionResult
@@ -77,7 +75,8 @@ def get_number_of_mandates(line):
     try:
         return int(line.sitze or 0)
     except ValueError:
-        raise ValueError(_('Value mandates is not a valid integer'))
+        raise ValueError(
+            _('Value mandates is not a valid integer'))
 
 
 def get_ausmittlungsstand(line):
@@ -85,9 +84,11 @@ def get_ausmittlungsstand(line):
         t = int(line.ausmittlungsstand or 0)
         assert 0 <= t <= 3
     except ValueError:
-        raise ValueError(_('Value ausmittlungsstand is not a valid integer.'))
+        raise ValueError(
+            _('Value ausmittlungsstand is not a valid integer.'))
     except AssertionError:
-        raise AssertionError(_('Value ausmittlungsstand is not between 0 and 3'))
+        raise AssertionError(
+            _('Value ausmittlungsstand is not between 0 and 3'))
 
 
 def get_stimmberechtigte(line):
@@ -98,6 +99,7 @@ def get_stimmberechtigte(line):
     except ValueError:
         raise ValueError(
             _('Value in Column stimmberechtige is not a valid integer'))
+
 
 def get_stimmentotal(line):
     if not hasattr(line, 'stimmentotal'):
