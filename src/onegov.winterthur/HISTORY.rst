@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Updates version to generate new urls for upstream theme changes.
+  [href]
+
 0.7.1 (2019-07-10)
 ~~~~~~~~~~~~~~~~~~~~~
 
