@@ -126,6 +126,22 @@ def include_provider_form_fields(providers, form_class):
                 form_field = f"{data['name']}_{key}"
                 getattr(self, form_field).data = value
 
+        def ensure_no_conflict(self):
+            provider = provider_by_name(providers, self.provider.data)
+
+            if not provider:
+                return
+
+            fields = self.authentication_provider['fields']
+            user = isinstance(self.model, User) and self.model or None
+
+            if provider.conflicts(self.request, fields, user):
+                self.provider.errors.append(_(
+                    "The provider configuration of this user conflicts "
+                    "with the configuration of another user."
+                ))
+                return False
+
         def populate_obj(self, model):
             super().populate_obj(model)
 
@@ -221,6 +237,19 @@ class AuthenticationProvider(metaclass=ABCMeta):
         in a way that eventually end up fulfilling the authentication. At the
         very least, providers should ensure that all parameters of the original
         request are kept when asking external services to call back.
+
+        """
+
+    @abstractmethod
+    def conflicts(self, request, fields, current_user):
+        """ Returns true if the given fields of the given user conflict
+        with the fields of another user (!= current_user).
+
+        This method should be implemented to ensure that a single
+        authentication doesn't apply to multiple users.
+
+        Note that the current_user may be None, in which case the check should
+        be done over all users.
 
         """
 
@@ -353,6 +382,18 @@ class KerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
         return _("Login with **${operating_system}**", mapping={
             'operating_system': agent_os
         })
+
+    def conflicts(self, request, fields, current_user):
+        """ Returns true if there's another user with the same username. """
+        selector = User.authentication_provider['fields']['username']
+
+        query = self.available_users(request)\
+            .filter(selector == fields['username'])
+
+        if current_user:
+            query = query.filter(User.id != current_user.id)
+
+        return query.first() and True or False
 
     def authenticate_request(self, request):
         """ Authenticates the kerberos request.

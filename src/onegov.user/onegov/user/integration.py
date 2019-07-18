@@ -6,7 +6,6 @@ from onegov.user.auth.provider import AUTHENTICATION_PROVIDERS
 from onegov.user.auth.provider import AuthenticationProvider
 from onegov.user.auth.provider import provider_by_name
 from onegov.user.auth.provider import Conclusion
-from onegov.user.models.user import User
 from webob.exc import HTTPForbidden
 from webob.response import Response
 

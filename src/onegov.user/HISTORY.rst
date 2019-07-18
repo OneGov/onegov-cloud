@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Enforces unique configurations for providers.
+  [href]
+
 - Shows the found user in the response if the authentication fails.
   [href]
 
