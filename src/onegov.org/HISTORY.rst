@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes authentication provider configuration not working on new users.
+  [href]
+
 1.5.0 (2019-07-17)
 ~~~~~~~~~~~~~~~~~~~
 

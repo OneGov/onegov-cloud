@@ -265,7 +265,8 @@ def handle_new_user(self, request, form):
                 password=password,
                 role=form.role.data,
                 active=form.active,
-                second_factor=second_factor
+                second_factor=second_factor,
+                authentication_provider=form.authentication_provider,
             )
         except ExistingUserError:
             form.username.errors.append(
