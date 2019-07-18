@@ -138,7 +138,7 @@ def compile_translation(pofile_path):
     po = POFILE_PATH_EXPRESSION.match(pofile_path)
 
     locale = po.group('locale').lower()
-    module = po.group('module').lower()
+    module = po.group('module').lower().replace('.po', '')
 
     log.info(f"Compiling locale {locale} for {module}")
 
