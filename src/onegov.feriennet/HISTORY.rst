@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.6.16 (2019-07-18)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds support for latest onegov.org release.
   [href]
