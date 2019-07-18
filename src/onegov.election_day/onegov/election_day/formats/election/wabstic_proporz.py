@@ -76,16 +76,24 @@ def get_entity_id(line, entities):
     return 0 if entity_id in EXPATS else entity_id
 
 
+def get_list_id_from_knr(line):
+    """
+    Takes a line with a candidate number (knr) in it and
+    return the abstracted listnr for this candidate
+    """
+    if not hasattr(line, 'knr'):
+        raise ValueError(_('Line does not contain candidate number knr.'))
+    if '.' in line.knr:
+        return line.knr.split('.')[0]
+    return line.knr[0:-2]
+
+
 def get_list_id(line):
     # FIXME: Adapt to WabstiCExport-Version 2.30e (2018)
     if hasattr(line, 'listnr'):
-        number = int(line.listnr or 0)
-    else:
-        # candidate_id knr relates to his position in the list and the list_id
-        # from version 2.30e: knr = 02a.01 and list_nr = 02a
-        number = get_candidate_id(line)[0:-2]
-    number = 999 if number == 99 else number  # blank list
-    return str(number)
+        number = line.listnr or '0'
+    number = '999' if number == '99' else number  # blank list
+    return number
 
 
 def import_election_wabstic_proporz(
@@ -440,7 +448,7 @@ def import_election_wabstic_proporz(
 
         try:
             candidate_id = line.knr
-            list_id = get_list_id(line)
+            list_id = get_list_id_from_knr(line)
             family_name = line.nachname
             first_name = line.vorname
         except ValueError:
