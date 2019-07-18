@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.22.5 (2019-07-18)
+~~~~~~~~~~~~~~~~~~~
 
 - Redirect to login, instead of showing a 403, when Kerberos auth fails.
   [href]
