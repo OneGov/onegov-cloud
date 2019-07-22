@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.2.1 (2019-07-22)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes Button-Text "Search" where something else makes sense
   [dadadamotha]
