@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.7.3 (2019-07-22)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Fixes a number of small issues with the daycare calculator.
   [href]
 
