@@ -304,6 +304,9 @@ def linkify_phone(text):
 
     """
 
+    def strip_whitespace(number):
+        return re.sub(r'\s', '', number)
+
     def is_valid_length(number):
         if number.startswith('00'):
             return len(number) == 13
@@ -315,8 +318,8 @@ def linkify_phone(text):
 
     def handle_match(match):
         number = match.group(0)
-
-        if is_valid_length(number.replace(' ', '')):
+        assert not number.endswith('\n')
+        if is_valid_length(strip_whitespace(number)):
             number = remove_duplicate_whitespace(number).strip()
             return f'<a href="tel:{number}">{number}</a>'
 
