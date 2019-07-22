@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Linkify supports link generation for phone numbers.
+  [dadadamotha]
+
 0.83.0 (2019-07-17)
 ~~~~~~~~~~~~~~~~~~~
 
