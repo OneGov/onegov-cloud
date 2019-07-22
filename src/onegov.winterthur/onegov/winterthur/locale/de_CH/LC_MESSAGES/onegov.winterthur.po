@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-07-10 14:22+0200\n"
+"POT-Creation-Date: 2019-07-22 11:10+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -107,17 +107,17 @@ msgstr "Samstag"
 msgid "Sunday"
 msgstr "Sonntag"
 
-msgid "Daycare"
-msgstr "Kita"
+msgid "Select Daycare"
+msgstr "Auswahl der Kita"
 
 msgid "Care"
 msgstr "Betreuung"
 
-msgid "Taxable income"
-msgstr "Steuerbares Einkommen"
+msgid "Definite Taxable income"
+msgstr "Definitives steuerbares Einkommen"
 
-msgid "Taxable wealth"
-msgstr "Steuerbares Vermögen"
+msgid "Definite Taxable wealth"
+msgstr "Definitives steuerbares Vermögen"
 
 msgid "Rebate"
 msgstr "Rabatt"
@@ -199,14 +199,14 @@ msgstr "Zusammenfassung"
 msgid "Print"
 msgstr "Ausdrucken"
 
-msgid "Your monthly costs"
-msgstr "Ihre monatlichen Kosten"
+msgid "Parent share per month"
+msgstr "Elternbeitrag pro Monat"
 
-msgid "Our monthly contribution"
-msgstr "Unser monatlicher Beitrag"
+msgid "City share per month"
+msgstr "Städtischer Beitrag pro Monat"
 
-msgid "Daycare cost"
-msgstr "Betreuungskosten"
+msgid "Full costs per month"
+msgstr "Vollkosten pro Monat"
 
 msgid ""
 "Since your taxable income and wealth is above ${amount} CHF, you are not "
@@ -420,6 +420,24 @@ msgstr "Ungültige "
 
 msgid "Calculate"
 msgstr "Berechnen"
+
+#~ msgid "Your monthly costs"
+#~ msgstr "Ihre monatlichen Kosten"
+
+#~ msgid "Our monthly contribution"
+#~ msgstr "Unser monatlicher Beitrag"
+
+#~ msgid "Daycare cost"
+#~ msgstr "Betreuungskosten"
+
+#~ msgid "Taxable income"
+#~ msgstr "Steuerbares Einkommen"
+
+#~ msgid "Taxable wealth"
+#~ msgstr "Steuerbares Vermögen"
+
+#~ msgid "Daycare"
+#~ msgstr "Kita"
 
 #~ msgid "Factor"
 #~ msgstr "Faktor"

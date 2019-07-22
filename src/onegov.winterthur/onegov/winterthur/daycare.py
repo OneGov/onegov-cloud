@@ -386,7 +386,8 @@ class DaycareSubsidyCalculator(object):
                 0),
             operation="+",
             note=f"""
-                Der Vermögenszuschlag beträgt {fmt(cfg.wealth_premium)}% des
+                Der Vermögenszuschlag beträgt
+                {fmt(cfg.wealth_premium).rstrip('.0')}% des
                 Vermögens, für das tatsächlich Steuern anfallen
                 (ab {fmt(cfg.max_wealth)} CHF).
             """)
@@ -454,7 +455,8 @@ class DaycareSubsidyCalculator(object):
             operation="-",
             note=f"""
                 Bei einem Betreuungsumfang von insgesamt mehr als 2 ganzen
-                Tagen pro Woche gilt ein Rabatt von {cfg.rebate}%.
+                Tagen pro Woche gilt ein Rabatt von
+                {fmt(cfg.rebate).rstrip('0.')}%.
             """)
 
         net.op(
@@ -535,9 +537,6 @@ class DaycareSubsidyCalculator(object):
             title="Städtischer Beitrag pro Monat",
             amount=city_share_per_day * services.total / 100 * daycare.factor,
             important=True,
-            note="""
-                Städtischer Beitrag für Ihr Kind pro Monat.
-            """,
             output_format=format_5_cents)
 
         # Services table
@@ -669,7 +668,7 @@ class DaycareServicesField(Field):
 class DaycareSubsidyCalculatorForm(Form):
 
     daycare = SelectField(
-        label=_("Daycare"),
+        label=_("Select Daycare"),
         validators=(InputRequired(), ),
         choices=(), )
 
@@ -678,11 +677,11 @@ class DaycareSubsidyCalculatorForm(Form):
         validators=(InputRequired(), ))
 
     income = DecimalField(
-        label=_("Taxable income"),
+        label=_("Definite Taxable income"),
         validators=(InputRequired(), NumberRange(min=0)))
 
     wealth = DecimalField(
-        label=_("Taxable wealth"),
+        label=_("Definite Taxable wealth"),
         validators=(InputRequired(), NumberRange(min=0)))
 
     rebate = BooleanField(
