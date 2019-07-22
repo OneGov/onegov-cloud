@@ -349,7 +349,11 @@ def linkify(text, escape=True):
         return linkified
 
     return bleach.clean(
-        linkified, tags=['a'], attributes={'a': ['href', 'rel']})
+        linkified,
+        tags=['a'],
+        attributes={'a': ['href', 'rel']},
+        protocols=['http', 'https', 'mailto', 'tel']
+    )
 
 
 def remove_duplicate_whitespace(text):
