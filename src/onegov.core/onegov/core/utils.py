@@ -59,7 +59,7 @@ _duplicate_whitespace = re.compile(r'\s{2,}')
 
 # regex pattern for swiss phone numbers
 _phone_ch_country_code = r"(\+41|0041|[^\+]?0)"
-_phone_ch = re.compile(_phone_ch_country_code + r'([\s\d]+)')
+_phone_ch = re.compile(_phone_ch_country_code + r'([ \r\f\t\d]+)')
 
 # for yubikeys
 ALPHABET = 'cbdefghijklnrtuv'
