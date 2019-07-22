@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.13.7 (2019-07-22)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds WabstiC v2.3 (2018) support.
   [dadadamotha]
