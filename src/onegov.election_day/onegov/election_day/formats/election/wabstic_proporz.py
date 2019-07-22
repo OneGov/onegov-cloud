@@ -83,14 +83,15 @@ def get_number_of_mandates(line):
 def get_ausmittlungsstand(line):
     col = 'ausmittlungsstand'
     try:
-        t = int(line.ausmittlungsstand or 0)
-        assert 0 <= t <= 3
+        result = int(line.ausmittlungsstand or 0)
+
     except ValueError:
         raise ValueError(
             _('Invalid integer: ${col}', mapping={'col': col}))
-    except AssertionError:
-        raise AssertionError(
+    if not (0 <= result <= 3):
+        raise ValueError(
             _('Value ${col} is not between 0 and 3', mapping={'col': col}))
+    return result
 
 
 def get_stimmberechtigte(line):
@@ -138,7 +139,6 @@ def get_list_id_from_knr(line):
         raise ValueError(_('Missing column: ${col}', mapping={'col', col}))
     if '.' in line.knr:
         return line.knr.split('.')[0]
-    # replaces int(int(line.knr) / 100))
     return line.knr[0:-2]
 
 
@@ -147,7 +147,8 @@ def get_list_id(line):
     if not hasattr(line, col):
         raise ValueError(_('Missing column: ${col}', mapping={'col': col}))
     number = line.listnr or '0'
-    number = '999' if number == '99' else number  # blank list
+    # wabstiC 99 is blank list that maps to 999 see open_data_de.md
+    number = '999' if number == '99' else number
     return number
 
 
@@ -614,7 +615,7 @@ def import_election_wabstic_proporz(
     if election.domain == 'region' and districts and election.distinct:
         if principal.has_districts:
             if len(districts) != 1:
-                # FIXME: better error messages
+                # FIXME: Distinguish between the two errors
                 errors.append(FileImportError(_("No clear district")))
         else:
             if len(added_results) != 1:
