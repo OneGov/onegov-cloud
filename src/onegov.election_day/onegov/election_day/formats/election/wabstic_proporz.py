@@ -70,44 +70,48 @@ def line_is_relevant(line, number, district=None):
 
 
 def get_number_of_mandates(line):
-    if not hasattr(line, 'sitze'):
-        raise ValueError(_('Missing column: sitze'))
+    col = 'sitze'
+    if not hasattr(line, col):
+        raise ValueError(_('Missing column: ${col}', mapping={'col': col}))
     try:
         return int(line.sitze or 0)
     except ValueError:
         raise ValueError(
-            _('Invalid integer: mandates'))
+            _('Invalid integer: ${col}', mapping={'col': col}))
 
 
 def get_ausmittlungsstand(line):
+    col = 'ausmittlungsstand'
     try:
         t = int(line.ausmittlungsstand or 0)
         assert 0 <= t <= 3
     except ValueError:
         raise ValueError(
-            _('Invalid integer: ausmittlungsstand'))
+            _('Invalid integer: ${col}', mapping={'col': col}))
     except AssertionError:
         raise AssertionError(
-            _('Value ausmittlungsstand is not between 0 and 3'))
+            _('Value ${col} is not between 0 and 3', mapping={'col': col}))
 
 
 def get_stimmberechtigte(line):
-    if not hasattr(line, 'stimmberechtigte'):
-        raise ValueError(_('Missing column: stimmberechtigte'))
+    col = 'stimmberechtigte'
+    if not hasattr(line, col):
+        raise ValueError(_('Missing column: ${col}', mapping={'col': col}))
     try:
         return int(line.stimmberechtigte or 0)
     except ValueError:
         raise ValueError(
-            _('Invalid integer: stimmberechtige'))
+            _('Invalid integer: ${col}', mapping={'col': col}))
 
 
 def get_stimmentotal(line):
-    if not hasattr(line, 'stimmentotal'):
-        raise ValueError(_('Missing column: stimmentotal'))
+    col = 'stimmentotal'
+    if not hasattr(line, col):
+        raise ValueError(_('Missing column: ${col}', mapping={'col': col}))
     try:
         return int(line.stimmentotal)
     except ValueError:
-        raise ValueError(_('Invalid integer: stimmentotal'))
+        raise ValueError(_('Invalid integer: ${col}', mapping={'col': col}))
 
 
 def get_entity_id(line, expats):
@@ -129,8 +133,9 @@ def get_list_id_from_knr(line):
     returns the derived listnr for this candidate. Will also handle the new
     WabstiC Standard 2018.
     """
-    if not hasattr(line, 'knr'):
-        raise ValueError(_('Missing column: knr'))
+    col = 'knr'
+    if not hasattr(line, col):
+        raise ValueError(_('Missing column: ${col}', mapping={'col', col}))
     if '.' in line.knr:
         return line.knr.split('.')[0]
     # replaces int(int(line.knr) / 100))
@@ -138,8 +143,9 @@ def get_list_id_from_knr(line):
 
 
 def get_list_id(line):
-    if not hasattr(line, 'listnr'):
-        raise ValueError(_('Missing column: listnr'))
+    col = 'listnr'
+    if not hasattr(line, col):
+        raise ValueError(_('Missing column: ${col}', mapping={'col': col}))
     number = line.listnr or '0'
     number = '999' if number == '99' else number  # blank list
     return number
