@@ -2279,13 +2279,7 @@ def test_votes_export(swissvotes_app):
     votes.export_xlsx(file)
     file.seek(0)
     workbook = open_workbook(file_contents=file.read())
-    sheet = workbook.sheet_by_index(0)
-    xlsx = dict(
-        zip(
-            [cell.value for cell in sheet.row(0)],
-            [cell.value for cell in sheet.row(1)]
-        )
-    )
+    sheet = workbook.sheet_by_name('DATA')
     xlsx = dict(
         zip(
             [cell.value for cell in sheet.row(0)],
