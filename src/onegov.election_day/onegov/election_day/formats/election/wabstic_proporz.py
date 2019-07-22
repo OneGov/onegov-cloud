@@ -116,15 +116,16 @@ def get_stimmentotal(line):
 
 
 def get_entity_id(line, expats):
-    if not hasattr(line, 'bfsnrgemeinde'):
+    col = 'bfsnrgemeinde'
+    if not hasattr(line, col):
         raise ValueError(
-            _('Missing column: bfsnrgemeinde'))
+            _('Missing column: ${col}', mapping={'col': col}))
     try:
         entity_id = int(line.bfsnrgemeinde or 0)
     except ValueError:
         raise ValueError(
-            _('Invalid integer: bfsnrgemeinde'
-              ' Can not extract entity_id.'))
+            _('Invalid integer: ${col}'
+              ' Can not extract entity_id.', mapping={'col': col}))
     return 0 if entity_id in expats else entity_id
 
 
