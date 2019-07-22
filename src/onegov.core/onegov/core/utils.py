@@ -55,7 +55,7 @@ _email_regex = re.compile((
 _multiple_newlines = re.compile(r'\n{2,}', re.MULTILINE)
 
 # matches duplicate whitespace
-_duplicate_whitespace = re.compile(r'\s+')
+_duplicate_whitespace = re.compile(r'\s{2,}')
 
 # regex pattern for swiss phone numbers
 _phone_ch_country_code = r"(\+41|0041|[^\+]?0)"
