@@ -35,6 +35,7 @@ setup(
         'click',
         'bjoern',
         'PyYAML',
+        'sentry_sdk>=0.10.0,<0.11.0',
         'watchdog',
         'webob',
         'xtermcolor'

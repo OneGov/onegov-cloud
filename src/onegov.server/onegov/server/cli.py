@@ -53,8 +53,9 @@ import bjoern
 import click
 import multiprocessing
 import os
-import signal
+import sentry_sdk
 import shutil
+import signal
 import sys
 import time
 import traceback
@@ -65,6 +66,8 @@ from functools import partial
 from onegov.server import Config
 from onegov.server import Server
 from onegov.server.tracker import ResourceTracker
+from sentry_sdk import push_scope, capture_exception
+from sentry_sdk.integrations.wsgi import _get_headers, _get_environ
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 from xtermcolor import colorize
@@ -89,17 +92,38 @@ RESOURCE_TRACKER = None
 )
 @click.option(
     '--pdb',
-    help="Enable post-mortem debugging",
+    help="Enable post-mortem debugging (debug mode only)",
     default=False,
     is_flag=True
 )
 @click.option(
     '--tracemalloc',
-    help="Enable tracemalloc",
+    help="Enable tracemalloc (debug mode only)",
     default=False,
     is_flag=True
 )
-def run(config_file, port, pdb, tracemalloc):
+@click.option(
+    '--mode',
+    help="Defines the mode used to run the server cli (debug|production)",
+    default='debug',
+)
+@click.option(
+    '--sentry-dsn',
+    help="Sentry DSN to use (production mode only)"
+)
+@click.option(
+    '--sentry-environment',
+    help="Sentry environment tag (production mode only)",
+    default='testing',
+)
+@click.option(
+    '--sentry-release',
+    help="Sentry release tag (production mode only)",
+    default=None,
+)
+def run(config_file, port, pdb, tracemalloc, mode,
+        sentry_dsn, sentry_environment, sentry_release):
+
     """ Runs the onegov server with the given configuration file in the
     foreground.
 
@@ -128,9 +152,80 @@ def run(config_file, port, pdb, tracemalloc):
     # time, which ensures that there is no residual state around that might
     # cause the first run of onegov-server to be different than any subsequent
     # runs through automated reloads.
+
+    if mode == 'debug':
+        return run_debug(config_file, port, pdb, tracemalloc)
+
+    if not sentry_dsn:
+        sentry_sdk.init(
+            dsn=sentry_dsn,
+            release=sentry_release,
+            environment=sentry_environment)
+
+        # somehow sentry attaches itself to the global exception hook, even if
+        # we set 'install_sys_hook' to False -> so we just reset to the
+        # original state before serving our application (otherwise we get each
+        # error report twice)
+        sys.excepthook = sys.__excepthook__
+
+    return run_production(config_file, port)
+
+
+def run_production(config_file, port):
+
+    class SentryServer(Server):
+
+        def __call__(self, environ, start_response):
+            with push_scope() as scope:
+                scope.clear_breadcrumbs()
+
+                return super().__call__(environ, start_response)
+
+    # required by Bjoern
+    env = {'webob.url_encoding': 'latin-1'}
+
+    app = SentryServer(
+        config=Config.from_yaml_file(config_file),
+        exception_hook=exception_hook,
+        environ_overrides=env)
+
+    bjoern.run(app, '127.0.0.1', port, reuse_port=True)
+
+
+def http_context(environ):
+    return {
+        'method': environ.get('REQUEST_METHOD'),
+        'url': ''.join((
+            environ.get('HTTP_X_VHM_HOST', ''),
+            environ.get('PATH_INFO', '')
+        )),
+        'query_string': environ.get('QUERY_STRING'),
+        'headers': dict(_get_headers(environ)),
+        'env': dict(_get_environ(environ))
+    }
+
+
+def exception_hook(environ):
+
+    def process_event(event, hint):
+        request_info = event.setdefault("request", {})
+        request_info.update(http_context(environ))
+
+        user_info = event.setdefault("user", {})
+        user_info['ip_address'] = environ.get('HTTP_X_REAL_IP')
+
+        return event
+
+    with push_scope() as scope:
+        scope.add_event_processor(process_event)
+        scope.set_tag('site', '<%= @sentry_site %>')
+        capture_exception()
+
+
+def run_debug(config_file, port, pdb, tracemalloc):
     multiprocessing.set_start_method('spawn')
 
-    factory = partial(wsgi_factory, config_file=config_file, pdb=pdb)
+    factory = partial(debug_wsgi_factory, config_file=config_file, pdb=pdb)
     server = WsgiServer(factory, port=port, enable_tracemalloc=tracemalloc)
     server.start()
 
@@ -151,7 +246,7 @@ def run(config_file, port, pdb, tracemalloc):
     server.join()
 
 
-def wsgi_factory(config_file, pdb):
+def debug_wsgi_factory(config_file, pdb):
     return Server(Config.from_yaml_file(config_file), post_mortem=pdb)
 
 

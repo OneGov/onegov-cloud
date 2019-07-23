@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a production mode to the server.
+  [href]
+
 0.8.0 (2019-07-17)
 ~~~~~~~~~~~~~~~~~~~
 
