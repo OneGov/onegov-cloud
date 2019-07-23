@@ -239,7 +239,6 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
     @observes('title')
     def title_observer(self, title):
         self.order = normalize_for_url(title)
-        self.name = self.name or self.order
 
     @observes('structure', 'configuration')
     def structure_configuration_observer(self, structure, configuration):
