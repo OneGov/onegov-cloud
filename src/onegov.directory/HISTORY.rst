@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.8 (2019-07-23)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Automatically increments the directory name if there's a conflict.
   [href]
 
