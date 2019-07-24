@@ -70,7 +70,7 @@ def view_archive_json(self, request):
 def view_principal(self, request):
 
     """ Shows all the results from the elections and votes of the last election
-    day.
+    day. It's the landing page.
 
     """
 

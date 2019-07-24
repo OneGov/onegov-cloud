@@ -117,7 +117,29 @@ class VoteForm(Form):
     )
 
     related_link = URLField(
-        label=_("Related link")
+        label=_("Link"),
+        fieldset=_("Related link")
+    )
+
+    related_link_label_de = StringField(
+        label=_("Link label german"),
+        fieldset=_("Related link"),
+        render_kw={'lang': 'de'}
+    )
+    related_link_label_fr = StringField(
+        label=_("Link label french"),
+        fieldset=_("Related link"),
+        render_kw={'lang': 'fr'}
+    )
+    related_link_label_it = StringField(
+        label=_("Link label italian"),
+        fieldset=_("Related link"),
+        render_kw={'lang': 'it'}
+    )
+    related_link_label_rm = StringField(
+        label=_("Link label romansh"),
+        fieldset=_("Related link"),
+        render_kw={'lang': 'rm'}
     )
 
     def on_request(self):
@@ -159,6 +181,17 @@ class VoteForm(Form):
             titles['rm_CH'] = self.vote_rm.data
         model.title_translations = titles
 
+        link_labels = {}
+        if self.related_link_label_de.data:
+            link_labels['de_CH'] = self.related_link_label_de.data
+        if self.related_link_label_fr.data:
+            link_labels['fr_CH'] = self.related_link_label_fr.data
+        if self.related_link_label_it.data:
+            link_labels['it_CH'] = self.related_link_label_it.data
+        if self.related_link_label_rm.data:
+            link_labels['rm_CH'] = self.related_link_label_rm.data
+        model.related_link_label = link_labels
+
         if model.type == 'complex':
             titles = {}
             if self.counter_proposal_de.data:
@@ -188,6 +221,12 @@ class VoteForm(Form):
         self.vote_fr.data = titles.get('fr_CH')
         self.vote_it.data = titles.get('it_CH')
         self.vote_rm.data = titles.get('rm_CH')
+
+        link_labels = model.related_link_labels
+        self.related_link_label_de = link_labels.get('de_CH')
+        self.related_link_label_fr = link_labels.get('fr_CH')
+        self.related_link_label_it = link_labels.get('it_CH')
+        self.related_link_label_rm = link_labels.get('rm_CH')
 
         self.date.data = model.date
         self.domain.data = model.domain
