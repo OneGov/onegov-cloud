@@ -90,7 +90,10 @@
     <div class="row related" tal:condition="layout.related_link">
         <div class="columns small-12">
             <h2 i18n:translate="">Related link</h2>
-            <p>
+            <p tal:condition="layout.related_link_label">
+                <a href="${layout.related_link}" class="related-link">${layout.related_link_label}</a>
+            </p>
+            <p tal:condition="not: layout.related_link_label">
                 <a href="${layout.related_link}" class="related-link">${layout.related_link}</a>
             </p>
         </div>
