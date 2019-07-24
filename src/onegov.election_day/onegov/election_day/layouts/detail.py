@@ -32,3 +32,7 @@ class DetailLayout(DefaultLayout):
     @cached_property
     def show_map(self):
         return self.principal.is_year_available(self.model.date.year)
+
+    @cached_property
+    def related_link_label(self):
+        return self.model.related_link_label.get(self.request.locale, None)
