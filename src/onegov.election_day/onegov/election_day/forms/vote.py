@@ -222,11 +222,11 @@ class VoteForm(Form):
         self.vote_it.data = titles.get('it_CH')
         self.vote_rm.data = titles.get('rm_CH')
 
-        link_labels = model.related_link_labels
-        self.related_link_label_de = link_labels.get('de_CH')
-        self.related_link_label_fr = link_labels.get('fr_CH')
-        self.related_link_label_it = link_labels.get('it_CH')
-        self.related_link_label_rm = link_labels.get('rm_CH')
+        link_labels = model.related_link_label or {}
+        self.related_link_label_de = link_labels.get('de_CH', '')
+        self.related_link_label_fr = link_labels.get('fr_CH', '')
+        self.related_link_label_it = link_labels.get('it_CH', '')
+        self.related_link_label_rm = link_labels.get('rm_CH', '')
 
         self.date.data = model.date
         self.domain.data = model.domain
