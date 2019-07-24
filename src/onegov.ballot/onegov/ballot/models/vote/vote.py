@@ -230,6 +230,8 @@ class Vote(Base, ContentMixin, TimestampMixin,
 
     #: may be used to store a link related to this vote
     related_link = meta_property('related_link')
+    #: Additional, translatable label for the link
+    related_link_label = meta_property('related_link_label')
 
     #: may be used to indicate that the vote contains expats as seperate
     #: resultas (typically with entity_id = 0)

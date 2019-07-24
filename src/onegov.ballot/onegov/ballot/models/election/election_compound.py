@@ -294,6 +294,7 @@ class ElectionCompound(
 
     #: may be used to store a link related to this election
     related_link = meta_property('related_link')
+    related_link_label = meta_property('related_link_label')
 
     #: may be used to enable/disable the visibility of party strengths
     show_party_strengths = meta_property('party_strengths')

@@ -250,6 +250,7 @@ class Election(Base, ContentMixin, TimestampMixin,
 
     #: may be used to store a link related to this election
     related_link = meta_property('related_link')
+    related_link_label = meta_property('related_link_label')
 
     #: may be used to mark an election as a tacit election
     tacit = meta_property('tacit', default=False)
