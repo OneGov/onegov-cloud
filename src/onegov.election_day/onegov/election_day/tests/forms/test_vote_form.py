@@ -44,7 +44,7 @@ def test_vote_form_translations():
     assert form.vote_rm.validators == []
 
 
-def test_vote_form_model(election_day_app):
+def test_vote_form_model(election_day_app, related_link_labels):
     model = Vote()
     model.title_translations = {
         'de_CH': 'Vote (DE)',
@@ -56,6 +56,7 @@ def test_vote_form_model(election_day_app):
     model.domain = 'federation'
     model.shortcode = 'xy'
     model.related_link = 'http://u.rl'
+    model.related_link_label = related_link_labels
 
     form = VoteForm()
     form.apply_model(model)
@@ -76,6 +77,10 @@ def test_vote_form_model(election_day_app):
     assert form.domain.data == 'federation'
     assert form.shortcode.data == 'xy'
     assert form.related_link.data == 'http://u.rl'
+    assert form.related_link_label_de.data == 'DE'
+    assert form.related_link_label_fr.data == 'FR'
+    assert form.related_link_label_it.data == 'IT'
+    assert form.related_link_label_rm.data == 'RM'
     assert form.vote_type.data == 'simple'
     assert form.expats.data is False
 
@@ -110,7 +115,7 @@ def test_vote_form_model(election_day_app):
     assert model.expats is True
 
 
-def test_vote_form_model_complex(election_day_app):
+def test_vote_form_model_complex(related_link_labels):
     model = ComplexVote()
     model.title_translations = {
         'de_CH': 'Vote (DE)',
@@ -134,6 +139,7 @@ def test_vote_form_model_complex(election_day_app):
     model.domain = 'federation'
     model.shortcode = 'xy'
     model.related_link = 'http://u.rl'
+    model.related_link_label = related_link_labels
 
     form = VoteForm()
     form.apply_model(model)
@@ -154,6 +160,10 @@ def test_vote_form_model_complex(election_day_app):
     assert form.domain.data == 'federation'
     assert form.shortcode.data == 'xy'
     assert form.related_link.data == 'http://u.rl'
+    assert form.related_link_label_de.data == 'DE'
+    assert form.related_link_label_fr.data == 'FR'
+    assert form.related_link_label_it.data == 'IT'
+    assert form.related_link_label_rm.data == 'RM'
     assert form.vote_type.data == 'complex'
 
     fieldsets = [f.label for f in form.fieldsets if f.label]

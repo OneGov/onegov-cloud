@@ -46,7 +46,7 @@ def test_election_form_translations(session):
     assert form.election_rm.validators == []
 
 
-def test_election_form_model(session):
+def test_election_form_model(session, related_link_labels):
     model = Election()
     model.title = 'Election (DE)'
     model.title_translations['de_CH'] = 'Election (DE)'
@@ -60,6 +60,7 @@ def test_election_form_model(session):
     model.majority_type = 'relative'
     model.number_of_mandates = 5
     model.related_link = 'http://u.rl'
+    model.related_link_label = related_link_labels
     model.tacit = False
     model.distinct = False
     model.expats = False
@@ -78,6 +79,10 @@ def test_election_form_model(session):
     assert form.election_type.data == 'proporz'
     assert form.mandates.data == 5
     assert form.related_link.data == 'http://u.rl'
+    assert form.related_link_label_de.data == 'DE'
+    assert form.related_link_label_fr.data == 'FR'
+    assert form.related_link_label_it.data == 'IT'
+    assert form.related_link_label_rm.data == 'RM'
     assert form.tacit.data is False
     assert form.distinct.data is False
     assert form.expats.data is False

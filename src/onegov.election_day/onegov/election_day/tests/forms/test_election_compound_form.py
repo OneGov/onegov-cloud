@@ -123,7 +123,7 @@ def test_election_compound_form_translations(session):
     assert form.election_rm.validators == []
 
 
-def test_election_compound_form_model(session):
+def test_election_compound_form_model(session, related_link_labels):
     date_ = date(2001, 1, 1)
     e1 = Election(domain='region', title='e', id='e-1', date=date_)
     e2 = Election(domain='region', title='e', id='e-2', date=date_)
@@ -143,6 +143,7 @@ def test_election_compound_form_model(session):
     model.domain = 'canton'
     model.shortcode = 'xy'
     model.related_link = 'http://u.rl'
+    model.related_link_label = related_link_labels
     model.show_party_strengths = True
     model.show_mandate_allocation = True
     model.elections = [e1, e2]
@@ -159,6 +160,10 @@ def test_election_compound_form_model(session):
     assert form.domain.data == 'canton'
     assert form.shortcode.data == 'xy'
     assert form.related_link.data == 'http://u.rl'
+    assert form.related_link_label_de.data == 'DE'
+    assert form.related_link_label_fr.data == 'FR'
+    assert form.related_link_label_it.data == 'IT'
+    assert form.related_link_label_rm.data == 'RM'
     assert form.show_party_strengths.data is True
     assert form.show_mandate_allocation.data is True
     assert form.elections.data == ['e-1', 'e-2']
