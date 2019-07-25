@@ -88,3 +88,8 @@ def election_day_app_kriens(request):
     app = create_election_day(request, "", "'1059'", "false")
     yield app
     app.session_manager.dispose()
+
+
+@pytest.fixture(scope='function')
+def related_link_labels():
+    return {'de_CH': 'DE', 'fr_CH': 'FR', 'it_CH': 'IT', 'rm_CH': 'RM'}
