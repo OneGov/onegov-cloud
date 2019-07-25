@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-22 12:57+0200\n"
-"PO-Revision-Date: 2019-07-22 13:10+0200\n"
+"POT-Creation-Date: 2019-07-25 11:09+0200\n"
+"PO-Revision-Date: 2019-07-25 11:28+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -1074,6 +1074,21 @@ msgstr "Italiano"
 
 msgid "Romansh"
 msgstr "Romancio"
+
+msgid "Link"
+msgstr "Link"
+
+msgid "Link label german"
+msgstr "Etichetta del link tedesco"
+
+msgid "Link label french"
+msgstr "Etichetta del link francese"
+
+msgid "Link label italian"
+msgstr "Etichetta del link italiano"
+
+msgid "Link label romansh"
+msgstr "Etichetta del link romancio"
 
 msgid "Absolute"
 msgstr "Assoluto"
