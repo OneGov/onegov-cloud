@@ -88,13 +88,11 @@
 
 <metal:related_link define-macro="related_link" i18n:domain="onegov.election_day">
     <div class="row related" tal:condition="layout.related_link">
-        <div class="columns small-12">
+        <div tal:define="label layout.related_link_label" class="columns small-12">
             <h2 i18n:translate="">Related link</h2>
-            <p tal:condition="layout.related_link_label">
-                <a href="${layout.related_link}" class="related-link">${layout.related_link_label}</a>
-            </p>
-            <p tal:condition="not: layout.related_link_label">
-                <a href="${layout.related_link}" class="related-link">${layout.related_link}</a>
+            <p tal:switch="label is None">
+                <a tal:case="True" href="${layout.related_link}" class="related-link">${layout.related_link}</a>
+                <a tal:case="False" href="${layout.related_link}" class="related-link">${label}</a>
             </p>
         </div>
     </div>
