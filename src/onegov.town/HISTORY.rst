@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes failure when saving homepage settings.
+  [href]
+
 1.15.9 (2019-01-09)
 ~~~~~~~~~~~~~~~~~~~~~
 

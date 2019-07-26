@@ -53,5 +53,6 @@ def custom_handle_settings(self, request, form):
     form.delete_field('homepage_cover')
     form.delete_field('homepage_structure')
     form.delete_field('redirect_homepage_to')
+    form.delete_field('redirect_path')
 
     return handle_homepage_settings(self, request, form)
