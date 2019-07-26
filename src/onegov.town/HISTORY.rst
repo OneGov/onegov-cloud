@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.15.10 (2019-07-26)
+~~~~~~~~~~~~~~~~~~~~~
 
 - Fixes failure when saving homepage settings.
   [href]
