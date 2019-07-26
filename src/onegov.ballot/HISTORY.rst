@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.10.0 (2019-07-26)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds label (de, fr...) for related link macro.
   [dadadamotha]
