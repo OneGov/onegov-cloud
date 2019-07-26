@@ -1,5 +1,6 @@
 import certifi
 import morepath
+import ssl
 
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
@@ -7,6 +8,7 @@ from elasticsearch import ConnectionError  # shadows a python builtin!
 from elasticsearch import Elasticsearch
 from elasticsearch import Transport
 from elasticsearch import TransportError
+from elasticsearch.connection import create_ssl_context
 from more.transaction.main import transaction_tween_factory
 from onegov.search import Search, log
 from onegov.search.errors import SearchOfflineError
@@ -164,8 +166,12 @@ class ElasticsearchApp(morepath.App):
                 'ca_certs': certifi.where()
             }
         else:
+            ssl_context = create_ssl_context()
+            ssl_context.check_hostname = False
+            ssl_context.verify_mode = ssl.CERT_NONE
             self.es_extra_params = {
-                'verify_certs': False
+                'verify_certs': False,
+                'ssl_context': ssl_context
             }
 
         self.es_configure_client(usage='default')
