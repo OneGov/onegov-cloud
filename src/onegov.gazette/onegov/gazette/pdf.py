@@ -379,7 +379,7 @@ class IssuePdf(NoticesPdf):
         return query.count()
 
     @classmethod
-    def from_issue(cls, issue, request, first_publication_number):
+    def from_issue(cls, issue, request, first_publication_number, links=None):
         """ Generate a PDF for one issue.
 
         Uses `first_publication_number` as a starting point for assigning
@@ -462,6 +462,22 @@ class IssuePdf(NoticesPdf):
         pdf.unfold_data(
             session, layout, issue.name, data, first_publication_number
         )
+
+        # add a final page with links
+        if links:
+
+            if not data[-1].get('page_break'):
+                pdf.pagebreak()
+
+            pdf.h2(request.translate(_("Additional Links")))
+
+            def paragraphs():
+                for url, title in links.items():
+                    yield f'<b>{title}</b><br><a href="{url}">{url}</a>'
+
+            html = "\n".join(f'<p>{p}</p>' for p in paragraphs())
+            pdf.mini_html(html)
+
         pdf.generate()
 
         file.seek(0)

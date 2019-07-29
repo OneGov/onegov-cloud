@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-01 07:57+0200\n"
+"POT-Creation-Date: 2019-07-29 10:13+0200\n"
 "PO-Revision-Date: 2019-04-01 07:57+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -96,6 +96,9 @@ msgstr "Stichwortverzeichnis"
 
 msgid "This official notice is only available in the print version."
 msgstr "Diese Meldung ist nur in der Papierversion erhältlich."
+
+msgid "Additional Links"
+msgstr "Weiterführende Links"
 
 msgid "Group"
 msgstr "Gruppe"

@@ -170,5 +170,8 @@ class Issue(Base, TimestampMixin, AssociatedFiles):
 
         from onegov.gazette.pdf import IssuePdf  # circular
         self.pdf = IssuePdf.from_issue(
-            self, request, self.first_publication_number
+            issue=self,
+            request=request,
+            first_publication_number=self.first_publication_number,
+            links=request.app.principal.links
         )

@@ -23,11 +23,13 @@ class Principal(object):
         publishing=False,
         frontend=False,
         sogc_import=None,
+        links=None,
         **kwargs
     ):
         assert not canton or canton in self.CANTONS
         assert not on_accept or on_accept['mail_to']
         assert not frontend or (frontend and publishing)
+        assert not links or isinstance(links, dict)
         assert not sogc_import or (
             sogc_import['endpoint']
             and sogc_import['category']
@@ -46,6 +48,7 @@ class Principal(object):
         self.publishing = publishing
         self.frontend = frontend
         self.sogc_import = sogc_import or {}
+        self.links = links
         if self.sogc_import and canton:
             self.sogc_import['canton'] = canton.upper()
 

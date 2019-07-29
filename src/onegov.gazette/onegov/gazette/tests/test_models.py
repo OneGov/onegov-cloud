@@ -22,6 +22,7 @@ from textwrap import dedent
 
 class DummyPrincipal(object):
     name = 'Govikon'
+    links = None
 
 
 class DummyApp(object):

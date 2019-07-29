@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a link section to the issue PDF.
+  [href]
+
 1.24.1 (2019-05-16)
 ~~~~~~~~~~~~~~~~~~~~
 
