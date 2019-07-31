@@ -11,6 +11,7 @@ from onegov.pdf import page_fn_footer
 from onegov.pdf import page_fn_header_and_footer
 from onegov.pdf import page_fn_header_logo_and_footer
 from onegov.pdf import Pdf as PdfBase
+from reportlab.platypus.flowables import PageBreak
 from pdfdocument.document import MarkupParagraph
 
 
@@ -466,7 +467,7 @@ class IssuePdf(NoticesPdf):
         # add a final page with links
         if links:
 
-            if not data[-1].get('page_break'):
+            if not isinstance(pdf.story[-1], PageBreak):
                 pdf.pagebreak()
 
             pdf.h2(request.translate(_("Additional Links")))
