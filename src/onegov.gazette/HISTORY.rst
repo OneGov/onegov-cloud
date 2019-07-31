@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.25.0 (2019-07-31)
+~~~~~~~~~~~~~~~~~~~~
 
 - Adds a link section to the issue PDF.
   [href]
