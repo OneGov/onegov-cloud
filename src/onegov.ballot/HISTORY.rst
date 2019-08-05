@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Add migration for related_link and related_link_label.
+- Adds migrations for related_link and related_link_label.
   [dadadamotha]
 
 3.10.0 (2019-07-26)

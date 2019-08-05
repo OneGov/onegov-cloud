@@ -5,7 +5,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 from onegov.ballot import Election
 from onegov.ballot import Vote
 from onegov.ballot.models.election.election_compound import \
-    ElectionCompoundAssociation
+    ElectionCompoundAssociation, ElectionCompound
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
@@ -521,3 +521,13 @@ def add_delete_contraints(context):
         f' FOREIGN KEY (connection_id) REFERENCES list_connections (id)'
         f' ON DELETE CASCADE'
     )
+
+
+@upgrade_task('Adds migration for related link and related link label')
+def add_related_link_and_label(context):
+    for model in (Vote, Election, ElectionCompound):
+        for item in context.session.query(model):
+            if not item.related_link:
+                item.related_link = None
+            if not item.related_link_label:
+                item.related_link_label = {}
