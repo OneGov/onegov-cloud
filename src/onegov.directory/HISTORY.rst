@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Ignores unavailable fields when processing submissions.
+  [href]
+
 0.4.8 (2019-07-23)
 ~~~~~~~~~~~~~~~~~~~~~
 

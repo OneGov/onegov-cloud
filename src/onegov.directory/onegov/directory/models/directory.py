@@ -326,6 +326,10 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
 
                 for field in directory.fields:
                     form_field = getattr(self, field.id)
+
+                    if form_field is None:
+                        continue
+
                     form_field.data = obj.values.get(field.id)
 
         return DirectoryEntryForm
