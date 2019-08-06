@@ -6,6 +6,7 @@ from itertools import groupby
 from onegov.form import utils
 from onegov.form.validators import StrictOptional
 from onegov.pay import Price
+from onegov.form.display import render_field
 from operator import itemgetter
 from wtforms import Form as BaseForm
 from wtforms import StringField, TextAreaField
@@ -259,6 +260,15 @@ class Form(BaseForm):
         # attach the pricing rules to the field instances
         for field_id, pricing in pricings.items():
             self._fields[field_id].pricing = pricing
+
+    def render_display(self, field):
+        """ Renders the given field for display (no input). May be overwritten
+        by descendants to return different html, or to return None.
+
+        If None is returned, the field is not rendered.
+
+        """
+        return render_field(field)
 
     def is_visible_through_dependencies(self, field_id):
         """ Returns true if the given field id has visible because all of

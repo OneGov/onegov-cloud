@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a render_display function to the form core.
+  [href]
+
 0.46.5 (2019-07-17)
 ~~~~~~~~~~~~~~~~~~~
 
