@@ -264,6 +264,7 @@ input[data-street-search]::placeholder {
     }
 
     .globals,
+    .locals,
     .header,
     .main-navigation,
     .main-title,
@@ -289,22 +290,6 @@ input[data-street-search]::placeholder {
 
     .alerts > .columns {
         padding: 0;
-    }
-
-    .sub-navigation {
-        > .columns {
-            margin-bottom: .75rem;
-            padding: 0;
-        }
-
-        .edit-bar,
-        .edit-bar .button {
-            background: $gray-pastel;
-        }
-
-        .edit-bar .button:hover {
-            background: $primary-color;
-        }
     }
 }
 
