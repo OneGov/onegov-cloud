@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.7.4 (2019-08-06)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Removes inline-editing from iframes.
   [href]
 
