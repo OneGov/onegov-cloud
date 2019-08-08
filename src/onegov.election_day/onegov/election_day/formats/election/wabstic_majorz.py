@@ -91,7 +91,6 @@ def import_election_wabstic_majorz(
             return True
         return False
 
-
     # Read the files
     wm_wahl, error = load_csv(
         file_wm_wahl, mimetype_wm_wahl,
@@ -340,17 +339,22 @@ def import_election_wabstic_majorz(
         try:
             entity_id = get_entity_id(line)
             candidate_id = validate_column(line, 'knr')
-            assert candidate_id in added_candidates
             votes = validate_integer(line, 'stimmen')
-        except (ValueError, AssertionError):
+        except ValueError:
             line_errors.append(_("Invalid candidate results"))
         else:
+            if added_candidates and candidate_id not in added_candidates:
+                line_errors.append(
+                    _("Candidate with id ${id} not in wm_kandidaten",
+                      mapping={'id': candidate_id}))
             if entity_id == 0 and not election.expats:
                 # Skip expats if not enabled
                 continue
 
             if entity_id not in added_entities:
-                line_errors.append(_("Invalid entity values"))
+                line_errors.append(
+                    _("Entity with id ${id} not in wmstatic_gemeinden",
+                        mapping={'id': entity_id}))
 
         # Pass the errors and continue to next line
         if line_errors:

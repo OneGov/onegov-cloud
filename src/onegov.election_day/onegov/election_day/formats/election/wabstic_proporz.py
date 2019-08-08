@@ -606,7 +606,7 @@ def import_election_wabstic_proporz(
             elected = True if line.gewaehlt == '1' else False
         except (ValueError, AssertionError):
             line_errors.append(
-                _("Candidate with id ${id} not in wpstatic_candidates",
+                _("Candidate with id ${id} not in wpstatic_kandidaten",
                   mapping={'id': candidate_id}))
         else:
             added_candidates[candidate_id]['elected'] = elected
