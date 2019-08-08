@@ -49,14 +49,14 @@ HEADERS_WM_KANDIDATENGDE = (
 
 def get_entity_id(line):
     col = 'bfsnrgemeinde'
-    validate_column(line, col)
-    try:
-        entity_id = int(line.bfsnrgemeinde or 0)
-    except ValueError:
-        raise ValueError(
-            _("Invalid integer: ${col}",
-              mapping={'col': col})
-        )
+    # try:
+    #     entity_id = int(line.bfsnrgemeinde or 0)
+    # except ValueError:
+    #     raise ValueError(
+    #         _("Invalid integer: ${col}",
+    #           mapping={'col': col})
+    #     )
+    entity_id = validate_integer(line, col)
     return 0 if entity_id in EXPATS else entity_id
 
 
