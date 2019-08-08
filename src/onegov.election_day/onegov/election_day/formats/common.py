@@ -152,12 +152,6 @@ def line_is_relevant(line, number, district=None):
         return line.sortgeschaeft == number
 
 
-def validate_column(line, col):
-    if not hasattr(line, col):
-        raise ValueError(_('Missing column: ${col}', mapping={'col': col}))
-    return getattr(line, col)
-
-
 def validate_integer(line, col, none_be_zero=True):
     """
     Checks line of a csv file for a valid integer.
@@ -167,13 +161,12 @@ def validate_integer(line, col, none_be_zero=True):
     :param none_be_zero: raises ValueError if line.col is None
     :return: integer value of line.col
     """
-
+    assert hasattr(line, col), 'Check done in load_csv'
     try:
-        value = validate_column(line, col)
         if none_be_zero:
-            return int(value or 0)
+            return int(getattr(line, col) or 0)
         else:
-            return int(value)
+            return int(getattr(line, col))
     except ValueError:
         raise ValueError(_('Invalid integer: ${col}',
                            mapping={'col': col}))

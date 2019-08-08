@@ -2,7 +2,7 @@ from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
 from onegov.ballot import ElectionResult
 from onegov.election_day import _
-from onegov.election_day.formats.common import EXPATS, validate_column, \
+from onegov.election_day.formats.common import EXPATS, \
     validate_integer, line_is_relevant
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
@@ -299,12 +299,11 @@ def import_election_wabstic_majorz(
             continue
 
         try:
-            candidate_id = validate_column(line, 'knr')
-            family_name = validate_column(line, 'nachname')
-            first_name = validate_column(line, 'vorname')
-            gewaehlt = validate_column(line, 'gewaehlt')
-            elected = True if gewaehlt == '1' else False
-            party = validate_column(line, 'partei')
+            candidate_id = line.knr
+            family_name = line.nachname
+            first_name = line.vorname
+            elected = True if line.gewaehlt == '1' else False
+            party = line.partei
         except ValueError as e:
             line_errors.append(e.args[0])
         else:
@@ -338,7 +337,7 @@ def import_election_wabstic_majorz(
 
         try:
             entity_id = get_entity_id(line)
-            candidate_id = validate_column(line, 'knr')
+            candidate_id = line.knr
             votes = validate_integer(line, 'stimmen')
         except ValueError:
             line_errors.append(_("Invalid candidate results"))
