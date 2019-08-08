@@ -155,6 +155,7 @@ def line_is_relevant(line, number, district=None):
 def validate_column(line, col):
     if not hasattr(line, col):
         raise ValueError(_('Missing column: ${col}', mapping={'col': col}))
+    return getattr(line, col)
 
 
 def validate_integer(line, col, none_be_zero=True):
@@ -167,12 +168,12 @@ def validate_integer(line, col, none_be_zero=True):
     :return: integer value of line.col
     """
 
-    validate_column(line, col)
     try:
+        value = validate_column(line, col)
         if none_be_zero:
-            return int(getattr(line, col) or 0)
+            return int(value or 0)
         else:
-            return int(getattr(line, col))
+            return int(value)
     except ValueError:
         raise ValueError(_('Invalid integer: ${col}',
                            mapping={'col': col}))
