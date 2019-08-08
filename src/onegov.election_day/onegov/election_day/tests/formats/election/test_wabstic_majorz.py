@@ -5,6 +5,7 @@ from io import BytesIO
 from onegov.ballot import Election
 from onegov.core.utils import module_path
 from onegov.election_day.formats import import_election_wabstic_majorz
+from onegov.election_day.formats.common import print_errors
 from onegov.election_day.models import Canton
 from pytest import mark
 
@@ -44,7 +45,7 @@ def test_import_wabstic_majorz(session, tar_file):
         BytesIO(wm_kandidaten), 'text/plain',
         BytesIO(wm_kandidatengde), 'text/plain',
     )
-
+    print_errors(errors)
     assert not errors
     assert election.completed
     assert election.progress == (78, 78)
@@ -154,7 +155,7 @@ def test_import_wabstic_majorz_invalid_values(session):
 
     errors = import_election_wabstic_majorz(
         election, principal, '0', '0',
-        BytesIO((
+        BytesIO((       # wm_wahl
             '\n'.join((
                 ','.join((
                     'SortGeschaeft',
@@ -168,7 +169,7 @@ def test_import_wabstic_majorz_invalid_values(session):
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
-        BytesIO((
+        BytesIO((       # wmstatic_gemeinden
             '\n'.join((
                 ','.join((
                     'SortWahlkreis',
@@ -196,7 +197,7 @@ def test_import_wabstic_majorz_invalid_values(session):
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
-        BytesIO((
+        BytesIO((       # wm_gemeinden
             '\n'.join((
                 ','.join((
                     'BfsNrGemeinde',
@@ -220,7 +221,7 @@ def test_import_wabstic_majorz_invalid_values(session):
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
-        BytesIO((
+        BytesIO((       # wm_kandidaten
             '\n'.join((
                 ','.join((
                     'SortGeschaeft',
@@ -240,7 +241,7 @@ def test_import_wabstic_majorz_invalid_values(session):
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
-        BytesIO((
+        BytesIO((       # wm_kandidatengde
             '\n'.join((
                 ','.join((
                     'SortGeschaeft',
@@ -264,12 +265,12 @@ def test_import_wabstic_majorz_invalid_values(session):
             ))
         ).encode('utf-8')), 'text/plain'
     )
-
+    print_errors(errors)
     assert sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
     ]) == [
         ('wm_gemeinden', 2, 'Invalid entity values'),
-        ('wm_gemeinden', 2, 'Invalid entity values'),
+        ('wm_gemeinden', 2, 'Invalid integer: sperrung'),
         ('wm_gemeinden', 2, 'Invalid entity values'),
         ('wm_kandidatengde', 2, 'Invalid candidate results'),
         ('wm_kandidatengde', 3, 'Invalid candidate results'),
@@ -528,7 +529,7 @@ def test_import_wabstic_majorz_temporary_results(session):
             ))
         ).encode('utf-8')), 'text/plain'
     )
-
+    print_errors(errors)
     assert not errors
 
     # 1 Counted, 1 Uncounted, 75 Missing
