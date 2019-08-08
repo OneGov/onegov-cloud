@@ -142,3 +142,41 @@ def load_csv(
         )
 
     return csv, error
+
+
+# Verification utils
+def line_is_relevant(line, number, district=None):
+    if district:
+        return line.sortwahlkreis == district and line.sortgeschaeft == number
+    else:
+        return line.sortgeschaeft == number
+
+
+def validate_column(line, col):
+    if not hasattr(line, col):
+        raise ValueError(_('Missing column: ${col}', mapping={'col': col}))
+
+
+def validate_integer(line, col, none_be_zero=True):
+    """
+    Checks line of a csv file for a valid integer.
+
+    :param line: line object from csv reader
+    :param col: attribute of line object
+    :param none_be_zero: raises ValueError if line.col is None
+    :return: integer value of line.col
+    """
+
+    validate_column(line, col)
+    try:
+        if none_be_zero:
+            return int(getattr(line, col) or 0)
+        else:
+            return int(getattr(line, col))
+    except ValueError:
+        raise ValueError(_('Invalid integer: ${col}',
+                           mapping={'col': col}))
+    except TypeError:
+        # raises error if none_be_zero=False and the integer is None
+        raise ValueError(_('Empty value: ${col}',
+                           mapping={'col': col}))

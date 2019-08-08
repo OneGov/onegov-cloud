@@ -2,7 +2,8 @@ from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
 from onegov.ballot import ElectionResult
 from onegov.election_day import _
-from onegov.election_day.formats.common import EXPATS
+from onegov.election_day.formats.common import EXPATS, validate_column, \
+    line_is_relevant, validate_integer
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from sqlalchemy.orm import object_session
@@ -46,17 +47,9 @@ HEADERS_WM_KANDIDATENGDE = (
 )
 
 
-def line_is_relevant(line, number, district=None):
-    if district:
-        return line.sortwahlkreis == district and line.sortgeschaeft == number
-    else:
-        return line.sortgeschaeft == number
-
-
 def get_entity_id(line):
     col = 'bfsnrgemeinde'
-    if not hasattr(line, col):
-        raise ValueError(_('Missing column: ${col}', mapping={'col': col}))
+    validate_column(line, col)
     try:
         entity_id = int(line.bfsnrgemeinde or 0)
     except ValueError:
@@ -98,21 +91,6 @@ def import_election_wabstic_majorz(
             return True
         return False
 
-    def validate_integer(line, col, none_be_zero=True):
-        if not hasattr(line, col):
-            raise ValueError(_('Missing column: ${col}', mapping={'col': col}))
-        try:
-            if none_be_zero:
-                return int(getattr(line, col) or 0)
-            else:
-                return int(getattr(line, col))
-        except ValueError:
-            raise ValueError(_('Invalid integer: ${col}',
-                               mapping={'col': col}))
-        except TypeError:
-            # raises error if none_be_zero=False and the integer is None
-            raise ValueError(_('Empty value: ${col}',
-                               mapping={'col': col}))
 
     # Read the files
     wm_wahl, error = load_csv(
@@ -170,17 +148,16 @@ def import_election_wabstic_majorz(
         if not line_is_relevant(line, number):
             continue
 
-        # Parse the absolute majority
+        # Parse the absolute majority, if None, 0 will be returned
         try:
-            absolute_majority = validate_integer(
-                line, 'absolutesmehr')
+            absolute_majority = validate_integer(line, 'absolutesmehr')
         except ValueError as e:
             line_errors.append(e.args[0])
         else:
             if absolute_majority == -1:
                 absolute_majority = None
 
-        # Check if complete
+        # Check if complete, if None, 0 will be returned
         try:
             complete = validate_integer(line, 'ausmittlungsstand')
         except ValueError as e:
@@ -189,7 +166,6 @@ def import_election_wabstic_majorz(
         if not 0 <= complete <= 3:
             line_errors.append(
                 _("Value of ausmittlungsstand not between 0 and 3"))
-
 
         # Pass the errors and continue to next line
         if line_errors:
