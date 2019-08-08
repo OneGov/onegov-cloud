@@ -183,7 +183,7 @@ def validate_integer(line, col, none_be_zero=True):
                            mapping={'col': col}))
 
 
-## Helpers
+# Helpers
 def print_errors(errors):
     error_list = sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
