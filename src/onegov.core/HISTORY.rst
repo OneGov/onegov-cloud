@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.85.1 (2019-08-08)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds missing dependency.
   [href]
