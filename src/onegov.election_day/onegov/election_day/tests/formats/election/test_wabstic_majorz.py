@@ -115,7 +115,7 @@ def test_import_wabstic_majorz_missing_headers(session):
                 ','.join((
                     'SortGeschaeft',
                     'Nachname',
-                    'Gewahlt',
+                    'Gewaehlt',
                     'Partei',
                 )),
             ))
@@ -227,7 +227,7 @@ def test_import_wabstic_majorz_invalid_values(session):
                     'KNR',
                     'Nachname',
                     'Vorname',
-                    'Gewahlt',
+                    'Gewaehlt',
                     'Partei',
                 )),
                 ','.join((
@@ -235,7 +235,7 @@ def test_import_wabstic_majorz_invalid_values(session):
                     'xxx',  # KNR
                     'xxx',  # Nachname
                     'xxx',  # Vorname
-                    'xxx',  # Gewahlt
+                    'xxx',  # Gewaehlt
                     'xxx',  # Partei
                 )),
             ))
@@ -360,7 +360,7 @@ def test_import_wabstic_majorz_expats(session):
                             'KNR',
                             'Nachname',
                             'Vorname',
-                            'Gewahlt',
+                            'Gewaehlt',
                             'Partei',
                         )),
                         ','.join((
@@ -368,7 +368,7 @@ def test_import_wabstic_majorz_expats(session):
                             '1',  # KNR
                             'xxx',  # Nachname
                             'xxx',  # Vorname
-                            '',  # Gewahlt
+                            '',  # Gewaehlt
                             '',  # Partei
                         )),
                     ))
@@ -492,7 +492,7 @@ def test_import_wabstic_majorz_temporary_results(session):
                     'KNR',
                     'Nachname',
                     'Vorname',
-                    'Gewahlt',
+                    'Gewaehlt',
                     'Partei',
                 )),
                 ','.join((
@@ -500,7 +500,7 @@ def test_import_wabstic_majorz_temporary_results(session):
                     '1',  # KNR
                     'xxx',  # Nachname
                     'xxx',  # Vorname
-                    '',  # Gewahlt
+                    '',  # Gewaehlt
                     '',  # Partei
                 )),
             ))
@@ -633,7 +633,7 @@ def test_import_wabstic_majorz_regional(session):
                         'KNR',
                         'Nachname',
                         'Vorname',
-                        'Gewahlt',
+                        'Gewaehlt',
                         'Partei',
                     )),
                     ','.join((
@@ -641,7 +641,7 @@ def test_import_wabstic_majorz_regional(session):
                         '1',  # KNR
                         'xxx',  # Nachname
                         'xxx',  # Vorname
-                        '',  # Gewahlt
+                        '',  # Gewaehlt
                         '',  # Partei
                     )),
                 ))
@@ -750,7 +750,7 @@ def test_import_wabstic_majorz_regional(session):
                         'KNR',
                         'Nachname',
                         'Vorname',
-                        'Gewahlt',
+                        'Gewaehlt',
                         'Partei',
                     )),
                     ','.join((
@@ -758,7 +758,7 @@ def test_import_wabstic_majorz_regional(session):
                         '1',  # KNR
                         'xxx',  # Nachname
                         'xxx',  # Vorname
-                        '',  # Gewahlt
+                        '',  # Gewaehlt
                         '',  # Partei
                     )),
                 ))
@@ -853,7 +853,7 @@ def test_import_wabstic_majorz_regional(session):
                     'KNR',
                     'Nachname',
                     'Vorname',
-                    'Gewahlt',
+                    'Gewaehlt',
                     'Partei',
                 )),
                 ','.join((
@@ -861,7 +861,7 @@ def test_import_wabstic_majorz_regional(session):
                     '1',  # KNR
                     'xxx',  # Nachname
                     'xxx',  # Vorname
-                    '',  # Gewahlt
+                    '',  # Gewaehlt
                     '',  # Partei
                 )),
             ))
@@ -953,7 +953,7 @@ def test_import_wabstic_majorz_regional(session):
                         'KNR',
                         'Nachname',
                         'Vorname',
-                        'Gewahlt',
+                        'Gewaehlt',
                         'Partei',
                     )),
                     ','.join((
@@ -961,7 +961,7 @@ def test_import_wabstic_majorz_regional(session):
                         '1',  # KNR
                         'xxx',  # Nachname
                         'xxx',  # Vorname
-                        '',  # Gewahlt
+                        '',  # Gewaehlt
                         '',  # Partei
                     )),
                 ))
