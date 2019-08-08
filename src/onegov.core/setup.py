@@ -47,6 +47,7 @@ setup(
         'editdistance',
         'fastcache',
         'fs>=2.0.0',
+        'genshi',
         'hiredis',
         'html2text',
         'itsdangerous',
