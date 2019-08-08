@@ -180,3 +180,9 @@ def validate_integer(line, col, none_be_zero=True):
         # raises error if none_be_zero=False and the integer is None
         raise ValueError(_('Empty value: ${col}',
                            mapping={'col': col}))
+
+
+## Helpers
+def print_errors(errors):
+    for e in errors:
+        print(f'{e.filename}:{e.line} {e.error.interpolate()}')
