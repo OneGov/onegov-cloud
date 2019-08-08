@@ -185,5 +185,8 @@ def validate_integer(line, col, none_be_zero=True):
 
 ## Helpers
 def print_errors(errors):
-    for e in errors:
-        print(f'{e.filename}:{e.line} {e.error.interpolate()}')
+    error_list = sorted([
+        (e.filename, e.line, e.error.interpolate()) for e in errors
+    ])
+    for fn, l, err in error_list:
+        print(f'{fn}:{l} {err}')
