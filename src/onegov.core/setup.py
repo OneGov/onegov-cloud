@@ -50,6 +50,7 @@ setup(
         'genshi',
         'hiredis',
         'html2text',
+        'html5lib',
         'itsdangerous',
         'isodate',
         'lazy-object-proxy',
