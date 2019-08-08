@@ -74,7 +74,9 @@ class CoordinatesFieldRenderer(BaseRenderer):
                  data-map-type="thumbnail"
                  data-lat="{lat}"
                  data-lon="{lon}"
-                 data-zoom="{zoom}"></div>
+                 data-zoom="{zoom}">
+                 {lat}, {lon}
+            </div>
         """.format(
             lat=field.data.lat,
             lon=field.data.lon,

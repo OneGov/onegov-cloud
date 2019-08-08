@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Renders the coordinates of coordinate fields as a fall-back.
+  [href]
+
 0.9.1 (2019-06-14)
 ~~~~~~~~~~~~~~~~~~~
 
