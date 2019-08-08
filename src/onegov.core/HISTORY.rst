@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.85.0 (2019-08-08)
+~~~~~~~~~~~~~~~~~~~
 
 - Vendors in htmldiff, an html diffing library.
   [href]
