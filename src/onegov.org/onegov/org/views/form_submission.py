@@ -150,6 +150,7 @@ def handle_pending_submission(self, request):
 
     form = request.get_form(self.form_class, data=self.data)
     form.action = request.link(self)
+    form.model = self
 
     if 'edit' not in request.GET:
         form.validate()
@@ -213,6 +214,7 @@ def handle_pending_submission(self, request):
 def handle_complete_submission(self, request):
     form = request.get_form(self.form_class)
     form.process(data=self.data)
+    form.model = self
 
     # we're not really using a csrf protected form here (the complete form
     # button is basically just there so we can use a POST instead of a GET)

@@ -8,6 +8,9 @@
                 <tal:b case="'adopted'" i18n:translate>
                     Directory entry adopted.
                 </tal:b>
+                <tal:b case="'applied'" i18n:translate>
+                    Change request applied.
+                </tal:b>
                 <tal:b case="'rejected'" i18n:translate>
                     Directory entry rejected.
                 </tal:b>

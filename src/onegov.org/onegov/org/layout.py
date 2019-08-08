@@ -20,7 +20,7 @@ from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryEntryCollection
 from onegov.event import OccurrenceCollection
 from onegov.file import File
-from onegov.form import FormCollection, render_field
+from onegov.form import FormCollection
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org import _
 from onegov.org import utils
@@ -367,10 +367,6 @@ class Layout(ChameleonLayout):
 
     def include_code_editor(self):
         self.request.include('code_editor')
-
-    def render_field(self, field):
-        """ Alias for ``onegov.form.render_field``. """
-        return render_field(field)
 
     def field_download_link(self, field):
         if not field.type == 'UploadField':

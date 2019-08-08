@@ -154,6 +154,7 @@ class FormSubmissionHandler(Handler):
 
     def get_summary(self, request):
         layout = DefaultLayout(self.submission, request)
+
         return render_macro(layout.macros['display_form'], request, {
             'form': self.form,
             'layout': layout
@@ -629,10 +630,32 @@ class DirectoryEntryHandler(Handler):
 
         return self.session.query(Directory).filter_by(id=directory_id).first()
 
+    @cached_property
+    def entry(self):
+        if self.submission:
+            id = self.submission.meta.get('directory_entry')
+        else:
+            id = self.ticket.handler_data.get('directory_entry')
+
+        return self.session.query(DirectoryEntry).filter_by(id=id).first()
+
     @property
     def deleted(self):
         if not self.directory:
             return True
+
+        if self.kind == 'change-request':
+            if self.submission:
+                data = self.submission.meta
+            else:
+                data = self.ticket.handler_data
+
+            entry = self.session.query(DirectoryEntry)\
+                .filter_by(id=data['directory_entry'])\
+                .first()
+
+            if not entry:
+                return True
 
         if self.state == 'adopted':
             name = self.ticket.handler_data.get('entry_name')
@@ -678,11 +701,31 @@ class DirectoryEntryHandler(Handler):
 
         return self.state is None
 
+    @property
+    def kind(self):
+        if self.submission:
+            data = self.submission.meta
+        else:
+            data = self.ticket.handler_data
+
+        if 'change-request' in data.get('extensions', ()):
+            return 'change-request'
+        else:
+            return 'new-entry'
+
     def get_summary(self, request):
         layout = DefaultLayout(self.submission, request)
-        return render_macro(layout.macros['display_form'], request, {
+
+        # XXX this is a poor man's request.get_form
+        self.form.request = request
+        self.form.model = self.submission
+
+        macro = layout.macros['directory_entry_submission']
+
+        return render_macro(macro, request, {
             'form': self.form,
-            'layout': layout
+            'layout': layout,
+            'handler': self,
         })
 
     def get_links(self, request):

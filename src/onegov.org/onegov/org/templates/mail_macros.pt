@@ -52,20 +52,28 @@
 <metal:display_form define-macro="display_form" i18n:domain="onegov.org">
     <p tal:condition="form" tal:repeat="fieldset form.fieldsets">
         <tal:b define="fields fieldset.non_empty_fields" condition="fields">
-            <div class="fieldset" tal:condition="fieldset.is_visible">${fieldset.label}</div>
-            <metal:b use-macro="layout.macros['display_fields']" tal:define="fields fields.values()">
+            <metal:b use-macro="layout.macros['display_fields']" tal:define="fields fields.values()" />
         </tal:b>
     </p>
 </metal:display_form>
 
 <metal:display_field define-macro="display_fields" i18n:domain="onegov.org">
-    <table class="field-display">
-        <tal:b repeat="field fields">
-            <tal:b define="rendered layout.render_field(field)|nothing" condition="rendered">
-                <tr><td><b>${field.label.text}</b></td></tr>
-                <tr><td><tal:b replace="structure rendered" /></td></tr>
-                <tr><td height="5"></td></tr>
-            </tal:b>
+    <?python
+        if fields:
+            rendered_fields = ((f, form.render_display(f)) for f in fields)
+            rendered_fields = ((f, rendered) for f, rendered in rendered_fields if rendered)
+
+            rendered_fields = tuple(rendered_fields)
+        else:
+            rendered_fields = None
+    ?>
+    <div class="fieldset" tal:condition="fieldset.is_visible and rendered_fields|nothing">${fieldset.label}</div>
+
+    <table class="field-display" tal:condition="rendered_fields">
+        <tal:b repeat="(field, rendered) rendered_fields">
+            <tr><td><b>${field.label.text}</b></td></tr>
+            <tr><td><tal:b replace="structure rendered" /></td></tr>
+            <tr><td height="5"></td></tr>
         </tal:b>
     </table>
 </metal:display_field>

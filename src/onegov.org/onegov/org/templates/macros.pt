@@ -247,6 +247,12 @@
 </metal:panel>
 
 <metal:form define-macro="form">
+    <div class="panel global-errors" tal:condition="form.errors.get('global-errors')">
+        <p tal:repeat="error form.errors['global-errors']">
+            ${error}
+        </p>
+    </div>
+
     <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url; data-image-list-url layout.image_list_url;data-file-upload-url layout.file_upload_json_url; data-file-list-url layout.file_list_url; data-sitecollection-url layout.sitecollection_url;" class="${form.css_class|''}" method="${form.method|'POST'}" enctype="multipart/form-data">
         <tal:b repeat="fieldset form.fieldsets">
             <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower().replace(' ', '-')}">
@@ -471,7 +477,6 @@
 <metal:display_form define-macro="display_form" i18n:domain="onegov.org">
     <div tal:condition="form" tal:repeat="fieldset form.fieldsets">
         <tal:b define="fields fieldset.non_empty_fields" condition="fields">
-            <h2 tal:condition="fieldset.is_visible">${fieldset.label}</h2>
             <metal:b use-macro="layout.macros['display_fields']" tal:define="fields fields.values()">
         </tal:b>
     </div>
@@ -484,26 +489,61 @@
 </metal:display_form>
 
 <metal:display_field define-macro="display_fields" i18n:domain="onegov.org">
-    <dl class="field-display" tal:repeat="field fields" tal:define="allow_downloads allow_downloads|request.is_manager; allow_views allow_views|False">
-        <tal:b define="rendered layout.render_field(field)|nothing" condition="rendered">
-            <dt>${field.label.text}</dt>
-            <dd>
-                <tal:b condition="(allow_downloads or allow_views) and field.type == 'UploadField'">
-                    <tal:b define="url layout.field_download_link(field)">
-                        <a href="${url}" tal:condition="not allow_views or not field.is_image">
-                            <tal:b replace="structure rendered" />
-                        </a>
-                        <img src="${url}" tal:condition="allow_views and field.is_image" alt="" />
-                    </tal:b>
+    <?python
+        if fields:
+            rendered_fields = ((f, form.render_display(f)) for f in fields)
+            rendered_fields = ((f, rendered) for f, rendered in rendered_fields if rendered)
+
+            rendered_fields = tuple(rendered_fields)
+        else:
+            rendered_fields = None
+    ?>
+    <h2 tal:condition="fieldset.is_visible and rendered_fields|nothing">${fieldset.label}</h2>
+
+    <dl class="field-display" tal:repeat="(field, rendered) rendered_fields" tal:define="allow_downloads allow_downloads|request.is_manager; allow_views allow_views|False">
+        <dt>${field.label.text}</dt>
+        <dd>
+            <tal:b condition="(allow_downloads or allow_views) and field.type == 'UploadField'">
+                <tal:b define="url layout.field_download_link(field)">
+                    <a href="${url}" tal:condition="not allow_views or not field.is_image">
+                        <tal:b replace="structure rendered" />
+                    </a>
+                    <img src="${url}" tal:condition="allow_views and field.is_image" alt="" />
                 </tal:b>
-                <tal:b condition="not (allow_downloads or allow_views) or field.type != 'UploadField'">
-                    <tal:b replace="structure rendered" />
-                </tal:b>
-            </dd>
-        </tal:b>
+            </tal:b>
+            <tal:b condition="not (allow_downloads or allow_views) or field.type != 'UploadField'">
+                <tal:b replace="structure rendered" />
+            </tal:b>
+        </dd>
         <div class="clearfix"></div>
     </dl>
 </metal:display_field>
+
+<metal:directory_entry_submission define-macro="directory_entry_submission" i18n:domain="onegov.org">
+    <h2 tal:condition="handler.kind == 'change-request'" i18n:translate>
+        Change request
+    </h2>
+
+    <h2 tal:condition="handler.kind == 'new-entry'" i18n:translate>
+        New Entry
+    </h2>
+
+    <div class="directory-entry-submission-summary" tal:condition="not: handler.deleted">
+        <dl>
+            <div>
+                <dt i18n:translate>Directory</dt>
+                <dd><a href="${request.link(handler.directory)}">${handler.directory.title}</a></dd>
+            </div>
+
+            <div tal:condition="handler.entry">
+                <dt i18n:translate>Entry</dt>
+                <dd><a href="${request.link(handler.entry)}">${handler.entry.title}</a></dd>
+            </div>
+        </dl>
+    </div>
+
+    <metal:b use-macro="layout.macros['display_form']" />
+</metal:directory_entry_submission>
 
 <metal:price define-macro="price">
     ${layout.format_number(price.net_amount)} ${price.currency}

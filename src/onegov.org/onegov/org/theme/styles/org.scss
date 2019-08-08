@@ -400,6 +400,18 @@ $globals-height: 2.5rem;
 }
 
 /*
+    Diffs
+*/
+ins {
+    background: $green-pastel;
+    text-decoration: none;
+}
+
+del {
+    background: $red-pastel;
+}
+
+/*
     Login page
 */
 #page-auth-login #content {
@@ -696,6 +708,17 @@ table {
 /*
     form style customizations
 */
+.panel.global-errors {
+    background: $alert-color;
+    border: 0;
+    padding: .5rem .75rem;
+
+    p {
+        color: $white;
+        font-size: .875rem;
+    }
+}
+
 form {
     label {
         min-width: 75%;

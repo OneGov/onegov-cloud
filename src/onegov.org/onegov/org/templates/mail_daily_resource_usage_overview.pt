@@ -46,7 +46,7 @@
 
                                         <p tal:repeat="field fields.values()">
                                             <span class="descreet">${field.label.text}</span><br>
-                                            ${layout.render_field(field)}
+                                            ${form.render_display(field)}
                                         </p>
                                     </tal:b>
                                 </div>

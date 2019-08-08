@@ -202,9 +202,11 @@ def test_browse_directory_editor(browser, org_app):
     assert browser.find_by_css('#content_fields').value == "Titel/Text"
 
     # Save the form and ensure that after the load we get the same selections
-    browser.find_by_value("Absenden").click()
-    browser.find_by_css('.edit-link').click()
+    submit = browser.find_by_value("Absenden")
+    submit.scroll_to()
+    submit.click()
 
+    browser.find_by_css('.edit-link').click()
     assert browser.find_by_css('.formcode-select input')[0].checked
     assert not browser.find_by_css('.formcode-select input')[1].checked
 

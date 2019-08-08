@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-07-17 14:52+0200\n"
+"POT-Creation-Date: 2019-08-08 12:29+0200\n"
 "PO-Revision-Date: 2019-02-18 06:39+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -884,6 +884,12 @@ msgstr "Beschreibt kurz um was es bei diesem Thema geht"
 msgid "Map"
 msgstr "Karte"
 
+msgid "Comment"
+msgstr "Kommentar"
+
+msgid "Please provide at least one change"
+msgstr "Bitte geben Sie mindestens eine Änderung ein"
+
 msgid "Time"
 msgstr "Zeit"
 
@@ -1229,6 +1235,22 @@ msgstr "Wegleitung"
 
 msgid "Price per submission"
 msgstr "Preis pro Eingabe"
+
+msgid "Users may send change requests"
+msgstr "Benutzer können Änderungen vorschlagen"
+
+msgid "Change requests"
+msgstr "Änderungsvorschläge"
+
+#, python-format
+msgid ""
+"User submissions are not possible, because «${field}» is not visible. Only "
+"if all fields are visible are user submission possible - otherwise users may "
+"see data that they are not intended to see. "
+msgstr ""
+"Benutzereingaben sind nicht möglich, da «${field}» nicht sichtbar ist. Nur "
+"wenn alle Felder sichtbar sind können Benutzereingaben akzeptiert werden - "
+"andernfalls ist es möglich dass der Benutzer versteckte Felder sehen kann."
 
 msgid "Apply directory configuration"
 msgstr "Verzeichniskonfiguration anwenden"
@@ -1750,6 +1772,9 @@ msgstr ""
 msgid "The submission was adopted"
 msgstr "Der Eintrag wurde übernommen"
 
+msgid "The change request was applied"
+msgstr "Der Änderungswunsch wurde übernommen"
+
 msgid "The submission was rejected"
 msgstr "Die Eingabe wurde abgelehnt"
 
@@ -1758,6 +1783,9 @@ msgstr "Der Eintrag ist nicht gültig, bitte korrigieren"
 
 msgid "Your directory submission has been adopted"
 msgstr "Ihr Verzeichniseintrag wurde übernommen"
+
+msgid "Your change request has been applied"
+msgstr "Ihr Änderungswunsch wurde übernommen"
 
 msgid "Your directory submission has been rejected"
 msgstr "Ihre Eingabe wurde abgelehnt"
@@ -1996,6 +2024,12 @@ msgstr ""
 
 msgid "Total Amount"
 msgstr "Totalbetrag"
+
+msgid "Change request"
+msgstr "Änderungsvorschlag"
+
+msgid "New Entry"
+msgstr "Neuer Eintrag"
 
 msgid "Open"
 msgstr "Offen"
@@ -2340,8 +2374,9 @@ msgstr "Keine Einträge gefunden."
 msgid "Propose entry"
 msgstr "Eintrag vorschlagen"
 
-msgid "Propose a new entry"
-msgstr "Einen neuen Eintrag vorschlagen"
+msgid "Something missing? Propose a new entry."
+msgstr ""
+"Fehlt ein Eintrag im Verzeichnis? Schlagen Sie einen neuen Eintrag vor."
 
 msgid "Don't have an account yet?"
 msgstr "Sie haben noch kein Benutzerkonto?"
@@ -2684,6 +2719,9 @@ msgstr "Wählen Sie einen Eintrag aus um diesen anzuzeigen"
 msgid "Directory entry adopted."
 msgstr "Verzeichniseintrag übernommen."
 
+msgid "Change request applied."
+msgstr "Änderungswunsch übernommen."
+
 msgid "Directory entry rejected."
 msgstr "Verzeichniseintrag abgelehnt."
 
@@ -2782,6 +2820,9 @@ msgstr "Zurück zur Startseite"
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
+
+msgid "Your change request has been applied:"
+msgstr "Ihr Änderungswunsch wurde übernommen:"
 
 msgid "No directories defined yet."
 msgstr "Noch keine Verzeichnisse definiert."
@@ -2936,6 +2977,12 @@ msgstr "Externer Link"
 
 msgid "More information"
 msgstr "Weiterführende Informationen"
+
+msgid "Change Request"
+msgstr "Änderung vorschlagen"
+
+msgid "Found an error? Propose a change to this entry."
+msgstr "Haben Sie einen Fehler gefunden? Schlagen Sie eine Änderung vor."
 
 msgid "Your event has unfortunately been rejected:"
 msgstr "Ihre Veranstaltung musste leider abgelehnt werden:"
@@ -3667,7 +3714,10 @@ msgid "Search Unavailable"
 msgstr "Suche Nicht Verfügbar"
 
 msgid "Submit a New Directory Entry"
-msgstr "Einen neuen Verzeichniseintrag vorschlagen"
+msgstr "Einen neuen Verzeichniseintrag vorschlagen."
+
+msgid "Propose a change"
+msgstr "Änderung vorschlagen"
 
 msgid "New Directory"
 msgstr "Neues Verzeichnis"
@@ -3677,6 +3727,14 @@ msgstr "Das Verzeichnis wurde gelöscht"
 
 msgid "New Directory Entry"
 msgstr "Neuer Verzeichniseintrag"
+
+msgid ""
+"To request a change, edit the fields you would like to change, leaving the "
+"other fields intact. Then submit your request."
+msgstr ""
+"Um eine Änderung vorzuschlagen, bearbeiten Sie die Felder die Sie ändern "
+"möchten. Wo keine Änderungen nötig sind, lassen Sie die Felder wie sie sind. "
+"Danach senden Sie Ihre Anfrage ab."
 
 msgid "The entry was deleted"
 msgstr "Der Eintrag wurde gelöscht"
@@ -3761,3 +3819,9 @@ msgstr "Die Zahlung wurde eingenommen"
 
 msgid "The payment was refunded"
 msgstr "Die Zahlung wurde rückerstattet"
+
+#~ msgid "Propose a new entry"
+#~ msgstr "Einen neuen Eintrag vorschlagen"
+
+#~ msgid "Request a change for this entry."
+#~ msgstr "Schlagen Sie eine Änderung vor."

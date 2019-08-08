@@ -1,6 +1,8 @@
+import inspect
 import sedate
 
 from cached_property import cached_property
+from copy import copy
 from datetime import timedelta
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.utils import linkify
@@ -8,6 +10,7 @@ from onegov.directory import Directory, DirectoryEntry
 from onegov.directory.errors import DuplicateEntryError, ValidationError
 from onegov.directory.migration import DirectoryMigration
 from onegov.form import as_internal_id, Extendable, FormSubmission
+from onegov.form.fields import UploadField
 from onegov.org import _
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.extensions import HiddenFromPublicExtension
@@ -93,7 +96,7 @@ class DirectorySubmissionAction(object):
         # fails
         self.submission.definition = self.directory.structure
 
-        # if the migration failes, update the form on the submission
+        # if the migration fails, update the form on the submission
         # and redirect to it so it can be fixed
         if not migration.possible:
             request.alert(_("The entry is not valid, please adjust it"))
@@ -103,7 +106,11 @@ class DirectorySubmissionAction(object):
         migration.migrate_values(data)
 
         try:
-            entry = self.directory.add(data)
+            if 'change-request' in self.submission.meta['extensions']:
+                entry = self.apply_change_request(request, data)
+            else:
+                entry = self.create_new_entry(request, data)
+
         except DuplicateEntryError:
             request.alert(_("An entry with this name already exists"))
             return
@@ -114,7 +121,9 @@ class DirectorySubmissionAction(object):
         self.ticket.handler_data['entry_name'] = entry.name
         self.ticket.handler_data['state'] = 'adopted'
 
-        entry.coordinates = self.submission.data.get('coordinates')
+    def create_new_entry(self, request, data):
+        entry = self.directory.add(data)
+        entry.coordinates = data.get('coordinates')
 
         self.send_mail_if_enabled(
             request=request,
@@ -123,8 +132,54 @@ class DirectorySubmissionAction(object):
         )
 
         request.success(_("The submission was adopted"))
+
         DirectoryMessage.create(
             self.directory, self.ticket, request, 'adopted')
+
+        return entry
+
+    def apply_change_request(self, request, data):
+        entry = request.session.query(ExtendedDirectoryEntry)\
+            .filter_by(id=self.submission.meta['directory_entry'])\
+            .one()
+
+        changed = []
+        values = copy(entry.values)
+        form = self.submission.form_class(data=data)
+        form.request = request
+        form.model = self.submission
+
+        for name, field in form._fields.items():
+            if form.is_different(field):
+                values[name] = form.data[name]
+                changed.append(name)
+
+        self.directory.update(entry, values)
+
+        # coordinates can only be set, not deleted at this point
+        if entry.coordinates != data.get('coordinates'):
+            if data.get('coordinates'):
+                entry.coordinates = data.get('coordinates')
+
+            changed.append('coordinates')
+
+        # keep a list of changes so the change request extension can
+        # still show the changes (the change detection no longer works once
+        # the changes have been applied)
+        self.submission.meta['changed'] = changed
+
+        self.send_mail_if_enabled(
+            request=request,
+            template='mail_directory_entry_applied.pt',
+            subject=_("Your change request has been applied"),
+        )
+
+        request.success(_("The change request was applied"))
+
+        DirectoryMessage.create(
+            self.directory, self.ticket, request, 'applied')
+
+        return entry
 
     def reject(self, request):
 
@@ -153,9 +208,12 @@ class ExtendedDirectory(Directory, HiddenFromPublicExtension, Extendable):
 
     enable_map = meta_property()
     enable_submissions = meta_property()
+    enable_change_requests = meta_property()
+
+    submissions_guideline = content_property()
+    change_requests_guideline = content_property()
 
     text = content_property()
-    guideline = content_property()
     price = content_property()
     price_per_submission = content_property()
     currency = content_property()
@@ -171,16 +229,39 @@ class ExtendedDirectory(Directory, HiddenFromPublicExtension, Extendable):
     def es_public(self):
         return not self.is_hidden_from_public
 
-    @property
-    def form_class_for_submissions(self):
-        return self.extend_form_class(self.form_class, self.extensions)
+    def form_class_for_submissions(self, include_private):
+        """ Generates the form_class used for user submissions and change
+        requests. The resulting form always includes a submitter field and all
+        fields (when submitting) or only public fields (when requesting a
+        change).
+
+        """
+
+        form_class = self.extend_form_class(self.form_class, self.extensions)
+
+        # force all upload fields to be simple, we do not support the more
+        # complex add/keep/replace widget, which is hard to properly support
+        # and is not super useful in submissions
+        def is_upload(attribute):
+            if not hasattr(attribute, 'field_class'):
+                return None
+
+            return issubclass(attribute.field_class, UploadField)
+
+        for name, field in inspect.getmembers(form_class, predicate=is_upload):
+            if 'render_kw' not in field.kwargs:
+                field.kwargs['render_kw'] = {}
+
+            field.kwargs['render_kw']['force_simple'] = True
+
+        return form_class
 
     @property
     def extensions(self):
         if self.enable_map == 'no':
-            return ('submitter', )
+            return ('submitter', 'comment')
         else:
-            return ('coordinates', 'submitter')
+            return ('coordinates', 'submitter', 'comment')
 
     @property
     def actual_price(self):

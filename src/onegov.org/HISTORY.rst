@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Gives users the ability to send change requests for directory entries.
+  [href]
+
 1.5.1 (2019-07-18)
 ~~~~~~~~~~~~~~~~~~~
 

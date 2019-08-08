@@ -4,7 +4,14 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
         <tal:b metal:use-macro="layout.macros.page_content"
-                   tal:define="lead entry.lead;text None; people None; contact entry.contact; coordinates entry.directory.enable_map in ('everywhere', 'entry') and entry.coordinates">
+                   tal:define="
+                    lead entry.lead;
+                    text None;
+                    people None;
+                    contact entry.contact;
+                    coordinates entry.directory.enable_map in ('everywhere', 'entry') and entry.coordinates;
+                    show_side_panel layout.model.directory.enable_change_requests|nothing;
+                    ">
 
             <div metal:fill-slot="before-lead">
                 <metal:b use-macro="layout.macros['before_directory_entry_lead']" />
@@ -18,6 +25,7 @@
                             fields entry.content_fields;
                             allow_downloads True;
                             allow_views True;
+                            form entry.directory.form_obj;
                         "
                     />
                 </div>
@@ -33,6 +41,18 @@
                 </dl>
             </div>
 
+            <div metal:fill-slot="after-panels" tal:condition="layout.model.directory.enable_change_requests|nothing">
+                <div class="submit-yours">
+                    <dl>
+                        <dt>
+                            <a href="${request.link(layout.model, 'change-request')}">
+                                <h2 i18n:translate>Change Request</h2>
+                            </a>
+                        </dt>
+                        <dd i18n:translate>Found an error? Propose a change to this entry.</dd>
+                    </dl>
+                </div>
+            </div>
         </tal:b>
     </tal:b>
 </div>

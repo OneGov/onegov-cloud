@@ -8,6 +8,7 @@ from onegov.form import FormDefinition
 from onegov.org.models import Organisation, Topic, News, ExtendedDirectory
 from onegov.org.utils import annotate_html
 from onegov.reservation import Resource
+from sqlalchemy.orm import undefer
 
 
 @upgrade_task('Move from town to organisation', always_run=True)
@@ -99,3 +100,13 @@ def add_default_recirect_setting(context):
 
     if org:
         org.redirect_homepage_to = 'no'
+
+
+@upgrade_task('Rename guideline to submissions_guideline')
+def rename_guideline_to_submissions_guideline(context):
+    directories = context.session.query(ExtendedDirectory)\
+        .options(undefer(ExtendedDirectory.content))
+
+    for directory in directories:
+        directory.content['submissions_guideline'] \
+            = directory.content.pop('guideline', None)

@@ -7,6 +7,7 @@ from onegov.form import as_internal_id
 from onegov.form import flatten_fieldsets
 from onegov.form import Form
 from onegov.form import merge_forms
+from onegov.form import move_fields
 from onegov.form import parse_formcode
 from onegov.form.errors import FormError
 from onegov.form.fields import IconField
@@ -117,13 +118,11 @@ class DirectoryBaseForm(Form):
         render_kw={
             'class_': 'formcode-select',
             'data-fields-include': 'fileinput'
-        }
-    )
+        })
 
     marker_icon = IconField(
         label=_("Icon"),
-        fieldset=_("Marker"),
-    )
+        fieldset=_("Marker"))
 
     marker_color_type = RadioField(
         label=_("Marker Color"),
@@ -132,14 +131,12 @@ class DirectoryBaseForm(Form):
             ('default', _("Default")),
             ('custom', _("Custom"))
         ],
-        default='default'
-    )
+        default='default')
 
     marker_color_value = ColorField(
         label=_("Color"),
         fieldset=_("Marker"),
-        depends_on=('marker_color_type', 'custom')
-    )
+        depends_on=('marker_color_type', 'custom'))
 
     order = RadioField(
         label=_("Order"),
@@ -164,32 +161,28 @@ class DirectoryBaseForm(Form):
             ('asc', _("Ascending")),
             ('desc', _("Descending"))
         ],
-        default='asc'
-    )
+        default='asc')
 
     link_pattern = StringField(
         label=_("Pattern"),
         fieldset=_("External Link"),
-        render_kw={'class_': 'formcode-format'},
-    )
+        render_kw={'class_': 'formcode-format'})
 
     link_title = StringField(
         label=_("Title"),
-        fieldset=_("External Link")
-    )
+        fieldset=_("External Link"))
 
     link_visible = BooleanField(
         label=_("Visible"),
         fieldset=_("External Link"),
-        default=True
-    )
+        default=True)
 
     enable_submissions = BooleanField(
         label=_("Users may propose new entries"),
         fieldset=_("New entries"),
-        default=True)
+        default=False)
 
-    guideline = HtmlField(
+    submissions_guideline = HtmlField(
         label=_("Guideline"),
         fieldset=_("New entries"),
         depends_on=('enable_submissions', 'y'))
@@ -217,6 +210,16 @@ class DirectoryBaseForm(Form):
         default="CHF",
         depends_on=('enable_submissions', 'y', 'price', 'paid'),
         validators=[validators.InputRequired()])
+
+    enable_change_requests = BooleanField(
+        label=_("Users may send change requests"),
+        fieldset=_("Change requests"),
+        default=False)
+
+    change_requests_guideline = HtmlField(
+        label=_("Guideline"),
+        fieldset=_("Change requests"),
+        depends_on=('enable_change_requests', 'y'))
 
     @cached_property
     def known_field_ids(self):
@@ -264,6 +267,94 @@ class DirectoryBaseForm(Form):
             raise ValidationError(
                 _("Please select at most one thumbnail field")
             )
+
+    def ensure_public_fields_for_submissions(self):
+        """ Force directories to show all fields (no hidden fields) if the
+        user may send in new entries or update exsting ones.
+
+        Otherwise we would have to filter out private fields which presents
+        all kinds of edge-cases that we should probably not solve - directories
+        are not meant to be private repositories.
+
+        """
+        inputs = (
+            self.enable_change_requests,
+            self.enable_submissions
+        )
+
+        if not any((i.data for i in inputs)):
+            return
+
+        hidden = self.first_hidden_field(self.configuration)
+
+        if hidden:
+            msg = _(
+                "User submissions are not possible, because «${field}» "
+                "is not visible. Only if all fields are visible are user "
+                "submission possible - otherwise users may see data that "
+                "they are not intended to see. ", mapping={
+                    'field': hidden.label
+                }
+            )
+
+            for i in inputs:
+                if i.data:
+                    i.errors.append(msg)
+
+            return False
+
+    def first_hidden_field(self, configuration):
+        """ Returns the first hidden field, or None. """
+
+        for field in flatten_fieldsets(parse_formcode(self.structure.data)):
+            if not self.is_public(field.id, configuration):
+                return field
+
+    def is_public(self, fid, configuration):
+        """ Returns true if the given field id is public.
+
+        A field is public, if none of these are true:
+
+            * It is part of the title/lead
+            * It is part of the display
+            * It is part of the keywords
+            * It is used as the thumbnail
+
+        Though we might also glean other fields if they are simply searchable
+        or if they are part of the link pattern, we do not count those as
+        public, because we are interested in *obviously* public fields
+        clearly visible to the user.
+
+        """
+
+        # the display sets are not really defined at one single point…
+        sets = ('contact', 'content')
+        conf = configuration.display or {}
+
+        for s in sets:
+            if s not in conf:
+                continue
+
+            if fid in (as_internal_id(v) for v in conf[s]):
+                return True
+
+        # …neither is this
+        txts = ('title', 'lead')
+
+        for t in txts:
+            for key in safe_format_keys(getattr(configuration, t, '')):
+                if fid == as_internal_id(key):
+                    return True
+
+        # also include fields which are used as keywords
+        if fid in (as_internal_id(v) for v in configuration.keywords):
+            return True
+
+        # check if the field is the thumbnail
+        if fid == as_internal_id(configuration.thumbnail):
+            return True
+
+        return False
 
     @property
     def default_marker_color(self):
@@ -358,6 +449,10 @@ class DirectoryForm(merge_forms(DirectoryBaseForm, PaymentMethodForm)):
         'enable_submissions', 'y', 'price', 'paid')
 
     payment_method = RadioField(**payment_method_args)
+
+
+DirectoryForm = move_fields(
+    DirectoryForm, ('payment_method', ), after='currency')
 
 
 class DirectoryImportForm(Form):

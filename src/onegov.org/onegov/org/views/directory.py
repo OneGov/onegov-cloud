@@ -47,7 +47,11 @@ def get_directory_entry_form_class(model, request):
 
 
 def get_submission_form_class(model, request):
-    return model.directory.form_class_for_submissions
+    return model.directory.form_class_for_submissions(include_private=True)
+
+
+def get_change_request_form_class(model, request):
+    return model.directory.form_class_for_submissions(include_private=False)
 
 
 @OrgApp.html(
@@ -392,6 +396,70 @@ def handle_submit_directory_entry(self, request, form):
         'form': form,
         'layout': layout,
         'title': title,
+        'guideline': self.directory.submissions_guideline,
+    }
+
+
+@OrgApp.form(model=DirectoryEntry,
+             permission=Public,
+             template='directory_entry_submission_form.pt',
+             form=get_change_request_form_class,
+             name='change-request')
+def handle_change_request(self, request, form):
+
+    if not self.directory.enable_change_requests:
+        raise HTTPForbidden()
+
+    title = _("Propose a change")
+
+    if form.submitted(request):
+        forms = FormCollection(request.session)
+
+        # required by the form submissions collection
+        form._source = self.directory.structure
+
+        extensions = [
+            ext for ext in self.directory.extensions if ext != 'submitter']
+        extensions.append('change-request')
+
+        submission = forms.submissions.add_external(
+            form=form,
+            state='pending',
+            email=form.submitter.data,
+            meta={
+                'handler_code': 'DIR',
+                'directory': self.directory.id.hex,
+                'directory_entry': self.id.hex,
+                'extensions': extensions,
+            }
+        )
+
+        # remove old submission while we are at it
+        self.directory.remove_old_pending_submissions()
+
+        url = URL(request.link(submission))
+        url = url.query_param('title', request.translate(title))
+
+        return request.redirect(url.as_string())
+
+    elif not request.POST:
+        form.process(obj=self)
+
+    layout = DirectoryEntryLayout(self, request)
+    layout.include_code_editor()
+    layout.breadcrumbs.append(Link(title, '#'))
+    layout.editbar_links = []
+
+    return {
+        'directory': self.directory,
+        'form': form,
+        'layout': layout,
+        'title': title,
+        'hint': _(
+            "To request a change, edit the fields you would like to change, "
+            "leaving the other fields intact. Then submit your request."
+        ),
+        'guideline': self.directory.change_requests_guideline,
     }
 
 

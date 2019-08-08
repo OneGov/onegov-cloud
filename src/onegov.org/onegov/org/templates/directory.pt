@@ -69,7 +69,7 @@
                                 <h2 i18n:translate="">Propose entry</h2>
                             </a>
                         </dt>
-                        <dd i18n:translate="">Propose a new entry</dd>
+                        <dd i18n:translate="">Something missing? Propose a new entry.</dd>
                     </dl>
                 </div>
             </div>
