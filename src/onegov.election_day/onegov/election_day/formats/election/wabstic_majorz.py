@@ -3,7 +3,7 @@ from onegov.ballot import CandidateResult
 from onegov.ballot import ElectionResult
 from onegov.election_day import _
 from onegov.election_day.formats.common import EXPATS, validate_column, \
-    line_is_relevant, validate_integer
+validate_integer, line_is_relevant
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from sqlalchemy.orm import object_session

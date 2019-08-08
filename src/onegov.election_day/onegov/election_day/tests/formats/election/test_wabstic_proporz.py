@@ -473,7 +473,7 @@ def test_import_wabstic_proporz_invalid_values(session):
         ('wp_gemeinden', 2,
             'Invalid integer: stimmberechtigte'),
         ('wp_kandidaten', 2, 'Candidate with id'
-                             ' xxx not in wpstatic_candidates'),
+                             ' xxx not in wpstatic_kandidaten'),
         ('wp_kandidatengde', 2, 'Invalid integer: stimmen'),
         ('wp_listen', 2, 'Invalid integer: sitze'),
         ('wp_listengde', 2, 'Invalid integer: stimmentotal'),

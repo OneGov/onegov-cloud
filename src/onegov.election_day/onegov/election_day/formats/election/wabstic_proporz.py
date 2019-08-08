@@ -5,7 +5,7 @@ from onegov.ballot import List
 from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
 from onegov.election_day import _
-from onegov.election_day.formats.common import EXPATS
+from onegov.election_day.formats.common import EXPATS, line_is_relevant
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from sqlalchemy.orm import object_session
@@ -60,13 +60,6 @@ HEADERS_WP_KANDIDATENGDE = (
     'knr',  # candidate id
     'stimmen',  # votes
 )
-
-
-def line_is_relevant(line, number, district=None):
-    if district:
-        return line.sortwahlkreis == district and line.sortgeschaeft == number
-    else:
-        return line.sortgeschaeft == number
 
 
 def get_number_of_mandates(line):
