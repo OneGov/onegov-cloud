@@ -198,16 +198,15 @@ def import_election_wabstic_majorz(
             if entity_id in added_entities:
                 line_errors.append(
                     _("${name} was found twice", mapping={'name': entity_id}))
+            # Skip expats if not enabled
+            if entity_id == 0 and not election.expats:
+                continue
 
         # Parse the eligible voters
         try:
             eligible_voters = validate_integer(line, 'stimmberechtigte')
         except ValueError as e:
             line_errors.append(e.args[0])
-
-        # Skip expats if not enabled
-        if entity_id == 0 and not election.expats:
-            continue
 
         # Pass the errors and continue to next line
         if line_errors:
