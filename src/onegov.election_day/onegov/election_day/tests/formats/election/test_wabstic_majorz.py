@@ -273,9 +273,10 @@ def test_import_wabstic_majorz_invalid_values(session):
         ('wm_gemeinden', 2, 'Invalid entity values'),
         ('wm_kandidatengde', 2, 'Invalid candidate results'),
         ('wm_kandidatengde', 3, 'Invalid candidate results'),
-        ('wm_wahl', 2, 'Invalid values'),
+        ('wm_wahl', 2, 'Invalid integer: absolutesmehr'),
+        ('wm_wahl', 2, 'Value of ausmittlungsstand not between 0 and 3'),
         ('wmstatic_gemeinden', 2, '100 is unknown'),
-        ('wmstatic_gemeinden', 2, 'Could not read the eligible voters'),
+        ('wmstatic_gemeinden', 2, 'Invalid integer: stimmberechtigte'),
         ('wmstatic_gemeinden', 4, '3215 was found twice')
     ]
 

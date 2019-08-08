@@ -53,7 +53,7 @@ HEADERS_WPSTATIC_KANDIDATEN = (
 HEADERS_WP_KANDIDATEN = (
     'sortgeschaeft',  # provides the link to the election
     'knr',  # candidate id
-    'gewahlt',  # elected
+    'gewaehlt',  # elected
 )
 HEADERS_WP_KANDIDATENGDE = (
     'bfsnrgemeinde',  # BFS
@@ -129,6 +129,19 @@ def get_entity_id(line, expats):
     return 0 if entity_id in expats else entity_id
 
 
+def get_votes(line):
+    col = 'stimmen'
+    if not hasattr(line, col):
+        raise ValueError(
+            _('Missing column: ${col}', mapping={'col': col}))
+    try:
+        return int(line.stimmen)
+    except ValueError:
+        raise ValueError(
+            _('Invalid integer: ${col}', mapping={'col': col})
+        )
+
+
 def get_list_id_from_knr(line):
     """
     Takes a line from csv file with a candidate number (knr) in it and
@@ -178,6 +191,16 @@ def import_election_wabstic_proporz(
     errors = []
     entities = principal.entities[election.date.year]
     election_id = election.id
+
+    def has_no_lines(lines, filename):
+        if not list(lines):
+            errors.append(
+                FileImportError(
+                    error=_("No entries in this file"),
+                    filename=filename)
+            )
+            return True
+        return False
 
     # Read the files
     wp_wahl, error = load_csv(
@@ -248,6 +271,9 @@ def import_election_wabstic_proporz(
         return errors
 
     # Parse the election
+    if has_no_lines(wp_wahl.lines, 'wp_wahl'):
+        pass
+
     complete = 0
     for line in wp_wahl.lines:
         line_errors = []
@@ -271,7 +297,11 @@ def import_election_wabstic_proporz(
             continue
 
     # Parse the entities
+    if has_no_lines(wpstatic_gemeinden.lines, 'wpstatic_gemeinden'):
+        pass
+
     added_entities = {}
+
     for line in wpstatic_gemeinden.lines:
         line_errors = []
 
@@ -281,8 +311,6 @@ def import_election_wabstic_proporz(
         # Parse the id of the entity
         try:
             entity_id = get_entity_id(line, EXPATS)
-            if entity_id == 3251:
-                pass
         except ValueError as e:
             line_errors.append(e.args[0])
         else:
@@ -321,6 +349,9 @@ def import_election_wabstic_proporz(
             'district': entity.get('district', ''),
             'eligible_voters': eligible_voters
         }
+
+    if has_no_lines(wp_gemeinden.lines, 'wp_gemeinden'):
+        pass
 
     for line in wp_gemeinden.lines:
         line_errors = []
@@ -384,6 +415,10 @@ def import_election_wabstic_proporz(
             continue
 
     # Parse the lists
+
+    if has_no_lines(wp_listen.lines, 'wp_listen'):
+        pass
+
     added_lists = {}
     added_connections = {}
     for line in wp_listen.lines:
@@ -450,8 +485,13 @@ def import_election_wabstic_proporz(
         )
 
     # Parse the list results
+
+    if has_no_lines(wp_listengde.lines, 'wp_listengde'):
+        pass
+
     added_list_results = {}
     for line in wp_listengde.lines:
+
         line_errors = []
 
         try:
@@ -468,7 +508,9 @@ def import_election_wabstic_proporz(
                 continue
 
             if entity_id not in added_entities:
-                line_errors.append(_("Invalid entity values"))
+                line_errors.append(
+                    _("Entity with id ${id} not in added_entities",
+                      mapping={'id': entity_id}))
 
             if list_id in added_list_results.get(entity_id, {}):
                 line_errors.append(
@@ -497,6 +539,10 @@ def import_election_wabstic_proporz(
         added_list_results[entity_id][list_id] = votes
 
     # Parse the candidates
+
+    if has_no_lines(wpstatic_kandidaten.lines, 'wpstatic_kandidaten'):
+        pass
+
     added_candidates = {}
     for line in wpstatic_kandidaten.lines:
         line_errors = []
@@ -518,7 +564,12 @@ def import_election_wabstic_proporz(
                       mapping={'name': candidate_id}))
 
             if list_id not in added_lists:
-                line_errors.append(_("Unknown derived list id"))
+                line_errors.append(
+                    _("List_id ${list_id} has not been found in list numbers",
+                        mapping={
+                            'list_id': list_id
+                        })
+                )
 
         # Pass the errors and continue to next line
         if line_errors:
@@ -540,6 +591,9 @@ def import_election_wabstic_proporz(
             list_id=added_lists[list_id]['id']
         )
 
+    if has_no_lines(wp_kandidaten.lines, 'wp_kandidaten'):
+        pass
+
     for line in wp_kandidaten.lines:
         line_errors = []
 
@@ -549,9 +603,11 @@ def import_election_wabstic_proporz(
         try:
             candidate_id = line.knr
             assert candidate_id in added_candidates
-            elected = True if line.gewahlt == '1' else False
+            elected = True if line.gewaehlt == '1' else False
         except (ValueError, AssertionError):
-            line_errors.append(_("Invalid candidate values"))
+            line_errors.append(
+                _("Candidate with id ${id} not in wpstatic_candidates",
+                  mapping={'id': candidate_id}))
         else:
             added_candidates[candidate_id]['elected'] = elected
 
@@ -560,11 +616,14 @@ def import_election_wabstic_proporz(
             errors.extend(
                 FileImportError(
                     error=err, line=line.rownumber,
-                    filename='wpstatic_kandidaten'
+                    filename='wp_kandidaten'
                 )
                 for err in line_errors
             )
             continue
+
+    if has_no_lines(wp_kandidatengde.lines, 'wp_kandidatengde'):
+        pass
 
     added_results = {}
     for line in wp_kandidatengde.lines:
@@ -573,9 +632,9 @@ def import_election_wabstic_proporz(
         try:
             entity_id = get_entity_id(line, EXPATS)
             candidate_id = line.knr
-            votes = int(line.stimmen)
-        except ValueError:
-            line_errors.append(_("Invalid candidate results"))
+            votes = get_votes(line)
+        except ValueError as e:
+            line_errors.append(e.args[0])
         else:
             if (
                 entity_id not in added_entities
