@@ -255,9 +255,9 @@ def import_election_wabstic_majorz(
 
         # Parse the eligible voters
         try:
-            eligible_voters = int(line.stimmberechtigte or 0)
-        except ValueError:
-            line_errors.append(_("Invalid entity values"))
+            eligible_voters = validate_integer(line, 'stimmberechtigte')
+        except ValueError as e:
+            line_errors.append(e.args[0])
         else:
             eligible_voters = (
                 eligible_voters
@@ -267,13 +267,13 @@ def import_election_wabstic_majorz(
 
         # Parse the ballots and votes
         try:
-            received_ballots = int(line.stmabgegeben or 0)
-            blank_ballots = int(line.stmleer or 0)
-            invalid_ballots = int(line.stmungueltig or 0)
-            blank_votes = int(line.stimmenleer or 0)
-            invalid_votes = int(line.stimmenungueltig or 0)
-        except ValueError:
-            line_errors.append(_("Invalid entity values"))
+            received_ballots = validate_integer(line, 'stmabgegeben')
+            blank_ballots = validate_integer(line, 'stmleer')
+            invalid_ballots = validate_integer(line, 'stmungueltig')
+            blank_votes = validate_integer(line, 'stimmenleer')
+            invalid_votes = validate_integer(line, 'stimmenungueltig')
+        except ValueError as e:
+            line_errors.append(e.args[0])
         else:
             entity['received_ballots'] = received_ballots
             entity['blank_ballots'] = blank_ballots

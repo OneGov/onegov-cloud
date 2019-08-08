@@ -269,9 +269,9 @@ def test_import_wabstic_majorz_invalid_values(session):
     assert sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
     ]) == [
-        ('wm_gemeinden', 2, 'Invalid entity values'),
         ('wm_gemeinden', 2, 'Invalid integer: sperrung'),
-        ('wm_gemeinden', 2, 'Invalid entity values'),
+        ('wm_gemeinden', 2, 'Invalid integer: stimmberechtigte'),
+        ('wm_gemeinden', 2, 'Invalid integer: stmabgegeben'),
         ('wm_kandidatengde', 2, 'Invalid candidate results'),
         ('wm_kandidatengde', 3, 'Invalid candidate results'),
         ('wm_wahl', 2, 'Invalid integer: absolutesmehr'),
