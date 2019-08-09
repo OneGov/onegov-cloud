@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.13.8 (2019-08-09)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes import error of majorz election test dataset and improves error messages for wabstiC import.
   [dadadamotha]
