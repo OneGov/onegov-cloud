@@ -161,7 +161,6 @@ def validate_integer(line, col, none_be_zero=True):
     :param none_be_zero: raises ValueError if line.col is None
     :return: integer value of line.col
     """
-    assert hasattr(line, col), 'Check done in load_csv'
     try:
         if none_be_zero:
             return int(getattr(line, col) or 0)
