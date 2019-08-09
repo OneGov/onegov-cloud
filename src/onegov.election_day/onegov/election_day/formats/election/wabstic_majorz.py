@@ -1,5 +1,3 @@
-import itertools
-
 from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
 from onegov.ballot import ElectionResult
@@ -119,7 +117,6 @@ def import_election_wabstic_majorz(
 
     if errors:
         return errors
-
 
     # Parse the election
     absolute_majority = None

@@ -185,7 +185,6 @@ def import_election_wabstic_proporz(
     entities = principal.entities[election.date.year]
     election_id = election.id
 
-
     # Read the files
     wp_wahl, error = load_csv(
         file_wp_wahl, mimetype_wp_wahl,
@@ -391,8 +390,6 @@ def import_election_wabstic_proporz(
             continue
 
     # Parse the lists
-
-
     added_lists = {}
     added_connections = {}
     for line in wp_listen.lines:
