@@ -1,8 +1,9 @@
 Changelog
 ---------
 
-- Adds label (de, fr...) for related link macro.
+- Fixes import error of majorz election test dataset and improves error messages for wabstiC import.
   [dadadamotha]
+
 
 3.13.7 (2019-07-22)
 ~~~~~~~~~~~~~~~~~~~
