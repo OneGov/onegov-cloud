@@ -148,8 +148,7 @@ def load_csv(
 def line_is_relevant(line, number, district=None):
     if district:
         return line.sortwahlkreis == district and line.sortgeschaeft == number
-    else:
-        return line.sortgeschaeft == number
+    return line.sortgeschaeft == number
 
 
 def validate_integer(line, col, none_be_zero=True):
