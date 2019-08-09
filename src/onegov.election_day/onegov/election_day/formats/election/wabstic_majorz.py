@@ -1,3 +1,5 @@
+import itertools
+
 from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
 from onegov.ballot import ElectionResult
@@ -81,16 +83,6 @@ def import_election_wabstic_majorz(
     entities = principal.entities[election.date.year]
     election_id = election.id
 
-    def has_no_lines(lines, filename):
-        if not list(lines):
-            errors.append(
-                FileImportError(
-                    error=_("No entries in this file"),
-                    filename=filename)
-            )
-            return True
-        return False
-
     # Read the files
     wm_wahl, error = load_csv(
         file_wm_wahl, mimetype_wm_wahl,
@@ -135,8 +127,6 @@ def import_election_wabstic_majorz(
     if errors:
         return errors
 
-    if has_no_lines(wm_wahl.lines, 'wm_wahl'):
-        pass
 
     # Parse the election
     absolute_majority = None

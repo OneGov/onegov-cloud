@@ -185,15 +185,6 @@ def import_election_wabstic_proporz(
     entities = principal.entities[election.date.year]
     election_id = election.id
 
-    def has_no_lines(lines, filename):
-        if not list(lines):
-            errors.append(
-                FileImportError(
-                    error=_("No entries in this file"),
-                    filename=filename)
-            )
-            return True
-        return False
 
     # Read the files
     wp_wahl, error = load_csv(
@@ -264,8 +255,6 @@ def import_election_wabstic_proporz(
         return errors
 
     # Parse the election
-    if has_no_lines(wp_wahl.lines, 'wp_wahl'):
-        pass
 
     complete = 0
     for line in wp_wahl.lines:
@@ -290,9 +279,6 @@ def import_election_wabstic_proporz(
             continue
 
     # Parse the entities
-    if has_no_lines(wpstatic_gemeinden.lines, 'wpstatic_gemeinden'):
-        pass
-
     added_entities = {}
 
     for line in wpstatic_gemeinden.lines:
@@ -342,9 +328,6 @@ def import_election_wabstic_proporz(
             'district': entity.get('district', ''),
             'eligible_voters': eligible_voters
         }
-
-    if has_no_lines(wp_gemeinden.lines, 'wp_gemeinden'):
-        pass
 
     for line in wp_gemeinden.lines:
         line_errors = []
@@ -409,8 +392,6 @@ def import_election_wabstic_proporz(
 
     # Parse the lists
 
-    if has_no_lines(wp_listen.lines, 'wp_listen'):
-        pass
 
     added_lists = {}
     added_connections = {}
@@ -479,9 +460,6 @@ def import_election_wabstic_proporz(
 
     # Parse the list results
 
-    if has_no_lines(wp_listengde.lines, 'wp_listengde'):
-        pass
-
     added_list_results = {}
     for line in wp_listengde.lines:
 
@@ -533,9 +511,6 @@ def import_election_wabstic_proporz(
 
     # Parse the candidates
 
-    if has_no_lines(wpstatic_kandidaten.lines, 'wpstatic_kandidaten'):
-        pass
-
     added_candidates = {}
     for line in wpstatic_kandidaten.lines:
         line_errors = []
@@ -584,9 +559,6 @@ def import_election_wabstic_proporz(
             list_id=added_lists[list_id]['id']
         )
 
-    if has_no_lines(wp_kandidaten.lines, 'wp_kandidaten'):
-        pass
-
     for line in wp_kandidaten.lines:
         line_errors = []
 
@@ -614,9 +586,6 @@ def import_election_wabstic_proporz(
                 for err in line_errors
             )
             continue
-
-    if has_no_lines(wp_kandidatengde.lines, 'wp_kandidatengde'):
-        pass
 
     added_results = {}
     for line in wp_kandidatengde.lines:
