@@ -448,6 +448,9 @@ class WsgiServer(FileSystemEventHandler):
     def on_any_event(self, event):
         """ If anything of significance changed, restart the process. """
 
+        if 'tests/' in event.src_path:
+            return
+
         if event.is_directory:
             return
 
