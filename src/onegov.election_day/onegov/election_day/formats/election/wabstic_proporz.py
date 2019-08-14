@@ -63,39 +63,10 @@ HEADERS_WP_KANDIDATENGDE = (
 )
 
 
-def get_ausmittlungsstand(line):
-    col = 'ausmittlungsstand'
-    result = validate_integer(line, 'ausmittlungsstand')
-    if not (0 <= result <= 3):
-        raise ValueError(
-            _('Value ${col} is not between 0 and 3', mapping={'col': col}))
-    return result
-
 def get_entity_id(line, expats):
     col = 'bfsnrgemeinde'
-    if not hasattr(line, col):
-        raise ValueError(
-            _('Missing column: ${col}', mapping={'col': col}))
-    try:
-        entity_id = validate_integer(line, col)
-    except ValueError:
-        raise ValueError(
-            _('Invalid integer: ${col}'
-              ' Can not extract entity_id.', mapping={'col': col}))
+    entity_id = validate_integer(line, col)
     return 0 if entity_id in expats else entity_id
-
-
-def get_votes(line):
-    col = 'stimmen'
-    if not hasattr(line, col):
-        raise ValueError(
-            _('Missing column: ${col}', mapping={'col': col}))
-    try:
-        return int(line.stimmen)
-    except ValueError:
-        raise ValueError(
-            _('Invalid integer: ${col}', mapping={'col': col})
-        )
 
 
 def get_list_id_from_knr(line):
@@ -104,18 +75,12 @@ def get_list_id_from_knr(line):
     returns the derived listnr for this candidate. Will also handle the new
     WabstiC Standard 2018.
     """
-    col = 'knr'
-    if not hasattr(line, col):
-        raise ValueError(_('Missing column: ${col}', mapping={'col', col}))
     if '.' in line.knr:
         return line.knr.split('.')[0]
     return line.knr[0:-2]
 
 
 def get_list_id(line):
-    col = 'listnr'
-    if not hasattr(line, col):
-        raise ValueError(_('Missing column: ${col}', mapping={'col': col}))
     number = line.listnr or '0'
     # wabstiC 99 is blank list that maps to 999 see open_data_de.md
     number = '999' if number == '99' else number
@@ -226,9 +191,14 @@ def import_election_wabstic_proporz(
             continue
 
         try:
-            complete = get_ausmittlungsstand(line)
-        except (ValueError, AssertionError) as e:
+            complete = validate_integer(line, 'ausmittlungsstand')
+        except ValueError as e:
             line_errors.append(e.args[0])
+        else:
+            if not (0 <= complete <= 3):
+                line_errors.append(
+                    _('Value ${col} is not between 0 and 3',
+                      mapping={'col': 'ausmittlungsstand'}))
 
         # Pass the errors and continue to next line
         if line_errors:
@@ -554,7 +524,7 @@ def import_election_wabstic_proporz(
         try:
             entity_id = get_entity_id(line, EXPATS)
             candidate_id = line.knr
-            votes = get_votes(line)
+            votes = validate_integer(line, 'stimmen')
         except ValueError as e:
             line_errors.append(e.args[0])
         else:
