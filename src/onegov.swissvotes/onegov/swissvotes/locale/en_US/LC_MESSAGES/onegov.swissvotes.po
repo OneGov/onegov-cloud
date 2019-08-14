@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2019-07-15 14:53+0200\n"
-"PO-Revision-Date: 2019-06-18 17:27+0200\n"
+"POT-Creation-Date: 2019-08-14 09:05+0200\n"
+"PO-Revision-Date: 2019-08-14 09:07+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 2.2\n"
+"X-Generator: Poedit 2.2.3\n"
 
 msgid "Select Some Options"
 msgstr "Select options"
@@ -21,6 +21,12 @@ msgstr "No results match"
 
 msgid "No data."
 msgstr "No data."
+
+msgid "Sheet DATA is missing."
+msgstr "Sheet DATA is missing."
+
+msgid "Sheet CITATION is missing."
+msgstr "Sheet CITATION is missing."
 
 #, python-format
 msgid "Some columns are missing: ${columns}."
@@ -91,7 +97,7 @@ msgid "Cancel"
 msgstr "Cancel"
 
 msgid "Search"
-msgstr ""
+msgstr "Search"
 
 msgid "Reset"
 msgstr "Reset"
@@ -303,12 +309,8 @@ msgstr "Result by canton, district and municipality"
 msgid "Interactive map of the Swiss Federal Statistical Office"
 msgstr "Interactive map by the Swiss Federal Statistical Office"
 
-#. Used in sentence: "<dynamic element>"
 msgid "Display the map"
-msgstr ""
-
-msgid "<dynamic element>"
-msgstr ""
+msgstr "Display the map"
 
 msgid "Cumulated electoral shares"
 msgstr "Cumulated electoral shares"
@@ -380,7 +382,7 @@ msgid "If you don't want to change your password, you can ignore this email."
 msgstr "If you don't want to change your password, you can ignore this email."
 
 msgid "Update"
-msgstr ""
+msgstr "Update"
 
 msgid "Do you really want to delete all votes?!"
 msgstr "Do you really want to delete all votes?!"

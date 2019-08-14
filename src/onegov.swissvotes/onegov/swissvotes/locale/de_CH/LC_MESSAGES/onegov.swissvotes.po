@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2019-07-15 14:53+0200\n"
-"PO-Revision-Date: 2019-07-15 12:50+0200\n"
+"POT-Creation-Date: 2019-08-14 09:05+0200\n"
+"PO-Revision-Date: 2019-08-14 09:04+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: de_CH\n"
@@ -21,6 +21,12 @@ msgstr "Keine Ergebnisse gefunden"
 
 msgid "No data."
 msgstr "Keine Daten."
+
+msgid "Sheet DATA is missing."
+msgstr "Tabellenblatt DATA fehlt."
+
+msgid "Sheet CITATION is missing."
+msgstr "Tabellenblatt CITATION fehlt."
 
 #, python-format
 msgid "Some columns are missing: ${columns}."
@@ -304,12 +310,8 @@ msgstr "Abstimmungsergebnis pro Kanton, Bezirk und Gemeinde"
 msgid "Interactive map of the Swiss Federal Statistical Office"
 msgstr "Interaktive Karte des Bundesamts für Statistik"
 
-#. Used in sentence: "<dynamic element>"
 msgid "Display the map"
 msgstr "Karte anzeigen"
-
-msgid "<dynamic element>"
-msgstr ""
 
 msgid "Cumulated electoral shares"
 msgstr "Kumulierte Wählerstärken"

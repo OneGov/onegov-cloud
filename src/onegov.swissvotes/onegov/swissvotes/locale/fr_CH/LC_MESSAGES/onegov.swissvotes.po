@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2019-07-15 14:53+0200\n"
-"PO-Revision-Date: 2019-07-15 12:54+0200\n"
+"POT-Creation-Date: 2019-08-14 09:05+0200\n"
+"PO-Revision-Date: 2019-08-14 09:10+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -21,6 +21,12 @@ msgstr "Aucun résultat"
 
 msgid "No data."
 msgstr "Aucune donnée"
+
+msgid "Sheet DATA is missing."
+msgstr "Tableau DATA manque."
+
+msgid "Sheet CITATION is missing."
+msgstr "Tableau CITATION manque."
 
 #, python-format
 msgid "Some columns are missing: ${columns}."
@@ -302,12 +308,8 @@ msgstr "Résultats par canton, district, commune"
 msgid "Interactive map of the Swiss Federal Statistical Office"
 msgstr "Carte interactive de l’Office fédéral de la statistique"
 
-#. Used in sentence: "<dynamic element>"
 msgid "Display the map"
 msgstr "Présenter la carte"
-
-msgid "<dynamic element>"
-msgstr ""
 
 msgid "Cumulated electoral shares"
 msgstr "Poids électoraux cumulés"

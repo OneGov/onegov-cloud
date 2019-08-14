@@ -62,10 +62,11 @@
                             <span tal:condition="request.html_lang == 'fr-CH'">(en allemand)</span>
                             </a></td>
                     </tr>
+
                     <tr tal:condition="vote.anneepolitique">
                         <th class="column-30" i18n:translate>Description Année Politique Suisse</th>
-                        <td><a href="${vote.anneepolitique}" target="_blank" i18n:translate>
-                            Link
+                        <td><a href="${vote.anneepolitique}" target="_blank">
+                            <tal:block i18n:translate>Link</tal:block>
                             <span tal:condition="request.html_lang == 'en-US'">(in German / French)</span>
                         </a></td>
                     </tr>
@@ -335,9 +336,8 @@
                     <tr tal:condition="bfs_map">
                         <td colspan="2">
                             <div style="margin-bottom: .5rem;"><strong i18n:translate>Interactive map of the Swiss Federal Statistical Office</strong></div>
-                            <a class="button secondary bfs-map" aria-role="button" i18n:translate
-                                href="${bfs_map}">
-                                <span i18n:translate>Display the map</span>
+                            <a class="button secondary bfs-map" aria-role="button" href="${bfs_map}">
+                                <tal:block i18n:translate>Display the map</tal:block>
                             </a>
                         </td>
                     </tr>
