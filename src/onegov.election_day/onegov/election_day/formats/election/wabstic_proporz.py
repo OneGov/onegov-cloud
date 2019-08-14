@@ -5,7 +5,8 @@ from onegov.ballot import List
 from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
 from onegov.election_day import _
-from onegov.election_day.formats.common import EXPATS, line_is_relevant
+from onegov.election_day.formats.common import EXPATS, line_is_relevant, \
+    validate_integer
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from sqlalchemy.orm import object_session
@@ -62,51 +63,13 @@ HEADERS_WP_KANDIDATENGDE = (
 )
 
 
-def get_number_of_mandates(line):
-    col = 'sitze'
-    if not hasattr(line, col):
-        raise ValueError(_('Missing column: ${col}', mapping={'col': col}))
-    try:
-        return int(line.sitze or 0)
-    except ValueError:
-        raise ValueError(
-            _('Invalid integer: ${col}', mapping={'col': col}))
-
-
 def get_ausmittlungsstand(line):
     col = 'ausmittlungsstand'
-    try:
-        result = int(line.ausmittlungsstand or 0)
-
-    except ValueError:
-        raise ValueError(
-            _('Invalid integer: ${col}', mapping={'col': col}))
+    result = validate_integer(line, 'ausmittlungsstand')
     if not (0 <= result <= 3):
         raise ValueError(
             _('Value ${col} is not between 0 and 3', mapping={'col': col}))
     return result
-
-
-def get_stimmberechtigte(line):
-    col = 'stimmberechtigte'
-    if not hasattr(line, col):
-        raise ValueError(_('Missing column: ${col}', mapping={'col': col}))
-    try:
-        return int(line.stimmberechtigte or 0)
-    except ValueError:
-        raise ValueError(
-            _('Invalid integer: ${col}', mapping={'col': col}))
-
-
-def get_stimmentotal(line):
-    col = 'stimmentotal'
-    if not hasattr(line, col):
-        raise ValueError(_('Missing column: ${col}', mapping={'col': col}))
-    try:
-        return int(line.stimmentotal)
-    except ValueError:
-        raise ValueError(_('Invalid integer: ${col}', mapping={'col': col}))
-
 
 def get_entity_id(line, expats):
     col = 'bfsnrgemeinde'
@@ -114,7 +77,7 @@ def get_entity_id(line, expats):
         raise ValueError(
             _('Missing column: ${col}', mapping={'col': col}))
     try:
-        entity_id = int(line.bfsnrgemeinde or 0)
+        entity_id = validate_integer(line, col)
     except ValueError:
         raise ValueError(
             _('Invalid integer: ${col}'
@@ -302,7 +265,7 @@ def import_election_wabstic_proporz(
 
         # Parse the eligible voters
         try:
-            eligible_voters = get_stimmberechtigte(line)
+            eligible_voters = validate_integer(line, 'stimmberechtigte')
         except ValueError as e:
             line_errors.append(e.args[0])
 
@@ -356,7 +319,7 @@ def import_election_wabstic_proporz(
 
         # Parse the eligible voters
         try:
-            eligible_voters = get_stimmberechtigte(line)
+            eligible_voters = validate_integer(line, 'stimmberechtigte')
         except ValueError as e:
             line_errors.append(e.args[0])
         else:
@@ -401,7 +364,7 @@ def import_election_wabstic_proporz(
         try:
             list_id = get_list_id(line)
             name = line.listcode
-            number_of_mandates = get_number_of_mandates(line)
+            number_of_mandates = validate_integer(line, 'sitze')
             connection = line.listverb or None
             subconnection = line.listuntverb or None
             if subconnection:
@@ -465,7 +428,7 @@ def import_election_wabstic_proporz(
         try:
             entity_id = get_entity_id(line, EXPATS)
             list_id = get_list_id(line)
-            votes = get_stimmentotal(line)
+            votes = validate_integer(line, 'stimmentotal')
         except ValueError as e:
             line_errors.append(e.args[0])
         else:

@@ -7,6 +7,7 @@ from onegov.ballot import ProporzElection
 from onegov.ballot import List
 from onegov.core.utils import module_path
 from onegov.election_day.formats import import_election_wabstic_proporz
+from onegov.election_day.formats.common import print_errors
 from onegov.election_day.formats.election.wabstic_proporz import \
     get_list_id_from_knr
 from onegov.election_day.models import Canton
@@ -86,7 +87,7 @@ def test_import_wabstic_proporz_v23(session, tar_file):
         BytesIO(regional_wp_kandidaten), 'text/plain',
         BytesIO(regional_wp_kandidatengde), 'text/plain',
     )
-
+    print_errors(errors)
     assert not errors
     assert election.completed
     # assert election.progress == (78, 78)
@@ -149,7 +150,7 @@ def test_import_wabstic_proporz1(session, tar_file):
         BytesIO(cantonal_wp_kandidaten), 'text/plain',
         BytesIO(cantonal_wp_kandidatengde), 'text/plain',
     )
-
+    print_errors(errors)
     assert not errors
     assert election.completed
     assert election.progress == (78, 78)
@@ -327,7 +328,7 @@ def test_import_wabstic_proporz_invalid_values(session):
 
     errors = import_election_wabstic_proporz(
         election, principal, '0', '0',
-        BytesIO((
+        BytesIO((       # wp_gememeinden
             '\n'.join((
                 ','.join((
                     'SortGeschaeft',
@@ -339,7 +340,7 @@ def test_import_wabstic_proporz_invalid_values(session):
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
-        BytesIO((
+        BytesIO((       #wp_kandidaten
             '\n'.join((
                 ','.join((
                     'SortWahlkreis',
@@ -363,7 +364,7 @@ def test_import_wabstic_proporz_invalid_values(session):
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
-        BytesIO((
+        BytesIO((       # wp_kandidatengde
             '\n'.join((
                 ','.join((
                     'BfsNrGemeinde',
@@ -385,7 +386,7 @@ def test_import_wabstic_proporz_invalid_values(session):
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
-        BytesIO((
+        BytesIO((       # wp_listen
             '\n'.join((
                 ','.join((
                     'SortGeschaeft',
@@ -405,7 +406,7 @@ def test_import_wabstic_proporz_invalid_values(session):
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
-        BytesIO((
+        BytesIO((       # wp_listengde
             '\n'.join((
                 ','.join((
                     'BfsNrGemeinde',
@@ -419,7 +420,7 @@ def test_import_wabstic_proporz_invalid_values(session):
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
-        BytesIO((
+        BytesIO((       # wp_wahl
             '\n'.join((
                 ','.join((
                     'SortGeschaeft',
@@ -435,7 +436,7 @@ def test_import_wabstic_proporz_invalid_values(session):
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
-        BytesIO((
+        BytesIO((       # wpstatic_gemeinden
             '\n'.join((
                 ','.join((
                     'SortGeschaeft',
@@ -449,7 +450,7 @@ def test_import_wabstic_proporz_invalid_values(session):
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
-        BytesIO((
+        BytesIO((       # wp_static_kandidaten
             '\n'.join((
                 ','.join((
                     'BfsNrGemeinde',
@@ -464,7 +465,7 @@ def test_import_wabstic_proporz_invalid_values(session):
             ))
         ).encode('utf-8')), 'text/plain'
     )
-
+    print_errors(errors)
     assert sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
     ]) == [
@@ -475,8 +476,8 @@ def test_import_wabstic_proporz_invalid_values(session):
         ('wp_kandidaten', 2, 'Candidate with id'
                              ' xxx not in wpstatic_kandidaten'),
         ('wp_kandidatengde', 2, 'Invalid integer: stimmen'),
-        ('wp_listen', 2, 'Invalid integer: sitze'),
-        ('wp_listengde', 2, 'Invalid integer: stimmentotal'),
+        ('wp_listen', 2, 'Invalid integer: listnr'),
+        ('wp_listengde', 2, 'Invalid integer: listnr'),
         ('wp_wahl', 2, 'Value ausmittlungsstand is not between 0 and 3'),
         ('wpstatic_gemeinden', 2, '100 is unknown'),
         ('wpstatic_kandidaten', 2, 'List_id x has not been found'
