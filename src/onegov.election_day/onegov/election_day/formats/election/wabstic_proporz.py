@@ -301,11 +301,11 @@ def import_election_wabstic_proporz(
 
         # Parse the ballots and votes
         try:
-            received_ballots = int(line.stmabgegeben or 0)
-            blank_ballots = int(line.stmleer or 0)
-            invalid_ballots = int(line.stmungueltig or 0)
-        except ValueError:
-            line_errors.append(_("Invalid entity values"))
+            received_ballots = validate_integer(line, 'stmabgegeben')
+            blank_ballots = validate_integer(line, 'stmleer')
+            invalid_ballots = validate_integer(line, 'stmungueltig')
+        except ValueError as e:
+            line_errors.append(e.args[0])
         else:
             entity['received_ballots'] = received_ballots
             entity['blank_ballots'] = blank_ballots
