@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds translations
+  [dadadamotha]
+
 1.2.1 (2019-07-22)
 ~~~~~~~~~~~~~~~~~~~
 
