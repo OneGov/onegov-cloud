@@ -328,7 +328,7 @@ def test_import_wabstic_proporz_invalid_values(session):
 
     errors = import_election_wabstic_proporz(
         election, principal, '0', '0',
-        BytesIO((       # wp_gememeinden
+        BytesIO((       # wp_wahl
             '\n'.join((
                 ','.join((
                     'SortGeschaeft',
@@ -340,7 +340,7 @@ def test_import_wabstic_proporz_invalid_values(session):
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
-        BytesIO((       # wp_kandidaten
+        BytesIO((       # wpstatic_gemeinden
             '\n'.join((
                 ','.join((
                     'SortWahlkreis',
@@ -364,7 +364,7 @@ def test_import_wabstic_proporz_invalid_values(session):
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
-        BytesIO((       # wp_kandidatengde
+        BytesIO((       # wp_gemeinden
             '\n'.join((
                 ','.join((
                     'BfsNrGemeinde',
@@ -470,9 +470,8 @@ def test_import_wabstic_proporz_invalid_values(session):
         (e.filename, e.line, e.error.interpolate()) for e in errors
     ]) == [
         ('wp_gemeinden', 2, 'Invalid entity values'),
-        ('wp_gemeinden', 2, 'Invalid entity values'),
-        ('wp_gemeinden', 2,
-            'Invalid integer: stimmberechtigte'),
+        ('wp_gemeinden', 2, 'Invalid integer: stimmberechtigte'),
+        ('wp_gemeinden', 2, 'Invalid integer: stmabgegeben'),
         ('wp_kandidaten', 2, 'Candidate with id'
                              ' xxx not in wpstatic_kandidaten'),
         ('wp_kandidatengde', 2, 'Invalid integer: stimmen'),

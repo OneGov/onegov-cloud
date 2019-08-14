@@ -453,7 +453,7 @@ def import_election_wabstic_proporz(
             list_id = get_list_id_from_knr(line)
             family_name = line.nachname
             first_name = line.vorname
-        except ValueError:
+        except TypeError:
             line_errors.append(_("Invalid candidate values"))
         else:
             if candidate_id in added_candidates:
