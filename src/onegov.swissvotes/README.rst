@@ -30,7 +30,7 @@ Batch Upload Attachments
 
 There is a command line command for batch-uploading and indexing attachments::
 
-  onegov-swissvotes import [folder]
+  sudo -u [user] bin/onegov-swissvotes --select /onegov_swissvotes/[instance] import [folder]
 
 The structure of the folder is expected to be in the form::
 
