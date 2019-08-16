@@ -1,4 +1,5 @@
 import pytest
+import transaction
 
 from onegov.pay.models import Payment
 
@@ -22,3 +23,5 @@ def reset_payment():
 
     if Payment.registered_links:
         Payment.registered_links.clear()
+
+    transaction.abort()
