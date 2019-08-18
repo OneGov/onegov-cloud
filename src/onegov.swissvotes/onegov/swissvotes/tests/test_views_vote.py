@@ -197,7 +197,7 @@ def test_view_vote(swissvotes_app):
     assert "22.2%" in page
     assert "Details" in page
     assert "Angenommen" in page
-    assert "(40.01% Jastimmen)" in page
+    assert "(40.01% Ja-Stimmen)" in page
     assert "(1.5 Ja, 24.5 Nein)" in page
     assert "20.01%" in page
 
@@ -239,8 +239,8 @@ def test_view_vote(swissvotes_app):
     assert "16.1%" in page
     assert "17.1%" in page
     assert "18.1%" in page
-    assert "19.1%" in page
-    assert "20.2%" not in page      # has code 9999
+    assert "19.1%" not in page, "Recommendation:None => not displayed"
+    assert "20.2%" not in page, "has code 9999, so not displayed"
 
     # Percentages
     page = client.get(page.request.url.replace('/strengths', '/percentages'))

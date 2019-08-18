@@ -296,6 +296,7 @@ def test_search_form(swissvotes_app):
         (1, 'Accepting'),
         (2, 'Rejecting'),
         (3, 'None'),
+        (-1, 'Unknown'),
     ]
     assert form.position_national_council.choices == [
         (1, 'Accepting'),
@@ -387,7 +388,7 @@ def test_search_form(swissvotes_app):
     assert form.policy_area.data is None
     assert form.term.data is None
     assert form.full_text.data == 1
-    assert form.position_federal_council.data == [1, 2, 3]
+    assert form.position_federal_council.data == [1, 2, 3, -1]
     assert form.position_national_council.data == [1, 2, 3]
     assert form.position_council_of_states.data == [1, 2, 3]
     assert form.sort_by.data is None
