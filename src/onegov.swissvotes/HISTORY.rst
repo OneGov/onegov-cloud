@@ -1,5 +1,15 @@
 Changelog
 ---------
+
+- DATASET is available french and english when uploaded in german (default locale)
+- Removes party and association recommendations if Unknown
+- Enable Search for federal council position "Unknown"
+- Fixes sorting of cumulative party strengths in vote/example/strengths
+- Fixes display of long title in favor of short title in top navigation
+- Fixes usage of comma instead of point as decimal separator for item number of a vote
+- Updated Translations
+  [dadadamotha]
+
 1.2.2 (2019-08-14)
 ~~~~~~~~~~~~~~~~~~~
 

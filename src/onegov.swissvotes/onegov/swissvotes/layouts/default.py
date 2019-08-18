@@ -148,7 +148,7 @@ class DefaultLayout(ChameleonLayout):
         otherwise 2.
 
         Overwrites parent class to use "." instead of "," for fr_CH locale
-        as would be retunred by
+        as would be returned by babel.
 
         """
         if number is None:
