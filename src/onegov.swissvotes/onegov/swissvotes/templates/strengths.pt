@@ -9,7 +9,7 @@
         <tal:block tal:condition="vote.has_national_council_share_data">
 
             <h3 i18n:translate>Cumulated electoral shares</h3>
-            <table class="sortable voter-strengths" data-sortlist="[[1,1]]">
+            <table class="sortable voter-strengths">
                 <thead>
                     <tr>
                         <th i18n:translate class="column-50">Recommendation</th>
@@ -25,10 +25,6 @@
                         <td i18n:translate>Nay</td>
                         <td>${layout.format_number(vote.national_council_share_nays, 1)}%</td>
                     </tr>
-                    <tr tal:condition="vote.national_council_share_none">
-                        <td i18n:translate>None</td>
-                        <td>${layout.format_number(vote.national_council_share_none, 1)}%</td>
-                    </tr>
                     <tr tal:condition="vote.national_council_share_empty">
                         <td i18n:translate>Empty</td>
                         <td>${layout.format_number(vote.national_council_share_empty, 1)}%</td>
@@ -36,6 +32,10 @@
                     <tr tal:condition="vote.national_council_share_free_vote">
                         <td i18n:translate>Free vote</td>
                         <td>${layout.format_number(vote.national_council_share_free_vote, 1)}%</td>
+                    </tr>
+                    <tr tal:condition="vote.national_council_share_none">
+                        <td i18n:translate>None</td>
+                        <td>${layout.format_number(vote.national_council_share_none, 1)}%</td>
                     </tr>
                     <tr tal:condition="vote.national_council_share_neutral">
                         <td i18n:translate>Neutral</td>
