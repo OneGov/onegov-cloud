@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.2.3 (2019-08-18)
+~~~~~~~~~~~~~~~~~~~
 
 - DATASET is available french and english when uploaded in german (default locale)
 - Removes party and association recommendations if Unknown
