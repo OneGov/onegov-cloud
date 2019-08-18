@@ -28,6 +28,12 @@ def view_page(self, request):
     """ View a page. """
 
     files = [file for file in self.files if file.locale == request.locale]
+    if 'DATASET' not in ",".join((f.filename for f in files)):
+        dataset = [
+            f for f in self.files
+            if 'DATASET' in f.filename and f.locale == request.default_locale]
+        files.extend(dataset)
+
     return {
         'layout': PageLayout(self, request),
         'files': files
