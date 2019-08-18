@@ -109,14 +109,14 @@ class SearchForm(Form):
         field = getattr(self, name)
         field.choices = list(SwissVote.codes(name).items())
         if add_none:
-            field.choices.append((-1, _("Without / Unknown")))
+            field.choices.append((-1, _("Unknown")))
 
     def on_request(self):
         if hasattr(self, 'csrf_token'):
             self.delete_field('csrf_token')
         self.populate_choice('legal_form')
         self.populate_choice('result')
-        self.populate_choice('position_federal_council')
+        self.populate_choice('position_federal_council', True)
         self.populate_choice('position_national_council')
         self.populate_choice('position_council_of_states')
         self.populate_policy_area()

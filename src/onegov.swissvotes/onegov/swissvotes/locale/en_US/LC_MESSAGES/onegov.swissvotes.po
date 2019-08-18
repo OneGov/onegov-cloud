@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2019-08-14 09:05+0200\n"
-"PO-Revision-Date: 2019-08-14 09:07+0200\n"
+"POT-Creation-Date: 2019-08-18 13:04+0200\n"
+"PO-Revision-Date: 2019-08-18 13:05+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -223,6 +223,9 @@ msgstr "Federal Council dispatch"
 msgid "Position of the Federal Council"
 msgstr "Position of the Federal Council"
 
+msgid "Unknown"
+msgstr "Unknown"
+
 msgid "Parliamentary phase"
 msgstr "Parliamentary phase"
 
@@ -346,7 +349,7 @@ msgid "Others"
 msgstr "Others"
 
 msgid "Files"
-msgstr ""
+msgstr "Files"
 
 msgid "Patrons"
 msgstr "Sponsors"
@@ -553,9 +556,6 @@ msgstr "Yes"
 
 msgid "No"
 msgstr "No"
-
-msgid "Without / Unknown"
-msgstr "none / unknown"
 
 msgid "d-1-1"
 msgstr "Staatsordnung"
@@ -1697,6 +1697,9 @@ msgstr "Reject"
 
 msgid "Organization no longer exists"
 msgstr "Organization no longer exists"
+
+#~ msgid "Without / Unknown"
+#~ msgstr "none / unknown"
 
 #~ msgid "Yes Camp"
 #~ msgstr "\"Yes\" camp"
