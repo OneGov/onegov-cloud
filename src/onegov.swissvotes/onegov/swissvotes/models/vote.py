@@ -642,7 +642,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
         return self.group_recommendations((
             (Actor(name), recommendations.get(name))
             for name in Actor.parties()
-        ))
+        ), ignore_unknown=True)
 
     @cached_property
     def recommendations_divergent_parties(self, ignore_unknown=True):
