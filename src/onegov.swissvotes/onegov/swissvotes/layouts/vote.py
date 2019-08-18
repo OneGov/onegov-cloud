@@ -50,7 +50,7 @@ class VoteStrengthsLayout(DefaultLayout):
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Votes"), self.votes_url),
-            Link(self.model.title, self.request.link(self.model)),
+            Link(self.model.short_title, self.request.link(self.model)),
             Link(self.title, '#'),
         ]
 
@@ -66,7 +66,7 @@ class UploadVoteAttachemtsLayout(DefaultLayout):
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Votes"), self.votes_url),
-            Link(self.model.title, self.request.link(self.model)),
+            Link(self.model.short_title, self.request.link(self.model)),
             Link(self.title, '#'),
         ]
 
@@ -82,6 +82,6 @@ class DeleteVoteLayout(DefaultLayout):
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Votes"), self.votes_url),
-            Link(self.model.title, self.request.link(self.model)),
+            Link(self.model.short_title, self.request.link(self.model)),
             Link(self.title, '#'),
         ]
