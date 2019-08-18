@@ -299,7 +299,7 @@ msgid "People"
 msgstr "Volk"
 
 msgid "Yeas"
-msgstr "Jastimmen"
+msgstr "Ja-Stimmen"
 
 msgid "Cantons"
 msgstr "Stände"
