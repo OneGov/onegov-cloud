@@ -678,7 +678,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
         recommendations.extend(as_list(self.recommendations_other_yes, 1))
         recommendations.extend(as_list(self.recommendations_other_no, 2))
         recommendations.extend(as_list(self.recommendations_other_free, 5))
-        return self.group_recommendations(recommendations)
+        return self.group_recommendations(recommendations, ignore_unknown=True)
 
     # Electoral strength
     national_council_election_year = Column(Integer)
