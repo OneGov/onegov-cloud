@@ -1,4 +1,5 @@
 from babel import Locale
+import numbers
 from cached_property import cached_property
 from onegov.core.elements import Link
 from onegov.core.i18n import SiteLocale
@@ -139,6 +140,33 @@ class DefaultLayout(ChameleonLayout):
 
         decimal_places = 0 if number.to_integral_value() == number else 1
         return self.format_number(number, decimal_places)
+
+    def format_number(self, number, decimal_places=None, padding=''):
+        """ Takes the given numer and formats it according to locale.
+
+        If the number is an integer, the default decimal places are 0,
+        otherwise 2.
+
+        Overwrites parent class to use "." instead of "," for fr_CH locale
+        as would be retunred by
+
+        """
+        if number is None:
+            return ''
+
+        if decimal_places is None:
+            if isinstance(number, numbers.Integral):
+                decimal_places = 0
+            else:
+                decimal_places = 2
+
+        locale = self.request.locale
+        # Fixes using "," for french locale instead of "." as for german
+        if locale == 'fr_CH':
+            locale = 'de_CH'
+        decimal, group = self.number_symbols(locale)
+        result = '{{:{},.{}f}}'.format(padding, decimal_places).format(number)
+        return result.translate({ord(','): group, ord('.'): decimal})
 
     def format_procedure_number(self, number):
         """ There are two different formats for the procedure number: a plain
