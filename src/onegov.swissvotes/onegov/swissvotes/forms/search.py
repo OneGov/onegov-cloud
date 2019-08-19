@@ -109,7 +109,7 @@ class SearchForm(Form):
         field = getattr(self, name)
         field.choices = list(SwissVote.codes(name).items())
         if add_none:
-            field.choices.append((-1, _("Unknown")))
+            field.choices.append((-1, _("Missing")))
 
     def on_request(self):
         if hasattr(self, 'csrf_token'):

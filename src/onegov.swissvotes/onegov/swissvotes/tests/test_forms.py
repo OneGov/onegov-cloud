@@ -296,7 +296,7 @@ def test_search_form(swissvotes_app):
         (1, 'Accepting'),
         (2, 'Rejecting'),
         (3, 'None'),
-        (-1, 'Unknown'),
+        (-1, 'Missing'),
     ]
     assert form.position_national_council.choices == [
         (1, 'Accepting'),

@@ -1,5 +1,8 @@
 Changelog
 ---------
+
+- Changes "Unknown" in search form to "Missing" for federal council position for all languages (no translation).
+
 1.2.3 (2019-08-18)
 ~~~~~~~~~~~~~~~~~~~
 

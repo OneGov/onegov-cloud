@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2019-08-18 15:09+0200\n"
+"POT-Creation-Date: 2019-08-19 12:15+0200\n"
 "PO-Revision-Date: 2019-08-18 15:12+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -221,9 +221,6 @@ msgstr "Botschaft des Bundesrats"
 
 msgid "Position of the Federal Council"
 msgstr "Position des Bundesrats"
-
-msgid "Unknown"
-msgstr "Unbekannt"
 
 msgid "Parliamentary phase"
 msgstr "Im Parlament"
@@ -561,6 +558,9 @@ msgstr "Ja"
 
 msgid "No"
 msgstr "Nein"
+
+msgid "Missing"
+msgstr "Missing"
 
 msgid "d-1-1"
 msgstr "Staatsordnung"
@@ -1705,6 +1705,9 @@ msgstr "Ablehnend"
 
 msgid "Organization no longer exists"
 msgstr "Organisation existiert nicht mehr"
+
+#~ msgid "Unknown"
+#~ msgstr "Unbekannt"
 
 #~ msgid ""
 #~ "Number of days between the start of collecting signatures and their "
