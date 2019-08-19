@@ -1,5 +1,10 @@
 Changelog
 ---------
+
+- Fixes import error
+  [dadadamotha]
+- Refactoring of error handling to have more consistency and code-reuse
+
 3.13.8 (2019-08-09)
 ~~~~~~~~~~~~~~~~~~~
 
