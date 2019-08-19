@@ -1,5 +1,7 @@
 Changelog
 ---------
+3.13.9 (2019-08-19)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes import error
   [dadadamotha]
