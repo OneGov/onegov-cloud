@@ -2,9 +2,10 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+import itertools
 from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
-from onegov.people import Person
+from onegov.people import AgencyMembership
 from sqlalchemy import Column, Integer
 from sqlalchemy import Text
 
@@ -91,22 +92,45 @@ def rename_order(context):
             'agency_memberships', 'order',
             new_column_name='order_within_agency')
 
+# @upgrade_task('Kill it 1')
+# def kill_it_temporarely(context):
+#     if context.has_column('agency_memberships', 'order_withing_person'):
+#             context.operations.drop_column(
+#                 'agency_memberships', 'order_withing_person')
 
-@upgrade_task('Add AgencyMembership order_for_person column')
-def add_order_for_person_column(context):
+
+@upgrade_task('Adding order_within_person column')
+def add_order_within_person_column(context):
     from onegov.core.utils import normalize_for_url
+
+    # Add the integer position based on alphabetic order
+    def sortkey(result):
+        return normalize_for_url(result.title)
+
+    def groupkey(result):
+        return result.person_id
+
+    data_list = []
+    for result in context.app.session().query(
+            AgencyMembership.id,
+            AgencyMembership.person_id,
+            AgencyMembership.title
+    ):
+        data_list.append(result)
+
+    index_mapping = {}
+    for person_id, memberships in itertools.groupby(
+            data_list, key=groupkey):
+        s_m = sorted(memberships, key=sortkey)
+        for ix, membership in enumerate(s_m):
+            index_mapping[membership.id] = ix
+
+    def get_index(agency_membership):
+        return index_mapping[agency_membership.id]
+
     if not context.has_column('agency_memberships', 'order_withing_person'):
         context.add_column_with_defaults(
             'agency_memberships',
             Column('order_within_person', Integer, nullable=False),
-            default=0
+            default=get_index
         )
-
-        # Add the integer position based on alphabetic order
-        def sortkey(membership):
-            return normalize_for_url(membership.agency.title)
-
-        for person in context.app.session().query(Person):
-            memberships = sorted(person.memberships, key=sortkey)
-            for ix, membership in enumerate(memberships):
-                membership.order_for_person = ix
