@@ -72,7 +72,7 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable):
     order_within_agency = Column(Integer, nullable=False)
 
     #: the position of the membership within all memberships of a person
-    # order_within_person = Column(Integer, nullable=False)
+    order_within_person = Column(Integer, nullable=False)
 
     #: describes the membership
     title = Column(Text, nullable=False)
