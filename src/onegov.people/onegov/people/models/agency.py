@@ -83,13 +83,13 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable):
             AgencyMembership(
                 person_id=person_id,
                 title=title,
-                order=order,
+                order_within_agency=order,
                 **kwargs
             )
         )
 
         for order, membership in enumerate(self.memberships):
-            membership.order = order
+            membership.order_within_agency = order
 
     def sort_children(self, sortkey=None):
         """ Sorts the suborganizations.
@@ -117,4 +117,4 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable):
         sortkey = sortkey or default_sortkey
         memberships = sorted(self.memberships.all(), key=sortkey)
         for order, membership in enumerate(memberships):
-            membership.order = order
+            membership.order_within_agency = order

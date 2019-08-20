@@ -82,3 +82,31 @@ def add_parliamentary_group_column(context):
             'people',
             Column('parliamentary_group', Text, nullable=True)
         )
+
+
+@upgrade_task('Rename order to order_within_agency')
+def rename_order(context):
+    context.operations.alter_column(
+            'agency_memberships', 'order',
+            new_column_name='order_within_agency')
+
+
+# @upgrade_task('Add AgencyMembership order_for_person column')
+# def add_order_for_person_column(context):
+#     from onegov.core.utils import normalize_for_url
+#     if not context.has_column('agency_memberships', 'order_withing_person'):
+#         context.operations.add_column(
+#             'agency_memberships',
+#             Column('order_within_person', Integer, nullable=False)
+#         )
+#
+#         # Add the integer position based on alphabetic order
+#         def sortkey(membership):
+#             return normalize_for_url(membership.agency.title)
+#
+#         for person in context.app.session().query(Person):
+#             memberships = person.memberships()
+#             memberships_sorted = sorted(person.memberships(), key=sortkey)
+#             ordering = [memberships_sorted.index(el) for el in memberships]
+#             for order, membership in zip(ordering, memberships):
+#                 membership.order_for_person = order

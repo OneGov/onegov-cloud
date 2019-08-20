@@ -55,13 +55,13 @@ def test_memberships(session):
         title="Member",
         agency_id=agency.id,
         person_id=tom.id,
-        order=2
+        order_within_agency=2
     )
     memberships.add(
         title="Director",
         agency_id=agency.id,
         person_id=tom.id,
-        order=1
+        order_within_agency=1
     )
 
     assert [m.title for m in memberships.query()] == ["Director", "Member"]
@@ -79,19 +79,19 @@ def test_memberships_move(session):
         title="A",
         agency_id=agency.id,
         person_id=person.id,
-        order=1
+        order_within_agency=1
     )
     membership_b = memberships.add(
         title="B",
         agency_id=agency.id,
         person_id=person.id,
-        order=2
+        order_within_agency=2
     )
     membership_c = memberships.add(
         title="C",
         agency_id=agency.id,
         person_id=person.id,
-        order=3
+        order_within_agency=3
     )
 
     assert [m.title for m in memberships.query()] == ['A', 'B', 'C']

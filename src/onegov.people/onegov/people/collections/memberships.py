@@ -19,7 +19,7 @@ class AgencyMembershipCollection(GenericCollection):
 
     def query(self):
         query = super(AgencyMembershipCollection, self).query()
-        return query.order_by(self.model_class.order)
+        return query.order_by(self.model_class.order_within_agency)
 
     def move(self, subject, target, direction):
         """ Takes the given subject and moves it somehwere in relation to the
@@ -62,4 +62,4 @@ class AgencyMembershipCollection(GenericCollection):
                 yield sibling
 
         for order, sibling in enumerate(new_order()):
-            sibling.order = order
+            sibling.order_within_agency = order

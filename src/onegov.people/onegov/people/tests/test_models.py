@@ -241,7 +241,7 @@ def test_agency_add_person(session):
     agency.add_person(selma.id, "Staff", since="2012")
     agency.add_person(str(selma.id), "Managing director", since="2018")
 
-    assert [m.order for m in agency.memberships] == [0, 1, 2]
+    assert [m.order_within_agency for m in agency.memberships] == [0, 1, 2]
 
     people = [f"{m.title} {m.person.first_name}" for m in agency.memberships]
     assert people == ['Staff Patty', 'Staff Selma', 'Managing director Selma']
@@ -311,7 +311,7 @@ def test_agency_sort_memberships(session):
         session.add(
             AgencyMembership(
                 title="Member",
-                order=order,
+                order_within_agency=order,
                 since="2012",
                 agency_id=agency.id,
                 person_id=person.id
@@ -342,7 +342,7 @@ def test_membership(session):
     session.add(
         AgencyMembership(
             title="Director",
-            order=12,
+            order_within_agency=12,
             since="2012",
             agency_id=agency.id,
             person_id=person.id
@@ -352,7 +352,7 @@ def test_membership(session):
     membership = session.query(AgencyMembership).one()
 
     assert membership.title == "Director"
-    assert membership.order == 12
+    assert membership.order_within_agency == 12
     assert membership.since == "2012"
     assert membership.agency_id == agency.id
     assert membership.person_id == person.id
@@ -386,7 +386,7 @@ def test_membership_polymorphism(session):
             title='default',
             agency_id=agency.id,
             person_id=person.id,
-            order=0
+            order_within_agency=0
         )
     )
     session.add(
@@ -394,7 +394,7 @@ def test_membership_polymorphism(session):
             title='my',
             agency_id=agency.id,
             person_id=person.id,
-            order=1
+            order_within_agency=1
         )
     )
     session.add(
@@ -402,7 +402,7 @@ def test_membership_polymorphism(session):
             title='other',
             agency_id=agency.id,
             person_id=person.id,
-            order=2
+            order_within_agency=2
         )
     )
     session.flush()
@@ -423,19 +423,19 @@ def test_membership_siblings(session):
 
     membership_x = AgencyMembership(
         title="X",
-        order=1,
+        order_within_agency=1,
         agency_id=agency_a.id,
         person_id=person.id
     )
     membership_y = AgencyMembership(
         title="Y",
-        order=2,
+        order_within_agency=2,
         agency_id=agency_a.id,
         person_id=person.id
     )
     membership_z = AgencyMembership(
         title="Z",
-        order=3,
+        order_within_agency=3,
         agency_id=agency_b.id,
         person_id=person.id
     )
