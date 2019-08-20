@@ -211,7 +211,7 @@ def import_agencies(group_context, file, clear, skip_root, skip_download,
                             prefix=values[3],
                             addition=values[4],
                             note=values[5],
-                            order=int(values[6]),
+                            order_within_agency=int(values[6]),
                         )
                     )
 

@@ -114,7 +114,7 @@ def test_extended_membership(session):
     session.add(
         ExtendedAgencyMembership(
             title="Director",
-            order=12,
+            order_within_agency=12,
             since="2012",
             note="Interim",
             addition="Production",
@@ -165,7 +165,7 @@ def test_agency_move(session):
     # test execute
     collection = ExtendedAgencyCollection(session)
     collection.add_root(title='2', id=2, order=2)
-    collection.add_root(title='1', id=1, oder=1)
+    collection.add_root(title='1', id=1, order=1)
     parent = collection.add_root(title='3', id=3, order=3)
     collection.add(parent=parent, title='5', id=5, order=2)
     collection.add(parent=parent, title='4', id=4, order=1)

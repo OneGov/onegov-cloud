@@ -87,7 +87,7 @@ class ExtendedAgency(Agency, HiddenFromPublicExtension):
             ExtendedAgencyMembership(
                 person_id=person_id,
                 title=title,
-                order=order,
+                order_within_agency=order,
                 **kwargs
             )
         )
