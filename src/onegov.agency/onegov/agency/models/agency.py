@@ -93,7 +93,7 @@ class ExtendedAgency(Agency, HiddenFromPublicExtension):
         )
 
         for order, membership in enumerate(self.memberships):
-            membership.order = order
+            membership.order_within_agency = order
 
 
 class AgencyProxy(object):

@@ -129,7 +129,7 @@ def test_extended_membership(session):
     assert isinstance(membership, ExtendedAgencyMembership)
     assert membership.type == 'extended'
     assert membership.title == "Director"
-    assert membership.order == 12
+    assert membership.order_within_agency == 12
     assert membership.since == "2012"
     assert membership.note == "Interim"
     assert membership.addition == "Production"
