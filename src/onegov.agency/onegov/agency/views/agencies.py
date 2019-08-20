@@ -268,7 +268,8 @@ def create_root_pdf(self, request, form):
             agencies=self.roots,
             title=request.app.org.name,
             toc=True,
-            exclude=request.app.org.hidden_people_fields
+            exclude=request.app.org.hidden_people_fields,
+            page_break_on_level=2
         )
         request.success(_("PDF created"))
         return redirect(request.link(self))
@@ -301,9 +302,11 @@ def create_agency_pdf(self, request, form):
             agencies=[self],
             title=self.title,
             toc=False,
-            exclude=request.app.org.hidden_people_fields
+            exclude=request.app.org.hidden_people_fields,
+            page_break_on_level=1
         )
         request.success(_("PDF created"))
+        # FIXME: clear cache for redirect so that pdf link is updated
         return redirect(request.link(self))
 
     layout = AgencyLayout(self, request)

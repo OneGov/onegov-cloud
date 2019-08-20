@@ -271,7 +271,8 @@ def create_pdf(group_context, root, recursive):
                 agencies=agencies.roots,
                 title=app.org.name,
                 toc=True,
-                exclude=app.org.hidden_people_fields
+                exclude=app.org.hidden_people_fields,
+                page_break_on_level=2
             )
             click.secho("Root PDF created", fg='green')
 
@@ -281,7 +282,8 @@ def create_pdf(group_context, root, recursive):
                     agencies=[agency],
                     title=agency.title,
                     toc=False,
-                    exclude=app.org.hidden_people_fields
+                    exclude=app.org.hidden_people_fields,
+                    page_break_on_level=1
                 )
                 click.secho(f"Created PDF of '{agency.title}'", fg='green')
 

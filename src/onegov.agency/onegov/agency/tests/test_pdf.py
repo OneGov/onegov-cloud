@@ -8,6 +8,10 @@ from onegov.agency.pdf import AgencyPdfZg
 from PyPDF2 import PdfFileReader
 
 
+def test_pdf_page_break_on_level(session):
+    pass
+
+
 def test_agency_pdf_default(session):
     people = ExtendedPersonCollection(session)
     aeschi = people.add(

@@ -12,6 +12,8 @@ from reportlab.lib.units import cm
 class AgencyPdfDefault(Pdf):
     """ A standard PDF of an agency. """
 
+    previous_level_context = None
+
     @property
     def page_fn(self):
         return page_fn_footer
@@ -21,7 +23,8 @@ class AgencyPdfDefault(Pdf):
         return page_fn_header_and_footer
 
     @classmethod
-    def from_agencies(cls, agencies, title, toc, exclude):
+    def from_agencies(cls,
+                      agencies, title, toc, exclude, page_break_on_level=1):
         """ Create an index PDF from a collection of notices. """
 
         result = BytesIO()
@@ -44,10 +47,11 @@ class AgencyPdfDefault(Pdf):
         for agency in agencies:
             if agency.is_hidden_from_public:
                 continue
-            pdf.agency(agency, exclude, skip_title=title == agency.title)
-            pdf.pagebreak()
+            pdf.agency(agency, exclude,
+                       content_so_far=False,
+                       skip_title=title == agency.title,
+                       page_break_on_level=page_break_on_level)
         pdf.generate()
-
         result.seek(0)
         return result
 
@@ -91,13 +95,20 @@ class AgencyPdfDefault(Pdf):
             self.table(data, [5.5 * cm, 0.5 * cm, None])
 
     def agency(self, agency, exclude, level=1, content_so_far=False,
-               skip_title=False):
+               skip_title=False, page_break_on_level=1):
         """ Adds a single agency with the portrait and memberships. """
+        if not self.previous_level_context:
+            self.previous_level_context = level
 
-        if (level < 4) and content_so_far:
+        if (
+                level <= page_break_on_level
+                and self.previous_level_context >= level
+        ):
             self.pagebreak()
         else:
             self.spacer()
+
+        self.previous_level_context = level
 
         if not skip_title:
             self.h(agency.title, level)
@@ -122,7 +133,8 @@ class AgencyPdfDefault(Pdf):
             if child.is_hidden_from_public:
                 continue
             child_has_content = self.agency(
-                child, exclude, level + 1, has_content
+                child, exclude, level + 1, has_content,
+                page_break_on_level=page_break_on_level
             )
             has_content = has_content or child_has_content
 
