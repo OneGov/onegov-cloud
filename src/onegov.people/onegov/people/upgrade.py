@@ -105,7 +105,6 @@ def add_order_within_person_column(context):
     def groupkey(result):
         return result[0].person_id
 
-
     agency_list = []
     for result in session.query(
             AgencyMembership.id,
