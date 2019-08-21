@@ -65,6 +65,10 @@ ul.sortable-multi-checkbox li label {
     cursor: grab;
 }
 
+body.is-logged-out li[data-sortable-id] a {
+    cursor: pointer;
+}
+
 .globals .hidden-contents::before {
     @include icon('\f070');
 }
