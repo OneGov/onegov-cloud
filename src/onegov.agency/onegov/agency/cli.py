@@ -198,11 +198,22 @@ def import_agencies(group_context, file, clear, skip_root, skip_download,
             memberships = sheet.cell_value(row, 16).split('//')
             for membership in memberships:
                 if membership:
-                    values = re.match(
+                    matched = re.match(
                         r'^\((\d*)\)\((.*)\)\((.*)\)\((.*)\)'
-                        r'\((.*)\)\((.*)\)\((\d*)\)$',
+                        r'\((.*)\)\((.*)\)\((\d*)\)\((\d*)\)$',
                         membership
-                    ).groups()
+                    )
+                    if matched:
+                        values = matched.groups()
+                    else:
+                        # old version before order_within_person existed
+                        matched = re.match(
+                            r'^\((\d*)\)\((.*)\)\((.*)\)\((.*)\)'
+                            r'\((.*)\)\((.*)\)\((\d*)\)$',
+                            membership
+                        )
+                        values = list(matched.groups())
+                        values.append('0')
                     person.memberships.append(
                         ExtendedAgencyMembership(
                             agency_id=ids[int(values[0])],
@@ -212,6 +223,7 @@ def import_agencies(group_context, file, clear, skip_root, skip_download,
                             addition=values[4],
                             note=values[5],
                             order_within_agency=int(values[6]),
+                            order_within_person=int(values[7]),
                         )
                     )
 
