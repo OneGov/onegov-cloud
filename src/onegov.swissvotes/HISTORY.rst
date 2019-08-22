@@ -1,5 +1,11 @@
 Changelog
 ---------
+
+- Fixes typo
+  [dadadamotha]
+- Shows correct percentage in parties table in /vote/example/strenghts for "Others"
+  [dadadamotha]
+
 1.2.4 (2019-08-19)
 ~~~~~~~~~~~~~~~~~~~
 
