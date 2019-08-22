@@ -7,7 +7,7 @@ from onegov.core.utils import normalize_for_url
 from onegov.file import File
 from onegov.file.utils import as_fileintent
 from onegov.org.models.extensions import HiddenFromPublicExtension
-from onegov.people import Agency, Person
+from onegov.people import Agency
 from sqlalchemy.orm import object_session
 
 

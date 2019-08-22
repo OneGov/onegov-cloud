@@ -246,7 +246,6 @@ def test_membership_move_within_agency(session):
     assert [m.title for m in agency_a.memberships] == ['Y', 'W', 'Z', 'X']
 
 
-
 def test_membership_move_within_person(session):
     agency_a = ExtendedAgency(title="A", name="a")
     agency_b = ExtendedAgency(title="B", name="b")
@@ -265,7 +264,6 @@ def test_membership_move_within_person(session):
     x = agency_a.memberships.filter_by(title="X").one().id
     y = agency_a.memberships.filter_by(title="Y").one().id
     z = agency_b.memberships.filter_by(title="Z").one().id
-    k = agency_a.memberships.filter_by(title="K").one().id
 
     memberships = person.memberships_by_agency
     # Check if add_person generates the correct numbers

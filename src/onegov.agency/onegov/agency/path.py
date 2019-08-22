@@ -76,6 +76,7 @@ def get_membership_move_for_agency(app, subject_id, direction, target_id):
         direction
     )
 
+
 @AgencyApp.path(
     model=AgencyMembershipMoveWithinPerson,
     path='/move-for-person/membership/{subject_id}/{direction}/{target_id}',
