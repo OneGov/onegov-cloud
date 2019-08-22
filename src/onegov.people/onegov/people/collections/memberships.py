@@ -17,6 +17,10 @@ class AgencyMembershipCollection(GenericCollection):
     def model_class(self):
         return AgencyMembership
 
+    def by_id(self, id):
+        return super(AgencyMembershipCollection, self).query().filter(
+            self.primary_key == id).first()
+
     def query(self, order_by=None):
         query = super(AgencyMembershipCollection, self).query()
         if not order_by:
