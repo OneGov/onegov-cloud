@@ -1,5 +1,5 @@
 from onegov.core.collection import GenericCollection
-from onegov.core.orm.abstract import MoveDirection
+from onegov.core.orm.abstract import MoveDirection, AdjacencyListCollection
 from onegov.people.models import AgencyMembership
 
 
@@ -17,12 +17,16 @@ class AgencyMembershipCollection(GenericCollection):
     def model_class(self):
         return AgencyMembership
 
-    def query(self):
+    def query(self, order_by=None):
         query = super(AgencyMembershipCollection, self).query()
-        return query.order_by(self.model_class.order_within_agency)
+        if not order_by:
+            assert False
+        else:
+            assert hasattr(self.model_class, order_by)
+        return query.order_by(getattr(self.model_class, order_by))
 
-    def move(self, subject, target, direction):
-        """ Takes the given subject and moves it somehwere in relation to the
+    def move(self, subject, target, direction, move_on_col):
+        """ Takes the given subject and moves it somewhere in relation to the
         target.
 
         :subject:
@@ -36,11 +40,16 @@ class AgencyMembershipCollection(GenericCollection):
             :attr:`MoveDirection.above` if the subject should be moved
             above the target, or :attr:`MoveDirection.below` if the subject
             should be moved below the target.
+        :move_on_col:
+            Designates the column for which the new order should be evaluated.
+            Possible values are `order_within_agency` and
+            `order_within_person`.
 
         """
-        assert direction in MoveDirection
-        assert subject != target
-        assert target.agency_id == subject.agency_id
+        assert isinstance(target, self.model_class)
+        assert isinstance(subject, self.model_class)
+        assert hasattr(subject, move_on_col)
+        assert hasattr(target, move_on_col)
 
         siblings = target.siblings.all()
 
@@ -62,4 +71,4 @@ class AgencyMembershipCollection(GenericCollection):
                 yield sibling
 
         for order, sibling in enumerate(new_order()):
-            sibling.order_within_agency = order
+            setattr(sibling, move_on_col, order)
