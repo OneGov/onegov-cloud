@@ -81,13 +81,15 @@ class ExtendedAgency(Agency, HiddenFromPublicExtension):
     def add_person(self, person_id, title, **kwargs):
         """ Appends a person to the agency with the given title. """
 
-        order = kwargs.pop('order', 2 ** 16)
+        order_within_agency = kwargs.pop('order_within_agency', 2 ** 16)
+        order_within_person = kwargs.pop('order_within_person', 0)
 
         self.memberships.append(
             ExtendedAgencyMembership(
                 person_id=person_id,
                 title=title,
-                order_within_agency=order,
+                order_within_agency=order_within_agency,
+                order_within_person=order_within_person,
                 **kwargs
             )
         )

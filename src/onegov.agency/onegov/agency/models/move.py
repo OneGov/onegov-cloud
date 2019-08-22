@@ -55,5 +55,6 @@ class AgencyMembershipMoveWithinAgency(Move):
                 memberships.move(
                     subject=subject,
                     target=target,
-                    direction=getattr(MoveDirection, self.direction)
+                    direction=getattr(MoveDirection, self.direction),
+                    move_on_col='order_within_agency'
                 )

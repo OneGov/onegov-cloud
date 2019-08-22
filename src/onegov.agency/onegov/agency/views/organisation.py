@@ -28,7 +28,9 @@ def view_hidden_agencies(self, request):
     agencies = agencies.order_by(None).order_by(ExtendedAgency.title)
     agencies = agencies.all()
 
-    memberships = AgencyMembershipCollection(session).query()
+    memberships = AgencyMembershipCollection(session).query(
+        order_by='order_within_agency'
+    )
     memberships = memberships.filter(
         AgencyMembership.meta['is_hidden_from_public'] == True
     )
