@@ -97,7 +97,6 @@ def view_people(self, request):
     permission=Public
 )
 def view_person(self, request):
-
     return {
         'title': self.title,
         'person': self,

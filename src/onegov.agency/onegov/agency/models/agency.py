@@ -7,7 +7,8 @@ from onegov.core.utils import normalize_for_url
 from onegov.file import File
 from onegov.file.utils import as_fileintent
 from onegov.org.models.extensions import HiddenFromPublicExtension
-from onegov.people import Agency
+from onegov.people import Agency, Person
+from sqlalchemy.orm import object_session
 
 
 class AgencyPdf(File):
@@ -82,7 +83,23 @@ class ExtendedAgency(Agency, HiddenFromPublicExtension):
         """ Appends a person to the agency with the given title. """
 
         order_within_agency = kwargs.pop('order_within_agency', 2 ** 16)
-        order_within_person = kwargs.pop('order_within_person', 0)
+        session = object_session(self)
+
+        orders_for_person = session.query(
+            ExtendedAgencyMembership.order_within_person
+        ).filter_by(person_id=person_id).all()
+
+        orders_for_person = list(
+            (o.order_within_person for o in orders_for_person))
+
+        if orders_for_person:
+            try:
+                order_within_person = max(orders_for_person) + 1
+            except ValueError:
+                order_within_person = 0
+            assert len(orders_for_person) == max(orders_for_person) + 1
+        else:
+            order_within_person = 0
 
         self.memberships.append(
             ExtendedAgencyMembership(

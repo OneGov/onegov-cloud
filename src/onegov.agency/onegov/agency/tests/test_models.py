@@ -4,6 +4,7 @@ from onegov.agency.models import AgencyMove
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedAgencyMembership
 from onegov.agency.models import ExtendedPerson
+from onegov.agency.models.move import AgencyMembershipMoveWithinPerson
 from onegov.people import Agency
 from onegov.people import AgencyMembership
 from onegov.people import Person
@@ -216,24 +217,70 @@ def test_membership_move_within_agency(session):
     session.add(person)
     session.flush()
 
+    agency_a.add_person(person.id, "W")
     agency_a.add_person(person.id, "X")
     agency_a.add_person(person.id, "Y")
     agency_a.add_person(person.id, "Z")
     agency_b.add_person(person.id, "K")
 
+    w = agency_a.memberships.filter_by(title="W").one().id
     x = agency_a.memberships.filter_by(title="X").one().id
     y = agency_a.memberships.filter_by(title="Y").one().id
     z = agency_a.memberships.filter_by(title="Z").one().id
     k = agency_b.memberships.one().id
 
-    assert [m.title for m in agency_a.memberships] == ['X', 'Y', 'Z']
+    assert [m.title for m in agency_a.memberships] == ['W', 'X', 'Y', 'Z']
 
     AgencyMembershipMoveWithinAgency(session, x, y, 'below').execute()
-    assert [m.title for m in agency_a.memberships] == ['Y', 'X', 'Z']
+    assert [m.title for m in agency_a.memberships] == ['W', 'Y', 'X', 'Z']
 
     AgencyMembershipMoveWithinAgency(session, z, y, 'above').execute()
-    assert [m.title for m in agency_a.memberships] == ['Z', 'Y', 'X']
+    assert [m.title for m in agency_a.memberships] == ['W', 'Z', 'Y', 'X']
 
     # invalid
     AgencyMembershipMoveWithinAgency(session, x, k, 'above').execute()
-    assert [m.title for m in agency_a.memberships] == ['Z', 'Y', 'X']
+    assert [m.title for m in agency_a.memberships] == ['W', 'Z', 'Y', 'X']
+
+    # additional test
+    AgencyMembershipMoveWithinAgency(session, y, w, 'above').execute()
+    assert [m.title for m in agency_a.memberships] == ['Y', 'W', 'Z', 'X']
+
+
+
+def test_membership_move_within_person(session):
+    agency_a = ExtendedAgency(title="A", name="a")
+    agency_b = ExtendedAgency(title="B", name="b")
+    person = ExtendedPerson(first_name="P", last_name="P")
+
+    session.add(agency_a)
+    session.add(agency_b)
+    session.add(person)
+    session.flush()
+
+    agency_a.add_person(person.id, "X")
+    agency_a.add_person(person.id, "Y")
+    agency_b.add_person(person.id, "Z")
+    agency_a.add_person(person.id, "K")
+
+    x = agency_a.memberships.filter_by(title="X").one().id
+    y = agency_a.memberships.filter_by(title="Y").one().id
+    z = agency_b.memberships.filter_by(title="Z").one().id
+    k = agency_a.memberships.filter_by(title="K").one().id
+
+    memberships = person.memberships_by_agency
+    # Check if add_person generates the correct numbers
+    # Checks that memberships_by_agency sorts the list correctly
+    assert [m.order_within_person for m in person.memberships_by_agency] == [
+        0, 1, 2, 3
+    ]
+    assert [m.title for m in memberships] == ['X', 'Y', 'Z', 'K']
+
+    AgencyMembershipMoveWithinPerson(session, x, y, 'below').execute()
+    assert [m.title for m in person.memberships_by_agency] == [
+        'Y', 'X', 'Z', 'K'
+    ]
+
+    AgencyMembershipMoveWithinPerson(session, z, y, 'above').execute()
+    assert [m.title for m in person.memberships_by_agency] == [
+        'Z', 'Y', 'X', 'K'
+    ]

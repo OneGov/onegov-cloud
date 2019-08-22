@@ -42,7 +42,7 @@ class AgencyMove(Move):
 
 
 class AgencyMembershipMoveWithinAgency(Move):
-    """ Represents a single move of a membership. """
+    """ Represents a single move of a membership with respect to a Agency. """
 
     def execute(self):
         from onegov.people import AgencyMembershipCollection
@@ -57,4 +57,23 @@ class AgencyMembershipMoveWithinAgency(Move):
                     target=target,
                     direction=getattr(MoveDirection, self.direction),
                     move_on_col='order_within_agency'
+                )
+
+
+class AgencyMembershipMoveWithinPerson(Move):
+    """ Represents a single move of a membership with respect to a Person. """
+
+    def execute(self):
+        from onegov.people import AgencyMembershipCollection
+
+        memberships = AgencyMembershipCollection(self.session)
+        subject = memberships.by_id(self.subject_id)
+        target = memberships.by_id(self.target_id)
+        if subject and target and subject != target:
+            if subject.person_id == target.person_id:
+                memberships.move(
+                    subject=subject,
+                    target=target,
+                    direction=getattr(MoveDirection, self.direction),
+                    move_on_col='order_within_person'
                 )

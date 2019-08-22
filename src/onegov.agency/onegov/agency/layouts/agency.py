@@ -188,7 +188,8 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
             ]
 
     @cached_property
-    def move_membership_url_template(self):
+    def move_membership_within_agency_url_template(self):
         return self.csrf_protected_url(
-            self.request.link(AgencyMembershipMoveWithinAgency.for_url_template())
+            self.request.link(
+                AgencyMembershipMoveWithinAgency.for_url_template())
         )
