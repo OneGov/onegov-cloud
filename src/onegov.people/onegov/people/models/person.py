@@ -201,6 +201,6 @@ class Person(Base, ContentMixin, TimestampMixin, ORMSearchable):
         """ Returns the memberships sorted alphabetically by the agency. """
 
         def sortkey(membership):
-            return membership.agency.title
+            return membership.order_within_person
 
         return sorted(self.memberships, key=sortkey)
