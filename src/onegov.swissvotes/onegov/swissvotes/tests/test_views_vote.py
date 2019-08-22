@@ -7,6 +7,7 @@ from transaction import commit
 from webtest import TestApp as Client
 from webtest.forms import Upload
 from translationstring import TranslationString
+import re
 
 
 def test_view_vote(swissvotes_app):
@@ -211,16 +212,21 @@ def test_view_vote(swissvotes_app):
     assert "32 Tage" in page
 
     # Party strengths
+
+    # Note: the lower table gets all actors whose paroles is not unknown
+    # To get a sum of 100%, not ubrige is displayed but the percentage of
+    # unknown paroles. Hence the percentage for Unknown paroles will be
+    # displayed twice.
     page = page.click("Details")
     assert "Nationalratswahl 1990"
-    assert "21.2%" in page
+    assert "21.2%" not in page, 'Ubrige are included in unknown'
     assert "22.2%" in page
     assert "23.2%" in page
     assert "24.2%" in page
     assert "25.2%" in page
     assert "26.2%" in page
     assert "27.2%" in page
-    assert "28.2%" in page
+    assert len(re.findall(r'28\.2\%', str(page))) == 2
     assert "1.1%" in page
     assert "2.1%" in page
     assert "3.1%" in page
