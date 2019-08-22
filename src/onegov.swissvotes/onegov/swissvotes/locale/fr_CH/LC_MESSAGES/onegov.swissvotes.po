@@ -559,7 +559,7 @@ msgid "No"
 msgstr "Non"
 
 msgid "Missing"
-msgstr "Mssing"
+msgstr "Missing"
 
 msgid "d-1-1"
 msgstr "Ordre public"
