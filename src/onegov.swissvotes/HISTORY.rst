@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.2.5 (2019-08-22)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes typo
   [dadadamotha]
