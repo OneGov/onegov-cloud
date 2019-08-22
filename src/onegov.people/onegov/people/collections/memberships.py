@@ -55,7 +55,10 @@ class AgencyMembershipCollection(GenericCollection):
         assert hasattr(subject, move_on_col)
         assert hasattr(target, move_on_col)
 
-        siblings = target.siblings.all()
+        if move_on_col == 'order_within_person':
+            siblings = target.siblings_for_person.all()
+        else:
+            siblings = target.siblings.all()
 
         def new_order():
             for sibling in siblings:
