@@ -41,7 +41,7 @@ class AgencyMove(Move):
                 )
 
 
-class AgencyMembershipMove(Move):
+class AgencyMembershipMoveWithinAgency(Move):
     """ Represents a single move of a membership. """
 
     def execute(self):

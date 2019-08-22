@@ -1,6 +1,6 @@
 from cached_property import cached_property
 from onegov.agency.collections import ExtendedAgencyCollection
-from onegov.agency.models import AgencyMembershipMove
+from onegov.agency.models import AgencyMembershipMoveWithinAgency
 from onegov.agency.models import AgencyMove
 from onegov.core.elements import Confirm
 from onegov.core.elements import Intercooler
@@ -190,5 +190,5 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
     @cached_property
     def move_membership_url_template(self):
         return self.csrf_protected_url(
-            self.request.link(AgencyMembershipMove.for_url_template())
+            self.request.link(AgencyMembershipMoveWithinAgency.for_url_template())
         )

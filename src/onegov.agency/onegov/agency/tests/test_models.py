@@ -1,5 +1,5 @@
 from onegov.agency.collections import ExtendedAgencyCollection
-from onegov.agency.models import AgencyMembershipMove
+from onegov.agency.models import AgencyMembershipMoveWithinAgency
 from onegov.agency.models import AgencyMove
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedAgencyMembership
@@ -115,6 +115,7 @@ def test_extended_membership(session):
         ExtendedAgencyMembership(
             title="Director",
             order_within_agency=12,
+            order_within_person=12,
             since="2012",
             note="Interim",
             addition="Production",
@@ -198,9 +199,10 @@ def test_agency_move(session):
     assert tree() == [['2', []], ['3', ['5', '4']], ['1', []]]
 
 
-def test_membership_move(session):
+def test_membership_move_within_agency(session):
     # test URL template
-    move = AgencyMembershipMove(None, None, None, None).for_url_template()
+    move = AgencyMembershipMoveWithinAgency(
+        None, None, None, None).for_url_template()
     assert move.direction == '{direction}'
     assert move.subject_id == '{subject_id}'
     assert move.target_id == '{target_id}'
@@ -226,12 +228,12 @@ def test_membership_move(session):
 
     assert [m.title for m in agency_a.memberships] == ['X', 'Y', 'Z']
 
-    AgencyMembershipMove(session, x, y, 'below').execute()
+    AgencyMembershipMoveWithinAgency(session, x, y, 'below').execute()
     assert [m.title for m in agency_a.memberships] == ['Y', 'X', 'Z']
 
-    AgencyMembershipMove(session, z, y, 'above').execute()
+    AgencyMembershipMoveWithinAgency(session, z, y, 'above').execute()
     assert [m.title for m in agency_a.memberships] == ['Z', 'Y', 'X']
 
     # invalid
-    AgencyMembershipMove(session, x, k, 'above').execute()
+    AgencyMembershipMoveWithinAgency(session, x, k, 'above').execute()
     assert [m.title for m in agency_a.memberships] == ['Z', 'Y', 'X']
