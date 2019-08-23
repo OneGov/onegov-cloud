@@ -12,6 +12,7 @@ from onegov.people.models.membership import AgencyMembership
 from onegov.search import ORMSearchable
 from sqlalchemy import Column
 from sqlalchemy import Text
+from sqlalchemy.orm import object_session
 
 
 class AgencyOrganigram(File):
@@ -77,13 +78,31 @@ class Agency(AdjacencyList, ContentMixin, TimestampMixin, ORMSearchable):
     def add_person(self, person_id, title, **kwargs):
         """ Appends a person to the agency with the given title. """
 
-        order = kwargs.pop('order', 2 ** 16)
+        order_within_agency = kwargs.pop('order_within_agency', 2 ** 16)
+        session = object_session(self)
+
+        orders_for_person = session.query(
+            AgencyMembership.order_within_person
+        ).filter_by(person_id=person_id).all()
+
+        orders_for_person = list(
+            (o.order_within_person for o in orders_for_person))
+
+        if orders_for_person:
+            try:
+                order_within_person = max(orders_for_person) + 1
+            except ValueError:
+                order_within_person = 0
+            assert len(orders_for_person) == max(orders_for_person) + 1
+        else:
+            order_within_person = 0
 
         self.memberships.append(
             AgencyMembership(
                 person_id=person_id,
                 title=title,
-                order_within_agency=order,
+                order_within_agency=order_within_agency,
+                order_within_person=order_within_person,
                 **kwargs
             )
         )
