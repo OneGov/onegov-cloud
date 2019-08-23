@@ -1,5 +1,5 @@
 from onegov.core.collection import GenericCollection
-from onegov.core.orm.abstract import MoveDirection, AdjacencyListCollection
+from onegov.core.orm.abstract import MoveDirection
 from onegov.people.models import AgencyMembership
 
 

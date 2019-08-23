@@ -89,8 +89,8 @@ def add_parliamentary_group_column(context):
 @upgrade_task('Rename order to order_within_agency')
 def rename_order(context):
     context.operations.alter_column(
-            'agency_memberships', 'order',
-            new_column_name='order_within_agency')
+        'agency_memberships', 'order',
+        new_column_name='order_within_agency')
 
 
 @upgrade_task('Adding order_within_person column')
