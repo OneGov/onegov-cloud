@@ -55,16 +55,19 @@ def test_memberships(session):
         title="Member",
         agency_id=agency.id,
         person_id=tom.id,
-        order_within_agency=2
+        order_within_agency=2,
+        order_within_person=0
     )
     memberships.add(
         title="Director",
         agency_id=agency.id,
         person_id=tom.id,
-        order_within_agency=1
+        order_within_agency=1,
+        order_within_person=1
     )
 
-    assert [m.title for m in memberships.query()] == ["Director", "Member"]
+    assert [m.title for m in memberships.query('order_within_agency')] ==\
+           ["Director", "Member"]
 
 
 def test_memberships_move(session):
@@ -74,30 +77,49 @@ def test_memberships_move(session):
     agencies = AgencyCollection(session)
     agency = agencies.add_root(title="Agency")
 
-    memberships = AgencyMembershipCollection(session)
-    membership_a = memberships.add(
+    ms = AgencyMembershipCollection(session)
+    ms_a = ms.add(
         title="A",
         agency_id=agency.id,
         person_id=person.id,
-        order_within_agency=1
+        order_within_agency=1,
+        order_within_person=2
     )
-    membership_b = memberships.add(
+    ms_b = ms.add(
         title="B",
         agency_id=agency.id,
         person_id=person.id,
-        order_within_agency=2
+        order_within_agency=2,
+        order_within_person=1
     )
-    membership_c = memberships.add(
+    ms_c = ms.add(
         title="C",
         agency_id=agency.id,
         person_id=person.id,
-        order_within_agency=3
+        order_within_agency=3,
+        order_within_person=0
     )
 
-    assert [m.title for m in memberships.query()] == ['A', 'B', 'C']
+    assert [m.title for m in ms.query(
+        order_by='order_within_agency'
+    )] == ['A', 'B', 'C']
 
-    memberships.move(membership_a, membership_b, MoveDirection.below)
-    assert [m.title for m in memberships.query()] == ['B', 'A', 'C']
+    assert [m.title for m in ms.query(
+        order_by='order_within_person'
+    )] == ['C', 'B', 'A']
 
-    memberships.move(membership_c, membership_b, MoveDirection.above)
-    assert [m.title for m in memberships.query()] == ['C', 'B', 'A']
+    ms.move(ms_a, ms_b, MoveDirection.below, 'order_within_agency')
+    assert [m.title for m in ms.query('order_within_agency')] == \
+           ['B', 'A', 'C']
+
+    ms.move(ms_c, ms_b, MoveDirection.above, 'order_within_agency')
+    assert [m.title for m in ms.query('order_within_agency')] == \
+           ['C', 'B', 'A']
+
+    ms.move(ms_b, ms_a, MoveDirection.below, 'order_within_person')
+    assert [m.title for m in ms.query('order_within_person')] == \
+           ['C', 'A', 'B']
+
+    ms.move(ms_a, ms_c, MoveDirection.above, 'order_within_person')
+    assert [m.title for m in ms.query('order_within_person')] == \
+           ['A', 'C', 'B']
