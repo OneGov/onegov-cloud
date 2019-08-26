@@ -287,7 +287,7 @@ def es_process(es_binary, es_version):
 
     url = f'http://127.0.0.1:{port}/_cluster/health?wait_for_status=green'
 
-    executor = HTTPExecutor(command, url, method='GET')
+    executor = HTTPExecutor(command, url, method='GET', shell=True)
     executor.start()
 
     yield executor
