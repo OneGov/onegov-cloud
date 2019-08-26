@@ -53,6 +53,7 @@ def test_extended_agency(agency_app):
 def test_extended_agency_add_person(session):
     agency = ExtendedAgency(title="Agency", name="agency",)
     person = ExtendedPerson(first_name="A", last_name="Person")
+    session.add(agency)
     session.add(person)
     session.flush()
 
