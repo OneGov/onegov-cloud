@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.11.1 (2019-08-26)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes bug in siblings_by_person
   [dadadamotha]
 
