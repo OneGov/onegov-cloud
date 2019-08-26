@@ -24,9 +24,8 @@ class AgencyMembershipCollection(GenericCollection):
     def query(self, order_by=None):
         query = super(AgencyMembershipCollection, self).query()
         if not order_by:
-            assert False
-        else:
-            assert hasattr(self.model_class, order_by)
+            return query
+        assert hasattr(self.model_class, order_by)
         return query.order_by(getattr(self.model_class, order_by))
 
     def move(self, subject, target, direction, move_on_col):
