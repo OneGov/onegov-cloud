@@ -27,10 +27,11 @@ def test_agency_pdf_default(session):
 
     agencies = ExtendedAgencyCollection(session)
     bund = agencies.add_root(title="Bundesbehörden")
+    canton = agencies.add_root(title="Kanton")
     nr = agencies.add(
         parent=bund,
         title="Nationalrat",
-        portrait="2016/2019",
+        portrait="Portrait NR",
         export_fields=[
             'membership.title',
             'person.title'
@@ -49,27 +50,60 @@ def test_agency_pdf_default(session):
     nr.add_person(aeschi.id, "Mitglied von Zug")
     sr.add_person(eder.id, "Ständerat für Zug")
 
+    # test single agency with toc break on level 1
     file = AgencyPdfDefault.from_agencies(
         agencies=[bund],
         title="Staatskalender",
         toc=True,
-        exclude=[]
+        exclude=[],
+        page_break_on_level=1
     )
     reader = PdfFileReader(file)
-    pdf = '\n'.join([
-        reader.getPage(page).extractText()
-        for page in range(reader.getNumPages())
-    ])
-    assert "Staatskalender" in pdf
-    assert "1 Bundesbehörden" in pdf
-    assert "1.1 Nationalrat" in pdf
-    assert "1.2 Ständerat" in pdf
-    assert "2016/2019" in pdf
-    assert "Mitglied von Zug" in pdf
-    assert "Aeschi Thomas" in pdf
-    assert "SVP" not in pdf
-    assert "Ständerat für Zug" not in pdf
-    assert "Joachim, Eder, FDP" in pdf
+    assert reader.getNumPages() == 2, 'No page break since its on level 1'
+    page1_toc = reader.getPage(0).extractText()
+    page2 = reader.getPage(1).extractText()
+
+    assert "Staatskalender" in page1_toc
+    assert "1 Bundesbehörden" in page1_toc
+    assert "1.1 Nationalrat" in page1_toc
+    assert "1.2 Ständerat" in page1_toc
+    assert "1 Bundesbehörden" in page2
+    assert "1.1 Nationalrat" in page2
+    assert "Portrait NR" in page2
+    assert "Mitglied von Zug" in page2
+    assert "Aeschi Thomas" in page2
+    assert "SVP" not in page2
+    assert "1.2 Ständerat" in page2
+    assert "Ständerat für Zug" not in page2
+    assert "Joachim, Eder, FDP" in page2
+
+    # test page break on level 2
+    file = AgencyPdfDefault.from_agencies(
+        agencies=[bund],
+        title="Staatskalender",
+        toc=True,
+        exclude=[],
+        page_break_on_level=2
+    )
+    reader = PdfFileReader(file)
+    assert reader.getNumPages() == 3, 'No page break since its on level 1'
+    page3 = reader.getPage(2).extractText()
+    assert "1.2 Ständerat" in page3
+    assert "Ständerat für Zug" not in page3
+    assert "Joachim, Eder, FDP" in page3
+
+    # test page break on level 1 with succeeding headers
+    file = AgencyPdfDefault.from_agencies(
+        agencies=[bund, canton],
+        title="Staatskalender",
+        toc=True,
+        exclude=[],
+        page_break_on_level=1
+    )
+    reader = PdfFileReader(file)
+    assert reader.getNumPages() == 3, 'Page break since its on level 1'
+    assert "2 Kanton" in reader.getPage(2).extractText()
+    assert "2 Kanton" in reader.getPage(0).extractText()
 
     file = AgencyPdfDefault.from_agencies(
         agencies=[nr, sr],
@@ -98,8 +132,9 @@ def test_agency_pdf_default(session):
         reader.getPage(page).extractText()
         for page in range(reader.getNumPages())
     ])
+    assert reader.getNumPages() == 1
     assert pdf == (
-        '1\nNationalrat\n2016/2019\nMitglied von Zug\nAeschi Thomas\n'
+        '1\nNationalrat\nPortrait NR\nMitglied von Zug\nAeschi Thomas\n'
     )
 
 
@@ -175,7 +210,7 @@ def test_agency_pdf_ar(session):
     nr = agencies.add(
         parent=bund,
         title="Nationalrat",
-        portrait="2016/2019",
+        portrait="Portrait NR",
         export_fields=[
             'membership.title',
             'person.title'
@@ -215,7 +250,7 @@ def test_agency_pdf_ar(session):
         f'Druckdatum: {date.today():%d.%m.%Y}\n2\n'
         f'1 Bundesbehörden\n'
         f'1.1 Nationalrat\n'
-        f'2016/2019\n'
+        f'Portrait NR\n'
         f'Mitglied von AR\nAeschi Thomas\n\n'
         f'Staatskalender Kanton Appenzell Ausserrhoden\n'
         f'Druckdatum: {date.today():%d.%m.%Y}\n3\n'
@@ -242,7 +277,7 @@ def test_agency_pdf_zg(session):
     nr = agencies.add(
         parent=bund,
         title="Nationalrat",
-        portrait="2016/2019",
+        portrait="Portrait NR",
         export_fields=[
             'membership.title',
             'person.title'
@@ -280,7 +315,7 @@ def test_agency_pdf_zg(session):
         f'Staatskalender\nDruckdatum: {date.today():%d.%m.%Y}\n2\n'
         f'1 Bundesbehörden\n'
         f'1.1 Nationalrat\n'
-        f'2016/2019\n'
+        f'Portrait NR\n'
         f'Mitglied von Zug\nAeschi Thomas\n\n'
         f'Staatskalender\nDruckdatum: {date.today():%d.%m.%Y}\n3\n'
         f'1.2 Ständerat\nJoachim, Eder, FDP\n'
