@@ -76,14 +76,5 @@ class AgencyMembershipCollection(GenericCollection):
 
                 yield sibling
 
-        for s in siblings:
-            print(s.title, s.order_within_person)
-
         for order, sibling in enumerate(new_order()):
-            print(sibling.title, order)
             setattr(sibling, move_on_col, order)
-
-        # for s in siblings:
-        #     print(s.title, s.order_within_person)
-
-        print('end')
