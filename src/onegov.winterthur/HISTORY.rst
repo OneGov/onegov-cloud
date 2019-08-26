@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.7.5 (2019-08-26)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Fixes mission reports not displaying certain mission reports after creation.
 
 0.7.4 (2019-08-06)
