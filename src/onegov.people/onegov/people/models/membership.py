@@ -97,7 +97,7 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable):
         """
         query = object_session(self).query(self.__class__)
         query = query.order_by(self.__class__.order_within_person)
-        query = query.filter(self.__class__.agency == self.agency)
+        query = query.filter(self.__class__.person == self.person)
         return query
 
     def vcard(self, exclude=None):
