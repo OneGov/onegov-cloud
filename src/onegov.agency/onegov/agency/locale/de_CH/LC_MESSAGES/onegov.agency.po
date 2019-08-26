@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-05-27 11:51+0200\n"
-"PO-Revision-Date: 2019-02-18 06:56+0100\n"
+"POT-Creation-Date: 2019-08-26 14:29+0200\n"
+"PO-Revision-Date: 2019-08-26 14:31+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.2.1\n"
+"X-Generator: Poedit 2.2.3\n"
 
 msgid "People"
 msgstr "Personen"
@@ -22,14 +22,252 @@ msgstr "Organisationen"
 msgid "Hidden contents"
 msgstr "Versteckte Inhalte"
 
-msgid "Title"
-msgstr "Titel"
+msgid "Homepage"
+msgstr "Startseite"
+
+msgid "Create PDF"
+msgstr "PDF erstellen"
+
+msgid "Add"
+msgstr "Hinzufügen"
+
+msgid "Edit"
+msgstr "Bearbeiten"
+
+msgid "Move"
+msgstr "Verschieben"
+
+msgid "Delete"
+msgstr "Löschen"
+
+msgid "Sort"
+msgstr "Sortieren"
+
+msgid "Do you really want to delete this agency?"
+msgstr "Möchten Sie die Organisation wirklich löschen?"
+
+msgid "This cannot be undone."
+msgstr "Dies kann nicht rückgängig gemacht werden."
+
+msgid "Delete agency"
+msgstr "Organisation löschen"
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid "Agency"
+msgstr "Organisation"
+
+msgid "Membership"
+msgstr "Mitgliedschaft"
+
+msgid "Suborganizations"
+msgstr "Unterorganisationen"
+
+msgid "Relationships"
+msgstr "Mitgliedschaften"
+
+msgid ""
+"Do you really want to sort the suborganizations alphabetically by title?"
+msgstr "Möchten Sie die Unterorganisationen alphabetisch nach Titel sortieren?"
+
+msgid "Sort suborganizations"
+msgstr "Unterorganisationen sortieren"
+
+msgid ""
+"Do you really want to sort the relationships alphabetically by last name and "
+"first name?"
+msgstr ""
+"Möchten Sie die Mitgliedschaften alphabetisch nach Nachname und Vornamen "
+"sortieren?"
+
+msgid "Sort relationships"
+msgstr "Mitgliedschaften sortieren"
+
+msgid "Do you really want to delete this membership?"
+msgstr "Möchten Sie die Mitgliedschaft wirklich löschen?"
+
+msgid "Delete membership"
+msgstr "Mitgliedschaft löschen"
+
+msgid "No agencies added yet."
+msgstr "Es wurden noch keine Organisationen hinzugefügt."
+
+msgid "Exports"
+msgstr "Exporte"
+
+msgid "Export all organisations as PDF"
+msgstr "Gesamter Staatskalender als PDF"
 
 msgid "Portrait"
 msgstr "Portrait"
 
 msgid "Organigram"
 msgstr "Organigramm"
+
+msgid "Salutation"
+msgstr "Anrede"
+
+msgid "Academic Title"
+msgstr "Akademischer Titel"
+
+msgid "Profession"
+msgstr "Beruf"
+
+msgid "Political Party"
+msgstr "Politische Partei"
+
+msgid "Parliamentary Group"
+msgstr "Fraktion"
+
+msgid "Born"
+msgstr "Jahrgang"
+
+msgid "Address"
+msgstr "Adresse"
+
+msgid "Email"
+msgstr "E-Mail"
+
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "Direct Phone"
+msgstr "Direktnummer"
+
+msgid "Website"
+msgstr "Webseite"
+
+msgid "Notes"
+msgstr "Bemerkungen"
+
+msgid "Memberships"
+msgstr "Mitgliedschaften"
+
+msgid "Title"
+msgstr "Titel"
+
+msgid "Person"
+msgstr "Person"
+
+msgid "Since"
+msgstr "Eintritt"
+
+msgid "Note"
+msgstr "Notiz"
+
+msgid "Addition"
+msgstr "Zusatz"
+
+msgid "Mutation report"
+msgstr "Mutationsmeldung"
+
+msgid "Path"
+msgstr "Pfad"
+
+msgid "Message"
+msgstr "Nachricht"
+
+msgid "No people found."
+msgstr "Keine Personen gefunden."
+
+msgid "Letter"
+msgstr "Buchstabe"
+
+msgid "Export this agency and its children as a PDF"
+msgstr "Organisation als PDF speichern"
+
+msgid "Report change"
+msgstr "Mutation melden"
+
+msgid "Report a change"
+msgstr "Eine Mutation melden"
+
+msgid "Export a vCard of this person"
+msgstr "Elektronische Visitenkarte (vCard)"
+
+msgid "No hidden contents."
+msgstr "Keine versteckten Inhalte."
+
+msgid "Your changes were saved"
+msgstr "Ihre Änderungen wurden gespeichert"
+
+msgid "New person"
+msgstr "Neue Person"
+
+msgid "Added a new person"
+msgstr "Eine neue Person wurde hinzugefügt"
+
+msgid "New"
+msgstr "Neu"
+
+msgid "New agency"
+msgstr "Neue Organisation"
+
+msgid "New membership"
+msgstr "Neue Mitgliedschaft"
+
+msgid ""
+"Moves the whole agency and all its people and suborganizations to the given "
+"destination."
+msgstr ""
+"Verschiebt die gesamte Organisation mit allen Personen und "
+"Unterorganisationen an den entsprechenden Ort."
+
+msgid ""
+"Create a PDF of this agency and all its suborganizations. This may take a "
+"while."
+msgstr ""
+"Ein PDF dieser Organisation und all ihrer Unterorganisationen erstellen. "
+"Kann je nach Anzahl Unterorganisationen einige Minuten dauern."
+
+msgid "Added a new agency"
+msgstr "Eine neue Organisation wurde hinzufügt"
+
+msgid "Added a new membership"
+msgstr "Eine neue Mitgliedschaft wurde hinzufügt"
+
+msgid "Agency moved"
+msgstr "Organisation verschoben"
+
+msgid "PDF created"
+msgstr "PDF erstellt"
+
+msgid "PDF Layout"
+msgstr "PDF Layout"
+
+msgid "Layout"
+msgstr "Layout"
+
+msgid "For root PDF, page after every:"
+msgstr "Für das Gesamt-PDF, Seitenwechsel nach:"
+
+msgid "For organisation PDF's, page after every:"
+msgstr "Für PDF's der Organisationen, Seitenwechsel nach:"
+
+msgid "Users may report corrections"
+msgstr "Benutzer können Mutationen melden"
+
+msgid "Data"
+msgstr "Daten"
+
+msgid "Default"
+msgstr "Standard"
+
+msgid "1 Heading"
+msgstr "1 Titel"
+
+msgid "1.1 Heading"
+msgstr "1.1 Titel"
+
+msgid "1.1.1 Heading"
+msgstr "1.1.1 Titel"
+
+msgid "Thank you for your submission!"
+msgstr "Vielen Dank für Ihre Eingabe!"
+
+msgid "Your ticket has been opened"
+msgstr "Ihr Ticket wurde eröffnet"
 
 msgid "Fields to include for each membership"
 msgstr "Zu berücksichtigende Felder der Mitgliedschaften"
@@ -88,234 +326,11 @@ msgstr "Person: Direktnummer"
 msgid "- Root -"
 msgstr "- oberste Ebene -"
 
-msgid "E-Mail"
-msgstr "E-Mail"
-
-msgid "Message"
-msgstr "Nachricht"
-
-msgid "Person"
-msgstr "Person"
-
-msgid "Since"
-msgstr "Eintritt"
-
-msgid "Note"
-msgstr "Notiz"
-
-msgid "Addition"
-msgstr "Zusatz"
-
 msgid "Prefix"
 msgstr "Präfix"
 
-msgid "Agency"
-msgstr "Organisation"
+msgid "E-Mail"
+msgstr "E-Mail"
 
 msgid "Mutation"
 msgstr "Mutation"
-
-msgid "Homepage"
-msgstr "Startseite"
-
-msgid "Create PDF"
-msgstr "PDF erstellen"
-
-msgid "Add"
-msgstr "Hinzufügen"
-
-msgid "Edit"
-msgstr "Bearbeiten"
-
-msgid "Move"
-msgstr "Verschieben"
-
-msgid "Delete"
-msgstr "Löschen"
-
-msgid "Sort"
-msgstr "Sortieren"
-
-msgid "Do you really want to delete this agency?"
-msgstr "Möchten Sie die Organisation wirklich löschen?"
-
-msgid "This cannot be undone."
-msgstr "Dies kann nicht rückgängig gemacht werden."
-
-msgid "Delete agency"
-msgstr "Organisation löschen"
-
-msgid "Cancel"
-msgstr "Abbrechen"
-
-msgid "Membership"
-msgstr "Mitgliedschaft"
-
-msgid "Suborganizations"
-msgstr "Unterorganisationen"
-
-msgid "Relationships"
-msgstr "Mitgliedschaften"
-
-msgid ""
-"Do you really want to sort the suborganizations alphabetically by title?"
-msgstr "Möchten Sie die Unterorganisationen alphabetisch nach Titel sortieren?"
-
-msgid "Sort suborganizations"
-msgstr "Unterorganisationen sortieren"
-
-msgid ""
-"Do you really want to sort the relationships alphabetically by last name and "
-"first name?"
-msgstr ""
-"Möchten Sie die Mitgliedschaften alphabetisch nach Nachname und Vornamen "
-"sortieren?"
-
-msgid "Sort relationships"
-msgstr "Mitgliedschaften sortieren"
-
-msgid "Do you really want to delete this membership?"
-msgstr "Möchten Sie die Mitgliedschaft wirklich löschen?"
-
-msgid "Delete membership"
-msgstr "Mitgliedschaft löschen"
-
-msgid "Salutation"
-msgstr "Anrede"
-
-msgid "Academic Title"
-msgstr "Akademischer Titel"
-
-msgid "Profession"
-msgstr "Beruf"
-
-msgid "Political Party"
-msgstr "Politische Partei"
-
-msgid "Parliamentary Group"
-msgstr "Fraktion"
-
-msgid "Born"
-msgstr "Jahrgang"
-
-msgid "Address"
-msgstr "Adresse"
-
-msgid "Email"
-msgstr "E-Mail"
-
-msgid "Phone"
-msgstr "Telefon"
-
-msgid "Direct Phone"
-msgstr "Direktnummer"
-
-msgid "Website"
-msgstr "Webseite"
-
-msgid "Notes"
-msgstr "Bemerkungen"
-
-msgid "Memberships"
-msgstr "Mitgliedschaften"
-
-msgid "Mutation report"
-msgstr "Mutationsmeldung"
-
-msgid "Path"
-msgstr "Pfad"
-
-msgid "Exports"
-msgstr "Exporte"
-
-msgid "Export a vCard of this person"
-msgstr "Elektronische Visitenkarte (vCard)"
-
-msgid "Report change"
-msgstr "Mutation melden"
-
-msgid "Report a change"
-msgstr "Eine Mutation melden"
-
-msgid "No agencies added yet."
-msgstr "Es wurden noch keine Organisationen hinzugefügt."
-
-msgid "Export all organisations as PDF"
-msgstr "Gesamter Staatskalender als PDF"
-
-msgid "Export this agency and its children as a PDF"
-msgstr "Organisation als PDF speichern"
-
-msgid "No hidden contents."
-msgstr "Keine versteckten Inhalte."
-
-msgid "No people found."
-msgstr "Keine Personen gefunden."
-
-msgid "Letter"
-msgstr "Buchstabe"
-
-msgid "New agency"
-msgstr "Neue Organisation"
-
-msgid "New membership"
-msgstr "Neue Mitgliedschaft"
-
-msgid ""
-"Moves the whole agency and all its people and suborganizations to the given "
-"destination."
-msgstr ""
-"Verschiebt die gesamte Organisation mit allen Personen und "
-"Unterorganisationen an den entsprechenden Ort."
-
-msgid ""
-"Create a PDF of this agency and all its suborganizations. This may take a "
-"while."
-msgstr ""
-"Ein PDF dieser Organisation und all ihrer Unterorganisationen erstellen. "
-"Kann je nach Anzahl Unterorganisationen einige Minuten dauern."
-
-msgid "Added a new agency"
-msgstr "Eine neue Organisation wurde hinzufügt"
-
-msgid "New"
-msgstr "Neu"
-
-msgid "Added a new membership"
-msgstr "Eine neue Mitgliedschaft wurde hinzufügt"
-
-msgid "Your changes were saved"
-msgstr "Ihre Änderungen wurden gespeichert"
-
-msgid "Agency moved"
-msgstr "Organisation verschoben"
-
-msgid "PDF created"
-msgstr "PDF erstellt"
-
-msgid "Thank you for your submission!"
-msgstr "Vielen Dank für Ihre Eingabe!"
-
-msgid "Your ticket has been opened"
-msgstr "Ihr Ticket wurde eröffnet"
-
-msgid "New person"
-msgstr "Neue Person"
-
-msgid "Added a new person"
-msgstr "Eine neue Person wurde hinzugefügt"
-
-msgid "PDF Layout"
-msgstr "PDF Layout"
-
-msgid "Layout"
-msgstr "Layout"
-
-msgid "Users may report corrections"
-msgstr "Benutzer können Mutationen melden"
-
-msgid "Data"
-msgstr "Daten"
-
-msgid "Default"
-msgstr "Standard"
