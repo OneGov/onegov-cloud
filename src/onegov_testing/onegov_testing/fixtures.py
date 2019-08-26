@@ -122,6 +122,8 @@ def postgres(pg_preferred_versions):
         "-h 127.0.0.1",
         "-F",
         "-c logging_collector=off",
+        "-c fsync=off",
+        "-c full_page_writes=off",
         "-N 1024"
     ))
 
@@ -226,7 +228,7 @@ def temporary_path(temporary_directory):
 
 @pytest.fixture(scope="session")
 def es_default_version():
-    return '6.6.0'
+    return '6.8.2'
 
 
 @pytest.fixture(scope="session")
@@ -272,7 +274,17 @@ def es_process(es_binary, es_version):
     port = port_for.select_random()
     pid = es_binary + '.pid'
 
-    command = f"{es_binary} -p {pid} -E http.port={port}"
+    # use a different garbage collector for better performance
+    os.environ['ES_JAVA_OPTS'] = \
+        '-Xms1g -Xmx1g -XX:-UseConcMarkSweepGC -XX:+UseG1GC'
+
+    command = (
+        f"{es_binary} -p {pid} -E http.port={port} "
+        f"-E xpack.monitoring.enabled=false "
+        f"-E xpack.monitoring.collection.enabled=false "
+        f"> /dev/null"
+    )
+
     url = f'http://127.0.0.1:{port}/_cluster/health?wait_for_status=green'
 
     executor = HTTPExecutor(command, url, method='GET')
@@ -298,6 +310,7 @@ def es_url(es_process):
 
     es = Elasticsearch(url)
     es.indices.delete(index='*')
+    es.indices.refresh()
 
 
 @pytest.fixture(scope="function")
