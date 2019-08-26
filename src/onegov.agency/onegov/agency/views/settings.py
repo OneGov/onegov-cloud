@@ -9,8 +9,6 @@ from wtforms import BooleanField, RadioField
 
 class AgencySettingsForm(Form):
 
-    default_page_break_level = '1'
-
     pdf_layout = RadioField(
         label=_("PDF Layout"),
         fieldset=_("Layout"),
@@ -52,9 +50,9 @@ class AgencySettingsForm(Form):
         super().process_obj(obj)
         self.pdf_layout.data = obj.meta.get('pdf_layout', 'default')
         self.root_pdf_page_break.data = obj.meta.get(
-            'page_break_on_level_root_pdf', self.default_page_break_level)
+            'page_break_on_level_root_pdf', 1)
         self.orga_pdf_page_break.data = obj.meta.get(
-            'page_break_on_level_orga_pdf', self.default_page_break_level)
+            'page_break_on_level_orga_pdf', 1)
         self.report_changes.data = obj.meta.get('report_changes', True)
 
     def populate_obj(self, obj, *args, **kwargs):
