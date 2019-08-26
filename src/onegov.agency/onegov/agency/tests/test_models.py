@@ -5,7 +5,7 @@ from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedAgencyMembership
 from onegov.agency.models import ExtendedPerson
 from onegov.agency.models.move import AgencyMembershipMoveWithinPerson
-from onegov.people import Agency
+from onegov.people import Agency, AgencyMembershipCollection
 from onegov.people import AgencyMembership
 from onegov.people import Person
 
@@ -265,6 +265,7 @@ def test_membership_move_within_person(session):
     y = agency_a.memberships.filter_by(title="Y").one().id
     z = agency_b.memberships.filter_by(title="Z").one().id
 
+
     memberships = person.memberships_by_agency
     # Check if add_person generates the correct numbers
     # Checks that memberships_by_agency sorts the list correctly
@@ -282,3 +283,14 @@ def test_membership_move_within_person(session):
     assert [m.title for m in person.memberships_by_agency] == [
         'Z', 'Y', 'X', 'K'
     ]
+
+    # Test siblings
+    membership = memberships[0]
+    assert membership.title == 'X'
+    siblings = membership.siblings_by_person.all()
+    assert len(siblings) == 4
+
+    siblings = membership.siblings_by_agency.all()
+    assert len(siblings) == 3
+
+
