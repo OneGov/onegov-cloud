@@ -55,9 +55,9 @@ class AgencyMembershipCollection(GenericCollection):
         assert hasattr(target, move_on_col)
 
         if move_on_col == 'order_within_person':
-            siblings = target.siblings_for_person.all()
+            siblings = target.siblings_by_person.all()
         else:
-            siblings = target.siblings.all()
+            siblings = target.siblings_by_agency.all()
 
         def new_order():
             for sibling in siblings:
@@ -76,5 +76,14 @@ class AgencyMembershipCollection(GenericCollection):
 
                 yield sibling
 
+        for s in siblings:
+            print(s.title, s.order_within_person)
+
         for order, sibling in enumerate(new_order()):
+            print(sibling.title, order)
             setattr(sibling, move_on_col, order)
+
+        # for s in siblings:
+        #     print(s.title, s.order_within_person)
+
+        print('end')

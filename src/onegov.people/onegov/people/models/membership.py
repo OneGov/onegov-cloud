@@ -81,8 +81,8 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable):
     since = Column(Text, nullable=True)
 
     @property
-    def siblings(self):
-        """ Returns a query that includes all siblings, including the item
+    def siblings_by_agency(self):
+        """ Returns a query that includes all siblings by agency, including the item
         itself ordered by `order_within_agency`.
         """
         query = object_session(self).query(self.__class__)
@@ -91,8 +91,8 @@ class AgencyMembership(Base, ContentMixin, TimestampMixin, ORMSearchable):
         return query
 
     @property
-    def siblings_for_person(self):
-        """ Returns a query that includes all siblings, including the item
+    def siblings_by_person(self):
+        """ Returns a query that includes all siblings by person, including the item
         itself ordered by `order_within_person`.
         """
         query = object_session(self).query(self.__class__)

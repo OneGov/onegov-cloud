@@ -452,6 +452,6 @@ def test_membership_siblings(session):
     session.add(membership_y)
     session.flush()
 
-    assert [m.title for m in membership_x.siblings] == ['X', 'Y']
-    assert [m.title for m in membership_y.siblings] == ['X', 'Y']
-    assert [m.title for m in membership_z.siblings] == ['Z']
+    assert [m.title for m in membership_x.siblings_by_agency] == ['X', 'Y']
+    assert [m.title for m in membership_y.siblings_by_agency] == ['X', 'Y']
+    assert [m.title for m in membership_z.siblings_by_agency] == ['Z']
