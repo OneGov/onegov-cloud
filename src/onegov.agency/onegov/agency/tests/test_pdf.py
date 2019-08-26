@@ -236,24 +236,24 @@ def test_agency_pdf_ar(session):
         exclude=[]
     )
     reader = PdfFileReader(file)
-    pdf = '\n'.join([
-        reader.getPage(page).extractText()
-        for page in range(reader.getNumPages())
-    ])
-    assert pdf == (
+    assert reader.getNumPages() == 2
+
+    page1 = reader.getPage(0).extractText()
+    page2 = reader.getPage(1).extractText()
+    assert page1 == (
         f'Druckdatum: {date.today():%d.%m.%Y}\n1\n'
-        f'Staatskalender\n'
-        f'2\n1 Bundesbehörden\n'
-        f'2\n1.1 Nationalrat\n'
-        f'3\n1.2 Ständerat\n\n'
+        'Staatskalender\n2\n'
+        '1 Bundesbehörden\n2\n'
+        '1.1 Nationalrat\n2\n'
+        '1.2 Ständerat\n'
+    )
+    assert page2 == (
         f'Staatskalender Kanton Appenzell Ausserrhoden\n'
         f'Druckdatum: {date.today():%d.%m.%Y}\n2\n'
         f'1 Bundesbehörden\n'
         f'1.1 Nationalrat\n'
         f'Portrait NR\n'
-        f'Mitglied von AR\nAeschi Thomas\n\n'
-        f'Staatskalender Kanton Appenzell Ausserrhoden\n'
-        f'Druckdatum: {date.today():%d.%m.%Y}\n3\n'
+        f'Mitglied von AR\nAeschi Thomas\n'
         f'1.2 Ständerat\n'
         f'Joachim, Eder, FDP\n'
     )
@@ -307,16 +307,19 @@ def test_agency_pdf_zg(session):
         reader.getPage(page).extractText()
         for page in range(reader.getNumPages())
     ])
+
     assert pdf == (
+        f'Staatskalender\n2\n'
+        f'1 Bundesbehörden\n2\n'
+        f'1.1 Nationalrat\n2\n'
+        f'1.2 Ständerat\n\n'
         f'Staatskalender\n'
-        f'2\n1 Bundesbehörden\n'
-        f'2\n1.1 Nationalrat\n'
-        f'3\n1.2 Ständerat\n\n'
-        f'Staatskalender\nDruckdatum: {date.today():%d.%m.%Y}\n2\n'
+        f'Druckdatum: {date.today():%d.%m.%Y}\n2\n'
         f'1 Bundesbehörden\n'
         f'1.1 Nationalrat\n'
         f'Portrait NR\n'
-        f'Mitglied von Zug\nAeschi Thomas\n\n'
-        f'Staatskalender\nDruckdatum: {date.today():%d.%m.%Y}\n3\n'
-        f'1.2 Ständerat\nJoachim, Eder, FDP\n'
+        f'Mitglied von Zug\n'
+        f'Aeschi Thomas\n'
+        f'1.2 Ständerat\n'
+        f'Joachim, Eder, FDP\n'
     )
