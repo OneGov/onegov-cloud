@@ -12,6 +12,7 @@ from onegov.agency.models import ExtendedAgencyMembership
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.core.html import html_to_text
+from onegov.org.models import Organisation
 from onegov.people.collections import AgencyCollection
 from onegov.people.collections import PersonCollection
 from requests import get
@@ -261,10 +262,10 @@ def import_agencies(group_context, file, clear, skip_root, skip_download,
 @click.option('--root/--no-root', default=True)
 @click.option('--recursive/--no-recursive', default=True)
 def create_pdf(group_context, root, recursive):
-
     def _create_pdf(request, app):
         session = app.session()
         agencies = ExtendedAgencyCollection(session)
+        orga = session.query(Organisation).one()
 
         if root:
             app.root_pdf = app.pdf_class.from_agencies(
@@ -272,7 +273,7 @@ def create_pdf(group_context, root, recursive):
                 title=app.org.name,
                 toc=True,
                 exclude=app.org.hidden_people_fields,
-                page_break_on_level=2
+                page_break_on_level=int(orga.page_break_on_level_root_pdf or 1)
             )
             click.secho("Root PDF created", fg='green')
 
@@ -283,7 +284,8 @@ def create_pdf(group_context, root, recursive):
                     title=agency.title,
                     toc=False,
                     exclude=app.org.hidden_people_fields,
-                    page_break_on_level=1
+                    page_break_on_level=int(
+                        orga.page_break_on_level_orga_pdf or 1)
                 )
                 click.secho(f"Created PDF of '{agency.title}'", fg='green')
 
