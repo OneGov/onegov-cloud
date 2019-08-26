@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+- Renames AgencyMembership.order to order_within_agency
+  [dadadamotha]
+- Adds AgencyMembership.order_within_person
+  [dadadamotha]
+
 0.10.0 (2019-04-01)
 ~~~~~~~~~~~~~~~~~~~
 
