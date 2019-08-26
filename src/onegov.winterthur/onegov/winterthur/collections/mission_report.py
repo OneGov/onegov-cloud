@@ -59,6 +59,11 @@ class MissionReportCollection(GenericCollection, Pagination):
     def __eq__(self, other):
         return self.page == other.page
 
+    def by_id(self, id):
+        # use the parent to get a report by id, so the date filter is
+        # not included, which is not desirable on this lookup
+        return super().query().filter(self.primary_key == id).first()
+
     def query(self):
         query = super().query()
 

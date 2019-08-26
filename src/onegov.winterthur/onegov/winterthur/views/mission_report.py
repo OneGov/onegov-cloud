@@ -1,3 +1,4 @@
+from datetime import date
 from onegov.core.elements import Link
 from onegov.core.security import Public, Private
 from onegov.form import FieldDependency, WTFormsClassBuilder, move_fields
@@ -186,7 +187,15 @@ def handle_new_mission_report(self, request, form):
 
         form.populate_obj(mission)
 
-        request.success(_("Successfully added a mission report"))
+        if mission.date.year != date.today().year:
+            request.warning(
+                _(
+                    "The report was entered in the current year, "
+                    "please verify the date"
+                ))
+        else:
+            request.success(_("Successfully added a mission report"))
+
         return request.redirect(request.link(mission))
 
     return {
