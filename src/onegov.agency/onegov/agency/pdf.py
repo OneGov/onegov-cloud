@@ -97,11 +97,9 @@ class AgencyPdfDefault(Pdf):
     def agency(self, agency, exclude, level=1, content_so_far=False,
                skip_title=False, page_break_on_level=1):
         """ Adds a single agency with the portrait and memberships. """
-        if not self.previous_level_context:
-            self.previous_level_context = level
-
         if (
-                level <= page_break_on_level
+                self.previous_level_context
+                and level <= page_break_on_level
                 and self.previous_level_context >= level
         ):
             self.pagebreak()
