@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds PDF page break settings to Organisation model as meta_property
+  [dadadamotha]
+
 1.12.0 (2019-07-05)
 ~~~~~~~~~~~~~~~~~~~~
 
