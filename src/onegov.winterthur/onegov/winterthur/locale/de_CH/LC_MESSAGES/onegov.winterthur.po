@@ -120,14 +120,15 @@ msgid "Definite Taxable wealth"
 msgstr "Definitives steuerbares Vermögen"
 
 msgid "Rebate"
-msgstr "Rabatt"
+msgstr "Betreuungsumfang / Rabatt"
 
 msgid ""
 "Does at least one child in your household attend the same daycare for more "
 "than two whole days a week?"
 msgstr ""
-"Wird mindestens ein Kind in ihrem Haushalt mehr als zwei Tage pro Woche in "
-"derselben Kita betreut?"
+"Werden ein oder mehrere Kinder Ihres Haushalts insgesamt mehr als zwei ganze "
+"Tage pro Woche in derselben Kita betreut?"
+
 
 #, python-format
 msgid "${title} / day rate CHF ${rate} / ${weeks} weeks open per year"
