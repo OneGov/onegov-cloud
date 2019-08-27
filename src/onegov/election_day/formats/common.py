@@ -161,17 +161,16 @@ def validate_integer(line, col, treat_none_as_default=True, default=0):
     :param treat_none_as_default: raises ValueError if line.col is None
     :return: integer value of line.col
     """
-    try:
+    result = getattr(line, col)
+    if not result:
         if treat_none_as_default:
-            return int(getattr(line, col) or default)
-        else:
-            return int(getattr(line, col))
+            return default
+        raise ValueError(_('Empty value: ${col}',
+                           mapping={'col': col}))
+    try:
+        return int(result)
     except ValueError:
         raise ValueError(_('Invalid integer: ${col}',
-                           mapping={'col': col}))
-    except TypeError:
-        # raises error if none_be_zero=False and the integer is None
-        raise ValueError(_('Empty value: ${col}',
                            mapping={'col': col}))
 
 
