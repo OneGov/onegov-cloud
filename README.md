@@ -183,6 +183,26 @@ To keep track of changes and only re-run necessary tests:
 
     py.test --testmon
 
+## Translations 🌍
+
+To extract the translation strings of an already configured module:
+
+    do/translate onegov.org
+
+To add a language to module:
+
+    do/translate onegov.org fr_CH
+
+## Releases 🚀
+
+To create a new release, check the changelog first:
+
+    do/changes
+
+Then run the release script:
+
+    do/release
+
 ## License 🤝
 
 OneGov Cloud is released under the MIT license:
