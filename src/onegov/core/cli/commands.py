@@ -132,7 +132,7 @@ def sendmail(group_context,
     'default_selector': '*'
 })
 @click.argument('server')
-@click.argument('remote-config')
+@click.option('--remote-config', default='/var/lib/onegov-cloud/onegov.yml')
 @click.option('--confirm/--no-confirm', default=True,
               help="Ask for confirmation (disabling this is dangerous!)")
 @click.option('--no-filestorage', default=False, is_flag=True,
