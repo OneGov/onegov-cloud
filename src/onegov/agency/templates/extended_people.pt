@@ -35,6 +35,17 @@
                             </tal:block>
                         </select>
                     </div>
+
+                    <div class="borderless-side-panel">
+                        <h2 i18n:translate>Exports</h2>
+                            <ul class="agency-export-list">
+                                <li>
+                                    <a href="#" target="_blank" i18n:translate>
+                                        Export all persons as a PDF
+                                    </a>
+                                </li>
+                            </ul>
+                    </div>
                 </div>
             </div>
         </div>
