@@ -207,8 +207,8 @@ def test_agency(test_app):
 
 
 @mark.parametrize("organigram", [
-    (module_path('onegov.people', 'tests/fixtures/organigram.jpg'), '.jpe'),
-    (module_path('onegov.people', 'tests/fixtures/organigram.png'), '.png'),
+    (module_path('tests.onegov.people', 'fixtures/organigram.jpg'), '.jpe'),
+    (module_path('tests.onegov.people', 'fixtures/organigram.png'), '.png'),
 ])
 def test_agency_organigram(test_app, organigram):
     with open(organigram[0], 'rb') as organigram_file:

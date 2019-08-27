@@ -204,6 +204,10 @@ def session(session_manager):
     This is the fixture you usually want to use for ORM tests.
 
     """
+
+    # the transaction might be in an unclean state at this point
+    transaction.abort()
+
     session_manager.set_current_schema('test_' + uuid4().hex)
     session_manager.set_locale('de_CH', 'de_CH')
 

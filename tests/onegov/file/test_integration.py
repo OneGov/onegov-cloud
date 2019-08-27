@@ -38,8 +38,8 @@ def app(request, postgres_dsn, temporary_path, redis_url):
     signing_services = (temporary_path / 'signing-services')
     signing_services.mkdir()
 
-    cert_file = module_path('onegov.file', 'tests/fixtures/test.crt')
-    cert_key = module_path('onegov.file', 'tests/fixtures/test.crt')
+    cert_file = module_path('tests.onegov.file', 'fixtures/test.crt')
+    cert_key = module_path('tests.onegov.file', 'fixtures/test.crt')
 
     with (signing_services / '__default__.yml').open('w') as f:
         f.write(textwrap.dedent(f"""
@@ -286,8 +286,8 @@ def test_cache_control(app):
 def test_ais_success(app):
     ensure_correct_depot(app)
 
-    path = module_path('onegov.file', 'tests/fixtures/example.pdf')
-    tape = module_path('onegov.file', 'tests/cassettes/ais-success.json')
+    path = module_path('tests.onegov.file', 'fixtures/example.pdf')
+    tape = module_path('tests.onegov.file', 'cassettes/ais-success.json')
 
     # recordings were shamelessly copied from AIS.py's unit tests
     with vcr.use_cassette(tape, record_mode='none'):
@@ -312,8 +312,8 @@ def test_ais_success(app):
 def test_ais_error(app):
     ensure_correct_depot(app)
 
-    path = module_path('onegov.file', 'tests/fixtures/example.pdf')
-    tape = module_path('onegov.file', 'tests/cassettes/ais-error.json')
+    path = module_path('tests.onegov.file', 'fixtures/example.pdf')
+    tape = module_path('tests.onegov.file', 'cassettes/ais-error.json')
 
     # recordings were shamelessly copied from AIS.py's unit tests
     with vcr.use_cassette(tape, record_mode='none'):
@@ -324,14 +324,14 @@ def test_ais_error(app):
 
 
 def test_sign_file(app):
-    tape = module_path('onegov.file', 'tests/cassettes/ais-success.json')
+    tape = module_path('tests.onegov.file', 'cassettes/ais-success.json')
 
     with vcr.use_cassette(tape, record_mode='none'):
         ensure_correct_depot(app)
 
         transaction.begin()
 
-        path = module_path('onegov.file', 'tests/fixtures/sample.pdf')
+        path = module_path('tests.onegov.file', 'fixtures/sample.pdf')
 
         with open(path, 'rb') as f:
             app.session().add(File(name='sample.pdf', reference=f))
@@ -377,13 +377,13 @@ def test_sign_file(app):
 
 
 def test_sign_transaction(app, temporary_path):
-    tape = module_path('onegov.file', 'tests/cassettes/ais-success.json')
+    tape = module_path('tests.onegov.file', 'cassettes/ais-success.json')
 
     with vcr.use_cassette(tape, record_mode='none'):
         ensure_correct_depot(app)
         transaction.begin()
 
-        path = module_path('onegov.file', 'tests/fixtures/sample.pdf')
+        path = module_path('tests.onegov.file', 'fixtures/sample.pdf')
 
         with open(path, 'rb') as f:
             app.session().add(File(name='sample.pdf', reference=f))
@@ -427,8 +427,8 @@ def test_sign_transaction(app, temporary_path):
 def test_find_by_content_signed(app, temporary_path):
     ensure_correct_depot(app)
 
-    tape = module_path('onegov.file', 'tests/cassettes/ais-success.json')
-    path = module_path('onegov.file', 'tests/fixtures/sample.pdf')
+    tape = module_path('tests.onegov.file', 'cassettes/ais-success.json')
+    path = module_path('tests.onegov.file', 'fixtures/sample.pdf')
 
     with vcr.use_cassette(tape, record_mode='none'):
         transaction.begin()
@@ -459,14 +459,14 @@ def test_find_by_content_signed(app, temporary_path):
 
 
 def test_signature_file_messages(app):
-    tape = module_path('onegov.file', 'tests/cassettes/ais-success.json')
+    tape = module_path('tests.onegov.file', 'cassettes/ais-success.json')
 
     with vcr.use_cassette(tape, record_mode='none'):
         ensure_correct_depot(app)
 
         # sign the file
         transaction.begin()
-        path = module_path('onegov.file', 'tests/fixtures/sample.pdf')
+        path = module_path('tests.onegov.file', 'fixtures/sample.pdf')
         with open(path, 'rb') as f:
             app.session().add(File(name='sample.pdf', reference=f))
         transaction.commit()

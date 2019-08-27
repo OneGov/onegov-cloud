@@ -249,8 +249,8 @@ def test_pdf_toc_levels():
 
 
 @mark.parametrize("path", [
-    module_path('onegov.pdf', 'tests/fixtures/onegov.jpg'),
-    module_path('onegov.pdf', 'tests/fixtures/onegov.png'),
+    module_path('tests.onegov.pdf', 'fixtures/onegov.jpg'),
+    module_path('tests.onegov.pdf', 'fixtures/onegov.png'),
 ])
 def test_pdf_image(path):
     file = BytesIO()
@@ -597,7 +597,7 @@ def test_page_fn_header_and_footer():
 
 
 @mark.parametrize("path", [
-    module_path('onegov.pdf', 'tests/fixtures/onegov.svg'),
+    module_path('tests.onegov.pdf', 'fixtures/onegov.svg'),
 ])
 def test_page_fn_header_logo(path):
     with open(path) as file:
@@ -627,7 +627,7 @@ def test_page_fn_header_logo(path):
 
 
 @mark.parametrize("path", [
-    module_path('onegov.pdf', 'tests/fixtures/onegov.svg'),
+    module_path('tests.onegov.pdf', 'fixtures/onegov.svg'),
 ])
 def test_page_fn_header_logo_and_footer(path):
     year = date.today().year

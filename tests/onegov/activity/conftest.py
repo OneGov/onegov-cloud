@@ -103,7 +103,7 @@ def inactive_period(collections):
 @fixture(scope='session')
 def postfinance_xml():
     xml = 'camt.053_P_CH0309000000250090342_380000000_0_2016053100163801.xml'
-    xml_path = module_path('onegov.activity', '/tests/fixtures/' + xml)
+    xml_path = module_path('tests.onegov.activity', '/fixtures/' + xml)
 
     with open(xml_path, 'r') as f:
         yield f.read()

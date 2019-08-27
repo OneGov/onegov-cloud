@@ -35,6 +35,13 @@ class CaptureLogPlugin(object):
         messages.
         """
 
+        # Running CLI tests will disable the loggers, which influences
+        # capturelog tests - a reset is necessary
+        loggers = map(logging.getLogger, logging.root.manager.loggerDict)
+
+        for logger in loggers:
+            logger.disabled = False
+
         # Create a handler for this test.
         item.capturelog_handler = CaptureLogHandler()
         item.capturelog_handler.setFormatter(self.formatter)
@@ -43,7 +50,7 @@ class CaptureLogPlugin(object):
         # root logger is set to log all levels.
         root_logger = logging.getLogger()
         root_logger.addHandler(item.capturelog_handler)
-        root_logger.setLevel(logging.NOTSET)
+        root_logger.setLevel(logging.DEBUG)
 
     def pytest_runtest_teardown(self, item, nextitem):
 
@@ -70,14 +77,26 @@ class CaptureLogHandler(logging.StreamHandler):
         super().__init__(stream=py.io.TextIO())
         self.records = []
 
+    def ignore_log(self, record):
+        """ Certain logs are noisy and not useful for our tests, so we
+        ignore them here - this could be made configurable if at all
+        necessary.
+
+        """
+
+        if record.module == '_transaction':
+            return True
+
     def emit(self, record):
         """Keep the log records in a list in addition to the log text."""
 
-        self.records.append(record)
+        if not self.ignore_log(record):
+            self.records.append(record)
+
         return super().emit(record)
 
 
-class CaptureLogFuncArg(object):
+class CaptureLogFixture(object):
     """Provides access and control of log capturing."""
 
     def __init__(self, handler):
@@ -140,14 +159,7 @@ class CaptureLogLevel(object):
 
 
 @pytest.fixture
-def caplog(request):
-    """Returns a funcarg to access and control log capturing."""
-
-    return CaptureLogFuncArg(request._pyfuncitem.capturelog_handler)
-
-
-@pytest.fixture
 def capturelog(request):
     """Returns a funcarg to access and control log capturing."""
 
-    return CaptureLogFuncArg(request._pyfuncitem.capturelog_handler)
+    return CaptureLogFixture(request._pyfuncitem.capturelog_handler)

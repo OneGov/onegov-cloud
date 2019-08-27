@@ -12,8 +12,8 @@ from pytest import mark
 
 
 @mark.parametrize("tar_file", [
-    module_path('onegov.election_day',
-                'tests/fixtures/internal_majorz.tar.gz'),
+    module_path('tests.onegov.election_day',
+                'fixtures/internal_majorz.tar.gz'),
 ])
 def test_import_internal_majorz(session, tar_file):
     session.add(

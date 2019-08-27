@@ -1,5 +1,3 @@
-import onegov.file
-
 from onegov.core.utils import module_path
 from onegov.file.utils import content_type_from_fileobj, word_count
 
@@ -7,7 +5,7 @@ from onegov.file.utils import content_type_from_fileobj, word_count
 def test_content_type_from_fileobj():
 
     def fixture(name):
-        return module_path(onegov.file, f'tests/fixtures/{name}')
+        return module_path('tests.onegov.file', f'fixtures/{name}')
 
     def content_type(name):
         with open(fixture(name), 'rb') as f:

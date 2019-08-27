@@ -117,7 +117,7 @@ def test_create_event(session):
     assert occurrence.event.id == event.id
 
 
-@mark.parametrize("path", [module_path('onegov.event', 'tests/fixtures')])
+@mark.parametrize("path", [module_path('tests.onegov.event', 'fixtures')])
 def test_event_image(test_app, path):
     session = test_app.session()
 

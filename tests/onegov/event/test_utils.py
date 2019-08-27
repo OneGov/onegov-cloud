@@ -17,7 +17,7 @@ def tzdatetime(year, month, day, hour, minute, seconds=0, microseconds=0):
 
 
 @mark.parametrize("xml", [
-    module_path('onegov.event', 'tests/fixtures/guidle.xml'),
+    module_path('tests.onegov.event', 'fixtures/guidle.xml'),
 ])
 def test_import_guidle(session, xml):
     offers = list(GuidleExportData(etree.parse(xml)).offers())

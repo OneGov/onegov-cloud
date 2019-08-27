@@ -93,7 +93,7 @@ def test_import_ical(cfg_path, temporary_directory):
 
 
 @mark.parametrize("xml", [
-    module_path('onegov.event', 'tests/fixtures/guidle.xml'),
+    module_path('tests.onegov.event', 'fixtures/guidle.xml'),
 ])
 def test_import_guidle(cfg_path, temporary_directory, xml):
     runner = CliRunner()

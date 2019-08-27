@@ -12,7 +12,7 @@ from pytest import mark
 
 
 @mark.parametrize("tar_file", [
-    module_path('onegov.election_day', 'tests/fixtures/wabstic_vote.tar.gz'),
+    module_path('tests.onegov.election_day', 'fixtures/wabstic_vote.tar.gz'),
 ])
 def test_import_wabstic_vote(session, tar_file):
     session.add(

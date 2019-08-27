@@ -12,7 +12,7 @@ from pathlib import Path
 
 @pytest.fixture()
 def fixtures():
-    return Path(module_path('onegov.winterthur', 'tests/fixtures'))
+    return Path(module_path('tests.onegov.winterthur', 'fixtures'))
 
 
 @pytest.fixture()

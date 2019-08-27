@@ -6,8 +6,8 @@ from webtest.forms import Upload
 
 
 @mark.parametrize("pdf_1, pdf_2", [(
-    module_path('onegov.wtfs', 'tests/fixtures/example_1.pdf'),
-    module_path('onegov.wtfs', 'tests/fixtures/example_2.pdf')
+    module_path('tests.onegov.wtfs', 'fixtures/example_1.pdf'),
+    module_path('tests.onegov.wtfs', 'fixtures/example_2.pdf')
 )])
 def test_views_user_manual(client, pdf_1, pdf_2):
     with open(pdf_1, 'rb') as file:

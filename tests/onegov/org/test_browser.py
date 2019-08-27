@@ -335,7 +335,7 @@ def test_publication_workflow(browser, temporary_path, org_app):
 
 
 def test_signature_workflow(browser, temporary_path, org_app):
-    path = module_path('onegov.org', 'tests/fixtures/sample.pdf')
+    path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
     org_app.enable_yubikey = True
 
     # upload the pdf

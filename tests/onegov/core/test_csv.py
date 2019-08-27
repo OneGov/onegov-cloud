@@ -97,8 +97,8 @@ def test_wacky_csv_file():
 
 
 @pytest.mark.parametrize("excel_file", [
-    utils.module_path('onegov.core', 'tests/fixtures/excel.xls'),
-    utils.module_path('onegov.core', 'tests/fixtures/excel.xlsx'),
+    utils.module_path('tests.onegov.core', 'fixtures/excel.xls'),
+    utils.module_path('tests.onegov.core', 'fixtures/excel.xlsx'),
 ])
 def test_convert_to_csv(excel_file):
     with open(excel_file, 'rb') as f:

@@ -146,7 +146,7 @@ def test_thumbnail_creation(session):
 
 
 def test_save_png_zipbomb(session):
-    path = module_path('onegov.file', 'tests/fixtures/bomb.png')
+    path = module_path('tests.onegov.file', 'fixtures/bomb.png')
 
     with open(path, 'rb') as f:
         session.add(File(name='zipbomb.png', reference=f))
@@ -158,7 +158,7 @@ def test_save_png_zipbomb(session):
 
 
 def test_pdf_preview_creation(session):
-    path = module_path('onegov.file', 'tests/fixtures/example.pdf')
+    path = module_path('tests.onegov.file', 'fixtures/example.pdf')
 
     with open(path, 'rb') as f:
         session.add(File(name='example.pdf', reference=f))
@@ -315,7 +315,7 @@ def test_update_metadata(session):
 
 
 def test_pdf_text_extraction(session):
-    path = module_path('onegov.file', 'tests/fixtures/sample.pdf')
+    path = module_path('tests.onegov.file', 'fixtures/sample.pdf')
 
     with open(path, 'rb') as f:
         session.add(File(name='sample.pdf', reference=f))
@@ -329,7 +329,7 @@ def test_pdf_text_extraction(session):
 
 
 def test_signature_timestamp(session):
-    path = module_path('onegov.file', 'tests/fixtures/sample.pdf')
+    path = module_path('tests.onegov.file', 'fixtures/sample.pdf')
     time = sedate.utcnow()
 
     with open(path, 'rb') as f:

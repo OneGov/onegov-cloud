@@ -100,7 +100,7 @@ def test_stripe_capture_evil_charge(capturelog):
         StripeCaptureManager.capture_charge('foo', 'bar')
 
         transaction.commit()
-        assert capturelog.records()[2].message\
+        assert capturelog.records()[0].message\
             == 'Stripe charge with capture id bar failed'
 
 

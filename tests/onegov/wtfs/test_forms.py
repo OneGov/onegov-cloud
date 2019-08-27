@@ -982,8 +982,8 @@ def test_create_invoices_form(session):
 
 
 @mark.parametrize("pdf_1, pdf_2", [(
-    module_path('onegov.wtfs', 'tests/fixtures/example_1.pdf'),
-    module_path('onegov.wtfs', 'tests/fixtures/example_2.pdf')
+    module_path('tests.onegov.wtfs', 'fixtures/example_1.pdf'),
+    module_path('tests.onegov.wtfs', 'fixtures/example_2.pdf')
 )])
 def test_user_manual_form(wtfs_app, pdf_1, pdf_2):
     with open(pdf_1, 'rb') as file:

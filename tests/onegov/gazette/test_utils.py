@@ -225,7 +225,7 @@ def test_sogc_importer_get_publication(session):
 
 
 @mark.parametrize("xml", [
-    module_path('onegov.gazette', 'tests/fixtures/KK01.xml')
+    module_path('tests.onegov.gazette', 'fixtures/KK01.xml')
 ])
 def test_sogc_converter_KK01(gazette_app, xml):
     converter = KK01(etree.parse(xml))
@@ -250,7 +250,7 @@ def test_sogc_converter_KK01(gazette_app, xml):
 
 
 @mark.parametrize("xml", [
-    module_path('onegov.gazette', 'tests/fixtures/KK02.xml')
+    module_path('tests.onegov.gazette', 'fixtures/KK02.xml')
 ])
 def test_sogc_converter_KK02(gazette_app, xml):
     converter = KK02(etree.parse(xml))
@@ -283,7 +283,7 @@ def test_sogc_converter_KK02(gazette_app, xml):
 
 
 @mark.parametrize("xml", [
-    module_path('onegov.gazette', 'tests/fixtures/KK03.xml')
+    module_path('tests.onegov.gazette', 'fixtures/KK03.xml')
 ])
 def test_sogc_converter_KK03(gazette_app, xml):
     converter = KK03(etree.parse(xml))
@@ -319,7 +319,7 @@ def test_sogc_converter_KK03(gazette_app, xml):
 
 
 @mark.parametrize("xml", [
-    module_path('onegov.gazette', 'tests/fixtures/KK04.xml')
+    module_path('tests.onegov.gazette', 'fixtures/KK04.xml')
 ])
 def test_sogc_converter_KK04(gazette_app, xml):
     converter = KK04(etree.parse(xml))
@@ -356,7 +356,7 @@ def test_sogc_converter_KK04(gazette_app, xml):
 
 
 @mark.parametrize("xml", [
-    module_path('onegov.gazette', 'tests/fixtures/KK05.xml')
+    module_path('tests.onegov.gazette', 'fixtures/KK05.xml')
 ])
 def test_sogc_converter_KK05(gazette_app, xml):
     converter = KK05(etree.parse(xml))
@@ -387,7 +387,7 @@ def test_sogc_converter_KK05(gazette_app, xml):
 
 
 @mark.parametrize("xml", [
-    module_path('onegov.gazette', 'tests/fixtures/KK06.xml')
+    module_path('tests.onegov.gazette', 'fixtures/KK06.xml')
 ])
 def test_sogc_converter_KK06(gazette_app, xml):
     converter = KK06(etree.parse(xml))
@@ -409,7 +409,7 @@ def test_sogc_converter_KK06(gazette_app, xml):
 
 
 @mark.parametrize("xml", [
-    module_path('onegov.gazette', 'tests/fixtures/KK07.xml')
+    module_path('tests.onegov.gazette', 'fixtures/KK07.xml')
 ])
 def test_sogc_converter_KK07(gazette_app, xml):
     converter = KK07(etree.parse(xml))
@@ -431,7 +431,7 @@ def test_sogc_converter_KK07(gazette_app, xml):
 
 
 @mark.parametrize("xml", [
-    module_path('onegov.gazette', 'tests/fixtures/KK08.xml')
+    module_path('tests.onegov.gazette', 'fixtures/KK08.xml')
 ])
 def test_sogc_converter_KK08(gazette_app, xml):
     converter = KK08(etree.parse(xml))
@@ -463,7 +463,7 @@ def test_sogc_converter_KK08(gazette_app, xml):
 
 
 @mark.parametrize("xml", [
-    module_path('onegov.gazette', 'tests/fixtures/KK09.xml')
+    module_path('tests.onegov.gazette', 'fixtures/KK09.xml')
 ])
 def test_sogc_converter_KK09(gazette_app, xml):
     converter = KK09(etree.parse(xml))
@@ -499,7 +499,7 @@ def test_sogc_converter_KK09(gazette_app, xml):
 
 
 @mark.parametrize("xml", [
-    module_path('onegov.gazette', 'tests/fixtures/KK10.xml')
+    module_path('tests.onegov.gazette', 'fixtures/KK10.xml')
 ])
 def test_sogc_converter_KK10(gazette_app, xml):
     converter = KK10(etree.parse(xml))

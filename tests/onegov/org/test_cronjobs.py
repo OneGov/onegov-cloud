@@ -27,10 +27,10 @@ def get_cronjob_url(cronjob):
 def register_echo_handler(handlers):
 
     class EchoTicket(Ticket):
-        __mapper_args__ = {'polymorphic_identity': 'ECO'}
-        es_type_name = 'eco_tickets'
+        __mapper_args__ = {'polymorphic_identity': 'EHO'}
+        es_type_name = 'echo_tickets'
 
-    @handlers.registered_handler('ECO')
+    @handlers.registered_handler('EHO')
     class EchoHandler(Handler):
 
         handler_title = "Echo"
@@ -110,7 +110,7 @@ def test_ticket_statistics(org_app, smtp, handlers):
     tickets = [
         collection.open_ticket(
             handler_id='1',
-            handler_code='ECO',
+            handler_code='EHO',
             title="Title",
             group="Group",
             email="citizen@example.org",
@@ -118,7 +118,7 @@ def test_ticket_statistics(org_app, smtp, handlers):
         ),
         collection.open_ticket(
             handler_id='2',
-            handler_code='ECO',
+            handler_code='EHO',
             title="Title",
             group="Group",
             email="citizen@example.org",
@@ -126,7 +126,7 @@ def test_ticket_statistics(org_app, smtp, handlers):
         ),
         collection.open_ticket(
             handler_id='3',
-            handler_code='ECO',
+            handler_code='EHO',
             title="Title",
             group="Group",
             email="citizen@example.org",
@@ -134,7 +134,7 @@ def test_ticket_statistics(org_app, smtp, handlers):
         ),
         collection.open_ticket(
             handler_id='4',
-            handler_code='ECO',
+            handler_code='EHO',
             title="Title",
             group="Group",
             email="citizen@example.org",
@@ -142,7 +142,7 @@ def test_ticket_statistics(org_app, smtp, handlers):
         ),
         collection.open_ticket(
             handler_id='5',
-            handler_code='ECO',
+            handler_code='EHO',
             title="Title",
             group="Group",
             email="citizen@example.org",
@@ -150,7 +150,7 @@ def test_ticket_statistics(org_app, smtp, handlers):
         ),
         collection.open_ticket(
             handler_id='6',
-            handler_code='ECO',
+            handler_code='EHO',
             title="Title",
             group="Group",
             email="citizen@example.org",

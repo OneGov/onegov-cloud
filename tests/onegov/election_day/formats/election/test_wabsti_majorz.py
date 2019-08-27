@@ -11,7 +11,7 @@ from pytest import mark
 
 
 @mark.parametrize("tar_file", [
-    module_path('onegov.election_day', 'tests/fixtures/wabsti_majorz.tar.gz'),
+    module_path('tests.onegov.election_day', 'fixtures/wabsti_majorz.tar.gz'),
 ])
 def test_import_wabsti_majorz(session, tar_file):
     session.add(

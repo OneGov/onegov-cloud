@@ -4597,7 +4597,7 @@ def test_search_signed_files(client_with_es):
     client = client_with_es
     client.login_admin()
 
-    path = module_path('onegov.org', 'tests/fixtures/sample.pdf')
+    path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
     with open(path, 'rb') as f:
         page = client.get('/files')
         page.form['file'] = Upload('Sample.pdf', f.read(), 'application/pdf')
@@ -4643,7 +4643,7 @@ def test_search_hashtags(client_with_es):
 def test_sign_document(client):
     client.login_admin()
 
-    path = module_path('onegov.org', 'tests/fixtures/sample.pdf')
+    path = module_path('tests.onegov.org', 'fixtures/sample.pdf')
     with open(path, 'rb') as f:
         page = client.get('/files')
         page.form['file'] = Upload('Sample.pdf', f.read(), 'application/pdf')
@@ -4694,7 +4694,7 @@ def test_sign_document(client):
     assert not FileCollection(client.app.session()).query().one().signed
 
     # once the signature has been applied, it can't be repeated
-    tape = module_path('onegov.org', 'tests/cassettes/ais-success.json')
+    tape = module_path('tests.onegov.org', 'cassettes/ais-success.json')
 
     with patch.object(Yubico, 'verify') as verify:
         verify.return_value = True

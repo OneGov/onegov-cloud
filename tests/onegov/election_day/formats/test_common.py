@@ -26,12 +26,12 @@ def test_load_csv():
 
 
 @pytest.mark.parametrize("excel_file", [
-    module_path('onegov.election_day', 'tests/fixtures/wb_v1.xls'),
-    module_path('onegov.election_day', 'tests/fixtures/wb_v2.xls'),
-    module_path('onegov.election_day', 'tests/fixtures/wb_v3.xls'),
-    module_path('onegov.election_day', 'tests/fixtures/wb_v1.xlsx'),
-    module_path('onegov.election_day', 'tests/fixtures/wb_v2.xlsx'),
-    module_path('onegov.election_day', 'tests/fixtures/wb_v3.xlsx'),
+    module_path('tests.onegov.election_day', 'fixtures/wb_v1.xls'),
+    module_path('tests.onegov.election_day', 'fixtures/wb_v2.xls'),
+    module_path('tests.onegov.election_day', 'fixtures/wb_v3.xls'),
+    module_path('tests.onegov.election_day', 'fixtures/wb_v1.xlsx'),
+    module_path('tests.onegov.election_day', 'fixtures/wb_v2.xlsx'),
+    module_path('tests.onegov.election_day', 'fixtures/wb_v3.xlsx'),
 ])
 def test_load_csv_excel(election_day_app, excel_file):
     with open(excel_file, 'rb') as f:
@@ -41,10 +41,10 @@ def test_load_csv_excel(election_day_app, excel_file):
 
 
 @pytest.mark.parametrize("excel_file", [
-    module_path('onegov.election_day', 'tests/fixtures/wb_error_v1.xls'),
-    module_path('onegov.election_day', 'tests/fixtures/wb_error_v1.xlsx'),
-    module_path('onegov.election_day', 'tests/fixtures/wb_error_v2.xls'),
-    module_path('onegov.election_day', 'tests/fixtures/wb_error_v2.xlsx'),
+    module_path('tests.onegov.election_day', 'fixtures/wb_error_v1.xls'),
+    module_path('tests.onegov.election_day', 'fixtures/wb_error_v1.xlsx'),
+    module_path('tests.onegov.election_day', 'fixtures/wb_error_v2.xls'),
+    module_path('tests.onegov.election_day', 'fixtures/wb_error_v2.xlsx'),
 ])
 def test_load_csv_excel_invalid(election_day_app, excel_file):
     with open(excel_file, 'rb') as f:

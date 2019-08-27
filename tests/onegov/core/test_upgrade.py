@@ -311,6 +311,7 @@ def test_raw_upgrade_cli(postgres_dsn, session_manager, temporary_directory,
             assert result.exit_code == 0
 
 
+@pytest.mark.skip(reason="this has to be rethought for the single module")
 def test_get_module_order_key():
     def first():
         pass

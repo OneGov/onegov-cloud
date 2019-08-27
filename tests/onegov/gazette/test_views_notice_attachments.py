@@ -8,8 +8,8 @@ from webtest.forms import Upload
 
 
 @mark.parametrize("pdf_1, pdf_2", [(
-    module_path('onegov.gazette', 'tests/fixtures/example_1.pdf'),
-    module_path('onegov.gazette', 'tests/fixtures/example_2.pdf')
+    module_path('tests.onegov.gazette', 'fixtures/example_1.pdf'),
+    module_path('tests.onegov.gazette', 'fixtures/example_2.pdf')
 )])
 def test_view_notice_attachments(gazette_app, temporary_path, pdf_1, pdf_2):
 

@@ -40,8 +40,8 @@ def test_get_list_id_from_knr():
 
 
 @mark.parametrize("tar_file", [
-    module_path('onegov.election_day',
-                'tests/fixtures/wabstic_proporz_v2.3.tar.gz'),
+    module_path('tests.onegov.election_day',
+                'fixtures/wabstic_proporz_v2.3.tar.gz'),
 ])
 def test_import_wabstic_proporz_v23(session, tar_file):
     session.add(
@@ -99,8 +99,8 @@ def test_import_wabstic_proporz_v23(session, tar_file):
 
 
 @mark.parametrize("tar_file", [
-    module_path('onegov.election_day',
-                'tests/fixtures/wabstic_proporz.tar.gz'),
+    module_path('tests.onegov.election_day',
+                'fixtures/wabstic_proporz.tar.gz'),
 ])
 def test_import_wabstic_proporz1(session, tar_file):
     session.add(

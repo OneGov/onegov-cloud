@@ -50,8 +50,8 @@ def test_view_page(swissvotes_app):
 
 
 @mark.parametrize("pdf_1, pdf_2", [(
-    module_path('onegov.swissvotes', 'tests/fixtures/example_1.pdf'),
-    module_path('onegov.swissvotes', 'tests/fixtures/example_2.pdf')
+    module_path('tests.onegov.swissvotes', 'fixtures/example_1.pdf'),
+    module_path('tests.onegov.swissvotes', 'fixtures/example_2.pdf')
 )])
 def test_view_page_attachments(swissvotes_app, temporary_path, pdf_1, pdf_2):
 

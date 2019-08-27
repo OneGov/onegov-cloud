@@ -120,7 +120,7 @@ def test_auth_login_unnecessary_yubikey(session):
     )
 
 
-def test_auth_logging(session, capturelog):
+def test_auth_logging(capturelog, session):
     UserCollection(session).add('AzureDiamond', 'hunter2', 'irc-user')
     auth = Auth(session=session, application_id='my-app')
 
