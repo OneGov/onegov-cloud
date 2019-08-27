@@ -20,7 +20,7 @@ looking for, you might appreciate these links:
 - **[Onboarding](https//start.onegovcloud.ch)**
 <br>Where you can start your own free instance
 
-- **[Changelog](changelog.md)
+- **[Changelog](CHANGES.md)**
 <br>Where you get a list of releases with relevant changes
 
 ---
