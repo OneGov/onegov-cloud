@@ -1,0 +1,54 @@
+steps:
+
+  # we can save quite a bit of compute, with a separate lint step
+  # - command: "test-container"
+  #   label: "Linting"
+
+  #   agents:
+  #     - queue=generic
+
+  #   env:
+  #     CONTAINER: "onegov-cloud:head"
+  #     CONTAINER_TEST_SCRIPT: ".buildkite/lint"
+
+  # - wait
+
+  # build the container…
+  - command: "build-container"
+    label: "Building"
+
+    agents:
+      - queue=builder
+
+    env:
+      CONTAINER: "onegov-cloud:head"
+
+  - wait
+
+  # …before running tests
+  - command: "test-container"
+    label: "Testing"
+
+    parallelism: 4
+
+    agents:
+      - queue=generic
+      - cpu=2
+      - ram=4096
+
+    env:
+      CONTAINER: "onegov-cloud:head"
+      CONTAINER_TEST_SCRIPT: ".buildkite/test"
+
+  - wait
+
+  # if this is a release, publish the container
+  - command: "publish-container"
+    label: "Publishing"
+    branches: "release-*"
+
+    agents:
+      - queue=builder
+
+    env:
+      CONTAINER: "onegov-cloud:head"

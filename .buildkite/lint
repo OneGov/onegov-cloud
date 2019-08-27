@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# automatically open the log output group if there's an error
+trap 'echo "^^^ +++"' ERR
+
+echo "--- Installing prerequisites"
+pip install flake8 nodeenv
+node=$(nodeenv --list 2>&1 | tr '\t' '\n' | grep -E '^12' | tail -n 1)
+
+nodeenv --node="$node" /tmp/node
+/tmp/node/bin/npm install -g sass-lint
+
+echo "--- Linting :python:"
+pip install flake8
+flake8 src/**.py
+
+echo "--- Linting :sasslang:"
+sass-lint -c .sass-lint.yml 'src/**/*.scss' -v -q

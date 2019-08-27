@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# automatically open the log output group if there's an error
+trap 'echo "^^^ +++"' ERR
+
+# install test requirements
+# shellcheck disable=SC2086
+echo "--- Installing requirements :redis: :postgres: :java: :chrome:"
+install-packages --keep-cache gnupg
+
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys DB69B232436DAC4B50BDC59E4E1B983C5B393194
+
+UBUNTU_CODENAME=$(grep 'UBUNTU_CODENAME' /etc/os-release | cut -d '=' -f2)
+echo "deb http://ppa.launchpad.net/canonical-chromium-builds/stage/ubuntu $UBUNTU_CODENAME main" \
+    > /etc/apt/sources.list.d/chromium.list
+echo "deb-src http://ppa.launchpad.net/canonical-chromium-builds/stage/ubuntu $UBUNTU_CODENAME main" \
+    >> /etc/apt/sources.list.d/chromium.list
+
+install-packages \
+    git-core \
+    postgresql \
+    redis \
+    openjdk-8-jre-headless \
+    gcc \
+    libc-dev \
+    chromium-browser
+
+# work around https://github.com/SergeyPirogov/webdriver_manager/issues/73
+ln -s /usr/bin/chromium-browser /usr/bin/google-chrome
+
+# Redis needs to be running
+redis-server --daemonize yes
+
+# this needs to be set on Google Cloud for unknown reasons
+echo '127.0.0.1 localhost' >> /etc/hosts
+
+# switch to virtual environment
+cd /app
+
+# shellcheck disable=SC1091
+source bin/activate
+
+# install testing dependencies
+echo "--- Installing dependencies :python:"
+cd /app/src
+pip install '.[test]' \
+    pytest-test-groups \
+    pytest-xdist \
+    --quiet
+
+# reset the build assets again (like in the upstream container script),
+# because pip install will undo that change
+find ../lib -type d -iname assets -print0 | xargs -0 chmod a+w
+
+# run the tests as a separate user
+export LC_ALL="C.UTF-8"
+export LANG="C.UTF-8"
+
+adduser --disabled-password --gecos "" test
+
+GROUP_COUNT="$BUILDKITE_PARALLEL_JOB_COUNT"
+GROUP="$(( BUILDKITE_PARALLEL_JOB + 1 ))"
+PROCESSES="$(($(grep -c ^processor /proc/cpuinfo) - 1))"
+
+echo "--- Running tests :pytest: (group: $GROUP/$GROUP_COUNT, processes: $PROCESSES)"
+set +x
+run-as "$(id -u test)":test py.test \
+    -n "$PROCESSES" \
+    -o cache_dir=/tmp/pytest \
+    --test-group "$GROUP" \
+    --test-group-count "$GROUP_COUNT" \
+    tests
