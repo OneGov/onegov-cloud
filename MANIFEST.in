@@ -1,0 +1,5 @@
+graft src/onegov
+include *.md
+global-exclude *.mo
+global-exclude *.pyc
+global-exclude __pycache__/*

@@ -1,0 +1,66 @@
+# Byte code
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.cache
+.pytest_cache/
+
+# Translation binaries
+*.mo
+*.pot
+
+# Packaging
+src/*.egg-info
+
+# Default config file
+onegov.yml
+
+# Default file storage
+file-storage
+depot-storage
+
+# Signing services config
+signing-services
+
+# IPython notebooks
+notebooks/
+.ipynb_checkpoints
+
+# Default mail directory
+mails/
+
+# Default sms directory
+sms/
+
+# Access databases for migrations
+*.mdb
+
+# Pyenv
+.python-version
+
+# Profiling information
+profiles/*
+
+# Bundles / Webassets
+.webassets-cache
+*.bundle.js
+*.bundle.css
+
+# Default virtual env
+venv/
+
+# Eggs folder
+eggs/
+
+# pytest-testmon data
+.testmondata
+
+# mypy
+.mypy_cache/*

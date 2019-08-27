@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SELF="$( cd "$(dirname "$0")" ; pwd -P )"
+REPO="$(dirname "$SELF")"
+
+function current-version() {
+    git ls-remote --tags origin \
+        | awk -F '/' '{print $NF}' \
+        | sort --reverse --version-sort\
+        | head -n 1
+}
+
+function new-version() {
+    local version
+    version="$(current-version)"
+
+    local year
+    year="$(date +"%Y")"
+
+    local build
+
+    if echo "${version}" | grep "release-${year}" -q; then
+        build="$(echo "${version}" | awk -F '.' '{print $NF}')"
+    else
+        build="1"
+    fi
+
+    echo "release-$year.$((build + 1))"
+}
+
+function release() {
+    git fetch --quiet
+
+    if ! git diff origin/master --exit-code --quiet; then
+        echo "There are unpulled remote changes, please update before release"
+        exit 1
+    fi
+
+    if [[ "$(git branch --show-current)" != "master" ]]; then
+        echo "A release can only be created on the master"
+        exit 1
+    fi
+
+    current=$(current-version)
+    new=$(new-version)
+
+    echo "Releasing $new (previous: $current)"
+    "$SELF"/changes "$new" > "$REPO/CHANGES.md"
+
+    pushd "$REPO" > /dev/null
+    git add .
+    git commit -m "Release $(new-version)"
+    git tag "$(new-version)"
+    git push
+    git push --tags
+    popd > /dev/null
+}

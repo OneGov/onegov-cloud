@@ -1,0 +1,25 @@
+rules:
+  no-css-comments: 0
+  indentation:
+    - 2
+    -
+      size: 4
+  force-pseudo-nesting: 0
+  no-ids: 0
+  force-element-nesting: 0
+  class-name-format: 0
+  no-important: 0
+  no-qualifying-elements: 0
+  no-trailing-zero: 0
+  nesting-depth: 0
+  force-attribute-nesting: 0
+  quotes: 0
+  no-vendor-prefixes: 0
+  no-color-literals: 0
+  no-transition-all: 0
+
+files:
+  ignore:
+    - '**/font-awesome/scss/*.scss'
+    - '**/foundation/*/*.scss'
+    - '**/font-*.scss'

@@ -1,0 +1,138 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+function script-path() {
+    echo "$( cd "$(dirname "$0")" ; pwd -P )"
+}
+
+function repository-path() {
+    dirname "$(script-path)"
+}
+
+function is-known-binary () {
+    type "$1" &> /dev/null;
+}
+
+function help() {
+    echo ""
+    echo "Usage: bash do/translate module-name [language]"
+    echo ""
+    echo "To update the translations in a module:"
+    echo "do/translate onegov.org"
+    echo ""
+    echo "To add a language to a module:"
+    echo "do/translate onegov.org fr_CH"
+    echo ""
+
+    exit 1
+}
+
+function main() {
+    local module="${1-}"
+    local locale="${2-}"
+
+    # check the provided path
+    if [[ "$module" == "" ]]; then
+        echo "Please pass in a module (e.g. do/translate onegov.org)"
+        help
+    fi
+
+    local modulepath
+    modulepath="$(repository-path)/src/${module/\./\/}"
+
+    if [[ ! -d "$modulepath" ]]; then
+        echo "Unknown module: $module"
+        echo "Path not found: $modulepath"
+        exit 1
+    fi
+
+    local localepath
+    localepath="$(repository-path)/src/${module/\./\/}/locale"
+    mkdir -p "$localepath"
+
+    # ensure gettext presence
+    local msginit
+    local msgmerge
+    local msgfmt
+    local potcreate="${VIRTUAL_ENV}/bin/pot-create"
+
+    if is-known-binary brew; then
+        if brew list | grep gettext -q; then
+            local prefix
+            prefix=$(brew --prefix)
+
+            local gettext
+            gettext=$(brew info gettext | grep "${prefix}" | awk '{print $1; exit}')
+
+            msginit="${gettext}/bin/msginit"
+            msgmerge="${gettext}/bin/msgmerge"
+            msgfmt="${gettext}/bin/msgfmt"
+        else
+            echo "Homebrew was found, but gettext is not installed"
+            echo "Install gettext using 'brew install gettext'"
+            exit 1
+        fi
+    else
+        msginit=$(command -v msginit)
+        msgmerge=$(command -v msgmerge)
+        msgfmt=$(command -v msgfmt)
+    fi
+
+    if [ ! -e "${potcreate}" ]; then
+        echo "pot-create command could not be found, please run make install"
+        exit 1
+    fi
+
+    if [ ! -e "${msginit}" ]; then
+        echo "msginit command could not be found, be sure to install gettext"
+        exit 1
+    fi
+
+    if [ ! -e "${msgmerge}" ]; then
+        echo "msgmerge command could not be found, be sure to install gettext"
+        exit 1
+    fi
+
+    if [ ! -e "${msgfmt}" ]; then
+        echo "msgfmt command could not be found, be sure to install gettext"
+        exit 1
+    fi
+
+    # add a new language, before translating
+    if [[ "$locale" != "" ]]; then
+        if echo "${locale}" | grep -E -v -q '^[a-z]{2}(_[A-Z]{2})?$'; then
+            echo "Invalid language code, valid examples: de_CH, en_GB, en, de, ..."
+            echo "The language code is lowercased, the optional country code is uppercased."
+            exit 1
+        fi
+
+        if [[ -e "${localepath}/${locale}/LC_MESSAGES" ]]; then
+            echo "Cannot initialize $locale, it exists already!"
+            exit 1
+        fi
+
+        mkdir -p "${localepath}/${locale}/LC_MESSAGES"
+        touch "${localepath}/${module}.pot"
+
+        $msginit -l "${locale}" \
+                 -i "${localepath}/${module}.pot" \
+                 -o "${localepath}/${locale}/LC_MESSAGES/$module.po"
+    fi
+
+    echo "Extracting messages"
+    $potcreate "$modulepath" \
+        --output "${localepath}/${module}.pot" \
+        --sort-by-file \
+        --copyright-holder "Seantis GmbH" \
+        --package-name "OneGov Cloud"
+
+    echo "Updating translations"
+    for po in "${modulepath}"/locale/*/LC_MESSAGES/"$module".po; do
+        $msgmerge \
+            --no-location \
+            --no-fuzzy-matching -o "${po}" "${po}" \
+            "${localepath}/${module}.pot"
+    done
+}
+
+main "$@"

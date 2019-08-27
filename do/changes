@@ -1,0 +1,268 @@
+#!/usr/bin/env python
+""" Renders the changelog from the last release up to the latest commit. """
+
+import git
+import re
+import sys
+
+from attr import attrs
+from itertools import groupby, tee
+from typing import Optional
+
+
+COMMIT_HEADER = re.compile(r'^[A-Z]{1}[A-Za-z_\- ]{2,15}: ')
+RELEASE_TAG = re.compile(r'release-[0-9]{4}\.[0-9]+')
+
+
+@attrs(auto_attribs=True)
+class ChangelogCommit(object):
+
+    module: str
+    title: str
+    type: str
+
+    commit: git.Commit
+    link: Optional[str] = None
+    note: Optional[str] = None
+
+    @classmethod
+    def is_match(cls, commit):
+        return COMMIT_HEADER.match(commit.message)
+
+    @classmethod
+    def parse(cls, commit):
+        assert cls.is_match(commit)
+
+        lines = commit.message.strip().splitlines()
+        module, title = lines[0].split(':', 1)
+
+        module = module.title()
+        title = title.strip().capitalize()
+
+        note = []
+        type = 'Other'
+        link = None
+
+        for line in lines[1:]:
+
+            if line.startswith('TYPE'):
+                type = line.split(':', 1)[-1].strip().capitalize()
+                continue
+
+            if line.startswith('LINK'):
+                link = line.split(':', 1)[-1].strip()
+                continue
+
+            note.append(line)
+
+        note = '\n'.join(note)
+
+        note = note.replace('[ci skip]', '')
+        note = note.replace('[skip ci]', '')
+        note = note.strip()
+
+        title = title.replace('[ci skip]', '')
+        title = title.replace('[skip ci]', '')
+        title = title.strip()
+
+        return cls(
+            module=module,
+            title=title,
+            type=type,
+            commit=commit,
+            link=link,
+            note=note
+        )
+
+    @property
+    def emoji(self):
+        if self.type == 'Feature':
+            return '🎉'
+
+        if self.type == 'Bugfix':
+            return '🐞'
+
+        return '✨'
+
+    @property
+    def short(self):
+        return self.commit.hexsha[:10]
+
+    @property
+    def url(self):
+        hex = self.commit.hexsha
+        return f'https://github.com/onegov/onegov-cloud/commit/{hex}'
+
+    @property
+    def type_order(self):
+        if self.type == 'Feature':
+            return 0
+
+        if self.type != 'Bugfix':
+            return 1
+
+        return 2
+
+    @property
+    def link_url(self):
+        if not self.link:
+            return
+
+        link = self.link
+
+        # issues tracked on GitHub
+        if self.link.isdigit():
+            return f'https://github.com/onegov/onegov-cloud/issues/{link}'
+
+        # issues tracked internally
+        if self.link.startswith(('FER-', 'VOTES-')):
+            return f'https://issues.seantis.ch/browse/{link}'
+
+        # issues tracked on other sites
+        if self.link.startswith(('SA-', 'FW-')):
+            return f'https://stadt-winterthur.atlassian.net/browse/{link}'
+
+        if self.link.startswith('FW-'):
+            return f'https://stadt-winterthur.atlassian.net/browse/'
+
+        if self.link.startswith('ZW-'):
+            return f'https://kanton-zug.atlassian.net/browse/'
+
+        # default to a non-functioning link (they can be added later)
+        return f'#{self.link}'
+
+
+def pairwise(iterable):
+    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
+    a, b = tee(iterable)
+    next(b, None)
+    return zip(a, b)
+
+
+def commits_between(repository, newer, older):
+    revisions = f'{older.hexsha}..{newer.hexsha}'
+    commits = repository.iter_commits(revisions, reverse=True)
+
+    for commit in commits:
+        if commit == older:
+            continue
+
+        yield commit
+
+        if commit == newer:
+            break
+
+
+def release_tags(repository):
+    for tag in repository.tags:
+        if RELEASE_TAG.match(tag.name):
+            yield tag
+
+
+def release_number(tag):
+    return tag.name.rsplit('-', 1)[-1]
+
+
+def release_date(tag):
+    return tag.commit.committed_datetime
+
+
+def format_datetime(dt):
+    return dt.strftime("%Y-%m-%d %H:%M")
+
+
+def parse_commit(commit):
+    pass
+
+
+def changelog(folder, new):
+    repository = git.Repo(folder, odbt=git.GitDB)
+
+    tags = list(release_tags(repository))
+    tags.sort(key=lambda t: (t.commit.committed_date, t.name), reverse=True)
+
+    # header
+    print("# Changes")
+    print("")
+
+    # not yet released
+    if new == 'Unreleased':
+        print(f"## Unreleased")
+    else:
+        print(f"## Release `{new.rsplit('-', 1)[-1]}`")
+    print("")
+
+    changelog_commits(new, repository, repository.head.commit, tags[-1].commit)
+
+    # releases (the last version is not included by design)
+    for newer, older in pairwise(tags):
+        print(f"## Release `{release_number(newer)}`")
+        print("")
+
+        # print the release overview
+        print(f"> Released: **{format_datetime(release_date(newer))}**<br>")
+        print("")
+
+        changelog_commits(newer.name, repository, newer.commit, older.commit)
+
+
+def changelog_commits(release, repository, newer, older):
+    commits = commits_between(repository, newer, older)
+    commits = tuple(commits)
+
+    # quit if there are no commits
+    if not commits:
+        print("No changes since last release")
+        print("")
+        return
+
+    # show the commit range
+    lo = commits[0].hexsha[:10]
+    hi = commits[-1].hexsha[:10]
+    url = f'https://github.com/OneGov/onegov-cloud/compare/{hi}...{lo}'
+    print(f"> commits: **{len(commits)} / [{lo}...{hi}]({url})**<br>")
+    print((
+        f"> [![Build status](https://badge.buildkite.com"
+        f"/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg"
+        f"?branch={release})](https://buildkite.com/seantis/onegov-cloud)"
+    ))
+    print("")
+
+    # parse the commit messages
+    commits = [
+        ChangelogCommit.parse(c) for c in commits
+        if ChangelogCommit.is_match(c)
+    ]
+
+    # sort the result by name and type
+    commits.sort(key=lambda k: (k.module, k.type_order))
+
+    # print the resulting information
+    for module, commit in groupby(commits, key=lambda c: c.module):
+        print(f"### `{module}`")
+        print("")
+
+        for c in commit:
+            print(f"{c.emoji} **{c.title}**")
+            print("")
+
+            if c.note:
+                print(c.note)
+                print("")
+
+            print(f"**`{c.type}`**", end='')
+
+            if c.link:
+                print(f" | **[{c.link}]({c.link_url})", end='')
+
+            print(f" | **[{c.short}]({c.url})**")
+            print("")
+
+
+if __name__ == '__main__':
+    if len(sys.argv) == 1:
+        new = "Unreleased"
+    else:
+        new = sys.argv[1]
+
+    changelog('.', new)
