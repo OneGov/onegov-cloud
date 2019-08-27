@@ -1,0 +1,218 @@
+# OneGov Cloud Example Configuration
+# ----------------------------------
+
+# The following block is shared with all applications below, though each
+# application may override any or all values.
+configuration: &global-config
+
+  # OneGov only accepts requests with URLs matching the following expression,
+  # in addition to localhost, which is always allowed.
+  allowed_hosts_expression: '^[a-z0-9-\.]+.(dev|test|io)'
+
+  # Additional exceptions to the host expressions can be listed one by one
+  # here (those are not expressions, but full host names)
+  # allowed_hosts:
+  #   - example.org
+
+  # The DSN to the postgres serve in use. The database has to exist and onegov
+  # processes must have access. To create the db in the following example, you
+  # can simply use 'createdb onegov' on a host with postgres installed.
+  dsn: postgresql://localhost:5432/onegov
+
+  # Set this to true for production deployments. It ensures that cookies are
+  # only sent over a secure connection (TLS)
+  identity_secure: false
+
+  # The secrets with which cookie identities and CSRF tokens are created.
+  #
+  # If not given, a random secret will be created every time the host reboots.
+  # Has to be different for each application and should be configured
+  # explicitly on production systems.
+  #
+  # identity_secret: very-secret-key
+  # csrf_secret: another-very-secret-key
+
+  # OneGov knows two kinds of file storage. The first is called 'filestorage'
+  # and it only supports very simple storage without links to the database.
+  filestorage: fs.osfs.OSFS
+  filestorage_options:
+    root_path: '/usr/local/var/onegov/files'
+    create: true
+    dir_mode: 0755
+
+  # The second kind of storage is depot, which is linked with the database
+  # and is used more often and is the default for new deployments
+  depot_backend: 'depot.io.local.LocalFileStorage'
+  depot_storage_path: '/usr/local/var/onegov/depot'
+
+  # Theme compilation is quick and in development it is possible to always
+  # compile theme on every request.
+  always_compile_theme: false
+
+  # Some browsers send a special header when a user clicks on refresh while
+  # holding down shift. The following setting will recompile themes whenever
+  # that happens.
+  allow_shift_f5_compile: false
+
+  # OneGov keeps track of queries run against postgres and reports the
+  # redundant ones when 'redundant' is selected. Other possible values are
+  # 'all' and 'none', to either get a print of all queries or none.
+  sql_query_report: redundant
+
+  # If this is set to true, each request will create a cprofile in the
+  # profiles folder. This slows down requests significantly.
+  profile: false
+
+  # Configures signing services (digital PDF signing), can be left out
+  # signing_services: './signing-services'
+
+  # Configures sentry tracebacks, usually only used in production or if
+  # the sentry integration needs to be tested.
+  # sentry_dsn: https://foo@sentry.io/bar
+  # sentry_environment: testing
+  # sentry_version: test
+
+  # Onegov holds two sorts of mail. Transactional, non-spammy e-mail or
+  # marketing e-mail. Though they can both have different configurations,
+  # in development we usually use https://mailcatcher.me to look at
+  # sent e-mails.
+  mail:
+    transactional:
+      host: localhost
+      port: 1025
+      force_tls: false
+      username:
+      password:
+      sender: service@onegovcloud.ch
+      use_directory: false
+      directory: '/usr/local/var/onegov/mail'
+    marketing:
+      host: localhost
+      port: 1025
+      force_tls: false
+      username:
+      password:
+      sender: newsletters@onegovcloud.ch
+      use_directory: false
+      directory: '/usr/local/var/onegov/mail'
+
+  # To test yubikey integration, a yubikey API access token has to be provided
+  # yubikey_client_id:
+  # yubikey_secret_key:
+
+  # To test mapbox integration, a mapbox token has to be provided
+  # mapbox_token:
+
+  # How long a user can fill out a form before we consider it too old
+  csrf_time_limit: 3600  # in minutes
+
+  # True if payment provider integration is used
+  payment_providers_enabled: false
+
+  # Stripe configuration with oauth gateway
+  payment_provider_defaults:
+    stripe_connect:
+      client_id: foo
+      client_secret: bar
+      # the gateway through which the redirects go
+      oauth_gateway: https://oauth.example.org
+      # the key needed to authenticate oneself with the gateway
+      oauth_gateway_auth: foobar
+      # the client-specific secret that is used to authenticate the
+      oauth_gateway_secret: barfoo
+
+# All supported applications
+applications:
+
+  - path: /onegov_town/*
+    application: onegov.town.TownApp
+    namespace: onegov_town
+    configuration:
+      <<: *global-config
+
+  - path: /onegov_agency/*
+    application: onegov.agency.AgencyApp
+    namespace: onegov_agency
+    configuration:
+      <<: *global-config
+
+  - path: /onegov_org/*
+    application: onegov.org.OrgApp
+    namespace: onegov_org
+    configuration:
+      <<: *global-config
+
+  - path: /onegov_feriennet/*
+    application: onegov.feriennet.FeriennetApp
+    namespace: onegov_feriennet
+    configuration:
+      <<: *global-config
+
+  - path: /onegov_election_day/*
+    application: onegov.election_day.ElectionDayApp
+    namespace: onegov_election_day
+    configuration:
+      <<: *global-config
+
+  - path: /onegov_intranet/*
+    application: onegov.intranet.IntranetApp
+    namespace: onegov_intranet
+    configuration:
+      <<: *global-config
+
+  - path: /onegov_winterthur/*
+    application: onegov.winterthur.WinterthurApp
+    namespace: onegov_winterthur
+    configuration:
+      <<: *global-config
+
+  - path: /onegov_swissvotes/*
+    application: onegov.swissvotes.SwissvotesApp
+    namespace: onegov_swissvotes
+    configuration:
+      <<: *global-config
+
+  - path: /onegov_wtfs/*
+    application: onegov.wtfs.WtfsApp
+    namespace: onegov_wtfs
+    configuration:
+      <<: *global-config
+
+  - path: /onegov_onboarding
+    application: onegov.onboarding.OnboardingApp
+    namespace: onegov_onboarding
+    configuration:
+      <<: *global-config
+
+      onboarding:
+        onegov.town:
+          namespace: onegov_town
+          domain: onegov.test
+          configuration:
+            depot_backend: depot.io.local.LocalFileStorage
+            depot_storage_path: /usr/local/var/onegov/depot
+
+# Default logging output
+logging:
+  disable_existing_loggers: true
+
+  formatters:
+    default:
+      format: '%(asctime)s - %(levelname)s: %(message)s'
+      datefmt: '%Y-%m-%d %H:%M:%S'
+
+  handlers:
+    console:
+      class: logging.StreamHandler
+      formatter: default
+      level: DEBUG
+      stream: ext://sys.stdout
+
+  loggers:
+    onegov:
+      level: DEBUG
+      handlers: [console]
+      propagate: False
+    stripe:
+      level: INFO
+      handlers: [console]
