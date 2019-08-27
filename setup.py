@@ -153,6 +153,7 @@ setup(
             'pytest-xdist',
             'scrambler',
             'lingua==3.12',
+            'gitpython',
         ],
         'test': [
             'Pillow!=5.4.0',
