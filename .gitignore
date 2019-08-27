@@ -61,6 +61,7 @@ eggs/
 
 # pytest-testmon data
 .testmondata
+.tmontmp
 
 # mypy
 .mypy_cache/*
