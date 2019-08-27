@@ -72,8 +72,7 @@ else
 fi
 
 run-as "$(id -u test)":test py.test \
-    "${xdist[@]}" \
     -o cache_dir=/tmp/pytest \
     --test-group "$GROUP" \
-    --test-group-count "$GROUP_COUNT" \
+    --test-group-count "$GROUP_COUNT" "${xdist[@]}" \
     tests
