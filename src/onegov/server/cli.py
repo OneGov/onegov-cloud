@@ -109,7 +109,8 @@ RESOURCE_TRACKER = None
 )
 @click.option(
     '--sentry-dsn',
-    help="Sentry DSN to use (production mode only)"
+    help="Sentry DSN to use (production mode only)",
+    default=None,
 )
 @click.option(
     '--sentry-environment',
@@ -156,7 +157,7 @@ def run(config_file, port, pdb, tracemalloc, mode,
     if mode == 'debug':
         return run_debug(config_file, port, pdb, tracemalloc)
 
-    if not sentry_dsn:
+    if sentry_dsn:
         sentry_sdk.init(
             dsn=sentry_dsn,
             release=sentry_release,
