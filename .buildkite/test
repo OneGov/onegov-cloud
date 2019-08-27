@@ -65,14 +65,15 @@ PROCESSES="$(($(grep -c ^processor /proc/cpuinfo) - 1))"
 echo "--- Running tests :pytest: (group: $GROUP/$GROUP_COUNT, processes: $PROCESSES)"
 set +x
 
-if [[ "$PROCESSES" == "0" ]]; then
-    xdist=()
+if [[ "$PROCESSES" == "1" ]]; then
+    xdist=""
 else
-    xdist=(-n "$PROCESSES")
+    xdist="-n $PROCESSES"
 fi
 
+# shellcheck disable=SC2086
 run-as "$(id -u test)":test py.test \
     -o cache_dir=/tmp/pytest \
     --test-group "$GROUP" \
-    --test-group-count "$GROUP_COUNT" "${xdist[@]}" \
+    --test-group-count "$GROUP_COUNT" $xdist \
     tests
