@@ -33,7 +33,7 @@ function release() {
     git fetch --quiet
 
     if ! git diff origin/master --exit-code --quiet; then
-        echo "There are unpulled remote changes, please update before release"
+        echo "There are unpulled/unpushed remote changes, please update before release"
         exit 1
     fi
 
