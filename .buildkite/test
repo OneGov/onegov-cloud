@@ -46,7 +46,6 @@ echo "--- Installing dependencies :python:"
 cd /app/src
 pip install '.[test]' \
     pytest-test-groups \
-    pytest-xdist \
     --quiet
 
 # reset the build assets again (like in the upstream container script),
@@ -65,8 +64,15 @@ PROCESSES="$(($(grep -c ^processor /proc/cpuinfo) - 1))"
 
 echo "--- Running tests :pytest: (group: $GROUP/$GROUP_COUNT, processes: $PROCESSES)"
 set +x
+
+if [[ "$PROCESSES" == "0" ]]; then
+    xdist=()
+else
+    xdist=(-n "$PROCESSES")
+fi
+
 run-as "$(id -u test)":test py.test \
-    -n "$PROCESSES" \
+    "${xdist[@]}" \
     -o cache_dir=/tmp/pytest \
     --test-group "$GROUP" \
     --test-group-count "$GROUP_COUNT" \
