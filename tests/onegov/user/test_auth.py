@@ -126,18 +126,21 @@ def test_auth_logging(capturelog, session):
 
     # XXX do not change the following messages, as they are used that way in
     # fail2ban already and should remain exactly the same
+    capturelog.handler.records.clear()
     auth.authenticate(username='AzureDiamond', password='hunter1')
     assert capturelog.records()[0].message \
         == "Failed login by unknown (AzureDiamond)"
 
+    capturelog.handler.records.clear()
     auth.authenticate(
         username='AzureDiamond', password='hunter1', client='127.0.0.1')
-    assert capturelog.records()[1].message \
+    assert capturelog.records()[0].message \
         == "Failed login by 127.0.0.1 (AzureDiamond)"
 
+    capturelog.handler.records.clear()
     auth.authenticate(
         username='AzureDiamond', password='hunter2', client='127.0.0.1')
-    assert capturelog.records()[2].message \
+    assert capturelog.records()[0].message \
         == "Successful login by 127.0.0.1 (AzureDiamond)"
 
 
