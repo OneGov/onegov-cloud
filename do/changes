@@ -193,7 +193,7 @@ def changelog(folder, new):
         print(f"## Release `{new.rsplit('-', 1)[-1]}`")
     print("")
 
-    changelog_commits(new, repository, repository.head.commit, tags[-1].commit)
+    changelog_commits(new, repository, tags[-1].commit, repository.head.commit)
 
     # releases (the last version is not included by design)
     for newer, older in pairwise(tags):
@@ -201,8 +201,7 @@ def changelog(folder, new):
         print("")
 
         # print the release overview
-        print(f"> Released: **{format_datetime(release_date(newer))}**<br>")
-        print("")
+        print(f"> released: **{format_datetime(release_date(newer))}**<br>")
 
         changelog_commits(newer.name, repository, newer.commit, older.commit)
 
@@ -220,8 +219,8 @@ def changelog_commits(release, repository, newer, older):
     # show the commit range
     lo = commits[0].hexsha[:10]
     hi = commits[-1].hexsha[:10]
-    url = f'https://github.com/OneGov/onegov-cloud/compare/{hi}...{lo}'
-    print(f"> commits: **{len(commits)} / [{hi}...{lo}]({url})**<br>")
+    url = f'https://github.com/OneGov/onegov-cloud/compare/{lo}...{hi}'
+    print(f"> commits: **{len(commits)} / [{lo}...{hi}]({url})**<br>")
     print((
         f"> [![Build status](https://badge.buildkite.com"
         f"/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg"
