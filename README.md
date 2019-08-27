@@ -20,6 +20,9 @@ looking for, you might appreciate these links:
 - **[Onboarding](https//start.onegovcloud.ch)**
 <br>Where you can start your own free instance
 
+- **[Changelog](changelog.md)
+<br>Where you get a list of releases with relevant changes
+
 ---
 
 [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg)](https://buildkite.com/seantis/onegov-cloud)
