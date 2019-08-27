@@ -37,7 +37,8 @@ class ChangelogCommit(object):
         module, title = lines[0].split(':', 1)
 
         module = module.title()
-        title = title.strip().capitalize()
+        title = title.strip()
+        title = f'{title[0].upper()}{title[1:]}'
 
         note = []
         type = 'Other'
