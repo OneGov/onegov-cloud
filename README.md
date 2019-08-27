@@ -74,6 +74,10 @@ For example:
 
 Commits that do not follow this scheme are not included in the changelog.
 
+To preview the changelog at any point, make your commit locally (with the
+appropriate message) and run `do/change`. This will render the complete
+changelog in markdown. Your commit should be somewhere at the top.
+
 ## Requirements ☝️
 
 To run OneGov Cloud locally, you must meet the following requirements:
