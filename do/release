@@ -56,3 +56,5 @@ function release() {
     git push --tags
     popd > /dev/null
 }
+
+release
