@@ -40,11 +40,6 @@ html {
     }
 }
 
-html,
-body {
-    height: 100%;
-}
-
 /*
     Rounded corners for panels.
 */
@@ -80,9 +75,9 @@ h2 small {
 
             li {
                 flex: 1 1 auto;
-                text-align: center;
                 float: none !important;
                 max-width: 11rem;
+                text-align: center;
 
                 a {
                     padding: 0 .5rem !important;

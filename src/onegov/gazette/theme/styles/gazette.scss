@@ -152,6 +152,7 @@ ul.pagination li.last {
     .stacktable.large-only { display: none; }
     .stacktable.small-only { display: table; }
     .stacktable th.st-head-row-main { display: none; }
+
     .stackable .answer {
         text-align: right;
     }
@@ -162,10 +163,6 @@ ul.pagination li.last {
         font-size: 1.2em;
         padding-top: 2em;
         text-align: center;
-    }
-
-    .stackable .answer {
-        text-align: right;
     }
 
     table tr.total {
@@ -647,7 +644,7 @@ a.button.right {
 }
 
 .sub-nav-chosen {
-    @include clearfix();
+    @include clearfix;
 
     background-color: #f5f5f5;
     margin: 0;

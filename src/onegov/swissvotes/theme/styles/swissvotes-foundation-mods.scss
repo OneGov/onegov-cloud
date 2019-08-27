@@ -32,7 +32,7 @@ $yellow-dark: #cca000;
 $yellow-light: #ffe480;
 $yellow-pastel: #fff4cc;
 $gainsboro: #d4d4d4;
-$black: #333333;
+$black: #333;
 
 /*
     Main colors
@@ -119,9 +119,9 @@ $primary-fg-color: if(lightness($primary-color) >= 60%, $body-font-color, $white
 $button-font-color: $primary-fg-color;
 
 @if lightness($primary-color) >= 50% {
-    $anchor-font-color: scale-color($anchor-font-color, $lightness: -45%, $saturation: +10%);
-    $crumb-font-color: scale-color($crumb-font-color, $lightness: -45%, $saturation: +10%);
-    $side-nav-link-color: scale-color($side-nav-link-color, $lightness: -45%, $saturation: +10%);
+    $anchor-font-color: scale-color($anchor-font-color, $lightness: -45%, $saturation: 10%);
+    $crumb-font-color: scale-color($crumb-font-color, $lightness: -45%, $saturation: 10%);
+    $side-nav-link-color: scale-color($side-nav-link-color, $lightness: -45%, $saturation: 10%);
 }
 
 

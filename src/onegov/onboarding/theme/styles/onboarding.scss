@@ -45,7 +45,7 @@ body {
     margin: 0 auto (-$footer-height);
 
     @media not print {
-      min-height: 100%;
+        min-height: 100%;
     }
 }
 
@@ -229,7 +229,7 @@ footer {
         display: none;
     }
 
-    > ul:before {
+    > ul::before {
         background: $white;
         border: inherit;
         border-bottom: 0;
