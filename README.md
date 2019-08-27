@@ -20,9 +20,9 @@ looking for, you might appreciate these links:
 - **[Onboarding](https//start.onegovcloud.ch)**
 <br>Where you can start your own free instance
 
-[![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg)](https://buildkite.com/seantis/onegov-cloud)
-
 ---
+
+[![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg)](https://buildkite.com/seantis/onegov-cloud)
 
 ## Branches 🖖
 
@@ -65,7 +65,7 @@ up in the release history, it needs to be written as follows:
 
 For example:
 
-    onegov.org: Adds an customizable footer
+    Election-Day: Adds an customizable footer
 
     The footer can be customized in the settings, by admin users.
 
@@ -74,9 +74,38 @@ For example:
 
 Commits that do not follow this scheme are not included in the changelog.
 
+**Module Name**
+
+The module name may be any valid string that starts with an uppercase
+character and is less than 17 characters long.
+
+Examples:
+
+* `Core`
+* `Org`
+* `Search`
+
+**Type**
+
+The type may be one of these values:
+
+* `Feature`
+* `Bugfix`
+* `Other`
+
+**Link**
+
+The link points to an issue, if there is any (optional). For example:
+
+* `101` - points to GitHub Issue 101 in the `onegov-cloud` repository.
+* `VOTES-1` - points to the first election day issue in the internal tracker.
+
 To preview the changelog at any point, make your commit locally (with the
-appropriate message) and run `do/change`. This will render the complete
+appropriate message) and run `do/changes`. This will render the complete
 changelog in markdown. Your commit should be somewhere at the top.
+
+If the commit you did does not show up, check to make sure that the module
+name is valid (first character must be uppercase!).
 
 ## Requirements ☝️
 
