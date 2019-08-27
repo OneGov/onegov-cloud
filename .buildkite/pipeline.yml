@@ -1,17 +1,17 @@
 steps:
 
   # we can save quite a bit of compute, with a separate lint step
-  # - command: "test-container"
-  #   label: "Linting"
+  - command: "test-container"
+    label: "Linting"
 
-  #   agents:
-  #     - queue=generic
+    agents:
+      - queue=generic
 
-  #   env:
-  #     CONTAINER: "onegov-cloud:head"
-  #     CONTAINER_TEST_SCRIPT: ".buildkite/lint"
+    env:
+      CONTAINER: "onegov-cloud:head"
+      CONTAINER_TEST_SCRIPT: ".buildkite/lint"
 
-  # - wait
+  - wait
 
   # build the container…
   - command: "build-container"
