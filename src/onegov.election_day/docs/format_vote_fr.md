@@ -2,6 +2,8 @@
 
 Les formats de fichier acceptés sont les fichiers générés à la main par le programme électoral « Élections et référendums de Wabsti (VRSG) », ou par l'application web elle-même.
 
+«Municipalité» fait référence à un district, une circonscription électorale, etc.
+
 ## Contenu
 
 <!-- TOC START min:1 max:4 link:true asterisk:false update:true -->

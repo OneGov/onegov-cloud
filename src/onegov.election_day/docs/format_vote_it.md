@@ -2,6 +2,8 @@
 
 I formati di file accettabili sono file generati manualmente, dal software elettorale "Wabsti Elections and Referenda (VRSG)" o dall'applicazione web stessa.
 
+"Comune" si riferisce ad un distretto, una circoscrizione elettorale, etc.
+
 ## Contenuto
 
 <!-- TOC START min:1 max:4 link:true asterisk:false update:true -->

@@ -79,8 +79,6 @@ def test_category(session):
     session.flush()
     assert session.query(GazetteNotice).one().category == 'Vote'
 
-    def session(self):
-        return self._session
 
 def test_organization(session):
     session.add(

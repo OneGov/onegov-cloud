@@ -367,7 +367,13 @@ Changelog
 - Updates translations.
   [msom]
 
-1.12.4 (2018-01-18)
+1.13.4 (2018-01-19)
+~~~~~~~~~~~~~~~~~~~
+
+- Assigns publication numbers when publishing the issue.
+  [msom]
+
+1.13.3 (2018-01-18)
 ~~~~~~~~~~~~~~~~~~~
 
 - Fixes print only option not set when creating a new notice.
@@ -409,13 +415,13 @@ Changelog
 - Fixes mails with attachments.
   [msom]
 
-- Requires Python 3.6.
-  [href]
+- Adds changelog entries when editing attachments.
+  [msom]
 
-1.11.2 (2017-12-22)
+1.12.0 (2017-12-11)
 ~~~~~~~~~~~~~~~~~~~
 
-- Updates dependencies.
+- Adds attachments to notices.
   [msom]
 
 1.11.1 (2017-12-08)

@@ -606,11 +606,8 @@ msgstr "Annehmen"
 msgid "Copy"
 msgstr "Kopieren"
 
-msgid "Submit"
-msgstr "Einreichen"
-
-msgid "Accept"
-msgstr "Annehmen"
+msgid "Preview"
+msgstr "Vorschau"
 
 msgid "Reject"
 msgstr "Zurückweisen"

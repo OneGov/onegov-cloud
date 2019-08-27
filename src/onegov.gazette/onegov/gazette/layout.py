@@ -270,9 +270,6 @@ class Layout(ChameleonLayout):
     def format_text(self, text):
         return '<br>'.join((text or '').splitlines())
 
-    def format_text(self, text):
-        return '<br>'.join((text or '').splitlines())
-
 
 class MailLayout(Layout):
     """ A special layout for creating HTML E-Mails. """

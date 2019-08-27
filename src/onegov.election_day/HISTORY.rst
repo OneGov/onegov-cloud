@@ -423,153 +423,6 @@ Changelog
 3.4.1 (2018-04-09)
 ~~~~~~~~~~~~~~~~~~~
 
-- Adds vote views for districts.
-  [msom]
-
-- Adds entities and districts heatmaps for candidates and lists.
-  [msom]
-
-- Fixes throwing an error on unexpected principal configuration options.
-  [msom]
-
-3.5.9 (2018-06-19)
-~~~~~~~~~~~~~~~~~~~
-
-- Add compatibility with wtforms 2.2.
-  [msom]
-
-3.5.8 (2018-06-18)
-~~~~~~~~~~~~~~~~~~~
-
-- Fixes importing XLSX files with only one column not working.
-  [msom]
-
-3.5.7 (2018-06-11)
-~~~~~~~~~~~~~~~~~~~
-
-- Prefills the email when unsubscribing from the newsletter.
-  [msom]
-
-- Updates javascript libraries.
-  [msom]
-
-- Fixes table sorting.
-  [msom]
-
-3.5.6 (2018-06-08)
-~~~~~~~~~~~~~~~~~~~
-
-- Make wabsti (majorz) import more robust.
-  [msom]
-
-3.5.5 (2018-06-04)
-~~~~~~~~~~~~~~~~~~~
-
-- Removes the radius from the panels.
-  [msom]
-
-3.5.4 (2018-06-04)
-~~~~~~~~~~~~~~~~~~~
-
-- Fixes placing of the expats/globe tooltip.
-  [msom]
-
-- Fixes sankey chart trying to render empty nodes and links.
-  [msom]
-
-3.5.3 (2018-06-04)
-~~~~~~~~~~~~~~~~~~~
-
-- Improves responsive behaviour.
-  [msom]
-
-3.5.2 (2018-05-29)
-~~~~~~~~~~~~~~~~~~~
-
-- Hides related elections title if empty.
-  [msom]
-
-3.5.1 (2018-05-29)
-~~~~~~~~~~~~~~~~~~~
-
-- Adds compatibility with babel 2.6.
-  [msom]
-
-3.5.0 (2018-05-17)
-~~~~~~~~~~~~~~~~~~~
-
-- Allows to add related elections to elections.
-  [msom]
-
-- Allows to specify the majority type of a majorz election.
-  [msom]
-
-3.4.7 (2018-05-15)
-~~~~~~~~~~~~~~~~~~~
-
-- Adds the node titles to the sankey links.
-  [msom]
-
-- Uses 'mandates' for propoz elections, 'seats' for majorz elections.
-  [msom]
-
-3.4.6 (2018-05-07)
-~~~~~~~~~~~~~~~~~~~
-
-- Updates translations.
-  [msom]
-
-- Orders the list panachage nodes by alphabet (if possible).
-  [msom]
-
-3.4.5 (2018-04-26)
-~~~~~~~~~~~~~~~~~~~
-
-- Adds an option to allow regional elections to span over several districts.
-  [msom]
-
-- Improve wabsti import.
-  [msom]
-
-3.4.4 (2018-04-24)
-~~~~~~~~~~~~~~~~~~~
-
-- Adds CORS header to JSON views.
-  [msom]
-
-- Runs the CLI tests in a separate process.
-  [msom]
-
-- Improves the import when using the internal format.
-  [msom]
-
-3.4.3 (2018-04-13)
-~~~~~~~~~~~~~~~~~~~
-
-- Removes XLSX export.
-  [msom]
-
-- Fixes district/entity not shown in election compounds PDF.
-  [msom]
-
-- Uses a fixed callout color.
-  [msom]
-
-- Adds titles to emails.
-  [msom]
-
-3.4.2 (2018-04-10)
-~~~~~~~~~~~~~~~~~~~
-
-- Fixes district/entity not shown in election compounds.
-  [msom]
-
-- Improves performance.
-  [msom]
-
-3.4.1 (2018-04-09)
-~~~~~~~~~~~~~~~~~~~
-
 - Updates translations.
   [msom]
 
@@ -633,19 +486,25 @@ Changelog
 3.0.0 (2018-03-08)
 ~~~~~~~~~~~~~~~~~~~
 
-- Optimizes sending email notifications.
+- Harmonizes the progress implementation of elections and votes.
   [msom]
 
-- Splits e-mails into transactional/marketing.
-  [href]
-
-- Makes some columns of the wabsti vote format optional.
+- Supports regional elections.
   [msom]
 
-2.1.0 (2018-03-05)
-~~~~~~~~~~~~~~~~~~~
+- Uses seperate domain definitions for elections and votes in the principals.
+  [msom]
 
-- Adds zulip integration.
+- Uses the static data to detect if a principal has districts or not.
+  [msom]
+
+- Uses a single function to import wabsti majorz elections.
+  [msom]
+
+- Improves handling of wabsti exporter formats.
+  [msom]
+
+- Fixes spelling of "eligible voters".
   [msom]
 
   **Breaking changes: The import and export formats have changed!**
@@ -702,7 +561,7 @@ Changelog
 - Adds district translations.
   [msom]
 
-- Updates translations.
+- Makes principal polymorphic.
   [msom]
 
 1.19.9 (2018-01-16)
@@ -1266,14 +1125,7 @@ Changelog
 - Adds support for the wabsti exporter format.
   [msom]
 
-- Allows to set the absolute majority of majorz elections without uploading
-  results.
-  [msom]
-
-- Use special, reserved numbers for expats.
-  [msom]
-
-- Fixs providing giving an invalid archive date throwing an error.
+- Fix providing giving an invalid archive date throwing an error.
   [msom]
 
 - The type of vote (simple vs complex with counter proposal and tie-breaker)
@@ -1614,35 +1466,50 @@ Changelog
 1.0.0 (2016-09-26)
 ~~~~~~~~~~~~~~~~~~~
 
-- Adds support for webhooks.
+- Adds elections and votes for municipalitites.
+
+  **Breaking changes: The import and export formats have changed!
+  Make sure to change your column names!**
+
+  - Election: OneGov Cloud
+
+    - election_counted_municipalities -> election_counted_entities
+    - election_total_municipalities -> election_total_entities
+    - municipality_name -> entity_name
+    - municipality_bfs_number -> entity_bfs_number
+    - municipality_elegible_voters -> entity_elegible_voters
+    - municipality_received_ballots -> entity_received_ballots
+    - municipality_blank_ballots -> entity_blank_ballots
+    - municipality_invalid_ballots -> entity_invalid_ballots
+    - municipality_unaccounted_ballots -> entity_unaccounted_ballots
+    - municipality_accounted_ballots -> entity_accounted_ballots
+    - municipality_blank_votes -> entity_blank_votes
+    - municipality_invalid_votes -> entity_invalid_votes
+    - municipality_accounted_votes -> entity_accounted_votes
+    - municipality_bfs_number -> entity_id
+
+  - Vote: OneGov Cloud
+
+    - municipality_id -> entity_id
+
+  - Vote: Default
+
+    - BFS Nummer -> ID
+    - Gemeinde -> Name
+
   [msom]
 
-0.9.5 (2016-09-21)
-~~~~~~~~~~~~~~~~~~~
+- Stores results of votes and elections in a separate table and allows
+  to fetch results from other instances via command line interface.
 
-- Adds MIME types typically returned by libmagic for XLS/XLSX files.
+  **Upgrading requires a manual extra step!**
+
+  After running the upgrade, log in and visit *'update-results'*. This fixes
+  the automatically generated URL linking to the elections and votes.
+
   [msom]
 
-0.9.4 (2016-09-21)
-~~~~~~~~~~~~~~~~~~~
-
-- Changes the order of backend menu.
-  [msom]
-
-0.9.3 (2016-09-19)
-~~~~~~~~~~~~~~~~~~~
-
-- Re-release 0.9.2.
-  [msom]
-
-0.9.2 (2016-09-19)
-~~~~~~~~~~~~~~~~~~~
-
-- Clarify the result of a vote with counter proposal.
-  [msom]
-
-- Removes the Last-Modified header from certain views, it interferes with the
-  localization.
+- Groups the elections and votes on the archive pages by date.
   [msom]
 
 - Only shows the latest election day on the homepage.

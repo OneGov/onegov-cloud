@@ -110,48 +110,6 @@ Changelog
 3.5.0 (2018-04-26)
 ~~~~~~~~~~~~~~~~~~~
 
-- Allows to group ballot results by districts.
-  [msom
-
-- Adds candidate collections.
-  [msom]
-
-- Adds list collections.
-  [msom]
-
-- Adds the percentages of votes by entites and districts to candidates.
-  [msom]
-
-- Adds the percentages of votes by entites and districts to lists.
-  [msom]
-
-3.6.1 (2018-05-17)
-~~~~~~~~~~~~~~~~~~~
-
-- Doesn't use a default absolute majority (of zero).
-  [msom]
-
-- Adds an upgrade step to set the a default majority types to elections.
-  [msom]
-
-3.6.0 (2018-05-07)
-~~~~~~~~~~~~~~~~~~~
-
-- Adds a majority type attribute to elections.
-  [msom]
-
-- Allows to store related elections.
-  [msom]
-
-- Allows to change the ID of elections and votes.
-  [msom]
-
-- Refactor election compound model.
-  [msom]
-
-3.5.0 (2018-04-26)
-~~~~~~~~~~~~~~~~~~~
-
 - Adds a distinct property to elections.
   [msom]
 
@@ -227,11 +185,15 @@ Changelog
 3.0.0 (2018-03-08)
 ~~~~~~~~~~~~~~~~~~~
 
-- Fixes json output of elected candidates.
-  [href]
+- Adds a counted attribute to election results, removes total_entities and
+  counted_entities from election.
+  [msom]
 
-2.0.1 (2018-02-27)
-~~~~~~~~~~~~~~~~~~~
+- Adds a new domain of influence: region.
+  [msom]
+
+- Fixes spelling of "eligible voters".
+  [msom]
 
 2.0.1 (2018-02-27)
 ~~~~~~~~~~~~~~~~~~~
@@ -345,7 +307,7 @@ Changelog
 1.5.0 (2017-06-01)
 ~~~~~~~~~~~~~~~~~~~
 
-- Adds a status (unknown, interim, final) to elections and votes.
+- Adds new columns (year, color, total votes) to party results.
   [msom]
 
 1.4.0 (2017-05-01)
