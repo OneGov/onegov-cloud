@@ -44,9 +44,12 @@ function release() {
 
     current=$(current-version)
     new=$(new-version)
+    short="${new/release-/}"
 
     echo "Releasing $new (previous: $current)"
     "$SELF"/changes "$new" > "$REPO/CHANGES.md"
+    sed -i '.bak' "s/__version__.*/__version__ = '${short}'/g" src/onegov/core/__init__.py
+    rm src/onegov/core/__init__.py.bak
 
     pushd "$REPO" > /dev/null
     git add .
