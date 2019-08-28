@@ -142,6 +142,7 @@ def test_extended_person_collection_layout():
     request.is_manager = True
     layout = ExtendedPersonCollectionLayout(model, request)
     assert list(hrefs(layout.editbar_links)) == [
+        'ExtendedPersonCollection/create-people-xlsx',
         'ExtendedPersonCollection/new'
     ]
 
