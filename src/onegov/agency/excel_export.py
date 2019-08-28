@@ -1,4 +1,6 @@
 from collections import OrderedDict
+from io import BytesIO
+
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.models import ExtendedPerson
 from xlsxwriter.workbook import Workbook
@@ -44,9 +46,9 @@ def extract_person_data(session):
     return write_out
 
 
-def export_xlsx(session, file):
+def export_person_xlsx(session):
     """ Exports all votes according to the code book. """
-
+    file = BytesIO()
     workbook = Workbook(file, {'default_date_format': 'dd.mm.yyyy'})
     worksheet = workbook.add_worksheet('Personen')
     worksheet.write_row(0, 0, column_mapper.values())
@@ -68,3 +70,5 @@ def export_xlsx(session, file):
                 assert False
 
     workbook.close()
+    file.seek(0)
+    return file
