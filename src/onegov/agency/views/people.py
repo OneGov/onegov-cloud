@@ -11,7 +11,6 @@ from onegov.agency.layouts import ExtendedPersonLayout
 from onegov.agency.models import ExtendedPerson
 from onegov.core.security import Private
 from onegov.core.security import Public
-from onegov.form import Form
 from onegov.org.elements import Link
 from onegov.org.forms import PersonForm
 from onegov.org.models import AtoZ
