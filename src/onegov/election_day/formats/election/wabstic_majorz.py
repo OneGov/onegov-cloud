@@ -318,7 +318,7 @@ def import_election_wabstic_majorz(
         try:
             entity_id = get_entity_id(line)
             candidate_id = line.knr
-            votes = validate_integer(line, 'stimmen', None)
+            votes = validate_integer(line, 'stimmen', default=None)
         except ValueError:
             line_errors.append(_("Invalid candidate results"))
         else:
