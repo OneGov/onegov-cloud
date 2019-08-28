@@ -11,6 +11,7 @@ from onegov.agency.layouts import ExtendedPersonLayout
 from onegov.agency.models import ExtendedPerson
 from onegov.core.security import Private
 from onegov.core.security import Public
+from onegov.form import Form
 from onegov.org.elements import Link
 from onegov.org.forms import PersonForm
 from onegov.org.models import AtoZ
@@ -34,9 +35,10 @@ def view_people(self, request):
     request.include('chosen')
     request.include('people-select')
 
-    people_xlsx_path = None
-    if request.app.person_xlsx_exists:
-        people_xlsx_path = request.link(self, name='people-pdf')
+    people_xlsx_link = None
+    if request.app.people_xlsx_exists:
+        people_xlsx_link = request.link(self, name='people-xlsx')
+        print('xlsx exists')
 
     if not request.is_logged_in:
         self.exclude_hidden = True
@@ -94,7 +96,7 @@ def view_people(self, request):
         'letters': letters,
         'agencies': agencies,
         'people': people.items(),
-        'people_xlsx_path': people_xlsx_path
+        'people_xlsx_link': people_xlsx_link
     }
 
 
