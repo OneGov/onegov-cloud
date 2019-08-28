@@ -1,5 +1,3 @@
-from io import BytesIO
-
 from xlrd import open_workbook
 
 from onegov.agency.excel_export import export_person_xlsx, column_mapper, \
@@ -87,7 +85,7 @@ def test_excel_export(session):
     for ix, (class_attrib, col_name) in enumerate(column_mapper.items()):
         if class_attrib == 'memberships':
             assert sheet.row(row_num)[ix].value == \
-                   f"{agency_x.title} - a in x\n{agency_y.title} - a in y"
+                f"{agency_x.title} - a in x\n{agency_y.title} - a in y"
         else:
             assert sheet.row(row_num)[ix].value == \
-                   getattr(person_a, class_attrib)
+                getattr(person_a, class_attrib)

@@ -39,7 +39,6 @@ def view_people(self, request):
     people_xlsx_link = None
     if request.app.people_xlsx_exists:
         people_xlsx_link = request.link(self, name='people-xlsx')
-        print('xlsx exists')
 
     if not request.is_logged_in:
         self.exclude_hidden = True
