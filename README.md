@@ -63,7 +63,7 @@ up in the release history, it needs to be written as follows:
 
     <Optional Description>
 
-    TYPE: <Feature|Fix|Improvement>
+    TYPE: <Feature|Bugfix>
     LINK: <Ticket-Number>
 
 For example:

@@ -142,7 +142,9 @@ def pairwise(iterable):
 
 def commits_between(repository, newer, older):
     revisions = f'{older.hexsha}..{newer.hexsha}'
-    commits = repository.iter_commits(revisions, reverse=True)
+
+    commits = repository.iter_commits(
+        revisions, reverse=True, first_parent=True)
 
     for commit in commits:
         if commit == older:
@@ -193,7 +195,7 @@ def changelog(folder, new):
         print(f"## Release `{new.rsplit('-', 1)[-1]}`")
     print("")
 
-    changelog_commits(new, repository, tags[-1].commit, repository.head.commit)
+    changelog_commits(new, repository, repository.head.commit, tags[0].commit)
 
     # releases (the last version is not included by design)
     for newer, older in pairwise(tags):
