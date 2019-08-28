@@ -21,9 +21,18 @@ class AgencyApp(OrgApp, FormApp):
         return self.filestorage.exists('root.pdf')
 
     @property
+    def people_xlsx_exists(self):
+        return self.filestorage.exists('people.xlsx')
+
+    @property
     def root_pdf_modified(self):
         if self.root_pdf_exists:
             return self.filestorage.getdetails('root.pdf').modified
+
+    @property
+    def people_xlsx_modified(self):
+        if self.people_xlsx:
+            return self.filestorage.getdetails('people.xlsx').modified
 
     @property
     def root_pdf(self):
