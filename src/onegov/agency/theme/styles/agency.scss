@@ -39,6 +39,7 @@
 
 .edit-bar {
     .create-pdf::before { @include icon('\f1c1'); }
+    .create-excel::before { @include icon('\f1c3'); }
     .move::before { @include icon('\f047'); }
     .new-agency::before { @include icon('\f0e8'); }
     .sort-alphabetically::before { @include icon('\f15d'); }
