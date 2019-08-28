@@ -47,14 +47,13 @@ def extract_person_data(session):
 
 
 def export_person_xlsx(session):
-    """ Exports all votes according to the code book. """
+    """ Exports every person with their memberships in xlsx format. """
     file = BytesIO()
     workbook = Workbook(file, {'default_date_format': 'dd.mm.yyyy'})
     worksheet = workbook.add_worksheet('Personen')
     worksheet.write_row(0, 0, column_mapper.values())
 
     write_out = extract_person_data(session)
-    print(len(write_out))
 
     row = 0
     for entry in write_out:

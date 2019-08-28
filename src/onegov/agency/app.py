@@ -51,7 +51,7 @@ class AgencyApp(OrgApp, FormApp):
     def people_xlsx(self):
         result = None
         if self.filestorage.exists('people.xlsx'):
-            with self.filestorage.open('people.pdf', 'rb') as file:
+            with self.filestorage.open('people.xlsx', 'rb') as file:
                 result = file.read()
         return result
 
