@@ -1,5 +1,16 @@
 # Changes
 
+## Release `2019.2`
+
+> commits: **5 / [69399e0e7a...dbe49a35e3](https://github.com/OneGov/onegov-cloud/compare/69399e0e7a...dbe49a35e3)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.2)](https://buildkite.com/seantis/onegov-cloud)
+
+### Election-Day
+
+🐞 **Fixes bug in validate_integer(line, 'stimmen') in wmkandidaten_gde**
+
+**`Bugfix`** | **[75dcf68244](https://github.com/onegov/onegov-cloud/commit/75dcf68244b1cc836fee5a5f27303536819a5720)**
+
 ## Release `2019.1`
 
 > released: **2019-08-27 14:22**<br>
