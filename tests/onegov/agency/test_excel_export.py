@@ -2,7 +2,7 @@ from io import BytesIO
 
 from xlrd import open_workbook
 
-from onegov.agency.excel_export import export_xlsx, column_mapper, \
+from onegov.agency.excel_export import export_person_xlsx, column_mapper, \
     extract_person_data
 from onegov.agency.models import ExtendedPerson, ExtendedAgency
 
@@ -67,10 +67,7 @@ def test_excel_export(session):
     write_out = extract_person_data(session)
     assert len(write_out) == 4
 
-    file = BytesIO()
-
-    export_xlsx(session, file)
-    file.seek(0)
+    file = export_person_xlsx(session)
     workbook = open_workbook(file_contents=file.read())
     sheet = workbook.sheet_by_name('Personen')
     titles = [cell.value for cell in sheet.row(0)]
