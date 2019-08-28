@@ -8,6 +8,7 @@ from onegov.org.layout import PersonLayout
 from onegov.agency.layouts.agency import AgencyLayout
 from onegov.org import _
 
+
 class AgencyPathMixin(object):
 
     def agency_path(self, agency):
