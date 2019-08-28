@@ -11,10 +11,6 @@ user_options = {
 class FeriennetTheme(OrgTheme):
     name = 'onegov.feriennet.foundation'
 
-    # don't touch this number, it's incremented using bumpversion, so every
-    # release will automatically trigger a rebuild of the theme
-    version = '1.6.16'
-
     @property
     def post_imports(self):
         return super().post_imports + [

@@ -101,7 +101,6 @@ def test_layout_default(swissvotes_app):
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == 'Principal'
     assert layout.static_path == 'Principal/static'
-    assert layout.app_version
     assert layout.locales == [
         ('de_CH', 'de', 'Deutsch', 'SiteLocale/'),
         ('fr_CH', 'fr', 'Français', 'SiteLocale/'),

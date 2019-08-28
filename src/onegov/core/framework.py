@@ -90,6 +90,11 @@ class Framework(
     #: the request cache is initialised/emptied before each request
     request_cache = None
 
+    @property
+    def version(self):
+        from onegov.core import __version__
+        return __version__
+
     @morepath.reify
     def __call__(self):
         """ Intercept all wsgi calls so we can attach debug tools. """

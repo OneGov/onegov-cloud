@@ -5,10 +5,6 @@ from onegov.org.theme import OrgTheme
 class AgencyTheme(OrgTheme):
     name = 'onegov.agency.foundation'
 
-    # don't touch this number, it's incremented using bumpversion, so every
-    # release will automatically trigger a rebuild of the theme
-    version = '1.12.0'
-
     @property
     def post_imports(self):
         return super().post_imports + [

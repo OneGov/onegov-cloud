@@ -85,7 +85,7 @@ metal:define-macro="layout">
             </div>
             <div class="small-12 medium-4 medium-pull-4 columns small-only-text-center">
                 <span >&copy; ${layout.copyright_year} ${layout.principal.name}</span><br>
-                <a class="onegov-link" href="https://onegovcloud.ch">OneGov Cloud</a> | <a href="https://github.com/OneGov/onegov.election_day/blob/master/HISTORY.rst#changelog">v${layout.app_version}</a><br>
+                <a class="onegov-link" href="https://onegovcloud.ch">OneGov Cloud</a> | <a href="https://github.com/OneGov/onegov-cloud/blob/master/CHANGES.md#release-${layout.app.version.replace('.', '')}">${layout.app.version}</a><br>
                 <a class="open-data-link" href="${layout.opendata_link}" i18n:translate>Open Data</a>
             </div>
             <div class="small-12 medium-4 columns small-only-text-center medium-text-right manage-links">

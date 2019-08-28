@@ -13,9 +13,6 @@ from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 
 class AgencyApp(OrgApp, FormApp):
 
-    #: the version of this application (do not change manually!)
-    version = '0.0.1'
-
     @property
     def root_pdf_exists(self):
         return self.filestorage.exists('root.pdf')

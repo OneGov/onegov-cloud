@@ -153,7 +153,6 @@ def test_default_layout(wtfs_app):
     assert layout.editbar_links == []
     assert path(layout.breadcrumbs) == 'Principal'
     assert layout.static_path == 'Principal/static'
-    assert layout.app_version
     assert layout.request.includes == ['frameworks', 'chosen', 'common']
     assert layout.top_navigation == []
     assert layout.cancel_url == ''

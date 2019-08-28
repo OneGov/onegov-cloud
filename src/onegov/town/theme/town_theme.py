@@ -11,10 +11,6 @@ user_options = {
 class TownTheme(OrgTheme):
     name = 'onegov.town.foundation'
 
-    # don't touch this number, it's incremented using bumpversion, so every
-    # release will automatically trigger a rebuild of the theme
-    version = '1.15.10'
-
     @property
     def post_imports(self):
         return super().post_imports + [

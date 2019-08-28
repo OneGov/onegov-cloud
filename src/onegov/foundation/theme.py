@@ -4,9 +4,10 @@ import sass
 from collections import OrderedDict
 from itertools import chain
 from io import StringIO
+from onegov.core.theme import Theme as CoreTheme
 
 
-class BaseTheme(object):
+class BaseTheme(CoreTheme):
     """ Base class for Zurb Foundation based themes. Use this class to
     create a theme that customizes Zurb Foundation somehow.
 
@@ -205,4 +206,3 @@ class Theme(BaseTheme):
 
     """
     name = 'zurb.foundation'
-    version = '1.0'

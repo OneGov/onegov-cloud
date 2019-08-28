@@ -13,6 +13,7 @@ from datetime import datetime, date, timedelta
 from freezegun import freeze_time
 from libres.modules.errors import AffectedReservationError
 from lxml.html import document_fromstring
+from onegov.core import __version__
 from onegov.core.custom import json
 from onegov.core.utils import Bunch
 from onegov.core.utils import module_path
@@ -297,8 +298,11 @@ def test_pages(client):
 def test_news(client):
     client.login_admin().follow()
 
+    def text_without_version(page):
+        return page.text.replace(__version__, '')
+
     page = client.get('/news')
-    assert str(datetime.utcnow().year) not in page.text
+    assert str(datetime.utcnow().year) not in text_without_version(page)
 
     page = page.click('Nachricht')
 
@@ -311,7 +315,7 @@ def test_news(client):
     assert "We have a new homepage" in page.text
     assert "It is very good" in page.text
     assert "It is lots of fun" in page.text
-    assert str(datetime.utcnow().year) not in page.text
+    assert str(datetime.utcnow().year) not in text_without_version(page)
 
     page = client.get('/news')
 
@@ -320,7 +324,7 @@ def test_news(client):
     assert "It is lots of fun" not in page.text
 
     # do not show the year in the news list if there's only one
-    assert str(datetime.utcnow().year) not in page.text
+    assert str(datetime.utcnow().year) not in text_without_version(page)
 
     page = client.get('/news/we-have-a-new-homepage')
 

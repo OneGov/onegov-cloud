@@ -1,3 +1,5 @@
+import onegov.core
+
 from cached_property import cached_property
 from datetime import datetime
 from onegov.core.layout import ChameleonLayout
@@ -33,10 +35,6 @@ class Layout(ChameleonLayout):
 
     def title(self):
         return ''
-
-    @cached_property
-    def app_version(self):
-        return self.app.settings.core.theme.version
 
     @cached_property
     def principal(self):
