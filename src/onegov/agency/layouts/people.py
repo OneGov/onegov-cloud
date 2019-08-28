@@ -1,10 +1,12 @@
 from cached_property import cached_property
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.models.move import AgencyMembershipMoveWithinPerson
+from onegov.core.elements import Link
+from onegov.org.elements import LinkGroup
 from onegov.org.layout import PersonCollectionLayout
 from onegov.org.layout import PersonLayout
 from onegov.agency.layouts.agency import AgencyLayout
-
+from onegov.org import _
 
 class AgencyPathMixin(object):
 
@@ -16,7 +18,31 @@ class AgencyPathMixin(object):
 
 
 class ExtendedPersonCollectionLayout(PersonCollectionLayout, AgencyPathMixin):
-    pass
+
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_manager:
+            return [
+                Link(
+                    text=_("Create Excel"),
+                    url=self.request.link(
+                        self.model, name='create-people-xlsx'),
+                    attrs={'class': 'create-excel'}
+                ),
+                LinkGroup(
+                    title=_("Add"),
+                    links=[
+                        Link(
+                            text=_("Person"),
+                            url=self.request.link(
+                                self.model,
+                                name='new'
+                            ),
+                            attrs={'class': 'new-person'}
+                        )
+                    ]
+                ),
+            ]
 
 
 class ExtendedPersonLayout(PersonLayout, AgencyPathMixin):
