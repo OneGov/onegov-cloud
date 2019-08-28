@@ -39,6 +39,19 @@ class AgencyApp(OrgApp, FormApp):
             file.write(value.read())
 
     @property
+    def people_xlsx(self):
+        result = None
+        if self.filestorage.exists('people.xlsx'):
+            with self.filestorage.open('people.pdf', 'rb') as file:
+                result = file.read()
+        return result
+
+    @people_xlsx.setter
+    def people_xlsx(self, value):
+        with self.filestorage.open('people.xlsx', 'wb') as file:
+            file.write(value.read())
+
+    @property
     def pdf_class(self):
         pdf_layout = self.org.meta.get('pdf_layout')
         if pdf_layout == 'ar':
