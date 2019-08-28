@@ -6,11 +6,13 @@ from morepath import redirect
 from onegov.agency import _
 from onegov.agency import AgencyApp
 from onegov.agency.collections import ExtendedPersonCollection
+from onegov.agency.excel_export import export_person_xlsx
 from onegov.agency.layouts import ExtendedPersonCollectionLayout
 from onegov.agency.layouts import ExtendedPersonLayout
 from onegov.agency.models import ExtendedPerson
 from onegov.core.security import Private
 from onegov.core.security import Public
+from onegov.form import Form
 from onegov.org.elements import Link
 from onegov.org.forms import PersonForm
 from onegov.org.models import AtoZ
@@ -99,15 +101,48 @@ def view_people(self, request):
     }
 
 
+@AgencyApp.form(
+    model=ExtendedPersonCollection,
+    name='create-people-xlsx',
+    permission=Private,
+    template='form.pt',
+    form=Form
+)
+def create_people_xlsx(self, request, form):
+    if form.submitted(request) and request.is_manager:
+        request.app.people_xlsx = export_person_xlsx(request.session)
+        if request.app.people_xlsx_exists:
+            request.success(_("Excel file created"))
+            return redirect(request.link(self))
+        else:
+            request.success(_("Excel could not be created"))
+            return redirect(request.link(self, name='create-people-xlsx'))
+
+    layout = ExtendedPersonCollectionLayout(self, request)
+
+    return {
+        'layout': layout,
+        'title': _("Create Excel"),
+        'helptext': _(
+            "Create an Excel of persons and their memberships. "
+            "This may take a while."
+        ),
+        'form': form
+    }
+
+
 @AgencyApp.view(
     model=ExtendedPersonCollection,
     name='people-xlsx',
-    permission=Public
+    permission=Private
 )
 def get_people_xlsx(self, request):
 
     if not request.app.people_xlsx_exists:
         return Response(status='503 Service Unavailable')
+
+    if not request.is_manager:
+        return Response('403 Forbidden', status=403)
 
     @request.after
     def cache_headers(response):
