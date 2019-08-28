@@ -155,7 +155,7 @@ Next you want to create a virtual environment:
 
 Then you want to activate it:
 
-    source venv/activate
+    source venv/bin/activate
 
 Finally, run the installation:
 
