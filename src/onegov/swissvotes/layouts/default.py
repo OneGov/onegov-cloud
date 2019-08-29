@@ -1,3 +1,5 @@
+import onegov.core
+
 from babel import Locale
 import numbers
 from cached_property import cached_property
@@ -51,10 +53,6 @@ class DefaultLayout(ChameleonLayout):
     @cached_property
     def breadcrumbs(self):
         return [Link(_("Homepage"), self.homepage_url)]
-
-    @cached_property
-    def app_version(self):
-        return self.app.settings.core.theme.version
 
     @cached_property
     def static_path(self):

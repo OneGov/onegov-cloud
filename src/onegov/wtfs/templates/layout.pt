@@ -10,7 +10,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="intercoolerjs:use-actual-http-method" content="true" />
-    <meta name="version" content="${layout.app_version}">
+    <meta name="version" content="${layout.app.version}">
     <title>
         <tal:block metal:define-slot="title">Stadt Winterthur</tal:block>
     </title>

@@ -11,10 +11,6 @@ user_options = {
 class WinterthurTheme(OrgTheme):
     name = 'onegov.winterthur.foundation'
 
-    # don't touch this number, it's incremented using bumpversion, so every
-    # release will automatically trigger a rebuild of the theme
-    version = '0.7.5'
-
     @property
     def post_imports(self):
         return super().post_imports + [

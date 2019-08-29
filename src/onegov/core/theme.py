@@ -40,6 +40,8 @@ template::
 Note that for the theme to work you need to define a filestorage. See
 :meth:`onegov.core.framework.Framework.configure_application`.
 """
+
+from onegov.core import __version__
 from onegov.core.framework import Framework
 from onegov.core import log
 from onegov.core import utils
@@ -62,17 +64,13 @@ class Theme(object):
     test against it).
     """
 
+    # this used to be configured for each theme, now it is an alias to the
+    # general version and should probably not be touched
+    version = __version__
+
     @property
     def name(self):
         """ The name of the theme, must be unique. """
-        raise NotImplementedError
-
-    @property
-    def version(self):
-        """ The version of the theme, should be changed whenever the theme
-        should trigger a recompile.
-
-        """
         raise NotImplementedError
 
     @property
@@ -126,7 +124,7 @@ def compile(storage, theme, options={}, force=False):
     if not force and storage.exists(filename):
         return filename
 
-    log.info("Compiling theme {}, v{}".format(theme.name, theme.version))
+    log.info(f"Compiling theme {theme.name}, {theme.version}")
     storage.setbytes(filename, theme.compile(options).encode('utf-8'))
 
     return filename

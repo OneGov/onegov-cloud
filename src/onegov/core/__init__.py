@@ -1,3 +1,12 @@
+# The current version set by do/release. Do not edit by hand!
+#
+# Note that during development this version information is stale. That is to
+# say, we do not have a separate development version - the use for this
+# version is to create release-dependent urls, artifacts and caches. During
+# development these dependencies do not need to be updated in lock-step.
+#
+__version__ = '2019.2'
+
 import logging
 import warnings
 

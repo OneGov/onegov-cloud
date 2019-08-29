@@ -1,3 +1,5 @@
+import onegov.core
+
 from babel import Locale
 from cached_property import cached_property
 from datetime import datetime
@@ -31,10 +33,6 @@ class DefaultLayout(ChameleonLayout):
 
     def title(self):
         return ''
-
-    @cached_property
-    def app_version(self):
-        return self.app.settings.core.theme.version
 
     @cached_property
     def principal(self):

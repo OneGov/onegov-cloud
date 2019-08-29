@@ -14,9 +14,6 @@ from onegov.winterthur.theme import WinterthurTheme
 
 class WinterthurApp(OrgApp):
 
-    #: the version of this application (do not change manually!)
-    version = '0.7.5'
-
     serve_static_files = True
 
     frame_ancestors = {
