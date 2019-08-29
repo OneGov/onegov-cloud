@@ -4,11 +4,104 @@ set -euo pipefail
 SELF="$( cd "$(dirname "$0")" ; pwd -P )"
 REPO="$(dirname "$SELF")"
 
+# The following block ontains the Sentry token to announce releases on
+# sentry.io. This has been encrypted as follows:
+#
+# echo "my-token" | gpg --encrypt --armor \
+#   --recipient denis.krienbuehl@seantis.ch \
+#   --recipient fabian.reinhard@seantis.ch \
+#   --recipient tobias.reinhard@seantis.ch \
+#   --recipient lukas.burkhard@seantis.ch
+#
+# Be sure to update `configure-sentry` below and update the comment above
+# if the intended recipients change. You will also want to create a new
+# token at that point and invalidate the old one.
+#
+SENTRY_TOKEN_ENCRYPTED="
+-----BEGIN PGP MESSAGE-----
+
+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
+8xTc8is+DzaUVxG/lUrmD2MN
+=opuu
+-----END PGP MESSAGE-----
+"
+
+function configure-sentry() {
+    SENTRY_AUTH_TOKEN="$(\
+        echo "$SENTRY_TOKEN_ENCRYPTED" | gpg --decrypt --quiet \
+            --recipient denis.krienbuehl@seantis.ch \
+            --recipient fabian.reinhard@seantis.ch \
+            --recipient tobias.reinhard@seantis.ch \
+            --recipient lukas.burkhard@seantis.ch \
+    )"
+
+    export SENTRY_ORG="seantis-gmbh"
+    export SENTRY_AUTH_TOKEN
+}
+
 function current-version() {
     git ls-remote --tags origin \
         | awk -F '/' '{print $NF}' \
         | sort --reverse --version-sort\
         | head -n 1
+}
+
+function announce-release-on-sentry-io() {
+    local version="$1"
+    local current_commit="$2"
+    local previous_commit="$3"
+
+    configure-sentry
+    curl "https://sentry.io/api/0/organizations/${SENTRY_ORG}/releases/" \
+        -X POST \
+        -H "Authorization: Bearer ${SENTRY_AUTH_TOKEN}" \
+        -H 'Content-Type: application/json' \
+        -d "{
+            \"version\": \"${version}\",
+            \"refs\": [{
+                \"repository\":\"OneGov/onegov-cloud\",
+                \"commit\":\"${current_commit}\",
+                \"previousCommit\":\"${previous_commit}\"
+            }],
+            \"projects\": [\"onegov-cloud\"]
+        }"
 }
 
 function new-version() {
@@ -58,6 +151,14 @@ function release() {
     git push
     git push --tags
     popd > /dev/null
+
+    local previous_commit
+    previous_commit="$(git rev-list -n 1 "$current")"
+
+    local current_commit
+    current_commit="$(git rev-parse --verify HEAD)"
+
+    announce-release-on-sentry-io "onegov-cloud:${new}" "$current_commit" "$previous_commit"
 }
 
 release
