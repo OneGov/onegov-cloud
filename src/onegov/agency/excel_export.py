@@ -8,6 +8,7 @@ from decimal import Decimal
 
 column_mapper = OrderedDict(
     salutation='Anrede',
+    academic_title='Akademischer Titel',
     last_name='Nachname',
     first_name='Vorname',
     email='Email',

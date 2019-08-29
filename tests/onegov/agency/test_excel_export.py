@@ -11,6 +11,7 @@ def test_excel_export(session):
 
     person_a = ExtendedPerson(
         salutation='Herr',
+        academic_title='Dr.',
         last_name='A',
         first_name='B',
         email='a@b.com',
@@ -81,6 +82,11 @@ def test_excel_export(session):
     assert order == ['NachnameVorname', 'AA', 'AB', 'AC', 'BC']
 
     # Test a row
+    def none_to_empty_string(value):
+        if value is None:
+            return ''
+        return value
+
     row_num = 2
     for ix, (class_attrib, col_name) in enumerate(column_mapper.items()):
         if class_attrib == 'memberships':
@@ -88,4 +94,4 @@ def test_excel_export(session):
                 f"{agency_x.title} - a in x\n{agency_y.title} - a in y"
         else:
             assert sheet.row(row_num)[ix].value == \
-                getattr(person_a, class_attrib)
+                none_to_empty_string(getattr(person_a, class_attrib))
