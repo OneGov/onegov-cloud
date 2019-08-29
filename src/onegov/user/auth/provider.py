@@ -3,13 +3,10 @@ import os
 
 from abc import ABCMeta, abstractmethod
 from attr import attrs, attrib
-from attr.validators import in_
 from contextlib import contextmanager
-from onegov.form import WTFormsClassBuilder
 from onegov.user import _, log
 from onegov.user.models.user import User
 from webob.exc import HTTPUnauthorized
-from wtforms.fields import BooleanField, RadioField, StringField
 from translationstring import TranslationString
 from typing import Optional
 from ua_parser import user_agent_parser
@@ -53,154 +50,6 @@ class ProviderMetadata(object):
 
     name: str = attrib()
     title: str = attrib()
-
-
-@attrs(slots=True, frozen=True)
-class UserField(object):
-    """ Defines user-specific field.
-
-    The following properties are required:
-
-        * suffix => part of the attribute name ([a-z_]+)
-        * label => the translatable label of the field
-        * type => the type of the field (currently only 'string')
-
-    """
-
-    field_classes = {'string': StringField}
-
-    suffix: str = attrib()
-    label: TranslationString = attrib()
-    type: str = attrib(validator=in_(field_classes.keys()))
-
-    @property
-    def field_class(self):
-        return self.field_classes[self.type]
-
-
-def include_provider_form_fields(providers, form_class):
-    """ Extends a form_class with provider selection.
-
-    The form class contains a list of providers to chose from and the
-    configuration necessary on the user for each provider. The providers
-    list is expected to be a list of provider instances.
-
-    The resulting data is automatically applied if the user is used
-    as a base for the model (via the authentication_provider property).
-
-    The form class is always returned with a new authentication_provider
-    that can be stored on the user property of the same name.
-
-    This property is available even if there are no providers - in this case
-    it will always return None.
-
-    """
-
-    class AuthProviderForm(form_class):
-
-        @property
-        def authentication_provider(self):
-            if not providers:
-                return None
-
-            provider = provider_by_name(providers, self.provider.data)
-
-            if not provider:
-                return None
-
-            fields = {}
-
-            for field in provider.user_fields:
-                form_field = f'{provider.metadata.name}_{field.suffix}'
-                fields[field.suffix] = getattr(self, form_field).data
-
-            return {
-                'name': provider.metadata.name,
-                'fields': fields,
-                'required': self.provider_required.data,
-            }
-
-        @authentication_provider.setter
-        def authentication_provider(self, data):
-            self.provider.data = data['name']
-            self.provider_required.data = data['required']
-
-            for key, value in data['fields'].items():
-                form_field = f"{data['name']}_{key}"
-                getattr(self, form_field).data = value
-
-        def ensure_no_conflict(self):
-            if not providers:
-                return
-
-            provider = provider_by_name(providers, self.provider.data)
-
-            if not provider:
-                return
-
-            fields = self.authentication_provider['fields']
-            user = isinstance(self.model, User) and self.model or None
-
-            if provider.conflicts(self.request, fields, user):
-                self.provider.errors.append(_(
-                    "The provider configuration of this user conflicts "
-                    "with the configuration of another user."
-                ))
-                return False
-
-        def populate_obj(self, model):
-            super().populate_obj(model)
-
-            if providers:
-                model.authentication_provider = self.authentication_provider
-
-        def process_obj(self, model):
-            super().process_obj(model)
-
-            if providers and model.authentication_provider:
-                self.authentication_provider = model.authentication_provider
-
-    if not providers:
-        return AuthProviderForm
-
-    choices = [('none', _("None"))]
-    choices.extend((p.metadata.name, p.metadata.title) for p in providers)
-
-    builder = WTFormsClassBuilder(base_class=AuthProviderForm)
-    builder.set_current_fieldset(_("Third-Party Authentication"))
-
-    builder.add_field(
-        field_class=RadioField,
-        field_id='provider',
-        label=_("Provider"),
-        required=False,
-        default='none',
-        choices=choices
-    )
-
-    for provider in providers:
-        for field in provider.user_fields:
-
-            builder.add_field(
-                field_class=field.field_class,
-                field_id=f'{provider.metadata.name}_{field.suffix}',
-                label=field.label,
-                required=True,
-                depends_on=('provider', provider.metadata.name)
-            )
-
-    builder.add_field(
-        field_class=BooleanField,
-        field_id='provider_required',
-        label=_("Force login through provider"),
-        required=False,
-        description=_(
-            "Forces the user to use this provider. Regular username/password "
-            "authentication will be disabled!"
-        ),
-        depends_on=('provider', '!none'))
-
-    return builder.form_class
 
 
 @attrs()
@@ -247,19 +96,6 @@ class AuthenticationProvider(metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def conflicts(self, request, fields, current_user):
-        """ Returns true if the given fields of the given user conflict
-        with the fields of another user (!= current_user).
-
-        This method should be implemented to ensure that a single
-        authentication doesn't apply to multiple users.
-
-        Note that the current_user may be None, in which case the check should
-        be done over all users.
-
-        """
-
-    @abstractmethod
     def button_text(self, request):
         """ Returns the translatable button text for the given request.
 
@@ -273,19 +109,6 @@ class AuthenticationProvider(metaclass=ABCMeta):
 
         """
 
-    def available_users(self, request):
-        """ Returns a query limited to users which may be authenticated
-        using the given provider.
-
-        This should be used as a base for the identification, rather than
-        building your own query, as inactive users and ones without the
-        proper configuration are excluded.
-
-        """
-        return request.session.query(User)\
-            .filter_by(active=True)\
-            .filter(User.authentication_provider['name'] == self.metadata.name)
-
     @classmethod
     def configure(cls, **kwargs):
         """ This function gets called with the per-provider configuration
@@ -298,16 +121,6 @@ class AuthenticationProvider(metaclass=ABCMeta):
         """
 
         return cls()
-
-    @property
-    def user_fields(self, request):
-        """ Optional fields required by the provider on the user. Should return
-        something that is iterable (even if only one or no fields are used).
-
-        See :class:`UserField`.
-        """
-
-        return ()
 
 
 @attrs()
@@ -323,10 +136,6 @@ class KerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
     keytab: str = attrib()
     hostname: str = attrib()
     service: str = attrib()
-
-    @property
-    def user_fields(self):
-        yield UserField('username', _("Kerberos username"), 'string')
 
     @classmethod
     def configure(cls, **cfg):
@@ -389,19 +198,7 @@ class KerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
             'operating_system': agent_os
         })
 
-    def conflicts(self, request, fields, current_user):
-        """ Returns true if there's another user with the same username. """
-        selector = User.authentication_provider['fields']['username']
-
-        query = self.available_users(request)\
-            .filter(selector == fields['username'])
-
-        if current_user:
-            query = query.filter(User.id != current_user.id)
-
-        return query.first() and True or False
-
-    def authenticate_request(self, request):
+    def authenticated_username(self, request):
         """ Authenticates the kerberos request.
 
         The kerberos handshake is as follows:
@@ -411,6 +208,12 @@ class KerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
 
         2. The client sends a request with the Authorization header set
            to the kerberos ticket.
+
+        The result is an authenticated username or None. Note that this
+        username is a username separate from our users table (in most cases).
+
+        The kerberos environment defines this username and it is most likely
+        the Windows login username.
 
         """
 
@@ -459,24 +262,21 @@ class KerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
             request.after(with_header)
 
             # extract the user if possible
-            username = kerberos.authGSSServerUserName(state)
-            selector = User.authentication_provider['fields']['username']
+            return kerberos.authGSSServerUserName(state) or None
 
-            user = self.available_users(request)\
-                .filter(selector == username)\
-                .first()
+    def authenticate_request(self, request):
+        response = self.authenticated_username(request)
 
-            if user:
-                return Success(
-                    user=user,
-                    note=_(
-                        "You have been logged in as ${user} (via ${identity})",
-                        mapping={'user': user.username, 'identity': username}
-                    )
-                )
+        # XXX this needs to be re-implemented differently for LDAP support
+        if isinstance(response, str):
+            user = User(username=response)
 
-            return Failure(
+            return Success(
+                user=user,
                 note=_(
-                    "Your identity ${identity} is not authorized",
-                    mapping={'identity': username}
-                ))
+                    "You have been logged in as ${user} (via ${identity})",
+                    mapping={'user': user.username, 'identity': user.username}
+                )
+            )
+
+        return response

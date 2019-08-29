@@ -152,10 +152,6 @@ class Auth(object):
         if not user.active:
             return fail()
 
-        if user.authentication_provider:
-            if user.authentication_provider.get('required', False):
-                return fail()
-
         if not self.is_valid_second_factor(user, second_factor):
             return fail()
 

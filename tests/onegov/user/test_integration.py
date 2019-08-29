@@ -2,11 +2,10 @@ import base64
 import kerberos
 import morepath
 import pytest
-import transaction
 
 from onegov.core import Framework
 from onegov.core.utils import scan_morepath_modules
-from onegov.user import Auth, UserApp, UserCollection
+from onegov.user import Auth, UserApp
 from onegov.user.auth.provider import provider_by_name
 from tempfile import NamedTemporaryFile
 from unittest.mock import patch, DEFAULT
@@ -96,7 +95,7 @@ def test_kerberos_auth(client, app):
     assert r.status_code == 401
     assert r.headers['WWW-Authenticate'] == 'Negotiate'
 
-    # for our tests we fake must mock the answers somewhat, setting up
+    # for our tests we must mock the answers, setting up
     # a Kerberos environment is no easy task
     methods = {
         'authGSSServerInit': DEFAULT,
@@ -130,47 +129,4 @@ def test_kerberos_auth(client, app):
         r = auth({'Authorization': 'Negotiate foobar'})
 
         assert r.status_code == 302
-        assert r.location.endswith('/auth/login')
-
-        # associate a user, but keep it inactive
-        user = UserCollection(app.session()).add(
-            username='foo@bar.org',
-            password='foobar',
-            role='member',
-            active=False,
-            authentication_provider={
-                'name': 'kerberos',
-                'fields': {
-                    'username': 'foo@EXAMPLE.ORG'
-                },
-                'required': True
-            }
-        )
-        transaction.commit()
-
-        r = auth({'Authorization': 'Negotiate foobar'})
-        assert r.status_code == 302
-        assert r.location.endswith('/auth/login')
-
-        # now activate the user
-        user = UserCollection(app.session()).by_username('foo@bar.org')
-        user.active = True
-        transaction.commit()
-
-        r = auth({'Authorization': 'Negotiate foobar'})
-        assert r.status_code == 302
-        assert r.location == 'http://localhost/'
-        assert r.headers['Set-Cookie'].startswith('session_id')
-
-        # since the user *requires* the auth provider, a normal login
-        # is no longer possible
-        auth = Auth.from_app(app)
-        assert not auth.authenticate('foo@bar.org', password='foobar')
-
-        # unless we make it optional
-        user = UserCollection(app.session()).by_username('foo@bar.org')
-        user.authentication_provider['required'] = False
-        transaction.commit()
-
-        auth = Auth.from_app(app)
-        assert auth.authenticate('foo@bar.org', password='foobar')
+        assert r.location.endswith('/')

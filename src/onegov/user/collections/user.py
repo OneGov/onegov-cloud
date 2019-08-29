@@ -88,14 +88,9 @@ class UserCollection(object):
             User.data['tags'].contains((v, )) for v in values
         ))
 
-    def apply_provider_filter(self, query, key, values):
-        return query.filter(or_(
-            User.authentication_provider['name'] == v for v in values
-        ))
-
     def add(self, username, password, role,
             data=None, second_factor=None, active=True, realname=None,
-            signup_token=None, group=None, authentication_provider=None):
+            signup_token=None, group=None):
         """ Add a user to the collection.
 
             The arguments given to this function are the attributes of the
@@ -115,8 +110,7 @@ class UserCollection(object):
             active=active,
             realname=realname,
             signup_token=signup_token,
-            group_id=group.id if group else None,
-            authentication_provider=authentication_provider or None,
+            group_id=group.id if group else None
         )
 
         self.session.add(user)
