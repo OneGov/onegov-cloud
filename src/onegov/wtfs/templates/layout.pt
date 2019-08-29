@@ -25,7 +25,7 @@
     -->
 
     <link rel="stylesheet" type="text/css" href="${layout.static_path}/font-awesome/css/font-awesome.min.css">
-    <script tal:condition="layout.app.sentry_dsn" src="https://browser.sentry-cdn.com/5.0.7/bundle.min.js" crossorigin="anonymous"></script>
+    <script tal:condition="layout.app.sentry_dsn" src="https://browser.sentry-cdn.com/5.6.2/bundle.min.js" crossorigin="anonymous"></script>
     <script tal:condition="layout.app.sentry_dsn">
         Sentry.init({
             dsn: '${layout.app.sentry_dsn}',

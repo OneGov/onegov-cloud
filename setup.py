@@ -120,7 +120,7 @@ setup(
         'requests',
         'rjsmin',
         'sedate',
-        'sentry_sdk',
+        'sentry_sdk>=0.11.1',
         'sortedcontainers',
         'sqlalchemy',
         'sqlalchemy-utils',
