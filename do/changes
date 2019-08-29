@@ -112,22 +112,28 @@ class ChangelogCommit(object):
         link = self.link
 
         # issues tracked on GitHub
-        if self.link.isdigit():
+        if link.isdigit():
             return f'https://github.com/onegov/onegov-cloud/issues/{link}'
 
         # issues tracked internally
-        if self.link.startswith(('FER-', 'VOTES-')):
+        if link.startswith(('FER-', 'VOTES-')):
             return f'https://issues.seantis.ch/browse/{link}'
 
         # issues tracked on other sites
-        if self.link.startswith(('SA-', 'FW-')):
+        if link.startswith(('SA-', 'FW-')):
             return f'https://stadt-winterthur.atlassian.net/browse/{link}'
 
-        if self.link.startswith('FW-'):
-            return f'https://stadt-winterthur.atlassian.net/browse/'
+        if link.startswith('FW-'):
+            return f'https://stadt-winterthur.atlassian.net/browse/{link}'
 
-        if self.link.startswith('ZW-'):
-            return f'https://kanton-zug.atlassian.net/browse/'
+        if link.startswith('ZW-'):
+            return f'https://kanton-zug.atlassian.net/browse/{link}'
+
+        if link.startswith('ONEGOV-CLOUD-'):
+            return (
+                f'https://sentry.io/organizations/seantis-gmbh'
+                f'/issues/?query={link}'
+            )
 
         # default to a non-functioning link (they can be added later)
         return f'#{self.link}'
