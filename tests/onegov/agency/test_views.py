@@ -435,6 +435,7 @@ def test_disable_report_changes(client):
 
 def test_excel_export_for_editor(client):
 
+    #  Eventually is_manager is true for admin and editor
     client.login_editor()
 
     # Test pdf is not present
