@@ -65,3 +65,6 @@ eggs/
 
 # mypy
 .mypy_cache/*
+
+# sublime
+*.sublime-workspace

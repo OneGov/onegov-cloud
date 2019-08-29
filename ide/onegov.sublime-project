@@ -1,0 +1,20 @@
+{
+    "folders":
+    [
+        {
+            "path": "..",
+            "folder_exclude_patterns": [
+                "bin",
+                "develop-eggs",
+                "dist",
+                "eggs/onegov",
+                "*.egg-info",
+                "docs/_build",
+                "file-storage",
+                "depot-storage",
+                "bundles",
+                ".webassets-cache"
+            ]
+        }
+    ]
+}
