@@ -1,8 +1,24 @@
 # Changes
 
+## Release `2019.3`
+
+> commits: **4 / [36ebdbfa71...ba66e0052e](https://github.com/OneGov/onegov-cloud/compare/36ebdbfa71...ba66e0052e)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.3)](https://buildkite.com/seantis/onegov-cloud)
+
+### Core
+
+🎉 **Adds `onegov.core.__version__`**
+
+This version identifier always contains the current version of the
+container. During development this information may be stale, as the
+version is only updated during the release process.
+
+**`Feature`** | **[b2f4f16f61](https://github.com/onegov/onegov-cloud/commit/b2f4f16f614ad690b8eb5c222b1881a677d1e323)**
+
 ## Release `2019.2`
 
-> commits: **5 / [69399e0e7a...dbe49a35e3](https://github.com/OneGov/onegov-cloud/compare/69399e0e7a...dbe49a35e3)**<br>
+> released: **2019-08-28 10:04**<br>
+> commits: **6 / [69399e0e7a...50afe830eb](https://github.com/OneGov/onegov-cloud/compare/69399e0e7a...50afe830eb)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.2)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election-Day
