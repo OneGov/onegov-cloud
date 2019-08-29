@@ -135,6 +135,9 @@ class ChangelogCommit(object):
                 f'/issues/?query={link}'
             )
 
+        if self.link.startswith('STAKA-'):
+            return f"https://ogc-ar.atlassian.net/projects/STAKA/issues/{link}"
+
         # default to a non-functioning link (they can be added later)
         return f'#{self.link}'
 
