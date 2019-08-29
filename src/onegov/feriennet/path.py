@@ -159,7 +159,7 @@ def get_invoice_action(request, app, id, action, extend_to=None):
     model=InvoiceCollection,
     path='/my-bills',
     converters=dict(invoice=UUID))
-def get_my_invoies(request, app, username=None, invoice=None):
+def get_my_invoices(request, app, username=None, invoice=None):
     # only admins can actually specify the username/invoice
     if not request.is_admin:
         username, invoice = None, None
@@ -167,6 +167,10 @@ def get_my_invoies(request, app, username=None, invoice=None):
     # the default username is the current user
     if not username:
         username = request.current_username
+
+    # the default period is the active period
+    if not invoice:
+        invoice = request.app.active_period.id
 
     # at this point the username has to exist
     user_id = request.app.user_ids_by_name.get(username)
