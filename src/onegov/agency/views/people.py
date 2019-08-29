@@ -108,7 +108,7 @@ def view_people(self, request):
     form=Form
 )
 def create_people_xlsx(self, request, form):
-    if form.submitted(request) and request.is_manager:
+    if form.submitted(request):
         request.app.people_xlsx = export_person_xlsx(request.session)
         if request.app.people_xlsx_exists:
             request.success(_("Excel file created"))
@@ -139,9 +139,6 @@ def get_people_xlsx(self, request):
 
     if not request.app.people_xlsx_exists:
         return Response(status='503 Service Unavailable')
-
-    if not request.is_manager:
-        return Response('403 Forbidden', status=403)
 
     @request.after
     def cache_headers(response):
