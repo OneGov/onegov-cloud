@@ -262,6 +262,9 @@ def get_root_pdf(self, request):
     form=Form
 )
 def create_root_pdf(self, request, form):
+    org = request.app.org
+    page_break_level = int(org.meta.get(
+        'page_break_on_level_root_pdf', 1))
 
     if form.submitted(request):
         request.app.root_pdf = request.app.pdf_class.from_agencies(
@@ -269,7 +272,7 @@ def create_root_pdf(self, request, form):
             title=request.app.org.name,
             toc=True,
             exclude=request.app.org.hidden_people_fields,
-            page_break_on_level=2
+            page_break_on_level=page_break_level
         )
         request.success(_("PDF created"))
         return redirect(request.link(self))
@@ -296,14 +299,16 @@ def create_root_pdf(self, request, form):
     form=Form
 )
 def create_agency_pdf(self, request, form):
-
+    org = request.app.org
+    page_break_level = int(org.meta.get(
+        'page_break_on_level_org_pdf', 1))
     if form.submitted(request):
         self.pdf_file = request.app.pdf_class.from_agencies(
             agencies=[self],
             title=self.title,
             toc=False,
             exclude=request.app.org.hidden_people_fields,
-            page_break_on_level=1
+            page_break_on_level=page_break_level
         )
         request.success(_("PDF created"))
         # FIXME: clear cache for redirect so that pdf link is updated

@@ -1,19 +1,23 @@
 from collections import namedtuple
 from collections import OrderedDict
+from datetime import datetime, timedelta
 from itertools import groupby
 from morepath import redirect
 from onegov.agency import _
 from onegov.agency import AgencyApp
 from onegov.agency.collections import ExtendedPersonCollection
+from onegov.agency.excel_export import export_person_xlsx
 from onegov.agency.layouts import ExtendedPersonCollectionLayout
 from onegov.agency.layouts import ExtendedPersonLayout
 from onegov.agency.models import ExtendedPerson
 from onegov.core.security import Private
 from onegov.core.security import Public
+from onegov.form import Form
 from onegov.org.elements import Link
 from onegov.org.forms import PersonForm
 from onegov.org.models import AtoZ
 from unidecode import unidecode
+from morepath.request import Response
 
 
 def get_person_form_class(model, request):
@@ -31,6 +35,10 @@ def view_people(self, request):
     request.include('common')
     request.include('chosen')
     request.include('people-select')
+
+    people_xlsx_link = None
+    if request.app.people_xlsx_exists:
+        people_xlsx_link = request.link(self, name='people-xlsx')
 
     if not request.is_logged_in:
         self.exclude_hidden = True
@@ -87,8 +95,71 @@ def view_people(self, request):
         'layout': ExtendedPersonCollectionLayout(self, request),
         'letters': letters,
         'agencies': agencies,
-        'people': people.items()
+        'people': people.items(),
+        'people_xlsx_link': people_xlsx_link
     }
+
+
+@AgencyApp.form(
+    model=ExtendedPersonCollection,
+    name='create-people-xlsx',
+    permission=Private,
+    template='form.pt',
+    form=Form
+)
+def create_people_xlsx(self, request, form):
+    if form.submitted(request):
+        request.app.people_xlsx = export_person_xlsx(request.session)
+        if request.app.people_xlsx_exists:
+            request.success(_("Excel file created"))
+            return redirect(request.link(self))
+        else:
+            request.success(_("Excel could not be created"))
+            return redirect(request.link(self, name='create-people-xlsx'))
+
+    layout = ExtendedPersonCollectionLayout(self, request)
+
+    return {
+        'layout': layout,
+        'title': _("Create Excel"),
+        'helptext': _(
+            "Create an Excel of persons and their memberships. "
+            "This may take a while."
+        ),
+        'form': form
+    }
+
+
+@AgencyApp.view(
+    model=ExtendedPersonCollection,
+    name='people-xlsx',
+    permission=Private
+)
+def get_people_xlsx(self, request):
+
+    if not request.app.people_xlsx_exists:
+        return Response(status='503 Service Unavailable')
+
+    @request.after
+    def cache_headers(response):
+        last_modified = request.app.people_xlsx_modified
+        if last_modified:
+            max_age = 1 * 24 * 60 * 60
+            expires = datetime.now() + timedelta(seconds=max_age)
+            fmt = '%a, %d %b %Y %H:%M:%S GMT'
+
+            response.headers.add('Cache-Control', f'max-age={max_age}, public')
+            response.headers.add('ETag', last_modified.isoformat())
+            response.headers.add('Expires', expires.strftime(fmt))
+            response.headers.add('Last-Modified', last_modified.strftime(fmt))
+
+    return Response(
+        request.app.people_xlsx,
+        content_type=(
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        ),
+        content_disposition='inline; filename=people.xlsx'
+    )
 
 
 @AgencyApp.html(

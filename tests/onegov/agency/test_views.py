@@ -1,5 +1,8 @@
 from io import BytesIO
 from PyPDF2 import PdfFileReader
+from xlrd import open_workbook
+
+from onegov.agency.models import ExtendedPerson
 
 
 def test_views(client):
@@ -428,3 +431,41 @@ def test_disable_report_changes(client):
     page.form.submit()
 
     assert "Mutation melden" in client.get(person_url)
+
+
+def test_excel_export_for_editor(client):
+
+    #  Eventually is_manager is true for admin and editor
+    client.login_editor()
+
+    # Test pdf is not present
+    page = client.get('/people/people-xlsx', expect_errors=True)
+    assert page.status == '503 Service Unavailable'
+
+    page = client.get('/people').click('Excel erstellen')
+    assert page.status_code == 200
+    redirected = page.form.submit().follow()
+    assert 'http://localhost/people?page=0' == redirected.request.url
+
+    # Download the file
+    page = client.get('/people')
+    page = page.click('Download Excel Personen')
+    assert page.content_type == \
+           'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+
+def test_excel_export_not_logged_in(client):
+    page = client.get('/people')
+    assert 'Excel erstellen' not in page
+
+    # Excel creation page
+    page = client.get(
+        '/people/create-people-xlsx', expect_errors=True).maybe_follow()
+    assert page.status == '403 Forbidden'
+
+    # Actual excel itself
+    page = client.get(
+        '/people/people-xlsx', expect_errors=True).maybe_follow()
+    assert page.status == '403 Forbidden'
+
+

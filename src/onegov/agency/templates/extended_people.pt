@@ -35,6 +35,17 @@
                             </tal:block>
                         </select>
                     </div>
+
+                    <div tal:condition="request.is_manager and people_xlsx_link|nothing" class="borderless-side-panel">
+                        <h2 i18n:translate>Exports</h2>
+                            <ul class="agency-export-list">
+                                <li>
+                                    <a class="create-excel" href="${people_xlsx_link}" target="_blank" i18n:translate>
+                                        Excel-Download Persons
+                                    </a>
+                                </li>
+                            </ul>
+                    </div>
                 </div>
             </div>
         </div>

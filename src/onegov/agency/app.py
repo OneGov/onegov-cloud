@@ -18,9 +18,18 @@ class AgencyApp(OrgApp, FormApp):
         return self.filestorage.exists('root.pdf')
 
     @property
+    def people_xlsx_exists(self):
+        return self.filestorage.exists('people.xlsx')
+
+    @property
     def root_pdf_modified(self):
         if self.root_pdf_exists:
             return self.filestorage.getdetails('root.pdf').modified
+
+    @property
+    def people_xlsx_modified(self):
+        if self.people_xlsx:
+            return self.filestorage.getdetails('people.xlsx').modified
 
     @property
     def root_pdf(self):
@@ -33,6 +42,19 @@ class AgencyApp(OrgApp, FormApp):
     @root_pdf.setter
     def root_pdf(self, value):
         with self.filestorage.open('root.pdf', 'wb') as file:
+            file.write(value.read())
+
+    @property
+    def people_xlsx(self):
+        result = None
+        if self.filestorage.exists('people.xlsx'):
+            with self.filestorage.open('people.xlsx', 'rb') as file:
+                result = file.read()
+        return result
+
+    @people_xlsx.setter
+    def people_xlsx(self, value):
+        with self.filestorage.open('people.xlsx', 'wb') as file:
             file.write(value.read())
 
     @property
