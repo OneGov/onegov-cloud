@@ -16,4 +16,4 @@ def add_default_value_for_pagebreak_pdf(context):
     if context.has_column('organisations', 'meta'):
         for org in session.query(Organisation).all():
             org.meta['page_break_on_level_root_pdf'] = 1
-            org.meta['page_break_on_level_orga_pdf'] = 1
+            org.meta['page_break_on_level_org_pdf'] = 1

@@ -52,7 +52,7 @@ class AgencySettingsForm(Form):
         self.root_pdf_page_break.data = str(obj.meta.get(
             'page_break_on_level_root_pdf', 1))
         self.orga_pdf_page_break.data = str(obj.meta.get(
-            'page_break_on_level_orga_pdf', 1))
+            'page_break_on_level_org_pdf', 1))
         self.report_changes.data = obj.meta.get('report_changes', True)
 
     def populate_obj(self, obj, *args, **kwargs):
@@ -61,7 +61,7 @@ class AgencySettingsForm(Form):
         obj.meta['report_changes'] = self.report_changes.data
         obj.meta['page_break_on_level_root_pdf'] = \
             int(self.root_pdf_page_break.data)
-        obj.meta['page_break_on_level_orga_pdf'] = \
+        obj.meta['page_break_on_level_org_pdf'] = \
             int(self.orga_pdf_page_break.data)
 
 

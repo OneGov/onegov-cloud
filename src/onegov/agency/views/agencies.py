@@ -18,7 +18,6 @@ from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form
 from onegov.org.elements import Link
-from onegov.org.models import Organisation
 
 
 def get_agency_form_class(model, request):
@@ -263,8 +262,8 @@ def get_root_pdf(self, request):
     form=Form
 )
 def create_root_pdf(self, request, form):
-    orga = request.session.query(Organisation).one()
-    page_break_level = int(orga.meta.get(
+    org = request.app.org
+    page_break_level = int(org.meta.get(
         'page_break_on_level_root_pdf', 1))
 
     if form.submitted(request):
@@ -300,9 +299,9 @@ def create_root_pdf(self, request, form):
     form=Form
 )
 def create_agency_pdf(self, request, form):
-    orga = request.session.query(Organisation).one()
-    page_break_level = int(orga.meta.get(
-        'page_break_on_level_orga_pdf', 1))
+    org = request.app.org
+    page_break_level = int(org.meta.get(
+        'page_break_on_level_org_pdf', 1))
     if form.submitted(request):
         self.pdf_file = request.app.pdf_class.from_agencies(
             agencies=[self],
