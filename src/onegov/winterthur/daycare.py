@@ -387,7 +387,7 @@ class DaycareSubsidyCalculator(object):
             operation="+",
             note=f"""
                 Der Vermögenszuschlag beträgt
-                {fmt(cfg.wealth_premium).rstrip('.0')}% des
+                {fmt(cfg.wealth_premium).rstrip('0').rstrip('.')}% des
                 Vermögens, für das tatsächlich Steuern anfallen
                 (ab {fmt(cfg.max_wealth)} CHF).
             """)
@@ -456,7 +456,7 @@ class DaycareSubsidyCalculator(object):
             note=f"""
                 Bei einem Betreuungsumfang von insgesamt mehr als 2 ganzen
                 Tagen pro Woche gilt ein Rabatt von
-                {fmt(cfg.rebate).rstrip('0.')}%.
+                {fmt(cfg.rebate).rstrip('0').rstrip('.')}%.
             """)
 
         net.op(
