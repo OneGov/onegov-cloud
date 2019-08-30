@@ -5305,6 +5305,12 @@ h2 + div.timeline {
     }
 }
 
+.is-logged-out {
+    .publication-info {
+        display: none;
+    }
+}
+
 .publication-info * {
     font-size: .875rem;
 }
