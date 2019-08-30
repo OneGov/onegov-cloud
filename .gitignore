@@ -68,3 +68,6 @@ eggs/
 
 # sublime
 *.sublime-workspace
+
+# Sphinx
+docs/_build

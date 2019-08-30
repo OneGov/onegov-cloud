@@ -155,6 +155,10 @@ setup(
             'lingua==3.12',
             'gitpython',
         ],
+        'docs': [
+            'alabaster',
+            'sphinx',
+        ],
         'test': [
             'Pillow!=5.4.0',
             'PyPDF2',
