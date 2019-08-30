@@ -51,9 +51,10 @@
                 </thead>
                 <tbody>
                     <tr tal:repeat="list lists">
-                        <td>${list[0]}</td>
-                        <td class="right-aligned" data-text="${list[1] or 0}">${layout.format_number(list[1] or 0)}</td>
-                        <td class="right-aligned">${list[3]}</td>
+                        <td>${list.name}</td>
+                        <td class="right-aligned" data-text="${list.getter or 0}">${layout.format_number(list.getter or 0)}</td>
+                        <td tal:condition="election.completed" class="right-aligned">${list.number_of_mandates}</td>
+                        <td tal:condition="not: election.completed" class="right-aligned">n.v.</td>
                     </tr>
                 </tbody>
             </table>
