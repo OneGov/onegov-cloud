@@ -46,11 +46,11 @@ class ChangelogCommit(object):
 
         for line in lines[1:]:
 
-            if line.startswith('TYPE'):
+            if line.lower().startswith('type'):
                 type = line.split(':', 1)[-1].strip().capitalize()
                 continue
 
-            if line.startswith('LINK'):
+            if line.lower().startswith('link'):
                 link = line.split(':', 1)[-1].strip()
                 continue
 
@@ -77,10 +77,10 @@ class ChangelogCommit(object):
 
     @property
     def emoji(self):
-        if self.type == 'Feature':
+        if self.type.lower() == 'feature':
             return '🎉'
 
-        if self.type == 'Bugfix':
+        if self.type.lower() == 'bugfix':
             return '🐞'
 
         return '✨'
