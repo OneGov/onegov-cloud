@@ -40,7 +40,6 @@
             environment: '${layout.app.sentry_environment}',
             role: '${request.current_role}',
             ignoreUrls: [/\/(gtm|ga|analytics)\.js/i],
-            ignoreErrors: [/data-".+"-alert/],
             shouldSendCallback: function(data) {
                 var crumbs = (data.breadcrumbs && data.breadcrumbs.values || []);
                 var errors = (data.exception.values && data.exception.values || []);
