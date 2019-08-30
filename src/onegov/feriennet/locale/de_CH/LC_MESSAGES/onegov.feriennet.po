@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-06-06 13:25+0200\n"
+"POT-Creation-Date: 2019-08-30 11:38+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -13,20 +13,8 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 1.8.12\n"
 
-msgid "No active period"
-msgstr "Kein aktiver Zeitraum"
-
-msgid "Activities"
-msgstr "Angebote"
-
-msgid "Invoices"
-msgstr "Rechnungen"
-
 msgid "Periods"
 msgstr "Zeiträume"
-
-msgid "Wishlist"
-msgstr "Wunschliste"
 
 msgid "Matching"
 msgstr "Zuteilungen"
@@ -40,945 +28,20 @@ msgstr "Mitteilungen"
 msgid "Exports"
 msgstr "Exporte"
 
+msgid "No active period"
+msgstr "Kein aktiver Zeitraum"
+
+msgid "Invoices"
+msgstr "Rechnungen"
+
+msgid "Wishlist"
+msgstr "Wunschliste"
+
 msgid "Bookings"
 msgstr "Buchungen"
 
-#, python-format
-msgid "Delete \"${text}\""
-msgstr "\"${text}\" entfernen"
-
-msgid "Homepage"
-msgstr "Startseite"
-
-msgid "Provide activity again"
-msgstr "Angebot erneut anbieten"
-
-#, python-format
-msgid "Wishlist of ${user}"
-msgstr "Wunschliste von ${user}"
-
-#, python-format
-msgid "Bookings of ${user}"
-msgstr "Buchungen von ${user}"
-
-msgid "Manage Periods"
-msgstr "Zeiträume"
-
-msgid "New Period"
-msgstr "Neuer Zeitraum"
-
-msgid "Matches"
-msgstr "Zuteilungen"
-
-msgid "Import Bank Statement"
-msgstr "Kontoauszug importieren"
-
-msgid "Synchronise Online Payments"
-msgstr "Online Zahlungen synchronisieren"
-
-msgid "Manual Booking"
-msgstr "Manuelle Buchung"
-
-msgid "Donation"
-msgstr "Spende"
-
-msgid "Attendees"
-msgstr "Teilnehmer"
-
-msgid "Notification Templates"
-msgstr "Mitteilungs-Vorlagen"
-
-msgid "Group"
-msgstr "Gruppe"
-
-msgid "Accounting"
-msgstr "Buchhaltung"
-
-msgid "New Notification Template"
-msgstr "Neue Mitteilungs-Vorlage"
-
-#, python-format
-msgid "Do you really want to provide \"${title}\" again?"
-msgstr "Möchten Sie \"${title}\" wirklich erneut anbieten?"
-
-msgid "You will have to request publication again"
-msgstr "Sie werden erneut die Publikation beantragen müssen"
-
-msgid "Provide Again"
-msgstr "Erneut anbieten"
-
-msgid "Cancel"
-msgstr "Abbrechen"
-
-msgid "Submit Activity"
-msgstr "Angebot erfassen"
-
-msgid "Edit"
-msgstr "Bearbeiten"
-
-msgid ""
-"This booking cannot be removed, at least one booking has been paid online."
-msgstr ""
-"Diese Buchung kann nicht entfernt werden, mindestens eine Buchung wurde "
-"online bezahlt."
-
-msgid "You may remove the bookings manually one by one."
-msgstr "Die Buchungen können nur einzeln entfernt werden."
-
-#, python-format
-msgid "Do you really want to remove \"${text}\"?"
-msgstr "Möchten Sie \"${text}\" wirklich entfernen?"
-
-#, python-format
-msgid "${count} bookings will be removed"
-msgstr "${count} Buchungen werden entfernt"
-
-#, python-format
-msgid "Remove ${count} bookings"
-msgstr "${count} Buchungen entfernen"
-
-msgid "New Occasion"
-msgstr "Neue Durchführung"
-
-msgid "Show Ticket"
-msgstr "Zum Ticket"
-
-msgid "Request Publication"
-msgstr "Publikation beantragen"
-
-msgid "Discard"
-msgstr "Verwerfen"
-
-msgid "Occasions cannot be created yet"
-msgstr "Durchführungen können noch nicht erstellt werden"
-
-msgid ""
-"There are no periods defined yet. At least one period needs to be defined "
-"before occasions can be created"
-msgstr ""
-"Es existieren zur Zeit keine Zeiträume. Mindestens ein Zeitraum muss "
-"bestehen bevor Durchführungen erfasst werden können"
-
-msgid ""
-"There is currently no active period. Please retry once a period has been "
-"activated."
-msgstr ""
-"Es ist zur Zeit kein Zeitraum aktiv. Bitte versuchen Sie es erneut wenn ein "
-"Zeitraum aktiviert wurde."
-
-#, python-format
-msgid "Do you really want to discard \"${title}\"?"
-msgstr "Möchten Sie \"${title}\" wirklich verwerfen?"
-
-msgid "This cannot be undone."
-msgstr "Dies kann nicht rückgängig gemacht werden."
-
-msgid "Discard Activity"
-msgstr "Angebot verwerfen"
-
-msgid "Do you really want to request publication?"
-msgstr "Möchten Sie die Publikation wirklich beantragen?"
-
-msgid "Please add at least one occasion before requesting publication."
-msgstr ""
-"Bitte fügen Sie mindestens eine Durchführung hinzu bevor Sie die Publikation "
-"beantragen."
-
-msgid "Manual bookings can only be added once the billing has been confirmed"
-msgstr ""
-"Manuelle Buchungen können erst nach Bestätigung der Fakturierung erstellt "
-"werden"
-
-msgid "Editor"
-msgstr "Veranstalter"
-
-msgid "Editors"
-msgstr "Veranstalter"
-
-msgid "Opening Hours"
-msgstr "Termine"
-
-msgid "Opening Hours Link"
-msgstr "Termine Link"
-
-msgid "The opening hours of the municipality"
-msgstr "Wichtige Termine des Ferienpasses"
-
-msgid "URL pointing to an opening hours page"
-msgstr "URL der auf die Seite der Termine zeigt"
-
-msgid "Register a new account"
-msgstr "Ein neues Konto eröffnen"
-
-msgid "Go to Login"
-msgstr "Anmelden"
-
-msgid "Go to Profile"
-msgstr "Benutzerprofil"
-
-msgid "Send a daily status e-mail."
-msgstr "Ein tägliches Status E-Mail senden."
-
-msgid "General"
-msgstr "Allgemein"
-
-msgid "Salutation"
-msgstr "Anrede"
-
-msgid "Personal"
-msgstr "Persönlich"
-
-msgid "First Name"
-msgstr "Vorname"
-
-msgid "Last Name"
-msgstr "Nachname"
-
-msgid "Organisation"
-msgstr "Organisation"
-
-msgid "Address"
-msgstr "Adresse"
-
-msgid "Zip Code"
-msgstr "PLZ"
-
-msgid "Place"
-msgstr "Ort"
-
-msgid "Political Municipality"
-msgstr "Politische Gemeinde"
-
-msgid "Public E-Mail Address"
-msgstr "Öffentliche E-Mail Adresse"
-
-msgid "If different than username"
-msgstr "Falls anders als Benutzername"
-
-msgid "Phone"
-msgstr "Telefon"
-
-msgid "Emergency Contact"
-msgstr "Kontakt im Notfall"
-
-msgid "012 345 67 89 (Peter Muster)"
-msgstr "012 345 67 89 (Peter Muster)"
-
-msgid "Website"
-msgstr "Webseite"
-
-msgid "Website address including http:// or https://"
-msgstr "Webseiten-Adresse inklusive http:// oder https://"
-
-msgid "Bank Account (IBAN)"
-msgstr "Bank Konto (IBAN)"
-
-msgid "Beneficiary"
-msgstr "Begünstigter"
-
-msgid "A beneficiary is required if a bank account is given."
-msgstr "Ein Begünstigter ist nötig wenn ein Bank Konto angegeben wird."
-
-msgid "Mr."
-msgstr "Herr"
-
-msgid "Ms."
-msgstr "Frau"
-
-msgid "Please enter both a phone number and a name"
-msgstr "Bitte geben Sie eine Telefonnummer und einen Namen ein"
-
-msgid "Confirm billing:"
-msgstr "Fakturierung bestätigen:"
-
-msgid "I know that this stops all changes including cancellations."
-msgstr ""
-"Mir ist bewusst dass danach keine Buchungsänderungen mehr möglich sind."
-
-msgid "Target"
-msgstr "Ziel"
-
-msgid "Tags"
-msgstr "Kategorien"
-
-msgid "User"
-msgstr "Benutzer"
-
-msgid "Booking Text"
-msgstr "Buchungstext"
-
-msgid "Kind"
-msgstr "Art"
-
-msgid "Discount"
-msgstr "Abzug"
-
-msgid "Surcharge"
-msgstr "Zuschlag"
-
-msgid "All"
-msgstr "Alle"
-
-msgid "For a specific user"
-msgstr "Für einen spezifischen Benutzer"
-
-msgid "No, preview only"
-msgstr "Nein, nur Vorschau"
-
-msgid "Yes, confirm billing"
-msgstr "Ja, Fakturierung abschliessen"
-
-msgid "For users with tags"
-msgstr "Für Benutzer einer bestimmten Kategorie"
-
-msgid "Name"
-msgstr "Name"
-
-msgid "Chaperones, Cars, Meals"
-msgstr "Begleitpersonen, Fahrzeuge, Verpflegung"
-
-msgid "Description"
-msgstr "Beschreibung"
-
-msgid "Need at least"
-msgstr "Benötige mindestens"
-
-msgid "Need up to"
-msgstr "Benötige bis zu"
-
-msgid "Minimum is larger than maximum"
-msgstr "Das Minimum ist grösser als das Maximum"
-
-msgid "This name has already been used for this occasion"
-msgstr "Dieser Name wurde bereits für diese Durchführung verwendet"
-
-msgid "Period"
-msgstr "Zeitraum"
-
-msgid "Dates"
-msgstr "Daten"
-
-msgid "Meeting Point"
-msgstr "Treffpunkt"
-
-msgid "Note"
-msgstr "Bemerkung"
-
-msgid "Cost"
-msgstr "Kosten"
-
-msgid "The amount paid to the organiser"
-msgstr "Der Betrag welcher dem Veranstalter gezahlt wird"
-
-msgid "Minimum Number of Participants"
-msgstr "Mindestteilnehmerzahl"
-
-msgid "Participants"
-msgstr "Teilnehmer"
-
-msgid "Maximum Number of Participants"
-msgstr "Anzahl Plätze"
-
-msgid "Minimum Age"
-msgstr "Mindestalter"
-
-msgid "Maximum Age"
-msgstr "Höchstalter"
-
-msgid "Allow overlap"
-msgstr "Überschneidung erlauben"
-
-msgid "Allows bookings to this occasion to overlap with other bookings."
-msgstr ""
-"Erlaubt die Überlappung von Buchungen dieser Durchführung mit anderen "
-"Buchungen."
-
-msgid "Advanced"
-msgstr "Erweitert"
-
-msgid "Exempt from booking limit"
-msgstr "Ausgenommen von der Buchungs-Limite"
-
-msgid ""
-"Allows bookings to this occasion to be excempt from booking limits. Does not "
-"apply to matching."
-msgstr ""
-"Erlaubt die Buchung dieser Durchführung über dem Limit. Bei der Zuteilung "
-"wird das Limit weiterhin beachtet."
-
-msgid "Must specify at least one date"
-msgstr "Bitte spezifizieren Sie mindestens ein Datum"
-
-msgid "Date validation failed"
-msgstr "Datums-Validierung fehlgeschlagen"
-
-msgid ""
-"The maximum number of spots is lower than the number of already accepted "
-"bookings."
-msgstr ""
-"Die Anzahl Plätze ist tiefer als die Anzahl bereits angenommener Buchungen."
-
-msgid "Cannot adjust period, there are bookings linked to this occassion"
-msgstr ""
-"Der Zeitraum kann nicht angepasst werden, bestehende Buchungen wären "
-"betroffen"
-
-msgid "The end date must be after the start date"
-msgstr "Das End-Datum muss nach dem Start-Datum liegen"
-
-msgid "The date is outside the selected period"
-msgstr "Das Datum liegt ausserhalb des gewählten Zeitraums"
-
-msgid "The minium age cannot be higher than the maximum age"
-msgstr "Das Mindestalter kann nicht tiefer als das Maximalalter sein"
-
-msgid ""
-"The minium number of participants cannot be higher than the maximum number "
-"of participants"
-msgstr ""
-"The Mindestteilnehmerzahl darf nicht grösser als die Anzahl Plätze sein"
-
-msgid "Start"
-msgstr "Start"
-
-msgid "End"
-msgstr "Ende"
-
-msgid "Add"
-msgstr "Hinzufügen"
-
-msgid "Remove"
-msgstr "Entfernen"
-
-msgid "The date overlaps with another in this occasion"
-msgstr "Das Datum überlappt sich mit einem anderen Datum dieser Durchführung"
-
-msgid "Title"
-msgstr "Titel"
-
-msgid "The title of the activity"
-msgstr "Der Titel des Angebots"
-
-msgid "Lead"
-msgstr "Einleitung"
-
-msgid "Describes briefly what this activity is about"
-msgstr "Beschreibt kurz um was es beim Angebot geht"
-
-msgid "Text"
-msgstr "Text"
-
-msgid "Organiser"
-msgstr "Veranstalter"
-
-msgid "Administration"
-msgstr "Administration"
-
-msgid "Location"
-msgstr "Ort"
-
-msgid "Map"
-msgstr "Karte"
-
-msgid "Accessible"
-msgstr "Behindertenfreundlich"
-
-msgid "Adventure"
-msgstr "Abenteuer"
-
-msgid "Animals"
-msgstr "Tiere"
-
-msgid "Baking"
-msgstr "Backen"
-
-msgid "Cinema"
-msgstr "Kino"
-
-msgid "Computer"
-msgstr "Computer"
-
-msgid "Cooking"
-msgstr "Kochen"
-
-msgid "Dance"
-msgstr "Tanz"
-
-msgid "Design"
-msgstr "Gestalten"
-
-msgid "Excursion"
-msgstr "Ausflug"
-
-msgid "Farm"
-msgstr "Bauernhof"
-
-msgid "Game"
-msgstr "Spiel"
-
-msgid "Handicraft"
-msgstr "Basteln"
-
-msgid "Health"
-msgstr "Gesundheit"
-
-msgid "Media"
-msgstr "Medien"
-
-msgid "Museums"
-msgstr "Museum"
-
-msgid "Music"
-msgstr "Musik"
-
-msgid "Nature"
-msgstr "Natur"
-
-msgid "Professions"
-msgstr "Berufe"
-
-msgid "Science"
-msgstr "Wissenschaft"
-
-msgid "Security"
-msgstr "Sicherheit"
-
-msgid "Sightseeing"
-msgstr "Besichtigung"
-
-msgid "Sport"
-msgstr "Sport"
-
-msgid "Styling"
-msgstr "Styling"
-
-msgid "Theater"
-msgstr "Theater"
-
-msgid "Trade"
-msgstr "Handwerk"
-
-#, python-format
-msgid "Ferienpass Summer ${year}"
-msgstr "Ferienpass Sommer ${year}"
-
-msgid "Prebooking Start"
-msgstr "Start Wunschphase"
-
-msgid "Prebooking End"
-msgstr "Ende Wunschphase"
-
-msgid "Execution Start"
-msgstr "Start Durchführung"
-
-msgid "Execution End"
-msgstr "Ende Durchführung"
-
-msgid "How are the activities conducted?"
-msgstr "Wie wird der Ferienpass umgesetzt?"
-
-msgid "Execution"
-msgstr "Ausführung"
-
-msgid "Maximum Number of Activities per Attendee"
-msgstr "Maximale Anzahl Angebote pro Teilnehmer"
-
-msgid "Cost of the Pass"
-msgstr "Kosten des Passes"
-
-msgid "The administrative cost of each booking"
-msgstr "Die administrativen Kosten einer einzelnen Buchung"
-
-msgid "How is the organiser paid?"
-msgstr "Wie wird der Veranstalter bezahlt?"
-
-msgid "Required minutes between bookings"
-msgstr "Blockzeit zwischen Buchungen in Minuten"
-
-msgid "Attendees are limited to one activity per day"
-msgstr "Teilnehmer sind auf ein Angebot pro Tag limitiert"
-
-msgid "Stop accepting bookings"
-msgstr "Die Annahme von Buchungen stoppen"
-
-msgid "Deadline"
-msgstr "Anmeldeschluss"
-
-msgid "Fixed day"
-msgstr "Stichtag"
-
-msgid "X Days Before"
-msgstr "X Tage vorher"
-
-msgid "Allow members to cancel confirmed bookings"
-msgstr "Mitgliedern erlauben bestätigte Buchungen abzusagen"
-
-msgid "Cancellation Deadline"
-msgstr "Stornierungsschluss"
-
-msgid "Method"
-msgstr "Methode"
-
-msgid "Age check"
-msgstr "Altersprüfung"
-
-msgid "The execution phase conflicts with existing occasions"
-msgstr "Konflikt mit bestehenden Durchführungen"
-
-msgid ""
-"Each attendee may book as many activites as he likes. Each activity is "
-"billed separately."
-msgstr ""
-"Jeder Teilnehmer kann so viele Angebote buchen wie er möchte. Jedes Angebot "
-"wird einzeln verrechnet."
-
-msgid ""
-"Each attendee may attend a limited number of activites for a fixed price."
-msgstr ""
-"Jeder Teilnehmer kann für einen fixen Preis an einer limitierten Anzahl von "
-"Angeboten teilnehmen."
-
-msgid "The parents pay everything by bill, the organisers are paid later"
-msgstr ""
-"Die Eltern zahlen alles per Rechnung, die Veranstalter werden später bezahlt"
-
-msgid ""
-"The parents pay the pass by bill, the organisers are paid in cash at the "
-"beginning of each occasion"
-msgstr ""
-"Die Eltern zahlen den Pass per Rechnung, zusätzliche Teilnahmegebühren "
-"werden dem Veranstalter bar vor Ort bezahlt"
-
-msgid "Yes"
-msgstr "Ja"
-
-msgid "No"
-msgstr "Nein"
-
-msgid "On a fixed day"
-msgstr "An einem Stichtag"
-
-msgid "X days before each occasion"
-msgstr "X Tage vor jeder Durchführung"
-
-msgid "No, only allow admins"
-msgstr "Nein, nur Administratoren erlauben"
-
-msgid "Until a fixed day"
-msgstr "Bis zu einem Stichtag"
-
-msgid "Up to X days before each occasion"
-msgstr "Bis zu X Tage vor jeder Durchführung"
-
-msgid ""
-"<b>Exact</b> - the attendees need to be of the expected age at the beginning "
-"of the occasion"
-msgstr ""
-"<b>Genau</b> - Die Teilnehmer müssen zu Beginn der Durchführung das "
-"erwartete Alter haben"
-
-msgid ""
-"<b>Age group</b> - The attendees need to be of the expected age sometime "
-"during the year of the occasion"
-msgstr ""
-"<b>Jahrgang</b> - Die Teilnehmer müssen irgendwann im Jahr der Durchführung "
-"das erwartete Alter haben"
-
-msgid ""
-"The prebooking period must start before the exeuction period and each period "
-"must start before it ends."
-msgstr ""
-"Die Wunschphase muss vor der Durchführung stattfinden und die Start-Daten "
-"müssen vor den End-Daten liegen."
-
-msgid ""
-"It is not possible to have required minutes between bookings when limiting "
-"attendees to one activity per day"
-msgstr ""
-"Es ist nicht möglich eine Blockzeit zu erfassen wenn Teilnehmer auf ein "
-"Angebot pro Tag beschränkt sind"
-
-msgid ""
-"It is no longer possible to change the execution settings since the period "
-"has already been confirmed"
-msgstr ""
-"Es ist nicht mehr möglich die Ausführungs-Einstellungen zu verändern da der "
-"Zeitraum bereits bestätigt wurde."
-
-msgid "Birthdate"
-msgstr "Geburtsdatum"
-
-msgid "Gender"
-msgstr "Geschlecht"
-
-msgid "Health Information"
-msgstr "Gesundheitsangaben"
-
-msgid "Allergies, Disabilities, Particulars"
-msgstr "Allergien, Behinderungen, Besonderheiten"
-
-msgid "Attendee"
-msgstr "Teilnehmer"
-
-msgid "Ignore Age Restriction"
-msgstr "Altersbeschränkung ignorieren"
-
-msgid "Accept TOS"
-msgstr "AGB akzeptieren"
-
-#.
-#. Used in sentence: "I have read the ${tos} and accept them."
-msgid "TOS"
-msgstr "AGB"
-
-msgid "Maximum number of bookings per period"
-msgstr "Maximale Anzahl Buchungen pro Zeitraum"
-
-msgid "You already entered a child with this name"
-msgstr "Sie haben bereits ein Kind mit diesem Namen eingegeben"
-
-msgid "Add a new attendee"
-msgstr "Neuen Teilnehmer erfassen"
-
-msgid "This occasion is outside the currently active period"
-msgstr "Diese Durchführung liegt ausserhalb des aktiven Zeitraums"
-
-msgid "This period has already been finalized"
-msgstr "Dieser Zeitraum wurde bereits abgeschlossen"
-
-msgid "Cannot create a booking outside the prebooking period"
-msgstr "Anmeldungen können nur während der Wunschphase gemacht werden"
-
-msgid "This occasion is already fully booked"
-msgstr "Diese Durchführung ist bereits ausgebucht"
-
-msgid "This is an unapproved activity"
-msgstr "Dies ist ein unbestätigtes Angebot"
-
-msgid "The attendee is too old"
-msgstr "Der Teilnehmer ist zu alt"
-
-msgid "The attendee is too young"
-msgstr "Der Teilnehmer ist zu jung"
-
-msgid "The deadline has passed"
-msgstr "Der Anmeldeschluss wurde erreicht"
-
-msgid "Girl"
-msgstr "Mädchen"
-
-msgid "Boy"
-msgstr "Junge"
-
-msgid "The TOS must be accepted to create a booking."
-msgstr "Die AGB müssen akzeptiert werden, bevor Buchung gemacht werden können."
-
-msgid ""
-"Your userprofile is not complete. It needs to be complete before signing up "
-"any attendees."
-msgstr ""
-"Ihr Benutzerprofil ist unvollständig. Es muss vollständig sein bevor Sie "
-"Teilnehmer anmelden können."
-
-msgid ""
-"The user's userprofile is not complete. It needs to be complete before "
-"signing up any attendees."
-msgstr ""
-"Das Benutzerprofil des Benutzers ist unvollständig. Es muss vollständig sein "
-"bevor Teilnehmer angemeldet werden können."
-
-#, python-format
-msgid "This occasion has already been booked by ${name}"
-msgstr "${name} hat sich bereits für diese Durchführung angemeldet"
-
-#, python-format
-msgid ""
-"The attendee already has already reached the maximum number of ${count} "
-"bookings"
-msgstr ""
-"Der Teilnehmer hat bereits die maximale Anzahl von ${count} Buchungen "
-"erreicht"
-
-msgid "This occasion overlaps with another booking"
-msgstr "Diese Durchführung wird von einer bestehenden Buchung überlappt"
-
-msgid "My donation"
-msgstr "Meine Spende"
-
-msgid "Invalid amount"
-msgstr "Ungültiger Betrag"
-
-msgid "ISO 20022 XML"
-msgstr "ISO 20022 XML"
-
-msgid "Subject"
-msgstr "Betreff"
-
-msgid "Message"
-msgstr "Mitteilung"
-
-msgid "Send to (applies to active period only)"
-msgstr "Senden an (bezieht sich nur auf den aktiven Zeitraum)"
-
-msgid "Role"
-msgstr "Rolle"
-
-msgid "Occasion"
-msgstr "Durchführung"
-
-msgid "Useraccounts"
-msgstr "Benutzerkonten"
-
-#, python-format
-msgid "${title} (cancelled) <small>${dates}, ${count} Attendees</small>"
-msgstr "${title} (abgesagt) <small>${dates}, ${count} Teilnehmer</small>"
-
-#, python-format
-msgid "${title} <small>${dates}, ${count} Attendees</small>"
-msgstr "${title} <small>${dates}, ${count} Teilnehmer</small>"
-
-msgid "A notification with this subject exists already"
-msgstr "Eine Mitteilung mit diesem Titel existiert bereits"
-
-msgid "Myself"
-msgstr "Mich selbst"
-
-msgid "Organisers with an occasion"
-msgstr "Veranstalter mit Durchführungen"
-
-msgid "Users of a given role"
-msgstr "Benutzer mit einer bestimmten Rolle"
-
-msgid "Users with wishes"
-msgstr "Benutzer mit Wünschen"
-
-msgid "Users with bookings"
-msgstr "Benutzer mit Buchungen"
-
-msgid "Users with unpaid bills"
-msgstr "Benutzer mit unbezahlten Rechnungen"
-
-msgid "Users with attendees of a given occasion"
-msgstr "Benutzer mit Teilnehmern einer bestimmten Durchführung"
-
-msgid "Administrators"
-msgstr "Administratoren"
-
-msgid "Organisers"
-msgstr "Veranstalter"
-
-msgid "Members"
-msgstr "Mitglieder"
-
-msgid "Active users"
-msgstr "Aktive Benutzer"
-
-msgid "Inactive users"
-msgstr "Inaktive Benutzer"
-
-msgid "Children of organisers"
-msgstr "Kinder von Veranstaltern"
-
-msgid "Prefer the following children:"
-msgstr "Folgende Kinder bevorzugen:"
-
-msgid "Children of administrators"
-msgstr "Kinder von Administratoren"
-
-msgid "Confirm matching:"
-msgstr "Zuteilung abschliessen:"
-
-msgid "I know the wishlist-phase ends as a result."
-msgstr "Mir ist bewusst dass die Wunschphase damit endet."
-
-msgid "Yes, confirm matching"
-msgstr "Ja, Zuteilung abschliessen"
-
-msgid "Activity"
-msgstr "Angebot"
-
-msgid "Half day"
-msgstr "Halbtägig"
-
-msgid "Full day"
-msgstr "Ganztägig"
-
-msgid "Multiple days"
-msgstr "Mehrtägig"
-
-msgid "Show activity"
-msgstr "Zum Angebot"
-
-msgid "Publish"
-msgstr "Veröffentlichen"
-
-msgid "Archive"
-msgstr "Archivieren"
-
-msgid "Do you really want to publish this activity?"
-msgstr "Möchten Sie dieses Angebot wirklich veröffentlichen?"
-
-msgid "Publish Activity"
-msgstr "Angebot veröffentlichen"
-
-msgid "Do you really want to archive this activity?"
-msgstr "Möchten Sie dieses Angebot wirklich archivieren?"
-
-msgid "This cannot be undone. The activity will be made private as a result."
-msgstr ""
-"Dies kann nicht rückgängig gemacht werden. Das Angebot wird von der "
-"Öffentlichkeit versteckt."
-
-msgid "Archive Activity"
-msgstr "Angebot archivieren"
-
-msgid "Title of the period."
-msgstr "Titel des Zeitraums."
-
-msgid "Link to the user's invoices."
-msgstr "Link zu den Rechnungen des Benutzers."
-
-msgid "Link to the user's bookings."
-msgstr "Link zu den Buchungen des Benutzers."
-
-msgid "Link to the activities."
-msgstr "Link zu den Aktivitäten."
-
-msgid "Link to the homepage."
-msgstr "Link zur Startseite."
-
-msgid "Users"
-msgstr "Benutzer"
-
-msgid "Exports user accounts."
-msgstr "Exportiert Benutzerkonten."
-
-msgid "Occasions"
-msgstr "Durchführungen"
-
-msgid "Exports activities with an occasion in the given period."
-msgstr "Exportiert Angebote mit Durchführungen im gewählten Zeitraum."
-
-msgid "Needs"
-msgstr "Bedarf"
-
-msgid "Exports occasion needs."
-msgstr "Exportiert den Bedarf von Durchführungen."
-
-msgid "Invoice Items"
-msgstr "Rechungspositionen"
-
-msgid "Exports invoice items in the given period."
-msgstr "Exportiert Rechnungspositionen im gewählten Zeitraum."
-
-msgid "Wishlist / Bookings"
-msgstr "Wunschliste / Buchungen"
-
-msgid ""
-"Exports wishlists or bookings, depending on the current state of the given "
-"period."
-msgstr ""
-"Exportiert Wünsche oder Buchungen, je nach Status des gewählten Zeitraums."
+msgid "Activities"
+msgstr "Angebote"
 
 msgid "Activity Title"
 msgstr "Angebot Titel"
@@ -1151,6 +214,15 @@ msgstr "Rechnungsposition Betrag"
 msgid "Invoice Item References"
 msgstr "Rechnungsposition Referenzen"
 
+msgid "Wishlist / Bookings"
+msgstr "Wunschliste / Buchungen"
+
+msgid ""
+"Exports wishlists or bookings, depending on the current state of the given "
+"period."
+msgstr ""
+"Exportiert Wünsche oder Buchungen, je nach Status des gewählten Zeitraums."
+
 msgid "Accepted"
 msgstr "Angenommen"
 
@@ -1166,6 +238,12 @@ msgstr "Beantragt"
 msgid "Published"
 msgstr "Veröffentlicht"
 
+msgid "Mr."
+msgstr "Herr"
+
+msgid "Ms."
+msgstr "Frau"
+
 msgid "Open"
 msgstr "Offen"
 
@@ -1178,43 +256,1050 @@ msgstr "Abgelehnt"
 msgid "Blocked"
 msgstr "Blockiert"
 
+msgid "Boy"
+msgstr "Junge"
+
+msgid "Girl"
+msgstr "Mädchen"
+
 msgid "Administrator"
 msgstr "Administrator"
+
+msgid "Editor"
+msgstr "Veranstalter"
 
 msgid "Member"
 msgstr "Mitglied"
 
-msgid "Period activated."
-msgstr "Zeitraum aktiviert."
+msgid "Invoice Items"
+msgstr "Rechungspositionen"
 
-msgid "Period deactivated."
-msgstr "Zeitraum deaktiviert."
+msgid "Exports invoice items in the given period."
+msgstr "Exportiert Rechnungspositionen im gewählten Zeitraum."
 
-msgid "Period deleted."
-msgstr "Zeitraum gelöscht."
+msgid "Occasions"
+msgstr "Durchführungen"
 
-msgid "Period archived."
-msgstr "Zeitraum archiviert."
+msgid "Exports activities with an occasion in the given period."
+msgstr "Exportiert Angebote mit Durchführungen im gewählten Zeitraum."
 
-msgid "Matching confirmed."
-msgstr "Zuteilung abgeschlossen."
+msgid "Needs"
+msgstr "Bedarf"
 
-msgid "Billing finalized."
-msgstr "Fakturierung abgeschlossen."
+msgid "Exports occasion needs."
+msgstr "Exportiert den Bedarf von Durchführungen."
 
-msgid "No notification templates yet."
-msgstr "Es wurden noch keine Mitteilungs-Vorlagen erfasst."
+msgid "Users"
+msgstr "Benutzer"
 
-msgid "sent ${time_ago}"
-msgstr "gesendet ${time_ago}"
+msgid "Exports user accounts."
+msgstr "Exportiert Benutzerkonten."
 
-msgid "Not sent yet"
-msgstr "Noch nie gesendet"
+msgid "Accessible"
+msgstr "Behindertenfreundlich"
 
-#. Used in sentence: "No bank account defined. Please define a bank account in
-#. the ${link} first."
-msgid "settings"
-msgstr "Einstellungen"
+msgid "Adventure"
+msgstr "Abenteuer"
+
+msgid "Animals"
+msgstr "Tiere"
+
+msgid "Baking"
+msgstr "Backen"
+
+msgid "Cinema"
+msgstr "Kino"
+
+msgid "Computer"
+msgstr "Computer"
+
+msgid "Cooking"
+msgstr "Kochen"
+
+msgid "Dance"
+msgstr "Tanz"
+
+msgid "Design"
+msgstr "Gestalten"
+
+msgid "Excursion"
+msgstr "Ausflug"
+
+msgid "Farm"
+msgstr "Bauernhof"
+
+msgid "Game"
+msgstr "Spiel"
+
+msgid "Handicraft"
+msgstr "Basteln"
+
+msgid "Health"
+msgstr "Gesundheit"
+
+msgid "Media"
+msgstr "Medien"
+
+msgid "Museums"
+msgstr "Museum"
+
+msgid "Music"
+msgstr "Musik"
+
+msgid "Nature"
+msgstr "Natur"
+
+msgid "Professions"
+msgstr "Berufe"
+
+msgid "Science"
+msgstr "Wissenschaft"
+
+msgid "Security"
+msgstr "Sicherheit"
+
+msgid "Sightseeing"
+msgstr "Besichtigung"
+
+msgid "Sport"
+msgstr "Sport"
+
+msgid "Styling"
+msgstr "Styling"
+
+msgid "Theater"
+msgstr "Theater"
+
+msgid "Trade"
+msgstr "Handwerk"
+
+msgid "Title"
+msgstr "Titel"
+
+msgid "The title of the activity"
+msgstr "Der Titel des Angebots"
+
+msgid "Lead"
+msgstr "Einleitung"
+
+msgid "Describes briefly what this activity is about"
+msgstr "Beschreibt kurz um was es beim Angebot geht"
+
+msgid "Text"
+msgstr "Text"
+
+msgid "Tags"
+msgstr "Kategorien"
+
+msgid "Organiser"
+msgstr "Veranstalter"
+
+msgid "Administration"
+msgstr "Administration"
+
+msgid "Location"
+msgstr "Ort"
+
+msgid "Map"
+msgstr "Karte"
+
+msgid "You already entered a child with this name"
+msgstr "Sie haben bereits ein Kind mit diesem Namen eingegeben"
+
+msgid "First Name"
+msgstr "Vorname"
+
+msgid "Last Name"
+msgstr "Nachname"
+
+msgid "Birthdate"
+msgstr "Geburtsdatum"
+
+msgid "Gender"
+msgstr "Geschlecht"
+
+msgid "Health Information"
+msgstr "Gesundheitsangaben"
+
+msgid "Allergies, Disabilities, Particulars"
+msgstr "Allergien, Behinderungen, Besonderheiten"
+
+msgid "Attendee"
+msgstr "Teilnehmer"
+
+msgid "Note"
+msgstr "Bemerkung"
+
+msgid "Ignore Age Restriction"
+msgstr "Altersbeschränkung ignorieren"
+
+msgid "Accept TOS"
+msgstr "AGB akzeptieren"
+
+#.
+#. Used in sentence: "I have read the ${tos} and accept them."
+msgid "TOS"
+msgstr "AGB"
+
+msgid "Add a new attendee"
+msgstr "Neuen Teilnehmer erfassen"
+
+msgid "The TOS must be accepted to create a booking."
+msgstr "Die AGB müssen akzeptiert werden, bevor Buchung gemacht werden können."
+
+msgid ""
+"Your userprofile is not complete. It needs to be complete before signing up "
+"any attendees."
+msgstr ""
+"Ihr Benutzerprofil ist unvollständig. Es muss vollständig sein bevor Sie "
+"Teilnehmer anmelden können."
+
+msgid ""
+"The user's userprofile is not complete. It needs to be complete before "
+"signing up any attendees."
+msgstr ""
+"Das Benutzerprofil des Benutzers ist unvollständig. Es muss vollständig sein "
+"bevor Teilnehmer angemeldet werden können."
+
+#, python-format
+msgid "This occasion has already been booked by ${name}"
+msgstr "${name} hat sich bereits für diese Durchführung angemeldet"
+
+msgid "This occasion is outside the currently active period"
+msgstr "Diese Durchführung liegt ausserhalb des aktiven Zeitraums"
+
+msgid "This period has already been finalized"
+msgstr "Dieser Zeitraum wurde bereits abgeschlossen"
+
+msgid "Cannot create a booking outside the prebooking period"
+msgstr "Anmeldungen können nur während der Wunschphase gemacht werden"
+
+msgid "This occasion is already fully booked"
+msgstr "Diese Durchführung ist bereits ausgebucht"
+
+msgid "This is an unapproved activity"
+msgstr "Dies ist ein unbestätigtes Angebot"
+
+#, python-format
+msgid ""
+"The attendee already has already reached the maximum number of ${count} "
+"bookings"
+msgstr ""
+"Der Teilnehmer hat bereits die maximale Anzahl von ${count} Buchungen "
+"erreicht"
+
+msgid "This occasion overlaps with another booking"
+msgstr "Diese Durchführung wird von einer bestehenden Buchung überlappt"
+
+msgid "The attendee is too old"
+msgstr "Der Teilnehmer ist zu alt"
+
+msgid "The attendee is too young"
+msgstr "Der Teilnehmer ist zu jung"
+
+msgid "The deadline has passed"
+msgstr "Der Anmeldeschluss wurde erreicht"
+
+msgid "Maximum number of bookings per period"
+msgstr "Maximale Anzahl Buchungen pro Zeitraum"
+
+msgid "Period"
+msgstr "Zeitraum"
+
+msgid "ISO 20022 XML"
+msgstr "ISO 20022 XML"
+
+msgid "Confirm billing:"
+msgstr "Fakturierung bestätigen:"
+
+msgid "No, preview only"
+msgstr "Nein, nur Vorschau"
+
+msgid "Yes, confirm billing"
+msgstr "Ja, Fakturierung abschliessen"
+
+msgid "I know that this stops all changes including cancellations."
+msgstr ""
+"Mir ist bewusst dass danach keine Buchungsänderungen mehr möglich sind."
+
+msgid "Target"
+msgstr "Ziel"
+
+msgid "User"
+msgstr "Benutzer"
+
+msgid "Booking Text"
+msgstr "Buchungstext"
+
+msgid "Kind"
+msgstr "Art"
+
+msgid "Discount"
+msgstr "Abzug"
+
+msgid "Surcharge"
+msgstr "Zuschlag"
+
+msgid "All"
+msgstr "Alle"
+
+msgid "For a specific user"
+msgstr "Für einen spezifischen Benutzer"
+
+msgid "For users with tags"
+msgstr "Für Benutzer einer bestimmten Kategorie"
+
+msgid "My donation"
+msgstr "Meine Spende"
+
+msgid "Invalid amount"
+msgstr "Ungültiger Betrag"
+
+msgid "Children of organisers"
+msgstr "Kinder von Veranstaltern"
+
+msgid "Prefer the following children:"
+msgstr "Folgende Kinder bevorzugen:"
+
+msgid "Children of administrators"
+msgstr "Kinder von Administratoren"
+
+msgid "Confirm matching:"
+msgstr "Zuteilung abschliessen:"
+
+msgid "Yes, confirm matching"
+msgstr "Ja, Zuteilung abschliessen"
+
+msgid "I know the wishlist-phase ends as a result."
+msgstr "Mir ist bewusst dass die Wunschphase damit endet."
+
+msgid "Subject"
+msgstr "Betreff"
+
+msgid "Message"
+msgstr "Mitteilung"
+
+msgid "A notification with this subject exists already"
+msgstr "Eine Mitteilung mit diesem Titel existiert bereits"
+
+msgid "Send to (applies to active period only)"
+msgstr "Senden an (bezieht sich nur auf den aktiven Zeitraum)"
+
+msgid "Myself"
+msgstr "Mich selbst"
+
+msgid "Organisers with an occasion"
+msgstr "Veranstalter mit Durchführungen"
+
+msgid "Users of a given role"
+msgstr "Benutzer mit einer bestimmten Rolle"
+
+msgid "Users with wishes"
+msgstr "Benutzer mit Wünschen"
+
+msgid "Users with bookings"
+msgstr "Benutzer mit Buchungen"
+
+msgid "Users with unpaid bills"
+msgstr "Benutzer mit unbezahlten Rechnungen"
+
+msgid "Users with attendees of a given occasion"
+msgstr "Benutzer mit Teilnehmern einer bestimmten Durchführung"
+
+msgid "Role"
+msgstr "Rolle"
+
+msgid "Administrators"
+msgstr "Administratoren"
+
+msgid "Organisers"
+msgstr "Veranstalter"
+
+msgid "Members"
+msgstr "Mitglieder"
+
+msgid "Occasion"
+msgstr "Durchführung"
+
+msgid "Useraccounts"
+msgstr "Benutzerkonten"
+
+msgid "Active users"
+msgstr "Aktive Benutzer"
+
+msgid "Inactive users"
+msgstr "Inaktive Benutzer"
+
+#, python-format
+msgid "${title} (cancelled) <small>${dates}, ${count} Attendees</small>"
+msgstr "${title} (abgesagt) <small>${dates}, ${count} Teilnehmer</small>"
+
+#, python-format
+msgid "${title} <small>${dates}, ${count} Attendees</small>"
+msgstr "${title} <small>${dates}, ${count} Teilnehmer</small>"
+
+msgid "Dates"
+msgstr "Daten"
+
+msgid "Meeting Point"
+msgstr "Treffpunkt"
+
+msgid "Cost"
+msgstr "Kosten"
+
+msgid "The amount paid to the organiser"
+msgstr "Der Betrag welcher dem Veranstalter gezahlt wird"
+
+msgid "Minimum Number of Participants"
+msgstr "Mindestteilnehmerzahl"
+
+msgid "Participants"
+msgstr "Teilnehmer"
+
+msgid "Maximum Number of Participants"
+msgstr "Anzahl Plätze"
+
+msgid "Minimum Age"
+msgstr "Mindestalter"
+
+msgid "Maximum Age"
+msgstr "Höchstalter"
+
+msgid "Allow overlap"
+msgstr "Überschneidung erlauben"
+
+msgid "Allows bookings to this occasion to overlap with other bookings."
+msgstr ""
+"Erlaubt die Überlappung von Buchungen dieser Durchführung mit anderen "
+"Buchungen."
+
+msgid "Advanced"
+msgstr "Erweitert"
+
+msgid "Exempt from booking limit"
+msgstr "Ausgenommen von der Buchungs-Limite"
+
+msgid ""
+"Allows bookings to this occasion to be excempt from booking limits. Does not "
+"apply to matching."
+msgstr ""
+"Erlaubt die Buchung dieser Durchführung über dem Limit. Bei der Zuteilung "
+"wird das Limit weiterhin beachtet."
+
+msgid "Must specify at least one date"
+msgstr "Bitte spezifizieren Sie mindestens ein Datum"
+
+msgid "Cannot adjust period, there are bookings linked to this occassion"
+msgstr ""
+"Der Zeitraum kann nicht angepasst werden, bestehende Buchungen wären "
+"betroffen"
+
+msgid "The end date must be after the start date"
+msgstr "Das End-Datum muss nach dem Start-Datum liegen"
+
+msgid "The date is outside the selected period"
+msgstr "Das Datum liegt ausserhalb des gewählten Zeitraums"
+
+msgid "The date overlaps with another in this occasion"
+msgstr "Das Datum überlappt sich mit einem anderen Datum dieser Durchführung"
+
+msgid "Date validation failed"
+msgstr "Datums-Validierung fehlgeschlagen"
+
+msgid "The minium age cannot be higher than the maximum age"
+msgstr "Das Mindestalter kann nicht tiefer als das Maximalalter sein"
+
+msgid ""
+"The minium number of participants cannot be higher than the maximum number "
+"of participants"
+msgstr ""
+"The Mindestteilnehmerzahl darf nicht grösser als die Anzahl Plätze sein"
+
+msgid ""
+"The maximum number of spots is lower than the number of already accepted "
+"bookings."
+msgstr ""
+"Die Anzahl Plätze ist tiefer als die Anzahl bereits angenommener Buchungen."
+
+msgid "Start"
+msgstr "Start"
+
+msgid "End"
+msgstr "Ende"
+
+msgid "Add"
+msgstr "Hinzufügen"
+
+msgid "Remove"
+msgstr "Entfernen"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Chaperones, Cars, Meals"
+msgstr "Begleitpersonen, Fahrzeuge, Verpflegung"
+
+msgid "Description"
+msgstr "Beschreibung"
+
+msgid "Need at least"
+msgstr "Benötige mindestens"
+
+msgid "Need up to"
+msgstr "Benötige bis zu"
+
+msgid "Minimum is larger than maximum"
+msgstr "Das Minimum ist grösser als das Maximum"
+
+msgid "This name has already been used for this occasion"
+msgstr "Dieser Name wurde bereits für diese Durchführung verwendet"
+
+#, python-format
+msgid "Ferienpass Summer ${year}"
+msgstr "Ferienpass Sommer ${year}"
+
+msgid "Prebooking Start"
+msgstr "Start Wunschphase"
+
+msgid "Prebooking End"
+msgstr "Ende Wunschphase"
+
+msgid "Execution Start"
+msgstr "Start Durchführung"
+
+msgid "Execution End"
+msgstr "Ende Durchführung"
+
+msgid "How are the activities conducted?"
+msgstr "Wie wird der Ferienpass umgesetzt?"
+
+msgid "Execution"
+msgstr "Ausführung"
+
+msgid ""
+"Each attendee may book as many activites as he likes. Each activity is "
+"billed separately."
+msgstr ""
+"Jeder Teilnehmer kann so viele Angebote buchen wie er möchte. Jedes Angebot "
+"wird einzeln verrechnet."
+
+msgid ""
+"Each attendee may attend a limited number of activites for a fixed price."
+msgstr ""
+"Jeder Teilnehmer kann für einen fixen Preis an einer limitierten Anzahl von "
+"Angeboten teilnehmen."
+
+msgid "Maximum Number of Activities per Attendee"
+msgstr "Maximale Anzahl Angebote pro Teilnehmer"
+
+msgid "Cost of the Pass"
+msgstr "Kosten des Passes"
+
+msgid "The administrative cost of each booking"
+msgstr "Die administrativen Kosten einer einzelnen Buchung"
+
+msgid "How is the organiser paid?"
+msgstr "Wie wird der Veranstalter bezahlt?"
+
+msgid "The parents pay everything by bill, the organisers are paid later"
+msgstr ""
+"Die Eltern zahlen alles per Rechnung, die Veranstalter werden später bezahlt"
+
+msgid ""
+"The parents pay the pass by bill, the organisers are paid in cash at the "
+"beginning of each occasion"
+msgstr ""
+"Die Eltern zahlen den Pass per Rechnung, zusätzliche Teilnahmegebühren "
+"werden dem Veranstalter bar vor Ort bezahlt"
+
+msgid "Required minutes between bookings"
+msgstr "Blockzeit zwischen Buchungen in Minuten"
+
+msgid "Attendees are limited to one activity per day"
+msgstr "Teilnehmer sind auf ein Angebot pro Tag limitiert"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nein"
+
+msgid "Stop accepting bookings"
+msgstr "Die Annahme von Buchungen stoppen"
+
+msgid "Deadline"
+msgstr "Anmeldeschluss"
+
+msgid "On a fixed day"
+msgstr "An einem Stichtag"
+
+msgid "X days before each occasion"
+msgstr "X Tage vor jeder Durchführung"
+
+msgid "Fixed day"
+msgstr "Stichtag"
+
+msgid "X Days Before"
+msgstr "X Tage vorher"
+
+msgid "Allow members to cancel confirmed bookings"
+msgstr "Mitgliedern erlauben bestätigte Buchungen abzusagen"
+
+msgid "Cancellation Deadline"
+msgstr "Stornierungsschluss"
+
+msgid "No, only allow admins"
+msgstr "Nein, nur Administratoren erlauben"
+
+msgid "Until a fixed day"
+msgstr "Bis zu einem Stichtag"
+
+msgid "Up to X days before each occasion"
+msgstr "Bis zu X Tage vor jeder Durchführung"
+
+msgid "Method"
+msgstr "Methode"
+
+msgid "Age check"
+msgstr "Altersprüfung"
+
+msgid ""
+"<b>Exact</b> - the attendees need to be of the expected age at the beginning "
+"of the occasion"
+msgstr ""
+"<b>Genau</b> - Die Teilnehmer müssen zu Beginn der Durchführung das "
+"erwartete Alter haben"
+
+msgid ""
+"<b>Age group</b> - The attendees need to be of the expected age sometime "
+"during the year of the occasion"
+msgstr ""
+"<b>Jahrgang</b> - Die Teilnehmer müssen irgendwann im Jahr der Durchführung "
+"das erwartete Alter haben"
+
+msgid "The execution phase conflicts with existing occasions"
+msgstr "Konflikt mit bestehenden Durchführungen"
+
+msgid ""
+"The prebooking period must start before the exeuction period and each period "
+"must start before it ends."
+msgstr ""
+"Die Wunschphase muss vor der Durchführung stattfinden und die Start-Daten "
+"müssen vor den End-Daten liegen."
+
+msgid ""
+"It is no longer possible to change the execution settings since the period "
+"has already been confirmed"
+msgstr ""
+"Es ist nicht mehr möglich die Ausführungs-Einstellungen zu verändern da der "
+"Zeitraum bereits bestätigt wurde."
+
+msgid ""
+"It is not possible to have required minutes between bookings when limiting "
+"attendees to one activity per day"
+msgstr ""
+"Es ist nicht möglich eine Blockzeit zu erfassen wenn Teilnehmer auf ein "
+"Angebot pro Tag beschränkt sind"
+
+msgid "Send a daily status e-mail."
+msgstr "Ein tägliches Status E-Mail senden."
+
+msgid "General"
+msgstr "Allgemein"
+
+msgid "Salutation"
+msgstr "Anrede"
+
+msgid "Personal"
+msgstr "Persönlich"
+
+msgid "Organisation"
+msgstr "Organisation"
+
+msgid "Address"
+msgstr "Adresse"
+
+msgid "Zip Code"
+msgstr "PLZ"
+
+msgid "Place"
+msgstr "Ort"
+
+msgid "Political Municipality"
+msgstr "Politische Gemeinde"
+
+msgid "Public E-Mail Address"
+msgstr "Öffentliche E-Mail Adresse"
+
+msgid "If different than username"
+msgstr "Falls anders als Benutzername"
+
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "Emergency Contact"
+msgstr "Kontakt im Notfall"
+
+msgid "012 345 67 89 (Peter Muster)"
+msgstr "012 345 67 89 (Peter Muster)"
+
+msgid "Website"
+msgstr "Webseite"
+
+msgid "Website address including http:// or https://"
+msgstr "Webseiten-Adresse inklusive http:// oder https://"
+
+msgid "Bank Account (IBAN)"
+msgstr "Bank Konto (IBAN)"
+
+msgid "Beneficiary"
+msgstr "Begünstigter"
+
+msgid "Please enter both a phone number and a name"
+msgstr "Bitte geben Sie eine Telefonnummer und einen Namen ein"
+
+msgid "A beneficiary is required if a bank account is given."
+msgstr "Ein Begünstigter ist nötig wenn ein Bank Konto angegeben wird."
+
+msgid "Register a new account"
+msgstr "Ein neues Konto eröffnen"
+
+msgid "Go to Login"
+msgstr "Anmelden"
+
+msgid "Go to Profile"
+msgstr "Benutzerprofil"
+
+#, python-format
+msgid "Do you really want to provide \"${title}\" again?"
+msgstr "Möchten Sie \"${title}\" wirklich erneut anbieten?"
+
+msgid "You will have to request publication again"
+msgstr "Sie werden erneut die Publikation beantragen müssen"
+
+msgid "Provide Again"
+msgstr "Erneut anbieten"
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid "Homepage"
+msgstr "Startseite"
+
+msgid "Submit Activity"
+msgstr "Angebot erfassen"
+
+msgid "Provide activity again"
+msgstr "Angebot erneut anbieten"
+
+#, python-format
+msgid "Wishlist of ${user}"
+msgstr "Wunschliste von ${user}"
+
+#, python-format
+msgid "Bookings of ${user}"
+msgstr "Buchungen von ${user}"
+
+msgid "Group"
+msgstr "Gruppe"
+
+msgid "Request Publication"
+msgstr "Publikation beantragen"
+
+msgid ""
+"There is currently no active period. Please retry once a period has been "
+"activated."
+msgstr ""
+"Es ist zur Zeit kein Zeitraum aktiv. Bitte versuchen Sie es erneut wenn ein "
+"Zeitraum aktiviert wurde."
+
+msgid "Do you really want to request publication?"
+msgstr "Möchten Sie die Publikation wirklich beantragen?"
+
+msgid "This cannot be undone."
+msgstr "Dies kann nicht rückgängig gemacht werden."
+
+msgid "Please add at least one occasion before requesting publication."
+msgstr ""
+"Bitte fügen Sie mindestens eine Durchführung hinzu bevor Sie die Publikation "
+"beantragen."
+
+msgid "Discard"
+msgstr "Verwerfen"
+
+#, python-format
+msgid "Do you really want to discard \"${title}\"?"
+msgstr "Möchten Sie \"${title}\" wirklich verwerfen?"
+
+msgid "Discard Activity"
+msgstr "Angebot verwerfen"
+
+msgid "Edit"
+msgstr "Bearbeiten"
+
+msgid "New Occasion"
+msgstr "Neue Durchführung"
+
+msgid "Occasions cannot be created yet"
+msgstr "Durchführungen können noch nicht erstellt werden"
+
+msgid ""
+"There are no periods defined yet. At least one period needs to be defined "
+"before occasions can be created"
+msgstr ""
+"Es existieren zur Zeit keine Zeiträume. Mindestens ein Zeitraum muss "
+"bestehen bevor Durchführungen erfasst werden können"
+
+msgid "Attendees"
+msgstr "Teilnehmer"
+
+msgid "Show Ticket"
+msgstr "Zum Ticket"
+
+msgid "Manage Periods"
+msgstr "Zeiträume"
+
+msgid "New Period"
+msgstr "Neuer Zeitraum"
+
+msgid "Matches"
+msgstr "Zuteilungen"
+
+#, python-format
+msgid "Delete \"${text}\""
+msgstr "\"${text}\" entfernen"
+
+msgid ""
+"This booking cannot be removed, at least one booking has been paid online."
+msgstr ""
+"Diese Buchung kann nicht entfernt werden, mindestens eine Buchung wurde "
+"online bezahlt."
+
+msgid "You may remove the bookings manually one by one."
+msgstr "Die Buchungen können nur einzeln entfernt werden."
+
+#, python-format
+msgid "Do you really want to remove \"${text}\"?"
+msgstr "Möchten Sie \"${text}\" wirklich entfernen?"
+
+#, python-format
+msgid "${count} bookings will be removed"
+msgstr "${count} Buchungen werden entfernt"
+
+#, python-format
+msgid "Remove ${count} bookings"
+msgstr "${count} Buchungen entfernen"
+
+msgid "Import Bank Statement"
+msgstr "Kontoauszug importieren"
+
+msgid "Synchronise Online Payments"
+msgstr "Online Zahlungen synchronisieren"
+
+msgid "Accounting"
+msgstr "Buchhaltung"
+
+msgid "Manual Booking"
+msgstr "Manuelle Buchung"
+
+msgid "Manual bookings can only be added once the billing has been confirmed"
+msgstr ""
+"Manuelle Buchungen können erst nach Bestätigung der Fakturierung erstellt "
+"werden"
+
+msgid "Donation"
+msgstr "Spende"
+
+msgid "Notification Templates"
+msgstr "Mitteilungs-Vorlagen"
+
+msgid "New Notification Template"
+msgstr "Neue Mitteilungs-Vorlage"
+
+msgid "Half day"
+msgstr "Halbtägig"
+
+msgid "Full day"
+msgstr "Ganztägig"
+
+msgid "Multiple days"
+msgstr "Mehrtägig"
+
+msgid "Activity"
+msgstr "Angebot"
+
+msgid "Publish"
+msgstr "Veröffentlichen"
+
+msgid "Do you really want to publish this activity?"
+msgstr "Möchten Sie dieses Angebot wirklich veröffentlichen?"
+
+msgid "Publish Activity"
+msgstr "Angebot veröffentlichen"
+
+msgid "Archive"
+msgstr "Archivieren"
+
+msgid "Do you really want to archive this activity?"
+msgstr "Möchten Sie dieses Angebot wirklich archivieren?"
+
+msgid "This cannot be undone. The activity will be made private as a result."
+msgstr ""
+"Dies kann nicht rückgängig gemacht werden. Das Angebot wird von der "
+"Öffentlichkeit versteckt."
+
+msgid "Archive Activity"
+msgstr "Angebot archivieren"
+
+msgid "Show activity"
+msgstr "Zum Angebot"
+
+msgid "Title of the period."
+msgstr "Titel des Zeitraums."
+
+msgid "Link to the user's invoices."
+msgstr "Link zu den Rechnungen des Benutzers."
+
+msgid "Link to the user's bookings."
+msgstr "Link zu den Buchungen des Benutzers."
+
+msgid "Link to the activities."
+msgstr "Link zu den Aktivitäten."
+
+msgid "Link to the homepage."
+msgstr "Link zur Startseite."
+
+msgid "No activities found."
+msgstr "Keine Angebote gefunden."
+
+msgid "Reset filter."
+msgstr "Filter zurücksetzen."
+
+msgid "Age"
+msgstr "Alter"
+
+msgid "${min_age} - ${max_age} years"
+msgstr "${min_age} - ${max_age} Jahre"
+
+msgid "starting at ${price} CHF"
+msgstr "ab ${price} CHF"
+
+msgid "Free Spots"
+msgstr "Freie Plätze"
+
+msgid "No free spots"
+msgstr "Keine freien Plätze"
+
+msgid "1 free spot"
+msgstr "1 freier Platz"
+
+msgid "${count} free spots"
+msgstr "${count} freie Plätze"
+
+msgid "Show more"
+msgstr "Mehr anzeigen"
+
+msgid "Navigate up"
+msgstr "Nach oben"
+
+msgid "States"
+msgstr "Status"
+
+msgid "Weeks"
+msgstr "Wochen"
+
+msgid "Weekdays"
+msgstr "Wochentage"
+
+msgid "Duration"
+msgstr "Dauer"
+
+msgid "Price"
+msgstr "Preis"
+
+msgid "Municipalities"
+msgstr "Gemeinden"
+
+msgid ""
+"This is a preview. Please edit it until you are satisifed with the result "
+"and then press \"Request Publication\". An administrator will then review "
+"your proposal."
+msgstr ""
+"Dies ist eine Vorschau. Bitte bearbeiten Sie diese, bis Sie zufrieden sind. "
+"Im Anschluss wählen Sie \"Publikation Beantragen\" in der Menübar. Ein "
+"Administrator überprüft darauf Ihr Angebot."
+
+msgid ""
+"This is a preview. Please edit it until you are satisifed with the result "
+"and then press \"Request Publication\" to mark the activity ready for review."
+msgstr ""
+"Dies ist eine Vorschau. Bitte bearbeiten Sie diese, bis Sie zufrieden sind. "
+"Im Anschluss wählen Sie \"Publikation Beantragen\". Sie oder ein anderer "
+"Administrator können daraufhin das Angebot prüfen und veröffentlichen."
+
+msgid "This activity is currently being reviewd by an administrator."
+msgstr "Dieses Angebot wird zur Zeit überprüft."
+
+msgid "This activity has been archived."
+msgstr "Dieses Angebot wurde archiviert."
+
+msgid "There are currently no occasions planned."
+msgstr "Es sind zur Zeit keine Durchführungen geplant."
+
+msgid "The total amount is ${amount} CHF."
+msgstr "Der Totalbetrag beläuft sich auf ${amount} CHF."
+
+msgid "The outstanding amount is ${amount} CHF."
+msgstr "Der ausstehende Betrag beläuft sich auf ${amount} CHF."
+
+msgid "No bills created yet."
+msgstr "Es wurden noch keine Rechnungen erstellt."
+
+msgid "Paid"
+msgstr "Bezahlt"
+
+msgid "${amount} unpaid"
+msgstr "${amount} Ausstehend"
+
+msgid "${amount} overpaid"
+msgstr "${amount} überbezahlt"
+
+msgid "Show Details"
+msgstr "Details anzeigen"
+
+msgid "Amount"
+msgstr "Betrag"
+
+msgid "Actions"
+msgstr "Aktionen"
+
+msgid "Discounts / Surcharges"
+msgstr "Abzüge / Zuschläge"
+
+msgid "Unpaid"
+msgstr "Unbezahlt"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Reset Billing"
+msgstr "Fakturierung zurücksetzen"
+
+msgid "The matching of this period has not been confirmed yet."
+msgstr "Die Zuteilung dieses Zeitraums wurde noch nicht bestätigt."
+
+msgid ""
+"This period is not active. Bills may only be created for the active period."
+msgstr ""
+"Dieser Zeitraum ist inaktiv. Rechnungen können nur für den aktive Zeitraum "
+"erstellt werden."
+
+msgid ""
+"The billing for this period has been confirmed. You can still change the "
+"invoices manually but you can no longer generate them automatically."
+msgstr ""
+"Die Fakturierung für diesen Zeitraum wurde abgeschlossen. Sie können die "
+"Rechnungen immer noch manuell ändern aber nicht mehr automatisch generieren."
 
 #. Canonical text for ${link} is: "settings"
 msgid ""
@@ -1222,6 +1307,11 @@ msgid ""
 msgstr ""
 "Es wurde noch kein Bankkonto definiert. Bitte definieren Sie ein Bankkonto "
 "in den ${link}."
+
+#. Used in sentence: "No bank account defined. Please define a bank account in
+#. the ${link} first."
+msgid "settings"
+msgstr "Einstellungen"
 
 msgid ""
 "To import a bank statement you need an account with one of the following "
@@ -1240,9 +1330,6 @@ msgstr ""
 "kennen das Format auch als \"camt.054\" oder \"camt.053\". Bitten Sie Ihre "
 "Bank darum Ihr Konto auf dieses Format umzustellen oder wählen Sie dieses "
 "Format in Ihrem Online-Banking Profil aus."
-
-msgid "Amount"
-msgstr "Betrag"
 
 msgid "Username"
 msgstr "Benutzername"
@@ -1289,14 +1376,84 @@ msgstr "Die Zahlung wurde bereits importiert."
 msgid "Could not match the payment to a bill."
 msgstr "Die Zahlung konnte keiner Rechnung zugewiesen werden."
 
-msgid "Hello!"
-msgstr "Guten Tag"
+msgid ""
+"You haven't added an emergency contact to your profile yet. Please add this "
+"information in your userprofile so we can reach you in an emergency!"
+msgstr ""
+"Sie haben noch keinen Notfallkontakt erfasst. Bitte fügen Sie diesen Kontakt "
+"hinzu damit wir sie im Notfall erreichen können!"
 
-msgid "Your activity has been archived:"
-msgstr "Ihr Angebot wurde archiviert:"
+msgid "Add in Userprofile"
+msgstr "Im Benutzerprofil ergänzen"
 
-msgid "Check ticket status"
-msgstr "Ticket Status anzeigen"
+msgid ""
+"This is your emergency contact. Please change it in the user profile if it "
+"is not up to date anymore:"
+msgstr ""
+"Dies ist Ihr Notfallkontakt. Bitte stellen Sie sicher dass dieser aktuell "
+"ist:"
+
+msgid "Change in Userprofile"
+msgstr "Im Benutzerprofil anpassen"
+
+msgid "No bookings yet."
+msgstr "Noch keine Buchungen."
+
+msgid "Mark up to three occasions per child as favorites."
+msgstr "Sie können bis zu drei Angebote pro Kind als Favorit markieren."
+
+msgid ""
+"Once the pre-booking is over, we will divide all children into activities."
+msgstr "Nach der Wunschphase verteilen wir die Kinder auf die Angebote."
+
+msgid "We cannot guarantee that everyone gets into their favorite activity."
+msgstr ""
+"Wir können nicht garantieren dass jedes Kind in sein Lieblingsangebot "
+"eingeteilt wird."
+
+msgid "Print"
+msgstr "Drucken"
+
+msgid "Add to calendar"
+msgstr "Zum Kalender hinzufügen"
+
+msgid "Limited to ${number} bookings"
+msgstr "Limitiert auf ${number} Buchungen"
+
+msgid "Unlimited bookings"
+msgstr "Keine Buchungslimite"
+
+msgid "Booked"
+msgstr "Gebucht"
+
+msgid "These wishes overlap accepted bookings and are therefore blocked."
+msgstr ""
+"Diese Wünsche überschneiden sich mit angenommenen Buchungen und sind daher "
+"blockiert."
+
+msgid "Free of charge"
+msgstr "Kostenlos"
+
+msgid "This occasion does not have enough attendees yet."
+msgstr "Diese Durchführung hat noch nicht genügend Teilnehmer."
+
+msgid "Parent"
+msgstr "Elternteil"
+
+msgid "Children"
+msgstr "Kinder"
+
+msgid "Contact"
+msgstr "Kontakt"
+
+msgid "E-Mail ${name}"
+msgstr "${name} schreiben"
+
+msgid "Call ${name}"
+msgstr "${name} anrufen"
+
+msgid "Passport"
+msgstr "Ferienpass"
 
 msgid "We thank you for your support!"
 msgstr "Wir danken herzlich für Ihre Unterstützung."
@@ -1307,6 +1464,100 @@ msgid ""
 msgstr ""
 "Ihre Spende wird Ihrer Rechnung hinzugefügt und kann bis zur Bezahlung der "
 "Rechnung jederzeit angepasst oder entfernt werden"
+
+msgid "For ${user}"
+msgstr "Für ${user}"
+
+msgid ""
+"Attendees can join their companions in a group to go to activities together."
+msgstr ""
+"Teilnehmer können mit Ihren Gspänli eine Gruppe bilden um gemeinsam an "
+"Angeboten teilzunehmen."
+
+msgid "This group is from an inactive period."
+msgstr "Dies ist eine Gruppe eines inaktiven Zeitraums"
+
+msgid "Sign Up for Activity"
+msgstr "Für das Angebot anmelden"
+
+msgid ""
+"Children need to be signed up to the activity to join the group. In case "
+"they are not, they can do that here."
+msgstr ""
+"Kinder müssen für das Angebot angemeldet sein, um der Gruppe beitreten zu "
+"können. Falls das noch nicht der Fall ist, können Sie das gleich hier tun."
+
+msgid "Children can join the group under \"Manage group\" after sign-up."
+msgstr ""
+"Nach der Anmeldung kann das Kind unter \"Gruppe verwalten\" der Gruppe "
+"hinzugefügt werden."
+
+msgid "Manage Group"
+msgstr "Gruppe verwalten"
+
+msgid ""
+"The formation of a group increases the chance of joining an activity "
+"together."
+msgstr ""
+"Die Bildung einer Gruppe erhöht die Wahrscheinlichkeit, ein Angebot "
+"gemeinsam besuchen zu können."
+
+msgid ""
+"You can add your own children to the group here or share the following link "
+"with other parents for them to sign up their own children:"
+msgstr ""
+"Sie können Ihre eigenen Kinder hier zu dieser Gruppe hinzufügen oder den "
+"folgenden Link mit anderen Eltern teilen, damit diese ihre Kinder hinzufügen "
+"können:"
+
+msgid "In Group"
+msgstr "In der Gruppe"
+
+msgid "Not in Group"
+msgstr "Nicht in der Gruppe"
+
+msgid "Booking Blocked"
+msgstr "Buchung blockiert"
+
+msgid "Booking Cancelled"
+msgstr "Buchung storniert"
+
+msgid "Booking Denied"
+msgstr "Buchung abgelehnt"
+
+msgid "Not signed up"
+msgstr "Nicht angemeldet"
+
+msgid "All your children are already part of this group."
+msgstr "Alle Ihre Kinder sind Teil dieser Gruppe."
+
+msgid "Your donation"
+msgstr "Ihre Spende"
+
+msgid "Adjust"
+msgstr "Anpassen"
+
+msgid "Do you really want to remove your donation?"
+msgstr "Möchten Sie Ihre Spende wirklich entfernen?"
+
+msgid "Remove donation"
+msgstr "Spende entfernen"
+
+msgid "I would like to make a donation to support children and teenagers."
+msgstr ""
+"Ich möchte einen zusätzlichen Betrag für Kinder und Jugendliche spenden."
+
+msgid "Donate now"
+msgstr "Jetzt spenden"
+
+msgid "Online Payment"
+msgstr "Online Bezahlung"
+
+msgid "Bank Transfer"
+msgstr "Bank-Überweisung"
+
+msgid "Notice"
+msgstr "Mitteilung"
 
 msgid "Pro Juventute Feriennet"
 msgstr "Pro Juventute Feriennet"
@@ -1358,12 +1609,6 @@ msgstr "Noch ${count} Plätze frei"
 msgid "${count} attendees"
 msgstr "${count} Teilnehmer"
 
-msgid "Age"
-msgstr "Alter"
-
-msgid "${min_age} - ${max_age} years"
-msgstr "${min_age} - ${max_age} Jahre"
-
 msgid "${min_spots} - ${max_spots} participants"
 msgstr "${min_spots} - ${max_spots} Teilnehmer"
 
@@ -1375,9 +1620,6 @@ msgstr "${cost} CHF"
 
 msgid "No additional costs"
 msgstr "Keine zusätzlichen Kosten"
-
-msgid "Free of charge"
-msgstr "Kostenlos"
 
 msgid "Independent of other occasions"
 msgstr "Unabhängig von anderen Durchführungen"
@@ -1469,9 +1711,6 @@ msgid ""
 "other booking is permitted."
 msgstr "Nötige Transferzeit zwischen zwei Durchführungen: ${minutes} Minuten."
 
-msgid "Actions"
-msgstr "Aktionen"
-
 msgid ""
 "Your request will be processed shortly. To see the state of your process "
 "your may return to this page at any time. All information on this page has "
@@ -1487,6 +1726,158 @@ msgstr "Ihr Anliegen wurde erfolgreich abgeschlossen."
 #. Canonical text for ${tos} is: "TOS"
 msgid "I have read the ${tos} and accept them."
 msgstr "Ich habe die ${tos} gelesen und stimme diesen zu."
+
+msgid "Hello!"
+msgstr "Guten Tag"
+
+msgid "Your activity has been published:"
+msgstr "Ihr Angebot wurde veröffentlicht:"
+
+msgid "Check ticket status"
+msgstr "Ticket Status anzeigen"
+
+msgid "Your activity has been archived:"
+msgstr "Ihr Angebot wurde archiviert:"
+
+msgid "Pro Juventute FERIENNET is supported by:"
+msgstr "Pro Juventute FERIENNET wird unterstützt von:"
+
+msgid "The average happiness is ${happiness}."
+msgstr "Die durchschnittliche Zufriedenheit liegt bei ${happiness}."
+
+msgid "${operability} of all occasions have enough attendees."
+msgstr "${operability} aller Durchführungen haben genug Teilnehmer."
+
+msgid "Marking bookings increases their priority during the next matching run."
+msgstr ""
+"Markierte Buchungen erhalten beim nächsten Zuteilungs-Lauf eine höhere "
+"Priorität."
+
+msgid "Years"
+msgstr "Jahre"
+
+msgid "State"
+msgstr "Status"
+
+msgid "Automatic Matching"
+msgstr "Automatische Zuteilung"
+
+msgid "Reset Matching"
+msgstr "Zuteilung zurücksetzen"
+
+msgid ""
+"This period is not yet in the wishlist phase. Only once the wishlist phase "
+"has started can the period be matched."
+msgstr ""
+"Dieser Zeitraum befindet sich noch nicht in der Wunschphase. Erst in dieser "
+"können Zuteilungen gemacht werden."
+
+msgid "This period is not active. Only the active period may be matched."
+msgstr ""
+"Dieser Zeitraum ist inaktiv. Zuteilungen können nur im aktiven Zeitraum "
+"gemacht werden."
+
+msgid ""
+"The matching for this period has been confirmed. If you want to change "
+"matching you need to book/cancel bookings manually."
+msgstr ""
+"Die automatische Zuteilung im aktuellen Zeitraum wurde bereits bestätigt. "
+"Die Zuteilung kann nur noch manuell über Buchungen/Stornierungen gemacht "
+"werden."
+
+msgid "Activity published."
+msgstr "Angebot veröffentlicht."
+
+msgid "Activity archived."
+msgstr "Angebot archiviert."
+
+msgid "Activity reassigned from ${old_username} to ${new_username}."
+msgstr "Zuteilung des Angebots an ${new_username} (von ${old_username})."
+
+msgid "Period activated."
+msgstr "Zeitraum aktiviert."
+
+msgid "Period deactivated."
+msgstr "Zeitraum deaktiviert."
+
+msgid "Period deleted."
+msgstr "Zeitraum gelöscht."
+
+msgid "Period archived."
+msgstr "Zeitraum archiviert."
+
+msgid "Matching confirmed."
+msgstr "Zuteilung abgeschlossen."
+
+msgid "Billing finalized."
+msgstr "Fakturierung abgeschlossen."
+
+msgid "Variables"
+msgstr "Variablen"
+
+msgid ""
+"Clicking \"Send\" will send the e-mail below to all selected recipients. You "
+"will receive a copy of the e-mail if you are not already on the recipients "
+"list."
+msgstr ""
+"Wenn Sie auf \"Senden\" klicken, wird eine E-Mail an alle ausgewählten "
+"Empfänger gesendet. Sie erhalten eine Kopie des E-Mails, falls Sie nicht "
+"bereits auf der Empfängerliste stehen."
+
+msgid "Target Group"
+msgstr "Zielgruppe"
+
+msgid "There are no available recipients for your user account."
+msgstr "Es bestehen keine verfügbaren Empfänger für Ihren Benutzer"
+
+msgid "No notification templates yet."
+msgstr "Es wurden noch keine Mitteilungs-Vorlagen erfasst."
+
+msgid "sent ${time_ago}"
+msgstr "gesendet ${time_ago}"
+
+msgid "Not sent yet"
+msgstr "Noch nie gesendet"
+
+msgid "This period has not been confirmed yet."
+msgstr "In diesem Zeitraum wurde noch keine Zuteilung gemacht."
+
+msgid "No occasions defined yet."
+msgstr "Es wurden noch keine Durchführungen definiert."
+
+msgid "Emergency Contact:"
+msgstr "Notfall:"
+
+msgid "Missing!"
+msgstr "Fehlt!"
+
+msgid "(User: ${user})"
+msgstr "(Benutzer: ${user})"
+
+msgid "Notes:"
+msgstr "Bemerkungen:"
+
+msgid "E-Mail:"
+msgstr "E-Mail:"
+
+msgid "Place:"
+msgstr "Ort:"
+
+msgid "Group:"
+msgstr "Gruppe:"
+
+msgid "Score"
+msgstr "Score"
+
+msgid "No bookings."
+msgstr "Keine Buchungen."
+
+msgid ""
+"The following activites contain occasions which are in conflict with the "
+"given execution phase:"
+msgstr ""
+"Folgende Angebote enthalten Durchführungen welche in Konflikt mit den "
+"Durchführungs-Daten stehen:"
 
 msgid "No periods defined."
 msgstr "Keine Zeiträume definiert."
@@ -1521,612 +1912,20 @@ msgstr "Aktiv"
 msgid "Inactive"
 msgstr "Inaktiv"
 
-msgid ""
-"Clicking \"Send\" will send the e-mail below to all selected recipients. You "
-"will receive a copy of the e-mail if you are not already on the recipients "
-"list."
-msgstr ""
-"Wenn Sie auf \"Senden\" klicken, wird eine E-Mail an alle ausgewählten "
-"Empfänger gesendet. Sie erhalten eine Kopie des E-Mails, falls Sie nicht "
-"bereits auf der Empfängerliste stehen."
+msgid "Editors"
+msgstr "Veranstalter"
 
-msgid "Target Group"
-msgstr "Zielgruppe"
+msgid "Opening Hours"
+msgstr "Termine"
 
-msgid "There are no available recipients for your user account."
-msgstr "Es bestehen keine verfügbaren Empfänger für Ihren Benutzer"
+msgid "Opening Hours Link"
+msgstr "Termine Link"
 
-msgid "For ${user}"
-msgstr "Für ${user}"
+msgid "The opening hours of the municipality"
+msgstr "Wichtige Termine des Ferienpasses"
 
-msgid ""
-"The following activites contain occasions which are in conflict with the "
-"given execution phase:"
-msgstr ""
-"Folgende Angebote enthalten Durchführungen welche in Konflikt mit den "
-"Durchführungs-Daten stehen:"
-
-msgid "No bills created yet."
-msgstr "Es wurden noch keine Rechnungen erstellt."
-
-msgid "Paid"
-msgstr "Bezahlt"
-
-msgid "${amount} unpaid"
-msgstr "${amount} Ausstehend"
-
-msgid "Show Details"
-msgstr "Details anzeigen"
-
-msgid "Discounts / Surcharges"
-msgstr "Abzüge / Zuschläge"
-
-msgid "Your donation"
-msgstr "Ihre Spende"
-
-msgid "Adjust"
-msgstr "Anpassen"
-
-msgid "Do you really want to remove your donation?"
-msgstr "Möchten Sie Ihre Spende wirklich entfernen?"
-
-msgid "Remove donation"
-msgstr "Spende entfernen"
-
-msgid "I would like to make a donation to support children and teenagers."
-msgstr ""
-"Ich möchte einen zusätzlichen Betrag für Kinder und Jugendliche spenden."
-
-msgid "Donate now"
-msgstr "Jetzt spenden"
-
-msgid "Total"
-msgstr "Total"
-
-msgid "Online Payment"
-msgstr "Online Bezahlung"
-
-msgid "Bank Transfer"
-msgstr "Bank-Überweisung"
-
-msgid "Notice"
-msgstr "Mitteilung"
-
-msgid "State"
-msgstr "Status"
-
-msgid "Score"
-msgstr "Score"
-
-msgid "No bookings."
-msgstr "Keine Buchungen."
-
-msgid "Variables"
-msgstr "Variablen"
-
-msgid "No activities found."
-msgstr "Keine Angebote gefunden."
-
-msgid "Reset filter."
-msgstr "Filter zurücksetzen."
-
-msgid "starting at ${price} CHF"
-msgstr "ab ${price} CHF"
-
-msgid "Free Spots"
-msgstr "Freie Plätze"
-
-msgid "No free spots"
-msgstr "Keine freien Plätze"
-
-msgid "1 free spot"
-msgstr "1 freier Platz"
-
-msgid "${count} free spots"
-msgstr "${count} freie Plätze"
-
-msgid "Show more"
-msgstr "Mehr anzeigen"
-
-msgid "Navigate up"
-msgstr "Nach oben"
-
-msgid "States"
-msgstr "Status"
-
-msgid "Weeks"
-msgstr "Wochen"
-
-msgid "Weekdays"
-msgstr "Wochentage"
-
-msgid "Duration"
-msgstr "Dauer"
-
-msgid "Price"
-msgstr "Preis"
-
-msgid "Municipalities"
-msgstr "Gemeinden"
-
-msgid "The average happiness is ${happiness}."
-msgstr "Die durchschnittliche Zufriedenheit liegt bei ${happiness}."
-
-msgid "${operability} of all occasions have enough attendees."
-msgstr "${operability} aller Durchführungen haben genug Teilnehmer."
-
-msgid "Marking bookings increases their priority during the next matching run."
-msgstr ""
-"Markierte Buchungen erhalten beim nächsten Zuteilungs-Lauf eine höhere "
-"Priorität."
-
-msgid "Years"
-msgstr "Jahre"
-
-msgid "Automatic Matching"
-msgstr "Automatische Zuteilung"
-
-msgid "Reset Matching"
-msgstr "Zuteilung zurücksetzen"
-
-msgid ""
-"This period is not yet in the wishlist phase. Only once the wishlist phase "
-"has started can the period be matched."
-msgstr ""
-"Dieser Zeitraum befindet sich noch nicht in der Wunschphase. Erst in dieser "
-"können Zuteilungen gemacht werden."
-
-msgid "This period is not active. Only the active period may be matched."
-msgstr ""
-"Dieser Zeitraum ist inaktiv. Zuteilungen können nur im aktiven Zeitraum "
-"gemacht werden."
-
-msgid ""
-"The matching for this period has been confirmed. If you want to change "
-"matching you need to book/cancel bookings manually."
-msgstr ""
-"Die automatische Zuteilung im aktuellen Zeitraum wurde bereits bestätigt. "
-"Die Zuteilung kann nur noch manuell über Buchungen/Stornierungen gemacht "
-"werden."
-
-msgid "Pro Juventute FERIENNET is supported by:"
-msgstr "Pro Juventute FERIENNET wird unterstützt von:"
-
-msgid "The total amount is ${amount} CHF."
-msgstr "Der Totalbetrag beläuft sich auf ${amount} CHF."
-
-msgid "The outstanding amount is ${amount} CHF."
-msgstr "Der ausstehende Betrag beläuft sich auf ${amount} CHF."
-
-msgid "${amount} overpaid"
-msgstr "${amount} überbezahlt"
-
-msgid "Unpaid"
-msgstr "Unbezahlt"
-
-msgid "Reset Billing"
-msgstr "Fakturierung zurücksetzen"
-
-msgid "The matching of this period has not been confirmed yet."
-msgstr "Die Zuteilung dieses Zeitraums wurde noch nicht bestätigt."
-
-msgid ""
-"This period is not active. Bills may only be created for the active period."
-msgstr ""
-"Dieser Zeitraum ist inaktiv. Rechnungen können nur für den aktive Zeitraum "
-"erstellt werden."
-
-msgid ""
-"The billing for this period has been confirmed. You can still change the "
-"invoices manually but you can no longer generate them automatically."
-msgstr ""
-"Die Fakturierung für diesen Zeitraum wurde abgeschlossen. Sie können die "
-"Rechnungen immer noch manuell ändern aber nicht mehr automatisch generieren."
-
-msgid "This period has not been confirmed yet."
-msgstr "In diesem Zeitraum wurde noch keine Zuteilung gemacht."
-
-msgid "No occasions defined yet."
-msgstr "Es wurden noch keine Durchführungen definiert."
-
-msgid "Print"
-msgstr "Drucken"
-
-msgid "Emergency Contact:"
-msgstr "Notfall:"
-
-msgid "Missing!"
-msgstr "Fehlt!"
-
-msgid "(User: ${user})"
-msgstr "(Benutzer: ${user})"
-
-msgid "Notes:"
-msgstr "Bemerkungen:"
-
-msgid "E-Mail:"
-msgstr "E-Mail:"
-
-msgid "Place:"
-msgstr "Ort:"
-
-msgid "Group:"
-msgstr "Gruppe:"
-
-msgid "Your activity has been published:"
-msgstr "Ihr Angebot wurde veröffentlicht:"
-
-msgid "Activity published."
-msgstr "Angebot veröffentlicht."
-
-msgid "Activity archived."
-msgstr "Angebot archiviert."
-
-msgid "Activity reassigned from ${old_username} to ${new_username}."
-msgstr "Zuteilung des Angebots an ${new_username} (von ${old_username})."
-
-msgid ""
-"You haven't added an emergency contact to your profile yet. Please add this "
-"information in your userprofile so we can reach you in an emergency!"
-msgstr ""
-"Sie haben noch keinen Notfallkontakt erfasst. Bitte fügen Sie diesen Kontakt "
-"hinzu damit wir sie im Notfall erreichen können!"
-
-msgid "Add in Userprofile"
-msgstr "Im Benutzerprofil ergänzen"
-
-msgid ""
-"This is your emergency contact. Please change it in the user profile if it "
-"is not up to date anymore:"
-msgstr ""
-"Dies ist Ihr Notfallkontakt. Bitte stellen Sie sicher dass dieser aktuell "
-"ist:"
-
-msgid "Change in Userprofile"
-msgstr "Im Benutzerprofil anpassen"
-
-msgid "No bookings yet."
-msgstr "Noch keine Buchungen."
-
-msgid "Mark up to three occasions per child as favorites."
-msgstr "Sie können bis zu drei Angebote pro Kind als Favorit markieren."
-
-msgid ""
-"Once the pre-booking is over, we will divide all children into activities."
-msgstr "Nach der Wunschphase verteilen wir die Kinder auf die Angebote."
-
-msgid "We cannot guarantee that everyone gets into their favorite activity."
-msgstr ""
-"Wir können nicht garantieren dass jedes Kind in sein Lieblingsangebot "
-"eingeteilt wird."
-
-msgid "Add to calendar"
-msgstr "Zum Kalender hinzufügen"
-
-msgid "Limited to ${number} bookings"
-msgstr "Limitiert auf ${number} Buchungen"
-
-msgid "Unlimited bookings"
-msgstr "Keine Buchungslimite"
-
-msgid "Booked"
-msgstr "Gebucht"
-
-msgid "These wishes overlap accepted bookings and are therefore blocked."
-msgstr ""
-"Diese Wünsche überschneiden sich mit angenommenen Buchungen und sind daher "
-"blockiert."
-
-msgid "This occasion does not have enough attendees yet."
-msgstr "Diese Durchführung hat noch nicht genügend Teilnehmer."
-
-msgid "Parent"
-msgstr "Elternteil"
-
-msgid "Children"
-msgstr "Kinder"
-
-msgid "Contact"
-msgstr "Kontakt"
-
-msgid "E-Mail ${name}"
-msgstr "${name} schreiben"
-
-msgid "Call ${name}"
-msgstr "${name} anrufen"
-
-msgid "Passport"
-msgstr "Ferienpass"
-
-msgid ""
-"Attendees can join their companions in a group to go to activities together."
-msgstr ""
-"Teilnehmer können mit Ihren Gspänli eine Gruppe bilden um gemeinsam an "
-"Angeboten teilzunehmen."
-
-msgid "This group is from an inactive period."
-msgstr "Dies ist eine Gruppe eines inaktiven Zeitraums"
-
-msgid "Sign Up for Activity"
-msgstr "Für das Angebot anmelden"
-
-msgid ""
-"Children need to be signed up to the activity to join the group. In case "
-"they are not, they can do that here."
-msgstr ""
-"Kinder müssen für das Angebot angemeldet sein, um der Gruppe beitreten zu "
-"können. Falls das noch nicht der Fall ist, können Sie das gleich hier tun."
-
-msgid "Children can join the group under \"Manage group\" after sign-up."
-msgstr ""
-"Nach der Anmeldung kann das Kind unter \"Gruppe verwalten\" der Gruppe "
-"hinzugefügt werden."
-
-msgid "Manage Group"
-msgstr "Gruppe verwalten"
-
-msgid ""
-"The formation of a group increases the chance of joining an activity "
-"together."
-msgstr ""
-"Die Bildung einer Gruppe erhöht die Wahrscheinlichkeit, ein Angebot "
-"gemeinsam besuchen zu können."
-
-msgid ""
-"You can add your own children to the group here or share the following link "
-"with other parents for them to sign up their own children:"
-msgstr ""
-"Sie können Ihre eigenen Kinder hier zu dieser Gruppe hinzufügen oder den "
-"folgenden Link mit anderen Eltern teilen, damit diese ihre Kinder hinzufügen "
-"können:"
-
-msgid "In Group"
-msgstr "In der Gruppe"
-
-msgid "Not in Group"
-msgstr "Nicht in der Gruppe"
-
-msgid "Booking Blocked"
-msgstr "Buchung blockiert"
-
-msgid "Booking Cancelled"
-msgstr "Buchung storniert"
-
-msgid "Booking Denied"
-msgstr "Buchung abgelehnt"
-
-msgid "Not signed up"
-msgstr "Nicht angemeldet"
-
-msgid "All your children are already part of this group."
-msgstr "Alle Ihre Kinder sind Teil dieser Gruppe."
-
-msgid ""
-"This is a preview. Please edit it until you are satisifed with the result "
-"and then press \"Request Publication\". An administrator will then review "
-"your proposal."
-msgstr ""
-"Dies ist eine Vorschau. Bitte bearbeiten Sie diese, bis Sie zufrieden sind. "
-"Im Anschluss wählen Sie \"Publikation Beantragen\" in der Menübar. Ein "
-"Administrator überprüft darauf Ihr Angebot."
-
-msgid ""
-"This is a preview. Please edit it until you are satisifed with the result "
-"and then press \"Request Publication\" to mark the activity ready for review."
-msgstr ""
-"Dies ist eine Vorschau. Bitte bearbeiten Sie diese, bis Sie zufrieden sind. "
-"Im Anschluss wählen Sie \"Publikation Beantragen\". Sie oder ein anderer "
-"Administrator können daraufhin das Angebot prüfen und veröffentlichen."
-
-msgid "This activity is currently being reviewd by an administrator."
-msgstr "Dieses Angebot wird zur Zeit überprüft."
-
-msgid "This activity has been archived."
-msgstr "Dieses Angebot wurde archiviert."
-
-msgid "There are currently no occasions planned."
-msgstr "Es sind zur Zeit keine Durchführungen geplant."
-
-#, python-format
-msgid "Attendees for ${period}"
-msgstr "Teilnehmer ${period}"
-
-#, python-format
-msgid "Online Payments by ${name}"
-msgstr "Online Zahlungen von ${name}"
-
-#, python-format
-msgid "Billing for ${title}"
-msgstr "Fakturierung für ${title}"
-
-msgid "Create Bills"
-msgstr "Rechnungen erstellen"
-
-msgid "The billing was successfully reset"
-msgstr "Die Fakturierung wurde erfolgreich zurückgesetzt"
-
-msgid "Add manual booking"
-msgstr "Manuelle Buchung hinzufügen"
-
-#, python-format
-msgid "Imported ${count} payments"
-msgstr "${count} Zahlungen wurden importiert"
-
-msgid "No payments could be imported"
-msgstr "Es konnten keine Zahlungen importiert werden"
-
-msgid "Show invoice"
-msgstr "Rechnung anzeigen"
-
-msgid "No transactions were found in the given file"
-msgstr "In der angegebenen Datei wurden keine Transaktionen gefunden"
-
-msgid "No manual bookings were created"
-msgstr "Es wurden keine manuellen Buchungen erstellt"
-
-#, python-format
-msgid "Created ${count} manual bookings"
-msgstr "${count} manuelle Buchungen wurden erstellt"
-
-msgid "Show online payments"
-msgstr "Online Zahlungen anzeigen"
-
-msgid ""
-"This bill or parts of it have been paid online. To change the state of the "
-"bill the payment needs to be charged back."
-msgstr ""
-"Diese Rechnung oder Teile davon wurden online bezahlt. Um den Status zu "
-"ändern muss die Zahlung rückgebucht werden."
-
-msgid ""
-"This position has been paid online. To change the state of the position the "
-"payment needs to be charged back."
-msgstr ""
-"Diese Position wurde online bezahlt. Um den Status zu ändern muss die "
-"Zahlung rückgebucht werden."
-
-msgid ""
-"This bill or parts of it have been confirmed by the bank, do you really want "
-"to change the payment status?"
-msgstr ""
-"Diese Rechnung oder Teile davon wurden von der Bank bestätigt. Möchten Sie "
-"den Zahlungsstatus wirklich ändern?"
-
-msgid ""
-"This position has been confirmed by the bank, do you really want to change "
-"the payment status?"
-msgstr ""
-"Diese Position wurde von der Bank bestätigt. Möchten Sie den Zahlungsstatus "
-"wirklich ändern?"
-
-msgid "Mark whole bill as unpaid"
-msgstr "Rechnung als unbezahlt markieren"
-
-msgid "Mark whole bill as paid"
-msgstr "Rechnung als bezahlt markieren"
-
-msgid "Mark as unpaid"
-msgstr "Buchung als unbezahlt markieren"
-
-msgid "Mark as paid"
-msgstr "Buchung als bezahlt markieren"
-
-msgid "Remove manual booking"
-msgstr "Manuelle Buchung entfernen"
-
-msgid "Refund Payment"
-msgstr "Zahlung rückerstatten"
-
-#, python-format
-msgid "Do you really want to refund ${amount}?"
-msgstr "Möchten Sie ${amount} wirklich rückerstatten?"
-
-#, python-format
-msgid "Refund ${amount}"
-msgstr "${amount} rückerstatten"
-
-msgid "Enroll Attendee"
-msgstr "Teilnehmer anmelden"
-
-msgid "Clone Occasion"
-msgstr "Durchführung duplizieren"
-
-msgid ""
-"The period of this occasion has already been confirmed. It is not "
-"recommended to change the period associated with this occasion. "
-msgstr ""
-"Der Zeitraum dieser Durchführung wurde bereits bestätigt. Es wird nicht "
-"empfohlen einen anderen Zeitraum auszuwählen."
-
-msgid "Edit Occasion"
-msgstr "Durchführung bearbeiten"
-
-msgid "New need"
-msgstr "Neuer Bedarf"
-
-msgid "Your changes were saved"
-msgstr "Ihre Änderungen wurden gespeichert"
-
-msgid "Edit need"
-msgstr "Bedarf bearbeiten"
-
-#, python-format
-msgid "The booking for ${name} was succesfull"
-msgstr "Die Buchung für ${name} war erfolgreich"
-
-#, python-format
-msgid "The occasion was added to ${name}'s wishlist"
-msgstr "Die Durchführung wurde zu ${name}s Wunschliste hinzugefügt"
-
-msgid "The booking was cancelled successfully"
-msgstr "Die Buchung wurde erfolgreich abgesagt"
-
-#, python-format
-msgid "Group for \"${title}\""
-msgstr "Gruppe für \"${title}\""
-
-msgid "Successfully joined the group"
-msgstr "Erfolgreich der Gruppe beigetreten"
-
-msgid "Successfully left the group"
-msgstr "Erfolgreich die Gruppe verlassen"
-
-msgid "Remove booking"
-msgstr "Buchung entfernen"
-
-msgid "Only open, cancelled, denied or blocked bookings may be deleted"
-msgstr ""
-"Nur offene, abgesagte, abgelehnte und blockierte Buchungen können gelöscht "
-"werden"
-
-msgid "The period is not in the wishlist-phase"
-msgstr "Der Zeitraum befindet sich nicht in der Wunschphase"
-
-msgid "The booking does not exist"
-msgstr "Diese Buchung existiert nicht"
-
-msgid "Not permitted to join this attendee to the group"
-msgstr "Keine Berechtigung um diesen Teilnehmer zu der Gruppe hinzuzufügen"
-
-msgid "Not permitted to evict this attendee from the group"
-msgstr "Keine Berechtigung um diesen Teilnehmer von der Gruppe zu entfernen"
-
-msgid "Remove wish"
-msgstr "Wunsch entfernen"
-
-msgid "Only admins may cancel bookings at this point"
-msgstr ""
-"Nur Administratoren können Buchungen zu diesem Zeitpunkt noch stornieren"
-
-msgid "Cannot select more than three favorites per child"
-msgstr "Pro Kind können maximal drei Favoriten gewählt werden"
-
-msgid "Leave Group"
-msgstr "Gruppe verlassen"
-
-msgid "Cancel Booking"
-msgstr "Buchung stornieren"
-
-msgid "Join Group"
-msgstr "Gruppe beitreten"
-
-msgid "Invite a companion"
-msgstr "Gspänli einladen"
-
-#, python-format
-msgid "Do you really want to remove \"${title}\"?"
-msgstr "Möchten Sie \"${title}\" wirklich entfernen?"
-
-#, python-format
-msgid "Do you really want to cancel \"${title}\"?"
-msgstr "Möchten Sie \"${title}\" wirklich stornieren?"
-
-msgid "With 1 companion in a group"
-msgstr "Mit 1 Gspänli in einer Gruppe"
-
-#, python-format
-msgid "With ${n} companions in a group"
-msgstr "Mit ${n} Gspänli in einer Gruppe"
+msgid "URL pointing to an opening hours page"
+msgstr "URL der auf die Seite der Termine zeigt"
 
 msgid "Mo"
 msgstr "Mo"
@@ -2149,27 +1948,6 @@ msgstr "Sa"
 msgid "Su"
 msgstr "So"
 
-msgid "New Activity"
-msgstr "Neues Angebot"
-
-msgid "The activity was discarded"
-msgstr "Das Angebot wurde verworfen"
-
-msgid "Thank you for your proposal!"
-msgstr "Vielen Dank für Ihren Antrag!"
-
-msgid "Your ticket has been opened"
-msgstr "Ihr Ticket wurde eröffnet"
-
-msgid "Your activity has been published"
-msgstr "Ihr Angebot wurde veröffentlicht"
-
-msgid "Your activity has been archived"
-msgstr "Ihr Angebot wurde archiviert"
-
-msgid "Clone"
-msgstr "Duplizieren"
-
 msgid "Elapsed"
 msgstr "Vergangen"
 
@@ -2178,9 +1956,6 @@ msgstr "Jetzt"
 
 msgid "Scheduled"
 msgstr "Geplant"
-
-msgid "Reinstate"
-msgstr "Reaktivieren"
 
 msgid "Without"
 msgstr "Ohne"
@@ -2212,8 +1987,11 @@ msgstr "Viele"
 msgid "Own"
 msgstr "Eigene"
 
-msgid "Rescind"
-msgstr "Absagen"
+msgid "Clone"
+msgstr "Duplizieren"
+
+msgid "Reinstate"
+msgstr "Reaktivieren"
 
 #, python-format
 msgid "Do you really want to reinstate \"${title}\"?"
@@ -2224,6 +2002,9 @@ msgstr "Vorherige Teilnehmer müssen sich neu anmelden"
 
 msgid "Reinstate Occasion"
 msgstr "Durchführung reaktivieren"
+
+msgid "Rescind"
+msgstr "Absagen"
 
 #, python-format
 msgid "Do you really want to rescind \"${title}\"?"
@@ -2251,33 +2032,345 @@ msgstr ""
 msgid "Delete Occasion"
 msgstr "Durchführung löschen"
 
-msgid "The period was activated successfully"
-msgstr "Der Zeitraum wurde erfolgreich aktiviert"
+msgid "New Activity"
+msgstr "Neues Angebot"
 
-msgid "The period was deactivated successfully"
-msgstr "Der Zeitraum wurde erfolgreich deaktiviert"
+msgid "Your changes were saved"
+msgstr "Ihre Änderungen wurden gespeichert"
 
-msgid "The period was archived successfully"
-msgstr "Der Zeitraum wurde erfolgreich archiviert"
+msgid "The activity was discarded"
+msgstr "Das Angebot wurde verworfen"
 
-msgid "The period was added successfully"
-msgstr "Der Zeitraum wurde erfolgreich hinzugefügt"
+msgid "Your ticket has been opened"
+msgstr "Ihr Ticket wurde eröffnet"
 
-msgid "The period was deleted successfully"
-msgstr "Der Zeitraum wurde erfolgreich gelöscht"
+msgid "Thank you for your proposal!"
+msgstr "Vielen Dank für Ihren Antrag!"
 
-msgid "The period could not be deleted as it is still in use"
+msgid "Your activity has been published"
+msgstr "Ihr Angebot wurde veröffentlicht"
+
+msgid "Your activity has been archived"
+msgstr "Ihr Angebot wurde archiviert"
+
+msgid "Edit Attendee"
+msgstr "Teilnehmer bearbeiten"
+
+#, python-format
+msgid "Booking Limit of ${name}"
+msgstr "Buchungslimite von ${name}"
+
+msgid "Add manual booking"
+msgstr "Manuelle Buchung hinzufügen"
+
+msgid "Show invoice"
+msgstr "Rechnung anzeigen"
+
+msgid "Show online payments"
+msgstr "Online Zahlungen anzeigen"
+
+msgid ""
+"This bill or parts of it have been paid online. To change the state of the "
+"bill the payment needs to be charged back."
 msgstr ""
-"Der Zeitraum konnte nicht gelöscht werden, da sie bereits verwendet wird"
+"Diese Rechnung oder Teile davon wurden online bezahlt. Um den Status zu "
+"ändern muss die Zahlung rückgebucht werden."
+
+msgid ""
+"This bill or parts of it have been confirmed by the bank, do you really want "
+"to change the payment status?"
+msgstr ""
+"Diese Rechnung oder Teile davon wurden von der Bank bestätigt. Möchten Sie "
+"den Zahlungsstatus wirklich ändern?"
+
+msgid ""
+"This position has been paid online. To change the state of the position the "
+"payment needs to be charged back."
+msgstr ""
+"Diese Position wurde online bezahlt. Um den Status zu ändern muss die "
+"Zahlung rückgebucht werden."
+
+msgid ""
+"This position has been confirmed by the bank, do you really want to change "
+"the payment status?"
+msgstr ""
+"Diese Position wurde von der Bank bestätigt. Möchten Sie den Zahlungsstatus "
+"wirklich ändern?"
+
+msgid "Mark whole bill as unpaid"
+msgstr "Rechnung als unbezahlt markieren"
+
+msgid "Mark whole bill as paid"
+msgstr "Rechnung als bezahlt markieren"
+
+msgid "Mark as unpaid"
+msgstr "Buchung als unbezahlt markieren"
+
+msgid "Mark as paid"
+msgstr "Buchung als bezahlt markieren"
+
+msgid "Remove manual booking"
+msgstr "Manuelle Buchung entfernen"
+
+#, python-format
+msgid "Billing for ${title}"
+msgstr "Fakturierung für ${title}"
+
+msgid "Create Bills"
+msgstr "Rechnungen erstellen"
+
+msgid "The billing was successfully reset"
+msgstr "Die Fakturierung wurde erfolgreich zurückgesetzt"
+
+#, python-format
+msgid "Online Payments by ${name}"
+msgstr "Online Zahlungen von ${name}"
+
+msgid "Refund Payment"
+msgstr "Zahlung rückerstatten"
+
+#, python-format
+msgid "Do you really want to refund ${amount}?"
+msgstr "Möchten Sie ${amount} wirklich rückerstatten?"
+
+#, python-format
+msgid "Refund ${amount}"
+msgstr "${amount} rückerstatten"
+
+#, python-format
+msgid "Imported ${count} payments"
+msgstr "${count} Zahlungen wurden importiert"
+
+msgid "No payments could be imported"
+msgstr "Es konnten keine Zahlungen importiert werden"
+
+msgid "No transactions were found in the given file"
+msgstr "In der angegebenen Datei wurden keine Transaktionen gefunden"
+
+msgid "No manual bookings were created"
+msgstr "Es wurden keine manuellen Buchungen erstellt"
+
+#, python-format
+msgid "Created ${count} manual bookings"
+msgstr "${count} manuelle Buchungen wurden erstellt"
+
+msgid "Invite a companion"
+msgstr "Gspänli einladen"
+
+msgid "With 1 companion in a group"
+msgstr "Mit 1 Gspänli in einer Gruppe"
+
+#, python-format
+msgid "With ${n} companions in a group"
+msgstr "Mit ${n} Gspänli in einer Gruppe"
+
+msgid "Remove wish"
+msgstr "Wunsch entfernen"
+
+msgid "Remove booking"
+msgstr "Buchung entfernen"
+
+#, python-format
+msgid "Do you really want to remove \"${title}\"?"
+msgstr "Möchten Sie \"${title}\" wirklich entfernen?"
+
+msgid "Cancel Booking"
+msgstr "Buchung stornieren"
+
+#, python-format
+msgid "Do you really want to cancel \"${title}\"?"
+msgstr "Möchten Sie \"${title}\" wirklich stornieren?"
+
+msgid "Only open, cancelled, denied or blocked bookings may be deleted"
+msgstr ""
+"Nur offene, abgesagte, abgelehnte und blockierte Buchungen können gelöscht "
+"werden"
+
+msgid "Only admins may cancel bookings at this point"
+msgstr ""
+"Nur Administratoren können Buchungen zu diesem Zeitpunkt noch stornieren"
+
+msgid "The booking was cancelled successfully"
+msgstr "Die Buchung wurde erfolgreich abgesagt"
+
+msgid "Cannot select more than three favorites per child"
+msgstr "Pro Kind können maximal drei Favoriten gewählt werden"
+
+msgid "The period is not in the wishlist-phase"
+msgstr "Der Zeitraum befindet sich nicht in der Wunschphase"
+
+msgid "Leave Group"
+msgstr "Gruppe verlassen"
+
+msgid "Join Group"
+msgstr "Gruppe beitreten"
+
+#, python-format
+msgid "Group for \"${title}\""
+msgstr "Gruppe für \"${title}\""
+
+msgid "The booking does not exist"
+msgstr "Diese Buchung existiert nicht"
+
+msgid "Not permitted to join this attendee to the group"
+msgstr "Keine Berechtigung um diesen Teilnehmer zu der Gruppe hinzuzufügen"
+
+msgid "Successfully joined the group"
+msgstr "Erfolgreich der Gruppe beigetreten"
+
+msgid "Not permitted to evict this attendee from the group"
+msgstr "Keine Berechtigung um diesen Teilnehmer von der Gruppe zu entfernen"
+
+msgid "Successfully left the group"
+msgstr "Erfolgreich die Gruppe verlassen"
+
+#, python-format
+msgid "Invoices of ${user}"
+msgstr "Rechnungen von ${user}"
+
+msgid "Pay Online Now"
+msgstr "Jetzt online bezahlen"
+
+msgid "Your card has insufficient funds"
+msgstr "Ihre Karte hat zu wenig Guthaben"
+
+msgid "Your payment could not be processed"
+msgstr "Ihre Zahlung konnte nicht verarbeitet werden"
+
+msgid "Your payment has been received. Thank you!"
+msgstr "Ihre Zahlung war erfolgreich. Vielen Dank!"
+
+#, python-format
+msgid "Donation of ${user}"
+msgstr "Spende von ${user}"
+
+msgid "No invoice found"
+msgstr "Keine Rechnung gefunden"
+
+msgid "Thank you for your donation"
+msgstr "Vielen Dank für Ihre Spende"
+
+msgid "Donate"
+msgstr "Spenden"
+
+msgid "Your donation was removed"
+msgstr "Ihre Spende wurde entfernt"
+
+msgid "This donation has already been paid"
+msgstr "Die Spende wurde bereits bezahlt"
+
+msgid "The matching was confirmed successfully"
+msgstr "Die Zuteilung wurde erfolgreich abgeschlossen"
+
+msgid "The matching run executed successfully"
+msgstr "Der Zuteilungs-Lauf wurde erfolgreich durchgeführt"
+
+msgid "Too many attendees"
+msgstr "Überbelegt"
+
+msgid "Fully occupied"
+msgstr "Belegt"
+
+msgid "Enough attendees"
+msgstr "Durchführbar"
+
+msgid "Not enough attendees"
+msgstr "Unterbelegt"
+
+msgid "No attendees"
+msgstr "Unbelegt"
+
+#, python-format
+msgid "Matches for ${title}"
+msgstr "Zuteilungen für ${title}"
+
+msgid "Run Matching"
+msgstr "Zuteilung ausführen"
+
+msgid "Signup Attendee"
+msgstr "Teilnehmer anmelden"
+
+msgid "The period has already been finalized. No new attendees may be added."
+msgstr ""
+"Der Zeitraum wurde bereits abgeschlossen. Es können keine neuen Teilnehmer "
+"mehr hinzugefügt werden."
+
+msgid "Remove Wish"
+msgstr "Wunsch entfernen"
+
+#, python-format
+msgid "Do you really want to remove ${attendee}'s wish?"
+msgstr "Möchten Sie ${attendee}s Wunsch wirklich entfernen?"
+
+msgid "Remove Booking"
+msgstr "Buchung entfernen"
+
+#, python-format
+msgid "Do you really want to delete ${attendee}'s booking?"
+msgstr "Möchten Sie ${attendee}s Buchung wirklich löschen?"
+
+#, python-format
+msgid "Do you really want to cancel ${attendee}'s booking?"
+msgstr "Möchten Sie ${attendee}s Buchung wirklich stornieren?"
+
+msgid "The matching was successfully reset"
+msgstr "Die Zuteilung wurde erfolgreich zurückgesetzt"
+
+msgid "Mailing"
+msgstr "Versand"
+
+msgid "Delete Notification Template"
+msgstr "Mitteilungs-Vorlage löschen"
+
+msgid "Successfully added a new notification template"
+msgstr "Die Mitteilungs-Vorlage wurde erfolgreich hinzugefügt"
+
+msgid "There are no recipients matching the selection"
+msgstr "Es wurden keine Empfänger gefunden welche dieser Auswahl entsprechen"
+
+#, python-format
+msgid "Successfully sent the e-mail to ${count} recipients"
+msgstr "Das E-Mail wurde erfolgreich an ${count} Empfänger gesendet"
+
+msgid "Send E-Mail Now"
+msgstr "E-Mail jetzt versenden"
+
+msgid "Clone Occasion"
+msgstr "Durchführung duplizieren"
+
+msgid ""
+"The period of this occasion has already been confirmed. It is not "
+"recommended to change the period associated with this occasion. "
+msgstr ""
+"Der Zeitraum dieser Durchführung wurde bereits bestätigt. Es wird nicht "
+"empfohlen einen anderen Zeitraum auszuwählen."
+
+msgid "Edit Occasion"
+msgstr "Durchführung bearbeiten"
+
+#, python-format
+msgid "The booking for ${name} was succesfull"
+msgstr "Die Buchung für ${name} war erfolgreich"
+
+#, python-format
+msgid "The occasion was added to ${name}'s wishlist"
+msgstr "Die Durchführung wurde zu ${name}s Wunschliste hinzugefügt"
+
+msgid "Enroll Attendee"
+msgstr "Teilnehmer anmelden"
+
+msgid "New need"
+msgstr "Neuer Bedarf"
+
+msgid "Edit need"
+msgstr "Bedarf bearbeiten"
+
+#, python-format
+msgid "Attendees for ${period}"
+msgstr "Teilnehmer ${period}"
 
 msgid "Deactivate"
 msgstr "Deaktivieren"
-
-msgid "Activate"
-msgstr "Aktivieren"
-
-msgid "Delete Period"
-msgstr "Zeitraum löschen"
 
 #, python-format
 msgid "Do you really want to deactivate \"${title}\"?"
@@ -2289,16 +2382,8 @@ msgstr "Damit werden alle damit verbundenen Durchführungen versteckt"
 msgid "Deactivate Period"
 msgstr "Zeitraum deaktivieren"
 
-#, python-format
-msgid "\"${title}\" cannot be archived yet"
-msgstr "\"${title}\" kann noch nicht archiviert werden"
-
-msgid ""
-"A period can only be archived once the bookings have been made and the bills "
-"have been compiled."
-msgstr ""
-"Ein Zeitraum kann erst archiviert werden wenn die Zuteilung gemacht und die "
-"Rechnungen erstellt wurden."
+msgid "Activate"
+msgstr "Aktivieren"
 
 #, python-format
 msgid "Do you really want to activate \"${title}\"?"
@@ -2331,21 +2416,53 @@ msgstr ""
 msgid "Archive Period"
 msgstr "Zeitraum archivieren"
 
-msgid "Edit Attendee"
-msgstr "Teilnehmer bearbeiten"
-
 #, python-format
-msgid "Booking Limit of ${name}"
-msgstr "Buchungslimite von ${name}"
+msgid "\"${title}\" cannot be archived yet"
+msgstr "\"${title}\" kann noch nicht archiviert werden"
 
-msgid "Feriennet"
-msgstr "Feriennet"
+msgid ""
+"A period can only be archived once the bookings have been made and the bills "
+"have been compiled."
+msgstr ""
+"Ein Zeitraum kann erst archiviert werden wenn die Zuteilung gemacht und die "
+"Rechnungen erstellt wurden."
+
+msgid "Delete Period"
+msgstr "Zeitraum löschen"
+
+msgid "The period was added successfully"
+msgstr "Der Zeitraum wurde erfolgreich hinzugefügt"
+
+msgid "The period could not be deleted as it is still in use"
+msgstr ""
+"Der Zeitraum konnte nicht gelöscht werden, da sie bereits verwendet wird"
+
+msgid "The period was deleted successfully"
+msgstr "Der Zeitraum wurde erfolgreich gelöscht"
+
+msgid "The period was activated successfully"
+msgstr "Der Zeitraum wurde erfolgreich aktiviert"
+
+msgid "The period was deactivated successfully"
+msgstr "Der Zeitraum wurde erfolgreich deaktiviert"
+
+msgid "The period was archived successfully"
+msgstr "Der Zeitraum wurde erfolgreich archiviert"
 
 msgid "Payment"
 msgstr "Bezahlung"
 
 msgid "Payment Order"
 msgstr "Einzahlungsschein"
+
+msgid "Basic"
+msgstr "Einfach"
+
+msgid "ESR (General)"
+msgstr "ESR (Generell)"
+
+msgid "ESR (Raiffeisen)"
+msgstr "ESR (Raiffeisen)"
 
 msgid "ESR participant number"
 msgstr "ESR Teilnehmernummer"
@@ -2369,6 +2486,9 @@ msgstr "Privatsphäre"
 msgid "Public organiser data"
 msgstr "Öffentliche Veranstalterdaten"
 
+msgid "E-Mail"
+msgstr "E-Mail"
+
 msgid "Link to the TOS"
 msgstr "Link zu den AGB"
 
@@ -2387,39 +2507,11 @@ msgstr "Spenden-Beträge"
 msgid "One amount per line"
 msgstr "Ein Betrag pro Zeile"
 
-msgid "Basic"
-msgstr "Einfach"
-
-msgid "ESR (General)"
-msgstr "ESR (Generell)"
-
-msgid "ESR (Raiffeisen)"
-msgstr "ESR (Raiffeisen)"
-
-msgid "E-Mail"
-msgstr "E-Mail"
-
 msgid "The ESR identification number must be 3-6 characters long"
 msgstr "Die ESR Identifikationsnummer muss 3-6 Zeichen lang sein"
 
-msgid "Mailing"
-msgstr "Versand"
-
-msgid "Send E-Mail Now"
-msgstr "E-Mail jetzt versenden"
-
-msgid "Successfully added a new notification template"
-msgstr "Die Mitteilungs-Vorlage wurde erfolgreich hinzugefügt"
-
-msgid "There are no recipients matching the selection"
-msgstr "Es wurden keine Empfänger gefunden welche dieser Auswahl entsprechen"
-
-#, python-format
-msgid "Successfully sent the e-mail to ${count} recipients"
-msgstr "Das E-Mail wurde erfolgreich an ${count} Empfänger gesendet"
-
-msgid "Delete Notification Template"
-msgstr "Mitteilungs-Vorlage löschen"
+msgid "Feriennet"
+msgstr "Feriennet"
 
 #, python-format
 msgid "Bookings for ${period}"
@@ -2428,95 +2520,6 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
-
-#, python-format
-msgid "Invoices of ${user}"
-msgstr "Rechnungen von ${user}"
-
-#, python-format
-msgid "Donation of ${user}"
-msgstr "Spende von ${user}"
-
-msgid "Donate"
-msgstr "Spenden"
-
-msgid "Your payment could not be processed"
-msgstr "Ihre Zahlung konnte nicht verarbeitet werden"
-
-msgid "Your payment has been received. Thank you!"
-msgstr "Ihre Zahlung war erfolgreich. Vielen Dank!"
-
-msgid "Your donation was removed"
-msgstr "Ihre Spende wurde entfernt"
-
-msgid "This donation has already been paid"
-msgstr "Die Spende wurde bereits bezahlt"
-
-msgid "Thank you for your donation"
-msgstr "Vielen Dank für Ihre Spende"
-
-msgid "Pay Online Now"
-msgstr "Jetzt online bezahlen"
-
-msgid "No invoice found"
-msgstr "Keine Rechnung gefunden"
-
-#, python-format
-msgid "Matches for ${title}"
-msgstr "Zuteilungen für ${title}"
-
-msgid "Run Matching"
-msgstr "Zuteilung ausführen"
-
-msgid "The matching was successfully reset"
-msgstr "Die Zuteilung wurde erfolgreich zurückgesetzt"
-
-msgid "The matching was confirmed successfully"
-msgstr "Die Zuteilung wurde erfolgreich abgeschlossen"
-
-msgid "The matching run executed successfully"
-msgstr "Der Zuteilungs-Lauf wurde erfolgreich durchgeführt"
-
-msgid "Too many attendees"
-msgstr "Überbelegt"
-
-msgid "Fully occupied"
-msgstr "Belegt"
-
-msgid "Enough attendees"
-msgstr "Durchführbar"
-
-msgid "Not enough attendees"
-msgstr "Unterbelegt"
-
-msgid "No attendees"
-msgstr "Unbelegt"
-
-msgid "Signup Attendee"
-msgstr "Teilnehmer anmelden"
-
-msgid "Remove Wish"
-msgstr "Wunsch entfernen"
-
-msgid "Remove Booking"
-msgstr "Buchung entfernen"
-
-msgid "The period has already been finalized. No new attendees may be added."
-msgstr ""
-"Der Zeitraum wurde bereits abgeschlossen. Es können keine neuen Teilnehmer "
-"mehr hinzugefügt werden."
-
-#, python-format
-msgid "Do you really want to remove ${attendee}'s wish?"
-msgstr "Möchten Sie ${attendee}s Wunsch wirklich entfernen?"
-
-#, python-format
-msgid "Do you really want to delete ${attendee}'s booking?"
-msgstr "Möchten Sie ${attendee}s Buchung wirklich löschen?"
-
-#, python-format
-msgid "Do you really want to cancel ${attendee}'s booking?"
-msgstr "Möchten Sie ${attendee}s Buchung wirklich stornieren?"
 
 #~ msgid "Donation Description"
 #~ msgstr "Beschreibung Spende"

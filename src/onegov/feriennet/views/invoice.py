@@ -8,7 +8,7 @@ from onegov.feriennet.forms import DonationForm
 from onegov.feriennet.layout import DonationLayout
 from onegov.feriennet.layout import InvoiceLayout
 from onegov.feriennet.views.shared import users_for_select_element
-from onegov.pay import process_payment
+from onegov.pay import process_payment, INSUFFICIENT_FUNDS
 from onegov.user import User
 from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm.exc import NoResultFound
@@ -161,7 +161,9 @@ def handle_payment(self, request):
     price = request.app.default_payment_provider.adjust_price(invoice.price)
     payment = process_payment('cc', price, provider, token)
 
-    if not payment:
+    if payment == INSUFFICIENT_FUNDS:
+        request.alert(_("Your card has insufficient funds"))
+    elif payment is None:
         request.alert(_("Your payment could not be processed"))
     else:
         for item in invoice.items:
