@@ -15,7 +15,7 @@ details AS (
         paid as paid,
         unit * quantity as amount,
         invoices.period_id,
-        source,
+        invoice_items.source,
         ARRAY_LENGTH(payment.states, 1) > 0 AS has_online_payments,
         CASE
             WHEN paid
@@ -23,11 +23,11 @@ details AS (
             ELSE unit * quantity
         END as outstanding,
         CASE
-            WHEN "source" is NULL
+            WHEN invoice_items."source" is NULL
                 THEN 'possible'
-            WHEN "source" = 'xml'
+            WHEN invoice_items."source" = 'xml'
                 THEN 'discouraged'
-            WHEN "source" = 'stripe_connect' AND NOT payment.states && ARRAY['open', 'paid']
+            WHEN invoice_items."source" = 'stripe_connect' AND NOT payment.states && ARRAY['open', 'paid']
                 THEN 'possible'
             ELSE 'impossible'
         END AS changes,
