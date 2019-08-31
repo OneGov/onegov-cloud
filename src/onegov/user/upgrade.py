@@ -207,14 +207,13 @@ def add_authentication_provider_column(context):
 
 
 @upgrade_task('Drop authentication_provider column')
-def add_authentication_provider_column(context):
+def drop_authentication_provider_column(context):
     context.operations.drop_column('users', 'authentication_provider')
 
 
-@upgrade_task('Add hidden column')
-def add_hidden_column(context):
-    context.add_column_with_defaults(
-        table='users',
-        column=Column('hidden', Boolean, nullable=False, default=True),
-        default=True
+@upgrade_task('Add source column')
+def add_source_column(context):
+    context.operations.add_column(
+        'users',
+        Column('source', Text, nullable=True, default=None)
     )

@@ -100,8 +100,8 @@ class User(Base, TimestampMixin, ORMSearchable):
     #:
     second_factor = Column(JSON, nullable=True)
 
-    #: true if the user is hidden
-    hidden = Column(Boolean, nullable=False, default=False)
+    #: a string describing where the user came from, None if internal
+    source = Column(Text, nullable=True, default=None)
 
     #: true if the user is active
     active = Column(Boolean, nullable=False, default=True)
