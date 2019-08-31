@@ -1,12 +1,8 @@
-import kerberos
-import os
-
 from abc import ABCMeta, abstractmethod
 from attr import attrs, attrib
-from contextlib import contextmanager
-from onegov.user import _, log
+from onegov.user import _
 from onegov.user.models.user import User
-from webob.exc import HTTPUnauthorized
+from onegov.user.auth.kerberos import KerberosClient
 from translationstring import TranslationString
 from typing import Optional
 from ua_parser import user_agent_parser
@@ -124,64 +120,60 @@ class AuthenticationProvider(metaclass=ABCMeta):
 
 
 @attrs()
-class KerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
-    name='kerberos', title=_("Kerberos (v5)")
+class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
+    name='ldap-kerberos', title=_("LDAP Kerberos")
 )):
-    """ Kerberos is a computer-network authentication protocol that works on
-    the basis of tickets to allow nodes communicating over a non-secure network
-    to prove their identity to one another in a secure manner.
+    """ Classic LDAP provider using python-ldap, combined with kerberos
 
     """
 
-    keytab: str = attrib()
-    hostname: str = attrib()
-    service: str = attrib()
+    # The URL of the LDAP server
+    url: str = attrib()
+
+    # The username for the LDAP connection
+    username: str = attrib()
+
+    # The password for the LDAP connection
+    password: str = attrib()
+
+    # The Kerberos client to use
+    kerberos: KerberosClient = attrib()
 
     @classmethod
     def configure(cls, **cfg):
-        keytab = cfg.get('keytab', None)
-        hostname = cfg.get('hostname', None)
-        service = cfg.get('service', None)
 
-        if not keytab:
+        # LDAP server URL
+        url = cfg.get('url', None)
+
+        if not url:
             return None
 
-        if not hostname:
-            return None
+        if not url.startswith('ldaps://'):
+            raise ValueError(f"Invalid url: {url}, must start with ldaps://")
 
-        if not service:
-            return None
+        # LDAP credentials
+        username = cfg.get('username', None)
+        password = cfg.get('password', None)
 
-        provider = cls(keytab, hostname, service)
+        if not (username or password):
+            raise ValueError(f"No username or password provided")
 
-        with provider.context():
-            try:
-                kerberos.getServerPrincipalDetails(
-                    provider.service, provider.hostname)
-            except kerberos.KrbError as e:
-                log.warning(f"Kerberos config error: {e}")
-            else:
-                return provider
+        # Kerberos configuration
+        kerberos = KerberosClient(
+            keytab=cfg.get('kerberos_keytab', None),
+            hostname=cfg.get('kerberos_hostname', None),
+            service=cfg.get('kerberos_service', None))
 
-    @contextmanager
-    def context(self):
-        """ Runs the block inside the context manager with the keytab
-        set to the provider's keytab.
+        try:
+            kerberos.try_configuration()
+        except kerberos.KrbError as e:
+            raise ValueError(f"Kerberos config error: {e}")
 
-        All functions that interact with kerberos must be run inside
-        this context.
-
-        For convenience, this context returns the kerberos module
-        when invoked.
-
-        """
-        previous = os.environ.pop('KRB5_KTNAME', None)
-        os.environ['KRB5_KTNAME'] = self.keytab
-
-        yield
-
-        if previous is not None:
-            os.environ['KRB5_KTNAME'] = previous
+        return cls(
+            url=url,
+            username=username,
+            password=password,
+            kerberos=kerberos)
 
     def button_text(self, request):
         """ Returns the request tailored to each OS (users won't understand
@@ -197,86 +189,3 @@ class KerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
         return _("Login with **${operating_system}**", mapping={
             'operating_system': agent_os
         })
-
-    def authenticated_username(self, request):
-        """ Authenticates the kerberos request.
-
-        The kerberos handshake is as follows:
-
-        1. An HTTPUnauthorized response (401) is returned, with the
-           WWW-Authenticate header set to "Negotiate"
-
-        2. The client sends a request with the Authorization header set
-           to the kerberos ticket.
-
-        The result is an authenticated username or None. Note that this
-        username is a username separate from our users table (in most cases).
-
-        The kerberos environment defines this username and it is most likely
-        the Windows login username.
-
-        """
-
-        # extract the token
-        token = request.headers.get('Authorization')
-        token = token and ''.join(token.split()[1:]).strip()
-
-        def with_header(response, include_token=True):
-            if include_token and token:
-                negotiate = f'Negotiate {token}'
-            else:
-                negotiate = 'Negotiate'
-
-            response.headers['WWW-Authenticate'] = negotiate
-
-            return response
-
-        def negotiate():
-            # only mirror the token back, if it is valid, which is never
-            # the case in the negotiate step
-            return with_header(HTTPUnauthorized(), include_token=False)
-
-        # ask for a token
-        if not token:
-            return negotiate()
-
-        # verify the token
-        with self.context():
-
-            # initialization step
-            result, state = kerberos.authGSSServerInit(self.service)
-
-            if result != kerberos.AUTH_GSS_COMPLETE:
-                return negotiate()
-
-            # challenge step
-            result = kerberos.authGSSServerStep(state, token)
-
-            if result != kerberos.AUTH_GSS_COMPLETE:
-                return negotiate()
-
-            # extract the final token
-            token = kerberos.authGSSServerResponse(state)
-
-            # include the token in the response
-            request.after(with_header)
-
-            # extract the user if possible
-            return kerberos.authGSSServerUserName(state) or None
-
-    def authenticate_request(self, request):
-        response = self.authenticated_username(request)
-
-        # XXX this needs to be re-implemented differently for LDAP support
-        if isinstance(response, str):
-            user = User(username=response)
-
-            return Success(
-                user=user,
-                note=_(
-                    "You have been logged in as ${user} (via ${identity})",
-                    mapping={'user': user.username, 'identity': user.username}
-                )
-            )
-
-        return response
