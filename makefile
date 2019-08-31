@@ -3,7 +3,7 @@ install: in_virtual_env
 	pip install --upgrade pip
 
 	# install requirements
-	pip install -e '.[test,dev]' --upgrade-strategy=eager
+	pip install -e '.[test,dev,docs]' --upgrade-strategy=eager
 
 	# ensure required folder structure
 	mkdir -p ./profiles
