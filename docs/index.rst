@@ -58,11 +58,11 @@ Start your own OneGov Town instance for free:
 
 - `<https://start.onegovcloud.ch>`_.
 
-Development
-^^^^^^^^^^^
+Source
+^^^^^^
 
-You can run OneGov Cloud locally using our development environment:
-`<https://github.com/onegov/dev>`_.
+OneGov Cloud is open source, available on GitHub:
+`<https://github.com/onegov/onegov-cloud>`_.
 
 Documentation Highlights
 ^^^^^^^^^^^^^^^^^^^^^^^^
