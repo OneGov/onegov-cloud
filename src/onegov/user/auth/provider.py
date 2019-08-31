@@ -1,8 +1,10 @@
 from abc import ABCMeta, abstractmethod
 from attr import attrs, attrib
+from morepath import Response
 from onegov.user import _
 from onegov.user.models.user import User
-from onegov.user.auth.kerberos import KerberosClient
+from onegov.user.auth.clients import KerberosClient
+from onegov.user.auth.clients import LDAPClient
 from translationstring import TranslationString
 from typing import Optional
 from ua_parser import user_agent_parser
@@ -76,7 +78,7 @@ class AuthenticationProvider(metaclass=ABCMeta):
 
         Providers are expected to return one of the following values:
 
-        * A valid user (if the authentication was successful)
+        * A conclusion (if the authentication was either successful or failed)
         * None (if the authentication failed)
         * A webob response (to perform handshakes)
 
@@ -127,14 +129,8 @@ class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
 
     """
 
-    # The URL of the LDAP server
-    url: str = attrib()
-
-    # The username for the LDAP connection
-    username: str = attrib()
-
-    # The password for the LDAP connection
-    password: str = attrib()
+    # The LDAP client to use
+    ldap: LDAPClient = attrib()
 
     # The Kerberos client to use
     kerberos: KerberosClient = attrib()
@@ -142,21 +138,21 @@ class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
     @classmethod
     def configure(cls, **cfg):
 
-        # LDAP server URL
-        url = cfg.get('url', None)
-
-        if not url:
+        # Providers have to decide themselves if they spawn or not
+        if not cfg:
             return None
 
-        if not url.startswith('ldaps://'):
-            raise ValueError(f"Invalid url: {url}, must start with ldaps://")
+        # LDAP configuration
+        ldap = LDAPClient(
+            url=cfg.get('ldap_url', None),
+            username=cfg.get('ldap_username', None),
+            password=cfg.get('ldap_password', None),
+        )
 
-        # LDAP credentials
-        username = cfg.get('username', None)
-        password = cfg.get('password', None)
-
-        if not (username or password):
-            raise ValueError(f"No username or password provided")
+        try:
+            ldap.try_configuration()
+        except Exception as e:
+            raise ValueError(f"LDAP config error: {e}")
 
         # Kerberos configuration
         kerberos = KerberosClient(
@@ -166,18 +162,14 @@ class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
 
         try:
             kerberos.try_configuration()
-        except kerberos.KrbError as e:
+        except Exception as e:
             raise ValueError(f"Kerberos config error: {e}")
 
-        return cls(
-            url=url,
-            username=username,
-            password=password,
-            kerberos=kerberos)
+        return cls(ldap=ldap, kerberos=kerberos)
 
     def button_text(self, request):
         """ Returns the request tailored to each OS (users won't understand
-        Kerberos, but for them it's basically their local OS login).
+        LDAP/Kerberos, but for them it's basically their local OS login).
 
         """
         agent = user_agent_parser.Parse(request.user_agent or "")
@@ -189,3 +181,28 @@ class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
         return _("Login with **${operating_system}**", mapping={
             'operating_system': agent_os
         })
+
+    def authenticate_request(self, request):
+        response = self.kerberos.authenticated_username(request)
+
+        # handshake
+        if isinstance(response, Response):
+            return response
+
+        # authentication failed
+        if response is None:
+            return Failure(_("LDAP authentication failed"))
+
+        # we got authentication, do we also have authorization?
+        name = response
+        user = self.request_authorization(username=name)
+
+        if user is None:
+            return Failure(_("${user} is not authorized", mapping={
+                'user': name
+            }))
+
+        return Success(user, _("Successfully logged in through LDAP"))
+
+    def request_authorization(self, username):
+        pass

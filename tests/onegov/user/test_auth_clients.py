@@ -7,7 +7,7 @@ from onegov.core import Framework
 from onegov.core.security import Public
 from onegov.core.utils import scan_morepath_modules
 from onegov.user import UserApp
-from onegov.user.auth import KerberosClient
+from onegov.user.auth.clients import KerberosClient
 from tempfile import NamedTemporaryFile
 from unittest.mock import patch, DEFAULT
 from webtest import TestApp as Client
