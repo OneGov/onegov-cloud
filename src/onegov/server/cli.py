@@ -225,7 +225,6 @@ def exception_hook(environ):
 
     with push_scope() as scope:
         scope.add_event_processor(process_event)
-        scope.set_tag('site', '<%= @sentry_site %>')
         capture_exception()
 
 
