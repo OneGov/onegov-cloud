@@ -201,7 +201,7 @@ class PdfGenerator():
             pdf.results(
                 [_('List'), _('Mandates'), _('single_votes')],
                 [
-                    [r['text'], r['value2'], r['value']]
+                    [r['name'], r['mandates'], r['votes']]
                     for r in data['results']
                 ],
                 [None, 2 * cm, 2 * cm],
