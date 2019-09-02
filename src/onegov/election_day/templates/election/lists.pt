@@ -54,7 +54,7 @@
                         <td>${list.name}</td>
                         <td class="right-aligned" data-text="${list.getter or 0}">${layout.format_number(list.getter or 0)}</td>
                         <td tal:condition="election.completed" class="right-aligned">${list.number_of_mandates}</td>
-                        <td tal:condition="not: election.completed" class="right-aligned">n.v.</td>
+                        <td tal:condition="not: election.completed" class="right-aligned" i18n:translate>n.a.</td>
                     </tr>
                 </tbody>
             </table>
