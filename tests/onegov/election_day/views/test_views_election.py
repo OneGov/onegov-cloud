@@ -2,7 +2,6 @@ from datetime import date
 from freezegun import freeze_time
 from math import isclose
 
-from onegov.ballot import Election
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import MAJORZ_HEADER
 from tests.onegov.election_day.common import upload_majorz_election
