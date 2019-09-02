@@ -16,7 +16,8 @@ def candidate_options(request, election):
             request.link(candidate_, name='by-district'),
             '{} {}'.format(
                 f'{candidate_.family_name} {candidate_.first_name}',
-                (f'({elected})' if candidate_.elected else '')
+                (f'({elected})' if election.completed
+                 and candidate_.elected else '')
             ).strip()
         )
         for candidate_ in election.candidates.order_by(None).order_by(
