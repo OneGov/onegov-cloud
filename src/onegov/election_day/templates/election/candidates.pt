@@ -66,7 +66,7 @@
                                 <td class="answer right-aligned" tal:condition="candidate.elected is None" i18n:translate=""></td>
                             </tal:block>
                             <tal:block tal:case="False">
-                                <td class="answer right-aligned">n.v.</td>
+                                <td class="right-aligned">n.v.</td>
                             </tal:block>
 
                         </tal:block>
