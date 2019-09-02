@@ -10,7 +10,7 @@
         <tal:block tal:condition="layout.visible">
 
             <h2 i18n:translate tal:condition="election.completed">Results</h2>
-            <h2 i18n:translate tal:condition="not: election.completed">Intermediate results</h2></h2>
+            <h2 i18n:translate tal:condition="not: election.completed">Intermediate results</h2>
 
             <div metal:use-macro="layout.macros['election_factoids']" />
 
