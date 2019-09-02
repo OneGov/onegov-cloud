@@ -95,7 +95,6 @@ class Candidate(Base, TimestampMixin):
             ElectionResult.accounted_ballots.label('total'),
             CandidateResult.votes.label('votes')
         )
-        results = results.all()
         percentage = {
             r.id: {
                 'counted': r.counted,
