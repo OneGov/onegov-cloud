@@ -8,7 +8,7 @@ from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.election import get_candidates_data
 from onegov.election_day.utils.election import get_candidates_results
 from sqlalchemy.orm import object_session
-
+from onegov.election_day import _
 
 @ElectionDayApp.json(
     model=Election,
@@ -41,6 +41,8 @@ def view_election_candidates_chart(self, request):
         add_last_modified_header(response, self.last_modified)
 
     return {
+        'skip_rendering': ~self.completed,
+        'help_text': _('Intermediate results'),
         'model': self,
         'layout': DefaultLayout(self, request),
         'type': 'bar',
@@ -62,6 +64,8 @@ def view_election_candidates(self, request):
     candidates = (c for c in get_candidates_results(
         self, object_session(self)))
     return {
+        'skip_rendering': ~self.completed,
+        'help_text': _('The graphic '),
         'election': self,
         'layout': layout,
         'candidates': candidates

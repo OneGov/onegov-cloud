@@ -5,6 +5,14 @@
       xmlns:tal="http://xml.zope.org/namespaces/tal">
 <body>
 
+<metal:intermediate-results-popup define-macro="intermediate-results-popup">
+    <tal:block tal:condition="skip_rendering|nothing">
+                <div class="alert-box secondary">
+                    <p>${help_text}</p>
+                </div>
+    </tal:block>
+</metal:intermediate-results-popup>
+
 <metal:answer define-macro="answer" i18n:domain="onegov.election_day">
     <span tal:condition="answer == 'accepted'" class="answer accepted" i18n:translate="">
         Accepted

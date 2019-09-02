@@ -22,10 +22,11 @@
             <p tal:condition="not layout.has_candidates" i18n:translate="">
                 No candidacies.
             </p>
+            <p tal:condition="skip_rendering and help_text">${help_text}</p>
 
-            <div class="row" tal:condition="not election.tacit and layout.has_candidates">
+            <div class="row" tal:condition="not election.tacit and layout.has_candidates and not skip_rendering">
                 <div class="small-12 small-centered large-10 columns">
-                    <figure>
+                    <figure tal:condition="election.completed">
                         <div class="bar-chart"
                             i18n:attributes="data-embed-link"
                             data-dataurl="${request.link(election, name='candidates-data')}"
@@ -37,6 +38,7 @@
                         </a>
                     </figure>
                 </div>
+<!--?                <tal:block metal:use-macro="layout.macros['intermediate-results-popup']" i18n:domain="onegov.election_day"></tal:block>-->
             </div>
 
             <table tal:condition="layout.has_candidates" class="results tablesaw collapsible collapsed sortable"
