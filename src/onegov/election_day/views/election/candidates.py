@@ -58,12 +58,33 @@ def view_election_candidates(self, request):
 
     """" The main view. """
 
-    layout = ElectionLayout(self, request, 'candidates')
+    return {
+        'election': self,
+        'layout': ElectionLayout(self, request, 'candidates'),
+        'candidates': get_candidates_results(self, object_session(self)).all()
+    }
+
+
+@ElectionDayApp.html(
+    model=Election,
+    name='candidates-table',
+    template='embed.pt',
+    permission=Public
+)
+def view_election_lists_table(self, request):
+
+    """" View the lists as table. """
+
+    @request.after
+    def add_last_modified(response):
+        add_last_modified_header(response, self.last_modified)
 
     return {
         'election': self,
-        'layout': layout,
-        'candidates': get_candidates_results(self, object_session(self)).all()
+        'candidates': get_candidates_results(self, object_session(self)).all(),
+        'layout': ElectionLayout(self, request, 'candidates'),
+        'type': 'election-table',
+        'scope': 'candidates',
     }
 
 

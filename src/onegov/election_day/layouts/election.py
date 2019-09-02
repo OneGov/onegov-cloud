@@ -13,6 +13,20 @@ class ElectionLayout(DetailLayout):
         self.tab = tab
 
     @cached_property
+    def tabs_with_embedded_tables(self):
+        return (
+            'lists',
+            'candidates',
+            'statistics',
+        )
+
+    @cached_property
+    def table_link(self):
+        if self.tab not in self.tabs_with_embedded_tables:
+            return None
+        return self.request.link(self.model, f'{self.tab}-table')
+
+    @cached_property
     def all_tabs(self):
         return (
             'lists',
@@ -131,15 +145,11 @@ class ElectionLayout(DetailLayout):
 
     @cached_property
     def majorz(self):
-        if self.model.type == 'majorz':
-            return True
-        return False
+        return self.model.type == 'majorz'
 
     @cached_property
     def proporz(self):
-        if self.model.type == 'proporz':
-            return True
-        return False
+        return self.model.type == 'proporz'
 
     @cached_property
     def tacit(self):

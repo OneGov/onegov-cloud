@@ -18,59 +18,9 @@
             <h3 tal:content="layout.title()" />
             <h4 tal:condition="layout.subtitle()" i18n:translate="">${layout.subtitle()}</h4>
 
-            <table
-                class="results tablesaw sortable"
-                data-tablesaw-mode="columntoggle"
-                data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
-                data-tablesaw-minimap=""
-                >
-                <thead>
-                    <tr>
-                        <th data-tablesaw-priority="persist" i18n:translate="" class="left-aligned">${layout.principal.label('entity')}</th>
-                        <th data-tablesaw-priority="3" i18n:translate="" class="left-aligned" tal:condition="layout.has_districts">${layout.principal.label('district')}</th>
-                        <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">eligible Voters</th>
-                        <th data-tablesaw-priority="4" i18n:translate="" class="right-aligned">Received Ballots</th>
-                        <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Accounted Ballots</th>
-                        <th data-tablesaw-priority="6" i18n:translate="" class="right-aligned">Blank Ballots</th>
-                        <th data-tablesaw-priority="6" i18n:translate="" class="right-aligned">Invalid Ballots</th>
-                        <th data-tablesaw-priority="4" i18n:translate="" class="right-aligned">Accounted Votes</th>
-                        <th data-tablesaw-priority="1" i18n:translate="" class="right-aligned" tal:condition="layout.completed">Turnout</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr tal:repeat="result election.results">
-                        <tal:block condition="not: result.counted">
-                            <td>${layout.format_name(result)}</td>
-                            <td tal:condition="layout.has_districts">${result.district}</td>
-                            <td class="answer" colspan="7" i18n:translate="">Not yet counted</td>
-                        </tal:block>
-                        <tal:block condition="result.counted">
-                            <td>${layout.format_name(result)}</td>
-                            <td tal:condition="layout.has_districts">${result.district}</td>
-                            <td class="right-aligned" data-text="${result.eligible_voters}">${layout.format_number(result.eligible_voters)}</td>
-                            <td class="right-aligned" data-text="${result.received_ballots}">${layout.format_number(result.received_ballots)}</td>
-                            <td class="right-aligned" data-text="${result.accounted_ballots}">${layout.format_number(result.accounted_ballots)}</td>
-                            <td class="right-aligned" data-text="${result.blank_ballots}">${layout.format_number(result.blank_ballots)}</td>
-                            <td class="right-aligned" data-text="${result.invalid_ballots}">${layout.format_number(result.invalid_ballots)}</td>
-                            <td class="right-aligned" data-text="${result.accounted_votes}">${layout.format_number(result.accounted_votes)}</td>
-                            <td class="right-aligned" tal:condition="layout.completed">${'{0:.2f}'.format(result.turnout)} %</td>
-                        </tal:block>
-                    </tr>
-                </tbody>
-                <tfoot tal:condition="layout.summarize">
-                    <tr class="total">
-                        <td i18n:translate="">Total</td>
-                        <td tal:condition="layout.has_districts"></td>
-                        <td class="right-aligned">${layout.format_number(election.eligible_voters)}</td>
-                        <td class="right-aligned">${layout.format_number(election.received_ballots)}</td>
-                        <td class="right-aligned">${layout.format_number(election.accounted_ballots)}</td>
-                        <td class="right-aligned">${layout.format_number(election.blank_ballots)}</td>
-                        <td class="right-aligned">${layout.format_number(election.invalid_ballots)}</td>
-                        <td class="right-aligned">${layout.format_number(election.accounted_votes)}</td>
-                        <td class="right-aligned" tal:condition="layout.completed">${'{0:.2f}'.format(election.turnout)} %</td>
-                    </tr>
-                </tfoot>
-            </table>
+            <tal:block metal:use-macro="layout.macros['election-statistics-table']"></tal:block>
+            <tal:block metal:use-macro="layout.macros['embedded_table']"></tal:block>
+
 
         </tal:block>
 

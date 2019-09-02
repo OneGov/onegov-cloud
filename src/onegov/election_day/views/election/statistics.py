@@ -20,3 +20,23 @@ def view_election_statistics(self, request):
         'election': self,
         'layout': layout
     }
+
+
+@ElectionDayApp.html(
+    model=Election,
+    name='statistics-table',
+    template='embed.pt',
+    permission=Public
+)
+def view_election_statistics_table(self, request):
+
+    """" View for the standalone statistics table.  """
+
+    layout = ElectionLayout(self, request, 'statistics')
+
+    return {
+        'election': self,
+        'layout': layout,
+        'type': 'election-table',
+        'scope': 'statistics'
+    }

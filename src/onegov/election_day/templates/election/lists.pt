@@ -33,28 +33,8 @@
                     </figure>
                 </div>
             </div>
-
-            <table
-                class="results tablesaw sortable"
-                data-tablesaw-mode="columntoggle"
-                data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
-                data-tablesaw-minimap=""
-                >
-                <thead>
-                    <tr>
-                        <th data-tablesaw-priority="persist" i18n:translate="">List</th>
-                        <th data-tablesaw-priority="1" i18n:translate="single_votes" class="right-aligned">Votes</th>
-                        <th data-tablesaw-priority="1" i18n:translate="" class="right-aligned">Mandates</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr tal:repeat="list lists">
-                        <td>${list[0]}</td>
-                        <td class="right-aligned" data-text="${list[1] or 0}">${layout.format_number(list[1] or 0)}</td>
-                        <td class="right-aligned">${list[3]}</td>
-                    </tr>
-                </tbody>
-            </table>
+            <tal:block metal:use-macro="layout.macros['election-lists-table']"></tal:block>
+            <tal:block metal:use-macro="layout.macros['embedded_table']"></tal:block>
         </tal:block>
 
         <div metal:use-macro="layout.macros['related_link']" />

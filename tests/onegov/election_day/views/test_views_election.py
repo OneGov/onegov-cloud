@@ -656,3 +656,19 @@ def test_view_election_relations(election_day_app_gr):
         assert '<h2>Zugehörige Wahlen</h2>' in result
         assert 'http://localhost/election/first-election' in result
         assert 'First Election' in result
+
+
+# def test_elections_embbeded_table_redirects(election_day_app_gr):
+#     client = Client(election_day_app_gr)
+#     client.get('/locale/de_CH').follow()
+#     session = election_day_app_gr.session_manager.session()
+#     login(client)
+#     upload_majorz_election(client)
+#     election = session.query(Election).filter(
+#         Election.title == 'Major Election')
+#     assert election
+#     layout = ElectionLayout(election, election_day_app_gr.request())
+#     for tab in layout.tabs_with_embedded_tables:
+#         resp = client.get(f'/election/majorz-election/{tab}')
+#         print(resp)
+#     assert False

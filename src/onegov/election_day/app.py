@@ -260,6 +260,9 @@ def get_custom_asset():
     yield 'charts-init.js'
     yield 'embed.js'
 
+    # Embedded tables as widgets
+    yield 'embedded_tables.js'
+
 
 @ElectionDayApp.webasset('backend_common')
 def get_backend_common_asset():

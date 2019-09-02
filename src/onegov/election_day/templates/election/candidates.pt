@@ -37,41 +37,8 @@
                     </figure>
                 </div>
             </div>
-
-            <table tal:condition="layout.has_candidates" class="results tablesaw collapsible collapsed sortable"
-                data-tablesaw-mode="columntoggle"
-                data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
-                data-tablesaw-minimap=""
-                >
-                <thead>
-                    <tr>
-                        <th data-tablesaw-priority="persist" i18n:translate="">Candidate</th>
-                        <th data-tablesaw-priority="2" tal:condition="not:layout.tacit" i18n:translate="single_votes" class="right-aligned">Votes</th>
-                        <th data-tablesaw-priority="3" tal:condition="layout.majorz" i18n:translate="" class="right-aligned">Party</th>
-                        <th data-tablesaw-priority="3" tal:condition="layout.proporz" i18n:translate="" class="right-aligned">List</th>
-                        <th data-tablesaw-priority="1" i18n:translate="" class="right-aligned">Elected</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr tal:repeat="candidate candidates" tal:attributes="class 'sticky-row' if candidate[2] > 0 else ''">
-                        <td>${candidate[0]} ${candidate[1]}</td>
-                        <td tal:condition="not:layout.tacit" class="right-aligned" data-text="${candidate[4]}">${layout.format_number(candidate[4])}</td>
-                        <td tal:condition="layout.majorz" class="right-aligned">${candidate[3]}</td>
-                        <td tal:condition="layout.proporz" class="right-aligned">${candidate[5]}</td>
-                        <td class="answer accepted right-aligned" tal:condition="candidate[2] == True" i18n:translate="">Yes</td>
-                        <td class="answer rejected right-aligned" tal:condition="candidate[2] == False" i18n:translate="">No</td>
-                        <td class="answer right-aligned" tal:condition="candidate[2] == None" i18n:translate=""></td>
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr class="more" tal:condition="not: election.tacit">
-                        <td colspan="4" i18n:translate="">All candidates</td>
-                    </tr>
-                    <tr class="less" tal:condition="not: election.tacit">
-                        <td colspan="4" i18n:translate="">Elected candidates only</td>
-                    </tr>
-                </tfoot>
-            </table>
+            <tal:block metal:use-macro="layout.macros['election-candidates-table']"></tal:block>
+            <tal:block metal:use-macro="layout.macros['embedded_table']"></tal:block>
         </tal:block>
 
         <div metal:use-macro="layout.macros['related_link']" />
