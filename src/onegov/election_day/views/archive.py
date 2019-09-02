@@ -1,7 +1,12 @@
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
+from onegov.election_day.collections.archived_results import (
+    SearchableArchivedResultCollection
+)
+from onegov.election_day.forms.archive import ArchiveSearchForm
 from onegov.election_day.layouts import DefaultLayout
+from onegov.election_day.layouts.archive import ArchiveLayout
 from onegov.election_day.models import Principal
 from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
@@ -23,11 +28,16 @@ def view_archive(self, request):
     layout = DefaultLayout(self, request)
     results, last_modified = self.by_date()
     results = self.group_items(results, request)
+    archive_link = request.class_link(
+        SearchableArchivedResultCollection,
+        variables={'item_type': 'vote'}
+    )
 
     return {
         'layout': layout,
         'date': self.date,
-        'archive_items': results
+        'archive_items': results,
+        'archive_link': archive_link
     }
 
 
@@ -78,11 +88,16 @@ def view_principal(self, request):
     archive = ArchivedResultCollection(request.session)
     latest, last_modified = archive.latest()
     latest = archive.group_items(latest, request)
+    archive_link = request.class_link(
+        SearchableArchivedResultCollection,
+        variables={'item_type': 'vote'}
+    )
 
     return {
         'layout': layout,
         'archive_items': latest,
-        'date': None
+        'date': None,
+        'archive_link': archive_link
     }
 
 
@@ -115,4 +130,39 @@ def view_principal_json(self, request):
             str(year): request.link(archive.for_date(year))
             for year in archive.get_years()
         }
+    }
+
+
+@ElectionDayApp.form(
+    model=SearchableArchivedResultCollection,
+    template='archive_search.pt',
+    form=ArchiveSearchForm,
+    permission=Public,
+)
+def view_archive_search(self, request, form):
+
+    """ Shows all the results from the elections and votes of the last election
+    day. It's the landing page.
+    """
+
+    # layout = DefaultLayout(self, request)
+    layout = ArchiveLayout(self, request)
+    self.locale = request.locale
+    results = self.batch
+    grouped_results = self.group_items(results, request)
+
+    if not form.errors:
+        form.apply_model(self)
+
+    # set principal for query function
+    self.app_principal_domain = request.app.principal.domain
+
+    return {
+        'item_type': self.item_type,
+        'layout': layout,
+        'form': form,
+        'form_method': 'GET',
+        'archive_items': grouped_results,
+        'item_count': self.subset_count,
+        'archive_link': request.link(self)
     }

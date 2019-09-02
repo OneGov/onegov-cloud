@@ -1,5 +1,3 @@
-import onegov.core
-
 from babel import Locale
 from cached_property import cached_property
 from datetime import datetime

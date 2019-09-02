@@ -28,6 +28,10 @@ html {
     text-transform: uppercase;
 }
 
+.no-wrap {
+    white-space: nowrap;
+}
+
 /*
     Before Content
 */
@@ -111,15 +115,16 @@ html {
     ul {
         list-style-type: none;
         margin: 0;
+    }
+}
 
-        li {
-            display: inline-block;
-
+.archive-breadcrumbs {
+    li {
+        display: inline-block;
             + li::before {
                 content: '/ ';
             }
         }
-    }
 }
 
 /*
@@ -175,6 +180,10 @@ table {
         &.left-aligned {
             text-align: left;
         }
+
+        &.top-aligned {
+            vertical-align: top;
+      }
     }
 
     &.tablesaw thead th.right-aligned {

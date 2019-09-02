@@ -10,6 +10,7 @@ from onegov.ballot import List
 from onegov.ballot import ListCollection
 from onegov.ballot import Vote
 from onegov.ballot import VoteCollection
+from onegov.core.converters import extended_date_converter
 from onegov.core.i18n import SiteLocale
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import ArchivedResultCollection
@@ -19,6 +20,9 @@ from onegov.election_day.collections import EmailSubscriberCollection
 from onegov.election_day.collections import SmsSubscriberCollection
 from onegov.election_day.collections import SubscriberCollection
 from onegov.election_day.collections import UploadTokenCollection
+from onegov.election_day.collections.archived_results import (
+    SearchableArchivedResultCollection
+)
 from onegov.election_day.models import DataSource
 from onegov.election_day.models import DataSourceItem
 from onegov.election_day.models import Principal
@@ -139,6 +143,42 @@ def get_data_source_item(app, id):
 @ElectionDayApp.path(model=ArchivedResultCollection, path='/archive/{date}')
 def get_archive_by_year(app, date):
     return ArchivedResultCollection(app.session(), date)
+
+
+@ElectionDayApp.path(
+    model=SearchableArchivedResultCollection,
+    path='archive-search/{item_type}',
+    converters=dict(
+        from_date=extended_date_converter,
+        to_date=extended_date_converter,
+        types=[str],
+        domains=[str],
+        answers=[str]
+    )
+)
+def get_archive_search(
+        app,
+        from_date=None,
+        to_date=None,
+        answers=None,
+        types=None,
+        item_type=None,
+        domains=None,
+        term=None,
+        page=0
+):
+
+    return SearchableArchivedResultCollection(
+        app.session(),
+        to_date=to_date,
+        from_date=from_date,
+        answers=answers,
+        types=types,
+        item_type=item_type,
+        domains=domains,
+        term=term,
+        page=page
+    )
 
 
 @ElectionDayApp.path(model=SiteLocale, path='/locale/{locale}')
