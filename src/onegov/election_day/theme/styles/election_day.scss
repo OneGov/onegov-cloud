@@ -121,10 +121,10 @@ html {
 .archive-breadcrumbs {
     li {
         display: inline-block;
-            + li::before {
-                content: '/ ';
-            }
+        + li::before {
+            content: '/ ';
         }
+    }
 }
 
 /*
