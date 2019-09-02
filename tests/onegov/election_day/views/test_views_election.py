@@ -1,6 +1,8 @@
 from datetime import date
 from freezegun import freeze_time
 from math import isclose
+
+from onegov.ballot import Election
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import MAJORZ_HEADER
 from tests.onegov.election_day.common import upload_majorz_election
@@ -60,8 +62,8 @@ def test_view_election_candidate_by_entity(election_day_app_gr):
     client.get('/locale/de_CH').follow()
 
     login(client)
-    upload_majorz_election(client)
-    upload_proporz_election(client)
+    upload_majorz_election(client, status='final')
+    upload_proporz_election(client, status='final')
 
     for url in (
         '/election/majorz-election/candidate-by-entity',

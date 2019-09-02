@@ -241,7 +241,7 @@ def upload_complex_vote(client, create=True, canton='zg'):
     return upload
 
 
-def upload_majorz_election(client, create=True, canton='gr'):
+def upload_majorz_election(client, create=True, canton='gr', status='unknown'):
     if create:
         new = client.get('/manage/elections/new-election')
         new.form['election_de'] = 'Majorz Election'
@@ -272,13 +272,13 @@ def upload_majorz_election(client, create=True, canton='gr'):
     )
     if canton == 'gr':
         csv += (
-            'unknown,,3503,True,56,25,0,4,1,0,1,True,Engler,Stefan,20,\n'
-            'unknown,,3503,True,56,25,0,4,1,0,2,True,Schmid,Martin,18,\n'
+            f'{status},,3503,True,56,25,0,4,1,0,1,True,Engler,Stefan,20,\n'
+            f'{status},,3503,True,56,25,0,4,1,0,2,True,Schmid,Martin,18,\n'
         )
     if canton == 'zg':
         csv += (
-            'unknown,,1711,True,56,25,0,4,1,0,1,True,Engler,Stefan,20,\n'
-            'unknown,,1710,True,56,25,0,4,1,0,2,True,Schmid,Martin,18,\n'
+            f'{status},,1711,True,56,25,0,4,1,0,1,True,Engler,Stefan,20,\n'
+            f'{status},,1710,True,56,25,0,4,1,0,2,True,Schmid,Martin,18,\n'
         )
     csv = csv.encode('utf-8')
 
@@ -291,7 +291,8 @@ def upload_majorz_election(client, create=True, canton='gr'):
     return upload
 
 
-def upload_proporz_election(client, create=True, canton='gr'):
+def upload_proporz_election(client, create=True, canton='gr',
+                            status='unknown'):
     if create:
         new = client.get('/manage/elections/new-election')
         new.form['election_de'] = 'Proporz Election'
@@ -304,20 +305,20 @@ def upload_proporz_election(client, create=True, canton='gr'):
     csv = PROPORZ_HEADER
     if canton == 'gr':
         csv += (
-            'unknown,3503,True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
+            f'{status},3503,True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
             '101,False,Casanova,Angela,0,,0,1\n'
         )
         csv += (
-            'unknown,3503,True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
+            f'{status},3503,True,56,32,1,0,1,2,2,CVP,1,2,0,6,'
             '201,False,Caluori,Corina,2,,2,0\n'
         )
     elif canton == 'zg':
         csv += (
-            'unknown,1711,True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
+            f'{status},1711,True,56,32,1,0,1,1,1,FDP,1,1,0,8,'
             '101,False,Casanova,Angela,0,,0,1\n'
         )
         csv += (
-            'unknown,1711,True,56,32,1,0,1,2,2,CVP,1,2,0,5,'
+            f'{status},1711,True,56,32,1,0,1,2,2,CVP,1,2,0,5,'
             '201,False,Caluori,Corina,2,,2,0\n'
         )
     csv = csv.encode('utf-8')
