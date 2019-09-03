@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from onegov.agency.app import AgencyApp
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
@@ -22,9 +24,9 @@ def get_people(app, page=0, letter=None, agency=None):
 
 @AgencyApp.path(
     model=ExtendedAgencyCollection,
-    path='/organizations'
+    path='/organizations',
 )
-def get_agencies(app):
+def get_agencies(app, pdf_modified=None):
     return ExtendedAgencyCollection(app.session())
 
 
