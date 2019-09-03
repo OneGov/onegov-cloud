@@ -20,12 +20,14 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
     def model_class(self):
         return ExtendedPerson
 
-    def __init__(self, session, page=0, letter=None, agency=None):
+    def __init__(self, session, page=0, letter=None, agency=None, xlsx_modified=None):
         self.session = session
         self.page = page
         self.letter = letter.upper() if letter else None
         self.agency = agency
         self.exclude_hidden = False
+        # Usage for link generation of people excel based on timestamp
+        self.xlsx_modified = xlsx_modified
 
     def subset(self):
         return self.query()
