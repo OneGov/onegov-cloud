@@ -44,9 +44,9 @@ def get_membership_form_class(model, request):
 def view_agencies(self, request):
 
     pdf_link = None
-    pdf_modified = request.app.root_pdf_modified
-    if pdf_modified is not None:
-        self.pdf_modified = str(pdf_modified.timestamp())
+    root_pdf_modified = request.app.root_pdf_modified
+    if root_pdf_modified is not None:
+        self.root_pdf_modified = str(root_pdf_modified.timestamp())
         pdf_link = request.link(self, name='pdf')
 
     return {
@@ -223,6 +223,35 @@ def move_agency(self, request, form):
         'form': form
     }
 
+@AgencyApp.view(
+    model=ExtendedAgencyCollection,
+    name='pdf',
+    permission=Public
+)
+def get_root_pdf(self, request):
+
+    last_modified = request.app.root_pdf_modified
+    if last_modified is None:
+        return Response(status='503 Service Unavailable')
+
+    @request.after
+    def cache_headers(response):
+        max_age = 1 * 24 * 60 * 60
+        expires = datetime.now() + timedelta(seconds=max_age)
+        fmt = '%a, %d %b %Y %H:%M:%S GMT'
+
+        response.headers.add('Cache-Control', f'max-age={max_age}, public')
+        response.headers.add('ETag', last_modified.isoformat())
+        response.headers.add('Expires', expires.strftime(fmt))
+        response.headers.add('Last-Modified', last_modified.strftime(fmt))
+
+    return Response(
+        request.app.root_pdf,
+        content_type='application/pdf',
+        content_disposition='inline; filename={}.pdf'.format(
+            normalize_for_url(request.app.org.name)
+        )
+    )
 
 @AgencyApp.form(
     model=ExtendedAgencyCollection,

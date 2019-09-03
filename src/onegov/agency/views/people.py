@@ -37,7 +37,9 @@ def view_people(self, request):
     request.include('people-select')
 
     people_xlsx_link = None
-    if request.app.people_xlsx_exists:
+    last_modified = request.app.people_xlsx_modified
+    if last_modified is not None:
+        self.xlsx_modified = str(last_modified.timestamp())
         people_xlsx_link = request.link(self, name='people-xlsx')
 
     if not request.is_logged_in:
