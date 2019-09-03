@@ -98,6 +98,19 @@ def test_view_election_candidate_by_entity(election_day_app_gr):
         assert data['Casanova']['3503']['counted'] is True
         assert data['Casanova']['3503']['percentage'] == 0.0
 
+    # test for incomplete majorz
+    upload_majorz_election(client, status='unknown')
+    upload_proporz_election(client, status='final')
+    for url in (
+        '/election/majorz-election/candidate-by-entity',
+        '/election/majorz-election/candidate-by-entity-chart'
+    ):
+        view = client.get(url)
+        assert '/by-entity">Engler Stefan</option>' in view
+        assert '/by-entity">Schmid Martin</option>' in view
+
+    # test for incomplete proporz
+
 
 def test_view_election_candidate_by_district(election_day_app_gr):
     client = Client(election_day_app_gr)
