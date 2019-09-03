@@ -10,6 +10,11 @@ from onegov.election_day.utils.election import get_candidates_results
 from sqlalchemy.orm import object_session
 from onegov.election_day import _
 
+election_incomplete_text = _(
+    'The figure with elected candidates will be available '
+                       'as soon the final results are published.'
+)
+
 @ElectionDayApp.json(
     model=Election,
     name='candidates-data',
@@ -42,7 +47,7 @@ def view_election_candidates_chart(self, request):
 
     return {
         'skip_rendering': ~self.completed,
-        'help_text': _('Intermediate results'),
+        'help_text': election_incomplete_text,
         'model': self,
         'layout': DefaultLayout(self, request),
         'type': 'bar',
@@ -65,7 +70,7 @@ def view_election_candidates(self, request):
         self, object_session(self)))
     return {
         'skip_rendering': ~self.completed,
-        'help_text': _('The graphic '),
+        'help_text': election_incomplete_text,
         'election': self,
         'layout': layout,
         'candidates': candidates

@@ -6,11 +6,11 @@
 <body>
 
 <metal:intermediate-results-popup define-macro="intermediate-results-popup">
-    <tal:block tal:condition="skip_rendering|nothing">
-                <div class="alert-box secondary">
-                    <p>${help_text}</p>
+    <tal:b tal:condition="skip_rendering|nothing">
+                <div class="panel">
+                    <h5>${help_text}</h5>
                 </div>
-    </tal:block>
+    </tal:b>
 </metal:intermediate-results-popup>
 
 <metal:answer define-macro="answer" i18n:domain="onegov.election_day">
@@ -29,16 +29,16 @@
 </metal:answer>
 
 <metal:progress define-macro="progress" i18n:domain="onegov.election_day">
-    <tal:block i18n:translate="" condition="progress[1]">
+    <tal:b i18n:translate="" condition="progress[1]">
         <span tal:replace="progress[0]" i18n:name='counted' />
             of
         <span tal:replace="progress[1]" i18n:name='total' />
-    </tal:block>
+    </tal:b>
 </metal:progress>
 
 <metal:search define-macro="form" i18n:domain="onegov.election_day">
     <form tal:attributes="action form.action" method="POST" enctype="multipart/form-data">
-        <tal:block repeat="fieldset form.fieldsets">
+        <tal:b repeat="fieldset form.fieldsets">
             <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower()}">
                 <legend>${fieldset.label}</legend>
                 <div class="formfields">
@@ -46,22 +46,22 @@
                     <div class="clearfix"></div>
                 </div>
             </fieldset>
-            <tal:block condition="not:fieldset.is_visible">
+            <tal:b condition="not:fieldset.is_visible">
                 <div class="formfields">
                     <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
                     <div class="clearfix"></div>
                 </div>
-            </tal:block>
-        </tal:block>
-        <tal:block condition="cancel|nothing">
+            </tal:b>
+        </tal:b>
+        <tal:b condition="cancel|nothing">
             <a class="button secondary cancel-button" href="${cancel}" i18n:translate="">Cancel</a>
-        </tal:block>
-        <tal:block condition="not: button_text|nothing">
+        </tal:b>
+        <tal:b condition="not: button_text|nothing">
             <input type="submit" value="Submit" class="button ${button_class|nothing}" i18n:attributes="value">
-        </tal:block>
-        <tal:block condition="button_text|nothing">
+        </tal:b>
+        <tal:b condition="button_text|nothing">
             <input type="submit" value="${button_text}" class="button ${button_class|nothing}">
-        </tal:block>
+        </tal:b>
     </form>
 </metal:search>
 

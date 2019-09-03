@@ -22,7 +22,7 @@
             <p tal:condition="not layout.has_candidates" i18n:translate="">
                 No candidacies.
             </p>
-            <p tal:condition="skip_rendering and help_text">${help_text}</p>
+            <tal:block metal:use-macro="layout.macros['intermediate-results-popup']" i18n:domain="onegov.election_day"></tal:block>
 
             <div class="row" tal:condition="not election.tacit and layout.has_candidates and not skip_rendering">
                 <div class="small-12 small-centered large-10 columns">
