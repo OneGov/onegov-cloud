@@ -63,9 +63,9 @@ class ArchivedResultCollection(object):
         if not items:
             return None
 
-        compounded = [
+        compounded = {
             id_ for item in items for id_ in getattr(item, 'elections', [])
-        ]
+        }
 
         dates = groupbydict(items, lambda i: i.date)
         order = ('federation', 'canton', 'region', 'municipality')
@@ -319,9 +319,9 @@ class SearchableArchivedResultCollection(
         )
 
     def group_items(self, items, request):
-        compounded = (
+        compounded = {
             id_ for item in items for id_ in getattr(item, 'elections', [])
-        )
+        }
 
         items = dict(
             votes=tuple(v for v in items if v.type == 'vote'),
@@ -401,19 +401,21 @@ class SearchableArchivedResultCollection(
             self.from_date = self.to_date
 
     def query(self, no_filter=False, sort=True):
+
         if no_filter:
             return self.session.query(ArchivedResult)
+        assert self.to_date, 'to_date must have a datetime.date value'
+
         self.check_from_date_to_date()
         allowed_results = tuple(a[0] for a in ArchivedResult.types_of_results)
-        assert self.to_date, 'to_date must have a datetime.date value'
         order = ('federation', 'canton', 'region', 'municipality')
         if self.app_principal_domain == 'municipality':
             order = ('municipality', 'federation', 'canton', 'region')
 
         def generate_cases():
             return tuple(
-                (ArchivedResult.domain == opt, ind + 1) for
-                ind, opt in enumerate(order)
+                (ArchivedResult.domain == opt, ind) for
+                ind, opt in enumerate(order, 1)
             )
 
         query = self.session.query(ArchivedResult)
