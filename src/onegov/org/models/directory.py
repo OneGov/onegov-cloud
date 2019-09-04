@@ -318,7 +318,7 @@ class ExtendedDirectoryEntry(DirectoryEntry, CoordinatesExtension,
             value = '\n'.join(linkify(v) for v in values if v)
 
             return '<ul><li>{}</li></ul>'.format(
-                '</li><li>'.join(linkify(value).splitlines())
+                '</li><li>'.join(value.splitlines())
             )
 
     @property
