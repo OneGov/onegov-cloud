@@ -348,7 +348,6 @@ class MapSettingsForm(Form):
             ('geo-mapbox', _("Mapbox (Default)")),
             ('geo-vermessungsamt-winterthur', "Vermessungsamt Winterthur"),
             ('geo-zugmap-luftbild', "ZugMap Luftbild"),
-            ('geo-zugmap-ortsplan', "ZugMap Ortsplan"),
         ])
 
 
