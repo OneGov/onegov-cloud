@@ -81,7 +81,7 @@
                     .attr('y', (options.barHeight - options.barMargin) / 2)
                     .attr('dy', '4')
                     .attr('class', 'name')
-                    .text(function(d) { return d.name; })
+                    .text(function(d) { return d.text; })
                     .style('font-size', options.fontSize)
                     .style('font-family', options.fontFamily)
                     .style('text-anchor', 'end');
@@ -89,14 +89,14 @@
                 // Adjust the offset & scale to give the text enough space
                 var offset = d3.max(name[0], function(d) {return d.getBBox().width;});
                 var scale = d3.scale.linear()
-                    .domain([0, Math.max(data.majority || 0, d3.max(data.results, function(d) { return d.votes; }))])
+                    .domain([0, Math.max(data.majority || 0, d3.max(data.results, function(d) { return d.value; }))])
                     .range([0, width - offset - 8]);
                 name.attr('x', offset);
 
                 // ... the bar on the right (blue, if active)
                 var bar = line.append('rect')
                     .attr('x', offset + 5)
-                    .attr('width', function(d) { return scale(d.votes); })
+                    .attr('width', function(d) { return scale(d.value); })
                     .attr('height', options.barHeight - options.barMargin)
                     .attr('class', function(d) {
                         return 'bar ' + d.class;
@@ -108,13 +108,13 @@
                 // ... and the label (one text inside the bar, one outside)
                 var label = line.append('g')
                     .attr('transform', function(d) {
-                      return 'translate(' + (offset + scale(d.votes)) + ',' + ((options.barHeight - options.barMargin) / 2 + 4) + ')';
+                      return 'translate(' + (offset + scale(d.value)) + ',' + ((options.barHeight - options.barMargin) / 2 + 4) + ')';
                     })
                     .attr('class', 'label');
                 label.append('text')
                     .attr('dx', -3)
                     .attr('class', 'left')
-                    .text(function(d) { return (!d.mandates) ? d.votes : d.votes + ' / ' + (d.mandates || 0); })
+                    .text(function(d) { return (!d.value2) ? d.value : d.value + ' / ' + (d.value2 || 0); })
                     .style('font-size', options.fontSizeSmall)
                     .style('font-family', options.fontFamily)
                     .style('text-anchor', 'end')
@@ -122,7 +122,7 @@
                 label.append('text')
                     .attr('dx', 8)
                     .attr('class', 'right')
-                    .text(function(d) { return (!d.mandates) ? d.votes : d.votes + ' / ' + (d.mandates || 0); })
+                    .text(function(d) { return (!d.value2) ? d.value : d.value + ' / ' + (d.value2 || 0); })
                     .style('font-size', options.fontSizeSmall)
                     .style('font-family', options.fontFamily)
                     .style('fill', options.colorInactive);
@@ -175,9 +175,9 @@
                             scale.range([0, width - offset - 8]);
 
                             svg.attr('width', width + margin.left + margin.right);
-                            bar.attr('width', function(d) { return scale(d.votes); });
+                            bar.attr('width', function(d) { return scale(d.value); });
                             label.attr('transform', function(d) {
-                              return 'translate(' + (offset + scale(d.votes)) + ',' + ((options.barHeight - options.barMargin) / 2 + 4) + ')';
+                              return 'translate(' + (offset + scale(d.value)) + ',' + ((options.barHeight - options.barMargin) / 2 + 4) + ')';
                             });
                             updateLabels(line);
 

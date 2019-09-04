@@ -29,9 +29,9 @@ def get_lists_data(election, request):
 
     return {
         'results': [{
-            'name': item[0],
-            'votes': item[1],
-            'mandates': item[3] if election.completed else None,
+            'text': item[0],
+            'value': item[1],
+            'value2': item[3] if election.completed else None,
             'class': 'active' if item[3] else 'inactive',
         } for item in get_list_results(election, object_session(election))],
         'majority': None,
