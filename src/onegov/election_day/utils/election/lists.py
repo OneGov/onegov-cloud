@@ -33,7 +33,7 @@ def get_lists_data(election, request):
             'value': item[1],
             'value2': item[3] if election.completed else None,
             'class': 'active' if election.completed
-                    and item[3] else 'inactive',
+            and item[3] else 'inactive',
         } for item in get_list_results(election, object_session(election))],
         'majority': None,
         'title': election.title
