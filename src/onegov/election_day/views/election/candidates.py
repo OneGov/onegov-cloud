@@ -46,7 +46,7 @@ def view_election_candidates_chart(self, request):
         add_last_modified_header(response, self.last_modified)
 
     return {
-        'skip_rendering': ~self.completed,
+        'skip_rendering': not self.completed,
         'help_text': election_incomplete_text,
         'model': self,
         'layout': DefaultLayout(self, request),
@@ -65,11 +65,8 @@ def view_election_candidates(self, request):
 
     """" The main view. """
 
-    layout = ElectionLayout(self, request, 'candidates')
-    candidates = (c for c in get_candidates_results(
-        self, object_session(self)))
     return {
-        'skip_rendering': ~self.completed,
+        'skip_rendering': not self.completed,
         'help_text': election_incomplete_text,
         'election': self,
         'layout': layout,
