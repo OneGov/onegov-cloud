@@ -1,8 +1,22 @@
 # Changes
 
+## Release `2019.6`
+
+> commits: **1 / [0d57b12204...0d57b12204](https://github.com/OneGov/onegov-cloud/compare/0d57b12204...0d57b12204)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.6)](https://buildkite.com/seantis/onegov-cloud)
+
+### Election-Day
+
+✨ **Hide intermediate results for elections and votes**
+
+Hides clear statuses such as elected or number of mandates per list for proporz election if election is not final.
+
+**`Other`** | **[0d57b12204](https://github.com/onegov/onegov-cloud/commit/0d57b122040a9e883735a56d40d891430bae3c10)**
+
 ## Release `2019.5`
 
-> commits: **13 / [326bab40a2...88a02c2a16](https://github.com/OneGov/onegov-cloud/compare/326bab40a2...88a02c2a16)**<br>
+> released: **2019-09-04 06:04**<br>
+> commits: **14 / [326bab40a2...a8937ba123](https://github.com/OneGov/onegov-cloud/compare/326bab40a2...a8937ba123)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.5)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
