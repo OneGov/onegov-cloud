@@ -28,6 +28,10 @@ html {
     text-transform: uppercase;
 }
 
+.no-wrap {
+    white-space: nowrap;
+}
+
 /*
     Before Content
 */
@@ -111,13 +115,14 @@ html {
     ul {
         list-style-type: none;
         margin: 0;
+    }
+}
 
-        li {
-            display: inline-block;
-
-            + li::before {
-                content: '/ ';
-            }
+.archive-breadcrumbs {
+    li {
+        display: inline-block;
+        + li::before {
+            content: '/ ';
         }
     }
 }
@@ -175,6 +180,10 @@ table {
         &.left-aligned {
             text-align: left;
         }
+
+        &.top-aligned {
+            vertical-align: top;
+      }
     }
 
     &.tablesaw thead th.right-aligned {
@@ -722,6 +731,12 @@ form {
     font-size: 1rem;
 }
 
+.embed-info {
+    margin-top: 1%;
+    margin-left: auto;
+    margin-right: auto;
+    width: 85%;
+}
 
 /*
     Upload errors

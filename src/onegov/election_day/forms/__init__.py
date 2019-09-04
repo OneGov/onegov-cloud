@@ -16,9 +16,10 @@ from onegov.election_day.forms.upload import UploadWabstiMajorzElectionForm
 from onegov.election_day.forms.upload import UploadWabstiProporzElectionForm
 from onegov.election_day.forms.upload import UploadWabstiVoteForm
 from onegov.election_day.forms.vote import VoteForm
-
+from onegov.election_day.forms.archive import ArchiveSearchForm
 
 __all__ = [
+    'ArchiveSearchForm',
     'DataSourceForm',
     'DataSourceItemForm',
     'ElectionCompoundForm',

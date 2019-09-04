@@ -5,15 +5,17 @@ import transaction
 
 from contextlib import contextmanager
 from inspect import getmembers, isfunction, ismethod
+from itertools import chain
+from onegov.core import LEVELS
 from onegov.core.orm import Base, find_models
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON
 from sqlalchemy import Column, Text
 from sqlalchemy import create_engine
 from sqlalchemy.engine.reflection import Inspector
-from sqlalchemy.pool import StaticPool
 from sqlalchemy.orm import load_only
-from toposort import toposort, toposort_flatten
+from sqlalchemy.pool import StaticPool
+from toposort import toposort
 
 
 class UpgradeState(Base, TimestampMixin):
@@ -241,37 +243,23 @@ def get_module_order_key(tasks):
     This is used to order unrelated tasks in a sane way.
 
     """
+    sorted_modules = {module: ix for ix, module in enumerate(chain(*LEVELS))}
     modules = set()
 
     for task in tasks:
-        modules.add(task.split(':')[0])
+        modules.add(task.split(':', 1)[0])
 
-    graph = {}
-    packages = pkg_resources.working_set
-
-    for module in modules:
-        if module not in graph:
-            graph[module] = set()
-
-        if module in packages.by_key:
-            for dependency in packages.by_key[module].requires():
-                graph[module].add(dependency.key)
-
-    sorted_modules = {
-        task_id: ix for ix, task_id in enumerate(toposort_flatten(graph))
-    }
-
-    def sortkey(task_id):
-        module, name = task_id.split(':', 1)
+    def sortkey(task):
+        module, name = task.split(':', 1)
         return (
-            # sort by the topological order
-            sorted_modules.get(module, float('inf')),
+            # sort by level (unknown models first)
+            sorted_modules.get(module, float('-inf')),
 
-            # then by module
+            # then by module name
             module,
 
             # then by appearance of update function in the code
-            tasks[task_id].__code__.co_firstlineno
+            tasks[task].__code__.co_firstlineno
         )
 
     return sortkey

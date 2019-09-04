@@ -191,6 +191,7 @@ def test_view_clear_results(election_day_app):
     upload_vote(client)
 
     marker = "<h2>Resultate</h2>"
+    i_marker = "<h2>Zwischenergebnisse</h2>"
     urls = (
         '/election/majorz-election/candidates',
         '/election/majorz-election/statistics',
@@ -205,7 +206,8 @@ def test_view_clear_results(election_day_app):
         '/elections/elections/party-strengths',
         '/vote/vote/entities'
     )
-    assert all((marker in client.get(url) for url in urls))
+    assert all((marker in client.get(url) or i_marker in client.get(url)
+                for url in urls))
 
     client.get('/election/majorz-election/clear').form.submit()
     client.get('/election/proporz-election/clear').form.submit()

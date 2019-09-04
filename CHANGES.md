@@ -1,8 +1,51 @@
 # Changes
 
+## Release `2019.6`
+
+> commits: **1 / [0d57b12204...0d57b12204](https://github.com/OneGov/onegov-cloud/compare/0d57b12204...0d57b12204)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.6)](https://buildkite.com/seantis/onegov-cloud)
+
+### Election-Day
+
+✨ **Hide intermediate results for elections and votes**
+
+Hides clear statuses such as elected or number of mandates per list for proporz election if election is not final.
+
+**`Other`** | **[0d57b12204](https://github.com/onegov/onegov-cloud/commit/0d57b122040a9e883735a56d40d891430bae3c10)**
+
+## Release `2019.5`
+
+> released: **2019-09-04 06:04**<br>
+> commits: **14 / [326bab40a2...a8937ba123](https://github.com/OneGov/onegov-cloud/compare/326bab40a2...a8937ba123)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.5)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+🎉 **Improved PDF rendering, solving Link caching**
+
+Features new page break settings where PDF Layout can be chosen. Fixes link caching especially on Firefox by generating unique links for agency pdf's on creation and links based on modified timestamp for root.pdf (and poeple Excel File as well).
+
+**`Feature`** | **[ZW-200](https://kanton-zug.atlassian.net/browse/ZW-200) | **[2410ee7ab7](https://github.com/onegov/onegov-cloud/commit/2410ee7ab715fcc956c2c49ec72016fe5219eef8)**
+
+### Fixes
+
+✨ **Sed -i '.bak' => sed -i.bak**
+
+**`Other`** | **[88a02c2a16](https://github.com/onegov/onegov-cloud/commit/88a02c2a16aa5822b910af00110205d4905ce8c6)**
+
+### Town
+
+✨ **Hide signature verification for anonymous**
+
+Only logged-in users are now able to see the verification widget - it
+seems that the public is more confused by this than anything.
+
+**`Other`** | **[326bab40a2](https://github.com/onegov/onegov-cloud/commit/326bab40a2d6870af9f1b84f204f493dc34a32a0)**
+
 ## Release `2019.4`
 
-> commits: **10 / [5c3adde749...1d9a695a06](https://github.com/OneGov/onegov-cloud/compare/5c3adde749...1d9a695a06)**<br>
+> released: **2019-08-30 15:31**<br>
+> commits: **11 / [5c3adde749...282ed75f8e](https://github.com/OneGov/onegov-cloud/compare/5c3adde749...282ed75f8e)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.4)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency

@@ -44,7 +44,9 @@ def get_membership_form_class(model, request):
 def view_agencies(self, request):
 
     pdf_link = None
-    if request.app.root_pdf_exists:
+    root_pdf_modified = request.app.root_pdf_modified
+    if root_pdf_modified is not None:
+        self.root_pdf_modified = str(root_pdf_modified.timestamp())
         pdf_link = request.link(self, name='pdf')
 
     return {
@@ -221,7 +223,6 @@ def move_agency(self, request, form):
         'form': form
     }
 
-
 @AgencyApp.view(
     model=ExtendedAgencyCollection,
     name='pdf',
@@ -229,21 +230,20 @@ def move_agency(self, request, form):
 )
 def get_root_pdf(self, request):
 
-    if not request.app.root_pdf_exists:
+    last_modified = request.app.root_pdf_modified
+    if last_modified is None:
         return Response(status='503 Service Unavailable')
 
     @request.after
     def cache_headers(response):
-        last_modified = request.app.root_pdf_modified
-        if last_modified:
-            max_age = 1 * 24 * 60 * 60
-            expires = datetime.now() + timedelta(seconds=max_age)
-            fmt = '%a, %d %b %Y %H:%M:%S GMT'
+        max_age = 1 * 24 * 60 * 60
+        expires = datetime.now() + timedelta(seconds=max_age)
+        fmt = '%a, %d %b %Y %H:%M:%S GMT'
 
-            response.headers.add('Cache-Control', f'max-age={max_age}, public')
-            response.headers.add('ETag', last_modified.isoformat())
-            response.headers.add('Expires', expires.strftime(fmt))
-            response.headers.add('Last-Modified', last_modified.strftime(fmt))
+        response.headers.add('Cache-Control', f'max-age={max_age}, public')
+        response.headers.add('ETag', last_modified.isoformat())
+        response.headers.add('Expires', expires.strftime(fmt))
+        response.headers.add('Last-Modified', last_modified.strftime(fmt))
 
     return Response(
         request.app.root_pdf,
@@ -252,7 +252,6 @@ def get_root_pdf(self, request):
             normalize_for_url(request.app.org.name)
         )
     )
-
 
 @AgencyApp.form(
     model=ExtendedAgencyCollection,

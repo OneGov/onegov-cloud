@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from onegov.agency.app import AgencyApp
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
@@ -16,16 +18,17 @@ from uuid import UUID
     path='/people',
     converters=dict(page=int)
 )
-def get_people(app, page=0, letter=None, agency=None):
-    return ExtendedPersonCollection(app.session(), page, letter, agency)
+def get_people(app, page=0, letter=None, agency=None, xlsx_modified=None):
+    return ExtendedPersonCollection(
+        app.session(), page, letter, agency, xlsx_modified)
 
 
 @AgencyApp.path(
     model=ExtendedAgencyCollection,
-    path='/organizations'
+    path='/organizations',
 )
-def get_agencies(app):
-    return ExtendedAgencyCollection(app.session())
+def get_agencies(app, root_pdf_modified=None):
+    return ExtendedAgencyCollection(app.session(), root_pdf_modified)
 
 
 @AgencyApp.path(

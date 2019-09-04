@@ -200,16 +200,16 @@
 </metal:answer>
 
 <metal:progress define-macro="progress" i18n:domain="onegov.election_day">
-    <tal:block i18n:translate="" condition="progress[1]">
+    <tal:b i18n:translate="" condition="progress[1]">
         <span tal:replace="progress[0]" i18n:name='counted' />
             of
         <span tal:replace="progress[1]" i18n:name='total' />
-    </tal:block>
+    </tal:b>
 </metal:progress>
 
 <metal:search define-macro="form" i18n:domain="onegov.election_day">
-    <form tal:attributes="action form.action" method="POST" enctype="multipart/form-data">
-        <tal:block repeat="fieldset form.fieldsets">
+    <form tal:attributes="action form.action; method form_method|'POST'" enctype="multipart/form-data">
+        <tal:b repeat="fieldset form.fieldsets">
             <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower()}">
                 <legend>${fieldset.label}</legend>
                 <div class="formfields">
@@ -217,52 +217,55 @@
                     <div class="clearfix"></div>
                 </div>
             </fieldset>
-            <tal:block condition="not:fieldset.is_visible">
+            <tal:b condition="not:fieldset.is_visible">
                 <div class="formfields">
                     <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
                     <div class="clearfix"></div>
                 </div>
-            </tal:block>
-        </tal:block>
-        <tal:block condition="cancel|nothing">
+            </tal:b>
+        </tal:b>
+        <tal:b condition="cancel|nothing">
             <a class="button secondary cancel-button" href="${cancel}" i18n:translate="">Cancel</a>
-        </tal:block>
-        <tal:block condition="not: button_text|nothing">
+        </tal:b>
+        <tal:b condition="not: button_text|nothing">
             <input type="submit" value="Submit" class="button ${button_class|nothing}" i18n:attributes="value">
-        </tal:block>
-        <tal:block condition="button_text|nothing">
+        </tal:b>
+        <tal:b condition="button_text|nothing">
             <input type="submit" value="${button_text}" class="button ${button_class|nothing}">
-        </tal:block>
+        </tal:b>
     </form>
 </metal:search>
 
 <metal:fields define-macro="fields" i18n:domain="onegov.election_day">
-    <tal:block repeat="field fields">
-        <div class="row"><div class="large-12 columns">
-        <tal:block define="input_type field.widget.input_type|None">
-            <tal:block condition="input_type == 'hidden'">
-                ${field()}
-                <small class="error" tal:repeat="error field.errors">${error}</small>
-            </tal:block>
-            <tal:block condition="input_type != 'hidden'">
-                <label tal:attributes="class field.errors and 'error' or None">
-                    <!--! render the label after the field if it's a boolean field -->
-                    <tal:block condition="field.type == 'BooleanField'">
-                        ${field(placeholder=request.translate(field.description))}
-                        <span class="label-text">${field.label.text}</span>
-                        <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+  <div class="row">
+      <tal:block repeat="field fields">
+            <div class="small-12 columns medium-${field.render_kw['size']|12} field-type-${field.type.lower()}" tal:condition="not field.render_kw.get('hidden', False)|True">
+                <tal:block define="input_type field.widget.input_type|None">
+                    <tal:block condition="input_type == 'hidden'">
+                        ${field()}
+                        <small class="error" tal:repeat="error field.errors">${error}</small>
                     </tal:block>
-                    <tal:block condition="field.type != 'BooleanField'">
-                        <span class="label-text">${field.label.text}</span>
-                        <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
-                        ${field(placeholder=request.translate(field.description))}
-                    </tal:block>
-                </label>
-                <small class="error" tal:repeat="error field.errors">${error}</small>
-            </tal:block>
+                     <tal:block condition="input_type != 'hidden'">
+                        <label tal:attributes="class field.errors and 'error' or None">
+                            <tal:block condition="field.type == 'BooleanField'">
+                                ${field(placeholder=request.translate(field.description))}
+                                <span class="label-text">${field.label.text}</span>
+                                <span tal:condition="field.description|nothing" data-tooltip aria-haspopup="true" class="has-tip" title="${field.description}"><i class="fa fa-info" aria-hidden="true"></i></span>
+                                <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+                            </tal:block>
+                            <tal:block condition="field.type != 'BooleanField'">
+                                <span class="label-text">${field.label.text}</span>
+                                <span tal:condition="field.description|nothing" data-tooltip aria-haspopup="true" class="has-tip" title="${field.description}"><i class="fa fa-info" aria-hidden="true"></i></span>
+                                <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+                                ${field(placeholder=request.translate(field.description))}
+                            </tal:block>
+                        </label>
+                        <small class="error" tal:repeat="error field.errors">${error}</small>
+                     </tal:block>
+               </tal:block>
+            </div>
         </tal:block>
-    </div></div>
-    </tal:block>
+  </div>
 </metal:fields>
 
 <metal:related_link define-macro="related_link" i18n:domain="onegov.election_day">
