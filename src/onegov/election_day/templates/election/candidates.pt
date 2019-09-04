@@ -59,7 +59,8 @@
                     <tr tal:repeat="candidate candidates" tal:attributes="class 'sticky-row' if not election.completed or candidate.elected > 0 else ''">
                         <td>${candidate.family_name} ${candidate.first_name}</td>
                         <td tal:condition="not:layout.tacit" class="right-aligned" data-text="${candidate.getter}">${layout.format_number(candidate.getter)}</td>
-                        <td tal:condition="layout.majorz" class="right-aligned">${candidate[3]}</td>
+                        <td tal:condition="layout.majorz" class="right-aligned">${candidate.party}</td>
+                        <!--? candidate.name is the name of his list                        -->
                         <td tal:condition="layout.proporz" class="right-aligned">${candidate.name}</td>
                         <tal:block tal:switch="election.completed">
                             <tal:block tal:case="True">
