@@ -12,8 +12,9 @@ from onegov.election_day import _
 
 election_incomplete_text = _(
     'The figure with elected candidates will be available '
-                       'as soon the final results are published.'
+    'as soon the final results are published.'
 )
+
 
 @ElectionDayApp.json(
     model=Election,
