@@ -12,9 +12,7 @@ class ElectionLayout(DetailLayout):
         super().__init__(model, request)
         self.tab = tab
 
-    @cached_property
-    def tabs_with_embedded_tables(self):
-        return (
+    tabs_with_embedded_tables = (
             'lists',
             'candidates',
             'statistics',
