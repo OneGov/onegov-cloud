@@ -34,8 +34,8 @@ def test_view_election_candidates(election_day_app_gr):
     client.get('/locale/de_CH').follow()
 
     login(client)
-    upload_majorz_election(client)
-    upload_proporz_election(client)
+    upload_majorz_election(client, status='final')
+    upload_proporz_election(client, status='final')
 
     candidates = client.get('/election/majorz-election/candidates')
     assert all((expected in candidates for expected in (
@@ -51,7 +51,6 @@ def test_view_election_candidates(election_day_app_gr):
     )))
 
     chart = client.get('/election/proporz-election/candidates-chart')
-    assert chart.status_code == 200
     assert '/election/proporz-election/candidates' in chart
 
 
@@ -116,8 +115,8 @@ def test_view_election_candidate_by_district(election_day_app_gr):
     client.get('/locale/de_CH').follow()
 
     login(client)
-    upload_majorz_election(client)
-    upload_proporz_election(client)
+    upload_majorz_election(client, status='final')
+    upload_proporz_election(client, status='final')
 
     for url in (
         '/election/majorz-election/candidate-by-district',
