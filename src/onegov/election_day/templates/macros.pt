@@ -38,7 +38,7 @@
 
 <metal:search define-macro="form" i18n:domain="onegov.election_day">
     <form tal:attributes="action form.action; method form_method|'POST'" enctype="multipart/form-data">
-        <tal:block repeat="fieldset form.fieldsets">
+        <tal:b repeat="fieldset form.fieldsets">
             <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower()}">
                 <legend>${fieldset.label}</legend>
                 <div class="formfields">
