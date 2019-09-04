@@ -18,14 +18,23 @@ def get_candidates_results(election, session):
         List.list_id
     )
     result = result.outerjoin(List)
-    result = result.order_by(
-        List.list_id,
-        desc(Candidate.elected),
-        desc(Candidate.votes),
-        Candidate.family_name,
-        Candidate.first_name
-    )
     result = result.filter(Candidate.election_id == election.id)
+
+    if election.completed:
+        result = result.order_by(
+            List.list_id,
+            desc(Candidate.elected),
+            desc(Candidate.votes),
+            Candidate.family_name,
+            Candidate.first_name
+        )
+    else:
+        result = result.order_by(
+            List.list_id,
+            desc(Candidate.votes),
+            Candidate.family_name,
+            Candidate.first_name
+        )
 
     return result
 
@@ -41,13 +50,21 @@ def get_candidates_data(election, request):
         Candidate.elected,
         Candidate.votes
     )
-    candidates = candidates.order_by(
-        desc(Candidate.elected),
-        desc(Candidate.votes),
-        Candidate.family_name,
-        Candidate.first_name
-    )
     candidates = candidates.filter(Candidate.election_id == election.id)
+
+    if election.completed:
+        candidates = candidates.order_by(
+            desc(Candidate.elected),
+            desc(Candidate.votes),
+            Candidate.family_name,
+            Candidate.first_name
+        )
+    else:
+        candidates = candidates.order_by(
+            desc(Candidate.votes),
+            Candidate.family_name,
+            Candidate.first_name
+        )
 
     majority = 0
     if (
@@ -58,17 +75,22 @@ def get_candidates_data(election, request):
     ):
         majority = election.absolute_majority
 
+    if election.type == 'proporz':
+        if not election.completed:
+            return {
+                'results': [],
+                'majority': majority,
+                'title': election.title
+            }
+        candidates = candidates.filter(Candidate.elected == True)
+
     return {
         'results': [
             {
                 'text': '{} {}'.format(candidate[0], candidate[1]),
                 'value': candidate[3],
-                'class': 'active' if candidate[2] else 'inactive'
-            } for candidate in candidates.all()
-            if (
-                election.type == 'majorz'
-                or election.type == 'proporz' and candidate[2]
-            )
+                'class': 'active' if candidate.elected else 'inactive'
+            } for candidate in candidates
         ],
         'majority': majority,
         'title': election.title

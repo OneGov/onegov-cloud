@@ -131,7 +131,6 @@ class Election(Base, ContentMixin, TimestampMixin,
         for result in self.results:
             if result.counted:
                 return True
-
         return False
 
     #: An election contains n candidates

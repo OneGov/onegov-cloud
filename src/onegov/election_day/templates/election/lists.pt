@@ -9,7 +9,9 @@
 
         <tal:block tal:condition="layout.visible">
 
-            <h2 i18n:translate="">Results</h2>
+            <h2 i18n:translate tal:condition="election.completed">Results</h2>
+            <h2 i18n:translate tal:condition="not: election.completed">Intermediate results</h2>
+
 
             <div metal:use-macro="layout.macros['election_factoids']" />
 
@@ -49,9 +51,10 @@
                 </thead>
                 <tbody>
                     <tr tal:repeat="list lists">
-                        <td>${list[0]}</td>
-                        <td class="right-aligned" data-text="${list[1] or 0}">${layout.format_number(list[1] or 0)}</td>
-                        <td class="right-aligned">${list[3]}</td>
+                        <td>${list.name}</td>
+                        <td class="right-aligned" data-text="${list.getter or 0}">${layout.format_number(list.getter or 0)}</td>
+                        <td tal:condition="election.completed" class="right-aligned">${list.number_of_mandates}</td>
+                        <td tal:condition="not: election.completed" class="right-aligned" i18n:translate>n.a.</td>
                     </tr>
                 </tbody>
             </table>
