@@ -43,7 +43,6 @@ def test_view_election_candidates(election_day_app_gr):
     )))
 
     chart = client.get('/election/majorz-election/candidates-chart')
-    assert chart.status_code == 200
     assert '/election/majorz-election/candidates' in chart
 
     candidates = client.get('/election/proporz-election/candidates')
