@@ -66,8 +66,6 @@ def view_election_candidates(self, request):
 
     """" The main view. """
 
-    layout = ElectionLayout(self, request, 'candidates')
-
     return {
         'skip_rendering': not self.completed,
         'help_text': election_incomplete_text,
