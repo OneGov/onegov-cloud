@@ -69,8 +69,8 @@ def view_election_candidates(self, request):
         'skip_rendering': not self.completed,
         'help_text': election_incomplete_text,
         'election': self,
-        'layout': layout,
-        'candidates': candidates
+        'layout': ElectionLayout(self, request, 'candidates'),
+        'candidates': get_candidates_results(self, object_session(self))
     }
 
 
