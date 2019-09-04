@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-02 19:18+0200\n"
-"PO-Revision-Date: 2019-09-02 19:34+0200\n"
+"POT-Creation-Date: 2019-09-04 09:23+0200\n"
+"PO-Revision-Date: 2019-09-04 09:35+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -137,7 +137,7 @@ msgstr "Kanidat mit id ${id} nicht in wm_kandidaten"
 
 #, python-format
 msgid "Entity with id ${id} not in wmstatic_gemeinden"
-msgstr "Wahl mit id ${id} nicht in wmstatic_gemeinden"
+msgstr "Gemeinde mit id ${id} nicht in wmstatic_gemeinden"
 
 #, python-format
 msgid "Value ${col} is not between 0 and 3"
@@ -149,7 +149,7 @@ msgstr "${var} nicht vorhanden."
 
 #, python-format
 msgid "Entity with id ${id} not in added_entities"
-msgstr "Wahl mit id ${id} nicht in added_entitie"
+msgstr "Gemeinde mit id ${id} nicht in added_entities"
 
 #, python-format
 msgid "List_id ${list_id} has not been found in list numbers"
@@ -578,6 +578,9 @@ msgstr "Suche in ${title}"
 msgid "Found ${item_count} items."
 msgstr "${item_count} Einträge gefunden."
 
+msgid "Intermediate results"
+msgstr "Zwischenergebnisse"
+
 msgid "No candidacies."
 msgstr "Keine Kandidaturen."
 
@@ -609,6 +612,9 @@ msgstr "Ja"
 
 msgid "No"
 msgstr "Nein"
+
+msgid "n.a."
+msgstr "n.v."
 
 msgid "All candidates"
 msgstr "Alle Kandidierenden"
@@ -729,9 +735,6 @@ msgstr "Aktuelle Seite"
 
 msgid "No results yet"
 msgstr "Noch keine Resultate"
-
-msgid "Intermediate results"
-msgstr "Zwischenergebnisse"
 
 msgid "Alerts"
 msgstr "Benachrichtigungen"
@@ -1029,6 +1032,13 @@ msgstr "Passwort geändert."
 
 msgid "Wrong username or password reset link not valid any more."
 msgstr "Ungültige Addresse oder abgelaufener Link."
+
+msgid ""
+"The figure with elected candidates will be available as soon the final "
+"results are published."
+msgstr ""
+"Die Grafik mit den gewählten Kandidaten wird verfügbar sobald die finalen "
+"Resultate publiziert sind."
 
 msgid "Access Denied"
 msgstr "Zugriff verweigert"

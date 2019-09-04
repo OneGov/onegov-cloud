@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-02 19:18+0200\n"
+"POT-Creation-Date: 2019-09-04 09:23+0200\n"
 "PO-Revision-Date: 2018-11-05 12:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -576,6 +576,9 @@ msgstr ""
 msgid "Found ${item_count} items."
 msgstr ""
 
+msgid "Intermediate results"
+msgstr "Resultats intermediars"
+
 msgid "No candidacies."
 msgstr "Naginas candidaturas."
 
@@ -607,6 +610,9 @@ msgstr "Gea"
 
 msgid "No"
 msgstr "Na"
+
+msgid "n.a."
+msgstr ""
 
 msgid "All candidates"
 msgstr "Tut las candidatas e candidats"
@@ -728,9 +734,6 @@ msgstr "Pagina actuala"
 
 msgid "No results yet"
 msgstr "Anc nagins resultats avant maun"
-
-msgid "Intermediate results"
-msgstr "Resultats intermediars"
 
 msgid "Alerts"
 msgstr "Communicaziuns"
@@ -1031,6 +1034,11 @@ msgstr "Midà il pled-clav."
 
 msgid "Wrong username or password reset link not valid any more."
 msgstr "L'adressa è nunvalaivla u il link è nunvalaivel."
+
+msgid ""
+"The figure with elected candidates will be available as soon the final "
+"results are published."
+msgstr ""
 
 msgid "Access Denied"
 msgstr "Refusà l'access"

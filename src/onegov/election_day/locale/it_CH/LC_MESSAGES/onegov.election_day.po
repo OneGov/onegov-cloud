@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-02 19:18+0200\n"
-"PO-Revision-Date: 2019-09-02 19:39+0200\n"
+"POT-Creation-Date: 2019-09-04 09:23+0200\n"
+"PO-Revision-Date: 2019-09-04 10:14+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -65,7 +65,7 @@ msgstr "Il file contiene una riga vuota."
 
 #, python-format
 msgid "Empty value: ${col}"
-msgstr ""
+msgstr "Valore vuoto: ${col}"
 
 #, python-format
 msgid "Invalid integer: ${col}"
@@ -128,15 +128,15 @@ msgid "Election statistics"
 msgstr "Statistiche delle elezioni"
 
 msgid "Value of ausmittlungsstand not between 0 and 3"
-msgstr ""
+msgstr "Valore di ausmittlungsstand non compreso tra 0 e 3"
 
 #, python-format
 msgid "Candidate with id ${id} not in wm_kandidaten"
-msgstr ""
+msgstr "Candidato con id ${id} non in wm_kandidaten"
 
 #, python-format
 msgid "Entity with id ${id} not in wmstatic_gemeinden"
-msgstr ""
+msgstr "Commune con id ${id} non in wmstatic_gemeinden"
 
 #, python-format
 msgid "Value ${col} is not between 0 and 3"
@@ -148,15 +148,15 @@ msgstr "${var} è scomparso"
 
 #, python-format
 msgid "Entity with id ${id} not in added_entities"
-msgstr ""
+msgstr "Commune con id ${id} non in added_entities"
 
 #, python-format
 msgid "List_id ${list_id} has not been found in list numbers"
-msgstr ""
+msgstr "List_id ${list_id} non è stato trovato in list numbers"
 
 #, python-format
 msgid "Candidate with id ${id} not in wpstatic_kandidaten"
-msgstr ""
+msgstr "Candidato con id ${id} non in wpstatic_kandidaten"
 
 msgid "Proposal"
 msgstr "Oggetto della votazione"
@@ -195,21 +195,23 @@ msgid "Invalid ballot type"
 msgstr "Tipo di scheda non valido"
 
 msgid "Text Retrieval"
-msgstr ""
+msgstr "Termine di ricerca"
 
 msgid ""
 "Searches the title of the election/vote. Use Wilcards (*) to find more "
 "results, e.g Nationalrat*."
 msgstr ""
+"Cerca il titolo dell'elettazione/voto. Usa un carattere jolly (*) per "
+"trovare altri risultati, ad esempio Nationalrat*."
 
 msgid "From date"
-msgstr ""
+msgstr "Da"
 
 msgid "To date"
-msgstr ""
+msgstr "A"
 
 msgid "Voting result"
-msgstr ""
+msgstr "Risultato elettorale"
 
 msgid "Type"
 msgstr "Tipo"
@@ -220,7 +222,7 @@ msgid ""
 msgstr ""
 
 msgid "Domain"
-msgstr ""
+msgstr "Livello"
 
 msgid "Name"
 msgstr "Nome"
@@ -567,13 +569,16 @@ msgid "Archive"
 msgstr "Archivio"
 
 msgid "Archive Search"
-msgstr ""
+msgstr "Ricerca in archivio"
 
 msgid "Search in ${title}"
-msgstr ""
+msgstr "Ricerca nel ${title}"
 
 msgid "Found ${item_count} items."
-msgstr ""
+msgstr "${item_count} risultati trovati."
+
+msgid "Intermediate results"
+msgstr "Risultati provvisori"
 
 msgid "No candidacies."
 msgstr "Nessuna candidatura."
@@ -606,6 +611,9 @@ msgstr "Si"
 
 msgid "No"
 msgstr "No"
+
+msgid "n.a."
+msgstr "n.d."
 
 msgid "All candidates"
 msgstr "Tutti i candidati"
@@ -725,9 +733,6 @@ msgstr "Tu sei qui"
 
 msgid "No results yet"
 msgstr "Ancora nessun risultato"
-
-msgid "Intermediate results"
-msgstr "Risultati provvisori"
 
 msgid "Alerts"
 msgstr "Avvisi"
@@ -1027,6 +1032,13 @@ msgid "Wrong username or password reset link not valid any more."
 msgstr ""
 "Il collegamento per reimpostare il nuome utente o la password errati non è "
 "più valido."
+
+msgid ""
+"The figure with elected candidates will be available as soon the final "
+"results are published."
+msgstr ""
+"La tabella con i candidati eletti sarà disponibile non appena saranno "
+"pubblicati i risultati finali."
 
 msgid "Access Denied"
 msgstr "Accesso Negato"

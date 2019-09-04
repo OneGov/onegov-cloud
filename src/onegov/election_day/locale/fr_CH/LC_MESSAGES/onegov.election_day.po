@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-02 19:18+0200\n"
-"PO-Revision-Date: 2019-09-02 19:35+0200\n"
+"POT-Creation-Date: 2019-09-04 09:23+0200\n"
+"PO-Revision-Date: 2019-09-04 09:27+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -577,6 +577,9 @@ msgstr "Recherche dans ${title}"
 msgid "Found ${item_count} items."
 msgstr "${item_count} entrées trouvés."
 
+msgid "Intermediate results"
+msgstr "Résultats intermédiaires"
+
 msgid "No candidacies."
 msgstr "Aucune candidature."
 
@@ -608,6 +611,9 @@ msgstr "Oui"
 
 msgid "No"
 msgstr "Non"
+
+msgid "n.a."
+msgstr "nd."
 
 msgid "All candidates"
 msgstr "Tous les candidats"
@@ -728,9 +734,6 @@ msgstr "Vous êtes ici"
 
 msgid "No results yet"
 msgstr "Pas de résultats à l'heure actuelle"
-
-msgid "Intermediate results"
-msgstr "Résultats intermédiaires"
 
 msgid "Alerts"
 msgstr "Alertes"
@@ -1032,6 +1035,13 @@ msgid "Wrong username or password reset link not valid any more."
 msgstr ""
 "Identifiant ou mot de passe erroné. Le lien de réinitialisation du mot de "
 "passe a expiré."
+
+msgid ""
+"The figure with elected candidates will be available as soon the final "
+"results are published."
+msgstr ""
+"Le tableau des candidats élus sera disponible dès que les résultats "
+"définitifs seront publiés."
 
 msgid "Access Denied"
 msgstr "Accès refusé"
