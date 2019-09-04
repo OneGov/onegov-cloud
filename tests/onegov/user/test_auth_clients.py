@@ -3,12 +3,14 @@ import kerberos
 import morepath
 import pytest
 
+from hashlib import sha256
 from onegov.core import Framework
 from onegov.core.security import Public
-from onegov.core.utils import scan_morepath_modules
+from onegov.core.utils import scan_morepath_modules, module_path
 from onegov.user import UserApp
-from onegov.user.auth.clients import KerberosClient
+from onegov.user.auth.clients import KerberosClient, LDAPClient
 from tempfile import NamedTemporaryFile
+from tests.shared.glauth import GLAuth
 from unittest.mock import patch, DEFAULT
 from webtest import TestApp as Client
 
@@ -128,3 +130,47 @@ def test_kerberos_client(client, app, keytab):
         r = auth({'Authorization': 'Negotiate foobar'})
 
         assert r.text == 'foo@EXAMPLE.ORG'
+
+
+def test_ldap_client(glauth_binary):
+    config = f"""
+        debug = true
+
+        [ldap]
+        enabled = false
+
+        [ldaps]
+        enabled = true
+        listen = "%(host)s:%(port)s"
+        cert = "{module_path('tests.shared', 'fixtures/self-signed.crt')}"
+        key = "{module_path('tests.shared', 'fixtures/self-signed.key')}"
+
+        [backend]
+        datastore = "config"
+        baseDN = "dc=seantis,dc=ch"
+
+        [[groups]]
+        name = "admins"
+        unixid = 5000
+
+        [[users]]
+        name = "admin"
+        mail = "admin@seantis.ch"
+        unixid = 1000
+        primarygroup = 5000
+        passsha256 = "{sha256(b'hunter2').hexdigest()}"
+    """
+
+    with GLAuth(glauth_binary, config) as server:
+        client = LDAPClient(
+            url=f'ldaps://{server.context.host}:{server.context.port}',
+            username='cn=admin,ou=admins,dc=seantis,dc=ch',
+            password='hunter2')
+
+        client.try_configuration()
+
+        assert client.search('(objectClass=*)', attributes='mail') == {
+            'cn=admin,ou=admins,dc=seantis,dc=ch': {
+                'mail': ['admin@seantis.ch']
+            }
+        }
