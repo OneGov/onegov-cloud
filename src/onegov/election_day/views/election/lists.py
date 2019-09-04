@@ -59,6 +59,7 @@ def view_election_lists_table(self, request):
         add_last_modified_header(response, self.last_modified)
 
     return {
+        'election': self,
         'lists': get_list_results(self, object_session(self)),
         'layout': DefaultLayout(self, request),
         'type': 'election-table',

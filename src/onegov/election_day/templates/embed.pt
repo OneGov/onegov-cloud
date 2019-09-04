@@ -30,7 +30,7 @@
             <tal:block metal:use-macro="layout.macros['intermediate-results-popup']" i18n:domain="onegov.election_day"></tal:block>
         </div>
         <tal:block tal:condition="not: skip_rendering|nothing">
-            <tal:block tal:condition="data_url">
+            <tal:block tal:condition="data_url|nothing">
                 <div class="bar-chart"
                     tal:condition="type == 'bar'"
                     data-dataurl="${data_url}"
@@ -119,7 +119,7 @@
                             <td class="right-aligned">${layout.format_number(result.yeas_percentage)}</td>
                             <td class="right-aligned">${layout.format_number(result.nays_percentage)}</td>
                         </tal:b>
-                    </tr>
+                        </tr>
                     </tal:b>
                 </tbody>
                 <tfoot tal:condition="ballot.results.count() != 1">
@@ -137,23 +137,22 @@
                     </tr>
                 </tfoot>
             </table>
-        </tal:b>
-        <tal:b tal:condition="type == 'election-table' and scope == 'lists'">
-            <metal metal:use-macro="election-lists-table"></metal>
-        </tal:b>
-        <tal:b tal:condition="type == 'election-table' and scope == 'candidates'">
-            <tal:b metal:use-macro="layout.macros['election-candidates-table']"></tal:b>
-        </tal:b>
-        <tal:b tal:condition="type == 'election-table' and scope == 'statistics'">
-            <tal:b metal:use-macro="layout.macros['election-statistics-table']"></tal:b>
-        </tal:b>
-        <tal:b tal:condition="type == 'election-compound-table' and scope == 'districts'">
-            <tal:b metal:use-macro="layout.macros['election-compound-districts-table']"></tal:b>
-        </tal:b>
-        <tal:b tal:condition="type == 'election-compound-table' and scope == 'candidates'">
-            <tal:b metal:use-macro="layout.macros['election-compound-candidates-table']"></tal:b>
-        </tal:b>
+            </tal:b>
+            <tal:b tal:condition="type == 'election-table' and scope == 'lists'">
+                <tal:b metal:use-macro="layout.macros['election-lists-table']"/>
+            </tal:b>
+            <tal:b tal:condition="type == 'election-table' and scope == 'candidates'">
+                <tal:b metal:use-macro="layout.macros['election-candidates-table']"/>
+            </tal:b>
+            <tal:b tal:condition="type == 'election-table' and scope == 'statistics'">
+                <tal:b metal:use-macro="layout.macros['election-statistics-table']"/>
+            </tal:b>
+            <tal:b tal:condition="type == 'election-compound-table' and scope == 'districts'">
+                <tal:b metal:use-macro="layout.macros['election-compound-districts-table']"/>
+            </tal:b>
+            <tal:b tal:condition="type == 'election-compound-table' and scope == 'candidates'">
+                <tal:b metal:use-macro="layout.macros['election-compound-candidates-table']"/>
+            </tal:b>
         </tal:block>
-
     </body>
 </html>
