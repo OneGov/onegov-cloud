@@ -311,7 +311,6 @@ def test_raw_upgrade_cli(postgres_dsn, session_manager, temporary_directory,
             assert result.exit_code == 0
 
 
-@pytest.mark.skip(reason="this has to be rethought for the single module")
 def test_get_module_order_key():
     def first():
         pass
@@ -330,7 +329,9 @@ def test_get_module_order_key():
         'onegov.core:test': first,
         'sqlalchemy:aaa': second,
         'sqlalchemy:bbb': first,
-        'missing_module:test': first
+        'missing_module:test': first,
+        'onegov.user:foo': first,
+        'onegov.agency:bar': first,
     })
 
     ids = [
@@ -338,7 +339,9 @@ def test_get_module_order_key():
         'sqlalchemy:aaa',
         'sqlalchemy:bbb',
         'onegov.core:test',
-        'click:test'
+        'click:test',
+        'onegov.user:foo',
+        'onegov.agency:bar',
     ]
     ids.sort(key=order_key)
 
@@ -348,6 +351,8 @@ def test_get_module_order_key():
         'missing_module:test',
         'sqlalchemy:bbb',
         'sqlalchemy:aaa',
-        # sorted after its dependencies
+        # core, before modules, before applications
         'onegov.core:test',
+        'onegov.user:foo',
+        'onegov.agency:bar',
     ]

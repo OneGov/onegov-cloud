@@ -9,19 +9,21 @@ import transaction
 import urllib3
 
 from _pytest.monkeypatch import MonkeyPatch
+from contextlib import suppress
 from distutils.spawn import find_executable
 from fs.tempfs import TempFS
 from functools import lru_cache
 from mirakuru import HTTPExecutor, TCPExecutor
 from onegov.core.crypto import hash_password
 from onegov.core.orm import Base, SessionManager
-from tests.shared.browser import ExtendedBrowser
 from pathlib import Path
 from pytest_redis import factories
 from redis import Redis
 from selenium.webdriver.chrome.options import Options
 from splinter import Browser
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, exc
+from sqlalchemy.orm.session import close_all_sessions
+from tests.shared.browser import ExtendedBrowser
 from tests.shared.postgresql import Postgresql
 from uuid import uuid4
 from webdriver_manager.chrome import ChromeDriverManager
@@ -115,16 +117,12 @@ def postgres(pg_preferred_versions):
 
     """
 
-    # XXX our tests do not properly release open postgres connections, but
-    # I don't know yet where. The following configuration increases the
-    # number of allowed connections substantially as a work around.
     postgres_args = ' '.join((
         "-h 127.0.0.1",
         "-F",
         "-c logging_collector=off",
         "-c fsync=off",
         "-c full_page_writes=off",
-        "-N 1024"
     ))
 
     postgres = Postgresql(
@@ -169,8 +167,17 @@ def postgres_dsn(postgres):
         # before finishing your test, or use the sesion_manager fixture!
         engine.execute(f'DROP SCHEMA "{schema}" CASCADE')
 
+    # drop all connections
+    with suppress(exc.OperationalError):
+        engine.execute((
+            "SELECT pg_terminate_backend(pid) FROM pg_stat_activity "
+            "WHERE datname='test'"
+        ))
+
     engine.raw_connection().invalidate()
     engine.dispose()
+
+    close_all_sessions()
 
 
 @pytest.fixture(scope="function")

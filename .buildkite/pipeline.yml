@@ -40,6 +40,22 @@ steps:
       CONTAINER: "onegov-cloud:head"
       CONTAINER_TEST_SCRIPT: ".buildkite/test"
 
+  # build the docs if possible (fails are ignored, only on master)
+  - command: "test-container"
+    label: "Publishing docs"
+
+    agents:
+      - queue=generic
+
+    soft_fail:
+      - exit_status: 1
+
+    env:
+      CONTAINER: "onegov-cloud:head"
+      CONTAINER_TEST_SCRIPT: ".buildkite/docs"
+
+    branches: "master"
+
   - wait
 
   # if this is a release, publish the container

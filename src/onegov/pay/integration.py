@@ -72,9 +72,21 @@ def get_pay_assets():
     yield 'stripe.js'
 
 
+INSUFFICIENT_FUNDS = 1
+
+
 def process_payment(method, price, provider=None, token=None):
-    """ Processes a payment using various methods, returning the processed
-    payment or None.
+    """ Processes a payment using various methods.
+
+    This method returns one of the following:
+
+        * The processed payment if successful.
+        * None if an unknown error occurred.
+        * An error code (see below).
+
+    Possible error codes:
+
+        * INSUFFICIENT_FUNDS - the card has insufficient funds.
 
     Available methods:
 
@@ -100,7 +112,11 @@ def process_payment(method, price, provider=None, token=None):
                 currency=price.currency,
                 token=token
             )
-        except CARD_ERRORS:
+        except CARD_ERRORS as e:
+
+            if 'insufficient funds' in getattr(e, 'message', ''):
+                return INSUFFICIENT_FUNDS
+
             log.exception(
                 "Processing {} through {} with token {} failed".format(
                     price,

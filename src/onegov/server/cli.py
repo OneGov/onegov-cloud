@@ -67,6 +67,8 @@ from onegov.server import Config
 from onegov.server import Server
 from onegov.server.tracker import ResourceTracker
 from sentry_sdk import push_scope, capture_exception
+from sentry_sdk.integrations.redis import RedisIntegration
+from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 from sentry_sdk.integrations.wsgi import _get_headers, _get_environ
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
@@ -161,7 +163,11 @@ def run(config_file, port, pdb, tracemalloc, mode,
         sentry_sdk.init(
             dsn=sentry_dsn,
             release=sentry_release,
-            environment=sentry_environment)
+            environment=sentry_environment,
+            integrations=(
+                RedisIntegration(),
+                SqlalchemyIntegration(),
+            ))
 
         # somehow sentry attaches itself to the global exception hook, even if
         # we set 'install_sys_hook' to False -> so we just reset to the
@@ -219,7 +225,6 @@ def exception_hook(environ):
 
     with push_scope() as scope:
         scope.add_event_processor(process_event)
-        scope.set_tag('site', '<%= @sentry_site %>')
         capture_exception()
 
 

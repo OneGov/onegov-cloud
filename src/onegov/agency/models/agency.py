@@ -58,14 +58,10 @@ class ExtendedAgency(Agency, HiddenFromPublicExtension):
         """
 
         filename = '{}.pdf'.format(normalize_for_url(self.title))
-        if self.pdf:
-            self.pdf.reference = as_fileintent(value, filename)
-            self.pdf.name = filename
-        else:
-            pdf = AgencyPdf(id=random_token())
-            pdf.reference = as_fileintent(value, filename)
-            pdf.name = filename
-            self.pdf = pdf
+        pdf = AgencyPdf(id=random_token())
+        pdf.reference = as_fileintent(value, filename)
+        pdf.name = filename
+        self.pdf = pdf
 
     @property
     def portrait_html(self):

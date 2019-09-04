@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-08-26 09:16+0200\n"
+"POT-Creation-Date: 2019-08-30 15:00+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -12,79 +12,6 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 1.8.12\n"
-
-msgid "Homepage"
-msgstr "Startseite"
-
-msgid "Addresses"
-msgstr "Adressen"
-
-msgid "Roadworks"
-msgstr "Strassenbaustellen"
-
-msgid "Daycare Subsidy Calculator"
-msgstr "Kita Beitragsrechner"
-
-msgid "Mission Reports"
-msgstr "Einsatzberichte"
-
-msgid "Update"
-msgstr "Aktualisieren"
-
-msgid "Vehicles"
-msgstr "Fahrzeuge"
-
-msgid "Images"
-msgstr "Bilder"
-
-msgid "Edit"
-msgstr "Bearbeiten"
-
-msgid "Delete"
-msgstr "Löschen"
-
-msgid "Add"
-msgstr "Hinzufügen"
-
-msgid "Do you really want to delete this mission report?"
-msgstr "Möchten Sie den Einsatzbericht wirklich löschen?"
-
-msgid "This cannot be undone."
-msgstr "Dies kann nicht rückgängig gemacht werden."
-
-msgid "Delete mission report"
-msgstr "Einsatzbericht löschen"
-
-msgid "Cancel"
-msgstr "Abbrechen"
-
-msgid "Mission Report"
-msgstr "Einsatzbericht"
-
-msgid "Vehicle"
-msgstr "Fahrzeug"
-
-msgid "This vehicle can't be deleted."
-msgstr "Dieses Fahrzeug kann nicht gelöscht werden."
-
-msgid "There are mission reports associated with this vehicle."
-msgstr "Es bestehen Einsatzberichte welche mit diesem Fahrzeug verknüpft sind."
-
-msgid "Do you really want to delete this vehicle?"
-msgstr "Möchten Sie dieses Fahrzeug wirklich löschen?"
-
-msgid "Delete vehicle"
-msgstr "Fahrzeug löschen?"
-
-msgid "Hide from the public"
-msgstr "Verbergen"
-
-msgid ""
-"This site is hidden from the general public. To show it to everyone, edit "
-"this page and disable \"Hide from public\"."
-msgstr ""
-"Diese Seite ist nicht öffentlich. Bearbeiten Sie diese Seite und entfernen "
-"Sie das Häckchen im Feld \"Verbergen\"."
 
 msgid "Monday"
 msgstr "Montag"
@@ -106,6 +33,12 @@ msgstr "Samstag"
 
 msgid "Sunday"
 msgstr "Sonntag"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Each day may only be selected once."
+msgstr "Jeder Tag kann höchstens einmal gewählt werden."
 
 msgid "Select Daycare"
 msgstr "Auswahl der Kita"
@@ -129,16 +62,9 @@ msgstr ""
 "Werden ein oder mehrere Kinder Ihres Haushalts insgesamt mehr als zwei ganze "
 "Tage pro Woche in derselben Kita betreut?"
 
-
 #, python-format
 msgid "${title} / day rate CHF ${rate} / ${weeks} weeks open per year"
 msgstr "${title} / Tagestarif CHF ${rate} / ${weeks} Öffnungswochen pro Jahr"
-
-msgid "Total"
-msgstr "Total"
-
-msgid "Each day may only be selected once."
-msgstr "Jeder Tag kann höchstens einmal gewählt werden."
 
 msgid "Date"
 msgstr "Datum"
@@ -173,26 +99,68 @@ msgstr "Symbol"
 msgid "Website"
 msgstr "Webseite"
 
-msgid "Start"
-msgstr "Von"
+msgid "Homepage"
+msgstr "Startseite"
 
-msgid "End"
-msgstr "Bis"
+msgid "Addresses"
+msgstr "Adressen"
 
-msgid "Current Traffic Provisions"
-msgstr "Momentane Verkehrsmassnahme(n)"
+msgid "Update"
+msgstr "Aktualisieren"
 
-msgid "Search"
-msgstr "Suche"
+msgid "Roadworks"
+msgstr "Strassenbaustellen"
 
-msgid "A to Z"
-msgstr "A bis Z"
+msgid "Daycare Subsidy Calculator"
+msgstr "Kita Beitragsrechner"
 
-msgid "Back to the overview"
-msgstr "Zurück zur Übersicht"
+msgid "Mission Reports"
+msgstr "Einsatzberichte"
 
-msgid "Search in ${directory}"
-msgstr "Suche in ${directory}"
+msgid "Vehicles"
+msgstr "Fahrzeuge"
+
+msgid "Add"
+msgstr "Hinzufügen"
+
+msgid "Mission Report"
+msgstr "Einsatzbericht"
+
+msgid "Vehicle"
+msgstr "Fahrzeug"
+
+msgid "Images"
+msgstr "Bilder"
+
+msgid "Edit"
+msgstr "Bearbeiten"
+
+msgid "Delete"
+msgstr "Löschen"
+
+msgid "Do you really want to delete this mission report?"
+msgstr "Möchten Sie den Einsatzbericht wirklich löschen?"
+
+msgid "This cannot be undone."
+msgstr "Dies kann nicht rückgängig gemacht werden."
+
+msgid "Delete mission report"
+msgstr "Einsatzbericht löschen"
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid "This vehicle can't be deleted."
+msgstr "Dieses Fahrzeug kann nicht gelöscht werden."
+
+msgid "There are mission reports associated with this vehicle."
+msgstr "Es bestehen Einsatzberichte welche mit diesem Fahrzeug verknüpft sind."
+
+msgid "Do you really want to delete this vehicle?"
+msgstr "Möchten Sie dieses Fahrzeug wirklich löschen?"
+
+msgid "Delete vehicle"
+msgstr "Fahrzeug löschen?"
 
 msgid "Summary"
 msgstr "Zusammenfassung"
@@ -251,8 +219,62 @@ msgstr "Betrag"
 msgid "Your details"
 msgstr "Ihre Angaben"
 
-msgid "Privacy Notice"
-msgstr "Hinweis zur Datenübertragung"
+msgid "Back to the overview"
+msgstr "Zurück zur Übersicht"
+
+msgid "Search in ${directory}"
+msgstr "Suche in ${directory}"
+
+msgid "Alarm"
+msgstr "Alarm"
+
+msgid "Mission duration"
+msgstr "Einsatzdauer"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nein"
+
+msgid "None"
+msgstr "Keine"
+
+msgid "No vehicles found."
+msgstr "Keine Fahrzeuge gefunden."
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Hidden"
+msgstr "Verborgen"
+
+msgid "Visible"
+msgstr "Sichtbar"
+
+msgid "No mission reports found."
+msgstr "Keine Einsatzberichte gefunden."
+
+msgid "Total missions in ${year}"
+msgstr "Total Einsätze im Jahr ${year}"
+
+msgid "Duration"
+msgstr "Dauer"
+
+msgid "Pers*"
+msgstr "Pers*"
+
+msgid "Pictures"
+msgstr "Fotos"
+
+msgid "* Legend Personnel"
+msgstr "* Legende Personal"
+
+msgid "Start"
+msgstr "Von"
+
+msgid "End"
+msgstr "Bis"
 
 msgid "Responsible Official Construction Site"
 msgstr "Zuständiger Sachbearbeiter Baustelle"
@@ -272,47 +294,17 @@ msgstr "GIS-Information öffnen"
 msgid "Back"
 msgstr "Zurück"
 
-msgid "No mission reports found."
-msgstr "Keine Einsatzberichte gefunden."
-
-msgid "Total missions in ${year}"
-msgstr "Total Einsätze im Jahr ${year}"
-
-msgid "Alarm"
-msgstr "Alarm"
-
-msgid "Duration"
-msgstr "Dauer"
-
-msgid "Pers*"
-msgstr "Pers*"
-
-msgid "Pictures"
-msgstr "Fotos"
-
-msgid "* Legend Personnel"
-msgstr "* Legende Personal"
-
-msgid "Mission duration"
-msgstr "Einsatzdauer"
-
-msgid "Yes"
-msgstr "Ja"
-
-msgid "No"
-msgstr "Nein"
-
-msgid "None"
-msgstr "Keine"
-
 msgid "Failed to connect to Projektdatenbank."
 msgstr "Keine Verbindung zu Projektdatenbank."
 
-msgid "Search streets"
-msgstr "Strassen suchen"
+msgid "Current Traffic Provisions"
+msgstr "Momentane Verkehrsmassnahme(n)"
 
-msgid "No streets found."
-msgstr "Keine Strassen gefunden."
+msgid "Search"
+msgstr "Suche"
+
+msgid "A to Z"
+msgstr "A bis Z"
 
 msgid "Show street on map"
 msgstr "Strasse auf Karte anzeigen"
@@ -329,32 +321,35 @@ msgstr "Stadtkreis"
 msgid "Neighbourhood"
 msgstr "Quartier"
 
-msgid "No vehicles found."
-msgstr "Keine Fahrzeuge gefunden."
+msgid "Search streets"
+msgstr "Strassen suchen"
 
-msgid "Status"
-msgstr "Status"
+msgid "No streets found."
+msgstr "Keine Strassen gefunden."
 
-msgid "Hidden"
-msgstr "Verborgen"
+msgid "Hide from the public"
+msgstr "Verbergen"
 
-msgid "Visible"
-msgstr "Sichtbar"
+msgid ""
+"This site is hidden from the general public. To show it to everyone, edit "
+"this page and disable \"Hide from public\"."
+msgstr ""
+"Diese Seite ist nicht öffentlich. Bearbeiten Sie diese Seite und entfernen "
+"Sie das Häckchen im Feld \"Verbergen\"."
 
-msgid "Successfully deleted mission report"
-msgstr "Einsatzbericht erfolgreich gelöscht"
+msgid "Calculate"
+msgstr "Berechnen"
 
-msgid "Successfully deleted vehicle"
-msgstr "Fahrzeug erfolgreich gelöscht"
+msgid "Connection Error"
+msgstr "Verbindungsfehler"
 
-msgid "Your changes were saved"
-msgstr "Ihre Änderungen wurden gespeichert"
-
-msgid "Successfully added a vehicle"
-msgstr "Das Fahrzeug wurde hinzugefügt"
+msgid "Count"
+msgstr "Anzahl"
 
 msgid "The report was entered in the current year, please verify the date"
-msgstr "Der Einsatzbericht wurde nicht zum aktuellen Jahr hinzugefügt, bitte überprüfen Sie das Datum"
+msgstr ""
+"Der Einsatzbericht wurde nicht zum aktuellen Jahr hinzugefügt, bitte "
+"überprüfen Sie das Datum"
 
 msgid "Successfully added a mission report"
 msgstr "Der Einsatzbericht wurde hinzugefügt"
@@ -362,23 +357,17 @@ msgstr "Der Einsatzbericht wurde hinzugefügt"
 msgid "New"
 msgstr "Neu"
 
-msgid "Count"
-msgstr "Anzahl"
+msgid "Your changes were saved"
+msgstr "Ihre Änderungen wurden gespeichert"
 
-msgid "Connection Error"
-msgstr "Verbindungsfehler"
+msgid "Successfully deleted mission report"
+msgstr "Einsatzbericht erfolgreich gelöscht"
 
-msgid "Streets Directory"
-msgstr "Strassenverzeichnis"
+msgid "Successfully added a vehicle"
+msgstr "Das Fahrzeug wurde hinzugefügt"
 
-msgid "The streets directory has been updated"
-msgstr "Das Strassenverzeichnis wurde aktualisiert"
-
-msgid "Daycare Settings"
-msgstr "Kita Einstellungen"
-
-msgid "Daycare Calculator"
-msgstr "Beitragsrechner"
+msgid "Successfully deleted vehicle"
+msgstr "Fahrzeug erfolgreich gelöscht"
 
 msgid "Maximum taxable income"
 msgstr "Maximal steuerbares Einkommen"
@@ -422,8 +411,20 @@ msgstr "Details"
 msgid "Invalid services configuration"
 msgstr "Ungültige "
 
-msgid "Calculate"
-msgstr "Berechnen"
+msgid "Daycare Calculator"
+msgstr "Beitragsrechner"
+
+msgid "Daycare Settings"
+msgstr "Kita Einstellungen"
+
+msgid "Streets Directory"
+msgstr "Strassenverzeichnis"
+
+msgid "The streets directory has been updated"
+msgstr "Das Strassenverzeichnis wurde aktualisiert"
+
+#~ msgid "Privacy Notice"
+#~ msgstr "Hinweis zur Datenübertragung"
 
 #~ msgid "Your monthly costs"
 #~ msgstr "Ihre monatlichen Kosten"

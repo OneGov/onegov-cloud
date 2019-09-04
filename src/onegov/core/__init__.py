@@ -5,13 +5,68 @@
 # version is to create release-dependent urls, artifacts and caches. During
 # development these dependencies do not need to be updated in lock-step.
 #
-__version__ = '2019.3'
+__version__ = '2019.5'
 
-import logging
-import warnings
+# The module levels used for dependency tests and to have a well defined
+# onegov core upgrade order.
+LEVELS = (
+    # root
+    (
+        'onegov.server',
+    ),
+
+    # core
+    (
+        'onegov.core',
+    ),
+
+    # modules,
+    (
+        'onegov.activity',
+        'onegov.ballot',
+        'onegov.chat',
+        'onegov.directory',
+        'onegov.event',
+        'onegov.file',
+        'onegov.form',
+        'onegov.foundation',
+        'onegov.gis',
+        'onegov.newsletter',
+        'onegov.notice',
+        'onegov.page',
+        'onegov.pay',
+        'onegov.pdf',
+        'onegov.people',
+        'onegov.quill',
+        'onegov.recipient',
+        'onegov.reservation',
+        'onegov.search',
+        'onegov.shared',
+        'onegov.ticket',
+        'onegov.user',
+    ),
+
+    # applications,
+    (
+        'onegov.agency',
+        'onegov.election_day',
+        'onegov.feriennet',
+        'onegov.gazette',
+        'onegov.intranet',
+        'onegov.onboarding',
+        'onegov.org',
+        'onegov.swissvotes',
+        'onegov.town',
+        'onegov.winterthur',
+        'onegov.wtfs',
+    ),
+)
+
+import logging   # noqa
+import warnings  # noqa
 
 log = logging.getLogger('onegov.core')  # noqa
-log.addHandler(logging.NullHandler())  # noqa
+log.addHandler(logging.NullHandler())   # noqa
 
 ignored_warnings = (
     # we will keep using psycopg2 instead of psycogp2-binary

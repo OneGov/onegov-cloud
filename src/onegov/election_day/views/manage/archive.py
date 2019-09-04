@@ -23,7 +23,6 @@ def view_update_results(self, request, form):
     """
 
     layout = DefaultLayout(self, request)
-    archive = ArchivedResultCollection(request.session)
 
     if form.submitted(request):
         archive = ArchivedResultCollection(request.session)

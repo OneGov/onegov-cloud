@@ -451,23 +451,9 @@ class Framework(
         self.sentry_version = cfg.get('sentry_version')
         self.sentry_environment = cfg.get('sentry_environment')
 
-        # init sentry if that hasn't happened already (in some environments
-        # we provide a different init through a WSGI wrapper, where the
-        # exception logging happens)
-        if not self.is_sentry_initialised:
-            sentry_sdk.init(
-                dsn=self.sentry_dsn,
-                release=self.sentry_version,
-                environment=self.sentry_environment)
-
     @property
     def is_sentry_supported(self):
         return getattr(self, 'sentry_dsn', None) and True or False
-
-    @property
-    def is_sentry_initialised(self):
-        from sentry_sdk.hub import Hub
-        return Hub.current.client is not None
 
     def set_application_id(self, application_id):
         """ Set before the request is handled. Gets the schema from the

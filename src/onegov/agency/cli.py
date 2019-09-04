@@ -12,6 +12,7 @@ from onegov.agency.excel_export import export_person_xlsx
 from onegov.agency.models import ExtendedAgencyMembership
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
+from onegov.core.filestorage import FilestorageFile
 from onegov.core.html import html_to_text
 from onegov.people.collections import AgencyCollection
 from onegov.people.collections import PersonCollection
@@ -21,8 +22,6 @@ from xlrd import open_workbook
 
 
 cli = command_group()
-
-
 @cli.command('import-agencies')
 @click.argument('file', type=click.Path(exists=True))
 @click.option('--clear/--no-clear', default=True)
@@ -265,6 +264,7 @@ def create_pdf(group_context, root, recursive):
     def _create_pdf(request, app):
         session = app.session()
         agencies = ExtendedAgencyCollection(session)
+        root_pdf = FilestorageFile('/root_pdf')
 
         if root:
             app.root_pdf = app.pdf_class.from_agencies(

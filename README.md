@@ -3,6 +3,8 @@
 OneGov Cloud is a Swiss initiative to provide municipalities with open-source
 web-applications.
 
+[![Screenshot](/docs/_static/govikon.png?raw=true)]()
+
 ---
 
 You have reached the source of `onegov-cloud`. If that's not what you were

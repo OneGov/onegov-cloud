@@ -2,6 +2,8 @@ from functools import lru_cache
 from findimports import ModuleGraph
 from pathlib import Path
 
+from onegov.core import LEVELS
+
 
 def test_hierarchy():
     """ Originally, onegov.* modules were separated into separate repositories
@@ -22,65 +24,15 @@ def test_hierarchy():
     Each module is put into a level. Modules may import from the same level
     or the levels below, but not from the levels above.
 
+    The current list of levels is also used for the upgrade step order. It can
+    be found in `onegov.core.__init__.py`.
+
     This is not exactly equivalent to what we had before, but it is good
     basic check to ensure that we do not add unwanted dependencies.
 
     """
 
-    levels = (
-        # root level
-        {
-            'onegov.server'
-        },
-
-        # core
-        {
-            'onegov.core',
-        },
-
-        # modules,
-        {
-            'onegov.activity',
-            'onegov.ballot',
-            'onegov.chat',
-            'onegov.directory',
-            'onegov.event',
-            'onegov.file',
-            'onegov.form',
-            'onegov.foundation',
-            'onegov.gis',
-            'onegov.newsletter',
-            'onegov.notice',
-            'onegov.page',
-            'onegov.pay',
-            'onegov.pdf',
-            'onegov.people',
-            'onegov.quill',
-            'onegov.recipient',
-            'onegov.reservation',
-            'onegov.search',
-            'onegov.shared',
-            'onegov.ticket',
-            'onegov.user',
-        },
-
-        # applications,
-        {
-            'onegov.agency',
-            'onegov.election_day',
-            'onegov.feriennet',
-            'onegov.gazette',
-            'onegov.intranet',
-            'onegov.onboarding',
-            'onegov.org',
-            'onegov.swissvotes',
-            'onegov.town',
-            'onegov.winterthur',
-            'onegov.wtfs',
-        },
-    )
-
-    modules = level_by_module(levels)
+    modules = level_by_module(LEVELS)
 
     # all modules must be defined
     for module in existing_modules():
@@ -97,7 +49,7 @@ def test_hierarchy():
         if name is None:
             continue
 
-        allowed = allowed_imports(levels, name)
+        allowed = allowed_imports(LEVELS, name)
 
         for imported in module.imported_names:
             import_name = '.'.join(imported.name.split('.')[:2])

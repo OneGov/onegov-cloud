@@ -1,5 +1,5 @@
 /* @preserve
- * Leaflet Control Geocoder 1.8.2
+ * Leaflet Control Geocoder 1.9.0
  * https://github.com/perliedman/leaflet-control-geocoder
  *
  * Copyright (c) 2012 sa3m (https://github.com/sa3m)
@@ -68,11 +68,21 @@ this.L.Control.Geocoder = (function (L) {
       if (xmlHttp.readyState !== 4) {
         return;
       }
+      var message;
       if (xmlHttp.status !== 200 && xmlHttp.status !== 304) {
-        callback('');
-        return;
+        message = '';
+      } else if (typeof xmlHttp.response === 'string') {
+        // IE doesn't parse JSON responses even with responseType: 'json'.
+        try {
+          message = JSON.parse(xmlHttp.response);
+        } catch (e) {
+          // Not a JSON response
+          message = xmlHttp.response;
+        }
+      } else {
+        message = xmlHttp.response;
       }
-      callback(xmlHttp.response);
+      callback(message);
     };
     xmlHttp.open('GET', url + getParamString(params), true);
     xmlHttp.responseType = 'json';
@@ -348,8 +358,8 @@ this.L.Control.Geocoder = (function (L) {
 
   var HERE = L.Class.extend({
     options: {
-      geocodeUrl: 'http://geocoder.api.here.com/6.2/geocode.json',
-      reverseGeocodeUrl: 'http://reverse.geocoder.api.here.com/6.2/reversegeocode.json',
+      geocodeUrl: 'https://geocoder.api.here.com/6.2/geocode.json',
+      reverseGeocodeUrl: 'https://reverse.geocoder.api.here.com/6.2/reversegeocode.json',
       app_id: '<insert your app_id here>',
       app_code: '<insert your app_code here>',
       geocodingQueryParams: {},
@@ -528,9 +538,9 @@ this.L.Control.Geocoder = (function (L) {
     geocode: function(query, cb, context) {
       var params = this.options.geocodingQueryParams;
       if (
-        typeof params.proximity !== 'undefined' &&
-        params.proximity.hasOwnProperty('lat') &&
-        params.proximity.hasOwnProperty('lng')
+        params.proximity !== undefined &&
+        params.proximity.lat !== undefined &&
+        params.proximity.lng !== undefined
       ) {
         params.proximity = params.proximity.lng + ',' + params.proximity.lat;
       }
@@ -543,7 +553,7 @@ this.L.Control.Geocoder = (function (L) {
           for (var i = 0; i <= data.features.length - 1; i++) {
             loc = data.features[i];
             latLng = L.latLng(loc.center.reverse());
-            if (loc.hasOwnProperty('bbox')) {
+            if (loc.bbox) {
               latLngBounds = L.latLngBounds(
                 L.latLng(loc.bbox.slice(0, 2).reverse()),
                 L.latLng(loc.bbox.slice(2, 4).reverse())
@@ -557,7 +567,7 @@ this.L.Control.Geocoder = (function (L) {
               address: loc.address
             };
 
-            for (var j = 0; j < loc.context.length; j++) {
+            for (var j = 0; j < (loc.context || []).length; j++) {
               var id = loc.context[j].id.split('.')[0];
               properties[id] = loc.context[j].text;
             }
@@ -596,7 +606,7 @@ this.L.Control.Geocoder = (function (L) {
             for (var i = 0; i <= data.features.length - 1; i++) {
               loc = data.features[i];
               latLng = L.latLng(loc.center.reverse());
-              if (loc.hasOwnProperty('bbox')) {
+              if (loc.bbox) {
                 latLngBounds = L.latLngBounds(
                   L.latLng(loc.bbox.slice(0, 2).reverse()),
                   L.latLng(loc.bbox.slice(2, 4).reverse())
@@ -736,7 +746,7 @@ this.L.Control.Geocoder = (function (L) {
           var results = [],
             latLng,
             latLngBounds;
-          if (data.hasOwnProperty('locations')) {
+          if (data.locations) {
             data.geometry = data.locations[0];
             latLng = L.latLng(data.geometry['latitude'], data.geometry['longitude']);
             latLngBounds = L.latLngBounds(latLng, latLng);
@@ -946,6 +956,96 @@ this.L.Control.Geocoder = (function (L) {
 
   function openLocationCode(options) {
     return new OpenLocationCode(options);
+  }
+
+  var OpenCage = L.Class.extend({
+    options: {
+      serviceUrl: 'https://api.opencagedata.com/geocode/v1/json'
+    },
+
+    initialize: function(apiKey) {
+      this._accessToken = apiKey;
+    },
+
+    geocode: function(query, cb, context) {
+      getJSON(
+        this.options.serviceUrl,
+        {
+          key: this._accessToken,
+          q: query
+        },
+        function(data) {
+          var results = [],
+            latLng,
+            latLngBounds,
+            loc;
+          if (data.results && data.results.length) {
+            for (var i = 0; i < data.results.length; i++) {
+              loc = data.results[i];
+              latLng = L.latLng(loc.geometry);
+              if (loc.annotations && loc.annotations.bounds) {
+                latLngBounds = L.latLngBounds(
+                  L.latLng(loc.annotations.bounds.northeast),
+                  L.latLng(loc.annotations.bounds.southwest)
+                );
+              } else {
+                latLngBounds = L.latLngBounds(latLng, latLng);
+              }
+              results.push({
+                name: loc.formatted,
+                bbox: latLngBounds,
+                center: latLng
+              });
+            }
+          }
+          cb.call(context, results);
+        }
+      );
+    },
+
+    suggest: function(query, cb, context) {
+      return this.geocode(query, cb, context);
+    },
+
+    reverse: function(location, scale, cb, context) {
+      getJSON(
+        this.options.serviceUrl,
+        {
+          key: this._accessToken,
+          q: [location.lat, location.lng].join(',')
+        },
+        function(data) {
+          var results = [],
+            latLng,
+            latLngBounds,
+            loc;
+          if (data.results && data.results.length) {
+            for (var i = 0; i < data.results.length; i++) {
+              loc = data.results[i];
+              latLng = L.latLng(loc.geometry);
+              if (loc.annotations && loc.annotations.bounds) {
+                latLngBounds = L.latLngBounds(
+                  L.latLng(loc.annotations.bounds.northeast),
+                  L.latLng(loc.annotations.bounds.southwest)
+                );
+              } else {
+                latLngBounds = L.latLngBounds(latLng, latLng);
+              }
+              results.push({
+                name: loc.formatted,
+                bbox: latLngBounds,
+                center: latLng
+              });
+            }
+          }
+          cb.call(context, results);
+        }
+      );
+    }
+  });
+
+  function opencage(apiKey) {
+    return new OpenCage(apiKey);
   }
 
   var Pelias = L.Class.extend({
@@ -1192,7 +1292,7 @@ this.L.Control.Geocoder = (function (L) {
           var results = [],
             latLng,
             latLngBounds;
-          if (data.hasOwnProperty('geometry')) {
+          if (data.geometry) {
             latLng = L.latLng(data.geometry['lat'], data.geometry['lng']);
             latLngBounds = L.latLngBounds(latLng, latLng);
             results[0] = {
@@ -1264,6 +1364,8 @@ this.L.Control.Geocoder = (function (L) {
     nominatim: nominatim,
     OpenLocationCode: OpenLocationCode,
     openLocationCode: openLocationCode,
+    OpenCage: OpenCage,
+    opencage: opencage,
     Pelias: Pelias,
     pelias: pelias,
     GeocodeEarth: GeocodeEarth,
@@ -1280,6 +1382,7 @@ this.L.Control.Geocoder = (function (L) {
 
   var Geocoder = L.Control.extend({
     options: {
+      showUniqueResult: true,
       showResultIcons: false,
       collapsed: true,
       expand: 'touch', // options: touch, click, anythingelse
@@ -1421,7 +1524,7 @@ this.L.Control.Geocoder = (function (L) {
     },
 
     _geocodeResult: function(results, suggest) {
-      if (!suggest && results.length === 1) {
+      if (!suggest && this.options.showUniqueResult && results.length === 1) {
         this._geocodeResultSelected(results[0]);
       } else if (results.length > 0) {
         this._alts.innerHTML = '';

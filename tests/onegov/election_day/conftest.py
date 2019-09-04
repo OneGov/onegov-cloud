@@ -2,9 +2,12 @@ import os.path
 import pytest
 import textwrap
 import transaction
-
+from onegov.ballot import Election, ElectionCompound, Vote
+from datetime import date
 from onegov.core.crypto import hash_password
 from onegov.election_day import ElectionDayApp
+from onegov.election_day.collections import SearchableArchivedResultCollection
+from tests.onegov.election_day.common import DummyRequest
 from onegov.user import User
 from tests.shared.utils import create_app
 
@@ -93,3 +96,46 @@ def election_day_app_kriens(request):
 @pytest.fixture(scope='function')
 def related_link_labels():
     return {'de_CH': 'DE', 'fr_CH': 'FR', 'it_CH': 'IT', 'rm_CH': 'RM'}
+
+
+@pytest.fixture(scope='function')
+def searchable_archive(session):
+    archive = SearchableArchivedResultCollection(session)
+
+    # Create 12 entries
+    for year in (2009, 2011, 2014):
+        session.add(
+            Election(
+                title="Election {}".format(year),
+                domain='federation',
+                date=date(year, 1, 1),
+            )
+        )
+    for year in (2008, 2012, 2016):
+        session.add(
+            ElectionCompound(
+                title="Elections {}".format(year),
+                domain='federation',
+                date=date(year, 1, 1),
+            )
+        )
+    for year in (2011, 2015, 2016):
+        session.add(
+            Vote(
+                title="Vote {}".format(year),
+                domain='federation',
+                date=date(year, 1, 1),
+            )
+        )
+    for domain in ('canton', 'region', 'municipality'):
+        session.add(
+            Election(
+                title="Election {}".format(domain),
+                domain=domain,
+                date=date(2019, 1, 1),
+            )
+        )
+
+    session.flush()
+    archive.update_all(DummyRequest())
+    return archive
