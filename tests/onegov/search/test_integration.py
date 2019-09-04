@@ -1,6 +1,4 @@
-import os
 import morepath
-import pytest
 import sedate
 import transaction
 
@@ -14,6 +12,7 @@ from onegov.search import ElasticsearchApp, ORMSearchable
 from sqlalchemy import Boolean, Column, Integer, Text
 from sqlalchemy.ext.declarative import declarative_base
 from webtest import TestApp as Client
+from time import sleep
 
 
 def test_app_integration(es_url):
@@ -719,7 +718,6 @@ def test_language_update(es_url, postgres_dsn):
     assert french
 
 
-@pytest.mark.flaky(reruns=3)
 def test_date_decay(es_url, postgres_dsn):
 
     class App(Framework, ElasticsearchApp):
@@ -755,7 +753,7 @@ def test_date_decay(es_url, postgres_dsn):
     one = Document(id=1, title="Dokument", body="Eins")
     two = Document(id=2, title="Dokument", body="Zwei")
 
-    one.created = sedate.utcnow() - timedelta(days=30)
+    one.created = sedate.utcnow() - timedelta(days=365)
     two.created = sedate.utcnow()
 
     session.add(one)
@@ -784,18 +782,21 @@ def test_date_decay(es_url, postgres_dsn):
     assert search("Dokument")[0].meta.id == '2'
     assert search("Dokument")[1].meta.id == '1'
 
-    one = session.query(Document).filter_by(id=1).one()
-    two = session.query(Document).filter_by(id=2).one()
+    # this part of the test is a bit flaky, for unknown reasons
+    for i in range(0, 10):
 
-    one.created = sedate.utcnow()
-    two.created = sedate.utcnow() - timedelta(days=30)
+        one = session.query(Document).filter_by(id=1).one()
+        two = session.query(Document).filter_by(id=2).one()
 
-    transaction.commit()
+        one.created = sedate.utcnow()
+        two.created = sedate.utcnow() - timedelta(days=365)
 
-    # Travis fails most of the time here, though it almost always works
-    # locally - I tried a few things and then gave up.
-    if 'TRAVIS' in os.environ:
-        return
+        transaction.commit()
+
+        sleep(0.1)
+
+        if search("Dokument")[0].meta.id == '1':
+            break
 
     assert search("Dokument")[0].meta.id == '1'
     assert search("Dokument")[1].meta.id == '2'
