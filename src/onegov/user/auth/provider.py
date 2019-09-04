@@ -1,10 +1,11 @@
 from abc import ABCMeta, abstractmethod
 from attr import attrs, attrib
 from morepath import Response
-from onegov.user import _
-from onegov.user.models.user import User
+from onegov.core.crypto import random_token
+from onegov.user import _, log, UserCollection
 from onegov.user.auth.clients import KerberosClient
 from onegov.user.auth.clients import LDAPClient
+from onegov.user.models.user import User
 from translationstring import TranslationString
 from typing import Optional
 from ua_parser import user_agent_parser
@@ -121,7 +122,7 @@ class AuthenticationProvider(metaclass=ABCMeta):
         return cls()
 
 
-@attrs()
+@attrs(auto_attribs=True)
 class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
     name='ldap-kerberos', title=_("LDAP Kerberos")
 )):
@@ -134,6 +135,16 @@ class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
 
     # The Kerberos client to use
     kerberos: KerberosClient = attrib()
+
+    # LDAP attributes configuration
+    name_attribute: str
+    mails_attribute: str
+    groups_attribute: str
+
+    # Authorization configuration
+    admin_group: str
+    editor_group: str
+    member_group: str
 
     @classmethod
     def configure(cls, **cfg):
@@ -165,7 +176,16 @@ class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
         except Exception as e:
             raise ValueError(f"Kerberos config error: {e}")
 
-        return cls(ldap=ldap, kerberos=kerberos)
+        return cls(
+            ldap=ldap,
+            kerberos=kerberos,
+            name_attribute=cfg.get('name_attribute', 'cn'),
+            mails_attribute=cfg.get('mails_attribute', 'mail'),
+            groups_attribute=cfg.get('groups_attribute', 'memberOf'),
+            admin_group=cfg.get('admin_group', 'admins'),
+            editor_group=cfg.get('editor_group', 'editors'),
+            member_group=cfg.get('member_group', 'members'),
+        )
 
     def button_text(self, request):
         """ Returns the request tailored to each OS (users won't understand
@@ -195,7 +215,7 @@ class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
 
         # we got authentication, do we also have authorization?
         name = response
-        user = self.request_authorization(username=name)
+        user = self.request_authorization(request=request, username=name)
 
         if user is None:
             return Failure(_("${user} is not authorized", mapping={
@@ -204,5 +224,64 @@ class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
 
         return Success(user, _("Successfully logged in through LDAP"))
 
-    def request_authorization(self, username):
-        pass
+    def request_authorization(self, request, username):
+
+        entries = self.ldap.search(
+            query=f'({self.name_attribute}={username})',
+            attributes=[self.mails_attribute, self.groups_attribute])
+
+        if not entries:
+            log.warning(f"No LDAP entries for {username}")
+            return None
+
+        if len(entries) > 1:
+            tip = ', '.join(entries.keys())
+            log.warning(f"Multiple LDAP entries for {username}: {tip}")
+            return None
+
+        attributes = next(v for v in entries.values())
+
+        mails = attributes[self.mails_attribute]
+        if not mails:
+            log.warning(f"No e-mail addresses for {username}")
+            return None
+
+        groups = attributes[self.groups_attribute]
+        if not groups:
+            log.warning(f"No groups for {username}")
+            return None
+
+        # get the common name of the groups
+        groups = {g.split(',')[0].split('cn=')[-1] for g in groups}
+
+        if self.admin_group in groups:
+            role = 'admin'
+        elif self.editor_group in groups:
+            role = 'editor'
+        elif self.member_group in groups:
+            role = 'member'
+        else:
+            log.warning(f"No authorized group for {username}")
+            return None
+
+        return self.ensure_user(
+            session=request.session,
+            username=mails[0],
+            role=role)
+
+    def ensure_user(self, session, username, role):
+        users = UserCollection(session)
+        user = users.by_username(username)
+
+        if not user:
+            user = users.add(
+                username=username,
+                password=random_token(),
+                role=role
+            )
+
+        # set attributes, to correct for changes
+        user.source = 'ldap'
+        user.role = role
+
+        return user
