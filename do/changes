@@ -264,7 +264,7 @@ def changelog_commits(release, repository, newer, older):
             print(f"**`{c.type}`**", end='')
 
             if c.link:
-                print(f" | **[{c.link}]({c.link_url})", end='')
+                print(f" | **[{c.link}]({c.link_url})**", end='')
 
             print(f" | **[{c.short}]({c.url})**")
             print("")
