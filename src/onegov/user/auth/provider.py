@@ -282,8 +282,7 @@ class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
                 role=role
             )
 
-        # set attributes, to correct for changes
-        user.source = 'ldap'
+        # update the role in all cases, should it change
         user.role = role
 
         return user
