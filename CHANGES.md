@@ -2,7 +2,8 @@
 
 ## Release `2019.6`
 
-> commits: **1 / [0d57b12204...0d57b12204](https://github.com/OneGov/onegov-cloud/compare/0d57b12204...0d57b12204)**<br>
+> released: **2019-09-04 10:24**<br>
+> commits: **2 / [0d57b12204...3d53d3b4b9](https://github.com/OneGov/onegov-cloud/compare/0d57b12204...3d53d3b4b9)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.6)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election-Day
@@ -25,13 +26,7 @@ Hides clear statuses such as elected or number of mandates per list for proporz 
 
 Features new page break settings where PDF Layout can be chosen. Fixes link caching especially on Firefox by generating unique links for agency pdf's on creation and links based on modified timestamp for root.pdf (and poeple Excel File as well).
 
-**`Feature`** | **[ZW-200](https://kanton-zug.atlassian.net/browse/ZW-200) | **[2410ee7ab7](https://github.com/onegov/onegov-cloud/commit/2410ee7ab715fcc956c2c49ec72016fe5219eef8)**
-
-### Fixes
-
-✨ **Sed -i '.bak' => sed -i.bak**
-
-**`Other`** | **[88a02c2a16](https://github.com/onegov/onegov-cloud/commit/88a02c2a16aa5822b910af00110205d4905ce8c6)**
+**`Feature`** | **[ZW-200](https://kanton-zug.atlassian.net/browse/ZW-200)** | **[2410ee7ab7](https://github.com/onegov/onegov-cloud/commit/2410ee7ab715fcc956c2c49ec72016fe5219eef8)**
 
 ### Town
 
@@ -55,7 +50,7 @@ seems that the public is more confused by this than anything.
 Adds Excel export for people and their memberships and download link for logged in users.
 Addition: Fixes static `page_break_on_levle` in `views/agencies.py` for root and org pdf.
 
-**`Feature`** | **[STAKA-15](https://ogc-ar.atlassian.net/projects/STAKA/issues/STAKA-15) | **[4191ba6e06](https://github.com/onegov/onegov-cloud/commit/4191ba6e0611c38a743b488e5fe7294bbf9d2151)**
+**`Feature`** | **[STAKA-15](https://ogc-ar.atlassian.net/projects/STAKA/issues/STAKA-15)** | **[4191ba6e06](https://github.com/onegov/onegov-cloud/commit/4191ba6e0611c38a743b488e5fe7294bbf9d2151)**
 
 ### Core
 
@@ -72,7 +67,7 @@ SQLAlchemy integrations for Sentry.
 
 Resolves #1
 
-**`Feature`** | **[1](https://github.com/onegov/onegov-cloud/issues/1) | **[cc0ad2475c](https://github.com/onegov/onegov-cloud/commit/cc0ad2475c9ec57c29d9c491897e3f296f8a7ac7)**
+**`Feature`** | **[1](https://github.com/onegov/onegov-cloud/issues/1)** | **[cc0ad2475c](https://github.com/onegov/onegov-cloud/commit/cc0ad2475c9ec57c29d9c491897e3f296f8a7ac7)**
 
 🐞 **Fixes donations not working**
 
@@ -86,13 +81,13 @@ Regular users were unable to make donations due to an infinite redirect.
 
 It is now renderd outside our iFrame.
 
-**`Other`** | **[FW-69](https://stadt-winterthur.atlassian.net/browse/FW-69) | **[1d9a695a06](https://github.com/onegov/onegov-cloud/commit/1d9a695a068021ffca8a8e44481cf188c854c7fe)**
+**`Other`** | **[FW-69](https://stadt-winterthur.atlassian.net/browse/FW-69)** | **[1d9a695a06](https://github.com/onegov/onegov-cloud/commit/1d9a695a068021ffca8a8e44481cf188c854c7fe)**
 
 🐞 **Fixes wrong formatting of percentages**
 
 The daycare subsidy calculator "rounded" percentage of '10.00' to '1'.
 
-**`Bugfix`** | **[FW-63](https://stadt-winterthur.atlassian.net/browse/FW-63) | **[7b0f07f86a](https://github.com/onegov/onegov-cloud/commit/7b0f07f86a3221d0de26adb6e1922bff46d73048)**
+**`Bugfix`** | **[FW-63](https://stadt-winterthur.atlassian.net/browse/FW-63)** | **[7b0f07f86a](https://github.com/onegov/onegov-cloud/commit/7b0f07f86a3221d0de26adb6e1922bff46d73048)**
 
 ## Release `2019.3`
 
