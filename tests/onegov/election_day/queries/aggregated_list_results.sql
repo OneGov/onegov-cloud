@@ -10,8 +10,20 @@ list_results AS (
     LEFT JOIN list_results lr ON l.id = lr.list_id
     GROUP BY lr.list_id
     ORDER BY total_votes DESC
+),
+candidate_results as (
+    SELECT DISTINCT
+           array_agg(distinct c.family_name) as family_name,
+           array_agg(distinct c.first_name)as first_name,
+           sum(cr.votes) as candidate_votes
+    FROM candidates c
+    LEFT JOIN candidate_results cr on c.id = cr.candidate_id
+    GROUP BY cr.candidate_id
+    ORDER BY candidate_votes DESC
 )
-SELECT * from list_results
+SELECT * from candidate_results
+
+
 ;
 SELECT
     lists.list_id,
