@@ -11,13 +11,15 @@ def keytab():
     Principal: HTTP/ogc.example.org@EXAMPLE.ORG
     Password: test
 
-    To create, start ktutil (the latest release, macOS's one is too old):
+    To create, start ktutil (the latest release, macOS's one is too old)*.
 
         ktutil
         addent -password -p HTTP/ogc.example.org@EXAMPLE.ORG -k 1 -e aes256-cts
         wkt service.keytab
         exit
         cat service.keytab | base64
+
+    * Use 'brew install krb5', then run '/usr/local/opt/krb5/bin/ktutil'
 
     """
     KEYTAB = (
