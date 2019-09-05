@@ -1,0 +1,3 @@
+election_absolute_majority,election_status,entity_id,entity_counted,entity_eligible_voters,entity_received_ballots,entity_blank_ballots,entity_invalid_ballots,entity_blank_votes,entity_invalid_votes,list_name,list_id,list_number_of_mandates,list_votes,list_connection,list_connection_parent,candidate_family_name,candidate_first_name,candidate_id,candidate_elected,candidate_party,candidate_votes,panachage_votes_from_list_999
+0,,3542,True,1013,428,2,16,13,0,BDP Graubünden,12,1,219,5,1,Buchli,Daniel,1205,BDP,False,43,0
+0,,3542,True,1013,428,2,16,13,0,BDP Graubünden,12,1,219,5,1,Campell,Duri,1201,BDP,True,71,0

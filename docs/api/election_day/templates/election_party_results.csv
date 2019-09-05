@@ -1,0 +1,12 @@
+name,id,color,year,total_votes,votes,mandates,panachage_votes_from_1,panachage_votes_from_2,panachage_votes_from_3,panachage_votes_from_4,panachage_votes_from_5,panachage_votes_from_6,panachage_votes_from_7,panachage_votes_from_8,panachage_votes_from_9,panachage_votes_from_10,panachage_votes_from_11,panachage_votes_from_999
+AL,1,#a74c97,2017,0,0,0,,0,0,0,0,0,0,0,0,0,0,0
+BDP,2,#efb52c,2017,0,0,0,0,,0,0,0,0,0,0,0,0,0,0
+CVP,3,#ff6300,2017,0,0,0,0,0,,0,0,0,0,0,0,0,0,0
+EDU,4,#7f6b65,2017,0,0,0,0,0,0,,0,0,0,0,0,0,0,0
+EVP,5,#e3c700,2017,0,0,0,0,0,0,0,,0,0,0,0,0,0,0
+FDP,6,#4068c8,2017,0,0,0,0,0,0,0,0,,0,0,0,0,0,0
+GLP,7,#aeca00,2017,0,0,0,0,0,0,0,0,0,,0,0,0,0,0
+Grüne,8,#4abb3e,2017,0,0,0,0,0,0,0,0,0,0,,0,0,0,0
+Piraten,9,#333333,2017,0,0,0,0,0,0,0,0,0,0,0,,0,0,0
+SP,10,#db3c27,2017,0,0,0,0,0,0,0,0,0,0,0,0,,0,0
+SVP,11,#3f841a,2017,0,0,0,0,0,0,0,0,0,0,0,0,0,,0

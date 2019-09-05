@@ -1,0 +1,2 @@
+election_absolute_majority,election_status,entity_id,entity_counted,entity_eligible_voters,entity_received_ballots,entity_blank_ballots,entity_invalid_ballots,entity_blank_votes,entity_invalid_votes,list_name,list_id,list_number_of_mandates,list_votes,list_connection,list_connection_parent,candidate_family_name,candidate_first_name,candidate_id,candidate_elected,candidate_party,candidate_votes
+21012,,3542,True,1013,375,22,1,113,0,,,,0,,,Engler,Stefan,1,True,CVP,322

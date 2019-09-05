@@ -1,0 +1,3 @@
+AnzMandate,BFS,StimmBer,StimmAbgegeben,StimmLeer,StimmUngueltig,StimmGueltig,KandID_1,KandName_1,KandVorname_1,Stimmen_1,KandID_2,KandName_2,KandVorname_2,Stimmen_2,KandID_3,KandName_3,KandVorname_3,Stimmen_3,KandID_4,KandName_4,KandVorname_4,Stimmen_4
+7,3681,16404,12,0,0,12,1,Muster,Hans,10,2,Muster,Paula,10,1000,Leere Zeilen,,4,1001,Ungültige Stimmen,,0
+7,3691,3560,10,1,1,8,1,Muster,Hans,4,2,Muster,Paula,4,1000,Leere Zeilen,,0,1001,Ungültige Stimmen,,0

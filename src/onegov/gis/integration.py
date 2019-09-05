@@ -74,14 +74,6 @@ def get_geo_vermessungsamt_winterthur():
     yield 'geo-vermessungsamt-winterthur.js'
 
 
-@MapboxApp.webasset('geo-zugmap-ortsplan')
-def get_geo_zugmap_ortsplan():
-    yield 'leaflet'
-    yield 'proj4js'
-    yield 'geo-zugmap.js'
-    yield 'geo-zugmap-ortsplan.js'
-
-
 @MapboxApp.webasset('geo-zugmap-luftbild')
 def get_geo_zugmap_luftbild():
     yield 'leaflet'
