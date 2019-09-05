@@ -1,4 +1,6 @@
 from freezegun import freeze_time
+
+from onegov.election_day.layouts import ElectionCompoundLayout
 from tests.onegov.election_day.common import create_election_compound
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_election_compound
@@ -287,3 +289,13 @@ def test_view_election_compound_data(election_day_app_gr):
 
     export = client.get('/elections/elections/data-csv')
     assert all((expected in export for expected in ("3503", "Sieger", "153")))
+
+
+def test_views_election_compound_embedded_tables(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+    upload_election_compound(client)
+    for tab_name in ElectionCompoundLayout.tabs_with_embedded_tables:
+        client.get(f'/elections/elections/{tab_name}-table')

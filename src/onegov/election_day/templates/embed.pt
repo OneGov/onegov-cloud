@@ -147,14 +147,15 @@
             <tal:b tal:condition="type == 'election-table' and scope == 'statistics'">
                 <tal:b metal:use-macro="layout.macros['election-statistics-table']"/>
             </tal:b>
+            <tal:b tal:condition="type == 'election-table' and scope == 'connections'">
+                <tal:b metal:use-macro="layout.macros['election-connections-table']"/>
+            </tal:b>
+
             <tal:b tal:condition="type == 'election-compound-table' and scope == 'districts'">
                 <tal:b metal:use-macro="layout.macros['election-compound-districts-table']"/>
             </tal:b>
             <tal:b tal:condition="type == 'election-compound-table' and scope == 'candidates'">
                 <tal:b metal:use-macro="layout.macros['election-compound-candidates-table']"/>
-            </tal:b>
-            <tal:b tal:condition="type == 'election-connections-table' and scope == 'connections'">
-                <tal:b metal:use-macro="layout.macros['election-connections-table']"/>
             </tal:b>
         </tal:block>
     </body>

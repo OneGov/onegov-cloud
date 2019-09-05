@@ -67,10 +67,9 @@ def view_election_connections_chart(self, request):
         'model': self,
         'layout': DefaultLayout(self, request),
         'connections': get_connection_results(self, object_session(self)),
-        'type': 'election-connections-table',
+        'type': 'election-table',
         'scope': 'connections'
     }
-
 
 
 @ElectionDayApp.html(

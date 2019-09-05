@@ -675,7 +675,7 @@ def test_view_election_relations(election_day_app_gr):
         assert 'First Election' in result
 
 
-def test_views_elections_embedded_tables(election_day_app_gr):
+def test_views_election_embedded_tables(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
     session = election_day_app_gr.session_manager.session()
