@@ -16,6 +16,9 @@ class DefaultLayout(ChameleonLayout):
     date_long_format = 'long'
     datetime_long_format = 'medium'
 
+    docs_base_url = 'https://github.com/OneGov/onegov-cloud' \
+                    '/tree/master/docs/api/election_day'
+
     def __init__(self, model, request):
         super().__init__(model, request)
 
@@ -44,12 +47,8 @@ class DefaultLayout(ChameleonLayout):
     def homepage_link(self):
         return self.request.link(self.principal)
 
-    @staticmethod
-    def get_opendata_link(lang):
-        return (
-            f"https://github.com/OneGov/onegov-cloud/tree/master/docs/"
-            f"api/election_day/open_data_{lang}.md"
-        )
+    def get_opendata_link(self, lang):
+        return f"{self.docs_base_url}/open_data_{lang}.md"
 
     @cached_property
     def opendata_link(self):
@@ -72,10 +71,7 @@ class DefaultLayout(ChameleonLayout):
     @cached_property
     def format_description_link(self):
         lang = (self.request.locale or 'en')[:2]
-        return (
-            "https://github.com/OneGov/onegov-cloud/tree/master/docs/"
-            f"api/election_day/format__{lang}.md"
-        )
+        return f"{self.docs_base_url}/format__{lang}.md"
 
     @cached_property
     def font_awesome_path(self):
