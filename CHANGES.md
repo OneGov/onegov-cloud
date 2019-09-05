@@ -1,5 +1,36 @@
 # Changes
 
+## Release `2019.7`
+
+> commits: **7 / [64c5f5bdfb...80af30dfe4](https://github.com/OneGov/onegov-cloud/compare/64c5f5bdfb...80af30dfe4)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.7)](https://buildkite.com/seantis/onegov-cloud)
+
+### Core
+
+🐞 **Fixes relative dates throwing an error**
+
+Arrow recently started supporting weeks, however it did not provide a
+translation yet, which lead to an exception.
+
+**`Bugfix`** | **[80af30dfe4](https://github.com/onegov/onegov-cloud/commit/80af30dfe4ac3672772618ff86134c10e9351e19)**
+
+### Gis
+
+✨ **Removes ZugMap Ortsplan**
+
+This map type is being phased out and is therefore no longer supported.
+
+**`Other`** | **[ZW-125](https://kanton-zug.atlassian.net/browse/ZW-125)** | **[148cb2c74d](https://github.com/onegov/onegov-cloud/commit/148cb2c74d92236feba6c562ef914c53f3b36a3b)**
+
+### Org
+
+🐞 **Fixes wrong phone number link**
+
+The phone number was linkified twice, which resulted in invalid HTML
+being generated and displayed in the directory contact.
+
+**`Bugfix`** | **[ZW-233](https://kanton-zug.atlassian.net/browse/ZW-233)** | **[64c5f5bdfb](https://github.com/onegov/onegov-cloud/commit/64c5f5bdfbde1891b391d0f67496904bdbc928df)**
+
 ## Release `2019.6`
 
 > released: **2019-09-04 10:24**<br>
