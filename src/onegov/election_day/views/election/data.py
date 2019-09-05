@@ -8,6 +8,8 @@ from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
+from onegov.election_day.utils.election.lists import \
+    get_aggregated_list_results
 
 
 @ElectionDayApp.html(
@@ -97,3 +99,18 @@ def view_election_parties_data_as_csv(self, request):
             )
         )
     )
+
+
+@ElectionDayApp.json(
+    model=Election,
+    name='data-aggregated-lists',
+    permission=Public
+)
+def view_election_aggregated_lists_data(self, request):
+
+    """" View the lists as JSON. Used to for the lists bar chart. """
+
+    result = get_aggregated_list_results(self, request.session)
+    assert result
+    return result
+
