@@ -211,18 +211,20 @@ class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
 
         # authentication failed
         if response is None:
-            return Failure(_("LDAP authentication failed"))
+            return Failure(_("Authentication failed"))
 
         # we got authentication, do we also have authorization?
         name = response
         user = self.request_authorization(request=request, username=name)
 
         if user is None:
-            return Failure(_("${user} is not authorized", mapping={
+            return Failure(_("User «${user}» is not authorized", mapping={
                 'user': name
             }))
 
-        return Success(user, _("Successfully logged in through LDAP"))
+        return Success(user, _("Successfully logged in as «${user}»", mapping={
+            'user': name
+        }))
 
     def request_authorization(self, request, username):
 

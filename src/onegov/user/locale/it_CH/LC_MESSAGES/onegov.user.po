@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-07-18 16:13+0200\n"
+"POT-Creation-Date: 2019-09-05 14:32+0200\n"
 "PO-Revision-Date: 2017-06-22 16:08+0200\n"
 "Last-Translator: Marc Sommerhalder <info@seantis.ch>\n"
 "Language-Team: Italian\n"
@@ -17,44 +17,71 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "X-Generator: Poedit 2.0.2\n"
 
+msgid "LDAP Kerberos"
+msgstr "LDAP Kerberos"
+
+msgid "Login with operating system"
+msgstr "Accedi con il sistema operativo"
+
+#, python-format
+msgid "Login with **${operating_system}**"
+msgstr "Accedi con **${operating_system}**"
+
+msgid "Authentication failed"
+msgstr "Autenticazione fallita"
+
+#, python-format
+msgid "User «${user}» is not authorized"
+msgstr "L'utente «${user}» non è autorizzato"
+
+#, python-format
+msgid "Successfully logged in as «${user}»"
+msgstr "Accesso effettuato con successo come «${user}»\n"
+
+msgid "Name"
+msgstr "Nome"
+
 msgid "E-Mail Address"
 msgstr "Indirizzo email"
 
 msgid "Password"
 msgstr "Password"
 
-msgid "Password Confirmation"
-msgstr "Conferma Password"
+msgid "YubiKey"
+msgstr "YubiKey"
 
-msgid "Please leave this field empty"
-msgstr "Si prega di lasciare vuoto questo campo"
+msgid "Plug your YubiKey into a USB slot and press it."
+msgstr "Collegare il dispositivo YubiKey a una porta USB e premerlo."
 
 msgid "The password must be at least eight characters long"
 msgstr "La password deve contenere almeno 8 caratteri"
 
+msgid "Password Confirmation"
+msgstr "Conferma Password"
+
 msgid "Passwords must match"
 msgstr "Le password devono corrispondere"
+
+msgid "Please leave this field empty"
+msgstr "Si prega di lasciare vuoto questo campo"
 
 msgid "The field is not empty"
 msgstr "Il campo non è vuoto"
 
-msgid "Name"
-msgstr "Nome"
+msgid "New Password"
+msgstr "Nuova Password"
 
 msgid "Role"
 msgstr "Ruolo"
-
-msgid "Expires in"
-msgstr "Scade tra"
-
-msgid "Number of Signups"
-msgstr "Numero di iscrizioni"
 
 msgid "Editor"
 msgstr "Editor"
 
 msgid "Admin"
 msgstr "Amministratore"
+
+msgid "Expires in"
+msgstr "Scade tra"
 
 msgid "1 hour"
 msgstr "1 ora"
@@ -68,56 +95,5 @@ msgstr "7 giorni"
 msgid "30 days"
 msgstr "30 giorni"
 
-msgid "YubiKey"
-msgstr "YubiKey"
-
-msgid "Plug your YubiKey into a USB slot and press it."
-msgstr "Collegare il dispositivo YubiKey a una porta USB e premerlo."
-
-msgid "New Password"
-msgstr "Nuova Password"
-
-msgid "Third-Party Authentication"
-msgstr "Autenticazione di terze parti"
-
-#, python-format
-msgid "Login with **${operating_system}**"
-msgstr "Accedi con **${operating_system}**"
-
-msgid "None"
-msgstr "Nessuna"
-
-msgid "Provider"
-msgstr "Provider"
-
-msgid "Force login through provider"
-msgstr "Forza l'autenticazione tramite provider"
-
-msgid ""
-"Forces the user to use this provider. Regular username/password "
-"authentication will be disabled!"
-msgstr ""
-"Forza l'utente a utilizzare questo provider. L'autenticazione regolare con "
-"nome utente/password sarà disabilitata!"
-
-msgid "Kerberos (v5)"
-msgstr "Kerberos (v5)"
-
-msgid "Login with operating system"
-msgstr "Accedi con il sistema operativo"
-
-msgid "Kerberos username"
-msgstr "Nome utente Kerberos"
-
-msgid ""
-"The provider configuration of this user conflicts with the configuration of "
-"another user."
-msgstr ""
-
-#, python-format
-msgid "Your identity ${identity} is not authorized"
-msgstr ""
-
-#, python-format
-msgid "You have been logged in as ${user} (via ${identity})"
-msgstr ""
+msgid "Number of Signups"
+msgstr "Numero di iscrizioni"
