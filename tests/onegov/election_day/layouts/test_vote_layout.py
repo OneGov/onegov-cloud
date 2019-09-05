@@ -8,6 +8,7 @@ from tests.onegov.election_day.common import DummyRequest
 from unittest.mock import Mock
 import pytest
 
+
 def test_vote_layout(session):
     layout = VoteLayout(Vote(), DummyRequest())
 
@@ -45,7 +46,6 @@ def test_vote_layout(session):
     assert layout.subtitle('tie-breaker-districts') == '__districts'
     assert layout.subtitle('data') == ''
 
-    layout.has_districts = True
     assert layout.subtitle('proposal-entities') == '__entities'
     assert layout.subtitle('counter-proposal-entities') == '__entities'
     assert layout.subtitle('tie-breaker-entities') == '__entities'
