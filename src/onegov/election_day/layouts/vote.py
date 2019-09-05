@@ -12,6 +12,8 @@ class VoteLayout(DetailLayout):
         super().__init__(model, request)
         self.tab = tab
 
+    tabs_with_embedded_tables = ('entities', 'districts')
+
     @cached_property
     def all_tabs(self):
         return (

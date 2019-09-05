@@ -157,6 +157,7 @@
             <tal:b tal:condition="type == 'election-compound-table' and scope == 'candidates'">
                 <tal:b metal:use-macro="layout.macros['election-compound-candidates-table']"/>
             </tal:b>
+
         </tal:block>
     </body>
 </html>
