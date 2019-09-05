@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from morepath import redirect
 from morepath.request import Response
 from onegov.ballot import Election
@@ -41,7 +43,7 @@ def view_election_json(self, request):
         add_cors_header(response)
         add_last_modified_header(response, last_modified)
 
-    embed = {}
+    embed = defaultdict(list)
     media = {'charts': {}}
     layout = ElectionLayout(self, request)
     layout.last_modified = last_modified
@@ -62,9 +64,12 @@ def view_election_json(self, request):
         layout = ElectionLayout(self, request, tab=tab)
         layout.last_modified = last_modified
         if layout.visible:
-            embed[tab] = request.link(self, f'{tab}-chart')
+            embed[tab].append(request.link(self, f'{tab}-chart'))
         if layout.svg_path:
             media['charts'][tab] = request.link(self, f'{tab}-svg')
+
+    for tab in ElectionLayout.tabs_with_embedded_tables:
+            embed[tab].append(request.link(self, f'{tab}-table'))
 
     years, parties = get_party_results(self)
 
