@@ -27,12 +27,15 @@ class ChangelogCommit(object):
 
     @classmethod
     def is_match(cls, commit):
+
+        # ignore single-line commit messages
+        if '\n' not in commit.message.strip():
+            return False
+
         return COMMIT_HEADER.match(commit.message)
 
     @classmethod
     def parse(cls, commit):
-        assert cls.is_match(commit)
-
         lines = commit.message.strip().splitlines()
         module, title = lines[0].split(':', 1)
 
