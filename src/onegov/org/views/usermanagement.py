@@ -26,8 +26,9 @@ def view_usermanagement(self, request):
     layout = UserManagementLayout(self, request)
 
     users = defaultdict(list)
+    query = self.query().filter(User.source == None).order_by(User.username)
 
-    for user in self.query().order_by(User.username).all():
+    for user in query:
         users[user.role].append(user)
 
     filters = {}

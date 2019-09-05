@@ -100,7 +100,14 @@ class User(Base, TimestampMixin, ORMSearchable):
     #:
     second_factor = Column(JSON, nullable=True)
 
-    #: a string describing where the user came from, None if internal
+    #: A string describing where the user came from, None if internal.
+    #
+    #: Internal users may login using a password, which they may also change.
+    #
+    #: External users may not login using a password, nor can they ask for one.
+    #
+    #: A user can technically come from changing providers - the source refers
+    #: to the last provider he used.
     source = Column(Text, nullable=True, default=None)
 
     #: true if the user is active

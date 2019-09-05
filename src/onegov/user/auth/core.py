@@ -155,6 +155,13 @@ class Auth(object):
         if not self.is_valid_second_factor(user, second_factor):
             return fail()
 
+        # users from external authentication providers may not login using
+        # a regular login - if for some reason the source is false (if the
+        # authentication system is switched) - the source column has to be
+        # set to NULL
+        if user.source is not None:
+            return fail()
+
         log.info(f"Successful login by {client} ({username})")
         return user
 

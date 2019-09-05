@@ -14,9 +14,13 @@ def password_reset_url(user, request, url):
         The URL which points to the password reset view (which is using the
         PasswordResetForm).
 
-    :return: An URL containg the password reset token.
+    :return: An URL containg the password reset token, or None if unsuccesful.
 
     """
+
+    # external users may not reset their passwords here
+    if user.source is not None:
+        return None
 
     token = request.new_url_safe_token({
         'username': user.username,
