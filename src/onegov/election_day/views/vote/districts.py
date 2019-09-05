@@ -120,6 +120,29 @@ def view_vote_districts_map_tie_breaker(self, request):
 
 
 @ElectionDayApp.html(
+    model=Ballot,
+    name='districts-table',
+    template='embed.pt',
+    permission=Public
+)
+def view_ballot_as_table(self, request):
+
+    """" View the results of the entities of ballot as table. """
+
+    @request.after
+    def add_last_modified(response):
+        add_last_modified_header(response, self.vote.last_modified)
+
+    return {
+        'ballot': self,
+        'layout': DefaultLayout(self, request),
+        'type': 'ballot-table',
+        'year': self.vote.date.year,
+        'scope': 'districts',
+    }
+
+
+@ElectionDayApp.html(
     model=Vote,
     name='proposal-by-districts-table',
     permission=Public
@@ -193,29 +216,6 @@ def view_ballot_districts_as_map(self, request):
         'label_left_hand': _("Nay"),
         'label_right_hand': _("Yay"),
         'data_url': request.link(self, name='by-district'),
-    }
-
-
-@ElectionDayApp.html(
-    model=Ballot,
-    name='districts-table',
-    template='embed.pt',
-    permission=Public
-)
-def view_ballot_as_table(self, request):
-
-    """" View the results of the entities of ballot as table. """
-
-    @request.after
-    def add_last_modified(response):
-        add_last_modified_header(response, self.vote.last_modified)
-
-    return {
-        'ballot': self,
-        'layout': DefaultLayout(self, request),
-        'type': 'ballot-table',
-        'year': self.vote.date.year,
-        'scope': 'districts',
     }
 
 

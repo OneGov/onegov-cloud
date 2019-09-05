@@ -160,6 +160,29 @@ def view_ballot_entities_as_map(self, request):
 
 
 @ElectionDayApp.html(
+    model=Ballot,
+    name='entities-table',
+    template='embed.pt',
+    permission=Public
+)
+def view_ballot_as_table(self, request):
+
+    """" View the results of the entities of ballot as table. """
+
+    @request.after
+    def add_last_modified(response):
+        add_last_modified_header(response, self.vote.last_modified)
+
+    return {
+        'ballot': self,
+        'layout': DefaultLayout(self, request),
+        'type': 'ballot-table',
+        'year': self.vote.date.year,
+        'scope': 'entities',
+    }
+
+
+@ElectionDayApp.html(
     model=Vote,
     name='proposal-by-entities-table',
     permission=Public
