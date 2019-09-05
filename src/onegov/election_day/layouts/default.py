@@ -44,11 +44,12 @@ class DefaultLayout(ChameleonLayout):
     def homepage_link(self):
         return self.request.link(self.principal)
 
-    def get_opendata_link(self, lang):
+    @staticmethod
+    def get_opendata_link(lang):
         return (
-            "https://github.com/OneGov/onegov.election_day"
-            "/blob/master/docs/open_data_{}.md"
-        ).format(lang)
+            f"https://github.com/OneGov/onegov-cloud/tree/master/docs/"
+            f"api/election_day/open_data_{lang}.md"
+        )
 
     @cached_property
     def opendata_link(self):
@@ -72,9 +73,9 @@ class DefaultLayout(ChameleonLayout):
     def format_description_link(self):
         lang = (self.request.locale or 'en')[:2]
         return (
-            "https://github.com/OneGov/onegov.election_day"
-            "/blob/master/docs/format__{}.md"
-        ).format(lang)
+            "https://github.com/OneGov/onegov-cloud/tree/master/docs/"
+            f"api/election_day/format__{lang}.md"
+        )
 
     @cached_property
     def font_awesome_path(self):

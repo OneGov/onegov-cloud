@@ -31,46 +31,39 @@ def test_default_layout():
     assert layout_it.terms_link == 'https://opendata.swiss/it/terms-of-use'
     assert layout_rm.terms_link == 'https://opendata.swiss/rm/terms-of-use'
 
+    base_url = 'https://github.com/OneGov/onegov-cloud' \
+               '/tree/master/docs/api/election_day/'
+
     assert layout_de.opendata_link == (
-        'https://github.com/OneGov/onegov.election_day/blob/master/docs/'
-        'open_data_de.md'
+        base_url + 'open_data_de.md'
     )
     assert layout_en.opendata_link == (
-        'https://github.com/OneGov/onegov.election_day/blob/master/docs/'
-        'open_data_en.md'
+        base_url + 'open_data_en.md'
     )
     assert layout_fr.opendata_link == (
-        'https://github.com/OneGov/onegov.election_day/blob/master/docs/'
-        'open_data_fr.md'
+        base_url + 'open_data_fr.md'
     )
     assert layout_it.opendata_link == (
-        'https://github.com/OneGov/onegov.election_day/blob/master/docs/'
-        'open_data_it.md'
+        base_url + 'open_data_it.md'
     )
     assert layout_rm.opendata_link == (
-        'https://github.com/OneGov/onegov.election_day/blob/master/docs/'
-        'open_data_rm.md'
+        base_url +'open_data_rm.md'
     )
 
     assert layout_de.format_description_link == (
-        'https://github.com/OneGov/onegov.election_day/blob/master/docs/'
-        'format__de.md'
+        base_url + 'format__de.md'
     )
     assert layout_en.format_description_link == (
-        'https://github.com/OneGov/onegov.election_day/blob/master/docs/'
-        'format__en.md'
+        base_url +'format__en.md'
     )
     assert layout_fr.format_description_link == (
-        'https://github.com/OneGov/onegov.election_day/blob/master/docs/'
-        'format__fr.md'
+        base_url + 'format__fr.md'
     )
     assert layout_it.format_description_link == (
-        'https://github.com/OneGov/onegov.election_day/blob/master/docs/'
-        'format__it.md'
+        base_url + 'format__it.md'
     )
     assert layout_rm.format_description_link == (
-        'https://github.com/OneGov/onegov.election_day/blob/master/docs/'
-        'format__rm.md'
+        base_url + 'format__rm.md'
     )
 
     assert layout_de.login_link == 'Auth/login'
