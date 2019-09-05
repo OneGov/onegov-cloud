@@ -12,11 +12,7 @@ class ElectionLayout(DetailLayout):
         super().__init__(model, request)
         self.tab = tab
 
-    tabs_with_embedded_tables = (
-            'lists',
-            'candidates',
-            'statistics',
-        )
+    tabs_with_embedded_tables = ('lists', 'candidates', 'statistics')
 
     @cached_property
     def table_link(self):
