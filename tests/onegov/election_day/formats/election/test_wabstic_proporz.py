@@ -7,23 +7,12 @@ from onegov.ballot import ProporzElection
 from onegov.ballot import List
 from onegov.core.utils import module_path
 from onegov.election_day.formats import import_election_wabstic_proporz
-from onegov.election_day.formats.common import print_errors
 from onegov.election_day.formats.election.wabstic_proporz import \
     get_list_id_from_knr
 from onegov.election_day.models import Canton
 from pytest import mark
 
-
-def help_print_errors(errors_list, max=20):
-    i = 0
-    while i < max:
-        try:
-            err = errors_list[i]
-            print('error in ', err.filename, ':',
-                  err.line, '-', err.error.interpolate())
-            i += 1
-        except Exception:
-            break
+from tests.onegov.election_day.common import import_wabstic_data, print_errors
 
 
 def test_get_list_id_from_knr():
@@ -57,38 +46,8 @@ def test_import_wabstic_proporz_v23(session, tar_file):
 
     principal = Canton(canton='sg')
 
-    # The tar file contains a test dataset
+    import_wabstic_data(election, tar_file, principal, expats=False)
 
-    with tarfile.open(tar_file, 'r:gz') as f:
-        regional_wp_gemeinden = f.extractfile('WP_Gemeinden.csv').read()
-        regional_wp_kandidaten = f.extractfile(
-            'WP_Kandidaten.csv').read()
-        regional_wp_kandidatengde = f.extractfile(
-            'WP_KandidatenGde.csv').read()
-        regional_wp_listen = f.extractfile('WP_Listen.csv').read()
-        regional_wp_listengde = f.extractfile('WP_ListenGde.csv').read()
-        regional_wpstatic_gemeinden = f.extractfile(
-            'WPStatic_Gemeinden.csv').read()
-        regional_wpstatic_kandidaten = f.extractfile(
-            'WPStatic_Kandidaten.csv').read()
-        regional_wp_wahl = f.extractfile('WP_Wahl.csv').read()
-
-    # Test cantonal elections
-    election.expats = False
-
-    errors = import_election_wabstic_proporz(
-        election, principal, '1', None,
-        BytesIO(regional_wp_wahl), 'text/plain',
-        BytesIO(regional_wpstatic_gemeinden), 'text/plain',
-        BytesIO(regional_wp_gemeinden), 'text/plain',
-        BytesIO(regional_wp_listen), 'text/plain',
-        BytesIO(regional_wp_listengde), 'text/plain',
-        BytesIO(regional_wpstatic_kandidaten), 'text/plain',
-        BytesIO(regional_wp_kandidaten), 'text/plain',
-        BytesIO(regional_wp_kandidatengde), 'text/plain',
-    )
-    print_errors(errors)
-    assert not errors
     assert election.completed
     # assert election.progress == (78, 78)
     # assert election.absolute_majority is None
