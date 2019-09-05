@@ -13,11 +13,10 @@ from onegov.core import utils
 from pytz import timezone
 
 
-# I introduced a bug with arrow that should be fixed in a future release, this
-# here is a workaround, until this is merged:
-# https://github.com/crsmithdev/arrow/pull/410
+# not yet in upstream: https://github.com/crsmithdev/arrow/pull/653
 from arrow.locales import SwissLocale
-SwissLocale.timeframes['days'] = '{0} Tagen'
+SwissLocale.timeframes['week'] = 'einer Woche'
+SwissLocale.timeframes['weeks'] = '{0} Wochen'
 
 
 class Layout(object):
