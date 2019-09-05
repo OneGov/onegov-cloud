@@ -1,3 +1,4 @@
+import re
 from datetime import date
 from freezegun import freeze_time
 from math import isclose
@@ -674,16 +675,11 @@ def test_view_election_relations(election_day_app_gr):
         assert 'First Election' in result
 
 
-def test_elections_embbeded_table_redirects(election_day_app_gr):
+def test_views_elections_embedded_tables(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
     session = election_day_app_gr.session_manager.session()
     login(client)
     upload_majorz_election(client)
-    election = session.query(Election).one()
-    assert election
     for tab_name in ElectionLayout.tabs_with_embedded_tables:
-        resp = client.get(f'/election/majorz-election/{tab_name}')
-        # Check if the Einbetten Text is there
-        print(resp)
-    assert False
+        client.get(f'/election/majorz-election/{tab_name}-table')
