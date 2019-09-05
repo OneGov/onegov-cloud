@@ -116,7 +116,7 @@ def app(request, glauth_binary, postgres_dsn, temporary_path, redis_url,
             redis_url=redis_url,
             identity_secure=False,
             authentication_providers={
-                'ldap-kerberos': {
+                'ldap_kerberos': {
                     'ldap_url': f'ldaps://{ldap_host}:{ldap_port}',
                     'ldap_username': 'cn=service,ou=service,dc=seantis,dc=ch',
                     'ldap_password': 'hunter2',
@@ -147,7 +147,7 @@ def test_ldap_kerberos_provider(client):
         methods['authGSSServerUserName'].return_value = username
 
     def get(path):
-        url = f'/auth/provider/ldap-kerberos?to={path}'
+        url = f'/auth/provider/ldap_kerberos?to={path}'
         headers = {'Authorization': 'Negotiate foobar'}
 
         page = client.spawn().get(url, headers=headers, expect_errors=True)

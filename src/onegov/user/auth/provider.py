@@ -124,7 +124,7 @@ class AuthenticationProvider(metaclass=ABCMeta):
 
 @attrs(auto_attribs=True)
 class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
-    name='ldap-kerberos', title=_("LDAP Kerberos")
+    name='ldap_kerberos', title=_("LDAP Kerberos")
 )):
     """ Classic LDAP provider using python-ldap, combined with kerberos
 
