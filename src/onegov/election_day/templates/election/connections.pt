@@ -42,43 +42,7 @@
                     </figure>
                 </div>
             </div>
-
-            <tal:block tal:repeat="connection connections">
-                <table class="results">
-                    <thead>
-                        <tr>
-                            <th><span i18n:translate="">List connection</span> ${connection[0]}</th>
-                            <th i18n:translate="single_votes" class="right-aligned">Votes</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr tal:repeat="list connection[2]">
-                            <td>${list[0]}</td>
-                            <td class="right-aligned">${layout.format_number(list[1])}</td>
-                        </tr>
-                        <tal:block tal:repeat="subconnection connection[3]">
-                            <tr>
-                                <td><span i18n:translate="">Sublist connection</span> ${subconnection[0]}</td>
-                                <td></td>
-                            </tr>
-                            <tr tal:repeat="list subconnection[2]">
-                                <td>${list[0]}</td>
-                                <td class="right-aligned">${layout.format_number(int(list[1]))}</td>
-                            </tr>
-                            <tr class="subtotal">
-                                <td i18n:translate="">Subtotal</td>
-                                <td class="right-aligned">${layout.format_number(int(subconnection[1]))}</td>
-                            </tr>
-                        </tal:block>
-                    </tbody>
-                    <tfoot>
-                        <tr class="total">
-                            <td i18n:translate="">Total</td>
-                            <td class="right-aligned">${layout.format_number(int(connection[1]))}</td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </tal:block>
+                <tal:block metal:use-macro="layout.macros['election-connections-table']"></tal:block>
         </tal:block>
 
         <div metal:use-macro="layout.macros['related_link']" />

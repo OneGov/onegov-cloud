@@ -51,6 +51,30 @@ def view_election_connections_chart(self, request):
 
 @ElectionDayApp.html(
     model=Election,
+    name='connections-table',
+    template='embed.pt',
+    permission=Public
+)
+def view_election_connections_chart(self, request):
+
+    """" View the connections as sankey chart. """
+
+    @request.after
+    def add_last_modified(response):
+        add_last_modified_header(response, self.last_modified)
+
+    return {
+        'model': self,
+        'layout': DefaultLayout(self, request),
+        'connections': get_connection_results(self, object_session(self)),
+        'type': 'election-connections-table',
+        'scope': 'connections'
+    }
+
+
+
+@ElectionDayApp.html(
+    model=Election,
     name='connections',
     template='election/connections.pt',
     permission=Public
