@@ -285,7 +285,7 @@ class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
             return None
 
         # get the common name of the groups
-        groups = {g.split(',')[0].split('cn=')[-1] for g in groups}
+        groups = {g.lower().split(',')[0].split('cn=')[-1] for g in groups}
 
         # get the roles
         roles = self.app_specific_roles(request.app)
@@ -294,11 +294,11 @@ class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
             log.warning(f"No role map for {request.app.application_id}")
             return None
 
-        if roles['admins'] in groups:
+        if roles['admins'].lower() in groups:
             role = 'admin'
-        elif roles['editors'] in groups:
+        elif roles['editors'].lower() in groups:
             role = 'editor'
-        elif roles['members'] in groups:
+        elif roles['members'].lower() in groups:
             role = 'member'
         else:
             log.warning(f"No authorized group for {username}")
