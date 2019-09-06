@@ -147,9 +147,25 @@ configuration: &global-config
       groups_attribute: memberOf
 
       # Role mapping
-      admin_group: admins
-      editor_group: editors
-      member_group: members
+      roles:
+
+        # For all applications
+        "__default__":
+          admin: admins
+          editor: editors
+          member: members
+
+        # For applications of a specific namespace
+        "onegov_org":
+          admin: admins
+          editor: editors
+          member: members
+
+        # For applications of a specific application id
+        "onegov_org/govikon":
+          admin: admins
+          editor: editors
+          member: members
 
 # All supported applications
 applications:

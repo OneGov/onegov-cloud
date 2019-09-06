@@ -7,6 +7,7 @@ from onegov.user.auth.clients import KerberosClient
 from onegov.user.auth.clients import LDAPClient
 from onegov.user.models.user import User
 from translationstring import TranslationString
+from typing import Dict
 from typing import Optional
 from ua_parser import user_agent_parser
 from webob.exc import HTTPClientError
@@ -145,10 +146,16 @@ class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
     mails_attribute: str
     groups_attribute: str
 
-    # Authorization configuration
-    admin_group: str
-    editor_group: str
-    member_group: str
+    # Role mapping, with three levels of keys. For example:
+    #
+    #   * "__default__"         Fallback for all applications
+    #   * "onegov_org"          Namespace specific config
+    #   * "onegov_org/govikon"  Application specific config
+    #
+    # Each level contains a group name for admins, editors and members.
+    # See onegov.yml.example for an illustrated example.
+    #
+    roles: Dict[str, Dict[str, str]]
 
     @classmethod
     def configure(cls, **cfg):
@@ -186,9 +193,13 @@ class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
             name_attribute=cfg.get('name_attribute', 'cn'),
             mails_attribute=cfg.get('mails_attribute', 'mail'),
             groups_attribute=cfg.get('groups_attribute', 'memberOf'),
-            admin_group=cfg.get('admin_group', 'admins'),
-            editor_group=cfg.get('editor_group', 'editors'),
-            member_group=cfg.get('member_group', 'members'),
+            roles=cfg.get('roles', {
+                '__default__': {
+                    'admins': 'admins',
+                    'editors': 'editors',
+                    'members': 'members'
+                }
+            })
         )
 
     def button_text(self, request):
@@ -230,6 +241,15 @@ class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
             'user': user.username
         }))
 
+    def app_specific_roles(self, app):
+        if app.application_id in self.roles:
+            return self.roles[app.application_id]
+
+        if app.namespace in self.roles:
+            return self.roles[app.namespace]
+
+        return self.roles.get('__default__')
+
     def request_authorization(self, request, username):
 
         entries = self.ldap.search(
@@ -260,11 +280,18 @@ class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
         # get the common name of the groups
         groups = {g.split(',')[0].split('cn=')[-1] for g in groups}
 
-        if self.admin_group in groups:
+        # get the roles
+        roles = self.app_specific_roles(request.app)
+
+        if not roles:
+            log.warning(f"No role map for {request.app.application_id}")
+            return None
+
+        if roles['admins'] in groups:
             role = 'admin'
-        elif self.editor_group in groups:
+        elif roles['editors'] in groups:
             role = 'editor'
-        elif self.member_group in groups:
+        elif roles['members'] in groups:
             role = 'member'
         else:
             log.warning(f"No authorized group for {username}")
