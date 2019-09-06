@@ -1,8 +1,23 @@
 # Changes
 
+## Release `2019.9`
+
+> commits: **3 / [3e406aeb3c...aeca0c1932](https://github.com/OneGov/onegov-cloud/compare/3e406aeb3c...aeca0c1932)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.9)](https://buildkite.com/seantis/onegov-cloud)
+
+### Auth
+
+🎉 **Adds app-specific role maps for LDAP**
+
+Without this change all applications whould share the same role map,
+which is too limiting for the general OneGov Cloud use.
+
+**`Feature`** | **[3e406aeb3c](https://github.com/onegov/onegov-cloud/commit/3e406aeb3c59e258e309f260cc525d77cb508dcd)**
+
 ## Release `2019.8`
 
-> commits: **1 / [a728bf78f8...a728bf78f8](https://github.com/OneGov/onegov-cloud/compare/a728bf78f8...a728bf78f8)**<br>
+> released: **2019-09-06 12:43**<br>
+> commits: **2 / [a728bf78f8...75d00e69fc](https://github.com/OneGov/onegov-cloud/compare/a728bf78f8...75d00e69fc)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.8)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Auth
