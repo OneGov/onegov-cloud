@@ -197,6 +197,7 @@ class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
             name_attribute=cfg.get('name_attribute', 'cn'),
             mails_attribute=cfg.get('mails_attribute', 'mail'),
             groups_attribute=cfg.get('groups_attribute', 'memberOf'),
+            suffix=cfg.get('suffix', None),
             roles=cfg.get('roles', {
                 '__default__': {
                     'admins': 'admins',
