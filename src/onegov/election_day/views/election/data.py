@@ -110,7 +110,4 @@ def view_election_aggregated_lists_data(self, request):
 
     """" View the lists as JSON. Used to for the lists bar chart. """
 
-    result = get_aggregated_list_results(self, request.session)
-    assert result
-    return result
-
+    return get_aggregated_list_results(self, request.session)
