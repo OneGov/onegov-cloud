@@ -5,9 +5,10 @@ from io import BytesIO
 from onegov.ballot import Election
 from onegov.core.utils import module_path
 from onegov.election_day.formats import import_election_wabstic_majorz
-from onegov.election_day.formats.common import print_errors
 from onegov.election_day.models import Canton
 from pytest import mark
+
+from tests.onegov.election_day.common import print_errors
 
 
 @mark.parametrize("tar_file", [

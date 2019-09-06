@@ -172,12 +172,3 @@ def validate_integer(line, col, treat_none_as_default=True, default=0):
     except ValueError:
         raise ValueError(_('Invalid integer: ${col}',
                            mapping={'col': col}))
-
-
-# Helpers
-def print_errors(errors):
-    error_list = sorted([
-        (e.filename, e.line, e.error.interpolate()) for e in errors
-    ])
-    for fn, l, err in error_list:
-        print(f'{fn}:{l} {err}')
