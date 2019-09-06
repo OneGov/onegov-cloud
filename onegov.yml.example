@@ -127,6 +127,10 @@ configuration: &global-config
     # Login with LDAP, using Kerberos as authentication
     ldap_kerberos:
 
+      # If set to true, the provider will automatically log in users that
+      # hit the root page (/) if they have an account
+      auto_login: true
+
       # Kerberos configuration
       kerberos_keytab: /etc/keytab
       kerberos_hostname: ogc.example.org

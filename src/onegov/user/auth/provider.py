@@ -9,6 +9,7 @@ from onegov.user.models.user import User
 from translationstring import TranslationString
 from typing import Optional
 from ua_parser import user_agent_parser
+from webob.exc import HTTPClientError
 
 
 AUTHENTICATION_PROVIDERS = {}
@@ -67,6 +68,9 @@ class AuthenticationProvider(metaclass=ABCMeta):
     def __init_subclass__(cls, metadata, **kwargs):
         global AUTHENTICATION_PROVIDERS
         assert metadata.name not in AUTHENTICATION_PROVIDERS
+
+        # reserved names
+        assert metadata.name not in ('auto', )
 
         cls.metadata = metadata
         AUTHENTICATION_PROVIDERS[metadata.name] = cls
@@ -210,7 +214,7 @@ class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
             return response
 
         # authentication failed
-        if response is None:
+        if response is None or isinstance(response, HTTPClientError):
             return Failure(_("Authentication failed"))
 
         # we got authentication, do we also have authorization?
@@ -223,7 +227,7 @@ class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
             }))
 
         return Success(user, _("Successfully logged in as «${user}»", mapping={
-            'user': name
+            'user': user.username
         }))
 
     def request_authorization(self, request, username):
