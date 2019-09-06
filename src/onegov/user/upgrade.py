@@ -204,3 +204,16 @@ def add_type_column(context):
 def add_authentication_provider_column(context):
     context.operations.add_column(
         'users', Column('authentication_provider', JSON, nullable=True))
+
+
+@upgrade_task('Drop authentication_provider column')
+def drop_authentication_provider_column(context):
+    context.operations.drop_column('users', 'authentication_provider')
+
+
+@upgrade_task('Add source column')
+def add_source_column(context):
+    context.operations.add_column(
+        'users',
+        Column('source', Text, nullable=True, default=None)
+    )

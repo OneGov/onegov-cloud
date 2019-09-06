@@ -1,4 +1,5 @@
 import os
+import platform
 import port_for
 import pytest
 import shlex
@@ -467,3 +468,23 @@ def redis_url(redis_server):
     yield url
 
     Redis.from_url(url).flushall()
+
+
+@pytest.fixture(scope="session")
+def glauth_binary():
+    v = '1.1.1'
+    n = platform.system() == 'Darwin' and 'glauthOSX' or 'glauth64'
+    url = f'https://github.com/glauth/glauth/releases/download/v{v}/{n}'
+
+    path = f'/tmp/glauth'
+
+    if not os.path.exists(path):
+        http = urllib3.PoolManager()
+
+        with http.request('GET', url, preload_content=False) as r:
+            with open(path, 'wb') as f:
+                shutil.copyfileobj(r, f)
+
+        os.chmod('/tmp/glauth', 0o755)
+
+    return path

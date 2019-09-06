@@ -84,6 +84,7 @@ setup(
         'kerberos',
         'langdetect',
         'lazy-object-proxy',
+        'ldap3',
         'libres',
         'libsass',
         'lxml',

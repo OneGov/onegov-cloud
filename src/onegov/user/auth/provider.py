@@ -1,18 +1,15 @@
-import kerberos
-import os
-
 from abc import ABCMeta, abstractmethod
 from attr import attrs, attrib
-from attr.validators import in_
-from contextlib import contextmanager
-from onegov.form import WTFormsClassBuilder
-from onegov.user import _, log
+from morepath import Response
+from onegov.core.crypto import random_token
+from onegov.user import _, log, UserCollection
+from onegov.user.auth.clients import KerberosClient
+from onegov.user.auth.clients import LDAPClient
 from onegov.user.models.user import User
-from webob.exc import HTTPUnauthorized
-from wtforms.fields import BooleanField, RadioField, StringField
 from translationstring import TranslationString
 from typing import Optional
 from ua_parser import user_agent_parser
+from webob.exc import HTTPClientError
 
 
 AUTHENTICATION_PROVIDERS = {}
@@ -55,154 +52,6 @@ class ProviderMetadata(object):
     title: str = attrib()
 
 
-@attrs(slots=True, frozen=True)
-class UserField(object):
-    """ Defines user-specific field.
-
-    The following properties are required:
-
-        * suffix => part of the attribute name ([a-z_]+)
-        * label => the translatable label of the field
-        * type => the type of the field (currently only 'string')
-
-    """
-
-    field_classes = {'string': StringField}
-
-    suffix: str = attrib()
-    label: TranslationString = attrib()
-    type: str = attrib(validator=in_(field_classes.keys()))
-
-    @property
-    def field_class(self):
-        return self.field_classes[self.type]
-
-
-def include_provider_form_fields(providers, form_class):
-    """ Extends a form_class with provider selection.
-
-    The form class contains a list of providers to chose from and the
-    configuration necessary on the user for each provider. The providers
-    list is expected to be a list of provider instances.
-
-    The resulting data is automatically applied if the user is used
-    as a base for the model (via the authentication_provider property).
-
-    The form class is always returned with a new authentication_provider
-    that can be stored on the user property of the same name.
-
-    This property is available even if there are no providers - in this case
-    it will always return None.
-
-    """
-
-    class AuthProviderForm(form_class):
-
-        @property
-        def authentication_provider(self):
-            if not providers:
-                return None
-
-            provider = provider_by_name(providers, self.provider.data)
-
-            if not provider:
-                return None
-
-            fields = {}
-
-            for field in provider.user_fields:
-                form_field = f'{provider.metadata.name}_{field.suffix}'
-                fields[field.suffix] = getattr(self, form_field).data
-
-            return {
-                'name': provider.metadata.name,
-                'fields': fields,
-                'required': self.provider_required.data,
-            }
-
-        @authentication_provider.setter
-        def authentication_provider(self, data):
-            self.provider.data = data['name']
-            self.provider_required.data = data['required']
-
-            for key, value in data['fields'].items():
-                form_field = f"{data['name']}_{key}"
-                getattr(self, form_field).data = value
-
-        def ensure_no_conflict(self):
-            if not providers:
-                return
-
-            provider = provider_by_name(providers, self.provider.data)
-
-            if not provider:
-                return
-
-            fields = self.authentication_provider['fields']
-            user = isinstance(self.model, User) and self.model or None
-
-            if provider.conflicts(self.request, fields, user):
-                self.provider.errors.append(_(
-                    "The provider configuration of this user conflicts "
-                    "with the configuration of another user."
-                ))
-                return False
-
-        def populate_obj(self, model):
-            super().populate_obj(model)
-
-            if providers:
-                model.authentication_provider = self.authentication_provider
-
-        def process_obj(self, model):
-            super().process_obj(model)
-
-            if providers and model.authentication_provider:
-                self.authentication_provider = model.authentication_provider
-
-    if not providers:
-        return AuthProviderForm
-
-    choices = [('none', _("None"))]
-    choices.extend((p.metadata.name, p.metadata.title) for p in providers)
-
-    builder = WTFormsClassBuilder(base_class=AuthProviderForm)
-    builder.set_current_fieldset(_("Third-Party Authentication"))
-
-    builder.add_field(
-        field_class=RadioField,
-        field_id='provider',
-        label=_("Provider"),
-        required=False,
-        default='none',
-        choices=choices
-    )
-
-    for provider in providers:
-        for field in provider.user_fields:
-
-            builder.add_field(
-                field_class=field.field_class,
-                field_id=f'{provider.metadata.name}_{field.suffix}',
-                label=field.label,
-                required=True,
-                depends_on=('provider', provider.metadata.name)
-            )
-
-    builder.add_field(
-        field_class=BooleanField,
-        field_id='provider_required',
-        label=_("Force login through provider"),
-        required=False,
-        description=_(
-            "Forces the user to use this provider. Regular username/password "
-            "authentication will be disabled!"
-        ),
-        depends_on=('provider', '!none'))
-
-    return builder.form_class
-
-
 @attrs()
 class AuthenticationProvider(metaclass=ABCMeta):
     """ Base class and registry for third party authentication providers. """
@@ -220,6 +69,9 @@ class AuthenticationProvider(metaclass=ABCMeta):
         global AUTHENTICATION_PROVIDERS
         assert metadata.name not in AUTHENTICATION_PROVIDERS
 
+        # reserved names
+        assert metadata.name not in ('auto', )
+
         cls.metadata = metadata
         AUTHENTICATION_PROVIDERS[metadata.name] = cls
 
@@ -231,7 +83,7 @@ class AuthenticationProvider(metaclass=ABCMeta):
 
         Providers are expected to return one of the following values:
 
-        * A valid user (if the authentication was successful)
+        * A conclusion (if the authentication was either successful or failed)
         * None (if the authentication failed)
         * A webob response (to perform handshakes)
 
@@ -243,19 +95,6 @@ class AuthenticationProvider(metaclass=ABCMeta):
         in a way that eventually end up fulfilling the authentication. At the
         very least, providers should ensure that all parameters of the original
         request are kept when asking external services to call back.
-
-        """
-
-    @abstractmethod
-    def conflicts(self, request, fields, current_user):
-        """ Returns true if the given fields of the given user conflict
-        with the fields of another user (!= current_user).
-
-        This method should be implemented to ensure that a single
-        authentication doesn't apply to multiple users.
-
-        Note that the current_user may be None, in which case the check should
-        be done over all users.
 
         """
 
@@ -273,19 +112,6 @@ class AuthenticationProvider(metaclass=ABCMeta):
 
         """
 
-    def available_users(self, request):
-        """ Returns a query limited to users which may be authenticated
-        using the given provider.
-
-        This should be used as a base for the identification, rather than
-        building your own query, as inactive users and ones without the
-        proper configuration are excluded.
-
-        """
-        return request.session.query(User)\
-            .filter_by(active=True)\
-            .filter(User.authentication_provider['name'] == self.metadata.name)
-
     @classmethod
     def configure(cls, **kwargs):
         """ This function gets called with the per-provider configuration
@@ -299,84 +125,75 @@ class AuthenticationProvider(metaclass=ABCMeta):
 
         return cls()
 
-    @property
-    def user_fields(self, request):
-        """ Optional fields required by the provider on the user. Should return
-        something that is iterable (even if only one or no fields are used).
 
-        See :class:`UserField`.
-        """
-
-        return ()
-
-
-@attrs()
-class KerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
-    name='kerberos', title=_("Kerberos (v5)")
+@attrs(auto_attribs=True)
+class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
+    name='ldap_kerberos', title=_("LDAP Kerberos")
 )):
-    """ Kerberos is a computer-network authentication protocol that works on
-    the basis of tickets to allow nodes communicating over a non-secure network
-    to prove their identity to one another in a secure manner.
+    """ Classic LDAP provider using python-ldap, combined with kerberos
 
     """
 
-    keytab: str = attrib()
-    hostname: str = attrib()
-    service: str = attrib()
+    # The LDAP client to use
+    ldap: LDAPClient = attrib()
 
-    @property
-    def user_fields(self):
-        yield UserField('username', _("Kerberos username"), 'string')
+    # The Kerberos client to use
+    kerberos: KerberosClient = attrib()
+
+    # LDAP attributes configuration
+    name_attribute: str
+    mails_attribute: str
+    groups_attribute: str
+
+    # Authorization configuration
+    admin_group: str
+    editor_group: str
+    member_group: str
 
     @classmethod
     def configure(cls, **cfg):
-        keytab = cfg.get('keytab', None)
-        hostname = cfg.get('hostname', None)
-        service = cfg.get('service', None)
 
-        if not keytab:
+        # Providers have to decide themselves if they spawn or not
+        if not cfg:
             return None
 
-        if not hostname:
-            return None
+        # LDAP configuration
+        ldap = LDAPClient(
+            url=cfg.get('ldap_url', None),
+            username=cfg.get('ldap_username', None),
+            password=cfg.get('ldap_password', None),
+        )
 
-        if not service:
-            return None
+        try:
+            ldap.try_configuration()
+        except Exception as e:
+            raise ValueError(f"LDAP config error: {e}")
 
-        provider = cls(keytab, hostname, service)
+        # Kerberos configuration
+        kerberos = KerberosClient(
+            keytab=cfg.get('kerberos_keytab', None),
+            hostname=cfg.get('kerberos_hostname', None),
+            service=cfg.get('kerberos_service', None))
 
-        with provider.context():
-            try:
-                kerberos.getServerPrincipalDetails(
-                    provider.service, provider.hostname)
-            except kerberos.KrbError as e:
-                log.warning(f"Kerberos config error: {e}")
-            else:
-                return provider
+        try:
+            kerberos.try_configuration()
+        except Exception as e:
+            raise ValueError(f"Kerberos config error: {e}")
 
-    @contextmanager
-    def context(self):
-        """ Runs the block inside the context manager with the keytab
-        set to the provider's keytab.
-
-        All functions that interact with kerberos must be run inside
-        this context.
-
-        For convenience, this context returns the kerberos module
-        when invoked.
-
-        """
-        previous = os.environ.pop('KRB5_KTNAME', None)
-        os.environ['KRB5_KTNAME'] = self.keytab
-
-        yield
-
-        if previous is not None:
-            os.environ['KRB5_KTNAME'] = previous
+        return cls(
+            ldap=ldap,
+            kerberos=kerberos,
+            name_attribute=cfg.get('name_attribute', 'cn'),
+            mails_attribute=cfg.get('mails_attribute', 'mail'),
+            groups_attribute=cfg.get('groups_attribute', 'memberOf'),
+            admin_group=cfg.get('admin_group', 'admins'),
+            editor_group=cfg.get('editor_group', 'editors'),
+            member_group=cfg.get('member_group', 'members'),
+        )
 
     def button_text(self, request):
         """ Returns the request tailored to each OS (users won't understand
-        Kerberos, but for them it's basically their local OS login).
+        LDAP/Kerberos, but for them it's basically their local OS login).
 
         """
         agent = user_agent_parser.Parse(request.user_agent or "")
@@ -389,94 +206,87 @@ class KerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
             'operating_system': agent_os
         })
 
-    def conflicts(self, request, fields, current_user):
-        """ Returns true if there's another user with the same username. """
-        selector = User.authentication_provider['fields']['username']
-
-        query = self.available_users(request)\
-            .filter(selector == fields['username'])
-
-        if current_user:
-            query = query.filter(User.id != current_user.id)
-
-        return query.first() and True or False
-
     def authenticate_request(self, request):
-        """ Authenticates the kerberos request.
+        response = self.kerberos.authenticated_username(request)
 
-        The kerberos handshake is as follows:
-
-        1. An HTTPUnauthorized response (401) is returned, with the
-           WWW-Authenticate header set to "Negotiate"
-
-        2. The client sends a request with the Authorization header set
-           to the kerberos ticket.
-
-        """
-
-        # extract the token
-        token = request.headers.get('Authorization')
-        token = token and ''.join(token.split()[1:]).strip()
-
-        def with_header(response, include_token=True):
-            if include_token and token:
-                negotiate = f'Negotiate {token}'
-            else:
-                negotiate = 'Negotiate'
-
-            response.headers['WWW-Authenticate'] = negotiate
-
+        # handshake
+        if isinstance(response, Response):
             return response
 
-        def negotiate():
-            # only mirror the token back, if it is valid, which is never
-            # the case in the negotiate step
-            return with_header(HTTPUnauthorized(), include_token=False)
+        # authentication failed
+        if response is None or isinstance(response, HTTPClientError):
+            return Failure(_("Authentication failed"))
 
-        # ask for a token
-        if not token:
-            return negotiate()
+        # we got authentication, do we also have authorization?
+        name = response
+        user = self.request_authorization(request=request, username=name)
 
-        # verify the token
-        with self.context():
+        if user is None:
+            return Failure(_("User «${user}» is not authorized", mapping={
+                'user': name
+            }))
 
-            # initialization step
-            result, state = kerberos.authGSSServerInit(self.service)
+        return Success(user, _("Successfully logged in as «${user}»", mapping={
+            'user': user.username
+        }))
 
-            if result != kerberos.AUTH_GSS_COMPLETE:
-                return negotiate()
+    def request_authorization(self, request, username):
 
-            # challenge step
-            result = kerberos.authGSSServerStep(state, token)
+        entries = self.ldap.search(
+            query=f'({self.name_attribute}={username})',
+            attributes=[self.mails_attribute, self.groups_attribute])
 
-            if result != kerberos.AUTH_GSS_COMPLETE:
-                return negotiate()
+        if not entries:
+            log.warning(f"No LDAP entries for {username}")
+            return None
 
-            # extract the final token
-            token = kerberos.authGSSServerResponse(state)
+        if len(entries) > 1:
+            tip = ', '.join(entries.keys())
+            log.warning(f"Multiple LDAP entries for {username}: {tip}")
+            return None
 
-            # include the token in the response
-            request.after(with_header)
+        attributes = next(v for v in entries.values())
 
-            # extract the user if possible
-            username = kerberos.authGSSServerUserName(state)
-            selector = User.authentication_provider['fields']['username']
+        mails = attributes[self.mails_attribute]
+        if not mails:
+            log.warning(f"No e-mail addresses for {username}")
+            return None
 
-            user = self.available_users(request)\
-                .filter(selector == username)\
-                .first()
+        groups = attributes[self.groups_attribute]
+        if not groups:
+            log.warning(f"No groups for {username}")
+            return None
 
-            if user:
-                return Success(
-                    user=user,
-                    note=_(
-                        "You have been logged in as ${user} (via ${identity})",
-                        mapping={'user': user.username, 'identity': username}
-                    )
-                )
+        # get the common name of the groups
+        groups = {g.split(',')[0].split('cn=')[-1] for g in groups}
 
-            return Failure(
-                note=_(
-                    "Your identity ${identity} is not authorized",
-                    mapping={'identity': username}
-                ))
+        if self.admin_group in groups:
+            role = 'admin'
+        elif self.editor_group in groups:
+            role = 'editor'
+        elif self.member_group in groups:
+            role = 'member'
+        else:
+            log.warning(f"No authorized group for {username}")
+            return None
+
+        return self.ensure_user(
+            session=request.session,
+            username=mails[0],
+            role=role)
+
+    def ensure_user(self, session, username, role):
+        users = UserCollection(session)
+        user = users.by_username(username)
+
+        if not user:
+            user = users.add(
+                username=username,
+                password=random_token(),
+                role=role
+            )
+
+        # update the role in all cases, should it change
+        user.role = role
+
+        return user

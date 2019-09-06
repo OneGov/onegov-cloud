@@ -72,7 +72,7 @@ configuration: &global-config
   # sentry_environment: testing
   # sentry_version: test
 
-  # Onegov holds two sorts of mail. Transactional, non-spammy e-mail or
+  # OneGov holds two sorts of mail. Transactional, non-spammy e-mail or
   # marketing e-mail. Though they can both have different configurations,
   # in development we usually use https://mailcatcher.me to look at
   # sent e-mails.
@@ -120,6 +120,36 @@ configuration: &global-config
       oauth_gateway_auth: foobar
       # the client-specific secret that is used to authenticate the
       oauth_gateway_secret: barfoo
+
+  # Alternative login providers
+  authentication_providers:
+    
+    # Login with LDAP, using Kerberos as authentication
+    ldap_kerberos:
+
+      # If set to true, the provider will automatically log in users that
+      # hit the root page (/) if they have an account
+      auto_login: true
+
+      # Kerberos configuration
+      kerberos_keytab: /etc/keytab
+      kerberos_hostname: ogc.example.org
+      kerberos_service: HTTP
+
+      # LDAP configuration (TLS is required!)
+      ldap_url: ldaps://ldap.example.org
+      ldap_username: 'cn=service,ou=service,dc=seantis,dc=ch'
+      ldap_password: 'hunter2'
+
+      # LDAP attributes
+      name_attribute: cn
+      mails_attribute: mail
+      groups_attribute: memberOf
+
+      # Role mapping
+      admin_group: admins
+      editor_group: editors
+      member_group: members
 
 # All supported applications
 applications:
