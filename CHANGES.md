@@ -1,8 +1,22 @@
 # Changes
 
+## Release `2019.10`
+
+> commits: **1 / [ac565ca225...ac565ca225](https://github.com/OneGov/onegov-cloud/compare/ac565ca225...ac565ca225)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.10)](https://buildkite.com/seantis/onegov-cloud)
+
+### Election-Day
+
+🎉 **Adds api endpoint with aggregated information for national council elections**
+
+The endpoint is available under the url `/election/eample/data-aggregated-lists`.
+
+**`Feature`** | **[ac565ca225](https://github.com/onegov/onegov-cloud/commit/ac565ca22590faf46e01f8325bd5f52833ff7a97)**
+
 ## Release `2019.9`
 
-> commits: **3 / [3e406aeb3c...aeca0c1932](https://github.com/OneGov/onegov-cloud/compare/3e406aeb3c...aeca0c1932)**<br>
+> released: **2019-09-06 15:09**<br>
+> commits: **4 / [3e406aeb3c...3c9b101357](https://github.com/OneGov/onegov-cloud/compare/3e406aeb3c...3c9b101357)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.9)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Auth
