@@ -1,8 +1,22 @@
 # Changes
 
+## Release `2019.8`
+
+> commits: **1 / [a728bf78f8...a728bf78f8](https://github.com/OneGov/onegov-cloud/compare/a728bf78f8...a728bf78f8)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.8)](https://buildkite.com/seantis/onegov-cloud)
+
+### Auth
+
+🎉 **Integrates Kerberos/LDAP**
+
+A new authentication provider provides LDAP authentication together with Kerberos. The request is authenticated by Kerberos (providing a username), the user authorised by LDAP.
+
+**`Feature`** | **[a728bf78f8](https://github.com/onegov/onegov-cloud/commit/a728bf78f8a2025e3b63ff4db3fe2b7342ceed91)**
+
 ## Release `2019.7`
 
-> commits: **7 / [64c5f5bdfb...80af30dfe4](https://github.com/OneGov/onegov-cloud/compare/64c5f5bdfb...80af30dfe4)**<br>
+> released: **2019-09-05 17:40**<br>
+> commits: **8 / [64c5f5bdfb...f48727bc88](https://github.com/OneGov/onegov-cloud/compare/64c5f5bdfb...f48727bc88)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.7)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Core
