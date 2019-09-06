@@ -146,6 +146,11 @@ configuration: &global-config
       mails_attribute: mail
       groups_attribute: memberOf
 
+      # This suffix is stripped from all user names if found.
+      # For example, if Kerberos returns foo@example.org, but LDAP only
+      # contains, 'foo', then setting the suffix to '@example.org' will help.
+      suffix: '@example.org'
+
       # Role mapping
       roles:
 

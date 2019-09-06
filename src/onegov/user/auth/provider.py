@@ -2,6 +2,7 @@ from abc import ABCMeta, abstractmethod
 from attr import attrs, attrib
 from morepath import Response
 from onegov.core.crypto import random_token
+from onegov.core.utils import rchop
 from onegov.user import _, log, UserCollection
 from onegov.user.auth.clients import KerberosClient
 from onegov.user.auth.clients import LDAPClient
@@ -157,6 +158,9 @@ class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
     #
     roles: Dict[str, Dict[str, str]]
 
+    # Optional suffix that is removed from the Kerberos username if present
+    suffix: Optional[str] = None
+
     @classmethod
     def configure(cls, **cfg):
 
@@ -251,6 +255,9 @@ class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
         return self.roles.get('__default__')
 
     def request_authorization(self, request, username):
+
+        if self.suffix:
+            username = rchop(username, self.suffix)
 
         entries = self.ldap.search(
             query=f'({self.name_attribute}={username})',
