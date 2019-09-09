@@ -1,8 +1,29 @@
 # Changes
 
+## Release `2019.11`
+
+> commits: **4 / [b4ca9c0722...6cbf703c64](https://github.com/OneGov/onegov-cloud/compare/b4ca9c0722...6cbf703c64)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.11)](https://buildkite.com/seantis/onegov-cloud)
+
+### Search
+
+✨ **Improves search resilience**
+
+Elasticsearch is not guaranteed to be in sync with our database. The
+server might also not be available or all data may be temporarily gone.
+
+We have of course been aware of this and have counter-measures in the
+code. However there were some loopholes which should now be closed.
+
+Apart from the search not being available, the user should not see
+any error messages anymore at this point.
+
+**`Other`** | **[6cbf703c64](https://github.com/onegov/onegov-cloud/commit/6cbf703c64f86e322b9df00292e6529d33753546)**
+
 ## Release `2019.10`
 
-> commits: **1 / [ac565ca225...ac565ca225](https://github.com/OneGov/onegov-cloud/compare/ac565ca225...ac565ca225)**<br>
+> released: **2019-09-06 16:11**<br>
+> commits: **2 / [ac565ca225...ba85af9184](https://github.com/OneGov/onegov-cloud/compare/ac565ca225...ba85af9184)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.10)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election-Day
