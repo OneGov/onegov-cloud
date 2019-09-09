@@ -8,9 +8,6 @@ var createEmbedLink = function(el)  {
 
 (function($) {
     $(document).ready(function() {
-        $('.embedded-table').each(function(ix, el) {
-            createEmbedLink(el);
-        });
         $('.embedded-widget').each(function(ix, el) {
             createEmbedLink(el);
         });

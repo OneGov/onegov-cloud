@@ -72,7 +72,7 @@
 </metal:proposal-by-entities-table>
 
 <metal:election-connections-table define-macro="election-connections-table">
-    <div class="embedded-table">
+    <div class="embedded-widget">
 
     </div>
     <tal:block tal:repeat="connection connections">
@@ -111,7 +111,6 @@
             </tfoot>
         </table>
         </tal:block>
-        <tal:block metal:use-macro="layout.macros['embedded-table']"></tal:block>
 </metal:election-connections-table>
 
 <metal:election-compound-districts-table define-macro="election-compound-districts-table">
@@ -295,19 +294,10 @@
     </table>
 </metal:election-lists-table>
 
-<metal:embedded_table define-macro="embedded_table" i18n:domain="onegov.election_day">
-    <div tal:condition="layout.table_link|False" class="embedded-table"
-        data-embed-link="Embed"
-        data-embed-source="${layout.table_link}"
-        i18n:attributes="data-embed-source; data-embed-link"
-        >
-    </div>
-</metal:embedded_table>
-
 <metal:embedded_widget define-macro="embedded_widget" i18n:domain="onegov.election_day">
-    <div tal:condition="layout.widget_link|False" class="embedded-widget"
+    <div tal:condition="embed_link" class="embedded-widget"
         data-embed-link="Embed"
-        data-embed-source="${layout.widget_link}"
+        data-embed-source="${embed_link}"
         i18n:attributes="data-embed-source; data-embed-link"
         >
     </div>
@@ -545,7 +535,6 @@
 </metal:election_header>
 
 <metal:vote_header define-macro="vote_header" i18n:domain="onegov.election_day">
-    <div class="embedded-widget">
         <h1>${vote.title}
         <small tal:condition="layout.answer">
             <div tal:condition="layout.type == 'simple'" metal:use-macro="layout.macros['answer']" tal:define="answer layout.answer"/>
@@ -601,7 +590,6 @@
     <tal:block tal:condition="not: layout.has_results and ballot">
         <hr />
     </tal:block>
-    </div>
 </metal:vote_header>
 
 <metal:election_factoids define-macro="election_factoids" i18n:domain="onegov.election_day">
