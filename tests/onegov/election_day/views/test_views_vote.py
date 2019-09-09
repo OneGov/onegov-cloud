@@ -142,7 +142,7 @@ def test_view_vote_data(election_day_app):
         'tie-breaker-by-districts-table',
         'vote-header-widget'
 ])
-def test_view_embedded_tables(election_day_app, url):
+def test_views_vote_embedded_widgets(election_day_app, url):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
