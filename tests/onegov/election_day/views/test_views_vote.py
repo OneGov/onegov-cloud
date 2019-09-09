@@ -133,18 +133,20 @@ def test_view_vote_data(election_day_app):
     assert all((expected in export for expected in ("1711", "Zug", "16516")))
 
 
-def test_view_embedded_tables(election_day_app):
+@pytest.mark.parametrize('url,', [
+        'proposal-by-entities-table',
+        'counter-proposal-by-entities-table',
+        'proposal-by-districts-table',
+        'counter-proposal-by-districts-table',
+        'tie-breaker-by-entities-table',
+        'tie-breaker-by-districts-table',
+        'vote-header-widget'
+])
+def test_view_embedded_tables(election_day_app, url):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
     login(client)
     upload_complex_vote(client)
+    client.get(f'/vote/complex-vote/{url}')
 
-    for widget in (
-        'proposal-by-entities-table',
-        'proposal-by-districts-table',
-        'tie-breaker-by-entities-table',
-        'tie-breaker-by-districts-table',
-        'vote-header-widget'
-    ):
-        client.get(f'/vote/complex-vote/{widget}')
