@@ -1,4 +1,4 @@
-var createTableEmbedLink = function(el)  {
+var createEmbedLink = function(el)  {
     var embedLink = $(el).data('embed-link');
     var embedSource = $(el).data('embed-source');
     if (embedLink && embedSource) {
@@ -9,7 +9,10 @@ var createTableEmbedLink = function(el)  {
 (function($) {
     $(document).ready(function() {
         $('.embedded-table').each(function(ix, el) {
-            createTableEmbedLink(el);
+            createEmbedLink(el);
+        });
+        $('.embedded-widget').each(function(ix, el) {
+            createEmbedLink(el);
         });
     });
 })(jQuery);
