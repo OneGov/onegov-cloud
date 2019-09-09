@@ -261,7 +261,7 @@ def get_custom_asset():
     yield 'embed.js'
 
     # Embedded tables as widgets
-    yield 'embedded_tables.js'
+    yield 'embedded_widgets.js'
 
 
 @ElectionDayApp.webasset('backend_common')
