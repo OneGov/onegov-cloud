@@ -1,6 +1,20 @@
+import tarfile
 from datetime import date
+from io import BytesIO
 from unittest.mock import Mock
 from webtest.forms import Upload
+
+from onegov.election_day.formats import import_election_wabstic_proporz
+
+# Helpers
+
+
+def print_errors(errors):
+    error_list = sorted([
+        (e.filename, e.line, e.error.interpolate()) for e in errors
+    ])
+    for fn, l, err in error_list:
+        print(f'{fn}:{l} {err}')
 
 
 PROPORZ_HEADER = (
@@ -439,3 +453,38 @@ def upload_election_compound(client, create=True, canton='gr'):
         upload = upload.form.submit()
 
         assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+
+
+def import_wabstic_data(election, tar_file, principal, expats=False):
+    # The tar file contains a test dataset
+
+    with tarfile.open(tar_file, 'r:gz') as f:
+        regional_wp_gemeinden = f.extractfile('WP_Gemeinden.csv').read()
+        regional_wp_kandidaten = f.extractfile(
+            'WP_Kandidaten.csv').read()
+        regional_wp_kandidatengde = f.extractfile(
+            'WP_KandidatenGde.csv').read()
+        regional_wp_listen = f.extractfile('WP_Listen.csv').read()
+        regional_wp_listengde = f.extractfile('WP_ListenGde.csv').read()
+        regional_wpstatic_gemeinden = f.extractfile(
+            'WPStatic_Gemeinden.csv').read()
+        regional_wpstatic_kandidaten = f.extractfile(
+            'WPStatic_Kandidaten.csv').read()
+        regional_wp_wahl = f.extractfile('WP_Wahl.csv').read()
+
+    # Test cantonal elections
+    election.expats = expats
+
+    errors = import_election_wabstic_proporz(
+        election, principal, '1', None,
+        BytesIO(regional_wp_wahl), 'text/plain',
+        BytesIO(regional_wpstatic_gemeinden), 'text/plain',
+        BytesIO(regional_wp_gemeinden), 'text/plain',
+        BytesIO(regional_wp_listen), 'text/plain',
+        BytesIO(regional_wp_listengde), 'text/plain',
+        BytesIO(regional_wpstatic_kandidaten), 'text/plain',
+        BytesIO(regional_wp_kandidaten), 'text/plain',
+        BytesIO(regional_wp_kandidatengde), 'text/plain',
+    )
+    print_errors(errors)
+    assert not errors

@@ -1,8 +1,51 @@
 # Changes
 
+## Release `2019.10`
+
+> commits: **1 / [ac565ca225...ac565ca225](https://github.com/OneGov/onegov-cloud/compare/ac565ca225...ac565ca225)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.10)](https://buildkite.com/seantis/onegov-cloud)
+
+### Election-Day
+
+🎉 **Adds api endpoint with aggregated information for national council elections**
+
+The endpoint is available under the url `/election/eample/data-aggregated-lists`.
+
+**`Feature`** | **[ac565ca225](https://github.com/onegov/onegov-cloud/commit/ac565ca22590faf46e01f8325bd5f52833ff7a97)**
+
+## Release `2019.9`
+
+> released: **2019-09-06 15:09**<br>
+> commits: **4 / [3e406aeb3c...3c9b101357](https://github.com/OneGov/onegov-cloud/compare/3e406aeb3c...3c9b101357)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.9)](https://buildkite.com/seantis/onegov-cloud)
+
+### Auth
+
+🎉 **Adds app-specific role maps for LDAP**
+
+Without this change all applications whould share the same role map,
+which is too limiting for the general OneGov Cloud use.
+
+**`Feature`** | **[3e406aeb3c](https://github.com/onegov/onegov-cloud/commit/3e406aeb3c59e258e309f260cc525d77cb508dcd)**
+
+## Release `2019.8`
+
+> released: **2019-09-06 12:43**<br>
+> commits: **2 / [a728bf78f8...75d00e69fc](https://github.com/OneGov/onegov-cloud/compare/a728bf78f8...75d00e69fc)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.8)](https://buildkite.com/seantis/onegov-cloud)
+
+### Auth
+
+🎉 **Integrates Kerberos/LDAP**
+
+A new authentication provider provides LDAP authentication together with Kerberos. The request is authenticated by Kerberos (providing a username), the user authorised by LDAP.
+
+**`Feature`** | **[a728bf78f8](https://github.com/onegov/onegov-cloud/commit/a728bf78f8a2025e3b63ff4db3fe2b7342ceed91)**
+
 ## Release `2019.7`
 
-> commits: **7 / [64c5f5bdfb...80af30dfe4](https://github.com/OneGov/onegov-cloud/compare/64c5f5bdfb...80af30dfe4)**<br>
+> released: **2019-09-05 17:40**<br>
+> commits: **8 / [64c5f5bdfb...f48727bc88](https://github.com/OneGov/onegov-cloud/compare/64c5f5bdfb...f48727bc88)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.7)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Core
