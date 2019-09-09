@@ -1,4 +1,4 @@
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from itertools import groupby
 
 from onegov.ballot import List
@@ -19,7 +19,7 @@ class LastUpdatedOrderedDict(OrderedDict):
         super().move_to_end(key)
 
 
-def get_aggregated_list_results(election, session):
+def get_aggregated_list_results(election, session, use_checks=False):
     if election.type == 'majorz':
         return {}
 
@@ -32,12 +32,21 @@ def get_aggregated_list_results(election, session):
     result = session.execute(query)
 
     data = LastUpdatedOrderedDict({})
-    list_id_count = 0
+
+    # checks
+    lst_ids = set()
+    lst_list_ids = set()
+    lst_names = set()
+
     for lid, g in groupby(result, lambda l: l.id):
-        list_id_count += 1
         for lst in g:
+            lst_ids.add(lst.id)
+            lst_list_ids.add(lst.list_id)
+            lst_names.add(lst.name)
+
             # key can be id or name, count was the same
-            key = f'{lst.name}-{lst.list_id}'
+            # key = f'{lst.name}-{lst.list_id}'
+            key = lst.id
             data.setdefault(
                 key,
                 {
@@ -55,15 +64,38 @@ def get_aggregated_list_results(election, session):
                 'total_votes': lst.candidate_votes,
                 'perc_to_list_votes': float(lst.perc_to_list_votes)
             })
-    assert len(data.keys()) == list_id_count, 'There are more grouped keys ' \
-                                              'than now entries ' \
-                                              'in your result.' \
-                                              'You are loosing data!'
+
+
+    # all of these must be unique for an election
+    assert len(lst_ids) == len(lst_list_ids)
+    assert len(lst_list_ids) == len(lst_names)
+
+    check_msg = defaultdict(list)
     total_percentage = 0
+    candidates_perc = defaultdict(int)
+    candidates_votes = defaultdict(int)
+
     for name, item in data.items():
         total_percentage += item['perc_to_total_votes']
-    assert total_percentage == 100
-    return data
+        for candidate in item['candidates']:
+            candidates_perc[item['name']] += candidate['perc_to_list_votes']
+            candidates_votes[item['name']] += candidate['total_votes']
+
+    for name, perc in candidates_perc.items():
+        if not perc <= 100:
+            check_msg['lists'].append(
+                f'All candidate votes / all list results '
+                                   f'> 100% for list {name}: {perc}.')
+
+    if not total_percentage == 100:
+        check_msg['total_percentage'].append(
+            f'Summing of all perc_to_total_votes'
+            f' not exactly 100%: {total_percentage}')
+
+    return {
+        'validations': check_msg,
+        'results': list(data.values())
+        }
 
 
 def get_list_results(election, session):
