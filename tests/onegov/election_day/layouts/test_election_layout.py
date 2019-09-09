@@ -373,7 +373,7 @@ def test_election_layout_menu_proporz(session):
     ('lists', 'Election/lists-table'),
     ('list-by-entity', None),
     ('list-by-district', None),
-    ('connections', None),
+    ('connections', 'Election/connections-table'),
     ('lists-panachage', None),
     ('candidates', 'Election/candidates-table'),
     ('candidate-by-entity', None),
