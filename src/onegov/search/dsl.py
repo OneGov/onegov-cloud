@@ -98,6 +98,10 @@ class Response(BaseResponse):
         """ Loads all results by querying the SQLAlchemy session in the order
         they were returned by elasticsearch.
 
+        Note that the resulting lists may include None values, since we are
+        might get elasticsearch results for which we do not have a model
+        on the database (the data is then out of sync).
+
         """
 
         positions = {}
