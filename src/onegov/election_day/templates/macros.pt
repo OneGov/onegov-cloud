@@ -536,7 +536,6 @@
 </metal:election_header>
 
 <metal:vote_header define-macro="vote_header" i18n:domain="onegov.election_day">
-    <div metal:use-macro="layout.macros['election_day_link']" tal:define="date vote.date"/>
     <h1>
         ${vote.title}
         <small tal:condition="layout.answer">
