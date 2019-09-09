@@ -101,6 +101,7 @@ def test_vote_layout_1(session):
         assert layout.svg_link == 'Ballot/districts-map-svg'
         assert layout.svg_name == 'vote-__districts.svg'
         assert layout.table_link == 'ComplexVote/proposal-by-districts-table'
+        assert layout.widget_link == 'ComplexVote/vote-header-widget'
 
         layout = VoteLayout(vote, request, 'proposal-entities')
         layout.has_districts = True
