@@ -83,6 +83,13 @@ html {
             height: .5rem;
         }
     }
+    .embedded-widget {
+        height: 1.7rem;
+        display: flex;
+        align-items: center;
+        flex-direction: row-reverse;
+
+    }
 }
 
 /*
