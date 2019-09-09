@@ -1,3 +1,4 @@
+import pytest
 from freezegun import freeze_time
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import upload_complex_vote
@@ -131,11 +132,19 @@ def test_view_vote_data(election_day_app):
     export = client.get('/vote/vote/data-csv')
     assert all((expected in export for expected in ("1711", "Zug", "16516")))
 
+
 def test_view_embedded_tables(election_day_app):
-    # proposal-by-entities-table
-    # counter-proposal-by-entities-table
-    # proposal-by-districts-table
-    # counter-proposal-by-districts-table
-    # tie-breaker-by-entities-table
-    # tie-breaker-by-districts-table
-    pass
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+    upload_complex_vote(client)
+
+    for widget in (
+        'proposal-by-entities-table',
+        'proposal-by-districts-table',
+        'tie-breaker-by-entities-table',
+        'tie-breaker-by-districts-table',
+        'vote-header-widget'
+    ):
+        client.get(f'/vote/complex-vote/{widget}')
