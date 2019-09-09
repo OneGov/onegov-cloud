@@ -178,7 +178,7 @@ def view_vote_pdf(self, request):
 
 @ElectionDayApp.html(
     model=Vote,
-    name='vote-header',
+    name='vote-header-widget',
     permission=Public,
     template='embed.pt'
 )
