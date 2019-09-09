@@ -149,7 +149,7 @@ def view_ballot_as_table(self, request):
 )
 def view_vote_districts_table_proposal(self, request):
 
-    """ A static link to the map of the proposal. """
+    """ A static link to the table by districts of the proposal. """
 
     return redirect(request.link(self.proposal, name='districts-table'))
 
@@ -161,7 +161,7 @@ def view_vote_districts_table_proposal(self, request):
 )
 def view_vote_districts_table_counter_proposal(self, request):
 
-    """ A static link to the map of the counter proposal. """
+    """ A static link to the table by districts of the counter proposal. """
 
     return redirect(request.link(self.counter_proposal,
                                  name='districts-table'))
@@ -174,7 +174,7 @@ def view_vote_districts_table_counter_proposal(self, request):
 )
 def view_vote_districts_table_tie_breaker(self, request):
 
-    """ A static link to the table of the tie breaker. """
+    """ A static link to the table of the tie breaker by districts. """
 
     return redirect(request.link(self.tie_breaker, name='districts-table'))
 

@@ -4,7 +4,7 @@ from onegov.ballot import Vote
 from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.layouts import VoteLayout, DefaultLayout
+from onegov.election_day.layouts import VoteLayout
 from onegov.election_day.utils import add_cors_header
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_vote_summary
@@ -184,7 +184,7 @@ def view_vote_pdf(self, request):
 )
 def view_vote_header_as_widget(self, request):
 
-    """ A static link to the table of the tie breaker. """
+    """ A static link to the top bar showing the vote result as widget. """
 
     @request.after
     def add_last_modified(response):
@@ -196,5 +196,3 @@ def view_vote_header_as_widget(self, request):
         'type': 'vote-header',
         'scope': 'vote',
     }
-
-
