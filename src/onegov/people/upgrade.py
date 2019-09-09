@@ -130,7 +130,7 @@ def add_order_within_person_column(context):
         for ix, membership in enumerate(s_m):
             index_mapping[membership[0].id] = ix
 
-    if not context.has_column('agency_memberships', 'order_withing_person'):
+    if not context.has_column('agency_memberships', 'order_within_person'):
         context.add_column_with_defaults(
             'agency_memberships',
             Column('order_within_person', Integer, nullable=False),
