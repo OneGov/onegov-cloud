@@ -21,7 +21,7 @@ list_results AS (
         l.list_id,
         number_of_mandates,
         name,
-        sum(lr.votes) as votes
+        sum(lr.votes) as list_votes
     FROM lists l
     LEFT JOIN list_results lr ON l.id = lr.list_id
     GROUP BY
@@ -30,6 +30,14 @@ list_results AS (
             l.id,
             l.number_of_mandates,
             l.name
+),
+
+election_total_list_votes AS (
+    SELECT
+        election_id,
+        SUM(lr.list_votes) as election_list_votes
+    FROM list_results lr
+    GROUP BY election_id
 ),
 
 candidate_results as (
@@ -47,35 +55,61 @@ candidate_results as (
             c.list_id,
             c.family_name,
             c.first_name
+),
+
+candidate_results_by_list AS (
+    SELECT
+           list_id,
+           election_id,
+           SUM(cr.candidate_votes) as candidate_votes_by_list
+
+    FROM candidate_results cr
+    GROUP BY
+            list_id,
+            election_id
+),
+
+election_total_candidate_votes AS (
+    SELECT
+           election_id,
+           SUM(candidate_votes) as election_candidate_votes
+    FROM candidate_results
+    GROUP BY election_id
 )
 
 SELECT
     CAST(l.id AS TEXT) AS id,     -- TEXT
     l.list_id,                    -- TEXT
-    CASE
-        WHEN ar.accounted_votes < 0
-            THEN 0
-    ELSE ar.accounted_votes
-    END as accounted_votes, -- Numeric
     l.election_id,          -- UUID
     l.name,                 -- Text
-    l.votes,                -- Numeric
+    l.list_votes,                -- Numeric
+    crbl.candidate_votes_by_list,  -- Numeric
+    etl.election_list_votes,    -- Numeric
+    etcv.election_candidate_votes,    -- Numeric
+    c.candidate_votes,      -- Numeric
     l.number_of_mandates,   --Numeric
     c.family_name,          --Text
     c.first_name,           --Text
-    c.candidate_votes,      -- Numeric
-    round(l.votes::DECIMAL / ar.accounted_votes * 100, 1) as perc_to_total_votes,        -- Numeric
+
     CASE
-        WHEN l.votes = 0
+        WHEN etl.election_list_votes = 0
             THEN 0
-        ELSE round(c.candidate_votes::DECIMAL / l.votes * 100, 1)
-    END as perc_to_list_votes   -- Numeric
+        ELSE round(l.list_votes::DECIMAL / etl.election_list_votes * 100, 1)        -- Numeric
+    END as perc_to_total_votes,
+    CASE
+        WHEN l.list_votes = 0
+            THEN 0
+        ELSE round(c.candidate_votes::DECIMAL / l.list_votes * 100, 1)
+    END as perc_to_list_votes                                               -- Numeric
 
 FROM list_results l
 LEFT JOIN candidate_results c ON l.id = c.list_id
 LEFT JOIN agg_election_results ar ON l.election_id = ar.election_id
+LEFT JOIN election_total_list_votes etl ON l.election_id = etl.election_id
+LEFT JOIN election_total_candidate_votes etcv ON l.election_id = etcv.election_id
+LEFT JOIN candidate_results_by_list crbl ON l.id = crbl.list_id
 ORDER BY
-    l.votes DESC,
+    l.list_votes DESC,
     c.candidate_votes DESC,
     l.name,
     c.family_name
