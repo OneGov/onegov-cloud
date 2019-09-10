@@ -72,7 +72,6 @@ def get_aggregated_list_results(election, session, use_checks=False):
                 'perc_to_list_votes': float(lst.perc_to_list_votes)
             })
 
-
     # all of these must be unique for an election
     assert len(lst_ids) == len(lst_list_ids)
     assert len(lst_list_ids) == len(lst_names)
@@ -97,7 +96,7 @@ def get_aggregated_list_results(election, session, use_checks=False):
         'summary': summary,
         'validations': validations,
         'results': data
-        }
+    }
 
 
 def get_list_results(election, session):

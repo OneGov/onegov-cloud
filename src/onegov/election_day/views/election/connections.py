@@ -55,9 +55,9 @@ def view_election_connections_chart(self, request):
     template='embed.pt',
     permission=Public
 )
-def view_election_connections_chart(self, request):
+def view_election_connections_table(self, request):
 
-    """" View the connections as sankey chart. """
+    """" View the connections as table widget. """
 
     @request.after
     def add_last_modified(response):
