@@ -44,6 +44,8 @@ class Election(Base, ContentMixin, TimestampMixin,
         'polymorphic_identity': 'majorz'
     }
 
+    i18n_used_locales = {'de_CH', 'fr_CH', 'it_CH', 'rm_CH'}
+
     #: Identifies the election, may be used in the url
     id = Column(Text, primary_key=True)
 
@@ -345,8 +347,9 @@ class Election(Base, ContentMixin, TimestampMixin,
         rows = []
         for result in results:
             row = OrderedDict()
-            for locale, title in (result[1] or {}).items():
-                row['election_title_{}'.format(locale)] = (title or '').strip()
+            for locale in Election.i18n_used_locales:
+                title = result[1] and result[1].get(locale, '') or ''
+                row[f'election_title_{locale}'] = title.strip()
             row['election_date'] = result[2].isoformat()
             row['election_domain'] = result[3]
             row['election_type'] = result[4]

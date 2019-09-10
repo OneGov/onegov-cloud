@@ -276,8 +276,9 @@ class ProporzElection(Election, PartyResultExportMixin):
         rows = []
         for result in results:
             row = OrderedDict()
-            for locale, title in (result[1] or {}).items():
-                row['election_title_{}'.format(locale)] = (title or '').strip()
+            for locale in ProporzElection.i18n_used_locales:
+                title = result[1] and result[1].get(locale, '') or ''
+                row[f'election_title_{locale}'] = title.strip()
             row['election_date'] = result[2].isoformat()
             row['election_domain'] = result[3]
             row['election_type'] = result[4]
