@@ -12,6 +12,8 @@ class VoteLayout(DetailLayout):
         super().__init__(model, request)
         self.tab = tab
 
+    tabs_with_embedded_tables = ('entities', 'districts')
+
     @cached_property
     def all_tabs(self):
         return (
@@ -104,6 +106,23 @@ class VoteLayout(DetailLayout):
     def districts_map_link(self):
         return self.request.link(
             self.model, f'{self.ballot.type}-by-districts-map'
+        )
+
+    @cached_property
+    def table_link(self):
+        if self.tab == 'data':
+            return None
+        scope = 'entities'
+        if 'district' in self.tab:
+            scope = 'districts'
+        return self.request.link(
+            self.model, f'{self.ballot.type}-by-{scope}-table'
+        )
+
+    @cached_property
+    def widget_link(self):
+        return self.request.link(
+            self.model, name='vote-header-widget'
         )
 
     @cached_property

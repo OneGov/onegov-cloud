@@ -14,9 +14,25 @@ def view_election_compound_districts(self, request):
 
     """" The districts view. """
 
-    layout = ElectionCompoundLayout(self, request, 'districts')
+    return {
+        'election_compound': self,
+        'layout': ElectionCompoundLayout(self, request, 'districts')
+    }
+
+
+@ElectionDayApp.html(
+    model=ElectionCompound,
+    name='districts-table',
+    template='embed.pt',
+    permission=Public
+)
+def view_election_compound_districts_table(self, request):
+
+    """" Displays the districts as standalone table. """
 
     return {
         'election_compound': self,
-        'layout': layout
+        'layout': ElectionCompoundLayout(self, request, 'districts'),
+        'type': 'election-compound-table',
+        'scope': 'districts'
     }

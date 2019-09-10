@@ -46,6 +46,29 @@ def view_election_lists_chart(self, request):
 
 @ElectionDayApp.html(
     model=Election,
+    name='lists-table',
+    template='embed.pt',
+    permission=Public
+)
+def view_election_lists_table(self, request):
+
+    """" View the lists as table. """
+
+    @request.after
+    def add_last_modified(response):
+        add_last_modified_header(response, self.last_modified)
+
+    return {
+        'election': self,
+        'lists': get_list_results(self, object_session(self)),
+        'layout': DefaultLayout(self, request),
+        'type': 'election-table',
+        'scope': 'lists',
+    }
+
+
+@ElectionDayApp.html(
+    model=Election,
     name='lists',
     template='election/lists.pt',
     permission=Public

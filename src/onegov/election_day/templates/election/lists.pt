@@ -36,28 +36,9 @@
                 </div>
             </div>
 
-            <table
-                class="results tablesaw sortable"
-                data-tablesaw-mode="columntoggle"
-                data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
-                data-tablesaw-minimap=""
-                >
-                <thead>
-                    <tr>
-                        <th data-tablesaw-priority="persist" i18n:translate="">List</th>
-                        <th data-tablesaw-priority="1" i18n:translate="single_votes" class="right-aligned">Votes</th>
-                        <th data-tablesaw-priority="1" i18n:translate="" class="right-aligned">Mandates</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr tal:repeat="list lists">
-                        <td>${list.name}</td>
-                        <td class="right-aligned" data-text="${list.getter or 0}">${layout.format_number(list.getter or 0)}</td>
-                        <td tal:condition="election.completed" class="right-aligned">${list.number_of_mandates}</td>
-                        <td tal:condition="not: election.completed" class="right-aligned" i18n:translate>n.a.</td>
-                    </tr>
-                </tbody>
-            </table>
+            <tal:block metal:use-macro="layout.macros['election-lists-table']"/>
+            <tal:block metal:use-macro="layout.macros['embedded_widget']" tal:define="embed_link layout.table_link"/>
+
         </tal:block>
 
         <div metal:use-macro="layout.macros['related_link']" />

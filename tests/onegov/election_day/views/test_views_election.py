@@ -1,7 +1,12 @@
+import re
 from datetime import date
+
+import pytest
 from freezegun import freeze_time
 from math import isclose
 
+from onegov.ballot import Election
+from onegov.election_day.layouts import ElectionLayout
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import MAJORZ_HEADER
 from tests.onegov.election_day.common import upload_majorz_election
@@ -518,6 +523,8 @@ def test_view_election_json(election_day_app_gr):
     assert all((expected in str(response.json) for expected in (
         "Engler", "Stefan", "20", "Schmid", "Martin", "18"
     )))
+    for tab in ElectionLayout.tabs_with_embedded_tables:
+        assert f'{tab}-table' in str(response.json['embed'])
 
     response = client.get('/election/proporz-election/json')
     assert response.headers['Access-Control-Allow-Origin'] == '*'
@@ -668,3 +675,12 @@ def test_view_election_relations(election_day_app_gr):
         assert '<h2>Zugehörige Wahlen</h2>' in result
         assert 'http://localhost/election/first-election' in result
         assert 'First Election' in result
+
+
+@pytest.mark.parametrize('tab_name', ElectionLayout.tabs_with_embedded_tables)
+def test_views_election_embedded_widgets(election_day_app_gr, tab_name):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+    login(client)
+    upload_majorz_election(client)
+    client.get(f'/election/majorz-election/{tab_name}-table')

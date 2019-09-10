@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from morepath import redirect
 from morepath.request import Response
 from onegov.ballot import Vote
@@ -37,7 +39,7 @@ def view_vote_json(self, request):
         add_cors_header(response)
         add_last_modified_header(response, last_modified)
 
-    embed = {}
+    embed = defaultdict(list)
     media = {}
     layout = VoteLayout(self, request)
     layout.last_modified = last_modified
@@ -51,9 +53,12 @@ def view_vote_json(self, request):
                 layout = VoteLayout(self, request, tab)
                 layout.last_modified = last_modified
                 if layout.visible:
-                    embed[tab] = request.link(layout.ballot, name=f'{map}-map')
+                    embed[tab].append(
+                        request.link(layout.ballot, name=f'{map}-map'))
                     if layout.svg_path:
                         media['maps'][tab] = layout.svg_link
+        embed['entities'].append(request.link(self, name='vote-header-widget'))
+
 
     counted = self.progress[0]
     nays_percentage = self.nays_percentage if counted else None
@@ -174,3 +179,25 @@ def view_vote_pdf(self, request):
             normalize_for_url(self.title)
         )
     )
+
+
+@ElectionDayApp.html(
+    model=Vote,
+    name='vote-header-widget',
+    permission=Public,
+    template='embed.pt'
+)
+def view_vote_header_as_widget(self, request):
+
+    """ A static link to the top bar showing the vote result as widget. """
+
+    @request.after
+    def add_last_modified(response):
+        add_last_modified_header(response, self.last_modified)
+
+    return {
+        'vote': self,
+        'layout': VoteLayout(self, request),
+        'type': 'vote-header',
+        'scope': 'vote',
+    }

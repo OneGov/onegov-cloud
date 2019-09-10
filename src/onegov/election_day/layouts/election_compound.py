@@ -12,6 +12,16 @@ class ElectionCompoundLayout(DetailLayout):
         super().__init__(model, request)
         self.tab = tab
 
+    tabs_with_embedded_tables = ('districts', 'candidates')
+
+    @cached_property
+    def table_link(self):
+        if self.tab not in self.tabs_with_embedded_tables:
+            return None
+        return self.request.link(
+            self.model, f'{self.tab}-table'
+        )
+
     @cached_property
     def all_tabs(self):
         return (

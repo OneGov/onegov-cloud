@@ -12,7 +12,6 @@ agg_election_results AS (
     FROM election_results er LEFT JOIN elections e on er.election_id = e.id
     GROUP BY
              er.election_id
-
     ),
 
 list_results AS (

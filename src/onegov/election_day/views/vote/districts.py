@@ -119,6 +119,66 @@ def view_vote_districts_map_tie_breaker(self, request):
     return redirect(request.link(self.tie_breaker, name='districts-map'))
 
 
+@ElectionDayApp.html(
+    model=Ballot,
+    name='districts-table',
+    template='embed.pt',
+    permission=Public
+)
+def view_ballot_as_table(self, request):
+
+    """" View the results of the entities of ballot as table. """
+
+    @request.after
+    def add_last_modified(response):
+        add_last_modified_header(response, self.vote.last_modified)
+
+    return {
+        'ballot': self,
+        'layout': DefaultLayout(self, request),
+        'type': 'ballot-table',
+        'year': self.vote.date.year,
+        'scope': 'districts',
+    }
+
+
+@ElectionDayApp.html(
+    model=Vote,
+    name='proposal-by-districts-table',
+    permission=Public
+)
+def view_vote_districts_table_proposal(self, request):
+
+    """ A static link to the table by districts of the proposal. """
+
+    return redirect(request.link(self.proposal, name='districts-table'))
+
+
+@ElectionDayApp.html(
+    model=Vote,
+    name='counter-proposal-by-districts-table',
+    permission=Public
+)
+def view_vote_districts_table_counter_proposal(self, request):
+
+    """ A static link to the table by districts of the counter proposal. """
+
+    return redirect(request.link(self.counter_proposal,
+                                 name='districts-table'))
+
+
+@ElectionDayApp.html(
+    model=Vote,
+    name='tie-breaker-by-districts-table',
+    permission=Public
+)
+def view_vote_districts_table_tie_breaker(self, request):
+
+    """ A static link to the table of the tie breaker by districts. """
+
+    return redirect(request.link(self.tie_breaker, name='districts-table'))
+
+
 @ElectionDayApp.json(
     model=Ballot,
     name='by-district',
