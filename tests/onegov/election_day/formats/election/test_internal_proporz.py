@@ -10,12 +10,51 @@ from onegov.election_day.formats import import_election_internal_proporz
 from onegov.election_day.models import Canton
 from pytest import mark
 
+from tests.onegov.election_day.common import print_errors
+
+
+def election_fixture_import(
+        session,
+        file_path,
+        election_type='proporz',
+        principal='sg'):
+
+    principal = Canton(canton=principal)
+
+    if election_type == 'proporz':
+        election = ProporzElection(
+            title='election',
+            domain='canton',
+            type='proporz',
+            date=date(2015, 10, 18),
+            number_of_mandates=2,
+        )
+        session.add(election)
+
+        with open(file_path, 'rb') as csv_file:
+            errors = import_election_internal_proporz(
+                election, principal, csv_file, 'text/plain',
+            )
+        return errors
+    else:
+        raise NotImplementedError
+
+
+
+@mark.parametrize('csv_file', [
+    module_path('tests.onegov.election_day',
+                'fixtures/erneuerungswahl-des-nationalrates-sg-test.csv')]
+)
+def test_roundtrip_internal_proporz(session, csv_file):
+    errors = election_fixture_import(session, csv_file, 'proporz')
+    assert not errors
+
 
 @mark.parametrize("tar_file", [
     module_path('tests.onegov.election_day',
                 'fixtures/internal_proporz.tar.gz'),
 ])
-def test_import_internal_proporz(session, tar_file):
+def test_import_internal_proporz_1(session, tar_file):
     session.add(
         ProporzElection(
             title='election',
