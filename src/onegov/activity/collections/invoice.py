@@ -1,9 +1,11 @@
 from cached_property import cached_property
 from decimal import Decimal
 from onegov.activity.models import Invoice, InvoiceItem
+from onegov.activity.models.invoice import sync_invoice_items
 from onegov.activity.models.invoice_reference import KNOWN_SCHEMAS
 from onegov.core.collection import GenericCollection
 from sqlalchemy import func, and_, not_
+from sqlalchemy.orm import joinedload
 from onegov.user import User
 from uuid import uuid4
 
@@ -113,8 +115,16 @@ class InvoiceCollection(GenericCollection):
         return q.scalar() or 0
 
     def sync(self):
-        for invoice in self.query():
-            invoice.sync()
+        items = self.session.query(InvoiceItem).filter(and_(
+            InvoiceItem.source != None,
+            InvoiceItem.source != 'xml',
+            InvoiceItem.invoice_id.in_(
+                self.query().with_entities(Invoice.id).subquery()
+            )
+        )).options(joinedload(InvoiceItem.payments))
+
+        sync_invoice_items(items, capture=False)
+        print("foo2")
 
     def add(self, period_id=None, user_id=None, flush=True, optimistic=False):
         invoice = Invoice(
