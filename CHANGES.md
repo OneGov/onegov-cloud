@@ -1,8 +1,27 @@
 # Changes
 
+## Release `2019.12`
+
+> commits: **2 / [cc133b91bc...56ffd63353](https://github.com/OneGov/onegov-cloud/compare/cc133b91bc...56ffd63353)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.12)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🏎 **Improves Stripe payment synchronisation**
+
+Stripe payments syncs were terribly slow, producing way too many
+queries, grinding the production server to a halt.
+
+With this update Stripe payments syncs are still amongst our slower
+views, but with a runtime of < 10s on large databases, we are now
+looking at reasonable numbers.
+
+**`Performance`** | **[FER-791](https://issues.seantis.ch/browse/FER-791)** | **[cc133b91bc](https://github.com/onegov/onegov-cloud/commit/cc133b91bc2fa8e133eccdfcb48fcfe1634c5b41)**
+
 ## Release `2019.11`
 
-> commits: **4 / [b4ca9c0722...6cbf703c64](https://github.com/OneGov/onegov-cloud/compare/b4ca9c0722...6cbf703c64)**<br>
+> released: **2019-09-09 12:48**<br>
+> commits: **5 / [b4ca9c0722...ef7ec74cd8](https://github.com/OneGov/onegov-cloud/compare/b4ca9c0722...ef7ec74cd8)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.11)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Search
@@ -172,17 +191,17 @@ Regular users were unable to make donations due to an infinite redirect.
 
 ### Winterthur
 
-✨ **Removes pricacy notice.**
-
-It is now renderd outside our iFrame.
-
-**`Other`** | **[FW-69](https://stadt-winterthur.atlassian.net/browse/FW-69)** | **[1d9a695a06](https://github.com/onegov/onegov-cloud/commit/1d9a695a068021ffca8a8e44481cf188c854c7fe)**
-
 🐞 **Fixes wrong formatting of percentages**
 
 The daycare subsidy calculator "rounded" percentage of '10.00' to '1'.
 
 **`Bugfix`** | **[FW-63](https://stadt-winterthur.atlassian.net/browse/FW-63)** | **[7b0f07f86a](https://github.com/onegov/onegov-cloud/commit/7b0f07f86a3221d0de26adb6e1922bff46d73048)**
+
+✨ **Removes pricacy notice.**
+
+It is now renderd outside our iFrame.
+
+**`Other`** | **[FW-69](https://stadt-winterthur.atlassian.net/browse/FW-69)** | **[1d9a695a06](https://github.com/onegov/onegov-cloud/commit/1d9a695a068021ffca8a8e44481cf188c854c7fe)**
 
 ## Release `2019.3`
 
