@@ -318,7 +318,7 @@ class ProporzElection(Election, PartyResultExportMixin):
             row['candidate_votes'] = result[0]
 
             for target_id in panachage_lists:
-                key = 'panachage_votes_from_list_{}'.format(target_id)
+                key = f'panachage_votes_from_list_{target_id}'
                 row[key] = panachage.get(result[22], {}).get(target_id)
 
             rows.append(row)
