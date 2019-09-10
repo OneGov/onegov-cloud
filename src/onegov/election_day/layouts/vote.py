@@ -120,6 +120,12 @@ class VoteLayout(DetailLayout):
         )
 
     @cached_property
+    def widget_link(self):
+        return self.request.link(
+            self.model, name='vote-header-widget'
+        )
+
+    @cached_property
     def summarize(self):
         return self.ballot.results.count() != 1
 

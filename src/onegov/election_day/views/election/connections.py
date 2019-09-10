@@ -57,7 +57,7 @@ def view_election_connections_chart(self, request):
 )
 def view_election_connections_table(self, request):
 
-    """" View the connections as table widget. """
+    """" View the connections tables as widget. """
 
     @request.after
     def add_last_modified(response):

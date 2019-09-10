@@ -1,8 +1,49 @@
 # Changes
 
+## Release `2019.12`
+
+> released: **2019-09-10 13:29**<br>
+> commits: **3 / [cc133b91bc...770c2a73dc](https://github.com/OneGov/onegov-cloud/compare/cc133b91bc^...770c2a73dc)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.12)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🏎 **Improves Stripe payment synchronisation**
+
+Stripe payments syncs were terribly slow, producing way too many
+queries, grinding the production server to a halt.
+
+With this update Stripe payments syncs are still amongst our slower
+views, but with a runtime of < 10s on large databases, we are now
+looking at reasonable numbers.
+
+**`Performance`** | **[FER-791](https://issues.seantis.ch/browse/FER-791)** | **[cc133b91bc](https://github.com/onegov/onegov-cloud/commit/cc133b91bc2fa8e133eccdfcb48fcfe1634c5b41)**
+
+## Release `2019.11`
+
+> released: **2019-09-09 12:48**<br>
+> commits: **5 / [b4ca9c0722...ef7ec74cd8](https://github.com/OneGov/onegov-cloud/compare/b4ca9c0722^...ef7ec74cd8)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.11)](https://buildkite.com/seantis/onegov-cloud)
+
+### Search
+
+✨ **Improves search resilience**
+
+Elasticsearch is not guaranteed to be in sync with our database. The
+server might also not be available or all data may be temporarily gone.
+
+We have of course been aware of this and have counter-measures in the
+code. However there were some loopholes which should now be closed.
+
+Apart from the search not being available, the user should not see
+any error messages anymore at this point.
+
+**`Other`** | **[6cbf703c64](https://github.com/onegov/onegov-cloud/commit/6cbf703c64f86e322b9df00292e6529d33753546)**
+
 ## Release `2019.10`
 
-> commits: **1 / [ac565ca225...ac565ca225](https://github.com/OneGov/onegov-cloud/compare/ac565ca225...ac565ca225)**<br>
+> released: **2019-09-06 16:11**<br>
+> commits: **2 / [ac565ca225...ba85af9184](https://github.com/OneGov/onegov-cloud/compare/ac565ca225^...ba85af9184)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.10)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election-Day
@@ -16,7 +57,7 @@ The endpoint is available under the url `/election/eample/data-aggregated-lists`
 ## Release `2019.9`
 
 > released: **2019-09-06 15:09**<br>
-> commits: **4 / [3e406aeb3c...3c9b101357](https://github.com/OneGov/onegov-cloud/compare/3e406aeb3c...3c9b101357)**<br>
+> commits: **4 / [3e406aeb3c...3c9b101357](https://github.com/OneGov/onegov-cloud/compare/3e406aeb3c^...3c9b101357)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.9)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Auth
@@ -31,7 +72,7 @@ which is too limiting for the general OneGov Cloud use.
 ## Release `2019.8`
 
 > released: **2019-09-06 12:43**<br>
-> commits: **2 / [a728bf78f8...75d00e69fc](https://github.com/OneGov/onegov-cloud/compare/a728bf78f8...75d00e69fc)**<br>
+> commits: **2 / [a728bf78f8...75d00e69fc](https://github.com/OneGov/onegov-cloud/compare/a728bf78f8^...75d00e69fc)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.8)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Auth
@@ -45,7 +86,7 @@ A new authentication provider provides LDAP authentication together with Kerbero
 ## Release `2019.7`
 
 > released: **2019-09-05 17:40**<br>
-> commits: **8 / [64c5f5bdfb...f48727bc88](https://github.com/OneGov/onegov-cloud/compare/64c5f5bdfb...f48727bc88)**<br>
+> commits: **8 / [64c5f5bdfb...f48727bc88](https://github.com/OneGov/onegov-cloud/compare/64c5f5bdfb^...f48727bc88)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.7)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Core
@@ -77,7 +118,7 @@ being generated and displayed in the directory contact.
 ## Release `2019.6`
 
 > released: **2019-09-04 10:24**<br>
-> commits: **2 / [0d57b12204...3d53d3b4b9](https://github.com/OneGov/onegov-cloud/compare/0d57b12204...3d53d3b4b9)**<br>
+> commits: **2 / [0d57b12204...3d53d3b4b9](https://github.com/OneGov/onegov-cloud/compare/0d57b12204^...3d53d3b4b9)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.6)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election-Day
@@ -91,7 +132,7 @@ Hides clear statuses such as elected or number of mandates per list for proporz 
 ## Release `2019.5`
 
 > released: **2019-09-04 06:04**<br>
-> commits: **14 / [326bab40a2...a8937ba123](https://github.com/OneGov/onegov-cloud/compare/326bab40a2...a8937ba123)**<br>
+> commits: **14 / [326bab40a2...a8937ba123](https://github.com/OneGov/onegov-cloud/compare/326bab40a2^...a8937ba123)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.5)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
@@ -114,7 +155,7 @@ seems that the public is more confused by this than anything.
 ## Release `2019.4`
 
 > released: **2019-08-30 15:31**<br>
-> commits: **11 / [5c3adde749...282ed75f8e](https://github.com/OneGov/onegov-cloud/compare/5c3adde749...282ed75f8e)**<br>
+> commits: **11 / [5c3adde749...282ed75f8e](https://github.com/OneGov/onegov-cloud/compare/5c3adde749^...282ed75f8e)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.4)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
@@ -151,22 +192,22 @@ Regular users were unable to make donations due to an infinite redirect.
 
 ### Winterthur
 
-✨ **Removes pricacy notice.**
-
-It is now renderd outside our iFrame.
-
-**`Other`** | **[FW-69](https://stadt-winterthur.atlassian.net/browse/FW-69)** | **[1d9a695a06](https://github.com/onegov/onegov-cloud/commit/1d9a695a068021ffca8a8e44481cf188c854c7fe)**
-
 🐞 **Fixes wrong formatting of percentages**
 
 The daycare subsidy calculator "rounded" percentage of '10.00' to '1'.
 
 **`Bugfix`** | **[FW-63](https://stadt-winterthur.atlassian.net/browse/FW-63)** | **[7b0f07f86a](https://github.com/onegov/onegov-cloud/commit/7b0f07f86a3221d0de26adb6e1922bff46d73048)**
 
+✨ **Removes pricacy notice.**
+
+It is now renderd outside our iFrame.
+
+**`Other`** | **[FW-69](https://stadt-winterthur.atlassian.net/browse/FW-69)** | **[1d9a695a06](https://github.com/onegov/onegov-cloud/commit/1d9a695a068021ffca8a8e44481cf188c854c7fe)**
+
 ## Release `2019.3`
 
 > released: **2019-08-29 09:39**<br>
-> commits: **5 / [36ebdbfa71...4633aeb348](https://github.com/OneGov/onegov-cloud/compare/36ebdbfa71...4633aeb348)**<br>
+> commits: **5 / [36ebdbfa71...4633aeb348](https://github.com/OneGov/onegov-cloud/compare/36ebdbfa71^...4633aeb348)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.3)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Core
@@ -182,7 +223,7 @@ version is only updated during the release process.
 ## Release `2019.2`
 
 > released: **2019-08-28 10:04**<br>
-> commits: **6 / [69399e0e7a...50afe830eb](https://github.com/OneGov/onegov-cloud/compare/69399e0e7a...50afe830eb)**<br>
+> commits: **6 / [69399e0e7a...50afe830eb](https://github.com/OneGov/onegov-cloud/compare/69399e0e7a^...50afe830eb)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.2)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election-Day
@@ -194,7 +235,7 @@ version is only updated during the release process.
 ## Release `2019.1`
 
 > released: **2019-08-27 14:22**<br>
-> commits: **19 / [53849be4fe...cc3764630e](https://github.com/OneGov/onegov-cloud/compare/53849be4fe...cc3764630e)**<br>
+> commits: **19 / [53849be4fe...cc3764630e](https://github.com/OneGov/onegov-cloud/compare/53849be4fe^...cc3764630e)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.1)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Core

@@ -401,7 +401,7 @@ class StripeConnect(PaymentProvider):
 
         charges = self.paged(
             stripe.Charge.list,
-            limit=50,
+            limit=100,
             include=lambda r: 'payment_id' in r.metadata
         )
 
@@ -415,7 +415,7 @@ class StripeConnect(PaymentProvider):
 
     def sync_payouts(self, session):
 
-        payouts = self.paged(stripe.Payout.list, limit=50, status='paid')
+        payouts = self.paged(stripe.Payout.list, limit=100, status='paid')
         latest_payout = None
 
         paid_charges = {}
@@ -429,7 +429,7 @@ class StripeConnect(PaymentProvider):
 
             transactions = self.paged(
                 stripe.BalanceTransaction.list,
-                limit=50,
+                limit=100,
                 payout=payout.id,
                 type='charge'
             )

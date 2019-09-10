@@ -162,7 +162,6 @@
                 <div class="before-content">
                     <div metal:use-macro="layout.macros['vote_header']" tal:define="ballot layout.ballot" />
                 </div>
-
             </tal:b>
 
         </tal:block>

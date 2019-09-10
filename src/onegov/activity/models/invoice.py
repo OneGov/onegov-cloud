@@ -11,8 +11,23 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import select
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import object_session, relationship
+from sqlalchemy.orm import object_session, relationship, joinedload
 from uuid import uuid4
+
+
+def sync_invoice_items(items, capture=True):
+    for item in (i for i in items if i.payments):
+        if capture:
+            for payment in item.payments:
+
+                # though it should be fairly rare, it's possible for
+                # charges not to be captured yet
+                if payment.state == 'open':
+                    payment.charge.capture()
+                    payment.sync()
+
+        # the last payment is the relevant one
+        item.paid = item.payments[-1].state == 'paid'
 
 
 class Invoice(Base, TimestampMixin):
@@ -51,23 +66,13 @@ class Invoice(Base, TimestampMixin):
 
         return None
 
-    def sync(self):
+    def sync(self, capture=True):
         items = object_session(self).query(InvoiceItem).filter(and_(
             InvoiceItem.source != None,
             InvoiceItem.source != 'xml'
-        )).join(InvoiceItem.payments)
+        )).options(joinedload(InvoiceItem.payments))
 
-        for item in (i for i in items if i.payments):
-            for payment in item.payments:
-
-                # though it should be fairly rare, it's possible for
-                # charges not to be captured yet
-                if payment.state == 'open':
-                    payment.charge.capture()
-                    payment.sync()
-
-            # the last payment is the relevant one
-            item.paid = item.payments[-1].state == 'paid'
+        sync_invoice_items(items, capture=capture)
 
     def add(self, group, text, unit, quantity, flush=True, **kwargs):
         item = InvoiceItem(

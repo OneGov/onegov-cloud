@@ -1,5 +1,7 @@
 import re
 from datetime import date
+
+import pytest
 from freezegun import freeze_time
 from math import isclose
 
@@ -675,11 +677,10 @@ def test_view_election_relations(election_day_app_gr):
         assert 'First Election' in result
 
 
-def test_views_election_embedded_tables(election_day_app_gr):
+@pytest.mark.parametrize('tab_name', ElectionLayout.tabs_with_embedded_tables)
+def test_views_election_embedded_widgets(election_day_app_gr, tab_name):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
-    session = election_day_app_gr.session_manager.session()
     login(client)
     upload_majorz_election(client)
-    for tab_name in ElectionLayout.tabs_with_embedded_tables:
-        client.get(f'/election/majorz-election/{tab_name}-table')
+    client.get(f'/election/majorz-election/{tab_name}-table')

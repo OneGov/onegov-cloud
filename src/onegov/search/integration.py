@@ -66,9 +66,7 @@ class TolerantTransport(Transport):
 
         try:
             response = super().perform_request(*args, **kwargs)
-
         except (TransportError, HTTPError) as e:
-
             # transport errors might be caused by bugs (for example, when we
             # refer to a non-existant index) -> we are only tolerant of
             # connection errors
@@ -155,7 +153,6 @@ class ElasticsearchApp(morepath.App):
 
         self.es_hosts = cfg.get('elasticsearch_hosts', (
             'http://localhost:9200',
-            'http://localhost:19200'
         ))
 
         self.es_verify_certs = cfg.get('elasticsearch_verify_certs', True)
@@ -303,11 +300,16 @@ class ElasticsearchApp(morepath.App):
             }
         )
 
-        result = search.execute().suggest
+        result = search.execute()
+
+        # if there's no matching index, no suggestions are returned, which
+        # happens if the Elasticsearch cluster is being rebuilt
+        if not hasattr(result, 'suggest'):
+            return ()
 
         suggestions = SortedSet()
 
-        for suggestion in getattr(result, 'es_suggestion', []):
+        for suggestion in getattr(result.suggest, 'es_suggestion', []):
             for item in suggestion['options']:
                 suggestions.add(item['text'].strip())
 

@@ -95,6 +95,7 @@ Examples:
 The type may be one of these values:
 
 * `Feature`
+* `Performance`
 * `Bugfix`
 * `Other`
 

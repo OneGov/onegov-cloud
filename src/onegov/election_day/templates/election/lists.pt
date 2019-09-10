@@ -37,7 +37,7 @@
             </div>
 
             <tal:block metal:use-macro="layout.macros['election-lists-table']"/>
-            <tal:block metal:use-macro="layout.macros['embedded_table']"/>
+            <tal:block metal:use-macro="layout.macros['embedded_widget']" tal:define="embed_link layout.table_link"/>
 
         </tal:block>
 
