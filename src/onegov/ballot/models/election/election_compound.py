@@ -81,7 +81,6 @@ class ElectionCompound(
 
     i18n_used_locales = ('de_CH', 'fr_CH', 'it_CH', 'rm_CH')
 
-
     #: Identifies the election compound, may be used in the url
     id = Column(Text, primary_key=True)
 

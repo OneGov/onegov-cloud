@@ -59,7 +59,6 @@ def view_vote_json(self, request):
                         media['maps'][tab] = layout.svg_link
         embed['entities'].append(request.link(self, name='vote-header-widget'))
 
-
     counted = self.progress[0]
     nays_percentage = self.nays_percentage if counted else None
     yeas_percentage = self.yeas_percentage if counted else None
