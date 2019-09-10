@@ -44,7 +44,7 @@ class Election(Base, ContentMixin, TimestampMixin,
         'polymorphic_identity': 'majorz'
     }
 
-    i18n_used_locales = {'de_CH', 'fr_CH', 'it_CH', 'rm_CH'}
+    i18n_used_locales = ('de_CH', 'fr_CH', 'it_CH', 'rm_CH')
 
     #: Identifies the election, may be used in the url
     id = Column(Text, primary_key=True)

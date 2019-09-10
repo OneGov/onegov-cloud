@@ -36,6 +36,8 @@ class ElectionCompoundAssociation(Base):
 
     __tablename__ = 'election_compound_associations'
 
+    i18n_used_locales = ('de_CH', 'fr_CH', 'it_CH', 'rm_CH')
+
     #: identifies the candidate result
     id = Column(UUID, primary_key=True, default=uuid4)
 
@@ -76,6 +78,9 @@ class ElectionCompound(
 ):
 
     __tablename__ = 'election_compounds'
+
+    i18n_used_locales = ('de_CH', 'fr_CH', 'it_CH', 'rm_CH')
+
 
     #: Identifies the election compound, may be used in the url
     id = Column(Text, primary_key=True)
@@ -325,8 +330,11 @@ class ElectionCompound(
         """
 
         common = OrderedDict()
+        for locale in self.i18n_used_locales:
+            common[f'compound_title_{locale}'] = \
+                self.title_translations.get(locale, '')
         for locale, title in self.title_translations.items():
-            common['compound_title_{}'.format(locale)] = (title or '').strip()
+            common[f'compound_title_{locale}'] = (title or '').strip()
         common['compound_date'] = self.date.isoformat()
         common['compound_mandates'] = self.number_of_mandates
 

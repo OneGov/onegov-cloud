@@ -24,6 +24,43 @@ class ProporzElection(Election, PartyResultExportMixin):
         'polymorphic_identity': 'proporz'
     }
 
+    i18n_used_locales = ('de_CH', 'fr_CH', 'it_CH', 'rm_CH')
+
+    FIX_EXPORT_HEADERS = [
+        *(f'election_title_{l}' for l in i18n_used_locales),
+        'election_date',
+        'election_domain',
+        'election_type',
+        'election_mandates',
+        'election_absolute_majority',
+        'election_status',
+        'entity_district',
+        'entity_name',
+        'entity_id',
+        'entity_counted'
+        'entity_eligible_voters',
+        'entity_received_ballots',
+        'entity_blank_ballots',
+        'entity_invalid_ballots',
+        'entity_unaccounted_ballots',
+        'entity_accounted_ballots'
+        'entity_blank_votes',
+        'entity_invalid_votes',
+        'entity_accounted_votes',
+        'list_name',
+        'list_id',
+        'list_number_of_mandates',
+        'list_votes',
+        'list_connection',
+        'list_connection_parent',
+        'candidate_family_name',
+        'candidate_first_name',
+        'candidate_id',
+        'candidate_elected',
+        'candidate_party',
+        'candidate_votes',
+    ]
+
     #: An election contains n list connections
     list_connections = relationship(
         'ListConnection',
