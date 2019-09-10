@@ -25,6 +25,10 @@ class ChangelogCommit(object):
     link: Optional[str] = None
     note: Optional[str] = None
 
+    @property
+    def type_id(self):
+        return self.type.lower()
+
     @classmethod
     def is_match(cls, commit):
 
@@ -80,10 +84,13 @@ class ChangelogCommit(object):
 
     @property
     def emoji(self):
-        if self.type.lower() == 'feature':
+        if self.type_id == 'feature':
             return '🎉'
 
-        if self.type.lower() == 'bugfix':
+        if self.type_id == 'performance':
+            return '🏎'
+
+        if self.type_id == 'bugfix':
             return '🐞'
 
         return '✨'
@@ -99,13 +106,16 @@ class ChangelogCommit(object):
 
     @property
     def type_order(self):
-        if self.type == 'Feature':
+        if self.type_id == 'feature':
             return 0
 
-        if self.type != 'Bugfix':
+        if self.type_id != 'performance':
             return 1
 
-        return 2
+        if self.type_id != 'bugfix':
+            return 2
+
+        return 100
 
     @property
     def link_url(self):
