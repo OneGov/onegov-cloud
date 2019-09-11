@@ -125,7 +125,7 @@ def parse_panachage_results(line, errors, panachage):
 
 def parse_candidate(line, errors, election_id):
     try:
-        id = int(line.candidate_id or 0)
+        id = line.candidate_id
         family_name = line.candidate_family_name
         first_name = line.candidate_first_name
         elected = str(line.candidate_elected or '').lower() == 'true'
