@@ -20,10 +20,10 @@ class PanachageResult(Base, TimestampMixin):
     # where electon.id is derived from the title
     owner = Column(Text, nullable=True)
 
-    #: the target this result belongs to
+    #: the target this result belongs to, maps to list.name
     target = Column(Text, nullable=False)
 
-    #: the source this result belongs to
+    #: the source this result belongs to, maps to list.name
     source = Column(Text, nullable=False)
 
     # votes
