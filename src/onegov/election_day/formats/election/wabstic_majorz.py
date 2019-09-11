@@ -9,10 +9,11 @@ from onegov.election_day.formats.common import load_csv
 from sqlalchemy.orm import object_session
 from uuid import uuid4
 
-from onegov.election_day.import_export.mappings import \
-    WABSTIC_MAJORZ_HEADERS_WM_WAHL, WABSTIC_MAJORZ_HEADERS_WMSTATIC_GEMEINDEN, \
-    WABSTIC_MAJORZ_HEADERS_WM_GEMEINDEN, WABSTIC_MAJORZ_HEADERS_WM_KANDIDATEN, \
-    WABSTIC_MAJORZ_HEADERS_WM_KANDIDATENGDE
+from onegov.election_day.import_export.mappings import (
+    WABSTIC_MAJORZ_HEADERS_WM_WAHL,
+    WABSTIC_MAJORZ_HEADERS_WMSTATIC_GEMEINDEN,
+    WABSTIC_MAJORZ_HEADERS_WM_GEMEINDEN, WABSTIC_MAJORZ_HEADERS_WM_KANDIDATEN,
+    WABSTIC_MAJORZ_HEADERS_WM_KANDIDATENGDE)
 
 
 def get_entity_id(line):

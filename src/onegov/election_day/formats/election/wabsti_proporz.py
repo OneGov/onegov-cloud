@@ -343,13 +343,15 @@ def import_election_wabsti_proporz(
     if statistics_file and statistics_mimetype:
         csv, error = load_csv(
             statistics_file, statistics_mimetype,
-            expected_headers=WABSTI_PROPORZ_HEADERS_STATS, filename=filename
+            expected_headers=WABSTI_PROPORZ_HEADERS_STATS,
+            filename=filename
         )
         if error:
             # Wabsti files are sometimes UTF-16
             csv, utf16_error = load_csv(
                 statistics_file, statistics_mimetype,
-                expected_headers=WABSTI_PROPORZ_HEADERS_STATS, filename=filename,
+                expected_headers=WABSTI_PROPORZ_HEADERS_STATS,
+                filename=filename,
                 encoding='utf-16-le'
             )
             if utf16_error:

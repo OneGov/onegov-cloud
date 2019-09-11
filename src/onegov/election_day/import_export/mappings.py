@@ -1,4 +1,6 @@
 
+#  --- INTERNAL
+
 INTERNAL_COMMON_ELECTION_HEADERS = [
     'election_status',
     'entity_id',
@@ -90,12 +92,14 @@ WABSTIC_MAJORZ_HEADERS_WM_WAHL = (
     'absolutesmehr',  # absolute majority
     'ausmittlungsstand',  # complete
 )
+
 WABSTIC_MAJORZ_HEADERS_WMSTATIC_GEMEINDEN = (
     'sortwahlkreis',  # provides the link to the election
     'sortgeschaeft',  # provides the link to the election
     'bfsnrgemeinde',  # BFS
     'stimmberechtigte',  # eligible votes
 )
+
 WABSTIC_MAJORZ_HEADERS_WM_GEMEINDEN = (
     'bfsnrgemeinde',  # BFS
     'stimmberechtigte',  # eligible votes
@@ -106,6 +110,7 @@ WABSTIC_MAJORZ_HEADERS_WM_GEMEINDEN = (
     'stimmenleer',  # blank votes
     'stimmenungueltig',  # invalid votes
 )
+
 WABSTIC_MAJORZ_HEADERS_WM_KANDIDATEN = (
     'sortgeschaeft',  # provides the link to the election
     'knr',  # candidate id
@@ -114,6 +119,7 @@ WABSTIC_MAJORZ_HEADERS_WM_KANDIDATEN = (
     'gewaehlt',  # elected
     'partei',  #
 )
+
 WABSTIC_MAJORZ_HEADERS_WM_KANDIDATENGDE = (
     'sortgeschaeft',  # provides the link to the election
     'bfsnrgemeinde',  # BFS
@@ -125,12 +131,14 @@ WABSTIC_PROPORZ_HEADERS_WP_WAHL = (
     'sortgeschaeft',  # provides the link to the election
     'ausmittlungsstand',  # complete
 )
+
 WABSTIC_PROPORZ_HEADERS_WPSTATIC_GEMEINDEN = (
     'sortwahlkreis',  # provides the link to the election
     'sortgeschaeft',  # provides the link to the election
     'bfsnrgemeinde',  # BFS
     'stimmberechtigte',  # eligible votes
 )
+
 WABSTIC_PROPORZ_HEADERS_WP_GEMEINDEN = (
     'bfsnrgemeinde',  # BFS
     'stimmberechtigte',  # eligible votes
@@ -140,6 +148,7 @@ WABSTIC_PROPORZ_HEADERS_WP_GEMEINDEN = (
     'stmungueltig',  # invalid ballots
     'anzwzamtleer',  # blank ballots
 )
+
 WABSTIC_PROPORZ_HEADERS_WP_LISTEN = (
     'sortgeschaeft',  # provides the link to the election
     'listnr',
@@ -148,22 +157,26 @@ WABSTIC_PROPORZ_HEADERS_WP_LISTEN = (
     'listverb',
     'listuntverb',
 )
+
 WABSTIC_PROPORZ_HEADERS_WP_LISTENGDE = (
     'bfsnrgemeinde',  # BFS
     'listnr',
     'stimmentotal',
 )
+
 WABSTIC_PROPORZ_HEADERS_WPSTATIC_KANDIDATEN = (
     'sortgeschaeft',  # provides the link to the election
     'knr',  # candidate id
     'nachname',  # familiy name
     'vorname',  # first name
 )
+
 WABSTIC_PROPORZ_HEADERS_WP_KANDIDATEN = (
     'sortgeschaeft',  # provides the link to the election
     'knr',  # candidate id
     'gewaehlt',  # elected
 )
+
 WABSTIC_PROPORZ_HEADERS_WP_KANDIDATENGDE = (
     'bfsnrgemeinde',  # BFS
     'knr',  # candidate id

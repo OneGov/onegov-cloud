@@ -156,12 +156,15 @@ def import_election_wabsti_majorz(
     # This format has one entity per line and every candidate as row
     filename = _("Results")
     csv, error = load_csv(
-        file, mimetype, expected_headers=WABSTI_MAJORZ_HEADERS, filename=filename
+        file, mimetype, expected_headers=WABSTI_MAJORZ_HEADERS,
+        filename=filename
     )
     if error:
         # Wabsti files are sometimes UTF-16
         csv, utf16_error = load_csv(
-            file, mimetype, expected_headers=WABSTI_MAJORZ_HEADERS, encoding='utf-16-le'
+            file, mimetype,
+            expected_headers=WABSTI_MAJORZ_HEADERS,
+            encoding='utf-16-le'
         )
         if utf16_error:
             errors.append(error)
