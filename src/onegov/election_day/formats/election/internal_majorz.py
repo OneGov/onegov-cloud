@@ -2,7 +2,7 @@ from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
 from onegov.ballot import ElectionResult
 from onegov.election_day import _
-from onegov.election_day.formats.common import EXPATS
+from onegov.election_day.formats.common import EXPATS, validate_integer
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import STATI
@@ -18,10 +18,14 @@ def parse_election(line, errors):
     status = None
     try:
         if line.election_absolute_majority:
-            majority = int(line.election_absolute_majority or 0)
+            majority = validate_integer(line, 'election_absolute_majority')
             majority = majority if majority else None
         status = line.election_status or 'unknown'
-    except ValueError:
+
+    except ValueError as e:
+        errors.append(e.args[0])
+
+    except Exception:
         errors.append(_("Invalid election values"))
     if status not in STATI:
         errors.append(_("Invalid status"))
@@ -30,16 +34,19 @@ def parse_election(line, errors):
 
 def parse_election_result(line, errors, entities, election_id):
     try:
-        entity_id = int(line.entity_id or 0)
+        entity_id = validate_integer(line, 'entity_id')
         counted = line.entity_counted.strip().lower() == 'true'
-        eligible_voters = int(line.entity_eligible_voters or 0)
-        received_ballots = int(line.entity_received_ballots or 0)
-        blank_ballots = int(line.entity_blank_ballots or 0)
-        invalid_ballots = int(line.entity_invalid_ballots or 0)
-        blank_votes = int(line.entity_blank_votes or 0)
-        invalid_votes = int(line.entity_invalid_votes or 0)
+        eligible_voters = validate_integer(line, 'entity_eligible_voters')
+        received_ballots = validate_integer(line, 'entity_received_ballots')
+        blank_ballots = validate_integer(line, 'entity_blank_ballots')
+        invalid_ballots = validate_integer(line, 'entity_invalid_ballots')
+        blank_votes = validate_integer(line, 'entity_blank_votes')
+        invalid_votes = validate_integer(line, 'entity_invalid_votes')
 
-    except ValueError:
+    except ValueError as e:
+        errors.append(e.args[0])
+
+    except Exception:
         errors.append(_("Invalid entity values"))
     else:
         if entity_id not in entities and entity_id in EXPATS:
@@ -70,13 +77,16 @@ def parse_election_result(line, errors, entities, election_id):
 
 def parse_candidate(line, errors, election_id):
     try:
-        id = int(line.candidate_id or 0)
+        id = validate_integer(line, 'candidate_id')
         family_name = line.candidate_family_name
         first_name = line.candidate_first_name
         elected = str(line.candidate_elected or '').lower() == 'true'
         party = line.candidate_party
 
-    except ValueError:
+    except ValueError as e:
+        errors.append(e.args[0])
+
+    except Exception:
         errors.append(_("Invalid candidate values"))
     else:
         return dict(
@@ -92,9 +102,9 @@ def parse_candidate(line, errors, election_id):
 
 def parse_candidate_result(line, errors):
     try:
-        votes = int(line.candidate_votes or 0)
-    except ValueError:
-        errors.append(_("Invalid candidate results"))
+        votes = validate_integer(line, 'candidate_votes')
+    except ValueError as e:
+        errors.append(e.args[0])
     else:
         return dict(
             id=uuid4(),

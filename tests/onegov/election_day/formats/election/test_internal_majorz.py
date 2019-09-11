@@ -309,12 +309,13 @@ def test_import_internal_majorz_invalid_values(session):
             ))
         ).encode('utf-8')), 'text/plain',
     )
-
-    assert sorted([(e.line, e.error.interpolate()) for e in errors]) == [
-        (2, 'Invalid candidate results'),
-        (2, 'Invalid candidate values'),
-        (2, 'Invalid election values'),
-        (2, 'Invalid entity values'),
+    errors = sorted([(e.line, e.error.interpolate()) for e in errors])
+    print(errors)
+    assert errors == [
+        (2, 'Invalid integer: candidate_id'),
+        (2, 'Invalid integer: candidate_votes'),
+        (2, 'Invalid integer: election_absolute_majority'),
+        (2, 'Invalid integer: entity_id'),
         (2, 'Invalid status'),
         (3, '1234 is unknown'),
     ]
