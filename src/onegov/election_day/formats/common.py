@@ -174,3 +174,27 @@ def validate_integer(line, col, treat_none_as_default=True, default=0):
     except ValueError:
         raise ValueError(_('Invalid integer: ${col}',
                            mapping={'col': col}))
+
+
+def validate_float(line, col, treat_none_as_default=True, default=0):
+    """
+    Checks line of a csv file for a valid float number.
+    Raises an error if the attribute is not there.
+
+    :param line: line object from csv reader
+    :param col: attribute of line object
+    :param default: default to return if line.col is None
+    :param treat_none_as_default: raises ValueError if line.col is None
+    :return: float value of line.col
+    """
+    result = getattr(line, col)
+    if not result:
+        if treat_none_as_default:
+            return default
+        raise ValueError(_('Empty value: ${col}',
+                           mapping={'col': col}))
+    try:
+        return float(result)
+    except ValueError:
+        raise ValueError(_('Invalid float number: ${col}',
+                           mapping={'col': col}))
