@@ -37,24 +37,31 @@ def get_aggregated_list_results(election, session, use_checks=False):
     lst_ids = set()
     lst_list_ids = set()
     lst_names = set()
+    validations = defaultdict(list)
+    summary = OrderedDict()
 
     for lid, g in groupby(result, lambda l: l.id):
         for lst in g:
+            # checks
             lst_ids.add(lst.id)
             lst_list_ids.add(lst.list_id)
             lst_names.add(lst.name)
 
-            # key can be id or name, count was the same
-            # key = f'{lst.name}-{lst.list_id}'
-            key = lst.id
+            summary.setdefault('election_list_votes',
+                               int(lst.election_list_votes))
+            summary.setdefault('election_candidate_votes',
+                               int(lst.election_candidate_votes))
+
+            key = lst.name
             data.setdefault(
                 key,
                 {
                     'name': lst.name,
                     'list_id': lst.list_id,
-                    'number_of_mandates': lst.number_of_mandates,
-                    'votes': lst.votes,
+                    'votes': lst.list_votes,
+                    'total_candidate_votes': int(lst.candidate_votes_by_list),
                     'perc_to_total_votes': float(lst.perc_to_total_votes),
+                    'number_of_mandates': lst.number_of_mandates,
                     'candidates': [],
                 }
             )
@@ -69,29 +76,27 @@ def get_aggregated_list_results(election, session, use_checks=False):
     assert len(lst_ids) == len(lst_list_ids)
     assert len(lst_list_ids) == len(lst_names)
 
-    check_msg = defaultdict(list)
-    total_percentage = 0
-    candidates_perc = defaultdict(int)
-    candidates_votes = defaultdict(int)
+    total_list_votes = 0
 
     for name, item in data.items():
-        total_percentage += item['perc_to_total_votes']
-        for candidate in item['candidates']:
-            candidates_perc[item['name']] += candidate['perc_to_list_votes']
-            candidates_votes[item['name']] += candidate['total_votes']
+        if item['votes'] < item['total_candidate_votes']:
+            validations['errors'].append(
+                f'List {name} has more candidates votes than list votes.'
+            )
+        total_list_votes += item['votes']
 
-    for name, perc in candidates_perc.items():
-        if not perc <= 100:
-            check_msg['total_percentages'].append({
-                'name': name,
-                'total_of_perc_to_list_votes': perc})
+    assert summary['election_list_votes'] == total_list_votes
 
-    if not total_percentage == 100:
-        check_msg['total_percentages'].append({
-            'total_of_perc_to_total_votes': total_percentage
-        })
+    if summary['election_list_votes'] < summary['election_candidate_votes']:
+        validations['errors'].append(
+            f"The election has less list votes than candidate votes"
+        )
 
-    return {'validations': check_msg, 'results': list(data.values())}
+    return {
+        'summary': summary,
+        'validations': validations,
+        'results': data
+    }
 
 
 def get_list_results(election, session):
