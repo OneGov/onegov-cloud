@@ -1,5 +1,32 @@
 # Changes
 
+## Release `2019.13`
+
+> commits: **5 / [226c3dd0ff...81517c6abe](https://github.com/OneGov/onegov-cloud/compare/226c3dd0ff^...81517c6abe)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.13)](https://buildkite.com/seantis/onegov-cloud)
+
+### Auth
+
+🐞 **Fixes Kerberos handshake not working**
+
+The handshake would only work if it had been successful before.
+
+**`Bugfix`** | **[81517c6abe](https://github.com/onegov/onegov-cloud/commit/81517c6abe145afe2dc53df7b15f126adf086068)**
+
+### Election-Day
+
+🎉 **Corrects calculation of total votes in one election**
+
+Provides new widgets, mostly tables that can be used a `<iframe>`
+
+**`Feature`** | **[1b4c135343](https://github.com/onegov/onegov-cloud/commit/1b4c135343d7c68e7307e2fbf42ee1078d6d22ac)**
+
+🐞 **Fixes calculation of total list votes for aggr. lists api**
+
+For the aggregated lists api, we deliver the % of `list_votes / total_votes` for one election in aggregated form. `total_votes` is now aggregated as the total of all `list_votes` across all lists rather than aggregated from `ElectionResults` as a function using counting valid - invalid - blank votes etc. It adds a couple of more fields to the api to directly evaluate if the results are correct.
+
+**`Bugfix`** | **[088d466583](https://github.com/onegov/onegov-cloud/commit/088d466583d071807adab92be8ebeb00d5da247d)**
+
 ## Release `2019.12`
 
 > released: **2019-09-10 13:29**<br>
