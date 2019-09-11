@@ -23,13 +23,15 @@ def election_fixture_import(
 
     if election_type == 'proporz':
         election = ProporzElection(
-            title='election',
+            title='election proporz',
             domain='canton',
             type='proporz',
             date=date(2015, 10, 18),
             number_of_mandates=2,
         )
         session.add(election)
+        session.flush()
+        assert election.id
 
         with open(file_path, 'rb') as csv_file:
             errors = import_election_internal_proporz(
