@@ -30,17 +30,17 @@ def parse_election(line, errors):
 
 def parse_election_result(line, errors, entities, election_id):
     try:
-        entity_id = int(line.entity_id or 0)
+        entity_id = validate_integer(line, 'entity_id')
         counted = line.entity_counted.strip().lower() == 'true'
-        eligible_voters = int(line.entity_eligible_voters or 0)
-        received_ballots = int(line.entity_received_ballots or 0)
-        blank_ballots = int(line.entity_blank_ballots or 0)
-        invalid_ballots = int(line.entity_invalid_ballots or 0)
-        blank_votes = int(line.entity_blank_votes or 0)
-        invalid_votes = int(line.entity_invalid_votes or 0)
+        eligible_voters = validate_integer(line, 'entity_eligible_voters')
+        received_ballots = validate_integer(line, 'entity_received_ballots')
+        blank_ballots = validate_integer(line, 'entity_blank_ballots')
+        invalid_ballots = validate_integer(line, 'entity_invalid_ballots')
+        blank_votes = validate_integer(line, 'entity_blank_votes')
+        invalid_votes = validate_integer(line, 'entity_invalid_votes')
 
-    except ValueError:
-        errors.append(_("Invalid entity values"))
+    except ValueError as e:
+        errors.append(e.args[0])
     else:
         if entity_id not in entities and entity_id in EXPATS:
             entity_id = 0
@@ -72,9 +72,9 @@ def parse_list(line, errors, election_id):
     try:
         id = line.list_id
         name = line.list_name
-        mandates = int(line.list_number_of_mandates or 0)
-    except ValueError:
-        errors.append(_("Invalid list values"))
+        mandates = validate_integer(line, 'list_number_of_mandates')
+    except ValueError as e:
+        errors.append(e.args[0])
     else:
         return dict(
             id=uuid4(),
@@ -118,8 +118,11 @@ def parse_panachage_results(line, errors, panachage):
         if target not in panachage:
             panachage[target] = {}
             for name, index in panachage['headers'].items():
-                panachage[target][index] = int(getattr(line, name))
+                panachage[target][index] = validate_integer(
+                    getattr(line, name), treat_none_as_default=False)
 
+    except ValueError as e:
+        errors.append(e.args[0])
     except Exception:
         errors.append(_("Invalid list results"))
 
@@ -148,9 +151,9 @@ def parse_candidate(line, errors, election_id):
 
 def parse_candidate_result(line, errors):
     try:
-        votes = int(line.candidate_votes or 0)
-    except ValueError:
-        errors.append(_("Invalid candidate results"))
+        votes = validate_integer(line, 'candidate_votes')
+    except ValueError as e:
+        errors.append(e.args[0])
     else:
         return dict(
             id=uuid4(),

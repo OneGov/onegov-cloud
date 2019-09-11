@@ -320,10 +320,10 @@ def test_import_internal_proporz_invalid_values(session):
     errors = sorted([(e.line, e.error.interpolate()) for e in errors])
     print(errors)
     assert errors == [
-        (2, 'Invalid candidate results'),
-        (2, 'Invalid entity values'),
+        (2, 'Invalid integer: candidate_votes'),
+        (2, 'Invalid integer: entity_id'),
+        (2, 'Invalid integer: list_number_of_mandates'),
         (2, 'Invalid integer: list_votes'),
-        (2, 'Invalid list values'),
         (2, 'Invalid status'),
         (3, '1234 is unknown'),
     ]
