@@ -7,7 +7,7 @@ from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from uuid import uuid4
 
-from onegov.election_day.import_export.election.mappings import \
+from onegov.election_day.import_export.mappings import \
     WABSTI_MAJORZ_HEADERS, WABSTI_MAJORZ_HEADERS_CANDIDATES
 
 

@@ -7,7 +7,7 @@ from re import match
 from sqlalchemy.orm import object_session
 from uuid import uuid4
 
-from onegov.election_day.import_export.election.mappings import \
+from onegov.election_day.import_export.mappings import \
     ELECTION_PARTY_HEADERS
 
 

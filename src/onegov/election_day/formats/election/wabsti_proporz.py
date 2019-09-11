@@ -11,7 +11,7 @@ from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from uuid import uuid4
 
-from onegov.election_day.import_export.election.mappings import \
+from onegov.election_day.import_export.mappings import \
     WABSTI_PROPORZ_HEADERS, WABSTI_PROPORZ_HEADERS_CONNECTIONS, \
     WABSTI_PROPORZ_HEADERS_CANDIDATES, WABSTI_PROPORZ_HEADERS_STATS
 

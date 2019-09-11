@@ -7,18 +7,7 @@ from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import STATI
 from sqlalchemy.orm import object_session
 
-
-HEADERS = [
-    'status',
-    'type',
-    'entity_id',
-    'counted',
-    'yeas',
-    'nays',
-    'invalid',
-    'empty',
-    'eligible_voters',
-]
+from onegov.election_day.import_export.mappings import INTERNAL_VOTE_HEADERS
 
 
 def import_vote_internal(vote, principal, file, mimetype):
@@ -34,7 +23,7 @@ def import_vote_internal(vote, principal, file, mimetype):
 
     """
     csv, error = load_csv(
-        file, mimetype, expected_headers=HEADERS, dialect='excel'
+        file, mimetype, expected_headers=INTERNAL_VOTE_HEADERS, dialect='excel'
     )
     if error:
         return [error]

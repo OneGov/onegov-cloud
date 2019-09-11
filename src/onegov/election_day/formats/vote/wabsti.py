@@ -3,22 +3,7 @@ from onegov.election_day import _
 from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
-
-
-HEADERS = (
-    'vorlage-nr.',
-    'bfs-nr.',
-    'stimmberechtigte',
-    'leere sz',
-    'ungultige sz',
-    'ja',
-    'nein',
-    'gegenvja',
-    'gegenvnein',
-    'stichfrja',
-    'stichfrnein',
-    'stimmbet',
-)
+from onegov.election_day.import_export.mappings import WABSTI_VOTE_HEADERS
 
 
 def import_vote_wabsti(vote, principal, vote_number, file, mimetype):
@@ -31,11 +16,13 @@ def import_vote_wabsti(vote, principal, vote_number, file, mimetype):
         A list containing errors.
 
     """
-    csv, error = load_csv(file, mimetype, expected_headers=HEADERS)
+    csv, error = load_csv(file, mimetype,
+                          expected_headers=WABSTI_VOTE_HEADERS)
     if error:
         # Wabsti files are sometimes UTF-16
         csv, utf16_error = load_csv(
-            file, mimetype, expected_headers=HEADERS, encoding='utf-16-le'
+            file, mimetype, expected_headers=WABSTI_VOTE_HEADERS,
+            encoding='utf-16-le'
         )
         if utf16_error:
             return [error]

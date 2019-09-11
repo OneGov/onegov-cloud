@@ -12,7 +12,7 @@ from onegov.election_day.formats.common import load_csv
 from sqlalchemy.orm import object_session
 from uuid import uuid4
 
-from onegov.election_day.import_export.election.mappings import \
+from onegov.election_day.import_export.mappings import \
     WABSTIC_PROPORZ_HEADERS_WP_WAHL, \
     WABSTIC_PROPORZ_HEADERS_WPSTATIC_GEMEINDEN, \
     WABSTIC_PROPORZ_HEADERS_WP_GEMEINDEN, WABSTIC_PROPORZ_HEADERS_WP_LISTEN, \

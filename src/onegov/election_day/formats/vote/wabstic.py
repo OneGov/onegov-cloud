@@ -5,33 +5,8 @@ from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from sqlalchemy.orm import object_session
 
-
-HEADERS_SG_GESCHAEFTE = (
-    'art',  # domain
-    'sortwahlkreis',
-    'sortgeschaeft',  # vote number
-    'ausmittlungsstand'
-)
-
-HEADERS_SG_GEMEINDEN = (
-    'art',  # domain
-    'sortwahlkreis',
-    'sortgeschaeft',  # vote number
-    'bfsnrgemeinde',  # BFS
-    'sperrung',  # counted
-    'stimmberechtigte',   # eligible votes
-    'stmungueltig',  # invalid
-    'stmleer',  # empty (proposal if simple)
-    'stmhgja',  # yeas (proposal)
-    'stmhgnein',  # nays (proposal)
-    'stmhgohneaw',  # empty (proposal if complex)
-    'stmn1ja',  # yeas (counter-proposal)
-    'stmn1nein',  # nays (counter-proposal)
-    'stmn1ohneaw',  # empty (counter-proposal)
-    'stmn2ja',  # yeas (tie-breaker)
-    'stmn2nein',  # nays (tie-breaker)
-    'stmn2ohneaw',  # empty (tie-breaker)
-)
+from onegov.election_day.import_export.mappings import \
+    WABSTIC_VOTE_HEADERS_SG_GESCHAEFTE, WABSTIC_VOTE_HEADERS_SG_GEMEINDEN
 
 
 def parse_domain(domain):
@@ -70,7 +45,7 @@ def import_vote_wabstic(vote, principal, number, district,
     # Read the files
     sg_geschaefte, error = load_csv(
         file_sg_geschaefte, mimetype_sg_geschaefte,
-        expected_headers=HEADERS_SG_GESCHAEFTE,
+        expected_headers=WABSTIC_VOTE_HEADERS_SG_GESCHAEFTE,
         filename='sg_geschaefte'
     )
     if error:
@@ -78,7 +53,7 @@ def import_vote_wabstic(vote, principal, number, district,
 
     sg_gemeinden, error = load_csv(
         file_sg_gemeinden, mimetype_sg_gemeinden,
-        expected_headers=HEADERS_SG_GEMEINDEN,
+        expected_headers=WABSTIC_VOTE_HEADERS_SG_GEMEINDEN,
         filename='sg_gemeinden'
     )
     if error:

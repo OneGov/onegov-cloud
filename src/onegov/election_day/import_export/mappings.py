@@ -1,6 +1,4 @@
 
-# ELECTIONS
-
 INTERNAL_COMMON_ELECTION_HEADERS = [
     'election_status',
     'entity_id',
@@ -170,4 +168,86 @@ WABSTIC_PROPORZ_HEADERS_WP_KANDIDATENGDE = (
     'bfsnrgemeinde',  # BFS
     'knr',  # candidate id
     'stimmen',  # votes
+)
+
+# VOTES
+
+DEFAULT_VOTE_HEADER = [
+    'id',
+    'ja stimmen',
+    'nein stimmen',
+    'Stimmberechtigte',
+    'leere stimmzettel',
+    'ungültige stimmzettel'
+]
+
+INTERNAL_VOTE_HEADERS = [
+    'status',
+    'type',
+    'entity_id',
+    'counted',
+    'yeas',
+    'nays',
+    'invalid',
+    'empty',
+    'eligible_voters',
+]
+
+WABSTI_VOTE_HEADERS = (
+    'vorlage-nr.',
+    'bfs-nr.',
+    'stimmberechtigte',
+    'leere sz',
+    'ungultige sz',
+    'ja',
+    'nein',
+    'gegenvja',
+    'gegenvnein',
+    'stichfrja',
+    'stichfrnein',
+    'stimmbet',
+)
+
+WABSTIC_VOTE_HEADERS_SG_GESCHAEFTE = (
+    'art',  # domain
+    'sortwahlkreis',
+    'sortgeschaeft',  # vote number
+    'ausmittlungsstand'
+)
+
+WABSTIC_VOTE_HEADERS_SG_GEMEINDEN = (
+    'art',  # domain
+    'sortwahlkreis',
+    'sortgeschaeft',  # vote number
+    'bfsnrgemeinde',  # BFS
+    'sperrung',  # counted
+    'stimmberechtigte',   # eligible votes
+    'stmungueltig',  # invalid
+    'stmleer',  # empty (proposal if simple)
+    'stmhgja',  # yeas (proposal)
+    'stmhgnein',  # nays (proposal)
+    'stmhgohneaw',  # empty (proposal if complex)
+    'stmn1ja',  # yeas (counter-proposal)
+    'stmn1nein',  # nays (counter-proposal)
+    'stmn1ohneaw',  # empty (counter-proposal)
+    'stmn2ja',  # yeas (tie-breaker)
+    'stmn2nein',  # nays (tie-breaker)
+    'stmn2ohneaw',  # empty (tie-breaker)
+)
+
+WABSTIM_VOTE_HEADERS = (
+    'freigegeben',
+    'stileer',
+    'stiungueltig',
+    'stijahg',
+    'stineinhg',
+    'stiohneawhg',
+    'stijan1',
+    'stineinn1',
+    'stiohneawN1',
+    'stijan2',
+    'stineinn2',
+    'stiohneawN2',
+    'stimmberechtigte',
+    'bfs',
 )

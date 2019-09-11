@@ -4,16 +4,7 @@ from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import BALLOT_TYPES
-
-
-HEADERS = [
-    'id',
-    'ja stimmen',
-    'nein stimmen',
-    'Stimmberechtigte',
-    'leere stimmzettel',
-    'ungültige stimmzettel'
-]
+from onegov.election_day.import_export.mappings import DEFAULT_VOTE_HEADER
 
 
 def import_vote_default(vote, principal, ballot_type, file, mimetype):
@@ -36,7 +27,8 @@ def import_vote_default(vote, principal, ballot_type, file, mimetype):
     }.get(ballot_type)
 
     csv, error = load_csv(
-        file, mimetype, expected_headers=HEADERS, filename=filename
+        file, mimetype, expected_headers=DEFAULT_VOTE_HEADER,
+        filename=filename
     )
     if error:
         return [error]

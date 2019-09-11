@@ -3,24 +3,7 @@ from onegov.election_day import _
 from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
-
-
-HEADERS = (
-    'freigegeben',
-    'stileer',
-    'stiungueltig',
-    'stijahg',
-    'stineinhg',
-    'stiohneawhg',
-    'stijan1',
-    'stineinn1',
-    'stiohneawN1',
-    'stijan2',
-    'stineinn2',
-    'stiohneawN2',
-    'stimmberechtigte',
-    'bfs',
-)
+from onegov.election_day.import_export.mappings import WABSTIM_VOTE_HEADERS
 
 
 def import_vote_wabstim(vote, principal, file, mimetype):
@@ -34,13 +17,16 @@ def import_vote_wabstim(vote, principal, file, mimetype):
 
     """
     csv, error = load_csv(
-        file, mimetype, expected_headers=HEADERS,
+        file, mimetype, expected_headers=WABSTIM_VOTE_HEADERS,
         rename_duplicate_column_names=True
     )
     if error:
         # Wabsti files are sometimes UTF-16
         csv, utf16_error = load_csv(
-            file, mimetype, expected_headers=HEADERS, encoding='utf-16-le',
+            file,
+            mimetype,
+            expected_headers=WABSTIM_VOTE_HEADERS,
+            encoding='utf-16-le',
             rename_duplicate_column_names=True
         )
         if utf16_error:
