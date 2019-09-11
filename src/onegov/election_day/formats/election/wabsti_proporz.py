@@ -6,7 +6,7 @@ from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
 from onegov.ballot import PanachageResult
 from onegov.election_day import _
-from onegov.election_day.formats.common import EXPATS
+from onegov.election_day.formats.common import EXPATS, validate_integer
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from uuid import uuid4
@@ -18,9 +18,9 @@ from onegov.election_day.import_export.mappings import \
 
 def parse_election_result(line, errors, entities):
     try:
-        entity_id = int(line.einheit_bfs or 0)
-    except ValueError:
-        errors.append(_("Invalid entity values"))
+        entity_id = validate_integer(line, 'einheit_bfs')
+    except ValueError as e:
+        errors.append(e.args[0])
     else:
         if entity_id not in entities and entity_id in EXPATS:
             entity_id = 0
@@ -42,10 +42,10 @@ def parse_election_result(line, errors, entities):
 
 def parse_list(line, errors):
     try:
-        list_id = int(line.liste_id or 0)
+        list_id = validate_integer(line, 'liste_id')
         name = line.liste_code
-    except ValueError:
-        errors.append(_("Invalid list values"))
+    except ValueError as e:
+        errors.append(e.args[0])
     else:
         return List(
             id=uuid4(),
@@ -57,9 +57,9 @@ def parse_list(line, errors):
 
 def parse_list_result(line, errors):
     try:
-        votes = int(line.liste_parteistimmentotal or 0)
-    except ValueError:
-        errors.append(_("Invalid list results"))
+        votes = validate_integer(line, 'liste_parteistimmentotal')
+    except ValueError as e:
+        errors.append(e.args[0])
     else:
         return ListResult(
             id=uuid4(),
@@ -87,25 +87,32 @@ def parse_panachage_results(line, errors, panachage):
     # candidate got votes. The column with the own list doesn't contain the
     # votes. The name of the columns are '{Listen-Nr} {Parteikurzbezeichnung}'
     try:
-        target = int(line.liste_id or 0)
+        target = validate_integer(line, 'liste_id')
         if target not in panachage:
             panachage[target] = {}
 
         for name, index in panachage['headers'].items():
             if index not in panachage[target]:
                 panachage[target][index] = 0
-            panachage[target][index] += int(getattr(line, name) or 0)
+            panachage[target][index] += validate_integer(line, name)
 
-    except ValueError:
+    except ValueError as e:
+        errors.append(e.args[0])
+
+    except Exception:
         errors.append(_("Invalid list results"))
 
 
 def parse_candidate(line, errors):
     try:
-        candidate_id = int(line.liste_kandid or 0)
+        candidate_id = validate_integer(line, 'liste_kandid')
         family_name = line.kand_nachname
         first_name = line.kand_vorname
-    except ValueError:
+
+    except ValueError as e:
+        errors.append(e.args[0])
+
+    except Exception:
         errors.append(_("Invalid candidate values"))
     else:
         return Candidate(
@@ -119,9 +126,9 @@ def parse_candidate(line, errors):
 
 def parse_candidate_result(line, errors):
     try:
-        votes = int(line.kand_stimmentotal or 0)
-    except ValueError:
-        errors.append(_("Invalid candidate results"))
+        votes = validate_integer(line, 'kand_stimmentotal')
+    except ValueError as e:
+        errors.append(e.args[0])
     else:
         return CandidateResult(
             id=uuid4(),
@@ -131,10 +138,14 @@ def parse_candidate_result(line, errors):
 
 def parse_connection(line, errors):
     try:
-        list_id = int(line.liste or 0)
+        list_id = validate_integer(line, 'liste')
         connection_id = line.lv
         subconnection_id = line.luv
-    except ValueError:
+
+    except ValueError as e:
+        errors.append(e.args[0])
+
+    except Exception:
         errors.append(_("Invalid list connection values"))
     else:
         connection = ListConnection(
@@ -314,11 +325,11 @@ def import_election_wabsti_proporz(
             indexes = dict([(item.id, key) for key, item in lists.items()])
             for line in csv.lines:
                 try:
-                    candidate_id = int(line.liste_kandid or 0)
-                except ValueError:
+                    candidate_id = validate_integer(line, 'liste_kandid')
+                except ValueError as e:
                     errors.append(
                         FileImportError(
-                            error=_("Invalid values"),
+                            error=e.args[0],
                             line=line.rownumber,
                             filename=filename
                         )
@@ -362,16 +373,17 @@ def import_election_wabsti_proporz(
             for line in csv.lines:
                 try:
                     group = line.einheit_name.strip()
-                    entity_id = int(line.einheit_bfs or 0)
-                    eligible_voters = int(line.stimbertotal or 0)
-                    received_ballots = int(line.wzeingegangen or 0)
-                    blank_ballots = int(line.wzleer or 0)
-                    invalid_ballots = int(line.wzungueltig or 0)
-                    blank_votes = int(line.stmwzveraendertleeramtlleer or 0)
-                except ValueError:
+                    entity_id = validate_integer(line, 'einheit_bfs')
+                    eligible_voters = validate_integer(line, 'stimbertotal')
+                    received_ballots = validate_integer(line, 'wzeingegangen')
+                    blank_ballots = validate_integer(line, 'wzleer')
+                    invalid_ballots = validate_integer(line, 'wzungueltig')
+                    blank_votes = validate_integer(
+                        line, 'stmwzveraendertleeramtlleer')
+                except ValueError as e:
                     errors.append(
                         FileImportError(
-                            error=_("Invalid values"),
+                            error=e.args[0],
                             line=line.rownumber,
                             filename=filename
                         )

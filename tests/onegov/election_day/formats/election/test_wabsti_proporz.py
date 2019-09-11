@@ -408,19 +408,21 @@ def test_import_wabsti_proporz_invalid_values(session):
         ).encode('utf-8')), 'text/plain',
     )
 
-    assert sorted([
+    errors = sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
-    ]) == [
-        ('Elected Candidates', 2, 'Invalid values'),
+    ])
+    print(errors)
+    assert errors == [
+        ('Elected Candidates', 2, 'Invalid integer: liste_kandid'),
         ('Elected Candidates', 3, 'Unknown candidate'),
-        ('Election statistics', 2, 'Invalid values'),
-        ('List connections', 2, 'Invalid list connection values'),
-        ('Results', 2, 'Invalid candidate results'),
-        ('Results', 2, 'Invalid candidate values'),
-        ('Results', 2, 'Invalid entity values'),
-        ('Results', 2, 'Invalid list results'),
-        ('Results', 2, 'Invalid list results'),
-        ('Results', 2, 'Invalid list values'),
+        ('Election statistics', 2, 'Invalid integer: einheit_bfs'),
+        ('List connections', 2, 'Invalid integer: liste'),
+        ('Results', 2, 'Invalid integer: einheit_bfs'),
+        ('Results', 2, 'Invalid integer: kand_stimmentotal'),
+        ('Results', 2, 'Invalid integer: liste_id'),
+        ('Results', 2, 'Invalid integer: liste_id'),
+        ('Results', 2, 'Invalid integer: liste_kandid'),
+        ('Results', 2, 'Invalid integer: liste_parteistimmentotal'),
         ('Results', 3, '1234 is unknown')
     ]
 
