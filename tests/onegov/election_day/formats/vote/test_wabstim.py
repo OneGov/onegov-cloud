@@ -206,15 +206,17 @@ def test_import_wabstim_vote_invalid_values(session):
         ).encode('utf-8')),
         'text/plain',
     )
-    assert sorted(set([
+    errors = sorted(set([
         (e.line, e.error.interpolate()) for e in errors
-    ])) == [
-        (2, 'Could not read nays'),
-        (2, 'Could not read the eligible voters'),
-        (2, 'Could not read the empty votes'),
-        (2, 'Could not read the invalid votes'),
-        (2, 'Could not read yeas'),
-        (2, 'Invalid id'),
+    ]))
+    print(errors)
+    assert errors == [
+        (2, 'Invalid integer: bfs'),
+        (2, 'Invalid integer: stijahg'),
+        (2, 'Invalid integer: stileer'),
+        (2, 'Invalid integer: stimmberechtigte'),
+        (2, 'Invalid integer: stineinhg'),
+        (2, 'Invalid integer: stiungueltig'),
         (4, '3427 was found twice'),
         (5, '3428 is unknown'),
     ]
