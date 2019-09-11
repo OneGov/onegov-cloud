@@ -210,15 +210,17 @@ def test_import_default_vote_invalid_values(session):
         'text/plain'
     )
 
-    assert sorted(set([
+    errors = sorted(set([
         (e.line, e.error.interpolate()) for e in errors
-    ])) == [
-        (2, 'Could not read nays'),
-        (2, 'Could not read the eligible voters'),
-        (2, 'Could not read the empty votes'),
-        (2, 'Could not read the invalid votes'),
-        (2, 'Could not read yeas'),
-        (2, 'Invalid id'),
+    ]))
+    print(errors)
+    assert errors == [
+        (2, 'Invalid integer: id'),
+        (2, 'Invalid integer: ja_stimmen'),
+        (2, 'Invalid integer: leere_stimmzettel'),
+        (2, 'Invalid integer: nein_stimmen'),
+        (2, 'Invalid integer: stimmberechtigte'),
+        (2, 'Invalid integer: ungultige_stimmzettel'),
         (3, '1234 is unknown'),
         (3, 'More cast votes than eligible voters'),
         (3, 'No eligible voters'),
