@@ -1,4 +1,4 @@
-var createEmbedLink = function(el)  {
+var createEmbedLink = function(el) {
     var embedLink = $(el).data('embed-link');
     var embedSource = $(el).data('embed-source');
     if (embedLink && embedSource) {
