@@ -1,6 +1,5 @@
 from abc import ABCMeta, abstractmethod
 from attr import attrs, attrib
-from morepath import Response
 from onegov.core.crypto import random_token
 from onegov.core.utils import rchop
 from onegov.user import _, log, UserCollection
@@ -11,6 +10,7 @@ from translationstring import TranslationString
 from typing import Dict
 from typing import Optional
 from ua_parser import user_agent_parser
+from webob import Response
 from webob.exc import HTTPClientError
 
 
