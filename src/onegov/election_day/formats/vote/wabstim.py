@@ -71,7 +71,7 @@ def import_vote_wabstim(vote, principal, file, mimetype):
 
         try:
             counted = True if line.freigegeben else False
-        except ValueError:
+        except AttributeError:
             line_errors.append(_("Invalid values"))
 
         # Skip expats if not enabled
