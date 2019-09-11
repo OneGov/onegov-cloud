@@ -155,6 +155,7 @@ def line_is_relevant(line, number, district=None):
 def validate_integer(line, col, treat_none_as_default=True, default=0):
     """
     Checks line of a csv file for a valid integer.
+    Raises an error if the attribute is not there.
 
     :param line: line object from csv reader
     :param col: attribute of line object
