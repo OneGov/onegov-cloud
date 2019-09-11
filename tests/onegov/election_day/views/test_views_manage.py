@@ -206,8 +206,12 @@ def test_view_clear_results(election_day_app):
         '/elections/elections/party-strengths',
         '/vote/vote/entities'
     )
-    assert all((marker in client.get(url) or i_marker in client.get(url)
-                for url in urls))
+    for url in urls:
+        page = client.get(url)
+        if marker not in page and i_marker not in page:
+            print(url)
+            assert False
+
 
     client.get('/election/majorz-election/clear').form.submit()
     client.get('/election/proporz-election/clear').form.submit()
