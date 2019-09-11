@@ -9,6 +9,8 @@ from onegov.election_day.models import Canton
 from onegov.election_day.models import Municipality
 from pytest import mark
 
+from tests.onegov.election_day.common import print_errors
+
 
 @mark.parametrize("tar_file", [
     module_path('tests.onegov.election_day', 'fixtures/wabsti_majorz.tar.gz'),
@@ -301,12 +303,14 @@ def test_import_wabsti_majorz_invalid_values(session):
         ).encode('utf-8')), 'text/plain',
     )
 
-    assert sorted([
+    errors = sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
-    ]) == [
+    ])
+    print(errors)
+    assert errors == [
         ('Elected Candidates', 2, 'Unknown candidate'),
-        ('Results', 2, 'Invalid election values'),
-        ('Results', 2, 'Invalid entity values'),
+        ('Results', 2, 'Invalid integer: anzmandate'),
+        ('Results', 2, 'Invalid integer: bfs'),
         ('Results', 3, '1234 is unknown')
     ]
 
