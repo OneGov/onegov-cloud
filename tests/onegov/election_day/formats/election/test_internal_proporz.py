@@ -10,8 +10,6 @@ from onegov.election_day.formats import import_election_internal_proporz
 from onegov.election_day.models import Canton
 from pytest import mark
 
-from tests.onegov.election_day.common import print_errors
-
 
 def election_fixture_import(
         session,
@@ -38,7 +36,6 @@ def election_fixture_import(
         return errors
     else:
         raise NotImplementedError
-
 
 
 @mark.parametrize('csv_file', [

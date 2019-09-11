@@ -7,20 +7,8 @@ from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from uuid import uuid4
 
-
-HEADERS = [
-    'anzmandate',
-    # 'absolutesmehr' optional
-    'bfs',
-    'stimmber',
-    # 'stimmabgegeben' or 'wzabgegeben'
-    # 'wzleer' or 'stimmleer'
-    # 'wzungueltig' or 'stimmungueltig'
-]
-
-HEADERS_CANDIDATES = [
-    'kandid',
-]
+from onegov.election_day.import_export.election.main import \
+    WABSTI_MAJORZ_HEADERS, WABSTI_MAJORZ_HEADERS_CANDIDATES
 
 
 def parse_election(line, errors):
@@ -168,12 +156,12 @@ def import_election_wabsti_majorz(
     # This format has one entity per line and every candidate as row
     filename = _("Results")
     csv, error = load_csv(
-        file, mimetype, expected_headers=HEADERS, filename=filename
+        file, mimetype, expected_headers=WABSTI_MAJORZ_HEADERS, filename=filename
     )
     if error:
         # Wabsti files are sometimes UTF-16
         csv, utf16_error = load_csv(
-            file, mimetype, expected_headers=HEADERS, encoding='utf-16-le'
+            file, mimetype, expected_headers=WABSTI_MAJORZ_HEADERS, encoding='utf-16-le'
         )
         if utf16_error:
             errors.append(error)
@@ -219,14 +207,15 @@ def import_election_wabsti_majorz(
     if elected_file and elected_mimetype:
         csv, error = load_csv(
             elected_file, elected_mimetype,
-            expected_headers=HEADERS_CANDIDATES,
+            expected_headers=WABSTI_MAJORZ_HEADERS_CANDIDATES,
             filename=filename
         )
         if error:
             # Wabsti files are sometimes UTF-16
             csv, utf16_error = load_csv(
                 elected_file, elected_mimetype,
-                expected_headers=HEADERS_CANDIDATES, encoding='utf-16-le'
+                expected_headers=WABSTI_MAJORZ_HEADERS_CANDIDATES,
+                encoding='utf-16-le'
             )
             if utf16_error:
                 errors.append(error)

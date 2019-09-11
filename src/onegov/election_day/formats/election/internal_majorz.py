@@ -9,25 +9,8 @@ from onegov.election_day.formats.common import STATI
 from sqlalchemy.orm import object_session
 from uuid import uuid4
 
-
-HEADERS = [
-    'election_absolute_majority',
-    'election_status',
-    'entity_id',
-    'entity_counted',
-    'entity_eligible_voters',
-    'entity_received_ballots',
-    'entity_blank_ballots',
-    'entity_invalid_ballots',
-    'entity_blank_votes',
-    'entity_invalid_votes',
-    'candidate_family_name',
-    'candidate_first_name',
-    'candidate_id',
-    'candidate_elected',
-    'candidate_votes',
-    'candidate_party',
-]
+from onegov.election_day.import_export.election.main import \
+    INTERNAL_MAJORZ_HEADERS
 
 
 def parse_election(line, errors):
@@ -133,7 +116,8 @@ def import_election_internal_majorz(election, principal, file, mimetype):
     """
     filename = _("Results")
     csv, error = load_csv(
-        file, mimetype, expected_headers=HEADERS, filename=filename,
+        file, mimetype, expected_headers=INTERNAL_MAJORZ_HEADERS,
+        filename=filename,
         dialect='excel'
     )
     if error:

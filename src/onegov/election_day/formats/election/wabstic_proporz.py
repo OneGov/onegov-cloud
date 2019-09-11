@@ -12,55 +12,14 @@ from onegov.election_day.formats.common import load_csv
 from sqlalchemy.orm import object_session
 from uuid import uuid4
 
-
-HEADERS_WP_WAHL = (
-    'sortgeschaeft',  # provides the link to the election
-    'ausmittlungsstand',  # complete
-)
-HEADERS_WPSTATIC_GEMEINDEN = (
-    'sortwahlkreis',  # provides the link to the election
-    'sortgeschaeft',  # provides the link to the election
-    'bfsnrgemeinde',  # BFS
-    'stimmberechtigte',  # eligible votes
-)
-HEADERS_WP_GEMEINDEN = (
-    'bfsnrgemeinde',  # BFS
-    'stimmberechtigte',  # eligible votes
-    'sperrung',  # counted
-    'stmabgegeben',  # received ballots
-    'stmleer',  # blank ballots
-    'stmungueltig',  # invalid ballots
-    'anzwzamtleer',  # blank ballots
-)
-HEADERS_WP_LISTEN = (
-    'sortgeschaeft',  # provides the link to the election
-    'listnr',
-    'listcode',
-    'sitze',
-    'listverb',
-    'listuntverb',
-)
-HEADERS_WP_LISTENGDE = (
-    'bfsnrgemeinde',  # BFS
-    'listnr',
-    'stimmentotal',
-)
-HEADERS_WPSTATIC_KANDIDATEN = (
-    'sortgeschaeft',  # provides the link to the election
-    'knr',  # candidate id
-    'nachname',  # familiy name
-    'vorname',  # first name
-)
-HEADERS_WP_KANDIDATEN = (
-    'sortgeschaeft',  # provides the link to the election
-    'knr',  # candidate id
-    'gewaehlt',  # elected
-)
-HEADERS_WP_KANDIDATENGDE = (
-    'bfsnrgemeinde',  # BFS
-    'knr',  # candidate id
-    'stimmen',  # votes
-)
+from onegov.election_day.import_export.election.main import \
+    WABSTIC_PROPORZ_HEADERS_WP_WAHL, \
+    WABSTIC_PROPORZ_HEADERS_WPSTATIC_GEMEINDEN, \
+    WABSTIC_PROPORZ_HEADERS_WP_GEMEINDEN, WABSTIC_PROPORZ_HEADERS_WP_LISTEN, \
+    WABSTIC_PROPORZ_HEADERS_WP_LISTENGDE, \
+    WABSTIC_PROPORZ_HEADERS_WPSTATIC_KANDIDATEN, \
+    WABSTIC_PROPORZ_HEADERS_WP_KANDIDATEN, \
+    WABSTIC_PROPORZ_HEADERS_WP_KANDIDATENGDE
 
 
 def get_entity_id(line, expats):
@@ -116,7 +75,7 @@ def import_election_wabstic_proporz(
     # Read the files
     wp_wahl, error = load_csv(
         file_wp_wahl, mimetype_wp_wahl,
-        expected_headers=HEADERS_WP_WAHL,
+        expected_headers=WABSTIC_PROPORZ_HEADERS_WP_WAHL,
         filename='wp_wahl'
     )
     if error:
@@ -124,7 +83,7 @@ def import_election_wabstic_proporz(
 
     wpstatic_gemeinden, error = load_csv(
         file_wpstatic_gemeinden, mimetype_wpstatic_gemeinden,
-        expected_headers=HEADERS_WPSTATIC_GEMEINDEN,
+        expected_headers=WABSTIC_PROPORZ_HEADERS_WPSTATIC_GEMEINDEN,
         filename='wpstatic_gemeinden'
     )
     if error:
@@ -132,7 +91,7 @@ def import_election_wabstic_proporz(
 
     wp_gemeinden, error = load_csv(
         file_wp_gemeinden, mimetype_wp_gemeinden,
-        expected_headers=HEADERS_WP_GEMEINDEN,
+        expected_headers=WABSTIC_PROPORZ_HEADERS_WP_GEMEINDEN,
         filename='wp_gemeinden'
     )
     if error:
@@ -140,7 +99,7 @@ def import_election_wabstic_proporz(
 
     wp_listen, error = load_csv(
         file_wp_listen, mimetype_wp_listen,
-        expected_headers=HEADERS_WP_LISTEN,
+        expected_headers=WABSTIC_PROPORZ_HEADERS_WP_LISTEN,
         filename='wp_listen'
     )
     if error:
@@ -148,7 +107,7 @@ def import_election_wabstic_proporz(
 
     wp_listengde, error = load_csv(
         file_wp_listengde, mimetype_wp_listengde,
-        expected_headers=HEADERS_WP_LISTENGDE,
+        expected_headers=WABSTIC_PROPORZ_HEADERS_WP_LISTENGDE,
         filename='wp_listengde'
     )
     if error:
@@ -156,7 +115,7 @@ def import_election_wabstic_proporz(
 
     wpstatic_kandidaten, error = load_csv(
         file_wpstatic_kandidaten, mimetype_wpstatic_kandidaten,
-        expected_headers=HEADERS_WPSTATIC_KANDIDATEN,
+        expected_headers=WABSTIC_PROPORZ_HEADERS_WPSTATIC_KANDIDATEN,
         filename='wpstatic_kandidaten'
     )
     if error:
@@ -164,7 +123,7 @@ def import_election_wabstic_proporz(
 
     wp_kandidaten, error = load_csv(
         file_wp_kandidaten, mimetype_wp_kandidaten,
-        expected_headers=HEADERS_WP_KANDIDATEN,
+        expected_headers=WABSTIC_PROPORZ_HEADERS_WP_KANDIDATEN,
         filename='wp_kandidaten'
     )
     if error:
@@ -172,7 +131,7 @@ def import_election_wabstic_proporz(
 
     wp_kandidatengde, error = load_csv(
         file_wp_kandidatengde, mimetype_wp_kandidatengde,
-        expected_headers=HEADERS_WP_KANDIDATENGDE,
+        expected_headers=WABSTIC_PROPORZ_HEADERS_WP_KANDIDATENGDE,
         filename='wp_kandidatengde'
     )
     if error:

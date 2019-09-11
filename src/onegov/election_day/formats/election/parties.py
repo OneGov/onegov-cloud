@@ -7,16 +7,8 @@ from re import match
 from sqlalchemy.orm import object_session
 from uuid import uuid4
 
-
-HEADERS = [
-    'year',
-    'total_votes',
-    'name',
-    'id',
-    'color',
-    'mandates',
-    'votes',
-]
+from onegov.election_day.import_export.election.main import \
+    ELECTION_PARTY_HEADERS
 
 
 def parse_party_result(line, errors, results, totals, parties, election_year):
@@ -103,7 +95,8 @@ def import_party_results(election, file, mimetype):
     # The party results file has one party per year per line (but only
     # panachage results in the year of the election)
     if file and mimetype:
-        csv, error = load_csv(file, mimetype, expected_headers=HEADERS)
+        csv, error = load_csv(
+            file, mimetype, expected_headers=ELECTION_PARTY_HEADERS)
         if error:
             errors.append(error)
         else:

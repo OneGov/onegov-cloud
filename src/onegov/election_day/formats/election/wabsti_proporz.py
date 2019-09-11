@@ -11,37 +11,9 @@ from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from uuid import uuid4
 
-
-HEADERS = [
-    'einheit_bfs',
-    'liste_kandid',
-    'kand_nachname',
-    'kand_vorname',
-    'liste_id',
-    'liste_code',
-    'kand_stimmentotal',
-    'liste_parteistimmentotal',
-]
-
-HEADERS_CONNECTIONS = [
-    'liste',
-    'lv',
-    'luv',
-]
-
-HEADERS_CANDIDATES = [
-    'liste_kandid'
-]
-
-HEADERS_STATS = [
-    'einheit_bfs',
-    'einheit_name',
-    'stimbertotal',
-    'wzeingegangen',
-    'wzleer',
-    'wzungueltig',
-    'stmwzveraendertleeramtlleer',
-]
+from onegov.election_day.import_export.election.main import \
+    WABSTI_PROPORZ_HEADERS, WABSTI_PROPORZ_HEADERS_CONNECTIONS, \
+    WABSTI_PROPORZ_HEADERS_CANDIDATES, WABSTI_PROPORZ_HEADERS_STATS
 
 
 def parse_election_result(line, errors, entities):
@@ -206,12 +178,14 @@ def import_election_wabsti_proporz(
     # This format has one candiate per entity per line
     filename = _("Results")
     csv, error = load_csv(
-        file, mimetype, expected_headers=HEADERS, filename=filename
+        file, mimetype, expected_headers=WABSTI_PROPORZ_HEADERS,
+        filename=filename
     )
     if error:
         # Wabsti files are sometimes UTF-16
         csv, utf16_error = load_csv(
-            file, mimetype, expected_headers=HEADERS, filename=filename,
+            file, mimetype, expected_headers=WABSTI_PROPORZ_HEADERS,
+            filename=filename,
             encoding='utf-16-le'
         )
         if utf16_error:
@@ -268,14 +242,15 @@ def import_election_wabsti_proporz(
     if connections_file and connections_mimetype:
         csv, error = load_csv(
             connections_file, connections_mimetype,
-            expected_headers=HEADERS_CONNECTIONS,
+            expected_headers=WABSTI_PROPORZ_HEADERS_CONNECTIONS,
             filename=filename
         )
         if error:
             # Wabsti files are sometimes UTF-16
             csv, utf16_error = load_csv(
                 connections_file, connections_mimetype,
-                expected_headers=HEADERS_CONNECTIONS, filename=filename,
+                expected_headers=WABSTI_PROPORZ_HEADERS_CONNECTIONS,
+                filename=filename,
                 encoding='utf-16-le'
             )
             if utf16_error:
@@ -320,14 +295,15 @@ def import_election_wabsti_proporz(
     if elected_file and elected_mimetype:
         csv, error = load_csv(
             elected_file, elected_mimetype,
-            expected_headers=HEADERS_CANDIDATES,
+            expected_headers=WABSTI_PROPORZ_HEADERS_CANDIDATES,
             filename=filename
         )
         if error:
             # Wabsti files are sometimes UTF-16
             csv, utf16_error = load_csv(
                 elected_file, elected_mimetype,
-                expected_headers=HEADERS_CANDIDATES, filename=filename,
+                expected_headers=WABSTI_PROPORZ_HEADERS_CANDIDATES,
+                filename=filename,
                 encoding='utf-16-le'
             )
             if utf16_error:
@@ -367,13 +343,13 @@ def import_election_wabsti_proporz(
     if statistics_file and statistics_mimetype:
         csv, error = load_csv(
             statistics_file, statistics_mimetype,
-            expected_headers=HEADERS_STATS, filename=filename
+            expected_headers=WABSTI_PROPORZ_HEADERS_STATS, filename=filename
         )
         if error:
             # Wabsti files are sometimes UTF-16
             csv, utf16_error = load_csv(
                 statistics_file, statistics_mimetype,
-                expected_headers=HEADERS_STATS, filename=filename,
+                expected_headers=WABSTI_PROPORZ_HEADERS_STATS, filename=filename,
                 encoding='utf-16-le'
             )
             if utf16_error:
