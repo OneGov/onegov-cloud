@@ -119,7 +119,7 @@ def parse_panachage_results(line, errors, panachage):
             panachage[target] = {}
             for name, index in panachage['headers'].items():
                 panachage[target][index] = validate_integer(
-                    getattr(line, name), treat_none_as_default=False)
+                    line, name, treat_none_as_default=False)
 
     except ValueError as e:
         errors.append(e.args[0])
