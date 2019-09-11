@@ -327,6 +327,7 @@ def import_election_internal_proporz(election, principal, file, mimetype):
     list_uids = {r['list_id']: r['id'] for r in lists.values()}
 
     session = object_session(election)
+    # FIXME: Sub-Sublists are also possible
     session.bulk_insert_mappings(ListConnection, connections.values())
     session.bulk_insert_mappings(ListConnection, subconnections.values())
     session.bulk_insert_mappings(List, lists.values())
@@ -335,7 +336,8 @@ def import_election_internal_proporz(election, principal, file, mimetype):
             id=uuid4(),
             source=source,
             target=str(list_uids[list_id]),
-            votes=votes
+            votes=votes,
+            owner=election_id
         )
         for list_id in filter(lambda x: x != 'headers', panachage)
         for source, votes in panachage[list_id].items()
