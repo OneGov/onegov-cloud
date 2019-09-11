@@ -1,3 +1,16 @@
+"""
+
+Following mappings should be used to map csv headers and database columns
+for import and export.
+
+Keys are the columns from the CSV Files, values are col names returned by
+database query.
+
+For complex queries, it is much better to write them in pure sql. Return
+the table as named tuples and work with that and this mapping.
+
+"""
+
 
 #  --- INTERNAL
 
