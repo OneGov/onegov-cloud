@@ -244,86 +244,85 @@ def test_import_internal_proporz_invalid_values(session):
     errors = import_election_internal_proporz(
         election, principal,
         BytesIO((
-            '\n'.join((
-                ','.join((
-                    'election_status',
-                    'entity_id',
-                    'entity_counted',
-                    'entity_eligible_voters',
-                    'entity_received_ballots',
-                    'entity_blank_ballots',
-                    'entity_invalid_ballots',
-                    'entity_blank_votes',
-                    'entity_invalid_votes',
-                    'list_name',
-                    'list_id',
-                    'list_number_of_mandates',
-                    'list_votes',
-                    'list_connection',
-                    'list_connection_parent',
-                    'candidate_family_name',
-                    'candidate_first_name',
-                    'candidate_id',
-                    'candidate_elected',
-                    'candidate_votes',
-                    'candidate_party',
-                )),
-                ','.join((
-                    'xxx',  # election_status
-                    'xxx',  # entity_id
-                    'xxx',  # entity_counted
-                    'xxx',  # entity_eligible_voters
-                    'xxx',  # entity_received_ballots
-                    'xxx',  # entity_blank_ballots
-                    'xxx',  # entity_invalid_ballots
-                    'xxx',  # entity_blank_votes
-                    'xxx',  # entity_invalid_votes
-                    'xxx',  # list_name
-                    'xxx',  # list_id
-                    'xxx',  # list_number_of_mandates
-                    'xxx',  # list_votes
-                    'xxx',  # list_connection
-                    'xxx',  # list_connection_parent
-                    'xxx',  # candidate_family_name
-                    'xxx',  # candidate_first_name
-                    'xxx',  # candidate_id
-                    'xxx',  # candidate_elected
-                    'xxx',  # candidate_votes
-                    'xxx',  # candidate_party
-                )),
-                ','.join((
-                    'unknown',  # election_status
-                    '1234',  # entity_id
-                    'True',  # entity_counted
-                    '100',  # entity_eligible_voters
-                    '10',  # entity_received_ballots
-                    '0',  # entity_blank_ballots
-                    '0',  # entity_invalid_ballots
-                    '0',  # entity_blank_votes
-                    '0',  # entity_invalid_votes
-                    '',  # list_name
-                    '',  # list_id
-                    '',  # list_number_of_mandates
-                    '',  # list_votes
-                    '',  # list_connection
-                    '',  # list_connection_parent
-                    '',  # candidate_family_name
-                    '',  # candidate_first_name
-                    '',  # candidate_id
-                    '',  # candidate_elected
-                    '',  # candidate_votes
-                    '',  # candidate_party
-                )),
-            ))
-        ).encode('utf-8')), 'text/plain',
+                    '\n'.join((
+                        ','.join((
+                            'election_status',
+                            'entity_id',
+                            'entity_counted',
+                            'entity_eligible_voters',
+                            'entity_received_ballots',
+                            'entity_blank_ballots',
+                            'entity_invalid_ballots',
+                            'entity_blank_votes',
+                            'entity_invalid_votes',
+                            'list_name',
+                            'list_id',
+                            'list_number_of_mandates',
+                            'list_votes',
+                            'list_connection',
+                            'list_connection_parent',
+                            'candidate_family_name',
+                            'candidate_first_name',
+                            'candidate_id',
+                            'candidate_elected',
+                            'candidate_votes',
+                            'candidate_party',
+                        )),
+                        ','.join((
+                            'xxx',  # election_status
+                            'xxx',  # entity_id
+                            'xxx',  # entity_counted
+                            'xxx',  # entity_eligible_voters
+                            'xxx',  # entity_received_ballots
+                            'xxx',  # entity_blank_ballots
+                            'xxx',  # entity_invalid_ballots
+                            'xxx',  # entity_blank_votes
+                            'xxx',  # entity_invalid_votes
+                            'xxx',  # list_name
+                            'xxx',  # list_id
+                            'xxx',  # list_number_of_mandates
+                            'xxx',  # list_votes
+                            'xxx',  # list_connection
+                            'xxx',  # list_connection_parent
+                            'xxx',  # candidate_family_name
+                            'xxx',  # candidate_first_name
+                            'xxx',  # candidate_id
+                            'xxx',  # candidate_elected
+                            'xxx',  # candidate_votes
+                            'xxx',  # candidate_party
+                        )),
+                        ','.join((
+                            'unknown',  # election_status
+                            '1234',  # entity_id
+                            'True',  # entity_counted
+                            '100',  # entity_eligible_voters
+                            '10',  # entity_received_ballots
+                            '0',  # entity_blank_ballots
+                            '0',  # entity_invalid_ballots
+                            '0',  # entity_blank_votes
+                            '0',  # entity_invalid_votes
+                            '',  # list_name
+                            '',  # list_id
+                            '',  # list_number_of_mandates
+                            '',  # list_votes
+                            '',  # list_connection
+                            '',  # list_connection_parent
+                            '',  # candidate_family_name
+                            '',  # candidate_first_name
+                            '',  # candidate_id
+                            '',  # candidate_elected
+                            '',  # candidate_votes
+                            '',  # candidate_party
+                        )),
+                    ))
+                ).encode('utf-8')), 'text/plain',
     )
-
-    assert sorted([(e.line, e.error.interpolate()) for e in errors]) == [
+    errors = sorted([(e.line, e.error.interpolate()) for e in errors])
+    print(errors)
+    assert errors == [
         (2, 'Invalid candidate results'),
-        (2, 'Invalid candidate values'),
         (2, 'Invalid entity values'),
-        (2, 'Invalid list results'),
-        (2, 'Invalid list results'),
+        (2, 'Invalid integer: list_votes'),
         (2, 'Invalid list values'),
         (2, 'Invalid status'),
         (3, '1234 is unknown'),
