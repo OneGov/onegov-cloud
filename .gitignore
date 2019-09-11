@@ -71,3 +71,6 @@ eggs/
 
 # Sphinx
 docs/_build
+
+# node
+node_modules/
