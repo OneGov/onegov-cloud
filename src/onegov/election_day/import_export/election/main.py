@@ -1,4 +1,7 @@
-INTERNAL_PROPORZ_HEADERS = [
+
+# ELECTIONS
+
+INTERNAL_COMMON_ELECTION_HEADERS = [
     'election_status',
     'entity_id',
     'entity_counted',
@@ -8,12 +11,6 @@ INTERNAL_PROPORZ_HEADERS = [
     'entity_invalid_ballots',
     'entity_blank_votes',
     'entity_invalid_votes',
-    'list_name',
-    'list_id',
-    'list_number_of_mandates',
-    'list_votes',
-    'list_connection',
-    'list_connection_parent',
     'candidate_family_name',
     'candidate_first_name',
     'candidate_id',
@@ -22,24 +19,18 @@ INTERNAL_PROPORZ_HEADERS = [
     'candidate_party',
 ]
 
+INTERNAL_PROPORZ_HEADERS = [
+    'list_name',
+    'list_id',
+    'list_number_of_mandates',
+    'list_votes',
+    'list_connection',
+    'list_connection_parent',
+] + INTERNAL_COMMON_ELECTION_HEADERS
+
 INTERNAL_MAJORZ_HEADERS = [
     'election_absolute_majority',
-    'election_status',
-    'entity_id',
-    'entity_counted',
-    'entity_eligible_voters',
-    'entity_received_ballots',
-    'entity_blank_ballots',
-    'entity_invalid_ballots',
-    'entity_blank_votes',
-    'entity_invalid_votes',
-    'candidate_family_name',
-    'candidate_first_name',
-    'candidate_id',
-    'candidate_elected',
-    'candidate_votes',
-    'candidate_party',
-]
+] + INTERNAL_COMMON_ELECTION_HEADERS
 
 ELECTION_PARTY_HEADERS = [
     'year',
