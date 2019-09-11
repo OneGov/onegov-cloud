@@ -87,9 +87,9 @@ def parse_list(line, errors, election_id):
 
 def parse_list_result(line, errors):
     try:
-        votes = int(line.list_votes or 0)
-    except ValueError:
-        errors.append(_("Invalid list results"))
+        votes = validate_integer(line, 'list_votes')
+    except ValueError as e:
+        errors.append(e.args[0])
     else:
         return dict(
             id=uuid4(),
@@ -120,7 +120,7 @@ def parse_panachage_results(line, errors, panachage):
             for name, index in panachage['headers'].items():
                 panachage[target][index] = int(getattr(line, name))
 
-    except ValueError:
+    except Exception:
         errors.append(_("Invalid list results"))
 
 
