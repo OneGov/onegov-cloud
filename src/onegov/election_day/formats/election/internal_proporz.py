@@ -13,7 +13,7 @@ from onegov.election_day.formats.common import STATI
 from sqlalchemy.orm import object_session
 from uuid import uuid4
 
-from onegov.election_day.import_export.election.main import \
+from onegov.election_day.import_export.election.mappings import \
     INTERNAL_PROPORZ_HEADERS
 
 
