@@ -161,14 +161,16 @@ def test_import_internal_vote_invalid_values(session):
         'text/plain'
     )
 
-    assert sorted(set([(e.line, e.error.interpolate()) for e in errors])) == [
-        (2, 'Could not read nays'),
-        (2, 'Could not read the eligible voters'),
-        (2, 'Could not read the empty votes'),
-        (2, 'Could not read the invalid votes'),
-        (2, 'Could not read yeas'),
+    errors = sorted(set([(e.line, e.error.interpolate()) for e in errors]))
+    print(errors)
+    assert errors == [
         (2, 'Invalid ballot type'),
-        (2, 'Invalid id'),
+        (2, 'Invalid integer: eligible_voters'),
+        (2, 'Invalid integer: empty'),
+        (2, 'Invalid integer: entity_id'),
+        (2, 'Invalid integer: invalid'),
+        (2, 'Invalid integer: nays'),
+        (2, 'Invalid integer: yeas'),
         (2, 'Invalid status'),
         (3, '1234 is unknown'),
         (3, 'More cast votes than eligible voters'),
