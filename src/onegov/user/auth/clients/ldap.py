@@ -46,13 +46,6 @@ class LDAPClient():
     # The password for the LDAP connection
     password: str = attrib()
 
-    @url.validator
-    def is_secure(self, attribute, value):
-        """ Asserts that LDAP can only be connect to via TLS. """
-
-        if not value.startswith('ldaps://'):
-            raise ValueError(f"Invalid url: {value}, must start with ldaps://")
-
     @property
     def base_dn(self):
         """ Extracts the distinguished name from the username. """
