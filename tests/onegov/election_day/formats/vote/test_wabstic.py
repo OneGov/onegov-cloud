@@ -262,24 +262,26 @@ def test_import_wabstic_vote_invalid_values(session):
         ).encode('utf-8')),
         'text/plain'
     )
-    assert sorted([
+    errors = sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
-    ]) == [
+    ])
+    print(errors)
+    assert errors == [
         ('sg_gemeinden', 2, '100 is unknown'),
-        ('sg_gemeinden', 2, 'Could not read nays'),
-        ('sg_gemeinden', 2, 'Could not read the eligible voters'),
         ('sg_gemeinden', 2, 'Could not read the empty votes'),
-        ('sg_gemeinden', 2, 'Could not read the invalid votes'),
-        ('sg_gemeinden', 2, 'Could not read yeas'),
+        ('sg_gemeinden', 2, 'Invalid integer: stimmberechtigte'),
+        ('sg_gemeinden', 2, 'Invalid integer: stmhgja'),
+        ('sg_gemeinden', 2, 'Invalid integer: stmhgnein'),
+        ('sg_gemeinden', 2, 'Invalid integer: stmungueltig'),
         ('sg_gemeinden', 2, 'Invalid values'),
-        ('sg_gemeinden', 3, 'Could not read nays'),
-        ('sg_gemeinden', 3, 'Could not read the eligible voters'),
         ('sg_gemeinden', 3, 'Could not read the empty votes'),
-        ('sg_gemeinden', 3, 'Could not read the invalid votes'),
-        ('sg_gemeinden', 3, 'Could not read yeas'),
-        ('sg_gemeinden', 3, 'Invalid id'),
+        ('sg_gemeinden', 3, 'Invalid integer: bfsnrgemeinde'),
+        ('sg_gemeinden', 3, 'Invalid integer: stimmberechtigte'),
+        ('sg_gemeinden', 3, 'Invalid integer: stmhgja'),
+        ('sg_gemeinden', 3, 'Invalid integer: stmhgnein'),
+        ('sg_gemeinden', 3, 'Invalid integer: stmungueltig'),
         ('sg_gemeinden', 3, 'Invalid values'),
-        ('sg_geschaefte', 2, 'Invalid values')
+        ('sg_geschaefte', 2, 'Value of ausmittlungsstand not between 0 and 3')
     ]
 
 

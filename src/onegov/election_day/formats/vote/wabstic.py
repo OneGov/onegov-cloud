@@ -1,6 +1,6 @@
 from onegov.ballot import BallotResult
 from onegov.election_day import _
-from onegov.election_day.formats.common import EXPATS
+from onegov.election_day.formats.common import EXPATS, validate_integer
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from sqlalchemy.orm import object_session
@@ -76,10 +76,14 @@ def import_vote_wabstic(vote, principal, number, district,
             continue
 
         try:
-            complete = int(line.ausmittlungsstand or 0)
+            complete = validate_integer(line, 'ausmittlungsstand')
             assert 0 <= complete <= 3
-        except (ValueError, AssertionError):
-            line_errors.append(_("Invalid values"))
+
+        except ValueError as e:
+            line_errors.append(e.args[0])
+        except AssertionError:
+            line_errors.append(
+                _("Value of ausmittlungsstand not between 0 and 3"))
 
         if line_errors:
             errors.extend(
@@ -102,9 +106,9 @@ def import_vote_wabstic(vote, principal, number, district,
         # Parse the id of the entity
         entity_id = None
         try:
-            entity_id = int(line.bfsnrgemeinde or 0)
-        except ValueError:
-            line_errors.append(_("Invalid id"))
+            entity_id = validate_integer(line, 'bfsnrgemeinde')
+        except ValueError as e:
+            line_errors.append(e.args[0])
         else:
             entity_id = 0 if entity_id in EXPATS else entity_id
 
@@ -124,7 +128,8 @@ def import_vote_wabstic(vote, principal, number, district,
 
         # Check if the entity is counted
         try:
-            counted = False if int(line.sperrung or 0) == 0 else True
+            counted_num = validate_integer(line, 'sperrung')
+            counted = False if counted_num == 0 else True
         except ValueError:
             line_errors.append(_("Invalid values"))
         else:
@@ -133,42 +138,43 @@ def import_vote_wabstic(vote, principal, number, district,
 
         # Parse the eligible voters
         try:
-            eligible_voters = int(line.stimmberechtigte or 0)
-        except ValueError:
-            line_errors.append(_("Could not read the eligible voters"))
+            eligible_voters = validate_integer(line, 'stimmberechtigte')
+        except ValueError as e:
+            line_errors.append(e.args[0])
 
         # Parse the invalid votes
         try:
-            invalid = int(line.stmungueltig or 0)
-        except ValueError:
-            line_errors.append(_("Could not read the invalid votes"))
+            invalid = validate_integer(line, 'stmungueltig')
+        except ValueError as e:
+            line_errors.append(e.args[0])
 
         # Parse the yeas
         yeas = {}
         try:
-            yeas['proposal'] = int(line.stmhgja or 0)
-            yeas['counter-proposal'] = int(line.stmn1ja or 0)
-            yeas['tie-breaker'] = int(line.stmn2ja or 0)
-        except ValueError:
-            line_errors.append(_("Could not read yeas"))
+            yeas['proposal'] = validate_integer(line, 'stmhgja')
+            yeas['counter-proposal'] = validate_integer(line, 'stmn1ja')
+            yeas['tie-breaker'] = validate_integer(line, 'stmn2ja')
+        except ValueError as e:
+            line_errors.append(e.args[0])
 
         # Parse the nays
         nays = {}
         try:
-            nays['proposal'] = int(line.stmhgnein or 0)
-            nays['counter-proposal'] = int(line.stmn1nein or 0)
-            nays['tie-breaker'] = int(line.stmn2nein or 0)
-        except ValueError:
-            line_errors.append(_("Could not read nays"))
+            nays['proposal'] = validate_integer(line, 'stmhgnein')
+            nays['counter-proposal'] = validate_integer(line, 'stmn1nein')
+            nays['tie-breaker'] = validate_integer(line, 'stmn2nein')
+        except ValueError as e:
+            line_errors.append(e.args[0])
 
         # Parse the empty votes
         empty = {}
         try:
             empty['proposal'] = (
-                int(line.stmleer or 0) or int(line.stmhgohneaw or 0)
+                validate_integer(line, 'stmleer')
+                or validate_integer(line, 'stmhgohneaw')
             )
-            empty['counter-proposal'] = int(line.stmn1ohneaw or 0)
-            empty['tie-breaker'] = int(line.stmn2ohneaw or 0)
+            empty['counter-proposal'] = validate_integer(line, 'stmn1ohneaw')
+            empty['tie-breaker'] = validate_integer(line, 'stmn2ohneaw')
         except ValueError:
             line_errors.append(_("Could not read the empty votes"))
 
