@@ -6,7 +6,7 @@ from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
 from onegov.ballot import PanachageResult
 from onegov.election_day import _
-from onegov.election_day.formats.common import EXPATS
+from onegov.election_day.formats.common import EXPATS, validate_integer
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import STATI
@@ -70,7 +70,7 @@ def parse_election_result(line, errors, entities, election_id):
 
 def parse_list(line, errors, election_id):
     try:
-        id = int(line.list_id or 0)
+        id = line.list_id
         name = line.list_name
         mandates = int(line.list_number_of_mandates or 0)
     except ValueError:
@@ -100,20 +100,21 @@ def parse_list_result(line, errors):
 def parse_panachage_headers(csv):
     headers = {}
     for header in csv.headers:
-        if header.startswith('panachage_votes_from_list_'):
-            parts = header.split('panachage_votes_from_list_')
-            if len(parts) > 1:
-                try:
-                    number = int(parts[1])
-                    headers[csv.as_valid_identifier(header)] = number
-                except ValueError:
-                    pass
+        if not header.startswith('panachage_votes_from_list_'):
+            continue
+        parts = header.split('panachage_votes_from_list_')
+        if len(parts) > 1:
+            try:
+                number = parts[1]
+                headers[csv.as_valid_identifier(header)] = number
+            except ValueError:
+                pass
     return headers
 
 
 def parse_panachage_results(line, errors, panachage):
     try:
-        target = int(line.list_id or 0)
+        target = line.list_id
         if target not in panachage:
             panachage[target] = {}
             for name, index in panachage['headers'].items():
