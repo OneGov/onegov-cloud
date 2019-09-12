@@ -74,6 +74,14 @@ class LDAPClient():
     def try_configuration(self):
         """ Verifies the connection to the LDAP server. """
 
+        # disconnect if necessary
+        with suppress(LDAPCommunicationError):
+            self.connection.unbind()
+
+        # clear cache
+        del self.__dict__['connection']
+
+        # reconnect
         if not self.connection.rebind(self.username, self.password):
             raise ValueError(f"Failed to connect to {self.url}")
 
