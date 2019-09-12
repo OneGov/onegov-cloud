@@ -50,7 +50,12 @@ class LDAPClient():
     def base_dn(self):
         """ Extracts the distinguished name from the username. """
 
-        return 'dc=' + self.username.lower().split(",dc=", 1)[-1]
+        name = self.username.lower()
+
+        if 'dc=' in name:
+            return 'dc=' + name.split(",dc=", 1)[-1]
+
+        return ''
 
     @cached_property
     def connection(self):
