@@ -149,14 +149,10 @@ def auto_login_tween_factory(app, handler):
         redirect the user if successful. This requires that the login provider
         can do the login without user interaction.
 
-        The auto-login script is only active on the root page, to give us some
-        ability to actually be logged out on these systems.
-
         """
 
-        if request.path_info == '/':
-            if getattr(app, 'auto_login_provider', False):
-                request.include('auto-login')
+        if getattr(app, 'auto_login_provider', False):
+            request.include('auto-login')
 
         return handler(request)
 
