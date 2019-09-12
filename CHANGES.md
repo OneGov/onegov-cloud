@@ -1,8 +1,46 @@
 # Changes
 
+## Release `2019.14`
+
+> commits: **6 / [8bf89eafbb...e951b53be8](https://github.com/OneGov/onegov-cloud/compare/8bf89eafbb^...e951b53be8)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.14)](https://buildkite.com/seantis/onegov-cloud)
+
+### Auth
+
+🎉 **Enable insecure LDAP connections**
+
+It would be great if we could limit ourselves to LDAPS, but not all IT
+departments support this configuration.
+
+**`Feature`** | **[b8c8650179](https://github.com/onegov/onegov-cloud/commit/b8c86501797b63c43ab1e205d9fa8af7fd9b263c)**
+
+✨ **Increases resilience for LDAP**
+
+LDAP connections should now automatically be re-established if the
+server disconnects the client.
+
+**`Other`** | **[cc61f23864](https://github.com/onegov/onegov-cloud/commit/cc61f23864be708d8d6818ad757865145b3c51b2)**
+
+✨ **Use auto-login on all pages if activated**
+
+It is preferrable to be always logged-in, rather than having an escape
+hatch.
+
+**`Other`** | **[e951b53be8](https://github.com/onegov/onegov-cloud/commit/e951b53be8e7cab5e8818beca14cb931a18501d4)**
+
+### Feriennet
+
+🐞 **Fixes my-bills raising an exception**
+
+When periods existed, but none of them were active, the "My Bills" view
+would throw an exception.
+
+**`Bugfix`** | **[8bf89eafbb](https://github.com/onegov/onegov-cloud/commit/8bf89eafbb5b30cc1550842484ff1d46b6b4b90f)**
+
 ## Release `2019.13`
 
-> commits: **5 / [226c3dd0ff...81517c6abe](https://github.com/OneGov/onegov-cloud/compare/226c3dd0ff^...81517c6abe)**<br>
+> released: **2019-09-11 11:33**<br>
+> commits: **6 / [226c3dd0ff...3646bae845](https://github.com/OneGov/onegov-cloud/compare/226c3dd0ff^...3646bae845)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.13)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Auth
