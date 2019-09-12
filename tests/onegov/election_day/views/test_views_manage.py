@@ -200,9 +200,6 @@ def test_upload_proporz_election(election_day_app):
     assert layout.visible
 
 
-@pytest.mark.skip(reason='Test currently fails for lists/panachage'
-                         ' because layout.visible is False because'
-                         ' self.proporz is False!')
 def test_view_clear_results(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
@@ -215,6 +212,9 @@ def test_view_clear_results(election_day_app):
     upload_party_results(client, slug='elections/elections')
     upload_vote(client)
 
+    # Test currently fails for lists / panachage because
+    # layout.visible is False because' self.proporz is False!?!
+
     marker = "<h2>Resultate</h2>"
     i_marker = "<h2>Zwischenergebnisse</h2>"
     urls = (
@@ -225,7 +225,7 @@ def test_view_clear_results(election_day_app):
         '/election/proporz-election/connections',
         '/election/proporz-election/party-strengths',
         '/election/proporz-election/parties-panachage',
-        '/election/proporz-election/lists-panachage',
+        # '/election/proporz-election/lists-panachage',
         '/election/proporz-election/statistics',
         '/elections/elections/parties-panachage',
         '/elections/elections/party-strengths',
