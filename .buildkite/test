@@ -7,15 +7,6 @@ trap 'echo "^^^ +++"' ERR
 # install test requirements
 # shellcheck disable=SC2086
 echo "--- Installing requirements :redis: :postgres: :java: :chrome:"
-install-packages --keep-cache gnupg
-
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys DB69B232436DAC4B50BDC59E4E1B983C5B393194
-
-UBUNTU_CODENAME=$(grep 'UBUNTU_CODENAME' /etc/os-release | cut -d '=' -f2)
-echo "deb http://ppa.launchpad.net/canonical-chromium-builds/stage/ubuntu $UBUNTU_CODENAME main" \
-    > /etc/apt/sources.list.d/chromium.list
-echo "deb-src http://ppa.launchpad.net/canonical-chromium-builds/stage/ubuntu $UBUNTU_CODENAME main" \
-    >> /etc/apt/sources.list.d/chromium.list
 
 install-packages \
     git-core \
