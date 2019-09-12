@@ -428,7 +428,7 @@ def test_import_wabstic_proporz_invalid_values(session):
     assert sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
     ]) == [
-        ('wp_gemeinden', 2, 'Invalid entity values'),
+        ('wp_gemeinden', 2, 'Invalid integer: sperrung'),
         ('wp_gemeinden', 2, 'Invalid integer: stimmberechtigte'),
         ('wp_gemeinden', 2, 'Invalid integer: stmabgegeben'),
         ('wp_kandidaten', 2, 'Invalid integer: gewaehlt'),

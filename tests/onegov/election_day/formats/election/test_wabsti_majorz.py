@@ -9,8 +9,6 @@ from onegov.election_day.models import Canton
 from onegov.election_day.models import Municipality
 from pytest import mark
 
-from tests.onegov.election_day.common import print_errors
-
 
 @mark.parametrize("tar_file", [
     module_path('tests.onegov.election_day', 'fixtures/wabsti_majorz.tar.gz'),

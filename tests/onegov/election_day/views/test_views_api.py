@@ -37,5 +37,3 @@ from tests.onegov.election_day.common import import_wabstic_data
 #     print(json.dumps(data, indent=2))
 #     assert False
 
-
-

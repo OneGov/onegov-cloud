@@ -1,6 +1,5 @@
 from datetime import date
 
-import pytest
 from lxml.html import document_fromstring
 
 from onegov.ballot import ProporzElection
@@ -14,6 +13,7 @@ from tests.onegov.election_day.common import upload_proporz_election
 from tests.onegov.election_day.common import upload_vote
 from webtest import TestApp as Client
 from tests.onegov.election_day.common import DummyRequest
+
 
 def test_view_login_logout(election_day_app):
     client = Client(election_day_app)
