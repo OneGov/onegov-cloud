@@ -66,6 +66,16 @@ def test_import_wabsti_proporz(session, tar_file):
     assert election.absolute_majority is None
     assert election.allocated_mandates == 0
 
+    # Test panachage results for ALG list
+    test_list = election.lists.first()
+    assert test_list.list_id == '1'
+    votes_panachage_csv = 3706
+
+    panachge_vote_count = 0
+    for result in test_list.panachage_results:
+        panachge_vote_count += result.votes
+    assert panachge_vote_count == votes_panachage_csv
+
     # Test cantonal election with elected candidates, connections and stats
     cantonal_elected = (
         'Liste_KandID,Name,Vorname\n'

@@ -158,6 +158,19 @@ def test_import_internal_proporz_1(session, tar_file):
         1175, 9557, 15580, 23406, 23653, 27116, 31412
     ]
 
+    # check panachage result from list 3
+    test_list = election.lists.first()
+    assert test_list.list_id == '3'
+    list_csv_votes = 23653
+    votes_panachage_csv = 606 + 334 + 5834 + 756 + 221 + 118 + 1048 + 2316
+    assert test_list.votes == list_csv_votes
+
+    panachge_vote_count = 0
+    for result in test_list.panachage_results:
+        panachge_vote_count += result.votes
+    assert panachge_vote_count == votes_panachage_csv
+
+
     # ... roundtrip
     csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
 
