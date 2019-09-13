@@ -68,9 +68,12 @@ def parse_list_result(line, errors):
 
 
 def parse_panachage_headers(csv):
+    # header should be of sort {List ID}.{List Code}
     headers = {}
     for header in csv.headers:
         if header[0] and header[0] in '0123456789':
+            # Todo: since 2019, list_nr can be alphanumeric in sg
+            # and may come for other cantons, example: 03B
             parts = header.split('.')
             if len(parts) > 1:
                 try:
