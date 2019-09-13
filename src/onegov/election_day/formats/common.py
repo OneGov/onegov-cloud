@@ -220,7 +220,8 @@ def validate_list_id(line, col, treat_empty_as_default=True, default='0'):
     if result:
         if re.match(r'^[0-9]+[A-Za-z0-9\.]*$', result):
             return result
-        raise ValueError(_('Not an alphanumeric: ${col}', mapping={'col': col}))
+        raise ValueError(
+            _('Not an alphanumeric: ${col}', mapping={'col': col}))
     elif treat_empty_as_default:
         return default
     raise ValueError(_('Empty value: ${col}', mapping={'col': col}))

@@ -72,18 +72,18 @@ def parse_panachage_headers(csv):
     # header should be of sort {List ID}.{List Code}
     headers = {}
     for header in csv.headers:
-        if header[0] and header[0] in '0123456789':
-            # Todo: since 2019, list_nr can be alphanumeric in sg
-            # and may come for other cantons, example: 03B
-            parts = header.split('.')
-            if len(parts) > 1:
-                try:
-                    list_id = parts[0]
-                    list_id = '999' if list_id == '99' else list_id  # blank list
-                    # as_valid_identfier converts eg 01.alg junge to alg_junge
-                    headers[csv.as_valid_identifier(header)] = list_id
-                except ValueError:
-                    pass
+        if not header[0] and not header[0] in '0123456789':
+            return headers
+        # since 2019, list_nr can be alphanumeric in sg
+        parts = header.split('.')
+        if len(parts) > 1:
+            try:
+                list_id = parts[0]
+                list_id = '999' if list_id == '99' else list_id  # blank list
+                # as_valid_identfier converts eg 01.alg junge to alg_junge
+                headers[csv.as_valid_identifier(header)] = list_id
+            except ValueError:
+                pass
     return headers
 
 
