@@ -1,8 +1,25 @@
 # Changes
 
+## Release `2019.16`
+
+> commits: **1 / [9ab37eddeb...9ab37eddeb](https://github.com/OneGov/onegov-cloud/compare/9ab37eddeb^...9ab37eddeb)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.16)](https://buildkite.com/seantis/onegov-cloud)
+
+### Core
+
+🐞 **Adds file datamanager cross-fs support**
+
+The file datamanager for transactions assumed that temp files were on
+the same filesystem as the final target files. With containers this is
+definitely no longer true (/tmp is usually mounted as tmpfs). This patch
+fixes this problem by falling back to a copy/delete approach.
+
+**`Bugfix`** | **[ONEGOV-CLOUD-37W](https://sentry.io/organizations/seantis-gmbh/issues/?query=ONEGOV-CLOUD-37W)** | **[9ab37eddeb](https://github.com/onegov/onegov-cloud/commit/9ab37eddeb1b05de459c987ff7b65510cca86510)**
+
 ## Release `2019.15`
 
-> commits: **2 / [7ee8f0b3ed...098fb14721](https://github.com/OneGov/onegov-cloud/compare/7ee8f0b3ed^...098fb14721)**<br>
+> released: **2019-09-13 10:15**<br>
+> commits: **3 / [7ee8f0b3ed...4b3c372d2e](https://github.com/OneGov/onegov-cloud/compare/7ee8f0b3ed^...4b3c372d2e)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.15)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Auth
