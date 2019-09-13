@@ -2,7 +2,7 @@ import tarfile
 
 from datetime import date
 from io import BytesIO
-from onegov.ballot import Election
+from onegov.ballot import Election, PanachageResult
 from onegov.ballot import ProporzElection
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.utils import module_path
@@ -176,7 +176,6 @@ def test_import_internal_proporz_1(session, tar_file):
         panachge_vote_count += result.votes
     assert panachge_vote_count == votes_panachage_csv
 
-
     # ... roundtrip
     csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
 
@@ -336,15 +335,18 @@ def test_import_internal_proporz_invalid_values(session):
                 ))
                 ).encode('utf-8')), 'text/plain',
     )
+    print_errors(errors)
     errors = sorted([(e.line, e.error.interpolate()) for e in errors])
-    print(errors)
     assert errors == [
         (2, 'Invalid integer: candidate_votes'),
         (2, 'Invalid integer: entity_id'),
-        (2, 'Invalid integer: list_number_of_mandates'),
         (2, 'Invalid integer: list_votes'),
         (2, 'Invalid status'),
+        (2, 'Not an alphanumeric: list_id'),
+        (2, 'Not an alphanumeric: list_id'),    #
         (3, '1234 is unknown'),
+        (3, 'Empty value: list_id'),
+        (3, 'Empty value: list_id'),
     ]
 
 
@@ -402,7 +404,7 @@ def test_import_internal_proporz_expats(session):
                             '1',  # entity_blank_votes
                             '1',  # entity_invalid_votes
                             '',  # list_name
-                            '',  # list_id
+                            '10.5',  # list_id
                             '',  # list_number_of_mandates
                             '',  # list_votes
                             '',  # list_connection
@@ -478,7 +480,7 @@ def test_import_internal_proporz_temporary_results(session):
                     '1',  # entity_blank_votes
                     '1',  # entity_invalid_votes
                     '',  # list_name
-                    '',  # list_id
+                    '10.5',  # list_id
                     '',  # list_number_of_mandates
                     '',  # list_votes
                     '',  # list_connection
@@ -501,7 +503,7 @@ def test_import_internal_proporz_temporary_results(session):
                     '1',  # entity_blank_votes
                     '1',  # entity_invalid_votes
                     '',  # list_name
-                    '',  # list_id
+                    '03B.04',  # list_id
                     '',  # list_number_of_mandates
                     '',  # list_votes
                     '',  # list_connection
@@ -516,6 +518,7 @@ def test_import_internal_proporz_temporary_results(session):
             ))
         ).encode('utf-8')), 'text/plain',
     )
+    print_errors(errors)
     assert not errors
 
     # 1 Counted, 1 Uncounted, 10 Missing
@@ -579,7 +582,7 @@ def test_import_internal_proporz_regional(session):
                         '1',  # entity_blank_votes
                         '1',  # entity_invalid_votes
                         '',  # list_name
-                        '',  # list_id
+                        '10.04',  # list_id
                         '',  # list_number_of_mandates
                         '',  # list_votes
                         '',  # list_connection
@@ -602,7 +605,7 @@ def test_import_internal_proporz_regional(session):
                         '1',  # entity_blank_votes
                         '1',  # entity_invalid_votes
                         '',  # list_name
-                        '',  # list_id
+                        '03B.04',  # list_id
                         '',  # list_number_of_mandates
                         '',  # list_votes
                         '',  # list_connection
@@ -617,6 +620,8 @@ def test_import_internal_proporz_regional(session):
                 ))
             ).encode('utf-8')), 'text/plain',
         )
+        print(expected)
+        print_errors(errors)
         assert [error.error for error in errors] == expected
 
         errors = import_election_internal_proporz(
@@ -657,7 +662,7 @@ def test_import_internal_proporz_regional(session):
                         '1',  # entity_blank_votes
                         '1',  # entity_invalid_votes
                         '',  # list_name
-                        '',  # list_id
+                        '03B.04',  # list_id
                         '',  # list_number_of_mandates
                         '',  # list_votes
                         '',  # list_connection
@@ -680,7 +685,7 @@ def test_import_internal_proporz_regional(session):
                         '1',  # entity_blank_votes
                         '1',  # entity_invalid_votes
                         '',  # list_name
-                        '',  # list_id
+                        '03B.04',  # list_id
                         '',  # list_number_of_mandates
                         '',  # list_votes
                         '',  # list_connection
@@ -737,7 +742,7 @@ def test_import_internal_proporz_regional(session):
                     '1',  # entity_blank_votes
                     '1',  # entity_invalid_votes
                     '',  # list_name
-                    '',  # list_id
+                    '03B.04',  # list_id
                     '',  # list_number_of_mandates
                     '',  # list_votes
                     '',  # list_connection
@@ -797,7 +802,7 @@ def test_import_internal_proporz_regional(session):
                         '1',  # entity_blank_votes
                         '1',  # entity_invalid_votes
                         '',  # list_name
-                        '',  # list_id
+                        '9.06',  # list_id
                         '',  # list_number_of_mandates
                         '',  # list_votes
                         '',  # list_connection
