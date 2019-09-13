@@ -165,6 +165,12 @@ def test_import_internal_proporz_1(session, tar_file):
     votes_panachage_csv = 606 + 334 + 5834 + 756 + 221 + 118 + 1048 + 2316
     assert test_list.votes == list_csv_votes
 
+    panachage_results = session.query(PanachageResult)
+    panachage_results = panachage_results.filter_by(owner=election.id).all()
+    assert panachage_results
+    for pa_result in panachage_results:
+        assert len(pa_result.target) > 10, 'target must be a casted uuid'
+
     panachge_vote_count = 0
     for result in test_list.panachage_results:
         panachge_vote_count += result.votes

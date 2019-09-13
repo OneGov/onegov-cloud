@@ -2,7 +2,7 @@ import tarfile
 
 from datetime import date
 from io import BytesIO
-from onegov.ballot import Election
+from onegov.ballot import Election, PanachageResult
 from onegov.ballot import ProporzElection
 from onegov.core.utils import module_path
 from onegov.election_day.formats import import_election_wabsti_proporz
@@ -67,6 +67,13 @@ def test_import_wabsti_proporz_1(session, tar_file):
     ]
     assert election.absolute_majority is None
     assert election.allocated_mandates == 0
+
+    # Test panachage results
+    panachage_results = session.query(PanachageResult)
+    panachage_results = panachage_results.filter_by(owner=election.id).all()
+    assert panachage_results
+    for pa_result in panachage_results:
+        assert len(pa_result.target) > 10, 'target must be a casted uuid'
 
     # Test panachage results for ALG list
     test_list = election.lists.first()
