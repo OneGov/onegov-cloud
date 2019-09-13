@@ -1,8 +1,31 @@
 # Changes
 
+## Release `2019.15`
+
+> commits: **2 / [7ee8f0b3ed...098fb14721](https://github.com/OneGov/onegov-cloud/compare/7ee8f0b3ed^...098fb14721)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.15)](https://buildkite.com/seantis/onegov-cloud)
+
+### Auth
+
+🎉 **Activates LDAP integration for onegov.wtfs**
+
+The integration works the exact same way as the one in onegov.org.
+
+**`Feature`** | **[098fb14721](https://github.com/onegov/onegov-cloud/commit/098fb14721ad2676623d0b8439a461f92d8d5f9e)**
+
+### Formcode
+
+🐞 **Fixes empty fieldsets causing an error**
+
+It is perfectly valid to create empty fieldsets in formcode (though
+non-sensical). Unfortunately this caused an error until this commit.
+
+**`Bugfix`** | **[ONEGOV-CLOUD-37S](https://sentry.io/organizations/seantis-gmbh/issues/?query=ONEGOV-CLOUD-37S)** | **[7ee8f0b3ed](https://github.com/onegov/onegov-cloud/commit/7ee8f0b3eddd48ea9c69badfe65f7912c48d8efb)**
+
 ## Release `2019.14`
 
-> commits: **6 / [8bf89eafbb...e951b53be8](https://github.com/OneGov/onegov-cloud/compare/8bf89eafbb^...e951b53be8)**<br>
+> released: **2019-09-12 15:42**<br>
+> commits: **7 / [8bf89eafbb...12cd043598](https://github.com/OneGov/onegov-cloud/compare/8bf89eafbb^...12cd043598)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.14)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Auth
