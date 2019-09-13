@@ -3,6 +3,7 @@ import tempfile
 import transaction
 
 from onegov.core import log
+from onegov.core.utils import safe_move
 
 
 class MailDataManager(object):
@@ -119,4 +120,4 @@ class FileDataManager(object):
         pass
 
     def tpc_finish(self, transaction):
-        os.rename(self.tempfn, self.path)
+        safe_move(self.tempfn, self.path)

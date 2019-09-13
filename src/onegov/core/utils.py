@@ -1,5 +1,6 @@
 import base64
 import bleach
+import errno
 import fcntl
 import gzip
 import hashlib
@@ -11,6 +12,7 @@ import morepath
 import operator
 import os.path
 import re
+import shutil
 import sqlalchemy
 import urllib.request
 
@@ -29,7 +31,7 @@ from onegov.core.errors import AlreadyLockedError
 from purl import URL
 from threading import Thread
 from unidecode import unidecode
-from uuid import UUID
+from uuid import UUID, uuid4
 from webob import static
 from yubico_client import Yubico
 from yubico_client.yubico_exceptions import SignatureVerificationError
@@ -877,3 +879,40 @@ def dict_path(dictionary, path):
         raise KeyError()
 
     return reduce(operator.getitem, path.split('.'), dictionary)
+
+
+def safe_move(src, dst):
+    """ Rename a file from ``src`` to ``dst``.
+
+    * Moves must be atomic.  ``shutil.move()`` is not atomic.
+
+    * Moves must work across filesystems.  Often temp directories and the
+      cache directories live on different filesystems.  ``os.rename()`` can
+      throw errors if run across filesystems.
+
+    So we try ``os.rename()``, but if we detect a cross-filesystem copy, we
+    switch to ``shutil.move()`` with some wrappers to make it atomic.
+
+    Via https://alexwlchan.net/2019/03/atomic-cross-filesystem-moves-in-python
+
+    """
+    try:
+        os.rename(src, dst)
+    except OSError as err:
+
+        if err.errno == errno.EXDEV:
+            # Generate a unique ID, and copy `<src>` to the target directory
+            # with a temporary name `<dst>.<ID>.tmp`.  Because we're copying
+            # across a filesystem boundary, this initial copy may not be
+            # atomic.  We intersperse a random UUID so if different processes
+            # are copying into `<dst>`, they don't overlap in their tmp copies.
+            copy_id = uuid4()
+            tmp_dst = "%s.%s.tmp" % (dst, copy_id)
+            shutil.copyfile(src, tmp_dst)
+
+            # Then do an atomic rename onto the new name, and clean up the
+            # source image.
+            os.rename(tmp_dst, dst)
+            os.unlink(src)
+        else:
+            raise
