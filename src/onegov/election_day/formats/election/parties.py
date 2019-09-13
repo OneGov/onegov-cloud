@@ -142,6 +142,7 @@ def import_party_results(election, file, mimetype):
                 if source in parties or source == 999:
                     election.panachage_results.append(
                         PanachageResult(
+                            owner=election.id,
                             id=uuid4(),
                             source=parties.get(source, ''),
                             target=parties[target],
