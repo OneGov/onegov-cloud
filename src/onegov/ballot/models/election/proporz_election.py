@@ -287,6 +287,12 @@ class ProporzElection(Election, PartyResultExportMixin):
         list_ids = list_ids.filter(List.election_id == self.id)
 
         panachage_lists = []
+        # FIXME: in db, PanachageResult.source is either list.name,
+        #  list.list_id, and list.id, this is very inconsistent
+
+        # Sesam uses list.list_id for this
+        # SG Wabstic uses
+
         panachage = {}
         if self.has_lists_panachage_data:
             panachage_results = session.query(PanachageResult)
