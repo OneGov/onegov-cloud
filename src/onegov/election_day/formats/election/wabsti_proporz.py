@@ -6,7 +6,8 @@ from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
 from onegov.ballot import PanachageResult
 from onegov.election_day import _
-from onegov.election_day.formats.common import EXPATS, validate_integer
+from onegov.election_day.formats.common import EXPATS, validate_integer, \
+    validate_list_id
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from uuid import uuid4
@@ -42,7 +43,7 @@ def parse_election_result(line, errors, entities):
 
 def parse_list(line, errors):
     try:
-        list_id = validate_integer(line, 'liste_id')
+        list_id = validate_list_id(line, 'liste_id')
         name = line.liste_code
     except ValueError as e:
         errors.append(e.args[0])
@@ -77,10 +78,10 @@ def parse_panachage_headers(csv):
             parts = header.split('.')
             if len(parts) > 1:
                 try:
-                    number = int(parts[0])
-                    number = 999 if number == 99 else number  # blank list
+                    list_id = parts[0]
+                    list_id = '999' if list_id == '99' else list_id  # blank list
                     # as_valid_identfier converts eg 01.alg junge to alg_junge
-                    headers[csv.as_valid_identifier(header)] = number
+                    headers[csv.as_valid_identifier(header)] = list_id
                 except ValueError:
                     pass
     return headers
@@ -91,7 +92,7 @@ def parse_panachage_results(line, errors, panachage):
     # candidate got votes. The column with the own list doesn't contain the
     # votes. The name of the columns are '{Listen-Nr} {Parteikurzbezeichnung}'
     try:
-        target = validate_integer(line, 'liste_id')
+        target = validate_list_id(line, 'liste_id')
         panachage.setdefault(target, {})
 
         for list_name, source in panachage['headers'].items():
@@ -141,7 +142,7 @@ def parse_candidate_result(line, errors):
 
 def parse_connection(line, errors):
     try:
-        list_id = validate_integer(line, 'liste')
+        list_id = validate_list_id(line, 'liste')
         connection_id = line.lv
         subconnection_id = line.luv
 
@@ -272,13 +273,13 @@ def import_election_wabsti_proporz(
             else:
                 error = None
         if not error:
-            indexes = dict([(item.id, key) for key, item in lists.items()])
             for line in csv.lines:
                 line_errors = []
                 list_id, connection, subconnection = parse_connection(
                     line, line_errors
                 )
-
+                if list_id:
+                    assert isinstance(list_id, str), 'list_id can be alphanum'
                 # Pass the errors and continue to next line
                 if line_errors:
                     errors.extend(

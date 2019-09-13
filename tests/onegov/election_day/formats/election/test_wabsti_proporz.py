@@ -9,11 +9,13 @@ from onegov.election_day.formats import import_election_wabsti_proporz
 from onegov.election_day.models import Canton
 from pytest import mark
 
+from tests.onegov.election_day.common import print_errors
+
 
 @mark.parametrize("tar_file", [
     module_path('tests.onegov.election_day', 'fixtures/wabsti_proporz.tar.gz'),
 ])
-def test_import_wabsti_proporz(session, tar_file):
+def test_import_wabsti_proporz_1(session, tar_file):
     session.add(
         ProporzElection(
             title='election',
@@ -417,22 +419,21 @@ def test_import_wabsti_proporz_invalid_values(session):
             ))
         ).encode('utf-8')), 'text/plain',
     )
-
+    print_errors(errors)
     errors = sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
     ])
-    print(errors)
     assert errors == [
         ('Elected Candidates', 2, 'Invalid integer: liste_kandid'),
         ('Elected Candidates', 3, 'Unknown candidate'),
         ('Election statistics', 2, 'Invalid integer: einheit_bfs'),
-        ('List connections', 2, 'Invalid integer: liste'),
+        ('List connections', 2, 'Not an alphanumeric: liste'),
         ('Results', 2, 'Invalid integer: einheit_bfs'),
         ('Results', 2, 'Invalid integer: kand_stimmentotal'),
-        ('Results', 2, 'Invalid integer: liste_id'),
-        ('Results', 2, 'Invalid integer: liste_id'),
         ('Results', 2, 'Invalid integer: liste_kandid'),
         ('Results', 2, 'Invalid integer: liste_parteistimmentotal'),
+        ('Results', 2, 'Not an alphanumeric: liste_id'),
+        ('Results', 2, 'Not an alphanumeric: liste_id'),
         ('Results', 3, '1234 is unknown')
     ]
 
