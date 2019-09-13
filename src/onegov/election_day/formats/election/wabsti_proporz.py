@@ -96,6 +96,7 @@ def parse_panachage_results(line, errors, panachage):
 
         for list_name, source in panachage['headers'].items():
             panachage[target].setdefault(source, 0)
+            # list_name is csv.as_valid_identifier(original_header)
             panachage[target][source] += validate_integer(line, list_name)
 
     except ValueError as e:
