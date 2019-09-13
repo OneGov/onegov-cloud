@@ -802,7 +802,7 @@ def parse_formcode(formcode):
 
         fs.fields = [
             parse_field_block(block, field_classes, used_ids, fs)
-            for block in fieldset[label]
+            for block in (fieldset[label] or ())
         ]
 
         fieldsets.append(fs)
