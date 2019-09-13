@@ -79,6 +79,7 @@ def parse_panachage_headers(csv):
                 try:
                     number = int(parts[0])
                     number = 999 if number == 99 else number  # blank list
+                    # as_valid_identfier converts eg 01.alg junge to alg_junge
                     headers[csv.as_valid_identifier(header)] = number
                 except ValueError:
                     pass
