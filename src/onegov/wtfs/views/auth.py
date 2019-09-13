@@ -1,16 +1,17 @@
+from onegov.core.markdown import render_untrusted_markdown
 from onegov.core.security import Public
 from onegov.core.templates import render_template
-from onegov.wtfs import _
-from onegov.wtfs import log
-from onegov.wtfs import WtfsApp
-from onegov.wtfs.layouts import DefaultLayout
-from onegov.wtfs.layouts import MailLayout
 from onegov.user import Auth
 from onegov.user import UserCollection
 from onegov.user.forms import LoginForm
 from onegov.user.forms import PasswordResetForm
 from onegov.user.forms import RequestPasswordResetForm
 from onegov.user.utils import password_reset_url
+from onegov.wtfs import _
+from onegov.wtfs import log
+from onegov.wtfs import WtfsApp
+from onegov.wtfs.layouts import DefaultLayout
+from onegov.wtfs.layouts import MailLayout
 
 
 @WtfsApp.form(
@@ -31,10 +32,17 @@ def handle_login(self, request, form):
     else:
         response = None
 
+    def provider_login(provider):
+        provider.to = self.to
+        return request.link(provider)
+
     return response or {
         'layout': DefaultLayout(self, request),
         'title': _("Login"),
         'form': form,
+        'providers': request.app.providers,
+        'provider_login': provider_login,
+        'render_untrusted_markdown': render_untrusted_markdown,
         'password_reset_link': request.link(
             Auth.from_request(request), name='request-password'
         ),

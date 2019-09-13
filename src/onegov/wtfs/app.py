@@ -3,12 +3,13 @@ from onegov.core import Framework
 from onegov.core import utils
 from onegov.file import DepotApp
 from onegov.form import FormApp
+from onegov.user import UserApp
 from onegov.wtfs.models import Principal
 from onegov.wtfs.models import PaymentType
 from onegov.wtfs.theme import WtfsTheme
 
 
-class WtfsApp(Framework, FormApp, DepotApp):
+class WtfsApp(Framework, FormApp, DepotApp, UserApp):
     """ The Wtfs application. Include this in your onegov.yml to serve
     it with onegov-server.
 
