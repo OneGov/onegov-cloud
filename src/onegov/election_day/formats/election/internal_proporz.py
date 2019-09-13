@@ -105,8 +105,8 @@ def parse_panachage_headers(csv):
         parts = header.split('panachage_votes_from_list_')
         if len(parts) > 1:
             try:
-                number = parts[1]
-                headers[csv.as_valid_identifier(header)] = number
+                source_list_id = parts[1]
+                headers[csv.as_valid_identifier(header)] = source_list_id
             except ValueError:
                 pass
     return headers
