@@ -91,13 +91,11 @@ def parse_panachage_results(line, errors, panachage):
     # votes. The name of the columns are '{Listen-Nr} {Parteikurzbezeichnung}'
     try:
         target = validate_integer(line, 'liste_id')
-        if target not in panachage:
-            panachage[target] = {}
+        panachage.setdefault(target, {})
 
-        for name, index in panachage['headers'].items():
-            if index not in panachage[target]:
-                panachage[target][index] = 0
-            panachage[target][index] += validate_integer(line, name)
+        for list_name, source in panachage['headers'].items():
+            panachage[target].setdefault(source, 0)
+            panachage[target][source] += validate_integer(line, list_name)
 
     except ValueError as e:
         errors.append(e.args[0])
