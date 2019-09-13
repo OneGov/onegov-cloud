@@ -33,8 +33,6 @@ def parse_election_result(line, errors, entities, added_entities):
     try:
         entity_id = validate_integer(line, 'bfs')
         eligible_voters = validate_integer(line, 'stimmber')
-        # FIXME: Check for presence of columns should happen before
-        # bad idea to just return 0 if a necessary columns is  not there
         received_ballots = int(
             getattr(line, 'wzabgegeben', 0)
             or getattr(line, 'stimmabgegeben', 0)
