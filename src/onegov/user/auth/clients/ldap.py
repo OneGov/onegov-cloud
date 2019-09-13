@@ -1,3 +1,5 @@
+import socket
+
 from attr import attrs, attrib
 from cached_property import cached_property
 from contextlib import suppress
@@ -6,7 +8,7 @@ from ldap3.core.exceptions import LDAPCommunicationError
 from time import sleep
 
 
-def auto_retry(fn, max_tries=3, pause=0.1):
+def auto_retry(fn, max_tries=5, pause=0.1):
     """ Retries the decorated function if a LDAP connection error occurs, up
     to a given set of retries, using linear backoff.
 
@@ -18,7 +20,7 @@ def auto_retry(fn, max_tries=3, pause=0.1):
 
         try:
             return fn(self, *args, **kwargs)
-        except LDAPCommunicationError:
+        except (LDAPCommunicationError, socket.error):
             tried += 1
 
             if tried >= max_tries:
@@ -75,7 +77,7 @@ class LDAPClient():
         """ Verifies the connection to the LDAP server. """
 
         # disconnect if necessary
-        with suppress(LDAPCommunicationError):
+        with suppress(LDAPCommunicationError, socket.error):
             self.connection.unbind()
 
         # clear cache
