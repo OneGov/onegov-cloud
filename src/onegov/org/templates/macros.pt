@@ -1693,7 +1693,7 @@
 <metal:publication define-macro="publication" i18n:domain="onegov.org">
     <div tal:define="file_link link(publication)" class="publication-item">
         <a class="file-preview" href="${file_link}">
-            <img class="pdf-preview lazyload" data-src="${link(publication, name='medium')}">
+            <img class="pdf-preview lazyload" data-no-alt data-src="${link(publication, name='medium')}">
         </a>
 
         <ul class="dense">
