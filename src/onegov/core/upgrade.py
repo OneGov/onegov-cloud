@@ -564,7 +564,7 @@ class UpgradeRunner(object):
             # assume that all modules have been ran through register_module
             self.states[module] = query.one()
 
-        return context.session.merge(self.states[module], load=False)
+        return context.session.merge(self.states[module], load=True)
 
     def register_modules(self, request):
         register_modules(request.session, self.modules, self.tasks)
