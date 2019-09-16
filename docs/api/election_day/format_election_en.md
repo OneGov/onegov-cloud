@@ -78,8 +78,8 @@ Name|Description
 `list_id`|ID of the list of the candidate. Only with Proporz elections.
 `list_number_of_mandates`|Total number of mandates of the list. Only with Proporz elections.
 `list_votes`|Number of list votes per municipality. Only with Proporz elections.
-`list_connection`|ID of the list connection. Only with Proporz elections.
-`list_connection_parent`|ID of the superordinate list connection. Only with Proporz elections and if it is a sub-list connection.
+`list_connection`|ID of the list connection or superordinate list connection (in case list_connection_parent is present). Only with Proporz elections.
+`list_connection_parent`|ID of the superordinate list connection. Only with Proporz elections. Must be empty if not subordinates lists are present.
 `candidate_id`|ID of the candidate.
 `candidate_family_name`|Surname of the candidate.
 `candidate_first_name`|First name of the candidate.

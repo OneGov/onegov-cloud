@@ -76,8 +76,8 @@ Nom|Description
 `list_id`|Identifiant de la liste de candidats. Uniquement avec les élections Proporz.
 `list_number_of_mandates`|Nombre total de mandats de la liste. Uniquement avec les élections Proporz.
 `list_votes`Nombre de votes de liste par municipalité. Uniquement avec les élections Proporz.
-`list_connection`|Identifiant de la connexion de liste. Uniquement avec les élections Proporz.
-`list_connection_parent`|Identifiant de la connexion de liste au niveau supérieur. Uniquement avec les élections Proporz et si c'est une connexion de sous-liste.
+`list_connection`|Identifiant de la connexion de liste ou sous-list (en cas list_connection_parent est présent). Uniquement avec les élections Proporz.
+`list_connection_parent`|Identifiant de la connexion de liste au niveau supérieur. Uniquement avec les élections Proporz et si sous-liste existe.
 `candidate_id`|Identifiant du candidat.
 `candidate_family_name`|Nom de famille du candidat.
 `candidate_first_name`|Prénom du candidat.
