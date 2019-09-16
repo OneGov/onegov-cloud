@@ -1,13 +1,22 @@
 import os.path
+import re
+import tarfile
+from collections import OrderedDict
+from io import BytesIO
+
 import pytest
 import textwrap
 import transaction
-from onegov.ballot import Election, ElectionCompound, Vote
+
+from onegov.ballot import Election, ElectionCompound, Vote, ProporzElection
 from datetime import date
 from onegov.core.crypto import hash_password
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import SearchableArchivedResultCollection
-from tests.onegov.election_day.common import DummyRequest
+from onegov.election_day.formats import import_election_internal_majorz, \
+    import_election_internal_proporz
+from tests.onegov.election_day.common import DummyRequest, print_errors, \
+    get_tar_file_path, create_principal
 from onegov.user import User
 from tests.shared.utils import create_app
 
@@ -139,3 +148,113 @@ def searchable_archive(session):
     session.flush()
     archive.update_all(DummyRequest())
     return archive
+
+
+def import_elections_internal(
+        election_type,
+        principal,
+        domain,
+        session,
+        number_of_mandates,
+        date_):
+    """ Import test datasets in internal formats. For one election, there is
+    a single file to load, so subfolders are not necessary.
+    """
+    assert isinstance(principal, str)
+
+    model_mapping = dict(proporz=ProporzElection, majorz=Election)
+
+    function_mapping = dict(
+        proporz=import_election_internal_proporz,
+        majorz=import_election_internal_majorz)
+
+    api = 'internal'
+    mimetype = 'text/plain'
+
+    loaded_elections = OrderedDict()
+
+    tar_fp = get_tar_file_path(
+        domain, principal, api, 'election', election_type)
+    with tarfile.open(tar_fp, 'r:gz') as f:
+        # According to docs, both methods return the same ordering
+        members = f.getmembers()
+        names = [fn.split('.')[0] for fn in f.getnames()]
+
+        for name, member in zip(names, members):
+            print(f'reading {name}.csv ...')
+
+            if not date_:
+                year = re.search(r'(\d){4}', name).group(0)
+                assert year, 'Put the a year into the filename'
+                election_date = date(int(year), 1, 1)
+            else:
+                election_date = date_
+
+            csv_file = f.extractfile(member).read()
+            election = model_mapping[election_type](
+                title=f'election-{election_type}_{api}_{name}',
+                date=election_date,
+                number_of_mandates=number_of_mandates,
+                domain=domain,
+                type=election_type
+            )
+            principal_obj = create_principal(principal)
+            session.add(election)
+            session.flush()
+            errors = function_mapping[election_type](
+                election, principal_obj, BytesIO(csv_file), mimetype,
+            )
+            print_errors(errors)
+            assert not errors
+            loaded_elections[election.title] = election
+    return loaded_elections
+
+
+@pytest.fixture(scope="function")
+def import_test_elections():
+    return import_elections_internal
+
+
+@pytest.fixture(scope="function")
+def import_test_datasets(session):
+
+    models = ('election', 'vote')
+    election_types = ('majorz', 'proporz')
+    apis = ('internal', 'wabstic', 'wabsti')
+    domains = ('canton', 'region', 'municipality')
+
+    def _import_test_datasets(
+            api_format,
+            model,
+            principal,
+            domain,
+            election_type=None,
+            number_of_mandates=None,
+            date_=None):
+
+        assert principal, 'Define a single principal'
+        assert api_format in apis, 'apis not defined or not in available apis'
+        assert model in models, 'Model not defined or not in available models'
+        assert domain in domains, f'Possible domains: {domains}'
+        if election_type:
+            assert election_type in election_types
+
+        all_loaded = OrderedDict()
+
+        if model == 'election' and api_format == 'internal':
+            assert election_type
+            elections = import_elections_internal(
+                election_type,
+                principal,
+                domain,
+                session,
+                number_of_mandates,
+                date_
+            )
+            all_loaded.update(elections)
+        else:
+            raise NotImplementedError
+        return all_loaded
+
+    return _import_test_datasets
+

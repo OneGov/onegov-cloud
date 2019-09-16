@@ -4,9 +4,11 @@ from io import BytesIO
 from unittest.mock import Mock
 from webtest.forms import Upload
 
+from onegov.core.utils import module_path
 from onegov.election_day.formats import import_election_wabstic_proporz
-
+import os
 # Helpers
+from onegov.election_day.models import Canton
 
 
 def print_errors(errors):
@@ -15,6 +17,43 @@ def print_errors(errors):
     ])
     for fn, l, err in error_list:
         print(f'{fn}:{l} {err}')
+
+
+def get_fixture_path(domain=None, principal=None):
+    """Fixtures are organized like
+    fixtures/domain/principal/internal_proporz.tar.gz
+    """
+    fixture_path = module_path('tests.onegov.election_day', 'fixtures')
+    if not domain:
+        return fixture_path
+    if not principal:
+            return os.path.join(fixture_path, domain)
+    return os.path.join(fixture_path, domain, principal)
+
+
+def get_tar_archive_name(api_format, model, election_type=None):
+    if model == 'vote':
+        return f'{api_format}_vote.tar.gz'
+    elif model == 'election':
+        assert election_type
+        return f'{api_format}_{election_type}.tar.gz'
+
+
+def get_tar_file_path(
+        domain, principal, api_format, model, election_type=None):
+    return os.path.join(
+        get_fixture_path(domain, principal),
+        get_tar_archive_name(api_format, model, election_type)
+    )
+
+
+def create_principal(principal):
+    if principal in Canton.CANTONS:
+        pr = Canton(canton=principal)
+    else:
+        # pr = Municipality(name=principal, municipality='351')
+        raise NotImplementedError
+    return pr
 
 
 PROPORZ_HEADER = (
@@ -488,3 +527,4 @@ def import_wabstic_data(election, tar_file, principal, expats=False):
     )
     print_errors(errors)
     assert not errors
+
