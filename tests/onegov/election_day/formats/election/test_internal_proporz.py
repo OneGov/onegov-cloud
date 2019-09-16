@@ -10,81 +10,62 @@ from onegov.election_day.formats import import_election_internal_proporz
 from onegov.election_day.models import Canton
 from pytest import mark
 
-from tests.onegov.election_day.common import print_errors
+from tests.onegov.election_day.common import print_errors, create_principal
 
 
-def election_fixture_import(
-        session,
-        file_path,
+# def election_fixture_import(
+#         session,
+#         file_path,
+#         election_type='proporz',
+#         principal='sg'):
+#
+#     principal = Canton(canton=principal)
+#
+#     if election_type == 'proporz':
+#         election = ProporzElection(
+#             title='election proporz',
+#             domain='canton',
+#             type='proporz',
+#             date=date(2015, 10, 18),
+#             number_of_mandates=2,
+#         )
+#         session.add(election)
+#         session.flush()
+#         assert election.id
+#
+#         with open(file_path, 'rb') as csv_file:
+#             errors = import_election_internal_proporz(
+#                 election, principal, csv_file, 'text/plain',
+#             )
+#         return errors
+#     else:
+#         raise NotImplementedError
+
+
+# @mark.parametrize('csv_file', [
+#     module_path('tests.onegov.election_day',
+#                 'fixtures/erneuerungswahl-des-nationalrates-sg-test.csv')]
+# )
+# def test_roundtrip_internal_proporz(session, csv_file):
+#     errors = election_fixture_import(session, csv_file, 'proporz')
+#     print_errors(errors)
+#     assert not errors
+
+
+def test_import_internal_proporz_cantonal(session, import_test_datasets):
+
+    elections = import_test_datasets(
+        api_format='internal',
+        model='election',
+        principal='zg',
+        domain='canton',
         election_type='proporz',
-        principal='sg'):
+        number_of_mandates=3,
+        date_=date(2015, 10, 18)
 
-    principal = Canton(canton=principal)
-
-    if election_type == 'proporz':
-        election = ProporzElection(
-            title='election proporz',
-            domain='canton',
-            type='proporz',
-            date=date(2015, 10, 18),
-            number_of_mandates=2,
-        )
-        session.add(election)
-        session.flush()
-        assert election.id
-
-        with open(file_path, 'rb') as csv_file:
-            errors = import_election_internal_proporz(
-                election, principal, csv_file, 'text/plain',
-            )
-        return errors
-    else:
-        raise NotImplementedError
-
-
-@mark.parametrize('csv_file', [
-    module_path('tests.onegov.election_day',
-                'fixtures/erneuerungswahl-des-nationalrates-sg-test.csv')]
-)
-def test_roundtrip_internal_proporz(session, csv_file):
-    errors = election_fixture_import(session, csv_file, 'proporz')
-    print_errors(errors)
-    assert not errors
-
-
-@mark.parametrize("tar_file", [
-    module_path('tests.onegov.election_day',
-                'fixtures/internal_proporz.tar.gz'),
-])
-def test_import_internal_proporz_1(session, tar_file):
-    session.add(
-        ProporzElection(
-            title='election',
-            domain='canton',
-            type='proporz',
-            date=date(2015, 10, 18),
-            number_of_mandates=2,
-        )
     )
-    session.flush()
-    election = session.query(Election).one()
+    election = elections['election-proporz_internal_nationalratswahlen-2015']
 
-    principal = Canton(canton='zg')
-
-    # The tar file contains
-    # - cantonal results from ZG from the 18.10.2015
-    # - regional results from ZG from the 05.10.2014
-    with tarfile.open(tar_file, 'r|gz') as f:
-        csv_cantonal = f.extractfile(f.next()).read()
-        csv_regional = f.extractfile(f.next()).read()
-
-    # Test federal election
-    election.number_of_mandates = 3
-    errors = import_election_internal_proporz(
-        election, principal, BytesIO(csv_cantonal), 'text/plain',
-    )
-
-    assert not errors
     assert election.completed
     assert election.progress == (11, 11)
     assert election.absolute_majority is None
@@ -108,6 +89,8 @@ def test_import_internal_proporz_1(session, tar_file):
 
     # ... roundtrip
     csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
+
+    principal = create_principal('zg')
 
     errors = import_election_internal_proporz(
         election, principal, BytesIO(csv), 'text/plain'
@@ -135,15 +118,24 @@ def test_import_internal_proporz_1(session, tar_file):
         0, 1128, 4178, 8352, 16048, 20584, 30856, 35543
     ]
 
+
+def test_import_internal_proporz_regional(session, import_test_datasets):
     # Test regional election
-    election.domain = 'region'
-    election.number_of_mandates = 19
 
-    errors = import_election_internal_proporz(
-        election, principal, BytesIO(csv_regional), 'text/plain',
+    principal=create_principal('zg')
+
+    elections = import_test_datasets(
+        api_format='internal',
+        model='election',
+        principal='zg',
+        domain='region',
+        election_type='proporz',
+        number_of_mandates=19,
+        date_=date(2015, 10, 18)
+
     )
+    election = elections['election-proporz_internal_kantonsratswahlen-2014']
 
-    assert not errors
     assert election.completed
     assert election.progress == (1, 1)
     assert election.absolute_majority is None
