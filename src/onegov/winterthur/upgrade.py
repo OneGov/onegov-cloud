@@ -7,7 +7,7 @@ from onegov.core.upgrade import upgrade_task
 from onegov.org.models import Organisation
 
 
-@upgrade_task('Change the default geo provider', always_run=True)
+@upgrade_task('Change the default geo provider')
 def change_default_geo_provider(context):
 
     org = context.session.query(Organisation).first()
