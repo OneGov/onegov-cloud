@@ -598,18 +598,21 @@ def import_test_datasets(session):
                 all_loaded.update(elections)
 
         elif model == 'vote':
-            votes = import_votes_internal(
-                vote_type,
-                principal,
-                domain,
-                session,
-                date_,
-                dataset_name,
-                expats,
-                vote,
-                municipality
-            )
-            all_loaded.update(votes)
+            if vote_type == 'normal':
+                votes = import_votes_internal(
+                    vote_type,
+                    principal,
+                    domain,
+                    session,
+                    date_,
+                    dataset_name,
+                    expats,
+                    vote,
+                    municipality
+                )
+                all_loaded.update(votes)
+            else:
+                raise NotImplementedError
         else:
             raise NotImplementedError
         if len(all_loaded.keys()) == 1:
