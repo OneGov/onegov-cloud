@@ -138,7 +138,7 @@ def load_csv(
             _("The file contains an empty line."),
             filename=filename
         )
-    except Exception:
+    except Exception as e:
         error = FileImportError(
             _("Not a valid csv/xls/xlsx file."),
             filename=filename

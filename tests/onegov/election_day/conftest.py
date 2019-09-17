@@ -15,7 +15,8 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import SearchableArchivedResultCollection
 from onegov.election_day.formats import import_election_internal_majorz, \
     import_election_internal_proporz, import_election_wabstic_proporz, \
-    import_election_wabstic_majorz
+    import_election_wabstic_majorz, import_election_wabsti_proporz, \
+    import_election_wabsti_majorz
 from tests.onegov.election_day.common import DummyRequest, print_errors, \
     get_tar_file_path, create_principal
 from onegov.user import User
@@ -317,6 +318,121 @@ def import_elections_wabstic(
     return loaded_elections
 
 
+def import_elections_wabsti(
+        election_type,
+        principal,
+        domain,
+        session,
+        number_of_mandates,
+        date_,
+        number,
+        district,
+        dataset_name,
+        expats,
+        election,
+        municipality
+
+):
+    """
+    :param principal: canton as string, e.g. zg
+    :param dataset_name: If set, import this dataset having that folder name
+    """
+    assert isinstance(principal, str)
+    assert isinstance(number, str)
+
+    model_mapping = dict(proporz=ProporzElection, majorz=Election)
+
+    function_mapping = dict(
+        proporz=import_election_wabsti_proporz,
+        majorz=import_election_wabsti_majorz)
+
+    api = 'wabsti'
+    mimetype = 'text/plain'
+
+    loaded_elections = OrderedDict()
+
+    tar_fp = get_tar_file_path(
+        domain, principal, api, 'election', election_type)
+    with tarfile.open(tar_fp, 'r:gz') as f:
+        # According to docs, both methods return the same ordering
+        folders = set(fn.split('/')[0] for fn in f.getnames())
+
+        for folder in folders:
+            if dataset_name and dataset_name != folder:
+                continue
+            if not date_:
+                year = re.search(r'(\d){4}', folder).group(0)
+                assert year, 'Put the a year into the filename'
+                election_date = date(int(year), 1, 1)
+            else:
+                election_date = date_
+            if not election:
+                election = model_mapping[election_type](
+                    title=f'{election_type}_{api}_{folder}',
+                    date=election_date,
+                    number_of_mandates=number_of_mandates,
+                    domain=domain,
+                    # type=election_type,
+                    expats=expats
+                )
+            principal_obj = create_principal(principal, municipality)
+            session.add(election)
+            session.flush()
+
+            files = [name.split('/')[1]
+                     for name in f.getnames()
+                     if name.startswith(folder)
+                     and name != folder]
+
+            def find_and_read(files, keyword=None, no_keywords=None):
+                no_kw_results = []
+                assert keyword or no_keywords
+                for file in files:
+                    if keyword:
+                        if keyword.lower() in file.lower():
+                            return BytesIO(
+                                f.extractfile(f'{folder}/{file}').read())
+                    elif all((kw.lower() not in file.lower()
+                           for kw in no_keywords)):
+                        no_kw_results.append(file)
+                if no_keywords:
+                    assert no_kw_results and len(no_kw_results) == 1
+                    filename = f'{folder}/{no_kw_results[0]}'
+                    return BytesIO(
+                        f.extractfile(filename).read())
+                return None
+
+            file = find_and_read(files, no_keywords=[
+                'statistik', 'kandidaten', 'verbindungen'])
+
+            assert file, 'Main result file is None'
+
+            additional_files = dict(
+                connections_file=find_and_read(files, keyword='Verbindungen'),
+                elected_file=find_and_read(files, keyword='Kandidaten'),
+                statistics_file=find_and_read(files, keyword='Statistik')
+            )
+
+            errors = function_mapping[election_type](
+                election,
+                principal_obj,
+                file,
+                mimetype,
+                **additional_files,
+                connections_mimetype=mimetype,
+                elected_mimetype=mimetype,
+                statistics_mimetype=mimetype,
+
+            )
+
+            print_errors(errors)
+            assert not errors
+            assert election.has_results
+            loaded_elections[election.title] = election
+    assert loaded_elections, 'No election was loaded'
+    return loaded_elections
+
+
 @pytest.fixture(scope="function")
 def import_test_datasets(session):
 
@@ -369,6 +485,22 @@ def import_test_datasets(session):
                 all_loaded.update(elections)
             elif api_format == 'wabstic':
                 elections = import_elections_wabstic(
+                    election_type,
+                    principal,
+                    domain,
+                    session,
+                    number_of_mandates=number_of_mandates,
+                    date_=date_,
+                    dataset_name=dataset_name,
+                    expats=expats,
+                    election=election,
+                    number=election_number,
+                    district=election_district,
+                    municipality=municipality
+                )
+                all_loaded.update(elections)
+            elif api_format == 'wabsti':
+                elections = import_elections_wabsti(
                     election_type,
                     principal,
                     domain,

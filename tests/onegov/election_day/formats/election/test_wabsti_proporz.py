@@ -12,41 +12,21 @@ from pytest import mark
 from tests.onegov.election_day.common import print_errors
 
 
-@mark.parametrize("tar_file", [
-    module_path('tests.onegov.election_day', 'fixtures/wabsti_proporz.tar.gz'),
-])
-def test_import_wabsti_proporz_1(session, tar_file):
-    session.add(
-        ProporzElection(
-            title='election',
-            domain='canton',
-            date=date(2015, 10, 18),
-            number_of_mandates=3,
-        )
-    )
-    session.flush()
-    election = session.query(Election).one()
+def test_import_wabsti_proporz_cantonal(session, import_test_datasets):
 
-    principal = Canton(canton='zg')
+    principal = 'zg'
 
-    # The tar file contains
-    # - cantonal results from ZG from the 18.10.2015
-    # - regional results from Rheintal from the 28.02.2016
-    with tarfile.open(tar_file, 'r|gz') as f:
-        cantonal_csv = f.extractfile(f.next()).read()
-        cantonal_connections = f.extractfile(f.next()).read()
-        cantonal_stats = f.extractfile(f.next()).read()
-        regional_csv = f.extractfile(f.next()).read()
-        regional_elected = f.extractfile(f.next()).read()
-        regional_stats = f.extractfile(f.next()).read()
-
-    # Test cantonal election without elected candidates, connections and stats
-    errors = import_election_wabsti_proporz(
-        election, principal,
-        BytesIO(cantonal_csv), 'text/plain',
+    election = import_test_datasets(
+        'wabsti',
+        'election',
+        principal,
+        'canton',
+        election_type='proporz',
+        date_=date(2015, 10, 18),
+        number_of_mandates=3,
+        dataset_name='nationalratswahlen-2015-minimum',
     )
 
-    assert not errors
     assert election.completed
     assert election.progress == (11, 11)
     assert election.results.count() == 11
@@ -85,23 +65,23 @@ def test_import_wabsti_proporz_1(session, tar_file):
         panachge_vote_count += result.votes
     assert panachge_vote_count == votes_panachage_csv
 
-    # Test cantonal election with elected candidates, connections and stats
-    cantonal_elected = (
-        'Liste_KandID,Name,Vorname\n'
-        '401,Pfister,Gerhard\n'
-        '601,Pezzatti,Bruno\n'
-        '1501,Aeschi,Thomas\n'
-    ).encode('utf-8')
 
-    errors = import_election_wabsti_proporz(
-        election, principal,
-        BytesIO(cantonal_csv), 'text/plain',
-        BytesIO(cantonal_connections), 'text/plain',
-        BytesIO(cantonal_elected), 'text/plain',
-        BytesIO(cantonal_stats), 'text/plain',
+def test_import_wabsti_proporz_cantonal_complete(
+        session, import_test_datasets):
+
+    principal = 'zg'
+
+    election = import_test_datasets(
+        'wabsti',
+        'election',
+        principal,
+        'canton',
+        election_type='proporz',
+        date_=date(2015, 10, 18),
+        number_of_mandates=3,
+        dataset_name='nationalratswahlen-2015-complete',
     )
 
-    assert not errors
     assert election.completed
     assert election.progress == (11, 11)
     assert round(election.turnout, 2) == 53.74
@@ -131,22 +111,22 @@ def test_import_wabsti_proporz_1(session, tar_file):
         0, 1128, 4178, 8352, 16048, 20584, 30856, 35543
     ]
 
-    # Test regional election
-    principal = Canton(canton='sg')
-    election.domain = 'region'
-    election.date = date(2016, 2, 28)
-    election.number_of_mandates = 17
 
-    mime = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    errors = import_election_wabsti_proporz(
-        election, principal,
-        BytesIO(regional_csv), mime,
-        None, None,
-        BytesIO(regional_elected), mime,
-        BytesIO(regional_stats), mime,
+def test_import_wabsti_proporz_regional(
+        session, import_test_datasets):
+    principal = 'sg'
+
+    election = import_test_datasets(
+        'wabsti',
+        'election',
+        principal,
+        'region',
+        election_type='proporz',
+        date_=date(2015, 10, 18),
+        number_of_mandates=17,
+        dataset_name='kantonsratswahl-2016',
     )
 
-    assert not errors
     assert election.completed
     assert election.progress == (13, 13)
     assert round(election.turnout, 2) == 46.86
