@@ -342,10 +342,6 @@ def import_elections_wabsti(
 
     model_mapping = dict(proporz=ProporzElection, majorz=Election)
 
-    function_mapping = dict(
-        proporz=import_election_wabsti_proporz,
-        majorz=import_election_wabsti_majorz)
-
     api = 'wabsti'
     mimetype = 'text/plain'
 
@@ -412,18 +408,27 @@ def import_elections_wabsti(
                 elected_file=find_and_read(files, keyword='Kandidaten'),
                 statistics_file=find_and_read(files, keyword='Statistik')
             )
+            if election_type == 'proporz':
+                errors = import_election_wabsti_proporz(
+                    election,
+                    principal_obj,
+                    file,
+                    mimetype,
+                    **additional_files,
+                    connections_mimetype=mimetype,
+                    elected_mimetype=mimetype,
+                    statistics_mimetype=mimetype,
 
-            errors = function_mapping[election_type](
-                election,
-                principal_obj,
-                file,
-                mimetype,
-                **additional_files,
-                connections_mimetype=mimetype,
-                elected_mimetype=mimetype,
-                statistics_mimetype=mimetype,
-
-            )
+                )
+            else:
+                errors = import_election_wabsti_majorz(
+                    election,
+                    principal_obj,
+                    file,
+                    mimetype,
+                    elected_file=additional_files['elected_file'],
+                    elected_mimetype=mimetype
+                )
 
             print_errors(errors)
             assert not errors
