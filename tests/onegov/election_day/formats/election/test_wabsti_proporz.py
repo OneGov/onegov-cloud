@@ -1,13 +1,9 @@
-import tarfile
-
 from datetime import date
 from io import BytesIO
 from onegov.ballot import Election, PanachageResult
 from onegov.ballot import ProporzElection
-from onegov.core.utils import module_path
 from onegov.election_day.formats import import_election_wabsti_proporz
 from onegov.election_day.models import Canton
-from pytest import mark
 
 from tests.onegov.election_day.common import print_errors
 
@@ -112,7 +108,7 @@ def test_import_wabsti_proporz_cantonal_complete(
     ]
 
 
-def test_import_wabsti_proporz_regional(
+def test_import_wabsti_proporz_regional_sg(
         session, import_test_datasets):
     principal = 'sg'
 

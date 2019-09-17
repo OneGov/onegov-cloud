@@ -71,7 +71,7 @@ def test_import_wabsti_majorz_cantonal_complete(
     assert election.elected_candidates == [('Paul', 'Rechsteiner')]
 
 
-def test_import_wabsti_majorz_regional(session, import_test_datasets):
+def test_import_wabsti_majorz_regional_sg(session, import_test_datasets):
     # - regional results from Rohrschach the 25.09.2016
     principal = 'sg'
     # Test regional election

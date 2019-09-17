@@ -1,5 +1,3 @@
-import tarfile
-
 from datetime import date
 from io import BytesIO
 from onegov.ballot import Election
@@ -121,7 +119,6 @@ def test_import_internal_majorz_municipality_bern(
     principal = 'bern'
     municipality = '1059'
 
-
     election = import_test_datasets(
         'internal',
         'election',
@@ -165,6 +162,7 @@ def test_import_internal_majorz_municipality_bern(
     assert round(election.turnout, 2) == 36.16
     assert election.allocated_mandates == 0
     assert election.candidates.count() == 4
+
 
 def test_import_internal_majorz_municipality_kriens(
         session, import_test_datasets):

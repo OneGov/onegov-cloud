@@ -1,18 +1,14 @@
-import tarfile
-
 from datetime import date
 from io import BytesIO
 from onegov.ballot import Election
 from onegov.ballot import ProporzElection
 from onegov.ballot import List
-from onegov.core.utils import module_path
 from onegov.election_day.formats import import_election_wabstic_proporz
 from onegov.election_day.formats.election.wabstic_proporz import \
     get_list_id_from_knr
 from onegov.election_day.models import Canton
-from pytest import mark
 
-from tests.onegov.election_day.common import import_wabstic_data, print_errors
+from tests.onegov.election_day.common import print_errors
 
 
 def test_get_list_id_from_knr():

@@ -1,14 +1,10 @@
-import tarfile
-
 from datetime import date
 from io import BytesIO
 from onegov.ballot import Election, PanachageResult
 from onegov.ballot import ProporzElection
 from onegov.core.csv import convert_list_of_dicts_to_csv
-from onegov.core.utils import module_path
 from onegov.election_day.formats import import_election_internal_proporz
 from onegov.election_day.models import Canton
-from pytest import mark
 
 from tests.onegov.election_day.common import print_errors, create_principal
 
@@ -80,10 +76,10 @@ def test_import_internal_proporz_cantonal(session, import_test_datasets):
     ]
 
 
-def test_import_internal_proporz_regional(session, import_test_datasets):
+def test_import_internal_proporz_regional_zg(session, import_test_datasets):
     # Test regional election
 
-    principal=create_principal('zg')
+    principal = create_principal('zg')
 
     elections = import_test_datasets(
         api_format='internal',

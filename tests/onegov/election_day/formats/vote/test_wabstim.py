@@ -1,13 +1,9 @@
 import tarfile
-
 from datetime import date
 from io import BytesIO
 from onegov.ballot import Vote
-from onegov.core.utils import module_path
 from onegov.election_day.formats import import_vote_wabstim
 from onegov.election_day.models import Municipality
-from pytest import mark
-
 from tests.onegov.election_day.common import get_tar_file_path
 
 

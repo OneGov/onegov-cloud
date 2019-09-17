@@ -149,4 +149,3 @@ def test_views_vote_embedded_widgets(election_day_app, url):
     login(client)
     upload_complex_vote(client)
     client.get(f'/vote/complex-vote/{url}')
-

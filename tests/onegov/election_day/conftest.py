@@ -186,7 +186,6 @@ def import_elections_internal(
 
     loaded_elections = OrderedDict()
 
-
     tar_fp = get_tar_file_path(
         domain, principal, api, 'election', election_type)
     with tarfile.open(tar_fp, 'r:gz') as f:
@@ -389,8 +388,9 @@ def import_elections_wabsti(
                         if keyword.lower() in file.lower():
                             return BytesIO(
                                 f.extractfile(f'{folder}/{file}').read())
-                    elif all((kw.lower() not in file.lower()
-                           for kw in no_keywords)):
+                    elif all(
+                            (kw.lower() not in file.lower()
+                             for kw in no_keywords)):
                         no_kw_results.append(file)
                 if no_keywords:
                     assert no_kw_results and len(no_kw_results) == 1
@@ -449,63 +449,64 @@ def import_votes_internal(
         expats,
         vote,
         municipality
-        ):
+):
 
-        """
-        Import test datasets in internal formats. For one vote, there is
-        a single file to load, so subfolders are not necessary.
+    """
+    Import test datasets in internal formats. For one vote, there is
+    a single file to load, so subfolders are not necessary.
 
-        :param dataset_name: use the filename without ending
-        :return:
-        """
-        assert isinstance(principal, str)
-        assert '.' not in dataset_name, 'Remove the file ending from dataset_name'
+    :param dataset_name: use the filename without ending
+    :return:
+    """
+    assert isinstance(principal, str)
+    assert '.' not in dataset_name, 'Remove file ending from dataset_name'
 
-        api = 'internal'
-        mimetype = 'text/plain'
+    api = 'internal'
+    mimetype = 'text/plain'
 
-        model_mapping = dict(normal=Vote, complex=ComplexVote)
-        loaded_votes = OrderedDict()
-    #
-        tar_fp = get_tar_file_path(
-            domain, principal, api, 'vote', vote_type)
-        with tarfile.open(tar_fp, 'r:gz') as f:
-            # According to docs, both methods return the same ordering
-            members = f.getmembers()
-            names = [fn.split('.')[0] for fn in f.getnames()]
+    model_mapping = dict(normal=Vote, complex=ComplexVote)
+    loaded_votes = OrderedDict()
 
-            for name, member in zip(names, members):
-                if dataset_name and dataset_name != name:
-                    continue
-                print(f'reading {name}.csv ...')
+    tar_fp = get_tar_file_path(
+        domain, principal, api, 'vote', vote_type)
+    with tarfile.open(tar_fp, 'r:gz') as f:
+        # According to docs, both methods return the same ordering
+        members = f.getmembers()
+        names = [fn.split('.')[0] for fn in f.getnames()]
 
-                if not date_:
-                    year = re.search(r'(\d){4}', name).group(0)
-                    assert year, 'Put the a year into the filename'
-                    election_date = date(int(year), 1, 1)
-                else:
-                    election_date = date_
+        for name, member in zip(names, members):
+            if dataset_name and dataset_name != name:
+                continue
+            print(f'reading {name}.csv ...')
 
-                csv_file = f.extractfile(member).read()
-                if not vote:
-                    vote = model_mapping[vote_type](
-                        title=f'{vote_type}_{api}_{name}',
-                        date=election_date,
-                        domain=domain,
-                        expats=expats,
-                    )
-                principal_obj = create_principal(principal, municipality)
-                session.add(vote)
-                session.flush()
-                errors = import_vote_internal(
-                    vote, principal_obj, BytesIO(csv_file), mimetype,
+            if not date_:
+                year = re.search(r'(\d){4}', name).group(0)
+                assert year, 'Put the a year into the filename'
+                election_date = date(int(year), 1, 1)
+            else:
+                election_date = date_
+
+            csv_file = f.extractfile(member).read()
+            if not vote:
+                vote = model_mapping[vote_type](
+                    title=f'{vote_type}_{api}_{name}',
+                    date=election_date,
+                    domain=domain,
+                    expats=expats,
                 )
-                print_errors(errors)
-                assert not errors
-                loaded_votes[vote.title] = vote
-        print(tar_fp)
-        assert loaded_votes, 'No vote was loaded'
-        return loaded_votes
+            principal_obj = create_principal(principal, municipality)
+            session.add(vote)
+            session.flush()
+            errors = import_vote_internal(
+                vote, principal_obj, BytesIO(csv_file), mimetype,
+            )
+            print_errors(errors)
+            assert not errors
+            loaded_votes[vote.title] = vote
+    print(tar_fp)
+    assert loaded_votes, 'No vote was loaded'
+    return loaded_votes
+
 
 def import_votes_wabsti(
         vote_type,
@@ -713,4 +714,3 @@ def import_test_datasets(session):
         return all_loaded
 
     return _import_test_datasets
-

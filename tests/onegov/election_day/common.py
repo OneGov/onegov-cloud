@@ -27,7 +27,7 @@ def get_fixture_path(domain=None, principal=None):
     if not domain:
         return fixture_path
     if not principal:
-            return os.path.join(fixture_path, domain)
+        return os.path.join(fixture_path, domain)
     return os.path.join(fixture_path, domain, principal)
 
 
@@ -541,4 +541,3 @@ def import_wabstic_data(election, tar_file, principal, expats=False):
     )
     print_errors(errors)
     assert not errors
-
