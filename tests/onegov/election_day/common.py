@@ -55,6 +55,11 @@ def create_principal(principal=None, municipality=None):
     return pr
 
 
+def compare_elections(left, right):
+    # How to compare two elections completely?
+    pass
+
+
 PROPORZ_HEADER = (
     'election_status,'
     'entity_id,'
