@@ -13,8 +13,6 @@ from tests.onegov.election_day.common import get_tar_file_path
 
 def test_import_wabstim_vote_1(session):
     domain = 'municipality'
-    principal = 'Walenstadt'
-    municipality = '3298'
 
     session.add(
         Vote(title='vote', domain=domain, date=date(2016, 2, 28))
