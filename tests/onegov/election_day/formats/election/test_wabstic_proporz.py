@@ -24,27 +24,6 @@ def test_get_list_id_from_knr():
     assert get_list_id_from_knr(DummyLine('05a.1')) == '05a'
 
 
-def test_import_wabstic_proporz_v23(session, import_test_datasets):
-    election = import_test_datasets(
-        'wabstic',
-        'election',
-        'sg',
-        domain='canton',
-        election_type='proporz',
-        dataset_name='NR2019-alphanumerische_list_nr',
-        number_of_mandates=12,
-        date_=date(2016, 2, 28),
-        expats=False,
-    )
-    assert election.completed
-    # assert election.progress == (78, 78)
-    # assert election.absolute_majority is None
-    # assert election.eligible_voters == 317969
-    # assert election.accounted_ballots == 145631
-    # assert election.accounted_votes == 1732456
-    # assert election.allocated_mandates == 12
-
-
 def test_import_wabstic_proporz_cantonal(session, import_test_datasets):
 
     # - cantonal results from SG from the 18.10.2015 (Nationalrat)
