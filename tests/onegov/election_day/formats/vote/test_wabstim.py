@@ -8,16 +8,21 @@ from onegov.election_day.formats import import_vote_wabstim
 from onegov.election_day.models import Municipality
 from pytest import mark
 
+from tests.onegov.election_day.common import get_tar_file_path
 
-@mark.parametrize("tar_file", [
-    module_path('tests.onegov.election_day', 'fixtures/wabstim_vote.tar.gz'),
-])
-def test_import_wabstim_vote(session, tar_file):
+
+def test_import_wabstim_vote_1(session):
+    domain = 'municipality'
+    principal = 'Walenstadt'
+    municipality = '3298'
+
     session.add(
-        Vote(title='vote', domain='municipality', date=date(2016, 2, 28))
+        Vote(title='vote', domain=domain, date=date(2016, 2, 28))
     )
     session.flush()
     vote = session.query(Vote).one()
+
+    tar_file = get_tar_file_path(model='vote', api_format='wabstim')
 
     # The tar file contains vote results from Walenstadt
     with tarfile.open(tar_file, 'r|gz') as f:

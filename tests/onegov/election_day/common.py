@@ -40,12 +40,16 @@ def get_tar_archive_name(api_format, model, election_type=None):
 
 
 def get_tar_file_path(
-        domain, principal, api_format, model, election_type=None):
-    if api_format == 'wabstic' and model == 'vote':
+        domain=None, principal=None,
+        api_format=None,
+        model=None,
+        election_type=None
+):
+    if model == 'vote' and api_format == 'wabstic' or api_format == 'wabstim':
         # This format can have all domains, the will be a separate archive
         return os.path.join(
             get_fixture_path(),
-            'wabstic_vote.tar.gz'
+            f'{api_format}_vote.tar.gz'
         )
     return os.path.join(
         get_fixture_path(domain, principal),
