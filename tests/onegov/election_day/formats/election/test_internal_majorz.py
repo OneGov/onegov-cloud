@@ -63,8 +63,7 @@ def test_import_internal_majorz_cantonal_zg(
     ]
 
 
-def test_import_internal_majorz_regional_zg(
-        session, import_test_datasets):
+def test_import_internal_majorz_regional_zg(session, import_test_datasets):
 
     # - regional results form Zug from the 24.06.2012
 
@@ -112,9 +111,7 @@ def test_import_internal_majorz_regional_zg(
 def test_import_internal_majorz_municipality_bern(
         session, import_test_datasets):
     # Test communal election without quarters
-
     # - communal results from Bern from the 25.11.2015
-    # - communal results from Kriens from the 23.08.2015
 
     principal = 'bern'
     municipality = '1059'
