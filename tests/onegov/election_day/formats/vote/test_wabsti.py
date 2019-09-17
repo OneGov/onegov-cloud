@@ -1,32 +1,31 @@
 import tarfile
-
 from datetime import date
 from io import BytesIO
 from onegov.ballot import ComplexVote
 from onegov.ballot import Vote
-from onegov.core.utils import module_path
 from onegov.election_day.formats import import_vote_wabsti
 from onegov.election_day.models import Canton
-from pytest import mark
+from tests.onegov.election_day.common import get_tar_file_path, \
+    create_principal
 
 
-@mark.parametrize("tar_file", [
-    module_path('tests.onegov.election_day', 'fixtures/wabsti_vote.tar.gz'),
-])
-def test_import_wabsti_vote(session, tar_file):
+def test_import_wabsti_vote_1(session):
+    principal = 'sg'
+    domain = 'federation'
+
     session.add(
-        Vote(title='vote', domain='federation', date=date(2016, 2, 28))
+        Vote(title='vote', domain=domain, date=date(2016, 2, 28))
     )
     session.flush()
     vote = session.query(Vote).one()
-
+    tar_file = get_tar_file_path(domain, principal, 'wabsti', 'vote')
     # The tar file contains vote results from SG with 4 simple federal votes
     # from the 28.02.2016 and one complex cantonal vote from the 27.11.2011
     with tarfile.open(tar_file, 'r|gz') as f:
         csv = f.extractfile(f.next()).read()
 
     # Test federal results
-    principal = Canton(canton='sg')
+    principal = create_principal(principal)
     vote.expats = True
     for number, yeas, nays, yeas_p, nays_p, turnout in (
         (1, 102759, 91138, 53.0, 47.0, 61.7),
@@ -45,7 +44,7 @@ def test_import_wabsti_vote(session, tar_file):
         assert round(vote.yeas_percentage, 1) == yeas_p
         assert round(vote.nays_percentage, 1) == nays_p
         assert round(vote.turnout, 1) == turnout
-
+    #
     # Test cantonal vote
     session.add(
         ComplexVote(title='vote', domain='canton', date=date(2011, 11, 27))
