@@ -13,58 +13,19 @@ from pytest import mark
 from tests.onegov.election_day.common import print_errors, create_principal
 
 
-# def election_fixture_import(
-#         session,
-#         file_path,
-#         election_type='proporz',
-#         principal='sg'):
-#
-#     principal = Canton(canton=principal)
-#
-#     if election_type == 'proporz':
-#         election = ProporzElection(
-#             title='election proporz',
-#             domain='canton',
-#             type='proporz',
-#             date=date(2015, 10, 18),
-#             number_of_mandates=2,
-#         )
-#         session.add(election)
-#         session.flush()
-#         assert election.id
-#
-#         with open(file_path, 'rb') as csv_file:
-#             errors = import_election_internal_proporz(
-#                 election, principal, csv_file, 'text/plain',
-#             )
-#         return errors
-#     else:
-#         raise NotImplementedError
-
-
-# @mark.parametrize('csv_file', [
-#     module_path('tests.onegov.election_day',
-#                 'fixtures/erneuerungswahl-des-nationalrates-sg-test.csv')]
-# )
-# def test_roundtrip_internal_proporz(session, csv_file):
-#     errors = election_fixture_import(session, csv_file, 'proporz')
-#     print_errors(errors)
-#     assert not errors
-
-
 def test_import_internal_proporz_cantonal(session, import_test_datasets):
 
-    elections = import_test_datasets(
+    election = import_test_datasets(
         api_format='internal',
         model='election',
         principal='zg',
         domain='canton',
         election_type='proporz',
         number_of_mandates=3,
-        date_=date(2015, 10, 18)
-
+        date_=date(2015, 10, 18),
+        dataset_name='nationalratswahlen-2015',
+        expats=False
     )
-    election = elections['election-proporz_internal_nationalratswahlen-2015']
 
     assert election.completed
     assert election.progress == (11, 11)
