@@ -160,9 +160,10 @@ def import_elections_internal(
         session,
         number_of_mandates,
         date_,
-        dataset_name=None,
-        expats=True,
-        election=None
+        dataset_name,
+        expats,
+        election,
+        municipality
 ):
     """
     Import test datasets in internal formats. For one election, there is
@@ -172,7 +173,7 @@ def import_elections_internal(
     :return:
     """
     assert isinstance(principal, str)
-
+    assert '.' not in dataset_name, 'Remove the file ending from dataset_name'
 
     function_mapping = dict(
         proporz=import_election_internal_proporz,
@@ -182,6 +183,7 @@ def import_elections_internal(
     mimetype = 'text/plain'
 
     loaded_elections = OrderedDict()
+
 
     tar_fp = get_tar_file_path(
         domain, principal, api, 'election', election_type)
@@ -212,7 +214,7 @@ def import_elections_internal(
                     type=election_type,
                     expats=expats,
                 )
-            principal_obj = create_principal(principal)
+            principal_obj = create_principal(principal, municipality)
             session.add(election)
             session.flush()
             errors = function_mapping[election_type](
@@ -221,6 +223,7 @@ def import_elections_internal(
             print_errors(errors)
             assert not errors
             loaded_elections[election.title] = election
+    print(tar_fp)
     assert loaded_elections, 'No election was loaded'
     return loaded_elections
 
@@ -234,9 +237,10 @@ def import_elections_wabstic(
         date_,
         number,
         district,
-        dataset_name=None,
-        expats=True,
-        election=None,
+        dataset_name,
+        expats,
+        election,
+        municipality
 
 ):
     """
@@ -281,7 +285,7 @@ def import_elections_wabstic(
                     # type=election_type,
                     expats=expats
                 )
-            principal_obj = create_principal(principal)
+            principal_obj = create_principal(principal, municipality)
             session.add(election)
             session.flush()
 
@@ -330,10 +334,11 @@ def import_test_datasets(session):
             number_of_mandates=None,
             date_=None,
             dataset_name=None,
-            expats=True,
+            expats=False,
             election=None,
             election_number='1',
-            election_district=None
+            election_district=None,
+            municipality=None
     ):
         assert domain in domains
         assert principal, 'Define a single principal'
@@ -358,7 +363,8 @@ def import_test_datasets(session):
                     date_=date_,
                     dataset_name=dataset_name,
                     expats=expats,
-                    election=election
+                    election=election,
+                    municipality=municipality
                 )
                 all_loaded.update(elections)
             elif api_format == 'wabstic':
@@ -373,7 +379,8 @@ def import_test_datasets(session):
                     expats=expats,
                     election=election,
                     number=election_number,
-                    district=election_district
+                    district=election_district,
+                    municipality=municipality
                 )
                 all_loaded.update(elections)
 

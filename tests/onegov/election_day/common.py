@@ -8,7 +8,7 @@ from onegov.core.utils import module_path
 from onegov.election_day.formats import import_election_wabstic_proporz
 import os
 # Helpers
-from onegov.election_day.models import Canton
+from onegov.election_day.models import Canton, Municipality
 
 
 def print_errors(errors):
@@ -47,12 +47,11 @@ def get_tar_file_path(
     )
 
 
-def create_principal(principal):
+def create_principal(principal=None, municipality=None):
     if principal in Canton.CANTONS:
         pr = Canton(canton=principal)
     else:
-        # pr = Municipality(name=principal, municipality='351')
-        raise NotImplementedError
+        pr = Municipality(municipality=municipality)
     return pr
 
 
