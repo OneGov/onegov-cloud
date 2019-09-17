@@ -108,8 +108,7 @@ def test_import_wabsti_proporz_cantonal_complete(
     ]
 
 
-def test_import_wabsti_proporz_regional_sg(
-        session, import_test_datasets):
+def test_import_wabsti_proporz_regional_sg(session, import_test_datasets):
     principal = 'sg'
 
     election = import_test_datasets(
@@ -120,7 +119,7 @@ def test_import_wabsti_proporz_regional_sg(
         election_type='proporz',
         date_=date(2015, 10, 18),
         number_of_mandates=17,
-        dataset_name='kantonsratswahl-2016',
+        dataset_name='kantonsratswahlen-2016',
     )
 
     assert election.completed

@@ -1,3 +1,4 @@
+from datetime import date
 from io import BytesIO
 
 from onegov.ballot import ProporzElection
@@ -15,18 +16,17 @@ def test_roundtrip_wabstic_internal_alphanum(import_test_datasets, session):
         domain='canton',
         election_type='proporz',
         dataset_name='NR2019-alphanumerische_list_nr',
-        number_of_mandates=12
+        number_of_mandates=12,
+        date_=date(2019, 10, 20)
     )
-
-    # print(election)
     csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
-    print(csv)
 
     election_copy = ProporzElection(
         title='copy',
         domain='canton',
-        election_type='proporz',
-        number_of_mandates=12
+        type='proporz',
+        number_of_mandates=12,
+        date=date(2019, 10, 20)
     )
 
     session.add(election_copy)

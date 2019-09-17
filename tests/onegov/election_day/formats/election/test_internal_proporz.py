@@ -81,17 +81,16 @@ def test_import_internal_proporz_regional_zg(session, import_test_datasets):
 
     principal = create_principal('zg')
 
-    elections = import_test_datasets(
+    election = import_test_datasets(
         api_format='internal',
         model='election',
         principal='zg',
         domain='region',
         election_type='proporz',
         number_of_mandates=19,
-        date_=date(2015, 10, 18)
-
+        date_=date(2015, 10, 18),
+        dataset_name='kantonsratswahl-2014'
     )
-    election = elections['election-proporz_internal_kantonsratswahlen-2014']
 
     assert election.completed
     assert election.progress == (1, 1)

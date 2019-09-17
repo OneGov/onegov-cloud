@@ -175,7 +175,9 @@ def import_elections_internal(
     :return:
     """
     assert isinstance(principal, str)
-    assert '.' not in dataset_name, 'Remove the file ending from dataset_name'
+    if dataset_name:
+        assert '.' not in dataset_name, 'Remove the file ending' \
+                                        ' from dataset_name'
 
     function_mapping = dict(
         proporz=import_election_internal_proporz,
@@ -318,6 +320,16 @@ def import_elections_wabstic(
     return loaded_elections
 
 
+def get_mimetype(archive_filename):
+    fname = archive_filename.split('/')[-1]
+    ending = fname.split('.')[-1]
+    if ending.lower() in('xlsx', 'xls'):
+        return 'application/vnd.openxmlformats-' \
+               'officedocument.spreadsheetml.sheet'
+    else:
+        return 'text/plain'
+
+
 def import_elections_wabsti(
         election_type,
         principal,
@@ -343,7 +355,6 @@ def import_elections_wabsti(
     model_mapping = dict(proporz=ProporzElection, majorz=Election)
 
     api = 'wabsti'
-    mimetype = 'text/plain'
 
     loaded_elections = OrderedDict()
 
@@ -379,6 +390,8 @@ def import_elections_wabsti(
                      for name in f.getnames()
                      if name.startswith(folder)
                      and name != folder]
+            assert files, f'No files found in {folder}'
+            mimetype = get_mimetype(files[0])
 
             def find_and_read(files, keyword=None, no_keywords=None):
                 no_kw_results = []
