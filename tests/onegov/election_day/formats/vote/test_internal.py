@@ -1,35 +1,28 @@
-import tarfile
-
 from datetime import date
 from io import BytesIO
 from onegov.ballot import Vote
 from onegov.core.csv import convert_list_of_dicts_to_csv
-from onegov.core.utils import module_path
 from onegov.election_day.formats import import_vote_internal
 from onegov.election_day.models import Canton
-from pytest import mark
+
+from tests.onegov.election_day.common import create_principal
 
 
-@mark.parametrize("tar_file", [
-    module_path('tests.onegov.election_day', 'fixtures/internal_vote.tar.gz'),
-])
-def test_import_internal_vote(session, tar_file):
-    session.add(
-        Vote(title='vote', domain='federation', date=date(2017, 5, 21))
+def test_import_internal_vote_1(session, import_test_datasets):
+
+    principal = 'sg'
+
+    vote = import_test_datasets(
+        'internal',
+        'vote',
+        principal,
+        'canton',
+        date_=date(2017, 5, 21),
+        vote_type='normal',
+        dataset_name='energiegesetz-eng',
+        expats=True
     )
-    session.flush()
-    vote = session.query(Vote).one()
 
-    # The tar file contains vote results from SG (Energiegesetz) v1.13.1
-    with tarfile.open(tar_file, 'r|gz') as f:
-        csv = f.extractfile(f.next()).read()
-
-    # Test federal results
-    principal = Canton(canton='sg')
-    vote.expats = True
-
-    errors = import_vote_internal(vote, principal, BytesIO(csv), 'text/plain')
-    assert not errors
     assert vote.completed
     assert vote.ballots.count() == 1
     assert round(vote.turnout, 2) == 40.91
@@ -44,7 +37,12 @@ def test_import_internal_vote(session, tar_file):
     # Test a roundtrip
     csv = convert_list_of_dicts_to_csv(vote.export()).encode('utf-8')
 
-    errors = import_vote_internal(vote, principal, BytesIO(csv), 'text/plain')
+    errors = import_vote_internal(
+        vote,
+        create_principal(principal),
+        BytesIO(csv),
+        'text/plain')
+
     assert not errors
     assert vote.completed
     assert vote.ballots.count() == 1

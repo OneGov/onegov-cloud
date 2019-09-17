@@ -8,7 +8,8 @@ import pytest
 import textwrap
 import transaction
 
-from onegov.ballot import Election, ElectionCompound, Vote, ProporzElection
+from onegov.ballot import Election, ElectionCompound, Vote, ProporzElection, \
+    ComplexVote
 from datetime import date
 from onegov.core.crypto import hash_password
 from onegov.election_day import ElectionDayApp
@@ -16,7 +17,7 @@ from onegov.election_day.collections import SearchableArchivedResultCollection
 from onegov.election_day.formats import import_election_internal_majorz, \
     import_election_internal_proporz, import_election_wabstic_proporz, \
     import_election_wabstic_majorz, import_election_wabsti_proporz, \
-    import_election_wabsti_majorz
+    import_election_wabsti_majorz, import_vote_internal
 from tests.onegov.election_day.common import DummyRequest, print_errors, \
     get_tar_file_path, create_principal
 from onegov.user import User
@@ -438,6 +439,75 @@ def import_elections_wabsti(
     return loaded_elections
 
 
+def import_votes_internal(
+        vote_type,
+        principal,
+        domain,
+        session,
+        date_,
+        dataset_name,
+        expats,
+        vote,
+        municipality
+        ):
+
+        """
+        Import test datasets in internal formats. For one vote, there is
+        a single file to load, so subfolders are not necessary.
+
+        :param dataset_name: use the filename without ending
+        :return:
+        """
+        assert isinstance(principal, str)
+        assert '.' not in dataset_name, 'Remove the file ending from dataset_name'
+
+        api = 'internal'
+        mimetype = 'text/plain'
+
+        model_mapping = dict(normal=Vote, complex=ComplexVote)
+        loaded_votes = OrderedDict()
+    #
+        tar_fp = get_tar_file_path(
+            domain, principal, api, 'vote', vote_type)
+        with tarfile.open(tar_fp, 'r:gz') as f:
+            # According to docs, both methods return the same ordering
+            members = f.getmembers()
+            names = [fn.split('.')[0] for fn in f.getnames()]
+
+            for name, member in zip(names, members):
+                if dataset_name and dataset_name != name:
+                    continue
+                print(f'reading {name}.csv ...')
+
+                if not date_:
+                    year = re.search(r'(\d){4}', name).group(0)
+                    assert year, 'Put the a year into the filename'
+                    election_date = date(int(year), 1, 1)
+                else:
+                    election_date = date_
+
+                csv_file = f.extractfile(member).read()
+                if not vote:
+                    vote = model_mapping[vote_type](
+                        title=f'{vote_type}_{api}_{name}',
+                        date=election_date,
+                        domain=domain,
+                        expats=expats,
+                    )
+                principal_obj = create_principal(principal, municipality)
+                session.add(vote)
+                session.flush()
+                errors = import_vote_internal(
+                    vote, principal_obj, BytesIO(csv_file), mimetype,
+                )
+                print_errors(errors)
+                assert not errors
+                loaded_votes[vote.title] = vote
+        print(tar_fp)
+        assert loaded_votes, 'No vote was loaded'
+        return loaded_votes
+
+
 @pytest.fixture(scope="function")
 def import_test_datasets(session):
 
@@ -445,6 +515,7 @@ def import_test_datasets(session):
     election_types = ('majorz', 'proporz')
     apis = ('internal', 'wabstic', 'wabsti')
     domains = ('canton', 'region', 'municipality')
+    vote_types = ('normal', 'complex')
 
     def _import_test_datasets(
             api_format,
@@ -459,7 +530,9 @@ def import_test_datasets(session):
             election=None,
             election_number='1',
             election_district=None,
-            municipality=None
+            municipality=None,
+            vote_type='normal',
+            vote=None
     ):
         assert domain in domains
         assert principal, 'Define a single principal'
@@ -469,6 +542,9 @@ def import_test_datasets(session):
             assert domain in domains, f'Possible domains: {domains}'
             if election_type:
                 assert election_type in election_types
+
+        if model == 'vote':
+            assert vote_type in vote_types
 
         all_loaded = OrderedDict()
 
@@ -521,11 +597,24 @@ def import_test_datasets(session):
                 )
                 all_loaded.update(elections)
 
+        elif model == 'vote':
+            votes = import_votes_internal(
+                vote_type,
+                principal,
+                domain,
+                session,
+                date_,
+                dataset_name,
+                expats,
+                vote,
+                municipality
+            )
+            all_loaded.update(votes)
         else:
             raise NotImplementedError
         if len(all_loaded.keys()) == 1:
             return all_loaded.get(
-                f'{election_type}_{api_format}_{dataset_name}')
+                f'{election_type or vote_type}_{api_format}_{dataset_name}')
         return all_loaded
 
     return _import_test_datasets
