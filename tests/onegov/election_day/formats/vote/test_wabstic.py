@@ -10,20 +10,26 @@ from onegov.election_day.models import Canton
 from onegov.election_day.models import Municipality
 from pytest import mark
 
+from tests.onegov.election_day.common import get_tar_file_path
 
-@mark.parametrize("tar_file", [
-    module_path('tests.onegov.election_day', 'fixtures/wabstic_vote.tar.gz'),
-])
-def test_import_wabstic_vote(session, tar_file):
+
+def test_import_wabstic_vote_1(session):
+    # The tar file contains (modified) vote results from SG from the 12.02.2017
+    # with 2 federal votes, 1 cantonal vote, 6 simple communal votes and one
+    # complex communal vote
+
+    domain = 'federation'
+    principal = 'sg'
+
     session.add(
-        Vote(title='vote', domain='federation', date=date(2017, 2, 12))
+        Vote(title='vote', domain=domain, date=date(2017, 2, 12))
     )
     session.flush()
     vote = session.query(Vote).one()
 
-    # The tar file contains (modified) vote results from SG from the 12.02.2017
-    # with 2 federal votes, 1 cantonal vote, 6 simple communal votes and one
-    # complex communal vote
+    tar_file = get_tar_file_path(
+        domain, principal, 'wabstic', 'vote')
+
     with tarfile.open(tar_file, 'r|gz') as f:
         sgstatic_gemeinden = f.extractfile(f.next()).read()
         sgstatic_geschaefte = f.extractfile(f.next()).read()
