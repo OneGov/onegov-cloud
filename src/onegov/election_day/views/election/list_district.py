@@ -21,7 +21,7 @@ def list_options(request, election):
                 list_.name,
                 (
                     f'({list_.number_of_mandates} {mandates})'
-                    if list_.number_of_mandates else ''
+                    if list_.number_of_mandates and election.completed else ''
                 )
             ).strip()
         )
