@@ -91,7 +91,6 @@ def import_vote_default(vote, principal, ballot_type, file, mimetype):
             else:
                 added_entity_ids.add(entity_id)
 
-        # FIXME: in all other imports, there is just one try for a line
         # Skip expats if not enabled
         if entity_id == 0 and not vote.expats:
             continue
