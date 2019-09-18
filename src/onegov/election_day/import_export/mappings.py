@@ -14,7 +14,7 @@ the table as named tuples and work with that and this mapping.
 
 #  --- INTERNAL
 
-INTERNAL_COMMON_ELECTION_HEADERS = [
+INTERNAL_COMMON_ELECTION_HEADERS = (
     'election_status',
     'entity_id',
     'entity_counted',
@@ -30,22 +30,24 @@ INTERNAL_COMMON_ELECTION_HEADERS = [
     'candidate_elected',
     'candidate_votes',
     'candidate_party',
-]
+)
 
-INTERNAL_PROPORZ_HEADERS = [
+INTERNAL_PROPORZ_HEADERS = (
+    *INTERNAL_COMMON_ELECTION_HEADERS,
     'list_name',
     'list_id',
     'list_number_of_mandates',
     'list_votes',
     'list_connection',
     'list_connection_parent',
-] + INTERNAL_COMMON_ELECTION_HEADERS
+)
 
-INTERNAL_MAJORZ_HEADERS = [
+INTERNAL_MAJORZ_HEADERS = (
+    *INTERNAL_COMMON_ELECTION_HEADERS,
     'election_absolute_majority',
-] + INTERNAL_COMMON_ELECTION_HEADERS
+)
 
-ELECTION_PARTY_HEADERS = [
+ELECTION_PARTY_HEADERS = (
     'year',
     'total_votes',
     'name',
@@ -53,9 +55,9 @@ ELECTION_PARTY_HEADERS = [
     'color',
     'mandates',
     'votes',
-]
+)
 
-WABSTI_MAJORZ_HEADERS = [
+WABSTI_MAJORZ_HEADERS = (
     'anzmandate',
     # 'absolutesmehr' optional
     'bfs',
@@ -63,13 +65,13 @@ WABSTI_MAJORZ_HEADERS = [
     # 'stimmabgegeben' or 'wzabgegeben'
     # 'wzleer' or 'stimmleer'
     # 'wzungueltig' or 'stimmungueltig'
-]
+)
 
-WABSTI_MAJORZ_HEADERS_CANDIDATES = [
+WABSTI_MAJORZ_HEADERS_CANDIDATES = (
     'kandid',
-]
+)
 
-WABSTI_PROPORZ_HEADERS = [
+WABSTI_PROPORZ_HEADERS = (
     'einheit_bfs',
     'liste_kandid',
     'kand_nachname',
@@ -78,19 +80,19 @@ WABSTI_PROPORZ_HEADERS = [
     'liste_code',
     'kand_stimmentotal',
     'liste_parteistimmentotal',
-]
+)
 
-WABSTI_PROPORZ_HEADERS_CONNECTIONS = [
+WABSTI_PROPORZ_HEADERS_CONNECTIONS = (
     'liste',
     'lv',
     'luv',
-]
+)
 
-WABSTI_PROPORZ_HEADERS_CANDIDATES = [
-    'liste_kandid'
-]
+WABSTI_PROPORZ_HEADERS_CANDIDATES = (
+    'liste_kandid',
+)
 
-WABSTI_PROPORZ_HEADERS_STATS = [
+WABSTI_PROPORZ_HEADERS_STATS = (
     'einheit_bfs',
     'einheit_name',
     'stimbertotal',
@@ -98,7 +100,7 @@ WABSTI_PROPORZ_HEADERS_STATS = [
     'wzleer',
     'wzungueltig',
     'stmwzveraendertleeramtlleer',
-]
+)
 
 WABSTIC_MAJORZ_HEADERS_WM_WAHL = (
     'sortgeschaeft',  # provides the link to the election
@@ -198,16 +200,16 @@ WABSTIC_PROPORZ_HEADERS_WP_KANDIDATENGDE = (
 
 # VOTES
 
-DEFAULT_VOTE_HEADER = [
+DEFAULT_VOTE_HEADER = (
     'id',
     'ja stimmen',
     'nein stimmen',
     'Stimmberechtigte',
     'leere stimmzettel',
     'ungültige stimmzettel'
-]
+)
 
-INTERNAL_VOTE_HEADERS = [
+INTERNAL_VOTE_HEADERS = (
     'status',
     'type',
     'entity_id',
@@ -217,7 +219,7 @@ INTERNAL_VOTE_HEADERS = [
     'invalid',
     'empty',
     'eligible_voters',
-]
+)
 
 WABSTI_VOTE_HEADERS = (
     'vorlage-nr.',
