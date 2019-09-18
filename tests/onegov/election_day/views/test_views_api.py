@@ -1,12 +1,12 @@
-import json
-from datetime import date
-
-import pytest
-from onegov.ballot import Election, ProporzElection
-from onegov.core.utils import module_path
-from onegov.election_day.utils.election.lists import \
-    get_aggregated_list_results
-from tests.onegov.election_day.common import import_wabstic_data
+# import json
+# from datetime import date
+#
+# import pytest
+# from onegov.ballot import Election, ProporzElection
+# from onegov.core.utils import module_path
+# from onegov.election_day.utils.election.lists import \
+#     get_aggregated_list_results
+# from tests.onegov.election_day.common import import_wabstic_data
 
 
 # @pytest.mark.parametrize("tar_file", [
@@ -36,6 +36,3 @@ from tests.onegov.election_day.common import import_wabstic_data
 #
 #     print(json.dumps(data, indent=2))
 #     assert False
-
-
-

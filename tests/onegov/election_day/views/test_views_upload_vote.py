@@ -353,7 +353,6 @@ def test_upload_vote_all_or_nothing(election_day_app):
     assert '<span class="error-line">Vorlage</span>' not in upload
     assert '<span class="error-line">Gegenentwurf</span>' not in upload
     assert '<span class="error-line">Stichfrage</span>' in upload
-    assert "Ungültige ID" in upload
     assert '<span class="error-line"><span>Zeile</span>2</span>' in upload
     assert archive.query().one().progress == (0, 0)
 

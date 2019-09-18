@@ -1,39 +1,34 @@
 from onegov.ballot import PanachageResult
 from onegov.ballot import PartyResult
 from onegov.election_day import _
-from onegov.election_day.formats.common import FileImportError
+from onegov.election_day.formats.common import FileImportError, \
+    validate_integer
 from onegov.election_day.formats.common import load_csv
 from re import match
 from sqlalchemy.orm import object_session
 from uuid import uuid4
 
-
-HEADERS = [
-    'year',
-    'total_votes',
-    'name',
-    'id',
-    'color',
-    'mandates',
-    'votes',
-]
+from onegov.election_day.import_export.mappings import \
+    ELECTION_PARTY_HEADERS
 
 
 def parse_party_result(line, errors, results, totals, parties, election_year):
     try:
-        year = int(line.year or election_year)
-        total_votes = int(line.total_votes or 0)
+        year = validate_integer(line, 'year', default=election_year)
+        total_votes = validate_integer(line, 'total_votes')
         name = line.name or ''
-        id_ = int(line.id or 0)
+        id_ = validate_integer(line, 'id')
         color = line.color or (
             '#0571b0' if year == election_year else '#999999'
         )
-        mandates = int(line.mandates or 0)
-        votes = int(line.votes or 0)
+        mandates = validate_integer(line, 'mandates')
+        votes = validate_integer(line, 'votes')
         assert all((year, total_votes, name, color))
         assert match(r'^#[0-9A-Fa-f]{6}$', color)
         assert totals.get(year, total_votes) == total_votes
-    except (ValueError, AssertionError):
+    except ValueError as e:
+        errors.append(e.args[0])
+    except AssertionError:
         errors.append(_("Invalid values"))
     else:
         key = '{}/{}'.format(name, year)
@@ -58,28 +53,31 @@ def parse_party_result(line, errors, results, totals, parties, election_year):
 def parse_panachage_headers(csv):
     headers = {}
     for header in csv.headers:
-        if header.startswith('panachage_votes_from_'):
-            parts = header.split('panachage_votes_from_')
-            if len(parts) > 1:
-                try:
-                    number = int(parts[1])
-                    headers[csv.as_valid_identifier(header)] = number
-                except ValueError:
-                    pass
+        if not header.startswith('panachage_votes_from_'):
+            continue
+        parts = header.split('panachage_votes_from_')
+        if len(parts) > 1:
+            try:
+                # FIXME: In db, target and is list.name, convert to int?
+                # target resp. So convert this  to an int ?
+                number = int(parts[1])
+                headers[csv.as_valid_identifier(header)] = number
+            except ValueError:
+                pass
     return headers
 
 
 def parse_panachage_results(line, errors, results, headers, election_year):
     try:
-        target = int(line.id or 0)
-        year = int(line.year or election_year)
+        target = validate_integer(line, 'id')
+        year = validate_integer(line, 'year', default=election_year)
         if target not in results and year == election_year:
             results[target] = {}
             for name, index in headers.items():
-                results[target][index] = int(getattr(line, name) or 0)
+                results[target][index] = validate_integer(line, name)
 
-    except ValueError:
-        errors.append(_("Invalid values"))
+    except ValueError as e:
+        errors.append(e.args[0])
 
 
 def import_party_results(election, file, mimetype):
@@ -98,12 +96,12 @@ def import_party_results(election, file, mimetype):
     party_results = {}
     party_totals = {}
     panachage_results = {}
-    panachage_headers = []
 
     # The party results file has one party per year per line (but only
     # panachage results in the year of the election)
     if file and mimetype:
-        csv, error = load_csv(file, mimetype, expected_headers=HEADERS)
+        csv, error = load_csv(
+            file, mimetype, expected_headers=ELECTION_PARTY_HEADERS)
         if error:
             errors.append(error)
         else:
@@ -144,6 +142,7 @@ def import_party_results(election, file, mimetype):
                 if source in parties or source == 999:
                     election.panachage_results.append(
                         PanachageResult(
+                            owner=election.id,
                             id=uuid4(),
                             source=parties.get(source, ''),
                             target=parties[target],

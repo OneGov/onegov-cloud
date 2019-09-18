@@ -11,6 +11,7 @@ from tests.onegov.election_day.common import DummyRequest
 from unittest.mock import Mock
 import pytest
 
+
 def test_election_compound_layout(session):
     date_ = date(2011, 1, 1)
     majorz = Election(title="majorz", domain='region', date=date_)
@@ -223,6 +224,7 @@ def test_election_compound_layout_menu_proporz(session):
         ('Panachage', 'ElectionCompound/parties-panachage', False, []),
         ('Downloads', 'ElectionCompound/data', False, [])
     ]
+
 
 @pytest.mark.parametrize('tab,expected', [
     ('districts', 'ElectionCompound/districts-table'),

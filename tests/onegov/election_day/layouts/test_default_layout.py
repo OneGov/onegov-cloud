@@ -47,14 +47,14 @@ def test_default_layout():
         base_url + 'open_data_it.md'
     )
     assert layout_rm.opendata_link == (
-        base_url +'open_data_rm.md'
+        base_url + 'open_data_rm.md'
     )
 
     assert layout_de.format_description_link == (
         base_url + 'format__de.md'
     )
     assert layout_en.format_description_link == (
-        base_url +'format__en.md'
+        base_url + 'format__en.md'
     )
     assert layout_fr.format_description_link == (
         base_url + 'format__fr.md'

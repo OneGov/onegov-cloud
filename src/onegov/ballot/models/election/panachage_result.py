@@ -16,13 +16,14 @@ class PanachageResult(Base, TimestampMixin):
     #: identifies the result
     id = Column(UUID, primary_key=True, default=uuid4)
 
-    #: the owner of this result
+    #: the owner of this result, maps to election.id
+    # where electon.id is derived from the title
     owner = Column(Text, nullable=True)
 
-    #: the target this result belongs to
+    #: the target this result belongs to, maps to list.id
     target = Column(Text, nullable=False)
 
-    #: the source this result belongs to
+    #: the source this result belongs to, maps to list.id
     source = Column(Text, nullable=False)
 
     # votes

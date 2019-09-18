@@ -1,26 +1,9 @@
 from onegov.ballot import BallotResult
 from onegov.election_day import _
-from onegov.election_day.formats.common import EXPATS
+from onegov.election_day.formats.common import EXPATS, validate_integer
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
-
-
-HEADERS = (
-    'freigegeben',
-    'stileer',
-    'stiungueltig',
-    'stijahg',
-    'stineinhg',
-    'stiohneawhg',
-    'stijan1',
-    'stineinn1',
-    'stiohneawN1',
-    'stijan2',
-    'stineinn2',
-    'stiohneawN2',
-    'stimmberechtigte',
-    'bfs',
-)
+from onegov.election_day.import_export.mappings import WABSTIM_VOTE_HEADERS
 
 
 def import_vote_wabstim(vote, principal, file, mimetype):
@@ -34,13 +17,16 @@ def import_vote_wabstim(vote, principal, file, mimetype):
 
     """
     csv, error = load_csv(
-        file, mimetype, expected_headers=HEADERS,
+        file, mimetype, expected_headers=WABSTIM_VOTE_HEADERS,
         rename_duplicate_column_names=True
     )
     if error:
         # Wabsti files are sometimes UTF-16
         csv, utf16_error = load_csv(
-            file, mimetype, expected_headers=HEADERS, encoding='utf-16-le',
+            file,
+            mimetype,
+            expected_headers=WABSTIM_VOTE_HEADERS,
+            encoding='utf-16-le',
             rename_duplicate_column_names=True
         )
         if utf16_error:
@@ -62,9 +48,9 @@ def import_vote_wabstim(vote, principal, file, mimetype):
         # the id of the entity
         entity_id = None
         try:
-            entity_id = int(line.bfs or 0)
-        except ValueError:
-            line_errors.append(_("Invalid id"))
+            entity_id = validate_integer(line, 'bfs')
+        except ValueError as e:
+            line_errors.append(e.args[0])
         else:
             if entity_id not in entities and entity_id in EXPATS:
                 entity_id = 0
@@ -85,7 +71,7 @@ def import_vote_wabstim(vote, principal, file, mimetype):
 
         try:
             counted = True if line.freigegeben else False
-        except ValueError:
+        except AttributeError:
             line_errors.append(_("Invalid values"))
 
         # Skip expats if not enabled
@@ -95,42 +81,45 @@ def import_vote_wabstim(vote, principal, file, mimetype):
         # the yeas
         yeas = {}
         try:
-            yeas['proposal'] = int(line.stijahg or 0)
-            yeas['counter-proposal'] = int(line.stijan1 or 0)
-            yeas['tie-breaker'] = int(line.stijan2 or 0)
-        except ValueError:
-            line_errors.append(_("Could not read yeas"))
+            yeas['proposal'] = validate_integer(line, 'stijahg')
+            yeas['counter-proposal'] = validate_integer(line, 'stijan1')
+            yeas['tie-breaker'] = validate_integer(line, 'stijan2')
+        except ValueError as e:
+            line_errors.append(e.args[0])
 
         # the nays
         nays = {}
         try:
-            nays['proposal'] = int(line.stineinhg or 0)
-            nays['counter-proposal'] = int(line.stineinn1 or 0)
-            nays['tie-breaker'] = int(line.stineinn2 or 0)
-        except ValueError:
-            line_errors.append(_("Could not read nays"))
+            nays['proposal'] = validate_integer(line, 'stineinhg')
+            nays['counter-proposal'] = validate_integer(line, 'stineinn1')
+            nays['tie-breaker'] = validate_integer(line, 'stineinn2')
+        except ValueError as e:
+            line_errors.append(e.args[0])
 
         # the eligible voters
         try:
-            eligible_voters = int(line.stimmberechtigte or 0)
-        except ValueError:
-            line_errors.append(_("Could not read the eligible voters"))
+            eligible_voters = validate_integer(line, 'stimmberechtigte')
+        except ValueError as e:
+            line_errors.append(e.args[0])
 
         # the empty votes
         empty = {}
         try:
-            e_ballots = int(line.stileer or 0)
-            empty['proposal'] = int(line.stiohneawhg or 0) + e_ballots
-            empty['counter-proposal'] = int(line.stiohneawn1 or 0) + e_ballots
-            empty['tie-breaker'] = int(line.stiohneawn2 or 0) + e_ballots
-        except ValueError:
-            line_errors.append(_("Could not read the empty votes"))
+            e_ballots = validate_integer(line, 'stileer')
+            empty['proposal'] = validate_integer(
+                line, 'stiohneawhg') + e_ballots
+            empty['counter-proposal'] = validate_integer(
+                line, 'stiohneawn1') + e_ballots
+            empty['tie-breaker'] = validate_integer(
+                line, 'stiohneawn2') + e_ballots
+        except ValueError as e:
+            line_errors.append(e.args[0])
 
         # the invalid votes
         try:
-            invalid = int(line.stiungueltig or 0)
-        except ValueError:
-            line_errors.append(_("Could not read the invalid votes"))
+            invalid = validate_integer(line, 'stiungueltig')
+        except ValueError as e:
+            line_errors.append(e.args[0])
 
         # pass the errors
         if line_errors:

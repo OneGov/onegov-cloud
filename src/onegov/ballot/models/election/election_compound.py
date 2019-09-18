@@ -1,4 +1,6 @@
 from collections import OrderedDict
+
+from onegov.ballot.constants import election_day_i18n_used_locales
 from onegov.ballot.models.election.candidate import Candidate
 from onegov.ballot.models.election.candidate_result import CandidateResult
 from onegov.ballot.models.election.election import Election
@@ -325,8 +327,11 @@ class ElectionCompound(
         """
 
         common = OrderedDict()
+        for locale in election_day_i18n_used_locales:
+            common[f'compound_title_{locale}'] = \
+                self.title_translations.get(locale, '')
         for locale, title in self.title_translations.items():
-            common['compound_title_{}'.format(locale)] = (title or '').strip()
+            common[f'compound_title_{locale}'] = (title or '').strip()
         common['compound_date'] = self.date.isoformat()
         common['compound_mandates'] = self.number_of_mandates
 

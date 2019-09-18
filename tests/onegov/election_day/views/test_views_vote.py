@@ -134,13 +134,13 @@ def test_view_vote_data(election_day_app):
 
 
 @pytest.mark.parametrize('url,', [
-        'proposal-by-entities-table',
-        'counter-proposal-by-entities-table',
-        'proposal-by-districts-table',
-        'counter-proposal-by-districts-table',
-        'tie-breaker-by-entities-table',
-        'tie-breaker-by-districts-table',
-        'vote-header-widget'
+    'proposal-by-entities-table',
+    'counter-proposal-by-entities-table',
+    'proposal-by-districts-table',
+    'counter-proposal-by-districts-table',
+    'tie-breaker-by-entities-table',
+    'tie-breaker-by-districts-table',
+    'vote-header-widget'
 ])
 def test_views_vote_embedded_widgets(election_day_app, url):
     client = Client(election_day_app)
@@ -149,4 +149,3 @@ def test_views_vote_embedded_widgets(election_day_app, url):
     login(client)
     upload_complex_vote(client)
     client.get(f'/vote/complex-vote/{url}')
-

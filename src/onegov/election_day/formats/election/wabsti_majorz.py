@@ -2,36 +2,28 @@ from onegov.ballot import Candidate
 from onegov.ballot import CandidateResult
 from onegov.ballot import ElectionResult
 from onegov.election_day import _
-from onegov.election_day.formats.common import EXPATS
+from onegov.election_day.formats.common import EXPATS, validate_integer
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from uuid import uuid4
 
-
-HEADERS = [
-    'anzmandate',
-    # 'absolutesmehr' optional
-    'bfs',
-    'stimmber',
-    # 'stimmabgegeben' or 'wzabgegeben'
-    # 'wzleer' or 'stimmleer'
-    # 'wzungueltig' or 'stimmungueltig'
-]
-
-HEADERS_CANDIDATES = [
-    'kandid',
-]
+from onegov.election_day.import_export.mappings import \
+    WABSTI_MAJORZ_HEADERS, WABSTI_MAJORZ_HEADERS_CANDIDATES
 
 
 def parse_election(line, errors):
     mandates = None
     majority = None
     try:
-        mandates = int(line.anzmandate or 0)
+        mandates = validate_integer(line, 'anzmandate')
         if hasattr(line, 'absolutesmehr'):
-            majority = int(line.absolutesmehr or 0)
+            majority = validate_integer(line, 'absolutesmehr')
             majority = majority if majority > 0 else None
-    except ValueError:
+
+    except ValueError as e:
+        errors.append(e.args[0])
+
+    except Exception:
         errors.append(_("Invalid election values"))
 
     return mandates, majority
@@ -39,8 +31,8 @@ def parse_election(line, errors):
 
 def parse_election_result(line, errors, entities, added_entities):
     try:
-        entity_id = int(line.bfs or 0)
-        eligible_voters = int(line.stimmber or 0)
+        entity_id = validate_integer(line, 'bfs')
+        eligible_voters = validate_integer(line, 'stimmber')
         received_ballots = int(
             getattr(line, 'wzabgegeben', 0)
             or getattr(line, 'stimmabgegeben', 0)
@@ -60,8 +52,8 @@ def parse_election_result(line, errors, entities, added_entities):
         while True:
             count += 1
             try:
-                name = getattr(line, 'kandname_{}'.format(count))
-                votes = int(getattr(line, 'stimmen_{}'.format(count)) or 0)
+                name = getattr(line, f'kandname_{count}')
+                votes = validate_integer(line, f'stimmen_{count}')
             except AttributeError:
                 break
             except Exception:
@@ -72,8 +64,8 @@ def parse_election_result(line, errors, entities, added_entities):
                 elif name == 'Ungültige Stimmen':
                     invalid_votes = votes
 
-    except ValueError:
-        errors.append(_("Invalid entity values"))
+    except ValueError as e:
+        errors.append(e.args[0])
     else:
         if entity_id not in entities and entity_id in EXPATS:
             entity_id = 0
@@ -111,15 +103,13 @@ def parse_candidates(line, errors):
     while True:
         index += 1
         try:
-            candidate_id = getattr(line, 'kandid_{}'.format(index), str(index))
-            family_name = getattr(line, 'kandname_{}'.format(index))
-            first_name = getattr(line, 'kandvorname_{}'.format(index))
-            votes = int(getattr(line, 'stimmen_{}'.format(index)) or 0)
+            candidate_id = getattr(line, f'kandid_{index}', str(index))
+            family_name = getattr(line, f'kandname_{index}')
+            first_name = getattr(line, f'kandvorname_{index}')
+            votes = validate_integer(line, f'stimmen_{index}')
             elected = False
-            if hasattr(line, 'kandresultart_{}'.format(index)):
-                elected = int(
-                    getattr(line, 'kandresultart_{}'.format(index)) or 0
-                ) == 2
+            if hasattr(line, f'kandresultart_{index}'):
+                elected = validate_integer(line, f'kandresultart_{index}') == 2
         except AttributeError:
             break
         except ValueError:
@@ -168,12 +158,15 @@ def import_election_wabsti_majorz(
     # This format has one entity per line and every candidate as row
     filename = _("Results")
     csv, error = load_csv(
-        file, mimetype, expected_headers=HEADERS, filename=filename
+        file, mimetype, expected_headers=WABSTI_MAJORZ_HEADERS,
+        filename=filename
     )
     if error:
         # Wabsti files are sometimes UTF-16
         csv, utf16_error = load_csv(
-            file, mimetype, expected_headers=HEADERS, encoding='utf-16-le'
+            file, mimetype,
+            expected_headers=WABSTI_MAJORZ_HEADERS,
+            encoding='utf-16-le'
         )
         if utf16_error:
             errors.append(error)
@@ -219,14 +212,15 @@ def import_election_wabsti_majorz(
     if elected_file and elected_mimetype:
         csv, error = load_csv(
             elected_file, elected_mimetype,
-            expected_headers=HEADERS_CANDIDATES,
+            expected_headers=WABSTI_MAJORZ_HEADERS_CANDIDATES,
             filename=filename
         )
         if error:
             # Wabsti files are sometimes UTF-16
             csv, utf16_error = load_csv(
                 elected_file, elected_mimetype,
-                expected_headers=HEADERS_CANDIDATES, encoding='utf-16-le'
+                expected_headers=WABSTI_MAJORZ_HEADERS_CANDIDATES,
+                encoding='utf-16-le'
             )
             if utf16_error:
                 errors.append(error)

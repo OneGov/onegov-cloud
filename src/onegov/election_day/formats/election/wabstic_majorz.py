@@ -9,42 +9,11 @@ from onegov.election_day.formats.common import load_csv
 from sqlalchemy.orm import object_session
 from uuid import uuid4
 
-
-HEADERS_WM_WAHL = (
-    'sortgeschaeft',  # provides the link to the election
-    'absolutesmehr',  # absolute majority
-    'ausmittlungsstand',  # complete
-)
-HEADERS_WMSTATIC_GEMEINDEN = (
-    'sortwahlkreis',  # provides the link to the election
-    'sortgeschaeft',  # provides the link to the election
-    'bfsnrgemeinde',  # BFS
-    'stimmberechtigte',  # eligible votes
-)
-HEADERS_WM_GEMEINDEN = (
-    'bfsnrgemeinde',  # BFS
-    'stimmberechtigte',  # eligible votes
-    'sperrung',  # counted
-    'stmabgegeben',  # received ballots
-    'stmleer',  # blank ballots
-    'stmungueltig',  # invalid ballots
-    'stimmenleer',  # blank votes
-    'stimmenungueltig',  # invalid votes
-)
-HEADERS_WM_KANDIDATEN = (
-    'sortgeschaeft',  # provides the link to the election
-    'knr',  # candidate id
-    'nachname',  # familiy name
-    'vorname',  # first name
-    'gewaehlt',  # elected
-    'partei',  #
-)
-HEADERS_WM_KANDIDATENGDE = (
-    'sortgeschaeft',  # provides the link to the election
-    'bfsnrgemeinde',  # BFS
-    'knr',  # candidate id
-    'stimmen',  # votes
-)
+from onegov.election_day.import_export.mappings import (
+    WABSTIC_MAJORZ_HEADERS_WM_WAHL,
+    WABSTIC_MAJORZ_HEADERS_WMSTATIC_GEMEINDEN,
+    WABSTIC_MAJORZ_HEADERS_WM_GEMEINDEN, WABSTIC_MAJORZ_HEADERS_WM_KANDIDATEN,
+    WABSTIC_MAJORZ_HEADERS_WM_KANDIDATENGDE)
 
 
 def get_entity_id(line):
@@ -77,7 +46,7 @@ def import_election_wabstic_majorz(
     # Read the files
     wm_wahl, error = load_csv(
         file_wm_wahl, mimetype_wm_wahl,
-        expected_headers=HEADERS_WM_WAHL,
+        expected_headers=WABSTIC_MAJORZ_HEADERS_WM_WAHL,
         filename='wm_wahl'
     )
     if error:
@@ -85,7 +54,7 @@ def import_election_wabstic_majorz(
 
     wmstatic_gemeinden, error = load_csv(
         file_wmstatic_gemeinden, mimetype_wmstatic_gemeinden,
-        expected_headers=HEADERS_WMSTATIC_GEMEINDEN,
+        expected_headers=WABSTIC_MAJORZ_HEADERS_WMSTATIC_GEMEINDEN,
         filename='wmstatic_gemeinden'
     )
     if error:
@@ -93,7 +62,7 @@ def import_election_wabstic_majorz(
 
     wm_gemeinden, error = load_csv(
         file_wm_gemeinden, mimetype_wm_gemeinden,
-        expected_headers=HEADERS_WM_GEMEINDEN,
+        expected_headers=WABSTIC_MAJORZ_HEADERS_WM_GEMEINDEN,
         filename='wm_gemeinden'
     )
     if error:
@@ -101,7 +70,7 @@ def import_election_wabstic_majorz(
 
     wm_kandidaten, error = load_csv(
         file_wm_kandidaten, mimetype_wm_kandidaten,
-        expected_headers=HEADERS_WM_KANDIDATEN,
+        expected_headers=WABSTIC_MAJORZ_HEADERS_WM_KANDIDATEN,
         filename='wm_kandidaten'
     )
     if error:
@@ -109,7 +78,7 @@ def import_election_wabstic_majorz(
 
     wm_kandidatengde, error = load_csv(
         file_wm_kandidatengde, mimetype_wm_kandidatengde,
-        expected_headers=HEADERS_WM_KANDIDATENGDE,
+        expected_headers=WABSTIC_MAJORZ_HEADERS_WM_KANDIDATENGDE,
         filename='wm_kandidatengde'
     )
     if error:

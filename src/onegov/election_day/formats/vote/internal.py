@@ -1,24 +1,13 @@
 from onegov.ballot import BallotResult
 from onegov.election_day import _
-from onegov.election_day.formats.common import BALLOT_TYPES
+from onegov.election_day.formats.common import BALLOT_TYPES, validate_integer
 from onegov.election_day.formats.common import EXPATS
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import STATI
 from sqlalchemy.orm import object_session
 
-
-HEADERS = [
-    'status',
-    'type',
-    'entity_id',
-    'counted',
-    'yeas',
-    'nays',
-    'invalid',
-    'empty',
-    'eligible_voters',
-]
+from onegov.election_day.import_export.mappings import INTERNAL_VOTE_HEADERS
 
 
 def import_vote_internal(vote, principal, file, mimetype):
@@ -34,7 +23,7 @@ def import_vote_internal(vote, principal, file, mimetype):
 
     """
     csv, error = load_csv(
-        file, mimetype, expected_headers=HEADERS, dialect='excel'
+        file, mimetype, expected_headers=INTERNAL_VOTE_HEADERS, dialect='excel'
     )
     if error:
         return [error]
@@ -64,9 +53,9 @@ def import_vote_internal(vote, principal, file, mimetype):
         # the id of the entity
         entity_id = None
         try:
-            entity_id = int(line.entity_id or 0)
-        except ValueError:
-            line_errors.append(_("Invalid id"))
+            entity_id = validate_integer(line, 'entity_id')
+        except ValueError as e:
+            line_errors.append(e.args[0])
         else:
             if entity_id not in entities and entity_id in EXPATS:
                 entity_id = 0
@@ -94,33 +83,33 @@ def import_vote_internal(vote, principal, file, mimetype):
 
         # the yeas
         try:
-            yeas = int(line.yeas or 0)
-        except ValueError:
-            line_errors.append(_("Could not read yeas"))
+            yeas = validate_integer(line, 'yeas')
+        except ValueError as e:
+            line_errors.append(e.args[0])
 
         # the nays
         try:
-            nays = int(line.nays or 0)
-        except ValueError:
-            line_errors.append(_("Could not read nays"))
+            nays = validate_integer(line, 'nays')
+        except ValueError as e:
+            line_errors.append(e.args[0])
 
         # the eligible voters
         try:
-            eligible_voters = int(line.eligible_voters or 0)
-        except ValueError:
-            line_errors.append(_("Could not read the eligible voters"))
+            eligible_voters = validate_integer(line, 'eligible_voters')
+        except ValueError as e:
+            line_errors.append(e.args[0])
 
         # the empty votes
         try:
-            empty = int(line.empty or 0)
-        except ValueError:
-            line_errors.append(_("Could not read the empty votes"))
+            empty = validate_integer(line, 'empty')
+        except ValueError as e:
+            line_errors.append(e.args[0])
 
         # the invalid votes
         try:
-            invalid = int(line.invalid or 0)
-        except ValueError:
-            line_errors.append(_("Could not read the invalid votes"))
+            invalid = validate_integer(line, 'invalid')
+        except ValueError as e:
+            line_errors.append(e.args[0])
 
         # now let's do some sanity checks
         try:

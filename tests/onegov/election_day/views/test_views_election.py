@@ -1,11 +1,9 @@
-import re
 from datetime import date
 
 import pytest
 from freezegun import freeze_time
 from math import isclose
 
-from onegov.ballot import Election
 from onegov.election_day.layouts import ElectionLayout
 from tests.onegov.election_day.common import login
 from tests.onegov.election_day.common import MAJORZ_HEADER

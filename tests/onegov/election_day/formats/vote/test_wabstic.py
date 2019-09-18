@@ -4,26 +4,29 @@ from datetime import date
 from io import BytesIO
 from onegov.ballot import Vote
 from onegov.ballot import ComplexVote
-from onegov.core.utils import module_path
 from onegov.election_day.formats import import_vote_wabstic
 from onegov.election_day.models import Canton
 from onegov.election_day.models import Municipality
-from pytest import mark
+from tests.onegov.election_day.common import get_tar_file_path
 
 
-@mark.parametrize("tar_file", [
-    module_path('tests.onegov.election_day', 'fixtures/wabstic_vote.tar.gz'),
-])
-def test_import_wabstic_vote(session, tar_file):
+def test_import_wabstic_vote_1(session):
+    # The tar file contains (modified) vote results from SG from the 12.02.2017
+    # with 2 federal votes, 1 cantonal vote, 6 simple communal votes and one
+    # complex communal vote
+
+    domain = 'federation'
+    principal = 'sg'
+
     session.add(
-        Vote(title='vote', domain='federation', date=date(2017, 2, 12))
+        Vote(title='vote', domain=domain, date=date(2017, 2, 12))
     )
     session.flush()
     vote = session.query(Vote).one()
 
-    # The tar file contains (modified) vote results from SG from the 12.02.2017
-    # with 2 federal votes, 1 cantonal vote, 6 simple communal votes and one
-    # complex communal vote
+    tar_file = get_tar_file_path(
+        domain, principal, 'wabstic', 'vote')
+
     with tarfile.open(tar_file, 'r|gz') as f:
         sgstatic_gemeinden = f.extractfile(f.next()).read()
         sgstatic_geschaefte = f.extractfile(f.next()).read()
@@ -262,24 +265,26 @@ def test_import_wabstic_vote_invalid_values(session):
         ).encode('utf-8')),
         'text/plain'
     )
-    assert sorted([
+    errors = sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
-    ]) == [
+    ])
+    print(errors)
+    assert errors == [
         ('sg_gemeinden', 2, '100 is unknown'),
-        ('sg_gemeinden', 2, 'Could not read nays'),
-        ('sg_gemeinden', 2, 'Could not read the eligible voters'),
         ('sg_gemeinden', 2, 'Could not read the empty votes'),
-        ('sg_gemeinden', 2, 'Could not read the invalid votes'),
-        ('sg_gemeinden', 2, 'Could not read yeas'),
+        ('sg_gemeinden', 2, 'Invalid integer: stimmberechtigte'),
+        ('sg_gemeinden', 2, 'Invalid integer: stmhgja'),
+        ('sg_gemeinden', 2, 'Invalid integer: stmhgnein'),
+        ('sg_gemeinden', 2, 'Invalid integer: stmungueltig'),
         ('sg_gemeinden', 2, 'Invalid values'),
-        ('sg_gemeinden', 3, 'Could not read nays'),
-        ('sg_gemeinden', 3, 'Could not read the eligible voters'),
         ('sg_gemeinden', 3, 'Could not read the empty votes'),
-        ('sg_gemeinden', 3, 'Could not read the invalid votes'),
-        ('sg_gemeinden', 3, 'Could not read yeas'),
-        ('sg_gemeinden', 3, 'Invalid id'),
+        ('sg_gemeinden', 3, 'Invalid integer: bfsnrgemeinde'),
+        ('sg_gemeinden', 3, 'Invalid integer: stimmberechtigte'),
+        ('sg_gemeinden', 3, 'Invalid integer: stmhgja'),
+        ('sg_gemeinden', 3, 'Invalid integer: stmhgnein'),
+        ('sg_gemeinden', 3, 'Invalid integer: stmungueltig'),
         ('sg_gemeinden', 3, 'Invalid values'),
-        ('sg_geschaefte', 2, 'Invalid values')
+        ('sg_geschaefte', 2, 'Value of ausmittlungsstand not between 0 and 3')
     ]
 
 

@@ -1,18 +1,14 @@
-import tarfile
-
 from datetime import date
 from io import BytesIO
 from onegov.ballot import Election
 from onegov.ballot import ProporzElection
 from onegov.ballot import List
-from onegov.core.utils import module_path
 from onegov.election_day.formats import import_election_wabstic_proporz
 from onegov.election_day.formats.election.wabstic_proporz import \
     get_list_id_from_knr
 from onegov.election_day.models import Canton
-from pytest import mark
 
-from tests.onegov.election_day.common import import_wabstic_data, print_errors
+from tests.onegov.election_day.common import print_errors
 
 
 def test_get_list_id_from_knr():
@@ -28,89 +24,22 @@ def test_get_list_id_from_knr():
     assert get_list_id_from_knr(DummyLine('05a.1')) == '05a'
 
 
-@mark.parametrize("tar_file", [
-    module_path('tests.onegov.election_day',
-                'fixtures/wabstic_proporz_v2.3.tar.gz'),
-])
-def test_import_wabstic_proporz_v23(session, tar_file):
-    session.add(
-        ProporzElection(
-            title='test cantonal election',
-            domain='canton',
-            date=date(2016, 2, 28),
-            number_of_mandates=12,
-        )
+def test_import_wabstic_proporz_cantonal(session, import_test_datasets):
+
+    # - cantonal results from SG from the 18.10.2015 (Nationalrat)
+
+    election = import_test_datasets(
+        'wabstic',
+        'election',
+        'sg',
+        domain='canton',
+        election_type='proporz',
+        dataset_name='nationalratswahl-2015',
+        number_of_mandates=12,
+        date_=date(2015, 10, 18),
+        expats=True,
     )
-    session.flush()
-    election = session.query(Election).one()
 
-    principal = Canton(canton='sg')
-
-    import_wabstic_data(election, tar_file, principal, expats=False)
-
-    assert election.completed
-    # assert election.progress == (78, 78)
-    # assert election.absolute_majority is None
-    # assert election.eligible_voters == 317969
-    # assert election.accounted_ballots == 145631
-    # assert election.accounted_votes == 1732456
-    # assert election.allocated_mandates == 12
-
-
-@mark.parametrize("tar_file", [
-    module_path('tests.onegov.election_day',
-                'fixtures/wabstic_proporz.tar.gz'),
-])
-def test_import_wabstic_proporz1(session, tar_file):
-    session.add(
-        ProporzElection(
-            title='election',
-            domain='canton',
-            date=date(2015, 10, 18),
-            number_of_mandates=12,
-        )
-    )
-    session.flush()
-    election = session.query(Election).one()
-
-    principal = Canton(canton='sg')
-
-    # The tar file contains
-    #  - regional results from SG from the 28.02.2016 (Kantonsrat)
-    #  - cantonal results from SG from the 18.10.2015 (Nationalrat)
-    with tarfile.open(tar_file, 'r|gz') as f:
-        regional_wpstatic_gemeinden = f.extractfile(f.next()).read()
-        regional_wpstatic_kandidaten = f.extractfile(f.next()).read()
-        regional_wp_gemeinden = f.extractfile(f.next()).read()
-        regional_wp_kandidaten = f.extractfile(f.next()).read()
-        regional_wp_kandidatengde = f.extractfile(f.next()).read()
-        regional_wp_listen = f.extractfile(f.next()).read()
-        regional_wp_listengde = f.extractfile(f.next()).read()
-        regional_wp_wahl = f.extractfile(f.next()).read()
-        cantonal_wpstatic_gemeinden = f.extractfile(f.next()).read()
-        cantonal_wpstatic_kandidaten = f.extractfile(f.next()).read()
-        cantonal_wp_gemeinden = f.extractfile(f.next()).read()
-        cantonal_wp_kandidaten = f.extractfile(f.next()).read()
-        cantonal_wp_kandidatengde = f.extractfile(f.next()).read()
-        cantonal_wp_listen = f.extractfile(f.next()).read()
-        cantonal_wp_listengde = f.extractfile(f.next()).read()
-        cantonal_wp_wahl = f.extractfile(f.next()).read()
-
-    # Test cantonal election
-    election.expats = True
-    errors = import_election_wabstic_proporz(
-        election, principal, '1', None,
-        BytesIO(cantonal_wp_wahl), 'text/plain',
-        BytesIO(cantonal_wpstatic_gemeinden), 'text/plain',
-        BytesIO(cantonal_wp_gemeinden), 'text/plain',
-        BytesIO(cantonal_wp_listen), 'text/plain',
-        BytesIO(cantonal_wp_listengde), 'text/plain',
-        BytesIO(cantonal_wpstatic_kandidaten), 'text/plain',
-        BytesIO(cantonal_wp_kandidaten), 'text/plain',
-        BytesIO(cantonal_wp_kandidatengde), 'text/plain',
-    )
-    print_errors(errors)
-    assert not errors
     assert election.completed
     assert election.progress == (78, 78)
     assert election.absolute_majority is None
@@ -142,10 +71,19 @@ def test_import_wabstic_proporz1(session, tar_file):
 
     assert sorted((c.votes for c in election.list_connections))[-1] == 636317
 
-    # Test regional elections
-    election.domain = 'region'
-    election.date = date(2016, 2, 28)
-    election.expats = False
+
+def test_import_wabstic_proporz_regional_sg(session, import_test_datasets):
+    election = import_test_datasets(
+        'wabstic',
+        'election',
+        'sg',
+        domain='region',
+        election_type='proporz',
+        dataset_name='kantonsratswahl-2016',
+        number_of_mandates=12,
+        date_=date(2016, 2, 28),
+        expats=False,
+    )
 
     for number, district, mandates, entities, votes, turnout in (
         ('1', '1', 29, 9, 949454, 44.45),  # SG
@@ -158,20 +96,18 @@ def test_import_wabstic_proporz1(session, tar_file):
         ('8', '13', 18, 10, 352595, 43.94),  # WI
     ):
         election.number_of_mandates = mandates
-
-        errors = import_election_wabstic_proporz(
-            election, principal, number, district,
-            BytesIO(regional_wp_wahl), 'text/plain',
-            BytesIO(regional_wpstatic_gemeinden), 'text/plain',
-            BytesIO(regional_wp_gemeinden), 'text/plain',
-            BytesIO(regional_wp_listen), 'text/plain',
-            BytesIO(regional_wp_listengde), 'text/plain',
-            BytesIO(regional_wpstatic_kandidaten), 'text/plain',
-            BytesIO(regional_wp_kandidaten), 'text/plain',
-            BytesIO(regional_wp_kandidatengde), 'text/plain',
+        election = import_test_datasets(
+            'wabstic',
+            'election',
+            'sg',
+            domain='region',
+            election=election,
+            election_type='proporz',
+            dataset_name='kantonsratswahl-2016',
+            election_number=number,
+            election_district=district
         )
 
-        assert not errors
         assert election.completed
         assert election.progress == (entities, entities)
         assert election.accounted_votes == votes
@@ -428,7 +364,7 @@ def test_import_wabstic_proporz_invalid_values(session):
     assert sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
     ]) == [
-        ('wp_gemeinden', 2, 'Invalid entity values'),
+        ('wp_gemeinden', 2, 'Invalid integer: sperrung'),
         ('wp_gemeinden', 2, 'Invalid integer: stimmberechtigte'),
         ('wp_gemeinden', 2, 'Invalid integer: stmabgegeben'),
         ('wp_kandidaten', 2, 'Invalid integer: gewaehlt'),
