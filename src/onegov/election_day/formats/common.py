@@ -99,8 +99,7 @@ def load_csv(
             encoding=encoding,
             rename_duplicate_column_names=rename_duplicate_column_names
         )
-        # FIXME: Remove if not necessary to speed up
-        list(csv.lines)
+        next(csv.lines)     # Needed to raise EmptyLineInFileError
     except MissingColumnsError as e:
         error = FileImportError(
             _(
