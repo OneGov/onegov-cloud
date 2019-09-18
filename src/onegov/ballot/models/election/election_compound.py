@@ -1,4 +1,6 @@
 from collections import OrderedDict
+
+from onegov.ballot.constants import election_day_i18n_used_locales
 from onegov.ballot.models.election.candidate import Candidate
 from onegov.ballot.models.election.candidate_result import CandidateResult
 from onegov.ballot.models.election.election import Election
@@ -35,8 +37,6 @@ from uuid import uuid4
 class ElectionCompoundAssociation(Base):
 
     __tablename__ = 'election_compound_associations'
-
-    i18n_used_locales = ('de_CH', 'fr_CH', 'it_CH', 'rm_CH')
 
     #: identifies the candidate result
     id = Column(UUID, primary_key=True, default=uuid4)
@@ -78,8 +78,6 @@ class ElectionCompound(
 ):
 
     __tablename__ = 'election_compounds'
-
-    i18n_used_locales = ('de_CH', 'fr_CH', 'it_CH', 'rm_CH')
 
     #: Identifies the election compound, may be used in the url
     id = Column(Text, primary_key=True)
@@ -329,7 +327,7 @@ class ElectionCompound(
         """
 
         common = OrderedDict()
-        for locale in self.i18n_used_locales:
+        for locale in election_day_i18n_used_locales:
             common[f'compound_title_{locale}'] = \
                 self.title_translations.get(locale, '')
         for locale, title in self.title_translations.items():

@@ -17,6 +17,7 @@ from sqlalchemy.orm import aliased
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
+from onegov.ballot.constants import election_day_i18n_used_locales
 
 
 class ProporzElection(Election, PartyResultExportMixin):
@@ -24,10 +25,8 @@ class ProporzElection(Election, PartyResultExportMixin):
         'polymorphic_identity': 'proporz'
     }
 
-    i18n_used_locales = ('de_CH', 'fr_CH', 'it_CH', 'rm_CH')
-
     FIX_EXPORT_HEADERS = [
-        *(f'election_title_{l}' for l in i18n_used_locales),
+        *(f'election_title_{l}' for l in election_day_i18n_used_locales),
         'election_date',
         'election_domain',
         'election_type',
@@ -319,7 +318,7 @@ class ProporzElection(Election, PartyResultExportMixin):
         rows = []
         for result in results:
             row = OrderedDict()
-            for locale in ProporzElection.i18n_used_locales:
+            for locale in election_day_i18n_used_locales:
                 title = result[1] and result[1].get(locale, '') or ''
                 row[f'election_title_{locale}'] = title.strip()
             row['election_date'] = result[2].isoformat()

@@ -1,4 +1,6 @@
 from collections import OrderedDict
+
+from onegov.ballot.constants import election_day_i18n_used_locales
 from onegov.ballot.models.election.candidate import Candidate
 from onegov.ballot.models.election.candidate_result import CandidateResult
 from onegov.ballot.models.election.election_result import ElectionResult
@@ -43,8 +45,6 @@ class Election(Base, ContentMixin, TimestampMixin,
         'polymorphic_on': type,
         'polymorphic_identity': 'majorz'
     }
-
-    i18n_used_locales = ('de_CH', 'fr_CH', 'it_CH', 'rm_CH')
 
     #: Identifies the election, may be used in the url
     id = Column(Text, primary_key=True)
@@ -347,7 +347,7 @@ class Election(Base, ContentMixin, TimestampMixin,
         rows = []
         for result in results:
             row = OrderedDict()
-            for locale in Election.i18n_used_locales:
+            for locale in election_day_i18n_used_locales:
                 title = result[1] and result[1].get(locale, '') or ''
                 row[f'election_title_{locale}'] = title.strip()
             row['election_date'] = result[2].isoformat()
