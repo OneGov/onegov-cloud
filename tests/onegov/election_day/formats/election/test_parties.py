@@ -1,8 +1,53 @@
+import tarfile
 from datetime import date
 from io import BytesIO
 from onegov.ballot import Election
 from onegov.ballot import ProporzElection
+from onegov.core.utils import module_path
 from onegov.election_day.formats import import_party_results
+
+
+def test_import_party_results_fixtures(session):
+    # Test data from R.Semlic
+    session.add(
+        ProporzElection(
+            title='election',
+            domain='canton',
+            date=date(2019, 10, 20),
+            number_of_mandates=6,
+        )
+    )
+    session.flush()
+    election = session.query(Election).one()
+
+    tar_file = module_path('tests.onegov.election_day',
+                       'fixtures/wabsti_election_parties.tar.gz')
+    with tarfile.open(tar_file, 'r:gz') as f:
+        csv = f.extractfile(
+            'Nationalratswahlen_2019_OneGov_Parteien.csv').read()
+
+    errors = import_party_results(election, BytesIO(csv), 'text/plain')
+    assert not errors
+    total_votes = 1750
+
+    # Test content directly from csv
+    assert [
+        (pr.name, pr.total_votes, pr.number_of_mandates, pr.votes)
+        for pr in election.party_results] == [
+        ('BDP', total_votes, 0, 150),
+        ('CVP', total_votes, 0, 397),
+        ('FDP', total_votes, 0, 53),
+        ('GLP', total_votes, 0, 100),
+        ('SP', total_votes, 0, 650),
+        ('SVP', total_votes, 0, 100),
+        ('VERDA', total_votes, 0, 300),
+    ]
+
+    # Test panachage results
+    assert election.panachage_results
+    for pana_r in election.panachage_results:
+        # assert len(pana_r.target) > 10, 'target must be casted list.id'
+        assert pana_r.votes == 0, "Panachage votes from own list don't count"
 
 
 def test_import_party_results(session):
