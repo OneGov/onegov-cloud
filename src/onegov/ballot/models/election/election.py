@@ -348,7 +348,7 @@ class Election(Base, ContentMixin, TimestampMixin,
         for result in results:
             row = OrderedDict()
             for locale in election_day_i18n_used_locales:
-                title = result[1] and result[1].get(locale, '') or ''
+                title = result[1] and result[1].get(locale) or ''
                 row[f'election_title_{locale}'] = title.strip()
             row['election_date'] = result[2].isoformat()
             row['election_domain'] = result[3]
