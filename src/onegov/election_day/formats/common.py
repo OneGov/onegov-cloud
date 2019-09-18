@@ -214,7 +214,7 @@ def validate_empty(line, col, treat_empty_as_default=True, default=''):
 def validate_list_id(line, col, treat_empty_as_default=True, default='0'):
     """ Used to validate list_id that can also be alphanumeric.
      Example: 03B.04
-     Previously, the list was also 0 if it was empty.
+     Previously, the list_id was also 0 if it was empty.
      """
     result = getattr(line, col)
     if result:
