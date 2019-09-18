@@ -242,8 +242,7 @@ def import_election_wabstic_proporz(
 
         # Check if the entity is counted
         try:
-            counted = validate_integer(line, 'sperrung')
-            entity['counted'] = False if counted == 0 else True
+            entity['counted'] = not validate_integer(line, 'sperrung')
         except ValueError as e:
             line_errors.append(e.args[0])
 
