@@ -99,7 +99,7 @@ def load_csv(
             encoding=encoding,
             rename_duplicate_column_names=rename_duplicate_column_names
         )
-        next(csv.lines)     # Needed to raise EmptyLineInFileError
+        list(csv.lines)  # Needed to raise correct errors and pass tests
     except MissingColumnsError as e:
         error = FileImportError(
             _(
