@@ -120,6 +120,7 @@ def parse_panachage_results(line, errors, panachage):
             panachage[target] = {}
 
         for name, index in panachage['headers'].items():
+            # Fixme: skip if target == line.id
             if index not in panachage[target]:
                 panachage[target][index] = 0
             panachage[target][index] += int(getattr(line, name) or 0)

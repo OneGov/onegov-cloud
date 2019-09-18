@@ -139,6 +139,7 @@ def parse_panachage_results(line, errors, panachage):
         if target not in panachage:
             panachage[target] = {}
             for name, index in panachage['headers'].items():
+                # Fixme: skip if target == line.id
                 panachage[target][index] = int(getattr(line, name))
 
     except ValueError:

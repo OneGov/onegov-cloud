@@ -76,6 +76,7 @@ def parse_panachage_results(line, errors, results, headers, election_year):
         if target not in results and year == election_year:
             results[target] = {}
             for name, index in headers.items():
+                # Fixme: skip if target == line.id
                 results[target][index] = int(getattr(line, name) or 0)
 
     except ValueError:
