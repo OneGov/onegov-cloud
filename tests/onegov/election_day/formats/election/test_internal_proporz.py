@@ -110,7 +110,7 @@ def test_import_internal_proporz_regional_zg(session, import_test_datasets):
     test_list = election.lists.first()
     assert test_list.list_id == '3'
     list_csv_votes = 23653
-    votes_panachage_csv = 606 + 334 + 5834 + 756 + 221 + 118 + 1048 + 2316
+    votes_panachage_csv = 606 + 334 + 756 + 221 + 118 + 1048 + 2316
     assert test_list.votes == list_csv_votes
 
     panachage_results = session.query(PanachageResult)
