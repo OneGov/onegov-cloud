@@ -7,7 +7,7 @@ from onegov.ballot import ListResult
 from onegov.ballot import PanachageResult
 from onegov.election_day import _
 from onegov.election_day.formats.common import EXPATS, validate_integer, \
-    validate_list_id
+    validate_list_id, parse_panachage_source
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import STATI
@@ -120,6 +120,9 @@ def parse_panachage_results(line, errors, panachage):
         if target not in panachage:
             panachage[target] = {}
             for col_name, source in panachage['headers'].items():
+                source = parse_panachage_source(source, target)
+                if source == target:
+                    continue
                 panachage[target][source] = validate_integer(
                     line, col_name, treat_none_as_default=False)
 
