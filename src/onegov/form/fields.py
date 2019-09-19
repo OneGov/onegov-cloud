@@ -117,7 +117,7 @@ class UploadFileWithORMSupport(UploadField):
         super().__init__(*args, **kwargs)
 
     def create(self):
-        if not self.file:
+        if not getattr(self, 'file', None):
             return None
 
         self.file.filename = self.filename
