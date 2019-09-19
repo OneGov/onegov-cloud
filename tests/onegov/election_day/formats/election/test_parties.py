@@ -5,6 +5,7 @@ from onegov.ballot import Election
 from onegov.ballot import ProporzElection
 from onegov.core.utils import module_path
 from onegov.election_day.formats import import_party_results
+from tests.onegov.election_day.common import get_tar_file_path
 
 
 def test_import_party_results_fixtures(session):
@@ -20,11 +21,11 @@ def test_import_party_results_fixtures(session):
     session.flush()
     election = session.query(Election).one()
 
-    tar_file = module_path('tests.onegov.election_day',
-                       'fixtures/wabsti_election_parties.tar.gz')
+    tar_file = get_tar_file_path(
+        'canton', 'gr', 'internal', 'election', 'proporz')
     with tarfile.open(tar_file, 'r:gz') as f:
         csv = f.extractfile(
-            'Nationalratswahlen_2019_OneGov_Parteien.csv').read()
+            'Nationalratswahlen_2019_sesam-test_Parteien.csv').read()
 
     errors = import_party_results(election, BytesIO(csv), 'text/plain')
     assert not errors
