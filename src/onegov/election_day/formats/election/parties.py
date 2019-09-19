@@ -57,7 +57,7 @@ def parse_panachage_headers(csv):
             continue
         parts = header.split('panachage_votes_from_')
         if len(parts) > 1:
-                headers[csv.as_valid_identifier(header)] = parts[1]
+            headers[csv.as_valid_identifier(header)] = parts[1]
     return headers
 
 

@@ -238,5 +238,3 @@ def parse_panachage_source(source_id, target_id):
     if source_id.startswith('0'):
         return source_id[1:]
     return source_id
-
-
