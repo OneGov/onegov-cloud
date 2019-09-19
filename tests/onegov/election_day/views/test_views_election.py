@@ -467,11 +467,14 @@ def test_view_election_lists_panachage_proporz(election_day_app_gr):
     assert 'FDP' in nodes
     assert 'CVP' in nodes
 
-    links = [link['value'] for link in data['links']]
-    assert 1 in links
-    assert 2 in links
-    assert 4 in links
-    assert 7 in links
+    # links = [link['value'] for link in data['links']]
+    links = sorted([(r['target'], r['value']) for r in data['links']])
+    print(links)
+    assert links == [(1, 1), (2, 2)]
+    # assert 1 in links
+    # assert 2 in links
+    # assert 4 in links
+    # assert 7 in links
 
 
 def test_view_election_parties_panachage(election_day_app_gr):
