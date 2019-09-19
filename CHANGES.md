@@ -1,8 +1,38 @@
 # Changes
 
+## Release `2019.17`
+
+> commits: **10 / [d37cb83d40...8ab40dc73c](https://github.com/OneGov/onegov-cloud/compare/d37cb83d40^...8ab40dc73c)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.17)](https://buildkite.com/seantis/onegov-cloud)
+
+### Election-Day
+
+🐞 **Fixes display of list mandates for intermediate results for election proporz**
+
+**`Bugfix`** | **[9345406de5](https://github.com/onegov/onegov-cloud/commit/9345406de5bc811a1f0116d61793d18374cf1b35)**
+
+🐞 **Fixes roundtrip, re-organizes tests and fixture data loading**
+
+- list_id can be alphanumeric, change that for all apis to evade roundtrip problems
+- Reorganizes sample data into folder strukture like `/domain/principal/{api_format}_{type}.tar.gz` instead of using a flat hierarchy.
+- Adds an import_test_dataset fixture to instantiate model object and then load result data from the fixtures folder.
+
+**`Bugfix`** | **[fdeeb69c67](https://github.com/onegov/onegov-cloud/commit/fdeeb69c67130fbb0b15dc0232a86572390e3f8e)**
+
+### User
+
+✨ **Adds removal to change-yubikey command**
+
+To remove a yubikey from an account through the onegov-user
+change-yubikey command, one can now simply enter an empty yubikey. This
+results in the same behaviour already present in `onegov-user add`.
+
+**`Other`** | **[8ab40dc73c](https://github.com/onegov/onegov-cloud/commit/8ab40dc73ca1b26348cfbd98c531cbf9566ddbb0)**
+
 ## Release `2019.16`
 
-> commits: **1 / [9ab37eddeb...9ab37eddeb](https://github.com/OneGov/onegov-cloud/compare/9ab37eddeb^...9ab37eddeb)**<br>
+> released: **2019-09-13 10:56**<br>
+> commits: **2 / [9ab37eddeb...a78362e65e](https://github.com/OneGov/onegov-cloud/compare/9ab37eddeb^...a78362e65e)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.16)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Core
