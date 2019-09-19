@@ -461,7 +461,10 @@ def test_view_election_lists_panachage(election_day_app_gr):
     assert 'CVP' in nodes
 
     links = [link['value'] for link in data['links']]
-    assert all((i in links for i in (1, 2, 4, 7)))
+    assert 1 in links
+    assert 2 in links
+    assert 4 in links
+    assert 7 in links
 
 
 def test_view_election_parties_panachage(election_day_app_gr):
