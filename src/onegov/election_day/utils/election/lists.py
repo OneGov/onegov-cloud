@@ -140,7 +140,7 @@ def get_lists_panachage_data(election, request):
     chart.
 
     """
-
+    # Fixme: Rewrite this function, it is very confusing what is does and why
     if election.type == 'majorz':
         return {}
 
