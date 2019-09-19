@@ -119,9 +119,9 @@ def parse_panachage_results(line, errors, panachage):
             line, 'list_id', treat_empty_as_default=False)
         if target not in panachage:
             panachage[target] = {}
-            for name, index in panachage['headers'].items():
-                panachage[target][index] = validate_integer(
-                    line, name, treat_none_as_default=False)
+            for col_name, source in panachage['headers'].items():
+                panachage[target][source] = validate_integer(
+                    line, col_name, treat_none_as_default=False)
 
     except ValueError as e:
         errors.append(e.args[0])
