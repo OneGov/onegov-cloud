@@ -249,6 +249,8 @@ def upload_vote(client, create=True, canton='zg'):
             '3503,3049,5111,13828,54,3\n'
         )
     csv = csv.encode('utf-8')
+    with open(f'vote-{canton}.csv', 'wb') as f:
+        f.write(csv)
 
     upload = client.get('/vote/vote/upload')
     upload.form['type'] = 'simple'
@@ -291,6 +293,9 @@ def upload_complex_vote(client, create=True, canton='zg'):
             '3503,3049,5111,13828,54,3\n'
         )
     csv = csv.encode('utf-8')
+
+    with open(f'complex-vote-{canton}.csv', 'wb') as f:
+        f.write(csv)
 
     upload = client.get('/vote/complex-vote/upload')
     upload.form['type'] = 'complex'
@@ -344,6 +349,9 @@ def upload_majorz_election(client, create=True, canton='gr', status='unknown'):
         )
     csv = csv.encode('utf-8')
 
+    with open(f'majorz-election-{canton}.csv', 'wb') as f:
+        f.write(csv)
+
     upload = client.get('/election/majorz-election/upload').follow()
     upload.form['file_format'] = 'internal'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
@@ -383,7 +391,11 @@ def upload_proporz_election(client, create=True, canton='gr',
             f'{status},1711,True,56,32,1,0,1,2,2,CVP,1,2,0,5,'
             '201,False,Caluori,Corina,2,,2,0\n'
         )
+
     csv = csv.encode('utf-8')
+
+    with open(f'proporz-election-{canton}.csv', 'wb') as f:
+        f.write(csv)
 
     upload = client.get('/election/proporz-election/upload').follow()
     upload.form['file_format'] = 'internal'
