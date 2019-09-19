@@ -279,8 +279,8 @@ def test_import_party_results_invalid_values(session):
     errors = sorted(set([(e.line, e.error.interpolate()) for e in errors]))
     print(errors)
     assert errors == [
-        (2, 'Invalid integer: id'),
         (2, 'Invalid integer: year'),
+        (2, 'Not an alphanumeric: id'),
         (3, 'Invalid values'),
         (4, 'Invalid values'),
         (6, 'FDP/2015 was found twice'),
