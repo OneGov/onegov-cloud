@@ -163,17 +163,23 @@ def parse_candidate_result(line, errors):
         )
 
 
+def parse_subconnection_name(parent_id, id):
+    # sesam provides subconnection 1 of parent connection 3 as 31
+    if len(id) <= len(parent_id):
+        return id
+    return id.replace(parent_id, '', 1) or id
+
 def parse_connection(line, errors, election_id):
     subconnection_id = None
     try:
         connection_id = line.list_connection
         parent_connection_id = line.list_connection_parent
-        if parent_connection_id:
-            subconnection_id = connection_id
-            connection_id = parent_connection_id
     except ValueError:
         errors.append(_("Invalid list connection values"))
     else:
+        if parent_connection_id:
+            subconnection_id = connection_id
+            connection_id = parent_connection_id
         connection = dict(
             id=uuid4(),
             election_id=election_id,
