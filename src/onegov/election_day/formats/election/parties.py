@@ -2,7 +2,7 @@ from onegov.ballot import PanachageResult
 from onegov.ballot import PartyResult
 from onegov.election_day import _
 from onegov.election_day.formats.common import FileImportError, \
-    validate_integer
+    validate_integer, parse_panachage_source
 from onegov.election_day.formats.common import load_csv
 from re import match
 from sqlalchemy.orm import object_session
@@ -57,13 +57,7 @@ def parse_panachage_headers(csv):
             continue
         parts = header.split('panachage_votes_from_')
         if len(parts) > 1:
-            try:
-                # FIXME: In db, target and is list.name, convert to int?
-                # target resp. So convert this  to an int ?
-                number = int(parts[1])
-                headers[csv.as_valid_identifier(header)] = number
-            except ValueError:
-                pass
+                headers[csv.as_valid_identifier(header)] = parts[1]
     return headers
 
 
@@ -73,8 +67,11 @@ def parse_panachage_results(line, errors, results, headers, election_year):
         year = validate_integer(line, 'year', default=election_year)
         if target not in results and year == election_year:
             results[target] = {}
-            for name, index in headers.items():
-                results[target][index] = validate_integer(line, name)
+            for col_name, source in headers.items():
+                source = parse_panachage_source(source, target)
+                if source == target:
+                    continue
+                results[target][source] = validate_integer(line, col_name)
 
     except ValueError as e:
         errors.append(e.args[0])
