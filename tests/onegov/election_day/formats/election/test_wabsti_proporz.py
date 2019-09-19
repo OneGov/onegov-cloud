@@ -54,7 +54,7 @@ def test_import_wabsti_proporz_cantonal(session, import_test_datasets):
     # Test panachage results for ALG list
     test_list = election.lists.first()
     assert test_list.list_id == '1'
-    votes_panachage_csv = 3706
+    votes_panachage_csv = 1614  # count all where source != target
 
     panachge_vote_count = 0
     for result in test_list.panachage_results:
