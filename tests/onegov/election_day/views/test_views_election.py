@@ -430,7 +430,7 @@ def test_view_election_connections(election_day_app_gr):
     assert '/election/proporz-election/connections-data' in chart
 
 
-def test_view_election_lists_panachage(election_day_app_gr):
+def test_view_election_lists_panachage_majorz(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -447,6 +447,13 @@ def test_view_election_lists_panachage(election_day_app_gr):
     chart = client.get('/election/majorz-election/lists-panachage-chart')
     assert chart.status_code == 200
     assert '/election/majorz-election/lists-panachage-data' in chart
+
+
+def test_view_election_lists_panachage_proporz(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
 
     upload_proporz_election(client)
 
