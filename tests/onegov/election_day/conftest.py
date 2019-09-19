@@ -610,7 +610,11 @@ def import_test_datasets(session):
             vote_type='normal',
             vote=None,
             vote_number=1,
+            app_session=None
     ):
+        if not app_session:
+            app_session = session
+
         assert domain in domains
         assert api_format in apis, 'apis not defined or not in available apis'
         assert principal, 'Define a single principal'
@@ -646,7 +650,7 @@ def import_test_datasets(session):
                     election_type,
                     principal,
                     domain,
-                    session,
+                    app_session,
                     number_of_mandates=number_of_mandates,
                     date_=date_,
                     dataset_name=dataset_name,
@@ -660,7 +664,7 @@ def import_test_datasets(session):
                     election_type,
                     principal,
                     domain,
-                    session,
+                    app_session,
                     number_of_mandates=number_of_mandates,
                     date_=date_,
                     dataset_name=dataset_name,
@@ -676,7 +680,7 @@ def import_test_datasets(session):
                     election_type,
                     principal,
                     domain,
-                    session,
+                    app_session,
                     number_of_mandates=number_of_mandates,
                     date_=date_,
                     dataset_name=dataset_name,
@@ -694,7 +698,7 @@ def import_test_datasets(session):
                     vote_type,
                     principal,
                     domain,
-                    session,
+                    app_session,
                     date_,
                     dataset_name,
                     expats,
@@ -710,7 +714,7 @@ def import_test_datasets(session):
                 vote_type,
                 principal,
                 domain,
-                session,
+                app_session,
                 date_,
                 dataset_name,
                 expats,
@@ -727,3 +731,21 @@ def import_test_datasets(session):
         return all_loaded
 
     return _import_test_datasets
+
+
+@pytest.fixture(scope="function")
+def majorz_election(import_test_datasets):
+    def _majorz_election(session, canton='gr'):
+        return import_test_datasets(
+            'internal',
+            'election',
+            canton,
+            'federation',
+            election_type='majorz',
+            number_of_mandates=2,
+            date_=date(2015, 1, 1),
+            dataset_name='majorz-election-gr',
+            expats=False,
+            app_session=session
+        )
+    return _majorz_election
