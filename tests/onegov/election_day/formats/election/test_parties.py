@@ -142,15 +142,16 @@ def test_import_party_results_with_panachage(session):
         (2015, 'P1', '#123456', 5000, 10000, 1),
         (2015, 'P2', '#aabbcc', 5000, 10000, 0)
     ]
-    assert sorted([
+
+    results = sorted([
         (r.target, r.source, r.votes) for r in election.panachage_results
-    ]) == [
+    ])
+    print(results)
+    assert results == [
         ('P1', '', 12),
-        ('P1', 'P1', 10),
         ('P1', 'P2', 11),
         ('P2', '', 22),
         ('P2', 'P1', 20),
-        ('P2', 'P2', 21)
     ]
 
 
