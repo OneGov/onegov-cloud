@@ -2,7 +2,7 @@ from onegov.ballot import PanachageResult
 from onegov.ballot import PartyResult
 from onegov.election_day import _
 from onegov.election_day.formats.common import FileImportError, \
-    validate_integer, parse_panachage_source
+    validate_integer, parse_panachage_source, validate_list_id
 from onegov.election_day.formats.common import load_csv
 from re import match
 from sqlalchemy.orm import object_session
@@ -17,7 +17,7 @@ def parse_party_result(line, errors, results, totals, parties, election_year):
         year = validate_integer(line, 'year', default=election_year)
         total_votes = validate_integer(line, 'total_votes')
         name = line.name or ''
-        id_ = validate_integer(line, 'id')
+        id_ = validate_list_id(line, 'id')
         color = line.color or (
             '#0571b0' if year == election_year else '#999999'
         )
@@ -63,7 +63,7 @@ def parse_panachage_headers(csv):
 
 def parse_panachage_results(line, errors, results, headers, election_year):
     try:
-        target = validate_integer(line, 'id')
+        target = validate_list_id(line, 'id')
         year = validate_integer(line, 'year', default=election_year)
         if target not in results and year == election_year:
             results[target] = {}
@@ -136,7 +136,7 @@ def import_party_results(election, file, mimetype):
     for target in panachage_results:
         if target in parties:
             for source, votes in panachage_results[target].items():
-                if source in parties or source == 999:
+                if source in parties or source == '999':
                     election.panachage_results.append(
                         PanachageResult(
                             owner=election.id,
