@@ -224,3 +224,19 @@ def validate_list_id(line, col, treat_empty_as_default=True, default='0'):
     elif treat_empty_as_default:
         return default
     raise ValueError(_('Empty value: ${col}', mapping={'col': col}))
+
+
+def parse_panachage_source(source_id, target_id):
+    """
+    Copes with the inconsistency that 01 is the same as 1, which was not
+    a problem before alphanumeric list_id's have been introduced.
+
+    :param source_id: 01 or 1 or 03B
+    :param target_id: 1 or 03B
+    :return:
+    """
+    if source_id.startswith('0'):
+        return source_id[1:]
+    return source_id
+
+
