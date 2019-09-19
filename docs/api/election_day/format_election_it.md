@@ -73,7 +73,7 @@ Nome|Descrizione
 `entity_blank_votes`|Numero voti bianchi nel Comune.
 `entity_invalid_votes`|Numero di voti nulli nel Comune. Zero nel caso di elezione con sistema proporzionale.
 `list_name`|Nome della lista di candidati. Solo con elezioni con sistema proporzionale.
-`list_id`|ID della lista del candidato. Solo con elezioni con sistema proporzionale.
+`list_id`|ID della lista del candidato. Solo con elezioni con sistema proporzionale. Può essere numerico o alfanumerico.
 `list_number_of_mandates`|Numero totale di mandati della lista. Solo con elezioni con sistema proporzionale.
 `list_votes`|Numero di voti di lista per comune. Solo con elezioni con sistema proporzionale.
 `list_connection`|ID dell'apparentamento della lista. Solo con elezioni con sistema proporzionale.
@@ -92,6 +92,7 @@ I risultati possono contenere dei risultati di panachage aggiungendo una colonna
 Nome|Descrizione
 ---|---
 `panachage_votes_from_list_{XX}`|Il numero dei voti ottenuti dalla lista da parte della lista con `list_id = XX`. Se `list_id` vale `999`, i voti provengono dalla lista vuota.
+**Commento**: `{xx}` in `panachage_votes_from_list_` possona essere `01`, ma `list_id = 1`. Questo caso è stato incluso e non causa errori.
 
 #### Risultati temporanei
 

@@ -73,7 +73,7 @@ Nom|Description
 `entity_blank_votes`|Nombre de votes vides dans la municipalité.
 `entity_invalid_votes`|Nombre de votes non valides dans la municipalité. Zéro si c'est une élection Proporz.
 `list_name`|Nom de la liste de candidats. Uniquement avec les élections Proporz.
-`list_id`|Identifiant de la liste de candidats. Uniquement avec les élections Proporz.
+`list_id`|Identifiant de la liste de candidats. Uniquement avec les élections Proporz. Peut-être numeric ou alpha-numeric.
 `list_number_of_mandates`|Nombre total de mandats de la liste. Uniquement avec les élections Proporz.
 `list_votes`Nombre de votes de liste par municipalité. Uniquement avec les élections Proporz.
 `list_connection`|Identifiant de la connexion de liste ou sous-list (en cas list_connection_parent est présent). Uniquement avec les élections Proporz.
@@ -92,6 +92,7 @@ Les résultats sont susceptibles de contenir les résultats du panachage, ce qui
 Nom|Description
 ---|---
 `panachage_votes_from_list_{XX}`|Le nombre de votes que la liste a obtenu de la liste `list_id = XX`. Une liste `list_id` avec la valeur `999` marque les votes de la liste vide.
+**Remarque**: `{xx}` dans `panachage_votes_from_list_` peut être `01`, mais `list_id = 1`. Cet cas est inclus et va pas causer des erreurs.
 
 #### Résultats temporaires
 
