@@ -18,7 +18,7 @@ def test_import_internal_vote_1(session, import_test_datasets):
         principal,
         'canton',
         date_=date(2017, 5, 21),
-        vote_type='normal',
+        vote_type='simple',
         dataset_name='energiegesetz-eng',
         expats=True
     )
