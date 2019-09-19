@@ -6,37 +6,16 @@ from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
 from onegov.ballot import PanachageResult
 from onegov.election_day import _
-from onegov.election_day.formats.common import EXPATS
+from onegov.election_day.formats.common import EXPATS, validate_integer, \
+    validate_list_id
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import STATI
 from sqlalchemy.orm import object_session
 from uuid import uuid4
 
-
-HEADERS = [
-    'election_status',
-    'entity_id',
-    'entity_counted',
-    'entity_eligible_voters',
-    'entity_received_ballots',
-    'entity_blank_ballots',
-    'entity_invalid_ballots',
-    'entity_blank_votes',
-    'entity_invalid_votes',
-    'list_name',
-    'list_id',
-    'list_number_of_mandates',
-    'list_votes',
-    'list_connection',
-    'list_connection_parent',
-    'candidate_family_name',
-    'candidate_first_name',
-    'candidate_id',
-    'candidate_elected',
-    'candidate_votes',
-    'candidate_party',
-]
+from onegov.election_day.import_export.mappings import \
+    INTERNAL_PROPORZ_HEADERS
 
 
 def parse_election(line, errors):
@@ -52,17 +31,17 @@ def parse_election(line, errors):
 
 def parse_election_result(line, errors, entities, election_id):
     try:
-        entity_id = int(line.entity_id or 0)
+        entity_id = validate_integer(line, 'entity_id')
         counted = line.entity_counted.strip().lower() == 'true'
-        eligible_voters = int(line.entity_eligible_voters or 0)
-        received_ballots = int(line.entity_received_ballots or 0)
-        blank_ballots = int(line.entity_blank_ballots or 0)
-        invalid_ballots = int(line.entity_invalid_ballots or 0)
-        blank_votes = int(line.entity_blank_votes or 0)
-        invalid_votes = int(line.entity_invalid_votes or 0)
+        eligible_voters = validate_integer(line, 'entity_eligible_voters')
+        received_ballots = validate_integer(line, 'entity_received_ballots')
+        blank_ballots = validate_integer(line, 'entity_blank_ballots')
+        invalid_ballots = validate_integer(line, 'entity_invalid_ballots')
+        blank_votes = validate_integer(line, 'entity_blank_votes')
+        invalid_votes = validate_integer(line, 'entity_invalid_votes')
 
-    except ValueError:
-        errors.append(_("Invalid entity values"))
+    except ValueError as e:
+        errors.append(e.args[0])
     else:
         if entity_id not in entities and entity_id in EXPATS:
             entity_id = 0
@@ -92,11 +71,11 @@ def parse_election_result(line, errors, entities, election_id):
 
 def parse_list(line, errors, election_id):
     try:
-        id = int(line.list_id or 0)
+        id = validate_list_id(line, 'list_id', treat_empty_as_default=False)
         name = line.list_name
-        mandates = int(line.list_number_of_mandates or 0)
-    except ValueError:
-        errors.append(_("Invalid list values"))
+        mandates = validate_integer(line, 'list_number_of_mandates')
+    except ValueError as e:
+        errors.append(e.args[0])
     else:
         return dict(
             id=uuid4(),
@@ -109,9 +88,9 @@ def parse_list(line, errors, election_id):
 
 def parse_list_result(line, errors):
     try:
-        votes = int(line.list_votes or 0)
-    except ValueError:
-        errors.append(_("Invalid list results"))
+        votes = validate_integer(line, 'list_votes')
+    except ValueError as e:
+        errors.append(e.args[0])
     else:
         return dict(
             id=uuid4(),
@@ -122,33 +101,37 @@ def parse_list_result(line, errors):
 def parse_panachage_headers(csv):
     headers = {}
     for header in csv.headers:
-        if header.startswith('panachage_votes_from_list_'):
-            parts = header.split('panachage_votes_from_list_')
-            if len(parts) > 1:
-                try:
-                    number = int(parts[1])
-                    headers[csv.as_valid_identifier(header)] = number
-                except ValueError:
-                    pass
+        if not header.startswith('panachage_votes_from_list_'):
+            continue
+        parts = header.split('panachage_votes_from_list_')
+        if len(parts) > 1:
+            try:
+                source_list_id = parts[1]
+                headers[csv.as_valid_identifier(header)] = source_list_id
+            except ValueError:
+                pass
     return headers
 
 
 def parse_panachage_results(line, errors, panachage):
     try:
-        target = int(line.list_id or 0)
+        target = validate_list_id(
+            line, 'list_id', treat_empty_as_default=False)
         if target not in panachage:
             panachage[target] = {}
             for name, index in panachage['headers'].items():
-                # Fixme: skip if target == line.id
-                panachage[target][index] = int(getattr(line, name))
+                panachage[target][index] = validate_integer(
+                    line, name, treat_none_as_default=False)
 
-    except ValueError:
+    except ValueError as e:
+        errors.append(e.args[0])
+    except Exception:
         errors.append(_("Invalid list results"))
 
 
 def parse_candidate(line, errors, election_id):
     try:
-        id = int(line.candidate_id or 0)
+        id = line.candidate_id
         family_name = line.candidate_family_name
         first_name = line.candidate_first_name
         elected = str(line.candidate_elected or '').lower() == 'true'
@@ -170,9 +153,9 @@ def parse_candidate(line, errors, election_id):
 
 def parse_candidate_result(line, errors):
     try:
-        votes = int(line.candidate_votes or 0)
-    except ValueError:
-        errors.append(_("Invalid candidate results"))
+        votes = validate_integer(line, 'candidate_votes')
+    except ValueError as e:
+        errors.append(e.args[0])
     else:
         return dict(
             id=uuid4(),
@@ -218,7 +201,8 @@ def import_election_internal_proporz(election, principal, file, mimetype):
     """
     filename = _("Results")
     csv, error = load_csv(
-        file, mimetype, expected_headers=HEADERS, filename=filename,
+        file, mimetype, expected_headers=INTERNAL_PROPORZ_HEADERS,
+        filename=filename,
         dialect='excel'
     )
     if error:
@@ -348,6 +332,7 @@ def import_election_internal_proporz(election, principal, file, mimetype):
     list_uids = {r['list_id']: r['id'] for r in lists.values()}
 
     session = object_session(election)
+    # FIXME: Sub-Sublists are also possible
     session.bulk_insert_mappings(ListConnection, connections.values())
     session.bulk_insert_mappings(ListConnection, subconnections.values())
     session.bulk_insert_mappings(List, lists.values())
@@ -356,7 +341,8 @@ def import_election_internal_proporz(election, principal, file, mimetype):
             id=uuid4(),
             source=source,
             target=str(list_uids[list_id]),
-            votes=votes
+            votes=votes,
+            owner=election_id
         )
         for list_id in filter(lambda x: x != 'headers', panachage)
         for source, votes in panachage[list_id].items()

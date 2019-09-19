@@ -61,7 +61,8 @@ def get_aggregated_list_results(election, session, use_checks=False):
                     'votes': lst.list_votes,
                     'total_candidate_votes': int(lst.candidate_votes_by_list),
                     'perc_to_total_votes': float(lst.perc_to_total_votes),
-                    'number_of_mandates': lst.number_of_mandates,
+                    'number_of_mandates': lst.number_of_mandates
+                    if election.completed else 0,
                     'candidates': [],
                 }
             )

@@ -6,49 +6,22 @@ from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
 from onegov.ballot import PanachageResult
 from onegov.election_day import _
-from onegov.election_day.formats.common import EXPATS
+from onegov.election_day.formats.common import EXPATS, validate_integer, \
+    validate_list_id
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from uuid import uuid4
 
-
-HEADERS = [
-    'einheit_bfs',
-    'liste_kandid',
-    'kand_nachname',
-    'kand_vorname',
-    'liste_id',
-    'liste_code',
-    'kand_stimmentotal',
-    'liste_parteistimmentotal',
-]
-
-HEADERS_CONNECTIONS = [
-    'liste',
-    'lv',
-    'luv',
-]
-
-HEADERS_CANDIDATES = [
-    'liste_kandid'
-]
-
-HEADERS_STATS = [
-    'einheit_bfs',
-    'einheit_name',
-    'stimbertotal',
-    'wzeingegangen',
-    'wzleer',
-    'wzungueltig',
-    'stmwzveraendertleeramtlleer',
-]
+from onegov.election_day.import_export.mappings import \
+    WABSTI_PROPORZ_HEADERS, WABSTI_PROPORZ_HEADERS_CONNECTIONS, \
+    WABSTI_PROPORZ_HEADERS_CANDIDATES, WABSTI_PROPORZ_HEADERS_STATS
 
 
 def parse_election_result(line, errors, entities):
     try:
-        entity_id = int(line.einheit_bfs or 0)
-    except ValueError:
-        errors.append(_("Invalid entity values"))
+        entity_id = validate_integer(line, 'einheit_bfs')
+    except ValueError as e:
+        errors.append(e.args[0])
     else:
         if entity_id not in entities and entity_id in EXPATS:
             entity_id = 0
@@ -70,10 +43,10 @@ def parse_election_result(line, errors, entities):
 
 def parse_list(line, errors):
     try:
-        list_id = int(line.liste_id or 0)
+        list_id = validate_list_id(line, 'liste_id')
         name = line.liste_code
-    except ValueError:
-        errors.append(_("Invalid list values"))
+    except ValueError as e:
+        errors.append(e.args[0])
     else:
         return List(
             id=uuid4(),
@@ -85,9 +58,9 @@ def parse_list(line, errors):
 
 def parse_list_result(line, errors):
     try:
-        votes = int(line.liste_parteistimmentotal or 0)
-    except ValueError:
-        errors.append(_("Invalid list results"))
+        votes = validate_integer(line, 'liste_parteistimmentotal')
+    except ValueError as e:
+        errors.append(e.args[0])
     else:
         return ListResult(
             id=uuid4(),
@@ -96,17 +69,21 @@ def parse_list_result(line, errors):
 
 
 def parse_panachage_headers(csv):
+    # header should be of sort {List ID}.{List Code}
     headers = {}
     for header in csv.headers:
-        if header[0] and header[0] in '0123456789':
-            parts = header.split('.')
-            if len(parts) > 1:
-                try:
-                    number = int(parts[0])
-                    number = 999 if number == 99 else number  # blank list
-                    headers[csv.as_valid_identifier(header)] = number
-                except ValueError:
-                    pass
+        if not header[0] and not header[0] in '0123456789':
+            return headers
+        # since 2019, list_nr can be alphanumeric in sg
+        parts = header.split('.')
+        if len(parts) > 1:
+            try:
+                list_id = parts[0]
+                list_id = '999' if list_id == '99' else list_id  # blank list
+                # as_valid_identfier converts eg 01.alg junge to alg_junge
+                headers[csv.as_valid_identifier(header)] = list_id
+            except ValueError:
+                pass
     return headers
 
 
@@ -115,26 +92,31 @@ def parse_panachage_results(line, errors, panachage):
     # candidate got votes. The column with the own list doesn't contain the
     # votes. The name of the columns are '{Listen-Nr} {Parteikurzbezeichnung}'
     try:
-        target = int(line.liste_id or 0)
-        if target not in panachage:
-            panachage[target] = {}
+        target = validate_list_id(line, 'liste_id')
+        panachage.setdefault(target, {})
 
-        for name, index in panachage['headers'].items():
-            # Fixme: skip if target == line.id
-            if index not in panachage[target]:
-                panachage[target][index] = 0
-            panachage[target][index] += int(getattr(line, name) or 0)
+        for list_name, source in panachage['headers'].items():
+            panachage[target].setdefault(source, 0)
+            # list_name is csv.as_valid_identifier(original_header)
+            panachage[target][source] += validate_integer(line, list_name)
 
-    except ValueError:
+    except ValueError as e:
+        errors.append(e.args[0])
+
+    except Exception:
         errors.append(_("Invalid list results"))
 
 
 def parse_candidate(line, errors):
     try:
-        candidate_id = int(line.liste_kandid or 0)
+        candidate_id = validate_integer(line, 'liste_kandid')
         family_name = line.kand_nachname
         first_name = line.kand_vorname
-    except ValueError:
+
+    except ValueError as e:
+        errors.append(e.args[0])
+
+    except Exception:
         errors.append(_("Invalid candidate values"))
     else:
         return Candidate(
@@ -148,9 +130,9 @@ def parse_candidate(line, errors):
 
 def parse_candidate_result(line, errors):
     try:
-        votes = int(line.kand_stimmentotal or 0)
-    except ValueError:
-        errors.append(_("Invalid candidate results"))
+        votes = validate_integer(line, 'kand_stimmentotal')
+    except ValueError as e:
+        errors.append(e.args[0])
     else:
         return CandidateResult(
             id=uuid4(),
@@ -160,10 +142,14 @@ def parse_candidate_result(line, errors):
 
 def parse_connection(line, errors):
     try:
-        list_id = int(line.liste or 0)
+        list_id = validate_list_id(line, 'liste')
         connection_id = line.lv
         subconnection_id = line.luv
-    except ValueError:
+
+    except ValueError as e:
+        errors.append(e.args[0])
+
+    except Exception:
         errors.append(_("Invalid list connection values"))
     else:
         connection = ListConnection(
@@ -207,12 +193,14 @@ def import_election_wabsti_proporz(
     # This format has one candiate per entity per line
     filename = _("Results")
     csv, error = load_csv(
-        file, mimetype, expected_headers=HEADERS, filename=filename
+        file, mimetype, expected_headers=WABSTI_PROPORZ_HEADERS,
+        filename=filename
     )
     if error:
         # Wabsti files are sometimes UTF-16
         csv, utf16_error = load_csv(
-            file, mimetype, expected_headers=HEADERS, filename=filename,
+            file, mimetype, expected_headers=WABSTI_PROPORZ_HEADERS,
+            filename=filename,
             encoding='utf-16-le'
         )
         if utf16_error:
@@ -269,14 +257,15 @@ def import_election_wabsti_proporz(
     if connections_file and connections_mimetype:
         csv, error = load_csv(
             connections_file, connections_mimetype,
-            expected_headers=HEADERS_CONNECTIONS,
+            expected_headers=WABSTI_PROPORZ_HEADERS_CONNECTIONS,
             filename=filename
         )
         if error:
             # Wabsti files are sometimes UTF-16
             csv, utf16_error = load_csv(
                 connections_file, connections_mimetype,
-                expected_headers=HEADERS_CONNECTIONS, filename=filename,
+                expected_headers=WABSTI_PROPORZ_HEADERS_CONNECTIONS,
+                filename=filename,
                 encoding='utf-16-le'
             )
             if utf16_error:
@@ -284,13 +273,13 @@ def import_election_wabsti_proporz(
             else:
                 error = None
         if not error:
-            indexes = dict([(item.id, key) for key, item in lists.items()])
             for line in csv.lines:
                 line_errors = []
                 list_id, connection, subconnection = parse_connection(
                     line, line_errors
                 )
-
+                if list_id:
+                    assert isinstance(list_id, str), 'list_id can be alphanum'
                 # Pass the errors and continue to next line
                 if line_errors:
                     errors.extend(
@@ -321,14 +310,15 @@ def import_election_wabsti_proporz(
     if elected_file and elected_mimetype:
         csv, error = load_csv(
             elected_file, elected_mimetype,
-            expected_headers=HEADERS_CANDIDATES,
+            expected_headers=WABSTI_PROPORZ_HEADERS_CANDIDATES,
             filename=filename
         )
         if error:
             # Wabsti files are sometimes UTF-16
             csv, utf16_error = load_csv(
                 elected_file, elected_mimetype,
-                expected_headers=HEADERS_CANDIDATES, filename=filename,
+                expected_headers=WABSTI_PROPORZ_HEADERS_CANDIDATES,
+                filename=filename,
                 encoding='utf-16-le'
             )
             if utf16_error:
@@ -339,11 +329,11 @@ def import_election_wabsti_proporz(
             indexes = dict([(item.id, key) for key, item in lists.items()])
             for line in csv.lines:
                 try:
-                    candidate_id = int(line.liste_kandid or 0)
-                except ValueError:
+                    candidate_id = validate_integer(line, 'liste_kandid')
+                except ValueError as e:
                     errors.append(
                         FileImportError(
-                            error=_("Invalid values"),
+                            error=e.args[0],
                             line=line.rownumber,
                             filename=filename
                         )
@@ -368,13 +358,15 @@ def import_election_wabsti_proporz(
     if statistics_file and statistics_mimetype:
         csv, error = load_csv(
             statistics_file, statistics_mimetype,
-            expected_headers=HEADERS_STATS, filename=filename
+            expected_headers=WABSTI_PROPORZ_HEADERS_STATS,
+            filename=filename
         )
         if error:
             # Wabsti files are sometimes UTF-16
             csv, utf16_error = load_csv(
                 statistics_file, statistics_mimetype,
-                expected_headers=HEADERS_STATS, filename=filename,
+                expected_headers=WABSTI_PROPORZ_HEADERS_STATS,
+                filename=filename,
                 encoding='utf-16-le'
             )
             if utf16_error:
@@ -385,16 +377,17 @@ def import_election_wabsti_proporz(
             for line in csv.lines:
                 try:
                     group = line.einheit_name.strip()
-                    entity_id = int(line.einheit_bfs or 0)
-                    eligible_voters = int(line.stimbertotal or 0)
-                    received_ballots = int(line.wzeingegangen or 0)
-                    blank_ballots = int(line.wzleer or 0)
-                    invalid_ballots = int(line.wzungueltig or 0)
-                    blank_votes = int(line.stmwzveraendertleeramtlleer or 0)
-                except ValueError:
+                    entity_id = validate_integer(line, 'einheit_bfs')
+                    eligible_voters = validate_integer(line, 'stimbertotal')
+                    received_ballots = validate_integer(line, 'wzeingegangen')
+                    blank_ballots = validate_integer(line, 'wzleer')
+                    invalid_ballots = validate_integer(line, 'wzungueltig')
+                    blank_votes = validate_integer(
+                        line, 'stmwzveraendertleeramtlleer')
+                except ValueError as e:
                     errors.append(
                         FileImportError(
-                            error=_("Invalid values"),
+                            error=e.args[0],
                             line=line.rownumber,
                             filename=filename
                         )
@@ -462,7 +455,8 @@ def import_election_wabsti_proporz(
         if list_.list_id in panachage:
             for source, votes in panachage[list_.list_id].items():
                 list_.panachage_results.append(
-                    PanachageResult(source=source, votes=votes)
+                    PanachageResult(
+                        owner=election.id, source=source, votes=votes)
                 )
 
     for candidate in candidates.values():

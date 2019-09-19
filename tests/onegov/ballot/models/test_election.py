@@ -591,10 +591,13 @@ def test_election_export(session):
 
     session.flush()
 
-    assert election.export() == [
-        {
+    exports = election.export()\
+
+    assert exports[0] == {
             'election_title_de_CH': 'Wahl',
+            'election_title_fr_CH': '',
             'election_title_it_CH': 'Elezione',
+            'election_title_rm_CH': '',
             'election_date': '2015-06-14',
             'election_domain': 'federation',
             'election_type': 'majorz',
@@ -620,9 +623,12 @@ def test_election_export(session):
             'candidate_elected': False,
             'candidate_party': 'Democratic Party',
             'candidate_votes': 111,
-        }, {
+        }
+    assert exports[1] == {
             'election_title_de_CH': 'Wahl',
+            'election_title_fr_CH': '',
             'election_title_it_CH': 'Elezione',
+            'election_title_rm_CH': '',
             'election_date': '2015-06-14',
             'election_domain': 'federation',
             'election_type': 'majorz',
@@ -649,7 +655,6 @@ def test_election_export(session):
             'candidate_party': 'Republican Party',
             'candidate_votes': 520,
         }
-    ]
 
 
 def test_election_meta_data(session):

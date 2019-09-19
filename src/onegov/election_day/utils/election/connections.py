@@ -96,15 +96,16 @@ def get_connections_data(election, request):
         nodes[list_.id] = {
             'name': list_.name,
             'value': list_.votes,
-            'display_value': list_.number_of_mandates or '',
-            'active': list_.number_of_mandates > 0
+            'display_value': list_.number_of_mandates or '' if
+            election.completed else '',
+            'active': list_.number_of_mandates > 0 and election.completed
         }
         if list_.connection:
             mandates = list_.connection.total_number_of_mandates
             nodes.setdefault(list_.connection.id, {
                 'name': '',
-                'display_value': mandates or '',
-                'active': mandates > 0
+                'display_value': mandates or '' if election.completed else '',
+                'active': mandates > 0 and election.completed
             })
             links.append({
                 'source': list(nodes.keys()).index(list_.id),
@@ -118,14 +119,14 @@ def get_connections_data(election, request):
             mandates = connection.total_number_of_mandates
             nodes.setdefault(connection.id, {
                 'name': '',
-                'display_value': mandates or '',
-                'active': mandates > 0
+                'display_value': mandates or '' if election.completed else '',
+                'active': mandates > 0 and election.completed
             })
             mandates = connection.parent.total_number_of_mandates
             nodes.setdefault(connection.parent.id, {
                 'name': '',
-                'display_value': mandates or '',
-                'active': mandates > 0
+                'display_value': mandates or '' if election.completed else '',
+                'active': mandates > 0 and election.completed
             })
             links.append({
                 'source': list(nodes.keys()).index(connection.id),

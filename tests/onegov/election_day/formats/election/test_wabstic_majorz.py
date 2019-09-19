@@ -1,53 +1,28 @@
-import tarfile
-
 from datetime import date
 from io import BytesIO
 from onegov.ballot import Election
-from onegov.core.utils import module_path
 from onegov.election_day.formats import import_election_wabstic_majorz
 from onegov.election_day.models import Canton
-from pytest import mark
 
 from tests.onegov.election_day.common import print_errors
 
 
-@mark.parametrize("tar_file", [
-    module_path('tests.onegov.election_day', 'fixtures/wabstic_majorz.tar.gz'),
-])
-def test_import_wabstic_majorz(session, tar_file):
-    session.add(
-        Election(
-            title='election',
-            domain='canton',
-            date=date(2016, 2, 28),
-            number_of_mandates=6,
-            expats=True
-        )
+def test_import_wabstic_majorz_1(session, import_test_datasets):
+
+    election = import_test_datasets(
+        'wabstic',
+        'election',
+        'sg',
+        'canton',
+        election_type='majorz',
+        number_of_mandates=6,
+        date_=date(2016, 2, 28),
+        dataset_name='regierungsratswahlen-2016',
+        expats=True,
+        election_number='9',
+        election_district='1'
     )
-    session.flush()
-    election = session.query(Election).one()
 
-    principal = Canton(canton='sg')
-
-    # The tar file contains
-    # - cantonal results from SG from the 28.02.2016
-    with tarfile.open(tar_file, 'r|gz') as f:
-        wmstatic_gemeinden = f.extractfile(f.next()).read()
-        wm_gemeinden = f.extractfile(f.next()).read()
-        wm_kandidaten = f.extractfile(f.next()).read()
-        wm_kandidatengde = f.extractfile(f.next()).read()
-        wm_wahl = f.extractfile(f.next()).read()
-
-    errors = import_election_wabstic_majorz(
-        election, principal, '9', '1',
-        BytesIO(wm_wahl), 'text/plain',
-        BytesIO(wmstatic_gemeinden), 'text/plain',
-        BytesIO(wm_gemeinden), 'text/plain',
-        BytesIO(wm_kandidaten), 'text/plain',
-        BytesIO(wm_kandidatengde), 'text/plain',
-    )
-    print_errors(errors)
-    assert not errors
     assert election.completed
     assert election.progress == (78, 78)
     assert election.results.count() == 78

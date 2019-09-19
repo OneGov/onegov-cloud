@@ -17,12 +17,48 @@ from sqlalchemy.orm import aliased
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
+from onegov.ballot.constants import election_day_i18n_used_locales
 
 
 class ProporzElection(Election, PartyResultExportMixin):
     __mapper_args__ = {
         'polymorphic_identity': 'proporz'
     }
+
+    FIX_EXPORT_HEADERS = [
+        *(f'election_title_{l}' for l in election_day_i18n_used_locales),
+        'election_date',
+        'election_domain',
+        'election_type',
+        'election_mandates',
+        'election_absolute_majority',
+        'election_status',
+        'entity_district',
+        'entity_name',
+        'entity_id',
+        'entity_counted'
+        'entity_eligible_voters',
+        'entity_received_ballots',
+        'entity_blank_ballots',
+        'entity_invalid_ballots',
+        'entity_unaccounted_ballots',
+        'entity_accounted_ballots'
+        'entity_blank_votes',
+        'entity_invalid_votes',
+        'entity_accounted_votes',
+        'list_name',
+        'list_id',
+        'list_number_of_mandates',
+        'list_votes',
+        'list_connection',
+        'list_connection_parent',
+        'candidate_family_name',
+        'candidate_first_name',
+        'candidate_id',
+        'candidate_elected',
+        'candidate_party',
+        'candidate_votes',
+    ]
 
     #: An election contains n list connections
     list_connections = relationship(
@@ -250,6 +286,12 @@ class ProporzElection(Election, PartyResultExportMixin):
         list_ids = list_ids.filter(List.election_id == self.id)
 
         panachage_lists = []
+        # FIXME: in db, PanachageResult.source is either list.name,
+        #  list.list_id, and list.id, this is very inconsistent
+
+        # Sesam uses list.list_id for this
+        # SG Wabstic uses
+
         panachage = {}
         if self.has_lists_panachage_data:
             panachage_results = session.query(PanachageResult)
@@ -276,8 +318,9 @@ class ProporzElection(Election, PartyResultExportMixin):
         rows = []
         for result in results:
             row = OrderedDict()
-            for locale, title in (result[1] or {}).items():
-                row['election_title_{}'.format(locale)] = (title or '').strip()
+            for locale in election_day_i18n_used_locales:
+                title = result[1] and result[1].get(locale, '') or ''
+                row[f'election_title_{locale}'] = title.strip()
             row['election_date'] = result[2].isoformat()
             row['election_domain'] = result[3]
             row['election_type'] = result[4]
@@ -317,7 +360,7 @@ class ProporzElection(Election, PartyResultExportMixin):
             row['candidate_votes'] = result[0]
 
             for target_id in panachage_lists:
-                key = 'panachage_votes_from_list_{}'.format(target_id)
+                key = f'panachage_votes_from_list_{target_id}'
                 row[key] = panachage.get(result[22], {}).get(target_id)
 
             rows.append(row)

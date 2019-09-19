@@ -274,11 +274,13 @@ def test_import_party_results_invalid_values(session):
             ))
         ).encode('utf-8')), 'text/plain'
     )
-
-    assert sorted(set([(e.line, e.error.interpolate()) for e in errors])) == [
-        (2, 'Invalid values'),
+    errors = sorted(set([(e.line, e.error.interpolate()) for e in errors]))
+    print(errors)
+    assert errors == [
+        (2, 'Invalid integer: id'),
+        (2, 'Invalid integer: year'),
         (3, 'Invalid values'),
         (4, 'Invalid values'),
         (6, 'FDP/2015 was found twice'),
-        (7, 'Invalid values'),
+        (7, 'Invalid integer: panachage_votes_from_1')
     ]

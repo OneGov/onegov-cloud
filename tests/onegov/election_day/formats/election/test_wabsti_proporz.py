@@ -1,50 +1,28 @@
-import tarfile
-
 from datetime import date
 from io import BytesIO
-from onegov.ballot import Election
+from onegov.ballot import Election, PanachageResult
 from onegov.ballot import ProporzElection
-from onegov.core.utils import module_path
 from onegov.election_day.formats import import_election_wabsti_proporz
 from onegov.election_day.models import Canton
-from pytest import mark
+
+from tests.onegov.election_day.common import print_errors
 
 
-@mark.parametrize("tar_file", [
-    module_path('tests.onegov.election_day', 'fixtures/wabsti_proporz.tar.gz'),
-])
-def test_import_wabsti_proporz(session, tar_file):
-    session.add(
-        ProporzElection(
-            title='election',
-            domain='canton',
-            date=date(2015, 10, 18),
-            number_of_mandates=3,
-        )
-    )
-    session.flush()
-    election = session.query(Election).one()
+def test_import_wabsti_proporz_cantonal(session, import_test_datasets):
 
-    principal = Canton(canton='zg')
+    principal = 'zg'
 
-    # The tar file contains
-    # - cantonal results from ZG from the 18.10.2015
-    # - regional results from Rheintal from the 28.02.2016
-    with tarfile.open(tar_file, 'r|gz') as f:
-        cantonal_csv = f.extractfile(f.next()).read()
-        cantonal_connections = f.extractfile(f.next()).read()
-        cantonal_stats = f.extractfile(f.next()).read()
-        regional_csv = f.extractfile(f.next()).read()
-        regional_elected = f.extractfile(f.next()).read()
-        regional_stats = f.extractfile(f.next()).read()
-
-    # Test cantonal election without elected candidates, connections and stats
-    errors = import_election_wabsti_proporz(
-        election, principal,
-        BytesIO(cantonal_csv), 'text/plain',
+    election = import_test_datasets(
+        'wabsti',
+        'election',
+        principal,
+        'canton',
+        election_type='proporz',
+        date_=date(2015, 10, 18),
+        number_of_mandates=3,
+        dataset_name='nationalratswahlen-2015-minimum',
     )
 
-    assert not errors
     assert election.completed
     assert election.progress == (11, 11)
     assert election.results.count() == 11
@@ -66,23 +44,40 @@ def test_import_wabsti_proporz(session, tar_file):
     assert election.absolute_majority is None
     assert election.allocated_mandates == 0
 
-    # Test cantonal election with elected candidates, connections and stats
-    cantonal_elected = (
-        'Liste_KandID,Name,Vorname\n'
-        '401,Pfister,Gerhard\n'
-        '601,Pezzatti,Bruno\n'
-        '1501,Aeschi,Thomas\n'
-    ).encode('utf-8')
+    # Test panachage results
+    panachage_results = session.query(PanachageResult)
+    panachage_results = panachage_results.filter_by(owner=election.id).all()
+    assert panachage_results
+    for pa_result in panachage_results:
+        assert len(pa_result.target) > 10, 'target must be a casted uuid'
 
-    errors = import_election_wabsti_proporz(
-        election, principal,
-        BytesIO(cantonal_csv), 'text/plain',
-        BytesIO(cantonal_connections), 'text/plain',
-        BytesIO(cantonal_elected), 'text/plain',
-        BytesIO(cantonal_stats), 'text/plain',
+    # Test panachage results for ALG list
+    test_list = election.lists.first()
+    assert test_list.list_id == '1'
+    votes_panachage_csv = 3706
+
+    panachge_vote_count = 0
+    for result in test_list.panachage_results:
+        panachge_vote_count += result.votes
+    assert panachge_vote_count == votes_panachage_csv
+
+
+def test_import_wabsti_proporz_cantonal_complete(
+        session, import_test_datasets):
+
+    principal = 'zg'
+
+    election = import_test_datasets(
+        'wabsti',
+        'election',
+        principal,
+        'canton',
+        election_type='proporz',
+        date_=date(2015, 10, 18),
+        number_of_mandates=3,
+        dataset_name='nationalratswahlen-2015-complete',
     )
 
-    assert not errors
     assert election.completed
     assert election.progress == (11, 11)
     assert round(election.turnout, 2) == 53.74
@@ -112,22 +107,21 @@ def test_import_wabsti_proporz(session, tar_file):
         0, 1128, 4178, 8352, 16048, 20584, 30856, 35543
     ]
 
-    # Test regional election
-    principal = Canton(canton='sg')
-    election.domain = 'region'
-    election.date = date(2016, 2, 28)
-    election.number_of_mandates = 17
 
-    mime = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    errors = import_election_wabsti_proporz(
-        election, principal,
-        BytesIO(regional_csv), mime,
-        None, None,
-        BytesIO(regional_elected), mime,
-        BytesIO(regional_stats), mime,
+def test_import_wabsti_proporz_regional_sg(session, import_test_datasets):
+    principal = 'sg'
+
+    election = import_test_datasets(
+        'wabsti',
+        'election',
+        principal,
+        'region',
+        election_type='proporz',
+        date_=date(2015, 10, 18),
+        number_of_mandates=17,
+        dataset_name='kantonsratswahlen-2016',
     )
 
-    assert not errors
     assert election.completed
     assert election.progress == (13, 13)
     assert round(election.turnout, 2) == 46.86
@@ -407,20 +401,21 @@ def test_import_wabsti_proporz_invalid_values(session):
             ))
         ).encode('utf-8')), 'text/plain',
     )
-
-    assert sorted([
+    print_errors(errors)
+    errors = sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
-    ]) == [
-        ('Elected Candidates', 2, 'Invalid values'),
+    ])
+    assert errors == [
+        ('Elected Candidates', 2, 'Invalid integer: liste_kandid'),
         ('Elected Candidates', 3, 'Unknown candidate'),
-        ('Election statistics', 2, 'Invalid values'),
-        ('List connections', 2, 'Invalid list connection values'),
-        ('Results', 2, 'Invalid candidate results'),
-        ('Results', 2, 'Invalid candidate values'),
-        ('Results', 2, 'Invalid entity values'),
-        ('Results', 2, 'Invalid list results'),
-        ('Results', 2, 'Invalid list results'),
-        ('Results', 2, 'Invalid list values'),
+        ('Election statistics', 2, 'Invalid integer: einheit_bfs'),
+        ('List connections', 2, 'Not an alphanumeric: liste'),
+        ('Results', 2, 'Invalid integer: einheit_bfs'),
+        ('Results', 2, 'Invalid integer: kand_stimmentotal'),
+        ('Results', 2, 'Invalid integer: liste_kandid'),
+        ('Results', 2, 'Invalid integer: liste_parteistimmentotal'),
+        ('Results', 2, 'Not an alphanumeric: liste_id'),
+        ('Results', 2, 'Not an alphanumeric: liste_id'),
         ('Results', 3, '1234 is unknown')
     ]
 

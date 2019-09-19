@@ -1,49 +1,28 @@
-import tarfile
-
 from datetime import date
 from io import BytesIO
-from onegov.ballot import Election
+from onegov.ballot import Election, PanachageResult
 from onegov.ballot import ProporzElection
 from onegov.core.csv import convert_list_of_dicts_to_csv
-from onegov.core.utils import module_path
 from onegov.election_day.formats import import_election_internal_proporz
 from onegov.election_day.models import Canton
-from pytest import mark
+
+from tests.onegov.election_day.common import print_errors, create_principal
 
 
-@mark.parametrize("tar_file", [
-    module_path('tests.onegov.election_day',
-                'fixtures/internal_proporz.tar.gz'),
-])
-def test_import_internal_proporz(session, tar_file):
-    session.add(
-        ProporzElection(
-            title='election',
-            domain='canton',
-            type='proporz',
-            date=date(2015, 10, 18),
-            number_of_mandates=2,
-        )
-    )
-    session.flush()
-    election = session.query(Election).one()
+def test_import_internal_proporz_cantonal(session, import_test_datasets):
 
-    principal = Canton(canton='zg')
-
-    # The tar file contains
-    # - cantonal results from ZG from the 18.10.2015
-    # - regional results from ZG from the 05.10.2014
-    with tarfile.open(tar_file, 'r|gz') as f:
-        csv_cantonal = f.extractfile(f.next()).read()
-        csv_regional = f.extractfile(f.next()).read()
-
-    # Test federal election
-    election.number_of_mandates = 3
-    errors = import_election_internal_proporz(
-        election, principal, BytesIO(csv_cantonal), 'text/plain',
+    election = import_test_datasets(
+        api_format='internal',
+        model='election',
+        principal='zg',
+        domain='canton',
+        election_type='proporz',
+        number_of_mandates=3,
+        date_=date(2015, 10, 18),
+        dataset_name='nationalratswahlen-2015',
+        expats=False
     )
 
-    assert not errors
     assert election.completed
     assert election.progress == (11, 11)
     assert election.absolute_majority is None
@@ -67,6 +46,8 @@ def test_import_internal_proporz(session, tar_file):
 
     # ... roundtrip
     csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
+
+    principal = create_principal('zg')
 
     errors = import_election_internal_proporz(
         election, principal, BytesIO(csv), 'text/plain'
@@ -94,15 +75,23 @@ def test_import_internal_proporz(session, tar_file):
         0, 1128, 4178, 8352, 16048, 20584, 30856, 35543
     ]
 
-    # Test regional election
-    election.domain = 'region'
-    election.number_of_mandates = 19
 
-    errors = import_election_internal_proporz(
-        election, principal, BytesIO(csv_regional), 'text/plain',
+def test_import_internal_proporz_regional_zg(session, import_test_datasets):
+    # Test regional election
+
+    principal = create_principal('zg')
+
+    election = import_test_datasets(
+        api_format='internal',
+        model='election',
+        principal='zg',
+        domain='region',
+        election_type='proporz',
+        number_of_mandates=19,
+        date_=date(2015, 10, 18),
+        dataset_name='kantonsratswahl-2014'
     )
 
-    assert not errors
     assert election.completed
     assert election.progress == (1, 1)
     assert election.absolute_majority is None
@@ -116,6 +105,24 @@ def test_import_internal_proporz(session, tar_file):
     assert sorted([list.votes for list in election.lists]) == [
         1175, 9557, 15580, 23406, 23653, 27116, 31412
     ]
+
+    # check panachage result from list 3
+    test_list = election.lists.first()
+    assert test_list.list_id == '3'
+    list_csv_votes = 23653
+    votes_panachage_csv = 606 + 334 + 5834 + 756 + 221 + 118 + 1048 + 2316
+    assert test_list.votes == list_csv_votes
+
+    panachage_results = session.query(PanachageResult)
+    panachage_results = panachage_results.filter_by(owner=election.id).all()
+    assert panachage_results
+    for pa_result in panachage_results:
+        assert len(pa_result.target) > 10, 'target must be a casted uuid'
+
+    panachge_vote_count = 0
+    for result in test_list.panachage_results:
+        panachge_vote_count += result.votes
+    assert panachge_vote_count == votes_panachage_csv
 
     # ... roundtrip
     csv = convert_list_of_dicts_to_csv(election.export()).encode('utf-8')
@@ -203,89 +210,91 @@ def test_import_internal_proporz_invalid_values(session):
     errors = import_election_internal_proporz(
         election, principal,
         BytesIO((
-            '\n'.join((
-                ','.join((
-                    'election_status',
-                    'entity_id',
-                    'entity_counted',
-                    'entity_eligible_voters',
-                    'entity_received_ballots',
-                    'entity_blank_ballots',
-                    'entity_invalid_ballots',
-                    'entity_blank_votes',
-                    'entity_invalid_votes',
-                    'list_name',
-                    'list_id',
-                    'list_number_of_mandates',
-                    'list_votes',
-                    'list_connection',
-                    'list_connection_parent',
-                    'candidate_family_name',
-                    'candidate_first_name',
-                    'candidate_id',
-                    'candidate_elected',
-                    'candidate_votes',
-                    'candidate_party',
-                )),
-                ','.join((
-                    'xxx',  # election_status
-                    'xxx',  # entity_id
-                    'xxx',  # entity_counted
-                    'xxx',  # entity_eligible_voters
-                    'xxx',  # entity_received_ballots
-                    'xxx',  # entity_blank_ballots
-                    'xxx',  # entity_invalid_ballots
-                    'xxx',  # entity_blank_votes
-                    'xxx',  # entity_invalid_votes
-                    'xxx',  # list_name
-                    'xxx',  # list_id
-                    'xxx',  # list_number_of_mandates
-                    'xxx',  # list_votes
-                    'xxx',  # list_connection
-                    'xxx',  # list_connection_parent
-                    'xxx',  # candidate_family_name
-                    'xxx',  # candidate_first_name
-                    'xxx',  # candidate_id
-                    'xxx',  # candidate_elected
-                    'xxx',  # candidate_votes
-                    'xxx',  # candidate_party
-                )),
-                ','.join((
-                    'unknown',  # election_status
-                    '1234',  # entity_id
-                    'True',  # entity_counted
-                    '100',  # entity_eligible_voters
-                    '10',  # entity_received_ballots
-                    '0',  # entity_blank_ballots
-                    '0',  # entity_invalid_ballots
-                    '0',  # entity_blank_votes
-                    '0',  # entity_invalid_votes
-                    '',  # list_name
-                    '',  # list_id
-                    '',  # list_number_of_mandates
-                    '',  # list_votes
-                    '',  # list_connection
-                    '',  # list_connection_parent
-                    '',  # candidate_family_name
-                    '',  # candidate_first_name
-                    '',  # candidate_id
-                    '',  # candidate_elected
-                    '',  # candidate_votes
-                    '',  # candidate_party
-                )),
-            ))
-        ).encode('utf-8')), 'text/plain',
+                '\n'.join((
+                    ','.join((
+                        'election_status',
+                        'entity_id',
+                        'entity_counted',
+                        'entity_eligible_voters',
+                        'entity_received_ballots',
+                        'entity_blank_ballots',
+                        'entity_invalid_ballots',
+                        'entity_blank_votes',
+                        'entity_invalid_votes',
+                        'list_name',
+                        'list_id',
+                        'list_number_of_mandates',
+                        'list_votes',
+                        'list_connection',
+                        'list_connection_parent',
+                        'candidate_family_name',
+                        'candidate_first_name',
+                        'candidate_id',
+                        'candidate_elected',
+                        'candidate_votes',
+                        'candidate_party',
+                    )),
+                    ','.join((
+                        'xxx',  # election_status
+                        'xxx',  # entity_id
+                        'xxx',  # entity_counted
+                        'xxx',  # entity_eligible_voters
+                        'xxx',  # entity_received_ballots
+                        'xxx',  # entity_blank_ballots
+                        'xxx',  # entity_invalid_ballots
+                        'xxx',  # entity_blank_votes
+                        'xxx',  # entity_invalid_votes
+                        'xxx',  # list_name
+                        'xxx',  # list_id
+                        'xxx',  # list_number_of_mandates
+                        'xxx',  # list_votes
+                        'xxx',  # list_connection
+                        'xxx',  # list_connection_parent
+                        'xxx',  # candidate_family_name
+                        'xxx',  # candidate_first_name
+                        'xxx',  # candidate_id
+                        'xxx',  # candidate_elected
+                        'xxx',  # candidate_votes
+                        'xxx',  # candidate_party
+                    )),
+                    ','.join((
+                        'unknown',  # election_status
+                        '1234',  # entity_id
+                        'True',  # entity_counted
+                        '100',  # entity_eligible_voters
+                        '10',  # entity_received_ballots
+                        '0',  # entity_blank_ballots
+                        '0',  # entity_invalid_ballots
+                        '0',  # entity_blank_votes
+                        '0',  # entity_invalid_votes
+                        '',  # list_name
+                        '',  # list_id
+                        '',  # list_number_of_mandates
+                        '',  # list_votes
+                        '',  # list_connection
+                        '',  # list_connection_parent
+                        '',  # candidate_family_name
+                        '',  # candidate_first_name
+                        '',  # candidate_id
+                        '',  # candidate_elected
+                        '',  # candidate_votes
+                        '',  # candidate_party
+                    )),
+                ))
+                ).encode('utf-8')), 'text/plain',
     )
-
-    assert sorted([(e.line, e.error.interpolate()) for e in errors]) == [
-        (2, 'Invalid candidate results'),
-        (2, 'Invalid candidate values'),
-        (2, 'Invalid entity values'),
-        (2, 'Invalid list results'),
-        (2, 'Invalid list results'),
-        (2, 'Invalid list values'),
+    print_errors(errors)
+    errors = sorted([(e.line, e.error.interpolate()) for e in errors])
+    assert errors == [
+        (2, 'Invalid integer: candidate_votes'),
+        (2, 'Invalid integer: entity_id'),
+        (2, 'Invalid integer: list_votes'),
         (2, 'Invalid status'),
+        (2, 'Not an alphanumeric: list_id'),
+        (2, 'Not an alphanumeric: list_id'),    #
         (3, '1234 is unknown'),
+        (3, 'Empty value: list_id'),
+        (3, 'Empty value: list_id'),
     ]
 
 
@@ -343,7 +352,7 @@ def test_import_internal_proporz_expats(session):
                             '1',  # entity_blank_votes
                             '1',  # entity_invalid_votes
                             '',  # list_name
-                            '',  # list_id
+                            '10.5',  # list_id
                             '',  # list_number_of_mandates
                             '',  # list_votes
                             '',  # list_connection
@@ -419,7 +428,7 @@ def test_import_internal_proporz_temporary_results(session):
                     '1',  # entity_blank_votes
                     '1',  # entity_invalid_votes
                     '',  # list_name
-                    '',  # list_id
+                    '10.5',  # list_id
                     '',  # list_number_of_mandates
                     '',  # list_votes
                     '',  # list_connection
@@ -442,7 +451,7 @@ def test_import_internal_proporz_temporary_results(session):
                     '1',  # entity_blank_votes
                     '1',  # entity_invalid_votes
                     '',  # list_name
-                    '',  # list_id
+                    '03B.04',  # list_id
                     '',  # list_number_of_mandates
                     '',  # list_votes
                     '',  # list_connection
@@ -457,6 +466,7 @@ def test_import_internal_proporz_temporary_results(session):
             ))
         ).encode('utf-8')), 'text/plain',
     )
+    print_errors(errors)
     assert not errors
 
     # 1 Counted, 1 Uncounted, 10 Missing
@@ -520,7 +530,7 @@ def test_import_internal_proporz_regional(session):
                         '1',  # entity_blank_votes
                         '1',  # entity_invalid_votes
                         '',  # list_name
-                        '',  # list_id
+                        '10.04',  # list_id
                         '',  # list_number_of_mandates
                         '',  # list_votes
                         '',  # list_connection
@@ -543,7 +553,7 @@ def test_import_internal_proporz_regional(session):
                         '1',  # entity_blank_votes
                         '1',  # entity_invalid_votes
                         '',  # list_name
-                        '',  # list_id
+                        '03B.04',  # list_id
                         '',  # list_number_of_mandates
                         '',  # list_votes
                         '',  # list_connection
@@ -558,6 +568,8 @@ def test_import_internal_proporz_regional(session):
                 ))
             ).encode('utf-8')), 'text/plain',
         )
+        print(expected)
+        print_errors(errors)
         assert [error.error for error in errors] == expected
 
         errors = import_election_internal_proporz(
@@ -598,7 +610,7 @@ def test_import_internal_proporz_regional(session):
                         '1',  # entity_blank_votes
                         '1',  # entity_invalid_votes
                         '',  # list_name
-                        '',  # list_id
+                        '03B.04',  # list_id
                         '',  # list_number_of_mandates
                         '',  # list_votes
                         '',  # list_connection
@@ -621,7 +633,7 @@ def test_import_internal_proporz_regional(session):
                         '1',  # entity_blank_votes
                         '1',  # entity_invalid_votes
                         '',  # list_name
-                        '',  # list_id
+                        '03B.04',  # list_id
                         '',  # list_number_of_mandates
                         '',  # list_votes
                         '',  # list_connection
@@ -678,7 +690,7 @@ def test_import_internal_proporz_regional(session):
                     '1',  # entity_blank_votes
                     '1',  # entity_invalid_votes
                     '',  # list_name
-                    '',  # list_id
+                    '03B.04',  # list_id
                     '',  # list_number_of_mandates
                     '',  # list_votes
                     '',  # list_connection
@@ -738,7 +750,7 @@ def test_import_internal_proporz_regional(session):
                         '1',  # entity_blank_votes
                         '1',  # entity_invalid_votes
                         '',  # list_name
-                        '',  # list_id
+                        '9.06',  # list_id
                         '',  # list_number_of_mandates
                         '',  # list_votes
                         '',  # list_connection

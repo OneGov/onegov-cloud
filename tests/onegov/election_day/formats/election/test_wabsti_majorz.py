@@ -1,48 +1,26 @@
-import tarfile
-
 from datetime import date
 from io import BytesIO
 from onegov.ballot import Election
-from onegov.core.utils import module_path
 from onegov.election_day.formats import import_election_wabsti_majorz
 from onegov.election_day.models import Canton
-from onegov.election_day.models import Municipality
-from pytest import mark
 
 
-@mark.parametrize("tar_file", [
-    module_path('tests.onegov.election_day', 'fixtures/wabsti_majorz.tar.gz'),
-])
-def test_import_wabsti_majorz(session, tar_file):
-    session.add(
-        Election(
-            title='election',
-            domain='canton',
-            date=date(2011, 10, 23),
-            number_of_mandates=1,
-        )
-    )
-    session.flush()
-    election = session.query(Election).one()
+def test_import_wabsti_majorz_cantonal_simple(session, import_test_datasets):
 
-    principal = Canton(canton='sg')
-
+    principal = 'sg'
     # The tar file contains
     # - cantonal results from SG from the 23.10.2011
-    # - regional results from Rohrschach the 25.09.2016
-    # - communal results from the 25.09.2016
-    with tarfile.open(tar_file, 'r|gz') as f:
-        cantonal = f.extractfile(f.next()).read()
-        regional = f.extractfile(f.next()).read()
-        communal = f.extractfile(f.next()).read()
-
-    # Test cantonal election without elected candiates
-    errors = import_election_wabsti_majorz(
-        election, principal,
-        BytesIO(cantonal), 'text/plain',
+    election = import_test_datasets(
+        'wabsti',
+        'election',
+        principal,
+        'canton',
+        election_type='majorz',
+        number_of_mandates=1,
+        date_=date(2011, 10, 23),
+        dataset_name='staenderatswahlen-2011-simple',
     )
 
-    assert not errors
     assert election.completed
     assert election.progress == (85, 85)
     assert round(election.turnout, 2) == 47.79
@@ -58,16 +36,24 @@ def test_import_wabsti_majorz(session, tar_file):
     assert election.absolute_majority is None
     assert election.allocated_mandates == 0
 
-    # Test cantonal election with elected candidates
-    elected = "KandID,Name,Vorname\n3,Rechsteiner,Paul".encode('utf-8')
 
-    errors = import_election_wabsti_majorz(
-        election, principal,
-        BytesIO(cantonal), 'text/plain',
-        BytesIO(elected), 'text/plain',
+def test_import_wabsti_majorz_cantonal_complete(
+        session, import_test_datasets):
+
+    # Test cantonal election with elected candidates
+    principal = 'sg'
+
+    election = import_test_datasets(
+        'wabsti',
+        'election',
+        principal,
+        'canton',
+        election_type='majorz',
+        number_of_mandates=1,
+        date_=date(2011, 10, 23),
+        dataset_name='staenderatswahlen-2011-complete',
     )
 
-    assert not errors
     assert election.completed
     assert election.progress == (85, 85)
     assert round(election.turnout, 2) == 47.79
@@ -84,17 +70,22 @@ def test_import_wabsti_majorz(session, tar_file):
     assert election.allocated_mandates == 1
     assert election.elected_candidates == [('Paul', 'Rechsteiner')]
 
-    # Test regional election
-    election.domain = 'region'
-    election.date = date(2016, 9, 25)
-    election.number_of_mandates = 1
 
-    errors = import_election_wabsti_majorz(
-        election, principal,
-        BytesIO(regional), 'text/plain',
+def test_import_wabsti_majorz_regional_sg(session, import_test_datasets):
+    # - regional results from Rohrschach the 25.09.2016
+    principal = 'sg'
+    # Test regional election
+    election = import_test_datasets(
+        'wabsti',
+        'election',
+        principal,
+        'region',
+        election_type='majorz',
+        number_of_mandates=1,
+        date_=date(2016, 9, 25),
+        dataset_name='RO-Kreisgericht-Rohrschach',
     )
 
-    assert not errors
     assert election.completed
     assert election.progress == (9, 9)
     assert round(election.turnout, 2) == 42.0
@@ -110,19 +101,21 @@ def test_import_wabsti_majorz(session, tar_file):
     assert election.absolute_majority == 5076
     assert election.allocated_mandates == 0
 
-    # Test communal election
-    election.domain = 'municipality'
-    election.date = date(2016, 9, 25)
-    election.number_of_mandates = 6
 
-    principal = Municipality(municipality='3231', name='Au')
-
-    errors = import_election_wabsti_majorz(
-        election, principal,
-        BytesIO(communal), 'text/plain',
+def test_import_wabsti_majorz_municipal(session, import_test_datasets):
+    # - communal results from the 25.09.2016
+    principal = 'Au'
+    election = import_test_datasets(
+        'wabsti',
+        'election',
+        principal,
+        'municipality',
+        election_type='majorz',
+        number_of_mandates=6,
+        date_=date(2016, 9, 25),
+        dataset_name='Au-gemeinderat-2016',
+        municipality='3231'
     )
-
-    assert not errors
     assert election.completed
     assert election.progress == (1, 1)
     assert round(election.turnout, 2) == 27.03
@@ -301,12 +294,14 @@ def test_import_wabsti_majorz_invalid_values(session):
         ).encode('utf-8')), 'text/plain',
     )
 
-    assert sorted([
+    errors = sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
-    ]) == [
+    ])
+    print(errors)
+    assert errors == [
         ('Elected Candidates', 2, 'Unknown candidate'),
-        ('Results', 2, 'Invalid election values'),
-        ('Results', 2, 'Invalid entity values'),
+        ('Results', 2, 'Invalid integer: anzmandate'),
+        ('Results', 2, 'Invalid integer: bfs'),
         ('Results', 3, '1234 is unknown')
     ]
 
