@@ -426,7 +426,8 @@ def import_election_wabsti_proporz(
         for list_id in panachage_headers.values():
             if not list_id == '999' and list_id not in lists.keys():
                 errors.append(FileImportError(
-                    _("Panachage results ids and list_id not consistent")))
+                    _("Panachage results id ${id} not in list_id's",
+                      mapping={'id': list_id})))
                 break
 
     if errors:
