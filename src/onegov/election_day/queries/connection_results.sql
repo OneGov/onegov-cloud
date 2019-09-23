@@ -56,9 +56,14 @@ result as (
 --     JOIN sublist_results sr ON lr.connection_id = sr.connection_id
     LEFT JOIN main_list_results mr ON lr.parent_group = mr.parent_group
 )
-SELECT * FROM result v
+
+-- I would like to add the main_list_results to result, but
+--  the table grows as it should'nt after the left join. Why is that?
+
+-- SELECT * FROM result v
+SELECT * FROM main_list_results v
 
 WHERE v.election_id = 'nationalratswahlen-2019'
-ORDER BY v.parent_group
+-- ORDER BY v.connection_id
 
 
