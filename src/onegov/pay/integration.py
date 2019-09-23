@@ -114,7 +114,7 @@ def process_payment(method, price, provider=None, token=None):
             )
         except CARD_ERRORS as e:
 
-            if 'insufficient funds' in getattr(e, 'message', ''):
+            if 'insufficient funds' in str(e):
                 return INSUFFICIENT_FUNDS
 
             log.exception(
