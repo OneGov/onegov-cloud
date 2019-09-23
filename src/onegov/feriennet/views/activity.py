@@ -428,10 +428,14 @@ def view_activity(self, request):
         if occasion.period.finalized:
             return False
 
+        # the rest of the restrictions only apply to non-admins
+        if request.is_admin:
+            return True
+
         if occasion.period.phase not in ('wishlist', 'booking', 'execution'):
             return False
 
-        if not request.is_admin and occasion.is_past_deadline(date.today()):
+        if occasion.is_past_deadline(date.today()):
             return False
 
         if occasion.period.wishlist_phase and\

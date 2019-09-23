@@ -69,6 +69,18 @@ class PeriodForm(Form):
         validators=[InputRequired()]
     )
 
+    booking_start = DateField(
+        label=_("Booking Start"),
+        fieldset=_("Dates"),
+        validators=[InputRequired()]
+    )
+
+    booking_end = DateField(
+        label=_("Booking End"),
+        fieldset=_("Dates"),
+        validators=[InputRequired()]
+    )
+
     execution_start = DateField(
         label=_("Execution Start"),
         fieldset=_("Dates"),
@@ -241,6 +253,10 @@ class PeriodForm(Form):
         return (self.prebooking_start.data, self.prebooking_end.data)
 
     @property
+    def booking(self):
+        return (self.booking_start.data, self.booking_end.data)
+
+    @property
     def execution(self):
         return (self.execution_start.data, self.execution_end.data)
 
@@ -377,6 +393,8 @@ class PeriodForm(Form):
         fields = (
             self.prebooking_start,
             self.prebooking_end,
+            self.booking_start,
+            self.booking_end,
             self.execution_start,
             self.execution_end
         )
@@ -389,8 +407,9 @@ class PeriodForm(Form):
 
             if stack.pop().data > field.data:
                 field.errors.append(_(
-                    "The prebooking period must start before the exeuction "
-                    "period and each period must start before it ends."
+                    "Prebooking must start before booking, and booking must "
+                    "start before execution. Each period must also start "
+                    "before it ends."
                 ))
                 return False
 

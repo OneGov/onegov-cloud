@@ -12,8 +12,7 @@
             <thead>
                 <tr>
                     <th i18n:translate>Title</th>
-                    <th i18n:translate>Prebooking Phase</th>
-                    <th i18n:translate>Exeuction Phase</th>
+                    <th i18n:translate>Dates</th>
                     <th i18n:translate>Administrative Costs</th>
                     <th colspan="2" i18n:translate>Status</th>
                 </tr>
@@ -22,13 +21,26 @@
                 <tr tal:repeat="period periods" class="${period.active and 'active' or ''}">
                     <td>${period.title}</td>
                     <td>
-                        <tal:b condition="not:period.confirmed">
-                            ${layout.format_date_range(period.prebooking_start, period.prebooking_end)}
-                        </tal:b>
-                        <tal:b condition="period.confirmed" i18n:translate>Completed</tal:b>
-                    </td>
-                    <td>
-                        ${layout.format_date_range(period.execution_start, period.execution_end)}
+                        <dl class="period-dates">
+                            <div>
+                                <dt i18n:translate>Prebooking</dt>
+                                <dd class="${period.confirmed and 'finished prebooking'}">
+                                    ${layout.format_date_range(period.prebooking_start, period.prebooking_end)}
+                                </dd>
+                            </div>
+                            <div>
+                                <dt i18n:translate>Booking</dt>
+                                <dd class="${period.finalized and 'finished booking'}">
+                                    ${layout.format_date_range(period.booking_start, period.booking_end)}
+                                </dd>
+                            </div>
+                            <div>
+                                <dt i18n:translate>Execution</dt>
+                                <dd class="${period.is_execution_in_past and 'finished execution'}">
+                                    ${layout.format_date_range(period.execution_start, period.execution_end)}
+                                </dd>
+                            </div>
+                        </dl>
                     </td>
                     <td>
                         <span tal:condition="period.all_inclusive and period.booking_cost" i18n:translate>

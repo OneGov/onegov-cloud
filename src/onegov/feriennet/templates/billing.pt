@@ -142,7 +142,7 @@
                     <h4 i18n:translate>Billing</h4>
 
                     <div class="form-panel-block">
-                        <tal:b condition="period.active and period.booking_phase">
+                        <tal:b condition="period.active and period.confirmed and not period.finalized">
                             <div metal:use-macro="layout.macros['form']" />
 
                             <a ic-post-to="${request.link(model, 'reset')}" redirect-after="${request.link(model)}" i18n:translate class="reset-billing" tal:condition="bills">

@@ -191,15 +191,24 @@ class Scenario(object):
             columns.setdefault('prebooking_end', self.date_offset(+1))
             columns.setdefault('execution_start', self.date_offset(+10))
             columns.setdefault('execution_end', self.date_offset(+20))
+
+            columns.setdefault('booking_start', columns['prebooking_end'])
+            columns.setdefault('booking_end', columns['execution_start'])
         elif phase == 'booking':
             columns.setdefault('prebooking_start', self.date_offset(-10))
             columns.setdefault('prebooking_end', self.date_offset(-5))
             columns.setdefault('execution_start', self.date_offset(-1))
             columns.setdefault('execution_end', self.date_offset(+1))
+
+            columns.setdefault('booking_start', columns['prebooking_end'])
+            columns.setdefault('booking_end', columns['execution_start'])
         else:
             raise NotImplementedError
 
         self.periods.append(self.add(Period, **columns))
+
+        if columns.get('confirmed'):
+            self.latest_period.confirm_and_start_booking_phase()
 
         return self.latest_period
 

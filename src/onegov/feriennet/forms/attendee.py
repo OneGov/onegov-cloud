@@ -267,6 +267,19 @@ class AttendeeSignupForm(AttendeeBase):
             ))
             return False
 
+    def ensure_within_booking_period(self):
+        if not self.model.period.confirmed:
+            return
+
+        if self.request.is_admin:
+            return
+
+        if not self.model.period.is_currently_booking:
+            self.attendee.errors.append(_(
+                "Cannot create a booking outside the booking period"
+            ))
+            return False
+
     def ensure_available_spots(self):
         if self.model.full and not self.model.period.wishlist_phase:
             self.attendee.errors.append(_(

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-08-30 11:38+0200\n"
+"POT-Creation-Date: 2019-09-20 11:49+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -474,6 +474,9 @@ msgstr "Dieser Zeitraum wurde bereits abgeschlossen"
 msgid "Cannot create a booking outside the prebooking period"
 msgstr "Anmeldungen können nur während der Wunschphase gemacht werden"
 
+msgid "Cannot create a booking outside the booking period"
+msgstr "Buchungen können nicht ausserhalb der Buchungsperiode gemacht werden"
+
 msgid "This occasion is already fully booked"
 msgstr "Diese Durchführung ist bereits ausgebucht"
 
@@ -764,6 +767,12 @@ msgstr "Start Wunschphase"
 msgid "Prebooking End"
 msgstr "Ende Wunschphase"
 
+msgid "Booking Start"
+msgstr "Start Buchungsphase"
+
+msgid "Booking End"
+msgstr "Ende Buchungsphase"
+
 msgid "Execution Start"
 msgstr "Start Durchführung"
 
@@ -881,11 +890,9 @@ msgid "The execution phase conflicts with existing occasions"
 msgstr "Konflikt mit bestehenden Durchführungen"
 
 msgid ""
-"The prebooking period must start before the exeuction period and each period "
-"must start before it ends."
-msgstr ""
-"Die Wunschphase muss vor der Durchführung stattfinden und die Start-Daten "
-"müssen vor den End-Daten liegen."
+"Prebooking must start before booking, and booking must start before "
+"execution. Each period must also start before it ends."
+msgstr "Die Wunsch- muss vor der Buchungsphase, die Buchungs- vor der Durchführungsphase stattfinden. Jede Phase muss starten bevor sie endet."
 
 msgid ""
 "It is no longer possible to change the execution settings since the period "
@@ -1671,6 +1678,15 @@ msgstr "Die Wunschphase ist jetzt bis am ${date} aktiv."
 msgid "Prebooking has ended."
 msgstr "Die Wunschphase wurde abgeschlossen."
 
+msgid "Booking begins on ${date}."
+msgstr "Die Buchungsphase beginnt am ${date}."
+
+msgid "Booking is now active until ${date}."
+msgstr "Die Buchungsphase ist jetzt bis am ${date} aktiv."
+
+msgid "Booking has ended."
+msgstr "Die Buchungsphase wurde abgeschlossen."
+
 msgid "There cannot be any more bookings."
 msgstr "Es können keine weiteren Buchungen mehr vorgenommen werden."
 
@@ -1882,20 +1898,17 @@ msgstr ""
 msgid "No periods defined."
 msgstr "Keine Zeiträume definiert."
 
-msgid "Prebooking Phase"
-msgstr "Wunschphase"
-
-msgid "Exeuction Phase"
-msgstr "Ausführungs-Phase"
-
 msgid "Administrative Costs"
 msgstr "Administrative Kosten"
 
 msgid "Status"
 msgstr "Status"
 
-msgid "Completed"
-msgstr "Abgeschlossen"
+msgid "Prebooking"
+msgstr "Wunschphase"
+
+msgid "Booking"
+msgstr "Buchungsphase"
 
 msgid "${cost} for ${count} bookings"
 msgstr "${cost} für ${count} Buchungen"
@@ -2520,15 +2533,3 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
-
-#~ msgid "Donation Description"
-#~ msgstr "Beschreibung Spende"
-
-#~ msgid "You support our work"
-#~ msgstr "Sie unterstützen unsere Arbeit"
-
-#~ msgid "Support our work with a donation."
-#~ msgstr "Unterstützen Sie unsere Arbeit mit einer Spende."
-
-#~ msgid "I donate"
-#~ msgstr "Ich spende"

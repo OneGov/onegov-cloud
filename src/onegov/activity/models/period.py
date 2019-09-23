@@ -56,6 +56,12 @@ class Period(Base, TimestampMixin):
     #: End of the wishlist-phase
     prebooking_end = Column(Date, nullable=False)
 
+    #: Start of the booking-phase
+    booking_start = Column(Date, nullable=False)
+
+    #: End of the booking-phase
+    booking_end = Column(Date, nullable=False)
+
     #: Date of the earliest possible occasion start of this period
     execution_start = Column(Date, nullable=False)
 
@@ -102,11 +108,14 @@ class Period(Base, TimestampMixin):
     age_barrier_type = Column(Text, nullable=False, default='exact')
 
     __table_args__ = (
-        CheckConstraint((
-            '"prebooking_start" <= "prebooking_end" AND '
-            '"prebooking_end" <= "execution_start" AND '
-            '"execution_start" <= "execution_end"'
-        ), name='period_date_order'),
+        CheckConstraint(("""
+            prebooking_start
+            <= prebooking_end AND prebooking_end
+            <= booking_start AND booking_start
+            <= booking_end AND booking_end
+            <= execution_start AND execution_start
+            <= execution_end
+        """), name='period_date_order'),
         Index(
             'only_one_active_period', 'active',
             unique=True, postgresql_where=column('active') == True
@@ -290,6 +299,12 @@ class Period(Base, TimestampMixin):
         if not self.confirmed:
             return 'wishlist'
 
+        if not self.finalized and today < local(self.booking_start):
+            return 'inactive'
+
+        if not self.finalized and local(self.booking_end) < today:
+            return 'inactive'
+
         if not self.finalized:
             return 'booking'
 
@@ -301,6 +316,18 @@ class Period(Base, TimestampMixin):
 
         if today > local(self.execution_end):
             return 'archive'
+
+    def confirm_and_start_booking_phase(self):
+        """ Confirms the period and sets the booking phase to now.
+
+        This is mainly an internal convenience function to activate the
+        previous behaviour before a specific booking phase date was introduced.
+
+        """
+
+        self.confirmed = True
+        self.prebooking_end = date.today()
+        self.booking_start = date.today()
 
     @property
     def wishlist_phase(self):
@@ -350,6 +377,42 @@ class Period(Base, TimestampMixin):
             return True
 
         return start <= today and not self.wishlist_phase
+
+    @property
+    def is_booking_in_future(self):
+        today = self.as_local_datetime(date.today())
+        start = self.as_local_datetime(self.booking_start)
+
+        return today < start
+
+    @property
+    def is_currently_booking(self):
+        if not self.booking_phase:
+            return False
+
+        today = self.as_local_datetime(date.today())
+        start = self.as_local_datetime(self.booking_start)
+        end = self.as_local_datetime(self.booking_end)
+
+        return start <= today <= end
+
+    @property
+    def is_booking_in_past(self):
+        today = self.as_local_datetime(date.today())
+        start = self.as_local_datetime(self.booking_start)
+        end = self.as_local_datetime(self.booking_end)
+
+        if today > end:
+            return True
+
+        return start <= today and not self.booking_phase
+
+    @property
+    def is_execution_in_past(self):
+        today = self.as_local_datetime(date.today())
+        end = self.as_local_datetime(self.execution_end)
+
+        return today > end
 
     @property
     def scoring(self):
