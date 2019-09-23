@@ -94,7 +94,6 @@ The results may contain panachage results by adding one column per list:
 Name|Description
 ---|---
 `panachage_votes_from_list_{XX}`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
-**Note**: It can be that `{xx}` in `panachage_votes_from_list_` is `01`, but `list_id = 1`. This will not cause an error.
 
 #### Temporary results
 

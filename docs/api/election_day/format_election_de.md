@@ -92,7 +92,6 @@ Die Resultate können Panaschierdaten enthalten, indem pro Liste eine Spalte hin
 Name|Beschreibung
 ---|---
 `panachage_votes_from_list_{XX}`|Die Anzahl Stimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.  
-**Anmerkung**: `{xx}` kann in `panachage_votes_from_list_` z.B. `01` sein, aber `list_id = 1`. Dies führt aber zu keinen Fehlern.
 
 #### Temporäre Resultate
 
