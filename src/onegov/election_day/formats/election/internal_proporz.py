@@ -7,7 +7,7 @@ from onegov.ballot import ListResult
 from onegov.ballot import PanachageResult
 from onegov.election_day import _
 from onegov.election_day.formats.common import EXPATS, validate_integer, \
-    validate_list_id, parse_panachage_source
+    validate_list_id
 from onegov.election_day.formats.common import FileImportError
 from onegov.election_day.formats.common import load_csv
 from onegov.election_day.formats.common import STATI
@@ -120,7 +120,6 @@ def parse_panachage_results(line, errors, panachage, panachage_headers):
         if target not in panachage:
             panachage[target] = {}
             for col_name, source in panachage_headers.items():
-                # source = parse_panachage_source(source, target)
                 if source == target:
                     continue
                 panachage[target][source] = validate_integer(
@@ -297,7 +296,7 @@ def import_election_internal_proporz(election, principal, file, mimetype):
         for list_id in panachage_headers.values():
             if not list_id == '999' and list_id not in lists.keys():
                 errors.append(FileImportError(
-                    _("Panachage Results ids and list_id not consistent")))
+                    _("Panachage results ids and list_id not consistent")))
 
     # Check if all results are from the same district if regional election
     districts = set([result['district'] for result in results.values()])

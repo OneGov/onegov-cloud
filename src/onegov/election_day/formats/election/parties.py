@@ -2,7 +2,7 @@ from onegov.ballot import PanachageResult
 from onegov.ballot import PartyResult
 from onegov.election_day import _
 from onegov.election_day.formats.common import FileImportError, \
-    validate_integer, parse_panachage_source, validate_list_id
+    validate_integer, validate_list_id
 from onegov.election_day.formats.common import load_csv
 from re import match
 from sqlalchemy.orm import object_session
@@ -68,7 +68,6 @@ def parse_panachage_results(line, errors, results, headers, election_year):
         if target not in results and year == election_year:
             results[target] = {}
             for col_name, source in headers.items():
-                source = parse_panachage_source(source, target)
                 if source == target:
                     continue
                 results[target][source] = validate_integer(line, col_name)
