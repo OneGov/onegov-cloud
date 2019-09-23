@@ -152,7 +152,8 @@ def test_occasions(session, owner):
 
     period = periods.add(
         title="Autumn 2016",
-        prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 14)),
+        booking=(datetime(2016, 9, 15), datetime(2016, 9, 30)),
         execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
         active=True
     )
@@ -202,7 +203,8 @@ def test_activity_date_ranges(session, owner, collections):
 
     period = collections.periods.add(
         title="Spring 2017",
-        prebooking=(datetime(2017, 2, 1), datetime(2017, 2, 28)),
+        prebooking=(datetime(2017, 2, 1), datetime(2017, 2, 14)),
+        booking=(datetime(2017, 2, 15), datetime(2017, 2, 28)),
         execution=(datetime(2017, 3, 1), datetime(2017, 3, 31)),
         active=True
     )
@@ -279,7 +281,8 @@ def test_activity_weekdays(session, owner, collections):
 
     period = collections.periods.add(
         title="Spring 2017",
-        prebooking=(datetime(2017, 2, 1), datetime(2017, 2, 28)),
+        prebooking=(datetime(2017, 2, 1), datetime(2017, 2, 14)),
+        booking=(datetime(2017, 2, 15), datetime(2017, 2, 28)),
         execution=(datetime(2017, 5, 8), datetime(2017, 5, 21)),
         active=True
     )
@@ -352,13 +355,15 @@ def test_profiles(session, owner):
 
     autumn = periods.add(
         title="Autumn 2016",
-        prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 15)),
+        booking=(datetime(2016, 9, 15), datetime(2016, 9, 30)),
         execution=(datetime(2016, 10, 1), datetime(2016, 10, 31))
     )
 
     winter = periods.add(
         title="Winter 2016",
-        prebooking=(datetime(2016, 11, 1), datetime(2016, 11, 30)),
+        prebooking=(datetime(2016, 11, 1), datetime(2016, 11, 15)),
+        booking=(datetime(2016, 11, 15), datetime(2016, 11, 30)),
         execution=(datetime(2016, 12, 1), datetime(2016, 12, 31))
     )
 
@@ -421,6 +426,7 @@ def test_occasion_daterange_constraint(session, owner):
     period = PeriodCollection(session).add(
         title="Autumn 2016",
         prebooking=(datetime(2000, 1, 1), datetime(2000, 1, 1)),
+        booking=(datetime(2000, 1, 1), datetime(2000, 1, 1)),
         execution=(datetime(2001, 1, 1), datetime(2050, 12, 31))
     )
 
@@ -447,7 +453,8 @@ def test_no_orphan_bookings(session, owner):
 
     period = periods.add(
         title="Autumn 2016",
-        prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 15)),
+        booking=(datetime(2016, 9, 15), datetime(2016, 9, 30)),
         execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
         active=True
     )
@@ -485,7 +492,8 @@ def test_no_orphan_occasions(session, owner):
 
     period = periods.add(
         title="Autumn 2016",
-        prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 15)),
+        booking=(datetime(2016, 9, 15), datetime(2016, 9, 30)),
         execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
         active=True
     )
@@ -535,6 +543,7 @@ def test_occasion_duration(session, owner):
     periods.add(
         title="2016",
         prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
+        booking=(datetime(2015, 12, 31), datetime(2015, 12, 31)),
         execution=(datetime(2016, 1, 1), datetime(2016, 12, 31)),
         active=True
     )
@@ -655,7 +664,10 @@ def test_occasion_duration_with_multiple_dates(collections, owner):
     period = collections.periods.add(
         "Summer 2018", (
             datetime(2018, 5, 1),
-            datetime(2018, 5, 31),
+            datetime(2018, 5, 15),
+        ), (
+            datetime(2018, 5, 15),
+            datetime(2018, 5, 30),
         ), (
             datetime(2018, 6, 1),
             datetime(2018, 6, 30)
@@ -729,6 +741,7 @@ def test_occasion_durations_query(session, owner):
     periods.add(
         title="2016",
         prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
+        booking=(datetime(2015, 12, 31), datetime(2015, 12, 31)),
         execution=(datetime(2016, 1, 1), datetime(2016, 12, 31)),
         active=True
     )
@@ -813,6 +826,7 @@ def test_occasion_ages(session, owner):
     periods.add(
         title="2016",
         prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
+        booking=(datetime(2015, 12, 31), datetime(2015, 12, 31)),
         execution=(datetime(2016, 1, 1), datetime(2016, 12, 31)),
         active=True
     )
@@ -932,6 +946,7 @@ def test_booking_collection(session, owner):
         period=periods.add(
             title="Autumn 2016",
             prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+            booking=(datetime(2016, 9, 30), datetime(2016, 9, 30)),
             execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
             active=True
         )
@@ -965,6 +980,7 @@ def test_star_nobble_booking(session, owner):
     autumn = periods.add(
         title="Autumn 2016",
         prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        booking=(datetime(2016, 9, 30), datetime(2016, 9, 30)),
         execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
         active=True
     )
@@ -1070,6 +1086,7 @@ def test_booking_period_id_reference(session, owner):
     period = periods.add(
         title="Autumn 2016",
         prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        booking=(datetime(2016, 9, 30), datetime(2016, 9, 30)),
         execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
         active=True
     )
@@ -1098,6 +1115,7 @@ def test_booking_period_id_reference(session, owner):
     new = periods.add(
         title="Autumn 2016",
         prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        booking=(datetime(2016, 9, 30), datetime(2016, 9, 30)),
         execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
         active=False
     )
@@ -1121,6 +1139,7 @@ def test_happiness(session, owner):
     period = periods.add(
         title="Autumn 2016",
         prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        booking=(datetime(2016, 9, 30), datetime(2016, 9, 30)),
         execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
         active=True
     )
@@ -1266,6 +1285,7 @@ def test_attendees_count(session, owner):
     period = periods.add(
         title="Autumn 2016",
         prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        booking=(datetime(2016, 9, 30), datetime(2016, 9, 30)),
         execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
         active=True
     )
@@ -1371,6 +1391,7 @@ def test_accept_booking(session, owner):
     period = periods.add(
         title="Autumn 2016",
         prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        booking=(datetime(2016, 9, 30), datetime(2016, 9, 30)),
         execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
         active=True,
     )
@@ -1567,6 +1588,7 @@ def test_booking_limit_exemption(session, owner):
     period = periods.add(
         title="Autumn 2016",
         prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        booking=(datetime(2016, 9, 30), datetime(2016, 9, 30)),
         execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
         active=True,
     )
@@ -1639,6 +1661,7 @@ def test_cancel_booking(session, owner):
     period = periods.add(
         title="Autumn 2016",
         prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        booking=(datetime(2016, 9, 30), datetime(2016, 9, 30)),
         execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
         active=True,
     )
@@ -1871,7 +1894,8 @@ def test_period_phases(session):
 
     period = periods.add(
         title="Autumn 2016",
-        prebooking=(date(2016, 9, 1), date(2016, 9, 30)),
+        prebooking=(date(2016, 9, 1), date(2016, 9, 15)),
+        booking=(date(2016, 9, 15), date(2016, 9, 30)),
         execution=(date(2016, 11, 1), date(2016, 11, 30)),
         active=False,
     )
@@ -1886,8 +1910,16 @@ def test_period_phases(session):
     with freeze_time('2016-09-01'):
         assert period.phase == 'wishlist'
 
+    with freeze_time('2016-09-15'):
+        assert period.phase == 'wishlist'
+
     period.confirmed = True
-    assert period.phase == 'booking'
+
+    with freeze_time('2016-09-14'):
+        assert period.phase == 'inactive'
+
+    with freeze_time('2016-09-15'):
+        assert period.phase == 'booking'
 
     period.finalized = True
 
@@ -2091,6 +2123,7 @@ def test_confirm_period(session, owner):
     period = periods.add(
         title="Autumn 2016",
         prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        booking=(datetime(2016, 9, 30), datetime(2016, 9, 30)),
         execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
         active=True)
     period.all_inclusive = False
@@ -2160,6 +2193,7 @@ def test_cancel_occasion(session, owner):
     period = periods.add(
         title="Autumn 2016",
         prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        booking=(datetime(2016, 9, 30), datetime(2016, 9, 30)),
         execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
         active=True)
 
@@ -2388,6 +2422,7 @@ def test_prebooking_phases():
 
     period.prebooking_start = date(2017, 5, 1)
     period.prebooking_end = date(2017, 5, 2)
+    period.booking_start = date(2017, 5, 3)
 
     with freeze_time('2017-04-30 23:59:59'):
         assert period.is_prebooking_in_future
@@ -2423,6 +2458,7 @@ def test_publication_request(session, owner):
     period = periods.add(
         title="Autumn 2016",
         prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        booking=(datetime(2016, 9, 30), datetime(2016, 9, 30)),
         execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
         active=True
     )
@@ -2449,6 +2485,7 @@ def test_archive_period(session, owner):
     current_period = periods.add(
         title="Autumn 2017",
         prebooking=(datetime(2017, 9, 1), datetime(2017, 9, 30)),
+        booking=(datetime(2017, 9, 30), datetime(2017, 9, 30)),
         execution=(datetime(2017, 10, 1), datetime(2017, 10, 31)),
         active=True
     )
@@ -2456,6 +2493,7 @@ def test_archive_period(session, owner):
     future_period = periods.add(
         title="Winter 2017",
         prebooking=(datetime(2017, 11, 1), datetime(2017, 11, 30)),
+        booking=(datetime(2017, 11, 30), datetime(2017, 11, 30)),
         execution=(datetime(2017, 12, 1), datetime(2017, 12, 31)),
         active=False
     )

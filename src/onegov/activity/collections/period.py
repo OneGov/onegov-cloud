@@ -8,7 +8,7 @@ class PeriodCollection(GenericCollection):
     def model_class(self):
         return Period
 
-    def add(self, title, prebooking, execution, active=False,
+    def add(self, title, prebooking, booking, execution, active=False,
             minutes_between=0, deadline_date=None, deadline_days=None,
             cancellation_date=None, cancellation_days=None):
 
@@ -16,6 +16,8 @@ class PeriodCollection(GenericCollection):
             title=title,
             prebooking_start=prebooking[0],
             prebooking_end=prebooking[1],
+            booking_start=booking[0],
+            booking_end=booking[1],
             execution_start=execution[0],
             execution_end=execution[1],
             minutes_between=minutes_between,

@@ -697,3 +697,33 @@ def add_age_barrier_type(context):
         column=Column('age_barrier_type', Text),
         default='exact'
     )
+
+
+@upgrade_task('Add booking phase dates')
+def add_booking_phase_dates(context):
+    context.operations.drop_constraint('period_date_order', 'periods')
+
+    context.add_column_with_defaults(
+        table='periods',
+        column=Column('booking_start', Date, nullable=False),
+        default=lambda p: p.prebooking_end
+    )
+
+    context.add_column_with_defaults(
+        table='periods',
+        column=Column('booking_end', Date, nullable=False),
+        default=lambda p: p.execution_start
+    )
+
+    context.operations.create_check_constraint(
+        'period_date_order',
+        'periods',
+        """
+            prebooking_start
+            <= prebooking_end AND prebooking_end
+            <= booking_start AND booking_start
+            <= booking_end AND booking_end
+            <= execution_start AND execution_start
+            <= execution_end
+        """
+    )

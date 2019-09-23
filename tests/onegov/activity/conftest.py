@@ -61,6 +61,7 @@ def prebooking_period(collections):
     return collections.periods.add(
         title="Testperiod",
         prebooking=(s, e),
+        booking=(e + timedelta(days=1), e + timedelta(days=9)),
         execution=(e + timedelta(days=10), e + timedelta(days=20)),
         active=True
     )
@@ -78,6 +79,7 @@ def execution_period(collections):
     return collections.periods.add(
         title="Testperiod",
         prebooking=(s - timedelta(days=20), s - timedelta(days=10)),
+        booking=(s - timedelta(days=9), s - timedelta(days=1)),
         execution=(s, e),
         active=True
     )
@@ -95,6 +97,7 @@ def inactive_period(collections):
     return collections.periods.add(
         title="Testperiod",
         prebooking=(s - timedelta(days=20), s - timedelta(days=10)),
+        booking=(s - timedelta(days=9), s - timedelta(days=1)),
         execution=(s, e),
         active=False
     )

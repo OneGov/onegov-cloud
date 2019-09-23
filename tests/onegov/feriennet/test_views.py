@@ -164,6 +164,8 @@ def test_activity_filter_tags(client, scenario):
     scenario.add_period(
         prebooking_start=datetime(2015, 1, 1),
         prebooking_end=datetime(2015, 12, 31),
+        booking_start=datetime(2015, 12, 31),
+        booking_end=datetime(2015, 12, 31),
         execution_start=datetime(2016, 1, 1),
         execution_end=datetime(2016, 12, 31)
     )
@@ -450,6 +452,8 @@ def test_occasions_form(client, scenario):
     scenario.add_period(
         prebooking_start=date(2016, 9, 1),
         prebooking_end=date(2016, 9, 30),
+        booking_start=date(2016, 9, 30),
+        booking_end=date(2016, 9, 30),
         execution_start=date(2016, 10, 1),
         execution_end=date(2016, 10, 31),
         deadline_date=date(2016, 10, 1)
@@ -515,6 +519,8 @@ def test_multiple_dates_occasion(client, scenario):
     scenario.add_period(
         prebooking_start=date(2016, 9, 1),
         prebooking_end=date(2016, 9, 30),
+        booking_start=date(2016, 9, 30),
+        booking_end=date(2016, 9, 30),
         execution_start=date(2016, 10, 1),
         execution_end=date(2016, 10, 31),
         deadline_date=date(2016, 10, 1)
@@ -575,6 +581,8 @@ def test_execution_period(client, scenario):
     scenario.add_period(
         prebooking_start=date(2016, 9, 1),
         prebooking_end=date(2016, 9, 30),
+        booking_start=date(2016, 9, 30),
+        booking_end=date(2016, 9, 30),
         execution_start=date(2016, 10, 1),
         execution_end=date(2016, 10, 1),
         deadline_date=date(2016, 10, 1)
@@ -719,8 +727,8 @@ def test_enroll_child(client, scenario):
     # prevent booking over the limit
     with scenario.update():
         scenario.latest_period.all_inclusive = True
-        scenario.latest_period.confirmed = True
         scenario.latest_period.max_bookings_per_attendee = 1
+        scenario.latest_period.confirm_and_start_booking_phase()
 
         scenario.add_activity(title="Another Retreat", state='accepted')
         scenario.add_occasion()
@@ -905,7 +913,7 @@ def test_confirmed_booking_view(scenario, client):
 
     # When the period is confirmed, the state is shown
     with scenario.update():
-        scenario.latest_period.confirmed = True
+        scenario.latest_period.confirm_and_start_booking_phase()
 
     page = client.get('/my-bookings')
     assert "Gebucht" in page
@@ -1117,6 +1125,9 @@ def test_reactivate_cancelled_booking(client, scenario):
     page.form['confirm'] = 'yes'
     page.form['sure'] = 'yes'
     page.form.submit()
+
+    with scenario.update():
+        scenario.latest_period.confirm_and_start_booking_phase()
 
     client.get('/my-bookings').click("Buchung stornieren")
     page = client.get('/activity/foobar').click('Anmelden')
@@ -1670,7 +1681,7 @@ def test_main_views_without_period(client):
 
 
 def test_book_alternate_occasion_regression(client, scenario):
-    scenario.add_period(title="Ferienpass", phase='booking', confirmed=True)
+    scenario.add_period(title="Ferienpass", confirmed=True)
     scenario.add_attendee(birth_date=date.today() - timedelta(days=8 * 360))
 
     scenario.add_activity(title="Fishing", state='accepted')

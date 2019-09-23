@@ -230,12 +230,17 @@ def change_yubikey(username, yubikey):
 
         nonlocal yubikey
         yubikey = (yubikey or getpass("Enter yubikey: ")).strip()[:12]
+        yubikey = yubikey.strip()
 
         user = users.by_username(username)
-        user.second_factor = {
-            'type': 'yubikey',
-            'data': yubikey
-        }
+
+        if yubikey:
+            user.second_factor = {
+                'type': 'yubikey',
+                'data': yubikey
+            }
+        else:
+            user.second_factor = None
 
         click.secho("{}'s yubikey was changed".format(username), fg='green')
 

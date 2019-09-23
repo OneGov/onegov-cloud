@@ -87,7 +87,7 @@ def parse_panachage_headers(csv):
     return headers
 
 
-def parse_panachage_results(line, errors, panachage):
+def parse_panachage_results(line, errors, panachage, panachage_headers):
     # Each line (candidate) contains a column for each list from where this
     # candidate got votes. The column with the own list doesn't contain the
     # votes. The name of the columns are '{Listen-Nr} {Parteikurzbezeichnung}'
@@ -95,7 +95,9 @@ def parse_panachage_results(line, errors, panachage):
         target = validate_list_id(line, 'liste_id')
         panachage.setdefault(target, {})
 
-        for list_name, source in panachage['headers'].items():
+        for list_name, source in panachage_headers.items():
+            if source == target:
+                continue
             panachage[target].setdefault(source, 0)
             # list_name is csv.as_valid_identifier(original_header)
             panachage[target][source] += validate_integer(line, list_name)
@@ -189,6 +191,7 @@ def import_election_wabsti_proporz(
     subconnections = {}
     results = {}
     entities = principal.entities[election.date.year]
+    panachage_headers = None
 
     # This format has one candiate per entity per line
     filename = _("Results")
@@ -208,7 +211,8 @@ def import_election_wabsti_proporz(
         else:
             error = None
     if not error:
-        panachage = {'headers': parse_panachage_headers(csv)}
+        panachage = {}
+        panachage_headers = parse_panachage_headers(csv)
         for line in csv.lines:
             line_errors = []
 
@@ -218,7 +222,8 @@ def import_election_wabsti_proporz(
             candidate_result = parse_candidate_result(line, line_errors)
             list = parse_list(line, line_errors)
             list_result = parse_list_result(line, line_errors)
-            parse_panachage_results(line, line_errors, panachage)
+            parse_panachage_results(
+                line, line_errors, panachage, panachage_headers)
 
             # Skip expats if not enabled
             if result and result.entity_id == 0 and not election.expats:
@@ -416,6 +421,14 @@ def import_election_wabsti_proporz(
         else:
             if len(results) != 1:
                 errors.append(FileImportError(_("No clear district")))
+
+    if panachage_headers:
+        for list_id in panachage_headers.values():
+            if not list_id == '999' and list_id not in lists.keys():
+                errors.append(FileImportError(
+                    _("Panachage results id ${id} not in list_id's",
+                      mapping={'id': list_id})))
+                break
 
     if errors:
         return errors

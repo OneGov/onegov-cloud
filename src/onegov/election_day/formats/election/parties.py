@@ -2,7 +2,7 @@ from onegov.ballot import PanachageResult
 from onegov.ballot import PartyResult
 from onegov.election_day import _
 from onegov.election_day.formats.common import FileImportError, \
-    validate_integer
+    validate_integer, validate_list_id
 from onegov.election_day.formats.common import load_csv
 from re import match
 from sqlalchemy.orm import object_session
@@ -12,12 +12,13 @@ from onegov.election_day.import_export.mappings import \
     ELECTION_PARTY_HEADERS
 
 
-def parse_party_result(line, errors, results, totals, parties, election_year):
+def parse_party_result(
+        line, errors, party_results, totals, parties, election_year):
     try:
         year = validate_integer(line, 'year', default=election_year)
         total_votes = validate_integer(line, 'total_votes')
         name = line.name or ''
-        id_ = validate_integer(line, 'id')
+        id_ = validate_list_id(line, 'id')
         color = line.color or (
             '#0571b0' if year == election_year else '#999999'
         )
@@ -36,10 +37,10 @@ def parse_party_result(line, errors, results, totals, parties, election_year):
         if year == election_year:
             parties[id_] = name
 
-        if key in results:
+        if key in party_results:
             errors.append(_("${name} was found twice", mapping={'name': key}))
         else:
-            results[key] = PartyResult(
+            party_results[key] = PartyResult(
                 id=uuid4(),
                 year=year,
                 total_votes=total_votes,
@@ -57,24 +58,20 @@ def parse_panachage_headers(csv):
             continue
         parts = header.split('panachage_votes_from_')
         if len(parts) > 1:
-            try:
-                # FIXME: In db, target and is list.name, convert to int?
-                # target resp. So convert this  to an int ?
-                number = int(parts[1])
-                headers[csv.as_valid_identifier(header)] = number
-            except ValueError:
-                pass
+            headers[csv.as_valid_identifier(header)] = parts[1]
     return headers
 
 
 def parse_panachage_results(line, errors, results, headers, election_year):
     try:
-        target = validate_integer(line, 'id')
+        target = validate_list_id(line, 'id')
         year = validate_integer(line, 'year', default=election_year)
         if target not in results and year == election_year:
             results[target] = {}
-            for name, index in headers.items():
-                results[target][index] = validate_integer(line, name)
+            for col_name, source in headers.items():
+                if source == target:
+                    continue
+                results[target][source] = validate_integer(line, col_name)
 
     except ValueError as e:
         errors.append(e.args[0])
@@ -96,6 +93,7 @@ def import_party_results(election, file, mimetype):
     party_results = {}
     party_totals = {}
     panachage_results = {}
+    panachage_headers = None
 
     # The party results file has one party per year per line (but only
     # panachage results in the year of the election)
@@ -124,6 +122,13 @@ def import_party_results(election, file, mimetype):
                         for err in line_errors
                     )
 
+    if panachage_headers:
+        for list_id in panachage_headers.values():
+            if not list_id == '999' and list_id not in parties.keys():
+                errors.append(FileImportError(
+                    _("Panachage results ids and id not consistent")))
+                break
+
     if errors:
         return errors
 
@@ -139,7 +144,7 @@ def import_party_results(election, file, mimetype):
     for target in panachage_results:
         if target in parties:
             for source, votes in panachage_results[target].items():
-                if source in parties or source == 999:
+                if source in parties or source == '999':
                     election.panachage_results.append(
                         PanachageResult(
                             owner=election.id,

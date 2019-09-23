@@ -430,7 +430,7 @@ def test_view_election_connections(election_day_app_gr):
     assert '/election/proporz-election/connections-data' in chart
 
 
-def test_view_election_lists_panachage(election_day_app_gr):
+def test_view_election_lists_panachage_majorz(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -448,6 +448,13 @@ def test_view_election_lists_panachage(election_day_app_gr):
     assert chart.status_code == 200
     assert '/election/majorz-election/lists-panachage-data' in chart
 
+
+def test_view_election_lists_panachage_proporz(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
     upload_proporz_election(client)
 
     main = client.get('/election/proporz-election/lists-panachage')
@@ -460,8 +467,13 @@ def test_view_election_lists_panachage(election_day_app_gr):
     assert 'FDP' in nodes
     assert 'CVP' in nodes
 
-    links = [link['value'] for link in data['links']]
-    assert all((i in links for i in (1, 2, 4, 7)))
+    # value is the thickness of the line
+    links = sorted([(r['target'], r['value']) for r in data['links']])
+    # List 1 gets 1 vote from list 2
+    # List 2 gets 2 votes from list 1
+    # 4 represents target index of list 2 in nodes on the right side
+    # 3 represents target index of list 1 in nodes on the right side
+    assert links == [(3, 1), (4, 2)]
 
 
 def test_view_election_parties_panachage(election_day_app_gr):

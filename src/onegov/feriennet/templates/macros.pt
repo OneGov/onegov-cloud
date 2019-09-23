@@ -487,13 +487,28 @@
     </div>
 
     <div tal:condition="period.is_currently_prebooking"
-         class="hint hint-prebooking" i18n:translate>
+         class="hint hint-prebooking active" i18n:translate>
             Prebooking is now active until <strong tal:content="layout.format_date(period.prebooking_end, 'date_long')" i18n:name="date" />.
     </div>
 
-    <div tal:condition="period.is_prebooking_in_past and not period.finalized"
-         class="hint hint-prebooking" i18n:translate>
+    <div tal:condition="period.is_prebooking_in_past and period.confirmed and not period.finalized"
+         class="hint hint-prebooking finish" i18n:translate>
             Prebooking has ended.
+    </div>
+
+    <div tal:condition="period.is_booking_in_future"
+         class="hint hint-booking" i18n:translate>
+            Booking begins on <strong tal:content="layout.format_date(period.booking_start, 'date_long')" i18n:name="date" />.
+    </div>
+
+    <div tal:condition="period.is_currently_booking"
+         class="hint hint-booking active" i18n:translate>
+            Booking is now active until <strong tal:content="layout.format_date(period.booking_end, 'date_long')" i18n:name="date" />.
+    </div>
+
+    <div tal:condition="period.is_booking_in_past and period.confirmed and not period.finalized"
+         class="hint hint-booking finish" i18n:translate>
+            Booking has ended.
     </div>
 
     <div tal:condition="period.finalized"
@@ -503,7 +518,7 @@
 
     <div tal:condition="not period.finalized and period.confirmed and period.deadline_date"
          class="hint hint-deadline" i18n:translate>
-            The deadline for last-minute bookings is the <tal:b i18n:name="date">${layout.format_date(period.deadline_date, 'date')}</tal:b>.
+            The deadline for last-minute bookings is the <strong i18n:name="date">${layout.format_date(period.deadline_date, 'date_long')}</strong>.
     </div>
 
     <div tal:condition="not period.finalized and period.confirmed and period.deadline_days"
@@ -513,7 +528,7 @@
 
     <div tal:condition="not period.finalized and period.confirmed and period.cancellation_date"
          class="hint hint-cancellation" i18n:translate>
-            The deadline for last-minute cancellations is the <tal:b i18n:name="date">${layout.format_date(period.cancellation_date, 'date')}</tal:b>.
+            The deadline for last-minute cancellations is the <strong i18n:name="date">${layout.format_date(period.cancellation_date, 'date_long')}</strong>.
     </div>
 
     <div tal:condition="not period.finalized and period.confirmed and period.cancellation_days"

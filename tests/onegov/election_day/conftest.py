@@ -223,9 +223,7 @@ def import_elections_internal(
             errors = function_mapping[election_type](
                 election, principal_obj, BytesIO(csv_file), mimetype,
             )
-            print_errors(errors)
-            assert not errors
-            loaded_elections[election.title] = election
+            loaded_elections[election.title] = (election, errors)
     print(tar_fp)
     assert loaded_elections, 'No election was loaded'
     return loaded_elections
@@ -312,10 +310,7 @@ def import_elections_wabstic(
                 **files_input,
                 **mimetypes
             )
-            print_errors(errors)
-            assert not errors
-            assert election.has_results
-            loaded_elections[election.title] = election
+            loaded_elections[election.title] = (election, errors)
     assert loaded_elections, 'No election was loaded'
     return loaded_elections
 
@@ -445,9 +440,7 @@ def import_elections_wabsti(
                 )
 
             print_errors(errors)
-            assert not errors
-            assert election.has_results
-            loaded_elections[election.title] = election
+            loaded_elections[election.title] = (election, errors)
     assert loaded_elections, 'No election was loaded'
     return loaded_elections
 
@@ -477,13 +470,13 @@ def import_votes_internal(
     api = 'internal'
     mimetype = 'text/plain'
 
-    model_mapping = dict(normal=Vote, complex=ComplexVote)
+    model_mapping = dict(simple=Vote, complex=ComplexVote)
     loaded_votes = OrderedDict()
 
     tar_fp = get_tar_file_path(
         domain, principal, api, 'vote', vote_type)
     with tarfile.open(tar_fp, 'r:gz') as f:
-        # According to docs, both methods return the same ordering
+        # According to docs, both methods return the same ordering (zip..)
         members = f.getmembers()
         names = [fn.split('.')[0] for fn in f.getnames()]
 
@@ -513,9 +506,7 @@ def import_votes_internal(
             errors = import_vote_internal(
                 vote, principal_obj, BytesIO(csv_file), mimetype,
             )
-            print_errors(errors)
-            assert not errors
-            loaded_votes[vote.title] = vote
+            loaded_votes[vote.title] = (vote, errors)
     print(tar_fp)
     assert loaded_votes, 'No vote was loaded'
     return loaded_votes
@@ -537,7 +528,7 @@ def import_votes_wabsti(
 
     api = 'wabsti'
     mimetype = 'text/plain'
-    model_mapping = dict(normal=Vote, complex=ComplexVote)
+    model_mapping = dict(simple=Vote, complex=ComplexVote)
 
     loaded_votes = OrderedDict()
     tar_fp = get_tar_file_path(
@@ -573,15 +564,11 @@ def import_votes_wabsti(
             session.flush()
             errors = import_vote_wabsti(
                 vote, principal_obj, vote_number, BytesIO(csv_file), mimetype)
-            print_errors(errors)
-            assert not errors
-            loaded_votes[vote.title] = vote
+            loaded_votes[vote.title] = (vote, errors)
 
     print(tar_fp)
     assert loaded_votes, 'No vote was loaded'
     return loaded_votes
-
-    pass
 
 
 @pytest.fixture(scope="function")
@@ -591,7 +578,7 @@ def import_test_datasets(session):
     election_types = ('majorz', 'proporz')
     apis = ('internal', 'wabstic', 'wabsti')
     domains = ('federation', 'canton', 'region', 'municipality')
-    vote_types = ('normal', 'complex')
+    vote_types = ('simple', 'complex')
 
     def _import_test_datasets(
             api_format,
@@ -607,27 +594,18 @@ def import_test_datasets(session):
             election_number='1',
             election_district=None,
             municipality=None,
-            vote_type='normal',
+            vote_type='simple',
             vote=None,
             vote_number=1,
+            app_session=None
     ):
+        if not app_session:
+            app_session = session
+
         assert domain in domains
         assert api_format in apis, 'apis not defined or not in available apis'
         assert principal, 'Define a single principal'
         assert model in models, 'Model not defined or not in available models'
-
-        # if just_return_csv:
-        #     tar_fp = get_tar_file_path(
-        #         domain, principal,
-        #         api_format,
-        #         model,
-        #         vote_type or election_type
-        #     )
-        #      with tarfile.open(tar_fp, 'r:gz') as f:
-        #         names = f.getnames()
-        #         if '/' in names[0]:
-        #             print(names[0])
-        #
 
         if not election:
             assert domain in domains, f'Possible domains: {domains}'
@@ -646,7 +624,7 @@ def import_test_datasets(session):
                     election_type,
                     principal,
                     domain,
-                    session,
+                    app_session,
                     number_of_mandates=number_of_mandates,
                     date_=date_,
                     dataset_name=dataset_name,
@@ -660,7 +638,7 @@ def import_test_datasets(session):
                     election_type,
                     principal,
                     domain,
-                    session,
+                    app_session,
                     number_of_mandates=number_of_mandates,
                     date_=date_,
                     dataset_name=dataset_name,
@@ -676,7 +654,7 @@ def import_test_datasets(session):
                     election_type,
                     principal,
                     domain,
-                    session,
+                    app_session,
                     number_of_mandates=number_of_mandates,
                     date_=date_,
                     dataset_name=dataset_name,
@@ -689,12 +667,12 @@ def import_test_datasets(session):
                 all_loaded.update(elections)
 
         elif model == 'vote' and api_format == 'internal':
-            if vote_type == 'normal':
+            if vote_type == 'simple':
                 votes = import_votes_internal(
                     vote_type,
                     principal,
                     domain,
-                    session,
+                    app_session,
                     date_,
                     dataset_name,
                     expats,
@@ -705,12 +683,12 @@ def import_test_datasets(session):
             else:
                 raise NotImplementedError
         elif model == 'vote' and api_format == 'wabsti':
-            # This function is used for normal and complex votes
+            # This function is used for simple and complex votes
             votes = import_votes_wabsti(
                 vote_type,
                 principal,
                 domain,
-                session,
+                app_session,
                 date_,
                 dataset_name,
                 expats,
@@ -727,3 +705,21 @@ def import_test_datasets(session):
         return all_loaded
 
     return _import_test_datasets
+
+
+@pytest.fixture(scope="function")
+def majorz_election(import_test_datasets):
+    def _majorz_election(session, canton='gr'):
+        return import_test_datasets(
+            'internal',
+            'election',
+            canton,
+            'federation',
+            election_type='majorz',
+            number_of_mandates=2,
+            date_=date(2015, 1, 1),
+            dataset_name='majorz-election-gr',
+            expats=False,
+            app_session=session
+        )
+    return _majorz_election

@@ -436,6 +436,13 @@ ul.tags {
 
 .hints {
     .hint-prebooking::before { @include icon('\f133'); }
+    .hint-prebooking.active::before { @include icon('\f274'); }
+    .hint-prebooking.finish::before { @include icon('\f046'); }
+
+    .hint-booking::before { @include icon('\f133'); }
+    .hint-booking.active::before { @include icon('\f274'); }
+    .hint-booking.finish::before { @include icon('\f046'); }
+
     .hint-max-activities::before { @include icon('\f2c3'); }
     .hint-costs::before { @include icon('\f0d6'); }
     .hint-favorites::before { @include icon('\f005'); }
@@ -768,6 +775,25 @@ ul.tags {
         vertical-align: top;
     }
 
+    .period-dates {
+        font-size: .875rem;
+        margin-bottom: -.5rem;
+
+        dt {
+            font-weight: normal;
+        }
+
+        dd.finished::before {
+            @include icon('\f046');
+            margin-right: .5ex;
+        }
+
+        dd:not(.finished)::before {
+            @include icon('\f096');
+            margin-right: .5ex;
+        }
+    }
+
     .active {
         td {
             color: $jet;
@@ -775,6 +801,10 @@ ul.tags {
             &:first-child {
                 border-left: 10px solid $primary-color;
             }
+        }
+
+        .period-dates dt {
+            font-weight: bold;
         }
     }
 }

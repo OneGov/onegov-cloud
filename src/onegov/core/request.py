@@ -16,6 +16,7 @@ from more.webassets.core import IncludeRequest
 from morepath.authentication import NO_IDENTITY
 from onegov.core import utils
 from onegov.core.crypto import random_token
+from ua_parser import user_agent_parser
 from webob.exc import HTTPForbidden
 from wtforms.csrf.session import SessionCSRF
 
@@ -251,12 +252,28 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
                 @self.after
                 def store_session(response):
+
+                    # Safari 12.x has a nasty bug, where same-site will lead
+                    # to a failure to safe cookies in certain scenarios. As a
+                    # work around, we do not send the same-site directive to
+                    # this specific Safari release. At the point of this
+                    # writing this version is about to be phased out, so this
+                    # has only a minor security impact.
+                    #
+                    # See https://bugs.webkit.org/show_bug.cgi?id=198181
+                    ua = self.agent['user_agent']
+
+                    if ua['family'] == 'Safari' and ua['major'] == '12':
+                        samesite = None
+                    else:
+                        samesite = self.app.same_site_cookie_policy
+
                     response.set_cookie(
                         'session_id',
                         self.cookies['session_id'],
                         secure=self.app.identity_secure,
                         httponly=True,
-                        samesite=self.app.same_site_cookie_policy
+                        samesite=samesite
                     )
 
         return self.app.modules.browser_session.BrowserSession(
@@ -422,6 +439,11 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
     def is_logged_in(self):
         """ Returns True if the current request is logged in at all. """
         return self.identity is not NO_IDENTITY
+
+    @cached_property
+    def agent(self):
+        """ Returns the user agent, parsed by ua-parser. """
+        return user_agent_parser.Parse(self.user_agent or "")
 
     def has_permission(self, model, permission):
         """ Returns True if the current user has the given permission on the

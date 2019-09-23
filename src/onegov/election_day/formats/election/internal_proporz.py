@@ -113,15 +113,17 @@ def parse_panachage_headers(csv):
     return headers
 
 
-def parse_panachage_results(line, errors, panachage):
+def parse_panachage_results(line, errors, panachage, panachage_headers):
     try:
         target = validate_list_id(
             line, 'list_id', treat_empty_as_default=False)
         if target not in panachage:
             panachage[target] = {}
-            for name, index in panachage['headers'].items():
-                panachage[target][index] = validate_integer(
-                    line, name)
+            for col_name, source in panachage_headers.items():
+                if source == target:
+                    continue
+                panachage[target][source] = validate_integer(
+                    line, col_name, treat_none_as_default=False)
 
     except ValueError as e:
         errors.append(e.args[0])
@@ -163,23 +165,17 @@ def parse_candidate_result(line, errors):
         )
 
 
-def parse_subconnection_name(parent_id, id):
-    # sesam provides subconnection 1 of parent connection 3 as 31
-    if len(id) <= len(parent_id):
-        return id
-    return id.replace(parent_id, '', 1) or id
-
 def parse_connection(line, errors, election_id):
     subconnection_id = None
     try:
         connection_id = line.list_connection
         parent_connection_id = line.list_connection_parent
-    except ValueError:
-        errors.append(_("Invalid list connection values"))
-    else:
         if parent_connection_id:
             subconnection_id = connection_id
             connection_id = parent_connection_id
+    except ValueError:
+        errors.append(_("Invalid list connection values"))
+    else:
         connection = dict(
             id=uuid4(),
             election_id=election_id,
@@ -223,7 +219,8 @@ def import_election_internal_proporz(election, principal, file, mimetype):
     connections = {}
     subconnections = {}
     results = {}
-    panachage = {'headers': parse_panachage_headers(csv)}
+    panachage = {}
+    panachage_headers = parse_panachage_headers(csv)
     entities = principal.entities[election.date.year]
     election_id = election.id
 
@@ -244,7 +241,8 @@ def import_election_internal_proporz(election, principal, file, mimetype):
         connection, subconnection = parse_connection(
             line, line_errors, election_id
         )
-        parse_panachage_results(line, line_errors, panachage)
+        parse_panachage_results(
+            line, line_errors, panachage, panachage_headers)
 
         # Skip expats if not enabled
         if result and result['entity_id'] == 0 and not election.expats:
@@ -294,6 +292,14 @@ def import_election_internal_proporz(election, principal, file, mimetype):
     if not errors and not results:
         errors.append(FileImportError(_("No data found")))
 
+    if panachage_headers:
+        for list_id in panachage_headers.values():
+            if not list_id == '999' and list_id not in lists.keys():
+                errors.append(FileImportError(
+                    _("Panachage results id ${id} not in list_id's",
+                      mapping={'id': list_id})))
+                break
+
     # Check if all results are from the same district if regional election
     districts = set([result['district'] for result in results.values()])
     if election.domain == 'region' and election.distinct:
@@ -336,7 +342,6 @@ def import_election_internal_proporz(election, principal, file, mimetype):
     election.status = status
     result_uids = {r['entity_id']: r['id'] for r in results.values()}
     list_uids = {r['list_id']: r['id'] for r in lists.values()}
-
     session = object_session(election)
     # FIXME: Sub-Sublists are also possible
     session.bulk_insert_mappings(ListConnection, connections.values())
@@ -350,7 +355,7 @@ def import_election_internal_proporz(election, principal, file, mimetype):
             votes=votes,
             owner=election_id
         )
-        for list_id in filter(lambda x: x != 'headers', panachage)
+        for list_id in panachage
         for source, votes in panachage[list_id].items()
     ))
     session.bulk_insert_mappings(Candidate, candidates.values())

@@ -12,6 +12,8 @@ from onegov.election_day.models import Canton, Municipality
 
 
 def print_errors(errors):
+    if not errors:
+        return
     error_list = sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
     ])
@@ -383,6 +385,7 @@ def upload_proporz_election(client, create=True, canton='gr',
             f'{status},1711,True,56,32,1,0,1,2,2,CVP,1,2,0,5,'
             '201,False,Caluori,Corina,2,,2,0\n'
         )
+
     csv = csv.encode('utf-8')
 
     upload = client.get('/election/proporz-election/upload').follow()

@@ -158,6 +158,7 @@ def new_period(self, request, form):
         period = self.add(
             title=form.title.data,
             prebooking=form.prebooking,
+            booking=form.booking,
             execution=form.execution,
             minutes_between=form.minutes_between.data,
             active=False)

@@ -9,7 +9,6 @@ from onegov.user.models.user import User
 from translationstring import TranslationString
 from typing import Dict
 from typing import Optional
-from ua_parser import user_agent_parser
 from webob import Response
 from webob.exc import HTTPClientError
 
@@ -212,14 +211,13 @@ class LDAPKerberosProvider(AuthenticationProvider, metadata=ProviderMetadata(
         LDAP/Kerberos, but for them it's basically their local OS login).
 
         """
-        agent = user_agent_parser.Parse(request.user_agent or "")
-        agent_os = agent['os']['family']
+        user_os = request.agent['os']['family']
 
-        if agent_os == "Other":
+        if user_os == "Other":
             return _("Login with operating system")
 
         return _("Login with **${operating_system}**", mapping={
-            'operating_system': agent_os
+            'operating_system': user_os
         })
 
     def authenticate_request(self, request):

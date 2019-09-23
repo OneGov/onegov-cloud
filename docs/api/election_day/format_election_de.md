@@ -73,7 +73,7 @@ Name|Beschreibung
 `entity_blank_votes`|Anzahl leerer Stimmen der Einheit.
 `entity_invalid_votes`|Anzahl ungültige Stimmen der Einheit. Null falls Proporzwahl.
 `list_name`|Name der Liste des Kandidierenden. Nur bei Proporzwahlen.
-`list_id`|ID der Liste des Kandidierenden. Nur bei Proporzwahlen.
+`list_id`|ID der Liste des Kandidierenden. Nur bei Proporzwahlen. Kann alphanumerisch oder numerisch sein.
 `list_number_of_mandates`|Gesamte Anzahl der Mandate der Liste. Nur bei Proporzwahlen.
 `list_votes`|Anzahl der Listenstimmen pro Gemeinde. Nur bei Proporzwahlen.
 `list_connection`|ID der Listenverbindung oder Unterlistenverbindung (wenn list_connetion_parent vorhanden). Nur bei Proporzwahlen. 
@@ -91,7 +91,7 @@ Die Resultate können Panaschierdaten enthalten, indem pro Liste eine Spalte hin
 
 Name|Beschreibung
 ---|---
-`panachage_votes_from_list_{XX}`|Die Anzahl Stimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
+`panachage_votes_from_list_{XX}`|Die Anzahl Stimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.  
 
 #### Temporäre Resultate
 
@@ -99,10 +99,10 @@ Einheiten gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bed
 - `counted = false`
 - die Einheit ist nicht in den Resultaten enthalten
 
-Falls der Status
-- `interim` ist, gilt die Wahl als noch nicht abgeschlossen
-- `final` ist, gilt die Wahl als abgeschlossen
-- `unknown` ist, gilt die Wahl als abgeschlossen, falls alle (erwarteten) Einheiten ausgezählt sind
+Für den Status
+- `interim` gilt die Wahl als noch nicht abgeschlossen
+- `final` gilt die Wahl als abgeschlossen
+- `unknown` gilt die Wahl als abgeschlossen, falls alle (erwarteten) Einheiten ausgezählt sind
 
 #### Vorlage
 
@@ -136,7 +136,7 @@ Zudem werden die leeren und ungültigen Stimmen auch als Kandidaten erfasst mitt
 
 #### Spalten Kandidatenresultate
 
-Da das Datenformat nicht zwingend Informationen über die gewählten Kandidaten liefert, können diese in einer zweiten Tabelle mitgeliefert werden. Jede Zeile enthält dabei eine gewählten Kandidaten mit den folgenden Spalten:
+Da das Datenformat nicht zwingend Informationen über die gewählten Kandidaten liefert, können diese in einer zweiten Tabelle mitgeliefert werden. Jede Zeile enthält dabei einen gewählten Kandidaten mit den folgenden Spalten:
 
 Name|Beschreibung
 ---|---

@@ -66,7 +66,7 @@ def test_browse_matching(browser, scenario):
 
     # verify the period's state
     browser.visit('/periods')
-    assert browser.is_text_present("Abgeschlossen")
+    assert 'finished prebooking' in browser.html
 
 
 def test_browse_billing(browser, scenario, postgres):

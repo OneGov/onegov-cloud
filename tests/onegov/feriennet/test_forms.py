@@ -90,6 +90,7 @@ def test_notification_template_send_form(session):
     period = periods.add(
         title="Ferienpass 2016",
         prebooking=prebooking,
+        booking=(prebooking[1], execution[0]),
         execution=execution,
         active=True
     )

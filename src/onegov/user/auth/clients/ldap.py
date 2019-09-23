@@ -3,7 +3,7 @@ import socket
 from attr import attrs, attrib
 from cached_property import cached_property
 from contextlib import suppress
-from ldap3 import Connection, Server, NONE
+from ldap3 import Connection, Server, NONE, RESTARTABLE
 from ldap3.core.exceptions import LDAPCommunicationError
 from time import sleep
 
@@ -70,7 +70,8 @@ class LDAPClient():
         return Connection(
             server=Server(self.url, get_info=NONE),
             read_only=True,
-            auto_bind=False
+            auto_bind=False,
+            client_strategy=RESTARTABLE,
         )
 
     def try_configuration(self):

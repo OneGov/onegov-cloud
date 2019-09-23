@@ -215,7 +215,9 @@ def actions_by_booking(layout, period, booking):
                         )
                     )
 
-    if period.wishlist_phase or booking.state in DELETABLE_STATES:
+    if period.wishlist_phase or (
+            booking.state in DELETABLE_STATES and not period.finalized):
+
         label = (
             period.wishlist_phase
             and _("Remove wish")
@@ -245,7 +247,7 @@ def actions_by_booking(layout, period, booking):
             )
         ))
 
-    if period.booking_phase and booking.state == 'accepted':
+    if period.active and period.confirmed and booking.state == 'accepted':
         if layout.request.is_admin:
             may_cancel = True
         elif not booking.occasion.is_past_cancellation(layout.today()):

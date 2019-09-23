@@ -140,7 +140,7 @@ def get_lists_panachage_data(election, request):
     chart.
 
     """
-
+    # Fixme: Rewrite this function, it is very confusing what is does and why
     if election.type == 'majorz':
         return {}
 
@@ -152,19 +152,19 @@ def get_lists_panachage_data(election, request):
     nodes = OrderedDict()
     nodes['left.999'] = {'name': blank}
     for list_ in election.lists.order_by(List.name):
-        nodes['left.{}'.format(list_.list_id)] = {'name': list_.name}
+        nodes[f'left.{list_.list_id}'] = {'name': list_.name}
     for list_ in election.lists:
-        nodes['right.{}'.format(list_.list_id)] = {'name': list_.name}
+        nodes[f'right.{list_.list_id}'] = {'name': list_.name}
     node_keys = list(nodes.keys())
 
     links = []
     for list_target in election.lists:
-        target = node_keys.index('right.{}'.format(list_target.list_id))
+        target = node_keys.index(f'right.{list_target.list_id}')
         remaining = list_target.votes - sum(
             [r.votes for r in list_target.panachage_results]
         )
         for result in list_target.panachage_results:
-            source = node_keys.index('left.{}'.format(result.source))
+            source = node_keys.index(f'left.{result.source}')
             votes = result.votes
             if list_target.list_id == result.source:
                 votes += remaining
