@@ -294,7 +294,10 @@ def import_election_internal_proporz(election, principal, file, mimetype):
         errors.append(FileImportError(_("No data found")))
 
     if panachage_headers:
-        pass
+        for list_id in panachage_headers.values():
+            if not list_id == '999' and list_id not in lists.keys():
+                errors.append(FileImportError(
+                    _("Panachage Results ids and list_id not consistent")))
 
     # Check if all results are from the same district if regional election
     districts = set([result['district'] for result in results.values()])
