@@ -223,9 +223,7 @@ def import_elections_internal(
             errors = function_mapping[election_type](
                 election, principal_obj, BytesIO(csv_file), mimetype,
             )
-            print_errors(errors)
-            assert not errors
-            loaded_elections[election.title] = election
+            loaded_elections[election.title] = (election, errors)
     print(tar_fp)
     assert loaded_elections, 'No election was loaded'
     return loaded_elections
@@ -312,10 +310,7 @@ def import_elections_wabstic(
                 **files_input,
                 **mimetypes
             )
-            print_errors(errors)
-            assert not errors
-            assert election.has_results
-            loaded_elections[election.title] = election
+            loaded_elections[election.title] = (election, errors)
     assert loaded_elections, 'No election was loaded'
     return loaded_elections
 
@@ -445,9 +440,7 @@ def import_elections_wabsti(
                 )
 
             print_errors(errors)
-            assert not errors
-            assert election.has_results
-            loaded_elections[election.title] = election
+            loaded_elections[election.title] = (election, errors)
     assert loaded_elections, 'No election was loaded'
     return loaded_elections
 
@@ -513,9 +506,7 @@ def import_votes_internal(
             errors = import_vote_internal(
                 vote, principal_obj, BytesIO(csv_file), mimetype,
             )
-            print_errors(errors)
-            assert not errors
-            loaded_votes[vote.title] = vote
+            loaded_votes[vote.title] = (vote, errors)
     print(tar_fp)
     assert loaded_votes, 'No vote was loaded'
     return loaded_votes
@@ -573,15 +564,11 @@ def import_votes_wabsti(
             session.flush()
             errors = import_vote_wabsti(
                 vote, principal_obj, vote_number, BytesIO(csv_file), mimetype)
-            print_errors(errors)
-            assert not errors
-            loaded_votes[vote.title] = vote
+            loaded_votes[vote.title] = (vote, errors)
 
     print(tar_fp)
     assert loaded_votes, 'No vote was loaded'
     return loaded_votes
-
-    pass
 
 
 @pytest.fixture(scope="function")
