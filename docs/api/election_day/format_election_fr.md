@@ -73,7 +73,7 @@ Nom|Description
 `entity_blank_votes`|Nombre de votes vides dans la municipalité.
 `entity_invalid_votes`|Nombre de votes non valides dans la municipalité. Zéro si c'est une élection Proporz.
 `list_name`|Nom de la liste de candidats. Uniquement avec les élections Proporz.
-`list_id`|Identifiant de la liste de candidats. Uniquement avec les élections Proporz.
+`list_id`|Identifiant de la liste de candidats. Uniquement avec les élections Proporz. Peut-être numeric ou alpha-numeric.
 `list_number_of_mandates`|Nombre total de mandats de la liste. Uniquement avec les élections Proporz.
 `list_votes`Nombre de votes de liste par municipalité. Uniquement avec les élections Proporz.
 `list_connection`|Identifiant de la connexion de liste ou sous-list (en cas list_connection_parent est présent). Uniquement avec les élections Proporz.

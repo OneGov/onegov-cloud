@@ -12,17 +12,18 @@ def test_import_internal_vote_1(session, import_test_datasets):
 
     principal = 'sg'
 
-    vote = import_test_datasets(
+    vote, errors = import_test_datasets(
         'internal',
         'vote',
         principal,
         'canton',
         date_=date(2017, 5, 21),
-        vote_type='normal',
+        vote_type='simple',
         dataset_name='energiegesetz-eng',
         expats=True
     )
-
+    assert not errors
+    assert not errors
     assert vote.completed
     assert vote.ballots.count() == 1
     assert round(vote.turnout, 2) == 40.91

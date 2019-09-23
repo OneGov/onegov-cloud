@@ -75,7 +75,7 @@ Name|Description
 `entity_blank_votes`|Number empty votes in municipality.
 `entity_invalid_votes`|Number invalid votes in municipality. Zero if Proporz election.
 `list_name`|Name of list of candidate. Only with Proporz elections.
-`list_id`|ID of the list of the candidate. Only with Proporz elections.
+`list_id`|ID of the list of the candidate. Only with Proporz elections. Can be numeric or alphanumeric.
 `list_number_of_mandates`|Total number of mandates of the list. Only with Proporz elections.
 `list_votes`|Number of list votes per municipality. Only with Proporz elections.
 `list_connection`|ID of the list connection or superordinate list connection (in case list_connection_parent is present). Only with Proporz elections.

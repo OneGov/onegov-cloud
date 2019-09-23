@@ -28,7 +28,7 @@ def test_import_wabstic_proporz_cantonal(session, import_test_datasets):
 
     # - cantonal results from SG from the 18.10.2015 (Nationalrat)
 
-    election = import_test_datasets(
+    election, errors = import_test_datasets(
         'wabstic',
         'election',
         'sg',
@@ -40,6 +40,7 @@ def test_import_wabstic_proporz_cantonal(session, import_test_datasets):
         expats=True,
     )
 
+    assert not errors
     assert election.completed
     assert election.progress == (78, 78)
     assert election.absolute_majority is None
@@ -73,7 +74,7 @@ def test_import_wabstic_proporz_cantonal(session, import_test_datasets):
 
 
 def test_import_wabstic_proporz_regional_sg(session, import_test_datasets):
-    election = import_test_datasets(
+    election, errors = import_test_datasets(
         'wabstic',
         'election',
         'sg',
@@ -84,6 +85,8 @@ def test_import_wabstic_proporz_regional_sg(session, import_test_datasets):
         date_=date(2016, 2, 28),
         expats=False,
     )
+
+    assert not errors
 
     for number, district, mandates, entities, votes, turnout in (
         ('1', '1', 29, 9, 949454, 44.45),  # SG
@@ -96,7 +99,7 @@ def test_import_wabstic_proporz_regional_sg(session, import_test_datasets):
         ('8', '13', 18, 10, 352595, 43.94),  # WI
     ):
         election.number_of_mandates = mandates
-        election = import_test_datasets(
+        election, errors = import_test_datasets(
             'wabstic',
             'election',
             'sg',
@@ -108,6 +111,7 @@ def test_import_wabstic_proporz_regional_sg(session, import_test_datasets):
             election_district=district
         )
 
+        assert not errors
         assert election.completed
         assert election.progress == (entities, entities)
         assert election.accounted_votes == votes

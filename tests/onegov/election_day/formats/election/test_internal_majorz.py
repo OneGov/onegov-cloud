@@ -14,7 +14,7 @@ def test_import_internal_majorz_cantonal_zg(
     # - cantonal results from ZG from the 18.10.2015
     principal = 'zg'
 
-    election = import_test_datasets(
+    election, errors = import_test_datasets(
         'internal',
         'election',
         principal,
@@ -25,7 +25,7 @@ def test_import_internal_majorz_cantonal_zg(
         dataset_name='staenderatswahl-2015',
         expats=False
     )
-
+    assert not errors
     assert election.completed
     assert election.progress == (11, 11)
     assert election.absolute_majority == 18191
@@ -69,7 +69,7 @@ def test_import_internal_majorz_regional_zg(session, import_test_datasets):
 
     principal = 'zg'
 
-    election = import_test_datasets(
+    election, errors = import_test_datasets(
         'internal',
         'election',
         principal,
@@ -80,7 +80,7 @@ def test_import_internal_majorz_regional_zg(session, import_test_datasets):
         dataset_name='friedensrichter-2012-06-24',
         expats=False
     )
-
+    assert not errors
     assert election.completed
     assert election.progress == (1, 1)
     assert election.absolute_majority == 3237
@@ -116,7 +116,7 @@ def test_import_internal_majorz_municipality_bern(
     principal = 'bern'
     municipality = '1059'
 
-    election = import_test_datasets(
+    election, errors = import_test_datasets(
         'internal',
         'election',
         principal,
@@ -128,7 +128,7 @@ def test_import_internal_majorz_municipality_bern(
         expats=False,
         municipality=municipality
     )
-
+    assert not errors
     assert election.completed
     assert election.progress == (1, 1)
     assert election.absolute_majority == 3294
@@ -170,7 +170,7 @@ def test_import_internal_majorz_municipality_kriens(
     principal = 'kriens'
     municipality = '351'
 
-    election = import_test_datasets(
+    election, errors = import_test_datasets(
         'internal',
         'election',
         principal,
@@ -182,7 +182,7 @@ def test_import_internal_majorz_municipality_kriens(
         expats=False,
         municipality=municipality
     )
-
+    assert not errors
     assert election.completed
     assert election.progress == (6, 6)
     assert election.absolute_majority == 12606
