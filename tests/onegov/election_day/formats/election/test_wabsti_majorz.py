@@ -10,7 +10,7 @@ def test_import_wabsti_majorz_cantonal_simple(session, import_test_datasets):
     principal = 'sg'
     # The tar file contains
     # - cantonal results from SG from the 23.10.2011
-    election = import_test_datasets(
+    election, errors = import_test_datasets(
         'wabsti',
         'election',
         principal,
@@ -21,6 +21,7 @@ def test_import_wabsti_majorz_cantonal_simple(session, import_test_datasets):
         dataset_name='staenderatswahlen-2011-simple',
     )
 
+    assert not errors
     assert election.completed
     assert election.progress == (85, 85)
     assert round(election.turnout, 2) == 47.79
@@ -43,7 +44,7 @@ def test_import_wabsti_majorz_cantonal_complete(
     # Test cantonal election with elected candidates
     principal = 'sg'
 
-    election = import_test_datasets(
+    election, errors = import_test_datasets(
         'wabsti',
         'election',
         principal,
@@ -53,7 +54,7 @@ def test_import_wabsti_majorz_cantonal_complete(
         date_=date(2011, 10, 23),
         dataset_name='staenderatswahlen-2011-complete',
     )
-
+    assert not errors
     assert election.completed
     assert election.progress == (85, 85)
     assert round(election.turnout, 2) == 47.79
@@ -75,7 +76,7 @@ def test_import_wabsti_majorz_regional_sg(session, import_test_datasets):
     # - regional results from Rohrschach the 25.09.2016
     principal = 'sg'
     # Test regional election
-    election = import_test_datasets(
+    election, errors = import_test_datasets(
         'wabsti',
         'election',
         principal,
@@ -86,6 +87,7 @@ def test_import_wabsti_majorz_regional_sg(session, import_test_datasets):
         dataset_name='RO-Kreisgericht-Rohrschach',
     )
 
+    assert not errors
     assert election.completed
     assert election.progress == (9, 9)
     assert round(election.turnout, 2) == 42.0
@@ -105,7 +107,7 @@ def test_import_wabsti_majorz_regional_sg(session, import_test_datasets):
 def test_import_wabsti_majorz_municipal(session, import_test_datasets):
     # - communal results from the 25.09.2016
     principal = 'Au'
-    election = import_test_datasets(
+    election, errors = import_test_datasets(
         'wabsti',
         'election',
         principal,
@@ -116,6 +118,7 @@ def test_import_wabsti_majorz_municipal(session, import_test_datasets):
         dataset_name='Au-gemeinderat-2016',
         municipality='3231'
     )
+    assert not errors
     assert election.completed
     assert election.progress == (1, 1)
     assert round(election.turnout, 2) == 27.03

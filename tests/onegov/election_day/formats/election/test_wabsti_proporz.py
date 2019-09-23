@@ -12,7 +12,7 @@ def test_import_wabsti_proporz_cantonal(session, import_test_datasets):
 
     principal = 'zg'
 
-    election = import_test_datasets(
+    election, errors = import_test_datasets(
         'wabsti',
         'election',
         principal,
@@ -22,7 +22,7 @@ def test_import_wabsti_proporz_cantonal(session, import_test_datasets):
         number_of_mandates=3,
         dataset_name='nationalratswahlen-2015-minimum',
     )
-
+    assert not errors
     assert election.completed
     assert election.progress == (11, 11)
     assert election.results.count() == 11
@@ -67,7 +67,7 @@ def test_import_wabsti_proporz_cantonal_complete(
 
     principal = 'zg'
 
-    election = import_test_datasets(
+    election, errors = import_test_datasets(
         'wabsti',
         'election',
         principal,
@@ -78,6 +78,7 @@ def test_import_wabsti_proporz_cantonal_complete(
         dataset_name='nationalratswahlen-2015-complete',
     )
 
+    assert not errors
     assert election.completed
     assert election.progress == (11, 11)
     assert round(election.turnout, 2) == 53.74
@@ -111,7 +112,7 @@ def test_import_wabsti_proporz_cantonal_complete(
 def test_import_wabsti_proporz_regional_sg(session, import_test_datasets):
     principal = 'sg'
 
-    election = import_test_datasets(
+    election, errors = import_test_datasets(
         'wabsti',
         'election',
         principal,
@@ -121,7 +122,7 @@ def test_import_wabsti_proporz_regional_sg(session, import_test_datasets):
         number_of_mandates=17,
         dataset_name='kantonsratswahlen-2016',
     )
-
+    assert not errors
     assert election.completed
     assert election.progress == (13, 13)
     assert round(election.turnout, 2) == 46.86

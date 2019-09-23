@@ -11,7 +11,7 @@ from tests.onegov.election_day.common import print_errors, create_principal
 
 def test_import_internal_proporz_cantonal(session, import_test_datasets):
 
-    election = import_test_datasets(
+    election, errors = import_test_datasets(
         api_format='internal',
         model='election',
         principal='zg',
@@ -22,7 +22,7 @@ def test_import_internal_proporz_cantonal(session, import_test_datasets):
         dataset_name='nationalratswahlen-2015',
         expats=False
     )
-
+    assert not errors
     assert election.completed
     assert election.progress == (11, 11)
     assert election.absolute_majority is None
@@ -81,7 +81,7 @@ def test_import_internal_proporz_regional_zg(session, import_test_datasets):
 
     principal = create_principal('zg')
 
-    election = import_test_datasets(
+    election, errors = import_test_datasets(
         api_format='internal',
         model='election',
         principal='zg',
@@ -92,6 +92,7 @@ def test_import_internal_proporz_regional_zg(session, import_test_datasets):
         dataset_name='kantonsratswahl-2014'
     )
 
+    assert not errors
     assert election.completed
     assert election.progress == (1, 1)
     assert election.absolute_majority is None

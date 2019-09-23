@@ -9,7 +9,7 @@ from tests.onegov.election_day.common import print_errors
 
 def test_import_wabstic_majorz_1(session, import_test_datasets):
 
-    election = import_test_datasets(
+    election, errors = import_test_datasets(
         'wabstic',
         'election',
         'sg',
@@ -23,6 +23,7 @@ def test_import_wabstic_majorz_1(session, import_test_datasets):
         election_district='1'
     )
 
+    assert not errors
     assert election.completed
     assert election.progress == (78, 78)
     assert election.results.count() == 78
