@@ -12,6 +12,8 @@ from onegov.election_day.models import Canton, Municipality
 
 
 def print_errors(errors):
+    if not errors:
+        return
     error_list = sorted([
         (e.filename, e.line, e.error.interpolate()) for e in errors
     ])
