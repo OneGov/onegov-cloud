@@ -12,7 +12,7 @@ from onegov.election_day.import_export.mappings import \
     ELECTION_PARTY_HEADERS
 
 
-def parse_party_result(line, errors, results, totals, parties, election_year):
+def parse_party_result(line, errors, party_results, totals, parties, election_year):
     try:
         year = validate_integer(line, 'year', default=election_year)
         total_votes = validate_integer(line, 'total_votes')
@@ -36,10 +36,10 @@ def parse_party_result(line, errors, results, totals, parties, election_year):
         if year == election_year:
             parties[id_] = name
 
-        if key in results:
+        if key in party_results:
             errors.append(_("${name} was found twice", mapping={'name': key}))
         else:
-            results[key] = PartyResult(
+            party_results[key] = PartyResult(
                 id=uuid4(),
                 year=year,
                 total_votes=total_votes,
@@ -92,6 +92,7 @@ def import_party_results(election, file, mimetype):
     party_results = {}
     party_totals = {}
     panachage_results = {}
+    panachage_headers = None
 
     # The party results file has one party per year per line (but only
     # panachage results in the year of the election)
@@ -119,6 +120,13 @@ def import_party_results(election, file, mimetype):
                         FileImportError(error=err, line=line.rownumber)
                         for err in line_errors
                     )
+
+    if panachage_headers:
+        for list_id in panachage_headers.values():
+            if not list_id == '999' and list_id not in parties.keys():
+                errors.append(FileImportError(
+                    _("Panachage results ids and id not consistent")))
+                break
 
     if errors:
         return errors

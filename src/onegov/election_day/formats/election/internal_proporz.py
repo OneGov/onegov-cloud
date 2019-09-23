@@ -297,6 +297,7 @@ def import_election_internal_proporz(election, principal, file, mimetype):
             if not list_id == '999' and list_id not in lists.keys():
                 errors.append(FileImportError(
                     _("Panachage results ids and list_id not consistent")))
+                break
 
     # Check if all results are from the same district if regional election
     districts = set([result['district'] for result in results.values()])
