@@ -1,8 +1,47 @@
 # Changes
 
+## Release `2019.18`
+
+> commits: **3 / [0b45b544e6...aa122cc81c](https://github.com/OneGov/onegov-cloud/compare/0b45b544e6^...aa122cc81c)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.18)](https://buildkite.com/seantis/onegov-cloud)
+
+### Auth
+
+🐞 **Fixes stale-connection error in LDAP client**
+
+The LDAP client would raise an error after a certain idle-period. Once
+that happened, the client would not reconnect to the server until the
+process was restartet.
+
+**`Bugfix`** | **[c8a1cce2d5](https://github.com/onegov/onegov-cloud/commit/c8a1cce2d504fde438fd3e49559572a918d4eecd)**
+
+### Core
+
+🐞 **Disable SameSite=Lax for Safari 12.x**
+
+Safari 12.x has some issues with SameSite=Lax, preventing the storage of
+cookies on certain environment (mainly in development). As a work
+around, this change disables SameSite for this specific browser.
+
+**`Bugfix`** | **[0b45b544e6](https://github.com/onegov/onegov-cloud/commit/0b45b544e653ec1424ae4cdbd87e20c8846ab0eb)**
+
+### Feriennet
+
+🎉 **Adds a booking phase date, anytime cancellations**
+
+Implements two seperate issues that largely touch the same lines of
+code. Bringing the following improvements:
+
+* Periods now hold an explicit booking phase date-range
+* Admins may now book outside the booking phase
+* Admins may now cancel bookings even if they have been billed
+
+**`Feature`** | **[FER-783](https://issues.seantis.ch/browse/FER-783)** | **[aa122cc81c](https://github.com/onegov/onegov-cloud/commit/aa122cc81c4806e8cf37b9dc4f343bc2a3020fcc)**
+
 ## Release `2019.17`
 
-> commits: **10 / [d37cb83d40...8ab40dc73c](https://github.com/OneGov/onegov-cloud/compare/d37cb83d40^...8ab40dc73c)**<br>
+> released: **2019-09-19 11:27**<br>
+> commits: **11 / [d37cb83d40...c1168ff4c9](https://github.com/OneGov/onegov-cloud/compare/d37cb83d40^...c1168ff4c9)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.17)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election-Day
