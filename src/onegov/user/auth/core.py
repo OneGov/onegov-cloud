@@ -41,10 +41,7 @@ class Auth(object):
             obj = cls(**kwargs)
 
             if obj.is_configured():
-                log.info(f"Second factor '{type}' configured successfully")
                 self.factors[type] = obj
-            else:
-                log.warn(f"Second factor '{type}' was not configured")
 
     @classmethod
     def from_app(cls, app, to='/', skip=False, signup_token=None):
