@@ -3,11 +3,9 @@ from datetime import date
 from io import BytesIO
 
 import pytest
-from onegov.election_day import _
 from onegov.ballot import Election
 from onegov.ballot import ProporzElection
 from onegov.election_day.formats import import_party_results
-from onegov.election_day.formats.common import FileImportError
 from tests.onegov.election_day.common import get_tar_file_path, print_errors
 
 
@@ -47,7 +45,6 @@ def test_import_party_results_fixtures(session):
         ('SVP', total_votes, 0, 100),
         ('VERDA', total_votes, 0, 300),
     ]
-
 
     assert election.panachage_results
     for pana_r in election.panachage_results:
@@ -122,24 +119,24 @@ def test_import_party_results_panachage_invalid_values(
     errors = import_party_results(
         election,
         BytesIO((
-                    '\n'.join((
-                        ','.join((
-                            'year',
-                            'total_votes',
-                            'id',
-                            'name',
-                            'color',
-                            'mandates',
-                            'votes',
-                            f'panachage_votes_from_{wrong_id}',
-                            'panachage_votes_from_2',
-                            'panachage_votes_from_999'
-                        )),
-                        '2015,10000,1,P1,#123456,1,5000,10,11,12',
-                        '2011,10000,1,P1,#123456,0,3000,13,14,15',
-                        '2015,10000,2,P2,#aabbcc,0,5000,20,21,22',
-                        '2011,10000,2,P2,#aabbcc,1,7000,23,24,25',
-                    ))
+                '\n'.join((
+                    ','.join((
+                        'year',
+                        'total_votes',
+                        'id',
+                        'name',
+                        'color',
+                        'mandates',
+                        'votes',
+                        f'panachage_votes_from_{wrong_id}',
+                        'panachage_votes_from_2',
+                        'panachage_votes_from_999'
+                    )),
+                    '2015,10000,1,P1,#123456,1,5000,10,11,12',
+                    '2011,10000,1,P1,#123456,0,3000,13,14,15',
+                    '2015,10000,2,P2,#aabbcc,0,5000,20,21,22',
+                    '2011,10000,2,P2,#aabbcc,1,7000,23,24,25',
+                ))
                 ).encode('utf-8')), 'text/plain'
     )
 
