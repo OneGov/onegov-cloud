@@ -12,7 +12,8 @@ from onegov.election_day.import_export.mappings import \
     ELECTION_PARTY_HEADERS
 
 
-def parse_party_result(line, errors, party_results, totals, parties, election_year):
+def parse_party_result(
+        line, errors, party_results, totals, parties, election_year):
     try:
         year = validate_integer(line, 'year', default=election_year)
         total_votes = validate_integer(line, 'total_votes')
