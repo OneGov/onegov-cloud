@@ -44,7 +44,8 @@ def test_import_party_results_fixtures(session):
         ('VERDA', total_votes, 0, 300),
     ]
 
-    # Test panachage results
+    # Validates if not somebody opened csv file with excel and converting
+    # 01 to 1, thus not matching panachage_results
     assert election.panachage_results
     for pana_r in election.panachage_results:
         # assert len(pana_r.target) > 10, 'target must be casted list.id'
