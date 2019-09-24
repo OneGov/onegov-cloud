@@ -140,7 +140,7 @@ def test_import_agencies(cfg_path, session_manager, file):
     session = session_manager.session()
     agency = session.query(Agency).filter_by(title="Nationalrat").one()
     assert agency.portrait == "NR\n2016/2019"
-    assert agency.portrait_html == "<p>NR<br>2016/2019</p>"
+    assert agency.portrait_html == "NR\n2016/2019"
     assert agency.export_fields == [
         'membership.title',
         'person.title',
