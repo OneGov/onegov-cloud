@@ -124,7 +124,8 @@ def import_agencies(group_context, file, clear, skip_root, skip_download,
                 ))
                 portrait = portrait.replace('\n\n', '\n').strip()
             else:
-                portrait = sheet.cell_value(row, 4)
+                portrait = f'<p>{sheet.cell_value(row, 3).strip()}</p>' +\
+                           sheet.cell_value(row, 4)
 
             # Re-map the export fields
             export_fields = sheet.cell_value(row, 7) or 'role,title'
