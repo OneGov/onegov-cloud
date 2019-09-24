@@ -28,9 +28,10 @@ cli = command_group()
 @click.option('--skip-download/--no-skip-download', default=False)
 @click.option('--dry-run/--no-dry-run', default=False)
 @click.option('--visualize/--no-visualize', default=False)
+@click.option('--strip-portrait-html/--leave-portrait-html', default=False)
 @pass_group_context
 def import_agencies(group_context, file, clear, skip_root, skip_download,
-                    dry_run, visualize):
+                    dry_run, visualize, strip_portrait_html):
     """ Import data from a seantis.agencies export. For example:
 
         onegov-people \
@@ -115,12 +116,15 @@ def import_agencies(group_context, file, clear, skip_root, skip_download,
             # We use our own, internal IDs which are auto-incremented
             external_id = int(sheet.cell_value(row, 0))
 
-            # Remove the HTML code from the portrait, prepend the description
-            portrait = '\n'.join((
-                sheet.cell_value(row, 3).strip(),
-                html_to_text(cleaner.clean(sheet.cell_value(row, 4)))
-            ))
-            portrait = portrait.replace('\n\n', '\n').strip()
+            # Leave input as html for redactor.js , prepend the description
+            if strip_portrait_html:
+                portrait = '\n'.join((
+                    sheet.cell_value(row, 3).strip(),
+                    html_to_text(cleaner.clean(sheet.cell_value(row, 4)))
+                ))
+                portrait = portrait.replace('\n\n', '\n').strip()
+            else:
+                portrait = sheet.cell_value(row, 4)
 
             # Re-map the export fields
             export_fields = sheet.cell_value(row, 7) or 'role,title'
