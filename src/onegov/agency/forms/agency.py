@@ -78,7 +78,7 @@ class ExtendedAgencyForm(Form):
 
     def update_model(self, model):
         model.title = self.title.data
-        model.portrait = self.portrait.data
+        model.portrait = linkify(self.portrait.data, escape=False)
         model.export_fields = self.export_fields.data
         if self.organigram.action == 'delete':
             del model.organigram
