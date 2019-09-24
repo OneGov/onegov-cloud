@@ -10,5 +10,3 @@ class ExtendedAgencyCollection(AgencyCollection):
     def __init__(self, session, root_pdf_modified=None):
         super(ExtendedAgencyCollection, self).__init__(session)
         self.root_pdf_modified = root_pdf_modified
-
-

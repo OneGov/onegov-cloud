@@ -264,7 +264,6 @@ def create_pdf(group_context, root, recursive):
     def _create_pdf(request, app):
         session = app.session()
         agencies = ExtendedAgencyCollection(session)
-        root_pdf = FilestorageFile('/root_pdf')
 
         if root:
             app.root_pdf = app.pdf_class.from_agencies(

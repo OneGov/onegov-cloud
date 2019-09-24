@@ -2,7 +2,6 @@ from onegov.agency.models.membership import ExtendedAgencyMembership
 from onegov.core.crypto import random_token
 from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import meta_property
-from onegov.core.utils import linkify
 from onegov.core.utils import normalize_for_url
 from onegov.file import File
 from onegov.file.utils import as_fileintent

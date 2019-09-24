@@ -1,8 +1,5 @@
 from io import BytesIO
 from PyPDF2 import PdfFileReader
-from xlrd import open_workbook
-
-from onegov.agency.models import ExtendedPerson
 from tests.onegov.core.test_utils import valid_test_phone_numbers
 
 
@@ -453,7 +450,7 @@ def test_excel_export_for_editor(client):
     page = client.get('/people')
     page = page.click('Download Excel Personen')
     assert page.content_type == \
-           'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
 
 def test_excel_export_not_logged_in(client):
@@ -469,5 +466,3 @@ def test_excel_export_not_logged_in(client):
     page = client.get(
         '/people/people-xlsx', expect_errors=True).maybe_follow()
     assert page.status == '403 Forbidden'
-
-

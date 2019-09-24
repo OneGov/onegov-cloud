@@ -89,7 +89,6 @@ def add_root_agency(self, request, form):
     layout.breadcrumbs.append(Link(_("New"), '#'))
     layout.include_editor()
 
-
     return {
         'layout': layout,
         'title': _("New agency"),
@@ -256,6 +255,7 @@ def get_root_pdf(self, request):
             normalize_for_url(request.app.org.name)
         )
     )
+
 
 @AgencyApp.form(
     model=ExtendedAgencyCollection,
