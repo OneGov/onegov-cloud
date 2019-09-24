@@ -87,6 +87,8 @@ def add_root_agency(self, request, form):
 
     layout = AgencyCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))
+    layout.include_editor()
+
 
     return {
         'layout': layout,
@@ -112,6 +114,7 @@ def add_agency(self, request, form):
 
     layout = AgencyLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))
+    layout.include_editor()
 
     return {
         'layout': layout,
