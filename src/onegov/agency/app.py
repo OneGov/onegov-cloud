@@ -9,6 +9,8 @@ from onegov.core import utils
 from onegov.form import FormApp
 from onegov.org import OrgApp
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
+from onegov.org.app import get_editor_asset as editor_assets
+from onegov.org.app import get_redactor_asset as redactor_assets
 
 
 class AgencyApp(OrgApp, FormApp):
@@ -124,3 +126,13 @@ def get_sortable_multi_checkbox_asset():
     yield 'jquery.js'
     yield 'sortable.js'
     yield 'sortable-multi-checkbox.js'
+
+
+@AgencyApp.webasset('redactor', filters={'js': None})
+def get_redactor_asserts():
+    yield from redactor_assets()
+
+
+@AgencyApp.webasset('editor')
+def get_editor_assets():
+    yield from editor_assets()

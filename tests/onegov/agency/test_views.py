@@ -1,11 +1,9 @@
 from io import BytesIO
 from PyPDF2 import PdfFileReader
-from xlrd import open_workbook
-
-from onegov.agency.models import ExtendedPerson
+from tests.onegov.core.test_utils import valid_test_phone_numbers
 
 
-def test_views(client):
+def test_views_1(client):
     client.login_admin()
     settings = client.get('/module-settings')
     settings.form['hidden_people_fields'] = ['academic_title', 'born']
@@ -89,14 +87,15 @@ def test_views(client):
 
     assert 'Bundesbehörden' in bund
 
+    tel_nr = valid_test_phone_numbers[0]
     new_agency = bund.click('Organisation', href='new')
     new_agency.form['title'] = 'Nationalrat'
-    new_agency.form['portrait'] = '2016/2019\nZug'
+    new_agency.form['portrait'] = f'2016/2019<br>{tel_nr}'
     new_agency.form['export_fields'] = ['membership.title', 'person.title']
     nr = new_agency.form.submit().follow()
 
     assert 'Nationalrat' in nr
-    assert '<p>2016/2019<br>Zug</p>' in nr
+    assert f'2016/2019<br><a href="tel:{tel_nr}">{tel_nr}</a>' in nr
 
     new_agency = bund.click('Organisation', href='new')
     new_agency.form['title'] = 'Standerat'
@@ -451,7 +450,7 @@ def test_excel_export_for_editor(client):
     page = client.get('/people')
     page = page.click('Download Excel Personen')
     assert page.content_type == \
-           'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
 
 def test_excel_export_not_logged_in(client):
@@ -467,5 +466,3 @@ def test_excel_export_not_logged_in(client):
     page = client.get(
         '/people/people-xlsx', expect_errors=True).maybe_follow()
     assert page.status == '403 Forbidden'
-
-

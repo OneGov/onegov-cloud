@@ -87,6 +87,7 @@ def add_root_agency(self, request, form):
 
     layout = AgencyCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))
+    layout.include_editor()
 
     return {
         'layout': layout,
@@ -112,6 +113,7 @@ def add_agency(self, request, form):
 
     layout = AgencyLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))
+    layout.include_editor()
 
     return {
         'layout': layout,
@@ -185,6 +187,7 @@ def edit_agency(self, request, form):
 
     layout = AgencyLayout(self, request)
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.include_editor()
 
     return {
         'layout': layout,
@@ -223,6 +226,7 @@ def move_agency(self, request, form):
         'form': form
     }
 
+
 @AgencyApp.view(
     model=ExtendedAgencyCollection,
     name='pdf',
@@ -252,6 +256,7 @@ def get_root_pdf(self, request):
             normalize_for_url(request.app.org.name)
         )
     )
+
 
 @AgencyApp.form(
     model=ExtendedAgencyCollection,

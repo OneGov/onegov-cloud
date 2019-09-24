@@ -2,7 +2,6 @@ from onegov.agency.models.membership import ExtendedAgencyMembership
 from onegov.core.crypto import random_token
 from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import meta_property
-from onegov.core.utils import linkify
 from onegov.core.utils import normalize_for_url
 from onegov.file import File
 from onegov.file.utils import as_fileintent
@@ -65,9 +64,10 @@ class ExtendedAgency(Agency, HiddenFromPublicExtension):
 
     @property
     def portrait_html(self):
-        """ Returns the portrait as HTML. """
+        """ Returns the portrait that is saved as HTML from the redactor js
+         plugin. """
 
-        return '<p>{}</p>'.format(linkify(self.portrait).replace('\n', '<br>'))
+        return self.portrait
 
     def proxy(self):
         """ Returns a proxy object to this agency allowing alternative linking

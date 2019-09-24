@@ -12,7 +12,6 @@ from onegov.agency.excel_export import export_person_xlsx
 from onegov.agency.models import ExtendedAgencyMembership
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
-from onegov.core.filestorage import FilestorageFile
 from onegov.core.html import html_to_text
 from onegov.people.collections import AgencyCollection
 from onegov.people.collections import PersonCollection
@@ -29,9 +28,10 @@ cli = command_group()
 @click.option('--skip-download/--no-skip-download', default=False)
 @click.option('--dry-run/--no-dry-run', default=False)
 @click.option('--visualize/--no-visualize', default=False)
+@click.option('--strip-portrait-html/--leave-portrait-html', default=False)
 @pass_group_context
 def import_agencies(group_context, file, clear, skip_root, skip_download,
-                    dry_run, visualize):
+                    dry_run, visualize, strip_portrait_html):
     """ Import data from a seantis.agencies export. For example:
 
         onegov-people \
@@ -116,12 +116,16 @@ def import_agencies(group_context, file, clear, skip_root, skip_download,
             # We use our own, internal IDs which are auto-incremented
             external_id = int(sheet.cell_value(row, 0))
 
-            # Remove the HTML code from the portrait, prepend the description
-            portrait = '\n'.join((
-                sheet.cell_value(row, 3).strip(),
-                html_to_text(cleaner.clean(sheet.cell_value(row, 4)))
-            ))
-            portrait = portrait.replace('\n\n', '\n').strip()
+            # Leave input as html for redactor.js , prepend the description
+            if strip_portrait_html:
+                portrait = '\n'.join((
+                    sheet.cell_value(row, 3).strip(),
+                    html_to_text(cleaner.clean(sheet.cell_value(row, 4)))
+                ))
+                portrait = portrait.replace('\n\n', '\n').strip()
+            else:
+                portrait = f'<p>{sheet.cell_value(row, 3).strip()}</p>' +\
+                           sheet.cell_value(row, 4)
 
             # Re-map the export fields
             export_fields = sheet.cell_value(row, 7) or 'role,title'
@@ -264,7 +268,6 @@ def create_pdf(group_context, root, recursive):
     def _create_pdf(request, app):
         session = app.session()
         agencies = ExtendedAgencyCollection(session)
-        root_pdf = FilestorageFile('/root_pdf')
 
         if root:
             app.root_pdf = app.pdf_class.from_agencies(

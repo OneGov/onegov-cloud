@@ -97,7 +97,10 @@ def test_import_agencies(cfg_path, session_manager, file):
         def raise_for_status(self):
             pass
 
-    # Import
+    session_manager.set_current_schema('agency-zug')
+    session = session_manager.session()
+
+    # Import without stripping portrait
     with patch('onegov.agency.cli.get', return_value=DummyResponse()):
         result = runner.invoke(cli, [
             '--config', cfg_path,
@@ -107,6 +110,9 @@ def test_import_agencies(cfg_path, session_manager, file):
         ])
     assert result.exit_code == 0
     assert indent(expected, '  ') in result.output
+    agency = session.query(Agency).filter_by(title="Nationalrat").one()
+    assert agency.portrait == "<p>NR</p><p>2016/2019</p>"
+    assert agency.portrait_html == agency.portrait
 
     # Reimport
     with patch('onegov.agency.cli.get', return_value=DummyResponse()):
@@ -114,7 +120,7 @@ def test_import_agencies(cfg_path, session_manager, file):
             '--config', cfg_path,
             '--select', '/agency/zug',
             'import-agencies', file,
-            '--visualize', '--clear'
+            '--visualize', '--clear', '--strip-portrait-html'
         ])
     assert result.exit_code == 0
     assert "Deleting all agencies" in result.output
@@ -136,11 +142,9 @@ def test_import_agencies(cfg_path, session_manager, file):
     assert "Aborting transaction" in result.output
 
     # Check some additional values
-    session_manager.set_current_schema('agency-zug')
-    session = session_manager.session()
     agency = session.query(Agency).filter_by(title="Nationalrat").one()
     assert agency.portrait == "NR\n2016/2019"
-    assert agency.portrait_html == "<p>NR<br>2016/2019</p>"
+    assert agency.portrait_html == "NR\n2016/2019"
     assert agency.export_fields == [
         'membership.title',
         'person.title',

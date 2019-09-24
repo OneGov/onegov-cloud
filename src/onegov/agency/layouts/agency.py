@@ -56,6 +56,10 @@ class AgencyCollectionLayout(DefaultLayout, MoveAgencyMixin):
 
 class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
 
+    def include_editor(self):
+        self.request.include('redactor')
+        self.request.include('editor')
+
     @cached_property
     def collection(self):
         return ExtendedAgencyCollection(self.request.session)

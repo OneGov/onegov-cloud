@@ -27,7 +27,7 @@ def test_extended_agency(agency_app):
     assert agency.title == "Test Agency"
     assert agency.name == "test-agency"
     assert agency.portrait == "This is a test\nagency."
-    assert agency.portrait_html == "<p>This is a test<br>agency.</p>"
+    assert agency.portrait_html == "This is a test\nagency."
     assert agency.export_fields == []
     assert agency.pdf is None
     assert agency.pdf_file is None
