@@ -65,9 +65,10 @@ class ExtendedAgency(Agency, HiddenFromPublicExtension):
 
     @property
     def portrait_html(self):
-        """ Returns the portrait as HTML. """
+        """ Returns the portrait that is saved as HTML from the redactor js
+         plugin. """
 
-        return '<p>{}</p>'.format(linkify(self.portrait).replace('\n', '<br>'))
+        return self.portrait
 
     def proxy(self):
         """ Returns a proxy object to this agency allowing alternative linking
