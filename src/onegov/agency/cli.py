@@ -12,7 +12,6 @@ from onegov.agency.excel_export import export_person_xlsx
 from onegov.agency.models import ExtendedAgencyMembership
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
-from onegov.core.filestorage import FilestorageFile
 from onegov.core.html import html_to_text
 from onegov.people.collections import AgencyCollection
 from onegov.people.collections import PersonCollection

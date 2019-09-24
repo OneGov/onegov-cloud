@@ -226,6 +226,7 @@ def move_agency(self, request, form):
         'form': form
     }
 
+
 @AgencyApp.view(
     model=ExtendedAgencyCollection,
     name='pdf',
