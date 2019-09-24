@@ -74,6 +74,8 @@ class ExtendedAgencyForm(Form):
         result = super(ExtendedAgencyForm, self).get_useful_data(exclude)
         if self.organigram.data:
             result['organigram_file'] = self.organigram.raw_data[-1].file
+        if self.portrait.data:
+            result['portrait'] = linkify(self.portrait.data, escape=False)
         return result
 
     def update_model(self, model):
