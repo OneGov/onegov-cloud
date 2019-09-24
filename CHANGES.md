@@ -1,8 +1,38 @@
 # Changes
 
+## Release `2019.19`
+
+> commits: **4 / [75f6dd1a4c...c2014f3002](https://github.com/OneGov/onegov-cloud/compare/75f6dd1a4c^...c2014f3002)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.19)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+🎉 **Adds WYSIWYG Editor for agency portrait**
+
+Supports html in agency portrait and export to pdf (except of images).
+
+**`Feature`** | **[c2014f3002](https://github.com/onegov/onegov-cloud/commit/c2014f3002d623817cc1f570dc597cff302ef77d)**
+
+### Election-Day
+
+🐞 **Fixes handling of panachage results**
+
+Introduces FileImportError if any `{id}` from `panachage_result_from_{id}` list not in one of the `list_id`/'id' for wabsti and internal api format.
+
+**`Bugfix`** | **[75f6dd1a4c](https://github.com/onegov/onegov-cloud/commit/75f6dd1a4c458c5df678348210a2adbf68038bb0)**
+
+### Feriennet
+
+🐞 **Fixes custom error for insufficient funds**
+
+The error message was not shown as expected.
+
+**`Bugfix`** | **[ONEGOV-CLOUD-356](https://sentry.io/organizations/seantis-gmbh/issues/?query=ONEGOV-CLOUD-356)** | **[e11ac602fc](https://github.com/onegov/onegov-cloud/commit/e11ac602fcae5e92b6c804ca5e780eff036e9482)**
+
 ## Release `2019.18`
 
-> commits: **3 / [0b45b544e6...aa122cc81c](https://github.com/OneGov/onegov-cloud/compare/0b45b544e6^...aa122cc81c)**<br>
+> released: **2019-09-23 11:44**<br>
+> commits: **4 / [0b45b544e6...18a54e46fe](https://github.com/OneGov/onegov-cloud/compare/0b45b544e6^...18a54e46fe)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.18)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Auth
