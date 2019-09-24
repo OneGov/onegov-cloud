@@ -185,6 +185,7 @@ def edit_agency(self, request, form):
 
     layout = AgencyLayout(self, request)
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.include_editor()
 
     return {
         'layout': layout,

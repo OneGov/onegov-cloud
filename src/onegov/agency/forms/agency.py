@@ -3,8 +3,9 @@ from io import BytesIO
 from onegov.agency import _
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.models import ExtendedAgency
+from onegov.core.utils import linkify
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import ChosenSelectField, HtmlField
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.fields import UploadField
 from onegov.form.validators import FileSizeLimit
@@ -12,7 +13,6 @@ from onegov.form.validators import WhitelistedMimeType
 from sqlalchemy import func
 from sqlalchemy import String
 from wtforms import StringField
-from wtforms import TextAreaField
 from wtforms import validators
 
 
@@ -26,7 +26,7 @@ class ExtendedAgencyForm(Form):
         ],
     )
 
-    portrait = TextAreaField(
+    portrait = HtmlField(
         label=_("Portrait"),
         render_kw={'rows': 10}
     )
