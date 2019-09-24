@@ -48,6 +48,7 @@ class AgencyPdfDefault(Pdf):
             if agency.is_hidden_from_public:
                 continue
             pdf.agency(agency, exclude,
+                       content_so_far=False,
                        skip_title=title == agency.title,
                        page_break_on_level=page_break_on_level)
         pdf.generate()
@@ -93,7 +94,7 @@ class AgencyPdfDefault(Pdf):
         if data:
             self.table(data, [5.5 * cm, 0.5 * cm, None])
 
-    def agency(self, agency, exclude, level=1,
+    def agency(self, agency, exclude, level=1, content_so_far=False,
                skip_title=False, page_break_on_level=1):
         """ Adds a single agency with the portrait and memberships. """
         if (
