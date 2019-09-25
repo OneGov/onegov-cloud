@@ -2,6 +2,7 @@ from onegov.core.collection import GenericCollection
 from onegov.core.orm.func import unaccent
 from onegov.wtfs.models import Municipality
 from onegov.wtfs.models import PickupDate
+from sqlalchemy import Integer
 
 
 class MunicipalityCollection(GenericCollection):
@@ -18,7 +19,10 @@ class MunicipalityCollection(GenericCollection):
     def import_data(self, data):
         for bfs_number, values in data.items():
             query = self.query()
-            query = query.filter(Municipality.meta['bfs_number'] == bfs_number)
+            query = query.filter(
+                Municipality.meta['bfs_number'].astext.cast(Integer)
+                == bfs_number
+            )
             municipality = query.first()
             if not municipality:
                 continue
