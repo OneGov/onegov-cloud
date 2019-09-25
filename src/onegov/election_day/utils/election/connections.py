@@ -7,7 +7,8 @@ from onegov.ballot import List
 from onegov.ballot import ListConnection
 from onegov.core.orm import as_selectable_from_path
 from onegov.core.utils import groupbylist, module_path
-from onegov.election_day.utils.common import LastUpdatedOrderedDict
+from onegov.election_day.utils.common import LastUpdatedOrderedDict, \
+    sublist_name_from_connection_id
 
 
 def to_int(value):
@@ -39,8 +40,10 @@ def get_connection_results_api(election, session):
                 subconns = data[conn].setdefault(
                     'subconns', LastUpdatedOrderedDict())
 
+                subconn_display = sublist_name_from_connection_id(
+                    lst.subconn, lst.conn)
                 subconn = subconns.setdefault(
-                    lst.subconn, LastUpdatedOrderedDict())
+                    subconn_display, LastUpdatedOrderedDict())
                 subconn.setdefault('total_votes', int(lst.subconn_votes))
 
                 lists = subconn.setdefault('lists', LastUpdatedOrderedDict())
@@ -48,7 +51,7 @@ def get_connection_results_api(election, session):
     return data
 
 
-def get_connection_results_(election, session):
+def get_connection_results(election, session):
     """ Returns the aggregated list connection results as list. """
 
     if election.type != 'proporz':
