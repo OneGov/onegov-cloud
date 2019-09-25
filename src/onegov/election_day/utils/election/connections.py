@@ -1,7 +1,13 @@
 from collections import OrderedDict
+from itertools import groupby
+
+from sqlalchemy import select
+
 from onegov.ballot import List
 from onegov.ballot import ListConnection
-from onegov.core.utils import groupbylist
+from onegov.core.orm import as_selectable_from_path
+from onegov.core.utils import groupbylist, module_path
+from onegov.election_day.utils.common import LastUpdatedOrderedDict
 
 
 def to_int(value):
@@ -12,6 +18,37 @@ def to_int(value):
 
 
 def get_connection_results(election, session):
+    connection_query = as_selectable_from_path(
+        module_path(
+            'onegov.election_day', 'queries/connection_results.sql'))
+    conn_query = connection_query.c
+    query = select(conn_query).where(conn_query.election_id == election.id)
+    results = session.execute(query)
+
+    data = LastUpdatedOrderedDict({})
+
+    for conn, g in groupby(results, lambda x: x.conn):
+        for lst in g:
+            data.setdefault(conn, LastUpdatedOrderedDict())
+            data[conn].setdefault('total_votes', int(lst.conn_votes))
+            if not lst.subconn:
+                conn_lists = data[conn].setdefault(
+                    'lists', LastUpdatedOrderedDict())
+                conn_lists.setdefault(lst.list_name, int(lst.list_votes))
+            else:
+                subconns = data[conn].setdefault(
+                    'subconns', LastUpdatedOrderedDict())
+
+                subconn = subconns.setdefault(
+                    lst.subconn, LastUpdatedOrderedDict())
+                subconn.setdefault('total_votes', int(lst.subconn_votes))
+
+                lists = subconn.setdefault('lists', LastUpdatedOrderedDict())
+                lists.setdefault(lst.list_name, int(lst.list_votes))
+    return data
+
+
+def get_connection_results_(election, session):
     """ Returns the aggregated list connection results as list. """
 
     if election.type != 'proporz':
