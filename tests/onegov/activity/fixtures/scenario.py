@@ -287,7 +287,9 @@ class Scenario(object):
 
     def add_attendee(self, **columns):
         columns.setdefault('name', self.faker.name())
-        columns.setdefault('birth_date', self.faker.date_of_birth())
+        columns.setdefault('birth_date', self.faker.date_of_birth(
+            minimum_age=0, maximum_age=20
+        ))
         columns.setdefault('username', self.default_username)
         columns.setdefault('gender', self.faker.random_element((
             'female', 'male'

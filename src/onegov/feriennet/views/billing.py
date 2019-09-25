@@ -37,8 +37,7 @@ def view_billing(self, request, form):
 
     if form.submitted(request) and not self.period.finalized:
         self.create_invoices(
-            all_inclusive_booking_text=request.translate(_("Passport"))
-        )
+            all_inclusive_booking_text=request.translate(_("Passport")))
 
         if form.finalize_period:
             PeriodMessage.create(self.period, request, 'finalized')

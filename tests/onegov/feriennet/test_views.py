@@ -5,7 +5,7 @@ import transaction
 
 from datetime import datetime, timedelta, date, time
 from freezegun import freeze_time
-from onegov.activity import Booking, InvoiceItem
+from onegov.activity import Booking, Invoice, InvoiceItem
 from onegov.activity.utils import generate_xml
 from onegov.core.custom import json
 from onegov.file import FileCollection
@@ -2397,3 +2397,153 @@ def test_donations(client, scenario):
 
     # the link should no longer show up
     assert "Entfernen" not in client.get('/my-bills')
+
+
+def test_booking_after_finalization_all_inclusive(client, scenario):
+    scenario.add_period(
+        title="2019",
+        confirmed=True,
+        finalized=True,
+        all_inclusive=True,
+        pay_organiser_directly=False,
+        booking_cost=100,
+    )
+
+    scenario.add_activity(title="Fishing", state='accepted')
+    scenario.add_occasion(cost=10)
+    scenario.add_activity(title="Hunting", state='accepted')
+    scenario.add_occasion(cost=10)
+
+    scenario.add_attendee(name="Beavis")
+    scenario.add_attendee(name="Butthead")
+
+    scenario.commit()
+
+    # this is only possible as an Admin
+    client.login_editor()
+    client.fill_out_profile()
+    assert "Anmelden" not in client.get('/activity/fishing')
+    assert "Anmelden" not in client.get('/activity/hunting')
+
+    client.login_admin()
+    client.fill_out_profile()
+    assert "Anmelden" in client.get('/activity/fishing')
+    assert "Anmelden" in client.get('/activity/hunting')
+
+    # adding Beavis should result in a new invoice with the all inclusive
+    # price, as well as the activity-specific price
+    page = client.get('/activity/fishing').click("Anmelden")
+    page.select_radio('attendee', "Beavis")
+    page.form.submit().follow()
+
+    page = client.get('/my-bills')
+    assert str(page).count('110.00 Ausstehend') == 1
+    assert [e.text.strip() for e in page.pyquery('.item-text')[:-1]] == [
+        'Ferienpass',
+        'Fishing',
+    ]
+
+    # adding Butthead will incur an additional all-inclusive charge
+    page = client.get('/activity/fishing').click("Anmelden")
+    page.select_radio('attendee', "Butthead")
+    page.form.submit().follow()
+
+    page = client.get('/my-bills')
+    assert str(page).count('220.00 Ausstehend') == 1
+    assert [e.text.strip() for e in page.pyquery('.item-text')[:-1]] == [
+        'Ferienpass',
+        'Fishing',
+        'Ferienpass',
+        'Fishing',
+    ]
+
+    # adding Beavis to a second activity this way should not result in
+    # an additional all-inclusive charge
+    page = client.get('/activity/hunting').click("Anmelden")
+    page.select_radio('attendee', "Beavis")
+    page.form.submit().follow()
+
+    page = client.get('/my-bills')
+    assert str(page).count('220.00 Ausstehend') == 0
+    assert str(page).count('230.00 Ausstehend') == 1
+    assert [e.text.strip() for e in page.pyquery('.item-text')[:-1]] == [
+        'Ferienpass',
+        'Fishing',
+        'Hunting',
+        'Ferienpass',
+        'Fishing',
+    ]
+
+    # none of this should have produced more than one invoice
+    assert client.app.session().query(Invoice).count() == 1
+
+
+def test_booking_after_finalization_itemized(client, scenario):
+    scenario.add_period(
+        title="2019",
+        confirmed=True,
+        finalized=True,
+        all_inclusive=False,
+        booking_cost=5,
+    )
+
+    scenario.add_activity(title="Fishing", state='accepted')
+    scenario.add_occasion(cost=95)
+    scenario.add_activity(title="Hunting", state='accepted')
+    scenario.add_occasion(cost=45)
+
+    scenario.add_attendee(name="Beavis")
+    scenario.add_attendee(name="Butthead")
+
+    scenario.commit()
+
+    # this is only possible as an Admin
+    client.login_editor()
+    client.fill_out_profile()
+    assert "Anmelden" not in client.get('/activity/fishing')
+    assert "Anmelden" not in client.get('/activity/hunting')
+
+    client.login_admin()
+    client.fill_out_profile()
+    assert "Anmelden" in client.get('/activity/fishing')
+    assert "Anmelden" in client.get('/activity/hunting')
+
+    # adding Beavis should result in a new invoice with the cost of the
+    # booking, plus the period booking cost
+    page = client.get('/activity/fishing').click("Anmelden")
+    page.select_radio('attendee', "Beavis")
+    page.form.submit().follow()
+
+    page = client.get('/my-bills')
+    assert str(page).count('100.00 Ausstehend') == 1
+    assert [e.text.strip() for e in page.pyquery('.item-text')[:-1]] == [
+        'Fishing',
+    ]
+
+    # adding Beavis to a second booking, should do the same
+    page = client.get('/activity/hunting').click("Anmelden")
+    page.select_radio('attendee', "Beavis")
+    page.form.submit().follow()
+
+    page = client.get('/my-bills')
+    assert str(page).count('150.00 Ausstehend') == 1
+    assert [e.text.strip() for e in page.pyquery('.item-text')[:-1]] == [
+        'Fishing',
+        'Hunting',
+    ]
+
+    # adding Butthead should also result in a new invoice item
+    page = client.get('/activity/fishing').click("Anmelden")
+    page.select_radio('attendee', "Butthead")
+    page.form.submit().follow()
+
+    page = client.get('/my-bills')
+    assert str(page).count('250.00 Ausstehend') == 1
+    assert [e.text.strip() for e in page.pyquery('.item-text')[:-1]] == [
+        'Fishing',
+        'Hunting',
+        'Fishing',
+    ]
+
+    # none of this should have produced more than one invoice
+    assert client.app.session().query(Invoice).count() == 1

@@ -251,7 +251,7 @@ class AttendeeSignupForm(AttendeeBase):
             return False
 
     def ensure_not_finalized(self):
-        if self.model.period.finalized:
+        if self.model.period.finalized and not self.request.is_admin:
             self.attendee.errors.append(_(
                 "This period has already been finalized"
             ))

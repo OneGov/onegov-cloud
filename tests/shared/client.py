@@ -104,6 +104,24 @@ class GenericResponseExtension(object):
             if label in el.label.text_content():
                 form.get(groupname, index=ix).value = checked
 
+    def select_radio(self, groupname, label, form=None):
+        """ Like `select_checkbox`, but with the ability to select a radio
+        button by the name of its label.
+
+        """
+
+        elements = self.pyquery(f'input[name="{groupname}"]')
+
+        if not elements:
+            raise KeyError(f"No input named {groupname} found")
+
+        form = form or self.form
+
+        for el in elements:
+            if label in el.label.text_content():
+                form.get(groupname).value = el.values()[-1]
+                break
+
 
 class SkipFirstFormExtension(object):
 

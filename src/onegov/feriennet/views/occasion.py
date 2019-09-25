@@ -5,6 +5,7 @@ from onegov.activity import PeriodCollection
 from onegov.core.security import Private, Personal, Public
 from onegov.feriennet import _
 from onegov.feriennet import FeriennetApp
+from onegov.feriennet.collections.billing import BookingInvoiceBridge
 from onegov.feriennet.forms import AttendeeSignupForm
 from onegov.feriennet.forms import OccasionForm
 from onegov.feriennet.forms import OccasionNeedForm
@@ -219,8 +220,21 @@ def book_occasion(self, request, form):
             if form.accept_tos.data:
                 request.current_user.data['tos_accepted'] = True
 
+        # to get the final cost, we need to accept bookings without wishlist
         if self.period.confirmed:
             bookings.accept_booking(booking)
+
+        # if the period has been finalized, an admin is responsible and we
+        # need to create an invoice item that goes with the booking
+        if self.period.finalized:
+            assert request.is_admin
+
+            bridge = BookingInvoiceBridge(request.session, self.period)
+            bridge.process(booking)
+            bridge.complete(
+                all_inclusive_booking_text=request.translate(_("Passport")))
+
+        if self.period.confirmed:
             request.success(
                 _("The booking for ${name} was succesfull", mapping={
                     'name': attendee.name

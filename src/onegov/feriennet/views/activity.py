@@ -425,12 +425,12 @@ def view_activity(self, request):
         if occasion.full and occasion.period.phase != 'wishlist':
             return False
 
-        if occasion.period.finalized:
-            return False
-
         # the rest of the restrictions only apply to non-admins
         if request.is_admin:
             return True
+
+        if occasion.period.finalized:
+            return False
 
         if occasion.period.phase not in ('wishlist', 'booking', 'execution'):
             return False

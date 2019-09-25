@@ -2,9 +2,10 @@ from collections import OrderedDict
 from decimal import Decimal
 from itertools import groupby
 from onegov.activity import Activity, Attendee, Booking, Occasion
-from onegov.activity import Invoice, InvoiceItem, InvoiceReference
 from onegov.activity import BookingCollection
-from onegov.core.orm import as_selectable_from_path
+from onegov.activity import Invoice, InvoiceItem, InvoiceReference
+from onegov.activity import InvoiceCollection
+from onegov.core.orm import as_selectable, as_selectable_from_path
 from onegov.core.utils import module_path, Bunch
 from onegov.user import User
 from sqlalchemy import select
@@ -202,21 +203,6 @@ class BillingCollection(object):
         for q in delete_queries():
             q.delete('fetch')
 
-        # preload data to avoid more expensive joins
-        activities = {
-            r.id: r.title
-            for r in session.query(Occasion.id, Activity.title).join(Activity)
-        }
-
-        attendees = {
-            a.id: (a.name, a.username)
-            for a in session.query(
-                Attendee.id,
-                Attendee.name,
-                Attendee.username
-            )
-        }
-
         # regenerate the invoices
         bookings = BookingCollection(session, period_id=period.id)
 
@@ -228,46 +214,133 @@ class BillingCollection(object):
         )
         q = q.filter(Booking.state == 'accepted')
 
-        # keep track of the attendees which have at least one booking (even
-        # if said booking is free)
-        actual_attendees = set()
-
-        # keep track of the invoices which were created
-        created_invoices = {}
-
-        # easy user_id lookup
-        users = dict(session.query(User).with_entities(User.username, User.id))
+        # create the invoices/items
+        bridge = BookingInvoiceBridge(self.session, period)
 
         for booking in q:
-            actual_attendees.add(booking.attendee_id)
+            bridge.process(booking)
 
-            if booking.username not in created_invoices:
-                created_invoices[booking.username] = invoices.add(
-                    period_id=period.id,
-                    user_id=users[booking.username],
-                    flush=False,
-                    optimistic=True
-                )
+        bridge.complete(all_inclusive_booking_text)
 
-            if period.pay_organiser_directly or not booking.cost:
-                continue
 
-            created_invoices[booking.username].add(
-                group=attendees[booking.attendee_id][0],
-                text=activities[booking.occasion_id],
-                unit=booking.cost,
-                quantity=1,
-                flush=False
+class BookingInvoiceBridge(object):
+    """ Creates invoices from bookings.
+
+    Should be used in a two-phase process, with one exception:
+
+    1. The bookings are processed using `process`.
+    2. Premiums are applied by calling `complete`.
+
+    The exception is if you want to simply process a single booking after
+    the premiums have been processed already. This is an exception for admins
+    which may add bookings after all bills have been processed already.
+
+    """
+
+    def __init__(self, session, period):
+        # tracks attendees which had at least one booking added through the
+        # bridge (even if said booking was free)
+        self.processed_attendees = set()
+
+        # init auxiliary tools
+        self.session = session
+        self.period = period
+        self.invoices = InvoiceCollection(session)
+
+        # preload data
+        self.activities = {
+            r.id: r.title
+            for r in session.query(Occasion.id, Activity.title).join(Activity)
+        }
+
+        # holds invoices which existed already
+        self.existing = {
+            i.user.username: i for i in self.invoices.query()
+             .options(joinedload(Invoice.user))
+             .filter(Invoice.period_id == period.id)
+        }
+
+        # holds attendee ids which already had at least one item in this period
+        stmt = as_selectable("""
+            SELECT DISTINCT
+                "group",    -- Text
+                "username", -- Text
+                period_id   -- UUID
+            FROM invoice_items
+
+            LEFT JOIN invoices
+                ON invoice_items.invoice_id = invoices.id
+
+            LEFT JOIN users
+                ON invoices.user_id = users.id
+
+            WHERE "group" != 'manual'
+        """)
+        self.billed_attendees = {
+            (r.username, r.group) for r in session.execute(
+                select(stmt.c).where(stmt.c.period_id == period.id)
+            )
+        }
+
+        self.attendees = {
+            a.id: (a.name, a.username)
+            for a in session.query(
+                Attendee.id,
+                Attendee.name,
+                Attendee.username
+            )
+        }
+
+        self.users = dict(session.query(User.username, User.id))
+
+    def process(self, booking):
+        """ Processes a single booking. This may be a tuple that includes
+        the following fields, though a model may also work:
+
+        * `Booking.username`
+        * `Booking.cost`
+        * `Booking.occasion_id`
+        * `Booking.attendee_id`
+
+        """
+
+        if booking.username not in self.existing:
+            self.existing[booking.username] = self.invoices.add(
+                period_id=self.period.id,
+                user_id=self.users[booking.username],
+                flush=False,
+                optimistic=True
             )
 
-        # add the all inclusive booking costs if necessary
-        if period.all_inclusive and period.booking_cost:
-            for id, (attendee, username) in attendees.items():
-                if id in actual_attendees:
-                    created_invoices[username].add(
+        self.processed_attendees.add(booking.attendee_id)
+
+        if self.period.pay_organiser_directly or not booking.cost:
+            return
+
+        self.existing[booking.username].add(
+            group=self.attendees[booking.attendee_id][0],
+            text=self.activities[booking.occasion_id],
+            unit=booking.cost,
+            quantity=1,
+            flush=False
+        )
+
+    def complete(self, all_inclusive_booking_text):
+        """ Finalises the processed bookings. """
+
+        if not self.period.all_inclusive:
+            return
+
+        if not self.period.booking_cost:
+            return
+
+        for id, (attendee, username) in self.attendees.items():
+            if id in self.processed_attendees:
+                if (username, attendee) not in self.billed_attendees:
+                    self.existing[username].add(
                         group=attendee,
                         text=all_inclusive_booking_text,
-                        unit=period.booking_cost,
+                        unit=self.period.booking_cost,
                         quantity=1,
                         flush=False
                     )
