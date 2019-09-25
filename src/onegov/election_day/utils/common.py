@@ -1,6 +1,17 @@
+from collections import OrderedDict
+
 from onegov.ballot import ComplexVote
 from onegov.ballot import Vote
 
+
+class LastUpdatedOrderedDict(OrderedDict):
+    """
+    Stores items in the order the keys were last added.
+    """
+
+    def __setitem__(self, key, value):
+        super().__setitem__(key, value)
+        super().move_to_end(key)
 
 def add_last_modified_header(response, last_modified):
     """ Adds the give date to the response as Last-Modified header. """
