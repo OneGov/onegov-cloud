@@ -9,12 +9,12 @@ list_results AS (
         WHEN pc.connection_id IS NULL
             THEN c.connection_id
             ELSE pc.connection_id
-    END as list_group,
+    END as conn,
     CASE
         WHEN c.parent_id IS NULL
             THEN NULL
             ELSE c.connection_id
-    END as sublist_group,
+    END as subconn,
     l.name as list_name,
     SUM(lr.votes) AS list_votes
     FROM lists l
@@ -27,7 +27,7 @@ list_results AS (
              l.connection_id,
              c.connection_id,
              parent_connection_id,
-             sublist_group
+             subconn
 ),
 
 result as (
@@ -35,11 +35,11 @@ result as (
         lr.election_id,
         lr.connection_id,
         lr.list_name,
-        lr.list_group,
-        lr.sublist_group,
+        lr.conn,
+        lr.subconn,
         lr.list_votes,
-        SUM(lr.list_votes) OVER (PARTITION BY lr.election_id, lr.sublist_group) as sublist_votes,
-        SUM(lr.list_votes) OVER (PARTITION BY lr.election_id, lr.list_group) as mainlist_votes,
+        SUM(lr.list_votes) OVER (PARTITION BY lr.election_id, lr.subconn) as subconn_votes,
+        SUM(lr.list_votes) OVER (PARTITION BY lr.election_id, lr.conn) as conn_votes,
         SUM(lr.list_votes) OVER(PARTITION BY lr.election_id) AS total_votes
     FROM list_results lr
 )
@@ -49,15 +49,15 @@ SELECT
        v.election_id,       -- Text
        v.connection_id,     -- Text
        v.list_name,         -- Text
-       v.list_group,        -- Text
-       v.sublist_group,     -- Text
+       v.conn,              -- Text
+       v.subconn,           -- Text
        v.list_votes,        -- Numeric
-       v.sublist_votes,     -- Numeric
-       v.mainlist_votes,    -- Numeric
+       v.subconn_votes,     -- Numeric
+       v.conn_votes,    -- Numeric
        v.total_votes        -- Numeric
 FROM result v
-ORDER BY v.list_group,
-         v.sublist_group,
-         v.sublist_votes DESC
+ORDER BY v.conn,
+         v.subconn,
+         v.subconn_votes DESC
 
 
