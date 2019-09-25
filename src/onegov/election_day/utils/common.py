@@ -4,6 +4,15 @@ from onegov.ballot import ComplexVote
 from onegov.ballot import Vote
 
 
+def sublist_name_from_connection_id(conn_name, subconn_name):
+    """
+    Removes prefixed parent_connection_id from connection_id
+    as introduced by sesam 2019.09
+    :param conn_name: list connection name aka parent_connection_id
+    :param subconn_name: subconnection name aka connection_id
+    """
+    return conn_name.replace(subconn_name, '', 1)
+
 class LastUpdatedOrderedDict(OrderedDict):
     """
     Stores items in the order the keys were last added.
