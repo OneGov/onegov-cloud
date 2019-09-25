@@ -9,7 +9,12 @@ list_results AS (
         WHEN pc.connection_id IS NULL
             THEN c.connection_id
             ELSE pc.connection_id
-    END as parent_group,
+    END as list_group,
+    CASE
+        WHEN c.parent_id IS NULL
+            THEN NULL
+            ELSE c.connection_id
+    END as sublist_group,
     l.name as list_name,
     SUM(lr.votes) AS list_votes
     FROM lists l
@@ -21,49 +26,38 @@ list_results AS (
              l.name,
              l.connection_id,
              c.connection_id,
-             parent_connection_id
+             parent_connection_id,
+             sublist_group
 ),
 
-sublist_results AS (
-    SELECT
-        lr.connection_id,
-        lr.election_id,
-        SUM(lr.list_votes) AS sublist_votes
-    FROM list_results lr
-    WHERE lr.parent_connection_id IS NOT NULL
-    GROUP BY lr.connection_id, lr.election_id
-
-),
-
-main_list_results AS (
-    SELECT
-        lr.election_id,
-        lr.parent_group,
-        SUM(lr.list_votes) AS mainlist_votes
-    FROM list_results lr
-    GROUP BY lr.parent_group, lr.election_id
-),
 result as (
     SELECT
         lr.election_id,
         lr.connection_id,
         lr.list_name,
+        lr.list_group,
+        lr.sublist_group,
         lr.list_votes,
-        lr.parent_group,
---         sr.sublist_votes
-        mr.mainlist_votes
+        SUM(lr.list_votes) OVER (PARTITION BY lr.election_id, lr.sublist_group) as sublist_votes,
+        SUM(lr.list_votes) OVER (PARTITION BY lr.election_id, lr.list_group) as mainlist_votes,
+        SUM(lr.list_votes) OVER(PARTITION BY lr.election_id) AS total_votes
     FROM list_results lr
---     JOIN sublist_results sr ON lr.connection_id = sr.connection_id
-    LEFT JOIN main_list_results mr ON lr.parent_group = mr.parent_group
 )
 
--- I would like to add the main_list_results to result, but
---  the table grows as it should'nt after the left join. Why is that?
-
--- SELECT * FROM result v
-SELECT * FROM main_list_results v
-
-WHERE v.election_id = 'nationalratswahlen-2019'
--- ORDER BY v.connection_id
+-- The resulting query
+SELECT
+       v.election_id,       -- Text
+       v.connection_id,     -- Text
+       v.list_name,         -- Text
+       v.list_group,        -- Text
+       v.sublist_group,     -- Text
+       v.list_votes,        -- Numeric
+       v.sublist_votes,     -- Numeric
+       v.mainlist_votes,    -- Numeric
+       v.total_votes        -- Numeric
+FROM result v
+ORDER BY v.list_group,
+         v.sublist_group,
+         v.sublist_votes DESC
 
 
