@@ -17,7 +17,7 @@ def to_int(value):
         return value
 
 
-def get_connection_results(election, session):
+def get_connection_results_api(election, session):
     connection_query = as_selectable_from_path(
         module_path(
             'onegov.election_day', 'queries/connection_results.sql'))
