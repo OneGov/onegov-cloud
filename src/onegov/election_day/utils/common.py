@@ -23,6 +23,7 @@ class LastUpdatedOrderedDict(OrderedDict):
         super().__setitem__(key, value)
         super().move_to_end(key)
 
+
 def add_last_modified_header(response, last_modified):
     """ Adds the give date to the response as Last-Modified header. """
 

@@ -5,8 +5,7 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
-from onegov.election_day.utils.election import get_connection_results, \
-    get_connection_results_api
+from onegov.election_day.utils.election import get_connection_results_api
 from onegov.election_day.utils.election import get_connections_data
 from sqlalchemy.orm import object_session
 

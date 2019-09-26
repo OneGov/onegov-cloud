@@ -119,7 +119,7 @@ def view_election_aggregated_lists_data(self, request):
     name='data-list-connections',
     permission=Public
 )
-def view_election_aggregated_lists_data(self, request):
+def view_election_aggregated_connections_data(self, request):
 
     """" View the lists as JSON. Used to for the lists bar chart. """
 
