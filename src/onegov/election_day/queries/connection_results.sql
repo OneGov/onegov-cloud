@@ -58,6 +58,7 @@ SELECT
 FROM result v
 ORDER BY v.conn,
          v.subconn,
-         v.subconn_votes DESC
+         v.subconn_votes DESC,
+         v.list_votes DESC
 
 
