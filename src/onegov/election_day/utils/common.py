@@ -11,7 +11,8 @@ def sublist_name_from_connection_id(conn_name, subconn_name):
     :param conn_name: list connection name aka parent_connection_id
     :param subconn_name: subconnection name aka connection_id
     """
-    return conn_name.replace(subconn_name, '', 1)
+    return conn_name.replace(subconn_name, '', 1) or conn_name
+
 
 class LastUpdatedOrderedDict(OrderedDict):
     """
