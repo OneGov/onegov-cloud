@@ -5,7 +5,8 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
-from onegov.election_day.utils.election import get_connection_results
+from onegov.election_day.utils.election import get_connection_results, \
+    get_connection_results_api
 from onegov.election_day.utils.election import get_connections_data
 from sqlalchemy.orm import object_session
 
@@ -66,7 +67,7 @@ def view_election_connections_table(self, request):
     return {
         'model': self,
         'layout': DefaultLayout(self, request),
-        'connections': get_connection_results(self, object_session(self)),
+        'connections': get_connection_results_api(self, object_session(self)),
         'type': 'election-table',
         'scope': 'connections'
     }
@@ -87,7 +88,7 @@ def view_election_connections(self, request):
     return {
         'election': self,
         'layout': layout,
-        'connections': get_connection_results(self, object_session(self)),
+        'connections': get_connection_results_api(self, object_session(self)),
     }
 
 

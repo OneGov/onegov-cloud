@@ -8,6 +8,7 @@ from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
+from onegov.election_day.utils.election import get_connection_results_api
 from onegov.election_day.utils.election.lists import \
     get_aggregated_list_results
 
@@ -111,3 +112,15 @@ def view_election_aggregated_lists_data(self, request):
     """" View the lists as JSON. Used to for the lists bar chart. """
 
     return get_aggregated_list_results(self, request.session)
+
+
+@ElectionDayApp.json(
+    model=Election,
+    name='data-list-connections',
+    permission=Public
+)
+def view_election_aggregated_lists_data(self, request):
+
+    """" View the lists as JSON. Used to for the lists bar chart. """
+
+    return get_connection_results_api(self, request.session)

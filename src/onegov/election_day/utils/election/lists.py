@@ -8,15 +8,7 @@ from onegov.election_day import _
 from sqlalchemy import desc, select
 from sqlalchemy.orm import object_session
 
-
-class LastUpdatedOrderedDict(OrderedDict):
-    """
-    Stores items in the order the keys were last added.
-    """
-
-    def __setitem__(self, key, value):
-        super().__setitem__(key, value)
-        super().move_to_end(key)
+from onegov.election_day.utils.common import LastUpdatedOrderedDict
 
 
 def get_aggregated_list_results(election, session, use_checks=False):
