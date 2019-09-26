@@ -1,8 +1,32 @@
 # Changes
 
+## Release `2019.20`
+
+> commits: **2 / [350f56de4b...b317593649](https://github.com/OneGov/onegov-cloud/compare/350f56de4b^...b317593649)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.20)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🎉 **Admins may now book after billing**
+
+When an admin adds a booking after the bills have been created, a new
+billing item is added for each booking made, unless the billing is
+all-inclusive, in which case the booking is only added if necessary.
+
+**`Feature`** | **[FER-786](https://issues.seantis.ch/browse/FER-786)** | **[350f56de4b](https://github.com/onegov/onegov-cloud/commit/350f56de4bea0a8e7fe4306eae46fd7f5d169423)**
+
+### Winterthur
+
+🐞 **Fixes municipality imports not working**
+
+It would work on certain Postgres releases, but not all.
+
+**`Bugfix`** | **[b317593649](https://github.com/onegov/onegov-cloud/commit/b3175936499cc317d4a89a53805a7778a192cb59)**
+
 ## Release `2019.19`
 
-> commits: **4 / [75f6dd1a4c...c2014f3002](https://github.com/OneGov/onegov-cloud/compare/75f6dd1a4c^...c2014f3002)**<br>
+> released: **2019-09-24 16:58**<br>
+> commits: **5 / [75f6dd1a4c...bbe6bb9f78](https://github.com/OneGov/onegov-cloud/compare/75f6dd1a4c^...bbe6bb9f78)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.19)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
