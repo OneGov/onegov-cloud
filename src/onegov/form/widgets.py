@@ -10,7 +10,7 @@ from wtforms.widgets import FileInput
 from wtforms.widgets import ListWidget
 from wtforms.widgets import Select
 from wtforms.widgets import TextInput
-from wtforms.widgets.core import HTMLString
+from wtforms.widgets.core import HTMLString, html_params
 
 
 class OrderedListWidget(ListWidget):
@@ -267,3 +267,19 @@ class PreviewWidget(object):
             events=field.events,
             display=field.display,
         ))
+
+
+class PanelWidget(object):
+    """ A widget that displays the field's text as panel (no input). """
+
+    template = chameleon.PageTemplate("""
+        <div class="panel ${kind}">
+            ${text}
+        </div>
+    """)
+
+    def __call__(self, field, **kwargs):
+        return HTMLString(self.template.render(
+            kind=field.kind,
+            text=field.meta.request.translate(field.text),
+        ).replace('">', '" ' + html_params(**kwargs) + '>'))

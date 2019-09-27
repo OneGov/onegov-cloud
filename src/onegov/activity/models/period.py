@@ -44,8 +44,18 @@ class Period(Base, TimestampMixin):
     #: booking changes to it are communicted to the customer
     confirmed = Column(Boolean, nullable=False, default=False)
 
+    #: A confirmable period has a prebooking phase, while an unconfirmable
+    # booking does not. An unconfirmable booking starts as `confirmed` for
+    # legacy reasons (even though it doesn't sound sane to have an
+    # unconfirmable period that is confirmed).
+    confirmable = Column(Boolean, nullable=False, default=True)
+
     #: A finalized period may not have any change in bookings anymore
     finalized = Column(Boolean, nullable=False, default=False)
+
+    #: A finalizable period may have invoices associated with it, an
+    #: unfinalizable period may not
+    finalizable = Column(Boolean, nullable=False, default=True)
 
     #: An archived period has been entirely completed
     archived = Column(Boolean, nullable=False, default=False)
@@ -229,7 +239,7 @@ class Period(Base, TimestampMixin):
         in a period newer than the current period.
 
         """
-        assert self.confirmed and self.finalized
+        assert self.confirmed and self.finalized or not self.finalizable
 
         self.archived = True
         self.active = False

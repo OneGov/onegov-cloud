@@ -100,28 +100,29 @@ def get_personal_tools(request):
         period = request.app.active_period
         periods = request.app.periods
 
-        invoices = request.app.invoice_collection(
-            user_id=request.current_user.id)
+        if not period or period.finalizable:
+            invoices = request.app.invoice_collection(
+                user_id=request.current_user.id)
 
-        unpaid = invoices.unpaid_count(excluded_period_ids={
-            p.id for p in periods if not p.finalized})
+            unpaid = invoices.unpaid_count(excluded_period_ids={
+                p.id for p in periods if not p.finalized})
 
-        if unpaid:
-            attributes = {
-                'data-count': str(unpaid),
-                'class': {'with-count', 'alert', 'invoices-count'}
-            }
-        else:
-            attributes = {
-                'data-count': '0',
-                'class': {'with-count', 'secondary', 'invoices-count'}
-            }
+            if unpaid:
+                attributes = {
+                    'data-count': str(unpaid),
+                    'class': {'with-count', 'alert', 'invoices-count'}
+                }
+            else:
+                attributes = {
+                    'data-count': '0',
+                    'class': {'with-count', 'secondary', 'invoices-count'}
+                }
 
-        yield Link(
-            text=_("Invoices"),
-            url=request.link(invoices),
-            attrs=attributes
-        )
+            yield Link(
+                text=_("Invoices"),
+                url=request.link(invoices),
+                attrs=attributes
+            )
 
         bookings = BookingCollection(session)
 

@@ -727,3 +727,13 @@ def add_booking_phase_dates(context):
             <= execution_end
         """
     )
+
+
+@upgrade_task('Add confirmable and finalizable columns')
+def add_confirmable_and_finalizable_columns(context):
+    for name in ('confirmable', 'finalizable'):
+        context.add_column_with_defaults(
+            table='periods',
+            column=Column(name, Boolean, nullable=False),
+            default=True
+        )

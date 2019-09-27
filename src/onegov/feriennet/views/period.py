@@ -71,7 +71,7 @@ def view_periods(self, request):
         yield Link(_("Edit"), request.link(period, 'edit'))
 
         if not period.archived:
-            if period.confirmed and period.finalized:
+            if period.confirmed and period.finalized or not period.finalizable:
                 yield Link(
                     text=_("Archive"),
                     url=layout.csrf_protected_url(
@@ -161,6 +161,8 @@ def new_period(self, request, form):
             booking=form.booking,
             execution=form.execution,
             minutes_between=form.minutes_between.data,
+            confirmable=form.confirmable.data,
+            finalizable=form.finalizable.data,
             active=False)
 
         form.populate_obj(period)

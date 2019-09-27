@@ -333,7 +333,7 @@
      <!--! render the label after the field if it's a boolean field -->
     <tal:b condition="field.type == 'BooleanField'">
         ${field()}
-        <span class="label-text">${field.label.text}</span>
+        <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
         <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
         <div class="field-help" tal:condition="field.description">
             ${field.description}
@@ -348,7 +348,7 @@
             See onegov.core.i18n.get_translation_bound_meta.render_field
         -->
         <tal:b define="content field(placeholder=request.translate(field.description))">
-            <span class="label-text">${field.label.text}</span>
+            <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
             <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
 
             <!--! The field is placed here -->

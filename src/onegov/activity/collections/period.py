@@ -10,9 +10,13 @@ class PeriodCollection(GenericCollection):
 
     def add(self, title, prebooking, booking, execution, active=False,
             minutes_between=0, deadline_date=None, deadline_days=None,
-            cancellation_date=None, cancellation_days=None):
+            cancellation_date=None, cancellation_days=None, finalizable=True,
+            confirmable=True):
 
-        return super().add(
+        if not confirmable:
+            prebooking = (booking[0], booking[0])
+
+        period = super().add(
             title=title,
             prebooking_start=prebooking[0],
             prebooking_end=prebooking[1],
@@ -26,7 +30,14 @@ class PeriodCollection(GenericCollection):
             deadline_days=deadline_days,
             cancellation_date=cancellation_date,
             cancellation_days=cancellation_days,
+            finalizable=finalizable,
+            confirmable=confirmable,
         )
+
+        if not confirmable:
+            period.confirmed = True
+
+        return period
 
     def active(self):
         return self.query().filter(Period.active == True).first()

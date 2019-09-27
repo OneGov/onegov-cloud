@@ -11,6 +11,7 @@ from onegov.form.widgets import ChosenSelectWidget
 from onegov.form.widgets import IconWidget
 from onegov.form.widgets import MultiCheckboxWidget
 from onegov.form.widgets import OrderedMultiCheckboxWidget
+from onegov.form.widgets import PanelWidget
 from onegov.form.widgets import PreviewWidget
 from onegov.form.widgets import TagsWidget
 from onegov.form.widgets import UploadWidget
@@ -274,3 +275,18 @@ class TimezoneDateTimeField(DateTimeField):
 
         if self.data:
             self.data = sedate.replace_timezone(self.data, self.timezone)
+
+
+class PanelField(Field):
+    """ Shows a panel as part of the form (no input, no lael). """
+
+    widget = PanelWidget()
+
+    def __init__(self, *args, **kwargs):
+        self.text = kwargs.pop('text')
+        self.kind = kwargs.pop('kind')
+        self.hide_label = True
+        super().__init__(*args, **kwargs)
+
+    def populate_obj(self, obj, name):
+        pass

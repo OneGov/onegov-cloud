@@ -155,6 +155,7 @@ setup(
             'scrambler',
             'lingua==3.12',
             'gitpython',
+            'honyaku@git+https://github.com/seantis/honyaku#egg=honyaku',
         ],
         'docs': [
             'alabaster',

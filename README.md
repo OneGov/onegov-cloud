@@ -228,6 +228,30 @@ To add a language to module:
 
     do/translate onegov.org fr_CH
 
+Additionally, you can use <https://gengo.com> to translate English messages
+to other languages, like German, French or Italian.
+
+For this to work, you need to set the following variables:
+
+    export GENGO_PUBLIC_KEY="my gengo public key"
+    export GENGO_PRIVATE_KEY="my gengo private key"
+
+To push a translation job to Gengo, run:
+
+    do/honyaku onegov.org fr_CH
+
+Later you can re-run the command to get the state of the translations. As they
+come in you can accept them or ask for revisions.
+
+You can also add a comment for the translator when creating the job:
+
+    do/honyaku onegov.org fr_CH "Please leave tickets as 'tickets', not 'billets'"
+
+Or:
+
+    do/honyaku onegov.org fr_CH "The following are variables and should be left as is: ${example}"
+
+
 ## Releases 🚀
 
 To create a new release, check the changelog first:

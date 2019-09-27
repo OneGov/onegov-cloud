@@ -5,8 +5,10 @@ from onegov.activity import PeriodCollection
 from onegov.core.utils import Bunch
 from onegov.feriennet import _
 from onegov.form import Form, merge_forms
+from onegov.form.fields import PanelField
 from onegov.org.forms import ExportForm
 from sqlalchemy import distinct, func, or_, literal
+from wtforms.fields import BooleanField
 from wtforms.fields import StringField, RadioField, SelectField
 from wtforms.fields.html5 import DateField, IntegerField, DecimalField
 from wtforms.validators import InputRequired, Optional, NumberRange
@@ -57,16 +59,49 @@ class PeriodForm(Form):
         validators=[InputRequired()]
     )
 
+    confirmable = BooleanField(
+        label=_("With pre-booking phase"),
+        default=True
+    )
+
+    unconfirmable_warning = PanelField(
+        text=_(
+            "A period that is started without pre-booking phase cannot be "
+            "turned into a period with pre-booking phase later. If in doubt, "
+            "use the pre-booking phase and confirm it manually."
+        ),
+        kind='callout',
+        depends_on=('confirmable', '!y')
+    )
+
+    finalizable = BooleanField(
+        label=_("With billing"),
+        default=True
+    )
+
+    unfinalizable_warning = PanelField(
+        text=_(
+            "A period without billing will hide all bills from regular users, "
+            "so if you have used billing before and have open bills, your "
+            "users won't find them. If in doubt, use billing without creating "
+            "any bills. "
+        ),
+        kind='callout',
+        depends_on=('finalizable', '!y')
+    )
+
     prebooking_start = DateField(
         label=_("Prebooking Start"),
         fieldset=_("Dates"),
-        validators=[InputRequired()]
+        validators=[InputRequired()],
+        depends_on=('confirmable', 'y'),
     )
 
     prebooking_end = DateField(
         label=_("Prebooking End"),
         fieldset=_("Dates"),
-        validators=[InputRequired()]
+        validators=[InputRequired()],
+        depends_on=('confirmable', 'y'),
     )
 
     booking_start = DateField(
@@ -260,7 +295,28 @@ class PeriodForm(Form):
     def execution(self):
         return (self.execution_start.data, self.execution_end.data)
 
+    @property
+    def is_new(self):
+        return isinstance(self.model, PeriodCollection)
+
+    def on_request(self):
+
+        # disable the 'confirmable' flag on existing periods
+        if not self.is_new:
+            self.confirmable.render_kw = self.confirmable.render_kw or {}
+            self.confirmable.render_kw['disabled'] = ''
+
     def populate_obj(self, model):
+
+        # prevent any changes to the 'confirmable' property after creation
+        if not self.is_new:
+            self.confirmable.data = model.confirmable
+
+        if not self.confirmable.data:
+            also_exclude = ('prebooking_start', 'prebooking_end')
+        else:
+            also_exclude = ()
+
         super().populate_obj(model, exclude={
             'max_bookings_per_attendee',
             'booking_cost',
@@ -270,6 +326,12 @@ class PeriodForm(Form):
             'pay_organiser_directly',
             'cancellation_date',
             'cancellation_days',
+
+            # excluded here and not used later, only has an effect when
+            # the period is added through the new period view
+            'confirmable',
+
+            *also_exclude,
         })
 
         if self.pass_system.data == 'yes':
@@ -399,6 +461,9 @@ class PeriodForm(Form):
             self.execution_end
         )
 
+        if not self.confirmable.data:
+            fields = fields[2:]
+
         stack = [fields[0]]
 
         for field in fields:
@@ -417,7 +482,7 @@ class PeriodForm(Form):
 
     def ensure_no_payment_changes_after_confirmation(self):
         if isinstance(self.model, Period) and self.model.confirmed:
-            preview = Bunch()
+            preview = Bunch(confirmable=self.model.confirmable)
             self.populate_obj(preview)
 
             fields = (

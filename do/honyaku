@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+function script-path() {
+    echo "$( cd "$(dirname "$0")" ; pwd -P )"
+}
+
+function repository-path() {
+    dirname "$(script-path)"
+}
+
+function help() {
+    echo ""
+    echo "Usage: do/honyaku MODULE-NAME LOCALE [COMMENT]"
+    echo ""
+
+    exit 1
+}
+
+function main() {
+    local module="${1-}"
+    local locale="${2-}"
+    local comment="${3-}"
+
+    if [[ "$module" == "" ]]; then
+        echo "Please pass in a module (e.g. do/honyaku onegov.org fr_CH)"
+        help
+    fi
+
+    if [[ "$locale" == "" ]]; then
+        echo "Please pass in a langauge to translate (e.g. do/honyaku onegov.org fr_CH)"
+        help
+    fi
+
+    local pofile
+    pofile="$(repository-path)/src/${module/\./\/}/locale/${locale}/LC_MESSAGES/${module}.po"
+
+    if [[ ! -f "$pofile" ]]; then
+        echo "Path not found: $pofile"
+        exit 1
+    fi
+
+    local lang
+    lang=$(echo "$locale" | cut -d '_' -f 1)
+
+    if [[ -z "$comment" ]]; then
+        honyaku "$pofile" en "$lang" --tone "formal" --limit 100
+    else
+        honyaku "$pofile" en "$lang" --tone "formal" --limit 100 --comment "$comment"
+    fi
+}
+
+main "$@"

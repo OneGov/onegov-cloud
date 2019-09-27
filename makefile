@@ -17,6 +17,9 @@ update: in_virtual_env
 	# update all dependencies
 	pip list --outdated --format=freeze |  sed 's/==/>/g' | pip install --upgrade -r /dev/stdin
 
+	# force update the latest honyaku release
+	pip install git+https://github.com/seantis/honyaku#egg=honyaku --force
+
 	# apply install step to avoid deviations
 	make install
 

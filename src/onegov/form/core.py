@@ -208,17 +208,21 @@ class Form(BaseForm):
 
         for field_id, field in self._unbound_fields:
 
-            if 'depends_on' not in field.kwargs:
-                continue
-
-            depends_on = field.kwargs.pop('depends_on')
+            depends_on = field.kwargs.pop('depends_on', None)
 
             if not depends_on:
                 continue
 
             field.depends_on = FieldDependency(*depends_on)
 
-            if 'validators' in field.kwargs:
+            if field.kwargs.get('validators', None):
+
+                # mirror the field flags of the first existing validator to the
+                # field flags of the wrapper, to carry over things like the
+                # 'required' flag
+                field_flags = getattr(
+                    field.kwargs['validators'][0], 'field_flags', None)
+
                 field.kwargs['validators'] = (
                     If(
                         field.depends_on.fulfilled,
@@ -229,6 +233,9 @@ class Form(BaseForm):
                         StrictOptional()
                     ),
                 )
+
+                if field_flags:
+                    field.kwargs['validators'][0].field_flags = field_flags
 
             field.kwargs['render_kw'] = field.kwargs.get('render_kw', {})
             field.kwargs['render_kw'].update(field.depends_on.html_data)

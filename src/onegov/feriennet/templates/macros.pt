@@ -481,17 +481,17 @@
 </metal:star>
 
 <metal:hints define-macro="period_hints" i18n:domain="onegov.feriennet">
-    <div tal:condition="period.is_prebooking_in_future"
+    <div tal:condition="period.confirmable and period.is_prebooking_in_future"
          class="hint hint-prebooking" i18n:translate>
             Prebooking begins on <strong tal:content="layout.format_date(period.prebooking_start, 'date_long')" i18n:name="date" />.
     </div>
 
-    <div tal:condition="period.is_currently_prebooking"
+    <div tal:condition="period.confirmable and period.is_currently_prebooking"
          class="hint hint-prebooking active" i18n:translate>
             Prebooking is now active until <strong tal:content="layout.format_date(period.prebooking_end, 'date_long')" i18n:name="date" />.
     </div>
 
-    <div tal:condition="period.is_prebooking_in_past and period.confirmed and not period.finalized"
+    <div tal:condition="period.confirmable and period.is_prebooking_in_past and period.confirmed and not period.finalized"
          class="hint hint-prebooking finish" i18n:translate>
             Prebooking has ended.
     </div>

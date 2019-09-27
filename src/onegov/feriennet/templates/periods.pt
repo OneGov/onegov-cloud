@@ -22,7 +22,7 @@
                     <td>${period.title}</td>
                     <td>
                         <dl class="period-dates">
-                            <div>
+                            <div tal:condition="period.confirmable">
                                 <dt i18n:translate>Prebooking</dt>
                                 <dd class="${period.confirmed and 'finished prebooking'}">
                                     ${layout.format_date_range(period.prebooking_start, period.prebooking_end)}
