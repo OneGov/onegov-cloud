@@ -28,14 +28,14 @@ def test_link(render_element):
 def test_confirm_link(render_element):
     result = render_element(Link(text="Delete", url='#', traits=(
         Confirm(
-            _("Confirm?"),
-            _("Extra..."),
+            _("Login"),
+            "Extra...",
             _("Yes"),
             _("No")
         ),
     ), attrs={'class': 'foo'}))
 
-    assert result.pyquery('a').attr('data-confirm') == "Bestätigen?"
+    assert result.pyquery('a').attr('data-confirm') == "Anmelden"
     assert result.pyquery('a').attr('data-confirm-extra') == "Extra..."
     assert result.pyquery('a').attr('data-confirm-yes') == "Ja"
     assert result.pyquery('a').attr('data-confirm-no') == "Nein"

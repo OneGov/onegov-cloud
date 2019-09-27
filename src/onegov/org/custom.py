@@ -26,7 +26,7 @@ def get_global_tools(request):
             ),
             Link(
                 _("Logout"), request.link(
-                    Auth.from_request_path(request), name='logout'
+                    Auth.from_request(request), name='logout'
                 ), attrs={'class': 'logout'}
             ),
         ))

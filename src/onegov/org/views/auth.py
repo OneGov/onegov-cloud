@@ -180,6 +180,12 @@ def handle_activation(self, request):
 def view_logout(self, request):
     """ Handles the logout requests. """
 
+    # the message has to be set after the log out code has run, since that
+    # clears all existing messages from the session
+    @request.after
+    def show_hint(response):
+        request.success(_("You have been logged out."))
+
     return self.logout_to(request)
 
 
