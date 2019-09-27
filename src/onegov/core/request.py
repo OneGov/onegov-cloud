@@ -243,38 +243,40 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             session_id = random_token()
 
         def on_dirty(session, token):
-            if not session.count():
-                @self.after
-                def delete_session(response):
-                    response.delete_cookie('session_id')
-            else:
-                self.cookies['session_id'] = self.app.sign(token)
 
-                @self.after
-                def store_session(response):
+            # once the cookie has been set, we do not change it, not even if
+            # the user logs out - this way we can still identify the user and
+            # send him messages, for example when logging out
+            if 'session_id' in self.cookies:
+                return
 
-                    # Safari 12.x has a nasty bug, where same-site will lead
-                    # to a failure to safe cookies in certain scenarios. As a
-                    # work around, we do not send the same-site directive to
-                    # this specific Safari release. At the point of this
-                    # writing this version is about to be phased out, so this
-                    # has only a minor security impact.
-                    #
-                    # See https://bugs.webkit.org/show_bug.cgi?id=198181
-                    ua = self.agent['user_agent']
+            self.cookies['session_id'] = self.app.sign(token)
 
-                    if ua['family'] == 'Safari' and ua['major'] == '12':
-                        samesite = None
-                    else:
-                        samesite = self.app.same_site_cookie_policy
+            @self.after
+            def store_session(response):
 
-                    response.set_cookie(
-                        'session_id',
-                        self.cookies['session_id'],
-                        secure=self.app.identity_secure,
-                        httponly=True,
-                        samesite=samesite
-                    )
+                # Safari 12.x has a nasty bug, where same-site will lead
+                # to a failure to safe cookies in certain scenarios. As a
+                # work around, we do not send the same-site directive to
+                # this specific Safari release. At the point of this
+                # writing this version is about to be phased out, so this
+                # has only a minor security impact.
+                #
+                # See https://bugs.webkit.org/show_bug.cgi?id=198181
+                ua = self.agent['user_agent']
+
+                if ua['family'] == 'Safari' and ua['major'] == '12':
+                    samesite = None
+                else:
+                    samesite = self.app.same_site_cookie_policy
+
+                response.set_cookie(
+                    'session_id',
+                    self.cookies['session_id'],
+                    secure=self.app.identity_secure,
+                    httponly=True,
+                    samesite=samesite
+                )
 
         return self.app.modules.browser_session.BrowserSession(
             cache=self.app.session_cache,
