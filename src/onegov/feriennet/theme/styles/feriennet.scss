@@ -256,8 +256,19 @@ ul.single-line {
     text-align: center;
 }
 
-.pro-juventute-ad-text > div {
-    margin-bottom: .5rem;
+.platform-awards {
+    margin-top: .5rem;
+
+    img {
+        border-radius: 3px;
+        height: 60px;
+        margin-right: 1ex;
+        text-align: center;
+    }
+}
+
+.platform-promotion > div {
+    margin-bottom: .75rem;
     max-width: 70ex;
 }
 
