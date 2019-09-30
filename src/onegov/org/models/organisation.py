@@ -41,8 +41,6 @@ class Organisation(Base, TimestampMixin):
     opening_hours_url = meta_property()
     about_url = meta_property()
     reply_to = meta_property()
-    facebook_url = meta_property()
-    twitter_url = meta_property()
     analytics_code = meta_property()
     online_counter_label = meta_property()
     reservations_label = meta_property()
@@ -61,6 +59,13 @@ class Organisation(Base, TimestampMixin):
     geo_provider = meta_property(default='geo-mapbox')
     holiday_settings = meta_property(default=dict)
 
+    # social media
+    facebook_url = meta_property()
+    twitter_url = meta_property()
+    youtube_url = meta_property()
+    instagram_url = meta_property()
+
+    # parter logos
     partner_1_img = meta_property()
     partner_1_url = meta_property()
     partner_1_name = meta_property()

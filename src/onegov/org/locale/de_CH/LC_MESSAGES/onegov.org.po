@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-09-27 17:19+0200\n"
+"POT-Creation-Date: 2019-09-30 10:47+0200\n"
 "PO-Revision-Date: 2019-02-18 06:39+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -806,8 +806,8 @@ msgstr "Link zur Öffnungszeiten Seite"
 msgid "Facebook"
 msgstr "Facebook"
 
-msgid "URL pointing to the facebook site"
-msgstr "URL zu Facebook"
+msgid "URL pointing to the Facebook site"
+msgstr "Link zu Facebook"
 
 msgid "Social Media"
 msgstr "Soziale Medien"
@@ -815,8 +815,20 @@ msgstr "Soziale Medien"
 msgid "Twitter"
 msgstr "Twitter"
 
-msgid "URL pointing to the twitter site"
-msgstr "URL zu Twitter"
+msgid "URL pointing to the Twitter site"
+msgstr "Link zu Twitter"
+
+msgid "YouTube"
+msgstr "YouTube"
+
+msgid "URL pointing to the YouTube site"
+msgstr "Link zu YouTube"
+
+msgid "Instagram"
+msgstr "Instagram"
+
+msgid "URL pointing to the Instagram site"
+msgstr "Link zu Instagram"
 
 msgid "Name of the partner"
 msgstr "Name des Partners"

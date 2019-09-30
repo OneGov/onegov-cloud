@@ -105,14 +105,18 @@
                        opening_hours layout.org.meta.opening_hours_html|nothing;
                        opening_hours_url layout.org.meta.opening_hours_url|nothing;
                        facebook layout.org.meta.facebook_url|nothing;
-                       twitter layout.org.meta.twitter_url|nothing;">
+                       twitter layout.org.meta.twitter_url|nothing;
+                       instagram layout.org.meta.instagram_url|nothing;
+                       youtube layout.org.meta.youtube_url|nothing;">
         <div class="row footer-columns" tal:condition="any((
             contact,
             contact_url,
             opening_hours,
             opening_hours_url,
             facebook,
-            twitter
+            twitter,
+            instagram,
+            youtube,
         ))">
             <div class="small-12 medium-3 columns">
                 <metal:b use-macro="layout.macros['footer_contact']" />
@@ -217,6 +221,16 @@
         <li tal:condition="twitter">
             <a tal:attributes="href twitter">
                 <i class="fa fa-twitter fa-fw"></i> Twitter
+            </a>
+        </li>
+        <li tal:condition="instagram">
+            <a tal:attributes="href instagram">
+                <i class="fa fa-instagram fa-fw"></i> Instagram
+            </a>
+        </li>
+        <li tal:condition="youtube">
+            <a tal:attributes="href youtube">
+                <i class="fa fa-youtube fa-fw"></i> YouTube
             </a>
         </li>
     </ul>

@@ -117,12 +117,22 @@ class FooterSettingsForm(Form):
 
     facebook_url = URLField(
         label=_("Facebook"),
-        description=_("URL pointing to the facebook site"),
+        description=_("URL pointing to the Facebook site"),
         fieldset=_("Social Media"))
 
     twitter_url = URLField(
         label=_("Twitter"),
-        description=_("URL pointing to the twitter site"),
+        description=_("URL pointing to the Twitter site"),
+        fieldset=_("Social Media"))
+
+    youtube_url = URLField(
+        label=_("YouTube"),
+        description=_("URL pointing to the YouTube site"),
+        fieldset=_("Social Media"))
+
+    instagram_url = URLField(
+        label=_("Instagram"),
+        description=_("URL pointing to the Instagram site"),
         fieldset=_("Social Media"))
 
     partner_1_name = StringField(
