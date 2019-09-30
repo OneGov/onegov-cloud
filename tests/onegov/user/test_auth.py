@@ -198,7 +198,6 @@ def test_auth_integration(session, redis_url):
     response = client.get('/auth/logout')
     assert response.status_code == 302
     assert response.location == 'http://localhost/go'
-    assert 'session_id=;' in response.headers['set-cookie']
 
     user = UserCollection(session).by_username('AzureDiamond')
     assert not user.sessions
