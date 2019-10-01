@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-09-27 15:36+0200\n"
+"POT-Creation-Date: 2019-10-01 16:02+0200\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -615,8 +615,11 @@ msgstr "Utilisateurs qui ont des réservations"
 msgid "Users with unpaid bills"
 msgstr "Utilisateurs avec des factures impayées"
 
-msgid "Users with attendees of a given occasion"
-msgstr "Utilisateurs avec des participants pour un événement défini"
+msgid ""
+"Users with attenedees that have an occasion on their wish- or booking-list"
+msgstr ""
+"Les utilisateurs qui ont des abonnés et qui ont un événement sur leur liste "
+"de souhaits ou de réservation"
 
 msgid "Role"
 msgstr "Fonction"
@@ -1624,6 +1627,12 @@ msgstr "Logo Pro Juventute"
 msgid "Feriennet Partner"
 msgstr "Partenaire de Réseau vacances"
 
+msgid "Best of Swiss Web Award 2019"
+msgstr "Prix du Best of Swiss Web 2019"
+
+msgid "OneGov.ch Award"
+msgstr "Prix OneGov.ch"
+
 msgid "Platform"
 msgstr "Plateforme"
 
@@ -2589,6 +2598,9 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
+
+#~ msgid "Users with attendees of a given occasion"
+#~ msgstr "Utilisateurs avec des participants pour un événement défini"
 
 #~ msgid ""
 #~ "The prebooking period must start before the exeuction period and each period"

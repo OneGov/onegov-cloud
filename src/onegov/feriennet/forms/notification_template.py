@@ -69,7 +69,8 @@ class NotificationTemplateSendForm(Form):
                 "Users with unpaid bills"
             )),
             ('by_occasion', _(
-                "Users with attendees of a given occasion"
+                "Users with attenedees that have an occasion on their "
+                "wish- or booking-list"
             )),
         ],
         default='by_role'
