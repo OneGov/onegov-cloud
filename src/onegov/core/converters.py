@@ -121,3 +121,16 @@ datetime_converter = morepath.Converter(
 @Framework.converter(type=datetime)
 def get_default_datetime_converter():
     return datetime_converter
+
+
+def integer_range_encode(t):
+    return t and f'{t[0]}-{t[1]}' or ''
+
+
+def integer_range_decode(s):
+    return s and tuple(int(p) for p in s.split('-', 1))
+
+
+integer_range_converter = morepath.Converter(
+    decode=integer_range_decode, encode=integer_range_encode
+)

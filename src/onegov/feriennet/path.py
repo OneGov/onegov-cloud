@@ -16,24 +16,33 @@ from onegov.feriennet.models import GroupInvite
 from onegov.feriennet.models import InvoiceAction, VacationActivity
 from onegov.feriennet.models import NotificationTemplate
 from onegov.org.converters import keywords_converter
+from onegov.core.converters import integer_range_converter
 from uuid import UUID
 
 
 @FeriennetApp.path(
     model=VacationActivityCollection,
     path='/activities',
-    converters={'filter': keywords_converter})
-def get_vacation_activities(request, app, page=0, filter=None):
+    converters={
+        'filter': keywords_converter,
+        'pages': integer_range_converter
+    })
+def get_vacation_activities(request, app, pages=None, filter=None):
     filter = filter and ActivityFilter(**filter) or ActivityFilter()
 
     if not request.is_organiser:
         filter.period_ids = app.active_period and [app.active_period.id]
 
-    return VacationActivityCollection(
+    collection = VacationActivityCollection(
         session=app.session(),
-        page=page,
+        pages=pages,
         identity=request.identity,
         filter=filter
+    )
+
+    # prevent large lookups
+    return collection.by_page_range(
+        collection.limit_range(collection.pages, 'down')
     )
 
 

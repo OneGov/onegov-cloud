@@ -22,6 +22,9 @@ Example:
             Load more
     </a>
 
+If an optional 'data-history' attribute is set, it is used to update the
+browser history with it.
+
 */
 jQuery.fn.clickToLoad = function() {
     var el = $(this);
@@ -41,6 +44,10 @@ jQuery.fn.clickToLoad = function() {
             } else {
                 target = next.data('target');
                 source = next.data('source');
+            }
+
+            if (next.data('history')) {
+                history.pushState({}, '', next.data('history'));
             }
         });
 

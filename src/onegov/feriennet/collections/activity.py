@@ -6,11 +6,13 @@ from sqlalchemy.orm import joinedload
 class VacationActivityCollection(ActivityCollection):
 
     # type is ignored, but present to keep the same signature as the superclass
-    def __init__(self, session, type=None, page=0, filter=None, identity=None):
+    def __init__(self, session, type=None, pages=(0, 0), filter=None,
+                 identity=None):
+
         super().__init__(
             session=session,
             type='vacation',
-            page=page,
+            pages=pages,
             filter=filter
         )
 
@@ -26,10 +28,10 @@ class VacationActivityCollection(ActivityCollection):
     def query_base(self):
         return self.policy.granted_subset(self.session.query(self.model_class))
 
-    def page_by_index(self, index):
+    def by_page_range(self, page_range):
         return self.__class__(
             session=self.session,
             identity=self.identity,
-            page=index,
+            pages=page_range,
             filter=self.filter
         )

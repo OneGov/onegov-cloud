@@ -10,7 +10,7 @@ from onegov.activity.utils import merge_ranges
 from onegov.activity.utils import num_range_decode
 from onegov.activity.utils import num_range_encode
 from onegov.activity.utils import overlaps
-from onegov.core.collection import Pagination
+from onegov.core.collection import RangedPagination
 from onegov.core.utils import increment_name
 from onegov.core.utils import is_uuid
 from onegov.core.utils import normalize_for_url
@@ -168,29 +168,26 @@ class ActivityFilter(object):
         return self.contains_num_range(price_range, self.price_ranges)
 
 
-class ActivityCollection(Pagination):
+class ActivityCollection(RangedPagination):
 
-    def __init__(self, session, type='*', page=0, filter=None):
+    def __init__(self, session, type='*', pages=None, filter=None):
         self.session = session
         self.type = type
-        self.page = page
+        self.pages = pages or (0, 0)
         self.filter = filter or ActivityFilter()
-
-    def __eq__(self, other):
-        return self.type == other.type and self.page == other.page
 
     def subset(self):
         return self.query()
 
     @property
-    def page_index(self):
-        return self.page
+    def page_range(self):
+        return self.pages
 
-    def page_by_index(self, index):
+    def by_page_range(self, page_range):
         return self.__class__(
             self.session,
             type=self.type,
-            page=index,
+            pages=page_range,
             filter=self.filter
         )
 
@@ -360,7 +357,7 @@ class ActivityCollection(Pagination):
         return self.__class__(
             session=self.session,
             type=self.type,
-            page=0,
+            pages=(0, 0),
             filter=self.filter.toggled(**keywords)
         )
 

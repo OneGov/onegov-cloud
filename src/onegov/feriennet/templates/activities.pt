@@ -83,6 +83,7 @@
                             href="${request.link(next_page)}"
                             data-source="${request.link(next_page)} .activities-list"
                             data-target="#click-to-load-target"
+                            data-history="${page_range_link}"
                             i18n:translate>
                                 Show more
                         </a>
