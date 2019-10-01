@@ -1,8 +1,87 @@
 # Changes
 
+## Release `2019.21`
+
+> commits: **13 / [729c079a33...b6b5c778e3](https://github.com/OneGov/onegov-cloud/compare/729c079a33^...b6b5c778e3)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.21)](https://buildkite.com/seantis/onegov-cloud)
+
+### Core
+
+✨ **No longer delete cookies**
+
+This fixes an issue with logout messages never being shown to the user.
+Security wise this does not make a difference, because when we forget a
+user we do so by removing the necessary authentication bits in our
+server-side session cache. That is, if a certain session id stored in
+the cookie is deleted, it is irrelevant if that session id is requested
+again, we have already downgraded it.
+
+**`Other`** | **[3fd5db0a87](https://github.com/onegov/onegov-cloud/commit/3fd5db0a877d18f57bef0fb6fe1cd7ced50ed5a7)**
+
+### Election-Day
+
+🏎 **Sql query api rewrite for election/connections-table**
+
+Adds sql query and api endpoint `/election/data-list-connections` for `election-connections-table`. Handles display of sublist names better for the case sublist names are prefixed with parent connections.
+
+**`Performance`** | **[729c079a33](https://github.com/onegov/onegov-cloud/commit/729c079a33ad8f3c00de56a4f4d84d3b7f50a344)**
+
+### Feriennet
+
+🎉 **Introduces a command to delete periods**
+
+This is a semi-regular support request we have to fulfill, which is
+going to be much easier to fulfill with this command.
+
+**`Feature`** | **[e532bb4c67](https://github.com/onegov/onegov-cloud/commit/e532bb4c67926c3ec3617b5e7e3508f2f8b39af2)**
+
+🎉 **Adds periods without pre-booking/billing**
+
+Users may now chose to disable pre-booking and/or billing when creating
+a period. Pre-booking can only be disabled upon creation of the period,
+billing can be changed at any time.
+
+**`Feature`** | **[FER-677](https://issues.seantis.ch/browse/FER-677)** | **[11e8490be4](https://github.com/onegov/onegov-cloud/commit/11e8490be4b28258d4a0de6e5d9872a28fe781bb)**
+
+🎉 **Adds locations for inline-loaded activites**
+
+In the activity list, clicking on "more activites" did not use any
+browser history yet. This caused issues with Chrome which does not come
+with a bfcache and therefore tries to re-load the site, losing all
+navigational state.
+
+This change solves this issue by updating the URL for each loaded page.
+
+**`Feature`** | **[FER-756](https://issues.seantis.ch/browse/FER-756)** | **[b7f503a21c](https://github.com/onegov/onegov-cloud/commit/b7f503a21c779ac950bf01cb11185f6033ddaac9)**
+
+✨ **Adds BoSW and OneGov Awards to Footer**
+
+**`Other`** | **[FER-752](https://issues.seantis.ch/browse/FER-752)** | **[172b88f6bd](https://github.com/onegov/onegov-cloud/commit/172b88f6bd5690b9bc3ce577e4f2f5ef45ff1b4d)**
+
+✨ **Improves wording of occasion notifactions**
+
+It was unclear that these notifications would also be sent to users with
+wishes.
+
+**`Other`** | **[FER-515](https://issues.seantis.ch/browse/FER-515)** | **[b6b5c778e3](https://github.com/onegov/onegov-cloud/commit/b6b5c778e33d610f975db1eb994994eef7b59043)**
+
+### Org
+
+🎉 **Logout now always redirects to the homepage**
+
+This avoids the confusing 'Access Denied' message after logging out
+while being on a protected view.
+
+**`Feature`** | **[FER-681](https://issues.seantis.ch/browse/FER-681)** | **[e1784982ce](https://github.com/onegov/onegov-cloud/commit/e1784982cefba4442787b25196dc106066fb787e)**
+
+🎉 **Adds social media links for YouTube and Instagram**
+
+**`Feature`** | **[FER-116](https://issues.seantis.ch/browse/FER-116)** | **[f6ec72a0bc](https://github.com/onegov/onegov-cloud/commit/f6ec72a0bcfec18c7d843780d7b50dd7ce12ad41)**
+
 ## Release `2019.20`
 
-> commits: **2 / [350f56de4b...b317593649](https://github.com/OneGov/onegov-cloud/compare/350f56de4b^...b317593649)**<br>
+> released: **2019-09-26 11:21**<br>
+> commits: **3 / [350f56de4b...8862d19fee](https://github.com/OneGov/onegov-cloud/compare/350f56de4b^...8862d19fee)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.20)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
