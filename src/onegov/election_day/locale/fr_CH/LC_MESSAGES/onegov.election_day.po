@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-01 10:29+0200\n"
-"PO-Revision-Date: 2019-09-04 09:27+0200\n"
+"POT-Creation-Date: 2019-10-01 10:43+0200\n"
+"PO-Revision-Date: 2019-10-01 11:01+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 2.2.3\n"
+"X-Generator: Poedit 2.2.4\n"
 
 msgid "The final results are available"
 msgstr "Les résultats finaux sont disponibles"
@@ -73,11 +73,11 @@ msgstr "Intègre non valide: ${col}"
 
 #, python-format
 msgid "Invalid float number: ${col}"
-msgstr ""
+msgstr "Nombre flottant invalide: ${col}"
 
 #, python-format
 msgid "Not an alphanumeric: ${col}"
-msgstr ""
+msgstr "Pas un alphanumerique: ${col}"
 
 msgid "Invalid election values"
 msgstr "Valeurs des élections non valides"
@@ -112,7 +112,7 @@ msgstr "Valeurs de connexion de liste non valides"
 
 #, python-format
 msgid "Panachage results id ${id} not in list_id's"
-msgstr ""
+msgstr "Panachage results id ${id} pas dans list_id's"
 
 msgid "Invalid values"
 msgstr "Valeurs non valides"
@@ -122,7 +122,7 @@ msgid "${name} was found twice"
 msgstr "${name} a été trouvé en double"
 
 msgid "Panachage results ids and id not consistent"
-msgstr ""
+msgstr "Panachage results ids and id ne sont pas consistente"
 
 msgid "Elected Candidates"
 msgstr "Candidats élus"
@@ -689,9 +689,6 @@ msgstr "Candidats élus seulement"
 
 msgid "Mandates"
 msgstr "Mandats"
-
-msgid "${embed_link}"
-msgstr ""
 
 msgid "${counted} of ${total}"
 msgstr "${counted} de ${total}"

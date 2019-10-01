@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-01 10:29+0200\n"
+"POT-Creation-Date: 2019-10-01 10:43+0200\n"
 "PO-Revision-Date: 2018-11-05 12:07+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -689,9 +689,6 @@ msgstr "Mo candidat(a)s elegid(a)s"
 
 msgid "Mandates"
 msgstr "Mandats"
-
-msgid "${embed_link}"
-msgstr ""
 
 msgid "${counted} of ${total}"
 msgstr "${counted} da ${total}"
