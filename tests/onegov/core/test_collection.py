@@ -13,11 +13,11 @@ def test_pagination():
             self.start = None
             self.end = None
 
-        def all(self):
+        def __iter__(self):
             if self.start is None or self.end is None:
-                return self.values
+                return iter(self.values)
             else:
-                return self.values[self.start:self.end]
+                return iter(self.values[self.start:self.end])
 
         def slice(self, start, end):
             self.start = start
@@ -26,7 +26,7 @@ def test_pagination():
             return self
 
         def count(self):
-            return len(self.all())
+            return len(self.values)
 
         def order_by(self, *args):
             return self
