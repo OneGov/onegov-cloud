@@ -93,7 +93,7 @@ def test_event_collection_pagination(session):
 
     assert events.page_index == 0
     assert events.pages_count == 0
-    assert events.batch == []
+    assert events.batch == ()
 
     for year in range(2008, 2011):
         for month in range(1, 13):
@@ -267,7 +267,7 @@ def test_occurrence_collection_pagination(session):
     occurrences = OccurrenceCollection(session)
     assert occurrences.page_index == 0
     assert occurrences.pages_count == 0
-    assert occurrences.batch == []
+    assert occurrences.batch == ()
 
     for year in range(2008, 2011):
         for month in range(1, 13):

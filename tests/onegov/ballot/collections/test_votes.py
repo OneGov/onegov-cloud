@@ -154,7 +154,7 @@ def test_votes_pagination(session):
 
     assert votes.page_index == 0
     assert votes.pages_count == 0
-    assert votes.batch == []
+    assert votes.batch == ()
 
     for year in range(2008, 2011):
         for month in range(1, 13):

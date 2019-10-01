@@ -154,7 +154,7 @@ def test_scan_jobs_pagination(session):
     scan_jobs = ScanJobCollection(session)
 
     assert scan_jobs.pages_count == 0
-    assert scan_jobs.batch == []
+    assert scan_jobs.batch == ()
     assert scan_jobs.page_index == 0
     assert scan_jobs.offset == 0
     assert scan_jobs.previous is None

@@ -448,7 +448,7 @@ def test_notice_collection_pagination(session):
 
     assert notices.page_index == 0
     assert notices.pages_count == 0
-    assert notices.batch == []
+    assert notices.batch == ()
 
     for year in range(2008, 2013):
         for month in range(1, 13):

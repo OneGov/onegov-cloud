@@ -146,7 +146,7 @@ def test_votes_pagination(swissvotes_app):
     votes = SwissVoteCollection(swissvotes_app)
 
     assert votes.pages_count == 0
-    assert votes.batch == []
+    assert votes.batch == ()
     assert votes.page_index == 0
     assert votes.offset == 0
     assert votes.previous is None

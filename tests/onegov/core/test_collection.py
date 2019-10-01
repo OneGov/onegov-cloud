@@ -57,18 +57,18 @@ def test_pagination():
     assert collection.previous is None
     assert collection.next is not None
 
-    assert collection.batch == list(range(0, 10))
-    assert collection.next.batch == list(range(10, 20))
-    assert collection.next.next.batch == list(range(20, 25))
+    assert collection.batch == tuple(range(0, 10))
+    assert collection.next.batch == tuple(range(10, 20))
+    assert collection.next.next.batch == tuple(range(20, 25))
     assert collection.next.next.next is None
 
-    assert collection.next.previous.batch == list(range(0, 10))
+    assert collection.next.previous.batch == tuple(range(0, 10))
     assert collection.next.previous == collection
 
     pages = collection.pages
-    assert next(pages).batch == list(range(0, 10))
-    assert next(pages).batch == list(range(10, 20))
-    assert next(pages).batch == list(range(20, 25))
+    assert next(pages).batch == tuple(range(0, 10))
+    assert next(pages).batch == tuple(range(10, 20))
+    assert next(pages).batch == tuple(range(20, 25))
 
 
 def test_generic_collection(postgres_dsn):

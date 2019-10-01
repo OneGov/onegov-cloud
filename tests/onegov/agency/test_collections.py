@@ -23,7 +23,7 @@ def test_extended_people_pagination(session):
     people = ExtendedPersonCollection(session)
 
     assert people.pages_count == 0
-    assert people.batch == []
+    assert people.batch == ()
 
     for letter in ascii_uppercase:
         people.add(first_name=letter.lower(), last_name=letter)

@@ -169,7 +169,7 @@ def test_elections_pagination(session):
 
     assert elections.page_index == 0
     assert elections.pages_count == 0
-    assert elections.batch == []
+    assert elections.batch == ()
 
     for year in range(2008, 2011):
         for month in range(1, 13):
