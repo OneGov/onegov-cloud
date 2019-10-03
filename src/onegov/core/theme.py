@@ -143,5 +143,5 @@ class ThemeFile(FilestorageFile):
 @Framework.path(model=ThemeFile, path='/theme', absorb=True)
 def get_themestorage_file(app, absorb):
     """ Serves the theme files. """
-    if app.themestorage.exists(absorb):
+    if app.themestorage.isfile(absorb):
         return ThemeFile(absorb)
