@@ -306,7 +306,7 @@ def view_activities(self, request):
         'get_ages': get_ages,
         'get_min_cost': get_min_cost,
         'get_available_spots': get_available_spots,
-        'page_range_link': request.link(
+        'current_location': request.link(
             self.by_page_range((0, self.pages[-1])))
     }
 
