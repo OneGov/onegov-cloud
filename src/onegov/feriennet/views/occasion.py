@@ -162,10 +162,13 @@ def book_occasion(self, request, form):
     # for the "nth. occasion" title
     number = request.session.execute("""
         SELECT count(*) FROM occasions
-        WHERE activity_id = :activity_id AND "order" <= :order
+        WHERE activity_id = :activity_id \
+          AND "order" <= :order \
+          AND "period_id" = :period_id
     """, {
         'activity_id': self.activity_id,
-        'order': self.order
+        'order': self.order,
+        'period_id': self.period.id
     }).scalar()
 
     if form.submitted(request):
