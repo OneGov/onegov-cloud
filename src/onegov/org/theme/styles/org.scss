@@ -105,7 +105,6 @@ a[onclick],
 /*
     Hyphenation for browsers which support it.
 */
-
 p,
 h1,
 h2,
@@ -118,6 +117,17 @@ h6,
 .news-lead,
 .newsletter-lead {
     @include prefix(hyphens, auto);
+}
+
+/*
+    Disable hyphenation in e-mail links and make them breakable
+*/
+a[href^="mailto:"] {
+    @include prefix(hyphens, none);
+    @include prefix(word-break, break-all);
+
+    // Non standard for WebKit
+    word-break: break-word;
 }
 
 /*
