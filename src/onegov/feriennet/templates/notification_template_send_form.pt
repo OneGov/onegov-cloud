@@ -17,6 +17,13 @@
             <a class="control" href="${edit_link}" i18n:translate>Edit</a>
         </div>
 
+        <h2 i18n:translate>Period</h2>
+        <div class="row">
+            <div class="column medium-6 small-12">
+                <metal:b use-macro="layout.macros['periods']" tal:define="periods request.app.periods; view_name 'send'; hide_title True" />
+            </div>
+        </div>
+
         <h2 i18n:translate>Target Group</h2>
         <div class="row">
             <div class="column medium-6 small-12">

@@ -150,7 +150,7 @@ def test_notification_template_send_form(session):
             ),
             session=session,
             include=lambda *args: None,
-            model=None,
+            model=Bunch(period_id=period.id),
             is_admin=admin,
             is_organiser_only=not admin and True or False,
             is_manager=admin and True or False,
@@ -163,7 +163,7 @@ def test_notification_template_send_form(session):
 
     # in the beginning there are no recipients
     form = NotificationTemplateSendForm()
-    form.model = None
+    form.model = Bunch(period_id=period.id)
     form.request = request(admin=True)
 
     assert form.has_choices  # we still have choices (like send to users)
@@ -176,38 +176,39 @@ def test_notification_template_send_form(session):
     assert len(form.occasion.choices) == 2
     assert len(form.send_to.choices) == 7
 
-    # if the period is inactive, there are no occasions
-    periods.query().one().active = False
+    # if the period is not confirmed, we send to attendees wanting the occasion
+    periods.query().one().confirmed = False
+    bookings.query().filter_by(username=admin.username)\
+        .one().state = 'denied'
     transaction.commit()
 
     form = NotificationTemplateSendForm()
-    form.model = None
+    form.model = Bunch(period_id=period.id)
     form.request = request(admin=True)
 
     form.on_request()
-    assert len(form.occasion.choices) == 0
-
-    # if the period is active but not confirmed, there are no recipients
-    period = periods.query().one()
-    period.active = True
-    period.confirmed = False
-    transaction.commit()
-
-    form = NotificationTemplateSendForm()
-    form.model = None
-    form.request = request(admin=True)
-
-    form.on_request()
+    assert len(form.occasion.choices) == 2
 
     occasions = [c[0] for c in form.occasion.choices]
-
-    # with organisers
+    assert len(form.recipients_by_occasion(occasions, False)) == 2
     assert len(form.recipients_by_occasion(occasions, True)) == 2
 
-    # without
-    assert len(form.recipients_by_occasion(occasions, False)) == 0
+    # if the period is confirmed, we send to attendees with accepted bookings
+    periods.query().one().confirmed = True
+    transaction.commit()
 
-    # the number of users is indepenedent of the period
+    form = NotificationTemplateSendForm()
+    form.model = Bunch(period_id=period.id)
+    form.request = request(admin=True)
+
+    form.on_request()
+    assert len(form.occasion.choices) == 2
+
+    occasions = [c[0] for c in form.occasion.choices]
+    assert len(form.recipients_by_occasion(occasions, False)) == 1
+    assert len(form.recipients_by_occasion(occasions, True)) == 2
+
+    # the number of users is independent of the period
     assert len(form.recipients_by_role(('admin', 'editor', 'member'))) == 3
     assert len(form.recipients_by_role(('admin', 'editor'))) == 2
     assert len(form.recipients_by_role(('admin',))) == 1
@@ -221,9 +222,11 @@ def test_notification_template_send_form(session):
     assert len(form.recipients_by_occasion(occasions)) == 2
 
     # only accepted bookings are counted
-    parent = admin.username
-    bookings.query().filter_by(username=parent).one().state = 'cancelled'
+    bookings.query().filter_by(username=admin.username)\
+        .one().state = 'cancelled'
     transaction.commit()
+
+    occasions = [c[0] for c in form.occasion.choices]
 
     # without organisers
     assert len(form.recipients_by_occasion(occasions, False)) == 1
@@ -247,10 +250,10 @@ def test_notification_template_send_form(session):
     period.confirmed = False
 
     transaction.commit()
-
     form.request = request(admin=True)
 
     # do not count cancelled bookings...
+    form.__dict__['period'] = period
     assert len(form.recipients_with_wishes()) == 2
     assert len(form.recipients_with_bookings()) == 0
 
@@ -261,6 +264,7 @@ def test_notification_template_send_form(session):
     transaction.commit()
 
     form.request = request(admin=True)
+    form.__dict__['period'] = period
     assert len(form.recipients_with_wishes()) == 0
     assert len(form.recipients_with_bookings()) == 2
 

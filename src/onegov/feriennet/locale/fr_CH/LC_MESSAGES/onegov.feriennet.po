@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-10-03 10:50+0200\n"
+"POT-Creation-Date: 2019-10-03 15:40+0200\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -597,8 +597,8 @@ msgstr "Remarque"
 msgid "A notification with this subject exists already"
 msgstr "Une notification avec ce sujet existe déjà"
 
-msgid "Send to (applies to active period only)"
-msgstr "Envoyer à (s'applique uniquement pour une période active)"
+msgid "Send to"
+msgstr "Envoyer à"
 
 msgid "Myself"
 msgstr "Moi-même"
@@ -2599,6 +2599,9 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
+
+#~ msgid "Send to (applies to active period only)"
+#~ msgstr "Envoyer à (s'applique uniquement pour une période active)"
 
 #~ msgid "I know that this stops all changes including cancellations."
 #~ msgstr ""
