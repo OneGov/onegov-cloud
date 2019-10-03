@@ -134,9 +134,12 @@
 
                                         <ul style="${toggled and 'display: block;' or 'display: none;'}">
                                             <li tal:repeat="booking grouped_bookings[attendee][state]" id="booking-${booking.id}">
-                                                <div class="panel" tal:condition="repeat.booking.index == 0 and state == 'blocked'">
+                                                <div class="panel" tal:condition="repeat.booking.index == 0 and state in ('blocked', 'denied')">
                                                     <tal:b condition="state == 'blocked'" i18n:translate>
                                                         These wishes overlap accepted bookings and are therefore blocked.
+                                                    </tal:b>
+                                                    <tal:b condition="state == 'denied'" i18n:translate>
+                                                        Unfortunately, these wishes could not be fulfilled.
                                                     </tal:b>
                                                 </div>
                                                 <div class="booking">
