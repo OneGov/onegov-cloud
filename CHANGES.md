@@ -1,8 +1,60 @@
 # Changes
 
+## Release `2019.22`
+
+> commits: **9 / [8636d6d3f5...21aeb3268e](https://github.com/OneGov/onegov-cloud/compare/8636d6d3f5^...21aeb3268e)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.22)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🎉 **Show a note for denied bookings**
+
+This explains why a booking has the 'denied' state in a few words, to
+soften the blow, so to speak.
+
+**`Feature`** | **[FER-777](https://issues.seantis.ch/browse/FER-777)** | **[7ce88e195a](https://github.com/onegov/onegov-cloud/commit/7ce88e195aa9816872cbac67e0e4733fee1feaf9)**
+
+🎉 **Send notifications per period**
+
+Notifications used to be sent to the active period in most cases. Now it
+is possible to select the period to which the notificaiton applies to
+(defaulting to the active period).
+
+**`Feature`** | **[FER-792](https://issues.seantis.ch/browse/FER-792)** | **[8ed483a499](https://github.com/onegov/onegov-cloud/commit/8ed483a4995f6e36b972a8d4ca02c6bf2daebd05)**
+
+🐞 **Improves locations for inline-loaded activites**
+
+In certain situations, the location history would not work for
+inline-loaded activites. Now it should work in all cases.
+
+**`Bugfix`** | **[FER-756](https://issues.seantis.ch/browse/FER-756)** | **[8636d6d3f5](https://github.com/onegov/onegov-cloud/commit/8636d6d3f542c72f79619751d49af97891a89521)**
+
+✨ **Improve finalization message**
+
+It did not yet take into account the newly given powers to
+administrators.
+
+**`Other`** | **[FER-394](https://issues.seantis.ch/browse/FER-394)** | **[c0c9c7ef7c](https://github.com/onegov/onegov-cloud/commit/c0c9c7ef7ca6af04b108186a6f67b67e0cee5fd9)**
+
+🐞 **Fixes occasion count**
+
+Activities with occasions in multiple periods would show the wrong
+occasion count when booking an occasion.
+
+**`Bugfix`** | **[FER-802](https://issues.seantis.ch/browse/FER-802)** | **[32aaf6c597](https://github.com/onegov/onegov-cloud/commit/32aaf6c597b69c49cfdc735ce1c3059cf2e8c16c)**
+
+### Org
+
+🎉 **Automatically break e-mail links**
+
+A hyphen was inserted before and it didn't work on Firefox.
+
+**`Feature`** | **[FER-776](https://issues.seantis.ch/browse/FER-776)** | **[21aeb3268e](https://github.com/onegov/onegov-cloud/commit/21aeb3268e1b648d1b6413762356e3778748cad3)**
+
 ## Release `2019.21`
 
-> commits: **13 / [729c079a33...b6b5c778e3](https://github.com/OneGov/onegov-cloud/compare/729c079a33^...b6b5c778e3)**<br>
+> released: **2019-10-01 16:29**<br>
+> commits: **14 / [729c079a33...d7e90e52ba](https://github.com/OneGov/onegov-cloud/compare/729c079a33^...d7e90e52ba)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.21)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Core
