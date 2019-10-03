@@ -3112,7 +3112,7 @@ msgid "Password changed."
 msgstr "Passwort geändert."
 
 msgid "Wrong username or password reset link not valid any more."
-msgstr "Ungültige Addresse oder abgelaufener Link."
+msgstr "Ungültige Adresse oder abgelaufener Link."
 
 msgid "A link was added to the clipboard"
 msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
