@@ -51,7 +51,6 @@ jQuery.fn.clickToLoad = function() {
 
             var location = $(data).find('#' + id + '-location');
             if (location.data('location')) {
-                console.log(location.data('location'));
                 history.pushState({}, '', location.data('location'));
             }
         });
