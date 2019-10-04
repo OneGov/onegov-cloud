@@ -64,7 +64,7 @@ def mission_report_form(model, request):
     builder.set_current_fieldset(_("Vehicles"))
 
     vehicles = MissionReportVehicleCollection(request.session).query()
-    vehicles = {v.id: v for v in vehicles if not v.is_hidden_from_public}
+    vehicles = {v.id: v for v in vehicles if v.access == 'public'}
 
     # include hidden vehicles that were picked before being hidden
     for used in report.used_vehicles:
@@ -98,7 +98,7 @@ def mission_report_form(model, request):
 
     if vehicle_field_id:
         form_class = move_fields(
-            form_class, ('is_hidden_from_public', ), vehicle_field_id)
+            form_class, ('access', ), vehicle_field_id)
 
     return form_class
 

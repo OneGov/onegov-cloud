@@ -143,7 +143,7 @@ def test_agency_pdf_default_hidden(session):
     aeschi = people.add(
         last_name="Aeschi",
         first_name="Thomas",
-        is_hidden_from_public=True
+        access='private'
     )
     eder = people.add(
         last_name="Eder",
@@ -155,7 +155,7 @@ def test_agency_pdf_default_hidden(session):
     agencies.add(
         parent=bund,
         title="Bundesrat",
-        is_hidden_from_public=True
+        access='private'
     )
     nr = agencies.add(
         parent=bund,
@@ -169,7 +169,7 @@ def test_agency_pdf_default_hidden(session):
     )
 
     nr.add_person(aeschi.id, "Mitglied von Zug")
-    sr.add_person(eder.id, "Ständerat für Zug", is_hidden_from_public=True)
+    sr.add_person(eder.id, "Ständerat für Zug", access='private')
 
     file = AgencyPdfDefault.from_agencies(
         agencies=[bund],

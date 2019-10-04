@@ -324,7 +324,7 @@ class DaycareSubsidyCalculator(object):
         adapter = DirectoryDaycareAdapter(self.directory)
 
         items = DirectoryEntryCollection(self.directory).query()
-        items = (i for i in items if not i.meta.get('is_hidden_from_public'))
+        items = (i for i in items if i.access == 'public')
         items = {i.id.hex: adapter.as_daycare(i) for i in items}
 
         return items

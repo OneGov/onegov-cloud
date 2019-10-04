@@ -1,9 +1,9 @@
 from onegov.core.orm.mixins import meta_property
-from onegov.org.models.extensions import HiddenFromPublicExtension
+from onegov.org.models.extensions import AccessExtension
 from onegov.people import AgencyMembership
 
 
-class ExtendedAgencyMembership(AgencyMembership, HiddenFromPublicExtension):
+class ExtendedAgencyMembership(AgencyMembership, AccessExtension):
     """ An extended version of the standard membership from onegov.people. """
 
     __mapper_args__ = {'polymorphic_identity': 'extended'}
@@ -13,12 +13,14 @@ class ExtendedAgencyMembership(AgencyMembership, HiddenFromPublicExtension):
     @property
     def es_public(self):
         if self.agency:
-            if getattr(self.agency, 'is_hidden_from_public', False):
+            if self.agency.meta.get('access', 'public') != 'public':
                 return False
+
         if self.person:
-            if getattr(self.person, 'is_hidden_from_public', False):
+            if self.person.meta.get('access', 'public') != 'public':
                 return False
-        return not self.is_hidden_from_public
+
+        return self.access == 'public'
 
     #: The prefix character.
     prefix = meta_property()

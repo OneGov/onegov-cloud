@@ -1,39 +1,39 @@
 from onegov.core.utils import Bunch
 from onegov.form import Form
 from onegov.org.models import (
-    PersonLinkExtension, ContactExtension, HiddenFromPublicExtension
+    PersonLinkExtension, ContactExtension, AccessExtension
 )
 from uuid import UUID
 
 
-def test_hidden_from_public_extension():
+def test_access_extension():
 
-    class Topic(HiddenFromPublicExtension):
+    class Topic(AccessExtension):
         meta = {}
 
     class TopicForm(Form):
         pass
 
     topic = Topic()
-    assert not topic.is_hidden_from_public
+    assert topic.access == 'public'
 
     form_class = topic.with_content_extensions(TopicForm, request=object())
     form = form_class()
 
-    assert 'is_hidden_from_public' in form._fields
-    assert not form.is_hidden_from_public.data
+    assert 'access' in form._fields
+    assert form.access.data == 'public'
 
-    form.is_hidden_from_public.data = True
+    form.access.data = 'private'
     form.populate_obj(topic)
 
-    assert topic.is_hidden_from_public
+    assert topic.access == 'private'
 
     form_class = topic.with_content_extensions(TopicForm, request=object())
     form = form_class()
 
     form.process(obj=topic)
 
-    assert form.is_hidden_from_public.data
+    assert form.access.data == 'private'
 
 
 def test_person_link_extension():

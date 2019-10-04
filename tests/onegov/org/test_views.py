@@ -376,7 +376,7 @@ def test_news_on_homepage(client):
 
     # hidden news don't count for anonymous users
     baz = PageCollection(client.app.session()).by_path('news/baz')
-    baz.is_hidden_from_public = True
+    baz.access = 'private'
 
     transaction.commit()
 
@@ -392,7 +392,7 @@ def test_news_on_homepage(client):
 
     # even if they are stickied
     baz = PageCollection(client.app.session()).by_path('news/baz')
-    baz.is_hidden_from_public = True
+    baz.access = 'private'
     baz.is_visible_on_homepage = True
 
     transaction.commit()
@@ -685,7 +685,7 @@ def test_hide_page(client):
     new_page = client.get('/topics/organisation').click('Thema')
 
     new_page.form['title'] = "Test"
-    new_page.form['is_hidden_from_public'] = True
+    new_page.form['access'] = 'private'
     page = new_page.form.submit().follow()
 
     anonymous = client.spawn()
@@ -693,7 +693,7 @@ def test_hide_page(client):
     assert response.status_code == 403
 
     edit_page = page.click("Bearbeiten")
-    edit_page.form['is_hidden_from_public'] = False
+    edit_page.form['access'] = 'public'
     page = edit_page.form.submit().follow()
 
     response = anonymous.get(page.request.url)
@@ -706,7 +706,7 @@ def test_hide_news(client):
     new_page = client.get('/news').click('Nachricht')
 
     new_page.form['title'] = "Test"
-    new_page.form['is_hidden_from_public'] = True
+    new_page.form['access'] = 'private'
     page = new_page.form.submit().follow()
 
     anonymous = client.spawn()
@@ -714,7 +714,7 @@ def test_hide_news(client):
     assert response.status_code == 403
 
     edit_page = page.click("Bearbeiten")
-    edit_page.form['is_hidden_from_public'] = False
+    edit_page.form['access'] = 'public'
     page = edit_page.form.submit().follow()
 
     response = anonymous.get(page.request.url)
@@ -725,7 +725,7 @@ def test_hide_form(client):
     client.login_editor()
 
     form_page = client.get('/form/anmeldung/edit')
-    form_page.form['is_hidden_from_public'] = True
+    form_page.form['access'] = 'private'
     page = form_page.form.submit().follow()
 
     anonymous = client.spawn()
@@ -734,7 +734,7 @@ def test_hide_form(client):
     assert response.status_code == 403
 
     edit_page = page.click("Bearbeiten")
-    edit_page.form['is_hidden_from_public'] = False
+    edit_page.form['access'] = 'public'
     page = edit_page.form.submit().follow()
 
     response = anonymous.get(page.request.url)
@@ -2705,7 +2705,7 @@ def test_basic_search(client_with_es):
     # make sure anonymous doesn't see hidden things in the search results
     assert "fulltext" in client.spawn().get('/search?q=fulltext')
     edit_news = news.click("Bearbeiten")
-    edit_news.form['is_hidden_from_public'] = True
+    edit_news.form['access'] = 'private'
     edit_news.form.submit()
 
     client.app.es_client.indices.refresh(index='_all')
@@ -4017,7 +4017,7 @@ def test_directory_visibility(client):
     assert "Soccer" in anon.get('/directories/clubs/soccer-club')
 
     page = client.get('/directories/clubs/soccer-club').click("Bearbeiten")
-    page.form['is_hidden_from_public'] = True
+    page.form['access'] = 'private'
     page.form.submit()
 
     assert "Clubs" in anon.get('/directories')
@@ -4025,11 +4025,11 @@ def test_directory_visibility(client):
     assert anon.get('/directories/clubs/soccer-club', status=403)
 
     page = client.get('/directories/clubs/soccer-club').click("Bearbeiten")
-    page.form['is_hidden_from_public'] = False
+    page.form['access'] = 'public'
     page.form.submit()
 
     page = client.get('/directories/clubs').click("Konfigurieren")
-    page.form['is_hidden_from_public'] = True
+    page.form['access'] = 'private'
     page.form.submit()
 
     assert "Clubs" not in anon.get('/directories')

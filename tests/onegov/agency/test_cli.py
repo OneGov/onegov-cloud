@@ -152,7 +152,7 @@ def test_import_agencies(cfg_path, session_manager, file):
         'person.political_party'
     ]
     assert agency.organigram_file.read() == b'image'
-    assert agency.is_hidden_from_public is True
+    assert agency.access == 'private'
 
     person = session.query(Person).filter_by(last_name="Balmer").one()
     assert person.academic_title == "lic.iur."
@@ -168,7 +168,7 @@ def test_import_agencies(cfg_path, session_manager, file):
     assert person.website == "https://zg.ch"
     assert person.notes == "Kantonsrat"
     assert person.salutation == "Herr"
-    assert person.is_hidden_from_public is True
+    assert person.access == 'private'
 
     membership = person.memberships.one()
     assert membership.title == "Stimmenzähler"
@@ -176,7 +176,7 @@ def test_import_agencies(cfg_path, session_manager, file):
     assert membership.addition == "yy"
     assert membership.note == "zz"
     assert membership.prefix == "xx"
-    assert membership.is_hidden_from_public is None
+    assert membership.access == 'public'
 
 
 @mark.parametrize("file", [

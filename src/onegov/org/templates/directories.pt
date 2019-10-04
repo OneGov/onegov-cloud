@@ -7,7 +7,7 @@
 
         <ul tal:condition="directories" class="with-lead">
             <li tal:repeat="directory directories">
-                <a class="list-title" tal:attributes="href link(directory)">${directory.title}</a><metal:hint use-macro="layout.macros['hidden-from-public-hint']" tal:define="item directory" />
+                <a class="list-title" tal:attributes="href link(directory)">${directory.title}</a><metal:hint use-macro="layout.macros['access_hint']" tal:define="item directory" />
                 <div class="list-lead">${directory.lead}</div>
             </li>
         </ul>

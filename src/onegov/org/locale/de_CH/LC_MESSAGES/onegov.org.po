@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-09-30 10:47+0200\n"
+"POT-Creation-Date: 2019-10-04 10:56+0200\n"
 "PO-Revision-Date: 2019-02-18 06:39+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -75,8 +75,11 @@ msgstr "Tickets"
 msgid "Ticket"
 msgstr "Ticket"
 
-msgid "This site is hidden from the general public"
-msgstr "Diese Seite ist nicht öffentlich."
+msgid "This site is private"
+msgstr "Diese Seite ist Privat"
+
+msgid "This site is secret"
+msgstr "Diese Seite ist Geheim"
 
 msgid "Cancel"
 msgstr "Abbrechen"
@@ -1326,14 +1329,26 @@ msgstr "Die Eingabe wurde abgelehnt"
 msgid "Your directory submission has been rejected"
 msgstr "Ihre Eingabe wurde abgelehnt"
 
-msgid "Hide from the public"
-msgstr "Vor der Öffentlichkeit verstecken"
+msgid "Access"
+msgstr "Zugriff"
 
-msgid "Visibility"
-msgstr "Sichtbarkeit"
+msgid "Public"
+msgstr "Öffentlich"
+
+msgid "Through URL only (not listed)"
+msgstr "Nur wer die URL kennt (wird nicht gelistet)"
+
+msgid "Only by privileged users"
+msgstr "Beschränkt auf Editoren und Administratoren"
+
+msgid "Security"
+msgstr "Sicherheit"
 
 msgid "Visible on homepage"
 msgstr "Auf der Startseite anzeigen"
+
+msgid "Visibility"
+msgstr "Sichtbarkeit"
 
 msgid "This month"
 msgstr "Diesen Monat"
@@ -1907,12 +1922,8 @@ msgstr "Dateien hierhin ziehen um sie hochzuladen"
 msgid "All news"
 msgstr "Alle Nachrichten"
 
-msgid ""
-"This site is hidden from the general public. To show it to everyone, edit "
-"this page and disable \"Hide from public\"."
-msgstr ""
-"Diese Seite ist nicht öffentlich. Bearbeiten Sie diese Seite und entfernen "
-"Sie das Häkchen im Feld \"Vor der Öffentlichkeit verstecken\"."
+msgid "This site is not public."
+msgstr "Diese Seite ist nicht öffentlich."
 
 msgid ""
 "This site contains no lead. Leads are used for lists and search results."
@@ -2089,9 +2100,6 @@ msgstr "Digitale Signatur"
 
 msgid "Publication"
 msgstr "Publikation"
-
-msgid "Public"
-msgstr "Öffentlich"
 
 msgid "Private"
 msgstr "Privat"
@@ -3816,3 +3824,25 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "This site is hidden from the general public"
+#~ msgstr "Diese Seite ist nicht öffentlich."
+
+#~ msgid ""
+#~ "This site is hidden from the general public. To show it to everyone, edit "
+#~ "this page and disable \"Hide from public\"."
+#~ msgstr ""
+#~ "Diese Seite ist nicht öffentlich. Bearbeiten Sie diese Seite und "
+#~ "entfernen Sie das Häkchen im Feld \"Vor der Öffentlichkeit verstecken\"."
+
+#~ msgid "Anyone that knows the url"
+#~ msgstr "Jedem der die URL kennt"
+
+#~ msgid "Accessible by"
+#~ msgstr "Aufrufbar von"
+
+#~ msgid "Anyone"
+#~ msgstr "Allen"
+
+#~ msgid "Hide from the public"
+#~ msgstr "Vor der Öffentlichkeit verstecken"

@@ -16,7 +16,7 @@ def test_link(render_element):
 
     # we show a hint if the link is hidden from public
     result = render_element(Link(text='hidden', url='#', model=Bunch(
-        is_hidden_from_public=True
+        access='private'
     )))
 
 

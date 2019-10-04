@@ -396,8 +396,8 @@
         <div class="row news-list-item" tal:repeat="item news">
             <div class="small-12 columns">
                 <a tal:attributes="href request.link(item)">
-                    <h2 tal:condition="heading == 'h2'|True">${item.title} <metal:hint use-macro="layout.macros['hidden_from_public_hint']" /></h2>
-                    <h3 tal:condition="heading == 'h3'|nothing">${item.title} <metal:hint use-macro="layout.macros['hidden_from_public_hint']" /></h3>
+                    <h2 tal:condition="heading == 'h2'|True">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h2>
+                    <h3 tal:condition="heading == 'h3'|nothing">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h3>
                 </a>
                 <p class="news-date" tal:condition="not:hide_date|False">${layout.format_date(item.created, 'relative')}</p>
                 <p class="news-lead">${item.content.lead}</p>
@@ -411,26 +411,28 @@
     </div>
 </metal:newslist>
 
-<metal:hidden_page_hint define-macro="hidden_from_public_hint" i18n:domain="onegov.org">
-    <tal:b condition="item.is_hidden_from_public|nothing">
-        <i title="This site is hidden from the general public" i18n:attributes="title" class="hidden-from-public-hint"></i>
+<metal:access_hint define-macro="access_hint" i18n:domain="onegov.org">
+    <tal:b condition="item.access == 'private'|False">
+        <i title="This site is private" i18n:attributes="title" class="private-hint"></i>
     </tal:b>
-</metal:hidden_page_hint>
+    <tal:b condition="item.access == 'secret'|False">
+        <i title="This site is secret" i18n:attributes="title" class="secret-hint"></i>
+    </tal:b>
+</metal:access_hint>
 
-<metal:hidden_page_hint define-macro="hidden_from_public_hint_long" i18n:domain="onegov.org">
-    <tal:b condition="item.is_hidden_from_public|nothing">
+<metal:access_hint_long define-macro="access_hint_long" i18n:domain="onegov.org">
+    <tal:b condition="item.access == 'private'|False">
         <div class="row">
             <div class="small-12 columns">
                 <div class="panel callout">
                     <p i18n:translate>
-                    This site is hidden from the general public. To show it to
-                    everyone, edit this page and disable "Hide from public".
+                        This site is not public.
                     </p>
                 </div>
             </div>
         </div>
     </tal:b>
-</metal:hidden_page_hint>
+</metal:access_hint_long>
 
 <metal:empty_lead_hint define-macro="empty_page_lead_hint" i18n:domain="onegov.org">
     <tal:b condition="not item.lead and request.is_manager|nothing">
@@ -649,7 +651,7 @@
                     <tal:b condition="not:is_group" replace="structure link(layout)" />
                     <tal:b condition="is_group">
                         <a href="#" class="group-title">${link.title}
-                            <metal:b use-macro="layout.macros['hidden_from_public_hint']" tal:define="item link"/>
+                            <metal:b use-macro="layout.macros['access_hint']" tal:define="item link"/>
                         </a>
                         <ul class="children" tal:condition="link.links"
                             data-sortable data-sortable-url="${layout.sortable_url_template}">
@@ -869,7 +871,7 @@
             <li tal:repeat="detail item[1]">
                 <div metal:define-slot="item-detail">
                     <a href="${request.link(detail)}">${detail.title}</a>
-                    <metal:hint tal:define="item detail" use-macro="layout.macros['hidden_from_public_hint']" />
+                    <metal:hint tal:define="item detail" use-macro="layout.macros['access_hint']" />
                 </div>
             </li>
         </ul>
@@ -1064,7 +1066,7 @@
 
 
 <metal:search_result_users define-macro="search_result_users" i18n:domain="onegov.org">
-    <a href="${request.return_here(request.link(result))}">${result.title}</a>
+    <a href="${request.return_here(request.link(result))}">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></a>
     <ul>
         <li>${translate(result.role.capitalize())}</li>
     </ul>
@@ -1072,7 +1074,7 @@
 
 
 <metal:search_result_files define-macro="search_result_files" i18n:domain="onegov.org">
-    <a href="${request.return_here(request.link(result))}">${result.name}</a>
+    <a href="${request.return_here(request.link(result))}">${result.name} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></a>
     <ul>
         <li>
             <tal:b condition="result.signed">
@@ -1093,7 +1095,7 @@
 
 
 <metal:search_result_tickets define-macro="search_result_tickets" i18n:domain="onegov.org">
-    <a href="${request.link(result)}">${result.number}</a>
+    <a href="${request.link(result)}">${result.number} <i title="This site is private" i18n:attributes="title" class="private-hint"></i></a>
     <ul>
         <li>${translate(result.group)}</li>
         <li tal:content="structure result.title"></li>
@@ -1103,7 +1105,7 @@
 
 
 <metal:search_result_events define-macro="search_result_events" i18n:domain="onegov.org">
-    <a href="${request.link(result, 'latest')}">${result.title}</a>
+    <a href="${request.link(result, 'latest')}">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></a>
     <ul tal:define="occurrence result.latest_occurrence">
         <li tal:condition="occurrence">${
             '-'.join((
@@ -1117,14 +1119,14 @@
 
 
 <metal:search_result_people define-macro="search_result_people" i18n:domain="onegov.org">
-    <a href="${request.link(result)}">${result.title}</a>
+    <a href="${request.link(result)}">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></a>
     <p tal:condition="result.function|nothing">${result.function}</p>
     <p tal:condition="not:result.function|nothing" i18n:translate>People</p>
 </metal:search_result_people>
 
 
 <metal:search_result_default define-macro="search_result_default" i18n:domain="onegov.org">
-    <a href="${request.link(result)}">${result.title}</a>
+    <a href="${request.link(result)}">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></a>
     <tal:b condition="result.lead">
         ${result.lead[:160]}<tal:b condition="len(result.lead) > 160">…</tal:b>
     </tal:b>
@@ -1380,7 +1382,7 @@
                 <a class="list-title" tal:attributes="href request.link(record)">
                     ${record.title}
                 </a>
-                <metal:hint use-macro="layout.macros['hidden-from-public-hint']" tal:define="item record" />
+                <metal:hint use-macro="layout.macros['access_hint']" tal:define="item record" />
 
                 <div class="list-lead">${record.meta.get('lead')}</div>
             </li>

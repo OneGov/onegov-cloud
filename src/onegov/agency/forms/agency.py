@@ -87,8 +87,8 @@ class ExtendedAgencyForm(Form):
         if self.organigram.action == 'replace':
             if self.organigram.data:
                 model.organigram_file = self.organigram.raw_data[-1].file
-        if hasattr(self, 'is_hidden_from_public'):
-            model.is_hidden_from_public = self.is_hidden_from_public.data
+        if hasattr(self, 'access'):
+            model.access = self.access.data
 
     def reorder_export_fields(self):
         titles = dict(self.export_fields.choices)
@@ -109,8 +109,8 @@ class ExtendedAgencyForm(Form):
             fs.type = model.organigram_file.content_type
             fs.filename = model.organigram_file.filename
             self.organigram.data = self.organigram.process_fieldstorage(fs)
-        if hasattr(self, 'is_hidden_from_public'):
-            self.is_hidden_from_public.data = model.is_hidden_from_public
+        if hasattr(self, 'access'):
+            self.access.data = model.access
 
         self.reorder_export_fields()
 

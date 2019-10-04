@@ -69,8 +69,8 @@ class MissionReportCollection(GenericCollection, Pagination):
 
         if not self.include_hidden:
             query = query.filter(or_(
-                MissionReport.meta['is_hidden_from_public'] == False,
-                MissionReport.meta['is_hidden_from_public'] == None
+                MissionReport.meta['access'] == 'public',
+                MissionReport.meta['access'] == None
             ))
 
         query = self.filter_by_year(query)

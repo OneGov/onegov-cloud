@@ -3,7 +3,7 @@ from onegov.core.orm.abstract import associated
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.file import File
-from onegov.org.models import HiddenFromPublicExtension
+from onegov.org.models import AccessExtension
 from sedate import to_timezone
 from sqlalchemy import Boolean
 from sqlalchemy import Column
@@ -19,7 +19,7 @@ class MissionReportFile(File):
     __mapper_args__ = {'polymorphic_identity': 'mission-report-file'}
 
 
-class MissionReport(Base, ContentMixin, HiddenFromPublicExtension):
+class MissionReport(Base, ContentMixin, AccessExtension):
 
     __tablename__ = 'mission_reports'
 
@@ -68,7 +68,7 @@ class MissionReport(Base, ContentMixin, HiddenFromPublicExtension):
         return to_timezone(self.date, 'Europe/Zurich')
 
 
-class MissionReportVehicle(Base, ContentMixin, HiddenFromPublicExtension):
+class MissionReportVehicle(Base, ContentMixin, AccessExtension):
 
     __tablename__ = 'mission_report_vehicles'
 

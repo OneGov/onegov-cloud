@@ -101,7 +101,7 @@ class Element(object):
         })
 
 
-class HiddenLinkMixin(object):
+class AccessMixin(object):
     """ Hidden links point to views which are not available to the public
     (usually through a publication mechanism).
 
@@ -113,18 +113,18 @@ class HiddenLinkMixin(object):
     __slots__ = ()
 
     @property
-    def is_hidden_from_public(self):
-        """ Returns True if Link is hidden from the public. Pass extra keyword
-        ``model`` to ``__init__`` to have this work automatically.
+    def access(self):
+        """ Wraps model.access, ensuring it is always available, even if the
+        model does not use it.
 
         """
         if hasattr(self, 'model'):
-            return getattr(self.model, 'is_hidden_from_public', False)
+            return getattr(self.model, 'access', 'public')
 
-        return False
+        return 'public'
 
 
-class Link(Element, HiddenLinkMixin):
+class Link(Element, AccessMixin):
     """ A generic link. """
 
     id = 'link'
@@ -141,7 +141,7 @@ class Link(Element, HiddenLinkMixin):
         super().__init__(text, attrs, traits, **props)
 
 
-class LinkGroup(HiddenLinkMixin):
+class LinkGroup(AccessMixin):
     """ Represents a list of links. """
 
     __slots__ = [

@@ -17,12 +17,11 @@ def test_link(render_element):
 
     # we show a hint if the link is hidden from public
     result = render_element(Link(text='hidden', url='#', model=Bunch(
-        is_hidden_from_public=True
+        access='private'
     )))
 
-    assert result.pyquery('i').attr('title') \
-        == "Diese Seite ist nicht öffentlich."
-    assert result.pyquery('i').attr('class') == 'hidden-from-public-hint'
+    assert result.pyquery('i').attr('title') == "Diese Seite ist Privat"
+    assert result.pyquery('i').attr('class') == 'private-hint'
 
 
 def test_confirm_link(render_element):

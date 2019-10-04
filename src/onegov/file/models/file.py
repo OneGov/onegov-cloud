@@ -98,7 +98,7 @@ class File(Base, Associable, TimestampMixin):
     published = Column(Boolean, nullable=False, default=True)
 
     #: the date after which this file will be made public - this controls
-    #: the visibility of the object through the ``is_hidden_from_public``
+    #: the visibility of the object through the ``access``
     #: property which in turn is enforced by :mod:`onegov.core.security.rules`.
     #:
     #: To get a file published, be sure to call
@@ -220,8 +220,8 @@ class File(Base, Associable, TimestampMixin):
         self.order = normalize_for_url(name)
 
     @property
-    def is_hidden_from_public(self):
-        return not self.published
+    def access(self):
+        return 'public' if self.published else 'private'
 
     @property
     def file_id(self):

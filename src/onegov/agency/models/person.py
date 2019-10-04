@@ -1,8 +1,8 @@
-from onegov.org.models.extensions import HiddenFromPublicExtension
+from onegov.org.models.extensions import AccessExtension
 from onegov.people import Person
 
 
-class ExtendedPerson(Person, HiddenFromPublicExtension):
+class ExtendedPerson(Person, AccessExtension):
     """ An extended version of the standard person from onegov.people. """
 
     __mapper_args__ = {'polymorphic_identity': 'extended'}
@@ -11,7 +11,7 @@ class ExtendedPerson(Person, HiddenFromPublicExtension):
 
     @property
     def es_public(self):
-        return not self.is_hidden_from_public
+        return self.access == 'public'
 
     @property
     def address_html(self):

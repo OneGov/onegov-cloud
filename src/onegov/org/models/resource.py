@@ -6,7 +6,7 @@ from onegov.core.orm.types import UUID
 from onegov.form.models import FormSubmission
 from onegov.org.models.extensions import ContactExtension
 from onegov.org.models.extensions import CoordinatesExtension
-from onegov.org.models.extensions import HiddenFromPublicExtension
+from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.reservation import Resource, Reservation
 from onegov.search import SearchableContent
@@ -123,7 +123,7 @@ class SharedMethods(object):
         return title
 
 
-class DaypassResource(Resource, HiddenFromPublicExtension, SearchableContent,
+class DaypassResource(Resource, AccessExtension, SearchableContent,
                       ContactExtension, PersonLinkExtension,
                       CoordinatesExtension, SharedMethods):
     __mapper_args__ = {'polymorphic_identity': 'daypass'}
@@ -140,7 +140,7 @@ class DaypassResource(Resource, HiddenFromPublicExtension, SearchableContent,
     title_template = '{start:%d.%m.%Y} ({quota})'
 
 
-class RoomResource(Resource, HiddenFromPublicExtension, SearchableContent,
+class RoomResource(Resource, AccessExtension, SearchableContent,
                    ContactExtension, PersonLinkExtension,
                    CoordinatesExtension, SharedMethods):
     __mapper_args__ = {'polymorphic_identity': 'room'}

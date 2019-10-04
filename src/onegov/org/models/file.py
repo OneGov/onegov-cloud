@@ -13,7 +13,7 @@ from onegov.file import File, FileSet, FileCollection, FileSetCollection
 from onegov.file import SearchableFile
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.org import _
-from onegov.org.models.extensions import HiddenFromPublicExtension
+from onegov.org.models.extensions import AccessExtension
 from onegov.search import ORMSearchable
 from sedate import standardize_date, utcnow
 from sqlalchemy import asc, desc, select
@@ -130,7 +130,7 @@ class ImageFile(File):
     __mapper_args__ = {'polymorphic_identity': 'image'}
 
 
-class ImageSet(FileSet, HiddenFromPublicExtension, ORMSearchable):
+class ImageSet(FileSet, AccessExtension, ORMSearchable):
     __mapper_args__ = {'polymorphic_identity': 'image'}
 
     es_properties = {
@@ -140,7 +140,7 @@ class ImageSet(FileSet, HiddenFromPublicExtension, ORMSearchable):
 
     @property
     def es_public(self):
-        return not self.is_hidden_from_public
+        return self.access == 'public'
 
     @property
     def es_suggestions(self):
