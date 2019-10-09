@@ -165,13 +165,23 @@ def parse_candidate_result(line, errors):
         )
 
 
+def prefix_connection_id(connection_id, parent_connection_id):
+    """Used to distinguish connection ids when they have the same id
+    as a parent_connection. """
+    if not len(connection_id) > len(parent_connection_id):
+        return parent_connection_id + connection_id
+    return connection_id
+
+
 def parse_connection(line, errors, election_id):
     subconnection_id = None
     try:
         connection_id = line.list_connection
         parent_connection_id = line.list_connection_parent
         if parent_connection_id:
-            subconnection_id = connection_id
+            subconnection_id = prefix_connection_id(
+                connection_id, parent_connection_id
+            )
             connection_id = parent_connection_id
     except ValueError:
         errors.append(_("Invalid list connection values"))
