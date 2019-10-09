@@ -131,7 +131,7 @@ def add_meta_access_property(context):
         # THIS IS UNSAFE, DO NOT COPY & PASTE
         context.session.execute(f"""
             UPDATE {table} SET meta = meta || jsonb '{{"access": "private"}}'
-            WHERE (meta->'is_hidden_from_public')::boolean = TRUE;
+            WHERE (meta->>'is_hidden_from_public')::boolean = TRUE;
 
             UPDATE {table} SET meta = meta - 'is_hidden_from_public'
             WHERE meta ? 'is_hidden_from_public';
