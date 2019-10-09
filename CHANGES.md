@@ -1,8 +1,34 @@
 # Changes
 
+## Release `2019.23`
+
+> commits: **5 / [7cdac038a6...bef57fa350](https://github.com/OneGov/onegov-cloud/compare/7cdac038a6^...bef57fa350)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.23)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Introduces new access settings**
+
+This replaces the 'hide from public' setting with a three-tiered setting
+that supports the following attributes:
+
+* Public (default)
+* Secret (accessible through URL, not listed)
+* Private (Existing hide from public equivalent)
+
+**`Feature`** | **[351550d9e0](https://github.com/onegov/onegov-cloud/commit/351550d9e0a65806f33b060c49585b831f9441ba)**
+
+🎉 **Adds a zipcode block for resources**
+
+Resources may now have an optional zipcode block, which prefers people
+from certain zipcodes when it comes to bookings.
+
+**`Feature`** | **[bef57fa350](https://github.com/onegov/onegov-cloud/commit/bef57fa3502d80a5bd108800a7e35bcf4a2b543f)**
+
 ## Release `2019.22`
 
-> commits: **9 / [8636d6d3f5...21aeb3268e](https://github.com/OneGov/onegov-cloud/compare/8636d6d3f5^...21aeb3268e)**<br>
+> released: **2019-10-03 16:54**<br>
+> commits: **10 / [8636d6d3f5...3925017707](https://github.com/OneGov/onegov-cloud/compare/8636d6d3f5^...3925017707)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.22)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
