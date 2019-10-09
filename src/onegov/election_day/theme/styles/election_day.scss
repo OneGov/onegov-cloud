@@ -273,7 +273,7 @@ table {
 // overview table on the homepage -> specified widths because we have
 // multiple tables which should align vertically
 @media (min-width: 40em) {
-    &.overview {
+    table.overview {
         margin-bottom: 2rem;
 
         &.vote {

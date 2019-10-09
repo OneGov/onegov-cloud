@@ -8,7 +8,7 @@
             <a i18n:translate href="${request.link(resource)}">Go to calendar</a>
         </tal:b>
 
-        <metal:b use-macro="layout.macros['reservation-infos']" />
+        <metal:b use-macro="layout.macros['reservation_infos']" />
 
         <div tal:condition="reservation_infos" class="row reservation-form">
             <div class="small-12 medium-7 large-5 columns">

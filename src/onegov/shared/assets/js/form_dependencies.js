@@ -91,7 +91,12 @@ var evaluate_dependencies = function(form, input, dependencies) {
     });
 
     if (visible) {
-        input.show();
+        var always_hidden = typeof input.attr('data-always-hidden') !== 'undefined';
+
+        if (!always_hidden) {
+            input.show();
+        }
+
         input.closest('label, .group-label').show().siblings('.error').show();
         input.trigger('show');
     } else {

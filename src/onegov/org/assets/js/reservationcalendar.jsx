@@ -787,6 +787,11 @@ ReservationSelection = React.createClass({
                                             <a onClick={boundGotoDate} title={locale('Goto date')} role="link">
                                                 {date.format('ddd LL')}
                                             </a>
+                                            {r.warning && (
+                                                <span className="reservation-warning" title={r.warning}>
+                                                    <i className="fa fa-clock-o" aria-hidden="true" />
+                                                </span>
+                                            )}
                                         </span>
                                         <span className="reservation-time">{r.time}</span>
                                         {r.price && (
@@ -829,7 +834,7 @@ ReservationSelection.render = function(element, calendar, reservations, predicti
             reservationform={reservationform}
             prediction={prediction}
         />,
-    element);
+        element);
 };
 
 /*
@@ -1059,7 +1064,7 @@ ReservationForm = React.createClass({
 
                 {showPreviousTime && (
                     <a href="#" onClick={this.handleSetPreviousTime} className="select-previous-time internal">
-                        <i className="fa fa-chevron-circle-right" aria-hidden="true"></i>
+                        <i className="fa fa-chevron-circle-right" aria-hidden="true" />
                         <span>{this.props.previousReservationState.start}</span>
                         <span>&nbsp;-&nbsp;</span>
                         <span>{this.props.previousReservationState.end}</span>
@@ -1102,5 +1107,5 @@ ReservationForm.render = function(element, event, previousReservationState, onSu
             previousReservationState={previousReservationState}
             onSubmit={onSubmit}
         />,
-    element);
+        element);
 };

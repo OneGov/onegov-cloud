@@ -1,4 +1,4 @@
-from onegov.form import Form, merge_forms
+from onegov.form import Form, merge_forms, parse_formcode
 from onegov.form.validators import ValidFormDefinition
 from onegov.form.filters import as_float
 from onegov.org import _
@@ -7,11 +7,13 @@ from onegov.org.forms.generic import DateRangeForm
 from onegov.org.forms.generic import ExportForm
 from onegov.org.forms.generic import PaymentMethodForm
 from onegov.org.forms.reservation import RESERVED_FIELDS
+from wtforms import BooleanField
 from wtforms import RadioField
 from wtforms import StringField
 from wtforms import TextAreaField
 from wtforms import TextField
 from wtforms import validators
+from wtforms.validators import ValidationError
 from wtforms.fields.html5 import DecimalField, IntegerField
 
 
@@ -81,6 +83,43 @@ class ResourceBaseForm(Form):
         ]
     )
 
+    zipcode_block_use = BooleanField(
+        label=_("Limit reservations to certain zip-codes"),
+        fieldset=_("Zip-code limit"),
+        default=False,
+    )
+
+    zipcode_field = TextAreaField(
+        label=_("Zip-code field"),
+        fieldset=_("Zip-code limit"),
+        depends_on=('zipcode_block_use', 'y'),
+        validators=[validators.InputRequired()],
+        render_kw={
+            'class_': 'formcode-select',
+            'data-fields-include': 'text',
+            'data-type': 'radio',
+        })
+
+    zipcode_list = TextAreaField(
+        label=_("Allowed zip-codes (one per line)"),
+        fieldset=_("Zip-code limit"),
+        depends_on=('zipcode_block_use', 'y'),
+        validators=[validators.InputRequired()],
+        render_kw={
+            'rows': 4
+        }
+    )
+
+    zipcode_days = IntegerField(
+        label=_("Days before an allocation may be reserved by anyone"),
+        fieldset=_("Zip-code limit"),
+        depends_on=('zipcode_block_use', 'y'),
+        validators=[
+            validators.InputRequired(),
+            validators.NumberRange(min=0)
+        ],
+    )
+
     pricing_method = RadioField(
         label=_("Price"),
         fieldset=_("Payments"),
@@ -116,6 +155,43 @@ class ResourceBaseForm(Form):
         depends_on=('pricing_method', '!free'),
         validators=[validators.InputRequired()],
     )
+
+    @property
+    def zipcodes(self):
+        return [int(z) for z in self.zipcode_list.data.split()]
+
+    def validate_zipcode_field(self, field):
+        if not self.zipcode_block_use.data:
+            return
+
+        if not self.zipcode_field.data:
+            raise ValidationError(
+                _("Please select the form field that holds the zip-code"))
+
+        for fieldset in parse_formcode(self.definition.data):
+            for field in fieldset.fields:
+                if field.human_id == self.zipcode_field.data:
+                    return
+
+        raise ValidationError(
+            _("Please select the form field that holds the zip-code"))
+
+    def validate_zipcode_list(self, field):
+        if not self.zipcode_block_use.data:
+            return
+
+        if not self.zipcode_list.data:
+            raise ValidationError(
+                _("Please enter at least one zip-code"))
+
+        try:
+            self.zipcodes
+        except ValueError:
+            raise ValidationError(
+                _(
+                    "Please enter one zip-code per line, "
+                    "without spaces or commas"
+                ))
 
     def ensure_valid_price(self):
         if self.pricing_method.data == 'per_item':
@@ -159,13 +235,38 @@ class ResourceBaseForm(Form):
         else:
             raise NotImplementedError()
 
+    @property
+    def zipcode_block(self):
+        if not self.zipcode_block_use.data:
+            return None
+
+        return {
+            'zipcode_field': self.zipcode_field.data,
+            'zipcode_list': self.zipcodes,
+            'zipcode_days': int(self.zipcode_days.data),
+        }
+
+    @zipcode_block.setter
+    def zipcode_block(self, value):
+        if not value:
+            self.zipcode_block_use.data = False
+            return
+
+        self.zipcode_block_use.data = True
+        self.zipcode_field.data = value['zipcode_field']
+        self.zipcode_days.data = value['zipcode_days']
+        self.zipcode_list.data = '\n'.join(
+            str(i) for i in sorted(value['zipcode_list']))
+
     def populate_obj(self, obj):
-        super().populate_obj(obj, exclude=('deadline', ))
+        super().populate_obj(obj, exclude=('deadline', 'zipcode_block'))
         obj.deadline = self.deadline
+        obj.zipcode_block = self.zipcode_block
 
     def process_obj(self, obj):
         super().process_obj(obj)
         self.deadline = obj.deadline
+        self.zipcode_block = obj.zipcode_block
 
 
 class ResourceForm(merge_forms(ResourceBaseForm, PaymentMethodForm)):

@@ -5217,3 +5217,88 @@ def test_ticket_chat_search(client_with_es):
     # but anonymous users should not
     page = client.spawn().get('/search?q=deadbeef')
     assert 'Foo' not in page
+
+
+@freeze_time("2019-08-01")
+def test_zipcode_block(client):
+    client.login_admin()
+
+    # enable zip-code blocking
+    page = client.get('/resource/tageskarte/edit')
+    page.form['definition'] = '\n'.join((
+        'PLZ *= ___',
+    ))
+    page.select_radio('payment_method', "Keine Kreditkarten-Zahlungen")
+    page.select_radio('pricing_method', "Kostenlos")
+    page.form['zipcode_block_use'] = True
+    page.form['zipcode_days'] = 1
+    page.form['zipcode_field'] = 'PLZ'
+    page.form['zipcode_list'] = '\n'.join((
+        '1234',
+        '5678',
+    ))
+    page.form.submit().follow()
+
+    # create a blocked and an unblocked allocation
+    transaction.begin()
+
+    scheduler = ResourceCollection(client.app.libres_context)\
+        .by_name('tageskarte')\
+        .get_scheduler(client.app.libres_context)
+
+    allocations = [
+        *scheduler.allocate(
+            dates=(datetime(2019, 8, 2), datetime(2019, 8, 2)),
+            whole_day=True,
+            quota=2,
+            quota_limit=2
+        ),
+        *scheduler.allocate(
+            dates=(datetime(2019, 8, 3), datetime(2019, 8, 3)),
+            whole_day=True,
+            quota=2,
+            quota_limit=2
+        )
+    ]
+
+    transaction.commit()
+
+    allocations[0] = client.app.session().merge(allocations[0])
+    allocations[1] = client.app.session().merge(allocations[1])
+
+    # reserve both allocations
+    client = client.spawn()
+    client.bound_reserve(allocations[0])(quota=1)
+    client.bound_reserve(allocations[1])(quota=1)
+
+    # one of them should now show a warning
+    page = client.get('/resource/tageskarte/form')
+    assert str(page).count('Postleitzahlen') == 1
+
+    # the confirmation should fail
+    page.form['email'] = 'info@example.org'
+    page.form['plz'] = '0000'
+    page = page.form.submit()
+
+    # unless we have the right PLZ
+    page.form['plz'] = '1234'
+    page.form.submit().follow()
+
+    # or unless we are admin
+    client = client.spawn()
+    client.login_admin()
+
+    allocations[0] = client.app.session().merge(allocations[0])
+    allocations[1] = client.app.session().merge(allocations[1])
+
+    client.bound_reserve(allocations[0])(quota=1)
+    client.bound_reserve(allocations[1])(quota=1)
+
+    # we won't get a warning
+    page = client.get('/resource/tageskarte/form')
+    assert str(page).count('Postleitzahlen') == 0
+
+    # and we can confirm
+    page.form['email'] = 'info@example.org'
+    page.form['plz'] = '0000'
+    page.form.submit().follow()

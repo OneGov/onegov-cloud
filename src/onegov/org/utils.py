@@ -3,12 +3,13 @@ import re
 import sedate
 
 from collections import defaultdict, Counter, OrderedDict
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 from isodate import parse_date, parse_datetime
 from itertools import groupby
 from libres.modules import errors as libres_errors
 from lxml.html import fragments_fromstring, tostring
 from onegov.core.cache import lru_cache
+from onegov.core.layout import Layout
 from onegov.file import File, FileCollection
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
@@ -255,6 +256,31 @@ class ReservationInfo(object):
         return self.reservation.display_start().isoformat()
 
     @property
+    def warning(self):
+        if self.request.is_manager:
+            return None
+
+        reservation_date = self.reservation.display_start().date()
+
+        if self.resource.is_zip_blocked(reservation_date):
+            layout = Layout(self.resource, self.request)
+
+            days = self.resource.zipcode_block['zipcode_days']
+            date = self.reservation.start - timedelta(days=days)
+
+            zipcodes = map(str, self.resource.zipcode_block['zipcode_list'])
+
+            return self.request.translate(_(
+                (
+                    "You can only reserve this allocation before ${date} "
+                    "if you live in the following zipcodes: ${zipcodes}"
+                ), mapping={
+                    'date': layout.format_date(date, 'date_long'),
+                    'zipcodes': ', '.join(zipcodes),
+                }
+            ))
+
+    @property
     def time(self):
         if sedate.is_whole_day(
             self.reservation.start,
@@ -287,7 +313,8 @@ class ReservationInfo(object):
             'delete': self.delete_link,
             'quota': self.reservation.quota,
             'created': self.reservation.created.isoformat(),
-            'price': self.price
+            'price': self.price,
+            'warning': self.warning,
         }
 
 

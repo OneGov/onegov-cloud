@@ -41,11 +41,13 @@ $(function() {
             $('.formcode-select').each(function() {
                 var exclude = (this.getAttribute('data-fields-exclude') || '');
                 var include = (this.getAttribute('data-fields-include') || '');
+                var type = (this.getAttribute('data-type') || 'checkbox');
                 var container = $("<div>").insertBefore(this);
 
                 $(this).hide();
+                $(this).attr('data-always-hidden', '');
 
-                initFormcodeSelect(container.get(0), watcher, this, include.split(','), exclude.split(','));
+                initFormcodeSelect(container.get(0), watcher, this, type, include.split(','), exclude.split(','));
             });
         }
 
