@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-04 09:23+0200\n"
-"PO-Revision-Date: 2018-11-05 12:07+0100\n"
+"PO-Revision-Date: 2019-10-09 09:18+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 2.2\n"
+"X-Generator: Poedit 2.2.4\n"
 
 msgid "The final results are available"
 msgstr "Ils resultats finals èn disponibels"
@@ -31,8 +31,8 @@ msgid ""
 "Successfully subscribed to the SMS service. You will receive a SMS every "
 "time new results are published."
 msgstr ""
-"La communicaziun per SMS è vegnida abunada. A partir d'ussa survegnis Vus in "
-"SMS, uschespert che novs resultats èn vegnids publitgads."
+"Las communicaziuns per SMS èn vegnidas abunadas. A partir d'ussa survegnis "
+"Vus in SMS, uschespert che novs resultats èn vegnids publitgads."
 
 msgid "Not a valid xls/xlsx file."
 msgstr "Nagina datoteca XLS/XLSX valaivla."
@@ -66,11 +66,11 @@ msgstr "La datoteca cuntegna ina lingia vida."
 
 #, python-format
 msgid "Empty value: ${col}"
-msgstr ""
+msgstr "Valur vida: ${col}"
 
 #, python-format
 msgid "Invalid integer: ${col}"
-msgstr ""
+msgstr "Cifra entira nunvalaivla: ${col}"
 
 msgid "Invalid election values"
 msgstr "Datas electoralas nunvalaivlas"
@@ -129,35 +129,36 @@ msgid "Election statistics"
 msgstr "Statistica electorala"
 
 msgid "Value of ausmittlungsstand not between 0 and 3"
-msgstr ""
+msgstr "La valur da ausmittlungsstand n'è betg tranter 0 e 3"
 
 #, python-format
 msgid "Candidate with id ${id} not in wm_kandidaten"
-msgstr ""
+msgstr "La candidata u il candidat cun id ${id} n'è betg en wm_kandidaten"
 
 #, python-format
 msgid "Entity with id ${id} not in wmstatic_gemeinden"
-msgstr ""
+msgstr "La vischnanca cun id ${id} n'è betg en wmstatic_gemeinden"
 
 #, python-format
 msgid "Value ${col} is not between 0 and 3"
-msgstr ""
+msgstr "La valur ${col} n'è betg tranter 0 e 3"
 
 #, python-format
 msgid "${var} is missing."
-msgstr ""
+msgstr "${var} n'è betg avant maun."
 
 #, python-format
 msgid "Entity with id ${id} not in added_entities"
-msgstr ""
+msgstr "La vischnanca cun id ${id} n'è betg en added_entities"
 
 #, python-format
 msgid "List_id ${list_id} has not been found in list numbers"
-msgstr ""
+msgstr "Betg chattà List_id ${list_id} en list numbers"
 
 #, python-format
 msgid "Candidate with id ${id} not in wpstatic_kandidaten"
 msgstr ""
+"La candidata u il candidat cun id ${id} n'è betg en wpstatic_kandidaten"
 
 msgid "Proposal"
 msgstr "Project da votaziun"
@@ -196,21 +197,23 @@ msgid "Invalid ballot type"
 msgstr "Tip da votaziun nunvalaivel"
 
 msgid "Text Retrieval"
-msgstr ""
+msgstr "Noziun tschertgada"
 
 msgid ""
 "Searches the title of the election/vote. Use Wilcards (*) to find more "
 "results, e.g Nationalrat*."
 msgstr ""
+"Tschertga en il titel da l'elecziun u da la votaziun. Utilisai wildcards (*) "
+"per survegnir dapli resultats, p.ex. scola*."
 
 msgid "From date"
-msgstr ""
+msgstr "Dals"
 
 msgid "To date"
-msgstr ""
+msgstr "Fin ils"
 
 msgid "Voting result"
-msgstr ""
+msgstr "Resultat da l'elecziun"
 
 msgid "Type"
 msgstr "Gener"
@@ -221,7 +224,7 @@ msgid ""
 msgstr ""
 
 msgid "Domain"
-msgstr ""
+msgstr "Plaun"
 
 msgid "Name"
 msgstr "Denominaziun"
@@ -290,25 +293,25 @@ msgid "Related elections"
 msgstr "Elecziuns appartegnentas"
 
 msgid "Link"
-msgstr ""
+msgstr "Link url"
 
 msgid "Related link"
 msgstr "Ulteriuras infurmaziuns"
 
 msgid "Link label german"
-msgstr ""
+msgstr "Link Text tudestg"
 
 msgid "Link label french"
-msgstr ""
+msgstr "Link Text franzos"
 
 msgid "Link label italian"
-msgstr ""
+msgstr "Link Text talian"
 
 msgid "Link label romansh"
-msgstr ""
+msgstr "Link Text rumantsch"
 
 msgid "Cantonal"
-msgstr "Sin plaun chantunal"
+msgstr "Plaun chantunal"
 
 msgid "Elections"
 msgstr "Elecziuns"
@@ -452,10 +455,10 @@ msgid "Mappings"
 msgstr "Attribuziuns"
 
 msgid "Federal"
-msgstr "Sin plaun naziunal"
+msgstr "Plaun naziunal"
 
 msgid "Regional"
-msgstr "Sin plaun regiunal"
+msgstr "Plaun regiunal"
 
 msgid "Municipality"
 msgstr "Vischnanca"
@@ -504,7 +507,7 @@ msgid "districts_label_default"
 msgstr "Circuls electorals"
 
 msgid "Communal"
-msgstr "Sin plaun communal"
+msgstr "Plaun communal"
 
 msgid "Quarter"
 msgstr "Quartier"
@@ -541,7 +544,7 @@ msgid "Federal Votes"
 msgstr "Votaziuns federalas"
 
 msgid "Regional Votes"
-msgstr "Votaziuns regionalas"
+msgstr "Votaziuns regiunalas"
 
 msgid "Cantonal Votes"
 msgstr "Votaziuns chantunalas"
@@ -568,13 +571,13 @@ msgid "Archive"
 msgstr "Archiv"
 
 msgid "Archive Search"
-msgstr ""
+msgstr "Tschertga en l'archiv"
 
 msgid "Search in ${title}"
 msgstr ""
 
 msgid "Found ${item_count} items."
-msgstr ""
+msgstr "${item_count} resultats."
 
 msgid "Intermediate results"
 msgstr "Resultats intermediars"
@@ -612,7 +615,7 @@ msgid "No"
 msgstr "Na"
 
 msgid "n.a."
-msgstr ""
+msgstr "n.i."
 
 msgid "All candidates"
 msgstr "Tut las candidatas e candidats"
@@ -684,7 +687,7 @@ msgid "Not yet counted"
 msgstr "Anc betg eruì il resultat"
 
 msgid "Seats"
-msgstr "sezs"
+msgstr "Sezs"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
@@ -742,7 +745,7 @@ msgid "Email alerts"
 msgstr "Communicaziuns per e-mail"
 
 msgid "SMS alerts"
-msgstr "Communicaziun per SMS"
+msgstr "Communicaziuns per SMS"
 
 msgid ""
 "The service provides free information on the publication of new results "
@@ -1039,6 +1042,8 @@ msgid ""
 "The figure with elected candidates will be available as soon the final "
 "results are published."
 msgstr ""
+"La grafica cun las candidatas ed ils candidats elegids è disponibla, "
+"uschespert ch'ils resultats finals èn publitgads."
 
 msgid "Access Denied"
 msgstr "Refusà l'access"
