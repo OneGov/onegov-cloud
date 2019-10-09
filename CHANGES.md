@@ -1,8 +1,22 @@
 # Changes
 
+## Release `2019.24`
+
+> commits: **1 / [33a3fe7881...33a3fe7881](https://github.com/OneGov/onegov-cloud/compare/33a3fe7881^...33a3fe7881)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.24)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🐞 **Fixes database upgrade failing on Postgres < 10**
+
+The upgrade used a feature not available on 9.6.'
+
+**`Bugfix`** | **[33a3fe7881](https://github.com/onegov/onegov-cloud/commit/33a3fe7881774c11129eeb93c7e264668b0feac4)**
+
 ## Release `2019.23`
 
-> commits: **5 / [7cdac038a6...bef57fa350](https://github.com/OneGov/onegov-cloud/compare/7cdac038a6^...bef57fa350)**<br>
+> released: **2019-10-09 13:11**<br>
+> commits: **6 / [7cdac038a6...3059a207ee](https://github.com/OneGov/onegov-cloud/compare/7cdac038a6^...3059a207ee)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.23)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
