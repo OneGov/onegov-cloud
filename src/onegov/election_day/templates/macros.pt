@@ -298,7 +298,7 @@
     <div tal:condition="embed_link" class="embedded-widget"
         data-embed-link="Embed"
         data-embed-source="${embed_link}"
-        i18n:attributes="data-embed-source; data-embed-link"
+        i18n:attributes="data-embed-link"
         >
     </div>
 </metal:embedded_widget>

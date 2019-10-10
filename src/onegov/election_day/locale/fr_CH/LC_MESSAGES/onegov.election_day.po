@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-04 09:23+0200\n"
-"PO-Revision-Date: 2019-09-04 09:27+0200\n"
+"POT-Creation-Date: 2019-10-01 10:43+0200\n"
+"PO-Revision-Date: 2019-10-01 11:01+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 2.2.3\n"
+"X-Generator: Poedit 2.2.4\n"
 
 msgid "The final results are available"
 msgstr "Les résultats finaux sont disponibles"
@@ -71,6 +71,14 @@ msgstr "Valeur vide: ${col}"
 msgid "Invalid integer: ${col}"
 msgstr "Intègre non valide: ${col}"
 
+#, python-format
+msgid "Invalid float number: ${col}"
+msgstr "Nombre flottant invalide: ${col}"
+
+#, python-format
+msgid "Not an alphanumeric: ${col}"
+msgstr "Pas un alphanumerique: ${col}"
+
 msgid "Invalid election values"
 msgstr "Valeurs des élections non valides"
 
@@ -87,9 +95,6 @@ msgstr "${name} inconnue"
 msgid "Invalid candidate values"
 msgstr "Valeurs des candidats non valides"
 
-msgid "Invalid candidate results"
-msgstr "Résultats des candidats non valides"
-
 msgid "Results"
 msgstr "Résultats"
 
@@ -99,14 +104,15 @@ msgstr "Pas de données trouvées"
 msgid "No clear district"
 msgstr "Aucun district clair"
 
-msgid "Invalid list values"
-msgstr "Valeurs de la liste non valides"
-
 msgid "Invalid list results"
 msgstr "Résultats de la liste non valides"
 
 msgid "Invalid list connection values"
 msgstr "Valeurs de connexion de liste non valides"
+
+#, python-format
+msgid "Panachage results id ${id} not in list_id's"
+msgstr "Panachage results id ${id} pas dans list_id's"
 
 msgid "Invalid values"
 msgstr "Valeurs non valides"
@@ -114,6 +120,9 @@ msgstr "Valeurs non valides"
 #, python-format
 msgid "${name} was found twice"
 msgstr "${name} a été trouvé en double"
+
+msgid "Panachage results ids and id not consistent"
+msgstr "Panachage results ids and id ne sont pas consistente"
 
 msgid "Elected Candidates"
 msgstr "Candidats élus"
@@ -129,6 +138,9 @@ msgstr "Statistiques des élections"
 
 msgid "Value of ausmittlungsstand not between 0 and 3"
 msgstr "Valeur de ausmittlungsstand pas entre 0 et 3"
+
+msgid "Invalid candidate results"
+msgstr "Résultats des candidats non valides"
 
 #, python-format
 msgid "Candidate with id ${id} not in wm_kandidaten"
@@ -167,24 +179,6 @@ msgstr "Contre-projet"
 msgid "Tie-Breaker"
 msgstr "Question subsidiaire"
 
-msgid "Invalid id"
-msgstr "Mauvaise référence"
-
-msgid "Could not read yeas"
-msgstr "Impossible de lire les oui"
-
-msgid "Could not read nays"
-msgstr "Impossible de lire les non"
-
-msgid "Could not read the eligible voters"
-msgstr "Impossible de connaître les électeurs valides"
-
-msgid "Could not read the empty votes"
-msgstr "Impossible de connaître les votes blancs"
-
-msgid "Could not read the invalid votes"
-msgstr "Impossible de connaître les votes invalides"
-
 msgid "No eligible voters"
 msgstr "Pas d'électeurs valides"
 
@@ -193,6 +187,9 @@ msgstr "Plus de votes que d'électeurs"
 
 msgid "Invalid ballot type"
 msgstr "Type de scrutin invalide"
+
+msgid "Could not read the empty votes"
+msgstr "Impossible de connaître les votes blancs"
 
 msgid "Text Retrieval"
 msgstr "Terme de recherche"
@@ -589,38 +586,6 @@ msgstr "Intégration"
 msgid "Download"
 msgstr "Télécharger"
 
-msgid "Candidate"
-msgstr "Candidat"
-
-#.
-#. Default: Votes
-msgid "single_votes"
-msgstr "Votes"
-
-msgid "Party"
-msgstr "Parti"
-
-msgid "List"
-msgstr "Liste"
-
-msgid "Elected"
-msgstr "Élus"
-
-msgid "Yes"
-msgstr "Oui"
-
-msgid "No"
-msgstr "Non"
-
-msgid "n.a."
-msgstr "nd."
-
-msgid "All candidates"
-msgstr "Tous les candidats"
-
-msgid "Elected candidates only"
-msgstr "Candidats élus seulement"
-
 #.
 #. Default: The diagram shows the distribution of votes and mandates on list
 #. and sublists. The bars on the left correspond to the list connections, the
@@ -635,18 +600,6 @@ msgstr ""
 "largeur des barres et des connexions est proportionnelle aux votes, les "
 "barres de couleur bleue contiennent le nombre de mandats."
 
-msgid "List connection"
-msgstr "Connexion de listes"
-
-msgid "Sublist connection"
-msgstr "Connexion de sous-listes"
-
-msgid "Subtotal"
-msgstr "Sous-total"
-
-msgid "Total"
-msgstr "Total"
-
 msgid "The raw data is available as:"
 msgstr "Les données brutes sont disponibles comme:"
 
@@ -656,35 +609,23 @@ msgstr "Le format des données est décrit ici:"
 msgid "Format Description"
 msgstr "Description du format"
 
-msgid "Mandates"
-msgstr "Mandats"
+msgid "Yeas"
+msgstr "Oui"
 
-msgid "eligible Voters"
-msgstr "Electeurs"
+msgid "Nays"
+msgstr "Non"
 
-msgid "Received Ballots"
-msgstr "Votes reçus"
+msgid "Empty"
+msgstr "Vide"
 
-msgid "Accounted Ballots"
-msgstr "Bulletins de vote comptabilisés"
-
-msgid "Blank Ballots"
-msgstr "Bulletins de vote vierges"
-
-msgid "Invalid Ballots"
-msgstr "Bulletins de vote non valides"
-
-msgid "Accounted Votes"
-msgstr "Votes comptés"
-
-msgid "Turnout"
-msgstr "Participation électorale"
+msgid "Invalid"
+msgstr "Invalide"
 
 msgid "Not yet counted"
 msgstr "Pas encore compté"
 
-msgid "Seats"
-msgstr "Sièges"
+msgid "Total"
+msgstr "Total"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
@@ -713,6 +654,41 @@ msgstr "Mot de passe oublié?"
 
 msgid "Reset password"
 msgstr "Réinitialiser mot de passe"
+
+msgid "Candidate"
+msgstr "Candidat"
+
+msgid "Party"
+msgstr "Parti"
+
+msgid "List"
+msgstr "Liste"
+
+#.
+#. Default: Votes
+msgid "single_votes"
+msgstr "Votes"
+
+msgid "Elected"
+msgstr "Élus"
+
+msgid "Yes"
+msgstr "Oui"
+
+msgid "No"
+msgstr "Non"
+
+msgid "n.a."
+msgstr "nd."
+
+msgid "All candidates"
+msgstr "Tous les candidats"
+
+msgid "Elected candidates only"
+msgstr "Candidats élus seulement"
+
+msgid "Mandates"
+msgstr "Mandats"
 
 msgid "${counted} of ${total}"
 msgstr "${counted} de ${total}"
@@ -790,11 +766,17 @@ msgstr "Jeu décisif en faveur de l'initiative"
 msgid "Tie breaker in favor of the counter proposal"
 msgstr "Jeu décisif en faveur de le contre-projet"
 
-msgid "Yeas"
-msgstr "Oui"
+msgid "Turnout"
+msgstr "Participation électorale"
 
-msgid "Nays"
-msgstr "Non"
+msgid "eligible Voters"
+msgstr "Electeurs"
+
+msgid "Received Ballots"
+msgstr "Votes reçus"
+
+msgid "Seats"
+msgstr "Sièges"
 
 #.
 #. Default: Voter turnout
@@ -999,20 +981,32 @@ msgstr "Non"
 msgid "Yay"
 msgstr "Oui"
 
-msgid "Empty"
-msgstr "Vide"
-
-msgid "Invalid"
-msgstr "Invalide"
-
 msgid "Blank list"
 msgstr "Liste vierge"
+
+msgid "List connection"
+msgstr "Connexion de listes"
+
+msgid "Sublist connection"
+msgstr "Connexion de sous-listes"
 
 msgid "Panachage (parties)"
 msgstr "Panachage (partis)"
 
 msgid "Panachage (lists)"
 msgstr "Panachage (listes)"
+
+msgid "Accounted Votes"
+msgstr "Votes comptés"
+
+msgid "Accounted Ballots"
+msgstr "Bulletins de vote comptabilisés"
+
+msgid "Blank Ballots"
+msgstr "Bulletins de vote vierges"
+
+msgid "Invalid Ballots"
+msgstr "Bulletins de vote non valides"
 
 msgid "Wrong username or password"
 msgstr "Mauvais nom d'utilisateur ou mot de passe"
@@ -1258,11 +1252,32 @@ msgstr ""
 msgid "The year ${year} is not yet supported"
 msgstr "L'année ${year} n'est pas encore prise en charge"
 
+msgid "Invalid id"
+msgstr "Mauvaise référence"
+
 msgid "Use an election based on proportional representation"
 msgstr "Aucune election selon le système proportionnel"
 
 msgid "The data source is not configured properly"
 msgstr "La source de données n'est pas configurée correctement"
+
+#~ msgid "Invalid list values"
+#~ msgstr "Valeurs de la liste non valides"
+
+#~ msgid "Could not read yeas"
+#~ msgstr "Impossible de lire les oui"
+
+#~ msgid "Could not read nays"
+#~ msgstr "Impossible de lire les non"
+
+#~ msgid "Could not read the eligible voters"
+#~ msgstr "Impossible de connaître les électeurs valides"
+
+#~ msgid "Could not read the invalid votes"
+#~ msgstr "Impossible de connaître les votes invalides"
+
+#~ msgid "Subtotal"
+#~ msgstr "Sous-total"
 
 #~ msgid "Missing column: ${col}"
 #~ msgstr "Intègre non valid: ${col}"
