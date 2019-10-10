@@ -8,6 +8,12 @@ from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils.election import get_connection_results_api
 from onegov.election_day.utils.election import get_connections_data
 from sqlalchemy.orm import object_session
+from onegov.election_day import _
+
+election_incomplete_text = _(
+    'The figure with the list connections will be available '
+    'as soon the final results are published.'
+)
 
 
 @ElectionDayApp.json(
@@ -23,6 +29,9 @@ def view_election_connections_data(self, request):
 
     """
 
+    # if self.completed:
+    #     return get_connections_data(self, request)
+    # return {}
     return get_connections_data(self, request)
 
 
@@ -40,12 +49,16 @@ def view_election_connections_chart(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_modified)
 
+    assert False
+
     return {
         'model': self,
         'layout': DefaultLayout(self, request),
         'type': 'sankey',
         'inverse': 'true',
         'data_url': request.link(self, name='connections-data'),
+        'skip_rendering': not self.completed,
+        'help_text': election_incomplete_text
     }
 
 
@@ -88,6 +101,8 @@ def view_election_connections(self, request):
         'election': self,
         'layout': layout,
         'connections': get_connection_results_api(self, object_session(self)),
+        'skip_rendering': not self.completed,
+        'help_text': election_incomplete_text,
     }
 
 

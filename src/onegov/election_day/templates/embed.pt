@@ -27,7 +27,7 @@
     </head>
     <body>
         <div class="embed-info">
-            <tal:block metal:use-macro="layout.macros['intermediate-results-popup']" i18n:domain="onegov.election_day"></tal:block>
+            <tal:block metal:use-macro="layout.macros['intermediate-results-popup']" i18n:domain="onegov.election_day" />
         </div>
         <tal:block tal:condition="not: skip_rendering|nothing">
             <tal:block tal:condition="data_url|nothing">

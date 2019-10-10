@@ -20,7 +20,10 @@
             <h4 tal:condition="layout.subtitle()" i18n:translate="">${layout.subtitle()}</h4>
 
             <div class="row">
-                <div class="small-12 small-centered large-10 columns">
+                <div class="columns small-12">
+                    <tal:block metal:use-macro="layout.macros['intermediate-results-popup']" i18n:domain="onegov.election_day" />
+                </div>
+                <div class="small-12 small-centered large-10 columns" tal:condition="not: skip_rendering">
                     <figure>
                         <div class="sankey-chart"
                             i18n:attributes="data-embed-link"
