@@ -28,10 +28,6 @@ def view_election_connections_data(self, request):
     Used to for the connection sankey chart.
 
     """
-
-    # if self.completed:
-    #     return get_connections_data(self, request)
-    # return {}
     return get_connections_data(self, request)
 
 
@@ -49,14 +45,15 @@ def view_election_connections_chart(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_modified)
 
-    assert False
+    data_url = request.link(
+        self, name='connections-data') if self.completed else None
 
     return {
         'model': self,
         'layout': DefaultLayout(self, request),
         'type': 'sankey',
         'inverse': 'true',
-        'data_url': request.link(self, name='connections-data'),
+        'data_url': data_url,
         'skip_rendering': not self.completed,
         'help_text': election_incomplete_text
     }
