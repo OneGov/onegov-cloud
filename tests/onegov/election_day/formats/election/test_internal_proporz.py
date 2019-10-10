@@ -116,7 +116,10 @@ def test_import_internal_proporz_regional_zg(session, import_test_datasets):
 
     panachage_results = session.query(PanachageResult)
     panachage_results = panachage_results.filter_by(owner=election.id).all()
-    assert panachage_results
+    assert not panachage_results, 'Owner of lists pana results must be NULL'
+
+    panachage_results = election.panachage_results
+
     for pa_result in panachage_results:
         assert len(pa_result.target) > 10, 'target must be a casted uuid'
 
