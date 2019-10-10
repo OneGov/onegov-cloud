@@ -1,8 +1,27 @@
 # Changes
 
+## Release `2019.25`
+
+> commits: **4 / [bfa6f6b0ff...b69d1d8b72](https://github.com/OneGov/onegov-cloud/compare/bfa6f6b0ff^...b69d1d8b72)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.25)](https://buildkite.com/seantis/onegov-cloud)
+
+### Election-Day
+
+🎉 **Hides connection-chart for lists if election is not completed**
+
+**`Feature`** | **[18958675f1](https://github.com/onegov/onegov-cloud/commit/18958675f11246d89104d2e54c2b6903d1c33686)**
+
+🐞 **Fixes displaying party pana results for list pana results**
+
+- Fixes adding owner for list panachage results
+- Adds parent_connection_id prefix to connection_id
+
+**`Bugfix`** | **[b69d1d8b72](https://github.com/onegov/onegov-cloud/commit/b69d1d8b720ebb1d1fc95504dd351492499c331d)**
+
 ## Release `2019.24`
 
-> commits: **1 / [33a3fe7881...33a3fe7881](https://github.com/OneGov/onegov-cloud/compare/33a3fe7881^...33a3fe7881)**<br>
+> released: **2019-10-09 14:31**<br>
+> commits: **2 / [33a3fe7881...cac0b1a82c](https://github.com/OneGov/onegov-cloud/compare/33a3fe7881^...cac0b1a82c)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.24)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
