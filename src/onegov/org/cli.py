@@ -472,10 +472,6 @@ def import_reservations(dsn, map):
             self.new_url = new_url
             self.type = type
 
-            if type != 'room':
-                raise NotImplementedError(
-                    "Room migration has not been tested yet")
-
         @property
         def name(self):
             return URL(self.new_url).path().rstrip('/').split('/')[-1]
@@ -735,7 +731,7 @@ def import_reservations(dsn, map):
         print("Writing reserved slots")
         for row in tqdm(rows, unit=" slots", total=count):
             session.add(ReservedSlot(
-                resource=mapping[row['resource']].new_uuid,
+                resource=row_resource(row),
                 start=replace_timezone(row['start'], 'Europe/Zurich'),
                 end=replace_timezone(row['end'], 'Europe/Zurich'),
                 allocation_id=allocation_ids[row['allocation_id']],
@@ -770,10 +766,11 @@ def import_reservations(dsn, map):
                 'modified': replace_timezone(row['modified'], 'UTC'),
             }
 
-            if row['quota'] > 1:
-                raise NotImplementedError((
-                    "Reservations with a quota > 1 are not supported yet"
-                ))
+            if row['quota'] > 1 and mapping[row.resource].type != 'daypass':
+                raise RuntimeError(
+                    "Reservations with multiple quotas for rooms "
+                    "cannot be migrated"
+                )
 
             # onegov.reservation does not support group targets, so we
             # translate those into normal allocations and create multiple
@@ -793,7 +790,12 @@ def import_reservations(dsn, map):
             )
 
             if row['target_type'] == 'group':
-                for allocation in targeted_allocations(group=row['target']):
+                targets = tuple(targeted_allocations(group=row['target']))
+
+                if not targets:
+                    raise RuntimeError(f"No rows for target {row['target']}")
+
+                for allocation in targets:
                     allocation.group = uuid4()
 
                     session.add(Reservation(
