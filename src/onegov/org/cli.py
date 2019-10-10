@@ -550,6 +550,9 @@ def import_reservations(dsn, map):
                     elif isinstance(v['value'], int):
                         fields.append(f"{label} = ___")
                         values[id] = str(v['value'])
+                    elif isinstance(v['value'], list):
+                        fields.append(f"{label} = ___")
+                        values[id] = ', '.join(v['value'])
                     else:
                         raise NotImplementedError((
                             f"No conversion for {v['value']} "
@@ -729,11 +732,24 @@ def import_reservations(dsn, map):
 
         # create the reserved slots with the mapped values
         print("Writing reserved slots")
+        known = set()
         for row in tqdm(rows, unit=" slots", total=count):
+            r = row_resource(row)
+            s = replace_timezone(row['start'], 'Europe/Zurich')
+            e = replace_timezone(row['end'], 'Europe/Zurich')
+
+            # it's possible for rows to become duplicated after replacing
+            # the timezone, if the reserved slot passes over daylight
+            # savings time changes
+            if (r, s) in known:
+                continue
+
+            known.add((r, s))
+
             session.add(ReservedSlot(
-                resource=row_resource(row),
-                start=replace_timezone(row['start'], 'Europe/Zurich'),
-                end=replace_timezone(row['end'], 'Europe/Zurich'),
+                resource=r,
+                start=s,
+                end=e,
                 allocation_id=allocation_ids[row['allocation_id']],
                 reservation_token=row['reservation_token']
             ))
