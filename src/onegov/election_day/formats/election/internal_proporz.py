@@ -363,7 +363,6 @@ def import_election_internal_proporz(election, principal, file, mimetype):
             source=source,
             target=str(list_uids[list_id]),
             votes=votes,
-            owner=election_id
         )
         for list_id in panachage
         for source, votes in panachage[list_id].items()
