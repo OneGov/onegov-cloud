@@ -113,8 +113,8 @@ def test_extended_people_exclude_hidden(session):
     people.exclude_hidden = True
     assert people.query().count() == 1
 
-    person.is_hidden_from_public = True
+    person.access = 'private'
     assert people.query().count() == 0
 
-    person.is_hidden_from_public = False
+    person.access = 'public'
     assert people.query().count() == 1

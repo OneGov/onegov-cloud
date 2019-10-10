@@ -555,7 +555,7 @@ def get_directory_entries(request, app, directory_name, keywords, page=0,
             searchwidget=searchwidget
         )
 
-        collection.is_hidden_from_public = directory.is_hidden_from_public
+        collection.access = directory.access
 
         return collection
 

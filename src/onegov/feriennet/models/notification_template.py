@@ -20,6 +20,9 @@ class NotificationTemplate(Base, ContentMixin, TimestampMixin):
 
     __tablename__ = 'notification_templates'
 
+    #: holds the selected period id (not stored in the database)
+    period_id = None
+
     #: The public id of the notification template
     id = Column(UUID, primary_key=True, default=uuid4)
 
@@ -31,6 +34,14 @@ class NotificationTemplate(Base, ContentMixin, TimestampMixin):
 
     #: The date the notification was last sent
     last_sent = Column(UTCDateTime, nullable=True)
+
+    def for_period(self, period):
+        """ Implements the required interface for the 'periods' macro in
+        onegov.feriennet.
+
+        """
+        self.period_id = period.id
+        return self
 
 
 def as_paragraphs(text):

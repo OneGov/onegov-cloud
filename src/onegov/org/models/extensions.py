@@ -7,7 +7,7 @@ from onegov.org import _
 from onegov.org.forms.extensions import CoordinatesFormExtension
 from onegov.people import Person, PersonCollection
 from sqlalchemy.orm import object_session
-from wtforms import BooleanField, StringField, TextAreaField
+from wtforms import BooleanField, RadioField, StringField, TextAreaField
 
 
 class ContentExtension(object):
@@ -48,24 +48,35 @@ class ContentExtension(object):
         raise NotImplementedError
 
 
-class HiddenFromPublicExtension(ContentExtension):
+class AccessExtension(ContentExtension):
     """ Extends any class that has a meta dictionary field with the ability to
-    hide it from the public.
+    set one of the following access levels:
+
+    * 'public' - The default, the model is listed and accessible.
+    * 'private' - Neither listed nor accessible.
+    * 'secret' - Not listed, but available for anyone that knows the URL.
 
     see :func:`onegov.core.security.rules.has_permission_not_logged_in`
 
     """
 
-    is_hidden_from_public = meta_property()
+    access = meta_property(default='public')
 
     def extend_form(self, form_class, request):
 
-        class HiddenPageForm(form_class):
-            is_hidden_from_public = BooleanField(
-                label=_("Hide from the public"),
-                fieldset=_("Visibility"))
+        class AccessForm(form_class):
+            access = RadioField(
+                label=_("Access"),
+                choices=(
+                    ('public', _("Public")),
+                    ('secret', _("Through URL only (not listed)")),
+                    ('private', _("Only by privileged users")),
+                ),
+                default='public',
+                fieldset=_("Security")
+            )
 
-        return HiddenPageForm
+        return AccessForm
 
 
 class CoordinatesExtension(ContentExtension, CoordinatesMixin):

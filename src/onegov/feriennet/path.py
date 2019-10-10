@@ -243,9 +243,14 @@ def get_notification_template_collection(request, app):
 @FeriennetApp.path(
     model=NotificationTemplate,
     path='/notification/{id}',
-    converters=dict(id=UUID))
-def get_notification_template(request, app, id):
-    return NotificationTemplateCollection(app.session()).by_id(id)
+    converters=dict(id=UUID, period_id=UUID))
+def get_notification_template(request, app, id, period_id):
+    template = NotificationTemplateCollection(app.session()).by_id(id)
+
+    if template:
+        template.period_id = period_id or app.active_period.id
+
+    return template
 
 
 @FeriennetApp.path(

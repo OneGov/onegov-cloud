@@ -13,7 +13,7 @@
                         <strong><a href="${request.link(agency)}">${agency.title}</a></strong>
                         <ul>
                             <tal:block tal:repeat="child agency.children">
-                                <li tal:condition="not child.is_hidden_from_public or request.is_logged_in">
+                                <li tal:condition="child.access == 'public' or request.is_logged_in">
                                     <a href="${request.link(child)}">${child.title}</a>
                                 </li>
                             </tal:block>

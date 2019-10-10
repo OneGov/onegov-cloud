@@ -24,7 +24,7 @@
                 <h3 i18n:translate>Suborganizations</h3>
                 <ul class="children" data-sortable data-sortable-url="${layout.move_agency_url_template}">
                     <tal:block tal:repeat="child children">
-                        <li tal:condition="not child.is_hidden_from_public or request.is_logged_in" data-sortable-id="${child.id}">
+                        <li tal:condition="child.access == 'public' or request.is_logged_in" data-sortable-id="${child.id}">
                             <a href="${request.link(child)}">${child.title}</a>
                         </li>
                     </tal:block>
@@ -35,7 +35,7 @@
                 <h3 i18n:translate>People</h3>
                 <ul class="memberships" data-sortable data-sortable-url="${layout.move_membership_within_agency_url_template}">
                     <tal:block tal:repeat="membership memberships">
-                        <li tal:condition="(not membership.is_hidden_from_public and not membership.person.is_hidden_from_public) or request.is_logged_in" data-sortable-id="${membership.id}">
+                        <li tal:condition="(membership.access == 'public' and membership.person.access == 'public') or request.is_logged_in" data-sortable-id="${membership.id}">
                             <strong><a href="${request.link(membership.person)}">${membership.person.title}</a></strong>,
                             <a style="text" href="${request.link(membership)}">${membership.title}</a>
                             <span tal:condition="membership.prefix|None">${membership.prefix}</span>
@@ -56,7 +56,7 @@
                     <em>${person.function}</em>
                 </li>
                 <tal:block tal:repeat="membership person.memberships_by_agency">
-                    <li tal:condition="not membership.is_hidden_from_public or request.is_logged_in" class="person-card-function">
+                    <li tal:condition="membership.access == 'public' or request.is_logged_in" class="person-card-function">
                         <em title="${layout.agency_path(membership.agency)|None}">${membership.title} - ${membership.agency.title}</em>
                     </li>
                 </tal:block>
@@ -146,7 +146,7 @@
                         <dd>
                             <ul data-sortable data-sortable-url="${layout.move_membership_within_person_url_template}">
                                 <tal:block tal:repeat="membership memberships">
-                                    <li tal:condition="not membership.is_hidden_from_public or request.is_logged_in" class="person-card-membership" data-sortable-id="${membership.id}">
+                                    <li tal:condition="membership.access == 'public' or request.is_logged_in" class="person-card-membership" data-sortable-id="${membership.id}">
                                         <a href="${request.link(membership.agency)}" title="${layout.agency_path(membership.agency)|None}">${membership.agency.title}</a> -
                                         <a href="${request.link(membership)}">${membership.title}</a>
                                     </li>
@@ -167,12 +167,12 @@
                     <dd>${membership.title}</dd>
                 </tal:block>
 
-                <tal:block tal:condition="membership.agency and (not membership.agency.is_hidden_from_public or request.is_logged_in)">
+                <tal:block tal:condition="membership.agency and (membership.agency.access == 'public' or request.is_logged_in)">
                     <dt i18n:translate>Agency</dt>
                     <dd><a href="${request.link(membership.agency)}">${membership.agency.title}</a></dd>
                 </tal:block>
 
-                <tal:block tal:condition="membership.person and (not membership.person.is_hidden_from_public or request.is_logged_in)">
+                <tal:block tal:condition="membership.person and (membership.person.access == 'public' or request.is_logged_in)">
                     <dt i18n:translate>Person</dt>
                     <dd><a href="${request.link(membership.person)}">${membership.person.title}</a></dd>
                 </tal:block>
@@ -199,7 +199,7 @@
         <a href="${request.link(result)}">${result.title}</a>
         <p tal:define="memberships result.memberships_by_agency">
             <tal:block tal:repeat="membership memberships">
-                <span tal:condition="(not membership.is_hidden_from_public and not membership.agency.is_hidden_from_public) or request.is_logged_in">
+                <span tal:condition="(membership.access == 'public' and membership.agency.access == 'public') or request.is_logged_in">
                     ${membership.title} ${membership.agency.title}<br>
                 </span>
             </tal:block>
@@ -213,12 +213,12 @@
     </metal:search_result_agencies>
 
     <metal:search_result_agency_memberships define-macro="search_result_agency_memberships" i18n:domain="onegov.agency">
-        <a href="${request.link(result.person)}" tal:condition="not result.person.is_hidden_from_public or request.is_logged_in">
+        <a href="${request.link(result.person)}" tal:condition="result.person.access == 'public' or request.is_logged_in">
             ${result.person.title}
         </a>
         <p>
             <span>${result.title}</span>
-            <span tal:condition="not result.agency.is_hidden_from_public or request.is_logged_in">${result.agency.title}</span>
+            <span tal:condition="result.agency.access == 'public' or request.is_logged_in">${result.agency.title}</span>
         </p>
     </metal:search_result_agency_memberships>
 

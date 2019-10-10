@@ -287,6 +287,8 @@ def send_newsletter(request, newsletter, recipients, is_test=False):
         }
     ))
 
+    count = 0
+
     for count, recipient in enumerate(recipients, start=1):
         unsubscribe = request.link(recipient.subscription, 'unsubscribe')
 

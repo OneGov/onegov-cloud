@@ -8,21 +8,21 @@ from onegov.org import _
 from purl import URL
 
 
-class HiddenElementMixin(object):
+class AccessMixin(object):
 
     @property
-    def is_hidden_from_public(self):
-        """ Returns True if Link is hidden from the public. Pass extra keyword
-        ``model`` to ``__init__`` to have this work automatically.
+    def access(self):
+        """ Wraps access to the model's access property, ensuring it always
+        works, even if the model does not use it.
 
         """
-        if getattr(self.model, 'is_hidden_from_public', None):
-            return True
-        else:
-            return False
+        if hasattr(self, 'model'):
+            return getattr(self.model, 'access', 'public')
+
+        return 'public'
 
 
-class Link(HiddenElementMixin):
+class Link(AccessMixin):
     """ Represents a link rendered in a template. """
 
     __slots__ = [
@@ -96,15 +96,23 @@ class Link(HiddenElementMixin):
             classes = self.classes + (extra_classes or tuple())
             a.attrib['class'] = ' '.join(classes)
 
-        # add the hidden from public hint if needed
-        if self.is_hidden_from_public:
+        # add the access hint if needed
+        if self.access == 'private':
 
-            # This snippet is duplicated in the hidden-from-public-hint macro!
+            # This snippet is duplicated in the access-hint macro!
             hint = builder.I()
-            hint.attrib['class'] = 'hidden-from-public-hint'
-            hint.attrib['title'] = request.translate(
-                _("This site is hidden from the general public")
-            )
+            hint.attrib['class'] = 'private-hint'
+            hint.attrib['title'] = request.translate(_("This site is private"))
+
+            a.append(builder.I(' '))
+            a.append(hint)
+
+        elif self.access == 'secret':
+
+            # This snippet is duplicated in the access-hint macro!
+            hint = builder.I()
+            hint.attrib['class'] = 'secret-hint'
+            hint.attrib['title'] = request.translate(_("This site is secret"))
 
             a.append(builder.I(' '))
             a.append(hint)
@@ -184,7 +192,7 @@ class ConfirmLink(DeleteLink):
             extra_information, redirect_after, request_method, classes)
 
 
-class LinkGroup(HiddenElementMixin):
+class LinkGroup(AccessMixin):
     """ Represents a list of links. """
 
     __slots__ = [

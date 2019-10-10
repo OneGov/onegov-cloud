@@ -24,9 +24,9 @@ def is_owner(username, activity):
 @FeriennetApp.permission_rule(model=object, permission=object)
 def local_has_permission_logged_in(app, identity, model, permission):
 
-    # is_hidden_from_public is stricter in feriennet, only admins see it
+    # access is stricter in feriennet, only admins see non-public models
     if identity.role != 'admin':
-        if getattr(model, 'is_hidden_from_public', False):
+        if getattr(model, 'access', None) == 'private':
             return False
 
     return has_permission_logged_in(app, identity, model, permission)

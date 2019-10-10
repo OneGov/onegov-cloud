@@ -60,8 +60,8 @@ class ExtendedPersonCollection(PersonCollection, Pagination):
         if self.exclude_hidden:
             query = query.filter(
                 or_(
-                    ExtendedPerson.meta['is_hidden_from_public'] == False,
-                    ExtendedPerson.meta['is_hidden_from_public'] == None,
+                    ExtendedPerson.meta['access'] == 'public',
+                    ExtendedPerson.meta['access'] == None,
                 )
             )
         if self.letter:

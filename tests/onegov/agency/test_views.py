@@ -253,7 +253,7 @@ def test_views_hidden(client):
     new_person = client.get('/people').click('Person', href='new')
     new_person.form['first_name'] = 'Thomas'
     new_person.form['last_name'] = 'Aeschi'
-    new_person.form['is_hidden_from_public'] = True
+    new_person.form['access'] = 'private'
     person = new_person.form.submit().follow()
     assert 'Thomas' in person
     assert 'Aeschi' in person
@@ -266,7 +266,7 @@ def test_views_hidden(client):
 
     new_agency = root.click('Organisation', href='new')
     new_agency.form['title'] = 'Nationalrat'
-    new_agency.form['is_hidden_from_public'] = True
+    new_agency.form['access'] = 'private'
     child = new_agency.form.submit().follow()
     assert 'Nationalrat' in child
     assert 'Nationalrat' in client.get('/organizations')
@@ -274,7 +274,7 @@ def test_views_hidden(client):
     new_membership = root.click("Mitgliedschaft", href='new')
     new_membership.form['title'] = "Mitglied von Zug"
     new_membership.form['person_id'].select(text="Aeschi Thomas")
-    new_membership.form['is_hidden_from_public'] = True
+    new_membership.form['access'] = 'private'
     agency = new_membership.form.submit().follow()
     assert "Mitglied von Zug" in agency
     assert "Aeschi Thomas" in agency
@@ -285,7 +285,7 @@ def test_views_hidden(client):
     new_membership = child.click("Mitgliedschaft", href='new')
     new_membership.form['title'] = "Nationalrat Zug"
     new_membership.form['person_id'].select(text="Aeschi Thomas")
-    new_membership.form['is_hidden_from_public'] = True
+    new_membership.form['access'] = 'private'
     agency = new_membership.form.submit().follow()
     assert "Nationalrat Zug" in agency
     assert "Aeschi Thomas" in agency

@@ -13,7 +13,7 @@ from onegov.form import as_internal_id, Extendable, FormSubmission
 from onegov.form.fields import UploadField
 from onegov.org import _
 from onegov.org.models.extensions import CoordinatesExtension
-from onegov.org.models.extensions import HiddenFromPublicExtension
+from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.message import DirectoryMessage
 from onegov.pay import Price
 from onegov.ticket import Ticket
@@ -201,7 +201,7 @@ class DirectorySubmissionAction(object):
             self.directory, self.ticket, request, 'rejected')
 
 
-class ExtendedDirectory(Directory, HiddenFromPublicExtension, Extendable):
+class ExtendedDirectory(Directory, AccessExtension, Extendable):
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
     es_type_name = 'extended_directories'
@@ -227,7 +227,7 @@ class ExtendedDirectory(Directory, HiddenFromPublicExtension, Extendable):
 
     @property
     def es_public(self):
-        return not self.is_hidden_from_public
+        return self.access == 'public'
 
     def form_class_for_submissions(self, include_private):
         """ Generates the form_class used for user submissions and change
@@ -293,14 +293,14 @@ class ExtendedDirectory(Directory, HiddenFromPublicExtension, Extendable):
 
 
 class ExtendedDirectoryEntry(DirectoryEntry, CoordinatesExtension,
-                             HiddenFromPublicExtension):
+                             AccessExtension):
     __mapper_args__ = {'polymorphic_identity': 'extended'}
 
     es_type_name = 'extended_directory_entries'
 
     @property
     def es_public(self):
-        return not self.is_hidden_from_public
+        return self.access == 'public'
 
     @property
     def display_config(self):

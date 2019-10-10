@@ -180,7 +180,7 @@ def test_reset_password(client):
     reset_page.form['email'] = 'someone_else@example.org'
     reset_page.form['password'] = 'new_password'
     reset_page = reset_page.form.submit()
-    assert "Ungültige Addresse oder abgelaufener Link" in reset_page.text
+    assert "Ungültige Adresse oder abgelaufener Link" in reset_page.text
     assert token in reset_page.text
 
     reset_page.form['email'] = 'admin@example.org'
@@ -198,7 +198,7 @@ def test_reset_password(client):
     reset_page.form['email'] = 'admin@example.org'
     reset_page.form['password'] = 'new_password'
     reset_page = reset_page.form.submit()
-    assert "Ungültige Addresse oder abgelaufener Link" in reset_page.text
+    assert "Ungültige Adresse oder abgelaufener Link" in reset_page.text
 
     login_page.form['username'] = 'admin@example.org'
     login_page.form['password'] = 'hunter2'
@@ -376,7 +376,7 @@ def test_news_on_homepage(client):
 
     # hidden news don't count for anonymous users
     baz = PageCollection(client.app.session()).by_path('news/baz')
-    baz.is_hidden_from_public = True
+    baz.access = 'private'
 
     transaction.commit()
 
@@ -392,7 +392,7 @@ def test_news_on_homepage(client):
 
     # even if they are stickied
     baz = PageCollection(client.app.session()).by_path('news/baz')
-    baz.is_hidden_from_public = True
+    baz.access = 'private'
     baz.is_visible_on_homepage = True
 
     transaction.commit()
@@ -685,7 +685,7 @@ def test_hide_page(client):
     new_page = client.get('/topics/organisation').click('Thema')
 
     new_page.form['title'] = "Test"
-    new_page.form['is_hidden_from_public'] = True
+    new_page.form['access'] = 'private'
     page = new_page.form.submit().follow()
 
     anonymous = client.spawn()
@@ -693,7 +693,7 @@ def test_hide_page(client):
     assert response.status_code == 403
 
     edit_page = page.click("Bearbeiten")
-    edit_page.form['is_hidden_from_public'] = False
+    edit_page.form['access'] = 'public'
     page = edit_page.form.submit().follow()
 
     response = anonymous.get(page.request.url)
@@ -706,7 +706,7 @@ def test_hide_news(client):
     new_page = client.get('/news').click('Nachricht')
 
     new_page.form['title'] = "Test"
-    new_page.form['is_hidden_from_public'] = True
+    new_page.form['access'] = 'private'
     page = new_page.form.submit().follow()
 
     anonymous = client.spawn()
@@ -714,7 +714,7 @@ def test_hide_news(client):
     assert response.status_code == 403
 
     edit_page = page.click("Bearbeiten")
-    edit_page.form['is_hidden_from_public'] = False
+    edit_page.form['access'] = 'public'
     page = edit_page.form.submit().follow()
 
     response = anonymous.get(page.request.url)
@@ -725,7 +725,7 @@ def test_hide_form(client):
     client.login_editor()
 
     form_page = client.get('/form/anmeldung/edit')
-    form_page.form['is_hidden_from_public'] = True
+    form_page.form['access'] = 'private'
     page = form_page.form.submit().follow()
 
     anonymous = client.spawn()
@@ -734,7 +734,7 @@ def test_hide_form(client):
     assert response.status_code == 403
 
     edit_page = page.click("Bearbeiten")
-    edit_page.form['is_hidden_from_public'] = False
+    edit_page.form['access'] = 'public'
     page = edit_page.form.submit().follow()
 
     response = anonymous.get(page.request.url)
@@ -2705,7 +2705,7 @@ def test_basic_search(client_with_es):
     # make sure anonymous doesn't see hidden things in the search results
     assert "fulltext" in client.spawn().get('/search?q=fulltext')
     edit_news = news.click("Bearbeiten")
-    edit_news.form['is_hidden_from_public'] = True
+    edit_news.form['access'] = 'private'
     edit_news.form.submit()
 
     client.app.es_client.indices.refresh(index='_all')
@@ -4017,7 +4017,7 @@ def test_directory_visibility(client):
     assert "Soccer" in anon.get('/directories/clubs/soccer-club')
 
     page = client.get('/directories/clubs/soccer-club').click("Bearbeiten")
-    page.form['is_hidden_from_public'] = True
+    page.form['access'] = 'private'
     page.form.submit()
 
     assert "Clubs" in anon.get('/directories')
@@ -4025,11 +4025,11 @@ def test_directory_visibility(client):
     assert anon.get('/directories/clubs/soccer-club', status=403)
 
     page = client.get('/directories/clubs/soccer-club').click("Bearbeiten")
-    page.form['is_hidden_from_public'] = False
+    page.form['access'] = 'public'
     page.form.submit()
 
     page = client.get('/directories/clubs').click("Konfigurieren")
-    page.form['is_hidden_from_public'] = True
+    page.form['access'] = 'private'
     page.form.submit()
 
     assert "Clubs" not in anon.get('/directories')
@@ -5217,3 +5217,88 @@ def test_ticket_chat_search(client_with_es):
     # but anonymous users should not
     page = client.spawn().get('/search?q=deadbeef')
     assert 'Foo' not in page
+
+
+@freeze_time("2019-08-01")
+def test_zipcode_block(client):
+    client.login_admin()
+
+    # enable zip-code blocking
+    page = client.get('/resource/tageskarte/edit')
+    page.form['definition'] = '\n'.join((
+        'PLZ *= ___',
+    ))
+    page.select_radio('payment_method', "Keine Kreditkarten-Zahlungen")
+    page.select_radio('pricing_method', "Kostenlos")
+    page.form['zipcode_block_use'] = True
+    page.form['zipcode_days'] = 1
+    page.form['zipcode_field'] = 'PLZ'
+    page.form['zipcode_list'] = '\n'.join((
+        '1234',
+        '5678',
+    ))
+    page.form.submit().follow()
+
+    # create a blocked and an unblocked allocation
+    transaction.begin()
+
+    scheduler = ResourceCollection(client.app.libres_context)\
+        .by_name('tageskarte')\
+        .get_scheduler(client.app.libres_context)
+
+    allocations = [
+        *scheduler.allocate(
+            dates=(datetime(2019, 8, 2), datetime(2019, 8, 2)),
+            whole_day=True,
+            quota=2,
+            quota_limit=2
+        ),
+        *scheduler.allocate(
+            dates=(datetime(2019, 8, 3), datetime(2019, 8, 3)),
+            whole_day=True,
+            quota=2,
+            quota_limit=2
+        )
+    ]
+
+    transaction.commit()
+
+    allocations[0] = client.app.session().merge(allocations[0])
+    allocations[1] = client.app.session().merge(allocations[1])
+
+    # reserve both allocations
+    client = client.spawn()
+    client.bound_reserve(allocations[0])(quota=1)
+    client.bound_reserve(allocations[1])(quota=1)
+
+    # one of them should now show a warning
+    page = client.get('/resource/tageskarte/form')
+    assert str(page).count('Postleitzahlen') == 1
+
+    # the confirmation should fail
+    page.form['email'] = 'info@example.org'
+    page.form['plz'] = '0000'
+    page = page.form.submit()
+
+    # unless we have the right PLZ
+    page.form['plz'] = '1234'
+    page.form.submit().follow()
+
+    # or unless we are admin
+    client = client.spawn()
+    client.login_admin()
+
+    allocations[0] = client.app.session().merge(allocations[0])
+    allocations[1] = client.app.session().merge(allocations[1])
+
+    client.bound_reserve(allocations[0])(quota=1)
+    client.bound_reserve(allocations[1])(quota=1)
+
+    # we won't get a warning
+    page = client.get('/resource/tageskarte/form')
+    assert str(page).count('Postleitzahlen') == 0
+
+    # and we can confirm
+    page.form['email'] = 'info@example.org'
+    page.form['plz'] = '0000'
+    page.form.submit().follow()

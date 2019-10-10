@@ -485,11 +485,21 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
 
     def is_visible(self, model):
         """ Returns True if the given model is visible to the current user.
-        This is basically an alias for :meth:`CoreRequest.is_public`. It exists
-        because it is easier to understand than ``is_public``.
+
+        In addition to the `is_public` check, this checks if the model is
+        secret and should therefore not be visible (though it can still be
+        reached via URL).
 
         """
-        return self.has_permission(model, self.app.modules.security.Public)
+
+        if not self.is_public(model):
+            return False
+
+        if not self.is_private(model) and hasattr(model, 'access'):
+            if model.access == 'secret':
+                return False
+
+        return True
 
     def is_public(self, model):
         """ Returns True if the current user has the Public permission for

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-09-30 10:47+0200\n"
+"POT-Creation-Date: 2019-10-09 10:42+0200\n"
 "PO-Revision-Date: 2019-02-18 06:40+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -76,8 +76,11 @@ msgstr "Tickets"
 msgid "Ticket"
 msgstr "Ticket"
 
-msgid "This site is hidden from the general public"
-msgstr "Ce site est caché pour le grand public"
+msgid "This site is private"
+msgstr "Ce site est privé"
+
+msgid "This site is secret"
+msgstr "Ce site est secret"
 
 msgid "Cancel"
 msgstr "Annuler"
@@ -730,6 +733,22 @@ msgstr "Heures"
 msgid "Days"
 msgstr "Jours"
 
+msgid "Limit reservations to certain zip-codes"
+msgstr "Limiter les réservations à certains codes postaux"
+
+msgid "Zip-code limit"
+msgstr "Limite de code postal"
+
+msgid "Zip-code field"
+msgstr "Champ code postal"
+
+msgid "Allowed zip-codes (one per line)"
+msgstr "Codes postaux autorisés (un par ligne)"
+
+msgid "Days before an allocation may be reserved by anyone"
+msgstr ""
+"Des jours avant une attribution peuvent être réservés par n'importe qui"
+
 msgid "Per item"
 msgstr "Par article"
 
@@ -741,6 +760,15 @@ msgstr "Prix par article"
 
 msgid "Price per hour"
 msgstr "Prix par heure"
+
+msgid "Please select the form field that holds the zip-code"
+msgstr "Veuillez sélectionner le champ de formulaire contenant le code postal."
+
+msgid "Please enter at least one zip-code"
+msgstr "Veuillez saisir au moins un code postal"
+
+msgid "Please enter one zip-code per line, without spaces or commas"
+msgstr "Veuillez saisir un code postal par ligne, sans espaces ni virgules"
 
 msgid "The price must be larger than zero"
 msgstr "Le prix doit être supérieur à zéro"
@@ -1328,14 +1356,26 @@ msgstr "La proposition a été rejetée"
 msgid "Your directory submission has been rejected"
 msgstr "Votre proposition de répertoire a été rejetée"
 
-msgid "Hide from the public"
-msgstr "Cacher au public"
+msgid "Access"
+msgstr "Accès"
 
-msgid "Visibility"
-msgstr "Visibilité"
+msgid "Public"
+msgstr "Public"
+
+msgid "Through URL only (not listed)"
+msgstr "Via URL uniquement (non répertorié)"
+
+msgid "Only by privileged users"
+msgstr "Seulement par les utilisateurs privilégiés"
+
+msgid "Security"
+msgstr "Sécurité"
 
 msgid "Visible on homepage"
 msgstr "Visible sur la page d'accueil"
+
+msgid "Visibility"
+msgstr "Visibilité"
 
 msgid "This month"
 msgstr "Ce mois-ci"
@@ -1913,12 +1953,8 @@ msgstr "Déposez des fichiers pour télécharger"
 msgid "All news"
 msgstr "Toutes les nouvelles"
 
-msgid ""
-"This site is hidden from the general public. To show it to everyone, edit "
-"this page and disable \"Hide from public\"."
-msgstr ""
-"Ce site est caché du grand public. Pour le montrer à tout le monde, modifiez "
-"cette page et désactivez « Cacher du public »."
+msgid "This site is not public."
+msgstr "Ce site n'est pas public."
 
 msgid ""
 "This site contains no lead. Leads are used for lists and search results."
@@ -1958,6 +1994,13 @@ msgstr "Page précédente"
 
 msgid "Next Page"
 msgstr "Page suivante"
+
+msgid ""
+"Persons living outside the following zipcodes may only reserve this "
+"allocation on the ${date}: ${zipcodes}"
+msgstr ""
+"Les personnes vivant en dehors des localités ayant les codes postaux "
+"suivants ne peuvent réserver cette allocation que le ${date} : ${zipcodes}"
 
 msgid "Quota"
 msgstr "Quota"
@@ -2096,9 +2139,6 @@ msgstr "Signature électronique"
 
 msgid "Publication"
 msgstr "Publication"
-
-msgid "Public"
-msgstr "Public"
 
 msgid "Private"
 msgstr "Privé"
@@ -2919,6 +2959,14 @@ msgstr "Choix invalide"
 
 msgid "Admins"
 msgstr "Admins"
+
+#, python-format
+msgid ""
+"You can only reserve this allocation before ${date} if you live in the "
+"following zipcodes: ${zipcodes}"
+msgstr ""
+"Vous ne pouvez réserver cette allocation avant le ${date} que si vous vivez "
+"dans les localités ayant les codes postaux suivants : ${zipcodes}"
 
 #, python-format
 msgid "${percent}% Available"
@@ -3834,3 +3882,16 @@ msgstr "L'utilisateur a bien été créé"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Vous vous êtes bien désinscrit(e) de tous les e-mails normaux."
+
+#~ msgid "This site is hidden from the general public"
+#~ msgstr "Ce site est caché pour le grand public"
+
+#~ msgid ""
+#~ "This site is hidden from the general public. To show it to everyone, edit "
+#~ "this page and disable \"Hide from public\"."
+#~ msgstr ""
+#~ "Ce site est caché du grand public. Pour le montrer à tout le monde, "
+#~ "modifiez cette page et désactivez « Cacher du public »."
+
+#~ msgid "Hide from the public"
+#~ msgstr "Cacher au public"

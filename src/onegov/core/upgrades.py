@@ -8,6 +8,7 @@ from onegov.core.orm.abstract import Associable
 from onegov.core.orm.types import JSON
 from sqlalchemy import inspect, text
 from sqlalchemy.exc import NoInspectionAvailable
+from sqlalchemy.orm import load_only
 
 
 @upgrade_task('Drop primary key from associated tables')

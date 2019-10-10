@@ -1,7 +1,7 @@
+from cached_property import cached_property
 from onegov.activity import Activity
 from onegov.activity import Booking, BookingCollection
 from onegov.activity import Occasion, OccasionCollection
-from onegov.activity import Period
 from onegov.core.orm import as_selectable_from_path
 from onegov.core.utils import module_path
 from onegov.feriennet import _
@@ -11,9 +11,9 @@ from onegov.feriennet.models import NotificationTemplate
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.user import User, UserCollection
-from sqlalchemy import distinct, or_, func, and_, select, exists
+from sqlalchemy import distinct, or_, and_, select, exists
 from uuid import uuid4
-from wtforms.fields import StringField, TextAreaField, RadioField, SelectField
+from wtforms.fields import StringField, TextAreaField, RadioField
 from wtforms.validators import InputRequired
 
 
@@ -48,7 +48,7 @@ class NotificationTemplateForm(Form):
 class NotificationTemplateSendForm(Form):
 
     send_to = RadioField(
-        label=_("Send to (applies to active period only)"),
+        label=_("Send to"),
         choices=[
             ('myself', _(
                 "Myself"
@@ -74,12 +74,6 @@ class NotificationTemplateSendForm(Form):
             )),
         ],
         default='by_role'
-    )
-
-    period = SelectField(
-        label=_("Period"),
-        choices=None,
-        depends_on=('send_to', 'with_unpaid_bills'),
     )
 
     roles = MultiCheckboxField(
@@ -108,8 +102,13 @@ class NotificationTemplateSendForm(Form):
     )
 
     def on_request(self):
-        self.populate_occasion()
-        self.populate_periods()
+        self.occasion.choices = list(self.occasion_choices)
+
+    @cached_property
+    def period(self):
+        for period in self.request.app.periods:
+            if period.id == self.model.period_id:
+                return period
 
     @property
     def has_choices(self):
@@ -161,9 +160,7 @@ class NotificationTemplateSendForm(Form):
         if not roles:
             return set()
 
-        users = UserCollection(self.request.session)
-
-        q = users.by_roles(*roles)
+        q = UserCollection(self.request.session).by_roles(*roles)
         q = q.filter(User.active == True)
         q = q.with_entities(User.username)
 
@@ -171,30 +168,22 @@ class NotificationTemplateSendForm(Form):
 
     def recipients_with_wishes(self):
         bookings = BookingCollection(self.request.session)
-        period = self.request.app.active_period
 
-        if not period.wishlist_phase:
+        if not self.period.wishlist_phase:
             return set()
 
-        q = bookings.query()
-        q = q.join(Period)
-
-        q = q.filter(Period.active == True)
+        q = bookings.query().filter_by(period_id=self.period.id)
         q = q.with_entities(distinct(Booking.username).label('username'))
 
         return {b.username for b in q}
 
     def recipients_with_bookings(self):
         bookings = BookingCollection(self.request.session)
-        period = self.request.app.active_period
 
-        if period.wishlist_phase:
+        if self.period.wishlist_phase:
             return set()
 
-        q = bookings.query()
-        q = q.join(Period)
-
-        q = q.filter(Period.active == True)
+        q = bookings.query().filter_by(period_id=self.period.id)
         q = q.with_entities(distinct(Booking.username).label('username'))
 
         return {b.username for b in q}
@@ -202,10 +191,8 @@ class NotificationTemplateSendForm(Form):
     def recipients_which_are_active_organisers(self):
         occasions = OccasionCollection(self.request.session)
 
-        q = occasions.query()
+        q = occasions.query().filter_by(period_id=self.period.id)
         q = q.join(Activity)
-        q = q.join(Period)
-        q = q.filter(Period.active == True)
         q = q.filter(Occasion.cancelled == False)
 
         q = q.with_entities(distinct(Activity.username).label('username'))
@@ -213,12 +200,7 @@ class NotificationTemplateSendForm(Form):
         return {o.username for o in q}
 
     def recipients_with_unpaid_bills(self):
-        period = next((
-            p for p in self.request.app.periods
-            if p.id.hex == self.period.data
-        ), None) or self.request.app.active_period
-
-        billing = BillingCollection(self.request, period=period)
+        billing = BillingCollection(self.request, period=self.period)
 
         return {
             username for username, bill in billing.bills.items()
@@ -228,19 +210,20 @@ class NotificationTemplateSendForm(Form):
     def recipients_by_occasion_query(self, occasions):
         bookings = BookingCollection(self.request.session)
 
-        q = bookings.query()
-        q = q.join(Period)
+        q = bookings.query().filter_by(period_id=self.period.id)
         q = q.join(Booking.occasion)
-        if occasions:
-            q = q.filter(Booking.occasion_id.in_(occasions))
-        else:
-            q = q.filter(Booking.occasion_id == uuid4())
-        q = q.filter(or_(
-            and_(Occasion.cancelled == False, Booking.state == 'accepted'),
-            and_(Occasion.cancelled == True, Booking.state == 'cancelled')
-        ))
-        q = q.filter(Period.active == True)
-        q = q.filter(Period.confirmed == True)
+
+        if not occasions:
+            # results in an impossible query that returns no results
+            return q.filter(Booking.occasion_id == uuid4())
+
+        q = q.filter(Booking.occasion_id.in_(occasions))
+
+        if self.period.confirmed:
+            q = q.filter(or_(
+                and_(Occasion.cancelled == False, Booking.state == 'accepted'),
+                and_(Occasion.cancelled == True, Booking.state == 'cancelled'),
+            ))
 
         return q
 
@@ -262,20 +245,8 @@ class NotificationTemplateSendForm(Form):
 
         return attendees | organisers
 
-    def recipients_count_by_occasion(self, occasions):
-        q = self.recipients_by_occasion_query(occasions)
-        q = q.with_entities(
-            Booking.occasion_id,
-            func.count(Booking.occasion_id).label('count')
-        )
-        q = q.group_by(Booking.occasion_id)
-        return {r.occasion_id: r.count for r in q}
-
     @property
     def occasion_choices(self):
-        if not self.request.app.active_period:
-            return
-
         layout = DefaultLayout(self.model, self.request)
 
         stmt = as_selectable_from_path(
@@ -286,7 +257,7 @@ class NotificationTemplateSendForm(Form):
         )
 
         query = select(stmt.c).where(
-            stmt.c.period_id == self.request.app.active_period.id
+            stmt.c.period_id == self.period.id
         )
 
         templates = {
@@ -311,12 +282,3 @@ class NotificationTemplateSendForm(Form):
             }))
 
             yield record.occasion_id.hex, label
-
-    def populate_periods(self):
-        periods = [p for p in self.request.app.periods]
-        periods.sort(key=lambda p: not p.active)
-
-        self.period.choices = [(p.id.hex, p.title) for p in periods]
-
-    def populate_occasion(self):
-        self.occasion.choices = list(self.occasion_choices)

@@ -53,7 +53,7 @@ var FormcodeSelect = React.createClass({
         // again later if the field reappears - if it doesn't, the selection
         // isn't submitted to the backend
         Object.keys(state.selected).forEach(function(field) {
-            if (! self.isKnownField(fields, 'human_id', field)) {
+            if (!self.isKnownField(fields, 'human_id', field)) {
                 state.missing[field] = true;
                 delete state.selected[field];
             }
@@ -70,13 +70,19 @@ var FormcodeSelect = React.createClass({
         this.setState(state);
         this.getTarget().value = this.getSelectionAsText(state.seleted);
     },
-    onSelect: function(human_id, selected) {
+    onSelect: function(human_id) {
         var state = this.cloneState();
-        if (selected) {
+
+        if (this.props.type === 'radio') {
+            state.selected = {};
+        }
+
+        if (typeof state.selected[human_id] === 'undefined') {
             state.selected[human_id] = true;
         } else {
             delete state.selected[human_id];
         }
+
         this.setState(state);
         this.getTarget().value = this.getSelectionAsText(state.selected);
     },
@@ -102,6 +108,7 @@ var FormcodeSelect = React.createClass({
                                     selected={self.isSelected(field)}
                                     label={field.human_id}
                                     handler={self.onSelect}
+                                    type={self.props.type}
                                 />
                             );
                         })
@@ -113,20 +120,15 @@ var FormcodeSelect = React.createClass({
 });
 
 var FormcodeSelectField = React.createClass({
-    getInitialState: function() {
-        return {selected: this.props.selected};
-    },
     handleChange: function() {
-        var selected = !this.state.selected;
-        this.setState({selected: selected});
-        this.props.handler(this.props.id, selected);
+        this.props.handler(this.props.id);
     },
     render: function() {
         return (
             <label>
                 <input
-                    type="checkbox"
-                    checked={this.state.selected}
+                    type={this.props.type}
+                    checked={this.props.selected}
                     onChange={this.handleChange}
                 />
                 {this.props.label}
@@ -135,11 +137,12 @@ var FormcodeSelectField = React.createClass({
     }
 });
 
-var initFormcodeSelect = function(container, watcher, target, include, exclude) {
+var initFormcodeSelect = function(container, watcher, target, type, include, exclude) {
     var el = container.appendChild(document.createElement('div'));
     ReactDOM.render(
         <FormcodeSelect
             watcher={watcher}
+            type={type}
             target={target}
             include={include}
             exclude={exclude}

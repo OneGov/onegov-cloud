@@ -33,7 +33,7 @@ def test_extended_agency(agency_app):
     assert agency.pdf_file is None
     assert agency.trait == 'agency'
     assert agency.proxy().id == agency.id
-    assert agency.is_hidden_from_public is None
+    assert agency.access == 'public'
     assert agency.es_public is True
 
     agency.pdf_file = b'PDF'
@@ -46,7 +46,7 @@ def test_extended_agency(agency_app):
     assert agency.pdf_file.filename == 'test-agency.pdf'
     assert agency.pdf.name == 'test-agency.pdf'
 
-    agency.is_hidden_from_public = True
+    agency.access = 'private'
     assert agency.es_public is False
 
 
@@ -99,10 +99,10 @@ def test_extended_person(session):
     assert person.address_html == "<p>Street 1<br>City</p>"
     assert person.notes == "This is\na note."
     assert person.notes_html == "<p>This is<br>a note.</p>"
-    assert person.is_hidden_from_public is None
+    assert person.access == 'public'
     assert person.es_public is True
 
-    person.is_hidden_from_public = True
+    person.access = 'private'
     assert person.es_public is False
 
 
@@ -137,7 +137,7 @@ def test_extended_membership(session):
     assert membership.note == "Interim"
     assert membership.addition == "Production"
     assert membership.prefix == "*"
-    assert membership.is_hidden_from_public is None
+    assert membership.access == 'public'
     assert membership.es_public is True
     assert membership.agency_id == agency.id
     assert membership.person_id == person.id
@@ -146,15 +146,15 @@ def test_extended_membership(session):
     assert agency.memberships.one() == membership
     assert person.memberships.one() == membership
 
-    membership.is_hidden_from_public = True
+    membership.access = 'private'
     assert membership.es_public is False
 
-    membership.is_hidden_from_public = False
-    membership.agency.is_hidden_from_public = True
+    membership.access = 'public'
+    membership.agency.meta['access'] = 'private'
     assert membership.es_public is False
 
-    membership.agency.is_hidden_from_public = False
-    membership.person.is_hidden_from_public = True
+    membership.agency.meta['access'] = 'public'
+    membership.person.meta['access'] = 'private'
     assert membership.es_public is False
 
 

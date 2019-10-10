@@ -124,7 +124,7 @@ def import_mission_reports(vehicles_file, missions_file, no_confirm):
             )
 
             if vehicle.hidden == '1':
-                created.is_hidden_from_public = True
+                created.access = 'private'
 
             created_vehicles[vehicle.uid] = created
             request.session.add(created)
@@ -139,7 +139,7 @@ def import_mission_reports(vehicles_file, missions_file, no_confirm):
                 location=mission.location,
                 personnel=extract_personnel(mission.personnel),
                 backup=extract_personnel(mission.personnel_hq),
-                meta={'is_hidden_from_public': is_hidden(mission)}
+                meta={'access': is_hidden(mission) and 'private' or 'public'}
             )
 
             vehicle_uids = mission.vehicles.split(',')

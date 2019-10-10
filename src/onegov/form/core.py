@@ -624,6 +624,10 @@ class FieldDependency(object):
             data = getattr(form, dependency['field_id']).data
             choice = dependency['choice']
             invert = dependency['invert']
+
+            if isinstance(data, bool) and choice in ('y', 'n'):
+                choice = choice == 'y' and True or False
+
             result = result and ((data == choice) ^ invert)
         return result
 

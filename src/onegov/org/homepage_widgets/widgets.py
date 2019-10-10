@@ -252,7 +252,7 @@ class TilesWidget(object):
 
                 if not request.is_manager:
                     children = (
-                        c for c in children if not c.is_hidden_from_public
+                        c for c in children if c.access == 'public'
                     )
 
                 yield Tile(
@@ -310,8 +310,8 @@ class SliderWidget(object):
         sets = sets.with_entities(ImageSet.id, ImageSet.meta)
         sets = tuple(
             s.id for s in sets
-            if s.meta.get('show_images_on_homepage') and not
-            s.meta.get('is_hidden_from_public')
+            if s.meta.get('show_images_on_homepage')
+            and s.meta.get('access', 'public') == 'public'
         )
 
         if not sets:

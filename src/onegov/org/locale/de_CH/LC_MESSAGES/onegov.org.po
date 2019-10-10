@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-09-30 10:47+0200\n"
+"POT-Creation-Date: 2019-10-09 10:42+0200\n"
 "PO-Revision-Date: 2019-02-18 06:39+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -75,8 +75,11 @@ msgstr "Tickets"
 msgid "Ticket"
 msgstr "Ticket"
 
-msgid "This site is hidden from the general public"
-msgstr "Diese Seite ist nicht öffentlich."
+msgid "This site is private"
+msgstr "Diese Seite ist Privat"
+
+msgid "This site is secret"
+msgstr "Diese Seite ist Geheim"
 
 msgid "Cancel"
 msgstr "Abbrechen"
@@ -725,6 +728,21 @@ msgstr "Stunden"
 msgid "Days"
 msgstr "Tage"
 
+msgid "Limit reservations to certain zip-codes"
+msgstr "Reservationen nach Postleitzahl einschränken"
+
+msgid "Zip-code limit"
+msgstr "Postleitzahl Einschränkung"
+
+msgid "Zip-code field"
+msgstr "Postleitzahl-Feld"
+
+msgid "Allowed zip-codes (one per line)"
+msgstr "Erlaubte Postleitzahlen (eine PLZ pro Zeile)"
+
+msgid "Days before an allocation may be reserved by anyone"
+msgstr "Anzahl Tage bevor Einteilungen von allen reserviert werden können"
+
 msgid "Per item"
 msgstr "Pro Eintrag"
 
@@ -736,6 +754,16 @@ msgstr "Preis pro Eintrag"
 
 msgid "Price per hour"
 msgstr "Preis pro Stunde"
+
+msgid "Please select the form field that holds the zip-code"
+msgstr "Bitte wählen Sie das Formfeld welches die Postleitzahl enthält"
+
+msgid "Please enter at least one zip-code"
+msgstr "Bitte geben Sie mindestens eine Postleitzahl ein"
+
+msgid "Please enter one zip-code per line, without spaces or commas"
+msgstr ""
+"Bitte geben Sie eine Postleitzahl pro Zeile ein, ohne Leerzeichen und Kommas"
 
 msgid "The price must be larger than zero"
 msgstr "Der Preis muss grösser als Null sein"
@@ -1326,14 +1354,26 @@ msgstr "Die Eingabe wurde abgelehnt"
 msgid "Your directory submission has been rejected"
 msgstr "Ihre Eingabe wurde abgelehnt"
 
-msgid "Hide from the public"
-msgstr "Vor der Öffentlichkeit verstecken"
+msgid "Access"
+msgstr "Zugriff"
 
-msgid "Visibility"
-msgstr "Sichtbarkeit"
+msgid "Public"
+msgstr "Öffentlich"
+
+msgid "Through URL only (not listed)"
+msgstr "Nur wer die URL kennt (wird nicht gelistet)"
+
+msgid "Only by privileged users"
+msgstr "Beschränkt auf Editoren und Administratoren"
+
+msgid "Security"
+msgstr "Sicherheit"
 
 msgid "Visible on homepage"
 msgstr "Auf der Startseite anzeigen"
+
+msgid "Visibility"
+msgstr "Sichtbarkeit"
 
 msgid "This month"
 msgstr "Diesen Monat"
@@ -1907,12 +1947,8 @@ msgstr "Dateien hierhin ziehen um sie hochzuladen"
 msgid "All news"
 msgstr "Alle Nachrichten"
 
-msgid ""
-"This site is hidden from the general public. To show it to everyone, edit "
-"this page and disable \"Hide from public\"."
-msgstr ""
-"Diese Seite ist nicht öffentlich. Bearbeiten Sie diese Seite und entfernen "
-"Sie das Häkchen im Feld \"Vor der Öffentlichkeit verstecken\"."
+msgid "This site is not public."
+msgstr "Diese Seite ist nicht öffentlich."
 
 msgid ""
 "This site contains no lead. Leads are used for lists and search results."
@@ -1952,6 +1988,13 @@ msgstr "Vorherige Seite"
 
 msgid "Next Page"
 msgstr "Nächste Seite"
+
+msgid ""
+"Persons living outside the following zipcodes may only reserve this "
+"allocation on the ${date}: ${zipcodes}"
+msgstr ""
+"Personen die ausserhalb der folgenden Postleitzahlen leben können diese "
+"Reservation erst am ${date} tätigen: ${zipcodes}"
 
 msgid "Quota"
 msgstr "Anzahl"
@@ -2089,9 +2132,6 @@ msgstr "Digitale Signatur"
 
 msgid "Publication"
 msgstr "Publikation"
-
-msgid "Public"
-msgstr "Öffentlich"
 
 msgid "Private"
 msgstr "Privat"
@@ -2908,6 +2948,14 @@ msgid "Admins"
 msgstr "Administratoren"
 
 #, python-format
+msgid ""
+"You can only reserve this allocation before ${date} if you live in the "
+"following zipcodes: ${zipcodes}"
+msgstr ""
+"Sie können diese Einteilung nur vor dem ${date} reservieren, wenn Sie in "
+"einem der folgenden Postleitzahlen wohnen: ${zipcodes}"
+
+#, python-format
 msgid "${percent}% Available"
 msgstr "${percent}% Verfügbar"
 
@@ -3112,7 +3160,7 @@ msgid "Password changed."
 msgstr "Passwort geändert."
 
 msgid "Wrong username or password reset link not valid any more."
-msgstr "Ungültige Addresse oder abgelaufener Link."
+msgstr "Ungültige Adresse oder abgelaufener Link."
 
 msgid "A link was added to the clipboard"
 msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
@@ -3816,3 +3864,25 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "This site is hidden from the general public"
+#~ msgstr "Diese Seite ist nicht öffentlich."
+
+#~ msgid ""
+#~ "This site is hidden from the general public. To show it to everyone, edit "
+#~ "this page and disable \"Hide from public\"."
+#~ msgstr ""
+#~ "Diese Seite ist nicht öffentlich. Bearbeiten Sie diese Seite und "
+#~ "entfernen Sie das Häkchen im Feld \"Vor der Öffentlichkeit verstecken\"."
+
+#~ msgid "Anyone that knows the url"
+#~ msgstr "Jedem der die URL kennt"
+
+#~ msgid "Accessible by"
+#~ msgstr "Aufrufbar von"
+
+#~ msgid "Anyone"
+#~ msgstr "Allen"
+
+#~ msgid "Hide from the public"
+#~ msgstr "Vor der Öffentlichkeit verstecken"

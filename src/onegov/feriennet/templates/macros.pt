@@ -621,9 +621,9 @@
 
 <metal:periods define-macro="periods" i18n:domain="onegov.feriennet" i18n:domain="onegov.feriennet">
     <div class="filter-panel" tal:condition="len(periods) > 1">
-        <h2 class="filter-title" i18n:translate>Period</h2>
-        <select onchange="location = this.value;">
-            <option tal:repeat="p periods" value="${request.link(model.for_period(p))}" tal:attributes="selected p.id == period.id">
+        <h2 class="filter-title" i18n:translate tal:condition="not hide_title|True">Period</h2>
+        <select onchange="location = this.value;" tal:define="view_name view_name|None">
+            <option tal:repeat="p periods" value="${request.link(model.for_period(p), name=view_name)}" tal:attributes="selected p.id == period.id">
                 ${p.title}
             </option>
         </select>

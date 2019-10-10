@@ -4,7 +4,7 @@ from onegov.org.forms import LinkForm, PageForm
 from onegov.org.models.atoz import AtoZ
 from onegov.org.models.extensions import ContactExtension
 from onegov.org.models.extensions import CoordinatesExtension
-from onegov.org.models.extensions import HiddenFromPublicExtension
+from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models.extensions import VisibleOnHomepageExtension
 from onegov.org.models.traitinfo import TraitInfo
@@ -15,7 +15,7 @@ from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.orm import undefer, object_session
 
 
-class Topic(Page, TraitInfo, SearchableContent, HiddenFromPublicExtension,
+class Topic(Page, TraitInfo, SearchableContent, AccessExtension,
             VisibleOnHomepageExtension, ContactExtension, PersonLinkExtension,
             CoordinatesExtension):
     __mapper_args__ = {'polymorphic_identity': 'topic'}
@@ -65,7 +65,7 @@ class Topic(Page, TraitInfo, SearchableContent, HiddenFromPublicExtension,
     def get_form_class(self, trait, request):
         if trait == 'link':
             return self.with_content_extensions(LinkForm, request, extensions=[
-                HiddenFromPublicExtension,
+                AccessExtension,
                 VisibleOnHomepageExtension
             ])
 
@@ -75,7 +75,7 @@ class Topic(Page, TraitInfo, SearchableContent, HiddenFromPublicExtension,
         raise NotImplementedError
 
 
-class News(Page, TraitInfo, SearchableContent, HiddenFromPublicExtension,
+class News(Page, TraitInfo, SearchableContent, AccessExtension,
            VisibleOnHomepageExtension, ContactExtension, PersonLinkExtension,
            CoordinatesExtension):
     __mapper_args__ = {'polymorphic_identity': 'news'}
@@ -173,5 +173,5 @@ class AtoZPages(AtoZ):
         else:
             return [
                 topic for topic in topics if topic.trait == 'page'
-                and not topic.is_hidden_from_public
+                and topic.access == 'public'
             ]

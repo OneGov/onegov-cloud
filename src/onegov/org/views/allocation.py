@@ -53,12 +53,10 @@ def view_allocations_json(self, request):
         .defer('allocation_id')
         .defer('end'))
 
-    allocations = query.all()
-
     # but only return the master allocations
     return tuple(
         e.as_dict() for e in utils.AllocationEventInfo.from_allocations(
-            request, self.scheduler, allocations
+            request, self.scheduler, tuple(query)
         )
     )
 

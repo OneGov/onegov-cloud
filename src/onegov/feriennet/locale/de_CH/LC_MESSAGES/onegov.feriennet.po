@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-10-01 16:02+0200\n"
+"POT-Creation-Date: 2019-10-04 10:56+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -521,9 +521,11 @@ msgstr "Nein, nur Vorschau"
 msgid "Yes, confirm billing"
 msgstr "Ja, Fakturierung abschliessen"
 
-msgid "I know that this stops all changes including cancellations."
+msgid ""
+"I know that after confirmation, only administrators may change bookings."
 msgstr ""
-"Mir ist bewusst dass danach keine Buchungsänderungen mehr möglich sind."
+"Mir ist bewusst, dass danach nur noch ein Administartor Buchungen erstellen "
+"oder verändern kann."
 
 msgid "Target"
 msgstr "Ziel"
@@ -585,8 +587,8 @@ msgstr "Mitteilung"
 msgid "A notification with this subject exists already"
 msgstr "Eine Mitteilung mit diesem Titel existiert bereits"
 
-msgid "Send to (applies to active period only)"
-msgstr "Senden an (bezieht sich nur auf den aktiven Zeitraum)"
+msgid "Send to"
+msgstr "Senden an"
 
 msgid "Myself"
 msgstr "Mich selbst"
@@ -608,7 +610,8 @@ msgstr "Benutzer mit unbezahlten Rechnungen"
 
 msgid ""
 "Users with attenedees that have an occasion on their wish- or booking-list"
-msgstr "Benutzer mit Teilnehmern die eine Durchführung gewünscht oder gebucht haben"
+msgstr ""
+"Benutzer mit Teilnehmern die eine Durchführung gewünscht oder gebucht haben"
 
 msgid "Role"
 msgstr "Rolle"
@@ -1469,6 +1472,10 @@ msgstr ""
 "Diese Wünsche überschneiden sich mit angenommenen Buchungen und sind daher "
 "blockiert."
 
+msgid "Unfortunately, these wishes could not be fulfilled."
+msgstr ""
+"Diese Wünsche konnten bei der Zuteilung leider nicht berücksichtigt werden."
+
 msgid "Free of charge"
 msgstr "Kostenlos"
 
@@ -1964,6 +1971,9 @@ msgstr "Inaktiv"
 
 msgid "Editors"
 msgstr "Veranstalter"
+
+msgid "Only by privileged users"
+msgstr "Beschränkt auf Administratoren"
 
 msgid "Opening Hours"
 msgstr "Termine"
@@ -2571,5 +2581,5 @@ msgstr "Buchungen ${period}"
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
 
-#~ msgid "Users with attendees of a given occasion"
-#~ msgstr "Benutzer mit Teilnehmern einer bestimmten Durchführung"
+#~ msgid "Send to (applies to active period only)"
+#~ msgstr "Senden an (bezieht sich nur auf den aktiven Zeitraum)"

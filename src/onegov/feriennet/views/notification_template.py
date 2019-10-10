@@ -148,10 +148,10 @@ def handle_send_notification(self, request, form):
         if not recipients:
             request.alert(_("There are no recipients matching the selection"))
         else:
-            current = request.current_username
+            # current = request.current_username
 
-            if current not in recipients:
-                recipients.add(current)
+            # if current not in recipients:
+            #     recipients.add(current)
 
             subject = variables.render(self.subject)
             content = render_template('mail_notification.pt', request, {
@@ -188,5 +188,7 @@ def handle_send_notification(self, request, form):
         'preview_subject': variables.render(self.subject),
         'preview_body': variables.render(self.text),
         'edit_link': request.return_here(request.link(self, 'edit')),
-        'button_text': _("Send E-Mail Now")
+        'button_text': _("Send E-Mail Now"),
+        'model': self,
+        'period': form.period,
     }

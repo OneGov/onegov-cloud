@@ -78,7 +78,7 @@ def test_pages_on_homepage(es_town_app):
     assert '0xdeadbeef' in client.get('/')
 
     edit_page = new_page.click('Bearbeiten')
-    edit_page.form['is_hidden_from_public'] = True
+    edit_page.form['access'] = 'private'
     edit_page.form.submit()
 
     assert '0xdeadbeef' in client.get('/')

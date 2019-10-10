@@ -254,7 +254,7 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
                 type='room',
                 group=floors[room.floor_id],
                 definition=form_definition,
-                meta={'is_hidden_from_public': True}
+                meta={'access': 'private'}
             )
 
             resources_by_room[room.id] = resource

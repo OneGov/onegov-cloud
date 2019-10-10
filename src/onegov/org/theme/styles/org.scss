@@ -105,7 +105,6 @@ a[onclick],
 /*
     Hyphenation for browsers which support it.
 */
-
 p,
 h1,
 h2,
@@ -118,6 +117,17 @@ h6,
 .news-lead,
 .newsletter-lead {
     @include prefix(hyphens, auto);
+}
+
+/*
+    Disable hyphenation in e-mail links and make them breakable
+*/
+a[href^="mailto:"] {
+    @include prefix(hyphens, none);
+    @include prefix(word-break, break-all);
+
+    // Non standard for WebKit
+    word-break: break-word;
 }
 
 /*
@@ -2177,16 +2187,6 @@ div#redactor-droparea {
 }
 
 /*
-    the icon hinting at pages being hidden from the public
-*/
-$hidden-page-icon: '\f070';
-
-.hidden-from-public-hint::before {
-    @include icon($hidden-page-icon);
-    color: $alert-color;
-}
-
-/*
     Person card
 */
 $person-website-icon: '\f0c1';
@@ -3606,6 +3606,10 @@ ul.search-results {
 /*
     Reservation calendar
 */
+.reservation-confirmation .reservation-selection .reservation-warning {
+    display: none;
+}
+
 .reservation-selection {
     float: right;
     padding: 0 0 0 15px;
@@ -3639,6 +3643,12 @@ ul.search-results {
             background-color: transparentize($alert-color, .8);
             color: $alert-color;
         }
+    }
+
+    .reservation-warning {
+        color: $warning-color;
+        cursor: help;
+        margin-left: 1ex;
     }
 
     .reservation-date {
@@ -3717,6 +3727,31 @@ ul.search-results {
         }
     }
 
+    .reservation-denied {
+        border-left: 5px solid $red-pastel;
+        color: $alert-color;
+        font-size: .8rem;
+        margin-bottom: 1rem;
+        margin-left: .6rem;
+        margin-top: .5rem;
+        max-width: 23.25rem;
+        padding-left: 1.4rem;
+
+        ol {
+            margin: .5rem 0 0;
+
+            li {
+                background: $red;
+                border-radius: 3px;
+                color: $white;
+                display: inline-block;
+                font-size: .8rem;
+                font-weight: bold;
+                margin: 0;
+                padding: 1px 5px;
+            }
+        }
+    }
 }
 /*
     Reservation selection responsive
@@ -5748,4 +5783,42 @@ h2 + div.timeline {
         padding-top: 50%;
         width: 100%;
     }
+}
+
+/*
+    Access hints
+*/
+.field-access {
+    input + label::before {
+        margin-right: 1ex;
+        text-align: center;
+        width: 2ex;
+    }
+
+    input[value="public"] + label::before {
+        @include icon('\f06e');
+        color: $blue-dark;
+    }
+
+    input[value="secret"] + label::before {
+        @include icon('\f21b');
+        color: $yellow-dark;
+    }
+
+    input[value="private"] + label::before {
+        @include icon('\f023');
+        color: $red-dark;
+    }
+}
+
+.secret-hint::before {
+    @include icon('\f21b');
+    color: $yellow-dark;
+    font-style: normal;
+}
+
+.private-hint::before {
+    @include icon('\f023');
+    color: $red-dark;
+    font-style: normal;
 }

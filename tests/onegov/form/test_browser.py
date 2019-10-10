@@ -1,3 +1,5 @@
+import pytest
+
 from time import sleep
 
 
@@ -69,14 +71,15 @@ def test_formcode_format(browser):
     assert browser.find_by_css('textarea').value == '[Textfield]'
 
 
-def test_formcode_select_empty(browser):
+def test_formcode_select_empty_checkbox(browser):
     browser.visit('/formcode-select')
     browser.wait_for_js_variable('initFormcodeSelect')
-    browser.driver.execute_script("""
+    browser.driver.execute_script(f"""
         var watcher = formcodeWatcherRegistry.new();
         var el = document.querySelector('#container');
 
-        initFormcodeSelect(el, watcher, 'textarea', ['text', 'textarea']);
+        initFormcodeSelect(
+            el, watcher, 'textarea', 'checkbox', ['text', 'textarea']);
         watcher.update(arguments[0]);
     """, 'A = ___\nB = ...\nC = *.png')
 
@@ -99,30 +102,60 @@ def test_formcode_select_empty(browser):
     assert browser.find_by_css('textarea').value == ""
 
 
-def test_formcode_select_prefilled(browser):
+def test_formcode_select_empty_radio(browser):
     browser.visit('/formcode-select')
     browser.wait_for_js_variable('initFormcodeSelect')
-    browser.driver.execute_script("""
+    browser.driver.execute_script(f"""
+        var watcher = formcodeWatcherRegistry.new();
+        var el = document.querySelector('#container');
+
+        initFormcodeSelect(
+            el, watcher, 'textarea', 'radio', ['text', 'textarea']);
+        watcher.update(arguments[0]);
+    """, 'A = ___\nB = ...\nC = *.png')
+
+    assert len(browser.find_by_css('.formcode-select input')) == 2
+    browser.find_by_css('.formcode-select input')[0].click()
+    assert browser.find_by_css('textarea').value == "A"
+
+    browser.find_by_css('.formcode-select input')[1].click()
+    assert browser.find_by_css('textarea').value == "B"
+
+    browser.find_by_css('.formcode-select input')[0].click()
+    assert browser.find_by_css('textarea').value == "A"
+
+    browser.find_by_css('.formcode-select input')[0].click()
+    assert browser.find_by_css('textarea').value == "A"
+
+
+@pytest.mark.parametrize('input_type', ('checkbox', 'radio'))
+def test_formcode_select_prefilled(browser, input_type):
+    browser.visit('/formcode-select')
+    browser.wait_for_js_variable('initFormcodeSelect')
+    browser.driver.execute_script(f"""
         var watcher = formcodeWatcherRegistry.new();
         var el = document.querySelector('#container');
         document.querySelector('textarea').value='A'
 
-        initFormcodeSelect(el, watcher, 'textarea', ['text', 'textarea']);
+        initFormcodeSelect(
+            el, watcher, 'textarea', '{input_type}', ['text', 'textarea']);
         watcher.update(arguments[0]);
     """, 'A = ___\nB = ...\nC = *.png')
 
     assert len(browser.find_by_css('.formcode-select input:checked')) == 1
 
 
-def test_formcode_keep_selection(browser):
+@pytest.mark.parametrize('input_type', ('checkbox', 'radio'))
+def test_formcode_keep_selection(browser, input_type):
     browser.visit('/formcode-select')
     browser.wait_for_js_variable('initFormcodeSelect')
-    browser.driver.execute_script("""
+    browser.driver.execute_script(f"""
         var watcher = document.watcher = formcodeWatcherRegistry.new();
         var el = document.querySelector('#container');
         document.querySelector('textarea').value='A'
 
-        initFormcodeSelect(el, watcher, 'textarea', ['text', 'textarea']);
+        initFormcodeSelect(
+            el, watcher, 'textarea', '{input_type}', ['text', 'textarea']);
         watcher.update('B = ___');
     """)
 

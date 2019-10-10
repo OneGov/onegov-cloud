@@ -472,6 +472,26 @@ class DefaultLayout(Layout):
         if self.request.is_manager:
             self.request.include('sortable')
 
+        self.hide_from_robots()
+
+    def hide_from_robots(self):
+        """ Returns a X-Robots-Tag:noindex header on secret pages.
+
+        This is probably not where you would expect this to happen, but it
+        ensures that this works on all pages without having to jump through
+        hoops.
+
+        """
+        if not hasattr(self.model, 'access'):
+            return
+
+        if self.model.access != 'secret':
+            return
+
+        @self.request.after
+        def respond_with_no_index(response):
+            response.headers['X-Robots-Tag'] = 'noindex'
+
     @cached_property
     def breadcrumbs(self):
         """ Returns the breadcrumbs for the current page. """

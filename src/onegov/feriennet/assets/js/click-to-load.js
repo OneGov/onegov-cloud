@@ -15,15 +15,16 @@ Example:
 
     </div>
 
-    <a class="#click-to-load"
+    <a class="click-to-load" id="click-to-load"
         href="/next-page"
         data-source="/next-page .list-of-things"
         data-target="#click-to-load-target">
             Load more
     </a>
 
-If an optional 'data-history' attribute is set, it is used to update the
-browser history with it.
+If an optional element with the id "click-to-load-location" is present on the
+loaded page, it's 'data-location' attribute is used to update the location
+history.
 
 */
 jQuery.fn.clickToLoad = function() {
@@ -35,6 +36,7 @@ jQuery.fn.clickToLoad = function() {
 
     el.on('click', function(e) {
         var container = $('<div>');
+
         container.load(source, function(data) {
             $(target).before(container);
 
@@ -42,12 +44,14 @@ jQuery.fn.clickToLoad = function() {
             if (next.length === 0) {
                 el.remove();
             } else {
+                latest = next;
                 target = next.data('target');
                 source = next.data('source');
             }
 
-            if (next.data('history')) {
-                history.pushState({}, '', next.data('history'));
+            var location = $(data).find('#' + id + '-location');
+            if (location.data('location')) {
+                history.pushState({}, '', location.data('location'));
             }
         });
 

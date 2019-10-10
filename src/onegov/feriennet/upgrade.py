@@ -166,7 +166,7 @@ def add_donation_page(context):
     order = max(p.order for p in pages.roots) + 1
 
     meta = page.get('meta', {})
-    meta['is_hidden_from_public'] = True
+    meta['access'] = 'public'
 
     pages.add(
         parent=None,

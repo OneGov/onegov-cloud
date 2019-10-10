@@ -21,7 +21,7 @@ def spawn_basic_permissions_app(redis_url):
 
     @App.path(path='/hidden')
     class HiddenFromPublic(object):
-        is_hidden_from_public = True
+        access = 'private'
 
     @App.view(model=Root, name='public', permission=Public)
     def public_view(self, request):

@@ -252,12 +252,14 @@ def view_geojson(self, request):
         DirectoryEntry.lead,
         DirectoryEntry.content["coordinates"]["lat"].label('lat'),
         DirectoryEntry.content["coordinates"]["lon"].label('lon'),
-        DirectoryEntry.meta["is_hidden_from_public"].label('is_hidden')
+        DirectoryEntry.meta["access"].label('access'),
     )
     q = q.filter(DirectoryEntry.content["coordinates"]["lat"] != None)
 
     # this could be done using a query, but that seems to be more verbose
-    entries = (c for c in q if request.is_manager or not c.is_hidden)
+    entries = (c for c in q if request.is_manager or (
+        c.access == 'public' or not c.access
+    ))
 
     url_prefix = request.class_link(DirectoryEntry, {
         'directory_name': self.directory.name,

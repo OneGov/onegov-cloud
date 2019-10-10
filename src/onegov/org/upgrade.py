@@ -2,6 +2,8 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from onegov.core.orm import Base, find_models
+from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
 from onegov.core.utils import normalize_for_url
 from onegov.form import FormDefinition
@@ -110,3 +112,27 @@ def rename_guideline_to_submissions_guideline(context):
     for directory in directories:
         directory.content['submissions_guideline'] \
             = directory.content.pop('guideline', None)
+
+
+@upgrade_task('Add meta access property')
+def add_meta_access_property(context):
+    def has_meta_property(model):
+        if not hasattr(model, 'meta'):
+            return False
+
+        assert isinstance(model.meta.property.columns[0].type, JSON)
+        return True
+
+    for model in find_models(Base, has_meta_property):
+        table = model.__tablename__
+
+        # We use update statements here because we need to touch a lot of data.
+        #
+        # THIS IS UNSAFE, DO NOT COPY & PASTE
+        context.session.execute(f"""
+            UPDATE {table} SET meta = meta || jsonb '{{"access": "private"}}'
+            WHERE (meta->>'is_hidden_from_public')::boolean = TRUE;
+
+            UPDATE {table} SET meta = meta - 'is_hidden_from_public'
+            WHERE meta ? 'is_hidden_from_public';
+        """)

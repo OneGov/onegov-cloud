@@ -2,11 +2,11 @@ import morepath
 import sedate
 import transaction
 
-from datetime import time
+from datetime import time, timedelta
 from libres.modules.errors import LibresError
 from onegov.core.custom import json
 from onegov.core.security import Public, Private
-from onegov.form import FormCollection, merge_forms
+from onegov.form import FormCollection, merge_forms, as_internal_id
 from onegov.org import _, OrgApp
 from onegov.org import utils
 from onegov.org.elements import Link
@@ -248,8 +248,14 @@ def handle_reservation_form(self, request, form):
                 submission, form, exclude=form.reserved_fields
             )
 
+    # enforce the zip-code block if configured
+    if request.POST:
+        blocked = blocked_by_zipcode(request, self, form, reservations)
+    else:
+        blocked = ()
+
     # go to the next step if the submitted data is valid
-    if form.submitted(request):
+    if form.submitted(request) and not blocked:
         return morepath.redirect(request.link(self, 'confirmation'))
     else:
         data = {}
@@ -263,6 +269,11 @@ def handle_reservation_form(self, request, form):
 
         form.process(data=data)
 
+    if not form.errors and blocked:
+        request.alert(_(
+            "The form contains errors. Please check the fields marked in red."
+        ))
+
     layout = ReservationLayout(self, request)
     layout.breadcrumbs.append(Link(_("Reserve"), '#'))
 
@@ -274,12 +285,45 @@ def handle_reservation_form(self, request, form):
         'layout': layout,
         'title': title,
         'form': form,
+        'blocked': blocked,
+        'zipcodes': self.zipcode_block and self.zipcode_block['zipcode_list'],
         'reservation_infos': [
             utils.ReservationInfo(self, r, request) for r in reservations
         ],
         'resource': self,
         'button_text': _("Continue")
     }
+
+
+def blocked_by_zipcode(request, resource, form, reservations):
+    """ Returns a dict of reservation ids that are blocked by zipcode, with
+    the value set to the date it will be available.
+
+    """
+
+    if request.is_manager:
+        return {}
+
+    if not resource.zipcode_block:
+        return {}
+
+    field_id = as_internal_id(resource.zipcode_block['zipcode_field'])
+    zipcode = (getattr(form, field_id).data or '').replace(' ', '')
+    excempt = resource.zipcode_block['zipcode_list']
+
+    if zipcode and zipcode.isdigit() and int(zipcode) in excempt:
+        return {}
+
+    blocked = {}
+    days = resource.zipcode_block['zipcode_days']
+
+    for reservation in reservations:
+        dt = reservation.display_start().date()
+
+        if resource.is_zip_blocked(dt):
+            blocked[reservation.id] = dt - timedelta(days=days)
+
+    return blocked
 
 
 @OrgApp.html(model=Resource, name='confirmation', permission=Public,
