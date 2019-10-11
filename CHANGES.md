@@ -1,8 +1,33 @@
 # Changes
 
+## Release `2019.26`
+
+> commits: **4 / [54237533cc...f75a760671](https://github.com/OneGov/onegov-cloud/compare/54237533cc^...f75a760671)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.26)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Adds payment state to ticket list view**
+
+This enables us to easily show which tickets have open payments.
+Additionally it is now possible to change the payment state without
+having to repoen a ticket.
+
+**`Feature`** | **[2443034e78](https://github.com/onegov/onegov-cloud/commit/2443034e7828189d71c85c22537704a34595bccb)**
+
+### User
+
+🎉 **Redirect to / after auto-login, if on login page**
+
+This ensures that after a successful auto-login, the user is not
+confused when he sees the login form again.
+
+**`Feature`** | **[f75a760671](https://github.com/onegov/onegov-cloud/commit/f75a7606717c4714e93bc37a4ea56f9114431bd6)**
+
 ## Release `2019.25`
 
-> commits: **4 / [bfa6f6b0ff...b69d1d8b72](https://github.com/OneGov/onegov-cloud/compare/bfa6f6b0ff^...b69d1d8b72)**<br>
+> released: **2019-10-10 15:09**<br>
+> commits: **5 / [bfa6f6b0ff...453ac1ade7](https://github.com/OneGov/onegov-cloud/compare/bfa6f6b0ff^...453ac1ade7)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.25)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election-Day
