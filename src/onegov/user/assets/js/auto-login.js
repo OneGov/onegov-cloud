@@ -52,7 +52,11 @@ document.addEventListener("DOMContentLoaded", function(_event) {
     if (!isBot() && supportsLocalStorage() && !isLoggedIn()) {
         rateLimit('auto-login', 60 * 1000, function() {
             attemptAutoLogin('/auth/provider/auto', function() {
-                window.location.reload();
+                if (window.location.pathname === "/auth/login") {
+                    window.location.replace("/");
+                } else {
+                    window.location.reload();
+                }
             });
         });
     }
