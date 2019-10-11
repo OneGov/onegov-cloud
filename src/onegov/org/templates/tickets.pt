@@ -77,6 +77,11 @@
                             <div>${translate(ticket.group)}</div>
                             <div>${ticket.title}</div>
                             <div>${ticket.subtitle}</div>
+                            <tal:b define="payment ticket.handler.payment" tal:condition="payment">
+                                <div class="payment-state payment-state-${payment.state}">
+                                    ${layout.format_number(payment.amount)} ${payment.currency}
+                                </div>
+                            </tal:b>
                         </td>
                         <td class="ticket-date">
                             ${layout.format_date(ticket.created, 'relative')}

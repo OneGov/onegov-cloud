@@ -79,15 +79,13 @@ def view_ticket(self, request):
     # if we have a payment, show the payment button
     layout = TicketLayout(self, request)
     payment_button = None
+    payment = handler.payment
 
-    if self.state == 'pending':
-        payment = handler.payment
+    if payment and payment.source == 'manual':
+        payment_button = manual_payment_button(payment, layout)
 
-        if payment and payment.source == 'manual':
-            payment_button = manual_payment_button(payment, layout)
-
-        if payment and payment.source == 'stripe_connect':
-            payment_button = stripe_payment_button(payment, layout)
+    if payment and payment.source == 'stripe_connect':
+        payment_button = stripe_payment_button(payment, layout)
 
     return {
         'title': self.number,
