@@ -21,6 +21,7 @@ from onegov.form import FormCollection
 from onegov.org.formats import DigirezDB
 from onegov.org.models import Organisation, TicketNote
 from onegov.org.forms import ReservationForm
+from onegov.pay.models import ManualPayment
 from onegov.reservation import Allocation, Reservation
 from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
@@ -502,6 +503,20 @@ def import_reservations(dsn, map):
 
         return count, session.execute(text(query), params)
 
+    # takes a reservation data json and guesses if it was paid
+    def was_paid(data):
+        data = json.loads(data)
+
+        for definition in data.values():
+            for value in definition['values']:
+                if is_payment_key(value['key']):
+                    return value['value'] == True
+
+        return False
+
+    def is_payment_key(key):
+        return key == 'bezahlt'
+
     print(f"Reading map")
     records = CSVFile(open(map, 'rb'), ('Old URL', 'New URL', 'Type')).lines
     records = tuple(records)
@@ -513,7 +528,11 @@ def import_reservations(dsn, map):
             return ReservationForm, {}
 
         def exclude(value):
-            return as_internal_id(value['desc']) == 'email'
+            if as_internal_id(value['desc']) == 'email':
+                return True
+
+            if is_payment_key(value['key']):
+                return True
 
         @lru_cache()
         def generate_form_class(formcode):
@@ -769,6 +788,7 @@ def import_reservations(dsn, map):
 
         # keep track of custom reservation data, for the creation of tickets
         reservation_data = {}
+        payment_states = {}
 
         print("Writing reservations")
         for row in tqdm(rows, unit=' reservations', total=count):
@@ -805,6 +825,16 @@ def import_reservations(dsn, map):
                 type='custom',
             )
 
+            r = mapping[row['resource']].resource
+
+            if r.pricing_method == 'per_item':
+                payment = ManualPayment(
+                    amount=r.price_per_item * row['quota'], currency='CHF')
+            elif r.pricing_method == 'per_hour':
+                raise NotImplementedError()
+            else:
+                payment = None
+
             if row['target_type'] == 'group':
                 targets = tuple(targeted_allocations(group=row['target']))
 
@@ -814,20 +844,37 @@ def import_reservations(dsn, map):
                 for allocation in targets:
                     allocation.group = uuid4()
 
-                    session.add(Reservation(
+                    reservation = Reservation(
                         target=allocation.group,
                         start=allocation.start,
                         end=allocation.end,
                         **shared
-                    ))
+                    )
+
+                    if payment:
+                        reservation.payment = payment
+
+                    session.add(reservation)
 
             else:
-                session.add(Reservation(
+                reservation = Reservation(
                     target=row['target'],
                     start=replace_timezone(row['start'], 'Europe/Zurich'),
                     end=replace_timezone(row['end'], 'Europe/Zurich'),
                     **shared
-                ))
+                )
+
+                if payment:
+                    reservation.payment = payment
+
+                session.add(reservation)
+
+            if reservation.payment:
+                if was_paid(row['data']):
+                    reservation.payment.state = 'paid'
+                    payment_states[row['token']] = 'paid'
+                else:
+                    payment_states[row['token']] = 'unpaid'
 
         session.flush()
 
@@ -845,6 +892,11 @@ def import_reservations(dsn, map):
             form_class, form_data = get_form_class_and_data(data['data'])
 
             if form_data:
+
+                # fix common form errors
+                if data['email'] == 'info@rischrotkreuz.c':
+                    data['email'] = 'info@rischrotkreuz.ch'
+
                 form_data['email'] = data['email']
                 form = form_class(data=form_data)
 
