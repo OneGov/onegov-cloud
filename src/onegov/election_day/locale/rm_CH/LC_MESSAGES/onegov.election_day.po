@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-10 10:44+0200\n"
-"PO-Revision-Date: 2019-10-10 09:18+0200\n"
+"PO-Revision-Date: 2019-10-14 10:49+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -74,11 +74,11 @@ msgstr "Cifra entira nunvalaivla: ${col}"
 
 #, python-format
 msgid "Invalid float number: ${col}"
-msgstr ""
+msgstr "Cifra a comma fluctuanta nunvalaivla: ${col}"
 
 #, python-format
 msgid "Not an alphanumeric: ${col}"
-msgstr ""
+msgstr "Betg alfanumeric: ${col}"
 
 msgid "Invalid election values"
 msgstr "Datas electoralas nunvalaivlas"
@@ -113,7 +113,7 @@ msgstr "Datas nunvalaivlas da colliaziuns da glistas"
 
 #, python-format
 msgid "Panachage results id ${id} not in list_id's"
-msgstr ""
+msgstr "Panachage results id ${id} betg en list_id's"
 
 msgid "Invalid values"
 msgstr "Valurs nunvalaivlas"
@@ -123,7 +123,7 @@ msgid "${name} was found twice"
 msgstr "${name} è avant maun duas giadas"
 
 msgid "Panachage results ids and id not consistent"
-msgstr ""
+msgstr "Inconsistenza tranter Panachage results ids ed id"
 
 msgid "Elected Candidates"
 msgstr "Candidat(a)s elegid(a)s"
