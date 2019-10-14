@@ -1,8 +1,23 @@
 # Changes
 
+## Release `2019.27`
+
+> commits: **2 / [cf141436da...c7a310ef3a](https://github.com/OneGov/onegov-cloud/compare/cf141436da^...c7a310ef3a)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.27)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🎉 **Allows for booking and execution phases to overlap**
+
+This also gets rid of the deadline date, which is now the booking
+phase's end date.
+
+**`Feature`** | **[FER-783](https://issues.seantis.ch/browse/FER-783)** | **[c7a310ef3a](https://github.com/onegov/onegov-cloud/commit/c7a310ef3a3404e2d358e6ec19c6f7c5e27dee08)**
+
 ## Release `2019.26`
 
-> commits: **4 / [54237533cc...f75a760671](https://github.com/OneGov/onegov-cloud/compare/54237533cc^...f75a760671)**<br>
+> released: **2019-10-11 10:21**<br>
+> commits: **5 / [54237533cc...7c8f1750e7](https://github.com/OneGov/onegov-cloud/compare/54237533cc^...7c8f1750e7)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.26)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
