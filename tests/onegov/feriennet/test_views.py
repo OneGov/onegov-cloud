@@ -456,7 +456,6 @@ def test_occasions_form(client, scenario):
         booking_end=date(2016, 9, 30),
         execution_start=date(2016, 10, 1),
         execution_end=date(2016, 10, 31),
-        deadline_date=date(2016, 10, 1)
     )
 
     scenario.add_activity(
@@ -523,7 +522,6 @@ def test_multiple_dates_occasion(client, scenario):
         booking_end=date(2016, 9, 30),
         execution_start=date(2016, 10, 1),
         execution_end=date(2016, 10, 31),
-        deadline_date=date(2016, 10, 1)
     )
 
     scenario.add_activity(
@@ -585,7 +583,6 @@ def test_execution_period(client, scenario):
         booking_end=date(2016, 9, 30),
         execution_start=date(2016, 10, 1),
         execution_end=date(2016, 10, 1),
-        deadline_date=date(2016, 10, 1)
     )
 
     scenario.add_activity(
@@ -1302,34 +1299,35 @@ def test_import_account_statement(client, scenario):
 
 
 def test_deadline(client, scenario):
-    deadline = datetime.utcnow().date() - timedelta(days=1)
-
-    scenario.add_period(deadline_date=deadline)
+    scenario.add_period()
     scenario.add_activity(title="Foo", state='accepted')
     scenario.add_occasion()
     scenario.commit()
+    scenario.refresh()
 
-    # show no 'enroll' for ordinary users past the deadline
-    # (there is one login link, for the ordinary login)
-    assert str(client.get('/activity/foo')).count("Anmelden") == 1
+    with freeze_time(scenario.latest_period.booking_end + timedelta(days=1)):
 
-    # do show it for admins though and allow signups
-    admin = client.spawn()
-    admin.login_admin()
+        # show no 'enroll' for ordinary users past the deadline
+        # (there is one login link, for the ordinary login)
+        assert str(client.get('/activity/foo')).count("Anmelden") == 1
 
-    # the ordinary login link vanishes
-    assert str(admin.get('/activity/foo')).count("Abmelden") == 1
-    assert str(admin.get('/activity/foo')).count("Anmelden") == 1
+        # do show it for admins though and allow signups
+        admin = client.spawn()
+        admin.login_admin()
 
-    page = admin.get('/activity/foo').click("Anmelden")
-    assert "Der Anmeldeschluss wurde erreicht" not in page.form.submit()
+        # the ordinary login link vanishes
+        assert str(admin.get('/activity/foo')).count("Abmelden") == 1
+        assert str(admin.get('/activity/foo')).count("Anmelden") == 1
 
-    # stop others, even if they get to the form
-    editor = client.spawn()
-    editor.login_editor()
+        page = admin.get('/activity/foo').click("Anmelden")
+        assert "Der Anmeldeschluss wurde erreicht" not in page.form.submit()
 
-    page = editor.get(page.request.url.replace('http://localhost', ''))
-    assert "Der Anmeldeschluss wurde erreicht" in page.form.submit()
+        # stop others, even if they get to the form
+        editor = client.spawn()
+        editor.login_editor()
+
+        page = editor.get(page.request.url.replace('http://localhost', ''))
+        assert "Der Anmeldeschluss wurde erreicht" in page.form.submit()
 
 
 def test_cancellation_deadline(client, scenario):

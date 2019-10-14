@@ -9,7 +9,7 @@ class PeriodCollection(GenericCollection):
         return Period
 
     def add(self, title, prebooking, booking, execution, active=False,
-            minutes_between=0, deadline_date=None, deadline_days=None,
+            minutes_between=0, deadline_days=None,
             cancellation_date=None, cancellation_days=None, finalizable=True,
             confirmable=True):
 
@@ -26,7 +26,6 @@ class PeriodCollection(GenericCollection):
             execution_end=execution[1],
             minutes_between=minutes_between,
             active=active,
-            deadline_date=deadline_date,
             deadline_days=deadline_days,
             cancellation_date=cancellation_date,
             cancellation_days=cancellation_days,

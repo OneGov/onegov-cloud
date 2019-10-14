@@ -1,6 +1,6 @@
 import sedate
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -229,15 +229,14 @@ class Occasion(Base, TimestampMixin):
         """ The date until which this occasion may be booked (inclusive). """
         period = self.period
 
-        if period.deadline_date is not None:
-            return period.deadline_date
+        if period.deadline_days is None:
+            if isinstance(self.period.booking_end, datetime):
+                return self.period.booking_end.date()
+
+            return self.period.booking_end
 
         min_date = min(d.start for d in self.dates)
-
-        if period.deadline_days is not None:
-            return (min_date - timedelta(days=period.deadline_days + 1)).date()
-
-        return min_date.date()
+        return (min_date - timedelta(days=period.deadline_days + 1)).date()
 
     @property
     def cancellation_deadline(self):

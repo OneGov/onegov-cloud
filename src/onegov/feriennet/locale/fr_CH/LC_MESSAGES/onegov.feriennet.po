@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-10-04 10:56+0200\n"
+"POT-Creation-Date: 2019-10-14 13:23+0200\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -882,14 +882,11 @@ msgstr "Ne plus accepter de réservations"
 msgid "Deadline"
 msgstr "Délai d'inscription"
 
-msgid "On a fixed day"
-msgstr "À une date définie"
+msgid "At the end of the booking phase"
+msgstr "À la fin de la phase de réservation"
 
 msgid "X days before each occasion"
 msgstr "X jours avant chaque événement"
-
-msgid "Fixed day"
-msgstr "A la date définie"
 
 msgid "X Days Before"
 msgstr "X jours avant"
@@ -908,6 +905,9 @@ msgstr "Jusqu'à un jour fixe"
 
 msgid "Up to X days before each occasion"
 msgstr "Jusqu'à X jours avant chaque événement"
+
+msgid "Fixed day"
+msgstr "A la date définie"
 
 msgid "Method"
 msgstr "Méthode"
@@ -932,13 +932,29 @@ msgstr ""
 msgid "The execution phase conflicts with existing occasions"
 msgstr "Conflit avec des événements existants"
 
-msgid ""
-"Prebooking must start before booking, and booking must start before "
-"execution. Each period must also start before it ends."
+msgid "Prebooking must start before it ends"
+msgstr "La pré-réservation doit commencer avant la fin"
+
+msgid "Booking must start before it ends"
+msgstr "La réservation doit commencer avant la fin"
+
+msgid "Execution must start before it ends"
+msgstr "L'exécution doit commencer avant la fin"
+
+msgid "Prebooking must end before booking starts"
 msgstr ""
-"La pré-réservation doit commencer avant la réservation, et la réservation "
-"doit commencer avant l'exécution. Chaque période doit également commencer "
-"avant de se terminer."
+"La réservation doit être terminée avant que la réservation ne commence"
+
+msgid "Prebooking must end before execution starts"
+msgstr "La pré-réservation doit se terminer avant le début de l'exécution"
+
+msgid "Execution may not start before booking starts"
+msgstr ""
+"L'exécution peut ne pas commencer avant que la réservation ne commence"
+
+msgid "Execution may not end before booking ends"
+msgstr ""
+"L'exécution ne peut pas se terminer avant que la réservation ne finisse"
 
 msgid ""
 "It is no longer possible to change the execution settings since the period "
@@ -1752,10 +1768,6 @@ msgstr "La réservation est terminée."
 
 msgid "There cannot be any more bookings."
 msgstr "Les réservations ne sont plus possibles."
-
-msgid "The deadline for last-minute bookings is the ${date}."
-msgstr ""
-"La date limite pour les réservations de dernière minute est le ${date}."
 
 msgid ""
 "Last-minute bookings are possible up to ${days} days before each occasion."
@@ -2608,6 +2620,21 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
+
+#~ msgid "On a fixed day"
+#~ msgstr "À une date définie"
+
+#~ msgid ""
+#~ "Prebooking must start before booking, and booking must start before "
+#~ "execution. Each period must also start before it ends."
+#~ msgstr ""
+#~ "La pré-réservation doit commencer avant la réservation, et la réservation "
+#~ "doit commencer avant l'exécution. Chaque période doit également commencer "
+#~ "avant de se terminer."
+
+#~ msgid "The deadline for last-minute bookings is the ${date}."
+#~ msgstr ""
+#~ "La date limite pour les réservations de dernière minute est le ${date}."
 
 #~ msgid "Send to (applies to active period only)"
 #~ msgstr "Envoyer à (s'applique uniquement pour une période active)"

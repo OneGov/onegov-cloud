@@ -216,17 +216,10 @@ class PeriodForm(Form):
         label=_("Stop accepting bookings"),
         fieldset=_("Deadline"),
         choices=[
-            ('fix', _("On a fixed day")),
+            ('fix', _("At the end of the booking phase")),
             ('rel', _("X days before each occasion")),
         ],
         default='fix',
-    )
-
-    deadline_date = DateField(
-        label=_("Fixed day"),
-        fieldset=_("Deadline"),
-        validators=[InputRequired()],
-        depends_on=('deadline', 'fix')
     )
 
     deadline_days = IntegerField(
@@ -321,7 +314,6 @@ class PeriodForm(Form):
             'max_bookings_per_attendee',
             'booking_cost',
             'deadline_days',
-            'deadline_date',
             'one_booking_per_day',
             'pay_organiser_directly',
             'cancellation_date',
@@ -344,11 +336,9 @@ class PeriodForm(Form):
             model.all_inclusive = False
 
         if self.deadline.data == 'fix':
-            model.deadline_date = self.deadline_date.data or None
             model.deadline_days = None
         else:
             model.deadline_days = self.deadline_days.data or None
-            model.deadline_date = None
 
         if self.cancellation.data == 'no':
             model.cancellation_date = None
@@ -452,33 +442,47 @@ class PeriodForm(Form):
             return False
 
     def ensure_valid_daterange_periods(self):
-        fields = (
-            self.prebooking_start,
-            self.prebooking_end,
-            self.booking_start,
-            self.booking_end,
-            self.execution_start,
-            self.execution_end
-        )
-
-        if not self.confirmable.data:
-            fields = fields[2:]
-
-        stack = [fields[0]]
-
-        for field in fields:
-            if field.data is None:
-                continue
-
-            if stack.pop().data > field.data:
-                field.errors.append(_(
-                    "Prebooking must start before booking, and booking must "
-                    "start before execution. Each period must also start "
-                    "before it ends."
-                ))
+        if self.prebooking_start.data and self.prebooking_end.data:
+            if self.prebooking_start.data > self.prebooking_end.data:
+                self.prebooking_start.errors.append(_(
+                    "Prebooking must start before it ends"))
                 return False
 
-            stack.append(field)
+        if self.booking_start.data and self.booking_end.data:
+            if self.booking_start.data > self.booking_end.data:
+                self.booking_start.errors.append(_(
+                    "Booking must start before it ends"))
+                return False
+
+        if self.execution_start.data and self.execution_end.data:
+            if self.execution_start.data > self.execution_end.data:
+                self.execution_start.errors.append(_(
+                    "Execution must start before it ends"))
+                return False
+
+        if self.prebooking_end.data and self.booking_start.data:
+            if self.prebooking_end.data > self.booking_start.data:
+                self.prebooking_end.errors.append(_(
+                    "Prebooking must end before booking starts"))
+                return False
+
+        if self.prebooking_end.data and self.execution_start.data:
+            if self.prebooking_end.data > self.execution_start.data:
+                self.prebooking_end.errors.append(_(
+                    "Prebooking must end before execution starts"))
+                return False
+
+        if self.booking_start.data and self.execution_start.data:
+            if self.booking_start.data > self.execution_start.data:
+                self.execution_start.errors.append(_(
+                    "Execution may not start before booking starts"))
+                return False
+
+        if self.booking_end.data and self.execution_end.data:
+            if self.booking_end.data > self.execution_end.data:
+                self.execution_end.errors.append(_(
+                    "Execution may not end before booking ends"))
+                return False
 
     def ensure_no_payment_changes_after_confirmation(self):
         if isinstance(self.model, Period) and self.model.confirmed:

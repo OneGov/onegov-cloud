@@ -737,3 +737,40 @@ def add_confirmable_and_finalizable_columns(context):
             column=Column(name, Boolean, nullable=False),
             default=True
         )
+
+
+@upgrade_task('Improve period dates constraint')
+def improve_period_dates_constraint(context):
+    context.operations.drop_constraint('period_date_order', 'periods')
+
+    context.operations.create_check_constraint(
+        'period_date_order',
+        'periods',
+        ' AND '.join((
+            # ranges should be valid
+            'prebooking_start <= prebooking_end',
+            'booking_start <= booking_end',
+            'execution_start <= execution_end',
+
+            # pre-booking must happen before booking and execution
+            'prebooking_end <= booking_start',
+            'prebooking_end <= execution_start',
+
+            # booking and execution may overlap, but the execution cannot
+            # start before booking begins
+            'booking_start <= execution_start',
+            'booking_end <= execution_end',
+        )),
+    )
+
+
+@upgrade_task('Drop deadline_date')
+def drop_deadline_date(context):
+    context.session.execute(f"""
+            UPDATE periods SET booking_end = deadline_date
+            WHERE deadline_date IS NOT NULL
+              AND execution_start <= deadline_date
+              AND deadline_date <= execution_end
+        """)
+
+    context.operations.drop_column('periods', 'deadline_date')

@@ -2365,13 +2365,10 @@ def test_deadline(session, collections, prebooking_period, owner):
         activity=collections.activities.add("Sport", username=owner.username),
         period=period
     )
-    assert occasion.deadline == period.execution_start.date()
+    assert occasion.deadline == period.booking_end.date()
 
     period.deadline_days = 1
     assert occasion.deadline == (start - timedelta(days=2)).date()
-
-    period.deadline_date = date(2017, 2, 23)
-    assert occasion.deadline == date(2017, 2, 23)
 
 
 def test_cancellation_deadline(session, collections, prebooking_period, owner):

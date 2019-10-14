@@ -100,9 +100,6 @@ class Period(Base, TimestampMixin):
     #: The alignment of bookings in the matching
     alignment = Column(Text, nullable=True)
 
-    #: Date after which no bookings are possible anymore
-    deadline_date = Column(Date, nullable=True)
-
     #: Days between the occasion and the deadline (an alternative to
     #: the deadline_date)
     deadline_days = Column(Integer, nullable=True)
@@ -118,14 +115,21 @@ class Period(Base, TimestampMixin):
     age_barrier_type = Column(Text, nullable=False, default='exact')
 
     __table_args__ = (
-        CheckConstraint(("""
-            prebooking_start
-            <= prebooking_end AND prebooking_end
-            <= booking_start AND booking_start
-            <= booking_end AND booking_end
-            <= execution_start AND execution_start
-            <= execution_end
-        """), name='period_date_order'),
+        CheckConstraint(' AND '.join((
+            # ranges should be valid
+            'prebooking_start <= prebooking_end',
+            'booking_start <= booking_end',
+            'execution_start <= execution_end',
+
+            # pre-booking must happen before booking and execution
+            'prebooking_end <= booking_start',
+            'prebooking_end <= execution_start',
+
+            # booking and execution may overlap, but the execution cannot
+            # start before booking begins
+            'booking_start <= execution_start',
+            'booking_end <= execution_end',
+        )), name='period_date_order'),
         Index(
             'only_one_active_period', 'active',
             unique=True, postgresql_where=column('active') == True
