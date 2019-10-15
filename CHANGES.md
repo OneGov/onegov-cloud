@@ -1,8 +1,20 @@
 # Changes
 
+## Release `2019.28`
+
+> commits: **2 / [af4ff8e167...f1da1d1f47](https://github.com/OneGov/onegov-cloud/compare/af4ff8e167^...f1da1d1f47)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.28)](https://buildkite.com/seantis/onegov-cloud)
+
+### Core
+
+🐞 **Fixes arrow week granularity translations for itialian and rumantsch**
+
+**`Bugfix`** | **[f1da1d1f47](https://github.com/onegov/onegov-cloud/commit/f1da1d1f47ebb570529f423cdd255f54e8530538)**
+
 ## Release `2019.27`
 
-> commits: **2 / [cf141436da...c7a310ef3a](https://github.com/OneGov/onegov-cloud/compare/cf141436da^...c7a310ef3a)**<br>
+> released: **2019-10-14 14:20**<br>
+> commits: **3 / [cf141436da...2f96cfc593](https://github.com/OneGov/onegov-cloud/compare/cf141436da^...2f96cfc593)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.27)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
