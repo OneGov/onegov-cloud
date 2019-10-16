@@ -207,8 +207,14 @@ def test_agency(test_app):
 
 
 @mark.parametrize("organigram", [
-    (module_path('tests.onegov.people', 'fixtures/organigram.jpg'), '.jpe'),
-    (module_path('tests.onegov.people', 'fixtures/organigram.png'), '.png'),
+    (
+        module_path('tests.onegov.people', 'fixtures/organigram.jpg'),
+        ('.jpg', '.jpe')
+    ),
+    (
+        module_path('tests.onegov.people', 'fixtures/organigram.png'),
+        ('.png', )
+    ),
 ])
 def test_agency_organigram(test_app, organigram):
     with open(organigram[0], 'rb') as organigram_file:
@@ -223,7 +229,7 @@ def test_agency_organigram(test_app, organigram):
         session.flush()
     agency = session.query(Agency).one()
 
-    assert splitext(agency.organigram_file.name)[1] == organigram[1]
+    assert splitext(agency.organigram_file.name)[1] in organigram[1]
     with open(organigram[0], 'rb') as organigram_file:
         assert agency.organigram_file.read() == organigram_file.read()
 
