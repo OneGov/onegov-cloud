@@ -242,6 +242,7 @@ def org_content_security_policy():
     policy.child_src.add('https://*.youtube.com')
     policy.child_src.add('https://*.vimeo.com')
     policy.child_src.add('https://checkout.stripe.com')
+    policy.child_src.add('https://*.rocket.chat')
 
     policy.connect_src.add(SELF)
     policy.connect_src.add('https://checkout.stripe.com')
