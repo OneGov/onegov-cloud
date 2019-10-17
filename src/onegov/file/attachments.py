@@ -6,6 +6,7 @@ from depot.io.interfaces import FileStorage
 from depot.io.utils import INMEMORY_FILESIZE
 from io import BytesIO
 from onegov.core.html import sanitize_svg
+from onegov.file.security import sanitize_pdf
 from onegov.file.utils import digest
 from onegov.file.utils import get_image_size
 from onegov.file.utils import get_svg_size
@@ -66,6 +67,13 @@ def sanitize_svg_images(file, content, content_type):
     return content
 
 
+def sanitize_pdf_files(file, content, content_type):
+    if content_type == 'application/pdf':
+        content = open(sanitize_pdf(content), 'rb')
+
+    return content
+
+
 def extract_pdf_info(content):
     pages = pdftotext.PDF(content)
     return len(pages), '\n'.join(pages).strip(' \t\r\n').replace('\0', '')
@@ -87,6 +95,7 @@ class ProcessedUploadedFile(UploadedFile):
         store_checksum,
         limit_and_store_image_size,
         sanitize_svg_images,
+        sanitize_pdf_files,
         store_extract_and_pages,
     )
 
