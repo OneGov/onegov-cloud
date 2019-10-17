@@ -845,6 +845,11 @@
             <dd tal:content="event.organizer" />
         </tal:b>
 
+        <tal:b condition="event.organizer_email">
+            <dt i18n:translate>Organizer E-Mail</dt>
+            <dd><a href="mailto:${event.organizer_email}" tal:content="event.organizer_email" /></dd>
+        </tal:b>
+
         <tal:b condition="event.tags">
             <dt i18n:translate>Tags</dt>
             <dd>

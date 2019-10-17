@@ -102,6 +102,7 @@ def view_occurrence(self, request):
     return {
         'description': description,
         'organizer': self.event.organizer,
+        'organizer_email': self.event.organizer_email,
         'layout': layout,
         'occurrence': self,
         'occurrences': occurrences,

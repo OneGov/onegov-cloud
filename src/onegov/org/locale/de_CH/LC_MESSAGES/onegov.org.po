@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-10-09 10:42+0200\n"
+"POT-Creation-Date: 2019-10-17 14:58+0200\n"
 "PO-Revision-Date: 2019-02-18 06:39+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -424,6 +424,12 @@ msgstr "Organisator"
 
 msgid "Music society"
 msgstr "Musikverein"
+
+msgid "Organizer E-Mail"
+msgstr "Organisator E-Mail"
+
+msgid "Shown as contact address"
+msgstr "Wird als Kontakt-Adresse angezeigt"
 
 msgid "The marker can be moved by dragging it with the mouse"
 msgstr "Der Marker kann mit der Maus verschoben werden"

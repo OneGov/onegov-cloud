@@ -100,6 +100,12 @@ class EventForm(Form):
         validators=[validators.InputRequired()]
     )
 
+    organizer_email = EmailField(
+        label=_("Organizer E-Mail"),
+        description=_("Shown as contact address"),
+        validators=[validators.Optional(), validators.Email()]
+    )
+
     coordinates = CoordinatesField(
         label=_("Coordinates"),
         description=_("The marker can be moved by dragging it with the mouse"),
