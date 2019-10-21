@@ -3,6 +3,7 @@ import re
 
 from datetime import datetime
 from dectate import directive
+from more.content_security.core import content_security_policy_tween_factory
 from onegov.core import Framework
 from onegov.core import utils
 from onegov.core.datamanager import FileDataManager
@@ -143,7 +144,9 @@ def get_i18n_default_locale():
     return 'de_CH'
 
 
-@ElectionDayApp.tween_factory()
+@ElectionDayApp.tween_factory(
+    under=content_security_policy_tween_factory
+)
 def enable_iframes_tween_factory(app, handler):
     iframe_paths = (
         r'/ballot/.*',
@@ -161,9 +164,8 @@ def enable_iframes_tween_factory(app, handler):
         result = handler(request)
 
         if iframe_paths.match(request.path_info):
-            request.content_security_policy.frame_ancestors |= {
-                'http://*', 'https://*',
-            }
+            request.content_security_policy.frame_ancestors.add('http://*')
+            request.content_security_policy.frame_ancestors.add('https://*')
 
         return result
 
