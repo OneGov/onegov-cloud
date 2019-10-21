@@ -143,6 +143,33 @@ def get_i18n_default_locale():
     return 'de_CH'
 
 
+@ElectionDayApp.tween_factory()
+def enable_iframes_tween_factory(app, handler):
+    iframe_paths = (
+        r'/ballot/.*',
+        r'/vote/.*',
+        r'/votes/.*',
+        r'/election/.*',
+        r'/elections/.*',
+    )
+
+    iframe_paths = re.compile(rf"({'|'.join(iframe_paths)})")
+
+    def enable_iframes_tween(request):
+        """ Enables iframes on matching paths. """
+
+        result = handler(request)
+
+        if iframe_paths.match(request.path_info):
+            request.content_security_policy.frame_ancestors |= {
+                'http://*', 'https://*',
+            }
+
+        return result
+
+    return enable_iframes_tween
+
+
 @ElectionDayApp.tween_factory(
     under=current_language_tween_factory,
     over=transaction_tween_factory
