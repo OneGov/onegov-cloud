@@ -5,7 +5,7 @@ from onegov.election_day.utils.election.connections import \
     get_connection_results_api
 
 
-def test_get_connection_results(import_test_datasets, session):
+def test_get_connection_results_interal(import_test_datasets, session):
     election, errors = import_test_datasets(
         'internal',
         'election',
@@ -58,3 +58,26 @@ def test_get_connection_results(import_test_datasets, session):
     assert results['2']['lists'] == LastUpdatedOrderedDict({
         'Verda - Grüne Graubünden': 1652
     })
+
+
+def test_get_connection_results_wabstic(import_test_datasets, session):
+    election, errors = import_test_datasets(
+        'wabstic',
+        'election',
+        'sg',
+        'canton',
+        election_type='proporz',
+        number_of_mandates=11,
+        date_=date(2019, 10, 20),
+        dataset_name='NR2019-alphanumerische_list_nr',
+        app_session=session
+    )
+    assert not errors
+    results = get_connection_results_api(election, session)
+    # Find the results in WPListenGde, sum for all entities
+    # List conn 1 are list_id's 02a, 02b, 05
+    # List conn 2 are list_id's 06a, 07, 08
+    assert results['1']['total_votes'] == 88 + 27 + 49
+    assert results['2']['total_votes'] == 2 + 47 + 79
+    assert results['1']['subconns']['1']['total_votes'] == 88 + 27
+    assert results['2']['subconns']['1']['total_votes'] == 2 + 47
