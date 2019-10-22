@@ -2,6 +2,8 @@ from morepath.request import Response
 from onegov.ballot import Election
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
+from onegov.election_day.hidden_by_principal import \
+    hide_connections_chart
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
@@ -14,13 +16,6 @@ election_incomplete_text = _(
     'The figure with the list connections will be available '
     'as soon the final results are published.'
 )
-
-
-def hide_connections_chart(election, request, default=False):
-    return request.app.principal.hidden_elements.get(
-        'intermediate_results', {}).get(
-        'connections', {}).get(
-        'chart', default) and not election.completed
 
 
 @ElectionDayApp.json(

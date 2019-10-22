@@ -14,7 +14,7 @@ from datetime import date
 from onegov.core.crypto import hash_password
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import SearchableArchivedResultCollection
-from onegov.election_day.defaults import \
+from onegov.election_day.hidden_by_principal import \
     always_hide_candidate_by_entity_chart_percentages as hide_chart_perc, \
     hide_connections_chart_intermediate_results as hide_conn_chart, \
     hide_candidates_chart_intermediate_results as hide_cand_chart
