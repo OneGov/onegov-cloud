@@ -51,6 +51,7 @@ class Principal(object):
         wabsti_import=False,
         pdf_signing=None,
         open_data=None,
+        hidden_elements=None,
         **kwargs
     ):
         assert all((id_, domain, domains_election, domains_vote, entities))
@@ -73,6 +74,7 @@ class Principal(object):
         self.wabsti_import = wabsti_import
         self.pdf_signing = pdf_signing or {}
         self.open_data = open_data or {}
+        self.hidden_elements = hidden_elements or {}
 
     @classmethod
     def from_yaml(cls, yaml_source):
