@@ -106,9 +106,12 @@ class GuidleOffer(GuidleBase):
         return self.join((
             self.get('guidle:contact/guidle:company'),
             self.get('guidle:contact/guidle:name'),
-            self.get('guidle:contact/guidle:email'),
             self.get('guidle:contact/guidle:telephone_1'),
         ))
+
+    @cached_property
+    def organizer_email(self):
+        return self.get('guidle:contact/guidle:email')
 
     @cached_property
     def location(self):

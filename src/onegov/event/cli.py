@@ -338,6 +338,7 @@ def import_guidle(group_context, url, tagmap):
                             timezone=schedule.timezone,
                             description=offer.description,
                             organizer=offer.organizer,
+                            organizer_email=offer.organizer_email,
                             location=offer.location,
                             coordinates=offer.coordinates,
                             tags=tags,

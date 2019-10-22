@@ -32,7 +32,7 @@
                             <dd>${organizer}</dd>
                         </div>
                         <div tal:condition="organizer_email">
-                            <dt i18n:translate>Contact</dt>
+                            <dt i18n:translate>E-Mail</dt>
                             <dd><a href="mailto:${organizer_email}" tal:content="organizer_email" /></dd>
                         </div>
                     </dl>
