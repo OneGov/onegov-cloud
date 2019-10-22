@@ -100,7 +100,13 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         query = query.order_by(desc(Page.type), Page.order)
         query = query.filter(Page.parent_id == None)
 
-        return tuple(query)
+        def include(page):
+            if page.type != 'news':
+                return True
+
+            return page.children and True or False
+
+        return tuple(p for p in query if include(p))
 
     @orm_cached(policy='on-table-change:organisations')
     def homepage_template(self):

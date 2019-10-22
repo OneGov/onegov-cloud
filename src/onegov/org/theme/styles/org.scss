@@ -637,6 +637,16 @@ $footer-border-width: 0;
     margin-bottom: .1rem;
 }
 
+// breadcrumbs without top bar
+// .main-navigation + nav ul {
+//     margin-top: -1rem;
+//     margin-bottom: 2rem;
+// }
+.main-navigation + nav ul {
+    background: $topbar-bg-color;
+    border-bottom: 0;
+}
+
 .top-bar {
     &.expanded {
         box-shadow: none;
