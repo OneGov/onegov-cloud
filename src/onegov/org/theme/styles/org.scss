@@ -638,11 +638,7 @@ $footer-border-width: 0;
 }
 
 // breadcrumbs without top bar
-// .main-navigation + nav ul {
-//     margin-top: -1rem;
-//     margin-bottom: 2rem;
-// }
-.main-navigation + nav ul {
+.main-navigation.empty + nav ul {
     background: $topbar-bg-color;
     border-bottom: 0;
 }

@@ -22,7 +22,7 @@
 </metal:b>
 
 <metal:navigation define-macro="top_navigation">
-    <div class="main-navigation" tal:define="links top_navigation|layout.top_navigation">
+    <div class="main-navigation ${not links and 'empty'}" tal:define="links top_navigation|layout.top_navigation">
         <nav class="top-bar" data-topbar role="navigation" tal:condition="links">
             <ul class="title-area">
                 <!--! this section needs to be included (even though it's empty),
