@@ -14,6 +14,10 @@ from datetime import date
 from onegov.core.crypto import hash_password
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import SearchableArchivedResultCollection
+from onegov.election_day.defaults import \
+    always_hide_candidate_by_entity_chart_percentages as hide_chart_perc, \
+    hide_connections_chart_intermediate_results as hide_conn_chart, \
+    hide_candidates_chart_intermediate_results as hide_cand_chart
 from onegov.election_day.formats import import_election_internal_majorz, \
     import_election_internal_proporz, import_election_wabstic_proporz, \
     import_election_wabstic_majorz, import_election_wabsti_proporz, \
@@ -26,6 +30,10 @@ from tests.shared.utils import create_app
 model_mapping = dict(proporz=ProporzElection, majorz=Election)
 
 
+def bool_as_string(val):
+    assert isinstance(val, bool)
+    return 'true' if val else 'false'
+
 @pytest.fixture(scope='session')
 def election_day_password():
     # only hash the password for the test users once per test session
@@ -37,9 +45,9 @@ def create_election_day(
         canton='',
         municipality='',
         use_maps='false',
-        hide_candidate_chart_percentages='false',
-        hide_connections_chart='false',
-        hide_candidates_chart='false'
+        hide_candidate_chart_percentages=hide_chart_perc,
+        hide_connections_chart=hide_conn_chart,
+        hide_candidates_chart=hide_cand_chart
         ):
     """
 
@@ -60,6 +68,7 @@ def create_election_day(
     app.configuration['d3_renderer'] = 'http://localhost:1337'
     app.session_manager.set_locale('de_CH', 'de_CH')
     tenan = f'canton: {canton}' if canton else f'municipality: {municipality}'
+    chart_percentages = bool_as_string(hide_candidate_chart_percentages)
 
     app.filestorage.settext('principal.yml', textwrap.dedent(f"""
         name: Kanton Govikon
@@ -71,12 +80,12 @@ def create_election_day(
         hidden_elements:
           always:
             candidate-by-entity:
-              chart_percentages: {hide_candidate_chart_percentages}
+              chart_percentages: {chart_percentages}
           intermediate_results:
             connections:
-              chart: {hide_connections_chart}
+              chart: {bool_as_string(hide_connections_chart)}
             candidates:
-              chart: {hide_candidates_chart}
+              chart: {bool_as_string(hide_candidates_chart)}
     """))
 
     app.session().add(User(
@@ -96,7 +105,7 @@ def election_day_app(request):
     app = create_election_day(
         request,
         "zg",
-        hide_candidate_chart_percentages='true')
+        hide_candidate_chart_percentages=True)
     yield app
     app.session_manager.dispose()
 
@@ -115,8 +124,8 @@ def election_day_app_sg(request):
     app = create_election_day(
         request,
         "sg",
-        hide_candidates_chart='true',
-        hide_connections_chart='true'
+        hide_candidates_chart=True,
+        hide_connections_chart=True
     )
     yield app
     app.session_manager.dispose()
