@@ -135,10 +135,19 @@
                             var name = '<strong>' + d.properties.name + '</strong>';
                             if (!isUndefined(d.properties.result) && !isUndefined(d.properties.result.percentage) && d.properties.result.counted) {
                                 var percentage = Math.round(d.properties.result.percentage * 100) / 100;
-                                if (!thumbs) return name + '<br/>' + percentage + '%';
-                                if (percentage > 50) return name + '<br/><i class="fa fa-thumbs-up"></i> ' + percentage + '%';
-                                percentage =  Math.round((100 - percentage) * 100) / 100;
-                                return name + '<br/><i class="fa fa-thumbs-down"></i> ' + percentage + '%';
+
+                                var hide_percentages = false;
+
+                                if (hide_percentages) {
+                                    if (!thumbs) return name;
+                                    if (percentage > 50) return name + '<br/><i class="fa fa-thumbs-up"></i>';
+                                    return name + '<br/><i class="fa fa-thumbs-down"></i>';
+                                } else {
+                                    if (!thumbs) return name + '<br/>' + percentage + '%';
+                                    if (percentage > 50) return name + '<br/><i class="fa fa-thumbs-up"></i> ' + percentage + '%';
+                                    percentage =  Math.round((100 - percentage) * 100) / 100;
+                                    return name + '<br/><i class="fa fa-thumbs-down"></i> ' + percentage + '%';
+                                }
                             }
                             return name;
                         });
