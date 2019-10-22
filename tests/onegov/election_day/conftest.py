@@ -40,21 +40,16 @@ def create_election_day(request, canton='', municipality='', use_maps='false'):
     app.configuration['sms_directory'] = os.path.join(tmp, 'sms')
     app.configuration['d3_renderer'] = 'http://localhost:1337'
     app.session_manager.set_locale('de_CH', 'de_CH')
+    tenan = f'canton: {canton}' if canton else f'municipalilty: {municipality}'
 
-    app.filestorage.settext('principal.yml', textwrap.dedent("""
+    app.filestorage.settext('principal.yml', textwrap.dedent(f"""
         name: Kanton Govikon
         logo: logo.jpg
-        {}
-        use_maps: {}
+        {tenan}
+        use_maps: {use_maps}
         color: '#000'
         wabsti_import: true
-    """.format(
-        (
-            'canton: {}'.format(canton) if canton else
-            'municipality: {}'.format(municipality)
-        ),
-        use_maps
-    )))
+    """))
 
     app.session().add(User(
         username='admin@example.org',
