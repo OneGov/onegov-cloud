@@ -145,9 +145,14 @@ def test_linkify():
 
 ])
 def test_linkify_with_phone(tel):
-    print('eval: ', utils.linkify(tel[0], escape=True))
     assert utils.linkify(tel[0], escape=False) == tel[1]
     assert utils.linkify(tel[0], escape=True) == tel[1]
+
+
+def test_linkify_with_phone_newline():
+    assert utils.linkify('Foo\n041 123 45 67') == (
+        'Foo\n<a href="tel:041 123 45 67">041 123 45 67</a>'
+    )
 
 
 def test_increment_name():
@@ -374,6 +379,8 @@ def test_yubikey_public_id():
 
 
 def test_paragraphify():
+    assert utils.paragraphify('') == ''
+    assert utils.paragraphify('\n') == ''
     assert utils.paragraphify('foo') == '<p>foo</p>'
     assert utils.paragraphify('foo\nbar') == '<p>foo<br>bar</p>'
     assert utils.paragraphify('foo\n\nbar') == '<p>foo</p><p>bar</p>'

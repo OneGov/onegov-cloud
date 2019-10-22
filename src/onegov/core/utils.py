@@ -60,7 +60,7 @@ _multiple_newlines = re.compile(r'\n{2,}', re.MULTILINE)
 _duplicate_whitespace = re.compile(r'\s{2,}')
 
 # regex pattern for swiss phone numbers
-_phone_ch_country_code = r"(\+41|0041|[^\+]?0)"
+_phone_ch_country_code = r"(\+41|0041|0[0-9]{2})"
 _phone_ch = re.compile(_phone_ch_country_code + r'([ \r\f\t\d]+)')
 
 # for yubikeys
@@ -382,7 +382,10 @@ def paragraphify(text):
     a paragraph and the extra newlines are discarded.
 
     """
-    text = text.replace('\r', '')
+    text = text.replace('\r', '').strip('\n')
+
+    if not text:
+        return ''
 
     return ''.join(f'<p>{p}</p>' for p in (
         p.replace('\n', '<br>') for p in _multiple_newlines.split(text)

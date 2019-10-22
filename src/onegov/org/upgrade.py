@@ -136,3 +136,14 @@ def add_meta_access_property(context):
             UPDATE {table} SET meta = meta - 'is_hidden_from_public'
             WHERE meta ? 'is_hidden_from_public';
         """)
+
+
+@upgrade_task('Rerender organisation html')
+def add_rerender_organsiation_html(context):
+    org = context.session.query(Organisation).first()
+
+    if not org:
+        return
+
+    org.contact = org.contact
+    org.opening_hours = org.opening_hours
