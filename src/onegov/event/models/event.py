@@ -74,6 +74,9 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
     #: the event organizer's public e-mail address
     organizer_email = content_property()
 
+    #: the price of the event (a text field, not an amount)
+    price = content_property()
+
     #: the source of the event, if imported
     source = meta_property()
 

@@ -32,9 +32,13 @@
 
 <metal:event define-macro="event" i18n:domain="onegov.org">
     <p><b>${model.title}</b></p>
-    <p>${model.location}</p>
-    <p>${model.organizer}</p>
     <p tal:condition="model.description" tal:content="structure model.description.replace('\n', '<br />')" />
+
+    <p>${model.location}</p>
+    <p>${model.price}</p>
+    <p>${model.organizer}</p>
+    <p>${model.organizer_email}</p>
+
     <p>
         <ul tal:define="occurrences model.occurrence_dates(localize=True)">
             <li tal:repeat="occurrence occurrences">${layout.format_date(occurrence, 'datetime')} - ${layout.format_date(model.localized_end, 'time')}</li>

@@ -97,9 +97,12 @@ class GuidleOffer(GuidleBase):
             self.get('guidle:offerDetail/guidle:openingHours'),
             self.get('guidle:offerDetail/guidle:externalLink'),
             self.get('guidle:offerDetail/guidle:homepage'),
-            self.get('guidle:offerDetail/guidle:priceInformation'),
             self.get('guidle:offerDetail/guidle:ticketingUrl')
         ), '\n\n')
+
+    @cached_property
+    def price(self):
+        return self.get('guidle:offerDetail/guidle:priceInformation')
 
     @cached_property
     def organizer(self):

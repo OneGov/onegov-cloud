@@ -168,9 +168,10 @@ def import_json(group_context, url, tagmap, clear):
             organizer = ', '.join((line for line in (
                 item['organizer'] or '',
                 item['contact_name'] or '',
-                item['contact_email'] or '',
                 item['contact_phone'] or ''
             ) if line))
+
+            organizer_email = item['contact_email'] or None
 
             location = ', '.join((line for line in (
                 item['locality'] or '',
@@ -189,9 +190,10 @@ def import_json(group_context, url, tagmap, clear):
                 item['long_description'] or '',
                 item['event_url'] or '',
                 item['location_url'] or '',
-                item['prices'],
                 item['registration']
             ) if line))
+
+            price = item['prices'] or None
 
             tags = item['cat1']
             if tagmap and tags:
@@ -214,8 +216,10 @@ def import_json(group_context, url, tagmap, clear):
                 timezone=timezone,
                 description=description,
                 organizer=organizer,
+                organizer_email=organizer_email,
                 location=location,
                 coordinates=coordinates,
+                price=price,
                 tags=tags or [],
                 meta={'submitter_email': item['submitter_email']},
             )
@@ -339,6 +343,7 @@ def import_guidle(group_context, url, tagmap):
                             description=offer.description,
                             organizer=offer.organizer,
                             organizer_email=offer.organizer_email,
+                            price=offer.price,
                             location=offer.location,
                             coordinates=offer.coordinates,
                             tags=tags,
@@ -461,6 +466,9 @@ def fetch(group_context, source, tag, location):
                                 tags=event.tags,
                                 source=f'fetch-{key}-{event.name}',
                                 coordinates=event.coordinates,
+                                organizer=event.organizer,
+                                organizer_email=event.organizer_email,
+                                price=event.price,
                             ),
                             image=(
                                 event_file(event.image.reference)

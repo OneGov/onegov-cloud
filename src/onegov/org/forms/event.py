@@ -75,7 +75,6 @@ class EventForm(Form):
 
     image = UploadFileWithORMSupport(
         label=_("Image"),
-        description="Foobar",
         file_class=EventFile,
         validators=[
             validators.Optional(),
@@ -90,8 +89,14 @@ class EventForm(Form):
 
     location = StringField(
         label=_("Venue"),
-        description=_("Castle garden"),
+        description="Pilatusstrasse 3, 6000 Luzern",
         validators=[validators.InputRequired()]
+    )
+
+    price = TextAreaField(
+        label=_("Price"),
+        description=_("10 CHF for adults"),
+        render_kw={'rows': 2}
     )
 
     organizer = StringField(
