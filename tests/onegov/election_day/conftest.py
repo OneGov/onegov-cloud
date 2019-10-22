@@ -40,7 +40,7 @@ def create_election_day(request, canton='', municipality='', use_maps='false'):
     app.configuration['sms_directory'] = os.path.join(tmp, 'sms')
     app.configuration['d3_renderer'] = 'http://localhost:1337'
     app.session_manager.set_locale('de_CH', 'de_CH')
-    tenan = f'canton: {canton}' if canton else f'municipalilty: {municipality}'
+    tenan = f'canton: {canton}' if canton else f'municipality: {municipality}'
 
     app.filestorage.settext('principal.yml', textwrap.dedent(f"""
         name: Kanton Govikon

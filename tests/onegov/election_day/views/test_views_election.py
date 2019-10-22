@@ -407,7 +407,8 @@ def test_view_election_connections(election_day_app_gr):
     chart = client.get('/election/majorz-election/connections-chart')
     assert '/election/majorz-election/connections-data' in chart
 
-    # Fixme: Add a complete election and test if connections_data is there
+    # Fixme: Add an incomplete election and test
+    #  if connections_data is not there
     upload_proporz_election(client)
 
     main = client.get('/election/proporz-election/connections')
