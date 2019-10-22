@@ -32,12 +32,14 @@ def test_import_guidle(session, xml):
         "nonumy eirmod tempor invidunt ut labore et dolore magna "
         "aliquyam.\n\n"
         "anschliessend Apéro\n\n"
-        "1-Tages- oder 2-Tagespass erhältlich\n\n"
         "www.theatermenzingen.ch"
     )
+    assert offers[0].price == '1-Tages- oder 2-Tagespass erhältlich'
     assert offers[0].organizer == (
-        "Theatervereinigung Menzingen, Peter Muster, "
-        "peter.muster@theatermenzingen.ch, +41 41 755 35 46"
+        "Theatervereinigung Menzingen, Peter Muster, +41 41 755 35 46"
+    )
+    assert offers[0].organizer_email == (
+        "peter.muster@theatermenzingen.ch"
     )
     assert offers[0].location == (
         "Zentrum Schützenmatt, Luegetenstrasse 3, 6313 Menzingen"
