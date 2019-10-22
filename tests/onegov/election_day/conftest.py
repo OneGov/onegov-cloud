@@ -32,7 +32,26 @@ def election_day_password():
     return hash_password('hunter2')
 
 
-def create_election_day(request, canton='', municipality='', use_maps='false'):
+def create_election_day(
+        request,
+        canton='',
+        municipality='',
+        use_maps='false',
+        hide_candidate_chart_percentages='false',
+        hide_connections_chart='false',
+        hide_candidates_chart='false'
+        ):
+    """
+
+    :param request:
+    :param canton:
+    :param municipality:
+    :param use_maps:
+    :param hide_candidate_chart_percentages: used by ZG, always
+    :param hide_connections_chart:  for intermediate results
+    :param hide_candidates_chart: for intermediate results
+    :return:
+    """
 
     tmp = request.getfixturevalue('temporary_directory')
 
@@ -49,6 +68,15 @@ def create_election_day(request, canton='', municipality='', use_maps='false'):
         use_maps: {use_maps}
         color: '#000'
         wabsti_import: true
+        hidden_elements:
+          always:
+            candidate-by-entity:
+              chart_percentages: {hide_candidate_chart_percentages}
+          intermediate_results:
+            connections:
+              chart: {hide_connections_chart}
+            candidates:
+              chart: {hide_candidates_chart}
     """))
 
     app.session().add(User(
@@ -65,7 +93,10 @@ def create_election_day(request, canton='', municipality='', use_maps='false'):
 @pytest.fixture(scope="function")
 def election_day_app(request):
 
-    app = create_election_day(request, "zg")
+    app = create_election_day(
+        request,
+        "zg",
+        hide_candidate_chart_percentages='true')
     yield app
     app.session_manager.dispose()
 
@@ -81,7 +112,12 @@ def election_day_app_gr(request):
 @pytest.fixture(scope="function")
 def election_day_app_sg(request):
 
-    app = create_election_day(request, "sg")
+    app = create_election_day(
+        request,
+        "sg",
+        hide_candidates_chart='true',
+        hide_connections_chart='true'
+    )
     yield app
     app.session_manager.dispose()
 
