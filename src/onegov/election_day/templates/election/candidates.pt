@@ -25,7 +25,7 @@
 
             <div class="row" tal:condition="not election.tacit and layout.has_candidates and not skip_rendering">
                 <div class="small-12 small-centered large-10 columns">
-                    <figure tal:condition="election.completed">
+                    <figure>
                         <div class="bar-chart"
                             i18n:attributes="data-embed-link"
                             data-dataurl="${request.link(election, name='candidates-data')}"
