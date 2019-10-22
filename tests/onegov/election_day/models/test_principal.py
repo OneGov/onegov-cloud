@@ -152,10 +152,12 @@ def test_principal_load_options():
             name: Staatskanzlei Kanton Zug
             mail: info@zg.ch
         hidden_elements:
-          candidate_by_entity_chart:
-            percentages: True
-          candidate_by_entity:
-            percentages: True
+          always:
+            candidate-by-entity:
+              percentages: True
+          intermediate_results:
+            connections:
+              chart: True
     """))
     assert isinstance(principal, Canton)
     assert principal.id == 'zg'
@@ -199,8 +201,12 @@ def test_principal_load_options():
     }
 
     assert principal.hidden_elements == {
-    'candidate_by_entity_chart': {'percentages': True},
-    'candidate_by_entity': {'percentages': True}
+        'always': {
+            'candidate-by-entity': {'percentages': True}
+        },
+        'intermediate_results': {
+            'connections': {'chart': True}
+        }
     }
 
 
