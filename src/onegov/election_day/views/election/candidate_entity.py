@@ -31,6 +31,13 @@ def candidate_options(request, election):
     ]
 
 
+def hide_candidate_map_percentages(request, default=False):
+    return request.app.principal.hidden_elements.get(
+        'always', {}).get(
+        'candidate-by-entity', {}).get(
+        'chart_percentages', default)
+
+
 @ElectionDayApp.json(
     model=Candidate,
     name='by-entity',
@@ -65,7 +72,7 @@ def view_election_candidate_by_entity(self, request):
         'map_type': 'entities',
         'data_url': data_url,
         'embed_source': request.link(self, name='candidate-by-entity-chart'),
-        'hide_percentages': True
+        'hide_percentages': hide_candidate_map_percentages(request)
     }
 
 
@@ -98,5 +105,5 @@ def view_election_candidate_by_entity_chart(self, request):
         'label_right_hand': '100%',
         'data_url': data_url,
         'options': options,
-        'hide_percentages': False
+        'hide_percentages': hide_candidate_map_percentages(request)
     }

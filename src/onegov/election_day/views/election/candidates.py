@@ -16,6 +16,13 @@ election_incomplete_text = _(
 )
 
 
+def hide_candidates_chart(election, request, default=True):
+    return request.app.principal.hidden_elements.get(
+        'intermediate_results', {}).get(
+        'candidates', {}).get(
+        'chart', default) and not election.completed
+
+
 @ElectionDayApp.json(
     model=Election,
     name='candidates-data',
@@ -47,7 +54,7 @@ def view_election_candidates_chart(self, request):
         add_last_modified_header(response, self.last_modified)
 
     return {
-        'skip_rendering': not self.completed,
+        'skip_rendering': hide_candidates_chart(self, request),
         'help_text': election_incomplete_text,
         'model': self,
         'layout': DefaultLayout(self, request),
@@ -67,7 +74,7 @@ def view_election_candidates(self, request):
     """" The main view. """
 
     return {
-        'skip_rendering': not self.completed,
+        'skip_rendering': hide_candidates_chart(self, request),
         'help_text': election_incomplete_text,
         'election': self,
         'layout': ElectionLayout(self, request, 'candidates'),
