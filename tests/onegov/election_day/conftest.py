@@ -34,6 +34,7 @@ def bool_as_string(val):
     assert isinstance(val, bool)
     return 'true' if val else 'false'
 
+
 @pytest.fixture(scope='session')
 def election_day_password():
     # only hash the password for the test users once per test session
@@ -48,7 +49,7 @@ def create_election_day(
         hide_candidate_chart_percentages=hide_chart_perc,
         hide_connections_chart=hide_conn_chart,
         hide_candidates_chart=hide_cand_chart
-        ):
+):
     """
 
     :param request:
