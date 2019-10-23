@@ -27,7 +27,7 @@
             fontSizePx: 14,
             fontFamily: 'sans-serif'
         };
-        var hide_percentages = false;
+        var hide_percentages;
 
         if (params) {
             if ('data' in params) data = params.data;
@@ -41,7 +41,7 @@
             if ('labelRightHand' in params) labelRightHand = params.labelRightHand;
             if ('labelExpats' in params) labelExpats = params.labelExpats;
             if ('options' in params) options = params.options;
-            if ('hidePercentages' in params) hide_percentages = params.hidePercentages ? params.hidePercentages : hide_percentages;
+            if ('hidePercentages' in params) hide_percentages = params.hidePercentages;
         }
         console.assert(typeof hide_percentages === "boolean", 'hide_percentages is not a boolean: ', hide_percentages);
         var isUndefined = function(obj) {
