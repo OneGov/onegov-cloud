@@ -41,7 +41,7 @@
             if ('labelRightHand' in params) labelRightHand = params.labelRightHand;
             if ('labelExpats' in params) labelExpats = params.labelExpats;
             if ('options' in params) options = params.options;
-            if ('hidePercentages' in params) hide_percentages = params.hidePercentages;
+            if ('hidePercentages' in params) hide_percentages = params.hidePercentages ? params.hidePercentages : hide_percentages;
         }
         console.assert(typeof hide_percentages === "boolean", 'hide_percentages is not a boolean: ', hide_percentages);
         var isUndefined = function(obj) {
