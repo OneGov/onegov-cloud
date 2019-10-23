@@ -20,6 +20,7 @@ setup(
         'onegov.file',
         'onegov.form',
         'onegov.foundation',
+        'onegov.fsi',
         'onegov.gazette',
         'onegov.gis',
         'onegov.intranet',

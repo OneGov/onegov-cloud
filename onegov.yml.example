@@ -123,7 +123,7 @@ configuration: &global-config
 
   # Alternative login providers
   authentication_providers:
-    
+
     # Login with LDAP, using Kerberos as authentication
     ldap_kerberos:
 
@@ -196,6 +196,12 @@ applications:
   - path: /onegov_feriennet/*
     application: onegov.feriennet.FeriennetApp
     namespace: onegov_feriennet
+    configuration:
+      <<: *global-config
+
+  - path: /onegov_fsi/*
+    application: onegov.fsi.FsiApp
+    namespace: onegov_fsi
     configuration:
       <<: *global-config
 

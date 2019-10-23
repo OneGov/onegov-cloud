@@ -51,6 +51,7 @@ LEVELS = (
         'onegov.agency',
         'onegov.election_day',
         'onegov.feriennet',
+        'onegov.fsi',
         'onegov.gazette',
         'onegov.intranet',
         'onegov.onboarding',
