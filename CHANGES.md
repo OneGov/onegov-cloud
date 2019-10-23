@@ -1,8 +1,73 @@
 # Changes
 
+## Release `2019.29`
+
+> commits: **14 / [d19e1fa2c6...76daca94a3](https://github.com/OneGov/onegov-cloud/compare/d19e1fa2c6^...76daca94a3)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.29)](https://buildkite.com/seantis/onegov-cloud)
+
+### Core
+
+🐞 **Fixes linkify/paragraphify producing bad output**
+
+This solves two cases, where the html output of these functions were
+less then optimal:
+
+* Paragraphify would output empty paragraphs for empty text
+* Linkify would swallow newlines in front of some phone numbers
+
+**`Bugfix`** | **[21b4fd7b57](https://github.com/onegov/onegov-cloud/commit/21b4fd7b5716fe085e204a32aafdace4b4631148)**
+
+### Election Day
+
+🐞 **Fixes being unable to embed iframes.**
+
+This was possible before because we did not enforce the Content Security
+Policy on all instances. Now we do.
+
+**`Bugfix`** | **[a023fc229f](https://github.com/onegov/onegov-cloud/commit/a023fc229fce57f4f789f632ee21b5bf5b226d28)**
+
+### Election-Day
+
+🐞 **Fixes sql query window function to connection results**
+
+**`Bugfix`** | **[b2950c657c](https://github.com/onegov/onegov-cloud/commit/b2950c657c1bd82d76939d3ed9a40a288ce30bd2)**
+
+### File
+
+🎉 **Automatically sanitize all incoming PDF files**
+
+The sanitizer will obfuscate dangerous directives like /JavaScript to
+ensure that the PDF does no harm. As a result, certain features might
+not work after uploading the PDF.
+
+**`Feature`** | **[ZW-196](https://kanton-zug.atlassian.net/browse/ZW-196)** | **[c241e03c62](https://github.com/onegov/onegov-cloud/commit/c241e03c6227e48aebf9eada6121bd169829d686)**
+
+### Org
+
+🎉 **Adds public e-mail address to events**
+
+E-Mails could always be entered in the description, but this makes it
+more explicit.
+
+**`Feature`** | **[ZW-196](https://kanton-zug.atlassian.net/browse/ZW-196)** | **[7a9a12fb96](https://github.com/onegov/onegov-cloud/commit/7a9a12fb96a88bc843c59b982d45f65c95d72cfe)**
+
+🎉 **Adds designated price field to events**
+
+This is a free text, since prices for events are often described, rather
+than quantified.
+
+**`Feature`** | **[ZW-196](https://kanton-zug.atlassian.net/browse/ZW-196)** | **[3a951a1bb4](https://github.com/onegov/onegov-cloud/commit/3a951a1bb49d63531965ded28276a2662116eb81)**
+
+🎉 **Hides the news if there are no news items.**
+
+This enables some sites to go completely without top-bar.
+
+**`Feature`** | **[c066ad168a](https://github.com/onegov/onegov-cloud/commit/c066ad168afde411497ba2445adad895aaa019c6)**
+
 ## Release `2019.28`
 
-> commits: **2 / [af4ff8e167...f1da1d1f47](https://github.com/OneGov/onegov-cloud/compare/af4ff8e167^...f1da1d1f47)**<br>
+> released: **2019-10-15 09:42**<br>
+> commits: **3 / [af4ff8e167...67cc464e10](https://github.com/OneGov/onegov-cloud/compare/af4ff8e167^...67cc464e10)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.28)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Core
