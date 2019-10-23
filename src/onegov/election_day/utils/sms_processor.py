@@ -109,7 +109,10 @@ class SmsQueueProcessor(object):
             path = ''
             name = filename
 
-        name, suffix = name.split('.', 1)
+        if '.' in name:
+            name, suffix = name.split('.', 1)
+        else:
+            suffix = ''
 
         return path, name, suffix
 

@@ -11,7 +11,6 @@ from onegov.ballot import BallotResult
 from onegov.ballot import Vote
 from onegov.election_day.cli import cli
 from onegov.election_day.models import ArchivedResult
-from unittest.mock import patch
 
 
 def write_config(path, postgres_dsn, temporary_directory, redis_url):
@@ -280,53 +279,6 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager, redis_url):
     assert get_session('be').query(ArchivedResult).count() == 12 + 4
     assert get_session('bern').query(ArchivedResult).count() == 5 + 12
     assert get_session('thun').query(ArchivedResult).count() == 4
-
-
-def test_send_sms(postgres_dsn, temporary_directory, redis_url):
-
-    class DummyResponse(object):
-        def raise_for_status(self):
-            pass
-
-        def json(self):
-            return {'StatusInfo': 'OK', 'StatusCode': '1'}
-
-    cfg_path = os.path.join(temporary_directory, 'onegov.yml')
-    write_config(cfg_path, postgres_dsn, temporary_directory, redis_url)
-    write_principal(temporary_directory, 'Govikon')
-    assert run_command(cfg_path, 'govikon', ['add']).exit_code == 0
-
-    sms_path = os.path.join(
-        temporary_directory, 'sms', 'onegov_election_day-govikon'
-    )
-    os.makedirs(sms_path)
-
-    # no SMS yet
-    send_sms = ['send-sms', 'username', 'password']
-    assert run_command(cfg_path, 'govikon', send_sms).exit_code == 0
-
-    # add a SMS
-    with open(os.path.join(sms_path, '+417772211.000000'), 'w') as f:
-        f.write('Fancy new results!')
-
-    with patch(
-        'onegov.election_day.utils.sms_processor.post',
-        return_value=DummyResponse()
-    ) as post:
-        assert run_command(cfg_path, 'govikon', send_sms).exit_code == 0
-        assert post.called
-        assert post.call_args[0] == (
-            'https://json.aspsms.com/SendSimpleTextSMS',
-        )
-        assert post.call_args[1] == {
-            'json': {
-                'MessageText': 'Fancy new results!',
-                'Originator': 'OneGov',
-                'Password': 'password',
-                'Recipients': ['+417772211'],
-                'UserName': 'username'
-            }
-        }
 
 
 def test_generate_media(postgres_dsn, temporary_directory, session_manager,
