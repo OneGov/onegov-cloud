@@ -38,7 +38,7 @@ result as (
         lr.conn,
         lr.subconn,
         lr.list_votes,
-        SUM(lr.list_votes) OVER (PARTITION BY lr.election_id, lr.subconn) as subconn_votes,
+        SUM(lr.list_votes) OVER (PARTITION BY lr.election_id, lr.conn, lr.subconn) as subconn_votes,
         SUM(lr.list_votes) OVER (PARTITION BY lr.election_id, lr.conn) as conn_votes,
         SUM(lr.list_votes) OVER(PARTITION BY lr.election_id) AS total_votes
     FROM list_results lr
