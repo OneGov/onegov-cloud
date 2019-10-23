@@ -69,6 +69,7 @@ var initGroupedChart = function(el) {
 var initEntitiesMap = function(el) {
     var mapurl = $(el).data('mapurl');
     var dataurl = $(el).data('dataurl');
+    var hidePercentages = $(el).data('hide-percentages');
     $.ajax({ url: mapurl }).done(function(mapdata) {
         $.ajax({ url: dataurl }).done(function(data) {
             var canton = $(el).data('canton');
@@ -86,7 +87,8 @@ var initEntitiesMap = function(el) {
                 colorScale: colorScale,
                 labelLeftHand: labelLeftHand,
                 labelRightHand: labelRightHand,
-                labelExpats: labelExpats
+                labelExpats: labelExpats,
+                hidePercentages: hidePercentages
             })(el);
             $(el).data('map', map);
 

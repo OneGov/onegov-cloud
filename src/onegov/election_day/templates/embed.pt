@@ -60,6 +60,7 @@
                     data-label-left-hand="${label_left_hand}"
                     data-label-right-hand="${label_right_hand}"
                     data-label-expats="Expats"
+                     data-hide-percentages="${hide_percentages|False}"
                     i18n:attributes="data-label-expats"
                     >
                 </div>

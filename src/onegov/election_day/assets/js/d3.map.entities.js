@@ -27,6 +27,7 @@
             fontSizePx: 14,
             fontFamily: 'sans-serif'
         };
+        var hide_percentages = false;
 
         if (params) {
             if ('data' in params) data = params.data;
@@ -40,6 +41,7 @@
             if ('labelRightHand' in params) labelRightHand = params.labelRightHand;
             if ('labelExpats' in params) labelExpats = params.labelExpats;
             if ('options' in params) options = params.options;
+            if ('hidePercentages' in params) hide_percentages = params.hidePercentages;
         }
 
         var isUndefined = function(obj) {
@@ -135,10 +137,17 @@
                             var name = '<strong>' + d.properties.name + '</strong>';
                             if (!isUndefined(d.properties.result) && !isUndefined(d.properties.result.percentage) && d.properties.result.counted) {
                                 var percentage = Math.round(d.properties.result.percentage * 100) / 100;
-                                if (!thumbs) return name + '<br/>' + percentage + '%';
-                                if (percentage > 50) return name + '<br/><i class="fa fa-thumbs-up"></i> ' + percentage + '%';
-                                percentage =  Math.round((100 - percentage) * 100) / 100;
-                                return name + '<br/><i class="fa fa-thumbs-down"></i> ' + percentage + '%';
+
+                                if (hide_percentages) {
+                                    if (!thumbs) return name;
+                                    if (percentage > 50) return name + '<br/><i class="fa fa-thumbs-up"></i>';
+                                    return name + '<br/><i class="fa fa-thumbs-down"></i>';
+                                } else {
+                                    if (!thumbs) return name + '<br/>' + percentage + '%';
+                                    if (percentage > 50) return name + '<br/><i class="fa fa-thumbs-up"></i> ' + percentage + '%';
+                                    percentage =  Math.round((100 - percentage) * 100) / 100;
+                                    return name + '<br/><i class="fa fa-thumbs-down"></i> ' + percentage + '%';
+                                }
                             }
                             return name;
                         });

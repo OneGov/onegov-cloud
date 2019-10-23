@@ -175,8 +175,8 @@
         initializeNodeDepth();
         resolveCollisions();
         for (var alpha = 1; iterations > 0; --iterations) {
-          relaxRightToLeft(alpha *= 0.99);
-          resolveCollisions();
+          // relaxRightToLeft(alpha *= 0.99);
+          // resolveCollisions();
           relaxLeftToRight(alpha);
           resolveCollisions();
         }

@@ -3,6 +3,8 @@ from onegov.ballot import Election
 from onegov.core.security import Public
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
+from onegov.election_day.hidden_by_principal import \
+    hide_candidate_map_percentages
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
@@ -64,7 +66,8 @@ def view_election_candidate_by_entity(self, request):
         'options': options,
         'map_type': 'entities',
         'data_url': data_url,
-        'embed_source': request.link(self, name='candidate-by-entity-chart')
+        'embed_source': request.link(self, name='candidate-by-entity-chart'),
+        'hide_percentages': hide_candidate_map_percentages(request)
     }
 
 
@@ -96,5 +99,6 @@ def view_election_candidate_by_entity_chart(self, request):
         'label_left_hand': '0%',
         'label_right_hand': '100%',
         'data_url': data_url,
-        'options': options
+        'options': options,
+        'hide_percentages': hide_candidate_map_percentages(request)
     }

@@ -2,6 +2,8 @@ from morepath.request import Response
 from onegov.ballot import Election
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
+from onegov.election_day.hidden_by_principal import \
+    hide_candidates_chart
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
@@ -47,7 +49,7 @@ def view_election_candidates_chart(self, request):
         add_last_modified_header(response, self.last_modified)
 
     return {
-        'skip_rendering': not self.completed,
+        'skip_rendering': hide_candidates_chart(self, request),
         'help_text': election_incomplete_text,
         'model': self,
         'layout': DefaultLayout(self, request),
@@ -67,7 +69,7 @@ def view_election_candidates(self, request):
     """" The main view. """
 
     return {
-        'skip_rendering': not self.completed,
+        'skip_rendering': hide_candidates_chart(self, request),
         'help_text': election_incomplete_text,
         'election': self,
         'layout': ElectionLayout(self, request, 'candidates'),

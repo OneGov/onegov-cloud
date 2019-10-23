@@ -2,6 +2,8 @@ from morepath.request import Response
 from onegov.ballot import Election
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
+from onegov.election_day.hidden_by_principal import \
+    hide_connections_chart
 from onegov.election_day.layouts import DefaultLayout
 from onegov.election_day.layouts import ElectionLayout
 from onegov.election_day.utils import add_last_modified_header
@@ -45,8 +47,10 @@ def view_election_connections_chart(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_modified)
 
+    skip_rendering = hide_connections_chart(self, request)
+
     data_url = request.link(
-        self, name='connections-data') if self.completed else None
+        self, name='connections-data') if not skip_rendering else None
 
     return {
         'model': self,
@@ -54,7 +58,7 @@ def view_election_connections_chart(self, request):
         'type': 'sankey',
         'inverse': 'true',
         'data_url': data_url,
-        'skip_rendering': not self.completed,
+        'skip_rendering': skip_rendering,
         'help_text': election_incomplete_text
     }
 
@@ -93,12 +97,11 @@ def view_election_connections(self, request):
     """" The main view. """
 
     layout = ElectionLayout(self, request, 'connections')
-
     return {
         'election': self,
         'layout': layout,
         'connections': get_connection_results_api(self, object_session(self)),
-        'skip_rendering': not self.completed,
+        'skip_rendering': hide_connections_chart(self, request),
         'help_text': election_incomplete_text,
     }
 

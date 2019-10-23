@@ -14,6 +14,10 @@ from datetime import date
 from onegov.core.crypto import hash_password
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.collections import SearchableArchivedResultCollection
+from onegov.election_day.hidden_by_principal import \
+    always_hide_candidate_by_entity_chart_percentages as hide_chart_perc, \
+    hide_connections_chart_intermediate_results as hide_conn_chart, \
+    hide_candidates_chart_intermediate_results as hide_cand_chart
 from onegov.election_day.formats import import_election_internal_majorz, \
     import_election_internal_proporz, import_election_wabstic_proporz, \
     import_election_wabstic_majorz, import_election_wabsti_proporz, \
@@ -26,13 +30,37 @@ from tests.shared.utils import create_app
 model_mapping = dict(proporz=ProporzElection, majorz=Election)
 
 
+def bool_as_string(val):
+    assert isinstance(val, bool)
+    return 'true' if val else 'false'
+
+
 @pytest.fixture(scope='session')
 def election_day_password():
     # only hash the password for the test users once per test session
     return hash_password('hunter2')
 
 
-def create_election_day(request, canton='', municipality='', use_maps='false'):
+def create_election_day(
+        request,
+        canton='',
+        municipality='',
+        use_maps='false',
+        hide_candidate_chart_percentages=hide_chart_perc,
+        hide_connections_chart=hide_conn_chart,
+        hide_candidates_chart=hide_cand_chart
+):
+    """
+
+    :param request:
+    :param canton:
+    :param municipality:
+    :param use_maps:
+    :param hide_candidate_chart_percentages: used by ZG, always
+    :param hide_connections_chart:  for intermediate results
+    :param hide_candidates_chart: for intermediate results
+    :return:
+    """
 
     tmp = request.getfixturevalue('temporary_directory')
 
@@ -40,21 +68,26 @@ def create_election_day(request, canton='', municipality='', use_maps='false'):
     app.configuration['sms_directory'] = os.path.join(tmp, 'sms')
     app.configuration['d3_renderer'] = 'http://localhost:1337'
     app.session_manager.set_locale('de_CH', 'de_CH')
+    tenan = f'canton: {canton}' if canton else f'municipality: {municipality}'
+    chart_percentages = bool_as_string(hide_candidate_chart_percentages)
 
-    app.filestorage.settext('principal.yml', textwrap.dedent("""
+    app.filestorage.settext('principal.yml', textwrap.dedent(f"""
         name: Kanton Govikon
         logo: logo.jpg
-        {}
-        use_maps: {}
+        {tenan}
+        use_maps: {use_maps}
         color: '#000'
         wabsti_import: true
-    """.format(
-        (
-            'canton: {}'.format(canton) if canton else
-            'municipality: {}'.format(municipality)
-        ),
-        use_maps
-    )))
+        hidden_elements:
+          always:
+            candidate-by-entity:
+              chart_percentages: {chart_percentages}
+          intermediate_results:
+            connections:
+              chart: {bool_as_string(hide_connections_chart)}
+            candidates:
+              chart: {bool_as_string(hide_candidates_chart)}
+    """))
 
     app.session().add(User(
         username='admin@example.org',
@@ -70,7 +103,10 @@ def create_election_day(request, canton='', municipality='', use_maps='false'):
 @pytest.fixture(scope="function")
 def election_day_app(request):
 
-    app = create_election_day(request, "zg")
+    app = create_election_day(
+        request,
+        "zg",
+        hide_candidate_chart_percentages=True)
     yield app
     app.session_manager.dispose()
 
@@ -86,7 +122,12 @@ def election_day_app_gr(request):
 @pytest.fixture(scope="function")
 def election_day_app_sg(request):
 
-    app = create_election_day(request, "sg")
+    app = create_election_day(
+        request,
+        "sg",
+        hide_candidates_chart=True,
+        hide_connections_chart=True
+    )
     yield app
     app.session_manager.dispose()
 

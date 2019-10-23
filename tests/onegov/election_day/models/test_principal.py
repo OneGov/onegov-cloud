@@ -52,6 +52,7 @@ def test_principal_load_canton():
     assert principal.wabsti_import is False
     assert principal.pdf_signing == {}
     assert principal.open_data == {}
+    assert principal.hidden_elements == {}
 
 
 def test_principal_load_municipality_with_static_data():
@@ -150,6 +151,13 @@ def test_principal_load_options():
             id: kanton-zug
             name: Staatskanzlei Kanton Zug
             mail: info@zg.ch
+        hidden_elements:
+          always:
+            candidate-by-entity:
+              percentages: True
+          intermediate_results:
+            connections:
+              chart: True
     """))
     assert isinstance(principal, Canton)
     assert principal.id == 'zg'
@@ -190,6 +198,15 @@ def test_principal_load_options():
         'id': 'kanton-zug',
         'name': 'Staatskanzlei Kanton Zug',
         'mail': 'info@zg.ch'
+    }
+
+    assert principal.hidden_elements == {
+        'always': {
+            'candidate-by-entity': {'percentages': True}
+        },
+        'intermediate_results': {
+            'connections': {'chart': True}
+        }
     }
 
 
