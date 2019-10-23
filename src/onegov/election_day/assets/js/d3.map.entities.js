@@ -43,7 +43,7 @@
             if ('options' in params) options = params.options;
             if ('hidePercentages' in params) hide_percentages = params.hidePercentages;
         }
-
+        console.assert(typeof hide_percentages === "boolean", 'hide_percentages is not a boolean: ', hide_percentages);
         var isUndefined = function(obj) {
             return obj === void 0;
         };
@@ -138,7 +138,7 @@
                             if (!isUndefined(d.properties.result) && !isUndefined(d.properties.result.percentage) && d.properties.result.counted) {
                                 var percentage = Math.round(d.properties.result.percentage * 100) / 100;
 
-                                if (hide_percentages) {
+                                if (hide_percentages === true) {
                                     if (!thumbs) return name;
                                     if (percentage > 50) return name + '<br/><i class="fa fa-thumbs-up"></i>';
                                     return name + '<br/><i class="fa fa-thumbs-down"></i>';
