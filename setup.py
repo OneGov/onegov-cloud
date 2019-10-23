@@ -46,7 +46,7 @@ setup(
     ],
     install_requires=[
         'AIS.py',
-        'Pillow!=5.4.0',
+        'Pillow>=6.2.0',
         'PyYAML',
         'alembic',
         'arrow',
