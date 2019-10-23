@@ -2,9 +2,7 @@ import os
 
 from onegov.election_day.utils.sms_processor import SmsQueueProcessor
 from pytest import raises
-from unittest.mock import MagicMock
 from unittest.mock import Mock
-from unittest.mock import patch
 
 
 def test_sms_queue_processor(election_day_app, temporary_directory):
@@ -14,7 +12,7 @@ def test_sms_queue_processor(election_day_app, temporary_directory):
     os.makedirs(sms_path)
 
     qp = SmsQueueProcessor(sms_path, 'username', 'password')
-    qp._send = Mock()
+    qp.send = Mock()
 
     def create(name, content='Fancy new results!'):
         with open(os.path.join(sms_path, name), 'w') as f:
@@ -51,9 +49,9 @@ def test_sms_queue_processor(election_day_app, temporary_directory):
     for name, content in ignored:
         assert os.path.exists(os.path.join(sms_path, name))
 
-    assert qp._send.called
+    assert qp.send.called
 
-    sorted([t[0][0] for t in qp._send.call_args_list]) == [
+    sorted([t[0][0] for t in qp.send.call_args_list]) == [
         '+41791112233',
         '+41791112233',
         '+41791112233',
@@ -67,32 +65,21 @@ def test_sms_queue_processor(election_day_app, temporary_directory):
 
 def test_sms_queue_processor_send():
     processor = SmsQueueProcessor('path', 'username', 'password')
+    processor.send_request = Mock()
 
-    with patch(
-        'onegov.election_day.utils.sms_processor.post',
-        return_value=MagicMock(json=lambda: {})
-    ) as post:
-        with raises(Exception):
-            processor._send('1234', 'content')
-        assert post.called
+    processor.send_request.return_value = (200, '{}')
+    with raises(RuntimeError):
+        processor.send('1234', 'content')
 
-    with patch(
-        'onegov.election_day.utils.sms_processor.post',
-        return_value=MagicMock(json=lambda: {
-            'StatusInfo': 'ERROR',
-            'StatusCode': '0'
-        })
-    ) as post:
-        with raises(Exception):
-            processor._send('1234', 'content')
-        assert post.called
+    processor.send_request.return_value = (
+        200, '{"StatusInfo": "ERROR", "StatusCode": "0"}')
+    with raises(RuntimeError):
+        processor.send('1234', 'content')
 
-    with patch(
-        'onegov.election_day.utils.sms_processor.post',
-        return_value=MagicMock(json=lambda: {
-            'StatusInfo': 'OK',
-            'StatusCode': '1'
-        })
-    ) as post:
-        processor._send('1234', 'content')
-        assert post.called
+    processor.send_request.return_value = (500, 'Error')
+    with raises(RuntimeError):
+        processor.send('1234', 'content')
+
+    processor.send_request.return_value = (
+        200, '{"StatusInfo": "OK", "StatusCode": "1"}')
+    processor.send('1234', 'content')

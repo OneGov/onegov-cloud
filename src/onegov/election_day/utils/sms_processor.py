@@ -9,12 +9,14 @@
 """
 
 import errno
+import json
 import logging
 import os
+import pycurl
 import stat
 import time
 
-from requests import post
+from io import BytesIO
 
 
 log = logging.getLogger('onegov.election_day')
@@ -88,57 +90,110 @@ class SmsQueueProcessor(object):
         self.password = password
         self.originator = originator or "OneGov"
 
-    def _send(self, number, content):
-        response = post(
-            'https://json.aspsms.com/SendSimpleTextSMS',
-            json={
-                "UserName": self.username,
-                "Password": self.password,
-                "Originator": self.originator,
-                "Recipients": [number],
-                "MessageText": content
-            }
-        )
+        # Keep a pycurl object around, to use HTTP keep-alive - though pycurl
+        # is much worse in terms of it's API, the performance is *much* better
+        # than requests and it supports modern features like HTTP/2 or HTTP/3
+        self.url = 'https://json.aspsms.com/SendSimpleTextSMS'
+        self.curl = pycurl.Curl()
+        self.curl.setopt(pycurl.TCP_KEEPALIVE, 1)
+        self.curl.setopt(pycurl.URL, self.url)
+        self.curl.setopt(pycurl.HTTPHEADER, ['Content-Type:application/json'])
+        self.curl.setopt(pycurl.POST, 1)
 
-        response.raise_for_status()
-        result = response.json()
+    def split(self, filename):
+        """ Returns the path, the name and the suffix of the given path. """
+
+        if '/' in filename:
+            path, name = filename.rsplit('/', 1)
+        else:
+            path = ''
+            name = filename
+
+        name, suffix = name.split('.', 1)
+
+        return path, name, suffix
+
+    def message_files(self):
+        """ Returns a tuple of full paths that need processing.
+
+        The file names in the directory usually look like this:
+
+            * +41764033314.1571822840.745629
+            * +41764033314.1571822743.595377
+
+        The part before the first dot is the number, the rest is the suffix.
+
+        The messages are sorted by suffix, so by default the sorting
+        happens from oldest to newest message.
+
+        """
+        files = []
+
+        for f in os.scandir(self.path):
+
+            if not f.is_file:
+                continue
+
+            # we expect to messages to in E.164 format, eg. '+41780000000'
+            if not f.name.startswith('+'):
+                continue
+
+            files.append(f)
+
+        files.sort(key=lambda i: self.split(i.name)[-1])
+
+        return tuple(os.path.join(self.path, f.name) for f in files)
+
+    def send(self, number, content):
+        code, body = self.send_request({
+            "UserName": self.username,
+            "Password": self.password,
+            "Originator": self.originator,
+            "Recipients": (number, ),
+            "MessageText": content,
+        })
+
+        if 400 <= code < 600:
+            raise RuntimeError(f"{code} calling {self.url}: {body}")
+
+        result = json.loads(body)
+
         if result.get('StatusInfo') != 'OK' or result.get('StatusCode') != '1':
-            raise Exception(
-                'Sending SMS failed, got: "{}"'.format(str(result))
-            )
+            raise RuntimeError(f'Sending SMS failed, got: "{result}"')
 
-    def _parseMessage(self, filename):
-        number = None
-        message = None
-        parts = os.path.basename(filename).split('.')
-        if len(parts):
-            if parts[0].startswith('+'):
-                if all(c.isdigit() for c in parts[0][1:]):
-                    number = parts[0]
+    def send_request(self, parameters):
+        """ Performes the API request using the given parameters. """
+
+        body = BytesIO()
+
+        self.curl.setopt(pycurl.WRITEDATA, body)
+        self.curl.setopt(pycurl.POSTFIELDS, json.dumps(parameters))
+        self.curl.perform()
+
+        code = self.curl.getinfo(pycurl.RESPONSE_CODE)
+
+        body.seek(0)
+        body = body.read().decode('utf-8')
+
+        return code, body
+
+    def parse(self, filename):
+        number = self.split(filename)[1].lstrip('+')
+
+        if not number.isdigit():
+            return None, None
 
         with open(filename) as f:
-            message = f.read()
-
-        return number, message
+            return number, f.read()
 
     def send_messages(self):
-        # We expect to messages to in E.164 format, eg. '+41780000000'
-        messages = [
-            os.path.join(self.path, x) for x in os.listdir(self.path)
-            if x.startswith('+')
-        ]
+        for filename in self.message_files():
+            self.send_message(filename)
 
-        # Sort by modification time so earlier messages are sent before
-        # later messages during queue processing.
-        messages = [(m, os.path.getmtime(m)) for m in messages]
-        messages.sort(key=lambda x: x[1])
-        for filename, timestamp in messages:
-            self._send_message(filename)
-
-    def _send_message(self, filename):
+    def send_message(self, filename):
         head, tail = os.path.split(filename)
-        tmp_filename = os.path.join(head, '.sending-' + tail)
-        rejected_filename = os.path.join(head, '.rejected-' + tail)
+        tmp_filename = os.path.join(head, f'.sending-{tail}')
+        rejected_filename = os.path.join(head, f'.rejected-{tail}')
 
         # perform a series of operations in an attempt to ensure
         # that no two threads/processes send this message
@@ -218,9 +273,9 @@ class SmsQueueProcessor(object):
                 raise
 
         # read message file and send contents
-        number, message = self._parseMessage(filename)
+        number, message = self.parse(filename)
         if number and message:
-            self._send(number, message)
+            self.send(number, message)
         else:
             log.error(
                 "Discarding SMS {} due to invalid content/number".format(
