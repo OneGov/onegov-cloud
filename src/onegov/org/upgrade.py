@@ -145,5 +145,8 @@ def add_rerender_organsiation_html(context):
     if not org:
         return
 
-    org.contact = org.contact
-    org.opening_hours = org.opening_hours
+    if org.contact is not None:
+        org.contact = org.contact
+
+    if org.opening_hours is not None:
+        org.opening_hours = org.opening_hours
