@@ -1,7 +1,7 @@
 import re
 import transaction
 
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 from onegov.core.security import Public, Private, Secret
 from onegov.core.utils import render_file
 from onegov.directory import Directory
@@ -256,6 +256,11 @@ def view_geojson(self, request):
     )
     q = q.filter(DirectoryEntry.content["coordinates"]["lat"] != None)
 
+    with_categories = request.params.get('with-categories', False)
+
+    if with_categories:
+        q = q.add_column(DirectoryEntry._keywords)
+
     # this could be done using a query, but that seems to be more verbose
     entries = (c for c in q if request.is_manager or (
         c.access == 'public' or not c.access
@@ -266,19 +271,33 @@ def view_geojson(self, request):
         'name': ''
     })
 
-    return tuple({
-        'type': "Feature",
-        'properties': {
-            'name': e.name,
-            'title': e.title,
-            'lead': e.lead,
-            'link': url_prefix + e.name
-        },
-        'geometry': {
-            'coordinates': [e.lon, e.lat],
-            'type': "Point"
+    def as_dict(entry):
+        result = {
+            'type': "Feature",
+            'properties': {
+                'name': entry.name,
+                'title': entry.title,
+                'lead': entry.lead,
+                'link': url_prefix + entry.name
+            },
+            'geometry': {
+                'coordinates': (entry.lon, entry.lat),
+                'type': "Point"
+            }
         }
-    } for e in entries)
+
+        if with_categories:
+            categories = defaultdict(list)
+
+            for item in entry._keywords.keys():
+                k, v = item.split(':', 1)
+                categories[k].append(v)
+
+            result['properties']['categories'] = categories
+
+        return result
+
+    return tuple(as_dict(e) for e in entries)
 
 
 @OrgApp.form(
