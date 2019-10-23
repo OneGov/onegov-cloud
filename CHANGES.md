@@ -1,8 +1,23 @@
 # Changes
 
+## Release `2019.31`
+
+> commits: **3 / [c898172a68...d085d65f8d](https://github.com/OneGov/onegov-cloud/compare/c898172a68^...d085d65f8d)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.31)](https://buildkite.com/seantis/onegov-cloud)
+
+### Election-Day
+
+🎉 **Improves SMS sending performance**
+
+The main change is that we switch from requests to pycurl, which offers
+much better performance.
+
+**`Feature`** | **[c898172a68](https://github.com/onegov/onegov-cloud/commit/c898172a68938b12dea41f86b024cbc5f2d04d26)**
+
 ## Release `2019.30`
 
-> commits: **1 / [816a404e04...816a404e04](https://github.com/OneGov/onegov-cloud/compare/816a404e04^...816a404e04)**<br>
+> released: **2019-10-23 10:39**<br>
+> commits: **2 / [816a404e04...117b19eb79](https://github.com/OneGov/onegov-cloud/compare/816a404e04^...117b19eb79)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.30)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election-Day
