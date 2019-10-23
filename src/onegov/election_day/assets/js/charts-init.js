@@ -66,10 +66,14 @@ var initGroupedChart = function(el) {
     });
 };
 
+var python_to_bool = function(val) {
+    return val === "false" ? false : !!val;
+};
+
 var initEntitiesMap = function(el) {
     var mapurl = $(el).data('mapurl');
     var dataurl = $(el).data('dataurl');
-    var hidePercentages = $(el).data('hide-percentages');
+    var hidePercentages = python_to_bool($(el).data('hide-percentages'));
     $.ajax({ url: mapurl }).done(function(mapdata) {
         $.ajax({ url: dataurl }).done(function(data) {
             var canton = $(el).data('canton');
