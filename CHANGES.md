@@ -1,8 +1,22 @@
 # Changes
 
+## Release `2019.30`
+
+> commits: **1 / [816a404e04...816a404e04](https://github.com/OneGov/onegov-cloud/compare/816a404e04^...816a404e04)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.30)](https://buildkite.com/seantis/onegov-cloud)
+
+### Election-Day
+
+🎉 **Adds support of yml configuration to hide certain graphics or views**
+
+Adapts code to use configuration value to hide certain graphs and percentages according to the tenant's needs. This was implemented for views where a `skip_rendering` was introduced beforehand. Also adds a small fix for a sql window function expression.
+
+**`Feature`** | **[816a404e04](https://github.com/onegov/onegov-cloud/commit/816a404e0498bc810863c22a116b109969944b4d)**
+
 ## Release `2019.29`
 
-> commits: **14 / [d19e1fa2c6...76daca94a3](https://github.com/OneGov/onegov-cloud/compare/d19e1fa2c6^...76daca94a3)**<br>
+> released: **2019-10-23 10:16**<br>
+> commits: **15 / [d19e1fa2c6...714bb1a7da](https://github.com/OneGov/onegov-cloud/compare/d19e1fa2c6^...714bb1a7da)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.29)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Core
