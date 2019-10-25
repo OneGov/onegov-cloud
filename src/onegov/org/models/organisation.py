@@ -58,6 +58,7 @@ class Organisation(Base, TimestampMixin):
     event_locations = meta_property(default=list)
     geo_provider = meta_property(default='geo-mapbox')
     holiday_settings = meta_property(default=dict)
+    hide_onegov_footer = meta_property(default=False)
 
     # social media
     facebook_url = meta_property()

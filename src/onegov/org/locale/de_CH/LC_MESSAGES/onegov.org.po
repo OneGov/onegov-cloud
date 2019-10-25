@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-10-22 11:36+0200\n"
+"POT-Creation-Date: 2019-10-25 10:14+0200\n"
 "PO-Revision-Date: 2019-02-18 06:39+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -415,9 +415,6 @@ msgstr "Bild"
 
 msgid "Venue"
 msgstr "Veranstaltungsort"
-
-msgid "Castle garden"
-msgstr "Schlossgarten"
 
 msgid "10 CHF for adults"
 msgstr "10 CHF für Erwachsene"
@@ -839,6 +836,14 @@ msgstr "Öffnungszeiten Link"
 
 msgid "URL pointing to an opening hours page"
 msgstr "Link zur Öffnungszeiten Seite"
+
+msgid "Hide OneGov Cloud information"
+msgstr "OneGov Cloud Informationen verstecken"
+
+msgid ""
+"This includes the link to the marketing page, and the link to the privacy "
+"policy."
+msgstr "Dies beinhaltet den Link auf die Marketing Seite, sowie der Link zum Datenschutz."
 
 msgid "Facebook"
 msgstr "Facebook"
@@ -3873,6 +3878,9 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "Castle garden"
+#~ msgstr "Schlossgarten"
 
 #~ msgid "This site is hidden from the general public"
 #~ msgstr "Diese Seite ist nicht öffentlich."

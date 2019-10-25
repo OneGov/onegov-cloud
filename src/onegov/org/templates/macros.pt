@@ -136,14 +136,16 @@
 <metal:footer_links define-macro="footer_links" i18n:domain="onegov.org">
     <div class="row footer-links">
       <div class="small-12 columns">
-        <span>
-            <a href="https://www.onegovcloud.ch">OneGov Cloud</a>
-        </span>
-        <span>
-            <a href="https://www.onegovcloud.ch/datenschutz" i18n:translate>
-                Privacy Protection
-            </a>
-        </span>
+        <tal:b condition="not request.app.org.hide_onegov_footer|True">
+            <span>
+                <a href="https://www.onegovcloud.ch">OneGov Cloud</a>
+            </span>
+            <span>
+                <a href="https://www.onegovcloud.ch/datenschutz" i18n:translate>
+                    Privacy Protection
+                </a>
+            </span>
+        </tal:b>
         <span tal:define="about_url layout.org.meta.about_url|nothing" tal:condition="about_url">
             <a href="${about_url}" i18n:translate>
                 About

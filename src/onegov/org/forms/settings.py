@@ -12,7 +12,7 @@ from onegov.org.homepage_widgets import transform_homepage_structure
 from onegov.org.homepage_widgets import XML_LINE_OFFSET
 from onegov.org.theme import user_options
 from purl import URL
-from wtforms import StringField, TextAreaField, RadioField
+from wtforms import BooleanField, StringField, TextAreaField, RadioField
 from wtforms import ValidationError
 from wtforms import validators
 from wtforms.fields.html5 import EmailField, URLField
@@ -114,6 +114,15 @@ class FooterSettingsForm(Form):
         description=_("URL pointing to an opening hours page"),
         fieldset=_("Information"),
         render_kw={'class_': 'internal-url'})
+
+    hide_onegov_footer = BooleanField(
+        label=_("Hide OneGov Cloud information"),
+        description=_(
+            "This includes the link to the marketing page, and the link "
+            "to the privacy policy."
+        ),
+        fieldset=_("Information")
+    )
 
     facebook_url = URLField(
         label=_("Facebook"),
