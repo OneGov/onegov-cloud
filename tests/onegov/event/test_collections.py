@@ -790,7 +790,9 @@ def test_from_import(session):
                 source='import-1-A'
             ),
             image=None,
-            filename=None
+            image_filename=None,
+            pdf=None,
+            pdf_filename=None,
         ),
         EventImportItem(
             event=Event(
@@ -812,7 +814,9 @@ def test_from_import(session):
                 source='import-1-B'
             ),
             image=None,
-            filename=None
+            image_filename=None,
+            pdf=None,
+            pdf_filename=None,
         )
     ]) == (2, 0, 0)
 
@@ -837,7 +841,9 @@ def test_from_import(session):
                 source='import-2-C'
             ),
             image=None,
-            filename=None
+            image_filename=None,
+            pdf=None,
+            pdf_filename=None,
         )
 
     assert events.from_import(items()) == (1, 0, 0)
@@ -864,7 +870,9 @@ def test_from_import(session):
                 source='import-2-C'
             ),
             image=None,
-            filename=None
+            image_filename=None,
+            pdf=None,
+            pdf_filename=None,
         )
     ]) == (0, 0, 0)
 
@@ -890,7 +898,9 @@ def test_from_import(session):
                 source='import-1-A'
             ),
             image=None,
-            filename=None
+            image_filename=None,
+            pdf=None,
+            pdf_filename=None,
         )
     ], 'import-1') == (0, 1, 1)
     assert events.subset_count == 2
@@ -922,7 +932,9 @@ def test_from_import(session):
                 source='import-2-C'
             ),
             image=None,
-            filename=None
+            image_filename=None,
+            pdf=None,
+            pdf_filename=None,
         )
     ]) == (0, 0, 0)
     assert events.by_name('title-c').state == 'withdrawn'

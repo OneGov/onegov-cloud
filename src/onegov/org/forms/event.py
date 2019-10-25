@@ -87,6 +87,18 @@ class EventForm(Form):
         ]
     )
 
+    pdf = UploadFileWithORMSupport(
+        label=_("Additional Information (PDF)"),
+        file_class=EventFile,
+        validators=[
+            validators.Optional(),
+            WhitelistedMimeType({
+                'application/pdf',
+            }),
+            FileSizeLimit(1 * 1024 * 1024)
+        ]
+    )
+
     location = StringField(
         label=_("Venue"),
         description="Pilatusstrasse 3, 6000 Luzern",

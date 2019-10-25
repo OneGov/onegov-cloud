@@ -62,12 +62,25 @@ def clear(group_context):
     return _clear
 
 
-def download_image(image_url):
+def download_file(file_url, size_limit=1 * 1024 * 1024):
     buffer = BytesIO()
+    received = 0
+    cancelled = False
+
+    def guarded_write(data):
+        nonlocal received
+        received += len(data)
+
+        if received > size_limit:
+            nonlocal cancelled
+            cancelled = True
+            return 0
+
+        return buffer.write(data)
 
     c = pycurl.Curl()
-    c.setopt(c.URL, image_url)
-    c.setopt(c.WRITEDATA, buffer)
+    c.setopt(c.URL, file_url)
+    c.setopt(c.WRITEFUNCTION, guarded_write)
     c.setopt(c.FOLLOWLOCATION, True)
 
     try:
@@ -75,6 +88,12 @@ def download_image(image_url):
 
         if c.getinfo(c.RESPONSE_CODE) != 200:
             return None
+
+    except pycurl.error:
+        if cancelled:
+            return None
+
+        raise
 
     finally:
         c.close()
@@ -236,11 +255,21 @@ def import_json(group_context, url, tagmap, clear):
                 event.recurrence = recurrence
 
             if item['images']:
-                buffer = download_image(item['images'][0]['url'])
+                buffer = download_file(item['images'][0]['url'])
 
                 if buffer:
                     filename = item['images'][0]['name'] or 'event-image'
                     event.image = EventFile(
+                        name=filename,
+                        reference=as_fileintent(buffer, filename)
+                    )
+
+            if item['attachements']:
+                buffer = download_file(item['attachements'][0]['url'])
+
+                if buffer:
+                    filename = item['attachements'][0]['name'] or 'attachment'
+                    event.pdf = EventFile(
                         name=filename,
                         reference=as_fileintent(buffer, filename)
                     )
@@ -325,12 +354,22 @@ def import_guidle(group_context, url, tagmap):
                     unknown_tags |= unknown
 
                     image = None
-                    filename = None
+                    image_filename = None
+
+                    pdf = None
+                    pdf_filename = None
+
                     if isinstance(app, DepotApp):
-                        image_url = offer.image_url(size='original')
+                        image_url, image_filename = offer.image(
+                            size='original')
+
                         if image_url:
-                            image = download_image(image_url)
-                            filename = image_url.rsplit('/', 1)[-1]
+                            image = download_file(image_url)
+
+                        pdf_url, pdf_filename = offer.pdf()
+
+                        if pdf_url:
+                            pdf = download_file(pdf_url)
 
                     for index, schedule in enumerate(offer.schedules()):
                         event = Event(
@@ -357,7 +396,9 @@ def import_guidle(group_context, url, tagmap):
                         yield EventImportItem(
                             event=event,
                             image=image,
-                            filename=filename
+                            image_filename=image_filename,
+                            pdf=pdf,
+                            pdf_filename=pdf_filename
                         )
 
                     if image:
@@ -474,7 +515,18 @@ def fetch(group_context, source, tag, location):
                                 event_file(event.image.reference)
                                 if event.image else None
                             ),
-                            filename=event.image.name if event.image else None
+                            image_filename=(
+                                event.image.name
+                                if event.image else None
+                            ),
+                            pdf=(
+                                event_file(event.pdf.reference)
+                                if event.pdf else None
+                            ),
+                            pdf_filename=(
+                                event.pdf.name
+                                if event.pdf else None
+                            )
                         )
 
                 # be sure to switch back to the local schema, lest we

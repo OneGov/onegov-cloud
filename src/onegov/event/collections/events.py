@@ -19,7 +19,9 @@ from sqlalchemy import or_
 
 
 EventImportItem = namedtuple(
-    'EventImportItem', ('event', 'image', 'filename')
+    'EventImportItem', (
+        'event', 'image', 'image_filename', 'pdf', 'pdf_filename'
+    )
 )
 
 
@@ -224,13 +226,15 @@ class EventCollection(Pagination):
                     existing.coordinates = event.coordinates
                     existing.recurrence = event.recurrence
                     existing.state = state
-                    existing.set_image(item.image, item.filename)
+                    existing.set_image(item.image, item.image_filename)
+                    existing.set_pdf(item.pdf, item.pdf_filename)
 
             else:
                 added += 1
                 event.name = self._get_unique_name(event.title)
                 event.state = 'initiated'
-                event.set_image(item.image, item.filename)
+                event.set_image(item.image, item.image_filename)
+                event.set_pdf(item.pdf, item.pdf_filename)
                 self.session.add(event)
                 event.submit()
                 event.publish()
@@ -328,7 +332,9 @@ class EventCollection(Pagination):
                         source=f'ical-{uid}',
                     ),
                     image=None,
-                    filename=None
+                    image_filename=None,
+                    pdf=None,
+                    pdf_filename=None,
                 )
             )
 

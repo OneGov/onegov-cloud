@@ -832,6 +832,13 @@
             </dd>
         </tal:b>
 
+        <tal:b condition="event.pdf">
+            <dt i18n:translate>Additional Information</dt>
+            <dd>
+                <a href="${request.link(event.pdf)}">${event.pdf.name}</a>
+            </dd>
+        </tal:b>
+
         <dt i18n:translate>Location</dt>
         <dd>${event.location}</dd>
 

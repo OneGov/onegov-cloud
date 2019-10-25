@@ -25,6 +25,13 @@
                     <img src="${request.link(occurrence.event.image)}">
                 </div>
 
+                <div class="occurrence-pdf" tal:condition="occurrence.event.pdf">
+                    <dl>
+                        <dt i18n:translate>Additional Information</dt>
+                        <dd><a href="${request.link(occurrence.event.pdf)}">${occurrence.event.pdf.name}</a></dd>
+                    </dl>
+                </div>
+
                 <div class="occurrence-price" tal:condition="occurrence.event.price">
                     <dl>
                         <dt i18n:translate>Price</dt>

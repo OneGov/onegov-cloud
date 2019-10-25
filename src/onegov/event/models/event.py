@@ -87,25 +87,40 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
     recurrence = Column(Text, nullable=True)
 
     #: The associated image
-    image = associated(EventFile, 'image', 'one-to-one', uselist=False)
+    image = associated(
+        EventFile, 'image', 'one-to-one', uselist=False, backref_suffix='image'
+    )
+
+    #: The associated PDF
+    pdf = associated(
+        EventFile, 'pdf', 'one-to-one', uselist=False, backref_suffix='pdf'
+    )
 
     def set_image(self, content, filename=None):
-        """ Adds or removes the image. """
+        self.set_blob('image', content, filename)
+
+    def set_pdf(self, content, filename=None):
+        self.set_blob('pdf', content, filename)
+
+    def set_blob(self, blob, content, filename=None):
+        """ Adds or removes the given blob. """
 
         filename = filename or 'file'
-        if content:
-            if self.image:
-                self.image.reference = as_fileintent(content, filename)
-            else:
-                try:
-                    self.image = EventFile(
-                        name=filename,
-                        reference=as_fileintent(content, filename)
-                    )
-                except DecompressionBombError:
-                    self.image = None
+
+        if not content:
+            setattr(self, blob, None)
+
+        elif getattr(self, blob):
+            getattr(self, blob).reference = as_fileintent(content, filename)
+
         else:
-            self.image = None
+            try:
+                setattr(self, blob, EventFile(
+                    name=filename,
+                    reference=as_fileintent(content, filename)
+                ))
+            except DecompressionBombError:
+                setattr(self, blob, None)
 
     #: Occurences of the event
     occurrences = relationship(

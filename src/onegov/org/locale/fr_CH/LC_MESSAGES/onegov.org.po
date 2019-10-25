@@ -415,6 +415,9 @@ msgstr "Profitez d'un concerto dans le jardin du château."
 msgid "Image"
 msgstr "Image"
 
+msgid "Additional Information (PDF)"
+msgstr "Informations complémentaires (PDF)"
+
 msgid "Venue"
 msgstr "Lieu"
 
@@ -2040,6 +2043,9 @@ msgstr "Retiré"
 
 msgid "List Preview"
 msgstr "Aperçu de la liste"
+
+msgid "Additional Information"
+msgstr "Information additionnelle"
 
 msgid "Location"
 msgstr "Localisation"

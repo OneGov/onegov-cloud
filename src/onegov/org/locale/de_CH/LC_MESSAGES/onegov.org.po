@@ -413,6 +413,9 @@ msgstr "Freuen Sie sich auf ein klassisches Konzert im Schlossgarten."
 msgid "Image"
 msgstr "Bild"
 
+msgid "Additional Information (PDF)"
+msgstr "Zusätzliche Informationen (PDF)"
+
 msgid "Venue"
 msgstr "Veranstaltungsort"
 
@@ -2027,6 +2030,9 @@ msgstr "Zurückgezogen"
 
 msgid "List Preview"
 msgstr "Listen-Vorschau"
+
+msgid "Additional Information"
+msgstr "Zusätzliche Informationen"
 
 msgid "Location"
 msgstr "Ort"
@@ -3878,28 +3884,3 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
-
-#~ msgid "Castle garden"
-#~ msgstr "Schlossgarten"
-
-#~ msgid "This site is hidden from the general public"
-#~ msgstr "Diese Seite ist nicht öffentlich."
-
-#~ msgid ""
-#~ "This site is hidden from the general public. To show it to everyone, edit "
-#~ "this page and disable \"Hide from public\"."
-#~ msgstr ""
-#~ "Diese Seite ist nicht öffentlich. Bearbeiten Sie diese Seite und "
-#~ "entfernen Sie das Häkchen im Feld \"Vor der Öffentlichkeit verstecken\"."
-
-#~ msgid "Anyone that knows the url"
-#~ msgstr "Jedem der die URL kennt"
-
-#~ msgid "Accessible by"
-#~ msgstr "Aufrufbar von"
-
-#~ msgid "Anyone"
-#~ msgstr "Allen"
-
-#~ msgid "Hide from the public"
-#~ msgstr "Vor der Öffentlichkeit verstecken"
