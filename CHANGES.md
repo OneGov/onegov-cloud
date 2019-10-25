@@ -1,8 +1,32 @@
 # Changes
 
+## Release `2019.32`
+
+> commits: **4 / [5687e1683f...d0df6ac7e2](https://github.com/OneGov/onegov-cloud/compare/5687e1683f^...d0df6ac7e2)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.32)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Adds categories to the directories geojson**
+
+**`Feature`** | **[ZW-238](https://kanton-zug.atlassian.net/browse/ZW-238)** | **[ca890fb369](https://github.com/onegov/onegov-cloud/commit/ca890fb369ca9de8bad690c57eb03845b1a00230)**
+
+🎉 **Adds a setting to hide the OneGov Cloud footer.**
+
+This includes the marketing site and the privacy policy link.
+
+**`Feature`** | **[ZW-245](https://kanton-zug.atlassian.net/browse/ZW-245)** | **[f0c9b5e937](https://github.com/onegov/onegov-cloud/commit/f0c9b5e9370df2780707ea99972da583ca63ffed)**
+
+🎉 **Adds the ability to upload PDFs with events**
+
+This is useful to add things like flyers or other information.
+
+**`Feature`** | **[ZW-196](https://kanton-zug.atlassian.net/browse/ZW-196)** | **[d0df6ac7e2](https://github.com/onegov/onegov-cloud/commit/d0df6ac7e22c56815045f2067c679615ce8bd0af)**
+
 ## Release `2019.31`
 
-> commits: **3 / [c898172a68...d085d65f8d](https://github.com/OneGov/onegov-cloud/compare/c898172a68^...d085d65f8d)**<br>
+> released: **2019-10-23 14:12**<br>
+> commits: **4 / [c898172a68...5949739a67](https://github.com/OneGov/onegov-cloud/compare/c898172a68^...5949739a67)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.31)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election-Day
