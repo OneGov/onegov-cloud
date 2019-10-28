@@ -57,6 +57,12 @@ def create_fsi_app(request, use_elasticsearch):
         role='editor'
     ))
 
+    session.add(User(
+        username='member@example.org',
+        password_hash=test_password,
+        role='member'
+    ))
+
     transaction.commit()
     session.close_all()
 
