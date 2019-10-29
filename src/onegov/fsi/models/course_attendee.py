@@ -9,7 +9,7 @@ from sqlalchemy.orm import relationship, backref
 ATTENDEE_TITLES = ('mr', 'ms', 'none')
 
 
-class Attendee(Base):
+class CourseAttendee(Base):
 
     __tablename__ = 'fsi_attendees'
 

@@ -4,7 +4,7 @@ import pytest
 import transaction
 
 from onegov.core.crypto import hash_password
-from onegov.fsi.models.attendee import Attendee
+from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course import Course
 from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.reservation import Reservation
@@ -114,13 +114,13 @@ def placeholder(session):
     data = dict(
         first_name='F',
         last_name='L',
-        email='attendee@example.org',
+        email='placeholder@example.org',
         address='Address'
     )
-    attendee = session.query(Attendee).filter_by(
+    attendee = session.query(CourseAttendee).filter_by(
         email='placeholder@example.org').first()
     if not attendee:
-        attendee = Attendee(**data)
+        attendee = CourseAttendee(**data)
         session.add(attendee)
         session.flush()
     return attendee, data
@@ -128,7 +128,7 @@ def placeholder(session):
 
 @pytest.fixture(scope='function')
 def attendee(session, admin):
-    attendee = session.query(Attendee).filter_by(
+    attendee = session.query(CourseAttendee).filter_by(
         email='attendee@example.org').first()
     data = dict(
         first_name='F',
@@ -138,7 +138,7 @@ def attendee(session, admin):
         user_id=admin.id
     )
     if not attendee:
-        attendee = Attendee(**data)
+        attendee = CourseAttendee(**data)
         session.add(attendee)
         session.flush()
     return attendee, data
