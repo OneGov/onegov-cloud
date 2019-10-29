@@ -28,4 +28,7 @@ class Course(Base, TimestampMixin):
     user_id = Column(UUID, ForeignKey('users.id'), nullable=True)
 
     # Each course can have n events
-    events = relationship('CourseEvent')
+    events = relationship(
+        'CourseEvent',
+        cascade='all, delete-orphan',
+    )

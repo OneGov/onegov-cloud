@@ -61,7 +61,7 @@ def member(session, hashed_password):
         username='member@example.org').first()
     if not member:
         member = User(
-            username='admin@example.org',
+            username='member@example.org',
             password_hash=hashed_password,
             role='member'
         )
@@ -88,9 +88,8 @@ def course(session):
 
 @pytest.fixture(scope='function')
 def course_event(session, course):
-    course, data = course
     data = dict(
-        course_id=course.id,
+        course_id=course[0].id,
         name='Event',
         start=datetime.datetime(2019, 1, 1, 12, 0),
         end=datetime.datetime(2019, 1, 1, 14, 0),
@@ -142,6 +141,20 @@ def attendee(session, admin):
         session.add(attendee)
         session.flush()
     return attendee, data
+
+
+@pytest.fixture(scope='function')
+def db_mock_session(session,
+            course_event, course, member, attendee, placeholder):
+    # Create Reservations
+    res = Reservation(
+        attendee_id=attendee[0].id,
+        course_event_id=course_event[0].id)
+    res2 = Reservation(
+        attendee_id=placeholder[0].id,
+        course_event_id=course_event[0].id)
+    session.add_all([res, res2])
+    return session
 
 
 def create_fsi_app(request, use_elasticsearch, hashed_password):

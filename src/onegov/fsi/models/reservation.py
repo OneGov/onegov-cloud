@@ -15,8 +15,10 @@ reservation_table = Table(
 
 
 class Reservation(Base):
-    # __tablename__ = 'fsi_reservations'
     __table__ = reservation_table
+    __mapper_args__ = {
+        'confirm_deleted_rows': False
+    }
 
     # id = Column(UUID, primary_key=True, default=uuid4)
     #

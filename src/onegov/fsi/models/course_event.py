@@ -59,7 +59,8 @@ class CourseEvent(Base, TimestampMixin):
         backref=backref(
             'course_event',
         ),
-        lazy='dynamic'
+        lazy='dynamic',
+        cascade='all, delete-orphan',
     )
 
     @property

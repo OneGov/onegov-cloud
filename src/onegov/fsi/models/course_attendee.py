@@ -26,6 +26,11 @@ class CourseAttendee(Base):
 
     reservations = relationship(
         'Reservation',
-        backref=backref('attendee',),
-        lazy='dynamic')
+        backref='attendee',
+        lazy='dynamic',
+        cascade='all, delete-orphan')
+
+    @property
+    def course_events(self):
+        raise NotImplementedError
 
