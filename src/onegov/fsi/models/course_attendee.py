@@ -5,7 +5,6 @@ from onegov.core.orm.types import UUID
 from onegov.core.orm.mixins import meta_property
 from sqlalchemy.orm import relationship, backref
 
-
 ATTENDEE_TITLES = ('mr', 'ms', 'none')
 
 
@@ -26,7 +25,7 @@ class CourseAttendee(Base):
     meta = Column(JSON, nullable=True, default=dict)
 
     reservations = relationship(
-            'Reservation',
-            backref=backref(
-                'attendee',
-            ))
+        'Reservation',
+        backref=backref('attendee',),
+        lazy='dynamic')
+

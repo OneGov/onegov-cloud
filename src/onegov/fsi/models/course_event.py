@@ -51,14 +51,13 @@ class CourseEvent(Base, TimestampMixin):
         secondary=reservation_table,
         primaryjoin=id==reservation_table.c.course_event_id,
         secondaryjoin=reservation_table.c.attendee_id==CourseAttendee.id,
-        # backref='course_events',
         lazy='dynamic'
     )
 
     reservations = relationship(
         'Reservation',
         backref=backref(
-            'couse_event',
+            'course_event',
         ),
         lazy='dynamic'
     )
@@ -66,8 +65,3 @@ class CourseEvent(Base, TimestampMixin):
     @property
     def duration(self):
         return self.end - self.start
-
-    # @property
-    # def attendees(self):
-    #     session = object_session(self)
-    #
