@@ -6,6 +6,7 @@ import transaction
 from onegov.core.crypto import hash_password
 from onegov.fsi.models.attendee import Attendee
 from onegov.fsi.models.course import Course
+from onegov.fsi.models.course_event import CourseEvent
 from onegov.user import User
 from onegov.fsi import FsiApp
 from onegov.fsi.initial_content import create_new_organisation
@@ -39,7 +40,7 @@ def client_with_es(es_fsi_app):
 
 
 @pytest.fixture(scope='function')
-def admin(session):
+def admin(session, hashed_password):
     admin = session.query(User).filter_by(
         username='admin@example.org').first()
     if not admin:
@@ -54,7 +55,7 @@ def admin(session):
 
 
 @pytest.fixture(scope='function')
-def member(session):
+def member(session, hashed_password):
     member = session.query(User).filter_by(
         username='member@example.org').first()
     if not member:
@@ -85,36 +86,55 @@ def course(session):
 
 
 @pytest.fixture(scope='function')
+def course_event(session, course):
+    course, data = course
+    data = dict(
+        course_id=course.id,
+        start=datetime.datetime(2019, 1, 1, 12, 0),
+        end=datetime.datetime(2019, 1, 1, 14, 0),
+        presenter_name='Presenter',
+        presenter_company='Company'
+
+    )
+    course_event = CourseEvent(**data)
+    session.add(course_event)
+    session.flush()
+    return course_event, data
+
+
+@pytest.fixture(scope='function')
 def placeholder(session):
+    data = dict(
+        first_name='F',
+        last_name='L',
+        email='attendee@example.org',
+        address='Address'
+    )
     attendee = session.query(Attendee).filter_by(
-        username='placeholder@example.org').first()
+        email='placeholder@example.org').first()
     if not attendee:
-        attendee = Attendee(
-            first_name='F',
-            last_name='L',
-            email='attendee@example.org',
-            address='Address'
-        )
+        attendee = Attendee(**data)
         session.add(attendee)
         session.flush()
-    return attendee
+    return attendee, data
 
 
 @pytest.fixture(scope='function')
 def attendee(session, admin):
     attendee = session.query(Attendee).filter_by(
-        username='attendee@example.org').first()
+        email='attendee@example.org').first()
+    data = dict(
+        first_name='F',
+        last_name='L',
+        email='attendee@example.org',
+        address='Address',
+        user_id=admin.id
+    )
     if not attendee:
-        attendee = Attendee(
-            first_name='F',
-            last_name='L',
-            email='attendee@example.org',
-            address='Address',
-            user_id=admin.id
-        )
+        attendee = Attendee(**data)
         session.add(attendee)
         session.flush()
-    return attendee
+    return attendee, data
 
 
 def create_fsi_app(request, use_elasticsearch, hashed_password):
