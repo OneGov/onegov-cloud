@@ -2,7 +2,7 @@ from uuid import uuid4
 
 from sqlalchemy import Column, Boolean, Interval, ForeignKey, DateTime, \
     SmallInteger, Enum, Text
-from sqlalchemy.orm import object_session, relationship
+from sqlalchemy.orm import relationship, backref
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
@@ -50,6 +50,14 @@ class CourseEvent(Base, TimestampMixin):
         primaryjoin='foreign(Reservation.course_event_id)==CourseEvent.id',
         secondaryjoin='foreign(Reservation.attendee_id)==CourseAttendee.id',
         backref='course_events',
+        lazy='dynamic'
+    )
+
+    reservations = relationship(
+        'Reservation',
+        backref=backref(
+            'couse_event',
+        ),
         lazy='dynamic'
     )
 

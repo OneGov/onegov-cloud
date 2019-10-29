@@ -50,14 +50,18 @@ def test_course_event(session, course_event, placeholder):
     event, data = course_event
     for key, val in data.items():
         assert getattr(event, key) == val
-    assert event.attendees.all() == []
 
-    # # Add a participant via a reservation
-    # reservation = Reservation(
-    #     course_event_id=event.id, attendee_id=placeholder[0].id)
-    # session.add(reservation)
-    # session.flush()
-    # assert len(event.attendees) == 1
+    assert event.attendees.all() == []
+    assert event.reservations.all() == []
+
+    # Add a participant via a reservation
+    reservation = Reservation(
+        course_event_id=event.id, attendee_id=placeholder[0].id)
+    session.add(reservation)
+    session.flush()
+
+    assert event.reservations.count() == 1
+    # assert event.attendees.count() == 1
 
 
 
