@@ -1,6 +1,11 @@
+import datetime
+
 import pytest
 import transaction
 
+from onegov.core.crypto import hash_password
+from onegov.fsi.models.attendee import Attendee
+from onegov.fsi.models.course import Course
 from onegov.user import User
 from onegov.fsi import FsiApp
 from onegov.fsi.initial_content import create_new_organisation
@@ -8,14 +13,19 @@ from tests.shared.utils import create_app
 from tests.onegov.org.conftest import Client
 
 
-@pytest.yield_fixture(scope='function')
-def fsi_app(request):
-    yield create_fsi_app(request, use_elasticsearch=False)
+@pytest.fixture(scope='session')
+def hashed_password():
+    return hash_password('test_password')
 
 
 @pytest.yield_fixture(scope='function')
-def es_fsi_app(request):
-    yield create_fsi_app(request, use_elasticsearch=True)
+def fsi_app(request, hashed_password):
+    yield create_fsi_app(request, False, hashed_password)
+
+
+@pytest.yield_fixture(scope='function')
+def es_fsi_app(request, hashed_password):
+    yield create_fsi_app(request, True, hashed_password)
 
 
 @pytest.fixture(scope='function')
@@ -28,7 +38,86 @@ def client_with_es(es_fsi_app):
     return Client(es_fsi_app)
 
 
-def create_fsi_app(request, use_elasticsearch):
+@pytest.fixture(scope='function')
+def admin(session):
+    admin = session.query(User).filter_by(
+        username='admin@example.org').first()
+    if not admin:
+        admin = User(
+            username='admin@example.org',
+            password_hash=hashed_password,
+            role='admin'
+        )
+        session.add(admin)
+        session.flush()
+    return admin
+
+
+@pytest.fixture(scope='function')
+def member(session):
+    member = session.query(User).filter_by(
+        username='member@example.org').first()
+    if not member:
+        member = User(
+            username='admin@example.org',
+            password_hash=hashed_password,
+            role='member'
+        )
+        session.add(member)
+        session.flush()
+    return member
+
+
+@pytest.fixture(scope='function')
+def course(session):
+    data = dict(
+        description='Desc',
+        name='Course',
+        presenter_name='Pres',
+        presenter_company='Company',
+        mandatory_refresh=True,
+        refresh_interval=datetime.timedelta(days=30)
+    )
+    course = Course(**data)
+    session.add(course)
+    session.flush()
+    return course, data
+
+
+@pytest.fixture(scope='function')
+def placeholder(session):
+    attendee = session.query(Attendee).filter_by(
+        username='placeholder@example.org').first()
+    if not attendee:
+        attendee = Attendee(
+            first_name='F',
+            last_name='L',
+            email='attendee@example.org',
+            address='Address'
+        )
+        session.add(attendee)
+        session.flush()
+    return attendee
+
+
+@pytest.fixture(scope='function')
+def attendee(session, admin):
+    attendee = session.query(Attendee).filter_by(
+        username='attendee@example.org').first()
+    if not attendee:
+        attendee = Attendee(
+            first_name='F',
+            last_name='L',
+            email='attendee@example.org',
+            address='Address',
+            user_id=admin.id
+        )
+        session.add(attendee)
+        session.flush()
+    return attendee
+
+
+def create_fsi_app(request, use_elasticsearch, hashed_password):
 
     app = create_app(
         app_class=FsiApp,
@@ -44,22 +133,21 @@ def create_fsi_app(request, use_elasticsearch):
     # usually we don't want to create the users directly, anywhere else you
     # *need* to go through the UserCollection. Here however, we can improve
     # the test speed by not hashing the password for every test.
-    test_password = request.getfixturevalue('test_password')
 
     session.add(User(
         username='admin@example.org',
-        password_hash=test_password,
+        password_hash=hashed_password,
         role='admin'
     ))
     session.add(User(
         username='editor@example.org',
-        password_hash=test_password,
+        password_hash=hashed_password,
         role='editor'
     ))
 
     session.add(User(
         username='member@example.org',
-        password_hash=test_password,
+        password_hash=hashed_password,
         role='member'
     ))
 
