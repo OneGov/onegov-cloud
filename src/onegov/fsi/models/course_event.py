@@ -7,6 +7,8 @@ from sqlalchemy.orm import relationship, backref
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.fsi.models.course_attendee import CourseAttendee
+from onegov.fsi.models.reservation import reservation_table
 
 COURSE_EVENT_STATUSES = ('created', 'confirmed', 'canceled', 'planned')
 
@@ -45,11 +47,11 @@ class CourseEvent(Base, TimestampMixin):
         nullable=False, default='created')
 
     attendees = relationship(
-        'CourseAttendee',
-        secondary='join(CourseEvent, Reservation, CourseEvent.id == Reservation.id)',
-        primaryjoin='foreign(Reservation.course_event_id)==CourseEvent.id',
-        secondaryjoin='foreign(Reservation.attendee_id)==CourseAttendee.id',
-        backref='course_events',
+        CourseAttendee,
+        secondary=reservation_table,
+        primaryjoin=id==reservation_table.c.course_event_id,
+        secondaryjoin=reservation_table.c.attendee_id==CourseAttendee.id,
+        # backref='course_events',
         lazy='dynamic'
     )
 

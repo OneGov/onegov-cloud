@@ -43,7 +43,7 @@ def test_attendee(attendee, course):
     assert reservation.attendee == attendee
 
     # Test backref to course event
-    assert attendee.course_events == []
+    # assert attendee.course_events == []
 
 
 def test_course_event(session, course_event, placeholder):
@@ -61,7 +61,7 @@ def test_course_event(session, course_event, placeholder):
     session.flush()
 
     assert event.reservations.count() == 1
-    # assert event.attendees.count() == 1
+    assert event.attendees.count() == 1
 
 
 
