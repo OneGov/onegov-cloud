@@ -7,6 +7,7 @@ from onegov.core.crypto import hash_password
 from onegov.fsi.models.attendee import Attendee
 from onegov.fsi.models.course import Course
 from onegov.fsi.models.course_event import CourseEvent
+from onegov.fsi.models.reservation import Reservation
 from onegov.user import User
 from onegov.fsi import FsiApp
 from onegov.fsi.initial_content import create_new_organisation
@@ -90,6 +91,7 @@ def course_event(session, course):
     course, data = course
     data = dict(
         course_id=course.id,
+        name='Event',
         start=datetime.datetime(2019, 1, 1, 12, 0),
         end=datetime.datetime(2019, 1, 1, 14, 0),
         presenter_name='Presenter',
@@ -100,6 +102,11 @@ def course_event(session, course):
     session.add(course_event)
     session.flush()
     return course_event, data
+
+
+@pytest.fixture(scope='function')
+def proto_reservation(session):
+    return Reservation()
 
 
 @pytest.fixture(scope='function')

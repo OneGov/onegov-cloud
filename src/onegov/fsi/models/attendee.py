@@ -3,6 +3,8 @@ from sqlalchemy import Column, Text, ForeignKey, JSON, Enum
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
 from onegov.core.orm.mixins import meta_property
+from sqlalchemy.orm import relationship, backref
+
 
 ATTENDEE_TITLES = ('mr', 'ms', 'none')
 
@@ -22,3 +24,9 @@ class Attendee(Base):
     address = meta_property('address')
 
     meta = Column(JSON, nullable=True, default=dict)
+
+    reservations = relationship(
+            'Reservation',
+            backref=backref(
+                'attendee',
+            ))

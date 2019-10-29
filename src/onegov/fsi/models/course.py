@@ -1,10 +1,12 @@
 from uuid import uuid4
 
 from sqlalchemy import Column, Boolean, Interval, ForeignKey, Text
+from sqlalchemy.orm import relationship
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.fsi.models.reservation import Reservation
 
 
 class Course(Base, TimestampMixin):
@@ -27,3 +29,4 @@ class Course(Base, TimestampMixin):
 
     # Creator of this course
     user_id = Column(UUID, ForeignKey('users.id'), nullable=True)
+    reservations = relationship(Reservation, backref='course_item')
