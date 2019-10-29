@@ -144,8 +144,8 @@ def attendee(session, admin):
 
 
 @pytest.fixture(scope='function')
-def db_mock_session(session,
-            course_event, course, member, attendee, placeholder):
+def db_mock_session(
+        session, course_event, course, member, attendee, placeholder):
     # Create Reservations
     res = Reservation(
         attendee_id=attendee[0].id,
@@ -154,6 +154,7 @@ def db_mock_session(session,
         attendee_id=placeholder[0].id,
         course_event_id=course_event[0].id)
     session.add_all([res, res2])
+    session.flush()
     return session
 
 

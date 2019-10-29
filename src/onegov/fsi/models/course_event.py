@@ -49,8 +49,8 @@ class CourseEvent(Base, TimestampMixin):
     attendees = relationship(
         CourseAttendee,
         secondary=reservation_table,
-        primaryjoin=id==reservation_table.c.course_event_id,
-        secondaryjoin=reservation_table.c.attendee_id==CourseAttendee.id,
+        primaryjoin=id == reservation_table.c.course_event_id,
+        secondaryjoin=reservation_table.c.attendee_id == CourseAttendee.id,
         lazy='dynamic'
     )
 

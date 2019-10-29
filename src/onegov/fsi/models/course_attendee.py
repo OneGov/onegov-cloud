@@ -3,7 +3,7 @@ from sqlalchemy import Column, Text, ForeignKey, JSON, Enum
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
 from onegov.core.orm.mixins import meta_property
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 
 ATTENDEE_TITLES = ('mr', 'ms', 'none')
 
@@ -33,4 +33,3 @@ class CourseAttendee(Base):
     @property
     def course_events(self):
         raise NotImplementedError
-
