@@ -3,7 +3,7 @@
 always_hide_candidate_by_entity_chart_percentages = False
 always_hide_candidate_by_district_chart_percentages = False
 hide_connections_chart_intermediate_results = False
-hide_candidates_chart_intermediate_results = True
+hide_candidates_chart_intermediate_results = False
 
 
 def hide_candidates_chart(
