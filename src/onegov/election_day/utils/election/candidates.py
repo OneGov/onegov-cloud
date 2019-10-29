@@ -89,7 +89,8 @@ def get_candidates_data(election, request):
             {
                 'text': '{} {}'.format(candidate[0], candidate[1]),
                 'value': candidate[3],
-                'class': 'active' if candidate.elected else 'inactive'
+                'class': 'active' if candidate.elected and election.completed
+                else 'inactive'
             } for candidate in candidates
         ],
         'majority': majority,
