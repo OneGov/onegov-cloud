@@ -25,7 +25,7 @@ class Course(Base, TimestampMixin):
     # If the course has to be refreshed after some interval
     mandatory_refresh = Column(Boolean, nullable=False)
     # Refresh interval
-    refresh_interval = Column(Interval, nullable=False)
+    refresh_interval = Column(Interval, nullable=True)
 
     # Creator of this course
     user_id = Column(UUID, ForeignKey('users.id'), nullable=True)
