@@ -62,7 +62,14 @@ class CourseEvent(Base, TimestampMixin):
         lazy='dynamic',
         cascade='all, delete-orphan',
     )
+    # hides from member roles
+    hidden_from_public = Column(Boolean, nullable=False, default=False)
 
     @property
     def duration(self):
         return self.end - self.start
+
+    @property
+    def hidden(self):
+        # Add criteria when a course should be hidden based on status or attr
+        return self.hidden_from_public

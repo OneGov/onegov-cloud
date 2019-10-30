@@ -32,3 +32,9 @@ class Course(Base, TimestampMixin):
         'CourseEvent',
         cascade='all, delete-orphan',
     )
+
+    hidden_from_public = Column(Boolean, nullable=False, default=False)
+
+    @property
+    def hidden(self):
+        return self.hidden_from_public
