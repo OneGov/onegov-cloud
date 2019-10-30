@@ -1,21 +1,25 @@
 from datetime import datetime
+from uuid import uuid4
 
 from sqlalchemy import desc
 
 from onegov.core.collection import Pagination
+from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
+from onegov.fsi.models.reservation import Reservation
 
 
 class CourseEventCollection(Pagination):
 
-    def __init__(self, session,
-                 page=0,
-                 creator=None,
-                 course_id=None,
-                 from_date=None,
-                 upcoming_only=True,
-                 past_only=False
-                 ):
+    def __init__(
+            self, session,
+            page=0,
+            creator=None,
+            course_id=None,
+            from_date=None,
+            upcoming_only=True,
+            past_only=False
+         ):
         self.session = session
         self.page = page
         self.creator = creator      # to filter courses events of a creator
@@ -29,7 +33,11 @@ class CourseEventCollection(Pagination):
     def __eq__(self, other):
         return (self.page == other.page
                 and self.creator == other.creator
-                and self.from_date == other.from_date)
+                and self.course_id == other.course_id
+                and self.from_date == other.from_date
+                and self.upcoming_only == other.upcoming_only
+                and self.past_only == other.past_only
+                )
 
     def query(self):
         query = self.session.query(CourseEvent).order_by(
