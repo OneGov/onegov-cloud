@@ -8,18 +8,20 @@ from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.reservation import Reservation
 
 
-def test_course_1(session, course, attendee):
+def test_course_1(session, course, attendee, mock_data_course_event):
     course, data = course
-
+    mock = mock_data_course_event
     assert course.events.count() == 0
 
     # Add an event
     now = utcnow()
     tmr = now + datetime.timedelta(days=1)
     just_before = now - datetime.timedelta(minutes=2)
-    event = mixer.blend(CourseEvent, course_id=course.id, start=just_before)
-    event_now = mixer.blend(CourseEvent, course_id=course.id, start=now)
-    event_tmr = mixer.blend(CourseEvent, course_id=course.id, start=tmr)
+
+    event = CourseEvent(**mock(),
+                        start=just_before, end=now, course_id=course.id)
+    event_now = CourseEvent(**mock(), start=now, end=tmr, course_id=course.id)
+    event_tmr = CourseEvent(**mock(), start=tmr, end=tmr, course_id=course.id)
 
     course.events.append(event)
     course.events.append(event_now)

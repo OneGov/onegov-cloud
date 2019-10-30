@@ -158,6 +158,13 @@ def external_attendee(session, admin):
 
 
 @pytest.fixture(scope='function')
+def mock_data_course_event():
+    def _mock_data_course_event():
+        return dict(
+            name='A', presenter_name='P', presenter_company='C', id=uuid4())
+    return _mock_data_course_event
+
+@pytest.fixture(scope='function')
 def db_mock_session(
         session, course_event, course, attendee):
     placeholder = Reservation.as_placeholder(
