@@ -35,9 +35,8 @@ def test_course_1(session, course, attendee):
     assert course.upcoming_events == [event_now, event_tmr]
 
 
-def test_attendee_as_placeholder(placeholder):
-    assert placeholder[0].user_id is None
-    assert placeholder[0].auth_user is None
+def test_reservation_as_placeholder(placeholder):
+    assert placeholder[0].attendee_id is None
 
 
 def test_attendee(session, attendee, course_event, admin):
