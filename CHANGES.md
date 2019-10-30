@@ -1,8 +1,20 @@
 # Changes
 
+## Release `2019.34`
+
+> commits: **1 / [123b198a00...123b198a00](https://github.com/OneGov/onegov-cloud/compare/123b198a00^...123b198a00)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.34)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🐞 **Fixes news widget failing on certain sites.**
+
+**`Bugfix`** | **[123b198a00](https://github.com/onegov/onegov-cloud/commit/123b198a00533299575e019f37429893a6b3f058)**
+
 ## Release `2019.33`
 
-> commits: **5 / [0dc5b8fc9f...6a26e712dd](https://github.com/OneGov/onegov-cloud/compare/0dc5b8fc9f^...6a26e712dd)**<br>
+> released: **2019-10-30 09:56**<br>
+> commits: **6 / [0dc5b8fc9f...ac06bc140a](https://github.com/OneGov/onegov-cloud/compare/0dc5b8fc9f^...ac06bc140a)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.33)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election-Day
