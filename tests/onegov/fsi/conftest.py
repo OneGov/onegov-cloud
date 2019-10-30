@@ -120,6 +120,7 @@ def future_course_event(session, course):
     session.flush()
     return course_event, data
 
+
 @pytest.fixture(scope='function')
 def proto_reservation(session):
     return Reservation()
@@ -128,15 +129,13 @@ def proto_reservation(session):
 @pytest.fixture(scope='function')
 def placeholder(session):
     data = dict(
-        first_name='F',
-        last_name='L',
         email='placeholder@example.org',
-        address='Address'
     )
     attendee = session.query(CourseAttendee).filter_by(
         email='placeholder@example.org').first()
     if not attendee:
-        attendee = CourseAttendee(**data)
+        attendee = CourseAttendee.as_placeholder(
+            'Placeholder', email=data['email'])
         session.add(attendee)
         session.flush()
     return attendee, data

@@ -57,3 +57,8 @@ class CourseAttendee(Base):
         result = result.filter(Reservation.event_completed==True)
         result = result.filter(Course.mandatory_refresh==True)
         return result
+
+    @classmethod
+    def as_placeholder(cls, dummy_desc, **kwargs):
+        return cls(dummy_desc=dummy_desc, **kwargs)
+
