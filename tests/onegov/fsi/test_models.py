@@ -10,8 +10,6 @@ from onegov.fsi.models.reservation import Reservation
 
 def test_course_1(session, course, attendee):
     course, data = course
-    for key, val in data.items():
-        assert getattr(course, key) == val
 
     assert course.events.count() == 0
 
@@ -41,8 +39,6 @@ def test_reservation_as_placeholder():
 
 def test_attendee(session, attendee, course_event, admin):
     attendee, data = attendee
-    for key, val in data.items():
-        assert getattr(attendee, key) == val
     assert attendee.reservations.count() == 0
 
     assert attendee.auth_user == admin
@@ -90,27 +86,18 @@ def test_attendee_upcoming_courses(
 
 def test_course_event_1(session, course_event, course, attendee):
     event, data = course_event
-    for key, val in data.items():
-        assert getattr(event, key) == val
 
     assert event.attendees.count() == 0
     assert event.reservations.count() == 0
-    # assert event.course == course[0]
+    assert event.course == course[0]
 
     # Add a participant via a reservation
-    reservation = Reservation(
-        course_event_id=event.id, attendee_id=attendee[0].id)
-    session.add(reservation)
+    session.add_all((
+        Reservation.as_placeholder('Placeholder', course_event_id=event.id),
+        Reservation(course_event_id=event.id, attendee_id=attendee[0].id)
+    ))
     session.flush()
 
-    assert event.reservations.count() == 1
-    assert event.attendees.count() == 1
-
-    # Add a placeholder
-    placeholder = Reservation.as_placeholder('Placeholder')
-    placeholder.course_event_id = event.id
-    session.add(placeholder)
-    session.flush()
     assert event.reservations.count() == 2
     assert event.attendees.count() == 1
 
