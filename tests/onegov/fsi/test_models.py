@@ -115,6 +115,7 @@ def test_reservation(session, attendee, course_event):
     # Test backrefs
     assert res.course_event == course_event[0]
     assert res.attendee == attendee[0]
+    assert str(res) == 'L, F'
 
 
 def test_cascading_course_deletion(db_mock_session):

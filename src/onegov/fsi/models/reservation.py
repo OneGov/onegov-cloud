@@ -21,7 +21,7 @@ class Reservation(Base):
     This table is defined in a way such that i can be used for a secondary
     join in CourseEvent.attendees.
 
-    course_event_id is Null if its a placeholder reservation.
+    attendee_id is Null if its a placeholder reservation.
 
     """
     __table__ = reservation_table
@@ -38,4 +38,6 @@ class Reservation(Base):
         return cls(dummy_desc=dummy_desc, **kwargs)
 
     def __str__(self):
-        return f'{self.dummy_desc}'
+        if self.is_placeholder:
+            return f'{self.dummy_desc or ""}'
+        return f'{self.attendee.last_name}, {self.attendee.first_name}'
