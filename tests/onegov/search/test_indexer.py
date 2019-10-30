@@ -542,24 +542,24 @@ def test_indexer_process(es_client):
     es_client.indices.refresh(index=index)
 
     search = es_client.search(index=index)
-    assert search['hits']['total'] == 1
+    assert search['hits']['total']['value'] == 1
     assert search['hits']['hits'][0]['_id'] == '1'
     assert search['hits']['hits'][0]['_source'] == {
         'title': 'Go ahead and jump',
         'es_public': True
     }
-    assert search['hits']['hits'][0]['_type'] == 'page'
+    assert search['hits']['hits'][0]['_type'] == '_doc'
 
     # check if the analyzer was applied correctly (stopword removal)
     search = es_client.search(
         index=index, body={'query': {'match': {'title': 'and'}}})
 
-    assert search['hits']['total'] == 0
+    assert search['hits']['total']['value'] == 0
 
     search = es_client.search(
         index=index, body={'query': {'match': {'title': 'go jump'}}})
 
-    assert search['hits']['total'] == 1
+    assert search['hits']['total']['value'] == 1
 
     # delete the document again
     indexer.queue.put({
@@ -574,7 +574,7 @@ def test_indexer_process(es_client):
     es_client.indices.refresh(index=index)
 
     es_client.search(index=index)
-    assert search['hits']['total'] == 1
+    assert search['hits']['total']['value'] == 1
 
 
 def test_extra_analyzers(es_client):
@@ -640,22 +640,22 @@ def test_tags(es_client):
     es_client.indices.refresh(index=index)
     search = es_client.search(index=index)
 
-    assert search['hits']['total'] == 1
+    assert search['hits']['total']['value'] == 1
 
     search = es_client.search(
         index=index, body={'query': {'match': {'tags': 'foo'}}})
 
-    assert search['hits']['total'] == 1
+    assert search['hits']['total']['value'] == 1
 
     search = es_client.search(
         index=index, body={'query': {'match': {'tags': 'bar'}}})
 
-    assert search['hits']['total'] == 1
+    assert search['hits']['total']['value'] == 1
 
     search = es_client.search(
         index=index, body={'query': {'match': {'tags': 'bad'}}})
 
-    assert search['hits']['total'] == 0
+    assert search['hits']['total']['value'] == 0
 
 
 def test_elasticsearch_outage(es_client, es_url):
@@ -708,10 +708,12 @@ def test_elasticsearch_outage(es_client, es_url):
     indexer.es_client.transport.perform_request = original
 
     indexer.es_client.indices.refresh(index='_all')
-    assert indexer.es_client.search(index='_all')['hits']['total'] == 0
+    assert indexer.es_client\
+        .search(index='_all')['hits']['total']['value'] == 0
 
     assert indexer.process() == 2
     assert indexer.failed_task is None
 
     indexer.es_client.indices.refresh(index='_all')
-    assert indexer.es_client.search(index='_all')['hits']['total'] == 2
+    assert indexer.es_client\
+        .search(index='_all')['hits']['total']['value'] == 2

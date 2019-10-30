@@ -17,6 +17,9 @@ install-packages \
     libc-dev \
     chromium-browser
 
+# configure JAVA_HOME
+export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
+
 # work around https://github.com/SergeyPirogov/webdriver_manager/issues/73
 ln -s /usr/bin/chromium-browser /usr/bin/google-chrome
 

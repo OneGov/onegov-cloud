@@ -240,7 +240,7 @@ def temporary_path(temporary_directory):
 
 @pytest.fixture(scope="session")
 def es_default_version():
-    return '6.8.2'
+    return '7.4.1'
 
 
 @pytest.fixture(scope="session")
@@ -250,7 +250,7 @@ def es_version(es_default_version):
 
 @pytest.fixture(scope="session")
 def es_archive(es_version):
-    archive = f'elasticsearch-{es_version}.tar.gz'
+    archive = f'elasticsearch-{es_version}-linux-x86_64.tar.gz'
     archive_path = f'/tmp/{archive}'
 
     if not os.path.exists(archive_path):
@@ -286,6 +286,10 @@ def es_process(es_binary, es_version):
     port = port_for.select_random()
     pid = es_binary + '.pid'
 
+    # if JAVA_HOME is not defined, try to find it
+    if 'JAVA_HOME' not in os.environ:
+        os.environ['JAVA_HOME'] = guess_java_home_or_fail()
+
     # use a different garbage collector for better performance
     os.environ['ES_JAVA_OPTS'] = \
         '-Xms1g -Xmx1g -XX:-UseConcMarkSweepGC -XX:+UseG1GC'
@@ -294,6 +298,7 @@ def es_process(es_binary, es_version):
         f"{es_binary} -p {pid} -E http.port={port} "
         f"-E xpack.monitoring.enabled=false "
         f"-E xpack.monitoring.collection.enabled=false "
+        f"-E xpack.ml.enabled=false "
         f"> /dev/null"
     )
 
@@ -306,6 +311,18 @@ def es_process(es_binary, es_version):
 
     executor.stop()
     executor.kill()
+
+
+def guess_java_home_or_fail():
+    if os.path.exists('/usr/libexec/java_home'):
+        result = subprocess.run('/usr/libexec/java_home', capture_output=True)
+
+        if result.returncode != 0:
+            raise RuntimeError(f'/usr/libexec/java_home failed')
+
+        return result.stdout.decode('utf-8').strip()
+
+    raise RuntimeError("Could not find JAVA_HOME, please set it manually")
 
 
 @pytest.fixture(scope="function")
