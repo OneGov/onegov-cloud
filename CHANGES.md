@@ -1,8 +1,29 @@
 # Changes
 
+## Release `2019.33`
+
+> commits: **5 / [0dc5b8fc9f...6a26e712dd](https://github.com/OneGov/onegov-cloud/compare/0dc5b8fc9f^...6a26e712dd)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.33)](https://buildkite.com/seantis/onegov-cloud)
+
+### Election-Day
+
+🎉 **Enabls hiding of percentage in candidate-by-district**
+
+**`Feature`** | **[0dc5b8fc9f](https://github.com/onegov/onegov-cloud/commit/0dc5b8fc9f8d2c8f18a91c7de81b9bb214bd2464)**
+
+### Search
+
+✨ **Switch to Elasticsearch 7.x**
+
+This doesn't come with any new features, it just uses the latest
+Elasticsearch release to stay up to date.
+
+**`Other`** | **[6a26e712dd](https://github.com/onegov/onegov-cloud/commit/6a26e712dd5bcbc39f90d01902017faf286fed68)**
+
 ## Release `2019.32`
 
-> commits: **4 / [5687e1683f...d0df6ac7e2](https://github.com/OneGov/onegov-cloud/compare/5687e1683f^...d0df6ac7e2)**<br>
+> released: **2019-10-25 11:52**<br>
+> commits: **5 / [5687e1683f...2ded9d9fd7](https://github.com/OneGov/onegov-cloud/compare/5687e1683f^...2ded9d9fd7)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.32)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
