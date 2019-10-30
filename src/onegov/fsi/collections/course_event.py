@@ -17,7 +17,7 @@ class CourseEventCollection(Pagination):
             from_date=None,
             upcoming_only=True,
             past_only=False
-         ):
+    ):
         self.session = session
         self.page = page
         self.creator = creator      # to filter courses events of a creator

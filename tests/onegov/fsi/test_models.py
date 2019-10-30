@@ -1,6 +1,5 @@
 import datetime
 
-from mixer.backend.sqlalchemy import mixer
 from sedate import utcnow
 
 from onegov.fsi.models.course import Course

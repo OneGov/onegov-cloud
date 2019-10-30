@@ -1,7 +1,7 @@
 from uuid import uuid4
 
-from sqlalchemy import Column, Boolean, Interval, ForeignKey, DateTime, \
-    SmallInteger, Enum, Text
+from sqlalchemy import Column, Boolean, ForeignKey, DateTime, SmallInteger, \
+    Enum, Text
 from sqlalchemy.orm import relationship, backref
 
 from onegov.core.orm import Base
@@ -52,6 +52,7 @@ class CourseEvent(Base, TimestampMixin):
         'Reservation',
         backref=backref(
             'course_event',
+            lazy='joined'
         ),
         lazy='dynamic',
         cascade='all, delete-orphan',

@@ -164,6 +164,7 @@ def mock_data_course_event():
             name='A', presenter_name='P', presenter_company='C', id=uuid4())
     return _mock_data_course_event
 
+
 @pytest.fixture(scope='function')
 def db_mock_session(
         session, course_event, course, attendee):
