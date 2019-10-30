@@ -56,6 +56,9 @@ class CourseEvent(Base, TimestampMixin):
         lazy='dynamic',
         cascade='all, delete-orphan',
     )
+
+    course = relationship('Course', lazy='joined')
+
     # hides from member roles
     hidden_from_public = Column(Boolean, nullable=False, default=False)
 
