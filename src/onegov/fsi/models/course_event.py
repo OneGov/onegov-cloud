@@ -77,3 +77,10 @@ class CourseEvent(Base, TimestampMixin):
         if self.max_attendees:
             return self.max_attendees - self.reservations.count()
         return None
+
+    def send_reminder_mail(self):
+        # use self.attendees to get a list of emails
+        raise NotImplementedError
+
+    def cancel_reservation(self, reservation):
+        self.reservations.remove(reservation)

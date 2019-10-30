@@ -93,8 +93,10 @@ def test_course_event_1(session, course_event, course, attendee):
     assert event.course == course[0]
 
     # Add a participant via a reservation
+    placeholder = Reservation.as_placeholder(
+        'Placeholder', course_event_id=event.id)
     session.add_all((
-        Reservation.as_placeholder('Placeholder', course_event_id=event.id),
+        placeholder,
         Reservation(course_event_id=event.id, attendee_id=attendee[0].id)
     ))
     session.flush()
@@ -102,6 +104,10 @@ def test_course_event_1(session, course_event, course, attendee):
     assert event.reservations.count() == 2
     assert event.attendees.count() == 1
     assert event.available_seats == 20 - 2
+
+    # Test cancel reservation
+    event.cancel_reservation(placeholder)
+    assert event.reservations.count() == 1
 
 
 def test_reservation(session, attendee, course_event):

@@ -54,3 +54,7 @@ class Course(Base, TimestampMixin):
             CourseEvent.start > utcnow()).order_by(
             CourseEvent.start
         ).first()
+
+    def send_invitation_mails(self, recipients):
+        # use self.events to send a user the links to possible events
+        raise NotImplementedError
