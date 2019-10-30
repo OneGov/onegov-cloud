@@ -5,6 +5,8 @@ from onegov.core.orm.types import UUID
 from onegov.core.orm.mixins import meta_property
 from sqlalchemy.orm import relationship, object_session
 
+from onegov.user import User
+
 ATTENDEE_TITLES = ('mr', 'ms', 'none')
 
 
@@ -35,6 +37,14 @@ class CourseAttendee(Base):
         backref='attendee',
         lazy='dynamic',
         cascade='all, delete-orphan')
+
+    @property
+    def auth_user(self):
+        """Get the onegov.user.User behind the attendee"""
+        if not self.user_id:
+            return None
+        return object_session(self).query(User).filter_by(
+            id=self.user_id).one()
 
     @property
     def course_events(self):

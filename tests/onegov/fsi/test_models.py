@@ -35,11 +35,18 @@ def test_course_1(session, course, attendee):
     assert course.upcoming_events == [event_now, event_tmr]
 
 
-def test_attendee(session, attendee, course_event):
+def test_attendee_as_placeholder(placeholder):
+    assert placeholder[0].user_id is None
+    assert placeholder[0].auth_user is None
+
+
+def test_attendee(session, attendee, course_event, admin):
     attendee, data = attendee
     for key, val in data.items():
         assert getattr(attendee, key) == val
     assert attendee.reservations.count() == 0
+
+    assert attendee.auth_user == admin
 
     # Add a reservation
     reservation = Reservation(
