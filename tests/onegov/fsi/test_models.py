@@ -89,13 +89,14 @@ def test_attendee_upcoming_courses(
     assert not attendee[0].upcoming_courses().count() == 1
 
 
-def test_course_event(session, course_event, placeholder):
+def test_course_event_1(session, course_event, placeholder, course):
     event, data = course_event
     for key, val in data.items():
         assert getattr(event, key) == val
 
     assert event.attendees.all() == []
     assert event.reservations.all() == []
+    assert event.course == course[0]
 
     # Add a participant via a reservation
     reservation = Reservation(

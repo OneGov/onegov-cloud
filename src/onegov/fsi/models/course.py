@@ -34,7 +34,8 @@ class Course(Base, TimestampMixin):
     events = relationship(
         'CourseEvent',
         cascade='all, delete-orphan',
-        lazy='dynamic'
+        lazy='dynamic',
+        backref='course'
     )
 
     upcoming_events = relationship(
