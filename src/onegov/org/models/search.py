@@ -106,7 +106,7 @@ class Search(Pagination):
 
     @cached_property
     def subset_count(self):
-        return self.cached_subset and self.cached_subset.hits.total or 0
+        return self.cached_subset and self.cached_subset.hits.total.value or 0
 
     def suggestions(self):
         return tuple(self.request.app.es_suggestions_by_request(

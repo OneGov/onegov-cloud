@@ -106,20 +106,23 @@ def test_search_query(es_url, postgres_dsn):
     app.es_indexer.process()
     app.es_client.indices.refresh(index='_all')
 
-    assert app.es_search().execute().hits.total == 2
-    assert app.es_search(include_private=True).execute().hits.total == 4
+    assert app.es_search().execute().hits.total.value == 2
+    assert app.es_search(include_private=True)\
+        .execute().hits.total.value == 4
 
     result = app.es_search(languages=['en']).execute()
-    assert result.hits.total == 1
+    assert result.hits.total.value == 1
 
     result = app.es_search(languages=['de'], include_private=True).execute()
-    assert result.hits.total == 2
+    assert result.hits.total.value == 2
 
     search = app.es_search(languages=['de'])
-    assert search.query('match', body='Dokumente').execute().hits.total == 1
+    assert search.query('match', body='Dokumente')\
+        .execute().hits.total.value == 1
 
     search = app.es_search(languages=['de'], include_private=True)
-    assert search.query('match', body='Dokumente').execute().hits.total == 2
+    assert search.query('match', body='Dokumente')\
+        .execute().hits.total.value == 2
 
     # test result loading in one query
     result = app.es_search(languages=['de'], include_private=True).execute()
@@ -258,33 +261,33 @@ def test_orm_integration(es_url, postgres_dsn, redis_url):
     client.get('/new?id=3&title=Terms&body=Stuff we pay lawyers for')
 
     documents = client.get('/').json
-    assert documents['hits']['total'] == 3
+    assert documents['hits']['total']['value'] == 3
 
     documents = client.get('/?q=stuff').json
-    assert documents['hits']['total'] == 2
+    assert documents['hits']['total']['value'] == 2
 
     documents = client.get('/?q=company').json
-    assert documents['hits']['total'] == 1
+    assert documents['hits']['total']['value'] == 1
 
     # %23 = #
     documents = client.get('/?q=%23company').json
-    assert documents['hits']['total'] == 1
+    assert documents['hits']['total']['value'] == 1
 
     documents = client.get('/?q=%23companx').json
-    assert documents['hits']['total'] == 0
+    assert documents['hits']['total']['value'] == 0
 
     client.get('/delete?id=3')
 
     documents = client.get('/?q=stuff').json
-    assert documents['hits']['total'] == 1
+    assert documents['hits']['total']['value'] == 1
 
     client.get('/update?id=2&title=About&body=We are a business')
 
     documents = client.get('/?q=company').json
-    assert documents['hits']['total'] == 0
+    assert documents['hits']['total']['value'] == 0
 
     documents = client.get('/?q=business').json
-    assert documents['hits']['total'] == 1
+    assert documents['hits']['total']['value'] == 1
 
 
 def test_alternate_id_property(es_url, postgres_dsn):

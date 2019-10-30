@@ -230,7 +230,6 @@ class Indexer(object):
                     yield {
                         '_op_type': 'index',
                         '_index': self.ensure_index(task),
-                        '_type': task['type_name'],
                         '_id': task['id'],
                         'doc': task['properties']
                     }
@@ -238,7 +237,6 @@ class Indexer(object):
                     yield {
                         '_op_type': 'delete',
                         '_index': self.ensure_index(task),
-                        '_type': task['type_name'],
                         '_id': task['id'],
                         'doc': task['properties']
                     }
@@ -274,7 +272,6 @@ class Indexer(object):
 
         self.es_client.index(
             index=index,
-            doc_type=task['type_name'],
             id=task['id'],
             body=task['properties']
         )
@@ -303,7 +300,6 @@ class Indexer(object):
                 try:
                     self.es_client.delete(
                         index=internal,
-                        doc_type=type,
                         id=task['id']
                     )
                 except NotFoundError:
@@ -516,7 +512,7 @@ class IndexManager(object):
         # create the index
         self.es_client.indices.create(internal, body={
             'mappings': {
-                mapping.name: {'properties': mapping.for_language(language)}
+                'properties': mapping.for_language(language)
             },
             'settings': {
                 'analysis': ANALYSIS_CONFIG,

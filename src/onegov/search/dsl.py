@@ -3,6 +3,10 @@ from elasticsearch_dsl.response import Hit as BaseHit
 from elasticsearch_dsl.response import Response as BaseResponse
 
 
+def type_from_hit(hit):
+    return hit.meta.index.split('-')[-2]
+
+
 class Search(BaseSearch):
     """ Extends elastichsearch_dsl's search object with ORM integration.
 
@@ -20,21 +24,6 @@ class Search(BaseSearch):
 
         super().__init__(*args, **kwargs)
 
-        assert not self._doc_type_map
-
-        # use the mappings to build the doc type map which elasticsearch_dsl
-        # uses for their own models - since we don't use them, we can hijack
-        # that map. When cloning, this map will be cloned as well.
-        if self.mappings:
-            for mapping in self.mappings:
-                if not mapping.model:
-                    continue
-
-                if mapping.name not in self._doc_type_map:
-                    self._doc_type_map[mapping.name] = Hit.bind(
-                        mapping.model, self.session
-                    )
-
         # bind responses to the orm
         self._response_class = Response.bind(
             self.session, self.mappings, self.explain)
@@ -49,6 +38,15 @@ class Search(BaseSearch):
         search.mappings = self.mappings
 
         return search
+
+    def _get_result(self, *args, **kwargs):
+        result = super()._get_result(*args, **kwargs)
+        result.__class__ = Hit.bind(
+            session=self.session,
+            model=self.mappings[type_from_hit(result)].model
+        )
+
+        return result
 
 
 class Response(BaseResponse):
@@ -71,7 +69,7 @@ class Response(BaseResponse):
 
     def hits_by_type(self, type):
         for hit in self.hits:
-            if hit.meta.doc_type == type:
+            if type_from_hit(hit) == type:
                 yield hit
 
     def query(self, type):
@@ -109,7 +107,7 @@ class Response(BaseResponse):
 
         # put the types into buckets and store the original position...
         for ix, hit in enumerate(self.hits):
-            type = hit.meta.doc_type
+            type = type_from_hit(hit)
             positions[(type, str(hit.meta.id))] = ix
             types.add(type)
 
@@ -118,7 +116,7 @@ class Response(BaseResponse):
         # ...so we can query the database once per type and not once per result
         # this has the potential of resulting in fewer queries
         for type in types:
-            for result in self.query(type).all():
+            for result in self.query(type):
                 object_id = str(getattr(result, result.es_id))
                 ix = positions[(type, object_id)]
 
