@@ -171,6 +171,7 @@ setup(
             'freezegun',
             'lxml',
             'mirakuru',
+            'mixer',
             'mock',
             'more.itsdangerous',
             'morepath',
