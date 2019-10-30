@@ -127,18 +127,18 @@ def proto_reservation(session):
 
 
 @pytest.fixture(scope='function')
-def placeholder(session):
+def placeholder(session, course_event):
     data = dict(
         email='placeholder@example.org',
     )
-    attendee = session.query(CourseAttendee).filter_by(
-        email='placeholder@example.org').first()
-    if not attendee:
-        attendee = CourseAttendee.as_placeholder(
-            'Placeholder', email=data['email'])
-        session.add(attendee)
+    reservation = session.query(Reservation).filter_by(
+        dummy_desc='Placeholder').first()
+    if not reservation:
+        reservation = Reservation.as_placeholder(
+            'Placeholder', course_event_id=course_event[0].id)
+        session.add(reservation)
         session.flush()
-    return attendee, data
+    return reservation, data
 
 
 @pytest.fixture(scope='function')
