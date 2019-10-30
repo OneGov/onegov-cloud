@@ -96,7 +96,8 @@ def course_event(session, course):
         start=datetime.datetime(2019, 1, 1, 12, 0),
         end=datetime.datetime(2019, 1, 1, 14, 0),
         presenter_name='Presenter',
-        presenter_company='Company'
+        presenter_company='Company',
+        max_attendees=20
 
     )
     course_event = CourseEvent(**data)

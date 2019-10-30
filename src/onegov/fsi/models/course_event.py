@@ -71,3 +71,9 @@ class CourseEvent(Base, TimestampMixin):
     def hidden(self):
         # Add criteria when a course should be hidden based on status or attr
         return self.hidden_from_public
+
+    @property
+    def available_seats(self):
+        if self.max_attendees:
+            return self.max_attendees - self.reservations.count()
+        return None

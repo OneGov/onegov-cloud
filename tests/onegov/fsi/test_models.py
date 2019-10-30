@@ -101,6 +101,7 @@ def test_course_event_1(session, course_event, course, attendee):
 
     assert event.reservations.count() == 2
     assert event.attendees.count() == 1
+    assert event.available_seats == 20 - 2
 
 
 def test_reservation(session, attendee, course_event):
