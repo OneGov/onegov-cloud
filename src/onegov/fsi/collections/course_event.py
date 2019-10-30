@@ -70,3 +70,14 @@ class CourseEventCollection(Pagination):
             upcoming_only=self.upcoming_only,
             past_only=self.past_only,
         )
+
+    def add_placeholder(self, title, course_event):
+        assert isinstance(course_event, CourseEvent)
+        placeholder = CourseAttendee.as_placeholder(
+            dummy_desc=title, id=uuid4())
+        self.session.add(placeholder)
+        self.session.add(
+            Reservation(
+                attendee_id=placeholder.id,
+                course_event_id=course_event.id))
+        self.session.flush()

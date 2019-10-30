@@ -54,9 +54,9 @@ def test_course_event_collection(session, course):
     session.add_all(new_course_events)
     session.flush()
 
-    collection = CourseEventCollection(session)
-    collection_attr_eq_test(collection, collection.page_by_index(1))
-    result = collection.query()
+    event_coll = CourseEventCollection(session)
+    collection_attr_eq_test(event_coll, event_coll.page_by_index(1))
+    result = event_coll.query()
 
     # Should return upcoming events by default
     assert result.count() == 2
@@ -65,21 +65,29 @@ def test_course_event_collection(session, course):
     assert result[0].created > result[1].created
 
     # Test all results
-    collection = CourseEventCollection(session, upcoming_only=False)
-    assert collection.query().count() == 3
+    event_coll = CourseEventCollection(session, upcoming_only=False)
+    assert event_coll.query().count() == 3
 
     # Test filtering with wrong course id
-    collection = CourseEventCollection(session, course_id=uuid4())
-    assert collection.query().count() == 0
+    event_coll = CourseEventCollection(session, course_id=uuid4())
+    assert event_coll.query().count() == 0
 
     # Test all past events
-    collection = CourseEventCollection(session, past_only=True)
-    assert collection.query().count() == 1
+    event_coll = CourseEventCollection(session, past_only=True)
+    assert event_coll.query().count() == 1
 
     # Test from specific date
     tmr = now + datetime.timedelta(days=1)
-    collection = CourseEventCollection(session, from_date=tmr)
-    assert collection.query().count() == 1
+    event_coll = CourseEventCollection(session, from_date=tmr)
+    assert event_coll.query().count() == 1
+
+
+def test_event_collection_add_placeholder(session, course_event):
+    # Test add_placeholder method
+    event_coll = CourseEventCollection(session)
+    event_coll.add_placeholder('Placeholder', course_event[0])
+    # Tests the secondary join event.attendees as well
+    assert course_event[0].attendees.count() == 1
 
 
 def test_attendee_collection(session, attendee, placeholder):
