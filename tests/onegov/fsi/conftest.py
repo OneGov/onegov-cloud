@@ -2,6 +2,7 @@ import datetime
 
 import pytest
 import transaction
+from sedate import utcnow
 
 from onegov.core.crypto import hash_password
 from onegov.fsi.models.course_attendee import CourseAttendee
@@ -102,6 +103,22 @@ def course_event(session, course):
     session.flush()
     return course_event, data
 
+
+@pytest.fixture(scope='function')
+def future_course_event(session, course):
+    tmr = utcnow() + datetime.timedelta(days=4)
+    data = dict(
+        course_id=course[0].id,
+        name='FutureEvent',
+        start=tmr,
+        end=tmr + datetime.timedelta(hours=2),
+        presenter_name='Presenter',
+        presenter_company='Company'
+    )
+    course_event = CourseEvent(**data)
+    session.add(course_event)
+    session.flush()
+    return course_event, data
 
 @pytest.fixture(scope='function')
 def proto_reservation(session):

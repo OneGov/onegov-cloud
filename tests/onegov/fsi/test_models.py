@@ -62,6 +62,26 @@ def test_attendee(session, attendee, course_event):
     assert attendee.reservations.count() == 1
 
 
+def test_attendee_upcoming_courses(
+        session, attendee, course, course_event, future_course_event):
+
+    # Add two reservations
+    assert course[0].mandatory_refresh is True
+    session.add_all((
+        Reservation(course_event_id=course_event[0].id,
+                    attendee_id=attendee[0].id, event_completed=True),
+        Reservation(course_event_id=future_course_event[0].id,
+                    attendee_id=attendee[0].id, event_completed=True)))
+    session.flush()
+
+    # Test for ignoring the date when future event is marked as completed
+    assert attendee[0].upcoming_courses().count() == 2
+
+    course[0].mandatory_refresh = False
+    session.flush()
+    assert not attendee[0].upcoming_courses().count() == 1
+
+
 def test_course_event(session, course_event, placeholder):
     event, data = course_event
     for key, val in data.items():
