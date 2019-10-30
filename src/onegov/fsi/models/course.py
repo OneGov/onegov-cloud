@@ -1,9 +1,12 @@
 from uuid import uuid4
-from sqlalchemy import Column, Boolean, Interval, ForeignKey, Text
+
+from sedate import utcnow
+from sqlalchemy import Column, Boolean, Interval, ForeignKey, Text, and_
 from sqlalchemy.orm import relationship
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.fsi.models.course_event import CourseEvent
 
 
 class Course(Base, TimestampMixin):
@@ -31,10 +34,22 @@ class Course(Base, TimestampMixin):
     events = relationship(
         'CourseEvent',
         cascade='all, delete-orphan',
+        lazy='dynamic'
     )
+
+    upcoming_events = relationship(
+        'CourseEvent',
+        primaryjoin=and_(CourseEvent.course_id==id,
+                    CourseEvent.start > utcnow()))
 
     hidden_from_public = Column(Boolean, nullable=False, default=False)
 
     @property
     def hidden(self):
         return self.hidden_from_public
+
+    def next_event(self):
+        return self.events.filter(
+            CourseEvent.start > utcnow()).order_by(
+            CourseEvent.start
+        ).first()

@@ -1,5 +1,8 @@
 import datetime
 
+from mixer.backend.sqlalchemy import mixer
+from sedate import utcnow
+
 from onegov.fsi.models.course import Course
 from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.reservation import Reservation
@@ -10,21 +13,26 @@ def test_course_1(session, course, attendee):
     for key, val in data.items():
         assert getattr(course, key) == val
 
-    assert course.events == []
+    assert course.events.count() == 0
 
     # Add an event
-    today = datetime.datetime.today()
-    event = CourseEvent(
-        course_id=course.id,
-        name='N',
-        start=today,
-        end=today + datetime.timedelta(hours=2),
-        presenter_name='P',
-        presenter_company='C'
-    )
+    now = utcnow()
+    tmr = now + datetime.timedelta(days=1)
+    just_before = utcnow() - datetime.timedelta(minutes=2)
+    event = mixer.blend(CourseEvent, course_id=course.id, start=just_before)
+    event_now = mixer.blend(CourseEvent, course_id=course.id, start=now)
+    event_tmr = mixer.blend(CourseEvent, course_id=course.id, start=tmr)
+
     course.events.append(event)
-    assert len(course.events) == 1
-    assert session.query(CourseEvent).one()
+    course.events.append(event_now)
+    course.events.append(event_tmr)
+
+    assert course.events.count() == 3
+    assert session.query(CourseEvent).count() == 3
+
+    # Test upcoming events
+    assert course.next_event() == event_tmr
+    assert course.upcoming_events == [event_now, event_tmr]
 
 
 def test_attendee(session, attendee, course_event):
