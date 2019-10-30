@@ -4,20 +4,20 @@ from onegov.fsi.models.course_attendee import CourseAttendee
 
 class CourseAttendeeCollection(Pagination):
 
-    def __init__(self, session, page=0, no_placeholders=False):
+    def __init__(self, session, page=0, exclude_external=False):
         self.session = session
         self.page = page
-        self.no_placeholders = no_placeholders
+        self.exclude_external = exclude_external
 
     def __eq__(self, other):
         return (
             self.page == other.page
-            and self.no_placeholders == other.no_placeholders)
+            and self.exclude_external == other.exclude_external)
 
     def query(self):
         query = self.session.query(CourseAttendee).order_by(
             CourseAttendee.last_name, CourseAttendee.first_name)
-        if self.no_placeholders:
+        if self.exclude_external:
             query = query.filter(CourseAttendee.user_id.isnot(None))
         return query
 
@@ -31,5 +31,5 @@ class CourseAttendeeCollection(Pagination):
     def page_by_index(self, index):
         return self.__class__(
             self.session, index,
-            no_placeholders=self.no_placeholders
+            exclude_external=self.exclude_external
         )

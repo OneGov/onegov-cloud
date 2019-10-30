@@ -2,7 +2,7 @@ from uuid import uuid4
 
 from sedate import utcnow
 from sqlalchemy import Column, Boolean, Interval, ForeignKey, Text, and_
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -32,10 +32,10 @@ class Course(Base, TimestampMixin):
 
     # Each course can have n events
     events = relationship(
-        'CourseEvent',
+        CourseEvent,
         cascade='all, delete-orphan',
         lazy='dynamic',
-        backref='course'
+        # backref=backref('course', lazy='joined')
     )
 
     upcoming_events = relationship(

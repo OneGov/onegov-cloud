@@ -1,4 +1,5 @@
 import datetime
+from uuid import uuid4
 
 import pytest
 import transaction
@@ -122,26 +123,6 @@ def future_course_event(session, course):
 
 
 @pytest.fixture(scope='function')
-def proto_reservation(session):
-    return Reservation()
-
-
-@pytest.fixture(scope='function')
-def placeholder(session, course_event):
-    data = dict(
-        email='placeholder@example.org',
-    )
-    reservation = session.query(Reservation).filter_by(
-        dummy_desc='Placeholder').first()
-    if not reservation:
-        reservation = Reservation.as_placeholder(
-            'Placeholder', course_event_id=course_event[0].id)
-        session.add(reservation)
-        session.flush()
-    return reservation, data
-
-
-@pytest.fixture(scope='function')
 def attendee(session, admin):
     attendee = session.query(CourseAttendee).filter_by(
         email='attendee@example.org').first()
@@ -178,15 +159,14 @@ def external_attendee(session, admin):
 
 @pytest.fixture(scope='function')
 def db_mock_session(
-        session, course_event, course, member, attendee, placeholder):
+        session, course_event, course, attendee):
+    placeholder = Reservation.as_placeholder(
+        'Placeholder', id=uuid4(), course_event_id=course_event[0].id)
     # Create Reservations
-    res = Reservation(
+    user_res = Reservation(
         attendee_id=attendee[0].id,
         course_event_id=course_event[0].id)
-    res2 = Reservation(
-        attendee_id=placeholder[0].id,
-        course_event_id=course_event[0].id)
-    session.add_all([res, res2])
+    session.add_all((placeholder, user_res))
     session.flush()
     return session
 

@@ -36,3 +36,6 @@ class Reservation(Base):
     @classmethod
     def as_placeholder(cls, dummy_desc, **kwargs):
         return cls(dummy_desc=dummy_desc, **kwargs)
+
+    def __str__(self):
+        return f'{self.dummy_desc}'

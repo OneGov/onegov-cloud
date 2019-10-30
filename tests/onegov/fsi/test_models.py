@@ -18,7 +18,7 @@ def test_course_1(session, course, attendee):
     # Add an event
     now = utcnow()
     tmr = now + datetime.timedelta(days=1)
-    just_before = utcnow() - datetime.timedelta(minutes=2)
+    just_before = now - datetime.timedelta(minutes=2)
     event = mixer.blend(CourseEvent, course_id=course.id, start=just_before)
     event_now = mixer.blend(CourseEvent, course_id=course.id, start=now)
     event_tmr = mixer.blend(CourseEvent, course_id=course.id, start=tmr)
@@ -35,8 +35,8 @@ def test_course_1(session, course, attendee):
     assert course.upcoming_events == [event_now, event_tmr]
 
 
-def test_reservation_as_placeholder(placeholder):
-    assert placeholder[0].attendee_id is None
+def test_reservation_as_placeholder():
+    assert Reservation.as_placeholder('Test').attendee_id is None
 
 
 def test_attendee(session, attendee, course_event, admin):
@@ -88,22 +88,30 @@ def test_attendee_upcoming_courses(
     assert not attendee[0].upcoming_courses().count() == 1
 
 
-def test_course_event_1(session, course_event, placeholder, course):
+def test_course_event_1(session, course_event, course, attendee):
     event, data = course_event
     for key, val in data.items():
         assert getattr(event, key) == val
 
-    assert event.attendees.all() == []
-    assert event.reservations.all() == []
-    assert event.course == course[0]
+    assert event.attendees.count() == 0
+    assert event.reservations.count() == 0
+    # assert event.course == course[0]
 
     # Add a participant via a reservation
     reservation = Reservation(
-        course_event_id=event.id, attendee_id=placeholder[0].id)
+        course_event_id=event.id, attendee_id=attendee[0].id)
     session.add(reservation)
     session.flush()
 
     assert event.reservations.count() == 1
+    assert event.attendees.count() == 1
+
+    # Add a placeholder
+    placeholder = Reservation.as_placeholder('Placeholder')
+    placeholder.course_event_id = event.id
+    session.add(placeholder)
+    session.flush()
+    assert event.reservations.count() == 2
     assert event.attendees.count() == 1
 
 

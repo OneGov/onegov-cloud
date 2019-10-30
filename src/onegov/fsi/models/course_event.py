@@ -31,12 +31,6 @@ class CourseEvent(Base, TimestampMixin):
     min_attendees = Column(SmallInteger, nullable=False, default=1)
     max_attendees = Column(SmallInteger, nullable=True)
 
-    # If the course has to be refreshed after some interval
-    mandatory_refresh = Column(Boolean, nullable=False, default=False)
-
-    # Refresh interval
-    refresh_interval = Column(Interval)
-
     # Creator of this course event
     user_id = Column(UUID, ForeignKey('users.id'), nullable=True)
 

@@ -1,10 +1,8 @@
 from datetime import datetime
-from uuid import uuid4
-
+from sedate import utcnow
 from sqlalchemy import desc
 
 from onegov.core.collection import Pagination
-from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.reservation import Reservation
 
@@ -30,6 +28,9 @@ class CourseEventCollection(Pagination):
         self.upcoming_only = upcoming_only      # active if from_date not set
         self.past_only = past_only
 
+        if from_date:
+            assert isinstance(from_date, datetime)
+
     def __eq__(self, other):
         return (self.page == other.page
                 and self.creator == other.creator
@@ -49,9 +50,9 @@ class CourseEventCollection(Pagination):
         if self.from_date:
             query = query.filter(CourseEvent.start > self.from_date)
         elif self.past_only:
-            query = query.filter(CourseEvent.start <= datetime.today())
+            query = query.filter(CourseEvent.start <= utcnow())
         elif self.upcoming_only:
-            query = query.filter(CourseEvent.start >= datetime.today())
+            query = query.filter(CourseEvent.start >= utcnow())
         return query
 
     def subset(self):
