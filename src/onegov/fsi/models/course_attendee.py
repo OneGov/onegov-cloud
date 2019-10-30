@@ -14,6 +14,7 @@ class CourseAttendee(Base):
 
     __tablename__ = 'fsi_attendees'
 
+    # is null if its an external attendee
     user_id = Column(UUID, ForeignKey('users.id'), nullable=True)
     title = Column(
         Enum(*ATTENDEE_TITLES, name='title'), nullable=False, default='none')
@@ -23,9 +24,6 @@ class CourseAttendee(Base):
     last_name = Column(Text)
     email = Column(Text)
     address = meta_property('address')
-
-    # Description of attendee is a placeholder
-    dummy_desc = Column(Text)
 
     def __str__(self):
         return f'{self.last_name or "", self.first_name or self.dummy_desc}'
@@ -67,8 +65,3 @@ class CourseAttendee(Base):
         result = result.filter(Reservation.event_completed==True)
         result = result.filter(Course.mandatory_refresh==True)
         return result
-
-    @classmethod
-    def as_placeholder(cls, dummy_desc, **kwargs):
-        return cls(dummy_desc=dummy_desc, **kwargs)
-
