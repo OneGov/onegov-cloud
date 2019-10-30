@@ -160,6 +160,23 @@ def attendee(session, admin):
 
 
 @pytest.fixture(scope='function')
+def external_attendee(session, admin):
+    attendee = session.query(CourseAttendee).filter_by(
+        email='external@example.org').first()
+    data = dict(
+        first_name='E',
+        last_name='E',
+        email='external@example.org',
+        address='Address',
+    )
+    if not attendee:
+        attendee = CourseAttendee(**data)
+        session.add(attendee)
+        session.flush()
+    return attendee, data
+
+
+@pytest.fixture(scope='function')
 def db_mock_session(
         session, course_event, course, member, attendee, placeholder):
     # Create Reservations
