@@ -11,14 +11,7 @@ reservation_table = Table(
            ForeignKey('fsi_course_events.id'), nullable=False),
     Column('attendee_id', UUID, ForeignKey('fsi_attendees.id')),
     Column('event_completed', Boolean, default=False, nullable=False),
-    Column('dummy_desc', Text),
-    # Fields for the NotificationTemplate.NOTIFICATION_TYPES
-    Column('invitation_sent', UTCDateTime),
-    Column('reminder_sent', UTCDateTime),
-    Column('cancelation_sent', UTCDateTime),
-    Column('info_sent', UTCDateTime),
-
-)
+    Column('dummy_desc', Text))
 
 
 class Reservation(Base):

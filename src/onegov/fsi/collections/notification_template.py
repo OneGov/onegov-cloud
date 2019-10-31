@@ -14,6 +14,5 @@ class FsiNotificationTemplateCollection(GenericCollection):
         return FsiNotificationTemplate
 
     def query(self):
-        # TODO: Filter for logged in user always
         query = super().query()
         return query

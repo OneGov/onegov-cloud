@@ -36,8 +36,5 @@ class FsiNotificationTemplate(Base, ContentMixin, TimestampMixin):
     #: The subject of the notification would be according to template type
     # subject = Column(Text, nullable=False, unique=True)
 
-    #: The body text injected into the template
+    #: The body text injected into the template appearing on GUI
     text = Column(Text, nullable=False)
-
-    #: The date the notification was last sent
-    last_sent = Column(UTCDateTime, nullable=True)
