@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship, backref
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
+from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.reservation import reservation_table
 
@@ -20,8 +20,8 @@ class CourseEvent(Base, TimestampMixin):
     id = Column(UUID, primary_key=True, default=uuid4)
     course_id = Column(UUID, ForeignKey('fsi_courses.id'), nullable=False)
 
-    start = Column(DateTime, nullable=False)
-    end = Column(DateTime, nullable=False)
+    start = Column(UTCDateTime, nullable=False)
+    end = Column(UTCDateTime, nullable=False)
     # Short description
     name = Column(Text, nullable=False)
 

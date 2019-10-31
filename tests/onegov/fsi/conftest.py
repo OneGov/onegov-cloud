@@ -109,8 +109,8 @@ def course_event(session, course):
     data = dict(
         course_id=course[0].id,
         name='Event',
-        start=datetime.datetime(2019, 1, 1, 12, 0),
-        end=datetime.datetime(2019, 1, 1, 14, 0),
+        start=utcnow() - datetime.timedelta(days=30, hours=2),
+        end=utcnow() - datetime.timedelta(days=30),
         presenter_name='Presenter',
         presenter_company='Company',
         max_attendees=20
