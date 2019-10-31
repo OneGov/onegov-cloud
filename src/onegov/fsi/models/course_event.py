@@ -44,7 +44,8 @@ class CourseEvent(Base, TimestampMixin):
         CourseAttendee,
         secondary=reservation_table,
         primaryjoin=id == reservation_table.c.course_event_id,
-        secondaryjoin=reservation_table.c.attendee_email == CourseAttendee.email,
+        secondaryjoin=reservation_table.c.attendee_email
+        == CourseAttendee.email,
         lazy='dynamic'
     )
 
