@@ -10,7 +10,7 @@ reservation_table = Table(
     Column('id', UUID, primary_key=True, default=uuid4),
     Column('course_event_id', UUID,
            ForeignKey('fsi_course_events.id'), nullable=False),
-    Column('attendee_id', UUID, ForeignKey('fsi_attendees.id')),
+    Column('attendee_email', Text, ForeignKey('fsi_attendees.email')),
     Column('event_completed', Boolean, default=False, nullable=False),
     Column('dummy_desc', Text)
 )
@@ -21,7 +21,7 @@ class Reservation(Base):
     This table is defined in a way such that i can be used for a secondary
     join in CourseEvent.attendees.
 
-    attendee_id is Null if its a placeholder reservation.
+    attendee_email is Null if its a placeholder reservation.
 
     """
     __table__ = reservation_table
@@ -31,7 +31,7 @@ class Reservation(Base):
 
     @property
     def is_placeholder(self):
-        return self.attendee_id is None
+        return self.attendee_email is None
 
     @classmethod
     def as_placeholder(cls, dummy_desc, **kwargs):

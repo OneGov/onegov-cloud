@@ -35,7 +35,7 @@ def test_course_1(session, course, attendee, mock_data_course_event):
 
 
 def test_reservation_as_placeholder():
-    assert Reservation.as_placeholder('Test').attendee_id is None
+    assert Reservation.as_placeholder('Test').attendee_email is None
 
 
 def test_attendee(session, attendee, course_event, admin):
@@ -46,7 +46,7 @@ def test_attendee(session, attendee, course_event, admin):
 
     # Add a reservation
     reservation = Reservation(
-        course_event_id=course_event[0].id, attendee_id=attendee.id)
+        course_event_id=course_event[0].id, attendee_email=attendee.email)
     session.add(reservation)
     session.flush()
     assert attendee.reservations.count() == 1
@@ -72,9 +72,9 @@ def test_attendee_upcoming_courses(
     assert course[0].mandatory_refresh is True
     session.add_all((
         Reservation(course_event_id=course_event[0].id,
-                    attendee_id=attendee[0].id, event_completed=True),
+                    attendee_email=attendee[0].email, event_completed=True),
         Reservation(course_event_id=future_course_event[0].id,
-                    attendee_id=attendee[0].id, event_completed=True)))
+                    attendee_email=attendee[0].email, event_completed=True)))
     session.flush()
 
     # Test for ignoring the date when future event is marked as completed
@@ -97,7 +97,7 @@ def test_course_event_1(session, course_event, course, attendee):
         'Placeholder', course_event_id=event.id)
     session.add_all((
         placeholder,
-        Reservation(course_event_id=event.id, attendee_id=attendee[0].id)
+        Reservation(course_event_id=event.id, attendee_email=attendee[0].email)
     ))
     session.flush()
 
@@ -113,7 +113,7 @@ def test_course_event_1(session, course_event, course, attendee):
 def test_reservation(session, attendee, course_event):
     res = Reservation(
         course_event_id=course_event[0].id,
-        attendee_id=attendee[0].id
+        attendee_email=attendee[0].email
     )
     session.add(res)
     session.flush()

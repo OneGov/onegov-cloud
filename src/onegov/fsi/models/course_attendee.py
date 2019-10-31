@@ -22,7 +22,7 @@ class CourseAttendee(Base):
     id = Column(UUID, primary_key=True, default=uuid4)
     first_name = Column(Text, nullable=False)
     last_name = Column(Text, nullable=False)
-    email = Column(Text)
+    email = Column(Text, nullable=False, unique=True)
     address = meta_property('address')
 
     def __str__(self):
@@ -61,7 +61,7 @@ class CourseAttendee(Base):
 
         session = object_session(self)
         result = session.query(Course).join(CourseEvent, Reservation)
-        result = result.filter(Reservation.attendee_id == self.id)
+        result = result.filter(Reservation.attendee_email == self.email)
         result = result.filter(Reservation.event_completed == True)
         result = result.filter(Course.mandatory_refresh == True)
         return result
