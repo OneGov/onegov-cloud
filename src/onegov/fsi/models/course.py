@@ -45,6 +45,9 @@ class Course(Base, TimestampMixin):
 
     hidden_from_public = Column(Boolean, nullable=False, default=False)
 
+    # Switch this as you would delete the record, or use hidden?
+    archived = Column(Boolean, nullable=False, default=False)
+
     @property
     def hidden(self):
         return self.hidden_from_public
@@ -58,3 +61,6 @@ class Course(Base, TimestampMixin):
     def send_invitation_mails(self, recipients):
         # use self.events to send a user the links to possible events
         raise NotImplementedError
+
+    def toggle_archived(self):
+        self.archived = not self.archived
