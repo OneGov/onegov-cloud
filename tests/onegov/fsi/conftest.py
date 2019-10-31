@@ -206,7 +206,7 @@ def db_mock_session(
         'Placeholder', id=uuid4(), course_event_id=course_event[0].id)
     # Create Reservations
     user_res = Reservation(
-        attendee_email=attendee[0].email,
+        attendee_id=attendee[0].id,
         course_event_id=course_event[0].id)
     session.add_all((placeholder, user_res))
     session.flush()

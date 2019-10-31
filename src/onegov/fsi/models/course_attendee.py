@@ -77,7 +77,7 @@ class CourseAttendee(Base):
 
         session = object_session(self)
         result = session.query(Course).join(CourseEvent, Reservation)
-        result = result.filter(Reservation.attendee_email == self.email)
+        result = result.filter(Reservation.attendee_id == self.id)
         result = result.filter(Reservation.event_completed == True)
         result = result.filter(Course.mandatory_refresh == True)
         return result

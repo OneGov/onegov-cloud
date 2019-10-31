@@ -13,22 +13,24 @@ class FsiNotificationTemplate(Base, ContentMixin, TimestampMixin):
 
     __tablename__ = 'fsi_notification_templates'
 
+    # the notification type used to choose the correct chameleon template
     type = Column(
         Enum(*NOTIFICATION_TYPES, name='notification_types'),
         default='info',
         nullable=False,
     )
 
-    owner_email = Column(
-        Text, ForeignKey('fsi_attendees.email'), nullable=False)
+    # the creator/owner of the record
+    owner_id = Column(
+        UUID, ForeignKey('fsi_attendees.id'), nullable=False)
 
     #: The public id of the notification template
     id = Column(UUID, primary_key=True, default=uuid4)
 
-    #: The subject of the notification
-    subject = Column(Text, nullable=False, unique=True)
+    #: The subject of the notification would be according to template type
+    # subject = Column(Text, nullable=False, unique=True)
 
-    #: The template text
+    #: The body text injected into the template
     text = Column(Text, nullable=False)
 
     #: The date the notification was last sent
