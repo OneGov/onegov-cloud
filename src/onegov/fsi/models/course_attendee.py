@@ -3,7 +3,7 @@ from sqlalchemy import Column, Text, ForeignKey, JSON, Enum
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
 from onegov.core.orm.mixins import meta_property
-from sqlalchemy.orm import relationship, object_session
+from sqlalchemy.orm import relationship, object_session, backref
 
 from onegov.user import User
 
@@ -16,6 +16,7 @@ class CourseAttendee(Base):
 
     # is null if its an external attendee
     user_id = Column(UUID, ForeignKey('users.id'), nullable=True)
+    user = relationship("User", backref=backref("attendee", uselist=False))
     title = Column(
         Enum(*ATTENDEE_TITLES, name='title'), nullable=False, default='none')
 
