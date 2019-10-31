@@ -124,7 +124,7 @@ def future_course_event(session, course):
 
 
 @pytest.fixture(scope='function')
-def attendee(session, admin):
+def attendee(session, member):
     attendee = session.query(CourseAttendee).filter_by(
         email='attendee@example.org').first()
     data = dict(
@@ -132,7 +132,7 @@ def attendee(session, admin):
         last_name='L',
         email='attendee@example.org',
         address='Address',
-        user_id=admin.id
+        user_id=member.id
     )
     if not attendee:
         attendee = CourseAttendee(**data)

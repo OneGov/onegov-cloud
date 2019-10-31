@@ -38,11 +38,11 @@ def test_reservation_as_placeholder():
     assert Reservation.as_placeholder('Test').attendee_email is None
 
 
-def test_attendee(session, attendee, course_event, admin):
+def test_attendee(session, attendee, course_event, member):
     attendee, data = attendee
     assert attendee.reservations.count() == 0
 
-    assert attendee.auth_user == admin
+    assert attendee.auth_user == member
 
     # Add a reservation
     reservation = Reservation(
