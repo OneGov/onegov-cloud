@@ -36,6 +36,11 @@ class CourseAttendee(Base):
         lazy='dynamic',
         cascade='all, delete-orphan')
 
+    templates = relationship(
+        'FsiNotificationTemplate',
+        backref='owner',
+    )
+
     @property
     def auth_user(self):
         """Get the onegov.user.User behind the attendee"""
