@@ -38,11 +38,12 @@ def test_reservation_as_placeholder():
     assert Reservation.as_placeholder('Test').attendee_email is None
 
 
-def test_attendee(session, attendee, course_event, member):
+def test_attendee_1(session, attendee, course_event, member):
     attendee, data = attendee
     assert attendee.reservations.count() == 0
 
-    assert attendee.auth_user == member
+    assert attendee.user == member
+    assert member.attendee == attendee
 
     # Add a reservation
     reservation = Reservation(
@@ -63,6 +64,9 @@ def test_attendee(session, attendee, course_event, member):
     # and add it differently
     attendee.reservations.append(reservation)
     assert attendee.reservations.count() == 1
+
+    # Test templates backref
+    assert attendee.templates == []
 
 
 def test_attendee_upcoming_courses(
