@@ -71,6 +71,10 @@ class CourseAttendee(Base):
             return self._email
         return self.user.username
 
+    @email.setter
+    def email(self, value):
+        self._email = value
+
     @property
     def course_events(self):
         raise NotImplementedError
