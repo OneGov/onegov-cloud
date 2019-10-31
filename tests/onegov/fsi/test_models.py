@@ -38,6 +38,13 @@ def test_reservation_as_placeholder():
     assert Reservation.as_placeholder('Test').attendee_email is None
 
 
+def test_attendee_as_external(external_attendee):
+    external, data = external_attendee
+    # Test the backrefs and how they work
+    assert external.user_id is None
+    assert external.user is None
+
+
 def test_attendee_1(session, attendee, course_event, member):
     attendee, data = attendee
     assert attendee.reservations.count() == 0
