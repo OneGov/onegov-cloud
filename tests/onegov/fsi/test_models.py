@@ -58,6 +58,7 @@ def test_attendee_1(session, attendee, course_event, member):
     session.add(reservation)
     session.flush()
     assert attendee.reservations.count() == 1
+    assert attendee.course_events.first() == course_event[0]
 
     # Test reservation backref
     assert reservation.attendee == attendee

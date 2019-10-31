@@ -77,7 +77,18 @@ class CourseAttendee(Base):
 
     @property
     def course_events(self):
-        raise NotImplementedError
+        """
+        Will return the query to for not completed (future) courses events
+         the attendee has a reservation record.
+        """
+        from onegov.fsi.models.course_event import CourseEvent  # circular
+        from onegov.fsi.models.reservation import Reservation  # circular
+
+        session = object_session(self)
+        result = session.query(CourseEvent).join(Reservation)
+        result = result.filter(Reservation.attendee_id == self.id)
+        result = result.filter(Reservation.event_completed == False)
+        return result
 
     def upcoming_courses(self):
         """
