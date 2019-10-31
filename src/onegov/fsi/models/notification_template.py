@@ -6,10 +6,16 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID, UTCDateTime
 
-NOTIFICATION_TYPES = ('info', 'reservation', 'cancelation')
+NOTIFICATION_TYPES = ('info', 'reservation', 'reminder', 'cancellation')
 
 
 class FsiNotificationTemplate(Base, ContentMixin, TimestampMixin):
+
+    """
+    For course event reservations, there are different types of emails.
+    Each of the types have an sent property on the reservation table.
+
+    """
 
     __tablename__ = 'fsi_notification_templates'
 

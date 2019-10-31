@@ -1,8 +1,7 @@
 from uuid import uuid4
 from sqlalchemy import Column, ForeignKey, Boolean, Table, Text
 from onegov.core.orm import Base
-from onegov.core.orm.types import UUID
-
+from onegov.core.orm.types import UUID, UTCDateTime
 
 reservation_table = Table(
     'fsi_reservations',
@@ -12,7 +11,13 @@ reservation_table = Table(
            ForeignKey('fsi_course_events.id'), nullable=False),
     Column('attendee_id', UUID, ForeignKey('fsi_attendees.id')),
     Column('event_completed', Boolean, default=False, nullable=False),
-    Column('dummy_desc', Text)
+    Column('dummy_desc', Text),
+    # Fields for the NotificationTemplate.NOTIFICATION_TYPES
+    Column('invitation_sent', UTCDateTime),
+    Column('reminder_sent', UTCDateTime),
+    Column('cancelation_sent', UTCDateTime),
+    Column('info_sent', UTCDateTime),
+
 )
 
 
@@ -35,6 +40,7 @@ class Reservation(Base):
 
     @classmethod
     def as_placeholder(cls, dummy_desc, **kwargs):
+        assert 'attendee_id' not in kwargs
         return cls(dummy_desc=dummy_desc, **kwargs)
 
     def __str__(self):
