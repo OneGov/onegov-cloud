@@ -9,6 +9,7 @@ from onegov.core.crypto import hash_password
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course import Course
 from onegov.fsi.models.course_event import CourseEvent
+from onegov.fsi.models.notification_template import FsiNotificationTemplate
 from onegov.fsi.models.reservation import Reservation
 from onegov.user import User
 from onegov.fsi import FsiApp
@@ -73,6 +74,21 @@ def member(session, hashed_password):
 
 
 @pytest.fixture(scope='function')
+def notification_template(session, planner):
+    # creator by a notification template
+    template = session.query(FsiNotificationTemplate).filter_by(
+        text='Hello World').first()
+    if not template:
+        template = FsiNotificationTemplate(
+            owner_id=planner.id,
+            text='Hello World'
+        )
+        session.add(template)
+        session.flush()
+    return template
+
+
+@pytest.fixture(scope='function')
 def course(session):
     data = dict(
         description='Desc',
@@ -121,6 +137,23 @@ def future_course_event(session, course):
     session.add(course_event)
     session.flush()
     return course_event, data
+
+
+@pytest.fixture(scope='function')
+def planner(session, admin):
+    # aka Kursverantwortlicher, is an admin
+    planner = session.query(CourseAttendee).filter_by(
+        email='planner@example.org').first()
+    if not planner:
+        planner = CourseAttendee(
+            first_name='P',
+            last_name='P',
+            email='planner@example.org',
+            user_id=admin.id
+        )
+        session.add(planner)
+        session.flush()
+    return planner
 
 
 @pytest.fixture(scope='function')
