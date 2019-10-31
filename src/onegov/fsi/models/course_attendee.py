@@ -11,6 +11,16 @@ ATTENDEE_TITLES = ('mr', 'ms', 'none')
 
 
 class CourseAttendee(Base):
+    """
+    Comprises the user base mirrored by one-to-one relationship with
+    onegov.user.User which is linked to the LDAP System.
+
+    Entries
+    - external attendees: the do not have a link to a user
+    - CourseAttendees linked to an admin role, aka Kursverantwortlicher
+    - CourseAttendess linked to a member role, aka Kursbesucher
+
+    """
 
     __tablename__ = 'fsi_attendees'
 
