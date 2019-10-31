@@ -13,7 +13,13 @@ ATTENDEE_TITLES = ('mr', 'ms', 'none')
 class CourseAttendee(Base):
     """
     Comprises the user base mirrored by one-to-one relationship with
-    onegov.user.User which is linked to the LDAP System.
+    onegov.user.User which is linked to the LDAP System including
+    external users, that are created by an admin role.
+
+    The onegov.user.User model should only contain email and role
+    and is only used for authentication and permissions.
+
+    All other attributes should be stored in here.
 
     Entries
     - external attendees: the do not have a link to a user
@@ -33,7 +39,7 @@ class CourseAttendee(Base):
     id = Column(UUID, primary_key=True, default=uuid4)
     first_name = Column(Text, nullable=False)
     last_name = Column(Text, nullable=False)
-    email = Column(Text, nullable=False, unique=True)
+    _email = Column(Text, unique=True)
     address = meta_property('address')
 
     def __str__(self):
@@ -53,12 +59,17 @@ class CourseAttendee(Base):
     )
 
     @property
-    def auth_user(self):
-        """Get the onegov.user.User behind the attendee"""
+    def role(self):
         if not self.user_id:
-            return None
-        return object_session(self).query(User).filter_by(
-            id=self.user_id).one()
+            return 'member'
+        return self.user.role
+
+    @property
+    def email(self):
+        """Needs a switch for external users"""
+        if not self.user_id:
+            return self._email
+        return self.user.username
 
     @property
     def course_events(self):
