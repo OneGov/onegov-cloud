@@ -80,7 +80,7 @@ def member(session, hashed_password):
 @pytest.fixture(scope='function')
 def notification_template(planner, course_event):
     # creator by a notification template
-    def _notification_template(session):
+    def _notification_template(session, **kwargs):
         template = session.query(FsiNotificationTemplate).filter_by(
             text='Hello World').first()
         data = dict(
@@ -89,6 +89,7 @@ def notification_template(planner, course_event):
             text='Hello World',
             course_event_id=course_event(session)[0].id
         )
+        data.update(**kwargs)
         if not template:
             template = FsiNotificationTemplate(**data)
             session.add(template)
@@ -99,7 +100,7 @@ def notification_template(planner, course_event):
 
 @pytest.fixture(scope='function')
 def course():
-    def _course(session):
+    def _course(session, **kwargs):
         data = dict(
             description='Desc',
             name='Course',
@@ -107,6 +108,7 @@ def course():
             presenter_company='Company',
             mandatory_refresh=True,
             refresh_interval=datetime.timedelta(days=30))
+        data.update(**kwargs)
         course = Course(**data)
         session.add(course)
         session.flush()
@@ -116,7 +118,7 @@ def course():
 
 @pytest.fixture(scope='function')
 def course_event(course):
-    def _course_event(session):
+    def _course_event(session, **kwargs):
         data = dict(
             course_id=course(session)[0].id,
             name='Event',
@@ -125,7 +127,10 @@ def course_event(course):
             presenter_name='Presenter',
             presenter_company='Company',
             max_attendees=20)
+        data.update(**kwargs)
+        template = notification_template(session)
         course_event = CourseEvent(**data)
+        course_event.template = template
         session.add(course_event)
         session.flush()
         return course_event, data
@@ -134,7 +139,7 @@ def course_event(course):
 
 @pytest.fixture(scope='function')
 def future_course_event(course):
-    def _future_course_event(session):
+    def _future_course_event(session, **kwargs):
         data = dict(
             course_id=course(session)[0].id,
             name='Future Event',
@@ -145,7 +150,10 @@ def future_course_event(course):
             max_attendees=20,
             schedule_reminder_before=datetime.timedelta(days=8)
         )
+        data.update(**kwargs)
+        template = notification_template(session)
         course_event = CourseEvent(**data)
+        course_event.template = template
         session.add(course_event)
         session.flush()
         return course_event, data
@@ -154,11 +162,12 @@ def future_course_event(course):
 
 @pytest.fixture(scope='function')
 def future_course_reservation(future_course_event, attendee):
-    def _future_course_reservation(session):
+    def _future_course_reservation(session, **kwargs):
         data = dict(
             course_event_id=future_course_event(session)[0].id,
             attendee_id=attendee(session)[0].id
         )
+        data.update(**kwargs)
         res = Reservation(**data)
         session.add(res)
         session.flush()
@@ -169,7 +178,7 @@ def future_course_reservation(future_course_event, attendee):
 
 @pytest.fixture(scope='function')
 def future_course_event(course):
-    def _future_course_event(session):
+    def _future_course_event(session, **kwargs):
         in_a_week = utcnow() + datetime.timedelta(days=7)
         data = dict(
             course_id=course(session)[0].id,
@@ -178,6 +187,7 @@ def future_course_event(course):
             end=in_a_week + datetime.timedelta(hours=2),
             presenter_name='Presenter',
             presenter_company='Company')
+        data.update(**kwargs)
         course_event = CourseEvent(**data)
         session.add(course_event)
         session.flush()
@@ -187,16 +197,19 @@ def future_course_event(course):
 
 @pytest.fixture(scope='function')
 def planner(admin):
-    def _planner(session):
+    def _planner(session, **kwargs):
         # aka Kursverantwortlicher, is an admin
         planner = session.query(CourseAttendee).filter_by(
             email='planner@example.org').first()
+        data = dict(
+            first_name='P',
+            last_name='P',
+            email='planner@example.org',
+            user_id=admin(session).id
+        )
+        data.update(**kwargs)
         if not planner:
-            planner = CourseAttendee(
-                first_name='P',
-                last_name='P',
-                email='planner@example.org',
-                user_id=admin(session).id)
+            planner = CourseAttendee(**data)
             session.add(planner)
             session.flush()
         return planner
@@ -205,7 +218,7 @@ def planner(admin):
 
 @pytest.fixture(scope='function')
 def attendee(session, member):
-    def _attendee(session):
+    def _attendee(session, **kwargs):
         attendee = session.query(CourseAttendee).filter_by(
             email='attendee@example.org').first()
         data = dict(
@@ -214,6 +227,7 @@ def attendee(session, member):
             email='attendee@example.org',
             address='Address',
             user_id=member(session).id)
+        data.update(**kwargs)
         if not attendee:
             attendee = CourseAttendee(**data)
             session.add(attendee)
@@ -224,7 +238,7 @@ def attendee(session, member):
 
 @pytest.fixture(scope='function')
 def external_attendee(admin):
-    def _external_attendee(session):
+    def _external_attendee(session, **kwargs):
         attendee = session.query(CourseAttendee).filter_by(
             email='external@example.org').first()
         data = dict(
@@ -232,6 +246,7 @@ def external_attendee(admin):
             last_name='E',
             email='external@example.org',
             address='Address')
+        data.update(**kwargs)
         if not attendee:
             attendee = CourseAttendee(**data)
             session.add(attendee)
