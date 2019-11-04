@@ -1,11 +1,18 @@
 from cached_property import cached_property
 
 from onegov.core.layout import ChameleonLayout
-from onegov.fsi.models.reservation import Reservation
+from onegov.fsi.collections.course_event import CourseEventCollection
+from onegov.org.layout import DefaultLayout as OrgDefaultLayout
 
 
-class DefaultLayout(ChameleonLayout):
-    pass
+class DefaultLayout(OrgDefaultLayout):
+
+    def events_link(self, course):
+        return self.request.link(CourseEventCollection(
+            self.session,
+            upcoming_only=True,
+            course_id=course.id)
+        )
 
 
 class MailLayout(ChameleonLayout):
