@@ -17,8 +17,8 @@ reservation_table = Table(
     Column('invitation_sent', UTCDateTime),
     Column('reminder_sent', UTCDateTime),
     Column('cancellation_sent', UTCDateTime),
-    Column('info_sent', UTCDateTime),
-    Column('scheduled_reminder', UTCDateTime))
+    Column('info_sent', UTCDateTime)
+)
 
 
 class Reservation(Base):
