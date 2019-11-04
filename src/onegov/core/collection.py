@@ -52,14 +52,9 @@ class GenericCollection(object):
 
 class SearcheableCollection(GenericCollection):
 
-    def __init__(self, *args, term=None):
-        super().__init__(*args)
-        self.term = term
-        self.locale = self.request.locale
-
-    @property
-    def model_class(self):
-        raise NotImplementedError
+    """
+    Requires a self.locale and self.term
+    """
 
     @staticmethod
     def match_term(column, language, term):
@@ -120,10 +115,7 @@ class SearcheableCollection(GenericCollection):
 
     @property
     def term_filter(self):
-        assert self.term
-        assert self.locale
         assert self.term_filter_cols
-
         term = self.__class__.term_to_tsquery_string(
             self.term)
 
@@ -134,7 +126,7 @@ class SearcheableCollection(GenericCollection):
         )
 
     def query(self):
-        if not self.term:
+        if not self.term or not self.locale:
             return super().query()
         return super().query().filter(or_(*self.term_filter))
 
