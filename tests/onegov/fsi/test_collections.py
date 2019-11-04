@@ -46,13 +46,14 @@ def test_course_collection(session):
 
 
 def test_course_event_collection(session, course):
+    course, data = course(session)
     now = utcnow()
     new_course_events = (
         mixer.blend(
             CourseEvent,
             start=now + datetime.timedelta(days=i),
             end=now + datetime.timedelta(days=i, hours=2),
-            course_id=course[0].id
+            course_id=course.id
 
         ) for i in (-1, 1, 2)
     )
@@ -89,18 +90,20 @@ def test_course_event_collection(session, course):
 
 def test_event_collection_add_placeholder(session, course_event):
     # Test add_placeholder method
+    course_event, data = course_event(session)
     event_coll = CourseEventCollection(session)
-    event_coll.add_placeholder('Placeholder', course_event[0])
+    event_coll.add_placeholder('Placeholder', course_event)
     # Tests the secondary join event.attendees as well
-    assert course_event[0].attendees.count() == 0
-    assert course_event[0].reservations.count() == 1
+    assert course_event.attendees.count() == 0
+    assert course_event.reservations.count() == 1
 
 
 def test_attendee_collection(session, attendee):
+    attendee, data = attendee(session)
     collection = CourseAttendeeCollection(session)
     collection_attr_eq_test(collection, collection.page_by_index(1))
 
-    assert collection.query().one() == attendee[0]
+    assert collection.query().one() == attendee
 
     # Exlude placeholders and return real users
     collection = CourseAttendeeCollection(session, exclude_external=True)
@@ -108,6 +111,7 @@ def test_attendee_collection(session, attendee):
 
 
 def test_reservation_collection(session, future_course_reservation):
+    future_course_reservation(session)
     soon = utcnow() + datetime.timedelta(seconds=60)
     reservations = ReservationCollection(session)
     res = reservations.for_reminder_mails().first()
