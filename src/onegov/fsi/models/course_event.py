@@ -1,7 +1,8 @@
+import datetime
 from uuid import uuid4
 
-from sqlalchemy import Column, Boolean, ForeignKey, DateTime, SmallInteger, \
-    Enum, Text
+from sqlalchemy import Column, Boolean, ForeignKey, SmallInteger, \
+    Enum, Text, Interval
 from sqlalchemy.orm import relationship, backref
 
 from onegov.core.orm import Base
@@ -14,6 +15,8 @@ COURSE_EVENT_STATUSES = ('created', 'confirmed', 'canceled', 'planned')
 
 
 class CourseEvent(Base, TimestampMixin):
+
+    default_reminder_before = datetime.timedelta(days=7)
 
     __tablename__ = 'fsi_course_events'
 
@@ -63,6 +66,16 @@ class CourseEvent(Base, TimestampMixin):
 
     # hides from member roles
     hidden_from_public = Column(Boolean, nullable=False, default=False)
+
+    # when before course start schedule reminder email
+    schedule_reminder_before = Column(
+        Interval,
+        nullable=False,
+        default=default_reminder_before)
+
+    @property
+    def scheduled_reminder(self):
+        return self.start - self.schedule_reminder_before
 
     @property
     def duration(self):
