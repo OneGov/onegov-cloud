@@ -165,6 +165,9 @@ def test_cascading_attendee_deletion(db_mock_session, attendee):
     assert session.query(Reservation).count() == 1
 
 
-def test_notification_templates(session, notification_template, course_event):
-    assert notification_template.text == 'Hello World'
-    assert course_event[0].template
+def test_notification_templates(session, notification_template):
+    template, data = notification_template(session)
+    event = session.query(CourseEvent).first()
+    assert template.text == 'Hello World'
+    assert not isinstance(event.template, list)
+    assert event.template == template

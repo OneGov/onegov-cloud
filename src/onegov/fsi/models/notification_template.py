@@ -1,7 +1,7 @@
 from uuid import uuid4
 
 from sqlalchemy import Column, Text, ForeignKey, Enum, UniqueConstraint
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
@@ -37,7 +37,11 @@ class FsiNotificationTemplate(Base, ContentMixin, TimestampMixin):
     course_event_id = Column(
         UUID, ForeignKey('fsi_course_events.id'), nullable=False)
 
-    course = relationship('CourseEvent', backref='template', lazy='joined')
+    course = relationship(
+        'CourseEvent',
+        backref=backref('template', uselist=False),
+        lazy='joined'
+    )
 
     #: The public id of the notification template
     id = Column(UUID, primary_key=True, default=uuid4)
