@@ -1,7 +1,10 @@
 import math
 
 from cached_property import cached_property
+from sqlalchemy import or_
 from sqlalchemy.inspection import inspect
+
+from onegov.core.orm import func
 
 
 class GenericCollection(object):
@@ -45,6 +48,95 @@ class GenericCollection(object):
     def delete(self, item):
         self.session.delete(item)
         self.session.flush()
+
+
+class SearcheableCollection(GenericCollection):
+
+    def __init__(self, *args, term=None):
+        super().__init__(*args)
+        self.term = term
+        self.locale = self.request.locale
+
+    @property
+    def model_class(self):
+        raise NotImplementedError
+
+    @staticmethod
+    def match_term(column, language, term):
+        """
+        Usage:
+        model.filter(match_term(model.col, 'german', 'my search term'))
+
+        """
+        document_tsvector = func.to_tsvector(language, column)
+        ts_query_object = func.to_tsquery(language, term)
+        return document_tsvector.op('@@')(ts_query_object)
+
+    @staticmethod
+    def term_to_tsquery_string(term):
+        """ Returns the current search term transformed to use within
+        Postgres ``to_tsquery`` function.
+        Removes all unwanted characters, replaces prefix matching, joins
+        word together using FOLLOWED BY.
+        """
+
+        def cleanup(word, whitelist_chars=',.-_'):
+            result = ''.join(
+                (c for c in word if c.isalnum() or c in whitelist_chars)
+            )
+            return f'{result}:*' if word.endswith('*') else result
+
+        parts = (cleanup(part) for part in (term or '').split())
+        return ' <-> '.join(tuple(part for part in parts if part))
+
+    def filter_text_by_locale(self, column, term, locale=None):
+        """
+        Returns an SqlAlchemy filter statement based on the search term.
+        If no locale is provided, it will use english as language.
+
+        ``to_tsquery`` creates a tsquery value from term,
+        which must consist of single tokens separated by the Boolean operators
+        & (AND), | (OR) and ! (NOT).
+
+        ``to_tsvector`` parses a textual document into tokens, reduces the
+        tokens to lexemes, and returns a tsvector which lists the lexemes
+        together with their positions in the document. The document is
+        processed according to the specified or default text search
+        configuration.
+        """
+
+        mapping = {'de_CH': 'german', 'fr_CH': 'french', 'it_CH': 'italian',
+                   'rm_CH': 'english'}
+
+        return self.__class__.match_term(
+            column, mapping.get(locale, 'english'), term)
+
+    @property
+    def term_filter_cols(self):
+        """ Returns a dict of column names to search in with term.
+         Must be attributes of self.model_class.
+         """
+        raise NotImplementedError
+
+    @property
+    def term_filter(self):
+        assert self.term
+        assert self.locale
+        assert self.term_filter_cols
+
+        term = self.__class__.term_to_tsquery_string(
+            self.term)
+
+        return (
+            self.__class__.filter_text_by_locale(
+                getattr(self.model_class, col), term, self.locale)
+            for col in self.term_filter_cols
+        )
+
+    def query(self):
+        if not self.term:
+            return super().query()
+        return super().query().filter(or_(*self.term_filter))
 
 
 class Pagination(object):
