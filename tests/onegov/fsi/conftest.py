@@ -74,14 +74,16 @@ def member(session, hashed_password):
 
 
 @pytest.fixture(scope='function')
-def notification_template(session, planner):
+def notification_template(session, planner, course_event):
     # creator by a notification template
     template = session.query(FsiNotificationTemplate).filter_by(
         text='Hello World').first()
     if not template:
         template = FsiNotificationTemplate(
             owner_id=planner.id,
-            text='Hello World'
+            subject='Say Hello',
+            text='Hello World',
+            course_event_id=course_event[0].id
         )
         session.add(template)
         session.flush()

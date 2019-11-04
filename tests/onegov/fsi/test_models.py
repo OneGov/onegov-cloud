@@ -122,7 +122,7 @@ def test_course_event_1(session, course_event, course, attendee):
     assert event.reservations.count() == 1
 
 
-def test_reservation(session, attendee, course_event):
+def test_reservation_1(session, attendee, course_event):
     res = Reservation(
         course_event_id=course_event[0].id,
         attendee_id=attendee[0].id
@@ -134,6 +134,7 @@ def test_reservation(session, attendee, course_event):
     assert res.course_event == course_event[0]
     assert res.attendee == attendee[0]
     assert str(res) == 'L, F'
+    assert res.course == course_event[0].course
 
 
 def test_cascading_course_deletion(db_mock_session):
@@ -164,5 +165,6 @@ def test_cascading_attendee_deletion(db_mock_session, attendee):
     assert session.query(Reservation).count() == 1
 
 
-def test_notification_templates(session, notification_template):
+def test_notification_templates(session, notification_template, course_event):
     assert notification_template.text == 'Hello World'
+    assert course_event[0].template
