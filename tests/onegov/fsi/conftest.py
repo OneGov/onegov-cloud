@@ -98,8 +98,7 @@ def course(session):
         presenter_name='Pres',
         presenter_company='Company',
         mandatory_refresh=True,
-        refresh_interval=datetime.timedelta(days=30)
-    )
+        refresh_interval=datetime.timedelta(days=30))
     course = Course(**data)
     session.add(course)
     session.flush()
@@ -115,8 +114,24 @@ def course_event(session, course):
         end=utcnow() - datetime.timedelta(days=30),
         presenter_name='Presenter',
         presenter_company='Company',
-        max_attendees=20
+        max_attendees=20)
+    course_event = CourseEvent(**data)
+    session.add(course_event)
+    session.flush()
+    return course_event, data
 
+
+@pytest.fixture(scope='function')
+def future_course_event(session, course):
+    data = dict(
+        course_id=course[0].id,
+        name='Future Event',
+        start=utcnow() + datetime.timedelta(days=8),
+        end=utcnow() + datetime.timedelta(days=8, hours=2),
+        presenter_name='Presenter',
+        presenter_company='Company',
+        max_attendees=20,
+        schedule_reminder_before=datetime.timedelta(days=7)
     )
     course_event = CourseEvent(**data)
     session.add(course_event)
@@ -133,8 +148,7 @@ def future_course_event(session, course):
         start=tmr,
         end=tmr + datetime.timedelta(hours=2),
         presenter_name='Presenter',
-        presenter_company='Company'
-    )
+        presenter_company='Company')
     course_event = CourseEvent(**data)
     session.add(course_event)
     session.flush()
@@ -151,8 +165,7 @@ def planner(session, admin):
             first_name='P',
             last_name='P',
             email='planner@example.org',
-            user_id=admin.id
-        )
+            user_id=admin.id)
         session.add(planner)
         session.flush()
     return planner
@@ -167,8 +180,7 @@ def attendee(session, member):
         last_name='L',
         email='attendee@example.org',
         address='Address',
-        user_id=member.id
-    )
+        user_id=member.id)
     if not attendee:
         attendee = CourseAttendee(**data)
         session.add(attendee)
@@ -184,8 +196,7 @@ def external_attendee(session, admin):
         first_name='E',
         last_name='E',
         email='external@example.org',
-        address='Address',
-    )
+        address='Address')
     if not attendee:
         attendee = CourseAttendee(**data)
         session.add(attendee)
