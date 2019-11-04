@@ -3,13 +3,14 @@ import datetime
 from sedate import utcnow
 
 from onegov.fsi.models.course import Course
+from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.reservation import Reservation
 
 
-def test_course_1(session, course, attendee, mock_data_course_event):
-    course, data = course
-    mock = mock_data_course_event
+def test_course_1(session, course, attendee, course_event_data):
+    course, data = course(session)
+    mock = course_event_data
     assert course.events.count() == 0
 
     # Add an event
@@ -38,15 +39,17 @@ def test_reservation_as_placeholder():
     assert Reservation.as_placeholder('Test').attendee_id is None
 
 
-def test_attendee_as_external(external_attendee):
-    external, data = external_attendee
+def test_attendee_as_external(session, external_attendee):
+    external, data = external_attendee(session)
     # Test the backrefs and how they work
     assert external.user_id is None
     assert external.user is None
 
 
 def test_attendee_1(session, attendee, course_event, member):
-    attendee, data = attendee
+    attendee, data = attendee(session)
+    course_event = course_event(session)
+    member = member(session)
     assert attendee.reservations.count() == 0
 
     assert attendee.user == member
@@ -80,6 +83,11 @@ def test_attendee_1(session, attendee, course_event, member):
 def test_attendee_upcoming_courses(
         session, attendee, course, course_event, future_course_event):
 
+    course = course(session)
+    attendee = attendee(session)
+    course_event = course_event(session)
+    future_course_event = future_course_event(session)
+
     # Add two reservations
     assert course[0].mandatory_refresh is True
     session.add_all((
@@ -97,12 +105,14 @@ def test_attendee_upcoming_courses(
     assert not attendee[0].upcoming_courses().count() == 1
 
 
-def test_course_event_1(session, course_event, course, attendee):
-    event, data = course_event
+def test_course_event_1(session, course_event, attendee):
+    attendee = attendee(session)
+    event, data = course_event(session)
+    course = session.query(Course).first()
 
     assert event.attendees.count() == 0
     assert event.reservations.count() == 0
-    assert event.course == course[0]
+    assert event.course == course
 
     # Add a participant via a reservation
     placeholder = Reservation.as_placeholder(
@@ -123,6 +133,8 @@ def test_course_event_1(session, course_event, course, attendee):
 
 
 def test_reservation_1(session, attendee, course_event):
+    attendee = attendee(session)
+    course_event = course_event(session)
     res = Reservation(
         course_event_id=course_event[0].id,
         attendee_id=attendee[0].id
@@ -137,9 +149,9 @@ def test_reservation_1(session, attendee, course_event):
     assert res.course == course_event[0].course
 
 
-def test_cascading_course_deletion(db_mock_session):
+def test_cascading_course_deletion(session, db_mock_session):
     # When a course is deleted, all course events should be deleted as well
-    session = db_mock_session
+    session = db_mock_session(session)
     course = session.query(Course).one()
     session.delete(course)
     session.flush()
@@ -147,21 +159,21 @@ def test_cascading_course_deletion(db_mock_session):
     assert session.query(Reservation).count() == 0
 
 
-def test_cascading_event_deletion(db_mock_session, course_event):
+def test_cascading_event_deletion(session, db_mock_session):
     # If a course event is deleted, all the reservations should be deleted
-    session = db_mock_session
+    session = db_mock_session(session)
+    event = session.query(CourseEvent).first()
     assert session.query(Reservation).count() == 2
-    session.delete(course_event[0])
-    session.flush()
+    session.delete(event)
     assert session.query(Reservation).count() == 0
 
 
-def test_cascading_attendee_deletion(db_mock_session, attendee):
+def test_cascading_attendee_deletion(session, db_mock_session):
     # If an attendee is deleted, his reservations should be deleted
-    session = db_mock_session
+    session = db_mock_session(session)
+    attendee = session.query(CourseAttendee).first()
     assert session.query(Reservation).count() == 2
-    session.delete(attendee[0])
-    session.flush()
+    session.delete(attendee)
     assert session.query(Reservation).count() == 1
 
 

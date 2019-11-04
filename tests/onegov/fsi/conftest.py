@@ -45,197 +45,226 @@ def client_with_es(es_fsi_app):
 
 @pytest.fixture(scope='function')
 def admin(session, hashed_password):
-    admin = session.query(User).filter_by(
-        username='admin@example.org').first()
-    if not admin:
-        admin = User(
-            username='admin@example.org',
-            password_hash=hashed_password,
-            role='admin'
-        )
-        session.add(admin)
-        session.flush()
-    return admin
+    def _admin(session):
+        admin = session.query(User).filter_by(
+            username='admin@example.org').first()
+        if not admin:
+            admin = User(
+                username='admin@example.org',
+                password_hash=hashed_password,
+                role='admin'
+            )
+            session.add(admin)
+            session.flush()
+        return admin
+    return _admin
 
 
 @pytest.fixture(scope='function')
 def member(session, hashed_password):
-    member = session.query(User).filter_by(
-        username='member@example.org').first()
-    if not member:
-        member = User(
-            username='member@example.org',
-            password_hash=hashed_password,
-            role='member'
-        )
-        session.add(member)
-        session.flush()
-    return member
+    def _member(session):
+        member = session.query(User).filter_by(
+            username='member@example.org').first()
+        if not member:
+            member = User(
+                username='member@example.org',
+                password_hash=hashed_password,
+                role='member'
+            )
+            session.add(member)
+            session.flush()
+        return member
+    return _member
 
 
 @pytest.fixture(scope='function')
-def notification_template(session, planner, course_event):
+def notification_template(planner, course_event):
     # creator by a notification template
-    template = session.query(FsiNotificationTemplate).filter_by(
-        text='Hello World').first()
-    if not template:
-        template = FsiNotificationTemplate(
-            owner_id=planner.id,
+    def _notification_template(session):
+        template = session.query(FsiNotificationTemplate).filter_by(
+            text='Hello World').first()
+        data = dict(
+            owner_id=planner(session).id,
             subject='Say Hello',
             text='Hello World',
-            course_event_id=course_event[0].id
+            course_event_id=course_event(session)[0].id
         )
-        session.add(template)
+        if not template:
+            template = FsiNotificationTemplate(**data)
+            session.add(template)
+            session.flush()
+        return template, data
+    return _notification_template
+
+
+@pytest.fixture(scope='function')
+def course():
+    def _course(session):
+        data = dict(
+            description='Desc',
+            name='Course',
+            presenter_name='Pres',
+            presenter_company='Company',
+            mandatory_refresh=True,
+            refresh_interval=datetime.timedelta(days=30))
+        course = Course(**data)
+        session.add(course)
         session.flush()
-    return template
+        return course, data
+    return _course
 
 
 @pytest.fixture(scope='function')
-def course(session):
-    data = dict(
-        description='Desc',
-        name='Course',
-        presenter_name='Pres',
-        presenter_company='Company',
-        mandatory_refresh=True,
-        refresh_interval=datetime.timedelta(days=30))
-    course = Course(**data)
-    session.add(course)
-    session.flush()
-    return course, data
-
-
-@pytest.fixture(scope='function')
-def course_event(session, course):
-    data = dict(
-        course_id=course[0].id,
-        name='Event',
-        start=utcnow() - datetime.timedelta(days=30, hours=2),
-        end=utcnow() - datetime.timedelta(days=30),
-        presenter_name='Presenter',
-        presenter_company='Company',
-        max_attendees=20)
-    course_event = CourseEvent(**data)
-    session.add(course_event)
-    session.flush()
-    return course_event, data
-
-
-@pytest.fixture(scope='function')
-def future_course_event(session, course):
-    data = dict(
-        course_id=course[0].id,
-        name='Future Event',
-        start=utcnow() + datetime.timedelta(days=7),
-        end=utcnow() + datetime.timedelta(days=7, hours=2),
-        presenter_name='Presenter',
-        presenter_company='Company',
-        max_attendees=20,
-        schedule_reminder_before=datetime.timedelta(days=8)
-    )
-    course_event = CourseEvent(**data)
-    session.add(course_event)
-    session.flush()
-    return course_event, data
-
-
-@pytest.fixture(scope='function')
-def future_course_reservation(session, future_course_event, attendee):
-    data = dict(
-        course_event_id=future_course_event[0].id,
-        attendee_id=attendee[0].id
-    )
-    res = Reservation(**data)
-    session.add(res)
-    session.flush()
-    return res, data
-
-
-@pytest.fixture(scope='function')
-def future_course_event(session, course):
-    in_a_week = utcnow() + datetime.timedelta(days=7)
-    data = dict(
-        course_id=course[0].id,
-        name='FutureEvent',
-        start=in_a_week,
-        end=in_a_week + datetime.timedelta(hours=2),
-        presenter_name='Presenter',
-        presenter_company='Company')
-    course_event = CourseEvent(**data)
-    session.add(course_event)
-    session.flush()
-    return course_event, data
-
-
-@pytest.fixture(scope='function')
-def planner(session, admin):
-    # aka Kursverantwortlicher, is an admin
-    planner = session.query(CourseAttendee).filter_by(
-        email='planner@example.org').first()
-    if not planner:
-        planner = CourseAttendee(
-            first_name='P',
-            last_name='P',
-            email='planner@example.org',
-            user_id=admin.id)
-        session.add(planner)
+def course_event(course):
+    def _course_event(session):
+        data = dict(
+            course_id=course(session)[0].id,
+            name='Event',
+            start=utcnow() - datetime.timedelta(days=30, hours=2),
+            end=utcnow() - datetime.timedelta(days=30),
+            presenter_name='Presenter',
+            presenter_company='Company',
+            max_attendees=20)
+        course_event = CourseEvent(**data)
+        session.add(course_event)
         session.flush()
-    return planner
+        return course_event, data
+    return _course_event
+
+
+@pytest.fixture(scope='function')
+def future_course_event(course):
+    def _future_course_event(session):
+        data = dict(
+            course_id=course(session)[0].id,
+            name='Future Event',
+            start=utcnow() + datetime.timedelta(days=7),
+            end=utcnow() + datetime.timedelta(days=7, hours=2),
+            presenter_name='Presenter',
+            presenter_company='Company',
+            max_attendees=20,
+            schedule_reminder_before=datetime.timedelta(days=8)
+        )
+        course_event = CourseEvent(**data)
+        session.add(course_event)
+        session.flush()
+        return course_event, data
+    return _future_course_event
+
+
+@pytest.fixture(scope='function')
+def future_course_reservation(future_course_event, attendee):
+    def _future_course_reservation(session):
+        data = dict(
+            course_event_id=future_course_event(session)[0].id,
+            attendee_id=attendee(session)[0].id
+        )
+        res = Reservation(**data)
+        session.add(res)
+        session.flush()
+        transaction.commit()
+        return res, data
+    return _future_course_reservation
+
+
+@pytest.fixture(scope='function')
+def future_course_event(course):
+    def _future_course_event(session):
+        in_a_week = utcnow() + datetime.timedelta(days=7)
+        data = dict(
+            course_id=course(session)[0].id,
+            name='FutureEvent',
+            start=in_a_week,
+            end=in_a_week + datetime.timedelta(hours=2),
+            presenter_name='Presenter',
+            presenter_company='Company')
+        course_event = CourseEvent(**data)
+        session.add(course_event)
+        session.flush()
+        return course_event, data
+    return _future_course_event
+
+
+@pytest.fixture(scope='function')
+def planner(admin):
+    def _planner(session):
+        # aka Kursverantwortlicher, is an admin
+        planner = session.query(CourseAttendee).filter_by(
+            email='planner@example.org').first()
+        if not planner:
+            planner = CourseAttendee(
+                first_name='P',
+                last_name='P',
+                email='planner@example.org',
+                user_id=admin(session).id)
+            session.add(planner)
+            session.flush()
+        return planner
+    return _planner
 
 
 @pytest.fixture(scope='function')
 def attendee(session, member):
-    attendee = session.query(CourseAttendee).filter_by(
-        email='attendee@example.org').first()
-    data = dict(
-        first_name='F',
-        last_name='L',
-        email='attendee@example.org',
-        address='Address',
-        user_id=member.id)
-    if not attendee:
-        attendee = CourseAttendee(**data)
-        session.add(attendee)
-        session.flush()
-    return attendee, data
+    def _attendee(session):
+        attendee = session.query(CourseAttendee).filter_by(
+            email='attendee@example.org').first()
+        data = dict(
+            first_name='F',
+            last_name='L',
+            email='attendee@example.org',
+            address='Address',
+            user_id=member(session).id)
+        if not attendee:
+            attendee = CourseAttendee(**data)
+            session.add(attendee)
+            session.flush()
+        return attendee, data
+    return _attendee
 
 
 @pytest.fixture(scope='function')
-def external_attendee(session, admin):
-    attendee = session.query(CourseAttendee).filter_by(
-        email='external@example.org').first()
-    data = dict(
-        first_name='E',
-        last_name='E',
-        email='external@example.org',
-        address='Address')
-    if not attendee:
-        attendee = CourseAttendee(**data)
-        session.add(attendee)
-        session.flush()
-    return attendee, data
+def external_attendee(admin):
+    def _external_attendee(session):
+        attendee = session.query(CourseAttendee).filter_by(
+            email='external@example.org').first()
+        data = dict(
+            first_name='E',
+            last_name='E',
+            email='external@example.org',
+            address='Address')
+        if not attendee:
+            attendee = CourseAttendee(**data)
+            session.add(attendee)
+            session.flush()
+        return attendee, data
+    return _external_attendee
 
 
 @pytest.fixture(scope='function')
-def mock_data_course_event():
-    def _mock_data_course_event():
+def course_event_data():
+    def _course_event_data():
         return dict(
             name='A', presenter_name='P', presenter_company='C', id=uuid4())
-    return _mock_data_course_event
+    return _course_event_data
 
 
 @pytest.fixture(scope='function')
-def db_mock_session(
-        session, course_event, course, attendee):
-    placeholder = Reservation.as_placeholder(
-        'Placeholder', id=uuid4(), course_event_id=course_event[0].id)
-    # Create Reservations
-    user_res = Reservation(
-        attendee_id=attendee[0].id,
-        course_event_id=course_event[0].id)
-    session.add_all((placeholder, user_res))
-    session.flush()
-    return session
+def db_mock_session(course_event, attendee):
+    def _db_mock_session(session):
+        # Create the fixtures with the current session
+        attendee_ = attendee(session)
+        course_event_ = course_event(session)
+
+        placeholder = Reservation.as_placeholder(
+            'Placeholder', id=uuid4(), course_event_id=course_event_[0].id)
+        # Create Reservations
+        user_res = Reservation(
+            attendee_id=attendee_[0].id,
+            course_event_id=course_event_[0].id)
+        session.add_all((placeholder, user_res))
+        session.flush()
+        return session
+    return _db_mock_session
 
 
 def create_fsi_app(request, use_elasticsearch, hashed_password):
