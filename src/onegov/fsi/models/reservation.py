@@ -3,8 +3,10 @@ from sqlalchemy import Column, ForeignKey, Boolean, Table, Text
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID, UTCDateTime
 
+table_name = 'fsi_reservations'
+
 reservation_table = Table(
-    'fsi_reservations',
+    table_name,
     Base.metadata,
     Column('id', UUID, primary_key=True, default=uuid4),
     Column('course_event_id', UUID,
@@ -30,6 +32,7 @@ class Reservation(Base):
 
     """
     __table__ = reservation_table
+    __tablename__ = table_name
     __mapper_args__ = {
         'confirm_deleted_rows': False
     }
