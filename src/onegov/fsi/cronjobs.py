@@ -14,7 +14,7 @@ def send_scheduled_reminders(request):
     reservations = ReservationCollection(request.session).for_reminder_mails()
 
     for res in reservations:
-        if not res.course.template:
+        if not res.course_event.template:
             continue
         template = res.course_event.template
         subject = _('Reminder for course: ${name}',
