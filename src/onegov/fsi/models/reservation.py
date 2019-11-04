@@ -11,7 +11,14 @@ reservation_table = Table(
            ForeignKey('fsi_course_events.id'), nullable=False),
     Column('attendee_id', UUID, ForeignKey('fsi_attendees.id')),
     Column('event_completed', Boolean, default=False, nullable=False),
-    Column('dummy_desc', Text))
+    Column('dummy_desc', Text),
+
+    # Fields for the NotificationTemplate.NOTIFICATION_TYPES
+    Column('invitation_sent', UTCDateTime),
+    Column('reminder_sent', UTCDateTime),
+    Column('cancellation_sent', UTCDateTime),
+    Column('info_sent', UTCDateTime),
+    Column('scheduled_reminder', UTCDateTime))
 
 
 class Reservation(Base):
@@ -40,3 +47,7 @@ class Reservation(Base):
         if self.is_placeholder:
             return f'{self.dummy_desc or ""}'
         return f'{self.attendee.last_name}, {self.attendee.first_name}'
+
+    @property
+    def course(self):
+        return self.course_event.course
