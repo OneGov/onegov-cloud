@@ -17,17 +17,19 @@ def view_course_collection(self, request):
             'courses': self.query().all()
     }
 
-
-@FsiApp.form(
-    model=CourseCollection,
-    template='course_collection.pt',
-    name='new',
-    form=EditCourseForm
-)
-def view_create_course(self, request):
-    layout = DefaultLayout(self, request)
-    return {
-            'title': _('Create Course'),
-            'layout': layout,
-            'model': self,
-    }
+#
+# @FsiApp.form(
+#     model=CourseCollection,
+#     template='course_collection.pt',
+#     name='new',
+#     form=EditCourseForm
+# )
+# def view_create_course(self, request, form):
+#     layout = DefaultLayout(self, request)
+#     return {
+#         'title': _('Create Course'),
+#         'layout': layout,
+#         'model': self,
+#         'form': form
+#
+#     }
