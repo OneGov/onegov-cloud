@@ -6,18 +6,18 @@ from onegov.fsi.models.course import Course
 
 class CourseCollection(Pagination):
 
-    def __init__(self, session, page=0, creator=None):
+    def __init__(self, session, page=0, creator_id=None):
         self.session = session
         self.page = page
-        self.creator = creator      # to filter courses of a creator
+        self.creator_id = creator_id    # to filter courses of a creator
 
     def __eq__(self, other):
-        return self.page == other.page and self.creator == other.creator
+        return self.page == other.page and self.creator_id == other.creator_id
 
     def query(self):
         query = self.session.query(Course).order_by(desc(Course.created))
-        if self.creator:
-            query = query.filter_by(user_id=self.creator.id)
+        if self.creator_id:
+            query = query.filter_by(user_id=self.creator_id)
         return query
 
     def subset(self):
@@ -28,4 +28,4 @@ class CourseCollection(Pagination):
         return self.page
 
     def page_by_index(self, index):
-        return self.__class__(self.session, index, self.creator)
+        return self.__class__(self.session, index, self.creator_id)
