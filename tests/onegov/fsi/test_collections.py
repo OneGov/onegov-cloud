@@ -1,11 +1,13 @@
 import datetime
 from uuid import uuid4
 
+import pytest
 from sedate import utcnow
 
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
+from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.models.course import Course
 from mixer.backend.sqlalchemy import mixer
 
@@ -103,3 +105,19 @@ def test_attendee_collection(session, attendee):
     # Exlude placeholders and return real users
     collection = CourseAttendeeCollection(session, exclude_external=True)
     assert collection.query().count() == 1
+
+
+def test_reservation_collection(session, future_course_reservation):
+    soon = utcnow() + datetime.timedelta(seconds=60)
+    reservations = ReservationCollection(session)
+    res = reservations.for_reminder_mails().first()
+    assert res
+    course_event = res.course_event
+    assert course_event.start - course_event.schedule_reminder_before < soon
+
+    # Change the reminder before value
+    course_event.schedule_reminder_before = datetime.timedelta(days=4)
+    session.flush()
+
+    assert course_event.start - course_event.schedule_reminder_before > soon
+    assert reservations.for_reminder_mails().count() == 0

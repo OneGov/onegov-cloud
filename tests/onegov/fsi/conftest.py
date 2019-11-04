@@ -126,12 +126,12 @@ def future_course_event(session, course):
     data = dict(
         course_id=course[0].id,
         name='Future Event',
-        start=utcnow() + datetime.timedelta(days=8),
-        end=utcnow() + datetime.timedelta(days=8, hours=2),
+        start=utcnow() + datetime.timedelta(days=7),
+        end=utcnow() + datetime.timedelta(days=7, hours=2),
         presenter_name='Presenter',
         presenter_company='Company',
         max_attendees=20,
-        schedule_reminder_before=datetime.timedelta(days=7)
+        schedule_reminder_before=datetime.timedelta(days=8)
     )
     course_event = CourseEvent(**data)
     session.add(course_event)
@@ -140,13 +140,25 @@ def future_course_event(session, course):
 
 
 @pytest.fixture(scope='function')
+def future_course_reservation(session, future_course_event, attendee):
+    data = dict(
+        course_event_id=future_course_event[0].id,
+        attendee_id=attendee[0].id
+    )
+    res = Reservation(**data)
+    session.add(res)
+    session.flush()
+    return res, data
+
+
+@pytest.fixture(scope='function')
 def future_course_event(session, course):
-    tmr = utcnow() + datetime.timedelta(days=4)
+    in_a_week = utcnow() + datetime.timedelta(days=7)
     data = dict(
         course_id=course[0].id,
         name='FutureEvent',
-        start=tmr,
-        end=tmr + datetime.timedelta(hours=2),
+        start=in_a_week,
+        end=in_a_week + datetime.timedelta(hours=2),
         presenter_name='Presenter',
         presenter_company='Company')
     course_event = CourseEvent(**data)

@@ -12,16 +12,8 @@ from webtest import TestApp as Client
 from sedate import ensure_timezone, utcnow
 from onegov.form import FormSubmissionCollection
 from onegov.org.models import ResourceRecipientCollection
-
-
-def get_cronjob_by_name(app, name):
-    for cronjob in app.config.cronjob_registry.cronjobs.values():
-        if name in cronjob.name:
-            return cronjob
-
-
-def get_cronjob_url(cronjob):
-    return '/cronjobs/{}'.format(cronjob.id)
+from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url, \
+    get_mail
 
 
 def register_echo_handler(handlers):
@@ -60,23 +52,6 @@ def register_echo_handler(handlers):
 
         def get_links(self, request):
             return self.data.get('links')
-
-
-def get_mail(outbox, index):
-    message = outbox[index]
-
-    return {
-        'from': message['From'],
-        'reply_to': message['Reply-To'],
-        'subject': message['Subject'],
-        'to': message['To'],
-        'text': b64decode(
-            ''.join(message.get_payload(0).as_string().splitlines()[3:])
-        ).decode('utf-8'),
-        'html': b64decode(
-            ''.join(message.get_payload(1).as_string().splitlines()[3:])
-        ).decode('utf-8')
-    }
 
 
 def test_ticket_statistics(org_app, smtp, handlers):

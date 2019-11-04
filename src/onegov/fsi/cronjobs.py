@@ -11,14 +11,11 @@ from onegov.fsi import _, FsiApp
 
 
 def send_scheduled_reminders(request):
-    reservations = ReservationCollection(request.session).query().filter(and_(
-        Reservation.attendee_id != None,
-        Reservation.reminder_sent == None,
-        Reservation.scheduled_reminder != None,
-        Reservation.scheduled_reminder <= (utcnow() + timedelta(seconds=60)),
-    ))
+    reservations = ReservationCollection(request.session).for_reminder_mails()
 
     for res in reservations:
+        if not res.course.template:
+            continue
         template = res.course_event.template
         subject = _('Reminder for course: ${name}',
                     mapping={'name': res.course.name})
@@ -34,8 +31,9 @@ def send_scheduled_reminders(request):
                     receivers=(res.attendee.email, ),
                     subject=subject,
                     content=content)
+        res.reminder_sent = utcnow()
 
 
 @FsiApp.cronjob(hour=8, minute=30, timezone='Europe/Zurich')
-def send_reminders(request):
+def send_reminder_mails(request):
     send_scheduled_reminders(request)
