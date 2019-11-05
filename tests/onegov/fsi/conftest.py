@@ -44,7 +44,7 @@ def client_with_es(es_fsi_app):
 
 
 @pytest.fixture(scope='function')
-def admin(session, hashed_password):
+def admin(hashed_password):
     def _admin(session):
         admin = session.query(User).filter_by(
             username='admin@example.org').first()
@@ -61,7 +61,28 @@ def admin(session, hashed_password):
 
 
 @pytest.fixture(scope='function')
-def member(session, hashed_password):
+def planner(admin):
+    def _planner(session, **kwargs):
+        # aka Kursverantwortlicher, is an admin, has admin email
+        user = admin(session)
+        data = dict(
+            first_name='P',
+            last_name='P',
+            address='Address',
+            user_id=user.id
+        )
+        data.update(**kwargs)
+        planner = session.query(CourseAttendee).filter_by(**data).first()
+        if not planner:
+            planner = CourseAttendee(**data)
+            session.add(planner)
+            session.flush()
+        return planner, data
+    return _planner
+
+
+@pytest.fixture(scope='function')
+def member(hashed_password):
     def _member(session):
         member = session.query(User).filter_by(
             username='member@example.org').first()
@@ -117,9 +138,7 @@ def course():
 
 
 @pytest.fixture(scope='function')
-def course_event(session, course, planner):
-    # planner, data = planner(session)
-
+def course_event(course, planner):
     def _course_event(session, **kwargs):
         data = dict(
             course_id=course(session)[0].id,
@@ -141,9 +160,7 @@ def course_event(session, course, planner):
 
 
 @pytest.fixture(scope='function')
-def future_course_event(session, course, planner):
-    planner, data = planner(session)
-
+def future_course_event(course):
     def _future_course_event(session, **kwargs):
         data = dict(
             course_id=course(session)[0].id,
@@ -202,29 +219,7 @@ def future_course_event(course):
 
 
 @pytest.fixture(scope='function')
-def planner(admin):
-    def _planner(session, **kwargs):
-        # aka Kursverantwortlicher, is an admin, has admin email
-        user = admin(session)
-        data = dict(
-            first_name='P',
-            last_name='P',
-            address='Address',
-            user_id=user.id
-        )
-        data.update(**kwargs)
-        planner = session.query(CourseAttendee).filter_by(
-            email=user.username).first()
-        if not planner:
-            planner = CourseAttendee(**data)
-            session.add(planner)
-            session.flush()
-        return planner, data
-    return _planner
-
-
-@pytest.fixture(scope='function')
-def attendee(session, member):
+def attendee(member):
     def _attendee(session, **kwargs):
         user = member(session)
         data = dict(
@@ -282,7 +277,8 @@ def db_mock_session(course_event, attendee):
         # Create Reservations
         user_res = Reservation(
             attendee_id=attendee_[0].id,
-            course_event_id=course_event_[0].id)
+            course_event_id=course_event_[0].id
+        ),
         session.add_all((placeholder, user_res))
         session.flush()
         return session
