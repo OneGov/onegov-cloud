@@ -1,5 +1,6 @@
 from onegov.core import utils
 from onegov.fsi.initial_content import create_new_organisation
+from onegov.fsi.request import FsiRequest
 from onegov.fsi.theme import FsiTheme
 from onegov.org import OrgApp
 from onegov.org.app import get_common_asset as default_common_asset
@@ -7,6 +8,8 @@ from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 
 
 class FsiApp(OrgApp):
+
+    request_class = FsiRequest
 
     def configure_organisation(self, **cfg):
         cfg.setdefault('enable_user_registration', False)
