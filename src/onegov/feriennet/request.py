@@ -19,7 +19,7 @@ class FeriennetRequest(OrgRequest):
 
         """
 
-        return self.has_role('editor')
+        return self.is_editor
 
     @cached_property
     def is_manager(self):
@@ -35,9 +35,3 @@ class FeriennetRequest(OrgRequest):
         """ Returns true if the current user is an admin. """
 
         return self.has_role('admin')
-
-    @cached_property
-    def current_user(self):
-        if self.identity:
-            return self.session.query(User)\
-                .filter_by(username=self.identity.userid).first()

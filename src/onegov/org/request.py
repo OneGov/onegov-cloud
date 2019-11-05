@@ -1,5 +1,6 @@
 from cached_property import cached_property
 from onegov.core.request import CoreRequest
+from onegov.user import User
 
 
 class OrgRequest(CoreRequest):
@@ -21,6 +22,20 @@ class OrgRequest(CoreRequest):
 
         return self.has_role('admin')
 
+    @cached_property
+    def is_editor(self):
+        """ Returns true if the current user is an editor.
+
+        """
+
+        return self.has_role('editor')
+
     @property
     def current_username(self):
         return self.identity and self.identity.userid or None
+
+    @cached_property
+    def current_user(self):
+        if self.identity:
+            return self.session.query(User) \
+                .filter_by(username=self.identity.userid).first()
