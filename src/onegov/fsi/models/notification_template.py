@@ -40,7 +40,6 @@ class FsiNotificationTemplate(Base, ContentMixin, TimestampMixin):
     course = relationship(
         'CourseEvent',
         backref=backref('template', uselist=False),
-        lazy='joined'
     )
 
     #: The public id of the notification template
