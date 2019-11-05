@@ -1,36 +1,35 @@
-from datetime import timedelta
-
 from sedate import utcnow
-from sqlalchemy import and_
 
 from onegov.core.templates import render_template
 from onegov.fsi.collections.reservation import ReservationCollection
-from onegov.fsi.models.reservation import Reservation
 from onegov.fsi.layout import MailLayout
 from onegov.fsi import _, FsiApp
+from onegov.fsi.models.notification_template import FsiNotificationTemplate
 
 
 def send_scheduled_reminders(request):
     reservations = ReservationCollection(request.session).for_reminder_mails()
 
     for res in reservations:
-        if not res.course_event.template:
-            continue
-        template = res.course_event.template
-        subject = _('Reminder for course: ${name}',
+        assert res.course_event.template
+        template = request.session.query(
+            FsiNotificationTemplate).filter_by(
+            course_event_id=res.course_event.id).one()
+        title = _('Reminder for course: ${name}',
                     mapping={'name': res.course.name})
         content = render_template(
             'mail_layout.pt', request,
             {
-                'layout': MailLayout(template, request),
-                'title': subject,
-                'notification': res.template.text
+                'layout': MailLayout(res, request),
+                'title': title,
+                'notification': template.text
                         })
-
+        mail = res.attendee.email
         request.app.send_marketing_email(
-                    receivers=(res.attendee.email, ),
-                    subject=subject,
-                    content=content)
+                    receivers=(mail, ),
+                    subject=template.subject,
+                    content=content
+        )
         res.reminder_sent = utcnow()
 
 
