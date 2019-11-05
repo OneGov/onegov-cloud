@@ -16,7 +16,8 @@ class CourseEventCollection(Pagination):
             course_id=None,
             from_date=None,
             upcoming_only=True,
-            past_only=False
+            past_only=False,
+            limit=None
     ):
         self.session = session
         self.page = page
@@ -27,6 +28,7 @@ class CourseEventCollection(Pagination):
         self.from_date = from_date              # ignores upcoming_only
         self.upcoming_only = upcoming_only      # active if from_date not set
         self.past_only = past_only
+        self.limit = limit
 
         if from_date:
             assert isinstance(from_date, datetime)
@@ -53,6 +55,8 @@ class CourseEventCollection(Pagination):
             query = query.filter(CourseEvent.start <= utcnow())
         elif self.upcoming_only:
             query = query.filter(CourseEvent.start >= utcnow())
+        if self.limit:
+            query = query.limit(self.limit)
         return query
 
     def subset(self):
