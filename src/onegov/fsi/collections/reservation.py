@@ -20,5 +20,6 @@ class ReservationCollection(GenericCollection):
         conditions = and_(
             Reservation.attendee_id != None,
             Reservation.reminder_sent == None,
-            CourseEvent.start - CourseEvent.schedule_reminder_before <= soon)
+            CourseEvent.scheduled_reminder <= soon
+        )
         return self.query().join(CourseEvent).filter(conditions)

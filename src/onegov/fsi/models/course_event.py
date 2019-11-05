@@ -3,6 +3,7 @@ from uuid import uuid4
 
 from sqlalchemy import Column, Boolean, ForeignKey, SmallInteger, \
     Enum, Text, Interval
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, backref
 
 from onegov.core.orm import Base
@@ -73,7 +74,7 @@ class CourseEvent(Base, TimestampMixin):
         nullable=False,
         default=default_reminder_before)
 
-    @property
+    @hybrid_property
     def scheduled_reminder(self):
         return self.start - self.schedule_reminder_before
 
