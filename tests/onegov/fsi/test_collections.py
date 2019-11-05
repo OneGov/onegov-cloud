@@ -49,13 +49,14 @@ def test_course_event_collection(session, course):
     course, data = course(session)
     now = utcnow()
     new_course_events = (
-        mixer.blend(
-            CourseEvent,
-            start=now + datetime.timedelta(days=i),
-            end=now + datetime.timedelta(days=i, hours=2),
-            course_id=course.id
-
-        ) for i in (-1, 1, 2)
+            CourseEvent(
+                name=f'Event {i}',
+                start=now + datetime.timedelta(days=i),
+                end=now + datetime.timedelta(days=i, hours=2),
+                course_id=course.id,
+                presenter_name=f'P{i}',
+                presenter_company=f'C{i}',
+            ) for i in (-1, 1, 2)
     )
     session.add_all(new_course_events)
     session.flush()
