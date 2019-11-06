@@ -2,6 +2,8 @@ from cached_property import cached_property
 
 from onegov.core.elements import Link, LinkGroup
 from onegov.fsi.collections.course_event import CourseEventCollection
+from onegov.fsi.models.course_event import COURSE_EVENT_STATUSES_TRANSLATIONS, \
+    COURSE_EVENT_STATUSES
 from onegov.org.layout import DefaultLayout as OrgDefaultLayout
 from onegov.org.layout import DefaultMailLayout as OrgDefaultMailLayout
 from onegov.org.layout import Layout as OrgBaseLayout
@@ -84,6 +86,11 @@ class CourseEventLayout(DefaultLayout):
             return _('Course Events')
 
         return 'Default Title'
+
+    def format_status(self, model_status):
+        return COURSE_EVENT_STATUSES_TRANSLATIONS[
+            COURSE_EVENT_STATUSES.index(model_status)
+        ]
 
 
 class MailLayout(OrgDefaultMailLayout):

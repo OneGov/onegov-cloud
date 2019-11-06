@@ -14,7 +14,7 @@ def view_course_event_collection(self, request):
             'title': _('Courses Events'),
             'layout': layout,
             'model': self,
-            'courses': self.query().all()
+            'events': self.query().all()
     }
 
 
