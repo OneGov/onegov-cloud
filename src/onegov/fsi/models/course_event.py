@@ -1,7 +1,8 @@
 import datetime
+from collections import OrderedDict
 from uuid import uuid4
 
-from sqlalchemy import Column, Boolean, ForeignKey, SmallInteger, \
+from sqlalchemy import Column, Boolean, SmallInteger, \
     Enum, Text, Interval
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, backref
@@ -110,6 +111,21 @@ class CourseEvent(Base, TimestampMixin):
     @property
     def booked(self):
         return self.max_attendees <= self.reservations.count()
+
+    @property
+    def duplicate_dict(self):
+        return OrderedDict(
+            name=self.name, description=self.description,
+            presenter_name=self.presenter_name,
+            presenter_company=self.presenter_company,
+            min_attendees=self.min_attendees,
+            max_attendees=self.max_attendees,
+            mandatory_refresh=self.mandatory_refresh,
+            refresh_interval=self.refresh_interval)
+
+    @property
+    def duplicate(self):
+        return self.__class__(**self.duplicate_dict)
 
     def send_reminder_mail(self):
         # use self.attendees to get a list of emails
