@@ -38,9 +38,7 @@ class CourseLayout(DefaultLayout):
         collection = CourseEventCollection(
             session,
             upcoming_only=True,
-            course_id=course.id
-                                           )
-        print('test')
+            course_id=course.id)
         return self.request.link(collection)
 
     @cached_property
@@ -93,6 +91,17 @@ class CourseEventsLayout(DefaultLayout):
                 )
             )
         return links
+
+    @cached_property
+    def title(self):
+
+        if self.model.limit is not None:
+            return _('Upcoming Course Events')
+
+        if self.request.view_name == '':
+            return _('Course Events')
+
+        return 'Default Title'
 
 
 class MailLayout(OrgDefaultMailLayout):

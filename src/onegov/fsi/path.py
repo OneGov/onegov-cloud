@@ -40,15 +40,18 @@ def get_courses_list(app, request, page=0, creator_id=None, term=None):
 
 
 @FsiApp.path(model=CourseEventCollection,
-             path='/events/{course_id}',
-             converters=dict(upcoming_only=bool, past_only=bool))
+             path='/events',
+             converters=dict(
+                 upcoming_only=bool, past_only=bool, course_id=UUID, limit=int)
+             )
 def get_events_from_course(
         app,
-        course_id,
+        course_id=None,
         page=0,
         from_date=None,
         upcoming_only=None,
-        past_only=None
+        past_only=None,
+        limit=None
 ):
     return CourseEventCollection(
         app.session(),
@@ -56,7 +59,9 @@ def get_events_from_course(
         course_id=course_id,
         from_date=from_date,
         upcoming_only=upcoming_only,
-        past_only=past_only)
+        past_only=past_only,
+        limit=limit
+    )
 
 
 @FsiApp.path(model=CourseAttendeeCollection, path='/attendees')

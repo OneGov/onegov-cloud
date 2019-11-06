@@ -2,6 +2,7 @@ from onegov.core.elements import Link
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.course import CourseCollection
+from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
 from onegov.org.elements import LinkGroup
@@ -140,6 +141,11 @@ def get_top_navigation(request):
     yield Link(
         text=_("Courses"),
         url=request.class_link(CourseCollection)
+    )
+
+    yield Link(
+        text=_("Upcoming Course Events"),
+        url=request.link(CourseEventCollection.latest(request.app.session()))
     )
 
     layout = DefaultLayout(request.app.org, request)

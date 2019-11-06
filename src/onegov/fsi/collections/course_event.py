@@ -59,10 +59,13 @@ class CourseEventCollection(GenericCollection, Pagination):
             query = query.filter(CourseEvent.start <= utcnow())
         elif self.upcoming_only:
             query = query.filter(CourseEvent.start >= utcnow())
+
+        query = query.order_by(desc(CourseEvent.start))
+
         if self.limit:
             query = query.limit(self.limit)
 
-        query = query.order_by(desc(CourseEvent.start))
+
         return query
 
     def subset(self):
@@ -89,3 +92,7 @@ class CourseEventCollection(GenericCollection, Pagination):
             dummy_desc=title, course_event_id=course_event.id)
         self.session.add(reservation)
         self.session.flush()
+
+    @classmethod
+    def latest(cls, session):
+        return cls(session, upcoming_only=True, limit=5, course_id=None)
