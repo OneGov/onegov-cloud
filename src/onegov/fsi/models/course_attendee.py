@@ -78,7 +78,7 @@ class CourseAttendee(Base):
     @property
     def course_events(self):
         """
-        Will return the query to for not completed (future) courses events
+        Will return the query for not completed (future) courses events
          the attendee has a reservation record.
         """
         from onegov.fsi.models.course_event import CourseEvent  # circular
@@ -90,7 +90,7 @@ class CourseAttendee(Base):
         result = result.filter(Reservation.event_completed == False)
         return result
 
-    def upcoming_courses(self):
+    def repeating_courses(self):
         """
         Will return the query to filter for all courses the attendee
         has done with mandatory_refresh.
@@ -98,12 +98,11 @@ class CourseAttendee(Base):
         is marked as passed, though for the sake of speed.
         """
         from onegov.fsi.models.course_event import CourseEvent      # circular
-        from onegov.fsi.models.course import Course                 # circular
         from onegov.fsi.models.reservation import Reservation       # circular
 
         session = object_session(self)
-        result = session.query(Course).join(CourseEvent, Reservation)
+        result = session.query(CourseEvent).filter_by(mandatory_refresh=True)
+        result = result.join(Reservation)
         result = result.filter(Reservation.attendee_id == self.id)
         result = result.filter(Reservation.event_completed == True)
-        result = result.filter(Course.mandatory_refresh == True)
         return result

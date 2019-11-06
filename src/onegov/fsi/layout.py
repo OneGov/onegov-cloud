@@ -1,7 +1,6 @@
 from cached_property import cached_property
 
 from onegov.core.elements import Link, LinkGroup
-from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.org.layout import DefaultLayout as OrgDefaultLayout
 from onegov.org.layout import DefaultMailLayout as OrgDefaultMailLayout
@@ -20,28 +19,6 @@ class DefaultLayout(OrgDefaultLayout):
 class CourseLayout(DefaultLayout):
 
     @cached_property
-    def breadcrumbs(self):
-        """ Returns the breadcrumbs for the current page. """
-        links = [Link(_("Homepage"), self.homepage_url)]
-        if self.request.is_admin:
-            links.append(
-                Link(_('Course management',
-                       self.request.class_link(CourseCollection))))
-        else:
-            links.append(
-                Link(_('Courses',
-                       self.request.class_link(CourseCollection))))
-        return links
-
-    def events_link(self, course):
-        session = self.request.app.session()
-        collection = CourseEventCollection(
-            session,
-            upcoming_only=True,
-            course_id=course.id)
-        return self.request.link(collection)
-
-    @cached_property
     def editbar_links(self):
         links = []
         if self.request.is_admin:
@@ -49,7 +26,7 @@ class CourseLayout(DefaultLayout):
                 Link(
                     text=_("Add Course"),
                     url=self.request.class_link(
-                        CourseCollection, name='new'
+                        CourseEventCollection, name='new'
                     ),
                     attrs={'class': 'new-item'}
                 )
@@ -71,11 +48,16 @@ class CourseEventsLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self):
         """ Returns the breadcrumbs for the current page. """
-        return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_('Course Events'),
-                 self.request.class_link(CourseEventCollection))
-        ]
+        links = [Link(_("Homepage"), self.homepage_url)]
+        if self.request.is_admin:
+            links.append(
+                Link(_('Course management',
+                       self.request.class_link(CourseEventCollection))))
+        else:
+            links.append(
+                Link(_('Courses',
+                       self.request.class_link(CourseEventCollection))))
+        return links
 
     @cached_property
     def editbar_links(self):

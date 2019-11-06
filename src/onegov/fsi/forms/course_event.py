@@ -1,3 +1,8 @@
+from wtforms import SelectField
+from onegov.fsi import _
+from onegov.form import Form
+from onegov.form.fields import TimezoneDateTimeField
+
 from wtforms import StringField, RadioField
 from wtforms.validators import InputRequired
 
@@ -6,7 +11,7 @@ from onegov.fsi import _
 from onegov.form import Form
 
 
-class CourseForm(Form):
+class CourseEventForm(Form):
 
     name = StringField(
         label=_('Short Description'),
@@ -88,4 +93,19 @@ class CourseForm(Form):
 
 
 
-
+# class CourseEventForm(Form):
+#
+#     course = SelectField(
+#         label=_('Course'),
+#         render_kw={'size': 4}
+#     )
+#
+#
+#     start = TimezoneDateTimeField(
+#         label=_('Course Start'),
+#         render_kw={'size': 4}
+#     )
+#
+#     end = TimezoneDateTimeField(
+#         label=_('Course End')
+#     )

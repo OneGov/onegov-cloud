@@ -1,19 +1,12 @@
 from uuid import UUID
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
-from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.collections.notification_template import \
     FsiNotificationTemplateCollection
 from onegov.fsi.collections.reservation import ReservationCollection
-from onegov.fsi.models.course import Course
 from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.notification_template import FsiNotificationTemplate
-
-
-@FsiApp.path(model=Course, path='/course/{id}')
-def get_course_details(app, id):
-    return CourseCollection(app.session()).by_id(id)
 
 
 @FsiApp.path(model=CourseEvent, path='/event/{id}')
@@ -28,15 +21,15 @@ def get_course_details(app, id):
     return FsiNotificationTemplateCollection(app.session()).by_id(id)
 
 
-@FsiApp.path(model=CourseCollection, path='/courses')
-def get_courses_list(app, request, page=0, creator_id=None, term=None):
-    return CourseCollection(
-        app.session(),
-        page=page,
-        creator_id=creator_id,
-        term=term,
-        locale=request.locale
-    )
+# @FsiApp.path(model=CourseCollection, path='/courses')
+# def get_courses_list(app, request, page=0, creator_id=None, term=None):
+#     return CourseCollection(
+#         app.session(),
+#         page=page,
+#         creator_id=creator_id,
+#         term=term,
+#         locale=request.locale
+#     )
 
 
 @FsiApp.path(model=CourseEventCollection,
@@ -44,9 +37,8 @@ def get_courses_list(app, request, page=0, creator_id=None, term=None):
              converters=dict(
                  upcoming_only=bool, past_only=bool, course_id=UUID, limit=int)
              )
-def get_events_from_course(
+def get_events_view(
         app,
-        course_id=None,
         page=0,
         from_date=None,
         upcoming_only=None,
@@ -56,7 +48,6 @@ def get_events_from_course(
     return CourseEventCollection(
         app.session(),
         page=page,
-        course_id=course_id,
         from_date=from_date,
         upcoming_only=upcoming_only,
         past_only=past_only,

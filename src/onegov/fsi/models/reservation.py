@@ -50,7 +50,3 @@ class Reservation(Base):
         if self.is_placeholder:
             return f'{self.dummy_desc or ""}'
         return f'{self.attendee.last_name}, {self.attendee.first_name}'
-
-    @property
-    def course(self):
-        return self.course_event.course

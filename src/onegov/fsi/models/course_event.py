@@ -22,21 +22,26 @@ class CourseEvent(Base, TimestampMixin):
     __tablename__ = 'fsi_course_events'
 
     id = Column(UUID, primary_key=True, default=uuid4)
-    course_id = Column(UUID, ForeignKey('fsi_courses.id'), nullable=False)
 
-    start = Column(UTCDateTime, nullable=False)
-    end = Column(UTCDateTime, nullable=False)
     # Short description
     name = Column(Text, nullable=False)
+    # Long description
+    description = Column(Text, nullable=False)
 
+    # Event specific information
+    start = Column(UTCDateTime, nullable=False)
+    end = Column(UTCDateTime, nullable=False)
     presenter_name = Column(Text, nullable=False)
     presenter_company = Column(Text, nullable=False)
-
     min_attendees = Column(SmallInteger, nullable=False, default=1)
     max_attendees = Column(SmallInteger, nullable=True)
+    refresh_interval = Column(Interval, nullable=True)
+
+    # If the course has to be refreshed after some interval
+    mandatory_refresh = Column(Boolean, nullable=False, default=False)
 
     # Creator of this course event
-    user_id = Column(UUID, ForeignKey('users.id'), nullable=True)
+    # user_id = Column(UUID, ForeignKey('users.id'), nullable=True)
 
     status = Column(
         Enum(
@@ -62,8 +67,6 @@ class CourseEvent(Base, TimestampMixin):
         lazy='dynamic',
         cascade='all, delete-orphan',
     )
-
-    course = relationship('Course', lazy='joined')
 
     # hides from member roles
     hidden_from_public = Column(Boolean, nullable=False, default=False)

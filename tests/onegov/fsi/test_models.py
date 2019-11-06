@@ -2,37 +2,9 @@ import datetime
 
 from sedate import utcnow
 
-from onegov.fsi.models.course import Course
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.reservation import Reservation
-
-
-def test_course_1(session, course, attendee, course_event_data):
-    course, data = course(session)
-    mock = course_event_data
-    assert course.events.count() == 0
-
-    # Add an event
-    now = utcnow()
-    tmr = now + datetime.timedelta(days=1)
-    just_before = now - datetime.timedelta(minutes=2)
-
-    event = CourseEvent(**mock(),
-                        start=just_before, end=now, course_id=course.id)
-    event_now = CourseEvent(**mock(), start=now, end=tmr, course_id=course.id)
-    event_tmr = CourseEvent(**mock(), start=tmr, end=tmr, course_id=course.id)
-
-    course.events.append(event)
-    course.events.append(event_now)
-    course.events.append(event_tmr)
-
-    assert course.events.count() == 3
-    assert session.query(CourseEvent).count() == 3
-
-    # Test upcoming events
-    assert course.next_event() == event_tmr
-    assert course.upcoming_events == [event_now, event_tmr]
 
 
 def test_reservation_as_placeholder():
@@ -81,15 +53,15 @@ def test_attendee_1(session, attendee, course_event, member):
 
 
 def test_attendee_upcoming_courses(
-        session, attendee, course, course_event, future_course_event):
+        session, attendee, course_event, future_course_event):
 
-    course = course(session)
     attendee = attendee(session)
     course_event = course_event(session)
     future_course_event = future_course_event(session)
 
     # Add two reservations
-    assert course[0].mandatory_refresh is True
+    assert course_event[0].mandatory_refresh is True
+    assert future_course_event[0].mandatory_refresh is True
     session.add_all((
         Reservation(course_event_id=course_event[0].id,
                     attendee_id=attendee[0].id, event_completed=True),
@@ -98,21 +70,18 @@ def test_attendee_upcoming_courses(
     session.flush()
 
     # Test for ignoring the date when future event is marked as completed
-    assert attendee[0].upcoming_courses().count() == 2
+    assert attendee[0].repeating_courses().count() == 2
 
-    course[0].mandatory_refresh = False
-    session.flush()
-    assert not attendee[0].upcoming_courses().count() == 1
+    course_event[0].mandatory_refresh = False
+    assert attendee[0].repeating_courses().count() == 1
 
 
 def test_course_event_1(session, course_event, attendee):
     attendee = attendee(session)
     event, data = course_event(session)
-    course = session.query(Course).first()
 
     assert event.attendees.count() == 0
     assert event.reservations.count() == 0
-    assert event.course == course
 
     # Add a participant via a reservation
     placeholder = Reservation.as_placeholder(
@@ -146,17 +115,6 @@ def test_reservation_1(session, attendee, course_event):
     assert res.course_event == course_event[0]
     assert res.attendee == attendee[0]
     assert str(res) == 'L, F'
-    assert res.course == course_event[0].course
-
-
-def test_cascading_course_deletion(session, db_mock_session):
-    # When a course is deleted, all course events should be deleted as well
-    session = db_mock_session(session)
-    course = session.query(Course).one()
-    session.delete(course)
-    session.flush()
-    assert session.query(CourseEvent).count() == 0
-    assert session.query(Reservation).count() == 0
 
 
 def test_cascading_event_deletion(session, db_mock_session):

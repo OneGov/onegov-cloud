@@ -15,7 +15,6 @@
                                     <th i18n:translate="">Presenter</th>
                                     <th i18n:translate="">Presenter Company</th>
                                     <th i18n:translate="">Refresh</th>
-                                    <th i18n:translate="">Next Events</th>
                                 </thead>
                                 <tbody>
                                     <tal:b tal:repeat="course courses">
@@ -25,7 +24,6 @@
                                             <td class="">${course.presenter_company}</td>
                                             <td class="" tal:condition="course.mandatory_refresh">${course.mandatory_refresh}</td>
                                             <td class="" tal:condition="not course.mandatory_refresh" i18n:translate="">None</td>
-                                            <td class=""><a href="${layout.events_link(course)}" i18n:translate="">See Events</a></td>
                                         </tr>
                                     </tal:b>
                                 </tbody>

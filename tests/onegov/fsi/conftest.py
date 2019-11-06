@@ -7,7 +7,6 @@ from sedate import utcnow
 
 from onegov.core.crypto import hash_password
 from onegov.fsi.models.course_attendee import CourseAttendee
-from onegov.fsi.models.course import Course
 from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.notification_template import FsiNotificationTemplate
 from onegov.fsi.models.reservation import Reservation
@@ -159,34 +158,18 @@ def notification_template(planner, course_event):
 
 
 @pytest.fixture(scope='function')
-def course():
-    def _course(session, **kwargs):
-        data = dict(
-            description='Desc',
-            name='Course',
-            presenter_name='Pres',
-            presenter_company='Company',
-            mandatory_refresh=True,
-            refresh_interval=datetime.timedelta(days=30))
-        data.update(**kwargs)
-        course = Course(**data)
-        session.add(course)
-        session.flush()
-        return course, data
-    return _course
-
-
-@pytest.fixture(scope='function')
-def course_event(course, planner):
+def course_event():
     def _course_event(session, **kwargs):
         data = dict(
-            course_id=course(session)[0].id,
             name='Event',
+            description='Description',
             start=utcnow() - datetime.timedelta(days=30, hours=2),
             end=utcnow() - datetime.timedelta(days=30),
             presenter_name='Presenter',
             presenter_company='Company',
-            max_attendees=20)
+            max_attendees=20,
+            mandatory_refresh=True
+        )
         data.update(**kwargs)
         course_event = session.query(CourseEvent).filter_by(**data).first()
         if not course_event:
@@ -199,16 +182,18 @@ def course_event(course, planner):
 
 
 @pytest.fixture(scope='function')
-def future_course_event(course):
+def future_course_event():
     def _future_course_event(session, **kwargs):
         in_a_week = utcnow() + datetime.timedelta(days=7)
         data = dict(
-            course_id=course(session)[0].id,
             name='FutureEvent',
+            description='Description',
             start=in_a_week,
             end=in_a_week + datetime.timedelta(hours=2),
             presenter_name='Presenter',
-            presenter_company='Company')
+            presenter_company='Company',
+            mandatory_refresh=True
+        )
         data.update(**kwargs)
         course_event = session.query(CourseEvent).filter_by(**data).first()
         if not course_event:
@@ -240,7 +225,8 @@ def future_course_reservation(future_course_event, attendee):
 def course_event_data():
     def _course_event_data():
         return dict(
-            name='A', presenter_name='P', presenter_company='C', id=uuid4())
+            name='A', presenter_name='P', presenter_company='C', id=uuid4(),
+        description='Some Desc')
     return _course_event_data
 
 

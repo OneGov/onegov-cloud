@@ -13,7 +13,6 @@ class CourseEventCollection(GenericCollection, Pagination):
             self, session,
             page=0,
             creator=None,
-            course_id=None,
             from_date=None,
             upcoming_only=True,
             past_only=False,
@@ -21,9 +20,6 @@ class CourseEventCollection(GenericCollection, Pagination):
     ):
         super().__init__(session)
         self.page = page
-        self.creator = creator      # to filter courses events of a creator
-        self.course_id = course_id
-
         # filter newer than from date
         self.from_date = from_date              # ignores upcoming_only
         self.upcoming_only = upcoming_only      # active if from_date not set
@@ -33,15 +29,14 @@ class CourseEventCollection(GenericCollection, Pagination):
         if from_date:
             assert isinstance(from_date, datetime)
 
-    def __eq__(self, other):
-        return (self.page == other.page
-                and self.creator == other.creator
-                and self.course_id == other.course_id
-                and self.from_date == other.from_date
-                and self.upcoming_only == other.upcoming_only
-                and self.past_only == other.past_only
-                and self.limit
-                )
+    # def __eq__(self, other):
+    #     return (self.page == other.page
+    #             and self.creator == other.creator
+    #             and self.from_date == other.from_date
+    #             and self.upcoming_only == other.upcoming_only
+    #             and self.past_only == other.past_only
+    #             and self.limit
+    #             )
 
     @property
     def model_class(self):
@@ -49,10 +44,6 @@ class CourseEventCollection(GenericCollection, Pagination):
 
     def query(self):
         query = super().query()
-        if self.creator:
-            query = query.filter_by(user_id=self.creator.id)
-        if self.course_id:
-            query = query.filter_by(course_id=self.course_id)
         if self.from_date:
             query = query.filter(CourseEvent.start > self.from_date)
         elif self.past_only:
@@ -64,7 +55,6 @@ class CourseEventCollection(GenericCollection, Pagination):
 
         if self.limit:
             query = query.limit(self.limit)
-
 
         return query
 
@@ -78,8 +68,6 @@ class CourseEventCollection(GenericCollection, Pagination):
     def page_by_index(self, index):
         return self.__class__(
             self.session, index,
-            creator=self.creator,
-            course_id=self.course_id,
             from_date=self.from_date,
             upcoming_only=self.upcoming_only,
             past_only=self.past_only,
@@ -95,4 +83,4 @@ class CourseEventCollection(GenericCollection, Pagination):
 
     @classmethod
     def latest(cls, session):
-        return cls(session, upcoming_only=True, limit=5, course_id=None)
+        return cls(session, upcoming_only=True, limit=5)
