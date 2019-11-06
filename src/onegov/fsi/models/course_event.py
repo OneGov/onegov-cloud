@@ -11,8 +11,18 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.reservation import reservation_table
+from onegov.fsi import _
 
 COURSE_EVENT_STATUSES = ('created', 'confirmed', 'canceled', 'planned')
+COURSE_EVENT_STATUSES_TRANSLATIONS = (
+    _('Created'), _('Confirmed'), _('Canceled'), _('Planned'))
+
+
+# for forms...
+def course_status_choices():
+    return tuple(
+        (val, key) for val, key in zip(COURSE_EVENT_STATUSES,
+                                       COURSE_EVENT_STATUSES_TRANSLATIONS))
 
 
 class CourseEvent(Base, TimestampMixin):

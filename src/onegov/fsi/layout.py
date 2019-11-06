@@ -16,26 +16,26 @@ class DefaultLayout(OrgDefaultLayout):
     pass
 
 
-class CourseLayout(DefaultLayout):
+# class CourseLayout(DefaultLayout):
+#
+#     @cached_property
+#     def editbar_links(self):
+#         links = []
+#         if self.request.is_admin:
+#             links.append(
+#                 Link(
+#                     text=_("Add Course"),
+#                     url=self.request.class_link(
+#                         CourseEventCollection, name='new'
+#                     ),
+#                     attrs={'class': 'new-item'}
+#                 )
+#             )
+#
+#         return links
 
-    @cached_property
-    def editbar_links(self):
-        links = []
-        if self.request.is_admin:
-            links.append(
-                Link(
-                    text=_("Add Course"),
-                    url=self.request.class_link(
-                        CourseEventCollection, name='new'
-                    ),
-                    attrs={'class': 'new-item'}
-                )
-            )
 
-        return links
-
-
-class CourseEventsLayout(DefaultLayout):
+class CourseEventLayout(DefaultLayout):
 
     def upcoming_events(self, limit):
         raise NotImplementedError

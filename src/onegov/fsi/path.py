@@ -21,17 +21,6 @@ def get_course_details(app, id):
     return FsiNotificationTemplateCollection(app.session()).by_id(id)
 
 
-# @FsiApp.path(model=CourseCollection, path='/courses')
-# def get_courses_list(app, request, page=0, creator_id=None, term=None):
-#     return CourseCollection(
-#         app.session(),
-#         page=page,
-#         creator_id=creator_id,
-#         term=term,
-#         locale=request.locale
-#     )
-
-
 @FsiApp.path(model=CourseEventCollection,
              path='/events',
              converters=dict(

@@ -84,3 +84,9 @@ class CourseEventCollection(GenericCollection, Pagination):
     @classmethod
     def latest(cls, session):
         return cls(session, upcoming_only=True, limit=5)
+
+    def next_event(self):
+        return self.query().filter(
+            self.model_class.start > utcnow()).order_by(
+            self.model_class.start
+        ).first()
