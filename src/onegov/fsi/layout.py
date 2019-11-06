@@ -1,9 +1,9 @@
 from cached_property import cached_property
 
-from onegov.core.elements import Link, LinkGroup
+from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.models.course_event import COURSE_EVENT_STATUSES_TRANSLATIONS, \
-    COURSE_EVENT_STATUSES
+    COURSE_EVENT_STATUSES, CourseEvent
 from onegov.org.layout import DefaultLayout as OrgDefaultLayout
 from onegov.org.layout import DefaultMailLayout as OrgDefaultMailLayout
 from onegov.org.layout import Layout as OrgBaseLayout
@@ -39,13 +39,13 @@ class DefaultLayout(OrgDefaultLayout):
 
 class CourseEventLayout(DefaultLayout):
 
-    def upcoming_events(self, limit):
-        raise NotImplementedError
-        # return self.request.link(CourseEventCollection(
-        #     self.session,
-        #     upcoming_only=True,
-        #     limit=limit
-        # ))
+    def include_editor(self):
+        self.request.include('redactor')
+        self.request.include('editor')
+
+    @cached_property
+    def collection(self):
+        return CourseEventCollection(self.request.session)
 
     @cached_property
     def breadcrumbs(self):
@@ -64,6 +64,10 @@ class CourseEventLayout(DefaultLayout):
     @cached_property
     def editbar_links(self):
         links = []
+
+        if self.request.view_name == 'duplicate':
+            return links
+
         if self.request.is_manager:
             links.append(
                 Link(
@@ -71,15 +75,54 @@ class CourseEventLayout(DefaultLayout):
                     url=self.request.class_link(
                         CourseEventCollection, name='new'
                     ),
-                    attrs={'class': 'new-item'}
+                    attrs={'class': 'new-link'}
                 )
             )
+            if isinstance(self.model, CourseEvent):
+                links.append(
+                    Link(
+                        text=_("Edit"),
+                        url=self.request.link(self.model, name='edit'),
+                        attrs={'class': 'edit-link'}
+                    )
+                )
+
+                links.append(
+                    Link(
+                        text=_('Duplicate'),
+                        url=self.request.link(self.model, name='duplicate')
+                    )
+                )
+                links.append(
+                    Link(
+                        text=_("Delete"),
+                        url=self.csrf_protected_url(
+                            self.request.link(self.model)
+                        ),
+                        attrs={'class': 'delete-link'},
+                        traits=(
+                            Confirm(
+                                _("Do you really want to delete this course event ?"),
+                                _("This cannot be undone."),
+                                _("Delete course event"),
+                                _("Cancel")
+                            ),
+                            Intercooler(
+                                request_method='DELETE',
+                                redirect_after=self.request.link(
+                                    self.collection
+                                )
+                            )
+                        )
+                    )
+                )
+
         return links
 
     @cached_property
     def title(self):
 
-        if self.model.limit is not None:
+        if self.model.limit and isinstance(self.model, CourseEventCollection):
             return _('Upcoming Course Events')
 
         if self.request.view_name == '':
@@ -87,7 +130,8 @@ class CourseEventLayout(DefaultLayout):
 
         return 'Default Title'
 
-    def format_status(self, model_status):
+    @staticmethod
+    def format_status(model_status):
         return COURSE_EVENT_STATUSES_TRANSLATIONS[
             COURSE_EVENT_STATUSES.index(model_status)
         ]

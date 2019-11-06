@@ -10,12 +10,14 @@
                         <tal:b tal:condition="model|nothing">
                             <h4>${model.name}</h4><br>
                             <p><strong i18n:translate="">Info: </strong> ${layout.format_date(model.start, 'date')} ${layout.format_date(model.start, 'time')} - ${layout.format_date(model.end, 'time')}</p>
-                            <p><strong>Remaing seats: </strong>${model.available_seats}</p>
+                            <p><strong i18n:translate="">Remaining seats: </strong>${model.available_seats}</p>
                             <p><strong i18n:translate="">Description:</strong></p>
                             <p>${model.description}</p>
+                            <tal:b tal:condition="layout.request.is_logged_in">
+                                <a tal:condition="not: model.booked" class="button" href="#" i18n:translate="">Subscribe</a>
+                                <strong tal:condition="model.booked" i18n:translate="">This course event is fully booked.</strong>
+                            </tal:b>
 
-                            <a tal:condition="not: model.booked" class="button" href="#">Subscribe</a>
-                            <strong tal:condition="model.booked" i18n:translate="">This course event is fully booked.</strong>
                         </tal:b>
                     </div>
                 </div>

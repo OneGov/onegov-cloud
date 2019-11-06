@@ -12,11 +12,10 @@ class CourseEventCollection(GenericCollection, Pagination):
     def __init__(
             self, session,
             page=0,
-            creator=None,
             from_date=None,
             upcoming_only=True,
             past_only=False,
-            limit=None
+            limit=None,
     ):
         super().__init__(session)
         self.page = page
