@@ -3,6 +3,7 @@ from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.forms.course_event import CourseEventForm
 from onegov.fsi import _
 from onegov.fsi.layout import CourseEventLayout
+from onegov.fsi.models.course_event import CourseEvent
 
 
 @FsiApp.html(
@@ -39,4 +40,16 @@ def view_create_course_event(self, request, form):
         'model': self,
         'form': form
 
+    }
+
+
+@FsiApp.html(
+    model=CourseEvent,
+    template='course_event.pt')
+def view_course_event(self, request):
+    layout = CourseEventLayout(self, request)
+    return {
+            'title': _('Courses Event Details'),
+            'layout': layout,
+            'model': self,
     }

@@ -103,8 +103,13 @@ class CourseEvent(Base, TimestampMixin):
     @property
     def available_seats(self):
         if self.max_attendees:
-            return self.max_attendees - self.reservations.count()
+            seats = self.max_attendees - self.reservations.count()
+            return 0 if seats < 0 else seats
         return None
+
+    @property
+    def booked(self):
+        return self.max_attendees <= self.reservations.count()
 
     def send_reminder_mail(self):
         # use self.attendees to get a list of emails

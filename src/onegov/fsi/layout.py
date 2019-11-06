@@ -92,6 +92,13 @@ class CourseEventLayout(DefaultLayout):
             COURSE_EVENT_STATUSES.index(model_status)
         ]
 
+    def instance_link(self, instance):
+        return self.request.link(instance)
+
+
+class ReservationLayout(DefaultLayout):
+    pass
+
 
 class MailLayout(OrgDefaultMailLayout):
 

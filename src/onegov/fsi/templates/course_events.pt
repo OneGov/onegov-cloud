@@ -24,7 +24,7 @@
                                 <tbody>
                                     <tal:b tal:repeat="event events">
                                         <tr>
-                                            <td class="">${event.name}</td>
+                                            <td class=""><a href="${layout.instance_link(event)}">${event.name}</a></td>
                                             <td class="">${event.presenter_name}</td>
                                             <td class="">${layout.format_date(event.start, 'date')}</td>
                                             <td class="">${layout.format_date(event.start, 'time')}</td>

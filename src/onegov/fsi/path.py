@@ -56,9 +56,12 @@ def get_notification_templates(app, request):
     )
 
 
-@FsiApp.path(model=ReservationCollection, path='/reservations')
-def get_reservations(app, request):
+@FsiApp.path(model=ReservationCollection,
+             path='/reservations')
+def get_reservations(app, request, course_event_id=None):
     return ReservationCollection(
-        app.session(), attendee_id=request.attendee_id
+        app.session(),
+        attendee_id=request.attendee_id,
+        course_event_id=course_event_id
     )
 

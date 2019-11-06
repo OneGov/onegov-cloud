@@ -10,9 +10,10 @@ from onegov.fsi.models.reservation import Reservation
 
 class ReservationCollection(GenericCollection):
 
-    def __init__(self, session, attendee_id=None):
+    def __init__(self, session, attendee_id=None, course_event_id=None):
         super().__init__(session)
         self.attendee_id = attendee_id
+        self.course_event_id = course_event_id
 
     @property
     def model_class(self):
@@ -32,4 +33,6 @@ class ReservationCollection(GenericCollection):
         query = super().query()
         if self.attendee_id:
             query = query.filter_by(attendee_id=self.attendee_id)
+        if self.course_event_id:
+            query = query.filter_by(course_event_id=self.course_event_id)
         return query

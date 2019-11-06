@@ -1,0 +1,25 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.fsi">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="row">
+            <div class="columns small-12">
+                <div class="row">
+                    <div class="columns small-12">
+                        <tal:b tal:condition="model|nothing">
+                            <h4>${model.name}</h4><br>
+                            <p><strong i18n:translate="">Info: </strong> ${layout.format_date(model.start, 'date')} ${layout.format_date(model.start, 'time')} - ${layout.format_date(model.end, 'time')}</p>
+                            <p><strong>Remaing seats: </strong>${model.available_seats}</p>
+                            <p><strong i18n:translate="">Description:</strong></p>
+                            <p>${model.description}</p>
+
+                            <a tal:condition="not: model.booked" class="button" href="#">Subscribe</a>
+                            <strong tal:condition="model.booked" i18n:translate="">This course event is fully booked.</strong>
+                        </tal:b>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </tal:b>
+</div>
