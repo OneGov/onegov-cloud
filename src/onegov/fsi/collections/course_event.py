@@ -2,12 +2,12 @@ from datetime import datetime
 from sedate import utcnow
 from sqlalchemy import desc
 
-from onegov.core.collection import Pagination
+from onegov.core.collection import Pagination, GenericCollection
 from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.reservation import Reservation
 
 
-class CourseEventCollection(Pagination):
+class CourseEventCollection(GenericCollection, Pagination):
 
     def __init__(
             self, session,
@@ -19,7 +19,7 @@ class CourseEventCollection(Pagination):
             past_only=False,
             limit=None
     ):
-        self.session = session
+        super().__init__(session)
         self.page = page
         self.creator = creator      # to filter courses events of a creator
         self.course_id = course_id
@@ -40,11 +40,15 @@ class CourseEventCollection(Pagination):
                 and self.from_date == other.from_date
                 and self.upcoming_only == other.upcoming_only
                 and self.past_only == other.past_only
+                and self.limit
                 )
 
+    @property
+    def model_class(self):
+        return CourseEvent
+
     def query(self):
-        query = self.session.query(CourseEvent).order_by(
-            desc(CourseEvent.created))
+        query = super().query()
         if self.creator:
             query = query.filter_by(user_id=self.creator.id)
         if self.course_id:
@@ -57,6 +61,8 @@ class CourseEventCollection(Pagination):
             query = query.filter(CourseEvent.start >= utcnow())
         if self.limit:
             query = query.limit(self.limit)
+
+        query = query.order_by(desc(CourseEvent.start))
         return query
 
     def subset(self):
@@ -74,6 +80,7 @@ class CourseEventCollection(Pagination):
             from_date=self.from_date,
             upcoming_only=self.upcoming_only,
             past_only=self.past_only,
+            limit=self.limit
         )
 
     def add_placeholder(self, title, course_event):

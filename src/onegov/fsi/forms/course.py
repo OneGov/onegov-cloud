@@ -1,32 +1,39 @@
 from wtforms import StringField, RadioField
+from wtforms.validators import InputRequired
 
 from onegov.form.fields import HtmlField
 from onegov.fsi import _
 from onegov.form import Form
 
 
-class EditCourseForm(Form):
+class CourseForm(Form):
 
     name = StringField(
-        label=_('Name'),
+        label=_('Short Description'),
         render_kw={'size': 4},
-        description=_('Short title of the course')
-    )
+        description=_('Short title of the course'),
+        validators=[
+            InputRequired()
+        ]
 
-    description = HtmlField(
-        label=_("Description"),
-        render_kw={'rows': 10}
     )
 
     presenter_name = StringField(
         label=_('Presenter'),
-        description=_('Full name of the presenter')
+        render_kw={'size': 4},
+        description=_('Full name of the presenter'),
+        validators=[
+            InputRequired()
+        ]
     )
 
     presenter_company = StringField(
         label=_('Company'),
         description='Presenters company',
-        render_kw={'size': 4}
+        render_kw={'size': 4},
+        validators=[
+            InputRequired()
+        ]
     )
 
     mandatory_refresh = RadioField(
@@ -36,7 +43,7 @@ class EditCourseForm(Form):
             (0, _("No")),
         ),
         coerce=bool,
-        render_kw={'size': 2},
+        render_kw={'size': 4},
         description=_(
             "Define if this course has a refresh. The refresh"
         )
@@ -49,10 +56,36 @@ class EditCourseForm(Form):
             (0, _("No")),
         ),
         coerce=bool,
-        render_kw={'size': 2},
+        render_kw={'size': 4},
         description=_(
-            "If checked, the course will only be visible by admins"
+            "If checked, the course will only be visible by admin"
         )
     )
+
+    description = HtmlField(
+        label=_("Description"),
+        render_kw={'rows': 10},
+        validators=[
+            InputRequired()
+        ]
+    )
+
+    def apply_model(self, model):
+        self.name.data = model.name
+        self.presenter_name.data = model.presenter_name
+        self.presenter_company = model.presenter_company
+        self.description = model.description
+        self.mandatory_refresh = model.mandatory_refresh
+        self.hidden_from_public = model.hidden_from_public
+
+    def update_model(self, model):
+        model.name = self.name.data
+        model.presenter_name = self.presenter_name.data
+        model.presenter_company = self.presenter_company.data
+        model.description = self.description
+        model.mandatory_refresh = self.mandatory_refresh
+        model.hidden_from_public = self.hidden_from_public
+
+
 
 

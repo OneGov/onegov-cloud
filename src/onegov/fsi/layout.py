@@ -1,9 +1,12 @@
 from cached_property import cached_property
 
+from onegov.core.elements import Link, LinkGroup
+from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.org.layout import DefaultLayout as OrgDefaultLayout
 from onegov.org.layout import DefaultMailLayout as OrgDefaultMailLayout
 from onegov.org.layout import Layout as OrgBaseLayout
+from onegov.fsi import _
 
 
 class Layout(OrgBaseLayout):
@@ -11,13 +14,85 @@ class Layout(OrgBaseLayout):
 
 
 class DefaultLayout(OrgDefaultLayout):
+    pass
+
+
+class CourseLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        """ Returns the breadcrumbs for the current page. """
+        links = [Link(_("Homepage"), self.homepage_url)]
+        if self.request.is_admin:
+            links.append(
+                Link(_('Course management',
+                       self.request.class_link(CourseCollection))))
+        else:
+            links.append(
+                Link(_('Courses',
+                       self.request.class_link(CourseCollection))))
+        return links
 
     def events_link(self, course):
-        return self.request.link(CourseEventCollection(
-            self.session,
+        session = self.request.app.session()
+        collection = CourseEventCollection(
+            session,
             upcoming_only=True,
-            course_id=course.id)
-        )
+            course_id=course.id
+                                           )
+        print('test')
+        return self.request.link(collection)
+
+    @cached_property
+    def editbar_links(self):
+        links = []
+        if self.request.is_admin:
+            links.append(
+                Link(
+                    text=_("Add Course"),
+                    url=self.request.class_link(
+                        CourseCollection, name='new'
+                    ),
+                    attrs={'class': 'new-item'}
+                )
+            )
+
+        return links
+
+
+class CourseEventsLayout(DefaultLayout):
+
+    def upcoming_events(self, limit):
+        raise NotImplementedError
+        # return self.request.link(CourseEventCollection(
+        #     self.session,
+        #     upcoming_only=True,
+        #     limit=limit
+        # ))
+
+    @cached_property
+    def breadcrumbs(self):
+        """ Returns the breadcrumbs for the current page. """
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_('Course Events'),
+                 self.request.class_link(CourseEventCollection))
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        links = []
+        if self.request.is_manager:
+            links.append(
+                Link(
+                    text=_("Add Course Event"),
+                    url=self.request.class_link(
+                        CourseEventCollection, name='new'
+                    ),
+                    attrs={'class': 'new-item'}
+                )
+            )
+        return links
 
 
 class MailLayout(OrgDefaultMailLayout):
