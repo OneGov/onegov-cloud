@@ -2,10 +2,12 @@ import re
 from collections import OrderedDict
 from datetime import timedelta
 
-from wtforms import SelectField
+from wtforms.compat import text_type
+from wtforms.widgets import TextInput
+
 from onegov.form.fields import TimezoneDateTimeField, ChosenSelectField
 
-from wtforms import StringField, RadioField
+from wtforms import StringField, RadioField, Field, IntegerField, SelectField
 from wtforms.validators import InputRequired
 
 from onegov.form.fields import HtmlField
@@ -18,6 +20,9 @@ mapping = OrderedDict({'year': 365, 'month': 30, 'week': 7, 'day': 1})
 
 def string_to_timedelta(value):
     # Incoming model value
+    if not value:
+        return None
+
     pattern = r'(\d+)\.?\d?\s?(\w+)'
     g = re.search(pattern, value)
     if not g.group():
@@ -36,7 +41,8 @@ def string_to_timedelta(value):
 
 
 def datetime_to_string(dt):
-    assert isinstance(dt, timedelta)
+    if not dt or not isinstance(dt, timedelta):
+        return None
     remaining = dt.days
 
     def s_append(key, value):
@@ -46,6 +52,36 @@ def datetime_to_string(dt):
         count = remaining // divisor
         if count != 0:
             return f"{count} {s_append(unit, count)}"
+    return None
+
+
+class IntervalStringField(StringField):
+    """To handle incoming data from python, override process_data.
+    Similarly, to handle incoming data from the outside,
+    override process_formdata.
+
+    The _value method is called by the TextInput widget to provide
+     the value that is displayed in the form. Overriding the process_formdata()
+    method processes the incoming form data back into a list of tags.
+
+    """
+    widget = TextInput()
+
+    def process_data(self, value):
+        print('test')
+        super().process_data(value)
+
+    def process_formdata(self, valuelist):
+        if valuelist and valuelist[0]:
+            self.data = string_to_timedelta(valuelist[0].strip())
+        else:
+            self.data = None
+
+    def _value(self):
+        if self.data is not None:
+            return datetime_to_string(self.data)
+        else:
+            return ''
 
 
 class CourseEventForm(Form):
@@ -105,12 +141,13 @@ class CourseEventForm(Form):
             (0, _("No")),
         ),
         coerce=bool,
-        render_kw={'size': 2}
+        render_kw={'size': 2},
+        default=0
     )
 
-    refresh_interval = StringField(
+    refresh_interval = IntervalStringField(
         label=_('Refresh Interval'),
-        render_kw={'size': 2}
+        render_kw={'size': 2},
     )
 
     # Course Event info
@@ -132,26 +169,25 @@ class CourseEventForm(Form):
         ]
     )
 
-    min_attendees = StringField(
+    min_attendees = IntegerField(
         label=_('Attendees min'),
         render_kw={'size': 2},
-        validators=[
-            InputRequired()
-        ]
     )
 
-    max_attendees = StringField(
+    max_attendees = IntegerField(
         label=_('Attendees max'),
         render_kw={'size': 2},
         validators=[
             InputRequired()
-        ]
+        ],
+        default=1
     )
 
-    status = ChosenSelectField(
+    status = SelectField(
         label=_('Status'),
         render_kw={'size': 2},
-        choices=course_status_choices()
+        choices=course_status_choices(),
+        default='created'
     )
 
     def apply_model(self, model):
@@ -167,7 +203,7 @@ class CourseEventForm(Form):
         self.min_attendees.data = model.min_attendees
         self.max_attendees.data = model.max_attendees
         self.status.data = model.status
-        self.refresh_interval.data = datetime_to_string(model.refresh_interval)
+        self.refresh_interval.data = model.refresh_interval
 
     def update_model(self, model):
         model.name = self.name.data
@@ -182,6 +218,6 @@ class CourseEventForm(Form):
         model.min_attendees = self.min_attendees.data
         model.max_attendees = self.max_attendees.data
         model.status = self.status.data
-        model.refresh_interval = string_to_timedelta(
-            self.refresh_interval.data)
+        model.refresh_interval = self.refresh_interval.data
         model.hidden_from_public = self.hidden_from_public.data
+

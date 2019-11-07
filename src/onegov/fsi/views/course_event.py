@@ -107,3 +107,13 @@ def view_duplicate_course_event(self, request, form):
         'model': self,
         'form': form
     }
+
+
+@FsiApp.view(
+    model=CourseEvent,
+    request_method='DELETE',
+)
+def delete_agency(self, request):
+
+    request.assert_valid_csrf_token()
+    CourseEventCollection(request.session).delete(self)

@@ -35,8 +35,15 @@ class CourseEventLayout(DefaultLayout):
             return []
         return [
             Link(
+                text=_("Add Course Event"),
+                url=self.request.class_link(
+                    CourseEventCollection, name='new'
+                ),
+                attrs={'class': 'add-icon'}
+            ),
+            Link(
                 text=_("Edit"),
-                url='#',
+                url=self.request.link(self.model, name='edit'),
                 attrs={'class': 'edit-icon'}
             ),
             Link(
@@ -123,10 +130,12 @@ class AddCourseEventLayout(CourseEventLayout):
     def editbar_links(self):
         return [
             Link(
-                text=_('Add course event'),
-                url='#',
+                text=_("Add Course Event"),
+                url=self.request.class_link(
+                    CourseEventCollection, name='new'
+                ),
                 attrs={'class': 'add-icon'}
-            )
+            ),
         ]
 
 
