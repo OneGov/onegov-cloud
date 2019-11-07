@@ -29,6 +29,7 @@ def view_course_event_collection(self, request):
 )
 def view_create_course_event(self, request, form):
     layout = AddCourseEventLayout(self, request)
+    layout.include_editor()
 
     if form.submitted(request):
         course_event = self.add(**form.get_useful_data())
@@ -90,6 +91,7 @@ def view_edit_course_event(self, request, form):
 )
 def view_duplicate_course_event(self, request, form):
     layout = DuplicateCourseEventLayout(self, request)
+    layout.include_editor()
 
     if form.submitted(request):
         CourseEventCollection(

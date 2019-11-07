@@ -216,7 +216,7 @@ class CourseEventForm(Form):
         model.name = self.name.data
         model.presenter_name = self.presenter_name.data
         model.presenter_company = self.presenter_company.data
-        model.description = self.description.data
+        model.description = linkify(self.description.data, escape=False)
         model.mandatory_refresh = self.mandatory_refresh.data
         model.hidden_from_public = self.hidden_from_public.data
 

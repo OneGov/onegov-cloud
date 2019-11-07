@@ -88,6 +88,14 @@ class CourseEvent(Base, TimestampMixin):
         nullable=False,
         default=default_reminder_before)
 
+    @property
+    def description_html(self):
+        """
+        Returns the portrait that is saved as HTML from the redactor js
+        plugin.
+        """
+        return self.description
+
     @hybrid_property
     def scheduled_reminder(self):
         return self.start - self.schedule_reminder_before

@@ -12,7 +12,7 @@
                             <p><strong i18n:translate="">Info: </strong> ${layout.format_date(model.start, 'date')} ${layout.format_date(model.start, 'time')} - ${layout.format_date(model.end, 'time')}</p>
                             <p><strong i18n:translate="">Remaining seats: </strong>${model.available_seats}</p>
                             <p><strong i18n:translate="">Description:</strong></p>
-                            <p>${model.description}</p>
+                            <div tal:content="structure model.description_html"></div>
                             <tal:b tal:condition="layout.request.is_logged_in">
                                 <a tal:condition="not: model.booked" class="button" href="#" i18n:translate="">Subscribe</a>
                                 <strong tal:condition="model.booked" i18n:translate="">This course event is fully booked.</strong>
