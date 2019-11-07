@@ -31,10 +31,9 @@ def view_create_course_event(self, request, form):
     layout = AddCourseEventLayout(self, request)
 
     if form.submitted(request):
-        self.add(**form.get_useful_data())
-
+        course_event = self.add(**form.get_useful_data())
         request.success(_("Added a new course event"))
-        return request.redirect(request.link(self))
+        return request.redirect(request.link(course_event))
 
     return {
         'title': layout.title,
@@ -94,7 +93,7 @@ def view_duplicate_course_event(self, request, form):
 
     if form.submitted(request):
         CourseEventCollection(
-            request.session()).add(**form.get_useful_data())
+            request.session).add(**form.get_useful_data())
 
         request.success(_("Your changes were saved"))
         return request.redirect(layout.collection_url)

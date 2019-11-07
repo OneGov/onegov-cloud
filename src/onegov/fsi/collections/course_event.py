@@ -13,7 +13,7 @@ class CourseEventCollection(GenericCollection, Pagination):
             self, session,
             page=0,
             from_date=None,
-            upcoming_only=True,
+            upcoming_only=False,
             past_only=False,
             limit=None,
     ):

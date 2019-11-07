@@ -121,7 +121,10 @@ class CourseEvent(Base, TimestampMixin):
             min_attendees=self.min_attendees,
             max_attendees=self.max_attendees,
             mandatory_refresh=self.mandatory_refresh,
-            refresh_interval=self.refresh_interval)
+            refresh_interval=self.refresh_interval,
+            status='created',
+            hidden_from_public=self.hidden_from_public
+        )
 
     @property
     def duplicate(self):

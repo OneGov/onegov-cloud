@@ -30,8 +30,8 @@ def get_events_view(
         app,
         page=0,
         from_date=None,
-        upcoming_only=None,
-        past_only=None,
+        upcoming_only=False,
+        past_only=False,
         limit=None
 ):
     return CourseEventCollection(

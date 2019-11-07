@@ -9,7 +9,7 @@
                     <div class="columns small-12">
                         <strong tal:condition="not: events" i18n:translate="">No entries found</strong>
                         <tal:b tal:condition="events">
-                            <table class="tablesaw">
+                            <table class="tablesaw hover">
                                 <thead>
                                     <th i18n:translate="">Name</th>
                                     <th i18n:translate="">Presenter</th>
