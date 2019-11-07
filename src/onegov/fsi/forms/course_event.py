@@ -25,7 +25,7 @@ def string_to_timedelta(value):
 
     pattern = r'(\d+)\.?\d?\s?(\w+)'
     g = re.search(pattern, value)
-    if not g or g.group():
+    if not isinstance(g, re.Match) or not g.group():
         return None
     count = g.group(1)
     unit = g.group(2)

@@ -31,15 +31,15 @@ def test_course_event_collection(session):
     collection_attr_eq_test(event_coll, event_coll.page_by_index(1))
     result = event_coll.query()
 
-    # Should return upcoming events by default
-    assert result.count() == 2
+    # Should return all events by default
+    assert result.count() == 3
 
     # Test ordering and timestamp mixin
     assert result[0].created > result[1].created
 
-    # Test all results
-    event_coll = CourseEventCollection(session, upcoming_only=False)
-    assert event_coll.query().count() == 3
+    # Test upcoming only
+    event_coll = CourseEventCollection(session, upcoming_only=True)
+    assert event_coll.query().count() == 2
 
     # Test latest
     event_coll = CourseEventCollection.latest(session)

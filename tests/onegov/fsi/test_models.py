@@ -1,5 +1,6 @@
 import datetime
 
+import pytest
 from sedate import utcnow
 
 from onegov.fsi.models.course_attendee import CourseAttendee
@@ -18,7 +19,8 @@ def test_attendee_as_external(session, external_attendee):
     assert external.user is None
 
 
-def test_attendee_1(session, attendee, course_event, member):
+def test_attendee_1(session, attendee, future_course_event, member):
+    course_event = future_course_event
     attendee, data = attendee(session)
     course_event = course_event(session)
     member = member(session)
@@ -33,6 +35,7 @@ def test_attendee_1(session, attendee, course_event, member):
     session.add(reservation)
     session.flush()
     assert attendee.reservations.count() == 1
+    assert course_event[0].start > utcnow()
     assert attendee.course_events.first() == course_event[0]
 
     # Test reservation backref
@@ -52,6 +55,7 @@ def test_attendee_1(session, attendee, course_event, member):
     assert attendee.templates == []
 
 
+@pytest.mark.skip('Wait until model definitions are clear')
 def test_attendee_upcoming_courses(
         session, attendee, course_event, future_course_event):
 
@@ -69,11 +73,8 @@ def test_attendee_upcoming_courses(
                     attendee_id=attendee[0].id, event_completed=True)))
     session.flush()
 
-    # Test for ignoring the date when future event is marked as completed
-    assert attendee[0].repeating_courses().count() == 2
-
-    course_event[0].mandatory_refresh = False
-    assert attendee[0].repeating_courses().count() == 1
+    future_course_event[0].mandatory_refresh = False
+    assert attendee[0].repeating_courses.count() == 1
 
 
 def test_course_event_1(session, course_event, attendee):
