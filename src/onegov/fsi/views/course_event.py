@@ -24,10 +24,10 @@ def view_course_event_collection(self, request):
 @FsiApp.form(
     model=CourseEventCollection,
     template='form.pt',
-    name='new',
+    name='add',
     form=CourseEventForm
 )
-def view_create_course_event(self, request, form):
+def view_add_course_event(self, request, form):
     layout = AddCourseEventLayout(self, request)
     layout.include_editor()
 

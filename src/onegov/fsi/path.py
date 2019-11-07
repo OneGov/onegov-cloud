@@ -1,10 +1,14 @@
 from uuid import UUID
+
+from onegov.core.security import Private
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.collections.notification_template import \
     FsiNotificationTemplateCollection
 from onegov.fsi.collections.reservation import ReservationCollection
+from onegov.fsi.layouts.course_attendee import CourseAttendeeLayout
+from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.notification_template import FsiNotificationTemplate
 
@@ -44,9 +48,18 @@ def get_events_view(
     )
 
 
-@FsiApp.path(model=CourseAttendeeCollection, path='/attendees')
-def get_attendees(app, page=0):
-    return CourseAttendeeCollection(app.session(), page)
+@FsiApp.path(model=CourseAttendeeCollection, path='/attendees',
+             converters=dict(exclude_external=bool))
+def get_attendees(app, page=0, exclude_external=False):
+    return CourseAttendeeCollection(app.session(), page, exclude_external)
+
+
+@FsiApp.path(model=CourseAttendee, path='/attendee/{id}')
+def get_attendees(app, request, id):
+    # only admins can actually specify the username
+    if not request.is_admin:
+        id = request.attendee_id
+    return CourseAttendeeCollection(app.session()).by_id(id)
 
 
 @FsiApp.path(model=FsiNotificationTemplateCollection, path='/templates')
@@ -57,11 +70,19 @@ def get_notification_templates(app, request):
 
 
 @FsiApp.path(model=ReservationCollection,
-             path='/reservations')
-def get_reservations(app, request, course_event_id=None):
+             path='/reservations',
+             converters=dict(attendee_id=UUID, course_event_id=UUID)
+             )
+def get_reservations(app, request, course_event_id=None, attendee_id=None):
+
+    if not attendee_id and not request.is_manager:
+        # check if someone has permission to see all reservations
+        attendee_id = request.attendee_id
+        # can be none....still, so not protected, use permissions
+
     return ReservationCollection(
         app.session(),
-        attendee_id=request.attendee_id,
+        attendee_id=attendee_id,
         course_event_id=course_event_id
     )
 

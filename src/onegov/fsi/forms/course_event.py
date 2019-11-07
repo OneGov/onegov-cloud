@@ -116,7 +116,7 @@ class CourseEventForm(Form):
 
     description = HtmlField(
         label=_("Description"),
-        render_kw={'rows': 10, 'size': 8},
+        render_kw={'rows': 10, 'cols': 8},
         validators=[
             InputRequired()
         ]

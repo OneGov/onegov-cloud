@@ -1,13 +1,22 @@
 from uuid import uuid4
+
+from sedate import utcnow
 from sqlalchemy import Column, Text, ForeignKey, JSON, Enum
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
 from onegov.core.orm.mixins import meta_property
 from sqlalchemy.orm import relationship, object_session, backref
-
-from onegov.user import User
-
+from onegov.fsi import _
 ATTENDEE_TITLES = ('mr', 'ms', 'none')
+ATTENDEE_TITLE_TRANSLATIONS = (_('Mr.'), _('Ms.'), '')
+
+
+def attendee_title_choices():
+    return tuple(
+        (val, key) for val, key in zip(ATTENDEE_TITLES,
+                                       ATTENDEE_TITLE_TRANSLATIONS))
 
 
 class CourseAttendee(Base):
@@ -59,8 +68,13 @@ class CourseAttendee(Base):
     )
 
     @property
+    def is_external(self):
+        return self.user_id is None
+
+    @property
     def role(self):
         if not self.user_id:
+            # External attendees
             return 'member'
         return self.user.role
 
@@ -88,14 +102,35 @@ class CourseAttendee(Base):
         result = session.query(CourseEvent).join(Reservation)
         result = result.filter(Reservation.attendee_id == self.id)
         result = result.filter(Reservation.event_completed == False)
+        result = result.filter(CourseEvent.start > utcnow())
+
         return result
 
+    @property
+    def confirmed_course_events(self):
+        """ Registered future course events which have been confirmed """
+        from onegov.fsi.models.course_event import CourseEvent
+        return self.course_events.filter(CourseEvent.status == 'confirmed')
+
+    @property
+    def total_done_course_events(self):
+        from onegov.fsi.models.reservation import Reservation  # circular
+        return self.reservations.filter(Reservation.event_completed == True)
+
+    @property
     def repeating_courses(self):
         """
-        Will return the query to filter for all courses the attendee
-        has done with mandatory_refresh.
-        It delivers wrong results if a reservation for a future event
-        is marked as passed, though for the sake of speed.
+        Will return query to filter for all upcoming courses the attendee
+        has to refresh.
+
+        TODO: First implement a foreign key to itself or fk to model course
+
+        This is necessary to answer:
+            if one course, how many course events has an attendee:
+                a) not registered if he had to
+            Or from the perspective of a course_event, was there a succeeding
+            course event in the range of the refresh interval?
+
         """
         from onegov.fsi.models.course_event import CourseEvent      # circular
         from onegov.fsi.models.reservation import Reservation       # circular
@@ -105,4 +140,18 @@ class CourseAttendee(Base):
         result = result.join(Reservation)
         result = result.filter(Reservation.attendee_id == self.id)
         result = result.filter(Reservation.event_completed == True)
+        result = result.filter(CourseEvent.next_event_start > utcnow())
+        return result
+
+    @property
+    def undone_registered_courses(self):
+        from onegov.fsi.models.course_event import CourseEvent  # circular
+        from onegov.fsi.models.reservation import Reservation   # circular
+
+        session = object_session(self)
+        result = session.query(CourseEvent).join(Reservation)
+        result = result.filter(CourseEvent.status == 'confirmed')
+        result = result.filter(CourseEvent.start < utcnow())
+        result = result.filter(Reservation.attendee_id == self.id)
+        result = result.filter(Reservation.event_completed == False)
         return result

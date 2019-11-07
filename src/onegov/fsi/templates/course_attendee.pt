@@ -1,0 +1,24 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.fsi">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="row">
+            <div class="columns small-12">
+                <div class="row">
+                    <div class="columns small-12">
+                       <tal:b tal:condition="model|nothong">
+                           <h5>Hi ${str(model)}</h5><br>
+                            <p><strong i18n:translate="">Salutation: </strong> ${layout.salutation}</p>
+                            <p><strong i18n:translate="">Your Email: </strong> ${model.email}</p>
+                            <p><strong i18n:translate="">Your Address: </strong> ${model.address}</p>
+                            <p><strong i18n:translate="">Reserved upcoming courses: </strong>${model.course_events.count()}</p>
+                            <p><strong i18n:translate="">Total courses to repeat: </strong>${model.repeating_courses.count()}</p>
+                            <p><strong i18n:translate="">Not done but registered: </strong>${model.undone_registered_courses.count()}</p>
+                       </tal:b>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </tal:b>
+</div>

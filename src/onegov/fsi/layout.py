@@ -1,3 +1,8 @@
+from onegov.fsi.models.course_attendee import ATTENDEE_TITLE_TRANSLATIONS, \
+    ATTENDEE_TITLES
+from onegov.fsi.models.course_event import (
+    COURSE_EVENT_STATUSES_TRANSLATIONS, COURSE_EVENT_STATUSES
+)
 from onegov.org.layout import DefaultLayout as OrgDefaultLayout
 from onegov.org.layout import Layout as OrgBaseLayout
 
@@ -14,3 +19,16 @@ class DefaultLayout(OrgDefaultLayout):
 
     def instance_link(self, instance):
         return self.request.link(instance)
+
+    @staticmethod
+    def format_status(model_status):
+        return COURSE_EVENT_STATUSES_TRANSLATIONS[
+            COURSE_EVENT_STATUSES.index(model_status)
+        ]
+
+    @staticmethod
+    def format_salutation(title):
+        print('tesdt')
+        return ATTENDEE_TITLE_TRANSLATIONS[
+            ATTENDEE_TITLES.index(title)
+        ]

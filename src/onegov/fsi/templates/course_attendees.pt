@@ -1,0 +1,42 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.fsi">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="row">
+            <div class="columns small-12">
+                <div class="row">
+                    <div class="columns small-12">
+                        <strong tal:condition="not: attendees">No attendees in the database</strong>
+                        <tal:b tal:condition="attendees|nothing">
+                            <table>
+                                <thead>
+                                    <th i18n:translate="">Email</th>
+                                    <th i18n:translate="">Family name, surname</th>
+                                    <th i18n:translate="">External</th>
+                                    <th i18n:translate="">All Open Reservations</th>
+                                    <th i18n:translate="">Confirmed Open Reservations</th>
+                                    <th i18n:translate="">Total Course Events done</th>
+
+                                </thead>
+                                <tbody>
+                                    <tal:b tal:repeat="attendee attendees">
+                                        <tr>
+                                            <td>${attendee.email}</td>
+                                            <td><a href="${layout.instance_link(attendee)}">${str(attendee)}</a></td>
+                                            <td tal:condition="attendee.is_external">True</td>
+                                            <td tal:condition="not: attendee.is_external">False</td>
+                                            <td>${attendee.course_events.count()}</td>
+                                            <td>${attendee.confirmed_course_events.count()}</td>
+                                            <td>${attendee.total_done_course_events.count()}</td>
+                                        </tr>
+                                    </tal:b>
+                                </tbody>
+                            </table>
+                        </tal:b>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </tal:b>
+</div>

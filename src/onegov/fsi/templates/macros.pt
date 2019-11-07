@@ -6,7 +6,7 @@
       i18n:domain="onegov.fsi">
 
 <body>
-<metal:search define-macro="form" i18n:domain="onegov.election_day">
+<metal:search define-macro="form" i18n:domain="onegov.fsi">
     <form tal:attributes="action form.action; method form_method|'POST'" enctype="multipart/form-data">
         <tal:b repeat="fieldset form.fieldsets">
             <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower()}">
@@ -35,7 +35,7 @@
     </form>
 </metal:search>
 
-<metal:fields define-macro="fields" i18n:domain="onegov.election_day">
+<metal:fields define-macro="fields" i18n:domain="onegov.fsi">
   <div class="row">
       <tal:block repeat="field fields">
             <div class="small-12 columns medium-${field.render_kw['size']|12} field-type-${field.type.lower()}" tal:condition="not field.render_kw.get('hidden', False)|True">
@@ -66,5 +66,13 @@
         </tal:block>
   </div>
 </metal:fields>
+
+<metal:reservation_confirmation_btn define-macro="reservation_confirmation_btn">
+    <tal:b tal:condition="layout.confirmation_btn">
+        <div tal:define="link layout.confirmation_btn" tal:content="structure link(layout)"/>
+    </tal:b>
+</metal:reservation_confirmation_btn>
+
+
 </body>
 </html>

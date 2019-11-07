@@ -1,21 +1,21 @@
-from onegov.core.collection import Pagination
+from onegov.core.collection import Pagination, GenericCollection
 from onegov.fsi.models.course_attendee import CourseAttendee
 
 
-class CourseAttendeeCollection(Pagination):
+class CourseAttendeeCollection(GenericCollection, Pagination):
 
     def __init__(self, session, page=0, exclude_external=False):
-        self.session = session
+        super().__init__(session)
         self.page = page
         self.exclude_external = exclude_external
 
-    def __eq__(self, other):
-        return (
-            self.page == other.page
-            and self.exclude_external == other.exclude_external)
+    @property
+    def model_class(self):
+        return CourseAttendee
 
     def query(self):
-        query = self.session.query(CourseAttendee).order_by(
+        query = super().query()
+        query = query.order_by(
             CourseAttendee.last_name, CourseAttendee.first_name)
         if self.exclude_external:
             query = query.filter(CourseAttendee.user_id.isnot(None))
@@ -33,3 +33,13 @@ class CourseAttendeeCollection(Pagination):
             self.session, index,
             exclude_external=self.exclude_external
         )
+
+    def add_from_user(self, user):
+        default = 'Default Value'
+        data = dict(
+            user_id=user.id,
+            first_name=default,
+            last_name=default,
+            email=user.username,
+        )
+        self.add(**data)

@@ -2,6 +2,7 @@ from cached_property import cached_property
 
 from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.fsi.collections.course_event import CourseEventCollection
+from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
 from onegov.fsi.models.course_event import (
@@ -17,17 +18,21 @@ class CourseEventLayout(DefaultLayout):
 
     @cached_property
     def collection(self):
-        return CourseEventCollection(self.request.session)
+        return CourseEventCollection(
+            self.request.session,
+        )
+
+    @cached_property
+    def reservation_collection(self):
+        return ReservationCollection(
+            self.request.session,
+            attendee_id=self.request.attendee_id,
+            course_event_id=self.model.id
+        )
 
     @cached_property
     def collection_url(self):
         return self.request.class_link(CourseEventCollection)
-
-    @staticmethod
-    def format_status(model_status):
-        return COURSE_EVENT_STATUSES_TRANSLATIONS[
-            COURSE_EVENT_STATUSES.index(model_status)
-        ]
 
     @cached_property
     def editbar_links(self):
@@ -37,7 +42,7 @@ class CourseEventLayout(DefaultLayout):
             Link(
                 text=_("Add Course Event"),
                 url=self.request.class_link(
-                    CourseEventCollection, name='new'
+                    CourseEventCollection, name='add'
                 ),
                 attrs={'class': 'add-icon'}
             ),
@@ -74,6 +79,34 @@ class CourseEventLayout(DefaultLayout):
             )
         ]
 
+    @cached_property
+    def confirmation_btn(self):
+        btn_class = f'button {"disabled" if self.model.booked else ""}'
+        return Link(
+                text=_("Make Reservation"),
+                url=self.csrf_protected_url(
+                    self.request.link(
+                        self.reservation_collection,
+                        name='add-from-course-event'
+                    )
+                ),
+                attrs={'class': btn_class},
+                traits=(
+                    Confirm(
+                        _("Do you want to register for this course event ?"),
+                        _("A confirmation email will be sent to you later."),
+                        _("Register for course event"),
+                        _("Cancel")
+                    ),
+                    Intercooler(
+                        request_method='POST',
+                        redirect_after=self.request.class_link(
+                            ReservationCollection
+                        )
+                    )
+                )
+            )
+
 
 class CourseEventCollectionLayout(CourseEventLayout):
 
@@ -105,7 +138,7 @@ class CourseEventCollectionLayout(CourseEventLayout):
                 Link(
                     text=_("Add Course Event"),
                     url=self.request.class_link(
-                        CourseEventCollection, name='new'
+                        CourseEventCollection, name='add'
                     ),
                     attrs={'class': 'add-icon'}
                 )
@@ -132,7 +165,7 @@ class AddCourseEventLayout(CourseEventLayout):
             Link(
                 text=_("Add Course Event"),
                 url=self.request.class_link(
-                    CourseEventCollection, name='new'
+                    CourseEventCollection, name='add'
                 ),
                 attrs={'class': 'add-icon'}
             ),
@@ -150,6 +183,6 @@ class DuplicateCourseEventLayout(CourseEventLayout):
             Link(
                 text=_('Duplicate'),
                 url='#',
-                attrs={'class': 'new-link'}
+                attrs={'class': 'copy-link'}
             )
         ]

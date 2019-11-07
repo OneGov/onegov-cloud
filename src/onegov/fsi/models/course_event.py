@@ -3,7 +3,7 @@ from collections import OrderedDict
 from uuid import uuid4
 
 from sqlalchemy import Column, Boolean, SmallInteger, \
-    Enum, Text, Interval
+    Enum, Text, Interval, UniqueConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, backref
 
@@ -31,10 +31,11 @@ class CourseEvent(Base, TimestampMixin):
     default_reminder_before = datetime.timedelta(days=7)
 
     __tablename__ = 'fsi_course_events'
+    __table_args__ = (UniqueConstraint('name', 'start', 'end',
+                                       name='_name_ts_uc'),)
 
     id = Column(UUID, primary_key=True, default=uuid4)
 
-    # Short description
     name = Column(Text, nullable=False)
     # Long description
     description = Column(Text, nullable=False)
@@ -99,6 +100,10 @@ class CourseEvent(Base, TimestampMixin):
     @hybrid_property
     def scheduled_reminder(self):
         return self.start - self.schedule_reminder_before
+
+    @hybrid_property
+    def next_event_start(self):
+        return self.end + self.refresh_interval
 
     @property
     def duration(self):

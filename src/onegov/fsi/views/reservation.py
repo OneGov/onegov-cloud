@@ -18,7 +18,7 @@ def view_reservations(self, request):
     }
 
 
-@FsiApp.form(
+@FsiApp.html(
     model=ReservationCollection,
     template='form.pt',
     name='add',
@@ -31,3 +31,16 @@ def view_add_reservation_confirmation(self, request):
             'layout': layout,
             'model': self,
     }
+
+
+@FsiApp.html(
+    model=ReservationCollection,
+    request_method='POST',
+    name='add-from-course-event'
+)
+def view_add_reservation_confirmation(self, request):
+    request.assert_valid_csrf_token()
+    self.add(attendee_id=self.attendee_id,
+             course_event_id=self.course_event_id
+    )
+    request.success(_('New reservation successfully added'))
