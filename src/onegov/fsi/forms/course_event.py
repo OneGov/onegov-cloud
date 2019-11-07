@@ -5,6 +5,7 @@ from datetime import timedelta
 from wtforms.compat import text_type
 from wtforms.widgets import TextInput
 
+from onegov.core.utils import linkify
 from onegov.form.fields import TimezoneDateTimeField, ChosenSelectField
 
 from wtforms import StringField, RadioField, Field, IntegerField, SelectField
@@ -189,6 +190,12 @@ class CourseEventForm(Form):
         choices=course_status_choices(),
         default='created'
     )
+
+    def get_useful_data(self, exclude={'csrf_token'}):
+        result = super().get_useful_data(exclude)
+        if self.description.data:
+            result['portrait'] = linkify(self.description.data, escape=False)
+        return result
 
     def apply_model(self, model):
         self.name.data = model.name
