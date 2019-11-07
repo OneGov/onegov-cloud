@@ -2,13 +2,12 @@ import re
 from collections import OrderedDict
 from datetime import timedelta
 
-from wtforms.compat import text_type
 from wtforms.widgets import TextInput
 
 from onegov.core.utils import linkify
-from onegov.form.fields import TimezoneDateTimeField, ChosenSelectField
+from onegov.form.fields import TimezoneDateTimeField
 
-from wtforms import StringField, RadioField, Field, IntegerField, SelectField
+from wtforms import StringField, RadioField, IntegerField, SelectField
 from wtforms.validators import InputRequired
 
 from onegov.form.fields import HtmlField
@@ -227,4 +226,3 @@ class CourseEventForm(Form):
         model.status = self.status.data
         model.refresh_interval = self.refresh_interval.data
         model.hidden_from_public = self.hidden_from_public.data
-

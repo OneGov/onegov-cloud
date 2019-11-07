@@ -1,27 +1,25 @@
 from uuid import UUID
 
-from onegov.core.security import Private
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.collections.notification_template import \
     FsiNotificationTemplateCollection
 from onegov.fsi.collections.reservation import ReservationCollection
-from onegov.fsi.layouts.course_attendee import CourseAttendeeLayout
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.notification_template import FsiNotificationTemplate
 
 
 @FsiApp.path(model=CourseEvent, path='/event/{id}')
-def get_course_details(app, id):
+def get_course_event_details(app, id):
     return CourseEventCollection(app.session()).by_id(id)
 
 
 @FsiApp.path(
     model=FsiNotificationTemplate,
     path='/template/{id}')
-def get_course_details(app, id):
+def get_template_details(app, id):
     return FsiNotificationTemplateCollection(app.session()).by_id(id)
 
 
@@ -55,8 +53,8 @@ def get_attendees(app, page=0, exclude_external=False):
 
 
 @FsiApp.path(model=CourseAttendee, path='/attendee/{id}')
-def get_attendees(app, request, id):
-    # only admins can actually specify the username
+def get_attendee_details(app, request, id):
+    # only admins can actually choose a username
     if not request.is_admin:
         id = request.attendee_id
     return CourseAttendeeCollection(app.session()).by_id(id)
@@ -85,4 +83,3 @@ def get_reservations(app, request, course_event_id=None, attendee_id=None):
         attendee_id=attendee_id,
         course_event_id=course_event_id
     )
-

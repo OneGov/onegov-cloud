@@ -2,7 +2,6 @@ from uuid import uuid4
 
 from sedate import utcnow
 from sqlalchemy import Column, Text, ForeignKey, JSON, Enum
-from sqlalchemy.ext.hybrid import hybrid_property
 
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID

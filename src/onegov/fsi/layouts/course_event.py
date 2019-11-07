@@ -5,9 +5,6 @@ from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
-from onegov.fsi.models.course_event import (
-    COURSE_EVENT_STATUSES_TRANSLATIONS, COURSE_EVENT_STATUSES
-)
 
 
 class CourseEventLayout(DefaultLayout):
@@ -83,29 +80,29 @@ class CourseEventLayout(DefaultLayout):
     def confirmation_btn(self):
         btn_class = f'button {"disabled" if self.model.booked else ""}'
         return Link(
-                text=_("Make Reservation"),
-                url=self.csrf_protected_url(
-                    self.request.link(
-                        self.reservation_collection,
-                        name='add-from-course-event'
-                    )
+            text=_("Make Reservation"),
+            url=self.csrf_protected_url(
+                self.request.link(
+                    self.reservation_collection,
+                    name='add-from-course-event'
+                )
+            ),
+            attrs={'class': btn_class},
+            traits=(
+                Confirm(
+                    _("Do you want to register for this course event ?"),
+                    _("A confirmation email will be sent to you later."),
+                    _("Register for course event"),
+                    _("Cancel")
                 ),
-                attrs={'class': btn_class},
-                traits=(
-                    Confirm(
-                        _("Do you want to register for this course event ?"),
-                        _("A confirmation email will be sent to you later."),
-                        _("Register for course event"),
-                        _("Cancel")
-                    ),
-                    Intercooler(
-                        request_method='POST',
-                        redirect_after=self.request.class_link(
-                            ReservationCollection
-                        )
+                Intercooler(
+                    request_method='POST',
+                    redirect_after=self.request.class_link(
+                        ReservationCollection
                     )
                 )
             )
+        )
 
 
 class CourseEventCollectionLayout(CourseEventLayout):

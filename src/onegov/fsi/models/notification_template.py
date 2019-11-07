@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship, backref
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
-from onegov.core.orm.types import UUID, UTCDateTime
+from onegov.core.orm.types import UUID
 
 NOTIFICATION_TYPES = ('info', 'reservation', 'reminder', 'cancellation')
 

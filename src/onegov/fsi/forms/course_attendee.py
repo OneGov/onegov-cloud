@@ -40,5 +40,3 @@ class ExternalCourseAttendeeForm(CourseAttendeeForm):
         validators=[InputRequired(), Email()],
         required=True
     )
-
-

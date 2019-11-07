@@ -1,4 +1,4 @@
-from onegov.core.elements import Link, Confirm, Intercooler
+from onegov.core.elements import Link
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
@@ -144,8 +144,6 @@ def get_template_variables(request):
 def get_personal_tools(request):
     # for logged-in users show their reservations
     if request.is_logged_in:
-        # session = request.session
-        # username = request.current_username
         yield Link(
             text=_("Own Reservations"),
             url=request.link(''),

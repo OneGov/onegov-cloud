@@ -11,10 +11,10 @@ from onegov.fsi import _
 def view_reservations(self, request):
     layout = ReservationLayout(self, request)
     return {
-            'title': _('Reservations'),
-            'layout': layout,
-            'model': self,
-            'reservations': self.query().all()
+        'title': _('Reservations'),
+        'layout': layout,
+        'model': self,
+        'reservations': self.query().all()
     }
 
 
@@ -27,9 +27,9 @@ def view_reservations(self, request):
 def view_add_reservation_confirmation(self, request):
     layout = ReservationLayout(self, request)
     return {
-            'title': _('Add Reservation'),
-            'layout': layout,
-            'model': self,
+        'title': _('Add Reservation'),
+        'layout': layout,
+        'model': self,
     }
 
 
@@ -38,9 +38,9 @@ def view_add_reservation_confirmation(self, request):
     request_method='POST',
     name='add-from-course-event'
 )
-def view_add_reservation_confirmation(self, request):
+def view_add_from_course_event(self, request):
     request.assert_valid_csrf_token()
-    self.add(attendee_id=self.attendee_id,
-             course_event_id=self.course_event_id
-    )
+    self.add(
+        attendee_id=self.attendee_id,
+        course_event_id=self.course_event_id)
     request.success(_('New reservation successfully added'))

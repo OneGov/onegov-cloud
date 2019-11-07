@@ -1,6 +1,6 @@
-from onegov.core.security import Secret
-from onegov.fsi import FsiApp
-from onegov.fsi.models.notification_template import FsiNotificationTemplate
+# from onegov.core.security import Secret
+# from onegov.fsi import FsiApp
+# from onegov.fsi.models.notification_template import FsiNotificationTemplate
 
 
 # @FsiApp.form(
@@ -18,7 +18,8 @@ from onegov.fsi.models.notification_template import FsiNotificationTemplate
 #         recipients = form.recipients
 #
 #         if not recipients:
-#             request.alert(_("There are no recipients matching the selection"))
+#             request.alert(
+#             _("There are no recipients matching the selection"))
 #         else:
 #             # current = request.current_username
 #
