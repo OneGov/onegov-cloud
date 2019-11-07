@@ -2,6 +2,7 @@ from onegov.core.elements import Link
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
+from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
 from onegov.org.elements import LinkGroup
@@ -12,6 +13,9 @@ from onegov.user import Auth, UserCollection
 def get_base_tools(request):
     # Authentication / Userprofile
     if request.is_logged_in:
+        usr = request.current_attendee
+        reservation_count = '0' if not usr else str(usr.course_events.count())
+
         yield LinkGroup(request.current_username, classes=('user',), links=(
             Link(
                 _("User Profile"), request.link(
@@ -74,6 +78,27 @@ def get_base_tools(request):
             )
         )
 
+        yield LinkGroup(
+            _('Reservations'),
+            links=[
+                Link(
+                    _("Open Reservations"),
+                    request.class_link(
+                        ReservationCollection,
+                    ),
+                    attrs={
+                        'class': ('with-count', 'alert', 'open-tickets'),
+                        'data-count': reservation_count
+                    }
+                )
+            ]
+        )
+
+        yield LinkGroup(_("Management"), classes=('management',),
+                        links=links)
+
+
+
         if request.is_admin:
             links.append(
                 Link(
@@ -82,7 +107,7 @@ def get_base_tools(request):
                 )
             )
 
-        yield LinkGroup(_("Management"), classes=('management',), links=links)
+
 
 
 def get_global_tools(request):
