@@ -2,7 +2,9 @@ from onegov.fsi import FsiApp
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.forms.course_event import CourseEventForm
 from onegov.fsi import _
-from onegov.fsi.layout import CourseEventLayout
+from onegov.fsi.layouts.course_event import EditCourseEventLayout, \
+    DuplicateCourseEventLayout, AddCourseEventLayout, \
+    CourseEventCollectionLayout, CourseEventLayout
 from onegov.fsi.models.course_event import CourseEvent
 
 
@@ -10,9 +12,9 @@ from onegov.fsi.models.course_event import CourseEvent
     model=CourseEventCollection,
     template='course_events.pt')
 def view_course_event_collection(self, request):
-    layout = CourseEventLayout(self, request)
+    layout = CourseEventCollectionLayout(self, request)
     return {
-        'title': _('Courses Events'),
+        'title': layout.title,
         'layout': layout,
         'model': self,
         'events': self.query().all()
@@ -26,7 +28,7 @@ def view_course_event_collection(self, request):
     form=CourseEventForm
 )
 def view_create_course_event(self, request, form):
-    layout = CourseEventLayout(self, request)
+    layout = AddCourseEventLayout(self, request)
 
     if form.submitted(request):
         self.add(**form.get_useful_data())
@@ -35,7 +37,7 @@ def view_create_course_event(self, request, form):
         return request.redirect(request.link(self))
 
     return {
-        'title': _('Add Course Event'),
+        'title': layout.title,
         'layout': layout,
         'model': self,
         'form': form
@@ -48,7 +50,7 @@ def view_create_course_event(self, request, form):
 def view_course_event(self, request):
     layout = CourseEventLayout(self, request)
     return {
-        'title': _('Courses Event Details'),
+        'title': layout.title,
         'layout': layout,
         'model': self,
     }
@@ -61,7 +63,7 @@ def view_course_event(self, request):
     form=CourseEventForm
 )
 def view_edit_course_event(self, request, form):
-    layout = CourseEventLayout(self, request)
+    layout = EditCourseEventLayout(self, request)
     layout.include_editor()
 
     if form.submitted(request):
@@ -74,7 +76,7 @@ def view_edit_course_event(self, request, form):
         form.apply_model(self)
 
     return {
-        'title': _('Edit Course Event'),
+        'title': layout.title,
         'layout': layout,
         'model': self,
         'form': form
@@ -88,19 +90,19 @@ def view_edit_course_event(self, request, form):
     form=CourseEventForm
 )
 def view_duplicate_course_event(self, request, form):
-    layout = CourseEventLayout(self, request)
+    layout = DuplicateCourseEventLayout(self, request)
 
     if form.submitted(request):
         CourseEventCollection(
             request.session()).add(**form.get_useful_data())
 
         request.success(_("Your changes were saved"))
-        return request.redirect(request.class_link(CourseEventCollection))
+        return request.redirect(layout.collection_url)
 
     form.apply_model(self.duplicate)
 
     return {
-        'title': _('Duplicate Course Event'),
+        'title': layout.title,
         'layout': layout,
         'model': self,
         'form': form

@@ -1,6 +1,6 @@
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.reservation import ReservationCollection
-from onegov.fsi.layout import ReservationLayout
+from onegov.fsi.layouts.reservation import ReservationLayout
 from onegov.org.forms import ReservationForm
 from onegov.fsi import _
 
