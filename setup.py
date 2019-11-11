@@ -85,7 +85,7 @@ setup(
         'langdetect',
         'lazy-object-proxy',
         'ldap3',
-        'libres',
+        'libres>=0.5.2',
         'libsass',
         'lxml',
         'mailthon',
