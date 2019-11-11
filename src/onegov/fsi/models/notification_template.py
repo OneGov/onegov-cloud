@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-from sqlalchemy import Column, Text, ForeignKey, Enum, UniqueConstraint
+from sqlalchemy import Column, Text, ForeignKey, Enum, UniqueConstraint, String
 from sqlalchemy.orm import relationship, backref
 
 from onegov.core.orm import Base
@@ -21,26 +21,32 @@ class FsiNotificationTemplate(Base, ContentMixin, TimestampMixin):
     __tablename__ = 'fsi_notification_templates'
 
     __table_args__ = (UniqueConstraint('subject', 'owner_id',
-                                       name='_subject_owner_id_uc'),)
+                                       name='_subject_owner_id_uc'),
+                      UniqueConstraint('course_event_id', 'type',
+                                       name='_course_type_uc'),
+                      )
 
     # the notification type used to choose the correct chameleon template
     type = Column(
         Enum(*NOTIFICATION_TYPES, name='notification_types'),
-        default='info',
         nullable=False,
     )
+
+    __mapper_args__ = {
+        'polymorphic_on': type,
+        'polymorphic_identity': 'fsi_notification_templates'
+    }
 
     # the creator/owner of the record
     owner_id = Column(
         UUID, ForeignKey('fsi_attendees.id'), nullable=False)
 
+    # One-To-Many relationship with course
     course_event_id = Column(
         UUID, ForeignKey('fsi_course_events.id'), nullable=False)
 
-    course = relationship(
-        'CourseEvent',
-        backref=backref('template', uselist=False),
-    )
+    course_event = relationship('CourseEvent',
+                                back_populates='notification_templates')
 
     #: The public id of the notification template
     id = Column(UUID, primary_key=True, default=uuid4)
@@ -59,3 +65,19 @@ class FsiNotificationTemplate(Base, ContentMixin, TimestampMixin):
             subject=self.subject,
             text=self.text
         )
+
+
+class InfoTemplate(FsiNotificationTemplate):
+    __mapper_args__ = {'polymorphic_identity': 'info'}
+
+
+class ReservationTemplate(FsiNotificationTemplate):
+    __mapper_args__ = {'polymorphic_identity': 'reservation'}
+
+
+class ReminderTemplate(FsiNotificationTemplate):
+    __mapper_args__ = {'polymorphic_identity': 'reminder'}
+
+
+class CancellationTemplate(FsiNotificationTemplate):
+    __mapper_args__ = {'polymorphic_identity': 'cancellation'}

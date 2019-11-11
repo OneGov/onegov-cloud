@@ -5,6 +5,8 @@ from sedate import utcnow
 
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
+from onegov.fsi.models.notification_template import NOTIFICATION_TYPES, \
+    FsiNotificationTemplate
 from onegov.fsi.models.reservation import Reservation
 
 
@@ -78,7 +80,7 @@ def test_attendee_upcoming_courses(
 
 
 def test_course_event_1(session, course_event, attendee):
-    attendee = attendee(session)
+    attendee, data = attendee(session)
     event, data = course_event(session)
 
     assert event.attendees.count() == 0
@@ -89,7 +91,7 @@ def test_course_event_1(session, course_event, attendee):
         'Placeholder', course_event_id=event.id)
     session.add_all((
         placeholder,
-        Reservation(course_event_id=event.id, attendee_id=attendee[0].id)
+        Reservation(course_event_id=event.id, attendee_id=attendee.id)
     ))
     session.flush()
 
@@ -136,9 +138,20 @@ def test_cascading_attendee_deletion(session, db_mock_session):
     assert session.query(Reservation).count() == 1
 
 
-def test_notification_templates(session, notification_template):
-    template, data = notification_template(session)
-    event = session.query(CourseEvent).first()
-    assert template.text == 'Hello World'
-    assert not isinstance(event.template, list)
-    assert event.template == template
+def test_notification_templates(session, course_event, notification_template):
+    event, data = course_event(session)
+    templates = []
+    for type_ in NOTIFICATION_TYPES:
+        template, data = notification_template(
+            session, type=type_, course_event_id=event.id)
+        templates.append(template)
+
+    for template in session.query(FsiNotificationTemplate):
+        print(template.course_event_id)
+
+    assert len(event.notification_templates) == 4
+    assert templates[0].text == 'Hello World'
+    assert event.info_template == templates[0]
+    assert event.reservation_template == templates[1]
+    assert event.reminder_template == templates[2]
+    assert event.cancellation_template == templates[3]

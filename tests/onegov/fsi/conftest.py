@@ -8,13 +8,19 @@ from sedate import utcnow
 from onegov.core.crypto import hash_password
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
-from onegov.fsi.models.notification_template import FsiNotificationTemplate
+from onegov.fsi.models.notification_template import InfoTemplate, \
+    ReservationTemplate, CancellationTemplate, ReminderTemplate
 from onegov.fsi.models.reservation import Reservation
 from onegov.user import User
 from onegov.fsi import FsiApp
 from onegov.fsi.initial_content import create_new_organisation
 from tests.shared.utils import create_app
 from tests.onegov.org.conftest import Client
+
+TEMPLATE_MODEL_MAPPING = dict(
+    info=InfoTemplate, reservation=ReservationTemplate,
+    cancellation=CancellationTemplate, reminder=ReminderTemplate
+)
 
 
 @pytest.fixture(scope='session')
@@ -140,17 +146,19 @@ def external_attendee(admin):
 def notification_template(planner, course_event):
     # creator by a notification template
     def _notification_template(session, **kwargs):
+        kwargs.setdefault('course_event_id', course_event(session)[0].id)
         data = dict(
+            type='reservation',
             owner_id=planner(session)[0].id,
             subject='Say Hello',
             text='Hello World',
-            course_event_id=course_event(session)[0].id
         )
         data.update(**kwargs)
+        type = data.pop('type')
         template = session.query(
-            FsiNotificationTemplate).filter_by(**data).first()
+            TEMPLATE_MODEL_MAPPING[type]).filter_by(**data).first()
         if not template:
-            template = FsiNotificationTemplate(**data)
+            template = TEMPLATE_MODEL_MAPPING[type](**data)
             session.add(template)
             session.flush()
         return template, data

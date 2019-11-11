@@ -80,6 +80,15 @@ class CourseEvent(Base, TimestampMixin):
         cascade='all, delete-orphan',
     )
 
+    notification_templates = relationship('FsiNotificationTemplate',
+                                          back_populates='course_event')
+
+    # The associated notification templates
+    info_template = relationship("InfoTemplate", uselist=False)
+    reservation_template = relationship("ReservationTemplate", uselist=False)
+    cancellation_template = relationship("CancellationTemplate", uselist=False)
+    reminder_template = relationship("ReminderTemplate", uselist=False)
+
     # hides from member roles
     hidden_from_public = Column(Boolean, nullable=False, default=False)
 
