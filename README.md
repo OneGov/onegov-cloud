@@ -164,6 +164,17 @@ Finally, run the installation:
 
     make install
 
+> :sos: **I get compile errors related to OpenSSL on macOS**
+>
+> This occurs if you are using brew to install Python and OpenSSL. The resulting
+> binaries link to the brew OpenSSL library, not the macOS one. To fix the
+> problem, export the following variables before trying `make install` again:
+
+```bash
+export LDFLAGS="-L/usr/local/opt/openssl/lib"
+export CPPFLAGS="-I/usr/local/opt/openssl/include"
+```
+
 ## Configuration 👌
 
 To configure your setup, copy the example configuration and adjust it to your needs:
