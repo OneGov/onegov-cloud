@@ -119,7 +119,7 @@ To run OneGov Cloud locally, you must meet the following requirements:
 
 * Linux/MacOS
 * Postgres 10+
-* Python 3.7+
+* Python 3.8+
 * OpenJDK 11+
 * Elasticsearch 7.x
 * Redis 5.x
