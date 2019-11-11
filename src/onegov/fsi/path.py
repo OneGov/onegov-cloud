@@ -16,13 +16,6 @@ def get_course_event_details(app, id):
     return CourseEventCollection(app.session()).by_id(id)
 
 
-@FsiApp.path(
-    model=FsiNotificationTemplate,
-    path='/template/{id}')
-def get_template_details(app, id):
-    return FsiNotificationTemplateCollection(app.session()).by_id(id)
-
-
 @FsiApp.path(model=CourseEventCollection,
              path='/events',
              converters=dict(
@@ -60,11 +53,20 @@ def get_attendee_details(app, request, id):
     return CourseAttendeeCollection(app.session()).by_id(id)
 
 
-@FsiApp.path(model=FsiNotificationTemplateCollection, path='/templates')
-def get_notification_templates(app, request):
+@FsiApp.path(model=FsiNotificationTemplateCollection, path='/templates',
+             converters=dict(course_event_id=UUID))
+def get_notification_templates(app, request, course_event_id=None):
     return FsiNotificationTemplateCollection(
-        app.session(), owner_id=request.attendee_id
+        app.session(), owner_id=request.attendee_id,
+        course_event_id=course_event_id
     )
+
+
+@FsiApp.path(
+    model=FsiNotificationTemplate,
+    path='/template/{id}')
+def get_template_details(app, id):
+    return FsiNotificationTemplateCollection(app.session()).by_id(id)
 
 
 @FsiApp.path(model=ReservationCollection,

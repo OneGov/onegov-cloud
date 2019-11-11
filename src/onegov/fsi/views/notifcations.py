@@ -1,7 +1,55 @@
-# from onegov.core.security import Secret
-# from onegov.fsi import FsiApp
-# from onegov.fsi.models.notification_template import FsiNotificationTemplate
+from onegov.fsi import FsiApp
+from onegov.fsi.collections.notification_template import \
+    FsiNotificationTemplateCollection
+from onegov.fsi.forms.notification import NotificationForm
+from onegov.fsi.layouts.notification import NotificationTemplateLayout, \
+    NotificationTemplateCollectionLayout, EditNotificationTemplateLayout
+from onegov.fsi.models.notification_template import FsiNotificationTemplate
+from onegov.fsi import _
 
+
+@FsiApp.html(
+    model=FsiNotificationTemplateCollection,
+    template='notifications.pt')
+def view_notifications(self, request):
+    layout = NotificationTemplateCollectionLayout(self, request)
+    layout.include_accordion()
+
+    return {
+        'notifications': self.query().all(),
+        'layout': layout
+    }
+
+
+@FsiApp.html(
+    model=FsiNotificationTemplate,
+    template='notification.pt')
+def view_notifications(self, request):
+    return {
+        'layout': NotificationTemplateLayout(self, request)
+    }
+
+
+@FsiApp.form(
+    model=FsiNotificationTemplate,
+    template='form.pt',
+    form=NotificationForm,
+    name='edit'
+)
+def view_edit_notification(self, request, form):
+
+    if form.submitted(request):
+        form.update_model(self)
+        request.success(_("Your changes were saved"))
+        return request.redirect(request.link(self))
+
+    form.apply_model(self)
+
+    return {
+        'model': self,
+        'layout': EditNotificationTemplateLayout(self, request),
+        'form': form
+    }
 
 # @FsiApp.form(
 #     model=FsiNotificationTemplate,

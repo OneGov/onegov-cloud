@@ -6,8 +6,20 @@ from sqlalchemy.orm import relationship, backref
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.fsi import _
 
 NOTIFICATION_TYPES = ('info', 'reservation', 'reminder', 'cancellation')
+NOTIFICATION_TYPE_TRANSLATIONS = (
+    _('Info Mail'), _('Reservation Confirmation'),
+    _('Event Reminder'), _('Cancellation Confirmation')
+)
+
+
+# for forms...
+def template_type_choices():
+    return tuple(
+        (val, key) for val, key in zip(NOTIFICATION_TYPES,
+                                       NOTIFICATION_TYPE_TRANSLATIONS))
 
 
 class FsiNotificationTemplate(Base, ContentMixin, TimestampMixin):

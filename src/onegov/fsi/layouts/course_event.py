@@ -2,6 +2,8 @@ from cached_property import cached_property
 
 from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.fsi.collections.course_event import CourseEventCollection
+from onegov.fsi.collections.notification_template import \
+    FsiNotificationTemplateCollection
 from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
@@ -24,6 +26,14 @@ class CourseEventLayout(DefaultLayout):
         return ReservationCollection(
             self.request.session,
             attendee_id=self.request.attendee_id,
+            course_event_id=self.model.id
+        )
+
+    @cached_property
+    def template_collection(self):
+        return FsiNotificationTemplateCollection(
+            self.request.session,
+            owner_id=self.request.attendee_id,
             course_event_id=self.model.id
         )
 
@@ -81,6 +91,9 @@ class CourseEventLayout(DefaultLayout):
                         )
                     )
                 )
+            ),
+            Link(_('Manage Email Templates'), self.request.link(
+                self.template_collection)
             )
         ]
 
