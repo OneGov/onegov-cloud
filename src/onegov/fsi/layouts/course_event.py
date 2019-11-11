@@ -32,6 +32,14 @@ class CourseEventLayout(DefaultLayout):
         return self.request.class_link(CourseEventCollection)
 
     @cached_property
+    def breadcrumbs(self):
+        """ Returns the breadcrumbs for the detail page. """
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_('Current Course Event'), self.request.link(self.model))
+        ]
+
+    @cached_property
     def editbar_links(self):
         if not self.request.is_manager:
             return []
@@ -150,6 +158,12 @@ class EditCourseEventLayout(CourseEventLayout):
     def title(self):
         return _('Edit course event')
 
+    @cached_property
+    def breadcrumbs(self):
+        breadcrumbs = super().breadcrumbs
+        breadcrumbs.append(Link(_('Edit'), '#'))
+        return breadcrumbs
+
 
 class AddCourseEventLayout(CourseEventLayout):
     @cached_property
@@ -167,6 +181,12 @@ class AddCourseEventLayout(CourseEventLayout):
                 attrs={'class': 'add-icon'}
             ),
         ]
+
+    @cached_property
+    def breadcrumbs(self):
+        links = super().breadcrumbs
+        links.append(Link(_('Add'), '#'))
+        return links
 
 
 class DuplicateCourseEventLayout(CourseEventLayout):
