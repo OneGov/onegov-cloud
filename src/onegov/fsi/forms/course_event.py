@@ -193,7 +193,8 @@ class CourseEventForm(Form):
     def get_useful_data(self, exclude={'csrf_token'}):
         result = super().get_useful_data(exclude)
         if self.description.data:
-            result['portrait'] = linkify(self.description.data, escape=False)
+            result['description'] = linkify(
+                self.description.data, escape=False)
         return result
 
     def apply_model(self, model):
