@@ -32,6 +32,7 @@ class OrgTheme(BaseTheme):
     def foundation_components(self):
         return (
             'grid',
+            'accordion',
             'alert-boxes',
             'block-grid',
             'breadcrumbs',

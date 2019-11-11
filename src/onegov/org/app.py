@@ -465,3 +465,8 @@ def get_common_asset():
     yield 'lazysizes.js'
     yield 'toggle.js'
     yield 'common.js'
+
+
+@OrgApp.webasset('accordion')
+def get_accordion_asset():
+    yield 'foundation.accordion.js'
