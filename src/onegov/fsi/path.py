@@ -68,19 +68,18 @@ def get_template_details(request, id):
     return FsiNotificationTemplateCollection(request.session).by_id(id)
 
 
-@FsiApp.path(model=ReservationCollection,
-             path='/fsi/reservations',
+@FsiApp.path(model=ReservationCollection, path='/fsi/reservations',
              converters=dict(attendee_id=UUID, course_event_id=UUID)
              )
 def get_reservations(app, request, course_event_id=None, attendee_id=None):
 
     if not attendee_id:
-        # check if someone has permission to see all reservations
-        attendee_id = request.attendee_id
-        # can be none....still, so not protected, use permissions
-    elif attendee_id != request.attendee_id:
         if not request.is_manager:
+            # check if someone has permission to see all reservations
             attendee_id = request.attendee_id
+        # can be none....still, so not protected, use permissions
+    elif attendee_id != request.attendee_id and not request.is_manager:
+        attendee_id = request.attendee_id
 
     return ReservationCollection(
         app.session(),
