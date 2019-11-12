@@ -142,6 +142,10 @@ class CourseEvent(Base, TimestampMixin):
         return not self.booked and self.start > utcnow()
 
     @property
+    def is_past(self):
+        return self.start < utcnow()
+
+    @property
     def duplicate_dict(self):
         return OrderedDict(
             name=self.name, description=self.description,
