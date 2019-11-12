@@ -2,6 +2,7 @@ import datetime
 from collections import OrderedDict
 from uuid import uuid4
 
+from sedate import utcnow
 from sqlalchemy import Column, Boolean, SmallInteger, \
     Enum, Text, Interval, UniqueConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
