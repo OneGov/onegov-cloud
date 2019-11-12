@@ -10,6 +10,7 @@
                         <tal:b tal:condition="model|nothing">
                             <h4>${model.name}</h4><br>
                             <p><strong i18n:translate="">Info: </strong> ${layout.format_date(model.start, 'date')} ${layout.format_date(model.start, 'time')} - ${layout.format_date(model.end, 'time')}</p>
+                            <p><strong i18n:translate="">Reservations: </strong>${model.reservations.count()}</p>
                             <p><strong i18n:translate="">Remaining seats: </strong>${model.available_seats}</p>
                             <p><strong i18n:translate="">Description:</strong></p>
                             <p tal:content="structure model.description_html"></p>
