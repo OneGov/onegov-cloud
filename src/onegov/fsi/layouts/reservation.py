@@ -38,7 +38,7 @@ class ReservationCollectionLayout(DefaultLayout):
         return Link(
             text=_("Delete"),
             url=self.csrf_protected_url(
-                self.request.link(reservation, name='delete')
+                    self.request.link(reservation, name='delete')
             ),
             attrs={'class': 'button tiny alert'},
             traits=(
@@ -50,9 +50,7 @@ class ReservationCollectionLayout(DefaultLayout):
                 ),
                 Intercooler(
                     request_method='DELETE',
-                    redirect_after=self.request.class_link(
-                        ReservationCollection
-                    )
+                    redirect_after=self.request.link(self.model)
                 )
             )
         )
