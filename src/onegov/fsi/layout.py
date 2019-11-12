@@ -1,3 +1,5 @@
+from sqlalchemy import event
+
 from onegov.fsi.models.course_attendee import ATTENDEE_TITLE_TRANSLATIONS, \
     ATTENDEE_TITLES
 from onegov.fsi.models.course_event import (
@@ -7,6 +9,29 @@ from onegov.fsi.models.notification_template import \
     NOTIFICATION_TYPE_TRANSLATIONS, NOTIFICATION_TYPES
 from onegov.org.layout import DefaultLayout as OrgDefaultLayout
 from onegov.org.layout import Layout as OrgBaseLayout
+
+
+class SessionEventMixin(object):
+
+    @property
+    def target_model(self):
+        if hasattr(self.model, 'model_class'):
+            return self.model.model_class
+        if hasattr(self.__class__, 'primary_key'):
+            return self.__class__
+        raise NotImplementedError
+
+    def session_event_callback(self, session, instance):
+        raise NotImplementedError
+
+    def register_event(self):
+
+        @event.listens_for(self.session, 'loaded_as_persistent')
+        def receive_loaded_as_persistent(session, instance):
+            "listen for the 'loaded_as_persistent' event"
+
+            if isinstance(instance, self.target_model):
+                self.session_event_callback(session, instance)
 
 
 class Layout(OrgBaseLayout):
@@ -39,7 +64,3 @@ class DefaultLayout(OrgDefaultLayout):
         return ATTENDEE_TITLE_TRANSLATIONS[
             ATTENDEE_TITLES.index(title)
         ]
-
-    def include_accordion(self):
-        pass
-        # self.request.include('accordion')
