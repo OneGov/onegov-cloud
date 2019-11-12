@@ -9,8 +9,7 @@ from onegov.fsi import _
 
 
 @FsiApp.html(
-    model=FsiNotificationTemplateCollection,
-    template='notifications.pt')
+    model=FsiNotificationTemplateCollection, template='notifications.pt')
 def view_notifications(self, request):
     layout = NotificationTemplateCollectionLayout(self, request)
     self.auto_add_templates_if_not_existing()
@@ -22,8 +21,17 @@ def view_notifications(self, request):
 
 
 @FsiApp.html(
+    model=FsiNotificationTemplate, template='notification.pt')
+def view_notifications(self, request):
+    return {
+        'layout': NotificationTemplateLayout(self, request)
+    }
+
+
+@FsiApp.html(
     model=FsiNotificationTemplate,
-    template='notification.pt')
+    template='info_notification.pt',
+    name='send')
 def view_notifications(self, request):
     return {
         'layout': NotificationTemplateLayout(self, request)
