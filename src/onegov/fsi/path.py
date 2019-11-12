@@ -11,10 +11,8 @@ from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.notification_template import FsiNotificationTemplate
 from onegov.fsi.models.reservation import Reservation
 
-# TODO: Use request.session istead of app.session() everywhere
 
-
-@FsiApp.path(model=CourseEvent, path='/event/{id}')
+@FsiApp.path(model=CourseEvent, path='/fsi/event/{id}')
 def get_course_event_details(app, id):
     return CourseEventCollection(app.session()).by_id(id)
 
@@ -42,36 +40,36 @@ def get_events_view(
     )
 
 
-@FsiApp.path(model=CourseAttendeeCollection, path='/attendees',
+@FsiApp.path(model=CourseAttendeeCollection, path='/fsi/attendees',
              converters=dict(exclude_external=bool))
-def get_attendees(app, page=0, exclude_external=False):
-    return CourseAttendeeCollection(app.session(), page, exclude_external)
+def get_attendees(request, page=0, exclude_external=False):
+    return CourseAttendeeCollection(request.session, page, exclude_external)
 
 
-@FsiApp.path(model=CourseAttendee, path='/attendee/{id}')
-def get_attendee_details(app, request, id):
+@FsiApp.path(model=CourseAttendee, path='/fsi/attendee/{id}')
+def get_attendee_details(request, id):
     # only admins can actually choose a username
     if not request.is_admin:
         id = request.attendee_id
-    return CourseAttendeeCollection(app.session()).by_id(id)
+    return CourseAttendeeCollection(request.session).by_id(id)
 
 
-@FsiApp.path(model=FsiNotificationTemplateCollection, path='/templates',
+@FsiApp.path(model=FsiNotificationTemplateCollection, path='/fsi/templates',
              converters=dict(course_event_id=UUID))
-def get_notification_templates(app, request, course_event_id=None):
+def get_notification_templates(request, course_event_id=None):
     return FsiNotificationTemplateCollection(
-        app.session(), owner_id=request.attendee_id,
+        request.session, owner_id=request.attendee_id,
         course_event_id=course_event_id
     )
 
 
-@FsiApp.path(model=FsiNotificationTemplate, path='/template/{id}')
-def get_template_details(app, id):
-    return FsiNotificationTemplateCollection(app.session()).by_id(id)
+@FsiApp.path(model=FsiNotificationTemplate, path='/fsi/template/{id}')
+def get_template_details(request, id):
+    return FsiNotificationTemplateCollection(request.session).by_id(id)
 
 
 @FsiApp.path(model=ReservationCollection,
-             path='/reservations',
+             path='/fsi/reservations',
              converters=dict(attendee_id=UUID, course_event_id=UUID)
              )
 def get_reservations(app, request, course_event_id=None, attendee_id=None):
