@@ -179,9 +179,9 @@ def view_mission_report_files(self, request):
 def handle_new_mission_report(self, request, form):
 
     if form.submitted(request):
-        mission = self.add(**{
+        mission = self.add(date=form.date, **{
             k: v for k, v in form.data.items()
-            if k != 'csrf_token'
+            if k not in ('csrf_token', 'day', 'time')
             and not k.startswith('vehicles_')
         })
 
@@ -218,12 +218,14 @@ def handle_edit_mission_report(self, request, form):
 
     if form.submitted(request):
         form.populate_obj(self)
+        self.date = form.date
 
         request.success(_("Your changes were saved"))
         return request.redirect(request.link(self))
 
     elif not request.POST:
         form.process(obj=self)
+        form.date = self.date
 
     return {
         'title': _("Mission Reports"),

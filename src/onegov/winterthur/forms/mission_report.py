@@ -1,6 +1,8 @@
+import sedate
+
+from datetime import datetime
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import Form
-from onegov.form.fields import TimezoneDateTimeField
 from onegov.form.fields import UploadFileWithORMSupport
 from onegov.form.validators import FileSizeLimit
 from onegov.form.validators import WhitelistedMimeType
@@ -9,6 +11,8 @@ from onegov.winterthur.models import MissionReportFile
 from wtforms.fields import BooleanField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
+from wtforms.fields.html5 import DateField
+from wtforms.fields.html5 import TimeField
 from wtforms.fields.html5 import DecimalField
 from wtforms.fields.html5 import IntegerField
 from wtforms.fields.html5 import URLField
@@ -17,11 +21,19 @@ from wtforms.validators import NumberRange
 from wtforms.validators import Optional
 
 
+def today():
+    return sedate.to_timezone(sedate.utcnow(), 'Europe/Zurich').date()
+
+
 class MissionReportForm(Form):
 
-    date = TimezoneDateTimeField(
+    day = DateField(
         _("Date"),
-        timezone='Europe/Zurich',
+        default=today,
+        validators=[InputRequired()])
+
+    time = TimeField(
+        _("Time"),
         validators=[InputRequired()])
 
     duration = DecimalField(
@@ -47,6 +59,17 @@ class MissionReportForm(Form):
 
     civil_defence = BooleanField(
         _("Civil Defence involvement"))
+
+    @property
+    def date(self):
+        dt = datetime.combine(self.day.data, self.time.data)
+        return sedate.replace_timezone(dt, timezone='Europe/Zurich')
+
+    @date.setter
+    def date(self, value):
+        dt = sedate.to_timezone(value, 'Europe/Zurich')
+        self.day.data = dt.date()
+        self.time.data = dt.time()
 
 
 class MissionReportVehicleForm(Form):
