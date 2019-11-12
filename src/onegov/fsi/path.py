@@ -9,6 +9,9 @@ from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.notification_template import FsiNotificationTemplate
+from onegov.fsi.models.reservation import Reservation
+
+# TODO: Use request.session istead of app.session() everywhere
 
 
 @FsiApp.path(model=CourseEvent, path='/event/{id}')
@@ -88,3 +91,10 @@ def get_reservations(app, request, course_event_id=None, attendee_id=None):
         attendee_id=attendee_id,
         course_event_id=course_event_id
     )
+
+
+@FsiApp.path(model=Reservation,
+             path='/reservation/{id}',
+             converters=dict(id=UUID))
+def get_reservation_detail(request, id):
+    return ReservationCollection.by_id(request.session, id)
