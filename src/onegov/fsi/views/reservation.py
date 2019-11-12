@@ -17,18 +17,19 @@ def view_reservations(self, request):
     }
 
 
-@FsiApp.html(
+@FsiApp.form(
     model=ReservationCollection,
     template='form.pt',
     name='add',
     form=ReservationForm
 )
-def view_add_reservation(self, request):
+def view_add_reservation(self, request, form):
     layout = ReservationLayout(self, request)
     return {
-        'title': _('Add Reservation'),
-        'layout': layout,
+        'title': layout.title,
         'model': self,
+        'layout': layout,
+        'form': form
     }
 
 
