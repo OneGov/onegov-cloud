@@ -6,59 +6,7 @@ from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
 
 
-class CourseAttendeeLayout(DefaultLayout):
-
-    @cached_property
-    def title(self):
-        if self.request.view_name == '':
-            return _('Profile Details')
-        if self.request.view_name == 'edit':
-            return _('Edit Profile')
-
-    @cached_property
-    def breadcrumbs(self):
-        links = super().breadcrumbs
-        links.append(
-            Link(_('Personal Profile'), self.request.link(self.model)))
-        if self.request.view_name == 'edit':
-            links.append(
-                Link(_('Edit'), self.request.link(self.model, name='edit'))
-            )
-        return links
-
-    @cached_property
-    def editbar_links(self):
-        if self.request.view_name == '':
-            return [
-                Link(
-                    _('Edit Profile'),
-                    url=self.request.link(self.model, name='edit'),
-                    attrs={'class': 'edit-icon'}
-                )
-            ]
-        if (self.request.view_name in ('add-external', 'edit')
-                and self.request.is_manager):
-            return [
-                Link(
-                    _('Add External Attendee'),
-                    url=self.request.class_link(
-                        CourseAttendeeCollection, name='add-external'),
-                    attrs={'class': 'plus-icon'}
-                )
-            ]
-        else:
-            return []
-
-    @cached_property
-    def salutation(self):
-        return self.format_salutation(self.model.title)
-
-
-class CourseAttendeeCollectionLayout(CourseAttendeeLayout):
-
-    @cached_property
-    def collection(self):
-        return CourseAttendeeCollection(self.request.session)
+class CourseAttendeeCollectionLayout(DefaultLayout):
 
     @cached_property
     def title(self):
@@ -79,7 +27,59 @@ class CourseAttendeeCollectionLayout(CourseAttendeeLayout):
 
     @cached_property
     def breadcrumbs(self):
+        links = super().breadcrumbs
+        links.append(
+            Link(_('Manage Attendees'), self.request.link(self.model))
+        )
         if self.request.view_name == 'add-external':
-            return [Link(_('Add External Attendee'))]
-        else:
-            return [Link(_('Personal Profile'))]
+            links.append(Link(_('Add External Attendee')))
+        return links
+
+
+class CourseAttendeeLayout(DefaultLayout):
+
+    @cached_property
+    def title(self):
+        if self.request.view_name == 'edit':
+            return _('Edit Profile')
+        return _('Profile Details')
+
+    @cached_property
+    def breadcrumbs(self):
+        links = super().breadcrumbs
+        if self.request.is_manager:
+            links.append(
+                Link(
+                    _('Manage Attendees'),
+                    self.request.class_link(CourseAttendeeCollection)
+                )
+            )
+        links.append(
+            Link(_('Personal Profile'), self.request.link(self.model)))
+        if self.request.view_name == 'edit':
+            links.append(
+                Link(_('Edit'), self.request.link(self.model, name='edit'))
+            )
+        return links
+
+    @cached_property
+    def editbar_links(self):
+        links = [Link(
+            _('Edit Profile'),
+            url=self.request.link(self.model, name='edit'),
+            attrs={'class': 'edit-icon'}
+        )]
+        if self.request.is_manager:
+            links.append(
+                Link(
+                    _('Add External Attendee'),
+                    url=self.request.class_link(
+                        CourseAttendeeCollection, name='add-external'),
+                    attrs={'class': 'plus-icon'}
+                )
+            )
+        return links
+
+    @cached_property
+    def salutation(self):
+        return self.format_salutation(self.model.title)
