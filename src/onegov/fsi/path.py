@@ -65,9 +65,7 @@ def get_notification_templates(app, request, course_event_id=None):
     )
 
 
-@FsiApp.path(
-    model=FsiNotificationTemplate,
-    path='/template/{id}')
+@FsiApp.path(model=FsiNotificationTemplate, path='/template/{id}')
 def get_template_details(app, id):
     return FsiNotificationTemplateCollection(app.session()).by_id(id)
 
@@ -93,8 +91,7 @@ def get_reservations(app, request, course_event_id=None, attendee_id=None):
     )
 
 
-@FsiApp.path(model=Reservation,
-             path='/reservation/{id}',
-             converters=dict(id=UUID))
-def get_reservation_detail(request, id):
-    return ReservationCollection.by_id(request.session, id)
+@FsiApp.path(model=Reservation, path='/reservation/{id}')
+def get_reservation_details(app, request, id):
+    return ReservationCollection(request.session).by_id(id)
+
