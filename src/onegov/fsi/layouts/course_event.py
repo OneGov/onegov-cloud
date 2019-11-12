@@ -25,7 +25,6 @@ class CourseEventLayout(DefaultLayout):
     def reservation_collection(self):
         return ReservationCollection(
             self.request.session,
-            attendee_id=self.request.attendee_id,
             course_event_id=self.model.id
         )
 
@@ -33,7 +32,6 @@ class CourseEventLayout(DefaultLayout):
     def template_collection(self):
         return FsiNotificationTemplateCollection(
             self.request.session,
-            owner_id=self.request.attendee_id,
             course_event_id=self.model.id
         )
 
