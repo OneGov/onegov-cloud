@@ -94,7 +94,10 @@ class CourseEventLayout(DefaultLayout):
             ),
             Link(_('Manage Email Templates'), self.request.link(
                 self.template_collection)
-            )
+            ),
+            Link(_('Manage Reservations'),
+                 self.request.link(self.reservation_collection))
+
         ]
 
     @cached_property
