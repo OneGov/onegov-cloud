@@ -32,10 +32,8 @@ class FsiNotificationTemplate(Base, ContentMixin, TimestampMixin):
 
     __tablename__ = 'fsi_notification_templates'
 
-    __table_args__ = (UniqueConstraint('subject', 'owner_id',
-                                       name='_subject_owner_id_uc'),
-                      UniqueConstraint('course_event_id', 'type',
-                                       name='_course_type_uc'),
+    __table_args__ = (UniqueConstraint('course_event_id', 'type', 'subject',
+                                       name='_course_type_subject_uc'),
                       )
 
     # the notification type used to choose the correct chameleon template
@@ -51,7 +49,7 @@ class FsiNotificationTemplate(Base, ContentMixin, TimestampMixin):
 
     # the creator/owner of the record
     owner_id = Column(
-        UUID, ForeignKey('fsi_attendees.id'), nullable=False)
+        UUID, ForeignKey('fsi_attendees.id'), nullable=True)
 
     # One-To-Many relationship with course
     course_event_id = Column(
@@ -64,10 +62,10 @@ class FsiNotificationTemplate(Base, ContentMixin, TimestampMixin):
     id = Column(UUID, primary_key=True, default=uuid4)
 
     #: The subject of the notification would be according to template type
-    subject = Column(Text, nullable=False, default='Template')
+    subject = Column(Text, nullable=False, default='Example Subject')
 
     #: The body text injected into the template appearing on GUI
-    text = Column(Text, nullable=False, default='Template')
+    text = Column(Text, nullable=False, default='Example Text')
 
     def duplicate(self):
         return self.__class__(

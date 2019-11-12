@@ -10,7 +10,7 @@
             <div class="columns small-12">
                 <div class="row">
                     <div class="columns small-12">
-                        <tal:b metal:use-macro="layout.macros['accordion']" />
+<!--?                        <tal:b metal:use-macro="layout.macros['accordion']" />-->
                         <strong tal:condition="not: notifications">There are no templates set for this course event</strong>
                         <tal:b tal:condition="notifications|nothing">
                             <table>
@@ -20,9 +20,10 @@
                                 </thead>
                                 <tbody>
                                     <tal:b tal:repeat="notification notifications">
-                                        <tr>${notification.subject}</tr>
-                                        <tr>${layout.format_notification_type(notification.type)}</tr>
-                                        <tr></tr>
+                                        <tr>
+                                            <td><a href="${layout.instance_link(notification)}">${notification.subject}</a></td>
+                                            <td>${layout.format_notification_type(notification.type)}</td>
+                                        </tr>
                                     </tal:b>
                                 </tbody>
                             </table>

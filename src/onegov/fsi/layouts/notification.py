@@ -3,6 +3,8 @@ from collections import namedtuple
 from cached_property import cached_property
 
 from onegov.core.elements import Link
+from onegov.fsi.collections.notification_template import \
+    FsiNotificationTemplateCollection
 from onegov.fsi.layout import DefaultLayout
 from onegov.org.layout import DefaultMailLayout as OrgDefaultMailLayout
 from onegov.fsi import _
@@ -50,15 +52,52 @@ class MailLayout(OrgDefaultMailLayout):
         return self.request.link(self.model.course_event)
 
 
-class NotificationTemplateLayout(DefaultLayout):
-
+class NotificationTemplateCollectionLayout(DefaultLayout):
     @cached_property
     def title(self):
-        return _('Notification Template Details')
+        return _('Manage Notification Templates')
 
     @cached_property
     def breadcrumbs(self):
         links = super().breadcrumbs
+        links.append(
+            Link(_('Manage Notification Templates'),
+                 self.request.link(self.model)),
+            )
+        return links
+
+    def accordion_items(self):
+        template = namedtuple('Template',
+                              ['subject', 'text', 'url', 'edit_url'])
+        return tuple(
+            template(
+                item.subject,
+                item.text,
+                self.request.link(item),
+                self.request.link(item, name='edit')
+            ) for item in self.model.query()
+        )
+
+
+class NotificationTemplateLayout(DefaultLayout):
+
+    @cached_property
+    def title(self):
+        return _('${type} Notification Template', mapping=dict(
+            type=self.format_notification_type(self.model.type)))
+
+    @cached_property
+    def collection(self):
+        return FsiNotificationTemplateCollection(
+            self.request.session,
+            course_event_id=self.model.course_event_id
+        )
+
+    @cached_property
+    def breadcrumbs(self):
+        links = super().breadcrumbs
+        links.append(Link(_('Manage Notification Templates'),
+                          self.request.link(self.collection)))
         links.append(Link(_('Current Notification Template'),
                           self.request.link(self.model)))
         return links
@@ -74,34 +113,12 @@ class NotificationTemplateLayout(DefaultLayout):
 class EditNotificationTemplateLayout(NotificationTemplateLayout):
     @cached_property
     def title(self):
-        return _('Edit Notification Template')
-
-    @cached_property
-    def editbar_links(self):
-        links = super().editbar_links
-        links.append(Link(_('Edit'), '#'))
-        return links
-
-
-class NotificationTemplateCollectionLayout(DefaultLayout):
-    @cached_property
-    def title(self):
-        return _('Manage Notification Templates')
+        return _('Edit ${type} Notification Template', mapping=dict(
+            type=self.format_notification_type(self.model.type)))
 
     @cached_property
     def breadcrumbs(self):
         links = super().breadcrumbs
-        links.append(Link(_('Manage Notification Templates')))
+        links.append(
+            Link(_('Edit'), self.request.link(self.model, name='edit')))
         return links
-
-    def accordion_items(self):
-        template = namedtuple('Template',
-                              ['subject', 'text', 'url', 'edit_url'])
-        return tuple(
-            template(
-                item.subject,
-                item.text,
-                self.request.link(item),
-                self.request.link(item, name='edit')
-            ) for item in self.model.query()
-        )

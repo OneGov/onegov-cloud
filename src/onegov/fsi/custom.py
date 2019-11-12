@@ -60,7 +60,7 @@ def get_base_tools(request):
                 )
             )
 
-    elif request.is_logged_in:
+    if request.is_logged_in:
         usr = request.current_attendee
         reservation_count = '0' if not usr else str(usr.reservations.count())
 

@@ -75,10 +75,13 @@ def get_template_details(app, id):
              )
 def get_reservations(app, request, course_event_id=None, attendee_id=None):
 
-    if not attendee_id and not request.is_manager:
+    if not attendee_id:
         # check if someone has permission to see all reservations
         attendee_id = request.attendee_id
         # can be none....still, so not protected, use permissions
+    elif attendee_id != request.attendee_id:
+        if not request.is_manager:
+            attendee_id = request.attendee_id
 
     return ReservationCollection(
         app.session(),

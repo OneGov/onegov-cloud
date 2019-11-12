@@ -13,7 +13,7 @@ from onegov.fsi import _
     template='notifications.pt')
 def view_notifications(self, request):
     layout = NotificationTemplateCollectionLayout(self, request)
-    layout.include_accordion()
+    self.auto_add_templates_if_not_existing()
 
     return {
         'notifications': self.query().all(),
@@ -44,10 +44,12 @@ def view_edit_notification(self, request, form):
         return request.redirect(request.link(self))
 
     form.apply_model(self)
+    layout = EditNotificationTemplateLayout(self, request)
 
     return {
+        'title': layout.title,
         'model': self,
-        'layout': EditNotificationTemplateLayout(self, request),
+        'layout': layout,
         'form': form
     }
 

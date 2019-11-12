@@ -6,11 +6,11 @@ from onegov.fsi.models.notification_template import template_type_choices
 
 
 class NotificationForm(Form):
-    type = SelectField(
-        label=_('Notification Type'),
-        choices=template_type_choices(),
-        render_kw={'size': 3}
-    )
+    # type = SelectField(
+    #     label=_('Notification Type'),
+    #     choices=template_type_choices(),
+    #     render_kw={'size': 3}
+    # )
 
     subject = StringField(
         label=_('Email Subject'),
@@ -23,12 +23,12 @@ class NotificationForm(Form):
     )
 
     def apply_model(self, model):
-        self.type.data = model.type
+        # self.type.data = model.type
         self.subject.data = model.subject
-        self.text.data = model.data
+        self.text.data = model.text
 
     def update_model(self, model):
-        model.type = self.type.data
+        # model.type = self.type.data
         model.subject = self.subject.data
         model.text = self.text.data
 
