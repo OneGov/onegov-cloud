@@ -63,7 +63,7 @@ class NotificationTemplateCollectionLayout(DefaultLayout):
         links.append(
             Link(_('Manage Notification Templates'),
                  self.request.link(self.model)),
-            )
+        )
         return links
 
     def accordion_items(self):

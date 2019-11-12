@@ -47,7 +47,7 @@ class ReservationCollectionLayout(DefaultLayout):
         return Link(
             text=_("Delete"),
             url=self.csrf_protected_url(
-                    self.request.link(reservation, name='delete')
+                self.request.link(reservation, name='delete')
             ),
             attrs={'class': 'button tiny alert'},
             traits=(

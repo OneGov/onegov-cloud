@@ -1,7 +1,7 @@
 from uuid import uuid4
 
-from sqlalchemy import Column, Text, ForeignKey, Enum, UniqueConstraint, String
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy import Column, Text, ForeignKey, Enum, UniqueConstraint
+from sqlalchemy.orm import relationship
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin

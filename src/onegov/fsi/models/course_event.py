@@ -12,8 +12,6 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.fsi.models.course_attendee import CourseAttendee
-from onegov.fsi.models.notification_template import InfoTemplate, \
-    ReservationTemplate, CancellationTemplate, ReminderTemplate
 from onegov.fsi.models.reservation import reservation_table
 from onegov.fsi import _
 

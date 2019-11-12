@@ -1,5 +1,3 @@
-from sqlalchemy import event
-
 from onegov.fsi.models.course_attendee import ATTENDEE_TITLE_TRANSLATIONS, \
     ATTENDEE_TITLES
 from onegov.fsi.models.course_event import (

@@ -1,16 +1,10 @@
-from wtforms import SelectField, StringField, TextAreaField
+from wtforms import StringField, TextAreaField
 
 from onegov.form import Form
 from onegov.fsi import _
-from onegov.fsi.models.notification_template import template_type_choices
 
 
 class NotificationForm(Form):
-    # type = SelectField(
-    #     label=_('Notification Type'),
-    #     choices=template_type_choices(),
-    #     render_kw={'size': 3}
-    # )
 
     subject = StringField(
         label=_('Email Subject'),
@@ -31,6 +25,3 @@ class NotificationForm(Form):
         # model.type = self.type.data
         model.subject = self.subject.data
         model.text = self.text.data
-
-
-

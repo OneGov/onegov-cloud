@@ -91,4 +91,3 @@ def get_reservations(app, request, course_event_id=None, attendee_id=None):
 @FsiApp.path(model=Reservation, path='/fsi/reservation/{id}')
 def get_reservation_details(request, id):
     return ReservationCollection(request.session).by_id(id)
-

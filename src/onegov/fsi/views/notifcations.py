@@ -22,7 +22,7 @@ def view_notifications(self, request):
 
 @FsiApp.html(
     model=FsiNotificationTemplate, template='notification.pt')
-def view_notifications(self, request):
+def view_notification_details(self, request):
     return {
         'layout': NotificationTemplateLayout(self, request)
     }
@@ -32,7 +32,7 @@ def view_notifications(self, request):
     model=FsiNotificationTemplate,
     template='info_notification.pt',
     name='send')
-def view_notifications(self, request):
+def view_send_notifications(self, request):
     return {
         'layout': NotificationTemplateLayout(self, request)
     }

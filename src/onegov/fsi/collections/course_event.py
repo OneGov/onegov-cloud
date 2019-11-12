@@ -1,6 +1,6 @@
 from datetime import datetime
 from sedate import utcnow
-from sqlalchemy import desc, event
+from sqlalchemy import desc
 
 from onegov.core.collection import Pagination, GenericCollection
 from onegov.fsi.models.course_event import CourseEvent

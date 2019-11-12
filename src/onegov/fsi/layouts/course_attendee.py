@@ -1,6 +1,6 @@
 from cached_property import cached_property
 
-from onegov.core.elements import Link, Confirm, Intercooler
+from onegov.core.elements import Link
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
