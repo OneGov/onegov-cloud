@@ -10,5 +10,7 @@ def test_view_courses(client):
     assert 'No entries found' in page
 
 
-# def test_view_courses_new(client):
-#     page = client.get('/courses/new')
+def test_view_courses_new(client):
+    page = client.get('/events/add')
+    # page.form['domain'] = 'federation'
+    # page.form.submit()
