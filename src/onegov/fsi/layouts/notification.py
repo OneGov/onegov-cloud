@@ -83,6 +83,8 @@ class NotificationTemplateLayout(DefaultLayout):
 
     @cached_property
     def title(self):
+        if self.request.view_name == 'send':
+            return _('Send Notification')
         return _('${type} Notification Template', mapping=dict(
             type=self.format_notification_type(self.model.type)))
 
