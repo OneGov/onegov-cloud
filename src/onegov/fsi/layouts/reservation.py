@@ -28,10 +28,6 @@ class ReservationLayout(DefaultLayout):
 class ReservationCollectionLayout(DefaultLayout):
 
     @cached_property
-    def collection(self):
-        return self.request(ReservationCollection(self.request.session))
-
-    @cached_property
     def title(self):
         return _('Reservation Overview')
 
