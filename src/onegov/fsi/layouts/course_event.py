@@ -9,7 +9,48 @@ from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
 
 
-class CourseEventLayout(DefaultLayout):
+class CourseEventCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def title(self):
+        if self.model.limit:
+            return _('Upcoming Course Events')
+        return _('Course Events')
+
+    @cached_property
+    def course_breadcrumbs_text(self):
+        return _('Course management') if self.request.is_manager else _(
+            'Courses')
+
+    @cached_property
+    def breadcrumbs(self):
+        """ Returns the breadcrumbs for the current page. """
+        links = super().breadcrumbs
+        if self.request.is_manager:
+            links.append(
+                Link(
+                    self.course_breadcrumbs_text,
+                    self.request.class_link(CourseEventCollection)))
+        return links
+
+    @cached_property
+    def editbar_links(self):
+        links = []
+        if self.request.is_manager:
+            links.append(
+                Link(
+                    text=_("Add Course Event"),
+                    url=self.request.class_link(
+                        CourseEventCollection, name='add'
+                    ),
+                    attrs={'class': 'add-icon'}
+                )
+            )
+
+        return links
+
+
+class CourseEventLayout(CourseEventCollectionLayout):
 
     @cached_property
     def title(self):
@@ -42,10 +83,11 @@ class CourseEventLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self):
         """ Returns the breadcrumbs for the detail page. """
-        return [
-            Link(_("Homepage"), self.homepage_url),
+        links = super().breadcrumbs
+        links.append(
             Link(_('Current Course Event'), self.request.link(self.model))
-        ]
+        )
+        return links
 
     @cached_property
     def editbar_links(self):
@@ -125,45 +167,6 @@ class CourseEventLayout(DefaultLayout):
                 )
             )
         )
-
-
-class CourseEventCollectionLayout(CourseEventLayout):
-
-    @cached_property
-    def title(self):
-        if self.model.limit:
-            return _('Upcoming Course Events')
-        return _('Course Events')
-
-    @cached_property
-    def breadcrumbs(self):
-        """ Returns the breadcrumbs for the current page. """
-        links = [Link(_("Homepage"), self.homepage_url)]
-        if self.request.is_manager:
-            links.append(
-                Link(_('Course management',
-                       self.request.class_link(CourseEventCollection))))
-        else:
-            links.append(
-                Link(_('Courses',
-                       self.request.class_link(CourseEventCollection))))
-        return links
-
-    @cached_property
-    def editbar_links(self):
-        links = []
-        if self.request.is_manager:
-            links.append(
-                Link(
-                    text=_("Add Course Event"),
-                    url=self.request.class_link(
-                        CourseEventCollection, name='add'
-                    ),
-                    attrs={'class': 'add-icon'}
-                )
-            )
-
-        return links
 
 
 class EditCourseEventLayout(CourseEventLayout):
