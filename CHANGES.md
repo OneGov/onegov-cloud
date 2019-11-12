@@ -1,8 +1,22 @@
 # Changes
 
+## Release `2019.35`
+
+> commits: **3 / [889623375e...248042c125](https://github.com/OneGov/onegov-cloud/compare/889623375e^...248042c125)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.35)](https://buildkite.com/seantis/onegov-cloud)
+
+### Core
+
+✨ **Upgrade to Python 3.8**
+
+OneGov Cloud now uses Python 3.8 instead of 3.7.
+
+**`Other`** | **[195ccc2f23](https://github.com/onegov/onegov-cloud/commit/195ccc2f23ac0d9b8d2968dcf464bf75732ce496)**
+
 ## Release `2019.34`
 
-> commits: **1 / [123b198a00...123b198a00](https://github.com/OneGov/onegov-cloud/compare/123b198a00^...123b198a00)**<br>
+> released: **2019-10-30 15:59**<br>
+> commits: **2 / [123b198a00...32e0377e18](https://github.com/OneGov/onegov-cloud/compare/123b198a00^...32e0377e18)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.34)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
