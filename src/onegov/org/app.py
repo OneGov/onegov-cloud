@@ -90,6 +90,9 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
             False
         )
 
+    def on_login(self, session, current_user):
+        pass
+
     @orm_cached(policy='on-table-change:organisations')
     def org(self):
         return self.session().query(Organisation).first()
