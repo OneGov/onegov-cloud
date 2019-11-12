@@ -11,8 +11,8 @@
                         <tal:b tal:condition="attendees|nothing">
                             <table>
                                 <thead>
-                                    <th i18n:translate="">Email</th>
                                     <th i18n:translate="">Family name, surname</th>
+                                    <th i18n:translate="">Email</th>
                                     <th i18n:translate="">External</th>
                                     <th i18n:translate="">All Open Reservations</th>
                                     <th i18n:translate="">Confirmed Open Reservations</th>
@@ -22,8 +22,8 @@
                                 <tbody>
                                     <tal:b tal:repeat="attendee attendees">
                                         <tr>
-                                            <td>${attendee.email}</td>
                                             <td><a href="${layout.instance_link(attendee)}">${str(attendee)}</a></td>
+                                            <td>${attendee.email}</td>
                                             <td tal:condition="attendee.is_external">True</td>
                                             <td tal:condition="not: attendee.is_external">False</td>
                                             <td>${attendee.course_events.count()}</td>
