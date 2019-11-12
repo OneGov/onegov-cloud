@@ -1,0 +1,43 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.fsi">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="row">
+            <div class="columns small-12">
+                <div class="row">
+                    <div class="columns small-12">
+                        <strong tal:condition="not: reservations" i18n:translate="">No reservations found.</strong>
+                        <tal:b tal:condition="reservations|nothing">
+                                <table class="hover">
+                                    <thead>
+                                        <th i18n:translate="">Description</th>
+                                        <th i18n:translate="">Course Name</th>
+                                        <th i18n:translate="">Date</th>
+                                        <th i18n:translate="">Course Status</th>
+                                        <th i18n:translate="">Course attended</th>
+                                        <th>Manage</th>
+                                    </thead>
+                                    <tbody>
+                                        <tal:b tal:repeat="reservation reservations">
+                                            <tr>
+                                                <td>${str(reservation)}</td>
+                                                <td>${reservation.course_event.name}</td>
+                                                <td>${layout.format_date(reservation.course_event.start, 'date')}</td>
+                                                <td>${layout.format_status(reservation.course_event.status)}</td>
+                                                <td tal:condition="reservation.event_completed" i18n:translate="">True</td>
+                                                <td tal:condition="not reservation.event_completed" i18n:translate="">False</td>
+                                                <td>
+                                                    <metal:b use-macro="layout.macros['reservation_cancellation_btn']"/>
+                                                </td>
+                                            </tr>
+                                        </tal:b>
+                                    </tbody>
+                                </table>
+                        </tal:b>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </tal:b>
+</div>

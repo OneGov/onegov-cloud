@@ -73,6 +73,12 @@
     </tal:b>
 </metal:reservation_confirmation_btn>
 
+<metal:reservation_cancellation_btn define-macro="reservation_cancellation_btn">
+    <tal:b tal:condition="layout.cancellation_btn">
+        <div tal:define="link layout.cancellation_btn(reservation)" tal:content="structure link(layout)"/>
+    </tal:b>
+</metal:reservation_cancellation_btn>
+
 <metal:accordion define-macro="accordion">
     <tal:b tal:define="items layout.accordion_items()" tal:condition="items|nothing">
         <dl class="accordion" data-accordion>
