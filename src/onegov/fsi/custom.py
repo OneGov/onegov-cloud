@@ -11,35 +11,6 @@ from onegov.user import Auth, UserCollection
 
 
 def get_base_tools(request):
-    # Authentication / Userprofile
-    if request.is_logged_in:
-        usr = request.current_attendee
-        reservation_count = '0' if not usr else str(usr.reservations.count())
-
-        yield LinkGroup(request.current_username, classes=('user',), links=(
-            Link(
-                _("User Profile"), request.link(
-                    request.app.org, name='userprofile'
-                ), attrs={'class': 'profile'}
-            ),
-            Link(
-                _("Logout"), request.link(
-                    Auth.from_request(request), name='logout'
-                ), attrs={'class': 'logout'}
-            ),
-        ))
-    else:
-        yield Link(
-            _("Login"), request.link(
-                Auth.from_request_path(request), name='login'
-            ), attrs={'class': 'login'}
-        )
-
-        if request.app.enable_user_registration:
-            yield Link(
-                _("Register"), request.link(
-                    Auth.from_request_path(request), name='register'
-                ), attrs={'class': 'register'})
 
     # Editors aka Sicherheitsbeaftragter
     if request.has_role('editor'):
@@ -78,6 +49,35 @@ def get_base_tools(request):
             )
         )
 
+        yield LinkGroup(_("Management"), classes=('management',),
+                        links=links)
+
+        if request.is_admin:
+            links.append(
+                Link(
+                    _("Users"), request.class_link(UserCollection),
+                    attrs={'class': 'users'}
+                )
+            )
+
+    elif request.is_logged_in:
+        usr = request.current_attendee
+        reservation_count = '0' if not usr else str(usr.reservations.count())
+
+        profile_url = request.link(request.app.org, name='userprofile') \
+            if request.is_admin else request.link(usr)
+
+        yield LinkGroup(request.current_username, classes=('user',), links=(
+            Link(
+                _("User Profile"), profile_url, attrs={'class': 'profile'}
+            ),
+            Link(
+                _("Logout"), request.link(
+                    Auth.from_request(request), name='logout'
+                ), attrs={'class': 'logout'}
+            ),
+        ))
+
         yield LinkGroup(
             _('Reservations'),
             links=[
@@ -95,16 +95,18 @@ def get_base_tools(request):
             ]
         )
 
-        yield LinkGroup(_("Management"), classes=('management',),
-                        links=links)
+    else:
+        yield Link(
+            _("Login"), request.link(
+                Auth.from_request_path(request), name='login'
+            ), attrs={'class': 'login'}
+        )
 
-        if request.is_admin:
-            links.append(
-                Link(
-                    _("Users"), request.class_link(UserCollection),
-                    attrs={'class': 'users'}
-                )
-            )
+        if request.app.enable_user_registration:
+            yield Link(
+                _("Register"), request.link(
+                    Auth.from_request_path(request), name='register'
+                ), attrs={'class': 'register'})
 
 
 def get_global_tools(request):

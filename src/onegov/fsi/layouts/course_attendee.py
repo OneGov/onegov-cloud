@@ -17,12 +17,17 @@ class CourseAttendeeLayout(DefaultLayout):
 
     @cached_property
     def breadcrumbs(self):
-        return [Link(_('Personal Profile'))]
+        links = super().breadcrumbs
+        links.append(
+            Link(_('Personal Profile'), self.request.link(self.model)))
+        if self.request.view_name == 'edit':
+            links.append(
+                Link(_('Edit'), self.request.link(self.model, name='edit'))
+            )
+        return links
 
     @cached_property
     def editbar_links(self):
-        if not self.request.is_manager:
-            return []
         if self.request.view_name == '':
             return [
                 Link(
@@ -31,16 +36,18 @@ class CourseAttendeeLayout(DefaultLayout):
                     attrs={'class': 'edit-icon'}
                 )
             ]
-        if self.request.view_name in ('add-external', 'edit'):
+        if (self.request.view_name in ('add-external', 'edit')
+                and self.request.is_manager):
             return [
                 Link(
                     _('Add External Attendee'),
                     url=self.request.class_link(
                         CourseAttendeeCollection, name='add-external'),
                     attrs={'class': 'plus-icon'}
-
                 )
             ]
+        else:
+            return []
 
     @cached_property
     def salutation(self):
