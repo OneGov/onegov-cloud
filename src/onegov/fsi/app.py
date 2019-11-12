@@ -1,5 +1,6 @@
 from onegov.core import utils
 from onegov.fsi.initial_content import create_new_organisation
+from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.request import FsiRequest
 from onegov.fsi.theme import FsiTheme
 from onegov.org import OrgApp
@@ -15,6 +16,13 @@ class FsiApp(OrgApp):
         cfg.setdefault('enable_user_registration', False)
         cfg.setdefault('enable_yubikey', False)
         super().configure_organisation(**cfg)
+
+    def on_login(self, session, current_user):
+        if not current_user.attendee:
+            current_user.attendee = CourseAttendee(
+                first_name=' ',
+                last_name=' '
+            )
 
 
 @FsiApp.template_directory()
