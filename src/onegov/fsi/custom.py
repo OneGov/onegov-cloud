@@ -43,6 +43,54 @@ def get_base_tools(request):
         yield LinkGroup(
             request.current_username, classes=('user',), links=profile_links)
 
+        # Editors aka Sicherheitsbeaftragter
+        if request.has_role('editor'):
+            pass
+
+        # Management dropdown for admin (e.g Kursverantwortlicher)
+        if request.is_manager:
+            links = []
+            links.append(
+                Link(
+                    _("Files"), request.class_link(GeneralFileCollection),
+                    attrs={'class': 'files'}
+                )
+            )
+
+            links.append(
+                Link(
+                    _("Images"), request.class_link(ImageFileCollection),
+                    attrs={'class': 'images'}
+                )
+            )
+
+            links.append(
+                Link(
+                    _("Settings"), request.link(
+                        request.app.org, 'settings'
+                    ), attrs={'class': 'settings'}
+                )
+            )
+
+            links.append(
+                Link(
+                    _('Attendees'),
+                    request.class_link(CourseAttendeeCollection),
+                    attrs={'class': 'users'}
+                )
+            )
+
+            if request.is_admin:
+                links.append(
+                    Link(
+                        _("Users"), request.class_link(UserCollection),
+                        attrs={'class': 'users'}
+                    )
+                )
+
+            yield LinkGroup(_("Management"), classes=('management',),
+                            links=links)
+
         yield LinkGroup(
             _('Reservations'),
             links=[
@@ -72,58 +120,6 @@ def get_base_tools(request):
                 _("Register"), request.link(
                     Auth.from_request_path(request), name='register'
                 ), attrs={'class': 'register'})
-
-    # Editors aka Sicherheitsbeaftragter
-    if request.has_role('editor'):
-        pass
-
-    # Management dropdown for admin (e.g Kursverantwortlicher)
-    if request.is_manager:
-        links = []
-        links.append(
-            Link(
-                _("Files"), request.class_link(GeneralFileCollection),
-                attrs={'class': 'files'}
-            )
-        )
-
-        links.append(
-            Link(
-                _("Images"), request.class_link(ImageFileCollection),
-                attrs={'class': 'images'}
-            )
-        )
-
-        links.append(
-            Link(
-                _("Settings"), request.link(
-                    request.app.org, 'settings'
-                ), attrs={'class': 'settings'}
-            )
-        )
-
-        links.append(
-            Link(
-                _('Attendees'),
-                request.class_link(CourseAttendeeCollection),
-                attrs={'class': 'users'}
-            )
-        )
-
-        if request.is_admin:
-            links.append(
-                Link(
-                    _("Users"), request.class_link(UserCollection),
-                    attrs={'class': 'users'}
-                )
-            )
-
-        yield LinkGroup(_("Management"), classes=('management',),
-                        links=links)
-
-
-
-
 
 
 def get_global_tools(request):
