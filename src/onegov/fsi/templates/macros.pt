@@ -67,11 +67,11 @@
   </div>
 </metal:fields>
 
-<metal:reservation_confirmation_btn define-macro="reservation_confirmation_btn">
+<metal:confirmation_btn define-macro="confirmation_btn">
     <tal:b tal:condition="layout.confirmation_btn">
         <div tal:define="link layout.confirmation_btn" tal:content="structure link(layout)"/>
     </tal:b>
-</metal:reservation_confirmation_btn>
+</metal:confirmation_btn>
 
 <metal:reservation_cancellation_btn define-macro="reservation_cancellation_btn">
     <tal:b tal:condition="layout.cancellation_btn">
