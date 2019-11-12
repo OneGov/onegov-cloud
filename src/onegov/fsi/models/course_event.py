@@ -167,5 +167,6 @@ class CourseEvent(Base, TimestampMixin):
         # use self.attendees to get a list of emails
         raise NotImplementedError
 
-    def cancel_reservation(self, reservation):
-        self.reservations.remove(reservation)
+    def has_reservation(self, attendee_id):
+        return self.reservations.filter_by(
+            attendee_id=attendee_id).count() != 0

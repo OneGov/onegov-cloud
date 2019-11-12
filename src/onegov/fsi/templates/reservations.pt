@@ -27,16 +27,26 @@
                                                 <td>${reservation.course_event.name}</td>
                                                 <td>${layout.format_date(reservation.course_event.start, 'date')}</td>
                                                 <td>${layout.format_status(reservation.course_event.status)}</td>
-                                                <td tal:condition="reservation.event_completed" i18n:translate="">True</td>
-                                                <td tal:condition="not reservation.event_completed" i18n:translate="">False</td>
+                                                <tal:b tal:switch="reservation.event_completed">
+                                                    <td tal:case="True" i18n:translate="">True</td>
+                                                    <td tal:case="False" i18n:translate="">False</td>
+                                                </tal:b>
+
                                                 <td tal:define="sent reservation.info_sent">${layout.format_date(sent, 'date') if sent else '-'}</td>
                                                 <td>
-                                                    <metal:b tal:condition="not: reservation.course_event.is_past" use-macro="layout.macros['reservation_cancellation_btn']"/>
+                                                    <tal:b tal:switch="reservation.course_event.is_past">
+                                                        <metal:b tal:case="False" tal:define="item reservation" use-macro="layout.macros['intercooler_btn_for_item']"/>
+                                                        <button tal:case="True" class="button tiny secondary disabled archived" i18n:translate="">Archived</button>
+                                                    </tal:b>
+
                                                 </td>
                                             </tr>
                                         </tal:b>
                                     </tbody>
                                 </table>
+                                <tal:b tal:condition="request.is_manager and not layout.current_course_event.is_past">
+                                    <a href="${layout.send_info_mail_url}" class="button success" i18n:translate="">Send Info Mail</a>
+                                </tal:b>
                         </tal:b>
                     </div>
                 </div>

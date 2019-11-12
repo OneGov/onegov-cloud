@@ -67,17 +67,19 @@
   </div>
 </metal:fields>
 
-<metal:confirmation_btn define-macro="confirmation_btn">
-    <tal:b tal:condition="layout.confirmation_btn">
-        <div tal:define="link layout.confirmation_btn" tal:content="structure link(layout)"/>
+<metal:intercooler_btn define-macro="intercooler_btn">
+    <tal:b tal:condition="layout.intercooler_btn">
+        <div tal:define="link layout.intercooler_btn" tal:content="structure link(layout)"/>
     </tal:b>
-</metal:confirmation_btn>
+</metal:intercooler_btn>
 
-<metal:reservation_cancellation_btn define-macro="reservation_cancellation_btn">
-    <tal:b tal:condition="layout.cancellation_btn">
-        <tal:b tal:define="link layout.cancellation_btn(reservation)" tal:content="structure link(layout)"/>
+<metal:intercooler_btn_for_item define-macro="intercooler_btn_for_item">
+    <tal:b tal:condition="layout.intercooler_btn_for_item">
+        <div tal:define="link layout.intercooler_btn_for_item(item)" tal:content="structure link(layout)"/>
     </tal:b>
-</metal:reservation_cancellation_btn>
+</metal:intercooler_btn_for_item>
+
+
 
 <metal:accordion define-macro="accordion">
     <tal:b tal:define="items layout.accordion_items()" tal:condition="items|nothing">
@@ -96,6 +98,13 @@
 
     </tal:b>
 </metal:accordion>
+
+<metal:email_preview define-macro="email_preview">
+    <tal:b tal:condition="layout.model|nothing">
+        <p><strong>Subject: </strong>${layout.model.subject}</p>
+        <div tal:content="text layout.model.text" />
+    </tal:b>
+</metal:email_preview>
 
 </body>
 </html>

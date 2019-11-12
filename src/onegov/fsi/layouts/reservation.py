@@ -27,6 +27,17 @@ class ReservationCollectionLayout(DefaultLayout):
         return []
 
     @cached_property
+    def current_course_event(self):
+        if not self.model.course_event_id:
+            return None
+        return self.model.query().first().course_event
+
+    @property
+    def send_info_mail_url(self):
+        return self.request.link(
+            self.current_course_event.info_template, name='send')
+
+    @cached_property
     def breadcrumbs(self):
         links = super().breadcrumbs
         links.append(
@@ -34,7 +45,7 @@ class ReservationCollectionLayout(DefaultLayout):
         )
         return links
 
-    def cancellation_btn(self, reservation):
+    def intercooler_btn_for_item(self, reservation):
         return Link(
             text=_("Delete"),
             url=self.csrf_protected_url(
@@ -60,6 +71,8 @@ class ReservationLayout(ReservationCollectionLayout):
 
     @cached_property
     def title(self):
+        if self.request.view_name == 'add':
+            return _('Add Reservation')
         return _('Reservation Details')
 
     @cached_property

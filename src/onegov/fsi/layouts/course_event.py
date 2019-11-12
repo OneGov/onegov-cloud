@@ -141,7 +141,7 @@ class CourseEventLayout(CourseEventCollectionLayout):
         ]
 
     @cached_property
-    def confirmation_btn(self):
+    def intercooler_btn(self):
         btn_class = f'button {"disabled" if self.model.booked else ""}'
         return Link(
             text=_("Make Reservation"),
