@@ -1,6 +1,6 @@
 from datetime import datetime
 from sedate import utcnow
-from sqlalchemy import desc
+from sqlalchemy import desc, event
 
 from onegov.core.collection import Pagination, GenericCollection
 from onegov.fsi.models.course_event import CourseEvent
@@ -27,15 +27,6 @@ class CourseEventCollection(GenericCollection, Pagination):
 
         if from_date:
             assert isinstance(from_date, datetime)
-
-    # def __eq__(self, other):
-    #     return (self.page == other.page
-    #             and self.creator == other.creator
-    #             and self.from_date == other.from_date
-    #             and self.upcoming_only == other.upcoming_only
-    #             and self.past_only == other.past_only
-    #             and self.limit
-    #             )
 
     @property
     def model_class(self):
