@@ -27,15 +27,13 @@ class ReservationCollectionLayout(DefaultLayout):
         return []
 
     @cached_property
-    def current_course_event(self):
-        if not self.model.course_event_id:
-            return None
-        return self.model.query().first().course_event
+    def course_event(self):
+        return self.model.course_event
 
     @property
     def send_info_mail_url(self):
         return self.request.link(
-            self.current_course_event.info_template, name='send')
+            self.course_event.info_template, name='send')
 
     @cached_property
     def breadcrumbs(self):
