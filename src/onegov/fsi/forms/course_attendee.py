@@ -32,6 +32,18 @@ class CourseAttendeeForm(Form):
         render_kw={'cols': 12, 'rows': 4}
     )
 
+    def update_model(self, model):
+        model.title = self.title.data
+        model.first_name = self.first_name.data
+        model.last_name = self.last_name.data
+        model.address = self.address.data
+
+    def apply_model(self, model):
+        self.title.data = model.title
+        self.first_name.data = model.first_name
+        self.last_name.data = model.last_name
+        self.address.data = model.address
+
 
 class ExternalCourseAttendeeForm(CourseAttendeeForm):
 
