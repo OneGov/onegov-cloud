@@ -1,8 +1,8 @@
 import chameleon
 import humanize
 
-from cgi import escape
 from contextlib import suppress
+from html import escape
 from morepath.error import LinkError
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.form import _

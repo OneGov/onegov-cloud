@@ -53,6 +53,23 @@ class WinterthurApp(OrgApp):
             password=config.password
         )
 
+    @property
+    def mission_report_legend(self):
+        from onegov.winterthur.views.settings import DEFAULT_LEGEND
+        settings = self.org.meta.get('mission_report_settings') or {}
+
+        if 'legend' in settings:
+            return settings['legend']
+
+        return DEFAULT_LEGEND
+
+    @property
+    def hide_civil_defence_field(self):
+        settings = self.org.meta.get('mission_report_settings') or {}
+        hide = settings.get('hide_civil_defence_field', False)
+
+        return hide
+
     def static_file(self, path):
         return StaticFile(path, version=self.version)
 

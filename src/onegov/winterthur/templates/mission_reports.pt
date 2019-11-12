@@ -7,7 +7,7 @@
             <p i18n:translate="">No mission reports found.</p>
         </div>
 
-        <tal:b condition="reports">
+        <tal:b condition="reports" tal:define="legend layout.app.mission_report_legend">
             <div class="total-missions"><span i18n:translate>Total missions in <tal:b i18n:name="year">${year}</tal:b></span>: <b>${count}</b></div>
 
             <table style="width: 100%;" class="valign-top responsive">
@@ -18,7 +18,9 @@
                         <th class="min-width-column" i18n:translate>Duration</th>
                         <th i18n:translate>Mission nature</th>
                         <th class="min-width-column" i18n:translate>Location</th>
-                        <th class="min-width-column" i18n:translate>Pers*</th>
+                        <th class="min-width-column">
+                            Pers<tal:b condition="legend">*</tal:b>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -46,9 +48,9 @@
                         <td data-label="Location" i18n:attributes="data-label" class="min-width-column">
                             ${report.location}
                         </td>
-                        <td data-label="Pers*" i18n:attributes="data-label" class="min-width-column">
+                        <td data-label="Pers${legend and '*' or ''}" class="min-width-column">
                             <div>${report.personnel} / ${report.backup}</div>
-                            <a href="https://stadt.winterthur.ch/gemeinde/verwaltung/sicherheit-und-umwelt/schutz-und-intervention/einsaetze/zivilschutz-einsaetze" target="_top">
+                            <a tal:condition="not:layout.app.hide_civil_defence_field" href="https://stadt.winterthur.ch/gemeinde/verwaltung/sicherheit-und-umwelt/schutz-und-intervention/einsaetze/zivilschutz-einsaetze" target="_top">
                                 <img i18n:attributes="title" title="Civil Defence involvement"
                                  tal:condition="report.civil_defence"
                                  src="${request.link(request.app.static_file('civil-defence.svg'))}"
@@ -64,24 +66,9 @@
                     collection layout.model; current_page layout.model;" />
             </div>
 
-            <div class="mission-report-legend">
+            <div class="mission-report-legend" tal:condition="legend">
                 <h2 i18n:translate>* Legend Personnel</h2>
-
-                <!--! quite specific content which might become dynamic, therefore not translated -->
-                <tal:b>
-                    <p>
-                        <b>1. Zahl</b><br>
-                        Direkt am Einsatz beteiligte Angehörige der Feuerwehr.
-                    </p>
-                    <p>
-                        <b>2. Zahl</b><br>
-                        Angehörige der Feuerwehr zur Sicherstellung der Einsatzbereitschaft auf der Wache.
-                    </p>
-                    <p>
-                        <b>Internationales Schutzzeichen Zivilschutz</b><br>
-                        An diesem Einsatz waren zusätzlich Angehörige der Zivilschutzorganisation Winterthur und Umgebung beteiligt.
-                    </p>
-                </tal:b>
+                <tal:b tal:replace="structure legend" />
             </div>
         </tal:b>
     </tal:b>

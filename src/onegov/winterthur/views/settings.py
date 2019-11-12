@@ -9,10 +9,28 @@ from onegov.org.views.settings import handle_generic_settings
 from onegov.winterthur import _
 from onegov.winterthur.app import WinterthurApp
 from onegov.winterthur.daycare import Services
-from wtforms.fields import RadioField, TextAreaField
+from wtforms.fields import BooleanField, RadioField, TextAreaField
 from wtforms.fields.html5 import DecimalField
 from wtforms.validators import InputRequired, ValidationError
 from yaml.error import YAMLError
+
+
+DEFAULT_LEGEND = """
+<p>
+    <b>1. Zahl</b><br>
+    Direkt am Einsatz beteiligte Angehörige der Feuerwehr.
+</p>
+<p>
+    <b>2. Zahl</b><br>
+    Angehörige der Feuerwehr zur Sicherstellung der
+    Einsatzbereitschaft auf der Wache.
+</p>
+<p>
+    <b>Internationales Schutzzeichen Zivilschutz</b><br>
+    An diesem Einsatz waren zusätzlich Angehörige der
+    Zivilschutzorganisation Winterthur und Umgebung beteiligt.
+</p>
+"""
 
 
 class WinterthurDaycareSettingsForm(Form):
@@ -132,3 +150,41 @@ class WinterthurDaycareSettingsForm(Form):
                     icon='fa-calculator')
 def custom_handle_settings(self, request, form):
     return handle_generic_settings(self, request, form, _("Daycare Settings"))
+
+
+class WinterthurMissionReportSettingsForm(Form):
+
+    legend = HtmlField(
+        label=_("Legend Text"))
+
+    hide_civil_defence_field = BooleanField(
+        label=_("Hide Civil Defence Field"))
+
+    def populate_obj(self, obj, *args, **kwargs):
+        super().populate_obj(obj, *args, **kwargs)
+
+        obj.meta['mission_report_settings'] = {
+            'hide_civil_defence_field': self.hide_civil_defence_field.data,
+            'legend': self.legend.data,
+        }
+
+    def process_obj(self, obj):
+        super().process_obj(obj)
+
+        d = obj.meta.get('mission_report_settings') or {}
+
+        self.hide_civil_defence_field.data = d.get(
+            'hide_civil_defence_field', False)
+
+        self.legend.data = d.get(
+            'legend', DEFAULT_LEGEND)
+
+
+@WinterthurApp.form(model=Organisation, name='mission-report-settings',
+                    template='form.pt', permission=Secret,
+                    form=WinterthurMissionReportSettingsForm,
+                    setting=_("Mission Reports"),
+                    icon='fa-ambulance')
+def handle_mission_report_settings(self, request, form):
+    return handle_generic_settings(
+        self, request, form, _("Mission Reports"))

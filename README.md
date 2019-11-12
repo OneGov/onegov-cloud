@@ -119,7 +119,7 @@ To run OneGov Cloud locally, you must meet the following requirements:
 
 * Linux/MacOS
 * Postgres 10+
-* Python 3.7+
+* Python 3.8+
 * OpenJDK 11+
 * Elasticsearch 7.x
 * Redis 5.x
@@ -163,6 +163,17 @@ Then you want to activate it:
 Finally, run the installation:
 
     make install
+
+> :sos: **I get compile errors related to OpenSSL on macOS**
+>
+> This occurs if you are using brew to install Python and OpenSSL. The resulting
+> binaries link to the brew OpenSSL library, not the macOS one. To fix the
+> problem, export the following variables before trying `make install` again:
+
+```bash
+export LDFLAGS="-L/usr/local/opt/openssl/lib"
+export CPPFLAGS="-I/usr/local/opt/openssl/include"
+```
 
 ## Configuration 👌
 

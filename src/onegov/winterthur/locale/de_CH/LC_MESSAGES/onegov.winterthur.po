@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-08-30 15:00+0200\n"
+"POT-Creation-Date: 2019-11-12 14:37+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -68,6 +68,9 @@ msgstr "${title} / Tagestarif CHF ${rate} / ${weeks} Öffnungswochen pro Jahr"
 
 msgid "Date"
 msgstr "Datum"
+
+msgid "Time"
+msgstr "Zeit"
 
 msgid "Mission duration (h)"
 msgstr "Einsatzdauer (h)"
@@ -261,9 +264,6 @@ msgstr "Total Einsätze im Jahr ${year}"
 msgid "Duration"
 msgstr "Dauer"
 
-msgid "Pers*"
-msgstr "Pers*"
-
 msgid "Pictures"
 msgstr "Fotos"
 
@@ -417,11 +417,23 @@ msgstr "Beitragsrechner"
 msgid "Daycare Settings"
 msgstr "Kita Einstellungen"
 
+msgid "Hide Civil Defence Field"
+msgstr "«Beteiligung Zivilschutz» ausblenden"
+
+msgid "Legend Text"
+msgstr "Text der Legende"
+
 msgid "Streets Directory"
 msgstr "Strassenverzeichnis"
 
 msgid "The streets directory has been updated"
 msgstr "Das Strassenverzeichnis wurde aktualisiert"
+
+#~ msgid "Mission Report Settings"
+#~ msgstr "Einsatzbericht Einstellungen"
+
+#~ msgid "Pers*"
+#~ msgstr "Pers*"
 
 #~ msgid "Privacy Notice"
 #~ msgstr "Hinweis zur Datenübertragung"
