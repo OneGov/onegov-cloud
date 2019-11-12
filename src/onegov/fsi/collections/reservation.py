@@ -23,6 +23,11 @@ class ReservationCollection(GenericCollection):
     def model_class(self):
         return Reservation
 
+    @property
+    def course_event(self):
+        return self.session.query(CourseEvent).filter_by(
+            id=self.course_event_id).first()
+
     def for_reminder_mails(self):
         soon = utcnow() + timedelta(seconds=60)
         conditions = and_(
