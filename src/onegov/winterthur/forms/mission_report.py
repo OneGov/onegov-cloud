@@ -71,6 +71,10 @@ class MissionReportForm(Form):
         self.day.data = dt.date()
         self.time.data = dt.time()
 
+    def on_request(self):
+        if self.request.app.hide_civil_defence_field:
+            self.delete_field('civil_defence')
+
 
 class MissionReportVehicleForm(Form):
 

@@ -33,7 +33,7 @@
                     <td class="min-width-column" i18n:translate>Backup personnel</td>
                     <td>${model.backup}</td>
                 </tr>
-                <tr>
+                <tr tal:condition="not:layout.app.hide_civil_defence_field">
                     <td class="min-width-column" i18n:translate>Civil Defence involvement</td>
                     <td>
                         <tal:b condition="model.civil_defence" i18n:translate>
