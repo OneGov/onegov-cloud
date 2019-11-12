@@ -99,10 +99,6 @@ def test_course_event_1(session, course_event, attendee):
     assert event.attendees.count() == 1
     assert event.available_seats == 20 - 2
 
-    # Test cancel reservation
-    event.cancel_reservation(placeholder)
-    assert event.reservations.count() == 1
-
 
 def test_reservation_1(session, attendee, course_event):
     attendee = attendee(session)
