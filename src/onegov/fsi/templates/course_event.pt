@@ -14,8 +14,9 @@
                             <p><strong i18n:translate="">Description:</strong></p>
                             <div tal:content="structure model.description_html"></div>
                             <tal:b tal:condition="layout.request.is_logged_in">
-                                <metal:b use-macro="layout.macros['reservation_confirmation_btn']"/>
-                                <strong tal:condition="model.booked" i18n:translate="">This course event is fully booked.</strong>
+
+                                <metal:b tal:condition="model.bookable" use-macro="layout.macros['reservation_confirmation_btn']"/>
+                                <strong tal:condition="not: model.bookable" i18n:translate="">This course event can't be booked anymore.</strong>
                             </tal:b>
                         </tal:b>
                     </div>

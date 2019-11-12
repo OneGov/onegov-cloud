@@ -137,6 +137,10 @@ class CourseEvent(Base, TimestampMixin):
         return self.max_attendees <= self.reservations.count()
 
     @property
+    def bookable(self):
+        return not self.booked and self.start > utcnow()
+
+    @property
     def duplicate_dict(self):
         return OrderedDict(
             name=self.name, description=self.description,
