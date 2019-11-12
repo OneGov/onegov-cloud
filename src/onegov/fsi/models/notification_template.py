@@ -64,10 +64,10 @@ class FsiNotificationTemplate(Base, ContentMixin, TimestampMixin):
     id = Column(UUID, primary_key=True, default=uuid4)
 
     #: The subject of the notification would be according to template type
-    subject = Column(Text, nullable=False)
+    subject = Column(Text, nullable=False, default='Template')
 
     #: The body text injected into the template appearing on GUI
-    text = Column(Text, nullable=False)
+    text = Column(Text, nullable=False, default='Template')
 
     def duplicate(self):
         return self.__class__(
