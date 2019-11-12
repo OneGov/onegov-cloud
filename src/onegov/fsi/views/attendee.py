@@ -8,20 +8,6 @@ from onegov.fsi.layouts.course_attendee import CourseAttendeeLayout, \
 from onegov.fsi.models.course_attendee import CourseAttendee
 
 
-@FsiApp.html(
-    model=CourseAttendeeCollection,
-    request_method='POST',
-    name='add-from-user',
-)
-def view_add_attendee_from_user(self, request):
-    if not request.current_user.attendee:
-        self.add_from_user(request.current_user)
-        request.success(_("Added attendee linked to your user"))
-    else:
-        request.info(_('Attendee already existed'))
-    # return request.redirect(request.link(self))
-
-
 @FsiApp.html(model=CourseAttendeeCollection, template='course_attendees.pt')
 def view_course_attendee_collection(self, request):
     layout = CourseAttendeeCollectionLayout(self, request)

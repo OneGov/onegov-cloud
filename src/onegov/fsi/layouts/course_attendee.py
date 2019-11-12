@@ -75,25 +75,6 @@ class CourseAttendeeCollectionLayout(CourseAttendeeLayout):
                     CourseAttendeeCollection, name='add-external'),
                 attrs={'class': 'users'}
             ),
-            Link(
-                text=_("Add attendee from user"),
-                url=self.request.link(
-                    CourseAttendeeCollection(self.request.session),
-                    name='add-from-user'),
-                attrs={'class': 'copy-link'},
-                traits=(
-                    Confirm(
-                        _("Do you really want to add a course attendee?"),
-                        _("This is for development only!"),
-                        _("Add Attendee"),
-                        _("Cancel")
-                    ),
-                    Intercooler(
-                        request_method='POST',
-                        redirect_after=self.request.link(self.collection)
-                    )
-                )
-            )
         ]
 
     @cached_property
