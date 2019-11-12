@@ -1,8 +1,31 @@
 # Changes
 
+## Release `2019.36`
+
+> commits: **2 / [fc630b8095...e108e096c3](https://github.com/OneGov/onegov-cloud/compare/fc630b8095^...e108e096c3)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.36)](https://buildkite.com/seantis/onegov-cloud)
+
+### Winterthur
+
+🎉 **Splits datetime on mission reports**
+
+The single datetime field was confusing for many users, and the widget
+we use has some corner cases with sloppy input. By splitting this field
+into two, we have fewer problems.
+
+**`Feature`** | **[FW-66](https://stadt-winterthur.atlassian.net/browse/FW-66)** | **[fc630b8095](https://github.com/onegov/onegov-cloud/commit/fc630b80953c97f17a67a269d572ddfa3a6ff9d5)**
+
+🎉 **Adds customisation options for mission reports**
+
+It is now possible to hide the civil defence's involvement and to
+provide a custom legend (including removing it entirely).
+
+**`Feature`** | **[FW-66](https://stadt-winterthur.atlassian.net/browse/FW-66)** | **[e108e096c3](https://github.com/onegov/onegov-cloud/commit/e108e096c376cfd012cd937da204f20b15f74917)**
+
 ## Release `2019.35`
 
-> commits: **3 / [889623375e...248042c125](https://github.com/OneGov/onegov-cloud/compare/889623375e^...248042c125)**<br>
+> released: **2019-11-12 08:59**<br>
+> commits: **4 / [889623375e...80349d6d9d](https://github.com/OneGov/onegov-cloud/compare/889623375e^...80349d6d9d)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.35)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Core
