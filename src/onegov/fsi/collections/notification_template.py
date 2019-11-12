@@ -28,6 +28,10 @@ class FsiNotificationTemplateCollection(GenericCollection):
             query = query.filter_by(course_event_id=self.course_event_id)
         return query
 
+    @cached_property
+    def course_reservations(self):
+        return self.course_event.reservations
+
     def auto_add_templates_if_not_existing(self):
         assert self.course_event_id
         if self.query().count() == 0:
