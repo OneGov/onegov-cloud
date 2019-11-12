@@ -75,7 +75,7 @@
 
 <metal:reservation_cancellation_btn define-macro="reservation_cancellation_btn">
     <tal:b tal:condition="layout.cancellation_btn">
-        <div tal:define="link layout.cancellation_btn(reservation)" tal:content="structure link(layout)"/>
+        <tal:b tal:define="link layout.cancellation_btn(reservation)" tal:content="structure link(layout)"/>
     </tal:b>
 </metal:reservation_cancellation_btn>
 
