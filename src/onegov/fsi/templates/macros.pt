@@ -68,15 +68,11 @@
 </metal:fields>
 
 <metal:intercooler_btn define-macro="intercooler_btn">
-    <tal:b tal:condition="layout.intercooler_btn">
-        <div tal:define="link layout.intercooler_btn" tal:content="structure link(layout)"/>
-    </tal:b>
+    <tal:b tal:define="link intercooler_btn|layout.intercooler_btn" tal:condition="link" tal:content="structure link(layout)" />
 </metal:intercooler_btn>
 
 <metal:intercooler_btn_for_item define-macro="intercooler_btn_for_item">
-    <tal:b tal:condition="layout.intercooler_btn_for_item">
-        <div tal:define="link layout.intercooler_btn_for_item(item)" tal:content="structure link(layout)"/>
-    </tal:b>
+    <tal:b tal:define="link intercooler_btn_for_item|layout.intercooler_btn_for_item" tal:condition="link and item" tal:content="structure link(item)(layout)" />
 </metal:intercooler_btn_for_item>
 
 
