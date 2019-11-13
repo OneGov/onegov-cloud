@@ -40,13 +40,20 @@ class FsiReservationForm(Form):
         event_collection = CourseEventCollection(
             self.request.session, upcoming_only=True)
 
+        event_choices = event_collection.query()
+
         def _repr(attendee):
             return f'{str(attendee)} - {attendee.email}'
 
-        if attendee:
-            self.attendee_id.choices = ((str(attendee.id), _repr(attendee)),)
-        elif self.request.view_name == 'add-placeholder':
+        if self.request.view_name == 'add-placeholder':
             self.delete_field('attendee_id')
+
+        elif attendee:
+            self.attendee_id.choices = ((str(attendee.id), _repr(attendee)),)
+            # Filter courses he registered
+            event_choices = event_choices.filter(
+                self.model.model_class.attendee_id != attendee.id)
+
         else:
             self.attendee_id.choices = list(
                 (str(a.id), _repr(a)) for a in attendee_collection.query()
@@ -58,6 +65,6 @@ class FsiReservationForm(Form):
             self.course_event_id.choices = ((str(event.id), event.name),)
         else:
             self.course_event_id.choices = list(
-                (str(a.id), a.name) for a in event_collection.query()
+                (str(a.id), a.name) for a in event_choices
             )
 

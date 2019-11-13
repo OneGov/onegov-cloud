@@ -11,7 +11,6 @@ from onegov.fsi import _
 def view_reservations(self, request):
     layout = ReservationCollectionLayout(self, request)
     return {
-        'title': _('Reservations'),
         'layout': layout,
         'reservations': self.query().all()
     }
@@ -48,7 +47,9 @@ def view_add_reservation_placeholder(self, request, form):
     layout = ReservationLayout(self, request)
 
     if form.submitted(request):
-        self.add(**form.get_useful_data())
+        data = form.get_useful_data()
+        data.setdefault('dummy_desc', _('Placeholder Reservation'))
+        self.add(**data)
         request.success(_("Added a new placeholder reservation"))
         return request.redirect(request.link(self))
 
