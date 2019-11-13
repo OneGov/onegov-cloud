@@ -93,7 +93,6 @@ class ExtendedAgency(Agency, AccessExtension):
                 order_within_person = max(orders_for_person) + 1
             except ValueError:
                 order_within_person = 0
-            assert len(orders_for_person) == max(orders_for_person) + 1
         else:
             order_within_person = 0
 
