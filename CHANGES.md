@@ -1,8 +1,29 @@
 # Changes
 
+## Release `2019.37`
+
+> commits: **2 / [847ec8204a...9084c913fb](https://github.com/OneGov/onegov-cloud/compare/847ec8204a^...9084c913fb)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.37)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+🐞 **Fixes accidental assert statement in Membership.add_person**
+
+When order index is repeating, this gets fixed if the user re-arranges
+the order
+
+**`Bugfix`** | **[847ec8204a](https://github.com/onegov/onegov-cloud/commit/847ec8204ad730ca42b53697602794a1954907fe)**
+
+### Winterthur
+
+✨ **Updates legend label**
+
+**`Other`** | **[FW-66](https://stadt-winterthur.atlassian.net/browse/FW-66)** | **[9084c913fb](https://github.com/onegov/onegov-cloud/commit/9084c913fbb38cd1d745faf4e0f0f551910d9f37)**
+
 ## Release `2019.36`
 
-> commits: **2 / [fc630b8095...e108e096c3](https://github.com/OneGov/onegov-cloud/compare/fc630b8095^...e108e096c3)**<br>
+> released: **2019-11-12 15:14**<br>
+> commits: **3 / [fc630b8095...18553040e2](https://github.com/OneGov/onegov-cloud/compare/fc630b8095^...18553040e2)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.36)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Winterthur
