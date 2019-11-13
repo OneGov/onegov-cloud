@@ -24,7 +24,7 @@
                                         <tal:b tal:repeat="reservation reservations">
                                             <tr>
                                                 <td>${str(reservation)}</td>
-                                                <td>${reservation.course_event.name}</td>
+                                                <td><a href="${request.link(reservation.course_event)}">${reservation.course_event.name}</a></td>
                                                 <td>${layout.format_date(reservation.course_event.start, 'date')}</td>
                                                 <td>${layout.format_status(reservation.course_event.status)}</td>
                                                 <tal:b tal:switch="reservation.event_completed">
