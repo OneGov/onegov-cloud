@@ -1,6 +1,6 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.fsi">
-    <tal:block metal:fill-slot="title">
-        ${title}
+    <tal:block metal:fill-slot="title" tal:define="text title|layout.title">
+        ${text}
     </tal:block>
     <tal:block metal:fill-slot="content">
         <h2 tal:condition="subtitle|nothing" class="subheader">${subtitle}</h2>
