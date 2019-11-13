@@ -25,6 +25,14 @@ class FsiReservationForm(Form):
     )
 
     def on_request(self):
+        """
+        - self.model is the reservation_collection of the view using the form
+        . the collection has the property course_event or attendee
+        - in path.py, the attendee_id is set using the request if not a manager
+        - self.model.attendee will be filled always if the user is not manager
+        - if attendee is None, this is a placeholder reservation
+
+        """
         attendee = self.model.attendee
         event = self.model.course_event
         attendee_collection = CourseAttendeeCollection(
@@ -37,6 +45,8 @@ class FsiReservationForm(Form):
 
         if attendee:
             self.attendee_id.choices = ((str(attendee.id), _repr(attendee)),)
+        elif self.request.view_name == 'add-placeholder':
+            self.delete_field('attendee_id')
         else:
             self.attendee_id.choices = list(
                 (str(a.id), _repr(a)) for a in attendee_collection.query()

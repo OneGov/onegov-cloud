@@ -67,10 +67,14 @@ class ReservationCollectionLayout(DefaultLayout):
 
 class ReservationLayout(ReservationCollectionLayout):
 
+    """ Only used for editing since it does not contain fields """
+
     @cached_property
     def title(self):
         if self.request.view_name == 'add':
             return _('Add Reservation')
+        if self.request.view_name == 'add-placeholder':
+            return _('Add Placeholder Reservation')
         return _('Reservation Details')
 
     @cached_property
@@ -78,10 +82,12 @@ class ReservationLayout(ReservationCollectionLayout):
         links = super().breadcrumbs
         if self.request.view_name == 'add':
             links.append(
-                Link(_('Add'), '#')
+                Link(_('Add'))
             )
+        elif self.request.view_name == 'add-placeholder':
+            links.append(Link(_('Add Placeholder')))
         else:
             links.append(
-                Link(_('Current Reservation'), '#')
+                Link(_('Current Reservation'))
             )
         return links

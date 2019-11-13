@@ -98,12 +98,6 @@ class CourseEventLayout(CourseEventCollectionLayout):
                 title=_('Add'),
                 links=(
                     Link(
-                        _("New Course Event"),
-                        self.request.class_link(
-                            CourseEventCollection, name='add'),
-                        attrs={'class': 'add-icon'}
-                    ),
-                    Link(
                         _('Duplicate'),
                         self.request.link(self.model, name='duplicate'),
                         attrs={'class': 'new-link'}
@@ -118,6 +112,20 @@ class CourseEventLayout(CourseEventCollectionLayout):
                             name='add'
                         ),
                         attrs={'class': 'new-link'}
+                    ),
+                    Link(
+                        _("Placeholder Reservation"),
+                        self.request.link(
+                            self.reservation_collection,
+                            name='add-placeholder'
+                        ),
+                        attrs={'class': 'add-icon'}
+                    ),
+                    Link(
+                        _("New Course Event"),
+                        self.request.class_link(
+                            CourseEventCollection, name='add'),
+                        attrs={'class': 'add-icon'}
                     ),
                 )
             ),
