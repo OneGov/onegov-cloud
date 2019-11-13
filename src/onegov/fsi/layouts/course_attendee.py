@@ -67,7 +67,7 @@ class CourseAttendeeLayout(DefaultLayout):
         links = [Link(
             _('Edit Profile'),
             url=self.request.link(self.model, name='edit'),
-            attrs={'class': 'edit-icon'}
+            attrs={'class': 'edit-link'}
         )]
         if self.request.is_manager:
             links.append(

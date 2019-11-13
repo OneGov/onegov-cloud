@@ -108,7 +108,7 @@ class NotificationTemplateLayout(DefaultLayout):
     def editbar_links(self):
         return [
             Link(_('Edit'), self.request.link(self.model, name='edit'),
-                 attrs={'class': 'edit-icon'})
+                 attrs={'class': 'edit-link'})
         ]
 
 

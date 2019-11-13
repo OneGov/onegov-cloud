@@ -102,9 +102,9 @@ class CourseEventLayout(CourseEventCollectionLayout):
                 attrs={'class': 'add-icon'}
             ),
             Link(
-                text=_("Edit"),
-                url=self.request.link(self.model, name='edit'),
-                attrs={'class': 'edit-icon'}
+                _('Edit'),
+                self.request.link(self.model, name='edit'),
+                attrs={'class': 'edit-link'}
             ),
             Link(
                 text=_('Duplicate'),
