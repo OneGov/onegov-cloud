@@ -1,8 +1,7 @@
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi import _
-from onegov.fsi.forms.course_attendee import CourseAttendeeForm, \
-    ExternalCourseAttendeeForm
+from onegov.fsi.forms.course_attendee import CourseAttendeeForm
 from onegov.fsi.layouts.course_attendee import CourseAttendeeLayout, \
     CourseAttendeeCollectionLayout
 from onegov.fsi.models.course_attendee import CourseAttendee
@@ -51,7 +50,7 @@ def view_edit_course_attendee(self, request, form):
 
 
 @FsiApp.form(model=CourseAttendeeCollection, template='form.pt',
-             form=ExternalCourseAttendeeForm, name='add-external')
+             form=CourseAttendeeForm, name='add-external')
 def view_att_external_attendee(self, request, form):
     layout = CourseAttendeeCollectionLayout(self, request)
 

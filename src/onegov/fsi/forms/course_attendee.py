@@ -1,8 +1,7 @@
 from wtforms import StringField, TextAreaField
 from wtforms.validators import InputRequired, Email
-
 from onegov.form.fields import ChosenSelectField
-from onegov.form.parser.core import EmailField
+from wtforms.fields.html5 import EmailField
 from onegov.fsi import _
 from onegov.form import Form
 from onegov.fsi.models.course_attendee import attendee_title_choices
@@ -18,14 +17,20 @@ class CourseAttendeeForm(Form):
 
     first_name = StringField(
         label=_('First Name'),
-        render_kw={'size': 5},
+        render_kw={'size': 3},
         validators=[InputRequired()]
     )
 
     last_name = StringField(
         label=_('Last Name'),
-        render_kw={'size': 6},
-        validators=[InputRequired()]
+        render_kw={'size': 4},
+        validators=[InputRequired()],
+    )
+
+    email = EmailField(
+        label=_('Email'),
+        validators=[InputRequired(), Email()],
+        render_kw={'size': 4},
     )
 
     address = TextAreaField(
@@ -45,11 +50,8 @@ class CourseAttendeeForm(Form):
         self.last_name.data = model.last_name
         self.address.data = model.address
 
+    def on_request(self):
+        if self.request.view_name != 'add-external':
+            self.delete_field('email')
 
-class ExternalCourseAttendeeForm(CourseAttendeeForm):
 
-    email = EmailField(
-        label=_('Email'),
-        validators=[InputRequired(), Email()],
-        required=True
-    )
