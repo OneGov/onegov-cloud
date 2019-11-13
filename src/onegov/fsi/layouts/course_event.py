@@ -1,6 +1,6 @@
 from cached_property import cached_property
 
-from onegov.core.elements import Link, Confirm, Intercooler
+from onegov.core.elements import Link, Confirm, Intercooler, LinkGroup
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.collections.notification_template import \
     FsiNotificationTemplateCollection
@@ -94,26 +94,37 @@ class CourseEventLayout(CourseEventCollectionLayout):
         if not self.request.is_manager:
             return []
         return [
-            Link(
-                text=_("Add Course Event"),
-                url=self.request.class_link(
-                    CourseEventCollection, name='add'
-                ),
-                attrs={'class': 'add-icon'}
+            LinkGroup(
+                title=_('Add'),
+                links=(
+                    Link(
+                        _("New Course Event"),
+                        self.request.class_link(
+                            CourseEventCollection, name='add'),
+                        attrs={'class': 'add-icon'}
+                    ),
+                    Link(
+                        _('Duplicate'),
+                        self.request.link(self.model, name='duplicate'),
+                        attrs={'class': 'new-link'}
+                    ),
+                    Link(
+                        _('Reservation for External'),
+                        self.request.class_link(
+                            ReservationCollection, name='add'),
+                        attrs={'class': 'new-link'}
+                    ),
+                )
             ),
             Link(
                 _('Edit'),
                 self.request.link(self.model, name='edit'),
                 attrs={'class': 'edit-link'}
             ),
+
             Link(
-                text=_('Duplicate'),
-                url=self.request.link(self.model, name='duplicate'),
-                attrs={'class': 'new-link'}
-            ),
-            Link(
-                text=_("Delete"),
-                url=self.csrf_protected_url(
+                _('Delete'),
+                self.csrf_protected_url(
                     self.request.link(self.model)
                 ),
                 attrs={'class': 'delete-link'},
@@ -132,12 +143,13 @@ class CourseEventLayout(CourseEventCollectionLayout):
                     )
                 )
             ),
-            Link(_('Manage Email Templates'), self.request.link(
-                self.template_collection)
-            ),
-            Link(_('Manage Reservations'),
-                 self.request.link(self.reservation_collection))
-
+            LinkGroup(_('Manage'), links=(
+                Link(_('Email Templates'), self.request.link(
+                    self.template_collection)
+                     ),
+                Link(_('Reservations'),
+                     self.request.link(self.reservation_collection))
+            )),
         ]
 
     @cached_property
