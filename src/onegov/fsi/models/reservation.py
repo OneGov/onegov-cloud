@@ -2,7 +2,6 @@ from uuid import uuid4
 from sqlalchemy import Column, ForeignKey, Boolean, Table, Text
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID, UTCDateTime
-
 table_name = 'fsi_reservations'
 
 reservation_table = Table(
@@ -40,11 +39,6 @@ class Reservation(Base):
     @property
     def is_placeholder(self):
         return self.attendee_id is None
-
-    @classmethod
-    def as_placeholder(cls, dummy_desc, **kwargs):
-        assert 'attendee_id' not in kwargs
-        return cls(dummy_desc=dummy_desc, **kwargs)
 
     def __str__(self):
         if self.is_placeholder:
