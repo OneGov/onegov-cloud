@@ -13,7 +13,7 @@ class CourseAttendeeForm(Form):
     title = ChosenSelectField(
         label=_('Salutation'),
         choices=attendee_title_choices(),
-        render_kw={'size': 2}
+        render_kw={'size': 1}
     )
 
     first_name = StringField(
@@ -23,8 +23,8 @@ class CourseAttendeeForm(Form):
     )
 
     last_name = StringField(
-        label=_('First Name'),
-        render_kw={'size': 5},
+        label=_('Last Name'),
+        render_kw={'size': 6},
         validators=[InputRequired()]
     )
 
