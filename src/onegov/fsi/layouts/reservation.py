@@ -1,6 +1,6 @@
 from cached_property import cached_property
 
-from onegov.core.elements import Link, Confirm, Intercooler
+from onegov.core.elements import Link, Confirm, Intercooler, LinkGroup
 from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
@@ -8,23 +8,43 @@ from onegov.fsi import _
 
 class ReservationCollectionLayout(DefaultLayout):
 
+    @property
+    def for_himself(self):
+        return self.model.attendee_id == self.request.attendee_id
+
     @cached_property
     def title(self):
-        return _('Reservation Overview')
+        if self.model.course_event_id:
+            return _('Reservations for ${event}',
+                     mapping={'event': self.model.course_event.name})
+        if self.for_himself:
+            return _('My Personal Reservations')
+        else:
+            return _('All Reservations for ${attendee}',
+                     mapping={'attendee': self.model.attendee})
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_manager:
-            return [
-                Link(
-                    text=_("Add Reservation"),
-                    url=self.request.class_link(
-                        ReservationCollection, name='add'
+        if not self.request.is_manager:
+            return []
+        return [
+            LinkGroup(
+                title=_('Add'),
+                links=[
+                    Link(
+                        _('Reservation'),
+                        self.request.link(self.model, name='add'),
+                        attrs={'class': 'add-icon'}
                     ),
-                    attrs={'class': 'add-icon'}
-                ),
-            ]
-        return []
+                    Link(
+                        _('Placeholder'),
+                        self.request.link(self.model, name='add-placeholder'),
+                        attrs={'class': 'add-icon'}
+                    )
+                ]
+            )
+
+        ]
 
     @cached_property
     def course_event(self):
