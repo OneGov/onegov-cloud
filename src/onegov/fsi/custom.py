@@ -96,24 +96,22 @@ def get_base_tools(request):
 
             yield LinkGroup(_("Management"), classes=('management',),
                             links=links)
+        if reservation_count:
+            css = 'alert open-tickets'
+        else:
+            css = 'no-tickets'
 
-        yield LinkGroup(
-            _('Reservations'),
-            links=[
-                Link(
-                    _("Open Reservations"),
-                    request.link(
-                        ReservationCollection(request.session,
-                                              request.attendee_id),
-                    ),
-                    attrs={
-                        'class': ('with-count', 'alert', 'open-tickets'),
-                        'data-count': reservation_count
-                    }
-                )
-            ]
+        yield Link(
+            reservation_count == 1 and _("Reservation") or _("Reservations"),
+            request.link(
+                ReservationCollection(request.session,
+                                      request.attendee_id),
+            ),
+            attrs={
+                'class': ('with-count', css),
+                'data-count': reservation_count
+            }
         )
-
     else:
         yield Link(
             _("Login"), request.link(
@@ -130,8 +128,6 @@ def get_base_tools(request):
 
 def get_global_tools(request):
     yield from get_base_tools(request)
-    # yield from get_personal_tools(request)
-    # yield from get_admin_tools(request)
 
 
 @FsiApp.template_variables()
@@ -140,39 +136,6 @@ def get_template_variables(request):
         'global_tools': tuple(get_global_tools(request)),
         'top_navigation': tuple(get_top_navigation(request))
     }
-
-
-# def get_admin_tools(request):
-#     links = []
-#
-#     if request.is_admin:
-#         links.append(
-#             Link(
-#                 text=_("All Courses"),
-#                 url=request.class_link(CourseCollection),
-#                 attrs={'class': 'courses'}
-#             )
-#         )
-    # if request.is_editor:
-    #     links.append(
-    #         Link(
-    #             text=_('Manage what?'),
-    #             url=request.link()
-    #         )
-    #     )
-
-
-def get_personal_tools(request):
-    # for logged-in users show their reservations
-    if request.is_logged_in:
-        yield Link(
-            text=_("Own Reservations"),
-            url=request.link(''),
-            attrs={
-                'data-count': '0',
-                'class': {'with-count', 'secondary'}
-            },
-        )
 
 
 def get_top_navigation(request):
