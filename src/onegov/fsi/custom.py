@@ -79,6 +79,12 @@ def get_base_tools(request):
                     attrs={'class': 'users'}
                 )
             )
+            links.append(
+                Link(
+                    _('Reservations'),
+                    request.class_link(ReservationCollection)
+                )
+            )
 
             if request.is_admin:
                 links.append(

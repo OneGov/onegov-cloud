@@ -19,9 +19,10 @@ class ReservationCollectionLayout(DefaultLayout):
                      mapping={'event': self.model.course_event.name})
         if self.for_himself:
             return _('My Personal Reservations')
-        else:
+        elif self.model.attendee_id:
             return _('All Reservations for ${attendee}',
                      mapping={'attendee': self.model.attendee})
+        return _('All Reservations')
 
     @cached_property
     def editbar_links(self):
