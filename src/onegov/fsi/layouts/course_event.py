@@ -85,7 +85,7 @@ class CourseEventLayout(CourseEventCollectionLayout):
         """ Returns the breadcrumbs for the detail page. """
         links = super().breadcrumbs
         links.append(
-            Link(_('Current Course Event'), self.request.link(self.model))
+            Link(self.model.name, self.request.link(self.model))
         )
         return links
 
@@ -186,8 +186,8 @@ class CourseEventLayout(CourseEventCollectionLayout):
                 ),
                 Intercooler(
                     request_method='POST',
-                    redirect_after=self.request.class_link(
-                        ReservationCollection
+                    redirect_after=self.request.link(
+                        self.model
                     )
                 )
             )

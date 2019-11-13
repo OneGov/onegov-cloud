@@ -86,5 +86,6 @@ class CourseEventCollection(GenericCollection, Pagination):
     def add(self, **kwargs):
         course_event = super().add(**kwargs)
         tc = FsiNotificationTemplateCollection(
-            self.session, course_event_id=course_event)
+            self.session, course_event_id=course_event.id)
         tc.auto_add_templates_if_not_existing()
+        return course_event

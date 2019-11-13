@@ -100,7 +100,7 @@ class NotificationTemplateLayout(DefaultLayout):
         links = super().breadcrumbs
         links.append(Link(_('Manage Notification Templates'),
                           self.request.link(self.collection)))
-        links.append(Link(_('Current Notification Template'),
+        links.append(Link(self.format_notification_type(self.model.name),
                           self.request.link(self.model)))
         return links
 
