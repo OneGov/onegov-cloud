@@ -76,7 +76,12 @@ class ReservationLayout(ReservationCollectionLayout):
     @cached_property
     def breadcrumbs(self):
         links = super().breadcrumbs
-        links.append(
-            Link(_('Current Reservation'), '#')
-        )
+        if self.request.view_name == 'add':
+            links.append(
+                Link(_('Add'), '#')
+            )
+        else:
+            links.append(
+                Link(_('Current Reservation'), '#')
+            )
         return links
