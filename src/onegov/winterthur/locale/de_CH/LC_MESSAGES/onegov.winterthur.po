@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-11-12 14:37+0100\n"
+"POT-Creation-Date: 2019-11-13 11:04+0100\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -267,8 +267,8 @@ msgstr "Dauer"
 msgid "Pictures"
 msgstr "Fotos"
 
-msgid "* Legend Personnel"
-msgstr "* Legende Personal"
+msgid "Legend"
+msgstr "Legende"
 
 msgid "Start"
 msgstr "Von"
@@ -417,62 +417,14 @@ msgstr "Beitragsrechner"
 msgid "Daycare Settings"
 msgstr "Kita Einstellungen"
 
-msgid "Hide Civil Defence Field"
-msgstr "«Beteiligung Zivilschutz» ausblenden"
-
 msgid "Legend Text"
 msgstr "Text der Legende"
+
+msgid "Hide Civil Defence Field"
+msgstr "«Beteiligung Zivilschutz» ausblenden"
 
 msgid "Streets Directory"
 msgstr "Strassenverzeichnis"
 
 msgid "The streets directory has been updated"
 msgstr "Das Strassenverzeichnis wurde aktualisiert"
-
-#~ msgid "Mission Report Settings"
-#~ msgstr "Einsatzbericht Einstellungen"
-
-#~ msgid "Pers*"
-#~ msgstr "Pers*"
-
-#~ msgid "Privacy Notice"
-#~ msgstr "Hinweis zur Datenübertragung"
-
-#~ msgid "Your monthly costs"
-#~ msgstr "Ihre monatlichen Kosten"
-
-#~ msgid "Our monthly contribution"
-#~ msgstr "Unser monatlicher Beitrag"
-
-#~ msgid "Daycare cost"
-#~ msgstr "Betreuungskosten"
-
-#~ msgid "Taxable income"
-#~ msgstr "Steuerbares Einkommen"
-
-#~ msgid "Taxable wealth"
-#~ msgstr "Steuerbares Vermögen"
-
-#~ msgid "Daycare"
-#~ msgstr "Kita"
-
-#~ msgid "Factor"
-#~ msgstr "Faktor"
-
-#~ msgid "Per Week"
-#~ msgstr "Pro Woche"
-
-#~ msgid "Per Month"
-#~ msgstr "Pro Monat"
-
-#~ msgid "Total per Week"
-#~ msgstr "Total pro Woche"
-
-#~ msgid "Total per Month"
-#~ msgstr "Total pro Monat"
-
-#~ msgid "Agenda"
-#~ msgstr "Agenda"
-
-#~ msgid "Calculation successful"
-#~ msgstr "Berechnung erfolgreich"
