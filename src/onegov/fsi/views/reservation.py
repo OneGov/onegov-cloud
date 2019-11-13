@@ -32,7 +32,27 @@ def view_add_reservation(self, request, form):
         return request.redirect(request.link(self))
 
     return {
-        'title': layout.title,
+        'model': self,
+        'layout': layout,
+        'form': form
+    }
+
+
+@FsiApp.form(
+    model=ReservationCollection,
+    template='form.pt',
+    name='add-placeholder',
+    form=FsiReservationForm
+)
+def view_add_reservation_placeholder(self, request, form):
+    layout = ReservationLayout(self, request)
+
+    if form.submitted(request):
+        self.add(**form.get_useful_data())
+        request.success(_("Added a new placeholder reservation"))
+        return request.redirect(request.link(self))
+
+    return {
         'model': self,
         'layout': layout,
         'form': form
