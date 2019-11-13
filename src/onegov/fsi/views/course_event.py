@@ -14,7 +14,6 @@ from onegov.fsi.models.course_event import CourseEvent
 def view_course_event_collection(self, request):
     layout = CourseEventCollectionLayout(self, request)
     return {
-        'title': layout.title,
         'layout': layout,
         'model': self,
         'events': self.query().all()
@@ -37,7 +36,6 @@ def view_add_course_event(self, request, form):
         return request.redirect(request.link(course_event))
 
     return {
-        'title': layout.title,
         'layout': layout,
         'model': self,
         'form': form
@@ -50,7 +48,6 @@ def view_add_course_event(self, request, form):
 def view_course_event(self, request):
     layout = CourseEventLayout(self, request)
     return {
-        'title': layout.title,
         'layout': layout,
         'model': self,
     }
@@ -76,7 +73,6 @@ def view_edit_course_event(self, request, form):
         form.apply_model(self)
 
     return {
-        'title': layout.title,
         'layout': layout,
         'model': self,
         'form': form
@@ -103,7 +99,6 @@ def view_duplicate_course_event(self, request, form):
     form.apply_model(self.duplicate)
 
     return {
-        'title': layout.title,
         'layout': layout,
         'model': self,
         'form': form
