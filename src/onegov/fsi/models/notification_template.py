@@ -47,10 +47,6 @@ class FsiNotificationTemplate(Base, ContentMixin, TimestampMixin):
         'polymorphic_identity': 'fsi_notification_templates'
     }
 
-    # the creator/owner of the record
-    owner_id = Column(
-        UUID, ForeignKey('fsi_attendees.id'), nullable=True)
-
     # One-To-Many relationship with course
     course_event_id = Column(
         UUID, ForeignKey('fsi_course_events.id'), nullable=False)
@@ -70,7 +66,6 @@ class FsiNotificationTemplate(Base, ContentMixin, TimestampMixin):
     def duplicate(self):
         return self.__class__(
             type=self.type,
-            owner_id=self.owner_id,
             id=uuid4(),
             subject=self.subject,
             text=self.text

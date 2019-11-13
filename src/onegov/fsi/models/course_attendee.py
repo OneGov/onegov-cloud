@@ -61,11 +61,6 @@ class CourseAttendee(Base):
         lazy='dynamic',
         cascade='all, delete-orphan')
 
-    templates = relationship(
-        'FsiNotificationTemplate',
-        backref='owner',
-    )
-
     @property
     def is_external(self):
         return self.user_id is None
