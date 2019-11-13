@@ -4,10 +4,14 @@ from onegov.fsi.models.course_attendee import CourseAttendee
 
 class CourseAttendeeCollection(GenericCollection, Pagination):
 
-    def __init__(self, session, page=0, exclude_external=False):
+    def __init__(self, session,
+                 page=0,
+                 exclude_external=False,
+                 external_only=False):
         super().__init__(session)
         self.page = page
         self.exclude_external = exclude_external
+        self.external_only = external_only
 
     @property
     def model_class(self):
@@ -19,6 +23,8 @@ class CourseAttendeeCollection(GenericCollection, Pagination):
             CourseAttendee.last_name, CourseAttendee.first_name)
         if self.exclude_external:
             query = query.filter(CourseAttendee.user_id.isnot(None))
+        elif self.external_only:
+            query = query.filter(CourseAttendee.user_id == None)
         return query
 
     def subset(self):

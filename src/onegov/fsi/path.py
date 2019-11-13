@@ -41,9 +41,14 @@ def get_events_view(
 
 
 @FsiApp.path(model=CourseAttendeeCollection, path='/fsi/attendees',
-             converters=dict(exclude_external=bool))
-def get_attendees(request, page=0, exclude_external=False):
-    return CourseAttendeeCollection(request.session, page, exclude_external)
+             converters=dict(exclude_external=bool, external_only=bool))
+def get_attendees(
+        request, page=0, exclude_external=False, external_only=False):
+    return CourseAttendeeCollection(
+        request.session, page,
+        exclude_external=exclude_external,
+        external_only=external_only
+    )
 
 
 @FsiApp.path(model=CourseAttendee, path='/fsi/attendee/{id}')
@@ -69,9 +74,12 @@ def get_template_details(request, id):
 
 
 @FsiApp.path(model=ReservationCollection, path='/fsi/reservations',
-             converters=dict(attendee_id=UUID, course_event_id=UUID)
+             converters=dict(
+                 attendee_id=UUID, course_event_id=UUID, external_only=bool)
              )
-def get_reservations(app, request, course_event_id=None, attendee_id=None):
+def get_reservations(
+        app, request,
+        course_event_id=None, attendee_id=None, external_only=False):
 
     if not attendee_id:
         if not request.is_manager:
@@ -84,7 +92,8 @@ def get_reservations(app, request, course_event_id=None, attendee_id=None):
     return ReservationCollection(
         app.session(),
         attendee_id=attendee_id,
-        course_event_id=course_event_id
+        course_event_id=course_event_id,
+        external_only=external_only
     )
 
 

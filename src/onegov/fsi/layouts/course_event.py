@@ -110,8 +110,13 @@ class CourseEventLayout(CourseEventCollectionLayout):
                     ),
                     Link(
                         _('Reservation for External'),
-                        self.request.class_link(
-                            ReservationCollection, name='add'),
+                        self.request.link(
+                            ReservationCollection(
+                                self.request.session,
+                                course_event_id=self.model.id,
+                                external_only=True),
+                            name='add'
+                        ),
                         attrs={'class': 'new-link'}
                     ),
                 )
