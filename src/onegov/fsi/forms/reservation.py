@@ -1,5 +1,4 @@
-from wtforms.validators import InputRequired, DataRequired
-
+from wtforms.validators import InputRequired
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 from onegov.fsi.collections.attendee import CourseAttendeeCollection

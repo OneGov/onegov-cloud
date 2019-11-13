@@ -1,6 +1,7 @@
-from wtforms import StringField, SelectField, TextAreaField
+from wtforms import StringField, TextAreaField
 from wtforms.validators import InputRequired, Email
 
+from onegov.form.fields import ChosenSelectField
 from onegov.form.parser.core import EmailField
 from onegov.fsi import _
 from onegov.form import Form
@@ -9,7 +10,7 @@ from onegov.fsi.models.course_attendee import attendee_title_choices
 
 class CourseAttendeeForm(Form):
 
-    title = SelectField(
+    title = ChosenSelectField(
         label=_('Salutation'),
         choices=attendee_title_choices(),
         render_kw={'size': 2}

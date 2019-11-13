@@ -5,9 +5,9 @@ from datetime import timedelta
 from wtforms.widgets import TextInput
 
 from onegov.core.utils import linkify
-from onegov.form.fields import TimezoneDateTimeField
+from onegov.form.fields import TimezoneDateTimeField, ChosenSelectField
 
-from wtforms import StringField, RadioField, IntegerField, SelectField
+from wtforms import StringField, RadioField, IntegerField
 from wtforms.validators import InputRequired
 
 from onegov.form.fields import HtmlField
@@ -183,7 +183,7 @@ class CourseEventForm(Form):
         ],
     )
 
-    status = SelectField(
+    status = ChosenSelectField(
         label=_('Status'),
         render_kw={'size': 2},
         choices=course_status_choices(),
