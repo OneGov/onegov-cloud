@@ -90,11 +90,11 @@ def view_duplicate_course_event(self, request, form):
     layout.include_editor()
 
     if form.submitted(request):
-        CourseEventCollection(
+        duplicate = CourseEventCollection(
             request.session).add(**form.get_useful_data())
 
         request.success(_("Your changes were saved"))
-        return request.redirect(layout.collection_url)
+        return request.redirect(request.link(duplicate))
 
     form.apply_model(self.duplicate)
 
