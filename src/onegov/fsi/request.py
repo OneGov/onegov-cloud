@@ -6,11 +6,10 @@ class FsiRequest(OrgRequest):
 
     @cached_property
     def current_attendee(self):
-        return self.current_user.attendee
+        return self.current_user and self.current_user.attendee or None
 
     @cached_property
     def attendee_id(self):
         return (
-            self.current_user.attendee
-            and self.current_user.attendee.id or None
+            self.current_attendee and self.current_attendee.id or None
         )
