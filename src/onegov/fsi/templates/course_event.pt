@@ -14,7 +14,7 @@
                             <p><strong i18n:translate="">Remaining seats: </strong>${model.available_seats}</p>
                             <p><strong i18n:translate="">Description:</strong></p>
                             <p tal:content="structure model.description_html"></p>
-                            <tal:b tal:condition="layout.request.is_logged_in" tal:define="registered model.has_reservation(request.attendee_id)">
+                            <tal:b tal:condition="request.is_logged_in" tal:define="registered model.has_reservation(request.attendee_id)">
                                 <tal:b tal:switch="registered">
                                     <button tal:case="True" class="button success" i18n:translate="">Registered</button>
                                     <metal:b tal:case="False" tal:condition="model.bookable" use-macro="layout.macros['intercooler_btn']"/>
