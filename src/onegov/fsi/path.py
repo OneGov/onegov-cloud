@@ -35,8 +35,6 @@ def get_events_view(
         limit=None,
         show_hidden=True
 ):
-    if show_hidden and not request.is_manager:
-        show_hidden = False
     return CourseEventCollection(
         request.session,
         page=page,
@@ -44,7 +42,7 @@ def get_events_view(
         upcoming_only=upcoming_only,
         past_only=past_only,
         limit=limit,
-        show_hidden=show_hidden
+        show_hidden=show_hidden and request.is_manager
     )
 
 
