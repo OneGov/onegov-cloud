@@ -1,6 +1,7 @@
 from cached_property import cached_property
 
 from onegov.core.collection import GenericCollection
+from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.notification_template import FsiNotificationTemplate, \
     InfoTemplate, ReservationTemplate, CancellationTemplate, ReminderTemplate
 
@@ -17,7 +18,8 @@ class FsiNotificationTemplateCollection(GenericCollection):
 
     @cached_property
     def course_event(self):
-        return self.by_id(self.course_event_id) if self.course_event else None
+        return self.session.query(CourseEvent).filter_by(
+            id=self.course_event_id).first()
 
     def query(self):
         query = super().query()
