@@ -6,7 +6,6 @@ from onegov.core.collection import Pagination, GenericCollection
 from onegov.fsi.collections.notification_template import \
     FsiNotificationTemplateCollection
 from onegov.fsi.models.course_event import CourseEvent
-from onegov.fsi.models.reservation import Reservation
 
 
 class CourseEventCollection(GenericCollection, Pagination):
@@ -39,7 +38,7 @@ class CourseEventCollection(GenericCollection, Pagination):
     def query(self):
         query = super().query()
         if not self.show_hidden:
-            query = query.filter_by(hidden_from_public=False)
+            query = query.filter(CourseEvent.hidden_from_public == False)
         if self.from_date:
             query = query.filter(CourseEvent.start > self.from_date)
         elif self.past_only:
