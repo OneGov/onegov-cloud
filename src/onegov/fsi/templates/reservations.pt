@@ -29,7 +29,7 @@
 
                                                 <td>
                                                     <div tal:condition="not: reservation.is_placeholder" class="switch round tiny confirmation-switch" tal:define="switch_id 'confirmation-switch-{}'.format(repeat.reservation.number)">
-                                                      <input tal:attributes="disabled python:not layout.course_event.is_past" id="${switch_id}" type="checkbox" name="testGroup">
+                                                      <input tal:attributes="disabled python: layout.course_event and not layout.course_event.is_past" id="${switch_id}" type="checkbox" name="testGroup">
                                                       <label for="${switch_id}"></label>
                                                     </div>
                                                 </td>

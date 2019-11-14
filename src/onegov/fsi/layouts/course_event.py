@@ -204,7 +204,7 @@ class EditCourseEventLayout(CourseEventLayout):
     @cached_property
     def breadcrumbs(self):
         breadcrumbs = super().breadcrumbs
-        breadcrumbs.append(Link(_('Edit'), '#'))
+        breadcrumbs.append(Link(_('Edit')))
         return breadcrumbs
 
 
@@ -228,7 +228,7 @@ class AddCourseEventLayout(CourseEventCollectionLayout):
     @cached_property
     def breadcrumbs(self):
         links = super().breadcrumbs
-        links.append(Link(_('Add'), '#'))
+        links.append(Link(_('Add')))
         return links
 
 
@@ -239,10 +239,4 @@ class DuplicateCourseEventLayout(CourseEventLayout):
 
     @cached_property
     def editbar_links(self):
-        return [
-            Link(
-                text=_('Duplicate'),
-                url='#',
-                attrs={'class': 'copy-link'}
-            )
-        ]
+        return [Link(_('Duplicate'), attrs={'class': 'copy-link'})]

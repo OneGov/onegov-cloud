@@ -152,8 +152,7 @@ class CourseAttendee(Base):
         result = result.filter(Reservation.event_completed == False)
         return result
 
-    @property
-    def possible_course_events(self):
+    def possible_course_events(self, show_hidden=True):
         """Used for the reservation form. Should exlucde past courses
         and courses already registered"""
         from onegov.fsi.models.course_event import CourseEvent
@@ -165,4 +164,6 @@ class CourseAttendee(Base):
         excl = excl.subquery('excl')
         result = session.query(CourseEvent).filter(CourseEvent.id.notin_(excl))
         result = result.filter(CourseEvent.start > utcnow())
+        if not show_hidden:
+            result = result.filter(CourseEvent.hidden_from_public == False)
         return result

@@ -28,7 +28,7 @@ def test_attendee_1(
     attendee, data = attendee(session)
     member = member(session)
     assert attendee.reservations.count() == 0
-    assert attendee.possible_course_events.count() == 1
+    assert attendee.possible_course_events().count() == 1
 
     assert attendee.user == member
     assert member.attendee == attendee
@@ -41,7 +41,7 @@ def test_attendee_1(
     assert attendee.reservations.count() == 1
     assert course_event[0].start > utcnow()
     assert attendee.course_events.first() == course_event[0]
-    assert attendee.possible_course_events.count() == 0
+    assert attendee.possible_course_events().count() == 0
 
     # Test reservation backref
     assert reservation.attendee == attendee

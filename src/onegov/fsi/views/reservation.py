@@ -1,6 +1,6 @@
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.reservation import ReservationCollection
-from onegov.fsi.forms.reservation import FsiReservationForm, \
+from onegov.fsi.forms.reservation import AddFsiReservationForm, \
     EditFsiReservationForm
 from onegov.fsi.layouts.reservation import ReservationLayout, \
     ReservationCollectionLayout
@@ -26,10 +26,10 @@ def reservation_redirect(self, request):
     model=ReservationCollection,
     template='form.pt',
     name='add',
-    form=FsiReservationForm
+    form=AddFsiReservationForm
 )
 def view_add_reservation(self, request, form):
-    layout = ReservationLayout(self, request)
+    layout = ReservationCollectionLayout(self, request)
 
     if form.submitted(request):
         self.add(**form.get_useful_data())
@@ -37,6 +37,7 @@ def view_add_reservation(self, request, form):
         return request.redirect(request.link(self))
 
     return {
+        'title': _('Add Reservation'),
         'model': self,
         'layout': layout,
         'form': form
@@ -60,8 +61,11 @@ def view_edit_reservation(self, request, form):
             course_event_id=self.id,
             attendee_id=self.attendee_id
         )))
+    title = _('Edit Placeholder') if self.is_placeholder \
+        else _('Edit Reservation')
 
     return {
+        'title': title,
         'model': self,
         'layout': layout,
         'form': form
@@ -72,10 +76,10 @@ def view_edit_reservation(self, request, form):
     model=ReservationCollection,
     template='form.pt',
     name='add-placeholder',
-    form=FsiReservationForm
+    form=AddFsiReservationForm
 )
 def view_add_reservation_placeholder(self, request, form):
-    layout = ReservationLayout(self, request)
+    layout = ReservationCollectionLayout(self, request)
 
     if form.submitted(request):
         data = form.get_useful_data()
@@ -88,6 +92,7 @@ def view_add_reservation_placeholder(self, request, form):
         return request.redirect(request.link(self))
 
     return {
+        'title': _('Add Placeholder Reservation'),
         'model': self,
         'layout': layout,
         'form': form
