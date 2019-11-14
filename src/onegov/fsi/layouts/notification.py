@@ -61,6 +61,10 @@ class NotificationTemplateCollectionLayout(DefaultLayout):
     def breadcrumbs(self):
         links = super().breadcrumbs
         links.append(
+            Link(self.model.course_event.name, self.request.link(
+                self.model.course_event))
+        )
+        links.append(
             Link(_('Manage Notification Templates'),
                  self.request.link(self.model)),
         )
@@ -98,6 +102,8 @@ class NotificationTemplateLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self):
         links = super().breadcrumbs
+        links.append(Link(self.model.course_event.name,
+                          self.request.link(self.model.course_event)))
         links.append(Link(_('Manage Notification Templates'),
                           self.request.link(self.collection)))
         links.append(Link(self.format_notification_type(self.model.type),
