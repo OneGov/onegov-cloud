@@ -1,6 +1,7 @@
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.reservation import ReservationCollection
-from onegov.fsi.forms.reservation import FsiReservationForm
+from onegov.fsi.forms.reservation import FsiReservationForm, \
+    EditFsiReservationForm
 from onegov.fsi.layouts.reservation import ReservationLayout, \
     ReservationCollectionLayout
 from onegov.fsi.models.reservation import Reservation
@@ -14,6 +15,11 @@ def view_reservations(self, request):
         'layout': layout,
         'reservations': self.query().all()
     }
+
+
+@FsiApp.html(model=Reservation)
+def reservation_redirect(self, request):
+    return request.redirect(request.link(self, name='edit'))
 
 
 @FsiApp.form(
@@ -38,6 +44,31 @@ def view_add_reservation(self, request, form):
 
 
 @FsiApp.form(
+    model=Reservation,
+    template='form.pt',
+    name='edit',
+    form=EditFsiReservationForm
+)
+def view_edit_reservation(self, request, form):
+    layout = ReservationLayout(self, request)
+
+    if form.submitted(request):
+        form.update_model(self)
+        request.success(_("Reservation was updated"))
+        return request.redirect(request.link(ReservationCollection(
+            request.session,
+            course_event_id=self.id,
+            attendee_id=self.attendee_id
+        )))
+
+    return {
+        'model': self,
+        'layout': layout,
+        'form': form
+    }
+
+
+@FsiApp.form(
     model=ReservationCollection,
     template='form.pt',
     name='add-placeholder',
@@ -48,7 +79,10 @@ def view_add_reservation_placeholder(self, request, form):
 
     if form.submitted(request):
         data = form.get_useful_data()
-        data.setdefault('dummy_desc', _('Placeholder Reservation'))
+        default_desc = _('Placeholder Reservation')
+        desc = data.setdefault('dummy_desc', default_desc)
+        if not desc:
+            data['dummy_desc'] = default_desc
         self.add(**data)
         request.success(_("Added a new placeholder reservation"))
         return request.redirect(request.link(self))
@@ -71,11 +105,6 @@ def view_add_from_course_event(self, request):
         attendee_id=self.attendee_id or request.attendee_id,
         course_event_id=self.course_event_id)
     request.success(_('New reservation successfully added'))
-
-
-@FsiApp.html(model=Reservation)
-def view_reservation(self, request):
-    pass
 
 
 @FsiApp.html(

@@ -1,3 +1,4 @@
+from wtforms import StringField
 from wtforms.validators import InputRequired
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
@@ -24,6 +25,88 @@ class FsiReservationForm(Form):
         ]
     )
 
+    dummy_desc = StringField(
+        label=_('Placeholder Description (optional)'),
+    )
+
+    @property
+    def event(self):
+        return self.model.course_event
+
+    @property
+    def attendee(self):
+        return self.model.attendee
+
+    @property
+    def event_collection(self):
+        return CourseEventCollection(
+            self.request.session,
+            upcoming_only=True,
+            show_hidden=self.request.is_manager
+        )
+
+    @property
+    def attendee_collection(self):
+        return CourseAttendeeCollection(self.request.session,
+                                        external_only=self.model.external_only)
+
+    @property
+    def none_choice(self):
+        return '', _('None')
+
+    def get_event_choices(self):
+        choices = self.event_collection.query()
+        # Filter courses he registered
+        if self.attendee:
+            if isinstance(self, CourseEventCollection):
+                event_model = self.model.model_class
+            else:
+                event_model = self.model.__class__
+            choices = self.event_choices.filter(
+                event_model.attendee_id != self.attendee.id)
+        return (self.event_choice(e) for e in choices)
+
+    @staticmethod
+    def attendee_choice(attendee):
+        return str(attendee.id), f'{str(attendee)} - {attendee.email}'
+
+    def get_attendee_choices(self):
+        result = [self.none_choice]
+        query = self.attendee_collection.query()
+        return tuple(result + [self.attendee_choice(a) for a in query])
+
+    @property
+    def dealing_with_placeholder(self):
+        return (self.request.view_name == 'add-placeholder'
+                or not self.attendee)
+
+    @property
+    def edits_placeholder(self):
+        return self.request.view_name == 'edit' and not self.attendee
+
+    @staticmethod
+    def event_choice(event):
+        return str(event.id), event.name
+
+    @property
+    def from_scratch(self):
+        return not self.attendee and not self.event
+
+    def populate_choices(self):
+        if self.edits_placeholder or self.from_scratch:
+            self.attendee_id.choices = self.get_attendee_choices()
+            self.attendee_id.default = self.none_choice[0]
+        elif self.dealing_with_placeholder and not self.from_scratch:
+            self.delete_field('attendee_id')
+        else:
+            self.attendee_id.choices = (self.attendee_choice(self.attendee),)
+            self.delete_field('dummy_desc')
+
+        if self.event:
+            self.course_event_id.choices = (self.event_choice(self.event),)
+        else:
+            self.course_event_id.choices = self.get_event_choices()
+
     def on_request(self):
         """
         - self.model is the reservation_collection of the view using the form
@@ -33,38 +116,23 @@ class FsiReservationForm(Form):
         - if attendee is None, this is a placeholder reservation
 
         """
-        attendee = self.model.attendee
-        event = self.model.course_event
-        attendee_collection = CourseAttendeeCollection(
-            self.request.session, external_only=self.model.external_only)
-        event_collection = CourseEventCollection(
-            self.request.session, upcoming_only=True)
+        self.populate_choices()
 
-        event_choices = event_collection.query()
 
-        def _repr(attendee):
-            return f'{str(attendee)} - {attendee.email}'
+class EditFsiReservationForm(FsiReservationForm):
 
-        if self.request.view_name == 'add-placeholder':
-            self.delete_field('attendee_id')
+    """
+    The view of this form is not accessible for members
+    """
 
-        elif attendee:
-            self.attendee_id.choices = ((str(attendee.id), _repr(attendee)),)
-            # Filter courses he registered
-            event_choices = event_choices.filter(
-                self.model.model_class.attendee_id != attendee.id)
+    @property
+    def attendee_collection(self):
+        return CourseAttendeeCollection(self.request.session)
 
-        else:
-            self.attendee_id.choices = list(
-                (str(a.id), _repr(a)) for a in attendee_collection.query()
-            )
-            if not self.attendee_id.choices:
-                self.attendee_id.choices.append(('', _('None')))
+    def update_model(self, model):
+        model.attendee_id = self.attendee_id.data
+        model.course_event_id = self.course_event_id.data
+        if model.is_placeholder:
+            model.dummy_desc = self.dummy_desc.data
 
-        if event:
-            self.course_event_id.choices = ((str(event.id), event.name),)
-        else:
-            self.course_event_id.choices = list(
-                (str(a.id), a.name) for a in event_choices
-            )
 

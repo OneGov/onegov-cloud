@@ -12,7 +12,7 @@
                                 <table class="hover">
                                     <thead>
                                         <th i18n:translate="">Description</th>
-                                        <th i18n:translate="">Course Name</th>
+                                        <th i18n:translate="" tal:condition="not: layout.model.course_event_id">Course Name</th>
                                         <th i18n:translate="">Date</th>
                                         <th i18n:translate="">Course Status</th>
                                         <th i18n:translate="">Course attended</th>
@@ -24,7 +24,7 @@
                                         <tal:b tal:repeat="reservation reservations">
                                             <tr>
                                                 <td>${str(reservation)}</td>
-                                                <td><a href="${request.link(reservation.course_event)}">${reservation.course_event.name}</a></td>
+                                                <td tal:condition="not: layout.model.course_event_id"><a href="${request.link(reservation.course_event)}">${reservation.course_event.name}</a></td>
                                                 <td>${layout.format_date(reservation.course_event.start, 'date')}</td>
                                                 <td>${layout.format_status(reservation.course_event.status)}</td>
                                                 <tal:b tal:switch="reservation.event_completed">
@@ -37,6 +37,9 @@
                                                     <tal:b tal:switch="reservation.course_event.is_past">
                                                         <metal:b tal:case="False" tal:define="item reservation" use-macro="layout.macros['intercooler_btn_for_item']"/>
                                                         <button tal:case="True" class="button tiny secondary disabled archived" i18n:translate="">Archived</button>
+                                                    </tal:b>
+                                                    <tal:b tal:condition="request.is_manager">
+                                                        <a tal:condition="request.is_manager" href="${request.link(reservation, name='edit')}" class="button tiny secondary" i18n:translate="">Edit</a>
                                                     </tal:b>
 
                                                 </td>

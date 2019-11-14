@@ -1,7 +1,6 @@
 from cached_property import cached_property
 
 from onegov.core.elements import Link, Confirm, Intercooler, LinkGroup
-from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
 
@@ -59,6 +58,13 @@ class ReservationCollectionLayout(DefaultLayout):
     @cached_property
     def breadcrumbs(self):
         links = super().breadcrumbs
+        if self.model.course_event_id:
+            links.append(
+                Link(
+                    self.model.course_event.name,
+                    self.request.link(self.model.course_event)
+                )
+            )
         links.append(
             Link(_('Manage Reservations'), self.request.link(self.model))
         )
@@ -96,6 +102,8 @@ class ReservationLayout(ReservationCollectionLayout):
             return _('Add Reservation')
         if self.request.view_name == 'add-placeholder':
             return _('Add Placeholder Reservation')
+        if self.model.is_placeholder:
+            return _('Placeholder Details')
         return _('Reservation Details')
 
     @cached_property
