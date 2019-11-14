@@ -21,12 +21,14 @@ def test_attendee_as_external(session, external_attendee):
     assert external.user is None
 
 
-def test_attendee_1(session, attendee, future_course_event, member):
-    course_event = future_course_event
+def test_attendee_1(
+        session, attendee, future_course_event, member, course_event):
+    past_event = course_event(session)
+    course_event = future_course_event(session)
     attendee, data = attendee(session)
-    course_event = course_event(session)
     member = member(session)
     assert attendee.reservations.count() == 0
+    assert attendee.possible_course_events.count() == 1
 
     assert attendee.user == member
     assert member.attendee == attendee
@@ -39,6 +41,7 @@ def test_attendee_1(session, attendee, future_course_event, member):
     assert attendee.reservations.count() == 1
     assert course_event[0].start > utcnow()
     assert attendee.course_events.first() == course_event[0]
+    assert attendee.possible_course_events.count() == 0
 
     # Test reservation backref
     assert reservation.attendee == attendee
@@ -52,9 +55,6 @@ def test_attendee_1(session, attendee, future_course_event, member):
     # and add it differently
     attendee.reservations.append(reservation)
     assert attendee.reservations.count() == 1
-
-    # Test templates backref
-    assert attendee.templates == []
 
 
 @pytest.mark.skip('Wait until model definitions are clear')

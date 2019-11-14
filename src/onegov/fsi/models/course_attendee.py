@@ -8,6 +8,8 @@ from onegov.core.orm.types import UUID
 from onegov.core.orm.mixins import meta_property
 from sqlalchemy.orm import relationship, object_session, backref
 from onegov.fsi import _
+
+
 ATTENDEE_TITLES = ('mr', 'ms', 'none')
 ATTENDEE_TITLE_TRANSLATIONS = (_('Mr.'), _('Ms.'), '')
 
@@ -139,8 +141,8 @@ class CourseAttendee(Base):
 
     @property
     def undone_registered_courses(self):
-        from onegov.fsi.models.course_event import CourseEvent  # circular
-        from onegov.fsi.models.reservation import Reservation   # circular
+        from onegov.fsi.models.course_event import CourseEvent
+        from onegov.fsi.models.reservation import Reservation
 
         session = object_session(self)
         result = session.query(CourseEvent).join(Reservation)
@@ -148,4 +150,19 @@ class CourseAttendee(Base):
         result = result.filter(CourseEvent.start < utcnow())
         result = result.filter(Reservation.attendee_id == self.id)
         result = result.filter(Reservation.event_completed == False)
+        return result
+
+    @property
+    def possible_course_events(self):
+        """Used for the reservation form. Should exlucde past courses
+        and courses already registered"""
+        from onegov.fsi.models.course_event import CourseEvent
+        from onegov.fsi.models.reservation import Reservation
+
+        session = object_session(self)
+        excl = session.query(CourseEvent.id).join(Reservation)
+        excl = excl.filter(Reservation.attendee_id == self.id)
+        excl = excl.subquery('excl')
+        result = session.query(CourseEvent).filter(CourseEvent.id.notin_(excl))
+        result = result.filter(CourseEvent.start > utcnow())
         return result
