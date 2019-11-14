@@ -12,6 +12,7 @@ from onegov.fsi import _
     model=FsiNotificationTemplateCollection, template='notifications.pt')
 def view_notifications(self, request):
     layout = NotificationTemplateCollectionLayout(self, request)
+    # This was a workaround and should be removed in the future
     self.auto_add_templates_if_not_existing()
 
     return {
