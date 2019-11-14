@@ -26,7 +26,7 @@ class CourseEventCollection(GenericCollection, Pagination):
         self.from_date = from_date              # ignores upcoming_only
         self.upcoming_only = upcoming_only      # active if from_date not set
         self.past_only = past_only
-        self.limit = limit,
+        self.limit = limit
         self.show_hidden = show_hidden
 
         if from_date:
