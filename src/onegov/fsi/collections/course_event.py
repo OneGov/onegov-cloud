@@ -39,7 +39,7 @@ class CourseEventCollection(GenericCollection, Pagination):
     def query(self):
         query = super().query()
         if not self.show_hidden:
-            query = query.filter_by(hidden_from_puplic=False)
+            query = query.filter_by(hidden_from_public=False)
         if self.from_date:
             query = query.filter(CourseEvent.start > self.from_date)
         elif self.past_only:
@@ -69,13 +69,6 @@ class CourseEventCollection(GenericCollection, Pagination):
             past_only=self.past_only,
             limit=self.limit
         )
-
-    def add_placeholder(self, title, course_event):
-        assert isinstance(course_event, CourseEvent)
-        reservation = Reservation.as_placeholder(
-            dummy_desc=title, course_event_id=course_event.id)
-        self.session.add(reservation)
-        self.session.flush()
 
     @classmethod
     def latest(cls, session):
