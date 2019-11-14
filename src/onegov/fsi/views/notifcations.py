@@ -16,7 +16,6 @@ def view_notifications(self, request):
     self.auto_add_templates_if_not_existing()
 
     return {
-        'notifications': self.query().all(),
         'layout': layout
     }
 
