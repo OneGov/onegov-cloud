@@ -80,24 +80,29 @@ def test_attendee_upcoming_courses(
 
 
 def test_course_event_1(session, course_event, attendee):
-    attendee, data = attendee(session)
+    attendee_, data = attendee(session)
     event, data = course_event(session)
 
     assert event.attendees.count() == 0
     assert event.reservations.count() == 0
 
     # Add a participant via a reservation
-    placeholder = Reservation.as_placeholder(
-        'Placeholder', course_event_id=event.id)
+    placeholder = Reservation(
+        dummy_desc='Placeholder', course_event_id=event.id)
     session.add_all((
         placeholder,
-        Reservation(course_event_id=event.id, attendee_id=attendee.id)
+        Reservation(course_event_id=event.id, attendee_id=attendee_.id)
     ))
     session.flush()
 
     assert event.reservations.count() == 2
     assert event.attendees.count() == 1
     assert event.available_seats == 20 - 2
+    assert event.possible_bookers().count() == 0
+    attendee_2, data = attendee(session, first_name='2')
+    assert event.possible_bookers().first() == attendee_2
+    assert event.possible_bookers(external_only=True).count() == 0
+
 
 
 def test_reservation_1(session, attendee, course_event):

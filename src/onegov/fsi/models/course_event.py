@@ -6,13 +6,13 @@ from sedate import utcnow
 from sqlalchemy import Column, Boolean, SmallInteger, \
     Enum, Text, Interval, UniqueConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship, backref, object_session
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.fsi.models.course_attendee import CourseAttendee
-from onegov.fsi.models.reservation import reservation_table
+from onegov.fsi.models.reservation import reservation_table, Reservation
 from onegov.fsi import _
 
 COURSE_EVENT_STATUSES = ('created', 'confirmed', 'canceled', 'planned')
@@ -170,3 +170,16 @@ class CourseEvent(Base, TimestampMixin):
     def has_reservation(self, attendee_id):
         return self.reservations.filter_by(
             attendee_id=attendee_id).count() != 0
+
+    def possible_bookers(self, external_only=False):
+        session = object_session(self)
+        excl = session.query(CourseAttendee.id).join(Reservation)
+        excl = excl.filter(Reservation.course_event_id == self.id)
+        excl = excl.subquery('excl')
+
+        query = session.query(CourseAttendee).filter(
+            CourseAttendee.id.notin_(excl))
+
+        if external_only:
+            query = query.filter(CourseAttendee.user_id == None)
+        return query
