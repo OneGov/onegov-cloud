@@ -143,13 +143,12 @@ def external_attendee(admin):
 
 
 @pytest.fixture(scope='function')
-def notification_template(planner, course_event):
+def notification_template(course_event):
     # creator by a notification template
     def _notification_template(session, **kwargs):
         kwargs.setdefault('course_event_id', course_event(session)[0].id)
         data = dict(
             type='reservation',
-            owner_id=planner(session)[0].id,
             subject='Say Hello',
             text='Hello World',
         )
@@ -245,8 +244,8 @@ def db_mock_session(course_event, attendee):
         attendee_ = attendee(session)
         course_event_ = course_event(session)
 
-        placeholder = Reservation.as_placeholder(
-            'Placeholder', id=uuid4(), course_event_id=course_event_[0].id)
+        placeholder = Reservation(
+            dummy_desc='Placeholder', id=uuid4(), course_event_id=course_event_[0].id)
         # Create Reservations
         user_res = Reservation(
             attendee_id=attendee_[0].id,

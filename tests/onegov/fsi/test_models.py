@@ -10,10 +10,6 @@ from onegov.fsi.models.notification_template import NOTIFICATION_TYPES, \
 from onegov.fsi.models.reservation import Reservation
 
 
-def test_reservation_as_placeholder():
-    assert Reservation.as_placeholder('Test').attendee_id is None
-
-
 def test_attendee_as_external(session, external_attendee):
     external, data = external_attendee(session)
     # Test the backrefs and how they work

@@ -15,6 +15,3 @@ def test_view_courses_new(client):
     # page.form['domain'] = 'federation'
     # page.form.submit()
 
-
-def test_reservation_collection_view(client):
-    page = client.get('/reservations')

@@ -8,14 +8,11 @@ from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
 
 @pytest.mark.skip('Causses infinite recusrion upon rendering template')
 def test_send_reminder_mails(
-        fsi_app, smtp, future_course_reservation, planner):
+        fsi_app, smtp, future_course_reservation):
 
     session = fsi_app.session()
-    planner, data = planner(session)
-    assert planner.id
     reservation, data = future_course_reservation(session)
     reservation.course_event.template = FsiNotificationTemplate(
-        owner_id=planner.id,
         subject='S',
         text='T')
 
