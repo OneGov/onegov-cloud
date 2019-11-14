@@ -17,26 +17,33 @@ def get_course_event_details(app, id):
     return CourseEventCollection(app.session()).by_id(id)
 
 
-@FsiApp.path(model=CourseEventCollection,
-             path='/events',
-             converters=dict(
-                 upcoming_only=bool, past_only=bool, course_id=UUID, limit=int)
-             )
+@FsiApp.path(
+    model=CourseEventCollection,
+    path='/events',
+    converters=dict(
+        upcoming_only=bool, past_only=bool, course_id=UUID, limit=int,
+        show_hidden=bool
+    )
+)
 def get_events_view(
-        app,
+        request,
         page=0,
         from_date=None,
         upcoming_only=False,
         past_only=False,
-        limit=None
+        limit=None,
+        show_hidden=False
 ):
+    if show_hidden and not request.is_manager:
+        show_hidden = False
     return CourseEventCollection(
-        app.session(),
+        request.session,
         page=page,
         from_date=from_date,
         upcoming_only=upcoming_only,
         past_only=past_only,
-        limit=limit
+        limit=limit,
+        show_hidden=show_hidden
     )
 
 
