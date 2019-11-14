@@ -82,7 +82,9 @@ class CourseEvent(Base, TimestampMixin):
     )
 
     notification_templates = relationship('FsiNotificationTemplate',
-                                          back_populates='course_event')
+                                          back_populates='course_event',
+                                          cascade='all, delete-orphan',
+                                          )
 
     # The associated notification templates
     info_template = relationship("InfoTemplate", uselist=False)
