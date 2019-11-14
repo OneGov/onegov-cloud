@@ -60,6 +60,7 @@ class CourseEventLayout(CourseEventCollectionLayout):
     def collection(self):
         return CourseEventCollection(
             self.request.session,
+            show_hidden=True
         )
 
     @cached_property

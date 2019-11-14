@@ -7,7 +7,7 @@ from wtforms.widgets import TextInput
 from onegov.core.utils import linkify
 from onegov.form.fields import TimezoneDateTimeField, ChosenSelectField
 
-from wtforms import StringField, RadioField, IntegerField
+from wtforms import StringField, IntegerField, BooleanField
 from wtforms.validators import InputRequired
 
 from onegov.form.fields import HtmlField
@@ -121,40 +121,25 @@ class CourseEventForm(Form):
         ]
     )
 
-    mandatory_refresh = RadioField(
+    mandatory_refresh = BooleanField(
         label=_("Refresh mandatory"),
-        choices=(
-            (1, _("Yes")),
-            (0, _("No")),
-        ),
-        coerce=bool,
-        render_kw={'size': 2},
-        description=_(
-            "Define if this course has a refresh. The refresh"
-        )
+        default=False
     )
 
-    hidden_from_public = RadioField(
+    hidden_from_public = BooleanField(
         label=_("Hidden"),
-        choices=(
-            (1, _("Yes")),
-            (0, _("No")),
-        ),
-        coerce=bool,
-        render_kw={'size': 2},
-        default=0
+        default=False,
     )
 
     refresh_interval = IntervalStringField(
         label=_('Refresh Interval'),
-        render_kw={'size': 2},
+        description=_('e.g. 5 years of 1 month a')
     )
 
     # Course Event info
     start = TimezoneDateTimeField(
         label=_('Course Start'),
         timezone='Europe/Zurich',
-        render_kw={'size': 2},
         validators=[
             InputRequired()
         ]
@@ -163,7 +148,6 @@ class CourseEventForm(Form):
     end = TimezoneDateTimeField(
         label=_('Course End'),
         timezone='Europe/Zurich',
-        render_kw={'size': 2},
         validators=[
             InputRequired()
         ]
@@ -171,13 +155,11 @@ class CourseEventForm(Form):
 
     min_attendees = IntegerField(
         label=_('Attendees min'),
-        render_kw={'size': 2},
         default=1
     )
 
     max_attendees = IntegerField(
         label=_('Attendees max'),
-        render_kw={'size': 2},
         validators=[
             InputRequired()
         ],
@@ -185,7 +167,6 @@ class CourseEventForm(Form):
 
     status = ChosenSelectField(
         label=_('Status'),
-        render_kw={'size': 2},
         choices=course_status_choices(),
         default='created'
     )
