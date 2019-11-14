@@ -11,6 +11,7 @@ reservation_table = Table(
     Column('course_event_id', UUID,
            ForeignKey('fsi_course_events.id'), nullable=False),
     Column('attendee_id', UUID, ForeignKey('fsi_attendees.id')),
+    # If the attendee completed the event
     Column('event_completed', Boolean, default=False, nullable=False),
     Column('dummy_desc', Text),
 
