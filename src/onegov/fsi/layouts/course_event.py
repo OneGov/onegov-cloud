@@ -207,7 +207,7 @@ class EditCourseEventLayout(CourseEventLayout):
         return breadcrumbs
 
 
-class AddCourseEventLayout(CourseEventLayout):
+class AddCourseEventLayout(CourseEventCollectionLayout):
     @cached_property
     def title(self):
         return _('Add course event')

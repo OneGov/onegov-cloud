@@ -20,6 +20,7 @@
                                     <th i18n:translate="">Refresh</th>
                                     <th i18n:translate="">Status</th>
                                     <th i18n:translate="">Free Space</th>
+                                    <th tal:condition="request.is_manager">Hidden</th>
                                 </thead>
                                 <tbody>
                                     <tal:b tal:repeat="event events">
@@ -34,6 +35,10 @@
                                             <td class="" tal:condition="not event.mandatory_refresh" i18n:translate="">No</td>
                                             <td class="">${layout.format_status(event.status)}</td>
                                             <td class="">${event.available_seats}</td>
+                                            <tal:b tal:condition="request.is_manager" tal:switch="event.hidden_from_public">
+                                                <td tal:case="True">Yes</td>
+                                                <td tal:case="False">No</td>
+                                            </tal:b>
                                         </tr>
                                     </tal:b>
                                 </tbody>

@@ -8,6 +8,9 @@
                 <div class="row">
                     <div class="columns small-12">
                         <tal:b tal:condition="model|nothing">
+
+                            <p tal:condition="request.is_manager and model.hidden_from_public">This course is hidden.</p>
+
                             <p><strong i18n:translate="">Info: </strong> ${layout.format_date(model.start, 'date')} ${layout.format_date(model.start, 'time')} - ${layout.format_date(model.end, 'time')}</p>
                             <p><strong i18n:translate="">Attendees: </strong> min. ${model.min_attendees} max. ${model.max_attendees}</p>
                             <p><strong i18n:translate="">Reservations: </strong>${model.reservations.count()}</p>
