@@ -13,8 +13,9 @@ from onegov.fsi.models.reservation import Reservation
 
 
 @FsiApp.path(model=CourseEvent, path='/fsi/event/{id}')
-def get_course_event_details(app, id):
-    return CourseEventCollection(app.session()).by_id(id)
+def get_course_event_details(request, id):
+    return CourseEventCollection(
+        request.session, show_hidden=request.is_manager).by_id(id)
 
 
 @FsiApp.path(
