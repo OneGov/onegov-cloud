@@ -33,7 +33,7 @@ def get_events_view(
         upcoming_only=False,
         past_only=False,
         limit=None,
-        show_hidden=False
+        show_hidden=True
 ):
     if show_hidden and not request.is_manager:
         show_hidden = False
