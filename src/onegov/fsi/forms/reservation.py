@@ -136,5 +136,3 @@ class EditFsiReservationForm(AddFsiReservationForm):
             choices = self.event_choices.filter(
                 event_model.attendee_id != self.attendee.id)
         return (self.event_choice(e) for e in choices)
-
-

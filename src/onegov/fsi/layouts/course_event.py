@@ -158,9 +158,8 @@ class CourseEventLayout(CourseEventCollectionLayout):
                 )
             ),
             LinkGroup(_('Manage'), links=(
-                Link(_('Email Templates'), self.request.link(
-                    self.template_collection)
-                     ),
+                Link(_('Email Templates'),
+                     self.request.link(self.template_collection)),
                 Link(_('Reservations'),
                      self.request.link(self.reservation_collection))
             )),

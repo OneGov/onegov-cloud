@@ -53,5 +53,3 @@ class CourseAttendeeForm(Form):
     def on_request(self):
         if self.request.view_name != 'add-external':
             self.delete_field('email')
-
-

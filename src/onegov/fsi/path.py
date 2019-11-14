@@ -71,7 +71,8 @@ def get_attendee_details(request, id):
 @FsiApp.path(model=FsiNotificationTemplateCollection, path='/fsi/templates',
              converters=dict(course_event_id=UUID))
 def get_notification_templates(request, course_event_id=None):
-    return FsiNotificationTemplateCollection(request.session, course_event_id=course_event_id)
+    return FsiNotificationTemplateCollection(
+        request.session, course_event_id=course_event_id)
 
 
 @FsiApp.path(model=FsiNotificationTemplate, path='/fsi/template/{id}')
