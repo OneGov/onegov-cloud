@@ -17,7 +17,6 @@
                                         <th i18n:translate="">Course Status</th>
                                         <th i18n:translate="">Course attended</th>
                                         <th i18n:translate="">Last info mail</th>
-
                                         <th i18n:translate="">Manage</th>
                                     </thead>
                                     <tbody>
@@ -27,16 +26,20 @@
                                                 <td tal:condition="not: layout.model.course_event_id"><a href="${request.link(reservation.course_event)}">${reservation.course_event.name}</a></td>
                                                 <td>${layout.format_date(reservation.course_event.start, 'date')}</td>
                                                 <td>${layout.format_status(reservation.course_event.status)}</td>
-                                                <tal:b tal:switch="reservation.event_completed">
-                                                    <td tal:case="True" i18n:translate="">True</td>
-                                                    <td tal:case="False" i18n:translate="">False</td>
-                                                </tal:b>
+
+                                                <td>
+                                                    <div tal:condition="not: reservation.is_placeholder" class="switch round tiny confirmation-switch" tal:define="switch_id 'confirmation-switch-{}'.format(repeat.reservation.number)">
+                                                      <input tal:attributes="disabled python:not layout.course_event.is_past" id="${switch_id}" type="checkbox" name="testGroup">
+                                                      <label for="${switch_id}"></label>
+                                                    </div>
+                                                </td>
+
 
                                                 <td tal:define="sent reservation.info_sent">${layout.format_date(sent, 'date') if sent else '-'}</td>
                                                 <td>
                                                     <tal:b tal:switch="reservation.course_event.is_past">
                                                         <metal:b tal:case="False" tal:define="item reservation" use-macro="layout.macros['intercooler_btn_for_item']"/>
-                                                        <button tal:case="True" class="button tiny secondary disabled archived" i18n:translate="">Archived</button>
+                                                        <button tal:case="True" class="button tiny secondary disabled archived" i18n:translate="">Delete</button>
                                                     </tal:b>
                                                     <tal:b tal:condition="request.is_manager">
                                                         <a tal:condition="request.is_manager" href="${request.link(reservation, name='edit')}" class="button tiny secondary" i18n:translate="">Edit</a>

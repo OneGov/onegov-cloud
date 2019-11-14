@@ -1,6 +1,7 @@
 from cached_property import cached_property
 
 from onegov.core.elements import Link, Confirm, Intercooler, LinkGroup
+from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
 
@@ -13,6 +14,10 @@ class ReservationCollectionLayout(DefaultLayout):
 
     @cached_property
     def title(self):
+        if self.request.view_name == 'add':
+            return _('Add Reservation')
+        if self.request.view_name == 'add-placeholder':
+            return _('Add Placeholder Reservation')
         if self.model.course_event_id:
             return _('Reservations for ${event}',
                      mapping={'event': self.model.course_event.name})
@@ -68,6 +73,8 @@ class ReservationCollectionLayout(DefaultLayout):
         links.append(
             Link(_('Manage Reservations'), self.request.link(self.model))
         )
+        if self.request.view_name in ('add', 'add-placeholder'):
+            links.append(Link(_('Add')))
         return links
 
     def intercooler_btn_for_item(self, reservation):
@@ -92,31 +99,29 @@ class ReservationCollectionLayout(DefaultLayout):
         )
 
 
-class ReservationLayout(ReservationCollectionLayout):
+class ReservationLayout(DefaultLayout):
 
     """ Only used for editing since it does not contain fields """
 
     @cached_property
-    def title(self):
-        if self.request.view_name == 'add':
-            return _('Add Reservation')
-        if self.request.view_name == 'add-placeholder':
-            return _('Add Placeholder Reservation')
-        if self.model.is_placeholder:
-            return _('Placeholder Details')
-        return _('Reservation Details')
+    def collection(self):
+        return ReservationCollection(
+            self.request.session,
+            attendee_id=None,
+            course_event_id=self.model.course_event_id
+        )
 
     @cached_property
     def breadcrumbs(self):
         links = super().breadcrumbs
-        if self.request.view_name == 'add':
-            links.append(
-                Link(_('Add'))
+        links.append(
+            Link(
+                self.model.course_event.name,
+                self.request.link(self.model.course_event)
             )
-        elif self.request.view_name == 'add-placeholder':
-            links.append(Link(_('Add Placeholder')))
-        else:
-            links.append(
-                Link(_('Current Reservation'))
-            )
+        )
+        links.append(
+            Link(_('Manage Reservations'), self.request.link(self.collection))
+        )
+        links.append(Link(str(self.model)))
         return links

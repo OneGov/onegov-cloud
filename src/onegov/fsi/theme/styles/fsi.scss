@@ -1,6 +1,6 @@
 // Removes margin for button inside a table td
 td {
-  a.button, button.button {
+  a.button, button.button, div.switch, fieldset.switch {
      margin: 0;
   }
 }

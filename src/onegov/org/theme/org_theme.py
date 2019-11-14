@@ -49,6 +49,7 @@ class OrgTheme(BaseTheme):
             'progress-bars',
             'reveal',
             'side-nav',
+            'switches',
             'split-buttons',
             'sub-nav',
             'tables',
