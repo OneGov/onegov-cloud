@@ -842,8 +842,10 @@
         <dt i18n:translate>Location</dt>
         <dd>${event.location}</dd>
 
-        <dt i18n:translate>Price</dt>
-        <dd tal:content="structure event.price.replace('\n', '<br>')" />
+        <tal:b tal:condition="event.price">
+            <dt i18n:translate>Price</dt>
+            <dd tal:content="structure event.price.replace('\n', '<br>')"></dd>
+        </tal:b>
 
         <tal:b condition="event.coordinates">
             <dt i18n:translate>Map</dt>
