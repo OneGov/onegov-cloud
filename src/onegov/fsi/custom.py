@@ -22,7 +22,7 @@ def get_base_tools(request):
                 _("Attendee Profile"), request.link(usr),
                 attrs={'class': 'profile'}
             )
-        ]
+        ] if usr else []
         if request.is_manager:
             profile_links.append(
                 Link(
