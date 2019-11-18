@@ -45,7 +45,7 @@ class GLAuth(object):
         self.context = Bunch()
 
         # pick the socket
-        self.context.host = 'localhost'
+        self.context.host = '127.0.0.1'
         self.context.port = port_for.select_random()
 
         # write the config

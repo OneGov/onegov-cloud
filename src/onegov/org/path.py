@@ -75,7 +75,7 @@ def get_org(app):
 
 @OrgApp.path(model=Auth, path='/auth', converters=dict(skip=bool))
 def get_auth(app, to='/', skip=False, signup_token=None):
-    return Auth.from_app(app, to, skip, signup_token)
+    return Auth(app, to=to, skip=skip, signup_token=signup_token)
 
 
 @OrgApp.path(model=User, path='/benutzer/{id}', converters=dict(id=UUID))

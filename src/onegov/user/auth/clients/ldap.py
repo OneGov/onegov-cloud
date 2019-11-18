@@ -89,7 +89,7 @@ class LDAPClient():
             raise ValueError(f"Failed to connect to {self.url}")
 
     @auto_retry
-    def search(self, query, attributes={}):
+    def search(self, query, attributes=()):
         """ Runs an LDAP query against the server and returns a dictionary
         with the distinguished name as key and the given attributes as values
         (also a dict).
@@ -101,3 +101,26 @@ class LDAPClient():
             entry.entry_dn: entry.entry_attributes_as_dict
             for entry in self.connection.entries
         }
+
+    @auto_retry
+    def compare(self, name, attribute, value):
+        """ Returns true if given user's attribute has the expected value.
+
+        :param name:
+            The distinguished name (DN) of the LDAP user.
+
+        :param attribute:
+            The attribute to query.
+
+        :param value:
+            The value to compare to.
+
+        The method returns True if the given value is found on the user.
+
+        This is most notably used for password checks. For example::
+
+            client.compare('cn=admin', 'userPassword', 'hunter2')
+
+        """
+
+        return self.connection.compare(name, attribute, value)
