@@ -2,7 +2,7 @@ from datetime import timedelta
 
 import pytest
 
-from onegov.fsi.forms.course_event import datetime_to_string, \
+from onegov.fsi.forms.course import datetime_to_string, \
     string_to_timedelta
 
 

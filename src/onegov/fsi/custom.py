@@ -16,11 +16,11 @@ def get_base_tools(request):
     if request.is_logged_in:
 
         usr = request.current_attendee
-        reservation_count = '0' if not usr else str(usr.reservations.count())
+        reservation_count = 0 if not usr else usr.reservations.count()
 
         profile_links = [
             Link(
-                _("Attendee Profile"), request.link(usr),
+                _("Profile"), request.link(usr),
                 attrs={'class': 'profile'}
             )
         ] if usr else []
@@ -82,7 +82,7 @@ def get_base_tools(request):
             )
             links.append(
                 Link(
-                    _('Reservations'),
+                    _('Event Subscriptions'),
                     request.class_link(ReservationCollection)
                 )
             )
@@ -103,14 +103,15 @@ def get_base_tools(request):
             css = 'no-tickets'
 
         yield Link(
-            reservation_count == 1 and _("Reservation") or _("Reservations"),
+            reservation_count == 1 and _("Event Subscription")
+            or _("Event Subscriptions"),
             request.link(
                 ReservationCollection(request.session,
                                       request.attendee_id),
             ),
             attrs={
                 'class': ('with-count', css),
-                'data-count': reservation_count
+                'data-count': str(reservation_count)
             }
         )
     else:
@@ -147,10 +148,10 @@ def get_top_navigation(request):
         url=request.class_link(CourseCollection)
     )
 
-    yield Link(
-        text=_("Upcoming Course Events"),
-        url=request.link(CourseEventCollection.latest(request.app.session()))
-    )
+    # yield Link(
+    #     text=_("Upcoming Course Events"),
+    #     url=request.link(CourseEventCollection.latest(request.app.session()))
+    # )
 
     layout = DefaultLayout(request.app.org, request)
     yield from layout.top_navigation

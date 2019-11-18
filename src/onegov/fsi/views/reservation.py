@@ -88,7 +88,7 @@ def view_add_reservation_placeholder(self, request, form):
         if not desc:
             data['dummy_desc'] = default_desc
         self.add(**data)
-        request.success(_("Added a new placeholder reservation"))
+        request.success(_("Added a new placeholder"))
         return request.redirect(request.link(self))
 
     return {
@@ -109,7 +109,7 @@ def view_add_from_course_event(self, request):
     self.add(
         attendee_id=self.attendee_id or request.attendee_id,
         course_event_id=self.course_event_id)
-    request.success(_('New reservation successfully added'))
+    request.success(_('New subscription successfully added'))
 
 
 @FsiApp.html(

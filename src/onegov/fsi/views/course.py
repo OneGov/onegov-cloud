@@ -89,5 +89,5 @@ def delete_course(self, request):
     if self.events.count() == 0:
         CourseEventCollection(request.session).delete(self)
     else:
-        request.error(_('This course has events and can not be deleted'))
+        request.warning(_('This course has events and can not be deleted'))
 

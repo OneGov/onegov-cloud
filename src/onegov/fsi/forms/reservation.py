@@ -43,7 +43,7 @@ class AddFsiReservationForm(Form):
 
     @staticmethod
     def attendee_choice(attendee):
-        return str(attendee.id), f'{str(attendee)} - {attendee.email}'
+        return str(attendee.id), f'{str(attendee)}'
 
     @property
     def event_collection(self):
