@@ -1,6 +1,7 @@
 from onegov.core.elements import Link
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
+from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.layout import DefaultLayout
@@ -143,7 +144,7 @@ def get_top_navigation(request):
     # inject an activites link in front of all top navigation links
     yield Link(
         text=_("Courses"),
-        url=request.class_link(CourseEventCollection)
+        url=request.class_link(CourseCollection)
     )
 
     yield Link(

@@ -77,14 +77,14 @@
 
 
 <metal:accordion define-macro="accordion">
-    <tal:b tal:define="items layout.accordion_items()" tal:condition="items|nothing">
+    <tal:b tal:condition="items|nothing">
         <dl class="accordion" data-accordion>
             <tal:b tal:repeat="item items" define="accordion_id 'accordion-panel-{}'.format(repeat.item.number)">
                 <dd class="accordion-navigation">
                     <a href="${accordion_id}">$item.title</a>
                     <div id="${accordion_id}" class="content">
-                        <span tal:condition="item.url|nothing"><a href="$item.url" class="tiny button hollow">Detail URL Icon</a></span>
-                        <span tal:condition="item.edit_url|nothing"><a href="$item.edit_url" class="tiny button hollow">Edit URL Icon</a></span>
+                        <span tal:condition="item.url|nothing"><a href="${item.url}" class="tiny button hollow">Details</a></span>
+                        <span tal:condition="request.is_manager and item.edit_url|nothing"><a href="${item.edit_url}" class="tiny button hollow">Edit</a></span>
                             ${item.content}
                     </div>
                 </dd>

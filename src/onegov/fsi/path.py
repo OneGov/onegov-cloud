@@ -2,14 +2,21 @@ from uuid import UUID
 
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
+from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.collections.notification_template import \
     FsiNotificationTemplateCollection
 from onegov.fsi.collections.reservation import ReservationCollection
+from onegov.fsi.models.course import Course
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.notification_template import FsiNotificationTemplate
 from onegov.fsi.models.reservation import Reservation
+
+
+@FsiApp.path(model=Course, path='/fsi/course/{id}')
+def get_course_details(request, id):
+    return CourseCollection(request.session).by_id(id)
 
 
 @FsiApp.path(model=CourseEvent, path='/fsi/event/{id}')
@@ -33,7 +40,8 @@ def get_events_view(
         upcoming_only=False,
         past_only=False,
         limit=None,
-        show_hidden=True
+        show_hidden=True,
+        course_id=None
 ):
     if not request.is_manager and show_hidden:
         show_hidden = False
@@ -45,8 +53,14 @@ def get_events_view(
         upcoming_only=upcoming_only,
         past_only=past_only,
         limit=limit,
-        show_hidden=show_hidden
+        show_hidden=show_hidden,
+        course_id=course_id
     )
+
+
+@FsiApp.path(model=CourseCollection, path='/fsi/courses')
+def get_courses(request, page=0):
+    return CourseCollection(request.session, page)
 
 
 @FsiApp.path(model=CourseAttendeeCollection, path='/fsi/attendees',

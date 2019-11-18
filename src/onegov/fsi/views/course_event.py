@@ -28,7 +28,6 @@ def view_course_event_collection(self, request):
 )
 def view_add_course_event(self, request, form):
     layout = AddCourseEventLayout(self, request)
-    layout.include_editor()
 
     if form.submitted(request):
         course_event = self.add(**form.get_useful_data())
@@ -61,7 +60,6 @@ def view_course_event(self, request):
 )
 def view_edit_course_event(self, request, form):
     layout = EditCourseEventLayout(self, request)
-    layout.include_editor()
 
     if form.submitted(request):
         form.update_model(self)
@@ -87,7 +85,6 @@ def view_edit_course_event(self, request, form):
 )
 def view_duplicate_course_event(self, request, form):
     layout = DuplicateCourseEventLayout(self, request)
-    layout.include_editor()
 
     if form.submitted(request):
         duplicate = CourseEventCollection(
@@ -109,7 +106,7 @@ def view_duplicate_course_event(self, request, form):
     model=CourseEvent,
     request_method='DELETE',
 )
-def delete_agency(self, request):
+def delete_course_event(self, request):
 
     request.assert_valid_csrf_token()
     CourseEventCollection(request.session).delete(self)

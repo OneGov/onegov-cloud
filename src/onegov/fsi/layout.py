@@ -15,6 +15,9 @@ class Layout(OrgBaseLayout):
 
 class DefaultLayout(OrgDefaultLayout):
 
+    def include_accordion(self):
+        self.request.include('accordion')
+
     def include_editor(self):
         self.request.include('redactor')
         self.request.include('editor')

@@ -17,7 +17,8 @@ class CourseEventCollection(GenericCollection, Pagination):
             upcoming_only=False,
             past_only=False,
             limit=None,
-            show_hidden=False
+            show_hidden=False,
+            course_id=None
     ):
         super().__init__(session)
         self.page = page
@@ -27,6 +28,7 @@ class CourseEventCollection(GenericCollection, Pagination):
         self.past_only = past_only
         self.limit = limit
         self.show_hidden = show_hidden
+        self.course_id = course_id
 
         if from_date:
             assert isinstance(from_date, datetime)
@@ -45,6 +47,8 @@ class CourseEventCollection(GenericCollection, Pagination):
             query = query.filter(CourseEvent.start <= utcnow())
         elif self.upcoming_only:
             query = query.filter(CourseEvent.start >= utcnow())
+        elif self.course_id:
+            query = query.filter(CourseEvent.course_id == self.course_id)
 
         query = query.order_by(desc(CourseEvent.start))
 

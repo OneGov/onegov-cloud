@@ -1,0 +1,32 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.fsi">
+    <tal:b metal:fill-slot="title">
+        ${layout.title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="row">
+            <div class="columns small-12">
+                <div class="row">
+                    <div class="columns small-12">
+                        <tal:b tal:define="items layout.accordion_items" tal:switch="items != ()">
+                            <strong tal:case="False" i18n:translate="">No entries found</strong>
+                            <tal:b tal:case="True">
+                                <dl class="accordion" data-accordion>
+                                    <tal:b tal:repeat="item items">
+                                        <dd class="accordion-navigation" tal:define="accordion_id 'accordion-panel-{}'.format(repeat.item.number)">
+                                            <a href="${'#'+ accordion_id}">+ <strong>${item['title']}</strong></a>
+                                            <div id="${accordion_id}" class="content">
+                                                <div tal:content="structure item['content']"/>
+                                                <span tal:condition="request.is_manager and item['edit_url']|nothing"><a href="${item['edit_url']}" class="tiny button secondary">Edit</a></span>
+                                                <span tal:condition="item['url']|nothing"><a href="${item['url']}" class="tiny button hollow">Details</a></span>
+                                            </div>
+                                        </dd>
+                                    </tal:b>
+                                </dl>
+                            </tal:b>
+                        </tal:b>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </tal:b>
+</div>

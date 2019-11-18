@@ -13,6 +13,7 @@ from wtforms.validators import InputRequired
 from onegov.form.fields import HtmlField
 from onegov.fsi import _
 from onegov.form import Form
+from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.models.course_event import course_status_choices
 
 mapping = OrderedDict({'year': 365, 'month': 30, 'week': 7, 'day': 1})
@@ -86,12 +87,9 @@ class IntervalStringField(StringField):
 
 class CourseEventForm(Form):
 
-    # Course info
-    name = StringField(
-        label=_('Short Description'),
-        validators=[
-            InputRequired()
-        ]
+    course_id = ChosenSelectField(
+        label=_('Course'),
+        choices=[],
     )
 
     presenter_name = StringField(
@@ -112,14 +110,6 @@ class CourseEventForm(Form):
 
     presenter_email = StringField(
         label=_('Presenter Email'),
-        validators=[
-            InputRequired()
-        ]
-    )
-
-    description = HtmlField(
-        label=_("Description"),
-        render_kw={'rows': 10, 'cols': 8},
         validators=[
             InputRequired()
         ]
@@ -175,19 +165,20 @@ class CourseEventForm(Form):
         default='created'
     )
 
-    def get_useful_data(self, exclude={'csrf_token'}):
-        result = super().get_useful_data(exclude)
-        if self.description.data:
-            result['description'] = linkify(
-                self.description.data, escape=False)
-        return result
+    def on_request(self):
+        collection = CourseCollection(self.request.session)
+        if self.model.course_id:
+            course = collection.by_id(self.model.course_id)
+            self.course_id.choices = (str(course.id), course.name),
+        else:
+            self.course_id.choices = tuple(
+                (str(c.id), c.name) for c in collection.query()
+            )
 
     def apply_model(self, model):
-        self.name.data = model.name
         self.presenter_name.data = model.presenter_name
         self.presenter_company.data = model.presenter_company
         self.presenter_email.data = model.presenter_email
-        self.description.data = model.description
         self.mandatory_refresh.data = model.mandatory_refresh
         self.hidden_from_public.data = model.hidden_from_public
 
@@ -199,11 +190,9 @@ class CourseEventForm(Form):
         self.refresh_interval.data = model.refresh_interval
 
     def update_model(self, model):
-        model.name = self.name.data
         model.presenter_name = self.presenter_name.data
         model.presenter_company = self.presenter_company.data
         model.presenter_email = self.presenter_email.data
-        model.description = linkify(self.description.data, escape=False)
         model.mandatory_refresh = self.mandatory_refresh.data
         model.hidden_from_public = self.hidden_from_public.data
 

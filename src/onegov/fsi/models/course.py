@@ -14,3 +14,12 @@ class Course(Base):
     name = Column(Text, nullable=False, unique=True)
     # Long description
     description = Column(Text, nullable=False)
+
+    @property
+    def description_html(self):
+        """
+        Returns the portrait that is saved as HTML from the redactor js
+        plugin.
+        """
+        return self.description
+

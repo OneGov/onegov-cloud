@@ -19,18 +19,17 @@ class CourseEventCollectionLayout(DefaultLayout):
 
     @cached_property
     def course_breadcrumbs_text(self):
-        return _('Course management') if self.request.is_manager else _(
-            'Courses')
+        return _('Course Event management') if self.request.is_manager else _(
+            'Course Events')
 
     @cached_property
     def breadcrumbs(self):
         """ Returns the breadcrumbs for the current page. """
         links = super().breadcrumbs
-        if self.request.is_manager:
-            links.append(
-                Link(
-                    self.course_breadcrumbs_text,
-                    self.request.class_link(CourseEventCollection)))
+        links.append(
+            Link(
+                self.course_breadcrumbs_text,
+                self.request.class_link(CourseEventCollection)))
         return links
 
     @cached_property
