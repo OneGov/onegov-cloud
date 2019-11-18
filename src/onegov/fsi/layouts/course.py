@@ -11,8 +11,7 @@ from onegov.org.elements import LinkGroup
 class CourseCollectionLayout(DefaultLayout):
     @cached_property
     def title(self):
-        return _('Course management') if self.request.is_manager else _(
-            'Courses')
+        return _('Courses')
 
     @cached_property
     def breadcrumbs(self):
@@ -77,17 +76,10 @@ class CourseLayout(DefaultLayout):
                 title=_('Add'),
                 links=(
                     Link(
-                        _('New Course'),
-                        self.request.class_link(
-                            CourseCollection, name='add'
-                        ),
-                        attrs={'class': 'new-link'}
-                    ),
-                    Link(
                         _('Event'),
                         self.request.link(self.event_collection, name='add'),
                         attrs={'class': 'new-link'}
-                    )
+                    ),
                 )
             ),
             Link(
@@ -120,13 +112,35 @@ class CourseLayout(DefaultLayout):
         ]
 
 
-class AddCourseLayout(CourseCollectionLayout):
+class AddCourseLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        breadcrumbs = super().breadcrumbs
+        breadcrumbs.append(
+            Link(_('Courses'), self.request.class_link(CourseCollection))
+        )
+        breadcrumbs.append(Link(_('Add')))
+        return breadcrumbs
+
     @cached_property
     def title(self):
         return _('Add Course')
 
 
-class EditCourseLayout(CourseLayout):
+class EditCourseLayout(DefaultLayout):
     @cached_property
     def title(self):
         return _('Edit Course')
+
+    @cached_property
+    def breadcrumbs(self):
+        breadcrumbs = super().breadcrumbs
+        breadcrumbs.append(
+            Link(_('Courses'), self.request.class_link(CourseCollection))
+        )
+        breadcrumbs.append(
+            Link(self.model.name, self.request.link(self.model))
+        )
+        breadcrumbs.append(Link(_('Edit')))
+        return breadcrumbs
