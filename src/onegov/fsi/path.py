@@ -59,8 +59,8 @@ def get_events_view(
 
 
 @FsiApp.path(model=CourseCollection, path='/fsi/courses')
-def get_courses(request, page=0):
-    return CourseCollection(request.session, page)
+def get_courses(request):
+    return CourseCollection(request.session)
 
 
 @FsiApp.path(model=CourseAttendeeCollection, path='/fsi/attendees',
