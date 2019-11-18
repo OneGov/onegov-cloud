@@ -123,6 +123,7 @@ class DirectoryBaseForm(Form):
     address_block_title_type = RadioField(
         label=_("Address Block Title"),
         fieldset=_("Address Block"),
+        default='auto',
         choices=(
             ('auto', _("The first line of the address")),
             ('fixed', _("Static title")),
