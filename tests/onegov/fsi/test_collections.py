@@ -17,6 +17,7 @@ def test_course_event_collection(session, course):
     new_course_events = (
             CourseEvent(
                 course_id=course(session)[0].id,
+                location=f'Address, Room {i}',
                 start=now + datetime.timedelta(days=i),
                 end=now + datetime.timedelta(days=i, hours=2),
                 presenter_name=f'P{i}',

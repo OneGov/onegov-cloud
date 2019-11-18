@@ -171,6 +171,8 @@ def course():
         data = dict(
             name='Course',
             description='Description',
+            mandatory_refresh=True,
+            refresh_interval=datetime.timedelta(days=365)
         )
         data.update(**kwargs)
         course = session.query(Course).filter_by(**data).first()
@@ -189,13 +191,13 @@ def course_event(course):
         course_ = course(session)
         data = dict(
             course_id=course_[0].id,
+            location='Room42',
             start=utcnow() - datetime.timedelta(days=30, hours=2),
             end=utcnow() - datetime.timedelta(days=30),
             presenter_name='Presenter',
             presenter_company='Company',
             presenter_email='presenter@presenter.org',
             max_attendees=20,
-            mandatory_refresh=True
         )
         data.update(**kwargs)
         course_event = session.query(CourseEvent).filter_by(**data).first()
@@ -215,12 +217,12 @@ def future_course_event(course):
         in_a_week = utcnow() + datetime.timedelta(days=7)
         data = dict(
             course_id=course_[0].id,
+            location='Room42',
             start=in_a_week,
             end=in_a_week + datetime.timedelta(hours=2),
             presenter_name='Presenter',
             presenter_company='Company',
             presenter_email='presenter@presenter.org',
-            mandatory_refresh=True
         )
         data.update(**kwargs)
         course_event = session.query(CourseEvent).filter_by(**data).first()

@@ -44,6 +44,7 @@ class CourseEvent(Base, TimestampMixin):
         lazy='joined'
     )
 
+    # Two aliases
     @property
     def name(self):
         return self.course.name
@@ -53,6 +54,7 @@ class CourseEvent(Base, TimestampMixin):
         return self.course.description
 
     # Event specific information
+    location = Column(Text, nullable=False)
     start = Column(UTCDateTime, nullable=False)
     end = Column(UTCDateTime, nullable=False)
     presenter_name = Column(Text, nullable=False)
@@ -60,10 +62,6 @@ class CourseEvent(Base, TimestampMixin):
     presenter_email = Column(Text, nullable=False)
     min_attendees = Column(SmallInteger, nullable=False, default=1)
     max_attendees = Column(SmallInteger, nullable=True)
-    refresh_interval = Column(Interval, nullable=True)
-
-    # If the course has to be refreshed after some interval
-    mandatory_refresh = Column(Boolean, nullable=False, default=False)
 
     status = Column(
         Enum(

@@ -7,7 +7,8 @@ def test_view_homepage(client):
 
 def test_view_courses(client):
     page = client.get('/events')
-    assert 'No entries found' in page
+    # assert 'No entries found' in page
+    assert 'Keine Einträge gefunden' in page
 
 
 def test_view_courses_new(client):
