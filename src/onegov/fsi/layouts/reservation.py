@@ -15,18 +15,18 @@ class ReservationCollectionLayout(DefaultLayout):
     @cached_property
     def title(self):
         if self.request.view_name == 'add':
-            return _('Add Reservation')
+            return _('Add Attendee')
         if self.request.view_name == 'add-placeholder':
-            return _('Add Placeholder Reservation')
+            return _('Add Placeholder')
         if self.model.course_event_id:
-            return _('Reservations for ${event}',
+            return _('Attendees Event ${event}',
                      mapping={'event': self.model.course_event.name})
         if self.for_himself:
-            return _('My Personal Reservations')
+            return _('My Event Subscriptions')
         elif self.model.attendee_id:
-            return _('All Reservations for ${attendee}',
+            return _('All event subscriptions for ${attendee}',
                      mapping={'attendee': self.model.attendee})
-        return _('All Reservations')
+        return _('All Event Subscriptions')
 
     @cached_property
     def editbar_links(self):
@@ -71,7 +71,7 @@ class ReservationCollectionLayout(DefaultLayout):
                 )
             )
         links.append(
-            Link(_('Manage Reservations'), self.request.link(self.model))
+            Link(_('Course Subscriptions'), self.request.link(self.model))
         )
         if self.request.view_name in ('add', 'add-placeholder'):
             links.append(Link(_('Add')))
@@ -121,7 +121,7 @@ class ReservationLayout(DefaultLayout):
             )
         )
         links.append(
-            Link(_('Manage Reservations'), self.request.link(self.collection))
+            Link(_('Course Subscriptions'), self.request.link(self.collection))
         )
         links.append(Link(str(self.model)))
         return links

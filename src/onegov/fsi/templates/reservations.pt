@@ -11,7 +11,7 @@
                         <tal:b tal:condition="reservations|nothing">
                                 <table class="hover">
                                     <thead>
-                                        <th i18n:translate="">Description</th>
+                                        <th i18n:translate="">Attendee</th>
                                         <th i18n:translate="" tal:condition="not: layout.model.course_event_id">Course Name</th>
                                         <th i18n:translate="">Date</th>
                                         <th i18n:translate="">Course Status</th>

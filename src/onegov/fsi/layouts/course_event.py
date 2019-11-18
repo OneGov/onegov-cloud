@@ -1,6 +1,7 @@
 from cached_property import cached_property
 
 from onegov.core.elements import Link, Confirm, Intercooler, LinkGroup
+from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.collections.notification_template import \
     FsiNotificationTemplateCollection
@@ -12,23 +13,30 @@ from onegov.fsi import _
 class CourseEventCollectionLayout(DefaultLayout):
 
     @cached_property
-    def title(self):
-        if self.model.limit:
-            return _('Upcoming Course Events')
-        return _('Course Events')
+    def course(self):
+        return CourseCollection(self.request.session).by_id(
+            self.model.course_id)
 
     @cached_property
-    def course_breadcrumbs_text(self):
-        return _('Course Event management') if self.request.is_manager else _(
-            'Course Events')
+    def title(self):
+        if self.model.past_only:
+            return _('Past Course Events')
+        return _('Course Events')
 
     @cached_property
     def breadcrumbs(self):
         """ Returns the breadcrumbs for the current page. """
         links = super().breadcrumbs
+        if self.course:
+            links.append(
+                Link(
+                    self.course.name,
+                    self.request.link(self.course)
+                )
+            )
         links.append(
             Link(
-                self.course_breadcrumbs_text,
+                _('Course Events'),
                 self.request.class_link(CourseEventCollection)))
         return links
 
@@ -37,19 +45,24 @@ class CourseEventCollectionLayout(DefaultLayout):
         links = []
         if self.request.is_manager:
             links.append(
-                Link(
-                    text=_("Add Course Event"),
-                    url=self.request.class_link(
-                        CourseEventCollection, name='add'
-                    ),
-                    attrs={'class': 'add-icon'}
+                LinkGroup(
+                    title=_('Add'),
+                    links=[
+                        Link(
+                            text=_("Course Event"),
+                            url=self.request.class_link(
+                                CourseEventCollection, name='add'
+                            ),
+                            attrs={'class': 'add-icon'}
+                        )
+                    ]
                 )
             )
 
         return links
 
 
-class CourseEventLayout(CourseEventCollectionLayout):
+class CourseEventLayout(DefaultLayout):
 
     @cached_property
     def title(self):
@@ -85,7 +98,17 @@ class CourseEventLayout(CourseEventCollectionLayout):
         """ Returns the breadcrumbs for the detail page. """
         links = super().breadcrumbs
         links.append(
-            Link(self.model.name, self.request.link(self.model))
+            Link(self.model.course.name,
+                 self.request.link(self.model.course)
+        ))
+        links.append(
+            Link(_('Course Events'),
+                 self.request.class_link(CourseEventCollection))
+        )
+        links.append(
+            Link(
+                self.format_date(self.model.start, 'date'),
+                self.request.link(self.model))
         )
         return links
 
@@ -103,7 +126,7 @@ class CourseEventLayout(CourseEventCollectionLayout):
                         attrs={'class': 'new-link'}
                     ),
                     Link(
-                        _('Reservation for External'),
+                        _('External Attendee'),
                         self.request.link(
                             ReservationCollection(
                                 self.request.session,
@@ -114,7 +137,7 @@ class CourseEventLayout(CourseEventCollectionLayout):
                         attrs={'class': 'new-link'}
                     ),
                     Link(
-                        _("Placeholder Reservation"),
+                        _("Placeholder"),
                         self.request.link(
                             self.reservation_collection,
                             name='add-placeholder'
@@ -122,7 +145,7 @@ class CourseEventLayout(CourseEventCollectionLayout):
                         attrs={'class': 'add-icon'}
                     ),
                     Link(
-                        _("New Course Event"),
+                        _("Course Event"),
                         self.request.class_link(
                             CourseEventCollection, name='add'),
                         attrs={'class': 'add-icon'}
@@ -159,7 +182,7 @@ class CourseEventLayout(CourseEventCollectionLayout):
             LinkGroup(_('Manage'), links=(
                 Link(_('Email Templates'),
                      self.request.link(self.template_collection)),
-                Link(_('Reservations'),
+                Link(_('Subscriptions'),
                      self.request.link(self.reservation_collection))
             )),
         ]
@@ -168,7 +191,7 @@ class CourseEventLayout(CourseEventCollectionLayout):
     def intercooler_btn(self):
         btn_class = f'button {"disabled" if self.model.booked else ""}'
         return Link(
-            text=_("Make Reservation"),
+            text=_("Subscribe"),
             url=self.csrf_protected_url(
                 self.request.link(
                     self.reservation_collection,
