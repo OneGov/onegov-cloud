@@ -44,4 +44,8 @@ class Reservation(Base):
     def __str__(self):
         if self.is_placeholder:
             return f'{self.dummy_desc or ""}'
-        return f'{self.attendee.last_name}, {self.attendee.first_name}'
+        fn = self.attendee.first_name
+        ln = self.atendee.last_name
+        if fn and ln:
+            return f'{self.attendee.last_name}, {self.attendee.first_name}'
+        return self.username
