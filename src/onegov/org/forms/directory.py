@@ -120,6 +120,21 @@ class DirectoryBaseForm(Form):
             'data-fields-include': 'fileinput'
         })
 
+    address_block_title_type = RadioField(
+        label=_("Address Block Title"),
+        fieldset=_("Address Block"),
+        choices=(
+            ('auto', _("The first line of the address")),
+            ('fixed', _("Static title")),
+        )
+    )
+
+    address_block_title = StringField(
+        label=_("Title"),
+        fieldset=_("Address Block"),
+        depends_on=('address_block_title_type', 'fixed'),
+    )
+
     marker_icon = IconField(
         label=_("Icon"),
         fieldset=_("Marker"))
@@ -395,7 +410,12 @@ class DirectoryBaseForm(Form):
             link_pattern=self.link_pattern.data,
             link_title=self.link_title.data,
             link_visible=self.link_visible.data,
-            thumbnail=self.thumbnail.data and self.thumbnail.data.split()[0]
+            thumbnail=self.thumbnail.data and self.thumbnail.data.split()[0],
+            address_block_title=(
+                self.address_block_title_type.data == 'fixed'
+                and self.address_block_title.data
+                or None
+            )
         )
 
     @configuration.setter
@@ -416,6 +436,13 @@ class DirectoryBaseForm(Form):
         else:
             self.order.data = 'by-format'
             self.order_format.data = ''.join(f'[{key}]' for key in cfg.order)
+
+        if cfg.address_block_title:
+            self.address_block_title_type.data = 'fixed'
+            self.address_block_title.data = cfg.address_block_title
+        else:
+            self.address_block_title_type.data = 'auto'
+            self.address_block_title.data = ""
 
     def populate_obj(self, obj):
         super().populate_obj(obj, exclude={

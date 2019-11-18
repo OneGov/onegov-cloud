@@ -199,7 +199,7 @@ def spawn_ldap_client(**cfg):
     return client
 
 
-def ensure_user(session, username, role):
+def ensure_user(provider, session, username, role):
     """ Creates the given user if it doesn't already exist. Ensures the
     role is set to the given role in all cases.
 
@@ -217,6 +217,9 @@ def ensure_user(session, username, role):
 
     # update the role in all cases, should it change
     user.role = role
+
+    # the source of the user is always the last provider that was used
+    user.source = provider.name
 
     return user
 
@@ -437,6 +440,7 @@ class LDAPProvider(
             return
 
         return ensure_user(
+            provider=self,
             session=request.session,
             username=username,
             role=role)
@@ -581,6 +585,7 @@ class LDAPKerberosProvider(
             return None
 
         return ensure_user(
+            provider=self,
             session=request.session,
             username=mails[0],
             role=role)
