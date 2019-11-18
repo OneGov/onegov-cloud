@@ -6,7 +6,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
 
 
-class FsiCourse(Base):
+class Course(Base):
     __tablename__ = 'fsi_courses'
 
     id = Column(UUID, primary_key=True, default=uuid4)

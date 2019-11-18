@@ -1,9 +1,6 @@
-import datetime
-
 import pytest
 from sedate import utcnow
 
-from onegov.fsi.models.course import FsiCourse
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.notification_template import NOTIFICATION_TYPES, \

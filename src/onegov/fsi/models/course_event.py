@@ -39,7 +39,7 @@ class CourseEvent(Base, TimestampMixin):
 
     course_id = Column(UUID, ForeignKey('fsi_courses.id'), nullable=False)
     course = relationship(
-        'FsiCourse',
+        'Course',
         backref=backref('events', lazy='dynamic'),
         lazy='joined'
     )

@@ -6,7 +6,7 @@ import transaction
 from sedate import utcnow
 
 from onegov.core.crypto import hash_password
-from onegov.fsi.models.course import FsiCourse
+from onegov.fsi.models.course import Course
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.notification_template import InfoTemplate, \
@@ -173,10 +173,10 @@ def course():
             description='Description',
         )
         data.update(**kwargs)
-        course = session.query(FsiCourse).filter_by(**data).first()
+        course = session.query(Course).filter_by(**data).first()
         if not course:
             data['id'] = uuid4()
-            course = FsiCourse(**data)
+            course = Course(**data)
             session.add(course)
             session.flush()
         return course, data
