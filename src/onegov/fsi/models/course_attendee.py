@@ -53,7 +53,9 @@ class CourseAttendee(Base):
     address = meta_property('address')
 
     def __str__(self):
-        return f'{self.last_name}, {self.first_name}'
+        if self.first_name.strip() and self.last_name.strip():
+            return f'{self.last_name}, {self.first_name}'
+        return self.email
 
     meta = Column(JSON, nullable=True, default=dict)
 
