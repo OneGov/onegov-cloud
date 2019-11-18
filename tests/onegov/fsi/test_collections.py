@@ -12,16 +12,16 @@ from onegov.fsi.models.course_event import CourseEvent
 from tests.onegov.fsi.common import collection_attr_eq_test
 
 
-def test_course_event_collection(session):
+def test_course_event_collection(session, course):
     now = utcnow()
     new_course_events = (
             CourseEvent(
-                name=f'Event {i}',
-                description='Desc',
+                course_id=course(session)[0].id,
                 start=now + datetime.timedelta(days=i),
                 end=now + datetime.timedelta(days=i, hours=2),
                 presenter_name=f'P{i}',
                 presenter_company=f'C{i}',
+                presenter_email=f'{i}@email.com'
             ) for i in (-1, 1, 2)
     )
     session.add_all(new_course_events)

@@ -3,6 +3,7 @@ import datetime
 import pytest
 from sedate import utcnow
 
+from onegov.fsi.models.course import FsiCourse
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.notification_template import NOTIFICATION_TYPES, \
@@ -75,8 +76,9 @@ def test_attendee_upcoming_courses(
     assert attendee[0].repeating_courses.count() == 1
 
 
-def test_course_event_1(session, course_event, attendee):
+def test_course_event_1(session, course, course_event, attendee):
     attendee_, data = attendee(session)
+    course, data = course(session)
     event, data = course_event(session)
 
     assert event.attendees.count() == 0
@@ -99,6 +101,12 @@ def test_course_event_1(session, course_event, attendee):
     assert event.possible_bookers().first() == attendee_2
     assert event.possible_bookers(external_only=True).count() == 0
 
+    # Test course behind the event
+    assert event.name == event.course.name
+    assert event.description == event.course.description
+    assert event.course == course
+
+    assert course.events.all() == [event]
 
 
 def test_reservation_1(session, attendee, course_event):

@@ -4,7 +4,7 @@ from uuid import uuid4
 
 from sedate import utcnow
 from sqlalchemy import Column, Boolean, SmallInteger, \
-    Enum, Text, Interval, UniqueConstraint
+    Enum, Text, Interval, UniqueConstraint, ForeignKey
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, backref, object_session
 
@@ -32,14 +32,25 @@ class CourseEvent(Base, TimestampMixin):
     default_reminder_before = datetime.timedelta(days=7)
 
     __tablename__ = 'fsi_course_events'
-    __table_args__ = (UniqueConstraint('name', 'start', 'end',
-                                       name='_name_ts_uc'),)
+    __table_args__ = (UniqueConstraint('start', 'end',
+                                       name='_start_end_uc'),)
 
     id = Column(UUID, primary_key=True, default=uuid4)
 
-    name = Column(Text, nullable=False)
-    # Long description
-    description = Column(Text, nullable=False)
+    course_id = Column(UUID, ForeignKey('fsi_courses.id'), nullable=False)
+    course = relationship(
+        'FsiCourse',
+        backref=backref('events', lazy='dynamic'),
+        lazy='joined'
+    )
+
+    @property
+    def name(self):
+        return self.course.name
+
+    @property
+    def description(self):
+        return self.course.description
 
     # Event specific information
     start = Column(UTCDateTime, nullable=False)
@@ -53,9 +64,6 @@ class CourseEvent(Base, TimestampMixin):
 
     # If the course has to be refreshed after some interval
     mandatory_refresh = Column(Boolean, nullable=False, default=False)
-
-    # Creator of this course event
-    # user_id = Column(UUID, ForeignKey('users.id'), nullable=True)
 
     status = Column(
         Enum(
@@ -149,7 +157,6 @@ class CourseEvent(Base, TimestampMixin):
     @property
     def duplicate_dict(self):
         return OrderedDict(
-            name=self.name, description=self.description,
             presenter_name=self.presenter_name,
             presenter_company=self.presenter_company,
             min_attendees=self.min_attendees,

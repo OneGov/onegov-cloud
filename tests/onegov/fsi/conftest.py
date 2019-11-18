@@ -6,6 +6,7 @@ import transaction
 from sedate import utcnow
 
 from onegov.core.crypto import hash_password
+from onegov.fsi.models.course import FsiCourse
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.notification_template import InfoTemplate, \
@@ -165,15 +166,34 @@ def notification_template(course_event):
 
 
 @pytest.fixture(scope='function')
-def course_event():
-    def _course_event(session, **kwargs):
+def course():
+    def _course(session, **kwargs):
         data = dict(
-            name='Event',
+            name='Course',
             description='Description',
+        )
+        data.update(**kwargs)
+        course = session.query(FsiCourse).filter_by(**data).first()
+        if not course:
+            data['id'] = uuid4()
+            course = FsiCourse(**data)
+            session.add(course)
+            session.flush()
+        return course, data
+    return _course
+
+
+@pytest.fixture(scope='function')
+def course_event(course):
+    def _course_event(session, **kwargs):
+        course_ = course(session)
+        data = dict(
+            course_id=course_[0].id,
             start=utcnow() - datetime.timedelta(days=30, hours=2),
             end=utcnow() - datetime.timedelta(days=30),
             presenter_name='Presenter',
             presenter_company='Company',
+            presenter_email='presenter@presenter.org',
             max_attendees=20,
             mandatory_refresh=True
         )
@@ -189,16 +209,17 @@ def course_event():
 
 
 @pytest.fixture(scope='function')
-def future_course_event():
+def future_course_event(course):
     def _future_course_event(session, **kwargs):
+        course_ = course(session)
         in_a_week = utcnow() + datetime.timedelta(days=7)
         data = dict(
-            name='FutureEvent',
-            description='Description',
+            course_id=course_[0].id,
             start=in_a_week,
             end=in_a_week + datetime.timedelta(hours=2),
             presenter_name='Presenter',
             presenter_company='Company',
+            presenter_email='presenter@presenter.org',
             mandatory_refresh=True
         )
         data.update(**kwargs)
