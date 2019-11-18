@@ -89,7 +89,6 @@ class CourseEventForm(Form):
     # Course info
     name = StringField(
         label=_('Short Description'),
-        render_kw={'size': 4},
         validators=[
             InputRequired()
         ]
@@ -97,7 +96,6 @@ class CourseEventForm(Form):
 
     presenter_name = StringField(
         label=_('Presenter'),
-        render_kw={'size': 4},
         description=_('Full name of the presenter'),
         validators=[
             InputRequired()
@@ -107,7 +105,13 @@ class CourseEventForm(Form):
     presenter_company = StringField(
         label=_('Company'),
         description='Presenters company',
-        render_kw={'size': 4},
+        validators=[
+            InputRequired()
+        ]
+    )
+
+    presenter_email = StringField(
+        label=_('Presenter Email'),
         validators=[
             InputRequired()
         ]
@@ -182,6 +186,7 @@ class CourseEventForm(Form):
         self.name.data = model.name
         self.presenter_name.data = model.presenter_name
         self.presenter_company.data = model.presenter_company
+        self.presenter_email.data = model.presenter_email
         self.description.data = model.description
         self.mandatory_refresh.data = model.mandatory_refresh
         self.hidden_from_public.data = model.hidden_from_public
@@ -197,6 +202,7 @@ class CourseEventForm(Form):
         model.name = self.name.data
         model.presenter_name = self.presenter_name.data
         model.presenter_company = self.presenter_company.data
+        model.presenter_email = self.presenter_email.data
         model.description = linkify(self.description.data, escape=False)
         model.mandatory_refresh = self.mandatory_refresh.data
         model.hidden_from_public = self.hidden_from_public.data
