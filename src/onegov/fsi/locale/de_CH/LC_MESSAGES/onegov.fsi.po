@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-08-30 15:00+0200\n"
-"PO-Revision-Date: 2017-03-02 09:52+0100\n"
+"POT-Creation-Date: 2019-11-18 14:23+0100\n"
+"PO-Revision-Date: 2019-11-18 13:57+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -11,4 +11,463 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.8.12\n"
+"X-Generator: Poedit 2.2.4\n"
+
+#, python-format
+msgid "Reminder for course: ${name}"
+msgstr "Erinnerung für Kurs: ${name}"
+
+msgid "Attendee Profile"
+msgstr "Profil Kursteilnehmer"
+
+msgid "User Profile"
+msgstr "Benutzer-Profile"
+
+msgid "Logout"
+msgstr "Ausloggen"
+
+msgid "Files"
+msgstr "Dateien"
+
+msgid "Images"
+msgstr "Bilder"
+
+msgid "Settings"
+msgstr "Einstellungen"
+
+msgid "Attendees"
+msgstr "Kursteilnehmer"
+
+msgid "Reservations"
+msgstr "Reservationen"
+
+msgid "Users"
+msgstr "Benutzer"
+
+msgid "Management"
+msgstr "Verwaltung"
+
+msgid "Reservation"
+msgstr "Reservation"
+
+msgid "Login"
+msgstr "Einloggen"
+
+msgid "Register"
+msgstr "Registrieren"
+
+msgid "Courses"
+msgstr "Kurse"
+
+msgid "Upcoming Course Events"
+msgstr "Nächste Kursdurchführungen"
+
+msgid "Short Description"
+msgstr "Kurzbeschreibung"
+
+msgid "Description"
+msgstr "Beschreibung"
+
+msgid "Enter all information to the course here"
+msgstr "Geben sie hier alle Kursinformationen ein"
+
+msgid "Salutation"
+msgstr "Anrede"
+
+msgid "First Name"
+msgstr "Vorname(n)"
+
+msgid "Last Name"
+msgstr "Nachname"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Address"
+msgstr "Addresse"
+
+msgid "Course"
+msgstr "Kurs"
+
+msgid "Presenter"
+msgstr "Referent"
+
+msgid "Full name of the presenter"
+msgstr "Vollständiger Name des Referenten"
+
+msgid "Company"
+msgstr "Firma"
+
+msgid "Presenter Email"
+msgstr "Referent Email"
+
+msgid "Refresh mandatory"
+msgstr "Wiederholdung obgligatorisch"
+
+msgid "Hidden"
+msgstr "Versteckt"
+
+msgid "Refresh Interval"
+msgstr "Wiederholdungs-Intervall"
+
+msgid "e.g. 5 years of 1 month a"
+msgstr "z.B. 5 Jahre"
+
+msgid "Course Start"
+msgstr "Kurs-Start"
+
+msgid "Course End"
+msgstr "Kurs-Ende"
+
+msgid "Attendees min"
+msgstr "Teilnehmer min"
+
+msgid "Attendees max"
+msgstr "Teilnehmer max"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Email Subject"
+msgstr "Betreff"
+
+msgid "Email Text"
+msgstr "Email Inhalt"
+
+msgid "Attendee"
+msgstr "Kursteilnehmer"
+
+msgid "Course Event"
+msgstr "Kursdurchführung"
+
+msgid "Placeholder Description (optional)"
+msgstr "Platzhalter-Beschreibung (optional)"
+
+msgid "None"
+msgstr "Keine"
+
+msgid "Course management"
+msgstr "Kursverwltung"
+
+msgid "Add Course"
+msgstr "Kurs hinzufügen"
+
+msgid "Add"
+msgstr "Hinzufügen"
+
+msgid "New Course"
+msgstr "Neuer Kurs"
+
+msgid "Event"
+msgstr "Kursdurchführung"
+
+msgid "Edit"
+msgstr "Editieren"
+
+msgid "Delete"
+msgstr "Löschen"
+
+msgid "Do you really want to delete this course ?"
+msgstr "Wollen Sie diesen Kurs wirklich löschen?"
+
+msgid "This cannot be undone."
+msgstr "Dies kann nicht rückgängig gemacht werden."
+
+msgid "Delete course event"
+msgstr "Kursdurchführung löschen"
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid "Edit Course"
+msgstr "Kurs editieren"
+
+msgid "Add External Attendee"
+msgstr "Externen Kursteilnehmer hinzufügen"
+
+msgid "Manage Course Attendees"
+msgstr "Kursteilnehmer verwalten"
+
+msgid "Edit Profile"
+msgstr "Profil editieren"
+
+msgid "Profile Details"
+msgstr "Profil Details"
+
+msgid "Personal Profile"
+msgstr "Persönliches Profil"
+
+msgid "Course Events"
+msgstr "Kursdurchführungen"
+
+msgid "Course Event management"
+msgstr "Verwaltung Kursdurchführungen"
+
+msgid "Add Course Event"
+msgstr "Kursdurchführung hinzufügen"
+
+msgid "Course Event Details"
+msgstr "Details Kursdurchführung"
+
+msgid "Duplicate"
+msgstr "Duplizieren"
+
+msgid "Reservation for External"
+msgstr "Reservationen Externe"
+
+msgid "Placeholder Reservation"
+msgstr "Platzhalter-Reservation"
+
+msgid "New Course Event"
+msgstr "Neue Kursdurchführung"
+
+msgid "Do you really want to delete this course event ?"
+msgstr "Wollen Sie diese Kursdurchführung wirklich löschen?"
+
+msgid "Manage"
+msgstr "Verwalten"
+
+msgid "Email Templates"
+msgstr "Email-Vorlagen"
+
+msgid "Make Reservation"
+msgstr "Reservieren"
+
+msgid "Do you want to register for this course event ?"
+msgstr "Wollen Sie sich für diesen Kurs anmelden?"
+
+msgid "A confirmation email will be sent to you later."
+msgstr "Sie werden eine Bestätigungs-Email erhalten"
+
+msgid "Register for course event"
+msgstr "Für Kursdurchführung registrieren"
+
+msgid "Edit course event"
+msgstr "Kursdurchführung editieren"
+
+msgid "Add course event"
+msgstr "Kursdurchführung hinzufügen"
+
+msgid "Duplicate course event"
+msgstr "Kursdurchführung duplizieren"
+
+msgid "Manage Notification Templates"
+msgstr "Email-Templates verwalten"
+
+msgid "Send Notification"
+msgstr "Sende Benachrichtigung"
+
+#, python-format
+msgid "${type} Notification Template"
+msgstr "${type} Email-Vorlage"
+
+#, python-format
+msgid "Edit ${type} Notification Template"
+msgstr "Edit ${type} Email-Vorlage"
+
+msgid "Add Reservation"
+msgstr "Reservation hinzufügen"
+
+msgid "Add Placeholder Reservation"
+msgstr "Platzhalter-Reservation hinzufügen"
+
+#, python-format
+msgid "Reservations for ${event}"
+msgstr "Reservationen für ${event}"
+
+msgid "My Personal Reservations"
+msgstr "Meine persönlichen Reservationen"
+
+#, python-format
+msgid "All Reservations for ${attendee}"
+msgstr "Alle Reservationen für ${attendee}"
+
+msgid "All Reservations"
+msgstr "Alle Reservationen"
+
+msgid "Placeholder"
+msgstr "Platzhalter"
+
+msgid "Manage Reservations"
+msgstr "Reservationen verwalten"
+
+msgid "Do you want to cancel the reservation ?"
+msgstr "Wollen Sie diese Reservation annulieren?"
+
+msgid "Cancel reservation for course event"
+msgstr "Reservation annulieren"
+
+msgid "Mr."
+msgstr "Herr"
+
+msgid "Ms."
+msgstr "Frau"
+
+msgid "Created"
+msgstr "Erstellt"
+
+msgid "Confirmed"
+msgstr "Bestätitgt"
+
+msgid "Canceled"
+msgstr "Abgesagt"
+
+msgid "Planned"
+msgstr "Geplant"
+
+msgid "Info Mail"
+msgstr "Info-EMail"
+
+msgid "Reservation Confirmation"
+msgstr "Reservations-Bestätigung"
+
+msgid "Event Reminder"
+msgstr "Kurs-Erinnerung"
+
+msgid "Cancellation Confirmation"
+msgstr "Absage-Bestätigung"
+
+msgid "Description:"
+msgstr "Beschreibung"
+
+msgid "Salutation:"
+msgstr "Anrede:"
+
+msgid "Your Email:"
+msgstr "Ihre Email:"
+
+msgid "Your Address:"
+msgstr "Ihre Addresse:"
+
+msgid "Reserved upcoming courses:"
+msgstr "Künftige Kurse mit Reservation"
+
+msgid "Total courses to repeat:"
+msgstr "Total Kurs zu Wiederholen"
+
+msgid "Not done but registered:"
+msgstr "Verpasst aber reserviert:"
+
+msgid "Family name, surname"
+msgstr "Nachname, Vorname"
+
+msgid "External"
+msgstr "Extern"
+
+msgid "All Open Reservations"
+msgstr "Alle offenen Reservationen"
+
+msgid "Confirmed Open Reservations"
+msgstr "Bestätigte, offene Reservationen"
+
+msgid "Total Course Events done"
+msgstr "Total aller absolvierten Kursdurchführungen"
+
+msgid "Info:"
+msgstr "Information:"
+
+msgid "Attendees:"
+msgstr "Kursteilnehmer:"
+
+msgid "Reservations:"
+msgstr "Reservationen:"
+
+msgid "Remaining seats:"
+msgstr "Verbleibende Plätze"
+
+msgid "Registered"
+msgstr "Reserviert"
+
+msgid "This course event can't be booked anymore."
+msgstr "Dieser Kurs kann nicht mehr gebucht werden."
+
+msgid "No entries found"
+msgstr "Keine Einträge gefunden"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Date"
+msgstr "Datum"
+
+msgid "Start"
+msgstr "Start"
+
+msgid "End"
+msgstr "Ende"
+
+msgid "Presenter Company"
+msgstr "Referent Firma"
+
+msgid "Refresh"
+msgstr "Wiederholung"
+
+msgid "Free Space"
+msgstr "Freie Plätze"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nein"
+
+msgid "Submit"
+msgstr "Absenden"
+
+msgid "Mail Subject"
+msgstr "Email Betreff"
+
+msgid "Mail Type"
+msgstr "Email-Typ"
+
+msgid "No reservations found."
+msgstr "Keine Reservationen gefunden"
+
+msgid "Course Name"
+msgstr "Kursname"
+
+msgid "Course Status"
+msgstr "Kursstatus"
+
+msgid "Course attended"
+msgstr "Am Kurs teilgenommen"
+
+msgid "Last info mail"
+msgstr "Letztes Info-Mail"
+
+msgid "Send Info Mail"
+msgstr "Sende Info-Email"
+
+msgid "Your changes were saved"
+msgstr "Ihre Änderungen wurden gespeichert"
+
+msgid "Added a new course event"
+msgstr "Neue Kursdurchführung hinzufügen"
+
+msgid "Added a new course"
+msgstr "Neuen Kurs hinzufügen"
+
+msgid "This course has events and can not be deleted"
+msgstr ""
+"Dieser Kurs besitzt bereits Durchführungen und kann nicht gelöscht werden."
+
+msgid "Added a new reservation"
+msgstr "Neue Reservation hinzugefügt"
+
+msgid "Reservation was updated"
+msgstr "Die Reservation wurde aktualisiert"
+
+msgid "Edit Placeholder"
+msgstr "Platzhalter bearbeiten"
+
+msgid "Edit Reservation"
+msgstr "Reservation bearbeiten"
+
+msgid "Added a new placeholder reservation"
+msgstr "Neue Platzhalter-Reservation hinzugefügt"
+
+msgid "New reservation successfully added"
+msgstr "Neue Reservation erfolgreich hinzugefügt"
+
+msgid "Reservation successfully deleted"
+msgstr "Reservation erfolgreich annuliert"

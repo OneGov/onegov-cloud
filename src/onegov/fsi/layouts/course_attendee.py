@@ -29,7 +29,7 @@ class CourseAttendeeCollectionLayout(DefaultLayout):
     def breadcrumbs(self):
         links = super().breadcrumbs
         links.append(
-            Link(_('Manage Attendees'), self.request.link(self.model))
+            Link(_('Manage Course Attendees'), self.request.link(self.model))
         )
         if self.request.view_name == 'add-external':
             links.append(Link(_('Add External Attendee')))
@@ -50,7 +50,7 @@ class CourseAttendeeLayout(DefaultLayout):
         if self.request.is_manager:
             links.append(
                 Link(
-                    _('Manage Attendees'),
+                    _('Manage Course Attendees'),
                     self.request.class_link(CourseAttendeeCollection)
                 )
             )
