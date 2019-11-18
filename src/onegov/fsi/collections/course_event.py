@@ -47,7 +47,7 @@ class CourseEventCollection(GenericCollection, Pagination):
             query = query.filter(CourseEvent.start <= utcnow())
         elif self.upcoming_only:
             query = query.filter(CourseEvent.start >= utcnow())
-        elif self.course_id:
+        if self.course_id:
             query = query.filter(CourseEvent.course_id == self.course_id)
 
         query = query.order_by(desc(CourseEvent.start))
