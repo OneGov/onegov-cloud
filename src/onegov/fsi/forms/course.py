@@ -55,7 +55,7 @@ def months_from_timedelta(td):
     if td:
         assert isinstance(td, datetime.timedelta)
         return td.days // 30
-    return None
+    return 0
 
 
 def months_to_timedelta(integer):
