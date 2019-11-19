@@ -2,7 +2,7 @@ import re
 from collections import OrderedDict
 from datetime import timedelta
 
-from wtforms import StringField, BooleanField
+from wtforms import StringField, BooleanField, TextAreaField
 from wtforms.validators import InputRequired
 from wtforms.widgets import TextInput
 
@@ -123,3 +123,12 @@ class CourseForm(Form):
     def update_model(self, model):
         model.name = self.name.data
         model.description = linkify(self.description.data, escape=False)
+
+
+class InviteCourseForm(Form):
+
+    attendees = TextAreaField(
+        label=_('Attendees'),
+        description=_('Paste a list of email addresses'),
+        render_kw={'rows': 20},
+    )

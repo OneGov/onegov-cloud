@@ -83,6 +83,11 @@ class CourseLayout(DefaultLayout):
                 )
             ),
             Link(
+                _('Invite Attendees'),
+                self.request.link(self.model, name='invite'),
+                attrs={'class': ''}
+            ),
+            Link(
                 _('Edit'),
                 self.request.link(self.model, name='edit'),
                 attrs={'class': 'edit-link'}
@@ -144,3 +149,18 @@ class EditCourseLayout(DefaultLayout):
         )
         breadcrumbs.append(Link(_('Edit')))
         return breadcrumbs
+
+
+class InviteCourseLayout(CourseLayout):
+
+    @cached_property
+    def title(self):
+        return _('Invite Attendees')
+
+    @cached_property
+    def breadcrumbs(self):
+        bread = super().breadcrumbs
+        bread.append(
+            Link(_('Invite Attendees'))
+        )
+        return bread

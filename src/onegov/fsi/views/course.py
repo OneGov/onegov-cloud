@@ -1,10 +1,10 @@
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
-from onegov.fsi.forms.course import CourseForm
+from onegov.fsi.forms.course import CourseForm, InviteCourseForm
 from onegov.fsi import _
 from onegov.fsi.layouts.course import CourseCollectionLayout, CourseLayout, \
-    AddCourseLayout, EditCourseLayout
+    AddCourseLayout, EditCourseLayout, InviteCourseLayout
 
 from onegov.fsi.models.course import Course
 
@@ -77,6 +77,26 @@ def view_edit_course_event(self, request, form):
         'layout': layout,
         'model': self,
         'form': form
+    }
+
+
+@FsiApp.form(
+    model=Course,
+    template='form.pt',
+    form=InviteCourseForm,
+    name='invite')
+def invite_attendees_for_event(self, request, form):
+    layout = InviteCourseLayout(self, request)
+
+    if form.submitted(request):
+        pass
+
+    return {
+        'layout': layout,
+        'model': self,
+        'form': form,
+        'button_text': _('Send Invitation')
+
     }
 
 
