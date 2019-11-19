@@ -1,8 +1,10 @@
+import datetime
+import math
 import re
 from collections import OrderedDict
 from datetime import timedelta
 
-from wtforms import StringField, BooleanField, TextAreaField
+from wtforms import StringField, BooleanField, TextAreaField, IntegerField
 from wtforms.validators import InputRequired
 from wtforms.widgets import TextInput
 
@@ -51,6 +53,20 @@ def datetime_to_string(dt):
     return None
 
 
+def months_from_timedelta(td):
+    if td:
+        assert isinstance(td, datetime.timedelta)
+        return td.days // 30
+    return None
+
+
+def months_to_timedelta(integer):
+    if integer:
+        assert isinstance(integer, int)
+        return datetime.timedelta(days=integer * 30)
+    return None
+
+
 class IntervalStringField(StringField):
     """To handle incoming data from python, override process_data.
     Similarly, to handle incoming data from the outside,
@@ -81,7 +97,6 @@ class IntervalStringField(StringField):
 
 
 class CourseForm(Form):
-
     # Course info
     name = StringField(
         label=_('Short Description'),
@@ -104,9 +119,10 @@ class CourseForm(Form):
         default=False
     )
 
-    refresh_interval = IntervalStringField(
-        label=_('Refresh Interval'),
-        description=_('e.g. 5 years of 1 month a')
+    refresh_interval = IntegerField(
+        label=_('Refresh Interval (months)'),
+        description=_('Number of months'),
+        depends_on=('mandatory_refresh', 'y')
     )
 
     def get_useful_data(self, exclude={'csrf_token'}):
@@ -114,19 +130,32 @@ class CourseForm(Form):
         if self.description.data:
             result['description'] = linkify(
                 self.description.data, escape=False)
+
+        if self.refresh_interval.data:
+            result['refresh_interval'] = months_to_timedelta(
+                self.refresh_interval.data)
+
         return result
 
     def apply_model(self, model):
         self.name.data = model.name
         self.description.data = model.description
+        self.mandatory_refresh.data = model.mandatory_refresh
+        self.refresh_interval.data = months_from_timedelta(
+            model.refresh_interval)
 
     def update_model(self, model):
         model.name = self.name.data
         model.description = linkify(self.description.data, escape=False)
+        model.mandatory_refresh = self.mandatory_refresh.data
+        if not model.mandatory_refresh:
+            model.refresh_interval = None
+        else:
+            model.refresh_interval = months_to_timedelta(
+            self.refresh_interval.data)
 
 
 class InviteCourseForm(Form):
-
     attendees = TextAreaField(
         label=_('Attendees'),
         description=_('Paste a list of email addresses'),
