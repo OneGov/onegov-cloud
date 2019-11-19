@@ -158,7 +158,7 @@ class EditCourseLayout(DefaultLayout):
         return breadcrumbs
 
 
-class InviteCourseLayout(CourseLayout):
+class InviteCourseLayout(DefaultLayout):
 
     @cached_property
     def title(self):
@@ -171,6 +171,12 @@ class InviteCourseLayout(CourseLayout):
     @cached_property
     def breadcrumbs(self):
         bread = super().breadcrumbs
+        bread.append(
+            Link(_('Courses'), self.request.class_link(CourseCollection))
+        )
+        bread.append(
+            Link(self.model.name, self.request.link(self.model))
+        )
         bread.append(
             Link(_('Invite Attendees'))
         )
