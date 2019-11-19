@@ -46,12 +46,19 @@ class CourseCollectionLayout(DefaultLayout):
                 title=c.name,
                 content=c.description,
                 url=self.request.link(c),
-                edit_url=self.request.link(c, name='edit')
+                edit_url=self.request.link(c, name='edit'),
+                events_url=self.request.link(
+                    CourseEventCollection(
+                        self.request.session,
+                        course_id=c.id,
+                        upcoming_only=True
+                    )
+                )
             ) for c in self.model.query()
         )
 
 
-class CourseLayout(DefaultLayout):
+class CourseLayout(CourseCollectionLayout):
 
     @cached_property
     def event_collection(self):

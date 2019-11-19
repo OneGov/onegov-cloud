@@ -7,9 +7,21 @@
             <div class="columns small-12">
                 <div class="row">
                     <div class="columns small-12">
-                        <tal:b tal:condition="model|nothing">
-                            <p><strong i18n:translate="">Description:</strong></p>
+                        <tal:b tal:condition="model|nothing" tal:define="events model.events.all()">
+                            <h3 i18n:translate="">Description:</h3>
                             <p tal:content="structure model.description_html"></p>
+                            <h3 i18n:translate="">Events</h3>
+
+                            <tal:b tal:switch="not: events">
+                                <tal:b tal:case="False">
+                                    <ul>
+                                        <tal:b tal:repeat="event events">
+                                            <li><a href="${request.link(event)}">${layout.format_date(event.start, 'date')}</a></li>
+                                        </tal:b>
+                                    </ul>
+                                </tal:b>
+                                <p tal:case="True">No entries found</p>
+                            </tal:b>
                         </tal:b>
                     </div>
                 </div>

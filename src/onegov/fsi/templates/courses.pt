@@ -16,8 +16,12 @@
                                             <a href="${'#'+ accordion_id}">+ <strong>${item['title']}</strong></a>
                                             <div id="${accordion_id}" class="content">
                                                 <div tal:content="structure item['content']"/>
-                                                <span tal:condition="request.is_manager and item['edit_url']|nothing"><a href="${item['edit_url']}" class="tiny button secondary">Edit</a></span>
+                                                <p>
+                                                    <span i18n:translate="">Go to</span>
+                                                    <a href="${item['events_url']}" i18n:translate="">course events...</a>
+                                                </p>
                                                 <span tal:condition="item['url']|nothing"><a href="${item['url']}" class="tiny button hollow">Details</a></span>
+                                                <span tal:condition="request.is_manager and item['edit_url']|nothing"><a href="${item['edit_url']}" class="tiny button secondary">Edit</a></span>
                                             </div>
                                         </dd>
                                     </tal:b>
