@@ -120,4 +120,4 @@ def view_add_from_course_event(self, request):
 def view_delete_reservation(self, request):
     request.assert_valid_csrf_token()
     ReservationCollection(request.session).delete(self)
-    request.success(_('Reservation successfully deleted'))
+    request.success(_('Subscription successfully deleted'))
