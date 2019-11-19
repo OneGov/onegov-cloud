@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-11-18 14:23+0100\n"
+"POT-Creation-Date: 2019-11-19 10:52+0100\n"
 "PO-Revision-Date: 2019-11-18 13:57+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -17,8 +17,8 @@ msgstr ""
 msgid "Reminder for course: ${name}"
 msgstr "Erinnerung für Kurs: ${name}"
 
-msgid "Attendee Profile"
-msgstr "Profil Kursteilnehmer"
+msgid "Profile"
+msgstr "Profile"
 
 msgid "User Profile"
 msgstr "Benutzer-Profile"
@@ -36,10 +36,10 @@ msgid "Settings"
 msgstr "Einstellungen"
 
 msgid "Attendees"
-msgstr "Kursteilnehmer"
+msgstr "Teilnehmer"
 
-msgid "Reservations"
-msgstr "Reservationen"
+msgid "Event Subscriptions"
+msgstr "Kursanmeldungen"
 
 msgid "Users"
 msgstr "Benutzer"
@@ -47,8 +47,8 @@ msgstr "Benutzer"
 msgid "Management"
 msgstr "Verwaltung"
 
-msgid "Reservation"
-msgstr "Reservation"
+msgid "Event Subscription"
+msgstr "Kursanmeldung"
 
 msgid "Login"
 msgstr "Einloggen"
@@ -59,9 +59,6 @@ msgstr "Registrieren"
 msgid "Courses"
 msgstr "Kurse"
 
-msgid "Upcoming Course Events"
-msgstr "Nächste Kursdurchführungen"
-
 msgid "Short Description"
 msgstr "Kurzbeschreibung"
 
@@ -70,6 +67,18 @@ msgstr "Beschreibung"
 
 msgid "Enter all information to the course here"
 msgstr "Geben sie hier alle Kursinformationen ein"
+
+msgid "Refresh mandatory"
+msgstr "Wiederholdung obgligatorisch"
+
+msgid "Refresh Interval"
+msgstr "Wiederholdungs-Intervall"
+
+msgid "e.g. 5 years of 1 month a"
+msgstr "z.B. 5 Jahre"
+
+msgid "Paste a list of email addresses"
+msgstr "Füge eine Liste von E-Mail-Addressen ein"
 
 msgid "Salutation"
 msgstr "Anrede"
@@ -101,23 +110,20 @@ msgstr "Firma"
 msgid "Presenter Email"
 msgstr "Referent Email"
 
-msgid "Refresh mandatory"
-msgstr "Wiederholdung obgligatorisch"
-
 msgid "Hidden"
 msgstr "Versteckt"
-
-msgid "Refresh Interval"
-msgstr "Wiederholdungs-Intervall"
-
-msgid "e.g. 5 years of 1 month a"
-msgstr "z.B. 5 Jahre"
 
 msgid "Course Start"
 msgstr "Kurs-Start"
 
 msgid "Course End"
 msgstr "Kurs-Ende"
+
+msgid "Location"
+msgstr "Kurslokal"
+
+msgid "Address and Room"
+msgstr ""
 
 msgid "Attendees min"
 msgstr "Teilnehmer min"
@@ -135,7 +141,7 @@ msgid "Email Text"
 msgstr "Email Inhalt"
 
 msgid "Attendee"
-msgstr "Kursteilnehmer"
+msgstr "Teilnehmer"
 
 msgid "Course Event"
 msgstr "Kursdurchführung"
@@ -146,20 +152,17 @@ msgstr "Platzhalter-Beschreibung (optional)"
 msgid "None"
 msgstr "Keine"
 
-msgid "Course management"
-msgstr "Kursverwltung"
-
 msgid "Add Course"
 msgstr "Kurs hinzufügen"
 
 msgid "Add"
 msgstr "Hinzufügen"
 
-msgid "New Course"
-msgstr "Neuer Kurs"
-
 msgid "Event"
 msgstr "Kursdurchführung"
+
+msgid "Invite Attendees"
+msgstr "Teilnehmer einladen"
 
 msgid "Edit"
 msgstr "Editieren"
@@ -183,10 +186,10 @@ msgid "Edit Course"
 msgstr "Kurs editieren"
 
 msgid "Add External Attendee"
-msgstr "Externen Kursteilnehmer hinzufügen"
+msgstr "Externen Teilnehmer hinzufügen"
 
 msgid "Manage Course Attendees"
-msgstr "Kursteilnehmer verwalten"
+msgstr "Teilnehmer verwalten"
 
 msgid "Edit Profile"
 msgstr "Profil editieren"
@@ -197,14 +200,11 @@ msgstr "Profil Details"
 msgid "Personal Profile"
 msgstr "Persönliches Profil"
 
+msgid "Past Course Events"
+msgstr "Vergangene Durchführungen"
+
 msgid "Course Events"
 msgstr "Kursdurchführungen"
-
-msgid "Course Event management"
-msgstr "Verwaltung Kursdurchführungen"
-
-msgid "Add Course Event"
-msgstr "Kursdurchführung hinzufügen"
 
 msgid "Course Event Details"
 msgstr "Details Kursdurchführung"
@@ -212,14 +212,14 @@ msgstr "Details Kursdurchführung"
 msgid "Duplicate"
 msgstr "Duplizieren"
 
-msgid "Reservation for External"
-msgstr "Reservationen Externe"
+msgid "External Attendee"
+msgstr "Externer Teilnehmer"
 
-msgid "Placeholder Reservation"
-msgstr "Platzhalter-Reservation"
+msgid "Placeholder"
+msgstr "Platzhalter"
 
-msgid "New Course Event"
-msgstr "Neue Kursdurchführung"
+msgid "Subscriptions"
+msgstr "Anmeldungen"
 
 msgid "Do you really want to delete this course event ?"
 msgstr "Wollen Sie diese Kursdurchführung wirklich löschen?"
@@ -230,8 +230,8 @@ msgstr "Verwalten"
 msgid "Email Templates"
 msgstr "Email-Vorlagen"
 
-msgid "Make Reservation"
-msgstr "Reservieren"
+msgid "Subscribe"
+msgstr "Anmelden"
 
 msgid "Do you want to register for this course event ?"
 msgstr "Wollen Sie sich für diesen Kurs anmelden?"
@@ -246,6 +246,9 @@ msgid "Edit course event"
 msgstr "Kursdurchführung editieren"
 
 msgid "Add course event"
+msgstr "Kursdurchführung hinzufügen"
+
+msgid "Add Course Event"
 msgstr "Kursdurchführung hinzufügen"
 
 msgid "Duplicate course event"
@@ -265,31 +268,31 @@ msgstr "${type} Email-Vorlage"
 msgid "Edit ${type} Notification Template"
 msgstr "Edit ${type} Email-Vorlage"
 
-msgid "Add Reservation"
-msgstr "Reservation hinzufügen"
+msgid "Add Attendee"
+msgstr "Teilnehmer hinzufügen"
 
-msgid "Add Placeholder Reservation"
-msgstr "Platzhalter-Reservation hinzufügen"
-
-#, python-format
-msgid "Reservations for ${event}"
-msgstr "Reservationen für ${event}"
-
-msgid "My Personal Reservations"
-msgstr "Meine persönlichen Reservationen"
+msgid "Add Placeholder"
+msgstr "Platzhalter hinzufügen"
 
 #, python-format
-msgid "All Reservations for ${attendee}"
-msgstr "Alle Reservationen für ${attendee}"
+msgid "Attendees Event ${event}"
+msgstr "Teilnehmer Durchführung ${event}"
 
-msgid "All Reservations"
-msgstr "Alle Reservationen"
+msgid "My Event Subscriptions"
+msgstr "Meine Kursanmeldungen"
 
-msgid "Placeholder"
-msgstr "Platzhalter"
+#, python-format
+msgid "All event subscriptions for ${attendee}"
+msgstr "Alle Kursanmeldungen für ${attendee}"
 
-msgid "Manage Reservations"
-msgstr "Reservationen verwalten"
+msgid "All Event Subscriptions"
+msgstr "Alle Kursanmeldungen"
+
+msgid "Reservation"
+msgstr "Reservation"
+
+msgid "Course Subscriptions"
+msgstr "Kursanmeldungen"
 
 msgid "Do you want to cancel the reservation ?"
 msgstr "Wollen Sie diese Reservation annulieren?"
@@ -330,6 +333,9 @@ msgstr "Absage-Bestätigung"
 msgid "Description:"
 msgstr "Beschreibung"
 
+msgid "Events"
+msgstr "Durchführungen"
+
 msgid "Salutation:"
 msgstr "Anrede:"
 
@@ -363,16 +369,13 @@ msgstr "Bestätigte, offene Reservationen"
 msgid "Total Course Events done"
 msgstr "Total aller absolvierten Kursdurchführungen"
 
-msgid "Info:"
-msgstr "Information:"
+msgid "Details"
+msgstr "Details"
 
-msgid "Attendees:"
-msgstr "Kursteilnehmer:"
+msgid "Date"
+msgstr "Datum"
 
-msgid "Reservations:"
-msgstr "Reservationen:"
-
-msgid "Remaining seats:"
+msgid "Remaining seats"
 msgstr "Verbleibende Plätze"
 
 msgid "Registered"
@@ -384,12 +387,6 @@ msgstr "Dieser Kurs kann nicht mehr gebucht werden."
 msgid "No entries found"
 msgstr "Keine Einträge gefunden"
 
-msgid "Name"
-msgstr "Name"
-
-msgid "Date"
-msgstr "Datum"
-
 msgid "Start"
 msgstr "Start"
 
@@ -399,17 +396,14 @@ msgstr "Ende"
 msgid "Presenter Company"
 msgstr "Referent Firma"
 
-msgid "Refresh"
-msgstr "Wiederholung"
-
 msgid "Free Space"
 msgstr "Freie Plätze"
 
-msgid "Yes"
-msgstr "Ja"
+msgid "Go to"
+msgstr "Gehe zu"
 
-msgid "No"
-msgstr "Nein"
+msgid "course events..."
+msgstr "Kursdurchführungen..."
 
 msgid "Submit"
 msgstr "Absenden"
@@ -447,12 +441,18 @@ msgstr "Neue Kursdurchführung hinzufügen"
 msgid "Added a new course"
 msgstr "Neuen Kurs hinzufügen"
 
+msgid "Send Invitation"
+msgstr "Sende Einladung"
+
 msgid "This course has events and can not be deleted"
 msgstr ""
 "Dieser Kurs besitzt bereits Durchführungen und kann nicht gelöscht werden."
 
 msgid "Added a new reservation"
 msgstr "Neue Reservation hinzugefügt"
+
+msgid "Add Reservation"
+msgstr "Reservation hinzufügen"
 
 msgid "Reservation was updated"
 msgstr "Die Reservation wurde aktualisiert"
@@ -463,11 +463,92 @@ msgstr "Platzhalter bearbeiten"
 msgid "Edit Reservation"
 msgstr "Reservation bearbeiten"
 
-msgid "Added a new placeholder reservation"
-msgstr "Neue Platzhalter-Reservation hinzugefügt"
+msgid "Placeholder Reservation"
+msgstr "Platzhalter-Reservation"
 
-msgid "New reservation successfully added"
-msgstr "Neue Reservation erfolgreich hinzugefügt"
+msgid "Added a new placeholder"
+msgstr "Platzhalter hinzugefügt"
 
-msgid "Reservation successfully deleted"
-msgstr "Reservation erfolgreich annuliert"
+msgid "Add Placeholder Reservation"
+msgstr "Platzhalter-Reservation hinzufügen"
+
+msgid "New subscription successfully added"
+msgstr "Neue Anmeldungen erfasst"
+
+msgid "Subscription successfully deleted"
+msgstr "Anmeldung erfolgreich gelöscht"
+
+#~ msgid "Reservation successfully deleted"
+#~ msgstr "Reservation erfolgreich annuliert"
+
+#~ msgid "Info:"
+#~ msgstr "Information:"
+
+#~ msgid "Attendees:"
+#~ msgstr "Teilnehmer:"
+
+#~ msgid "Reservations:"
+#~ msgstr "Reservationen:"
+
+#~ msgid "Remaining seats:"
+#~ msgstr "Verbleibende Plätze"
+
+#~ msgid "Upcoming Course Events"
+#~ msgstr "Nächste Kursdurchführungen"
+
+#~ msgid "Course management"
+#~ msgstr "Kursverwaltung"
+
+#~ msgid "Course Event management"
+#~ msgstr "Verwaltung Kursdurchführungen"
+
+#~ msgid "Reservation for External"
+#~ msgstr "Reservationen Externe"
+
+#~ msgid "Reservations"
+#~ msgstr "Reservationen"
+
+#~ msgid "Make Reservation"
+#~ msgstr "Reservieren"
+
+#~ msgid "All Reservations"
+#~ msgstr "Alle Reservationen"
+
+#~ msgid "Manage Reservations"
+#~ msgstr "Reservationen verwalten"
+
+#~ msgid "Name"
+#~ msgstr "Name"
+
+#~ msgid "Refresh"
+#~ msgstr "Wiederholung"
+
+#~ msgid "Yes"
+#~ msgstr "Ja"
+
+#~ msgid "No"
+#~ msgstr "Nein"
+
+#~ msgid "Added a new placeholder reservation"
+#~ msgstr "Neue Platzhalter-Reservation hinzugefügt"
+
+#~ msgid "New reservation successfully added"
+#~ msgstr "Neue Reservation erfolgreich hinzugefügt"
+
+#~ msgid "Reservations for ${event}"
+#~ msgstr "Reservationen für ${event}"
+
+#~ msgid "My Personal Reservations"
+#~ msgstr "Meine persönlichen Reservationen"
+
+#~ msgid "All Reservations for ${attendee}"
+#~ msgstr "Alle Reservationen für ${attendee}"
+
+#~ msgid "New Course"
+#~ msgstr "Neuer Kurs"
+
+#~ msgid "New Course Event"
+#~ msgstr "Neue Kursdurchführung"
+
+#~ msgid "Attendee Profile"
+#~ msgstr "Profil Teilnehmer"
