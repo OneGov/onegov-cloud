@@ -146,6 +146,8 @@ class CourseEventLayout(DefaultLayout):
                     ),
                 )
             ),
+            Link(_('Subscriptions'),
+                 self.request.link(self.reservation_collection)),
             Link(
                 _('Edit'),
                 self.request.link(self.model, name='edit'),
@@ -176,8 +178,6 @@ class CourseEventLayout(DefaultLayout):
             LinkGroup(_('Manage'), links=(
                 Link(_('Email Templates'),
                      self.request.link(self.template_collection)),
-                Link(_('Subscriptions'),
-                     self.request.link(self.reservation_collection))
             )),
         ]
 
