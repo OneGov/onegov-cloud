@@ -24,7 +24,7 @@ def get_base_tools(request):
                 attrs={'class': 'profile'}
             )
         ] if usr else []
-        if request.is_manager:
+        if request.is_admin:
             profile_links.append(
                 Link(
                     _("User Profile"),
