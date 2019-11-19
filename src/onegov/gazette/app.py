@@ -156,6 +156,9 @@ def get_frameworks_asset():
     yield 'sortable_custom.js'
     yield 'dropzone.js'
 
+    # utils
+    yield 'url.js'
+
 
 @GazetteApp.webasset('common')
 def get_common_asset():

@@ -10,6 +10,7 @@ from onegov.gazette.models.notice import GazetteNoticeChange
 from onegov.notice import OfficialNoticeCollection
 from onegov.user import User
 from onegov.user import UserGroup
+from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy import or_
 from sqlalchemy import String
@@ -398,12 +399,12 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         session = self.session
 
         used = session.query(GazetteNotice._issues.keys().label('list'))
-        used = list(set([value for item in used for value in item.list]))
+        used = list(set(value for item in used for value in item.list))
 
         result = session.query(Issue)
         result = result.filter(Issue.name.in_(used))
-        result = result.order_by(Issue.name)
-        return result.all()
+        result = result.order_by(desc(Issue.date))
+        return tuple(result)
 
     @property
     def used_organizations(self):
@@ -412,12 +413,12 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         session = self.session
 
         used = session.query(GazetteNotice._organizations.keys().label('list'))
-        used = list(set([value for item in used for value in item.list]))
+        used = list(set(value for item in used for value in item.list))
 
         result = session.query(Organization)
         result = result.filter(Organization.name.in_(used))
         result = result.order_by(Organization.title)
-        return result.all()
+        return tuple(result)
 
     @property
     def used_categories(self):
@@ -426,9 +427,9 @@ class GazetteNoticeCollection(OfficialNoticeCollection):
         session = self.session
 
         used = session.query(GazetteNotice._categories.keys().label('list'))
-        used = list(set([value for item in used for value in item.list]))
+        used = list(set(value for item in used for value in item.list))
 
         result = session.query(Category)
         result = result.filter(Category.name.in_(used))
         result = result.order_by(Category.title)
-        return result.all()
+        return tuple(result)
