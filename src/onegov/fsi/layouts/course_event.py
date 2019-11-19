@@ -144,12 +144,6 @@ class CourseEventLayout(DefaultLayout):
                         ),
                         attrs={'class': 'add-icon'}
                     ),
-                    Link(
-                        _("Course Event"),
-                        self.request.class_link(
-                            CourseEventCollection, name='add'),
-                        attrs={'class': 'add-icon'}
-                    ),
                 )
             ),
             Link(
