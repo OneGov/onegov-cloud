@@ -268,7 +268,9 @@ def db_mock_session(course_event, attendee):
         course_event_ = course_event(session)
 
         placeholder = Reservation(
-            dummy_desc='Placeholder', id=uuid4(), course_event_id=course_event_[0].id)
+            dummy_desc='Placeholder',
+            id=uuid4(),
+            course_event_id=course_event_[0].id)
         # Create Reservations
         user_res = Reservation(
             attendee_id=attendee_[0].id,
