@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-11-19 10:52+0100\n"
+"POT-Creation-Date: 2019-11-19 12:25+0100\n"
 "PO-Revision-Date: 2019-11-18 13:57+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -71,11 +71,11 @@ msgstr "Geben sie hier alle Kursinformationen ein"
 msgid "Refresh mandatory"
 msgstr "Wiederholdung obgligatorisch"
 
-msgid "Refresh Interval"
-msgstr "Wiederholdungs-Intervall"
+msgid "Refresh Interval (months)"
+msgstr "Wiederholungsintervall (in Montaten)"
 
-msgid "e.g. 5 years of 1 month a"
-msgstr "z.B. 5 Jahre"
+msgid "Number of months"
+msgstr "Anzahl Monate"
 
 msgid "Paste a list of email addresses"
 msgstr "Füge eine Liste von E-Mail-Addressen ein"
@@ -123,7 +123,7 @@ msgid "Location"
 msgstr "Kurslokal"
 
 msgid "Address and Room"
-msgstr ""
+msgstr "Addresse und Kursraum"
 
 msgid "Attendees min"
 msgstr "Teilnehmer min"
@@ -288,8 +288,8 @@ msgstr "Alle Kursanmeldungen für ${attendee}"
 msgid "All Event Subscriptions"
 msgstr "Alle Kursanmeldungen"
 
-msgid "Reservation"
-msgstr "Reservation"
+msgid "Subscription"
+msgstr "Anmeldung"
 
 msgid "Course Subscriptions"
 msgstr "Kursanmeldungen"
@@ -335,6 +335,9 @@ msgstr "Beschreibung"
 
 msgid "Events"
 msgstr "Durchführungen"
+
+msgid "No entries found"
+msgstr "Keine Einträge gefunden"
 
 msgid "Salutation:"
 msgstr "Anrede:"
@@ -384,9 +387,6 @@ msgstr "Reserviert"
 msgid "This course event can't be booked anymore."
 msgstr "Dieser Kurs kann nicht mehr gebucht werden."
 
-msgid "No entries found"
-msgstr "Keine Einträge gefunden"
-
 msgid "Start"
 msgstr "Start"
 
@@ -414,9 +414,6 @@ msgstr "Email Betreff"
 msgid "Mail Type"
 msgstr "Email-Typ"
 
-msgid "No reservations found."
-msgstr "Keine Reservationen gefunden"
-
 msgid "Course Name"
 msgstr "Kursname"
 
@@ -440,6 +437,9 @@ msgstr "Neue Kursdurchführung hinzufügen"
 
 msgid "Added a new course"
 msgstr "Neuen Kurs hinzufügen"
+
+msgid "Update"
+msgstr "Aktualisieren"
 
 msgid "Send Invitation"
 msgstr "Sende Einladung"
@@ -477,6 +477,18 @@ msgstr "Neue Anmeldungen erfasst"
 
 msgid "Subscription successfully deleted"
 msgstr "Anmeldung erfolgreich gelöscht"
+
+#~ msgid "Refresh Interval"
+#~ msgstr "Wiederholdungs-Intervall"
+
+#~ msgid "e.g. 5 years of 1 month a"
+#~ msgstr "z.B. 5 Jahre"
+
+#~ msgid "Reservation"
+#~ msgstr "Reservation"
+
+#~ msgid "No reservations found."
+#~ msgstr "Keine Reservationen gefunden"
 
 #~ msgid "Reservation successfully deleted"
 #~ msgstr "Reservation erfolgreich annuliert"
