@@ -20,7 +20,7 @@
                                         </tal:b>
                                     </ul>
                                 </tal:b>
-                                <p tal:case="True">No entries found</p>
+                                <p tal:case="True" i18n:translate="">No entries found</p>
                             </tal:b>
                         </tal:b>
                     </div>

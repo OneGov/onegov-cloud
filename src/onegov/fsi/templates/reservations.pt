@@ -7,7 +7,7 @@
             <div class="columns small-12">
                 <div class="row">
                     <div class="columns small-12">
-                        <strong tal:condition="not: reservations" i18n:translate="">No reservations found.</strong>
+                        <strong tal:condition="not: reservations" i18n:translate="">No entries found</strong>
                         <tal:b tal:condition="reservations|nothing">
                                 <table class="hover">
                                     <thead>

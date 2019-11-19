@@ -37,7 +37,7 @@ class ReservationCollectionLayout(DefaultLayout):
                 title=_('Add'),
                 links=[
                     Link(
-                        _('Reservation'),
+                        _('Subscription'),
                         self.request.link(self.model, name='add'),
                         attrs={'class': 'add-icon'}
                     ),
