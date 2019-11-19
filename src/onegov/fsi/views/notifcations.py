@@ -58,7 +58,8 @@ def view_edit_notification(self, request, form):
         'title': layout.title,
         'model': self,
         'layout': layout,
-        'form': form
+        'form': form,
+        'button_text': _('Update')
     }
 
 # @FsiApp.form(

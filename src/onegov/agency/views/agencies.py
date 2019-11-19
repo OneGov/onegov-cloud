@@ -192,7 +192,9 @@ def edit_agency(self, request, form):
     return {
         'layout': layout,
         'title': self.title,
-        'form': form
+        'form': form,
+        'button_text': _('Update')
+
     }
 
 

@@ -76,7 +76,8 @@ def view_edit_course_event(self, request, form):
     return {
         'layout': layout,
         'model': self,
-        'form': form
+        'form': form,
+        'button_text': _('Update')
     }
 
 

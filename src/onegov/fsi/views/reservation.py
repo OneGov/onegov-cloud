@@ -68,7 +68,8 @@ def view_edit_reservation(self, request, form):
         'title': title,
         'model': self,
         'layout': layout,
-        'form': form
+        'form': form,
+        'button_text': _('Update')
     }
 
 
