@@ -98,16 +98,14 @@ class CourseEventLayout(DefaultLayout):
         """ Returns the breadcrumbs for the detail page. """
         links = super().breadcrumbs
         links.append(
-            Link(self.model.course.name,
-                 self.request.link(self.model.course)
-        ))
-        links.append(
-            Link(_('Course Events'),
-                 self.request.class_link(CourseEventCollection))
+            Link(
+                self.model.course.name,
+                self.request.link(self.model.course)
+            )
         )
         links.append(
             Link(
-                self.format_date(self.model.start, 'date'),
+                self.format_date(self.model.start, 'date_long'),
                 self.request.link(self.model))
         )
         return links
@@ -121,11 +119,6 @@ class CourseEventLayout(DefaultLayout):
                 title=_('Add'),
                 links=(
                     Link(
-                        _('Duplicate'),
-                        self.request.link(self.model, name='duplicate'),
-                        attrs={'class': 'new-link'}
-                    ),
-                    Link(
                         _('External Attendee'),
                         self.request.link(
                             ReservationCollection(
@@ -134,7 +127,7 @@ class CourseEventLayout(DefaultLayout):
                                 external_only=True),
                             name='add'
                         ),
-                        attrs={'class': 'new-link'}
+                        attrs={'class': 'add-external'}
                     ),
                     Link(
                         _("Placeholder"),
@@ -142,18 +135,25 @@ class CourseEventLayout(DefaultLayout):
                             self.reservation_collection,
                             name='add-placeholder'
                         ),
-                        attrs={'class': 'add-icon'}
+                        attrs={'class': 'add-placeholder'}
                     ),
                 )
             ),
-            Link(_('Subscriptions'),
-                 self.request.link(self.reservation_collection)),
+            Link(
+                _('Attendees'),
+                self.request.link(self.reservation_collection),
+                attrs={'class': 'reservations'}
+            ),
             Link(
                 _('Edit'),
                 self.request.link(self.model, name='edit'),
                 attrs={'class': 'edit-link'}
             ),
-
+            Link(
+                _('Duplicate'),
+                self.request.link(self.model, name='duplicate'),
+                attrs={'class': 'duplicate-link'}
+            ),
             Link(
                 _('Delete'),
                 self.csrf_protected_url(
@@ -176,8 +176,11 @@ class CourseEventLayout(DefaultLayout):
                 )
             ),
             LinkGroup(_('Manage'), links=(
-                Link(_('Email Templates'),
-                     self.request.link(self.template_collection)),
+                Link(
+                    _('Email Templates'),
+                    self.request.link(self.template_collection),
+                    attrs={'class': 'email-link'}
+                ),
             )),
         ]
 

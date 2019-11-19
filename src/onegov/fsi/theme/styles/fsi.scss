@@ -1,6 +1,46 @@
 // Removes margin for button inside a table td
 td {
-  a.button, button.button, div.switch, fieldset.switch {
-     margin: 0;
-  }
+    a.button,
+    button.button,
+    div.switch,
+    fieldset.switch {
+        margin: 0;
+    }
+}
+
+/*
+    Accordion adjustments
+*/
+dd.accordion-navigation + dd.accordion-navigation {
+    margin-top: 1rem;
+}
+
+/*
+    Edit-bar icons
+*/
+.edit-bar {
+    .add-icon::before { @include icon('\f067'); }
+    .invite-attendees::before { @include icon('\f0a1'); }
+    .new-event::before { @include icon('\f133'); }
+    .reservations::before { @include icon('\f1ae'); }
+    .add-external::before { @include icon('\f14c'); }
+    .email-link::before { @include icon('\f003'); }
+    .duplicate-link::before { @include icon('\f24d'); }
+    .add-placeholder::before { @include icon('\f2c0'); }
+}
+
+/*
+    Global tool icons
+*/
+.globals {
+    .attendees::before { @include icon('\f1ae'); }
+    .reservations::before { @include icon('\f19d'); }
+}
+
+/*
+    Events table
+*/
+.events-table {
+    border: 1px solid $gray-light;
+    border-width: 1px 1px 0;
 }

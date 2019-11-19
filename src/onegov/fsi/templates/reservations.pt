@@ -9,7 +9,7 @@
                     <div class="columns small-12">
                         <strong tal:condition="not: reservations" i18n:translate="">No entries found</strong>
                         <tal:b tal:condition="reservations|nothing">
-                                <table class="hover">
+                                <table class="hover" style="width: 100%">
                                     <thead>
                                         <th i18n:translate="">Attendee</th>
                                         <th i18n:translate="" tal:condition="not: layout.model.course_event_id">Course Name</th>
@@ -29,13 +29,13 @@
 
                                                 <td>
                                                     <div tal:condition="not: reservation.is_placeholder" class="switch round tiny confirmation-switch" tal:define="switch_id 'confirmation-switch-{}'.format(repeat.reservation.number)">
-                                                      <input tal:attributes="disabled python: layout.course_event and not layout.course_event.is_past" id="${switch_id}" type="checkbox" name="testGroup">
+                                                      <input id="${switch_id}" type="checkbox" name="testGroup">
                                                       <label for="${switch_id}"></label>
                                                     </div>
                                                 </td>
 
 
-                                                <td tal:define="sent reservation.info_sent">${layout.format_date(sent, 'date') if sent else '-'}</td>
+                                                <td tal:define="sent reservation.info_sent">${layout.format_date(sent, 'date') if sent else ''}</td>
                                                 <td>
                                                     <tal:b tal:switch="reservation.course_event.is_past">
                                                         <metal:b tal:case="False" tal:define="item reservation" use-macro="layout.macros['intercooler_btn_for_item']"/>

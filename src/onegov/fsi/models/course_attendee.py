@@ -130,11 +130,17 @@ class CourseAttendee(Base):
             course event in the range of the refresh interval?
 
         """
-        from onegov.fsi.models.course_event import CourseEvent      # circular
-        from onegov.fsi.models.reservation import Reservation       # circular
+
+        # circular imports
+        from onegov.fsi.models.course import Course
+        from onegov.fsi.models.course_event import CourseEvent
+        from onegov.fsi.models.reservation import Reservation
 
         session = object_session(self)
-        result = session.query(CourseEvent).filter_by(mandatory_refresh=True)
+
+        result = session.query(CourseEvent).join(Course)\
+            .filter(Course.mandatory_refresh == True)
+
         result = result.join(Reservation)
         result = result.filter(Reservation.attendee_id == self.id)
         result = result.filter(Reservation.event_completed == True)

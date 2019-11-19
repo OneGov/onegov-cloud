@@ -1,17 +1,15 @@
 import datetime
-import math
 import re
+
 from collections import OrderedDict
 from datetime import timedelta
-
-from wtforms import StringField, BooleanField, TextAreaField, IntegerField
-from wtforms.validators import InputRequired
-from wtforms.widgets import TextInput
-
 from onegov.core.utils import linkify
 from onegov.form import Form
 from onegov.form.fields import HtmlField
 from onegov.fsi import _
+from wtforms import StringField, BooleanField, TextAreaField, IntegerField
+from wtforms.validators import InputRequired
+from wtforms.widgets import TextInput
 
 mapping = OrderedDict({'year': 365, 'month': 30, 'week': 7, 'day': 1})
 
@@ -107,7 +105,6 @@ class CourseForm(Form):
 
     description = HtmlField(
         label=_('Description'),
-        description=_('Enter all information to the course here'),
         validators=[
             InputRequired()
         ],
@@ -122,7 +119,8 @@ class CourseForm(Form):
     refresh_interval = IntegerField(
         label=_('Refresh Interval (months)'),
         description=_('Number of months'),
-        depends_on=('mandatory_refresh', 'y')
+        depends_on=('mandatory_refresh', 'y'),
+        default=12,
     )
 
     def get_useful_data(self, exclude={'csrf_token'}):
@@ -152,7 +150,7 @@ class CourseForm(Form):
             model.refresh_interval = None
         else:
             model.refresh_interval = months_to_timedelta(
-            self.refresh_interval.data)
+                self.refresh_interval.data)
 
 
 class InviteCourseForm(Form):

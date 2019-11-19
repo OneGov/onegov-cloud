@@ -7,14 +7,39 @@
             <div class="columns small-12">
                 <div class="row">
                     <div class="columns small-12">
-                       <tal:b tal:condition="model|nothong">
-                           <h5>Hi ${str(model)}</h5><br>
-                            <p><strong i18n:translate="">Salutation: </strong> ${layout.salutation}</p>
-                            <p><strong i18n:translate="">Your Email: </strong> ${model.email}</p>
-                            <p><strong i18n:translate="">Your Address: </strong> ${model.address}</p>
-                            <p><strong i18n:translate="">Reserved upcoming courses: </strong>${model.course_events.count()}</p>
-                            <p><strong i18n:translate="">Total courses to repeat: </strong>${model.repeating_courses.count()}</p>
-                            <p><strong i18n:translate="">Not done but registered: </strong>${model.undone_registered_courses.count()}</p>
+                        <tal:b tal:condition="model|nothong">
+                            <dl class="field-display">
+                                <dt i18n:translate>E-Mail</dt>
+                                <dd>${model.email}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="layout.salutation">
+                                <dt i18n:translate>Salutation</dt>
+                                <dd>${layout.salutation}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.first_name">
+                                <dt i18n:translate>First name</dt>
+                                <dd>${model.first_name}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.last_name">
+                                <dt i18n:translate>Last name</dt>
+                                <dd>${model.last_name}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.address">
+                                <dt i18n:translate>Address</dt>
+                                <dd>${model.address}</dd>
+                            </dl>
+                            <dl class="field-display">
+                                <dt i18n:translate>Total courses</dt>
+                                <dd>${model.course_events.count()}</dd>
+                            </dl>
+                            <dl class="field-display">
+                                <dt i18n:translate>Total courses to repeat</dt>
+                                <dd>${model.repeating_courses.count()}</dd>
+                            </dl>
+                            <dl class="field-display">
+                                <dt i18n:translate>Unfinished courses</dt>
+                                <dd>${model.undone_registered_courses.count()}</dd>
+                            </dl>
                        </tal:b>
                     </div>
                 </div>

@@ -5,22 +5,13 @@ from onegov.fsi.models.course_event import (
 )
 from onegov.fsi.models.notification_template import \
     NOTIFICATION_TYPE_TRANSLATIONS, NOTIFICATION_TYPES
-from onegov.org.layout import DefaultLayout as OrgDefaultLayout
-from onegov.org.layout import Layout as OrgBaseLayout
+from onegov.org.layout import DefaultLayout as BaseLayout
 
 
-class Layout(OrgBaseLayout):
-    pass
-
-
-class DefaultLayout(OrgDefaultLayout):
+class DefaultLayout(BaseLayout):
 
     def include_accordion(self):
         self.request.include('accordion')
-
-    def include_editor(self):
-        self.request.include('redactor')
-        self.request.include('editor')
 
     def instance_link(self, instance):
         return self.request.link(instance)

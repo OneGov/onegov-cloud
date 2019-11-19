@@ -127,7 +127,10 @@ class CourseEvent(Base, TimestampMixin):
 
     @hybrid_property
     def next_event_start(self):
-        return self.end + self.refresh_interval
+        # XXX this is currently wrong, since the refresh_interval was moved
+        # to the course. Before that the it looked like this, which now fails:
+        # return self.end + refresh_interval
+        return self.end
 
     @property
     def duration(self):

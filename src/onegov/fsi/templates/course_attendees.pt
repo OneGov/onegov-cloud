@@ -7,9 +7,9 @@
             <div class="columns small-12">
                 <div class="row">
                     <div class="columns small-12">
-                        <strong tal:condition="not: attendees">No attendees in the database</strong>
+                        <strong tal:condition="not: attendees" i18n:translate>No attendees in the database</strong>
                         <tal:b tal:condition="attendees|nothing">
-                            <table>
+                            <table style="width: 100%">
                                 <thead>
                                     <th i18n:translate="">Family name, surname</th>
                                     <th i18n:translate="">Email</th>

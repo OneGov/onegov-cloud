@@ -29,7 +29,7 @@ class CourseCollectionLayout(DefaultLayout):
         if self.request.is_manager:
             links.append(
                 Link(
-                    text=_("Add Course"),
+                    text=_("New Course"),
                     url=self.request.class_link(
                         CourseCollection, name='add'
                     ),
@@ -85,14 +85,14 @@ class CourseLayout(CourseCollectionLayout):
                     Link(
                         _('Event'),
                         self.request.link(self.event_collection, name='add'),
-                        attrs={'class': 'new-link'}
+                        attrs={'class': 'new-event'}
                     ),
                 )
             ),
             Link(
                 _('Invite Attendees'),
                 self.request.link(self.model, name='invite'),
-                attrs={'class': ''}
+                attrs={'class': 'invite-attendees'}
             ),
             Link(
                 _('Edit'),
@@ -110,7 +110,7 @@ class CourseLayout(CourseCollectionLayout):
                     Confirm(
                         _("Do you really want to delete this course ?"),
                         _("This cannot be undone."),
-                        _("Delete course event"),
+                        _("Delete course"),
                         _("Cancel")
                     ),
                     Intercooler(
@@ -137,7 +137,7 @@ class AddCourseLayout(DefaultLayout):
 
     @cached_property
     def title(self):
-        return _('Add Course')
+        return _('New Course')
 
 
 class EditCourseLayout(DefaultLayout):
@@ -163,6 +163,10 @@ class InviteCourseLayout(CourseLayout):
     @cached_property
     def title(self):
         return _('Invite Attendees')
+
+    @cached_property
+    def editbar_links(self):
+        return []
 
     @cached_property
     def breadcrumbs(self):

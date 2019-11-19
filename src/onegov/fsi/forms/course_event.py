@@ -103,7 +103,6 @@ class CourseEventForm(Form):
         self.presenter_name.data = model.presenter_name
         self.presenter_company.data = model.presenter_company
         self.presenter_email.data = model.presenter_email
-        self.mandatory_refresh.data = model.mandatory_refresh
         self.hidden_from_public.data = model.hidden_from_public
 
         self.start.data = model.start
@@ -111,14 +110,12 @@ class CourseEventForm(Form):
         self.min_attendees.data = model.min_attendees
         self.max_attendees.data = model.max_attendees
         self.status.data = model.status
-        self.refresh_interval.data = model.refresh_interval
 
     def update_model(self, model):
         model.location = self.location.data
         model.presenter_name = self.presenter_name.data
         model.presenter_company = self.presenter_company.data
         model.presenter_email = self.presenter_email.data
-        model.mandatory_refresh = self.mandatory_refresh.data
         model.hidden_from_public = self.hidden_from_public.data
 
         model.start = self.start.data
@@ -126,5 +123,4 @@ class CourseEventForm(Form):
         model.min_attendees = self.min_attendees.data
         model.max_attendees = self.max_attendees.data
         model.status = self.status.data
-        model.refresh_interval = self.refresh_interval.data
         model.hidden_from_public = self.hidden_from_public.data

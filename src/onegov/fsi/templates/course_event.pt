@@ -51,7 +51,7 @@
 
                             <tal:b tal:condition="request.is_logged_in" tal:define="registered model.has_reservation(request.attendee_id)">
                                 <tal:b tal:switch="registered">
-                                    <button tal:case="True" class="button success" i18n:translate="">Registered</button>
+                                    <button tal:case="True" class="button success disabled"><i class="fa fa-check" aria-hidden="true"></i> <tal:b i18n:translate>Registered</tal:b></button>
                                     <metal:b tal:case="False" tal:condition="model.bookable" use-macro="layout.macros['intercooler_btn']"/>
                                 </tal:b>
 
@@ -60,7 +60,7 @@
                             <h3 i18n:translate="">Attendees</h3>
 
                             <tal:b tal:switch="model.attendees.count() == 0">
-                                <p tal:case="True">No entries found</p>
+                                <p tal:case="True" i18n:translate>No entries found.</p>
                                 <ul tal:case="False">
                                 <tal:b tal:repeat="attendee model.attendees">
                                     <li>${str(attendee)}</li>
