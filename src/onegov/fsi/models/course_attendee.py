@@ -11,7 +11,7 @@ from onegov.fsi import _
 
 
 ATTENDEE_TITLES = ('mr', 'ms', 'none')
-ATTENDEE_TITLE_TRANSLATIONS = (_('Mr.'), _('Ms.'), '')
+ATTENDEE_TITLE_TRANSLATIONS = (_('Mr.'), _('Ms.'), _('None'))
 
 
 def attendee_title_choices():
