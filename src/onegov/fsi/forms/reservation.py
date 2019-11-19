@@ -1,3 +1,5 @@
+import datetime
+
 from wtforms import StringField
 from wtforms.validators import InputRequired
 from onegov.form import Form
@@ -37,9 +39,8 @@ class AddFsiReservationForm(Form):
     def attendee(self):
         return self.model.attendee
 
-    @staticmethod
-    def event_choice(event):
-        return str(event.id), event.name
+    def event_choice(self, event):
+        return str(event.id), str(event)
 
     @staticmethod
     def attendee_choice(attendee):

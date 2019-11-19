@@ -53,6 +53,11 @@ class CourseEvent(Base, TimestampMixin):
     def description(self):
         return self.course.description
 
+    def __str__(self):
+        format = '%d.%m.%Y'
+        date = self.start.strftime(format)
+        return f'{self.name} - {date}'
+
     # Event specific information
     location = Column(Text, nullable=False)
     start = Column(UTCDateTime, nullable=False)
