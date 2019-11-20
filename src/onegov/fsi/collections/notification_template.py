@@ -2,11 +2,16 @@ from cached_property import cached_property
 
 from onegov.core.collection import GenericCollection
 from onegov.fsi.models.course_event import CourseEvent
-from onegov.fsi.models.notification_template import FsiNotificationTemplate, \
-    InfoTemplate, ReservationTemplate, CancellationTemplate, ReminderTemplate
+from onegov.fsi.models.course_notification_template import (
+    CourseNotificationTemplate,
+    InfoTemplate,
+    ReservationTemplate,
+    CancellationTemplate,
+    ReminderTemplate,
+)
 
 
-class FsiNotificationTemplateCollection(GenericCollection):
+class CourseNotificationTemplateCollection(GenericCollection):
 
     def __init__(self, session, course_event_id=None):
         super().__init__(session)
@@ -14,7 +19,7 @@ class FsiNotificationTemplateCollection(GenericCollection):
 
     @cached_property
     def model_class(self):
-        return FsiNotificationTemplate
+        return CourseNotificationTemplate
 
     @cached_property
     def course_event(self):

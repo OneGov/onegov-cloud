@@ -4,7 +4,7 @@ from onegov.fsi.forms.reservation import AddFsiReservationForm, \
     EditFsiReservationForm
 from onegov.fsi.layouts.reservation import ReservationLayout, \
     ReservationCollectionLayout
-from onegov.fsi.models.reservation import Reservation
+from onegov.fsi.models import CourseReservation
 from onegov.fsi import _
 
 
@@ -17,7 +17,7 @@ def view_reservations(self, request):
     }
 
 
-@FsiApp.html(model=Reservation)
+@FsiApp.html(model=CourseReservation)
 def reservation_redirect(self, request):
     return request.redirect(request.link(self, name='edit'))
 
@@ -45,7 +45,7 @@ def view_add_reservation(self, request, form):
 
 
 @FsiApp.form(
-    model=Reservation,
+    model=CourseReservation,
     template='form.pt',
     name='edit',
     form=EditFsiReservationForm
@@ -114,7 +114,7 @@ def view_add_from_course_event(self, request):
 
 
 @FsiApp.html(
-    model=Reservation,
+    model=CourseReservation,
     request_method='DELETE',
     name='delete'
 )

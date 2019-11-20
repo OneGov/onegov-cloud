@@ -4,7 +4,8 @@ from onegov.core.templates import render_template
 from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi import _, FsiApp
 from onegov.fsi.layouts.notification import MailLayout
-from onegov.fsi.models.notification_template import FsiNotificationTemplate
+from onegov.fsi.models.course_notification_template import \
+    CourseNotificationTemplate
 
 
 def send_scheduled_reminders(request):
@@ -13,7 +14,7 @@ def send_scheduled_reminders(request):
     for res in reservations:
         assert res.course_event.template
         template = request.session.query(
-            FsiNotificationTemplate).filter_by(
+            CourseNotificationTemplate).filter_by(
             course_event_id=res.course_event.id).one()
         title = _('Reminder for course: ${name}',
                   mapping={'name': res.course.name})

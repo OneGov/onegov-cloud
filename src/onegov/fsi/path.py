@@ -5,13 +5,14 @@ from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.collections.notification_template import \
-    FsiNotificationTemplateCollection
+    CourseNotificationTemplateCollection
 from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.models.course import Course
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
-from onegov.fsi.models.notification_template import FsiNotificationTemplate
-from onegov.fsi.models.reservation import Reservation
+from onegov.fsi.models.course_notification_template import \
+    CourseNotificationTemplate
+from onegov.fsi.models.course_reservation import CourseReservation
 
 
 @FsiApp.path(model=Course, path='/fsi/course/{id}')
@@ -82,16 +83,16 @@ def get_attendee_details(request, id):
     return CourseAttendeeCollection(request.session).by_id(id)
 
 
-@FsiApp.path(model=FsiNotificationTemplateCollection, path='/fsi/templates',
+@FsiApp.path(model=CourseNotificationTemplateCollection, path='/fsi/templates',
              converters=dict(course_event_id=UUID))
 def get_notification_templates(request, course_event_id=None):
-    return FsiNotificationTemplateCollection(
+    return CourseNotificationTemplateCollection(
         request.session, course_event_id=course_event_id)
 
 
-@FsiApp.path(model=FsiNotificationTemplate, path='/fsi/template/{id}')
+@FsiApp.path(model=CourseNotificationTemplate, path='/fsi/template/{id}')
 def get_template_details(request, id):
-    return FsiNotificationTemplateCollection(request.session).by_id(id)
+    return CourseNotificationTemplateCollection(request.session).by_id(id)
 
 
 @FsiApp.path(model=ReservationCollection, path='/fsi/reservations',
@@ -118,6 +119,6 @@ def get_reservations(
     )
 
 
-@FsiApp.path(model=Reservation, path='/fsi/reservation/{id}')
+@FsiApp.path(model=CourseReservation, path='/fsi/reservation/{id}')
 def get_reservation_details(request, id):
     return ReservationCollection(request.session).by_id(id)

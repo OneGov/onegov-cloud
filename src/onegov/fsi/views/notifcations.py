@@ -1,15 +1,16 @@
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.notification_template import \
-    FsiNotificationTemplateCollection
+    CourseNotificationTemplateCollection
 from onegov.fsi.forms.notification import NotificationForm
 from onegov.fsi.layouts.notification import NotificationTemplateLayout, \
     NotificationTemplateCollectionLayout, EditNotificationTemplateLayout
-from onegov.fsi.models.notification_template import FsiNotificationTemplate
+from onegov.fsi.models.course_notification_template import \
+    CourseNotificationTemplate
 from onegov.fsi import _
 
 
 @FsiApp.html(
-    model=FsiNotificationTemplateCollection, template='notifications.pt')
+    model=CourseNotificationTemplateCollection, template='notifications.pt')
 def view_notifications(self, request):
     layout = NotificationTemplateCollectionLayout(self, request)
     # This was a workaround and should be removed in the future
@@ -21,7 +22,7 @@ def view_notifications(self, request):
 
 
 @FsiApp.html(
-    model=FsiNotificationTemplate, template='notification.pt')
+    model=CourseNotificationTemplate, template='notification.pt')
 def view_notification_details(self, request):
     return {
         'layout': NotificationTemplateLayout(self, request)
@@ -29,7 +30,7 @@ def view_notification_details(self, request):
 
 
 @FsiApp.html(
-    model=FsiNotificationTemplate,
+    model=CourseNotificationTemplate,
     template='info_notification.pt',
     name='send')
 def view_send_notifications(self, request):
@@ -39,7 +40,7 @@ def view_send_notifications(self, request):
 
 
 @FsiApp.form(
-    model=FsiNotificationTemplate,
+    model=CourseNotificationTemplate,
     template='form.pt',
     form=NotificationForm,
     name='edit'
@@ -63,7 +64,7 @@ def view_edit_notification(self, request, form):
     }
 
 # @FsiApp.form(
-#     model=FsiNotificationTemplate,
+#     model=CourseNotificationTemplate,
 #     permission=Secret,
 #     template='notification_template_send_form.pt',
 #     name='send',

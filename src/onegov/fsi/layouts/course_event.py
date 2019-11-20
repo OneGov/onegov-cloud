@@ -4,7 +4,7 @@ from onegov.core.elements import Link, Confirm, Intercooler, LinkGroup
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.collections.notification_template import \
-    FsiNotificationTemplateCollection
+    CourseNotificationTemplateCollection
 from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
@@ -84,7 +84,7 @@ class CourseEventLayout(DefaultLayout):
 
     @cached_property
     def template_collection(self):
-        return FsiNotificationTemplateCollection(
+        return CourseNotificationTemplateCollection(
             self.request.session,
             course_event_id=self.model.id
         )

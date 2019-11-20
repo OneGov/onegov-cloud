@@ -22,7 +22,7 @@ def template_type_choices():
                                        NOTIFICATION_TYPE_TRANSLATIONS))
 
 
-class FsiNotificationTemplate(Base, ContentMixin, TimestampMixin):
+class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
 
     """
     For course event reservations, there are different types of emails.
@@ -72,17 +72,17 @@ class FsiNotificationTemplate(Base, ContentMixin, TimestampMixin):
         )
 
 
-class InfoTemplate(FsiNotificationTemplate):
+class InfoTemplate(CourseNotificationTemplate):
     __mapper_args__ = {'polymorphic_identity': 'info'}
 
 
-class ReservationTemplate(FsiNotificationTemplate):
+class ReservationTemplate(CourseNotificationTemplate):
     __mapper_args__ = {'polymorphic_identity': 'reservation'}
 
 
-class ReminderTemplate(FsiNotificationTemplate):
+class ReminderTemplate(CourseNotificationTemplate):
     __mapper_args__ = {'polymorphic_identity': 'reminder'}
 
 
-class CancellationTemplate(FsiNotificationTemplate):
+class CancellationTemplate(CourseNotificationTemplate):
     __mapper_args__ = {'polymorphic_identity': 'cancellation'}

@@ -12,7 +12,8 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.fsi.models.course_attendee import CourseAttendee
-from onegov.fsi.models.reservation import reservation_table, Reservation
+from onegov.fsi.models.course_reservation import reservation_table
+from onegov.fsi.models.course_reservation import CourseReservation
 from onegov.fsi import _
 
 COURSE_EVENT_STATUSES = ('created', 'confirmed', 'canceled', 'planned')
@@ -84,7 +85,7 @@ class CourseEvent(Base, TimestampMixin):
     )
 
     reservations = relationship(
-        'Reservation',
+        'CourseReservation',
         backref=backref(
             'course_event',
             lazy='joined'
@@ -93,7 +94,7 @@ class CourseEvent(Base, TimestampMixin):
         cascade='all, delete-orphan',
     )
 
-    notification_templates = relationship('FsiNotificationTemplate',
+    notification_templates = relationship('CourseNotificationTemplate',
                                           back_populates='course_event',
                                           cascade='all, delete-orphan',
                                           )
@@ -188,8 +189,8 @@ class CourseEvent(Base, TimestampMixin):
 
     def possible_bookers(self, external_only=False):
         session = object_session(self)
-        excl = session.query(CourseAttendee.id).join(Reservation)
-        excl = excl.filter(Reservation.course_event_id == self.id)
+        excl = session.query(CourseAttendee.id).join(CourseReservation)
+        excl = excl.filter(CourseReservation.course_event_id == self.id)
         excl = excl.subquery('excl')
 
         query = session.query(CourseAttendee).filter(

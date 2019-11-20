@@ -2,7 +2,8 @@ import pytest
 import transaction
 # from webtest import TestApp as Client
 from onegov.fsi.collections.reservation import ReservationCollection
-from onegov.fsi.models.notification_template import FsiNotificationTemplate
+from onegov.fsi.models.course_notification_template import \
+    CourseNotificationTemplate
 from tests.onegov.org.common import get_cronjob_by_name
 
 
@@ -12,7 +13,7 @@ def test_send_reminder_mails(
 
     session = fsi_app.session()
     reservation, data = future_course_reservation(session)
-    reservation.course_event.template = FsiNotificationTemplate(
+    reservation.course_event.template = CourseNotificationTemplate(
         subject='S',
         text='T')
 

@@ -76,7 +76,7 @@ class CourseAttendee(Base):
     meta = Column(JSON, nullable=True, default=dict)
 
     reservations = relationship(
-        'Reservation',
+        'CourseReservation',
         backref='attendee',
         lazy='dynamic',
         cascade='all, delete-orphan')
@@ -109,13 +109,13 @@ class CourseAttendee(Base):
         Will return the query for not completed (future) courses events
          the attendee has a reservation record.
         """
-        from onegov.fsi.models.course_event import CourseEvent  # circular
-        from onegov.fsi.models.reservation import Reservation  # circular
+        from onegov.fsi.models import CourseEvent  # circular
+        from onegov.fsi.models import CourseReservation  # circular
 
         session = object_session(self)
-        result = session.query(CourseEvent).join(Reservation)
-        result = result.filter(Reservation.attendee_id == self.id)
-        result = result.filter(Reservation.event_completed == False)
+        result = session.query(CourseEvent).join(CourseReservation)
+        result = result.filter(CourseReservation.attendee_id == self.id)
+        result = result.filter(CourseReservation.event_completed == False)
         result = result.filter(CourseEvent.start > utcnow())
 
         return result
@@ -123,13 +123,14 @@ class CourseAttendee(Base):
     @property
     def confirmed_course_events(self):
         """ Registered future course events which have been confirmed """
-        from onegov.fsi.models.course_event import CourseEvent
+        from onegov.fsi.models import CourseEvent
         return self.course_events.filter(CourseEvent.status == 'confirmed')
 
     @property
     def total_done_course_events(self):
-        from onegov.fsi.models.reservation import Reservation  # circular
-        return self.reservations.filter(Reservation.event_completed == True)
+        from onegov.fsi.models import CourseReservation  # circular
+        return self.reservations.filter(
+            CourseReservation.event_completed == True)
 
     @property
     def repeating_courses(self):
@@ -148,43 +149,43 @@ class CourseAttendee(Base):
         """
 
         # circular imports
-        from onegov.fsi.models.course import Course
-        from onegov.fsi.models.course_event import CourseEvent
-        from onegov.fsi.models.reservation import Reservation
+        from onegov.fsi.models import Course
+        from onegov.fsi.models import CourseEvent
+        from onegov.fsi.models import CourseReservation
 
         session = object_session(self)
 
         result = session.query(CourseEvent).join(Course)\
             .filter(Course.mandatory_refresh == True)
 
-        result = result.join(Reservation)
-        result = result.filter(Reservation.attendee_id == self.id)
-        result = result.filter(Reservation.event_completed == True)
+        result = result.join(CourseReservation)
+        result = result.filter(CourseReservation.attendee_id == self.id)
+        result = result.filter(CourseReservation.event_completed == True)
         result = result.filter(CourseEvent.next_event_start > utcnow())
         return result
 
     @property
     def undone_registered_courses(self):
-        from onegov.fsi.models.course_event import CourseEvent
-        from onegov.fsi.models.reservation import Reservation
+        from onegov.fsi.models import CourseEvent
+        from onegov.fsi.models import CourseReservation
 
         session = object_session(self)
-        result = session.query(CourseEvent).join(Reservation)
+        result = session.query(CourseEvent).join(CourseReservation)
         result = result.filter(CourseEvent.status == 'confirmed')
         result = result.filter(CourseEvent.start < utcnow())
-        result = result.filter(Reservation.attendee_id == self.id)
-        result = result.filter(Reservation.event_completed == False)
+        result = result.filter(CourseReservation.attendee_id == self.id)
+        result = result.filter(CourseReservation.event_completed == False)
         return result
 
     def possible_course_events(self, show_hidden=True):
         """Used for the reservation form. Should exlucde past courses
         and courses already registered"""
-        from onegov.fsi.models.course_event import CourseEvent
-        from onegov.fsi.models.reservation import Reservation
+        from onegov.fsi.models import CourseEvent
+        from onegov.fsi.models import CourseReservation
 
         session = object_session(self)
-        excl = session.query(CourseEvent.id).join(Reservation)
-        excl = excl.filter(Reservation.attendee_id == self.id)
+        excl = session.query(CourseEvent.id).join(CourseReservation)
+        excl = excl.filter(CourseReservation.attendee_id == self.id)
         excl = excl.subquery('excl')
         result = session.query(CourseEvent).filter(CourseEvent.id.notin_(excl))
         result = result.filter(CourseEvent.start > utcnow())

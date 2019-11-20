@@ -9,9 +9,9 @@ from onegov.core.crypto import hash_password
 from onegov.fsi.models.course import Course
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
-from onegov.fsi.models.notification_template import InfoTemplate, \
+from onegov.fsi.models.course_notification_template import InfoTemplate, \
     ReservationTemplate, CancellationTemplate, ReminderTemplate
-from onegov.fsi.models.reservation import Reservation
+from onegov.fsi.models.course_reservation import CourseReservation
 from onegov.user import User
 from onegov.fsi import FsiApp
 from onegov.fsi.initial_content import create_new_organisation
@@ -242,9 +242,9 @@ def future_course_reservation(future_course_event, attendee):
             attendee_id=attendee(session)[0].id
         )
         data.update(**kwargs)
-        res = session.query(Reservation).filter_by(**data).first()
+        res = session.query(CourseReservation).filter_by(**data).first()
         if not res:
-            res = Reservation(**data)
+            res = CourseReservation(**data)
             session.add(res)
             session.flush()
         return res, data
@@ -271,12 +271,12 @@ def db_mock_session(course_event, attendee):
         attendee_ = attendee(session)
         course_event_ = course_event(session)
 
-        placeholder = Reservation(
+        placeholder = CourseReservation(
             dummy_desc='Placeholder',
             id=uuid4(),
             course_event_id=course_event_[0].id)
         # Create Reservations
-        user_res = Reservation(
+        user_res = CourseReservation(
             attendee_id=attendee_[0].id,
             course_event_id=course_event_[0].id
         )

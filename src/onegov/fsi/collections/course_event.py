@@ -4,7 +4,7 @@ from sqlalchemy import desc
 
 from onegov.core.collection import Pagination, GenericCollection
 from onegov.fsi.collections.notification_template import \
-    FsiNotificationTemplateCollection
+    CourseNotificationTemplateCollection
 from onegov.fsi.models.course_event import CourseEvent
 
 
@@ -85,7 +85,7 @@ class CourseEventCollection(GenericCollection, Pagination):
 
     def add(self, **kwargs):
         course_event = super().add(**kwargs)
-        tc = FsiNotificationTemplateCollection(
+        tc = CourseNotificationTemplateCollection(
             self.session, course_event_id=course_event.id)
         tc.auto_add_templates_if_not_existing()
         return course_event

@@ -4,7 +4,7 @@ from cached_property import cached_property
 
 from onegov.core.elements import Link
 from onegov.fsi.collections.notification_template import \
-    FsiNotificationTemplateCollection
+    CourseNotificationTemplateCollection
 from onegov.fsi.layout import DefaultLayout
 from onegov.org.layout import DefaultMailLayout as OrgDefaultMailLayout
 from onegov.fsi import _
@@ -94,7 +94,7 @@ class NotificationTemplateLayout(DefaultLayout):
 
     @cached_property
     def collection(self):
-        return FsiNotificationTemplateCollection(
+        return CourseNotificationTemplateCollection(
             self.request.session,
             course_event_id=self.model.course_event_id
         )
