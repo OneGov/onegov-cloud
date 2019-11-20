@@ -30,7 +30,6 @@ LEVELS = (
         'onegov.file',
         'onegov.form',
         'onegov.foundation',
-        'onegov.fsi',
         'onegov.gis',
         'onegov.newsletter',
         'onegov.notice',
