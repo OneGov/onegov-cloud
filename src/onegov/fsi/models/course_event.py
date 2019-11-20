@@ -163,13 +163,13 @@ class CourseEvent(Base, TimestampMixin):
     @property
     def duplicate_dict(self):
         return OrderedDict(
+            location=self.location,
             course_id=self.course_id,
             presenter_name=self.presenter_name,
             presenter_company=self.presenter_company,
+            presenter_email=self.presenter_email,
             min_attendees=self.min_attendees,
             max_attendees=self.max_attendees,
-            mandatory_refresh=self.mandatory_refresh,
-            refresh_interval=self.refresh_interval,
             status='created',
             hidden_from_public=self.hidden_from_public
         )
