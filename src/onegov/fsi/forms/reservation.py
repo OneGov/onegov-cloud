@@ -97,6 +97,11 @@ class AddFsiReservationForm(Form):
                     external_only=self.model.external_only
                 )
             return (self.attendee_choice(a) for a in attendees)
+        if self.request.view_name == 'edit':
+            attendees = self.model.course_event.possible_bookers(
+                external_only=False
+            )
+            return (self.attendee_choice(a) for a in attendees)
 
         else:
             raise NotImplementedError
@@ -127,13 +132,4 @@ class EditFsiReservationForm(AddFsiReservationForm):
             model.dummy_desc = self.dummy_desc.data
 
     def get_event_choices(self):
-        choices = self.event_collection.query()
-        # Filter courses he registered
-        if self.attendee:
-            if isinstance(self, CourseEventCollection):
-                event_model = self.model.model_class
-            else:
-                event_model = self.model.__class__
-            choices = self.event_choices.filter(
-                event_model.attendee_id != self.attendee.id)
-        return (self.event_choice(e) for e in choices)
+        return [self.event_choice(self.model.course_event)]
