@@ -217,3 +217,12 @@ def add_source_column(context):
         'users',
         Column('source', Text, nullable=True, default=None)
     )
+
+
+@upgrade_task('Add source_id column')
+def add_source_id_column(context):
+    context.operations.add_column(
+        'users', Column('source_id', Text, nullable=True, default=None))
+
+    context.operations.create_unique_constraint(
+        'unique_source_id', 'users', ('source', 'source_id'))

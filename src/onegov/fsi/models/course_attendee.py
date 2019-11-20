@@ -40,21 +40,37 @@ class CourseAttendee(Base):
 
     __tablename__ = 'fsi_attendees'
 
+    id = Column(UUID, primary_key=True, default=uuid4)
+
     # is null if its an external attendee
     user_id = Column(UUID, ForeignKey('users.id'), nullable=True)
     user = relationship("User", backref=backref("attendee", uselist=False))
-    title = Column(
-        Enum(*ATTENDEE_TITLES, name='title'), nullable=False, default='none')
 
-    id = Column(UUID, primary_key=True, default=uuid4)
-    first_name = Column(Text, nullable=False)
-    last_name = Column(Text, nullable=False)
+    title = Column(
+        Enum(*ATTENDEE_TITLES, name='title'),
+        nullable=False,
+        default='none')
+
+    first_name = Column(Text, nullable=True)
+    last_name = Column(Text, nullable=True)
+
+    # The organization of the attendee. This has an influence on the
+    # permissions of the user, as editors should only have access to the
+    # information of attendees belonging to the same organization.
+    organisation = Column(Text, nullable=True)
+
+    # The department is for information only, it has no impact on permissions.
+    # A department here is part of an organization (with an organization
+    # spanning multiple departments).
+    department = Column(Text, nullable=True)
+
     _email = Column(Text, unique=True)
     address = meta_property('address')
 
     def __str__(self):
-        if self.first_name.strip() and self.last_name.strip():
+        if self.first_name and self.last_name:
             return f'{self.last_name}, {self.first_name}'
+
         return self.email
 
     meta = Column(JSON, nullable=True, default=dict)

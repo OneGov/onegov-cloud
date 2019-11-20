@@ -199,7 +199,7 @@ def spawn_ldap_client(**cfg):
     return client
 
 
-def ensure_user(provider, session, username, role):
+def ensure_user(source, session, username, role):
     """ Creates the given user if it doesn't already exist. Ensures the
     role is set to the given role in all cases.
 
@@ -219,7 +219,7 @@ def ensure_user(provider, session, username, role):
     user.role = role
 
     # the source of the user is always the last provider that was used
-    user.source = provider.name
+    user.source = source
 
     return user
 
@@ -389,7 +389,11 @@ class LDAPProvider(
         # onegov-cloud uses the e-mail as username, therefore we need to query
         # LDAP to get the designated name (actual LDAP username)
         query = f"({self.attributes.mails}={username})"
-        attrs = (self.attributes.groups, self.attributes.mails)
+        attrs = (
+            self.attributes.groups,
+            self.attributes.mails,
+            self.attributes.uid
+        )
 
         # we query the groups at the same time, so if we have a password
         # match we are all ready to go
@@ -417,6 +421,7 @@ class LDAPProvider(
 
         for name, attrs in entries.items():
             groups = attrs[self.attributes.groups]
+            uid = attrs[self.attributes.uid]
 
             # do not iterate over all entries, or this becomes a very
             # handy way to check a single password against multiple
@@ -440,10 +445,11 @@ class LDAPProvider(
             return
 
         return ensure_user(
-            provider=self,
+            source=self.name,
             session=request.session,
             username=username,
-            role=role)
+            role=role,
+            uid=uid)
 
 
 @attrs(auto_attribs=True)
@@ -585,7 +591,8 @@ class LDAPKerberosProvider(
             return None
 
         return ensure_user(
-            provider=self,
+            source=self.name,
             session=request.session,
             username=mails[0],
-            role=role)
+            role=role,
+            uid=username)

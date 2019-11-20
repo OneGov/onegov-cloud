@@ -10,6 +10,7 @@ from onegov.core.utils import yubikey_otp_to_serial
 from onegov.search import ORMSearchable
 from onegov.user.models.group import UserGroup
 from sqlalchemy import Boolean, Column, Index, Text, func, ForeignKey
+from sqlalchemy import UniqueConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref, deferred, relationship
 from uuid import uuid4
@@ -110,6 +111,12 @@ class User(Base, TimestampMixin, ORMSearchable):
     #: to the last provider he used.
     source = Column(Text, nullable=True, default=None)
 
+    #: A string describing the user id on the source, which is an id that is
+    #: supposed never change (unlike the username, which may change).
+    #:
+    #: If set, the source_id is unique per source.
+    source_id = Column(Text, nullable=True, default=None)
+
     #: true if the user is active
     active = Column(Boolean, nullable=False, default=True)
 
@@ -118,6 +125,7 @@ class User(Base, TimestampMixin, ORMSearchable):
 
     __table_args__ = (
         Index('lowercase_username', func.lower(username), unique=True),
+        UniqueConstraint('source', 'source_id', name='unique_source_id'),
     )
 
     @hybrid_property

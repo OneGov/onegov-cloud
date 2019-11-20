@@ -19,10 +19,7 @@ class FsiApp(OrgApp):
 
     def on_login(self, session, current_user):
         if not current_user.attendee:
-            current_user.attendee = CourseAttendee(
-                first_name=' ',
-                last_name=' '
-            )
+            current_user.attendee = CourseAttendee()
 
 
 @FsiApp.template_directory()
