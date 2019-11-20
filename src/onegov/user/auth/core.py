@@ -18,15 +18,16 @@ class Auth(object):
 
     identity_class = morepath.Identity
 
-    def __init__(self, session, application_id, to='/', skip=False,
-                 signup_token=None, signup_token_secret=None, **kwargs):
-        assert application_id  # may not be empty!
+    def __init__(self, app, to='/', skip=False,
+                 signup_token=None, signup_token_secret=None):
 
-        self.session = session
-        self.application_id = application_id
+        self.app = app
+        self.session = app.session()
+        self.application_id = app.application_id
 
         self.signup_token = signup_token
-        self.signup_token_secret = signup_token_secret
+        self.signup_token_secret = signup_token_secret \
+            or getattr(app, 'identity_secret', None)
 
         # never redirect to an external page, this might potentially be used
         # to trick the user into thinking he's on our page after entering his
@@ -38,31 +39,14 @@ class Auth(object):
         self.factors = {}
 
         for type, cls in SECOND_FACTORS.items():
-            obj = cls(**kwargs)
+            obj = cls(**cls.args_from_app(app))
 
             if obj.is_configured():
                 self.factors[type] = obj
 
     @classmethod
-    def from_app(cls, app, to='/', skip=False, signup_token=None):
-        kwargs = {}
-
-        for factor in SECOND_FACTORS.values():
-            kwargs.update(factor.args_from_app(app))
-
-        return cls(
-            session=app.session(),
-            application_id=app.application_id,
-            to=to,
-            skip=skip,
-            signup_token=signup_token,
-            signup_token_secret=getattr(app, 'identity_secret', None),
-            **kwargs,
-        )
-
-    @classmethod
     def from_request(cls, request, to='/', skip=False, signup_token=None):
-        return cls.from_app(request.app, to, skip, signup_token)
+        return cls(request.app, to, skip, signup_token)
 
     @classmethod
     def from_request_path(cls, request, skip=False, signup_token=None):
@@ -115,7 +99,7 @@ class Auth(object):
         else:
             raise NotImplementedError
 
-    def authenticate(self, username, password,
+    def authenticate(self, request, username, password,
                      client='unknown', second_factor=None):
         """ Takes the given username and password and matches them against the
         users collection. This does not login the user, use :meth:`login_to` to
@@ -137,7 +121,25 @@ class Auth(object):
 
         """
 
-        user = self.users.by_username_and_password(username, password)
+        from onegov.user.integration import UserApp  # circular import
+
+        user = None
+        source = None
+
+        if isinstance(self.app, UserApp):
+            for provider in self.app.providers:
+                if provider.kind == 'integrated':
+                    user = provider.authenticate_user(
+                        request=request,
+                        username=username,
+                        password=password)
+
+                if user:
+                    source = user.source
+                    break
+
+        # fall back to default, only if it didn't work otherwise
+        user = user or self.users.by_username_and_password(username, password)
 
         def fail():
             log.info(f"Failed login by {client} ({username})")
@@ -149,14 +151,16 @@ class Auth(object):
         if not user.active:
             return fail()
 
-        if not self.is_valid_second_factor(user, second_factor):
-            return fail()
+        # only built-in users currently support second factors
+        if source is None:
+            if not self.is_valid_second_factor(user, second_factor):
+                return fail()
 
         # users from external authentication providers may not login using
         # a regular login - if for some reason the source is false (if the
         # authentication system is switched) - the source column has to be
         # set to NULL
-        if user.source is not None:
+        if user.source != source:
             return fail()
 
         log.info(f"Successful login by {client} ({username})")
@@ -199,6 +203,7 @@ class Auth(object):
         """
 
         user = self.authenticate(
+            request=request,
             username=username,
             password=password,
             client=request.client_addr,

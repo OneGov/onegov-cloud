@@ -5,6 +5,11 @@
     <tal:b metal:fill-slot="content">
         <div class="row">
             <div class="small-12 medium-7 large-5 columns">
+                <tal:b define="integrated [p for p in providers if p.kind == 'integrated']">
+                    <div tal:repeat="provider integrated" class="panel">
+                        <tal:b replace="structure render_untrusted_markdown(request.translate(provider.hint(request)))" />
+                    </div>
+                </tal:b>
                 <div metal:use-macro="layout.macros['form']" />
             </div>
         </div>
@@ -33,15 +38,16 @@
             </div>
         </div>
         <div class="row" tal:condition="providers">
-            <div class="small-12 medium-7 large-5 columns alternatives">
-                <h2 i18n:translate>Alternatives</h2>
-
-                <div tal:repeat="provider providers" class="provider-login">
-                    <a href="${provider_login(provider)}" class="button">
-                        <tal:b replace="structure render_untrusted_markdown(request.translate(provider.button_text(request)))" />
-                    </a>
+            <tal:b define="separate [p for p in providers if p.kind == 'separate']" condition="separate">
+                <div class="small-12 medium-7 large-5 columns alternatives">
+                    <h2 i18n:translate>Alternatives</h2>
+                    <div tal:repeat="provider separate" class="provider-login">
+                        <a href="${provider_login(provider)}" class="button">
+                            <tal:b replace="structure render_untrusted_markdown(request.translate(provider.button_text(request)))" />
+                        </a>
+                    </div>
                 </div>
-            </div>
+            </tal:b>
         </div>
     </tal:b>
 </div>

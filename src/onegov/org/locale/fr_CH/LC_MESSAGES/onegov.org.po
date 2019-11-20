@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-10-25 10:14+0200\n"
+"POT-Creation-Date: 2019-11-18 16:06+0100\n"
 "PO-Revision-Date: 2019-02-18 06:40+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -228,6 +228,18 @@ msgstr "Filtres"
 
 msgid "Thumbnail"
 msgstr "Vignette"
+
+msgid "Address Block Title"
+msgstr "Titre du bloc d'adresses"
+
+msgid "Address Block"
+msgstr "Bloc d'adresses"
+
+msgid "The first line of the address"
+msgstr "La première ligne de l'adresse"
+
+msgid "Static title"
+msgstr "Titre statique"
 
 msgid "Icon"
 msgstr "Icône"

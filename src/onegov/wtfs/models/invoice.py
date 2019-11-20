@@ -33,6 +33,7 @@ class Invoice(object):
                 ScanJob.municipality_id == self.municipality_id
             )
         query = query.order_by(
+            Municipality.meta['bfs_number'],
             Municipality.meta['gpn_number'],
             ScanJob.delivery_number
         )

@@ -11,8 +11,9 @@ from onegov.user.models import UserGroup
 
 
 class DummyApp():
-    def __init__(self, session):
+    def __init__(self, session, application_id='app'):
         self._session = session
+        self.application_id = application_id
 
     def session(self):
         return self._session
@@ -96,7 +97,7 @@ def test_registration_form(session):
     assert form.validate()
 
     # Test register user
-    auth = Auth(session, 'foobar')
+    auth = Auth(DummyApp(session, 'foobar'))
     auth.register(form, DummyRequest(session))
 
     assert session.query(User).filter_by(username='info@example.com').one()

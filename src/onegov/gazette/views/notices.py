@@ -111,10 +111,17 @@ def view_notices(self, request):
     if layout.publishing:
         states.append('published')
 
+    # https://kanton-zug.atlassian.net/browse/ZW-246
+    def for_state(state):
+        if state == 'accepted':
+            return self.for_state(state).for_order('first_issue', 'desc')
+
+        return self.for_state(state).for_order('first_issue', 'asc')
+
     filters = (
         {
             'title': _(state),
-            'link': request.link(self.for_state(state)),
+            'link': request.link(for_state(state)),
             'class': 'active' if state == self.state else ''
         }
         for state in states

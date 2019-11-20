@@ -528,7 +528,7 @@ def test_notice_collection_used_issues(session):
             user=None
         )
 
-    assert collection.used_issues == [a, b, c]
+    assert collection.used_issues == (c, b, a)
 
 
 def test_notice_collection_used_organizations(session):
@@ -549,7 +549,7 @@ def test_notice_collection_used_organizations(session):
                 user=None
             )
 
-    assert collection.used_organizations == [a, b, c]
+    assert collection.used_organizations == (a, b, c)
 
 
 def test_notice_collection_used_categories(session):
@@ -570,4 +570,4 @@ def test_notice_collection_used_categories(session):
                 user=None
             )
 
-    assert collection.used_categories == [a, b, c]
+    assert collection.used_categories == (a, b, c)

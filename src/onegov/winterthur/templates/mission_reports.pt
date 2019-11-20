@@ -19,7 +19,7 @@
                         <th i18n:translate>Mission nature</th>
                         <th class="min-width-column" i18n:translate>Location</th>
                         <th class="min-width-column">
-                            Pers<tal:b condition="legend">*</tal:b>
+                            Pers
                         </th>
                     </tr>
                 </thead>
@@ -48,7 +48,7 @@
                         <td data-label="Location" i18n:attributes="data-label" class="min-width-column">
                             ${report.location}
                         </td>
-                        <td data-label="Pers${legend and '*' or ''}" class="min-width-column">
+                        <td data-label="Pers" class="min-width-column">
                             <div>${report.personnel} / ${report.backup}</div>
                             <a tal:condition="not:layout.app.hide_civil_defence_field" href="https://stadt.winterthur.ch/gemeinde/verwaltung/sicherheit-und-umwelt/schutz-und-intervention/einsaetze/zivilschutz-einsaetze" target="_top">
                                 <img i18n:attributes="title" title="Civil Defence involvement"
@@ -67,7 +67,7 @@
             </div>
 
             <div class="mission-report-legend" tal:condition="legend">
-                <h2 i18n:translate>* Legend Personnel</h2>
+                <h2 i18n:translate>Legend</h2>
                 <tal:b tal:replace="structure legend" />
             </div>
         </tal:b>

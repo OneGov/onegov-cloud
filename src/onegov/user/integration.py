@@ -104,9 +104,6 @@ def handle_authentication(self, request):
             if not ajax_request:
                 request.success(request.translate(response.note))
 
-            # a user's source is always the last provider he used
-            response.user.source = self.name
-
             return Auth.from_request(request, to=self.to)\
                 .complete_login(user=response.user, request=request)
 

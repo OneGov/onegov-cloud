@@ -1,5 +1,3 @@
-
-import kerberos
 import morepath
 import pytest
 
@@ -9,8 +7,8 @@ from onegov.core.security import Public, Private, Secret
 from onegov.core.utils import scan_morepath_modules, module_path
 from onegov.user import Auth, UserApp
 from tests.shared.glauth import GLAuth
-from unittest.mock import patch, DEFAULT
 from tests.shared.client import Client
+from unittest.mock import MagicMock
 
 
 @pytest.fixture(scope='function')
@@ -89,6 +87,18 @@ def app(request, glauth_binary, postgres_dsn, temporary_path, redis_url,
     def view_auth(self, request):
         return 'login-page'
 
+    @App.view(model=Auth, permission=Public, name='login',
+              request_method='POST')
+    def handle_auth(self, request):
+        if self.login_to(
+                request.params.get('username'),
+                request.params.get('password'),
+                request):
+
+            return 'success'
+
+        return 'unauthorized'
+
     @App.json(model=PrivateDocument, permission=Private)
     def view_private(self, request):
         return {
@@ -116,13 +126,17 @@ def app(request, glauth_binary, postgres_dsn, temporary_path, redis_url,
             redis_url=redis_url,
             identity_secure=False,
             authentication_providers={
-                'ldap_kerberos': {
+                'ldap': {
                     'ldap_url': f'ldaps://{ldap_host}:{ldap_port}',
                     'ldap_username': 'cn=service,ou=service,dc=seantis,dc=ch',
                     'ldap_password': 'hunter2',
-                    'kerberos_keytab': keytab,
-                    'kerberos_hostname': 'ogc.example.org',
-                    'kerberos_service': 'HTTP',
+                    'roles': {
+                        '__default__': {
+                            'admins': 'cn=admins,ou=groups,dc=seantis,dc=ch',
+                            'editors': 'cn=editors,ou=groups,dc=seantis,dc=ch',
+                            'members': 'cn=members,ou=groups,dc=seantis,dc=ch',
+                        }
+                    }
                 }
             }
         )
@@ -138,50 +152,44 @@ def client(app):
     yield Client(app)
 
 
-def test_ldap_kerberos_provider(client):
+def test_generic_ldap(client):
 
-    def set_kerberos_user(methods, username):
-        methods['authGSSServerInit'].return_value = 1, None
-        methods['authGSSServerStep'].return_value = 1
-        methods['authGSSServerResponse'].return_value = 'foobar'
-        methods['authGSSServerUserName'].return_value = username
+    assert 'login-page' in client.get('/auth/login')
+    assert client.get('/private', status=403)
+    assert client.get('/secret', status=403)
 
-    def get(path):
-        url = f'/auth/provider/ldap_kerberos?to={path}'
-        headers = {'Authorization': 'Negotiate foobar'}
+    client.app.providers[0].ldap.compare = MagicMock()
 
-        page = client.spawn().get(url, headers=headers, expect_errors=True)
-        return page.maybe_follow(expect_errors=True)
+    client.app.providers[0].ldap.compare.return_value = False
+    assert 'unauthorized' in client.post('/auth/login', {
+        'username': 'editor@seantis.ch',
+        'password': 'hunter2'
+    })
 
-    # for our tests we must mock the answers, setting up
-    # a Kerberos environment is no easy task
-    methods = {
-        'authGSSServerInit': DEFAULT,
-        'authGSSServerStep': DEFAULT,
-        'authGSSServerResponse': DEFAULT,
-        'authGSSServerUserName': DEFAULT,
-    }
-    with patch.multiple(kerberos, **methods) as methods:
+    client.app.providers[0].ldap.compare.return_value = True
+    assert 'success' in client.post('/auth/login', {
+        'username': 'editor@seantis.ch',
+        'password': 'hunter2'
+    })
 
-        set_kerberos_user(methods, 'admin')
-        assert get('/private').json == {
-            'name': 'private',
-            'user': 'admin@seantis.ch'
-        }
+    assert client.get('/private', status=200)
+    assert client.get('/secret', status=403)
 
-        assert get('/secret').json == {
-            'name': 'secret',
-            'user': 'admin@seantis.ch'
-        }
+    assert 'success' in client.post('/auth/login', {
+        'username': 'admin@seantis.ch',
+        'password': 'hunter2'
+    })
 
-        set_kerberos_user(methods, 'editor')
-        assert get('/private').json == {
-            'name': 'private',
-            'user': 'editor@seantis.ch'
-        }
+    assert client.get('/private', status=200)
+    assert client.get('/secret', status=200)
 
-        assert get('/secret').status_code == 403
+    # the uid can be used alternatively
+    assert 'success' in client.post('/auth/login', {
+        'username': 'admin',
+        'password': 'hunter2'
+    })
 
-        set_kerberos_user(methods, 'anonymous')
-        assert 'login-page' in get('/private')
-        assert 'login-page' in get('/secret')
+    assert 'success' in client.post('/auth/login', {
+        'username': 'editor',
+        'password': 'hunter2'
+    })

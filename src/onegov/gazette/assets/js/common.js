@@ -74,8 +74,14 @@ $('.sub-nav-chosen-select').chosen({
 // the chosen selects or the checkbox.
 $('a.notice-filter').click(function(event) {
     var form = $(this).parents('form');
-    form.attr('action', this.getAttribute('href'));
+    var url = new URL(this.getAttribute('href'));
+
+    form.find('input[name="order"]').val(url.searchParams.get('order'));
+    form.find('input[name="direction"]').val(url.searchParams.get('direction'));
+
+    form.attr('action', url.toString());
     form.submit();
+
     event.preventDefault();
 });
 $('input[name=own]').on('change', function() {

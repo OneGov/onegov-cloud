@@ -82,7 +82,7 @@ def handle_create_signup_link(self, request, form):
     link = None
 
     if form.submitted(request):
-        auth = Auth.from_app(request.app)
+        auth = Auth(request.app)
         auth.signup_token = form.signup_token(auth)
 
         link = request.link(auth, 'register')

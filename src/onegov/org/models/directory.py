@@ -314,11 +314,18 @@ class ExtendedDirectoryEntry(DirectoryEntry, CoordinatesExtension,
         )
 
         if contact_config:
-            values = (self.values.get(name) for name in contact_config)
-            value = '\n'.join(linkify(v) for v in values if v)
+            if self.directory.configuration.address_block_title:
+                values = [self.directory.configuration.address_block_title]
+            else:
+                values = []
+
+            for name in contact_config:
+                values.append(self.values.get(name))
+
+            result = '\n'.join(linkify(v) for v in values if v)
 
             return '<ul><li>{}</li></ul>'.format(
-                '</li><li>'.join(value.splitlines())
+                '</li><li>'.join(result.splitlines())
             )
 
     @property

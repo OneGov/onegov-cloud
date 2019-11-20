@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-10-25 10:14+0200\n"
+"POT-Creation-Date: 2019-11-18 16:06+0100\n"
 "PO-Revision-Date: 2019-02-18 06:39+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -227,6 +227,18 @@ msgstr "Filter"
 
 msgid "Thumbnail"
 msgstr "Thumbnail"
+
+msgid "Address Block Title"
+msgstr "Addressblock Titel"
+
+msgid "Address Block"
+msgstr "Adressblock"
+
+msgid "The first line of the address"
+msgstr "Die erste Zeile der Adresse"
+
+msgid "Static title"
+msgstr "Fixer Titel"
 
 msgid "Icon"
 msgstr "Symbol"
@@ -846,7 +858,9 @@ msgstr "OneGov Cloud Informationen verstecken"
 msgid ""
 "This includes the link to the marketing page, and the link to the privacy "
 "policy."
-msgstr "Dies beinhaltet den Link auf die Marketing Seite, sowie der Link zum Datenschutz."
+msgstr ""
+"Dies beinhaltet den Link auf die Marketing Seite, sowie der Link zum "
+"Datenschutz."
 
 msgid "Facebook"
 msgstr "Facebook"

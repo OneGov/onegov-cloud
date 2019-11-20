@@ -21,6 +21,9 @@
                 </div>
 
                 <form action="" method="GET">
+                    <input type="hidden" name="order" value="">
+                    <input type="hidden" name="direction" value="">
+
                     <dl class="sub-nav state" tal:condition="filters">
                       <dt><tal:block i18n:translate>State</tal:block>:</dt>
                       <dd tal:repeat="filter filters" class="${filter['class']}">
