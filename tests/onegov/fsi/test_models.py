@@ -17,7 +17,7 @@ def test_attendee_as_external(session, external_attendee):
 
 def test_attendee_1(
         session, attendee, future_course_event, member, course_event):
-    past_event = course_event(session)
+    # past_event = course_event(session)
     course_event = future_course_event(session)
     attendee, data = attendee(session)
     member = member(session)

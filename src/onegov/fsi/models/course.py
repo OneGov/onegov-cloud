@@ -27,4 +27,3 @@ class Course(Base):
         plugin.
         """
         return self.description
-

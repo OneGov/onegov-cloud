@@ -13,6 +13,6 @@ def test_view_courses(client):
 
 def test_view_courses_new(client):
     page = client.get('/events/add')
+    assert page
     # page.form['domain'] = 'federation'
     # page.form.submit()
-

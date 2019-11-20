@@ -22,7 +22,7 @@ def test_datetime_string_conversion(dt, string):
 
 
 @pytest.mark.parametrize("dt, string", [
-    (timedelta(days=2*365), '2 years'),
+    (timedelta(days=2 * 365), '2 years'),
     (timedelta(days=1), ' 1.2 day '),
     (timedelta(days=3), '3days'),
     (timedelta(days=7), ' 1 week'),

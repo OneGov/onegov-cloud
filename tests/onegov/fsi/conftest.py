@@ -255,8 +255,12 @@ def future_course_reservation(future_course_event, attendee):
 def course_event_data():
     def _course_event_data():
         return dict(
-            name='A', presenter_name='P', presenter_company='C', id=uuid4(),
-        description='Some Desc')
+            name='A',
+            presenter_name='P',
+            presenter_company='C',
+            id=uuid4(),
+            description='Some Desc'
+        )
     return _course_event_data
 
 

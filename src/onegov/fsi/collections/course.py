@@ -1,4 +1,4 @@
-from onegov.core.collection import GenericCollection, Pagination
+from onegov.core.collection import GenericCollection
 from onegov.fsi.models.course import Course
 
 

@@ -1,7 +1,4 @@
 import datetime
-from uuid import uuid4
-
-import pytest
 from sedate import utcnow
 
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
@@ -15,15 +12,15 @@ from tests.onegov.fsi.common import collection_attr_eq_test
 def test_course_event_collection(session, course):
     now = utcnow()
     new_course_events = (
-            CourseEvent(
-                course_id=course(session)[0].id,
-                location=f'Address, Room {i}',
-                start=now + datetime.timedelta(days=i),
-                end=now + datetime.timedelta(days=i, hours=2),
-                presenter_name=f'P{i}',
-                presenter_company=f'C{i}',
-                presenter_email=f'{i}@email.com'
-            ) for i in (-1, 1, 2)
+        CourseEvent(
+            course_id=course(session)[0].id,
+            location=f'Address, Room {i}',
+            start=now + datetime.timedelta(days=i),
+            end=now + datetime.timedelta(days=i, hours=2),
+            presenter_name=f'P{i}',
+            presenter_company=f'C{i}',
+            presenter_email=f'{i}@email.com'
+        ) for i in (-1, 1, 2)
     )
     session.add_all(new_course_events)
     session.flush()
@@ -59,7 +56,6 @@ def test_course_event_collection(session, course):
 def test_event_collection_add_placeholder(session, course_event):
     # Test add_placeholder method
     course_event, data = course_event(session)
-    event_coll = CourseEventCollection(session)
     # event_coll.add_placeholder('Placeholder', course_event)
     # Tests the secondary join event.attendees as well
     assert course_event.attendees.count() == 0

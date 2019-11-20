@@ -111,4 +111,3 @@ def delete_course(self, request):
         CourseEventCollection(request.session).delete(self)
     else:
         request.warning(_('This course has events and can not be deleted'))
-
