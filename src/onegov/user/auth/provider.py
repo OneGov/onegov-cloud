@@ -199,14 +199,19 @@ def spawn_ldap_client(**cfg):
     return client
 
 
-def ensure_user(source, session, username, role):
+def ensure_user(source, source_id, session, username, role):
     """ Creates the given user if it doesn't already exist. Ensures the
     role is set to the given role in all cases.
 
     """
 
     users = UserCollection(session)
-    user = users.by_username(username)
+
+    # find the user by source and source_id
+    user = users.by_source_id(source, source_id)
+
+    # fall back to the username
+    user = user or users.by_username(username)
 
     if not user:
         user = users.add(
@@ -215,11 +220,15 @@ def ensure_user(source, session, username, role):
             role=role
         )
 
+    # update the username
+    user.username = username
+
     # update the role in all cases, should it change
     user.role = role
 
     # the source of the user is always the last provider that was used
     user.source = source
+    user.source_id = source_id
 
     return user
 
@@ -421,7 +430,7 @@ class LDAPProvider(
 
         for name, attrs in entries.items():
             groups = attrs[self.attributes.groups]
-            uid = attrs[self.attributes.uid]
+            uid = attrs[self.attributes.uid][0]
 
             # do not iterate over all entries, or this becomes a very
             # handy way to check a single password against multiple
@@ -446,10 +455,10 @@ class LDAPProvider(
 
         return ensure_user(
             source=self.name,
+            source_id=uid,
             session=request.session,
             username=username,
-            role=role,
-            uid=uid)
+            role=role)
 
 
 @attrs(auto_attribs=True)
@@ -592,7 +601,7 @@ class LDAPKerberosProvider(
 
         return ensure_user(
             source=self.name,
+            source_id=username,
             session=request.session,
             username=mails[0],
-            role=role,
-            uid=username)
+            role=role)

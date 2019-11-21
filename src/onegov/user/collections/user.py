@@ -180,6 +180,11 @@ class UserCollection(object):
         """ Returns the user by username. """
         return self.query().filter(User.username == username).first()
 
+    def by_source_id(self, source, source_id):
+        """ Returns the user by source and source_id. """
+        return self.query()\
+            .filter_by(source=source, source_id=source_id).first()
+
     def by_username_and_password(self, username, password):
         """ Returns the user by username and password.
 
