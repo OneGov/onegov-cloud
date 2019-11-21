@@ -431,6 +431,11 @@ class Pdf(PDFDocument):
             text = text.strip('\r\n')
             prefix = ' ' if text.startswith(' ') else ''
             postfix = ' ' if text.endswith(' ') else ''
+
+            # some characters cause issues in the Reportlab and pdfdocument
+            # library, so we need to escape them
+            text = text.replace(';', '&#59;')
+
             return prefix + text.strip() + postfix
 
         def inner_html(element):
