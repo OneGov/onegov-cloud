@@ -399,7 +399,7 @@ class Pdf(PDFDocument):
 
         """
 
-        if not html:
+        if not html or html == '<p></p>':
             return
 
         # Remove unwanted markup
