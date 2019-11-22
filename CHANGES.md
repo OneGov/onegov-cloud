@@ -1,8 +1,49 @@
 # Changes
 
+## Release `2019.39`
+
+> commits: **255 / [4fa47c7b87...7bc18af1e1](https://github.com/OneGov/onegov-cloud/compare/4fa47c7b87^...7bc18af1e1)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.39)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+🐞 **Fixes PDF generation not working**
+
+Semicolons were not escaped which lead to invalid PDF files in some
+scenarios.
+
+**`Bugfix`** | **[687504c8a8](https://github.com/onegov/onegov-cloud/commit/687504c8a845cd3f8dbc2ff3a89e85cba8ccc061)**
+
+🐞 **Fixes PDF rendering failing in certain cases**
+
+This is the second fix to the PDF rendering issue. We found that the
+logo of Appenzell Ausserrhoden could not be parsed reliably and needed
+to be replaced with a high-resolution PNG.
+
+**`Bugfix`** | **[7bc18af1e1](https://github.com/onegov/onegov-cloud/commit/7bc18af1e13809f945568c01aa4a8d9d24664d5f)**
+
+### Fsi
+
+🎉 **Supports database updates**
+
+Database updates were not yet activated. Existing FSI databases have to
+be recreated.
+
+**`Feature`** | **[ed99729224](https://github.com/onegov/onegov-cloud/commit/ed9972922429f1cf3edf2ac3b65e0e27244aec34)**
+
+### User
+
+🎉 **Adds a source id to external users**
+
+This allows us to track user changes by external providers, including
+changes to the e-mail address.
+
+**`Feature`** | **[23ce2b6793](https://github.com/onegov/onegov-cloud/commit/23ce2b6793bd50020294f213225549b5895b8705)**
+
 ## Release `2019.38`
 
-> commits: **5 / [0658a7862b...e8570e82e2](https://github.com/OneGov/onegov-cloud/compare/0658a7862b^...e8570e82e2)**<br>
+> released: **2019-11-19 08:38**<br>
+> commits: **6 / [0658a7862b...176281bfe3](https://github.com/OneGov/onegov-cloud/compare/0658a7862b^...176281bfe3)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.38)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
