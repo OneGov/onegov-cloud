@@ -54,15 +54,25 @@ class CourseAttendee(Base):
     first_name = Column(Text, nullable=True)
     last_name = Column(Text, nullable=True)
 
-    # The organization of the attendee. This has an influence on the
-    # permissions of the user, as editors should only have access to the
-    # information of attendees belonging to the same organization.
+    # The organization this user belongs to, which may be a path like this:
+    #
+    # BD / HBA / Planungsbaukommission
+    #
+    # This is equal to Baudirektion / Hochbauamt / Planungsbaukommission.
+    # The path may also be shorter:
+    #
+    # BD / HBA
+    #
+    # Or be missing all together.
+    #
+    # This is used for permissions. Editors are limited to access the users
+    # for whose organization they have access by full path / exact match.
+    #
+    # So a user would have to have get permission for both
+    # BD / HBA / Planungsbaukommission" and "BD / HBA" to access all of
+    # "BD / HBA / *"
+    #
     organisation = Column(Text, nullable=True)
-
-    # The department is for information only, it has no impact on permissions.
-    # A department here is part of an organization (with an organization
-    # spanning multiple departments).
-    department = Column(Text, nullable=True)
 
     _email = Column(Text, unique=True)
     address = meta_property('address')
