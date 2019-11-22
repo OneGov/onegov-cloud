@@ -218,8 +218,18 @@ class AgencyPdfAr(AgencyPdfDefault):
         numbers.
 
         """
+        height = .81 * cm
+        width = height * 5.72
 
-        page_fn_header_logo(canvas, doc)
+        canvas.saveState()
+        canvas.drawImage(
+            doc.logo,
+            x=doc.leftMargin,
+            y=doc.pagesize[1] - 2.35 * cm,
+            height=height,
+            width=width,
+            mask='auto')
+        canvas.restoreState()
         AgencyPdfAr.page_fn_footer(canvas, doc)
 
     @staticmethod
@@ -251,10 +261,8 @@ class AgencyPdfAr(AgencyPdfDefault):
     def __init__(self, *args, **kwargs):
         filename = path.join(
             module_path('onegov.agency', 'static/logos'),
-            'canton-ar.svg'
+            'canton-ar.png'
         )
-        with open(filename) as file:
-            logo = file.read()
-        kwargs['logo'] = logo
+        kwargs['logo'] = filename
         kwargs['author'] = "Kanton Appenzell Ausserrhoden"
         super(AgencyPdfDefault, self).__init__(*args, **kwargs)
