@@ -90,6 +90,9 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
     #: reservation deadline (e.g. None, (5, 'd'), (24, 'h'))
     deadline = content_property()
 
+    #: the default view
+    default_view = content_property()
+
     #: reservation zip code limit, contains None or something like this:
     #: {
     #:     'zipcode_field': 'PLZ',

@@ -84,3 +84,12 @@ def add_access_token_to_existing_resources(context):
     if run_upgrades(context):
         for resource in context.session.query(Resource):
             resource.renew_access_token()
+
+
+@upgrade_task('Add default view to existing resource types')
+def add_default_view_to_existing_resource_types(context):
+    for resource in context.session.query(Resource):
+        if resource.type == 'daypass':
+            resource.default_view = 'month'
+        else:
+            resource.default_view = 'agendaWeek'

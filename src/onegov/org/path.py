@@ -254,7 +254,7 @@ def get_resources(app):
 
 @OrgApp.path(model=Resource, path='/resource/{name}', converters=dict(
              date=date, highlights_min=int, highlights_max=int))
-def get_resource(app, name, date=None, view='agendaWeek',
+def get_resource(app, name, date=None, view=None,
                  highlights_min=None, highlights_max=None):
 
     resource = app.libres_resources.by_name(name)

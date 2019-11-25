@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-11-18 16:06+0100\n"
+"POT-Creation-Date: 2019-11-25 10:08+0100\n"
 "PO-Revision-Date: 2019-02-18 06:39+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -775,6 +775,15 @@ msgstr "Preis pro Eintrag"
 
 msgid "Price per hour"
 msgstr "Preis pro Stunde"
+
+msgid "Default view"
+msgstr "Standardansicht"
+
+msgid "Week view"
+msgstr "Wochenansicht"
+
+msgid "Month view"
+msgstr "Monatsansicht"
 
 msgid "Please select the form field that holds the zip-code"
 msgstr "Bitte wählen Sie das Formfeld welches die Postleitzahl enthält"

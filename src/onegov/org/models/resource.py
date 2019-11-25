@@ -41,12 +41,16 @@ class SharedMethods(object):
         else:
             date = sedate.to_timezone(sedate.utcnow(), self.timezone)
 
-        if self.view == 'month':
+        view = self.view or self.default_view or 'agendaWeek'
+
+        if view == 'month':
             return sedate.align_range_to_month(date, date, self.timezone)
-        elif self.view == 'agendaWeek':
+        elif view == 'agendaWeek':
             return sedate.align_range_to_week(date, date, self.timezone)
-        elif self.view == 'agendaDay':
+        elif view == 'agendaDay':
             return sedate.align_range_to_day(date, date, self.timezone)
+        else:
+            raise NotImplementedError()
 
     def remove_expired_reservation_sessions(self, expiration_date=None):
         session = self.libres_context.get_service('session_provider').session()
@@ -130,7 +134,7 @@ class DaypassResource(Resource, AccessExtension, SearchableContent,
 
     es_type_name = 'daypasses'
 
-    # the default view
+    # the selected view
     view = 'month'
 
     # show or hide quota numbers in reports
@@ -147,8 +151,8 @@ class RoomResource(Resource, AccessExtension, SearchableContent,
 
     es_type_name = 'rooms'
 
-    # the default view
-    view = 'agendaWeek'
+    # the selected view (depends on the resource's default)
+    view = None
 
     # show or hide quota numbers in reports
     show_quota = False

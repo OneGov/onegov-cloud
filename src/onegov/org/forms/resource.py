@@ -156,6 +156,25 @@ class ResourceBaseForm(Form):
         validators=[validators.InputRequired()],
     )
 
+    # only used for rooms, not day-passes
+    default_view = RadioField(
+        label=_("Default view"),
+        fieldset=_("View"),
+        default='agendaWeek',
+        validators=[validators.InputRequired()],
+        choices=(
+            ('agendaWeek', _("Week view")),
+            ('month', _("Month view")),
+        ))
+
+    def on_request(self):
+        if hasattr(self.model, 'type'):
+            if self.model.type == 'daypass':
+                self.delete_field('default_view')
+        else:
+            if self.request.view_name.endswith('new-daypass'):
+                self.delete_field('default_view')
+
     @property
     def zipcodes(self):
         return [int(z) for z in self.zipcode_list.data.split()]
