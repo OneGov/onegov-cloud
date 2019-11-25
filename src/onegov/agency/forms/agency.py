@@ -3,6 +3,7 @@ from io import BytesIO
 from onegov.agency import _
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.models import ExtendedAgency
+from onegov.agency.utils import handle_empty_p_tags
 from onegov.core.utils import linkify
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField, HtmlField
@@ -80,7 +81,9 @@ class ExtendedAgencyForm(Form):
 
     def update_model(self, model):
         model.title = self.title.data
-        model.portrait = linkify(self.portrait.data, escape=False)
+        model.portrait = handle_empty_p_tags(
+            linkify(self.portrait.data, escape=False)
+        )
         model.export_fields = self.export_fields.data
         if self.organigram.action == 'delete':
             del model.organigram

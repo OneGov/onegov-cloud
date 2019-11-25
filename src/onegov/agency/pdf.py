@@ -1,5 +1,7 @@
 from datetime import date
 from io import BytesIO
+
+from onegov.agency.utils import handle_empty_p_tags
 from onegov.core.utils import module_path
 from onegov.pdf import page_fn_footer
 from onegov.pdf import page_fn_header_and_footer
@@ -113,7 +115,7 @@ class AgencyPdfDefault(Pdf):
             self.story[-1].keepWithNext = True
 
         has_content = False
-        if agency.portrait:
+        if handle_empty_p_tags(agency.portrait):
             self.mini_html(agency.portrait_html, linkify=True)
             has_content = True
 
