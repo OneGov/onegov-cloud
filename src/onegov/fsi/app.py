@@ -12,6 +12,10 @@ class FsiApp(OrgApp):
 
     request_class = FsiRequest
 
+    # FSI doesn't really deal with tickets much, so no reason to send the
+    # daily ticket statistics.
+    send_daily_ticket_statistics = False
+
     def configure_organisation(self, **cfg):
         cfg.setdefault('enable_user_registration', False)
         cfg.setdefault('enable_yubikey', False)

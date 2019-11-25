@@ -39,6 +39,9 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     directory_search_widget = directive(directives.DirectorySearchWidgetAction)
     settings_view = directive(directives.SettingsView)
 
+    #: cronjob settings
+    send_daily_ticket_statistics = True
+
     def is_allowed_application_id(self, application_id):
         """ Stops onegov.server from ever passing the request to the org
         application, if the schema does not exist. This way we can host

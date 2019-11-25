@@ -78,6 +78,9 @@ def send_daily_ticket_statistics(request):
     if today.weekday() in (SAT, SUN):
         return
 
+    if not request.app.send_daily_ticket_statistics:
+        return
+
     args = {}
     app = request.app
 
