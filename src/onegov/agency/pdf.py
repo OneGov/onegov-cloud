@@ -1,5 +1,7 @@
 from datetime import date
 from io import BytesIO
+
+from onegov.agency.utils import handle_empty_p_tags
 from onegov.core.utils import module_path
 from onegov.pdf import page_fn_footer
 from onegov.pdf import page_fn_header_and_footer
@@ -104,16 +106,19 @@ class AgencyPdfDefault(Pdf):
         ):
             self.pagebreak()
         else:
-            self.spacer()
+            if content_so_far:
+                self.spacer()
 
         self.previous_level_context = level
+
+        self.start_keeptogether()
 
         if not skip_title:
             self.h(agency.title, level)
             self.story[-1].keepWithNext = True
 
         has_content = False
-        if agency.portrait:
+        if handle_empty_p_tags(agency.portrait):
             self.mini_html(agency.portrait_html, linkify=True)
             has_content = True
 
@@ -126,6 +131,8 @@ class AgencyPdfDefault(Pdf):
             self.image(BytesIO(agency.organigram_file.read()))
             self.spacer()
             has_content = True
+
+        self.end_keeptogether()
 
         for child in agency.children:
             if child.access == 'private':
