@@ -106,7 +106,8 @@ class AgencyPdfDefault(Pdf):
         ):
             self.pagebreak()
         else:
-            self.spacer()
+            if content_so_far:
+                self.spacer()
 
         self.previous_level_context = level
 
