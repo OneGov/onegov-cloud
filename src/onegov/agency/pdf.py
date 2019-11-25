@@ -111,6 +111,8 @@ class AgencyPdfDefault(Pdf):
 
         self.previous_level_context = level
 
+        self.start_keeptogether()
+
         if not skip_title:
             self.h(agency.title, level)
             self.story[-1].keepWithNext = True
@@ -129,6 +131,8 @@ class AgencyPdfDefault(Pdf):
             self.image(BytesIO(agency.organigram_file.read()))
             self.spacer()
             has_content = True
+
+        self.end_keeptogether()
 
         for child in agency.children:
             if child.access == 'private':
