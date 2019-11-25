@@ -317,7 +317,6 @@ def create_agency_pdf(self, request, form):
             page_break_on_level=page_break_level
         )
         request.success(_("PDF created"))
-        # FIXME: clear cache for redirect so that pdf link is updated
         return redirect(request.link(self))
 
     layout = AgencyLayout(self, request)
