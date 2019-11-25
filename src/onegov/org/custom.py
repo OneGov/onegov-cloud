@@ -1,10 +1,11 @@
 from onegov.chat import MessageCollection
+from onegov.core.elements import Link, LinkGroup
 from onegov.org import _, OrgApp
 from onegov.org.models import GeneralFileCollection, ImageFileCollection
-from onegov.core.elements import Link, LinkGroup
 from onegov.pay import PaymentProviderCollection, PaymentCollection
 from onegov.ticket import TicketCollection
 from onegov.user import Auth, UserCollection
+from purl import URL
 
 
 @OrgApp.template_variables()
@@ -12,6 +13,11 @@ def get_template_variables(request):
     return {
         'global_tools': tuple(get_global_tools(request))
     }
+
+
+def logout_path(request):
+    url = URL(request.link(request.app.org))
+    return url.path()
 
 
 def get_global_tools(request):
@@ -26,7 +32,8 @@ def get_global_tools(request):
             ),
             Link(
                 _("Logout"), request.link(
-                    Auth.from_request(request), name='logout'
+                    Auth.from_request(
+                        request, to=logout_path(request)), name='logout'
                 ), attrs={'class': 'logout'}
             ),
         ))
