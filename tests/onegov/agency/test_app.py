@@ -17,7 +17,7 @@ class DummyRequest():
     def class_link(self, cls, name=''):
         return f'{cls.__name__}/{name}'
 
-    def link(self, target, name):
+    def link(self, target, name=None):
         return f"{target.__class__.__name__}/{name}"
 
     def transform(self, url):
