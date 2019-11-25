@@ -1,10 +1,10 @@
 from uuid import uuid4
 
 from sedate import utcnow
-from sqlalchemy import Column, Text, ForeignKey, JSON, Enum
+from sqlalchemy import Column, Text, ForeignKey, Enum
 
 from onegov.core.orm import Base
-from onegov.core.orm.types import UUID
+from onegov.core.orm.types import UUID, JSON
 from onegov.core.orm.mixins import meta_property
 from sqlalchemy.orm import relationship, object_session, backref
 from onegov.fsi import _
