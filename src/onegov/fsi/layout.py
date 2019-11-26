@@ -1,5 +1,3 @@
-from onegov.fsi.models.course_attendee import ATTENDEE_TITLE_TRANSLATIONS, \
-    ATTENDEE_TITLES
 from onegov.fsi.models.course_event import (
     COURSE_EVENT_STATUSES_TRANSLATIONS, COURSE_EVENT_STATUSES
 )
@@ -28,8 +26,3 @@ class DefaultLayout(BaseLayout):
             NOTIFICATION_TYPES.index(notification_type)
         ]
 
-    @staticmethod
-    def format_salutation(title):
-        return ATTENDEE_TITLE_TRANSLATIONS[
-            ATTENDEE_TITLES.index(title)
-        ]

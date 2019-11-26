@@ -74,7 +74,6 @@ def planner(admin):
         data = dict(
             first_name='P',
             last_name='P',
-            address='Address',
             user_id=user.id
         )
         data.update(**kwargs)
@@ -111,7 +110,6 @@ def attendee(member):
         data = dict(
             first_name='F',
             last_name='L',
-            address='Address',
             user_id=user.id)
         data.update(**kwargs)
         attendee = session.query(CourseAttendee).filter_by(
@@ -132,8 +130,7 @@ def external_attendee(admin):
         data = dict(
             first_name='E',
             last_name='E',
-            email='external@example.org',
-            address='Address')
+            email='external@example.org')
         data.update(**kwargs)
         if not attendee:
             attendee = CourseAttendee(**data)

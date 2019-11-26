@@ -1,23 +1,12 @@
 from uuid import uuid4
 
 from sedate import utcnow
-from sqlalchemy import Column, Text, ForeignKey, Enum, ARRAY
+from sqlalchemy import Column, Text, ForeignKey, ARRAY
 
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID, JSON
 from onegov.core.orm.mixins import meta_property
 from sqlalchemy.orm import relationship, object_session, backref
-from onegov.fsi import _
-
-
-ATTENDEE_TITLES = ('mr', 'ms', 'none')
-ATTENDEE_TITLE_TRANSLATIONS = (_('Mr.'), _('Ms.'), _('None'))
-
-
-def attendee_title_choices():
-    return tuple(
-        (val, key) for val, key in zip(ATTENDEE_TITLES,
-                                       ATTENDEE_TITLE_TRANSLATIONS))
 
 
 class CourseAttendee(Base):
@@ -73,7 +62,6 @@ class CourseAttendee(Base):
     permissions = Column(ARRAY(Text), default=list)
 
     _email = Column(Text, unique=True)
-    address = meta_property('address')
 
     def __str__(self):
         if self.first_name and self.last_name:

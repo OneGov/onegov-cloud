@@ -12,10 +12,6 @@
                                 <dt i18n:translate>E-Mail</dt>
                                 <dd>${model.email}</dd>
                             </dl>
-                            <dl class="field-display" tal:condition="layout.salutation">
-                                <dt i18n:translate>Salutation</dt>
-                                <dd>${layout.salutation}</dd>
-                            </dl>
                             <dl class="field-display" tal:condition="model.first_name">
                                 <dt i18n:translate>First name</dt>
                                 <dd>${model.first_name}</dd>
@@ -23,10 +19,6 @@
                             <dl class="field-display" tal:condition="model.last_name">
                                 <dt i18n:translate>Last name</dt>
                                 <dd>${model.last_name}</dd>
-                            </dl>
-                            <dl class="field-display" tal:condition="model.address">
-                                <dt i18n:translate>Address</dt>
-                                <dd>${model.address}</dd>
                             </dl>
                             <dl class="field-display">
                                 <dt i18n:translate>Total courses</dt>

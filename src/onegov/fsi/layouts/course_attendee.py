@@ -80,6 +80,3 @@ class CourseAttendeeLayout(DefaultLayout):
             )
         return links
 
-    @cached_property
-    def salutation(self):
-        return self.format_salutation(self.model.title)
