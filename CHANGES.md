@@ -1,8 +1,25 @@
 # Changes
 
+## Release `2019.41`
+
+> commits: **1 / [1c5bad57b7...1c5bad57b7](https://github.com/OneGov/onegov-cloud/compare/1c5bad57b7^...1c5bad57b7)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.41)](https://buildkite.com/seantis/onegov-cloud)
+
+### File
+
+🐞 **Removes PDF file sanitizing**
+
+This caused a number of issues with Reportlab generated PDFs. Since the
+risk of malicious PDFs is somewhat low in most modern environments, we
+disable the PDF sanitizing feature, until we find one that works
+reliably.
+
+**`Bugfix`** | **[1c5bad57b7](https://github.com/onegov/onegov-cloud/commit/1c5bad57b7d77d8fe9aee9f5bf9e5f22d2b53585)**
+
 ## Release `2019.40`
 
-> commits: **8 / [df42fa39b6...1d951640d6](https://github.com/OneGov/onegov-cloud/compare/df42fa39b6^...1d951640d6)**<br>
+> released: **2019-11-26 09:05**<br>
+> commits: **9 / [df42fa39b6...ba91f9cc07](https://github.com/OneGov/onegov-cloud/compare/df42fa39b6^...ba91f9cc07)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.40)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
