@@ -9,20 +9,17 @@ class CourseAttendeeForm(Form):
 
     first_name = StringField(
         label=_('First Name'),
-        render_kw={'size': 3},
         validators=[InputRequired()]
     )
 
     last_name = StringField(
         label=_('Last Name'),
-        render_kw={'size': 4},
         validators=[InputRequired()],
     )
 
     email = EmailField(
         label=_('Email'),
         validators=[InputRequired(), Email()],
-        render_kw={'size': 4},
     )
 
     def update_model(self, model):
