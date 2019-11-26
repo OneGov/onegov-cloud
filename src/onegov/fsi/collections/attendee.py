@@ -52,7 +52,7 @@ class CourseAttendeeCollection(GenericCollection, Pagination):
 
         if self.attendee_permissions is not None:
             query = query.filter(
-                CourseAttendee.organisation in self.attendee_permissions)
+                CourseAttendee.organisation.in_(self.attendee_permissions))
         return query
 
     def subset(self):
