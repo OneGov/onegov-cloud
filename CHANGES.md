@@ -1,8 +1,44 @@
 # Changes
 
+## Release `2019.40`
+
+> commits: **8 / [df42fa39b6...1d951640d6](https://github.com/OneGov/onegov-cloud/compare/df42fa39b6^...1d951640d6)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.40)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+🐞 **Improves pdf rendering**
+
+- Fixes saving and rendering empty p-tags for agency.portrait
+- Does not add spacer after empty title
+- Keeps agency and members on one page if possible
+
+**`Bugfix`** | **[f62d32a463](https://github.com/onegov/onegov-cloud/commit/f62d32a463a41f7f49de0dcea719c412c79689cf)**
+
+### Org
+
+🎉 **Adds default view option to resource editor**
+
+This gives users the ability to have their room resource open with a
+monthly or weekly view. So far, the weekly view was hardcoded in this
+case.
+
+They daypass resource only has one view, so the option is not shown for
+this resource type.
+
+**`Feature`** | **[ZW-226](https://kanton-zug.atlassian.net/browse/ZW-226)** | **[184c4ae1e5](https://github.com/onegov/onegov-cloud/commit/184c4ae1e58406083a99ff28a1f2756635bc855c)**
+
+🐞 **Fixes logout not redirecting to root**
+
+This issue only occurred in development, where the full path to the
+tenant is used in the browser.
+
+**`Bugfix`** | **[5a42041a41](https://github.com/onegov/onegov-cloud/commit/5a42041a416a77231d95175fa59fe0299cd477f6)**
+
 ## Release `2019.39`
 
-> commits: **255 / [4fa47c7b87...7bc18af1e1](https://github.com/OneGov/onegov-cloud/compare/4fa47c7b87^...7bc18af1e1)**<br>
+> released: **2019-11-22 13:58**<br>
+> commits: **256 / [4fa47c7b87...1986fcfd5b](https://github.com/OneGov/onegov-cloud/compare/4fa47c7b87^...1986fcfd5b)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.39)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
