@@ -67,6 +67,23 @@ def admin(hashed_password):
 
 
 @pytest.fixture(scope='function')
+def editor(hashed_password):
+    def _editor(session):
+        editor = session.query(User).filter_by(
+            username='editor@example.org').first()
+        if not editor:
+            admin = User(
+                username='editor@example.org',
+                password_hash=hashed_password,
+                role='editor'
+            )
+            session.add(admin)
+            session.flush()
+        return editor
+    return _editor
+
+
+@pytest.fixture(scope='function')
 def planner(admin):
     def _planner(session, **kwargs):
         # aka Kursverantwortlicher, is an admin, has admin email
