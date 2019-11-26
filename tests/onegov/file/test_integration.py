@@ -228,8 +228,13 @@ def test_bust_cache_via_events(app, temporary_path):
     app.frontend_cache_bust_delay = 0.1
 
     def busted(fid):
-        sleep(0.2)
-        return (temporary_path / fid).exists()
+        for _ in range(0, 10):
+            if (temporary_path / fid).exists():
+                return True
+            else:
+                sleep(0.1)
+        else:
+            return (temporary_path / fid).exists()
 
     def reset(fid):
         (temporary_path / fid).unlink()
