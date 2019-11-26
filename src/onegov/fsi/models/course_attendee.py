@@ -1,7 +1,7 @@
 from uuid import uuid4
 
 from sedate import utcnow
-from sqlalchemy import Column, Text, ForeignKey, Enum
+from sqlalchemy import Column, Text, ForeignKey, Enum, ARRAY
 
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID, JSON
@@ -46,10 +46,6 @@ class CourseAttendee(Base):
     user_id = Column(UUID, ForeignKey('users.id'), nullable=True)
     user = relationship("User", backref=backref("attendee", uselist=False))
 
-    title = Column(
-        Enum(*ATTENDEE_TITLES, name='title'),
-        nullable=False,
-        default='none')
 
     first_name = Column(Text, nullable=True)
     last_name = Column(Text, nullable=True)
@@ -73,6 +69,8 @@ class CourseAttendee(Base):
     # "BD / HBA / *"
     #
     organisation = Column(Text, nullable=True)
+
+    permissions = Column(ARRAY(Text), default=list)
 
     _email = Column(Text, unique=True)
     address = meta_property('address')
