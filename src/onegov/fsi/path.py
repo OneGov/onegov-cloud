@@ -65,13 +65,18 @@ def get_courses(request):
 
 
 @FsiApp.path(model=CourseAttendeeCollection, path='/fsi/attendees',
-             converters=dict(exclude_external=bool, external_only=bool))
+             converters=dict(
+                 exclude_external=bool, external_only=bool, attendee_id=UUID))
 def get_attendees(
-        request, page=0, exclude_external=False, external_only=False):
+        request, page=0, exclude_external=False, external_only=False,
+        attendee_id=None):
+    if not request.is_admin:
+        attendee_id = request.attendee_id
     return CourseAttendeeCollection(
         request.session, page,
         exclude_external=exclude_external,
-        external_only=external_only
+        external_only=external_only,
+        attendee_id=attendee_id
     )
 
 

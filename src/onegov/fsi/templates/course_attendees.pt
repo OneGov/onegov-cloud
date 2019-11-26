@@ -7,25 +7,27 @@
             <div class="columns small-12">
                 <div class="row">
                     <div class="columns small-12">
-                        <strong tal:condition="not: attendees" i18n:translate>No attendees in the database</strong>
-                        <tal:b tal:condition="attendees|nothing">
+                        <strong tal:condition="not: model.query().count()" i18n:translate>No attendees in the database</strong>
+                        <tal:b>
                             <table style="width: 100%">
                                 <thead>
                                     <th i18n:translate="">Family name, surname</th>
                                     <th i18n:translate="">Email</th>
                                     <th i18n:translate="">External</th>
+                                    <th i18n:translate="">Organisation</th>
                                     <th i18n:translate="">All Open Reservations</th>
                                     <th i18n:translate="">Confirmed Open Reservations</th>
                                     <th i18n:translate="">Total Course Events done</th>
 
                                 </thead>
                                 <tbody>
-                                    <tal:b tal:repeat="attendee attendees">
+                                    <tal:b tal:repeat="attendee model.batch">
                                         <tr>
                                             <td><a href="${layout.instance_link(attendee)}">${str(attendee)}</a></td>
                                             <td>${attendee.email}</td>
                                             <td tal:condition="attendee.is_external">True</td>
                                             <td tal:condition="not: attendee.is_external">False</td>
+                                            <td >${attendee.organisation}</td>
                                             <td>${attendee.course_events.count()}</td>
                                             <td>${attendee.confirmed_course_events.count()}</td>
                                             <td>${attendee.total_done_course_events.count()}</td>
@@ -33,6 +35,12 @@
                                     </tal:b>
                                 </tbody>
                             </table>
+
+                            <div class="pagination-centered">
+                                <div metal:use-macro="layout.macros['pagination']" tal:define="
+                                collection model; current_page model;" />
+                            </div>
+
                         </tal:b>
                     </div>
                 </div>

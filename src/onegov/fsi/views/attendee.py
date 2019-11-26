@@ -13,7 +13,7 @@ def view_course_attendee_collection(self, request):
     return {
         'title': layout.title,
         'layout': layout,
-        'attendees': self.query().all(),
+        'model': self
     }
 
 
