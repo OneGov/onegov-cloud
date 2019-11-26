@@ -104,6 +104,25 @@ def planner(admin):
 
 
 @pytest.fixture(scope='function')
+def planner_editor(editor):
+    def _planner_editor(session, **kwargs):
+        # aka Kursverantwortlicher, is an admin, has admin email
+        user = editor(session)
+        data = dict(
+            first_name='PE',
+            last_name='PE',
+            user_id=user.id
+        )
+        data.update(**kwargs)
+        planner = session.query(CourseAttendee).filter_by(**data).first()
+        if not planner:
+            planner = CourseAttendee(**data)
+            session.add(planner)
+            session.flush()
+        return planner, data
+    return _planner_editor
+
+@pytest.fixture(scope='function')
 def member(hashed_password):
     def _member(session):
         member = session.query(User).filter_by(
