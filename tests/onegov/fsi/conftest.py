@@ -16,7 +16,8 @@ from onegov.user import User
 from onegov.fsi import FsiApp
 from onegov.fsi.initial_content import create_new_organisation
 from tests.shared.utils import create_app
-from tests.onegov.org.conftest import Client
+from tests.shared import Client as BaseClient
+
 
 TEMPLATE_MODEL_MAPPING = dict(
     info=InfoTemplate, reservation=ReservationTemplate,
@@ -24,9 +25,23 @@ TEMPLATE_MODEL_MAPPING = dict(
 )
 
 
+global_password = 'hunter2'
+
+
+class Client(BaseClient):
+
+    use_intercooler = True
+    skip_first_form = True
+
+
+@pytest.fixture(scope='session')
+def plain_password():
+    return global_password
+
+
 @pytest.fixture(scope='session')
 def hashed_password():
-    return hash_password('test_password')
+    return hash_password(global_password)
 
 
 @pytest.yield_fixture(scope='function')
@@ -121,6 +136,7 @@ def planner_editor(editor):
             session.flush()
         return planner, data
     return _planner_editor
+
 
 @pytest.fixture(scope='function')
 def member(hashed_password):
