@@ -6,9 +6,11 @@
         <div class="row">
             <div class="small-12 medium-7 large-5 columns">
                 <tal:b define="integrated [p for p in providers if p.kind == 'integrated']">
-                    <div tal:repeat="provider integrated" class="panel">
-                        <tal:b replace="structure render_untrusted_markdown(request.translate(provider.hint(request)))" />
-                    </div>
+                    <tal:b tal:repeat="provider integrated">
+                        <div class="panel" tal:define="hint provider.hint(request)" tal:condition="hint">
+                            <tal:b replace="structure render_untrusted_markdown(request.translate(provider.hint(request)))" />
+                        </div>
+                    </tal:b>
                 </tal:b>
                 <div metal:use-macro="layout.macros['form']" />
             </div>
