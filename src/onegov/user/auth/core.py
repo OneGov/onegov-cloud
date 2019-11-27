@@ -228,7 +228,9 @@ class Auth(object):
         response = self.redirect(request)
 
         request.app.remember_identity(response, request, identity)
-        request.app.on_login(request, user)
+
+        if hasattr(request.app, 'on_login'):
+            request.app.on_login(request, user)
 
         user.save_current_session(request)
 
