@@ -21,9 +21,9 @@ class FsiApp(OrgApp):
         cfg.setdefault('enable_yubikey', False)
         super().configure_organisation(**cfg)
 
-    def on_login(self, session, current_user):
-        if not current_user.attendee:
-            current_user.attendee = CourseAttendee()
+    def on_login(self, request, user):
+        if not user.attendee:
+            user.attendee = CourseAttendee()
 
 
 @FsiApp.template_directory()

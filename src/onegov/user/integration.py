@@ -37,6 +37,12 @@ class UserApp(WebassetsApp):
     def provider(self, name):
         return provider_by_name(self.providers, name)
 
+    def on_login(self, request, user):
+        """ Called by the auth module, whenever a successful login
+        was completed.
+
+        """
+
     def configure_authentication_providers(self, **cfg):
 
         def bound(provider):

@@ -53,10 +53,6 @@ def handle_login(self, request, form):
         response = self.login_to(request=request, **form.login_data)
 
         if response:
-            request.app.on_login(
-                request.session,
-                self.users.by_username(form.login_data['username'])
-            )
             if redirected_to_userprofile:
                 request.warning(_(
                     "Your userprofile is incomplete. "
