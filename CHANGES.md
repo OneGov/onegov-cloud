@@ -1,8 +1,23 @@
 # Changes
 
+## Release `2019.42`
+
+> commits: **3 / [f4fbdf6818...d5ea3ee783](https://github.com/OneGov/onegov-cloud/compare/f4fbdf6818^...d5ea3ee783)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.42)](https://buildkite.com/seantis/onegov-cloud)
+
+### User
+
+✨ **Integrates on_login support**
+
+This extends the on_login callback to all user handling applications and
+brings it under the onegov.user umbrella, fixing a few bugs.
+
+**`Other`** | **[10f6c5f33d](https://github.com/onegov/onegov-cloud/commit/10f6c5f33df348c578eab1d9aea0ab6ec5951265)**
+
 ## Release `2019.41`
 
-> commits: **1 / [1c5bad57b7...1c5bad57b7](https://github.com/OneGov/onegov-cloud/compare/1c5bad57b7^...1c5bad57b7)**<br>
+> released: **2019-11-26 10:41**<br>
+> commits: **2 / [1c5bad57b7...7b78ee1ad1](https://github.com/OneGov/onegov-cloud/compare/1c5bad57b7^...7b78ee1ad1)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.41)](https://buildkite.com/seantis/onegov-cloud)
 
 ### File
