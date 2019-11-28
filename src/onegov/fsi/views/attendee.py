@@ -1,3 +1,4 @@
+from onegov.core.security import Private, Personal, Secret
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi import _
@@ -7,7 +8,11 @@ from onegov.fsi.layouts.course_attendee import CourseAttendeeLayout, \
 from onegov.fsi.models.course_attendee import CourseAttendee
 
 
-@FsiApp.html(model=CourseAttendeeCollection, template='course_attendees.pt')
+@FsiApp.html(
+    model=CourseAttendeeCollection,
+    template='course_attendees.pt',
+    permission=Private
+)
 def view_course_attendee_collection(self, request):
     layout = CourseAttendeeCollectionLayout(self, request)
     return {
@@ -17,7 +22,11 @@ def view_course_attendee_collection(self, request):
     }
 
 
-@FsiApp.html(model=CourseAttendee, template='course_attendee.pt')
+@FsiApp.html(
+    model=CourseAttendee,
+    template='course_attendee.pt',
+    permission=Personal
+)
 def view_course_attendee(self, request):
     layout = CourseAttendeeLayout(self, request)
     return {
@@ -27,8 +36,13 @@ def view_course_attendee(self, request):
     }
 
 
-@FsiApp.form(model=CourseAttendee, name='edit', form=CourseAttendeeForm,
-             template='form.pt')
+@FsiApp.form(
+    model=CourseAttendee,
+    name='edit',
+    form=CourseAttendeeForm,
+    template='form.pt',
+    permission=Secret
+)
 def view_edit_course_attendee(self, request, form):
     layout = CourseAttendeeLayout(self, request)
 
@@ -49,8 +63,13 @@ def view_edit_course_attendee(self, request, form):
     }
 
 
-@FsiApp.form(model=CourseAttendeeCollection, template='form.pt',
-             form=CourseAttendeeForm, name='add-external')
+@FsiApp.form(
+    model=CourseAttendeeCollection,
+    template='form.pt',
+    form=CourseAttendeeForm,
+    name='add-external',
+    permission=Private
+)
 def view_att_external_attendee(self, request, form):
     layout = CourseAttendeeCollectionLayout(self, request)
 
