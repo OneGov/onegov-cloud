@@ -40,7 +40,7 @@ def test_edit_course(client_with_db):
     new = client.get(view)
     new.form['description'] = 'Changed'
     new.form['name'] = 'Changed'
-    page = new.form.submit()
+    page = new.form.submit().follow()
     assert 'Changed' in page
 
 
@@ -69,7 +69,6 @@ def test_course_invite(client_with_db):
 
     client.login_editor()
     new = client.get(view)
-
 
 
 def test_course_collection(client):
