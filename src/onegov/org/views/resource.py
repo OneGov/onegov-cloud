@@ -350,7 +350,10 @@ def view_occupancy(self, request):
 def view_resource_subscribe(self, request):
     url = URL(request.link(self, 'ical'))
     url = url.scheme('webcal')
-    url = url.remove_query_param('view')
+
+    if url.has_query_param('view'):
+        url = url.remove_query_param('view')
+
     url = url.query_param('access-token', self.access_token)
     url = url.as_string()
 
