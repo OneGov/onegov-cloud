@@ -82,9 +82,6 @@ def get_attendees(
 
 @FsiApp.path(model=CourseAttendee, path='/fsi/attendee/{id}')
 def get_attendee_details(request, id):
-    # only admins can actually choose a username
-    if not request.is_admin:
-        id = request.attendee_id
     return CourseAttendeeCollection(request.session).by_id(id)
 
 
