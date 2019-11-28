@@ -1,8 +1,33 @@
 # Changes
 
+## Release `2019.43`
+
+> commits: **2 / [9acc0a1abe...5685e17e88](https://github.com/OneGov/onegov-cloud/compare/9acc0a1abe^...5685e17e88)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.43)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Adds the ability to hide events**
+
+Events may now be hidden with the same access methods as normal pages.
+That is they can be removed from the list (accessible if you know the
+URL), or made private entirely.
+
+**`Feature`** | **[ZW-196](https://kanton-zug.atlassian.net/browse/ZW-196)** | **[5685e17e88](https://github.com/onegov/onegov-cloud/commit/5685e17e88ea943d7925e4af3018cd139f40212c)**
+
+🐞 **Fixes resource subscription error**
+
+When viewing a resource subscription, an error would occur in certain
+secenarios.
+
+Fixes ONEGOV-CLOUD-3AS
+
+**`Bugfix`** | **[9acc0a1abe](https://github.com/onegov/onegov-cloud/commit/9acc0a1abe87f508b073cc049b198dbdc2b6c97e)**
+
 ## Release `2019.42`
 
-> commits: **3 / [f4fbdf6818...d5ea3ee783](https://github.com/OneGov/onegov-cloud/compare/f4fbdf6818^...d5ea3ee783)**<br>
+> released: **2019-11-27 15:13**<br>
+> commits: **4 / [f4fbdf6818...616849323b](https://github.com/OneGov/onegov-cloud/compare/f4fbdf6818^...616849323b)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.42)](https://buildkite.com/seantis/onegov-cloud)
 
 ### User
