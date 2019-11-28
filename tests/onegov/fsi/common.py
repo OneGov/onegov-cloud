@@ -1,4 +1,5 @@
 import datetime
+from collections import namedtuple
 from uuid import uuid4
 
 from sedate import utcnow
@@ -18,6 +19,7 @@ TEMPLATE_MODEL_MAPPING = dict(
     info=InfoTemplate, reservation=ReservationTemplate,
     cancellation=CancellationTemplate, reminder=ReminderTemplate
 )
+
 
 def collection_attr_eq_test(collection, other_collection):
     # Tests a collection of the method page_by_index duplicates all attrs
@@ -228,35 +230,35 @@ def future_course_reservation_factory(session, **kwargs):
 
 def db_mock(session):
     # Create the fixtures with the current session
-    attendee = attendee_factory(session)
-    planner = planner_factory(session)
-    planner_editor = planner_editor_factory(session)
-    course_event = course_event_factory(session)
-    future_course_event = future_course_event_factory(session)
+    attendee, data = attendee_factory(session)
+    planner, data = planner_factory(session)
+    planner_editor, data = planner_editor_factory(session)
+    course_event, data = course_event_factory(session)
+    future_course_event, data = future_course_event_factory(session)
 
     placeholder = CourseReservation(
         dummy_desc='Placeholder',
         id=uuid4(),
-        course_event_id=course_event[0].id)
+        course_event_id=course_event.id)
     # Create Reservations
     attendee_res = CourseReservation(
-        attendee_id=attendee[0].id,
-        course_event_id=course_event[0].id
+        attendee_id=attendee.id,
+        course_event_id=course_event.id
     )
 
     attendee_future_res = CourseReservation(
-        attendee_id=attendee[0].id,
-        course_event_id=future_course_event[0].id
+        attendee_id=attendee.id,
+        course_event_id=future_course_event.id
     )
 
     planner_res = CourseReservation(
-        attendee_id=planner[0].id,
-        course_event_id=course_event[0].id
+        attendee_id=planner.id,
+        course_event_id=course_event.id
     )
 
     planner_future_res = CourseReservation(
-        attendee_id=planner_editor[0].id,
-        course_event_id=future_course_event[0].id
+        attendee_id=planner_editor.id,
+        course_event_id=future_course_event.id
     )
 
     session.add_all(
@@ -266,4 +268,15 @@ def db_mock(session):
         )
     )
     session.flush()
-    return session
+    return namedtuple(
+        'Mock',
+        [
+            'attendee', 'planner', 'planner_editor', 'course_event',
+            'future_course_event', 'placeholder', 'attendee_res',
+            'attendee_future_res', 'planner_res', 'planner_future_res'
+         ]
+    )(attendee, planner, planner_editor, course_event,
+      future_course_event, placeholder, attendee_res,
+      attendee_future_res, planner_res, planner_future_res)
+
+
