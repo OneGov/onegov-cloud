@@ -1,3 +1,4 @@
+from onegov.core.security import Private, Secret, Public, Personal
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
@@ -11,7 +12,9 @@ from onegov.fsi.models.course import Course
 
 @FsiApp.html(
     model=CourseCollection,
-    template='courses.pt')
+    template='courses.pt',
+    permission=Personal
+)
 def view_course_collection(self, request):
     layout = CourseCollectionLayout(self, request)
     layout.include_accordion()
@@ -25,7 +28,8 @@ def view_course_collection(self, request):
     model=CourseCollection,
     template='form.pt',
     name='add',
-    form=CourseForm
+    form=CourseForm,
+    permission=Secret
 )
 def view_add_course_event(self, request, form):
     layout = AddCourseLayout(self, request)
@@ -45,7 +49,9 @@ def view_add_course_event(self, request, form):
 
 @FsiApp.html(
     model=Course,
-    template='course.pt')
+    template='course.pt',
+    permission=Personal
+)
 def view_course_event(self, request):
     layout = CourseLayout(self, request)
     return {
@@ -58,7 +64,8 @@ def view_course_event(self, request):
     model=Course,
     template='form.pt',
     name='edit',
-    form=CourseForm
+    form=CourseForm,
+    permission=Secret
 )
 def view_edit_course_event(self, request, form):
     layout = EditCourseLayout(self, request)
@@ -85,7 +92,9 @@ def view_edit_course_event(self, request, form):
     model=Course,
     template='form.pt',
     form=InviteCourseForm,
-    name='invite')
+    name='invite',
+    permission=Private
+)
 def invite_attendees_for_event(self, request, form):
     layout = InviteCourseLayout(self, request)
 
@@ -104,6 +113,7 @@ def invite_attendees_for_event(self, request, form):
 @FsiApp.view(
     model=Course,
     request_method='DELETE',
+    permission=Secret
 )
 def delete_course(self, request):
     request.assert_valid_csrf_token()
