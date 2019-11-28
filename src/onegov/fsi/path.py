@@ -28,7 +28,7 @@ def get_course_event_details(request, id):
 
 @FsiApp.path(
     model=CourseEventCollection,
-    path='/events',
+    path='/fsi/events',
     converters=dict(
         upcoming_only=bool, past_only=bool, course_id=UUID, limit=int,
         show_hidden=bool
