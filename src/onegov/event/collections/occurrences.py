@@ -14,6 +14,7 @@ from sqlalchemy import and_
 from sqlalchemy import distinct
 from sqlalchemy import or_
 from sqlalchemy.dialects.postgresql import array
+from sqlalchemy.orm import contains_eager, joinedload
 
 
 class OccurrenceCollection(Pagination):
@@ -44,7 +45,8 @@ class OccurrenceCollection(Pagination):
         end=None,
         outdated=False,
         tags=None,
-        locations=None
+        locations=None,
+        only_public=False,
     ):
         self.session = session
         self.page = page
@@ -53,6 +55,7 @@ class OccurrenceCollection(Pagination):
         self.outdated = outdated
         self.tags = tags if tags else []
         self.locations = locations if locations else []
+        self.only_public = only_public
 
     def __eq__(self, other):
         return self.page == other.page
@@ -73,7 +76,8 @@ class OccurrenceCollection(Pagination):
             end=self.end,
             outdated=self.outdated,
             tags=self.tags,
-            locations=self.locations
+            locations=self.locations,
+            only_public=self.only_public,
         )
 
     def range_to_dates(self, range, start=None, end=None):
@@ -158,7 +162,8 @@ class OccurrenceCollection(Pagination):
             end=end,
             outdated=kwargs.get('outdated', self.outdated),
             tags=tags,
-            locations=locations
+            locations=locations,
+            only_public=self.only_public,
         )
 
     @cached_property
@@ -196,7 +201,14 @@ class OccurrenceCollection(Pagination):
 
         """
 
-        query = self.session.query(Occurrence)
+        query = self.session.query(Occurrence).join(Event)\
+            .options(contains_eager(Occurrence.event).joinedload(Event.image))
+
+        if self.only_public:
+            query = query.filter(or_(
+                Event.meta['access'].astext == 'public',
+                Event.meta['access'].astext == None
+            ))
 
         if self.start is not None or self.outdated is False:
             if self.start is None:

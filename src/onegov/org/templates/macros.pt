@@ -960,7 +960,10 @@
             />
         </div>
         <div class="large-9 medium-8 small-7 columns calendar-text-column">
-            <h3><a href="${use_links and request.link(occurrence)}">${occurrence.title}</a></h3>
+            <h3>
+                <a href="${use_links and request.link(occurrence)}">${occurrence.title}</a>
+                <metal:hint use-macro="layout.macros['access_hint']" tal:define="item occurrence" />
+            </h3>
             <div class="occurrence-date show-for-sr">${layout.format_date(occurrence.localized_start, 'date')}</div>
             <div class="occurrence-location">${occurrence.location}</div>
             <div class="occurrence-time" tal:define="time layout.format_time_range(occurrence.localized_start, occurrence.localized_end)">

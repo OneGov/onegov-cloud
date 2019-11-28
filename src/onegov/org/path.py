@@ -367,9 +367,9 @@ def get_resource_move(app, key, subject, direction, target):
         locations=[]
     )
 )
-def get_occurrences(
-    app, page=0, range=None, start=None, end=None, tags=None, locations=None
-):
+def get_occurrences(app, request, page=0, range=None, start=None, end=None,
+                    tags=None, locations=None):
+
     return OccurrenceCollection(
         app.session(),
         page=page,
@@ -377,18 +377,14 @@ def get_occurrences(
         start=start,
         end=end,
         tags=tags,
-        locations=locations
+        locations=locations,
+        only_public=(not request.is_manager)
     )
 
 
 @OrgApp.path(model=Occurrence, path='/event/{name}')
 def get_occurrence(app, name):
     return OccurrenceCollection(app.session()).by_name(name)
-
-
-@OrgApp.path(model=EventCollection, path='/event-manager')
-def get_events(app, page=0, state='published'):
-    return EventCollection(app.session(), page, state)
 
 
 @OrgApp.path(model=Event, path='/event-management/{name}')

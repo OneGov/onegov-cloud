@@ -10,6 +10,7 @@ from onegov.org.forms import EventForm
 from onegov.org.layout import EventLayout
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage, EventMessage
+from onegov.org.models.extensions import AccessExtension
 from onegov.ticket import TicketCollection
 from sedate import utcnow
 from uuid import uuid4
@@ -46,6 +47,16 @@ def assert_anonymous_access_only_temporary(request, event):
 
     if session_id != get_session_id(request):
         raise exc.HTTPForbidden()
+
+
+def event_form(model, request):
+    if request.is_manager:
+        # unlike typical extended models, the property of this is defined
+        # on the event model, while we are only using the form extension part
+        # here
+        return AccessExtension().extend_form(EventForm, request)
+
+    return EventForm
 
 
 @OrgApp.view(
@@ -86,7 +97,7 @@ def publish_event(self, request):
     model=OccurrenceCollection,
     name='new',
     template='form.pt',
-    form=EventForm,
+    form=event_form,
     permission=Public
 )
 def handle_new_event(self, request, form):
@@ -198,7 +209,7 @@ def view_event(self, request):
     name='edit',
     template='form.pt',
     permission=Public,
-    form=EventForm
+    form=event_form
 )
 def handle_edit_event(self, request, form):
     """ Edit an event.

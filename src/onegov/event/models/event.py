@@ -8,7 +8,7 @@ from icalendar import Event as vEvent
 from icalendar import vRecur
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
-from onegov.core.orm.mixins import content_property
+from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
@@ -85,6 +85,11 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
 
     #: Recurrence of the event (RRULE, see RFC2445)
     recurrence = Column(Text, nullable=True)
+
+    #: The access property of the event, taken from onegov.org. Not ideal to
+    #: have this defined here, instead of using an AccessExtension, but that
+    #: would only be possible with deeper changes to the Event model.
+    access = meta_property(default='public')
 
     #: The associated image
     image = associated(

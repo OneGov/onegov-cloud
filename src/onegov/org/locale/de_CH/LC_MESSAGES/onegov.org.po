@@ -480,7 +480,7 @@ msgid "The end date must be later than the start date."
 msgstr "Das Enddatum muss nach dem Startdatum liegen."
 
 msgid "The weekday of the start date must be selected."
-msgstr "Der Wochentag der Veranstaltung muss ausgewählt sein."
+msgstr "Der Wochentag an dem die Veranstaltung beginnt muss ausgewählt sein."
 
 msgid "Please set and end date if the event is recurring."
 msgstr "Bitte ein Enddatum angeben, falls eine Wiederholungen ausgewählt ist."

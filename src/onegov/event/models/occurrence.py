@@ -49,3 +49,7 @@ class Occurrence(Base, OccurrenceMixin, TimestampMixin):
         vcalendar.add('version', '2.0')
         vcalendar.add_component(vevent)
         return vcalendar.to_ical()
+
+    @property
+    def access(self):
+        return self.event.access
