@@ -30,6 +30,9 @@ class Client(BaseClient):
     use_intercooler = True
     skip_first_form = True
 
+    def login_member(self, to=None):
+        return self.login('member@example.org', global_password, to)
+
 
 def _db_mock_session_func(session):
     # Create the fixtures with the current session
@@ -68,6 +71,7 @@ def fsi_app(request, hashed_password):
 @pytest.yield_fixture(scope='function')
 def fsi_app_mocked(request, hashed_password):
     yield create_fsi_app(request, False, hashed_password, mock_db=True)
+
 
 @pytest.yield_fixture(scope='function')
 def es_fsi_app(request, hashed_password):
@@ -141,7 +145,7 @@ def course_event(course):
 
 @pytest.fixture(scope='function')
 def future_course_event(course):
-        return future_course_event_factory
+    return future_course_event_factory
 
 
 @pytest.fixture(scope='function')
@@ -217,7 +221,6 @@ def create_fsi_app(request, use_elasticsearch, hashed_password, mock_db=False):
         password_hash=hashed_password,
         role='member'
     ))
-
     if mock_db:
         db_mock(session)
 
