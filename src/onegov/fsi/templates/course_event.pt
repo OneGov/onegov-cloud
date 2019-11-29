@@ -63,7 +63,7 @@
                                 <p tal:case="True" i18n:translate>No entries found.</p>
                                 <ul tal:case="False">
                                 <tal:b tal:repeat="reservation model.reservations">
-                                    <li>${str(reservation)}</li>
+                                    <li tal:attributes="class python: 'placeholder' if reservation.is_placeholder else ''">${str(reservation)}</li>
                                 </tal:b>
                             </ul>
 
