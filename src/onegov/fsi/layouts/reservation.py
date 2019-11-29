@@ -33,6 +33,14 @@ class ReservationCollectionLayout(DefaultLayout):
         if not self.request.is_manager:
             return []
         return [
+            Link(
+                text=_("Print"),
+                url='#',
+                attrs={
+                    'class': 'print-icon',
+                    'onclick': 'window.print();return false;'
+                }
+            ),
             LinkGroup(
                 title=_('Add'),
                 links=[
