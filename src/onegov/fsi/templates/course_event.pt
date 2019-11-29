@@ -59,11 +59,11 @@
                             </tal:b>
                             <h3 i18n:translate="">Attendees</h3>
 
-                            <tal:b tal:switch="model.attendees.count() == 0">
+                            <tal:b tal:switch="model.reservations.count() == 0">
                                 <p tal:case="True" i18n:translate>No entries found.</p>
                                 <ul tal:case="False">
-                                <tal:b tal:repeat="attendee model.attendees">
-                                    <li>${str(attendee)}</li>
+                                <tal:b tal:repeat="reservation model.reservations">
+                                    <li>${str(reservation)}</li>
                                 </tal:b>
                             </ul>
 
