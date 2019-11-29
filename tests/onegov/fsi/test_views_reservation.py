@@ -16,8 +16,8 @@ def test_reservation_details(client_with_db):
     reservation = attendee.reservations.first()
 
     view = f'/fsi/reservation/{reservation.id}'
-    # This view should not existing
-    client.get(view, status=404)
+    # This view has just the delete method
+    client.get(view, status=405)
 
 
 def test_add_reservation(client):
