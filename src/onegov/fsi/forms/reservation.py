@@ -95,11 +95,13 @@ class AddFsiReservationForm(Form):
                     external_only=self.model.external_only
                 )
             return (self.attendee_choice(a) for a in attendees)
+
         if self.request.view_name == 'edit':
             attendees = self.model.course_event.possible_bookers(
                 external_only=False
             )
-            return (self.attendee_choice(a) for a in attendees)
+            choices = [self.attendee_choice(self.attendee)]
+            return choices + [self.attendee_choice(a) for a in attendees]
 
         else:
             raise NotImplementedError
@@ -109,6 +111,7 @@ class AddFsiReservationForm(Form):
             self.delete_field('attendee_id')
         else:
             self.attendee_id.choices = self.get_attendee_choices()
+            self.attendee_id.default = [self.attendee_choice(self.attendee)]
             self.delete_field('dummy_desc')
         self.course_event_id.choices = self.get_event_choices()
 
@@ -128,6 +131,10 @@ class EditFsiReservationForm(AddFsiReservationForm):
         model.course_event_id = self.course_event_id.data
         if model.is_placeholder:
             model.dummy_desc = self.dummy_desc.data
+
+    def apply_model(self, model):
+        self.attendee_id.data = model.attendee_id
+        self.course_event_id = model.course_event_id
 
     def get_event_choices(self):
         return [self.event_choice(self.model.course_event)]
