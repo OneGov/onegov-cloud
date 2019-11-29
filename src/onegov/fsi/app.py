@@ -66,5 +66,3 @@ def get_webasset_output():
 def get_common_asset():
     yield from default_common_asset()
     yield 'ifs.js'
-    # yield 'printthis.js'
-    # yield 'print.js'
