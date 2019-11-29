@@ -75,3 +75,30 @@ dd.accordion-navigation + dd.accordion-navigation {
         }
     }
 }
+
+/*
+    General Printing of a site
+*/
+
+@media print {
+
+    .no-print, .globals {
+        display: none;
+    }
+}
+
+/*
+    Reservation/Subscription Printout
+*/
+@media print {
+
+    .breadcrumbs {
+        display: none;
+    }
+
+    .subscription-table {
+        a.button {
+            display: none;
+        }
+    }
+}
