@@ -116,7 +116,7 @@ def view_add_from_course_event(self, request):
 @FsiApp.html(
     model=CourseReservation,
     request_method='DELETE',
-    name='delete'
+    permission=Secret
 )
 def view_delete_reservation(self, request):
     request.assert_valid_csrf_token()
