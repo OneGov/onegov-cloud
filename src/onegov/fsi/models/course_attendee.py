@@ -5,7 +5,6 @@ from sqlalchemy import Column, Text, ForeignKey, ARRAY
 
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID, JSON
-from onegov.core.orm.mixins import meta_property
 from sqlalchemy.orm import relationship, object_session, backref
 
 
@@ -34,7 +33,6 @@ class CourseAttendee(Base):
     # is null if its an external attendee
     user_id = Column(UUID, ForeignKey('users.id'), nullable=True)
     user = relationship("User", backref=backref("attendee", uselist=False))
-
 
     first_name = Column(Text, nullable=True)
     last_name = Column(Text, nullable=True)

@@ -1,4 +1,4 @@
-from wtforms import StringField, SelectField
+from wtforms import StringField
 from wtforms.validators import InputRequired, Email
 from wtforms.fields.html5 import EmailField
 
@@ -54,4 +54,3 @@ class CourseAttendeeForm(Form):
             ]
         else:
             self.delete_field('permissions')
-

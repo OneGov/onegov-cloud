@@ -113,29 +113,30 @@ class ReservationLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_admin:
-            return [
-                Link(
-                    text=_("Delete"),
-                    url=self.csrf_protected_url(
-                        self.request.link(self.model)
+        if not self.request.is_admin:
+            return []
+        return [
+            Link(
+                text=_("Delete"),
+                url=self.csrf_protected_url(
+                    self.request.link(self.model)
+                ),
+                attrs={'class': 'button tiny alert'},
+                traits=(
+                    Confirm(
+                        _("Do you want to cancel the reservation ?"),
+                        _(
+                            "A confirmation email will be sent to you later."),
+                        _("Cancel reservation for course event"),
+                        _("Cancel")
                     ),
-                    attrs={'class': 'button tiny alert'},
-                    traits=(
-                        Confirm(
-                            _("Do you want to cancel the reservation ?"),
-                            _(
-                                "A confirmation email will be sent to you later."),
-                            _("Cancel reservation for course event"),
-                            _("Cancel")
-                        ),
-                        Intercooler(
-                            request_method='DELETE',
-                            redirect_after=self.request.link(self.model)
-                        )
+                    Intercooler(
+                        request_method='DELETE',
+                        redirect_after=self.request.link(self.model)
                     )
                 )
-            ]
+            )
+        ]
 
     @cached_property
     def breadcrumbs(self):

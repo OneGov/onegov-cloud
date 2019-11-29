@@ -25,4 +25,3 @@ class DefaultLayout(BaseLayout):
         return NOTIFICATION_TYPE_TRANSLATIONS[
             NOTIFICATION_TYPES.index(notification_type)
         ]
-

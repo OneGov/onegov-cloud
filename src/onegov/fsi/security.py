@@ -1,5 +1,4 @@
-from onegov.core.security import Private, Secret, Personal
-from onegov.core.security.rules import has_permission_logged_in
+from onegov.core.security import Personal
 from onegov.fsi import FsiApp
 from onegov.fsi.models import CourseAttendee
 
@@ -33,4 +32,3 @@ def has_course_attendee_permission(app, identity, model, permission):
 #     """ Things just admins can do
 #     """
 #     return has_permission_logged_in(app, identity, model, permission)
-

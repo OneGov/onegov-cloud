@@ -1,4 +1,4 @@
-from onegov.core.security import Private, Personal, Secret
+from onegov.core.security import Personal, Secret
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.forms.course_event import CourseEventForm
