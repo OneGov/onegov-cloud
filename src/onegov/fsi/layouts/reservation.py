@@ -12,6 +12,12 @@ class ReservationCollectionLayout(DefaultLayout):
     def for_himself(self):
         return self.model.attendee_id == self.request.attendee_id
 
+    def link(self, reservation):
+        if reservation.is_placeholder:
+            return self.request.link(reservation, name='edit')
+        return self.request.link(reservation.attendee)
+
+
     @cached_property
     def title(self):
         if self.request.view_name == 'add':
