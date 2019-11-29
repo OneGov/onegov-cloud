@@ -6,6 +6,7 @@ from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
 from onegov.org.elements import LinkGroup
+from onegov.org.custom import logout_path
 from onegov.org.models import GeneralFileCollection, ImageFileCollection
 from onegov.user import Auth, UserCollection
 
@@ -35,9 +36,10 @@ def get_base_tools(request):
         profile_links.append(
             Link(
                 _("Logout"), request.link(
-                    Auth.from_request(request), name='logout'
+                    Auth.from_request(
+                        request, to=logout_path(request)), name='logout'
                 ), attrs={'class': 'logout'}
-            )
+            ),
         )
 
         yield LinkGroup(
