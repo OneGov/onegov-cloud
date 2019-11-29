@@ -28,10 +28,7 @@
                                                 <td>${layout.format_status(reservation.course_event.status)}</td>
 
                                                 <td>
-                                                    <div tal:condition="not: reservation.is_placeholder" class="switch round tiny confirmation-switch" tal:define="switch_id 'confirmation-switch-{}'.format(repeat.reservation.number)">
-                                                      <input id="${switch_id}" type="checkbox" name="testGroup">
-                                                      <label for="${switch_id}"></label>
-                                                    </div>
+                                                    <tal:b metal:use-macro="layout.macros['confirmation_slider']" tal:define="switch_id 'confirmation-switch-{}'.format(repeat.reservation.number)" />
                                                 </td>
 
 
