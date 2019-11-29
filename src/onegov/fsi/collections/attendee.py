@@ -8,13 +8,24 @@ class CourseAttendeeCollection(GenericCollection, Pagination):
                  page=0,
                  exclude_external=False,
                  external_only=False,
-                 attendee_id=None
+                 attendee_id=None,
+                 editors_only=False
                  ):
         super().__init__(session)
         self.page = page
         self.exclude_external = exclude_external
         self.external_only = external_only
         self.attendee_id = attendee_id
+        self.editors_only = editors_only
+
+    @property
+    def unfiltered(self):
+        return all((
+            self.exclude_external is False,
+            self.external_only is False,
+            self.attendee_id is None,
+            self.editors_only is False
+        ))
 
     @property
     def model_class(self):
@@ -51,6 +62,9 @@ class CourseAttendeeCollection(GenericCollection, Pagination):
         if self.attendee_permissions is not None:
             query = query.filter(
                 CourseAttendee.organisation.in_(self.attendee_permissions))
+        if self.editors_only:
+            query = query.filter(CourseAttendee.permissions != [])
+
         return query
 
     def subset(self):

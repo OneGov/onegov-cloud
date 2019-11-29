@@ -38,19 +38,28 @@ class CourseAttendeeForm(Form):
     def update_model(self, model):
         model.first_name = self.first_name.data
         model.last_name = self.last_name.data
-        model.permissions = self.permissions.data
+        if self.permissions:
+            model.permissions = self.permissions.data
 
     def apply_model(self, model):
         self.first_name.data = model.first_name
         self.last_name.data = model.last_name
-        self.permissions.data = model.permissions
+        if self.permissions:
+            self.permissions.data = model.permissions
 
     def on_request(self):
-        if self.request.view_name != 'add-external':
+
+        if not self.model.user_id:
+            self.delete_field('permissions')
+        else:
             self.delete_field('email')
             self.permissions.choices = [
                 (p.code, p.code)
                 for p in self.unique_permission_codes() if p.code
             ]
-        else:
-            self.delete_field('permissions')
+
+
+class AddExternalAttendeeForm(CourseAttendeeForm):
+
+    def on_request(self):
+        self.delete_field('permissions')

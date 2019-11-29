@@ -35,6 +35,28 @@ class CourseAttendeeCollectionLayout(DefaultLayout):
             links.append(Link(_('Add External Attendee')))
         return links
 
+    @cached_property
+    def menu(self):
+
+        return [
+            (_('All'), self.request.class_link(CourseAttendeeCollection), self.model.unfiltered),
+            (_('Externe'), self.request.link(CourseAttendeeCollection(
+                self.request.session, external_only=True)), self.model.external_only),
+            (_('Editors'), self.request.link(CourseAttendeeCollection(
+                self.request.session, editors_only=True)), self.model.editors_only)
+        ]
+
+    # @property
+    # def filters(self):
+    #     return [
+    #         Link(_('All'), self.request.class_link(CourseAttendeeCollection),
+    #              active=(not self.model.external_only and not self.model.editors_only)),
+    #         Link(_('External'), self.request.link(CourseAttendeeCollection(
+    #             self.request.session, external_only=True)), self.model.external_only),
+    #         Link(_('Editors'), self.request.link(CourseAttendeeCollection(
+    #             self.request.session, editors_only=True)), self.model.editors_only)
+    #     ]
+
 
 class CourseAttendeeLayout(DefaultLayout):
 

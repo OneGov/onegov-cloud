@@ -44,3 +44,25 @@ dd.accordion-navigation + dd.accordion-navigation {
     border: 1px solid $gray-light;
     border-width: 1px 1px 0;
 }
+
+/*
+    Navigation
+*/
+
+.tab-navigation {
+    margin-bottom: 1em;
+    margin-top: 1em;
+
+    .top-bar-section {
+        li.active + a {
+            background: transparent;
+            background-color: transparent;
+        }
+    }
+
+    .left {
+        li.active {
+            border-left: 2px solid $primary-color;
+        }
+    }
+}

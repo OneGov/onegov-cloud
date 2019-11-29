@@ -2,7 +2,8 @@ from onegov.core.security import Private, Personal, Secret
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi import _
-from onegov.fsi.forms.course_attendee import CourseAttendeeForm
+from onegov.fsi.forms.course_attendee import CourseAttendeeForm, \
+    AddExternalAttendeeForm
 from onegov.fsi.layouts.course_attendee import CourseAttendeeLayout, \
     CourseAttendeeCollectionLayout
 from onegov.fsi.models.course_attendee import CourseAttendee
@@ -66,7 +67,7 @@ def view_edit_course_attendee(self, request, form):
 @FsiApp.form(
     model=CourseAttendeeCollection,
     template='form.pt',
-    form=CourseAttendeeForm,
+    form=AddExternalAttendeeForm,
     name='add-external',
     permission=Private
 )
