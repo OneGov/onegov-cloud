@@ -46,17 +46,6 @@ class CourseAttendeeCollectionLayout(DefaultLayout):
                 self.request.session, editors_only=True)), self.model.editors_only)
         ]
 
-    # @property
-    # def filters(self):
-    #     return [
-    #         Link(_('All'), self.request.class_link(CourseAttendeeCollection),
-    #              active=(not self.model.external_only and not self.model.editors_only)),
-    #         Link(_('External'), self.request.link(CourseAttendeeCollection(
-    #             self.request.session, external_only=True)), self.model.external_only),
-    #         Link(_('Editors'), self.request.link(CourseAttendeeCollection(
-    #             self.request.session, editors_only=True)), self.model.editors_only)
-    #     ]
-
 
 class CourseAttendeeLayout(DefaultLayout):
 
@@ -101,3 +90,8 @@ class CourseAttendeeLayout(DefaultLayout):
                 )
             )
         return links
+
+    @property
+    def attendee_permissions(self):
+        return self.model.permissions and "<br>".join(self.model.permissions)
+

@@ -24,6 +24,12 @@
                                 <dt i18n:translate>Organisation Code</dt>
                                 <dd>${model.organisation}</dd>
                             </dl>
+
+                            <dl class="field-display" tal:condition="model.permissions">
+                                <dt i18n:translate>Permissions</dt>
+                                <dd tal:content="structure layout.attendee_permissions" />
+                            </dl>
+
                             <dl class="field-display">
                                 <dt i18n:translate>Total courses</dt>
                                 <dd>${model.course_events.count()}</dd>
