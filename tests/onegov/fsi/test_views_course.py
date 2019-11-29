@@ -68,7 +68,7 @@ def test_course_invite(client_with_db):
     client.get(view, status=403)
 
     client.login_editor()
-    new = client.get(view)
+    client.get(view)
 
 
 def test_course_collection(client):

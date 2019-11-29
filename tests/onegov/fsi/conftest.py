@@ -1,24 +1,18 @@
-import datetime
 from uuid import uuid4
 
 import pytest
 import transaction
-from sedate import utcnow
 
-from onegov.fsi.models.course import Course
-from onegov.fsi.models.course_attendee import CourseAttendee
-from onegov.fsi.models.course_event import CourseEvent
-from onegov.fsi.models.course_notification_template import InfoTemplate, \
-    ReservationTemplate, CancellationTemplate, ReminderTemplate
 from onegov.fsi.models.course_reservation import CourseReservation
 from onegov.user import User
 from onegov.fsi import FsiApp
 from onegov.fsi.initial_content import create_new_organisation
-from tests.onegov.fsi.common import global_password, admin_factory, \
-    editor_factory, planner_factory, planner_editor_factory, member_factory, \
-    attendee_factory, external_attendee_factory, notification_template_factory, \
-    course_factory, course_event_factory, future_course_event_factory, \
-    future_course_reservation_factory, db_mock
+from tests.onegov.fsi.common import (
+    global_password, admin_factory,
+    editor_factory, planner_factory, planner_editor_factory, member_factory,
+    attendee_factory, external_attendee_factory, notification_template_factory,
+    course_factory, course_event_factory, future_course_event_factory,
+    future_course_reservation_factory, db_mock)
 from tests.onegov.fsi.common import hashed_password as _hashed_password
 
 from tests.shared.utils import create_app

@@ -274,9 +274,7 @@ def db_mock(session):
             'attendee', 'planner', 'planner_editor', 'course_event',
             'future_course_event', 'placeholder', 'attendee_res',
             'attendee_future_res', 'planner_res', 'planner_future_res'
-         ]
+        ]
     )(attendee, planner, planner_editor, course_event,
       future_course_event, placeholder, attendee_res,
       attendee_future_res, planner_res, planner_future_res)
-
-

@@ -1,4 +1,3 @@
-from onegov.fsi.models import CourseAttendee
 from onegov.user import User
 
 
@@ -26,7 +25,7 @@ def test_attendee_details(client_with_db):
 
     # ca see all others
     client.login_editor()
-    resp = client.get(f'/fsi/attendee/{planner.id}', status=200)
+    client.get(f'/fsi/attendee/{planner.id}', status=200)
 
 
 def test_edit_attendee(client_with_db):

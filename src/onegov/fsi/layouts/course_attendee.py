@@ -39,11 +39,14 @@ class CourseAttendeeCollectionLayout(DefaultLayout):
     def menu(self):
 
         return [
-            (_('All'), self.request.class_link(CourseAttendeeCollection), self.model.unfiltered),
-            (_('Externe'), self.request.link(CourseAttendeeCollection(
-                self.request.session, external_only=True)), self.model.external_only),
+            (_('All'), self.request.class_link(CourseAttendeeCollection),
+             self.model.unfiltered),
+            (_('External'), self.request.link(CourseAttendeeCollection(
+                self.request.session, external_only=True)),
+             self.model.external_only),
             (_('Editors'), self.request.link(CourseAttendeeCollection(
-                self.request.session, editors_only=True)), self.model.editors_only)
+                self.request.session, editors_only=True)),
+             self.model.editors_only)
         ]
 
 
@@ -94,4 +97,3 @@ class CourseAttendeeLayout(DefaultLayout):
     @property
     def attendee_permissions(self):
         return self.model.permissions and "<br>".join(self.model.permissions)
-
