@@ -28,7 +28,7 @@
                                                 <td>${layout.format_status(reservation.course_event.status)}</td>
 
                                                 <td>
-                                                    <tal:b metal:use-macro="layout.macros['confirmation_slider']" tal:define="switch_id 'confirmation-switch-{}'.format(repeat.reservation.number)" />
+                                                    <tal:b metal:use-macro="layout.macros['confirmation_slider']" tal:define="switch_id 'confirmation-switch-{}'.format(repeat.reservation.number); url layout.confirmation_link(reservation)" />
                                                 </td>
 
 

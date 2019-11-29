@@ -17,6 +17,9 @@ class ReservationCollectionLayout(DefaultLayout):
             return self.request.link(reservation, name='edit')
         return self.request.link(reservation.attendee)
 
+    def confirmation_link(self, reservation):
+        return self.csrf_protected_url(
+            self.request.link(reservation, name='toggle-confirm'))
 
     @cached_property
     def title(self):

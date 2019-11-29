@@ -40,12 +40,12 @@
     </tal:b>
 </metal:email_preview>
 
-<metal:confirmation_slide define-macro="confirmation_slider">
+<metal:confirmation_slider define-macro="confirmation_slider">
     <div tal:condition="not: reservation.is_placeholder" class="switch round tiny confirmation-switch">
-        <input id="${switch_id}" type="checkbox" tal:attributes="disabled python:not layout.course_event.is_past">
+        <input id="${switch_id}" type="checkbox" tal:attributes="disabled python:not layout.course_event.is_past; checked python:reservation.event_completed; ic-post-to url|nothing">
         <label for="${switch_id}"></label>
     </div>
-</metal:confirmation_slide>
+</metal:confirmation_slider>
 
 </body>
 </html>
