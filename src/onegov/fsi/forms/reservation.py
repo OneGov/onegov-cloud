@@ -42,6 +42,8 @@ class AddFsiReservationForm(Form):
 
     @staticmethod
     def attendee_choice(attendee):
+        if not attendee:
+            return '', _('None')
         return str(attendee.id), f'{str(attendee)}'
 
     @property
