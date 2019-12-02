@@ -108,10 +108,12 @@ class AgencyPdfDefault(Pdf):
         else:
             if content_so_far:
                 self.spacer()
+                self.start_keeptogether()
+            else:
+                # Do not separate subtitles from parents
+                self.keeptogether_index = len(self.story) - 1
 
         self.previous_level_context = level
-
-        self.start_keeptogether()
 
         if not skip_title:
             self.h(agency.title, level)
