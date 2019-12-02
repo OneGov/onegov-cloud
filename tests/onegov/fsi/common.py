@@ -168,9 +168,15 @@ def course_event_factory(session, **kwargs):
     data.update(**kwargs)
     course_event = session.query(CourseEvent).filter_by(**data).first()
     if not course_event:
-        data['id'] = uuid4()
+        data.setdefault('id', uuid4())
         course_event = CourseEvent(**data)
-        session.add(course_event)
+        session.add_all((
+            course_event,
+            InfoTemplate(course_event_id=data['id']),
+            ReservationTemplate(course_event_id=data['id']),
+            ReminderTemplate(course_event_id=data['id']),
+            CancellationTemplate(course_event_id=data['id'])
+        ))
         session.flush()
     return course_event, data
 
@@ -190,8 +196,15 @@ def future_course_event_factory(session, **kwargs):
     data.update(**kwargs)
     course_event = session.query(CourseEvent).filter_by(**data).first()
     if not course_event:
+        data.setdefault('id', uuid4())
         course_event = CourseEvent(**data)
-        session.add(course_event)
+        session.add_all((
+            course_event,
+            InfoTemplate(course_event_id=data['id']),
+            ReservationTemplate(course_event_id=data['id']),
+            ReminderTemplate(course_event_id=data['id']),
+            CancellationTemplate(course_event_id=data['id'])
+        ))
         session.flush()
     return course_event, data
 
