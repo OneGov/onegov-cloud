@@ -1,8 +1,23 @@
 # Changes
 
+## Release `2019.44`
+
+> commits: **2 / [d1e2208edb...3a37b55ec5](https://github.com/OneGov/onegov-cloud/compare/d1e2208edb^...3a37b55ec5)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.44)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+🎉 **Improves pdf rendering**
+
+- hold titles together
+- makes spacing after portrait consistent
+
+**`Feature`** | **[3a37b55ec5](https://github.com/onegov/onegov-cloud/commit/3a37b55ec5edf88cfd7802c833f30ca68f36f6cc)**
+
 ## Release `2019.43`
 
-> commits: **2 / [9acc0a1abe...5685e17e88](https://github.com/OneGov/onegov-cloud/compare/9acc0a1abe^...5685e17e88)**<br>
+> released: **2019-11-28 14:27**<br>
+> commits: **3 / [9acc0a1abe...55b6c0d996](https://github.com/OneGov/onegov-cloud/compare/9acc0a1abe^...55b6c0d996)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.43)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
