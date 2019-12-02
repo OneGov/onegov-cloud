@@ -199,3 +199,7 @@ class CourseEvent(Base, TimestampMixin):
         if external_only:
             query = query.filter(CourseAttendee.user_id == None)
         return query
+
+    @property
+    def email_recipients(self):
+        return (att.email for att in self.attendees)

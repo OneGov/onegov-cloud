@@ -35,10 +35,33 @@
 
 <metal:email_preview define-macro="email_preview">
     <tal:b tal:condition="layout.model|nothing">
-        <p><strong>Subject: </strong>${layout.model.subject}</p>
-        <div tal:content="text layout.model.text" />
+        <dl class="field-display">
+            <dt i18n:translate="">Subject: </dt>
+            <dd>${layout.model.subject}</dd>
+            <div class="clearfix"></div>
+        </dl>
+        <dl class="field-display">
+            <dt i18n:translate="">Text: </dt>
+            <dd tal:content="text layout.model.text"></dd>
+            <iframe src="request.link(layout.model, name='embed')" frameborder="0" width="100%"></iframe>
+            <div class="clearfix"></div>
+        </dl>
     </tal:b>
 </metal:email_preview>
+
+<metal:email_recipients define-macro="email_recipients">
+    <tal:b tal:condition="layout.model|nothing">
+        <dl class="field-display">
+            <dt i18n:translate="">Recipients: </dt>
+            <dd>
+                <tal:b tal:repeat="email layout.model.course_event.email_recipients">
+                    ${email}<br>
+                </tal:b>
+            </dd>
+            <div class="clearfix"></div>
+        </dl>
+    </tal:b>
+</metal:email_recipients>
 
 <metal:confirmation_slider define-macro="confirmation_slider">
     <div tal:condition="not: reservation.is_placeholder" class="switch round tiny confirmation-switch">

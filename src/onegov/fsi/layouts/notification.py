@@ -2,7 +2,7 @@ from collections import namedtuple
 
 from cached_property import cached_property
 
-from onegov.core.elements import Link
+from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.fsi.collections.notification_template import \
     CourseNotificationTemplateCollection
 from onegov.fsi.layout import DefaultLayout
@@ -17,6 +17,15 @@ class MailLayout(OrgDefaultMailLayout):
     def __init__(self, *args, notification_type=None):
         super().__init__(*args)
         self.notification_type = notification_type
+
+    @cached_property
+    def title(self):
+        return _('Preview Info Mail for ${course_event}', mapping=dict(
+            course_event=self.model.course_event.name))
+
+    @cached_property
+    def edit_link(self):
+        return self.request.link(self.model, name='edit')
 
     @cached_property
     def base(self):
@@ -87,8 +96,6 @@ class NotificationTemplateLayout(DefaultLayout):
 
     @cached_property
     def title(self):
-        if self.request.view_name == 'send':
-            return _('Send Notification')
         return _('${type} Notification Template', mapping=dict(
             type=self.format_notification_type(self.model.type)))
 
@@ -130,3 +137,15 @@ class EditNotificationTemplateLayout(NotificationTemplateLayout):
         links.append(
             Link(_('Edit'), self.request.link(self.model, name='edit')))
         return links
+
+
+class SendNotificationTemplateLayout(NotificationTemplateLayout):
+    @cached_property
+    def title(self):
+        return _('Mailing')
+
+    @cached_property
+    def breadcrumbs(self):
+        breadcrumbs = super().breadcrumbs
+        breadcrumbs.append(Link(_('Send')))
+        return breadcrumbs

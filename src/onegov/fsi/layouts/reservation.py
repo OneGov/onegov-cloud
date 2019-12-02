@@ -73,7 +73,7 @@ class ReservationCollectionLayout(DefaultLayout):
         return self.model.course_event
 
     @property
-    def send_info_mail_url(self):
+    def preview_info_mail_url(self):
         return self.request.link(
             self.course_event.info_template, name='send')
 

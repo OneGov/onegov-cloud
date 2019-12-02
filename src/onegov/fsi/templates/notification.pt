@@ -9,7 +9,7 @@
                     <div class="columns small-12">
                         <tal:b tal:condition="layout.model|nothing">
                             <p><strong>Subject: </strong>${layout.model.subject}</p>
-                                <div tal:content="text layout.model.text" />
+                                <div tal:content="structure layout.model.text" />
                         </tal:b>
                     </div>
                 </div>

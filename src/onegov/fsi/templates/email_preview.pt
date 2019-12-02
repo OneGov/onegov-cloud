@@ -8,7 +8,10 @@
                 <div class="row">
                     <div class="columns small-12">
 
+                        <tal:b metal:use-macro="layout.macros['email_recipients']" />
                         <tal:b metal:use-macro="layout.macros['email_preview']" />
+                        <tal:b metal:use-macro="layout.macros['intercooler_btn']" tal:define="intercooler_btn layout.send_info_mail_btn" />
+
                     </div>
                 </div>
             </div>
