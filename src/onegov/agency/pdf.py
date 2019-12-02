@@ -97,7 +97,8 @@ class AgencyPdfDefault(Pdf):
             self.table(data, [5.5 * cm, 0.5 * cm, None])
 
     def agency(self, agency, exclude, level=1, content_so_far=False,
-               skip_title=False, page_break_on_level=1):
+               skip_title=False, page_break_on_level=1,
+               portrait_last_content=False):
         """ Adds a single agency with the portrait and memberships. """
         if (
                 self.previous_level_context
@@ -106,12 +107,12 @@ class AgencyPdfDefault(Pdf):
         ):
             self.pagebreak()
         else:
-            if content_so_far:
+            if content_so_far and not portrait_last_content:
                 self.spacer()
-                self.start_keeptogether()
-            else:
-                # Do not separate subtitles from parents
+            if not content_so_far and self.previous_level_context:
                 self.keeptogether_index = len(self.story) - 1
+            else:
+                self.start_keeptogether()
 
         self.previous_level_context = level
 
@@ -120,28 +121,34 @@ class AgencyPdfDefault(Pdf):
             self.story[-1].keepWithNext = True
 
         has_content = False
+        portrait_last_content = False
         if handle_empty_p_tags(agency.portrait):
             self.mini_html(agency.portrait_html, linkify=True)
             has_content = True
+            portrait_last_content = True
 
         if agency.memberships.count():
             self.memberships(agency, exclude)
             has_content = True
+            portrait_last_content = False
 
         if agency.organigram_file:
             self.spacer()
             self.image(BytesIO(agency.organigram_file.read()))
             self.spacer()
             has_content = True
+            portrait_last_content = False
 
-        self.end_keeptogether()
+        if has_content and hasattr(self, 'keeptogether_index'):
+            self.end_keeptogether()
 
         for child in agency.children:
             if child.access == 'private':
                 continue
             child_has_content = self.agency(
                 child, exclude, level + 1, has_content,
-                page_break_on_level=page_break_on_level
+                page_break_on_level=page_break_on_level,
+                portrait_last_content=portrait_last_content
             )
             has_content = has_content or child_has_content
 
