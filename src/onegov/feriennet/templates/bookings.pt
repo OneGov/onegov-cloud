@@ -3,39 +3,39 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <tal:b condition="show_emergency_info">
-            <div class="emergency-contact-missing emergency-contact" tal:condition="not:has_emergency_contact">
-                <div i18n:translate>
-                    You haven't added an emergency contact to your profile yet.
-                    Please add this information in your userprofile so we can reach you in an emergency!
-                </div>
-                <a i18n:translate href="${request.return_here(request.link(request.app.org, 'userprofile'))}">Add in Userprofile</a>
-            </div>
-            <div class="emergency-contact" tal:condition="has_emergency_contact">
-                <div i18n:translate>
-                    This is your emergency contact. Please change it in the user profile if it is not up to date anymore:
-                </div>
-                <div>
-                    <strong>${user.data.emergency}</strong>
-                </div>
-                <a i18n:translate href="${request.return_here(request.link(request.app.org, 'userprofile'))}">Change in Userprofile</a>
-            </div>
-        </tal:b>
+        <div class="row">
+            <div class="columns small-12 medium-8">
+                <tal:b condition="show_emergency_info">
+                    <div class="emergency-contact-missing emergency-contact" tal:condition="not:has_emergency_contact">
+                        <div i18n:translate>
+                            You haven't added an emergency contact to your profile yet.
+                            Please add this information in your userprofile so we can reach you in an emergency!
+                        </div>
+                        <a i18n:translate href="${request.return_here(request.link(request.app.org, 'userprofile'))}">Add in Userprofile</a>
+                    </div>
+                    <div class="emergency-contact" tal:condition="has_emergency_contact">
+                        <div i18n:translate>
+                            This is your emergency contact. Please change it in the user profile if it is not up to date anymore:
+                        </div>
+                        <div>
+                            <strong>${user.data.emergency}</strong>
+                        </div>
+                        <a i18n:translate href="${request.return_here(request.link(request.app.org, 'userprofile'))}">Change in Userprofile</a>
+                    </div>
+                </tal:b>
 
-        <div tal:condition="not:period">
-            <p i18n:translate>
-                No bookings yet.
-            </p>
-        </div>
+                <div tal:condition="not:period">
+                    <p i18n:translate>
+                        No bookings yet.
+                    </p>
+                </div>
 
-        <div class="my-bookings" tal:condition="period">
-            <h2>${period.title}</h2>
+                <div class="my-bookings" tal:condition="period">
+                    <h2>${period.title}</h2>
 
-            <div class="row">
-                <div class="columns small-12 medium-8">
-                    <div class="callout panel">
+                    <div class="panel">
                         <div class="hints">
-                            <tal:b metal:use-macro="layout.macros.period_hints" />
+                            <tal:b metal:use-macro="layout.macros.period_hints"></tal:b>
 
                             <div class="hint hint-favorites" tal:condition="period.wishlist_phase" i18n:translate>
                                 Mark up to three occasions per child as favorites.
@@ -111,23 +111,23 @@
                                             <tal:b switch="state">
                                                 <h4 tal:case="'open'">
                                                     <tal:b i18n:translate>Open</tal:b>
-                                                    <tal:b>(${len(grouped_bookings[attendee][state])})
+                                                    <tal:b>(${len(grouped_bookings[attendee][state])})</tal:b>
                                                 </h4>
                                                 <h4 tal:case="'blocked'">
                                                     <tal:b i18n:translate>Blocked</tal:b>
-                                                    <tal:b>(${len(grouped_bookings[attendee][state])})
+                                                    <tal:b>(${len(grouped_bookings[attendee][state])})</tal:b>
                                                 </h4>
                                                 <h4 tal:case="'accepted'">
                                                     <tal:b i18n:translate>Booked</tal:b>
-                                                    <tal:b>(${len(grouped_bookings[attendee][state])})
+                                                    <tal:b>(${len(grouped_bookings[attendee][state])})</tal:b>
                                                 </h4>
                                                 <h4 tal:case="'denied'">
                                                     <tal:b i18n:translate>Denied</tal:b>
-                                                    <tal:b>(${len(grouped_bookings[attendee][state])})
+                                                    <tal:b>(${len(grouped_bookings[attendee][state])})</tal:b>
                                                 </h4>
                                                 <h4 tal:case="'cancelled'">
                                                     <tal:b i18n:translate>Cancelled</tal:b>
-                                                    <tal:b>(${len(grouped_bookings[attendee][state])})
+                                                    <tal:b>(${len(grouped_bookings[attendee][state])})</tal:b>
                                                 </h4>
                                             </tal:b>
                                         </div>
@@ -263,10 +263,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="columns small-12 medium-4">
-                    <tal:b metal:use-macro="layout.macros.periods" />
-                    <tal:b metal:use-macro="layout.macros.users" />
-                </div>
+            </div>
+            <div class="columns small-12 medium-4">
+                <tal:b metal:use-macro="layout.macros.periods" />
+                <tal:b metal:use-macro="layout.macros.users" />
+                <tal:b metal:use-macro="layout.macros.user_panel" />
             </div>
         </div>
     </tal:b>

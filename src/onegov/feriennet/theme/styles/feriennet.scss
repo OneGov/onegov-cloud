@@ -2057,7 +2057,9 @@ $booking-left-margin: 2rem;
 */
 
 .emergency-contact {
-    @include panel;
+    @include panel($bg: $callout-panel-bg);
+    border-color: scale-color($callout-panel-bg, $lightness: -11%);
+
     margin-bottom: 1.5rem;
     max-width: rem-calc(1050) / 12 * 8 - rem-calc(30);
 
@@ -2068,6 +2070,9 @@ $booking-left-margin: 2rem;
 }
 
 .emergency-contact-missing {
+    background: $red-pastel;
+    border-color: $red-light;
+
     div:first-child {
         font-weight: bold;
     }

@@ -192,6 +192,7 @@
 
         <div class="columns small-12 medium-4 hide-for-print">
             <tal:b metal:use-macro="layout.macros.users" define="model model.for_period_id(period_id=None)"/>
+            <tal:b metal:use-macro="layout.macros.user_panel" />
         </div>
 
     </div>

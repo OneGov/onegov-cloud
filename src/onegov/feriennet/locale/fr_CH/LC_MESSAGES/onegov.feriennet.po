@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-10-14 13:23+0200\n"
+"POT-Creation-Date: 2019-12-03 11:34+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1823,6 +1823,12 @@ msgstr "Votre demande a été traitée."
 msgid "I have read the ${tos} and accept them."
 msgstr "J'ai lu les ${tos} et je les accepte"
 
+msgid "E-Mail"
+msgstr "E-mail"
+
+msgid "Manage user"
+msgstr "Gérer l'utilisateur"
+
 msgid "Hello!"
 msgstr "Bonjour"
 
@@ -2583,9 +2589,6 @@ msgstr "Confidentialité"
 
 msgid "Public organiser data"
 msgstr "Données publiques de l'organisateur"
-
-msgid "E-Mail"
-msgstr "E-mail"
 
 msgid "Link to the TOS"
 msgstr "Lien vers les conditions de participation"

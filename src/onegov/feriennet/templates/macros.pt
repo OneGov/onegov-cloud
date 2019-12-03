@@ -194,6 +194,17 @@
     </a>
 </metal:footer_projuventute>
 
+<metal:b define-macro="extra_usermanagement_fields" i18n:domain="onegov.feriennet">
+    <div tal:define="emergency user.data.get('emergency')" tal:condition="emergency">
+        <dt i18n:translate>Emergency Contact</dt>
+        <dd><a href="tel:${emergency}">${emergency}</a></dd>
+    </div>
+    <div tal:define="phone user.data.get('phone')" tal:condition="phone">
+        <dt i18n:translate>Phone</dt>
+        <dd><a href="tel:${phone}">${phone}</a></dd>
+    </div>
+</metal:b
+
 <metal:activity_ticket_summary define-macro="activity_ticket_summary" i18n:domain="onegov.feriennet">
     <tal:b define="user activity.user.data.organisation or activity.user.title|activity.user.title">
 
@@ -692,3 +703,37 @@
         I have read the <a href="${url}" i18n:name="tos" i18n:translate>TOS</a> and accept them.
     </div>
 </metal:accept_tos>
+
+
+<metal:user_panel define-macro="user_panel" i18n:domain="onegov.feriennet">
+    <div class="borderless-side-panel without-title highlighted">
+        <h2 i18n:translate>Contact</h2>
+        <dl class="field-display">
+            <div>
+                <dt i18n:translate>Name</dt>
+                <dd>${user.title}</dd>
+            </div>
+            <div tal:define="email user.data.get('email') or user.username">
+                <dt i18n:translate>E-Mail</dt>
+                <dd>
+                    <a href="mailto:${email}">
+                        ${email}
+                    </a>
+                </dd>
+            </div>
+            <div tal:define="emergency user.data.get('emergency')" tal:condition="emergency">
+                <dt i18n:translate>Emergency Contact</dt>
+                <dd><a href="tel:${emergency}">${emergency}</a></dd>
+            </div>
+            <div tal:define="phone user.data.get('phone')" tal:condition="phone">
+                <dt i18n:translate>Phone</dt>
+                <dd><a href="tel:${phone}">${phone}</a></dd>
+            </div>
+            <div tal:condition="request.is_admin">
+                <a href="${request.link(user)}" i18n:translate class="button radius secondary" style="width: 100%">
+                    Manage user
+                </a>
+            </div>
+        </dl>
+    </div>
+</metal:user_panel>

@@ -3,36 +3,40 @@
         ${title}
     </tal:b>
     <tal:b metal:fill-slot="content">
-        <div class="field-display">
-            <div class="field-display-block">
-                <div class="field-display-label" i18n:translate>E-Mail</div>
-                <div class="field-display-data ticket-state">
+        <dl class="field-display">
+            <div>
+                <dt i18n:translate>E-Mail</dt>
+                <dd>
                     <a href="mailto:${layout.model.username}">${layout.model.username}</a>
-                </div>
+                </dd>
             </div>
 
-            <div class="field-display-block">
-                <div class="field-display-label" i18n:translate>State</div>
-                <div class="field-display-data ticket-state">
+            <div>
+                <dt i18n:translate>State</dt>
+                <dd>
                     <tal:b condition="layout.model.active">
                         ✔︎ <span i18n:translate>Active</span>
                     </tal:b>
                     <tal:b condition="not: layout.model.active">
                         ✘︎ <span i18n:translate>Inactive</span>
                     </tal:b>
-                </div>
+                </dd>
             </div>
 
-            <div class="field-display-block">
-                <div class="field-display-label" i18n:translate>Role</div>
-                <div class="field-display-data ticket-state">
+            <div>
+                <dt i18n:translate>Role</dt>
+                <dd>
                     <metal:b use-macro="layout.macros['role_singular']" tal:define="role layout.model.role" />
-                </div>
+                </dd>
             </div>
 
-            <div class="linkgroup field-display-block" tal:repeat="group linkgroups">
-                <div class="field-display-label">${group.title}</div>
-                <div class="field-display-data">
+            <metal:b use-macro="layout.macros['extra_usermanagement_fields']" tal:define="user layout.model" />
+
+            <hr tal:condition="linkgroups">
+
+            <div class="linkgroup" tal:repeat="group linkgroups">
+                <dt>${group.title}</dt>
+                <dd>
                     <div tal:condition="not:group.links" i18n:translate>
                         No links found.
                     </div>
@@ -49,9 +53,8 @@
                             </li>
                         </ul>
                     </tal:b>
-                </div>
+                </dd>
             </div>
-
-        </div>
+        </dl>
     </tal:b>
 </div>
