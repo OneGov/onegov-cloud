@@ -26,6 +26,7 @@ class FeriennetSettingsForm(Form):
     bank_beneficiary = StringField(
         label=_("Beneficiary"),
         fieldset=_("Payment"),
+        placeholder=_("Ferienpass Musterlingen, Bahnhofstr. 2, 1234 Beispiel"),
     )
 
     bank_reference_schema = RadioField(

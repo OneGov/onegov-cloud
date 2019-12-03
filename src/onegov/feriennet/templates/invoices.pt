@@ -178,7 +178,7 @@
                                             <span class="reference-number">${invoice.readable_by_bucket(invoice_bucket)}</span>
                                         </li>
                                         <li tal:case="default">
-                                            <span i18n:translate>Notice</span>
+                                            <span i18n:translate>Purpose of Payment</span>
                                             <span class="reference-number">${invoice.readable_by_bucket(invoice_bucket)}</span>
                                         </li>
                                     </tal:b>
