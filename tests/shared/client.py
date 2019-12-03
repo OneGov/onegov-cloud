@@ -1,5 +1,7 @@
 import re
 
+from cached_property import cached_property
+from pyquery import PyQuery as pq
 from webtest import TestApp
 
 
@@ -121,6 +123,15 @@ class GenericResponseExtension(object):
             if label in el.label.text_content():
                 form.get(groupname).value = el.values()[-1]
                 break
+
+    @cached_property
+    def pyquery(self):
+        """ Webtests property of the same name seems to not work on all
+        pages (it uses self.testbody and not self.body) and it also doesn't
+        cache the result, which is an easy way to improve some lookups here.
+
+        """
+        return pq(self.body)
 
 
 class SkipFirstFormExtension(object):
