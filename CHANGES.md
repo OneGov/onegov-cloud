@@ -1,8 +1,54 @@
 # Changes
 
+## Release `2019.45`
+
+> commits: **8 / [87138a72a5...5e02776a5f](https://github.com/OneGov/onegov-cloud/compare/87138a72a5^...5e02776a5f)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.45)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🎉 **Shows user contact data on bookings/reservations.**
+
+This makes it easier for admins to get in touch with users. Additionally
+we also provide a link to the user management of the user.
+
+**`Feature`** | **[FER-825](https://issues.seantis.ch/browse/FER-825)** | **[9f576f76d4](https://github.com/onegov/onegov-cloud/commit/9f576f76d491d1b0568cd8fb68f09f0a69487fad)**
+
+🎉 **Removes edit links for archived occasions**
+
+Occasions from archived periods can technically still be edited, but the
+
+**`Feature`** | **[FER-831](https://issues.seantis.ch/browse/FER-831)** | **[c1e73c7940](https://github.com/onegov/onegov-cloud/commit/c1e73c7940eac2b1054fdb04e11d541228c9e219)**
+
+🎉 **Improves payment details**
+
+Label changes and an additional placeholder should make the usage of
+bank payments a bit clearer.
+
+**`Feature`** | **[FER-588](https://issues.seantis.ch/browse/FER-588)** | **[662832b4d0](https://github.com/onegov/onegov-cloud/commit/662832b4d022a47f3019d957aaff17b9fd003fd0)**
+
+✨ **Removes unclear label**
+
+The 'no additional costs' label was misunderstood by many to mean 'free
+public transport'. Removing the label altogether rectifies the problem.
+
+**`Other`** | **[FER-564](https://issues.seantis.ch/browse/FER-564)** | **[ffcbc06d5b](https://github.com/onegov/onegov-cloud/commit/ffcbc06d5b8fe0decccc8a1ac8795dea05b5c579)**
+
+### Fsi
+
+🎉 **Adds email previews, info notification sending**
+
+- Email-Previews and Email-Rendering for all Templates
+- Improved Attendee Collection with pagination
+- Toggle course attended has is passed course event
+- Implementation of permissions from LDAP in collections
+
+**`Feature`** | **[5e02776a5f](https://github.com/onegov/onegov-cloud/commit/5e02776a5f92b49804579d7ffa9b42a909bbdf44)**
+
 ## Release `2019.44`
 
-> commits: **2 / [d1e2208edb...3a37b55ec5](https://github.com/OneGov/onegov-cloud/compare/d1e2208edb^...3a37b55ec5)**<br>
+> released: **2019-12-02 12:53**<br>
+> commits: **3 / [d1e2208edb...d6c938c5f6](https://github.com/OneGov/onegov-cloud/compare/d1e2208edb^...d6c938c5f6)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.44)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
