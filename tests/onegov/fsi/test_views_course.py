@@ -44,8 +44,9 @@ def test_edit_course(client_with_db):
     assert 'Changed' in page
 
 
-def test_delete_course(client_with_db):
+def test_delete_course_1(client_with_db):
     client = client_with_db
+    assert client.use_intercooler is True
     session = client.app.session()
     course = session.query(Course).first()
     view = f'/fsi/course/{course.id}'
@@ -56,6 +57,8 @@ def test_delete_course(client_with_db):
     client.delete(view, status=403)
     page = client.get(view)
     page = page.click('Löschen')
+
+    client.get(view, status=404)
 
 
 def test_course_invite(client_with_db):

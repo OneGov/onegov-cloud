@@ -17,6 +17,50 @@ from onegov.fsi.models.course_notification_template import \
 from onegov.fsi import _
 
 
+def handle_send_email(self, request, recipients, cc_to_sender=True):
+
+    if not recipients:
+        request.alert(_("There are no recipients matching the selection"))
+    else:
+        att = request.current_attendee
+        key = f'{att.id}|{att.email}'
+        if cc_to_sender and key not in recipients:
+            recipients.append(key)
+
+        mail_layout = MailLayout(self, request)
+
+        for key_choice in recipients:
+            att_id, recipient = tuple(key_choice.split('|'))
+            attendee = request.session.query(
+                CourseAttendee).filter_by(id=att_id).one()
+
+            content = render_template('mail_notification.pt', request, {
+                'layout': mail_layout,
+                'title': self.subject,
+                'notification': self.text_html,
+                'attendee': attendee
+            })
+            plaintext = html_to_text(content)
+
+            request.app.send_marketing_email(
+                receivers=(recipient,),
+                subject=self.subject,
+                content=content,
+                plaintext=plaintext,
+            )
+
+        self.last_sent = utcnow()
+
+        request.success(_(
+            "Successfully sent the e-mail to ${count} recipients",
+            mapping={
+                'count': len(recipients)
+            }
+        ))
+    return request.redirect(
+        request.link(self.course_event))
+
+
 @FsiApp.html(
     model=CourseNotificationTemplateCollection,
     template='notifications.pt',
@@ -98,46 +142,7 @@ def handle_send_notification(self, request, form):
 
     if form.submitted(request):
         recipients = list(form.recipients.data)
-
-        if not recipients:
-            request.alert(_("There are no recipients matching the selection"))
-
-        else:
-            if request.current_attendee.email not in recipients:
-                recipients.append(request.current_attendee.email)
-            mail_layout = MailLayout(self, request)
-
-            for key_choice in recipients:
-                att_id, recipient = tuple(key_choice.split('|'))
-                attendee = request.session.query(
-                    CourseAttendee).filter_by(id=att_id).one()
-
-                content = render_template('mail_notification.pt', request, {
-                    'layout': mail_layout,
-                    'title': self.subject,
-                    'notification': self.text_html,
-                    'attendee': attendee
-                })
-                plaintext = html_to_text(content)
-
-                request.app.send_marketing_email(
-                    receivers=(recipient, ),
-                    subject=self.subject,
-                    content=content,
-                    plaintext=plaintext,
-                )
-
-            self.last_sent = utcnow()
-
-            request.success(_(
-                "Successfully sent the e-mail to ${count} recipients",
-                mapping={
-                    'count': len(recipients)
-                }
-            ))
-
-            return request.redirect(
-                request.link(self.course_event))
+        return handle_send_email(self, request, recipients)
 
     return {
         'layout': layout,

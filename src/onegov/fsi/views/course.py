@@ -117,7 +117,8 @@ def invite_attendees_for_event(self, request, form):
 )
 def delete_course(self, request):
     request.assert_valid_csrf_token()
-    if self.events.count() == 0:
+    if not self.events.count():
         CourseEventCollection(request.session).delete(self)
+        request.success(_('Course successfully deleted'))
     else:
         request.warning(_('This course has events and can not be deleted'))

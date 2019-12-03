@@ -17,7 +17,7 @@
             <br>
         </tal:b>
         <tal:b tal:case="'reservation'">
-            <p>We hereby confirm your subscription for:</p>
+            <p i18n:translate="">We hereby confirm your subscription for:</p>
             <br>
             <tal:b metal:use-macro="layout.default_macros['course_event_details']" tal:define="model layout.model.course_event; for_email True"/>
             <br>

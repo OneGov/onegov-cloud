@@ -8,8 +8,8 @@
                 <div class="row">
                     <div class="columns small-12">
                         <strong tal:condition="not: events" i18n:translate="">No entries found</strong>
-                        <h4 tal:condition="layout.course">${layout.course.name}</h4>
                         <tal:b tal:condition="events">
+                            <h4 tal:condition="layout.course">${layout.course.name}</h4>
                             <table class="tablesaw hover">
                                 <thead>
                                     <th i18n:translate="" tal:condition="not: layout.model.course_id">Course</th>
@@ -21,7 +21,7 @@
 <!--?                                    <th i18n:translate="">Refresh</th>-->
 <!--?                                    <th i18n:translate="">Status</th>-->
                                     <th i18n:translate="">Free Space</th>
-                                    <th tal:condition="request.is_manager">Hidden</th>
+                                    <th tal:condition="request.is_manager" i18n:translate>Hidden</th>
                                 </thead>
                                 <tbody>
                                     <tal:b tal:repeat="event events">
