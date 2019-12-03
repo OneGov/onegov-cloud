@@ -333,6 +333,10 @@ def view_activity(self, request):
         if request.is_organiser_only and not o.period.active:
             return
 
+        # nobody can edit occasions in archived periods
+        if o.period.archived:
+            return
+
         yield Link(text=_("Edit"), url=request.link(o, name='edit'))
         yield Link(text=_("Clone"), url=request.link(o, name='clone'))
 
