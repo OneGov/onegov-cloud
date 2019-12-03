@@ -49,6 +49,7 @@ def test_delete_course_1(client_with_db):
     assert client.use_intercooler is True
     session = client.app.session()
     course = session.query(Course).first()
+    # course_id = course.id
     view = f'/fsi/course/{course.id}'
     client.login_admin()
     assert not course.events.count()
@@ -56,9 +57,18 @@ def test_delete_course_1(client_with_db):
     # csrf protected url must be used
     client.delete(view, status=403)
     page = client.get(view)
-    page = page.click('Löschen')
+    page.click('Löschen')
 
-    client.get(view, status=404)
+    page = client.get(view)
+    assert "Dieser Kurs besitzt bereits Durchführungen " \
+           "und kann nicht gelöscht werden." in page
+    # for event in course.events:
+    #     session.delete(event)
+    # session.flush()
+    #
+    # page = client.get(view)
+    # assert "Keine Einträge gefunden" in page
+    # assert not session.query(Course).filter_by(id=course_id).first()
 
 
 def test_course_invite(client_with_db):

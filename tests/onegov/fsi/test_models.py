@@ -3,9 +3,7 @@ from sedate import utcnow
 
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
-from onegov.fsi.models.course_notification_template import \
-    NOTIFICATION_TYPES, CourseNotificationTemplate, \
-    NOTIFICATION_TYPE_TRANSLATIONS, InfoTemplate, template_name
+from onegov.fsi.models.course_notification_template import template_name
 from onegov.fsi.models.course_reservation import CourseReservation
 
 

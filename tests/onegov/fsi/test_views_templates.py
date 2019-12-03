@@ -10,7 +10,7 @@ def test_send_template(client_with_es_db):
     info_template = session.query(InfoTemplate).first()
     view = f'/fsi/template/{info_template.id}/send'
     client.login_editor()
-    page = client.get(view)
+    client.get(view)
     # page = page.form.submit().follow()
     # assert "an 2 Empfänger gesendet" in page.form.submit().follow()
     # assert len(client.app.smtp.outbox) == 2
@@ -23,4 +23,4 @@ def test_embed_template(client_with_db):
     info_template = session.query(InfoTemplate).first()
     view = f'/fsi/template/{info_template.id}/embed'
     client.login_editor()
-    page = client.get(view)
+    client.get(view)
