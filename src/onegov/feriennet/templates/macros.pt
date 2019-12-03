@@ -418,9 +418,6 @@
                     <tal:b condition="occasion.cost" i18n:translate>
                         <tal:b i18n:name="cost" replace="occasion.cost" /> CHF
                     </tal:b>
-                    <tal:b condition="not:occasion.cost" i18n:translate>
-                        No additional costs
-                    </tal:b>
                 </tal:b>
                 <tal:b condition="not:period.all_inclusive">
                     <tal:b condition="occasion.cost or period.booking_cost" i18n:translate>
