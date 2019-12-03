@@ -108,7 +108,7 @@ def handle_send_notification(self, request, form):
             mail_layout = MailLayout(self, request)
 
             for key_choice in recipients:
-                att_id, recipient = tuple(key_choice.split('-'))
+                att_id, recipient = tuple(key_choice.split('|'))
                 attendee = request.session.query(
                     CourseAttendee).filter_by(id=att_id).one()
 

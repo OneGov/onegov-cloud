@@ -39,12 +39,12 @@ class NotificationTemplateSendForm(Form):
 
     @property
     def recipients_keys(self):
-        return [f'{a.id}-{a.email}' for a in self.model.course_event.attendees]
+        return [f'{a.id}|{a.email}' for a in self.model.course_event.attendees]
 
     @property
     def recipients_choices(self):
         return [
-            (f'{a.id}-{a.email}', a.email)
+            (f'{a.id}|{a.email}', a.email)
             for a in self.model.course_event.attendees
         ]
 
