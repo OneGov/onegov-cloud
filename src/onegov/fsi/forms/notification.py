@@ -38,8 +38,8 @@ class NotificationTemplateSendForm(Form):
         return bool(self.model.course_event.attendees.count())
 
     @property
-    def recipients_emails(self):
-        return [a.email for a in self.model.course_event.attendees]
+    def recipients_keys(self):
+        return [f'{a.id}-{a.email}' for a in self.model.course_event.attendees]
 
     @property
     def recipients_choices(self):
@@ -50,4 +50,4 @@ class NotificationTemplateSendForm(Form):
 
     def on_request(self):
         self.recipients.choices = self.recipients_choices
-        self.recipients.data = self.recipients_emails
+        self.recipients.data = self.recipients_keys
