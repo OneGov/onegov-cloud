@@ -60,8 +60,8 @@ class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
     #: The subject of the notification would be according to template type
     subject = Column(Text, nullable=False, default='Example Subject')
 
-    #: The body text injected into the template appearing on GUI
-    text = Column(Text, nullable=False, default='Example Text')
+    #: The body text injected in plaintext (not html)
+    text = Column(Text)
 
     def duplicate(self):
         return self.__class__(
@@ -70,6 +70,10 @@ class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
             subject=self.subject,
             text=self.text
         )
+
+    @property
+    def text_html(self):
+        return "<br>".join((f'<p>{el}</p>' for el in self.text.split('\n')))
 
 
 class InfoTemplate(CourseNotificationTemplate):
