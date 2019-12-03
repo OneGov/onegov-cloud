@@ -72,6 +72,11 @@ def es_fsi_app(request, hashed_password):
     yield create_fsi_app(request, True, hashed_password)
 
 
+@pytest.yield_fixture(scope='function')
+def es_fsi_app_mocked(request, hashed_password):
+    yield create_fsi_app(request, True, hashed_password, mock_db=True)
+
+
 @pytest.fixture(scope='function')
 def client(fsi_app):
     return Client(fsi_app)
@@ -85,6 +90,11 @@ def client_with_es(es_fsi_app):
 @pytest.fixture(scope='function')
 def client_with_db(fsi_app_mocked):
     return Client(fsi_app_mocked)
+
+
+@pytest.fixture(scope='function')
+def client_with_es_db(es_fsi_app_mocked):
+    return Client(es_fsi_app_mocked)
 
 
 @pytest.fixture(scope='function')
