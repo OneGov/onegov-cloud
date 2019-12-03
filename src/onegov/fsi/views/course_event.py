@@ -119,7 +119,7 @@ def view_duplicate_course_event(self, request, form):
 def delete_course_event(self, request):
 
     request.assert_valid_csrf_token()
-    if not self.course_event.count():
+    if not self.reservations.count():
         CourseEventCollection(request.session).delete(self)
     else:
         request.warning(_(
