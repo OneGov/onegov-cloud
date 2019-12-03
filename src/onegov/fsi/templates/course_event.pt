@@ -9,6 +9,7 @@
                     <div class="columns small-12">
                         <tal:b tal:condition="model|nothing">
 
+                            <h3 i18n:translate="">Details</h3>
                             <tal:b metal:use-macro="layout.macros['course_event_details']" />
 
                             <tal:b tal:condition="request.is_logged_in" tal:define="registered model.has_reservation(request.attendee_id)">

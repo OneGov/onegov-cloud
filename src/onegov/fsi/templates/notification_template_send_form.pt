@@ -10,8 +10,7 @@
         </div>
 
         <div class="notification-preview">
-            <h5><strong i18n:translate="">Subject:</strong> <strong>${layout.model.subject}</strong></h5>
-            <iframe src="${request.link(layout.model, name='embed')}" frameborder="0" width="100%" height="300px"></iframe>
+            <tal:b metal:use-macro="layout.macros['email_preview']" />
         </div>
 
         <div tal:condition="not:form.has_recipients" i18n:translate>

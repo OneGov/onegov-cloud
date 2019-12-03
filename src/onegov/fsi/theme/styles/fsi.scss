@@ -47,11 +47,15 @@ dd.accordion-navigation + dd.accordion-navigation {
 }
 
 /*
-    Events table
+    Tables
 */
 .events-table {
     border: 1px solid $gray-light;
     border-width: 1px 1px 0;
+}
+
+.fullwidth {
+    width: 100%
 }
 
 /*

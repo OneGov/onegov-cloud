@@ -78,7 +78,11 @@ class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
 
     @property
     def text_html(self):
-        return "<br>".join((f'<p>{el}</p>' for el in self.text.split('\n')))
+        if not self.text:
+            return None
+        parts = self.text.replace('\n\n', '\n').split('\n')
+        rendered = " ".join((f'<p>{el}</p>' for el in parts if el))
+        return rendered
 
 
 class InfoTemplate(CourseNotificationTemplate):

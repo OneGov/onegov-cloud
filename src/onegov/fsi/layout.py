@@ -6,13 +6,7 @@ from onegov.fsi.models.course_notification_template import \
 from onegov.org.layout import DefaultLayout as BaseLayout
 
 
-class DefaultLayout(BaseLayout):
-
-    def include_accordion(self):
-        self.request.include('accordion')
-
-    def instance_link(self, instance):
-        return self.request.link(instance)
+class FormatMixin:
 
     @staticmethod
     def format_status(model_status):
@@ -25,3 +19,12 @@ class DefaultLayout(BaseLayout):
         return NOTIFICATION_TYPE_TRANSLATIONS[
             NOTIFICATION_TYPES.index(notification_type)
         ]
+
+
+class DefaultLayout(BaseLayout, FormatMixin):
+
+    def include_accordion(self):
+        self.request.include('accordion')
+
+    def instance_link(self, instance):
+        return self.request.link(instance)

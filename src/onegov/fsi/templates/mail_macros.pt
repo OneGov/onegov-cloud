@@ -28,7 +28,7 @@
             </p>
         </tal:b>
         <tal:b tal:case="'reminder'">
-            <p i18n:translate="">We would like to remind you for the following course: </p>
+            <p i18n:translate="">We would like to remind you of your subscription for: </p>
             <br>
             <tal:b metal:use-macro="layout.default_macros['course_event_details']" tal:define="model layout.model.course_event; for_email True"/>
             <br>

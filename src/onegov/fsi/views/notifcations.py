@@ -11,6 +11,7 @@ from onegov.fsi.layouts.notification import NotificationTemplateLayout, \
     NotificationTemplateCollectionLayout, EditNotificationTemplateLayout, \
     MailLayout, \
     SendNotificationTemplateLayout
+from onegov.fsi.models import CourseAttendee
 from onegov.fsi.models.course_notification_template import \
     CourseNotificationTemplate
 from onegov.fsi import _
@@ -58,7 +59,6 @@ def view_edit_notification(self, request, form):
 
     form.apply_model(self)
     layout = EditNotificationTemplateLayout(self, request)
-    layout.include_editor()
 
     return {
         'title': layout.title,
@@ -66,6 +66,23 @@ def view_edit_notification(self, request, form):
         'layout': layout,
         'form': form,
         'button_text': _('Update')
+    }
+
+
+@FsiApp.html(
+    model=CourseNotificationTemplate,
+    template='mail_notification.pt',
+    permission=Private,
+    name='embed')
+def view_email_preview(self, request):
+
+    layout = MailLayout(self, request)
+
+    return {
+        'model': self,
+        'layout': layout,
+        'title': self.subject,
+        'notification': self.text_html,
     }
 
 
@@ -78,25 +95,31 @@ def view_edit_notification(self, request, form):
 def handle_send_notification(self, request, form):
 
     layout = SendNotificationTemplateLayout(self, request)
-    content = render_template('mail_notification.pt', request, {
-        'layout': MailLayout(self, request),
-        'title': self.subject,
-        'notification': self.text
-    })
-    plaintext = html_to_text(content)
 
     if form.submitted(request):
         recipients = list(form.recipients.data)
 
         if not recipients:
-            request.alert(
-            _("There are no recipients matching the selection"))
+            request.alert(_("There are no recipients matching the selection"))
 
         else:
             if request.current_attendee.email not in recipients:
                 recipients.append(request.current_attendee.email)
+            mail_layout = MailLayout(self, request)
 
-            for recipient in recipients:
+            for key_choice in recipients:
+                att_id, recipient = tuple(key_choice.split('-'))
+                attendee = request.session.query(
+                    CourseAttendee).filter_by(id=att_id).one()
+
+                content = render_template('mail_notification.pt', request, {
+                    'layout': mail_layout,
+                    'title': self.subject,
+                    'notification': self.text_html,
+                    'attendee': attendee
+                })
+                plaintext = html_to_text(content)
+
                 request.app.send_marketing_email(
                     receivers=(recipient, ),
                     subject=self.subject,
@@ -119,9 +142,6 @@ def handle_send_notification(self, request, form):
     return {
         'layout': layout,
         'form': form,
-        'preview_subject': self.subject,
-        'preview_body': self.text,
-        'edit_link': request.return_here(request.link(self, 'edit')),
         'button_text': _("Send E-Mail Now"),
         'model': self,
     }

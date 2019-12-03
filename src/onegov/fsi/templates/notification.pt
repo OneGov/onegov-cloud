@@ -7,10 +7,9 @@
             <div class="columns small-12">
                 <div class="row">
                     <div class="columns small-12">
-                        <tal:b tal:condition="layout.model|nothing">
-                            <p><strong>Subject: </strong>${layout.model.subject}</p>
-                                <div tal:content="structure layout.model.text" />
-                        </tal:b>
+                        <div class="notification-preview">
+                            <tal:b metal:use-macro="layout.macros['email_preview']" />
+                        </div>
                     </div>
                 </div>
             </div>

@@ -39,7 +39,7 @@ def add_attendee_permissions_col(context):
 
 
 @upgrade_task('Make Notification.text nullable')
-def add_attendee_permissions_col(context):
+def make_notification_text_null(context):
     if context.has_column('fsi_notification_templates', 'text'):
         context.operations.alter_column(
             'fsi_notification_templates', 'text', nullable=True)

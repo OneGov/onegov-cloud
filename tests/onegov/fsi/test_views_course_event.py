@@ -48,7 +48,8 @@ def test_edit_course_event(client_with_db):
     assert '05. Mai 2015' in page
     assert 'Pres' in page
     assert f'min. 2 max. 3' in page
-    assert 'This course is hidden.' in page
+    # String will not be rendered in email preview
+    assert 'This course is hidden.' not in page
 
 
 def test_add_course_event(client):
