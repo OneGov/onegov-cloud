@@ -127,9 +127,10 @@ def test_cascading_event_deletion(session, db_mock_session):
     # If a course event is deleted, all the reservations should be deleted
     session = db_mock_session(session)
     event = session.query(CourseEvent).first()
-    assert session.query(CourseReservation).count() == 2
+    assert event.reservations.count() == 2
     session.delete(event)
     assert session.query(CourseReservation).count() == 0
+    assert event.reservations.count() == 0
 
 
 def test_cascading_attendee_deletion(session, db_mock_session):
