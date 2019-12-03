@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-12-03 13:37+0100\n"
-"PO-Revision-Date: 2019-12-03 13:52+0100\n"
+"POT-Creation-Date: 2019-12-03 15:55+0100\n"
+"PO-Revision-Date: 2019-12-03 15:56+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -273,7 +273,7 @@ msgstr "${type} Email-Vorlage"
 
 #, python-format
 msgid "Edit ${type} Notification Template"
-msgstr "Edit ${type} Email-Vorlage"
+msgstr "Bearbeite ${type} Email-Vorlage"
 
 msgid "Mailing"
 msgstr "Mail-Versand"
@@ -320,7 +320,7 @@ msgid "Created"
 msgstr "Erstellt"
 
 msgid "Confirmed"
-msgstr "Bestätitgt"
+msgstr "Bestätigt"
 
 msgid "Canceled"
 msgstr "Abgesagt"
@@ -436,6 +436,9 @@ msgstr "Sehr geehrte(r) ${attendee.first_name} ${attendee.last_name},"
 msgid "Dear [first_name] [last_name],"
 msgstr "Sehr geehrte(r) [first_name] [last_name],"
 
+msgid "We hereby confirm your subscription for:"
+msgstr "Wir bestätigen hiermit ihre Anmeldung für:"
+
 msgid "You will receive a reminder email prior to the course."
 msgstr "Sie werden eine Erinnerungs-Email vor dem Kurs-Start erhalten."
 
@@ -511,9 +514,16 @@ msgstr "Aktualisieren"
 msgid "Send Invitation"
 msgstr "Einladung senden"
 
+msgid "Course successfully deleted"
+msgstr "Kurs erfolgreich gelöscht"
+
 msgid "This course has events and can not be deleted"
 msgstr ""
 "Dieser Kurs besitzt bereits Durchführungen und kann nicht gelöscht werden."
+
+msgid "This event has registrations and can not be deleted"
+msgstr ""
+"Diese Durchführung hat bereits Anmeldungen und kann nicht gelöscht werden"
 
 msgid "There are no recipients matching the selection"
 msgstr "Keine Empfänger die auf diese Auswahl zutreffen"
