@@ -1732,12 +1732,12 @@ def test_view_archived_occasions(client, scenario):
     # they do not get any action links however
     assert 'Duplizieren' not in client.get('/activity/fishing')
 
-    # admins see archived occasions
+    # admins see archived occasions, but get no links either
     client = client.spawn()
     client.login_admin()
 
     assert '1. Durchführung' in client.get('/activity/fishing')
-    assert 'Duplizieren' in client.get('/activity/fishing')
+    assert 'Duplizieren' not in client.get('/activity/fishing')
 
 
 def test_no_new_activites_without_active_period(client, scenario):
