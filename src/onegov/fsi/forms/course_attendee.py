@@ -1,55 +1,65 @@
-from wtforms import StringField, TextAreaField
+from wtforms import StringField
 from wtforms.validators import InputRequired, Email
-from onegov.form.fields import ChosenSelectField
 from wtforms.fields.html5 import EmailField
+
+from onegov.form.fields import ChosenSelectMultipleField
 from onegov.fsi import _
 from onegov.form import Form
-from onegov.fsi.models.course_attendee import attendee_title_choices
+from onegov.fsi.models import CourseAttendee
 
 
 class CourseAttendeeForm(Form):
 
-    title = ChosenSelectField(
-        label=_('Salutation'),
-        choices=attendee_title_choices(),
-        render_kw={'size': 1}
-    )
-
     first_name = StringField(
         label=_('First Name'),
-        render_kw={'size': 3},
         validators=[InputRequired()]
     )
 
     last_name = StringField(
         label=_('Last Name'),
-        render_kw={'size': 4},
         validators=[InputRequired()],
     )
 
     email = EmailField(
         label=_('Email'),
         validators=[InputRequired(), Email()],
-        render_kw={'size': 4},
     )
 
-    address = TextAreaField(
-        label=_('Address'),
-        render_kw={'cols': 12, 'rows': 4}
+    permissions = ChosenSelectMultipleField(
+        label=_('Permissions'),
+        choices=[]
     )
+
+    def unique_permission_codes(self):
+        query = self.request.session.query(
+            CourseAttendee.organisation.distinct().label('code'))
+        return query.order_by(CourseAttendee.organisation)
 
     def update_model(self, model):
-        model.title = self.title.data
         model.first_name = self.first_name.data
         model.last_name = self.last_name.data
-        model.address = self.address.data
+        if self.permissions:
+            model.permissions = self.permissions.data
 
     def apply_model(self, model):
-        self.title.data = model.title
         self.first_name.data = model.first_name
         self.last_name.data = model.last_name
-        self.address.data = model.address
+        if self.permissions:
+            self.permissions.data = model.permissions
 
     def on_request(self):
-        if self.request.view_name != 'add-external':
+
+        if not self.model.user_id:
+            self.delete_field('permissions')
+        else:
             self.delete_field('email')
+            self.permissions.choices = [
+                (p.code, p.code)
+                for p in self.unique_permission_codes() if p.code
+            ]
+
+
+class AddExternalAttendeeForm(CourseAttendeeForm):
+
+    def on_request(self):
+        self.delete_field('permissions')

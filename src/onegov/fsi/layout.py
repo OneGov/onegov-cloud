@@ -1,5 +1,3 @@
-from onegov.fsi.models.course_attendee import ATTENDEE_TITLE_TRANSLATIONS, \
-    ATTENDEE_TITLES
 from onegov.fsi.models.course_event import (
     COURSE_EVENT_STATUSES_TRANSLATIONS, COURSE_EVENT_STATUSES
 )
@@ -8,13 +6,7 @@ from onegov.fsi.models.course_notification_template import \
 from onegov.org.layout import DefaultLayout as BaseLayout
 
 
-class DefaultLayout(BaseLayout):
-
-    def include_accordion(self):
-        self.request.include('accordion')
-
-    def instance_link(self, instance):
-        return self.request.link(instance)
+class FormatMixin:
 
     @staticmethod
     def format_status(model_status):
@@ -28,8 +20,11 @@ class DefaultLayout(BaseLayout):
             NOTIFICATION_TYPES.index(notification_type)
         ]
 
-    @staticmethod
-    def format_salutation(title):
-        return ATTENDEE_TITLE_TRANSLATIONS[
-            ATTENDEE_TITLES.index(title)
-        ]
+
+class DefaultLayout(BaseLayout, FormatMixin):
+
+    def include_accordion(self):
+        self.request.include('accordion')
+
+    def instance_link(self, instance):
+        return self.request.link(instance)

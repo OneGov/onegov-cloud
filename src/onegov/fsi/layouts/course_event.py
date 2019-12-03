@@ -76,6 +76,14 @@ class CourseEventLayout(DefaultLayout):
         )
 
     @cached_property
+    def course_collection(self):
+        return CourseEventCollection(
+            self.request.session,
+            show_hidden=True,
+            course_id=self.model.course.id
+        )
+
+    @cached_property
     def reservation_collection(self):
         return ReservationCollection(
             self.request.session,
@@ -170,7 +178,7 @@ class CourseEventLayout(DefaultLayout):
                     Intercooler(
                         request_method='DELETE',
                         redirect_after=self.request.link(
-                            self.collection
+                            self.course_collection
                         )
                     )
                 )

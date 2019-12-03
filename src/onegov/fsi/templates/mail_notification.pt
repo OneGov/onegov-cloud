@@ -1,0 +1,8 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.fsi">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="body">
+        <tal:b replace="structure notification" />
+    </tal:b>
+</div>

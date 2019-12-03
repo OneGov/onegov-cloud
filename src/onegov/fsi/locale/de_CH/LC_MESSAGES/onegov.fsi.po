@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-11-19 15:02+0100\n"
-"PO-Revision-Date: 2019-11-18 13:57+0100\n"
+"POT-Creation-Date: 2019-12-03 15:55+0100\n"
+"PO-Revision-Date: 2019-12-03 15:56+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -77,9 +77,6 @@ msgstr "Anzahl Monate"
 msgid "Paste a list of email addresses"
 msgstr "Füge eine Liste von E-Mail-Addressen ein"
 
-msgid "Salutation"
-msgstr "Anrede"
-
 msgid "First Name"
 msgstr "Vorname(n)"
 
@@ -89,8 +86,8 @@ msgstr "Nachname"
 msgid "Email"
 msgstr "Email"
 
-msgid "Address"
-msgstr "Addresse"
+msgid "Permissions"
+msgstr "Berechtigungen"
 
 msgid "Course"
 msgstr "Kurs"
@@ -136,6 +133,9 @@ msgstr "Betreff"
 
 msgid "Email Text"
 msgstr "Email Inhalt"
+
+msgid "Recipients"
+msgstr "Empfänger"
 
 msgid "Attendee"
 msgstr "Teilnehmer"
@@ -187,6 +187,15 @@ msgstr "Externen Teilnehmer hinzufügen"
 
 msgid "Manage Course Attendees"
 msgstr "Teilnehmer verwalten"
+
+msgid "All"
+msgstr "Alle"
+
+msgid "External"
+msgstr "Extern"
+
+msgid "Editors"
+msgstr "Sicherheitsverantwortliche"
 
 msgid "Edit Profile"
 msgstr "Profil bearbeiten"
@@ -251,11 +260,12 @@ msgstr "Kursdurchführung hinzufügen"
 msgid "Duplicate course event"
 msgstr "Kursdurchführung duplizieren"
 
+#, python-format
+msgid "Preview Info Mail for ${course_event}"
+msgstr "Vorschaue Info Mail für ${course_event}"
+
 msgid "Manage Notification Templates"
 msgstr "Email-Templates verwalten"
-
-msgid "Send Notification"
-msgstr "Sende Benachrichtigung"
 
 #, python-format
 msgid "${type} Notification Template"
@@ -263,7 +273,13 @@ msgstr "${type} Email-Vorlage"
 
 #, python-format
 msgid "Edit ${type} Notification Template"
-msgstr "Edit ${type} Email-Vorlage"
+msgstr "Bearbeite ${type} Email-Vorlage"
+
+msgid "Mailing"
+msgstr "Mail-Versand"
+
+msgid "Send"
+msgstr "Senden"
 
 msgid "Add Attendee"
 msgstr "Teilnehmer hinzufügen"
@@ -285,6 +301,9 @@ msgstr "Alle Kursanmeldungen für ${attendee}"
 msgid "All Event Subscriptions"
 msgstr "Alle Kursanmeldungen"
 
+msgid "Print"
+msgstr "Drucken"
+
 msgid "Subscription"
 msgstr "Anmeldung"
 
@@ -297,17 +316,11 @@ msgstr "Wollen Sie diese Reservation annulieren?"
 msgid "Cancel reservation for course event"
 msgstr "Reservation annulieren"
 
-msgid "Mr."
-msgstr "Herr"
-
-msgid "Ms."
-msgstr "Frau"
-
 msgid "Created"
 msgstr "Erstellt"
 
 msgid "Confirmed"
-msgstr "Bestätitgt"
+msgstr "Bestätigt"
 
 msgid "Canceled"
 msgstr "Abgesagt"
@@ -333,30 +346,6 @@ msgstr "Beschreibung"
 msgid "Events"
 msgstr "Durchführungen"
 
-msgid "Date"
-msgstr "Datum"
-
-msgid "Start"
-msgstr "Start"
-
-msgid "End"
-msgstr "Ende"
-
-msgid "Presenter Company"
-msgstr "Referent Firma"
-
-msgid "Free Space"
-msgstr "Freie Plätze"
-
-msgid "Yes"
-msgstr "Ja"
-
-msgid "No"
-msgstr "Nein"
-
-msgid "No entries found."
-msgstr "Keine Einträge gefunden."
-
 msgid "E-Mail"
 msgstr "E-Mail"
 
@@ -365,6 +354,9 @@ msgstr "Vorname"
 
 msgid "Last name"
 msgstr "Nachname"
+
+msgid "Organisation Code"
+msgstr "Kürzel Organisation"
 
 msgid "Total courses"
 msgstr "Total Kurse"
@@ -381,23 +373,11 @@ msgstr "Keine Teilnehmer in der Datenbank"
 msgid "Family name, surname"
 msgstr "Nachname, Vorname"
 
-msgid "External"
-msgstr "Extern"
-
-msgid "All Open Reservations"
-msgstr "Alle offenen Reservationen"
-
-msgid "Confirmed Open Reservations"
-msgstr "Bestätigte, offene Reservationen"
-
-msgid "Total Course Events done"
-msgstr "Total aller absolvierten Kursdurchführungen"
+msgid "Organisation"
+msgstr "Organisation"
 
 msgid "Details"
 msgstr "Details"
-
-msgid "Remaining seats"
-msgstr "Verbleibende Plätze"
 
 msgid "Registered"
 msgstr "Angemeldet"
@@ -405,17 +385,104 @@ msgstr "Angemeldet"
 msgid "This course event can't be booked anymore."
 msgstr "Dieser Kurs kann nicht mehr gebucht werden."
 
+msgid "No entries found."
+msgstr "Keine Einträge gefunden."
+
 msgid "No entries found"
 msgstr "Keine Einträge gefunden"
 
+msgid "Date"
+msgstr "Datum"
+
+msgid "Start"
+msgstr "Start"
+
+msgid "End"
+msgstr "Ende"
+
+msgid "Presenter Company"
+msgstr "Referent Firma"
+
+msgid "Free Space"
+msgstr "Freie Plätze"
+
 msgid "Details / Registration"
 msgstr "Details / Anmeldung"
+
+msgid "Subject:"
+msgstr "Betreff:"
+
+msgid "Text:"
+msgstr "Nachricht:"
+
+msgid "Recipients:"
+msgstr "Empfänger:"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Remaining seats"
+msgstr "Verbleibende Plätze"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nein"
+
+msgid "Dear ${attendee.first_name} ${attendee.last_name},"
+msgstr "Sehr geehrte(r) ${attendee.first_name} ${attendee.last_name},"
+
+msgid "Dear [first_name] [last_name],"
+msgstr "Sehr geehrte(r) [first_name] [last_name],"
+
+msgid "We hereby confirm your subscription for:"
+msgstr "Wir bestätigen hiermit ihre Anmeldung für:"
+
+msgid "You will receive a reminder email prior to the course."
+msgstr "Sie werden eine Erinnerungs-Email vor dem Kurs-Start erhalten."
+
+msgid "Further information can be found on the"
+msgstr "Weitere Informationen finden auf der"
+
+msgid "course website."
+msgstr "Kurswebseite."
+
+msgid "We would like to remind you of your subscription for:"
+msgstr "Wir würden Sie gerne an ihre Anmeldung erinnern für:"
+
+msgid "We hereby confirm your cancellation for subscription:"
+msgstr "Hiermit bestätigen wir die Annulierung für die Anmeldung:"
+
+msgid "If you still like to visit this course, have a look at the"
+msgstr "Falls sie diesen Kurs noch besuchen möchten, schauen sie unter"
+
+msgid "open events."
+msgstr "zukünfigte Durchführungen"
+
+msgid "Event Details"
+msgstr "Details Durchführung"
+
+msgid ""
+"Clicking \"Send\" will send the e-mail below to all selected recipients. You "
+"will receive a copy of the e-mail if you are not already on the recipients "
+"list."
+msgstr ""
+"Wenn sie auf \"Senden\" klicken, wird das untenstehende Email an die "
+"ausgewählten Empfänger versendet. Sie werden eine Kopie dieser Email "
+"erhalten, falls sie noch nicht in der Empfängerliste sind."
+
+msgid "There are subscriptions for this course event."
+msgstr "Für diese Durchführung existieren Anmeldungen"
 
 msgid "Mail Subject"
 msgstr "Email Betreff"
 
 msgid "Mail Type"
 msgstr "Email-Typ"
+
+msgid "Last Modified"
+msgstr "Zuletzt Geändert"
 
 msgid "Course Name"
 msgstr "Kursname"
@@ -447,9 +514,26 @@ msgstr "Aktualisieren"
 msgid "Send Invitation"
 msgstr "Einladung senden"
 
+msgid "Course successfully deleted"
+msgstr "Kurs erfolgreich gelöscht"
+
 msgid "This course has events and can not be deleted"
 msgstr ""
 "Dieser Kurs besitzt bereits Durchführungen und kann nicht gelöscht werden."
+
+msgid "This event has registrations and can not be deleted"
+msgstr ""
+"Diese Durchführung hat bereits Anmeldungen und kann nicht gelöscht werden"
+
+msgid "There are no recipients matching the selection"
+msgstr "Keine Empfänger die auf diese Auswahl zutreffen"
+
+#, python-format
+msgid "Successfully sent the e-mail to ${count} recipients"
+msgstr "Email erfolgreich an ${count} Empfänger gesendet"
+
+msgid "Send E-Mail Now"
+msgstr "Email jetzt senden"
 
 msgid "Added a new reservation"
 msgstr "Neue Reservation hinzugefügt"
@@ -480,3 +564,30 @@ msgstr "Neue Anmeldungen erfasst"
 
 msgid "Subscription successfully deleted"
 msgstr "Anmeldung erfolgreich gelöscht"
+
+#~ msgid "subscription"
+#~ msgstr "Anmeldung"
+
+#~ msgid "Salutation"
+#~ msgstr "Anrede"
+
+#~ msgid "Address"
+#~ msgstr "Addresse"
+
+#~ msgid "Send Notification"
+#~ msgstr "Sende Benachrichtigung"
+
+#~ msgid "Mr."
+#~ msgstr "Herr"
+
+#~ msgid "Ms."
+#~ msgstr "Frau"
+
+#~ msgid "All Open Reservations"
+#~ msgstr "Alle offenen Reservationen"
+
+#~ msgid "Confirmed Open Reservations"
+#~ msgstr "Bestätigte, offene Reservationen"
+
+#~ msgid "Total Course Events done"
+#~ msgstr "Total aller absolvierten Kursdurchführungen"

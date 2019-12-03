@@ -6,33 +6,63 @@
         <div class="row">
             <div class="columns small-12">
                 <div class="row">
-                    <div class="columns small-12">
-                        <strong tal:condition="not: attendees" i18n:translate>No attendees in the database</strong>
-                        <tal:b tal:condition="attendees|nothing">
-                            <table style="width: 100%">
+                    <div class="columns small-12" tal:define="has_entries model.query().count()">
+                        <div class="tab-navigation clearfix" tal:condition="layout.menu">
+                            <nav class="top-bar clearfix" data-topbar data-options="back_text: &lt;; is_hover: false; mobile_show_parent_link: false" role="navigation">
+                                <section class="top-bar-section">
+                                    <ul class="left">
+
+                                        <tal:b repeat="(title, link, active) layout.menu">
+                                            <li tal:attributes="class python: 'active' if active else ''">
+                                                <a href="${link}">${title}</a>
+                                            </li>
+                                        </tal:b>
+                                    </ul>
+                                </section>
+                            </nav>
+                        </div>
+
+                        <strong tal:condition="not: has_entries" i18n:translate>No attendees in the database</strong>
+                        <tal:b tal:condition="has_entries">
+
+                            <table class="fullwidth">
                                 <thead>
                                     <th i18n:translate="">Family name, surname</th>
                                     <th i18n:translate="">Email</th>
-                                    <th i18n:translate="">External</th>
-                                    <th i18n:translate="">All Open Reservations</th>
-                                    <th i18n:translate="">Confirmed Open Reservations</th>
-                                    <th i18n:translate="">Total Course Events done</th>
+                                    <th i18n:translate="" tal:condition="not: layout.model.external_only">Organisation</th>
+<!--?                                    <th i18n:translate="">All Open Reservations</th>-->
+<!--?                                    <th i18n:translate="">Confirmed Open Reservations</th>-->
+<!--?                                    <th i18n:translate="">Total Course Events done</th>-->
+                                    <th i18n:translate="" tal:condition="layout.model.unfiltered">External</th>
 
                                 </thead>
                                 <tbody>
-                                    <tal:b tal:repeat="attendee attendees">
+                                    <tal:b tal:repeat="attendee model.batch">
                                         <tr>
                                             <td><a href="${layout.instance_link(attendee)}">${str(attendee)}</a></td>
                                             <td>${attendee.email}</td>
-                                            <td tal:condition="attendee.is_external">True</td>
-                                            <td tal:condition="not: attendee.is_external">False</td>
-                                            <td>${attendee.course_events.count()}</td>
-                                            <td>${attendee.confirmed_course_events.count()}</td>
-                                            <td>${attendee.total_done_course_events.count()}</td>
+
+                                            <td tal:condition="not: layout.model.external_only">${attendee.organisation}</td>
+<!--?                                            <td>${attendee.course_events.count()}</td>-->
+<!--?                                            <td>${attendee.confirmed_course_events.count()}</td>-->
+<!--?                                            <td>${attendee.total_done_course_events.count()}</td>-->
+
+                                            <tal:b tal:switch="attendee.is_external" tal:condition="layout.model.unfiltered">
+                                                <td tal:case="True">True</td>
+                                                <td tal:case="False">False
+                                                </td>
+                                            </tal:b>
+
                                         </tr>
                                     </tal:b>
                                 </tbody>
                             </table>
+
+                            <div class="pagination-centered">
+                                <div metal:use-macro="layout.macros['pagination']" tal:define="
+                                collection model; current_page model;" />
+                            </div>
+
                         </tal:b>
                     </div>
                 </div>

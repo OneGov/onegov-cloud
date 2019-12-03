@@ -12,6 +12,15 @@ class ReservationCollectionLayout(DefaultLayout):
     def for_himself(self):
         return self.model.attendee_id == self.request.attendee_id
 
+    def link(self, reservation):
+        if reservation.is_placeholder:
+            return self.request.link(reservation, name='edit')
+        return self.request.link(reservation.attendee)
+
+    def confirmation_link(self, reservation):
+        return self.csrf_protected_url(
+            self.request.link(reservation, name='toggle-confirm'))
+
     @cached_property
     def title(self):
         if self.request.view_name == 'add':
@@ -33,6 +42,14 @@ class ReservationCollectionLayout(DefaultLayout):
         if not self.request.is_manager:
             return []
         return [
+            Link(
+                text=_("Print"),
+                url='#',
+                attrs={
+                    'class': 'print-icon',
+                    'onclick': 'window.print();return false;'
+                }
+            ),
             LinkGroup(
                 title=_('Add'),
                 links=[
@@ -56,7 +73,7 @@ class ReservationCollectionLayout(DefaultLayout):
         return self.model.course_event
 
     @property
-    def send_info_mail_url(self):
+    def preview_info_mail_url(self):
         return self.request.link(
             self.course_event.info_template, name='send')
 
@@ -81,7 +98,7 @@ class ReservationCollectionLayout(DefaultLayout):
         return Link(
             text=_("Delete"),
             url=self.csrf_protected_url(
-                self.request.link(reservation, name='delete')
+                self.request.link(reservation)
             ),
             attrs={'class': 'button tiny alert'},
             traits=(
@@ -110,6 +127,33 @@ class ReservationLayout(DefaultLayout):
             attendee_id=None,
             course_event_id=self.model.course_event_id
         )
+
+    @cached_property
+    def editbar_links(self):
+        if not self.request.is_admin:
+            return []
+        return [
+            Link(
+                text=_("Delete"),
+                url=self.csrf_protected_url(
+                    self.request.link(self.model)
+                ),
+                attrs={'class': 'button tiny alert'},
+                traits=(
+                    Confirm(
+                        _("Do you want to cancel the reservation ?"),
+                        _(
+                            "A confirmation email will be sent to you later."),
+                        _("Cancel reservation for course event"),
+                        _("Cancel")
+                    ),
+                    Intercooler(
+                        request_method='DELETE',
+                        redirect_after=self.request.link(self.model)
+                    )
+                )
+            )
+        ]
 
     @cached_property
     def breadcrumbs(self):

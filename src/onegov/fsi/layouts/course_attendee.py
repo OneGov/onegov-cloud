@@ -35,6 +35,20 @@ class CourseAttendeeCollectionLayout(DefaultLayout):
             links.append(Link(_('Add External Attendee')))
         return links
 
+    @cached_property
+    def menu(self):
+
+        return [
+            (_('All'), self.request.class_link(CourseAttendeeCollection),
+             self.model.unfiltered),
+            (_('External'), self.request.link(CourseAttendeeCollection(
+                self.request.session, external_only=True)),
+             self.model.external_only),
+            (_('Editors'), self.request.link(CourseAttendeeCollection(
+                self.request.session, editors_only=True)),
+             self.model.editors_only)
+        ]
+
 
 class CourseAttendeeLayout(DefaultLayout):
 
@@ -80,6 +94,6 @@ class CourseAttendeeLayout(DefaultLayout):
             )
         return links
 
-    @cached_property
-    def salutation(self):
-        return self.format_salutation(self.model.title)
+    @property
+    def attendee_permissions(self):
+        return self.model.permissions and "<br>".join(self.model.permissions)

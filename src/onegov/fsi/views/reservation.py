@@ -1,3 +1,4 @@
+from onegov.core.security import Personal, Private, Secret
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.forms.reservation import AddFsiReservationForm, \
@@ -8,7 +9,11 @@ from onegov.fsi.models import CourseReservation
 from onegov.fsi import _
 
 
-@FsiApp.html(model=ReservationCollection, template='reservations.pt')
+@FsiApp.html(
+    model=ReservationCollection,
+    template='reservations.pt',
+    permission=Personal
+)
 def view_reservations(self, request):
     layout = ReservationCollectionLayout(self, request)
     return {
@@ -17,16 +22,12 @@ def view_reservations(self, request):
     }
 
 
-@FsiApp.html(model=CourseReservation)
-def reservation_redirect(self, request):
-    return request.redirect(request.link(self, name='edit'))
-
-
 @FsiApp.form(
     model=ReservationCollection,
     template='form.pt',
     name='add',
-    form=AddFsiReservationForm
+    form=AddFsiReservationForm,
+    permission=Private
 )
 def view_add_reservation(self, request, form):
     layout = ReservationCollectionLayout(self, request)
@@ -48,7 +49,8 @@ def view_add_reservation(self, request, form):
     model=CourseReservation,
     template='form.pt',
     name='edit',
-    form=EditFsiReservationForm
+    form=EditFsiReservationForm,
+    permission=Secret
 )
 def view_edit_reservation(self, request, form):
     layout = ReservationLayout(self, request)
@@ -64,6 +66,9 @@ def view_edit_reservation(self, request, form):
     title = _('Edit Placeholder') if self.is_placeholder \
         else _('Edit Reservation')
 
+    if not form.errors:
+        form.apply_model(self)
+
     return {
         'title': title,
         'model': self,
@@ -77,7 +82,8 @@ def view_edit_reservation(self, request, form):
     model=ReservationCollection,
     template='form.pt',
     name='add-placeholder',
-    form=AddFsiReservationForm
+    form=AddFsiReservationForm,
+    permission=Private
 )
 def view_add_reservation_placeholder(self, request, form):
     layout = ReservationCollectionLayout(self, request)
@@ -103,7 +109,8 @@ def view_add_reservation_placeholder(self, request, form):
 @FsiApp.html(
     model=ReservationCollection,
     request_method='POST',
-    name='add-from-course-event'
+    name='add-from-course-event',
+    permission=Private
 )
 def view_add_from_course_event(self, request):
     request.assert_valid_csrf_token()
@@ -116,9 +123,20 @@ def view_add_from_course_event(self, request):
 @FsiApp.html(
     model=CourseReservation,
     request_method='DELETE',
-    name='delete'
+    permission=Secret
 )
 def view_delete_reservation(self, request):
     request.assert_valid_csrf_token()
     ReservationCollection(request.session).delete(self)
     request.success(_('Subscription successfully deleted'))
+
+
+@FsiApp.html(
+    model=CourseReservation,
+    request_method='POST',
+    permission=Private,
+    name='toggle-confirm'
+)
+def view_toggle_confirm_reservation(self, request):
+    request.assert_valid_csrf_token()
+    self.event_completed = not self.event_completed

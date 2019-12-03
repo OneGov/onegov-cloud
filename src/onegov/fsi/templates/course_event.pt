@@ -10,44 +10,7 @@
                         <tal:b tal:condition="model|nothing">
 
                             <h3 i18n:translate="">Details</h3>
-
-                            <p tal:condition="request.is_manager and model.hidden_from_public">This course is hidden.</p>
-
-                            <dl class="field-display">
-                                <dt i18n:translate="">Location</dt>
-                                <dd>${model.location}</dd>
-                                <div class="clearfix"></div>
-                            </dl>
-
-                            <dl class="field-display">
-                                <dt i18n:translate="">Date</dt>
-                                <dd>${layout.format_date(model.start, 'event')}, ${layout.format_date(model.start, 'time')} - ${layout.format_date(model.end, 'time')}</dd>
-                                <div class="clearfix"></div>
-                            </dl>
-
-                            <dl class="field-display">
-                                <dt i18n:translate="">Presenter</dt>
-                                <dd>${model.presenter_name}, ${model.presenter_email}</dd>
-                                <div class="clearfix"></div>
-                            </dl>
-
-                            <dl class="field-display">
-                                <dt i18n:translate="">Attendees</dt>
-                                <dd>min. ${model.min_attendees} max. ${model.max_attendees}</dd>
-                                <div class="clearfix"></div>
-                            </dl>
-
-                            <dl class="field-display">
-                                <dt i18n:translate="">Remaining seats</dt>
-                                <dd>${model.available_seats}</dd>
-                                <div class="clearfix"></div>
-                            </dl>
-
-                              <dl class="field-display">
-                                <dt i18n:translate="">Status</dt>
-                                <dd>${layout.format_status(model.status)}</dd>
-                                <div class="clearfix"></div>
-                            </dl>
+                            <tal:b metal:use-macro="layout.macros['course_event_details']" />
 
                             <tal:b tal:condition="request.is_logged_in" tal:define="registered model.has_reservation(request.attendee_id)">
                                 <tal:b tal:switch="registered">
@@ -59,11 +22,11 @@
                             </tal:b>
                             <h3 i18n:translate="">Attendees</h3>
 
-                            <tal:b tal:switch="model.attendees.count() == 0">
+                            <tal:b tal:switch="model.reservations.count() == 0">
                                 <p tal:case="True" i18n:translate>No entries found.</p>
                                 <ul tal:case="False">
-                                <tal:b tal:repeat="attendee model.attendees">
-                                    <li>${str(attendee)}</li>
+                                <tal:b tal:repeat="reservation model.reservations">
+                                    <li tal:attributes="class python: 'grayed-out' if reservation.is_placeholder else ''">${str(reservation)}</li>
                                 </tal:b>
                             </ul>
 

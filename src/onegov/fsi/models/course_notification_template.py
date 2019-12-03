@@ -22,6 +22,11 @@ def template_type_choices():
                                        NOTIFICATION_TYPE_TRANSLATIONS))
 
 
+def template_name(context, type=None):
+    t = type or context.get_current_parameters()['type']
+    return NOTIFICATION_TYPE_TRANSLATIONS[NOTIFICATION_TYPES.index(t)]
+
+
 class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
 
     """
@@ -58,10 +63,10 @@ class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
     id = Column(UUID, primary_key=True, default=uuid4)
 
     #: The subject of the notification would be according to template type
-    subject = Column(Text, nullable=False, default='Example Subject')
+    subject = Column(Text, nullable=False, default=template_name)
 
-    #: The body text injected into the template appearing on GUI
-    text = Column(Text, nullable=False, default='Example Text')
+    #: The body text injected in plaintext (not html)
+    text = Column(Text)
 
     def duplicate(self):
         return self.__class__(
@@ -70,6 +75,14 @@ class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
             subject=self.subject,
             text=self.text
         )
+
+    @property
+    def text_html(self):
+        if not self.text:
+            return None
+        parts = self.text.replace('\n\n', '\n').split('\n')
+        rendered = " ".join((f'<p>{el}</p>' for el in parts if el))
+        return rendered
 
 
 class InfoTemplate(CourseNotificationTemplate):

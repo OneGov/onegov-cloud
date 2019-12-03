@@ -74,7 +74,7 @@ def test_attendee_collection(session, attendee):
     assert collection.query().count() == 1
 
 
-def test_reservation_collection(session, future_course_reservation):
+def test_reservation_collection_1(session, future_course_reservation):
     future_course_reservation(session)
     soon = utcnow() + datetime.timedelta(seconds=60)
     reservations = ReservationCollection(session)

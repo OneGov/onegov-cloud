@@ -9,7 +9,7 @@
                     <div class="columns small-12">
                         <strong tal:condition="not: reservations" i18n:translate="">No entries found</strong>
                         <tal:b tal:condition="reservations|nothing">
-                                <table class="hover" style="width: 100%">
+                                <table class="subscription-table fullwidth">
                                     <thead>
                                         <th i18n:translate="">Attendee</th>
                                         <th i18n:translate="" tal:condition="not: layout.model.course_event_id">Course Name</th>
@@ -17,26 +17,23 @@
                                         <th i18n:translate="">Course Status</th>
                                         <th i18n:translate="">Course attended</th>
                                         <th i18n:translate="">Last info mail</th>
-                                        <th i18n:translate="">Manage</th>
+                                        <th i18n:translate="" class="no-print">Manage</th>
                                     </thead>
                                     <tbody>
                                         <tal:b tal:repeat="reservation reservations">
                                             <tr>
-                                                <td>${str(reservation)}</td>
+                                                <td><a href="${layout.link(reservation)}">${str(reservation)}</a></td>
                                                 <td tal:condition="not: layout.model.course_event_id"><a href="${request.link(reservation.course_event)}">${reservation.course_event.name}</a></td>
                                                 <td>${layout.format_date(reservation.course_event.start, 'date')}</td>
                                                 <td>${layout.format_status(reservation.course_event.status)}</td>
 
                                                 <td>
-                                                    <div tal:condition="not: reservation.is_placeholder" class="switch round tiny confirmation-switch" tal:define="switch_id 'confirmation-switch-{}'.format(repeat.reservation.number)">
-                                                      <input id="${switch_id}" type="checkbox" name="testGroup">
-                                                      <label for="${switch_id}"></label>
-                                                    </div>
+                                                    <tal:b metal:use-macro="layout.macros['confirmation_slider']" tal:define="switch_id 'confirmation-switch-{}'.format(repeat.reservation.number); url layout.confirmation_link(reservation)" />
                                                 </td>
 
 
                                                 <td tal:define="sent reservation.info_sent">${layout.format_date(sent, 'date') if sent else ''}</td>
-                                                <td>
+                                                <td class="no-print">
                                                     <tal:b tal:switch="reservation.course_event.is_past">
                                                         <metal:b tal:case="False" tal:define="item reservation" use-macro="layout.macros['intercooler_btn_for_item']"/>
                                                         <button tal:case="True" class="button tiny secondary disabled archived" i18n:translate="">Delete</button>
@@ -51,7 +48,7 @@
                                     </tbody>
                                 </table>
                                 <tal:b tal:condition="request.is_manager and layout.course_event and not layout.course_event.is_past">
-                                    <a href="${layout.send_info_mail_url}" class="button success" i18n:translate="">Send Info Mail</a>
+                                    <a href="${layout.preview_info_mail_url}" class="button success no-print" i18n:translate="">Send Info Mail</a>
                                 </tal:b>
                         </tal:b>
                     </div>

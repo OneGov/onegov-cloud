@@ -30,7 +30,7 @@ def course_status_choices():
 
 class CourseEvent(Base, TimestampMixin):
 
-    default_reminder_before = datetime.timedelta(days=7)
+    default_reminder_before = datetime.timedelta(days=14)
 
     __tablename__ = 'fsi_course_events'
     __table_args__ = (UniqueConstraint('start', 'end',
@@ -199,3 +199,7 @@ class CourseEvent(Base, TimestampMixin):
         if external_only:
             query = query.filter(CourseAttendee.user_id == None)
         return query
+
+    @property
+    def email_recipients(self):
+        return (att.email for att in self.attendees)

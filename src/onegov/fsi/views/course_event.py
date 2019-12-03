@@ -1,3 +1,4 @@
+from onegov.core.security import Personal, Secret
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.forms.course_event import CourseEventForm
@@ -10,7 +11,9 @@ from onegov.fsi.models.course_event import CourseEvent
 
 @FsiApp.html(
     model=CourseEventCollection,
-    template='course_events.pt')
+    template='course_events.pt',
+    permission=Personal
+)
 def view_course_event_collection(self, request):
     layout = CourseEventCollectionLayout(self, request)
     return {
@@ -24,7 +27,8 @@ def view_course_event_collection(self, request):
     model=CourseEventCollection,
     template='form.pt',
     name='add',
-    form=CourseEventForm
+    form=CourseEventForm,
+    permission=Secret
 )
 def view_add_course_event(self, request, form):
     layout = AddCourseEventLayout(self, request)
@@ -43,7 +47,9 @@ def view_add_course_event(self, request, form):
 
 @FsiApp.html(
     model=CourseEvent,
-    template='course_event.pt')
+    template='course_event.pt',
+    permission=Personal
+)
 def view_course_event(self, request):
     layout = CourseEventLayout(self, request)
     return {
@@ -56,7 +62,8 @@ def view_course_event(self, request):
     model=CourseEvent,
     template='form.pt',
     name='edit',
-    form=CourseEventForm
+    form=CourseEventForm,
+    permission=Secret
 )
 def view_edit_course_event(self, request, form):
     layout = EditCourseEventLayout(self, request)
@@ -82,7 +89,8 @@ def view_edit_course_event(self, request, form):
     model=CourseEvent,
     template='form.pt',
     name='duplicate',
-    form=CourseEventForm
+    form=CourseEventForm,
+    permission=Secret
 )
 def view_duplicate_course_event(self, request, form):
     layout = DuplicateCourseEventLayout(self, request)
@@ -106,8 +114,13 @@ def view_duplicate_course_event(self, request, form):
 @FsiApp.view(
     model=CourseEvent,
     request_method='DELETE',
+    permission=Secret
 )
 def delete_course_event(self, request):
 
     request.assert_valid_csrf_token()
-    CourseEventCollection(request.session).delete(self)
+    if not self.reservations.count():
+        CourseEventCollection(request.session).delete(self)
+    else:
+        request.warning(_(
+            'This event has registrations and can not be deleted'))

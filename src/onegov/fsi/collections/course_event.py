@@ -3,6 +3,7 @@ from sedate import utcnow
 from sqlalchemy import desc
 
 from onegov.core.collection import Pagination, GenericCollection
+from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.notification_template import \
     CourseNotificationTemplateCollection
 from onegov.fsi.models.course_event import CourseEvent
@@ -36,6 +37,12 @@ class CourseEventCollection(GenericCollection, Pagination):
     @property
     def model_class(self):
         return CourseEvent
+
+    @property
+    def course(self):
+        if not self.course_id:
+            return None
+        return CourseCollection(self.session).by_id(self.course_id)
 
     def query(self):
         query = super().query()

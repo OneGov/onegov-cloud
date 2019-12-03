@@ -16,6 +16,14 @@ dd.accordion-navigation + dd.accordion-navigation {
 }
 
 /*
+    fonts
+*/
+
+.grayed-out {
+    color: darkgray;
+}
+
+/*
     Edit-bar icons
 */
 .edit-bar {
@@ -27,6 +35,7 @@ dd.accordion-navigation + dd.accordion-navigation {
     .email-link::before { @include icon('\f003'); }
     .duplicate-link::before { @include icon('\f24d'); }
     .add-placeholder::before { @include icon('\f2c0'); }
+    .print-icon::before { @include icon('\f02f'); }
 }
 
 /*
@@ -38,9 +47,62 @@ dd.accordion-navigation + dd.accordion-navigation {
 }
 
 /*
-    Events table
+    Tables
 */
 .events-table {
     border: 1px solid $gray-light;
     border-width: 1px 1px 0;
+}
+
+.fullwidth {
+    width: 100%
+}
+
+/*
+    Navigation
+*/
+
+.tab-navigation {
+    margin-bottom: 1em;
+    margin-top: 1em;
+
+    .top-bar-section {
+        li.active + a {
+            background: transparent;
+            background-color: transparent;
+        }
+    }
+
+    .left {
+        li.active {
+            border-left: 2px solid $primary-color;
+        }
+    }
+}
+
+/*
+    General Printing of a site
+*/
+
+@media print {
+
+    .no-print, .globals {
+        display: none;
+    }
+}
+
+/*
+    Reservation/Subscription Printout
+*/
+@media print {
+
+    .breadcrumbs {
+        display: none;
+    }
+
+    .subscription-table {
+        a.button {
+            display: none;
+        }
+    }
 }
