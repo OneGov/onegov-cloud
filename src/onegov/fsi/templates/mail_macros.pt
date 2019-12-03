@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      i18n:domain="onegov.fsi">
+
+<body>
+
+<metal:email_header define-macro="email_header">
+    <p tal:condition="attendee|nothing" i18n:translate="">Dear ${attendee.first_name} ${attendee.last_name}, </p>
+    <p tal:condition="not: attendee|False" i18n:translate="">Dear [first_name] [last_name], </p>
+    <br>
+    <tal:b tal:switch="layout.notification_type">
+        <tal:b tal:case="'info'">
+            <p>Please take notice about the information below.</p>
+            <br>
+        </tal:b>
+        <tal:b tal:case="'reservation'">
+            <p>We hereby confirm your subscription for:</p>
+            <br>
+            <tal:b metal:use-macro="layout.default_macros['course_event_details']" tal:define="model layout.model.course_event; for_email True"/>
+            <br>
+            <p i18n:translate="">You will receive a reminder email prior to the course.</p>
+            <p>
+                <span i18n:translate="">Further information can be found on the </span>
+                <a href="${layout.event_url}" i18n:translate="">course website.</a>
+            </p>
+        </tal:b>
+        <tal:b tal:case="'reminder'">
+            <p i18n:translate="">We would like to remind you for the following course: </p>
+            <br>
+            <tal:b metal:use-macro="layout.default_macros['course_event_details']" tal:define="model layout.model.course_event; for_email True"/>
+            <br>
+            <p>
+                <span i18n:translate="">Further information can be found on the </span>
+                <a href="${layout.event_url}" i18n:translate="">course website.</a>
+            </p>
+
+        </tal:b>
+        <tal:b tal:case="'cancellation'">
+            <p i18n:translate="">We hereby confirm your cancellation for subscription:</p>
+            <br>
+            <tal:b metal:use-macro="layout.default_macros['course_event_details']" tal:define="model layout.model.course_event; for_email True"/>
+            <br>
+            <p>
+                <span i18n:translate="">If you still like to visit this course, have a look at the </span>
+                <a href="${layout.open_events_url}" i18n:translate="">open events.</a>
+            </p>
+        </tal:b>
+    </tal:b>
+</metal:email_header>
+
+<metal:email_footer define-macro="email_footer">
+    <tal:b tal:switch="layout.notification_type">
+        <tal:b tal:case="'info'">
+            <h3 i18n:translate="">Event Details</h3>
+            <tal:b metal:use-macro="layout.default_macros['course_event_details']" tal:define="model layout.model.course_event; for_email True"/>
+        </tal:b>
+    </tal:b>
+    <br>
+    <p>Your course management team.</p>
+</metal:email_footer>
+
+
+<metal:sender define-macro="sender" i18n:domain="onegov.org">
+    <p>${layout.org.name}</p>
+</metal:sender>
+
+</body>
+</html>
