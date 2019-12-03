@@ -14,16 +14,18 @@
                         <tal:b tal:switch="count != 0">
                             <strong tal:case="False">There are no templates set for this course event</strong>
                             <tal:b tal:case="True" tal:define="notifications layout.model.query()">
-                            <table>
+                            <table class="fullwidth">
                                 <thead>
                                     <th i18n:translate="">Mail Subject</th>
                                     <th i18n:translate="">Mail Type</th>
+                                    <th i18n:translate="">Last Modified</th>
                                 </thead>
                                 <tbody>
                                     <tal:b tal:repeat="notification notifications">
                                         <tr>
                                             <td><a href="${layout.instance_link(notification)}">${notification.subject}</a></td>
                                             <td>${layout.format_notification_type(notification.type)}</td>
+                                            <td>${layout.format_date(notification.modified, 'datetime_long_without_year')}</td>
                                         </tr>
                                     </tal:b>
                                 </tbody>
