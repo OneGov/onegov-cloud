@@ -4,7 +4,8 @@ from sedate import utcnow
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.course_notification_template import \
-    NOTIFICATION_TYPES, CourseNotificationTemplate
+    NOTIFICATION_TYPES, CourseNotificationTemplate, \
+    NOTIFICATION_TYPE_TRANSLATIONS, InfoTemplate, template_name
 from onegov.fsi.models.course_reservation import CourseReservation
 
 
@@ -140,20 +141,18 @@ def test_cascading_attendee_deletion(session, db_mock_session):
     assert session.query(CourseReservation).count() == 1
 
 
-def test_notification_templates(session, course_event, notification_template):
+def test_notification_templates_1(session, course_event):
     event, data = course_event(session)
-    templates = []
-    for type_ in NOTIFICATION_TYPES:
-        template, data = notification_template(
-            session, type=type_, course_event_id=event.id)
-        templates.append(template)
-
-    for template in session.query(CourseNotificationTemplate):
-        print(template.course_event_id)
-
     assert len(event.notification_templates) == 4
-    assert templates[0].text == 'Hello World'
-    assert event.info_template == templates[0]
-    assert event.reservation_template == templates[1]
-    assert event.reminder_template == templates[2]
-    assert event.cancellation_template == templates[3]
+    assert event.info_template
+    assert event.reservation_template
+    assert event.reminder_template
+    assert event.cancellation_template
+
+    assert event.info_template.subject == template_name('dummy', type='info')
+    assert event.reservation_template.subject == template_name(
+        'dummy', type='reservation')
+    assert event.reminder_template.subject == template_name(
+        'dummy', type='reminder')
+    assert event.cancellation_template.subject == template_name(
+        'dummy', type='cancellation')
