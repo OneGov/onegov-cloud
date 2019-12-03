@@ -1,5 +1,4 @@
-from cached_property import cached_property
-from wtforms import StringField, TextAreaField
+from wtforms import StringField
 
 from onegov.form import Form
 from onegov.form.fields import HtmlField, MultiCheckboxField
@@ -20,12 +19,10 @@ class NotificationForm(Form):
     )
 
     def apply_model(self, model):
-        # self.type.data = model.type
         self.subject.data = model.subject
         self.text.data = model.text
 
     def update_model(self, model):
-        # model.type = self.type.data
         model.subject = self.subject.data
         model.text = handle_empty_p_tags(self.text.data)
 
