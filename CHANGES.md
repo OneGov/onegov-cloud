@@ -1,8 +1,23 @@
 # Changes
 
+## Release `2019.46`
+
+> commits: **3 / [96e14a3688...0b6814cbbe](https://github.com/OneGov/onegov-cloud/compare/96e14a3688^...0b6814cbbe)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.46)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🐞 **Fixes reservations not being shown after selecting them**
+
+This is a regression introduced with the recent view settings change.
+The accompanying javascript would generate invalid URLs.
+
+**`Bugfix`** | **[96e14a3688](https://github.com/onegov/onegov-cloud/commit/96e14a36884617ca33ee1b90074cef9df9690d50)**
+
 ## Release `2019.45`
 
-> commits: **8 / [87138a72a5...5e02776a5f](https://github.com/OneGov/onegov-cloud/compare/87138a72a5^...5e02776a5f)**<br>
+> released: **2019-12-03 18:13**<br>
+> commits: **9 / [87138a72a5...4fd31b78b4](https://github.com/OneGov/onegov-cloud/compare/87138a72a5^...4fd31b78b4)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.45)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
