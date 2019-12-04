@@ -38,6 +38,13 @@ def test_edit_attendee(client_with_db):
     client.login_member()
     client.get(f'/fsi/attendee/{attendee.id}', status=200)
 
+    # Assure permission Secret
+    client.login_member()
+    client.get(f'/fsi/attendee/{attendee.id}/edit', status=403)
+
+    client.login_editor()
+    client.get(f'/fsi/attendee/{attendee.id}/edit', status=403)
+
     client.login_admin()
     new = client.get(f'/fsi/attendee/{attendee.id}/edit')
     new.form['first_name'] = 'New FN'
