@@ -40,15 +40,18 @@ class CourseAttendeeForm(Form):
         model.last_name = self.last_name.data
         if self.permissions:
             model.permissions = self.permissions.data
+        if self.email:
+            model._email = self.email.data
 
     def apply_model(self, model):
         self.first_name.data = model.first_name
         self.last_name.data = model.last_name
         if self.permissions:
             self.permissions.data = model.permissions
+        self.email.data = model.email
 
     def on_request(self):
-
+        # is an external
         if not self.model.user_id:
             self.delete_field('permissions')
         else:
