@@ -34,13 +34,11 @@
 
                                                 <td tal:define="sent reservation.info_sent">${layout.format_date(sent, 'date') if sent else ''}</td>
                                                 <td class="no-print">
-                                                    <tal:b tal:switch="reservation.course_event.is_past">
+                                                    <tal:b tal:switch="reservation.course_event.is_past" tal:condition="request.is_admin">
                                                         <metal:b tal:case="False" tal:define="item reservation" use-macro="layout.macros['intercooler_btn_for_item']"/>
                                                         <button tal:case="True" class="button tiny secondary disabled archived" i18n:translate="">Delete</button>
                                                     </tal:b>
-                                                    <tal:b tal:condition="request.is_manager">
-                                                        <a tal:condition="request.is_manager" href="${request.link(reservation, name='edit')}" class="button tiny secondary" i18n:translate="">Edit</a>
-                                                    </tal:b>
+                                                    <a tal:condition="request.is_manager and reservation.is_placeholder or request.is_admin" href="${request.link(reservation, name='edit')}" class="button tiny secondary" i18n:translate="">Edit</a>
 
                                                 </td>
                                             </tr>

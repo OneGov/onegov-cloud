@@ -1,3 +1,5 @@
+from sqlalchemy import or_
+
 from onegov.core.collection import Pagination, GenericCollection
 from onegov.fsi.models.course_attendee import CourseAttendee
 
@@ -23,7 +25,6 @@ class CourseAttendeeCollection(GenericCollection, Pagination):
         return all((
             self.exclude_external is False,
             self.external_only is False,
-            self.attendee_id is None,
             self.editors_only is False
         ))
 
@@ -60,8 +61,11 @@ class CourseAttendeeCollection(GenericCollection, Pagination):
             query = query.filter(CourseAttendee.user_id == None)
 
         if self.attendee_permissions is not None:
-            query = query.filter(
-                CourseAttendee.organisation.in_(self.attendee_permissions))
+            query = query.filter(or_(
+                CourseAttendee.organisation.in_(self.attendee_permissions,),
+                CourseAttendee.user_id == None
+            )
+                )
         if self.editors_only:
             query = query.filter(CourseAttendee.permissions != [])
 
