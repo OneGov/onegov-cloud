@@ -198,6 +198,8 @@ class CourseEvent(Base, TimestampMixin):
 
         if external_only:
             query = query.filter(CourseAttendee.user_id == None)
+        query = query.order_by(
+            CourseAttendee.last_name, CourseAttendee.first_name)
         return query
 
     @property
