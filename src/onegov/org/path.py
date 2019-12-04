@@ -263,7 +263,7 @@ def get_resource(app, name, date=None, view=None,
         resource.date = date
         resource.highlights_min = highlights_min
         resource.highlights_max = highlights_max
-        resource.view = view
+        resource.view = view or resource.default_view or 'agendaWeek'
 
     return resource
 

@@ -467,6 +467,13 @@ rc.setupHistory = function(fcOptions) {
     });
 };
 
+// add ie-cache busting to url
+rc.bustIECache = function(originalUrl) {
+    var url = new Url(originalUrl);
+    url.query['ie-cache'] = (new Date()).getTime();
+    return url.toString();
+};
+
 // setup the reservation selection on the right
 rc.setupReservationSelect = function(fcOptions) {
     var selection = null;
@@ -496,7 +503,7 @@ rc.setupReservationSelect = function(fcOptions) {
         });
 
         calendar.on('rc-reservations-changed', function() {
-            $.getJSON(fcOptions.reservations + '&ie-cache=' + (new Date()).getTime(), function(data) {
+            $.getJSON(rc.bustIECache(fcOptions.reservations), function(data) {
                 ReservationSelection.render(
                     selection.get(0),
                     calendar,

@@ -41,13 +41,11 @@ class SharedMethods(object):
         else:
             date = sedate.to_timezone(sedate.utcnow(), self.timezone)
 
-        view = self.view or self.default_view or 'agendaWeek'
-
-        if view == 'month':
+        if self.view == 'month':
             return sedate.align_range_to_month(date, date, self.timezone)
-        elif view == 'agendaWeek':
+        elif self.view == 'agendaWeek':
             return sedate.align_range_to_week(date, date, self.timezone)
-        elif view == 'agendaDay':
+        elif self.view == 'agendaDay':
             return sedate.align_range_to_day(date, date, self.timezone)
         else:
             raise NotImplementedError()
