@@ -64,7 +64,7 @@
 
 <metal:confirmation_slider define-macro="confirmation_slider">
     <div tal:condition="not: reservation.is_placeholder" class="switch round tiny confirmation-switch">
-        <input id="${switch_id}" type="checkbox" tal:attributes="disabled python:not reservation.course_event.is_past and request.is_admin; checked python:reservation.event_completed; ic-post-to url|nothing">
+        <input id="${switch_id}" type="checkbox" tal:attributes="disabled python:not reservation.course_event.is_past or not request.is_admin; checked python:reservation.event_completed; ic-post-to url|nothing">
         <label for="${switch_id}"></label>
     </div>
 </metal:confirmation_slider>
