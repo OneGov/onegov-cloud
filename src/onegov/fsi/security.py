@@ -1,4 +1,5 @@
-from onegov.core.security import Personal
+from onegov.core.security import Personal, Secret
+from onegov.core.security.rules import has_permission_logged_in
 from onegov.fsi import FsiApp
 from onegov.fsi.models import CourseAttendee
 
@@ -21,14 +22,8 @@ def local_is_logged_in(app, identity, model, permission):
     return identity.role in ('admin', 'editor', 'member')
 
 
-@FsiApp.permission_rule(model=CourseAttendee, permission=object)
+@FsiApp.permission_rule(model=CourseAttendee, permission=Personal)
 def has_course_attendee_permission(app, identity, model, permission):
     if identity.role == 'member':
         return model.user.username == identity.userid
-    return True
-
-# @FsiApp.permission_rule(model=object, permission=Secret)
-# def has_secret_permission_logged_in(app, identity, model, permission):
-#     """ Things just admins can do
-#     """
-#     return has_permission_logged_in(app, identity, model, permission)
+    return has_permission_logged_in(app, identity, model, permission)
