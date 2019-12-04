@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-12-03 15:55+0100\n"
+"POT-Creation-Date: 2019-12-04 08:56+0100\n"
 "PO-Revision-Date: 2019-12-03 15:56+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -436,6 +436,9 @@ msgstr "Sehr geehrte(r) ${attendee.first_name} ${attendee.last_name},"
 msgid "Dear [first_name] [last_name],"
 msgstr "Sehr geehrte(r) [first_name] [last_name],"
 
+msgid "Please take notice about the information below."
+msgstr "Bitte beachten sie die untenstehenden Informationen."
+
 msgid "We hereby confirm your subscription for:"
 msgstr "Wir bestätigen hiermit ihre Anmeldung für:"
 
@@ -462,6 +465,9 @@ msgstr "zukünfigte Durchführungen"
 
 msgid "Event Details"
 msgstr "Details Durchführung"
+
+msgid "Your course management team."
+msgstr "Ihr Kursverwaltungteam"
 
 msgid ""
 "Clicking \"Send\" will send the e-mail below to all selected recipients. You "

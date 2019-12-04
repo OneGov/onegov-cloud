@@ -13,7 +13,7 @@
     <br>
     <tal:b tal:switch="layout.notification_type">
         <tal:b tal:case="'info'">
-            <p>Please take notice about the information below.</p>
+            <p i18n:translate="">Please take notice about the information below.</p>
             <br>
         </tal:b>
         <tal:b tal:case="'reservation'">
@@ -59,7 +59,7 @@
         </tal:b>
     </tal:b>
     <br>
-    <p>Your course management team.</p>
+    <p i18n:translate="">Your course management team.</p>
 </metal:email_footer>
 
 
