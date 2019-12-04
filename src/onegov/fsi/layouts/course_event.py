@@ -127,6 +127,16 @@ class CourseEventLayout(DefaultLayout):
                 title=_('Add'),
                 links=(
                     Link(
+                        _('Attendee'),
+                        self.request.link(
+                            ReservationCollection(
+                                self.request.session,
+                                course_event_id=self.model.id),
+                            name='add'
+                        ),
+                        attrs={'class': 'add-icon'}
+                    ),
+                    Link(
                         _('External Attendee'),
                         self.request.link(
                             ReservationCollection(
