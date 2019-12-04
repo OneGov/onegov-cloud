@@ -61,11 +61,9 @@ class CourseAttendeeCollection(GenericCollection, Pagination):
             query = query.filter(CourseAttendee.user_id == None)
 
         if self.attendee_permissions is not None:
-            query = query.filter(or_(
-                CourseAttendee.organisation.in_(self.attendee_permissions,),
-                CourseAttendee.user_id == None
+            query = query.filter(
+                CourseAttendee.organisation.in_(self.attendee_permissions,)
             )
-                )
         if self.editors_only:
             query = query.filter(CourseAttendee.permissions != [])
 
