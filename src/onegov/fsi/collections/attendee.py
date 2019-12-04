@@ -23,7 +23,6 @@ class CourseAttendeeCollection(GenericCollection, Pagination):
         return all((
             self.exclude_external is False,
             self.external_only is False,
-            self.attendee_id is None,
             self.editors_only is False
         ))
 
