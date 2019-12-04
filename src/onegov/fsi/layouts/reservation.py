@@ -92,6 +92,12 @@ class ReservationCollectionLayout(DefaultLayout):
         )
         if self.request.view_name in ('add', 'add-placeholder'):
             links.append(Link(_('Add')))
+        if self.model.course_event_id:
+            links.append(
+                Link(
+                    self.format_date(self.course_event.start, 'date_long'),
+                    self.request.link(self.course_event))
+            )
         return links
 
     def intercooler_btn_for_item(self, reservation):
