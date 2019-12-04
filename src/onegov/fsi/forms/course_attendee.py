@@ -48,7 +48,8 @@ class CourseAttendeeForm(Form):
         self.last_name.data = model.last_name
         if self.permissions:
             self.permissions.data = model.permissions
-        self.email.data = model.email
+        if self.email:
+            self.email.data = model.email
 
     def on_request(self):
         # is an external
