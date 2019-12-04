@@ -22,11 +22,8 @@ def test_reservation_details(client_with_db):
 
 def test_add_reservation(client):
     view = '/fsi/reservations/add'
-    client.login_member()
-    client.get(view, status=403)
-
     client.login_editor()
-    client.get(view, status=200)
+    client.get(view, status=403)
 
     view = '/fsi/reservations/add-placeholder'
     client.get(view, status=200)
