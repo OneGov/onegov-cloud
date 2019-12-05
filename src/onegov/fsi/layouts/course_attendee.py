@@ -37,7 +37,9 @@ class CourseAttendeeCollectionLayout(DefaultLayout):
 
     @cached_property
     def menu(self):
-
+        if not self.request.is_admin:
+            # Hide menu for editor since filtered by permissions
+            return []
         return [
             (_('All'), self.request.class_link(CourseAttendeeCollection),
              self.model.unfiltered),
