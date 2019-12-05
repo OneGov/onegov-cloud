@@ -110,14 +110,20 @@ def view_add_reservation_placeholder(self, request, form):
     model=ReservationCollection,
     request_method='POST',
     name='add-from-course-event',
-    permission=Private
+    permission=Personal
 )
 def view_add_from_course_event(self, request):
     request.assert_valid_csrf_token()
-    self.add(
+    data = dict(
         attendee_id=self.attendee_id or request.attendee_id,
-        course_event_id=self.course_event_id)
-    request.success(_('New subscription successfully added'))
+        course_event_id=self.course_event_id
+    )
+    exists = self.session.query(self.model_class).filter_by(**data).first()
+    if exists:
+        request.warn(_('Subscription was already made'))
+    else:
+        self.add(**data)
+        request.success(_('New subscription successfully added'))
 
 
 @FsiApp.html(
