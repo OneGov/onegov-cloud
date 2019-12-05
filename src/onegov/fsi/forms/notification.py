@@ -3,7 +3,6 @@ from wtforms import StringField, TextAreaField
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.fsi import _
-from onegov.fsi.utils import handle_empty_p_tags
 
 
 class NotificationForm(Form):
@@ -24,7 +23,7 @@ class NotificationForm(Form):
 
     def update_model(self, model):
         model.subject = self.subject.data
-        model.text = handle_empty_p_tags(self.text.data)
+        model.text = self.text.data
 
 
 class NotificationTemplateSendForm(Form):
@@ -39,14 +38,11 @@ class NotificationTemplateSendForm(Form):
 
     @property
     def recipients_keys(self):
-        return [f'{a.id}|{a.email}' for a in self.model.course_event.attendees]
+        return [a.id for a in self.model.course_event.attendees]
 
     @property
     def recipients_choices(self):
-        return [
-            (f'{a.id}|{a.email}', a.email)
-            for a in self.model.course_event.attendees
-        ]
+        return [(a.id, a.email) for a in self.model.course_event.attendees]
 
     def on_request(self):
         self.recipients.choices = self.recipients_choices

@@ -86,7 +86,7 @@ def test_delete_course_event(client_with_db):
     event = session.query(CourseEvent).filter_by(
         location='Empty'
     ).one()
-    assert not event.reservation.count()
+    assert not event.reservations.count()
     view = f'/fsi/event/{event.id}'
     client.login_admin()
 
@@ -108,3 +108,8 @@ def test_register_for_course_event(client_with_db):
     page = client.get(f'/fsi/event/{event.id}').click('Anmelden')
     page = client.get(f'/fsi/event/{event.id}')
     assert 'Angemeldet' in page
+
+    assert len(client.app.smtp.outbox) == 1
+    message = client.app.smtp.outbox.pop()
+    assert message['To'] == 'member@example.org'
+    assert message['Subject'] == 'Reservation Confirmation'
