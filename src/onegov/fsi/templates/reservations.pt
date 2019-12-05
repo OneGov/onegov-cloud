@@ -46,7 +46,7 @@
                                         </tal:b>
                                     </tbody>
                                 </table>
-                                <tal:b tal:condition="request.admin and layout.course_event and not layout.course_event.is_past">
+                                <tal:b tal:condition="request.is_admin and layout.course_event and not layout.course_event.is_past">
                                     <a href="${layout.preview_info_mail_url}" class="button success no-print" i18n:translate="">Send Info Mail</a>
                                 </tal:b>
                         </tal:b>
