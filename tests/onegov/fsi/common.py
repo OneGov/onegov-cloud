@@ -172,7 +172,7 @@ def course_event_factory(session, **kwargs):
         course_event = CourseEvent(**data)
         session.add_all((
             course_event,
-            InfoTemplate(course_event_id=data['id']),
+            InfoTemplate(course_event_id=data['id'], text='Info'),
             ReservationTemplate(course_event_id=data['id']),
             ReminderTemplate(course_event_id=data['id']),
             CancellationTemplate(course_event_id=data['id'])
@@ -200,7 +200,7 @@ def future_course_event_factory(session, **kwargs):
         course_event = CourseEvent(**data)
         session.add_all((
             course_event,
-            InfoTemplate(course_event_id=data['id']),
+            InfoTemplate(course_event_id=data['id'], text='Info'),
             ReservationTemplate(course_event_id=data['id']),
             ReminderTemplate(course_event_id=data['id']),
             CancellationTemplate(course_event_id=data['id'])
