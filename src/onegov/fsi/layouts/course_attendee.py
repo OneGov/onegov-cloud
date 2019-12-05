@@ -16,6 +16,8 @@ class CourseAttendeeCollectionLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
+        if not self.request.is_admin:
+            return []
         return [
             Link(
                 _('Add External Attendee'),
@@ -80,21 +82,21 @@ class CourseAttendeeLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        links = [Link(
-            _('Edit Profile'),
-            url=self.request.link(self.model, name='edit'),
-            attrs={'class': 'edit-link'}
-        )]
-        if self.request.is_manager:
-            links.append(
-                Link(
-                    _('Add External Attendee'),
-                    url=self.request.class_link(
-                        CourseAttendeeCollection, name='add-external'),
-                    attrs={'class': 'add-external'}
-                )
+        if not self.request.is_admin:
+            return []
+        return [
+            Link(
+                _('Edit Profile'),
+                url=self.request.link(self.model, name='edit'),
+                attrs={'class': 'edit-link'}
+            ),
+            Link(
+                _('Add External Attendee'),
+                url=self.request.class_link(
+                    CourseAttendeeCollection, name='add-external'),
+                attrs={'class': 'add-external'}
             )
-        return links
+        ]
 
     @property
     def attendee_permissions(self):

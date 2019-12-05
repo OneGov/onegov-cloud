@@ -21,11 +21,6 @@ class ReservationCollectionLayout(DefaultLayout):
         return self.csrf_protected_url(
             self.request.link(reservation, name='toggle-confirm'))
 
-    def course_has_reservations(self):
-        if not self.model.course_event:
-            return False
-        return bool(self.model.course_event.reservations.count())
-
     @cached_property
     def title(self):
         if self.request.view_name == 'add':
@@ -44,9 +39,7 @@ class ReservationCollectionLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if not self.request.is_manager:
-            return []
-        return [
+        links = [
             Link(
                 text=_("Print"),
                 url='#',
@@ -54,7 +47,12 @@ class ReservationCollectionLayout(DefaultLayout):
                     'class': 'print-icon',
                     'onclick': 'window.print();return false;'
                 }
-            ),
+            )
+        ]
+        if self.request.is_manager:
+            return links
+        return links.extend([
+
             LinkGroup(
                 title=_('Add'),
                 links=[
@@ -71,7 +69,7 @@ class ReservationCollectionLayout(DefaultLayout):
                 ]
             )
 
-        ]
+        ])
 
     @cached_property
     def course_event(self):
