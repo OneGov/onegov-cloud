@@ -248,6 +248,11 @@ def db_mock(session):
     planner_editor, data = planner_editor_factory(session)
     course_event, data = course_event_factory(session)
     future_course_event, data = future_course_event_factory(session)
+    empty_course_event, data = future_course_event_factory(
+        session,
+        start=utcnow() + datetime.timedelta(days=4),
+        location='Empty'
+    )
 
     placeholder = CourseReservation(
         dummy_desc='Placeholder',
@@ -286,8 +291,10 @@ def db_mock(session):
         [
             'attendee', 'planner', 'planner_editor', 'course_event',
             'future_course_event', 'placeholder', 'attendee_res',
-            'attendee_future_res', 'planner_res', 'planner_future_res'
+            'attendee_future_res', 'planner_res', 'planner_future_res',
+            'empty_course_event'
         ]
     )(attendee, planner, planner_editor, course_event,
       future_course_event, placeholder, attendee_res,
-      attendee_future_res, planner_res, planner_future_res)
+      attendee_future_res, planner_res, planner_future_res,
+      empty_course_event)

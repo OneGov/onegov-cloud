@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from sedate import utcnow
+
 from onegov.fsi.models import CourseEvent
 
 
@@ -89,3 +91,16 @@ def test_delete_course_event(client_with_db):
     client.delete(view, status=403)
     page = client.get(view)
     page = page.click('Löschen')
+
+
+def test_register_for_course_event(client_with_db):
+    client = client_with_db
+    session = client.app.session()
+    event = session.query(CourseEvent).filter_by(
+        location='Empty'
+    ).one()
+    assert not event.is_past
+    client.login_member()
+    page = client.get(f'/fsi/event/{event.id}').click('Anmelden')
+    page = client.get(f'/fsi/event/{event.id}')
+    assert 'Angemeldet' in page
