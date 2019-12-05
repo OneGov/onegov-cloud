@@ -2,6 +2,7 @@ from sqlalchemy import or_
 
 from onegov.core.collection import Pagination, GenericCollection
 from onegov.fsi.models.course_attendee import CourseAttendee
+from onegov.user import User
 
 
 class CourseAttendeeCollection(GenericCollection, Pagination):
@@ -65,7 +66,11 @@ class CourseAttendeeCollection(GenericCollection, Pagination):
                 CourseAttendee.organisation.in_(self.attendee_permissions,)
             )
         if self.editors_only:
-            query = query.filter(CourseAttendee.permissions != [])
+            query = query.join(User)
+            query = query.filter(or_(
+                CourseAttendee.permissions != [],
+                User.role == 'editor'
+            ))
 
         return query
 
