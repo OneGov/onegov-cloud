@@ -34,6 +34,6 @@ def send_scheduled_reminders(request):
         res.reminder_sent = utcnow()
 
 
-@FsiApp.cronjob(hour=8, minute=30, timezone='Europe/Zurich')
-def send_reminder_mails(request):
-    send_scheduled_reminders(request)
+# @FsiApp.cronjob(hour=8, minute=30, timezone='Europe/Zurich')
+# def send_reminder_mails(request):
+#     send_scheduled_reminders(request)
