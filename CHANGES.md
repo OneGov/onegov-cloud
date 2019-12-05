@@ -1,8 +1,23 @@
 # Changes
 
+## Release `2019.47`
+
+> commits: **1 / [fa96aac112...fa96aac112](https://github.com/OneGov/onegov-cloud/compare/fa96aac112^...fa96aac112)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.47)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🎉 **Redesigns group code bookings**
+
+The new UI solves a number of issues with the old approach,
+streamlining common use-cases and offering more clarity.
+
+**`Feature`** | **[FER-789](https://issues.seantis.ch/browse/FER-789)** | **[fa96aac112](https://github.com/onegov/onegov-cloud/commit/fa96aac11205c3ac29c00f333f0a7f0e54d6fedb)**
+
 ## Release `2019.46`
 
-> commits: **3 / [96e14a3688...0b6814cbbe](https://github.com/OneGov/onegov-cloud/compare/96e14a3688^...0b6814cbbe)**<br>
+> released: **2019-12-04 11:52**<br>
+> commits: **4 / [96e14a3688...4fa9647ea2](https://github.com/OneGov/onegov-cloud/compare/96e14a3688^...4fa9647ea2)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.46)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
