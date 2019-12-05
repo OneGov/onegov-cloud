@@ -10,7 +10,7 @@
 
                         <tal:b tal:condition="not: reservations">
                             <p><strong i18n:translate="">No entries found</strong></p>
-                            <p><strong tal:condition="request.is_editor and layout.course_has_reservations" i18n:translate="">There are reservations you are not permitted to see</strong></p>
+                            <p tal:condition="request.is_editor and layout.course_has_reservations" i18n:translate="">You can only see subscriptions from attendees fitting your permissions.</p>
                         </tal:b>
                         <tal:b tal:condition="reservations|nothing">
                                 <table class="subscription-table fullwidth">
