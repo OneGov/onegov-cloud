@@ -218,6 +218,10 @@ def book_occasion(self, request, form):
                 occasion=self
             )
 
+        # apply the group code, if given
+        if form.group_code.data:
+            booking.group_code = form.group_code.data
+
         # if the TOS have been accepted, record this now
         if hasattr(form, 'accept_tos') and form.accept_tos:
             if form.accept_tos.data:
@@ -250,6 +254,11 @@ def book_occasion(self, request, form):
                 }))
 
         return request.redirect(request.link(self.activity))
+
+    # pre select the attendee if given
+    if 'attendee_id' in request.params:
+        form.attendee.data = request.params['attendee_id'].replace('-', '')
+        form.group_code.data = request.params.get('group_code')
 
     title = _("Enroll Attendee")
 

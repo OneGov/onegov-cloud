@@ -1920,35 +1920,39 @@ def test_group_codes(client, scenario):
     usr1.login('foobar@example.org', 'hunter2')
 
     page = usr1.get('/my-bookings').click("Gspänli einladen").follow()
+    group_url = page.request.url
 
     # bar is in the group as it was the target of aboves link
-    assert "Bar" in page.pyquery('.members-in-group').text()
-    assert "Foo" in page.pyquery('.members-outside-group').text()
-    assert "Nicht angemeldet" in page.pyquery('.members-outside-group').text()
+    assert "Bar" in page.pyquery('.own-children').text()
+    assert "Foo" not in page.pyquery('.own-children').text()
+    assert "Bar" not in page.pyquery('#add-possible').text()
+    assert "Foo" in page.pyquery('#add-possible').text()
 
-    # we can sign-up foo
-    page = page.click("Anmelden")
-    page.form['attendee'] = scenario.attendees[0].id.hex
-    page = page.form.submit().follow()
+    # we can sign-up Foo
+    page = page.click("Foo").form.submit().follow()
 
-    # we end up at the group view again, where nothing has changed yet
-    assert "Bar" in page.pyquery('.members-in-group').text()
-    assert "Foo" in page.pyquery('.members-outside-group').text()
+    # we end up at the group view again, where Foo is in the group now
+    assert "Bar" in page.pyquery('.own-children').text()
+    assert "Foo" in page.pyquery('.own-children').text()
 
-    # we can now join foo however
-    group_url = page.request.url
-    page.click("Gruppe beitreten")
-    page = usr1.get(group_url)
-
-    assert "Bar" in page.pyquery('.members-in-group').text()
-    assert "Foo" in page.pyquery('.members-in-group').text()
-
-    # we can remove bar from the group
+    # we can remove Bar from the group
     page = page.click("Gruppe verlassen", index=0)
     page = usr1.get(group_url)
 
-    assert "Bar" in page.pyquery('.members-outside-group').text()
-    assert "Foo" in page.pyquery('.members-in-group').text()
+    assert "Bar" not in page.pyquery('.own-children').text()
+    assert "Foo" in page.pyquery('.own-children').text()
+
+    # we can add a new attendee that is added to the group automatically
+    page = page.click("Neues eigenes Kind anmelden")
+    page.form['first_name'] = "Tom"
+    page.form['last_name'] = "Sawyer"
+    page.form['birth_date'] = "2017-01-01"
+    page.form['gender'] = 'male'
+    page = page.form.submit().follow()
+
+    assert "Sawyer" in page.pyquery('.own-children').text()
+
+    page = page.click("Gruppe verlassen", index=1)
 
     # other users can see the group view, but cannot execute actions and
     # they only see the active attendees
@@ -1957,7 +1961,6 @@ def test_group_codes(client, scenario):
     page = usr2.get(group_url)
     assert "Foo" in page
     assert "Bar" not in page
-    assert "Qux" not in page
     assert "Gruppe verlassen" not in page.pyquery('a').text()
     assert "Gruppe beitreten" not in page.pyquery('a').text()
 
@@ -1970,17 +1973,10 @@ def test_group_codes(client, scenario):
     assert "Gruppe beitreten" not in page.pyquery('a').text()
 
     # the second user's child should be listed now
-    assert "Qux" in page
-    assert "Qux" not in usr1.get(group_url)
-    assert "Qux" in page.pyquery('.members-outside-group').text()
-    assert "Nicht angemeldet" in page
+    assert "Qux" in page.pyquery('#add-possible').text()
 
     # let's join the group
-    page = page.click("Anmelden")
-    page.form['attendee'] = scenario.attendees[2].id.hex
-    page = page.form.submit().follow()
-
-    page.click("Gruppe beitreten")
+    page = page.click("Qux").form.submit().follow()
 
     # now we can do the matching, and we should have Foo and Qux in the group
     admin = client.spawn()
@@ -1994,7 +1990,7 @@ def test_group_codes(client, scenario):
     bookings = scenario.session.query(Booking).all()
     bookings.sort(key=lambda b: b.attendee.name)
 
-    b1, b2, b3 = bookings
+    b1, b2, b3, b4 = bookings
 
     assert b1.attendee.name == 'Bar'
     assert b1.state == 'denied'
@@ -2004,6 +2000,9 @@ def test_group_codes(client, scenario):
 
     assert b3.attendee.name == 'Qux'
     assert b3.state == 'accepted'
+
+    assert b4.attendee.name == 'Tom\xa0Sawyer'
+    assert b4.state == 'denied'
 
 
 def test_needs(client, scenario):

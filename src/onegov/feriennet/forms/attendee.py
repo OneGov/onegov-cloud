@@ -15,6 +15,7 @@ from wtforms.fields import BooleanField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
+from wtforms.fields import HiddenField
 from wtforms.fields.html5 import DateField, IntegerField
 from wtforms.validators import InputRequired, NumberRange
 
@@ -135,6 +136,12 @@ class AttendeeSignupForm(AttendeeBase):
         label=_("Accept TOS"),
         fieldset=_("TOS"),
         default=False,
+    )
+
+    group_code = HiddenField(
+        label=_("Group Code"),
+        fieldset=_("Administration"),
+        default=None
     )
 
     @property

@@ -1,4 +1,5 @@
 import morepath
+import urllib.parse
 
 from collections import defaultdict, OrderedDict
 from datetime import date
@@ -21,7 +22,7 @@ from onegov.feriennet.views.shared import users_for_select_element
 from onegov.user import User
 from purl import URL
 from sortedcontainers import SortedList
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, not_
 from sqlalchemy.orm import contains_eager
 from uuid import UUID
 
@@ -523,15 +524,53 @@ def view_group_invite(self, request):
     occasion = self.occasion
     attendees_count = len(self.attendees)
 
-    own_children = set(
-        a.id for a in request.session.query(Attendee.id)
-        .filter_by(username=request.current_username)
-    )
+    # to be made available to the admin (user switching)
+    current_username = request.current_username
 
-    def may_execute_action(booking):
-        return booking.attendee_id in own_children
+    existing = [a for a, b in self.attendees if a.username == current_username]
+    external = [a for a, b in self.attendees if a.username != current_username]
+    possible = [
+        a for a in request.session.query(Attendee)
+        .filter_by(username=current_username)
+        .filter(not_(Attendee.id.in_(tuple(a.id for a in existing))))
+    ]
 
-    def group_action(booking, action):
+    actionable_bookings = {
+        b.attendee_id: b for b in request.session.query(Booking).filter_by(
+            username=current_username,
+            occasion_id=occasion.id,
+        )
+    }
+
+    def signup_url(attendee=None):
+        # we need a logged in user
+        if not request.is_logged_in:
+            return layout.login_to_url(request.link(self))
+
+        # build the URL needed to book the occasion
+        url = request.link(occasion, name='book')
+
+        # preselect the attendee when booking the occasion, and join this group
+        if attendee:
+            url = URL(url)\
+                .query_param('attendee_id', attendee.id)\
+                .as_string()
+        else:
+            url = URL(url)\
+                .query_param('attendee_id', 'other')\
+                .as_string()
+
+        # preselect the group code
+        url = URL(url)\
+            .query_param('group_code', self.group_code)\
+            .as_string()
+
+        # return to the current URL
+        url = request.return_here(url)
+
+        return url
+
+    def group_action(attendee, action):
         assert action in ('join', 'leave')
 
         if attendees_count == 1 and action == 'leave':
@@ -549,15 +588,49 @@ def view_group_invite(self, request):
                 ),
             )
 
-        url = URL(request.link(self, action))\
-            .query_param('booking_id', booking.id)\
-            .as_string()
+        if attendee.id in actionable_bookings:
+            booking = actionable_bookings[attendee.id]
+
+            url = URL(request.link(self, action))\
+                .query_param('booking_id', booking.id)\
+                .as_string()
+        else:
+            url = signup_url(attendee)
+            traits = ()
+
+        if action == 'join':
+            text = (attendee.gender == 'male' and '👦 ' or '👧 ') \
+                + attendee.name
+        else:
+            text = _("Leave Group")
 
         return Link(
-            text=(action == 'join' and _("Join Group") or _("Leave Group")),
+            text=text,
             url=layout.csrf_protected_url(url),
             traits=traits
         )
+
+    # https://stackoverflow.com/a/23847977/138103
+    subject = occasion.activity.title
+    message = _(
+        (
+            "Hi!\n\n"
+            "My child wants to take part in the \"${title}\" activity and "
+            "would be thrilled to go with a mate.\n\n"
+            "You can add the activity to the wishlist of your child through "
+            "the following link, if you are interested. This way the children "
+            "have a better chance of getting a spot together:\n\n"
+            "${link}"
+        ), mapping={
+            'title': occasion.activity.title,
+            'link': request.link(self)
+        }
+    )
+
+    mailto = "mailto:%20?subject={subject}&body={message}".format(
+        subject=urllib.parse.quote(subject),
+        message=urllib.parse.quote(request.translate(message))
+    )
 
     return {
         'layout': layout,
@@ -567,8 +640,11 @@ def view_group_invite(self, request):
         'occasion': occasion,
         'model': self,
         'group_action': group_action,
-        'wrap_occasion_link': request.return_here,
-        'may_execute_action': may_execute_action,
+        'signup_url': signup_url,
+        'existing': existing,
+        'external': external,
+        'possible': possible,
+        'mailto': mailto,
     }
 
 

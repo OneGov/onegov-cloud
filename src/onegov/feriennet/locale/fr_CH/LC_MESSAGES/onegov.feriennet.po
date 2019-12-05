@@ -2,7 +2,6 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-12-03 16:35+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1548,67 +1547,33 @@ msgid "For ${user}"
 msgstr "Pour ${user}"
 
 msgid ""
-"Attendees can join their companions in a group to go to activities together."
+"Attendees can join their companions in a group to go to activities together. "
+"This increases their chances to go together, but it is not a guarantee."
 msgstr ""
-"Les participants peuvent rejoindre leurs amies dans un groupe pour "
-"participer à des activités."
 
 msgid "This group is from an inactive period."
 msgstr "Ce groupe est issu d'une période d'inactivité."
 
-msgid "Sign Up for Activity"
-msgstr "S’inscrire pour cette activité"
-
-msgid ""
-"Children need to be signed up to the activity to join the group. In case "
-"they are not, they can do that here."
+msgid "Own Children"
 msgstr ""
-"Un enfant doit être inscrit à cette activité avant de le sélectionner pour "
-"le groupe de personnes. Si ce n’est pas déjà fait vous pouvez l’inscrire ici."
 
-msgid "Children can join the group under \"Manage group\" after sign-up."
+msgid "Add own child"
 msgstr ""
-"Une fois l’inscription enregistrée vous pouvez l’affecter au groupe dans "
-"\"Gérer un groupe\""
 
-msgid "Manage Group"
-msgstr "Gérer un groupe"
-
-msgid ""
-"The formation of a group increases the chance of joining an activity "
-"together."
+msgid "Add new own child"
 msgstr ""
-"La création d’un groupe augmente la probabilité que les enfants sont "
-"affectés à la même activité pour la même date."
 
-msgid ""
-"You can add your own children to the group here or share the following link "
-"with other parents for them to sign up their own children:"
+msgid "None of own children in group."
 msgstr ""
-"Vous pouvez ajouter votre enfant à un groupe existant ici ou vous pouvez "
-"partager le lien ci-après avec d’autres parents qui ajoutent leur enfant au "
-"groupe :"
 
-msgid "In Group"
-msgstr "En Groupe"
+msgid "Other Children"
+msgstr ""
 
-msgid "Not in Group"
-msgstr "Pas en groupe"
+msgid "Invite other children"
+msgstr ""
 
-msgid "Booking Blocked"
-msgstr "Réservation bloquée"
-
-msgid "Booking Cancelled"
-msgstr "Réservation annulée"
-
-msgid "Booking Denied"
-msgstr "Réservation refusée"
-
-msgid "Not signed up"
-msgstr "Non inscrit"
-
-msgid "All your children are already part of this group."
-msgstr "Tous vos enfants font déjà partie de ce groupe."
+msgid "No other children in group"
+msgstr ""
 
 msgid "Your donation"
 msgstr "Votre don"
@@ -2296,8 +2261,19 @@ msgstr ""
 msgid "Leave Group"
 msgstr "Quitter le groupe"
 
-msgid "Join Group"
-msgstr "Rejoindre le groupe"
+#, python-format
+msgid ""
+"Hi!\n"
+"\n"
+"My child wants to take part in the \"${title}\" activity and would be "
+"thrilled to go with a mate.\n"
+"\n"
+"You can add the activity to the wishlist of your child through the following "
+"link, if you are interested. This way the children have a better chance of "
+"getting a spot together:\n"
+"\n"
+"${link}"
+msgstr ""
 
 #, python-format
 msgid "Group for \"${title}\""
@@ -2615,207 +2591,3 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
-
-#~ msgid "No additional costs"
-#~ msgstr "Aucun frais supplémentaires"
-
-#~ msgid "Notice"
-#~ msgstr "Notification"
-
-#~ msgid "On a fixed day"
-#~ msgstr "À une date définie"
-
-#~ msgid ""
-#~ "Prebooking must start before booking, and booking must start before "
-#~ "execution. Each period must also start before it ends."
-#~ msgstr ""
-#~ "La pré-réservation doit commencer avant la réservation, et la réservation "
-#~ "doit commencer avant l'exécution. Chaque période doit également commencer "
-#~ "avant de se terminer."
-
-#~ msgid "The deadline for last-minute bookings is the ${date}."
-#~ msgstr ""
-#~ "La date limite pour les réservations de dernière minute est le ${date}."
-
-#~ msgid "Send to (applies to active period only)"
-#~ msgstr "Envoyer à (s'applique uniquement pour une période active)"
-
-#~ msgid "I know that this stops all changes including cancellations."
-#~ msgstr ""
-#~ "Je prends bien note qu'aucune modification ni annulation sera possible "
-#~ "par la suite."
-
-#~ msgid "Users with attendees of a given occasion"
-#~ msgstr "Utilisateurs avec des participants pour un événement défini"
-
-#~ msgid ""
-#~ "The prebooking period must start before the exeuction period and each "
-#~ "period must start before it ends."
-#~ msgstr ""
-#~ "La période de pré-réservation doit débuter avant la période d'exécution "
-#~ "et chaque période doit débuter avant sa fin."
-
-#~ msgid "Prebooking Phase"
-#~ msgstr "Période de pré-réservation"
-
-#~ msgid "Exeuction Phase"
-#~ msgstr "Période d'exécution"
-
-#~ msgid "Completed"
-#~ msgstr "Terminé"
-
-#~ msgid "Thank you for your generosity"
-#~ msgstr "Nous vous remercions pour votre don"
-
-#~ msgid "You support our work"
-#~ msgstr "Vous soutenez notre travail"
-
-#~ msgid "Support our work with a donation."
-#~ msgstr "Soutenez notre travail avec un don."
-
-#~ msgid "I donate"
-#~ msgstr "Je donne"
-
-#~ msgid ""
-#~ "Feriennet ist die Buchungsplattform von Pro Juventute für betreute "
-#~ "Ferienangebote."
-#~ msgstr ""
-#~ "Feriennet est la plateforme de réservation de Pro Juventute pour les "
-#~ "offres de vacances encadrées."
-
-#~ msgid ""
-#~ "Feriennet est la plateforme de réservation mise sur pieds par Pro "
-#~ "Juventute pour les offres de vacances encadrées."
-#~ msgstr ""
-#~ "Feriennet est la plateforme de réservation mise sur pieds par Pro "
-#~ "Jeventute pour les offres de vacances encadrées."
-
-#~ msgid ""
-#~ "Feriennet is Pro Juventute's booking platform for supervised vacation "
-#~ "activities."
-#~ msgstr ""
-#~ "Réseau vacances est la plateforme de réservations de Pro Juventute pour "
-#~ "les activités de loisirs encadrées."
-
-#~ msgid ""
-#~ "This platform was developed by ${seantis} with ${onegovcloud}, supported "
-#~ "by ${netcetera}."
-#~ msgstr ""
-#~ "La plateforme est développé par ${seantis}, en collaboration avec "
-#~ "${onegovcloud} et soutenu par ${netcetera}."
-
-#~ msgid "here"
-#~ msgstr "ici"
-
-#~ msgid "You can find additional Pro Juventute offers ${here}."
-#~ msgstr "Vous trouverez d'autres offres Pro Juventute ${here}."
-
-#~ msgid "partners"
-#~ msgstr "partenaires"
-
-#~ msgid ""
-#~ "Pro Juventute Feriennet could only be realised thanks to the generous "
-#~ "support of our ${partners}."
-#~ msgstr ""
-#~ "La plateforme Réseau vacances de Pro Juventute n'a pu être réalisée que "
-#~ "grâce à la générosité de nos ${partners}."
-
-#~ msgid ""
-#~ "You can add your own children to the group here or share the following "
-#~ "link with other parents for them to sign up their own children."
-#~ msgstr ""
-#~ "Vous pouvez ajouter votre enfant à un groupe existant ici ou vous pouvez "
-#~ "partager le lien ci-après avec d’autres parents qui ajoutent leur enfant "
-#~ "au groupe :"
-
-#~ msgid "With ${n} ami(e) in a group"
-#~ msgstr "Avec ${n} ami(e) dans un groupe"
-
-#~ msgid "Information"
-#~ msgstr "Information"
-
-#~ msgid ""
-#~ "We will try our best to keep groups together, but there are no "
-#~ "guarantees. It is possible that only parts of the group are accepted for "
-#~ "an activity, but it should be fairly rare."
-#~ msgstr ""
-#~ "Nous ferons de notre mieux pour maintenir les groupes ensemble, mais rien "
-#~ "ne garantit. Il est possible que seules des parties du groupe soient "
-#~ "acceptées pour une activité, mais cela devrait être assez rare."
-
-#~ msgid ""
-#~ "You can join your own children to this group or you can share this link "
-#~ "with other parents so they can join their children:"
-#~ msgstr ""
-#~ "Vous pouvez rejoindre vos propres enfants dans ce groupe ou partager ce "
-#~ "lien avec d'autres parents afin qu'ils puissent rejoindre leurs enfants :"
-
-#~ msgid "Children need to have a booking before they can join the group."
-#~ msgstr ""
-#~ "Les enfants doivent avoir une réservation avant de pouvoir rejoindre le "
-#~ "groupe."
-
-#~ msgid " 3 - 6 years"
-#~ msgstr " de 3 à 6 ans"
-
-#~ msgid " 7 - 10 years"
-#~ msgstr " de 7 à 10 ans"
-
-#~ msgid "11 - 13 years"
-#~ msgstr "De 11 à 13 ans"
-
-#~ msgid "14 - 17 years"
-#~ msgstr "De 14 à 17 ans"
-
-#~ msgid "Invoice References"
-#~ msgstr "Références facture"
-
-#~ msgid "Invoice Item Code"
-#~ msgstr "Code de l'article de la facture"
-
-#~ msgid "Invoice Item ESR"
-#~ msgstr "Code BVR facture"
-
-#~ msgid "Bookings to this occasion may overlap with other bookings"
-#~ msgstr ""
-#~ "Il est possible que la réservation pour cet événement se chevauche avec "
-#~ "une autre réservation"
-
-#~ msgid "The attendee already has a booking for this activity"
-#~ msgstr "Ce participant a déjà une réservation pour cette activité"
-
-#~ msgid "With reference number (ESR)"
-#~ msgstr "Avec un bulletin de paiement (BVR)"
-
-#~ msgid "Dear Sir or Madam,"
-#~ msgstr "Cher Monsieur, chère Madame,"
-
-#~ msgid "The ticket number is"
-#~ msgstr "Le numéro du ticket est"
-
-#~ msgid "Feriennet Settings"
-#~ msgstr "Paramètres Feriennet"
-
-#~ msgid "Settings"
-#~ msgstr "Paramètres"
-
-#~ msgid "Edit contact info"
-#~ msgstr "Modifier les coordonnées"
-
-#~ msgid "Print All"
-#~ msgstr "Tout imprimer"
-
-#~ msgid "Edit Activity"
-#~ msgstr "Modifier l'activité"
-
-#~ msgid "<dynamic element>"
-#~ msgstr "<dynamic element>"
-
-#~ msgid "The period was successfully reset"
-#~ msgstr "La période a été réinitialisée avec succès"
-
-#~ msgid "Delete \"${text}\" (${count} entries)"
-#~ msgstr "Supprimer « ${text} » (${count} entrées)"
-
-#~ msgid "Extra Features"
-#~ msgstr "Paramètres supplémentaires"

@@ -4,26 +4,6 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
 
-        <p i18n:translate class="page-lead" i18n:translate>
-            Attendees can join their companions in a group to go to activities
-            together.
-        </p>
-
-        <div class="panel callout" tal:condition="not:model.occasion.period.active" i18n:translate>
-            This group is from an inactive period.
-        </div>
-
-        <h3 i18n:translate>Sign Up for Activity</h3>
-
-        <div class="limit-line-width">
-            <p class="tight" i18n:translate>
-                Children need to be signed up to the activity to join the group. In case they are not, they can do that here.
-            </p>
-            <p class="tight" i18n:translate>
-                Children can join the group under "Manage group" after sign-up.
-            </p>
-        </div>
-
         <div class="occasion-panel">
             <h3>
                 <a href="${request.link(model.occasion.activity)}">
@@ -32,57 +12,94 @@
             </h3>
 
             <div class="occasions">
-                <metal:b use-macro="layout.macros['occasion']" tal:define="show_enroll True"/>
+                <metal:b use-macro="layout.macros['occasion']" tal:define="show_enroll False"/>
             </div>
         </div>
 
-        <h3 i18n:translate>Manage Group</h3>
+        <p i18n:translate class="panel limit-line-width" tal:condition="model.occasion.period.active|False">
+            Attendees can join their companions in a group to go to activities
+            together. This increases their chances to go together, but it is not a
+            guarantee.
+        </p>
 
-        <div class="limit-line-width">
-            <p class="tight" i18n:translate>
-                The formation of a group increases the chance of joining an activity together.
-            </p>
-            <p class="tight" i18n:translate>
-                You can add your own children to the group here or share the following link with other parents for them
-                to sign up their own children:
-            </p>
+        <div class="panel callout" tal:condition="not:model.occasion.period.active|True" i18n:translate>
+            This group is from an inactive period.
         </div>
 
-        <div class="panel limit-line-width" style="text-align: center;">
-            <strong>${request.link(model)}</strong>
-        </div>
+        <div class="inline-top-bar">
+            <h2 class="h3-size" i18n:translate>
+                Own Children
+            </h2>
 
-        <div class="group-membership" tal:define="prospects request.is_logged_in and tuple(model.prospects(request.current_username))">
-            <div>
-                <h3 i18n:translate>In Group</h3>
-                <ul class="members-in-group">
-                    <li tal:repeat="(attendee, booking) model.attendees">
-                        <div class="group-attendee">${attendee.name} ${attendee.gender == 'male' and '👦' or '👧'}</div>
-                        <div tal:condition="may_execute_action(booking)" class="group-action" tal:content="structure group_action(booking, 'leave')(layout)"></div>
+            <!--! Show a drop down if there's at least one child -->
+            <tal:b condition="possible or existing">
+                <button href="#" data-dropdown="add-possible" aria-controls="add-possible" aria-expanded="false" class="button dropdown small secondary">
+                    <i class="fa fa-fw fa-plus-circle" aria-hidden="true"></i>
+                    <tal:b i18n:translate>
+                        Add own child
+                    </tal:b>
+                </button>
+                <ul id="add-possible" data-dropdown-content class="f-dropdown" aria-hidden="true">
+                    <li tal:repeat="attendee possible">
+                        <tal:b replace="structure group_action(attendee, 'join')(layout)" />
+                    </li>
+                    <li i18n:translate>
+                        <a href="${signup_url()}" i18n:translate>
+                            Add new own child
+                        </a>
                     </li>
                 </ul>
-            </div>
-            <div class="${prospects and 'has-prospects'}">
-                <tal:b condition="request.is_logged_in">
-                    <h3 i18n:translate>Not in Group</h3>
-                    <tal:b>
-                        <ul class="members-outside-group" tal:condition="prospects">
-                            <li tal:repeat="(attendee, booking) prospects">
-                                <div class="group-attendee">${attendee.name} ${attendee.gender == 'male' and '👦' or '👧'}</div>
-                                <div class="group-action" tal:condition="booking and (booking.period.wishlist_phase or booking.state in ('open', 'accepted')) and may_execute_action(booking)" tal:content="structure group_action(booking, 'join')(layout)"></div>
-                                <div class="group-disabled-action" i18n:translate tal:condition="booking and not booking.period.wishlist_phase and booking.state == 'blocked'">Booking Blocked</div>
-                                <div class="group-disabled-action" i18n:translate tal:condition="booking and not booking.period.wishlist_phase and booking.state == 'cancelled'">Booking Cancelled</div>
-                                <div class="group-disabled-action" i18n:translate tal:condition="booking and not booking.period.wishlist_phase and booking.state == 'denied'">Booking Denied</div>
-                                <div class="group-disabled-action" i18n:translate tal:condition="not:booking">Not signed up</div>
-                            </li>
-                        </ul>
-                        <p tal:condition="not:prospects" i18n:translate>
-                            All your children are already part of this group.
-                        </p>
+            </tal:b>
+
+            <!--! Show a simple button if there's no child yet -->
+            <tal:b condition="not possible and not existing">
+                <a href="${signup_url()}" class="button small secondary">
+                    <i class="fa fa-fw fa-plus-circle" aria-hidden="true"></i>
+                    <tal:b i18n:translate>
+                        Add own child
                     </tal:b>
-                </tal:b>
-            </div>
+                </a>
+            </tal:b>
         </div>
 
+        <p tal:condition="not:existing" i18n:translate>
+            None of own children in group.
+        </p>
+
+        <ul tal:condition="existing" class="dense with-margin own-children">
+            <li tal:repeat="attendee existing">
+                <div class="with-icon with-small-margin">
+                    <div>${attendee.gender == 'male' and '👦' or '👧'}</div>
+                    <div>
+                        ${attendee.name}<br>
+                        <i class="fa fa-fw fa-sign-out" aria-hidden="true"></i>
+                        <tal:b replace="structure group_action(attendee, 'leave')(layout)" />
+                    </div>
+                </div>
+            </li>
+        </ul>
+
+        <div class="inline-top-bar">
+            <h2 class="h3-size" i18n:translate>
+                Other Children
+            </h2>
+            <a href="${mailto}" class="button small secondary">
+                <i class="fa fa-fw fa-envelope" aria-hidden="true"></i>
+                <tal:b i18n:translate>
+                    Invite other children
+                </tal:b>
+            </a>
+        </div>
+        <p>
+            <tal:b condition="not:external" i18n:translate>
+                No other children in group
+            </tal:b>
+
+            <ul tal:condition="external" class="dense other-children">
+                <li tal:repeat="attendee external" class="with-small-margin">
+                    ${attendee.gender == 'male' and '👦' or '👧'} ${attendee.name}
+                </li>
+            </ul>
+        </p>
     </tal:b>
 </div>
