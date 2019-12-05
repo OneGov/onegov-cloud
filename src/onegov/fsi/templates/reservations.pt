@@ -8,10 +8,9 @@
                 <div class="row">
                     <div class="columns small-12">
 
-                        <tal:b tal:condition="not: reservations">
-                            <p><strong i18n:translate="">No entries found</strong></p>
-                            <p tal:condition="request.is_editor and layout.course_has_reservations" i18n:translate="">You can only see subscriptions from attendees fitting your permissions.</p>
-                        </tal:b>
+                        <p tal:condition="not: reservations"><strong i18n:translate="">No entries found</strong></p>
+                        <p tal:condition="request.is_editor" i18n:translate="">You can only see subscriptions from attendees fitting your permissions.</p>
+
                         <tal:b tal:condition="reservations|nothing">
                                 <table class="subscription-table fullwidth">
                                     <thead>
@@ -47,7 +46,7 @@
                                         </tal:b>
                                     </tbody>
                                 </table>
-                                <tal:b tal:condition="request.is_manager and layout.course_event and not layout.course_event.is_past">
+                                <tal:b tal:condition="request.admin and layout.course_event and not layout.course_event.is_past">
                                     <a href="${layout.preview_info_mail_url}" class="button success no-print" i18n:translate="">Send Info Mail</a>
                                 </tal:b>
                         </tal:b>
