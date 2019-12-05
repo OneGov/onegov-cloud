@@ -70,7 +70,6 @@ class ReservationCollectionLayout(DefaultLayout):
         )
         return links
 
-
     @cached_property
     def course_event(self):
         return self.model.course_event

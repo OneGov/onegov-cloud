@@ -79,11 +79,13 @@ class CourseLayout(CourseCollectionLayout):
         if not self.request.is_manager:
             return []
 
-        links = [Link(
+        links = [
+            Link(
                 _('Invite Attendees'),
                 self.request.link(self.model, name='invite'),
                 attrs={'class': 'invite-attendees'}
-            )]
+            )
+        ]
 
         if self.request.is_editor:
             return links

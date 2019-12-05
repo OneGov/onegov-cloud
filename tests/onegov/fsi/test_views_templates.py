@@ -26,4 +26,3 @@ def test_embed_template(client_with_db):
     client.get(view, status=403)
     client.login_admin()
     client.get(view)
-

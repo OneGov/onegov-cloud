@@ -1,6 +1,6 @@
 from arrow import utcnow
 from onegov.core.html import html_to_text
-from onegov.core.security import Secret, Private
+from onegov.core.security import Secret
 from onegov.core.templates import render_template
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.notification_template import \

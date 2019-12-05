@@ -121,10 +121,10 @@ class CourseEventLayout(DefaultLayout):
     @cached_property
     def editbar_links(self):
         attendee_link = Link(
-                _('Attendees'),
-                self.request.link(self.reservation_collection),
-                attrs={'class': 'reservations'}
-            )
+            _('Attendees'),
+            self.request.link(self.reservation_collection),
+            attrs={'class': 'reservations'}
+        )
         if self.request.is_editor:
             return [attendee_link]
 

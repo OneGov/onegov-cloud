@@ -1,4 +1,4 @@
-from onegov.core.security import Personal, Private, Secret
+from onegov.core.security import Personal, Secret
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.forms.reservation import AddFsiReservationForm, \

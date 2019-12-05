@@ -100,13 +100,12 @@ def test_reservation_collection_query(
     att, data = attendee(session)
     external, data = external_attendee(session)
     event, data = course_event(session)
-    res, data = future_course_reservation(session, course_event_id=event.id,
-                                          attendee_id=att.id)
-    f_res, data = future_course_reservation(session, attendee_id=editor.id)
+    future_course_reservation(
+        session, course_event_id=event.id, attendee_id=att.id)
+    future_course_reservation(session, attendee_id=editor.id)
 
-    ext_res = future_course_reservation(session, course_event_id=event.id,
-                                          attendee_id=external.id)
-
+    future_course_reservation(
+        session, course_event_id=event.id, attendee_id=external.id)
 
     # unfiltered
     coll = ReservationCollection(session)
