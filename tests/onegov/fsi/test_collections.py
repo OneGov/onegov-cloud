@@ -89,3 +89,55 @@ def test_reservation_collection_1(session, future_course_reservation):
 
     assert course_event.start - course_event.schedule_reminder_before > soon
     assert reservations.for_reminder_mails().count() == 0
+
+
+def test_reservation_collection_query(
+        session, attendee, planner, planner_editor, course_event,
+        future_course_reservation, external_attendee):
+
+    admin, data = planner(session)
+    editor, data = planner_editor(session)
+    att, data = attendee(session)
+    external, data = external_attendee(session)
+    event, data = course_event(session)
+    res, data = future_course_reservation(session, course_event_id=event.id,
+                                          attendee_id=att.id)
+    f_res, data = future_course_reservation(session, attendee_id=editor.id)
+
+    ext_res = future_course_reservation(session, course_event_id=event.id,
+                                          attendee_id=external.id)
+
+
+    # unfiltered
+    coll = ReservationCollection(session)
+    assert coll.query().count() == 3
+
+    # filter attendee
+    coll.attendee_id = att.id
+    assert coll.query().count() == 1
+
+    coll.external_only = True
+    assert coll.query().count() == 1
+
+    coll.external_only = False
+    coll.attendee_id = None
+
+    # auth attendee is passed in path.py always
+    coll.user_role = 'admin'
+    coll.permissions = admin.permissions
+    assert coll.query().count() == 3
+
+    coll.user_role = 'editor'
+    coll.permissions = editor.permissions
+    assert coll.query().count() == 0
+
+    # See the ones with permission without the external reservations
+    att.organisation = 'A'
+    coll.permissions = ['A']
+    assert coll.query().count() == 1
+
+    # member user_role
+    coll.user_role = 'member'
+    # coll.attendee_id will be set in path like
+    coll.attendee_id = att.id
+    assert coll.query().count() == 1

@@ -12,16 +12,20 @@ from onegov.fsi.models.course_reservation import CourseReservation
 
 class ReservationCollection(GenericCollection):
 
-    def __init__(self, session,
+    def __init__(self, session, permissions=None,
+                 user_role=None,
                  attendee_id=None,
                  course_event_id=None,
-                 role=None,
                  external_only=False
                  ):
         super().__init__(session)
         self.attendee_id = attendee_id
+
+        # current attendee permissions of auth user
+        self.permissions = permissions or []
+        # role of auth user
+        self.user_role = user_role
         self.course_event_id = course_event_id
-        self.role = role
         self.external_only = external_only
 
     @property
@@ -54,9 +58,16 @@ class ReservationCollection(GenericCollection):
 
     def query(self):
         query = super().query()
-        if not self.role:
-            pass
+
+        if self.user_role == 'editor':
+            query = query.join(CourseAttendee)
+            query = query.filter(
+                CourseAttendee.organisation.in_(
+                    self.permissions,)
+            )
+
         if self.attendee_id:
+            # Always set in path for members to their own
             query = query.filter_by(attendee_id=self.attendee_id)
         if self.course_event_id:
             query = query.filter_by(course_event_id=self.course_event_id)

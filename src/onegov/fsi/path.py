@@ -119,10 +119,12 @@ def get_reservations(
         attendee_id = request.attendee_id
 
     return ReservationCollection(
-        app.session(),
+        request.session,
         attendee_id=attendee_id,
         course_event_id=course_event_id,
-        external_only=external_only
+        external_only=external_only,
+        permissions=request.current_attendee.permissions,
+        user_role=request.current_attendee.user.role
     )
 
 
