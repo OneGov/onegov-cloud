@@ -49,10 +49,9 @@ class ReservationCollectionLayout(DefaultLayout):
                 }
             )
         ]
-        if self.request.is_manager:
+        if self.request.is_editor:
             return links
-        return links.extend([
-
+        links.append(
             LinkGroup(
                 title=_('Add'),
                 links=[
@@ -68,8 +67,9 @@ class ReservationCollectionLayout(DefaultLayout):
                     )
                 ]
             )
+        )
+        return links
 
-        ])
 
     @cached_property
     def course_event(self):

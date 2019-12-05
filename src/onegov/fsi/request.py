@@ -13,3 +13,13 @@ class FsiRequest(OrgRequest):
         return (
             self.current_attendee and self.current_attendee.id or None
         )
+
+    @cached_property
+    def is_editor(self):
+        return self.current_user \
+               and self.current_user.role == 'editor' or False
+
+    @cached_property
+    def is_member(self):
+        return self.current_user \
+               and self.current_user.role == 'member' or False

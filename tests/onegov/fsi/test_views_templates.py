@@ -23,4 +23,7 @@ def test_embed_template(client_with_db):
     info_template = session.query(InfoTemplate).first()
     view = f'/fsi/template/{info_template.id}/embed'
     client.login_editor()
+    client.get(view, status=403)
+    client.login_admin()
     client.get(view)
+

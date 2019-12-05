@@ -125,7 +125,7 @@ class CourseEventLayout(DefaultLayout):
                 self.request.link(self.reservation_collection),
                 attrs={'class': 'reservations'}
             )
-        if self.request.is_manager:
+        if self.request.is_editor:
             return [attendee_link]
 
         return [
