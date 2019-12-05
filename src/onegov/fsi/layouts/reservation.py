@@ -21,6 +21,11 @@ class ReservationCollectionLayout(DefaultLayout):
         return self.csrf_protected_url(
             self.request.link(reservation, name='toggle-confirm'))
 
+    def course_has_reservations(self):
+        if not self.model.course_event:
+            return False
+        return bool(self.model.course_event.reservations.count())
+
     @cached_property
     def title(self):
         if self.request.view_name == 'add':
