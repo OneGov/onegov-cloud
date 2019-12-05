@@ -1,3 +1,5 @@
+import uuid
+
 from arrow import utcnow
 from onegov.core.html import html_to_text
 from onegov.core.security import Secret, Private
@@ -25,11 +27,17 @@ def handle_send_email(self, request, recipients, cc_to_sender=True):
     else:
         att = request.current_attendee
         if cc_to_sender and att.id not in recipients:
+            recipients = list(recipients)
             recipients.append(att.id)
 
         mail_layout = MailLayout(self, request)
 
         for att_id in recipients:
+
+            assert any(
+                (isinstance(att_id, str), isinstance(att_id, uuid.UUID))
+            ), f'att_id of type {type(att_id)}'
+
             attendee = request.session.query(
                 CourseAttendee).filter_by(id=att_id).one()
 

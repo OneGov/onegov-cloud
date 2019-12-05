@@ -36,6 +36,7 @@ dd.accordion-navigation + dd.accordion-navigation {
     .duplicate-link::before { @include icon('\f24d'); }
     .add-placeholder::before { @include icon('\f2c0'); }
     .print-icon::before { @include icon('\f02f'); }
+    .cancel-icon::before { @include icon('\f05e'); }
 }
 
 /*

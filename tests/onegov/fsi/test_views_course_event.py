@@ -80,6 +80,31 @@ def test_duplicate_course_event(client_with_db):
     assert dup.form['max_attendees'].value == str(event.max_attendees)
 
 
+def test_cancel_course_event(client_with_db):
+    client = client_with_db
+    session = client.app.session()
+    event = session.query(CourseEvent).filter(
+        CourseEvent.start > utcnow()).first()
+
+    wanted_count = event.attendees.count()
+
+    view = f'/fsi/event/{event.id}'
+    client.login_admin()
+
+    # Cancel event
+    page = client.get(view)
+    redirect_link = page.pyquery('a.cancel-icon').attr('redirect-after')
+    assert redirect_link
+    page = client.get(view).click('Absagen')
+
+    msg = f"Email erfolgreich an {wanted_count + 1} Empfänger gesendet"
+    assert msg in client.get(redirect_link)
+    assert len(client.app.smtp.outbox) == wanted_count + 1
+
+    message = client.app.smtp.outbox.pop()
+    assert message['Subject'] == 'Cancellation Confirmation'
+
+
 def test_delete_course_event(client_with_db):
     client = client_with_db
     session = client.app.session()

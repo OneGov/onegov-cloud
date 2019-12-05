@@ -122,7 +122,7 @@ class CourseEventLayout(DefaultLayout):
     def editbar_links(self):
         if not self.request.is_manager:
             return []
-        return [
+        links = [
             LinkGroup(
                 title=_('Add'),
                 links=(
@@ -201,6 +201,31 @@ class CourseEventLayout(DefaultLayout):
                 ),
             )),
         ]
+        if not self.model.is_past:
+            links.append(
+                Link(
+                    _('Cancel Event'),
+                    self.csrf_protected_url(
+                        self.request.link(self.model, name='cancel')
+                    ),
+                    attrs={'class': 'cancel-icon'},
+                    traits=(
+                        Confirm(
+                            _("Do you want to cancel this course event ?"),
+                            _("This will send an email to all subscribers"),
+                            _("Cancel course event"),
+                            _("Cancel")
+                        ),
+                        Intercooler(
+                            request_method='POST',
+                            redirect_after=self.request.link(
+                                self.course_collection
+                            )
+                        )
+                    )
+                ),
+            )
+        return links
 
     @cached_property
     def intercooler_btn(self):
