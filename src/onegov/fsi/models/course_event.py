@@ -151,6 +151,8 @@ class CourseEvent(Base, TimestampMixin):
 
     @property
     def booked(self):
+        if not self.max_attendees:
+            return False
         return self.max_attendees <= self.reservations.count()
 
     @property
