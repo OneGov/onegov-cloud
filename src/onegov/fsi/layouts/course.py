@@ -26,7 +26,7 @@ class CourseCollectionLayout(DefaultLayout):
     @cached_property
     def editbar_links(self):
         links = []
-        if self.request.is_manager:
+        if self.request.admin:
             links.append(
                 Link(
                     text=_("New Course"),
@@ -78,50 +78,57 @@ class CourseLayout(CourseCollectionLayout):
     def editbar_links(self):
         if not self.request.is_manager:
             return []
-        return [
-            LinkGroup(
-                title=_('Add'),
-                links=(
-                    Link(
-                        _('Event'),
-                        self.request.link(self.event_collection, name='add'),
-                        attrs={'class': 'new-event'}
-                    ),
-                )
-            ),
-            Link(
+        links = [Link(
                 _('Invite Attendees'),
                 self.request.link(self.model, name='invite'),
                 attrs={'class': 'invite-attendees'}
-            ),
-            Link(
-                _('Edit'),
-                self.request.link(self.model, name='edit'),
-                attrs={'class': 'edit-link'}
-            ),
-
-            Link(
-                _('Delete'),
-                self.csrf_protected_url(
-                    self.request.link(self.model)
+            )]
+        if self.request.is_manager:
+            return links
+        links = links.extend(
+            [
+                LinkGroup(
+                    title=_('Add'),
+                    links=(
+                        Link(
+                            _('Event'),
+                            self.request.link(self.event_collection,
+                                              name='add'),
+                            attrs={'class': 'new-event'}
+                        ),
+                    )
                 ),
-                attrs={'class': 'delete-link'},
-                traits=(
-                    Confirm(
-                        _("Do you really want to delete this course ?"),
-                        _("This cannot be undone."),
-                        _("Delete course"),
-                        _("Cancel")
+                Link(
+                    _('Edit'),
+                    self.request.link(self.model, name='edit'),
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    _('Delete'),
+                    self.csrf_protected_url(
+                        self.request.link(self.model)
                     ),
-                    Intercooler(
-                        request_method='DELETE',
-                        redirect_after=self.request.class_link(
-                            CourseCollection
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _(
+                                "Do you really want to delete this course ?"),
+                            _("This cannot be undone."),
+                            _("Delete course"),
+                            _("Cancel")
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.class_link(
+                                CourseCollection
+                            )
                         )
                     )
-                )
-            ),
-        ]
+                ),
+            ]
+        )
+        # if admin
+        return links
 
 
 class AddCourseLayout(DefaultLayout):
