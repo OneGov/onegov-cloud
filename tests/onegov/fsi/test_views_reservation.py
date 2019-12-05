@@ -1,7 +1,7 @@
 from onegov.fsi.models import CourseReservation, CourseAttendee
 
 
-def test_reservation_collection(client):
+def test_reservation_collection_view(client):
     view = '/fsi/reservations'
     client.get(view, status=403)
 
@@ -56,6 +56,5 @@ def test_create_delete_reservation(client_with_db):
     page = new.form.submit().follow()
     assert 'Safe!' in page
     page = page.click('Safe!').click('Löschen')
-    # new = client.get(view).click('Anmeldung')
     page = client.get('/fsi/reservations')
     assert 'Safe!' not in page
