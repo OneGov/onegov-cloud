@@ -83,7 +83,10 @@ def test_duplicate_course_event(client_with_db):
 def test_delete_course_event(client_with_db):
     client = client_with_db
     session = client.app.session()
-    event = session.query(CourseEvent).first()
+    event = session.query(CourseEvent).filter_by(
+        location='Empty'
+    ).one()
+    assert not event.reservation.count()
     view = f'/fsi/event/{event.id}'
     client.login_admin()
 
@@ -91,6 +94,7 @@ def test_delete_course_event(client_with_db):
     client.delete(view, status=403)
     page = client.get(view)
     page = page.click('Löschen')
+    client.get(view, status=404)
 
 
 def test_register_for_course_event(client_with_db):
