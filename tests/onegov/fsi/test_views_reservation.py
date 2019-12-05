@@ -46,16 +46,16 @@ def test_edit_reservation(client_with_db):
     assert edit.form['attendee_id'].value == str(reservation.attendee_id)
 
 
-def test_delete_reservations(client_with_db):
+def test_create_delete_reservation(client_with_db):
     client = client_with_db
-    session = client.app.session()
-    reservation = session.query(CourseReservation).filter(
-        CourseReservation.attendee_id == None).first()
-
-    view = f'/fsi/reservation/{reservation.id}'
+    view = f'/fsi/reservations/add'
     client.login_admin()
 
-    # csrf protected url must be used
-    client.delete(view, status=403)
-    page = client.get(view + '/edit')
-    page.click('Löschen')
+    new = client.get(view).click('Platzhalter')
+    new.form['dummy_desc'] = 'Safe!'
+    page = new.form.submit().follow()
+    assert 'Safe!' in page
+    page = page.click('Safe!').click('Löschen')
+    # new = client.get(view).click('Anmeldung')
+    page = client.get('/fsi/reservations')
+    assert 'Safe!' not in page
