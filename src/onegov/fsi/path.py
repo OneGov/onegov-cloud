@@ -118,13 +118,17 @@ def get_reservations(
     elif attendee_id != request.attendee_id and not request.is_manager:
         attendee_id = request.attendee_id
 
+    att = request.current_attendee
+    permissions = att and att.permissions or []
+    role = att and att.user.role or 'member'
+
     return ReservationCollection(
         request.session,
         attendee_id=attendee_id,
         course_event_id=course_event_id,
         external_only=external_only,
-        permissions=request.current_attendee.permissions,
-        user_role=request.current_attendee.user.role
+        permissions=permissions,
+        user_role=role
     )
 
 

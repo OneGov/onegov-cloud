@@ -26,7 +26,7 @@ def test_add_reservation(client):
     client.get(view, status=403)
 
     view = '/fsi/reservations/add-placeholder'
-    client.get(view, status=200)
+    client.get(view, status=403)
 
 
 def test_edit_reservation(client_with_db):
