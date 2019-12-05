@@ -68,7 +68,9 @@ class ReservationCollection(GenericCollection):
 
         if self.attendee_id:
             # Always set in path for members to their own
-            query = query.filter_by(attendee_id=self.attendee_id)
+            query = query.filter(
+                CourseReservation.attendee_id == self.attendee_id)
         if self.course_event_id:
-            query = query.filter_by(course_event_id=self.course_event_id)
+            query = query.filter(
+                CourseReservation.course_event_id == self.course_event_id)
         return query
