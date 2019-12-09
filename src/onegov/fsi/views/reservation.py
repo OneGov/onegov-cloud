@@ -7,6 +7,7 @@ from onegov.fsi.layouts.reservation import ReservationLayout, \
     ReservationCollectionLayout
 from onegov.fsi.models import CourseReservation
 from onegov.fsi import _
+from onegov.fsi.views.notifcations import handle_send_email
 
 
 @FsiApp.html(
@@ -117,6 +118,13 @@ def view_add_from_course_event(self, request):
     self.add(
         attendee_id=self.attendee_id or request.attendee_id,
         course_event_id=self.course_event_id)
+    request = handle_send_email(
+        self.course_event.reservation_template,
+        request,
+        (self.attendee, ),
+        cc_to_sender=False,
+        show_sent_count=False
+    )
     request.success(_('New subscription successfully added'))
 
 

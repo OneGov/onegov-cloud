@@ -18,27 +18,27 @@ from onegov.fsi.models.course_notification_template import \
 from onegov.fsi import _
 
 
-def handle_send_email(self, request, recipients, cc_to_sender=True):
-    """Recipients must be a list of attendee id's"""
+def handle_send_email(self, request, recipients, cc_to_sender=True,
+                      show_sent_count=True):
+    """Recipients must be a list of attendee id's or attendees"""
 
     if not recipients:
         request.alert(_("There are no recipients matching the selection"))
     else:
         att = request.current_attendee
+        handle_attendees = isinstance(recipients[0], CourseAttendee)
         if cc_to_sender and att.id not in recipients:
             recipients = list(recipients)
-            recipients.append(att.id)
+            recipients.append(att if handle_attendees else att.id)
 
         mail_layout = MailLayout(self, request)
 
         for att_id in recipients:
-
-            assert any(
-                (isinstance(att_id, str), isinstance(att_id, uuid.UUID))
-            ), f'att_id of type {type(att_id)}'
-
-            attendee = request.session.query(
-                CourseAttendee).filter_by(id=att_id).one()
+            if handle_attendees:
+                attendee = att
+            else:
+                attendee = request.session.query(
+                    CourseAttendee).filter_by(id=att_id).one()
 
             content = render_template('mail_notification.pt', request, {
                 'layout': mail_layout,
@@ -56,13 +56,13 @@ def handle_send_email(self, request, recipients, cc_to_sender=True):
             )
 
         self.last_sent = utcnow()
-
-        request.success(_(
-            "Successfully sent the e-mail to ${count} recipients",
-            mapping={
-                'count': len(recipients)
-            }
-        ))
+        if show_sent_count:
+            request.success(_(
+                "Successfully sent the e-mail to ${count} recipients",
+                mapping={
+                    'count': len(recipients)
+                }
+            ))
     return request
 
 
@@ -148,7 +148,8 @@ def handle_send_notification(self, request, form):
 
     if form.submitted(request):
         recipients = list(form.recipients.data)
-        request = handle_send_email(self, request, recipients)
+        request = handle_send_email(self, request, recipients,
+                                    show_sent_count=True)
         return request.redirect(request.link(self.course_event))
 
     return {
