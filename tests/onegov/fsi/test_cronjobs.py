@@ -7,7 +7,7 @@ from onegov.fsi.models.course_notification_template import \
 from tests.onegov.org.common import get_cronjob_by_name
 
 
-@pytest.mark.skip('Causses infinite recusrion upon rendering template')
+# @pytest.mark.skip('Causses infinite recusrion upon rendering template')
 def test_send_reminder_mails(
         fsi_app, smtp, future_course_reservation):
 

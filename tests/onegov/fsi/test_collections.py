@@ -52,6 +52,9 @@ def test_course_event_collection(session, course):
     event_coll = CourseEventCollection(session, from_date=tmr)
     assert event_coll.query().count() == 1
 
+    # test for reminder emails query
+    events = event_coll.for_reminder_emails()
+
 
 def test_event_collection_add_placeholder(session, course_event):
     # Test add_placeholder method

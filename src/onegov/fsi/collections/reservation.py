@@ -47,15 +47,6 @@ class ReservationCollection(GenericCollection):
         return CourseAttendeeCollection(
             self.session, external_only=self.external_only)
 
-    def for_reminder_mails(self):
-        soon = utcnow() + timedelta(seconds=60)
-        conditions = and_(
-            CourseReservation.attendee_id != None,
-            CourseReservation.reminder_sent == None,
-            CourseEvent.scheduled_reminder <= soon
-        )
-        return self.query().join(CourseEvent).filter(conditions)
-
     def query(self):
         query = super().query()
 
