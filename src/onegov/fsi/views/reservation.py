@@ -110,7 +110,7 @@ def view_add_reservation_placeholder(self, request, form):
     model=ReservationCollection,
     request_method='POST',
     name='add-from-course-event',
-    permission=Secret
+    permission=Personal
 )
 def view_add_from_course_event(self, request):
     request.assert_valid_csrf_token()
