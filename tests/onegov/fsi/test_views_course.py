@@ -12,6 +12,7 @@ def test_add_course_and_invite(client):
     new = client.get(view)
     new.form['description'] = 'New Course'
     new.form['name'] = 'New Course'
+    new.form['description'] = 'Desc'
     new.form.submit()
 
     session = client.app.session()
@@ -31,12 +32,12 @@ def test_add_course_and_invite(client):
 
     assert 'Email erfolgreich an 1 Empfänger gesendet' in page
 
-    message = client.app.smtp.outbox.pop()
-    assert message['To'] == 'admin@example.org'
-    assert message['Subject'] == 'Course Subscription Invitation'
+    message = get_mail(client.app.smtp.outbox, 0)
+    assert message['to'] == 'admin@example.org'
+    assert message['subject'] == 'Course Subscription Invitation'
     text = message['text']
-
-    # assert message['Message'] == 'Cancellation Confirmation'
+    assert 'New Course' in text
+    assert 'Desc' in text
 
 
 def test_course_details(client_with_db):
