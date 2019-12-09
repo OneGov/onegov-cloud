@@ -132,6 +132,7 @@ def view_email_preview(self, request):
         'layout': layout,
         'title': self.subject,
         'notification': self.text_html,
+        'attendee': request.current_attendee
     }
 
 

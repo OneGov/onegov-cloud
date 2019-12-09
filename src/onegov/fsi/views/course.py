@@ -92,6 +92,7 @@ def view_email_preview_for_course(self, request):
         'layout': mail_layout,
         'title': template.subject,
         'notification': template.text_html,
+        'attendee': request.current_attendee
     }
 
 
