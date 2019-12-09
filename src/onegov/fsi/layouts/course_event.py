@@ -43,7 +43,7 @@ class CourseEventCollectionLayout(DefaultLayout):
     @cached_property
     def editbar_links(self):
         links = []
-        if self.request.is_manager:
+        if self.request.is_admin:
             links.append(
                 LinkGroup(
                     title=_('Add'),
@@ -120,8 +120,14 @@ class CourseEventLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if not self.request.is_manager:
-            return []
+        attendee_link = Link(
+            _('Attendees'),
+            self.request.link(self.reservation_collection),
+            attrs={'class': 'reservations'}
+        )
+        if self.request.is_editor:
+            return [attendee_link]
+
         return [
             LinkGroup(
                 title=_('Add'),
@@ -157,11 +163,7 @@ class CourseEventLayout(DefaultLayout):
                     ),
                 )
             ),
-            Link(
-                _('Attendees'),
-                self.request.link(self.reservation_collection),
-                attrs={'class': 'reservations'}
-            ),
+            attendee_link,
             Link(
                 _('Edit'),
                 self.request.link(self.model, name='edit'),

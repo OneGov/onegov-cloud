@@ -1,4 +1,4 @@
-from onegov.core.security import Personal, Private, Secret
+from onegov.core.security import Personal, Secret
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.forms.reservation import AddFsiReservationForm, \
@@ -27,7 +27,7 @@ def view_reservations(self, request):
     template='form.pt',
     name='add',
     form=AddFsiReservationForm,
-    permission=Private
+    permission=Secret
 )
 def view_add_reservation(self, request, form):
     layout = ReservationCollectionLayout(self, request)
@@ -83,7 +83,7 @@ def view_edit_reservation(self, request, form):
     template='form.pt',
     name='add-placeholder',
     form=AddFsiReservationForm,
-    permission=Private
+    permission=Secret
 )
 def view_add_reservation_placeholder(self, request, form):
     layout = ReservationCollectionLayout(self, request)
@@ -110,7 +110,7 @@ def view_add_reservation_placeholder(self, request, form):
     model=ReservationCollection,
     request_method='POST',
     name='add-from-course-event',
-    permission=Private
+    permission=Secret
 )
 def view_add_from_course_event(self, request):
     request.assert_valid_csrf_token()
@@ -134,7 +134,7 @@ def view_delete_reservation(self, request):
 @FsiApp.html(
     model=CourseReservation,
     request_method='POST',
-    permission=Private,
+    permission=Secret,
     name='toggle-confirm'
 )
 def view_toggle_confirm_reservation(self, request):

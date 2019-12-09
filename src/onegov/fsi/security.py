@@ -1,4 +1,4 @@
-from onegov.core.security import Personal, Secret
+from onegov.core.security import Personal
 from onegov.core.security.rules import has_permission_logged_in
 from onegov.fsi import FsiApp
 from onegov.fsi.models import CourseAttendee

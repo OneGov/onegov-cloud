@@ -39,9 +39,7 @@ class ReservationCollectionLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if not self.request.is_manager:
-            return []
-        return [
+        links = [
             Link(
                 text=_("Print"),
                 url='#',
@@ -49,7 +47,11 @@ class ReservationCollectionLayout(DefaultLayout):
                     'class': 'print-icon',
                     'onclick': 'window.print();return false;'
                 }
-            ),
+            )
+        ]
+        if self.request.is_editor:
+            return links
+        links.append(
             LinkGroup(
                 title=_('Add'),
                 links=[
@@ -65,8 +67,8 @@ class ReservationCollectionLayout(DefaultLayout):
                     )
                 ]
             )
-
-        ]
+        )
+        return links
 
     @cached_property
     def course_event(self):
@@ -92,6 +94,12 @@ class ReservationCollectionLayout(DefaultLayout):
         )
         if self.request.view_name in ('add', 'add-placeholder'):
             links.append(Link(_('Add')))
+        if self.model.course_event_id:
+            links.append(
+                Link(
+                    self.format_date(self.course_event.start, 'date_long'),
+                    self.request.link(self.course_event))
+            )
         return links
 
     def intercooler_btn_for_item(self, reservation):

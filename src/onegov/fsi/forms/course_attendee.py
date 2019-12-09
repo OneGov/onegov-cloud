@@ -53,7 +53,7 @@ class CourseAttendeeForm(Form):
 
     def on_request(self):
         # is an external
-        if not self.model.user_id:
+        if not self.model.user_id or self.model.user.role != 'editor':
             self.delete_field('permissions')
         else:
             self.delete_field('email')
