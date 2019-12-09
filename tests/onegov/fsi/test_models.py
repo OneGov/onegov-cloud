@@ -103,6 +103,7 @@ def test_course_event_1(session, course, course_event, attendee):
     assert event.course == course
 
     assert course.events.all() == [event]
+    assert course.future_events.all() == []
 
 
 def test_reservation_1(session, attendee, course_event):

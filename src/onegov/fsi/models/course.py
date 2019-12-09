@@ -1,6 +1,8 @@
 from uuid import uuid4
 
+from arrow import utcnow
 from sqlalchemy import Column, Text, Boolean, Interval
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
@@ -27,3 +29,8 @@ class Course(Base):
         plugin.
         """
         return self.description
+
+    @hybrid_property
+    def future_events(self):
+        from onegov.fsi.models import CourseEvent
+        return self.events.filter(CourseEvent.start > utcnow())
