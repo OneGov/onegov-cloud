@@ -52,9 +52,6 @@ def test_course_event_collection(session, course):
     event_coll = CourseEventCollection(session, from_date=tmr)
     assert event_coll.query().count() == 1
 
-    # test for reminder emails query
-    events = event_coll.for_reminder_emails()
-
 
 def test_event_collection_add_placeholder(session, course_event):
     # Test add_placeholder method
@@ -75,23 +72,6 @@ def test_attendee_collection(session, attendee):
     # Exlude placeholders and return real users
     collection = CourseAttendeeCollection(session, exclude_external=True)
     assert collection.query().count() == 1
-
-
-def test_reservation_collection_1(session, future_course_reservation):
-    future_course_reservation(session)
-    soon = utcnow() + datetime.timedelta(seconds=60)
-    reservations = ReservationCollection(session)
-    res = reservations.for_reminder_mails().first()
-    assert res
-    course_event = res.course_event
-    assert course_event.start - course_event.schedule_reminder_before < soon
-
-    # Change the reminder before value
-    course_event.schedule_reminder_before = datetime.timedelta(days=4)
-    session.flush()
-
-    assert course_event.start - course_event.schedule_reminder_before > soon
-    assert reservations.for_reminder_mails().count() == 0
 
 
 def test_reservation_collection_query(
