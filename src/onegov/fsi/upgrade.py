@@ -54,3 +54,12 @@ def add_last_sent_to_notifaction_templates(context):
             Column('last_sent', UTCDateTime)
         )
 
+
+@upgrade_task('Remove sent col in reservation')
+def remove_reservation_email_ts(context):
+    cols = 'invitation_sent', 'reminder_sent', 'cancellation_sent', 'info_sent'
+
+    for col in cols:
+
+        if context.has_column('fsi_reservations', col):
+            context.operations.drop_column('fsi_reservations', col)

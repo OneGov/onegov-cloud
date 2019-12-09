@@ -15,11 +15,6 @@ reservation_table = Table(
     Column('event_completed', Boolean, default=False, nullable=False),
     Column('dummy_desc', Text),
 
-    # Fields for the NotificationTemplate.NOTIFICATION_TYPES
-    Column('invitation_sent', UTCDateTime),
-    Column('reminder_sent', UTCDateTime),
-    Column('cancellation_sent', UTCDateTime),
-    Column('info_sent', UTCDateTime)
 )
 
 
