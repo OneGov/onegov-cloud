@@ -22,11 +22,11 @@ def send_scheduled_reminders(request):
                   mapping={'name': course_event.course.name})
         for attendee in course_event.attendees:
             content = render_template('mail_notification.pt', request, {
-                    'layout': MailLayout(template, request),
-                    'title': title,
-                    'notification': template.text_html,
-                    'attendee': attendee
-                })
+                'layout': MailLayout(template, request),
+                'title': title,
+                'notification': template.text_html,
+                'attendee': attendee
+            })
             request.app.send_marketing_email(
                 receivers=(attendee.email, ),
                 subject=template.subject,

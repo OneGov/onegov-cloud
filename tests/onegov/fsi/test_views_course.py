@@ -1,5 +1,5 @@
 from onegov.fsi.models import Course
-from onegov.user import User
+from tests.onegov.org.common import get_mail
 
 
 def test_add_course_and_invite(client):
@@ -10,7 +10,6 @@ def test_add_course_and_invite(client):
     # on login, admin gets his attendee
     client.login_admin()
     new = client.get(view)
-    new.form['description'] = 'New Course'
     new.form['name'] = 'New Course'
     new.form['description'] = 'Desc'
     new.form.submit()

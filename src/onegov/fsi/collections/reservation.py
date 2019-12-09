@@ -1,8 +1,3 @@
-from datetime import timedelta
-
-from sedate import utcnow
-from sqlalchemy import and_
-
 from onegov.core.collection import GenericCollection
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.models.course_attendee import CourseAttendee

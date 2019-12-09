@@ -146,7 +146,7 @@ def test_register_for_course_event(client_with_db):
     ).one()
     assert not event.is_past
     client.login_member()
-    page = client.get(f'/fsi/event/{event.id}').click('Anmelden')
+    client.get(f'/fsi/event/{event.id}').click('Anmelden')
     page = client.get(f'/fsi/event/{event.id}')
     assert 'Angemeldet' in page
 

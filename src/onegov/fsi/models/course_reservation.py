@@ -1,7 +1,7 @@
 from uuid import uuid4
 from sqlalchemy import Column, ForeignKey, Boolean, Table, Text
 from onegov.core.orm import Base
-from onegov.core.orm.types import UUID, UTCDateTime
+from onegov.core.orm.types import UUID
 table_name = 'fsi_reservations'
 
 reservation_table = Table(

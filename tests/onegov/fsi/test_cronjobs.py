@@ -1,5 +1,4 @@
 from onegov.fsi.collections.course_event import CourseEventCollection
-from onegov.fsi.models import CourseEvent
 
 from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
 
@@ -7,7 +6,6 @@ from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
 def test_send_reminder_mails(client_with_db, smtp):
     app = client_with_db.app
     session = app.session()
-    reminder_before = CourseEvent.default_reminder_before
     events = CourseEventCollection(session).get_past_reminder_date()
     # empty and future course event, future contains two reservations
     assert events.count() == 2

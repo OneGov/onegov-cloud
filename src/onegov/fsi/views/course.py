@@ -72,8 +72,10 @@ def handle_send_invitation_email(
         ))
 
         if errors:
-            request.warning(_('Following emails were unknown: ${mail_list}',
-                           mapping={'mail_list': ', '.join(errors)}))
+            request.warning(
+                _('Following emails were unknown: ${mail_list}',
+                  mapping={'mail_list': ', '.join(errors)})
+            )
     return request
 
 

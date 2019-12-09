@@ -1,5 +1,3 @@
-import uuid
-
 from arrow import utcnow
 from onegov.core.html import html_to_text
 from onegov.core.security import Secret
