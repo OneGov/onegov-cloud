@@ -145,11 +145,8 @@ def cancel_course_event(self, request):
             self.cancellation_template,
             request,
             recipients,
-            cc_to_sender=True
+            cc_to_sender=True,
+            show_sent_count=True
         )
-
-        request.success(_(
-            'Event cancelled and ${count} emails sent.',
-            mapping={'count': len(recipients)}))
     else:
         request.warn('No recipients and no cancellation emails sent')
