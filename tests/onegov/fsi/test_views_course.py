@@ -1,16 +1,42 @@
 from onegov.fsi.models import Course
+from onegov.user import User
 
 
-def test_add_course(client):
+def test_add_course_and_invite(client):
     view = '/fsi/courses/add'
     client.login_editor()
     client.get(view, status=403)
 
+    # on login, admin gets his attendee
     client.login_admin()
     new = client.get(view)
     new.form['description'] = 'New Course'
     new.form['name'] = 'New Course'
     new.form.submit()
+
+    session = client.app.session()
+    course = session.query(Course).one()
+
+    page = client.get(f'/fsi/course/{course.id}/invite')
+    page.form['attendees'] = '\n'.join((
+        'test1@email.com, admin@example.org',
+        'member@example.org'
+    ))
+    page = page.form.submit().follow()
+
+    assert len(client.app.smtp.outbox) == 1
+
+    # member not found since the user does not have an attendee before login
+    assert 'Emails sind unbekannt: test1@email.com, member@example.org' in page
+
+    assert 'Email erfolgreich an 1 Empfänger gesendet' in page
+
+    message = client.app.smtp.outbox.pop()
+    assert message['To'] == 'admin@example.org'
+    assert message['Subject'] == 'Course Subscription Invitation'
+    text = message['text']
+
+    # assert message['Message'] == 'Cancellation Confirmation'
 
 
 def test_course_details(client_with_db):

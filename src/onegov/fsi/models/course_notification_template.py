@@ -27,6 +27,14 @@ def template_name(context, type=None):
     return NOTIFICATION_TYPE_TRANSLATIONS[NOTIFICATION_TYPES.index(t)]
 
 
+class CourseInvitationTemplate:
+
+    subject = _('Course Subscription Invitation')
+    text = None
+    text_html = None
+    type = 'invitation'
+
+
 class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
 
     """

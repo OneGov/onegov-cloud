@@ -1,13 +1,81 @@
+from onegov.core.html import html_to_text
 from onegov.core.security import Private, Secret, Personal
+from onegov.core.templates import render_template
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.forms.course import CourseForm, InviteCourseForm
 from onegov.fsi import _
 from onegov.fsi.layouts.course import CourseCollectionLayout, CourseLayout, \
-    AddCourseLayout, EditCourseLayout, InviteCourseLayout
+    AddCourseLayout, EditCourseLayout, InviteCourseLayout, \
+    CourseInviteMailLayout
+from onegov.fsi.models import CourseAttendee
 
 from onegov.fsi.models.course import Course
+from onegov.fsi.models.course_notification_template import \
+    CourseInvitationTemplate
+from onegov.user import User
+
+
+def handle_send_invitation_email(
+        self, course, request, recipients, cc_to_sender=True):
+    """Recipients must be a list of emails"""
+
+    if not recipients:
+        request.alert(_("There are no recipients matching the selection"))
+    else:
+        att = request.current_attendee
+        if cc_to_sender and att.id not in recipients:
+            recipients = list(recipients)
+            recipients.append(att.id)
+
+        mail_layout = CourseInviteMailLayout(course, request)
+
+        errors = []
+
+        for email in recipients:
+
+            attendee = request.session.query(
+                CourseAttendee).filter_by(_email=email).first()
+            if not attendee:
+                user = request.session.query(User).filter_by(
+                    username=email).first()
+                if not user:
+                    errors.append(email)
+                    continue
+                attendee = user.attendee
+                if not attendee:
+                    # This is a case that should not happen except in testing
+                    errors.append(email)
+                    continue
+
+            content = render_template('mail_notification.pt', request, {
+                'layout': mail_layout,
+                'title': self.subject,
+                'notification': self.text_html,
+                'attendee': attendee,
+                'course': course
+            })
+            plaintext = html_to_text(content)
+
+            request.app.send_marketing_email(
+                receivers=(attendee.email,),
+                subject=self.subject,
+                content=content,
+                plaintext=plaintext,
+            )
+
+        request.success(_(
+            "Successfully sent the e-mail to ${count} recipients",
+            mapping={
+                'count': len(recipients) - len(errors)
+            }
+        ))
+
+        if errors:
+            request.warning(_('Following emails were unknown: ${mail_list}',
+                           mapping={'mail_list': ', '.join(errors)}))
+    return request
 
 
 @FsiApp.html(
@@ -90,7 +158,7 @@ def view_edit_course_event(self, request, form):
 
 @FsiApp.form(
     model=Course,
-    template='form.pt',
+    template='course_invite.pt',
     form=InviteCourseForm,
     name='invite',
     permission=Private
@@ -99,7 +167,15 @@ def invite_attendees_for_event(self, request, form):
     layout = InviteCourseLayout(self, request)
 
     if form.submitted(request):
-        pass
+        recipients = form.get_useful_data()
+        request = handle_send_invitation_email(
+            CourseInvitationTemplate(),
+            self,
+            request,
+            recipients,
+            cc_to_sender=False
+        )
+        return request.redirect(request.link(self))
 
     return {
         'layout': layout,
