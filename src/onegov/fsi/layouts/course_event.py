@@ -202,6 +202,27 @@ class CourseEventLayout(DefaultLayout):
                     attrs={'class': 'email-link'}
                 ),
             )),
+            Link(
+                _('Cancel Event'),
+                self.csrf_protected_url(
+                    self.request.link(self.model, name='cancel')
+                ),
+                attrs={'class': 'cancel-icon'},
+                traits=(
+                    Confirm(
+                        _("Do you really want to cancel this course event ?"),
+                        _("An email will be sent to all the subscribers"),
+                        _("Cancel course event"),
+                        _("Cancel")
+                    ),
+                    Intercooler(
+                        request_method='POST',
+                        redirect_after=self.request.link(
+                            self.course_collection
+                        )
+                    )
+                )
+            ),
         ]
 
     @cached_property
