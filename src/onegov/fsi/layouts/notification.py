@@ -87,7 +87,6 @@ class MailLayout(OrgDefaultMailLayout, FormatMixin):
         return self.model.type
 
 
-
 class NotificationTemplateCollectionLayout(DefaultLayout):
     @cached_property
     def title(self):

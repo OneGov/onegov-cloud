@@ -34,15 +34,15 @@
 </metal:accordion>
 
 <metal:email_preview define-macro="email_preview">
-    <tal:b tal:condition="layout.model|nothing">
+    <tal:b tal:condition="email|layout.model|nothing" tal:define="mail email|layout.model">
         <dl class="field-display">
             <dt i18n:translate="">Subject: </dt>
-            <dd>${layout.model.subject}</dd>
+            <dd>${mail.subject}</dd>
             <div class="clearfix"></div>
         </dl>
         <dl class="field-display">
             <dt i18n:translate="">Text: </dt>
-            <iframe src="${request.link(layout.model, name='embed')}" frameborder="0" width="100%" height="600px"></iframe>
+            <iframe src="${iframe_link|request.link(mail, name='embed')}" frameborder="0" width="100%" height="600px"></iframe>
             <div class="clearfix"></div>
         </dl>
     </tal:b>
@@ -114,6 +114,13 @@
         <div class="clearfix"></div>
     </dl>
 </metal:course_event>
+
+<metal:course define-macro="course_details">
+    <h3 i18n:translate="">Description:</h3>
+    <div class="page-text">
+        <p tal:content="structure model.description_html"></p>
+    </div>
+</metal:course>
 
 <metal:course_event_listing define-macro="course_event_listing">
     <tal:b tal:switch="events and True or False">

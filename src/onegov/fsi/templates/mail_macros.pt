@@ -48,6 +48,15 @@
                 <a href="${layout.open_events_url}" i18n:translate="">open events.</a>
             </p>
         </tal:b>
+        <tal:b tal:case="'invitation'">
+            <p>We would like to invite you to subscribe for one of the events for the course ${layout.model.name}.</p>
+            <p i18n:translate="">You can find the list of future events below.</p><br>
+            <tal:b metal:use-macro="layout.default_macros['course_details']" tal:define="model layout.model"/>
+            <h3 i18n:translate="">Events</h3>
+            <tal:b metal:use-macro="layout.default_macros['course_event_listing']" tal:define="events layout.model.future_events"/>
+
+
+        </tal:b>
     </tal:b>
 </metal:email_header>
 

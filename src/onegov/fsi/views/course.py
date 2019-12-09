@@ -13,7 +13,7 @@ from onegov.fsi.models import CourseAttendee
 
 from onegov.fsi.models.course import Course
 from onegov.fsi.models.course_notification_template import \
-    CourseInvitationTemplate
+    CourseInvitationTemplate, CourseNotificationTemplate
 from onegov.user import User
 
 
@@ -54,7 +54,6 @@ def handle_send_invitation_email(
                 'title': self.subject,
                 'notification': self.text_html,
                 'attendee': attendee,
-                'course': course
             })
             plaintext = html_to_text(content)
 
@@ -76,6 +75,24 @@ def handle_send_invitation_email(
             request.warning(_('Following emails were unknown: ${mail_list}',
                            mapping={'mail_list': ', '.join(errors)}))
     return request
+
+
+@FsiApp.html(
+    model=Course,
+    template='mail_notification.pt',
+    permission=Secret,
+    name='embed')
+def view_email_preview_for_course(self, request):
+
+    mail_layout = CourseInviteMailLayout(self, request)
+
+    template = CourseNotificationTemplate()
+
+    return {
+        'layout': mail_layout,
+        'title': template.subject,
+        'notification': template.text_html,
+    }
 
 
 @FsiApp.html(
@@ -181,7 +198,9 @@ def invite_attendees_for_event(self, request, form):
         'layout': layout,
         'model': self,
         'form': form,
-        'button_text': _('Send Invitation')
+        'button_text': _('Send Invitation'),
+        'email': CourseInvitationTemplate(),
+        'iframe_link': request.link(self, name='embed')
 
     }
 

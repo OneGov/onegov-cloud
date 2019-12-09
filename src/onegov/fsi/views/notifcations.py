@@ -11,8 +11,7 @@ from onegov.fsi.forms.notification import NotificationForm, \
     NotificationTemplateSendForm
 from onegov.fsi.layouts.notification import NotificationTemplateLayout, \
     NotificationTemplateCollectionLayout, EditNotificationTemplateLayout, \
-    MailLayout, \
-    SendNotificationTemplateLayout
+    MailLayout, SendNotificationTemplateLayout
 from onegov.fsi.models import CourseAttendee
 from onegov.fsi.models.course_notification_template import \
     CourseNotificationTemplate
