@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-12-05 15:48+0100\n"
-"PO-Revision-Date: 2019-12-05 15:47+0100\n"
+"POT-Creation-Date: 2019-12-09 14:56+0100\n"
+"PO-Revision-Date: 2019-12-09 14:53+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -74,8 +74,8 @@ msgstr "Wiederholungsintervall (in Monaten)"
 msgid "Number of months"
 msgstr "Anzahl Monate"
 
-msgid "Paste a list of email addresses"
-msgstr "Füge eine Liste von E-Mail-Addressen ein"
+msgid "Paste a list of email addresses."
+msgstr "Fügen Sie eine Liste von Email-Addressen ein."
 
 msgid "First Name"
 msgstr "Vorname(n)"
@@ -152,14 +152,14 @@ msgstr "Keine"
 msgid "New Course"
 msgstr "Neuer Kurs"
 
+msgid "Invite Attendees"
+msgstr "Teilnehmer einladen"
+
 msgid "Add"
 msgstr "Hinzufügen"
 
 msgid "Event"
 msgstr "Kursdurchführung"
-
-msgid "Invite Attendees"
-msgstr "Teilnehmer einladen"
 
 msgid "Edit"
 msgstr "Bearbeiten"
@@ -239,11 +239,11 @@ msgstr "Email-Vorlagen"
 msgid "Cancel Event"
 msgstr "Absagen"
 
-msgid "Do you want to cancel this course event ?"
-msgstr "Wollen sie diese Kursveranstaltung absagen?"
+msgid "Do you really want to cancel this course event ?"
+msgstr "Wollen sie diese Kursdurchführung annulieren?"
 
-msgid "This will send an email to all subscribers"
-msgstr "Dies wird eine E-Mail an alle Teilnehmenden senden"
+msgid "An email will be sent to all the subscribers"
+msgstr "Eine Email wird an alle Angemeldeten versendet"
 
 msgid "Cancel course event"
 msgstr "Kursveranstaltung annulieren"
@@ -352,8 +352,8 @@ msgstr "Kurs-Erinnerung"
 msgid "Cancellation Confirmation"
 msgstr "Absage-Bestätigung"
 
-msgid "Description:"
-msgstr "Beschreibung"
+msgid "Course Subscription Invitation"
+msgstr "Einladung für Kursanmeldung"
 
 msgid "Events"
 msgstr "Durchführungen"
@@ -418,6 +418,9 @@ msgstr "Referent Firma"
 msgid "Free Space"
 msgstr "Freie Plätze"
 
+msgid "Email Preview"
+msgstr "Email Vorschau"
+
 msgid "Details / Registration"
 msgstr "Details / Anmeldung"
 
@@ -435,6 +438,9 @@ msgstr "Name"
 
 msgid "Remaining seats"
 msgstr "Verbleibende Plätze"
+
+msgid "Description:"
+msgstr "Beschreibung"
 
 msgid "Yes"
 msgstr "Ja"
@@ -458,7 +464,7 @@ msgid "You will receive a reminder email prior to the course."
 msgstr "Sie werden eine Erinnerungs-Email vor dem Kurs-Start erhalten."
 
 msgid "Further information can be found on the"
-msgstr "Weitere Informationen finden auf der"
+msgstr "Weitere Informationen finden Sie auf der"
 
 msgid "course website."
 msgstr "Kurswebseite."
@@ -473,7 +479,17 @@ msgid "If you still like to visit this course, have a look at the"
 msgstr "Falls sie diesen Kurs noch besuchen möchten, schauen sie unter"
 
 msgid "open events."
-msgstr "zukünfigte Durchführungen"
+msgstr "zukünfigte Durchführungen."
+
+msgid ""
+"We would like to invite you to subscribe for one of the events for the "
+"course ${layout.model.name}."
+msgstr ""
+"Wir würden sie gerne einladen, sich für einen der Durchführungen des Kurses "
+"${layout.model.name} anzumelden."
+
+msgid "You can find the list of future events below."
+msgstr "Untenstehend finden Sie eine Liste der zukünftigen Durchführungen."
 
 msgid "Event Details"
 msgstr "Details Durchführung"
@@ -486,7 +502,7 @@ msgid ""
 "will receive a copy of the e-mail if you are not already on the recipients "
 "list."
 msgstr ""
-"Wenn sie auf \"Senden\" klicken, wird das untenstehende Email an die "
+"Wenn sie auf \"Senden\" klicken, wird die untenstehende Email an die "
 "ausgewählten Empfänger versendet. Sie werden eine Kopie dieser Email "
 "erhalten, falls sie noch nicht in der Empfängerliste sind."
 
@@ -501,6 +517,9 @@ msgstr "Email-Typ"
 
 msgid "Last Modified"
 msgstr "Zuletzt Geändert"
+
+msgid "You can only see subscriptions from attendees fitting your permissions."
+msgstr "Sie können nur Anmeldung sehen, zu dene Sie berechtigt sind."
 
 msgid "Course Name"
 msgstr "Kursname"
@@ -522,6 +541,17 @@ msgstr "Ihre Änderungen wurden gespeichert"
 
 msgid "Added a new course event"
 msgstr "Eine neue Durchführung wurde hinzugefügt"
+
+msgid "There are no recipients matching the selection"
+msgstr "Keine Empfänger die auf diese Auswahl zutreffen"
+
+#, python-format
+msgid "Successfully sent the e-mail to ${count} recipients"
+msgstr "Email erfolgreich an ${count} Empfänger gesendet"
+
+#, python-format
+msgid "Following emails were unknown: ${mail_list}"
+msgstr "Die folgenden Emails sind unbekannt: ${mail_list}"
 
 msgid "Added a new course"
 msgstr "Ein neuer Kurs wurde hinzugefügt"
@@ -546,13 +576,6 @@ msgstr ""
 #, python-format
 msgid "Event cancelled and ${count} emails sent."
 msgstr "Veranstaltung abgesagt und ${count} Email versendet."
-
-msgid "There are no recipients matching the selection"
-msgstr "Keine Empfänger die auf diese Auswahl zutreffen"
-
-#, python-format
-msgid "Successfully sent the e-mail to ${count} recipients"
-msgstr "Email erfolgreich an ${count} Empfänger gesendet"
 
 msgid "Send E-Mail Now"
 msgstr "Email jetzt senden"
@@ -581,17 +604,67 @@ msgstr "Platzhalter hinzugefügt"
 msgid "Add Placeholder Reservation"
 msgstr "Platzhalter-Reservation hinzufügen"
 
-msgid "Subscription was already made"
-msgstr "Anmeldung wurde bereits getätigt"
-
 msgid "New subscription successfully added"
 msgstr "Neue Anmeldungen erfasst"
 
 msgid "Subscription successfully deleted"
 msgstr "Anmeldung erfolgreich gelöscht"
 
-#~ msgid "Do you really want to cancel this course event ?"
-#~ msgstr "Wollen sie diese Kursdurchführung annulieren?"
+#~ msgid "Dear"
+#~ msgstr "Sehr geehrte(r)"
+
+#~ msgid ""
+#~ "We would like to invite you to subscribe for one of the events for the "
+#~ "course"
+#~ msgstr ""
+#~ "Wir würden Sie gerne einladen, sich für einen zukünftige Durchführungen"
+
+#~ msgid "open events"
+#~ msgstr "offene Veranstaltungen"
+
+#~ msgid "After logging in, you can choose one of the events."
+#~ msgstr ""
+#~ "Nachdem sie sich eingeloggt haben, können sich für eine Durchführung "
+#~ "anmelden."
+
+#~ msgid "Have a nice day!"
+#~ msgstr "Wir wünschen einen angenehmen Tag!"
+
+#~ msgid ""
+#~ "We would like to invite you to take a look at future course events for "
+#~ "the course"
+#~ msgstr ""
+#~ "Wir würden Sie gerne einladen, sich für eine zukünftige Durchführung für "
+#~ "den Kurs"
+
+#~ msgid ""
+#~ "We would like to invite you to take a look at future course events for"
+#~ msgstr ""
+#~ "Wir würden Sie gerne einladen, einen Blick auf die zukünftigen "
+#~ "Durchführungen für"
+
+#~ msgid "Go to the open events"
+#~ msgstr "Gehen sie zu den Durchführungen"
+
+#~ msgid "Course Subscription Invitations"
+#~ msgstr "Course Subscription Invitations"
+
+#~ msgid ""
+#~ "We would like to invite you to take a look at future course event for"
+#~ msgstr ""
+#~ "We would like to invite you to take a look at future course event for"
+
+#~ msgid "Paste a list of email addresses"
+#~ msgstr "Füge eine Liste von E-Mail-Addressen ein"
+
+#~ msgid "Do you want to cancel this course event ?"
+#~ msgstr "Wollen sie diese Kursveranstaltung absagen?"
+
+#~ msgid "This will send an email to all subscribers"
+#~ msgstr "Dies wird eine E-Mail an alle Teilnehmenden senden"
+
+#~ msgid "Subscription was already made"
+#~ msgstr "Anmeldung wurde bereits getätigt"
 
 #~ msgid "The event has successfully been set to canceled"
 #~ msgstr "Die Kursdurchführung wurde erfolgreich auf annuliert gesetzt."
