@@ -148,9 +148,12 @@ def handle_send_notification(self, request, form):
 
     if form.submitted(request):
         recipients = list(form.recipients.data)
+        course = self.course_event
         request = handle_send_email(self, request, recipients,
                                     show_sent_count=True)
-        return request.redirect(request.link(self.course_event))
+        return request.redirect(
+            request.link(course)
+        )
 
     return {
         'layout': layout,
