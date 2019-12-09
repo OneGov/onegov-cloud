@@ -1,7 +1,7 @@
 from onegov.fsi.models import CourseReservation, CourseAttendee
 
 
-def test_reservation_collection(client):
+def test_reservation_collection_view(client):
     view = '/fsi/reservations'
     client.get(view, status=403)
 
@@ -22,14 +22,11 @@ def test_reservation_details(client_with_db):
 
 def test_add_reservation(client):
     view = '/fsi/reservations/add'
-    client.login_member()
+    client.login_editor()
     client.get(view, status=403)
 
-    client.login_editor()
-    client.get(view, status=200)
-
     view = '/fsi/reservations/add-placeholder'
-    client.get(view, status=200)
+    client.get(view, status=403)
 
 
 def test_edit_reservation(client_with_db):
@@ -49,16 +46,15 @@ def test_edit_reservation(client_with_db):
     assert edit.form['attendee_id'].value == str(reservation.attendee_id)
 
 
-def test_delete_reservations(client_with_db):
+def test_create_delete_reservation(client_with_db):
     client = client_with_db
-    session = client.app.session()
-    reservation = session.query(CourseReservation).filter(
-        CourseReservation.attendee_id == None).first()
-
-    view = f'/fsi/reservation/{reservation.id}'
+    view = f'/fsi/reservations/add'
     client.login_admin()
 
-    # csrf protected url must be used
-    client.delete(view, status=403)
-    page = client.get(view + '/edit')
-    page.click('Löschen')
+    new = client.get(view).click('Platzhalter')
+    new.form['dummy_desc'] = 'Safe!'
+    page = new.form.submit().follow()
+    assert 'Safe!' in page
+    page = page.click('Safe!').click('Löschen')
+    page = client.get('/fsi/reservations')
+    assert 'Safe!' not in page

@@ -43,7 +43,7 @@ class CourseEventCollectionLayout(DefaultLayout):
     @cached_property
     def editbar_links(self):
         links = []
-        if self.request.is_manager:
+        if self.request.is_admin:
             links.append(
                 LinkGroup(
                     title=_('Add'),
@@ -120,9 +120,15 @@ class CourseEventLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if not self.request.is_manager:
-            return []
-        links = [
+        attendee_link = Link(
+            _('Attendees'),
+            self.request.link(self.reservation_collection),
+            attrs={'class': 'reservations'}
+        )
+        if self.request.is_editor:
+            return [attendee_link]
+
+        return [
             LinkGroup(
                 title=_('Add'),
                 links=(
@@ -157,11 +163,7 @@ class CourseEventLayout(DefaultLayout):
                     ),
                 )
             ),
-            Link(
-                _('Attendees'),
-                self.request.link(self.reservation_collection),
-                attrs={'class': 'reservations'}
-            ),
+            attendee_link,
             Link(
                 _('Edit'),
                 self.request.link(self.model, name='edit'),
@@ -201,31 +203,6 @@ class CourseEventLayout(DefaultLayout):
                 ),
             )),
         ]
-        if not self.model.is_past:
-            links.append(
-                Link(
-                    _('Cancel Event'),
-                    self.csrf_protected_url(
-                        self.request.link(self.model, name='cancel')
-                    ),
-                    attrs={'class': 'cancel-icon'},
-                    traits=(
-                        Confirm(
-                            _("Do you want to cancel this course event ?"),
-                            _("This will send an email to all subscribers"),
-                            _("Cancel course event"),
-                            _("Cancel")
-                        ),
-                        Intercooler(
-                            request_method='POST',
-                            redirect_after=self.request.link(
-                                self.course_collection
-                            )
-                        )
-                    )
-                ),
-            )
-        return links
 
     @cached_property
     def intercooler_btn(self):

@@ -1,4 +1,4 @@
-from onegov.core.security import Personal, Private, Secret
+from onegov.core.security import Personal, Secret
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.forms.reservation import AddFsiReservationForm, \
@@ -7,7 +7,6 @@ from onegov.fsi.layouts.reservation import ReservationLayout, \
     ReservationCollectionLayout
 from onegov.fsi.models import CourseReservation
 from onegov.fsi import _
-from onegov.fsi.views.notifcations import handle_send_email
 
 
 @FsiApp.html(
@@ -28,7 +27,7 @@ def view_reservations(self, request):
     template='form.pt',
     name='add',
     form=AddFsiReservationForm,
-    permission=Private
+    permission=Secret
 )
 def view_add_reservation(self, request, form):
     layout = ReservationCollectionLayout(self, request)
@@ -84,7 +83,7 @@ def view_edit_reservation(self, request, form):
     template='form.pt',
     name='add-placeholder',
     form=AddFsiReservationForm,
-    permission=Private
+    permission=Secret
 )
 def view_add_reservation_placeholder(self, request, form):
     layout = ReservationCollectionLayout(self, request)
@@ -111,28 +110,14 @@ def view_add_reservation_placeholder(self, request, form):
     model=ReservationCollection,
     request_method='POST',
     name='add-from-course-event',
-    permission=Personal
+    permission=Secret
 )
 def view_add_from_course_event(self, request):
     request.assert_valid_csrf_token()
-    data = dict(
+    self.add(
         attendee_id=self.attendee_id or request.attendee_id,
-        course_event_id=self.course_event_id
-    )
-    exists = self.session.query(self.model_class).filter_by(**data).first()
-    if exists:
-        request.warn(_('Subscription was already made'))
-    else:
-        self.add(**data)
-
-        handle_send_email(
-            self.course_event.reservation_template,
-            request,
-            (self.attendee_id,),
-            cc_to_sender=False
-        )
-
-        request.success(_('New subscription successfully added'))
+        course_event_id=self.course_event_id)
+    request.success(_('New subscription successfully added'))
 
 
 @FsiApp.html(
@@ -149,7 +134,7 @@ def view_delete_reservation(self, request):
 @FsiApp.html(
     model=CourseReservation,
     request_method='POST',
-    permission=Private,
+    permission=Secret,
     name='toggle-confirm'
 )
 def view_toggle_confirm_reservation(self, request):

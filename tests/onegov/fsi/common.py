@@ -47,12 +47,12 @@ def editor_factory(session):
     editor = session.query(User).filter_by(
         username='editor@example.org').first()
     if not editor:
-        admin = User(
+        editor = User(
             username='editor@example.org',
             password_hash=hashed_password,
             role='editor'
         )
-        session.add(admin)
+        session.add(editor)
         session.flush()
     return editor
 

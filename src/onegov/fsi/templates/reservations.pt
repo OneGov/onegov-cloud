@@ -7,7 +7,10 @@
             <div class="columns small-12">
                 <div class="row">
                     <div class="columns small-12">
-                        <strong tal:condition="not: reservations" i18n:translate="">No entries found</strong>
+
+                        <p tal:condition="not: reservations"><strong i18n:translate="">No entries found</strong></p>
+                        <p tal:condition="request.is_editor" i18n:translate="">You can only see subscriptions from attendees fitting your permissions.</p>
+
                         <tal:b tal:condition="reservations|nothing">
                                 <table class="subscription-table fullwidth">
                                     <thead>
@@ -17,7 +20,7 @@
                                         <th i18n:translate="">Course Status</th>
                                         <th i18n:translate="">Course attended</th>
                                         <th i18n:translate="">Last info mail</th>
-                                        <th i18n:translate="" class="no-print">Manage</th>
+                                        <th tal:condition="request.is_admin" i18n:translate="" class="no-print">Manage</th>
                                     </thead>
                                     <tbody>
                                         <tal:b tal:repeat="reservation reservations">
@@ -33,19 +36,17 @@
 
 
                                                 <td tal:define="sent reservation.info_sent">${layout.format_date(sent, 'date') if sent else ''}</td>
-                                                <td class="no-print">
-                                                    <tal:b tal:switch="reservation.course_event.is_past" tal:condition="request.is_admin">
-                                                        <metal:b tal:case="False" tal:define="item reservation" use-macro="layout.macros['intercooler_btn_for_item']"/>
-                                                        <button tal:case="True" class="button tiny secondary disabled archived" i18n:translate="">Delete</button>
-                                                    </tal:b>
-                                                    <a tal:condition="request.is_manager and reservation.is_placeholder or request.is_admin" href="${request.link(reservation, name='edit')}" class="button tiny secondary" i18n:translate="">Edit</a>
+                                                <td tal:condition="request.is_admin" class="no-print">
+                                                    <!--?  Delete Button -->
+                                                    <metal:b tal:condition="not: reservation.course_event.is_past" tal:define="item reservation" use-macro="layout.macros['intercooler_btn_for_item']"/>
+                                                    <a href="${request.link(reservation, name='edit')}" class="button tiny secondary" i18n:translate="">Edit</a>
 
                                                 </td>
                                             </tr>
                                         </tal:b>
                                     </tbody>
                                 </table>
-                                <tal:b tal:condition="request.is_manager and layout.course_event and not layout.course_event.is_past">
+                                <tal:b tal:condition="request.is_admin and layout.course_event and not layout.course_event.is_past">
                                     <a href="${layout.preview_info_mail_url}" class="button success no-print" i18n:translate="">Send Info Mail</a>
                                 </tal:b>
                         </tal:b>

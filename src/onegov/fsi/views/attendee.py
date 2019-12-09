@@ -48,6 +48,7 @@ def view_edit_course_attendee(self, request, form):
     layout = CourseAttendeeLayout(self, request)
 
     if form.submitted(request):
+
         form.update_model(self)
 
         request.success(_("Your changes were saved"))

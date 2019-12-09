@@ -2,7 +2,7 @@ import uuid
 
 from arrow import utcnow
 from onegov.core.html import html_to_text
-from onegov.core.security import Secret, Private
+from onegov.core.security import Secret
 from onegov.core.templates import render_template
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.notification_template import \
@@ -122,7 +122,7 @@ def view_edit_notification(self, request, form):
 @FsiApp.html(
     model=CourseNotificationTemplate,
     template='mail_notification.pt',
-    permission=Private,
+    permission=Secret,
     name='embed')
 def view_email_preview(self, request):
 
@@ -138,7 +138,7 @@ def view_email_preview(self, request):
 
 @FsiApp.form(
     model=CourseNotificationTemplate,
-    permission=Private,
+    permission=Secret,
     template='notification_template_send_form.pt',
     name='send',
     form=NotificationTemplateSendForm)
