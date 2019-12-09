@@ -13,7 +13,9 @@ from onegov.fsi import _
 
 class MailLayout(OrgDefaultMailLayout, FormatMixin):
 
-    """Layout for emails expecting the model to be a reservation object."""
+    """Layout for emails expecting the model to be a reservation object.
+    Takes in a notification template linked to a course_event.
+    """
 
     @cached_property
     def title(self):
@@ -84,15 +86,6 @@ class MailLayout(OrgDefaultMailLayout, FormatMixin):
     def notification_type(self):
         return self.model.type
 
-    def template_variables(self):
-        return dict(
-            event_start=self.event_start,
-            event_end=self.event_end,
-            event_date=self.event_date,
-            course_name=self.course_name,
-            event_url=self.event_url,
-            course_url=self.course_url
-        )
 
 
 class NotificationTemplateCollectionLayout(DefaultLayout):
