@@ -123,7 +123,7 @@
 </metal:course>
 
 <metal:course_event_listing define-macro="course_event_listing">
-    <tal:b tal:switch="events and True or False">
+    <tal:b tal:switch="events and True or False" tal:define="for_email for_email|False">
         <tal:b tal:case="True">
             <tal:b tal:condition="events">
                 <table class="tablesaw hover events-table">
@@ -134,7 +134,7 @@
                         <th i18n:translate="">Presenter</th>
                         <th i18n:translate="">Presenter Company</th>
                         <th i18n:translate="">Free Space</th>
-                        <th tal:condition="request.is_manager" i18n:translate>Hidden</th>
+                        <th tal:condition="not for_email and request.is_manager" i18n:translate>Hidden</th>
                     </thead>
                     <tbody>
                         <tal:b tal:repeat="event events">
@@ -149,7 +149,7 @@
                                 <td>${event.presenter_name}</td>
                                 <td>${event.presenter_company}</td>
                                 <td>${event.available_seats}</td>
-                                <tal:b tal:condition="request.is_manager" tal:switch="event.hidden_from_public">
+                                <tal:b tal:condition="request.is_manager and not for_email" tal:switch="event.hidden_from_public">
                                     <td tal:case="True" i18n:translate>Yes</td>
                                     <td tal:case="False" i18n:translate>No</td>
                                 </tal:b>

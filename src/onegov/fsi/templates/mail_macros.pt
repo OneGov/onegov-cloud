@@ -8,7 +8,7 @@
 <body>
 
 <metal:email_header define-macro="email_header">
-    <p tal:condition="attendee|nothing" i18n:translate="">Dear ${attendee.first_name} ${attendee.last_name}, </p>
+    <p tal:condition="attendee|nothing" i18n:translate>Dear ${attendee.first_name} ${attendee.last_name}, </p>
     <p tal:condition="not: attendee|False" i18n:translate="">Dear [first_name] [last_name], </p>
     <br>
     <tal:b tal:switch="layout.notification_type">
@@ -49,11 +49,11 @@
             </p>
         </tal:b>
         <tal:b tal:case="'invitation'">
-            <p>We would like to invite you to subscribe for one of the events for the course ${layout.model.name}.</p>
+            <p i18n:translate="">We would like to invite you to subscribe for one of the events for the course ${layout.model.name}.</p>
             <p i18n:translate="">You can find the list of future events below.</p><br>
             <tal:b metal:use-macro="layout.default_macros['course_details']" tal:define="model layout.model"/>
             <h3 i18n:translate="">Events</h3>
-            <tal:b metal:use-macro="layout.default_macros['course_event_listing']" tal:define="events layout.model.future_events"/>
+            <tal:b metal:use-macro="layout.default_macros['course_event_listing']" tal:define="events layout.model.future_events; for_email True"/>
 
 
         </tal:b>
