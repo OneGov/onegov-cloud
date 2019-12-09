@@ -7,13 +7,10 @@
             <div class="columns small-12">
                 <div class="row">
                     <div class="columns small-12">
-                        <tal:b tal:condition="model|nothing" tal:define="events model.events.all()">
-                            <h3 i18n:translate="">Description:</h3>
-                            <div class="page-text">
-                                <p tal:content="structure model.description_html"></p>
-                            </div>
+                        <tal:b tal:condition="model|nothing" tal:define="events model.future_events.all()">
+                            <metal:b use-macro="layout.macros['course_details']" />
                             <h3 i18n:translate="">Events</h3>
-                            <tal:b metal:use-macro="layout.macros['course_event_listing']" />
+                            <tal:b metal:use-macro="layout.macros['course_event_listing']"/>
                         </tal:b>
                     </div>
                 </div>
