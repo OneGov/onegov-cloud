@@ -181,10 +181,6 @@ class CourseEvent(Base, TimestampMixin):
     def duplicate(self):
         return self.__class__(**self.duplicate_dict)
 
-    def send_reminder_mail(self):
-        # use self.attendees to get a list of emails
-        raise NotImplementedError
-
     def has_reservation(self, attendee_id):
         return self.reservations.filter_by(
             attendee_id=attendee_id).count() != 0
