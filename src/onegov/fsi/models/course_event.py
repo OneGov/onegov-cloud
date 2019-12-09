@@ -124,7 +124,7 @@ class CourseEvent(Base, TimestampMixin):
 
     @hybrid_property
     def scheduled_reminder(self):
-        return self.start - self.schedule_reminder_before
+        return self.start + self.schedule_reminder_before
 
     @hybrid_property
     def next_event_start(self):
