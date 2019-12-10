@@ -519,7 +519,7 @@ msgid "Last Modified"
 msgstr "Zuletzt Geändert"
 
 msgid "You can only see subscriptions from attendees fitting your permissions."
-msgstr "Sie können nur Anmeldung sehen, zu dene Sie berechtigt sind."
+msgstr "Sie können nur Anmeldung sehen, zu denen Sie berechtigt sind."
 
 msgid "Course Name"
 msgstr "Kursname"
