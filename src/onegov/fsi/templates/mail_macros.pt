@@ -54,6 +54,7 @@
             <tal:b metal:use-macro="layout.default_macros['course_details']" tal:define="model layout.model"/>
             <h3 i18n:translate="">Events</h3>
             <tal:b metal:use-macro="layout.default_macros['course_event_listing']" tal:define="events layout.model.future_events; for_email True"/>
+            <br>
 
 
         </tal:b>
@@ -68,7 +69,6 @@
         </tal:b>
     </tal:b>
     <br>
-    <p i18n:translate="">Your course management team.</p>
 </metal:email_footer>
 
 
