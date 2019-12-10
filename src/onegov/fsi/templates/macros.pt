@@ -128,12 +128,12 @@
             <tal:b tal:condition="events">
                 <table class="tablesaw hover events-table">
                     <thead>
-                        <th i18n:translate="">Date</th>
-                        <th i18n:translate="">Start</th>
-                        <th i18n:translate="">End</th>
-                        <th i18n:translate="">Presenter</th>
-                        <th i18n:translate="" tal:condition="not for_email">Presenter Company</th>
-                        <th i18n:translate="">Free Space</th>
+                        <th i18n:translate class='text-left'>Date</th>
+                        <th i18n:translate class='text-left'>Start</th>
+                        <th i18n:translate class='text-left'>End</th>
+                        <th i18n:translate class='text-left'>Presenter</th>
+                        <th i18n:translate class='text-left' tal:condition="not for_email">Presenter Company</th>
+                        <th i18n:translate class='text-left'>Free Space</th>
                         <th tal:condition="not for_email and request.is_manager" i18n:translate>Hidden</th>
                     </thead>
                     <tbody>
