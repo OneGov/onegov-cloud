@@ -528,7 +528,7 @@ msgid "Course Status"
 msgstr "Kursstatus"
 
 msgid "Course attended"
-msgstr "Am Kurs teilgenommen"
+msgstr "Teilgenommen"
 
 msgid "Last info mail"
 msgstr "Letztes Info-Mail"
