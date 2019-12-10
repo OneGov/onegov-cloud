@@ -14,6 +14,13 @@ NOTIFICATION_TYPE_TRANSLATIONS = (
     _('Event Reminder'), _('Cancellation Confirmation')
 )
 
+# The defaults for the title are in german, otherwise adapt database
+SUBJECT_DEFAULTS = dict(
+    info='Info E-Mail Kursveranstaltung',
+    reservation='Anmeldungsbestätigung',
+    reminder='Erinnerung Kursdurchführung',
+    cancellation='Absage Kursveranstaltung'
+)
 
 # for forms...
 def template_type_choices():
@@ -24,7 +31,7 @@ def template_type_choices():
 
 def template_name(context, type=None):
     t = type or context.get_current_parameters()['type']
-    return NOTIFICATION_TYPE_TRANSLATIONS[NOTIFICATION_TYPES.index(t)]
+    return SUBJECT_DEFAULTS[t]
 
 
 class CourseInvitationTemplate:
@@ -42,7 +49,6 @@ class CourseInvitationTemplate:
 
 
 class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
-
 
     __tablename__ = 'fsi_notification_templates'
 
