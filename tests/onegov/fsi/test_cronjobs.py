@@ -1,31 +1,19 @@
-import pytest
-import transaction
-# from webtest import TestApp as Client
-from onegov.fsi.collections.reservation import ReservationCollection
-from onegov.fsi.models.course_notification_template import \
-    CourseNotificationTemplate
-from tests.onegov.org.common import get_cronjob_by_name
+from onegov.fsi.collections.course_event import CourseEventCollection
+
+from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
 
 
-@pytest.mark.skip('Causses infinite recusrion upon rendering template')
-def test_send_reminder_mails(
-        fsi_app, smtp, future_course_reservation):
+def test_send_reminder_mails(client_with_db, smtp):
+    app = client_with_db.app
+    session = app.session()
+    events = CourseEventCollection(session).get_past_reminder_date()
+    # empty and future course event, future contains two reservations
+    assert events.count() == 2
 
-    session = fsi_app.session()
-    reservation, data = future_course_reservation(session)
-    reservation.course_event.template = CourseNotificationTemplate(
-        subject='S',
-        text='T')
-
-    transaction.commit()
-    reservations = ReservationCollection(session).for_reminder_mails()
-    assert reservations.count() == 1
-
-    # client = Client(fsi_app)
-    job = get_cronjob_by_name(fsi_app, 'send_reminder_mails')
-    job.app = fsi_app
-
+    job = get_cronjob_by_name(app, 'send_reminder_mails')
+    job.app = app
     assert len(smtp.outbox) == 0
-    # url = get_cronjob_url(job)
-    # resp = client.get(url)
-    assert len(smtp.outbox) == 1
+    url = get_cronjob_url(job)
+    client_with_db.get(url)
+    # planner_future_res and attendee_future_res
+    assert len(smtp.outbox) == 2

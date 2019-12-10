@@ -35,7 +35,7 @@
                                                 </td>
 
 
-                                                <td tal:define="sent reservation.info_sent">${layout.format_date(sent, 'date') if sent else ''}</td>
+                                                <td tal:define="sent reservation.course_event.info_template.last_sent">${layout.format_date(sent, 'date') if sent else ''}</td>
                                                 <td tal:condition="request.is_admin" class="no-print">
                                                     <!--?  Delete Button -->
                                                     <metal:b tal:condition="not: reservation.course_event.is_past" tal:define="item reservation" use-macro="layout.macros['intercooler_btn_for_item']"/>

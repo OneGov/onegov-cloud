@@ -3,7 +3,7 @@ import re
 
 from collections import OrderedDict
 from datetime import timedelta
-from onegov.core.utils import linkify
+from onegov.core.utils import linkify, _email_regex
 from onegov.form import Form
 from onegov.form.fields import HtmlField
 from onegov.fsi import _
@@ -156,6 +156,10 @@ class CourseForm(Form):
 class InviteCourseForm(Form):
     attendees = TextAreaField(
         label=_('Attendees'),
-        description=_('Paste a list of email addresses'),
+        description=_('Paste a list of email addresses.'),
         render_kw={'rows': 20},
     )
+
+    def get_useful_data(self, exclude={'csrf_token'}):
+        string = self.attendees.data
+        return tuple(t[0] for t in _email_regex.findall(string))

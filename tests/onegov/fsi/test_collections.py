@@ -74,23 +74,6 @@ def test_attendee_collection(session, attendee):
     assert collection.query().count() == 1
 
 
-def test_reservation_collection_1(session, future_course_reservation):
-    future_course_reservation(session)
-    soon = utcnow() + datetime.timedelta(seconds=60)
-    reservations = ReservationCollection(session)
-    res = reservations.for_reminder_mails().first()
-    assert res
-    course_event = res.course_event
-    assert course_event.start - course_event.schedule_reminder_before < soon
-
-    # Change the reminder before value
-    course_event.schedule_reminder_before = datetime.timedelta(days=4)
-    session.flush()
-
-    assert course_event.start - course_event.schedule_reminder_before > soon
-    assert reservations.for_reminder_mails().count() == 0
-
-
 def test_reservation_collection_query(
         session, attendee, planner, planner_editor, course_event,
         future_course_reservation, external_attendee):

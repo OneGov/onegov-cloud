@@ -1,39 +1,40 @@
 from sedate import utcnow
 
 from onegov.core.templates import render_template
-from onegov.fsi.collections.reservation import ReservationCollection
-from onegov.fsi import _
+from onegov.fsi.collections.course_event import CourseEventCollection
+from onegov.fsi import _, FsiApp
 from onegov.fsi.layouts.notification import MailLayout
-from onegov.fsi.models.course_notification_template import \
-    CourseNotificationTemplate
 
 
 def send_scheduled_reminders(request):
-    reservations = ReservationCollection(request.session).for_reminder_mails()
 
-    for res in reservations:
-        assert res.course_event.template
-        template = request.session.query(
-            CourseNotificationTemplate).filter_by(
-            course_event_id=res.course_event.id).one()
-        title = _('Reminder for course: ${name}',
-                  mapping={'name': res.course.name})
-        content = render_template(
-            'mail_layout.pt', request,
-            {
-                'layout': MailLayout(res, request),
+    events = CourseEventCollection(request.session).get_past_reminder_date()
+
+    for course_event in events:
+        if not course_event.attendees.count():
+            continue
+        template = course_event.reminder_template
+
+        if not template or template.last_sent:
+            continue
+
+        title = _('Reminder for course event: ${name}',
+                  mapping={'name': course_event.course.name})
+        for attendee in course_event.attendees:
+            content = render_template('mail_notification.pt', request, {
+                'layout': MailLayout(template, request),
                 'title': title,
-                'notification': template.text
+                'notification': template.text_html,
+                'attendee': attendee
             })
-        mail = res.attendee.email
-        request.app.send_marketing_email(
-            receivers=(mail, ),
-            subject=template.subject,
-            content=content
-        )
-        res.reminder_sent = utcnow()
+            request.app.send_marketing_email(
+                receivers=(attendee.email, ),
+                subject=template.subject,
+                content=content
+            )
+        template.last_sent = utcnow()
 
 
-# @FsiApp.cronjob(hour=8, minute=30, timezone='Europe/Zurich')
-# def send_reminder_mails(request):
-#     send_scheduled_reminders(request)
+@FsiApp.cronjob(hour=8, minute=30, timezone='Europe/Zurich')
+def send_reminder_mails(request):
+    send_scheduled_reminders(request)

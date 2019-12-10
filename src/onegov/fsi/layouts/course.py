@@ -7,6 +7,33 @@ from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
 from onegov.org.elements import LinkGroup
 
+from onegov.org.layout import DefaultMailLayout as OrgDefaultMailLayout
+
+
+class CourseInviteMailLayout(OrgDefaultMailLayout):
+    """Takes a course as its model, not a notification template """
+
+    @cached_property
+    def event_collection(self):
+        return CourseEventCollection(
+            self.request.session, course_id=self.model.id, upcoming_only=True)
+
+    @cached_property
+    def default_macros(self):
+        return self.template_loader.macros
+
+    @cached_property
+    def event_collection_url(self):
+        return self.request.link(self.event_collection)
+
+    @cached_property
+    def course_url(self):
+        return self.request.link(self.model)
+
+    @property
+    def notification_type(self):
+        return 'invitation'
+
 
 class CourseCollectionLayout(DefaultLayout):
     @cached_property

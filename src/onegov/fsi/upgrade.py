@@ -4,6 +4,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 from sqlalchemy import Column, ARRAY, Text
 
+from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task
 
 
@@ -43,3 +44,22 @@ def make_notification_text_null(context):
     if context.has_column('fsi_notification_templates', 'text'):
         context.operations.alter_column(
             'fsi_notification_templates', 'text', nullable=True)
+
+
+@upgrade_task('Adds last sent to notification template')
+def add_last_sent_to_notifaction_templates(context):
+    if not context.has_column('fsi_notification_templates', 'last_sent'):
+        context.operations.add_column(
+            'fsi_notification_templates',
+            Column('last_sent', UTCDateTime)
+        )
+
+
+@upgrade_task('Remove sent col in reservation')
+def remove_reservation_email_ts(context):
+    cols = 'invitation_sent', 'reminder_sent', 'cancellation_sent', 'info_sent'
+
+    for col in cols:
+
+        if context.has_column('fsi_reservations', col):
+            context.operations.drop_column('fsi_reservations', col)

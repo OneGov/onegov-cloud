@@ -1,7 +1,7 @@
 from uuid import uuid4
 from sqlalchemy import Column, ForeignKey, Boolean, Table, Text
 from onegov.core.orm import Base
-from onegov.core.orm.types import UUID, UTCDateTime
+from onegov.core.orm.types import UUID
 table_name = 'fsi_reservations'
 
 reservation_table = Table(
@@ -15,11 +15,6 @@ reservation_table = Table(
     Column('event_completed', Boolean, default=False, nullable=False),
     Column('dummy_desc', Text),
 
-    # Fields for the NotificationTemplate.NOTIFICATION_TYPES
-    Column('invitation_sent', UTCDateTime),
-    Column('reminder_sent', UTCDateTime),
-    Column('cancellation_sent', UTCDateTime),
-    Column('info_sent', UTCDateTime)
 )
 
 

@@ -7,6 +7,7 @@ from onegov.fsi.layouts.course_event import EditCourseEventLayout, \
     DuplicateCourseEventLayout, AddCourseEventLayout, \
     CourseEventCollectionLayout, CourseEventLayout
 from onegov.fsi.models.course_event import CourseEvent
+from onegov.fsi.views.notifcations import handle_send_email
 
 
 @FsiApp.html(
@@ -124,3 +125,28 @@ def delete_course_event(self, request):
     else:
         request.warning(_(
             'This event has registrations and can not be deleted'))
+
+
+@FsiApp.view(
+    model=CourseEvent,
+    request_method='POST',
+    permission=Secret,
+    name='cancel'
+)
+def cancel_course_event(self, request):
+
+    request.assert_valid_csrf_token()
+    self.status = 'canceled'
+
+    recipients = [a.id for a in self.attendees]
+
+    if recipients:
+        request = handle_send_email(
+            self.cancellation_template,
+            request,
+            recipients,
+            cc_to_sender=True,
+            show_sent_count=True
+        )
+    else:
+        request.warn('No recipients and no cancellation emails sent')

@@ -124,7 +124,7 @@ class CourseEvent(Base, TimestampMixin):
 
     @hybrid_property
     def scheduled_reminder(self):
-        return self.start - self.schedule_reminder_before
+        return self.start + self.schedule_reminder_before
 
     @hybrid_property
     def next_event_start(self):
@@ -151,6 +151,8 @@ class CourseEvent(Base, TimestampMixin):
 
     @property
     def booked(self):
+        if not self.max_attendees:
+            return False
         return self.max_attendees <= self.reservations.count()
 
     @property
@@ -178,10 +180,6 @@ class CourseEvent(Base, TimestampMixin):
     @property
     def duplicate(self):
         return self.__class__(**self.duplicate_dict)
-
-    def send_reminder_mail(self):
-        # use self.attendees to get a list of emails
-        raise NotImplementedError
 
     def has_reservation(self, attendee_id):
         return self.reservations.filter_by(

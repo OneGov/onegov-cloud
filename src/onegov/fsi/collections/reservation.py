@@ -1,8 +1,3 @@
-from datetime import timedelta
-
-from sedate import utcnow
-from sqlalchemy import and_
-
 from onegov.core.collection import GenericCollection
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.models.course_attendee import CourseAttendee
@@ -46,15 +41,6 @@ class ReservationCollection(GenericCollection):
     def attendee_collection(self):
         return CourseAttendeeCollection(
             self.session, external_only=self.external_only)
-
-    def for_reminder_mails(self):
-        soon = utcnow() + timedelta(seconds=60)
-        conditions = and_(
-            CourseReservation.attendee_id != None,
-            CourseReservation.reminder_sent == None,
-            CourseEvent.scheduled_reminder <= soon
-        )
-        return self.query().join(CourseEvent).filter(conditions)
 
     def query(self):
         query = super().query()

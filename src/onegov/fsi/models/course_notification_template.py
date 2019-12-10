@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
-from onegov.core.orm.types import UUID
+from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.fsi import _
 
 NOTIFICATION_TYPES = ('info', 'reservation', 'reminder', 'cancellation')
@@ -25,6 +25,14 @@ def template_type_choices():
 def template_name(context, type=None):
     t = type or context.get_current_parameters()['type']
     return NOTIFICATION_TYPE_TRANSLATIONS[NOTIFICATION_TYPES.index(t)]
+
+
+class CourseInvitationTemplate:
+
+    subject = _('Course Subscription Invitation')
+    text = None
+    text_html = None
+    type = 'invitation'
 
 
 class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
@@ -67,6 +75,9 @@ class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
 
     #: The body text injected in plaintext (not html)
     text = Column(Text)
+
+    # when email based on template was sent last time
+    last_sent = Column(UTCDateTime)
 
     def duplicate(self):
         return self.__class__(

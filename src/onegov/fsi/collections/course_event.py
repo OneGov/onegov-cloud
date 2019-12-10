@@ -81,14 +81,18 @@ class CourseEventCollection(GenericCollection, Pagination):
         )
 
     @classmethod
-    def latest(cls, session):
-        return cls(session, upcoming_only=True, limit=5)
+    def latest(cls, session, limit=5):
+        return cls(session, upcoming_only=True, limit=limit)
 
     def next_event(self):
         return self.query().filter(
             self.model_class.start > utcnow()).order_by(
             self.model_class.start
         ).first()
+
+    def get_past_reminder_date(self):
+        return super().query().filter(
+            self.model_class.scheduled_reminder > utcnow())
 
     def add(self, **kwargs):
         course_event = super().add(**kwargs)
