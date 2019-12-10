@@ -29,6 +29,12 @@ def template_name(context, type=None):
 
 class CourseInvitationTemplate:
 
+    """
+    This is cind of a dummy db model for using as the template for
+    CourseInviteMailLayout. If needed, this can be replaced with
+    a real model without changing too much code.
+    """
+
     subject = _('Course Subscription Invitation')
     text = None
     text_html = None
@@ -37,11 +43,6 @@ class CourseInvitationTemplate:
 
 class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
 
-    """
-    For course event reservations, there are different types of emails.
-    Each of the types have an sent property on the reservation table.
-
-    """
 
     __tablename__ = 'fsi_notification_templates'
 
