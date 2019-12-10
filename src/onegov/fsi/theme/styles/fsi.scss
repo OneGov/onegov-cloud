@@ -97,6 +97,10 @@ dd.accordion-navigation + dd.accordion-navigation {
 */
 @media print {
 
+    .print-checked::before { @include icon('\f046'); }
+
+    .print-unchecked::before { @include icon('\f096'); }
+
     .breadcrumbs {
         display: none;
     }

@@ -62,9 +62,9 @@
     </tal:b>
 </metal:email_recipients>
 
-<metal:confirmation_slider define-macro="confirmation_slider">
-    <div tal:condition="not: reservation.is_placeholder" class="switch round tiny confirmation-switch">
-        <input id="${switch_id}" type="checkbox" tal:attributes="disabled python:not reservation.course_event.is_past or not request.is_admin; checked python:reservation.event_completed; ic-post-to url|nothing">
+<metal:confirmation_slider define-macro="confirmation_slider" tal:define="completed reservation.event_completed">
+    <div tal:condition="not: reservation.is_placeholder" tal:attributes="class python: 'switch round tiny confirmation-switch' + (' print-checked' if completed else ' print-unchecked')">
+        <input id="${switch_id}" type="checkbox" tal:attributes="disabled python:not reservation.course_event.is_past or not request.is_admin; checked completed; ic-post-to url|nothing">
         <label for="${switch_id}"></label>
     </div>
 </metal:confirmation_slider>
