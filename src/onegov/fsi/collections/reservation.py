@@ -44,10 +44,10 @@ class ReservationCollection(GenericCollection):
 
     def query(self):
         query = super().query()
-        query = query.join(CourseAttendee).order_by(
-            CourseAttendee.last_name,
-            CourseAttendee.first_name,
-        )
+        # query = query.join(CourseAttendee).order_by(
+        #     CourseAttendee.last_name,
+        #     CourseAttendee.first_name,
+        # )
 
         if self.user_role == 'editor':
             query = query.filter(
