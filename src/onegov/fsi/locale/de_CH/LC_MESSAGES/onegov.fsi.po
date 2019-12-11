@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-12-09 14:56+0100\n"
-"PO-Revision-Date: 2019-12-09 14:53+0100\n"
+"POT-Creation-Date: 2019-12-10 13:57+0100\n"
+"PO-Revision-Date: 2019-12-10 13:57+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -14,8 +14,8 @@ msgstr ""
 "X-Generator: Poedit 2.2.4\n"
 
 #, python-format
-msgid "Reminder for course: ${name}"
-msgstr "Erinnerung für Kurs: ${name}"
+msgid "Reminder for course event: ${name}"
+msgstr "Erinnerung für Kursveranstaltung: ${name}"
 
 msgid "Profile"
 msgstr "Profile"
@@ -300,8 +300,8 @@ msgid "Add Placeholder"
 msgstr "Platzhalter hinzufügen"
 
 #, python-format
-msgid "Attendees Event ${event}"
-msgstr "Teilnehmer Durchführung ${event}"
+msgid "Attendees Event ${event} - ${date}"
+msgstr "Teilnehmer ${event} - ${date}"
 
 msgid "My Event Subscriptions"
 msgstr "Meine Kursanmeldungen"
@@ -440,7 +440,7 @@ msgid "Remaining seats"
 msgstr "Verbleibende Plätze"
 
 msgid "Description:"
-msgstr "Beschreibung"
+msgstr "Beschreibung:"
 
 msgid "Yes"
 msgstr "Ja"
@@ -494,9 +494,6 @@ msgstr "Untenstehend finden Sie eine Liste der zukünftigen Durchführungen."
 msgid "Event Details"
 msgstr "Details Durchführung"
 
-msgid "Your course management team."
-msgstr "Ihr Kursverwaltungteam"
-
 msgid ""
 "Clicking \"Send\" will send the e-mail below to all selected recipients. You "
 "will receive a copy of the e-mail if you are not already on the recipients "
@@ -507,7 +504,7 @@ msgstr ""
 "erhalten, falls sie noch nicht in der Empfängerliste sind."
 
 msgid "There are subscriptions for this course event."
-msgstr "Für diese Durchführung existieren Anmeldungen"
+msgstr "Für diese Durchführung existieren Anmeldungen."
 
 msgid "Mail Subject"
 msgstr "Email Betreff"
@@ -519,7 +516,10 @@ msgid "Last Modified"
 msgstr "Zuletzt Geändert"
 
 msgid "You can only see subscriptions from attendees fitting your permissions."
-msgstr "Sie können nur Anmeldung sehen, zu dene Sie berechtigt sind."
+msgstr "Sie können nur Anmeldung sehen, zu denen Sie berechtigt sind."
+
+msgid "Shortcode"
+msgstr "Kürzel"
 
 msgid "Course Name"
 msgstr "Kursname"
@@ -528,7 +528,7 @@ msgid "Course Status"
 msgstr "Kursstatus"
 
 msgid "Course attended"
-msgstr "Am Kurs teilgenommen"
+msgstr "Teilgenommen"
 
 msgid "Last info mail"
 msgstr "Letztes Info-Mail"
@@ -567,15 +567,11 @@ msgstr "Kurs erfolgreich gelöscht"
 
 msgid "This course has events and can not be deleted"
 msgstr ""
-"Dieser Kurs besitzt bereits Durchführungen und kann nicht gelöscht werden."
+"Dieser Kurs besitzt bereits Durchführungen und kann nicht gelöscht werden"
 
 msgid "This event has registrations and can not be deleted"
 msgstr ""
 "Diese Durchführung hat bereits Anmeldungen und kann nicht gelöscht werden"
-
-#, python-format
-msgid "Event cancelled and ${count} emails sent."
-msgstr "Veranstaltung abgesagt und ${count} Email versendet."
 
 msgid "Send E-Mail Now"
 msgstr "Email jetzt senden"
@@ -609,6 +605,18 @@ msgstr "Neue Anmeldungen erfasst"
 
 msgid "Subscription successfully deleted"
 msgstr "Anmeldung erfolgreich gelöscht"
+
+#~ msgid "Attendees Event ${event}"
+#~ msgstr "Teilnehmer Durchführung ${event}"
+
+#~ msgid "Reminder for course: ${name}"
+#~ msgstr "Erinnerung für Kurs: ${name}"
+
+#~ msgid "Your course management team."
+#~ msgstr "Ihr Kursverwaltungteam"
+
+#~ msgid "Event cancelled and ${count} emails sent."
+#~ msgstr "Veranstaltung abgesagt und ${count} Email versendet."
 
 #~ msgid "Dear"
 #~ msgstr "Sehr geehrte(r)"

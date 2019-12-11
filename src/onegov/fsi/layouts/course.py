@@ -72,15 +72,9 @@ class CourseCollectionLayout(DefaultLayout):
             dict(
                 title=c.name,
                 content=c.description,
+                # Todo: how to inject html with intercooler?
+                # content_url=self.request.link(c, name='content-json'),
                 url=self.request.link(c),
-                edit_url=self.request.link(c, name='edit'),
-                events_url=self.request.link(
-                    CourseEventCollection(
-                        self.request.session,
-                        course_id=c.id,
-                        upcoming_only=True
-                    )
-                )
             ) for c in self.model.query()
         )
 

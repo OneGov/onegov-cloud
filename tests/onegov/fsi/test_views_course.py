@@ -87,14 +87,7 @@ def test_delete_course_1(client_with_db):
 
     page = client.get(view)
     assert "Dieser Kurs besitzt bereits Durchführungen " \
-           "und kann nicht gelöscht werden." in page
-    # for event in course.events:
-    #     session.delete(event)
-    # session.flush()
-    #
-    # page = client.get(view)
-    # assert "Keine Einträge gefunden" in page
-    # assert not session.query(Course).filter_by(id=course_id).first()
+           "und kann nicht gelöscht werden" in page
 
 
 def test_course_invite(client_with_db):

@@ -97,11 +97,6 @@
         padding: 10px 0;
     }
 
-    .ticket-number {
-        font-family: Consolas, "Liberation Mono", Courier, monospace;
-        font-weight: bold;
-    }
-
     table {
         width: 100% !important;
     }
@@ -163,16 +158,6 @@
         font-weight: bold;
     }
 
-    .fieldset {
-        font-size: 14px;
-        font-weight: normal;
-        Margin-bottom: 10px;
-    }
-
-    .descreet {
-        color: #555;
-    }
-
     ul li, ol li {
         Margin-left: 5px;
         list-style-position: inside;
@@ -199,27 +184,6 @@
         Margin-top: 20px;
     }
 
-    .reservation {
-        border: 1px solid #eee;
-        color: #222;
-        Margin-bottom: 10px;
-        padding: 0;
-    }
-
-    .header {
-        background-color: #eee;
-        padding: 5px 10px;
-    }
-
-    .body {
-        padding: 0 10px;
-    }
-
-    .inline-message {
-        padding: 10px 10px 5px;
-        background-color: #f5f5f5;
-        border-left: 4px solid #ddd;
-    }
 
     .inline-message + br {
         content: "";
@@ -227,25 +191,6 @@
         display: block;
     }
 
-    .message-owner, .message-owner a {
-        font-size: .8rem;
-        color: #666;
-    }
-
-    .message-owner {
-        display: block;
-        position: relative;
-        top: -5px;
-    }
-
-    .previous-message {
-        border-left: 4px solid #ddd;
-    }
-
-    .current-message {
-        Margin-bottom: 10px;
-        border-left: 4px solid <tal:b replace="primary_color" />;
-    }
 
     .inline-message p:last-child {
         Margin-bottom: 5px;
@@ -275,6 +220,11 @@
     .content table {
         width: 100%;
     }
+
+    .text-left {
+        text-align: left;
+    }
+
     </style>
 </head>
 <body bgcolor="#f6f6f6">
