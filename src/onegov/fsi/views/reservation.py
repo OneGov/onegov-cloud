@@ -91,7 +91,7 @@ def view_add_reservation_placeholder(self, request, form):
 
     if form.submitted(request):
         data = form.get_useful_data()
-        default_desc = _('Placeholder Reservation')
+        default_desc = request.translate(_('Placeholder Reservation'))
         desc = data.setdefault('dummy_desc', default_desc)
         if not desc:
             data['dummy_desc'] = default_desc

@@ -20,6 +20,7 @@ def send_scheduled_reminders(request):
 
         title = _('Reminder for course event: ${name}',
                   mapping={'name': course_event.course.name})
+
         for attendee in course_event.attendees:
             content = render_template('mail_notification.pt', request, {
                 'layout': MailLayout(template, request),

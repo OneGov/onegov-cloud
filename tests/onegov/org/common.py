@@ -11,7 +11,7 @@ def get_cronjob_url(cronjob):
     return '/cronjobs/{}'.format(cronjob.id)
 
 
-def get_mail(outbox, index):
+def get_mail(outbox, index, encoding='utf-8'):
     message = outbox[index]
 
     return {
@@ -21,8 +21,8 @@ def get_mail(outbox, index):
         'to': message['To'],
         'text': b64decode(
             ''.join(message.get_payload(0).as_string().splitlines()[3:])
-        ).decode('utf-8'),
+        ).decode(encoding),
         'html': b64decode(
             ''.join(message.get_payload(1).as_string().splitlines()[3:])
-        ).decode('utf-8')
+        ).decode(encoding)
     }

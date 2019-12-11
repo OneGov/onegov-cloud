@@ -3,7 +3,7 @@ from sedate import utcnow
 
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
-from onegov.fsi.models.course_notification_template import template_name
+from onegov.fsi.models.course_notification_template import get_template_default
 from onegov.fsi.models.course_reservation import CourseReservation
 
 
@@ -149,10 +149,8 @@ def test_notification_templates_1(session, course_event):
     assert event.reminder_template
     assert event.cancellation_template
 
-    assert event.info_template.subject == template_name('dummy', type='info')
-    assert event.reservation_template.subject == template_name(
-        'dummy', type='reservation')
-    assert event.reminder_template.subject == template_name(
-        'dummy', type='reminder')
-    assert event.cancellation_template.subject == template_name(
-        'dummy', type='cancellation')
+    func = get_template_default
+    assert event.info_template.subject == func(None, 'info')
+    assert event.reservation_template.subject == func(None, 'reservation')
+    assert event.reminder_template.subject == func(None, 'reminder')
+    assert event.cancellation_template.subject == func(None, 'cancellation')

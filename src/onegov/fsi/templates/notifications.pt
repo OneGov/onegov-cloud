@@ -10,7 +10,6 @@
             <div class="columns small-12">
                 <div class="row">
                     <div class="columns small-12" tal:define="count layout.model.query().count()">
-<!--?                        <tal:b metal:use-macro="layout.macros['accordion']" />-->
                         <tal:b tal:switch="count != 0">
                             <strong tal:case="False">There are no templates set for this course event</strong>
                             <tal:b tal:case="True" tal:define="notifications layout.model.query()">
@@ -23,7 +22,7 @@
                                 <tbody>
                                     <tal:b tal:repeat="notification notifications">
                                         <tr>
-                                            <td><a href="${layout.instance_link(notification)}">${notification.subject}</a></td>
+                                            <td><a href="${layout.instance_link(notification)}">${notification.subject or notification.type}</a></td>
                                             <td>${layout.format_notification_type(notification.type)}</td>
                                             <td>${layout.format_date(notification.modified, 'datetime_long_without_year')}</td>
                                         </tr>

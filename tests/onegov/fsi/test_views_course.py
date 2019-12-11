@@ -33,7 +33,7 @@ def test_add_course_and_invite(client):
 
     message = get_mail(client.app.smtp.outbox, 0)
     assert message['to'] == 'admin@example.org'
-    assert message['subject'] == 'Course Subscription Invitation'
+    assert message['subject'] == '=?utf-8?q?Einladung_f=C3=BCr_Kursanmeldung?='
     text = message['text']
     assert 'New Course' in text
     assert 'Desc' in text

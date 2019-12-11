@@ -25,7 +25,8 @@ def handle_send_email(self, request, recipients, cc_to_sender=True,
     else:
         att = request.current_attendee
         handle_attendees = isinstance(recipients[0], CourseAttendee)
-        if cc_to_sender and att.id not in recipients:
+        att_ref = att if handle_attendees else att.id
+        if cc_to_sender and att_ref not in recipients:
             recipients = list(recipients)
             recipients.append(att if handle_attendees else att.id)
 
@@ -33,7 +34,7 @@ def handle_send_email(self, request, recipients, cc_to_sender=True,
 
         for att_id in recipients:
             if handle_attendees:
-                attendee = att
+                attendee = att_id
             else:
                 attendee = request.session.query(
                     CourseAttendee).filter_by(id=att_id).one()

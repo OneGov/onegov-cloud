@@ -153,7 +153,7 @@ def view_course_event(self, request):
     permission=Personal,
     name='content-json'
 )
-def view_course_event(self, request):
+def get_course_event_content(self, request):
     return self.description_html
 
 
