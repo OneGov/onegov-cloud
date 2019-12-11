@@ -1,8 +1,61 @@
 # Changes
 
+## Release `2019.48`
+
+> commits: **14 / [ead36cf8ec...a823aa4efa](https://github.com/OneGov/onegov-cloud/compare/ead36cf8ec^...a823aa4efa)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.48)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🎉 **Clear dates when duplicating occasions**
+
+Before, a default date was automatically filled. By clearing the dates
+instead we force the user to make a decision, which is what they need to
+do anyways, so this is communicated more clearly this way.
+
+**`Feature`** | **[FER-832](https://issues.seantis.ch/browse/FER-832)** | **[ea41093077](https://github.com/onegov/onegov-cloud/commit/ea4109307782802b03cf12ef9f34a5a38873da80)**
+
+🎉 **Adds a print button to my-bills**
+
+It was always possible to have a print version, but not a lot of users
+knew about it. With a button it is more obvious.
+
+**`Feature`** | **[FER-653](https://issues.seantis.ch/browse/FER-653)** | **[897f773f32](https://github.com/onegov/onegov-cloud/commit/897f773f3207b4e0787da7372ccddda27892461c)**
+
+### Fsi
+
+🎉 **Limits editor capabilities**
+
+- hide links in UI
+- make email sending admin-only
+- hides all attendees editors do not have permission to see
+- hides all reservations editors do not have permissions to see
+
+**`Feature`** | **[2efe80fe51](https://github.com/onegov/onegov-cloud/commit/2efe80fe5127735ec661e46362d0e366f7001070)**
+
+🎉 **Mailing System incl. previews**
+
+completes functionality for email templates subscription confirmation, cancellation, invitation via form and automatic reminders sent via cronjob. Adds "Cancel" Button to cancel a course event.
+
+**`Feature`** | **[9f9fed2126](https://github.com/onegov/onegov-cloud/commit/9f9fed2126038fc7a04c69e827f795110bf35e9a)**
+
+🎉 **UI Improvements**
+
+- auto-resizing of iframe for email preview
+- Hiding cols in reservation table
+- prepare lazy-loading switch for accordions /fsi/courses
+- use fa icons when printing "course attended" column
+
+**`Feature`** | **[91061072b3](https://github.com/onegov/onegov-cloud/commit/91061072b3d2c3c1a7398c13f6a4e62ed128280f)**
+
+🐞 **Fix translation issues**
+
+**`Bugfix`** | **[a823aa4efa](https://github.com/onegov/onegov-cloud/commit/a823aa4efa1be80e28e9325a472fdfb2205e160f)**
+
 ## Release `2019.47`
 
-> commits: **1 / [fa96aac112...fa96aac112](https://github.com/OneGov/onegov-cloud/compare/fa96aac112^...fa96aac112)**<br>
+> released: **2019-12-05 16:02**<br>
+> commits: **2 / [fa96aac112...2ae5915c63](https://github.com/OneGov/onegov-cloud/compare/fa96aac112^...2ae5915c63)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.47)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
