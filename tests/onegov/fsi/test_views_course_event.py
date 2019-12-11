@@ -3,6 +3,7 @@ from datetime import datetime
 from sedate import utcnow
 
 from onegov.fsi.models import CourseEvent
+from tests.onegov.org.common import get_mail
 
 
 def test_course_event_collection(client):
@@ -128,14 +129,14 @@ def test_cancel_course_event(client_with_db):
     page = client.get(view)
     redirect_link = page.pyquery('a.cancel-icon').attr('redirect-after')
     assert redirect_link
-    page = client.get(view).click('Absagen')
+    client.get(view).click('Absagen')
 
     msg = f"Email erfolgreich an {wanted_count + 1} Empfänger gesendet"
     assert msg in client.get(redirect_link)
     assert len(client.app.smtp.outbox) == wanted_count + 1
 
     message = client.app.smtp.outbox.pop()
-    assert message['Subject'] == 'Cancellation Confirmation'
+    assert message['Subject'] == 'Absage Kursveranstaltung'
 
 
 def test_register_for_course_event(client_with_db):
@@ -151,6 +152,6 @@ def test_register_for_course_event(client_with_db):
     assert 'Angemeldet' in page
 
     assert len(client.app.smtp.outbox) == 1
-    message = client.app.smtp.outbox.pop()
-    assert message['To'] == 'member@example.org'
-    assert message['Subject'] == 'Reservation Confirmation'
+    message = get_mail(client.app.smtp.outbox, 0)
+    assert message['to'] == 'member@example.org'
+    assert message['subject'] == 'Anmeldungsbestätigung'

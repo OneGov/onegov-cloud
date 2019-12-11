@@ -1,6 +1,7 @@
 from onegov.fsi.collections.course_event import CourseEventCollection
 
-from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url
+from tests.onegov.org.common import get_cronjob_by_name, get_cronjob_url, \
+    get_mail
 
 
 def test_send_reminder_mails(client_with_db, smtp):
@@ -17,3 +18,7 @@ def test_send_reminder_mails(client_with_db, smtp):
     client_with_db.get(url)
     # planner_future_res and attendee_future_res
     assert len(smtp.outbox) == 2
+
+    message = get_mail(
+        client_with_db.app.smtp.outbox, 0, encoding='iso-8859-1')
+    assert message['subject'] == 'Erinnerung Kursdurchführung'

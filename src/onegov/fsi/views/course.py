@@ -13,7 +13,7 @@ from onegov.fsi.models import CourseAttendee
 
 from onegov.fsi.models.course import Course
 from onegov.fsi.models.course_notification_template import \
-    CourseInvitationTemplate, CourseNotificationTemplate
+    CourseInvitationTemplate, CourseNotificationTemplate, template_name
 from onegov.user import User
 
 
@@ -49,9 +49,11 @@ def handle_send_invitation_email(
                     errors.append(email)
                     continue
 
+            default_subject = template_name(self.type, request)
+
             content = render_template('mail_notification.pt', request, {
                 'layout': mail_layout,
-                'title': self.subject,
+                'title': self.subject or default_subject,
                 'notification': self.text_html,
                 'attendee': attendee,
             })
@@ -59,7 +61,7 @@ def handle_send_invitation_email(
 
             request.app.send_marketing_email(
                 receivers=(attendee.email,),
-                subject=self.subject,
+                subject=self.subject or default_subject,
                 content=content,
                 plaintext=plaintext,
             )

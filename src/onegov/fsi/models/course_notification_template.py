@@ -14,24 +14,27 @@ NOTIFICATION_TYPE_TRANSLATIONS = (
     _('Event Reminder'), _('Cancellation Confirmation')
 )
 
-# The defaults for the title are in german, otherwise adapt database
-SUBJECT_DEFAULTS = dict(
-    info='Info E-Mail Kursveranstaltung',
-    reservation='Anmeldungsbestätigung',
-    reminder='Erinnerung Kursdurchführung',
-    cancellation='Absage Kursveranstaltung'
-)
-
 # for forms...
-def template_type_choices():
+def template_type_choices(request=None):
+    if request:
+        translations = (
+            request.translate(t) for t in NOTIFICATION_TYPE_TRANSLATIONS)
+    else:
+        translations = NOTIFICATION_TYPE_TRANSLATIONS
     return tuple(
         (val, key) for val, key in zip(NOTIFICATION_TYPES,
-                                       NOTIFICATION_TYPE_TRANSLATIONS))
+                                       translations))
 
 
-def template_name(context, type=None):
-    t = type or context.get_current_parameters()['type']
-    return SUBJECT_DEFAULTS[t]
+def template_name(type, request=None):
+    try:
+        text = NOTIFICATION_TYPE_TRANSLATIONS[NOTIFICATION_TYPES.index(type)]
+    except ValueError:
+        if type == 'invitation':
+            text = _('Course Subscription Invitation')
+        else:
+            raise AssertionError('There are 5 notifications types allowed')
+    return request.translate(text) if request else text
 
 
 class CourseInvitationTemplate:
@@ -42,7 +45,7 @@ class CourseInvitationTemplate:
     a real model without changing too much code.
     """
 
-    subject = _('Course Subscription Invitation')
+    subject = None
     text = None
     text_html = None
     type = 'invitation'

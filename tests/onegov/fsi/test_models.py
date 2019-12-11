@@ -149,10 +149,8 @@ def test_notification_templates_1(session, course_event):
     assert event.reminder_template
     assert event.cancellation_template
 
-    assert event.info_template.subject == template_name('dummy', type='info')
-    assert event.reservation_template.subject == template_name(
-        'dummy', type='reservation')
-    assert event.reminder_template.subject == template_name(
-        'dummy', type='reminder')
-    assert event.cancellation_template.subject == template_name(
-        'dummy', type='cancellation')
+    assert event.info_template.subject == template_name(type='info')
+    assert event.reservation_template.subject == template_name(type='reservation')
+    assert event.reminder_template.subject == template_name(type='reminder')
+    assert event.cancellation_template.subject == template_name(type='cancellation')
+
