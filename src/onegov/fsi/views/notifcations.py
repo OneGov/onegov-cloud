@@ -33,7 +33,7 @@ def handle_send_email(self, request, recipients, cc_to_sender=True,
 
         for att_id in recipients:
             if handle_attendees:
-                attendee = att
+                attendee = att_id
             else:
                 attendee = request.session.query(
                     CourseAttendee).filter_by(id=att_id).one()
