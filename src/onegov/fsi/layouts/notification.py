@@ -159,7 +159,6 @@ class EditNotificationTemplateLayout(NotificationTemplateLayout):
             type=self.request.translate(
                 self.format_notification_type(self.model.type))))
 
-
     @cached_property
     def breadcrumbs(self):
         links = super().breadcrumbs
