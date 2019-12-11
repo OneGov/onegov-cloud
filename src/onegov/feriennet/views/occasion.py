@@ -76,6 +76,7 @@ def clone_occasion(self, request, form):
         return request.redirect(request.link(self.activity))
     elif not request.POST:
         form.process(obj=self)
+        form.dates.data = form.dates_to_json(dates=None)
 
     return {
         'layout': OccasionFormLayout(
