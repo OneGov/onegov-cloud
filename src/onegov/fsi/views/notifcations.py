@@ -103,7 +103,9 @@ def view_edit_notification(self, request, form):
     if form.submitted(request):
         form.update_model(self)
         request.success(_("Your changes were saved"))
-        return request.redirect(request.link(self))
+        collection = CourseNotificationTemplateCollection(
+            request.session, course_event_id=self.course_event.id)
+        return request.redirect(request.link(collection))
 
     form.apply_model(self)
     layout = EditNotificationTemplateLayout(self, request)
