@@ -140,7 +140,7 @@ class AttendeeSignupForm(AttendeeBase):
 
     group_code = HiddenField(
         label=_("Group Code"),
-        fieldset=_("Administration"),
+        fieldset=None,
         default=None
     )
 
