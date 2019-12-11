@@ -100,7 +100,7 @@
                         <tal:b condition="request.locale.startswith('fr')">
                             <div>
                                 <a href="https://reseauvacances.projuventute.ch">
-                                    Feriennet est la plateforme de réservation mise sur pieds par Pro Juventute pour les offres de vacances encadrées.
+                                    Réseau vacances est une plateforme, développée par Pro Juventute, qui permet de mettre en ligne des passeports vacances et d’en assurer la gestion et l’utilisation complète.
                                 </a>
                                 <span>
                                     Pour de plus amples informations sur les offres de la Fondation Pro Juventute : <a href="https://www.projuventute.ch/Programme.3232.0.html?L=1">Programmes</a>.
