@@ -1876,6 +1876,26 @@ $booking-left-margin: 2rem;
             margin-left: 1rem;
         }
     }
+
+    .print-area {
+        display: block;
+        margin-bottom: -.5rem;
+        margin-right: -1.75rem;
+        margin-top: 1rem;
+        text-align: center;
+    }
+
+    .print {
+        background: $gray-pastel;
+        display: inline-block;
+        font-size: .875rem;
+        margin: 0 0 .5rem;
+        padding: .5rem 1rem;
+
+        &:hover {
+            background: $gray-light;
+        }
+    }
 }
 
 /*

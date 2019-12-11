@@ -108,10 +108,10 @@
                                 </li>
                             </tal:b>
                             <tal:b condition="layout.org.meta.get('donation', True) and invoice.period.active and invoice.period.confirmed and not invoice.period.archived and not invoice.has_donation">
-                                <li class="item-group">
+                                <li class="item-group hide-for-print">
                                     <strong i18n:translate>Donation</strong>
                                 </li>
-                                <li class="row">
+                                <li class="row hide-for-print">
                                     <div class="small-8 columns">
                                         <span class="item-text" i18n:translate>I would like to make a donation to support children and teenagers.</span>
                                     </div>
@@ -127,6 +127,12 @@
                                 <strong class="item-amount" tal:content="'{:.2f}'.format(invoice.total_amount)"></strong>
                             </li>
                         </ul>
+                        <div class="print-area">
+                            <a class="print button secondary small round" href="#" data-print-selector="#${invoice.id}">
+                                <i class="fa fa-print" aria-hidden="true"></i>
+                                <tal:b i18n:translate>Print</tal:b>
+                            </a>
+                        </div>
                     </div>
 
                     <div class="invoice-items-payment hide-for-print" tal:condition="payment_provider and not invoice.paid">
