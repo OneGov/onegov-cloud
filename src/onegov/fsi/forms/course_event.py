@@ -84,8 +84,7 @@ class CourseEventForm(Form):
 
     status = ChosenSelectField(
         label=_('Status'),
-        choices=course_status_choices(),
-        default='created'
+        choices=[],
     )
 
     def on_request(self):
@@ -97,6 +96,9 @@ class CourseEventForm(Form):
             self.course_id.choices = tuple(
                 (str(c.id), c.name) for c in collection.query()
             )
+
+        self.status.choices = course_status_choices(self.request)
+        self.status.default = 'created'
 
     def apply_model(self, model):
         self.location.data = model.location

@@ -22,10 +22,17 @@ COURSE_EVENT_STATUSES_TRANSLATIONS = (
 
 
 # for forms...
-def course_status_choices():
+def course_status_choices(request=None):
+
+    if request:
+        translations = (
+            request.translate(v) for v in COURSE_EVENT_STATUSES_TRANSLATIONS)
+    else:
+        translations = COURSE_EVENT_STATUSES_TRANSLATIONS
+
     return tuple(
         (val, key) for val, key in zip(COURSE_EVENT_STATUSES,
-                                       COURSE_EVENT_STATUSES_TRANSLATIONS))
+                                       translations))
 
 
 class CourseEvent(Base, TimestampMixin):
