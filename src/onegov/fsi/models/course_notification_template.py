@@ -14,6 +14,15 @@ NOTIFICATION_TYPE_TRANSLATIONS = (
     _('Event Reminder'), _('Cancellation Confirmation')
 )
 
+GERMAN_TYPE_TRANSLATIONS = {
+    'info': 'Info E-Mail Kursveranstaltung',
+    'reservation': 'Anmeldungsbestätigung',
+    'reminder': 'Erinnerung Kursdurchführung',
+    'cancellation': 'Absage Kursveranstaltung',
+    'invitation': 'Einladung für Kursanmeldung'
+}
+
+
 # for forms...
 def template_type_choices(request=None):
     if request:
@@ -24,6 +33,11 @@ def template_type_choices(request=None):
     return tuple(
         (val, key) for val, key in zip(NOTIFICATION_TYPES,
                                        translations))
+
+
+def get_template_default(context, type=None):
+    t = type or context.current_parameters.get('type')
+    return GERMAN_TYPE_TRANSLATIONS[t]
 
 
 def template_name(type, request=None):
@@ -45,10 +59,10 @@ class CourseInvitationTemplate:
     a real model without changing too much code.
     """
 
-    subject = None
     text = None
     text_html = None
     type = 'invitation'
+    subject = get_template_default(None, type)
 
 
 class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
@@ -81,7 +95,7 @@ class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
     id = Column(UUID, primary_key=True, default=uuid4)
 
     #: The subject of the notification would be according to template type
-    subject = Column(Text)
+    subject = Column(Text, default=get_template_default)
 
     #: The body text injected in plaintext (not html)
     text = Column(Text)

@@ -19,6 +19,5 @@ def test_send_reminder_mails(client_with_db, smtp):
     # planner_future_res and attendee_future_res
     assert len(smtp.outbox) == 2
 
-    message = get_mail(
-        client_with_db.app.smtp.outbox, 0, encoding='iso-8859-1')
-    assert message['subject'] == 'Erinnerung Kursdurchführung'
+    message = get_mail(client_with_db.app.smtp.outbox, 0)
+    assert message['subject'] == '=?utf-8?q?Erinnerung_Kursdurchf=C3=BChrung?='

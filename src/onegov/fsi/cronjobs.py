@@ -4,7 +4,6 @@ from onegov.core.templates import render_template
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi import _, FsiApp
 from onegov.fsi.layouts.notification import MailLayout
-from onegov.fsi.models.course_notification_template import template_name
 
 
 def send_scheduled_reminders(request):
@@ -22,9 +21,6 @@ def send_scheduled_reminders(request):
         title = _('Reminder for course event: ${name}',
                   mapping={'name': course_event.course.name})
 
-        default_subject = template_name(course_event.reminder_template.type,
-                                        request)
-
         for attendee in course_event.attendees:
             content = render_template('mail_notification.pt', request, {
                 'layout': MailLayout(template, request),
@@ -34,7 +30,7 @@ def send_scheduled_reminders(request):
             })
             request.app.send_marketing_email(
                 receivers=(attendee.email, ),
-                subject=template.subject or default_subject,
+                subject=template.subject,
                 content=content
             )
         template.last_sent = utcnow()

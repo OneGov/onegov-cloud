@@ -154,4 +154,4 @@ def test_register_for_course_event(client_with_db):
     assert len(client.app.smtp.outbox) == 1
     message = get_mail(client.app.smtp.outbox, 0)
     assert message['to'] == 'member@example.org'
-    assert message['subject'] == 'Anmeldungsbestätigung'
+    assert message['subject'] == '=?utf-8?q?Anmeldungsbest=C3=A4tigung?='

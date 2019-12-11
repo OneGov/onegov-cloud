@@ -12,7 +12,7 @@ from onegov.fsi.layouts.notification import NotificationTemplateLayout, \
     MailLayout, SendNotificationTemplateLayout
 from onegov.fsi.models import CourseAttendee
 from onegov.fsi.models.course_notification_template import \
-    CourseNotificationTemplate, template_name
+    CourseNotificationTemplate
 from onegov.fsi import _
 
 
@@ -39,11 +39,9 @@ def handle_send_email(self, request, recipients, cc_to_sender=True,
                 attendee = request.session.query(
                     CourseAttendee).filter_by(id=att_id).one()
 
-            default_subject = template_name(self.type, request)
-
             content = render_template('mail_notification.pt', request, {
                 'layout': mail_layout,
-                'title': self.subject or default_subject,
+                'title': self.subject,
                 'notification': self.text_html,
                 'attendee': attendee
             })
@@ -51,7 +49,7 @@ def handle_send_email(self, request, recipients, cc_to_sender=True,
 
             request.app.send_marketing_email(
                 receivers=(attendee.email,),
-                subject=self.subject or default_subject,
+                subject=self.subject,
                 content=content,
                 plaintext=plaintext,
             )

@@ -66,7 +66,7 @@ def remove_reservation_email_ts(context):
 
 
 @upgrade_task('Make Notification.subject nullable')
-def make_notification_text_null(context):
+def make_notification_subject_null(context):
     if context.has_column('fsi_notification_templates', 'subject'):
         context.operations.alter_column(
             'fsi_notification_templates', 'subject', nullable=True)
