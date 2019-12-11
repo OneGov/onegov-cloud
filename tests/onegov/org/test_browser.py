@@ -308,7 +308,7 @@ def test_publication_workflow(browser, temporary_path, org_app):
     assert not browser.is_text_present("Öffentlich")
 
     # enter a publication date in the past (no type date support in selenium)
-    browser.find_by_css('select').select('07:00')
+    browser.find_by_css('select').select('01:00')
 
     assert browser.is_text_present("Wird publiziert am", wait_time=1)
     assert not browser.is_text_present("Publikationsdatum")
@@ -317,8 +317,8 @@ def test_publication_workflow(browser, temporary_path, org_app):
     f = FileCollection(org_app.session()).query().one()
 
     assert f.publish_date in (
-        datetime(dt.year, dt.month, dt.day, 5, tzinfo=UTC),  # dst
-        datetime(dt.year, dt.month, dt.day, 6, tzinfo=UTC)   # !dst
+        datetime(dt.year, dt.month, dt.day, 0, tzinfo=UTC),  # dst
+        datetime(dt.year, dt.month, dt.day, 1, tzinfo=UTC)   # !dst
     )
 
     # run the cronjob and make sure it works
