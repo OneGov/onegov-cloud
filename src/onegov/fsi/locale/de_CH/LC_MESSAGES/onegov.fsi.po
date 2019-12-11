@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-12-10 08:44+0100\n"
-"PO-Revision-Date: 2019-12-10 08:01+0100\n"
+"POT-Creation-Date: 2019-12-11 10:31+0100\n"
+"PO-Revision-Date: 2019-12-11 10:32+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -300,8 +300,8 @@ msgid "Add Placeholder"
 msgstr "Platzhalter hinzufügen"
 
 #, python-format
-msgid "Attendees Event ${event}"
-msgstr "Teilnehmer Durchführung ${event}"
+msgid "Attendees Event ${event} - ${date}"
+msgstr "Teilnehmer Durchführung ${event} - ${date}"
 
 msgid "My Event Subscriptions"
 msgstr "Meine Kursanmeldungen"
@@ -483,10 +483,10 @@ msgstr "zukünfigte Durchführungen."
 
 msgid ""
 "We would like to invite you to subscribe for one of the events for the "
-"course ${course}."
+"course ${layout.model.name}."
 msgstr ""
-"Wir würden sie gerne einladen, sich für einen der offenen Veranstaltungen "
-"für den Kurs ${course} anzumelden."
+"Wir würden sie gerne einladen, sich für einen der Durchführungen des Kurses "
+"${layout.model.name} anzumelden."
 
 msgid "You can find the list of future events below."
 msgstr "Untenstehend finden Sie eine Liste der zukünftigen Durchführungen."
@@ -517,6 +517,9 @@ msgstr "Zuletzt Geändert"
 
 msgid "You can only see subscriptions from attendees fitting your permissions."
 msgstr "Sie können nur Anmeldung sehen, zu dene Sie berechtigt sind."
+
+msgid "Shortcode"
+msgstr "Kürzel"
 
 msgid "Course Name"
 msgstr "Kursname"
@@ -603,18 +606,21 @@ msgstr "Neue Anmeldungen erfasst"
 msgid "Subscription successfully deleted"
 msgstr "Anmeldung erfolgreich gelöscht"
 
+#~ msgid "Attendees Event ${event}"
+#~ msgstr "Teilnehmer Durchführung ${event}"
+
+#~ msgid ""
+#~ "We would like to invite you to subscribe for one of the events for the "
+#~ "course ${course}."
+#~ msgstr ""
+#~ "Wir würden sie gerne einladen, sich für einen der offenen Veranstaltungen "
+#~ "für den Kurs ${course} anzumelden."
+
 #~ msgid "Dear ${attendee.first_name} ${attendee.last_name},"
 #~ msgstr "Sehr geehrte(r) ${attendee.first_name} ${attendee.last_name},"
 
 #~ msgid "Reminder for course: ${name}"
 #~ msgstr "Erinnerung für Kurs: ${name}"
-
-#~ msgid ""
-#~ "We would like to invite you to subscribe for one of the events for the "
-#~ "course ${layout.model.name}."
-#~ msgstr ""
-#~ "Wir würden sie gerne einladen, sich für einen der Durchführungen des "
-#~ "Kurses ${layout.model.name} anzumelden."
 
 #~ msgid "Your course management team."
 #~ msgstr "Ihr Kursverwaltungteam"
