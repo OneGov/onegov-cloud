@@ -50,6 +50,7 @@ class ReservationCollection(GenericCollection):
         # )
 
         if self.user_role == 'editor':
+            query = query.join(CourseAttendee)
             query = query.filter(
                 CourseAttendee.organisation.in_(
                     self.permissions,)

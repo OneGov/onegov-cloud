@@ -12,7 +12,7 @@
                             <h3 i18n:translate="">Details</h3>
                             <tal:b metal:use-macro="layout.macros['course_event_details']" />
 
-                            <tal:b tal:condition="request.is_logged_in" tal:define="registered model.has_reservation(request.attendee_id)">
+                            <tal:b tal:define="registered model.has_reservation(request.attendee_id)">
                                 <tal:b tal:switch="registered">
                                     <button tal:case="True" class="button success disabled"><i class="fa fa-check" aria-hidden="true"></i> <tal:b i18n:translate>Registered</tal:b></button>
                                     <metal:b tal:case="False" tal:condition="model.bookable" use-macro="layout.macros['intercooler_btn']"/>
@@ -20,18 +20,18 @@
 
                                 <p><strong tal:condition="not: model.bookable" i18n:translate="">This course event can't be booked anymore.</strong></p>
                             </tal:b>
-                            <h3 i18n:translate="">Attendees</h3>
 
-                            <tal:b tal:switch="model.reservations.count() == 0">
-                                <p tal:case="True" i18n:translate>No entries found.</p>
-                                <ul tal:case="False">
-                                <tal:b tal:repeat="reservation model.reservations">
-                                    <li tal:attributes="class python: 'grayed-out' if reservation.is_placeholder else ''">${str(reservation)}</li>
-                                </tal:b>
-                            </ul>
-
+                            <tal:b tal:condition="request.is_admin">
+                                <h3 i18n:translate="">Attendees</h3>
+                                    <tal:b tal:switch="model.reservations.count() == 0">
+                                        <p tal:case="True" i18n:translate>No entries found.</p>
+                                        <ul tal:case="False">
+                                            <tal:b tal:repeat="reservation model.reservations">
+                                                <li tal:attributes="class python: 'grayed-out' if reservation.is_placeholder else ''">${str(reservation)}</li>
+                                            </tal:b>
+                                        </ul>
+                                    </tal:b>
                             </tal:b>
-
                         </tal:b>
                     </div>
                 </div>

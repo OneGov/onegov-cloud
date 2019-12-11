@@ -10,17 +10,7 @@
                         <tal:b tal:define="items layout.accordion_items" tal:switch="items != ()">
                             <span tal:case="False" i18n:translate="">No entries found.</span>
                             <tal:b tal:case="True">
-                                <dl class="accordion" data-accordion>
-                                    <tal:b tal:repeat="item items">
-                                        <dd class="accordion-navigation" tal:define="accordion_id 'accordion-panel-{}'.format(repeat.item.number)">
-                                            <a href="${'#'+ accordion_id}"><i class="fa fa-plus fa-fw" aria-hidden="true"></i> <strong>${item['title']}</strong></a>
-                                            <div id="${accordion_id}" class="content page-text">
-                                                <div tal:content="structure item['content']"/>
-                                                <span tal:condition="item['url']|nothing"><a href="${item['url']}" class="button hollow" i18n:translate>Details / Registration</a></span>
-                                            </div>
-                                        </dd>
-                                    </tal:b>
-                                </dl>
+                                <tal:b metal:use-macro="layout.macros['accordion']" />
                             </tal:b>
                         </tal:b>
                     </div>

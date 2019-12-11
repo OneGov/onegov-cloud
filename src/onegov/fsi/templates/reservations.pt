@@ -6,7 +6,7 @@
         <div class="row">
             <div class="columns small-12">
                 <div class="row">
-                    <div class="columns small-12">
+                    <div class="columns small-12" tal:define="has_course layout.model.course_event_id">
 
                         <p tal:condition="not: reservations"><strong i18n:translate="">No entries found</strong></p>
                         <p tal:condition="request.is_editor" i18n:translate="">You can only see subscriptions from attendees fitting your permissions.</p>
@@ -14,20 +14,26 @@
                         <tal:b tal:condition="reservations|nothing">
                                 <table class="subscription-table fullwidth">
                                     <thead>
-                                        <th i18n:translate="">Attendee</th>
-                                        <th i18n:translate="" tal:condition="not: layout.model.course_event_id">Course Name</th>
-                                        <th i18n:translate="">Date</th>
-                                        <th i18n:translate="">Course Status</th>
-                                        <th i18n:translate="">Course attended</th>
-                                        <th i18n:translate="">Last info mail</th>
+                                        <th i18n:translate>Attendee</th>
+                                        <th i18n:translate>Shortcode</th>
+                                        <th i18n:translate tal:condition="not: has_course">Course Name</th>
+                                        <th i18n:translate tal:condition="not: has_course">Date</th>
+                                        <th i18n:translate>Course Status</th>
+                                        <th i18n:translate>Course attended</th>
+                                        <th i18n:translate>Last info mail</th>
                                         <th tal:condition="request.is_admin" i18n:translate="" class="no-print">Manage</th>
                                     </thead>
                                     <tbody>
                                         <tal:b tal:repeat="reservation reservations">
                                             <tr>
                                                 <td><a href="${layout.link(reservation)}">${str(reservation)}</a></td>
-                                                <td tal:condition="not: layout.model.course_event_id"><a href="${request.link(reservation.course_event)}">${reservation.course_event.name}</a></td>
-                                                <td>${layout.format_date(reservation.course_event.start, 'date')}</td>
+                                                <td>
+                                                    <tal:b tal:condition="reservation.attendee and reservation.attendee.user">
+                                                        ${reservation.attendee.user.source_id}
+                                                    </tal:b>
+                                                </td>
+                                                <td tal:condition="not: has_course"><a href="${request.link(reservation.course_event)}">${reservation.course_event.name}</a></td>
+                                                <td tal:condition="not: has_course">${layout.format_date(reservation.course_event.start, 'date')}</td>
                                                 <td>${layout.format_status(reservation.course_event.status)}</td>
 
                                                 <td>

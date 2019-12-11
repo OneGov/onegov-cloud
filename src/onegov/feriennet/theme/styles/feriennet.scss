@@ -606,6 +606,10 @@ ul.tags {
     }
 }
 
+.field-attendee {
+    margin-bottom: 1rem !important;
+}
+
 /*
     Factoids
 */
@@ -1870,6 +1874,26 @@ $booking-left-margin: 2rem;
 
         .button {
             margin-left: 1rem;
+        }
+    }
+
+    .print-area {
+        display: block;
+        margin-bottom: -.5rem;
+        margin-right: -1.75rem;
+        margin-top: 1rem;
+        text-align: center;
+    }
+
+    .print {
+        background: $gray-pastel;
+        display: inline-block;
+        font-size: .875rem;
+        margin: 0 0 .5rem;
+        padding: .5rem 1rem;
+
+        &:hover {
+            background: $gray-light;
         }
     }
 }

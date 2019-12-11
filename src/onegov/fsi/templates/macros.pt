@@ -18,18 +18,24 @@
 <metal:accordion define-macro="accordion">
     <tal:b tal:condition="items|nothing">
         <dl class="accordion" data-accordion>
-            <tal:b tal:repeat="item items" define="accordion_id 'accordion-panel-{}'.format(repeat.item.number)">
-                <dd class="accordion-navigation">
-                    <a href="${accordion_id}">$item.title</a>
-                    <div id="${accordion_id}" class="content">
-                        <span tal:condition="item.url|nothing"><a href="${item.url}" class="tiny button hollow">Details</a></span>
-                        <span tal:condition="request.is_manager and item.edit_url|nothing"><a href="${item.edit_url}" class="tiny button hollow">Edit</a></span>
-                            ${item.content}
+            <tal:b tal:repeat="item items">
+                <dd class="accordion-navigation"
+                    tal:define="accordion_id 'accordion-panel-{}'.format(repeat.item.number)"
+                    tal:attributes="ic-get-from item['content_url']|nothing; ic-target '#' + accordion_id + 'content';"
+                    ic-trigger-on="click"
+                >
+                    <a href="${'#'+ accordion_id}"><i class="fa fa-plus fa-fw" aria-hidden="true"></i> <strong>${item['title']}</strong></a>
+                    <div id="${accordion_id}" class="content page-text">
+                        <tal:b tal:switch="python:True if item.get('content_url') else False">
+                            <div tal:case="False" tal:condition="item['content']" tal:content="structure item['content']"/>
+                            <div tal:case="True" id="${accordion_id + 'content'}"></div>
+                        </tal:b>
+
+                        <span tal:condition="item['url']|nothing"><a href="${item['url']}" class="button hollow" i18n:translate>Details / Registration</a></span>
                     </div>
                 </dd>
             </tal:b>
         </dl>
-
     </tal:b>
 </metal:accordion>
 
@@ -42,7 +48,7 @@
         </dl>
         <dl class="field-display">
             <dt i18n:translate="">Text: </dt>
-            <iframe src="${iframe_link|request.link(mail, name='embed')}" frameborder="0" width="100%" height="600px"></iframe>
+            <iframe class="resizeable" src="${iframe_link|request.link(mail, name='embed')}" frameborder="0" width="100%" height="600px" onload="autoResize()"></iframe>
             <div class="clearfix"></div>
         </dl>
     </tal:b>
@@ -62,9 +68,15 @@
     </tal:b>
 </metal:email_recipients>
 
-<metal:confirmation_slider define-macro="confirmation_slider">
-    <div tal:condition="not: reservation.is_placeholder" class="switch round tiny confirmation-switch">
-        <input id="${switch_id}" type="checkbox" tal:attributes="disabled python:not reservation.course_event.is_past or not request.is_admin; checked python:reservation.event_completed; ic-post-to url|nothing">
+<metal:confirmation_slider define-macro="confirmation_slider" tal:define="completed reservation.event_completed">
+    <div tal:condition="not: reservation.is_placeholder" tal:attributes="class python: 'switch round tiny confirmation-switch' + (' print-checked' if completed else ' print-unchecked')">
+        <input
+                id="${switch_id}"
+                type="checkbox"
+                tal:attributes="disabled python:not reservation.course_event.is_past or not request.is_admin; checked completed; ic-post-to url|nothing"
+                ic_target="${switch_id}"
+                ic-trigger-on="click"
+        >
         <label for="${switch_id}"></label>
     </div>
 </metal:confirmation_slider>
@@ -128,12 +140,12 @@
             <tal:b tal:condition="events">
                 <table class="tablesaw hover events-table">
                     <thead>
-                        <th i18n:translate="">Date</th>
-                        <th i18n:translate="">Start</th>
-                        <th i18n:translate="">End</th>
-                        <th i18n:translate="">Presenter</th>
-                        <th i18n:translate="" tal:condition="not for_email">Presenter Company</th>
-                        <th i18n:translate="">Free Space</th>
+                        <th i18n:translate class='text-left'>Date</th>
+                        <th i18n:translate class='text-left'>Start</th>
+                        <th i18n:translate class='text-left'>End</th>
+                        <th i18n:translate class='text-left'>Presenter</th>
+                        <th i18n:translate class='text-left' tal:condition="not for_email">Presenter Company</th>
+                        <th i18n:translate class='text-left'>Free Space</th>
                         <th tal:condition="not for_email and request.is_manager" i18n:translate>Hidden</th>
                     </thead>
                     <tbody>

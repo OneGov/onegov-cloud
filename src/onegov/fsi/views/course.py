@@ -148,6 +148,15 @@ def view_course_event(self, request):
     }
 
 
+@FsiApp.json(
+    model=Course,
+    permission=Personal,
+    name='content-json'
+)
+def view_course_event(self, request):
+    return self.description_html
+
+
 @FsiApp.form(
     model=Course,
     template='form.pt',

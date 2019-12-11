@@ -49,12 +49,11 @@
             </p>
         </tal:b>
         <tal:b tal:case="'invitation'">
-            <p i18n:translate="">We would like to invite you to subscribe for one of the events for the course <span tal:replace="layout.model.name" i18n:name="course" />.</p>
+            <p i18n:translate="">We would like to invite you to subscribe for one of the events for the course ${layout.model.name}.</p>
             <p i18n:translate="">You can find the list of future events below.</p><br>
             <tal:b metal:use-macro="layout.default_macros['course_details']" tal:define="model layout.model"/>
             <h3 i18n:translate="">Events</h3>
             <tal:b metal:use-macro="layout.default_macros['course_event_listing']" tal:define="events layout.model.future_events; for_email True"/>
-            <br>
 
 
         </tal:b>

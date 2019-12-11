@@ -139,7 +139,7 @@ def view_delete_reservation(self, request):
     request.success(_('Subscription successfully deleted'))
 
 
-@FsiApp.html(
+@FsiApp.json(
     model=CourseReservation,
     request_method='POST',
     permission=Secret,
@@ -148,3 +148,4 @@ def view_delete_reservation(self, request):
 def view_toggle_confirm_reservation(self, request):
     request.assert_valid_csrf_token()
     self.event_completed = not self.event_completed
+    return self.event_completed
