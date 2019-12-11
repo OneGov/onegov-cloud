@@ -70,3 +70,10 @@ def make_notification_subject_null(context):
     if context.has_column('fsi_notification_templates', 'subject'):
         context.operations.alter_column(
             'fsi_notification_templates', 'subject', nullable=True)
+
+
+@upgrade_task('Make course_event.presenter_email nullable')
+def nullable_event_presenter_email(context):
+    if context.has_column('fsi_course_events', 'presenter_email'):
+        context.operations.alter_column(
+            'fsi_course_events', 'presenter_email', nullable=True)

@@ -72,7 +72,7 @@ class CourseEvent(Base, TimestampMixin):
     end = Column(UTCDateTime, nullable=False)
     presenter_name = Column(Text, nullable=False)
     presenter_company = Column(Text, nullable=False)
-    presenter_email = Column(Text, nullable=False)
+    presenter_email = Column(Text)
     min_attendees = Column(SmallInteger, nullable=False, default=1)
     max_attendees = Column(SmallInteger, nullable=True)
 
