@@ -122,8 +122,9 @@ class NotificationTemplateLayout(DefaultLayout):
 
     @cached_property
     def title(self):
-        return _('${type} Notification Template', mapping=dict(
-            type=self.format_notification_type(self.model.type)))
+        return _('Notification Template ${type}', mapping=dict(
+            type=self.request.translate(
+                self.format_notification_type(self.model.type))))
 
     @cached_property
     def collection(self):
@@ -154,8 +155,10 @@ class NotificationTemplateLayout(DefaultLayout):
 class EditNotificationTemplateLayout(NotificationTemplateLayout):
     @cached_property
     def title(self):
-        return _('Edit ${type} Notification Template', mapping=dict(
-            type=self.format_notification_type(self.model.type)))
+        return _('Edit ${type}', mapping=dict(
+            type=self.request.translate(
+                self.format_notification_type(self.model.type))))
+
 
     @cached_property
     def breadcrumbs(self):
