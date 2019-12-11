@@ -78,7 +78,7 @@ class CourseNotificationTemplate(Base, ContentMixin, TimestampMixin):
     id = Column(UUID, primary_key=True, default=uuid4)
 
     #: The subject of the notification would be according to template type
-    subject = Column(Text, nullable=False, default=template_name)
+    subject = Column(Text)
 
     #: The body text injected in plaintext (not html)
     text = Column(Text)
