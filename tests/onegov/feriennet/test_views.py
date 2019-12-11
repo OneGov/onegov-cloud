@@ -497,6 +497,12 @@ def test_occasions_form(client, scenario):
 
     occasion = activity.click("Duplizieren")
     occasion.form['min_age'] = 10
+    occasion.form['dates'] = json.dumps({
+        'values': [{
+            'start': '2016-10-04 13:00:00',
+            'end': '2016-10-04 15:00:00'
+        }]
+    })
     activity = occasion.form.submit().follow()
     assert "15 - 20 Jahre" in activity
     assert "10 - 20 Jahre" in activity
