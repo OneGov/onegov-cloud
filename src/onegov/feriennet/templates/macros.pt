@@ -703,8 +703,8 @@
 
 
 <metal:user_panel define-macro="user_panel" i18n:domain="onegov.feriennet">
-    <div class="borderless-side-panel without-title highlighted">
-        <h2 i18n:translate>Contact</h2>
+    <div class="borderless-side-panel without-title highlighted filter-panel">
+        <h2 class="filter-title" i18n:translate>Contact</h2>
         <dl class="field-display">
             <div>
                 <dt i18n:translate>Name</dt>
