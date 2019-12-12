@@ -329,15 +329,9 @@ def view_activity(self, request):
 
     def occasion_links(o):
 
-        # organisers can only edit occasions in active periods
-        if request.is_organiser_only and not o.period.active:
-            return
+        if not o.period.archived and (o.period.active or request.is_admin):
+            yield Link(text=_("Edit"), url=request.link(o, name='edit'))
 
-        # nobody can edit occasions in archived periods
-        if o.period.archived:
-            return
-
-        yield Link(text=_("Edit"), url=request.link(o, name='edit'))
         yield Link(text=_("Clone"), url=request.link(o, name='clone'))
 
         title = layout.format_datetime_range(
