@@ -1,5 +1,6 @@
 from onegov.activity import AttendeeCollection
 from onegov.activity import Booking, BookingCollection
+from onegov.activity import InvoiceCollection
 from onegov.activity import Occasion, OccasionCollection, OccasionNeed
 from onegov.activity import PeriodCollection
 from onegov.core.security import Private, Personal, Public
@@ -254,7 +255,10 @@ def book_occasion(self, request, form):
                     'name': attendee.name
                 }))
 
-        return request.redirect(request.link(self.activity))
+        if self.period.finalized:
+            return request.redirect(request.class_link(InvoiceCollection))
+        else:
+            return request.redirect(request.link(self.activity))
 
     # pre select the attendee if given
     if 'attendee_id' in request.params:

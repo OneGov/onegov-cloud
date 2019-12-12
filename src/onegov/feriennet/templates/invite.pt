@@ -43,7 +43,7 @@
                     <li tal:repeat="attendee possible">
                         <tal:b replace="structure group_action(attendee, 'join')(layout)" />
                     </li>
-                    <li i18n:translate>
+                    <li>
                         <a href="${signup_url()}" i18n:translate>
                             Add new own child
                         </a>

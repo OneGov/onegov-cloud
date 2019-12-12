@@ -2550,3 +2550,35 @@ def test_booking_after_finalization_itemized(client, scenario):
 
     # none of this should have produced more than one invoice
     assert client.app.session().query(Invoice).count() == 1
+
+
+def test_booking_after_finalization_for_anonymous(client, scenario):
+    scenario.add_period(
+        title="2019",
+        phase='booking',
+        confirmed=True,
+        finalized=True,
+        book_finalized=True,
+        all_inclusive=False,
+        deadline_days=1,
+        booking_cost=5,
+    )
+
+    scenario.add_activity(title="Fishing", state='accepted')
+    scenario.add_occasion(cost=95)
+    scenario.add_activity(title="Hunting", state='accepted')
+    scenario.add_occasion(cost=45)
+
+    scenario.commit()
+
+    # this is now possible for anyone
+    assert client.get('/activity/fishing').body.count(b"Anmelden") == 2
+    assert client.get('/activity/fishing').body.count(b"Anmelden") == 2
+
+    client.login_editor()
+    assert client.get('/activity/fishing').body.count(b"Anmelden") == 1
+    assert client.get('/activity/fishing').body.count(b"Anmelden") == 1
+
+    client.login_admin()
+    assert client.get('/activity/fishing').body.count(b"Anmelden") == 1
+    assert client.get('/activity/fishing').body.count(b"Anmelden") == 1

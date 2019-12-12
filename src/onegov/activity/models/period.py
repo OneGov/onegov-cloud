@@ -100,9 +100,22 @@ class Period(Base, TimestampMixin):
     #: The alignment of bookings in the matching
     alignment = Column(Text, nullable=True)
 
-    #: Days between the occasion and the deadline (an alternative to
-    #: the deadline_date)
+    #: Deadline for booking occasions. A deadline of 3 means that 3 days before
+    #: an occasion is set to start, bookings are disabled.
+    #:
+    #: Note, unless book_finalized is set to True, this setting has no effect
+    #: in a finalized period.
+    #:
+    #: Also, if deadline_days is None, bookings can't be created in a
+    #: finalized period either, as deadline_days is a prerequisite for the
+    #: book_finalized setting.
     deadline_days = Column(Integer, nullable=True)
+
+    #: True if bookings can be created by normal users in finalized periods.
+    #: The deadline_days are still applied for these normal users.
+    #: Admins can always create bookings during any time, deadline_days and
+    #: book_finalized are ignored.
+    book_finalized = Column(Boolean, nullable=False, default=False)
 
     #: Date after which no bookings can be canceled by a mere member
     cancellation_date = Column(Date, nullable=True)

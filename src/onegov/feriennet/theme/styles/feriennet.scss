@@ -1963,6 +1963,15 @@ $booking-left-margin: 2rem;
         content: '\f09d';
         font-size: .875rem;
     }
+
+    .item-created {
+        @include label($bg: $gray-light);
+        border-radius: 3px;
+        padding: 5px 8px;
+        font-size: .8rem;
+        margin-left: -.5rem;
+        color: $charcoal;
+    }
 }
 
 .toggled + .invoice-items-list + .invoice-items-payment > div {

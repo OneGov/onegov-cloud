@@ -21,8 +21,8 @@ class BillingForm(Form):
 
     sure = BooleanField(
         label=_(
-            "I know that after confirmation, only administrators "
-            "may change bookings."
+            "I know that after confirmation, bills can only be adjusted "
+            "manually."
         ),
         default=False,
         depends_on=('confirm', 'yes')

@@ -429,10 +429,15 @@ def view_activity(self, request):
         if request.is_admin:
             return True
 
-        if occasion.period.finalized:
+        if occasion.period.finalized and not occasion.period.book_finalized:
             return False
 
-        if occasion.period.phase not in ('wishlist', 'booking', 'execution'):
+        if occasion.period.finalized and occasion.period.book_finalized:
+            acceptable_phases = ('wishlist', 'booking', 'execution', 'payment')
+        else:
+            acceptable_phases = ('wishlist', 'booking', 'execution')
+
+        if occasion.period.phase not in acceptable_phases:
             return False
 
         if occasion.is_past_deadline(date.today()):

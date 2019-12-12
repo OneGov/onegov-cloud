@@ -232,6 +232,18 @@ class PeriodForm(Form):
         depends_on=('deadline', 'rel')
     )
 
+    book_finalized = BooleanField(
+        label=_("Allow bookings after the bills have been created."),
+        description=_(
+            "By default, only admins can create bookings after the billing "
+            "has been confirmed. With this setting, every user can create new "
+            "bookings after confirmation and before the deadline. Booking "
+            "costs incurred after confirmation will be added to the existing "
+            "bill."
+        ),
+        depends_on=('deadline', 'rel'),
+    )
+
     cancellation = RadioField(
         label=_("Allow members to cancel confirmed bookings"),
         fieldset=_("Cancellation Deadline"),
@@ -337,8 +349,10 @@ class PeriodForm(Form):
 
         if self.deadline.data == 'fix':
             model.deadline_days = None
+            model.book_finalized = False
         else:
             model.deadline_days = self.deadline_days.data or None
+            model.book_finalized = self.book_finalized.data
 
         if self.cancellation.data == 'no':
             model.cancellation_date = None
@@ -375,8 +389,10 @@ class PeriodForm(Form):
 
         if model.deadline_days is None:
             self.deadline.data = 'fix'
+            self.book_finalized.data = False
         else:
             self.deadline.data = 'rel'
+            self.book_finalized.data = model.book_finalized
 
         if model.cancellation_days is None and model.cancellation_date is None:
             self.cancellation.data = 'no'

@@ -197,8 +197,8 @@ class Scenario(object):
         elif phase == 'booking':
             columns.setdefault('prebooking_start', self.date_offset(-10))
             columns.setdefault('prebooking_end', self.date_offset(-5))
-            columns.setdefault('execution_start', self.date_offset(-1))
-            columns.setdefault('execution_end', self.date_offset(+1))
+            columns.setdefault('execution_start', self.date_offset(+5))
+            columns.setdefault('execution_end', self.date_offset(+10))
 
             columns.setdefault('booking_start', columns['prebooking_end'])
             columns.setdefault('booking_end', columns['execution_start'])

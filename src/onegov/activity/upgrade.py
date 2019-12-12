@@ -774,3 +774,12 @@ def drop_deadline_date(context):
         """)
 
     context.operations.drop_column('periods', 'deadline_date')
+
+
+@upgrade_task('Add book_finalized')
+def book_finalized(context):
+    context.add_column_with_defaults(
+        table='periods',
+        column=Column('book_finalized', Boolean, nullable=False),
+        default=False
+    )
