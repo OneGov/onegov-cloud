@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-12-11 15:19+0100\n"
-"PO-Revision-Date: 2019-12-11 15:16+0100\n"
+"POT-Creation-Date: 2019-12-11 15:46+0100\n"
+"PO-Revision-Date: 2019-12-11 15:44+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -280,12 +280,12 @@ msgid "Manage Notification Templates"
 msgstr "Email-Templates verwalten"
 
 #, python-format
-msgid "${type} Notification Template"
-msgstr "${type} Email-Vorlage"
+msgid "Notification Template ${type}"
+msgstr "Email-Vorlage ${type}"
 
 #, python-format
-msgid "Edit ${type} Notification Template"
-msgstr "Bearbeite ${type} Email-Vorlage"
+msgid "Edit ${type}"
+msgstr "Bearbeite ${type}"
 
 msgid "Mailing"
 msgstr "Mail-Versand"
@@ -605,6 +605,12 @@ msgstr "Neue Anmeldungen erfasst"
 
 msgid "Subscription successfully deleted"
 msgstr "Anmeldung erfolgreich gelöscht"
+
+#~ msgid "Edit ${type} Notification Template"
+#~ msgstr "Bearbeite ${type} Email-Vorlage"
+
+#~ msgid "${type} Notification Template"
+#~ msgstr "${type} Email-Vorlage"
 
 #~ msgid ""
 #~ "We would like to invite you to subscribe for one of the events for the "

@@ -1,4 +1,5 @@
 from wtforms import StringField, TextAreaField
+from wtforms.validators import InputRequired
 
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
@@ -9,7 +10,10 @@ class NotificationForm(Form):
 
     subject = StringField(
         label=_('Email Subject'),
-        render_kw={'size': 6, 'clear': True}
+        render_kw={'size': 6, 'clear': True},
+        validators=[
+            InputRequired()
+        ],
     )
 
     text = TextAreaField(
