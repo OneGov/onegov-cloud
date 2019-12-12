@@ -411,23 +411,28 @@
                 </span>
             </div>
 
-            <div class="cost">
-                <span i18n:translate class="show-for-sr">Cost</span>
-
-                <tal:b condition="period.all_inclusive">
-                    <tal:b condition="occasion.cost" i18n:translate>
+            <tal:b condition="period.all_inclusive and occasion.cost">
+                <div class="cost">
+                    <span i18n:translate class="show-for-sr">Cost</span>
+                    
+                    <tal:b i18n:translate>
                         <tal:b i18n:name="cost" replace="occasion.cost" /> CHF
                     </tal:b>
-                </tal:b>
-                <tal:b condition="not:period.all_inclusive">
+                </div>
+            </tal:b>
+
+            <tal:b condition="not period.all_inclusive">
+                <div class="cost">
+                    <span i18n:translate class="show-for-sr">Cost</span>
+
                     <tal:b condition="occasion.cost or period.booking_cost" i18n:translate>
                         <tal:b i18n:name="cost" replace="(occasion.cost or 0) + (period.booking_cost or 0)" /> CHF
                     </tal:b>
                     <tal:b condition="not:occasion.cost or period.booking_cost" i18n:translate>
                         Free of charge
                     </tal:b>
-                </tal:b>
-            </div>
+                </div>
+            </tal:b>
         </div>
 
         <div class="factoids spacer">
