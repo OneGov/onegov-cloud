@@ -2519,11 +2519,9 @@ $booking-left-margin: 2rem;
     Group invites
 */
 .occasion-panel {
-
     border: 1px solid $gray;
     border-radius: 3px;
     margin-bottom: 1rem;
-    max-width: $max-line-width;
     padding: .5rem 0 1rem 1rem;
 
     .call-to-action {
@@ -2571,22 +2569,15 @@ $booking-left-margin: 2rem;
 .inline-top-bar {
     border-bottom: 2px solid $primary-color;
     margin-bottom: 1rem;
-    max-width: $max-line-width;
     padding-left: .5rem;
     position: relative;
-
-    h2 {
-        display: inline-block;
-    }
 
     .button {
         border-radius: 5px;
         margin-top: .25rem;
-        min-width: 15rem;
         padding-bottom: .5rem !important;
         padding-top: .5rem !important;
-        position: absolute !important;
-        right: .25rem;
+        width: 100%;
 
         i.fa-plus-circle {
             color: $primary-color;
@@ -2594,6 +2585,19 @@ $booking-left-margin: 2rem;
 
         i.fa-envelope {
             color: $success-color;
+        }
+    }
+
+    @media #{$large-only} {
+        .button {
+            min-width: 15rem;
+            position: absolute !important;
+            right: .25rem;
+            width: auto;
+        }
+
+        h2 {
+            display: inline-block;
         }
     }
 
@@ -2606,7 +2610,6 @@ $booking-left-margin: 2rem;
     display: flex;
     justify-content: space-between;
     margin-bottom: 1.5rem;
-    max-width: $max-line-width;
 
     @media #{$small-only} {
         display: block;

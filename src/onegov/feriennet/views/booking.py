@@ -177,7 +177,9 @@ def actions_by_booking(layout, period, booking):
                 count = booking.group_code_count(states) - 1
 
                 invite = GroupInvite(
-                    layout.request.session, booking.group_code)
+                    layout.request.session,
+                    booking.group_code,
+                    booking.username)
 
                 if count < 1:
 
@@ -509,9 +511,12 @@ def create_invite(self, request):
     """
 
     if not self.group_code:
-        self.group_code = GroupInvite.create(request.session).group_code
+        self.group_code = GroupInvite.create(
+            request.session, self.username).group_code
 
-    link = request.link(GroupInvite(request.session, self.group_code))
+    link = request.link(GroupInvite(
+        request.session, self.group_code, self.username))
+
     return request.redirect(link)
 
 
@@ -524,20 +529,17 @@ def view_group_invite(self, request):
     occasion = self.occasion
     attendees_count = len(self.attendees)
 
-    # to be made available to the admin (user switching)
-    current_username = request.current_username
-
-    existing = [a for a, b in self.attendees if a.username == current_username]
-    external = [a for a, b in self.attendees if a.username != current_username]
+    existing = [a for a, b in self.attendees if a.username == self.username]
+    external = [a for a, b in self.attendees if a.username != self.username]
     possible = [
         a for a in request.session.query(Attendee)
-        .filter_by(username=current_username)
+        .filter_by(username=self.username)
         .filter(not_(Attendee.id.in_(tuple(a.id for a in existing))))
     ]
 
     actionable_bookings = {
         b.attendee_id: b for b in request.session.query(Booking).filter_by(
-            username=current_username,
+            username=self.username,
             occasion_id=occasion.id,
         )
     }
@@ -560,9 +562,10 @@ def view_group_invite(self, request):
                 .query_param('attendee_id', 'other')\
                 .as_string()
 
-        # preselect the group code
+        # preselect the group code and the username
         url = URL(url)\
             .query_param('group_code', self.group_code)\
+            .query_param('username', self.username)\
             .as_string()
 
         # return to the current URL
@@ -623,7 +626,7 @@ def view_group_invite(self, request):
             "${link}"
         ), mapping={
             'title': occasion.activity.title,
-            'link': request.link(self)
+            'link': request.link(self.for_username(None))
         }
     )
 
@@ -631,6 +634,13 @@ def view_group_invite(self, request):
         subject=urllib.parse.quote(subject),
         message=urllib.parse.quote(request.translate(message))
     )
+
+    users = users_for_select_element(request)
+    user = request.session.query(User)\
+        .filter_by(username=self.username).first()
+
+    def user_select_link(user):
+        return request.link(self.for_username(user.username))
 
     return {
         'layout': layout,
@@ -645,6 +655,9 @@ def view_group_invite(self, request):
         'external': external,
         'possible': possible,
         'mailto': mailto,
+        'users': users,
+        'user': user,
+        'user_select_link': user_select_link,
     }
 
 
@@ -665,7 +678,7 @@ def join_group(self, request):
 
     own_children = set(
         a.id for a in request.session.query(Attendee.id)
-        .filter_by(username=request.current_username)
+        .filter_by(username=self.username)
     )
     if booking.attendee_id not in own_children:
         request.alert(
@@ -693,7 +706,7 @@ def leave_group(self, request):
 
     own_children = set(
         a.id for a in request.session.query(Attendee.id)
-        .filter_by(username=request.current_username)
+        .filter_by(username=self.username)
     )
 
     if booking.attendee_id not in own_children:

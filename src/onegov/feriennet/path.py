@@ -263,13 +263,16 @@ def get_calendar(request, name, token):
 @FeriennetApp.path(
     model=GroupInvite,
     path='/join/{group_code}')
-def get_group_invite(app, request, group_code):
+def get_group_invite(app, request, group_code, username=None):
     group_code = group_code.upper()
 
     if not is_valid_group_code(group_code):
         return None
 
-    invite = GroupInvite(request.session, group_code)
+    if not request.is_admin:
+        username = request.current_username
+
+    invite = GroupInvite(request.session, group_code, username)
     return invite.exists and invite or None
 
 

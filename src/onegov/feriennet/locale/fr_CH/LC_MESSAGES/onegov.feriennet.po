@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-12-12 13:53+0800\n"
+"POT-Creation-Date: 2019-12-12 16:17+0800\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1574,6 +1574,10 @@ msgstr ""
 
 msgid "For ${user}"
 msgstr "Pour ${user}"
+
+msgid "You are viewing this group invite as the user ${name}."
+msgstr ""
+"Vous consultez cette invitation de groupe en tant qu'utilisateur ${name}."
 
 msgid ""
 "Attendees can join their companions in a group to go to activities together."
