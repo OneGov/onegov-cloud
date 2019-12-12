@@ -1,8 +1,23 @@
 # Changes
 
+## Release `2019.49`
+
+> commits: **7 / [837d01d82e...9d4f242107](https://github.com/OneGov/onegov-cloud/compare/837d01d82e^...9d4f242107)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.49)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🎉 **Adds the ability to book after finalization**
+
+This allows normal users to create bookings after the bill has been
+published. Before, this was reserved for administrators.
+
+**`Feature`** | **[FER-194](https://issues.seantis.ch/browse/FER-194)** | **[9d4f242107](https://github.com/onegov/onegov-cloud/commit/9d4f24210762cba487c932b493026a0b5502de00)**
+
 ## Release `2019.48`
 
-> commits: **14 / [ead36cf8ec...a823aa4efa](https://github.com/OneGov/onegov-cloud/compare/ead36cf8ec^...a823aa4efa)**<br>
+> released: **2019-12-11 14:10**<br>
+> commits: **15 / [ead36cf8ec...11a07e9dcc](https://github.com/OneGov/onegov-cloud/compare/ead36cf8ec^...11a07e9dcc)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.48)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
