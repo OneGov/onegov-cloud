@@ -2536,7 +2536,7 @@ msgid "Payment"
 msgstr "Paiement"
 
 msgid "Ferienpass Musterlingen, Bahnhofstr. 2, 1234 Beispiel"
-msgstr "Ferienpass Musterlingen, Bahnhofstr. 2, 1234 Beispiel"
+msgstr "Passeport Vacances, Rue de Gare 2, 1234 Exemple"
 
 msgid "Payment Order"
 msgstr "Mode de paiement"
