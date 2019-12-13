@@ -139,7 +139,7 @@ def test_cancel_course_event(client_with_db):
     assert message['Subject'] == 'Absage Kursveranstaltung'
 
 
-def test_register_for_course_event(client_with_db):
+def test_register_for_course_event_member(client_with_db):
     client = client_with_db
     session = client.app.session()
     event = session.query(CourseEvent).filter_by(
@@ -155,3 +155,34 @@ def test_register_for_course_event(client_with_db):
     message = get_mail(client.app.smtp.outbox, 0)
     assert message['to'] == 'member@example.org'
     assert message['subject'] == '=?utf-8?q?Anmeldungsbest=C3=A4tigung?='
+
+
+def test_register_for_course_event_editor(client_with_db):
+    client = client_with_db
+    session = client.app.session()
+    event = session.query(CourseEvent).filter_by(
+        location='Empty'
+    ).one()
+    client.login_editor()
+    client.get(f'/fsi/event/{event.id}').click('Anmelden')
+    page = client.get(f'/fsi/event/{event.id}')
+    assert 'Angemeldet' in page
+
+    assert len(client.app.smtp.outbox) == 1
+    message = get_mail(client.app.smtp.outbox, 0)
+    assert message['to'] == 'editor@example.org'
+
+
+def test_register_for_course_event_admin(client_with_db):
+    client = client_with_db
+    session = client.app.session()
+    event = session.query(CourseEvent).filter_by(
+        location='Empty'
+    ).one()
+    client.login_admin()
+    client.get(f'/fsi/event/{event.id}').click('Anmelden')
+    page = client.get(f'/fsi/event/{event.id}')
+    assert 'Angemeldet' in page
+
+    assert len(client.app.smtp.outbox) == 1
+
