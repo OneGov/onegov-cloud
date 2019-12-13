@@ -235,7 +235,11 @@ class CourseEventLayout(DefaultLayout):
             text=_("Subscribe"),
             url=self.csrf_protected_url(
                 self.request.link(
-                    self.reservation_collection,
+                    ReservationCollection(
+                        self.request.session,
+                        course_event_id=self.model.id,
+                        attendee_id=self.request.attendee_id
+                    ),
                     name='add-from-course-event'
                 )
             ),
