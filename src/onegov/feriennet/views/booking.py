@@ -18,6 +18,7 @@ from onegov.core.utils import normalize_for_url, module_path
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.layout import BookingCollectionLayout, GroupInviteLayout
 from onegov.feriennet.models import AttendeeCalendar, GroupInvite
+from onegov.feriennet.utils import decode_name
 from onegov.feriennet.views.shared import users_for_select_element
 from onegov.user import User
 from purl import URL
@@ -614,19 +615,22 @@ def view_group_invite(self, request):
         )
 
     # https://stackoverflow.com/a/23847977/138103
+    first_name = decode_name(existing[0].name)[0]
     subject = occasion.activity.title
     message = _(
         (
             "Hi!\n\n"
-            "My child wants to take part in the \"${title}\" activity and "
-            "would be thrilled to go with a mate.\n\n"
+            "${first_name} wants to take part in the \"${title}\" activity by "
+            "${organisation} and would be thrilled to go with a mate.\n\n"
             "You can add the activity to the wishlist of your child through "
             "the following link, if you are interested. This way the children "
             "have a better chance of getting a spot together:\n\n"
             "${link}"
         ), mapping={
+            'first_name': first_name,
+            'link': request.link(self.for_username(None)),
             'title': occasion.activity.title,
-            'link': request.link(self.for_username(None))
+            'organisation': request.app.org.name,
         }
     )
 
