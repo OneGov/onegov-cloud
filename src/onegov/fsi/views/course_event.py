@@ -149,4 +149,4 @@ def cancel_course_event(self, request):
             show_sent_count=True
         )
     else:
-        request.warn('No recipients and no cancellation emails sent')
+        request.warning(_('No recipients and no cancellation emails sent'))
