@@ -51,7 +51,7 @@ class ReservationCollectionLayout(DefaultLayout):
                 }
             )
         ]
-        if self.request.is_editor:
+        if not self.request.is_admin:
             return links
         links.append(
             LinkGroup(
