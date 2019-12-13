@@ -1650,20 +1650,6 @@ $booking-left-margin: 2rem;
     }
 }
 
-.bills-header {
-    display: flex;
-    margin-bottom: 1rem;
-    padding-left: 1.6rem;
-
-    .bill-creditor {
-        width: 50%;
-
-        h2 {
-            display: none;
-        }
-    }
-}
-
 .bill {
     border-radius: 2px;
     margin-bottom: 1rem;
@@ -1895,6 +1881,71 @@ $booking-left-margin: 2rem;
         &:hover {
             background: $gray-light;
         }
+    }
+}
+
+/*
+    Invoice printing
+*/
+@media print {
+    #page-my-bills {
+        .main-title {
+            display: none;
+        }
+    }
+
+    .bills-header {
+        display: flex;
+        margin-bottom: 1rem;
+        padding-left: 1rem;
+
+        .bill-creditor {
+            padding-left: .6rem;
+            width: 50%;
+
+            ::first-line {
+                font-weight: bold;
+            }
+
+            h2 {
+                display: none;
+            }
+        }
+
+        .bill-debtor {
+            font-size: 1rem;
+
+            span:first-child {
+                font-weight: bold;
+            }
+        }
+    }
+
+    .bill.unpaid {
+        background: transparent;
+        border: 0;
+
+        * {
+            background: transparent;
+            color: $black;
+        }
+
+        h3 {
+            margin-left: 1.5rem;
+        }
+
+        .invoice-items-list {
+            border-bottom-color: black;
+        }
+
+        .invoice-items-payment {
+            padding-left: 0;
+        }
+    }
+
+    .outstanding {
+        font-size: 1rem;
+        margin-right: 2rem !important;
     }
 }
 

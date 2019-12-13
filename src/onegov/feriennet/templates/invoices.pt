@@ -18,34 +18,34 @@
                 />
 
             <div class="bills" tal:condition="invoices">
-                <div class="bills-header show-for-print">
-                    <div class="bill-creditor"
-                         tal:define="contact layout.org.meta.contact_html|nothing; contact_url None"
-                         condition="contact">
-
-                        <metal:b use-macro="layout.macros['footer_contact']" />
-                    </div>
-
-                    <div class="bill-debtor">
-                        <tal:b condition="user.data.get('organisation')">
-                            <span>${user.data['organisation']}</span><br>
-                        </tal:b>
-
-                        <tal:b condition="user.realname">
-                            <span>${user.realname}</span><br>
-                        </tal:b>
-
-                        <tal:b condition="user.data.get('address')">
-                            <span class="newlines">${user.data['address']}</span><br>
-                        </tal:b>
-
-                        <span tal:condition="user.data.get('zip_code')">${user.data['zip_code']}</span>
-                        <span tal:condition="user.data.get('place')">${user.data['place']}</span>
-                        <br tal:condition="user.data.get('zip_code') or user.data.get('place')">
-                    </div>
-                </div>
-
                 <div class="bill ${invoice.paid and 'paid' or 'unpaid'}" id="${invoice.id}" tal:repeat="invoice invoices">
+                    <div class="bills-header show-for-print">
+                        <div class="bill-creditor"
+                             tal:define="contact layout.org.meta.contact_html|nothing; contact_url None"
+                             condition="contact">
+
+                            <metal:b use-macro="layout.macros['footer_contact']" />
+                        </div>
+
+                        <div class="bill-debtor">
+                            <tal:b condition="user.data.get('organisation')">
+                                <span>${user.data['organisation']}</span><br>
+                            </tal:b>
+
+                            <tal:b condition="user.realname">
+                                <span>${user.realname}</span><br>
+                            </tal:b>
+
+                            <tal:b condition="user.data.get('address')">
+                                <span class="newlines">${user.data['address']}</span><br>
+                            </tal:b>
+
+                            <span tal:condition="user.data.get('zip_code')">${user.data['zip_code']}</span>
+                            <span tal:condition="user.data.get('place')">${user.data['place']}</span>
+                            <br tal:condition="user.data.get('zip_code') or user.data.get('place')">
+                        </div>
+                    </div>
+
                     <h3>${invoice.period.title}</h3>
 
                     <strong class="outstanding">
@@ -55,7 +55,7 @@
                         </tal:b>
                     </strong>
 
-                    <button id="button-${invoice.id}" data-toggle="#details-${invoice.id}" class="${invoice.paid and 'untoggled' or 'toggled'} hide_for-print">
+                    <button id="button-${invoice.id}" data-toggle="#details-${invoice.id}" class="${invoice.paid and 'untoggled' or 'toggled'} hide-for-print">
                         <span i18n:translate class="show-for-sr">Show Details</span>
                         <i class="fa fa-angle-double-down" aria-hidden="true"></i>
                     </button>
