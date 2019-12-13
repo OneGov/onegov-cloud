@@ -81,6 +81,15 @@
                         <th class="column-30" i18n:translate>Vote number</th>
                         <td>${layout.format_bfs_number(vote.bfs_number)}</td>
                     </tr>
+                    <tr tal:condition="bkchrono">
+                        <th class="column-30" i18n:translate>Official Chronology</th>
+                        <td>
+                            <a href="${bkchrono}" class="bkchrono">
+                        Link
+                        <span tal:condition="request.html_lang == 'en-US'">(in German / French)</span>
+                        </a>
+                        </td>
+                    </tr>
                     <tr tal:condition="False">
                         <th class="column-30" i18n:translate>Related votes</th>
                         <td></td>
@@ -97,6 +106,11 @@
                     <tr tal:condition="vote.initiator">
                         <th class="column-30" i18n:translate>Initiator</th>
                         <td>${vote.initiator}</td>
+                    </tr>
+                    <tr tal:condition="preliminary_examination">
+                        <th class="column-30" i18n:translate>Preliminary Examination</th>
+                        <td><a href="${request.link(preliminary_examiniation)}">PDF</a></td>
+
                     </tr>
                     <tr tal:condition="vote.signatures_valid is not None">
                         <th class="column-30" i18n:translate>Signatures</th>
@@ -149,7 +163,9 @@
                         <td><a href="${request.link(parliamentary_debate)}" target="_blank" class="parliamentary-debate">
                         PDF
                         <span tal:condition="request.html_lang == 'en-US'">(in German / French)</span>
-                        </a></td>
+                        </a> /
+                        <a href="${curiavista}" i18n:translate>Link <span tal:condition="request.html_lang == 'en-US'">(in German / French)</span></a>
+                        </td>
                     </tr>
                     <tr tal:condition="vote.duration_federal_assembly is not None">
                         <th class="column-30">
@@ -278,6 +294,21 @@
                             <span tal:condition="request.html_lang == 'fr-CH'">(en allemand)</span>
                             </a></td>
                     </tr>
+                    <tr tal:condition="bkresults">
+                        <th i18n:translate>Overview of voting result by the Confederation</th>
+                        <td>
+                            <a href="${bkresults}" i18n:translate>Link <span tal:condition="request.html_lang == 'en-US'">(in German / French)</span></a>
+                        </td>
+                    </tr>
+                    <tr tal:condition="foeg_analysis">
+                        <th i18n:translate>Post-vote poll</th>
+                        <td>
+                            <a href="${request.link(foeg_analysis)}" target="_blank" class="foeg_analysis">
+                            PDF <span tal:condition="request.html_lang == 'en-US'">(in German)</span> <span tal:condition="request.html_lang == 'fr-CH'">(en allemand)</span></a> /
+                            <a href="${layout.foeg_static_url}" i18n:translate>Link</a>
+                        </td>
+                    </tr>
+
                 </tbody>
             </table>
 
@@ -332,6 +363,13 @@
                             <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                             <span tal:condition="request.html_lang == 'fr-CH'">(en allemand)</span>
                             </a></td>
+                    </tr>
+                    <tr tal:condition="post_vote_poll">
+                        <th i18n:translate>Post-vote poll</th>
+                        <td>
+                            <a href="${request.link(post_vote_poll)}" target="_blank" class="post_vote_poll">PDF <span tal:condition="request.html_lang == 'en-US'">(in German / French)</span></a> /
+                            <a href="${layout.voto_static_url}" i18n:translate>Link</a>
+                        </td>
                     </tr>
                     <tr tal:condition="bfs_map">
                         <td colspan="2">

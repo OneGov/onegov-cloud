@@ -38,6 +38,16 @@ class VoteLayout(DefaultLayout):
             Link(self.title, '#'),
         ]
 
+    @property
+    def voto_static_url(self):
+        if self.request.html_lang =='fr-CH':
+            return 'https://wwww.voto.swiss/fr/voto'
+        return 'https://wwww.voto.swiss/voto'
+
+    @property
+    def foeg_static_url(self):
+        return 'https://foeg.uzh.ch/de/abstimmungsmonitor.html'
+
 
 class VoteStrengthsLayout(DefaultLayout):
 
