@@ -615,7 +615,8 @@ def view_group_invite(self, request):
         )
 
     # https://stackoverflow.com/a/23847977/138103
-    first_name = decode_name(existing[0].name)[0]
+    first_child = existing and existing[0] or external[0]
+    first_name = decode_name(first_child.name)[0]
     subject = occasion.activity.title
     message = _(
         (
