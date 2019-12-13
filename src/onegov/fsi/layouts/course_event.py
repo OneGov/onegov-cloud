@@ -120,6 +120,9 @@ class CourseEventLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
+
+        if self.request.is_member:
+            return []
         attendee_link = Link(
             _('Attendees'),
             self.request.link(self.reservation_collection),
