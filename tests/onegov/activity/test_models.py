@@ -2704,3 +2704,87 @@ def test_no_occasion_in_period_filter(scenario):
 
     # 2 activites have no occasion in the current period
     assert a.for_filter(period_id=scenario.periods[1].id).query().count() == 2
+
+
+def test_occasion_costs_all_inclusive_free(scenario):
+    scenario.add_period(all_inclusive=True, booking_cost=10)
+    scenario.add_activity(state='accepted')
+    scenario.add_occasion()
+    scenario.commit()
+    scenario.refresh()
+
+    cost = scenario.session.query(Occasion.total_cost).scalar()
+    assert cost == 0
+
+    cost = scenario.session.query(Occasion).first().total_cost
+    assert cost == 0
+
+
+def test_occasion_costs_all_inclusive_paid(scenario):
+    scenario.add_period(all_inclusive=True, booking_cost=10)
+    scenario.add_activity(state='accepted')
+    scenario.add_occasion(cost=20)
+    scenario.commit()
+    scenario.refresh()
+
+    cost = scenario.session.query(Occasion.total_cost).scalar()
+    assert cost == 20
+
+    cost = scenario.session.query(Occasion).first().total_cost
+    assert cost == 20
+
+
+def test_occasion_costs_free(scenario):
+    scenario.add_period(all_inclusive=False, booking_cost=0)
+    scenario.add_activity(state='accepted')
+    scenario.add_occasion()
+    scenario.commit()
+    scenario.refresh()
+
+    cost = scenario.session.query(Occasion.total_cost).scalar()
+    assert cost == 0
+
+    cost = scenario.session.query(Occasion).first().total_cost
+    assert cost == 0
+
+
+def test_occasion_costs_partial(scenario):
+    scenario.add_period(all_inclusive=False, booking_cost=10)
+    scenario.add_activity(state='accepted')
+    scenario.add_occasion()
+    scenario.commit()
+    scenario.refresh()
+
+    cost = scenario.session.query(Occasion.total_cost).scalar()
+    assert cost == 10
+
+    cost = scenario.session.query(Occasion).first().total_cost
+    assert cost == 10
+
+
+def test_occasion_costs_full(scenario):
+    scenario.add_period(all_inclusive=False, booking_cost=10)
+    scenario.add_activity(state='accepted')
+    scenario.add_occasion(cost=20)
+    scenario.commit()
+    scenario.refresh()
+
+    cost = scenario.session.query(Occasion.total_cost).scalar()
+    assert cost == 30
+
+    cost = scenario.session.query(Occasion).first().total_cost
+    assert cost == 30
+
+
+def test_occasion_costs_custom(scenario):
+    scenario.add_period(all_inclusive=False, booking_cost=10)
+    scenario.add_activity(state='accepted')
+    scenario.add_occasion(cost=20, booking_cost=5)
+    scenario.commit()
+    scenario.refresh()
+
+    cost = scenario.session.query(Occasion.total_cost).scalar()
+    assert cost == 25
+
+    cost = scenario.session.query(Occasion).first().total_cost
+    assert cost == 25

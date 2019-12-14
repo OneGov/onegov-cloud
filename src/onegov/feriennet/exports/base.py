@@ -116,13 +116,6 @@ class FeriennetExport(Export):
             for d in occasion.dates
         ]
 
-        if occasion.period.all_inclusive:
-            cost = 0
-        else:
-            cost = occasion.period.booking_cost or 0
-
-        cost = occasion.cost or 0
-
         yield _("Occasion Rescinded"), occasion.cancelled
         yield _("Occasion Dates"), dates
         yield _("Occasion Note"), occasion.note
@@ -130,7 +123,8 @@ class FeriennetExport(Export):
             occasion.age.lower, occasion.age.upper - 1)
         yield _("Occasion Spots"), '{} - {}'.format(
             occasion.spots.lower, occasion.spots.upper - 1)
-        yield _("Occasion Cost"), cost
+        yield _("Occasion Cost"), occasion.cost or 0
+        yield _("Occasion Custom Booking Cost"), occasion.booking_cost or 0
         yield _("Occasion Meeting Point"), occasion.meeting_point
         yield _("Occasion May Overlap"), occasion.exclude_from_overlap_check
 

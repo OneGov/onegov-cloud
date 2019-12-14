@@ -295,14 +295,8 @@ class ActivityCollection(RangedPagination):
             o = o.filter(or_(
                 *(
                     and_(
-                        min_price <= (
-                            func.coalesce(Occasion.cost, 0)
-                            + func.coalesce(Period.occasion_extra_cost, 0)
-                        ),
-                        (
-                            func.coalesce(Occasion.cost, 0)
-                            + func.coalesce(Period.occasion_extra_cost, 0)
-                        ) <= max_price
+                        min_price <= Occasion.total_cost,
+                        Occasion.total_cost <= max_price,
                     ) for min_price, max_price in self.filter.price_ranges
                 )
             ))

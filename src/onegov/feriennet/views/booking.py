@@ -345,8 +345,7 @@ def view_my_bookings(self, request):
         if period.confirmed:
             return booking.cost
         else:
-            base_cost = 0 if period.all_inclusive else period.booking_cost
-            return (booking.occasion.cost or 0) + (base_cost or 0)
+            return booking.occasion.total_cost
 
     has_emergency_contact = user.data and user.data.get('emergency')
     show_emergency_info = user.username == request.current_username

@@ -1,10 +1,10 @@
 import sedate
 
 from datetime import datetime, timedelta
+from onegov.activity.models.occasion_date import DAYS
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from onegov.activity.models.occasion_date import DAYS
 from psycopg2.extras import NumericRange
 from sqlalchemy import Boolean
 from sqlalchemy import case
@@ -16,6 +16,7 @@ from sqlalchemy import Numeric
 from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import ARRAY, INT4RANGE
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.sql.functions import coalesce
 from sqlalchemy.orm import relationship, object_session, validates
 from sqlalchemy_utils import aggregated, observes
 from uuid import uuid4
@@ -55,6 +56,13 @@ class Occasion(Base, TimestampMixin):
     #: assumed to be CHF as this system will probably never be used outside
     #: Switzerland
     cost = Column(Numeric(precision=8, scale=2), nullable=True)
+
+    #: The administrative cost of the occasion, this shadows the same column
+    #: on the period. If given, it overrides that column, if left to None, it
+    #: means that the period's booking cost is taken.
+    #:
+    #: In all-inclusive periods, this value is ignored.
+    booking_cost = Column(Numeric(precision=8, scale=2), nullable=True)
 
     #: The activity this occasion belongs to
     activity_id = Column(
@@ -145,6 +153,38 @@ class Occasion(Base, TimestampMixin):
         """
 
         return (self.activity_id.hex, self.period_id.hex)
+
+    @hybrid_property
+    def total_cost(self):
+        """ Calculates the cost of booking a single occasion, including all
+        costs only relevant to this occasion (i.e. excluding the all-inclusive
+        subscription cost).
+
+        """
+
+        base = self.cost or 0
+
+        if self.period.all_inclusive:
+            return base
+
+        if self.booking_cost:
+            return base + self.booking_cost
+
+        if self.period.booking_cost:
+            return base + self.period.booking_cost
+
+        return base
+
+    @total_cost.expression
+    def total_cost(self):
+        from onegov.activity.models.period import Period
+
+        return coalesce(Occasion.cost, 0) + case([
+            (Period.all_inclusive == True, 0),
+            (Period.all_inclusive == False, func.coalesce(
+                Occasion.booking_cost, Period.booking_cost, 0
+            )),
+        ])
 
     def compute_duration(self, dates):
         if not dates:

@@ -328,10 +328,7 @@ class BookingInvoiceBridge(object):
     def complete(self, all_inclusive_booking_text):
         """ Finalises the processed bookings. """
 
-        if not self.period.all_inclusive:
-            return
-
-        if not self.period.booking_cost:
+        if not self.period.all_inclusive or not self.period.booking_cost:
             return
 
         for id, (attendee, username) in self.attendees.items():

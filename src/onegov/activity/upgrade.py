@@ -783,3 +783,9 @@ def book_finalized(context):
         column=Column('book_finalized', Boolean, nullable=False),
         default=False
     )
+
+
+@upgrade_task('Add occasion booking_cost')
+def add_occasion_booking_cost(context):
+    context.operations.add_column('occasions', column=Column(
+        'booking_cost', Numeric(precision=8, scale=2), nullable=True))

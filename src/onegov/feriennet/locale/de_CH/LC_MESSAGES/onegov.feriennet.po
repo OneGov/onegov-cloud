@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-12-13 11:05+0800\n"
+"POT-Creation-Date: 2019-12-14 11:53+0800\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -105,6 +105,9 @@ msgstr "Durchführung Plätze"
 
 msgid "Occasion Cost"
 msgstr "Durchführung Kosten"
+
+msgid "Occasion Custom Booking Cost"
+msgstr ""
 
 msgid "Occasion Meeting Point"
 msgstr "Durchführung Treffpunkt"
@@ -695,6 +698,18 @@ msgstr ""
 "Erlaubt die Buchung dieser Durchführung über dem Limit. Bei der Zuteilung "
 "wird das Limit weiterhin beachtet."
 
+msgid "The administrative cost of each booking"
+msgstr "Die administrativen Kosten einer einzelnen Buchung"
+
+msgid "Use default costs defined by the period"
+msgstr "Standard-Kosten des Zeitraums"
+
+msgid "Use custom costs"
+msgstr "Andere Kosten"
+
+msgid "Administrative cost"
+msgstr "Administrative Kosten"
+
 msgid "Must specify at least one date"
 msgstr "Bitte spezifizieren Sie mindestens ein Datum"
 
@@ -834,9 +849,6 @@ msgstr "Maximale Anzahl Angebote pro Teilnehmer"
 
 msgid "Cost of the Pass"
 msgstr "Kosten des Passes"
-
-msgid "The administrative cost of each booking"
-msgstr "Die administrativen Kosten einer einzelnen Buchung"
 
 msgid "How is the organiser paid?"
 msgstr "Wie wird der Veranstalter bezahlt?"

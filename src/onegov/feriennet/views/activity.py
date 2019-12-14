@@ -280,12 +280,7 @@ def view_activities(self, request):
         if not occasions:
             return None
 
-        if active_period.all_inclusive:
-            extra = 0
-        else:
-            extra = active_period.booking_cost or 0
-
-        return min((o.cost or 0) + extra for o in occasions)
+        return min(o.total_cost for o in occasions)
 
     filtered = next(
         (

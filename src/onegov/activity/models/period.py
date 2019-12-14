@@ -8,7 +8,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID, JSON
 from sqlalchemy import Boolean
-from sqlalchemy import case, desc, not_, distinct, func
+from sqlalchemy import desc, not_, distinct
 from sqlalchemy import CheckConstraint
 from sqlalchemy import column
 from sqlalchemy import Column
@@ -17,7 +17,6 @@ from sqlalchemy import Index
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
 from sqlalchemy import Text
-from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import object_session, relationship, joinedload, defer
 from sqlalchemy.orm import validates
 from uuid import uuid4
@@ -162,26 +161,6 @@ class Period(Base, TimestampMixin):
         backref='period'
     )
 
-    @hybrid_property
-    def occasion_extra_cost(self):
-        """ Returns the cost that has to be added to each occasion to
-        get its actual price. Only relevant if not all-inclusive.
-
-        """
-        if self.all_inclusive:
-            return 0
-        else:
-            return self.booking_cost or 0
-
-    @occasion_extra_cost.expression
-    def occasion_extra_cost(self):
-        return case([
-            (Period.all_inclusive == True, 0),
-            (Period.all_inclusive == False, func.coalesce(
-                Period.booking_cost, 0
-            ))
-        ])
-
     @validates('age_barrier_type')
     def validate_age_barrier_type(self, key, age_barrier_type):
         assert age_barrier_type in AgeBarrier.registry
@@ -248,7 +227,7 @@ class Period(Base, TimestampMixin):
             if booking.state == 'open':
                 booking.state = 'denied'
 
-            booking.cost = booking.provisional_booking_cost(period=self)
+            booking.cost = booking.occasion.total_cost
 
     def archive(self):
         """ Moves all accepted activities with an occasion in this period
