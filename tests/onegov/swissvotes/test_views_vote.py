@@ -488,41 +488,39 @@ def test_vote_chart(session):
     model._position_federal_council = 33
     model._position_national_council = 1
     model._position_council_of_states = 2
-    assert view_vote_percentages(model, request) == {
-        'results': [
-            {
+    data = view_vote_percentages(model, request)
+    results = data['results']
+    assert results[0] == {
                 'empty': False,
                 'text': 'People', 'text_label': '',
                 'yea': 0.0, 'yea_label': '',
                 'none': 0.0, 'none_label': '',
                 'nay': True, 'nay_label': 'Rejected',
-            },
-            {
+            }
+    assert results[1] == {
                 'empty': False,
                 'text': 'Cantons', 'text_label': '',
                 'yea': 0.0, 'yea_label': '',
                 'none': True,
                 'none_label': 'Majority of the cantons not necessary',
                 'nay': 0.0, 'nay_label': '',
-            },
-            empty,
-            {
+            }
+    assert results[2] == empty
+    assert results[3] == {
                 'empty': False,
                 'text': 'National Council', 'text_label': '',
                 'yea': True, 'yea_label': 'Accepting',
                 'none': 0.0, 'none_label': '',
                 'nay': 0.0, 'nay_label': '',
-            },
-            {
+            }
+    assert results[4] == {
                 'empty': False,
                 'text': 'Council of States', 'text_label': '',
                 'yea': 0.0, 'yea_label': '',
                 'none': 0.0, 'none_label': '',
                 'nay': True, 'nay_label': 'Rejecting',
             }
-        ],
-        'title': 'Vote DE'
-    }
+    assert data['title'] == 'Vote DE'
 
     model.result_people_yeas_p = Decimal('10.2')
     model.result_cantons_yeas = Decimal('23.5')
@@ -533,38 +531,39 @@ def test_vote_chart(session):
     model.position_council_of_states_nays = Decimal('3')
     model.national_council_share_yeas = Decimal('1.0')
     model.national_council_share_nays = Decimal('3.4')
-    assert view_vote_percentages(model, request) == {
-        'results': [
-            {
+
+    data = view_vote_percentages(model, request)
+    results = data['results']
+    assert results[0] == {
                 'empty': False,
                 'text': 'People', 'text_label': '',
                 'yea': 10.2, 'yea_label': '10.2% yea',
                 'none': 0.0, 'none_label': '',
                 'nay': 89.8, 'nay_label': '89.8% nay',
-            },
-            {
+            }
+    assert results[0] == {
                 'empty': False,
                 'text': 'Cantons', 'text_label': '',
                 'yea': 90.4, 'yea_label': '23.5 yea',
                 'none': 0.0, 'none_label': '',
                 'nay': 9.6, 'nay_label': '2.5 nay',
-            },
-            empty,
-            {
+            }
+    assert results[0] == empty
+    assert results[0] == {
                 'empty': False,
                 'text': 'National Council', 'text_label': '',
                 'yea': 74.5, 'yea_label': '149 yea',
                 'none': 0.0, 'none_label': '',
                 'nay': 25.5, 'nay_label': '51 nay',
-            },
-            {
+            }
+    assert results[0] == {
                 'empty': False,
                 'text': 'Council of States', 'text_label': '',
                 'yea': 93.5, 'yea_label': '43 yea',
                 'none': 0.0, 'none_label': '',
                 'nay': 6.5, 'nay_label': '3 nay',
-            },
-            {
+            }
+    assert results[0] == {
                 'empty': False,
                 'text': 'Party slogans',
                 'text_label': 'Recommendations by political parties',
@@ -582,6 +581,4 @@ def test_vote_chart(session):
                     'Electoral shares of parties: Parties recommending No 3.4%'
                 ),
             }
-        ],
-        'title': 'Vote DE'
-    }
+
