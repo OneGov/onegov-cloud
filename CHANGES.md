@@ -1,8 +1,36 @@
 # Changes
 
+## Release `2019.50`
+
+> commits: **8 / [c50857d184...0ff2671f01](https://github.com/OneGov/onegov-cloud/compare/c50857d184^...0ff2671f01)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.50)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🎉 **View group invites as another user**
+
+Admins may now view group invites from the view of another user, which
+helps them help out users that are stuck.
+
+**`Feature`** | **[FER-754](https://issues.seantis.ch/browse/FER-754)** | **[c71bc833d4](https://github.com/onegov/onegov-cloud/commit/c71bc833d46fe73e9c6ce98d3a98b434f40124cb)**
+
+🎉 **Optionally override booking cost per occasion**
+
+This allows users to have a higher booking cost for occasions which need
+more work to administer, say a 1-week sommercamp.
+
+**`Feature`** | **[FER-824](https://issues.seantis.ch/browse/FER-824)** | **[0ff2671f01](https://github.com/onegov/onegov-cloud/commit/0ff2671f01ab39aa9f37f31eb2c24708d19b976d)**
+
+### Org
+
+🐞 **Fixes thumbnails not working in many cases**
+
+**`Bugfix`** | **[fce1381665](https://github.com/onegov/onegov-cloud/commit/fce138166531db76435149da0b5ebe97cb018654)**
+
 ## Release `2019.49`
 
-> commits: **7 / [837d01d82e...9d4f242107](https://github.com/OneGov/onegov-cloud/compare/837d01d82e^...9d4f242107)**<br>
+> released: **2019-12-12 15:18**<br>
+> commits: **8 / [837d01d82e...f470ca3a09](https://github.com/OneGov/onegov-cloud/compare/837d01d82e^...f470ca3a09)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.49)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
