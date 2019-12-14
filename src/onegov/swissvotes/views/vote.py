@@ -81,11 +81,24 @@ def view_vote_percentages(self, request):
             'empty': empty
         }
 
+        default_yea_label = _("${x}% yea") if not self.deciding_question \
+            else _("${x}% for the initiative")
+
+        default_nay_label = _("${x}% nay") if not self.deciding_question \
+            else _("${x}% for the counter-proposal")
+
+        yea_label_no_perc = _("${x} yea") if not self.deciding_question \
+            else _("${x} for the initiative")
+
+        nay_label_no_per = _("${x} nay") if not self.deciding_question \
+            else _("${x} for the counter-proposal")
+
         if percentage is not None:
             yea = round(float(percentage), 1)
             nay = round(float(100 - percentage), 1)
-            yea_label = yea_label or _("${x}% yea")
-            nay_label = nay_label or _("${x}% nay")
+
+            yea_label = yea_label or default_yea_label
+            nay_label = nay_label or default_nay_label
             result.update({
                 'yea': yea,
                 'nay': nay,
@@ -97,8 +110,8 @@ def view_vote_percentages(self, request):
             yea = round(float(yeas_p), 1)
             nay = round(float(nays_p), 1)
             none = round(float(100 - yeas_p - nays_p), 1)
-            yea_label = yea_label or _("${x}% yea")
-            nay_label = nay_label or _("${x}% nay")
+            yea_label = yea_label or default_yea_label
+            nay_label = nay_label or default_nay_label
             none_label = none_label or _("${x}% none")
             result.update({
                 'yea': yea,
@@ -112,8 +125,8 @@ def view_vote_percentages(self, request):
         elif yeas is not None and nays is not None:
             yea = round(float(100 * (yeas / (yeas + nays))), 1)
             nay = round(float(100 * (nays / (yeas + nays))), 1)
-            yea_label = yea_label or _("${x} yea")
-            nay_label = nay_label or _("${x} nay")
+            yea_label = yea_label or yea_label_no_perc
+            nay_label = nay_label or nay_label_no_per
             result.update({
                 'yea': yea,
                 'nay': nay,
@@ -180,10 +193,16 @@ def view_vote_percentages(self, request):
             yea_label=_(
                 "Electoral shares of parties: "
                 "Parties recommending Yes ${x}%"
+            ) if not self.deciding_question else _(
+                "Electoral shares of parties: "
+                "Parties preferring the initiative ${x}%"
             ),
             nay_label=_(
                 "Electoral shares of parties: "
                 "Parties recommending No ${x}%"
+            ) if not self.deciding_question else _(
+                "Electoral shares of parties: "
+                "Parties preferring the counter-proposal ${x}%"
             ),
             none_label=_(
                 "Electoral shares of parties: neutral/unknown ${x}%"

@@ -102,15 +102,26 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
         if attribute == 'result_cantons_accepted':
             return OrderedDict((
                 (0, _("Rejected") if not dc
-                    else _("Preference for the counter-proposal")),
+                    else _("Preferred the counter-proposal")),
                 (1, _("Accepted") if not dc
-                    else _("Preference for the popular initiative")),
+                    else _("Preferred the popular initiative")),
                 (3, _("Majority of the cantons not necessary")),
             ))
+
+        if attribute == 'result_accepted':
+            return OrderedDict((
+                (0, _("Rejected") if not dc
+                    else _("For the counter-proposal")),
+                (1, _("Accepted") if not dc
+                    else _("For the initiative")),
+            ))
+
         if attribute == 'result' or attribute.endswith('_accepted'):
             return OrderedDict((
-                (0, _("Rejected")),
-                (1, _("Accepted")),
+                (0, _("Rejected") if not dc
+                    else _("Preferred the counter-proposal")),
+                (1, _("Accepted") if not dc
+                    else _("Preferred the popular initiative")),
             ))
         if attribute == 'department_in_charge':
             return OrderedDict((
@@ -553,7 +564,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
             if value is not None:
                 result.setdefault(value, []).append(Region(canton))
 
-        codes = self.codes('result_accepted')
+        codes = self.codes('result_accepted', self.deciding_question)
         return OrderedDict([
             (codes[key], result[key])
             for key in sorted(result.keys())
