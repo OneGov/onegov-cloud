@@ -307,6 +307,9 @@ def view_file(self, request):
             'parliamentary_debate': _("Parliamentary debate"),
             'voting_booklet': _("Voting booklet"),
             'ad_analysis': _("Analysis of the advertising campaign"),
+            'foeg_analysis': _("Media coverage: fög analysis"),
+            'post_vote_poll': _("Post-vote poll"),
+            'preliminary_examination': _("Preliminary examination"),
             'resolution': _("Resolution"),
             'results_by_domain': _(
                 "Result by canton, district and municipality"
