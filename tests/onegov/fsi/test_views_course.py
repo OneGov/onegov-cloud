@@ -120,3 +120,7 @@ def test_course_1(client_with_db):
 
     client.login_member()
     client.get(view, status=200)
+
+    # Test if editor can view embeded email template
+    client.login_editor()
+    client.get(f'/fsi/course/{course.id}/embed')

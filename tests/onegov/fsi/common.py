@@ -65,6 +65,7 @@ def planner_factory(session, **kwargs):
         last_name='P',
         user_id=user.id
     )
+
     data.update(**kwargs)
     planner = session.query(CourseAttendee).filter_by(**data).first()
     if not planner:

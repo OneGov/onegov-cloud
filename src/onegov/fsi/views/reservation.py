@@ -116,7 +116,7 @@ def view_add_reservation_placeholder(self, request, form):
 def view_add_from_course_event(self, request):
     request.assert_valid_csrf_token()
     self.add(
-        attendee_id=self.attendee_id or request.attendee_id,
+        attendee_id=self.attendee_id,
         course_event_id=self.course_event_id)
     request = handle_send_email(
         self.course_event.reservation_template,
