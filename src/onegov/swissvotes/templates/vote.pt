@@ -302,12 +302,6 @@
                         <span tal:condition="request.html_lang == 'en-US'">(in German)</span><span tal:condition="request.html_lang == 'fr-CH'">(en allemand)</span>
                         </td>
                     </tr>
-                    <tr tal:condition="bkresults">
-                        <th i18n:translate>Overview of voting result by the Confederation</th>
-                        <td>
-                            <a href="${bkresults}" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
-                        </td>
-                    </tr>
                     <tr tal:condition="foeg_analysis">
                         <th i18n:translate>Media coverage: fög analysis</th>
                         <td>
@@ -384,6 +378,12 @@
                             Excel
                             </a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                             <span tal:condition="request.html_lang == 'fr-CH'">(en allemand)</span>
+                        </td>
+                    </tr>
+                    <tr tal:condition="bkresults">
+                        <th i18n:translate>Overview of voting result by the Confederation</th>
+                        <td>
+                            <a href="${bkresults}" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                         </td>
                     </tr>
                     <tr tal:condition="post_vote_poll">
