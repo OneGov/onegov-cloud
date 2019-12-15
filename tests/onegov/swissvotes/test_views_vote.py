@@ -30,9 +30,6 @@ test_vote_data = dict(
     bkresults_fr='bkr_fr',
     bkchrono_de='bkc_de',
     bkchrono_fr='bkc_fr',
-    # post_vote_poll=LocalizedFile(),
-    # foeg_analysis=LocalizedFile(),
-    # preliminary_examination='exam.pdf',
     descriptor_1_level_1=Decimal('4'),
     descriptor_1_level_2=Decimal('4.2'),
     descriptor_1_level_3=Decimal('4.21'),
@@ -400,7 +397,10 @@ def test_vote_upload(swissvotes_app, attachments):
 
     for name in names:
         name = name.replace('_', '-')
-        page = client.get(manage.pyquery(f'a.{name}')[0].attrib['href'])
+        url = manage.pyquery(f'a.{name}')[0].attrib['href']
+        print(url)
+        page = client.get(
+            url).maybe_follow()
         assert page.content_type in (
             'application/pdf',
             'application/zip',
@@ -418,7 +418,8 @@ def test_vote_upload(swissvotes_app, attachments):
     manage = manage.click("Details")
     for name in names:
         name = name.replace('_', '-')
-        page = client.get(manage.pyquery(f'a.{name}')[0].attrib['href'])
+        page = client.get(
+            manage.pyquery(f'a.{name}')[0].attrib['href']).maybe_follow()
         assert page.content_type in (
             'application/pdf',
             'application/zip',
