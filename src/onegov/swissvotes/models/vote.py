@@ -789,7 +789,8 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
         'parliamentary_debate',
         # we don't include the voting booklet, resolution and ad analysis
         # - they might contain other votes from the same day!
-        'realization'
+        'realization',
+        'preliminary_examination'
     }
 
     def vectorize_files(self):
