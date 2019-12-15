@@ -869,6 +869,7 @@ def test_vote_attachments(swissvotes_app, attachments):
         'parliamentary_debate',
         'realization',
         'voting_text',
+        'preliminary_examination'
     }
 
     vote.ad_analysis = attachments['ad_analysis']
