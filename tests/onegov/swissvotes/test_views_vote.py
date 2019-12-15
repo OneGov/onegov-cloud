@@ -1,6 +1,7 @@
 from datetime import date
 from decimal import Decimal
 from onegov.swissvotes.models import SwissVote
+from onegov.swissvotes.models.localized_file import LocalizedFile
 from onegov.swissvotes.views.vote import view_vote_percentages
 from psycopg2.extras import NumericRange
 from transaction import commit
@@ -9,132 +10,143 @@ from webtest.forms import Upload
 from translationstring import TranslationString
 import re
 
+test_vote_data = dict(
+    bfs_number=Decimal('100.1'),
+    date=date(1990, 6, 2),
+    legislation_number=4,
+    legislation_decade=NumericRange(1990, 1994),
+    title_de="Vote DE",
+    title_fr="Vote FR",
+    short_title_de="V D",
+    short_title_fr="V F",
+    keyword="Keyword",
+    votes_on_same_day=2,
+    _legal_form=1,
+    initiator="Initiator",
+    anneepolitique="anneepolitique",
+    curia_vista_de='cv_de',
+    curia_vista_fr='cv_fr',
+    bkresults_de='bkr_de',
+    bkresults_fr='bkr_fr',
+    bkchrono_de='bkc_de',
+    bkchrono_fr='bkc_fr',
+    # post_vote_poll=LocalizedFile(),
+    # foeg_analysis=LocalizedFile(),
+    # preliminary_examination='exam.pdf',
+    descriptor_1_level_1=Decimal('4'),
+    descriptor_1_level_2=Decimal('4.2'),
+    descriptor_1_level_3=Decimal('4.21'),
+    descriptor_2_level_1=Decimal('10'),
+    descriptor_2_level_2=Decimal('10.3'),
+    descriptor_2_level_3=Decimal('10.35'),
+    descriptor_3_level_1=Decimal('10'),
+    descriptor_3_level_2=Decimal('10.3'),
+    descriptor_3_level_3=Decimal('10.33'),
+    _result=1,
+    result_eligible_voters=2,
+    result_votes_empty=3,
+    result_votes_invalid=4,
+    result_votes_valid=5,
+    result_votes_total=6,
+    result_turnout=Decimal('20.01'),
+    _result_people_accepted=1,
+    result_people_yeas=8,
+    result_people_nays=9,
+    result_people_yeas_p=Decimal('40.01'),
+    _result_cantons_accepted=1,
+    result_cantons_yeas=Decimal('1.5'),
+    result_cantons_nays=Decimal('24.5'),
+    result_cantons_yeas_p=Decimal('60.01'),
+    _department_in_charge=1,
+    procedure_number=Decimal('24.557'),
+    _position_federal_council=1,
+    _position_parliament=1,
+    _position_national_council=1,
+    position_national_council_yeas=10,
+    position_national_council_nays=20,
+    _position_council_of_states=1,
+    position_council_of_states_yeas=30,
+    position_council_of_states_nays=40,
+    duration_federal_assembly=30,
+    duration_post_federal_assembly=31,
+    duration_initative_collection=32,
+    duration_initative_federal_council=33,
+    duration_initative_total=34,
+    duration_referendum_collection=35,
+    duration_referendum_total=36,
+    signatures_valid=40,
+    signatures_invalid=41,
+    recommendations={
+        'fdp': 1,
+        'cvp': 1,
+        'sps': 1,
+        'svp': 1,
+        'lps': 2,
+        'ldu': 2,
+        'evp': 2,
+        'csp': 3,
+        'pda': 3,
+        'poch': 3,
+        'gps': 4,
+        'sd': 4,
+        'rep': 4,
+        'edu': 5,
+        'fps': 5,
+        'lega': 5,
+        'kvp': 66,
+        'glp': 66,
+        'bdp': None,
+        'mcg': 9999,
+        'sav': 1,
+        'eco': 2,
+        'sgv': 3,
+        'sbv-usp': 3,
+        'sgb': 3,
+        'travs': 3,
+        'vsa': 9999,
+    },
+    recommendations_other_yes="Pro Velo",
+    recommendations_other_no=None,
+    recommendations_other_free="Pro Natura, Greenpeace",
+    recommendations_divergent={
+        'fdp-fr_ch': 2,
+        'jcvp_ch': 2,
+    },
+    national_council_election_year=1990,
+    national_council_share_fdp=Decimal('01.10'),
+    national_council_share_cvp=Decimal('02.10'),
+    national_council_share_sp=Decimal('03.10'),
+    national_council_share_svp=Decimal('04.10'),
+    national_council_share_lps=Decimal('05.10'),
+    national_council_share_ldu=Decimal('06.10'),
+    national_council_share_evp=Decimal('07.10'),
+    national_council_share_csp=Decimal('08.10'),
+    national_council_share_pda=Decimal('09.10'),
+    national_council_share_poch=Decimal('10.10'),
+    national_council_share_gps=Decimal('11.10'),
+    national_council_share_sd=Decimal('12.10'),
+    national_council_share_rep=Decimal('13.10'),
+    national_council_share_edu=Decimal('14.10'),
+    national_council_share_fps=Decimal('15.10'),
+    national_council_share_lega=Decimal('16.10'),
+    national_council_share_kvp=Decimal('17.10'),
+    national_council_share_glp=Decimal('18.10'),
+    national_council_share_bdp=Decimal('19.10'),
+    national_council_share_mcg=Decimal('20.20'),
+    national_council_share_ubrige=Decimal('21.20'),
+    national_council_share_yeas=Decimal('22.20'),
+    national_council_share_nays=Decimal('23.20'),
+    national_council_share_neutral=Decimal('24.20'),
+    national_council_share_none=Decimal('25.20'),
+    national_council_share_empty=Decimal('26.20'),
+    national_council_share_free_vote=Decimal('27.20'),
+    national_council_share_unknown=Decimal('28.20')
+)
+
 
 def test_view_vote(swissvotes_app):
     swissvotes_app.session().add(
-        SwissVote(
-            bfs_number=Decimal('100.1'),
-            date=date(1990, 6, 2),
-            legislation_number=4,
-            legislation_decade=NumericRange(1990, 1994),
-            title_de="Vote DE",
-            title_fr="Vote FR",
-            short_title_de="V D",
-            short_title_fr="V F",
-            keyword="Keyword",
-            votes_on_same_day=2,
-            _legal_form=1,
-            initiator="Initiator",
-            anneepolitique="anneepolitique",
-            descriptor_1_level_1=Decimal('4'),
-            descriptor_1_level_2=Decimal('4.2'),
-            descriptor_1_level_3=Decimal('4.21'),
-            descriptor_2_level_1=Decimal('10'),
-            descriptor_2_level_2=Decimal('10.3'),
-            descriptor_2_level_3=Decimal('10.35'),
-            descriptor_3_level_1=Decimal('10'),
-            descriptor_3_level_2=Decimal('10.3'),
-            descriptor_3_level_3=Decimal('10.33'),
-            _result=1,
-            result_eligible_voters=2,
-            result_votes_empty=3,
-            result_votes_invalid=4,
-            result_votes_valid=5,
-            result_votes_total=6,
-            result_turnout=Decimal('20.01'),
-            _result_people_accepted=1,
-            result_people_yeas=8,
-            result_people_nays=9,
-            result_people_yeas_p=Decimal('40.01'),
-            _result_cantons_accepted=1,
-            result_cantons_yeas=Decimal('1.5'),
-            result_cantons_nays=Decimal('24.5'),
-            result_cantons_yeas_p=Decimal('60.01'),
-            _department_in_charge=1,
-            procedure_number=Decimal('24.557'),
-            _position_federal_council=1,
-            _position_parliament=1,
-            _position_national_council=1,
-            position_national_council_yeas=10,
-            position_national_council_nays=20,
-            _position_council_of_states=1,
-            position_council_of_states_yeas=30,
-            position_council_of_states_nays=40,
-            duration_federal_assembly=30,
-            duration_post_federal_assembly=31,
-            duration_initative_collection=32,
-            duration_initative_federal_council=33,
-            duration_initative_total=34,
-            duration_referendum_collection=35,
-            duration_referendum_total=36,
-            signatures_valid=40,
-            signatures_invalid=41,
-            recommendations={
-                'fdp': 1,
-                'cvp': 1,
-                'sps': 1,
-                'svp': 1,
-                'lps': 2,
-                'ldu': 2,
-                'evp': 2,
-                'csp': 3,
-                'pda': 3,
-                'poch': 3,
-                'gps': 4,
-                'sd': 4,
-                'rep': 4,
-                'edu': 5,
-                'fps': 5,
-                'lega': 5,
-                'kvp': 66,
-                'glp': 66,
-                'bdp': None,
-                'mcg': 9999,
-                'sav': 1,
-                'eco': 2,
-                'sgv': 3,
-                'sbv-usp': 3,
-                'sgb': 3,
-                'travs': 3,
-                'vsa': 9999,
-            },
-            recommendations_other_yes="Pro Velo",
-            recommendations_other_no=None,
-            recommendations_other_free="Pro Natura, Greenpeace",
-            recommendations_divergent={
-                'fdp-fr_ch': 2,
-                'jcvp_ch': 2,
-            },
-            national_council_election_year=1990,
-            national_council_share_fdp=Decimal('01.10'),
-            national_council_share_cvp=Decimal('02.10'),
-            national_council_share_sp=Decimal('03.10'),
-            national_council_share_svp=Decimal('04.10'),
-            national_council_share_lps=Decimal('05.10'),
-            national_council_share_ldu=Decimal('06.10'),
-            national_council_share_evp=Decimal('07.10'),
-            national_council_share_csp=Decimal('08.10'),
-            national_council_share_pda=Decimal('09.10'),
-            national_council_share_poch=Decimal('10.10'),
-            national_council_share_gps=Decimal('11.10'),
-            national_council_share_sd=Decimal('12.10'),
-            national_council_share_rep=Decimal('13.10'),
-            national_council_share_edu=Decimal('14.10'),
-            national_council_share_fps=Decimal('15.10'),
-            national_council_share_lega=Decimal('16.10'),
-            national_council_share_kvp=Decimal('17.10'),
-            national_council_share_glp=Decimal('18.10'),
-            national_council_share_bdp=Decimal('19.10'),
-            national_council_share_mcg=Decimal('20.20'),
-            national_council_share_ubrige=Decimal('21.20'),
-            national_council_share_yeas=Decimal('22.20'),
-            national_council_share_nays=Decimal('23.20'),
-            national_council_share_neutral=Decimal('24.20'),
-            national_council_share_none=Decimal('25.20'),
-            national_council_share_empty=Decimal('26.20'),
-            national_council_share_free_vote=Decimal('27.20'),
-            national_council_share_unknown=Decimal('28.20'),
-        )
+        SwissVote(**test_vote_data)
     )
     commit()
 
@@ -250,46 +262,45 @@ def test_view_vote(swissvotes_app):
 
     # Percentages
     page = client.get(page.request.url.replace('/strengths', '/percentages'))
-    assert page.json == {
-        'results': [
-            {
+    results = page.json['results']
+    assert results[0] == {
                 'text': 'Volk', 'text_label': '', 'empty': False,
                 'yea': 40.0, 'yea_label': '40.0% Ja',
                 'none': 0.0, 'none_label': '',
                 'nay': 60.0, 'nay_label': '60.0% Nein',
-            },
-            {
+            }
+    assert results[1] == {
                 'text': 'Stände', 'text_label': '', 'empty': False,
                 'yea': 5.8, 'yea_label': '1.5 Ja',
                 'none': 0.0, 'none_label': '',
                 'nay': 94.2, 'nay_label': '24.5 Nein',
-            },
-            {
+            }
+    assert results[2] == {
                 'text': '', 'text_label': '', 'empty': True,
                 'yea': 0.0, 'yea_label': '',
                 'none': 0.0, 'none_label': '',
                 'nay': 0.0, 'nay_label': '',
-            },
-            {
+            }
+    assert results[3] == {
                 'text': 'Bundesrat', 'text_label': 'Position des Bundesrats',
                 'empty': False,
                 'yea': True, 'yea_label': 'Befürwortend',
                 'none': 0.0, 'none_label': '',
                 'nay': 0.0, 'nay_label': '',
-            },
-            {
+            }
+    assert results[4] == {
                 'text': 'Nationalrat', 'text_label': '', 'empty': False,
                 'yea': 33.3, 'yea_label': '10 Ja',
                 'none': 0.0, 'none_label': '',
                 'nay': 66.7, 'nay_label': '20 Nein',
-            },
-            {
+            }
+    assert results[5] == {
                 'text': 'Ständerat', 'text_label': '', 'empty': False,
                 'yea': 42.9, 'yea_label': '30 Ja',
                 'none': 0.0, 'none_label': '',
                 'nay': 57.1, 'nay_label': '40 Nein',
-            },
-            {
+            }
+    assert results[6] == {
                 'text': 'Parteiparolen',
                 'text_label': 'Empfehlungen der politischen Parteien',
                 'empty': False,
@@ -306,10 +317,7 @@ def test_view_vote(swissvotes_app):
                     'Wähleranteile der Parteien: Ablehnende Parteien 23.2%'
                 ),
             }
-
-        ],
-        'title': 'Vote DE'
-    }
+    assert page.json['title'] == 'Vote DE'
 
     # Delete vote
     login = client.get('/auth/login')
@@ -319,9 +327,35 @@ def test_view_vote(swissvotes_app):
 
     manage = client.get('/').maybe_follow().click("Abstimmungen")
     manage = manage.click("Details").click("Abstimmung löschen")
-    manage = manage.form.submit().follow()
+    manage.form.submit().follow()
 
     assert swissvotes_app.session().query(SwissVote).count() == 0
+
+
+def test_view_deciding_question(swissvotes_app):
+    data = test_vote_data
+    data['_legal_form'] = 5
+
+    swissvotes_app.session().add(
+        SwissVote(**data)
+    )
+    commit()
+
+    client = Client(swissvotes_app)
+    client.get('/locale/de_CH').follow()
+
+    page = client.get('/').maybe_follow().click("Abstimmungen")
+    page = page.click("Details")
+
+    assert "Offizielle Chronologie" in page
+    assert "Ergebnisübersicht Bundeskanzlei" in page
+    assert "Ergebnisübersicht Bundeskanzlei" in page
+
+    assert "Wähleranteil des Lagers für Bevorzugung der Initiative" in page
+    assert "Abgelehnt" not in page
+    assert "Angenommen"not in page
+    assert "Ja" not in page
+    assert "Nein" not in page
 
 
 def test_vote_upload(swissvotes_app, attachments):
@@ -488,41 +522,39 @@ def test_vote_chart(session):
     model._position_federal_council = 33
     model._position_national_council = 1
     model._position_council_of_states = 2
-    assert view_vote_percentages(model, request) == {
-        'results': [
-            {
+    data = view_vote_percentages(model, request)
+    results = data['results']
+    assert results[0] == {
                 'empty': False,
                 'text': 'People', 'text_label': '',
                 'yea': 0.0, 'yea_label': '',
                 'none': 0.0, 'none_label': '',
                 'nay': True, 'nay_label': 'Rejected',
-            },
-            {
+            }
+    assert results[1] == {
                 'empty': False,
                 'text': 'Cantons', 'text_label': '',
                 'yea': 0.0, 'yea_label': '',
                 'none': True,
                 'none_label': 'Majority of the cantons not necessary',
                 'nay': 0.0, 'nay_label': '',
-            },
-            empty,
-            {
+            }
+    assert results[2] == empty
+    assert results[3] == {
                 'empty': False,
                 'text': 'National Council', 'text_label': '',
                 'yea': True, 'yea_label': 'Accepting',
                 'none': 0.0, 'none_label': '',
                 'nay': 0.0, 'nay_label': '',
-            },
-            {
+            }
+    assert results[4] == {
                 'empty': False,
                 'text': 'Council of States', 'text_label': '',
                 'yea': 0.0, 'yea_label': '',
                 'none': 0.0, 'none_label': '',
                 'nay': True, 'nay_label': 'Rejecting',
             }
-        ],
-        'title': 'Vote DE'
-    }
+    assert data['title'] == 'Vote DE'
 
     model.result_people_yeas_p = Decimal('10.2')
     model.result_cantons_yeas = Decimal('23.5')
@@ -533,38 +565,39 @@ def test_vote_chart(session):
     model.position_council_of_states_nays = Decimal('3')
     model.national_council_share_yeas = Decimal('1.0')
     model.national_council_share_nays = Decimal('3.4')
-    assert view_vote_percentages(model, request) == {
-        'results': [
-            {
+
+    data = view_vote_percentages(model, request)
+    results = data['results']
+    assert results[0] == {
                 'empty': False,
                 'text': 'People', 'text_label': '',
                 'yea': 10.2, 'yea_label': '10.2% yea',
                 'none': 0.0, 'none_label': '',
                 'nay': 89.8, 'nay_label': '89.8% nay',
-            },
-            {
+            }
+    assert results[1] == {
                 'empty': False,
                 'text': 'Cantons', 'text_label': '',
                 'yea': 90.4, 'yea_label': '23.5 yea',
                 'none': 0.0, 'none_label': '',
                 'nay': 9.6, 'nay_label': '2.5 nay',
-            },
-            empty,
-            {
+            }
+    assert results[2] == empty
+    assert results[3] == {
                 'empty': False,
                 'text': 'National Council', 'text_label': '',
                 'yea': 74.5, 'yea_label': '149 yea',
                 'none': 0.0, 'none_label': '',
                 'nay': 25.5, 'nay_label': '51 nay',
-            },
-            {
+            }
+    assert results[4] == {
                 'empty': False,
                 'text': 'Council of States', 'text_label': '',
                 'yea': 93.5, 'yea_label': '43 yea',
                 'none': 0.0, 'none_label': '',
                 'nay': 6.5, 'nay_label': '3 nay',
-            },
-            {
+            }
+    assert results[5] == {
                 'empty': False,
                 'text': 'Party slogans',
                 'text_label': 'Recommendations by political parties',
@@ -582,6 +615,59 @@ def test_vote_chart(session):
                     'Electoral shares of parties: Parties recommending No 3.4%'
                 ),
             }
-        ],
-        'title': 'Vote DE'
+
+    # Test deciding question
+    model._legal_form = 5
+    results = view_vote_percentages(model, request)['results']
+
+    assert results[0] == {
+        'empty': False,
+        'text': 'People', 'text_label': '',
+        'yea': 10.2, 'yea_label': '10.2% for the initiative',
+        'none': 0.0, 'none_label': '',
+        'nay': 89.8, 'nay_label': '89.8% for the counter-proposal',
     }
+    assert results[1] == {
+        'empty': False,
+        'text': 'Cantons', 'text_label': '',
+        'yea': 90.4, 'yea_label': '23.5 for the initiative',
+        'none': 0.0, 'none_label': '',
+        'nay': 9.6, 'nay_label': '2.5 for the counter-proposal',
+    }
+
+    assert results[2] == empty
+
+    assert results[3] == {
+        'empty': False,
+        'text': 'National Council', 'text_label': '',
+        'yea': 74.5, 'yea_label': '149 for the initiative',
+        'none': 0.0, 'none_label': '',
+        'nay': 25.5, 'nay_label': '51 for the counter-proposal',
+    }
+    assert results[4] == {
+        'empty': False,
+        'text': 'Council of States', 'text_label': '',
+        'yea': 93.5, 'yea_label': '43 for the initiative',
+        'none': 0.0, 'none_label': '',
+        'nay': 6.5, 'nay_label': '3 for the counter-proposal',
+    }
+    assert results[5] == {
+        'empty': False,
+        'text': 'Party slogans',
+        'text_label': 'Recommendations by political parties',
+        'yea': 1.0,
+        'yea_label': (
+            'Electoral shares of parties: '
+            'Parties preferring the initiative 1.0%'
+        ),
+        'none': 95.6,
+        'none_label': (
+            'Electoral shares of parties: neutral/unknown 95.6%'
+        ),
+        'nay': 3.4,
+        'nay_label': (
+            'Electoral shares of parties: '
+            'Parties preferring the counter-proposal 3.4%'
+        ),
+    }
+

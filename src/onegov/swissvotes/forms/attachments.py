@@ -86,6 +86,30 @@ class AttachmentsForm(Form):
         ]
     )
 
+    foeg_analysis = UploadField(
+        label=_("Fög Analysis"),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(50 * 1024 * 1024)
+        ]
+    )
+
+    post_vote_poll = UploadField(
+        label=_("Post-vote poll"),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(50 * 1024 * 1024)
+        ]
+    )
+
+    preliminary_examination = UploadField(
+        label=_("Preliminary examination"),
+        validators=[
+            WhitelistedMimeType({'application/pdf'}),
+            FileSizeLimit(50 * 1024 * 1024)
+        ]
+    )
+
     results_by_domain = UploadField(
         label=_("Result by canton, district and municipality"),
         validators=[

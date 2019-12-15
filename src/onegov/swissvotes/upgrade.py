@@ -294,3 +294,20 @@ def add_national_council_share_parole_columns(context):
 def remove_decade_column(context):
     if context.has_column('swissvotes', 'decade'):
         context.operations.drop_column('swissvotes', 'decade')
+
+
+@upgrade_task('Adds links for extensions 2019')
+def add_curiavista_and_additional_links(context):
+
+    new_cols = (
+        'curia_vista_de',
+        'curia_vista_fr',
+        'bkresults_de',
+        'bkresults_fr',
+        'bkchrono_de',
+        'bkchrono_fr'
+    )
+
+    for col in new_cols:
+        if not context.has_column('swissvotes', col):
+            context.operations.add_column('swissvotes', Column(col, Text()))

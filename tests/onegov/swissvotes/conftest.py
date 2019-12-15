@@ -70,6 +70,9 @@ def swissvotes_app(request, temporary_path):
 def attachments(swissvotes_app):
     result = {}
     for name, content in (
+        ('preliminary_examination', "Voruntersuchung"),
+        ('post_vote_poll', "Nachbefragung"),
+        ('foeg_analysis', "Medienanalyse fög"),
         ('ad_analysis', "Inserateanalyse"),
         ('brief_description', "Kurschbeschreibung"),
         ('federal_council_message', "Message du Conseil fédéral"),

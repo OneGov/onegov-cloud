@@ -286,7 +286,8 @@ def test_search_form(swissvotes_app):
         (1, 'Mandatory referendum'),
         (2, 'Optional referendum'),
         (3, 'Popular initiative'),
-        (4, 'Direct counter-proposal')
+        (4, 'Direct counter-proposal'),
+        (5, 'Deciding question'),
     ]
     assert form.result.choices == [
         (0, 'Rejected'),
@@ -383,7 +384,7 @@ def test_search_form(swissvotes_app):
     form.apply_model(votes)
     assert form.from_date.data is None
     assert form.to_date.data is None
-    assert form.legal_form.data == [1, 2, 3, 4]
+    assert form.legal_form.data == [1, 2, 3, 4, 5]
     assert form.result.data == [0, 1]
     assert form.policy_area.data is None
     assert form.term.data is None

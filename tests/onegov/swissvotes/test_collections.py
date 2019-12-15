@@ -1537,6 +1537,14 @@ def test_votes_export(swissvotes_app):
     vote.national_council_share_unknown = Decimal('28.20')
     vote.bfs_map_de = 'map de'
     vote.bfs_map_fr = 'map fr'
+    vote.curia_vista_de = 'curiavista_de'
+    vote.curia_vista_fr = 'curiavista_fr'
+    vote.bkresults_de = 'bkresults_de'
+    vote.bkresults_fr = 'bkresults_fr'
+    vote.bkchrono_de = 'bkchrono_de'
+    vote.bkchrono_fr = 'bkchrono_fr'
+
+
     votes.session.flush()
     votes.session.expire_all()
 
@@ -1614,6 +1622,10 @@ def test_votes_export(swissvotes_app):
         'be-japroz': '10,8',
         'be-nein': '107',
         'be-stimmen': '103',
+        'bkchrono-de': 'bkchrono_de',
+        'bkchrono-fr': 'bkchrono_fr',
+        'bkresults-de': 'bkresults_de',
+        'bkresults-fr': 'bkresults_fr',
         'bl-annahme': '0',
         'bl-berecht': '101',
         'bl-bet': '10,4',
@@ -1630,6 +1642,8 @@ def test_votes_export(swissvotes_app):
         'bs-japroz': '10,8',
         'bs-nein': '107',
         'bs-stimmen': '103',
+        'curiavista-de': 'curiavista_de',
+        'curiavista-fr': 'curiavista_fr',
         'fr-annahme': '0',
         'fr-berecht': '101',
         'fr-bet': '10,4',
@@ -2354,6 +2368,10 @@ def test_votes_export(swissvotes_app):
         'be-japroz': 10.8,
         'be-nein': 107.0,
         'be-stimmen': 103.0,
+        'bkchrono-de': 'bkchrono_de',
+        'bkchrono-fr': 'bkchrono_fr',
+        'bkresults-de': 'bkresults_de',
+        'bkresults-fr': 'bkresults_fr',
         'bl-annahme': 0.0,
         'bl-berecht': 101.0,
         'bl-bet': 10.4,
@@ -2370,6 +2388,8 @@ def test_votes_export(swissvotes_app):
         'bs-japroz': 10.8,
         'bs-nein': 107.0,
         'bs-stimmen': 103.0,
+        'curiavista-de': 'curiavista_de',
+        'curiavista-fr': 'curiavista_fr',
         'fr-annahme': 0.0,
         'fr-berecht': 101.0,
         'fr-bet': 10.4,

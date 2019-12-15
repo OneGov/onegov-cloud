@@ -747,6 +747,12 @@ class ColumnMapper(object):
             ('anneepolitique', 'anneepolitique'),
             ('bfs_map_de', 'bfsmap-de'),
             ('bfs_map_fr', 'bfsmap-fr'),
+            ('curia_vista_de', 'curiavista-de'),
+            ('curia_vista_fr', 'curiavista-fr'),
+            ('bkresults_de', 'bkresults-de'),
+            ('bkresults_fr', 'bkresults-fr'),
+            ('bkchrono_de', 'bkchrono-de'),
+            ('bkchrono_fr', 'bkchrono-fr'),
         ))
 
     def set_value(self, vote, attribute, value):
