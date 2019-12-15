@@ -1,8 +1,37 @@
 # Changes
 
+## Release `2019.51`
+
+> commits: **3 / [497c3d9581...93b02920ff](https://github.com/OneGov/onegov-cloud/compare/497c3d9581^...93b02920ff)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.51)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🎉 **Adds a paid/unpaid filter to billing**
+
+By default, we only show unpaid bills and use the filter as a toggle.
+
+**`Feature`** | **[FER-489](https://issues.seantis.ch/browse/FER-489)** | **[497c3d9581](https://github.com/onegov/onegov-cloud/commit/497c3d958187c3966697109cbd438877b7fa42c7)**
+
+### Fsi
+
+🐞 **Fixes smaller issue of beta testing phase**
+
+**`Bugfix`** | **[93b02920ff](https://github.com/onegov/onegov-cloud/commit/93b02920ffd329beb9c702ce022684bd3a0c75df)**
+
+### Swissvotes
+
+🎉 **Adds legel form deciding question**
+
+Updates dataset with curiavista, bkresults and bkchrono links. Adds 3 additional attachments.
+Adapts views for deciding question.
+
+**`Feature`** | **[b592e32e76](https://github.com/onegov/onegov-cloud/commit/b592e32e769e4cd666f4161b136508580387bd5e)**
+
 ## Release `2019.50`
 
-> commits: **8 / [c50857d184...0ff2671f01](https://github.com/OneGov/onegov-cloud/compare/c50857d184^...0ff2671f01)**<br>
+> released: **2019-12-14 15:44**<br>
+> commits: **9 / [c50857d184...2c694b27a9](https://github.com/OneGov/onegov-cloud/compare/c50857d184^...2c694b27a9)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.50)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
