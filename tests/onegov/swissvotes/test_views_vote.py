@@ -616,7 +616,7 @@ def test_vote_chart(session):
                 ),
             }
 
-    # Test deciding querstion
+    # Test deciding question
     model._legal_form = 5
     results = view_vote_percentages(model, request)['results']
 
