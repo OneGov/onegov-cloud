@@ -42,6 +42,10 @@
                         <th class="column-30" i18n:translate>Vote date</th>
                         <td>${layout.format_date(vote.date, 'date')}</td>
                     </tr>
+                    <tr tal:condition="vote.bfs_number is not None">
+                        <th class="column-30" i18n:translate>Vote number</th>
+                        <td>${layout.format_bfs_number(vote.bfs_number)}</td>
+                    </tr>
                     <tr tal:condition="vote.legal_form is not None">
                         <th class="column-30" i18n:translate>Legal form</th>
                         <td>${vote.legal_form}</td>
@@ -71,10 +75,6 @@
                         <th class="column-30" i18n:translate>Voting text</th>
                         <td><a href="${request.link(voting_text)}" target="_blank" class="voting-text">
                         PDF</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span></td>
-                    </tr>
-                    <tr tal:condition="vote.bfs_number is not None">
-                        <th class="column-30" i18n:translate>Vote number</th>
-                        <td>${layout.format_bfs_number(vote.bfs_number)}</td>
                     </tr>
                     <tr tal:condition="bkchrono">
                         <th class="column-30" i18n:translate>Official Chronology</th>
