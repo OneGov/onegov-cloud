@@ -118,7 +118,7 @@ def test_browse_billing(browser, scenario, postgres):
 
     # initially there are no bills
     admin.visit('/billing')
-    assert admin.is_text_present("noch keine Rechnungen")
+    assert admin.is_text_present("Keine Rechnungen gefunden")
 
     # they can be created
     admin.find_by_css("input[type='submit']").click()
@@ -157,7 +157,7 @@ def test_browse_billing(browser, scenario, postgres):
         assert not client.is_text_present('noch keine Rechnungen')
         assert client.is_text_present("Ferienpass 2016")
 
-    admin.visit('/billing?username=member@example.org')
+    admin.visit('/billing?username=member@example.org&state=all')
     assert client.is_text_present('1100.00 Ausstehend')
 
     # we'll test a few scenarios here
@@ -184,7 +184,7 @@ def test_browse_billing(browser, scenario, postgres):
     # try to introduce a manual booking
     postgres.undo()
 
-    admin.visit('/billing')
+    admin.visit('/billing?state=all')
     admin.find_by_css('.dropdown.right-side').click()
     admin.find_by_css('.new-booking').click()
 

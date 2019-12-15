@@ -47,6 +47,23 @@ def view_billing(self, request, form):
     # as quick as possible, which is why we only use one token
     csrf_token = request.new_csrf_token().decode('utf-8')
 
+    filters = {
+        'state': [
+            Link(
+                text=_("Paid"),
+                active=self.state == 'paid',
+                url=request.link(self.for_state('paid')),
+                rounded=True,
+            ),
+            Link(
+                text=_("Unpaid"),
+                active=self.state == 'unpaid',
+                url=request.link(self.for_state('unpaid')),
+                rounded=True,
+            ),
+        ]
+    }
+
     def csrf_protected(url):
         return URL(url).query_param('csrf-token', csrf_token).as_string()
 
@@ -210,7 +227,8 @@ def view_billing(self, request, form):
         'form': form,
         'button_text': _("Create Bills"),
         'invoice_links': invoice_links,
-        'item_links': item_links
+        'item_links': item_links,
+        'filters': filters,
     }
 
 
@@ -296,7 +314,7 @@ def view_online_payments(self, request):
         'payments': payments,
         'payment_actions': payment_actions,
         'providers': providers,
-        'layout': layout
+        'layout': layout,
     }
 
 

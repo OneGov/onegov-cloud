@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-12-14 11:53+0800\n"
+"POT-Creation-Date: 2019-12-15 09:07+0800\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1350,8 +1350,8 @@ msgstr "Le montant total est de ${amount} CHF."
 msgid "The outstanding amount is ${amount} CHF."
 msgstr "Le montant impayé est de ${amount} CHF."
 
-msgid "No bills created yet."
-msgstr "Aucune facture n'a été créée pour le moment."
+msgid "No bills found."
+msgstr "Aucune facture trouvée."
 
 msgid "Paid"
 msgstr "Payé"
@@ -1402,6 +1402,9 @@ msgstr ""
 "La facturation pour cette période a été confirmée. Vous pouvez toujours "
 "modifier les factures manuellement mais vous ne pouvez plus les générer "
 "automatiquement."
+
+msgid "Payment State"
+msgstr "État de paiement"
 
 #. Canonical text for ${link} is: "settings"
 msgid ""
@@ -1622,6 +1625,9 @@ msgstr "Inviter d'autres enfants"
 
 msgid "No other children in group"
 msgstr "Pas d'autres enfants dans le groupe"
+
+msgid "No bills created yet."
+msgstr "Aucune facture n'a été créée pour le moment."
 
 msgid "Your donation"
 msgstr "Votre don"

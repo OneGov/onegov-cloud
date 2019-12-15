@@ -1528,7 +1528,7 @@ def test_online_payment(client, scenario):
     assert "96.80" in page
     assert "3.20" in page
 
-    page = client.get('/billing')
+    page = client.get('/billing?state=all')
     page = page.click('Online Zahlungen anzeigen').follow()
     assert "96.80" in page
     assert "3.20" in page
@@ -1542,7 +1542,7 @@ def test_online_payment(client, scenario):
         page.click("Zahlung rückerstatten")
         # client.post(get_post_url(page, 'payment-refund'))
 
-    page = client.get('/billing?expand=1')
+    page = client.get('/billing?expand=1&state=all')
     assert ">Unbezahlt<" in page
 
     page = client.get('/payments')
@@ -1553,8 +1553,8 @@ def test_online_payment(client, scenario):
     assert "Jetzt online bezahlen" in page
 
     # it should be possible to change the payment state again
-    client.get('/billing').click("Rechnung als bezahlt markieren")
-    client.get('/billing').click("Rechnung als unbezahlt markieren")
+    client.get('/billing?state=all').click("Rechnung als bezahlt markieren")
+    client.get('/billing?state=all').click("Rechnung als unbezahlt markieren")
 
     # pay again (leading to a refunded and an open charge)
     with requests_mock.Mocker() as m:

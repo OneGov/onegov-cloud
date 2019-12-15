@@ -15,7 +15,8 @@ from ulid import ulid
 
 class BillingCollection(object):
 
-    def __init__(self, request, period, username=None, expand=False):
+    def __init__(self, request, period,
+                 username=None, expand=False, state=None):
         self.request = request
         self.session = request.session
         self.app = request.app
@@ -26,6 +27,7 @@ class BillingCollection(object):
             user_id=self.user_id,
             period_id=self.period.id
         )
+        self.state = state
 
     @property
     def user_id(self):
@@ -37,13 +39,20 @@ class BillingCollection(object):
         return self.period.id
 
     def for_period(self, period):
-        return self.__class__(self.request, period, self.username, self.expand)
+        return self.__class__(
+            self.request, period, self.username, self.expand, self.state)
 
     def for_username(self, username):
-        return self.__class__(self.request, self.period, username, self.expand)
+        return self.__class__(
+            self.request, self.period, username, self.expand, self.state)
 
     def for_expand(self, expand):
-        return self.__class__(self.request, self.period, self.username, expand)
+        return self.__class__(
+            self.request, self.period, self.username, expand, self.state)
+
+    def for_state(self, state):
+        return self.__class__(
+            self.request, self.period, self.username, self.expand, state)
 
     @property
     def invoices_by_period_query(self):
@@ -58,6 +67,9 @@ class BillingCollection(object):
 
         if self.username:
             query = query.where(invoices.username == self.username)
+
+        if self.state in ('paid', 'unpaid'):
+            query = query.where(invoices.paid == (self.state == 'paid'))
 
         return self.session.execute(query)
 

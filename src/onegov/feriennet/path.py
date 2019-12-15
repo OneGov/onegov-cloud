@@ -137,7 +137,8 @@ def get_matches(request, app, period_id, states=None):
     model=BillingCollection,
     path='/billing',
     converters=dict(period_id=UUID))
-def get_billing(request, app, period_id, username=None, expand=False):
+def get_billing(request, app, period_id,
+                username=None, expand=False, state='unpaid'):
     # the default period is the active period or the first we can find
     if not period_id:
         period = app.default_period
@@ -147,7 +148,7 @@ def get_billing(request, app, period_id, username=None, expand=False):
     if not period:
         return None
 
-    return BillingCollection(request, period, username, expand)
+    return BillingCollection(request, period, username, expand, state)
 
 
 @FeriennetApp.path(
