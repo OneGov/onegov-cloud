@@ -389,7 +389,7 @@
                     <tr tal:condition="post_vote_poll">
                         <th i18n:translate>Post-vote poll</th>
                         <td>
-                            <a href="${request.link(post_vote_poll)}" target="_blank" class="post-vote-poll">
+                            <a href="${post_vote_poll}" target="_blank" class="post-vote-poll">
                             PDF</a> /
                             <a href="${layout.voto_static_url}" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                         </td>

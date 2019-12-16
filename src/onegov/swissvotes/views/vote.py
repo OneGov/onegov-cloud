@@ -50,7 +50,7 @@ def view_vote(self, request):
         'realization': layout.get_file_url('realization'),
         'ad_analysis': layout.get_file_url('ad_analysis'),
         'foeg_analysis': layout.get_file_url('foeg_analysis'),
-        'post_vote_poll': poll,
+        'post_vote_poll': layout.get_file_url('post_vote_poll'),
         'preliminary_examination': exam,
         'bkchrono': self.bk_chrono(request.locale),
         'bkresults': self.bk_results(request.locale),
