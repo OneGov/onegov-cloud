@@ -1,8 +1,20 @@
 # Changes
 
+## Release `2019.52`
+
+> commits: **1 / [c5f8710c60...c5f8710c60](https://github.com/OneGov/onegov-cloud/compare/c5f8710c60^...c5f8710c60)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.52)](https://buildkite.com/seantis/onegov-cloud)
+
+### Swisvotes
+
+🎉 **Adds static urls for vote details page**
+
+**`Feature`** | **[c5f8710c60](https://github.com/onegov/onegov-cloud/commit/c5f8710c60a004f0c8a5a9170eb3b674116badb5)**
+
 ## Release `2019.51`
 
-> commits: **3 / [497c3d9581...93b02920ff](https://github.com/OneGov/onegov-cloud/compare/497c3d9581^...93b02920ff)**<br>
+> released: **2019-12-15 23:06**<br>
+> commits: **4 / [497c3d9581...286b2d3137](https://github.com/OneGov/onegov-cloud/compare/497c3d9581^...286b2d3137)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.51)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
