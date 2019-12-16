@@ -824,3 +824,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
             self, self.session_manager.default_locale
         )
         return getattr(self, name, None) or fallback
+
+    def get_file_by_locale(self, name, locale):
+        return SwissVote.__dict__.get(name).__get_by_locale__(
+            self, locale)

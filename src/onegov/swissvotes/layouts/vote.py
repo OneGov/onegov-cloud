@@ -40,13 +40,43 @@ class VoteLayout(DefaultLayout):
 
     @property
     def voto_static_url(self):
-        if self.request.html_lang =='fr-CH':
+        if self.request.html_lang == 'fr-CH':
             return 'https://wwww.voto.swiss/fr/voto'
         return 'https://wwww.voto.swiss/voto'
 
     @property
     def foeg_static_url(self):
         return 'https://foeg.uzh.ch/de/abstimmungsmonitor.html'
+
+    def get_file_url(self, name):
+
+        mapping = {
+            'voting_text': 'abstimmungstext-<lang>.pdf',
+            'brief_description': 'kurzbeschreibung.pdf',
+            'federal_council_message': 'botschaft-<lang>.pdf',
+            'parliamentary_debate': 'parlamentsberatung.pdf',
+            'voting_booklet': 'brochure-<lang>.pdf',
+            'resolution': 'erwahrung-<lang>.pdf',
+            'realization': 'zustandekommen-<lang>.pdf',
+            'ad_analysis': 'inserateanalyse.pdf',
+            'results_by_domain': 'staatsebenen.xlsx',
+            'foeg_analysis': 'medienanalyse.pdf',
+            'post_vote_poll': 'nachbefragung-<lang>.pdf',
+            'preliminary_examination': 'vorpruefung-<lang>.pdf',
+        }
+
+        if name not in mapping:
+            return None
+
+        attachment = self.model.get_file(name)
+        if not attachment:
+            return None
+
+        attachment_locale = attachment.name.split('-')[1]
+        viewname = mapping[name].replace(
+            '<lang>', attachment_locale.split('_')[0])
+
+        return self.request.link(self.model, name=viewname)
 
 
 class VoteStrengthsLayout(DefaultLayout):
