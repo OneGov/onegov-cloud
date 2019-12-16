@@ -1,5 +1,3 @@
-import onegov.core
-
 from babel import Locale
 import numbers
 from cached_property import cached_property

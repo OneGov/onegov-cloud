@@ -1544,7 +1544,6 @@ def test_votes_export(swissvotes_app):
     vote.bkchrono_de = 'bkchrono_de'
     vote.bkchrono_fr = 'bkchrono_fr'
 
-
     votes.session.flush()
     votes.session.expire_all()
 

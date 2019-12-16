@@ -40,7 +40,7 @@ class VoteLayout(DefaultLayout):
 
     @property
     def voto_static_url(self):
-        if self.request.html_lang =='fr-CH':
+        if self.request.html_lang == 'fr-CH':
             return 'https://wwww.voto.swiss/fr/voto'
         return 'https://wwww.voto.swiss/voto'
 

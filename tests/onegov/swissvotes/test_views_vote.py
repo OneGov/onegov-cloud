@@ -1,7 +1,6 @@
 from datetime import date
 from decimal import Decimal
 from onegov.swissvotes.models import SwissVote
-from onegov.swissvotes.models.localized_file import LocalizedFile
 from onegov.swissvotes.views.vote import view_vote_percentages
 from psycopg2.extras import NumericRange
 from transaction import commit
@@ -261,59 +260,59 @@ def test_view_vote(swissvotes_app):
     page = client.get(page.request.url.replace('/strengths', '/percentages'))
     results = page.json['results']
     assert results[0] == {
-                'text': 'Volk', 'text_label': '', 'empty': False,
-                'yea': 40.0, 'yea_label': '40.0% Ja',
-                'none': 0.0, 'none_label': '',
-                'nay': 60.0, 'nay_label': '60.0% Nein',
-            }
+        'text': 'Volk', 'text_label': '', 'empty': False,
+        'yea': 40.0, 'yea_label': '40.0% Ja',
+        'none': 0.0, 'none_label': '',
+        'nay': 60.0, 'nay_label': '60.0% Nein',
+    }
     assert results[1] == {
-                'text': 'Stände', 'text_label': '', 'empty': False,
-                'yea': 5.8, 'yea_label': '1.5 Ja',
-                'none': 0.0, 'none_label': '',
-                'nay': 94.2, 'nay_label': '24.5 Nein',
-            }
+        'text': 'Stände', 'text_label': '', 'empty': False,
+        'yea': 5.8, 'yea_label': '1.5 Ja',
+        'none': 0.0, 'none_label': '',
+        'nay': 94.2, 'nay_label': '24.5 Nein',
+    }
     assert results[2] == {
-                'text': '', 'text_label': '', 'empty': True,
-                'yea': 0.0, 'yea_label': '',
-                'none': 0.0, 'none_label': '',
-                'nay': 0.0, 'nay_label': '',
-            }
+        'text': '', 'text_label': '', 'empty': True,
+        'yea': 0.0, 'yea_label': '',
+        'none': 0.0, 'none_label': '',
+        'nay': 0.0, 'nay_label': '',
+    }
     assert results[3] == {
-                'text': 'Bundesrat', 'text_label': 'Position des Bundesrats',
-                'empty': False,
-                'yea': True, 'yea_label': 'Befürwortend',
-                'none': 0.0, 'none_label': '',
-                'nay': 0.0, 'nay_label': '',
-            }
+        'text': 'Bundesrat', 'text_label': 'Position des Bundesrats',
+        'empty': False,
+        'yea': True, 'yea_label': 'Befürwortend',
+        'none': 0.0, 'none_label': '',
+        'nay': 0.0, 'nay_label': '',
+    }
     assert results[4] == {
-                'text': 'Nationalrat', 'text_label': '', 'empty': False,
-                'yea': 33.3, 'yea_label': '10 Ja',
-                'none': 0.0, 'none_label': '',
-                'nay': 66.7, 'nay_label': '20 Nein',
-            }
+        'text': 'Nationalrat', 'text_label': '', 'empty': False,
+        'yea': 33.3, 'yea_label': '10 Ja',
+        'none': 0.0, 'none_label': '',
+        'nay': 66.7, 'nay_label': '20 Nein',
+    }
     assert results[5] == {
-                'text': 'Ständerat', 'text_label': '', 'empty': False,
-                'yea': 42.9, 'yea_label': '30 Ja',
-                'none': 0.0, 'none_label': '',
-                'nay': 57.1, 'nay_label': '40 Nein',
-            }
+        'text': 'Ständerat', 'text_label': '', 'empty': False,
+        'yea': 42.9, 'yea_label': '30 Ja',
+        'none': 0.0, 'none_label': '',
+        'nay': 57.1, 'nay_label': '40 Nein',
+    }
     assert results[6] == {
-                'text': 'Parteiparolen',
-                'text_label': 'Empfehlungen der politischen Parteien',
-                'empty': False,
-                'yea': 22.2,
-                'yea_label': (
-                    'Wähleranteile der Parteien: Befürwortende Parteien 22.2%'
-                ),
-                'none': 54.6,
-                'none_label': (
-                    'Wähleranteile der Parteien: Neutral/unbekannt 54.6%'
-                ),
-                'nay': 23.2,
-                'nay_label': (
-                    'Wähleranteile der Parteien: Ablehnende Parteien 23.2%'
-                ),
-            }
+        'text': 'Parteiparolen',
+        'text_label': 'Empfehlungen der politischen Parteien',
+        'empty': False,
+        'yea': 22.2,
+        'yea_label': (
+            'Wähleranteile der Parteien: Befürwortende Parteien 22.2%'
+        ),
+        'none': 54.6,
+        'none_label': (
+            'Wähleranteile der Parteien: Neutral/unbekannt 54.6%'
+        ),
+        'nay': 23.2,
+        'nay_label': (
+            'Wähleranteile der Parteien: Ablehnende Parteien 23.2%'
+        ),
+    }
     assert page.json['title'] == 'Vote DE'
 
     # Delete vote
@@ -526,35 +525,35 @@ def test_vote_chart(session):
     data = view_vote_percentages(model, request)
     results = data['results']
     assert results[0] == {
-                'empty': False,
-                'text': 'People', 'text_label': '',
-                'yea': 0.0, 'yea_label': '',
-                'none': 0.0, 'none_label': '',
-                'nay': True, 'nay_label': 'Rejected',
-            }
+        'empty': False,
+        'text': 'People', 'text_label': '',
+        'yea': 0.0, 'yea_label': '',
+        'none': 0.0, 'none_label': '',
+        'nay': True, 'nay_label': 'Rejected',
+    }
     assert results[1] == {
-                'empty': False,
-                'text': 'Cantons', 'text_label': '',
-                'yea': 0.0, 'yea_label': '',
-                'none': True,
-                'none_label': 'Majority of the cantons not necessary',
-                'nay': 0.0, 'nay_label': '',
-            }
+        'empty': False,
+        'text': 'Cantons', 'text_label': '',
+        'yea': 0.0, 'yea_label': '',
+        'none': True,
+        'none_label': 'Majority of the cantons not necessary',
+        'nay': 0.0, 'nay_label': '',
+    }
     assert results[2] == empty
     assert results[3] == {
-                'empty': False,
-                'text': 'National Council', 'text_label': '',
-                'yea': True, 'yea_label': 'Accepting',
-                'none': 0.0, 'none_label': '',
-                'nay': 0.0, 'nay_label': '',
-            }
+        'empty': False,
+        'text': 'National Council', 'text_label': '',
+        'yea': True, 'yea_label': 'Accepting',
+        'none': 0.0, 'none_label': '',
+        'nay': 0.0, 'nay_label': '',
+    }
     assert results[4] == {
-                'empty': False,
-                'text': 'Council of States', 'text_label': '',
-                'yea': 0.0, 'yea_label': '',
-                'none': 0.0, 'none_label': '',
-                'nay': True, 'nay_label': 'Rejecting',
-            }
+        'empty': False,
+        'text': 'Council of States', 'text_label': '',
+        'yea': 0.0, 'yea_label': '',
+        'none': 0.0, 'none_label': '',
+        'nay': True, 'nay_label': 'Rejecting',
+    }
     assert data['title'] == 'Vote DE'
 
     model.result_people_yeas_p = Decimal('10.2')
@@ -570,52 +569,52 @@ def test_vote_chart(session):
     data = view_vote_percentages(model, request)
     results = data['results']
     assert results[0] == {
-                'empty': False,
-                'text': 'People', 'text_label': '',
-                'yea': 10.2, 'yea_label': '10.2% yea',
-                'none': 0.0, 'none_label': '',
-                'nay': 89.8, 'nay_label': '89.8% nay',
-            }
+        'empty': False,
+        'text': 'People', 'text_label': '',
+        'yea': 10.2, 'yea_label': '10.2% yea',
+        'none': 0.0, 'none_label': '',
+        'nay': 89.8, 'nay_label': '89.8% nay',
+    }
     assert results[1] == {
-                'empty': False,
-                'text': 'Cantons', 'text_label': '',
-                'yea': 90.4, 'yea_label': '23.5 yea',
-                'none': 0.0, 'none_label': '',
-                'nay': 9.6, 'nay_label': '2.5 nay',
-            }
+        'empty': False,
+        'text': 'Cantons', 'text_label': '',
+        'yea': 90.4, 'yea_label': '23.5 yea',
+        'none': 0.0, 'none_label': '',
+        'nay': 9.6, 'nay_label': '2.5 nay',
+    }
     assert results[2] == empty
     assert results[3] == {
-                'empty': False,
-                'text': 'National Council', 'text_label': '',
-                'yea': 74.5, 'yea_label': '149 yea',
-                'none': 0.0, 'none_label': '',
-                'nay': 25.5, 'nay_label': '51 nay',
-            }
+        'empty': False,
+        'text': 'National Council', 'text_label': '',
+        'yea': 74.5, 'yea_label': '149 yea',
+        'none': 0.0, 'none_label': '',
+        'nay': 25.5, 'nay_label': '51 nay',
+    }
     assert results[4] == {
-                'empty': False,
-                'text': 'Council of States', 'text_label': '',
-                'yea': 93.5, 'yea_label': '43 yea',
-                'none': 0.0, 'none_label': '',
-                'nay': 6.5, 'nay_label': '3 nay',
-            }
+        'empty': False,
+        'text': 'Council of States', 'text_label': '',
+        'yea': 93.5, 'yea_label': '43 yea',
+        'none': 0.0, 'none_label': '',
+        'nay': 6.5, 'nay_label': '3 nay',
+    }
     assert results[5] == {
-                'empty': False,
-                'text': 'Party slogans',
-                'text_label': 'Recommendations by political parties',
-                'yea': 1.0,
-                'yea_label': (
-                    'Electoral shares of parties: '
-                    'Parties recommending Yes 1.0%'
-                ),
-                'none': 95.6,
-                'none_label': (
-                    'Electoral shares of parties: neutral/unknown 95.6%'
-                ),
-                'nay': 3.4,
-                'nay_label': (
-                    'Electoral shares of parties: Parties recommending No 3.4%'
-                ),
-            }
+        'empty': False,
+        'text': 'Party slogans',
+        'text_label': 'Recommendations by political parties',
+        'yea': 1.0,
+        'yea_label': (
+            'Electoral shares of parties: '
+            'Parties recommending Yes 1.0%'
+        ),
+        'none': 95.6,
+        'none_label': (
+            'Electoral shares of parties: neutral/unknown 95.6%'
+        ),
+        'nay': 3.4,
+        'nay_label': (
+            'Electoral shares of parties: Parties recommending No 3.4%'
+        )
+    }
 
     # Test deciding question
     model._legal_form = 5
@@ -671,4 +670,3 @@ def test_vote_chart(session):
             'Parties preferring the counter-proposal 3.4%'
         ),
     }
-
