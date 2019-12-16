@@ -34,13 +34,9 @@ def view_vote(self, request):
     if bfs_map_host:
         request.content_security_policy.default_src |= {bfs_map_host}
 
-    exam = self.get_file(
-            'preliminary_examination')
+    exam = self.get_file('preliminary_examination')
 
     poll = self.get_file('post_vote_poll')
-
-    if exam:
-        print('stop')
 
     return {
         'layout': layout,
