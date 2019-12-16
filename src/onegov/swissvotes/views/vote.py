@@ -34,10 +34,6 @@ def view_vote(self, request):
     if bfs_map_host:
         request.content_security_policy.default_src |= {bfs_map_host}
 
-    exam = self.get_file('preliminary_examination')
-
-    poll = self.get_file('post_vote_poll')
-
     return {
         'layout': layout,
         'brief_description': layout.get_file_url('brief_description'),
@@ -51,7 +47,8 @@ def view_vote(self, request):
         'ad_analysis': layout.get_file_url('ad_analysis'),
         'foeg_analysis': layout.get_file_url('foeg_analysis'),
         'post_vote_poll': layout.get_file_url('post_vote_poll'),
-        'preliminary_examination': exam,
+        'preliminary_examination': layout.get_file_url(
+            'preliminary_examination'),
         'bkchrono': self.bk_chrono(request.locale),
         'bkresults': self.bk_results(request.locale),
         'curiavista': self.curiavista(request.locale),
@@ -234,7 +231,7 @@ def foeg_analysis_static(self, request):
 @SwissvotesApp.view(
     model=SwissVote,
     permission=Public,
-    name='nachbefragung-de'
+    name='nachbefragung-de.pdf'
 )
 def post_vote_poll_de_static(self, request):
     return request.redirect(
@@ -245,7 +242,7 @@ def post_vote_poll_de_static(self, request):
 @SwissvotesApp.view(
     model=SwissVote,
     permission=Public,
-    name='nachbefragung-fr'
+    name='nachbefragung-fr.pdf'
 )
 def post_vote_poll_fr_static(self, request):
     return request.redirect(
@@ -256,7 +253,7 @@ def post_vote_poll_fr_static(self, request):
 @SwissvotesApp.view(
     model=SwissVote,
     permission=Public,
-    name='vorpruefung-de'
+    name='vorpruefung-de.pdf'
 )
 def preliminary_exam_de_static(self, request):
     return request.redirect(
@@ -267,7 +264,7 @@ def preliminary_exam_de_static(self, request):
 @SwissvotesApp.view(
     model=SwissVote,
     permission=Public,
-    name='vorpruefung-fr'
+    name='vorpruefung-fr.pdf'
 )
 def preliminary_exam_fr_static(self, request):
     return request.redirect(
