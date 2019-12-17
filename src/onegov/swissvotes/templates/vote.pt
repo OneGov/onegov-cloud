@@ -225,7 +225,7 @@
                     </tr>
                     <tr tal:condition="realization">
                         <th class="column-30" i18n:translate>Realization</th>
-                        <td><a href="${request.link(realization)}" target="_blank" class="realization">PDF</a></td>
+                        <td><a href="${realization}" target="_blank" class="realization">PDF</a></td>
                     </tr>
                 </tbody>
             </table>
