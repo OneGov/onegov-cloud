@@ -76,7 +76,7 @@ class Search(Pagination):
         match_rest = MultiMatch(query=query, fields=[
             field for field in self.request.app.es_mappings.registered_fields
             if not field.startswith('es_')
-        ], fuzziness='1')
+        ], fuzziness='1', prefix_length=3)
 
         search = search.query(match_title | match_rest)
 
