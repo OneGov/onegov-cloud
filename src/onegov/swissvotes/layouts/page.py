@@ -61,6 +61,22 @@ class PageLayout(DefaultLayout):
             Link(self.title, '#'),
         ]
 
+    def get_file_url(self, file):
+
+        lang = file.locale.split('_')[0]
+
+        if 'QUELLEN' in file.filename or 'REFERENCES' in file.filename:
+            return self.request.link(
+                self.model, name=f'kurzbeschreibung-{lang}.pdf')
+        if 'CODEBOOK' in file.filename:
+            return self.request.link(self.model, name=f'codebook-{lang}.pdf')
+        if 'DATASET CSV' in file.filename:
+            return self.request.link(self.model, name='swissvotes_dataset.csv')
+        if 'DATASET XLSX' in file.filename:
+            return self.request.link(
+                self.model, name='swissvotes_dataset.xlsx')
+        return self.request.link(file)
+
 
 class AddPageLayout(DefaultLayout):
 
