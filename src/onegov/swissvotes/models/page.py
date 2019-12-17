@@ -46,6 +46,29 @@ class TranslatablePage(Base, TimestampMixin, AssociatedFiles):
         query = query.order_by(TranslatablePage.order)
         return query
 
+    def get_file(self, name, request):
+        if 'DATASET' in name:
+            print('debug')
+        files_from_name = [f for f in self.files if name in f.filename]
+        if not files_from_name:
+            return None
+
+        files = [f for f in files_from_name if f.locale == request.locale]
+        if files:
+            return files[0]
+
+        files = [
+            f for f in files_from_name if f.locale == request.default_locale]
+        if not files:
+            return None
+
+        return files[0]
+
+    def get_file_by_locale(self, name, locale):
+        files = [f for f in self.files
+                 if name in f.filename and f.locale == locale]
+        return files and files[0] or None
+
 
 class TranslatablePageMove(object):
     """ Represents a single move of a page. """
