@@ -1,8 +1,32 @@
 # Changes
 
+## Release `2019.53`
+
+> commits: **2 / [14d3d9de02...a856b44726](https://github.com/OneGov/onegov-cloud/compare/14d3d9de02^...a856b44726)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.53)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Slightly decrease fuzziness of search results**
+
+We now require the first three letters to match exactly, giving only the
+other letters the option to be slightly mismatched with a Levenshtein
+distance of 1.
+
+This should improve the clarity of our search results.
+
+**`Feature`** | **[14d3d9de02](https://github.com/onegov/onegov-cloud/commit/14d3d9de02064013fe4ab9b025900c991593c9ad)**
+
+### Swissvotes
+
+🎉 **Adds static urls for /page/dataset**
+
+**`Feature`** | **[a856b44726](https://github.com/onegov/onegov-cloud/commit/a856b44726f6465bb88ff5594a41ddfaa0f46517)**
+
 ## Release `2019.52`
 
-> commits: **1 / [c5f8710c60...c5f8710c60](https://github.com/OneGov/onegov-cloud/compare/c5f8710c60^...c5f8710c60)**<br>
+> released: **2019-12-16 15:02**<br>
+> commits: **2 / [c5f8710c60...c66dbd3a70](https://github.com/OneGov/onegov-cloud/compare/c5f8710c60^...c66dbd3a70)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.52)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Swisvotes
