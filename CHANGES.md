@@ -1,8 +1,20 @@
 # Changes
 
+## Release `2019.54`
+
+> commits: **8 / [89e5bbdbfa...09ce2b82df](https://github.com/OneGov/onegov-cloud/compare/89e5bbdbfa^...09ce2b82df)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.54)](https://buildkite.com/seantis/onegov-cloud)
+
+### Swissvotes
+
+🎉 **Adds Matomo tracking for swissvotes.ch**
+
+**`Feature`** | **[89e5bbdbfa](https://github.com/onegov/onegov-cloud/commit/89e5bbdbfa58634b8f4f525c2bc71ab97ae1ea43)**
+
 ## Release `2019.53`
 
-> commits: **2 / [14d3d9de02...a856b44726](https://github.com/OneGov/onegov-cloud/compare/14d3d9de02^...a856b44726)**<br>
+> released: **2019-12-17 13:57**<br>
+> commits: **3 / [14d3d9de02...c62c828a51](https://github.com/OneGov/onegov-cloud/compare/14d3d9de02^...c62c828a51)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.53)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
