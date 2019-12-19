@@ -25,6 +25,8 @@
 
     <link rel="stylesheet" type="text/css" href="${layout.static_path}/font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="${layout.static_path}/apercu/css/apercu.css">
+    <link rel="stylesheet" type="text/css" href="${request.theme_link}">
+    
     <script tal:condition="layout.app.sentry_dsn" src="https://browser.sentry-cdn.com/5.6.2/bundle.min.js" crossorigin="anonymous"></script>
     <script tal:condition="layout.app.sentry_dsn">
         Sentry.init({
@@ -33,7 +35,19 @@
             environment: '${layout.app.sentry_environment}',
         });
     </script>
-    <link rel="stylesheet" type="text/css" href="${request.theme_link}">
+
+    <script type="text/javascript" tal:condition="'swissvotes.ch' in request.url">
+      var _paq = window._paq || [];
+      _paq.push(['trackPageView']);
+      _paq.push(['enableLinkTracking']);
+      (function() {
+        var u="https://stats.seantis.ch/";
+        _paq.push(['setTrackerUrl', u+'matomo.php']);
+        _paq.push(['setSiteId', '22']);
+        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+        g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+      })();
+    </script>
 </head>
 <body>
     <header>
