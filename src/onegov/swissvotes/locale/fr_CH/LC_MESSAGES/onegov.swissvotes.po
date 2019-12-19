@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2019-12-14 14:35+0100\n"
+"POT-Creation-Date: 2019-12-19 10:27+0800\n"
 "PO-Revision-Date: 2019-12-14 14:49+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -1494,14 +1494,14 @@ msgstr "Mot-clé"
 msgid "Vote date"
 msgstr "Date de la votation"
 
+msgid "Vote number"
+msgstr "Votation n°"
+
 msgid "Description Année Politique Suisse"
 msgstr "Résumé Année Politique Suisse"
 
 msgid "Link"
 msgstr "Lien"
-
-msgid "Vote number"
-msgstr "Votation n°"
 
 msgid "Official Chronology"
 msgstr "Chronologie officielle"
@@ -1595,9 +1595,6 @@ msgstr "Sections cantonales divergentes"
 msgid "Analysis of the advertising campaign"
 msgstr "Analyse des annonces de campagne"
 
-msgid "Overview of voting result by the Confederation"
-msgstr "Tableau récapitulatif de la Confédération"
-
 msgid "Media coverage: fög analysis"
 msgstr "Couverture médiatique: analyse fög"
 
@@ -1621,6 +1618,9 @@ msgstr "pour le contre-projet"
 
 msgid "Turnout"
 msgstr "Participation"
+
+msgid "Overview of voting result by the Federal Chancellery"
+msgstr "Tableau récapitulatif de la Chancellerie fédérale"
 
 msgid "Interactive map of the Swiss Federal Statistical Office"
 msgstr "Carte interactive de l’Office fédéral de la statistique"
@@ -1794,6 +1794,9 @@ msgstr "Toutes les votations ont été supprimées."
 
 msgid "Do you really want to delete all votes?!"
 msgstr "Voulez-vous vraiment supprimer l'ensemble des votations?!"
+
+#~ msgid "Overview of voting result by the Confederation"
+#~ msgstr "Tableau récapitulatif de la Confédération"
 
 #~ msgid "Unknown"
 #~ msgstr "Inconnu"

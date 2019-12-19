@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2019-12-14 14:35+0100\n"
+"POT-Creation-Date: 2019-12-19 10:27+0800\n"
 "PO-Revision-Date: 2019-12-14 14:10+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -1487,14 +1487,14 @@ msgstr "Kurzbezeichnung"
 msgid "Vote date"
 msgstr "Abstimmungsdatum"
 
+msgid "Vote number"
+msgstr "Abstimmungsnummer"
+
 msgid "Description Année Politique Suisse"
 msgstr "Beschreibung Année Politique Suisse"
 
 msgid "Link"
 msgstr "Link"
-
-msgid "Vote number"
-msgstr "Abstimmungsnummer"
 
 msgid "Official Chronology"
 msgstr "Offizielle Chronologie"
@@ -1592,9 +1592,6 @@ msgstr "Abweichende Sektionen"
 msgid "Analysis of the advertising campaign"
 msgstr "Analyse der Inseratekampagne"
 
-msgid "Overview of voting result by the Confederation"
-msgstr "Ergebnisübersicht Bundeskanzlei"
-
 msgid "Media coverage: fög analysis"
 msgstr "Medienberichterstattung: Analyse des fög"
 
@@ -1618,6 +1615,9 @@ msgstr "für den Gegenentwurf"
 
 msgid "Turnout"
 msgstr "Stimmbeteiligung"
+
+msgid "Overview of voting result by the Federal Chancellery"
+msgstr "Ergebnisübersicht Bundeskanzlei"
 
 msgid "Interactive map of the Swiss Federal Statistical Office"
 msgstr "Interaktive Karte des Bundesamts für Statistik"
@@ -1793,6 +1793,9 @@ msgstr "Alle Abstimmungen gelöscht"
 
 msgid "Do you really want to delete all votes?!"
 msgstr "Möchten Sie wirklich alle Abstimmungen löschen?!"
+
+#~ msgid "Overview of voting result by the Confederation"
+#~ msgstr "Ergebnisübersicht Bundeskanzlei"
 
 #~ msgid "Unknown"
 #~ msgstr "Unbekannt"

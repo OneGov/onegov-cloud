@@ -390,7 +390,7 @@
                         </td>
                     </tr>
                     <tr tal:condition="bkresults">
-                        <th i18n:translate>Overview of voting result by the Confederation</th>
+                        <th i18n:translate>Overview of voting result by the Federal Chancellery</th>
                         <td>
                             <a href="${bkresults}" target="_blank" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                         </td>

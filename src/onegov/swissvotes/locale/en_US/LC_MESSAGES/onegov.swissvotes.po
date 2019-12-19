@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2019-12-14 14:35+0100\n"
+"POT-Creation-Date: 2019-12-19 10:27+0800\n"
 "PO-Revision-Date: 2019-08-18 15:10+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -1478,17 +1478,17 @@ msgstr "Keyword"
 msgid "Vote date"
 msgstr "Voting day"
 
+msgid "Vote number"
+msgstr "Vote Nº"
+
 msgid "Description Année Politique Suisse"
 msgstr "Description by Année Politique Suisse"
 
 msgid "Link"
 msgstr "Link"
 
-msgid "Vote number"
-msgstr "Vote Nº"
-
 msgid "Official Chronology"
-msgstr ""
+msgstr "Official Chronology"
 
 msgid "Related votes"
 msgstr "Related votes"
@@ -1582,11 +1582,8 @@ msgstr "Deviating party sections"
 msgid "Analysis of the advertising campaign"
 msgstr "Analysis of the advertising campaign"
 
-msgid "Overview of voting result by the Confederation"
-msgstr ""
-
 msgid "Media coverage: fög analysis"
-msgstr ""
+msgstr "Media coverage: fög analysis"
 
 msgid "Vote"
 msgstr "Vote"
@@ -1608,6 +1605,9 @@ msgstr ""
 
 msgid "Turnout"
 msgstr "Turnout"
+
+msgid "Overview of voting result by the Federal Chancellery"
+msgstr "Overview of voting result by the Federal Chancellery"
 
 msgid "Interactive map of the Swiss Federal Statistical Office"
 msgstr "Interactive map by the Swiss Federal Statistical Office"
