@@ -79,7 +79,7 @@
                     <tr tal:condition="bkchrono">
                         <th class="column-30" i18n:translate>Official Chronology</th>
                         <td>
-                            <a href="${bkchrono}" class="bkchrono" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                            <a href="${bkchrono}" target="_blank" class="bkchrono" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                         </td>
                     </tr>
                     <tr tal:condition="False">
@@ -101,7 +101,7 @@
                     </tr>
                     <tr tal:condition="preliminary_examination">
                         <th class="column-30" i18n:translate>Preliminary examination</th>
-                        <td><a class="preliminary-examination" href="${preliminary_examination}">PDF</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span></td>
+                        <td><a class="preliminary-examination" target="_blank" href="${preliminary_examination}">PDF</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span></td>
 
                     </tr>
                     <tr tal:condition="vote.signatures_valid is not None">
@@ -153,7 +153,7 @@
                         <th class="column-30" i18n:translate>Parliamentary debate</th>
                         <td>
                             <a href="${parliamentary_debate}" target="_blank" class="parliamentary-debate">
-                            PDF</a> / <a href="${curiavista}" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German / French)</span>
+                            PDF</a> / <a href="${curiavista}" target="_blank" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German / French)</span>
                         </td>
                     </tr>
                     <tr tal:condition="vote.duration_federal_assembly is not None">
@@ -306,7 +306,7 @@
                         <th i18n:translate>Media coverage: fög analysis</th>
                         <td>
                             <a href="${foeg_analysis}" target="_blank" class="foeg-analysis">PDF</a> /
-                            <a href="${layout.foeg_static_url}" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                            <a href="${layout.foeg_static_url}" target="_blank" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                             <span tal:condition="request.html_lang == 'fr-CH'">(en allemand)</span>
                         </td>
                     </tr>
@@ -383,7 +383,7 @@
                     <tr tal:condition="bkresults">
                         <th i18n:translate>Overview of voting result by the Confederation</th>
                         <td>
-                            <a href="${bkresults}" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                            <a href="${bkresults}" target="_blank" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                         </td>
                     </tr>
                     <tr tal:condition="post_vote_poll">
@@ -391,7 +391,7 @@
                         <td>
                             <a href="${post_vote_poll}" target="_blank" class="post-vote-poll">
                             PDF</a> /
-                            <a href="${layout.voto_static_url}" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
+                            <a href="${layout.voto_static_url}" target="_blank" i18n:translate>Link</a> <span tal:condition="request.html_lang == 'en-US'">(in German)</span>
                         </td>
                     </tr>
                     <tr tal:condition="bfs_map">
