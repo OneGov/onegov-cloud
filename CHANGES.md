@@ -1,8 +1,20 @@
 # Changes
 
+## Release `2019.55`
+
+> commits: **1 / [c43a598fa2...c43a598fa2](https://github.com/OneGov/onegov-cloud/compare/c43a598fa2^...c43a598fa2)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.55)](https://buildkite.com/seantis/onegov-cloud)
+
+### Fsi
+
+🎉 **Adds teacher user import**
+
+**`Feature`** | **[c43a598fa2](https://github.com/onegov/onegov-cloud/commit/c43a598fa25ed26644d898cdcb39984db3c8348a)**
+
 ## Release `2019.54`
 
-> commits: **8 / [89e5bbdbfa...09ce2b82df](https://github.com/OneGov/onegov-cloud/compare/89e5bbdbfa^...09ce2b82df)**<br>
+> released: **2019-12-19 12:31**<br>
+> commits: **9 / [89e5bbdbfa...95da9e95b5](https://github.com/OneGov/onegov-cloud/compare/89e5bbdbfa^...95da9e95b5)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.54)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Swissvotes
