@@ -1341,13 +1341,13 @@ msgid "Accepting"
 msgstr "Befürwortend"
 
 msgid "Preference for the popular initiative"
-msgstr "Initiative bevorzugt"
+msgstr "Bevorzugung der Volksinitiative"
 
 msgid "Rejecting"
 msgstr "Ablehnend"
 
 msgid "Preference for the counter-proposal"
-msgstr "Gegenentwurf bevorzugt"
+msgstr "Bevorzugung des Gegenentwurfs"
 
 msgid "None"
 msgstr "Keine"
