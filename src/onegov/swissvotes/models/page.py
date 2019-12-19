@@ -47,8 +47,6 @@ class TranslatablePage(Base, TimestampMixin, AssociatedFiles):
         return query
 
     def get_file(self, name, request):
-        if 'DATASET' in name:
-            print('debug')
         files_from_name = [f for f in self.files if name in f.filename]
         if not files_from_name:
             return None
