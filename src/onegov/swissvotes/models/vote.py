@@ -234,13 +234,13 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
             pass
 
     def bk_results(self, locale):
-        return self.bkresults_fr if locale == 'fr-CH' else self.bkresults_de
+        return self.bkresults_fr if locale == 'fr_CH' else self.bkresults_de
 
     def bk_chrono(self, locale):
-        return self.bkchrono_fr if locale == 'fr-CH' else self.bkchrono_de
+        return self.bkchrono_fr if locale == 'fr_CH' else self.bkchrono_de
 
     def curiavista(self, locale):
-        return self.curia_vista_fr if locale == 'fr-CH' \
+        return self.curia_vista_fr if locale == 'fr_CH' \
             else self.curia_vista_de
 
     # Descriptor
