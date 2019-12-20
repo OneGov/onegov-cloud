@@ -12,6 +12,7 @@ from onegov.activity import InvoiceCollection
 from onegov.activity import InvoiceItem
 from onegov.activity import InvoiceReference
 from onegov.activity import Occasion
+from onegov.activity import OccasionNeed
 from onegov.activity import Period
 from onegov.activity import PeriodCollection
 from onegov.core.crypto import random_token
@@ -789,3 +790,19 @@ def book_finalized(context):
 def add_occasion_booking_cost(context):
     context.operations.add_column('occasions', column=Column(
         'booking_cost', Numeric(precision=8, scale=2), nullable=True))
+
+
+@upgrade_task('Add seeking_voluneteers column')
+def add_seeking_volunteers_column(context):
+    seeking_volunteers = set(
+        n.occasion_id for n in context.session.query(
+            OccasionNeed).distinct(OccasionNeed.occasion_id))
+
+    def is_seeking_volunteers(occasion):
+        return occasion.id in seeking_volunteers
+
+    context.add_column_with_defaults(
+        table='occasions',
+        column=Column('seeking_volunteers', Boolean, nullable=False),
+        default=is_seeking_volunteers
+    )

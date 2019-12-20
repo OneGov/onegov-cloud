@@ -739,3 +739,14 @@
         </dl>
     </div>
 </metal:user_panel>
+
+<metal:volunteer_cart define-macro="volunteer_cart" i18n:domain="onegov.feriennet">
+    <div class="volunteer-cart-widget"
+        data-empty-label="No activities in your list."
+        data-button-label="Register as volunteer"
+        data-remove-label="Remove"
+        data-cart-url="${cart_url}"
+        data-cart-submit-url="${cart_submit_url}"
+        data-cart-action-url="${cart_action_url}"
+        i18n:attributes="data-empty-label;data-button-label;data-remove-label"></div>
+</metal:volunteer_cart>

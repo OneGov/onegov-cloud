@@ -286,7 +286,7 @@ class AttendeeSignupForm(AttendeeBase):
         if not self.model.period.confirmed:
             return
 
-        if self.request.is_admin:
+        if self.request.is_admin or self.model.period.book_finalized:
             return
 
         if not self.model.period.is_currently_booking:

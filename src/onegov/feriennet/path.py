@@ -4,6 +4,7 @@ from onegov.activity import Booking, BookingCollection
 from onegov.activity import InvoiceCollection, InvoiceItem
 from onegov.activity import Occasion, OccasionCollection, OccasionNeed
 from onegov.activity import Period, PeriodCollection
+from onegov.activity import Volunteer, VolunteerCollection
 from onegov.activity.utils import is_valid_group_code
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections import BillingCollection
@@ -15,6 +16,8 @@ from onegov.feriennet.models import Calendar
 from onegov.feriennet.models import GroupInvite
 from onegov.feriennet.models import InvoiceAction, VacationActivity
 from onegov.feriennet.models import NotificationTemplate
+from onegov.feriennet.models import VolunteerCart
+from onegov.feriennet.models import VolunteerCartAction
 from onegov.org.converters import keywords_converter
 from onegov.core.converters import integer_range_converter
 from uuid import UUID
@@ -283,3 +286,42 @@ def get_group_invite(app, request, group_code, username=None):
     converters=dict(id=UUID))
 def get_occasion_need(request, id):
     return request.session.query(OccasionNeed).filter_by(id=id).first()
+
+
+@FeriennetApp.path(
+    model=VolunteerCart,
+    path='/volunteer-cart')
+def get_volunteer_cart(request):
+    return VolunteerCart.from_request(request)
+
+
+@FeriennetApp.path(
+    model=VolunteerCartAction,
+    path='/volunteer-cart-action/{action}/{target}',
+    converters=dict(target=UUID))
+def get_volunteer_cart_action(request, action, target):
+    return VolunteerCartAction(action, target)
+
+
+@FeriennetApp.path(
+    model=VolunteerCollection,
+    path='/volunteers/{period_id}',
+    converters=dict(period_id=UUID))
+def get_volunteers(request, period_id):
+    if not request.app.show_volunteers(request):
+        return None
+
+    period = request.app.periods_by_id.get(period_id.hex)
+
+    if not period:
+        return None
+
+    return VolunteerCollection(request.session, period)
+
+
+@FeriennetApp.path(
+    model=Volunteer,
+    path='/volunteer/{id}',
+    converters=dict(id=UUID))
+def get_volunteer(request, id):
+    return VolunteerCollection(request.session, None).by_id(id)

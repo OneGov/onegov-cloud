@@ -13,7 +13,8 @@ from onegov.activity.models import (
     OccasionDate,
     OccasionNeed,
     Period,
-    PublicationRequest
+    PublicationRequest,
+    Volunteer
 )
 from onegov.activity.collections import (
     ActivityCollection,
@@ -23,7 +24,8 @@ from onegov.activity.collections import (
     InvoiceCollection,
     OccasionCollection,
     PeriodCollection,
-    PublicationRequestCollection
+    PublicationRequestCollection,
+    VolunteerCollection
 )
 
 
@@ -47,4 +49,6 @@ __all__ = [
     'PeriodCollection',
     'PublicationRequest',
     'PublicationRequestCollection',
+    'Volunteer',
+    'VolunteerCollection',
 ]

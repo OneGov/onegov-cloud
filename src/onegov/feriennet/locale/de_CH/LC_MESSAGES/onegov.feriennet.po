@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-12-15 09:07+0800\n"
+"POT-Creation-Date: 2019-12-20 14:07+0800\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -13,6 +13,9 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 1.8.12\n"
 
+msgid "Help us"
+msgstr "Helfen"
+
 msgid "Periods"
 msgstr "Zeiträume"
 
@@ -21,6 +24,9 @@ msgstr "Zuteilungen"
 
 msgid "Billing"
 msgstr "Fakturierung"
+
+msgid "Volunteers"
+msgstr "Helfer"
 
 msgid "Notifications"
 msgstr "Mitteilungen"
@@ -1041,6 +1047,9 @@ msgstr "Bitte geben Sie eine Telefonnummer und einen Namen ein"
 msgid "A beneficiary is required if a bank account is given."
 msgstr "Ein Begünstigter ist nötig wenn ein Bank Konto angegeben wird."
 
+msgid "E-Mail Address"
+msgstr "E-Mail Adresse"
+
 msgid "Register a new account"
 msgstr "Ein neues Konto eröffnen"
 
@@ -1196,6 +1205,12 @@ msgstr "Mitteilungs-Vorlagen"
 msgid "New Notification Template"
 msgstr "Neue Mitteilungs-Vorlage"
 
+msgid "Join as a Volunteer"
+msgstr "Machen Sie mit als Helfer"
+
+msgid "Register as Volunteer"
+msgstr "Registration als Helfer"
+
 msgid "Half day"
 msgstr "Halbtägig"
 
@@ -1249,11 +1264,59 @@ msgstr "Link zu den Aktivitäten."
 msgid "Link to the homepage."
 msgstr "Link zur Startseite."
 
+msgid "This item is already in your list."
+msgstr "Dieser Eintrag ist bereits in Ihrer Liste."
+
+msgid "Could not add item. It overlaps with another item in your list."
+msgstr ""
+"Eintrag konnte nicht hinzugefügt werden. Es besteht eine Überlappung mit "
+"einem anderen Eintrag in der Liste."
+
+msgid ""
+"Join us as a volunteer. Select the activities you are interested in and fill "
+"out the volunteer form. We will contact you afterwards. Activities not "
+"listed here are not actively looking for volunteers."
+msgstr ""
+"Machen Sie mit als Helfer. Wählen Sie die Angebote an denen Sie mithelfen "
+"möchten und füllen Sie das Formular aus. Wir kontaktieren Sie anschliessend. "
+"Angebote die nicht gelistet sind suchen nicht aktiv nach Helfern."
+
+msgid ""
+"Note that we cannot guarantee that you will be placed in the same activity "
+"as your children."
+msgstr ""
+"Beachten Sie dass wir nicht garantieren können dass Sie mit Ihren Kindern am "
+"gleichen Angebot teilnehmen können."
+
 msgid "No activities found."
 msgstr "Keine Angebote gefunden."
 
 msgid "Reset filter."
 msgstr "Filter zurücksetzen."
+
+msgid "To my list"
+msgstr "Zu meiner Liste"
+
+msgid "Show more"
+msgstr "Mehr anzeigen"
+
+msgid "Navigate up"
+msgstr "Nach oben"
+
+msgid "My list"
+msgstr "Meine Liste"
+
+msgid "Weeks"
+msgstr "Wochen"
+
+msgid "Weekdays"
+msgstr "Wochentage"
+
+msgid "Duration"
+msgstr "Dauer"
+
+msgid "Municipalities"
+msgstr "Gemeinden"
 
 msgid "Age"
 msgstr "Alter"
@@ -1276,29 +1339,11 @@ msgstr "1 freier Platz"
 msgid "${count} free spots"
 msgstr "${count} freie Plätze"
 
-msgid "Show more"
-msgstr "Mehr anzeigen"
-
-msgid "Navigate up"
-msgstr "Nach oben"
-
 msgid "States"
 msgstr "Status"
 
-msgid "Weeks"
-msgstr "Wochen"
-
-msgid "Weekdays"
-msgstr "Wochentage"
-
-msgid "Duration"
-msgstr "Dauer"
-
 msgid "Price"
 msgstr "Preis"
-
-msgid "Municipalities"
-msgstr "Gemeinden"
 
 msgid ""
 "This is a preview. Please edit it until you are satisifed with the result "
@@ -1815,6 +1860,12 @@ msgstr "E-Mail"
 msgid "Manage user"
 msgstr "Benutzer verwalten"
 
+msgid "No activities in your list."
+msgstr "Keine Angebote in Ihrer Liste."
+
+msgid "Register as volunteer"
+msgstr "Als Helfer registrieren"
+
 msgid "Hello!"
 msgstr "Guten Tag"
 
@@ -1933,6 +1984,15 @@ msgstr "In diesem Zeitraum wurde noch keine Zuteilung gemacht."
 msgid "No occasions defined yet."
 msgstr "Es wurden noch keine Durchführungen definiert."
 
+msgid "Duty:"
+msgstr "Aufgabe:"
+
+msgid "E-Mail:"
+msgstr "E-Mail:"
+
+msgid "Phone:"
+msgstr "Telefon:"
+
 msgid "Emergency Contact:"
 msgstr "Notfall:"
 
@@ -1944,9 +2004,6 @@ msgstr "(Benutzer: ${user})"
 
 msgid "Notes:"
 msgstr "Bemerkungen:"
-
-msgid "E-Mail:"
-msgstr "E-Mail:"
 
 msgid "Place:"
 msgstr "Ort:"
@@ -1996,6 +2053,57 @@ msgstr "Aktiv"
 
 msgid "Inactive"
 msgstr "Inaktiv"
+
+msgid ""
+"Thank you for offering to volunteer! We will have a look at your request and "
+"get back to you."
+msgstr "Vielen Dank dass Sie uns Ihre Hilfe angeboten haben! Wir werden Ihre Anfrage ansehen und uns wieder bei Ihnen melden."
+
+msgid "Back to the homepage"
+msgstr "Zurück zur Startseite"
+
+msgid ""
+"No activities needing volunteers found."
+msgstr "Keine Angebote gefunden welche Helfer benötigen."
+
+msgid "${count} of ${total}"
+msgstr "${count} von ${total}"
+
+msgid "First name"
+msgstr "Vorname"
+
+msgid "Last name"
+msgstr "Nachname"
+
+msgid "Contacted"
+msgstr "Kontaktiert"
+
+msgid "Confirmed"
+msgstr "Bestätigt"
+
+msgid "Contact by e-mail"
+msgstr "Via E-Mail kontaktieren"
+
+msgid "Contact by phone"
+msgstr "Via Telefon kontaktieren"
+
+msgid "Hide Details"
+msgstr "Details verstecken"
+
+msgid "Mark as open"
+msgstr "Als offen markieren"
+
+msgid "Mark as contacted"
+msgstr "Als kontaktiert markieren"
+
+msgid "Mark as confirmed"
+msgstr "Als bestätigt markieren"
+
+msgid "Do you really want to remove this volunteer?"
+msgstr "Möchten Sie den Helfer wirklich entfernen?"
+
+msgid "Remove volunteer"
+msgstr "Helfer entfernen"
 
 msgid "Editors"
 msgstr "Veranstalter"
@@ -2616,6 +2724,21 @@ msgstr "Spenden-Beträge"
 msgid "One amount per line"
 msgstr "Ein Betrag pro Zeile"
 
+msgid "Volunteer registration"
+msgstr "Helfer Registration"
+
+msgid "Experimental"
+msgstr "Experimentell"
+
+msgid "Disabled"
+msgstr "Deaktiviert"
+
+msgid "Only for Admins"
+msgstr "Nur für Administratoren"
+
+msgid "Enabled"
+msgstr "Aktiviert"
+
 msgid "The ESR identification number must be 3-6 characters long"
 msgstr "Die ESR Identifikationsnummer muss 3-6 Zeichen lang sein"
 
@@ -2629,3 +2752,6 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
+
+#~ msgid "Volunteer"
+#~ msgstr "Helfer"

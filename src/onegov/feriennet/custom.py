@@ -1,5 +1,6 @@
 from onegov.activity import BookingCollection
 from onegov.activity import PeriodCollection
+from onegov.activity import VolunteerCollection
 from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.collections import MatchCollection
@@ -24,6 +25,12 @@ def get_global_tools(request):
     yield from get_personal_tools(request)
     yield from get_admin_tools(request)
 
+    if request.app.show_volunteers(request):
+        yield Link(
+            text=_("Help us"),
+            url=request.class_link(VacationActivityCollection, name='volunteer'),
+            attrs={'class': ('volunteer', 'highlighted')}
+        )
 
 def get_admin_tools(request):
     if request.is_organiser:
@@ -60,6 +67,20 @@ def get_admin_tools(request):
 
         if periods:
             if request.is_admin:
+                if request.app.show_volunteers(request):
+                    links.append(
+                        Link(
+                            text=_("Volunteers"),
+                            url=request.link(
+                                VolunteerCollection(
+                                    request.session,
+                                    period=(period or periods[0])
+                                )
+                            ),
+                            attrs={'class': 'show-volunteers'}
+                        )
+                    )
+
                 links.append(
                     Link(
                         text=_("Notifications"),

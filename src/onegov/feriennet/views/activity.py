@@ -21,10 +21,14 @@ from onegov.feriennet.layout import VacationActivityFormLayout
 from onegov.feriennet.layout import VacationActivityLayout
 from onegov.feriennet.models import ActivityMessage
 from onegov.feriennet.models import VacationActivity
+from onegov.feriennet.models import VolunteerCart
+from onegov.feriennet.models import VolunteerCartAction
 from onegov.org.mail import send_ticket_mail
 from onegov.org.models import TicketMessage
 from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.ticket import TicketCollection
+from purl import URL
+from sedate import dtrange, overlaps
 from sqlalchemy import desc
 from sqlalchemy.orm import contains_eager
 from webob import exc
@@ -80,6 +84,277 @@ def occasions_by_period(session, activity, show_inactive, show_archived):
     )
 
 
+def filter_link(text, active, url, rounded=False):
+    return Link(text=text, active=active, url=url, rounded=rounded, attrs={
+        'ic-get-from': url
+    })
+
+
+def filter_timelines(activity, request):
+    links = [
+        filter_link(
+            text=request.translate(_("Elapsed")),
+            active='past' in activity.filter.timelines,
+            url=request.link(activity.for_filter(timeline='past'))
+        ),
+        filter_link(
+            text=request.translate(_("Now")),
+            active='now' in activity.filter.timelines,
+            url=request.link(activity.for_filter(timeline='now'))
+        ),
+        filter_link(
+            text=request.translate(_("Scheduled")),
+            active='future' in activity.filter.timelines,
+            url=request.link(activity.for_filter(timeline='future'))
+        ),
+    ]
+
+    if request.is_organiser:
+        links.insert(0, filter_link(
+            text=request.translate(_("Without")),
+            active='undated' in activity.filter.timelines,
+            url=request.link(activity.for_filter(timeline='undated'))
+        ))
+
+    return links
+
+
+def filter_tags(activity, request):
+    links = [
+        filter_link(
+            text=request.translate(_(tag)),
+            active=tag in activity.filter.tags,
+            url=request.link(activity.for_filter(tag=tag)),
+        ) for tag in activity.used_tags
+    ]
+    links.sort(key=lambda l: l.text)
+
+    return links
+
+
+def filter_durations(activity, request):
+    return tuple(
+        filter_link(
+            text=request.translate(text),
+            active=duration in activity.filter.durations,
+            url=request.link(activity.for_filter(duration=duration))
+        ) for text, duration in (
+            (_("Half day"), DAYS.half),
+            (_("Full day"), DAYS.full),
+            (_("Multiple days"), DAYS.many),
+        )
+    )
+
+
+def filter_ages(activity, request):
+    ages = activity.available_ages()
+
+    if not ages:
+        return
+
+    def age_filters():
+        for age in range(*ages):
+            if age < 16:
+                yield str(age), (age, age)
+            else:
+                yield "16+", (16, 99)
+                break
+
+    return tuple(
+        filter_link(
+            text=request.translate(text),
+            active=activity.filter.contains_age_range(age_range),
+            url=request.link(activity.for_filter(age_range=age_range))
+        ) for text, age_range in age_filters()
+    )
+
+
+def filter_price_range(activity, request):
+    return tuple(
+        filter_link(
+            text=request.translate(text),
+            active=activity.filter.contains_price_range(price_range),
+            url=request.link(activity.for_filter(price_range=price_range))
+        ) for text, price_range in (
+            (_("Free of Charge"), (0, 0)),
+            (_("Up to 25 CHF"), (1, 25)),
+            (_("Up to 50 CHF"), (26, 50)),
+            (_("Up to 100 CHF"), (51, 100)),
+            (_("More than 100 CHF"), (101, 100000)),
+        )
+    )
+
+
+def filter_weeks(activity, request):
+    layout = VacationActivityCollectionLayout(activity, request)
+
+    return tuple(
+        filter_link(
+            text='{} - {}'.format(
+                layout.format_date(daterange[0], 'date'),
+                layout.format_date(daterange[1], 'date')
+            ),
+            active=daterange in activity.filter.dateranges,
+            url=request.link(activity.for_filter(daterange=daterange))
+        ) for nth, daterange in enumerate(
+            activity.available_weeks(request.app.active_period),
+            start=1
+        )
+    )
+
+
+def filter_weekdays(activity, request):
+    return tuple(
+        filter_link(
+            text=WEEKDAYS[weekday],
+            active=weekday in activity.filter.weekdays,
+            url=request.link(activity.for_filter(weekday=weekday))
+        ) for weekday in range(0, 7)
+    )
+
+
+def filter_available(activity, request):
+    return tuple(
+        filter_link(
+            text=request.translate(text),
+            active=available in activity.filter.available,
+            url=request.link(activity.for_filter(available=available))
+        ) for text, available in (
+            (_("None"), 'none'),
+            (_("Few"), 'few'),
+            (_("Many"), 'many'),
+        )
+    )
+
+
+def filter_municipalities(activity, request):
+    links = [
+        filter_link(
+            text=municipality,
+            active=municipality in activity.filter.municipalities,
+            url=request.link(activity.for_filter(municipality=municipality))
+        ) for municipality in activity.used_municipalities
+    ]
+
+    links.sort(key=lambda l: normalize_for_url(l.text))
+
+    return links
+
+
+def filter_periods(activity, request):
+    links = [
+        filter_link(
+            text=period.title,
+            active=period.id in activity.filter.period_ids,
+            url=request.link(activity.for_filter(period_id=period.id))
+        ) for period in request.app.periods if period
+    ]
+    links.sort(key=lambda l: l.text)
+
+    return links
+
+
+def filter_own(activity, request):
+    return (
+        filter_link(
+            text=request.translate(_("Own")),
+            active=request.current_username in activity.filter.owners,
+            url=request.link(
+                activity.for_filter(owner=request.current_username)
+            )
+        ),
+    )
+
+
+def filter_states(activity, request):
+    return tuple(
+        filter_link(
+            text=ACTIVITY_STATE_TRANSLATIONS[state],
+            active=state in activity.filter.states,
+            url=request.link(activity.for_filter(state=state))
+        ) for state in ACTIVITY_STATES
+    )
+
+
+def period_bound_occasions(activity, request):
+    active_period = request.app.active_period
+
+    if not active_period:
+        return []
+
+    return [o for o in activity.occasions if o.period_id == active_period.id]
+
+
+def activity_ages(activity, request):
+    return tuple(o.age for o in period_bound_occasions(activity, request))
+
+
+def activity_spots(activity, request):
+    if not request.app.active_period:
+        return 0
+
+    if not request.app.active_period.confirmed:
+        return sum(o.max_spots for o in period_bound_occasions(
+            activity, request))
+
+    return sum(o.available_spots for o in period_bound_occasions(
+        activity, request))
+
+
+def activity_min_cost(activity, request):
+    occasions = period_bound_occasions(activity, request)
+
+    if not occasions:
+        return None
+
+    return min(o.total_cost for o in occasions)
+
+
+def is_filtered(filters):
+    for links in filters.values():
+        for link in links:
+            if link.active:
+                return True
+
+    return False
+
+
+def adjust_filter_path(filters, suffix):
+
+    for links in filters.values():
+        for link in links:
+            link.attrs['href'] = link.attrs['ic-get-from'] = \
+                URL(link.attrs['href']).add_path_segment(suffix).as_string()
+
+
+def exclude_filtered_dates(activities, dates):
+    result = []
+
+    if not activities.filter.dateranges:
+        result = dates
+    else:
+        for dt in dates:
+            for s, e in activities.filter.dateranges:
+                if overlaps(dt.start.date(), dt.end.date(), s, e):
+                    result.append(dt)
+                    break
+
+    dates = result
+    result = []
+
+    if not activities.filter.weekdays:
+        result = dates
+    else:
+        for dt in dates:
+            for day in dtrange(dt.start, dt.end):
+                if day.weekday() not in activities.filter.weekdays:
+                    break
+            else:
+                result.append(dt)
+
+    return result
+
+
 @FeriennetApp.html(
     model=VacationActivityCollection,
     template='activities.pt',
@@ -91,218 +366,99 @@ def view_activities(self, request):
 
     filters = {}
 
-    def link(text, active, url, rounded=False):
-        return Link(text=text, active=active, url=url, rounded=rounded, attrs={
-            'ic-get-from': url
-        })
-
     if show_activities:
-        filters['timelines'] = [
-            link(
-                text=request.translate(_("Elapsed")),
-                active='past' in self.filter.timelines,
-                url=request.link(self.for_filter(timeline='past'))
-            ),
-            link(
-                text=request.translate(_("Now")),
-                active='now' in self.filter.timelines,
-                url=request.link(self.for_filter(timeline='now'))
-            ),
-            link(
-                text=request.translate(_("Scheduled")),
-                active='future' in self.filter.timelines,
-                url=request.link(self.for_filter(timeline='future'))
-            ),
-        ]
-
-        if request.is_organiser:
-            filters['timelines'].insert(0, link(
-                text=request.translate(_("Without")),
-                active='undated' in self.filter.timelines,
-                url=request.link(self.for_filter(timeline='undated'))
-            ))
-
-        filters['tags'] = [
-            link(
-                text=request.translate(_(tag)),
-                active=tag in self.filter.tags,
-                url=request.link(self.for_filter(tag=tag)),
-            ) for tag in self.used_tags
-        ]
-        filters['tags'].sort(key=lambda l: l.text)
-
-        filters['durations'] = tuple(
-            link(
-                text=request.translate(text),
-                active=duration in self.filter.durations,
-                url=request.link(self.for_filter(duration=duration))
-            ) for text, duration in (
-                (_("Half day"), DAYS.half),
-                (_("Full day"), DAYS.full),
-                (_("Multiple days"), DAYS.many),
-            )
-        )
-
-        ages = self.available_ages()
-        if ages:
-
-            def age_filters():
-                for age in range(*ages):
-                    if age < 16:
-                        yield str(age), (age, age)
-                    else:
-                        yield "16+", (16, 99)
-                        break
-
-            filters['ages'] = tuple(
-                link(
-                    text=request.translate(text),
-                    active=self.filter.contains_age_range(age_range),
-                    url=request.link(self.for_filter(age_range=age_range))
-                ) for text, age_range in age_filters()
-            )
-
-        filters['price_range'] = tuple(
-            link(
-                text=request.translate(text),
-                active=self.filter.contains_price_range(price_range),
-                url=request.link(self.for_filter(price_range=price_range))
-            ) for text, price_range in (
-                (_("Free of Charge"), (0, 0)),
-                (_("Up to 25 CHF"), (1, 25)),
-                (_("Up to 50 CHF"), (26, 50)),
-                (_("Up to 100 CHF"), (51, 100)),
-                (_("More than 100 CHF"), (101, 100000)),
-            )
-        )
+        filters['timelines'] = filter_timelines(self, request)
+        filters['tags'] = filter_tags(self, request)
+        filters['durations'] = filter_durations(self, request)
+        filters['ages'] = filter_ages(self, request)
+        filters['price_range'] = filter_price_range(self, request)
 
         if active_period:
-            filters['weeks'] = tuple(
-                link(
-                    text='{} - {}'.format(
-                        layout.format_date(daterange[0], 'date'),
-                        layout.format_date(daterange[1], 'date')
-                    ),
-                    active=daterange in self.filter.dateranges,
-                    url=request.link(self.for_filter(daterange=daterange))
-                ) for nth, daterange in enumerate(
-                    self.available_weeks(active_period),
-                    start=1
-                )
-            )
+            filters['weeks'] = filter_weeks(self, request)
 
-        filters['weekdays'] = tuple(
-            link(
-                text=WEEKDAYS[weekday],
-                active=weekday in self.filter.weekdays,
-                url=request.link(self.for_filter(weekday=weekday))
-            ) for weekday in range(0, 7)
-        )
-
-        filters['available'] = tuple(
-            link(
-                text=request.translate(text),
-                active=available in self.filter.available,
-                url=request.link(self.for_filter(available=available))
-            ) for text, available in (
-                (_("None"), 'none'),
-                (_("Few"), 'few'),
-                (_("Many"), 'many'),
-            )
-        )
-
-        filters['municipalities'] = [
-            link(
-                text=municipality,
-                active=municipality in self.filter.municipalities,
-                url=request.link(self.for_filter(municipality=municipality))
-            ) for municipality in self.used_municipalities
-        ]
-        filters['municipalities'].sort(key=lambda l: normalize_for_url(l.text))
+        filters['weekdays'] = filter_weekdays(self, request)
+        filters['available'] = filter_available(self, request)
+        filters['municipalities'] = filter_municipalities(self, request)
 
         if request.is_organiser:
             if request.app.periods:
-                filters['periods'] = [
-                    link(
-                        text=period.title,
-                        active=period.id in self.filter.period_ids,
-                        url=request.link(self.for_filter(period_id=period.id))
-                    ) for period in request.app.periods if period
-                ]
-                filters['periods'].sort(key=lambda l: l.text)
+                filters['periods'] = filter_periods(self, request)
 
-            filters['own'] = (
-                link(
-                    text=request.translate(_("Own")),
-                    active=request.current_username in self.filter.owners,
-                    url=request.link(
-                        self.for_filter(owner=request.current_username)
-                    )
-                ),
-            )
+            filters['own'] = filter_own(self, request)
+            filters['states'] = filter_states(self, request)
 
-            filters['states'] = tuple(
-                link(
-                    text=ACTIVITY_STATE_TRANSLATIONS[state],
-                    active=state in self.filter.states,
-                    url=request.link(self.for_filter(state=state))
-                ) for state in ACTIVITY_STATES
-            )
-
-    def get_period_bound_occasions(activity):
-        if not active_period:
-            return []
-
-        return [
-            o for o in activity.occasions
-            if o.period_id == active_period.id
-        ]
-
-    def get_ages(a):
-        return tuple(o.age for o in get_period_bound_occasions(a))
-
-    def get_available_spots(a):
-        if not active_period:
-            return 0
-
-        if not active_period.confirmed:
-            return sum(
-                o.max_spots for o in get_period_bound_occasions(a)
-            )
-        else:
-            return sum(
-                o.available_spots for o in get_period_bound_occasions(a)
-            )
-
-    def get_min_cost(a):
-        occasions = get_period_bound_occasions(a)
-
-        if not occasions:
-            return None
-
-        return min(o.total_cost for o in occasions)
-
-    filtered = next(
-        (
-            True
-            for links in filters.values()
-            for link in links
-            if link.active
-        ), False
-    )
+    filters = {k: v for k, v in filters.items() if v}
 
     return {
         'activities': self.batch if show_activities else None,
         'layout': layout,
         'title': _("Activities"),
         'filters': filters,
-        'filtered': filtered,
+        'filtered': is_filtered(filters),
         'period': active_period,
-        'get_ages': get_ages,
-        'get_min_cost': get_min_cost,
-        'get_available_spots': get_available_spots,
+        'activity_ages': activity_ages,
+        'activity_min_cost': activity_min_cost,
+        'activity_spots': activity_spots,
         'current_location': request.link(
             self.by_page_range((0, self.pages[-1])))
+    }
+
+
+@FeriennetApp.html(
+    model=VacationActivityCollection,
+    template='activities-for-volunteers.pt',
+    permission=Public,
+    name='volunteer')
+def view_activities_for_volunteers(self, request):
+    if not request.app.show_volunteers(request):
+        raise exc.HTTPForbidden()
+
+    active_period = request.app.active_period
+    show_activities = bool(active_period or request.is_organiser)
+
+    layout = VacationActivityCollectionLayout(self, request)
+    layout.breadcrumbs[-1].text = _("Join as a Volunteer")
+
+    # always limit to activities seeking volunteers
+    self.filter.volunteers = {True}
+
+    # include javascript part
+    request.include('volunteer-cart')
+
+    filters = {}
+
+    if show_activities:
+        filters['tags'] = filter_tags(self, request)
+        filters['durations'] = filter_durations(self, request)
+
+        if active_period:
+            filters['weeks'] = filter_weeks(self, request)
+
+        filters['weekdays'] = filter_weekdays(self, request)
+        filters['municipalities'] = filter_municipalities(self, request)
+
+    filters = {k: v for k, v in filters.items() if v}
+    adjust_filter_path(filters, suffix='volunteer')
+
+    return {
+        'activities': self.batch if show_activities else None,
+        'layout': layout,
+        'title': _("Join as a Volunteer"),
+        'filters': filters,
+        'filtered': is_filtered(filters),
+        'period': active_period,
+        'activity_ages': activity_ages,
+        'activity_min_cost': activity_min_cost,
+        'activity_spots': activity_spots,
+        'exclude_filtered_dates': exclude_filtered_dates,
+        'cart_url': request.class_link(VolunteerCart),
+        'cart_submit_url': request.class_link(VolunteerCart, name='submit'),
+        'cart_action_url': request.class_link(VolunteerCartAction, {
+            'action': 'action',
+            'target': 'target',
+        }),
+        'current_location': request.link(
+            self.by_page_range((0, self.pages[-1])), name='volunteer')
     }
 
 

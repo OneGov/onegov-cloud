@@ -94,6 +94,9 @@ class Occasion(Base, TimestampMixin):
     #: Weekdays on which this occasion is active
     weekdays = Column(ARRAY(Integer), nullable=False, default=list)
 
+    #: Indicates if an occasion needs volunteers or not
+    seeking_volunteers = Column(Boolean, nullable=False, default=False)
+
     @aggregated('accepted', Column(Integer, default=0))
     def attendee_count(self):
         return func.count('1')
@@ -229,6 +232,10 @@ class Occasion(Base, TimestampMixin):
                     date.start, date.end, o.start, o.end)
 
         return date
+
+    @observes('needs')
+    def observe_needs(self, needs):
+        self.seeking_volunteers = needs and True or False
 
     @hybrid_property
     def operable(self):

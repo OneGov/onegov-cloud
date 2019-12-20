@@ -194,6 +194,14 @@ ul.single-line {
 
 .calendar-icon {
     @include generic-icon('\f133');
+
+    &:first-of-type::before {
+        color: $body-font-color;
+    }
+
+    &::before {
+        color: transparent;
+    }
 }
 
 .calendar-add-icon {
@@ -245,6 +253,22 @@ ul.single-line {
     .show-notifications::before { @include icon('\f003'); }
     .show-exports::before { @include icon('\f019'); }
     .show-ticket::before { @include icon('\f145'); }
+    .show-volunteers::before { @include icon('\f004'); }
+    .volunteer::before { @include icon('\f004'); }
+}
+
+.globals .highlighted {
+    background: $success-color;
+    border: 1px solid darken($success-color, 5%);
+    border-radius: 3px;
+    height: 1.4rem !important;
+    line-height: 1.5 !important;
+    margin-top: .6rem;
+
+    &:hover,
+    &:active {
+        background: darken($success-color, 5%) !important;
+    }
 }
 
 /*
@@ -1535,73 +1559,76 @@ $booking-left-margin: 2rem;
             animation: oscillate-opacity 1s infinite;
         }
     }
+}
 
-    .progress {
-        border: 0;
-        cursor: pointer;
-        display: inline-block;
-        height: 2.5rem;
-        padding: 0;
-        position: relative;
-        width: calc(100% - 2.5rem);
+/*
+    Progress bar
+*/
+.progress {
+    border: 0;
+    cursor: pointer;
+    display: inline-block;
+    height: 2.5rem;
+    padding: 0;
+    position: relative;
+    width: calc(100% - 2.5rem);
+
+    .meter {
+        width: 100%;
+    }
+
+    &.success .meter {
+        background-color: $green-pastel;
+    }
+
+    &.alert .meter {
+        background-color: $red-pastel;
+    }
+
+    &.cancelled {
+        background: repeating-linear-gradient(
+            45deg,
+            $red-pastel,
+            $red-pastel 15px,
+            $gray-pastel 15px,
+            $gray-pastel 30px
+        );
 
         .meter {
-            width: 100%;
+            background-color: $red-light;
         }
 
-        &.success .meter {
-            background-color: $green-pastel;
-        }
-
-        &.alert .meter {
-            background-color: $red-pastel;
-        }
-
-        &.cancelled {
-            background: repeating-linear-gradient(
-                45deg,
-                $red-pastel,
-                $red-pastel 15px,
-                $gray-pastel 15px,
-                $gray-pastel 30px
-            );
-
-            .meter {
-                background-color: $red-light;
-            }
-
-            .meter-text::before {
-                @include icon('\f00d');
-                color: $red;
-                margin-right: 1ex;
-            }
-
-            .meter-text-inner {
-                color: $red-dark;
-            }
-        }
-
-        &.success .meter-text::before {
-            @include icon('\f058');
-            color: $green;
-            margin-right: 1ex;
-        }
-
-        &.alert .meter-text::before {
-            @include icon('\f06a');
+        .meter-text::before {
+            @include icon('\f00d');
             color: $red;
             margin-right: 1ex;
         }
+
+        .meter-text-inner {
+            color: $red-dark;
+        }
     }
 
-    .meter-text {
-        font-size: .9rem;
-        left: 0;
-        line-height: .9rem;
-        padding: .75rem;
-        position: absolute;
-        top: 0;
+    &.success .meter-text::before {
+        @include icon('\f058');
+        color: $green;
+        margin-right: 1ex;
     }
+
+    &.alert .meter-text::before {
+        @include icon('\f06a');
+        color: $red;
+        margin-right: 1ex;
+    }
+}
+
+.meter-text {
+    font-size: .9rem;
+    left: 0;
+    line-height: .9rem;
+    padding: .75rem;
+    position: absolute;
+    top: 0;
 }
 
 /*
@@ -1935,7 +1962,7 @@ $booking-left-margin: 2rem;
         }
 
         .invoice-items-list {
-            border-bottom-color: black;
+            border-bottom-color: $black;
         }
 
         .invoice-items-payment {
@@ -2018,10 +2045,10 @@ $booking-left-margin: 2rem;
     .item-created {
         @include label($bg: $gray-light);
         border-radius: 3px;
-        padding: 5px 8px;
+        color: $charcoal;
         font-size: .8rem;
         margin-left: -.5rem;
-        color: $charcoal;
+        padding: 5px 8px;
     }
 }
 
@@ -2936,4 +2963,232 @@ $booking-left-margin: 2rem;
 .svg-icon-medium {
     height: 32px;
     width: 32px;
+}
+
+
+/*
+    Volunteer sign-up
+*/
+
+.volunteer-cart-panel {
+    h2 {
+        border-color: $success-color !important;
+    }
+}
+
+.call-for-volunteers {
+    background: $gray-pastel;
+    border: 1px solid  $gray;
+    border-radius: 3px;
+    padding: 0 .75rem .75rem;
+
+    &:first-of-type {
+        margin-top: .75rem;
+    }
+
+    h3 {
+        font-size: .875rem;
+        font-weight: bold;
+        margin-bottom: .75rem;
+        margin-top: .75rem;
+    }
+
+    h3 + .needs {
+        margin-top: -5px;
+    }
+
+    li {
+        font-size: .875rem;
+        margin-left: -3px;
+        padding: 3px;
+    }
+
+    & + .call-for-volunteers {
+        margin-top: 1rem;
+    }
+
+    .dates::before {
+        line-height: 1.25;
+    }
+
+    .needs li:hover {
+        background: darken($gray-light, 1%);
+        border-radius: 3px;
+    }
+
+    .needs .button {
+        background: $success-color;
+        border: 1px solid darken($success-color, 5%);
+        border-radius: 3px;
+        float: right;
+        font-size: .875rem;
+        height: 22px;
+        line-height: 1.25;
+        margin: 0;
+        padding: 2px 5px;
+
+        &:hover,
+        &:active {
+            background: darken($success-color, 5%);
+        }
+    }
+
+    .needs div {
+        margin-left: 3.25ex;
+    }
+
+    .alert {
+        background: $red-pastel;
+        border-radius: 3px;
+        color: $red-dark;
+        font-size: .875rem;
+        line-height: 1.3;
+        margin-left: -2px;
+        margin-top: .25rem;
+        padding: 2px 4px;
+    }
+}
+
+.volunteer-cart {
+    .cart-item-activity {
+        font-weight: bold;
+    }
+
+    .cart-item-dates {
+        margin: .5rem 0;
+
+        li {
+            font-size: .875rem;
+        }
+    }
+
+    .volunteer-cart-item {
+        margin-bottom: 1rem;
+    }
+
+    .cart-item-remove {
+        font-size: .875rem;
+    }
+
+    .button {
+        margin-top: .5rem;
+    }
+}
+
+.volunteer-form-layout .volunteer-cart .button {
+    display: none;
+}
+
+
+/*
+    Volunteer view
+*/
+.volunteer-actions {
+    .state-transitions {
+        background: $gray-light;
+        border-top: 1px solid $gray;
+
+        &:nth-last-child(1),
+        &:nth-last-child(2) {
+            border-top: 0;
+        }
+    }
+
+    .show-details {
+        a::before {
+            @include icon('\f05a');
+            margin-right: 1.25ex;
+        }
+    }
+}
+
+.volunteers-list {
+
+    h2 {
+        font-size: $h3-font-size;
+        margin-bottom: 1rem;
+    }
+
+    h3 {
+        color: $tuatara;
+        font-size: 1.1rem;
+        margin-bottom: .5rem;
+        margin-top: 1.5rem;
+    }
+
+    h2 + h3 {
+        margin-top: 0;
+    }
+
+    .right-aligned {
+        float: right;
+        font-weight: normal;
+    }
+
+    table {
+        margin-top: -1rem;
+        width: 100%;
+
+        th:last-child {
+            width: 22.5%;
+        }
+    }
+
+    table + h2 {
+        margin-top: 1.5rem;
+    }
+
+    .progress + h2 {
+        margin-top: .5rem;
+    }
+
+    .progress {
+        width: 100%;
+
+        & + .progress {
+            margin-top: -1rem;
+        }
+    }
+
+    .success + table {
+        border-top: 1px solid $green-light;
+    }
+
+    .alert + table {
+        border-top: 1px solid $gray-dark;
+    }
+
+    .state-cell {
+        font-weight: bold;
+    }
+
+    .volunteer-details {
+        * {
+            font-size: .875rem;
+        }
+    }
+
+    .volunteer-confirmed {
+        background: lighten($green-pastel, 6%);
+
+        .state-cell {
+            color: $green-dark;
+        }
+    }
+
+    .volunteer-contacted {
+        background: lighten($blue-pastel, 6%);
+
+        .state-cell {
+            color: $blue-dark;
+        }
+    }
+
+    .volunteer-denied {
+        background: lighten($red-pastel, 6%);
+
+        .state-cell {
+            color: $red-dark;
+        }
+    }
 }

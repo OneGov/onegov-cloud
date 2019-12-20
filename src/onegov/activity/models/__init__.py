@@ -9,6 +9,7 @@ from onegov.activity.models.occasion_date import OccasionDate, DAYS
 from onegov.activity.models.occasion_need import OccasionNeed
 from onegov.activity.models.period import Period
 from onegov.activity.models.publication_request import PublicationRequest
+from onegov.activity.models.volunteer import Volunteer
 
 __all__ = [
     'Activity',
@@ -22,6 +23,7 @@ __all__ = [
     'OccasionNeed',
     'Period',
     'PublicationRequest',
+    'Volunteer',
     'ACTIVITY_STATES',
     'DAYS'
 ]

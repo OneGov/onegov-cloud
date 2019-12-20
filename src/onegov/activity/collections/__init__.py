@@ -7,6 +7,7 @@ from onegov.activity.collections.occasion import OccasionCollection
 from onegov.activity.collections.period import PeriodCollection
 from onegov.activity.collections.publication_request import \
     PublicationRequestCollection
+from onegov.activity.collections.volunteer import VolunteerCollection
 
 __all__ = [
     'ActivityCollection',
@@ -16,5 +17,6 @@ __all__ = [
     'InvoiceCollection',
     'OccasionCollection',
     'PeriodCollection',
-    'PublicationRequestCollection'
+    'PublicationRequestCollection',
+    'VolunteerCollection',
 ]

@@ -34,6 +34,10 @@
 
         <div data-toggle="#details" data-alt-text="Hide">Show</div>
         <div id="#details"></div>
+
+    If the default click handling needs to be kept, use the following:
+
+        <div data-prevent-default="false">
 */
 
 var isToggled = function(target) {
@@ -79,8 +83,12 @@ var clickToggled = function(e) {
 
     ensureToggled(button, target, !isToggled(target));
 
-    e.preventDefault();
-    return false;
+    if (button.attr('data-prevent-default') === 'false') {
+        return true;
+    } else {
+        e.preventDefault();
+        return false;
+    }
 };
 
 var ToggleButton = function(button, toggled) {

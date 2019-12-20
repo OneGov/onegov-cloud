@@ -14,6 +14,7 @@ from onegov.activity.models import Attendee
 from onegov.activity.models import Booking
 from onegov.activity.models import Occasion
 from onegov.activity.models import OccasionDate
+from onegov.activity.models import OccasionNeed
 from onegov.activity.models import Period
 from onegov.core.utils import normalize_for_url
 from onegov.pay import PaymentProviderCollection
@@ -21,6 +22,7 @@ from onegov.user import UserCollection
 from onegov.user.models import User
 from sedate import standardize_date
 from sqlalchemy import inspect
+from psycopg2.extras import NumericRange
 
 
 class Collections(object):
@@ -99,6 +101,7 @@ class Scenario(object):
         self.attendees = []
         self.bookings = []
         self.occasions = []
+        self.needs = []
         self.periods = []
         self.users = []
 
@@ -156,6 +159,10 @@ class Scenario(object):
     @property
     def latest_occasion(self):
         return self.occasions and self.occasions[-1] or None
+
+    @property
+    def latest_need(self):
+        return self.needs and self.needs[-1] or None
 
     @property
     def latest_period(self):
@@ -284,6 +291,14 @@ class Scenario(object):
             ))
 
         return self.latest_occasion
+
+    def add_need(self, **columns):
+        columns.setdefault('occasion', self.latest_occasion)
+        columns.setdefault('name', self.faker.name())
+        columns.setdefault('number', NumericRange(1, 5))
+
+        self.needs.append(self.add(model=OccasionNeed, **columns))
+        return self.latest_need
 
     def add_attendee(self, **columns):
         columns.setdefault('name', self.faker.name())

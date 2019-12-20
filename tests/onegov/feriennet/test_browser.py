@@ -1,5 +1,7 @@
 import time
 
+from psycopg2.extras import NumericRange
+
 
 def test_browse_matching(browser, scenario):
     scenario.add_period(title="Ferienpass 2016")
@@ -206,3 +208,72 @@ def test_browse_billing(browser, scenario, postgres):
 
     time.sleep(0.25)
     assert not admin.is_element_present_by_css('.remove-manual')
+
+
+def test_volunteers(browser, scenario):
+    scenario.add_period(title="Ferienpass 2019", active=True, confirmed=True)
+    scenario.add_activity(title="Zoo", state='accepted')
+    scenario.add_user(username='member@example.org', role='member')
+    scenario.add_occasion(age=(0, 10), spots=(0, 2), cost=100)
+    scenario.add_need(name="Begleiter", number=NumericRange(1, 4))
+    scenario.add_attendee(name="Dustin")
+    scenario.add_booking(
+        username='admin@example.org',
+        occasion=scenario.occasions[0],
+        state='accepted',
+        cost=100
+    )
+    scenario.commit()
+    scenario.refresh()
+
+    # initially, the volunteer feature is disabled
+    browser.visit('/')
+    assert not browser.is_text_present('Helfen')
+
+    # once activated, it is public
+    browser.login_admin()
+    browser.visit('/feriennet-settings')
+    browser.fill_form({'volunteers': 'enabled'})
+    browser.find_by_value("Absenden").click()
+
+    browser.visit('/')
+    assert browser.is_text_present('Helfen')
+
+    # users can sign up as volunteers
+    browser.click_link_by_text("Helfen")
+    assert browser.is_text_present("Begleiter")
+    assert not browser.is_element_present_by_css('.volunteer-cart-item')
+
+    browser.click_link_by_partial_text("Zu meiner Liste")
+    assert browser.is_element_present_by_css('.volunteer-cart-item')
+
+    browser.click_link_by_text("Als Helfer registrieren")
+    browser.fill_form({
+        'first_name': "Foo",
+        'last_name': "Bar",
+        'birth_date': '06.04.1984',
+        'address': 'Foostreet 1',
+        'zip_code': '1234',
+        'place': 'Bartown',
+        'email': 'foo@bar.org',
+        'phone': '1234'
+    })
+    browser.find_by_value("Absenden").click()
+
+    # the volunteer is not in the helpers list yet
+    browser.visit('/attendees/zoo')
+    assert not browser.is_text_present("Foo")
+
+    # the admin can see the signed up users
+    browser.visit(f'/volunteers/{scenario.latest_period.id.hex}')
+    assert browser.is_text_present("Foo")
+    assert not browser.is_text_present("Bestätigt")
+
+    browser.find_by_css('.actions-button').first.click()
+    browser.find_link_by_partial_text("Als bestätigt markieren")
+    browser.click_link_by_partial_text("Als bestätigt markieren")
+    assert browser.is_text_present("Bestätigt")
+
+    # now the volunteer is in the list
+    browser.visit('/attendees/zoo')
+    assert browser.is_text_present("Foo")

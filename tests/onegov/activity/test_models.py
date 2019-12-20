@@ -266,7 +266,7 @@ def test_activity_weekdays(session, owner, collections):
         active=True
     )
 
-    # Monday
+    # Monday, Tuesday (Sport)
     collections.occasions.add(
         start=datetime(2017, 5, 8, 10),
         end=datetime(2017, 5, 8, 12),
@@ -277,7 +277,6 @@ def test_activity_weekdays(session, owner, collections):
         period=period
     )
 
-    # Tuesday
     collections.occasions.add(
         start=datetime(2017, 5, 9, 10),
         end=datetime(2017, 5, 9, 12),
@@ -288,7 +287,7 @@ def test_activity_weekdays(session, owner, collections):
         period=period
     )
 
-    # Tuesday - Wednesdy
+    # Tuesday - Wednesdy (Police)
     collections.occasions.add(
         start=datetime(2017, 5, 9, 18),
         end=datetime(2017, 5, 10, 18),
@@ -309,11 +308,11 @@ def test_activity_weekdays(session, owner, collections):
 
     # monday, tuesday
     a = a.for_filter(weekday=1)
-    assert a.query().count() == 2
+    assert a.query().count() == 1
 
     # tuesday (negates monday)
     a = a.for_filter(weekday=0)
-    assert a.query().count() == 2
+    assert a.query().count() == 1
 
     # tuesday, wednesday
     a = a.for_filter(weekday=2)
@@ -321,7 +320,7 @@ def test_activity_weekdays(session, owner, collections):
 
     # wednesday (negates tuesday)
     a = a.for_filter(weekday=1)
-    assert a.query().count() == 1
+    assert a.query().count() == 0
 
 
 def test_profiles(session, owner):
