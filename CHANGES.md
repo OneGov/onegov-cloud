@@ -1,8 +1,24 @@
 # Changes
 
+## Release `2019.57`
+
+> commits: **1 / [692adda0c0...692adda0c0](https://github.com/OneGov/onegov-cloud/compare/692adda0c0^...692adda0c0)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.57)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🎉 **Adds a way for volunteers to sign up**
+
+Volunteers may now look at the needs of activites and select which needs
+they would like to fulfill. The admin has the ability to check the
+volunteer submissions and manage their statuses.
+
+**`Feature`** | **[FER-739](https://issues.seantis.ch/browse/FER-739)** | **[692adda0c0](https://github.com/onegov/onegov-cloud/commit/692adda0c0a0ad5eac566c41b047e749e8d2ad55)**
+
 ## Release `2019.56`
 
-> commits: **2 / [92a10e053f...370397a09e](https://github.com/OneGov/onegov-cloud/compare/92a10e053f^...370397a09e)**<br>
+> released: **2019-12-20 09:30**<br>
+> commits: **3 / [92a10e053f...12b5595ce3](https://github.com/OneGov/onegov-cloud/compare/92a10e053f^...12b5595ce3)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.56)](https://buildkite.com/seantis/onegov-cloud)
 
 ## Release `2019.55`
