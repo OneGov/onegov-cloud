@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2019-12-19 10:27+0800\n"
+"POT-Creation-Date: 2019-12-23 10:34+0100\n"
 "PO-Revision-Date: 2019-12-14 14:10+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -1607,9 +1607,6 @@ msgstr "Ja-Stimmen"
 msgid "Cantons"
 msgstr "Stände"
 
-msgid "for the initative"
-msgstr "für die Initiative"
-
 msgid "for the counter proposal"
 msgstr "für den Gegenentwurf"
 
@@ -1714,7 +1711,7 @@ msgstr "${x}% Nein"
 
 #, python-format
 msgid "${x}% for the counter-proposal"
-msgstr "${x}% für den Gegenvorschlag"
+msgstr "${x}% für den Gegenentwurf"
 
 #, python-format
 msgid "${x} yea"
@@ -1730,7 +1727,7 @@ msgstr "${x} Nein"
 
 #, python-format
 msgid "${x} for the counter-proposal"
-msgstr "${x} für den Gegenvorschlag"
+msgstr "${x} für den Gegenentwurf"
 
 #, python-format
 msgid "${x}% none"
@@ -1793,6 +1790,9 @@ msgstr "Alle Abstimmungen gelöscht"
 
 msgid "Do you really want to delete all votes?!"
 msgstr "Möchten Sie wirklich alle Abstimmungen löschen?!"
+
+#~ msgid "for the initative"
+#~ msgstr "für die Initiative"
 
 #~ msgid "Overview of voting result by the Confederation"
 #~ msgstr "Ergebnisübersicht Bundeskanzlei"
