@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2019-12-23 10:34+0100\n"
+"POT-Creation-Date: 2019-12-23 11:01+0100\n"
 "PO-Revision-Date: 2019-08-18 15:10+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -1537,10 +1537,10 @@ msgstr ""
 msgid "Parliament's position"
 msgstr "Parliament's position"
 
-msgid "for the counter-proposal"
+msgid "for the initiative"
 msgstr ""
 
-msgid "for the initiative"
+msgid "for the counter-proposal"
 msgstr ""
 
 msgid ""
@@ -1596,9 +1596,6 @@ msgstr "Yes"
 
 msgid "Cantons"
 msgstr "Cantons"
-
-msgid "for the counter proposal"
-msgstr ""
 
 msgid "Turnout"
 msgstr "Turnout"

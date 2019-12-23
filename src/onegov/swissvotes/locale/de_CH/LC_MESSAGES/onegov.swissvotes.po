@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2019-12-23 10:34+0100\n"
+"POT-Creation-Date: 2019-12-23 11:01+0100\n"
 "PO-Revision-Date: 2019-12-14 14:10+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -1544,11 +1544,11 @@ msgstr ""
 msgid "Parliament's position"
 msgstr "Position des Parlaments"
 
-msgid "for the counter-proposal"
-msgstr "für den Gegenentwurf"
-
 msgid "for the initiative"
 msgstr "für die Initiative"
+
+msgid "for the counter-proposal"
+msgstr "für den Gegenentwurf"
 
 msgid ""
 "Number of days between the Parliament’s final vote and the decree to declare "
@@ -1606,9 +1606,6 @@ msgstr "Ja-Stimmen"
 
 msgid "Cantons"
 msgstr "Stände"
-
-msgid "for the counter proposal"
-msgstr "für den Gegenentwurf"
 
 msgid "Turnout"
 msgstr "Stimmbeteiligung"
@@ -1790,6 +1787,9 @@ msgstr "Alle Abstimmungen gelöscht"
 
 msgid "Do you really want to delete all votes?!"
 msgstr "Möchten Sie wirklich alle Abstimmungen löschen?!"
+
+#~ msgid "for the counter proposal"
+#~ msgstr "für den Gegenentwurf"
 
 #~ msgid "for the initative"
 #~ msgstr "für die Initiative"
