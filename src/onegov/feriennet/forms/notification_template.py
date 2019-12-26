@@ -62,8 +62,8 @@ class NotificationTemplateSendForm(Form):
             ('with_wishlist', _(
                 "Users with wishes"
             )),
-            ('with_bookings', _(
-                "Users with bookings"
+            ('with_accepted_bookings', _(
+                "Users with accepted bookings"
             )),
             ('with_unpaid_bills', _(
                 "Users with unpaid bills"
@@ -128,8 +128,8 @@ class NotificationTemplateSendForm(Form):
         elif self.send_to.data == 'with_wishlist':
             recipients = self.recipients_with_wishes()
 
-        elif self.send_to.data == 'with_bookings':
-            recipients = self.recipients_with_bookings()
+        elif self.send_to.data == 'with_accepted_bookings':
+            recipients = self.recipients_with_accepted_bookings()
 
         elif self.send_to.data == 'active_organisers':
             recipients = self.recipients_which_are_active_organisers()
@@ -177,13 +177,16 @@ class NotificationTemplateSendForm(Form):
 
         return {b.username for b in q}
 
-    def recipients_with_bookings(self):
+    def recipients_with_accepted_bookings(self):
         bookings = BookingCollection(self.request.session)
 
         if self.period.wishlist_phase:
             return set()
 
-        q = bookings.query().filter_by(period_id=self.period.id)
+        q = bookings.query().filter_by(
+            period_id=self.period.id,
+            state='accepted')
+
         q = q.with_entities(distinct(Booking.username).label('username'))
 
         return {b.username for b in q}
