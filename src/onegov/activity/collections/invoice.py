@@ -28,13 +28,13 @@ class InvoiceCollection(GenericCollection):
     def schema(self):
         return KNOWN_SCHEMAS[self.schema_name](**self.schema_config)
 
-    def query(self):
+    def query(self, ignore_period_id=False):
         q = super().query()
 
         if self.user_id:
             q = q.filter_by(user_id=self.user_id)
 
-        if self.period_id is not None:
+        if self.period_id is not None and not ignore_period_id:
             q = q.filter_by(period_id=self.period_id)
 
         return q

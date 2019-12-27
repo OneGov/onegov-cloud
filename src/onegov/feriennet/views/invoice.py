@@ -54,7 +54,12 @@ def view_creditcard_payments(self, request):
 def view_my_invoices(self, request):
     periods = {p.id.hex: p for p in request.app.periods if p.finalized}
 
-    q = self.query()
+    # By default, we want to see all the invoices, unless a specific one
+    # is selected. This is a bit of a code-smell, because we usually would
+    # want to set that through the model in the path directive.
+    show_all_invoices = 'invoice' not in request.params
+
+    q = self.query(ignore_period_id=show_all_invoices is True)
     q = q.filter(Invoice.period_id.in_(periods.keys()))
     q = q.outerjoin(Period)
     q = q.outerjoin(InvoiceItem)
