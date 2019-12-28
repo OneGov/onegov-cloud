@@ -1,8 +1,42 @@
 # Changes
 
+## Release `2019.59`
+
+> commits: **4 / [8ca49480cf...a31556313b](https://github.com/OneGov/onegov-cloud/compare/8ca49480cf^...a31556313b)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.59)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🎉 **Adds an unlucky attendees report**
+
+The report contains all attendees that have a booking in the given
+period, but no accepted one.
+
+**`Feature`** | **[FER-763](https://issues.seantis.ch/browse/FER-763)** | **[63f593025d](https://github.com/onegov/onegov-cloud/commit/63f593025dad9a1ddabd15668c5c32e387584a1f)**
+
+🐞 **Limit notifications for bookings**
+
+Before, notifications would be sent to all individuals with bookings,
+now only accepted bookings are considered.
+
+**`Bugfix`** | **[FER-784](https://issues.seantis.ch/browse/FER-784)** | **[8ca49480cf](https://github.com/onegov/onegov-cloud/commit/8ca49480cf2759916f5b550c5ba73bfc74c3fc25)**
+
+🐞 **Fixes some bills not showing up**
+
+Only the current period's bill would show up in the my-bills view.
+
+**`Bugfix`** | **[FER-835](https://issues.seantis.ch/browse/FER-835)** | **[54c7fc95eb](https://github.com/onegov/onegov-cloud/commit/54c7fc95eb42416cc5eeb5dca1fc2a0556771eab)**
+
+### Org
+
+✨ **Increases size of auth provider banners**
+
+**`Other`** | **[a31556313b](https://github.com/onegov/onegov-cloud/commit/a31556313bcce58ef973f02bb1490782c007855a)**
+
 ## Release `2019.58`
 
-> commits: **2 / [f9c476f850...db7dc06596](https://github.com/OneGov/onegov-cloud/compare/f9c476f850^...db7dc06596)**<br>
+> released: **2019-12-23 11:45**<br>
+> commits: **3 / [f9c476f850...1ec81076c4](https://github.com/OneGov/onegov-cloud/compare/f9c476f850^...1ec81076c4)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.58)](https://buildkite.com/seantis/onegov-cloud)
 
 ## Release `2019.57`
