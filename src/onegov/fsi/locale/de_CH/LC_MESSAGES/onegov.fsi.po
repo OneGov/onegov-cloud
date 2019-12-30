@@ -18,10 +18,10 @@ msgid "Reminder for course event: ${name}"
 msgstr "Erinnerung für die Kursdurchführung: ${name}"
 
 msgid "Profile"
-msgstr "Profile"
+msgstr "Profil"
 
 msgid "User Profile"
-msgstr "Benutzer-Profile"
+msgstr "Benutzer-Profil"
 
 msgid "Logout"
 msgstr "Ausloggen"
