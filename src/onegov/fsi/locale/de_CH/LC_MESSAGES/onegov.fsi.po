@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-12-13 11:46+0100\n"
-"PO-Revision-Date: 2019-12-13 11:47+0100\n"
+"POT-Creation-Date: 2019-12-30 13:10+0100\n"
+"PO-Revision-Date: 2019-12-30 13:11+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -447,6 +447,9 @@ msgstr "Ja"
 
 msgid "No"
 msgstr "Nein"
+
+msgid "No events found."
+msgstr "Keine Durchführungen gefunden."
 
 msgid "Dear ${first_name} ${last_name},"
 msgstr "Sehr geehrte(r) ${first_name} ${last_name},"

@@ -75,6 +75,7 @@ class CourseCollectionLayout(DefaultLayout):
                 # Todo: how to inject html with intercooler?
                 # content_url=self.request.link(c, name='content-json'),
                 url=self.request.link(c),
+                events=c.events.all()
             ) for c in self.model.query()
         )
 
