@@ -195,7 +195,7 @@ msgid "External"
 msgstr "Extern"
 
 msgid "Editors"
-msgstr "Sicherheitsverantwortliche"
+msgstr "Sicherheitsbeauftragter"
 
 msgid "Edit Profile"
 msgstr "Profil bearbeiten"
