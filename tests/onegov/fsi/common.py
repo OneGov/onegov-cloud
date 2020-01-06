@@ -114,7 +114,7 @@ def attendee_factory(session, **kwargs):
         user_id=user.id)
     data.update(**kwargs)
     attendee = session.query(CourseAttendee).filter_by(
-        email=user.username).first()
+        user_id=user.id).first()
     if not attendee:
         attendee = CourseAttendee(**data)
         session.add(attendee)
