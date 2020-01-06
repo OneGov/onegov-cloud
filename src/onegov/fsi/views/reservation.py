@@ -1,4 +1,4 @@
-from onegov.core.security import Personal, Secret
+from onegov.core.security import Personal, Secret, Private
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.forms.reservation import AddFsiReservationForm, \
@@ -28,7 +28,7 @@ def view_reservations(self, request):
     template='form.pt',
     name='add',
     form=AddFsiReservationForm,
-    permission=Secret
+    permission=Private
 )
 def view_add_reservation(self, request, form):
     layout = ReservationCollectionLayout(self, request)

@@ -58,7 +58,8 @@ class AddFsiReservationForm(Form):
     def attendee_collection(self):
         return CourseAttendeeCollection(
             self.request.session,
-            external_only=self.model.external_only
+            external_only=self.model.external_only,
+            auth_attendee=self.request.current_attendee
         )
 
     @property

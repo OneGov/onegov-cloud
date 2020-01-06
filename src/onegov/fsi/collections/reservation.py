@@ -7,21 +7,19 @@ from onegov.fsi.models.course_reservation import CourseReservation
 
 class ReservationCollection(GenericCollection):
 
-    def __init__(self, session, permissions=None,
-                 user_role=None,
+    def __init__(self, session,
                  attendee_id=None,
                  course_event_id=None,
-                 external_only=False
+                 external_only=False,
+                 auth_attendee=None
                  ):
         super().__init__(session)
         self.attendee_id = attendee_id
 
         # current attendee permissions of auth user
-        self.permissions = permissions or []
-        # role of auth user
-        self.user_role = user_role
         self.course_event_id = course_event_id
         self.external_only = external_only
+        self.auth_attendee = auth_attendee
 
     @property
     def model_class(self):
@@ -40,7 +38,9 @@ class ReservationCollection(GenericCollection):
     @property
     def attendee_collection(self):
         return CourseAttendeeCollection(
-            self.session, external_only=self.external_only)
+            self.session, external_only=self.external_only,
+            auth_attendee=self.auth_attendee
+        )
 
     def query(self):
         query = super().query()
@@ -49,11 +49,11 @@ class ReservationCollection(GenericCollection):
         #     CourseAttendee.first_name,
         # )
 
-        if self.user_role == 'editor':
+        if self.auth_attendee.role == 'editor':
             query = query.join(CourseAttendee)
             query = query.filter(
                 CourseAttendee.organisation.in_(
-                    self.permissions,)
+                    self.auth_attendee.permissions,)
             )
 
         if self.attendee_id:
@@ -64,3 +64,6 @@ class ReservationCollection(GenericCollection):
             query = query.filter(
                 CourseReservation.course_event_id == self.course_event_id)
         return query
+
+    def by_id(self, id):
+        return super().query().filter(self.primary_key == id).first()

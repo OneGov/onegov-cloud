@@ -94,9 +94,10 @@ def get_base_tools(request):
                     attrs={'class': 'users'}
                 )
             )
-
+        if request.is_manager:
             yield LinkGroup(_("Management"), classes=('management',),
                             links=links)
+
         if reservation_count:
             css = 'alert open-tickets'
         else:

@@ -1,3 +1,4 @@
+
 from onegov.fsi.models import CourseReservation, CourseAttendee
 
 
@@ -18,16 +19,6 @@ def test_reservation_details(client_with_db):
     view = f'/fsi/reservation/{reservation.id}'
     # This view has just the delete method
     client.get(view, status=405)
-
-
-def test_add_reservation(client):
-    view = '/fsi/reservations/add'
-    client.login_editor()
-    client.get(view, status=403)
-
-    view = '/fsi/reservations/add-placeholder'
-    client.get(view, status=403)
-
 
 def test_edit_reservation(client_with_db):
     client = client_with_db
@@ -58,3 +49,29 @@ def test_create_delete_reservation(client_with_db):
     page = page.click('Safe!').click('Löschen')
     page = client.get('/fsi/reservations')
     assert 'Safe!' not in page
+
+
+def test_makeing_reservations(client_with_db):
+    client = client_with_db
+
+    # Test permissions for editor, member
+    view = '/fsi/reservations/add'
+    client.login_editor()
+    client.get(view)
+    view = '/fsi/reservations/add-placeholder'
+    client.get(view, status=403)
+
+    session = client.app.session()
+
+    planner_editor = session.query(CourseAttendee).filter_by(
+        first_name='PE').one()
+    assert planner_editor.user.role == 'editor'
+
+
+
+    # edi = editor(session)
+    # att, data = attendee(session)
+    # client.login_admin()
+    # view = '/fsi/reservations/add'
+    # page = client.get(f'/fsi/attendee/{att.id}')
+    # pass
