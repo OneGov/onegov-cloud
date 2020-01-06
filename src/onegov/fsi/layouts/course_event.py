@@ -253,8 +253,8 @@ class CourseEventLayout(DefaultLayout):
                 ),
                 Intercooler(
                     request_method='POST',
-                    redirect_after=self.request.link(
-                        self.model
+                    redirect_after=self.request.class_link(
+                        CourseCollection
                     )
                 )
             )
