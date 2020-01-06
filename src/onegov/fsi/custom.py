@@ -45,13 +45,27 @@ def get_base_tools(request):
         yield LinkGroup(
             request.current_username, classes=('user',), links=profile_links)
 
-        # Editors aka Sicherheitsbeaftragter
-        if request.has_role('editor'):
-            pass
 
         # Management dropdown for admin (e.g Kursverantwortlicher)
+        links = []
+
         if request.is_manager:
-            links = []
+            links.append(
+                Link(
+                    _('Attendees'),
+                    request.class_link(CourseAttendeeCollection),
+                    attrs={'class': 'attendees'}
+                )
+            )
+            links.append(
+                Link(
+                    _('Event Subscriptions'),
+                    request.class_link(ReservationCollection),
+                    attrs={'class': 'reservations'}
+                )
+            )
+
+        if request.is_admin:
             links.append(
                 Link(
                     _("Files"), request.class_link(GeneralFileCollection),
@@ -76,26 +90,10 @@ def get_base_tools(request):
 
             links.append(
                 Link(
-                    _('Attendees'),
-                    request.class_link(CourseAttendeeCollection),
-                    attrs={'class': 'attendees'}
+                    _("Users"), request.class_link(UserCollection),
+                    attrs={'class': 'users'}
                 )
             )
-            links.append(
-                Link(
-                    _('Event Subscriptions'),
-                    request.class_link(ReservationCollection),
-                    attrs={'class': 'reservations'}
-                )
-            )
-
-            if request.is_admin:
-                links.append(
-                    Link(
-                        _("Users"), request.class_link(UserCollection),
-                        attrs={'class': 'users'}
-                    )
-                )
 
             yield LinkGroup(_("Management"), classes=('management',),
                             links=links)
