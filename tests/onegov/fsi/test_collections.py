@@ -98,6 +98,7 @@ def test_reservation_collection_query(
 
     class authAttendee:
         role = 'admin'
+        id = 'some_id'
         permissions = []
 
     auth_attendee = authAttendee()
