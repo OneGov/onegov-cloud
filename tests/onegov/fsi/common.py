@@ -2,6 +2,7 @@ import datetime
 from collections import namedtuple
 from uuid import uuid4
 
+import pytz
 from sedate import utcnow
 
 from onegov.core.crypto import hash_password
@@ -114,7 +115,7 @@ def attendee_factory(session, **kwargs):
         user_id=user.id)
     data.update(**kwargs)
     attendee = session.query(CourseAttendee).filter_by(
-        user_id=user.id).first()
+        **data).first()
     if not attendee:
         attendee = CourseAttendee(**data)
         session.add(attendee)
@@ -249,7 +250,7 @@ def db_mock(session):
 
     attendee, data = attendee_factory(session, organisation='ORG')
     planner, data = planner_factory(session)
-    planner_editor, data = planner_editor_factory(session)
+    planner_editor, data = planner_editor_factory(session, permissions=['ORG'])
     course_event, data = course_event_factory(session)
     future_course_event, data = future_course_event_factory(session)
     empty_course_event, data = future_course_event_factory(
