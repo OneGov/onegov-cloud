@@ -34,8 +34,18 @@ def view_add_reservation(self, request, form):
     layout = ReservationCollectionLayout(self, request)
 
     if form.submitted(request):
-        self.add(**form.get_useful_data())
-        request.success(_("Added a new reservation"))
+        data = form.get_useful_data()
+        course_id = data['course_event_id']
+        attendee_id = data['attendee_id']
+        existing = request.session.query(CourseReservation).filter_by(
+            course_event_id=course_id,
+            attendee_id=attendee_id
+        ).first()
+        if not existing:
+            self.add(**data)
+            request.success(_("Added a new reservation"))
+        else:
+            request.warning(_('Reservation already exists'))
         return request.redirect(request.link(self))
 
     return {
