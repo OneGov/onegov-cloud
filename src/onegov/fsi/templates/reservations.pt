@@ -14,8 +14,8 @@
                         <tal:b tal:condition="reservations|nothing">
                                 <table class="subscription-table fullwidth">
                                     <thead>
-                                        <th i18n:translate>Attendee</th>
-                                        <th i18n:translate>Shortcode</th>
+                                        <th tal:condition="not:layout.for_himself" i18n:translate>Attendee</th>
+                                        <th tal:condition="not:layout.for_himself" i18n:translate>Shortcode</th>
                                         <th i18n:translate tal:condition="not: has_course">Course Name</th>
                                         <th i18n:translate tal:condition="not: has_course">Date</th>
                                         <th i18n:translate>Course Status</th>
@@ -26,8 +26,8 @@
                                     <tbody>
                                         <tal:b tal:repeat="reservation reservations">
                                             <tr>
-                                                <td><a href="${layout.link(reservation)}">${str(reservation)}</a></td>
-                                                <td>
+                                                <td tal:condition="not: layout.for_himself"><a href="${layout.link(reservation)}">${str(reservation)}</a></td>
+                                                <td tal:condition="not: layout.for_himself">
                                                     <tal:b tal:condition="reservation.attendee and reservation.attendee.user">
                                                         ${reservation.attendee.user.source_id}
                                                     </tal:b>
