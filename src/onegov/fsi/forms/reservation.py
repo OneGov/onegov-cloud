@@ -107,14 +107,6 @@ class AddFsiReservationForm(Form, ReservationFormMixin):
 
 class AddFsiPlaceholderReservationForm(Form, ReservationFormMixin):
 
-    attendee_id = ChosenSelectField(
-        label=_("Attendee"),
-        choices=[],
-        validators=[
-            InputRequired()
-        ]
-    )
-
     course_event_id = ChosenSelectField(
         label=_("Course Event"),
         choices=[],

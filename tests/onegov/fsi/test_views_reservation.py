@@ -156,7 +156,11 @@ def test_create_delete_reservation(client_with_db):
 
     client.login_admin()
     #
-    new = client.get(view).click('Platzhalter')
+    new = client.get(view)
+    options = [opt[2] for opt in new.form['course_event_id'].options]
+    # must decending order from newest to oldest, past events excluded
+    assert options == [
+        'Course - 01.01.2060', 'Course - 01.01.2050']
     new.form['dummy_desc'] = 'Safe!'
     page = new.form.submit().follow()
     assert 'Safe!' in page
