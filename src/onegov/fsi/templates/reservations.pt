@@ -9,7 +9,7 @@
                     <div class="columns small-12" tal:define="has_course layout.model.course_event_id">
 
                         <p tal:condition="not: reservations"><strong i18n:translate="">No entries found</strong></p>
-                        <p tal:condition="request.is_editor" i18n:translate="">You can only see subscriptions from attendees fitting your permissions.</p>
+                        <p tal:condition="not: layout.for_himself and not request.is_admin" i18n:translate="">You can only see subscriptions from attendees fitting your permissions.</p>
 
                         <tal:b tal:condition="reservations|nothing">
                                 <table class="subscription-table fullwidth">
