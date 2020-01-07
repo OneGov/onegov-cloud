@@ -157,11 +157,12 @@ def course_factory(session, **kwargs):
 
 def course_event_factory(session, **kwargs):
     course_ = course_factory(session)
+    start = datetime.datetime(1950, 1, 1, tzinfo=pytz.utc)
     data = dict(
         course_id=course_[0].id,
         location='Room42',
-        start=utcnow() - datetime.timedelta(days=30, hours=2),
-        end=utcnow() - datetime.timedelta(days=30),
+        start=start,
+        end=start - datetime.timedelta(days=30),
         presenter_name='Presenter',
         presenter_company='Company',
         presenter_email='presenter@presenter.org',
