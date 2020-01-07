@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-12-30 13:10+0100\n"
-"PO-Revision-Date: 2019-12-30 13:11+0100\n"
+"POT-Creation-Date: 2020-01-07 09:13+0100\n"
+"PO-Revision-Date: 2020-01-07 09:06+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -26,6 +26,12 @@ msgstr "Benutzer-Profil"
 msgid "Logout"
 msgstr "Ausloggen"
 
+msgid "Attendees"
+msgstr "Teilnehmer"
+
+msgid "Event Subscriptions"
+msgstr "Kursanmeldungen"
+
 msgid "Files"
 msgstr "Dateien"
 
@@ -34,12 +40,6 @@ msgstr "Bilder"
 
 msgid "Settings"
 msgstr "Einstellungen"
-
-msgid "Attendees"
-msgstr "Teilnehmer"
-
-msgid "Event Subscriptions"
-msgstr "Kursanmeldungen"
 
 msgid "Users"
 msgstr "Benutzer"
@@ -205,6 +205,9 @@ msgstr "Profil Details"
 
 msgid "Personal Profile"
 msgstr "Persönliches Profil"
+
+msgid "Add Subscription"
+msgstr "Anmeldung hinzufügen"
 
 msgid "Past Course Events"
 msgstr "Vergangene Durchführungen"
@@ -442,6 +445,9 @@ msgstr "Verbleibende Plätze"
 msgid "Description:"
 msgstr "Beschreibung:"
 
+msgid "Time"
+msgstr "Uhrzeit"
+
 msgid "Yes"
 msgstr "Ja"
 
@@ -519,7 +525,7 @@ msgid "Last Modified"
 msgstr "Zuletzt Geändert"
 
 msgid "You can only see subscriptions from attendees fitting your permissions."
-msgstr "Sie können nur Anmeldung sehen, zu dene Sie berechtigt sind."
+msgstr "Sie können nur Anmeldung sehen, zu denen Sie berechtigt sind."
 
 msgid "Shortcode"
 msgstr "Kürzel"
@@ -584,6 +590,9 @@ msgstr "Email jetzt senden"
 
 msgid "Added a new reservation"
 msgstr "Neue Reservation hinzugefügt"
+
+msgid "Reservation already exists"
+msgstr "Anmeldung existiert bereits"
 
 msgid "Add Reservation"
 msgstr "Reservation hinzufügen"
