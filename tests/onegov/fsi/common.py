@@ -184,12 +184,12 @@ def course_event_factory(session, **kwargs):
 
 def future_course_event_factory(session, **kwargs):
     course_ = course_factory(session)
-    in_a_week = utcnow() + datetime.timedelta(days=7)
+    in_the_future = datetime.datetime(2050, 1, 1, tzinfo=pytz.utc)
     data = dict(
         course_id=course_[0].id,
         location='Room42',
-        start=in_a_week,
-        end=in_a_week + datetime.timedelta(hours=2),
+        start=in_the_future,
+        end=in_the_future + datetime.timedelta(hours=2),
         presenter_name='Presenter',
         presenter_company='Company',
         presenter_email='presenter@presenter.org',
@@ -244,14 +244,18 @@ def future_course_reservation_factory(session, **kwargs):
 
 def db_mock(session):
     # Create the fixtures with the current session
-    attendee, data = attendee_factory(session)
+
+    in_the_future = datetime.datetime(2060, 1, 1, tzinfo=pytz.utc)
+
+    attendee, data = attendee_factory(session, organisation='ORG')
     planner, data = planner_factory(session)
     planner_editor, data = planner_editor_factory(session)
     course_event, data = course_event_factory(session)
     future_course_event, data = future_course_event_factory(session)
     empty_course_event, data = future_course_event_factory(
         session,
-        start=utcnow() + datetime.timedelta(days=4),
+        start=in_the_future,
+        end=in_the_future + datetime.timedelta(hours=8),
         location='Empty'
     )
 
