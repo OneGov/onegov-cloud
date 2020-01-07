@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-01-07 09:13+0100\n"
-"PO-Revision-Date: 2020-01-07 09:06+0100\n"
+"POT-Creation-Date: 2020-01-07 13:09+0100\n"
+"PO-Revision-Date: 2020-01-07 13:09+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -137,6 +137,9 @@ msgstr "Email Inhalt"
 msgid "Recipients"
 msgstr "Empfänger"
 
+msgid "None"
+msgstr "Keine"
+
 msgid "Attendee"
 msgstr "Teilnehmer"
 
@@ -145,9 +148,6 @@ msgstr "Kursdurchführung"
 
 msgid "Placeholder Description (optional)"
 msgstr "Platzhalter-Beschreibung (optional)"
-
-msgid "None"
-msgstr "Keine"
 
 msgid "New Course"
 msgstr "Neuer Kurs"
@@ -588,23 +588,26 @@ msgstr "Keine Empfänger und kein Absage-Email gesendet"
 msgid "Send E-Mail Now"
 msgstr "Email jetzt senden"
 
-msgid "Added a new reservation"
-msgstr "Neue Reservation hinzugefügt"
+msgid "Added a new subscription"
+msgstr "Neue Anmeldung wurde hinzugefügt"
 
-msgid "Reservation already exists"
+msgid "Subscription already exists"
 msgstr "Anmeldung existiert bereits"
 
 msgid "Add Reservation"
 msgstr "Reservation hinzufügen"
 
-msgid "Reservation was updated"
-msgstr "Die Reservation wurde aktualisiert"
+msgid "Subscription was updated"
+msgstr "Anmeldung wurde aktualisert"
+
+msgid "Edit Subscription"
+msgstr "Anmeldung bearbeiten"
+
+msgid "Placeholder was updated"
+msgstr "Platzhalter aktualisiert"
 
 msgid "Edit Placeholder"
 msgstr "Platzhalter bearbeiten"
-
-msgid "Edit Reservation"
-msgstr "Reservation bearbeiten"
 
 msgid "Placeholder Reservation"
 msgstr "Platzhalter-Reservation"
@@ -620,6 +623,18 @@ msgstr "Neue Anmeldungen erfasst"
 
 msgid "Subscription successfully deleted"
 msgstr "Anmeldung erfolgreich gelöscht"
+
+#~ msgid "Edit Reservation"
+#~ msgstr "Reservation bearbeiten"
+
+#~ msgid "Added a new reservation"
+#~ msgstr "Neue Reservation hinzugefügt"
+
+#~ msgid "Reservation already exists"
+#~ msgstr "Anmeldung existiert bereits"
+
+#~ msgid "Reservation was updated"
+#~ msgstr "Die Reservation wurde aktualisiert"
 
 #~ msgid "Edit ${type} Notification Template"
 #~ msgstr "Bearbeite ${type} Email-Vorlage"
