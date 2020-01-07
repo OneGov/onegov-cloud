@@ -87,6 +87,17 @@ def test_edit_reservation(client_with_db):
     assert page.form['attendee_id'].value == new_id
 
 
+def test_own_reservations(client_with_db):
+    client = client_with_db
+    client.login_editor()
+    page = client.get('/topics/informationen')
+
+    # check if the management bar shows the correct number of reservations
+    res_count = page.pyquery('a.open-tickets').attr('data-count')
+    assert res_count == '1'
+    page = page.click('Kursanmeldung', href='attendee_id')
+    assert 'Keine Einträge gefunden' not in page
+
 def test_create_delete_reservation(client_with_db):
     client = client_with_db
     session = client.app.session()

@@ -48,8 +48,8 @@ class ReservationCollection(GenericCollection):
         #     CourseAttendee.last_name,
         #     CourseAttendee.first_name,
         # )
-
-        if self.auth_attendee.role == 'editor':
+        for_himself = str(self.auth_attendee.id) == str(self.attendee_id)
+        if self.auth_attendee.role == 'editor' and not for_himself:
             query = query.join(CourseAttendee)
             query = query.filter(
                 CourseAttendee.organisation.in_(
