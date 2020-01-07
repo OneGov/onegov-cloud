@@ -5,12 +5,18 @@ from onegov.fsi.models import CourseReservation, CourseAttendee, CourseEvent
 from onegov.user import User
 
 
-def test_reservation_collection_view(client):
+def test_reservation_collection_view(client_with_db):
     view = '/fsi/reservations'
+    client = client_with_db
     client.get(view, status=403)
 
     client.login_member(to=view)
-    client.get(view)
+    # is the current attendee registered for two courses
+    page = client.get(view)
+    assert 'Meine Kursanmeldungen' in page
+    assert 'Course' in page
+    assert '01.01.2050' in page
+    assert '01.01.1950' in page
 
 
 def test_reservation_details(client_with_db):
@@ -23,21 +29,62 @@ def test_reservation_details(client_with_db):
     # This view has just the delete method
     client.get(view, status=405)
 
+
 def test_edit_reservation(client_with_db):
     client = client_with_db
     session = client.app.session()
     reservation = session.query(CourseReservation).filter(
         CourseReservation.attendee_id != None).first()
 
+    placeholder = session.query(CourseReservation).filter(
+        CourseReservation.attendee_id == None).first()
+
+    events = session.query(CourseEvent).all()
+    assert events[1].id != reservation.course_event_id
+
+    # --- Test edit a placeholder --
+    client.login_admin()
+    view = f'/fsi/reservation/{placeholder.id}/edit-placeholder'
+    page = client.get(view)
+    assert page.form['course_event_id'].value == str(
+        placeholder.course_event_id)
+
+    # The default dummy desc will be set in the view
+    assert page.form['dummy_desc'].value == 'Placeholder'
+    page.form['dummy_desc'] = ''
+    page = page.form.submit().maybe_follow()
+    assert 'Platzhalter aktualisiert' in page
+    page = client.get(view)
+    # check if empty placeholder is replaced by default
+    assert page.form['dummy_desc'].value == 'Platzhalter-Reservation'
+
+    # --- Test a normal reservation ---
     view = f'/fsi/reservation/{reservation.id}/edit'
     client.login_editor()
     client.get(view, status=403)
 
     client.login_admin()
     edit = client.get(view)
+    assert 'Anmeldung bearbeiten' in edit
     assert edit.form['course_event_id'].value == str(
         reservation.course_event_id)
     assert edit.form['attendee_id'].value == str(reservation.attendee_id)
+    options = [opt[2] for opt in edit.form['attendee_id'].options]
+    # Returns event.possible_bookers, tested elsewhere
+    # Planner (admin) and attendee have reservation, not planner_editor (PE)
+    # L, F is the normal attendee
+    assert options == ['L, F', 'PE, PE']
+
+    # course must be fixed
+    options = [opt[2] for opt in edit.form['course_event_id'].options]
+    assert options == ['Course - 01.01.1950']
+
+    new_id = edit.form['attendee_id'].options[1][0]
+    edit.form['attendee_id'] = new_id
+    page = edit.form.submit().maybe_follow()
+    assert 'Anmeldung wurde aktualisert' in page
+    page = client.get(view)
+    assert page.form['attendee_id'].value == new_id
 
 
 def test_create_delete_reservation(client_with_db):

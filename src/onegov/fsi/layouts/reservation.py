@@ -14,7 +14,7 @@ class ReservationCollectionLayout(DefaultLayout):
 
     def link(self, reservation):
         if reservation.is_placeholder:
-            return self.request.link(reservation, name='edit')
+            return self.request.link(reservation, name='edit-placeholder')
         return self.request.link(reservation.attendee)
 
     def confirmation_link(self, reservation):
