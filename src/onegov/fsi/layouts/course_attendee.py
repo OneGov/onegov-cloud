@@ -2,6 +2,7 @@ from cached_property import cached_property
 
 from onegov.core.elements import Link
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
+from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
 
@@ -82,21 +83,34 @@ class CourseAttendeeLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if not self.request.is_admin:
-            return []
-        return [
-            Link(
-                _('Edit Profile'),
-                url=self.request.link(self.model, name='edit'),
-                attrs={'class': 'edit-link'}
-            ),
-            Link(
-                _('Add External Attendee'),
-                url=self.request.class_link(
-                    CourseAttendeeCollection, name='add-external'),
-                attrs={'class': 'add-external'}
+        links = []
+        if self.request.is_manager:
+            links = [
+                Link(
+                    _('Add Subscription'),
+                    self.request.link(ReservationCollection(
+                        self.request.session, attendee_id=self.model.id),
+                        name='add'),
+                    attrs={'class': 'add-icon'}
+                )
+            ]
+        if self.request.is_admin:
+            links.append(
+                Link(
+                    _('Edit Profile'),
+                    url=self.request.link(self.model, name='edit'),
+                    attrs={'class': 'edit-link'}
+                )
             )
-        ]
+            links.append(
+                Link(
+                    _('Add External Attendee'),
+                    url=self.request.class_link(
+                        CourseAttendeeCollection, name='add-external'),
+                    attrs={'class': 'add-external'}
+                )
+            )
+        return links
 
     @property
     def attendee_permissions(self):
