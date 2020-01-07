@@ -66,8 +66,7 @@ class CourseCollectionLayout(DefaultLayout):
 
         return links
 
-    @property
-    def accordion_items(self):
+    def accordion_items(self, future_only=False):
         return tuple(
             dict(
                 title=c.name,
@@ -75,7 +74,7 @@ class CourseCollectionLayout(DefaultLayout):
                 # Todo: how to inject html with intercooler?
                 # content_url=self.request.link(c, name='content-json'),
                 url=self.request.link(c),
-                events=c.events.all()
+                events=c.future_events.all() if future_only else c.events.all()
             ) for c in self.model.query()
         )
 
