@@ -44,7 +44,10 @@ class AddFsiReservationForm(Form):
     def attendee_choice(attendee):
         if not attendee:
             return '', _('None')
-        return str(attendee.id), f'{str(attendee)}'
+        text = f'{str(attendee)}'
+        if attendee.user and attendee.user.source_id:
+            text += f' | {attendee.user.source_id}'
+        return str(attendee.id), text
 
     @property
     def event_collection(self):
@@ -64,7 +67,7 @@ class AddFsiReservationForm(Form):
 
     @property
     def none_choice(self):
-        return '', _('None')
+        return '', self.request.translate(_('None'))
 
     def get_event_choices(self):
 
@@ -97,7 +100,9 @@ class AddFsiReservationForm(Form):
                 attendees = self.event.possible_bookers(
                     external_only=self.model.external_only
                 )
-            return (self.attendee_choice(a) for a in attendees)
+            return (
+                self.attendee_choice(a) for a in attendees
+            ) if attendees.first() else result
 
         if self.request.view_name == 'edit':
             attendees = self.model.course_event.possible_bookers(
