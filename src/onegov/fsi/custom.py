@@ -45,7 +45,6 @@ def get_base_tools(request):
         yield LinkGroup(
             request.current_username, classes=('user',), links=profile_links)
 
-
         # Management dropdown for admin (e.g Kursverantwortlicher)
         links = []
 

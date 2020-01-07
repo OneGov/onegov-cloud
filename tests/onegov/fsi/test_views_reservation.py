@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.models import CourseReservation, CourseAttendee, CourseEvent
 from onegov.user import User
@@ -98,6 +96,7 @@ def test_own_reservations(client_with_db):
     page = page.click('Kursanmeldung', href='attendee_id')
     assert 'Keine Einträge gefunden' not in page
 
+
 def test_create_delete_reservation(client_with_db):
     client = client_with_db
     session = client.app.session()
@@ -135,7 +134,7 @@ def test_create_delete_reservation(client_with_db):
     new = client.get(view).click('Anmeldung')
 
     assert new.form['attendee_id'].options[0] == (
-        str(attendee.id), False,  str(attendee))
+        str(attendee.id), False, str(attendee))
 
     # the fixture also provides a past event which should not be an option
     options = [opt[2] for opt in new.form['course_event_id'].options]

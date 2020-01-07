@@ -3,7 +3,6 @@ from collections import namedtuple
 from uuid import uuid4
 
 import pytz
-from sedate import utcnow
 
 from onegov.core.crypto import hash_password
 from onegov.fsi.models import CourseAttendee, Course, CourseEvent, \
