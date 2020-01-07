@@ -174,5 +174,21 @@
     </tal:b>
 </metal:course_event_listing>
 
+<metal:role_snippet define-macro="role_snippet">
+    <h4 i18n:translate="">Roles</h4>
+    <dl class="field-display">
+        <dt>Administrator</dt>
+        <dd>Fachstelle Sicherheit / Staatskanzlei / Seantis</dd>
+    </dl>
+    <dl class="field-display">
+        <dt>Editor</dt>
+        <dd>Sicherheitsbeauftragte/r (SIBA)</dd>
+    </dl>
+    <dl class="field-display">
+        <dt>Member</dt>
+        <dd>Miterarbeitende / Lehrpersonen / Externe</dd>
+    </dl>
+</metal:role_snippet>
+
 </body>
 </html>

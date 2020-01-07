@@ -39,6 +39,12 @@ dd.accordion-navigation + dd.accordion-navigation {
     .cancel-icon::before { @include icon('\f05e'); }
 }
 
+.info-panel {
+    border: 1px solid $gray;
+    background-color: $topbar-bg-color;
+    padding: .5rem 1rem .75rem;
+}
+
 /*
     Global tool icons
 */
