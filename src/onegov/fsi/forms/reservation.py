@@ -40,10 +40,9 @@ class AddFsiReservationForm(Form):
     def event_choice(self, event):
         return str(event.id), str(event)
 
-    @staticmethod
-    def attendee_choice(attendee):
+    def attendee_choice(self, attendee):
         if not attendee:
-            return '', _('None')
+            return '', self.request.translate(_('None'))
         text = f'{str(attendee)}'
         if attendee.user and attendee.user.source_id:
             text += f' | {attendee.user.source_id}'
@@ -81,7 +80,8 @@ class AddFsiReservationForm(Form):
             events = self.attendee.possible_course_events(
                 show_hidden=self.request.is_manager
             )
-
+        if not events.first():
+            return [self.none_choice]
         return (self.event_choice(e) for e in events)
 
     def get_attendee_choices(self):
