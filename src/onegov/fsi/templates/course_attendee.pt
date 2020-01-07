@@ -7,7 +7,7 @@
             <div class="columns small-12">
                 <div class="row">
                     <div class="columns small-12">
-                        <tal:b tal:condition="model|nothong">
+                        <tal:b tal:condition="model|nothing">
                             <dl class="field-display">
                                 <dt i18n:translate>E-Mail</dt>
                                 <dd>${model.email}</dd>
