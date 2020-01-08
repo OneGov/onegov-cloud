@@ -137,7 +137,14 @@ def load_csv(
             _("The file contains an empty line."),
             filename=filename
         )
-    except Exception:
+    except IndexError as e:
+        # Will happen if something goes wrong in src/onegov/core/csv.py:188
+        # use list(csv.lines_to_debug) and see which index ix fails
+        error = FileImportError(
+            e.args[0],
+            filename=filename
+        )
+    except Exception as e:
         error = FileImportError(
             _("Not a valid csv/xls/xlsx file."),
             filename=filename
