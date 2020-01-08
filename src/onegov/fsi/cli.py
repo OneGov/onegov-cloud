@@ -129,7 +129,7 @@ def fetch_users(session, ldap_server, ldap_username, ldap_password, ldap_base):
 
         user.attendee.first_name = data['first_name']
         user.attendee.last_name = data['last_name']
-        user.attendee._email = data['mail']
+        # user.attendee._email = data['mail']
         user.attendee.organisation = ' / '.join(o for o in (
             data['directorate'],
             data['agency'],
