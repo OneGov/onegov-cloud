@@ -174,6 +174,7 @@ def parse_persons(csvfile):
         # valid_till = parse_date(line.p_valid_till)
 
         persons.setdefault(obj_id, {
+            'obj_id': obj_id,
             'email': parse_email(line.p_email),
             'code': line.p_userid,
             # 'org': line.p_verwaltung,
@@ -342,7 +343,7 @@ def parse_subscriptions(csvfile, persons, events):
     return errors, reservations, droppped_teilnehmer_ids, external_attendees
 
 
-def map_person_to_known_ldap_user(line, session):
+def map_persons_to_known_ldap_user(person_record, session):
     """
     Since the exported persons table contains records without email
     from various sources, we have to try to map it to an existing record
@@ -353,61 +354,38 @@ def map_person_to_known_ldap_user(line, session):
 
     Returns an obj_id, attendee tuple
     """
-    obj_id = line.obj_id
-    assert obj_id
-    org = line.p_verwaltung.strip()
-    assert org
+    code = person_record['code']
+    email = person_record['email']
+    obj_id = person_record['obj_id']
 
-    code = line.p_userid.strip()        # compare with user.source_id
-    email = line.p_email.strip()
-    first_name = line.p_vorname.strip()
-    last_name = line.p_name.strip()
-    left_org = line.p_austrittsdatum.strip()
-    valid_til = line.p_valid_till.strip()
-
-
-    ldap_org = 'Kantonale Verwaltung Zug'
-
-    # 1st stage: email and shortcode are right
-    if code and email:
-        user = session.query(User).filter_by(
-            username=email, source_id=code).first()
+    if code:
+        user = session.query(User).filter_by(source_id=code).first()
         if user:
+            if email and user.username != email:
+                # set email to most up-to-date
+                email = email.username
+
             if not user.attendee:
                 raise InconsistencyError(
                     f'{email} - {code}: user should have an attendee',
                     'Personen.txt',
-                    rownumber=line.rownumber
                 )
             return obj_id, user.attendee
-        else:
-            # the person does not exists in ldap anymore
+    elif email:
+        user = session.query(User).filter_by(username=email)
+        if not user.attendee:
             raise InconsistencyError(
-                f'{email} - {code}: no entry found in users',
+                f'{email} - {code}: user should have an attendee',
                 'Personen.txt',
-                rownumber=line.rownumber
             )
-
-    if email:
-        user = session.query(User).filter_by(username=email).first()
-        if user:
-            assert user.attendee
-            return user.attendee
-        # else:
-        #     # try to find the user/attendee as external one
-        #     # does not make sense much, cause where from we have this data
-        #     attendee = session.query(CourseAttendee).filter_by(
-        #         _email=email).first()
-        #     if attendee:
-        #         return attendee
-        #     else:
-        #         raise InconsistencyError(
-        #             f'{email}: no entry found in attendees (external)',
-        #             'Personen.txt',
-        #             rownumber=line.rownumber
-        #         )
-    # assuming this person was external
-    was_external_for_sure = ldap_org != org
+        # code = user.source_id
+        return obj_id, user.attendee
+    else:
+        # the person does not exists in ldap anymore
+        raise InconsistencyError(
+            f'{email} - {code}: no entry found in users',
+            'Personen.txt',
+        )
 
 
 def find_lacking_person_email(persons, subscriptions):
@@ -458,4 +436,3 @@ def import_ims_data(
     # session.flush()
 
     return {}
-
