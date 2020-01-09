@@ -3,7 +3,8 @@ Dateien:
 
 - Kurse: Die Liste der Kurse
 - Personen -> importiert aus ldap
-- Teilnehmer: repräsentiert die Anmeldungen mit referenz zu Personen/Ausführungen
+- Teilnehmer: repräsentiert die Anmeldungen mit referenz zu
+  Personen und Durchführungen
 - Ausführungen: die Listen der Durchführungen.
 
 
@@ -94,8 +95,7 @@ import dateutil.parser
 from sedate import replace_timezone
 
 from onegov.core.csv import CSVFile
-from onegov.fsi.models import CourseEvent, Course, CourseReservation, \
-    CourseAttendee
+from onegov.fsi.models import CourseEvent, Course
 from onegov.user import User
 
 
@@ -194,10 +194,10 @@ def parse_courses(csvfile):
     for line in csvfile.lines:
         try:
             courses[line.vorgangsnr] = Course(
-                    id=uuid4(),
-                    name=line.kurzbeschreibung,
-                    description=line.detailbeschreibung
-                )
+                id=uuid4(),
+                name=line.kurzbeschreibung,
+                description=line.detailbeschreibung
+            )
         except Exception as e:
             errors[line.rownumber] = e.args[0]
             continue
