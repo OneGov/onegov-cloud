@@ -311,9 +311,9 @@ def parse_subscriptions(csvfile, persons, events):
                 # is complete
                 if not current_email == email:
                     assert complete_record
-                    identifier = f'{current_email}-{code}'
-                    identifier += f'-{last_name},{first_name}'
-                    new_emails_for_existing[identifier].append(email)
+                    # identifier = f'{current_email}-{code}'
+                    # identifier += f'-{last_name},{first_name}'
+                    # new_emails_for_existing[identifier].append(email)
                     # the the actual email to most up-to-date
                     email = current_email
 
@@ -350,9 +350,9 @@ def parse_subscriptions(csvfile, persons, events):
     #     print('Dropped person ids:')
     #     print('\n'.join(droppped_teilnehmer_ids))
 
-    print('--- Verschiedene Emails für Personen.email vorhanden ---')
-    for key, val in new_emails_for_existing.items():
-        print(f'-- Identifier {key} | Anmeldungen für ' + ', '.join(set(val)))
+    # print('--- Verschiedene Emails für Personen.email vorhanden ---')
+    # for key, val in new_emails_for_existing.items():
+    #     print(f'-- Identifier {key} | Anmeldungen für ' + ', '.join(set(val)))
 
     print('--- Eindeute Emails als Auswahl für Personen.email = None ---')
     for key, val in emails_choices_for_nonexisting.items():
