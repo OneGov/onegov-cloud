@@ -280,16 +280,23 @@ def parse_subscriptions(csvfile, persons, events):
         email = parse_email(line.teilnehmer_email)
 
         if teilnehmer_id:
+            # Deal with the persons object
             person_obj = persons.get(line.teilnehmer_id)
             if not person_obj:
-                print(
-                    f'Skipping {line.rownumber}: '
-                    f'dropping {line.teilnehmer_id} not in persons')
+                # print(
+                #     f'Skipping {line.rownumber}: '
+                #     f'dropping {line.teilnehmer_id} not in persons')
                 continue
 
-            # Fill missing Email or drop the user completely
+            # Analyze possible identifiers
             current_email = persons[teilnehmer_id]['email']
+            # first_name, last_name from two sources, Persons taking priority
+            first_name = persons[teilnehmer_id].get('first_name')
+            last_name = persons[teilnehmer_id].get('last_name')
             code = persons[teilnehmer_id]['code']
+
+            complete_record = all((current_email, code, first_name, last_name))
+
             if not current_email:
                 if email:
                     # print(f'-- {line.rownumber} person.email completed')
@@ -302,20 +309,14 @@ def parse_subscriptions(csvfile, persons, events):
                     droppped_teilnehmer_ids.append(teilnehmer_id)
                     continue
             else:
-                # check if the email is different
-                if current_email and not current_email == email:
-                    # print(f'-- getting different email for {teilnehmer_id}')
+                # check if the email is different, if not assert person entry
+                # is complete
+                if not current_email == email:
+                    assert complete_record
                     identifier = f'{current_email}-{code}'
+                    identifier += f'-{last_name},{first_name}'
                     new_emails_for_existing[identifier].append(email)
                     different_email_count += 1
-                    # print(f'person.email {current_email} v.s {email}')
-
-            # first_name, last_name from two sources, Persons taking priority
-            first_name = persons.get(teilnehmer_id, {}).get(
-                'first_name') or line.teilnehmer_vorname
-
-            last_name = persons.get(teilnehmer_id, {}).get(
-                'last_name') or line.teilnehmer_nachname
 
         elif line.teilnehmer_firma == 'Intern':
             print(f'Skipping {line.rownumber}: '
@@ -323,6 +324,9 @@ def parse_subscriptions(csvfile, persons, events):
             continue
         else:
             # no teilnehmer_id so is external from a school or elsewhere
+            first_name = line.teilnehmer_vorname
+            last_name = line.teilnehmer_nachname
+
             if not all((email, first_name, last_name)):
                 print(f'Skipping {line.rownumber}: '
                       f'External person with no email, firstname or lastname')
@@ -333,9 +337,12 @@ def parse_subscriptions(csvfile, persons, events):
                 email=email,
                 organisation=line.teilnehmer_firma
             ))
+
+    print('--- Verschiedene Emails für Personen.email vorhanden ---')
     for key, val in new_emails_for_existing.items():
         print(f'-- Identifier {key} | Anmeldungen für ' + ', '.join(set(val)))
 
+    print('--- Eindeute Emails als Auswahl für Personen.email = None ---')
     for key, val in emails_choices_for_nonexisting:
         print(f' -- OBJ_ID {key}: Mögliche Addressen: ' + ', '.join(set(val)))
 
@@ -420,6 +427,7 @@ def import_ims_data(
         subscriptions_file, persons, events)
 
     # Delete persons with no email at all and no code
+
     for person_id in dropped_person_ids:
         print(f'Dropping user with teilnehmer_id={person_id}')
         del persons[person_id]
