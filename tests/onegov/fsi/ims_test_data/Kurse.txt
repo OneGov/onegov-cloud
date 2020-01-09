@@ -1,2 +1,0 @@
-VORGANGSNR,KURZBESCHREIBUNG,REFERENT_NAME,REFERENT_FIRMA,KURSLOKAL,TEILNEHMER_MIN,MAND_DESC
-"KV-10-000003","Sicherheitsgrundkurs (SGK)",,,"Gewerblich-industrielles Bildungszentrum Zug (GIBZ), Baarerstrasse 100, 6300 Zug, Trakt 2 / 1. OG / Seminarraum 2.112",15,"KURS"

@@ -1,3 +1,0 @@
-PROC_ID,PROC_ID_KV,VORGANGSART,STATUS,BUCHUNGSSTATUS,KURZBESCHREIBUNG,DAUER,KURS_VON,KURS_BIS,TEILNEHMER_ANZAHL,REFERENT_NAME,REFERENT_FIRMA,KURSLOKAL,TEILNEHMER_MIN,TEILNEHMER_MAX,EXTERNE_BUCHBAR
-"KV-10-000003.0108","KV-10-000003","Kursausführung","Abgeschlossen","OK (Ausgebucht)","Sicherheitsgrundkurs (SGK)",2.5,6/8/2017 9:30:00 AM,6/8/2017 12:00:00 PM,16,"Furrer, Andreas","FSI","Freiwillige Feuerwehr der Stadt Zug FFZ, Ahornstrasse 10, 6300 Zug, Theorieraum 3. OG, MZ 3",12,16,"J"
-"KV-10-000003.0109","KV-10-000003","Kursausführung","Abgeschlossen","OK (Ausgebucht)","Sicherheitsgrundkurs (SGK)",2.5,6/8/2017 1:30:00 PM,6/8/2017 4:00:00 PM,16,"Furrer, Andreas","FSI","Freiwillige Feuerwehr der Stadt Zug FFZ, Ahornstrasse 10, 6300 Zug, Theorieraum 3. OG, MZ 3",12,16,"J"
