@@ -282,9 +282,7 @@ def parse_subscriptions(csvfile, persons, events):
             # Deal with the persons object
             person_obj = persons.get(line.teilnehmer_id)
             if not person_obj:
-                # print(
-                #     f'Skipping {line.rownumber}: '
-                #     f'dropping {line.teilnehmer_id} not in persons')
+                # skip orphaned subscriptions
                 continue
 
             # Analyze possible identifiers
@@ -296,26 +294,18 @@ def parse_subscriptions(csvfile, persons, events):
 
             complete_record = all((current_email, code, first_name, last_name))
 
-            if not current_email:
-                if email:
-                    # print(f'-- {line.rownumber} person.email completed')
-                    emails_choices_for_nonexisting[teilnehmer_id].append(email)
-                    # persons[teilnehmer_id]['email'] = email
-                elif not code:
-                    print(f'Skipping {line.rownumber}: '
-                          f'No email found at all, no code')
-                    droppped_teilnehmer_ids.append(teilnehmer_id)
-                    continue
-            else:
-                # check if the email is different, if not assert person entry
-                # is complete
+            if current_email:
                 if not current_email == email:
                     assert complete_record
-                    # identifier = f'{current_email}-{code}'
-                    # identifier += f'-{last_name},{first_name}'
-                    # new_emails_for_existing[identifier].append(email)
-                    # the the actual email to most up-to-date
-                    email = current_email
+                    identifier = f'{current_email}-{code}'
+                    identifier += f'-{last_name},{first_name}'
+                    new_emails_for_existing[identifier].append(email)
+            else:
+                if email:
+                    # print(f'-- {line.rownumber} person.email completed')
+                    identifier = f'{code}-{teilnehmer_id}-' \
+                                 f'{last_name},{first_name}-{line.teilnehmer_firma}'
+                    emails_choices_for_nonexisting[identifier].append(email)
 
         elif line.teilnehmer_firma == 'Intern':
             print(f'Skipping {line.rownumber}: '
@@ -346,9 +336,9 @@ def parse_subscriptions(csvfile, persons, events):
             )
 
     assert not droppped_teilnehmer_ids
-    # if droppped_teilnehmer_ids:
-    #     print('Dropped person ids:')
-    #     print('\n'.join(droppped_teilnehmer_ids))
+    if droppped_teilnehmer_ids:
+        print('Dropped person ids:')
+        print('\n'.join(droppped_teilnehmer_ids))
 
     # print('--- Verschiedene Emails für Personen.email vorhanden ---')
     # for key, val in new_emails_for_existing.items():
