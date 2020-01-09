@@ -95,7 +95,8 @@ import dateutil.parser
 from sedate import replace_timezone
 
 from onegov.core.csv import CSVFile
-from onegov.fsi.models import CourseEvent, Course
+from onegov.fsi.models import CourseEvent, Course, CourseReservation, \
+    CourseAttendee
 from onegov.user import User
 
 
@@ -260,20 +261,18 @@ def parse_events(csvfile, courses):
 @with_open
 def parse_subscriptions(csvfile, persons, events):
     print('-- parse_subscriptions --')
-
-    reservations = []
+    subscriptions = []
     errors = OrderedDict()
     droppped_teilnehmer_ids = []
     external_attendees = []
-    different_email_count = 0
     emails_choices_for_nonexisting = defaultdict(list)
     new_emails_for_existing = defaultdict(list)
 
     for line in csvfile.lines:
         teilnehmer_id = line.teilnehmer_id
+        course_event = events.get(line.proc_id)
 
-        course_event_id = events.get(line.proc_id)
-        if not course_event_id:
+        if not course_event:
             print(f'Skipping {line.rownumber}: drop since no course event')
             continue
 
@@ -302,10 +301,9 @@ def parse_subscriptions(csvfile, persons, events):
                     # print(f'-- {line.rownumber} person.email completed')
                     emails_choices_for_nonexisting[teilnehmer_id].append(email)
                     # persons[teilnehmer_id]['email'] = email
-                elif not persons[teilnehmer_id]['code']:
+                elif not code:
                     print(f'Skipping {line.rownumber}: '
                           f'No email found at all, no code')
-                    # del persons[teilnehmer_id]
                     droppped_teilnehmer_ids.append(teilnehmer_id)
                     continue
             else:
@@ -316,7 +314,8 @@ def parse_subscriptions(csvfile, persons, events):
                     identifier = f'{current_email}-{code}'
                     identifier += f'-{last_name},{first_name}'
                     new_emails_for_existing[identifier].append(email)
-                    different_email_count += 1
+                    # the the actual email to most up-to-date
+                    email = current_email
 
         elif line.teilnehmer_firma == 'Intern':
             print(f'Skipping {line.rownumber}: '
@@ -331,23 +330,36 @@ def parse_subscriptions(csvfile, persons, events):
                 print(f'Skipping {line.rownumber}: '
                       f'External person with no email, firstname or lastname')
                 continue
-            external_attendees.append(dict(
+
+            attendee = CourseAttendee(
+                id=uuid4(),
                 first_name=first_name,
                 last_name=last_name,
-                email=email,
+                _email=email,
                 organisation=line.teilnehmer_firma
-            ))
+            )
+            external_attendees.append(attendee)
+            course_event.reservations.append(
+                CourseReservation(
+                    attendee_id=attendee.id,
+                )
+            )
+
+    assert not droppped_teilnehmer_ids
+    # if droppped_teilnehmer_ids:
+    #     print('Dropped person ids:')
+    #     print('\n'.join(droppped_teilnehmer_ids))
 
     print('--- Verschiedene Emails für Personen.email vorhanden ---')
     for key, val in new_emails_for_existing.items():
         print(f'-- Identifier {key} | Anmeldungen für ' + ', '.join(set(val)))
 
     print('--- Eindeute Emails als Auswahl für Personen.email = None ---')
-    for key, val in emails_choices_for_nonexisting:
+    for key, val in emails_choices_for_nonexisting.items():
         print(f' -- OBJ_ID {key}: Mögliche Addressen: ' + ', '.join(set(val)))
 
     # print(f'Different emails counted: {different_email_count}')
-    return errors, reservations, droppped_teilnehmer_ids, external_attendees
+    return errors, subscriptions, droppped_teilnehmer_ids, external_attendees
 
 
 def map_persons_to_known_ldap_user(person_record, session):
