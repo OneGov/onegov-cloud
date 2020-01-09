@@ -428,6 +428,10 @@ def import_ims_data(
     errors, subscriptions, dropped_person_ids, external = parse_subscriptions(
         subscriptions_file, persons, events)
 
+    print('Reservationen Externe: Total: ', len(external))
+    for attendee in external:
+        print(f'{attendee}-{attendee._email}')
+
     # Delete persons with no email at all and no code
 
     for person_id in dropped_person_ids:
