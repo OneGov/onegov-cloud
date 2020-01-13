@@ -10,36 +10,31 @@ from onegov.user.auth.provider import ensure_user
 cli = command_group()
 
 
+def do_ims_import(path, request):
+    print('test a print if it works')
+    assert False
+    errors, persons, courses, events, possible_ldap_users = parse_ims_data(
+        f'{path}/Teilnehmer.txt',
+        f'{path}/Ausführungen.txt',
+        f'{path}/Kurse.txt',
+        f'{path}/Personen.txt'
+    )
+    statistics = import_ims_data(
+        request.session, persons, courses, events, possible_ldap_users)
+    for key, val in statistics.items():
+        click.secho(f'{key}: {val}')
+
+
 @cli.command(name='import-ims-data', context_settings={'singular': True})
 @click.option('--path', help='Path with pre-named files', required=True)
 def import_ims_data_cli(path):
 
     def execute(request, app):
-        persons_file = f'{path}/Personen.txt'
-        subscriptions_file = f'{path}/Teilnehmer.txt'
-        events_file = f'{path}/Ausführungen.txt'
-        courses_file = f'{path}/Kurse.txt'
-
         # cli hangs in src/onegov/core/cli/core.py:596
         # request in venv/lib/python3.8/site-packages/webtest/app.py:628
         # goes to src/onegov/server/core.py:120
+        do_ims_import(path, request)
 
-        print('test a print if it works')
-        #
-        # assert all((
-        #     os.path.isfile(f) for f in (
-        #         persons_file, subscriptions_file, events_file, courses_file)
-        # ))
-        # errors, persons, courses, events, possible_ldap_users = parse_ims_data(
-        #     subscriptions_file,
-        #     events_file,
-        #     courses_file,
-        #     persons_file
-        # )
-        # statistics = import_ims_data(
-        #    request.session, persons, courses, events, possible_ldap_users)
-        # for key, val in statistics.items():
-        #     click.secho(f'{key}: {val}')
     return execute
 
 
