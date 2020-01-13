@@ -1,12 +1,46 @@
 import click
-
+import os
 from onegov.core.cli import command_group
+from onegov.fsi.ims_import import parse_ims_data, import_ims_data
 from onegov.fsi.models import CourseAttendee
 from onegov.user.auth.clients import LDAPClient
 from onegov.user.auth.provider import ensure_user
 
 
 cli = command_group()
+
+
+@cli.command(name='import-ims-data', context_settings={'singular': True})
+@click.option('--path', help='Path with pre-named files', required=True)
+def import_ims_data_cli(path):
+
+    def execute(request, app):
+        persons_file = f'{path}/Personen.txt'
+        subscriptions_file = f'{path}/Teilnehmer.txt'
+        events_file = f'{path}/Ausführungen.txt'
+        courses_file = f'{path}/Kurse.txt'
+
+        # cli hangs in src/onegov/core/cli/core.py:596
+        # request in venv/lib/python3.8/site-packages/webtest/app.py:628
+        # goes to src/onegov/server/core.py:120
+
+        print('test a print if it works')
+        #
+        # assert all((
+        #     os.path.isfile(f) for f in (
+        #         persons_file, subscriptions_file, events_file, courses_file)
+        # ))
+        # errors, persons, courses, events, possible_ldap_users = parse_ims_data(
+        #     subscriptions_file,
+        #     events_file,
+        #     courses_file,
+        #     persons_file
+        # )
+        # statistics = import_ims_data(
+        #    request.session, persons, courses, events, possible_ldap_users)
+        # for key, val in statistics.items():
+        #     click.secho(f'{key}: {val}')
+    return execute
 
 
 @cli.command(name='fetch-users', context_settings={'singular': True})
@@ -23,7 +57,7 @@ def fetch_users_cli(ldap_server, ldap_username, ldap_password, ldap_base):
 
     Example:
 
-        onegov-fsi --select /onegov_fsi/fsi fetch-users \\
+        onegov-fsi --select /fsi/fsi fetch-users \\
             --ldap-server ldaps://1.2.3.4 \\
             --ldap-username foo \\
             --ldap-password bar \\

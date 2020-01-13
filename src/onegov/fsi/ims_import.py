@@ -68,6 +68,8 @@ Vorgeschlagenes Vorgehen:
 
 Die "single source of truth" bildet das bereits umegesetzte Verzeichnis
 der gültigen Benutzer aus dem LDAP kombiniert mit den weiteren Verzeichnissen.
+Es sollen nur Anmeldungen von mittels LDAP identifizierbaren Personen
+importiert werden.
 
 Es werden nicht importiert:
 
@@ -81,12 +83,15 @@ Vervollständigungen
 - .local in email addressen wird herausgenommen
 - Fehlender Wert für ANWESEND bei alten Anmeldungen wird mit JA gefüllt.
 - Referent Kurs: Standard-Wert einfügen "Unbekannter Referent" sofern fehlend
-- Fehlt die Email in Personen.txt wird noch in Teilnehmer.txt gesucht.
 
-Als Externe Benutzer sollen erstellt werden:
+Fehlt die Email und der Code in Personen.txt wird noch in Teilnehmer.txt
+gesucht:
 
-Mit Beantwortung der Fragen zu klären, wie man solche in Personen.txt
-  identifiziert.
+- Existiert eine einzige mögliche Email, wird sie mit dem Vor und Nachname der
+  Person verglichen (der gemäss Logfile immer vorhanden ist).
+  Stimmt er überein, wird danach mit dieser Email im LDAP gesucht.
+
+Externere Anmeldungen ohne Bezug zu Personen.txt werden verworfen.
 
 """
 from collections import OrderedDict, defaultdict
@@ -158,9 +163,7 @@ def with_open(func):
 
 
 def parse_completed(val):
-    if not val:
-        raise TypeError('Empty Value in parse completed')
-    return True if val == 'J' else False
+    return False if val == 'N' else True
 
 
 @with_open
@@ -178,10 +181,8 @@ def parse_persons(csvfile):
             'obj_id': obj_id,
             'email': parse_email(line.p_email),
             'code': line.p_userid,
-            # 'org': line.p_verwaltung,
             'first_name': line.p_vorname,
             'last_name': line.p_name,
-            # 'valid_till': valid_till
         })
     return persons
 
@@ -216,13 +217,14 @@ def parse_events(csvfile, courses):
         # Block accepts empty end values, but fails if the start is not set
         parent_course = courses[line.proc_id_kv]
         if not parent_course:
-            print(f'Skipping {line.rownumber}: parent course not found')
+            print(f'Skipping {line.rownumber}: parent id {line.proc_id_kv} '
+                  f'not found in Personen.txt')
             continue
 
         date_lacking = not line.kurs_von or not line.kurs_bis
         if line.buchungsstatus == 'Keine Buchung' and date_lacking:
             print(f'Skipping line {line.rownumber}: '
-                  f'status: Keine Buchung and lacking date')
+                  f'status: Buchungsstatus = Keine Buchung and lacking date')
             continue
 
         try:
@@ -239,6 +241,7 @@ def parse_events(csvfile, courses):
             end = start
 
         default_name = 'Unbekannter Referent'
+        default_company = 'Unbekannte Firma'
         min_att = validate_integer(line.teilnehmer_min)
         max_att = validate_integer(line.teilnehmer_max)
 
@@ -249,7 +252,7 @@ def parse_events(csvfile, courses):
             start=start,
             end=end,
             presenter_name=line.referent_name or default_name,
-            presenter_company=line.referent_firma,
+            presenter_company=line.referent_firma or default_company,
             min_attendees=min_att,
             max_attendees=max_att,
             status=parse_status(line.status),
@@ -260,17 +263,27 @@ def parse_events(csvfile, courses):
 
 @with_open
 def parse_subscriptions(csvfile, persons, events):
+    """
+
+    :param csvfile:
+    :param persons: dict of dicts of person records
+    :param events: dict of CourseEvent classes
+    :return: subscriptions within persons and within maybe_external_in_ldap
+    """
     print('-- parse_subscriptions --')
-    subscriptions = []
+
+    # The selection of valid subscriptions/reservations
     errors = OrderedDict()
     droppped_teilnehmer_ids = []
-    external_attendees = []
-    emails_choices_for_nonexisting = defaultdict(list)
-    new_emails_for_existing = defaultdict(list)
+    maybe_external_in_ldap = OrderedDict()
+    emails_by_teilnehmer_id = defaultdict(list)
+
+    # new_emails_for_existing = defaultdict(list)
 
     for line in csvfile.lines:
         teilnehmer_id = line.teilnehmer_id
         course_event = events.get(line.proc_id)
+        completed = parse_completed(line.anwesend)
 
         if not course_event:
             print(f'Skipping {line.rownumber}: drop since no course event')
@@ -281,31 +294,51 @@ def parse_subscriptions(csvfile, persons, events):
         if teilnehmer_id:
             # Deal with the persons object
             person_obj = persons.get(line.teilnehmer_id)
+
             if not person_obj:
+                print(f'Skipping {line.rownumber}: orphaned subscription')
                 # skip orphaned subscriptions
                 continue
 
             # Analyze possible identifiers
-            current_email = persons[teilnehmer_id]['email']
-            # first_name, last_name from two sources, Persons taking priority
-            first_name = persons[teilnehmer_id].get('first_name')
-            last_name = persons[teilnehmer_id].get('last_name')
-            code = persons[teilnehmer_id]['code']
-
+            code = person_obj['code']
+            current_email = person_obj['email']
+            # first_name, last_name from Persons
+            first_name = person_obj['first_name']
+            last_name = person_obj['last_name']
             complete_record = all((current_email, code, first_name, last_name))
 
+            # skip subscriptions for persons without email and code
+            if not current_email and not code:
+                print(f'Skipping {line.rownumber}: '
+                      f'person obj without email and code')
+                continue
+
+            subscriptions = person_obj.setdefault(
+                'subscriptions', [])
+
+            if code:
+                # Add to valid subscriptions
+                subscriptions.append(dict(
+                    course_event_id=course_event.id,
+                    completed=completed
+                ))
+                continue
+
             if current_email:
+                # just current_email
                 if not current_email == email:
+                    # Assert full profile of the record in Personen.txt
                     assert complete_record
-                    identifier = f'{current_email}-{code}'
-                    identifier += f'-{last_name},{first_name}'
-                    new_emails_for_existing[identifier].append(email)
-            else:
-                if email:
-                    # print(f'-- {line.rownumber} person.email completed')
-                    identifier = f'{code}-{teilnehmer_id}-' \
-                                 f'{last_name},{first_name}-{line.teilnehmer_firma}'
-                    emails_choices_for_nonexisting[identifier].append(email)
+                subscriptions.append(dict(
+                    course_event_id=course_event.id,
+                    completed=completed
+                ))
+                continue
+
+            if email:
+                # Just a check, empty will be assert beneath
+                emails_by_teilnehmer_id[teilnehmer_id].append(email)
 
         elif line.teilnehmer_firma == 'Intern':
             print(f'Skipping {line.rownumber}: '
@@ -318,38 +351,26 @@ def parse_subscriptions(csvfile, persons, events):
 
             if not all((email, first_name, last_name)):
                 print(f'Skipping {line.rownumber}: '
-                      f'External person with no email, firstname or lastname')
+                      'Subscription misses one of '
+                      'email, firstname or lastname')
                 continue
 
-            attendee = CourseAttendee(
+            external = maybe_external_in_ldap.setdefault(email, dict(
                 id=uuid4(),
                 first_name=first_name,
                 last_name=last_name,
-                _email=email,
-                organisation=line.teilnehmer_firma
-            )
-            external_attendees.append(attendee)
-            course_event.reservations.append(
-                CourseReservation(
-                    attendee_id=attendee.id,
-                )
-            )
+                organisation=line.teilnehmer_firma,
+                subscriptions=[]
+            ))
+            external['subscriptions'].append(dict(
+                course_event_id=course_event.id,
+                completed=completed
+            ))
 
     assert not droppped_teilnehmer_ids
-    if droppped_teilnehmer_ids:
-        print('Dropped person ids:')
-        print('\n'.join(droppped_teilnehmer_ids))
+    assert not emails_by_teilnehmer_id
 
-    # print('--- Verschiedene Emails für Personen.email vorhanden ---')
-    # for key, val in new_emails_for_existing.items():
-    #     print(f'-- Identifier {key} | Anmeldungen für ' + ', '.join(set(val)))
-
-    print('--- Eindeute Emails als Auswahl für Personen.email = None ---')
-    for key, val in emails_choices_for_nonexisting.items():
-        print(f' -- OBJ_ID {key}: Mögliche Addressen: ' + ', '.join(set(val)))
-
-    # print(f'Different emails counted: {different_email_count}')
-    return errors, subscriptions, droppped_teilnehmer_ids, external_attendees
+    return errors, persons, maybe_external_in_ldap
 
 
 def map_persons_to_known_ldap_user(person_record, session):
@@ -361,11 +382,10 @@ def map_persons_to_known_ldap_user(person_record, session):
     The ldap fetched users have an attendee created with
     first_name, last_name and email set on the attendee as well.
 
-    Returns an obj_id, attendee tuple
+    Returns an attendee or None
     """
     code = person_record['code']
     email = person_record['email']
-    obj_id = person_record['obj_id']
 
     if code:
         user = session.query(User).filter_by(source_id=code).first()
@@ -379,74 +399,96 @@ def map_persons_to_known_ldap_user(person_record, session):
                     f'{email} - {code}: user should have an attendee',
                     'Personen.txt',
                 )
-            return obj_id, user.attendee
+            return user.attendee
+        print(f'LDAP CODE: {code} not found, Email {email} not searched')
     elif email:
         user = session.query(User).filter_by(username=email)
-        if not user.attendee:
-            raise InconsistencyError(
-                f'{email} - {code}: user should have an attendee',
-                'Personen.txt',
-            )
-        # code = user.source_id
-        return obj_id, user.attendee
+        if user:
+            if not user.attendee:
+                raise InconsistencyError(
+                    f'{email}: user should have an attendee',
+                    'Personen.txt',
+                )
+            return user.attendee
+        print(f'LDAP EMAIL: {email} not found')
+
     else:
-        # the person does not exists in ldap anymore
-        raise InconsistencyError(
-            f'{email} - {code}: no entry found in users',
-            'Personen.txt',
-        )
+        identifier = person_record.get('obj_id') or email
+        print(f'No identifier for user with OBJ_ID {identifier}')
+    return None
 
 
-def find_lacking_person_email(persons, subscriptions):
-    pass
-
-
-def import_ims_data(
-        session,
+def parse_ims_data(
         subscriptions_file,
         events_file,
         courses_file,
         persons_file,
-        write_log=False
 ):
     gathered_errors = {}
 
     # raw extraction
-    persons = parse_persons(persons_file)
+    raw_persons = parse_persons(persons_file)
 
     errors, courses = parse_courses(courses_file)
 
     if errors:
         gathered_errors['parse_courses'] = errors
-        return gathered_errors
+        return gathered_errors, None, None, None, None, None
 
     errors, events = parse_events(events_file, courses)
     if errors:
         gathered_errors['parse_events'] = errors
-        return gathered_errors
+        return gathered_errors, None, None, None, None, None
 
-    errors, subscriptions, dropped_person_ids, external = parse_subscriptions(
-        subscriptions_file, persons, events)
-
-    print('Reservationen Externe: Total: ', len(external))
-    for attendee in external:
-        print(f'{attendee}-{attendee._email}')
-
-    # Delete persons with no email at all and no code
-
-    for person_id in dropped_person_ids:
-        print(f'Dropping user with teilnehmer_id={person_id}')
-        del persons[person_id]
+    errors, persons, possible_ldap_users = parse_subscriptions(
+        subscriptions_file, raw_persons, events)
 
     if errors:
         gathered_errors['parse_subscriptions'] = errors
 
-    if gathered_errors:
-        return gathered_errors
+    return gathered_errors, persons, courses, events, possible_ldap_users
 
-    # session.add_all(courses.values())
-    # session.add_all(events.values())
-    # session.add_all(subscriptions)
-    # session.flush()
 
-    return {}
+def import_ims_data(session, persons, courses, events, possible_ldap_users):
+
+    print('-- Import IMS DATA to database with LDAP --')
+
+    statistics = {
+        'LDAP_found': 0,
+        'LDAP_not_found': 0,
+        'external_found:': 0,
+        'external_not_found:': 0,
+    }
+
+    session.add_all(courses.values())
+    session.add_all(events.values())
+
+    for obj_id, person in persons.items():
+        attendee = map_persons_to_known_ldap_user(person, session)
+        if not attendee:
+            statistics['LDAP_not_found'] += 1
+            continue
+        statistics['LDAP_found'] += 1
+        subscriptions = person['subscriptions']
+        if not subscriptions:
+            continue
+        session.add_all((
+            CourseReservation(
+                attendee_id=attendee.id,
+                course_event_id=r['course_event_id']
+            ) for r in subscriptions
+        ))
+
+    for record in possible_ldap_users:
+        attendee = map_persons_to_known_ldap_user(record, session)
+        if not attendee:
+            statistics['external_not_found'] += 1
+            continue
+        statistics['external_found'] += 1
+        session.add_all((
+            CourseReservation(
+                attendee_id=attendee.id,
+                course_event_id=r['course_event_id']
+            ) for r in record['subscriptions']
+        ))
+    return statistics

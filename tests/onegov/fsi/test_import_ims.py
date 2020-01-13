@@ -1,5 +1,5 @@
 from onegov.core.utils import module_path
-from onegov.fsi.ims_import import import_ims_data
+from onegov.fsi.ims_import import parse_ims_data
 
 data_path = module_path('tests.onegov.fsi', 'temp_data')
 
@@ -11,13 +11,11 @@ courses_file = f'{data_path}/Kurse.txt'
 
 def test_import_ims(session, attendee):
 
-    errors = import_ims_data(
-        session,
-        subscriptions_file,
-        events_file,
-        courses_file,
-        persons_file
+    errors, persons, courses, events, possible_ldap_users = parse_ims_data(
+            subscriptions_file,
+            events_file,
+            courses_file,
+            persons_file
     )
-    print(errors)
     assert not errors
-    assert False
+    assert all((persons, courses, events, possible_ldap_users))
