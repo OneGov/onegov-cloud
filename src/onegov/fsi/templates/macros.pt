@@ -73,7 +73,7 @@
         <input
                 id="${switch_id}"
                 type="checkbox"
-                tal:attributes="disabled python:not reservation.course_event.is_past or not request.is_admin; checked completed; ic-post-to url|nothing"
+                tal:attributes="disabled python: reservation.course_event.is_past or not request.is_admin; checked completed; ic-post-to url|nothing"
                 ic_target="${switch_id}"
                 ic-trigger-on="click"
         >
