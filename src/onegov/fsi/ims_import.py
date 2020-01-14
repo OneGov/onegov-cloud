@@ -102,6 +102,8 @@ from sedate import replace_timezone
 from onegov.core.csv import CSVFile
 from onegov.fsi.models import CourseEvent, Course, CourseReservation, \
     CourseAttendee
+from onegov.fsi.models.course_notification_template import InfoTemplate, \
+    ReservationTemplate, CancellationTemplate, ReminderTemplate
 from onegov.user import User
 
 
@@ -360,7 +362,8 @@ def parse_subscriptions(csvfile, persons, events):
                 first_name=first_name,
                 last_name=last_name,
                 organisation=line.teilnehmer_firma,
-                subscriptions=[]
+                subscriptions=[],
+                email=email
             ))
             external['subscriptions'].append(dict(
                 course_event_id=course_event.id,
@@ -384,7 +387,9 @@ def map_persons_to_known_ldap_user(person_record, session):
 
     Returns an attendee or None
     """
-    code = person_record['code']
+    code = None
+    if 'code' in person_record:
+        code = person_record['code']
     email = person_record['email']
 
     if code:
@@ -392,7 +397,7 @@ def map_persons_to_known_ldap_user(person_record, session):
         if user:
             if email and user.username != email:
                 # set email to most up-to-date
-                email = email.username
+                email = user.username
 
             if not user.attendee:
                 raise InconsistencyError(
@@ -402,7 +407,7 @@ def map_persons_to_known_ldap_user(person_record, session):
             return user.attendee
         print(f'LDAP CODE: {code} not found, Email {email} not searched')
     elif email:
-        user = session.query(User).filter_by(username=email)
+        user = session.query(User).filter_by(username=email).first()
         if user:
             if not user.attendee:
                 raise InconsistencyError(
@@ -456,12 +461,20 @@ def import_ims_data(session, persons, courses, events, possible_ldap_users):
     statistics = {
         'LDAP_found': 0,
         'LDAP_not_found': 0,
-        'external_found:': 0,
-        'external_not_found:': 0,
+        'external_found': 0,
+        'external_not_found': 0,
     }
 
     session.add_all(courses.values())
-    session.add_all(events.values())
+    for event in events.values():
+        session.add(event)
+        data = {'course_event_id': event.id}
+        session.add_all((
+            InfoTemplate(**data),
+            ReservationTemplate(**data),
+            CancellationTemplate(**data),
+            ReminderTemplate(**data)
+        ))
 
     for obj_id, person in persons.items():
         attendee = map_persons_to_known_ldap_user(person, session)
@@ -479,7 +492,7 @@ def import_ims_data(session, persons, courses, events, possible_ldap_users):
             ) for r in subscriptions
         ))
 
-    for record in possible_ldap_users:
+    for record in possible_ldap_users.values():
         attendee = map_persons_to_known_ldap_user(record, session)
         if not attendee:
             statistics['external_not_found'] += 1
