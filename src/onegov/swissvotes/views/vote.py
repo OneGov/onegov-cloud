@@ -22,6 +22,7 @@ from onegov.swissvotes.models import SwissVoteFile
     template='vote.pt'
 )
 def view_vote(self, request):
+    layout = VoteLayout(self, request)
     query = request.session.query(SwissVote)
     prev = query.order_by(SwissVote.bfs_number.desc())
     prev = prev.filter(SwissVote.bfs_number < self.bfs_number).first()
@@ -34,21 +35,241 @@ def view_vote(self, request):
         request.content_security_policy.default_src |= {bfs_map_host}
 
     return {
-        'layout': VoteLayout(self, request),
-        'brief_description': self.get_file('brief_description'),
-        'voting_text': self.get_file('voting_text'),
-        'federal_council_message': self.get_file('federal_council_message'),
-        'parliamentary_debate': self.get_file('parliamentary_debate'),
-        'voting_booklet': self.get_file('voting_booklet'),
-        'resolution': self.get_file('resolution'),
-        'realization': self.get_file('realization'),
-        'ad_analysis': self.get_file('ad_analysis'),
-        'results_by_domain': self.get_file('results_by_domain'),
+        'layout': layout,
+        'brief_description': layout.get_file_url('brief_description'),
+        'voting_text': layout.get_file_url('voting_text'),
+        'federal_council_message': layout.get_file_url(
+            'federal_council_message'),
+        'parliamentary_debate': layout.get_file_url('parliamentary_debate'),
+        'voting_booklet': layout.get_file_url('voting_booklet'),
+        'resolution': layout.get_file_url('resolution'),
+        'realization': layout.get_file_url('realization'),
+        'ad_analysis': layout.get_file_url('ad_analysis'),
+        'foeg_analysis': layout.get_file_url('foeg_analysis'),
+        'post_vote_poll': layout.get_file_url('post_vote_poll'),
+        'preliminary_examination': layout.get_file_url(
+            'preliminary_examination'),
+        'bkchrono': self.bk_chrono(request.locale),
+        'bkresults': self.bk_results(request.locale),
+        'curiavista': self.curiavista(request.locale),
+        'results_by_domain': layout.get_file_url('results_by_domain'),
         'bfs_map': bfs_map,
         'prev': prev,
         'next': next,
         'map_preview': request.link(StaticFile('images/map-preview.png')),
     }
+
+
+# Static paths for files
+@SwissvotesApp.view(
+    model=SwissVote,
+    permission=Public,
+    name='kurzbeschreibung.pdf'
+)
+def brief_description_static(self, request):
+    return request.redirect(
+        request.link(self.get_file('brief_description'))
+    )
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    permission=Public,
+    name='abstimmungstext-de.pdf'
+)
+def voting_text_de_static(self, request):
+    return request.redirect(
+        request.link(self.get_file_by_locale('voting_text', 'de_CH'))
+    )
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    permission=Public,
+    name='abstimmungstext-fr.pdf'
+)
+def voting_text_fr_static(self, request):
+    return request.redirect(
+        request.link(self.get_file_by_locale('voting_text', 'fr_CH'))
+    )
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    permission=Public,
+    name='botschaft-de.pdf'
+)
+def federal_council_message_de_static(self, request):
+    return request.redirect(
+        request.link(self.get_file_by_locale(
+            'federal_council_message', 'de_CH'))
+    )
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    permission=Public,
+    name='botschaft-fr.pdf'
+)
+def federal_council_message_fr_static(self, request):
+    return request.redirect(
+        request.link(self.get_file_by_locale(
+            'federal_council_message', 'fr_CH'))
+    )
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    permission=Public,
+    name='parlamentsberatung.pdf'
+)
+def parliamentary_debate_static(self, request):
+    return request.redirect(
+        request.link(self.get_file('parliamentary_debate'))
+    )
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    permission=Public,
+    name='brochure-de.pdf'
+)
+def voting_booklet_de_static(self, request):
+    return request.redirect(
+        request.link(self.get_file_by_locale('voting_booklet', 'de_CH'))
+    )
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    permission=Public,
+    name='brochure-fr.pdf'
+)
+def voting_booklet_fr_static(self, request):
+    return request.redirect(
+        request.link(self.get_file_by_locale('voting_booklet', 'fr_CH'))
+    )
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    permission=Public,
+    name='erwahrung-de.pdf'
+)
+def resultion_de_static(self, request):
+    return request.redirect(
+        request.link(self.get_file_by_locale('resolution', 'de_CH'))
+    )
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    permission=Public,
+    name='erwahrung-fr.pdf'
+)
+def resolution_fr_static(self, request):
+    return request.redirect(
+        request.link(self.get_file_by_locale('resolution', 'fr_CH'))
+    )
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    permission=Public,
+    name='zustandekommen-de.pdf'
+)
+def realization_de_static(self, request):
+    return request.redirect(
+        request.link(self.get_file_by_locale('realization', 'de_CH'))
+    )
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    permission=Public,
+    name='zustandekommen-fr.pdf'
+)
+def realization_fr_static(self, request):
+    return request.redirect(
+        request.link(self.get_file_by_locale('realization', 'fr_CH'))
+    )
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    permission=Public,
+    name='inserateanalyse.pdf'
+)
+def ad_analysis_static(self, request):
+    return request.redirect(
+        request.link(self.get_file('ad_analysis'))
+    )
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    permission=Public,
+    name='staatsebenen.xlsx'
+)
+def results_by_domain_static(self, request):
+    return request.redirect(
+        request.link(self.get_file('results_by_domain'))
+    )
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    permission=Public,
+    name='medienanalyse.pdf'
+)
+def foeg_analysis_static(self, request):
+    return request.redirect(
+        request.link(self.get_file('foeg_analysis'))
+    )
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    permission=Public,
+    name='nachbefragung-de.pdf'
+)
+def post_vote_poll_de_static(self, request):
+    return request.redirect(
+        request.link(self.get_file_by_locale('post_vote_poll', 'de_CH'))
+    )
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    permission=Public,
+    name='nachbefragung-fr.pdf'
+)
+def post_vote_poll_fr_static(self, request):
+    return request.redirect(
+        request.link(self.get_file_by_locale('post_vote_poll', 'fr_CH'))
+    )
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    permission=Public,
+    name='vorpruefung-de.pdf'
+)
+def preliminary_exam_de_static(self, request):
+    return request.redirect(
+        request.link(
+            self.get_file_by_locale('preliminary_examination', 'de_CH')))
+
+
+@SwissvotesApp.view(
+    model=SwissVote,
+    permission=Public,
+    name='vorpruefung-fr.pdf'
+)
+def preliminary_exam_fr_static(self, request):
+    return request.redirect(
+        request.link(
+            self.get_file_by_locale('preliminary_examination', 'fr_CH')))
 
 
 @SwissvotesApp.json(
@@ -75,11 +296,24 @@ def view_vote_percentages(self, request):
             'empty': empty
         }
 
+        default_yea_label = _("${x}% yea") if not self.deciding_question \
+            else _("${x}% for the initiative")
+
+        default_nay_label = _("${x}% nay") if not self.deciding_question \
+            else _("${x}% for the counter-proposal")
+
+        yea_label_no_perc = _("${x} yea") if not self.deciding_question \
+            else _("${x} for the initiative")
+
+        nay_label_no_per = _("${x} nay") if not self.deciding_question \
+            else _("${x} for the counter-proposal")
+
         if percentage is not None:
             yea = round(float(percentage), 1)
             nay = round(float(100 - percentage), 1)
-            yea_label = yea_label or _("${x}% yea")
-            nay_label = nay_label or _("${x}% nay")
+
+            yea_label = yea_label or default_yea_label
+            nay_label = nay_label or default_nay_label
             result.update({
                 'yea': yea,
                 'nay': nay,
@@ -91,8 +325,8 @@ def view_vote_percentages(self, request):
             yea = round(float(yeas_p), 1)
             nay = round(float(nays_p), 1)
             none = round(float(100 - yeas_p - nays_p), 1)
-            yea_label = yea_label or _("${x}% yea")
-            nay_label = nay_label or _("${x}% nay")
+            yea_label = yea_label or default_yea_label
+            nay_label = nay_label or default_nay_label
             none_label = none_label or _("${x}% none")
             result.update({
                 'yea': yea,
@@ -106,8 +340,8 @@ def view_vote_percentages(self, request):
         elif yeas is not None and nays is not None:
             yea = round(float(100 * (yeas / (yeas + nays))), 1)
             nay = round(float(100 * (nays / (yeas + nays))), 1)
-            yea_label = yea_label or _("${x} yea")
-            nay_label = nay_label or _("${x} nay")
+            yea_label = yea_label or yea_label_no_perc
+            nay_label = nay_label or nay_label_no_per
             result.update({
                 'yea': yea,
                 'nay': nay,
@@ -174,10 +408,16 @@ def view_vote_percentages(self, request):
             yea_label=_(
                 "Electoral shares of parties: "
                 "Parties recommending Yes ${x}%"
+            ) if not self.deciding_question else _(
+                "Electoral shares of parties: "
+                "Parties preferring the initiative ${x}%"
             ),
             nay_label=_(
                 "Electoral shares of parties: "
                 "Parties recommending No ${x}%"
+            ) if not self.deciding_question else _(
+                "Electoral shares of parties: "
+                "Parties preferring the counter-proposal ${x}%"
             ),
             none_label=_(
                 "Electoral shares of parties: neutral/unknown ${x}%"
@@ -282,6 +522,9 @@ def view_file(self, request):
             'parliamentary_debate': _("Parliamentary debate"),
             'voting_booklet': _("Voting booklet"),
             'ad_analysis': _("Analysis of the advertising campaign"),
+            'foeg_analysis': _("Media coverage: fög analysis"),
+            'post_vote_poll': _("Post-vote poll"),
+            'preliminary_examination': _("Preliminary examination"),
             'resolution': _("Resolution"),
             'results_by_domain': _(
                 "Result by canton, district and municipality"

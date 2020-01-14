@@ -8,11 +8,12 @@
                     <tal:block tal:content="structure: layout.model.content"></tal:block>
                 </div>
                 <div class="columns large-4 large-offset-1 small-12">
-                    <div class="side-panel" tal:condition="files">
+                    <div class="side-panel" tal:condition="files_data">
                         <h5 i18n:translate>Files</h5>
                         <ul class="attachments">
-                            <li tal:repeat="file files">
-                                <a href="${request.link(file)}">${file.filename}</a>
+                            <li tal:repeat="file files_data">
+<!--?                                <a href="${request.link(file)}">${file.filename}</a>-->
+                                <a href="${file[1]}">${file[0]}</a>
                             </li>
                         </ul>
                     </div>

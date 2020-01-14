@@ -411,7 +411,9 @@ class DirectoryBaseForm(Form):
             link_pattern=self.link_pattern.data,
             link_title=self.link_title.data,
             link_visible=self.link_visible.data,
-            thumbnail=self.thumbnail.data and self.thumbnail.data.split()[0],
+            thumbnail=(
+                self.thumbnail.data and self.thumbnail.data.splitlines()[0]
+            ),
             address_block_title=(
                 self.address_block_title_type.data == 'fixed'
                 and self.address_block_title.data

@@ -52,7 +52,7 @@ class encoded_property(object):
 
     def __get__(self, instance, owner):
         value = getattr(instance, f'_{self.name}')
-        return instance.codes(self.name).get(value)
+        return instance.codes(self.name, instance.deciding_question).get(value)
 
 
 class SwissVote(Base, TimestampMixin, AssociatedFiles):
@@ -82,28 +82,46 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     ORGANIZATION_NO_LONGER_EXISTS = 9999
 
     @staticmethod
-    def codes(attribute):
+    def codes(attribute, deciding_question=False):
         """ Returns the codes for the given attribute as defined in the code
         book.
+        deciding_question is a switch needed for three votes as of 2019.
 
         """
+
+        dc = deciding_question
+
         if attribute == 'legal_form':
             return OrderedDict((
                 (1, _("Mandatory referendum")),
                 (2, _("Optional referendum")),
                 (3, _("Popular initiative")),
                 (4, _("Direct counter-proposal")),
+                (5, _("Deciding question")),
             ))
         if attribute == 'result_cantons_accepted':
             return OrderedDict((
-                (0, _("Rejected")),
-                (1, _("Accepted")),
+                (0, _("Rejected") if not dc
+                    else _("Preferred the counter-proposal")),
+                (1, _("Accepted") if not dc
+                    else _("Preferred the popular initiative")),
                 (3, _("Majority of the cantons not necessary")),
             ))
+
+        if attribute == 'result_accepted':
+            return OrderedDict((
+                (0, _("Rejected") if not dc
+                    else _("For the counter-proposal")),
+                (1, _("Accepted") if not dc
+                    else _("For the initiative")),
+            ))
+
         if attribute == 'result' or attribute.endswith('_accepted'):
             return OrderedDict((
-                (0, _("Rejected")),
-                (1, _("Accepted")),
+                (0, _("Rejected") if not dc
+                    else _("Preferred the counter-proposal")),
+                (1, _("Accepted") if not dc
+                    else _("Preferred the popular initiative")),
             ))
         if attribute == 'department_in_charge':
             return OrderedDict((
@@ -123,20 +141,27 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
                 or attribute == 'position_national_council'
                 or attribute == 'position_council_of_states'):
             return OrderedDict((
-                (1, _("Accepting")),
-                (2, _("Rejecting")),
+                (1, _("Accepting") if not dc
+                    else _("Preference for the popular initiative")),
+                (2, _("Rejecting") if not dc
+                    else _("Preference for the counter-proposal")),
                 (3, _("None"))
             ))
+
         if attribute == 'position_parliament':
             return OrderedDict((
-                (1, _("Accepting")),
-                (2, _("Rejecting")),
+                (1, _("Accepting") if not dc
+                    else _("Preference for the popular initiative")),
+                (2, _("Rejecting") if not dc
+                    else _("Preference for the counter-proposal")),
             ))
         if attribute == 'recommendation':
             # Added ordering how it should be displayed in strengths table
             return OrderedDict((
-                (1, _("Yea")),
-                (2, _("Nay")),
+                (1, _("Preference for the popular initiative")
+                    if deciding_question else _("Yea")),
+                (2, _("Preference for the counter-proposal")
+                    if deciding_question else _("Nay")),
                 (4, _("Empty")),
                 (5, _("Free vote")),
                 (3, _("None")),
@@ -168,6 +193,18 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     bfs_map_fr = Column(Text)
 
     @property
+    def deciding_question(self):
+        return self._legal_form == 5
+
+    # Additional links added late 2019
+    curia_vista_de = Column(Text)
+    curia_vista_fr = Column(Text)
+    bkresults_de = Column(Text)
+    bkresults_fr = Column(Text)
+    bkchrono_de = Column(Text)
+    bkchrono_fr = Column(Text)
+
+    @property
     def title(self):
         if self.session_manager.current_locale == 'fr_CH':
             return self.title_fr
@@ -195,6 +232,16 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
             )
         except ValueError:
             pass
+
+    def bk_results(self, locale):
+        return self.bkresults_fr if locale == 'fr_CH' else self.bkresults_de
+
+    def bk_chrono(self, locale):
+        return self.bkchrono_fr if locale == 'fr_CH' else self.bkchrono_de
+
+    def curiavista(self, locale):
+        return self.curia_vista_fr if locale == 'fr_CH' \
+            else self.curia_vista_de
 
     # Descriptor
     descriptor_1_level_1 = Column(Numeric(8, 4))
@@ -517,7 +564,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
             if value is not None:
                 result.setdefault(value, []).append(Region(canton))
 
-        codes = self.codes('result_accepted')
+        codes = self.codes('result_accepted', self.deciding_question)
         return OrderedDict([
             (codes[key], result[key])
             for key in sorted(result.keys())
@@ -560,7 +607,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
 
     def get_recommendation(self, name):
         """ Get the recommendations by name. """
-        return self.codes('recommendation').get(
+        return self.codes('recommendation', self.deciding_question).get(
             self.recommendations.get(name)
         )
 
@@ -576,7 +623,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     def group_recommendations(self, recommendations, ignore_unknown=False):
         """ Group the given recommendations by slogan. """
 
-        codes = self.codes('recommendation')
+        codes = self.codes('recommendation', self.deciding_question)
         recommendation_codes = list(codes.keys())
 
         def by_recommendation(reco):
@@ -727,6 +774,9 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     realization = LocalizedFile()
     ad_analysis = LocalizedFile()
     results_by_domain = LocalizedFile()
+    foeg_analysis = LocalizedFile()
+    post_vote_poll = LocalizedFile()
+    preliminary_examination = LocalizedFile()
 
     # searchable attachment texts
     searchable_text_de_CH = deferred(Column(TSVECTOR))
@@ -739,7 +789,8 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
         'parliamentary_debate',
         # we don't include the voting booklet, resolution and ad analysis
         # - they might contain other votes from the same day!
-        'realization'
+        'realization',
+        'preliminary_examination'
     }
 
     def vectorize_files(self):
@@ -773,3 +824,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
             self, self.session_manager.default_locale
         )
         return getattr(self, name, None) or fallback
+
+    def get_file_by_locale(self, name, locale):
+        return SwissVote.__dict__.get(name).__get_by_locale__(
+            self, locale)

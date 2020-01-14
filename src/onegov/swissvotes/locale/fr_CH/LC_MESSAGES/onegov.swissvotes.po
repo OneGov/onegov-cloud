@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2019-08-19 12:15+0200\n"
-"PO-Revision-Date: 2019-08-18 15:15+0200\n"
+"POT-Creation-Date: 2019-12-23 11:01+0100\n"
+"PO-Revision-Date: 2019-12-14 14:49+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -11,13 +11,10 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 2.2.3\n"
+"X-Generator: Poedit 2.2.4\n"
 
-msgid "Select Some Options"
-msgstr "Sélectionner les options"
-
-msgid "No results match"
-msgstr "Aucun résultat"
+msgid "Not a valid XLSX file."
+msgstr "Aucun fichier-XLSX valide"
 
 msgid "No data."
 msgstr "Aucune donnée"
@@ -36,498 +33,58 @@ msgstr "Il manque certaines colonnes: ${columns}."
 msgid "Some cells contain invalid values: ${errors}."
 msgstr "Les valeurs de certaines cellules sont non valides: ${errors}"
 
-msgid "Not a valid XLSX file."
-msgstr "Aucun fichier-XLSX valide"
-
-msgid "Votes"
-msgstr "Votations"
-
-msgid "Homepage"
-msgstr "Accueil"
-
-msgid "Update dataset"
-msgstr "Actualiser la base de données"
-
-msgid "Delete all votes"
-msgstr "Supprimer toutes les votations"
-
-msgid "Download dataset (CSV)"
-msgstr "Télécharger le fichier de données (CSV)"
-
-msgid "Download dataset (XLSX)"
-msgstr "Télécharger le fichier de données (XLSX)"
-
-msgid "Add page"
-msgstr "Nouvelle page"
-
-msgid "Edit page"
-msgstr "Modifier la page"
-
-msgid "Delete page"
-msgstr "Supprimer la page"
-
-msgid "Manage attachments"
-msgstr "Gérer les pièces jointes"
-
-msgid "Delete attachment"
-msgstr "Supprimer la pièce jointe"
-
-msgid "Add"
-msgstr "Ajouter"
-
-msgid "Page"
-msgstr "Page"
-
-msgid "Voter strengths"
-msgstr "Poids électoraux"
-
-msgid "Delete vote"
-msgstr "Supprimer cette votation"
-
-msgid "You are here"
-msgstr "Vous êtes ici"
-
-msgid "Previous Page"
-msgstr "Page précédente"
-
-msgid "Next Page"
-msgstr "Page suivante"
-
-msgid "Cancel"
-msgstr "Annuler"
-
-msgid "Search"
-msgstr "Rechercher"
-
-msgid "Reset"
-msgstr "Réinitialiser"
-
-msgid "Stack"
-msgstr "Stack"
-
-msgid "Toggle"
-msgstr "Toggle"
-
-msgid "Columns"
-msgstr "Columns"
-
-msgid "The form contains errors. Please check the fields marked in red."
-msgstr ""
-"Le formulaire contient des erreurs. Veuillez vérifier les champs marqués en "
-"rouge."
-
-msgid "Forgot your password?"
-msgstr "Mot de passe oublié?"
-
-msgid "Reset password"
-msgstr "Réinitialiser le mot de passe"
-
-msgid "Filter"
-msgstr "Filtre de recherche"
-
-msgid "Results"
-msgstr "Résultats"
-
-msgid "Title"
-msgstr "Titre"
-
-msgid "Date"
-msgstr "Date"
-
-msgid "Legal form"
-msgstr "Type de processus"
-
-msgid "Policy area"
-msgstr "Domaine politique"
-
-msgid "Voting result"
-msgstr "Résultat de la votation"
-
-msgid "Yeas Percentage People"
-msgstr "Pourcentage de \"oui\""
-
-msgid "Turnout"
-msgstr "Participation"
-
-msgid "Details"
-msgstr "Détails"
-
-msgid "Pagination"
-msgstr "Pagination "
-
-msgid "Previous vote"
-msgstr "Votation précédente"
-
-msgid "Next vote"
-msgstr "Votation suivante"
-
-msgid "General"
-msgstr "Informations générales"
-
-msgid "Official title"
-msgstr "Titre officiel"
-
-msgid "Keyword"
-msgstr "Mot-clé"
-
-msgid "Vote date"
-msgstr "Date de la votation"
-
-msgid "Brief description Swissvotes"
-msgstr "Résumé Swissvotes"
-
-msgid "Description Année Politique Suisse"
-msgstr "Résumé Année Politique Suisse"
-
-msgid "Link"
-msgstr "Lien"
-
-msgid "Voting text"
-msgstr "Texte soumis au vote"
-
-msgid "Vote number"
-msgstr "Votation n°"
-
-msgid "Related votes"
-msgstr "Objets apparentés"
-
-msgid "Submission"
-msgstr "Dépôt"
-
-msgid "Initiator"
-msgstr "Initiants"
-
-msgid "Signatures"
-msgstr "Signatures"
-
-msgid "Collection duration"
-msgstr "Durée de la récolte des signatures"
-
-msgid ""
-"Number of days between the start of collecting signatures and their filing "
-"by the initiators"
-msgstr ""
-"Durée entre le début de la récolte des signatures et le dépôt des signatures"
-
-msgid "Days"
-msgstr "jours"
-
-msgid "Realization"
-msgstr "Aboutissement"
-
-msgid "Pre-parliamentary phase"
-msgstr "Phase pré-parlementaire"
-
-msgid "Federal council message"
-msgstr "Message du Conseil fédéral"
-
-msgid "Position of the Federal Council"
-msgstr "Position du Conseil fédéral"
-
-msgid "Parliamentary phase"
-msgstr "Au Parlement"
-
-msgid "Procedure number"
-msgstr "Numéro d'objet"
-
-msgid "Parliamentary debate"
-msgstr "Débat parlementaire"
-
-msgid "Duration in Parliament"
-msgstr "Durée de traitement"
-
-msgid ""
-"Number of days between the Federal Council dispatch and the Parliament’s "
-"final vote"
-msgstr "Durée entre le message du Conseil Fédéral et l’arrêté du Parlement"
-
-msgid "Parliament's position"
-msgstr "Position du Parlement"
-
-msgid "Position of the National Council"
-msgstr "Position du Conseil national"
-
-msgid "Yea"
-msgstr "Oui"
-
-msgid "Nay"
-msgstr "Non"
-
-msgid "Position of the Council of States"
-msgstr "Position du Conseil des Etats"
-
-msgid ""
-"Number of days between the Parliament’s final vote and the decree to declare "
-"the success of the referendum"
-msgstr ""
-"Durée entre l’arrêté du Parlement et l’arrêté constatant l’aboutissement du "
-"référendum"
-
-msgid "Voting campaign"
-msgstr "Campagne"
-
-msgid "Voting booklet"
-msgstr "Brochure explicative"
-
-msgid "Recommendations of the Parties"
-msgstr "Mots d'ordre des partis"
-
-msgid "Voter share of yes camp"
-msgstr "Poids électoral des partis en faveur de oui"
-
-msgid "Cumulated electoral share of the parties which recommend to vote Yes"
-msgstr "Poids électoral cumulé des partis en faveur de oui"
-
-msgid "Further Recommendations"
-msgstr "Autres mots d'ordre"
-
-msgid "Divergent branches"
-msgstr "Sections cantonales divergentes"
-
-msgid "Analysis of the advertising campaign"
-msgstr "Analyse des annonces de campagne"
-
-msgid "Vote"
-msgstr "Votation"
-
-msgid "People"
-msgstr "Peuple"
-
-msgid "Yeas"
-msgstr "Oui"
-
-msgid "Cantons"
-msgstr "Cantons"
-
-msgid "Resolution"
-msgstr "Arrêté constatant le résultat"
-
-msgid "Result by canton, district and municipality"
-msgstr "Résultats par canton, district, commune"
-
-msgid "Interactive map of the Swiss Federal Statistical Office"
-msgstr "Carte interactive de l’Office fédéral de la statistique"
-
-msgid "Display the map"
-msgstr "Présenter la carte"
-
-msgid "Cumulated electoral shares"
-msgstr "Poids électoraux cumulés"
-
-msgid "Recommendation"
-msgstr "Mot d'ordre"
-
-msgid "Percentage of voters in the National Council elections"
-msgstr "Force des partis aux élections du Conseil national"
-
-msgid "Empty"
-msgstr "Voter blanc"
-
-msgid "Free vote"
-msgstr "Liberté de vote"
-
-msgid "None"
-msgstr "Aucune"
-
-msgid "Neutral"
-msgstr "Neutre"
-
-msgid "unknown"
-msgstr "inconnu"
-
-msgid "Parties"
-msgstr "Partis"
-
-msgid "Party"
-msgstr "Parti"
-
-msgid "Others"
-msgstr "Autres"
-
-msgid "Files"
-msgstr "Fichiers"
-
-msgid "Patrons"
-msgstr "Sponsors"
-
-msgid "Attachment"
-msgstr "Pièce jointe"
-
-msgid "Actions"
-msgstr "Actions "
-
-msgid "No attachments."
-msgstr "Pas de pièce jointe."
-
-msgid "Delete"
-msgstr "Supprimer"
-
-msgid "Drop files to upload"
-msgstr "Veuillez glisser les fichiers à importer ici"
-
-msgid "Upload"
-msgstr "Charger"
-
-msgid "Logout"
-msgstr "Se déconnecter"
-
-msgid "Dear Sir or Madam,"
-msgstr "Madame, Monsieur,"
-
-msgid "Click the following link to set a new password:"
-msgstr "Cliquez sur le lien suivant pour définir un nouveau mot de passe :"
-
-msgid "If you don't want to change your password, you can ignore this email."
-msgstr ""
-"Si vous ne souhaitez pas modifier votre mot de passe, vous pouvez ignorer ce "
-"message."
-
-msgid "Update"
-msgstr "Mise à jour"
-
-msgid "Do you really want to delete all votes?!"
-msgstr "Voulez-vous vraiment supprimer l'ensemble des votations?!"
-
-#, python-format
-msgid "Dataset updated (${added} added, ${updated} updated)"
-msgstr ""
-"La base de données a été mise à jour (${added} ajouté, ${updated} modifié)"
-
-msgid "All votes deleted"
-msgstr "Toutes les votations ont été supprimées."
-
-#, python-format
-msgid "The dataset contains unknown descriptors: ${items}."
-msgstr "La base de données contient des codes inconnus."
-
-#, python-format
-msgid "Do you really want to delete \"${item}\"?"
-msgstr "Voulez-vous vraiment supprimer \"${item}\" ?"
-
-msgid "Attachments"
-msgstr "Pièces jointes"
-
-msgid "Attachment added."
-msgstr "Pièce jointe ajoutée"
-
-msgid "Page added."
-msgstr "Page ajoutée"
-
-msgid "Page modified."
-msgstr "Page modifiée"
-
-msgid "Page deleted"
-msgstr "Page supprimée"
-
-msgid "Attachment deleted."
-msgstr "Pièce jointe supprimée"
-
-msgid "Wrong username or password"
-msgstr "Nom d'utilisateur ou mot de passe incorrect"
-
-#, python-format
-msgid ""
-"A password reset link has been sent to ${email}, provided an account exists "
-"for this email address."
-msgstr ""
-"Réinitialisation du mot de passe: un lien a été envoyé à l'adresse ${email}."
-
-msgid "Submit"
-msgstr "Soumettre"
-
-msgid "Login"
-msgstr "Se connecter"
-
-msgid "Wrong username or password reset link not valid any more."
-msgstr "E-Mail non valide ou expiration de la durée de validité du lien."
-
-msgid "Password changed."
-msgstr "Le mot de passe a été changé."
-
-msgid "Password reset"
-msgstr "Réinitialisation du mot de passe"
-
-msgid "Access Denied"
-msgstr "Accès refusé"
-
-msgid "You are trying to open a page for which you are not authorized."
-msgstr "Accès non autorisé"
-
-msgid "Page not Found"
-msgstr "Page introuvable"
-
-msgid "The page you are looking for could not be found."
-msgstr "La page que vous cherchez n’a pas pu être trouvée."
-
-msgid "Federal Council"
-msgstr "Conseil fédéral"
-
-msgid "National Council"
-msgstr "Conseil national"
-
-msgid "Council of States"
-msgstr "Conseil des Etats"
-
-msgid "Party slogans"
-msgstr "Partis"
-
-msgid "Attachments updated"
-msgstr "Pièces jointes mises à jour"
-
-msgid "Vote deleted"
-msgstr "Votation supprimée"
-
-#, python-format
-msgid "${x}% yea"
-msgstr "${x}% Oui"
-
-#, python-format
-msgid "${x}% nay"
-msgstr "${x}% Non"
-
-msgid "Recommendations by political parties"
-msgstr "Mots d’ordre des partis"
-
-#, python-format
-msgid "Electoral shares of parties: Parties recommending Yes ${x}%"
-msgstr "Poids électoraux des partis: Partis en faveur de oui ${x}%"
-
-#, python-format
-msgid "Electoral shares of parties: Parties recommending No ${x}%"
-msgstr "Poids électoraux des partis: Partis en faveur de non ${x}%"
-
-#, python-format
-msgid "Electoral shares of parties: neutral/unknown ${x}%"
-msgstr "Poids électoraux des partis: neutres/inconnus ${x}"
-
-#, python-format
-msgid "${x}% none"
-msgstr "${x}% neutres/inconnus"
-
-#, python-format
-msgid "${x} yea"
-msgstr "${x} Oui"
-
-#, python-format
-msgid "${x} nay"
-msgstr "${x} Non"
-
-msgid "Content"
-msgstr "Contenu"
+msgid "Select Some Options"
+msgstr "Sélectionner les options"
+
+msgid "No results match"
+msgstr "Aucun résultat"
 
 msgid "Uploading attachments may take some time due to full-text indexing."
 msgstr ""
 "Le téléchargement des pièces jointes peut prendre un certain temps en raison "
 "de l’indexation en texte intégral."
 
+msgid "Voting text"
+msgstr "Texte soumis au vote"
+
+msgid "Brief description Swissvotes"
+msgstr "Résumé Swissvotes"
+
+msgid "Federal council message"
+msgstr "Message du Conseil fédéral"
+
+msgid "Parliamentary debate"
+msgstr "Débat parlementaire"
+
+msgid "Voting booklet"
+msgstr "Brochure explicative"
+
+msgid "Resolution"
+msgstr "Arrêté constatant le résultat"
+
+msgid "Realization"
+msgstr "Aboutissement"
+
 msgid "Advertisment analysis"
 msgstr "Analyse des annonces de campagne"
 
-msgid "Updating the dataset may take some time."
-msgstr "La mise à jour de l’ensemble de données peut prendre un certain temps."
+msgid "Fög Analysis"
+msgstr "Analyse fög"
 
-msgid "Dataset"
-msgstr "Base de données"
+msgid "Post-vote poll"
+msgstr "Enquête post-votation"
+
+msgid "Preliminary examination"
+msgstr "Examen préliminaire"
+
+msgid "Result by canton, district and municipality"
+msgstr "Résultats par canton, district, commune"
+
+msgid "Title"
+msgstr "Titre"
+
+msgid "Content"
+msgstr "Contenu"
 
 msgid "From date"
 msgstr "De"
@@ -535,11 +92,26 @@ msgstr "De"
 msgid "To date"
 msgstr "A"
 
+msgid "Legal form"
+msgstr "Type de processus"
+
+msgid "Voting result"
+msgstr "Résultat de la votation"
+
+msgid "Policy area"
+msgstr "Domaine politique"
+
 msgid "Text Search"
 msgstr "Texte"
 
 msgid "Full Text"
 msgstr "Texte intégral"
+
+msgid "Yes"
+msgstr "Oui"
+
+msgid "No"
+msgstr "Non"
 
 msgid ""
 "Searches all text fields and attachments. Select «No» to limit the search to "
@@ -549,545 +121,71 @@ msgstr ""
 "Sélectionnez \"non\" si vous souhaitez limiter la recherche au titre, mot-"
 "clé, numéro de vote et numéro de procédure."
 
+msgid "Position of the Federal Council"
+msgstr "Position du Conseil fédéral"
+
 msgid "Other Filters"
 msgstr "Recherche avancée"
 
-msgid "Yes"
-msgstr "Oui"
+msgid "Position of the National Council"
+msgstr "Position du Conseil national"
 
-msgid "No"
-msgstr "Non"
+msgid "Position of the Council of States"
+msgstr "Position du Conseil des Etats"
 
 msgid "Missing"
 msgstr "Missing"
 
-msgid "d-1-1"
-msgstr "Ordre public"
+msgid "Updating the dataset may take some time."
+msgstr "La mise à jour de l’ensemble de données peut prendre un certain temps."
 
-msgid "d-1-2"
-msgstr "Politique étrangère"
+msgid "Dataset"
+msgstr "Base de données"
 
-msgid "d-1-3"
-msgstr "Politique de sécurité"
+msgid "Votes"
+msgstr "Votations"
 
-msgid "d-1-4"
-msgstr "Economie"
+msgid "Homepage"
+msgstr "Accueil"
 
-msgid "d-1-5"
-msgstr "Agriculture"
+msgid "Edit page"
+msgstr "Modifier la page"
 
-msgid "d-1-6"
-msgstr "Finances publiques"
+msgid "Manage attachments"
+msgstr "Gérer les pièces jointes"
 
-msgid "d-1-7"
-msgstr "Energie"
+msgid "Delete page"
+msgstr "Supprimer la page"
 
-msgid "d-1-8"
-msgstr "Transports et infrastructures"
+msgid "Add"
+msgstr "Ajouter"
 
-msgid "d-1-9"
-msgstr "Environnement"
+msgid "Page"
+msgstr "Page"
 
-msgid "d-1-10"
-msgstr "Politique sociale"
+msgid "Add page"
+msgstr "Nouvelle page"
 
-msgid "d-1-11"
-msgstr "Formation et recherche"
+msgid "Delete attachment"
+msgstr "Supprimer la pièce jointe"
 
-msgid "d-1-12"
-msgstr "Culture, religion, médias"
+msgid "Delete vote"
+msgstr "Supprimer cette votation"
 
-msgid "d-2-11"
-msgstr "Identité nationale"
+msgid "Voter strengths"
+msgstr "Poids électoraux"
 
-msgid "d-2-12"
-msgstr "Système politique"
+msgid "Update dataset"
+msgstr "Actualiser la base de données"
 
-msgid "d-2-13"
-msgstr "Institutions"
+msgid "Download dataset (CSV)"
+msgstr "Télécharger le fichier de données (CSV)"
 
-msgid "d-2-14"
-msgstr "Droits populaires"
+msgid "Download dataset (XLSX)"
+msgstr "Télécharger le fichier de données (XLSX)"
 
-msgid "d-2-15"
-msgstr "Fédéralisme"
-
-msgid "d-2-16"
-msgstr "Droit, ordre public et juridique"
-
-msgid "d-2-21"
-msgstr "Ligne directrice de la politique étrangère"
-
-msgid "d-2-22"
-msgstr "Politique européenne"
-
-msgid "d-2-23"
-msgstr "Organisations internationales"
-
-msgid "d-2-24"
-msgstr "Coopération au développement"
-
-msgid "d-2-25"
-msgstr "Relations bilatérales (traités)"
-
-msgid "d-2-26"
-msgstr "Politique économique extérieure"
-
-msgid "d-2-27"
-msgstr "Diplomatie"
-
-msgid "d-2-28"
-msgstr "Suisses à l'étranger"
-
-msgid "d-2-31"
-msgstr "Sécurité publique"
-
-msgid "d-2-32"
-msgstr "Armée"
-
-msgid "d-2-33"
-msgstr "Approvisionnement du pays"
-
-msgid "d-2-41"
-msgstr "Politique économique"
-
-msgid "d-2-42"
-msgstr "Travail et emploi"
-
-msgid "d-2-43"
-msgstr "Finances"
-
-msgid "d-2-44"
-msgstr "Tourisme et loisirs"
-
-msgid "d-2-51"
-msgstr "Politique agricole"
-
-msgid "d-2-52"
-msgstr "Production animale"
-
-msgid "d-2-53"
-msgstr "Production végétale"
-
-msgid "d-2-54"
-msgstr "Sylviculture"
-
-msgid "d-2-55"
-msgstr "Pêche, chasse, animaux domestiques"
-
-msgid "d-2-61"
-msgstr "Impôts"
-
-msgid "d-2-62"
-msgstr "Ordre financier"
-
-msgid "d-2-63"
-msgstr "Dépenses publiques"
-
-msgid "d-2-64"
-msgstr "Mesures d'économie, mesures d'assainissement"
-
-msgid "d-2-71"
-msgstr "Politique énergétique"
-
-msgid "d-2-72"
-msgstr "Energie nucléaire"
-
-msgid "d-2-73"
-msgstr "Energie hydro-électrique"
-
-msgid "d-2-74"
-msgstr "Energies alternatives"
-
-msgid "d-2-75"
-msgstr "Produits pétroliers et gaz"
-
-msgid "d-2-81"
-msgstr "Politique des transports"
-
-msgid "d-2-82"
-msgstr "Trafic routier"
-
-msgid "d-2-83"
-msgstr "Chemins de fer"
-
-msgid "d-2-84"
-msgstr "Trafic aérien"
-
-msgid "d-2-85"
-msgstr "Navigation"
-
-msgid "d-2-86"
-msgstr "Poste"
-
-msgid "d-2-87"
-msgstr "Télécommunications"
-
-msgid "d-2-91"
-msgstr "Sol"
-
-msgid "d-2-92"
-msgstr "Logement"
-
-msgid "d-2-93"
-msgstr "Environnement"
-
-msgid "d-2-101"
-msgstr "Santé"
-
-msgid "d-2-102"
-msgstr "Assurances sociales"
-
-msgid "d-2-103"
-msgstr "Groupes sociaux"
-
-msgid "d-2-111"
-msgstr "Système d'éducation et de formation"
-
-msgid "d-2-112"
-msgstr "Ecoles"
-
-msgid "d-2-113"
-msgstr "Hautes écoles"
-
-msgid "d-2-114"
-msgstr "Recherche"
-
-msgid "d-2-115"
-msgstr "Formation professionnelle"
-
-msgid "d-2-121"
-msgstr "Politique culturelle"
-
-msgid "d-2-122"
-msgstr "Politique linguistique"
-
-msgid "d-2-123"
-msgstr "Religion, églises"
-
-msgid "d-2-124"
-msgstr "Sport"
-
-msgid "d-2-125"
-msgstr "Médias et communication"
-
-msgid "d-3-121"
-msgstr "Constitution fédérale"
-
-msgid "d-3-122"
-msgstr "Procédure de révision constitutionnelle"
-
-msgid "d-3-123"
-msgstr "Procédure législative"
-
-msgid "d-3-124"
-msgstr "Système électoral"
-
-msgid "d-3-131"
-msgstr "Gouvernement, administration"
-
-msgid "d-3-132"
-msgstr "Parlement"
-
-msgid "d-3-133"
-msgstr "Tribunaux"
-
-msgid "d-3-134"
-msgstr "Banque nationale"
-
-msgid "d-3-141"
-msgstr "Initiative populaire"
-
-msgid "d-3-142"
-msgstr "Référendum"
-
-msgid "d-3-143"
-msgstr "Droit de vote"
-
-msgid "d-3-151"
-msgstr "Questions territoriales"
-
-msgid "d-3-152"
-msgstr "Relations entre Confédération et cantons"
-
-msgid "d-3-153"
-msgstr "Répartition des tâches"
-
-msgid "d-3-161"
-msgstr "Droit international"
-
-msgid "d-3-162"
-msgstr "Droits fondamentaux"
-
-msgid "d-3-163"
-msgstr "Droit de cité"
-
-msgid "d-3-164"
-msgstr "Droit privé"
-
-msgid "d-3-165"
-msgstr "Droit pénal"
-
-msgid "d-3-166"
-msgstr "Protection des données"
-
-msgid "d-3-211"
-msgstr "Neutralité"
-
-msgid "d-3-212"
-msgstr "Indépendance"
-
-msgid "d-3-213"
-msgstr "Bons offices"
-
-msgid "d-3-221"
-msgstr "AELE"
-
-msgid "d-3-222"
-msgstr "UE"
-
-msgid "d-3-223"
-msgstr "EEE"
-
-msgid "d-3-224"
-msgstr "Autres institutions européennes"
-
-msgid "d-3-231"
-msgstr "ONU"
-
-msgid "d-3-232"
-msgstr "Autres institutions"
-
-msgid "d-3-261"
-msgstr "Soutien aux exportations"
-
-msgid "d-3-262"
-msgstr "Politique douanière"
-
-msgid "d-3-311"
-msgstr "Protection de la population"
-
-msgid "d-3-312"
-msgstr "Sûreté intérieure"
-
-msgid "d-3-313"
-msgstr "Police"
-
-msgid "d-3-321"
-msgstr "Armée (aspects généraux)"
-
-msgid "d-3-322"
-msgstr "Organisation militaire"
-
-msgid "d-3-323"
-msgstr "Armement"
-
-msgid "d-3-324"
-msgstr "Installations militaires"
-
-msgid "d-3-325"
-msgstr "Refus de servir, service civil"
-
-msgid "d-3-326"
-msgstr "Suppression de l'armée"
-
-msgid "d-3-327"
-msgstr "Formation militaire"
-
-msgid "d-3-328"
-msgstr "Engagements à l'étranger"
-
-msgid "d-3-411"
-msgstr "Politique conjoncturelle"
-
-msgid "d-3-412"
-msgstr "Politique concurrentielle"
-
-msgid "d-3-413"
-msgstr "Politique structurelle"
-
-msgid "d-3-414"
-msgstr "Politique des prix"
-
-msgid "d-3-415"
-msgstr "Protection des consommateurs"
-
-msgid "d-3-416"
-msgstr "Droit des sociétés"
-
-msgid "d-3-421"
-msgstr "Conditions de travail"
-
-msgid "d-3-422"
-msgstr "Temps de travail"
-
-msgid "d-3-423"
-msgstr "Partenaires sociaux"
-
-msgid "d-3-424"
-msgstr "Politique de l'emploi"
-
-msgid "d-3-431"
-msgstr "Politique monétaire"
-
-msgid "d-3-432"
-msgstr "Banques, bourses, assurances"
-
-msgid "d-3-441"
-msgstr "Tourisme"
-
-msgid "d-3-442"
-msgstr "Hôtellerie"
-
-msgid "d-3-443"
-msgstr "Loteries, jeux, casinos"
-
-msgid "d-3-611"
-msgstr "Politique fiscale (aspects généraux)"
-
-msgid "d-3-612"
-msgstr "Système fiscal"
-
-msgid "d-3-613"
-msgstr "Impôts directs"
-
-msgid "d-3-614"
-msgstr "Impôts indirects"
-
-msgid "d-3-811"
-msgstr "Transports au sein des agglomérations"
-
-msgid "d-3-812"
-msgstr "Trafic de transit"
-
-msgid "d-3-821"
-msgstr "Constructions routières"
-
-msgid "d-3-822"
-msgstr "Trafic poids lourds"
-
-msgid "d-3-831"
-msgstr "Trafic marchandises"
-
-msgid "d-3-832"
-msgstr "Trafic voyageurs"
-
-msgid "d-3-911"
-msgstr "Aménagement du territoire"
-
-msgid "d-3-912"
-msgstr "Droit foncier"
-
-msgid "d-3-921"
-msgstr "Loyers et location"
-
-msgid "d-3-922"
-msgstr "Construction de logements et propriété"
-
-msgid "d-3-931"
-msgstr "Politique environnementale"
-
-msgid "d-3-932"
-msgstr "Protection contre le bruit"
-
-msgid "d-3-933"
-msgstr "Qualité de l'air"
-
-msgid "d-3-934"
-msgstr "Protection des eaux"
-
-msgid "d-3-935"
-msgstr "Sols"
-
-msgid "d-3-936"
-msgstr "Déchets"
-
-msgid "d-3-937"
-msgstr "Protection des sites et de la nature"
-
-msgid "d-3-938"
-msgstr "Protection des animaux"
-
-msgid "d-3-1011"
-msgstr "Politique de la santé"
-
-msgid "d-3-1012"
-msgstr "Recherche et technologie médicale"
-
-msgid "d-3-1013"
-msgstr "Médicaments"
-
-msgid "d-3-1014"
-msgstr "Produits engendrant la dépendance"
-
-msgid "d-3-1015"
-msgstr "Médecine reproductive"
-
-msgid "d-3-1021"
-msgstr "Assurance-vieillesse"
-
-msgid "d-3-1022"
-msgstr "Assurance-invalidité"
-
-msgid "d-3-1023"
-msgstr "Prévoyance professionnelle"
-
-msgid "d-3-1024"
-msgstr "Assurance-maladie, assurance-accidents"
-
-msgid "d-3-1025"
-msgstr "Assurance-maternité"
-
-msgid "d-3-1026"
-msgstr "Assurance-chômage"
-
-msgid "d-3-1027"
-msgstr "Allocations pour perte de gain"
-
-msgid "d-3-1028"
-msgstr "Aide sociale"
-
-msgid "d-3-1031"
-msgstr "Politique à l'égard des étrangers"
-
-msgid "d-3-1032"
-msgstr "Réfugiés"
-
-msgid "d-3-1033"
-msgstr "Condition de la femme"
-
-msgid "d-3-1034"
-msgstr "Politique familiale"
-
-msgid "d-3-1035"
-msgstr "Enfants et jeunes"
-
-msgid "d-3-1036"
-msgstr "Personnes âgées"
-
-msgid "d-3-1037"
-msgstr "Invalides"
-
-msgid "d-3-1038"
-msgstr "Homosexuels"
-
-msgid "d-3-1141"
-msgstr "Génie génétique"
-
-msgid "d-3-1142"
-msgstr "Expérimentations animales"
-
-msgid "d-3-1251"
-msgstr "Politique des médias"
-
-msgid "d-3-1252"
-msgstr "Presse"
-
-msgid "d-3-1253"
-msgstr "Radio et télévision, nouvelles technologies"
-
-msgid "d-3-1254"
-msgstr "Liberté de la presse"
+msgid "Delete all votes"
+msgstr "Supprimer toutes les votations"
 
 msgid "actor-acs-abbreviation"
 msgstr "ACS"
@@ -1563,6 +661,534 @@ msgstr "Syndicat des services publics"
 msgid "actor-vsa-label"
 msgstr "Fédération des sociétés suisses d'employés"
 
+msgid "d-1-1"
+msgstr "Ordre public"
+
+msgid "d-2-11"
+msgstr "Identité nationale"
+
+msgid "d-2-12"
+msgstr "Système politique"
+
+msgid "d-3-121"
+msgstr "Constitution fédérale"
+
+msgid "d-3-122"
+msgstr "Procédure de révision constitutionnelle"
+
+msgid "d-3-123"
+msgstr "Procédure législative"
+
+msgid "d-3-124"
+msgstr "Système électoral"
+
+msgid "d-2-13"
+msgstr "Institutions"
+
+msgid "d-3-131"
+msgstr "Gouvernement, administration"
+
+msgid "d-3-132"
+msgstr "Parlement"
+
+msgid "d-3-133"
+msgstr "Tribunaux"
+
+msgid "d-3-134"
+msgstr "Banque nationale"
+
+msgid "d-2-14"
+msgstr "Droits populaires"
+
+msgid "d-3-141"
+msgstr "Initiative populaire"
+
+msgid "d-3-142"
+msgstr "Référendum"
+
+msgid "d-3-143"
+msgstr "Droit de vote"
+
+msgid "d-2-15"
+msgstr "Fédéralisme"
+
+msgid "d-3-151"
+msgstr "Questions territoriales"
+
+msgid "d-3-152"
+msgstr "Relations entre Confédération et cantons"
+
+msgid "d-3-153"
+msgstr "Répartition des tâches"
+
+msgid "d-2-16"
+msgstr "Droit, ordre public et juridique"
+
+msgid "d-3-161"
+msgstr "Droit international"
+
+msgid "d-3-162"
+msgstr "Droits fondamentaux"
+
+msgid "d-3-163"
+msgstr "Droit de cité"
+
+msgid "d-3-164"
+msgstr "Droit privé"
+
+msgid "d-3-165"
+msgstr "Droit pénal"
+
+msgid "d-3-166"
+msgstr "Protection des données"
+
+msgid "d-1-2"
+msgstr "Politique étrangère"
+
+msgid "d-2-21"
+msgstr "Ligne directrice de la politique étrangère"
+
+msgid "d-3-211"
+msgstr "Neutralité"
+
+msgid "d-3-212"
+msgstr "Indépendance"
+
+msgid "d-3-213"
+msgstr "Bons offices"
+
+msgid "d-2-22"
+msgstr "Politique européenne"
+
+msgid "d-3-221"
+msgstr "AELE"
+
+msgid "d-3-222"
+msgstr "UE"
+
+msgid "d-3-223"
+msgstr "EEE"
+
+msgid "d-3-224"
+msgstr "Autres institutions européennes"
+
+msgid "d-2-23"
+msgstr "Organisations internationales"
+
+msgid "d-3-231"
+msgstr "ONU"
+
+msgid "d-3-232"
+msgstr "Autres institutions"
+
+msgid "d-2-24"
+msgstr "Coopération au développement"
+
+msgid "d-2-25"
+msgstr "Relations bilatérales (traités)"
+
+msgid "d-2-26"
+msgstr "Politique économique extérieure"
+
+msgid "d-3-261"
+msgstr "Soutien aux exportations"
+
+msgid "d-3-262"
+msgstr "Politique douanière"
+
+msgid "d-2-27"
+msgstr "Diplomatie"
+
+msgid "d-2-28"
+msgstr "Suisses à l'étranger"
+
+msgid "d-1-3"
+msgstr "Politique de sécurité"
+
+msgid "d-2-31"
+msgstr "Sécurité publique"
+
+msgid "d-3-311"
+msgstr "Protection de la population"
+
+msgid "d-3-312"
+msgstr "Sûreté intérieure"
+
+msgid "d-3-313"
+msgstr "Police"
+
+msgid "d-2-32"
+msgstr "Armée"
+
+msgid "d-3-321"
+msgstr "Armée (aspects généraux)"
+
+msgid "d-3-322"
+msgstr "Organisation militaire"
+
+msgid "d-3-323"
+msgstr "Armement"
+
+msgid "d-3-324"
+msgstr "Installations militaires"
+
+msgid "d-3-325"
+msgstr "Refus de servir, service civil"
+
+msgid "d-3-326"
+msgstr "Suppression de l'armée"
+
+msgid "d-3-327"
+msgstr "Formation militaire"
+
+msgid "d-3-328"
+msgstr "Engagements à l'étranger"
+
+msgid "d-2-33"
+msgstr "Approvisionnement du pays"
+
+msgid "d-1-4"
+msgstr "Economie"
+
+msgid "d-2-41"
+msgstr "Politique économique"
+
+msgid "d-3-411"
+msgstr "Politique conjoncturelle"
+
+msgid "d-3-412"
+msgstr "Politique concurrentielle"
+
+msgid "d-3-413"
+msgstr "Politique structurelle"
+
+msgid "d-3-414"
+msgstr "Politique des prix"
+
+msgid "d-3-415"
+msgstr "Protection des consommateurs"
+
+msgid "d-3-416"
+msgstr "Droit des sociétés"
+
+msgid "d-2-42"
+msgstr "Travail et emploi"
+
+msgid "d-3-421"
+msgstr "Conditions de travail"
+
+msgid "d-3-422"
+msgstr "Temps de travail"
+
+msgid "d-3-423"
+msgstr "Partenaires sociaux"
+
+msgid "d-3-424"
+msgstr "Politique de l'emploi"
+
+msgid "d-2-43"
+msgstr "Finances"
+
+msgid "d-3-431"
+msgstr "Politique monétaire"
+
+msgid "d-3-432"
+msgstr "Banques, bourses, assurances"
+
+msgid "d-2-44"
+msgstr "Tourisme et loisirs"
+
+msgid "d-3-441"
+msgstr "Tourisme"
+
+msgid "d-3-442"
+msgstr "Hôtellerie"
+
+msgid "d-3-443"
+msgstr "Loteries, jeux, casinos"
+
+msgid "d-1-5"
+msgstr "Agriculture"
+
+msgid "d-2-51"
+msgstr "Politique agricole"
+
+msgid "d-2-52"
+msgstr "Production animale"
+
+msgid "d-2-53"
+msgstr "Production végétale"
+
+msgid "d-2-54"
+msgstr "Sylviculture"
+
+msgid "d-2-55"
+msgstr "Pêche, chasse, animaux domestiques"
+
+msgid "d-1-6"
+msgstr "Finances publiques"
+
+msgid "d-2-61"
+msgstr "Impôts"
+
+msgid "d-3-611"
+msgstr "Politique fiscale (aspects généraux)"
+
+msgid "d-3-612"
+msgstr "Système fiscal"
+
+msgid "d-3-613"
+msgstr "Impôts directs"
+
+msgid "d-3-614"
+msgstr "Impôts indirects"
+
+msgid "d-2-62"
+msgstr "Ordre financier"
+
+msgid "d-2-63"
+msgstr "Dépenses publiques"
+
+msgid "d-2-64"
+msgstr "Mesures d'économie, mesures d'assainissement"
+
+msgid "d-1-7"
+msgstr "Energie"
+
+msgid "d-2-71"
+msgstr "Politique énergétique"
+
+msgid "d-2-72"
+msgstr "Energie nucléaire"
+
+msgid "d-2-73"
+msgstr "Energie hydro-électrique"
+
+msgid "d-2-74"
+msgstr "Energies alternatives"
+
+msgid "d-2-75"
+msgstr "Produits pétroliers et gaz"
+
+msgid "d-1-8"
+msgstr "Transports et infrastructures"
+
+msgid "d-2-81"
+msgstr "Politique des transports"
+
+msgid "d-3-811"
+msgstr "Transports au sein des agglomérations"
+
+msgid "d-3-812"
+msgstr "Trafic de transit"
+
+msgid "d-2-82"
+msgstr "Trafic routier"
+
+msgid "d-3-821"
+msgstr "Constructions routières"
+
+msgid "d-3-822"
+msgstr "Trafic poids lourds"
+
+msgid "d-2-83"
+msgstr "Chemins de fer"
+
+msgid "d-3-831"
+msgstr "Trafic marchandises"
+
+msgid "d-3-832"
+msgstr "Trafic voyageurs"
+
+msgid "d-2-84"
+msgstr "Trafic aérien"
+
+msgid "d-2-85"
+msgstr "Navigation"
+
+msgid "d-2-86"
+msgstr "Poste"
+
+msgid "d-2-87"
+msgstr "Télécommunications"
+
+msgid "d-1-9"
+msgstr "Environnement"
+
+msgid "d-2-91"
+msgstr "Sol"
+
+msgid "d-3-911"
+msgstr "Aménagement du territoire"
+
+msgid "d-3-912"
+msgstr "Droit foncier"
+
+msgid "d-2-92"
+msgstr "Logement"
+
+msgid "d-3-921"
+msgstr "Loyers et location"
+
+msgid "d-3-922"
+msgstr "Construction de logements et propriété"
+
+msgid "d-2-93"
+msgstr "Environnement"
+
+msgid "d-3-931"
+msgstr "Politique environnementale"
+
+msgid "d-3-932"
+msgstr "Protection contre le bruit"
+
+msgid "d-3-933"
+msgstr "Qualité de l'air"
+
+msgid "d-3-934"
+msgstr "Protection des eaux"
+
+msgid "d-3-935"
+msgstr "Sols"
+
+msgid "d-3-936"
+msgstr "Déchets"
+
+msgid "d-3-937"
+msgstr "Protection des sites et de la nature"
+
+msgid "d-3-938"
+msgstr "Protection des animaux"
+
+msgid "d-1-10"
+msgstr "Politique sociale"
+
+msgid "d-2-101"
+msgstr "Santé"
+
+msgid "d-3-1011"
+msgstr "Politique de la santé"
+
+msgid "d-3-1012"
+msgstr "Recherche et technologie médicale"
+
+msgid "d-3-1013"
+msgstr "Médicaments"
+
+msgid "d-3-1014"
+msgstr "Produits engendrant la dépendance"
+
+msgid "d-3-1015"
+msgstr "Médecine reproductive"
+
+msgid "d-2-102"
+msgstr "Assurances sociales"
+
+msgid "d-3-1021"
+msgstr "Assurance-vieillesse"
+
+msgid "d-3-1022"
+msgstr "Assurance-invalidité"
+
+msgid "d-3-1023"
+msgstr "Prévoyance professionnelle"
+
+msgid "d-3-1024"
+msgstr "Assurance-maladie, assurance-accidents"
+
+msgid "d-3-1025"
+msgstr "Assurance-maternité"
+
+msgid "d-3-1026"
+msgstr "Assurance-chômage"
+
+msgid "d-3-1027"
+msgstr "Allocations pour perte de gain"
+
+msgid "d-3-1028"
+msgstr "Aide sociale"
+
+msgid "d-2-103"
+msgstr "Groupes sociaux"
+
+msgid "d-3-1031"
+msgstr "Politique à l'égard des étrangers"
+
+msgid "d-3-1032"
+msgstr "Réfugiés"
+
+msgid "d-3-1033"
+msgstr "Condition de la femme"
+
+msgid "d-3-1034"
+msgstr "Politique familiale"
+
+msgid "d-3-1035"
+msgstr "Enfants et jeunes"
+
+msgid "d-3-1036"
+msgstr "Personnes âgées"
+
+msgid "d-3-1037"
+msgstr "Invalides"
+
+msgid "d-3-1038"
+msgstr "Homosexuels"
+
+msgid "d-1-11"
+msgstr "Formation et recherche"
+
+msgid "d-2-111"
+msgstr "Système d'éducation et de formation"
+
+msgid "d-2-112"
+msgstr "Ecoles"
+
+msgid "d-2-113"
+msgstr "Hautes écoles"
+
+msgid "d-2-114"
+msgstr "Recherche"
+
+msgid "d-3-1141"
+msgstr "Génie génétique"
+
+msgid "d-3-1142"
+msgstr "Expérimentations animales"
+
+msgid "d-2-115"
+msgstr "Formation professionnelle"
+
+msgid "d-1-12"
+msgstr "Culture, religion, médias"
+
+msgid "d-2-121"
+msgstr "Politique culturelle"
+
+msgid "d-2-122"
+msgstr "Politique linguistique"
+
+msgid "d-2-123"
+msgstr "Religion, églises"
+
+msgid "d-2-124"
+msgstr "Sport"
+
+msgid "d-2-125"
+msgstr "Médias et communication"
+
+msgid "d-3-1251"
+msgstr "Politique des médias"
+
+msgid "d-3-1252"
+msgstr "Presse"
+
+msgid "d-3-1253"
+msgstr "Radio et télévision, nouvelles technologies"
+
+msgid "d-3-1254"
+msgstr "Liberté de la presse"
+
 msgid "canton-ag-label"
 msgstr "Argovie"
 
@@ -1662,14 +1288,29 @@ msgstr "Initiative populaire"
 msgid "Direct counter-proposal"
 msgstr "Contre-projet direct"
 
+msgid "Deciding question"
+msgstr "Question subsidiaire"
+
 msgid "Rejected"
 msgstr "Rejeté"
+
+msgid "Preferred the counter-proposal"
+msgstr "Contre-projet préféré"
 
 msgid "Accepted"
 msgstr "Accepté"
 
+msgid "Preferred the popular initiative"
+msgstr "Initiative préférée"
+
 msgid "Majority of the cantons not necessary"
 msgstr "Majorité des cantons non nécessaire"
+
+msgid "For the counter-proposal"
+msgstr "Pour le contre-projet"
+
+msgid "For the initiative"
+msgstr "Pour l'initiative"
 
 msgid "Federal Department of Foreign Affairs (FDFA)"
 msgstr "Département fédéral des affaires étrangères (DFAE)"
@@ -1705,11 +1346,457 @@ msgstr "Chancellerie fédérale (ChF)"
 msgid "Accepting"
 msgstr "Accepter"
 
+msgid "Preference for the popular initiative"
+msgstr "Préférence pour l'initiative populaire"
+
 msgid "Rejecting"
 msgstr "Rejeter"
 
+msgid "Preference for the counter-proposal"
+msgstr "Préférence pour le contre-projet"
+
+msgid "None"
+msgstr "Aucune"
+
+msgid "Yea"
+msgstr "Oui"
+
+msgid "Nay"
+msgstr "Non"
+
+msgid "Empty"
+msgstr "Voter blanc"
+
+msgid "Free vote"
+msgstr "Liberté de vote"
+
+msgid "Neutral"
+msgstr "Neutre"
+
 msgid "Organization no longer exists"
 msgstr "Cette formation n'existe plus."
+
+msgid "unknown"
+msgstr "inconnu"
+
+msgid "Attachment"
+msgstr "Pièce jointe"
+
+msgid "Actions"
+msgstr "Actions "
+
+msgid "No attachments."
+msgstr "Pas de pièce jointe."
+
+msgid "Delete"
+msgstr "Supprimer"
+
+msgid "Drop files to upload"
+msgstr "Veuillez glisser les fichiers à importer ici"
+
+msgid "Upload"
+msgstr "Charger"
+
+msgid "The form contains errors. Please check the fields marked in red."
+msgstr ""
+"Le formulaire contient des erreurs. Veuillez vérifier les champs marqués en "
+"rouge."
+
+msgid "Logout"
+msgstr "Se déconnecter"
+
+msgid "Forgot your password?"
+msgstr "Mot de passe oublié?"
+
+msgid "Reset password"
+msgstr "Réinitialiser le mot de passe"
+
+msgid "You are here"
+msgstr "Vous êtes ici"
+
+msgid "Previous Page"
+msgstr "Page précédente"
+
+msgid "Next Page"
+msgstr "Page suivante"
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Search"
+msgstr "Rechercher"
+
+msgid "Reset"
+msgstr "Réinitialiser"
+
+msgid "Stack"
+msgstr "Stack"
+
+msgid "Toggle"
+msgstr "Toggle"
+
+msgid "Columns"
+msgstr "Columns"
+
+msgid "Dear Sir or Madam,"
+msgstr "Madame, Monsieur,"
+
+msgid "Click the following link to set a new password:"
+msgstr "Cliquez sur le lien suivant pour définir un nouveau mot de passe :"
+
+msgid "If you don't want to change your password, you can ignore this email."
+msgstr ""
+"Si vous ne souhaitez pas modifier votre mot de passe, vous pouvez ignorer ce "
+"message."
+
+msgid "Files"
+msgstr "Fichiers"
+
+msgid "Patrons"
+msgstr "Sponsors"
+
+msgid "Cumulated electoral shares"
+msgstr "Poids électoraux cumulés"
+
+msgid "Recommendation"
+msgstr "Mot d'ordre"
+
+msgid "Percentage of voters in the National Council elections"
+msgstr "Force des partis aux élections du Conseil national"
+
+msgid "Parties"
+msgstr "Partis"
+
+msgid "Party"
+msgstr "Parti"
+
+msgid "Others"
+msgstr "Autres"
+
+msgid "Pagination"
+msgstr "Pagination "
+
+msgid "Previous vote"
+msgstr "Votation précédente"
+
+msgid "Next vote"
+msgstr "Votation suivante"
+
+msgid "General"
+msgstr "Informations générales"
+
+msgid "Official title"
+msgstr "Titre officiel"
+
+msgid "Keyword"
+msgstr "Mot-clé"
+
+msgid "Vote date"
+msgstr "Date de la votation"
+
+msgid "Vote number"
+msgstr "Votation n°"
+
+msgid "Description Année Politique Suisse"
+msgstr "Résumé Année Politique Suisse"
+
+msgid "Link"
+msgstr "Lien"
+
+msgid "Official Chronology"
+msgstr "Chronologie officielle"
+
+msgid "Related votes"
+msgstr "Objets apparentés"
+
+msgid "Submission"
+msgstr "Dépôt"
+
+msgid "Initiator"
+msgstr "Initiants"
+
+msgid "Signatures"
+msgstr "Signatures"
+
+msgid "Collection duration"
+msgstr "Durée de la récolte des signatures"
+
+msgid ""
+"Number of days between the start of collecting signatures and their filing "
+"by the initiators"
+msgstr ""
+"Durée entre le début de la récolte des signatures et le dépôt des signatures"
+
+msgid "Days"
+msgstr "jours"
+
+msgid "Pre-parliamentary phase"
+msgstr "Phase pré-parlementaire"
+
+msgid "Parliamentary phase"
+msgstr "Au Parlement"
+
+msgid "Procedure number"
+msgstr "Numéro d'objet"
+
+msgid "Duration in Parliament"
+msgstr "Durée de traitement"
+
+msgid ""
+"Number of days between the Federal Council dispatch and the Parliament’s "
+"final vote"
+msgstr "Durée entre le message du Conseil Fédéral et l’arrêté du Parlement"
+
+msgid "Parliament's position"
+msgstr "Position du Parlement"
+
+msgid "for the initiative"
+msgstr "pour l'initiative"
+
+msgid "for the counter-proposal"
+msgstr "pour le contre-projet"
+
+msgid ""
+"Number of days between the Parliament’s final vote and the decree to declare "
+"the success of the referendum"
+msgstr ""
+"Durée entre l’arrêté du Parlement et l’arrêté constatant l’aboutissement du "
+"référendum"
+
+msgid "Voting campaign"
+msgstr "Campagne"
+
+msgid "Recommendations of the Parties"
+msgstr "Mots d'ordre des partis"
+
+msgid "Voter share of yes camp"
+msgstr "Poids électoral des partis en faveur de oui"
+
+msgid "Cumulated electoral share of the parties which recommend to vote Yes"
+msgstr "Poids électoral cumulé des partis en faveur de oui"
+
+msgid "Electoral share of pro-initiative camp"
+msgstr "Poids électoral des partis en faveur de l'initiative"
+
+msgid ""
+"Cumulated electoral share of the parties which recommend to prefer the "
+"popular initiative"
+msgstr "Poids électoral cumulé des partis en faveur de l'initiative"
+
+msgid "Details"
+msgstr "Détails"
+
+msgid "Further Recommendations"
+msgstr "Autres mots d'ordre"
+
+msgid "Divergent branches"
+msgstr "Sections cantonales divergentes"
+
+msgid "Analysis of the advertising campaign"
+msgstr "Analyse des annonces de campagne"
+
+msgid "Media coverage: fög analysis"
+msgstr "Couverture médiatique: analyse fög"
+
+msgid "Vote"
+msgstr "Votation"
+
+msgid "People"
+msgstr "Peuple"
+
+msgid "Yeas"
+msgstr "Oui"
+
+msgid "Cantons"
+msgstr "Cantons"
+
+msgid "Turnout"
+msgstr "Participation"
+
+msgid "Overview of voting result by the Federal Chancellery"
+msgstr "Tableau récapitulatif de la Chancellerie fédérale"
+
+msgid "Interactive map of the Swiss Federal Statistical Office"
+msgstr "Carte interactive de l’Office fédéral de la statistique"
+
+msgid "Display the map"
+msgstr "Présenter la carte"
+
+msgid "Filter"
+msgstr "Filtre de recherche"
+
+msgid "Results"
+msgstr "Résultats"
+
+msgid "Date"
+msgstr "Date"
+
+msgid "Yeas Percentage People"
+msgstr "Pourcentage de \"oui\""
+
+msgid "Wrong username or password"
+msgstr "Nom d'utilisateur ou mot de passe incorrect"
+
+msgid "Login"
+msgstr "Se connecter"
+
+msgid "Submit"
+msgstr "Soumettre"
+
+msgid "Password reset"
+msgstr "Réinitialisation du mot de passe"
+
+#, python-format
+msgid ""
+"A password reset link has been sent to ${email}, provided an account exists "
+"for this email address."
+msgstr ""
+"Réinitialisation du mot de passe: un lien a été envoyé à l'adresse ${email}."
+
+msgid "Password changed."
+msgstr "Le mot de passe a été changé."
+
+msgid "Wrong username or password reset link not valid any more."
+msgstr "E-Mail non valide ou expiration de la durée de validité du lien."
+
+msgid "Access Denied"
+msgstr "Accès refusé"
+
+msgid "You are trying to open a page for which you are not authorized."
+msgstr "Accès non autorisé"
+
+msgid "Page not Found"
+msgstr "Page introuvable"
+
+msgid "The page you are looking for could not be found."
+msgstr "La page que vous cherchez n’a pas pu être trouvée."
+
+msgid "Page added."
+msgstr "Page ajoutée"
+
+msgid "Page modified."
+msgstr "Page modifiée"
+
+msgid "Update"
+msgstr "Mise à jour"
+
+msgid "Page deleted"
+msgstr "Page supprimée"
+
+#, python-format
+msgid "Do you really want to delete \"${item}\"?"
+msgstr "Voulez-vous vraiment supprimer \"${item}\" ?"
+
+msgid "Attachments"
+msgstr "Pièces jointes"
+
+msgid "Attachment added."
+msgstr "Pièce jointe ajoutée"
+
+msgid "Attachment deleted."
+msgstr "Pièce jointe supprimée"
+
+#, python-format
+msgid "${x}% yea"
+msgstr "${x}% Oui"
+
+#, python-format
+msgid "${x}% for the initiative"
+msgstr "${x}% pour l'initiative"
+
+#, python-format
+msgid "${x}% nay"
+msgstr "${x}% Non"
+
+#, python-format
+msgid "${x}% for the counter-proposal"
+msgstr "${x}% pour le contre-projet"
+
+#, python-format
+msgid "${x} yea"
+msgstr "${x} Oui"
+
+#, python-format
+msgid "${x} for the initiative"
+msgstr "${x} pour l'initiative"
+
+#, python-format
+msgid "${x} nay"
+msgstr "${x} Non"
+
+#, python-format
+msgid "${x} for the counter-proposal"
+msgstr "${x} pour le contre-projet"
+
+#, python-format
+msgid "${x}% none"
+msgstr "${x}% neutres/inconnus"
+
+msgid "Federal Council"
+msgstr "Conseil fédéral"
+
+msgid "National Council"
+msgstr "Conseil national"
+
+msgid "Council of States"
+msgstr "Conseil des Etats"
+
+msgid "Party slogans"
+msgstr "Partis"
+
+msgid "Recommendations by political parties"
+msgstr "Mots d’ordre des partis"
+
+#, python-format
+msgid "Electoral shares of parties: Parties recommending Yes ${x}%"
+msgstr "Poids électoraux des partis: Partis en faveur de oui ${x}%"
+
+#, python-format
+msgid "Electoral shares of parties: Parties preferring the initiative ${x}%"
+msgstr "Poids électoraux des partis: Partis en faveur de l'initiative ${x}%"
+
+#, python-format
+msgid "Electoral shares of parties: Parties recommending No ${x}%"
+msgstr "Poids électoraux des partis: Partis en faveur de non ${x}%"
+
+#, python-format
+msgid ""
+"Electoral shares of parties: Parties preferring the counter-proposal ${x}%"
+msgstr "Poids électoraux des partis: Partis en faveur du contre-projet ${x}%"
+
+#, python-format
+msgid "Electoral shares of parties: neutral/unknown ${x}%"
+msgstr "Poids électoraux des partis: neutres/inconnus ${x}"
+
+msgid "Attachments updated"
+msgstr "Pièces jointes mises à jour"
+
+msgid "Vote deleted"
+msgstr "Votation supprimée"
+
+#, python-format
+msgid "Dataset updated (${added} added, ${updated} updated)"
+msgstr ""
+"La base de données a été mise à jour (${added} ajouté, ${updated} modifié)"
+
+#, python-format
+msgid "The dataset contains unknown descriptors: ${items}."
+msgstr "La base de données contient des codes inconnus."
+
+msgid "All votes deleted"
+msgstr "Toutes les votations ont été supprimées."
+
+msgid "Do you really want to delete all votes?!"
+msgstr "Voulez-vous vraiment supprimer l'ensemble des votations?!"
+
+#~ msgid "for the counter proposal"
+#~ msgstr "pour le contre-projet"
+
+#~ msgid "for the initative"
+#~ msgstr "pour l'initiative"
+
+#~ msgid "Overview of voting result by the Confederation"
+#~ msgstr "Tableau récapitulatif de la Confédération"
 
 #~ msgid "Unknown"
 #~ msgstr "Inconnu"

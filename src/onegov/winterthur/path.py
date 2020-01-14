@@ -45,7 +45,7 @@ def get_roadwork(app, id):
 @WinterthurApp.path(
     model=MissionReportCollection,
     path='/mission-reports')
-def get_mission_reports(request, page=0, year=date.today().year):
+def get_mission_reports(request, page=0, year=None):
     year = str(year).isdigit() and int(year) or date.today().year
 
     return MissionReportCollection(

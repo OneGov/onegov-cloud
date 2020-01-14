@@ -382,7 +382,7 @@ def paragraphify(text):
     a paragraph and the extra newlines are discarded.
 
     """
-    text = text.replace('\r', '').strip('\n')
+    text = text and text.replace('\r', '').strip('\n')
 
     if not text:
         return ''

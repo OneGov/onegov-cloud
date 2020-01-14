@@ -348,7 +348,13 @@ class SwissVoteCollection(Pagination):
         if self.legal_form:
             query = query.filter(SwissVote._legal_form.in_(self.legal_form))
         if self.result:
-            query = query.filter(SwissVote._result.in_(self.result))
+            # XXX votes with deciding questions have not been properly added
+            # to the query view (no way to select for their results), so we
+            # always include them here
+            query = query.filter(or_(
+                SwissVote._result.in_(self.result),
+                SwissVote._result == None,
+            ))
         if self.policy_area:
             levels = [[], [], []]
             for area in self.policy_area:

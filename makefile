@@ -3,7 +3,7 @@ install: in_virtual_env
 	pip install --upgrade pip
 
 	# install requirements
-	pip install -e '.[test,dev,docs]' --upgrade-strategy=eager
+	CPPFLAGS="-std=c++11" pip install -e '.[test,dev,docs]' --upgrade-strategy=eager
 
 	# ensure required folder structure
 	mkdir -p ./profiles
@@ -15,7 +15,7 @@ install: in_virtual_env
 update: in_virtual_env
 
 	# update all dependencies
-	pip list --outdated --format=freeze |  sed 's/==/>/g' | pip install --upgrade -r /dev/stdin
+	pip list --outdated --format=freeze |  sed 's/==/>/g' | CPPFLAGS="-std=c++11" pip install --upgrade -r /dev/stdin
 
 	# force update the latest honyaku release
 	pip install git+https://github.com/seantis/honyaku#egg=honyaku --force

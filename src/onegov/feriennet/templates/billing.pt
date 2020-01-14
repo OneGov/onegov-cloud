@@ -20,7 +20,7 @@
 
         <div class="row">
             <div class="columns small-12 medium-8">
-                <tal:b condition="not: bills" i18n:translate>No bills created yet.</tal:b>
+                <tal:b condition="not: bills" i18n:translate>No bills found.</tal:b>
 
                 <div class="bills billing">
                     <div class="bill ${details.outstanding == 0 and 'paid'} ${details.outstanding > 0 and 'unpaid'} ${details.outstanding < 0 and 'overpaid'}" id="${details.invoice_id}" tal:repeat="(username, details) bills.items()" data-reload-from="${request.link(model.for_username(username).for_expand(True))}" data-reload-from-selector=".bill">
@@ -185,6 +185,13 @@
                                 </span>
                             </p>
                         </tal:b>
+                    </div>
+                </div>
+
+                <div class="filter-panel">
+                    <div class="filter-state">
+                        <h2 class="filter-title" i18n:translate>Payment State</h2>
+                        <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['state']" />
                     </div>
                 </div>
 

@@ -255,7 +255,7 @@ def test_notification_template_send_form(session):
     # do not count cancelled bookings...
     form.__dict__['period'] = period
     assert len(form.recipients_with_wishes()) == 2
-    assert len(form.recipients_with_bookings()) == 0
+    assert len(form.recipients_with_accepted_bookings()) == 0
 
     # otherwise they count towards the bookings
     period = periods.query().one()
@@ -266,7 +266,7 @@ def test_notification_template_send_form(session):
     form.request = request(admin=True)
     form.__dict__['period'] = period
     assert len(form.recipients_with_wishes()) == 0
-    assert len(form.recipients_with_bookings()) == 2
+    assert len(form.recipients_with_accepted_bookings()) == 1
 
     # count the active organisers
     form.request = request(admin=True)

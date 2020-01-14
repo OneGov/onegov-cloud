@@ -116,7 +116,7 @@ function new-version() {
     if echo "${version}" | grep "release-${year}" -q; then
         build="$(echo "${version}" | awk -F '.' '{print $NF}')"
     else
-        build="1"
+        build="0"
     fi
 
     echo "release-$year.$((build + 1))"

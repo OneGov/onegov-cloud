@@ -4,6 +4,7 @@ from onegov.activity import Booking, BookingCollection
 from onegov.activity import InvoiceCollection, InvoiceItem
 from onegov.activity import Occasion, OccasionCollection, OccasionNeed
 from onegov.activity import Period, PeriodCollection
+from onegov.activity import Volunteer, VolunteerCollection
 from onegov.activity.utils import is_valid_group_code
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections import BillingCollection
@@ -15,6 +16,8 @@ from onegov.feriennet.models import Calendar
 from onegov.feriennet.models import GroupInvite
 from onegov.feriennet.models import InvoiceAction, VacationActivity
 from onegov.feriennet.models import NotificationTemplate
+from onegov.feriennet.models import VolunteerCart
+from onegov.feriennet.models import VolunteerCartAction
 from onegov.org.converters import keywords_converter
 from onegov.core.converters import integer_range_converter
 from uuid import UUID
@@ -137,7 +140,8 @@ def get_matches(request, app, period_id, states=None):
     model=BillingCollection,
     path='/billing',
     converters=dict(period_id=UUID))
-def get_billing(request, app, period_id, username=None, expand=False):
+def get_billing(request, app, period_id,
+                username=None, expand=False, state='unpaid'):
     # the default period is the active period or the first we can find
     if not period_id:
         period = app.default_period
@@ -147,7 +151,7 @@ def get_billing(request, app, period_id, username=None, expand=False):
     if not period:
         return None
 
-    return BillingCollection(request, period, username, expand)
+    return BillingCollection(request, period, username, expand, state)
 
 
 @FeriennetApp.path(
@@ -263,13 +267,16 @@ def get_calendar(request, name, token):
 @FeriennetApp.path(
     model=GroupInvite,
     path='/join/{group_code}')
-def get_group_invite(app, request, group_code):
+def get_group_invite(app, request, group_code, username=None):
     group_code = group_code.upper()
 
     if not is_valid_group_code(group_code):
         return None
 
-    invite = GroupInvite(request.session, group_code)
+    if not request.is_admin:
+        username = request.current_username
+
+    invite = GroupInvite(request.session, group_code, username)
     return invite.exists and invite or None
 
 
@@ -279,3 +286,42 @@ def get_group_invite(app, request, group_code):
     converters=dict(id=UUID))
 def get_occasion_need(request, id):
     return request.session.query(OccasionNeed).filter_by(id=id).first()
+
+
+@FeriennetApp.path(
+    model=VolunteerCart,
+    path='/volunteer-cart')
+def get_volunteer_cart(request):
+    return VolunteerCart.from_request(request)
+
+
+@FeriennetApp.path(
+    model=VolunteerCartAction,
+    path='/volunteer-cart-action/{action}/{target}',
+    converters=dict(target=UUID))
+def get_volunteer_cart_action(request, action, target):
+    return VolunteerCartAction(action, target)
+
+
+@FeriennetApp.path(
+    model=VolunteerCollection,
+    path='/volunteers/{period_id}',
+    converters=dict(period_id=UUID))
+def get_volunteers(request, period_id):
+    if not request.app.show_volunteers(request):
+        return None
+
+    period = request.app.periods_by_id.get(period_id.hex)
+
+    if not period:
+        return None
+
+    return VolunteerCollection(request.session, period)
+
+
+@FeriennetApp.path(
+    model=Volunteer,
+    path='/volunteer/{id}',
+    converters=dict(id=UUID))
+def get_volunteer(request, id):
+    return VolunteerCollection(request.session, None).by_id(id)

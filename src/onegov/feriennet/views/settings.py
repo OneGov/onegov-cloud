@@ -103,6 +103,17 @@ class FeriennetSettingsForm(Form):
         fieldset=_("Donation"),
         render_kw={'rows': 10})
 
+    volunteers = RadioField(
+        label=_("Volunteer registration"),
+        fieldset=_("Experimental"),
+        choices=[
+            ('disabled', _("Disabled")),
+            ('admins', _("Only for Admins")),
+            ('enabled', _("Enabled")),
+        ],
+        default='disabled'
+    )
+
     def ensure_beneificary_if_bank_account(self):
         if self.bank_account.data and not self.bank_beneficiary.data:
             self.bank_beneficiary.errors.append(_(
@@ -136,6 +147,7 @@ class FeriennetSettingsForm(Form):
             ('donation', True),
             ('donation_amounts', DEFAULT_DONATION_AMOUNTS),
             ('donation_description', ''),
+            ('volunteers', 'disabled'),
         )
 
         for attr, default in attributes:
@@ -162,6 +174,7 @@ class FeriennetSettingsForm(Form):
             'donation',
             'donation_amounts',
             'donation_description',
+            'volunteers',
         )
 
         for attr in attributes:

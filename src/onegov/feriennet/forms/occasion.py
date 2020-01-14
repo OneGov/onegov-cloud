@@ -10,6 +10,7 @@ from onegov.form import Form
 from sedate import to_timezone, standardize_date, overlaps
 from sqlalchemy import desc
 from wtforms.fields import BooleanField
+from wtforms.fields import RadioField
 from wtforms.fields import SelectField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
@@ -105,9 +106,45 @@ class OccasionForm(Form):
         default=False
     )
 
+    administrative_cost = RadioField(
+        label=_("The administrative cost of each booking"),
+        choices=(
+            ('default', _("Use default costs defined by the period")),
+            ('custom', _("Use custom costs")),
+        ),
+        fieldset=_("Advanced"),
+        default='default'
+    )
+
+    administrative_cost_amount = DecimalField(
+        label=_("Administrative cost"),
+        validators=[
+            Optional(),
+            NumberRange(0.00, 10000.00)
+        ],
+        fieldset=_("Advanced"),
+        depends_on=('administrative_cost', 'custom')
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.date_errors = {}
+
+    @property
+    def booking_cost(self):
+        if self.administrative_cost.data == 'default':
+            return None
+
+        return self.administrative_cost_amount.data or 0
+
+    @booking_cost.setter
+    def booking_cost(self, amount):
+        if amount is None:
+            self.administrative_cost.data = 'default'
+            self.administrative_cost_amount.data = None
+        else:
+            self.administrative_cost.data = 'custom'
+            self.administrative_cost_amount.data = amount
 
     @cached_property
     def selected_period(self):
@@ -309,6 +346,8 @@ class OccasionForm(Form):
         for date in sorted(self.parsed_dates):
             occasions.add_date(model, date.start, date.end, self.timezone)
 
+        model.booking_cost = self.booking_cost
+
         model.age = OccasionCollection.to_half_open_interval(
             self.min_age.data, self.max_age.data)
 
@@ -325,3 +364,5 @@ class OccasionForm(Form):
 
         self.min_spots.data = model.spots.lower
         self.max_spots.data = model.spots.upper - 1
+
+        self.booking_cost = model.booking_cost

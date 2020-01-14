@@ -120,6 +120,9 @@ class CourseEventLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
+
+        if self.request.is_member:
+            return []
         attendee_link = Link(
             _('Attendees'),
             self.request.link(self.reservation_collection),
@@ -232,7 +235,11 @@ class CourseEventLayout(DefaultLayout):
             text=_("Subscribe"),
             url=self.csrf_protected_url(
                 self.request.link(
-                    self.reservation_collection,
+                    ReservationCollection(
+                        self.request.session,
+                        course_event_id=self.model.id,
+                        attendee_id=self.request.attendee_id
+                    ),
                     name='add-from-course-event'
                 )
             ),

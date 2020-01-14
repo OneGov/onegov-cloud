@@ -153,7 +153,7 @@ class BookingCollection(GenericCollection):
                 b.state = 'blocked'
 
         booking.state = 'accepted'
-        booking.cost = booking.provisional_booking_cost()
+        booking.cost = booking.occasion.total_cost
 
     def cancel_booking(self, booking,
                        score_function=booking_order, cascade=True):

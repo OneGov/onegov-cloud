@@ -1,8 +1,221 @@
 # Changes
 
+## Release `2020.1`
+
+> commits: **9 / [28e219a921...824b155b16](https://github.com/OneGov/onegov-cloud/compare/28e219a921^...824b155b16)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.1)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+✨ **Updates tracking URLs**
+
+**`Other`** | **[FER-838](https://issues.seantis.ch/browse/FER-838)** | **[a6732ad567](https://github.com/onegov/onegov-cloud/commit/a6732ad5674290e1bbde665503f441303f539516)**
+
+### Fsi
+
+🎉 **Improves login workflow**
+
+**`Feature`** | **[FSI-1](#FSI-1)** | **[824b155b16](https://github.com/onegov/onegov-cloud/commit/824b155b169558f5d8c04259a5676d7b5344eaea)**
+
+### Winterthur
+
+🐞 **Fixes stale mission reports default year**
+
+The deault year of mission reports would stay at the old year, when the
+processe stayed alive over the new year. This was due to the current
+year being set at the process startup.
+
+**`Bugfix`** | **[FW-74](https://stadt-winterthur.atlassian.net/browse/FW-74)** | **[11affee714](https://github.com/onegov/onegov-cloud/commit/11affee714c61491322b9980af44b34edbc54049)**
+
+### Wtfs
+
+✨ **Updates confirmation e-mail wording**
+
+**`Other`** | **[SA-52](https://stadt-winterthur.atlassian.net/browse/SA-52)** | **[c789eb70b0](https://github.com/onegov/onegov-cloud/commit/c789eb70b0365b65b43839d9a1cac3b9f543e001)**
+
+## Release `2019.59`
+
+> released: **2019-12-28 10:29**<br>
+> commits: **5 / [8ca49480cf...c73c896e9f](https://github.com/OneGov/onegov-cloud/compare/8ca49480cf^...c73c896e9f)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.59)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🎉 **Adds an unlucky attendees report**
+
+The report contains all attendees that have a booking in the given
+period, but no accepted one.
+
+**`Feature`** | **[FER-763](https://issues.seantis.ch/browse/FER-763)** | **[63f593025d](https://github.com/onegov/onegov-cloud/commit/63f593025dad9a1ddabd15668c5c32e387584a1f)**
+
+🐞 **Limit notifications for bookings**
+
+Before, notifications would be sent to all individuals with bookings,
+now only accepted bookings are considered.
+
+**`Bugfix`** | **[FER-784](https://issues.seantis.ch/browse/FER-784)** | **[8ca49480cf](https://github.com/onegov/onegov-cloud/commit/8ca49480cf2759916f5b550c5ba73bfc74c3fc25)**
+
+🐞 **Fixes some bills not showing up**
+
+Only the current period's bill would show up in the my-bills view.
+
+**`Bugfix`** | **[FER-835](https://issues.seantis.ch/browse/FER-835)** | **[54c7fc95eb](https://github.com/onegov/onegov-cloud/commit/54c7fc95eb42416cc5eeb5dca1fc2a0556771eab)**
+
+### Org
+
+✨ **Increases size of auth provider banners**
+
+**`Other`** | **[a31556313b](https://github.com/onegov/onegov-cloud/commit/a31556313bcce58ef973f02bb1490782c007855a)**
+
+## Release `2019.58`
+
+> released: **2019-12-23 11:45**<br>
+> commits: **3 / [f9c476f850...1ec81076c4](https://github.com/OneGov/onegov-cloud/compare/f9c476f850^...1ec81076c4)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.58)](https://buildkite.com/seantis/onegov-cloud)
+
+## Release `2019.57`
+
+> released: **2019-12-20 15:58**<br>
+> commits: **2 / [692adda0c0...f18ebe02e4](https://github.com/OneGov/onegov-cloud/compare/692adda0c0^...f18ebe02e4)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.57)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🎉 **Adds a way for volunteers to sign up**
+
+Volunteers may now look at the needs of activites and select which needs
+they would like to fulfill. The admin has the ability to check the
+volunteer submissions and manage their statuses.
+
+**`Feature`** | **[FER-739](https://issues.seantis.ch/browse/FER-739)** | **[692adda0c0](https://github.com/onegov/onegov-cloud/commit/692adda0c0a0ad5eac566c41b047e749e8d2ad55)**
+
+## Release `2019.56`
+
+> released: **2019-12-20 09:30**<br>
+> commits: **3 / [92a10e053f...12b5595ce3](https://github.com/OneGov/onegov-cloud/compare/92a10e053f^...12b5595ce3)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.56)](https://buildkite.com/seantis/onegov-cloud)
+
+## Release `2019.55`
+
+> released: **2019-12-19 15:11**<br>
+> commits: **2 / [c43a598fa2...b80fe144ff](https://github.com/OneGov/onegov-cloud/compare/c43a598fa2^...b80fe144ff)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.55)](https://buildkite.com/seantis/onegov-cloud)
+
+### Fsi
+
+🎉 **Adds teacher user import**
+
+**`Feature`** | **[c43a598fa2](https://github.com/onegov/onegov-cloud/commit/c43a598fa25ed26644d898cdcb39984db3c8348a)**
+
+## Release `2019.54`
+
+> released: **2019-12-19 12:31**<br>
+> commits: **9 / [89e5bbdbfa...95da9e95b5](https://github.com/OneGov/onegov-cloud/compare/89e5bbdbfa^...95da9e95b5)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.54)](https://buildkite.com/seantis/onegov-cloud)
+
+### Swissvotes
+
+🎉 **Adds Matomo tracking for swissvotes.ch**
+
+**`Feature`** | **[89e5bbdbfa](https://github.com/onegov/onegov-cloud/commit/89e5bbdbfa58634b8f4f525c2bc71ab97ae1ea43)**
+
+## Release `2019.53`
+
+> released: **2019-12-17 13:57**<br>
+> commits: **3 / [14d3d9de02...c62c828a51](https://github.com/OneGov/onegov-cloud/compare/14d3d9de02^...c62c828a51)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.53)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Slightly decrease fuzziness of search results**
+
+We now require the first three letters to match exactly, giving only the
+other letters the option to be slightly mismatched with a Levenshtein
+distance of 1.
+
+This should improve the clarity of our search results.
+
+**`Feature`** | **[14d3d9de02](https://github.com/onegov/onegov-cloud/commit/14d3d9de02064013fe4ab9b025900c991593c9ad)**
+
+### Swissvotes
+
+🎉 **Adds static urls for /page/dataset**
+
+**`Feature`** | **[a856b44726](https://github.com/onegov/onegov-cloud/commit/a856b44726f6465bb88ff5594a41ddfaa0f46517)**
+
+## Release `2019.52`
+
+> released: **2019-12-16 15:02**<br>
+> commits: **2 / [c5f8710c60...c66dbd3a70](https://github.com/OneGov/onegov-cloud/compare/c5f8710c60^...c66dbd3a70)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.52)](https://buildkite.com/seantis/onegov-cloud)
+
+### Swisvotes
+
+🎉 **Adds static urls for vote details page**
+
+**`Feature`** | **[c5f8710c60](https://github.com/onegov/onegov-cloud/commit/c5f8710c60a004f0c8a5a9170eb3b674116badb5)**
+
+## Release `2019.51`
+
+> released: **2019-12-15 23:06**<br>
+> commits: **4 / [497c3d9581...286b2d3137](https://github.com/OneGov/onegov-cloud/compare/497c3d9581^...286b2d3137)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.51)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🎉 **Adds a paid/unpaid filter to billing**
+
+By default, we only show unpaid bills and use the filter as a toggle.
+
+**`Feature`** | **[FER-489](https://issues.seantis.ch/browse/FER-489)** | **[497c3d9581](https://github.com/onegov/onegov-cloud/commit/497c3d958187c3966697109cbd438877b7fa42c7)**
+
+### Fsi
+
+🐞 **Fixes smaller issue of beta testing phase**
+
+**`Bugfix`** | **[93b02920ff](https://github.com/onegov/onegov-cloud/commit/93b02920ffd329beb9c702ce022684bd3a0c75df)**
+
+### Swissvotes
+
+🎉 **Adds legel form deciding question**
+
+Updates dataset with curiavista, bkresults and bkchrono links. Adds 3 additional attachments.
+Adapts views for deciding question.
+
+**`Feature`** | **[b592e32e76](https://github.com/onegov/onegov-cloud/commit/b592e32e769e4cd666f4161b136508580387bd5e)**
+
+## Release `2019.50`
+
+> released: **2019-12-14 15:44**<br>
+> commits: **9 / [c50857d184...2c694b27a9](https://github.com/OneGov/onegov-cloud/compare/c50857d184^...2c694b27a9)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.50)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🎉 **View group invites as another user**
+
+Admins may now view group invites from the view of another user, which
+helps them help out users that are stuck.
+
+**`Feature`** | **[FER-754](https://issues.seantis.ch/browse/FER-754)** | **[c71bc833d4](https://github.com/onegov/onegov-cloud/commit/c71bc833d46fe73e9c6ce98d3a98b434f40124cb)**
+
+🎉 **Optionally override booking cost per occasion**
+
+This allows users to have a higher booking cost for occasions which need
+more work to administer, say a 1-week sommercamp.
+
+**`Feature`** | **[FER-824](https://issues.seantis.ch/browse/FER-824)** | **[0ff2671f01](https://github.com/onegov/onegov-cloud/commit/0ff2671f01ab39aa9f37f31eb2c24708d19b976d)**
+
+### Org
+
+🐞 **Fixes thumbnails not working in many cases**
+
+**`Bugfix`** | **[fce1381665](https://github.com/onegov/onegov-cloud/commit/fce138166531db76435149da0b5ebe97cb018654)**
+
 ## Release `2019.49`
 
-> commits: **7 / [837d01d82e...9d4f242107](https://github.com/OneGov/onegov-cloud/compare/837d01d82e^...9d4f242107)**<br>
+> released: **2019-12-12 15:18**<br>
+> commits: **8 / [837d01d82e...f470ca3a09](https://github.com/OneGov/onegov-cloud/compare/837d01d82e^...f470ca3a09)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.49)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet

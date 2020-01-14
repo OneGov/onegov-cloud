@@ -19,6 +19,89 @@ from onegov.swissvotes.models import TranslatablePageFile
 from onegov.swissvotes.models import TranslatablePageMove
 
 
+# Static redirects
+@SwissvotesApp.html(
+    model=TranslatablePage,
+    permission=Public,
+    name='kurzbeschreibung-de.pdf'
+)
+def brief_desc_static_de(self, request):
+    file = self.get_file_by_locale('QUELLEN', 'de_CH')
+    return request.redirect(request.link(file))
+
+
+@SwissvotesApp.html(
+    model=TranslatablePage,
+    permission=Public,
+    name='kurzbeschreibung-fr.pdf'
+)
+def brief_desc_static_fr(self, request):
+    locale = 'fr_CH'
+    file = self.get_file_by_locale('REFERENCES des descriptifs', locale)
+    return request.redirect(request.link(file))
+
+
+@SwissvotesApp.html(
+    model=TranslatablePage,
+    permission=Public,
+    name='kurzbeschreibung-en.pdf'
+)
+def brief_desc_static_en(self, request):
+    locale = 'en_US'
+    file = self.get_file_by_locale('REFERENCES for descriptions', locale)
+    return request.redirect(request.link(file))
+
+
+@SwissvotesApp.html(
+    model=TranslatablePage,
+    permission=Public,
+    name='swissvotes_dataset.csv'
+)
+def dataset_csv_static(self, request):
+    file = self.get_file('DATASET CSV', request)
+    return request.redirect(request.link(file))
+
+
+@SwissvotesApp.html(
+    model=TranslatablePage,
+    permission=Public,
+    name='swissvotes_dataset.xlsx'
+)
+def dataset_xlsx_static(self, request):
+    file = self.get_file('DATASET XLSX', request)
+    return request.redirect(request.link(file))
+
+
+@SwissvotesApp.html(
+    model=TranslatablePage,
+    permission=Public,
+    name='codebook-de.pdf'
+)
+def codebook_de_static(self, request):
+    file = self.get_file_by_locale('CODEBOOK', 'de_CH')
+    return request.redirect(request.link(file))
+
+
+@SwissvotesApp.html(
+    model=TranslatablePage,
+    permission=Public,
+    name='codebook-fr.pdf'
+)
+def codebook_fr_static(self, request):
+    file = self.get_file_by_locale('CODEBOOK', 'fr_CH')
+    return request.redirect(request.link(file))
+
+
+@SwissvotesApp.html(
+    model=TranslatablePage,
+    permission=Public,
+    name='codebook-en.pdf'
+)
+def codebook_us_static(self, request):
+    file = self.get_file_by_locale('CODEBOOK', 'en_US')
+    return request.redirect(request.link(file))
+
+
 @SwissvotesApp.html(
     model=TranslatablePage,
     template='page.pt',
@@ -33,10 +116,14 @@ def view_page(self, request):
             f for f in self.files
             if 'DATASET' in f.filename and f.locale == request.default_locale]
         files.extend(dataset)
+    layout = PageLayout(self, request)
+    files_data = [
+        (f.filename, layout.get_file_url(f)) for f in files
+    ]
 
     return {
-        'layout': PageLayout(self, request),
-        'files': files
+        'layout': layout,
+        'files_data': files_data
     }
 
 

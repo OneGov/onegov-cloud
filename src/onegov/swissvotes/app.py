@@ -1,6 +1,8 @@
 from cached_property import cached_property
+from more.content_security import SELF
 from onegov.core import Framework
 from onegov.core import utils
+from onegov.core.framework import default_content_security_policy
 from onegov.file import DepotApp
 from onegov.form import FormApp
 from onegov.quill import QuillApp
@@ -83,6 +85,18 @@ def get_i18n_used_locales():
 @SwissvotesApp.setting(section='i18n', name='default_locale')
 def get_i18n_default_locale():
     return 'de_CH'
+
+
+@SwissvotesApp.setting(section='content_security_policy', name='default')
+def org_content_security_policy():
+    policy = default_content_security_policy()
+
+    policy.connect_src.add(SELF)
+    policy.connect_src.add('https://sentry.io')
+
+    policy.script_src.add('https://stats.seantis.ch')
+
+    return policy
 
 
 @SwissvotesApp.webasset_path()

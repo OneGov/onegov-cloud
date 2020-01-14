@@ -200,7 +200,8 @@ def test_max_image_size(session):
     assert limited.reference.size == ['2048px', '2047px']
 
     assert unchanged.reference.thumbnail_small['size'] == ['512px', '512px']
-    assert limited.reference.thumbnail_small['size'] == ['512px', '511px']
+    assert limited.reference.thumbnail_small['size'][0] in ['512px', '511px']
+    assert limited.reference.thumbnail_small['size'][1] in ['512px', '511px']
 
 
 def test_checksum(session):

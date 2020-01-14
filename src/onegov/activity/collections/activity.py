@@ -48,6 +48,7 @@ class ActivityFilter(object):
         'tags',
         'timelines',
         'weekdays',
+        'volunteers',
     )
 
     singular = {
@@ -128,6 +129,9 @@ class ActivityFilter(object):
     def adapt_durations(self, values):
         return set(int(v) for v in values)
 
+    def adapt_volunteers(self, values):
+        return set(v == 'yes' for v in values)
+
     def encode(self, key, value):
         if isinstance(value, str):
             return value
@@ -149,6 +153,9 @@ class ActivityFilter(object):
 
         if isinstance(value, UUID):
             return value.hex
+
+        if isinstance(value, bool):
+            return value and 'yes' or 'no'
 
         if isinstance(value, (tuple, list, set)):
             return [self.encode(key, v) for v in value]
@@ -275,6 +282,10 @@ class ActivityCollection(RangedPagination):
             if conditions:
                 o = o.filter(or_(*conditions))
 
+        if self.filter.volunteers:
+            o = o.filter(Occasion.seeking_volunteers.in_(
+                self.filter.volunteers))
+
         if self.filter.period_ids:
             o = o.filter(Occasion.period_id.in_(self.filter.period_ids))
 
@@ -295,14 +306,8 @@ class ActivityCollection(RangedPagination):
             o = o.filter(or_(
                 *(
                     and_(
-                        min_price <= (
-                            func.coalesce(Occasion.cost, 0)
-                            + func.coalesce(Period.occasion_extra_cost, 0)
-                        ),
-                        (
-                            func.coalesce(Occasion.cost, 0)
-                            + func.coalesce(Period.occasion_extra_cost, 0)
-                        ) <= max_price
+                        min_price <= Occasion.total_cost,
+                        Occasion.total_cost <= max_price,
                     ) for min_price, max_price in self.filter.price_ranges
                 )
             ))
@@ -318,7 +323,7 @@ class ActivityCollection(RangedPagination):
 
         if self.filter.weekdays:
             o = o.filter(
-                Occasion.weekdays.op('&&')(array(self.filter.weekdays)))
+                Occasion.weekdays.op('<@')(array(self.filter.weekdays)))
 
         if self.filter.available:
             conditions = []

@@ -39,6 +39,30 @@
                         <div class="child-icon before fixed-width" i18n:translate><tal:b i18n:name="count" replace="occasion.attendee_count" /> attendees</div>
                     </div>
 
+                    <tal:b define="volunteers occasion_volunteers(occasion)" tal:condition="volunteers">
+                        <h4 i18n:translate>Volunteers</h4>
+
+                        <ul class="attendees">
+                            <li tal:repeat="volunteer volunteers">
+                                <strong>${volunteer.first_name} ${volunteer.last_name}</strong>
+                                <div>
+                                    <span i18n:translate>Duty:</span>
+                                    <span>${volunteer.need.name}</span>
+                                </div>
+                                <div>
+                                    <span i18n:translate>E-Mail:</span>
+                                    <span><a href="mailto:${volunteer.email}">${volunteer.email}</a></span>
+                                </div>
+                                <div>
+                                    <span i18n:translate>Phone:</span>
+                                    <span><a href="tel:${volunteer.phone}">${volunteer.phone}</a></span>
+                                </div>
+                            </li>
+                        </ul>
+                    </tal:b>
+
+
+                    <h4 i18n:translate>Attendees</h4>
                     <ul class="attendees">
                         <li tal:repeat="details occasions[occasion]">
                             <strong class="${details.attendee.gender or ''}">${details.attendee.name} (${details.attendee.age})</strong>
@@ -56,7 +80,7 @@
                             </div>
                             <div tal:condition="details.info.email">
                                 <span i18n:translate>E-Mail:</span>
-                                <span>${details.info.email}</span>
+                                <span><a href="mailto:${details.info.email}">${details.info.email}</span>
                             </div>
                             <div tal:condition="details.info.place">
                                 <span i18n:translate>Place:</span>

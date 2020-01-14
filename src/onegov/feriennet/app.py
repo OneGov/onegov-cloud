@@ -155,6 +155,21 @@ class FeriennetApp(OrgApp):
     def donation_amounts(self):
         return self.meta.get('donation_amounts', DEFAULT_DONATION_AMOUNTS)
 
+    def show_volunteers(self, request):
+
+        if not self.active_period:
+            return False
+
+        setting = self.org.meta.get('volunteers', 'disabled')
+
+        if setting == 'enabled':
+            return True
+
+        if setting == 'admins' and request.is_admin:
+            return True
+
+        return False
+
 
 @FeriennetApp.template_directory()
 def get_template_directory():
@@ -228,6 +243,11 @@ def get_static_directory():
 @FeriennetApp.webasset_path()
 def get_js_path():
     return 'assets/js'
+
+
+@FeriennetApp.webasset('volunteer-cart')
+def get_volunteer_cart():
+    yield 'volunteer-cart.jsx'
 
 
 @FeriennetApp.webasset('common')

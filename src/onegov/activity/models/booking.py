@@ -123,23 +123,6 @@ class Booking(Base, TimestampMixin):
 
         return self.state == 'cancelled' and 'cancelled' or 'open'
 
-    def provisional_booking_cost(self, period=None):
-        """ The costs of the final booking, including the booking costs
-        of the period (if not all-inclusive).
-
-        This cost is written to the booking.cost when the period is
-        confirmed.
-
-        """
-
-        period = period or self.period
-        cost = self.occasion.cost or 0
-
-        if not period.all_inclusive and period.booking_cost:
-            cost += period.booking_cost
-
-        return cost or 0
-
     def set_priority_bit(self, index, bit):
         """ Changes the priority, setting the the nth bit from the right to
         the value of ``bit`` (index/n begins at 0).

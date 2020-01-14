@@ -319,6 +319,7 @@ import yaml
 from cached_property import cached_property
 from dateutil import parser as dateutil_parser
 from decimal import Decimal
+from onegov.core.cache import lru_cache
 from onegov.core.utils import Bunch
 from onegov.form import errors
 from onegov.form.parser.grammar import checkbox
@@ -783,6 +784,7 @@ class CheckboxField(OptionsField, Field):
     type = 'checkbox'
 
 
+@lru_cache(maxsize=1)
 def parse_formcode(formcode):
     """ Takes the given formcode and returns an intermediate representation
     that can be used to generate forms or do other things.

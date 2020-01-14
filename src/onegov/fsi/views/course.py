@@ -82,7 +82,7 @@ def handle_send_invitation_email(
 @FsiApp.html(
     model=Course,
     template='mail_notification.pt',
-    permission=Secret,
+    permission=Private,
     name='embed')
 def view_email_preview_for_course(self, request):
 

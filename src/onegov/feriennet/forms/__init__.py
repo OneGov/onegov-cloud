@@ -13,7 +13,7 @@ from onegov.feriennet.forms.period import PeriodExportForm
 from onegov.feriennet.forms.period import PeriodForm
 from onegov.feriennet.forms.period import PeriodSelectForm
 from onegov.feriennet.forms.userprofile import UserProfileForm
-
+from onegov.feriennet.forms.volunteer import VolunteerForm
 from onegov.feriennet.forms.notification_template import (
     NotificationTemplateForm,
     NotificationTemplateSendForm
@@ -36,5 +36,6 @@ __all__ = [
     'PeriodForm',
     'PeriodSelectForm',
     'UserProfileForm',
-    'VacationActivityForm'
+    'VacationActivityForm',
+    'VolunteerForm',
 ]

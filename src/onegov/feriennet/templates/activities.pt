@@ -25,9 +25,9 @@
                                 <p class="page-lead">${activity.lead}</p>
 
                                 <div class="row collapse" tal:define="
-                                    ages get_ages(activity);
-                                    min_cost get_min_cost(activity);
-                                    available_spots get_available_spots(activity);
+                                    ages activity_ages(activity, request);
+                                    min_cost activity_min_cost(activity, request);
+                                    available_spots activity_spots(activity, request);
                                 ">
                                     <div class="small-12 columns factoids">
                                         <tal:b condition="ages">

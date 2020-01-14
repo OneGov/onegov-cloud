@@ -422,13 +422,13 @@
             </tal:b>
 
             <tal:b condition="not period.all_inclusive">
-                <div class="cost">
+                <div class="cost" tal:define="cost occasion.total_cost">
                     <span i18n:translate class="show-for-sr">Cost</span>
 
-                    <tal:b condition="occasion.cost or period.booking_cost" i18n:translate>
-                        <tal:b i18n:name="cost" replace="(occasion.cost or 0) + (period.booking_cost or 0)" /> CHF
+                    <tal:b condition="cost" i18n:translate>
+                        <tal:b i18n:name="cost" replace="cost" /> CHF
                     </tal:b>
-                    <tal:b condition="not:occasion.cost or period.booking_cost" i18n:translate>
+                    <tal:b condition="not:cost" i18n:translate>
                         Free of charge
                     </tal:b>
                 </div>
@@ -739,3 +739,14 @@
         </dl>
     </div>
 </metal:user_panel>
+
+<metal:volunteer_cart define-macro="volunteer_cart" i18n:domain="onegov.feriennet">
+    <div class="volunteer-cart-widget"
+        data-empty-label="No activities in your list."
+        data-button-label="Register as volunteer"
+        data-remove-label="Remove"
+        data-cart-url="${cart_url}"
+        data-cart-submit-url="${cart_submit_url}"
+        data-cart-action-url="${cart_action_url}"
+        i18n:attributes="data-empty-label;data-button-label;data-remove-label"></div>
+</metal:volunteer_cart>

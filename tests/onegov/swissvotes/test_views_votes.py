@@ -10,7 +10,8 @@ from xlsxwriter.workbook import Workbook
 
 
 @mark.parametrize("file", [
-    module_path('tests.onegov.swissvotes', 'fixtures/votes.xlsx'),
+    module_path(
+        'tests.onegov.swissvotes', 'fixtures/votes.xlsx'),
 ])
 def test_update_votes(swissvotes_app, file):
     client = Client(swissvotes_app)
@@ -50,7 +51,8 @@ def test_update_votes(swissvotes_app, file):
         "Gegenentwurf zur Volksinitiative "
         "«für ein Verbot der Errichtung von Spielbanken»"
     )
-    assert vote.short_title_de == "Gegenentwurf zur Spielbanken-Initiative"
+    assert vote.short_title_de == "Gegenentwurf zur Initiative " \
+                                  "für ein Verbot der Spielbanken"
     assert [str(pa) for pa in vote.policy_areas] == ['4.41.413', '4.44.443']
     assert str(vote.result_turnout) == '60.2323410000'
     assert vote.recommendations_parties['Nay'][0].name == 'sps'
