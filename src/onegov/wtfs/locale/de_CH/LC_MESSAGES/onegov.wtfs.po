@@ -454,7 +454,7 @@ msgid ""
 "shipment on ${date}. Please have the container(s) ready from 8 a.m. onwards. "
 "Thank you very much for your cooperation."
 msgstr ""
-"Ihr Auftrag wurde entgegen genommen. Optimo wird am ${date} Ihre Sendung "
+"Ihr Auftrag wurde entgegen genommen. Der Kurierdienst wird am ${date} Ihre Sendung "
 "abholen. Bitte halten Sie den/die Behälter ab 8 Uhr bereit. Besten Dank für "
 "Ihre Mitarbeit."
 
