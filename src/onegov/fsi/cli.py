@@ -1,5 +1,4 @@
 import click
-import os
 from onegov.core.cli import command_group
 from onegov.fsi.ims_import import parse_ims_data, import_ims_data
 from onegov.fsi.models import CourseAttendee
@@ -11,8 +10,6 @@ cli = command_group()
 
 
 def do_ims_import(path, request):
-    print('test a print if it works')
-    assert False
     errors, persons, courses, events, possible_ldap_users = parse_ims_data(
         f'{path}/Teilnehmer.txt',
         f'{path}/Ausführungen.txt',
@@ -158,7 +155,6 @@ def fetch_users(session, ldap_server, ldap_username, ldap_password, ldap_base):
 
         user.attendee.first_name = data['first_name']
         user.attendee.last_name = data['last_name']
-        # user.attendee._email = data['mail']
         user.attendee.organisation = ' / '.join(o for o in (
             data['directorate'],
             data['agency'],
