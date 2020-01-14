@@ -98,8 +98,7 @@ import dateutil.parser
 from sedate import replace_timezone
 
 from onegov.core.csv import CSVFile
-from onegov.fsi.models import CourseEvent, Course, CourseReservation, \
-    CourseAttendee
+from onegov.fsi.models import CourseEvent, Course, CourseReservation
 from onegov.fsi.models.course_notification_template import InfoTemplate, \
     ReservationTemplate, CancellationTemplate, ReminderTemplate
 from onegov.user import User

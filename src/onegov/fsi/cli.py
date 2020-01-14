@@ -1,5 +1,6 @@
 import click
 
+from onegov.core.cache import lru_cache
 from onegov.core.cli import command_group
 from onegov.fsi.ims_import import parse_ims_data, import_ims_data
 from onegov.fsi.models import CourseAttendee

@@ -185,4 +185,3 @@ def test_register_for_course_event_admin(client_with_db):
     assert 'Angemeldet' in page
 
     assert len(client.app.smtp.outbox) == 1
-

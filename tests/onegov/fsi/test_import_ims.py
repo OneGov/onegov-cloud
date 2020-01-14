@@ -12,10 +12,10 @@ courses_file = f'{data_path}/Kurse.txt'
 def test_import_ims(session, attendee):
 
     errors, persons, courses, events, possible_ldap_users = parse_ims_data(
-            subscriptions_file,
-            events_file,
-            courses_file,
-            persons_file
+        subscriptions_file,
+        events_file,
+        courses_file,
+        persons_file
     )
     assert not errors
     assert all((persons, courses, events, possible_ldap_users))
