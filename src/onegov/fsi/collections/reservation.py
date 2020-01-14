@@ -1,3 +1,5 @@
+from sqlalchemy import or_
+
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.models.course_attendee import CourseAttendee
@@ -26,8 +28,6 @@ class ReservationCollection(GenericCollection, Pagination):
         return all((
             self.page == other.page,
             self.attendee_id == other.attendee_id,
-            self.user_role == other.user_role,
-            self.permissions == other.permissions,
             self.course_event_id == other.course_event_id,
             self.external_only == other.external_only
         ))
@@ -90,8 +90,6 @@ class ReservationCollection(GenericCollection, Pagination):
         return self.__class__(
             self.session, page=index,
             attendee_id=self.attendee_id,
-            permissions=self.permissions,
-            user_role=self.user_role,
             course_event_id=self.course_event_id,
             external_only=self.external_only
         )

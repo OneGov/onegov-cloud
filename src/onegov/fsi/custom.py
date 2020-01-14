@@ -59,7 +59,7 @@ def get_base_tools(request):
             links.append(
                 Link(
                     _('Event Subscriptions'),
-                    request.class_link(ReservationCollection),
+                    request.link(ReservationCollection(request.session)),
                     attrs={'class': 'reservations'}
                 )
             )
