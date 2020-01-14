@@ -28,11 +28,7 @@ def do_ims_import(path, request):
 def import_ims_data_cli(path):
 
     def execute(request, app):
-        # cli hangs in src/onegov/core/cli/core.py:596
-        # request in venv/lib/python3.8/site-packages/webtest/app.py:628
-        # goes to src/onegov/server/core.py:120
         do_ims_import(path, request)
-
     return execute
 
 
