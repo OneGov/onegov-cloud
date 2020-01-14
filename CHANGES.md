@@ -1,8 +1,42 @@
 # Changes
 
+## Release `2020.1`
+
+> commits: **9 / [28e219a921...824b155b16](https://github.com/OneGov/onegov-cloud/compare/28e219a921^...824b155b16)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.1)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+✨ **Updates tracking URLs**
+
+**`Other`** | **[FER-838](https://issues.seantis.ch/browse/FER-838)** | **[a6732ad567](https://github.com/onegov/onegov-cloud/commit/a6732ad5674290e1bbde665503f441303f539516)**
+
+### Fsi
+
+🎉 **Improves login workflow**
+
+**`Feature`** | **[FSI-1](#FSI-1)** | **[824b155b16](https://github.com/onegov/onegov-cloud/commit/824b155b169558f5d8c04259a5676d7b5344eaea)**
+
+### Winterthur
+
+🐞 **Fixes stale mission reports default year**
+
+The deault year of mission reports would stay at the old year, when the
+processe stayed alive over the new year. This was due to the current
+year being set at the process startup.
+
+**`Bugfix`** | **[FW-74](https://stadt-winterthur.atlassian.net/browse/FW-74)** | **[11affee714](https://github.com/onegov/onegov-cloud/commit/11affee714c61491322b9980af44b34edbc54049)**
+
+### Wtfs
+
+✨ **Updates confirmation e-mail wording**
+
+**`Other`** | **[SA-52](https://stadt-winterthur.atlassian.net/browse/SA-52)** | **[c789eb70b0](https://github.com/onegov/onegov-cloud/commit/c789eb70b0365b65b43839d9a1cac3b9f543e001)**
+
 ## Release `2019.59`
 
-> commits: **4 / [8ca49480cf...a31556313b](https://github.com/OneGov/onegov-cloud/compare/8ca49480cf^...a31556313b)**<br>
+> released: **2019-12-28 10:29**<br>
+> commits: **5 / [8ca49480cf...c73c896e9f](https://github.com/OneGov/onegov-cloud/compare/8ca49480cf^...c73c896e9f)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2019.59)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
