@@ -77,3 +77,10 @@ def nullable_event_presenter_email(context):
     if context.has_column('fsi_course_events', 'presenter_email'):
         context.operations.alter_column(
             'fsi_course_events', 'presenter_email', nullable=True)
+
+
+@upgrade_task('Drop CourseEvent start-end unique constraint')
+def remove_course_event_uc(context):
+    if context.has_table('fsi_course_events'):
+        context.operations.drop_constraint(
+            '_start_end_uc', 'fsi_course_events')
