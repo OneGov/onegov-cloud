@@ -108,7 +108,7 @@ def get_template_details(request, id):
              )
 def get_reservations(
         app, request,
-        course_event_id=None, attendee_id=None, external_only=False):
+        course_event_id=None, attendee_id=None, external_only=False, page=0):
 
     if not attendee_id:
         if not request.is_manager:
@@ -128,7 +128,8 @@ def get_reservations(
         course_event_id=course_event_id,
         external_only=external_only,
         permissions=permissions,
-        user_role=role
+        user_role=role,
+        page=page
     )
 
 
