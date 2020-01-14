@@ -321,7 +321,7 @@ def parse_subscriptions(csvfile, persons, events):
                 # Add to valid subscriptions
                 subscriptions.append(dict(
                     course_event_id=course_event.id,
-                    event_completed=completed
+                    completed=completed
                 ))
                 continue
 
@@ -487,7 +487,7 @@ def import_ims_data(session, persons, courses, events, possible_ldap_users):
             CourseReservation(
                 attendee_id=attendee.id,
                 course_event_id=r['course_event_id'],
-                event_completed=r['event_completed']
+                event_completed=r['completed']
             ) for r in subscriptions
         ))
 
