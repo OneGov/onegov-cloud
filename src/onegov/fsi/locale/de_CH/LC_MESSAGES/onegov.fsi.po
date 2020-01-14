@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-01-07 14:26+0100\n"
-"PO-Revision-Date: 2020-01-07 14:27+0100\n"
+"POT-Creation-Date: 2020-01-14 17:50+0100\n"
+"PO-Revision-Date: 2020-01-14 17:51+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -454,9 +454,6 @@ msgstr "Verbleibende Plätze"
 msgid "Description:"
 msgstr "Beschreibung:"
 
-msgid "Time"
-msgstr "Uhrzeit"
-
 msgid "Yes"
 msgstr "Ja"
 
@@ -594,6 +591,9 @@ msgstr ""
 msgid "No recipients and no cancellation emails sent"
 msgstr "Keine Empfänger und kein Absage-Email gesendet"
 
+msgid "E-Mail Address / Username / Shortcut"
+msgstr "E-Mail / Benutzername / Kürzel"
+
 msgid "Send E-Mail Now"
 msgstr "Email jetzt senden"
 
@@ -629,6 +629,9 @@ msgstr "Neue Anmeldungen erfasst"
 
 msgid "Subscription successfully deleted"
 msgstr "Anmeldung erfolgreich gelöscht"
+
+#~ msgid "Time"
+#~ msgstr "Uhrzeit"
 
 #~ msgid "Edit Reservation"
 #~ msgstr "Reservation bearbeiten"
