@@ -55,18 +55,14 @@ class ReservationCollection(GenericCollection, Pagination):
 
     def query(self):
         query = super().query()
-        # query = query.join(CourseAttendee).order_by(
-        #     CourseAttendee.last_name,
-        #     CourseAttendee.first_name,
-        # )
         for_himself = str(self.auth_attendee.id) == str(self.attendee_id)
         if self.auth_attendee.role == 'editor' and not for_himself:
             query = query.join(CourseAttendee)
             query = query.filter(
-                CourseAttendee.organisation.in_(
-                    self.auth_attendee.permissions,)
+                or_(CourseAttendee.organisation.in_(
+                    self.auth_attendee.permissions, ),
+                    CourseReservation.attendee_id == self.auth_attendee.id)
             )
-
         if self.attendee_id:
             # Always set in path for members to their own
             query = query.filter(
