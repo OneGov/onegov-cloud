@@ -80,18 +80,16 @@ Es werden nicht importiert:
 
 Vervollständigungen
 
-- .local in email addressen wird herausgenommen
+- .local in Email-Addressen wird herausgenommen
 - Fehlender Wert für ANWESEND bei alten Anmeldungen wird mit JA gefüllt.
 - Referent Kurs: Standard-Wert einfügen "Unbekannter Referent" sofern fehlend
 
-Fehlt die Email und der Code in Personen.txt wird noch in Teilnehmer.txt
-gesucht:
+Gemäss dem code (src/onegov/fsi/ims_import.py:368) gibt es keine Benutzer
+in Personen.txt die weder email noch code haben und von den Teilnehmer.txt
+her aus vervollständigt werden müssten.
 
-- Existiert eine einzige mögliche Email, wird sie mit dem Vor und Nachname der
-  Person verglichen (der gemäss Logfile immer vorhanden ist).
-  Stimmt er überein, wird danach mit dieser Email im LDAP gesucht.
-
-Externere Anmeldungen ohne Bezug zu Personen.txt werden verworfen.
+Anmeldungen in Teilnehmer.txt die keine Referenz zu Personen.txt haben,
+wurden berücksichtigt, sofern eine Email vorlag.
 
 """
 from collections import OrderedDict, defaultdict
