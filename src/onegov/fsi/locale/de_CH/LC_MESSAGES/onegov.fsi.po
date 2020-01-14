@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-12-13 11:46+0100\n"
+"POT-Creation-Date: 2020-01-14 11:20+0100\n"
 "PO-Revision-Date: 2019-12-13 11:47+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -575,6 +575,9 @@ msgstr ""
 
 msgid "No recipients and no cancellation emails sent"
 msgstr "Keine Empfänger und kein Absage-Email gesendet"
+
+msgid "E-Mail Address / Username / Shortcut"
+msgstr "E-Mail Adresse / Benutzername / Kürzel"
 
 msgid "Send E-Mail Now"
 msgstr "Email jetzt senden"
