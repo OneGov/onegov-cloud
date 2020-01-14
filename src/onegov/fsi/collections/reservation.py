@@ -1,4 +1,4 @@
-from onegov.core.collection import GenericCollection
+from onegov.core.collection import GenericCollection, Pagination
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent

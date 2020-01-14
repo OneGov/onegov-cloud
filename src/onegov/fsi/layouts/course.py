@@ -3,14 +3,14 @@ from cached_property import cached_property
 from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
-from onegov.fsi.layout import DefaultLayout
+from onegov.fsi.layout import DefaultLayout, FormatMixin
 from onegov.fsi import _
 from onegov.org.elements import LinkGroup
 
 from onegov.org.layout import DefaultMailLayout as OrgDefaultMailLayout
 
 
-class CourseInviteMailLayout(OrgDefaultMailLayout):
+class CourseInviteMailLayout(OrgDefaultMailLayout, FormatMixin):
     """Takes a course as its model, not a notification template """
 
     @cached_property
