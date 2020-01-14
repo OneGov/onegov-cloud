@@ -19,7 +19,7 @@ def view_reservations(self, request):
     layout = ReservationCollectionLayout(self, request)
     return {
         'layout': layout,
-        'reservations': self.query().all()
+        'reservations': self.batch
     }
 
 
