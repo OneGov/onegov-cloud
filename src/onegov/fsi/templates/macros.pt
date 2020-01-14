@@ -142,7 +142,9 @@
                 <table class="tablesaw hover events-table fullwidth">
                     <thead>
                         <th i18n:translate class='text-left'>Date</th>
-                        <th i18n:translate class='text-left'>Time</th>
+                        <th i18n:translate class='text-left'>Start</th>
+                        <th i18n:translate class='text-left'>End</th>
+                        <th i18n:translate class='text-left'>Status</th>
                         <th i18n:translate class='text-left'>Presenter</th>
                         <th i18n:translate class='text-left' tal:condition="not for_email">Presenter Company</th>
                         <th i18n:translate class='text-left'>Free Space</th>
@@ -156,10 +158,13 @@
                                         <strong>${layout.format_date(event.start, 'date_long')}</strong>
                                     </a>
                                 </td>
-                                <td>${layout.format_date(event.start, 'time')} - ${layout.format_date(event.end, 'time')}</td>
+
+                                <td>${layout.format_date(event.start, 'time')}</td>
+                                <td>${layout.format_date(event.end, 'time')}</td>
+                                <td>${layout.format_status(event.status)}</td>
                                 <td>${event.presenter_name}</td>
                                 <td tal:condition="not for_email">${event.presenter_company}</td>
-                                <td>${event.available_seats}</td>
+                                <td class='text-right'>${event.available_seats}</td>
                                 <tal:b tal:condition="request.is_manager and not for_email" tal:switch="event.hidden_from_public">
                                     <td tal:case="True" i18n:translate>Yes</td>
                                     <td tal:case="False" i18n:translate>No</td>
