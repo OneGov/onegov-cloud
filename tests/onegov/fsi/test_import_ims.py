@@ -1,3 +1,5 @@
+import pytest
+
 from onegov.core.utils import module_path
 from onegov.fsi.ims_import import parse_ims_data
 
@@ -9,6 +11,7 @@ events_file = f'{data_path}/Ausführungen.txt'
 courses_file = f'{data_path}/Kurse.txt'
 
 
+@pytest.mark.skip('Runs only with the original data, was used for testing')
 def test_import_ims(session, attendee):
 
     errors, persons, courses, events, possible_ldap_users = parse_ims_data(
