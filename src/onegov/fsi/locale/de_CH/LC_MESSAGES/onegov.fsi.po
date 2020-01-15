@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-01-14 17:50+0100\n"
-"PO-Revision-Date: 2020-01-14 17:51+0100\n"
+"POT-Creation-Date: 2020-01-15 11:05+0100\n"
+"PO-Revision-Date: 2020-01-15 11:05+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -399,6 +399,12 @@ msgstr "Nachname, Vorname"
 
 msgid "Organisation"
 msgstr "Organisation"
+
+msgid "True"
+msgstr "Ja"
+
+msgid "False"
+msgstr "Nein"
 
 msgid "Details"
 msgstr "Details"
