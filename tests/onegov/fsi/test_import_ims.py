@@ -2,8 +2,8 @@ import pytest
 
 from onegov.core.utils import module_path
 from onegov.fsi.ims_import import parse_ims_data
-
-data_path = module_path('tests.onegov.fsi', 'temp_data')
+import os
+data_path = os.environ.get('IMS_DATA_PATH')
 
 persons_file = f'{data_path}/Personen.txt'
 subscriptions_file = f'{data_path}/Teilnehmer.txt'
