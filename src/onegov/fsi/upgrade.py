@@ -93,4 +93,4 @@ def add_event_property_locked(context):
             'fsi_course_events',
             Column('locked_for_subscriptions', Boolean,
                    nullable=False, default=True),
-            default=lambda x: True)
+            default=lambda x: False)
