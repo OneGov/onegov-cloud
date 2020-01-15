@@ -93,44 +93,52 @@ def test_reservation_collection_query(
     event, data = course_event(session)
     future_course_reservation(
         session, course_event_id=event.id, attendee_id=att.id)
+
     future_course_reservation(session, attendee_id=editor.id)
 
     future_course_reservation(
         session, course_event_id=event.id, attendee_id=external.id)
 
     class authAttendee:
-        role = 'admin'
-        id = uuid4()
-        permissions = []
+
+        def __init__(self, role=None, id=None, permissions=None):
+            self.role = role or 'admin'
+            self.id = id or uuid4()
+            self.permissions = permissions or []
 
     auth_attendee = authAttendee()
 
-    # unfiltered
+    # unfiltered for admin, must yield all
     coll = ReservationCollection(session, auth_attendee=auth_attendee)
     assert coll.query().count() == 3
 
-    # filter attendee
-    coll.attendee_id = att.id
+    # test filter for attendee_id
+    coll = ReservationCollection(
+        session,
+        auth_attendee=auth_attendee,
+        attendee_id=att.id)
     assert coll.query().count() == 1
 
-    coll.external_only = True
+    # test for course_event_id
+    coll = ReservationCollection(
+        session,
+        auth_attendee=auth_attendee,
+        course_event_id=event.id)
+    assert coll.query().count() == 2
+
+    # Test for editor with no permissions should see just his own
+    auth_attendee = authAttendee(role='editor', id=editor.id)
+    coll = ReservationCollection(session, auth_attendee=auth_attendee)
     assert coll.query().count() == 1
 
-    coll.external_only = False
-    coll.attendee_id = None
-
-    # auth attendee is passed in path.py always
-    coll.auth_attendee.role = 'admin'
-    coll.auth_attendee.permissions = admin.permissions
-    assert coll.query().count() == 3
-
-    coll.auth_attendee.role = 'editor'
-    coll.auth_attendee.permissions = editor.permissions
-    assert coll.query().count() == 0
-
-    # See the ones with permission without the external reservations
+    # Add a the same organisation and get one entry more
     att.organisation = 'A'
     coll.auth_attendee.permissions = ['A']
+    assert coll.query().count() == 2
+
+    # Test editor wants to get his own
+    coll = ReservationCollection(
+        session, auth_attendee=auth_attendee, attendee_id=editor.id)
     assert coll.query().count() == 1
 
     # member user_role

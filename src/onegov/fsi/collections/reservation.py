@@ -29,7 +29,8 @@ class ReservationCollection(GenericCollection, Pagination):
             self.page == other.page,
             self.attendee_id == other.attendee_id,
             self.course_event_id == other.course_event_id,
-            self.external_only == other.external_only
+            self.external_only == other.external_only,
+            self.auth_attendee == other.auth_attendee
         ))
 
     @property
@@ -55,8 +56,7 @@ class ReservationCollection(GenericCollection, Pagination):
 
     def query(self):
         query = super().query()
-        for_himself = str(self.auth_attendee.id) == str(self.attendee_id)
-        if self.auth_attendee.role == 'editor' and not for_himself:
+        if self.auth_attendee.role == 'editor':
             query = query.join(CourseAttendee)
             query = query.filter(
                 or_(CourseAttendee.organisation.in_(
@@ -85,6 +85,7 @@ class ReservationCollection(GenericCollection, Pagination):
     def page_by_index(self, index):
         return self.__class__(
             self.session, page=index,
+            auth_attendee=self.auth_attendee,
             attendee_id=self.attendee_id,
             course_event_id=self.course_event_id,
             external_only=self.external_only
