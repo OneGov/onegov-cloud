@@ -1,4 +1,3 @@
-from sqlalchemy import or_
 from wtforms import StringField
 from wtforms.validators import InputRequired
 from onegov.form import Form

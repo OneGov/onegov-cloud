@@ -1,6 +1,5 @@
 import pytest
 
-from onegov.core.utils import module_path
 from onegov.fsi.ims_import import parse_ims_data
 import os
 data_path = os.environ.get('IMS_DATA_PATH')
