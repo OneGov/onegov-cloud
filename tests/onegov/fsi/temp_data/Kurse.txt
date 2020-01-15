@@ -1,8 +1,0 @@
-VORGANGSNR,STATUS,KURZBESCHREIBUNG,DETAILBESCHREIBUNG,DAUER,REFERENT_NAME,REFERENT_FIRMA,TEILNEHMER_MAX,EXTERNE_BUCHBAR
-"KV-16-000070","Erfasst","adsfadsfads","dasfdasfdasdfs",,"Acar, Nilüfer",,,"J"
-"KV-10-000003","Aktiv","Sicherheitsgrundkurs (SGK)","- Verhalten bei einem Herz-Kreislauf-Stillstand<br>- Umgang mit Stress<br>- Verhalten bei schwierigen Kundenkontakten/Situationen",,,,21,"J"
-"KV-10-000005","Abgeschlossen","Taktik-Mental-Modul (TaMe)","- Denken / Emotionen in Stresssituationen reflektieren können<br>- kennen der psychologischen Anforderungen<br>- Ablauf einer Evakuation praktisch durchspielen<br>- unter minimalem Zeitdruck seine  Funktion gemäss Aufgabenumschreibung fehlerfrei durchführen können",,"Willimann, Joe",,20,"J"
-"KV-10-000002","Abgeschlossen","BLS-AED-SRC Kompaktkurs","Durchführung der Basismassnahmen der Wiederbelebung inkl. Defibrillation",,,,6,"J"
-"KV-10-000004","Abgeschlossen","Notfallkurs (NTP)","Begriffe und Definitionen der Patientenbeurteilung kennen und erste Hilfemassnahmen einleiten und durchführen können",,,,12,"J"
-"KV-13-000039","Abgeschlossen","Implementierungsschulung KBS VuG","Kurzschulung zum neuen Sicherheitskonzept",,"Willimann, Joe","Leiter Fachstelle Sicherheit",30,"J"
-"KV-14-000062","Erfasst","BESIBE Kompaktkurs","- Gefahrenermittlung Aussenanlagen<br>- Umgang mit Hubarbeitsbühnen<br>- Notfall- und Ereignismanagement",,"Furrer, Andreas",,25,"J"
