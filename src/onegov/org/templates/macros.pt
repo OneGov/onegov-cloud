@@ -356,7 +356,7 @@
         <span class="label-text" tal:condition="not field.hide_label|True">${field.label.text}</span>
         <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
         <div class="field-help" tal:condition="field.description">
-            ${field.description}
+            <tal:b replace="structure request.translate(field.description)" />
         </div>
     </tal:b>
     <tal:b condition="field.type != 'BooleanField'">
