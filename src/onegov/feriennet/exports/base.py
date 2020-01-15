@@ -178,3 +178,22 @@ class FeriennetExport(Export):
         yield _("Invoice Item References"), '\n'.join(
             r.readable for r in item.invoice.references
         )
+
+    def organiser_fields(self, organiser):
+        user_data = organiser.data or {}
+        first_name, last_name = decode_name(organiser.realname)
+        street = extract_street(user_data.get('address', None))
+
+        yield _("Organiser Last Name"), last_name or ''
+        yield _("Organiser First Name"), first_name or ''
+        yield _("Organiser Organisation"), user_data.get('organisation', '')
+        yield _("Organiser Address"), user_data.get('address', '')
+        yield _("Organiser Street"), street.name or ''
+        yield _("Organiser Street Number"), street.number or ''
+        yield _("Organiser Zipcode"), user_data.get('zip_code', '')
+        yield _("Organiser Location"), user_data.get('place', '')
+        yield _("Organiser E-Mail"), user_data.get('email', '')
+        yield _("Organiser Phone"), user_data.get('phone', '')
+        yield _("Organiser Website"), user_data.get('website', '')
+        yield _("Organiser Bank Account"), user_data.get('bank_account', '')
+        yield _("Organiser Beneficiary"), user_data.get('bank_beneficiary', '')

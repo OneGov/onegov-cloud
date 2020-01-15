@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-01-15 11:18+0100\n"
+"POT-Creation-Date: 2020-01-15 14:17+0100\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -223,6 +223,45 @@ msgstr "Rechnungsposition Betrag"
 msgid "Invoice Item References"
 msgstr "Rechnungsposition Referenzen"
 
+msgid "Organiser Last Name"
+msgstr "Veranstalter Nachname"
+
+msgid "Organiser First Name"
+msgstr "Veranstalter Vorname"
+
+msgid "Organiser Organisation"
+msgstr "Veranstalter Organisation"
+
+msgid "Organiser Address"
+msgstr "Veranstalter Adresse"
+
+msgid "Organiser Street"
+msgstr "Veranstalter Strasse"
+
+msgid "Organiser Street Number"
+msgstr "Veranstalter Strassennummer"
+
+msgid "Organiser Zipcode"
+msgstr "Veranstalter PLZ"
+
+msgid "Organiser Location"
+msgstr "Veranstalter Ort"
+
+msgid "Organiser E-Mail"
+msgstr "Veranstalter E-Mail"
+
+msgid "Organiser Phone"
+msgstr "Veranstalter Telefon"
+
+msgid "Organiser Website"
+msgstr "Veranstalter Webseite"
+
+msgid "Organiser Bank Account"
+msgstr "Veranstalter Bankkonto"
+
+msgid "Organiser Beneficiary"
+msgstr "Veranstalter Begünstigter"
+
 msgid "Wishlist / Bookings"
 msgstr "Wunschliste / Buchungen"
 
@@ -299,7 +338,7 @@ msgid "Exports occasion needs."
 msgstr "Exportiert den Bedarf von Durchführungen."
 
 msgid "Attendees without Bookings"
-msgstr "Teilnemher ohne Buchungen"
+msgstr "Teilnehmer ohne Buchungen"
 
 msgid "Attendees who were not granted any of their wishes"
 msgstr "Teilnehmer die keine gewünschten Buchungen erhalten haben"
@@ -540,7 +579,9 @@ msgid "Yes, confirm billing"
 msgstr "Ja, Fakturierung abschliessen"
 
 msgid "I know that after confirmation, bills are made visible to users."
-msgstr "Mir ist bewusst das Rechnungen nach Abschluss für die jeweiligen Benutzer sichtbar sind."
+msgstr ""
+"Mir ist bewusst das Rechnungen nach Abschluss für die jeweiligen Benutzer "
+"sichtbar sind."
 
 msgid "Target"
 msgstr "Ziel"

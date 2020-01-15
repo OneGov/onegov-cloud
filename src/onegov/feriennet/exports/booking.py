@@ -20,6 +20,11 @@ from sqlalchemy.orm import contains_eager, undefer
 class BookingExport(FeriennetExport):
 
     def run(self, form, session):
+        self.users = {
+            user.username: user for user in
+            session.query(User).options(undefer('*'))
+        }
+
         return self.rows(session, form.selected_period)
 
     def query(self, session, period):
@@ -57,3 +62,5 @@ class BookingExport(FeriennetExport):
         yield from self.occasion_fields(booking.occasion)
         yield from self.attendee_fields(booking.attendee)
         yield from self.user_fields(booking.attendee.user)
+        yield from self.organiser_fields(
+            self.users[booking.occasion.activity.username])

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-01-15 11:18+0100\n"
+"POT-Creation-Date: 2020-01-15 14:17+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -223,6 +223,45 @@ msgstr "Montant facture"
 
 msgid "Invoice Item References"
 msgstr "Références du poste de facture"
+
+msgid "Organiser Last Name"
+msgstr "Nom de l'organisateur"
+
+msgid "Organiser First Name"
+msgstr "Prénom de l'organisateur"
+
+msgid "Organiser Organisation"
+msgstr "Organisation de l'organisateur"
+
+msgid "Organiser Address"
+msgstr "Adresse de l'organisateur"
+
+msgid "Organiser Street"
+msgstr "Rue de l'organisateur"
+
+msgid "Organiser Street Number"
+msgstr "Numéro de rue de l'organisateur"
+
+msgid "Organiser Zipcode"
+msgstr "Code postal de l'organisateur"
+
+msgid "Organiser Location"
+msgstr "Emplacement de l'organisateur"
+
+msgid "Organiser E-Mail"
+msgstr "Courriel de l'organisateur"
+
+msgid "Organiser Phone"
+msgstr "Téléphone de l'organisateur"
+
+msgid "Organiser Website"
+msgstr "Site Web de l'organisateur"
+
+msgid "Organiser Bank Account"
+msgstr "Compte bancaire de l'organisateur"
+
+msgid "Organiser Beneficiary"
+msgstr "Bénéficiaire de l'organisateur "
 
 msgid "Wishlist / Bookings"
 msgstr "Liste des souhaits / Réservations"
