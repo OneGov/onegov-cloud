@@ -52,14 +52,18 @@ def get_base_tools(request):
             links.append(
                 Link(
                     _('Attendees'),
-                    request.class_link(CourseAttendeeCollection),
+                    request.link(CourseAttendeeCollection(
+                        request.session,
+                        auth_attendee=request.current_attendee)),
                     attrs={'class': 'attendees'}
                 )
             )
             links.append(
                 Link(
                     _('Event Subscriptions'),
-                    request.link(ReservationCollection(request.session)),
+                    request.link(ReservationCollection(
+                        request.session,
+                        auth_attendee=request.current_attendee)),
                     attrs={'class': 'reservations'}
                 )
             )
@@ -106,8 +110,11 @@ def get_base_tools(request):
             reservation_count == 1 and _("Event Subscription")
             or _("Event Subscriptions"),
             request.link(
-                ReservationCollection(request.session,
-                                      request.attendee_id),
+                ReservationCollection(
+                    request.session,
+                    attendee_id=request.attendee_id,
+                    auth_attendee=request.current_attendee
+                ),
             ),
             attrs={
                 'class': ('with-count', css),
