@@ -11,10 +11,11 @@ from sqlalchemy.orm import relationship, backref, object_session
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID, UTCDateTime
-from onegov.fsi.models.course_attendee import CourseAttendee
-from onegov.fsi.models.course_reservation import reservation_table
-from onegov.fsi.models.course_reservation import CourseReservation
 from onegov.fsi import _
+from onegov.fsi.models.course_attendee import CourseAttendee
+from onegov.fsi.models.course_reservation import CourseReservation
+from onegov.fsi.models.course_reservation import reservation_table
+from onegov.search import ORMSearchable
 
 COURSE_EVENT_STATUSES = ('created', 'confirmed', 'canceled', 'planned')
 COURSE_EVENT_STATUSES_TRANSLATIONS = (
@@ -35,13 +36,22 @@ def course_status_choices(request=None):
                                        translations))
 
 
-class CourseEvent(Base, TimestampMixin):
+class CourseEvent(Base, TimestampMixin, ORMSearchable):
 
     default_reminder_before = datetime.timedelta(days=14)
 
     __tablename__ = 'fsi_course_events'
     __table_args__ = (UniqueConstraint('start', 'end',
                                        name='_start_end_uc'),)
+
+    es_properties = {
+        'name': {'type': 'localized'},
+        'description': {'type': 'localized'},
+        'location': {'type': 'localized'},
+        'presenter_name': {'type': 'text'},
+        'presenter_company': {'type': 'text'},
+        'presenter_email': {'type': 'text'},
+    }
 
     id = Column(UUID, primary_key=True, default=uuid4)
 
@@ -52,10 +62,25 @@ class CourseEvent(Base, TimestampMixin):
         lazy='joined'
     )
 
-    # Two aliases
+    @property
+    def es_public(self):
+        return not self.hidden_from_public
+
+    @property
+    def title(self):
+        return str(self)
+
     @property
     def name(self):
         return self.course.name
+
+    @property
+    def lead(self):
+        return (
+            f'{self.location} - '
+            f'{self.presenter_name} - '
+            f'{self.presenter_company}'
+        )
 
     @property
     def description(self):

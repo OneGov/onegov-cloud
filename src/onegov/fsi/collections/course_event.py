@@ -95,7 +95,7 @@ class CourseEventCollection(GenericCollection, Pagination):
             self.model_class.scheduled_reminder > utcnow())
 
     def add(self, **kwargs):
-        course_event = super().add(**kwargs)
+        course_event = super().add(course=self.course, **kwargs)
         tc = CourseNotificationTemplateCollection(
             self.session, course_event_id=course_event.id)
         tc.auto_add_templates_if_not_existing()

@@ -16,6 +16,9 @@ class FsiApp(OrgApp):
     # daily ticket statistics.
     send_daily_ticket_statistics = False
 
+    def es_may_use_private_search(self, request):
+        return request.is_admin
+
     def configure_organisation(self, **cfg):
         cfg.setdefault('enable_user_registration', False)
         cfg.setdefault('enable_yubikey', False)

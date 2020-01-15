@@ -1,14 +1,13 @@
-from uuid import uuid4
-
-from sedate import utcnow
-from sqlalchemy import Column, Text, ForeignKey, ARRAY
-
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID, JSON
+from onegov.search import ORMSearchable
+from sedate import utcnow
+from sqlalchemy import Column, Text, ForeignKey, ARRAY
 from sqlalchemy.orm import relationship, object_session, backref
+from uuid import uuid4
 
 
-class CourseAttendee(Base):
+class CourseAttendee(Base, ORMSearchable):
     """
     Comprises the user base mirrored by one-to-one relationship with
     onegov.user.User which is linked to the LDAP System including
@@ -27,6 +26,16 @@ class CourseAttendee(Base):
     """
 
     __tablename__ = 'fsi_attendees'
+
+    es_properties = {
+        'first_name': {'type': 'text'},
+        'last_name': {'type': 'text'},
+        'organisation': {'type': 'text'},
+        'email': {'type': 'text'},
+        'title': {'type': 'text'},
+    }
+
+    es_public = False
 
     id = Column(UUID, primary_key=True, default=uuid4)
 
@@ -79,6 +88,19 @@ class CourseAttendee(Base):
         backref='attendee',
         lazy='dynamic',
         cascade='all, delete-orphan')
+
+    @property
+    def title(self):
+        return ' '.join((
+            p for p in (
+                self.first_name,
+                self.last_name,
+            ) if p
+        )) or self.email
+
+    @property
+    def lead(self):
+        return self.organisation
 
     @property
     def is_external(self):

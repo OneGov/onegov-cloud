@@ -1,26 +1,45 @@
-from uuid import uuid4
-
 from arrow import utcnow
-from sqlalchemy import Column, Text, Boolean, Interval, desc
-from sqlalchemy.ext.hybrid import hybrid_property
-
+from onegov.core.html import html_to_text
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
+from onegov.search import ORMSearchable
+from sqlalchemy import Column, Text, Boolean, Interval, desc
+from sqlalchemy.ext.hybrid import hybrid_property
+from uuid import uuid4
 
 
-class Course(Base):
+class Course(Base, ORMSearchable):
     __tablename__ = 'fsi_courses'
+
+    es_properties = {
+        'name': {'type': 'localized'},
+        'description': {'type': 'localized'},
+    }
+    es_public = True
 
     id = Column(UUID, primary_key=True, default=uuid4)
 
     name = Column(Text, nullable=False, unique=True)
-    # Long description
+
     description = Column(Text, nullable=False)
 
     refresh_interval = Column(Interval)
 
     # If the course has to be refreshed after some interval
     mandatory_refresh = Column(Boolean, nullable=False, default=False)
+
+    @property
+    def title(self):
+        return self.name
+
+    @property
+    def lead(self):
+        text = html_to_text(self.description)
+
+        if len(text) > 160:
+            return text[:160] + '…'
+        else:
+            return text
 
     @property
     def description_html(self):
