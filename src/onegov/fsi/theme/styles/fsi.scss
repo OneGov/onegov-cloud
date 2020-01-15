@@ -66,6 +66,17 @@ dd.accordion-navigation + dd.accordion-navigation {
 }
 
 /*
+    Links
+*/
+
+a.grayed-out {
+    color: darkgray;
+    &:hover {
+        color: gray;
+    }
+}
+
+/*
     Navigation
 */
 
