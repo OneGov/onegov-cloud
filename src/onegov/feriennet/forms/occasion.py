@@ -132,6 +132,9 @@ class OccasionForm(Form):
 
     @property
     def booking_cost(self):
+        if not self.administrative_cost:
+            return None
+
         if self.administrative_cost.data == 'default':
             return None
 
@@ -193,6 +196,12 @@ class OccasionForm(Form):
         self.dates.data = self.dates_to_json(self.parsed_dates)
         self.request.include('common')
         self.request.include('many')
+
+        period = self.request.app.active_period or None
+
+        if not period or period.all_inclusive:
+            self.delete_field('administrative_cost')
+            self.delete_field('administrative_cost_amount')
 
     def ensure_at_least_one_date(self):
         if not self.parsed_dates:
