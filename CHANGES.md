@@ -1,8 +1,43 @@
 # Changes
 
+## Release `2020.4`
+
+> commits: **9 / [775357c4e7...f798db4090](https://github.com/OneGov/onegov-cloud/compare/775357c4e7^...f798db4090)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.4)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🎉 **Adds organiser info to export**
+
+**`Feature`** | **[FER-840](https://issues.seantis.ch/browse/FER-840)** | **[984467b933](https://github.com/onegov/onegov-cloud/commit/984467b933a3e5809cc18675d4697ef8e90ed98c)**
+
+🐞 **Fixes some issues with booking after finalization**
+
+**`Bugfix`** | **[FER-194](https://issues.seantis.ch/browse/FER-194)** | **[4e3898085c](https://github.com/onegov/onegov-cloud/commit/4e3898085ce5f94f79b0085f9708db4996b24738)**
+
+🐞 **Fixes past periods shown**
+
+The past periods on activities were shown to people that have no
+interest in them. This fixes this issue.
+
+**`Bugfix`** | **[FER-839](https://issues.seantis.ch/browse/FER-839)** | **[1edb5d87a6](https://github.com/onegov/onegov-cloud/commit/1edb5d87a640c181c1bc13bf7f00a11c19156ca4)**
+
+🐞 **Fixes administrative costs display**
+
+The administrative costs cannot be manipulated in all_inclusive periods.
+
+**`Bugfix`** | **[FER-839](https://issues.seantis.ch/browse/FER-839)** | **[e7f80220cd](https://github.com/onegov/onegov-cloud/commit/e7f80220cd0278af0b5a26e53bced07c04c826cd)**
+
+### Fsi
+
+🎉 **Integrates search**
+
+**`Feature`** | **[e591a29189](https://github.com/onegov/onegov-cloud/commit/e591a291892a92c252f173d9e8f10a5c1885ecf0)**
+
 ## Release `2020.3`
 
-> commits: **2 / [24b4600f0f...c7bf242325](https://github.com/OneGov/onegov-cloud/compare/24b4600f0f^...c7bf242325)**<br>
+> released: **2020-01-15 09:36**<br>
+> commits: **3 / [24b4600f0f...1f801129cd](https://github.com/OneGov/onegov-cloud/compare/24b4600f0f^...1f801129cd)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.3)](https://buildkite.com/seantis/onegov-cloud)
 
 ## Release `2020.2`
