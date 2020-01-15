@@ -2,7 +2,7 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
-from sqlalchemy import Column, ARRAY, Text
+from sqlalchemy import Column, ARRAY, Text, Boolean
 
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task
@@ -84,3 +84,13 @@ def remove_course_event_uc(context):
     if context.has_table('fsi_course_events'):
         context.operations.drop_constraint(
             '_start_end_uc', 'fsi_course_events')
+
+
+@upgrade_task('Adds locked_for_subscriptions property')
+def add_event_property_locked(context):
+    if not context.has_column('fsi_course_events', 'locked_for_subscriptions'):
+        context.add_column_with_defaults(
+            'fsi_course_events',
+            Column('locked_for_subscriptions', Boolean,
+                   nullable=False, default=True),
+            default=lambda x: True)

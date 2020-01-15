@@ -140,6 +140,9 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     # hides from member roles
     hidden_from_public = Column(Boolean, nullable=False, default=False)
 
+    # to a locked event, only admin can place subscriptions
+    locked_for_subscriptions = Column(Boolean, default=False)
+
     # when before course start schedule reminder email
     schedule_reminder_before = Column(
         Interval,
@@ -194,6 +197,11 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     @property
     def is_past(self):
         return self.start < utcnow()
+
+    @property
+    def locked(self):
+        # Basically locked for non-admins
+        return self.locked_for_subscriptions or not self.bookable
 
     @property
     def duplicate_dict(self):
