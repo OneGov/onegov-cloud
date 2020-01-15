@@ -48,8 +48,8 @@
 <!--?                                            <td>${attendee.total_done_course_events.count()}</td>-->
 
                                             <tal:b tal:switch="attendee.is_external" tal:condition="layout.model.unfiltered">
-                                                <td tal:case="True">True</td>
-                                                <td tal:case="False">False
+                                                <td tal:case="True" i18n:translate>True</td>
+                                                <td tal:case="False" i18n:translate>False
                                                 </td>
                                             </tal:b>
 

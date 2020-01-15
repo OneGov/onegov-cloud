@@ -5,6 +5,7 @@ from onegov.form.fields import ChosenSelectField
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi import _
+from onegov.fsi.models import CourseAttendee
 
 
 class ReservationFormMixin:
@@ -90,11 +91,17 @@ class AddFsiReservationForm(Form, ReservationFormMixin):
         if self.model.attendee_id:
             return self.attendee_choice(self.attendee),
 
-        attendees = self.attendee_collection.query()
         if self.model.course_event_id:
             attendees = self.event.possible_bookers(
                 external_only=self.model.external_only
             )
+            att = self.request.current_attendee
+            if att.role == 'editor':
+                attendees = attendees.filter(
+                    CourseAttendee.organisation.in_(att.permissions, )
+                )
+        else:
+            attendees = self.attendee_collection.query()
         return (
             self.attendee_choice(a) for a in attendees
         ) if attendees.first() else [self.none_choice]
@@ -190,6 +197,11 @@ class EditFsiReservationForm(Form, ReservationFormMixin):
         attendees = self.model.course_event.possible_bookers(
             external_only=False
         )
+        att = self.request.current_attendee
+        if att.role == 'editor':
+            attendees = attendees.filter(
+                CourseAttendee.organisation.in_(att.permissions, )
+            )
         choices = [self.attendee_choice(self.attendee)]
         return choices + [self.attendee_choice(a) for a in attendees]
 

@@ -121,50 +121,60 @@ class CourseEventLayout(DefaultLayout):
     @cached_property
     def editbar_links(self):
 
+        add_group_links = [
+            Link(
+                _('Attendee'),
+                self.request.link(
+                    ReservationCollection(
+                        self.request.session,
+                        auth_attendee=self.request.current_attendee,
+                        course_event_id=self.model.id),
+                    name='add'
+                ),
+                attrs={'class': 'add-icon'}
+            )
+        ]
+
         if self.request.is_member:
             return []
+
         attendee_link = Link(
             _('Attendees'),
             self.request.link(self.reservation_collection),
             attrs={'class': 'reservations'}
         )
         if self.request.is_editor:
-            return [attendee_link]
+            return [
+                attendee_link,
+                LinkGroup(title=_('Add'), links=add_group_links)
+            ]
+
+        add_group_links.extend([
+            Link(
+                _('External Attendee'),
+                self.request.link(
+                    ReservationCollection(
+                        self.request.session,
+                        course_event_id=self.model.id,
+                        external_only=True),
+                    name='add'
+                ),
+                attrs={'class': 'add-external'}
+            ),
+            Link(
+                _("Placeholder"),
+                self.request.link(
+                    self.reservation_collection,
+                    name='add-placeholder'
+                ),
+                attrs={'class': 'add-placeholder'}
+            )
+        ])
 
         return [
             LinkGroup(
                 title=_('Add'),
-                links=(
-                    Link(
-                        _('Attendee'),
-                        self.request.link(
-                            ReservationCollection(
-                                self.request.session,
-                                course_event_id=self.model.id),
-                            name='add'
-                        ),
-                        attrs={'class': 'add-icon'}
-                    ),
-                    Link(
-                        _('External Attendee'),
-                        self.request.link(
-                            ReservationCollection(
-                                self.request.session,
-                                course_event_id=self.model.id,
-                                external_only=True),
-                            name='add'
-                        ),
-                        attrs={'class': 'add-external'}
-                    ),
-                    Link(
-                        _("Placeholder"),
-                        self.request.link(
-                            self.reservation_collection,
-                            name='add-placeholder'
-                        ),
-                        attrs={'class': 'add-placeholder'}
-                    ),
-                )
+                links=add_group_links
             ),
             attendee_link,
             Link(
