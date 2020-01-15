@@ -1,4 +1,6 @@
 import datetime
+from uuid import uuid4
+
 from sedate import utcnow
 
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
@@ -98,7 +100,7 @@ def test_reservation_collection_query(
 
     class authAttendee:
         role = 'admin'
-        id = 'some_id'
+        id = uuid4()
         permissions = []
 
     auth_attendee = authAttendee()
