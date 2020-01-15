@@ -1,8 +1,38 @@
 # Changes
 
+## Release `2020.2`
+
+> commits: **3 / [daf22a65f5...083ad03648](https://github.com/OneGov/onegov-cloud/compare/daf22a65f5^...083ad03648)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.2)](https://buildkite.com/seantis/onegov-cloud)
+
+### Fsi
+
+🎉 **Adds pagination to reservation collection**
+
+**`Feature`** | **[FSI-4](#FSI-4)** | **[daf22a65f5](https://github.com/onegov/onegov-cloud/commit/daf22a65f52329258ba9965f028df1321437be8e)**
+
+🎉 **Adds IMS Import scripts**
+
+Adds tested import script with cli integration for one-time import of old data base export. The documentation is withing the script.
+
+**`Feature`** | **[FSI-3](#FSI-3)** | **[8870da91d8](https://github.com/onegov/onegov-cloud/commit/8870da91d85d63ae8e1a1e5d269dc119b8caf7f4)**
+
+✨ **General application improvements**
+
+- Fixes redicret to course collection after subscription
+- Fixes choices translation on None
+- Introduces separate form for placeholder subscription
+- Hides email and shortcode if viewing own subscriptions
+- Ensure editors and admin can add subscriptions
+- Fixes editor can see his own subscriptions when seeing all
+- other minor issues
+
+**`Other`** | **[083ad03648](https://github.com/onegov/onegov-cloud/commit/083ad03648fbaa7c58657d59a3a77f7ca1a1c41a)**
+
 ## Release `2020.1`
 
-> commits: **9 / [28e219a921...824b155b16](https://github.com/OneGov/onegov-cloud/compare/28e219a921^...824b155b16)**<br>
+> released: **2020-01-14 13:18**<br>
+> commits: **10 / [28e219a921...af6edff0c7](https://github.com/OneGov/onegov-cloud/compare/28e219a921^...af6edff0c7)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.1)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
