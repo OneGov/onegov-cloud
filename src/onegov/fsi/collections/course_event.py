@@ -6,6 +6,7 @@ from onegov.core.collection import Pagination, GenericCollection
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.notification_template import \
     CourseNotificationTemplateCollection
+from onegov.fsi.models.course import Course
 from onegov.fsi.models.course_event import CourseEvent
 
 
@@ -95,7 +96,12 @@ class CourseEventCollection(GenericCollection, Pagination):
             self.model_class.scheduled_reminder > utcnow())
 
     def add(self, **kwargs):
-        course_event = super().add(course=self.course, **kwargs)
+        # store the course instead of the course_id, for Elasticsearch to
+        # properly work (which needs access to the course)
+        course = self.session.query(Course).filter_by(
+            id=kwargs['course_id']).one()
+
+        course_event = super().add(course=course, **kwargs)
         tc = CourseNotificationTemplateCollection(
             self.session, course_event_id=course_event.id)
         tc.auto_add_templates_if_not_existing()
