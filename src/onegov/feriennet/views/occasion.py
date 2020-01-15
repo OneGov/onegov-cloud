@@ -236,7 +236,7 @@ def book_occasion(self, request, form):
         # if the period has been finalized, an admin is responsible and we
         # need to create an invoice item that goes with the booking
         if self.period.finalized:
-            assert request.is_admin
+            assert request.is_admin or self.period.book_finalized
 
             bridge = BookingInvoiceBridge(request.session, self.period)
             bridge.process(booking)

@@ -305,7 +305,7 @@ class Period(Base, TimestampMixin):
         if not self.confirmed:
             return 'wishlist'
 
-        if not self.finalized and today < local(self.booking_start):
+        if today < local(self.booking_start):
             return 'inactive'
 
         if not self.finalized and local(self.booking_end) < today:
