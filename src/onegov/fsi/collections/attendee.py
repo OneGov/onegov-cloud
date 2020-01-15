@@ -14,7 +14,6 @@ class CourseAttendeeCollection(GenericCollection, Pagination):
                  auth_attendee=None,
                  editors_only=False,
                  ):
-        assert auth_attendee
         super().__init__(session)
         self.page = page
         self.exclude_external = exclude_external
@@ -60,7 +59,7 @@ class CourseAttendeeCollection(GenericCollection, Pagination):
         elif self.external_only:
             query = query.filter(CourseAttendee.user_id == None)
 
-        if self.auth_attendee.role == 'editor':
+        if self.auth_attendee and self.auth_attendee.role == 'editor':
             query = query.filter(
                 or_(CourseAttendee.organisation.in_(
                     self.attendee_permissions,),

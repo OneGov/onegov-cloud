@@ -56,7 +56,7 @@ class ReservationCollection(GenericCollection, Pagination):
 
     def query(self):
         query = super().query()
-        if self.auth_attendee.role == 'editor':
+        if self.auth_attendee and self.auth_attendee.role == 'editor':
             query = query.join(CourseAttendee)
             query = query.filter(
                 or_(CourseAttendee.organisation.in_(
