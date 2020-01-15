@@ -35,10 +35,10 @@
                     </p>
                 </div>
 
-                <tal:b define="today layout.today()" condition="occasions_by_period" repeat="(title, occasions) occasions_by_period">
+                <tal:b define="today layout.today()" condition="occasions_by_period and (request.is_admin or activity.username == request.current_username)" repeat="(title, occasions) occasions_by_period">
                     <div tal:define="period occasions[0].period" class="occasions-by-period">
                         <div class="title-with-toggle">
-                            <div class="toggle" data-toggle="#occasions-for-${period.id.hex}" tal:condition="request.is_admin or activity.username == request.current_username">
+                            <div class="toggle" data-toggle="#occasions-for-${period.id.hex}">
                                 <i class="fa fa-plus-circle toggle-on" aria-hidden="true"></i>
                                 <i class="fa fa-minus-circle toggle-off" aria-hidden="true"></i>
                             </div>
