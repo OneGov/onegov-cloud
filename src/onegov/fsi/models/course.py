@@ -1,7 +1,7 @@
 from uuid import uuid4
 
 from arrow import utcnow
-from sqlalchemy import Column, Text, Boolean, Interval
+from sqlalchemy import Column, Text, Boolean, Interval, desc
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from onegov.core.orm import Base
@@ -33,4 +33,10 @@ class Course(Base):
     @hybrid_property
     def future_events(self):
         from onegov.fsi.models import CourseEvent
-        return self.events.filter(CourseEvent.start > utcnow())
+        return self.events.filter(CourseEvent.start > utcnow()).order_by(
+            desc(CourseEvent.start))
+
+    @property
+    def sorted_events(self):
+        from onegov.fsi.models import CourseEvent
+        return self.events.order_by(desc(CourseEvent.start))

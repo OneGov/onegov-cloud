@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-01-14 11:20+0100\n"
-"PO-Revision-Date: 2019-12-13 11:47+0100\n"
+"POT-Creation-Date: 2020-01-14 17:50+0100\n"
+"PO-Revision-Date: 2020-01-14 17:51+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -18,13 +18,19 @@ msgid "Reminder for course event: ${name}"
 msgstr "Erinnerung für die Kursdurchführung: ${name}"
 
 msgid "Profile"
-msgstr "Profile"
+msgstr "Profil"
 
 msgid "User Profile"
-msgstr "Benutzer-Profile"
+msgstr "Benutzer-Profil"
 
 msgid "Logout"
 msgstr "Ausloggen"
+
+msgid "Attendees"
+msgstr "Teilnehmer"
+
+msgid "Event Subscriptions"
+msgstr "Kursanmeldungen"
 
 msgid "Files"
 msgstr "Dateien"
@@ -34,12 +40,6 @@ msgstr "Bilder"
 
 msgid "Settings"
 msgstr "Einstellungen"
-
-msgid "Attendees"
-msgstr "Teilnehmer"
-
-msgid "Event Subscriptions"
-msgstr "Kursanmeldungen"
 
 msgid "Users"
 msgstr "Benutzer"
@@ -137,6 +137,9 @@ msgstr "Email Inhalt"
 msgid "Recipients"
 msgstr "Empfänger"
 
+msgid "None"
+msgstr "Keine"
+
 msgid "Attendee"
 msgstr "Teilnehmer"
 
@@ -146,8 +149,8 @@ msgstr "Kursdurchführung"
 msgid "Placeholder Description (optional)"
 msgstr "Platzhalter-Beschreibung (optional)"
 
-msgid "None"
-msgstr "Keine"
+msgid "Placeholder Reservation"
+msgstr "Platzhalter-Reservation"
 
 msgid "New Course"
 msgstr "Neuer Kurs"
@@ -195,7 +198,7 @@ msgid "External"
 msgstr "Extern"
 
 msgid "Editors"
-msgstr "Sicherheitsverantwortliche"
+msgstr "Sicherheitsbeauftragter"
 
 msgid "Edit Profile"
 msgstr "Profil bearbeiten"
@@ -205,6 +208,9 @@ msgstr "Profil Details"
 
 msgid "Personal Profile"
 msgstr "Persönliches Profil"
+
+msgid "Add Subscription"
+msgstr "Anmeldung hinzufügen"
 
 msgid "Past Course Events"
 msgstr "Vergangene Durchführungen"
@@ -367,8 +373,14 @@ msgstr "Vorname"
 msgid "Last name"
 msgstr "Nachname"
 
+msgid "Shortcode"
+msgstr "Kürzel"
+
 msgid "Organisation Code"
 msgstr "Kürzel Organisation"
+
+msgid "Role"
+msgstr "Rolle"
 
 msgid "Total courses"
 msgstr "Total Kurse"
@@ -448,6 +460,12 @@ msgstr "Ja"
 msgid "No"
 msgstr "Nein"
 
+msgid "No events found."
+msgstr "Keine Durchführungen gefunden."
+
+msgid "Roles"
+msgstr "Rollen"
+
 msgid "Dear ${first_name} ${last_name},"
 msgstr "Sehr geehrte(r) ${first_name} ${last_name},"
 
@@ -516,10 +534,7 @@ msgid "Last Modified"
 msgstr "Zuletzt Geändert"
 
 msgid "You can only see subscriptions from attendees fitting your permissions."
-msgstr "Sie können nur Anmeldung sehen, zu dene Sie berechtigt sind."
-
-msgid "Shortcode"
-msgstr "Kürzel"
+msgstr "Sie können nur Anmeldung sehen, zu denen Sie berechtigt sind."
 
 msgid "Course Name"
 msgstr "Kursname"
@@ -577,28 +592,31 @@ msgid "No recipients and no cancellation emails sent"
 msgstr "Keine Empfänger und kein Absage-Email gesendet"
 
 msgid "E-Mail Address / Username / Shortcut"
-msgstr "E-Mail Adresse / Benutzername / Kürzel"
+msgstr "E-Mail / Benutzername / Kürzel"
 
 msgid "Send E-Mail Now"
 msgstr "Email jetzt senden"
 
-msgid "Added a new reservation"
-msgstr "Neue Reservation hinzugefügt"
+msgid "Added a new subscription"
+msgstr "Neue Anmeldung wurde hinzugefügt"
+
+msgid "Subscription already exists"
+msgstr "Anmeldung existiert bereits"
 
 msgid "Add Reservation"
 msgstr "Reservation hinzufügen"
 
-msgid "Reservation was updated"
-msgstr "Die Reservation wurde aktualisiert"
+msgid "Subscription was updated"
+msgstr "Anmeldung wurde aktualisert"
+
+msgid "Edit Subscription"
+msgstr "Anmeldung bearbeiten"
+
+msgid "Placeholder was updated"
+msgstr "Platzhalter aktualisiert"
 
 msgid "Edit Placeholder"
 msgstr "Platzhalter bearbeiten"
-
-msgid "Edit Reservation"
-msgstr "Reservation bearbeiten"
-
-msgid "Placeholder Reservation"
-msgstr "Platzhalter-Reservation"
 
 msgid "Added a new placeholder"
 msgstr "Platzhalter hinzugefügt"
@@ -611,6 +629,21 @@ msgstr "Neue Anmeldungen erfasst"
 
 msgid "Subscription successfully deleted"
 msgstr "Anmeldung erfolgreich gelöscht"
+
+#~ msgid "Time"
+#~ msgstr "Uhrzeit"
+
+#~ msgid "Edit Reservation"
+#~ msgstr "Reservation bearbeiten"
+
+#~ msgid "Added a new reservation"
+#~ msgstr "Neue Reservation hinzugefügt"
+
+#~ msgid "Reservation already exists"
+#~ msgstr "Anmeldung existiert bereits"
+
+#~ msgid "Reservation was updated"
+#~ msgstr "Die Reservation wurde aktualisiert"
 
 #~ msgid "Edit ${type} Notification Template"
 #~ msgstr "Bearbeite ${type} Email-Vorlage"

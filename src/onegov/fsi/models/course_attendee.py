@@ -63,9 +63,14 @@ class CourseAttendee(Base):
 
     def __str__(self):
         if self.first_name and self.last_name:
-            return f'{self.last_name}, {self.first_name}'
-
-        return self.email
+            text = f'{self.last_name}, {self.first_name}'
+            # if self.user and (self.user.source and self.user.source_id):
+            #     text += f' - {self.user.source_id}'
+            return text
+        mail = self.email
+        if mail:
+            return mail
+        return 'NO NAME NO EMAIL'
 
     meta = Column(JSON, nullable=True, default=dict)
 

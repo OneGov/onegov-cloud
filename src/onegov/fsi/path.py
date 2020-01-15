@@ -68,20 +68,19 @@ def get_courses(request):
              converters=dict(
                  exclude_external=bool,
                  external_only=bool,
-                 attendee_id=UUID,
                  editors_only=bool
              ))
 def get_attendees(
         request, page=0, exclude_external=False, external_only=False,
-        attendee_id=None, editors_only=False):
-    if not request.is_admin:
-        attendee_id = request.attendee_id
+        editors_only=False):
+    """This collection has permission private, so no members can see it"""
+
     return CourseAttendeeCollection(
         request.session, page,
         exclude_external=exclude_external,
         external_only=external_only,
-        attendee_id=attendee_id,
-        editors_only=editors_only
+        auth_attendee=request.current_attendee,
+        editors_only=editors_only,
     )
 
 
@@ -118,17 +117,12 @@ def get_reservations(
     elif attendee_id != request.attendee_id and not request.is_manager:
         attendee_id = request.attendee_id
 
-    att = request.current_attendee
-    permissions = att and att.permissions or []
-    role = att and att.user.role or 'member'
-
     return ReservationCollection(
         request.session,
         attendee_id=attendee_id,
         course_event_id=course_event_id,
         external_only=external_only,
-        permissions=permissions,
-        user_role=role,
+        auth_attendee=request.current_attendee,
         page=page
     )
 

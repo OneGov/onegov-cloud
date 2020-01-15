@@ -1,4 +1,6 @@
 import datetime
+from uuid import uuid4
+
 from sedate import utcnow
 
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
@@ -63,14 +65,20 @@ def test_event_collection_add_placeholder(session, course_event):
 
 
 def test_attendee_collection(session, attendee):
+
+    class authAttendee:
+        role = 'admin'
+
     attendee, data = attendee(session)
-    collection = CourseAttendeeCollection(session)
+    collection = CourseAttendeeCollection(
+        session, auth_attendee=authAttendee())
     collection_attr_eq_test(collection, collection.page_by_index(1))
 
     assert collection.query().one() == attendee
 
     # Exlude placeholders and return real users
-    collection = CourseAttendeeCollection(session, exclude_external=True)
+    collection = CourseAttendeeCollection(
+        session, exclude_external=True, auth_attendee=authAttendee())
     assert collection.query().count() == 1
 
 
@@ -90,8 +98,15 @@ def test_reservation_collection_query(
     future_course_reservation(
         session, course_event_id=event.id, attendee_id=external.id)
 
+    class authAttendee:
+        role = 'admin'
+        id = uuid4()
+        permissions = []
+
+    auth_attendee = authAttendee()
+
     # unfiltered
-    coll = ReservationCollection(session)
+    coll = ReservationCollection(session, auth_attendee=auth_attendee)
     assert coll.query().count() == 3
 
     # filter attendee
@@ -105,21 +120,21 @@ def test_reservation_collection_query(
     coll.attendee_id = None
 
     # auth attendee is passed in path.py always
-    coll.user_role = 'admin'
-    coll.permissions = admin.permissions
+    coll.auth_attendee.role = 'admin'
+    coll.auth_attendee.permissions = admin.permissions
     assert coll.query().count() == 3
 
-    coll.user_role = 'editor'
-    coll.permissions = editor.permissions
+    coll.auth_attendee.role = 'editor'
+    coll.auth_attendee.permissions = editor.permissions
     assert coll.query().count() == 0
 
     # See the ones with permission without the external reservations
     att.organisation = 'A'
-    coll.permissions = ['A']
+    coll.auth_attendee.permissions = ['A']
     assert coll.query().count() == 1
 
     # member user_role
-    coll.user_role = 'member'
+    coll.auth_attendee.role = 'member'
     # coll.attendee_id will be set in path like
     coll.attendee_id = att.id
     assert coll.query().count() == 1

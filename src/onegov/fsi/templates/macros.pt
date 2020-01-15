@@ -25,8 +25,9 @@
                     ic-trigger-on="click"
                 >
                     <a href="${'#'+ accordion_id}"><i class="fa fa-plus fa-fw" aria-hidden="true"></i> <strong>${item['title']}</strong></a>
-                    <div id="${accordion_id}" class="content page-text">
-                        <tal:b tal:switch="python:True if item.get('content_url') else False">
+                    <div id="${accordion_id}" class="content page-text" >
+                        <tal:b tal:switch="python:True if item.get('content_url') else False" tal:define="events item['events']">
+                            <tal:b metal:use-macro="layout.macros['course_event_listing']" />
                             <div tal:case="False" tal:condition="item['content']" tal:content="structure item['content']"/>
                             <div tal:case="True" id="${accordion_id + 'content'}"></div>
                         </tal:b>
@@ -138,11 +139,12 @@
     <tal:b tal:switch="events and True or False" tal:define="for_email for_email|False">
         <tal:b tal:case="True">
             <tal:b tal:condition="events">
-                <table class="tablesaw hover events-table">
+                <table class="tablesaw hover events-table fullwidth">
                     <thead>
                         <th i18n:translate class='text-left'>Date</th>
                         <th i18n:translate class='text-left'>Start</th>
                         <th i18n:translate class='text-left'>End</th>
+                        <th i18n:translate class='text-left'>Status</th>
                         <th i18n:translate class='text-left'>Presenter</th>
                         <th i18n:translate class='text-left' tal:condition="not for_email">Presenter Company</th>
                         <th i18n:translate class='text-left'>Free Space</th>
@@ -156,11 +158,13 @@
                                         <strong>${layout.format_date(event.start, 'date_long')}</strong>
                                     </a>
                                 </td>
+
                                 <td>${layout.format_date(event.start, 'time')}</td>
                                 <td>${layout.format_date(event.end, 'time')}</td>
+                                <td>${layout.format_status(event.status)}</td>
                                 <td>${event.presenter_name}</td>
                                 <td tal:condition="not for_email">${event.presenter_company}</td>
-                                <td>${event.available_seats}</td>
+                                <td class='text-right'>${event.available_seats}</td>
                                 <tal:b tal:condition="request.is_manager and not for_email" tal:switch="event.hidden_from_public">
                                     <td tal:case="True" i18n:translate>Yes</td>
                                     <td tal:case="False" i18n:translate>No</td>
@@ -171,9 +175,25 @@
                 </table>
             </tal:b>
         </tal:b>
-        <p tal:case="False" i18n:translate="">No entries found.</p>
+        <p tal:case="False" i18n:translate="">No events found.</p>
     </tal:b>
 </metal:course_event_listing>
+
+<metal:role_snippet define-macro="role_snippet">
+    <h4 i18n:translate="">Roles</h4>
+    <dl class="field-display">
+        <dt>Administrator</dt>
+        <dd>Fachstelle Sicherheit / Staatskanzlei / Seantis</dd>
+    </dl>
+    <dl class="field-display">
+        <dt>Editor</dt>
+        <dd>Sicherheitsbeauftragte/r (SIBA)</dd>
+    </dl>
+    <dl class="field-display">
+        <dt>Member</dt>
+        <dd>Miterarbeitende / Lehrpersonen / Externe</dd>
+    </dl>
+</metal:role_snippet>
 
 </body>
 </html>

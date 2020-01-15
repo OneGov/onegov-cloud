@@ -224,7 +224,7 @@ def invite_attendees_for_event(self, request, form):
 )
 def delete_course(self, request):
     request.assert_valid_csrf_token()
-    if not self.events.count():
+    if not self.events.first():
         CourseEventCollection(request.session).delete(self)
         request.success(_('Course successfully deleted'))
     else:

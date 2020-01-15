@@ -28,25 +28,6 @@ class Client(BaseClient):
         return self.login('member@example.org', global_password, to)
 
 
-def _db_mock_session_func(session):
-    # Create the fixtures with the current session
-    attendee_ = attendee(session)
-    course_event_ = course_event(session)
-
-    placeholder = CourseReservation(
-        dummy_desc='Placeholder',
-        id=uuid4(),
-        course_event_id=course_event_[0].id)
-    # Create Reservations
-    user_res = CourseReservation(
-        attendee_id=attendee_[0].id,
-        course_event_id=course_event_[0].id
-    )
-    session.add_all((placeholder, user_res))
-    session.flush()
-    return session
-
-
 @pytest.fixture(scope='session')
 def plain_password():
     return global_password

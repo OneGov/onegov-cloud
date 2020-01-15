@@ -14,7 +14,7 @@ class ReservationCollectionLayout(DefaultLayout):
 
     def link(self, reservation):
         if reservation.is_placeholder:
-            return self.request.link(reservation, name='edit')
+            return self.request.link(reservation, name='edit-placeholder')
         return self.request.link(reservation.attendee)
 
     def confirmation_link(self, reservation):
@@ -51,25 +51,33 @@ class ReservationCollectionLayout(DefaultLayout):
                 }
             )
         ]
-        if not self.request.is_admin:
+        if not self.request.is_manager:
             return links
+
+        add_links = [
+            Link(
+                _('Subscription'),
+                self.request.link(self.model, name='add'),
+                attrs={'class': 'add-icon'}
+            )
+        ]
+
+        if self.request.is_admin:
+            add_links.append(
+                Link(
+                    _('Placeholder'),
+                    self.request.link(self.model, name='add-placeholder'),
+                    attrs={'class': 'add-icon'}
+                )
+            )
+
         links.append(
             LinkGroup(
                 title=_('Add'),
-                links=[
-                    Link(
-                        _('Subscription'),
-                        self.request.link(self.model, name='add'),
-                        attrs={'class': 'add-icon'}
-                    ),
-                    Link(
-                        _('Placeholder'),
-                        self.request.link(self.model, name='add-placeholder'),
-                        attrs={'class': 'add-icon'}
-                    )
-                ]
+                links=add_links
             )
         )
+
         return links
 
     @cached_property
@@ -127,7 +135,6 @@ class ReservationCollectionLayout(DefaultLayout):
 
 
 class ReservationLayout(DefaultLayout):
-
     """ Only used for editing since it does not contain fields """
 
     @cached_property

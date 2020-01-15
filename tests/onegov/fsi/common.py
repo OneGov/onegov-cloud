@@ -2,7 +2,7 @@ import datetime
 from collections import namedtuple
 from uuid import uuid4
 
-from sedate import utcnow
+import pytz
 
 from onegov.core.crypto import hash_password
 from onegov.fsi.models import CourseAttendee, Course, CourseEvent, \
@@ -114,7 +114,7 @@ def attendee_factory(session, **kwargs):
         user_id=user.id)
     data.update(**kwargs)
     attendee = session.query(CourseAttendee).filter_by(
-        email=user.username).first()
+        **data).first()
     if not attendee:
         attendee = CourseAttendee(**data)
         session.add(attendee)
@@ -156,11 +156,12 @@ def course_factory(session, **kwargs):
 
 def course_event_factory(session, **kwargs):
     course_ = course_factory(session)
+    start = datetime.datetime(1950, 1, 1, tzinfo=pytz.utc)
     data = dict(
         course_id=course_[0].id,
         location='Room42',
-        start=utcnow() - datetime.timedelta(days=30, hours=2),
-        end=utcnow() - datetime.timedelta(days=30),
+        start=start,
+        end=start - datetime.timedelta(days=30),
         presenter_name='Presenter',
         presenter_company='Company',
         presenter_email='presenter@presenter.org',
@@ -184,12 +185,12 @@ def course_event_factory(session, **kwargs):
 
 def future_course_event_factory(session, **kwargs):
     course_ = course_factory(session)
-    in_a_week = utcnow() + datetime.timedelta(days=7)
+    in_the_future = datetime.datetime(2050, 1, 1, tzinfo=pytz.utc)
     data = dict(
         course_id=course_[0].id,
         location='Room42',
-        start=in_a_week,
-        end=in_a_week + datetime.timedelta(hours=2),
+        start=in_the_future,
+        end=in_the_future + datetime.timedelta(hours=2),
         presenter_name='Presenter',
         presenter_company='Company',
         presenter_email='presenter@presenter.org',
@@ -244,14 +245,18 @@ def future_course_reservation_factory(session, **kwargs):
 
 def db_mock(session):
     # Create the fixtures with the current session
-    attendee, data = attendee_factory(session)
+
+    in_the_future = datetime.datetime(2060, 1, 1, tzinfo=pytz.utc)
+
+    attendee, data = attendee_factory(session, organisation='ORG')
     planner, data = planner_factory(session)
-    planner_editor, data = planner_editor_factory(session)
+    planner_editor, data = planner_editor_factory(session, permissions=['ORG'])
     course_event, data = course_event_factory(session)
     future_course_event, data = future_course_event_factory(session)
     empty_course_event, data = future_course_event_factory(
         session,
-        start=utcnow() + datetime.timedelta(days=4),
+        start=in_the_future,
+        end=in_the_future + datetime.timedelta(hours=8),
         location='Empty'
     )
 

@@ -6,8 +6,8 @@
         <div class="row">
             <div class="columns small-12">
                 <div class="row">
-                    <div class="columns small-12">
-                        <tal:b tal:condition="model|nothong">
+                    <div class="columns small-12 medium-6">
+                        <tal:b tal:condition="model|nothing">
                             <dl class="field-display">
                                 <dt i18n:translate>E-Mail</dt>
                                 <dd>${model.email}</dd>
@@ -20,9 +20,18 @@
                                 <dt i18n:translate>Last name</dt>
                                 <dd>${model.last_name}</dd>
                             </dl>
+                            <dl class="field-display" tal:condition="model.user and model.user.source_id">
+                                <dt i18n:translate>Shortcode</dt>
+                                <dd>${model.user.source_id}</dd>
+                            </dl>
                             <dl class="field-display" tal:condition="model.organisation">
                                 <dt i18n:translate>Organisation Code</dt>
                                 <dd>${model.organisation}</dd>
+                            </dl>
+
+                            <dl class="field-display" tal:condition="model.role">
+                                <dt i18n:translate>Role</dt>
+                                <dd>${model.role.capitalize()}</dd>
                             </dl>
 
                             <dl class="field-display" tal:condition="model.permissions">
@@ -43,6 +52,11 @@
                                 <dd>${model.undone_registered_courses.count()}</dd>
                             </dl>
                        </tal:b>
+                    </div>
+                    <div class="columns small-12 medium-6">
+                        <div class="info-panel">
+                            <metal:b use-macro="layout.macros['role_snippet']" />
+                        </div>
                     </div>
                 </div>
             </div>

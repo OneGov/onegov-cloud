@@ -11,14 +11,14 @@ class CourseAttendeeCollection(GenericCollection, Pagination):
                  page=0,
                  exclude_external=False,
                  external_only=False,
-                 attendee_id=None,
-                 editors_only=False
+                 auth_attendee=None,
+                 editors_only=False,
                  ):
         super().__init__(session)
         self.page = page
         self.exclude_external = exclude_external
         self.external_only = external_only
-        self.attendee_id = attendee_id
+        self.auth_attendee = auth_attendee
         self.editors_only = editors_only
 
     @property
@@ -45,11 +45,9 @@ class CourseAttendeeCollection(GenericCollection, Pagination):
 
     @property
     def attendee_permissions(self):
-        if self.attendee_id:
-            return self.session.query(
-                CourseAttendee).filter_by(
-                id=self.attendee_id).one().permissions
-        return None
+        if self.auth_attendee:
+            return self.auth_attendee.permissions or []
+        return []
 
     def query(self):
 
@@ -61,7 +59,7 @@ class CourseAttendeeCollection(GenericCollection, Pagination):
         elif self.external_only:
             query = query.filter(CourseAttendee.user_id == None)
 
-        if self.attendee_permissions is not None:
+        if self.auth_attendee.role == 'editor':
             query = query.filter(
                 CourseAttendee.organisation.in_(self.attendee_permissions,)
             )
@@ -84,7 +82,10 @@ class CourseAttendeeCollection(GenericCollection, Pagination):
     def page_by_index(self, index):
         return self.__class__(
             self.session, index,
-            exclude_external=self.exclude_external
+            exclude_external=self.exclude_external,
+            external_only=self.external_only,
+            auth_attendee=self.auth_attendee,
+            editors_only=self.editors_only
         )
 
     def add_from_user(self, user):
@@ -96,3 +97,6 @@ class CourseAttendeeCollection(GenericCollection, Pagination):
             email=user.username,
         )
         self.add(**data)
+
+    def by_id(self, id):
+        return super().query().filter(self.primary_key == id).first()

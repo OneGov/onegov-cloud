@@ -1,8 +1,9 @@
-from onegov.core.security import Personal, Secret
+from onegov.core.security import Personal, Secret, Private
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.forms.reservation import AddFsiReservationForm, \
-    EditFsiReservationForm
+    EditFsiReservationForm, EditFsiPlaceholderReservationForm, \
+    AddFsiPlaceholderReservationForm
 from onegov.fsi.layouts.reservation import ReservationLayout, \
     ReservationCollectionLayout
 from onegov.fsi.models import CourseReservation
@@ -28,14 +29,25 @@ def view_reservations(self, request):
     template='form.pt',
     name='add',
     form=AddFsiReservationForm,
-    permission=Secret
+    permission=Private
 )
 def view_add_reservation(self, request, form):
     layout = ReservationCollectionLayout(self, request)
 
     if form.submitted(request):
-        self.add(**form.get_useful_data())
-        request.success(_("Added a new reservation"))
+        data = form.get_useful_data()
+        course_id = data['course_event_id']
+        attendee_id = data['attendee_id']
+        existing = request.session.query(CourseReservation).filter_by(
+            course_event_id=course_id,
+            attendee_id=attendee_id
+        ).first()
+
+        if not existing:
+            self.add(**data)
+            request.success(_("Added a new subscription"))
+        else:
+            request.warning(_('Subscription already exists'))
         return request.redirect(request.link(self))
 
     return {
@@ -55,23 +67,65 @@ def view_add_reservation(self, request, form):
 )
 def view_edit_reservation(self, request, form):
     layout = ReservationLayout(self, request)
+    assert not self.is_placeholder
 
     if form.submitted(request):
-        form.update_model(self)
-        request.success(_("Reservation was updated"))
-        return request.redirect(request.link(ReservationCollection(
+        data = form.get_useful_data()
+        coll = ReservationCollection(
             request.session,
-            course_event_id=self.id,
-            attendee_id=self.attendee_id
-        )))
-    title = _('Edit Placeholder') if self.is_placeholder \
-        else _('Edit Reservation')
+            attendee_id=data['attendee_id'],
+            course_event_id=data['course_event_id'],
+            auth_attendee=request.current_attendee
+        )
+        res_existing = coll.query().first()
+        if not res_existing:
+            form.update_model(self)
+            request.success(_("Subscription was updated"))
+            return request.redirect(request.link(ReservationCollection(
+                request.session,
+                course_event_id=self.course_event_id,
+                attendee_id=self.attendee_id
+            )))
+        else:
+            request.warning(_('Subscription already exists'))
+            return request.redirect(request.link(self))
 
     if not form.errors:
         form.apply_model(self)
 
     return {
-        'title': title,
+        'title': _('Edit Subscription'),
+        'model': self,
+        'layout': layout,
+        'form': form,
+        'button_text': _('Update')
+    }
+
+
+@FsiApp.form(
+    model=CourseReservation,
+    template='form.pt',
+    name='edit-placeholder',
+    form=EditFsiPlaceholderReservationForm,
+    permission=Secret
+)
+def view_edit_placeholder_reservation(self, request, form):
+    layout = ReservationLayout(self, request)
+    assert self.is_placeholder
+
+    if form.submitted(request):
+        form.update_model(self)
+        request.success(_("Placeholder was updated"))
+        return request.redirect(request.link(ReservationCollection(
+            request.session,
+            course_event_id=self.course_event_id,
+        )))
+
+    if not form.errors:
+        form.apply_model(self)
+
+    return {
+        'title': _('Edit Placeholder'),
         'model': self,
         'layout': layout,
         'form': form,
@@ -83,7 +137,7 @@ def view_edit_reservation(self, request, form):
     model=ReservationCollection,
     template='form.pt',
     name='add-placeholder',
-    form=AddFsiReservationForm,
+    form=AddFsiPlaceholderReservationForm,
     permission=Secret
 )
 def view_add_reservation_placeholder(self, request, form):
@@ -92,9 +146,9 @@ def view_add_reservation_placeholder(self, request, form):
     if form.submitted(request):
         data = form.get_useful_data()
         default_desc = request.translate(_('Placeholder Reservation'))
-        desc = data.setdefault('dummy_desc', default_desc)
-        if not desc:
+        if not data.get('dummy_desc'):
             data['dummy_desc'] = default_desc
+
         self.add(**data)
         request.success(_("Added a new placeholder"))
         return request.redirect(request.link(self))
