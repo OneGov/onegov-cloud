@@ -33,18 +33,18 @@
         fr: sponsors/concordia-banner-fr.jpg
         it: sponsors/concordia-banner-it.jpg
       url:
-        de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner-fn191hj-0-0-fnet-de'
-        fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-fn191hj-0-0-fnet-fr'
-        it: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-fn191hj-0-0-fnet-fr'
+        de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=web-feriennet-0-0-fnet-de'
+        fr: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=web-feriennet-0-0-fnet-fr'
+        it: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=web-feriennet-0-0-fnet-it'
     invoices:
       src:
         de: sponsors/concordia-banner-de.jpg
         fr: sponsors/concordia-banner-fr.jpg
         it: sponsors/concordia-banner-it.jpg
       url:
-        de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=banner-rgfn191hj-0-0-fnet-de'
-        fr: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-rgfn191hj-0-0-fnet-fr'
-        it: 'https://www.concordia.ch/fr/microsites/feriennet.html?cocid=banner-rgfn191hj-0-0-fnet-fr'
+        de: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=web-feriennet-0-0-fnet-de'
+        fr: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=web-feriennet-0-0-fnet-fr'
+        it: 'https://www.concordia.ch/de/microsites/feriennet.html?cocid=web-feriennet-0-0-fnet-it'
 
 - name: CREDIT SUISSE
   logo_url:
