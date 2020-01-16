@@ -39,18 +39,36 @@ class CourseAttendeeCollectionLayout(DefaultLayout):
         return links
 
     @cached_property
+    def collection(self):
+        return CourseAttendeeCollection(
+            self.request.session, auth_attendee=self.request.current_attendee
+        )
+
+    @cached_property
+    def collection_externals(self):
+        return CourseAttendeeCollection(
+            self.request.session, auth_attendee=self.request.current_attendee,
+            external_only=True
+        )
+
+    @cached_property
+    def collection_editors(self):
+        return CourseAttendeeCollection(
+            self.request.session, auth_attendee=self.request.current_attendee,
+            editors_only=True
+        )
+
+    @cached_property
     def menu(self):
         if not self.request.is_admin:
             # Hide menu for editor since filtered by permissions
             return []
         return [
-            (_('All'), self.request.class_link(CourseAttendeeCollection),
+            (_('All'), self.request.link(self.collection),
              self.model.unfiltered),
-            (_('External'), self.request.link(CourseAttendeeCollection(
-                self.request.session, external_only=True)),
+            (_('External'), self.request.link(self.collection_externals),
              self.model.external_only),
-            (_('Editors'), self.request.link(CourseAttendeeCollection(
-                self.request.session, editors_only=True)),
+            (_('Editors'), self.request.link(self.collection_editors),
              self.model.editors_only)
         ]
 
@@ -64,13 +82,18 @@ class CourseAttendeeLayout(DefaultLayout):
         return _('Profile Details')
 
     @cached_property
+    def collection(self):
+        return CourseAttendeeCollection(
+            self.request.session, auth_attendee=self.request.current_attendee)
+
+    @cached_property
     def breadcrumbs(self):
         links = super().breadcrumbs
         if self.request.is_manager:
             links.append(
                 Link(
                     _('Manage Course Attendees'),
-                    self.request.class_link(CourseAttendeeCollection)
+                    self.request.link(self.collection)
                 )
             )
         links.append(
@@ -89,7 +112,8 @@ class CourseAttendeeLayout(DefaultLayout):
                 Link(
                     _('Add Subscription'),
                     self.request.link(ReservationCollection(
-                        self.request.session, attendee_id=self.model.id),
+                        self.request.session, attendee_id=self.model.id,
+                        auth_attendee=self.request.current_attendee),
                         name='add'),
                     attrs={'class': 'add-icon'}
                 )
@@ -98,15 +122,14 @@ class CourseAttendeeLayout(DefaultLayout):
             links.append(
                 Link(
                     _('Edit Profile'),
-                    url=self.request.link(self.model, name='edit'),
+                    self.request.link(self.model, name='edit'),
                     attrs={'class': 'edit-link'}
                 )
             )
             links.append(
                 Link(
                     _('Add External Attendee'),
-                    url=self.request.class_link(
-                        CourseAttendeeCollection, name='add-external'),
+                    self.request.link(self.collection, name='add-external'),
                     attrs={'class': 'add-external'}
                 )
             )
