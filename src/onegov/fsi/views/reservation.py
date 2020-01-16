@@ -83,6 +83,7 @@ def view_edit_reservation(self, request, form):
             request.success(_("Subscription was updated"))
             return request.redirect(request.link(ReservationCollection(
                 request.session,
+                auth_attendee=request.current_attendee,
                 course_event_id=self.course_event_id,
                 attendee_id=self.attendee_id
             )))
@@ -119,6 +120,7 @@ def view_edit_placeholder_reservation(self, request, form):
         return request.redirect(request.link(ReservationCollection(
             request.session,
             course_event_id=self.course_event_id,
+            auth_attendee=request.current_attendee
         )))
 
     if not form.errors:
@@ -189,7 +191,8 @@ def view_add_from_course_event(self, request):
 )
 def view_delete_reservation(self, request):
     request.assert_valid_csrf_token()
-    ReservationCollection(request.session).delete(self)
+    ReservationCollection(
+        request.session, auth_attendee=request.current_attendee).delete(self)
     request.success(_('Subscription successfully deleted'))
 
 

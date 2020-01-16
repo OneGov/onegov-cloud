@@ -87,7 +87,8 @@ class CourseEventLayout(DefaultLayout):
     def reservation_collection(self):
         return ReservationCollection(
             self.request.session,
-            course_event_id=self.model.id
+            course_event_id=self.model.id,
+            auth_attendee=self.request.current_attendee
         )
 
     @cached_property
@@ -155,6 +156,7 @@ class CourseEventLayout(DefaultLayout):
                 self.request.link(
                     ReservationCollection(
                         self.request.session,
+                        auth_attendee=self.request.current_attendee,
                         course_event_id=self.model.id,
                         external_only=True),
                     name='add'
@@ -247,6 +249,7 @@ class CourseEventLayout(DefaultLayout):
                 self.request.link(
                     ReservationCollection(
                         self.request.session,
+                        auth_attendee=self.request.current_attendee,
                         course_event_id=self.model.id,
                         attendee_id=self.request.attendee_id
                     ),

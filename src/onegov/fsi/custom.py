@@ -53,8 +53,7 @@ def get_base_tools(request):
                 Link(
                     _('Attendees'),
                     request.link(CourseAttendeeCollection(
-                        request.session,
-                        auth_attendee=request.current_attendee)),
+                        request.session, auth_attendee=usr)),
                     attrs={'class': 'attendees'}
                 )
             )
@@ -62,8 +61,7 @@ def get_base_tools(request):
                 Link(
                     _('Event Subscriptions'),
                     request.link(ReservationCollection(
-                        request.session,
-                        auth_attendee=request.current_attendee)),
+                        request.session, auth_attendee=usr)),
                     attrs={'class': 'reservations'}
                 )
             )
@@ -113,7 +111,7 @@ def get_base_tools(request):
                 ReservationCollection(
                     request.session,
                     attendee_id=request.attendee_id,
-                    auth_attendee=request.current_attendee
+                    auth_attendee=usr
                 ),
             ),
             attrs={
@@ -155,11 +153,6 @@ def get_top_navigation(request):
         text=_("Courses"),
         url=request.class_link(CourseCollection)
     )
-
-    # yield Link(
-    #     text=_("Upcoming Course Events"),
-    #     url=request.link(CourseEventCollection.latest(request.app.session()))
-    # )
 
     layout = DefaultLayout(request.app.org, request)
     yield from layout.top_navigation

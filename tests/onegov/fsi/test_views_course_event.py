@@ -45,6 +45,7 @@ def test_edit_course_event(client_with_db):
     new.form['min_attendees'] = 2
     new.form['max_attendees'] = 3
     new.form['hidden_from_public'] = True
+    new.form['locked_for_subscriptions'] = True
     page = new.form.submit().follow()
 
     assert 'New Loc' in page
