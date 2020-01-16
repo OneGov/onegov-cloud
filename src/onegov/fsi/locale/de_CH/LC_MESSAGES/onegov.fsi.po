@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-01-15 11:05+0100\n"
-"PO-Revision-Date: 2020-01-15 11:05+0100\n"
+"POT-Creation-Date: 2020-01-16 08:19+0100\n"
+"PO-Revision-Date: 2020-01-16 08:19+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -106,6 +106,9 @@ msgstr "Referent Email"
 
 msgid "Hidden"
 msgstr "Versteckt"
+
+msgid "Locked for Subscriptions"
+msgstr "Für Anmeldungen gesperrt"
 
 msgid "Course Start"
 msgstr "Kurs-Start"
@@ -412,8 +415,8 @@ msgstr "Details"
 msgid "Registered"
 msgstr "Angemeldet"
 
-msgid "This course event can't be booked anymore."
-msgstr "Dieser Kurs kann nicht mehr gebucht werden."
+msgid "This course event can't be booked (anymore)."
+msgstr "Diese Durchführung kann (nicht) mehr gebucht werden."
 
 msgid "No entries found."
 msgstr "Keine Einträge gefunden."
@@ -459,6 +462,9 @@ msgstr "Verbleibende Plätze"
 
 msgid "Description:"
 msgstr "Beschreibung:"
+
+msgid "Locked"
+msgstr "Gesperrt"
 
 msgid "Yes"
 msgstr "Ja"
@@ -635,6 +641,9 @@ msgstr "Neue Anmeldungen erfasst"
 
 msgid "Subscription successfully deleted"
 msgstr "Anmeldung erfolgreich gelöscht"
+
+#~ msgid "This course event can't be booked anymore."
+#~ msgstr "Dieser Kurs kann nicht mehr gebucht werden."
 
 #~ msgid "Time"
 #~ msgstr "Uhrzeit"
