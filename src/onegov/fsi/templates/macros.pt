@@ -125,7 +125,12 @@
         <dt i18n:translate="">Status</dt>
         <dd>${layout.format_status(model.status)}</dd>
         <div class="clearfix"></div>
-    </dl>
+      </dl>
+      <dl class="field-display" tal:condition="not: for_email|False and request.is_manager">
+        <dt i18n:translate="">Locked for Subscriptions</dt>
+        <dd>${layout.format_boolean(model.locked_for_subscriptions)}</dd>
+        <div class="clearfix"></div>
+      </dl>
 </metal:course_event>
 
 <metal:course define-macro="course_details">

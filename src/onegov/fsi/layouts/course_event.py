@@ -6,7 +6,7 @@ from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.collections.notification_template import \
     CourseNotificationTemplateCollection
 from onegov.fsi.collections.reservation import ReservationCollection
-from onegov.fsi.layout import DefaultLayout
+from onegov.fsi.layout import DefaultLayout, FormatMixin
 from onegov.fsi import _
 
 
@@ -62,7 +62,7 @@ class CourseEventCollectionLayout(DefaultLayout):
         return links
 
 
-class CourseEventLayout(DefaultLayout):
+class CourseEventLayout(DefaultLayout, FormatMixin):
 
     @cached_property
     def title(self):
