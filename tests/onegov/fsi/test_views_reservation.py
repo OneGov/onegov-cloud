@@ -5,7 +5,6 @@ from onegov.fsi.models import CourseReservation, CourseAttendee, CourseEvent, \
 from onegov.user import User
 
 
-@pytest.mark.skip('Webstest ES configuration issue')
 def test_locked_course_event_reservations(client_with_db):
     client = client_with_db
     client.login_admin()
@@ -24,10 +23,20 @@ def test_locked_course_event_reservations(client_with_db):
     page.form['max_attendees'] = 20
     # goes to the event created
     new = page.form.submit().follow()
+    assert 'Eine neue Durchführung wurde hinzugefügt' in new
 
-    # Hinzufügen - Teilnehmer
-    add_subscription = new.click('Teilnehmer', href='attendees')
-    page = add_subscription.form.submit()
+    client.login_editor()
+    # Hinzufügen - Teilnehmer als editor
+    add_subscription = new.click('Teilnehmer', href='reservations', index=0)
+    page = add_subscription.form.submit().follow()
+    assert 'Neue Anmeldung wurde hinzugefügt' not in page
+    assert 'Diese Durchführung kann (nicht) mehr gebucht werden.' in page
+
+    client.login_admin()
+    add_subscription = new.click('Teilnehmer', href='reservations', index=0)
+    page = add_subscription.form.submit().follow()
+    assert 'Neue Anmeldung wurde hinzugefügt' in page
+    assert 'Diese Durchführung kann (nicht) mehr gebucht werden.' not in page
 
 
 def test_reservation_collection_view(client_with_db):
