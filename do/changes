@@ -139,7 +139,7 @@ class ChangelogCommit(object):
         if link.startswith('FW-'):
             return f'https://stadt-winterthur.atlassian.net/browse/{link}'
 
-        if link.startswith('ZW-'):
+        if link.startswith(('ZW-', 'FSI-')):
             return f'https://kanton-zug.atlassian.net/browse/{link}'
 
         if link.startswith('ONEGOV-CLOUD-'):
