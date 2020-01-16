@@ -66,7 +66,7 @@ class ReservationCollection(GenericCollection, Pagination):
                 or_(CourseAttendee.organisation.in_(
                     self.auth_attendee.permissions, ),
                     CourseReservation.attendee_id == self.auth_attendee.id)
-                )
+            )
         if self.attendee_id:
             # Always set in path for members to their own
             query = query.filter(
