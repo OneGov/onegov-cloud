@@ -139,6 +139,9 @@ class CourseEventLayout(DefaultLayout, FormatMixin):
         if self.request.is_member:
             return []
 
+        if self.request.is_editor and self.model.locked:
+            return []
+
         attendee_link = Link(
             _('Attendees'),
             self.request.link(self.reservation_collection),
