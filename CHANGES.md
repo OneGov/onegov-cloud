@@ -1,8 +1,32 @@
 # Changes
 
+## Release `2020.5`
+
+> commits: **2 / [0e6ae7daf1...303612192e](https://github.com/OneGov/onegov-cloud/compare/0e6ae7daf1^...303612192e)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.5)](https://buildkite.com/seantis/onegov-cloud)
+
+### Fsi
+
+🎉 **Adds event locking for subscriptions**
+
+Only admins should be able add subscriptions for locked course events.
+Adds property `locked_for_subscriptions` to `CourseEvent` and adapts form.
+Introduces checks for reservation adding/editing in views.
+
+**`Feature`** | **[FSI-6](#FSI-6)** | **[303612192e](https://github.com/onegov/onegov-cloud/commit/303612192ef9108a9e4e21ef5548904e702a8442)**
+
+🐞 **Fixes editor subscription capabilities**
+
+- Editor can place reservations for attendees from his departement (in permissions)
+- Fixes links and Dropdown-Choices for editors
+- Fixes Editor Message he cant see all the records
+
+**`Bugfix`** | **[FSI-7](#FSI-7)** | **[0e6ae7daf1](https://github.com/onegov/onegov-cloud/commit/0e6ae7daf1a0bd93bd6c08b35f5fa3e749ce0f19)**
+
 ## Release `2020.4`
 
-> commits: **9 / [775357c4e7...f798db4090](https://github.com/OneGov/onegov-cloud/compare/775357c4e7^...f798db4090)**<br>
+> released: **2020-01-15 16:29**<br>
+> commits: **10 / [775357c4e7...16cf983b8d](https://github.com/OneGov/onegov-cloud/compare/775357c4e7^...16cf983b8d)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.4)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
