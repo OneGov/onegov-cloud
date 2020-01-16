@@ -1,6 +1,42 @@
+import pytest
 from onegov.fsi.collections.course_event import CourseEventCollection
-from onegov.fsi.models import CourseReservation, CourseAttendee, CourseEvent
+from onegov.fsi.models import CourseReservation, CourseAttendee, CourseEvent, \
+    Course
 from onegov.user import User
+
+
+def test_locked_course_event_reservations(client_with_db):
+    client = client_with_db
+    client.login_admin()
+    session = client.app.session()
+    course = session.query(Course).first()
+
+    # Add a new course event
+    page = client.get(f'/fsi/events/add?course_id={course.id}')
+    page.form['presenter_name'] = 'Presenter'
+    page.form['presenter_company'] = 'Presenter'
+    page.form['presenter_email'] = 'presenter@example.org'
+    page.form['locked_for_subscriptions'] = True
+    page.form['start'] = '2050-10-04 10:00:00'
+    page.form['end'] = '2050-10-04 12:00:00'
+    page.form['location'] = 'location'
+    page.form['max_attendees'] = 20
+    # goes to the event created
+    new = page.form.submit().follow()
+    assert 'Eine neue Durchführung wurde hinzugefügt' in new
+
+    client.login_editor()
+    # Hinzufügen - Teilnehmer als editor
+    add_subscription = new.click('Teilnehmer', href='reservations', index=0)
+    page = add_subscription.form.submit().follow()
+    assert 'Neue Anmeldung wurde hinzugefügt' not in page
+    assert 'Diese Durchführung kann (nicht) mehr gebucht werden.' in page
+
+    client.login_admin()
+    add_subscription = new.click('Teilnehmer', href='reservations', index=0)
+    page = add_subscription.form.submit().follow()
+    assert 'Neue Anmeldung wurde hinzugefügt' in page
+    assert 'Diese Durchführung kann (nicht) mehr gebucht werden.' not in page
 
 
 def test_reservation_collection_view(client_with_db):

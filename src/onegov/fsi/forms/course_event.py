@@ -45,6 +45,11 @@ class CourseEventForm(Form):
         default=False,
     )
 
+    locked_for_subscriptions = BooleanField(
+        label=_("Locked for Subscriptions"),
+        default=False,
+    )
+
     # Course Event info
     start = TimezoneDateTimeField(
         label=_('Course Start'),
@@ -106,6 +111,7 @@ class CourseEventForm(Form):
         self.presenter_company.data = model.presenter_company
         self.presenter_email.data = model.presenter_email
         self.hidden_from_public.data = model.hidden_from_public
+        self.locked_for_subscriptions = model.locked_for_subscriptions
 
         self.start.data = model.start
         self.end.data = model.end
@@ -119,6 +125,7 @@ class CourseEventForm(Form):
         model.presenter_company = self.presenter_company.data
         model.presenter_email = self.presenter_email.data
         model.hidden_from_public = self.hidden_from_public.data
+        model.locked_for_subscriptions = self.locked_for_subscriptions.data
 
         model.start = self.start.data
         model.end = self.end.data

@@ -54,6 +54,10 @@ class ReservationCollection(GenericCollection, Pagination):
             auth_attendee=self.auth_attendee
         )
 
+    @property
+    def for_himself(self):
+        return str(self.auth_attendee.id) == str(self.attendee_id)
+
     def query(self):
         query = super().query()
         if self.auth_attendee and self.auth_attendee.role == 'editor':
