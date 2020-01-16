@@ -6,7 +6,7 @@ from onegov.fsi.forms.reservation import AddFsiReservationForm, \
     AddFsiPlaceholderReservationForm
 from onegov.fsi.layouts.reservation import ReservationLayout, \
     ReservationCollectionLayout
-from onegov.fsi.models import CourseReservation
+from onegov.fsi.models import CourseReservation, CourseEvent
 from onegov.fsi import _
 from onegov.fsi.views.notifcations import handle_send_email
 
@@ -36,16 +36,23 @@ def view_add_reservation(self, request, form):
 
     if form.submitted(request):
         data = form.get_useful_data()
-        course_id = data['course_event_id']
+        event_id = data['course_event_id']
         attendee_id = data['attendee_id']
         existing = request.session.query(CourseReservation).filter_by(
-            course_event_id=course_id,
+            course_event_id=event_id,
             attendee_id=attendee_id
         ).first()
 
         if not existing:
-            self.add(**data)
-            request.success(_("Added a new subscription"))
+            course_event = request.session.query(CourseEvent).filter_by(
+                id=event_id).first()
+            if course_event.locked and not request.is_admin:
+                request.warning(
+                    _("This course event can't be booked (anymore)."))
+                return request.redirect(request.link(self))
+            else:
+                self.add(**data)
+                request.success(_("Added a new subscription"))
         else:
             request.warning(_('Subscription already exists'))
         return request.redirect(request.link(self))
@@ -71,14 +78,22 @@ def view_edit_reservation(self, request, form):
 
     if form.submitted(request):
         data = form.get_useful_data()
+        event_id = data['course_event_id']
         coll = ReservationCollection(
             request.session,
             attendee_id=data['attendee_id'],
-            course_event_id=data['course_event_id'],
+            course_event_id=event_id,
             auth_attendee=request.current_attendee
         )
         res_existing = coll.query().first()
         if not res_existing:
+            course_event = request.session.query(CourseEvent).filter_by(
+                id=event_id).first()
+            if course_event.locked and not request.is_admin:
+                request.warning(
+                    _("This course event can't be booked (anymore)."))
+                return request.redirect(request.link(self))
+
             form.update_model(self)
             request.success(_("Subscription was updated"))
             return request.redirect(request.link(ReservationCollection(
@@ -147,6 +162,14 @@ def view_add_reservation_placeholder(self, request, form):
 
     if form.submitted(request):
         data = form.get_useful_data()
+        event_id = data['course_event_id']
+        course_event = request.session.query(CourseEvent).filter_by(
+            id=event_id).first()
+        if course_event.locked and not request.is_admin:
+            request.warning(
+                _("This course event can't be booked (anymore)."))
+            return request.redirect(request.link(self))
+
         default_desc = request.translate(_('Placeholder Reservation'))
         if not data.get('dummy_desc'):
             data['dummy_desc'] = default_desc

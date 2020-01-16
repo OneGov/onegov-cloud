@@ -22,6 +22,11 @@ class ReservationCollectionLayout(DefaultLayout):
             self.request.link(reservation, name='toggle-confirm'))
 
     @cached_property
+    def course_event(self):
+        event_id = self.model.course_event_id
+        return self.model.by_id(event_id) if event_id else None
+
+    @cached_property
     def title(self):
         if self.request.view_name == 'add':
             return _('Add Attendee')
