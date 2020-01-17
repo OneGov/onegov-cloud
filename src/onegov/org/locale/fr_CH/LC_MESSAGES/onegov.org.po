@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-11-25 10:08+0100\n"
+"POT-Creation-Date: 2020-01-17 08:56+0100\n"
 "PO-Revision-Date: 2019-02-18 06:40+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -358,6 +358,27 @@ msgstr "Remplacer toutes les entrées"
 msgid "Import"
 msgstr "Imprimer"
 
+msgid "Art"
+msgstr "Art"
+
+msgid "Cinema"
+msgstr "Cinéma"
+
+msgid "Concert"
+msgstr "Concert"
+
+msgid "Congress"
+msgstr "Congrès"
+
+msgid "Culture"
+msgstr "Culture"
+
+msgid "Dancing"
+msgstr "Dansant"
+
+msgid "Education"
+msgstr "Éducation"
+
 msgid "Exhibition"
 msgstr "Exposition"
 
@@ -367,23 +388,20 @@ msgstr "Gastronomie"
 msgid "Health"
 msgstr "Santé"
 
-msgid "Cinema"
-msgstr "Cinéma"
-
-msgid "Congress"
-msgstr "Congrès"
-
-msgid "Concert"
-msgstr "Concert"
-
-msgid "Art"
-msgstr "Art"
+msgid "Library"
+msgstr "Bibliothèque"
 
 msgid "Literature"
 msgstr "Littérature"
 
 msgid "Market"
 msgstr "Marché"
+
+msgid "Meetup"
+msgstr "Rencontre"
+
+msgid "Music School"
+msgstr "École de musique"
 
 msgid "Music"
 msgstr "Musique"
@@ -400,17 +418,23 @@ msgstr "Religion"
 msgid "Sports"
 msgstr "Sports"
 
-msgid "Dancing"
-msgstr "Dansant"
+msgid "Talk"
+msgstr "Conférence"
 
 msgid "Theater"
 msgstr "Théâtre"
 
-msgid "Meetup"
-msgstr "Rencontre"
+msgid "Tourism"
+msgstr "Tourisme"
 
-msgid "Talk"
-msgstr "Conférence"
+msgid "Toy Library"
+msgstr "Bibliothèque de jouets"
+
+msgid "Tradition"
+msgstr "Tradition"
+
+msgid "Youth"
+msgstr "Jeunesse"
 
 msgid "Submitter"
 msgstr "Auteur"

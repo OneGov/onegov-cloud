@@ -2462,8 +2462,8 @@ def test_submit_event(client):
     assert "My event is an event." in preview_page
     assert "Location" in preview_page
     assert "Ausstellung" in preview_page
+    assert "Bibliothek" in preview_page
     assert "The Organizer" in preview_page
-    assert "Gastronomie" in preview_page
     assert "{} 18:00 - 22:00".format(
         babel.dates.format_date(
             start_date, format='d. MMMM yyyy', locale='de'
@@ -2520,7 +2520,7 @@ def test_submit_event(client):
     assert "Location" in ticket_page
     assert "The Organizer" in ticket_page
     assert "Ausstellung" in ticket_page
-    assert "Gastronomie" in ticket_page
+    assert "Bibliothek" in ticket_page
 
     assert "{} 18:00 - 22:00".format(
         babel.dates.format_date(
@@ -2549,7 +2549,7 @@ def test_submit_event(client):
     assert "My event is an event." in message
     assert "Location" in message
     assert "Ausstellung" in message
-    assert "Gastronomie" in message
+    assert "Bibliothek" in message
     assert "The Organizer" in message
     assert "{} 18:00 - 22:00".format(
         start_date.strftime('%d.%m.%Y')) in message

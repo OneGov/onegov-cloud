@@ -19,24 +19,32 @@ from wtforms_components import TimeField
 
 
 TAGS = [(tag, tag) for tag in (
+    _("Art"),
+    _("Cinema"),
+    _("Concert"),
+    _("Congress"),
+    _("Culture"),
+    _("Dancing"),
+    _("Education"),
     _("Exhibition"),
     _("Gastronomy"),
     _("Health"),
-    _("Cinema"),
-    _("Congress"),
-    _("Concert"),
-    _("Art"),
+    _("Library"),
     _("Literature"),
     _("Market"),
+    _("Meetup"),
+    _("Music School"),
     _("Music"),
     _("Party"),
     _("Politics"),
     _("Religion"),
     _("Sports"),
-    _("Dancing"),
-    _("Theater"),
-    _("Meetup"),
     _("Talk"),
+    _("Theater"),
+    _("Tourism"),
+    _("Toy Library"),
+    _("Tradition"),
+    _("Youth"),
 )]
 
 WEEKDAYS = (
@@ -219,9 +227,13 @@ class EventForm(Form):
     def on_request(self):
         self.request.include('common')
         self.request.include('many')
+        self.sort_tags()
 
         if not self.dates.data:
             self.dates.data = self.dates_to_json(None)
+
+    def sort_tags(self):
+        self.tags.choices.sort(key=lambda c: self.request.translate(c[1]))
 
     def validate(self):
         """ Make sure a valid RRULE can be generated with the given fields.
