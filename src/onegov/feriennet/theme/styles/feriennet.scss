@@ -253,8 +253,8 @@ ul.single-line {
     .show-notifications::before { @include icon('\f003'); }
     .show-exports::before { @include icon('\f019'); }
     .show-ticket::before { @include icon('\f145'); }
-    .show-volunteers::before { @include icon('\f004'); }
-    .volunteer::before { @include icon('\f004'); }
+    .show-volunteers::before { @include icon('\f164'); }
+    .volunteer::before { @include icon('\f164'); }
 }
 
 .globals .highlighted {
@@ -2969,6 +2969,12 @@ $booking-left-margin: 2rem;
 /*
     Volunteer sign-up
 */
+.feriennet-management {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
 .volunteer-cart-panel {
     h2 {

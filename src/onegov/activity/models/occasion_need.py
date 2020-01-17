@@ -1,6 +1,7 @@
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Text
@@ -25,6 +26,9 @@ class OccasionNeed(Base, TimestampMixin):
 
     #: the required range of resources
     number = Column(INT4RANGE, nullable=False)
+
+    #: true if volunteers may sign up for this
+    accept_signups = Column(Boolean, nullable=False, default=False)
 
     #: The associated occasion
     occasion_id = Column(UUID, ForeignKey('occasions.id'), nullable=False)

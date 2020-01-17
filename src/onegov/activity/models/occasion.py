@@ -235,7 +235,12 @@ class Occasion(Base, TimestampMixin):
 
     @observes('needs')
     def observe_needs(self, needs):
-        self.seeking_volunteers = needs and True or False
+        for need in (needs or ()):
+            if need.accept_signups:
+                self.seeking_volunteers = True
+                break
+        else:
+            self.seeking_volunteers = False
 
     @hybrid_property
     def operable(self):

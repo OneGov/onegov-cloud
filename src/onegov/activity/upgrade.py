@@ -806,3 +806,15 @@ def add_seeking_volunteers_column(context):
         column=Column('seeking_volunteers', Boolean, nullable=False),
         default=is_seeking_volunteers
     )
+
+
+@upgrade_task('Add occasion need accept_signups toggle')
+def add_occasion_need_public_toggle(context):
+    context.add_column_with_defaults(
+        table='occasion_needs',
+        column=Column('accept_signups', Boolean, nullable=False),
+        default=False
+    )
+
+    for occasion in context.session.query(Occasion):
+        occasion.seeking_volunteers = False

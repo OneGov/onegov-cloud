@@ -142,6 +142,9 @@ class OccasionForm(Form):
 
     @booking_cost.setter
     def booking_cost(self, amount):
+        if not self.administrative_cost:
+            return
+
         if amount is None:
             self.administrative_cost.data = 'default'
             self.administrative_cost_amount.data = None

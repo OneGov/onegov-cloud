@@ -483,6 +483,10 @@
                     </span>
                     <span class="need-name">
                         ${need.name}
+
+                        <tal:b condition="not:need.accept_signups">
+                            <i class="fa fa-eye-slash" aria-hidden="true" title="Accept signups" i18n:attributes="title"></i>
+                        </tal:b>
                     </span>
                     <span class="need-actions text-links" tal:condition="request.is_admin">
                         <a href="${request.link(need, 'edit')}" i18n:translate>Edit</a>

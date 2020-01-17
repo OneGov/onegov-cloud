@@ -300,7 +300,8 @@ def handle_new_occasion_need(self, request, form):
             occasion_id=self.id,
             name=form.name.data,
             description=form.description.data,
-            number=form.number
+            number=form.number,
+            accept_signups=form.accept_signups.data,
         ))
 
         request.success(_("Your changes were saved"))
@@ -324,6 +325,11 @@ def handle_occasion_need(self, request, form):
 
     if form.submitted(request):
         form.populate_obj(self)
+
+        # XXX the observer only works when we add/remove things from the list,
+        # not when we change something inside the list
+        self.occasion.observe_needs(self.occasion.needs)
+
         request.success(_("Your changes were saved"))
         return request.redirect(request.link(self.occasion))
 

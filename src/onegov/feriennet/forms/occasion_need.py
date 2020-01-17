@@ -1,7 +1,7 @@
 from onegov.activity import OccasionNeed
 from onegov.feriennet import _
 from onegov.form import Form
-from wtforms.fields import StringField, TextAreaField
+from wtforms.fields import BooleanField, StringField, TextAreaField
 from wtforms.fields.html5 import IntegerField
 from wtforms.validators import InputRequired, NumberRange
 from psycopg2.extras import NumericRange
@@ -34,6 +34,13 @@ class OccasionNeedForm(Form):
             InputRequired(),
             NumberRange(0, 10000)
         ]
+    )
+
+    accept_signups = BooleanField(
+        label=_("Accept signups by volunteers"),
+        description=_(
+            "Only relevant if the experimental volunteer feature is used"
+        )
     )
 
     @property
