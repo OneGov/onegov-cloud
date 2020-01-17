@@ -1,5 +1,6 @@
 from onegov.core.security import Personal, Secret, Private
 from onegov.fsi import FsiApp
+from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.forms.reservation import AddFsiReservationForm, \
     EditFsiReservationForm, EditFsiPlaceholderReservationForm, \
@@ -53,6 +54,13 @@ def view_add_reservation(self, request, form):
             else:
                 self.add(**data)
                 request.success(_("Added a new subscription"))
+                request = handle_send_email(
+                    course_event.reservation_template,
+                    request,
+                    (attendee_id, ),
+                    cc_to_sender=False,
+                    show_sent_count=False
+                )
         else:
             request.warning(_('Subscription already exists'))
         return request.redirect(request.link(self))
@@ -96,6 +104,13 @@ def view_edit_reservation(self, request, form):
 
             form.update_model(self)
             request.success(_("Subscription was updated"))
+            request = handle_send_email(
+                course_event.reservation_template,
+                request,
+                (data['attendee_id'],),
+                cc_to_sender=False,
+                show_sent_count=False
+            )
             return request.redirect(request.link(ReservationCollection(
                 request.session,
                 auth_attendee=request.current_attendee,
