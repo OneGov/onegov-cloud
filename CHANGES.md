@@ -1,8 +1,29 @@
 # Changes
 
+## Release `2020.6`
+
+> commits: **6 / [cd726aa8df...d0db4f5c0d](https://github.com/OneGov/onegov-cloud/compare/cd726aa8df^...d0db4f5c0d)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.6)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🎉 **Adds optional signups for occasion needs**
+
+So far, all occasion needs were presented to volunteers. Now, only
+selected ones are.
+
+**`Feature`** | **[FER-739](https://issues.seantis.ch/browse/FER-739)** | **[802f4f0614](https://github.com/onegov/onegov-cloud/commit/802f4f06145f90d819e65e2a76c81ef7c1eeb395)**
+
+### Org
+
+🎉 **Adds new categories for events**
+
+**`Feature`** | **[60918b0b94](https://github.com/onegov/onegov-cloud/commit/60918b0b9491c2df51afd557c2a40627e18f5f15)**
+
 ## Release `2020.5`
 
-> commits: **2 / [0e6ae7daf1...303612192e](https://github.com/OneGov/onegov-cloud/compare/0e6ae7daf1^...303612192e)**<br>
+> released: **2020-01-16 12:14**<br>
+> commits: **3 / [0e6ae7daf1...e305d77e8b](https://github.com/OneGov/onegov-cloud/compare/0e6ae7daf1^...e305d77e8b)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.5)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Fsi
@@ -13,7 +34,7 @@ Only admins should be able add subscriptions for locked course events.
 Adds property `locked_for_subscriptions` to `CourseEvent` and adapts form.
 Introduces checks for reservation adding/editing in views.
 
-**`Feature`** | **[FSI-6](#FSI-6)** | **[303612192e](https://github.com/onegov/onegov-cloud/commit/303612192ef9108a9e4e21ef5548904e702a8442)**
+**`Feature`** | **[FSI-6](https://kanton-zug.atlassian.net/browse/FSI-6)** | **[303612192e](https://github.com/onegov/onegov-cloud/commit/303612192ef9108a9e4e21ef5548904e702a8442)**
 
 🐞 **Fixes editor subscription capabilities**
 
@@ -21,7 +42,7 @@ Introduces checks for reservation adding/editing in views.
 - Fixes links and Dropdown-Choices for editors
 - Fixes Editor Message he cant see all the records
 
-**`Bugfix`** | **[FSI-7](#FSI-7)** | **[0e6ae7daf1](https://github.com/onegov/onegov-cloud/commit/0e6ae7daf1a0bd93bd6c08b35f5fa3e749ce0f19)**
+**`Bugfix`** | **[FSI-7](https://kanton-zug.atlassian.net/browse/FSI-7)** | **[0e6ae7daf1](https://github.com/onegov/onegov-cloud/commit/0e6ae7daf1a0bd93bd6c08b35f5fa3e749ce0f19)**
 
 ## Release `2020.4`
 
@@ -74,13 +95,13 @@ The administrative costs cannot be manipulated in all_inclusive periods.
 
 🎉 **Adds pagination to reservation collection**
 
-**`Feature`** | **[FSI-4](#FSI-4)** | **[daf22a65f5](https://github.com/onegov/onegov-cloud/commit/daf22a65f52329258ba9965f028df1321437be8e)**
+**`Feature`** | **[FSI-4](https://kanton-zug.atlassian.net/browse/FSI-4)** | **[daf22a65f5](https://github.com/onegov/onegov-cloud/commit/daf22a65f52329258ba9965f028df1321437be8e)**
 
 🎉 **Adds IMS Import scripts**
 
 Adds tested import script with cli integration for one-time import of old data base export. The documentation is withing the script.
 
-**`Feature`** | **[FSI-3](#FSI-3)** | **[8870da91d8](https://github.com/onegov/onegov-cloud/commit/8870da91d85d63ae8e1a1e5d269dc119b8caf7f4)**
+**`Feature`** | **[FSI-3](https://kanton-zug.atlassian.net/browse/FSI-3)** | **[8870da91d8](https://github.com/onegov/onegov-cloud/commit/8870da91d85d63ae8e1a1e5d269dc119b8caf7f4)**
 
 ✨ **General application improvements**
 
@@ -110,7 +131,7 @@ Adds tested import script with cli integration for one-time import of old data b
 
 🎉 **Improves login workflow**
 
-**`Feature`** | **[FSI-1](#FSI-1)** | **[824b155b16](https://github.com/onegov/onegov-cloud/commit/824b155b169558f5d8c04259a5676d7b5344eaea)**
+**`Feature`** | **[FSI-1](https://kanton-zug.atlassian.net/browse/FSI-1)** | **[824b155b16](https://github.com/onegov/onegov-cloud/commit/824b155b169558f5d8c04259a5676d7b5344eaea)**
 
 ### Winterthur
 
