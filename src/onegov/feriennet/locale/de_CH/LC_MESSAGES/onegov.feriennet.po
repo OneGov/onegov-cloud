@@ -1260,7 +1260,7 @@ msgid "New Notification Template"
 msgstr "Neue Mitteilungs-Vorlage"
 
 msgid "Join as a Volunteer"
-msgstr "Machen Sie mit als Helfer"
+msgstr "Helfen Sie mit"
 
 msgid "Register as Volunteer"
 msgstr "Registration als Helfer"
@@ -1333,8 +1333,7 @@ msgid ""
 msgstr ""
 "Wählen Sie die Angebote an denen Sie mithelfen möchten und füllen Sie das "
 "Formular aus. Wir kontaktieren Sie anschliessend. Angebote die nicht "
-"gelistet sind haben keinen Bedarf. Beachten Sie dass wir nicht garantieren "
-"können dass Sie mit Ihren Kindern am gleichen Angebot teilnehmen können."
+"gelistet sind haben keinen Bedarf."
 
 msgid ""
 "Note that we cannot guarantee that you will be placed in the same activity "
