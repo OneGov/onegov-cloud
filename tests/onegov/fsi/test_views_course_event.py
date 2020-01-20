@@ -190,13 +190,7 @@ def test_register_for_course_event_admin(client_with_db):
 
 def test_add_subscription_for_other_attendee(client_with_db):
     client = client_with_db
-    session = client.app.session()
-    event = session.query(CourseEvent).filter_by(
-        location='Empty'
-    ).one()
     client.login_admin()
-
-    view = f'/fsi/event/{event.id}'
     new = client.get('/fsi/reservations').click('Anmeldung')
     print(new)
     page = new.form.submit().follow()
@@ -207,16 +201,12 @@ def test_add_subscription_for_other_attendee(client_with_db):
 def test_edit_subscription_for_other_attendee(client_with_db):
     client = client_with_db
     session = client.app.session()
-    event = session.query(CourseEvent).filter(
-        CourseEvent.start > utcnow()
-    ).first()
-    subscriptions = event.reservations.first()
-    assert subscriptions
+    event = session.query(CourseEvent).filter_by(
+        location='Empty'
+    ).one()
     client.login_admin()
 
-    view = f'/fsi/reservation/{event.id}'
-    # new = client.get('/fsi/reservations').click('Anmeldung')
-    # print(new)
-    # page = new.form.submit().follow()
-    # assert 'Neue Anmeldung wurde hinzugefügt' in page
-    # assert len(client.app.smtp.outbox) == 1
+    new = client.get(f'/fsi/reservations/add?course_event_id={event.id}')
+    page = new.form.submit().follow()
+    assert 'Neue Anmeldung wurde hinzugefügt' in page
+    assert len(client.app.smtp.outbox) == 1
