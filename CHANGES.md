@@ -1,8 +1,20 @@
 # Changes
 
+## Release `2020.8`
+
+> commits: **1 / [12805c2f2e...12805c2f2e](https://github.com/OneGov/onegov-cloud/compare/12805c2f2e^...12805c2f2e)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.8)](https://buildkite.com/seantis/onegov-cloud)
+
+### Election-Day
+
+🐞 **Fixes calculation of election/vote turnout for intermediary results**
+
+**`Bugfix`** | **[12805c2f2e](https://github.com/onegov/onegov-cloud/commit/12805c2f2e33e1c7d25719e7ae22cea39ea80f11)**
+
 ## Release `2020.7`
 
-> commits: **7 / [3f9d2afaac...addae0f89e](https://github.com/OneGov/onegov-cloud/compare/3f9d2afaac^...addae0f89e)**<br>
+> released: **2020-01-20 10:40**<br>
+> commits: **8 / [3f9d2afaac...e9160c5daa](https://github.com/OneGov/onegov-cloud/compare/3f9d2afaac^...e9160c5daa)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.7)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
