@@ -399,7 +399,26 @@ def test_vote_turnout(session):
     )
 
     session.flush()
+    assert vote.counted_eligible_voters == vote.eligible_voters
+    assert vote.counted_cast_ballots == 10
+    assert vote.turnout == 10
+    assert vote.proposal.turnout == 10
 
+    vote.proposal.results.append(
+        BallotResult(
+            name='2',
+            counted=False,
+            eligible_voters=100,
+            yeas=10,
+            entity_id=2
+        )
+    )
+    session.flush()
+
+    assert vote.proposal.eligible_voters != \
+        vote.proposal.counted_eligible_voters
+
+    assert vote.eligible_voters != vote.counted_eligible_voters
     assert vote.turnout == 10
     assert vote.proposal.turnout == 10
 

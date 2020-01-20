@@ -157,6 +157,7 @@ def test_election_summarized_properties(session):
         date=date(2015, 6, 14),
         number_of_mandates=2
     )
+
     for x in range(1, 4):
         election.results.append(
             ElectionResult(
@@ -176,11 +177,36 @@ def test_election_summarized_properties(session):
     session.flush()
 
     assert election.eligible_voters == 600
+    assert election.counted_eligible_voters == 600
     assert election.received_ballots == 480
+    assert election.counted_received_ballots == election.received_ballots
     assert election.accounted_ballots == 438
     assert election.blank_ballots == 24
     assert election.invalid_ballots == 18
     assert election.accounted_votes == 858
+    trnout = election.received_ballots / election.counted_eligible_voters * 100
+    assert election.turnout == trnout
+
+    # Test turnout calculation
+    x = 5
+    election.results.append(
+        ElectionResult(
+            name='name',
+            entity_id=x,
+            counted=False,
+            eligible_voters=100 * x,
+            received_ballots=80 * x,
+            blank_ballots=4 * x,
+            invalid_ballots=3 * x,
+            blank_votes=2 * x,
+            invalid_votes=x
+        )
+    )
+    session.flush()
+    assert election.eligible_voters != election.counted_eligible_voters
+
+    # turnout should not change due to a new incomplete result
+    assert election.turnout == trnout
 
 
 def test_election_derived_properties(session):

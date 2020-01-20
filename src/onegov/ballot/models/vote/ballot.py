@@ -161,8 +161,15 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
     #: the total eligible voters
     eligible_voters = summarized_property('eligible_voters')
 
+    # sum of eligible voters if BallotResult.counted is True
+    counted_eligible_voters = summarized_property('counted_eligible_voters')
+
+    counted_cast_ballots = summarized_property('counted_cast_ballots')
+
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """
+        if attribute == 'counted_eligible_voters':
+            return sum(getattr(result, attribute) for result in self.results)
 
         result = self.results.with_entities(
             func.sum(getattr(BallotResult, attribute))

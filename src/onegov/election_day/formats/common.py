@@ -144,7 +144,7 @@ def load_csv(
             e.args[0],
             filename=filename
         )
-    except Exception as e:
+    except Exception:
         error = FileImportError(
             _("Not a valid csv/xls/xlsx file."),
             filename=filename

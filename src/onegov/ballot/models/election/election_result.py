@@ -62,6 +62,15 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
     invalid_votes = Column(Integer, nullable=False, default=lambda: 0)
 
     @hybrid_property
+    def counted_eligible_voters(self):
+        """ The number of votes for turnout calculation """
+        return 0 if not self.counted else self.eligible_voters
+
+    @hybrid_property
+    def counted_received_ballots(self):
+        return 0 if not self.counted else self.received_ballots
+
+    @hybrid_property
     def accounted_votes(self):
         """ The number of accounted votes. """
 
