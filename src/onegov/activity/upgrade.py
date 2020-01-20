@@ -796,7 +796,7 @@ def add_occasion_booking_cost(context):
 def add_seeking_volunteers_column(context):
     seeking_volunteers = set(
         n.occasion_id for n in context.session.query(
-            OccasionNeed).distinct(OccasionNeed.occasion_id))
+            OccasionNeed.occasion_id).distinct(OccasionNeed.occasion_id))
 
     def is_seeking_volunteers(occasion):
         return occasion.id in seeking_volunteers
