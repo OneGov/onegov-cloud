@@ -57,8 +57,8 @@ class Auth(object):
     def users(self):
         return UserCollection(self.session)
 
-    def redirect(self, request):
-        return morepath.redirect(request.transform(self.to))
+    def redirect(self, request, path):
+        return morepath.redirect(request.transform(path))
 
     def skippable(self, request):
         """ Returns true if the login for the current `to` target is optional
@@ -225,7 +225,11 @@ class Auth(object):
         assert user is not None
 
         identity = self.as_identity(user)
-        response = self.redirect(request)
+
+        to = request.app.redirect_after_login(identity, request, self.to)
+        to = to or self.to
+
+        response = self.redirect(request, to)
 
         request.app.remember_identity(response, request, identity)
 
@@ -247,7 +251,7 @@ class Auth(object):
         user = self.by_identity(request.identity)
         user and user.remove_current_session(request)
 
-        response = self.redirect(request)
+        response = self.redirect(request, self.to)
         request.app.forget_identity(response, request)
 
         return response

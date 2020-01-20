@@ -14,6 +14,7 @@ from onegov.gis import MapboxApp
 from onegov.org import directives
 from onegov.org.homepage_widgets import transform_homepage_structure
 from onegov.org.initial_content import create_new_organisation
+from onegov.org.models import Dashboard
 from onegov.org.models import Topic, Organisation, PublicationCollection
 from onegov.org.request import OrgRequest
 from onegov.org.theme import OrgTheme
@@ -23,6 +24,7 @@ from onegov.reservation import LibresIntegration
 from onegov.search import ElasticsearchApp
 from onegov.ticket import TicketCollection
 from onegov.user import UserApp
+from purl import URL
 from sqlalchemy import desc
 
 
@@ -38,6 +40,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     userlinks = directive(directives.UserlinkAction)
     directory_search_widget = directive(directives.DirectorySearchWidgetAction)
     settings_view = directive(directives.SettingsView)
+    boardlet = directive(directives.Boardlet)
 
     #: cronjob settings
     send_daily_ticket_statistics = True
@@ -187,6 +190,33 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
             checkout['image'] = self.org.square_logo_url
 
         return provider.checkout_button(**checkout)
+
+    def redirect_after_login(self, identity, request, default):
+        """ Returns the path to redirect after login, given the request and
+        the default login path, which is usually the current path.
+
+        Returns a path or None, if the default should be used.
+
+        """
+
+        # if we already have a target, we do not change it
+        if default != '/':
+            return None
+
+        # we redirect to the dashboard…
+        dashboard = Dashboard(request)
+
+        # …if available…
+        if not dashboard.is_available:
+            return None
+
+        # …and accessible…
+        permission = self.permission_by_view(dashboard, view_name=None)
+
+        if not self._permits(identity, dashboard, permission):
+            return None
+
+        return URL(request.link(dashboard)).path()
 
 
 @OrgApp.webasset_path()

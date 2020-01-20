@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-01-17 10:48+0100\n"
+"POT-Creation-Date: 2020-01-20 14:23+0100\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -13,8 +13,98 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 1.8.12\n"
 
+msgid "No active period"
+msgstr "Kein aktiver Zeitraum"
+
+#, python-format
+msgid "Prebooking: ${dates}"
+msgstr "Wunschphase: ${dates}"
+
+#, python-format
+msgid "Booking: ${dates}"
+msgstr "Buchungsphase: ${dates}"
+
+#, python-format
+msgid "Execution: ${dates}"
+msgstr "Durchführung: ${dates}"
+
+#, python-format
+msgid "${count} Activities"
+msgstr "${count} Angebote"
+
+#, python-format
+msgid "${count} Occasions"
+msgstr "${count} Durchführungen"
+
+#, python-format
+msgid "${count} Wishes"
+msgstr "${count} Wünsche"
+
+#, python-format
+msgid "${count} Bookings"
+msgstr "${count} Buchungen"
+
+#, python-format
+msgid "${count} Wishes per Attendee"
+msgstr "${count} Wünsche pro Teilnehmer"
+
+#, python-format
+msgid "${count} accepted"
+msgstr "${count} angenommen"
+
+#, python-format
+msgid "${count} cancelled"
+msgstr "${count} abgesagt"
+
+#, python-format
+msgid "${count} denied"
+msgstr "${count} abgelehnt"
+
+#, python-format
+msgid "${count} blocked"
+msgstr "${count} blockiert"
+
+#, python-format
+msgid "${count} Bookings per Attendee"
+msgstr "${count} Buchungen pro Teilnehmer"
+
+#, python-format
+msgid "${count} Attendees"
+msgstr "${count} Teilnehmer"
+
+#, python-format
+msgid "${count} Girls"
+msgstr "${count} Mädchen"
+
+#, python-format
+msgid "${count} Boys"
+msgstr "${count} Jungen"
+
+#, python-format
+msgid "${amount}% Happiness"
+msgstr "${amount}% Zufriedenheit"
+
+#, python-format
+msgid "${count} Attendees Without Occasion"
+msgstr "${count} Teilnehmer ohne Durchführung"
+
+#, python-format
+msgid "${amount} CHF outstanding"
+msgstr "${amount} CHF offen"
+
+#, python-format
+msgid "${amount} CHF total"
+msgstr "${amount} CHF total"
+
+#, python-format
+msgid "${amount} CHF paid"
+msgstr "${amount} CHF bezahlt"
+
 msgid "Help us"
 msgstr "Helfen"
+
+msgid "Dashboard"
+msgstr "Dashboard"
 
 msgid "Periods"
 msgstr "Zeiträume"
@@ -33,9 +123,6 @@ msgstr "Mitteilungen"
 
 msgid "Exports"
 msgstr "Exporte"
-
-msgid "No active period"
-msgstr "Kein aktiver Zeitraum"
 
 msgid "Invoices"
 msgstr "Rechnungen"
@@ -827,7 +914,8 @@ msgid "Accept signups by volunteers"
 msgstr "Anmeldungen von Helfern akzeptieren"
 
 msgid "Only relevant if the experimental volunteer feature is used"
-msgstr "Nur relevant wenn die experimentelle Helfer Registration verwendet wird"
+msgstr ""
+"Nur relevant wenn die experimentelle Helfer Registration verwendet wird"
 
 msgid "Minimum is larger than maximum"
 msgstr "Das Minimum ist grösser als das Maximum"
@@ -2810,6 +2898,10 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
+
+#, python-format
+#~ msgid "${count} Accepted Bookings per Attendee"
+#~ msgstr "${count} Angenommene Buchungen pro Teilnehmer"
 
 #~ msgid "I know that after confirmation, bills can only be adjusted manually."
 #~ msgstr ""

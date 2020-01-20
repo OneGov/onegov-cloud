@@ -29,6 +29,7 @@ from onegov.org.app import OrgApp
 from onegov.org.converters import keywords_converter
 from onegov.org.models import AtoZPages
 from onegov.org.models import Clipboard
+from onegov.org.models import Dashboard
 from onegov.org.models import DirectorySubmissionAction
 from onegov.org.models import Editor
 from onegov.org.models import Export
@@ -591,3 +592,13 @@ def get_directory_submission_action(app, directory_id, submission_id, action):
 def get_publication_collection(request, year=None):
     year = year or sedate.to_timezone(sedate.utcnow(), 'Europe/Zurich').year
     return PublicationCollection(request.session, year)
+
+
+@OrgApp.path(
+    model=Dashboard,
+    path='/dashboard')
+def get_dashboard(request):
+    dashboard = Dashboard(request)
+
+    if dashboard.is_available:
+        return dashboard

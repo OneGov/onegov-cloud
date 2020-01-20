@@ -43,6 +43,16 @@ class UserApp(WebassetsApp):
 
         """
 
+    def redirect_after_login(self, identity, request, default):
+        """ Returns the path to redirect after login, given the received
+        identity, the request and the default path.
+
+        Returns a path, or None if the default path should be used.
+
+        """
+
+        return None
+
     def configure_authentication_providers(self, **cfg):
 
         def bound(provider):

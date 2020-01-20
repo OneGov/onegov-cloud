@@ -102,3 +102,29 @@ class SettingsView(Action):
 
     def perform(self, func, settings_view_registry):
         settings_view_registry[self.name] = self.setting
+
+
+class Boardlet(Action):
+    """ Registers a boardlet on the Dashboard. """
+
+    config = {
+        'boardlets_registry': dict
+    }
+
+    def __init__(self, name, order):
+        assert isinstance(order, tuple) and len(order) == 2, """
+            The order should consist of two values, a group and an order
+            within the group.
+        """
+
+        self.name = name
+        self.order = order
+
+    def identifier(self, boardlets_registry):
+        return self.name
+
+    def perform(self, func, boardlets_registry):
+        boardlets_registry[self.name] = {
+            'cls': func,
+            'order': self.order
+        }

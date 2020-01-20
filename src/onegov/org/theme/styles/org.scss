@@ -5844,3 +5844,39 @@ h2 + div.timeline {
     color: $red-dark;
     font-style: normal;
 }
+
+/*
+    Dashboard
+*/
+.boardlet-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.boardlet {
+    background: $gray-pastel;
+    border-top: 10px solid $green-light;
+    margin-bottom: 1.5rem;
+    width: calc((100% / 3) - 1rem);
+    padding: .5rem 1rem 1rem;
+
+    h2 {
+        font-size: 1.3rem;
+        font-weight: bold;
+        text-align: center;
+        word-wrap: break-word;
+    }
+
+    li {
+        font-size: .9rem;
+    }
+
+    &.boardlet-warning {
+        border-top-color: $yellow-light;
+    }
+
+    &.boardlet-failure {
+        border-top-color: $red-light;
+    }
+}

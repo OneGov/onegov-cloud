@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-01-17 10:48+0100\n"
+"POT-Creation-Date: 2020-01-20 14:23+0100\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -14,8 +14,98 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "X-Generator: Poedit 2.0.3\n"
 
+msgid "No active period"
+msgstr "Pas de période active"
+
+#, python-format
+msgid "Prebooking: ${dates}"
+msgstr "Pré-réservation : ${dates}"
+
+#, python-format
+msgid "Booking: ${dates}"
+msgstr "Réservation : ${dates}"
+
+#, python-format
+msgid "Execution: ${dates}"
+msgstr "Exécution : ${dates}"
+
+#, python-format
+msgid "${count} Activities"
+msgstr "${count} activités"
+
+#, python-format
+msgid "${count} Occasions"
+msgstr "${count} occasions"
+
+#, python-format
+msgid "${count} Wishes"
+msgstr "${count} souhaits"
+
+#, python-format
+msgid "${count} Bookings"
+msgstr "${count} réservations"
+
+#, python-format
+msgid "${count} Wishes per Attendee"
+msgstr "${count} souhaits par participant"
+
+#, python-format
+msgid "${count} accepted"
+msgstr "${count} acceptés"
+
+#, python-format
+msgid "${count} cancelled"
+msgstr "${count} annulés"
+
+#, python-format
+msgid "${count} denied"
+msgstr "${count} refusés"
+
+#, python-format
+msgid "${count} blocked"
+msgstr "${count} bloqués"
+
+#, python-format
+msgid "${count} Bookings per Attendee"
+msgstr "${count} réservations par participant"
+
+#, python-format
+msgid "${count} Attendees"
+msgstr "${count} participants"
+
+#, python-format
+msgid "${count} Girls"
+msgstr "${count} filles"
+
+#, python-format
+msgid "${count} Boys"
+msgstr "${count} garçons"
+
+#, python-format
+msgid "${amount}% Happiness"
+msgstr "${amount}% de bonheur"
+
+#, python-format
+msgid "${count} Attendees Without Occasion"
+msgstr "${count} participants sans occasion précise"
+
+#, python-format
+msgid "${amount} CHF outstanding"
+msgstr "${amount} CHF impayés"
+
+#, python-format
+msgid "${amount} CHF total"
+msgstr "Total de ${amount} CHF "
+
+#, python-format
+msgid "${amount} CHF paid"
+msgstr "${amount} CHF payés"
+
 msgid "Help us"
 msgstr "Aidez nous"
+
+msgid "Dashboard"
+msgstr "Dashboard"
 
 msgid "Periods"
 msgstr "Périodes"
@@ -34,9 +124,6 @@ msgstr "Notifications"
 
 msgid "Exports"
 msgstr "Exportations"
-
-msgid "No active period"
-msgstr "Pas de période active"
 
 msgid "Invoices"
 msgstr "Factures"

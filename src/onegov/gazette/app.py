@@ -5,9 +5,10 @@ from onegov.form import FormApp
 from onegov.gazette.models import Principal
 from onegov.gazette.theme import GazetteTheme
 from onegov.quill import QuillApp
+from onegov.user import UserApp
 
 
-class GazetteApp(Framework, DepotApp, QuillApp, FormApp):
+class GazetteApp(Framework, DepotApp, QuillApp, FormApp, UserApp):
     """ The gazette application. Include this in your onegov.yml to serve
     it with onegov-server.
 

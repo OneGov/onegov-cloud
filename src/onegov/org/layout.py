@@ -2133,3 +2133,13 @@ class PublicationLayout(DefaultLayout):
                 PublicationCollection
             ))
         ]
+
+
+class DashboardLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Dashboard"), '#')
+        ]

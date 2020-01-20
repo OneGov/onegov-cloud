@@ -9,7 +9,7 @@ from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.layout import DefaultLayout
 from onegov.org.custom import get_global_tools as get_base_tools
 from onegov.core.elements import Link, LinkGroup
-from onegov.org.models import ExportCollection
+from onegov.org.models import Dashboard, ExportCollection
 
 
 @FeriennetApp.template_variables()
@@ -40,6 +40,14 @@ def get_admin_tools(request):
         links = []
 
         if request.is_admin:
+            links.append(
+                Link(
+                    text=_("Dashboard"),
+                    url=request.class_link(Dashboard),
+                    attrs={'class': 'show-dashboard'}
+                )
+            )
+
             links.append(
                 Link(
                     text=_("Periods"),

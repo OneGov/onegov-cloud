@@ -32,7 +32,7 @@ def handle_login(self, request, form):
         form.delete_field('yubikey')
 
     if self.skippable(request):
-        return self.redirect(request)
+        return self.redirect(request, self.to)
 
     if form.submitted(request):
 

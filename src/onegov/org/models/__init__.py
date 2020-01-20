@@ -1,14 +1,17 @@
 from onegov.org.models.atoz import AtoZ
 from onegov.org.models.clipboard import Clipboard
+from onegov.org.models.dashboard import Boardlet
+from onegov.org.models.dashboard import BoardletFact
+from onegov.org.models.dashboard import Dashboard
 from onegov.org.models.directory import DirectorySubmissionAction
 from onegov.org.models.directory import ExtendedDirectory
 from onegov.org.models.directory import ExtendedDirectoryEntry
 from onegov.org.models.editor import Editor
 from onegov.org.models.export import Export, ExportCollection
+from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import ContactExtension
 from onegov.org.models.extensions import ContentExtension
 from onegov.org.models.extensions import CoordinatesExtension
-from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models.extensions import VisibleOnHomepageExtension
 from onegov.org.models.file import GeneralFile
@@ -49,12 +52,15 @@ from onegov.org.models.traitinfo import TraitInfo
 __all__ = [
     'AtoZ',
     'AtoZPages',
+    'Boardlet',
+    'BoardletFact',
     'BuiltinFormDefinition',
     'Clipboard',
     'ContactExtension',
     'ContentExtension',
     'CoordinatesExtension',
     'CustomFormDefinition',
+    'Dashboard',
     'DaypassResource',
     'DirectoryMessage',
     'DirectorySubmissionAction',
