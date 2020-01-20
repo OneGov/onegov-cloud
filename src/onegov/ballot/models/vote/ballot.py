@@ -191,23 +191,6 @@ class Ballot(Base, TimestampMixin, TitleTranslationsMixin,
 
         return expr
 
-    # def aggregate_results(self, attribute):
-    #     """ Gets the sum of the given attribute from the results. """
-    #
-    #     return sum(getattr(result, attribute) for result in self.results)
-    #
-    # @staticmethod
-    # def aggregate_results_expression(cls, attribute):
-    #     """ Gets the sum of the given attribute from the results,
-    #     as SQL expression.
-    #
-    #     """
-    #
-    #     expr = select([func.sum(getattr(ElectionResult, attribute))])
-    #     expr = expr.where(ElectionResult.election_id == cls.id)
-    #     expr = expr.label(attribute)
-    #     return expr
-
     def clear_results(self):
         """ Clear all the results. """
 

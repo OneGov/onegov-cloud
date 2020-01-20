@@ -416,7 +416,7 @@ def test_vote_turnout(session):
     session.flush()
 
     assert vote.proposal.eligible_voters != \
-           vote.proposal.counted_eligible_voters
+        vote.proposal.counted_eligible_voters
 
     assert vote.eligible_voters != vote.counted_eligible_voters
     assert vote.turnout == 10
