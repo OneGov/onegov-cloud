@@ -180,6 +180,10 @@ class Vote(Base, ContentMixin, TimestampMixin,
     #: the total eligible voters
     eligible_voters = summarized_property('eligible_voters')
 
+    counted_cast_ballots = summarized_property('counted_cast_ballots')
+
+    counted_eligible_voters = summarized_property('counted_eligible_voters')
+
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """
 
