@@ -1,8 +1,30 @@
 # Changes
 
+## Release `2020.7`
+
+> commits: **7 / [3f9d2afaac...addae0f89e](https://github.com/OneGov/onegov-cloud/compare/3f9d2afaac^...addae0f89e)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.7)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+✨ **Fixes some small text issues**
+
+**`Other`** | **[FER-739](https://issues.seantis.ch/browse/FER-739)** | **[addae0f89e](https://github.com/onegov/onegov-cloud/commit/addae0f89ef18fb8206be2f24c74c89d8eaba47b)**
+
+### Search
+
+🐞 **Fixes search not working**
+
+A new elasticsearch-py release broke our Elasticsearch integration. We
+used a no longer valid API for a core functionality. We now switched to
+a more modern (and faster) variant.
+
+**`Bugfix`** | **[79d024f744](https://github.com/onegov/onegov-cloud/commit/79d024f744c04cbef962468832402044e0219ce3)**
+
 ## Release `2020.6`
 
-> commits: **6 / [cd726aa8df...d0db4f5c0d](https://github.com/OneGov/onegov-cloud/compare/cd726aa8df^...d0db4f5c0d)**<br>
+> released: **2020-01-17 12:27**<br>
+> commits: **7 / [cd726aa8df...06eadc5e75](https://github.com/OneGov/onegov-cloud/compare/cd726aa8df^...06eadc5e75)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.6)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
