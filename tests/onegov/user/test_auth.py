@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from onegov.core import Framework
 from onegov.core.utils import Bunch
 from onegov.core.security.identity_policy import IdentityPolicy
-from onegov.user import Auth, UserCollection
+from onegov.user import Auth, UserCollection, UserApp
 from onegov.user.errors import ExpiredSignupLinkError
 from webtest import TestApp as Client
 from unittest.mock import patch
@@ -163,7 +163,7 @@ def test_auth_logging(capturelog, session):
 
 def test_auth_integration(session, redis_url):
 
-    class App(Framework):
+    class App(Framework, UserApp):
         pass
 
     @App.identity_policy()
