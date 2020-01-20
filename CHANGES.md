@@ -1,8 +1,20 @@
 # Changes
 
+## Release `2020.10`
+
+> commits: **2 / [fe9445a220...cf8f76d337](https://github.com/OneGov/onegov-cloud/compare/fe9445a220^...cf8f76d337)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.10)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🎉 **Adds a dashboard**
+
+**`Feature`** | **[FER-78](https://issues.seantis.ch/browse/FER-78)** | **[fe9445a220](https://github.com/onegov/onegov-cloud/commit/fe9445a22024e3650893d271b506b0e00ab98bcf)**
+
 ## Release `2020.9`
 
-> commits: **1 / [05d3cc2313...05d3cc2313](https://github.com/OneGov/onegov-cloud/compare/05d3cc2313^...05d3cc2313)**<br>
+> released: **2020-01-20 13:33**<br>
+> commits: **2 / [05d3cc2313...df025b625e](https://github.com/OneGov/onegov-cloud/compare/05d3cc2313^...df025b625e)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.9)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Activity
