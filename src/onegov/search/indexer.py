@@ -451,9 +451,9 @@ class IndexManager(object):
         hostname. """
 
         return set(
-            ix for ix in self.es_client.indices.get(
-                '{}-*'.format(self.normalized_hostname), feature='_settings'
-            )
+            ix for ix in self.es_client.cat.indices(
+                f'{self.normalized_hostname}-*', h='index'
+            ).splitlines()
         )
 
     def query_aliases(self):
