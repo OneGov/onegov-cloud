@@ -26,7 +26,8 @@ class DerivedAttributesMixin(object):
         if not self.eligible_voters:
             return 0
 
-        return self.received_ballots / self.counted_eligible_voters * 100
+        return self.counted_received_ballots /\
+            self.counted_eligible_voters * 100
 
 
 class PartyResultExportMixin(object):

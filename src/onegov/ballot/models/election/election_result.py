@@ -67,6 +67,10 @@ class ElectionResult(Base, TimestampMixin, DerivedAttributesMixin):
         return 0 if not self.counted else self.eligible_voters
 
     @hybrid_property
+    def counted_received_ballots(self):
+        return 0 if not self.counted else self.received_ballots
+
+    @hybrid_property
     def accounted_votes(self):
         """ The number of accounted votes. """
 

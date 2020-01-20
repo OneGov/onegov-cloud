@@ -159,8 +159,11 @@ class Election(Base, ContentMixin, TimestampMixin,
     # sum of eligible voters of only if ElectionResult.counted is true
     counted_eligible_voters = summarized_property('counted_eligible_voters')
 
-    #: The total recceived ballots
+    #: The total received ballots
     received_ballots = summarized_property('received_ballots')
+
+    #: The total of all counted balled where ElectionResult.counted is true
+    counted_received_ballots = summarized_property('counted_received_ballots')
 
     #: The total accounted ballots
     accounted_ballots = summarized_property('accounted_ballots')

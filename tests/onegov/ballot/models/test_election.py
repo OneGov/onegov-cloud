@@ -179,6 +179,7 @@ def test_election_summarized_properties(session):
     assert election.eligible_voters == 600
     assert election.counted_eligible_voters == 600
     assert election.received_ballots == 480
+    assert election.counted_received_ballots == election.received_ballots
     assert election.accounted_ballots == 438
     assert election.blank_ballots == 24
     assert election.invalid_ballots == 18
@@ -203,7 +204,8 @@ def test_election_summarized_properties(session):
     )
     session.flush()
     assert election.eligible_voters != election.counted_eligible_voters
-    trnout = election.received_ballots / election.counted_eligible_voters * 100
+
+    # turnout should not change due to a new incomplete result
     assert election.turnout == trnout
 
 
