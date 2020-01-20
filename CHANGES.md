@@ -1,8 +1,20 @@
 # Changes
 
+## Release `2020.9`
+
+> commits: **1 / [05d3cc2313...05d3cc2313](https://github.com/OneGov/onegov-cloud/compare/05d3cc2313^...05d3cc2313)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.9)](https://buildkite.com/seantis/onegov-cloud)
+
+### Activity
+
+🐞 **Fixes upgrade script failing on some hosts**
+
+**`Bugfix`** | **[05d3cc2313](https://github.com/onegov/onegov-cloud/commit/05d3cc2313d86911c633f593b03c64f7cc14adad)**
+
 ## Release `2020.8`
 
-> commits: **1 / [12805c2f2e...12805c2f2e](https://github.com/OneGov/onegov-cloud/compare/12805c2f2e^...12805c2f2e)**<br>
+> released: **2020-01-20 13:10**<br>
+> commits: **2 / [12805c2f2e...ceefca4a3f](https://github.com/OneGov/onegov-cloud/compare/12805c2f2e^...ceefca4a3f)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.8)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election-Day
