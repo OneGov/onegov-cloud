@@ -1,8 +1,41 @@
 # Changes
 
+## Release `2020.12`
+
+> commits: **6 / [dee367655e...391d35770f](https://github.com/OneGov/onegov-cloud/compare/dee367655e^...391d35770f)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.12)](https://buildkite.com/seantis/onegov-cloud)
+
+### Election-Day
+
+🎉 **Changes wabstic import vote status reading**
+
+Changes wabstic import for votes: `AnzGdePedent` is new indicator if `vote.status` is `interim` or `final`
+unknown` as status for wabstic import is deprecated and a fallback.
+
+**`Feature`** | **[7c65662d95](https://github.com/onegov/onegov-cloud/commit/7c65662d95153d1033bec67d78b01c8cac6d9eb6)**
+
+### Events
+
+🎉 **Imports sync/import**
+
+More images are now imported and it is possible to do a clean guidle
+import.
+
+**`Feature`** | **[dd31dff4d7](https://github.com/onegov/onegov-cloud/commit/dd31dff4d791627c6f95db1b2bf5db9b5997586b)**
+
+### Winterthur
+
+🎉 **Use less whitespace on reports**
+
+Some reports used quite a bit of paper due to a lot of whitespace, this
+commit changes this, resulting in more compact prints.
+
+**`Feature`** | **[2db6e4d35c](https://github.com/onegov/onegov-cloud/commit/2db6e4d35c8e8d7ba3c6737229f54488d2bebdb7)**
+
 ## Release `2020.11`
 
-> commits: **1 / [47b6879cbd...47b6879cbd](https://github.com/OneGov/onegov-cloud/compare/47b6879cbd^...47b6879cbd)**<br>
+> released: **2020-01-20 16:03**<br>
+> commits: **2 / [47b6879cbd...00a95b7a0a](https://github.com/OneGov/onegov-cloud/compare/47b6879cbd^...00a95b7a0a)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.11)](https://buildkite.com/seantis/onegov-cloud)
 
 ## Release `2020.10`
