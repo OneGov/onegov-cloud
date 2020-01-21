@@ -111,7 +111,7 @@ Für den Status
 
 ### Wabsti Majorz
 
-Das Datenformat benötig zwei einzelne Tabellen: den Datenexport und die Liste der gewählten Kandidaten.
+Das Datenformat benötigt zwei einzelne Tabellen: den Datenexport und die Liste der gewählten Kandidaten.
 
 #### Spalten Datenexport
 
