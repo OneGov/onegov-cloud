@@ -226,6 +226,12 @@ def import_json(group_context, url, tagmap, clear):
                     lon=item['longitude']
                 )
 
+            # special case for Steinhausen, may be deleted by whoever reads
+            # this comment next
+            if 'cat2' in item and 'Im Dreiklang' in item['cat2']:
+                if 'Im Dreiklang'.lower() not in location.lower():
+                    location = f'Im Dreiklang, {location}'
+
             event = Event(
                 state='initiated',
                 name=events._get_unique_name(title),
@@ -314,7 +320,8 @@ def import_ical(group_context, ical):
 @pass_group_context
 @click.argument('url')
 @click.option('--tagmap', type=click.File())
-def import_guidle(group_context, url, tagmap):
+@click.option('--clear', is_flag=True, default=False)
+def import_guidle(group_context, url, tagmap, clear):
     """ Fetches the events from guidle.
 
     Example:
@@ -334,6 +341,16 @@ def import_guidle(group_context, url, tagmap):
             unknown_tags = set()
             prefix = 'guidle-{}'.format(sha1(url.encode()).hexdigest()[:10])
             collection = EventCollection(app.session())
+
+            if clear:
+                events = request.session.query(Event)\
+                    .filter(Event.meta['source'].astext.startswith(prefix))
+
+                for event in events:
+                    request.session.delete(event)
+
+                request.session.flush()
+
             updated = dict(collection.query().with_entities(
                 Event.meta['source'].astext,
                 Event.meta['source_updated'].astext,
@@ -360,8 +377,7 @@ def import_guidle(group_context, url, tagmap):
                     pdf_filename = None
 
                     if isinstance(app, DepotApp):
-                        image_url, image_filename = offer.image(
-                            size='original')
+                        image_url, image_filename = offer.image(size='medium')
 
                         if image_url:
                             image = download_file(image_url)
