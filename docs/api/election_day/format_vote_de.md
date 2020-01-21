@@ -101,7 +101,7 @@ Falls der Status
 
 ### Wabsti
 
-Das Format des Wahlprogrammen "Wabsti Wahlen und Abstimmungen (VRSG)" besteht aus einer einzelnen Datei, welche alle Daten für mehrere Abstimmungen enthält. Es gibt für jede Abstimmung und Gemeinde eine Zeile.
+Das Format des Wahlprogrammes "Wabsti Wahlen und Abstimmungen (VRSG)" besteht aus einer einzelnen Datei, welche alle Daten für mehrere Abstimmungen enthält. Es gibt für jede Abstimmung und Gemeinde eine Zeile.
 
 #### Spalten
 
@@ -134,3 +134,14 @@ Gemeinden gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bed
 ### WabstiCExport
 
 Es wird die Version `>= 2.2` unterstützt. Die verschiedenen Spalten der verschiedenen Dateien sind in der Dokumentation des Exporter-Programms definiert.
+
+#### Ermittlung des Status einer Wahl
+
+In der Format-Spezifikation der Datei `SG_Geschaefte.csv` befinden sich folgende Spalten:
+
+- `Ausmittlungsstand`: Wird vom Benutzer am Wabsti-Client ausgelöst für die gesamte Datenlieferung
+- `AnzGdePendent`: Indikator, ob die Einzelwahl abgeschlossen ist, auch wenn mehrere Wahlen in der Datenlierung sind. 
+
+Seit 2020 wird `AnzGdePendent` statt `Ausmittlungsstand` dazu verwendet, um den Status der Gesamtwahl zu setzen.
+Der Status ist `final` wenn `AnzGdePendent = 0` ist. 
+ 

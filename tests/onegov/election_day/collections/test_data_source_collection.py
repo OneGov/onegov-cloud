@@ -22,9 +22,9 @@ def test_data_source_collection_pagination(session):
         collection.add(DataSource(type='vote', name='{:02}'.format(number)))
     assert collection.query().count() == 100
 
-    assert DataSourceCollection(session, page=0).batch[0].name == '00'
-    assert DataSourceCollection(session, page=4).batch[4].name == '44'
-    assert DataSourceCollection(session, page=5).batch[5].name == '55'
-    assert DataSourceCollection(session, page=9).batch[9].name == '99'
+    assert DataSourceCollection(session, page=0).batch[0].name == '99'
+    assert DataSourceCollection(session, page=4).batch[4].name == '55'
+    assert DataSourceCollection(session, page=5).batch[5].name == '44'
+    assert DataSourceCollection(session, page=9).batch[9].name == '00'
 
     assert len(DataSourceCollection(session, page=10).batch) == 0

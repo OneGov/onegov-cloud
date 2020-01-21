@@ -7,6 +7,7 @@ from webtest.forms import Upload
 from onegov.core.utils import module_path
 from onegov.election_day.formats import import_election_wabstic_proporz
 import os
+
 # Helpers
 from onegov.election_day.models import Canton, Municipality
 
