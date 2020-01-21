@@ -240,7 +240,8 @@ WABSTIC_VOTE_HEADERS_SG_GESCHAEFTE = (
     'art',  # domain
     'sortwahlkreis',
     'sortgeschaeft',  # vote number
-    'ausmittlungsstand'
+    'ausmittlungsstand',    # for status, old
+    'anzgdependent'         # for status, new
 )
 
 WABSTIC_VOTE_HEADERS_SG_GEMEINDEN = (
