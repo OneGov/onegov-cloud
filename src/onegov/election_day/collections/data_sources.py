@@ -1,3 +1,5 @@
+from sqlalchemy import desc
+
 from onegov.core.collection import Pagination
 from onegov.election_day.models import DataSource
 from onegov.election_day.models import DataSourceItem
@@ -26,7 +28,8 @@ class DataSourceCollectionPagination(Pagination):
 class DataSourceCollection(DataSourceCollectionPagination):
 
     def query(self):
-        return self.session.query(DataSource).order_by(DataSource.name)
+        return self.session.query(DataSource).order_by(
+            desc(DataSource.created))
 
     def by_id(self, id):
         return self.query().filter(DataSource.id == id).first()
