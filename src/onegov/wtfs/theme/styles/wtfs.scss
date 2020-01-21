@@ -354,6 +354,37 @@ footer {
             font-size: 9px;
         }
     }
+
+    .delivery-note {
+        table {
+            th,
+            td {
+                font-size: 14px;
+                padding: 2px 10px;
+            }
+        }
+
+        table,
+        p {
+            margin-bottom: 5px;
+        }
+
+        table:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    .daily-list-boxes {
+        table {
+            margin-bottom: 0;
+
+            th,
+            td {
+                font-size: 12px;
+                padding: 1px 5px;
+            }
+        }
+    }
 }
 
 $footer-header-color: $charcoal;

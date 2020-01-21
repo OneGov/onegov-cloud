@@ -57,7 +57,7 @@
                         </tr>
                         <tr>
                             <td colspan="5" class="top"><span i18n:translate>Note</span>:<br>${layout.model.dispatch_note}</td>
-                            <td colspan="3"><span i18n:translate>Signature</span>:<br><br><br><br></td>
+                            <td colspan="3"><span i18n:translate>Signature</span>:<br><br></td>
                         </tr>
                     </body>
                 </table>
