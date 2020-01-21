@@ -69,7 +69,7 @@ def import_vote_wabstic(vote, principal, number, district,
 
     # Parse the vote
     remaining_entities = None
-    ausmittlungsstand = 0
+    ausmittlungsstand = None
     for line in sg_geschaefte.lines:
         line_errors = []
 
@@ -105,6 +105,12 @@ def import_vote_wabstic(vote, principal, number, district,
                 for err in line_errors
             )
             continue
+
+    # If all the lines were skipped
+    if remaining_entities is None and ausmittlungsstand is None:
+        return [FileImportError(
+            error=_("No line was read."), filename='sg_geschaefte'
+        )]
 
     # Parse the results
     ballot_results = {key: [] for key in used_ballot_types}
