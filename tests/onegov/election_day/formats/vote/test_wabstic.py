@@ -7,7 +7,7 @@ from onegov.ballot import ComplexVote
 from onegov.election_day.formats import import_vote_wabstic
 from onegov.election_day.models import Canton
 from onegov.election_day.models import Municipality
-from tests.onegov.election_day.common import get_tar_file_path
+from tests.onegov.election_day.common import get_tar_file_path, print_errors
 
 
 def test_import_wabstic_vote_1(session):
@@ -48,6 +48,7 @@ def test_import_wabstic_vote_1(session):
             BytesIO(sg_geschaefte), 'text/plain',
             BytesIO(sg_gemeinden), 'text/plain'
         )
+        print_errors(errors)
         assert not errors
         assert vote.completed == completed
         assert vote.ballots.one().results.count() == 78
@@ -84,7 +85,7 @@ def test_import_wabstic_vote_1(session):
             BytesIO(sg_gemeinden), 'text/plain'
         )
         assert not errors
-        assert vote.completed
+        assert not vote.completed
         assert vote.ballots.one().results.one().yeas == yeas
 
     # Test communal results (missing)
@@ -170,7 +171,8 @@ def test_import_wabstic_vote_missing_headers(session):
         'text/plain'
     )
     assert [(e.filename, e.error.interpolate()) for e in errors] == [
-        ('sg_geschaefte', "Missing columns: 'ausmittlungsstand'"),
+        ('sg_geschaefte', "Missing columns: 'ausmittlungsstand, anzgdependent'"
+         ),
         ('sg_gemeinden', "Missing columns: 'art, sperrung'")
     ]
 
@@ -191,13 +193,15 @@ def test_import_wabstic_vote_invalid_values(session):
                     'Art',
                     'SortWahlkreis',
                     'SortGeschaeft',
-                    'Ausmittlungsstand'
+                    'Ausmittlungsstand',
+                    'AnzGdePendent'
                 )),
                 ','.join((
                     'Eidg',
                     '0',
                     '0',
-                    '4'
+                    '4',
+                    '2'
                 )),
             ))
         ).encode('utf-8')),
@@ -307,13 +311,15 @@ def test_import_wabstic_vote_expats(session):
                             'Art',
                             'SortWahlkreis',
                             'SortGeschaeft',
-                            'Ausmittlungsstand'
+                            'Ausmittlungsstand',
+                            'AnzGdePendent'
                         )),
                         ','.join((
                             'Eidg',
                             '0',
                             '0',
-                            '0'
+                            '0',
+                            '1'
                         )),
                     ))
                 ).encode('utf-8')),
@@ -362,7 +368,7 @@ def test_import_wabstic_vote_expats(session):
                 ).encode('utf-8')),
                 'text/plain'
             )
-
+            print_errors(errors)
             assert not errors
 
             result = vote.proposal.results.filter_by(entity_id=0).first()
@@ -388,13 +394,15 @@ def test_import_wabstic_vote_temporary_results(session):
                     'Art',
                     'SortWahlkreis',
                     'SortGeschaeft',
-                    'Ausmittlungsstand'
+                    'Ausmittlungsstand',
+                    'AnzGdePendent'
                 )),
                 ','.join((
                     'Eidg',
                     '0',
                     '0',
-                    '0'
+                    '0',
+                    '1'
                 )),
             ))
         ).encode('utf-8')),
