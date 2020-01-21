@@ -106,12 +106,6 @@ def import_vote_wabstic(vote, principal, number, district,
             )
             continue
 
-    # If all the lines were skipped
-    if remaining_entities is None and ausmittlungsstand is None:
-        return [FileImportError(
-            error=_("No line was read."), filename='sg_geschaefte'
-        )]
-
     # Parse the results
     ballot_results = {key: [] for key in used_ballot_types}
     added_entities = []
@@ -255,6 +249,11 @@ def import_vote_wabstic(vote, principal, number, district,
         :param ausmittlungsstand: value between 0 and 3
         :return:
         """
+
+        # If all the lines were skipped
+        if remaining_entities is None and ausmittlungsstand is None:
+            return 'unknown'
+
         if remaining_entities is not None:
             if remaining_entities == 0:
                 return 'final'
