@@ -113,6 +113,9 @@ def get_admin_tools(request):
             title = period and period.active and period.title
             title = title or _("No active period")
 
+            if len(title) > 25:
+                title = f'{title[:25]}…'
+
             yield LinkGroup(
                 title=title,
                 links=links,
