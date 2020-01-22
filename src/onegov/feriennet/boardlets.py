@@ -212,7 +212,7 @@ class BookingsBoardlet(FeriennetBoardlet):
             yield BoardletFact(
                 text=_("${count} Wishes per Attendee", mapping={
                     'count': self.attendees_count and (
-                        self.counts['total'] / self.attendees_count
+                        round(self.counts['total'] / self.attendees_count, 1)
                     ) or 0
                 }),
                 icon='fa-line-chart',
