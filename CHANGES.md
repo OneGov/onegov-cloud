@@ -1,8 +1,34 @@
 # Changes
 
+## Release `2020.13`
+
+> commits: **4 / [5b67e10c52...7c8b118757](https://github.com/OneGov/onegov-cloud/compare/5b67e10c52^...7c8b118757)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.13)](https://buildkite.com/seantis/onegov-cloud)
+
+### Ferienent
+
+🐞 **Fixes lack of rounding in dashboard**
+
+**`Bugfix`** | **[FER-842](https://issues.seantis.ch/browse/FER-842)** | **[2541f96fb1](https://github.com/onegov/onegov-cloud/commit/2541f96fb1857375a116aeb0f18ab2d63c465f5a)**
+
+### Feriennet
+
+🐞 **Fixes top-header display issue**
+
+Uses an alternative approach to text-ellipsis than before.
+
+**`Bugfix`** | **[FER-841](https://issues.seantis.ch/browse/FER-841)** | **[5b67e10c52](https://github.com/onegov/onegov-cloud/commit/5b67e10c5206bec12e381eca4a1b5553ed42a25f)**
+
+### Winterthur
+
+🐞 **Fixes mission reports error**
+
+**`Bugfix`** | **[FW-76](https://stadt-winterthur.atlassian.net/browse/FW-76)** | **[9e82805b74](https://github.com/onegov/onegov-cloud/commit/9e82805b7464eddb6b4a4645a2d868bf0c39573d)**
+
 ## Release `2020.12`
 
-> commits: **6 / [dee367655e...391d35770f](https://github.com/OneGov/onegov-cloud/compare/dee367655e^...391d35770f)**<br>
+> released: **2020-01-21 17:11**<br>
+> commits: **7 / [dee367655e...eabde3ad06](https://github.com/OneGov/onegov-cloud/compare/dee367655e^...eabde3ad06)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.12)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Election-Day
