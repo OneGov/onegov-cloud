@@ -79,9 +79,6 @@ def import_vote_wabstic(vote, principal, number, district,
         try:
             remaining_entities = validate_integer(
                 line, 'anzgdependent', default=None)
-        except AttributeError:
-            # the row is not in the files and ausmittlungsstand precedes
-            pass
         except Exception as e:
             line_errors.append(
                 _("Error in anzgdependent: ${msg}",
@@ -232,31 +229,8 @@ def import_vote_wabstic(vote, principal, number, district,
     vote.clear_results()
     vote.status = 'unknown'
 
-    def decide_vote_status(remaining_entities, ausmittlungsstand):
-        """
-
-        :param remaining_entities: precedes ausmittlungstand for status
-        :param ausmittlungsstand: value between 0 and 3
-        :return:
-        """
-
-        # If all the lines were skipped
-        if remaining_entities is None and ausmittlungsstand is None:
-            return 'unknown'
-
-        if remaining_entities is not None:
-            if remaining_entities == 0:
-                return 'final'
-            else:
-                return 'interim'
-
-        elif ausmittlungsstand == 1:
-            return 'interim'
-        elif ausmittlungsstand == 0:
-            return 'unknown'
-        raise ValueError
-
-    vote.status = decide_vote_status(remaining_entities, ausmittlungsstand)
+    if remaining_entities == 0:
+        vote.status = 'final'
 
     ballot_ids = {b: vote.ballot(b, create=True).id for b in used_ballot_types}
 

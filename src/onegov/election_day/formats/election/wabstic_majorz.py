@@ -89,7 +89,6 @@ def import_election_wabstic_majorz(
 
     # Parse the election
     absolute_majority = None
-    complete = 0
     for line in wm_wahl.lines:
         line_errors = []
 
