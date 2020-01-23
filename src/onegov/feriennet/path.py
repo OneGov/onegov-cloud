@@ -273,7 +273,7 @@ def get_group_invite(app, request, group_code, username=None):
     if not is_valid_group_code(group_code):
         return None
 
-    if not request.is_admin:
+    if not request.is_admin or not username:
         username = request.current_username
 
     invite = GroupInvite(request.session, group_code, username)
