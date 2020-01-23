@@ -7,7 +7,7 @@ from onegov.winterthur.models import WinterthurAddress
 from pycurl import Curl
 from sqlalchemy import select, func
 
-HOST = 'https://stadt.winterthur.ch'
+HOST = 'http://stadt.winterthur.winport.net'
 STREETS = f'{HOST}/_static/strassenverzeichnis/gswpl_strver_str.csv'
 ADDRESSES = f'{HOST}/_static/strassenverzeichnis/gswpl_strver_adr.csv'
 
