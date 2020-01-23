@@ -149,26 +149,12 @@ def import_election_wabstic_proporz(
 
         if not line_is_relevant(line, number):
             continue
-
-        try:
-            complete = validate_integer(line, 'ausmittlungsstand')
-        except ValueError as e:
-            line_errors.append(e.args[0])
-        else:
-            if not (0 <= complete <= 3):
-                line_errors.append(
-                    _('Value ${col} is not between 0 and 3',
-                      mapping={'col': 'ausmittlungsstand'}))
-
         try:
             remaining_entities = validate_integer(
-                line, 'anpendentgde', default=None)
-        except AttributeError:
-            # the row is not in the files and ausmittlungsstand precedes
-            pass
+                line, 'anzpendentgde', default=None)
         except Exception as e:
             line_errors.append(
-                _("Error in anzgdependent: ${msg}",
+                _("Error in anzpendentgde: ${msg}",
                   mapping={'msg': e.args[0]}))
 
         # Pass the errors and continue to next line

@@ -109,7 +109,7 @@ def test_import_wabstic_majorz_missing_headers(session):
         ).encode('utf-8')), 'text/plain'
     )
     assert [(e.filename, e.error.interpolate()) for e in errors] == [
-        ('wm_wahl', "Missing columns: 'absolutesmehr'"),
+        ('wm_wahl', "Missing columns: 'absolutesmehr, anzpendentgde'"),
         ('wmstatic_gemeinden', "Missing columns: 'bfsnrgemeinde'"),
         ('wm_gemeinden', "Missing columns: 'sperrung'"),
         ('wm_kandidaten', "Missing columns: 'knr, vorname'"),
@@ -138,11 +138,13 @@ def test_import_wabstic_majorz_invalid_values(session):
                     'SortGeschaeft',
                     'AbsolutesMehr',
                     'Ausmittlungsstand',
+                    'AnzPendendGde'
                 )),
                 ','.join((
                     '0',
                     'xxx',  # AbsolutesMehr
                     '4',  # Ausmittlungsstand
+                    '1'
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
@@ -254,7 +256,6 @@ def test_import_wabstic_majorz_invalid_values(session):
         ('wm_kandidatengde', 3,
             'Entity with id 3256 not in wmstatic_gemeinden'),
         ('wm_wahl', 2, 'Invalid integer: absolutesmehr'),
-        ('wm_wahl', 2, 'Value of ausmittlungsstand not between 0 and 3'),
         ('wmstatic_gemeinden', 2, '100 is unknown'),
         ('wmstatic_gemeinden', 2, 'Invalid integer: stimmberechtigte'),
         ('wmstatic_gemeinden', 4, '3215 was found twice')
@@ -285,11 +286,13 @@ def test_import_wabstic_majorz_expats(session):
                             'SortGeschaeft',
                             'AbsolutesMehr',
                             'Ausmittlungsstand',
+                            'AnzPendendGde'
                         )),
                         ','.join((
                             '0',
                             '5000',  # AbsolutesMehr
                             '0',  # Ausmittlungsstand
+                            '1'
                         )),
                     ))
                 ).encode('utf-8')), 'text/plain',
@@ -401,11 +404,13 @@ def test_import_wabstic_majorz_temporary_results(session):
                     'SortGeschaeft',
                     'AbsolutesMehr',
                     'Ausmittlungsstand',
+                    'AnzPendendGde'
                 )),
                 ','.join((
                     '0',
                     '5000',  # AbsolutesMehr
                     '0',  # Ausmittlungsstand
+                    '1'
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
@@ -542,11 +547,13 @@ def test_import_wabstic_majorz_regional(session):
                         'SortGeschaeft',
                         'AbsolutesMehr',
                         'Ausmittlungsstand',
+                        'AnzPendendGde'
                     )),
                     ','.join((
                         '0',
                         '5000',  # AbsolutesMehr
                         '0',  # Ausmittlungsstand
+                        '1'
                     )),
                 ))
             ).encode('utf-8')), 'text/plain',
@@ -659,11 +666,13 @@ def test_import_wabstic_majorz_regional(session):
                         'SortGeschaeft',
                         'AbsolutesMehr',
                         'Ausmittlungsstand',
+                        'AnzPendendGde'
                     )),
                     ','.join((
                         '0',
                         '5000',  # AbsolutesMehr
                         '0',  # Ausmittlungsstand
+                        '1'
                     )),
                 ))
             ).encode('utf-8')), 'text/plain',
@@ -778,11 +787,13 @@ def test_import_wabstic_majorz_regional(session):
                     'SortGeschaeft',
                     'AbsolutesMehr',
                     'Ausmittlungsstand',
+                    'AnzPendendGde'
                 )),
                 ','.join((
                     '0',
                     '5000',  # AbsolutesMehr
                     '0',  # Ausmittlungsstand
+                    '1'
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
@@ -878,11 +889,13 @@ def test_import_wabstic_majorz_regional(session):
                         'SortGeschaeft',
                         'AbsolutesMehr',
                         'Ausmittlungsstand',
+                        'AnzPendendGde'
                     )),
                     ','.join((
                         '0',
                         '5000',  # AbsolutesMehr
                         '0',  # Ausmittlungsstand
+                        '1'
                     )),
                 ))
             ).encode('utf-8')), 'text/plain',

@@ -105,15 +105,14 @@ def import_election_wabstic_majorz(
             if absolute_majority == -1:
                 absolute_majority = None
 
-        # Check if complete, if None, 0 will be returned
+        # Check if remaining entities is 0 is final, else unknown
         try:
-            complete = validate_integer(line, 'ausmittlungsstand')
-        except ValueError as e:
-            line_errors.append(e.args[0])
-
-        if not 0 <= complete <= 3:
+            remaining_entities = validate_integer(
+                line, 'anzpendentgde', default=None)
+        except Exception as e:
             line_errors.append(
-                _("Value of ausmittlungsstand not between 0 and 3"))
+                _("Error in anzpendentgde: ${msg}",
+                  mapping={'msg': e.args[0]}))
 
         # Pass the errors and continue to next line
         if line_errors:
@@ -336,9 +335,7 @@ def import_election_wabstic_majorz(
     election.clear_results()
     election.absolute_majority = absolute_majority
     election.status = 'unknown'
-    if complete == 1:
-        election.status = 'interim'
-    if complete == 2:
+    if remaining_entities == 0:
         election.status = 'final'
 
     result_uids = {entity_id: uuid4() for entity_id in added_results}
