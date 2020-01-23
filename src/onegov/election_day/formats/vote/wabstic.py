@@ -258,12 +258,8 @@ def import_vote_wabstic(vote, principal, number, district,
             if remaining_entities == 0:
                 return 'final'
             else:
-                return 'interim'
-
-        elif ausmittlungsstand == 1:
-            return 'interim'
-        elif ausmittlungsstand == 0:
-            return 'unknown'
+                # the StatusMixin will return completed False if interim
+                return 'unknown'
         raise ValueError
 
     vote.status = decide_vote_status(remaining_entities, ausmittlungsstand)

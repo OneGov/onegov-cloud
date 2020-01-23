@@ -39,9 +39,9 @@ def test_import_wabstic_vote_1(session):
     # Test federal results
     principal = Canton(name='sg', canton='sg')
     vote.expats = True
-    for number, yeas, completed in (
-        ('1', 70821, True),
-        ('2', 84247, False),
+    for number, yeas, completed, status in (
+        ('1', 70821, True, 'final'),     # final and progress (78, 78)
+        ('2', 84247, True, 'unknown'),    # unknown and progress (78, 78)
     ):
         errors = import_vote_wabstic(
             vote, principal, number, '1',
@@ -50,8 +50,9 @@ def test_import_wabstic_vote_1(session):
         )
         print_errors(errors)
         assert not errors
+        assert vote.status == status
+        assert vote.progress == (78, 78)
         assert vote.completed == completed
-        assert vote.ballots.one().results.count() == 78
         assert vote.yeas == yeas
 
     # Test cantonal results
@@ -85,7 +86,9 @@ def test_import_wabstic_vote_1(session):
             BytesIO(sg_gemeinden), 'text/plain'
         )
         assert not errors
-        assert not vote.completed
+        assert vote.counted
+        assert vote.status == 'unknown'
+        assert vote.completed
         assert vote.ballots.one().results.one().yeas == yeas
 
     # Test communal results (missing)
