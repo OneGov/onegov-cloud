@@ -251,6 +251,9 @@ def get_notification_template_collection(request, app):
 def get_notification_template(request, app, id, period_id):
     template = NotificationTemplateCollection(app.session()).by_id(id)
 
+    if not period_id and not app.active_period:
+        return None
+
     if template:
         template.period_id = period_id or app.active_period.id
 

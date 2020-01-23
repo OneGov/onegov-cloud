@@ -34,6 +34,9 @@ def view_notification_templates(self, request):
     layout = NotificationTemplateCollectionLayout(self, request)
 
     def get_links(notification):
+        if not request.app.active_period:
+            return
+
         yield Link(
             text=_("Mailing"),
             url=request.link(notification, 'send')

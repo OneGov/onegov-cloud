@@ -23,9 +23,9 @@
 
                             <div class="progress ${int(need_group[0].confirmed) >= int(need_group[0].min_required) and 'success' or 'alert'}">
 
-                                <span class="meter" style="width: ${min(int(need_group[0].confirmed) / int(need_group[0].min_required), 1) * 100}%">
-
-                                </span>
+                                <span class="meter" tal:condition="need_group[0].min_required" style="width: ${min(int(need_group[0].confirmed) / int(
+                                    need_group[0].min_required), 1) * 100}%"></span>
+                                <span class="meter" tal:condition="not:need_group[0].min_required" style="width: 100%"></span>
                                 <span class="meter-text">
                                     <strong>${need_group[0].need_name}</strong>,
                                     <span i18n:translate>
