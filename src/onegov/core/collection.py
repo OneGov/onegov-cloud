@@ -277,7 +277,13 @@ class RangedPagination(object):
 
         """
         assert direction in ('up', 'down')
-        s, e = page_range
+
+        if not page_range:
+            s, e = 0, 9
+        elif len(page_range) == 1:
+            s, e = page_range[0], page_range[0]
+        else:
+            s, e = page_range[:2]
 
         if e < s:
             s, e = e, s
