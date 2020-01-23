@@ -142,7 +142,8 @@ def import_election_wabstic_proporz(
 
     # Parse the election
 
-    complete = 0
+    remaining_entities = None
+
     for line in wp_wahl.lines:
         line_errors = []
 
@@ -158,6 +159,17 @@ def import_election_wabstic_proporz(
                 line_errors.append(
                     _('Value ${col} is not between 0 and 3',
                       mapping={'col': 'ausmittlungsstand'}))
+
+        try:
+            remaining_entities = validate_integer(
+                line, 'anpendentgde', default=None)
+        except AttributeError:
+            # the row is not in the files and ausmittlungsstand precedes
+            pass
+        except Exception as e:
+            line_errors.append(
+                _("Error in anzgdependent: ${msg}",
+                  mapping={'msg': e.args[0]}))
 
         # Pass the errors and continue to next line
         if line_errors:
@@ -544,9 +556,7 @@ def import_election_wabstic_proporz(
     # Add the results to the DB
     election.clear_results()
     election.status = 'unknown'
-    if complete == 1:
-        election.status = 'interim'
-    if complete == 2:
+    if remaining_entities == 0:
         election.status = 'final'
 
     result_uids = {entity_id: uuid4() for entity_id in added_results}

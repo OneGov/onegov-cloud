@@ -206,7 +206,7 @@ def test_import_wabstic_proporz_missing_headers(session):
         ('wp_kandidatengde', "Missing columns: 'bfsnrgemeinde'"),
         ('wp_listen', "Missing columns: 'sortgeschaeft'"),
         ('wp_listengde', "Missing columns: 'bfsnrgemeinde'"),
-        ('wp_wahl', "Missing columns: 'sortgeschaeft'"),
+        ('wp_wahl', "Missing columns: 'sortgeschaeft, anzpendentgde'"),
         ('wpstatic_gemeinden', "Missing columns: 'sortgeschaeft'"),
         ('wpstatic_kandidaten', "Missing columns: 'sortgeschaeft'"),
     ]
@@ -232,10 +232,12 @@ def test_import_wabstic_proporz_invalid_values(session):
                 ','.join((
                     'SortGeschaeft',
                     'Ausmittlungsstand',
+                    'AnzPendentGde'
                 )),
                 ','.join((
                     '0',
                     '4',  # Ausmittlungsstand
+                    '1'
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
@@ -405,10 +407,12 @@ def test_import_wabstic_proporz_expats(session):
                         ','.join((
                             'SortGeschaeft',
                             'Ausmittlungsstand',
+                            'AnzPendentGde'
                         )),
                         ','.join((
                             '0',
                             '0',  # Ausmittlungsstand
+                            '1'
                         )),
                     ))
                 ).encode('utf-8')), 'text/plain',
@@ -559,10 +563,12 @@ def test_import_wabstic_proporz_temporary_results(session):
                 ','.join((
                     'SortGeschaeft',
                     'Ausmittlungsstand',
+                    'AnzPendentGde'
                 )),
                 ','.join((
                     '0',
                     '0',  # Ausmittlungsstand
+                    '1'
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
@@ -741,10 +747,12 @@ def test_import_wabstic_proporz_regional(session):
                     ','.join((
                         'SortGeschaeft',
                         'Ausmittlungsstand',
+                        'AnzPendentGde'
                     )),
                     ','.join((
                         '0',
                         '0',  # Ausmittlungsstand
+                        '1'
                     )),
                 ))
             ).encode('utf-8')), 'text/plain',
@@ -901,10 +909,12 @@ def test_import_wabstic_proporz_regional(session):
                     ','.join((
                         'SortGeschaeft',
                         'Ausmittlungsstand',
+                        'AnzPendentGde'
                     )),
                     ','.join((
                         '0',
                         '0',  # Ausmittlungsstand
+                        '1'
                     )),
                 ))
             ).encode('utf-8')), 'text/plain',
@@ -1061,10 +1071,12 @@ def test_import_wabstic_proporz_regional(session):
                 ','.join((
                     'SortGeschaeft',
                     'Ausmittlungsstand',
+                    'AnzPendentGde'
                 )),
                 ','.join((
                     '0',
                     '0',  # Ausmittlungsstand
+                    '1'
                 )),
             ))
         ).encode('utf-8')), 'text/plain',
@@ -1199,10 +1211,12 @@ def test_import_wabstic_proporz_regional(session):
                     ','.join((
                         'SortGeschaeft',
                         'Ausmittlungsstand',
+                        'AnzPendentGde'
                     )),
                     ','.join((
                         '0',
                         '0',  # Ausmittlungsstand
+                        '1'
                     )),
                 ))
             ).encode('utf-8')), 'text/plain',
