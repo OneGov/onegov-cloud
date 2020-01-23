@@ -39,9 +39,9 @@ def test_import_wabstic_vote_1(session):
     # Test federal results
     principal = Canton(name='sg', canton='sg')
     vote.expats = True
-    for number, yeas, completed in (
-        ('1', 70821, True),
-        ('2', 84247, False),
+    for number, yeas, completed, status, counted in (
+        ('1', 70821, True, 'final', True),
+        ('2', 84247, True, 'unknown', True),
     ):
         errors = import_vote_wabstic(
             vote, principal, number, '1',
@@ -85,7 +85,9 @@ def test_import_wabstic_vote_1(session):
             BytesIO(sg_gemeinden), 'text/plain'
         )
         assert not errors
-        assert not vote.completed
+        assert vote.counted
+        assert vote.status == 'unknown'
+        assert vote.completed
         assert vote.ballots.one().results.one().yeas == yeas
 
     # Test communal results (missing)
@@ -288,7 +290,6 @@ def test_import_wabstic_vote_invalid_values(session):
         ('sg_gemeinden', 3, 'Invalid integer: stmhgnein'),
         ('sg_gemeinden', 3, 'Invalid integer: stmungueltig'),
         ('sg_gemeinden', 3, 'Invalid values'),
-        ('sg_geschaefte', 2, 'Value of ausmittlungsstand not between 0 and 3')
     ]
 
 
