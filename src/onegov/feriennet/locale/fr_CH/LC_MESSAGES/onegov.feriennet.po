@@ -12,7 +12,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.12\n"
-"gengo-order-id: 4408747\n"
 "X-Generator: Poedit 2.0.3\n"
 
 msgid "No active period"
@@ -2146,6 +2145,8 @@ msgstr ""
 
 msgid "Notification templates can only be used with an active period."
 msgstr ""
+"Les modèles de notification peuvent être utilisés uniquement avec une "
+"période active."
 
 msgid "No notification templates yet."
 msgstr "Il n'y a pas encore de modèles de notification enregistrés."
