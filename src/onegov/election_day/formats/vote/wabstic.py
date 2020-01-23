@@ -90,7 +90,7 @@ def import_vote_wabstic(vote, principal, number, district,
             remaining_entities = validate_integer(
                 line, 'anzgdependent', default=None)
         except AttributeError:
-            # die row is not in the files and ausmittlungsstand precedes
+            # the row is not in the files and ausmittlungsstand precedes
             pass
         except Exception as e:
             line_errors.append(
