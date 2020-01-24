@@ -69,29 +69,16 @@ def import_vote_wabstic(vote, principal, number, district,
 
     # Parse the vote
     remaining_entities = None
-    ausmittlungsstand = None
     for line in sg_geschaefte.lines:
         line_errors = []
 
         if not line_is_relevant(line, vote.domain, district, number):
             continue
-        try:
-            ausmittlungsstand = validate_integer(line, 'ausmittlungsstand')
-            assert 0 <= ausmittlungsstand <= 3
-
-        except ValueError as e:
-            line_errors.append(e.args[0])
-        except AssertionError:
-            line_errors.append(
-                _("Value of ausmittlungsstand not between 0 and 3"))
 
         remaining_entities = None
         try:
             remaining_entities = validate_integer(
                 line, 'anzgdependent', default=None)
-        except AttributeError:
-            # die row is not in the files and ausmittlungsstand precedes
-            pass
         except Exception as e:
             line_errors.append(
                 _("Error in anzgdependent: ${msg}",
@@ -242,27 +229,8 @@ def import_vote_wabstic(vote, principal, number, district,
     vote.clear_results()
     vote.status = 'unknown'
 
-    def decide_vote_status(remaining_entities, ausmittlungsstand):
-        """
-
-        :param remaining_entities: precedes ausmittlungstand for status
-        :param ausmittlungsstand: value between 0 and 3
-        :return:
-        """
-
-        # If all the lines were skipped
-        if remaining_entities is None and ausmittlungsstand is None:
-            return 'unknown'
-
-        if remaining_entities is not None:
-            if remaining_entities == 0:
-                return 'final'
-            else:
-                # the StatusMixin will return completed False if interim
-                return 'unknown'
-        raise ValueError
-
-    vote.status = decide_vote_status(remaining_entities, ausmittlungsstand)
+    if remaining_entities == 0:
+        vote.status = 'final'
 
     ballot_ids = {b: vote.ballot(b, create=True).id for b in used_ballot_types}
 

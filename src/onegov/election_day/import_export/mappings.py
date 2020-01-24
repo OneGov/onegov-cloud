@@ -105,7 +105,7 @@ WABSTI_PROPORZ_HEADERS_STATS = (
 WABSTIC_MAJORZ_HEADERS_WM_WAHL = (
     'sortgeschaeft',  # provides the link to the election
     'absolutesmehr',  # absolute majority
-    'ausmittlungsstand',  # complete
+    'anzpendentgde',  # status
 )
 
 WABSTIC_MAJORZ_HEADERS_WMSTATIC_GEMEINDEN = (
@@ -144,7 +144,7 @@ WABSTIC_MAJORZ_HEADERS_WM_KANDIDATENGDE = (
 
 WABSTIC_PROPORZ_HEADERS_WP_WAHL = (
     'sortgeschaeft',  # provides the link to the election
-    'ausmittlungsstand',  # complete
+    'anzpendentgde',      # status
 )
 
 WABSTIC_PROPORZ_HEADERS_WPSTATIC_GEMEINDEN = (
