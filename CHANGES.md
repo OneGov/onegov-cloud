@@ -1,8 +1,56 @@
 # Changes
 
+## Release `2020.14`
+
+> commits: **11 / [3187fdea56...d47ce90bca](https://github.com/OneGov/onegov-cloud/compare/3187fdea56^...d47ce90bca)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.14)](https://buildkite.com/seantis/onegov-cloud)
+
+### Core
+
+🐞 **Improve page_range resilience**
+
+With some odd inputs, an error could be provoked.
+
+**`Bugfix`** | **[e63a0797b0](https://github.com/onegov/onegov-cloud/commit/e63a0797b0fbafcf5dd229663ca141f48c156196)**
+
+### Election-Day
+
+🐞 **Fixes Status Mixin and default status for wabstic**
+
+Fixes default status to `unknown` for election proporz/majorz and vote so that they are completed if fully counted.
+
+**`Bugfix`** | **[d47ce90bca](https://github.com/onegov/onegov-cloud/commit/d47ce90bca2752b586cf3fd17788b5f9512a2b56)**
+
+### Feriennet
+
+🐞 **Fixes error in group invite**
+
+The group invite would not work for admins, unless they entered the view
+through the booking view.
+
+**`Bugfix`** | **[3187fdea56](https://github.com/onegov/onegov-cloud/commit/3187fdea560babf3d498ba4e80e08bba917c8467)**
+
+🐞 **Fixes division by zero error in volunteers view**
+
+**`Bugfix`** | **[d8213704a4](https://github.com/onegov/onegov-cloud/commit/d8213704a4e1924ed23f7bea5d8ac3748d0b0093)**
+
+🐞 **Fixes error in notifications template**
+
+The error was caused by the lack of an active period, which is now
+explicitly required.
+
+**`Bugfix`** | **[4f65eefe32](https://github.com/onegov/onegov-cloud/commit/4f65eefe32f5032aa47ea48a5df823311b73aef7)**
+
+### Winterthur
+
+✨ **Update address URLs**
+
+**`Other`** | **[8749ba7008](https://github.com/onegov/onegov-cloud/commit/8749ba7008ad7659ea62bb815feae3f0e882a88b)**
+
 ## Release `2020.13`
 
-> commits: **4 / [5b67e10c52...7c8b118757](https://github.com/OneGov/onegov-cloud/compare/5b67e10c52^...7c8b118757)**<br>
+> released: **2020-01-22 15:32**<br>
+> commits: **5 / [5b67e10c52...3906284a47](https://github.com/OneGov/onegov-cloud/compare/5b67e10c52^...3906284a47)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.13)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Ferienent
