@@ -291,7 +291,6 @@ def test_import_wabstic_vote_invalid_values(session):
         ('sg_gemeinden', 3, 'Invalid integer: stmhgnein'),
         ('sg_gemeinden', 3, 'Invalid integer: stmungueltig'),
         ('sg_gemeinden', 3, 'Invalid values'),
-        ('sg_geschaefte', 2, 'Value of ausmittlungsstand not between 0 and 3')
     ]
 
 
