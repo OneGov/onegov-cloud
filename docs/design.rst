@@ -3,7 +3,7 @@ The Design of OneGov Cloud
 
 This document gives a general overview over the design of OneGov Cloud. After
 reading this document you should understand its history, structure, and reason
-for being. Hopefully this can serve as a guide for future development.
+for being.
 
 Primordial Soup
 ===============
@@ -62,3 +62,105 @@ Enter Morepath.
 Morepath
 ========
 
+Morepath is dubbed a micro-framework with superpowers. It heavily borrows from
+Zope and Grok, both of which were at least in part written by Morepath's
+author.
+
+Like Zope it allows for web applications to inherit from others. And like Grok
+it eschews Zope's heavy reliance on XML configuration files.
+
+When it came out, we decided to take a chance and build our own in-house
+framework based on Morepath, to find a path out of our reliance on Plone.
+
+Learning Morepath is essential to learn more about OneGov Cloud. Here are
+a few good starting points.
+
+First, a general overview over framework patterns, which nicely presents the
+case for Morepath:
+
+https://blog.startifact.com/posts/framework-patterns.html
+
+Second, an introductory video (25 mins):
+
+https://www.youtube.com/watch?v=gyDKMAWPyuY
+
+Third, the official Morepath docs:
+
+https://morepath.readthedocs.io/en/latest/
+
+Turtles All The Way Down
+========================
+
+Resting upon the foundation that is Morepath, we built our own set of modules
+that implement a lot of the parts that are missing in Morepath, which is a
+*micro*-framework after all.
+
+This includes some tooling, like a development server (`onegov.server`), a
+general framework component for requests/session handling and the like
+(``onegov.core``), libraries implementing data models, like ``onegov.user``,
+and applications tying it all together, like ``onegov.org``.
+
+An overview over the most important modules can be found here:
+:doc:`onegov_cloud_modules`.
+
+Crucially, almost everything can be written in a way that allows for
+customization using the open/close principle (open for extension,
+closed for modification).
+
+Partially this is directly supported by Morepath, partially it is done with
+custom implementations of things like template macro lookups.
+
+Though it is never free to do so, it is always possible to take an application
+or a module and add an abstraction on top that modifies its behavior.
+
+Efficient Request Handling
+==========================
+
+Another thing that Plone is not that great at is running at scale. Of course,
+you can scale a Plone application to thousands of users and millions of
+requests. But it's going to require a lot of resources.
+
+With OneGov Cloud we wanted to be more efficient. After some years and lots of
+added code we sometimes fall short of this, but in general wen can run some
+pretty nice workloads on pretty small servers with OneGov Cloud.
+
+One reason for this is a lot of new code that we wrote ourselves. That is,
+what runs is really what we need and want. To a large degree that is something
+that you get with every new software project. Something that you will also lose
+as the software grows bigger.
+
+The other reason however is due to a design decision. We can run all our
+OneGov Cloud workloads in a single process, no matter the request. Basically
+we are supporting multi-tenant since the very first day.
+
+As a result we have hosts where a handful of processes support over 100
+different websites. Though we tend to distribute them homogeneously for
+logistical reasons, we can theoretically load all our customers onto a single
+server and run the workloads on a single set of processes.
+
+Each request that hits our processes has a namespace which is associated with
+different code-paths and database records, but which runs on a shared code-base.
+
+As a result, our biggest server handling some 300 requests a second can run
+on 8GB worth of RAM and 4 CPUs without breaking a sweat.
+
+Single Container
+================
+
+The latest thing we got rid of that often was a source of pain is the package
+management aspect of our deployments. At its conception, OneGov Cloud was
+made up of a list of different Python modules that could be installed
+separately.
+
+This proved to be tricky, as one could not easily make changes over multiple
+modules in a single commit. Often one would have to apply a change to different
+modules in succession and release them one by one for CI to work properly.
+
+To solve this once and for all, we now deploy all our sources using a single
+container that contains all sources of all OneGov Cloud projects.
+
+As a result our memory footprint is a bit higher than it needs to be, since we
+are possibly loading modules we will never need. But on the other hand we can
+test all code together and be sure that it all interacts well with each other.
+
+The containerization also made our deployments easier and more reliable.

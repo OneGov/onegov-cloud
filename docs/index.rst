@@ -72,5 +72,7 @@ Documentation Highlights
 Further Reading
 ^^^^^^^^^^^^^^^
 
+Learn about OneGov Cloud's history and design :doc:`design`.
+
 Find out more about the inner workings of OneGov Cloud by having a look at
 the OneGov Cloud modules documentation at :doc:`onegov_cloud_modules`.
