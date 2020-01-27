@@ -2,10 +2,6 @@ install: in_virtual_env
 	# use latest pip
 	pip install --upgrade pip
 
-	# workaround for pdftotext issue on macOS
-	# https://github.com/jalan/pdftotext/issues/55
-	CPPFLAGS="-std=c++11" pip install --upgrade pdftotext
-
 	# install requirements
 	pip install -e '.[test,dev,docs]' --upgrade-strategy=eager
 
