@@ -94,3 +94,13 @@ def add_event_property_locked(context):
             Column('locked_for_subscriptions', Boolean,
                    nullable=False, default=True),
             default=lambda x: False)
+
+
+@upgrade_task('Adds hidden_from_public to course')
+def add_hidden_from_public_in_course(context):
+    if not context.has_column('fsi_courses', 'hidden_from_public'):
+        context.add_column_with_defaults(
+            'fsi_courses',
+            Column('hidden_from_public', Boolean, nullable=False,
+                   default=False),
+            default=lambda x: False)
