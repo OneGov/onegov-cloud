@@ -13,7 +13,8 @@ class CourseCollection(GenericCollection):
 
     def query(self):
         query = super().query()
-        return query.filter_by(hidden_from_public=False)
+        query = query.filter_by(hidden_from_public=False)
+        return query.order_by(Course.name)
 
     def by_id(self, id):
         return super().query().filter(self.primary_key == id).first()
