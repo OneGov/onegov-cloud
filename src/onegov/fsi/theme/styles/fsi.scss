@@ -1,3 +1,16 @@
+/*
+    The maximum width of a line relative to the font. This limits textblocks
+    to a readable length.
+*/
+
+$course-description-line-width: 87ex;
+
+.course-page-text {
+    p {
+        max-width: $course-description-line-width;
+    }
+}
+
 // Removes margin for button inside a table td
 td {
     a.button,

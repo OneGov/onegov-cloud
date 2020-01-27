@@ -135,7 +135,7 @@
 
 <metal:course define-macro="course_details">
     <h3 i18n:translate="">Description:</h3>
-    <div class="page-text">
+    <div class="page-text course-page-text">
         <p tal:content="structure model.description_html"></p>
     </div>
 </metal:course>
