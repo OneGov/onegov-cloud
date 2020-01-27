@@ -69,6 +69,11 @@ dd.accordion-navigation + dd.accordion-navigation {
 /*
     Tables
 */
+
+.no-wrap {
+    white-space: nowrap;
+}
+
 .events-table {
     border: 1px solid $gray-light;
     border-width: 1px 1px 0;
