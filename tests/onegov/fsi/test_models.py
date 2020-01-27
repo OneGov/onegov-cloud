@@ -93,6 +93,7 @@ def test_course_event_1(session, course, course_event, attendee):
     # Subscription in for event2 has impact on possible bookers in event
     assert event.start.year == event2.start.year
     assert event.possible_bookers(year=event.start.year).first() is None
+    assert event.can_book(attendee) is False
 
     # Test course behind the event
     assert event.name == event.course.name

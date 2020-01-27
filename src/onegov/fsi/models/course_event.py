@@ -226,7 +226,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         return self.reservations.filter_by(
             attendee_id=attendee_id).first() is not None
 
-    def possible_bookers(self, external_only=False, year=None):
+    def possible_bookers(self, external_only=False, year=None, as_uids=False):
         """Returns the list of possible bookers. Attendees that already have
         a subscription for the parent course in the same year are excluded."""
         session = object_session(self)
@@ -252,15 +252,28 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         )
         excl = excl.subquery('excl')
 
-        query = session.query(CourseAttendee).filter(
-            CourseAttendee.id.notin_(excl))
+        if as_uids:
+            # Use this because its less costly
+            query = session.query(CourseAttendee.id)
+        else:
+            query = session.query(CourseAttendee)
 
         if external_only:
             query = query.filter(CourseAttendee.user_id == None)
-        query = query.order_by(
-            CourseAttendee.last_name, CourseAttendee.first_name)
+
+        query = query.filter(CourseAttendee.id.notin_(excl))
+
+        if not as_uids:
+            query = query.order_by(
+                CourseAttendee.last_name, CourseAttendee.first_name)
         return query
 
     @property
     def email_recipients(self):
         return (att.email for att in self.attendees)
+
+    def can_book(self, attendee, year=None):
+        assert isinstance(attendee, CourseAttendee)
+        if self.locked:
+            return False
+        return attendee.id in self.possible_bookers(year=year, as_uids=True)
