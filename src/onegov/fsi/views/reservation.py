@@ -66,7 +66,7 @@ def view_add_reservation(self, request, form):
         return request.redirect(request.link(self))
 
     return {
-        'title': _('Add Reservation'),
+        'title': _('Add Subscription'),
         'model': self,
         'layout': layout,
         'form': form

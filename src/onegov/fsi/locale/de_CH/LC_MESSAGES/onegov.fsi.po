@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-01-16 08:19+0100\n"
+"POT-Creation-Date: 2020-01-27 09:21+0100\n"
 "PO-Revision-Date: 2020-01-16 08:19+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -154,6 +154,12 @@ msgstr "Platzhalter-Beschreibung (optional)"
 
 msgid "Placeholder Reservation"
 msgstr "Platzhalter-Reservation"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nein"
 
 msgid "New Course"
 msgstr "Neuer Kurs"
@@ -466,12 +472,6 @@ msgstr "Beschreibung:"
 msgid "Locked"
 msgstr "Gesperrt"
 
-msgid "Yes"
-msgstr "Ja"
-
-msgid "No"
-msgstr "Nein"
-
 msgid "No events found."
 msgstr "Keine Durchführungen gefunden."
 
@@ -615,9 +615,6 @@ msgstr "Neue Anmeldung wurde hinzugefügt"
 msgid "Subscription already exists"
 msgstr "Anmeldung existiert bereits"
 
-msgid "Add Reservation"
-msgstr "Reservation hinzufügen"
-
 msgid "Subscription was updated"
 msgstr "Anmeldung wurde aktualisert"
 
@@ -641,6 +638,9 @@ msgstr "Neue Anmeldungen erfasst"
 
 msgid "Subscription successfully deleted"
 msgstr "Anmeldung erfolgreich gelöscht"
+
+#~ msgid "Add Reservation"
+#~ msgstr "Reservation hinzufügen"
 
 #~ msgid "This course event can't be booked anymore."
 #~ msgstr "Dieser Kurs kann nicht mehr gebucht werden."
