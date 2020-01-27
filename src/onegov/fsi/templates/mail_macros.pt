@@ -17,11 +17,12 @@
             <br>
         </tal:b>
         <tal:b tal:case="'reservation'">
-            <p i18n:translate="">We hereby confirm your subscription for:</p>
+            <p i18n:translate="">You have successfully subscribed to the following course event: </p>
+            <metal:b use-macro="layout.default_macros['course_details']" tal:define="model layout.model.course_event.course"/>
+            <metal:b use-macro="layout.default_macros['course_event_details']" tal:define="model layout.model.course_event; for_email True"/>
             <br>
-            <tal:b metal:use-macro="layout.default_macros['course_event_details']" tal:define="model layout.model.course_event; for_email True"/>
-            <br>
-            <p i18n:translate="">You will receive a reminder email prior to the course.</p>
+            <p i18n:translate="">Thank you for your course subscription. Please add the course event to your outlook calender.</p>
+            <p i18n:translate="">You will receive a reminder email 2 weeks prior to the start</p>
             <p>
                 <span i18n:translate="">Further information can be found on the </span>
                 <a href="${layout.event_url}" i18n:translate="">course website.</a>
