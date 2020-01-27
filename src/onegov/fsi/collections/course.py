@@ -3,8 +3,9 @@ from onegov.fsi.models.course import Course
 
 
 class CourseCollection(GenericCollection):
-    def __init__(self, session):
+    def __init__(self, session, auth_attendee=None):
         super().__init__(session)
+        self.auth_attendee = auth_attendee
 
     @property
     def model_class(self):
@@ -12,4 +13,7 @@ class CourseCollection(GenericCollection):
 
     def query(self):
         query = super().query()
-        return query
+        return query.filter_by(hidden_from_public=False)
+
+    def by_id(self, id):
+        return super().query().filter(self.primary_key == id).first()
