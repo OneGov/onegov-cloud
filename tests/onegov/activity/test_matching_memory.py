@@ -1,4 +1,5 @@
 import sys
+import time
 
 from datetime import date, timedelta, datetime
 from functools import partial
@@ -730,3 +731,37 @@ def test_anti_affinity_groups():
     foo._no_overlap_check = True
     bar._no_overlap_check = True
     assert len(match(bookings, (foo, bar)).accepted) == 1
+
+
+def test_limited_bookings_regression():
+    """ When limiting attendees to a low limit of occasions, an error would
+    result in attendees with lots of wishes not getting as many occasions
+    as possible.
+
+    """
+
+    # a week-long occasion for one person only
+    o1 = Occasion(1, [[today(), today() + days(1)]], max_spots=1)
+
+    # single-day occasions for one person only
+    o2 = Occasion(2, [[today() + days(1), today() + days(1)]], max_spots=1)
+    o3 = Occasion(3, [[today() + days(2), today() + days(2)]], max_spots=1)
+
+    # we need the week-long occasion to be booked in the first loop, then
+    # denied in the next due to low-priority, to trigger a deny call
+    bookings = [
+        o1.booking("Abed", 'open', 0),
+        o2.booking("Abed", 'open', 1),
+        o3.booking("Abed", 'open', 2),
+        o1.booking("Evil Abed", 'open', 3),
+        o2.booking("Evil Abed", 'open', 4),
+        o3.booking("Evil Abed", 'open', 5),
+    ]
+
+    result = match(
+        bookings, (o1, o2, o3),
+        default_limit=2,        
+    )
+
+    # in the regression, this would be 2, even though 3 were possible
+    assert len(result.accepted) == 3

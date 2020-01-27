@@ -69,9 +69,6 @@ class AttendeeAgent(hashable('id')):
         for booking in unblockable(
                 self.accepted, self.blocked, with_anti_affinity_check=True):
 
-            if self.limit and len(self.wishlist) >= self.limit:
-                break
-
             self.blocked.remove(booking)
             self.wishlist.add(booking)
 
