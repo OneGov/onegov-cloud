@@ -32,7 +32,7 @@
                             <div tal:case="True" id="${accordion_id + 'content'}"></div>
                         </tal:b>
 
-                        <span tal:condition="item['url']|nothing"><a href="${item['url']}" class="button hollow" i18n:translate>Details / Registration</a></span>
+                        <span tal:condition="item['url']|nothing and request.is_admin"><a href="${item['url']}" class="button hollow" i18n:translate>Details</a></span>
                     </div>
                 </dd>
             </tal:b>
