@@ -2,9 +2,10 @@ import datetime
 from collections import OrderedDict
 from uuid import uuid4
 
+import pytz
 from sedate import utcnow
 from sqlalchemy import Column, Boolean, SmallInteger, \
-    Enum, Text, Interval, UniqueConstraint, ForeignKey
+    Enum, Text, Interval, UniqueConstraint, ForeignKey, or_, and_
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, backref, object_session
 
@@ -225,10 +226,30 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         return self.reservations.filter_by(
             attendee_id=attendee_id).first() is not None
 
-    def possible_bookers(self, external_only=False):
+    def possible_bookers(self, external_only=False, year=None):
+        """Returns the list of possible bookers. Attendees that already have
+        a subscription for the parent course in the same year are excluded."""
         session = object_session(self)
+
         excl = session.query(CourseAttendee.id).join(CourseReservation)
-        excl = excl.filter(CourseReservation.course_event_id == self.id)
+        excl = excl.join(CourseEvent)
+
+        year = year or datetime.datetime.today().year
+        bounds = (
+            datetime.datetime(year, 1, 1, tzinfo=pytz.utc),
+            datetime.datetime(year, 12, 31, tzinfo=pytz.utc)
+        )
+
+        excl = excl.filter(
+            or_(
+                and_(
+                    CourseEvent.course_id == self.course.id,
+                    CourseEvent.start >= bounds[0],
+                    CourseEvent.start <= bounds[1]
+                ),
+                CourseReservation.course_event_id == self.id
+            )
+        )
         excl = excl.subquery('excl')
 
         query = session.query(CourseAttendee).filter(
