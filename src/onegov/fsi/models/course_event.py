@@ -223,7 +223,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
 
     def has_reservation(self, attendee_id):
         return self.reservations.filter_by(
-            attendee_id=attendee_id).count() != 0
+            attendee_id=attendee_id).first() is not None
 
     def possible_bookers(self, external_only=False):
         session = object_session(self)
