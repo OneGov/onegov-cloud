@@ -231,6 +231,13 @@ def view_delete_reservation(self, request):
     request.assert_valid_csrf_token()
     ReservationCollection(
         request.session, auth_attendee=request.current_attendee).delete(self)
+    request = handle_send_email(
+            self.course_event.cancellation_template,
+            request,
+            (self.attendee_id, ),
+            cc_to_sender=False,
+            show_sent_count=True
+        )
     request.success(_('Subscription successfully deleted'))
 
 

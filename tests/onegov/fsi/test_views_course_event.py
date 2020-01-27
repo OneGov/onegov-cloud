@@ -157,6 +157,15 @@ def test_register_for_course_event_member(client_with_db):
     assert message['to'] == 'member@example.org'
     assert message['subject'] == '=?utf-8?q?Anmeldungsbest=C3=A4tigung?='
 
+    # Test cancellation emails upon unsubscribing
+    client.login_admin()
+    view = f'/fsi/reservations?course_event_id={event.id}'
+    page = client.get(view)
+    page = page.click('Löschen')
+    assert len(client.app.smtp.outbox) == 2
+    message = get_mail(client.app.smtp.outbox, 1)
+    assert message['subject'] == 'Absage Kursveranstaltung'
+
 
 def test_register_for_course_event_editor(client_with_db):
     client = client_with_db
