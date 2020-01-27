@@ -3011,6 +3011,16 @@ $booking-left-margin: 2rem;
         line-height: 1.25;
     }
 
+    .needs li {
+        display: flex;
+        justify-content: space-between;
+
+        a {
+            align-self: flex-end;
+            flex-shrink: 0;
+        }
+    }
+
     .needs li:hover {
         background: darken($gray-light, 1%);
         border-radius: 3px;

@@ -70,8 +70,8 @@
                 <div class="show-more" tal:condition="activities">
                     <tal:b define="next_page layout.model.next" condition="next_page">
                         <a class="click-to-load" id="click-to-load"
-                            href="${request.link(next_page, name='volunteers')}"
-                            data-source="${request.link(next_page, name='volunteers')} .activities-list"
+                            href="${request.link(next_page, name='volunteer')}"
+                            data-source="${request.link(next_page, name='volunteer')} .activities-list"
                             data-target="#click-to-load-target"
                             i18n:translate>
                                 Show more
