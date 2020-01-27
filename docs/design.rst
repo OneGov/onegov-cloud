@@ -95,7 +95,7 @@ Resting upon the foundation that is Morepath, we built our own set of modules
 that implement a lot of the parts that are missing in Morepath, which is a
 *micro*-framework after all.
 
-This includes some tooling, like a development server (`onegov.server`), a
+This includes some tooling, like a development server (``onegov.server``), a
 general framework component for requests/session handling and the like
 (``onegov.core``), libraries implementing data models, like ``onegov.user``,
 and applications tying it all together, like ``onegov.org``.
