@@ -462,10 +462,10 @@ def get_context_specific_settings(context):
 
 #: Decorator to acquire the group context on a command::
 #:
-#:     @cli.command()
-#:     @pass_group_context()
-#:     def my_command(group_context):
-#:         pass
+#:     > @cli.command()
+#:     > @pass_group_context()
+#:     > def my_command(group_context):
+#:     >    pass
 #:
 pass_group_context = click.make_pass_decorator(GroupContext, ensure=True)
 

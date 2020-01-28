@@ -189,7 +189,7 @@ def associated(associated_cls, attribute_name, cardinality='one-to-many',
 
 class Associable(object):
     """ Mixin to enable associations on a model. Only models which are
-    associable may be targeted by :func:`associated`_
+    associable may be targeted by :func:`associated`.
 
     """
 

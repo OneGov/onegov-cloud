@@ -77,7 +77,7 @@ def get_upgrade_modules():
         }
 
     To add multiple upgrades in a single setup.py file, the following syntax
-    may be used. This will become the default in the future:
+    may be used. This will become the default in the future::
 
         entry_points= {
             'onegov_upgrades': [
@@ -85,7 +85,7 @@ def get_upgrade_modules():
             ]
         }
 
-    Note that the part before the '='-sign should be kept the same, even if
+    Note that the part before the ``=``-sign should be kept the same, even if
     the location changes. Otherwise completed updates may be run again!
 
     """

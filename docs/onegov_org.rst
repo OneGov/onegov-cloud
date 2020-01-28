@@ -115,9 +115,6 @@ Form Models
 .. automodule:: onegov.org.forms.reservation
     :members:
 
-.. automodule:: onegov.org.forms.reset_password
-    :members:
-
 .. automodule:: onegov.org.forms.resource
     :members:
 
@@ -188,9 +185,6 @@ Views
     :members:
 
 .. automodule:: onegov.org.views.reservation
-    :members:
-
-.. automodule:: onegov.org.views.reset_password
     :members:
 
 .. automodule:: onegov.org.views.resource

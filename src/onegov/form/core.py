@@ -684,7 +684,7 @@ def merge_forms(*forms):
     the default method resolution order. So the first class will override
     fields in the second class and so on.
 
-    So this method is basically the same as:
+    So this method is basically the same as::
 
         class Merged(*forms):
             pass

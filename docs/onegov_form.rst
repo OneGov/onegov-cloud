@@ -49,7 +49,13 @@ Parser
 .. automodule:: onegov.form.parser.core
     :members:
 
+.. automodule:: onegov.form.parser.errors
+    :members:
+
 .. automodule:: onegov.form.parser.grammar
+    :members:
+
+.. automodule:: onegov.form.parser.snippets
     :members:
 
 Errors

@@ -48,7 +48,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     def is_allowed_application_id(self, application_id):
         """ Stops onegov.server from ever passing the request to the org
         application, if the schema does not exist. This way we can host
-        onegov.org in a way that allows all requests to *.example.org
+        onegov.org in a way that allows all requests to ``*.example.org``.
 
         If the schema for ``newyork.example.org`` exists, the request is
         handled. If the schema does not exist, the request is not handled.

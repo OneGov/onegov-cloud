@@ -58,21 +58,27 @@ Start your own OneGov Town instance for free:
 
 - `<https://start.onegovcloud.ch>`_.
 
+Documentation Highlights
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+:doc:`design`
++++++++++++++
+
+An introduction into the history and the design of OneGov Cloud.
+
+:doc:`formcode`
++++++++++++++++
+
+Describes our very own Formcode™ Syntax, a DSL to write forms with.
+
 Source
 ^^^^^^
 
 OneGov Cloud is open source, available on GitHub:
 `<https://github.com/onegov/onegov-cloud>`_.
 
-Documentation Highlights
-^^^^^^^^^^^^^^^^^^^^^^^^
-
-- :doc:`formcode`.
-
 Further Reading
 ^^^^^^^^^^^^^^^
-
-Learn about OneGov Cloud's history and design :doc:`design`.
 
 Find out more about the inner workings of OneGov Cloud by having a look at
 the OneGov Cloud modules documentation at :doc:`onegov_cloud_modules`.

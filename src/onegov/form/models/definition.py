@@ -56,11 +56,13 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, Extendable):
     #: result of both start and end in relation to the current date
     #:
     #: the result is the *nearest* date range in relation to today:
+    #:
     #: * during an active registration window, it's that active window
     #: * outside of active windows, it's last window half way until
     #:   the next window starts
     #:
     #: this could of course be done more conventionally, but this is cooler 😅
+    #:
     current_registration_window = relationship(
         'FormRegistrationWindow', viewonly=True, uselist=False,
         primaryjoin="""and_(

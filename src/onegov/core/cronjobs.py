@@ -78,7 +78,7 @@ CRONJOB_FORMAT = re.compile(r'\*/[0-9]+')
 
 
 def parse_cron(value, type):
-    """ Minimal cron style interval parser. Currently only supports this:
+    """ Minimal cron style interval parser. Currently only supports this::
 
         *   -> Run every hour, minute
         */2 -> Run every other hour, minute

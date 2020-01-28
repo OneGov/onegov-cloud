@@ -360,16 +360,24 @@ class SearchableArchivedResultCollection(
 
     @staticmethod
     def filter_text_by_locale(column, term, locale=None):
-        """ Returns an SqlAlchemy filter statement based on the search term.
+        """ Returns an SQLAlchemy filter statement based on the search term.
         If no locale is provided, it will use english as language.
+
         ``to_tsquery`` creates a tsquery value from term, which must consist of
-         single tokens separated by the Boolean operators
-        & (AND), | (OR) and ! (NOT).
+         single tokens separated by these Boolean operators:
+
+            * ``&`` (AND)
+            * ``|`` (OR)
+            * ``!`` (NOT)
+
         ``to_tsvector`` parses a textual document into tokens, reduces the
         tokens to lexemes, and returns a tsvector which lists the lexemes
-        together with their positions in the document. The document is
-        processed according to the specified or default text search
-        configuration. """
+        together with their positions in the document.
+
+        The document is processed according to the specified or default text
+        search configuration.
+
+        """
 
         mapping = {'de_CH': 'german', 'fr_CH': 'french', 'it_CH': 'italian',
                    'rm_CH': 'english'}

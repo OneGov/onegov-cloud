@@ -148,16 +148,17 @@ class EventCollection(Pagination):
     def from_import(self, items, purge=None):
         """ Add or updates the given events.
 
-        Only updates events which have changed. Uses `Event.source_updated` if
-        available, falls back to comparing all relevant attributes.
+        Only updates events which have changed. Uses ``Event.source_updated``
+        if available, falls back to comparing all relevant attributes.
 
         Doesn't change the states of events allowing to permanently withdraw
         imported events.
 
-        :items:
-            A list of `EventImportItem`s or event sources to keep from purging.
+        :param items:
+            A list of ``EventImportItem``'s or event sources to keep
+            from purging.
 
-        :purge:
+        :param purge:
             Optionally removes all events with the given meta-source-prefix not
             present in the given events.
 
