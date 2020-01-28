@@ -186,8 +186,9 @@ def test_create_delete_reservation(client_with_db):
     assert '01.01.2060' in page
 
     page = client.get(view).form.submit().follow()
-    assert 'Anmeldung existiert bereits' in page
-
+    print(page)
+    msg = 'Für dieses Jahr gibt es bereits andere Anmeldungen für diesen Kurs'
+    assert msg in page
     # Settings the attendee id should filter down to events the attendee
     # hasn't any subscription
     page = client.get(f'/fsi/reservations/add?attendee_id={attendee.id}')
