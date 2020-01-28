@@ -65,7 +65,8 @@ def view_add_reservation(self, request, form):
             request,
             (attendee_id, ),
             cc_to_sender=False,
-            show_sent_count=False
+            show_sent_count=False,
+            attachments=(course_event.as_ical_attachment(), )
         )
         return request.redirect(request.link(self))
 
@@ -113,7 +114,8 @@ def view_edit_reservation(self, request, form):
                 request,
                 (data['attendee_id'],),
                 cc_to_sender=False,
-                show_sent_count=False
+                show_sent_count=False,
+                attachments=(course_event.as_ical_attachment(),)
             )
             return request.redirect(request.link(ReservationCollection(
                 request.session,
@@ -221,7 +223,8 @@ def view_add_from_course_event(self, request):
         request,
         (self.attendee, ),
         cc_to_sender=False,
-        show_sent_count=False
+        show_sent_count=False,
+        attachments=(self.course_event.as_ical_attachment(),)
     )
     request.success(_('New subscription successfully added'))
 

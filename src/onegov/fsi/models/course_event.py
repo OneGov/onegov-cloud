@@ -5,6 +5,7 @@ from uuid import uuid4
 import pytz
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
+from mailthon.enclosure import Binary, PlainText
 from sedate import utcnow
 from sqlalchemy import Column, Boolean, SmallInteger, \
     Enum, Text, Interval, UniqueConstraint, ForeignKey, or_, and_
@@ -284,12 +285,15 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         return (att.email for att in self.attendees)
 
     def as_ical(self, event_url=None):
+        modified = self.modified or self.created or utcnow()
 
         vevent = vEvent()
         vevent.add('uid', f'{self.name}-{self.start}-{self.end}@onegov.fsi')
         vevent.add('summary', self.name)
         vevent.add('dtstart', self.start)
         vevent.add('dtend', self.end)
+        vevent.add('last-modified', modified)
+        vevent.add('dtstamp', modified)
         vevent.add('location', self.location)
         vevent.add('description', self.description)
         vevent.add('tags', ['FSI'])
@@ -300,7 +304,15 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         vcalendar.add('prodid', '-//OneGov//onegov.fsi//')
         vcalendar.add('version', '2.0')
         vcalendar.add_component(vevent)
+
         return vcalendar.to_ical()
+
+    def as_ical_attachment(self, url=None):
+        attachment = PlainText(content=self.as_ical(url))
+        name = self.name.lower().replace(' ', '_')
+        content_disposition = f'attachment; filename="{name}"'
+        attachment.headers['Content-Disposition'] = content_disposition
+        return attachment
 
     def can_book(self, attendee, year=None):
         assert isinstance(attendee, CourseAttendee), f'{type(attendee)}'
