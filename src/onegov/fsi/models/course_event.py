@@ -227,8 +227,10 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
             attendee_id=attendee_id).first() is not None
 
     def excluded_subscribers(self, year=None, as_uids=True):
-        """Returns a list of UIDS of attendees that have booked one
-        of the events of a course in the given year."""
+        """
+        Returns a list of attendees / names tuple of UIDS
+        of attendees that have booked one of the events of a course in
+        the given year."""
         session = object_session(self)
 
         excl = session.query(CourseAttendee.id if as_uids else CourseAttendee)
@@ -245,13 +247,14 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
                 and_(
                     CourseEvent.course_id == self.course.id,
                     CourseEvent.start >= bounds[0],
-                    CourseEvent.start <= bounds[1]
+                    CourseEvent.end <= bounds[1]
                 ),
                 CourseReservation.course_event_id == self.id
             )
         )
 
-    def possible_subscribers(self, external_only=False, year=None, as_uids=False):
+    def possible_subscribers(
+            self, external_only=False, year=None, as_uids=False):
         """Returns the list of possible bookers. Attendees that already have
         a subscription for the parent course in the same year are excluded."""
         session = object_session(self)
@@ -279,5 +282,9 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         return (att.email for att in self.attendees)
 
     def can_book(self, attendee, year=None):
-        assert isinstance(attendee, CourseAttendee)
-        return attendee.id not in self.excluded_subscribers(year=year)
+        assert isinstance(attendee, CourseAttendee), f'{type(attendee)}'
+        att_id = attendee.id
+        for entry in self.excluded_subscribers(year, as_uids=True).all():
+            if entry.id == att_id:
+                return False
+        return True

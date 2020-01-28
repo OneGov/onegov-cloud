@@ -56,8 +56,6 @@ def test_course_event_1(session, course, course_event, attendee):
     course, data = course(session)
     event, data = course_event(session)
     delta = datetime.timedelta(days=265)
-    event2, data = course_event(
-        session, start=event.start + delta, end=event.end + delta)
 
     assert event.attendees.count() == 0
     assert event.reservations.count() == 0
@@ -74,26 +72,39 @@ def test_course_event_1(session, course, course_event, attendee):
     assert event.reservations.count() == 2
     assert event.attendees.count() == 1
     assert event.available_seats == 20 - 2
-    assert event.possible_subscribers().count() == 0
+    assert event.possible_subscribers().first() is None
 
+    # Test possible and excluded subscribers
     attendee_2, data = attendee(session, first_name='2')
     assert event.possible_subscribers().first() == attendee_2
-    assert event2.possible_subscribers().first() == attendee_2
     assert event.possible_subscribers(external_only=True).count() == 0
 
-    # Add attendee2 also to event2, so that can not book event
+    event2, data = course_event(
+        session, start=event.start + delta, end=event.end + delta)
+
+    assert event2.excluded_subscribers(as_uids=False).all() == []
+    # assert event2.possible_subscribers().first() == attendee_2
+
+    # Add attendee2 also to event, so that can not book event2
+    year = event.start.year
+    assert year == event2.start.year
+    assert event2.reservations.first() is None
     session.add(
         CourseReservation(
             attendee_id=attendee_2.id,
-            course_event_id=event2.id
+            course_event_id=event.id
         )
     )
     session.flush()
 
     # Subscription in for event2 has impact on possible bookers in event
-    assert event.start.year == event2.start.year
-    assert event.possible_subscribers(year=event.start.year).first() is None
-    assert event.can_book(attendee) is False
+    other_subscribers = event.attendees.all()
+    assert event2.excluded_subscribers(
+        as_uids=False, year=year).all() == other_subscribers
+    assert event2.can_book(attendee_, year=year) is False
+
+    assert attendee_ in event.attendees.all()
+    assert event.can_book(attendee_, year=year) is False
 
     # Test course behind the event
     assert event.name == event.course.name
