@@ -35,6 +35,7 @@
         </tal:b>
         <tal:b tal:case="'cancellation'">
             <p i18n:translate="">Unfortuntely, we have to inform you, that the following course event will not take place:</p>
+            <br>
             <tal:b metal:use-macro="layout.default_macros['course_event_details']" tal:define="model layout.model.course_event; for_email True"/>
             <br>
             <p>
