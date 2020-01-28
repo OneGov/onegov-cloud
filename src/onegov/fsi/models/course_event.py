@@ -280,6 +280,4 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
 
     def can_book(self, attendee, year=None):
         assert isinstance(attendee, CourseAttendee)
-        if self.locked:
-            return False
         return attendee.id not in self.excluded_subscribers(year=year)
