@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-01-17 08:56+0100\n"
+"POT-Creation-Date: 2020-01-28 09:07+0100\n"
 "PO-Revision-Date: 2019-02-18 06:40+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1398,6 +1398,9 @@ msgstr "Entrée"
 
 msgid "Delete entry"
 msgstr "Supprimer l'entrée"
+
+msgid "Dashboard"
+msgstr "Dashboard"
 
 msgid "The submission was adopted"
 msgstr "La proposition a été adoptée"
@@ -3385,6 +3388,9 @@ msgstr "Ce type de fichier n'est pas pris en charge"
 
 msgid "The file name is too long"
 msgstr "Le nom du fichier est trop long"
+
+msgid "The file cannot be processed"
+msgstr "Impossible de traiter le fichier"
 
 msgid "Please submit your yubikey"
 msgstr "Veuillez saisir votre yubikey"

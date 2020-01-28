@@ -368,6 +368,11 @@ def view_upload_file_by_json(self, request):
             'error': True,
             'message': request.translate(_("The file name is too long"))
         }
+    except ValueError:
+        return {
+            'error': True,
+            'message': request.translate(_("The file cannot be processed"))
+        }
 
     return {
         'filelink': request.link(f),
