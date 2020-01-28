@@ -36,7 +36,7 @@ def test_add_course_and_invite(client):
     assert message['subject'] == '=?utf-8?q?Einladung_f=C3=BCr_Kursanmeldung?='
     text = message['text']
     assert 'New Course' in text
-    assert 'Desc' in text
+    assert 'Verfügbare Kurstermine finden Sie unter' in text
 
 
 def test_course_details(client_with_db):
