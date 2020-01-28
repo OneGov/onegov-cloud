@@ -2,6 +2,7 @@ import colorsys
 import re
 import sedate
 
+from contextlib import suppress
 from collections import defaultdict, Counter, OrderedDict
 from datetime import datetime, time, timedelta
 from isodate import parse_date, parse_datetime
@@ -198,8 +199,9 @@ def set_image_sizes(images, request):
 
         for id, image in images.items():
             if id in sizes:
-                image.set('width', sizes[id].size[0])
-                image.set('height', sizes[id].size[1])
+                with suppress(AttributeError):
+                    image.set('width', sizes[id].size[0])
+                    image.set('height', sizes[id].size[1])
 
 
 def parse_fullcalendar_request(request, timezone):
