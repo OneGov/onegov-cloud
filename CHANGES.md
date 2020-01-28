@@ -1,8 +1,50 @@
 # Changes
 
+## Release `2020.15`
+
+> commits: **8 / [05f502fe6d...b1b121763b](https://github.com/OneGov/onegov-cloud/compare/05f502fe6d^...b1b121763b)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.15)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🐞 **Fixes matching error**
+
+When limiting attendees to a low limit of occasions, an error would result in
+attendees with lots of wishes not getting as many occasions as possible.
+
+**`Bugfix`** | **[abad982bed](https://github.com/onegov/onegov-cloud/commit/abad982bed79a0780c107c05a49fe3de55a5b33c)**
+
+🐞 **Fixes "next page" not working for volunteers**
+
+**`Bugfix`** | **[FER-843](https://issues.seantis.ch/browse/FER-843)** | **[6af8d7bb42](https://github.com/onegov/onegov-cloud/commit/6af8d7bb425511286640c9f46ebc6b1b1af53736)**
+
+### Org
+
+🐞 **Fixes attribute error when setting image size**
+
+For some images, the size cannot be determined on the server, so in this
+case we just don't annotate the html.
+
+Fixes ONEGOV-CLOUD-39B
+
+**`Bugfix`** | **[e65bfcbeb5](https://github.com/onegov/onegov-cloud/commit/e65bfcbeb506598564a99cca27f4f7b2dce3f97e)**
+
+🐞 **Shows a proper error when a file cannot be parsed**
+
+This solves ONEGOV-CLOUD-3AM
+
+**`Bugfix`** | **[8dfc4a7076](https://github.com/onegov/onegov-cloud/commit/8dfc4a7076787fce94de7032f33535a921561069)**
+
+### Wtfs
+
+🎉 **Extend new print styles to more reports**
+
+**`Feature`** | **[b1b121763b](https://github.com/onegov/onegov-cloud/commit/b1b121763be840b53109ccb854af68e90b1ca609)**
+
 ## Release `2020.14`
 
-> commits: **11 / [3187fdea56...d47ce90bca](https://github.com/OneGov/onegov-cloud/compare/3187fdea56^...d47ce90bca)**<br>
+> released: **2020-01-24 06:34**<br>
+> commits: **12 / [3187fdea56...435b2985f8](https://github.com/OneGov/onegov-cloud/compare/3187fdea56^...435b2985f8)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.14)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Core
