@@ -176,8 +176,8 @@
                                 <td tal:condition="not for_email">${event.presenter_company}</td>
                                 <td class='text-left'>${event.available_seats}</td>
                                 <td tal:condition="request.is_manager and not for_email">
-                                    <span class="${'hidden-icon ' if event.hidden_from_public else ''}"></span>
-                                    <span class="${'locked-icon' if event.locked_for_subscriptions else ''}"></span>
+                                    <span tal:condition="event.hidden_from_public" class="hidden-icon"></span>
+                                    <span tal:condition="event.locked_for_subscriptions" class="locked-icon"></span>
                                 </td>
                             </tr>
                         </tal:b>
