@@ -32,7 +32,7 @@
                             <div tal:case="True" id="${accordion_id + 'content'}"></div>
                         </tal:b>
 
-                        <span tal:condition="item['url']|nothing"><a href="${item['url']}" class="button hollow" i18n:translate>Details / Registration</a></span>
+                        <span tal:condition="item['url']|nothing and request.is_admin"><a href="${item['url']}" class="button hollow" i18n:translate>Details</a></span>
                     </div>
                 </dd>
             </tal:b>
@@ -121,21 +121,26 @@
         <div class="clearfix"></div>
     </dl>
 
-      <dl class="field-display" tal:condition="not: for_email|False">
+    <dl class="field-display" tal:condition="not: for_email|False">
         <dt i18n:translate="">Status</dt>
         <dd>${layout.format_status(model.status)}</dd>
         <div class="clearfix"></div>
       </dl>
-      <dl class="field-display" tal:condition="not: for_email|False and request.is_manager">
+    <dl class="field-display" tal:condition="not: for_email|False and request.is_manager">
         <dt i18n:translate="">Locked for Subscriptions</dt>
         <dd>${layout.format_boolean(model.locked_for_subscriptions)}</dd>
         <div class="clearfix"></div>
-      </dl>
+    </dl>
+    <dl class="field-display" tal:condition="not: for_email|False and request.is_admin">
+        <dt i18n:translate="">Hidden</dt>
+        <dd>${layout.format_boolean(model.hidden_from_public)}</dd>
+        <div class="clearfix"></div>
+    </dl>
 </metal:course_event>
 
 <metal:course define-macro="course_details">
     <h3 i18n:translate="">Description:</h3>
-    <div class="page-text">
+    <div class="page-text course-page-text">
         <p tal:content="structure model.description_html"></p>
     </div>
 </metal:course>
@@ -146,20 +151,19 @@
             <tal:b tal:condition="events">
                 <table class="tablesaw hover events-table fullwidth">
                     <thead>
-                        <th i18n:translate class='text-left'>Date</th>
-                        <th i18n:translate class='text-left'>Start</th>
-                        <th i18n:translate class='text-left'>End</th>
-                        <th i18n:translate class='text-left'>Status</th>
-                        <th i18n:translate class='text-left'>Presenter</th>
-                        <th i18n:translate class='text-left' tal:condition="not for_email">Presenter Company</th>
+                        <th i18n:translate>Date</th>
+                        <th i18n:translate class="text-left">Start</th>
+                        <th i18n:translate class="text-left">End</th>
+                        <th i18n:translate class="text-left">Status</th>
+                        <th i18n:translate class="text-left">Presenter</th>
+                        <th i18n:translate class="text-left" tal:condition="not for_email">Presenter Company</th>
                         <th i18n:translate class='text-left'>Free Space</th>
-                        <th tal:condition="not for_email and request.is_manager" i18n:translate>Hidden</th>
-                        <th tal:condition="not for_email and request.is_manager" i18n:translate>Locked</th>
+                        <th tal:condition="not for_email and request.is_manager" i18n:translate>Hidden / Locked</th>
                     </thead>
                     <tbody>
                         <tal:b tal:repeat="event events">
                             <tr>
-                                <td>
+                                <td class="no-wrap">
                                     <a href="${request.link(event)}" class="${'grayed-out' if event.locked else ''}">
                                         <strong>${layout.format_date(event.start, 'date_long')}</strong>
                                     </a>
@@ -170,15 +174,11 @@
                                 <td>${layout.format_status(event.status)}</td>
                                 <td>${event.presenter_name}</td>
                                 <td tal:condition="not for_email">${event.presenter_company}</td>
-                                <td class='text-right'>${event.available_seats}</td>
-                                <tal:b tal:condition="request.is_manager and not for_email" tal:switch="event.hidden_from_public">
-                                    <td tal:case="True" i18n:translate>Yes</td>
-                                    <td tal:case="False" i18n:translate>No</td>
-                                </tal:b>
-                                <tal:b tal:condition="not for_email and request.is_manager" tal:switch="event.locked_for_subscriptions">
-                                    <td tal:case="True" i18n:translate>Yes</td>
-                                    <td tal:case="False" i18n:translate>No</td>
-                                </tal:b>
+                                <td class='text-left'>${event.available_seats}</td>
+                                <td tal:condition="request.is_manager and not for_email">
+                                    <span class="${'hidden-icon ' if event.hidden_from_public else ''}"></span>
+                                    <span class="${'locked-icon' if event.locked_for_subscriptions else ''}"></span>
+                                </td>
                             </tr>
                         </tal:b>
                     </tbody>

@@ -14,48 +14,48 @@
     <tal:b tal:switch="layout.notification_type">
         <tal:b tal:case="'info'">
             <p i18n:translate="">Please take notice about the information below.</p>
-            <br>
         </tal:b>
         <tal:b tal:case="'reservation'">
-            <p i18n:translate="">We hereby confirm your subscription for:</p>
+            <p i18n:translate="">You have successfully subscribed to the following course event:</p>
+            <metal:b use-macro="layout.default_macros['course_details']" tal:define="model layout.model.course_event.course"/>
+            <h3 i18n:translate="">Details:</h3>
+            <metal:b use-macro="layout.default_macros['course_event_details']" tal:define="model layout.model.course_event; for_email True"/>
             <br>
-            <tal:b metal:use-macro="layout.default_macros['course_event_details']" tal:define="model layout.model.course_event; for_email True"/>
-            <br>
-            <p i18n:translate="">You will receive a reminder email prior to the course.</p>
-            <p>
-                <span i18n:translate="">Further information can be found on the </span>
-                <a href="${layout.event_url}" i18n:translate="">course website.</a>
-            </p>
+            <p i18n:translate="">Thank you for your course subscription. Please add the course event to your outlook calender.</p>
+            <p i18n:translate="">You will receive a reminder email 2 weeks prior to the start.</p>
         </tal:b>
         <tal:b tal:case="'reminder'">
-            <p i18n:translate="">We would like to remind you of your subscription for: </p>
-            <br>
+            <p i18n:translate="">You have successfully subscribed to the following course event:</p>
+            <metal:b use-macro="layout.default_macros['course_details']" tal:define="model layout.model.course_event.course"/>
+            <h3 i18n:translate="">Details:</h3>
             <tal:b metal:use-macro="layout.default_macros['course_event_details']" tal:define="model layout.model.course_event; for_email True"/>
-            <br>
-            <p>
-                <span i18n:translate="">Further information can be found on the </span>
-                <a href="${layout.event_url}" i18n:translate="">course website.</a>
+            <p><span i18n:translate="">The event will take place as planned. We kindly request to arrive on time at the event location.
+                Please take note of the course description at </span><a href="${layout.event_url}" i18n:translate="">iZug/Fachstelle Sicherheit</a>.
             </p>
-
         </tal:b>
         <tal:b tal:case="'cancellation'">
-            <p i18n:translate="">We hereby confirm your cancellation for subscription:</p>
+            <p i18n:translate="">Unfortuntely, we have to inform you, that the following course event will not take place:</p>
             <br>
             <tal:b metal:use-macro="layout.default_macros['course_event_details']" tal:define="model layout.model.course_event; for_email True"/>
             <br>
             <p>
-                <span i18n:translate="">If you still like to visit this course, have a look at the </span>
-                <a href="${layout.open_events_url}" i18n:translate="">open events.</a>
+                <span i18n:translate="">Available event dates can be found at: </span>
+                <a href="${layout.open_events_url}" i18n:translate="">iZug/Fachstelle Sicherheit</a>.
             </p>
+            <p i18n:translate="">We kindly ask for understanding and acknowledgement.</p>
         </tal:b>
         <tal:b tal:case="'invitation'">
             <p i18n:translate="">We would like to invite you to subscribe for one of the events for the course <span tal:replace="layout.model.name" i18n:name="course_name" />.</p>
-            <p i18n:translate="">You can find the list of future events below.</p><br>
-            <tal:b metal:use-macro="layout.default_macros['course_details']" tal:define="model layout.model"/>
-            <h3 i18n:translate="">Events</h3>
-            <tal:b metal:use-macro="layout.default_macros['course_event_listing']" tal:define="events layout.model.future_events; for_email True"/>
+            <p>
+                <span i18n:translate="">Available event dates can be found at: </span>
+                <a href="${layout.open_events_url}" i18n:translate="">iZug/Fachstelle Sicherheit</a>.
+            </p>
+            <br>
 
-
+        </tal:b>
+        <tal:b tal:case="'unsubscribe'">
+            <p i18n:translate="">Your subscription for the following event has been deleted:</p>
+            <metal:b use-macro="layout.default_macros['course_event_details']" tal:define="model layout.model.course_event; for_email True"/>
         </tal:b>
     </tal:b>
 </metal:email_header>
@@ -71,9 +71,15 @@
 </metal:email_footer>
 
 
-<metal:sender define-macro="sender" i18n:domain="onegov.org">
+<metal:sender define-macro="sender">
     <p>${layout.org.name}</p>
 </metal:sender>
+
+
+<metal:email_signature define-macro="email_signature">
+    <p i18n:translate="">Your's sincerily</p>
+    <p i18n:translate="" class="last">Fachstelle Sicherheit</p>
+</metal:email_signature>
 
 </body>
 </html>

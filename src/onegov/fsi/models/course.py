@@ -28,6 +28,9 @@ class Course(Base, ORMSearchable):
     # If the course has to be refreshed after some interval
     mandatory_refresh = Column(Boolean, nullable=False, default=False)
 
+    # hides the course in the collection for non-admins
+    hidden_from_public = Column(Boolean, nullable=False, default=False)
+
     @property
     def title(self):
         return self.name

@@ -1,3 +1,16 @@
+/*
+    The maximum width of a line relative to the font. This limits textblocks
+    to a readable length.
+*/
+
+$course-description-line-width: 87ex;
+
+.course-page-text {
+    p {
+        max-width: $course-description-line-width;
+    }
+}
+
 // Removes margin for button inside a table td
 td {
     a.button,
@@ -56,14 +69,31 @@ dd.accordion-navigation + dd.accordion-navigation {
 /*
     Tables
 */
+
+.no-wrap {
+    white-space: nowrap;
+}
+
 .events-table {
     border: 1px solid $gray-light;
     border-width: 1px 1px 0;
+
+    td > span {
+        padding-right: 1em;;
+    }
 }
 
 .fullwidth {
     width: 100%
 }
+
+// Table icons
+
+.locked-icon::before { @include icon('\f023'); }
+.locked-icon-after::after { @include icon('\f023'); }
+.unlocked-icon::before { @include icon('\f09c'); }
+.visible-icon::before { @include icon('\f06e'); }
+.hidden-icon::before { @include icon('\f070'); }
 
 /*
     Links
