@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-01-28 09:53+0100\n"
-"PO-Revision-Date: 2020-01-28 09:54+0100\n"
+"POT-Creation-Date: 2020-01-28 11:37+0100\n"
+"PO-Revision-Date: 2020-01-28 11:39+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -430,21 +430,6 @@ msgstr "Keine Einträge gefunden."
 msgid "No entries found"
 msgstr "Keine Einträge gefunden"
 
-msgid "Date"
-msgstr "Datum"
-
-msgid "Start"
-msgstr "Start"
-
-msgid "End"
-msgstr "Ende"
-
-msgid "Presenter Company"
-msgstr "Referent Firma"
-
-msgid "Free Space"
-msgstr "Freie Plätze"
-
 msgid "Email Preview"
 msgstr "Email Vorschau"
 
@@ -460,11 +445,26 @@ msgstr "Empfänger:"
 msgid "Name"
 msgstr "Name"
 
+msgid "Date"
+msgstr "Datum"
+
 msgid "Remaining seats"
 msgstr "Verbleibende Plätze"
 
 msgid "Description:"
 msgstr "Beschreibung:"
+
+msgid "Start"
+msgstr "Start"
+
+msgid "End"
+msgstr "Ende"
+
+msgid "Presenter Company"
+msgstr "Referent Firma"
+
+msgid "Free Space"
+msgstr "Freie Plätze"
 
 msgid "Hidden / Locked"
 msgstr "Versteckt / Gesperrt"
@@ -485,33 +485,43 @@ msgid "Please take notice about the information below."
 msgstr "Bitte beachten sie die untenstehenden Informationen."
 
 msgid "You have successfully subscribed to the following course event:"
-msgstr ""
+msgstr "Sie haben sich erfolgreich für folgenden Kurs angemeldet:"
+
+msgid "Details:"
+msgstr "Details:"
 
 msgid ""
 "Thank you for your course subscription. Please add the course event to your "
 "outlook calender."
 msgstr ""
+"Besten Dank für Ihre Kursanmeldung. Bitte tragen Sie sich den Kurstermin in "
+"den Outlook-Kalender ein."
 
-msgid "You will receive a reminder email 2 weeks prior to the start"
+msgid "You will receive a reminder email 2 weeks prior to the start."
+msgstr "Sie erhalten 2 Wochen vor Kursbeginn eine Erinnerungsmail."
+
+msgid ""
+"The event will take place as planned. We kindly request to arrive on time at "
+"the event location. Please take note of the course description at"
 msgstr ""
+"Der Kurs wird wie geplant durchgeführt. Wir bitten um pünktliches Eintreffen "
+"im Kurslokal. Bitte beachten Sie auch den Kursbeschrieb im"
 
-msgid "Further information can be found on the"
-msgstr "Weitere Informationen finden Sie auf der"
+msgid "iZug/Fachstelle Sicherheit"
+msgstr "iZug/Fachstelle Sicherheit"
 
-msgid "course website."
-msgstr "Kurswebseite."
+msgid ""
+"Unfortuntely, we have to inform you, that the following course event will "
+"not take place:"
+msgstr ""
+"Leider müssen wir Ihnen mitteilen, dass folgender Kurs nicht wie geplant "
+"stattfindet:"
 
-msgid "We would like to remind you of your subscription for:"
-msgstr "Wir würden Sie gerne an ihre Anmeldung erinnern für:"
+msgid "Available event dates can be found at:"
+msgstr "Verfügbare Kurstermine finden Sie unter:"
 
-msgid "We hereby confirm your cancellation for subscription:"
-msgstr "Hiermit bestätigen wir die Annulierung für die Anmeldung:"
-
-msgid "If you still like to visit this course, have a look at the"
-msgstr "Falls sie diesen Kurs noch besuchen möchten, schauen sie unter"
-
-msgid "open events."
-msgstr "zukünfigte Durchführungen."
+msgid "We kindly ask for understanding and acknowledgement."
+msgstr "Wir bitten um Verständnis und Ihre Kenntnisnahme."
 
 msgid ""
 "We would like to invite you to subscribe for one of the events for the "
@@ -520,11 +530,17 @@ msgstr ""
 "Wir würden Sie gerne einladen, sich für eine zukünftige Kursveranstaltung "
 "des Kurses ${course_name} anzumelden."
 
-msgid "You can find the list of future events below."
-msgstr "Untenstehend finden Sie eine Liste der zukünftigen Durchführungen."
+msgid "Your subscription for the following event has been deleted:"
+msgstr "Ihre Anmeldung für den folgenden Kurs wurde gelöscht:"
 
 msgid "Event Details"
 msgstr "Details Durchführung"
+
+msgid "Your's sincerily"
+msgstr "Mit freundlichen Grüssen"
+
+msgid "Fachstelle Sicherheit"
+msgstr "Fachstelle Sicherheit"
 
 msgid ""
 "Clicking \"Send\" will send the e-mail below to all selected recipients. You "
@@ -645,7 +661,31 @@ msgid "Subscription successfully deleted"
 msgstr "Anmeldung erfolgreich gelöscht"
 
 msgid "Placeholder successfully deleted"
-msgstr ""
+msgstr "Platzhalter erfolgreich gelöscht"
+
+#~ msgid "Your subscription for the following event has beeen deleted:"
+#~ msgstr "Ihre Anmeldung für den folgenden Kurs wurde gelöscht:"
+
+#~ msgid "Further information can be found on the"
+#~ msgstr "Weitere Informationen finden Sie auf der"
+
+#~ msgid "course website."
+#~ msgstr "Kurswebseite."
+
+#~ msgid "We would like to remind you of your subscription for:"
+#~ msgstr "Wir würden Sie gerne an ihre Anmeldung erinnern für:"
+
+#~ msgid "We hereby confirm your cancellation for subscription:"
+#~ msgstr "Hiermit bestätigen wir die Annulierung für die Anmeldung:"
+
+#~ msgid "If you still like to visit this course, have a look at the"
+#~ msgstr "Falls sie diesen Kurs noch besuchen möchten, schauen sie unter"
+
+#~ msgid "open events."
+#~ msgstr "zukünfigte Durchführungen."
+
+#~ msgid "You can find the list of future events below."
+#~ msgstr "Untenstehend finden Sie eine Liste der zukünftigen Durchführungen."
 
 #~ msgid "Details / Registration"
 #~ msgstr "Details / Anmeldung"

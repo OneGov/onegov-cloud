@@ -10,41 +10,8 @@
                         <strong tal:condition="not: events" i18n:translate="">No entries found</strong>
                         <tal:b tal:condition="events">
                             <h4 tal:condition="layout.course">${layout.course.name}</h4>
-                            <table class="tablesaw hover">
-                                <thead>
-                                    <th i18n:translate="" tal:condition="not: layout.model.course_id">Course</th>
-                                    <th i18n:translate="">Date</th>
-                                    <th i18n:translate="">Start</th>
-                                    <th i18n:translate="">End</th>
-                                    <th i18n:translate="">Presenter</th>
-                                    <th i18n:translate="">Presenter Company</th>
-<!--?                                    <th i18n:translate="">Refresh</th>-->
-<!--?                                    <th i18n:translate="">Status</th>-->
-                                    <th i18n:translate="">Free Space</th>
-                                    <th tal:condition="request.is_manager" i18n:translate>Hidden</th>
-                                </thead>
-                                <tbody>
-                                    <tal:b tal:repeat="event events">
-                                        <tr>
-                                            <td class="" tal:condition="not: layout.model.course_id"><a href="${layout.instance_link(event)}">${event.name}</a></td>
-                                            <td class="">${layout.format_date(event.start, 'date')}</td>
-                                            <td class="">${layout.format_date(event.start, 'time')}</td>
-                                            <td class="">${layout.format_date(event.end, 'time')}</td>
-                                            <td class="">${event.presenter_name}</td>
-                                            <td class="">${event.presenter_company}</td>
-<!--?                                            <td class="" tal:condition="event.mandatory_refresh" i18n:translate="">Yes</td>-->
-<!--?                                            <td class="" tal:condition="not event.mandatory_refresh" i18n:translate="">No</td>-->
-<!--?                                            <td class="">${layout.format_status(event.status)}</td>-->
-                                            <td class="">${event.available_seats}</td>
-                                            <tal:b tal:condition="request.is_manager" tal:switch="event.hidden_from_public">
-                                                <td tal:case="True">Yes</td>
-                                                <td tal:case="False">No</td>
-                                            </tal:b>
-                                        </tr>
-                                    </tal:b>
-                                </tbody>
-
-                            </table>
+                            <br>
+                            <tal:b metal:use-macro="layout.macros['course_event_listing']"/>
                         </tal:b>
 
                     </div>
