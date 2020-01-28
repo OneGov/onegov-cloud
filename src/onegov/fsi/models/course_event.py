@@ -231,26 +231,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         a subscription for the parent course in the same year are excluded."""
         session = object_session(self)
 
-        excl = session.query(CourseAttendee.id).join(CourseReservation)
-        excl = excl.join(CourseEvent)
-
-        year = year or datetime.datetime.today().year
-        bounds = (
-            datetime.datetime(year, 1, 1, tzinfo=pytz.utc),
-            datetime.datetime(year, 12, 31, tzinfo=pytz.utc)
-        )
-
-        excl = excl.filter(
-            or_(
-                and_(
-                    CourseEvent.course_id == self.course.id,
-                    CourseEvent.start >= bounds[0],
-                    CourseEvent.start <= bounds[1]
-                ),
-                CourseReservation.course_event_id == self.id
-            )
-        )
-        excl = excl.subquery('excl')
+        excl = self.excluded_subscribers(year).subquery('excl')
 
         if as_uids:
             # Use this because its less costly
@@ -276,4 +257,4 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         assert isinstance(attendee, CourseAttendee)
         if self.locked:
             return False
-        return attendee.id in self.possible_bookers(year=year, as_uids=True)
+        return attendee.id not in self.excluded_subscribers(year=year)

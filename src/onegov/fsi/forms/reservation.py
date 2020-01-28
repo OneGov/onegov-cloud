@@ -92,7 +92,7 @@ class AddFsiReservationForm(Form, ReservationFormMixin):
             return self.attendee_choice(self.attendee),
 
         if self.model.course_event_id:
-            attendees = self.event.possible_bookers(
+            attendees = self.event.possible_subscribers(
                 external_only=self.model.external_only
             )
             att = self.request.current_attendee
@@ -194,7 +194,7 @@ class EditFsiReservationForm(Form, ReservationFormMixin):
         return [self.event_choice(self.model.course_event)]
 
     def get_attendee_choices(self):
-        attendees = self.model.course_event.possible_bookers(
+        attendees = self.model.course_event.possible_subscribers(
             external_only=False
         )
         att = self.request.current_attendee

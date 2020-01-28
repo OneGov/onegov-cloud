@@ -74,12 +74,12 @@ def test_course_event_1(session, course, course_event, attendee):
     assert event.reservations.count() == 2
     assert event.attendees.count() == 1
     assert event.available_seats == 20 - 2
-    assert event.possible_bookers().count() == 0
+    assert event.possible_subscribers().count() == 0
 
     attendee_2, data = attendee(session, first_name='2')
-    assert event.possible_bookers().first() == attendee_2
-    assert event2.possible_bookers().first() == attendee_2
-    assert event.possible_bookers(external_only=True).count() == 0
+    assert event.possible_subscribers().first() == attendee_2
+    assert event2.possible_subscribers().first() == attendee_2
+    assert event.possible_subscribers(external_only=True).count() == 0
 
     # Add attendee2 also to event2, so that can not book event
     session.add(
@@ -92,7 +92,7 @@ def test_course_event_1(session, course, course_event, attendee):
 
     # Subscription in for event2 has impact on possible bookers in event
     assert event.start.year == event2.start.year
-    assert event.possible_bookers(year=event.start.year).first() is None
+    assert event.possible_subscribers(year=event.start.year).first() is None
     assert event.can_book(attendee) is False
 
     # Test course behind the event
