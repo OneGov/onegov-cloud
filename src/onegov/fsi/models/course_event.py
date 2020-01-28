@@ -226,7 +226,32 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         return self.reservations.filter_by(
             attendee_id=attendee_id).first() is not None
 
-    def possible_bookers(self, external_only=False, year=None, as_uids=False):
+    def excluded_subscribers(self, year=None, as_uids=True):
+        """Returns a list of UIDS of attendees that have booked one
+        of the events of a course in the given year."""
+        session = object_session(self)
+
+        excl = session.query(CourseAttendee.id if as_uids else CourseAttendee)
+        excl = excl.join(CourseReservation).join(CourseEvent)
+
+        year = year or datetime.datetime.today().year
+        bounds = (
+            datetime.datetime(year, 1, 1, tzinfo=pytz.utc),
+            datetime.datetime(year, 12, 31, tzinfo=pytz.utc)
+        )
+
+        return excl.filter(
+            or_(
+                and_(
+                    CourseEvent.course_id == self.course.id,
+                    CourseEvent.start >= bounds[0],
+                    CourseEvent.start <= bounds[1]
+                ),
+                CourseReservation.course_event_id == self.id
+            )
+        )
+
+    def possible_subscribers(self, external_only=False, year=None, as_uids=False):
         """Returns the list of possible bookers. Attendees that already have
         a subscription for the parent course in the same year are excluded."""
         session = object_session(self)
