@@ -1,8 +1,30 @@
 # Changes
 
+## Release `2020.16`
+
+> commits: **1 / [f60596884f...f60596884f](https://github.com/OneGov/onegov-cloud/compare/f60596884f^...f60596884f)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.16)](https://buildkite.com/seantis/onegov-cloud)
+
+### Fsi
+
+🎉 **Minor improvements**
+
+- Adds property to hide a course from the collection
+- Adapted Email Template texts and translations
+- order courses by name
+- hides Course "Details" button for non-admins
+- disables "Subscribe Button" based on other events of the selected year
+- prevents selecting attendees that have already other subscriptions of same course in the same year
+- adds icons for locked and hidden_from_public
+- sends cancellation email when subscription is deleted
+- fixes table wrapping even listing macro
+
+**`Feature`** | **[f60596884f](https://github.com/onegov/onegov-cloud/commit/f60596884f56e9eaaebefc0330ddc785b70ed436)**
+
 ## Release `2020.15`
 
-> commits: **8 / [05f502fe6d...b1b121763b](https://github.com/OneGov/onegov-cloud/compare/05f502fe6d^...b1b121763b)**<br>
+> released: **2020-01-28 09:51**<br>
+> commits: **9 / [05f502fe6d...bb292e8e0f](https://github.com/OneGov/onegov-cloud/compare/05f502fe6d^...bb292e8e0f)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.15)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
