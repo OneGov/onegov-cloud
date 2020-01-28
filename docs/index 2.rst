@@ -66,6 +66,11 @@ Documentation Highlights
 
 An introduction into the history and the design of OneGov Cloud.
 
+:doc:`org`
+++++++++++
+
+An introduction to the most fully-featured application of OneGov Cloud.
+
 :doc:`formcode`
 +++++++++++++++
 
