@@ -2,11 +2,12 @@ import datetime
 from collections import OrderedDict
 from uuid import uuid4
 
+import pytz
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
 from sedate import utcnow
 from sqlalchemy import Column, Boolean, SmallInteger, \
-    Enum, Text, Interval, UniqueConstraint, ForeignKey
+    Enum, Text, Interval, UniqueConstraint, ForeignKey, or_, and_
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, backref, object_session
 
@@ -225,21 +226,57 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
 
     def has_reservation(self, attendee_id):
         return self.reservations.filter_by(
-            attendee_id=attendee_id).count() != 0
+            attendee_id=attendee_id).first() is not None
 
-    def possible_bookers(self, external_only=False):
+    def excluded_subscribers(self, year=None, as_uids=True):
+        """
+        Returns a list of attendees / names tuple of UIDS
+        of attendees that have booked one of the events of a course in
+        the given year."""
         session = object_session(self)
-        excl = session.query(CourseAttendee.id).join(CourseReservation)
-        excl = excl.filter(CourseReservation.course_event_id == self.id)
-        excl = excl.subquery('excl')
 
-        query = session.query(CourseAttendee).filter(
-            CourseAttendee.id.notin_(excl))
+        excl = session.query(CourseAttendee.id if as_uids else CourseAttendee)
+        excl = excl.join(CourseReservation).join(CourseEvent)
+
+        year = year or datetime.datetime.today().year
+        bounds = (
+            datetime.datetime(year, 1, 1, tzinfo=pytz.utc),
+            datetime.datetime(year, 12, 31, tzinfo=pytz.utc)
+        )
+
+        return excl.filter(
+            or_(
+                and_(
+                    CourseEvent.course_id == self.course.id,
+                    CourseEvent.start >= bounds[0],
+                    CourseEvent.end <= bounds[1]
+                ),
+                CourseReservation.course_event_id == self.id
+            )
+        )
+
+    def possible_subscribers(
+            self, external_only=False, year=None, as_uids=False):
+        """Returns the list of possible bookers. Attendees that already have
+        a subscription for the parent course in the same year are excluded."""
+        session = object_session(self)
+
+        excl = self.excluded_subscribers(year).subquery('excl')
+
+        if as_uids:
+            # Use this because its less costly
+            query = session.query(CourseAttendee.id)
+        else:
+            query = session.query(CourseAttendee)
 
         if external_only:
             query = query.filter(CourseAttendee.user_id == None)
-        query = query.order_by(
-            CourseAttendee.last_name, CourseAttendee.first_name)
+
+        query = query.filter(CourseAttendee.id.notin_(excl))
+
+        if not as_uids:
+            query = query.order_by(
+                CourseAttendee.last_name, CourseAttendee.first_name)
         return query
 
     @property
@@ -264,3 +301,11 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         vcalendar.add('version', '2.0')
         vcalendar.add_component(vevent)
         return vcalendar.to_ical()
+
+    def can_book(self, attendee, year=None):
+        assert isinstance(attendee, CourseAttendee), f'{type(attendee)}'
+        att_id = attendee.id
+        for entry in self.excluded_subscribers(year, as_uids=True).all():
+            if entry.id == att_id:
+                return False
+        return True

@@ -104,7 +104,7 @@ def test_edit_reservation(client_with_db):
         reservation.course_event_id)
     assert edit.form['attendee_id'].value == str(reservation.attendee_id)
     options = [opt[2] for opt in edit.form['attendee_id'].options]
-    # Returns event.possible_bookers, tested elsewhere
+    # Returns event.possible_subscribers, tested elsewhere
     # Planner (admin) and attendee have reservation, not planner_editor (PE)
     # L, F is the normal attendee
     assert options == ['L, F', 'PE, PE']
@@ -186,8 +186,9 @@ def test_create_delete_reservation(client_with_db):
     assert '01.01.2060' in page
 
     page = client.get(view).form.submit().follow()
-    assert 'Anmeldung existiert bereits' in page
-
+    print(page)
+    msg = 'Für dieses Jahr gibt es bereits andere Anmeldungen für diesen Kurs'
+    assert msg in page
     # Settings the attendee id should filter down to events the attendee
     # hasn't any subscription
     page = client.get(f'/fsi/reservations/add?attendee_id={attendee.id}')

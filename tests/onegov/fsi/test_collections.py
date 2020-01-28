@@ -4,6 +4,7 @@ from uuid import uuid4
 from sedate import utcnow
 
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
+from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.collections.reservation import ReservationCollection
 
@@ -17,6 +18,16 @@ class authAttendee:
         self.role = role or 'admin'
         self.id = id or uuid4()
         self.permissions = permissions or []
+
+
+def test_course_collection_1(session, course):
+    course(session, hidden_from_public=True, name='Hidden')
+    course1, data = course(session)
+    coll = CourseCollection(session)
+    assert coll.query().count() == 1
+    course1.hidden_from_public = True
+    session.flush()
+    assert coll.by_id(course1.id) is not None
 
 
 def test_course_event_collection(session, course):

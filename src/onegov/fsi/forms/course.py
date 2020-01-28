@@ -123,6 +123,11 @@ class CourseForm(Form):
         default=12,
     )
 
+    hidden_from_public = BooleanField(
+        label=_("Hidden"),
+        default=False,
+    )
+
     def get_useful_data(self, exclude={'csrf_token'}):
         result = super().get_useful_data(exclude)
         if self.description.data:
@@ -141,11 +146,13 @@ class CourseForm(Form):
         self.mandatory_refresh.data = model.mandatory_refresh
         self.refresh_interval.data = months_from_timedelta(
             model.refresh_interval)
+        self.hidden_from_public.data = model.hidden_from_public
 
     def update_model(self, model):
         model.name = self.name.data
         model.description = linkify(self.description.data, escape=False)
         model.mandatory_refresh = self.mandatory_refresh.data
+        model.hidden_from_public = self.hidden_from_public.data
         if not model.mandatory_refresh:
             model.refresh_interval = None
         else:

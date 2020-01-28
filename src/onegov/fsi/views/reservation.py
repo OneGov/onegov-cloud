@@ -8,7 +8,7 @@ from onegov.fsi.forms.reservation import AddFsiReservationForm, \
     AddFsiPlaceholderReservationForm
 from onegov.fsi.layouts.reservation import ReservationLayout, \
     ReservationCollectionLayout
-from onegov.fsi.models import CourseReservation, CourseEvent
+from onegov.fsi.models import CourseReservation, CourseEvent, CourseAttendee
 from onegov.fsi import _
 from onegov.fsi.views.notifcations import handle_send_email
 
@@ -40,34 +40,37 @@ def view_add_reservation(self, request, form):
         data = form.get_useful_data()
         event_id = data['course_event_id']
         attendee_id = data['attendee_id']
-        existing = request.session.query(CourseReservation).filter_by(
-            course_event_id=event_id,
-            attendee_id=attendee_id
+        course_event = request.session.query(CourseEvent).filter_by(
+            id=event_id).first()
+
+        if course_event.locked and not request.is_admin:
+            request.warning(
+                _("This course event can't be booked (anymore)."))
+            return request.redirect(request.link(self))
+
+        attendee = request.session.query(CourseAttendee).filter_by(
+            id=attendee_id
         ).first()
 
-        if not existing:
-            course_event = request.session.query(CourseEvent).filter_by(
-                id=event_id).first()
-            if course_event.locked and not request.is_admin:
-                request.warning(
-                    _("This course event can't be booked (anymore)."))
-                return request.redirect(request.link(self))
-            else:
-                self.add(**data)
-                request.success(_("Added a new subscription"))
-                request = handle_send_email(
-                    course_event.reservation_template,
-                    request,
-                    (attendee_id, ),
-                    cc_to_sender=False,
-                    show_sent_count=False
-                )
-        else:
-            request.warning(_('Subscription already exists'))
+        if not course_event.can_book(attendee):
+            request.warning(
+                _("There are other subscriptions for "
+                  "the same course in this year"))
+            return request.redirect(request.link(self))
+
+        self.add(**data)
+        request.success(_("Added a new subscription"))
+        request = handle_send_email(
+            course_event.reservation_template,
+            request,
+            (attendee_id, ),
+            cc_to_sender=False,
+            show_sent_count=False
+        )
         return request.redirect(request.link(self))
 
     return {
-        'title': _('Add Reservation'),
+        'title': _('Add Subscription'),
         'model': self,
         'layout': layout,
         'form': form
@@ -232,7 +235,17 @@ def view_delete_reservation(self, request):
     request.assert_valid_csrf_token()
     ReservationCollection(
         request.session, auth_attendee=request.current_attendee).delete(self)
-    request.success(_('Subscription successfully deleted'))
+    if not self.is_placeholder:
+        request = handle_send_email(
+                self.course_event.cancellation_template,
+                request,
+                (self.attendee_id, ),
+                cc_to_sender=False,
+                show_sent_count=True
+            )
+        request.success(_('Subscription successfully deleted'))
+    else:
+        request.success(_('Placeholder successfully deleted'))
 
 
 @FsiApp.json(

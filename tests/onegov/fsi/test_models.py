@@ -1,3 +1,4 @@
+import datetime
 import pytest
 from sedate import utcnow
 
@@ -50,32 +51,11 @@ def test_attendee_1(
     assert attendee.reservations.count() == 1
 
 
-@pytest.mark.skip('Wait until model definitions are clear')
-def test_attendee_upcoming_courses(
-        session, attendee, course_event, future_course_event):
-
-    attendee = attendee(session)
-    course_event = course_event(session)
-    future_course_event = future_course_event(session)
-
-    # Add two reservations
-    assert course_event[0].mandatory_refresh is True
-    assert future_course_event[0].mandatory_refresh is True
-    session.add_all((
-        CourseReservation(course_event_id=course_event[0].id,
-                    attendee_id=attendee[0].id, event_completed=True),
-        CourseReservation(course_event_id=future_course_event[0].id,
-                    attendee_id=attendee[0].id, event_completed=True)))
-    session.flush()
-
-    future_course_event[0].mandatory_refresh = False
-    assert attendee[0].repeating_courses.count() == 1
-
-
 def test_course_event_1(session, course, course_event, attendee):
     attendee_, data = attendee(session)
     course, data = course(session)
     event, data = course_event(session)
+    delta = datetime.timedelta(days=265)
 
     assert event.attendees.count() == 0
     assert event.reservations.count() == 0
@@ -92,17 +72,46 @@ def test_course_event_1(session, course, course_event, attendee):
     assert event.reservations.count() == 2
     assert event.attendees.count() == 1
     assert event.available_seats == 20 - 2
-    assert event.possible_bookers().count() == 0
+    assert event.possible_subscribers().first() is None
+
+    # Test possible and excluded subscribers
     attendee_2, data = attendee(session, first_name='2')
-    assert event.possible_bookers().first() == attendee_2
-    assert event.possible_bookers(external_only=True).count() == 0
+    assert event.possible_subscribers().first() == attendee_2
+    assert event.possible_subscribers(external_only=True).count() == 0
+
+    event2, data = course_event(
+        session, start=event.start + delta, end=event.end + delta)
+
+    assert event2.excluded_subscribers(as_uids=False).all() == []
+    # assert event2.possible_subscribers().first() == attendee_2
+
+    # Add attendee2 also to event, so that can not book event2
+    year = event.start.year
+    assert year == event2.start.year
+    assert event2.reservations.first() is None
+    session.add(
+        CourseReservation(
+            attendee_id=attendee_2.id,
+            course_event_id=event.id
+        )
+    )
+    session.flush()
+
+    # Subscription in for event2 has impact on possible bookers in event
+    other_subscribers = event.attendees.all()
+    assert event2.excluded_subscribers(
+        as_uids=False, year=year).all() == other_subscribers
+    assert event2.can_book(attendee_, year=year) is False
+
+    assert attendee_ in event.attendees.all()
+    assert event.can_book(attendee_, year=year) is False
 
     # Test course behind the event
     assert event.name == event.course.name
     assert event.description == event.course.description
     assert event.course == course
 
-    assert course.events.all() == [event]
+    assert course.events.all() == [event, event2]
     assert course.future_events.all() == []
 
 

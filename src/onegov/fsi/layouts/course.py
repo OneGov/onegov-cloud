@@ -30,6 +30,17 @@ class CourseInviteMailLayout(OrgDefaultMailLayout, FormatMixin):
     def course_url(self):
         return self.request.link(self.model)
 
+    @cached_property
+    def upcoming_events_collection(self):
+        return CourseEventCollection(
+            self.request.session,
+            course_id=self.model.id,
+            upcoming_only=True)
+
+    @cached_property
+    def open_events_url(self):
+        return self.request.link(self.upcoming_events_collection)
+
     @property
     def notification_type(self):
         return 'invitation'
