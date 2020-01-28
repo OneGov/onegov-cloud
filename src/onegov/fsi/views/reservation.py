@@ -1,6 +1,7 @@
+from mailthon.enclosure import Binary
+
 from onegov.core.security import Personal, Secret, Private
 from onegov.fsi import FsiApp
-from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.forms.reservation import AddFsiReservationForm, \
     EditFsiReservationForm, EditFsiPlaceholderReservationForm, \

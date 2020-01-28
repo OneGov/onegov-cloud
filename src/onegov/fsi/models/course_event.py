@@ -2,6 +2,8 @@ import datetime
 from collections import OrderedDict
 from uuid import uuid4
 
+from icalendar import Calendar as vCalendar
+from icalendar import Event as vEvent
 from sedate import utcnow
 from sqlalchemy import Column, Boolean, SmallInteger, \
     Enum, Text, Interval, UniqueConstraint, ForeignKey
@@ -243,3 +245,22 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     @property
     def email_recipients(self):
         return (att.email for att in self.attendees)
+
+    def as_ical(self, event_url=None):
+
+        vevent = vEvent()
+        vevent.add('uid', f'{self.name}-{self.start}-{self.end}@onegov.fsi')
+        vevent.add('summary', self.name)
+        vevent.add('dtstart', self.start)
+        vevent.add('dtend', self.end)
+        vevent.add('location', self.location)
+        vevent.add('description', self.description)
+        vevent.add('tags', ['FSI'])
+        if event_url:
+            vevent.add('url', event_url)
+
+        vcalendar = vCalendar()
+        vcalendar.add('prodid', '-//OneGov//onegov.fsi//')
+        vcalendar.add('version', '2.0')
+        vcalendar.add_component(vevent)
+        return vcalendar.to_ical()

@@ -17,7 +17,7 @@ from onegov.fsi import _
 
 
 def handle_send_email(self, request, recipients, cc_to_sender=True,
-                      show_sent_count=True):
+                      show_sent_count=True, attachments=None):
     """Recipients must be a list of attendee id's or attendees"""
 
     if not recipients:
@@ -52,6 +52,7 @@ def handle_send_email(self, request, recipients, cc_to_sender=True,
                 subject=self.subject,
                 content=content,
                 plaintext=plaintext,
+                attachments=attachments or ()
             )
 
         self.last_sent = utcnow()
