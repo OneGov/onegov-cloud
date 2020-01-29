@@ -310,7 +310,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     def as_ical_attachment(self, url=None):
         attachment = PlainText(content=self.as_ical(url))
         name = self.name.lower().replace(' ', '_')
-        content_disposition = f'attachment; filename="{name}"'
+        content_disposition = f'attachment; filename="{name}.ics"'
         attachment.headers['Content-Disposition'] = content_disposition
         return attachment
 
