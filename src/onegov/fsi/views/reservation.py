@@ -1,6 +1,5 @@
 from onegov.core.security import Personal, Secret, Private
 from onegov.fsi import FsiApp
-from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.forms.reservation import AddFsiReservationForm, \
     EditFsiReservationForm, EditFsiPlaceholderReservationForm, \
@@ -64,7 +63,8 @@ def view_add_reservation(self, request, form):
             request,
             (attendee_id, ),
             cc_to_sender=False,
-            show_sent_count=False
+            show_sent_count=False,
+            attachments=(course_event.as_ical_attachment(), )
         )
         return request.redirect(request.link(self))
 
@@ -72,7 +72,8 @@ def view_add_reservation(self, request, form):
         'title': _('Add Subscription'),
         'model': self,
         'layout': layout,
-        'form': form
+        'form': form,
+        'button_text': _('Subscribe')
     }
 
 
@@ -112,7 +113,8 @@ def view_edit_reservation(self, request, form):
                 request,
                 (data['attendee_id'],),
                 cc_to_sender=False,
-                show_sent_count=False
+                show_sent_count=False,
+                attachments=(course_event.as_ical_attachment(),)
             )
             return request.redirect(request.link(ReservationCollection(
                 request.session,
@@ -220,7 +222,8 @@ def view_add_from_course_event(self, request):
         request,
         (self.attendee, ),
         cc_to_sender=False,
-        show_sent_count=False
+        show_sent_count=False,
+        attachments=(self.course_event.as_ical_attachment(),)
     )
     request.success(_('New subscription successfully added'))
 
@@ -236,12 +239,12 @@ def view_delete_reservation(self, request):
         request.session, auth_attendee=request.current_attendee).delete(self)
     if not self.is_placeholder:
         request = handle_send_email(
-                self.course_event.cancellation_template,
-                request,
-                (self.attendee_id, ),
-                cc_to_sender=False,
-                show_sent_count=True
-            )
+            self.course_event.cancellation_template,
+            request,
+            (self.attendee_id, ),
+            cc_to_sender=False,
+            show_sent_count=True
+        )
         request.success(_('Subscription successfully deleted'))
     else:
         request.success(_('Placeholder successfully deleted'))
