@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-01-28 11:37+0100\n"
+"POT-Creation-Date: 2020-01-29 09:37+0100\n"
 "PO-Revision-Date: 2020-01-28 11:39+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -652,7 +652,7 @@ msgid "Added a new placeholder"
 msgstr "Platzhalter hinzugefügt"
 
 msgid "Add Placeholder Reservation"
-msgstr "Platzhalter-Reservation hinzufügen"
+msgstr "Platzhalter-Anmeldung hinzufügen"
 
 msgid "New subscription successfully added"
 msgstr "Neue Anmeldungen erfasst"

@@ -74,7 +74,8 @@ def view_add_reservation(self, request, form):
         'title': _('Add Subscription'),
         'model': self,
         'layout': layout,
-        'form': form
+        'form': form,
+        'button_text': _('Subscribe')
     }
 
 
