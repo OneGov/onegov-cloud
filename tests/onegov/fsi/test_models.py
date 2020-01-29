@@ -1,5 +1,4 @@
 import datetime
-import pytest
 from sedate import utcnow
 
 from onegov.fsi.models.course_attendee import CourseAttendee

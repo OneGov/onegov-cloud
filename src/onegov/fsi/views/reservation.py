@@ -1,5 +1,3 @@
-from mailthon.enclosure import Binary
-
 from onegov.core.security import Personal, Secret, Private
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.reservation import ReservationCollection
@@ -241,12 +239,12 @@ def view_delete_reservation(self, request):
         request.session, auth_attendee=request.current_attendee).delete(self)
     if not self.is_placeholder:
         request = handle_send_email(
-                self.course_event.cancellation_template,
-                request,
-                (self.attendee_id, ),
-                cc_to_sender=False,
-                show_sent_count=True
-            )
+            self.course_event.cancellation_template,
+            request,
+            (self.attendee_id, ),
+            cc_to_sender=False,
+            show_sent_count=True
+        )
         request.success(_('Subscription successfully deleted'))
     else:
         request.success(_('Placeholder successfully deleted'))

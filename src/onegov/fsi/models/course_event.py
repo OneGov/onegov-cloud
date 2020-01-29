@@ -5,7 +5,7 @@ from uuid import uuid4
 import pytz
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
-from mailthon.enclosure import Binary, PlainText
+from mailthon.enclosure import PlainText
 from sedate import utcnow
 from sqlalchemy import Column, Boolean, SmallInteger, \
     Enum, Text, Interval, UniqueConstraint, ForeignKey, or_, and_

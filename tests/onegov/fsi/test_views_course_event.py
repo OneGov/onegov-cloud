@@ -3,7 +3,6 @@ from datetime import datetime
 from sedate import utcnow
 
 from onegov.fsi.models import CourseEvent
-from tests.onegov.org.common import get_mail
 
 
 def test_course_event_collection(client):

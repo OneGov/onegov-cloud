@@ -1,4 +1,3 @@
-import pytest
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.models import CourseReservation, CourseAttendee, CourseEvent, \
     Course
