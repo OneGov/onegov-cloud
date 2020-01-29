@@ -153,18 +153,18 @@ def test_register_for_course_event_member(client_with_db):
     assert 'Angemeldet' in page
 
     assert len(client.app.smtp.outbox) == 1
-    message = get_mail(client.app.smtp.outbox, 0)
-    assert message['to'] == 'member@example.org'
-    assert message['subject'] == '=?utf-8?q?Anmeldungsbest=C3=A4tigung?='
+    message = client.app.smtp.outbox[0]
+    assert message['To'] == 'member@example.org'
+    assert message['Subject'] == '=?utf-8?q?Anmeldungsbest=C3=A4tigung?='
 
     # Test cancellation emails upon unsubscribing
     client.login_admin()
     view = f'/fsi/reservations?course_event_id={event.id}'
     page = client.get(view)
-    page = page.click('Löschen')
+    page.click('Löschen')
     assert len(client.app.smtp.outbox) == 2
-    message = get_mail(client.app.smtp.outbox, 1)
-    assert message['subject'] == 'Absage Kursveranstaltung'
+    message = client.app.smtp.outbox[1]
+    assert message['Subject'] == 'Absage Kursveranstaltung'
 
 
 def test_register_for_course_event_editor(client_with_db):
@@ -179,8 +179,8 @@ def test_register_for_course_event_editor(client_with_db):
     assert 'Angemeldet' in page
 
     assert len(client.app.smtp.outbox) == 1
-    message = get_mail(client.app.smtp.outbox, 0)
-    assert message['to'] == 'editor@example.org'
+    message = client.app.smtp.outbox[0]
+    assert message['To'] == 'editor@example.org'
 
 
 def test_register_for_course_event_admin(client_with_db):
