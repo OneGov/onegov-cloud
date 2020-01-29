@@ -4,9 +4,11 @@ from uuid import uuid4
 from sedate import utcnow
 
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
+from onegov.fsi.collections.audit import AuditCollection
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.collections.reservation import ReservationCollection
+from onegov.fsi.models import CourseReservation
 
 from onegov.fsi.models.course_event import CourseEvent
 from tests.onegov.fsi.common import collection_attr_eq_test
@@ -186,3 +188,72 @@ def test_reservation_collection_query(
     # coll.attendee_id will be set in path like
     coll.attendee_id = att.id
     assert coll.query().count() == 1
+
+
+def test_audit_collection(
+        session, course, course_event, attendee, planner_editor, planner):
+    course_, data = course(session)
+    editor, data = planner_editor(
+        session,
+        permissions=['SD / STVA']
+    )
+    admin_att, data = planner(session)
+
+    organisations = [
+        'SD / STVA',
+        'SD / STVA',
+        'SD / STVA',
+        'SD / STVA / SUB',
+    ]
+
+    attendees = []
+    for i, org in enumerate(organisations):
+        att, data = attendee(
+            session,
+            first_name=f'Attendee{i}',
+            organisation=org
+        )
+        attendees.append(att)
+
+    events = [course_event(session)[0]]
+
+    for i in range(3):
+        ev, data = course_event(
+            session,
+            start=events[0].start + datetime.timedelta(days=i),
+            end=events[0].end + datetime.timedelta(days=i)
+        )
+        events.append(ev)
+
+    subscriptions = []
+    for i, event in enumerate(events):
+        subscription = CourseReservation(
+            course_event_id=event.id,
+            attendee_id=attendees[i].id
+        )
+        subscriptions.append(subscription)
+    session.add_all(subscriptions)
+
+    # test for editor
+    coll = AuditCollection(
+        session,
+        course_.id,
+        editor,
+    )
+
+    assert coll.query().count() == 3
+
+    # test for admin
+    coll = AuditCollection(
+        session,
+        course_.id,
+        admin_att,
+        organisation='SD / STVA',
+    )
+
+    assert coll.query().count() == 3
+
+
+    for data in coll.query():
+        print(data)
+    assert False

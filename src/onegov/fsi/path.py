@@ -2,6 +2,7 @@ from uuid import UUID
 
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
+from onegov.fsi.collections.audit import AuditCollection
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.collections.notification_template import \
@@ -130,3 +131,12 @@ def get_reservations(
 @FsiApp.path(model=CourseReservation, path='/fsi/reservation/{id}')
 def get_reservation_details(request, id):
     return ReservationCollection(request.session).by_id(id)
+
+
+@FsiApp.path(model=AuditCollection, path='/fsi/{course_event_id}/audit')
+def get_audit(request, course_event_id):
+    return AuditCollection(
+        request,
+        course_event_id,
+        auth_attendee=request.current_attendee
+    )
