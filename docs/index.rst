@@ -71,6 +71,11 @@ An introduction into the history and the design of OneGov Cloud.
 
 An introduction to the most fully-featured application of OneGov Cloud.
 
+:doc:`feriennet`
+++++++++++++++++
+
+An introduction to the most popular application of OneGov Cloud.
+
 :doc:`formcode`
 +++++++++++++++
 
