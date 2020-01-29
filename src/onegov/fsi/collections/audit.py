@@ -1,4 +1,5 @@
 from cached_property import cached_property
+from sqlalchemy import func, desc, asc
 
 from onegov.core.collection import GenericCollection
 from onegov.fsi.models import CourseAttendee, CourseReservation, CourseEvent, \
@@ -24,30 +25,58 @@ class AuditCollection(GenericCollection):
             assert organisation
         self.organisation = organisation
 
+    def ranked_subscription_query(self):
+        """
+        Ranks all subscriptions of all events of a course
+        windowed over the attendee_id and ranked after completed, most recent
+        Use this query for make a join with any collection of attendees.
+        """
+        ranked = self.session.query(
+            CourseReservation.attendee_id,
+            CourseReservation.event_completed,
+            CourseEvent.start,
+            func.row_number().over(
+                partition_by=CourseAttendee.id,
+                order_by=[
+                    desc(CourseReservation.event_completed),
+                    CourseEvent.start]
+            ).label('rownum'),
+        )
+        ranked = ranked.join(CourseEvent).join(CourseAttendee)
+        ranked = ranked.filter(CourseEvent.course_id == self.course_id)
+        return ranked.filter(CourseReservation.attendee_id != None)
+
+    def last_completed_subscriptions_query(self):
+        """Filter the ranked subscriptions by the rownum resulting
+        in a list of just the most recent and completed subscriptions
+        for every attendee_id
+        """
+        ranked = self.ranked_subscription_query().subquery('ranked')
+        subquery = self.session.query(
+            CourseReservation.attendee_id,
+            CourseEvent.start,
+            ranked.c.event_completed
+        ).select_entity_from(ranked)
+        return subquery.filter(ranked.c.rownum == 1)
+
     def query(self):
+        last = self.last_completed_subscriptions_query().subquery()
         query = self.session.query(
+            CourseAttendee.id,
             CourseAttendee.first_name,
             CourseAttendee.last_name,
-            CourseEvent.start,
-            CourseEvent.end,
-            CourseReservation.event_completed
+            CourseAttendee.organisation,
+            last.c.start.label('subscription_start'),
+            last.c.event_completed
         )
-        query = query.join(CourseReservation).join(CourseEvent).join(Course)
-        query = query.filter(Course.id == self.course_id)
+        query = query.filter_by(organisation=self.organisation)
 
-        if self.auth_attendee.role == 'editor':
-            query = query.filter(CourseAttendee.organisation.in_(
-                self.auth_attendee.permissions,))
-        else:
-            query = query.filter(
-                CourseAttendee.organisation == self.organisation)
-
-        query.order_by(
-            CourseReservation.event_completed,
+        query = query.join(
+            last, CourseAttendee.id == last.c.attendee_id, isouter=True)
+        query = query.order_by(
             CourseAttendee.last_name,
-            CourseAttendee.first_name
+            CourseAttendee.first_name,
         )
-
         return query
 
     @property

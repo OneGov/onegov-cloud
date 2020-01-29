@@ -8,7 +8,7 @@ from onegov.fsi.collections.audit import AuditCollection
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.collections.reservation import ReservationCollection
-from onegov.fsi.models import CourseReservation
+from onegov.fsi.models import CourseReservation, CourseAttendee
 
 from onegov.fsi.models.course_event import CourseEvent
 from tests.onegov.fsi.common import collection_attr_eq_test
@@ -190,24 +190,51 @@ def test_reservation_collection_query(
     assert coll.query().count() == 1
 
 
+def test_last_completed_subscriptions_query(
+        session, course_event, attendee):
+    org = 'Example'
+    attendee_, data = attendee(session, organisation=org)
+    auth_attendee = authAttendee(role='admin')
+
+    course_events = [
+        course_event(
+            session,
+            start=utcnow() + datetime.timedelta(days=i+1))[0]
+        for i in range(2)
+    ]
+    session.add_all(course_events)
+    # Most recent last course was not completed, but the first
+    session.add_all((
+        CourseReservation(
+            attendee_id=attendee_.id,
+            course_event_id=course_events[0].id,
+            event_completed=True
+        ),
+        CourseReservation(
+            attendee_id=attendee_.id,
+            course_event_id=course_events[1].id)
+    ))
+    coll = AuditCollection(
+        session, course_events[0].course.id, auth_attendee, organisation=org)
+    assert coll.last_completed_subscriptions_query().all()[0] == (
+        attendee_.id,
+        course_events[0].start,
+        True
+    )
+
+
 def test_audit_collection(
         session, course, course_event, attendee, planner_editor, planner):
     course_, data = course(session)
+    org = 'SD / STVA'
     editor, data = planner_editor(
         session,
-        permissions=['SD / STVA']
+        permissions=[org]
     )
     admin_att, data = planner(session)
 
-    organisations = [
-        'SD / STVA',
-        'SD / STVA',
-        'SD / STVA',
-        'SD / STVA / SUB',
-    ]
-
     attendees = []
-    for i, org in enumerate(organisations):
+    for i in range(4):
         att, data = attendee(
             session,
             first_name=f'Attendee{i}',
@@ -215,45 +242,61 @@ def test_audit_collection(
         )
         attendees.append(att)
 
-    events = [course_event(session)[0]]
-
-    for i in range(3):
+    # Create 3 events for the course
+    proto_event = course_event(session)[0]
+    events = [proto_event]
+    for i in range(2):
         ev, data = course_event(
             session,
-            start=events[0].start + datetime.timedelta(days=i),
-            end=events[0].end + datetime.timedelta(days=i)
+            start=proto_event.start + datetime.timedelta(days=i+1),
+            end=proto_event.end + datetime.timedelta(days=i+1)
         )
         events.append(ev)
 
     subscriptions = []
+    # last attendee should not have a subscription
     for i, event in enumerate(events):
         subscription = CourseReservation(
             course_event_id=event.id,
-            attendee_id=attendees[i].id
+            attendee_id=attendees[i].id,
+            event_completed=True
         )
         subscriptions.append(subscription)
     session.add_all(subscriptions)
+    session.flush()
+    assert attendees[-1].reservations.first() is None
 
-    # test for editor
-    coll = AuditCollection(
-        session,
-        course_.id,
-        editor,
+    # add the first attendee also to the second event
+    session.add(
+        CourseReservation(
+            attendee_id=attendees[0].id,
+            course_event_id=events[1].id
+        )
     )
-
-    assert coll.query().count() == 3
+    session.flush()
 
     # test for admin
     coll = AuditCollection(
         session,
         course_.id,
         admin_att,
-        organisation='SD / STVA',
+        organisation=org
     )
-
-    assert coll.query().count() == 3
-
-
     for data in coll.query():
         print(data)
+    assert coll.query().count() == len(attendees)
+
+
+    # assert coll.query().count() == len(attendees)
+    #
+    # # test for admin
+    # coll = AuditCollection(
+    #     session,
+    #     course_.id,
+    #     admin_att,
+    #     organisation='SD / STVA',
+    # )
+    #
+    # assert coll.query().count() == 3
+
     assert False
