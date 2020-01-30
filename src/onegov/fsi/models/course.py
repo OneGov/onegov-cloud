@@ -56,7 +56,7 @@ class Course(Base, ORMSearchable):
     def future_events(self):
         from onegov.fsi.models import CourseEvent
         return self.events.filter(CourseEvent.start > utcnow()).order_by(
-            desc(CourseEvent.start))
+            CourseEvent.start)
 
     @property
     def sorted_events(self):
