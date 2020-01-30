@@ -99,7 +99,7 @@
 
     <dl class="field-display">
         <dt i18n:translate="">Date</dt>
-        <dd>${layout.format_date(model.start, 'event')}, ${layout.format_date(model.start, 'time')} - ${layout.format_date(model.end, 'time')}</dd>
+        <dd>${layout.format_date(model.start, 'event')}, ${layout.format_date(model.start, 'time')} - ${layout.format_date(model.end, 'time')} <span i18n:translate="">h</span></dd>
         <div class="clearfix"></div>
     </dl>
 
