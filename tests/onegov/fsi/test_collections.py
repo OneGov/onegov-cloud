@@ -8,7 +8,7 @@ from onegov.fsi.collections.audit import AuditCollection
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.collections.reservation import ReservationCollection
-from onegov.fsi.models import CourseReservation, CourseAttendee
+from onegov.fsi.models import CourseReservation
 
 from onegov.fsi.models.course_event import CourseEvent
 from tests.onegov.fsi.common import collection_attr_eq_test
@@ -199,7 +199,7 @@ def test_last_completed_subscriptions_query(
     course_events = [
         course_event(
             session,
-            start=utcnow() + datetime.timedelta(days=i+1))[0]
+            start=utcnow() + datetime.timedelta(days=i + 1))[0]
         for i in range(2)
     ]
     session.add_all(course_events)
@@ -249,8 +249,8 @@ def test_audit_collection(
     for i in range(2):
         ev, data = course_event(
             session,
-            start=proto_event.start + datetime.timedelta(days=i+1),
-            end=proto_event.end + datetime.timedelta(days=i+1)
+            start=proto_event.start + datetime.timedelta(days=i + 1),
+            end=proto_event.end + datetime.timedelta(days=i + 1)
         )
         events.append(ev)
 
