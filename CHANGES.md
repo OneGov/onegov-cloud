@@ -1,8 +1,20 @@
 # Changes
 
+## Release `2020.17`
+
+> commits: **7 / [2bfc0ed77a...13c51d4900](https://github.com/OneGov/onegov-cloud/compare/2bfc0ed77a^...13c51d4900)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.17)](https://buildkite.com/seantis/onegov-cloud)
+
+### Fsi
+
+🎉 **Adds ics calender files as attachments for course events**
+
+**`Feature`** | **[FSI-15](https://kanton-zug.atlassian.net/browse/FSI-15)** | **[20e9e2d95f](https://github.com/onegov/onegov-cloud/commit/20e9e2d95f374945c3bf5677b3fb6936fe0f1607)**
+
 ## Release `2020.16`
 
-> commits: **1 / [f60596884f...f60596884f](https://github.com/OneGov/onegov-cloud/compare/f60596884f^...f60596884f)**<br>
+> released: **2020-01-28 14:14**<br>
+> commits: **2 / [f60596884f...8e165127c5](https://github.com/OneGov/onegov-cloud/compare/f60596884f^...8e165127c5)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.16)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Fsi
