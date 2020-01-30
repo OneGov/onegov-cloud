@@ -1,8 +1,34 @@
 # Changes
 
+## Release `2020.18`
+
+> commits: **2 / [98512a4cf5...804d25e03a](https://github.com/OneGov/onegov-cloud/compare/98512a4cf5^...804d25e03a)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.18)](https://buildkite.com/seantis/onegov-cloud)
+
+### Fsi
+
+🎉 **Adds auditing feature for courses**
+
+Adds printable audit for attendee's last course subscriptions for courses with mandatory refresh.
+
+Further changes:
+
+- changes sorting of event in event listing
+- removed long course description from emails
+- hides hidden course events for editors in `/courses`
+
+**`Feature`** | **[FSI-16](https://kanton-zug.atlassian.net/browse/FSI-16)** | **[804d25e03a](https://github.com/onegov/onegov-cloud/commit/804d25e03a19dd07d964bcdc05b0ac8601d42dfe)**
+
+### Org
+
+🐞 **Fixes logo being resized disproportionately**
+
+**`Bugfix`** | **[98512a4cf5](https://github.com/onegov/onegov-cloud/commit/98512a4cf5cb24e1bbcd2084ad53bad0795ba996)**
+
 ## Release `2020.17`
 
-> commits: **7 / [2bfc0ed77a...13c51d4900](https://github.com/OneGov/onegov-cloud/compare/2bfc0ed77a^...13c51d4900)**<br>
+> released: **2020-01-30 07:42**<br>
+> commits: **8 / [2bfc0ed77a...ec65424f72](https://github.com/OneGov/onegov-cloud/compare/2bfc0ed77a^...ec65424f72)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.17)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Fsi
