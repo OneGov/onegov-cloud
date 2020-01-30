@@ -7,7 +7,7 @@
             <div class="columns small-12">
                 <div class="row">
                     <div class="columns small-12">
-                        <tal:b tal:condition="model|nothing" tal:define="events model.future_events.all()">
+                        <tal:b tal:condition="model|nothing">
                             <metal:b use-macro="layout.macros['course_details']" />
                         </tal:b>
                     </div>
