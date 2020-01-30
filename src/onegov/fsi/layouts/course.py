@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 from cached_property import cached_property
 
 from onegov.core.elements import Link, Confirm, Intercooler

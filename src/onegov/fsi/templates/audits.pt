@@ -40,7 +40,7 @@
                                 <th class="text-left" i18n:translate="">First Name</th>
                                     <th class="text-left" i18n:translate="">Last Event</th>
                                     <th class="text-left" i18n:translate="">Attended</th>
-                                    <th class="text-left" i18n:translate="">Due in</th>
+                                    <th class="text-left" i18n:translate="">Due by</th>
                                 </thead>
                                 <tbody>
                                     <tal:b tal:repeat="result results">

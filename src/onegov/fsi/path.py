@@ -60,8 +60,8 @@ def get_events_view(
     )
 
 
-@FsiApp.path(model=CourseCollection, path='/fsi/courses', converters=dict(
-                 show_hidden_from_public=bool))
+@FsiApp.path(model=CourseCollection, path='/fsi/courses',
+             converters=dict(show_hidden_from_public=bool))
 def get_courses(request, show_hidden_from_public):
     if not request.is_admin:
         show_hidden_from_public = False

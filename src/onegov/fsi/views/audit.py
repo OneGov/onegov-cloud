@@ -1,6 +1,3 @@
-from datetime import datetime
-
-import pytz
 from sedate import utcnow
 
 from onegov.core.security import Private

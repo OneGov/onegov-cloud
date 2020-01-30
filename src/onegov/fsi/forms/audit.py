@@ -56,4 +56,3 @@ class AuditForm(Form):
     def on_request(self):
         self.course_id.choices = self.get_course_choices()
         self.organisation.choices = self.get_organisation_choices()
-

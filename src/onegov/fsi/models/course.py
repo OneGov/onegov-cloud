@@ -3,7 +3,7 @@ from onegov.core.html import html_to_text
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
 from onegov.search import ORMSearchable
-from sqlalchemy import Column, Text, Boolean, Interval, desc
+from sqlalchemy import Column, Text, Boolean, Interval
 from sqlalchemy.ext.hybrid import hybrid_property
 from uuid import uuid4
 

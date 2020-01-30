@@ -286,18 +286,3 @@ def test_audit_collection(
     for data in coll.query():
         print(data)
     assert coll.query().count() == len(attendees)
-
-
-    # assert coll.query().count() == len(attendees)
-    #
-    # # test for admin
-    # coll = AuditCollection(
-    #     session,
-    #     course_.id,
-    #     admin_att,
-    #     organisation='SD / STVA',
-    # )
-    #
-    # assert coll.query().count() == 3
-
-    assert False

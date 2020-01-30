@@ -1,6 +1,5 @@
 from datetime import datetime
 from sedate import utcnow
-from sqlalchemy import desc
 
 from onegov.core.collection import Pagination, GenericCollection
 from onegov.fsi.collections.course import CourseCollection

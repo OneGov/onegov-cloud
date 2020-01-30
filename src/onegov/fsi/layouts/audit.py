@@ -1,10 +1,8 @@
 from datetime import timedelta
 
 from cached_property import cached_property
-from sedate import utcnow
 
 from onegov.core.elements import Link
-from onegov.fsi.forms.course import months_to_timedelta
 from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
 
@@ -49,6 +47,3 @@ class AuditLayout(DefaultLayout):
             return
         assert isinstance(refresh_interval, timedelta)
         return start + refresh_interval
-
-
-

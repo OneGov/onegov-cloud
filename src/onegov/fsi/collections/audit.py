@@ -1,5 +1,5 @@
 from cached_property import cached_property
-from sqlalchemy import func, desc, asc
+from sqlalchemy import func, desc
 
 from onegov.core.collection import GenericCollection
 from onegov.fsi.models import CourseAttendee, CourseReservation, CourseEvent, \
