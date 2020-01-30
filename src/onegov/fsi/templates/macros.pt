@@ -85,12 +85,6 @@
 <metal:course_event define-macro="course_event_details">
     <p tal:condition="request.is_manager and model.hidden_from_public and not for_email|False">This course is hidden.</p>
 
-    <dl class="field-display" tal:condition="for_email|False">
-        <dt i18n:translate="">Name</dt>
-        <dd>${model.course.name}</dd>
-        <div class="clearfix"></div>
-    </dl>
-
     <dl class="field-display">
         <dt i18n:translate="">Location</dt>
         <dd>${model.location}</dd>
