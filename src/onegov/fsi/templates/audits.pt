@@ -1,0 +1,72 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.fsi">
+    <tal:b metal:fill-slot="title">
+        ${layout.title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="row">
+            <div class="columns small-12">
+                <div class="row">
+                    <div tal:condition="show_form|True" class="columns small-12 medium-8">
+                        <div metal:use-macro="layout.macros['form']" />
+                        <dl class="field-display">
+                            <dt i18n:translate="">Refresh Interval:</dt>
+                            <dd>${layout.format_timedelta(layout.model.course.refresh_interval)}</dd>
+                        </dl>
+                    </div>
+                    <div class="columns small-12 medium-4">
+                        <div class="info-panel hide-for-print">
+                            <tal:b metal:use-macro="layout.macros['color_code_snippet']" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="columns small-12 end">
+                <div class="row">
+                    <div class="columns small-12">
+                        <div class="hide-for-print" tal:condition="not: results">
+                            <ul>
+                                <li i18n:translate="">Hidden Courses are not shown in Dropdown</li>
+                                <li i18n:translate="">Courses withouth mandatory refresh are not shown in Dropdown</li>
+                            </ul>
+                        </div>
+
+                        <tal:b condition="results">
+                            <table class="tablesaw hover fullwidth">
+                                <thead>
+                                <th class="text-left" i18n:translate="">Last Name</th>
+                                <th class="text-left" i18n:translate="">First Name</th>
+                                    <th class="text-left" i18n:translate="">Last Event</th>
+                                    <th class="text-left" i18n:translate="">Attended</th>
+                                    <th class="text-left" i18n:translate="">Due by</th>
+                                </thead>
+                                <tbody>
+                                    <tal:b tal:repeat="result results">
+                                        <tr tal:define="date layout.next_event_date(result.start, layout.model.course.refresh_interval)">
+                                            <td>${result.last_name}</td>
+                                            <td>${result.first_name}</td>
+                                            <td>${layout.render_start_end(result.start, result.end)} <span i18n:translate="" tal:condition="result.start">h</span></td>
+                                            <td>
+                                                <span tal:condition="result.event_completed" class="check-icon"></span>
+                                                <span tal:condition="not result.event_completed">-</span>
+                                            </td>
+                                            <td>
+                                                <tal:b tal:condition="date">
+                                                    <span class="text-red" tal:condition="now > date">${now.year}</span>
+                                                    <span class="${'text-orange' if date.year == now.year else 'text-green'}" tal:condition="now < date">${date.month}/${date.year}</span>
+                                                </tal:b>
+                                                <span class="text-red" tal:condition="not: date">${now.year}</span>
+                                            </td>
+                                        </tr>
+                                    </tal:b>
+                                </tbody>
+                            </table>
+                        </tal:b>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </tal:b>
+</div>

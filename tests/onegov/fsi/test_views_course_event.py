@@ -200,9 +200,21 @@ def test_add_subscription_for_other_attendee(client_with_db):
     client = client_with_db
     client.login_admin()
     new = client.get('/fsi/reservations').click('Anmeldung')
-    print(new)
+
+    # There is already a subscription for this course and attendee
+    assert new.form['course_event_id'].options[0][2] == 'Course - 01.01.2050'
+
+    assert new.form['course_event_id'].options[1][2] == 'Course - 01.01.2060'
+    bookable_id = new.form['course_event_id'].options[1][0]
+
+    # take the fist choices and fail to to it
     page = new.form.submit().follow()
-    assert 'Neue Anmeldung wurde hinzugefügt' in page
+    assert 'Für dieses Jahr gibt es bereits andere Anmeldungen' in page
+
+    new.form['course_event_id'] = bookable_id
+    page = new.form.submit().follow()
+    assert "Neue Anmeldung wurde hinzugefügt" in page
+
     assert len(client.app.smtp.outbox) == 1
 
 

@@ -31,8 +31,7 @@
                             <div tal:case="False" tal:condition="item['content']" tal:content="structure item['content']"/>
                             <div tal:case="True" id="${accordion_id + 'content'}"></div>
                         </tal:b>
-
-                        <span tal:condition="item['url']|nothing and request.is_admin"><a href="${item['url']}" class="button hollow" i18n:translate>Details</a></span>
+                        <span tal:condition="request.is_manager and item.get('url')"><a href="${item['url']}" class="button hollow" i18n:translate>Details</a></span>
                     </div>
                 </dd>
             </tal:b>
@@ -85,12 +84,6 @@
 <metal:course_event define-macro="course_event_details">
     <p tal:condition="request.is_manager and model.hidden_from_public and not for_email|False">This course is hidden.</p>
 
-    <dl class="field-display" tal:condition="for_email|False">
-        <dt i18n:translate="">Name</dt>
-        <dd>${model.course.name}</dd>
-        <div class="clearfix"></div>
-    </dl>
-
     <dl class="field-display">
         <dt i18n:translate="">Location</dt>
         <dd>${model.location}</dd>
@@ -99,7 +92,7 @@
 
     <dl class="field-display">
         <dt i18n:translate="">Date</dt>
-        <dd>${layout.format_date(model.start, 'event')}, ${layout.format_date(model.start, 'time')} - ${layout.format_date(model.end, 'time')}</dd>
+        <dd>${layout.format_date(model.start, 'event')}, ${layout.format_date(model.start, 'time')} - ${layout.format_date(model.end, 'time')} <span i18n:translate="">h</span></dd>
         <div class="clearfix"></div>
     </dl>
 
@@ -204,6 +197,22 @@
         <dd>Miterarbeitende / Lehrpersonen / Externe</dd>
     </dl>
 </metal:role_snippet>
+
+<metal:color_code_snippet define-macro="color_code_snippet">
+    <h4 i18n:translate="">Colors</h4>
+    <dl class="field-display">
+        <dt class="text-green">Green</dt>
+        <dd>Attendee should visit course next year or even later.</dd>
+    </dl>
+    <dl class="field-display">
+        <dt class="text-orange">Orange</dt>
+        <dd>Attendee should visit course this year.</dd>
+    </dl>
+    <dl class="field-display">
+        <dt class="text-red">Red</dt>
+        <dd>Attendee should have attended the course already, but didn't.</dd>
+    </dl>
+</metal:color_code_snippet>
 
 </body>
 </html>

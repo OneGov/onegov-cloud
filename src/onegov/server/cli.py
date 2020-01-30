@@ -499,6 +499,9 @@ class WsgiServer(FileSystemEventHandler):
         if '.cache' in event.src_path:
             return
 
+        if event.src_path.endswith('~'):
+            return
+
         print("changed: {}".format(event.src_path))
 
         self.restart()

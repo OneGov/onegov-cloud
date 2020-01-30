@@ -3,7 +3,7 @@ from onegov.core.html import html_to_text
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
 from onegov.search import ORMSearchable
-from sqlalchemy import Column, Text, Boolean, Interval, desc
+from sqlalchemy import Column, Text, Boolean, Interval
 from sqlalchemy.ext.hybrid import hybrid_property
 from uuid import uuid4
 
@@ -23,6 +23,7 @@ class Course(Base, ORMSearchable):
 
     description = Column(Text, nullable=False)
 
+    # given in months
     refresh_interval = Column(Interval)
 
     # If the course has to be refreshed after some interval
@@ -56,9 +57,4 @@ class Course(Base, ORMSearchable):
     def future_events(self):
         from onegov.fsi.models import CourseEvent
         return self.events.filter(CourseEvent.start > utcnow()).order_by(
-            desc(CourseEvent.start))
-
-    @property
-    def sorted_events(self):
-        from onegov.fsi.models import CourseEvent
-        return self.events.order_by(desc(CourseEvent.start))
+            CourseEvent.start)

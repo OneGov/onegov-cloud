@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-01-29 09:37+0100\n"
+"POT-Creation-Date: 2020-01-30 07:57+0100\n"
 "PO-Revision-Date: 2020-01-28 11:39+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -448,6 +448,9 @@ msgstr "Name"
 msgid "Date"
 msgstr "Datum"
 
+msgid "h"
+msgstr "Uhr"
+
 msgid "Remaining seats"
 msgstr "Verbleibende Plätze"
 
@@ -505,7 +508,7 @@ msgid ""
 "the event location. Please take note of the course description at"
 msgstr ""
 "Der Kurs wird wie geplant durchgeführt. Wir bitten um pünktliches Eintreffen "
-"im Kurslokal. Bitte beachten Sie auch den Kursbeschrieb im"
+"im Kurslokal. Bitte beachten Sie auch den Kursbeschrieb auf"
 
 msgid "iZug/Fachstelle Sicherheit"
 msgstr "iZug/Fachstelle Sicherheit"
@@ -537,7 +540,7 @@ msgid "Event Details"
 msgstr "Details Durchführung"
 
 msgid "Your's sincerily"
-msgstr "Mit freundlichen Grüssen"
+msgstr "Freundliche Grüsse"
 
 msgid "Fachstelle Sicherheit"
 msgstr "Fachstelle Sicherheit"

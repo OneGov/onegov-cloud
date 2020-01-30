@@ -145,6 +145,7 @@ def view_course_event(self, request):
     return {
         'layout': layout,
         'model': self,
+        'events': self.future_events.all()
     }
 
 

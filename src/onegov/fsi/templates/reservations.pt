@@ -21,7 +21,7 @@
                                         <th i18n:translate>Course Status</th>
                                         <th i18n:translate>Course attended</th>
                                         <th i18n:translate>Last info mail</th>
-                                        <th tal:condition="request.is_admin" i18n:translate="" class="no-print">Manage</th>
+                                        <th tal:condition="request.is_admin" i18n:translate="" class="hide-for-print">Manage</th>
                                     </thead>
                                     <tbody>
                                         <tal:b tal:repeat="reservation reservations">
@@ -42,7 +42,7 @@
 
 
                                                 <td tal:define="sent reservation.course_event.info_template.last_sent">${layout.format_date(sent, 'date') if sent else ''}</td>
-                                                <td tal:condition="request.is_admin" class="no-print">
+                                                <td tal:condition="request.is_admin" class="hide-for-print">
                                                     <!--?  Delete Button -->
                                                     <metal:b tal:condition="not: reservation.course_event.is_past" tal:define="item reservation" use-macro="layout.macros['intercooler_btn_for_item']"/>
                                                     <a href="${request.link(reservation, name='edit-placeholder' if reservation.is_placeholder else 'edit')}" class="button tiny secondary" i18n:translate="">Edit</a>
@@ -53,7 +53,7 @@
                                 </tbody>
                             </table>
                             <tal:b tal:condition="request.is_admin and layout.course_event and not layout.course_event.is_past">
-                                <a href="${layout.preview_info_mail_url}" class="button success no-print" i18n:translate="">Send Info Mail</a>
+                                <a href="${layout.preview_info_mail_url}" class="button success hide-for-print" i18n:translate="">Send Info Mail</a>
                             </tal:b>
                             <div class="pagination-centered">
                                 <div metal:use-macro="layout.macros['pagination']" tal:define="collection layout.model; current_page layout.model;" />

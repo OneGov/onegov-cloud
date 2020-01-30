@@ -1,6 +1,5 @@
 from datetime import datetime
 from sedate import utcnow
-from sqlalchemy import desc
 
 from onegov.core.collection import Pagination, GenericCollection
 from onegov.fsi.collections.course import CourseCollection
@@ -58,7 +57,7 @@ class CourseEventCollection(GenericCollection, Pagination):
         if self.course_id:
             query = query.filter(CourseEvent.course_id == self.course_id)
 
-        query = query.order_by(desc(CourseEvent.start))
+        query = query.order_by(CourseEvent.start)
 
         if self.limit:
             query = query.limit(self.limit)

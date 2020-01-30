@@ -4,9 +4,11 @@ from uuid import uuid4
 from sedate import utcnow
 
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
+from onegov.fsi.collections.audit import AuditCollection
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.collections.reservation import ReservationCollection
+from onegov.fsi.models import CourseReservation
 
 from onegov.fsi.models.course_event import CourseEvent
 from tests.onegov.fsi.common import collection_attr_eq_test
@@ -53,8 +55,8 @@ def test_course_event_collection(session, course):
     # Should return all events by default
     assert result.count() == 3
 
-    # Test ordering and timestamp mixin
-    assert result[0].created > result[1].created
+    # Test ascending ordering and timestamp mixin
+    assert result[0].start < result[1].start
 
     # Test upcoming only
     event_coll = CourseEventCollection(session, upcoming_only=True)
@@ -186,3 +188,101 @@ def test_reservation_collection_query(
     # coll.attendee_id will be set in path like
     coll.attendee_id = att.id
     assert coll.query().count() == 1
+
+
+def test_last_completed_subscriptions_query(
+        session, course_event, attendee):
+    org = 'Example'
+    attendee_, data = attendee(session, organisation=org)
+    auth_attendee = authAttendee(role='admin')
+
+    course_events = [
+        course_event(
+            session,
+            start=utcnow() + datetime.timedelta(days=i + 1))[0]
+        for i in range(2)
+    ]
+    session.add_all(course_events)
+    # Most recent last course was not completed, but the first
+    session.add_all((
+        CourseReservation(
+            attendee_id=attendee_.id,
+            course_event_id=course_events[0].id,
+            event_completed=True
+        ),
+        CourseReservation(
+            attendee_id=attendee_.id,
+            course_event_id=course_events[1].id)
+    ))
+    coll = AuditCollection(
+        session, course_events[0].course.id, auth_attendee, organisation=org)
+    assert coll.last_completed_subscriptions_query().all()[0] == (
+        attendee_.id,
+        course_events[0].start,
+        course_events[0].end,
+        True
+    )
+
+
+def test_audit_collection(
+        session, course, course_event, attendee, planner_editor, planner):
+    course_, data = course(session)
+    org = 'SD / STVA'
+    editor, data = planner_editor(
+        session,
+        permissions=[org]
+    )
+    admin_att, data = planner(session)
+
+    attendees = []
+    for i in range(4):
+        att, data = attendee(
+            session,
+            first_name=f'Attendee{i}',
+            organisation=org
+        )
+        attendees.append(att)
+
+    # Create 3 events for the course
+    proto_event = course_event(session)[0]
+    events = [proto_event]
+    for i in range(2):
+        ev, data = course_event(
+            session,
+            start=proto_event.start + datetime.timedelta(days=i + 1),
+            end=proto_event.end + datetime.timedelta(days=i + 1)
+        )
+        events.append(ev)
+
+    subscriptions = []
+    # last attendee should not have a subscription
+    for i, event in enumerate(events):
+        subscription = CourseReservation(
+            course_event_id=event.id,
+            attendee_id=attendees[i].id,
+            event_completed=True
+        )
+        subscriptions.append(subscription)
+    session.add_all(subscriptions)
+    session.flush()
+    assert attendees[-1].reservations.first() is None
+
+    # add the first attendee also to the second event
+    session.add(
+        CourseReservation(
+            attendee_id=attendees[0].id,
+            course_event_id=events[1].id
+        )
+    )
+    session.flush()
+
+    # test for admin
+    coll = AuditCollection(
+        session,
+        course_.id,
+        admin_att,
+        organisation=org
+    )
+    for data in coll.query():
+        print(data)
+    assert coll.query().count() == len(attendees)

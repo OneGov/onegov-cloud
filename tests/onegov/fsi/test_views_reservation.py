@@ -147,8 +147,8 @@ def test_create_delete_reservation(client_with_db):
     # one of the three is past
     assert len(events) == 2
 
-    assert events[0].start.year == 2060
-    assert events[0].id not in [e.course_event_id for e in att_res]
+    assert events[0].start.year == 2050     # ascending order, other is 2060
+    assert events[1].id not in [e.course_event_id for e in att_res]
 
     assert attendee.user_id == member.id
     assert attendee.organisation == 'ORG'
@@ -173,12 +173,13 @@ def test_create_delete_reservation(client_with_db):
 
     # the fixture also provides a past event which should not be an option
     options = [opt[2] for opt in new.form['course_event_id'].options]
+    print(options)
     assert options == [
-        'Course - 01.01.2060',
-        'Course - 01.01.2050'
+        'Course - 01.01.2050',
+        'Course - 01.01.2060'
     ]
-    # select course_id where there is no registration done
-    assert new.form['course_event_id'].value == str(events[0].id)
+    # select course_id where there is no registration done (2060)
+    new.form['course_event_id'] = str(events[1].id)
     page = new.form.submit().maybe_follow()
     assert 'Alle Kursanmeldungen' in page
     assert 'Course' in page
@@ -204,9 +205,8 @@ def test_create_delete_reservation(client_with_db):
     #
     new = client.get(view)
     options = [opt[2] for opt in new.form['course_event_id'].options]
-    # must decending order from newest to oldest, past events excluded
-    assert options == [
-        'Course - 01.01.2060', 'Course - 01.01.2050']
+    # must asscending order from newest to oldest, past events excluded
+    assert options == ['Course - 01.01.2050', 'Course - 01.01.2060']
     new.form['dummy_desc'] = 'Safe!'
     page = new.form.submit().follow()
     assert 'Safe!' in page

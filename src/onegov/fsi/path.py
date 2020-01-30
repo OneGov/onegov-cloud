@@ -2,6 +2,7 @@ from uuid import UUID
 
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
+from onegov.fsi.collections.audit import AuditCollection
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.collections.notification_template import \
@@ -59,9 +60,16 @@ def get_events_view(
     )
 
 
-@FsiApp.path(model=CourseCollection, path='/fsi/courses')
-def get_courses(request):
-    return CourseCollection(request.session)
+@FsiApp.path(model=CourseCollection, path='/fsi/courses',
+             converters=dict(show_hidden_from_public=bool))
+def get_courses(request, show_hidden_from_public):
+    if not request.is_admin:
+        show_hidden_from_public = False
+    return CourseCollection(
+        request.session,
+        auth_attendee=request.current_attendee,
+        show_hidden_from_public=show_hidden_from_public
+    )
 
 
 @FsiApp.path(model=CourseAttendeeCollection, path='/fsi/attendees',
@@ -130,3 +138,14 @@ def get_reservations(
 @FsiApp.path(model=CourseReservation, path='/fsi/reservation/{id}')
 def get_reservation_details(request, id):
     return ReservationCollection(request.session).by_id(id)
+
+
+@FsiApp.path(model=AuditCollection, path='/fsi/audit',
+             converters=dict(course_id=UUID))
+def get_audit(request, course_id, organisation):
+    return AuditCollection(
+        request.session,
+        course_id,
+        auth_attendee=request.current_attendee,
+        organisation=organisation
+    )

@@ -17,8 +17,7 @@
         </tal:b>
         <tal:b tal:case="'reservation'">
             <p i18n:translate="">You have successfully subscribed to the following course event:</p>
-            <metal:b use-macro="layout.default_macros['course_details']" tal:define="model layout.model.course_event.course"/>
-            <h3 i18n:translate="">Details:</h3>
+            <h3>${layout.model.course_event.name}</h3>
             <metal:b use-macro="layout.default_macros['course_event_details']" tal:define="model layout.model.course_event; for_email True"/>
             <br>
             <p i18n:translate="">Thank you for your course subscription. Please add the course event to your outlook calender.</p>
@@ -26,16 +25,15 @@
         </tal:b>
         <tal:b tal:case="'reminder'">
             <p i18n:translate="">You have successfully subscribed to the following course event:</p>
-            <metal:b use-macro="layout.default_macros['course_details']" tal:define="model layout.model.course_event.course"/>
-            <h3 i18n:translate="">Details:</h3>
+            <h3>${layout.model.course_event.name}</h3>
             <tal:b metal:use-macro="layout.default_macros['course_event_details']" tal:define="model layout.model.course_event; for_email True"/>
             <p><span i18n:translate="">The event will take place as planned. We kindly request to arrive on time at the event location.
-                Please take note of the course description at </span><a href="${layout.event_url}" i18n:translate="">iZug/Fachstelle Sicherheit</a>.
+                Please take note of the course description at</span> <a href="${layout.course_url}" i18n:translate="">iZug/Fachstelle Sicherheit</a>.
             </p>
         </tal:b>
         <tal:b tal:case="'cancellation'">
             <p i18n:translate="">Unfortuntely, we have to inform you, that the following course event will not take place:</p>
-            <br>
+            <h3>${layout.model.course_event.name}</h3>
             <tal:b metal:use-macro="layout.default_macros['course_event_details']" tal:define="model layout.model.course_event; for_email True"/>
             <br>
             <p>
@@ -77,7 +75,7 @@
 
 
 <metal:email_signature define-macro="email_signature">
-    <p i18n:translate="">Your's sincerily</p>
+    <p i18n:translate="" class="last">Your's sincerily</p>
     <p i18n:translate="" class="last">Fachstelle Sicherheit</p>
 </metal:email_signature>
 

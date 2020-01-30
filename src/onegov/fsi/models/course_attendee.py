@@ -2,7 +2,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.types import UUID, JSON
 from onegov.search import ORMSearchable
 from sedate import utcnow
-from sqlalchemy import Column, Text, ForeignKey, ARRAY
+from sqlalchemy import Column, Text, ForeignKey, ARRAY, desc
 from sqlalchemy.orm import relationship, object_session, backref
 from uuid import uuid4
 
@@ -198,7 +198,7 @@ class CourseAttendee(Base, ORMSearchable):
         result = result.filter(CourseReservation.event_completed == False)
         return result
 
-    def possible_course_events(self, show_hidden=True):
+    def possible_course_events(self, show_hidden=True, show_locked=False):
         """Used for the reservation form. Should exlucde past courses
         and courses already registered"""
         from onegov.fsi.models import CourseEvent
@@ -212,4 +212,9 @@ class CourseAttendee(Base, ORMSearchable):
         result = result.filter(CourseEvent.start > utcnow())
         if not show_hidden:
             result = result.filter(CourseEvent.hidden_from_public == False)
+        if not show_locked:
+            result = result.filter(
+                CourseEvent.locked_for_subscriptions == False)
+
+        result = result.order_by(desc(CourseEvent.start))
         return result

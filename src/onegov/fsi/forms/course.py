@@ -78,7 +78,6 @@ class IntervalStringField(StringField):
     widget = TextInput()
 
     def process_data(self, value):
-        print('test')
         super().process_data(value)
 
     def process_formdata(self, valuelist):

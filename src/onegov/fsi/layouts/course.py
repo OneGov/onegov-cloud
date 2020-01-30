@@ -1,6 +1,7 @@
 from cached_property import cached_property
 
 from onegov.core.elements import Link, Confirm, Intercooler
+from onegov.fsi.collections.audit import AuditCollection
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.layout import DefaultLayout, FormatMixin
@@ -77,20 +78,34 @@ class CourseCollectionLayout(DefaultLayout):
 
         return links
 
-    def accordion_items(self, future_only=False):
-        return tuple(
-            dict(
-                title=c.name,
-                content=c.description,
-                # Todo: how to inject html with intercooler?
-                # content_url=self.request.link(c, name='content-json'),
-                url=self.request.link(c),
-                events=c.future_events.all() if future_only else c.events.all()
-            ) for c in self.model.query()
+    def accordion_items(self, future_only=True):
+        coll = CourseEventCollection(
+            self.request.session,
+            upcoming_only=future_only,
+            show_hidden=self.request.current_attendee.role == 'admin'
         )
+        result = []
+        for course in self.model.query():
+            coll.course_id = course.id
+            result.append(
+                dict(
+                    title=course.name,
+                    content=course.description,
+                    # Todo: how to inject html with intercooler?
+                    # content_url=self.request.link(c, name='content-json'),
+                    url=self.request.link(course),
+                    events=coll.query().all()
+                )
+            )
+        return result
 
 
 class CourseLayout(CourseCollectionLayout):
+
+    @cached_property
+    def audit_collection(self):
+        return AuditCollection(
+            self.request.session, self.model.id, self.request.current_attendee)
 
     @cached_property
     def event_collection(self):
@@ -116,6 +131,11 @@ class CourseLayout(CourseCollectionLayout):
                 _('Invite Attendees'),
                 self.request.link(self.model, name='invite'),
                 attrs={'class': 'invite-attendees'}
+            ),
+            Link(
+                _('Audit'),
+                self.request.link(self.audit_collection),
+                attrs={'class': 'audit-icon'}
             )
         ]
 
@@ -161,7 +181,7 @@ class CourseLayout(CourseCollectionLayout):
                             )
                         )
                     )
-                ),
+                )
             ]
         )
         return links
