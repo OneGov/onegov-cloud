@@ -37,6 +37,10 @@ class AuditForm(Form):
             self.request.session, self.request.current_attendee)
 
     def get_organisation_choices(self):
+        att = self.request.current_attendee
+        if att.role == 'editor':
+            return [(p, p) for p in att.permissions] or self.none_choice
+
         session = self.request.session
         results = session.query(CourseAttendee.organisation).filter(
             CourseAttendee.organisation != None).distinct()
@@ -50,7 +54,6 @@ class AuditForm(Form):
         return [(str(c.id), c.name) for c in results] or self.none_choice
 
     def on_request(self):
-        if self.request.current_attendee.role == 'editor':
-            self.delete_field('organisation')
-        self.organisation.choices = self.get_organisation_choices()
         self.course_id.choices = self.get_course_choices()
+        self.organisation.choices = self.get_organisation_choices()
+
