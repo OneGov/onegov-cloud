@@ -537,7 +537,7 @@ msgid "Event Details"
 msgstr "Details Durchführung"
 
 msgid "Your's sincerily"
-msgstr "Mit freundlichen Grüssen"
+msgstr "Freundliche Grüsse"
 
 msgid "Fachstelle Sicherheit"
 msgstr "Fachstelle Sicherheit"
