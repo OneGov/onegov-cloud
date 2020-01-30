@@ -77,7 +77,9 @@ class AddFsiReservationForm(Form, ReservationFormMixin):
 
             # Filters courses he registered
             events = self.attendee.possible_course_events(
-                show_hidden=self.request.is_manager)
+                show_hidden=self.request.is_manager,
+                show_locked=self.request.is_admin
+            )
         else:
             events = self.event_collection.query()
 
@@ -144,7 +146,8 @@ class AddFsiPlaceholderReservationForm(Form, ReservationFormMixin):
 
             # Filters courses he registered
             events = self.attendee.possible_course_events(
-                show_hidden=self.request.is_manager
+                show_hidden=self.request.is_manager,
+                show_locked=self.request.is_admin
             )
         if not events.first():
             return [self.none_choice]
