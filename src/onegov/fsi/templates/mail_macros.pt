@@ -28,7 +28,7 @@
             <h3>${layout.model.course_event.name}</h3>
             <tal:b metal:use-macro="layout.default_macros['course_event_details']" tal:define="model layout.model.course_event; for_email True"/>
             <p><span i18n:translate="">The event will take place as planned. We kindly request to arrive on time at the event location.
-                Please take note of the course description at </span><a href="${layout.event_url}" i18n:translate="">iZug/Fachstelle Sicherheit</a>.
+                Please take note of the course description at</span> <a href="${layout.course_url}" i18n:translate="">iZug/Fachstelle Sicherheit</a>.
             </p>
         </tal:b>
         <tal:b tal:case="'cancellation'">

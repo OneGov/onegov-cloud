@@ -508,7 +508,7 @@ msgid ""
 "the event location. Please take note of the course description at"
 msgstr ""
 "Der Kurs wird wie geplant durchgeführt. Wir bitten um pünktliches Eintreffen "
-"im Kurslokal. Bitte beachten Sie auch den Kursbeschrieb im"
+"im Kurslokal. Bitte beachten Sie auch den Kursbeschrieb auf"
 
 msgid "iZug/Fachstelle Sicherheit"
 msgstr "iZug/Fachstelle Sicherheit"
