@@ -58,7 +58,7 @@ class CourseEventCollection(GenericCollection, Pagination):
         if self.course_id:
             query = query.filter(CourseEvent.course_id == self.course_id)
 
-        query = query.order_by(desc(CourseEvent.start))
+        query = query.order_by(CourseEvent.start)
 
         if self.limit:
             query = query.limit(self.limit)
