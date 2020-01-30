@@ -219,6 +219,7 @@ def test_last_completed_subscriptions_query(
     assert coll.last_completed_subscriptions_query().all()[0] == (
         attendee_.id,
         course_events[0].start,
+        course_events[0].end,
         True
     )
 

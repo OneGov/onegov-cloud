@@ -1,6 +1,7 @@
 from cached_property import cached_property
 
 from onegov.core.elements import Link, Confirm, Intercooler
+from onegov.fsi.collections.audit import AuditCollection
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.layout import DefaultLayout, FormatMixin
@@ -93,6 +94,11 @@ class CourseCollectionLayout(DefaultLayout):
 class CourseLayout(CourseCollectionLayout):
 
     @cached_property
+    def audit_collection(self):
+        return AuditCollection(
+            self.request.session, self.model.id, self.request.current_attendee)
+
+    @cached_property
     def event_collection(self):
         return CourseEventCollection(
             self.request.session, course_id=self.model.id)
@@ -116,6 +122,11 @@ class CourseLayout(CourseCollectionLayout):
                 _('Invite Attendees'),
                 self.request.link(self.model, name='invite'),
                 attrs={'class': 'invite-attendees'}
+            ),
+            Link(
+                _('Audit'),
+                self.request.link(self.audit_collection),
+                attrs={'class': 'audit-icon'}
             )
         ]
 
@@ -161,7 +172,7 @@ class CourseLayout(CourseCollectionLayout):
                             )
                         )
                     )
-                ),
+                )
             ]
         )
         return links

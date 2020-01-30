@@ -133,10 +133,12 @@ def get_reservation_details(request, id):
     return ReservationCollection(request.session).by_id(id)
 
 
-@FsiApp.path(model=AuditCollection, path='/fsi/{course_event_id}/audit')
-def get_audit(request, course_event_id):
+@FsiApp.path(model=AuditCollection, path='/fsi/audit',
+             converters=dict(course_id=UUID))
+def get_audit(request, course_id, organisation):
     return AuditCollection(
-        request,
-        course_event_id,
-        auth_attendee=request.current_attendee
+        request.session,
+        course_id,
+        auth_attendee=request.current_attendee,
+        organisation=organisation
     )

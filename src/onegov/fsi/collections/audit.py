@@ -21,8 +21,6 @@ class AuditCollection(GenericCollection):
         self.auth_attendee = auth_attendee
 
         # e.g. SD / STVA or nothing in case of editor
-        if auth_attendee.role != 'editor':
-            assert organisation
         self.organisation = organisation
 
     def ranked_subscription_query(self):
@@ -35,6 +33,7 @@ class AuditCollection(GenericCollection):
             CourseReservation.attendee_id,
             CourseReservation.event_completed,
             CourseEvent.start,
+            CourseEvent.end,
             func.row_number().over(
                 partition_by=CourseAttendee.id,
                 order_by=[
@@ -54,7 +53,8 @@ class AuditCollection(GenericCollection):
         ranked = self.ranked_subscription_query().subquery('ranked')
         subquery = self.session.query(
             CourseReservation.attendee_id,
-            CourseEvent.start,
+            ranked.c.start,
+            ranked.c.end,
             ranked.c.event_completed
         ).select_entity_from(ranked)
         return subquery.filter(ranked.c.rownum == 1)
@@ -66,10 +66,17 @@ class AuditCollection(GenericCollection):
             CourseAttendee.first_name,
             CourseAttendee.last_name,
             CourseAttendee.organisation,
-            last.c.start.label('subscription_start'),
+            last.c.start.label('start'),
+            last.c.end.label('end'),
             last.c.event_completed
         )
-        query = query.filter_by(organisation=self.organisation)
+        if self.auth_attendee.role != 'editor':
+            assert self.organisation
+            query = query.filter_by(organisation=self.organisation)
+        else:
+            query = query.filter(CourseAttendee.organisation.in_(
+                self.auth_attendee.permissions,
+            ))
 
         query = query.join(
             last, CourseAttendee.id == last.c.attendee_id, isouter=True)

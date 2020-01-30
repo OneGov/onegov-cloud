@@ -23,6 +23,7 @@ class Course(Base, ORMSearchable):
 
     description = Column(Text, nullable=False)
 
+    # given in months
     refresh_interval = Column(Interval)
 
     # If the course has to be refreshed after some interval
