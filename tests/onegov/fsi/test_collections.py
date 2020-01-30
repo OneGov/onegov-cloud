@@ -55,8 +55,8 @@ def test_course_event_collection(session, course):
     # Should return all events by default
     assert result.count() == 3
 
-    # Test ordering and timestamp mixin
-    assert result[0].created > result[1].created
+    # Test ascending ordering and timestamp mixin
+    assert result[0].start < result[1].start
 
     # Test upcoming only
     event_coll = CourseEventCollection(session, upcoming_only=True)
