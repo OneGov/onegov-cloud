@@ -8,7 +8,7 @@ REPO="$(dirname "$SELF")"
 # sentry.io. This has been encrypted as follows:
 #
 # echo "my-token" | gpg --encrypt --armor \
-#   --recipient denis.krienbuehl@seantis.ch \
+#   --recipient patrick.bucher@seantis.ch \
 #   --recipient fabian.reinhard@seantis.ch \
 #   --recipient tobias.reinhard@seantis.ch \
 #   --recipient lukas.burkhard@seantis.ch
@@ -20,53 +20,48 @@ REPO="$(dirname "$SELF")"
 SENTRY_TOKEN_ENCRYPTED="
 -----BEGIN PGP MESSAGE-----
 
-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
-8xTc8is+DzaUVxG/lUrmD2MN
-=opuu
+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
+ag==
+=BrJo
 -----END PGP MESSAGE-----
 "
 
 function configure-sentry() {
     SENTRY_AUTH_TOKEN="$(\
         echo "$SENTRY_TOKEN_ENCRYPTED" | gpg --decrypt --quiet \
-            --recipient denis.krienbuehl@seantis.ch \
+            --recipient patrick.bucher@seantis.ch \
             --recipient fabian.reinhard@seantis.ch \
             --recipient tobias.reinhard@seantis.ch \
             --recipient lukas.burkhard@seantis.ch \
