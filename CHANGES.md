@@ -1,8 +1,14 @@
 # Changes
 
+## Release `2020.19`
+
+> commits: **4 / [24a1bfe659...688df1f749](https://github.com/OneGov/onegov-cloud/compare/24a1bfe659^...688df1f749)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.19)](https://buildkite.com/seantis/onegov-cloud)
+
 ## Release `2020.18`
 
-> commits: **2 / [98512a4cf5...804d25e03a](https://github.com/OneGov/onegov-cloud/compare/98512a4cf5^...804d25e03a)**<br>
+> released: **2020-01-30 18:29**<br>
+> commits: **3 / [98512a4cf5...94fffb910d](https://github.com/OneGov/onegov-cloud/compare/98512a4cf5^...94fffb910d)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.18)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Fsi
