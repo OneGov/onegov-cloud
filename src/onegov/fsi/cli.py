@@ -198,7 +198,7 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password):
         if data['type'] == 'ldap':
             source = 'ldap'
             source_id = data['source_id']
-            force_role = True
+            force_role = False
         elif data['type'] == 'regular':
             source = None
             source_id = None
