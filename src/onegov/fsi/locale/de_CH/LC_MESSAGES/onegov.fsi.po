@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-01-30 07:57+0100\n"
-"PO-Revision-Date: 2020-01-28 11:39+0100\n"
+"POT-Creation-Date: 2020-02-03 11:36+0100\n"
+"PO-Revision-Date: 2020-02-03 11:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -59,6 +59,20 @@ msgstr "Registrieren"
 msgid "Courses"
 msgstr "Kurse"
 
+msgid "Course"
+msgstr "Kurs"
+
+msgid "Hidden courses or courses without mandatory refresh are not in the list"
+msgstr ""
+"Versteckte Kurse oder Kurse ohne obligatorische Wiederholung sind nicht in "
+"der Liste"
+
+msgid "Organisation"
+msgstr "Organisation"
+
+msgid "None"
+msgstr "Keine"
+
 msgid "Short Description"
 msgstr "Kurzbeschreibung"
 
@@ -91,9 +105,6 @@ msgstr "Email"
 
 msgid "Permissions"
 msgstr "Berechtigungen"
-
-msgid "Course"
-msgstr "Kurs"
 
 msgid "Presenter"
 msgstr "Referent"
@@ -140,9 +151,6 @@ msgstr "Email Inhalt"
 msgid "Recipients"
 msgstr "Empfänger"
 
-msgid "None"
-msgstr "Keine"
-
 msgid "Attendee"
 msgstr "Teilnehmer"
 
@@ -160,6 +168,12 @@ msgstr "Ja"
 
 msgid "No"
 msgstr "Nein"
+
+msgid "Audit"
+msgstr "Auswertung"
+
+msgid "Print"
+msgstr "Drucken"
 
 msgid "New Course"
 msgstr "Neuer Kurs"
@@ -328,9 +342,6 @@ msgstr "Alle Kursanmeldungen für ${attendee}"
 msgid "All Event Subscriptions"
 msgstr "Alle Kursanmeldungen"
 
-msgid "Print"
-msgstr "Drucken"
-
 msgid "Subscription"
 msgstr "Anmeldung"
 
@@ -370,8 +381,26 @@ msgstr "Absage Kursveranstaltung"
 msgid "Course Subscription Invitation"
 msgstr "Einladung für Kursanmeldung"
 
-msgid "Events"
-msgstr "Durchführungen"
+msgid "Refresh Interval:"
+msgstr "Wiederholungsintervall:"
+
+msgid "Hidden Courses are not shown in Dropdown"
+msgstr "Versteckte Kurse sind nicht in der Liste."
+
+msgid "Courses withouth mandatory refresh are not shown in Dropdown"
+msgstr "Kurse ohne obligatorische Wiederholung sind nicht in der Liste."
+
+msgid "Last Event"
+msgstr "Letzte Durchführung"
+
+msgid "Attended"
+msgstr "Besucht"
+
+msgid "Due by"
+msgstr "Fällig bis"
+
+msgid "h"
+msgstr "Uhr"
 
 msgid "E-Mail"
 msgstr "E-Mail"
@@ -406,9 +435,6 @@ msgstr "Keine Teilnehmer in der Datenbank"
 msgid "Family name, surname"
 msgstr "Nachname, Vorname"
 
-msgid "Organisation"
-msgstr "Organisation"
-
 msgid "True"
 msgstr "Ja"
 
@@ -442,14 +468,8 @@ msgstr "Nachricht:"
 msgid "Recipients:"
 msgstr "Empfänger:"
 
-msgid "Name"
-msgstr "Name"
-
 msgid "Date"
 msgstr "Datum"
-
-msgid "h"
-msgstr "Uhr"
 
 msgid "Remaining seats"
 msgstr "Verbleibende Plätze"
@@ -478,6 +498,9 @@ msgstr "Keine Durchführungen gefunden."
 msgid "Roles"
 msgstr "Rollen"
 
+msgid "Colors"
+msgstr "Farbcode"
+
 msgid "Dear ${first_name} ${last_name},"
 msgstr "Sehr geehrte(r) ${first_name} ${last_name},"
 
@@ -489,9 +512,6 @@ msgstr "Bitte beachten sie die untenstehenden Informationen."
 
 msgid "You have successfully subscribed to the following course event:"
 msgstr "Sie haben sich erfolgreich für folgenden Kurs angemeldet:"
-
-msgid "Details:"
-msgstr "Details:"
 
 msgid ""
 "Thank you for your course subscription. Please add the course event to your "
@@ -590,6 +610,9 @@ msgstr "Ihre Änderungen wurden gespeichert"
 msgid "Added a new course event"
 msgstr "Eine neue Durchführung wurde hinzugefügt"
 
+msgid "Create Audit"
+msgstr "Erstelle Auswertung"
+
 msgid "There are no recipients matching the selection"
 msgstr "Keine Empfänger die auf diese Auswahl zutreffen"
 
@@ -665,6 +688,15 @@ msgstr "Anmeldung erfolgreich gelöscht"
 
 msgid "Placeholder successfully deleted"
 msgstr "Platzhalter erfolgreich gelöscht"
+
+#~ msgid "Events"
+#~ msgstr "Durchführungen"
+
+#~ msgid "Name"
+#~ msgstr "Name"
+
+#~ msgid "Details:"
+#~ msgstr "Details:"
 
 #~ msgid "Your subscription for the following event has beeen deleted:"
 #~ msgstr "Ihre Anmeldung für den folgenden Kurs wurde gelöscht:"
