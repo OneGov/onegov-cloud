@@ -1,3 +1,4 @@
+import sedate
 
 from onegov.form.fields import TimezoneDateTimeField, ChosenSelectField
 
@@ -105,6 +106,13 @@ class CourseEventForm(Form):
         self.status.choices = course_status_choices(self.request)
         self.status.default = 'created'
 
+    @staticmethod
+    def fix_utc_to_local_time(db_time):
+        # Todo: TimezoneDateTimeField.process_data is not called when applying
+        # the date from the database in apply model
+        return db_time and sedate.to_timezone(
+            db_time, 'Europe/Zurich') or db_time
+
     def apply_model(self, model):
         self.location.data = model.location
         self.presenter_name.data = model.presenter_name
@@ -113,8 +121,8 @@ class CourseEventForm(Form):
         self.hidden_from_public.data = model.hidden_from_public
         self.locked_for_subscriptions.data = model.locked_for_subscriptions
 
-        self.start.data = model.start
-        self.end.data = model.end
+        self.start.data = self.fix_utc_to_local_time(model.start)
+        self.end.data = self.fix_utc_to_local_time(model.end)
         self.min_attendees.data = model.min_attendees
         self.max_attendees.data = model.max_attendees
         self.status.data = model.status
