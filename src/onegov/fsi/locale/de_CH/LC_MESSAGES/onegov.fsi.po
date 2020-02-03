@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-02-03 11:36+0100\n"
-"PO-Revision-Date: 2020-02-03 11:40+0100\n"
+"POT-Creation-Date: 2020-02-03 11:55+0100\n"
+"PO-Revision-Date: 2020-02-03 11:57+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -500,6 +500,25 @@ msgstr "Rollen"
 
 msgid "Colors"
 msgstr "Farbcode"
+
+msgid "Green"
+msgstr "Grün"
+
+msgid "Attendee should visit course next year or even later."
+msgstr ""
+"Der Teilnehmer sollte den Kurs frühestens nächstes Jahr besuchen."
+
+msgid "Orange"
+msgstr "Orange"
+
+msgid "Attendee should visit course this year."
+msgstr "Der Teilnehmer sollte den Kurs noch dieses Jahr besuchen."
+
+msgid "Red"
+msgstr "Rot"
+
+msgid "Attendee should have attended the course already, but didn't."
+msgstr "Der Teilnehmer sollte den Kurs bereits besucht haben."
 
 msgid "Dear ${first_name} ${last_name},"
 msgstr "Sehr geehrte(r) ${first_name} ${last_name},"

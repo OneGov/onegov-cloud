@@ -201,16 +201,16 @@
 <metal:color_code_snippet define-macro="color_code_snippet">
     <h4 i18n:translate="">Colors</h4>
     <dl class="field-display">
-        <dt class="text-green">Green</dt>
-        <dd>Attendee should visit course next year or even later.</dd>
+        <dt class="text-green" i18n:translate="">Green</dt>
+        <dd i18n:translate="">Attendee should visit course next year or even later.</dd>
     </dl>
     <dl class="field-display">
-        <dt class="text-orange">Orange</dt>
-        <dd>Attendee should visit course this year.</dd>
+        <dt class="text-orange" i18n:translate="">Orange</dt>
+        <dd i18n:translate="">Attendee should visit course this year.</dd>
     </dl>
     <dl class="field-display">
-        <dt class="text-red">Red</dt>
-        <dd>Attendee should have attended the course already, but didn't.</dd>
+        <dt class="text-red" i18n:translate="">Red</dt>
+        <dd i18n:translate="">Attendee should have attended the course already, but didn't.</dd>
     </dl>
 </metal:color_code_snippet>
 
