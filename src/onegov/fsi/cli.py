@@ -219,7 +219,6 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password):
 
         user.attendee.first_name = data['first_name']
         user.attendee.last_name = data['last_name']
-        user.attendee._email = data['mail']
         user.attendee.organisation = data['organisation']
 
         if ix % 1000 == 0:
