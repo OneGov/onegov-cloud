@@ -10,7 +10,10 @@
                         <tal:b tal:condition="model|nothing">
                             <dl class="field-display">
                                 <dt i18n:translate>E-Mail</dt>
-                                <dd>${model.email}</dd>
+                                <dd>
+                                    <a tal:condition="model.user" href="${request.link(model.user)}">${model.email}</a>
+                                    <span tal:condition="not: model.user">${model.email}</span>
+                                </dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.first_name">
                                 <dt i18n:translate>First name</dt>
