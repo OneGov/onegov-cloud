@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-02-03 11:55+0100\n"
-"PO-Revision-Date: 2020-02-03 11:57+0100\n"
+"POT-Creation-Date: 2020-02-04 11:57+0100\n"
+"PO-Revision-Date: 2020-02-04 11:58+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -234,6 +234,12 @@ msgstr "Persönliches Profil"
 
 msgid "Add Subscription"
 msgstr "Anmeldung hinzufügen"
+
+msgid "Do you really want to delete this external attendee ?"
+msgstr "Wollen sie diesen externen Teilnehmer wirklich löschen?"
+
+msgid "Delete external attendee"
+msgstr "Externer Teilnehmer löschen"
 
 msgid "Past Course Events"
 msgstr "Vergangene Durchführungen"
@@ -505,8 +511,7 @@ msgid "Green"
 msgstr "Grün"
 
 msgid "Attendee should visit course next year or even later."
-msgstr ""
-"Der Teilnehmer sollte den Kurs frühestens nächstes Jahr besuchen."
+msgstr "Der Teilnehmer sollte den Kurs frühestens nächstes Jahr besuchen."
 
 msgid "Orange"
 msgstr "Orange"
@@ -628,6 +633,12 @@ msgstr "Ihre Änderungen wurden gespeichert"
 
 msgid "Added a new course event"
 msgstr "Eine neue Durchführung wurde hinzugefügt"
+
+msgid "External attendee successfully deleted"
+msgstr "Externer Teilnehmer erfolgreich gelöscht"
+
+msgid "Can only delete external attendees"
+msgstr "Es können nur externe Teilnehmer gelöscht werden"
 
 msgid "Create Audit"
 msgstr "Erstelle Auswertung"

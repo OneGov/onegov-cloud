@@ -1,6 +1,6 @@
 from cached_property import cached_property
 
-from onegov.core.elements import Link
+from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.layout import DefaultLayout
@@ -133,6 +133,31 @@ class CourseAttendeeLayout(DefaultLayout):
                     attrs={'class': 'add-external'}
                 )
             )
+            if self.model.is_external:
+                links.append(
+                    Link(
+                        _('Delete'),
+                        self.csrf_protected_url(
+                            self.request.link(self.model)
+                        ),
+                        attrs={'class': 'delete-link'},
+                        traits=(
+                            Confirm(
+                                _("Do you really want to delete "
+                                  "this external attendee ?"),
+                                _("This cannot be undone."),
+                                _("Delete external attendee"),
+                                _("Cancel")
+                            ),
+                            Intercooler(
+                                request_method='DELETE',
+                                redirect_after=self.request.link(
+                                    self.collection
+                                )
+                            )
+                        )
+                    )
+                )
         return links
 
     @property

@@ -85,3 +85,19 @@ def view_att_external_attendee(self, request, form):
         'layout': layout,
         'form': form
     }
+
+
+@FsiApp.html(
+    model=CourseAttendee,
+    request_method='DELETE',
+    permission=Secret
+)
+def view_delete_reservation(self, request):
+    request.assert_valid_csrf_token()
+    if self.is_external:
+        CourseAttendeeCollection(
+            request.session,
+            auth_attendee=request.current_attendee).delete(self)
+        request.success(_('External attendee successfully deleted'))
+    else:
+        request.warning(_('Can only delete external attendees'))
