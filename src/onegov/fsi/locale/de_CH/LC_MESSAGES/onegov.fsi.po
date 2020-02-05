@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-02-04 11:57+0100\n"
-"PO-Revision-Date: 2020-02-04 11:58+0100\n"
+"POT-Creation-Date: 2020-02-05 10:59+0100\n"
+"PO-Revision-Date: 2020-02-05 11:00+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.2.4\n"
+"X-Generator: Poedit 2.3\n"
 
 #, python-format
 msgid "Reminder for course event: ${name}"
@@ -354,11 +354,11 @@ msgstr "Anmeldung"
 msgid "Course Subscriptions"
 msgstr "Kursanmeldungen"
 
-msgid "Do you want to cancel the reservation ?"
-msgstr "Wollen Sie diese Reservation annulieren?"
+msgid "Do you want to cancel the subscription ?"
+msgstr "Wollen Sie diese Anmeldung löschen?"
 
-msgid "Cancel reservation for course event"
-msgstr "Reservation annulieren"
+msgid "Cancel subscription for course event"
+msgstr "Anmeldung für Durchführung löschen"
 
 msgid "Created"
 msgstr "Erstellt"
@@ -391,10 +391,10 @@ msgid "Refresh Interval:"
 msgstr "Wiederholungsintervall:"
 
 msgid "Hidden Courses are not shown in Dropdown"
-msgstr "Versteckte Kurse sind nicht in der Liste."
+msgstr "Versteckte Kurse sind nicht in der Liste"
 
 msgid "Courses withouth mandatory refresh are not shown in Dropdown"
-msgstr "Kurse ohne obligatorische Wiederholung sind nicht in der Liste."
+msgstr "Kurse ohne obligatorische Wiederholung sind nicht in der Liste"
 
 msgid "Last Event"
 msgstr "Letzte Durchführung"
@@ -434,6 +434,12 @@ msgstr "Total zu wiederholende Kurse"
 
 msgid "Unfinished courses"
 msgstr "Offene Kurse"
+
+msgid "Subscriptions"
+msgstr "Anmeldungen"
+
+msgid "Attendee has no subscriptions"
+msgstr "Teilnehmer hat keine Anmeldungen"
 
 msgid "No attendees in the database"
 msgstr "Keine Teilnehmer in der Datenbank"
@@ -718,6 +724,12 @@ msgstr "Anmeldung erfolgreich gelöscht"
 
 msgid "Placeholder successfully deleted"
 msgstr "Platzhalter erfolgreich gelöscht"
+
+#~ msgid "Do you want to cancel the reservation ?"
+#~ msgstr "Wollen Sie diese Reservation annulieren?"
+
+#~ msgid "Cancel reservation for course event"
+#~ msgstr "Reservation annulieren"
 
 #~ msgid "Events"
 #~ msgstr "Durchführungen"

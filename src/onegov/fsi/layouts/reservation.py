@@ -121,9 +121,9 @@ class ReservationCollectionLayout(DefaultLayout):
             attrs={'class': 'button tiny alert'},
             traits=(
                 Confirm(
-                    _("Do you want to cancel the reservation ?"),
+                    _("Do you want to cancel the subscription ?"),
                     _("A confirmation email will be sent to you later."),
-                    _("Cancel reservation for course event"),
+                    _("Cancel subscription for course event"),
                     _("Cancel")
                 ),
                 Intercooler(
@@ -159,10 +159,10 @@ class ReservationLayout(DefaultLayout):
                 attrs={'class': 'button tiny alert'},
                 traits=(
                     Confirm(
-                        _("Do you want to cancel the reservation ?"),
+                        _("Do you want to cancel the subscription ?"),
                         _(
                             "A confirmation email will be sent to you later."),
-                        _("Cancel reservation for course event"),
+                        _("Cancel subscription for course event"),
                         _("Cancel")
                     ),
                     Intercooler(
