@@ -1,8 +1,26 @@
 # Changes
 
+## Release `2020.23`
+
+> commits: **3 / [1a03df3bc1...bdededb15e](https://github.com/OneGov/onegov-cloud/compare/1a03df3bc1^...bdededb15e)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.23)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🐞 **Fixes cascade deletion of Volunteer if OccasionNeed is deleted**
+
+**`Bugfix`** | **[bdededb15e](https://github.com/onegov/onegov-cloud/commit/bdededb15ed603d2a9055d7731d411850415dbbb)**
+
+### Swissvotes
+
+🎉 **Disables Matomo Tracking Cookie**
+
+**`Feature`** | **[1e091f6bde](https://github.com/onegov/onegov-cloud/commit/1e091f6bde31bc8b30ee22c0351c76f80333c152)**
+
 ## Release `2020.22`
 
-> commits: **1 / [dae588359c...dae588359c](https://github.com/OneGov/onegov-cloud/compare/dae588359c^...dae588359c)**<br>
+> released: **2020-02-07 10:35**<br>
+> commits: **2 / [dae588359c...203ae504ed](https://github.com/OneGov/onegov-cloud/compare/dae588359c^...203ae504ed)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.22)](https://buildkite.com/seantis/onegov-cloud)
 
 ## Release `2020.21`
