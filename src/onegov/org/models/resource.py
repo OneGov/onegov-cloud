@@ -78,7 +78,7 @@ class SharedMethods(object):
         res = scheduler.queries.reservations_by_session(session)
         res = res.filter(Reservation.resource == self.id)
         res = res.filter(Reservation.status == status)
-        res = res.order_by(False)  # clear existing order
+        res = res.order_by(None)  # clear existing order
         res = res.order_by(Reservation.start)
 
         # used by ReservationInfo
