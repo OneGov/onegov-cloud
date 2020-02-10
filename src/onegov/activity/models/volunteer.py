@@ -31,7 +31,6 @@ class Volunteer(Base, ContentMixin, TimestampMixin):
 
     #: The need the volunteer signed up for
     need_id = Column(UUID, ForeignKey('occasion_needs.id'), nullable=False)
-    need = relationship('OccasionNeed')
 
     #: A token linking multiple volunteer records (volunteers sign up for
     #: multiple needs at once, and are then multiplexed here)

@@ -4,7 +4,7 @@ import transaction
 
 from datetime import datetime, date, timedelta
 from freezegun import freeze_time
-from onegov.activity import ActivityCollection
+from onegov.activity import ActivityCollection, OccasionNeed, Volunteer
 from onegov.activity import ActivityFilter
 from onegov.activity import Attendee
 from onegov.activity import AttendeeCollection
@@ -493,7 +493,35 @@ def test_no_orphan_occasions(session, owner):
 
     bookings.add(owner, dustin, tournament)
 
+    # Test volunteer and occasion need
+    assert tournament.id
+    need = OccasionNeed(
+        id=uuid4(),
+        name='Helpers',
+        number=NumericRange(1, 2),
+        occasion_id=tournament.id
+    )
+
+    volunteer = Volunteer(
+        first_name='V',
+        last_name='P',
+        address='street',
+        zip_code='12',
+        place='some place',
+        birth_date=date(2019, 1, 1),
+        email='test@test.com',
+        phone='041 322 22 22',
+        need_id=need.id)
+
+    session.add_all((need, volunteer))
     session.flush()
+
+    assert need.volunteers == [volunteer]
+    assert volunteer.need == need
+
+    session.delete(need)
+    session.flush()
+    assert not session.query(Volunteer).first()
 
     with pytest.raises(sqlalchemy.exc.IntegrityError):
         activities.delete(activities.query().first())
