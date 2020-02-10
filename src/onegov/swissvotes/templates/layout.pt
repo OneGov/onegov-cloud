@@ -38,6 +38,7 @@
 
     <script type="text/javascript" tal:condition="'swissvotes.ch' in request.url">
       var _paq = window._paq || [];
+      _paq.push(['disableCookies']);
       _paq.push(['trackPageView']);
       _paq.push(['enableLinkTracking']);
       (function() {
