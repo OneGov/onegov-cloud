@@ -1,3 +1,5 @@
+from sqlalchemy.orm import relationship
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -32,6 +34,9 @@ class OccasionNeed(Base, TimestampMixin):
 
     #: The associated occasion
     occasion_id = Column(UUID, ForeignKey('occasions.id'), nullable=False)
+
+    volunteers = relationship(
+        'Volunteer', backref='need', cascade='all, delete-orphan')
 
     __table_args__ = (
         UniqueConstraint(
