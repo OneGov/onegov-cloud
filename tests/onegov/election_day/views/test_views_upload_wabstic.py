@@ -256,7 +256,9 @@ def test_create_elections_wabsti_proporz(election_day_app_sg):
     )
 
     params = [
-        ('wp_wahl', Upload(test_file, content_type='text/plain'))
+        ('wp_wahl', Upload(test_file, content_type='text/plain')),
+        ('wp_listen', Upload('wp_listen.csv', 'a'.encode('utf-8'),
+                             content_type='text/plain'))
     ]
 
     client = Client(election_day_app_sg)
