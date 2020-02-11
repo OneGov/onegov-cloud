@@ -133,6 +133,19 @@ def election_day_app_sg(request):
 
 
 @pytest.fixture(scope="function")
+def election_day_app_sz(request):
+
+    app = create_election_day(
+        request,
+        "sz",
+        hide_candidates_chart=True,
+        hide_connections_chart=True
+    )
+    yield app
+    app.session_manager.dispose()
+
+
+@pytest.fixture(scope="function")
 def election_day_app_bern(request):
 
     app = create_election_day(request, "", "'351'", "true")

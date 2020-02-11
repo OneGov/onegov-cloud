@@ -1,4 +1,8 @@
 from datetime import date
+from uuid import uuid4
+
+from onegov.ballot import ElectionCompound, Election
+from onegov.core.utils import module_path
 from tests.onegov.election_day.common import login
 from webtest import TestApp as Client
 from webtest import Upload
@@ -159,7 +163,7 @@ def test_view_wabstic_vote(election_day_app):
     client.authorization = ('Basic', ('', token))
 
     params = [
-        (name, Upload('{}.csv'.format(name), 'a'.encode('utf-8')))
+        (name, Upload(f'{name}.csv', 'a'.encode('utf-8')))
         for name in ('sg_geschaefte', 'sg_gemeinden')
     ]
 
@@ -184,7 +188,7 @@ def test_view_wabstic_majorz(election_day_app):
     client.authorization = ('Basic', ('', token))
 
     params = [
-        (name, Upload('{}.csv'.format(name), 'a'.encode('utf-8')))
+        (name, Upload(f'{name}.csv', 'a'.encode('utf-8')))
         for name in (
             'wm_wahl',
             'wmstatic_gemeinden',
@@ -216,7 +220,7 @@ def test_view_wabstic_proporz(election_day_app):
     client.authorization = ('Basic', ('', token))
 
     params = [
-        (name, Upload('{}.csv'.format(name), 'a'.encode('utf-8')))
+        (name, Upload(f'{name}.csv', 'a'.encode('utf-8')))
         for name in (
             'wp_wahl',
             'wpstatic_gemeinden',
@@ -238,3 +242,108 @@ def test_view_wabstic_proporz(election_day_app):
         assert '1' in import_.call_args[0]
         assert '2' in import_.call_args[0]
         assert result.json['status'] == 'success'
+
+
+def test_create_elections_wabsti_proporz(election_day_app_sg):
+    test_file = module_path(
+        'tests.onegov.election_day', 'fixtures/wabstic_243/WP_Wahl.csv')
+
+    id_, token = add_data_source(
+        Client(election_day_app_sg),
+        name='Verbundene Wahlen KR',
+        upload_type='proporz',
+        fill=False
+    )
+
+    params = [
+        ('wp_wahl', Upload(test_file, content_type='text/plain'))
+    ]
+
+    client = Client(election_day_app_sg)
+    client.authorization = ('Basic', ('', token))
+    result = client.post(
+        '/create-wabsti-proporz',
+        params=params,
+        headers=[('Accept-Language', 'de_CH')]
+    )
+    print(result.json)
+    assert result.json['status'] == 'success'
+
+    session = election_day_app_sg.session()
+
+    compound = session.query(ElectionCompound).first()
+    assert compound.title == 'Wahl der Mitglieder des Kantonsrates 2016'
+    assert compound.shortcode == 'Kantonsratswahl_2016'
+    assert compound.associations.count() == 8
+
+    elections = session.query(Election).filter_by(date=date(2016, 2, 28))
+    elections = elections.order_by(Election.shortcode)
+
+    assert compound.elections == elections.all()
+
+    for e in compound.elections:
+        print(f'{e.title} - {e.shortcode}')
+
+    test_election = elections.first()
+    assert test_election.shortcode == 'Kantonsratswahl (RH)'
+    assert test_election.title == 'Wahl der Mitglieder des Kantonsrates ' \
+                                  '(Wahlkreis Rheintal)'
+
+    # Test Re-Upload
+    result = client.post(
+        '/create-wabsti-proporz',
+        params=params,
+        headers=[('Accept-Language', 'de_CH')]
+    )
+
+    error = 'This source has already elections assigned to it'
+    assert result.json['errors']['data_source'][0] == error
+
+    # Test wrong token
+    wrong_token = str(uuid4())
+    client = Client(election_day_app_sg)
+    client.authorization = ('Basic', ('', wrong_token))
+    result = client.post(
+        '/create-wabsti-proporz',
+        params=params,
+        headers=[('Accept-Language', 'de_CH')],
+        status=403
+    )
+
+
+def test_create_wabstic_proporz_election_errors(election_day_app_sg):
+    test_file = module_path(
+        'tests.onegov.election_day', 'fixtures/wabstic_243/WP_Wahl_errors.csv')
+
+    id_, token = add_data_source(
+        Client(election_day_app_sg),
+        name='Verbundene Wahlen KR',
+        upload_type='proporz',
+        fill=False
+    )
+
+    params = [
+        ('wp_wahl', Upload(test_file, content_type='text/plain'))
+    ]
+
+    client = Client(election_day_app_sg)
+    client.authorization = ('Basic', ('', token))
+    result = client.post(
+        '/create-wabsti-proporz',
+        params=params,
+        headers=[('Accept-Language', 'de_CH')]
+    )
+    assert result.json['status'] == 'error'
+    errors = result.json['errors']
+    assert errors == [
+        dict(
+            message="time data '28.02.AA' does not match format '%d.%m.%Y'",
+            filename='wp_wahl',
+            line=2
+        ),
+        dict(
+            message='Leerer Wert: mandate',
+            filename='wp_wahl',
+            line=3
+        )
+    ]
