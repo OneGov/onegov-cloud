@@ -1,8 +1,22 @@
 # Changes
 
+## Release `2020.24`
+
+> commits: **1 / [458bc88d4a...458bc88d4a](https://github.com/OneGov/onegov-cloud/compare/458bc88d4a^...458bc88d4a)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.24)](https://buildkite.com/seantis/onegov-cloud)
+
+### Electionday
+
+🎉 **Adds auto-creation of election compound / proporz elections for WabstiC**
+
+Based on the data in `WP_Wahl` and an existing DataSource, the endpoint `/create-wabsti-proporz` will create all elections, the election compound, and the all DataSourceItems. The same DataSource can then be used to upload the results.
+
+**`Feature`** | **[458bc88d4a](https://github.com/onegov/onegov-cloud/commit/458bc88d4aeee18a38cc0f057020505e947538f6)**
+
 ## Release `2020.23`
 
-> commits: **3 / [1a03df3bc1...bdededb15e](https://github.com/OneGov/onegov-cloud/compare/1a03df3bc1^...bdededb15e)**<br>
+> released: **2020-02-10 17:25**<br>
+> commits: **4 / [1a03df3bc1...d07ea4e28b](https://github.com/OneGov/onegov-cloud/compare/1a03df3bc1^...d07ea4e28b)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.23)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
