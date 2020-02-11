@@ -250,3 +250,19 @@ Panaschierdaten werden nur hinzugefügt, falls:
 #### Vorlagen
 
 - [election_party_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_party_results.csv)
+
+### Automatische Erstellung verbundene Wahl und Wahlen mit REST-API
+
+Mit der WabstiC Export Version 2.4.3 können verbundene Wahlen mithilfe der Datei `WP_Wahl.csv` erstellt werden. 
+Das Token wird unter **WabstiDatenquellen** erzeugt.
+
+    curl https://[base_url]/create-wabsti-proporz \
+      --user :[token] \
+      --header "Accept-Language: de_CH" \
+      --form "wp_wahl=@WP_Wahl.csv"
+      
+Diese Endpunkt ersetzt dann folgende, manuellen Schritte:
+
+1. Alle Wahlen, die in `WP_Wahl.csv` vorhanden sind.
+2. Die verbundene Wahl
+3. Je eine Zuordnung für jede Wahl zur Wabsti Datenquelle, um Resultate hochzuladen.

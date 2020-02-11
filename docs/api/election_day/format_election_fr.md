@@ -252,3 +252,19 @@ Les résultats avec panachage sont uniquement ajoutés si :
 #### Modèles
 
 - [election_party_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_party_results.csv)
+
+### Création automatique des composantes des élections
+
+Avec WabstiC Export version 2.4.3, les composantes des élections peuvent être créées en utilisant le fichier 'WP_Wahl.csv'. 
+Le token est créé sous **Source de données Wabsti**.
+
+    curl https://[base_url]/create-wabsti-proporz \
+      --user :[token] \
+      --header "Accept-Language: de_CH" \
+      --form "wp_wahl=@WP_Wahl.csv"
+      
+La demande précedant effectue ensuite les étapes suivantes:
+
+1. Tous les élections présent dans le fichier `WP_Wahl.csv`.
+2. la composante des élections
+3. Une cartopgraphie pour chaque election afin de mettre a jour les résultats.

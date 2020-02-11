@@ -193,3 +193,19 @@ It is possible to set the language used for the error messages by setting the
       --form "wp_wahl=@WP_Wahl.csv" \
       --form "wpstatic_gemeinden=@WPStatic_Gemeinden.csv" \
       --form "wpstatic_kandidaten=@WPStatic_Kandidaten.csv"
+
+### Auto-creation of election and election compound using the REST-API
+
+As of the WabstiC Export version 2.4.3, a compound election with proporz elections can be created
+automatically using `WP_Wahl.csv` only using a normal wabsti data source token.
+
+    curl https://[base_url]/create-wabsti-proporz \
+      --user :[token] \
+      --header "Accept-Language: de_CH" \
+      --form "wp_wahl=@WP_Wahl.csv"
+      
+The endpoint created the following:
+
+1. All elections that are present in `WP_Wahl.csv`.
+2. The election compound
+3. A link (`DataSourceItem`) for each election to the data source (token), so that results can be uploaded.
