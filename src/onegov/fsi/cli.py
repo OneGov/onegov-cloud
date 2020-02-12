@@ -47,9 +47,9 @@ def fetch_users_cli(ldap_server, ldap_username, ldap_password):
     Example:
 
         onegov-fsi --select /fsi/fsi fetch-users \\
-            --ldap-server ldaps://1.2.3.4 \\
-            --ldap-username foo \\
-            --ldap-password bar \\
+            --ldap-server 'ldaps://1.2.3.4' \\
+            --ldap-username 'foo' \\
+            --ldap-password 'bar' \\
 
     """
 
