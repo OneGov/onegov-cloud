@@ -261,7 +261,7 @@ Das Token wird unter **WabstiDatenquellen** erzeugt.
       --header "Accept-Language: de_CH" \
       --form "wp_wahl=@WP_Wahl.csv"
       
-Diese Endpunkt ersetzt dann folgende, manuellen Schritte:
+Dieser Endpunkt erstellt dann folgendes:
 
 1. Alle Wahlen, die in `WP_Wahl.csv` vorhanden sind.
 2. Die verbundene Wahl
