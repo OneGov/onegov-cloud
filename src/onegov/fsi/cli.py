@@ -193,7 +193,7 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password):
 
     client = LDAPClient(ldap_server, ldap_username, ldap_password)
     client.try_configuration()
-
+    count = 0
     for ix, data in enumerate(users(client.connection)):
 
         if data['type'] == 'ldap':
@@ -222,6 +222,8 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password):
         user.attendee.last_name = data['last_name']
         user.attendee.organisation = data['organisation']
 
+        count += 1
+
         if ix % 1000 == 0:
             app.es_indexer.process()
-    log.info(f'LDAP users imported (#{ix})')
+    log.info(f'LDAP users imported (#{count})')
