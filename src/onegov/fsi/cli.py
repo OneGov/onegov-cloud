@@ -2,6 +2,7 @@ import click
 
 from onegov.core.cache import lru_cache
 from onegov.core.cli import command_group
+from onegov.fsi import log
 from onegov.fsi.ims_import import parse_ims_data, import_ims_data
 from onegov.fsi.models import CourseAttendee
 from onegov.user.auth.clients import LDAPClient
@@ -223,3 +224,4 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password):
 
         if ix % 1000 == 0:
             app.es_indexer.process()
+    log.info(f'LDAP users imported (#{ix})')
