@@ -64,7 +64,7 @@ class ReservationCollection(GenericCollection, Pagination):
             query = query.join(CourseAttendee)
             query = query.filter(
                 or_(CourseAttendee.organisation.in_(
-                    self.auth_attendee.permissions, ),
+                    self.auth_attendee.permissions or [], ),
                     CourseReservation.attendee_id == self.auth_attendee.id)
             )
         if self.attendee_id:
