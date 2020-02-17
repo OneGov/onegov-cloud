@@ -270,7 +270,9 @@ def es_binary(es_archive):
 
     try:
         process = subprocess.Popen(
-            shlex.split(f"tar xzvf {es_archive} --strip-components=1"),
+            shlex.split(
+                f"tar xzvf {es_archive} -C {path} --strip-components=1"
+            ),
             cwd=path,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
