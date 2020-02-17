@@ -193,6 +193,12 @@ applications:
     configuration:
       <<: *global-config
 
+  - path: /events/*
+    application: onegov.org.OrgApp
+    namespace: events
+    configuration:
+      <<: *global-config
+
   - path: /onegov_feriennet/*
     application: onegov.feriennet.FeriennetApp
     namespace: onegov_feriennet
