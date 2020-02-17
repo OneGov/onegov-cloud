@@ -62,8 +62,6 @@ def view_parse_formcode(self, request):
     except (FormError, AttributeError, TypeError):
         return {'error': True}
 
-    return []
-
 
 @FormApp.webasset_path()
 def get_js_path():
