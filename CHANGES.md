@@ -1,8 +1,31 @@
 # Changes
 
+## Release `2020.26`
+
+> commits: **4 / [0e7fa93022...59174e4b85](https://github.com/OneGov/onegov-cloud/compare/0e7fa93022^...59174e4b85)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.26)](https://buildkite.com/seantis/onegov-cloud)
+
+### Core
+
+🐞 **Fixes failing upgrade with add_column_with_defaults**
+
+Looping through columns to add a default for a not yet migrated table
+caused upgrade failures. The fix will skip empty tables when adding defaults.
+
+**`Bugfix`** | **[59174e4b85](https://github.com/onegov/onegov-cloud/commit/59174e4b858efa9b0056a49c8fa715252e11f149)**
+
+### Org
+
+🐞 **Fixes virtual occurence for dates 2+ years ahead**
+
+Fixes form input "send daily ticket statistics" and error in template when seeing an event with a date that is two years from now.
+
+**`Bugfix`** | **[6ef0d2e664](https://github.com/onegov/onegov-cloud/commit/6ef0d2e664c76f4ee2e8759677d6a84f206244dd)**
+
 ## Release `2020.25`
 
-> commits: **5 / [122cca97ab...e22a503b19](https://github.com/OneGov/onegov-cloud/compare/122cca97ab^...e22a503b19)**<br>
+> released: **2020-02-13 15:42**<br>
+> commits: **6 / [122cca97ab...5dc09181d1](https://github.com/OneGov/onegov-cloud/compare/122cca97ab^...5dc09181d1)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.25)](https://buildkite.com/seantis/onegov-cloud)
 
 ## Release `2020.24`
