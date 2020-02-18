@@ -35,4 +35,4 @@ class UserProfileForm(Form):
 
         if self.enable_daily_ticket_statistics:
             self.daily_ticket_statistics.data\
-                = (obj.data or {}).get('daily_ticket_statistics', True)
+                = (obj.data or {}).get('daily_ticket_statistics', False)

@@ -322,7 +322,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
 
         """
 
-        for start in self.occurrence_dates():
+        for start in self.occurrence_dates(limit=False):
             occurrence = self.spawn_occurrence(start)
             occurrence.event = self
 
