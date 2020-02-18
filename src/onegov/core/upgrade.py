@@ -443,6 +443,10 @@ class UpgradeContext(object):
         else:
             yield
 
+    def is_empty_table(self, table):
+        return self.operations_connection.execute(
+            f"SELECT * FROM {table} LIMIT 1").rowcount == 0
+
     def add_column_with_defaults(self, table, column, default):
         # XXX while adding default values we shouldn't reindex the data
         # since this is what the default add_column code does and will be
@@ -456,16 +460,17 @@ class UpgradeContext(object):
 
             self.operations.add_column(table, nullable_column)
 
-            # fill it with defaults
-            for record in self.records_per_table(table, (column, )):
-                value = default(record) if callable(default) else default
-                setattr(record, column.name, value)
+            if not self.is_empty_table(table):
+                # fill it with defaults if the tables has any rows
+                for record in self.records_per_table(table, (column, )):
+                    value = default(record) if callable(default) else default
+                    setattr(record, column.name, value)
 
-                if hasattr(getattr(record, column.name), 'changed'):
-                    getattr(record, column.name).changed()
+                    if hasattr(getattr(record, column.name), 'changed'):
+                        getattr(record, column.name).changed()
 
-            # make sure all generated values are flushed
-            self.session.flush()
+                # make sure all generated values are flushed
+                self.session.flush()
 
             # activate non-null constraint
             if not column.nullable:
