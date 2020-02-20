@@ -54,6 +54,8 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
 
     __tablename__ = 'events'
 
+    occurrence_dates_year_limit = 2
+
     #: Internal number of the event
     id = Column(UUID, primary_key=True, default=uuid4)
 
@@ -298,7 +300,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
             dates = [to_timezone(date_, self.timezone) for date_ in dates]
 
         if limit:
-            max_year = datetime.today().year + 2
+            max_year = datetime.today().year + self.occurrence_dates_year_limit
             dates = [date_ for date_ in dates if date_.year <= max_year]
 
         return dates
