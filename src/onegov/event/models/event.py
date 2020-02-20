@@ -170,16 +170,18 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
             self._update_occurrences()
 
     @property
+    def base_query(self):
+        session = object_session(self)
+        return session.query(Occurrence).filter_by(event_id=self.id)
+
+    @property
     def latest_occurrence(self):
         """ Returns the occurrence which is presently occurring, the next
         one to occur or the last occurrence.
 
         """
 
-        session = object_session(self)
-
-        base = session.query(Occurrence).filter_by(event_id=self.id)
-
+        base = self.base_query
         current = base.filter(and_(
             Occurrence.start <= func.now(),
             Occurrence.end >= func.now()
@@ -194,6 +196,11 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         ).order_by(desc(Occurrence.start))
 
         return current.union_all(future, past).first()
+
+    def future_occurrences(self, offset=0, limit=10):
+        return self.base_query.filter(
+            Occurrence.start >= func.now()
+        ).order_by(Occurrence.start).offset(offset).limit(limit)
 
     @validates('recurrence')
     def validate_recurrence(self, key, r):
