@@ -291,7 +291,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
             dates = [to_timezone(date_, self.timezone) for date_ in dates]
 
         if limit:
-            max_year = datetime.today().year + 1
+            max_year = datetime.today().year + 2
             dates = [date_ for date_ in dates if date_.year <= max_year]
 
         return dates
@@ -322,7 +322,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
 
         """
 
-        for start in self.occurrence_dates(limit=False):
+        for start in self.occurrence_dates():
             occurrence = self.spawn_occurrence(start)
             occurrence.event = self
 
@@ -386,7 +386,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         """ Returns the event and all its occurrences as icalendar objects.
 
         If the calendar has a bunch of RDATE's instead of a proper RRULE, we
-        return every occurrence as seperate event since most calendars doen't
+        return every occurrence as separate event since most calendars don't
         support RDATE's.
 
         """
