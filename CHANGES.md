@@ -1,8 +1,23 @@
 # Changes
 
+## Release `2020.27`
+
+> commits: **1 / [c34ce0e627...c34ce0e627](https://github.com/OneGov/onegov-cloud/compare/c34ce0e627^...c34ce0e627)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.27)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Adds "Further occurrences" to event search results**
+
+- Limit to 10 future occurrences
+- Least intrusive and not blowing up elasticsearch
+
+**`Feature`** | **[ZW-260](https://kanton-zug.atlassian.net/browse/ZW-260)** | **[c34ce0e627](https://github.com/onegov/onegov-cloud/commit/c34ce0e627c13e7e44c1208c8a30cfaf71e3120e)**
+
 ## Release `2020.26`
 
-> commits: **4 / [0e7fa93022...59174e4b85](https://github.com/OneGov/onegov-cloud/compare/0e7fa93022^...59174e4b85)**<br>
+> released: **2020-02-18 14:35**<br>
+> commits: **5 / [0e7fa93022...840c5fff7a](https://github.com/OneGov/onegov-cloud/compare/0e7fa93022^...840c5fff7a)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.26)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Core
