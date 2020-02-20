@@ -1144,17 +1144,48 @@
 
 <metal:search_result_events define-macro="search_result_events" i18n:domain="onegov.org">
     <a href="${request.link(result, 'latest')}">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></a>
-    <ul tal:define="occurrence result.latest_occurrence">
-        <li tal:condition="occurrence">${
-            '-'.join((
-                layout.format_date(occurrence.localized_start, 'event'),
-                layout.format_date(occurrence.localized_end, 'time')
+    <ul tal:define="latest result.latest_occurrence">
+        <li tal:condition="latest">
+            ${
+            ' - '.join((
+                layout.format_date(latest.localized_start, 'event'),
+                layout.format_date(latest.localized_end, 'time')
             ))
-        }</li>
+            }
+        </li>
         <li tal:condition="result.location">${result.location}</li>
+
+        <tal:b tal:condition="future_occ" tal:define="future_occ result.future_occurrences(offset=1).all()">
+
+            <li><span i18n:translate="">Further occurrences:</span>
+                <div class="event-child-results">
+                    <ul>
+                        <tal:b tal:repeat="occ future_occ">
+                            <li>
+                                <a href="${request.link(occ)}">
+                                    ${
+                                    ' - '.join((
+                                        layout.format_date(occ.localized_start, 'event'),
+                                        layout.format_date(occ.localized_end, 'time')
+                                    ))
+                                    }
+                                </a>
+                            </li>
+                        </tal:b>
+                    </ul>
+                </div></li>
+        </tal:b>
+
     </ul>
 </metal:search_result_events>
 
+<!--?<metal:search_result_event_occurrences define-macro="search_result_event_occurrences" i18n:domain="onegov.org">-->
+<!--?    <a href="${request.link(occurrence)}">${occurrence.event.title}</a>-->
+<!--?    <ul tal:define="location occurrence.event.location">-->
+<!--?        <metal:b use-macro="layout.macros['occurrence_date']" />-->
+<!--?        <li tal:condition="location">${location}</li>-->
+<!--?    </ul>-->
+<!--?</metal:search_result_event_occurrences>-->
 
 <metal:search_result_people define-macro="search_result_people" i18n:domain="onegov.org">
     <a href="${request.link(result)}">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></a>

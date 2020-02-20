@@ -3376,6 +3376,20 @@ ul.search-results {
     > li {
         margin-bottom: 1em;
     }
+
+    div.event-child-results > ul {
+
+        list-style-type: disc;
+        margin-left: 1em;
+
+        > li {
+            font-size: .9rem;
+        }
+
+        a {
+            font-weight: normal;
+        }
+    }
 }
 
 .result-explanation li {

@@ -170,16 +170,18 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
             self._update_occurrences()
 
     @property
+    def base_query(self):
+        session = object_session(self)
+        return session.query(Occurrence).filter_by(event_id=self.id)
+
+    @property
     def latest_occurrence(self):
         """ Returns the occurrence which is presently occurring, the next
         one to occur or the last occurrence.
 
         """
 
-        session = object_session(self)
-
-        base = session.query(Occurrence).filter_by(event_id=self.id)
-
+        base = self.base_query
         current = base.filter(and_(
             Occurrence.start <= func.now(),
             Occurrence.end >= func.now()
@@ -194,6 +196,11 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         ).order_by(desc(Occurrence.start))
 
         return current.union_all(future, past).first()
+
+    def future_occurrences(self, offset=0, limit=10):
+        return self.base_query.filter(
+            Occurrence.start >= func.now()
+        ).order_by(Occurrence.start).offset(offset).limit(limit)
 
     @validates('recurrence')
     def validate_recurrence(self, key, r):
@@ -291,7 +298,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
             dates = [to_timezone(date_, self.timezone) for date_ in dates]
 
         if limit:
-            max_year = datetime.today().year + 1
+            max_year = datetime.today().year + 2
             dates = [date_ for date_ in dates if date_.year <= max_year]
 
         return dates
@@ -322,7 +329,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
 
         """
 
-        for start in self.occurrence_dates(limit=False):
+        for start in self.occurrence_dates():
             occurrence = self.spawn_occurrence(start)
             occurrence.event = self
 
@@ -386,7 +393,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         """ Returns the event and all its occurrences as icalendar objects.
 
         If the calendar has a bunch of RDATE's instead of a proper RRULE, we
-        return every occurrence as seperate event since most calendars doen't
+        return every occurrence as separate event since most calendars don't
         support RDATE's.
 
         """
