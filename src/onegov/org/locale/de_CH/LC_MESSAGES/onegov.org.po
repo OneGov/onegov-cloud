@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-01-28 09:07+0100\n"
-"PO-Revision-Date: 2019-02-18 06:39+0100\n"
+"POT-Creation-Date: 2020-02-20 15:31+0100\n"
+"PO-Revision-Date: 2020-02-20 15:33+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.2.1\n"
+"X-Generator: Poedit 2.3\n"
 
 #, python-format
 msgid "${org} OneGov Cloud Status"
@@ -1683,9 +1683,9 @@ msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
 msgid "Reject reservation"
 msgstr "Reservation absagen"
 
-#.
 #. Used in sentence: "${event} published."
 #. Used in sentence: "${event} deleted."
+#.
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -2142,6 +2142,9 @@ msgstr "${count} Seite"
 
 msgid "${count} pages"
 msgstr "${count} Seiten"
+
+msgid "Further occurrences:"
+msgstr "Weitere Termine:"
 
 msgid ""
 "Your request will be processed shortly. To see the state of your process "
