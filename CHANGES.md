@@ -1,8 +1,29 @@
 # Changes
 
+## Release `2020.29`
+
+> commits: **3 / [3970f94e5c...0e37ef38b7](https://github.com/OneGov/onegov-cloud/compare/3970f94e5c^...0e37ef38b7)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.29)](https://buildkite.com/seantis/onegov-cloud)
+
+### Electionday
+
+🎉 **Improvements for Kantons+Regierungsratswahlen**
+
+For intermediary results, the source data might flag a candidate as elected. For the Web UI,
+`allocated_mandates` (e.g. Mandates **1** of 15 in `/lists`) will now always show 0 if the election is not completed.
+Also for compound election, the sum of allocated mandates will only consider completed elections. For majorz elections,
+`absolute_majority` and `candidate_elected` will be None if the election is not completed viewing the results with the api (`/json` and `/data-json` views). However, when exporting as CSV the original data gets exported.
+
+- Fixes possible division by zero (`counted_eligible_voters`)
+- Removes the year at the end of compound election title (`create_wabstic_proporz`)
+- Re-introduces election status `interim` for `upload_wabstic_majorz` view.
+
+**`Feature`** | **[5f1e445093](https://github.com/onegov/onegov-cloud/commit/5f1e4450936bbcb4ce7d8cb10341a73bdfc54f63)**
+
 ## Release `2020.28`
 
-> commits: **1 / [e7f76d69a7...e7f76d69a7](https://github.com/OneGov/onegov-cloud/compare/e7f76d69a7^...e7f76d69a7)**<br>
+> released: **2020-02-20 18:42**<br>
+> commits: **2 / [e7f76d69a7...92296ffed5](https://github.com/OneGov/onegov-cloud/compare/e7f76d69a7^...92296ffed5)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.28)](https://buildkite.com/seantis/onegov-cloud)
 
 ## Release `2020.27`
