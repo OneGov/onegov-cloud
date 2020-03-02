@@ -143,7 +143,10 @@ class ElectionCompound(
     def allocated_mandates(self):
         """ Number of already allocated mandates/elected candidates. """
 
-        election_ids = [election.id for election in self.elections]
+        election_ids = [
+            election.id for election in self.elections if election.completed]
+        if not election_ids:
+            return 0
         session = object_session(self)
         mandates = session.query(
             func.count(func.nullif(Candidate.elected, False))
