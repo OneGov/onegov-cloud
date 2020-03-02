@@ -32,7 +32,7 @@ def test_import_internal_proporz_cantonal(session, import_test_datasets):
     assert election.blank_ballots == 118
     assert election.invalid_ballots == 1015
     assert round(election.turnout, 2) == 53.74
-    assert election.allocated_mandates == 3
+    assert election.allocated_mandates() == 3
     assert sorted(election.elected_candidates) == [
         ('Bruno', 'Pezzatti'), ('Gerhard', 'Pfister'), ('Thomas', 'Aeschi')
     ]
@@ -63,7 +63,7 @@ def test_import_internal_proporz_cantonal(session, import_test_datasets):
     assert election.blank_ballots == 118
     assert election.invalid_ballots == 1015
     assert round(election.turnout, 2) == 53.74
-    assert election.allocated_mandates == 3
+    assert election.allocated_mandates() == 3
     assert sorted(election.elected_candidates) == [
         ('Bruno', 'Pezzatti'), ('Gerhard', 'Pfister'), ('Thomas', 'Aeschi')
     ]
@@ -102,7 +102,7 @@ def test_import_internal_proporz_regional_zg(session, import_test_datasets):
     assert election.invalid_ballots == 204
     assert election.accounted_votes == 131899
     assert round(election.turnout, 2) == 45.33
-    assert election.allocated_mandates == 19
+    assert election.allocated_mandates() == 19
     assert sorted([list.votes for list in election.lists]) == [
         1175, 9557, 15580, 23406, 23653, 27116, 31412
     ]
@@ -145,7 +145,7 @@ def test_import_internal_proporz_regional_zg(session, import_test_datasets):
     assert election.invalid_ballots == 204
     assert election.accounted_votes == 131899
     assert round(election.turnout, 2) == 45.33
-    assert election.allocated_mandates == 19
+    assert election.allocated_mandates() == 19
     assert sorted([list.votes for list in election.lists]) == [
         1175, 9557, 15580, 23406, 23653, 27116, 31412
     ]

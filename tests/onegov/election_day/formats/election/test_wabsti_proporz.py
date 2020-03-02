@@ -42,7 +42,7 @@ def test_import_wabsti_proporz_cantonal(session, import_test_datasets):
         17034
     ]
     assert election.absolute_majority is None
-    assert election.allocated_mandates == 0
+    assert election.allocated_mandates() == 0
 
     # Test panachage results
     panachage_results = session.query(PanachageResult)
@@ -96,7 +96,7 @@ def test_import_wabsti_proporz_cantonal_complete(
         17034
     ]
     assert election.absolute_majority is None
-    assert election.allocated_mandates == 3
+    assert election.allocated_mandates() == 3
     assert sorted(election.elected_candidates) == [
         ('Bruno', 'Pezzatti'), ('Gerhard', 'Pfister'), ('Thomas', 'Aeschi')
     ]
@@ -143,7 +143,7 @@ def test_import_wabsti_proporz_regional_sg(session, import_test_datasets):
         7415, 9055, 9144, 9242
     ]
     assert election.absolute_majority is None
-    assert election.allocated_mandates == 17
+    assert election.allocated_mandates() == 17
     assert sorted(election.elected_candidates) == [
         ('Alexander', 'Bartl'),
         ('Andreas', 'Broger'),

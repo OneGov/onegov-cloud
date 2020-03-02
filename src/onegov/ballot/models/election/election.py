@@ -70,12 +70,11 @@ class Election(Base, ContentMixin, TimestampMixin,
     #: Number of mandates
     number_of_mandates = Column(Integer, nullable=False, default=lambda: 0)
 
-    @property
-    def allocated_mandates(self):
+    def allocated_mandates(self, consider_completed=False):
         """ Number of already allocated mandates/elected candidates. """
 
         # Unless an election is finished, allocated mandates are 0
-        if not self.completed:
+        if consider_completed and not self.completed:
             return 0
 
         results = object_session(self).query(
