@@ -31,12 +31,15 @@ def test_view_election_compound_districts(election_day_app_gr):
     districts = client.get('/elections/elections/districts')
     assert "Hinterrhein" in districts
     assert "Albula" in districts
-    assert "1 von 10" in districts  # mandates A
-    assert "1 von 5" in districts  # mandates B
-    assert "2 von 15" in districts  # overall mandates
-    assert "1 von 10" in districts  # municipalites A
-    assert "1 von 24" in districts  # municipalites B
-    assert "0 von 2" in districts  # overall counted
+    # Intermediary results status_callout etc.
+    assert '0 von 2' in districts        # Ausgezählt 0 von 2
+    assert '0 von 15' in districts      # Mandate 0 von 15
+
+    # Will render 0 if election is not completed
+    assert "0 von 10" in districts  # Table Mandates Hinterrhein
+    assert "0 von 5" in districts  # Table Mandates Albula
+    assert "1 von 24" in districts  # Ausgezählt Hinterrhein
+    assert "1 von 16" in districts  # Ausgezählt Albula
 
 
 def test_view_election_compound_elected_candidates(election_day_app_gr):
