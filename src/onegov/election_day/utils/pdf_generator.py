@@ -543,7 +543,8 @@ class PdfGenerator():
         pdf.h2(principal.label('districts'))
         pdf.results(
             [principal.label('district'), _('Mandates')],
-            [[e.title, e.allocated_mandates(consider_completed=True)] for e in compound.elections],
+            [[e.title, e.allocated_mandates(consider_completed=True)]
+             for e in compound.elections],
             [None, 2 * cm],
             pdf.style.table_results_1
         )
