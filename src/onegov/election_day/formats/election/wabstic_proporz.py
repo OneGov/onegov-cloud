@@ -63,7 +63,6 @@ def construct_copound_title(line, year):
         compound_title = compound_title.replace(word, '', 1)
     compound_title = compound_title.replace('(', '').replace(')', '')
     compound_title = compound_title.replace('  ', ' ').strip()
-    compound_title = f'{compound_title} {year}'
     return compound_title
 
 

@@ -35,7 +35,7 @@ def test_import_wabsti_majorz_cantonal_simple(session, import_test_datasets):
         36282, 53308, 54616
     ]
     assert election.absolute_majority is None
-    assert election.allocated_mandates == 0
+    assert election.allocated_mandates() == 0
 
 
 def test_import_wabsti_majorz_cantonal_complete(
@@ -68,7 +68,7 @@ def test_import_wabsti_majorz_cantonal_complete(
         36282, 53308, 54616
     ]
     assert election.absolute_majority is None
-    assert election.allocated_mandates == 1
+    assert election.allocated_mandates() == 1
     assert election.elected_candidates == [('Paul', 'Rechsteiner')]
 
 
@@ -101,7 +101,7 @@ def test_import_wabsti_majorz_regional_sg(session, import_test_datasets):
         2804, 3602, 3721
     ]
     assert election.absolute_majority == 5076
-    assert election.allocated_mandates == 0
+    assert election.allocated_mandates() == 0
 
 
 def test_import_wabsti_majorz_municipal(session, import_test_datasets):
@@ -131,7 +131,7 @@ def test_import_wabsti_majorz_municipal(session, import_test_datasets):
         556, 665, 678, 715, 790, 810, 830
     ]
     assert election.absolute_majority == 519
-    assert election.allocated_mandates == 6
+    assert election.allocated_mandates() == 6
     assert sorted(election.elected_candidates) == [
         ('Alex', 'Frei'),
         ('Carola', 'Espanhol'),

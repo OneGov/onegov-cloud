@@ -32,7 +32,7 @@ def test_import_wabstic_majorz_1(session, import_test_datasets):
     assert election.accounted_ballots == 158822
     assert election.accounted_votes == 626581
 
-    assert election.allocated_mandates == 6
+    assert election.allocated_mandates() == 6
     assert sorted(election.elected_candidates) == [
         ('Beni', 'Würth'),
         ('Bruno', 'Damann'),

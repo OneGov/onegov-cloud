@@ -196,7 +196,7 @@ class ProporzElection(Election, PartyResultExportMixin):
             PanachageResult.owner == self.id
         ).delete()
 
-    def export(self):
+    def export(self, consider_completed=False):
         """ Returns all data connected to this election as list with dicts.
 
         This is meant as a base for json/csv/excel exports. The result is
@@ -207,6 +207,8 @@ class ProporzElection(Election, PartyResultExportMixin):
         lists).
 
         """
+        if consider_completed:
+            completed = self.completed
 
         session = object_session(self)
 
@@ -321,11 +323,19 @@ class ProporzElection(Election, PartyResultExportMixin):
             for locale in election_day_i18n_used_locales:
                 title = result[1] and result[1].get(locale, '') or ''
                 row[f'election_title_{locale}'] = title.strip()
+
+            if consider_completed:
+                elected = result[29] if completed else None
+                absolute_majority = result[6] if completed else None
+            else:
+                elected = result[29]
+                absolute_majority = result[6]
+
             row['election_date'] = result[2].isoformat()
             row['election_domain'] = result[3]
             row['election_type'] = result[4]
             row['election_mandates'] = result[5]
-            row['election_absolute_majority'] = result[6]
+            row['election_absolute_majority'] = absolute_majority
             row['election_status'] = result[7] or 'unknown'
 
             row['entity_district'] = result[8] or ''
@@ -355,7 +365,7 @@ class ProporzElection(Election, PartyResultExportMixin):
             row['candidate_family_name'] = result[26]
             row['candidate_first_name'] = result[27]
             row['candidate_id'] = result[28]
-            row['candidate_elected'] = result[29]
+            row['candidate_elected'] = elected
             row['candidate_party'] = result[30]
             row['candidate_votes'] = result[0]
 

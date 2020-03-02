@@ -42,7 +42,10 @@ def view_election_compound_data_as_json(self, request):
         add_last_modified_header(response, self.last_modified)
 
     return Response(
-        json.dumps(self.export(), sort_keys=True, indent=2).encode('utf-8'),
+        json.dumps(
+            self.export(consider_completed=True),
+            sort_keys=True,
+            indent=2).encode('utf-8'),
         content_type='application/json',
         content_disposition='inline; filename={}.json'.format(
             normalize_for_url(self.title)

@@ -184,7 +184,7 @@ class PdfGenerator():
                 ''
             ],
             [
-                election.allocated_mandates,
+                election.allocated_mandates(consider_completed=True),
                 election.absolute_majority if show_majority else '',
                 ''
             ],
@@ -534,7 +534,7 @@ class PdfGenerator():
         # Factoids
         pdf.factoids(
             [_('Seats') if majorz else _('Mandates'), '', ''],
-            [compound.allocated_mandates, '', '']
+            [compound.allocated_mandates(consider_completed=True), '', '']
         )
         pdf.spacer()
         pdf.spacer()
@@ -543,7 +543,8 @@ class PdfGenerator():
         pdf.h2(principal.label('districts'))
         pdf.results(
             [principal.label('district'), _('Mandates')],
-            [[e.title, e.allocated_mandates] for e in compound.elections],
+            [[e.title, e.allocated_mandates(consider_completed=True)]
+             for e in compound.elections],
             [None, 2 * cm],
             pdf.style.table_results_1
         )

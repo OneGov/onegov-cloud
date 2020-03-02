@@ -35,7 +35,7 @@ def test_import_internal_majorz_cantonal_zg(
     assert election.blank_ballots == 63
     assert election.invalid_ballots == 115
     assert round(election.turnout, 2) == 53.01
-    assert election.allocated_mandates == 2
+    assert election.allocated_mandates() == 2
     assert sorted(election.elected_candidates) == [
         ('Joachim', 'Eder'), ('Peter', 'Hegglin')
     ]
@@ -57,7 +57,7 @@ def test_import_internal_majorz_cantonal_zg(
     assert election.blank_ballots == 63
     assert election.invalid_ballots == 115
     assert round(election.turnout, 2) == 53.01
-    assert election.allocated_mandates == 2
+    assert election.allocated_mandates() == 2
     assert sorted(election.elected_candidates) == [
         ('Joachim', 'Eder'), ('Peter', 'Hegglin')
     ]
@@ -136,7 +136,7 @@ def test_import_internal_majorz_municipality_bern(
     assert election.blank_ballots == 124
     assert election.invalid_ballots == 51
     assert round(election.turnout, 2) == 36.16
-    assert election.allocated_mandates == 0
+    assert election.allocated_mandates() == 0
     assert election.candidates.count() == 4
 
     # ... roundtrip
@@ -157,7 +157,7 @@ def test_import_internal_majorz_municipality_bern(
     assert election.blank_ballots == 124
     assert election.invalid_ballots == 51
     assert round(election.turnout, 2) == 36.16
-    assert election.allocated_mandates == 0
+    assert election.allocated_mandates() == 0
     assert election.candidates.count() == 4
 
 
@@ -190,7 +190,7 @@ def test_import_internal_majorz_municipality_kriens(
     assert election.blank_ballots == 1274
     assert election.invalid_ballots == 2797
     assert round(election.turnout, 2) == 35.49
-    assert election.allocated_mandates == 1
+    assert election.allocated_mandates() == 1
     assert sorted(election.elected_candidates) == [('Tschäppät', 'Alexander')]
 
     # ... roundtrip
@@ -211,7 +211,7 @@ def test_import_internal_majorz_municipality_kriens(
     assert election.blank_ballots == 1274
     assert election.invalid_ballots == 2797
     assert round(election.turnout, 2) == 35.49
-    assert election.allocated_mandates == 1
+    assert election.allocated_mandates() == 1
     assert sorted(election.elected_candidates) == [('Tschäppät', 'Alexander')]
 
 

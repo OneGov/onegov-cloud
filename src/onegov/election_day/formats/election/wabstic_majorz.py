@@ -90,6 +90,7 @@ def import_election_wabstic_majorz(
     # Parse the election
     absolute_majority = None
     remaining_entities = None
+    complete = None
 
     for line in wm_wahl.lines:
         line_errors = []
@@ -105,6 +106,11 @@ def import_election_wabstic_majorz(
         else:
             if absolute_majority == -1:
                 absolute_majority = None
+
+        try:
+            complete = validate_integer(line, 'ausmittlungsstand')
+        except ValueError as e:
+            line_errors.append(e.args[0])
 
         # Check if remaining entities is 0 is final, else unknown
         try:
@@ -329,6 +335,10 @@ def import_election_wabstic_majorz(
             if len(added_results) != 1:
                 errors.append(FileImportError(_("No clear district")))
 
+    if complete and complete == 2 and remaining_entities != 0:
+        errors.append(FileImportError(
+            _('Ausmittlungsstand set to final but AnzPendentGde is not 0'))
+        )
     if errors:
         return errors
 
@@ -336,6 +346,10 @@ def import_election_wabstic_majorz(
     election.clear_results()
     election.absolute_majority = absolute_majority
     election.status = 'unknown'
+
+    if complete == 1:
+        election.status = 'interim'
+
     if remaining_entities == 0:
         election.status = 'final'
 
