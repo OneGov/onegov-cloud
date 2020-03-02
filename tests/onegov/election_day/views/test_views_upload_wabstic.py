@@ -274,7 +274,7 @@ def test_create_elections_wabsti_proporz(election_day_app_sg):
     session = election_day_app_sg.session()
 
     compound = session.query(ElectionCompound).first()
-    assert compound.title == 'Wahl der Mitglieder des Kantonsrates 2016'
+    assert compound.title == 'Wahl der Mitglieder des Kantonsrates'
     assert compound.shortcode == 'Kantonsratswahl_2016'
     assert compound.associations.count() == 8
 
