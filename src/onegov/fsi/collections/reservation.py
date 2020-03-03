@@ -9,6 +9,8 @@ from onegov.fsi.models.course_reservation import CourseReservation
 
 class ReservationCollection(GenericCollection, Pagination):
 
+    batch_size = 30
+
     def __init__(self, session,
                  attendee_id=None,
                  course_event_id=None,
