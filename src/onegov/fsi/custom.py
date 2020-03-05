@@ -2,6 +2,8 @@ from onegov.core.elements import Link
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.course import CourseCollection
+from onegov.fsi.collections.course_event import CourseEventCollection, \
+    PastCourseEventCollection
 from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
@@ -153,6 +155,16 @@ def get_top_navigation(request):
         text=_("Courses"),
         url=request.class_link(CourseCollection)
     )
+    if request.is_manager:
+        yield Link(
+            text=_("Attendee Check"),
+            url=request.link(
+                PastCourseEventCollection(
+                    request.session,
+                    show_hidden=request.is_manager
+                )
+            )
+        )
 
     layout = DefaultLayout(request.app.org, request)
     yield from layout.top_navigation

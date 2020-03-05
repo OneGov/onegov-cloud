@@ -28,10 +28,13 @@ class ReservationCollectionLayout(DefaultLayout):
         if self.request.view_name == 'add-placeholder':
             return _('Add Placeholder')
         if self.model.course_event_id:
-            return _('Attendees Event ${event} - ${date}',
+            return _('Attendees Event ${event} - ${date} - ${begin}',
                      mapping={'event': self.model.course_event.name,
                               'date': self.format_date(
-                                  self.course_event.start, 'date')})
+                                  self.course_event.start, 'date'),
+                              'begin': self.format_date(
+                                  self.course_event.start, 'time'
+                              )})
         if self.for_himself:
             return _('My Event Subscriptions')
         elif self.model.attendee_id:

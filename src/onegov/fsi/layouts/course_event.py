@@ -1,6 +1,7 @@
 from cached_property import cached_property
 
 from onegov.core.elements import Link, Confirm, Intercooler, LinkGroup
+from onegov.fsi.collections.audit import AuditCollection
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.collections.notification_template import \
@@ -60,6 +61,19 @@ class CourseEventCollectionLayout(DefaultLayout):
             )
 
         return links
+
+    def subscriptions_link(self, event):
+        return self.request.link(ReservationCollection(
+            self.request.session, course_event_id=event.id))
+
+    def audit_link(self, course):
+        if not course:
+            return None
+        return self.request.link(AuditCollection(
+            self.request.session,
+            auth_attendee=self.request.current_attendee,
+            course_id=course.id,
+        ))
 
 
 class CourseEventLayout(DefaultLayout, FormatMixin):
