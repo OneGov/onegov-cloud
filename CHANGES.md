@@ -1,8 +1,22 @@
 # Changes
 
+## Release `2020.30`
+
+> commits: **2 / [edeff88f92...636069e476](https://github.com/OneGov/onegov-cloud/compare/edeff88f92^...636069e476)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.30)](https://buildkite.com/seantis/onegov-cloud)
+
+### Fsi
+
+🎉 **Adds new view for past events**
+
+Editors and admins have to check attendance of attendees. Past courses are hidden from `/courses` view since the list gets too long. A new view for this purpose was introduced with `/past-events`
+
+**`Feature`** | **[ZW-265](https://kanton-zug.atlassian.net/browse/ZW-265)** | **[636069e476](https://github.com/onegov/onegov-cloud/commit/636069e476491382fbb66a1ecbe9e83f1329b8ad)**
+
 ## Release `2020.29`
 
-> commits: **3 / [3970f94e5c...0e37ef38b7](https://github.com/OneGov/onegov-cloud/compare/3970f94e5c^...0e37ef38b7)**<br>
+> released: **2020-03-02 19:15**<br>
+> commits: **4 / [3970f94e5c...7468e0b9e4](https://github.com/OneGov/onegov-cloud/compare/3970f94e5c^...7468e0b9e4)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.29)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Electionday
