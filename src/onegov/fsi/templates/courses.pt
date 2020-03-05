@@ -6,8 +6,8 @@
         <div class="row">
             <div class="columns small-12">
                 <div class="row">
-                    <div class="columns small-12">
-                        <tal:b tal:define="items layout.accordion_items(future_only=True)" tal:switch="items != ()">
+                    <div class="columns small-12" tal:define="future_only request.is_member">
+                        <tal:b tal:define="items layout.accordion_items(future_only=future_only)" tal:switch="items != ()">
                             <span tal:case="False" i18n:translate="">No entries found.</span>
                             <tal:b tal:case="True">
                                 <tal:b metal:use-macro="layout.macros['accordion']" />

@@ -182,6 +182,43 @@
     </tal:b>
 </metal:course_event_listing>
 
+<metal:events_check_listing define-macro="events_check_listing">
+    <tal:b tal:switch="events and True or False" tal:define="for_email for_email|False; show_course layout.model.course_id is None">
+        <tal:b tal:case="True">
+            <tal:b tal:condition="events">
+                <table class="tablesaw hover events-table fullwidth">
+                    <thead>
+                        <th i18n:translate tal:condition="show_course">Course</th>
+                        <th i18n:translate>Date</th>
+                        <th i18n:translate class="text-left">Start</th>
+                        <th i18n:translate class="text-left">End</th>
+                        <th i18n:translate class="text-left">Status</th>
+                        <th i18n:translate class="text-left">Subscriptions</th>
+                    </thead>
+                    <tbody>
+                        <tal:b tal:repeat="event events">
+                            <tr>
+                                <td tal:condition="show_course">${event.course.name}</td>
+                                <td class="no-wrap">
+                                    <a href="${request.link(event)}">
+                                        <strong>${layout.format_date(event.start, 'date_long')}</strong>
+                                    </a>
+                                </td>
+
+                                <td>${layout.format_date(event.start, 'time')}</td>
+                                <td>${layout.format_date(event.end, 'time')}</td>
+                                <td>${layout.format_status(event.status)}</td>
+                                <td><a href="${layout.subscriptions_link(event)}" i18n:translate="">Subscriptions</a></td>
+                            </tr>
+                        </tal:b>
+                    </tbody>
+                </table>
+            </tal:b>
+        </tal:b>
+        <p tal:case="False" i18n:translate="">No events found.</p>
+    </tal:b>
+</metal:events_check_listing>
+
 <metal:role_snippet define-macro="role_snippet">
     <h4 i18n:translate="">Roles</h4>
     <dl class="field-display">

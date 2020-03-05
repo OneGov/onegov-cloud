@@ -4,7 +4,8 @@ from onegov.fsi import FsiApp
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.audit import AuditCollection
 from onegov.fsi.collections.course import CourseCollection
-from onegov.fsi.collections.course_event import CourseEventCollection
+from onegov.fsi.collections.course_event import CourseEventCollection, \
+    PastCourseEventCollection
 from onegov.fsi.collections.notification_template import \
     CourseNotificationTemplateCollection
 from onegov.fsi.collections.reservation import ReservationCollection
@@ -28,11 +29,32 @@ def get_course_event_details(request, id):
 
 
 @FsiApp.path(
+    model=PastCourseEventCollection,
+    path='/fsi/past-events',
+    converters=dict(course_id=UUID, show_hidden=bool, sort_desc=bool)
+)
+def get_events_view(
+        request,
+        page=0,
+        show_hidden=True,
+        course_id=None,
+):
+    if not request.is_manager and show_hidden:
+        show_hidden = False
+
+    return PastCourseEventCollection(
+        request.session,
+        page=page,
+        show_hidden=show_hidden,
+        course_id=course_id,
+    )
+
+@FsiApp.path(
     model=CourseEventCollection,
     path='/fsi/events',
     converters=dict(
         upcoming_only=bool, past_only=bool, course_id=UUID, limit=int,
-        show_hidden=bool
+        show_hidden=bool, sort_desc=bool
     )
 )
 def get_events_view(
@@ -43,7 +65,8 @@ def get_events_view(
         past_only=False,
         limit=None,
         show_hidden=True,
-        course_id=None
+        course_id=None,
+        sort_desc=False
 ):
     if not request.is_manager and show_hidden:
         show_hidden = False
@@ -56,7 +79,8 @@ def get_events_view(
         past_only=past_only,
         limit=limit,
         show_hidden=show_hidden,
-        course_id=course_id
+        course_id=course_id,
+        sort_desc=sort_desc
     )
 
 

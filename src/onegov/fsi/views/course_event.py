@@ -1,6 +1,7 @@
 from onegov.core.security import Personal, Secret
 from onegov.fsi import FsiApp
-from onegov.fsi.collections.course_event import CourseEventCollection
+from onegov.fsi.collections.course_event import CourseEventCollection, \
+    PastCourseEventCollection
 from onegov.fsi.forms.course_event import CourseEventForm
 from onegov.fsi import _
 from onegov.fsi.layouts.course_event import EditCourseEventLayout, \
@@ -21,6 +22,20 @@ def view_course_event_collection(self, request):
         'layout': layout,
         'model': self,
         'events': self.query().all()
+    }
+
+
+@FsiApp.html(
+    model=PastCourseEventCollection,
+    template='past_course_events.pt',
+    permission=Personal,
+)
+def view_past_course_event_collection(self, request):
+    layout = CourseEventCollectionLayout(self, request)
+    return {
+        'layout': layout,
+        'model': self,
+        'events': self.batch,
     }
 
 
