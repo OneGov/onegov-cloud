@@ -1,11 +1,11 @@
 from datetime import date
-from onegov.ballot import Candidate
+from onegov.ballot import Candidate, List, ListResult
 from onegov.ballot import CandidateResult
 from onegov.ballot import ProporzElection
 from onegov.ballot import ElectionResult
 
 
-def test_candidate_percentages(session):
+def test_candidate_percentages_proporz(session):
     election = ProporzElection(
         title='Election',
         domain='federation',
@@ -156,43 +156,119 @@ def test_candidate_percentages(session):
             votes=10
         )
     )
+
+    # Add 5 lists
+    list_1 = List(
+        number_of_mandates=1,
+        list_id='1',
+        name='1'
+    )
+    list_2 = List(
+        list_id='2',
+        name='2'
+    )
+    list_3 = List(
+        list_id='3',
+        name='3'
+    )
+    list_4 = List(
+        list_id='4',
+        name='4'
+    )
+    list_5 = List(
+        list_id='5',
+        name='5'
+    )
+    election.lists.append(list_1)
+    election.lists.append(list_2)
+    election.lists.append(list_3)
+    election.lists.append(list_4)
+    election.lists.append(list_5)
     session.flush()
 
-    assert candidate_1.percentage_by_entity == {
-        1: {'counted': True, 'percentage': 100 * 50 / 1000},
-        2: {'counted': True, 'percentage': 100 * 30 / 1000},
-        3: {'counted': False, 'percentage': 0.0},
-        4: {'counted': True, 'percentage': 0.0}
-    }
-    assert candidate_2.percentage_by_entity == {
-        1: {'counted': True, 'percentage': 100 * 10 / 1000},
-        2: {'counted': True, 'percentage': 0.0},
-        3: {'counted': False, 'percentage': 0.0},
-        4: {'counted': True, 'percentage': 0.0}
-    }
-    assert candidate_3.percentage_by_entity == {
-        1: {'counted': True, 'percentage': 100 * 20 / 1000},
-        2: {'counted': True, 'percentage': 0.0},
-        3: {'counted': False, 'percentage': 0.0},
-        4: {'counted': True, 'percentage': 0.0}
-    }
-    assert candidate_4.percentage_by_entity == {
-        1: {'counted': True, 'percentage': 100 * 1 / 1000},
-        2: {'counted': True, 'percentage': 0.0},
-        3: {'counted': False, 'percentage': 0.0},
-        4: {'counted': True, 'percentage': 0.0}
-    }
-    assert candidate_5.percentage_by_entity == {
-        1: {'counted': True, 'percentage': 0.0},
-        2: {'counted': True, 'percentage': 100 * 5 / 1000},
-        3: {'counted': False, 'percentage': 0.0},
-        4: {'counted': True, 'percentage': 0.0}
-    }
+    # Add the list results to the first entity
+    election_result_1.list_results.append(
+        ListResult(
+            list_id=list_1.id,
+            votes=52,
+        )
+    )
+    election_result_1.list_results.append(
+        ListResult(
+            list_id=list_2.id,
+            votes=11
+        )
+    )
+    election_result_1.list_results.append(
+        ListResult(
+            list_id=list_3.id,
+            votes=20
+        )
+    )
+    election_result_1.list_results.append(
+        ListResult(
+            list_id=list_4.id,
+            votes=1
+        )
+    )
+    election_result_1.list_results.append(
+        ListResult(
+            list_id=list_5.id,
+            votes=0
+        )
+    )
+
+    # Add only two list results to the second entity.
+    election_result_2.list_results.append(
+        ListResult(
+            list_id=list_1.id,
+            votes=20
+        )
+    )
+    election_result_2.list_results.append(
+        ListResult(
+            list_id=list_5.id,
+            votes=5
+        )
+    )
+
+    # Add only one list results to the last entity
+    election_result_4.list_results.append(
+        ListResult(
+            list_id=list_1.id,
+            votes=10
+        )
+    )
+    er1_list_votes = 52+11+20+1
+    er2_list_votes = 20+5
+    er4_list_votes = 10
+    session.flush()
+
+    def round_(votes, total):
+        return round(100 * votes / total, 2)
+
+    assert election.list_votes_by_entity.all() == [
+        ('election', 1, True, er1_list_votes),
+        ('election', 2, True, er2_list_votes),
+        ('election', 3, False, 0),
+        ('election', 4, True, er4_list_votes)
+    ]
+
+    assert election.list_votes_by_district.all() == [
+        ('election', '1', [1, 2], True, er1_list_votes+er2_list_votes),
+        ('election', '2', [3, 4], False, er4_list_votes)
+    ]
+
+    # election result 1 and 2 are belonging to district 1
+    tot = er1_list_votes + er2_list_votes
+    assert tot == 109
 
     assert candidate_1.percentage_by_district == {
-        '1': {'counted': True, 'entities': [1, 2], 'percentage': 8000 / 2000},
+        '1': {'counted': True, 'entities': [1, 2],
+              'percentage': round_(50 + 30, 109)},
         '2': {'counted': False, 'entities': [3, 4], 'percentage': 0.0}
     }
+
     assert candidate_2.percentage_by_district == {
         '1': {'counted': True, 'entities': [1, 2], 'percentage': 0.0},
         '2': {'counted': False, 'entities': [3, 4], 'percentage': 0.0}
@@ -206,6 +282,39 @@ def test_candidate_percentages(session):
         '2': {'counted': False, 'entities': [3, 4], 'percentage': 0.0}
     }
     assert candidate_5.percentage_by_district == {
-        '1': {'counted': True, 'entities': [1, 2], 'percentage': 500 / 2000},
+        '1': {'counted': True, 'entities': [1, 2],
+              'percentage': round_(5, tot)},
         '2': {'counted': False, 'entities': [3, 4], 'percentage': 0.0}
     }
+
+    assert candidate_1.percentage_by_entity == {
+        1: {'counted': True, 'percentage': round_(50, er1_list_votes)},
+        2: {'counted': True, 'percentage': round_(30, er2_list_votes)},
+        3: {'counted': False, 'percentage': 0.0},
+        4: {'counted': True, 'percentage': 100.0}
+    }
+    assert candidate_2.percentage_by_entity == {
+        1: {'counted': True, 'percentage': round_(10, er1_list_votes)},
+        2: {'counted': True, 'percentage': 0.0},
+        3: {'counted': False, 'percentage': 0.0},
+        4: {'counted': True, 'percentage': 0.0}
+    }
+    assert candidate_3.percentage_by_entity == {
+        1: {'counted': True, 'percentage': round_(20, er1_list_votes)},
+        2: {'counted': True, 'percentage': 0.0},
+        3: {'counted': False, 'percentage': 0.0},
+        4: {'counted': True, 'percentage': 0.0}
+    }
+    assert candidate_4.percentage_by_entity == {
+        1: {'counted': True, 'percentage': round_(1, er1_list_votes)},
+        2: {'counted': True, 'percentage': 0.0},
+        3: {'counted': False, 'percentage': 0.0},
+        4: {'counted': True, 'percentage': 0.0}
+    }
+    assert candidate_5.percentage_by_entity == {
+        1: {'counted': True, 'percentage': 0.0},
+        2: {'counted': True, 'percentage': round_(5, er2_list_votes)},
+        3: {'counted': False, 'percentage': 0.0},
+        4: {'counted': True, 'percentage': 0.0}
+    }
+

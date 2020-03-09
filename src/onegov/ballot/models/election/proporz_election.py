@@ -10,7 +10,7 @@ from onegov.ballot.models.election.list_result import ListResult
 from onegov.ballot.models.election.party_result import PartyResult
 from onegov.ballot.models.election.panachage_result import PanachageResult
 from onegov.ballot.models.election.mixins import PartyResultExportMixin
-from sqlalchemy import cast
+from sqlalchemy import cast, func
 from sqlalchemy import desc
 from sqlalchemy import String
 from sqlalchemy.orm import aliased
@@ -96,6 +96,51 @@ class ProporzElection(Election, PartyResultExportMixin):
         cascade='all, delete-orphan',
         lazy='dynamic',
     )
+
+    @property
+    def list_votes_by_entity(self):
+        results = self.results.order_by(None)
+        results = results.outerjoin(ListResult)
+        results = results.with_entities(
+            self.__class__.id.label('election_id'),
+            ElectionResult.entity_id,
+            ElectionResult.counted,
+            func.coalesce(func.sum(ListResult.votes), 0).label('votes')
+        )
+        results = results.group_by(
+            ElectionResult.entity_id,
+            ElectionResult.counted,
+            self.__class__.id.label('election_id')
+        )
+        return results
+
+    @property
+    def list_votes_by_district(self):
+        results = self.results.order_by(None)
+        results = results.outerjoin(ListResult)
+        results = results.with_entities(
+            self.__class__.id.label('election_id'),
+            ElectionResult.district,
+            func.array_agg(
+                ElectionResult.entity_id.distinct()).label('entities'),
+            func.coalesce(
+                func.bool_and(ElectionResult.counted), False
+            ).label('counted'),
+            func.coalesce(func.sum(ListResult.votes), 0).label('votes')
+        )
+        results = results.group_by(
+            ElectionResult.district,
+            self.__class__.id.label('election_id')
+        )
+        return results
+
+    @property
+    def votes_by_district(self):
+        return self.list_votes_by_district
+
+    @property
+    def votes_by_entity(self):
+        return self.list_votes_by_entity
 
     @property
     def polymorphic_base(self):
