@@ -157,20 +157,44 @@ class List(Base, TimestampMixin):
 
         """
 
-        results = self.election.results
+        results = self.election.results.order_by(None)
         results = results.join(ElectionResult.list_results)
         results = results.filter(ListResult.list_id == self.id)
-        results = results.with_entities(
-            ElectionResult.district.label('name'),
-            func.array_agg(ElectionResult.entity_id).label('entities'),
-            func.coalesce(
-                func.bool_and(ElectionResult.counted), False
-            ).label('counted'),
-            func.sum(ElectionResult.accounted_votes).label('total'),
-            func.sum(ListResult.votes).label('votes'),
-        )
-        results = results.group_by(ElectionResult.district)
-        results = results.order_by(None)
+
+        if self.election.type == 'proporz':
+            totals_by_district = self.election.votes_by_district.subquery()
+            results = results.with_entities(
+                ElectionResult.district.label('name'),
+                func.sum(ListResult.votes).label('votes'),
+            )
+            results = results.group_by(ElectionResult.district)
+            results_sub = results.subquery()
+
+            session = object_session(self)
+            query = session.query(
+                results_sub.c.name,
+                totals_by_district.c.entities,
+                totals_by_district.c.counted,
+                totals_by_district.c.votes.label('total'),
+                results_sub.c.votes
+            )
+            results = query.join(
+                totals_by_district,
+                totals_by_district.c.district == results_sub.c.name
+            )
+
+        else:
+            results = results.with_entities(
+                ElectionResult.district.label('name'),
+                func.array_agg(ElectionResult.entity_id).label('entities'),
+                func.coalesce(
+                    func.bool_and(ElectionResult.counted), False
+                ).label('counted'),
+                func.sum(ElectionResult.accounted_votes).label('total'),
+                func.sum(ListResult.votes).label('votes'),
+            )
+            results = results.group_by(ElectionResult.district)
+
         results = results.all()
         percentage = {
             r.name: {
