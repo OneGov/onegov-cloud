@@ -85,16 +85,39 @@ class Candidate(Base, TimestampMixin):
         entities and entities with no results available.
 
         """
-
-        results = self.election.results
+        results = self.election.results.order_by(None)
         results = results.join(ElectionResult.candidate_results)
         results = results.filter(CandidateResult.candidate_id == self.id)
-        results = results.with_entities(
-            ElectionResult.entity_id.label('id'),
-            ElectionResult.counted.label('counted'),
-            ElectionResult.accounted_ballots.label('total'),
-            CandidateResult.votes.label('votes')
-        )
+
+        if self.election.type == 'proporz':
+            totals_by_entity = self.election.votes_by_entity.subquery()
+
+            results = results.with_entities(
+                ElectionResult.entity_id.label('id'),
+                ElectionResult.counted.label('counted'),
+                CandidateResult.votes.label('votes')
+            )
+            results_sub = results.subquery()
+
+            session = object_session(self)
+            query = session.query(
+                results_sub.c.id, results_sub.c.counted,
+                totals_by_entity.c.votes.label('total'),
+                results_sub.c.votes
+            )
+            results = query.join(
+                totals_by_entity,
+                totals_by_entity.c.entity_id == results_sub.c.id
+            )
+
+        else:
+            results = results.with_entities(
+                ElectionResult.entity_id.label('id'),
+                ElectionResult.counted.label('counted'),
+                ElectionResult.accounted_ballots.label('total'),
+                CandidateResult.votes.label('votes')
+            )
+
         percentage = {
             r.id: {
                 'counted': r.counted,
