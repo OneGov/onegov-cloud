@@ -14,6 +14,10 @@ from webtest import TestApp as Client
 from webtest.forms import Upload
 
 
+def round_(n, z):
+    return round(100 * n / z, 2)
+
+
 def test_view_election_redirect(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
@@ -78,9 +82,9 @@ def test_view_election_candidate_by_entity(election_day_app_gr):
             for option in view.pyquery('option')
         }
         assert data['Engler']['3503']['counted'] is True
-        assert isclose(data['Engler']['3503']['percentage'], 100 * 20 / 21)
+        assert data['Engler']['3503']['percentage'] == round_(20, 21)
         assert data['Schmid']['3503']['counted'] is True
-        assert isclose(data['Schmid']['3503']['percentage'], 100 * 18 / 21)
+        assert data['Schmid']['3503']['percentage'] == round_(18, 21)
 
     for url in (
         '/election/proporz-election/candidate-by-entity',
@@ -95,7 +99,7 @@ def test_view_election_candidate_by_entity(election_day_app_gr):
             for option in view.pyquery('option')
         }
         assert data['Caluori']['3503']['counted'] is True
-        assert isclose(data['Caluori']['3503']['percentage'], 100 * 2 / 31)
+        assert data['Caluori']['3503']['percentage'] == round_(2, 14)
         assert data['Casanova']['3503']['counted'] is True
         assert data['Casanova']['3503']['percentage'] == 0.0
 
@@ -234,9 +238,9 @@ def test_view_election_list_by_entity(election_day_app_gr):
             for option in view.pyquery('option')
         }
         assert data['CVP']['3503']['counted'] is True
-        assert data['CVP']['3503']['percentage'] == 100 * 6 / 153
+        assert data['CVP']['3503']['percentage'] == round_(6, 14)
         assert data['FDP']['3503']['counted'] is True
-        assert data['FDP']['3503']['percentage'] == 100 * 8 / 153
+        assert data['FDP']['3503']['percentage'] == round_(8, 14)
 
 
 def test_view_election_list_by_district(election_day_app_gr):
