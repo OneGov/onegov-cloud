@@ -180,6 +180,8 @@ class Canton(Principal):
             if self.id == 'sg':
                 return _("district_label_sg", default="Constituency")
             if self.id == 'sz':
+                if date.today().year >= 2020:
+                    return _("district_label_sz_2020", default="District")
                 return _("district_label_sz", default="District")
             return _("district_label_default", default="Constituency")
         if value == 'districts':
@@ -188,6 +190,8 @@ class Canton(Principal):
             if self.id == 'sg':
                 return _("districts_label_sg", default="Constituencies")
             if self.id == 'sz':
+                if date.today().year >= 2020:
+                    return _("districts_label_sz_2020", default="District")
                 return _("districts_label_sz", default="Districts")
             return _("districts_label_default", default="Constituencies")
         return ''
