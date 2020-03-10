@@ -96,7 +96,7 @@ def test_view_election_candidate_by_entity(election_day_app_gr):
             for option in view.pyquery('option')
         }
         assert data['Caluori']['3503']['counted'] is True
-        assert isclose(data['Caluori']['3503']['percentage'], 100 * 2 / 14)
+        assert data['Caluori']['3503']['percentage'] == round(100 * 2 / 14, 2)
         assert data['Casanova']['3503']['counted'] is True
         assert data['Casanova']['3503']['percentage'] == 0.0
 
