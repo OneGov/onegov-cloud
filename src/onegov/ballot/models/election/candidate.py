@@ -234,29 +234,50 @@ class Candidate(Base, TimestampMixin):
         results = results.join(ElectionResult.candidate_results)
         results = results.filter(CandidateResult.candidate_id == self.id)
         results = results.with_entities(
-            ElectionResult.entity_id.label('id'),
-            ElectionResult.counted.label('counted'),
-            ElectionResult.accounted_votes.label('total'),
-            CandidateResult.votes.label('votes')
+            ElectionResult.district.label('name'),
+            func.array_agg(ElectionResult.entity_id).label('entities'),
+            func.coalesce(
+                func.bool_and(ElectionResult.counted), False
+            ).label('counted'),
+            func.sum(ElectionResult.accounted_votes).label('total'),
+            func.sum(CandidateResult.votes).label('votes'),
         )
+        results = results.group_by(ElectionResult.district)
+        results = results.order_by(None)
+        results = results.all()
         percentage = {
-            r.id: {
+            r.name: {
                 'counted': r.counted,
+                'entities': r.entities,
                 'percentage': 100 * (r.votes / r.total) if r.total else 0.0
             } for r in results
         }
 
         empty = self.election.results
         empty = empty.with_entities(
-            ElectionResult.entity_id.label('id'),
-            ElectionResult.counted.label('counted')
+            ElectionResult.district.label('name'),
+            func.array_agg(ElectionResult.entity_id).label('entities'),
+            func.coalesce(
+                func.bool_and(ElectionResult.counted), False
+            ).label('counted')
         )
-        empty = empty.filter(
-            ElectionResult.entity_id.notin_([r.id for r in results])
-        )
-        percentage.update({
-            r.id: {'counted': r.counted, 'percentage': 0.0} for r in empty}
-        )
+        empty = empty.group_by(ElectionResult.district)
+        empty = empty.order_by(None)
+        for result in empty:
+            update = (
+                result.name not in percentage
+                or (
+                    set(percentage[result.name]['entities'])
+                    != set(result.entities)
+                )
+            )
+            if update:
+                percentage[result.name] = {
+                    'counted': result.counted,
+                    'entities': result.entities,
+                    'percentage': 0.0
+                }
+
         return percentage
 
     @property
