@@ -132,7 +132,7 @@
             <tr tal:repeat="election election_compound.elections">
                 <td class="left-aligned"><a href="${request.link(election)}">${election.district}</a></td>
                 <td class="right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress (election.allocated_mandates(consider_completed=True), election.number_of_mandates)" /></td>
-                <td class="right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress election.progress" /></td>
+                <td class="right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress election.progress; enable_y_n True" /></td>
             </tr>
         </tbody>
     </table>
@@ -320,7 +320,7 @@
 
 <metal:progress define-macro="progress" i18n:domain="onegov.election_day">
     <tal:b i18n:translate="" condition="progress[1]">
-        <tal:b tal:switch="progress[0] in (0, 1) and progress[1] == 1">
+        <tal:b tal:switch="enable_y_n|False and progress[0] in (0, 1) and progress[1] == 1">
             <tal:b tal:case="False">
                 <span tal:replace="progress[0]" i18n:name='counted' />
                 of
