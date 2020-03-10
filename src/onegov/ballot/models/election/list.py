@@ -10,7 +10,7 @@ from sqlalchemy import func
 from sqlalchemy import Integer
 from sqlalchemy import select
 from sqlalchemy import Text
-from sqlalchemy.orm import backref
+from sqlalchemy.orm import backref, object_session
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
@@ -98,16 +98,37 @@ class List(Base, TimestampMixin):
         entities and entities with no results available.
 
         """
-
         results = self.election.results
         results = results.join(ElectionResult.list_results)
         results = results.filter(ListResult.list_id == self.id)
-        results = results.with_entities(
-            ElectionResult.entity_id.label('id'),
-            ElectionResult.counted.label('counted'),
-            ElectionResult.accounted_votes.label('total'),
-            ListResult.votes.label('votes')
-        )
+
+        if self.election.type == 'proporz':
+            totals_by_entity = self.election.votes_by_entity.subquery()
+            results = results.with_entities(
+                ElectionResult.entity_id.label('id'),
+                ElectionResult.counted.label('counted'),
+                ListResult.votes.label('votes')
+            )
+            results_sub = results.subquery()
+
+            session = object_session(self)
+            query = session.query(
+                results_sub.c.id, results_sub.c.counted,
+                totals_by_entity.c.votes.label('total'),
+                results_sub.c.votes
+            )
+            results = query.join(
+                totals_by_entity,
+                totals_by_entity.c.entity_id == results_sub.c.id
+            )
+        else:
+            results = results.with_entities(
+                ElectionResult.entity_id.label('id'),
+                ElectionResult.counted.label('counted'),
+                ElectionResult.accounted_ballots.label('total'),
+                ListResult.votes.label('votes')
+            )
+
         results = results.all()
         percentage = {
             r.id: {
