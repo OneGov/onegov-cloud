@@ -274,38 +274,6 @@ class Election(Base, ContentMixin, TimestampMixin,
     distinct = meta_property('distinct', default=True)
 
     @property
-    def votes_by_entity(self):
-        raise NotImplementedError
-
-    @property
-    def votes_by_district(self):
-        raise NotImplementedError
-
-    @property
-    def candidate_results(self):
-        """
-        Returns a query for all results of the current election and
-        aggregates the candidate results. If no candidate results are linked,
-        0 is returned for votes_by_entity and votes_by_district.
-
-        """
-        results = self.results
-        results = results.outerjoin(CandidateResult)
-        results = results.with_entities(
-            ElectionResult.id.label('election_result_id'),
-            ElectionResult.entity_id,
-            ElectionResult.district,
-            ElectionResult.counted,
-            CandidateResult.candidate_id,
-            func.coalesce(func.sum(CandidateResult.votes).over(partition_by=(
-                ElectionResult.entity_id,
-                CandidateResult.candidate_id)), 0).label('votes_by_entity'),
-            func.coalesce(func.sum(CandidateResult.votes).over(partition_by=(
-                ElectionResult.district)), 0).label('votes_by_district'),
-        )
-        return results
-
-    @property
     def district(self):
         """ Returns the district name, if this is a `distinct` election.
         Requires results to be present.

@@ -5,7 +5,7 @@ from onegov.ballot import ProporzElection
 from onegov.ballot import ElectionResult
 
 
-def test_list_percentages_proporz(session):
+def test_list_percentages(session):
     election = ProporzElection(
         title='Election',
         domain='federation',
