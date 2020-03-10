@@ -283,6 +283,43 @@ class Election(Base, ContentMixin, TimestampMixin,
         if result:
             return result.district or result.name
 
+    # @property
+    # def votes_by_entity(self):
+    #     results = self.results.order_by(None)
+    #     results = results.with_entities(
+    #         self.__class__.id.label('election_id'),
+    #         ElectionResult.entity_id,
+    #         ElectionResult.counted,
+    #         func.coalesce(
+    #             func.sum(ElectionResult.accounted_ballots), 0).label('votes')
+    #     )
+    #     results = results.group_by(
+    #         ElectionResult.entity_id,
+    #         ElectionResult.counted,
+    #         self.__class__.id.label('election_id')
+    #     )
+    #     return results
+
+    @property
+    def votes_by_district(self):
+        results = self.results.order_by(None)
+        results = results.with_entities(
+            self.__class__.id.label('election_id'),
+            ElectionResult.district,
+            func.array_agg(
+                ElectionResult.entity_id.distinct()).label('entities'),
+            func.coalesce(
+                func.bool_and(ElectionResult.counted), False
+            ).label('counted'),
+            func.coalesce(
+                func.sum(ElectionResult.accounted_ballots), 0).label('votes')
+        )
+        results = results.group_by(
+            ElectionResult.district,
+            self.__class__.id.label('election_id')
+        )
+        return results
+
     def clear_results(self):
         """ Clears all the results. """
 

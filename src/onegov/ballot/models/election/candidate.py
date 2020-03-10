@@ -10,7 +10,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import select
 from sqlalchemy import Text
-from sqlalchemy.orm import backref
+from sqlalchemy.orm import backref, object_session
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
@@ -121,21 +121,52 @@ class Candidate(Base, TimestampMixin):
         uncounted districts and districts with no results available.
 
         """
-
         results = self.election.results
         results = results.join(ElectionResult.candidate_results)
         results = results.filter(CandidateResult.candidate_id == self.id)
-        results = results.with_entities(
-            ElectionResult.district.label('name'),
-            func.array_agg(ElectionResult.entity_id).label('entities'),
-            func.coalesce(
-                func.bool_and(ElectionResult.counted), False
-            ).label('counted'),
-            func.sum(ElectionResult.accounted_ballots).label('total'),
-            func.sum(CandidateResult.votes).label('votes'),
-        )
-        results = results.group_by(ElectionResult.district)
-        results = results.order_by(None)
+
+        if self.election.type == 'proporz':
+
+            totals_by_district = self.election.votes_by_district.subquery()
+
+            results = results.with_entities(
+                ElectionResult.district.label('name'),
+                func.array_agg(ElectionResult.entity_id).label('entities'),
+                func.coalesce(
+                    func.bool_and(ElectionResult.counted), False
+                ).label('counted'),
+                func.sum(CandidateResult.votes).label('votes'),
+            )
+            results = results.group_by(ElectionResult.district)
+            results = results.order_by(None)
+
+            results_sub = results.subquery()
+
+            session = object_session(self)
+            query = session.query(
+                results_sub.c.name, results_sub.c.entities,
+                results_sub.c.counted,
+                totals_by_district.c.votes.label('total'),
+                results_sub.c.votes
+            )
+            results = query.join(
+                totals_by_district,
+                totals_by_district.c.district == results_sub.c.name
+            )
+
+        else:
+            results = results.with_entities(
+                ElectionResult.district.label('name'),
+                func.array_agg(ElectionResult.entity_id).label('entities'),
+                func.coalesce(
+                    func.bool_and(ElectionResult.counted), False
+                ).label('counted'),
+                func.sum(ElectionResult.accounted_ballots).label('total'),
+                func.sum(CandidateResult.votes).label('votes'),
+            )
+            results = results.group_by(ElectionResult.district)
+            results = results.order_by(None)
+
         results = results.all()
         percentage = {
             r.name: {
