@@ -1,8 +1,22 @@
 # Changes
 
+## Release `2020.31`
+
+> commits: **1 / [10b8e57d50...10b8e57d50](https://github.com/OneGov/onegov-cloud/compare/10b8e57d50^...10b8e57d50)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.31)](https://buildkite.com/seantis/onegov-cloud)
+
+### Electionday
+
+✨ **Fixes candidate percentages by-entity and by-district**
+
+Majorz by district is using accounted_votes instead of accounted ballots. For proporz election, the total as devider for candidate votes is using `ListResult.votes`
+
+**`Fix`** | **[10b8e57d50](https://github.com/onegov/onegov-cloud/commit/10b8e57d50e53cf3f5d2ce9ae5e0da30e81dbbc8)**
+
 ## Release `2020.30`
 
-> commits: **2 / [edeff88f92...636069e476](https://github.com/OneGov/onegov-cloud/compare/edeff88f92^...636069e476)**<br>
+> released: **2020-03-05 16:12**<br>
+> commits: **3 / [edeff88f92...ca149c611f](https://github.com/OneGov/onegov-cloud/compare/edeff88f92^...ca149c611f)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.30)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Fsi
