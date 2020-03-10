@@ -320,9 +320,18 @@
 
 <metal:progress define-macro="progress" i18n:domain="onegov.election_day">
     <tal:b i18n:translate="" condition="progress[1]">
-        <span tal:replace="progress[0]" i18n:name='counted' />
-            of
-        <span tal:replace="progress[1]" i18n:name='total' />
+        <tal:b tal:switch="progress[0] in (0, 1) and progress[1] == 1">
+            <tal:b tal:case="False">
+                <span tal:replace="progress[0]" i18n:name='counted' />
+                of
+                <span tal:replace="progress[1]" i18n:name='total' />
+            </tal:b>
+            <tal:b tal:case="True">
+                <span tal:condition="progress[0] == 0" i18n:translate="">No</span>
+                <span tal:condition="progress[0] == 1" i18n:translate="">Yes</span>
+            </tal:b>
+        </tal:b>
+
     </tal:b>
 </metal:progress>
 
