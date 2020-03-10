@@ -10,7 +10,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import select
 from sqlalchemy import Text
-from sqlalchemy.orm import backref
+from sqlalchemy.orm import backref, object_session
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
@@ -60,6 +60,18 @@ class Candidate(Base, TimestampMixin):
         lazy='dynamic',
     )
 
+    @property
+    def results_by_district(self):
+        results = self.results.join(ElectionResult)
+        results = results.with_entities(
+            ElectionResult.district,
+            func.array_agg(ElectionResult.entity_id).label('entities'),
+            func.sum(CandidateResult.votes).label('votes')
+        )
+        results = results.group_by(ElectionResult.district)
+        results = results.order_by(None)
+        return results
+
     #: the total votes
     votes = summarized_property('votes')
 
@@ -81,10 +93,142 @@ class Candidate(Base, TimestampMixin):
 
     @property
     def percentage_by_entity(self):
-        """ Returns the percentage of votes by the entity. Includes uncounted
-        entities and entities with no results available.
+        if self.election.type == 'proporz':
+            return self.percentage_by_entity_proporz
+        return self.percentage_by_entity_majorz
+
+
+    @property
+    def votes_by_entity_proporz(self):
+        session = object_session(self)
+        cr = self.election.candidate_results
+        cr = cr.filter(CandidateResult.candidate_id == self.id).subquery()
+        lve = self.election.votes_by_entity.subquery()
+
+        results = session.query(
+            cr.c.entity_id.label('id'),
+            cr.c.counted,
+            cr.c.votes_by_entity.label('votes'),
+            lve.c.votes.label('total'),
+        )
+        results = results.join(lve, lve.c.entity_id == cr.c.entity_id)
+        return results
+
+    @property
+    def percentage_by_entity_proporz(self):
+        results = self.votes_by_entity_proporz
+        percentage = {
+            r.id: {
+                'counted': r.counted,
+                'percentage': round(
+                    100 * (r.votes / r.total), 2) if r.total else 0.0
+            } for r in results
+        }
+
+        empty = self.election.results
+        empty = empty.with_entities(
+            ElectionResult.entity_id.label('id'),
+            ElectionResult.counted.label('counted')
+        )
+        empty = empty.filter(
+            ElectionResult.entity_id.notin_([r.id for r in results])
+        )
+        percentage.update({
+            r.id: {'counted': r.counted, 'percentage': 0.0} for r in empty}
+        )
+        return percentage
+
+    @property
+    def percentage_by_district(self):
+        if self.election.type == 'proporz':
+            return self.percentage_by_district_proporz
+        return self.percentage_by_district_majorz
+
+
+    @property
+    def percentage_by_district_proporz(self):
+        """ Returns the percentage of votes aggregated by the distict. Includes
+        uncounted districts and districts with no results available.
 
         """
+
+        totals_by_district = self.election.votes_by_district.subquery()
+        results = self.election.results
+        results = results.join(ElectionResult.candidate_results)
+        results = results.join(
+            totals_by_district,
+            totals_by_district.c.district == ElectionResult.district
+        )
+        results = results.filter(CandidateResult.candidate_id == self.id)
+
+        results = results.with_entities(
+            ElectionResult.district.label('name'),
+            func.array_agg(
+                ElectionResult.entity_id.distinct()).label('entities'),
+            func.coalesce(
+                func.bool_and(ElectionResult.counted), False
+            ).label('counted'),
+            func.sum(CandidateResult.votes).label('votes')
+        )
+        results = results.group_by(
+            ElectionResult.district,
+        )
+        results = results.order_by(None)
+
+        candidate_results = results.subquery()
+
+        session = object_session(self)
+
+        query = session.query(
+            candidate_results.c.name,
+            candidate_results.c.entities,
+            candidate_results.c.counted,
+            candidate_results.c.votes,
+            totals_by_district.c.votes.label('total')
+        )
+        query = query.join(
+            totals_by_district,
+            totals_by_district.c.district == candidate_results.c.name
+        )
+
+        percentage = {
+            r.name: {
+                'counted': r.counted,
+                'entities': r.entities,
+                'percentage': round(
+                    100 * (r.votes / r.total), 2) if r.total else 0.0
+            } for r in query
+        }
+
+        empty = self.election.results
+        empty = empty.with_entities(
+            ElectionResult.district.label('name'),
+            func.array_agg(ElectionResult.entity_id).label('entities'),
+            func.coalesce(
+                func.bool_and(ElectionResult.counted), False
+            ).label('counted')
+        )
+        empty = empty.group_by(ElectionResult.district)
+        empty = empty.order_by(None)
+        for result in empty:
+            update = (
+                    result.name not in percentage
+                    or (
+                            set(percentage[result.name]['entities'])
+                            != set(result.entities)
+                    )
+            )
+            if update:
+                percentage[result.name] = {
+                    'counted': result.counted,
+                    'entities': result.entities,
+                    'percentage': 0.0
+                }
+
+        return percentage
+
+    @property
+    def percentage_by_entity_majorz(self):
 
         results = self.election.results
         results = results.join(ElectionResult.candidate_results)
@@ -92,7 +236,7 @@ class Candidate(Base, TimestampMixin):
         results = results.with_entities(
             ElectionResult.entity_id.label('id'),
             ElectionResult.counted.label('counted'),
-            ElectionResult.accounted_ballots.label('total'),
+            ElectionResult.accounted_votes.label('total'),
             CandidateResult.votes.label('votes')
         )
         percentage = {
@@ -116,7 +260,7 @@ class Candidate(Base, TimestampMixin):
         return percentage
 
     @property
-    def percentage_by_district(self):
+    def percentage_by_district_majorz(self):
         """ Returns the percentage of votes aggregated by the distict. Includes
         uncounted districts and districts with no results available.
 
@@ -131,7 +275,7 @@ class Candidate(Base, TimestampMixin):
             func.coalesce(
                 func.bool_and(ElectionResult.counted), False
             ).label('counted'),
-            func.sum(ElectionResult.accounted_ballots).label('total'),
+            func.sum(ElectionResult.accounted_votes).label('total'),
             func.sum(CandidateResult.votes).label('votes'),
         )
         results = results.group_by(ElectionResult.district)

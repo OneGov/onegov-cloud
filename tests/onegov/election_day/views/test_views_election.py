@@ -77,10 +77,11 @@ def test_view_election_candidate_by_entity(election_day_app_gr):
             option.text.split(' ')[0]: client.get(option.attrib['value']).json
             for option in view.pyquery('option')
         }
+        # 2 is the number of mandates, 41 accounted_votes
         assert data['Engler']['3503']['counted'] is True
-        assert isclose(data['Engler']['3503']['percentage'], 100 * 20 / 21)
+        assert isclose(data['Engler']['3503']['percentage'], 100 * 20 / 41)
         assert data['Schmid']['3503']['counted'] is True
-        assert isclose(data['Schmid']['3503']['percentage'], 100 * 18 / 21)
+        assert isclose(data['Schmid']['3503']['percentage'], 100 * 18 / 41)
 
     for url in (
         '/election/proporz-election/candidate-by-entity',
@@ -95,7 +96,7 @@ def test_view_election_candidate_by_entity(election_day_app_gr):
             for option in view.pyquery('option')
         }
         assert data['Caluori']['3503']['counted'] is True
-        assert isclose(data['Caluori']['3503']['percentage'], 100 * 2 / 31)
+        assert data['Caluori']['3503']['percentage'] == round(100 * 2 / 14, 2)
         assert data['Casanova']['3503']['counted'] is True
         assert data['Casanova']['3503']['percentage'] == 0.0
 
