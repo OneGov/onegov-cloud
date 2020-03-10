@@ -133,7 +133,9 @@ class List(Base, TimestampMixin):
         percentage = {
             r.id: {
                 'counted': r.counted,
-                'percentage': 100 * (r.votes / r.total) if r.total else 0.0
+                'votes': r.votes,
+                'percentage': round(
+                    100 * (r.votes / r.total), 2) if r.total else 0.0
             } for r in results
         }
 
@@ -146,7 +148,11 @@ class List(Base, TimestampMixin):
             ElectionResult.entity_id.notin_([r.id for r in results])
         )
         percentage.update({
-            r.id: {'counted': r.counted, 'percentage': 0.0} for r in empty}
+            r.id: {
+                'counted': r.counted,
+                'percentage': 0.0,
+                'votes': 0.0
+            } for r in empty}
         )
         return percentage
 
@@ -200,7 +206,9 @@ class List(Base, TimestampMixin):
             r.name: {
                 'counted': r.counted,
                 'entities': r.entities,
-                'percentage': 100 * (r.votes / r.total) if r.total else 0.0
+                'votes': r.votes,
+                'percentage': round(
+                    100 * (r.votes / r.total), 2) if r.total else 0.0
             } for r in results
         }
 
@@ -226,7 +234,8 @@ class List(Base, TimestampMixin):
                 percentage[result.name] = {
                     'counted': result.counted,
                     'entities': result.entities,
-                    'percentage': 0.0
+                    'percentage': 0.0,
+                    'votes': 0.0
                 }
 
         return percentage
