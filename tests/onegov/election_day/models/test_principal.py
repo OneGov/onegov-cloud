@@ -367,12 +367,23 @@ def test_principal_label(election_day_app):
     ):
         assert translate(principal.label(label), locale) == result
 
+    with freeze_time("2019-10-12 00:00"):
+        principal = Canton(name='sz', canton='sz')
+        for label, locale, result in (
+            ('entity', 'de_CH', 'Gemeinde'),
+            ('entities', 'de_CH', 'Gemeinden'),
+            ('district', 'de_CH', 'Bezirk'),
+            ('districts', 'de_CH', 'Bezirke'),
+        ):
+            assert translate(principal.label(label), locale) == result
+
+    # In 2020, sz have one entity per district so that the apear as the same
     principal = Canton(name='sz', canton='sz')
     for label, locale, result in (
         ('entity', 'de_CH', 'Gemeinde'),
         ('entities', 'de_CH', 'Gemeinden'),
-        ('district', 'de_CH', 'Bezirk'),
-        ('districts', 'de_CH', 'Bezirke'),
+        ('district', 'de_CH', 'Gemeinde'),
+        ('districts', 'de_CH', 'Gemeinden'),
     ):
         assert translate(principal.label(label), locale) == result
 
