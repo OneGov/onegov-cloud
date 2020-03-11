@@ -343,12 +343,6 @@ def upload_majorz_election(client, create=True, canton='gr', status='unknown'):
         'candidate_party,'
         '\n'
     )
-    # received ballots = 25
-    # invalid ballots = 0
-    # blank ballots = 4
-    # blank votes = 1
-    # invalid votes = 0
-    # accounted_votes = ((25 - 4) * 2) - 1 = 41
     if canton == 'gr':
         csv += (
             f'{status},,3503,True,56,25,0,4,1,0,1,True,Engler,Stefan,20,\n'
