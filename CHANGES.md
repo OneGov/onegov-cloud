@@ -1,8 +1,28 @@
 # Changes
 
+## Release `2020.34`
+
+> commits: **1 / [9dceb83c5b...9dceb83c5b](https://github.com/OneGov/onegov-cloud/compare/9dceb83c5b^...9dceb83c5b)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.34)](https://buildkite.com/seantis/onegov-cloud)
+
+### Electionday
+
+🎉 **Adaptions for SZ Elections**
+
+In SZ since 2020, entity and district are named the same. For elections of a compound (Kantonsratswahl), the UI has to be changed.
+
+- Changes canton district label starting 2020 using translations
+- Introduces property `district_are_entities` on `ElectionLayout`
+- Changes `statistics_table` to remove district column if `district_are_entities`  is True
+- Hides `candidate-by-district` if `district_are_entities` is True (the are the same)
+- Changes progress macro to display e.g. "Yes" instead of "1 of 1" if flagged
+
+**`Feature`** | **[9dceb83c5b](https://github.com/onegov/onegov-cloud/commit/9dceb83c5b01dc2f128bcaf8fa9b08d00575edad)**
+
 ## Release `2020.33`
 
-> commits: **1 / [9e784ae306...9e784ae306](https://github.com/OneGov/onegov-cloud/compare/9e784ae306^...9e784ae306)**<br>
+> released: **2020-03-11 11:40**<br>
+> commits: **2 / [9e784ae306...4a00e596e6](https://github.com/OneGov/onegov-cloud/compare/9e784ae306^...4a00e596e6)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.33)](https://buildkite.com/seantis/onegov-cloud)
 
 ## Release `2020.32`
