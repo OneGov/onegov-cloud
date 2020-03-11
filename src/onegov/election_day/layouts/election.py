@@ -142,7 +142,7 @@ class ElectionLayout(DetailLayout):
     @cached_property
     def district_are_entities(self):
         entities = self.request.app.principal.entities[self.model.date.year]
-        return all(d['name'] == d['district'] for d in entities.values())
+        return all(d['name'] == d.get('district') for d in entities.values())
 
     @cached_property
     def majorz(self):
