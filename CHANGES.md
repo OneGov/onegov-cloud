@@ -1,8 +1,14 @@
 # Changes
 
+## Release `2020.32`
+
+> commits: **15 / [1cbd5352e8...84d22e61b6](https://github.com/OneGov/onegov-cloud/compare/1cbd5352e8^...84d22e61b6)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.32)](https://buildkite.com/seantis/onegov-cloud)
+
 ## Release `2020.31`
 
-> commits: **1 / [10b8e57d50...10b8e57d50](https://github.com/OneGov/onegov-cloud/compare/10b8e57d50^...10b8e57d50)**<br>
+> released: **2020-03-10 08:12**<br>
+> commits: **2 / [10b8e57d50...b5760ebe22](https://github.com/OneGov/onegov-cloud/compare/10b8e57d50^...b5760ebe22)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.31)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Electionday
