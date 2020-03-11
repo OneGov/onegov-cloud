@@ -104,6 +104,7 @@ class ElectionLayout(DetailLayout):
                 and self.show_map
                 and self.has_districts
                 and not self.tacit
+                and not self.district_are_entities
             )
         if tab == 'connections':
             return (
@@ -137,6 +138,11 @@ class ElectionLayout(DetailLayout):
     @cached_property
     def visible(self):
         return self.tab_visible(self.tab)
+
+    @cached_property
+    def district_are_entities(self):
+        entities = self.request.app.principal.entities[self.model.date.year]
+        return all(d['name'] == d.get('district') for d in entities.values())
 
     @cached_property
     def majorz(self):

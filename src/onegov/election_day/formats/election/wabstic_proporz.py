@@ -8,6 +8,7 @@ from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
 from onegov.ballot.models.election.election_compound import \
     ElectionCompoundAssociation
+from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day.formats.common import EXPATS, line_is_relevant, \
     validate_integer
@@ -100,7 +101,7 @@ def create_election_wabstic_proporz(
                 line, 'mandate', treat_none_as_default=False)
 
             election = dict(
-                id=uuid4(),
+                id=normalize_for_url(line.gebezoffiziell),
                 type='proporz',
                 title_translations={request.locale: line.gebezoffiziell},
                 shortcode=line.gebezkurz,
@@ -158,7 +159,7 @@ def create_election_wabstic_proporz(
     )
 
     compound = dict(
-        id=uuid4(),
+        id=normalize_for_url(compound_title),
         title_translations={request.locale: compound_title},
         shortcode=compound_shortcode,
         date=elections[0]['date'],

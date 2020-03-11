@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-10 10:44+0200\n"
+"POT-Creation-Date: 2020-03-10 14:56+0100\n"
 "PO-Revision-Date: 2019-10-10 10:46+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -136,8 +136,9 @@ msgstr "Connexions de listes"
 msgid "Election statistics"
 msgstr "Statistiques des élections"
 
-msgid "Value of ausmittlungsstand not between 0 and 3"
-msgstr "Valeur de ausmittlungsstand pas entre 0 et 3"
+#, python-format
+msgid "Error in anzpendentgde: ${msg}"
+msgstr ""
 
 msgid "Invalid candidate results"
 msgstr "Résultats des candidats non valides"
@@ -150,9 +151,12 @@ msgstr "Candidate avec id ${id} pas dans wm_kandidaten"
 msgid "Entity with id ${id} not in wmstatic_gemeinden"
 msgstr "Commune avec id ${id} pas dans wmstatic_gemeinden"
 
+msgid "Ausmittlungsstand set to final but AnzPendentGde is not 0"
+msgstr ""
+
 #, python-format
-msgid "Value ${col} is not between 0 and 3"
-msgstr "Valeur ${col} n'est pas entry 0 et 3"
+msgid "${msg}"
+msgstr ""
 
 #, python-format
 msgid "${var} is missing."
@@ -190,6 +194,10 @@ msgstr "Type de scrutin invalide"
 
 msgid "Could not read the empty votes"
 msgstr "Impossible de connaître les votes blancs"
+
+#, python-format
+msgid "Error in anzgdependent: ${msg}"
+msgstr ""
 
 msgid "Text Retrieval"
 msgstr "Terme de recherche"
@@ -478,6 +486,10 @@ msgid "district_label_sg"
 msgstr "Circonscription électorale"
 
 #. Default: District
+msgid "district_label_sz_2020"
+msgstr "District électoral"
+
+#. Default: District
 msgid "district_label_sz"
 msgstr "District électoral"
 
@@ -492,6 +504,10 @@ msgstr "Régions"
 #. Default: Constituencies
 msgid "districts_label_sg"
 msgstr "Circonscriptions électorales"
+
+#. Default: District
+msgid "districts_label_sz_2020"
+msgstr "Districts électorales"
 
 #. Default: Districts
 msgid "districts_label_sz"
@@ -1259,6 +1275,9 @@ msgstr ""
 msgid "The year ${year} is not yet supported"
 msgstr "L'année ${year} n'est pas encore prise en charge"
 
+msgid "This source has already elections assigned to it"
+msgstr ""
+
 msgid "Invalid id"
 msgstr "Mauvaise référence"
 
@@ -1267,6 +1286,12 @@ msgstr "Aucune election selon le système proportionnel"
 
 msgid "The data source is not configured properly"
 msgstr "La source de données n'est pas configurée correctement"
+
+#~ msgid "Value of ausmittlungsstand not between 0 and 3"
+#~ msgstr "Valeur de ausmittlungsstand pas entre 0 et 3"
+
+#~ msgid "Value ${col} is not between 0 and 3"
+#~ msgstr "Valeur ${col} n'est pas entry 0 et 3"
 
 #~ msgid "Invalid list values"
 #~ msgstr "Valeurs de la liste non valides"

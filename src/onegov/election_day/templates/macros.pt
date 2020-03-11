@@ -132,7 +132,7 @@
             <tr tal:repeat="election election_compound.elections">
                 <td class="left-aligned"><a href="${request.link(election)}">${election.district}</a></td>
                 <td class="right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress (election.allocated_mandates(consider_completed=True), election.number_of_mandates)" /></td>
-                <td class="right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress election.progress" /></td>
+                <td class="right-aligned"><tal:block metal:use-macro="layout.macros['progress']" tal:define="progress election.progress; enable_y_n True" /></td>
             </tr>
         </tbody>
     </table>
@@ -144,11 +144,12 @@
     data-tablesaw-mode="columntoggle"
     data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
     data-tablesaw-minimap=""
+    tal:define="show_district not:layout.district_are_entities"
     >
         <thead>
             <tr>
                 <th data-tablesaw-priority="persist" i18n:translate="" class="left-aligned">${layout.principal.label('entity')}</th>
-                <th data-tablesaw-priority="3" i18n:translate="" class="left-aligned" tal:condition="layout.has_districts">${layout.principal.label('district')}</th>
+                <th data-tablesaw-priority="3" i18n:translate="" class="left-aligned" tal:condition="show_district and layout.has_districts">${layout.principal.label('district')}</th>
                 <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">eligible Voters</th>
                 <th data-tablesaw-priority="4" i18n:translate="" class="right-aligned">Received Ballots</th>
                 <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Accounted Ballots</th>
@@ -162,12 +163,12 @@
             <tr tal:repeat="result election.results">
                 <tal:block condition="not: result.counted">
                     <td>${layout.format_name(result)}</td>
-                    <td tal:condition="layout.has_districts">${result.district}</td>
+                    <td tal:condition="show_district and layout.has_districts">${result.district}</td>
                     <td class="answer" colspan="7" i18n:translate="">Not yet counted</td>
                 </tal:block>
                 <tal:block condition="result.counted">
                     <td>${layout.format_name(result)}</td>
-                    <td tal:condition="layout.has_districts">${result.district}</td>
+                    <td tal:condition="show_district and layout.has_districts">${result.district}</td>
                     <td class="right-aligned" data-text="${result.eligible_voters}">${layout.format_number(result.eligible_voters)}</td>
                     <td class="right-aligned" data-text="${result.received_ballots}">${layout.format_number(result.received_ballots)}</td>
                     <td class="right-aligned" data-text="${result.accounted_ballots}">${layout.format_number(result.accounted_ballots)}</td>
@@ -181,7 +182,7 @@
         <tfoot tal:condition="layout.summarize">
             <tr class="total">
                 <td i18n:translate="">Total</td>
-                <td tal:condition="layout.has_districts"></td>
+                <td tal:condition="show_district and layout.has_districts"></td>
                 <td class="right-aligned">${layout.format_number(election.eligible_voters)}</td>
                 <td class="right-aligned">${layout.format_number(election.received_ballots)}</td>
                 <td class="right-aligned">${layout.format_number(election.accounted_ballots)}</td>
@@ -319,10 +320,19 @@
 </metal:answer>
 
 <metal:progress define-macro="progress" i18n:domain="onegov.election_day">
-    <tal:b i18n:translate="" condition="progress[1]">
-        <span tal:replace="progress[0]" i18n:name='counted' />
-            of
-        <span tal:replace="progress[1]" i18n:name='total' />
+    <tal:b i18n:translate="" condition="progress[1]" tal:define="show_y_n enable_y_n|False">
+        <tal:b tal:switch="python:show_y_n and progress[0] in (0, 1) and progress[1] == 1">
+            <tal:b tal:case="False">
+                <span tal:replace="progress[0]" i18n:name='counted' />
+                of
+                <span tal:replace="progress[1]" i18n:name='total' />
+            </tal:b>
+            <tal:b tal:case="True">
+                <span tal:condition="progress[0] == 0" i18n:translate="">No</span>
+                <span tal:condition="progress[0] == 1" i18n:translate="">Yes</span>
+            </tal:b>
+        </tal:b>
+
     </tal:b>
 </metal:progress>
 

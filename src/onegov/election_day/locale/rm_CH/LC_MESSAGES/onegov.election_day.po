@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-10 10:44+0200\n"
+"POT-Creation-Date: 2020-03-10 14:56+0100\n"
 "PO-Revision-Date: 2019-10-15 09:19+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -137,8 +137,9 @@ msgstr "Colliaziuns da glistas"
 msgid "Election statistics"
 msgstr "Statistica electorala"
 
-msgid "Value of ausmittlungsstand not between 0 and 3"
-msgstr "La valur da ausmittlungsstand n'è betg tranter 0 e 3"
+#, python-format
+msgid "Error in anzpendentgde: ${msg}"
+msgstr ""
 
 msgid "Invalid candidate results"
 msgstr "Resultats da candidat nunvalaivels"
@@ -151,9 +152,12 @@ msgstr "La candidata u il candidat cun id ${id} n'è betg en wm_kandidaten"
 msgid "Entity with id ${id} not in wmstatic_gemeinden"
 msgstr "La vischnanca cun id ${id} n'è betg en wmstatic_gemeinden"
 
+msgid "Ausmittlungsstand set to final but AnzPendentGde is not 0"
+msgstr ""
+
 #, python-format
-msgid "Value ${col} is not between 0 and 3"
-msgstr "La valur ${col} n'è betg tranter 0 e 3"
+msgid "${msg}"
+msgstr ""
 
 #, python-format
 msgid "${var} is missing."
@@ -192,6 +196,10 @@ msgstr "Tip da votaziun nunvalaivel"
 
 msgid "Could not read the empty votes"
 msgstr "I n'è betg stà pussaivel da leger ils cedels da votar vids"
+
+#, python-format
+msgid "Error in anzgdependent: ${msg}"
+msgstr ""
 
 msgid "Text Retrieval"
 msgstr "Noziun tschertgada"
@@ -480,6 +488,10 @@ msgid "district_label_sg"
 msgstr "Circul electoral"
 
 #. Default: District
+msgid "district_label_sz_2020"
+msgstr "Circul electoral"
+
+#. Default: District
 msgid "district_label_sz"
 msgstr "Circul electoral"
 
@@ -493,6 +505,10 @@ msgstr "Regiuns"
 
 #. Default: Constituencies
 msgid "districts_label_sg"
+msgstr "Circuls electorals"
+
+#. Default: District
+msgid "districts_label_sz_2020"
 msgstr "Circuls electorals"
 
 #. Default: Districts
@@ -1265,6 +1281,9 @@ msgstr ""
 msgid "The year ${year} is not yet supported"
 msgstr "L'onn ${year} na vegn anc betg sustegnì"
 
+msgid "This source has already elections assigned to it"
+msgstr ""
+
 msgid "Invalid id"
 msgstr "ID nunvalaivel"
 
@@ -1273,6 +1292,12 @@ msgstr "Nagina elecziun da proporz"
 
 msgid "The data source is not configured properly"
 msgstr "La configuraziun da la funtauna da datas n'è betg valaivla"
+
+#~ msgid "Value of ausmittlungsstand not between 0 and 3"
+#~ msgstr "La valur da ausmittlungsstand n'è betg tranter 0 e 3"
+
+#~ msgid "Value ${col} is not between 0 and 3"
+#~ msgstr "La valur ${col} n'è betg tranter 0 e 3"
 
 #~ msgid "Invalid list values"
 #~ msgstr "Datas da glista nunvalaivlas"

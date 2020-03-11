@@ -135,6 +135,13 @@ class DummyPostData(dict):
 
 class DummyPrincipal(object):
 
+    all_years = range(2000, 2030)
+
+    entities = {year: {
+        1: {'name': 'Entity', 'district': 'District'},
+        2: {'name': 'Entity2', 'district': 'District'}
+    } for year in all_years}
+
     def __init__(self):
         self.name = 'name'
         self.webhooks = []
