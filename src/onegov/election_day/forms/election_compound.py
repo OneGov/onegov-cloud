@@ -104,6 +104,19 @@ class ElectionCompoundForm(Form):
         render_kw=dict(force_simple=True)
     )
 
+    after_pukelsheim = BooleanField(
+        label=_("After Doppelter Pukelsheim"),
+        fieldset=_("Views"),
+        render_kw=dict(force_simple=True)
+    )
+
+    pukelsheim_completed = BooleanField(
+        label=_("Completed"),
+        depends_on=('after_pukelsheim', True),
+        fieldset=_("Views"),
+        render_kw=dict(force_simple=True)
+    )
+
     def validate(self):
         result = super(ElectionCompoundForm, self).validate()
 
@@ -158,6 +171,8 @@ class ElectionCompoundForm(Form):
         model.related_link = self.related_link.data
         model.show_party_strengths = self.show_party_strengths.data
         model.show_mandate_allocation = self.show_mandate_allocation.data
+        model.after_pukelsheim = self.after_pukelsheim.data
+        model.pukelsheim_completed = self.pukelsheim_completed.data
 
         elections = self.request.session.query(Election)
         elections = elections.filter(Election.id.in_(self.elections.data))
@@ -202,6 +217,8 @@ class ElectionCompoundForm(Form):
         self.date.data = model.date
         self.shortcode.data = model.shortcode
         self.related_link.data = model.related_link
+        self.after_pukelsheim.data = model.after_pukelsheim
+        self.pukelsheim_completed.data = model.pukelsheim_completed
         self.show_party_strengths.data = model.show_party_strengths
         self.show_mandate_allocation.data = model.show_mandate_allocation
         self.elections.data = [election.id for election in model.elections]
