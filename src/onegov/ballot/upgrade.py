@@ -519,3 +519,15 @@ def add_related_link_and_label(context):
                 item.related_link = None
             if not item.related_link_label:
                 item.related_link_label = {}
+
+
+@upgrade_task('Adds Doppelter Pukelsheim to CompoundElection')
+def add_after_pukelsheim(context):
+    if not context.has_column('election_compounds', 'after_pukelsheim'):
+        context.add_column_with_defaults(
+            'election_compounds', Column(
+                'after_pukelsheim',
+                Boolean,
+                nullable=False,
+                default=False
+            ), default=lambda x: False)

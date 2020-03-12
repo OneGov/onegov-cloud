@@ -20,7 +20,7 @@ from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import UUID
-from sqlalchemy import Column
+from sqlalchemy import Column, Boolean
 from sqlalchemy import Date
 from sqlalchemy import desc
 from sqlalchemy import ForeignKey
@@ -99,6 +99,9 @@ class ElectionCompound(
 
     #: The date of the elections
     date = Column(Date, nullable=False)
+
+    #: Enable Doppelter Pukelsheim for setting status of child elections
+    after_pukelsheim = Column(Boolean, nullable=False, default=False)
 
     #: An election compound may contains n party results
     party_results = relationship(
