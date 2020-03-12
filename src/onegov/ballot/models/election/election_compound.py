@@ -103,6 +103,9 @@ class ElectionCompound(
     #: Enable Doppelter Pukelsheim for setting status of child elections
     after_pukelsheim = Column(Boolean, nullable=False, default=False)
 
+    #: Status for Doppelter Pukelsheim to set via Website
+    pukelsheim_completed = Column(Boolean, nullable=False, default=False)
+
     #: An election compound may contains n party results
     party_results = relationship(
         'PartyResult',
@@ -197,6 +200,9 @@ class ElectionCompound(
     @property
     def completed(self):
         """ Returns True, if the all elections are completed. """
+
+        if self.after_pukelsheim:
+            return self.pukelsheim_completed
 
         for election in self.elections:
             if not election.completed:
