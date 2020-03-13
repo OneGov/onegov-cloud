@@ -87,7 +87,7 @@ def test_election_form_model(session, related_link_labels):
     assert form.tacit.data is False
     assert form.distinct.data is False
     assert form.expats.data is False
-    assert form.after_pukelsheim is True
+    assert form.after_pukelsheim.data is True
 
     form.election_de.data = 'An Election (DE)'
     form.election_fr.data = 'An Election (FR)'
@@ -104,7 +104,7 @@ def test_election_form_model(session, related_link_labels):
     form.tacit.data = True
     form.distinct.data = True
     form.expats.data = True
-    form.after_pukelsheim = False
+    form.after_pukelsheim.data = False
 
     form.update_model(model)
 
