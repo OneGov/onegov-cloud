@@ -160,7 +160,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr tal:repeat="result election.results">
+            <tr tal:repeat="result layout.results">
                 <tal:block condition="not: result.counted">
                     <td>${layout.format_name(result)}</td>
                     <td tal:condition="show_district and layout.has_districts">${result.district}</td>
@@ -320,9 +320,9 @@
 </metal:answer>
 
 <metal:progress define-macro="progress" i18n:domain="onegov.election_day">
-    <tal:b i18n:translate="" condition="progress[1]" tal:define="show_y_n enable_y_n|False">
+    <tal:b condition="progress[1]" tal:define="show_y_n enable_y_n|False">
         <tal:b tal:switch="python:show_y_n and progress[0] in (0, 1) and progress[1] == 1">
-            <tal:b tal:case="False">
+            <tal:b tal:case="False" i18n:translate="">
                 <span tal:replace="progress[0]" i18n:name='counted' />
                 of
                 <span tal:replace="progress[1]" i18n:name='total' />

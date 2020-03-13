@@ -12,7 +12,7 @@ from unittest.mock import Mock
 import pytest
 
 
-def test_election_compound_layout(session):
+def test_election_compound_layout_1(session):
     date_ = date(2011, 1, 1)
     majorz = Election(title="majorz", domain='region', date=date_)
     proporz = ProporzElection(title="proporz", domain='region', date=date_)
@@ -29,6 +29,7 @@ def test_election_compound_layout(session):
         'mandate-allocation',
         'party-strengths',
         'parties-panachage',
+        'statistics',
         'data'
     )
     assert layout.title() == ''
@@ -39,10 +40,13 @@ def test_election_compound_layout(session):
     assert layout.title('party-strengths') == 'Party strengths'
     assert layout.title('parties-panachage') == 'Panachage'
     assert layout.title('data') == 'Downloads'
+    assert layout.title('statistics') == 'Election compound statistics'
     assert layout.main_view == 'ElectionCompound/districts'
     assert layout.majorz is False
     assert layout.proporz is False
     assert layout.has_party_results is False
+    assert layout.districts_are_entities is False
+    assert layout.tab_visible('statistics') is False
 
     compound.elections = [majorz]
     layout = ElectionCompoundLayout(compound, DummyRequest())

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-10 14:56+0100\n"
+"POT-Creation-Date: 2020-03-13 11:18+0100\n"
 "PO-Revision-Date: 2019-10-15 09:19+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: \n"
@@ -270,6 +270,9 @@ msgstr "Svizzers a l'exteriur"
 msgid "Distinct district"
 msgstr "Clera regiun"
 
+msgid "Doppelter Pukelsheim"
+msgstr ""
+
 msgid "Date"
 msgstr "Data"
 
@@ -329,6 +332,12 @@ msgstr "Vistas"
 
 msgid "Mandate allocation"
 msgstr "Repartiziun dals sezs"
+
+msgid "After Doppelter Pukelsheim"
+msgstr ""
+
+msgid "Mark Pukelsheim Completed"
+msgstr ""
 
 msgid "Select either majorz or proporz elections."
 msgstr "Tscherni u las elecziuns da maiorz u las elecziuns da proporz."

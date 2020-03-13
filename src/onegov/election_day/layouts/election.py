@@ -273,3 +273,7 @@ class ElectionLayout(DetailLayout):
             )
             for association in self.model.related_elections
         ]
+
+    @property
+    def results(self):
+        return self.model.results

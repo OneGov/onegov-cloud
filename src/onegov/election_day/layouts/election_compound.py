@@ -12,7 +12,7 @@ class ElectionCompoundLayout(DetailLayout):
         super().__init__(model, request)
         self.tab = tab
 
-    tabs_with_embedded_tables = ('districts', 'candidates')
+    tabs_with_embedded_tables = ('districts', 'candidates', 'statistics')
 
     @cached_property
     def table_link(self):
@@ -30,8 +30,15 @@ class ElectionCompoundLayout(DetailLayout):
             'mandate-allocation',
             'party-strengths',
             'parties-panachage',
+            'statistics',
             'data'
         )
+
+    @property
+    def results(self):
+        for e in self.model.elections:
+            for result in e.results:
+                yield result
 
     def title(self, tab=None):
         tab = self.tab if tab is None else tab
@@ -48,6 +55,8 @@ class ElectionCompoundLayout(DetailLayout):
             return _("Panachage")
         if tab == 'data':
             return _("Downloads")
+        if tab == 'statistics':
+            return _("Election statistics")
 
         return ''
 
@@ -66,6 +75,8 @@ class ElectionCompoundLayout(DetailLayout):
             )
         if tab == 'parties-panachage':
             return self.model.panachage_results.first() is not None
+        if tab == 'statistics':
+            return self.districts_are_entities
 
         return True
 
@@ -155,3 +166,7 @@ class ElectionCompoundLayout(DetailLayout):
                 )
             )
         )
+
+    @property
+    def summarize(self):
+        return False
