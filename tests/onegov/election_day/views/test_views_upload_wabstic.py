@@ -300,7 +300,8 @@ def test_create_elections_wabsti_proporz(election_day_app_sg):
         headers=[('Accept-Language', 'de_CH')]
     )
 
-    error = 'This source has already elections assigned to it'
+    error = 'Die Datenquelle hat bereits Verbindungen zu Wahlen, ' \
+            'die erstellt wurden.'
     assert result.json['errors']['data_source'][0] == error
 
     # Test wrong token

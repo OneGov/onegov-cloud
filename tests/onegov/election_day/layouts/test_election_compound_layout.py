@@ -40,7 +40,7 @@ def test_election_compound_layout_1(session):
     assert layout.title('party-strengths') == 'Party strengths'
     assert layout.title('parties-panachage') == 'Panachage'
     assert layout.title('data') == 'Downloads'
-    assert layout.title('statistics') == 'Election compound statistics'
+    assert layout.title('statistics') == 'Election statistics'
     assert layout.main_view == 'ElectionCompound/districts'
     assert layout.majorz is False
     assert layout.proporz is False
