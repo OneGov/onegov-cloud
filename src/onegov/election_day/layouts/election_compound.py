@@ -12,7 +12,8 @@ class ElectionCompoundLayout(DetailLayout):
         super().__init__(model, request)
         self.tab = tab
 
-    tabs_with_embedded_tables = ('districts', 'candidates', 'statistics')
+    tabs_with_embedded_tables = (
+        'lists', 'districts', 'candidates', 'statistics')
 
     @cached_property
     def table_link(self):
@@ -25,6 +26,7 @@ class ElectionCompoundLayout(DetailLayout):
     @cached_property
     def all_tabs(self):
         return (
+            'lists',
             'districts',
             'candidates',
             'mandate-allocation',
@@ -43,6 +45,8 @@ class ElectionCompoundLayout(DetailLayout):
     def title(self, tab=None):
         tab = self.tab if tab is None else tab
 
+        if tab == 'lists':
+            return _("Lists")
         if tab == 'districts':
             return self.request.app.principal.label('districts')
         if tab == 'candidates':
@@ -61,6 +65,10 @@ class ElectionCompoundLayout(DetailLayout):
         return ''
 
     def tab_visible(self, tab):
+
+        if self.hide_tab(tab):
+            return False
+
         if not self.has_results:
             return False
         if tab == 'mandate-allocation':

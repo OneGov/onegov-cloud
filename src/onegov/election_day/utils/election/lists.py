@@ -1,7 +1,7 @@
 from collections import OrderedDict, defaultdict
 from itertools import groupby
 
-from onegov.ballot import List
+from onegov.ballot import List, ElectionCompound
 from onegov.core.orm import as_selectable_from_path
 from onegov.core.utils import module_path
 from onegov.election_day import _
@@ -95,6 +95,9 @@ def get_aggregated_list_results(election, session, use_checks=False):
 def get_list_results(election, session):
     """ Returns the aggregated list results as list. """
 
+    if isinstance(election, ElectionCompound):
+        return election.lists_data
+
     result = session.query(
         List.name, List.votes.label('votes'),
         List.list_id, List.number_of_mandates
@@ -107,6 +110,17 @@ def get_list_results(election, session):
 
 def get_lists_data(election, request):
     """" View the lists as JSON. Used to for the lists bar chart. """
+
+    if isinstance(election, ElectionCompound):
+        completed = election.completed
+        return {
+            'results': [{
+                'text': list_.name,
+                'value': list_.votes,
+                'value2': list_.number_of_mandates,
+                'class': 'active' if completed else 'inactive'
+            } for list_ in election.lists_data]
+        }
 
     if election.type == 'majorz':
         return {
