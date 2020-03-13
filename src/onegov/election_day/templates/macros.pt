@@ -144,7 +144,7 @@
     data-tablesaw-mode="columntoggle"
     data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
     data-tablesaw-minimap=""
-    tal:define="show_district not:layout.district_are_entities"
+    tal:define="show_district not:layout.districts_are_entities"
     >
         <thead>
             <tr>

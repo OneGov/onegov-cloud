@@ -36,3 +36,12 @@ class DetailLayout(DefaultLayout):
     @cached_property
     def related_link_label(self):
         return self.model.related_link_label.get(self.request.locale, None)
+
+    @cached_property
+    def districts_are_entities(self):
+        """ For the canton SZ it is the case, that all districts are entities.
+         For the election and election compound layout, this hides certain
+         tabs and show others.
+         """
+        entities = self.request.app.principal.entities[self.model.date.year]
+        return all(d['name'] == d.get('district') for d in entities.values())

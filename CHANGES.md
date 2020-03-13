@@ -12,9 +12,9 @@
 In SZ since 2020, entity and district are named the same. For elections of a compound (Kantonsratswahl), the UI has to be changed.
 
 - Changes canton district label starting 2020 using translations
-- Introduces property `district_are_entities` on `ElectionLayout`
-- Changes `statistics_table` to remove district column if `district_are_entities`  is True
-- Hides `candidate-by-district` if `district_are_entities` is True (the are the same)
+- Introduces property `districts_are_entities` on `ElectionLayout`
+- Changes `statistics_table` to remove district column if `districts_are_entities`  is True
+- Hides `candidate-by-district` if `districts_are_entities` is True (the are the same)
 - Changes progress macro to display e.g. "Yes" instead of "1 of 1" if flagged
 
 **`Feature`** | **[9dceb83c5b](https://github.com/onegov/onegov-cloud/commit/9dceb83c5b01dc2f128bcaf8fa9b08d00575edad)**
