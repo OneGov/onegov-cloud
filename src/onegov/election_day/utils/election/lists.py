@@ -96,7 +96,8 @@ def get_list_results(election, session):
     """ Returns the aggregated list results as list. """
 
     result = session.query(
-        List.name, List.votes, List.list_id, List.number_of_mandates
+        List.name, List.votes.label('votes'),
+        List.list_id, List.number_of_mandates
     )
     result = result.order_by(desc(List.votes))
     result = result.filter(List.election_id == election.id)

@@ -13,7 +13,7 @@ def get_candidates_results(election, session):
         Candidate.first_name,
         Candidate.elected,
         Candidate.party,
-        Candidate.votes,
+        Candidate.votes.label('votes'),
         List.name,
         List.list_id
     )
@@ -48,7 +48,7 @@ def get_candidates_data(election, request):
         Candidate.family_name,
         Candidate.first_name,
         Candidate.elected,
-        Candidate.votes
+        Candidate.votes.label('votes')
     )
     candidates = candidates.filter(Candidate.election_id == election.id)
 
@@ -88,7 +88,7 @@ def get_candidates_data(election, request):
         'results': [
             {
                 'text': '{} {}'.format(candidate[0], candidate[1]),
-                'value': candidate[3],
+                'value': candidate.votes,
                 'class': 'active' if candidate.elected and election.completed
                 else 'inactive'
             } for candidate in candidates
