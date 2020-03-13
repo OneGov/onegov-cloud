@@ -32,6 +32,11 @@ from onegov.election_day.views.upload.wabsti_exporter import \
 def view_create_wabsti_proporz(self, request):
     set_locale(request)
     data_source = authenticated_source(request)
+
+    # Get Additional params, if None then False
+    create_compound = bool(request.params.get('create_compound'))
+    after_pukelsheim = bool(request.params.get('after_pukelsheim'))
+
     if data_source.items.first():
         return {
             'status': 'error',
@@ -57,7 +62,9 @@ def view_create_wabsti_proporz(self, request):
         request,
         data_source,
         form.wp_wahl.raw_data[0].file,
-        form.wp_wahl.data['mimetype']
+        form.wp_wahl.data['mimetype'],
+        create_compound=create_compound,
+        after_pukelsheim=after_pukelsheim,
     )
     translate_errors(errors, request)
 

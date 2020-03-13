@@ -263,8 +263,9 @@ def test_create_elections_wabsti_proporz(election_day_app_sg):
 
     client = Client(election_day_app_sg)
     client.authorization = ('Basic', ('', token))
+    query_params = '?create_compound=1&after_pukelsheim=1'
     result = client.post(
-        '/create-wabsti-proporz',
+        '/create-wabsti-proporz' + query_params,
         params=params,
         headers=[('Accept-Language', 'de_CH')]
     )
@@ -277,6 +278,7 @@ def test_create_elections_wabsti_proporz(election_day_app_sg):
     assert compound.title == 'Wahl der Mitglieder des Kantonsrates'
     assert compound.shortcode == 'Kantonsratswahl_2016'
     assert compound.associations.count() == 8
+    assert compound.after_pukelsheim is True
 
     elections = session.query(Election).filter_by(date=date(2016, 2, 28))
     elections = elections.order_by(Election.shortcode)
