@@ -53,6 +53,7 @@ def test_principal_load_canton():
     assert principal.pdf_signing == {}
     assert principal.open_data == {}
     assert principal.hidden_elements == {}
+    assert principal.after_pukelsheim is False
 
 
 def test_principal_load_municipality_with_static_data():
@@ -158,6 +159,7 @@ def test_principal_load_options():
           intermediate_results:
             connections:
               chart: True
+        after_pukelsheim: true
     """))
     assert isinstance(principal, Canton)
     assert principal.id == 'zg'
@@ -208,6 +210,7 @@ def test_principal_load_options():
             'connections': {'chart': True}
         }
     }
+    assert principal.after_pukelsheim is True
 
 
 def test_canton_entities():
