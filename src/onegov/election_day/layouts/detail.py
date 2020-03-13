@@ -2,7 +2,39 @@ from cached_property import cached_property
 from onegov.election_day.layouts.default import DefaultLayout
 
 
-class DetailLayout(DefaultLayout):
+class HiddenTabsMixin:
+    """
+    Mixing for a generic handling of hiding any kind of menu or submenu
+    tab on election, election_compound and vote detail layouts in
+    combination with the yaml file config.
+    """
+
+    @cached_property
+    def hidden_tabs(self):
+        return self.request.app.principal.hidden_tabs.get(self.section, [])
+
+    def hide_tab(self, tab):
+        return tab in self.hidden_tabs
+
+    @cached_property
+    def section(self):
+        """Represents section under
+          principal:
+            hidden_elements:
+              tabs:
+                <section>:
+                    - tab1
+                    - tab2
+        """
+        mapping = {
+            'votes': 'vote',
+            'elections': 'election',
+            'election_compounds': 'elections'
+        }
+        return mapping.get(self.model.__tablename__, '')
+
+
+class DetailLayout(DefaultLayout, HiddenTabsMixin):
 
     """ A common base layout for election and votes which caches some values
     used in the macros.

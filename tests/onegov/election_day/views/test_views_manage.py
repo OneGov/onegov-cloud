@@ -194,7 +194,7 @@ def test_upload_proporz_election(election_day_app):
     election = session.query(ProporzElection).one()
     assert election.type == 'proporz'
 
-    request = DummyRequest(election_day_app, session)
+    request = DummyRequest(session, election_day_app)
 
     layout = ElectionLayout(election, request, 'lists-panachage')
     assert layout.visible

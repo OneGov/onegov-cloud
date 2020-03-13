@@ -24,6 +24,7 @@ def test_election_compound_layout_1(session):
 
     layout = ElectionCompoundLayout(compound, DummyRequest())
     assert layout.all_tabs == (
+        'lists',
         'districts',
         'candidates',
         'mandate-allocation',

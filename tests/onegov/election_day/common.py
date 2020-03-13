@@ -168,6 +168,10 @@ class DummyPrincipal(object):
     def label(self, type):
         return '__{}'.format(type)
 
+    @property
+    def hidden_tabs(self):
+        return {'elections': ['lists']}
+
 
 class DummyApp(object):
     def __init__(self, session=None, application_id='application_id'):

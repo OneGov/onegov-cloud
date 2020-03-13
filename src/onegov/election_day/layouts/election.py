@@ -71,6 +71,10 @@ class ElectionLayout(DetailLayout):
         return ''
 
     def tab_visible(self, tab):
+
+        if self.hide_tab(tab):
+            return False
+
         if not self.has_results:
             return False
 
