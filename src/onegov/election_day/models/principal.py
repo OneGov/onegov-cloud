@@ -52,7 +52,6 @@ class Principal(object):
         pdf_signing=None,
         open_data=None,
         hidden_elements=None,
-        after_pukelsheim=None,
         **kwargs
     ):
         assert all((id_, domain, domains_election, domains_vote, entities))
@@ -76,7 +75,6 @@ class Principal(object):
         self.pdf_signing = pdf_signing or {}
         self.open_data = open_data or {}
         self.hidden_elements = hidden_elements or {}
-        self.after_pukelsheim = after_pukelsheim or False
 
     @classmethod
     def from_yaml(cls, yaml_source):
