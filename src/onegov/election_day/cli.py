@@ -5,7 +5,7 @@ import os
 
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
-from onegov.election_day.models import ArchivedResult
+from onegov.election_day.models import ArchivedResult, DataSource
 from onegov.election_day.utils import add_local_results
 from onegov.election_day.utils.d3_renderer import D3Renderer
 from onegov.election_day.utils.pdf_generator import PdfGenerator
@@ -136,3 +136,32 @@ def generate_media():
             lockfile.unlink()
 
     return generate
+
+
+@cli.command('delete-associated')
+@click.option('--wabsti-token')
+@click.option('--delete-compound', help='Delete the compound if it exists')
+def delete_associated(wabsti_token, delete_compound):
+
+    def delete(request, app):
+        query = request.session.query(DataSource)
+        query = query.filter(DataSource.token == wabsti_token)
+        data_source = query.one()
+
+        compound = None
+        session = request.session
+
+        for item in data_source.items:
+            election = item.item
+            click.secho(f'Deleting election {election.shortcode}')
+            if not compound and election.compound:
+                compound = election.compound
+            election.clear_results()
+            session.delete(item)
+            session.delete(election)
+
+        if delete_compound and compound:
+            click.secho(f'Deleting {compound.title}')
+            session.delete(compound)
+
+    return delete
