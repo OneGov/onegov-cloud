@@ -142,6 +142,8 @@ class DummyPrincipal(object):
         2: {'name': 'Entity2', 'district': 'District'}
     } for year in all_years}
 
+    hidden_tabs = {'elections': ['lists']}
+
     def __init__(self):
         self.name = 'name'
         self.webhooks = []
@@ -167,6 +169,7 @@ class DummyPrincipal(object):
 
     def label(self, type):
         return '__{}'.format(type)
+
 
 
 class DummyApp(object):

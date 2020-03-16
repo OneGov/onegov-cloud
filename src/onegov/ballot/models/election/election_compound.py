@@ -20,7 +20,7 @@ from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE
 from onegov.core.orm.types import UUID
-from sqlalchemy import Column
+from sqlalchemy import Column, Boolean
 from sqlalchemy import Date
 from sqlalchemy import desc
 from sqlalchemy import ForeignKey
@@ -100,6 +100,12 @@ class ElectionCompound(
     #: The date of the elections
     date = Column(Date, nullable=False)
 
+    #: Enable Doppelter Pukelsheim for setting status of child elections
+    after_pukelsheim = Column(Boolean, nullable=False, default=False)
+
+    #: Status for Doppelter Pukelsheim to set via Website
+    pukelsheim_completed = Column(Boolean, nullable=False, default=False)
+
     #: An election compound may contains n party results
     party_results = relationship(
         'PartyResult',
@@ -123,7 +129,10 @@ class ElectionCompound(
     @property
     def elections(self):
         elections = [association.election for association in self.associations]
-        return sorted(elections, key=lambda x: x.shortcode or '')
+        return sorted(
+            elections,
+            key=lambda x: f"{x.status}{x.shortcode or ''}"
+        )
 
     @elections.setter
     def elections(self, value):
@@ -194,6 +203,9 @@ class ElectionCompound(
     @property
     def completed(self):
         """ Returns True, if the all elections are completed. """
+
+        if self.after_pukelsheim:
+            return self.pukelsheim_completed
 
         for election in self.elections:
             if not election.completed:
@@ -298,6 +310,27 @@ class ElectionCompound(
             result.extend(election.elected_candidates)
 
         return result
+
+    @property
+    def lists_data(self):
+        """
+        Returns the sum of the number_of_mandates for every list of every
+        election of the compound
+        :return:
+        """
+        ec = ElectionCompound
+        session = object_session(self)
+        q = session.query(
+            List.name,
+            func.sum(List.number_of_mandates).label('number_of_mandates'),
+            func.sum(ListResult.votes).label('votes')
+        )
+        q = q.join(ec.associations)
+        q = q.join(Election).join(List).join(ListResult)
+        q = q.filter(ec.id == self.id, ec.date == Election.date)
+        q = q.group_by(List.name).subquery()
+
+        return session.query(q).order_by(q.c.votes.desc())
 
     #: may be used to store a link related to this election
     related_link = meta_property('related_link')

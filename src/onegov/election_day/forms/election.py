@@ -76,6 +76,12 @@ class ElectionForm(Form):
         depends_on=('domain', 'region'),
     )
 
+    after_pukelsheim = BooleanField(
+        label=_("Doppelter Pukelsheim"),
+        depends_on=('election_type', 'proporz'),
+        render_kw=dict(force_simple=True)
+    )
+
     date = DateField(
         label=_("Date"),
         validators=[
@@ -196,6 +202,7 @@ class ElectionForm(Form):
         model.tacit = self.tacit.data
         model.expats = self.expats.data
         model.distinct = self.distinct.data
+        model.after_pukelsheim = self.after_pukelsheim.data
 
         titles = {}
         if self.election_de.data:
@@ -261,6 +268,7 @@ class ElectionForm(Form):
         self.tacit.data = model.tacit
         self.expats.data = model.expats
         self.distinct.data = model.distinct
+        self.after_pukelsheim.data = model.after_pukelsheim
 
         if model.type == 'majorz':
             self.election_type.choices = [

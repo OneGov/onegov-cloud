@@ -98,6 +98,31 @@ class ProporzElection(Election, PartyResultExportMixin):
     )
 
     @property
+    def compound(self):
+        associations = self.associations
+        if not associations:
+            return None
+        compounds = [
+            a.election_compound for a in associations
+            if a.election_compound.date == self.date
+        ]
+        return compounds[0] if compounds else None
+
+    @property
+    def completed(self):
+        """ Overwrites StatusMixin's 'completed' for Doppelter Pukelsheim """
+        if self.after_pukelsheim:
+            cmp = self.compound
+            if cmp:
+                if not cmp.after_pukelsheim:
+                    return super(ProporzElection, self).completed
+                return cmp.pukelsheim_completed
+            else:
+                # case before the associations are created
+                pass
+        return super(ProporzElection, self).completed
+
+    @property
     def votes_by_entity(self):
         results = self.results.order_by(None)
         results = results.outerjoin(ListResult)

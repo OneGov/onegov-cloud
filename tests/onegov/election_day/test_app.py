@@ -13,6 +13,11 @@ def test_principal_app_not_existant(election_day_app):
     assert election_day_app.principal is None
 
 
+def test_principal_sz_static_entities(election_day_app_sz):
+    entities = election_day_app_sz.principal.entities[2020]
+    assert all(d['name'] == d.get('district') for d in entities.values())
+
+
 def test_send_sms(election_day_app, temporary_directory):
     election_day_app.send_sms('+41791112233', 'text')
     transaction.commit()

@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-10 14:56+0100\n"
-"PO-Revision-Date: 2019-10-10 10:45+0200\n"
+"POT-Creation-Date: 2020-03-13 11:18+0100\n"
+"PO-Revision-Date: 2020-03-13 11:14+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Lingua 3.12\n"
-"X-Generator: Poedit 2.2.4\n"
+"X-Generator: Poedit 2.3\n"
 
 msgid "The final results are available"
 msgstr "Die Schlussresultate sind verfügbar"
@@ -269,6 +269,9 @@ msgstr "Auslandschweizer"
 msgid "Distinct district"
 msgstr "Eindeutiger Wahlkreis"
 
+msgid "Doppelter Pukelsheim"
+msgstr "Doppelter Pukelsheim"
+
 msgid "Date"
 msgstr "Datum"
 
@@ -328,6 +331,12 @@ msgstr "Ansichten"
 
 msgid "Mandate allocation"
 msgstr "Sitzzuteilung"
+
+msgid "After Doppelter Pukelsheim"
+msgstr "Nach Doppeltem Pukelsheim"
+
+msgid "Mark Pukelsheim Completed"
+msgstr "Doppelter Pukelsheim abgeschlossen"
 
 msgid "Select either majorz or proporz elections."
 msgstr "Wählen Sie entweder Majorz- oder Proporzwahlen."
@@ -1272,6 +1281,7 @@ msgstr "Das Jahr ${year} wird noch nicht unterstützt"
 
 msgid "This source has already elections assigned to it"
 msgstr ""
+"Die Datenquelle hat bereits Verbindungen zu Wahlen, die erstellt wurden."
 
 msgid "Invalid id"
 msgstr "Ungültige ID"

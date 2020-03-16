@@ -207,5 +207,13 @@ automatically using `WP_Wahl.csv` only using a normal wabsti data source token.
 The endpoint created the following:
 
 1. All elections that are present in `WP_Wahl.csv`.
-2. The election compound
-3. A link (`DataSourceItem`) for each election to the data source (token), so that results can be uploaded.
+2. A link (`DataSourceItem`) for each election to the data source (token), so that results can be uploaded.
+3. The election compound if using the query param `?create_compound=1` in the url.
+4. With query parameters `?create_compound=1&after_pukelsheim=1`, it will also flag the compound and elections
+to show temporary results adapted to the Doppelter Pukelsheim.
+
+### Doppelter Pukelsheim
+
+When an election compound is linked to elections all on the same date, and all of them are flagged with 
+`after_pukelsheim` (by creating the election like explained above or by settings on the WebUI), 
+elections are completed when the compound election's the attribute `pukelsheim_completed` is true. 

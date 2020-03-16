@@ -116,6 +116,10 @@ class Principal(object):
     def label(self, value):
         raise NotImplementedError()
 
+    @cached_property
+    def hidden_tabs(self):
+        return self.hidden_elements.get('tabs', {})
+
 
 class Canton(Principal):
     """ A cantonal instance. """

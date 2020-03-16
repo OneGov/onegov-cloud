@@ -72,7 +72,9 @@ def create_election_wabstic_proporz(
         request,
         data_source,
         file_wp_wahl,
-        mimetype_wp_wahl
+        mimetype_wp_wahl,
+        create_compound=False,
+        after_pukelsheim=False
 ):
     assert isinstance(data_source, DataSource)
     session = request.session
@@ -109,7 +111,8 @@ def create_election_wabstic_proporz(
                 number_of_mandates=mandates,
                 domain='region',
                 status='unknown',
-                distinct=True
+                distinct=True,
+                after_pukelsheim=after_pukelsheim
             )
 
             data_source_item = dict(
@@ -158,12 +161,16 @@ def create_election_wabstic_proporz(
         DataSourceItem, data_source_items
     )
 
+    if not create_compound:
+        return errors
+
     compound = dict(
         id=normalize_for_url(compound_title),
         title_translations={request.locale: compound_title},
         shortcode=compound_shortcode,
         date=elections[0]['date'],
-        domain='canton'
+        domain='canton',
+        after_pukelsheim=after_pukelsheim
     )
 
     session.add(ElectionCompound(**compound))

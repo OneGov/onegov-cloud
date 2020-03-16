@@ -71,6 +71,10 @@ class ElectionLayout(DetailLayout):
         return ''
 
     def tab_visible(self, tab):
+
+        if self.hide_tab(tab):
+            return False
+
         if not self.has_results:
             return False
 
@@ -104,7 +108,7 @@ class ElectionLayout(DetailLayout):
                 and self.show_map
                 and self.has_districts
                 and not self.tacit
-                and not self.district_are_entities
+                and not self.districts_are_entities
             )
         if tab == 'connections':
             return (
@@ -140,11 +144,6 @@ class ElectionLayout(DetailLayout):
         return self.tab_visible(self.tab)
 
     @cached_property
-    def district_are_entities(self):
-        entities = self.request.app.principal.entities[self.model.date.year]
-        return all(d['name'] == d.get('district') for d in entities.values())
-
-    @cached_property
     def majorz(self):
         return self.model.type == 'majorz'
 
@@ -172,6 +171,9 @@ class ElectionLayout(DetailLayout):
     def main_view(self):
         if self.majorz or self.tacit:
             return self.request.link(self.model, 'candidates')
+        for tab in self.all_tabs:
+            if not self.hide_tab(tab):
+                return self.request.link(self.model, tab)
         return self.request.link(self.model, 'lists')
 
     @cached_property
@@ -278,3 +280,7 @@ class ElectionLayout(DetailLayout):
             )
             for association in self.model.related_elections
         ]
+
+    @property
+    def results(self):
+        return self.model.results
