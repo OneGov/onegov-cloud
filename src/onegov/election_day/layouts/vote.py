@@ -16,6 +16,7 @@ class VoteLayout(DetailLayout):
 
     @cached_property
     def all_tabs(self):
+        """Return all tabs. Ordering is important for the main view."""
         return (
             'entities',
             'districts',
@@ -137,6 +138,9 @@ class VoteLayout(DetailLayout):
     def main_view(self):
         if self.type == 'complex':
             return self.request.link(self.model, 'proposal-entities')
+        for tab in self.all_tabs:
+            if not self.hide_tab(tab):
+                return self.request.link(self.model, tab)
         return self.request.link(self.model, 'entities')
 
     @cached_property
