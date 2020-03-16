@@ -1,8 +1,27 @@
 # Changes
 
+## Release `2020.35`
+
+> commits: **1 / [680a480bf7...680a480bf7](https://github.com/OneGov/onegov-cloud/compare/680a480bf7^...680a480bf7)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.35)](https://buildkite.com/seantis/onegov-cloud)
+
+### Electionday
+
+🎉 **Adds Doppelter Pukelsheim and Adaptions for Kt. SZ**
+
+- Adds CheckBox Doppelter Pukelsheim to Election and ElectionCompound
+- Adds Feature to mark elections as completed when a common ElectionCompound
+for Doppelter Pukelsheim
+- Adds lists and statistics tab to CompoundElection
+- Adds feature to hide any tab in votes, elections and election compound
+- Adds Cli helpter tool
+
+**`Feature`** | **[680a480bf7](https://github.com/onegov/onegov-cloud/commit/680a480bf7cb43e6820cbb6136b1b041319e732f)**
+
 ## Release `2020.34`
 
-> commits: **1 / [9dceb83c5b...9dceb83c5b](https://github.com/OneGov/onegov-cloud/compare/9dceb83c5b^...9dceb83c5b)**<br>
+> released: **2020-03-11 16:34**<br>
+> commits: **2 / [9dceb83c5b...c0a99cf250](https://github.com/OneGov/onegov-cloud/compare/9dceb83c5b^...c0a99cf250)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.34)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Electionday
@@ -12,9 +31,9 @@
 In SZ since 2020, entity and district are named the same. For elections of a compound (Kantonsratswahl), the UI has to be changed.
 
 - Changes canton district label starting 2020 using translations
-- Introduces property `districts_are_entities` on `ElectionLayout`
-- Changes `statistics_table` to remove district column if `districts_are_entities`  is True
-- Hides `candidate-by-district` if `districts_are_entities` is True (the are the same)
+- Introduces property `district_are_entities` on `ElectionLayout`
+- Changes `statistics_table` to remove district column if `district_are_entities`  is True
+- Hides `candidate-by-district` if `district_are_entities` is True (the are the same)
 - Changes progress macro to display e.g. "Yes" instead of "1 of 1" if flagged
 
 **`Feature`** | **[9dceb83c5b](https://github.com/onegov/onegov-cloud/commit/9dceb83c5b01dc2f128bcaf8fa9b08d00575edad)**
