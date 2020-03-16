@@ -25,6 +25,7 @@ class ElectionCompoundLayout(DetailLayout):
 
     @cached_property
     def all_tabs(self):
+        """ Return the tabs in order of their appearance. """
         return (
             'lists',
             'districts',
@@ -98,7 +99,10 @@ class ElectionCompoundLayout(DetailLayout):
 
     @cached_property
     def main_view(self):
-        return self.request.link(self.model, 'districts')
+        for tab in self.all_tabs:
+            if not self.hide_tab(tab):
+                return self.request.link(self.model, tab)
+        return 'districts'
 
     @cached_property
     def menu(self):

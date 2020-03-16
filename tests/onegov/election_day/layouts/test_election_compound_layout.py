@@ -21,8 +21,8 @@ def test_election_compound_layout_1(session):
     session.add(ElectionCompound(title="e", domain='canton', date=date_))
     session.flush()
     compound = session.query(ElectionCompound).one()
-
-    layout = ElectionCompoundLayout(compound, DummyRequest())
+    request = DummyRequest()
+    layout = ElectionCompoundLayout(compound, request)
     assert layout.all_tabs == (
         'lists',
         'districts',
@@ -48,6 +48,13 @@ def test_election_compound_layout_1(session):
     assert layout.has_party_results is False
     assert layout.districts_are_entities is False
     assert layout.tab_visible('statistics') is False
+    assert request.app.principal.hidden_tabs == {'elections':  ['lists']}
+    assert layout.hide_tab('lists') is True
+
+    request.app.principal.hidden_tabs = {}
+    reloaded_layout = ElectionCompoundLayout(compound, request)
+    assert reloaded_layout.hide_tab('lists') is False
+    assert reloaded_layout.main_view == 'ElectionCompound/lists'
 
     compound.elections = [majorz]
     layout = ElectionCompoundLayout(compound, DummyRequest())
