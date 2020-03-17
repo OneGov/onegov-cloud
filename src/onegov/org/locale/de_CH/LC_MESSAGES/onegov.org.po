@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-02-20 15:31+0100\n"
+"POT-Creation-Date: 2020-03-16 21:43+0100\n"
 "PO-Revision-Date: 2020-02-20 15:33+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -398,6 +398,9 @@ msgstr "Markt"
 msgid "Meetup"
 msgstr "Treffen"
 
+msgid "Misc"
+msgstr "Diverses"
+
 msgid "Music School"
 msgstr "Musikschule"
 
@@ -409,6 +412,9 @@ msgstr "Party"
 
 msgid "Politics"
 msgstr "Politik"
+
+msgid "Reading"
+msgstr "Lesung"
 
 msgid "Religion"
 msgstr "Religion"
@@ -3940,3 +3946,6 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "Lecture"
+#~ msgstr "Lesung"
