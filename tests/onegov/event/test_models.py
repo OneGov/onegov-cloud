@@ -205,6 +205,7 @@ def test_occurrence_dates(session):
 
 
 def test_latest_occurrence(session):
+    # Fixme: Depending on the time, this test fails
 
     def create_event(delta):
         start = datetime.now() + delta
