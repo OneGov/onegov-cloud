@@ -14,7 +14,7 @@ from sqlalchemy import and_
 from sqlalchemy import distinct
 from sqlalchemy import or_
 from sqlalchemy.dialects.postgresql import array
-from sqlalchemy.orm import contains_eager, joinedload
+from sqlalchemy.orm import contains_eager
 
 
 class OccurrenceCollection(Pagination):
