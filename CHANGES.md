@@ -1,8 +1,20 @@
 # Changes
 
+## Release `2020.37`
+
+> commits: **2 / [20f716cc1e...537cde1080](https://github.com/OneGov/onegov-cloud/compare/20f716cc1e^...537cde1080)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.37)](https://buildkite.com/seantis/onegov-cloud)
+
+### Electionday
+
+🐞 **Fixes form field depends_on boolean value**
+
+**`Bugfix`** | **[537cde1080](https://github.com/onegov/onegov-cloud/commit/537cde10803d592cb7151597b98a75d3ef0267f5)**
+
 ## Release `2020.36`
 
-> commits: **3 / [c5769b4cb3...5560b2aa5c](https://github.com/OneGov/onegov-cloud/compare/c5769b4cb3^...5560b2aa5c)**<br>
+> released: **2020-03-17 11:19**<br>
+> commits: **4 / [c5769b4cb3...ed50ff6709](https://github.com/OneGov/onegov-cloud/compare/c5769b4cb3^...ed50ff6709)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.36)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
