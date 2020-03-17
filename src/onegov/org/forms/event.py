@@ -15,7 +15,7 @@ from onegov.org import _
 from sedate import replace_timezone, to_timezone
 from wtforms import RadioField, StringField, TextAreaField, validators
 from wtforms.fields.html5 import DateField, EmailField
-from wtforms_components import TimeField
+from onegov.form.fields import TimeField
 
 
 TAGS = [(tag, tag) for tag in (

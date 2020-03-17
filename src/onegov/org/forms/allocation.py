@@ -11,7 +11,7 @@ from uuid import uuid4
 from wtforms.fields import StringField, RadioField
 from wtforms.fields.html5 import DateField, IntegerField
 from wtforms.validators import DataRequired, NumberRange, InputRequired
-from wtforms_components import TimeField
+from onegov.form.fields import TimeField
 
 
 WEEKDAYS = (
