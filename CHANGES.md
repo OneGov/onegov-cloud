@@ -1,8 +1,28 @@
 # Changes
 
+## Release `2020.36`
+
+> commits: **3 / [c5769b4cb3...5560b2aa5c](https://github.com/OneGov/onegov-cloud/compare/c5769b4cb3^...5560b2aa5c)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.36)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🐞 **Adds cli tool to fix german tags for OccurrenceMixin**
+
+Imported tags were not coherent with tags defined in forms. Adds a tool to identify german words that are in the database even when translations exist. Identifies also unknown translations.
+
+**`Bugfix`** | **[ZW-264](https://kanton-zug.atlassian.net/browse/ZW-264)** | **[c5769b4cb3](https://github.com/onegov/onegov-cloud/commit/c5769b4cb3c68522d24689984fa86338c4532692)**
+
+🐞 **Fixes not using localized date in Ticket.subtitle**
+
+Fixes not using localized time in Ticket.subtitle, updated by EventSubmissionHandler.
+
+**`Bugfix`** | **[ZW-268](https://kanton-zug.atlassian.net/browse/ZW-268)** | **[b2ef85d50c](https://github.com/onegov/onegov-cloud/commit/b2ef85d50c2d81e6b9d4dfa9e64a46af4ea536f0)**
+
 ## Release `2020.35`
 
-> commits: **1 / [680a480bf7...680a480bf7](https://github.com/OneGov/onegov-cloud/compare/680a480bf7^...680a480bf7)**<br>
+> released: **2020-03-16 13:23**<br>
+> commits: **2 / [680a480bf7...163cb11542](https://github.com/OneGov/onegov-cloud/compare/680a480bf7^...163cb11542)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.35)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Electionday
