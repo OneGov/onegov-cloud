@@ -36,7 +36,6 @@ from sqlalchemy import or_
 from sqlalchemy.dialects.postgresql import array
 from urllib.parse import urlparse
 
-from onegov.org.forms.event import TAGS
 
 cli = command_group()
 
@@ -568,78 +567,3 @@ def fetch(group_context, source, tag, location):
             raise(e)
 
     return _fetch
-
-
-@cli.command(context_settings={'default_selector': '*'})
-@click.option('--dry-run', default=False, is_flag=True,
-              help="Do not write any changes into the database.")
-@pass_group_context
-def fix_tags(group_context, dry_run):
-
-    def fixes_german_tags_in_db(request, app):
-        session = request.session
-
-        de_transl = app.translations.get('de_CH')
-
-        DEFINED_TAGS = [t[0] for t in TAGS]
-        DEFINED_TAG_IDS = [str(s) for s in DEFINED_TAGS]
-
-        def translate(text):
-            return text.interpolate(de_transl.gettext(text))
-
-        form_de_to_en = {translate(text): str(text) for text in DEFINED_TAGS}
-
-        predefined = {
-            'Theater / Tanz': ('Dancing', 'Theater'),
-            'Cultur': ('Culture',),
-            'Vortrag / Lesung': ('Talk', 'Reading')
-        }
-
-        msg_log = []
-
-        def replace_with_predefined(tags):
-            new_tags = tags.copy()
-            for t in tags:
-                predef = predefined.get(t)
-                if predef:
-                    new_tags.remove(t)
-                    new_tags.extend(predef)
-                    if dry_run:
-                        msg_log.append(
-                            f'{t} -> {", ". join(predef)}')
-            return new_tags
-
-        undefined_msg_ids = set()
-
-        def handle_occurrence_tags(occurrence):
-            tags = occurrence.tags.copy()
-            tags = replace_with_predefined(tags)
-            for tag in occurrence.tags:
-                if tag in predefined:
-                    continue
-                if tag not in DEFINED_TAG_IDS:
-                    if tag in form_de_to_en:
-                        tags.remove(tag)
-                        tags.append(form_de_to_en[tag])
-                        msg_log.append(
-                            f'{tag} -> {form_de_to_en[tag]}')
-                    else:
-                        undefined_msg_ids.add(tag)
-            if tags != occurrence.tags:
-                if not dry_run:
-                    occurrence.tags = tags
-
-        for event in session.query(Event):
-            handle_occurrence_tags(event)
-
-        for occurrence in session.query(Occurrence):
-            handle_occurrence_tags(occurrence)
-
-        if dry_run:
-            print("\n".join(set(msg_log)))
-
-        assert not undefined_msg_ids, f'Define ' \
-                                      f'{", ".join(undefined_msg_ids)}' \
-                                      f' in org/forms/event.py'
-
-    return fixes_german_tags_in_db
