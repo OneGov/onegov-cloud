@@ -533,7 +533,7 @@ class EventSubmissionHandler(Handler):
 
         parts = (
             self.event.meta.get('submitter_email'),
-            '{:%d.%m.%Y %H:%M}'.format(self.event.start)
+            '{:%d.%m.%Y %H:%M}'.format(self.event.localized_start)
         )
 
         return ', '.join(p for p in parts if p)
