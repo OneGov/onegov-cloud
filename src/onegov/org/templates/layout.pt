@@ -145,7 +145,7 @@
               <tal:b metal:use-macro="layout.macros['consume_messages']" />
                 <div data-alert class="alert-box warning"
                         tal:define="url_part request.path_info"
-                        tal:condition="python: url_part.startswith('/events') or url_part.startswith('/event') or url_part == '/'"
+                        tal:condition="python: url_part.startswith('/events') or url_part.startswith('/event') or (url_part == '/' and 'onegov_org' not in request.app.application_id)"
                 >
                     <tal:b i18n:translate>corona_message</tal:b>
                     <a href="#" class="close">&times;</a>
