@@ -112,7 +112,7 @@ class ElectionCompoundForm(Form):
 
     pukelsheim_completed = BooleanField(
         label=_("Mark Pukelsheim Completed"),
-        depends_on=('after_pukelsheim', True),
+        depends_on=('after_pukelsheim', 'y'),
         fieldset=_("Views"),
         render_kw=dict(force_simple=True)
     )
