@@ -299,6 +299,10 @@ class SearchableArchivedResultCollection(
     def subset(self):
         return self.query()
 
+    @staticmethod
+    def allowed_item_types():
+        return tuple(a[0] for a in ArchivedResult.types_of_results)
+
     @property
     def page_index(self):
         return self.page
@@ -415,7 +419,6 @@ class SearchableArchivedResultCollection(
         assert self.to_date, 'to_date must have a datetime.date value'
 
         self.check_from_date_to_date()
-        allowed_results = tuple(a[0] for a in ArchivedResult.types_of_results)
         order = ('federation', 'canton', 'region', 'municipality')
         if self.app_principal_domain == 'municipality':
             order = ('municipality', 'federation', 'canton', 'region')
@@ -428,7 +431,7 @@ class SearchableArchivedResultCollection(
 
         query = self.session.query(ArchivedResult)
 
-        if self.item_type and self.item_type in allowed_results:
+        if self.item_type:
             # Treat compound election as elections
             if self.item_type == 'vote':
                 query = query.filter(ArchivedResult.type == self.item_type)
@@ -479,3 +482,11 @@ class SearchableArchivedResultCollection(
         self.term = None
         self.answers = None
         self.locale = 'de_CH'
+
+    @classmethod
+    def for_item_type(cls, session, item_type, **kwargs):
+        if item_type not in cls.allowed_item_types():
+            return None
+        kwargs['item_type'] = item_type
+        return cls(session, **kwargs)
+
