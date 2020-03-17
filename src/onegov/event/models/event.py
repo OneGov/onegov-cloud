@@ -8,7 +8,7 @@ from icalendar import Event as vEvent
 from icalendar import vRecur
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
-from onegov.core.orm.mixins import meta_property, content_property
+from onegov.core.orm.mixins import content_property
 from onegov.core.orm.mixins import ContentMixin
 from onegov.core.orm.mixins import meta_property
 from onegov.core.orm.mixins import TimestampMixin

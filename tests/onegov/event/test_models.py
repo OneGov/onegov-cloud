@@ -171,14 +171,16 @@ def test_occurrence_dates(session):
 
     assert len(dates) < 1100
     assert dates[0] == tzdatetime(year, 2, 7, 10, 15, 'Europe/Zurich')
-    assert dates[-1] == tzdatetime(year + year_limit, 12, 31, 10, 15, 'Europe/Zurich')
+    assert dates[-1] == tzdatetime(
+        year + year_limit, 12, 31, 10, 15, 'Europe/Zurich')
     assert str(dates[0].tzinfo) == 'UTC'
     assert str(dates[-1].tzinfo) == 'UTC'
 
     dates = event.occurrence_dates(localize=True)
     assert len(dates) < 1100
     assert dates[0] == tzdatetime(year, 2, 7, 10, 15, 'Europe/Zurich')
-    assert dates[-1] == tzdatetime(year + year_limit, 12, 31, 10, 15, 'Europe/Zurich')
+    assert dates[-1] == tzdatetime(
+        year + year_limit, 12, 31, 10, 15, 'Europe/Zurich')
     assert str(dates[0].tzinfo) == 'Europe/Zurich'
     assert str(dates[-1].tzinfo) == 'Europe/Zurich'
 
@@ -192,14 +194,16 @@ def test_occurrence_dates(session):
     dates = event.occurrence_dates()
     assert len(dates) < 1100
     assert dates[0] == tzdatetime(year, 2, 7, 10, 15, 'Europe/Zurich')
-    assert dates[-1] == tzdatetime(year + year_limit, 12, 31, 10, 15, 'Europe/Zurich')
+    assert dates[-1] == tzdatetime(
+        year + year_limit, 12, 31, 10, 15, 'Europe/Zurich')
     assert str(dates[0].tzinfo) == 'UTC'
     assert str(dates[-1].tzinfo) == 'UTC'
 
     dates = event.occurrence_dates(localize=True)
     assert len(dates) < 1100
     assert dates[0] == tzdatetime(year, 2, 7, 10, 15, 'Europe/Zurich')
-    assert dates[-1] == tzdatetime(year + year_limit, 12, 31, 10, 15, 'Europe/Zurich')
+    assert dates[-1] == tzdatetime(
+        year + year_limit, 12, 31, 10, 15, 'Europe/Zurich')
     assert str(dates[0].tzinfo) == 'Europe/Zurich'
     assert str(dates[-1].tzinfo) == 'Europe/Zurich'
 
