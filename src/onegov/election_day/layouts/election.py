@@ -95,6 +95,7 @@ class ElectionLayout(DetailLayout):
                 and self.has_districts
                 and self.proporz
                 and not self.tacit
+                and not self.districts_are_entities
             )
         if tab == 'candidate-by-entity':
             return (
