@@ -1,8 +1,22 @@
 # Changes
 
+## Release `2020.38`
+
+> commits: **1 / [ff8d897a2d...ff8d897a2d](https://github.com/OneGov/onegov-cloud/compare/ff8d897a2d^...ff8d897a2d)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.38)](https://buildkite.com/seantis/onegov-cloud)
+
+### Electionday
+
+🎉 **Modifies ElectionCompound list view**
+
+If the ElectionCompound is after_pukelsheim, hides by default the votes from the list table on the ElectionCompound. Also if after_pukelheim, the bar chart shows only the mandates not the sum of all ListResult.votes.
+
+**`Feature`** | **[ff8d897a2d](https://github.com/onegov/onegov-cloud/commit/ff8d897a2da2cd561979033a05c1ec6064f054e6)**
+
 ## Release `2020.37`
 
-> commits: **2 / [20f716cc1e...537cde1080](https://github.com/OneGov/onegov-cloud/compare/20f716cc1e^...537cde1080)**<br>
+> released: **2020-03-17 12:16**<br>
+> commits: **3 / [20f716cc1e...79aa0463c3](https://github.com/OneGov/onegov-cloud/compare/20f716cc1e^...79aa0463c3)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.37)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Electionday
