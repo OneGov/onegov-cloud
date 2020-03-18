@@ -61,7 +61,7 @@ def view_election_compound_lists_table(self, request):
         'election': self,
         'lists': get_list_results(self, object_session(self)),
         'layout': DefaultLayout(self, request),
-        'type': 'election-table',
+        'type': 'election-compound-table',
         'scope': 'lists',
     }
 

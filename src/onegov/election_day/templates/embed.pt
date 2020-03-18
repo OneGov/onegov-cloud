@@ -142,6 +142,9 @@
             <tal:b tal:condition="type == 'election-table' and scope == 'lists'">
                 <tal:b metal:use-macro="layout.macros['election-lists-table']"/>
             </tal:b>
+            <tal:b tal:condition="type == 'election-compound-table' and scope == 'lists'">
+                <tal:b metal:use-macro="layout.macros['election-compound-lists-table']"/>
+            </tal:b>
             <tal:b tal:condition="type == 'election-compound-table' and scope == 'statistics'">
                 <tal:b metal:use-macro="layout.macros['election-statistics-table']"/>
             </tal:b>
