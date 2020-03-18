@@ -18,7 +18,7 @@ def view_election_compound_lists_data(self, request):
 
     """" View the lists as JSON. Used to for the lists bar chart. """
 
-    return get_lists_data(self, request)
+    return get_lists_data(self, request, mandates_only=self.after_pukelsheim)
 
 
 @ElectionDayApp.html(
