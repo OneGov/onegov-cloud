@@ -997,8 +997,8 @@ def fix_tags(group_context, dry_run):
                 if not dry_run:
                     occurrence.tags = tags
 
-        for event in session.query(Event):
-            handle_occurrence_tags(event)
+        for event_ in session.query(Event):
+            handle_occurrence_tags(event_)
 
         for occurrence in session.query(Occurrence):
             handle_occurrence_tags(occurrence)

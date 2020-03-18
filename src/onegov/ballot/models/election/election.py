@@ -286,7 +286,6 @@ class Election(Base, ContentMixin, TimestampMixin,
         if result:
             return result.district or result.name
 
-
     @property
     def votes_by_district(self):
         results = self.results.order_by(None)

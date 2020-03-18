@@ -1,6 +1,4 @@
 import inspect
-import re
-from datetime import timedelta
 
 import phonenumbers
 import sedate
@@ -28,6 +26,20 @@ from wtforms.fields import Field
 from wtforms.validators import DataRequired
 from wtforms.validators import InputRequired
 from wtforms.fields.html5 import DateTimeField
+from wtforms_components import TimeField as DefaultTimeField
+
+
+class TimeField(DefaultTimeField):
+    """
+    Fixes the case for MS Edge Browser that returns the 'valuelist'
+    as [08:00:000] instead of [08:00]. This is only the case of the time
+    is set with the js popup, not when switching the time
+    e.g. with the arrow keys on the form.
+    """
+
+    def process_formdata(self, valuelist):
+        valuelist = [t[:5] for t in valuelist]
+        return super().process_formdata(valuelist)
 
 
 class MultiCheckboxField(SelectMultipleField):

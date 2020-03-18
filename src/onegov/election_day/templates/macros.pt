@@ -295,6 +295,35 @@
     </table>
 </metal:election-lists-table>
 
+<metal:election-compound-lists-table define-macro="election-compound-lists-table" i18n:domain="onegov.election_day">
+    <table
+        class="results tablesaw sortable"
+        data-tablesaw-mode="columntoggle"
+        data-tablesaw-mode-switch="" data-tablesaw-mode-exclude="swipe"
+        data-tablesaw-minimap=""
+        >
+        <thead>
+            <tr>
+                <th data-tablesaw-priority="persist" i18n:translate="">List</th>
+                <th data-tablesaw-priority="${'0' if election.after_pukelsheim else '1'}" i18n:translate="single_votes" class="right-aligned">Votes</th>
+                <th data-tablesaw-priority="2" i18n:translate="" class="right-aligned">Mandates</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr tal:repeat="list lists">
+                <td>${list.name}</td>
+                <td class="right-aligned" data-text="${list.votes or 0}">${layout.format_number(list.votes or 0)}</td>
+                <tal:b tal:switch="python: (election.after_pukelsheim or election.completed)">
+                    <td tal:case="True" class="right-aligned">${list.number_of_mandates}</td>
+                    <td tal:case="False" class="right-aligned" i18n:translate>n.a.</td>
+
+                </tal:b>
+
+            </tr>
+        </tbody>
+    </table>
+</metal:election-compound-lists-table>
+
 <metal:embedded_widget define-macro="embedded_widget" i18n:domain="onegov.election_day">
     <div tal:condition="embed_link" class="embedded-widget"
         data-embed-link="Embed"
