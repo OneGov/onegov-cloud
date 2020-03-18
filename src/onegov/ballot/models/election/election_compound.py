@@ -311,13 +311,13 @@ class ElectionCompound(
 
         return result
 
-    @property
-    def lists_data(self):
+    def lists_data(self, order_by='votes'):
         """
         Returns the sum of the number_of_mandates for every list of every
-        election of the compound
-        :return:
+        election of the compound.
+
         """
+        assert order_by in ('votes', 'number_of_mandates')
         ec = ElectionCompound
         session = object_session(self)
         q = session.query(
@@ -326,11 +326,12 @@ class ElectionCompound(
             func.sum(ListResult.votes).label('votes')
         )
         q = q.join(ec.associations)
-        q = q.join(Election).join(List).join(ListResult)
         q = q.filter(ec.id == self.id, ec.date == Election.date)
-        q = q.group_by(List.name).subquery()
+        q = q.join(Election).join(List).join(ListResult)
 
-        return session.query(q).order_by(q.c.votes.desc())
+        q = q.group_by(List.name).subquery()
+        order_col = getattr(q.c, order_by)
+        return session.query(q).order_by(order_col.desc())
 
     #: may be used to store a link related to this election
     related_link = meta_property('related_link')
