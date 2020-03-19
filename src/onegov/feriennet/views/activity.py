@@ -428,6 +428,10 @@ def view_activities_for_volunteers(self, request):
     filters = {}
 
     if show_activities:
+        # Limit dates to active period and to occasion dates in the future
+        self.filter.period_ids = (active_period.id,)
+        self.filter.timelines = ('future', )
+
         filters['tags'] = filter_tags(self, request)
         filters['durations'] = filter_durations(self, request)
 
