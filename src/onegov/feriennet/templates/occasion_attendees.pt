@@ -80,7 +80,7 @@
                             </div>
                             <div tal:condition="details.info.email">
                                 <span i18n:translate>E-Mail:</span>
-                                <span><a href="mailto:${details.info.email}">${details.info.email}</span>
+                                <span><a href="mailto:${details.info.email}">${details.info.email}</a></span>
                             </div>
                             <div tal:condition="details.info.place">
                                 <span i18n:translate>Place:</span>
