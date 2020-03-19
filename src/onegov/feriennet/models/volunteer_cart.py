@@ -70,11 +70,16 @@ class VolunteerCart(object):
 
         return False
 
-    def for_frontend(self, layout):
+    def for_frontend(self, layout, localize=True):
         grouped = groupby(self.card_items(), key=lambda i: i.need_id)
 
         def date(record):
-            return layout.format_datetime_range(record.start, record.end)
+            start = record.start
+            end = record.end
+            if localize:
+                start = layout.to_timezone(start, record.timezone)
+                end = layout.to_timezone(end, record.timezone)
+            return layout.format_datetime_range(start, end)
 
         def remove(record):
             return layout.csrf_protected_url(
