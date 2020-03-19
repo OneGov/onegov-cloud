@@ -16,7 +16,8 @@ def test_jsx_filter():
 
     output.seek(0)
     assert output.read() == (
-        'var component = Rect.createClass({'
-        'render: function() { return React.createElement("div", null); }'
+        '"use strict";'
+        'var component=Rect.createClass({'
+        'render:function render(){return React.createElement("div",null)}'
         '});'
     )

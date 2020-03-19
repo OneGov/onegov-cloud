@@ -1,18 +1,39 @@
 """ Extra webasset filters. """
+import os
 
 from webassets.filter import Filter, register_filter
 from webassets.filter.datauri import CSSDataUri, CSSUrlRewriter
+from dukpy.webassets import BabelJSX
+from dukpy import jsx_compile
 
 
-class JsxFilter(Filter):
+class JsxFilter(BabelJSX):
+    """
+    DukPy is a simple javascript interpreter for Python built on top of
+    duktape engine without any external dependency.
+
+    Note: let is not supported by the duktape engine,
+    see https://github.com/amol-/dukpy/issues/47.
+    """
     name = 'jsx'
 
-    def setup(self):
-        from react import jsx
-        self.transformer = jsx.JSXTransformer()
+    babel_options = {'minified': True}
 
     def input(self, _in, out, **kwargs):
-        out.write(self.transformer.transform_string(_in.read()))
+        """kwargs are actually babel options"""
+        options = self.babel_options.copy()
+        source_path = kwargs.get('source_path')
+        if source_path:
+            options['filename'] = os.path.basename(source_path)
+
+        if self.loader == 'systemjs':
+            options['plugins'] = ['transform-es2015-modules-systemjs']
+        elif self.loader == 'umd':
+            options['plugins'] = ['transform-es2015-modules-umd']
+        out.write(self.transformer(_in.read(), **options))
+
+    def setup(self):
+        self.transformer = jsx_compile
 
 
 register_filter(JsxFilter)
