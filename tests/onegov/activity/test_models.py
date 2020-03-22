@@ -2307,6 +2307,7 @@ def test_no_occasion_orphans(session, collections, prebooking_period, owner):
 
 
 def test_date_changes(session, collections, prebooking_period, owner):
+    # Fixme: Is a flaky test
     period = prebooking_period
 
     collections.occasions.add(
