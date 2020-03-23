@@ -3,6 +3,7 @@ SELECT
     occasion_needs.name AS need_name,   -- Text
     occasion_dates.start AS "start",    -- UTCDateTime
     occasion_dates.end AS "end",        -- UTCDateTime
+    occasion_dates.timezone AS timezone, -- Text
     activities.title AS activity_title, -- Text
     occasions.id AS occasion_id         -- UUID
 FROM

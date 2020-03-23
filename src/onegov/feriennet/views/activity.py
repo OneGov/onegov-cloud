@@ -428,6 +428,10 @@ def view_activities_for_volunteers(self, request):
     filters = {}
 
     if show_activities:
+        # Limit dates to active period and to occasion dates in the future
+        self.filter.period_ids = (active_period.id,)
+        self.filter.timelines = ('future', )
+
         filters['tags'] = filter_tags(self, request)
         filters['durations'] = filter_durations(self, request)
 
@@ -489,8 +493,8 @@ def view_activity(self, request):
             o.dates[0].localized_start,
             o.dates[0].localized_end
         )
-
-        if o.cancelled and not o.period.finalized:
+        admin_or_not_finalized = request.is_admin or not o.period.finalized
+        if o.cancelled and admin_or_not_finalized:
             yield Link(
                 text=_("Reinstate"),
                 url=layout.csrf_protected_url(
@@ -512,7 +516,7 @@ def view_activity(self, request):
                     )
                 )
             )
-        elif o.id in occasion_ids_with_bookings and not o.period.finalized:
+        elif o.id in occasion_ids_with_bookings and admin_or_not_finalized:
             yield Link(
                 text=_("Rescind"),
                 url=layout.csrf_protected_url(request.link(o, name='cancel')),

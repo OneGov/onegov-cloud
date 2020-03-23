@@ -40,7 +40,7 @@ class Period(Base, TimestampMixin):
     active = Column(Boolean, nullable=False, default=False)
 
     #: A confirmed period may not be automatically matched anymore and all
-    #: booking changes to it are communicted to the customer
+    #: booking changes to it are communicated to the customer
     confirmed = Column(Boolean, nullable=False, default=False)
 
     #: A confirmable period has a prebooking phase, while an unconfirmable
