@@ -155,7 +155,7 @@ setup(
             'pytest-xdist',
             'scrambler',
             'lingua==3.12',
-            'gitpython',
+            'gitpython==3.0.9',
             'honyaku@git+https://github.com/seantis/honyaku#egg=honyaku',
         ],
         'docs': [
