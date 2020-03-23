@@ -1,8 +1,33 @@
 # Changes
 
+## Release `2020.39`
+
+> commits: **4 / [d83aded397...639a3c5e11](https://github.com/OneGov/onegov-cloud/compare/d83aded397^...639a3c5e11)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.39)](https://buildkite.com/seantis/onegov-cloud)
+
+### Core
+
+🎉 **Replaces pyreact with dukpy as jsx compiler**
+
+Replaces depreceated pyreact library.
+
+**`Feature`** | **[f0f777bdb8](https://github.com/onegov/onegov-cloud/commit/f0f777bdb8c10a0b4f414df700c1f9df2c702060)**
+
+### Feriennet
+
+✨ **Minor Fixes**
+
+- Fixes unclosed html tag
+- Fixes not hiding past dates on /activities/volunteer
+- Show links on occasion to rescind even if billing has been done (=> period.finalized is True)
+- Fixes non-localized date on /volunteer-cart
+
+**`Other`** | **[93a3a18f1d](https://github.com/onegov/onegov-cloud/commit/93a3a18f1dae39e29bcad9eaf9c9ad50c318d971)**
+
 ## Release `2020.38`
 
-> commits: **1 / [ff8d897a2d...ff8d897a2d](https://github.com/OneGov/onegov-cloud/compare/ff8d897a2d^...ff8d897a2d)**<br>
+> released: **2020-03-18 12:10**<br>
+> commits: **2 / [ff8d897a2d...46625efdf3](https://github.com/OneGov/onegov-cloud/compare/ff8d897a2d^...46625efdf3)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.38)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Electionday
