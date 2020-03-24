@@ -948,6 +948,22 @@ $booking-left-margin: 2rem;
             margin-bottom: 0;
         }
 
+        .rega-widget {
+            display: flex;
+            font-style: italic;
+            width: 100% !important;
+
+            .left {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .right {
+                margin-left: 1rem;
+            }
+        }
+
         .icons {
             position: absolute;
             right: 32px;

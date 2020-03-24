@@ -1,4 +1,6 @@
 from cached_property import cached_property
+from purl import URL
+
 from onegov.activity import Activity, PeriodCollection, Occasion
 from onegov.activity import BookingCollection
 from onegov.core.elements import Link, Confirm, Intercooler, Block
@@ -134,6 +136,32 @@ class BookingCollectionLayout(DefaultLayout):
     def __init__(self, model, request, user=None):
         super().__init__(model, request)
         self.user = user or request.current_user
+
+    def rega_link(self, attendee, period, grouped_bookings):
+        base_url = 'https://example.rega.ch'
+        home_page = self.request.link(self.request.app.org)
+        if not any((period, attendee, grouped_bookings)):
+            return
+
+        dates = []
+        for state, bookings in grouped_bookings[attendee].items():
+            if state not in ('open', 'accepted'):
+                continue
+            for booking in bookings:
+                for _date in booking.occasion.dates:
+                    dates.append(_date)
+        if not dates:
+            return
+
+        url = URL(base_url)
+        for _date in dates:
+            url = url.query_param('booked_date', _date.start.date())
+        url = url.query_param('period_id', period.id)
+        url = url.query_param('execution_start', period.execution_start)
+        url = url.query_param('execution_end', period.execution_end)
+        url = url.query_param('ferienpass_url', home_page)
+
+        return url.as_string()
 
     @cached_property
     def title(self):
