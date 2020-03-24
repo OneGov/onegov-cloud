@@ -29,6 +29,16 @@ def get_custom_settings_form(model, request):
             label=_("Publications Label"),
             description=_("Official Documents"))
 
+        e_move_label = StringField(
+            label=_('E-Move Label'),
+            description=_('E-Move')
+        )
+
+        e_move_url = StringField(
+            label=_('E-Move Url'),
+            description=_('E-Move')
+        )
+
         hide_publications = BooleanField(
             label=_("Hide Publications on Homepage"))
 
@@ -39,6 +49,8 @@ def get_custom_settings_form(model, request):
             'reservations_label',
             'daypass_label',
             'publications_label',
+            'e_move_label',
+            'e_move_url',
             'hide_publications',
         ),
         after='homepage_image_6'

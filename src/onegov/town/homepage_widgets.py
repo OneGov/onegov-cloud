@@ -48,6 +48,16 @@ class ServicesWidget(object):
             )
         )
 
+        if layout.org.meta.get('e_move_url'):
+            yield Link(
+                text=_("E-Move"),
+                url=layout.org.meta.get('e_move_url'),
+                subtitle=(
+                    layout.org.meta.get('e_move_label')
+                    or _("Move with eMovingCH")
+                )
+            )
+
         resources = ResourceCollection(layout.app.libres_context)
 
         # ga-tageskarte is the legacy name

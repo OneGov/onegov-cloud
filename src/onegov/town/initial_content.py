@@ -25,6 +25,7 @@ def create_new_organisation(app, name, reply_to=None, forms=None,
     org = Organisation(name=name, **content['organisation'])
     org.reply_to = reply_to
     org.meta['locales'] = locale
+    org.meta['e_move_url'] = 'https://www.eumzug.swiss/eumzug/#/global'
     session.add(org)
 
     form_locales = {

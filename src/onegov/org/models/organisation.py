@@ -47,6 +47,8 @@ class Organisation(Base, TimestampMixin):
     publications_label = meta_property()
     hide_publications = meta_property()
     daypass_label = meta_property()
+    e_move_label = meta_property()
+    e_move_url = meta_property()
     default_map_view = meta_property()
     homepage_structure = meta_property()
     homepage_cover = meta_property()
