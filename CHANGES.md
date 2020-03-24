@@ -1,8 +1,23 @@
 # Changes
 
+## Release `2020.40`
+
+> commits: **3 / [3b28334755...8db8a825f7](https://github.com/OneGov/onegov-cloud/compare/3b28334755^...8db8a825f7)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.40)](https://buildkite.com/seantis/onegov-cloud)
+
+### Town
+
+🎉 **Adds eUmzug Label and Url**
+
+- Hide this entry if no url is defined
+- add the default e-move url when creating new town app
+
+**`Feature`** | **[8db8a825f7](https://github.com/onegov/onegov-cloud/commit/8db8a825f7b98449b5b9b7ccd202403325b8d347)**
+
 ## Release `2020.39`
 
-> commits: **4 / [d83aded397...639a3c5e11](https://github.com/OneGov/onegov-cloud/compare/d83aded397^...639a3c5e11)**<br>
+> released: **2020-03-23 11:46**<br>
+> commits: **5 / [d83aded397...0873416984](https://github.com/OneGov/onegov-cloud/compare/d83aded397^...0873416984)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.39)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Core
