@@ -429,7 +429,6 @@ def view_activities_for_volunteers(self, request):
 
     if show_activities:
         # Limit dates to active period and to occasion dates in the future
-        self.filter.period_ids = (active_period.id,)
         self.filter.timelines = ('future', )
 
         filters['tags'] = filter_tags(self, request)
@@ -437,6 +436,7 @@ def view_activities_for_volunteers(self, request):
 
         if active_period:
             filters['weeks'] = filter_weeks(self, request)
+            self.filter.period_ids = (active_period.id,)
 
         filters['weekdays'] = filter_weekdays(self, request)
         filters['municipalities'] = filter_municipalities(self, request)
