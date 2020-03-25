@@ -329,6 +329,13 @@ def adjust_filter_path(filters, suffix):
 
 def exclude_filtered_dates(activities, dates):
     result = []
+    today = date.today()
+    for dt in dates:
+        if dt.start.date() > today:
+            result.append(dt)
+
+    dates = result
+    result = []
 
     if not activities.filter.dateranges:
         result = dates
@@ -428,15 +435,12 @@ def view_activities_for_volunteers(self, request):
     filters = {}
 
     if show_activities:
-        # Limit dates to active period and to occasion dates in the future
-        self.filter.timelines = ('future', )
 
         filters['tags'] = filter_tags(self, request)
         filters['durations'] = filter_durations(self, request)
 
         if active_period:
             filters['weeks'] = filter_weeks(self, request)
-            self.filter.period_ids = (active_period.id,)
 
         filters['weekdays'] = filter_weekdays(self, request)
         filters['municipalities'] = filter_municipalities(self, request)
