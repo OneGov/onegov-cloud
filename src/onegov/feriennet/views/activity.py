@@ -494,7 +494,7 @@ def view_activity(self, request):
             o.dates[0].localized_end
         )
         admin_or_not_finalized = request.is_admin or not o.period.finalized
-        if o.cancelled and admin_or_not_finalized:
+        if o.cancelled and not o.period.finalized:
             yield Link(
                 text=_("Reinstate"),
                 url=layout.csrf_protected_url(
