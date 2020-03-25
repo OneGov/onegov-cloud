@@ -112,7 +112,7 @@ var TimelineMessages = React.createClass({
                                 showDate(ix) && <div className="date"><span>{m.date}</span></div>
                             }
                             <div className={(function() {
-                                classes = ['message'];
+                                var classes = ['message'];
                                 classes.push('message-' + m.type);
 
                                 if (showDate(ix)) {
