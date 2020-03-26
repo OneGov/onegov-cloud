@@ -441,6 +441,7 @@ def view_activities_for_volunteers(self, request):
 
         if active_period:
             filters['weeks'] = filter_weeks(self, request)
+            self.filter.period_ids = (active_period.id,)
 
         filters['weekdays'] = filter_weekdays(self, request)
         filters['municipalities'] = filter_municipalities(self, request)
