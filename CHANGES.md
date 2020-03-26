@@ -1,8 +1,14 @@
 # Changes
 
+## Release `2020.41`
+
+> commits: **5 / [6457276d64...5f4d3494d2](https://github.com/OneGov/onegov-cloud/compare/6457276d64^...5f4d3494d2)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.41)](https://buildkite.com/seantis/onegov-cloud)
+
 ## Release `2020.40`
 
-> commits: **3 / [3b28334755...8db8a825f7](https://github.com/OneGov/onegov-cloud/compare/3b28334755^...8db8a825f7)**<br>
+> released: **2020-03-24 13:01**<br>
+> commits: **4 / [3b28334755...dc30694a00](https://github.com/OneGov/onegov-cloud/compare/3b28334755^...dc30694a00)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.40)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Town
