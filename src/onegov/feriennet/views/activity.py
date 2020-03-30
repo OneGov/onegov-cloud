@@ -498,7 +498,9 @@ def view_activity(self, request):
             o.dates[0].localized_start,
             o.dates[0].localized_end
         )
-        admin_or_not_finalized = request.is_admin or not o.period.finalized
+        can_cancel = not o.cancelled and (
+                request.is_admin or not o.period.finalized)
+
         if o.cancelled and not o.period.finalized:
             yield Link(
                 text=_("Reinstate"),
@@ -521,7 +523,7 @@ def view_activity(self, request):
                     )
                 )
             )
-        elif o.id in occasion_ids_with_bookings and admin_or_not_finalized:
+        elif o.id in occasion_ids_with_bookings and can_cancel:
             yield Link(
                 text=_("Rescind"),
                 url=layout.csrf_protected_url(request.link(o, name='cancel')),
