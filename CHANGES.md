@@ -1,8 +1,26 @@
 # Changes
 
+## Release `2020.42`
+
+> commits: **3 / [17ab53cb70...55a7ebe664](https://github.com/OneGov/onegov-cloud/compare/17ab53cb70^...55a7ebe664)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.42)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🐞 **Fixes cancel link**
+
+**`Bugfix`** | **[bedbdbb12b](https://github.com/onegov/onegov-cloud/commit/bedbdbb12b8822c0e1cccfa70cba12e67266ffa6)**
+
+### Org
+
+🐞 **Improves homepage alert and alert padding**
+
+**`Bugfix`** | **[55a7ebe664](https://github.com/onegov/onegov-cloud/commit/55a7ebe664e46ad1011a637d75c807e3766df6e7)**
+
 ## Release `2020.41`
 
-> commits: **5 / [6457276d64...5f4d3494d2](https://github.com/OneGov/onegov-cloud/compare/6457276d64^...5f4d3494d2)**<br>
+> released: **2020-03-26 07:59**<br>
+> commits: **6 / [6457276d64...606c9f0995](https://github.com/OneGov/onegov-cloud/compare/6457276d64^...606c9f0995)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.41)](https://buildkite.com/seantis/onegov-cloud)
 
 ## Release `2020.40`
