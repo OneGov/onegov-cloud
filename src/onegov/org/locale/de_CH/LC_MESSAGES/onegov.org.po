@@ -1980,7 +1980,7 @@ msgstr ""
 
 msgid "corona_message"
 msgstr ""
-"Aufgrund der ausserordentliche Lage verbietet der Bundesrat öffentliche und "
+"Aufgrund der ausserordentlichen Lage verbietet der Bundesrat öffentliche und "
 "private Veranstaltungen. Alle Veranstaltungen sind damit abgesagt und finden "
 "nicht statt."
 
