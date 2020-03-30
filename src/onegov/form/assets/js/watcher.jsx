@@ -23,7 +23,7 @@ var FormcodeWatcher = function(name) {
             });
         };
 
-        formcodeUtils.request('post', '/formcode-fields', success, formcode);
+        formcodeUtils.request('post', base_url + '/formcode-fields', success, formcode);
     };
 
     self.subscribe = function(subscriber) {
