@@ -675,9 +675,23 @@ $info-icon: '\f05a';
 $success-icon: '\f058';
 $warning-icon: '\f071';
 
+.homepage-warning {
+    font-size: inherit;
+    display: flex;
+    flex-direction: row;
+    background-color: $warning-color;
+
+    .icon {
+        margin-right: 0.5rem;
+        &::before {
+            @include icon($info-icon);
+        }
+    }
+}
+
 .alert-box {
     border: 0;
-    padding: .75rem 1.5rem .75rem .875rem;
+    padding: .75rem 2rem .75rem .875rem;
     vertical-align: middle;
 
     .close {
