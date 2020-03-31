@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-03-17 11:08+0100\n"
+"POT-Creation-Date: 2020-03-31 09:43+0200\n"
 "PO-Revision-Date: 2020-03-17 11:04+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -932,6 +932,18 @@ msgstr "Instagram"
 
 msgid "URL pointing to the Instagram site"
 msgstr "Lien vers la page Instagram"
+
+msgid "Custom Link 1"
+msgstr "Lien personnalisé 1"
+
+msgid "URL to internal/external site"
+msgstr "Lien site interne/externe"
+
+msgid "Custom Link 2"
+msgstr "Lien personnalisé 2"
+
+msgid "Custom Link 3"
+msgstr "Lien personnalisé 3"
 
 msgid "Name of the partner"
 msgstr "Nom du partenaire"

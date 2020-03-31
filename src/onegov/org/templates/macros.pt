@@ -132,10 +132,19 @@
 
             <div class="small-12 medium-4 columns">
                 <metal:b use-macro="layout.macros['footer_social_media']" />
+                <metal:b use-macro="layout.macros['footer_custom_links']" />
             </div>
         </div>
     </tal:b>
 </metal:footer_columns>
+
+<metal:footer_custom_links define-macro="footer_custom_links">
+    <tal:b define="custom_links layout.custom_links">
+        <tal:b tal:condition="custom_links" tal:repeat="link custom_links">
+            <h2><a href="${link[1]}">${link[0]}</a></h2>
+        </tal:b>
+    </tal:b>
+</metal:footer_custom_links>
 
 <metal:footer_links define-macro="footer_links" i18n:domain="onegov.org">
     <div class="row footer-links">

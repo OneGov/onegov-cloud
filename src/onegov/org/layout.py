@@ -361,6 +361,26 @@ class Layout(ChameleonLayout):
         else:
             return url
 
+    @property
+    def custom_links(self):
+        links = {}
+
+        def split_entry(name):
+            num_, key = name.replace('custom_link_', '').split('_')
+            return int(num_), key
+
+        for entry, value in self.org.meta.items():
+            if entry.startswith('custom_link'):
+                num, key = split_entry(entry)
+                link = links.setdefault(num, {})
+                link[key] = value
+
+        return [
+            (v['name'], v['url']) for k, v in sorted(
+                links.items(), key=lambda item: item[0])
+            if v['name'] and v['url']
+        ]
+
     def include_editor(self):
         self.request.include('redactor')
         self.request.include('editor')

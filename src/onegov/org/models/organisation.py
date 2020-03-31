@@ -68,6 +68,14 @@ class Organisation(Base, TimestampMixin):
     youtube_url = meta_property()
     instagram_url = meta_property()
 
+    # custom links
+    custom_link_1_name = meta_property()
+    custom_link_1_url = meta_property()
+    custom_link_2_name = meta_property()
+    custom_link_2_url = meta_property()
+    custom_link_3_name = meta_property()
+    custom_link_3_url = meta_property()
+
     # parter logos
     partner_1_img = meta_property()
     partner_1_url = meta_property()

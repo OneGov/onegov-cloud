@@ -173,6 +173,42 @@ class FooterSettingsForm(Form):
         description=_("URL pointing to the Instagram site"),
         fieldset=_("Social Media"))
 
+    custom_link_1_name = StringField(
+        label=_("Name"),
+        description="Name of the Label",
+        fieldset=_("Custom Link 1")
+    )
+
+    custom_link_1_url = URLField(
+        label=_("URL"),
+        description=_("URL to internal/external site"),
+        fieldset=_("Custom Link 1")
+    )
+
+    custom_link_2_name = StringField(
+        label=_("Name"),
+        description="Name of the Label",
+        fieldset=_("Custom Link 2")
+    )
+
+    custom_link_2_url = URLField(
+        label=_("URL"),
+        description=_("URL to internal/external site"),
+        fieldset=_("Custom Link 2")
+    )
+
+    custom_link_3_name = StringField(
+        label=_("Name"),
+        description="Name of the Label",
+        fieldset=_("Custom Link 3")
+    )
+
+    custom_link_3_url = URLField(
+        label=_("URL"),
+        description=_("URL to internal/external site"),
+        fieldset=_("Custom Link 3")
+    )
+
     partner_1_name = StringField(
         label=_("Name"),
         description=_("Name of the partner"),
