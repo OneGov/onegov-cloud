@@ -1,9 +1,10 @@
 import re
 
+from cached_property import cached_property
 from lxml import etree
 from onegov.form import Form
 from onegov.form import with_options
-from onegov.form.fields import MultiCheckboxField, TagsField
+from onegov.form.fields import MultiCheckboxField, TagsField, ChosenSelectField
 from onegov.form.fields import PreviewField
 from onegov.gis import CoordinatesField
 from onegov.org import _
@@ -46,6 +47,13 @@ class GeneralSettingsForm(Form):
     primary_color = ColorField(
         label=_("Primary Color"))
 
+    font_family_sans_serif = ChosenSelectField(
+        label=_('Default Font Family'),
+        description='Used for text in html body',
+        choices=[],
+        validators=[validators.InputRequired()]
+    )
+
     locales = RadioField(
         label=_("Languages"),
         choices=(
@@ -62,6 +70,11 @@ class GeneralSettingsForm(Form):
             options['primary-color'] = self.primary_color.data.get_hex()
         except AttributeError:
             options['primary-color'] = user_options['primary-color']
+        font_family = self.font_family_sans_serif.data
+        if font_family not in self.theme.font_families.values():
+            options['font-family-sans-serif'] = self.default_font_family
+        else:
+            options['font-family-sans-serif'] = font_family
 
         # override the options using the default values if no value was given
         for key in options:
@@ -70,9 +83,19 @@ class GeneralSettingsForm(Form):
 
         return options
 
+    @cached_property
+    def theme(self):
+        return self.request.app.settings.core.theme
+
+    @property
+    def default_font_family(self):
+        return self.theme.default_options.get('font-family-sans-serif')
+
     @theme_options.setter
     def theme_options(self, options):
         self.primary_color.data = options.get('primary-color')
+        self.font_family_sans_serif.data = options.get(
+            'font-family-sans-serif') or self.default_font_family
 
     def populate_obj(self, model):
         super().populate_obj(model)
@@ -82,7 +105,13 @@ class GeneralSettingsForm(Form):
         super().process_obj(model)
         self.theme_options = model.theme_options
 
+    def populate_font_families(self):
+        self.font_family_sans_serif.choices = tuple(
+            (value, label) for label, value in self.theme.font_families.items()
+        )
+
     def on_request(self):
+        self.populate_font_families()
 
         @self.request.after
         def clear_locale(response):
