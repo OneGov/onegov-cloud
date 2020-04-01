@@ -191,7 +191,8 @@ def handle_update_publish_date(self, request):
         return
 
     try:
-        date = parse(request.params['date'], dayfirst=True)
+        # dates are returned as 2019-01-31
+        date = parse(request.params['date'], dayfirst=False)
     except (ValueError, KeyError):
         date = self.publish_date and self.publish_date.date()
         date = date or layout.today()

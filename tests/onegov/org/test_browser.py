@@ -2,7 +2,7 @@ import pytest
 import requests
 import transaction
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from onegov.core.utils import module_path
 from onegov.directory import DirectoryCollection
 from onegov.file import FileCollection
@@ -308,17 +308,20 @@ def test_publication_workflow(browser, temporary_path, org_app):
     assert not browser.is_text_present("Öffentlich")
 
     # enter a publication date in the past (no type date support in selenium)
-    browser.find_by_css('select').select('01:00')
+    # set as the time of the layout timezone. UTC date can be a day before
+    browser.find_by_name('hour').select('00:00')
 
     assert browser.is_text_present("Wird publiziert am", wait_time=1)
     assert not browser.is_text_present("Publikationsdatum")
 
-    dt = datetime.today()
     f = FileCollection(org_app.session()).query().one()
+    dt = datetime.today()
+    midnight = datetime(dt.year, dt.month, dt.day, 0, tzinfo=UTC)
 
     assert f.publish_date in (
-        datetime(dt.year, dt.month, dt.day, 0, tzinfo=UTC),  # dst
-        datetime(dt.year, dt.month, dt.day, 1, tzinfo=UTC)   # !dst
+        midnight,                        # utc
+        midnight - timedelta(hours=1),   # +1:00 winter, Europe
+        midnight - timedelta(hours=2)    # +2:00 summer, Europa
     )
 
     # run the cronjob and make sure it works
