@@ -33,6 +33,3 @@ OneGov.utils.inferTime = function(time) {
 
     return numeric;
 };
-
-// if you have to hardcode url in js, use this base url as prefix in able to work in development
-var base_url = document.getElementsByTagName('link')[0].href.split('theme')[0];

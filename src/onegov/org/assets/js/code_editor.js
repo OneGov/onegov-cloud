@@ -97,7 +97,7 @@ $(function() {
             var fnid = 'onInsertSnippet' + Math.floor(Math.random() * 10001);
             var toolbar = $(
                 '<div class="formcode-ace-editor-toolbar" ' +
-                     'data-source="' + base_url + '/formcode-snippets" ' +
+                     'data-source="' + get_base_url() + '/formcode-snippets" ' +
                      'data-target="' + fnid + '">'
             );
 

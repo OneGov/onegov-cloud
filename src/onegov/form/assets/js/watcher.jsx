@@ -22,8 +22,9 @@ var FormcodeWatcher = function(name) {
                 subscriber(fields);
             });
         };
+        // if you have to hardcode url in js, use this base url as prefix in able to work in development
 
-        formcodeUtils.request('post', base_url + '/formcode-fields', success, formcode);
+        formcodeUtils.request('post', get_base_url() + '/formcode-fields', success, formcode);
     };
 
     self.subscribe = function(subscriber) {
