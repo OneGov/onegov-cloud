@@ -7,6 +7,8 @@ $course-description-line-width: 87ex;
 $green-color: #16b749;
 $red-color: #ca0020;
 $orange-color: #eda815;
+$dark-gray-color: #a9a9a9;
+$gray-color: #808080;
 
 .course-page-text {
     p {
@@ -36,7 +38,7 @@ dd.accordion-navigation + dd.accordion-navigation {
 */
 
 .grayed-out {
-    color: darkgray;
+    color: $dark-gray-color;
 }
 
 .text-red {
@@ -69,8 +71,8 @@ dd.accordion-navigation + dd.accordion-navigation {
 }
 
 .info-panel {
-    border: 1px solid $gray;
     background-color: $topbar-bg-color;
+    border: 1px solid $gray;
     padding: .5rem 1rem .75rem;
 }
 
@@ -95,12 +97,12 @@ dd.accordion-navigation + dd.accordion-navigation {
     border-width: 1px 1px 0;
 
     td > span {
-        padding-right: 1em;;
+        padding-right: 1em;
     }
 }
 
 .fullwidth {
-    width: 100%
+    width: 100%;
 }
 
 // Table icons
@@ -117,9 +119,10 @@ dd.accordion-navigation + dd.accordion-navigation {
 */
 
 a.grayed-out {
-    color: darkgray;
+    color: $dark-gray-color;
+
     &:hover {
-        color: gray;
+        color: $gray-color;
     }
 }
 
@@ -151,7 +154,8 @@ a.grayed-out {
 */
 @media print {
 
-    .globals, input.button {
+    .globals,
+    input.button {
         display: none;
     }
 
