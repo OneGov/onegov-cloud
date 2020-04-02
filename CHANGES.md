@@ -1,8 +1,32 @@
 # Changes
 
+## Release `2020.43`
+
+> commits: **3 / [94b3e7b77b...1be0f28e91](https://github.com/OneGov/onegov-cloud/compare/94b3e7b77b^...1be0f28e91)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.43)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Adds font choices in general-settings**
+
+New sans-serif fonts can be included by placing them as scss files in `theme/fonts`. 
+The font family for a file is derived from it's filename which must be congruent
+to the css syntax. They are not lazy loaded, but will be cached by the browser.
+
+**`Feature`** | **[6a6d5ef60b](https://github.com/onegov/onegov-cloud/commit/6a6d5ef60b4ea912ed3b1aad769714d86b864497)**
+
+🎉 **Adds 3 static custom footer links**
+
+**`Feature`** | **[1be0f28e91](https://github.com/onegov/onegov-cloud/commit/1be0f28e9195a0be087cf9d3183c5b8b6860dc63)**
+
+🐞 **Fixes File publish date**
+
+**`Bugfix`** | **[94b3e7b77b](https://github.com/onegov/onegov-cloud/commit/94b3e7b77b3f16c63de3f41b9833fff40e26d922)**
+
 ## Release `2020.42`
 
-> commits: **3 / [17ab53cb70...55a7ebe664](https://github.com/OneGov/onegov-cloud/compare/17ab53cb70^...55a7ebe664)**<br>
+> released: **2020-03-30 16:39**<br>
+> commits: **4 / [17ab53cb70...434fc835ea](https://github.com/OneGov/onegov-cloud/compare/17ab53cb70^...434fc835ea)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.42)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
