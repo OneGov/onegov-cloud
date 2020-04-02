@@ -182,7 +182,7 @@ def test_pdf_preview_creation(session):
     # this somewhat varies between local and test, probably due to some
     # version difference - not a big deal though, just keep an eye on it
     # if the values should change some more
-    assert w in (362, 395)
+    assert w in (362, 396)
 
 
 def test_max_image_size(session):
