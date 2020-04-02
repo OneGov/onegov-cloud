@@ -676,13 +676,14 @@ $success-icon: '\f058';
 $warning-icon: '\f071';
 
 .homepage-warning {
-    font-size: inherit;
+    background-color: $warning-color;
     display: flex;
     flex-direction: row;
-    background-color: $warning-color;
+    font-size: inherit;
 
     .icon {
-        margin-right: 0.5rem;
+        margin-right: .5rem;
+
         &::before {
             @include icon($info-icon);
         }
@@ -5887,8 +5888,8 @@ h2 + div.timeline {
     background: $gray-pastel;
     border-top: 10px solid $green-light;
     margin-bottom: 1.5rem;
-    width: calc((100% / 3) - 1rem);
     padding: .5rem 1rem 1rem;
+    width: calc((100% / 3) - 1rem);
 
     h2 {
         font-size: 1.3rem;

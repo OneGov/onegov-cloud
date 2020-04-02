@@ -2,9 +2,13 @@ from onegov.core.utils import module_path
 from onegov.org.theme import OrgTheme
 
 
+from onegov.org.theme.org_theme import HELVETICA
+
 # options editable by the user
 user_options = {
     'primary-color': '#006fba',
+    'font-family-sans-serif': HELVETICA
+
 }
 
 

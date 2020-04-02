@@ -48,6 +48,7 @@ def view_settings(self, request):
 
 def handle_generic_settings(self, request, form, title):
     layout = SettingsLayout(self, request, title)
+    request.include('fontpreview')
 
     if form.submitted(request):
         form.populate_obj(self)

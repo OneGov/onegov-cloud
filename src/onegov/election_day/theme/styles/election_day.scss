@@ -83,11 +83,12 @@ html {
             height: .5rem;
         }
     }
+
     .embedded-widget {
-        height: 1.7rem;
-        display: flex;
         align-items: center;
+        display: flex;
         flex-direction: row-reverse;
+        height: 1.7rem;
 
     }
 }
@@ -128,6 +129,7 @@ html {
 .archive-breadcrumbs {
     li {
         display: inline-block;
+
         + li::before {
             content: '/ ';
         }
@@ -739,9 +741,9 @@ form {
 }
 
 .embed-info {
-    margin-top: 1%;
     margin-left: auto;
     margin-right: auto;
+    margin-top: 1%;
     width: 85%;
 }
 

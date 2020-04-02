@@ -22,6 +22,7 @@ from onegov.file import FileCollection
 from onegov.form import FormCollection, FormSubmission
 from onegov.gis import Coordinates
 from onegov.newsletter import RecipientCollection, NewsletterCollection
+from onegov.org.theme.org_theme import HELVETICA
 from onegov.page import PageCollection
 from onegov.pay import PaymentProviderCollection
 from onegov.people import Person
@@ -3184,10 +3185,14 @@ def test_settings(client):
 
     # general settings
     settings = client.get('/general-settings')
+    assert client.app.font_family is None
     document = settings.pyquery
 
     assert document.find('input[name=name]').val() == 'Govikon'
     assert document.find('input[name=primary_color]').val() == '#006fba'
+    # is not defined in org/content, but on the form as default and in the UI
+    assert document.find(
+        'select[name=font_family_sans_serif]').val() == HELVETICA
 
     settings.form['primary_color'] = '#xxx'
     settings.form['reply_to'] = 'info@govikon.ch'
@@ -3201,6 +3206,8 @@ def test_settings(client):
 
     settings = client.get('/general-settings')
     assert "Ungültige Farbe." not in settings.text
+    # Form was populated with user_options default before submitting
+    assert client.app.font_family == HELVETICA
 
     settings.form['logo_url'] = 'https://seantis.ch/logo.img'
     settings.form['reply_to'] = 'info@govikon.ch'

@@ -1,6 +1,5 @@
 import transaction
 
-from base64 import b64decode
 from datetime import datetime
 from freezegun import freeze_time
 from onegov.core.utils import Bunch

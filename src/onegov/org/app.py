@@ -169,6 +169,10 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     def theme_options(self):
         return self.org.theme_options or {}
 
+    @property
+    def font_family(self):
+        return self.theme_options.get('font-family-sans-serif')
+
     def checkout_button(self, button_label, title, price, email, locale):
         provider = self.default_payment_provider
 
@@ -503,3 +507,8 @@ def get_common_asset():
 @OrgApp.webasset('accordion')
 def get_accordion_asset():
     yield 'foundation.accordion.js'
+
+
+@OrgApp.webasset('fontpreview')
+def get_fontpreview_asset():
+    yield 'fontpreview.js'

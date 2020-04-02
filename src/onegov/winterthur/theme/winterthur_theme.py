@@ -1,10 +1,12 @@
 from onegov.core.utils import module_path
 from onegov.org.theme import OrgTheme
 
+NEWSGOT = '"NewsGot", Verdana, Arial, sans-serif;'
 
 # options editable by the user
 user_options = {
     'primary-color': '#e33521',
+    'font-family-sans-serif': NEWSGOT
 }
 
 
@@ -25,6 +27,5 @@ class WinterthurTheme(OrgTheme):
     @property
     def pre_imports(self):
         return super().pre_imports + [
-            'font-newsgot',
             'winterthur-foundation-mods'
         ]

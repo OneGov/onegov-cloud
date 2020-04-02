@@ -1,17 +1,26 @@
+import os
 from collections import OrderedDict
 
 from onegov.foundation import BaseTheme
 from onegov.core.utils import module_path
 
+HELVETICA = '"Helvetica Neue", Helvetica, Roboto, Arial, sans-serif !default;'
 
 # options editable by the user
 user_options = {
     'primary-color': '#006fba',
+    'font-family-sans-serif': HELVETICA
+}
+
+default_font_families = {
+    'Helvetica': HELVETICA,
 }
 
 
 class OrgTheme(BaseTheme):
     name = 'onegov.org.foundation'
+
+    _force_compile = False
 
     @property
     def default_options(self):
@@ -62,9 +71,12 @@ class OrgTheme(BaseTheme):
 
     @property
     def pre_imports(self):
-        return [
+        imports = [
             'foundation-mods',
         ]
+        for font_family in self.additional_font_families:
+            imports.append(font_family)
+        return imports
 
     @property
     def post_imports(self):
@@ -74,4 +86,37 @@ class OrgTheme(BaseTheme):
 
     @property
     def extra_search_paths(self):
-        return [module_path('onegov.org.theme', 'styles')]
+        return [
+            module_path('onegov.org.theme', 'styles'),
+            self.font_search_path
+        ]
+
+    @property
+    def font_search_path(self):
+        """ Load fonts of the current theme folder and ignore fonts from
+        parent applications if OrgTheme is inherited. """
+        module = self.name.replace('foundation', 'theme')
+        return module_path(module, 'fonts')
+
+    @property
+    def font_families(self):
+        families = default_font_families.copy()
+        families.update(self.additional_font_families)
+        return families
+
+    @property
+    def additional_font_families(self):
+        """ Returns the filenames as they are to use as label in the settings
+        as well as to construct the font-family string.
+        Only sans-serif fonts are supported by now.
+        """
+        if not os.path.exists(self.font_search_path):
+            return {}
+
+        def fn(n):
+            return n.split('.')
+
+        return {
+            fn(n)[0]: f'"{fn(n)[0]}", {HELVETICA}' for n in os.listdir(
+                self.font_search_path) if fn(n)[1] == 'scss'
+        }

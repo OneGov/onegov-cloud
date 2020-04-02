@@ -44,3 +44,13 @@ var FormcodeUtils = function() {
 };
 
 window.formcodeUtils = FormcodeUtils();
+
+get_base_url = function() {
+    var links = document.getElementsByTagName('link');
+    for (var i = 0, max = links.length; i < max; i++) {
+        if (links[i].href.includes('/static')) {
+            return links[i].href.split('static')[0];
+        }
+    }
+    return '';
+};
