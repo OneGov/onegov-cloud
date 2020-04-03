@@ -64,9 +64,10 @@ def handle_field(builder, field, dependency=None):
     """ Takes the given parsed field and adds it to the form. """
 
     if field.type == 'text':
-
+        render_kw = None
         if field.maxlength:
             validators = [Length(max=field.maxlength)]
+            render_kw = {'data-max-length': field.maxlength}
         else:
             validators = []
 
@@ -79,7 +80,8 @@ def handle_field(builder, field, dependency=None):
             label=field.label,
             dependency=dependency,
             required=field.required,
-            validators=validators
+            validators=validators,
+            render_kw=render_kw
         )
 
     elif field.type == 'textarea':

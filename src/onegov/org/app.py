@@ -512,3 +512,8 @@ def get_accordion_asset():
 @OrgApp.webasset('fontpreview')
 def get_fontpreview_asset():
     yield 'fontpreview.js'
+
+
+@OrgApp.webasset('form-length-counter')
+def get_form_length_counter_asset():
+    yield 'form-length-counter.js'
