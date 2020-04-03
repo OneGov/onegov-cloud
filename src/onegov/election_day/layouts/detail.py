@@ -77,3 +77,13 @@ class DetailLayout(DefaultLayout, HiddenTabsMixin):
          """
         entities = self.request.app.principal.entities[self.model.date.year]
         return all(d['name'] == d.get('district') for d in entities.values())
+
+    @property
+    def districts_label(self):
+        return self.principal.label('entities') if self.districts_are_entities\
+            else self.principal.label('districts')
+
+    @property
+    def district_label(self):
+        return self.principal.label('entity') if self.districts_are_entities \
+            else self.principal.label('district')

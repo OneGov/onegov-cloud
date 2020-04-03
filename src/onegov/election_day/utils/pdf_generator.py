@@ -463,7 +463,7 @@ class PdfGenerator():
             pdf.results(
                 [
                     principal.label('entity'),
-                    principal.label('district'),
+                    principal.label('district', election.date.year),
                     _('Turnout'),
                     _('eligible Voters'),
                     _('Accounted Votes'),
@@ -488,7 +488,7 @@ class PdfGenerator():
             pdf.results(
                 [
                     principal.label('entity'),
-                    principal.label('district'),
+                    principal.label('district', election.date.year),
                     _('Received Ballots'),
                     _('Accounted Ballots'),
                     _('Blank Ballots'),
@@ -540,9 +540,9 @@ class PdfGenerator():
         pdf.spacer()
 
         # Districts
-        pdf.h2(principal.label('districts'))
+        pdf.h2(principal.label('districts', compound.date.year))
         pdf.results(
-            [principal.label('district'), _('Mandates')],
+            [principal.label('district', compound.date.year), _('Mandates')],
             [[e.title, e.allocated_mandates(consider_completed=True)]
              for e in compound.elections],
             [None, 2 * cm],
@@ -558,7 +558,7 @@ class PdfGenerator():
                 [
                     _('Candidate'),
                     _('Party'),
-                    principal.label('district'),
+                    principal.label('district', compound.date.year),
                 ],
                 [[
                     '{} {}'.format(r[0], r[1]),
@@ -876,7 +876,7 @@ class PdfGenerator():
 
                 # Districts
                 if principal.has_districts:
-                    subtitle(principal.label('districts'))
+                    subtitle(principal.label('districts', vote.date.year))
                     pdf.spacer()
                     pdf.results(
                         [

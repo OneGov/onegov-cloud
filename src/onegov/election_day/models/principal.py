@@ -113,7 +113,7 @@ class Principal(object):
             return True
         return False
 
-    def label(self, value):
+    def label(self, value, year=None):
         raise NotImplementedError()
 
     @cached_property
@@ -173,7 +173,7 @@ class Canton(Principal):
             **kwargs
         )
 
-    def label(self, value):
+    def label(self, value, year=None):
         if value == 'entity':
             return _("Municipality")
         if value == 'entities':
@@ -184,8 +184,8 @@ class Canton(Principal):
             if self.id == 'sg':
                 return _("district_label_sg", default="Constituency")
             if self.id == 'sz':
-                if date.today().year >= 2020:
-                    return _("district_label_sz_2020", default="District")
+                if year and year >= 2020:
+                    return _("Municipality")
                 return _("district_label_sz", default="District")
             return _("district_label_default", default="Constituency")
         if value == 'districts':
@@ -194,8 +194,8 @@ class Canton(Principal):
             if self.id == 'sg':
                 return _("districts_label_sg", default="Constituencies")
             if self.id == 'sz':
-                if date.today().year >= 2020:
-                    return _("districts_label_sz_2020", default="District")
+                if year and year >= 2020:
+                    return _("Municipalities")
                 return _("districts_label_sz", default="Districts")
             return _("districts_label_default", default="Constituencies")
         return ''
@@ -252,7 +252,7 @@ class Municipality(Principal):
             **kwargs
         )
 
-    def label(self, value):
+    def label(self, value, year=None):
         if value == 'entity':
             return _("Quarter") if self.has_quarters else _("Municipality")
         if value == 'entities':

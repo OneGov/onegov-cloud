@@ -10,7 +10,8 @@ import pytest
 
 
 def test_vote_layout_1(session):
-    layout = VoteLayout(Vote(), DummyRequest())
+
+    layout = VoteLayout(Vote(date=date(2021, 1, 1)), DummyRequest())
 
     assert layout.all_tabs == (
         'entities',

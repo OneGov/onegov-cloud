@@ -60,7 +60,7 @@ class ElectionLayout(DetailLayout):
         if tab.endswith('-by-entity'):
             return self.principal.label('entities')
         if tab.endswith('-by-district'):
-            return self.principal.label('districts')
+            return self.districts_label
         if tab.endswith('-panachage'):
             return _("Panachage")
         if tab == 'connections':

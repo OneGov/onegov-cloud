@@ -15,7 +15,7 @@ import pytest
 
 
 def test_election_layout(session):
-    layout = ElectionLayout(None, DummyRequest())
+    layout = ElectionLayout(Election(date=date(2019, 1, 1)), DummyRequest())
 
     assert layout.all_tabs == (
         'lists',

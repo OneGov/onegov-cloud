@@ -49,7 +49,7 @@ class ElectionCompoundLayout(DetailLayout):
         if tab == 'lists':
             return _("Lists")
         if tab == 'districts':
-            return self.request.app.principal.label('districts')
+            return self.districts_label
         if tab == 'candidates':
             return _("Elected candidates")
         if tab == 'mandate-allocation':
