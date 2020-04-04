@@ -1,8 +1,34 @@
 # Changes
 
+## Release `2020.44`
+
+> commits: **3 / [6fac7588d4...cf8d7187c5](https://github.com/OneGov/onegov-cloud/compare/6fac7588d4^...cf8d7187c5)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.44)](https://buildkite.com/seantis/onegov-cloud)
+
+### Electionday
+
+🐞 **Fixes label districts for sz for pre 2020**
+
+**`Bugfix`** | **[1efc88aa9a](https://github.com/onegov/onegov-cloud/commit/1efc88aa9ac7302ee8970494396cfbe8f012c814)**
+
+### Feriennet
+
+🐞 **Fixes division by zero error**
+
+**`Bugfix`** | **[cf8d7187c5](https://github.com/onegov/onegov-cloud/commit/cf8d7187c55cd021456fac8a9fc8fe34aefe60e5)**
+
+### Org
+
+🎉 **Integrates js counter for maximum length**
+
+Integrates server-side length validation with a javascript counter for formcode fields.
+
+**`Feature`** | **[6fac7588d4](https://github.com/onegov/onegov-cloud/commit/6fac7588d4f288a29a2ee1085e0caed3a0a36755)**
+
 ## Release `2020.43`
 
-> commits: **3 / [94b3e7b77b...1be0f28e91](https://github.com/OneGov/onegov-cloud/compare/94b3e7b77b^...1be0f28e91)**<br>
+> released: **2020-04-02 13:00**<br>
+> commits: **4 / [94b3e7b77b...7753e17809](https://github.com/OneGov/onegov-cloud/compare/94b3e7b77b^...7753e17809)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.43)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
