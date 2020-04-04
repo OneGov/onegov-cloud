@@ -35,7 +35,7 @@ class VoteLayout(DetailLayout):
         if tab == 'entities':
             return self.principal.label('entities')
         if tab == 'districts':
-            return self.principal.label('districts')
+            return self.districts_label
         if tab.startswith('proposal'):
             return _("Proposal")
         if tab.startswith('counter-proposal'):
@@ -53,7 +53,7 @@ class VoteLayout(DetailLayout):
         if tab.endswith('-entities') and self.has_districts:
             return self.principal.label('entities')
         if tab.endswith('-districts'):
-            return self.principal.label('districts')
+            return self.districts_label
 
         return ''
 

@@ -387,10 +387,16 @@ def test_principal_label(election_day_app):
     for label, locale, result in (
         ('entity', 'de_CH', 'Gemeinde'),
         ('entities', 'de_CH', 'Gemeinden'),
-        ('district', 'de_CH', 'Gemeinde'),
-        ('districts', 'de_CH', 'Gemeinden'),
+        ('district', 'de_CH', 'Bezirk'),
+        ('districts', 'de_CH', 'Bezirke'),
     ):
-        assert translate(principal.label(label), locale) == result
+        assert translate(principal.label(label, year=2019), locale) == result
+
+    for label, locale, result in (
+            ('district', 'de_CH', 'Gemeinde'),
+            ('districts', 'de_CH', 'Gemeinden'),
+    ):
+        assert translate(principal.label(label, year=2020), locale) == result
 
     principal = Canton(name='sg', canton='sg')
     for label, locale, result in (
