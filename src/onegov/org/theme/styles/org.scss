@@ -795,6 +795,12 @@ form {
         margin-left: 1.25rem;
     }
 
+    .long-field-help {
+        color: $steel;
+        font-size: .8rem;
+        margin: .25rem 0 .5rem 0;
+    }
+
     .group-label {
         color: $form-label-font-color;
         font-size: $form-label-font-size;

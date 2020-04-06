@@ -46,6 +46,30 @@ a textfield::
 
     My textfield = ___
 
+Comments can be added beneath a field, using the same indentation:
+
+    My textfield = ___
+    << Explanation for my field >>
+
+All characters are allowed except ''>''.
+
+Complex example:
+
+        Delivery * =
+            (x) I want it delivered
+                Alternate Address =
+                    (x) No
+                    ( ) Yes
+                        Street = ___
+                        << town >
+                        Town = ___
+                << Alt >>
+            ( ) I want to pick it up
+        << delivery >>
+
+        Kommentar = ...
+        << kommentar >>
+
 All possible fields are documented further below.
 
 Fieldsets
@@ -322,7 +346,7 @@ from decimal import Decimal
 from onegov.core.cache import lru_cache
 from onegov.core.utils import Bunch
 from onegov.form import errors
-from onegov.form.parser.grammar import checkbox
+from onegov.form.parser.grammar import checkbox, field_help_identifier
 from onegov.form.parser.grammar import code
 from onegov.form.parser.grammar import date
 from onegov.form.parser.grammar import datetime
@@ -346,6 +370,7 @@ from onegov.form.utils import as_internal_id
 def create_parser_elements():
     elements = Bunch()
     elements.identifier = field_identifier()
+    elements.help_identifier = field_help_identifier()
     elements.fieldset_title = fieldset_title()
     elements.textfield = textfield()
     elements.textarea = textarea()
@@ -562,11 +587,14 @@ class Choice(object):
 class Field(object):
     """ Represents a parsed field. """
 
-    def __init__(self, label, required, parent=None, fieldset=None, **kwargs):
+    def __init__(self, label, required, parent=None, fieldset=None,
+                 field_help=None, **kwargs):
+
         self.label = label
         self.required = required
         self.parent = parent
         self.fieldset = fieldset
+        self.field_help = field_help
 
         for key, value in kwargs.items():
             setattr(self, key, value)
@@ -592,12 +620,15 @@ class Field(object):
         return self.label
 
     @classmethod
-    def create(cls, field, identifier, parent=None, fieldset=None):
+    def create(cls, field, identifier, parent=None, fieldset=None,
+               field_help=None):
+
         return cls(
             label=identifier.label,
             required=identifier.required,
             parent=parent,
-            fieldset=fieldset
+            fieldset=fieldset,
+            field_help=field_help
         )
 
     def parse(self, value):
@@ -645,7 +676,8 @@ class TextField(Field):
     type = 'text'
 
     @classmethod
-    def create(cls, field, identifier, parent=None, fieldset=None):
+    def create(cls, field, identifier, parent=None, fieldset=None,
+               field_help=None):
         regex = field.regex and re.compile(field.regex) or None
 
         return cls(
@@ -654,7 +686,8 @@ class TextField(Field):
             parent=parent,
             fieldset=fieldset,
             maxlength=field.length or None,
-            regex=regex
+            regex=regex,
+            field_help=field_help
         )
 
 
@@ -662,13 +695,15 @@ class TextAreaField(Field):
     type = 'textarea'
 
     @classmethod
-    def create(cls, field, identifier, parent=None, fieldset=None):
+    def create(cls, field, identifier, parent=None, fieldset=None,
+               field_help=None):
         return cls(
             label=identifier.label,
             required=identifier.required,
             parent=parent,
             fieldset=fieldset,
-            rows=field.rows or None
+            rows=field.rows or None,
+            field_help=field_help
         )
 
 
@@ -676,13 +711,15 @@ class CodeField(Field):
     type = 'code'
 
     @classmethod
-    def create(cls, field, identifier, parent=None, fieldset=None):
+    def create(cls, field, identifier, parent=None, fieldset=None,
+               field_help=None):
         return cls(
             label=identifier.label,
             required=identifier.required,
             parent=parent,
             fieldset=fieldset,
-            syntax=field.syntax
+            syntax=field.syntax,
+            field_help=field_help
         )
 
 
@@ -690,26 +727,31 @@ class StdnumField(Field):
     type = 'stdnum'
 
     @classmethod
-    def create(cls, field, identifier, parent=None, fieldset=None):
+    def create(cls, field, identifier, parent=None, fieldset=None,
+               field_help=None):
         return cls(
             label=identifier.label,
             required=identifier.required,
             parent=parent,
             fieldset=fieldset,
-            format=field.format
+            format=field.format,
+            field_help=field_help
         )
 
 
 class RangeField(object):
 
     @classmethod
-    def create(cls, field, identifier, parent=None, fieldset=None):
+    def create(cls, field, identifier, parent=None, fieldset=None,
+               field_help=None):
         return cls(
             label=identifier.label,
             required=identifier.required,
             parent=parent,
             fieldset=fieldset,
-            range=field[0]
+            range=field[0],
+            field_help=field_help
+
         )
 
 
@@ -731,20 +773,24 @@ class FileinputField(Field):
     type = 'fileinput'
 
     @classmethod
-    def create(cls, field, identifier, parent=None, fieldset=None):
+    def create(cls, field, identifier, parent=None, fieldset=None,
+               field_help=None):
         return cls(
             label=identifier.label,
             required=identifier.required,
             parent=parent,
             fieldset=fieldset,
-            extensions=field.extensions
+            extensions=field.extensions,
+            field_help=field_help
         )
 
 
 class OptionsField(object):
 
     @classmethod
-    def create(cls, field, identifier, parent=None, fieldset=None):
+    def create(cls, field, identifier, parent=None, fieldset=None,
+               field_help=None):
+
         choices = [
             Choice(
                 key=c.label,
@@ -762,7 +808,8 @@ class OptionsField(object):
             parent=parent,
             fieldset=fieldset,
             choices=choices,
-            pricing=pricing or None
+            pricing=pricing or None,
+            field_help=field_help
         )
 
     def parse(self, value):
@@ -817,6 +864,7 @@ def parse_field_block(field_block, field_classes,
     """ Takes the given parsed field block and yields the fields from it """
 
     key, field = next(i for i in field_block.items())
+    field_help = field_block.get('field_help')
 
     identifier_src = key.rstrip('= ') + '='
     identifier = ELEMENTS.identifier.parseString(identifier_src)
@@ -834,11 +882,13 @@ def parse_field_block(field_block, field_classes,
 
         # make sure only one type is found (either radio or checkbox)
         types = {f.type for f in field.choices}
-        assert types <= {'radio', 'checkbox'}
-        assert len(types) == 1
+        # assert types <= {'radio', 'checkbox'}
+        # assert len(types) == 1
+        if not all((types <= {'radio', 'checkbox'}, len(types) == 1)):
+            raise FieldCompileError(key)
 
     result = field_classes[field.type].create(
-        field, identifier, parent, fieldset)
+        field, identifier, parent, fieldset, field_help)
 
     if result.id in used_ids:
         raise errors.DuplicateLabelError(label=result.label)
@@ -969,6 +1019,16 @@ def translate_to_yaml(text):
             )
             expect_nested = len(indent) > 4
             actual_fields += 1
+            continue
+
+        # help descriptions following a field
+        parse_result = try_parse(ELEMENTS.help_identifier, line)
+        if parse_result is not None:
+            yield '{indent}"{identifier}": \'{message}\''.format(
+                indent=indent + 2 * ' ',
+                identifier='field_help',
+                message=parse_result.message
+            )
             continue
 
         # checkboxes/radios come without identifier

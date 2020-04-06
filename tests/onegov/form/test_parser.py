@@ -3,6 +3,7 @@ import pytest
 from decimal import Decimal
 from onegov.form import Form, errors, find_field
 from onegov.form import parse_formcode, parse_form, flatten_fieldsets
+from onegov.form.parser.grammar import field_help_identifier
 from onegov.pay import Price
 from textwrap import dedent
 from webob.multidict import MultiDict
@@ -17,14 +18,26 @@ from wtforms.fields.html5 import (
 from wtforms_components import TimeField
 
 
+def parse(expr, text):
+    return expr.parseString(text)
+
+
+def test_help_field_identifier():
+
+    parsed_result = parse(field_help_identifier(), '<< Some text >>')
+    assert parsed_result.message == 'Some text'
+
+
 def test_parse_text():
     text = dedent("""
         First name * = ___
+        << Fill in all in UPPER case >>
         Last name = ___
         Country = ___[50]
         Comment = ...[8]
         Zipcode = ___[4]/[0-9]*
         Currency = ___/[A-Z]{3}
+        << like EUR, CHF >>
     """)
 
     form_class = parse_form(text)
@@ -34,6 +47,7 @@ def test_parse_text():
     assert len(fields) == 6
 
     assert form.first_name.label.text == 'First name'
+    assert form.first_name.description == 'Fill in all in UPPER case'
     assert len(form.first_name.validators) == 1
     assert isinstance(form.first_name.validators[0], validators.DataRequired)
 
@@ -60,6 +74,7 @@ def test_parse_text():
     assert len(form.currency.validators) == 2
     assert isinstance(form.currency.validators[0], validators.Optional)
     assert isinstance(form.currency.validators[1], validators.Regexp)
+    assert form.currency.description == 'like EUR, CHF'
 
 
 def test_regex_validation():
@@ -165,10 +180,11 @@ def test_parse_fieldsets():
 
 
 def test_parse_syntax():
-    form = parse_form("Text = <markdown>")()
+    form = parse_form("Text = <markdown>\n<< # H1, ## H2 >>")()
     assert len(form._fields.values()) == 1
     assert form.text.label.text == 'Text'
     assert form.text.render_kw == {'data-editor': 'markdown'}
+    assert form.text.description == '# H1, ## H2'
 
 
 def test_fieldset_field_ids():
@@ -177,11 +193,13 @@ def test_fieldset_field_ids():
 
         # Spouse
         First Name = ___
+        << No abbreviations, pls >>
     """)
 
     form = parse_form(text)()
-    hasattr(form, 'first_name')
-    hasattr(form, 'spouse_first_name')
+    assert hasattr(form, 'first_name')
+    assert hasattr(form, 'spouse_first_name')
+    assert form.spouse_first_name.description == 'No abbreviations, pls'
 
 
 def test_duplicate_field():
@@ -199,18 +217,24 @@ def test_dependent_field():
         Comment =
             [ ] I have one
                 Comment = ...
+        << first >>
 
         # Extra
         Comment =
             [ ] I have one
                 Comment = ...
+                << last >>
+        << middle >>
     """)
 
     form = parse_form(text)
     assert hasattr(form, 'comment')
+    assert form.comment.kwargs['description'] == 'first'
     assert hasattr(form, 'comment_comment')
     assert hasattr(form, 'extra_comment')
+    assert form.extra_comment.kwargs['description'] == 'middle'
     assert hasattr(form, 'extra_comment_comment')
+    assert form.extra_comment_comment.kwargs['description'] == 'last'
 
 
 def test_parse_email():
@@ -284,6 +308,9 @@ def test_parse_radio_checkbox_mixed():
 
     form = parse_form(text)()
 
+    # another string that breaks the code
+    # - "Zeit* =":
+
 
 def test_parse_radio_escape():
 
@@ -330,6 +357,7 @@ def test_parse_radio_with_pricing():
         Drink =
             ( ) Coffee (2.50 CHF)
             (x) Tea (1.50 CHF)
+        << beer cant be cheaper than water >>
     """)
 
     form = parse_form(text)()
@@ -337,6 +365,7 @@ def test_parse_radio_with_pricing():
         'Coffee': Price(Decimal(2.5), 'CHF'),
         'Tea': Price(Decimal(1.5), 'CHF')
     }
+    assert form.drink.description == 'beer cant be cheaper than water'
 
 
 def test_parse_checkbox_with_pricing():
@@ -362,6 +391,7 @@ def test_dependent_validation():
         Payment * =
             ( ) Bill
                 Address * = ___
+                << Company preferred >>
             ( ) Credit Card
                 Credit Card Number * = ___
     """)
@@ -373,6 +403,8 @@ def test_dependent_validation():
         ('payment', 'Bill'),
         ('payment_address', 'Destiny Lane')
     ]))
+
+    assert form.payment_address.description == 'Company preferred'
 
     form.validate()
     assert not form.errors
@@ -416,9 +448,14 @@ def test_nested_regression():
                     (x) No
                     ( ) Yes
                         Street = ___
+                        << street >>
                         Town = ___
+                        << town >>
+                << Alt >>
             ( ) I want to pick it up
+        << delivery >>
         Kommentar = ...
+        << kommentar >>
     """)
 
     form_class = parse_form(text)
@@ -431,6 +468,11 @@ def test_nested_regression():
 
     assert hasattr(form, 'delivery_alternate_address_street')
     assert hasattr(form, 'delivery_alternate_address_town')
+    assert form.kommentar.description == 'kommentar'
+    assert form.delivery.description == 'delivery'
+    assert form.delivery_alternate_address.description == 'Alt'
+    assert form.delivery_alternate_address_street.description == 'street'
+    assert form.delivery_alternate_address_town.description == 'town'
 
 
 def test_stdnum_field():
@@ -458,7 +500,7 @@ def test_stdnum_field():
     assert form.errors
 
     with pytest.raises(ImportError):
-        form_class = parse_form("Invalid = # asdf")
+        parse_form("Invalid = # asdf")
 
     form_class = parse_form("ahv = # ch.ssn")
     form = form_class(MultiDict([
@@ -796,7 +838,7 @@ def test_dependency_validation_chain(field, invalid):
 
         form = parse_form(code)
 
-        # we cannot supply an empty value if the depencency is fulfilled
+        # we cannot supply an empty value if the dependency is fulfilled
         # and an input is required
         if required:
             assert not form(data={'select': 'ya'}).validate()
