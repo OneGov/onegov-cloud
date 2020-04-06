@@ -461,3 +461,15 @@ def field_identifier():
     # text and catual fields), then includes the name and the '*' which marks
     # required fields
     return label + required + Suppress('=')
+
+
+def field_help_identifier():
+    """ Returns parser for a field help comment following a field/fieldset:
+
+    General Example:
+
+        << Help text for My Field >>
+
+    """
+    field_explanation = with_whitespace_inside(text_without('>'))('message')
+    return Suppress('<<') + field_explanation + Suppress('>>')

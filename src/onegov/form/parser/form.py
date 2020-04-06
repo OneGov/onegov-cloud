@@ -81,7 +81,8 @@ def handle_field(builder, field, dependency=None):
             dependency=dependency,
             required=field.required,
             validators=validators,
-            render_kw=render_kw
+            render_kw=render_kw,
+            description=field.field_help
         )
 
     elif field.type == 'textarea':
@@ -91,7 +92,8 @@ def handle_field(builder, field, dependency=None):
             label=field.label,
             dependency=dependency,
             required=field.required,
-            widget=with_options(TextArea, rows=field.rows)
+            widget=with_options(TextArea, rows=field.rows),
+            description=field.field_help
         )
 
     elif field.type == 'password':
@@ -100,7 +102,8 @@ def handle_field(builder, field, dependency=None):
             field_id=field.id,
             label=field.label,
             dependency=dependency,
-            required=field.required
+            required=field.required,
+            description=field.field_help
         )
 
     elif field.type == 'email':
@@ -110,7 +113,8 @@ def handle_field(builder, field, dependency=None):
             label=field.label,
             dependency=dependency,
             required=field.required,
-            validators=[Email()]
+            validators=[Email()],
+            description=field.field_help
         )
 
     elif field.type == 'url':
@@ -120,7 +124,8 @@ def handle_field(builder, field, dependency=None):
             label=field.label,
             dependency=dependency,
             required=field.required,
-            validators=[URL()]
+            validators=[URL()],
+            description=field.field_help
         )
 
     elif field.type == 'stdnum':
@@ -130,7 +135,8 @@ def handle_field(builder, field, dependency=None):
             label=field.label,
             dependency=dependency,
             required=field.required,
-            validators=[Stdnum(field.format)]
+            validators=[Stdnum(field.format)],
+            description=field.field_help
         )
 
     elif field.type == 'date':
@@ -140,6 +146,7 @@ def handle_field(builder, field, dependency=None):
             label=field.label,
             dependency=dependency,
             required=field.required,
+            description=field.field_help
         )
 
     elif field.type == 'datetime':
@@ -149,6 +156,7 @@ def handle_field(builder, field, dependency=None):
             label=field.label,
             dependency=dependency,
             required=field.required,
+            description=field.field_help
         )
 
     elif field.type == 'time':
@@ -157,7 +165,8 @@ def handle_field(builder, field, dependency=None):
             field_id=field.id,
             label=field.label,
             dependency=dependency,
-            required=field.required
+            required=field.required,
+            description=field.field_help
         )
 
     elif field.type == 'fileinput':
@@ -170,7 +179,8 @@ def handle_field(builder, field, dependency=None):
             validators=[
                 ExpectedExtensions(field.extensions),
                 FileSizeLimit(DEFAULT_UPLOAD_LIMIT)
-            ]
+            ],
+            description=field.field_help
         )
 
     elif field.type == 'radio':
@@ -184,7 +194,8 @@ def handle_field(builder, field, dependency=None):
             default=next((c.key for c in field.choices if c.selected), None),
             pricing=field.pricing,
             # do not coerce None into 'None'
-            coerce=lambda v: str(v) if v is not None else v
+            coerce=lambda v: str(v) if v is not None else v,
+            description=field.field_help
         )
 
     elif field.type == 'checkbox':
@@ -198,7 +209,8 @@ def handle_field(builder, field, dependency=None):
             default=[c.key for c in field.choices if c.selected],
             pricing=field.pricing,
             # do not coerce None into 'None'
-            coerce=lambda v: str(v) if v is not None else v
+            coerce=lambda v: str(v) if v is not None else v,
+            description=field.field_help
         )
 
     elif field.type == 'integer_range':
@@ -213,7 +225,8 @@ def handle_field(builder, field, dependency=None):
                     field.range.start,
                     field.range.stop
                 )
-            ]
+            ],
+            description=field.field_help
         )
 
     elif field.type == 'decimal_range':
@@ -228,7 +241,8 @@ def handle_field(builder, field, dependency=None):
                     field.range.start,
                     field.range.stop
                 )
-            ]
+            ],
+            description=field.field_help
         )
 
     elif field.type == 'code':
@@ -238,7 +252,8 @@ def handle_field(builder, field, dependency=None):
             label=field.label,
             dependency=dependency,
             required=field.required,
-            render_kw={'data-editor': field.syntax}
+            render_kw={'data-editor': field.syntax},
+            description=field.field_help
         )
 
     else:
