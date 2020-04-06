@@ -56,7 +56,6 @@ def view_parse_formcode(self, request):
                 'id': field.id,
                 'human_id': field.human_id,
                 'type': field.type,
-                'field_help': field.field_help
             }
             for field in flatten_fieldsets(parse_formcode(formcode))
         ]
