@@ -454,54 +454,59 @@ class WsgiServer(FileSystemEventHandler):
     def on_any_event(self, event):
         """ If anything of significance changed, restart the process. """
 
-        if 'tests/' in event.src_path:
+        src_path = event.src_path
+
+        if 'tests/' in src_path:
             return
 
         if event.is_directory:
             return
 
-        if event.src_path.endswith('pyc'):
+        if src_path.endswith('pyc'):
             return
 
-        if event.src_path.endswith('scss'):
+        if src_path.endswith('scss'):
             return
 
-        if event.src_path.endswith('pt'):
+        if src_path.endswith('pt'):
             return
 
-        if '/.git' in event.src_path:
+        if '/.testmondata' in src_path:
             return
 
-        if '/__pycache__' in event.src_path:
+        if '/.git' in src_path:
             return
 
-        if '/onegov.server' in event.src_path:
+        if '/__pycache__' in src_path:
             return
 
-        if '/file-storage' in event.src_path:
+        if '/onegov.server' in src_path:
             return
 
-        if '/mails' in event.src_path:
+        if '/file-storage' in src_path:
             return
 
-        if '/profiles' in event.src_path:
+        if '/mails' in src_path:
             return
 
-        if '.webassets-cache' in event.src_path:
+        if '/profiles' in src_path:
             return
 
-        if 'assets/bundles' in event.src_path:
+        if '.webassets-cache' in src_path:
             return
 
-        if 'onegov.sublime' in event.src_path:
+        if 'assets/bundles' in src_path:
             return
 
-        if '.cache' in event.src_path:
+        if 'onegov.sublime' in src_path:
             return
 
-        if event.src_path.endswith('~'):
+        if '.cache' in src_path:
             return
 
-        print("changed: {}".format(event.src_path))
+        if src_path.endswith('~'):
+            return
+
+        print("changed: {}".format(src_path))
 
         self.restart()
