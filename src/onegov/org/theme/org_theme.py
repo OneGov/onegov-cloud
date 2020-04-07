@@ -5,6 +5,9 @@ from onegov.foundation import BaseTheme
 from onegov.core.utils import module_path
 
 HELVETICA = '"Helvetica Neue", Helvetica, Roboto, Arial, sans-serif !default;'
+ARIAL = 'Arial, sans-serif !default;'
+VERDANA = 'Verdana, Geneva, sans-serif !default;'
+COURIER_NEW = '"Courier New", Courier, monospace !default;'     # monospace
 
 # options editable by the user
 user_options = {
@@ -14,6 +17,9 @@ user_options = {
 
 default_font_families = {
     'Helvetica': HELVETICA,
+    'Arial': ARIAL,
+    'Verdana': VERDANA,
+    'Courier New': COURIER_NEW,
 }
 
 
@@ -118,5 +124,5 @@ class OrgTheme(BaseTheme):
 
         return {
             fn(n)[0]: f'"{fn(n)[0]}", {HELVETICA}' for n in os.listdir(
-                self.font_search_path) if fn(n)[1] == 'scss'
+                self.font_search_path) if fn(n)[1] in ('css', 'scss')
         }
