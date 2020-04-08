@@ -197,7 +197,7 @@ def get_filters(request, self, keyword_counts=None):
     )
 
     def link_title(field_id, value):
-        if not keyword_counts:
+        if keyword_counts is None:
             return value
         count = keyword_counts.get(field_id, {}).get(value, 0)
         return f'{value} ({count})'
@@ -218,7 +218,7 @@ def get_filters(request, self, keyword_counts=None):
     return filters
 
 
-def keyword_count(models, collection):
+def keyword_count(request, collection):
     self = collection
     keywords = tuple(
         as_internal_id(k)
@@ -226,7 +226,7 @@ def keyword_count(models, collection):
     )
     fields = {f.id: f for f in self.directory.fields if f.id in keywords}
     counts = {}
-    for model in models:
+    for model in request.exclude_invisible(self.without_keywords().query()):
         for entry in model.keywords:
             field_id, value = entry.split(':')
             if field_id in fields:
@@ -242,9 +242,7 @@ def keyword_count(models, collection):
 def view_directory(self, request):
 
     entries = request.exclude_invisible(self.query())
-
-    keyword_counts = keyword_count(entries, self)
-
+    keyword_counts = keyword_count(request, self)
     filters = get_filters(request, self, keyword_counts)
 
     if self.directory.configuration.thumbnail:

@@ -141,3 +141,11 @@ class DirectoryEntryCollection(GenericCollection, Pagination):
             type=self.type,
             searchwidget=self.searchwidget,
             keywords=parameters)
+
+    def without_keywords(self):
+        return self.__class__(
+            directory=self.directory,
+            type=self.type,
+            page=self.page,
+            searchwidget=self.searchwidget
+        )
