@@ -1081,6 +1081,26 @@ form {
 */
 .fieldset-display {
     margin-bottom: 1em;
+
+    .thumbnail {
+            border-radius: 5px;
+            flex: 2;
+            margin-right: 1rem;
+            overflow: hidden;
+            position: relative;
+
+            & + div {
+                flex: 10;
+            }
+
+            img {
+                border-radius: 5px;
+                max-height: 150px;
+                object-fit: cover;
+                vertical-align: top;
+                width: 100%;
+            }
+        }
 }
 
 dl.field-display,
@@ -1100,6 +1120,18 @@ dl.field-display > dt {
         .marker-map {
             max-height: 300px;
             max-width: 500px;
+        }
+
+        div.thumbnail {
+            border-radius: 5px;
+            padding: 0;
+
+            img {
+                border-radius: 5px;
+                max-height: 150px;
+                object-fit: cover;
+                vertical-align: top;
+            }
         }
     }
 }

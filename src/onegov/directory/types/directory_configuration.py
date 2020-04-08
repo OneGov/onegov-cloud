@@ -97,12 +97,14 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         'link_visible',
         'thumbnail',
         'address_block_title',
+        'show_as_thumbnails',
     )
 
     def __init__(self, title=None, lead=None, order=None, keywords=None,
                  searchable=None, display=None, direction=None,
                  link_pattern=None, link_title=None, link_visible=None,
-                 thumbnail=None, address_block_title=None):
+                 thumbnail=None, address_block_title=None,
+                 show_as_thumbnails=None, **kwargs):
 
         self.title = title
         self.lead = lead
@@ -116,6 +118,7 @@ class DirectoryConfiguration(Mutable, StoredConfiguration):
         self.link_visible = link_visible
         self.thumbnail = thumbnail
         self.address_block_title = address_block_title
+        self.show_as_thumbnails = show_as_thumbnails
 
     def __setattr__(self, name, value):
         self.changed()
