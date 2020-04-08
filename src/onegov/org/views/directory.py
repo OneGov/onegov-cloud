@@ -187,12 +187,7 @@ def delete_directory(self, request):
     request.success(_("The directory was deleted"))
 
 
-@OrgApp.html(
-    model=DirectoryEntryCollection,
-    permission=Public,
-    template='directory.pt')
-def view_directory(self, request):
-
+def get_filters(request, self, keyword_counts=None):
     Filter = namedtuple('Filter', ('title', 'tags'))
     filters = []
     empty = tuple()
@@ -201,10 +196,16 @@ def view_directory(self, request):
         f.id for f in self.directory.fields if f.type == 'radio'
     )
 
+    def link_title(field_id, value):
+        if keyword_counts is None:
+            return value
+        count = keyword_counts.get(field_id, {}).get(value, 0)
+        return f'{value} ({count})'
+
     for keyword, title, values in self.available_filters:
         filters.append(Filter(title=title, tags=tuple(
             Link(
-                text=value,
+                text=link_title(keyword, value),
                 active=value in self.keywords.get(keyword, empty),
                 url=request.link(self.for_filter(
                     singular=keyword in radio_fields,
@@ -214,7 +215,35 @@ def view_directory(self, request):
             ) for value in values
         )))
 
+    return filters
+
+
+def keyword_count(request, collection):
+    self = collection
+    keywords = tuple(
+        as_internal_id(k)
+        for k in self.directory.configuration.keywords or tuple()
+    )
+    fields = {f.id: f for f in self.directory.fields if f.id in keywords}
+    counts = {}
+    for model in request.exclude_invisible(self.without_keywords().query()):
+        for entry in model.keywords:
+            field_id, value = entry.split(':')
+            if field_id in fields:
+                f_count = counts.setdefault(field_id, defaultdict(int))
+                f_count[value] += 1
+    return counts
+
+
+@OrgApp.html(
+    model=DirectoryEntryCollection,
+    permission=Public,
+    template='directory.pt')
+def view_directory(self, request):
+
     entries = request.exclude_invisible(self.query())
+    keyword_counts = keyword_count(request, self)
+    filters = get_filters(request, self, keyword_counts)
 
     if self.directory.configuration.thumbnail:
         thumbnail = as_internal_id(self.directory.configuration.thumbnail)
