@@ -167,14 +167,13 @@ def get_archive_search(
         term=None,
         page=0
 ):
-
-    return SearchableArchivedResultCollection(
+    return SearchableArchivedResultCollection.for_item_type(
         app.session(),
+        item_type,
         to_date=to_date,
         from_date=from_date,
         answers=answers,
         types=types,
-        item_type=item_type,
         domains=domains,
         term=term,
         page=page

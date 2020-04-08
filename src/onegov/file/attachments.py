@@ -42,7 +42,12 @@ def limit_and_store_image_size(file, content, content_type):
     if max(image.size) > IMAGE_MAX_SIZE:
         image.thumbnail((IMAGE_MAX_SIZE, IMAGE_MAX_SIZE), Image.LANCZOS)
         content = SpooledTemporaryFile(INMEMORY_FILESIZE)
-        image.save(content, image.format, quality=IMAGE_QUALITY)
+        try:
+            # Quality is only supported by jpeg
+            image.save(content, image.format, quality=IMAGE_QUALITY)
+        except ValueError:
+            image.save(content, image.format)
+
 
     # the file size is stored in pixel as string (for browser usage)
     file.size = get_image_size(image)

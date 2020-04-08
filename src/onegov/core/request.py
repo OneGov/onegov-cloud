@@ -623,6 +623,8 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
         If the token is invalid, None is returned.
 
         """
+        if not data:
+            return None
         serializer = URLSafeTimedSerializer(self.identity_secret)
         try:
             return serializer.loads(data, salt=salt, max_age=max_age)

@@ -168,6 +168,8 @@ class Activity(Base, ContentMixin, TimestampMixin):
         return q.first()
 
     def request_by_period(self, period):
+        if not period:
+            return None
         q = self.requests.query()
         q = q.filter_by(activity_id=self.id, period_id=period.id)
 
