@@ -1,3 +1,5 @@
+import os
+import shutil
 import time
 
 from contextlib import suppress
@@ -143,3 +145,13 @@ class ExtendedBrowser(InjectedBrowserExtension):
 
         input = self.driver.execute_script(JS_DROP_FILE, dropzone)
         input.send_keys(str(path))
+
+
+def screen_shot(name, browser, open_file=True):
+    file = browser.screenshot(f'/tmp/{name}.png', full=True)
+    if not open_file:
+        return
+    programs = ('xviewer', )
+    for p in programs:
+        if shutil.which(p):
+            os.system(f'{p} {file} &')

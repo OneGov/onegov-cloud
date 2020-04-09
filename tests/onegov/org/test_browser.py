@@ -146,6 +146,44 @@ def test_upload_image_with_error(browser, org_app):
     assert not browser.is_element_present_by_css('.field-display img')
 
 
+@pytest.mark.skip('Picture upload is needed to check scaling')
+def test_directory_thumbnail_views(browser, org_app):
+    screen_shots = '/home/lukas/Desktop/screenshots'
+
+    DirectoryCollection(org_app.session(), type='extended').add(
+        title="Jam Session",
+        structure="""
+            Name *= ___
+            Photo = *.jpg|*.png
+            Instruments = *.jpg|*.png
+            """,
+        configuration="""
+            title:
+                - name
+            order:
+                - name
+            display:
+                content:
+                    - name
+                    - instruments
+                    - photo                  
+            show_as_thumbnails:
+                - photo                
+            """,
+        type='extended'
+    )
+
+    transaction.commit()
+    browser.login_admin()
+
+    browser.visit('/directories/jam-session/+new')
+    photo = create_image(output=NamedTemporaryFile(suffix='.png'))
+    browser.fill('name', 'Bar59')
+    browser.fill('photo', photo.name)
+    browser.fill('instruments', photo.name)
+    browser.find_by_value("Absenden").click()
+
+
 def test_browse_directory_editor(browser, org_app):
     browser.login_admin()
     browser.visit('/directories/+new')
