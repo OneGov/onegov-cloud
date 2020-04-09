@@ -2090,7 +2090,8 @@ class DirectoryEntryLayout(DirectoryEntryBaseLayout):
     def thumbnail_field_ids(self):
         return [
             as_internal_id(e) for e in getattr(
-                self.model.directory.configuration, 'show_as_thumbnails', [])
+                self.model.directory.configuration,
+                'show_as_thumbnails', []) or []
         ]
 
     def field_download_link(self, field):
