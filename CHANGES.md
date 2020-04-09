@@ -1,8 +1,40 @@
 # Changes
 
+## Release `2020.45`
+
+> commits: **5 / [eb6b6612a6...15a3924914](https://github.com/OneGov/onegov-cloud/compare/eb6b6612a6^...15a3924914)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.45)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Adds field descriptions to Formcode**
+
+Underneath formcode fields using same identation, the field description can be defined using `<< ...>>`.
+
+**`Feature`** | **[73ecd5f505](https://github.com/onegov/onegov-cloud/commit/73ecd5f505d7ae358113619c20407192546b9b01)**
+
+🎉 **Adds default font family set**
+
+Adds fonts Arial, Verdana, Courier New, and Google fonts LatoWeb, Roboto and OpenSans.
+
+**`Feature`** | **[3d1906e45a](https://github.com/onegov/onegov-cloud/commit/3d1906e45a3a161070d020445e26edf63ec4ef36)**
+
+🎉 **Adds keyword count for available filters**
+
+Adds a count per keyword for all visible models on `/directories/{directory_name}`.
+
+**`Feature`** | **[9f056dae17](https://github.com/onegov/onegov-cloud/commit/9f056dae1781f5d2cb27f2fe7db9525ec7c38bb4)**
+
+🎉 **Adds display as thumbnail on DirectoryConfiguration**
+
+For UploadFields defined in formcode, one can choose to display if a field should be shown as thumbnail on an director entry.
+
+**`Feature`** | **[15a3924914](https://github.com/onegov/onegov-cloud/commit/15a3924914b2d29c5457d99d5fffffb949d25280)**
+
 ## Release `2020.44`
 
-> commits: **3 / [6fac7588d4...cf8d7187c5](https://github.com/OneGov/onegov-cloud/compare/6fac7588d4^...cf8d7187c5)**<br>
+> released: **2020-04-04 07:07**<br>
+> commits: **4 / [6fac7588d4...c4216ba2b2](https://github.com/OneGov/onegov-cloud/compare/6fac7588d4^...c4216ba2b2)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.44)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Electionday
