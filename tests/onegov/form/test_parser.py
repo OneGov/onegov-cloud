@@ -297,21 +297,6 @@ def test_parse_radio():
     assert form.gender.default == 'Female'
 
 
-@pytest.mark.skip('Todo: Reproduces server error on wrong input')
-def test_parse_radio_checkbox_mixed():
-
-    text = dedent("""
-        Gender =
-            [ ] Male
-            (x) Female
-    """)
-
-    form = parse_form(text)()
-
-    # another string that breaks the code
-    # - "Zeit* =":
-
-
 def test_parse_radio_escape():
 
     text = dedent("""

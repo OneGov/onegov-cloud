@@ -6,7 +6,8 @@ from cgi import FieldStorage
 from mimetypes import types_map
 from onegov.form import _
 from onegov.form.utils import with_options
-from onegov.form.errors import InvalidFormSyntax, DuplicateLabelError
+from onegov.form.errors import InvalidFormSyntax, DuplicateLabelError, \
+    FieldCompileError
 from stdnum.exceptions import ValidationError as StdnumValidationError
 from wtforms import ValidationError
 from wtforms.fields import SelectField
@@ -146,6 +147,8 @@ class ValidFormDefinition(object):
                 raise ValidationError(
                     field.gettext(self.duplicate).format(label=e.label)
                 )
+            except FieldCompileError as e:
+                raise ValidationError(e.field_name)
             except AttributeError:
                 raise ValidationError(field.gettext(self.message))
             else:
