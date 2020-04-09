@@ -235,6 +235,13 @@ def keyword_count(request, collection):
     return counts
 
 
+def create_thumbnail_link(field_id, request):
+    def thumbnail_link(entry):
+        id = (entry.values.get(field_id) or {}).get('data', '').lstrip('@')
+        return id and request.class_link(File, {'id': id}, name='thumbnail')
+    return thumbnail_link
+
+
 @OrgApp.html(
     model=DirectoryEntryCollection,
     permission=Public,
@@ -245,14 +252,10 @@ def view_directory(self, request):
     keyword_counts = keyword_count(request, self)
     filters = get_filters(request, self, keyword_counts)
 
-    if self.directory.configuration.thumbnail:
-        thumbnail = as_internal_id(self.directory.configuration.thumbnail)
-    else:
-        thumbnail = None
-
-    def thumbnail_link(entry):
-        id = (entry.values.get(thumbnail) or {}).get('data', '').lstrip('@')
-        return id and request.class_link(File, {'id': id}, name='thumbnail')
+    thumbnail = None
+    configuration = self.directory.configuration
+    if configuration.thumbnail:
+        thumbnail = as_internal_id(configuration.thumbnail)
 
     return {
         'layout': DirectoryEntryCollectionLayout(self, request),
@@ -264,7 +267,7 @@ def view_directory(self, request):
         'geojson': request.link(self, name='+geojson'),
         'submit': request.link(self, name='+submit'),
         'show_thumbnails': thumbnail and True or False,
-        'thumbnail_link': thumbnail_link
+        'thumbnail_link': create_thumbnail_link(thumbnail, request),
     }
 
 

@@ -120,6 +120,14 @@ class DirectoryBaseForm(Form):
             'data-fields-include': 'fileinput'
         })
 
+    show_as_thumbnails = TextAreaField(
+        label=_("Pictures to be displayed as thumbnails on an entry"),
+        fieldset=_("Display"),
+        render_kw={
+            'class_': 'formcode-select',
+            'data-fields-include': 'fileinput'
+        })
+
     address_block_title_type = RadioField(
         label=_("Address Block Title"),
         fieldset=_("Address Block"),
@@ -392,6 +400,7 @@ class DirectoryBaseForm(Form):
         content_fields = list(self.extract_field_ids(self.content_fields))
         contact_fields = list(self.extract_field_ids(self.contact_fields))
         keyword_fields = list(self.extract_field_ids(self.keyword_fields))
+        thumbnails = list(self.extract_field_ids(self.show_as_thumbnails))
 
         order_format = self.data[
             self.order.data == 'by-title' and 'title_format' or 'order_format'
@@ -418,21 +427,27 @@ class DirectoryBaseForm(Form):
                 self.address_block_title_type.data == 'fixed'
                 and self.address_block_title.data
                 or None
-            )
+            ),
+            show_as_thumbnails=thumbnails
         )
 
     @configuration.setter
     def configuration(self, cfg):
+
+        def join(attr):
+            return getattr(cfg, attr, None) and '\n'.join(getattr(cfg, attr))
+
         self.title_format.data = cfg.title
         self.lead_format.data = cfg.lead or ''
         self.content_fields.data = '\n'.join(cfg.display.get('content', ''))
         self.contact_fields.data = '\n'.join(cfg.display.get('contact', ''))
-        self.keyword_fields.data = '\n'.join(cfg.keywords)
+        self.keyword_fields.data = join('keywords')
         self.order_direction = cfg.direction == 'desc' and 'desc' or 'asc'
         self.link_pattern.data = cfg.link_pattern
         self.link_title.data = cfg.link_title
         self.link_visible.data = cfg.link_visible
         self.thumbnail.data = cfg.thumbnail
+        self.show_as_thumbnails.data = join('show_as_thumbnails')
 
         if safe_format_keys(cfg.title) == cfg.order:
             self.order.data = 'by-title'

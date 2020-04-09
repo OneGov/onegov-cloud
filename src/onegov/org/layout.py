@@ -20,7 +20,7 @@ from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryEntryCollection
 from onegov.event import OccurrenceCollection
 from onegov.file import File
-from onegov.form import FormCollection
+from onegov.form import FormCollection, as_internal_id
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org import _
 from onegov.org import utils
@@ -349,7 +349,7 @@ class Layout(ChameleonLayout):
         by onegov.file or not. May possibly fail.
 
         """
-        if '/storage/' not in url:
+        if not url or '/storage/' not in url:
             return url
 
         image_id = url.split('/storage/')[-1]
@@ -2085,6 +2085,20 @@ class DirectoryEntryCollectionLayout(DirectoryEntryBaseLayout):
 
 
 class DirectoryEntryLayout(DirectoryEntryBaseLayout):
+
+    @property
+    def thumbnail_field_ids(self):
+        return [
+            as_internal_id(e) for e in getattr(
+                self.model.directory.configuration,
+                'show_as_thumbnails', []) or []
+        ]
+
+    def field_download_link(self, field):
+        url = super().field_download_link(field)
+        if field.id in self.thumbnail_field_ids:
+            return self.thumbnail_url(url)
+        return url
 
     @cached_property
     def breadcrumbs(self):
