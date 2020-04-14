@@ -1482,7 +1482,7 @@ msgid "Official title"
 msgstr "Offizieller Titel"
 
 msgid "Keyword"
-msgstr "Kurzbezeichnung"
+msgstr "Schlagwort"
 
 msgid "Vote date"
 msgstr "Abstimmungsdatum"
