@@ -38,6 +38,10 @@ def test_upload_file():
     assert data['size']
     assert data['data']
 
+    textfile = create_file('text/plain', 'C:/mydata/test.txt', b'foobar')
+    data = field.process_fieldstorage(textfile)
+    assert data['filename'] == 'test.txt'
+
     def decompress(data):
         with GzipFile(filename='', mode='r', fileobj=BytesIO(data)) as f:
             return f.read()
