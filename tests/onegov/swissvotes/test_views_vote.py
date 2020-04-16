@@ -154,6 +154,7 @@ def test_view_vote(swissvotes_app):
 
     page = client.get('/').maybe_follow().click("Abstimmungen")
     page = page.click("Details")
+    print(page)
     assert "100.1" in page
     assert "Vote DE" in page
     assert "V D" in page

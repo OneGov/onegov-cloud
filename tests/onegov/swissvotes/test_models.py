@@ -1012,7 +1012,7 @@ def test_column_mapper():
         ('votes_on_same_day', 'anzahl', 'INTEGER', False, None, None),
         ('_legal_form', 'rechtsform', 'INTEGER', False, None, None)
     ]
-    assert list(mapper.items())[302] == (
+    assert list(mapper.items())[304] == (
         '!recommendations!sodk', 'p-sodk', 'INTEGER', True, None, None
     )
 
