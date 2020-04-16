@@ -311,3 +311,28 @@ def add_curiavista_and_additional_links(context):
     for col in new_cols:
         if not context.has_column('swissvotes', col):
             context.operations.add_column('swissvotes', Column(col, Text()))
+
+
+@upgrade_task('Adds poster_yes and poster_no')
+def add_poster_yes_no(context):
+    for col in ('posters_yes', 'posters_no'):
+        if not context.has_column('swissvotes', col):
+            context.operations.add_column('swissvotes', Column(col, Text()))
+
+
+@upgrade_task('Adds meta and content for external data sources')
+def add_meta_content(context):
+
+    if not context.has_column('swissvotes', 'meta'):
+        context.add_column_with_defaults(
+            'swissvotes',
+            Column('meta', JSON, nullable=False),
+            default=dict()
+        )
+
+    if not context.has_column('swissvotes', 'content'):
+        context.add_column_with_defaults(
+            'swissvotes',
+            Column('content', JSON, nullable=False),
+            default=dict()
+        )

@@ -137,6 +137,11 @@ def sample_vote():
         "https://www.atlas.bfs.admin.ch/maps/12/map/mapIdOnly/1815_de.html"
     )
     vote.bfs_map_fr = "htt(ps://www.ap/mapIdOnly/1815[e.html}"
+    vote.posters_yes = 'https://yes.com/objects/1 https://yes.com/objects/2'
+    vote.posters_no = 'https://no.com/objects/1 https://no.com/objects/2'
+    vote.posters_yes_imgs = {
+        'https://yes.com/objects/1': 'https://detail.com/1'
+    }
     vote.descriptor_1_level_1 = Decimal('4')
     vote.descriptor_1_level_2 = Decimal('4.2')
     vote.descriptor_1_level_3 = Decimal('4.21')
