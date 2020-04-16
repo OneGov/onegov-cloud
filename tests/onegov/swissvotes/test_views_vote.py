@@ -29,6 +29,9 @@ test_vote_data = dict(
     bkresults_fr='bkr_fr',
     bkchrono_de='bkc_de',
     bkchrono_fr='bkc_fr',
+    posters_yes='https://yes.com/objects/1 https://yes.com/objects/2',
+    posters_no='https://no.com/objects/1 https://no.com/objects/2',
+    posters_yes_imgs={'https://yes.com/objects/1': 'img_url'},
     descriptor_1_level_1=Decimal('4'),
     descriptor_1_level_2=Decimal('4.2'),
     descriptor_1_level_3=Decimal('4.21'),
@@ -209,6 +212,7 @@ def test_view_vote(swissvotes_app):
     assert "(40.01% Ja-Stimmen)" in page
     assert "(1.5 Ja, 24.5 Nein)" in page
     assert "20.01%" in page
+    assert "Poster material in favor of yes camp" in page
 
     swissvotes_app.session().query(SwissVote).one()._legal_form = 3
     commit()

@@ -259,3 +259,36 @@ svg text {
         width: 100%;
     }
 }
+
+/*
+    Museum für Gestaltung image gallery
+*/
+
+.image-gallery {
+
+    align-content: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    .gallery-image {
+        box-sizing: border-box;
+        margin-bottom: .5rem;
+
+        img {
+            margin-bottom: .25rem;
+        }
+
+        @media #{$small-only} {
+            width: 100%;
+        }
+
+        @media #{$medium-only} {
+            width: 49%;
+        }
+
+        @media #{$large-up} {
+            width: 32%;
+        }
+    }
+}
