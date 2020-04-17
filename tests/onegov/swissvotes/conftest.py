@@ -142,6 +142,7 @@ def sample_vote():
     vote.posters_yes_imgs = {
         'https://yes.com/objects/1': 'https://detail.com/1'
     }
+    vote.swissvoteslink = 'https://example.com/122.0'
     vote.descriptor_1_level_1 = Decimal('4')
     vote.descriptor_1_level_2 = Decimal('4.2')
     vote.descriptor_1_level_3 = Decimal('4.21')

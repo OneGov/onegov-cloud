@@ -755,6 +755,7 @@ class ColumnMapper(object):
             ('bkresults_fr', 'bkresults-fr'),
             ('bkchrono_de', 'bkchrono-de'),
             ('bkchrono_fr', 'bkchrono-fr'),
+            ('swissvoteslink', 'swissvoteslink'),
         ))
 
     def set_value(self, vote, attribute, value):

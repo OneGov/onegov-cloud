@@ -336,3 +336,11 @@ def add_meta_content(context):
             Column('content', JSON, nullable=False),
             default=dict()
         )
+
+
+@upgrade_task('Adds swissvoteslink')
+def add_swissvoteslink(context):
+    if not context.has_column('swissvotes', 'swissvoteslink'):
+        context.operations.add_column(
+            'swissvotes', Column('swissvoteslink', Text())
+        )

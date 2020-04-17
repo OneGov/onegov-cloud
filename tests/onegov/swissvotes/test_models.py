@@ -335,6 +335,7 @@ def test_vote(session, sample_vote):
         'https://yes.com/objects/1': 'https://detail.com/1'
     }
     assert vote.posters_no_imgs is None
+    assert vote.swissvoteslink == 'https://example.com/122.0'
 
     assert vote.descriptor_1_level_1 == Decimal('4')
     assert vote.descriptor_1_level_2 == Decimal('4.2')

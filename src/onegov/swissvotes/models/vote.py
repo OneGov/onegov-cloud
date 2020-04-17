@@ -194,6 +194,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
     anneepolitique = Column(Text)
     bfs_map_de = Column(Text)
     bfs_map_fr = Column(Text)
+    swissvoteslink = Column(Text)
 
     @property
     def deciding_question(self):
