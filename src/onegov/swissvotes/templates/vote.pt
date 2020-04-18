@@ -309,25 +309,13 @@
                     <tr tal:condition="vote.posters_yes_imgs">
                         <th class="column-30" style="vertical-align: top" i18n:translate="">Poster material in favor of yes camp</th>
                         <td>
-                            <div class="image-gallery">
-                                <tal:b tal:repeat="(url, img_url) vote.posters_yes_imgs.items()">
-                                    <div class="gallery-image"><img src="${img_url}" alt=""><br>
-                                    <a href="${url}" target="_blank" i18n:translate>Link eMuseum.ch</a></div>
-                                 </tal:b>
-                            </div>
+                            <tal:b metal:use-macro="layout.macros['image_gallery']" tal:define="items vote.posters_yes_imgs.items(); id_suffix 'yes'" />
                         </td>
                     </tr>
-                    <tr tal:condition="vote.posters_no_imgs">
+                    <tr tal:condition="vote.posters_no_imgs" tal:define="items vote.posters_no_imgs.items()">
                         <th class="column-30" style="vertical-align: top" i18n:translate="">Poster material in favor of no camp</th>
                         <td>
-                            <div class="image-gallery">
-                                <tal:b tal:repeat="(url, img_url) vote.posters_no_imgs.items()">
-                                    <div class="gallery-image">
-                                        <img src="${img_url}" alt="">
-                                        <a href="${url}" target="_blank" i18n:translate>Link eMuseum.ch</a>
-                                    </div>
-                                 </tal:b>
-                            </div>
+                            <tal:b metal:use-macro="layout.macros['image_gallery']" tal:define="items vote.posters_no_imgs.items(); id_suffix 'no'" />
                         </td>
                     </tr>
                     <tr tal:condition="ad_analysis">

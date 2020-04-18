@@ -157,3 +157,4 @@ def get_frameworks_asset():
 def get_common_asset():
     yield 'common.js'
     yield 'policy-selector.jsx'
+    yield 'image-gallery.js'
