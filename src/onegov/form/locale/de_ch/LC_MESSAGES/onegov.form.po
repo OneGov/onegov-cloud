@@ -110,7 +110,7 @@ msgid "Time"
 msgstr "Uhrzeit"
 
 msgid "Choices"
-msgstr "Auswahlsmöglichkeiten"
+msgstr "Auswahlmöglichkeiten"
 
 msgid "Choice"
 msgstr "Auswahl"
