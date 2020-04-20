@@ -118,7 +118,7 @@ class Layout(ChameleonLayout):
     @cached_property
     def font_awesome_path(self):
         return self.request.link(StaticFile(
-            f'font-awesome/css/font-awesome.min.css',
+            'font-awesome/css/font-awesome.min.css',
             version=self.app.version
         ))
 
@@ -404,7 +404,6 @@ class Layout(ChameleonLayout):
         if field.data.get('data', '').startswith('@'):
             return self.request.session.query(DirectoryFile).filter_by(
                 id=field.data['data'].lstrip('@')).first()
-
 
     @cached_property
     def move_person_url_template(self):
