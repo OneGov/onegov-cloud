@@ -61,7 +61,7 @@ Complex example:
                     (x) No
                     ( ) Yes
                         Street = ___
-                        << town >
+                        << street >>
                         Town = ___
                 << Alt >>
             ( ) I want to pick it up
