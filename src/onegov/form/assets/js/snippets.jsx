@@ -19,6 +19,7 @@ var FormSnippets = React.createClass({
                                     snippet={snippet}
                                     required={self.props.labels.required}
                                     optional={self.props.labels.optional}
+                                    field_comment_example={self.props.labels.field_comment_example}
                                     target={self.props.target}
                                 />
                             ) || (
@@ -40,7 +41,11 @@ var FormSnippet = React.createClass({
         formcodeUtils.updateTarget(this.props.target, snippet, this.props.snippet[0]);
     },
     getSnippet: function(required) {
-        // the title is the only thing that renders differently
+        // comment are handled differently
+        if (this.props.snippet[1] === '<<  >>') {
+            return '<< ' + this.props.field_comment_example + ' >>';
+        }
+        // the title is the other thing that renders differently
         if (this.props.snippet[1] === '#') {
             return '# ' + this.props.snippet[0];
         }
@@ -61,7 +66,7 @@ var FormSnippet = React.createClass({
             <div className="formcode-snippet">
                 <div className="formcode-snippet-name" onClick={this.handleOptional}>{name}</div>
                 {
-                    this.props.snippet[1] !== '#' &&
+                    (this.props.snippet[1] !== '#' && this.props.snippet[1] !== '<<  >>') &&
                     (
                         <div className="formcode-snippet-action">
                             <span

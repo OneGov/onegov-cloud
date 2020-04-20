@@ -35,6 +35,9 @@ def view_formcode_snippets(self, request):
         'labels': {
             'required': request.translate(_("Required")),
             'optional': request.translate(_("Optional")),
+            'field_comment_example': request.translate(_(
+                'Place the field comment beneath the field or choices, '
+                'always using the same indentation'))
         },
         'snippets': tuple(self.translated(request))
     }
