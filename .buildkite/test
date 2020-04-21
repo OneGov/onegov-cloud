@@ -7,21 +7,30 @@ trap 'echo "^^^ +++"' ERR
 # install test requirements
 # shellcheck disable=SC2086
 echo "--- Installing requirements :redis: :postgres: :java: :chrome:"
-
+rm /etc/apt/preferences
 install-packages \
+    wget \
+    apparmor \
     git-core \
     postgresql \
     redis \
     openjdk-8-jre-headless \
     gcc \
     libc-dev \
-    chromium-browser
+    fonts-liberation \
+    libappindicator3-1 \
+    libasound2 \
+    libdrm2 \
+    libgbm1 \
+    libnspr4 \
+    libnss3 \
+    libx11-xcb1 \
+    libxcb-dri3-0 \
+    libxss1 \
+    xdg-utils
 
-# configure JAVA_HOME
-export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
-
-# work around https://github.com/SergeyPirogov/webdriver_manager/issues/73
-ln -s /usr/bin/chromium-browser /usr/bin/google-chrome
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+dpkg -i google-chrome-stable_current_amd64.deb
 
 # Redis needs to be running
 redis-server --daemonize yes
