@@ -7,6 +7,7 @@ from onegov.core.html import sanitize_html
 from onegov.core.utils import binary_to_dictionary
 from onegov.file.utils import as_fileintent
 from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
+from onegov.form.utils import path_to_filename
 from onegov.form.validators import ValidPhoneNumber
 from onegov.form.widgets import ChosenSelectWidget
 from onegov.form.widgets import IconWidget
@@ -112,7 +113,7 @@ class UploadField(FileField):
 
     def process_fieldstorage(self, fs):
         self.file = getattr(fs, 'file', getattr(fs, 'stream', None))
-        self.filename = getattr(fs, 'filename', None)
+        self.filename = path_to_filename(getattr(fs, 'filename', None))
 
         if not self.file:
             return {}

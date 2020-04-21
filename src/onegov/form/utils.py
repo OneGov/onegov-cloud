@@ -145,3 +145,15 @@ def with_options(widget, **render_options):
                 return widget.__call__(*args, **render_options)
 
         return Widget()
+
+
+def path_to_filename(path):
+    if not path:
+        return
+    if not isinstance(path, str):
+        raise ValueError
+    if '/' in path:
+        return path.split('/')[-1]
+    if '\\' in path:
+        return path.split('\\')[-1]
+    return path
