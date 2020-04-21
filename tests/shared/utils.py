@@ -1,3 +1,6 @@
+import os
+import shutil
+
 import dectate
 import morepath
 import textwrap
@@ -7,6 +10,14 @@ from onegov.core.utils import Bunch, scan_morepath_modules, module_path
 from PIL import Image
 from random import randint
 from uuid import uuid4
+
+
+def open_in_browser(response, browser='firefox'):
+    assert shutil.which(browser)
+    path = '/tmp/test.html'
+    with open(path, 'w') as f:
+        print(response.text, file=f)
+    os.system(f'{browser} {path} &')
 
 
 def create_image(width=50, height=50, output=None):
