@@ -114,7 +114,7 @@ msgid "The file is too large, please provide a file smaller than {}."
 msgstr "Die Datei ist zu gross, bitte senden Sie eine Datei kleiner als {}."
 
 msgid "Files of this type are not supported."
-msgstr "Dateien dieses Typs werde nicht unterstützt."
+msgstr "Dateien dieses Typs werden nicht unterstützt."
 
 msgid "The form could not be parsed."
 msgstr "Das Formular ist nicht gültig."
