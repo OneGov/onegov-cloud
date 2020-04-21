@@ -32,6 +32,9 @@ install-packages \
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 dpkg -i google-chrome-stable_current_amd64.deb
 
+# configure JAVA_HOME
+export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
+
 # Redis needs to be running
 redis-server --daemonize yes
 
