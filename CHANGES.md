@@ -1,8 +1,26 @@
 # Changes
 
+## Release `2020.48`
+
+> commits: **2 / [30952ea2bd...1796883d6b](https://github.com/OneGov/onegov-cloud/compare/30952ea2bd^...1796883d6b)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.48)](https://buildkite.com/seantis/onegov-cloud)
+
+### Swissvotes
+
+🎉 **Add poster of eMuesum.ch**
+
+- Import of poster urls from dataset
+- responsive Image gallery (not IE 11 supported)
+- Routine to fetch image urls for posters and save them to the database
+- changed translation "Schlagwort"
+- hint for Internet Explorer uses
+
+**`Feature`** | **[VOTES-71](https://issues.seantis.ch/browse/VOTES-71)** | **[1796883d6b](https://github.com/onegov/onegov-cloud/commit/1796883d6b6cac664a341dc86dcd7f46037a15ca)**
+
 ## Release `2020.47`
 
-> commits: **1 / [7b09649188...7b09649188](https://github.com/OneGov/onegov-cloud/compare/7b09649188^...7b09649188)**<br>
+> released: **2020-04-22 12:01**<br>
+> commits: **2 / [7b09649188...89895df1d1](https://github.com/OneGov/onegov-cloud/compare/7b09649188^...89895df1d1)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.47)](https://buildkite.com/seantis/onegov-cloud)
 
 ## Release `2020.46`
