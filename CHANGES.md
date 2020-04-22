@@ -1,8 +1,24 @@
 # Changes
 
+## Release `2020.46`
+
+> commits: **4 / [fa03e0d4ef...c20b8a380a](https://github.com/OneGov/onegov-cloud/compare/fa03e0d4ef^...c20b8a380a)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.46)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Additional Directory Optimisations**
+
+- adds image popup to thumbnails on a entry
+- Fixes uppercase footer label for custom link
+- Adds comment button to formcode toolbar
+
+**`Feature`** | **[ONEGOV-5](#ONEGOV-5)** | **[c20b8a380a](https://github.com/onegov/onegov-cloud/commit/c20b8a380a88500ff9b3648c96c9f5c42bf51796)**
+
 ## Release `2020.45`
 
-> commits: **5 / [eb6b6612a6...15a3924914](https://github.com/OneGov/onegov-cloud/compare/eb6b6612a6^...15a3924914)**<br>
+> released: **2020-04-09 10:20**<br>
+> commits: **6 / [eb6b6612a6...1a13643021](https://github.com/OneGov/onegov-cloud/compare/eb6b6612a6^...1a13643021)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.45)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
