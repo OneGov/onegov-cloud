@@ -68,7 +68,7 @@ def view_vote(self, request):
 )
 def brief_description_static(self, request):
     return request.redirect(
-        request.link(self.get_file('brief_description'))
+        request.link(self.get_file('brief_description', request))
     )
 
 
@@ -125,7 +125,7 @@ def federal_council_message_fr_static(self, request):
 )
 def parliamentary_debate_static(self, request):
     return request.redirect(
-        request.link(self.get_file('parliamentary_debate'))
+        request.link(self.get_file('parliamentary_debate', request))
     )
 
 
