@@ -1,5 +1,5 @@
 from cached_property import cached_property
-from onegov.core.elements import Link
+from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.swissvotes import _
 from onegov.swissvotes.layouts.default import DefaultLayout
 
@@ -21,6 +21,39 @@ class VotesLayout(DefaultLayout):
                     attrs={'class': 'upload-icon'}
                 )
             )
+            result.append(
+                Link(
+                    text=_("Update external resources"),
+                    url=self.csrf_protected_url(
+                        self.request.link(
+                            self.model.default(),
+                            name='update-external-resources'
+                        )
+                    ),
+                    attrs={'class': 'update-icon'},
+                    traits=(
+                        Confirm(
+                            _("Update all external resources?"),
+                            _("This can take some time."),
+                            _("Update external resources"),
+                            _("Cancel")
+                        ),
+                        Intercooler(
+                            request_method='POST',
+                            redirect_after=self.request.link(self.model)
+                        )
+                    )
+                )
+            )
+            # result.append(
+            #     Link(
+            #         text=_("Update external resources"),
+            #         url=self.request.link(
+            #             self.model.default(),
+            #             name='update-external-resources'),
+            #         attrs={'class': 'update-icon'}
+            #     )
+            # )
             result.append(
                 Link(
                     text=_("Download dataset (CSV)"),

@@ -6,6 +6,7 @@ from onegov.form import Form
 from onegov.swissvotes import _
 from onegov.swissvotes import SwissvotesApp
 from onegov.swissvotes.collections import SwissVoteCollection
+from onegov.swissvotes.external_sources import update_poster_urls
 from onegov.swissvotes.forms import SearchForm
 from onegov.swissvotes.forms import UpdateDatasetForm
 from onegov.swissvotes.layouts import DeleteVotesLayout
@@ -28,6 +29,33 @@ def view_votes(self, request, form):
         'layout': VotesLayout(self, request),
         'form': form
     }
+
+
+@SwissvotesApp.html(
+    model=SwissVoteCollection,
+    permission=Private,
+    name='update-external-resources',
+    request_method='POST'
+)
+def update_external_resources(self, request):
+    request.assert_valid_csrf_token()
+    if not request.app.mfg_api_token:
+        request.alert(_("A valid api key is missing"))
+        return
+    added, updated, failed = update_poster_urls(request)
+    request.message(
+        _(
+            "Poster image urls updated (${added} added, ${updated} updated)",
+            mapping={'added': added, 'updated': updated}
+        ),
+        'success'
+    )
+
+    if failed:
+        request.alert(
+            _("Poster image urls failed: ${failed}",
+              mapping={'failed': failed}),
+        )
 
 
 @SwissvotesApp.form(

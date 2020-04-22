@@ -68,7 +68,7 @@ class VoteLayout(DefaultLayout):
         if name not in mapping:
             return None
 
-        attachment = self.model.get_file(name)
+        attachment = self.model.get_file(name, self.request)
         if not attachment:
             return None
 

@@ -68,7 +68,7 @@ def view_vote(self, request):
 )
 def brief_description_static(self, request):
     return request.redirect(
-        request.link(self.get_file('brief_description'))
+        request.link(self.get_file('brief_description', request))
     )
 
 
@@ -125,7 +125,7 @@ def federal_council_message_fr_static(self, request):
 )
 def parliamentary_debate_static(self, request):
     return request.redirect(
-        request.link(self.get_file('parliamentary_debate'))
+        request.link(self.get_file('parliamentary_debate', request))
     )
 
 
@@ -202,7 +202,7 @@ def realization_fr_static(self, request):
 )
 def ad_analysis_static(self, request):
     return request.redirect(
-        request.link(self.get_file('ad_analysis'))
+        request.link(self.get_file('ad_analysis', request))
     )
 
 
@@ -213,7 +213,7 @@ def ad_analysis_static(self, request):
 )
 def results_by_domain_static(self, request):
     return request.redirect(
-        request.link(self.get_file('results_by_domain'))
+        request.link(self.get_file('results_by_domain', request))
     )
 
 
@@ -224,7 +224,7 @@ def results_by_domain_static(self, request):
 )
 def foeg_analysis_static(self, request):
     return request.redirect(
-        request.link(self.get_file('foeg_analysis'))
+        request.link(self.get_file('foeg_analysis', request))
     )
 
 

@@ -324,6 +324,19 @@ def test_vote(session, sample_vote):
     assert vote.bfs_map_host('de_CH') == "https://www.atlas.bfs.admin.ch"
     assert vote.bfs_map_host('en_US') == "https://www.atlas.bfs.admin.ch"
     assert vote.bfs_map_host('fr_CH') == ""
+    assert vote.posters_yes == 'https://yes.com/objects/1 ' \
+                               'https://yes.com/objects/2'
+
+    assert vote.posters_no == 'https://no.com/objects/1 ' \
+                              'https://no.com/objects/2'
+
+    # Stored dictionaries with poster urls as keys
+    assert vote.posters_yes_imgs == {
+        'https://yes.com/objects/1': 'https://detail.com/1'
+    }
+    assert vote.posters_no_imgs is None
+    assert vote.swissvoteslink == 'https://example.com/122.0'
+
     assert vote.descriptor_1_level_1 == Decimal('4')
     assert vote.descriptor_1_level_2 == Decimal('4.2')
     assert vote.descriptor_1_level_3 == Decimal('4.21')
@@ -1000,7 +1013,7 @@ def test_column_mapper():
         ('votes_on_same_day', 'anzahl', 'INTEGER', False, None, None),
         ('_legal_form', 'rechtsform', 'INTEGER', False, None, None)
     ]
-    assert list(mapper.items())[302] == (
+    assert list(mapper.items())[304] == (
         '!recommendations!sodk', 'p-sodk', 'INTEGER', True, None, None
     )
 

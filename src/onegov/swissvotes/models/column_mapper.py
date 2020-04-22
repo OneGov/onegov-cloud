@@ -41,6 +41,8 @@ class ColumnMapper(object):
             ('descriptor_3_level_1', 'd3e1'),
             ('descriptor_3_level_2', 'd3e2'),
             ('descriptor_3_level_3', 'd3e3'),
+            ('posters_yes', 'poster_ja'),
+            ('posters_no', 'poster_nein'),
             ('_result_people_accepted', 'volk'),
             ('_result_cantons_accepted', 'stand'),
             ('_result', 'annahme'),
@@ -753,6 +755,7 @@ class ColumnMapper(object):
             ('bkresults_fr', 'bkresults-fr'),
             ('bkchrono_de', 'bkchrono-de'),
             ('bkchrono_fr', 'bkchrono-fr'),
+            ('swissvoteslink', 'swissvoteslink'),
         ))
 
     def set_value(self, vote, attribute, value):

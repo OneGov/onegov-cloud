@@ -53,6 +53,10 @@ class SwissvotesApp(Framework, FormApp, QuillApp, DepotApp, UserApp):
             result = file.read()
         return result
 
+    def configure_mfg_api_token(self, **cfg):
+        """ Configures the Museum für Gestaltung API Token. """
+        self.mfg_api_token = cfg.get('mfg_api_token', None)
+
 
 @SwissvotesApp.static_directory()
 def get_static_directory():
@@ -96,6 +100,7 @@ def org_content_security_policy():
     policy.connect_src.add('https://sentry.io')
 
     policy.script_src.add('https://stats.seantis.ch')
+    policy.child_src.add('https://www.emuseum.ch')
 
     return policy
 
@@ -152,3 +157,4 @@ def get_frameworks_asset():
 def get_common_asset():
     yield 'common.js'
     yield 'policy-selector.jsx'
+    yield 'image-gallery.js'

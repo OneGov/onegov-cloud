@@ -29,6 +29,9 @@ test_vote_data = dict(
     bkresults_fr='bkr_fr',
     bkchrono_de='bkc_de',
     bkchrono_fr='bkc_fr',
+    posters_yes='https://yes.com/objects/1 https://yes.com/objects/2',
+    posters_no='https://no.com/objects/1 https://no.com/objects/2',
+    posters_yes_imgs={'https://yes.com/objects/1': 'img_url'},
     descriptor_1_level_1=Decimal('4'),
     descriptor_1_level_2=Decimal('4.2'),
     descriptor_1_level_3=Decimal('4.21'),
@@ -151,6 +154,7 @@ def test_view_vote(swissvotes_app):
 
     page = client.get('/').maybe_follow().click("Abstimmungen")
     page = page.click("Details")
+    print(page)
     assert "100.1" in page
     assert "Vote DE" in page
     assert "V D" in page
@@ -209,6 +213,7 @@ def test_view_vote(swissvotes_app):
     assert "(40.01% Ja-Stimmen)" in page
     assert "(1.5 Ja, 24.5 Nein)" in page
     assert "20.01%" in page
+    assert "Kampagnenmaterial Ja" in page
 
     swissvotes_app.session().query(SwissVote).one()._legal_form = 3
     commit()
@@ -330,6 +335,7 @@ def test_view_vote(swissvotes_app):
 
 def test_view_deciding_question(swissvotes_app):
     data = test_vote_data
+    del data['posters_yes_imgs']
     data['_legal_form'] = 5
 
     swissvotes_app.session().add(

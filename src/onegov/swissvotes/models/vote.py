@@ -1,7 +1,7 @@
 from cached_property import cached_property
 from collections import OrderedDict
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.mixins import TimestampMixin, ContentMixin, meta_property
 from onegov.core.orm.types import JSON
 from onegov.file import AssociatedFiles
 from onegov.file import File
@@ -55,7 +55,7 @@ class encoded_property(object):
         return instance.codes(self.name, instance.deciding_question).get(value)
 
 
-class SwissVote(Base, TimestampMixin, AssociatedFiles):
+class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
 
     """ A single vote as defined by the code book.
 
@@ -75,6 +75,9 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     - Different localized attachments, some of them indexed for full text
       search.
 
+    - Metadata from external information sources such as Museum für Gestaltung
+      can be stored in the content or meta field provided by the
+      ``ContentMixin``.
     """
 
     __tablename__ = 'swissvotes'
@@ -191,6 +194,7 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     anneepolitique = Column(Text)
     bfs_map_de = Column(Text)
     bfs_map_fr = Column(Text)
+    swissvoteslink = Column(Text)
 
     @property
     def deciding_question(self):
@@ -203,6 +207,14 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     bkresults_fr = Column(Text)
     bkchrono_de = Column(Text)
     bkchrono_fr = Column(Text)
+
+    # space-sep urls for Museum for Gestaltung, coming from the dataset
+    posters_yes = Column(Text)
+    posters_no = Column(Text)
+
+    # Fetched list of image urls using MfG API
+    posters_yes_imgs = meta_property()
+    posters_no_imgs = meta_property()
 
     @property
     def title(self):
@@ -815,13 +827,13 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles):
     def files_observer(self, files):
         self.vectorize_files()
 
-    def get_file(self, name):
+    def get_file(self, name, request):
         """ Returns the requested localized file, falls back to the default
         locale.
 
         """
         fallback = SwissVote.__dict__.get(name).__get_by_locale__(
-            self, self.session_manager.default_locale
+            self, request.app.default_locale
         )
         return getattr(self, name, None) or fallback
 

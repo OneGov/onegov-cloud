@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2019-12-23 11:01+0100\n"
+"POT-Creation-Date: 2020-04-22 21:49+0200\n"
 "PO-Revision-Date: 2019-12-14 14:49+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -177,6 +177,18 @@ msgstr "Poids électoraux"
 
 msgid "Update dataset"
 msgstr "Actualiser la base de données"
+
+msgid "Update external resources"
+msgstr "Actualiser des resources externes"
+
+msgid "Update all external resources?"
+msgstr "Actualiser des resources externes?"
+
+msgid "This can take some time."
+msgstr "Cela peut prendre un certain temps."
+
+msgid "Cancel"
+msgstr "Annuler"
 
 msgid "Download dataset (CSV)"
 msgstr "Télécharger le fichier de données (CSV)"
@@ -1420,9 +1432,6 @@ msgstr "Page précédente"
 msgid "Next Page"
 msgstr "Page suivante"
 
-msgid "Cancel"
-msgstr "Annuler"
-
 msgid "Search"
 msgstr "Rechercher"
 
@@ -1437,6 +1446,9 @@ msgstr "Toggle"
 
 msgid "Columns"
 msgstr "Columns"
+
+msgid "Link eMuseum.ch"
+msgstr "Lien eMuseum.ch"
 
 msgid "Dear Sir or Madam,"
 msgstr "Madame, Monsieur,"
@@ -1591,6 +1603,12 @@ msgstr "Autres mots d'ordre"
 
 msgid "Divergent branches"
 msgstr "Sections cantonales divergentes"
+
+msgid "Campaign material for a Yes"
+msgstr "Matériel de campagne pour le oui"
+
+msgid "Campaign material for a No"
+msgstr "Matériel de campagne pour le non"
 
 msgid "Analysis of the advertising campaign"
 msgstr "Analyse des annonces de campagne"
@@ -1773,6 +1791,17 @@ msgstr "Pièces jointes mises à jour"
 
 msgid "Vote deleted"
 msgstr "Votation supprimée"
+
+msgid "A valid api key is missing"
+msgstr "Il manque une clé api valide"
+
+#, python-format
+msgid "Poster image urls updated (${added} added, ${updated} updated)"
+msgstr "Mise à jour des liens pour les affiches (${added} nouveau, ${updated} actualisé)"
+
+#, python-format
+msgid "Poster image urls failed: ${failed}"
+msgstr "Mise à jour des liens pour les affiches avec erreurs: ${failed}"
 
 #, python-format
 msgid "Dataset updated (${added} added, ${updated} updated)"

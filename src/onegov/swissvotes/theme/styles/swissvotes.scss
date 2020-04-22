@@ -259,3 +259,119 @@ svg text {
         width: 100%;
     }
 }
+
+/*
+    Museum für Gestaltung image gallery
+*/
+
+$modal-padding-sm: 50px;
+$modal-padding: 25px;
+$modal-padding-md: 70px;
+
+.image-gallery {
+
+    align-content: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    @keyframes zoom {
+        from {transform: scale(0)}
+        to {transform: scale(1)}
+    }
+
+    .image-container {
+        box-sizing: border-box;
+        margin-bottom: .5rem;
+
+        img {
+            cursor: pointer;
+            margin-bottom: .25rem;
+            transition: .2s;
+
+            &:hover {
+                opacity: .7;
+            }
+        }
+
+        @media #{$small-only} {
+            width: 100%;
+        }
+
+        @media #{$medium-only} {
+            width: 49%;
+        }
+
+        @media #{$large-up} {
+            width: 32%;
+        }
+
+        .modal {
+            background-color: rgba(0, 0, 0, .9);
+            display: none;
+            height: 100%;
+            left: 0;
+            overflow: auto;
+            padding-bottom: $modal-padding;
+            padding-top: $modal-padding;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1;
+
+            @media #{$small-only} {
+                padding-top: $modal-padding-sm;
+            }
+
+            @media #{$medium-only} {
+                padding-bottom: $modal-padding-md;
+                padding-top: $modal-padding-md;
+            }
+
+            .close {
+                color: #f1f1f1;
+                font-size: 40px;
+                font-weight: bold;
+                position: absolute;
+                right: 35px;
+                top: $modal-padding;
+                transition: .3s;
+
+                @media #{$small-only} {
+                    right: 15px;
+                    top: 15px;
+                }
+            }
+
+            .close:hover,
+            .close:focus {
+                color: #bbb;
+                cursor: pointer;
+                text-decoration: none;
+            }
+
+            img {
+                animation-duration: .6s;
+                animation-name: zoom;
+                cursor: default;
+                display: block;
+                margin: auto;
+                max-height: calc(100vh - 2 * #{$modal-padding});
+                max-width: 80%;
+
+                &:hover {
+                    opacity: 1;
+                }
+
+                @media #{$medium-only} {
+                    max-height: calc(100vh - 2 * #{$modal-padding-md});
+                }
+
+                @media #{$small-only} {
+                    max-height: calc(100vh - 2 * #{$modal-padding-sm});
+                    max-width: 100%;
+                }
+            }
+        }
+    }
+}

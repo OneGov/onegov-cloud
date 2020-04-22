@@ -11,7 +11,8 @@ from xlsxwriter.workbook import Workbook
 
 @mark.parametrize("file", [
     module_path(
-        'tests.onegov.swissvotes', 'fixtures/votes.xlsx'),
+        'tests.onegov.swissvotes',
+        'fixtures/votes_2020_04_05_mit_Plakaten.xlsx'),
 ])
 def test_update_votes(swissvotes_app, file):
     client = Client(swissvotes_app)

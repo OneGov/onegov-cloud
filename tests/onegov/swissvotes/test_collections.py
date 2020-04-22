@@ -842,7 +842,9 @@ def test_votes_export(swissvotes_app):
         _result_cantons_accepted=1,
         result_cantons_yeas=Decimal('1.5'),
         result_cantons_nays=Decimal('24.5'),
-        result_cantons_yeas_p=Decimal('60.01')
+        result_cantons_yeas_p=Decimal('60.01'),
+        posters_no="https://museum.ch/objects/1 https://museum.ch/objects/1",
+        swissvoteslink='https://example.com/122.0'
     )
     vote.result_ag_eligible_voters = 101
     vote.result_ag_votes_valid = 102
@@ -2285,7 +2287,11 @@ def test_votes_export(swissvotes_app):
         'urheber': 'Initiator',
         'anneepolitique': 'anneepolitique',
         'bfsmap-de': 'map de',
-        'bfsmap-fr': 'map fr'
+        'bfsmap-fr': 'map fr',
+        'poster_nein': "https://museum.ch/objects/1 "
+                       "https://museum.ch/objects/1",
+        'poster_ja': '.',
+        'swissvoteslink': 'https://example.com/122.0'
     }
 
     file = BytesIO()
@@ -3032,7 +3038,11 @@ def test_votes_export(swissvotes_app):
         'urheber': 'Initiator',
         'anneepolitique': 'anneepolitique',
         'bfsmap-de': 'map de',
-        'bfsmap-fr': 'map fr'
+        'bfsmap-fr': 'map fr',
+        'poster_ja': '',
+        'poster_nein': "https://museum.ch/objects/1 "
+                       "https://museum.ch/objects/1",
+        'swissvoteslink': 'https://example.com/122.0'
     }
 
     assert csv.keys() == xlsx.keys()
