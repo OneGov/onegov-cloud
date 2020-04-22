@@ -148,7 +148,6 @@ def test_upload_image_with_error(browser, org_app):
 
 @pytest.mark.skip('Picture upload is needed to check scaling')
 def test_directory_thumbnail_views(browser, org_app):
-    screen_shots = '/home/lukas/Desktop/screenshots'
 
     DirectoryCollection(org_app.session(), type='extended').add(
         title="Jam Session",

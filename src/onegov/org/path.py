@@ -180,7 +180,10 @@ def get_file_for_org(request, app, id):
 
     obj = get_file(app, id)
 
-    if obj and obj.type in protected_filetypes:
+    if not obj:
+        return
+
+    if obj.type in protected_filetypes:
         if not request.has_role('editor', 'admin'):
             obj = None
         else:
