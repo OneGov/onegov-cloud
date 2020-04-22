@@ -531,6 +531,10 @@ $footer-border-width: 0;
         text-transform: uppercase;
     }
 
+    h2.custom-links {
+        text-transform: none;
+    }
+
     .footer-columns {
         padding-bottom: .5rem;
         padding-top: 1.25rem;
@@ -1109,6 +1113,19 @@ dl.field-display > dt {
 }
 
 .field-display {
+
+    p.thumbnail {
+        border-radius: 5px;
+        padding: 0;
+
+        img {
+            border-radius: 5px;
+            max-height: 150px;
+            object-fit: cover;
+            vertical-align: top;
+        }
+    }
+
     > dd,
     .field-display-data {
         margin-bottom: 1rem;
@@ -1122,17 +1139,6 @@ dl.field-display > dt {
             max-width: 500px;
         }
 
-        div.thumbnail {
-            border-radius: 5px;
-            padding: 0;
-
-            img {
-                border-radius: 5px;
-                max-height: 150px;
-                object-fit: cover;
-                vertical-align: top;
-            }
-        }
     }
 }
 

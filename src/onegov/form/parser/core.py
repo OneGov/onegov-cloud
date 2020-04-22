@@ -61,7 +61,7 @@ Complex example:
                     (x) No
                     ( ) Yes
                         Street = ___
-                        << town >
+                        << street >>
                         Town = ___
                 << Alt >>
             ( ) I want to pick it up
@@ -882,10 +882,8 @@ def parse_field_block(field_block, field_classes,
 
         # make sure only one type is found (either radio or checkbox)
         types = {f.type for f in field.choices}
-        # assert types <= {'radio', 'checkbox'}
-        # assert len(types) == 1
-        if not all((types <= {'radio', 'checkbox'}, len(types) == 1)):
-            raise FieldCompileError(key)
+        assert types <= {'radio', 'checkbox'}
+        assert len(types) == 1
 
     result = field_classes[field.type].create(
         field, identifier, parent, fieldset, field_help)

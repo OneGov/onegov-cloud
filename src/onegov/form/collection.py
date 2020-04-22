@@ -266,7 +266,7 @@ class FormSubmissionCollection(object):
 
     def update(self, submission, form, exclude=None):
         """ Takes a submission and a form and updates the submission data
-        as well as the files stored in a spearate table.
+        as well as the files stored in a separate table.
 
         """
         assert submission.id and submission.state

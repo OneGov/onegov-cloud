@@ -18,6 +18,7 @@ from onegov.core.static import StaticFile
 from onegov.core.utils import linkify
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryEntryCollection
+from onegov.directory.models.directory import DirectoryFile
 from onegov.event import OccurrenceCollection
 from onegov.file import File
 from onegov.form import FormCollection, as_internal_id
@@ -117,7 +118,7 @@ class Layout(ChameleonLayout):
     @cached_property
     def font_awesome_path(self):
         return self.request.link(StaticFile(
-            f'font-awesome/css/font-awesome.min.css',
+            'font-awesome/css/font-awesome.min.css',
             version=self.app.version
         ))
 
@@ -396,6 +397,13 @@ class Layout(ChameleonLayout):
             return self.request.class_link(File, {
                 'id': field.data['data'].lstrip('@')
             })
+
+    def field_file(self, field):
+        if not field.type == 'UploadField':
+            return None
+        if field.data.get('data', '').startswith('@'):
+            return self.request.session.query(DirectoryFile).filter_by(
+                id=field.data['data'].lstrip('@')).first()
 
     @cached_property
     def move_person_url_template(self):
@@ -1975,7 +1983,7 @@ class DirectoryEntryBaseLayout(DefaultLayout):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
+        self.request.include('photoswipe')
         if self.directory.marker_color:
             self.custom_body_attributes['data-default-marker-color']\
                 = self.directory.marker_color

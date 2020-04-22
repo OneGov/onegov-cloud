@@ -11,6 +11,9 @@ class Snippets(object):
         (_("E-Mail"), '@@@'),
         (_("Website"), 'http://'),
 
+        (_("Comment"), None),
+        (_("Example Comment"), '<<  >>'),
+
         (_("Date and time"), None),
         (_("Date"), 'YYYY.MM.DD'),
         (_("Time"), 'HH:MM'),

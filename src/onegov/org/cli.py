@@ -457,7 +457,7 @@ def import_reservations(dsn, map):
 
     """
 
-    print(f"Connecting to remote")
+    print("Connecting to remote")
     engine = create_engine(dsn).connect()
 
     @event.listens_for(engine, 'begin')
@@ -519,7 +519,7 @@ def import_reservations(dsn, map):
     def is_payment_key(key):
         return key == 'bezahlt'
 
-    print(f"Reading map")
+    print("Reading map")
     records = CSVFile(open(map, 'rb'), ('Old URL', 'New URL', 'Type')).lines
     records = tuple(records)
 

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-02-21 09:38+0100\n"
+"POT-Creation-Date: 2020-04-20 16:04+0200\n"
 "PO-Revision-Date: 2017-06-28 12:03+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: Romansh\n"
@@ -16,65 +16,15 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "X-Generator: Poedit 2.0.2\n"
 
-#, python-format
-msgid "The file is too large, please provide a file smaller than {}."
-msgstr ""
-
-msgid "Files of this type are not supported."
-msgstr ""
-
-msgid "The form could not be parsed."
-msgstr ""
-
-msgid "Define at least one required e-mail field ('E-Mail * = @@@')"
-msgstr ""
-
-#, python-format
-msgid "The syntax on line {line} is not valid."
-msgstr ""
-
-#, python-format
-msgid "The field '{label}' exists more than once."
-msgstr ""
-
-#, python-format
-msgid "'{label}' is a reserved name. Please use a different name."
-msgstr ""
-
-msgid "Define at least one required field"
-msgstr ""
-
-msgid "Not a valid phone number."
-msgstr "Numer da telefon nunvalaivel."
-
-msgid "This value already exists."
-msgstr ""
-
 msgid "Required"
 msgstr ""
 
 msgid "Optional"
 msgstr ""
 
-msgid "Select an Option"
-msgstr ""
-
-msgid "No results match"
-msgstr ""
-
-msgid "Select Some Options"
-msgstr ""
-
-msgid "Uploaded file"
-msgstr ""
-
-msgid "Keep file"
-msgstr ""
-
-msgid "Delete file"
-msgstr ""
-
-msgid "Replace file"
+msgid ""
+"Place the field comment beneath the field or choices, always using the same "
+"indentation"
 msgstr ""
 
 msgid "General"
@@ -94,6 +44,12 @@ msgstr ""
 
 msgid "Website"
 msgstr ""
+
+msgid "Comment"
+msgstr "Commentar"
+
+msgid "Example Comment"
+msgstr "Commentar Exaimpel"
 
 msgid "Date and time"
 msgstr ""
@@ -147,4 +103,59 @@ msgid "Swiss vat number"
 msgstr ""
 
 msgid "Markdown"
+msgstr ""
+
+#, python-format
+msgid "The file is too large, please provide a file smaller than {}."
+msgstr ""
+
+msgid "Files of this type are not supported."
+msgstr ""
+
+msgid "The form could not be parsed."
+msgstr ""
+
+msgid "Define at least one required e-mail field ('E-Mail * = @@@')"
+msgstr ""
+
+#, python-format
+msgid "The syntax on line {line} is not valid."
+msgstr ""
+
+#, python-format
+msgid "The field '{label}' exists more than once."
+msgstr ""
+
+#, python-format
+msgid "'{label}' is a reserved name. Please use a different name."
+msgstr ""
+
+msgid "Define at least one required field"
+msgstr ""
+
+msgid "Not a valid phone number."
+msgstr "Numer da telefon nunvalaivel."
+
+msgid "This value already exists."
+msgstr ""
+
+msgid "Uploaded file"
+msgstr ""
+
+msgid "Keep file"
+msgstr ""
+
+msgid "Delete file"
+msgstr ""
+
+msgid "Replace file"
+msgstr ""
+
+msgid "Select an Option"
+msgstr ""
+
+msgid "No results match"
+msgstr ""
+
+msgid "Select Some Options"
 msgstr ""
