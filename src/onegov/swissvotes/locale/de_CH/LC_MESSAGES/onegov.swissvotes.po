@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2019-12-23 11:01+0100\n"
+"POT-Creation-Date: 2020-04-22 21:49+0200\n"
 "PO-Revision-Date: 2019-12-14 14:10+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -177,6 +177,18 @@ msgstr "Wählerstärken"
 
 msgid "Update dataset"
 msgstr "Datensatz aktualisieren"
+
+msgid "Update external resources"
+msgstr "Externe Quellen aktualisieren"
+
+msgid "Update all external resources?"
+msgstr "Alle externen Quellen aktualisieren?"
+
+msgid "This can take some time."
+msgstr "Dies kann eine Weile dauern."
+
+msgid "Cancel"
+msgstr "Abbrechen"
 
 msgid "Download dataset (CSV)"
 msgstr "Datensatz herunterladen (CSV)"
@@ -1413,9 +1425,6 @@ msgstr "Vorherige Seite"
 msgid "Next Page"
 msgstr "Nächste Seite"
 
-msgid "Cancel"
-msgstr "Abbrechen"
-
 msgid "Search"
 msgstr "Suchen"
 
@@ -1430,6 +1439,9 @@ msgstr "Auswahl"
 
 msgid "Columns"
 msgstr "Spalten"
+
+msgid "Link eMuseum.ch"
+msgstr "Link eMuseum.ch"
 
 msgid "Dear Sir or Madam,"
 msgstr "Sehr geehrte Damen und Herren,"
@@ -1588,6 +1600,12 @@ msgstr "Weitere Parolen"
 
 msgid "Divergent branches"
 msgstr "Abweichende Sektionen"
+
+msgid "Campaign material for a Yes"
+msgstr "Kampagnenmaterial Ja"
+
+msgid "Campaign material for a No"
+msgstr "Kampagnenmaterial Nein"
 
 msgid "Analysis of the advertising campaign"
 msgstr "Analyse der Inseratekampagne"
@@ -1773,6 +1791,17 @@ msgstr "Anhänge aktualisiert"
 
 msgid "Vote deleted"
 msgstr "Abstimmung gelöscht."
+
+msgid "A valid api key is missing"
+msgstr "Ein gültiger Api-Key fehlt"
+
+#, python-format
+msgid "Poster image urls updated (${added} added, ${updated} updated)"
+msgstr "Bild-Urls aktualisiert (${added} neu, ${updated} aktualisiert)"
+
+#, python-format
+msgid "Poster image urls failed: ${failed}"
+msgstr "Fehlgeschlagene Bild-Url-Abfragen: ${failed}"
 
 #, python-format
 msgid "Dataset updated (${added} added, ${updated} updated)"
