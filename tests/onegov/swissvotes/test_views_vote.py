@@ -213,7 +213,7 @@ def test_view_vote(swissvotes_app):
     assert "(40.01% Ja-Stimmen)" in page
     assert "(1.5 Ja, 24.5 Nein)" in page
     assert "20.01%" in page
-    assert "Poster material in favor of yes camp" in page
+    assert "Kampagnenmaterial Ja" in page
 
     swissvotes_app.session().query(SwissVote).one()._legal_form = 3
     commit()
@@ -335,6 +335,7 @@ def test_view_vote(swissvotes_app):
 
 def test_view_deciding_question(swissvotes_app):
     data = test_vote_data
+    del data['posters_yes_imgs']
     data['_legal_form'] = 5
 
     swissvotes_app.session().add(

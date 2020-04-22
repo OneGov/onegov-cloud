@@ -17,7 +17,7 @@ def test_view_page(swissvotes_app):
     login.form['password'] = 'hunter2'
     login.form.submit()
 
-    client.get(f'/locale/en_US').follow()
+    client.get('/locale/en_US').follow()
     add = client.get('/').maybe_follow().click(href='add')
     add.form['title'] = "About"
     add.form['content'] = "About the project"
@@ -44,7 +44,7 @@ def test_view_page(swissvotes_app):
         assert title in page
         assert content in page
 
-    client.get(f'/locale/de_CH').follow()
+    client.get('/locale/de_CH').follow()
     client.get('/page/about').click("Seite löschen").form.submit()
     client.get('/page/about', status=404)
 
@@ -62,7 +62,7 @@ def test_view_page_attachments(swissvotes_app, temporary_path, pdf_1, pdf_2):
     login.form['password'] = 'hunter2'
     login.form.submit()
 
-    client.get(f'/locale/en_US').follow()
+    client.get('/locale/en_US').follow()
     add = client.get('/').maybe_follow().click(href='add')
     add.form['title'] = "About"
     add.form['content'] = "About the project"
@@ -80,7 +80,7 @@ def test_view_page_attachments(swissvotes_app, temporary_path, pdf_1, pdf_2):
     assert "1.pdf" in manage
     assert manage.click('1.pdf').content_type == 'application/pdf'
 
-    client.get(f'/locale/de_CH').follow()
+    client.get('/locale/de_CH').follow()
     manage = client.get('/page/about').click("Anhänge verwalten")
 
     with open(pdf_2, 'rb') as file:
@@ -97,7 +97,7 @@ def test_view_page_attachments(swissvotes_app, temporary_path, pdf_1, pdf_2):
     assert "1.pdf" not in view
     assert "2.pdf" in view
 
-    client.get(f'/locale/en_US').follow()
+    client.get('/locale/en_US').follow()
     view = client.get('/page/about')
     assert "1.pdf" in view
     assert "2.pdf" not in view
@@ -106,7 +106,7 @@ def test_view_page_attachments(swissvotes_app, temporary_path, pdf_1, pdf_2):
     client.get('/page/about').click("Manage attachments")\
         .click("Delete").form.submit()
 
-    client.get(f'/locale/de_CH').follow()
+    client.get('/locale/de_CH').follow()
     client.get('/page/about').click("Anhänge verwalten")\
         .click("Löschen").form.submit()
 
