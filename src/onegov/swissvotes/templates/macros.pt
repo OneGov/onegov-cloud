@@ -186,7 +186,7 @@
     </metal:tablesaw_translations>
 
     <metal:image_gallery define-macro="image_gallery" i18n:domain="onegov.swissvotes">
-        <div class="image-gallery" tal:condition="items|nothing and id_suffix|nothong">
+        <div class="image-gallery" tal:condition="items|nothing and id_suffix|nothing">
             <div tal:repeat="url_pair items" class="image-container">
                 <tal:b tal:define="ix str(repeat.url_pair.index); img_url url_pair[1]; url url_pair[0]">
                     <img src="${img_url}" alt="" id="${'img-' + ix + id_suffix}">
