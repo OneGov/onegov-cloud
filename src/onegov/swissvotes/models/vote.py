@@ -827,13 +827,13 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
     def files_observer(self, files):
         self.vectorize_files()
 
-    def get_file(self, name):
+    def get_file(self, name, request):
         """ Returns the requested localized file, falls back to the default
         locale.
 
         """
         fallback = SwissVote.__dict__.get(name).__get_by_locale__(
-            self, self.session_manager.default_locale
+            self, request.app.default_locale
         )
         return getattr(self, name, None) or fallback
 
