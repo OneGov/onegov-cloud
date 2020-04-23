@@ -80,6 +80,6 @@ fi
 # shellcheck disable=SC2086
 run-as "$(id -u test)":test py.test \
     -o cache_dir=/tmp/pytest \
-    --test-group "$GROUP" \
-    --test-group-count "$GROUP_COUNT" $xdist \
+    --test-group $GROUP \
+    --test-group-count $GROUP_COUNT $xdist \
     tests
