@@ -9,7 +9,6 @@ from onegov.core.utils import normalize_for_url
 from onegov.directory import DirectoryEntry
 from onegov.directory.models.directory import DirectoryFile
 from onegov.file import File
-from onegov.file.utils import as_fileintent
 from onegov.form import FormDefinition
 from onegov.org.models import Organisation, Topic, News, ExtendedDirectory
 from onegov.org.utils import annotate_html
@@ -157,9 +156,10 @@ def add_rerender_organsiation_html(context):
         org.opening_hours = org.opening_hours
 
 
-@upgrade_task('Fix directory files polymorphic identity')
+@upgrade_task("Migrate FormFile's attached to DirectoryEntry to DirectoryFile")
 def fix_directory_file_identity(context):
-    statements = []
+    # Not sure of this doubles the files, but actually the file
+    # reference remains, so it shouldn't
     for entry in context.session.query(DirectoryEntry).all():
         for field in entry.directory.file_fields:
             field_data = entry.content['values'][field.id]
@@ -168,27 +168,12 @@ def fix_directory_file_identity(context):
                 file = context.session.query(File).filter_by(
                     id=file_id).first()
                 if file and not file.type == 'directory':
-                    pass
-                    # setting file.type will not work since the mapper is not
-                    # updated
-                    # the SQL statement below will cause errors loading images
-                    # since the depot storage can't find the file
-                    # f"""
-                    #     UPDATE files
-                    #     SET type = 'directory'
-                    #     WHERE id = '{file_id}';
-                    # """
-
-
-                    # new = DirectoryFile(
-                    #     id=random_token(),
-                    #     name=file.name,
-                    #     note=field.id,
-                    #     reference=as_fileintent(
-                    #         content=file.reference.content,
-                    #         filename=file.reference.filename))
-                    # context.session.delete(file)
-                    # entry.content['values'][field.id]['data'] = f'@{new.id}'
-                    # entry.files.append(file)
-
-    assert False
+                    new = DirectoryFile(
+                        id=random_token(),
+                        name=file.name,
+                        note=file.note,
+                        reference=file.reference
+                    )
+                    entry.files.append(new)
+                    entry.content['values'][field.id]['data'] = f'@{new.id}'
+                    entry.content.changed()
