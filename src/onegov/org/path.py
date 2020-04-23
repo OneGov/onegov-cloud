@@ -523,7 +523,7 @@ def get_directories(app):
     model=Directory,
     path='/directory/{name}')
 def get_directory(app, name):
-    return DirectoryCollection(app.session()).by_name(name)
+    return DirectoryCollection(app.session(), type='extended').by_name(name)
 
 
 @OrgApp.path(
