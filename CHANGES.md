@@ -1,8 +1,22 @@
 # Changes
 
+## Release `2020.49`
+
+> commits: **4 / [f0b15642c0...6c446639c3](https://github.com/OneGov/onegov-cloud/compare/f0b15642c0^...6c446639c3)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.49)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🐞 **Adds migration FormFiles to DirectoryFiles**
+
+Files uploaded with a UploadField defined in a directory are added as DiretoryFile. Migrates FormFiles attached to DirectoryEntries in order to be accessed as anon user in a public DirectoryEntry.
+
+**`Bugfix`** | **[ONEGOV-10](#ONEGOV-10)** | **[6c446639c3](https://github.com/onegov/onegov-cloud/commit/6c446639c3fa7bcb51f296d01200a81e83cd6724)**
+
 ## Release `2020.48`
 
-> commits: **2 / [30952ea2bd...1796883d6b](https://github.com/OneGov/onegov-cloud/compare/30952ea2bd^...1796883d6b)**<br>
+> released: **2020-04-22 23:06**<br>
+> commits: **3 / [30952ea2bd...1a9e507db6](https://github.com/OneGov/onegov-cloud/compare/30952ea2bd^...1a9e507db6)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.48)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Swissvotes
