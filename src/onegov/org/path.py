@@ -180,7 +180,10 @@ def get_file_for_org(request, app, id):
 
     obj = get_file(app, id)
 
-    if obj and obj.type in protected_filetypes:
+    if not obj:
+        return
+
+    if obj.type in protected_filetypes:
         if not request.has_role('editor', 'admin'):
             obj = None
         else:
@@ -520,7 +523,7 @@ def get_directories(app):
     model=Directory,
     path='/directory/{name}')
 def get_directory(app, name):
-    return DirectoryCollection(app.session()).by_name(name)
+    return DirectoryCollection(app.session(), type='extended').by_name(name)
 
 
 @OrgApp.path(

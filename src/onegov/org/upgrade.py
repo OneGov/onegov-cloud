@@ -6,11 +6,15 @@ from onegov.core.orm import Base, find_models
 from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
 from onegov.core.utils import normalize_for_url
+from onegov.directory import DirectoryEntry
+from onegov.directory.models.directory import DirectoryFile
+from onegov.file import File
 from onegov.form import FormDefinition
 from onegov.org.models import Organisation, Topic, News, ExtendedDirectory
 from onegov.org.utils import annotate_html
 from onegov.reservation import Resource
 from sqlalchemy.orm import undefer
+from onegov.core.crypto import random_token
 
 
 @upgrade_task('Move from town to organisation', always_run=True)
@@ -150,3 +154,26 @@ def add_rerender_organsiation_html(context):
 
     if org.opening_hours is not None:
         org.opening_hours = org.opening_hours
+
+
+@upgrade_task("Migrate FormFile's attached to DirectoryEntry to DirectoryFile")
+def fix_directory_file_identity(context):
+    # Not sure of this doubles the files, but actually the file
+    # reference remains, so it shouldn't
+    for entry in context.session.query(DirectoryEntry).all():
+        for field in entry.directory.file_fields:
+            field_data = entry.content['values'][field.id]
+            if field_data.get('data', '').startswith('@'):
+                file_id = field_data['data'].lstrip('@')
+                file = context.session.query(File).filter_by(
+                    id=file_id).first()
+                if file and not file.type == 'directory':
+                    new = DirectoryFile(
+                        id=random_token(),
+                        name=file.name,
+                        note=file.note,
+                        reference=file.reference
+                    )
+                    entry.files.append(new)
+                    entry.content['values'][field.id]['data'] = f'@{new.id}'
+                    entry.content.changed()

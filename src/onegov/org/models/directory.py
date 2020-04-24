@@ -226,6 +226,10 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable):
     marker_color = content_property()
 
     @property
+    def entry_cls_name(self):
+        return 'ExtendedDirectoryEntry'
+
+    @property
     def es_public(self):
         return self.access == 'public'
 
