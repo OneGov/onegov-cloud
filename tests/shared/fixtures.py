@@ -501,9 +501,13 @@ def glauth_binary():
         http = urllib3.PoolManager()
 
         with http.request('GET', url, preload_content=False) as r:
+            assert r.status == 200, "Can't get glauth binary"
             with open(path, 'wb') as f:
                 shutil.copyfileobj(r, f)
 
         os.chmod('/tmp/glauth', 0o755)
+
+    # short check if binary is downloaded correctly
+    assert os.path.getsize(path) > 6000000
 
     return path
