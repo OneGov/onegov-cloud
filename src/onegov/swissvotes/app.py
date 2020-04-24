@@ -100,7 +100,7 @@ def org_content_security_policy():
     policy.connect_src.add('https://sentry.io')
 
     policy.script_src.add('https://stats.seantis.ch')
-    policy.child_src.add('https://www.emuseum.ch')
+    policy.img_src.add('https://www.emuseum.ch')
 
     return policy
 

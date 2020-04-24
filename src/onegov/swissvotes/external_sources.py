@@ -47,6 +47,8 @@ def fetch_changed(poster_urls, image_urls, api_key,):
             continue
         try:
             img_url = parse_xml(resp)
+            # eMuseum should deliver urls as https when they redirect anyway
+            img_url = img_url.replace('http:', 'https:')
         except ElementTree.ParseError:
             failed += 1
             continue
@@ -60,6 +62,16 @@ def fetch_changed(poster_urls, image_urls, api_key,):
     if new_urls:
         assert any((added != 0, updated != 0))
     return new_urls, added, updated, failed
+
+
+def update_vote_dict(vote, attr, changed):
+    attr_data = getattr(vote, attr)
+    for k, v in changed.items():
+        if k not in attr_data:
+            attr_data[k] = v
+        elif attr_data[k] != v:
+            attr_data[k] = v
+    setattr(vote, attr, attr_data)
 
 
 def update_poster_urls(request):
@@ -76,7 +88,7 @@ def update_poster_urls(request):
         failed_total += failed
         if changed:
             if isinstance(vote.posters_yes_imgs, dict):
-                vote.posters_yes_imgs.update(changed)
+                update_vote_dict(vote, 'posters_yes_imgs', changed)
             else:
                 vote.posters_yes_imgs = changed
 
@@ -87,7 +99,7 @@ def update_poster_urls(request):
         failed_total += failed
         if changed:
             if isinstance(vote.posters_no_imgs, dict):
-                vote.posters_no_imgs.update(changed)
+                update_vote_dict(vote, 'posters_no_imgs', changed)
             else:
                 vote.posters_no_imgs = changed
 
