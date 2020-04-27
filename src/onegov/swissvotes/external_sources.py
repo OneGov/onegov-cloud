@@ -57,6 +57,8 @@ def fetch_changed(poster_urls, image_urls, api_key,):
             if not old_img_url:
                 added += 1
             else:
+                # it will always be updated, since the url is suffixed with
+                # ;jsessionid... that changes upon every api request
                 updated += 1
             new_urls[url] = img_url
     if new_urls:
