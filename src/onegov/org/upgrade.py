@@ -163,7 +163,7 @@ def fix_directory_file_identity(context):
     for entry in context.session.query(DirectoryEntry).all():
         for field in entry.directory.file_fields:
             field_data = entry.content['values'][field.id]
-            if field_data.get('data', '').startswith('@'):
+            if field_data and field_data.get('data', '').startswith('@'):
                 file_id = field_data['data'].lstrip('@')
                 file = context.session.query(File).filter_by(
                     id=file_id).first()
