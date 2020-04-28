@@ -199,6 +199,7 @@ def test_fetch(cfg_path, session_manager):
     assert get_session('bar').query(Event).count() == 7
     assert get_session('baz').query(Event).count() == 3
     assert get_session('qux').query(Event).count() == 0
+    assert get_session('bar').query(Event).first().state == 'initiated'
 
     # No sources provided
     result = runner.invoke(cli, [
@@ -218,6 +219,8 @@ def test_fetch(cfg_path, session_manager):
     ])
     assert result.exit_code == 0
     assert "5 added, 0 updated, 0 deleted" in result.output
+    assert get_session('qux').query(Event).first().state == 'published'
+
 
     # Bar[B, C] -> Qux
     result = runner.invoke(cli, [
