@@ -412,7 +412,11 @@ def view_billing_import(self, request, form):
 
         binary = BytesIO(b64decode(cache['data']))
         xml = GzipFile(filename='', mode='r', fileobj=binary).read()
-        xml = xml.decode('utf-8')
+        try:
+            xml = xml.decode('utf-8')
+        except UnicodeDecodeError:
+            request.error(_("The submitted xml data could not be decoded"))
+            return request.redirect(request.link(self))
 
         transactions = list(
             match_iso_20022_to_usernames(

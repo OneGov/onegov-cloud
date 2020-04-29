@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-04-29 14:54+0200\n"
+"POT-Creation-Date: 2020-04-29 15:14+0200\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2512,6 +2512,9 @@ msgstr "${count} paiements importés"
 
 msgid "No payments could be imported"
 msgstr "Aucun paiement n'a pu être importé"
+
+msgid "The submitted xml data could not be decoded"
+msgstr "Les données xml soumises n'ont pas pu être décodées"
 
 msgid "No transactions were found in the given file"
 msgstr "Aucune transaction n'a été trouvée dans le fichier donné"

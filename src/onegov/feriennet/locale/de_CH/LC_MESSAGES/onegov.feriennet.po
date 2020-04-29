@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-04-29 14:54+0200\n"
+"POT-Creation-Date: 2020-04-29 15:14+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2491,6 +2491,9 @@ msgstr "${count} Zahlungen wurden importiert"
 msgid "No payments could be imported"
 msgstr "Es konnten keine Zahlungen importiert werden"
 
+msgid "The submitted xml data could not be decoded"
+msgstr "Die abgeschickten Daten konnten nicht dekodiert werden"
+
 msgid "No transactions were found in the given file"
 msgstr "In der angegebenen Datei wurden keine Transaktionen gefunden"
 
@@ -2631,7 +2634,8 @@ msgid "Can not do matchings for an inactive period"
 msgstr "Zuteilungen können nur in einer aktiven Periode durchgeführt werden"
 
 msgid "Can not do matchings for an unconfirmed period"
-msgstr "Zuteilungen können nur in einer bestätigten Periode durchgeführt werden"
+msgstr ""
+"Zuteilungen können nur in einer bestätigten Periode durchgeführt werden"
 
 msgid "The matching was confirmed successfully"
 msgstr "Die Zuteilung wurde erfolgreich abgeschlossen"
@@ -2909,6 +2913,9 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
+
+#~ msgid "The submitted xml data could not be encoded"
+#~ msgstr "Die abgeschickten XML-Daten konnten nicht "
 
 #~ msgid "${count} Accepted Bookings per Attendee"
 #~ msgstr "${count} Angenommene Buchungen pro Teilnehmer"
