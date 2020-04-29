@@ -11,7 +11,7 @@
     <p tal:condition="attendee|nothing" i18n:translate>Dear <span tal:replace="attendee.first_name" i18n:name="first_name" /> <span tal:replace="attendee.last_name" i18n:name="last_name" />, </p>
     <p tal:condition="not: attendee|False" i18n:translate="">Dear [first_name] [last_name], </p>
     <br>
-    <tal:b tal:switch="layout.notification_type">
+    <tal:b tal:switch="layout.notification_type|nothing">
         <tal:b tal:case="'info'">
             <p i18n:translate="">Please take notice about the information below.</p>
         </tal:b>
@@ -59,7 +59,7 @@
 </metal:email_header>
 
 <metal:email_footer define-macro="email_footer">
-    <tal:b tal:switch="layout.notification_type">
+    <tal:b tal:switch="layout.notification_type|nothing">
         <tal:b tal:case="'info'">
             <h3 i18n:translate="">Event Details</h3>
             <tal:b metal:use-macro="layout.default_macros['course_event_details']" tal:define="model layout.model.course_event; for_email True"/>
