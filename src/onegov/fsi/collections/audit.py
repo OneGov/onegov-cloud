@@ -92,4 +92,4 @@ class AuditCollection(GenericCollection):
 
     @cached_property
     def course(self):
-        return self.session.query(Course).filter_by(id=self.course_id).one()
+        return self.session.query(Course).filter_by(id=self.course_id).first()
