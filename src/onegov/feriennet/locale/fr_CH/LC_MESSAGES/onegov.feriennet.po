@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-04-29 15:14+0200\n"
+"POT-Creation-Date: 2020-04-29 15:30+0200\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -2505,6 +2505,9 @@ msgstr "Voulez-vous vraiment rembourser ${montant} ?"
 #, python-format
 msgid "Refund ${amount}"
 msgstr "Rembourser ${montant}"
+
+msgid "Could not import payments. Check your import data."
+msgstr "Aucun paiement n'a pu être importé. Vérifiez vos données importées."
 
 #, python-format
 msgid "Imported ${count} payments"
