@@ -51,7 +51,7 @@
                 data-tablesaw-minimap="">
                 <thead>
                     <tr>
-                        <th data-tablesaw-priority="persist" i18n:translate="" class="left-aligned">${layout.principal.label('district')}</th>
+                        <th data-tablesaw-priority="persist" i18n:translate="" class="left-aligned">${layout.principal.label('district', layout.model.date.year)}</th>
                         <th data-tablesaw-priority="1" i18n:translate="" class="left-aligned">Result</th>
                         <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Yeas</th>
                         <th data-tablesaw-priority="5" i18n:translate="" class="right-aligned">Nays</th>
