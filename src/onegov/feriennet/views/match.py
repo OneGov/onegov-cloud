@@ -29,10 +29,10 @@ def handle_matches(self, request, form):
 
     if form.submitted(request):
         if not self.period.active:
-            request.warn(_("Can not do matchings for an inactive period"))
+            request.warning(_("Can not do matchings for an inactive period"))
             return request.redirect(request.link(self))
         elif not self.period.confirmed:
-            request.warn(_("Can not do matchings for an unconfirmed period"))
+            request.warning(_("Can not do matchings for an unconfirmed period"))
             return request.redirect(request.link(self))
 
         reset_matching(self, request)
