@@ -82,7 +82,14 @@ def view_directory_redirect(self, request):
              permission=Secret, form=get_directory_form_class)
 def handle_new_directory(self, request, form):
     if form.submitted(request):
-        directory = self.add_by_form(form, properties=('configuration', ))
+        try:
+            directory = self.add_by_form(form, properties=('configuration', ))
+        except DuplicateEntryError as e:
+            request.alert(_("The entry ${name} exists twice", mapping={
+                'name': e.name
+            }))
+            transaction.abort()
+            return request.redirect(request.link(self))
 
         request.success(_("Added a new directory"))
         return request.redirect(
