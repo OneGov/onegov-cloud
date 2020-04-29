@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-01-23 10:47+0100\n"
+"POT-Creation-Date: 2020-04-29 14:54+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -577,8 +577,8 @@ msgstr "Altersbeschränkung ignorieren"
 msgid "Accept TOS"
 msgstr "AGB akzeptieren"
 
-#.
 #. Used in sentence: "I have read the ${tos} and accept them."
+#.
 msgid "TOS"
 msgstr "AGB"
 
@@ -2115,7 +2115,9 @@ msgid "There are no available recipients for your user account."
 msgstr "Es bestehen keine verfügbaren Empfänger für Ihren Benutzer"
 
 msgid "Notification templates can only be used with an active period."
-msgstr "Mitteilungs-Vorlagen können nur während eines aktiven Zeitraums verwendet werden."
+msgstr ""
+"Mitteilungs-Vorlagen können nur während eines aktiven Zeitraums verwendet "
+"werden."
 
 msgid "No notification templates yet."
 msgstr "Es wurden noch keine Mitteilungs-Vorlagen erfasst."
@@ -2625,6 +2627,12 @@ msgstr "Ihre Spende wurde entfernt"
 msgid "This donation has already been paid"
 msgstr "Die Spende wurde bereits bezahlt"
 
+msgid "Can not do matchings for an inactive period"
+msgstr "Zuteilungen können nur in einer aktiven Periode durchgeführt werden"
+
+msgid "Can not do matchings for an unconfirmed period"
+msgstr "Zuteilungen können nur in einer bestätigten Periode durchgeführt werden"
+
 msgid "The matching was confirmed successfully"
 msgstr "Die Zuteilung wurde erfolgreich abgeschlossen"
 
@@ -2902,7 +2910,6 @@ msgstr "Buchungen ${period}"
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
 
-#, python-format
 #~ msgid "${count} Accepted Bookings per Attendee"
 #~ msgstr "${count} Angenommene Buchungen pro Teilnehmer"
 
