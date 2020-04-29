@@ -10,7 +10,6 @@ from onegov.fsi.models.course import Course
 from onegov.fsi.models.course_event import CourseEvent
 
 
-
 class CourseEventCollection(GenericCollection, Pagination):
 
     batch_size = 10

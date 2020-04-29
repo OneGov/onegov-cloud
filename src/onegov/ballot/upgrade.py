@@ -405,12 +405,12 @@ def add_update_contraints(context):
 
     # there was a typo
     context.operations.execute(
-        f'ALTER TABLE candidates '
-        f'DROP CONSTRAINT IF EXISTS candiates_election_id_fkey, '
-        f'DROP CONSTRAINT IF EXISTS candidates_election_id_fkey, '
-        f'ADD CONSTRAINT candidates_election_id_fkey'
-        f' FOREIGN KEY (election_id) REFERENCES elections (id)'
-        f' ON UPDATE CASCADE'
+        'ALTER TABLE candidates '
+        'DROP CONSTRAINT IF EXISTS candiates_election_id_fkey, '
+        'DROP CONSTRAINT IF EXISTS candidates_election_id_fkey, '
+        'ADD CONSTRAINT candidates_election_id_fkey'
+        ' FOREIGN KEY (election_id) REFERENCES elections (id)'
+        ' ON UPDATE CASCADE'
     )
 
 
@@ -475,39 +475,39 @@ def add_delete_contraints(context):
 
     # there was a typo
     context.operations.execute(
-        f'ALTER TABLE candidate_results '
-        f'DROP CONSTRAINT IF EXISTS candiate_results_candiate_id_fkey, '
-        f'DROP CONSTRAINT IF EXISTS candiate_results_candidate_id_fkey, '
-        f'DROP CONSTRAINT IF EXISTS candidate_results_candiate_id_fkey, '
-        f'DROP CONSTRAINT IF EXISTS candidate_results_candidate_id_fkey, '
-        f'ADD CONSTRAINT candidate_results_candidate_id_fkey'
-        f' FOREIGN KEY (candidate_id) REFERENCES candidates (id)'
-        f' ON DELETE CASCADE'
+        'ALTER TABLE candidate_results '
+        'DROP CONSTRAINT IF EXISTS candiate_results_candiate_id_fkey, '
+        'DROP CONSTRAINT IF EXISTS candiate_results_candidate_id_fkey, '
+        'DROP CONSTRAINT IF EXISTS candidate_results_candiate_id_fkey, '
+        'DROP CONSTRAINT IF EXISTS candidate_results_candidate_id_fkey, '
+        'ADD CONSTRAINT candidate_results_candidate_id_fkey'
+        ' FOREIGN KEY (candidate_id) REFERENCES candidates (id)'
+        ' ON DELETE CASCADE'
     )
     context.operations.execute(
-        f'ALTER TABLE candidate_results '
-        f'DROP CONSTRAINT IF EXISTS candiate_results_election_result_id_fkey, '
-        f'DROP CONSTRAINT IF EXISTS candidate_results_election_result_id_fkey,'
-        f' ADD CONSTRAINT candidate_results_election_result_id_fkey'
-        f' FOREIGN KEY (election_result_id) REFERENCES election_results (id)'
-        f' ON DELETE CASCADE'
+        'ALTER TABLE candidate_results '
+        'DROP CONSTRAINT IF EXISTS candiate_results_election_result_id_fkey, '
+        'DROP CONSTRAINT IF EXISTS candidate_results_election_result_id_fkey,'
+        ' ADD CONSTRAINT candidate_results_election_result_id_fkey'
+        ' FOREIGN KEY (election_result_id) REFERENCES election_results (id)'
+        ' ON DELETE CASCADE'
     )
     context.operations.execute(
-        f'ALTER TABLE candidates '
-        f'DROP CONSTRAINT IF EXISTS candiates_list_id_fkey, '
-        f'DROP CONSTRAINT IF EXISTS candidates_list_id_fkey,'
-        f' ADD CONSTRAINT candidates_list_id_fkey'
-        f' FOREIGN KEY (list_id) REFERENCES lists (id)'
-        f' ON DELETE CASCADE'
+        'ALTER TABLE candidates '
+        'DROP CONSTRAINT IF EXISTS candiates_list_id_fkey, '
+        'DROP CONSTRAINT IF EXISTS candidates_list_id_fkey,'
+        ' ADD CONSTRAINT candidates_list_id_fkey'
+        ' FOREIGN KEY (list_id) REFERENCES lists (id)'
+        ' ON DELETE CASCADE'
     )
 
     # this one does not fit the schema
     context.operations.execute(
-        f'ALTER TABLE lists '
-        f'DROP CONSTRAINT IF EXISTS lists_connection_id_fkey,'
-        f' ADD CONSTRAINT lists_connection_id_fkey'
-        f' FOREIGN KEY (connection_id) REFERENCES list_connections (id)'
-        f' ON DELETE CASCADE'
+        'ALTER TABLE lists '
+        'DROP CONSTRAINT IF EXISTS lists_connection_id_fkey,'
+        ' ADD CONSTRAINT lists_connection_id_fkey'
+        ' FOREIGN KEY (connection_id) REFERENCES list_connections (id)'
+        ' ON DELETE CASCADE'
     )
 
 

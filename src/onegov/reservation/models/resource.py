@@ -222,7 +222,7 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
             raise RuntimeError(f"The given date has no timezone: {date}")
 
         if not self.timezone:
-            raise RuntimeError(f"No timezone set on the resource")
+            raise RuntimeError("No timezone set on the resource")
 
         n, unit = self.deadline
 

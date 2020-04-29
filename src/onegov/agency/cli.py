@@ -309,7 +309,7 @@ def export_xlsx(group_context, people):
         if people:
             xlsx = export_person_xlsx(session)
             app.people_xlsx = xlsx
-            click.secho(f"Created XLSX for people'", fg='green')
+            click.secho("Created XLSX for people'", fg='green')
     return _export_xlsx
 
 

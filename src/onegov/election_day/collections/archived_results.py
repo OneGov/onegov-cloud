@@ -489,4 +489,3 @@ class SearchableArchivedResultCollection(
             return None
         kwargs['item_type'] = item_type
         return cls(session, **kwargs)
-

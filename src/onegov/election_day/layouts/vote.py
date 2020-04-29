@@ -74,18 +74,17 @@ class VoteLayout(DetailLayout):
         if tab == 'tie-breaker-entities':
             return self.type == 'complex'
 
+        if 'districts' in tab and self.districts_are_entities:
+            return False
+
         if tab == 'districts':
-            return self.has_districts and self.type == 'simple' \
-                   and not self.districts_are_entities
+            return self.has_districts and self.type == 'simple'
         if tab == 'proposal-districts':
-            return self.has_districts and self.type == 'complex' \
-                   and not self.districts_are_entities
+            return self.has_districts and self.type == 'complex'
         if tab == 'counter-proposal-districts':
-            return self.has_districts and self.type == 'complex' \
-                   and not self.districts_are_entities
+            return self.has_districts and self.type == 'complex'
         if tab == 'tie-breaker-districts':
-            return self.has_districts and self.type == 'complex' \
-                   and not self.districts_are_entities
+            return self.has_districts and self.type == 'complex'
 
         return True
 

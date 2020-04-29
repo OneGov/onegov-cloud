@@ -28,9 +28,12 @@ def get_global_tools(request):
     if request.app.show_volunteers(request):
         yield Link(
             text=_("Help us"),
-            url=request.class_link(VacationActivityCollection, name='volunteer'),
+            url=request.class_link(
+                VacationActivityCollection, name='volunteer'
+            ),
             attrs={'class': ('volunteer', 'highlighted')}
         )
+
 
 def get_admin_tools(request):
     if request.is_organiser:
