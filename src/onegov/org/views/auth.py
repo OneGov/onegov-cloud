@@ -194,6 +194,9 @@ def view_logout(self, request):
 def handle_password_reset_request(self, request, form):
     """ Handles the GET and POST password reset requests. """
 
+    if request.app.disable_password_reset:
+        raise exc.HTTPNotFound()
+
     layout = DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
@@ -241,6 +244,10 @@ def handle_password_reset_request(self, request, form):
 @OrgApp.form(model=Auth, name='reset-password', template='form.pt',
              permission=Public, form=PasswordResetForm)
 def handle_password_reset(self, request, form):
+
+    if request.app.disable_password_reset:
+        raise exc.HTTPNotFound()
+
     if form.submitted(request):
         # do NOT log the user in at this point - only onegov.user.auth does
         # logins - we only ever want one path to be able to login, which makes
