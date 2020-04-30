@@ -389,10 +389,11 @@ def test_event_form_create_rrule():
     assert occurrences(form) == [date(2015, 6, day) for day in (3, 5, 8, 10)]
 
 
-def test_form_registration_window_form():
+@pytest.mark.parametrize('end', ['2015-06-23', '2015-08-23'])
+def test_form_registration_window_form(end):
     form = FormRegistrationWindowForm(MultiDict([
         ('start', '2015-08-23'),
-        ('end', '2015-06-23'),
+        ('end', end),
         ('limit_attendees', 'no'),
         ('waitinglist', 'no'),
     ]))
