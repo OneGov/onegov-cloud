@@ -1,8 +1,35 @@
 # Changes
 
+## Release `2020.51`
+
+> commits: **4 / [d22727d4ae...35094d589a](https://github.com/OneGov/onegov-cloud/compare/d22727d4ae^...35094d589a)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.51)](https://buildkite.com/seantis/onegov-cloud)
+
+### Electionday
+
+🐞 **Hides /districts tab for sz for 2020 ongoing**
+
+The districts tab should be hidden for votes if all entities are districts.
+Solves Problem of wrong label "Districts" in a vote with date 2020,
+but results using the entities from 2016.
+
+**`Bugfix`** | **[7de0e43cec](https://github.com/onegov/onegov-cloud/commit/7de0e43cec122dcda5f7615dfafcc37f7dab46d2)**
+
+### Onegov
+
+🐞 **Minor bugfixes and improved form validation**
+
+- changes the lint step to be more rigorous
+- Added additional form validations
+- deactives password reset for fsi application as default
+- adds app.disable_password_reset for org applications
+
+**`Bugfix`** | **[35094d589a](https://github.com/onegov/onegov-cloud/commit/35094d589a225399ddf4bd02a8cda60725f615f5)**
+
 ## Release `2020.50`
 
-> commits: **6 / [41923b358d...aa54ea3d10](https://github.com/OneGov/onegov-cloud/compare/41923b358d^...aa54ea3d10)**<br>
+> released: **2020-04-27 11:01**<br>
+> commits: **7 / [41923b358d...4ff04c134a](https://github.com/OneGov/onegov-cloud/compare/41923b358d^...4ff04c134a)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.50)](https://buildkite.com/seantis/onegov-cloud)
 
 ## Release `2020.49`
