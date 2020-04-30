@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-04-29 15:30+0200\n"
+"POT-Creation-Date: 2020-04-30 09:49+0200\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -861,6 +861,9 @@ msgstr "Coût administratif"
 
 msgid "Must specify at least one date"
 msgstr "Vous devez saisir au moins une date"
+
+msgid "Minimum Age must be lower than maximum age"
+msgstr "L'age minimum doit ètre inférieur à l'âge maximum"
 
 msgid "Cannot adjust period, there are bookings linked to this occassion"
 msgstr ""
@@ -2659,8 +2662,8 @@ msgstr "Ce don a déjà été payé"
 msgid "Can not do matchings for an inactive period"
 msgstr "L'attribution n'est pass possible en cas d'une période inactive"
 
-msgid "Can not do matchings for an unconfirmed period"
-msgstr "L'attribution n'est pass possible en cas d'une période non-confirmée"
+msgid "Can not do matchings for an confirmed period"
+msgstr "L'attribution n'est pass possible en cas d'une période confirmée"
 
 msgid "The matching was confirmed successfully"
 msgstr "L'attribution a été confirmé avec succès"
@@ -2939,6 +2942,10 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
+
+#~ msgid "Can not do matchings for an unconfirmed period"
+#~ msgstr ""
+#~ "L'attribution n'est pass possible en cas d'une période non-confirmée"
 
 #~ msgid "I know that after confirmation, bills can only be adjusted manually."
 #~ msgstr ""

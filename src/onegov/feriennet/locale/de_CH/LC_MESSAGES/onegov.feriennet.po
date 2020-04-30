@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-04-29 15:30+0200\n"
+"POT-Creation-Date: 2020-04-30 09:49+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -850,6 +850,9 @@ msgstr "Administrative Kosten"
 
 msgid "Must specify at least one date"
 msgstr "Bitte spezifizieren Sie mindestens ein Datum"
+
+msgid "Minimum Age must be lower than maximum age"
+msgstr "Das Minimum-Alter muss höher sein als das Maximum-Alter"
 
 msgid "Cannot adjust period, there are bookings linked to this occassion"
 msgstr ""
@@ -2636,9 +2639,8 @@ msgstr "Die Spende wurde bereits bezahlt"
 msgid "Can not do matchings for an inactive period"
 msgstr "Zuteilungen können nur in einer aktiven Periode durchgeführt werden"
 
-msgid "Can not do matchings for an unconfirmed period"
-msgstr ""
-"Zuteilungen können nur in einer bestätigten Periode durchgeführt werden"
+msgid "Can not do matchings for an confirmed period"
+msgstr "Zuteilungen können nur in einer nicht bestätigten Periode durchgeführt werden"
 
 msgid "The matching was confirmed successfully"
 msgstr "Die Zuteilung wurde erfolgreich abgeschlossen"
@@ -2916,6 +2918,10 @@ msgstr "Buchungen ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Fakturierung ${period}"
+
+#~ msgid "Can not do matchings for an unconfirmed period"
+#~ msgstr ""
+#~ "Zuteilungen können nur in einer bestätigten Periode durchgeführt werden"
 
 #~ msgid "The submitted xml data could not be encoded"
 #~ msgstr "Die abgeschickten XML-Daten konnten nicht "
