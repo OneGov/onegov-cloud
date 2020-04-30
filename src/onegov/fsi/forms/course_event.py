@@ -93,6 +93,11 @@ class CourseEventForm(Form):
         choices=[],
     )
 
+    def ensure_start_before_end(self):
+        if self.start.data >= self.end.data:
+            self.start.errors = [_("Please use a start prior to the end")]
+            return False
+
     def on_request(self):
         collection = CourseCollection(self.request.session)
         if self.model.course_id:
