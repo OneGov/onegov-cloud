@@ -346,7 +346,10 @@ def execute_invoice_action(self, request):
     permission=Secret)
 def view_execute_import(self, request):
     request.assert_valid_csrf_token()
-    cache = request.browser_session['account-statement']
+    cache = request.browser_session.get('account-statement')
+    if not cache:
+        request.alert(_("Could not import payments. Check your import data."))
+        return
 
     binary = BytesIO(b64decode(cache['data']))
     xml = GzipFile(filename='', mode='r', fileobj=binary).read()
@@ -412,7 +415,11 @@ def view_billing_import(self, request, form):
 
         binary = BytesIO(b64decode(cache['data']))
         xml = GzipFile(filename='', mode='r', fileobj=binary).read()
-        xml = xml.decode('utf-8')
+        try:
+            xml = xml.decode('utf-8')
+        except UnicodeDecodeError:
+            request.alert(_("The submitted xml data could not be decoded"))
+            return request.redirect(request.link(self))
 
         transactions = list(
             match_iso_20022_to_usernames(

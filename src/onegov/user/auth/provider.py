@@ -430,7 +430,7 @@ class LDAPProvider(
 
         if len(entries) > 1:
             log.warning(f"Found more than one user for e-mail {username}")
-            log.warning(f"All but the first user will be ignored")
+            log.warning("All but the first user will be ignored")
 
         for name, attrs in entries.items():
             groups = attrs[self.attributes.groups]

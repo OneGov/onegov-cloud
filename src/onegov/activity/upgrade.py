@@ -767,7 +767,7 @@ def improve_period_dates_constraint(context):
 
 @upgrade_task('Drop deadline_date')
 def drop_deadline_date(context):
-    context.session.execute(f"""
+    context.session.execute("""
             UPDATE periods SET booking_end = deadline_date
             WHERE deadline_date IS NOT NULL
               AND execution_start <= deadline_date

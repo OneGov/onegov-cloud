@@ -253,10 +253,17 @@ class OccurrenceCollection(Pagination):
             query = query.filter(Occurrence._tags.has_any(array(self.tags)))
 
         if self.locations:
+
+            def escape(qstring):
+                purge = "\\(),\"\'."
+                for s in purge:
+                    qstring = qstring.replace(s, '')
+                return qstring
+
             query = query.filter(
                 or_(*[
-                    Occurrence.location.op('~')(f'\\y{location}\\y')
-                    for location in self.locations
+                    Occurrence.location.op('~')(f'\\y{escape(loc)}\\y')
+                    for loc in self.locations
                 ])
             )
 

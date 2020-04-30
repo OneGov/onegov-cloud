@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-04-09 05:53+0200\n"
+"POT-Creation-Date: 2020-04-29 14:29+0200\n"
 "PO-Revision-Date: 2020-03-17 11:04+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -595,6 +595,9 @@ msgstr "N'accepter aucunes soumissions"
 
 msgid "Advanced"
 msgstr "Avancé"
+
+msgid "Please use a stop date after the start"
+msgstr "Veuillez utiliser une date d'arrêt après le début"
 
 #, python-format
 msgid ""

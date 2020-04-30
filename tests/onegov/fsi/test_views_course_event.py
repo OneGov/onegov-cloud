@@ -39,7 +39,7 @@ def test_edit_course_event(client_with_db):
     new = client.get(view)
     new.form['location'] = 'New Loc'
     new.form['start'] = datetime(2015, 5, 5)
-    new.form['end'] = datetime(2015, 5, 5)
+    new.form['end'] = datetime(2015, 5, 6)
     new.form['presenter_name'] = 'Pres'
     new.form['min_attendees'] = 2
     new.form['max_attendees'] = 3

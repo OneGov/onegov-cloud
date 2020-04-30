@@ -74,6 +74,15 @@ class FormRegistrationWindowForm(Form):
     def requested_spots(self):
         return self.model.requested_spots
 
+    def ensure_start_before_end(self):
+        """ Validate start and end for proper error message.
+        def ensure_start_end(self) would also be run in side the validate
+        function, but the error is not clear. """
+
+        if self.start.data >= self.end.data:
+            self.end.errors = [_("Please use a stop date after the start")]
+            return False
+
     def validate_limit(self, field):
 
         # new registration windows do not need to enforce limits

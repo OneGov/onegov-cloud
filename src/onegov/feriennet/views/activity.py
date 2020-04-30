@@ -499,7 +499,8 @@ def view_activity(self, request):
             o.dates[0].localized_end
         )
         can_cancel = not o.cancelled and (
-                request.is_admin or not o.period.finalized)
+            request.is_admin or not o.period.finalized
+        )
 
         if o.cancelled and not o.period.finalized:
             yield Link(

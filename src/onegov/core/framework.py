@@ -22,7 +22,6 @@ import inspect
 import morepath
 import traceback
 import random
-import sentry_sdk
 import sys
 
 from base64 import b64encode

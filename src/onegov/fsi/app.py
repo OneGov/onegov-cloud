@@ -22,6 +22,7 @@ class FsiApp(OrgApp):
     def configure_organisation(self, **cfg):
         cfg.setdefault('enable_user_registration', False)
         cfg.setdefault('enable_yubikey', False)
+        cfg.setdefault('disable_password_reset', True)
         super().configure_organisation(**cfg)
 
     def on_login(self, request, user):

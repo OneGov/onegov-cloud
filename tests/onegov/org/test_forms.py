@@ -387,3 +387,17 @@ def test_event_form_create_rrule():
     form.end_date.data = date(2015, 6, 10)
     form.weekly.data = ['MO', 'WE', 'FR']
     assert occurrences(form) == [date(2015, 6, day) for day in (3, 5, 8, 10)]
+
+
+@pytest.mark.parametrize('end', ['2015-06-23', '2015-08-23'])
+def test_form_registration_window_form(end):
+    form = FormRegistrationWindowForm(MultiDict([
+        ('start', '2015-08-23'),
+        ('end', end),
+        ('limit_attendees', 'no'),
+        ('waitinglist', 'no'),
+    ]))
+    form.request = Bunch(translate=lambda txt: txt, include=lambda src: None)
+
+    assert not form.validate()
+    assert form.errors == {'end': ['Please use a stop date after the start']}

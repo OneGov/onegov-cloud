@@ -259,7 +259,7 @@ def transfer(group_context,
             local_storage = os.path.join('.', local_fs['root_path'])
 
             transfer_storage(
-                remote_storage, local_storage, glob=f'global-*')
+                remote_storage, local_storage, glob='global-*')
 
             transfer_storage(
                 remote_storage, local_storage, glob=f'{local_cfg.namespace}*')

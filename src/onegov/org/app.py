@@ -90,11 +90,8 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
             'enable_user_registration',
             False
         )
-
-        self.enable_yubikey = cfg.get(
-            'enable_yubikey',
-            False
-        )
+        self.enable_yubikey = cfg.get('enable_yubikey', False)
+        self.disable_password_reset = cfg.get('disable_password_reset', False)
 
     @orm_cached(policy='on-table-change:organisations')
     def org(self):

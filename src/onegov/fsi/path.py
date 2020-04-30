@@ -33,7 +33,7 @@ def get_course_event_details(request, id):
     path='/fsi/past-events',
     converters=dict(course_id=UUID, show_hidden=bool, sort_desc=bool)
 )
-def get_events_view(
+def get_past_events_view(
         request,
         page=0,
         show_hidden=True,
@@ -48,6 +48,7 @@ def get_events_view(
         show_hidden=show_hidden,
         course_id=course_id,
     )
+
 
 @FsiApp.path(
     model=CourseEventCollection,

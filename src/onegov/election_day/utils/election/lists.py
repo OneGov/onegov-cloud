@@ -82,7 +82,7 @@ def get_aggregated_list_results(election, session, use_checks=False):
 
     if summary['election_list_votes'] < summary['election_candidate_votes']:
         validations['errors'].append(
-            f"The election has less list votes than candidate votes"
+            "The election has less list votes than candidate votes"
         )
 
     return {
@@ -131,7 +131,9 @@ def get_lists_data(election, request, mandates_only=False):
                     'value': list_.number_of_mandates,
                     'value2': None,
                     'class': 'active' if completed else 'inactive'
-                } for list_ in election.lists_data(order_by='number_of_mandates')]
+                } for list_ in election.lists_data(
+                    order_by='number_of_mandates')
+                ]
             }
 
     if election.type == 'majorz':

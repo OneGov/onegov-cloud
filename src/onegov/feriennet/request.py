@@ -1,6 +1,5 @@
 from cached_property import cached_property
 from onegov.org.request import OrgRequest
-from onegov.user import User
 
 
 class FeriennetRequest(OrgRequest):
