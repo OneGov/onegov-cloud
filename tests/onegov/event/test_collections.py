@@ -225,6 +225,9 @@ def test_occurrence_collection_query(session):
     assert query(outdated=True, locations=['Squirrel']).count() == 5
     assert query(outdated=True, locations=['Squirrel Park']).count() == 5
     assert query(outdated=True, locations=['Squirrel', 'Park']).count() == 5
+    # test random user input
+    assert query(
+        outdated=True, locations=['Squirrel Park\'\',,"").")']).count() == 5
     assert query(outdated=True, locations=['Center']).count() == 1
     assert query(outdated=True, locations=['squirrel', 'park']).count() == 0
     assert query(outdated=True, locations=[]).count() == 5
