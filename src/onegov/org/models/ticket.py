@@ -520,6 +520,8 @@ class EventSubmissionHandler(Handler):
 
     @cached_property
     def email(self):
+        if self.event.source:
+            return self.event.organizer_email
         return self.event.meta.get('submitter_email')
 
     @property
@@ -599,6 +601,26 @@ class EventSubmissionHandler(Handler):
                         )
                     )
                 )
+            ) if self.event.source else (
+                Link(
+                    text=_("Reject imported event"),
+                    url=layout.csrf_protected_url(request.link(
+                        self.event, name='withdraw')),
+                    attrs={'class': ('delete-link')},
+                    traits=(
+                        Confirm(
+                            _("Do you really want to withdraw this event?"),
+                            _("Withdrawing this event can't be undone."),
+                            _("Withdraw event"),
+                            _("Cancel")
+                        ),
+                        Intercooler(
+                            request_method='POST',
+                            redirect_after=request.link(self.ticket)
+                        )
+                    )
+                ),
+
             ), right_side=False))
 
         return links
