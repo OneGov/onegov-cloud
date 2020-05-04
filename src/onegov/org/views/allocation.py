@@ -286,7 +286,8 @@ def handle_edit_allocation(self, request, form):
                 new_start=new_start,
                 new_end=new_end,
                 new_quota=form.quota,
-                quota_limit=form.quota_limit
+                quota_limit=form.quota_limit,
+                whole_day=form.whole_day
             )
         except LibresError as e:
             utils.show_libres_error(e, request)

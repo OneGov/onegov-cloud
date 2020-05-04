@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-04-29 14:29+0200\n"
+"POT-Creation-Date: 2020-05-04 14:10+0200\n"
 "PO-Revision-Date: 2020-03-17 11:04+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -178,11 +178,20 @@ msgstr "Peut être partiellement réservé"
 msgid "Options"
 msgstr "Options"
 
+msgid "Reservations per time slot"
+msgstr "Maximum des reservation par unité des temps"
+
 msgid "From"
 msgstr "De"
 
 msgid "Until"
 msgstr "Jusqu'à"
+
+msgid "Slots per Reservation"
+msgstr "Limit des reservations"
+
+msgid "Start time before end time"
+msgstr "Heure de début avant l'heure de fin"
 
 msgid "Lead"
 msgstr "Accroche"
@@ -3289,6 +3298,10 @@ msgstr ""
 msgid "A link was added to the clipboard"
 msgstr "Un lien a été ajouté au presse-papiers"
 
+#, python-format
+msgid "The entry ${name} exists twice"
+msgstr "L'entrée ${name} existe deux fois"
+
 msgid "Added a new directory"
 msgstr "Ajout d'un nouveau dossier"
 
@@ -3344,10 +3357,6 @@ msgstr "La colonne ${name} est manquante"
 #, python-format
 msgid "The file ${name} is missing"
 msgstr "Le fichier ${name} est manquante"
-
-#, python-format
-msgid "The entry ${name} exists twice"
-msgstr "L'entrée ${name} existe deux fois"
 
 msgid ""
 "The given file is invalid, does it include a metadata.json with a data.xlsx, "
