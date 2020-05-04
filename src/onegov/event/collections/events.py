@@ -1,3 +1,4 @@
+from uuid import uuid4
 from collections import namedtuple
 from datetime import date
 from datetime import datetime
@@ -5,7 +6,7 @@ from datetime import timedelta
 from hashlib import md5
 from icalendar import Calendar as vCalendar
 from onegov.core.collection import Pagination
-from onegov.core.utils import increment_name
+from onegov.core.utils import increment_name, Bunch
 from onegov.core.utils import normalize_for_url
 from onegov.event.models import Event
 from onegov.gis import Coordinates
@@ -17,6 +18,7 @@ from sedate import to_timezone
 from sqlalchemy import and_
 from sqlalchemy import or_
 
+from onegov.ticket import TicketCollection
 
 EventImportItem = namedtuple(
     'EventImportItem', (
@@ -140,12 +142,12 @@ class EventCollection(Pagination):
         return query.first()
 
     def by_id(self, id):
-        """ Return an event by its id. """
-
+        """ Return an event by its id. Hex representations work as well. """
         query = self.session.query(Event).filter(Event.id == id)
         return query.first()
 
-    def from_import(self, items, purge=None):
+    def from_import(self, items, purge=None, create_tickets=False,
+                    valid_state_transfers=None, published_only=True):
         """ Add or updates the given events.
 
         Only updates events which have changed. Uses ``Event.source_updated``
@@ -162,6 +164,25 @@ class EventCollection(Pagination):
             Optionally removes all events with the given meta-source-prefix not
             present in the given events.
 
+        :param create_tickets:
+            Optionally create a ticket and a ticket message for an added event
+            before publishing it, but only if the remote event is published.
+
+        :param allowed_state_transfers:
+            Dict of existing : remote state should be considered when updating.
+
+            Example:
+
+            {'published': 'withdrawn'} would update locally published events
+            if the remote has been withdrawn.
+
+            for any {'valid_state': 'withdrawn'} that lead to an update of
+            the local state, an existing ticket will be close automatically.
+
+        :param published_only:
+            Do not import unpublished events. Still do not ignore state
+            like withdrawn.
+
         """
 
         if purge:
@@ -171,6 +192,17 @@ class EventCollection(Pagination):
 
         added = 0
         updated = 0
+        valid_state_transfers = valid_state_transfers or {}
+
+        def ticket_for_event(event):
+            return TicketCollection(self.session).by_handler_id(event.id.hex)
+
+        def close_ticket(ticket):
+            if ticket.state == 'open':
+                ticket.accept_ticket(None)
+                ticket.close_ticket()
+            if ticket.state == 'pending':
+                ticket.close_ticket()
 
         for item in items:
             if isinstance(item, str):
@@ -186,6 +218,11 @@ class EventCollection(Pagination):
                 purge -= set([event.source])
 
             if existing:
+                update_state = valid_state_transfers.get(
+                    existing.state) == event.state
+
+                # ticket = ticket_for_event(existing)
+
                 if existing.source_updated:
                     changed = existing.source_updated != event.source_updated
                 else:
@@ -214,7 +251,6 @@ class EventCollection(Pagination):
                     )
 
                 if changed:
-                    updated += 1
                     state = existing.state  # avoid updating occurrences
                     existing.state = 'initiated'
                     existing.title = event.title
@@ -229,21 +265,53 @@ class EventCollection(Pagination):
                     existing.state = state
                     existing.set_image(item.image, item.image_filename)
                     existing.set_pdf(item.pdf, item.pdf_filename)
+                if update_state:
+                    # ignoring if there is a ticket, this might lead to
+                    # inconsistencies
+                    existing.state = event.state
+
+                # check if there is any ticket
+                # if ticket:
+                    # only if this state transfer is allowed and final state
+                    # is withdrawn, then close the ticket automatically
+                    # if update_state and event.state == 'withdrawn':
+                    #     close_ticket(ticket)
+
+                if changed or update_state:
+                    updated += 1
 
             else:
+                if published_only and not event.state == 'published':
+                    continue
                 added += 1
+                event.id = uuid4()
                 event.name = self._get_unique_name(event.title)
                 event.state = 'initiated'
                 event.set_image(item.image, item.image_filename)
                 event.set_pdf(item.pdf, item.pdf_filename)
                 self.session.add(event)
                 event.submit()
-                event.publish()
+                # publish depending if creating ticket first
+                if create_tickets:
+                    # Flush the event in order the EventSubmissionHandler
+                    # can access the event with handler.refresh()
+                    self.session.flush()
+                    with self.session.no_autoflush:
+                        # Ticket needs a title but how is it set?
+                        TicketCollection(self.session).open_ticket(
+                            handler_code='EVN', handler_id=event.id.hex
+                        )
+                else:
+                    event.publish()
 
         if purge:
             query = self.session.query(Event)
             query = query.filter(Event.meta['source'].in_(purge))
             for event in query:
+                ticket = ticket_for_event(event)
+                if ticket:
+                    # we can not take snapshots without a request
+                    close_ticket(ticket)
                 event.state = 'withdrawn'  # remove occurrences
                 self.session.delete(event)
 

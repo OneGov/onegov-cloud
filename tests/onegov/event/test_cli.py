@@ -10,6 +10,8 @@ from transaction import commit
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
+from onegov.ticket import TicketCollection
+
 
 def test_import_ical(cfg_path, temporary_directory):
     runner = CliRunner()
@@ -161,6 +163,128 @@ def test_import_guidle(cfg_path, temporary_directory, xml):
     assert "Events successfully imported" in result.output
     assert "Tags not in tagmap: \"Kulinarik\"!"
     assert "4 added, 0 updated, 0 deleted" in result.output
+
+
+def test_fetch_with_state_and_tickets(cfg_path, session_manager):
+    runner = CliRunner()
+    local = 'baz'
+    remote = 'bar'
+    session_manager.ensure_schema_exists('foo-baz')
+    session_manager.ensure_schema_exists('foo-bar')
+
+    def events(entity=local):
+        return get_session(entity).query(Event)
+
+    def get_session(entity):
+        session_manager.set_current_schema(f'foo-{entity}')
+        return session_manager.session()
+
+    for entity, title, source, tags, location in (
+        (remote, '1', None, [], ''),
+        (remote, '2', None, [], None),
+    ):
+        EventCollection(get_session(entity)).add(
+            title=title,
+            start=datetime(2015, 6, 16, 9, 30),
+            end=datetime(2015, 6, 16, 18, 00),
+            timezone='Europe/Zurich',
+            tags=tags,
+            location=location,
+            source=source
+        )
+    commit()
+
+    # test published_only, import none
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', f'/foo/{local}',
+        'fetch',
+        '--source', remote,
+        '--create-tickets',
+        '--published-only'
+    ])
+    assert result.exit_code == 0
+    assert "0 added, 0 updated, 0 deleted" in result.output
+
+    # Import initiated events
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', f'/foo/{local}',
+        'fetch',
+        '--source', remote,
+        '--create-tickets',
+    ])
+    assert result.exit_code == 0
+    assert "2 added, 0 updated, 0 deleted" in result.output
+    local_event = events().filter_by(title='1').first()
+    assert local_event.state == 'submitted'
+    assert TicketCollection(get_session(local)).query().count() == 2
+    collection = TicketCollection(get_session(local))
+    ticket = collection.by_handler_id(local_event.id.hex)
+    assert ticket.title == local_event.title
+    assert ticket.handler.event == local_event
+
+    # Chance the state of one ticket
+    remote_event = events(remote).filter_by(title='1').first()
+    remote_event.submit()
+    remote_event.publish()
+    commit()
+
+    # Test not updating anything,
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/baz',
+        'fetch',
+        '--source', 'bar',
+        '--create-tickets',
+        '--state-transfers', 'published:withdrawn'
+    ])
+    assert result.exit_code == 0
+    assert "0 added, 0 updated, 0 deleted" in result.output
+
+    # Withdraw event when ticket is still open and state is submitted
+    remote_event = events(remote).filter_by(title='1').first()
+    remote_event.withdraw()
+    commit()
+    assert remote_event.state == 'withdrawn'
+
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/baz',
+        'fetch',
+        '--source', 'bar',
+        '--create-tickets',
+        '--state-transfers', 'published:withdrawn',
+        '--state-transfers', 'submitted:withdrawn'
+    ])
+    assert result.exit_code == 0
+    assert "0 added, 1 updated, 0 deleted" in result.output
+    local_event = events(local).filter_by(title='1').first()
+    assert local_event.state == 'withdrawn'
+    collection = TicketCollection(get_session(local))
+    ticket = collection.by_handler_id(local_event.id.hex)
+    assert ticket.state == 'closed'
+
+    # Change state of remaining to published
+    # Chance the state of one ticket
+    remote_event = events(remote).filter_by(title='2').first()
+    remote_event.submit()
+    remote_event.publish()
+    commit()
+
+    # Update local state from submitted to published
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/baz',
+        'fetch',
+        '--source', 'bar',
+        '--create-tickets',
+        '--state-transfers', 'submitted:published'
+    ])
+    assert result.exit_code == 0
+    assert "0 added, 1 updated, 0 deleted" in result.output
+    event = events(local).filter_by(title='2').first()
+    assert event.state == 'published'
 
 
 def test_fetch(cfg_path, session_manager):

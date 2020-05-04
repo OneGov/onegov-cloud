@@ -448,7 +448,13 @@ def import_guidle(group_context, url, tagmap, clear):
 @click.option('--source', multiple=True)
 @click.option('--tag', multiple=True)
 @click.option('--location', multiple=True)
-def fetch(group_context, source, tag, location):
+@click.option('--create-tickets', is_flag=True, default=False)
+@click.option('--state-transfers', multiple=True,
+              help="Usage: local:remote, e.g. published:withdrawn")
+@click.option('--published-only', is_flag=True, default=False,
+              help='Only add event is they are publised on remote')
+def fetch(group_context, source, tag, location, create_tickets,
+          state_transfers, published_only):
     """ Fetches events from other instances.
 
     Only fetches events from the same namespace which have not been imported
@@ -461,6 +467,32 @@ def fetch(group_context, source, tag, location):
             --tag Sport --tag Konzert
             --location Zug
 
+    Additional parameters:
+
+            --state-transfers published:withdrawn
+
+            Will update the local event.state from published to withdrawn
+            automatically. If there are any tickets associated with the event,
+            the will be closed automatically.
+
+            --create-tickets
+            For events that will be imported, will create a ticket type EVN
+            before publishing the event on the local instance.
+
+            --pusblished_only:
+            When passing the remote items to the EventCollection, only add
+            events if they are published.
+
+    The following example will close tickets automatically for
+    submitted and published events that were withdrawn on the remote.
+
+    onegov-event --select '/veranstaltungen/zug' fetch \
+            --source menzingen --source steinhausen
+            --published-only
+            --create-tickets
+            --state-transfers published:withdrawn
+            --state-transfers submitted:withdrawm
+
     """
 
     def vector_add(a, b):
@@ -468,6 +500,16 @@ def fetch(group_context, source, tag, location):
 
     if not len(source):
         abort("Provide at least one source")
+
+    valid_state_transfers = {}
+    valid_choices = ('initiated', 'submitted', 'published', 'withdrawn')
+    if len(state_transfers):
+        for string in state_transfers:
+            local, remote = string.split(':')
+            assert local, remote
+            assert local in valid_choices
+            assert remote in valid_choices
+            valid_state_transfers[local] = remote
 
     def _fetch(request, app):
 
@@ -512,7 +554,7 @@ def fetch(group_context, source, tag, location):
                         event._es_skip = True
                         yield EventImportItem(
                             event=Event(
-                                state='initiated',
+                                state=event.state,
                                 title=event.title,
                                 start=event.start,
                                 end=event.end,
@@ -552,7 +594,13 @@ def fetch(group_context, source, tag, location):
 
                 result = vector_add(
                     result,
-                    local_events.from_import(remote_events(), f'fetch-{key}')
+                    local_events.from_import(
+                        remote_events(),
+                        purge=f'fetch-{key}',
+                        create_tickets=create_tickets,
+                        valid_state_transfers=valid_state_transfers,
+                        published_only=published_only
+                    )
                 )
 
             click.secho(
