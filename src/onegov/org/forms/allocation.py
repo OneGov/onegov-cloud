@@ -553,3 +553,8 @@ class RoomAllocationEditForm(AllocationEditForm):
         self.apply_dates(model.display_start(), model.display_end())
         self.as_whole_day.data = model.whole_day and 'yes' or 'no'
         self.per_time_slot.data = model.quota
+
+    def on_request(self):
+        if self.partly_available:
+            self.hide(self.as_whole_day)
+            self.hide(self.per_time_slot)
