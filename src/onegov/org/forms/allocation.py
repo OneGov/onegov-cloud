@@ -422,12 +422,28 @@ class RoomAllocationForm(AllocationForm):
             ('no', _("No"))
         ],
         default='yes',
-        fieldset=_("Options")
+        fieldset=_("Options"),
+        depends_on=('as_whole_day', 'no')
     )
 
-    data = None
-    quota = 1
+    per_time_slot = IntegerField(
+        label=_("Reservations per time slot"),
+        validators=[
+            InputRequired(),
+            NumberRange(1, 999)
+        ],
+        fieldset=_("Options"),
+        default=1,
+        depends_on=('as_whole_day', 'no', 'is_partly_available', 'no')
+    )
+
     quota_limit = 1
+
+    @property
+    def quota(self):
+        return self.per_time_slot.data
+
+    data = None
 
     @property
     def whole_day(self):
@@ -435,6 +451,9 @@ class RoomAllocationForm(AllocationForm):
 
     @property
     def partly_available(self):
+        if self.whole_day:
+            # Hiding a field will still pass the default, we catch it here
+            return False
         return self.is_partly_available.data == 'yes'
 
     @property
@@ -476,9 +495,29 @@ class RoomAllocationEditForm(AllocationEditForm):
         depends_on=('as_whole_day', 'no')
     )
 
-    data = None
-    quota = 1
+    per_time_slot = IntegerField(
+        label=_("Slots per Reservation"),
+        validators=[
+            InputRequired(),
+            NumberRange(1, 999)
+        ],
+        fieldset=_("Options"),
+        default=1,
+        depends_on=('as_whole_day', 'no')
+    )
+
+    def ensure_start_before_end(self):
+        if self.start_time.data >= self.end_time.data:
+            self.start_time.errors.append(_("Start time before end time"))
+            return False
+
     quota_limit = 1
+
+    @property
+    def quota(self):
+        return self.per_time_slot.data
+
+    data = None
 
     @property
     def whole_day(self):
@@ -486,7 +525,7 @@ class RoomAllocationEditForm(AllocationEditForm):
 
     @property
     def partly_available(self):
-        return self.is_partly_available.data == 'yes'
+        return self.model.partly_available
 
     @property
     def dates(self):
@@ -511,3 +550,4 @@ class RoomAllocationEditForm(AllocationEditForm):
     def apply_model(self, model):
         self.apply_dates(model.display_start(), model.display_end())
         self.as_whole_day.data = model.whole_day and 'yes' or 'no'
+        self.per_time_slot.data = model.quota
