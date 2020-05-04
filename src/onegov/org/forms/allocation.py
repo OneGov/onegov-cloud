@@ -507,6 +507,8 @@ class RoomAllocationEditForm(AllocationEditForm):
     )
 
     def ensure_start_before_end(self):
+        if self.whole_day:
+            return
         if self.start_time.data >= self.end_time.data:
             self.start_time.errors.append(_("Start time before end time"))
             return False
