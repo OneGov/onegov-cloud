@@ -235,7 +235,7 @@ def test_fetch_with_state_and_tickets(cfg_path, session_manager):
         '--config', cfg_path,
         '--select', '/foo/baz',
         'fetch',
-        '--source', 'bar',
+        '--source', remote,
         '--create-tickets',
         '--state-transfers', 'published:withdrawn'
     ])
@@ -252,7 +252,7 @@ def test_fetch_with_state_and_tickets(cfg_path, session_manager):
         '--config', cfg_path,
         '--select', '/foo/baz',
         'fetch',
-        '--source', 'bar',
+        '--source', remote,
         '--create-tickets',
         '--state-transfers', 'published:withdrawn',
         '--state-transfers', 'submitted:withdrawn'
@@ -278,7 +278,7 @@ def test_fetch_with_state_and_tickets(cfg_path, session_manager):
         '--config', cfg_path,
         '--select', '/foo/baz',
         'fetch',
-        '--source', 'bar',
+        '--source', remote,
         '--create-tickets',
         '--state-transfers', 'submitted:published'
     ])
@@ -296,7 +296,7 @@ def test_fetch_with_state_and_tickets(cfg_path, session_manager):
         '--config', cfg_path,
         '--select', '/foo/baz',
         'fetch',
-        '--source', 'bar',
+        '--source', remote,
         '--create-tickets',
     ])
     assert result.exit_code == 0

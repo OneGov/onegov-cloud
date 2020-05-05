@@ -6,7 +6,7 @@ from datetime import timedelta
 from hashlib import md5
 from icalendar import Calendar as vCalendar
 from onegov.core.collection import Pagination
-from onegov.core.utils import increment_name, Bunch
+from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
 from onegov.event.models import Event
 from onegov.gis import Coordinates

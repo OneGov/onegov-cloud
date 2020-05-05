@@ -442,7 +442,6 @@ def import_guidle(group_context, url, tagmap, clear):
 
     return _import_guidle
 
-
 @cli.command()
 @pass_group_context
 @click.option('--source', multiple=True)
@@ -462,7 +461,7 @@ def fetch(group_context, source, tag, location, create_tickets,
 
     Example
 
-        onegov-event --select '/veranstaltungen/zug' fetch \
+        onegov-org --select '/veranstaltungen/zug' fetch \
             --source menzingen --source steinhausen
             --tag Sport --tag Konzert
             --location Zug
