@@ -1,8 +1,22 @@
 # Changes
 
+## Release `2020.52`
+
+> commits: **2 / [30dd5086f9...2f43f43559](https://github.com/OneGov/onegov-cloud/compare/30dd5086f9^...2f43f43559)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.52)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Adds reservation quota for room resource**
+
+Adds a quota for allocations of Rooms so that multiple reservations per time slot are possible. If the time slot can be booked partially, the quota will be set to 1. Limit edit possiblities for allocations set to `partly_available`. Adds form validation for `EditRoomAllocationForm`.
+
+**`Feature`** | **[30dd5086f9](https://github.com/onegov/onegov-cloud/commit/30dd5086f9315ebbfa9ab6bf30eef8519149a1cc)**
+
 ## Release `2020.51`
 
-> commits: **4 / [d22727d4ae...35094d589a](https://github.com/OneGov/onegov-cloud/compare/d22727d4ae^...35094d589a)**<br>
+> released: **2020-04-30 14:15**<br>
+> commits: **5 / [d22727d4ae...651af27668](https://github.com/OneGov/onegov-cloud/compare/d22727d4ae^...651af27668)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.51)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Electionday
