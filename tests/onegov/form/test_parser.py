@@ -322,7 +322,7 @@ def test_parse_checkbox():
         Extras =
             [ ] Extra Luggage
             [x] Priority Seating
-            [x] Early Boarding: At 5 pm
+            [x] Early Boarding
     """)
 
     form = parse_form(text)()
@@ -331,7 +331,7 @@ def test_parse_checkbox():
     assert form.extras.choices == [
         ('Extra Luggage', 'Extra Luggage'),
         ('Priority Seating', 'Priority Seating'),
-        ('Early Boarding: At 5 pm', 'Early Boarding: At 5 pm'),
+        ('Early Boarding', 'Early Boarding'),
     ]
     assert form.extras.default == ['Priority Seating', 'Early Boarding']
 
