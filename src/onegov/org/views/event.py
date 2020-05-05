@@ -257,6 +257,9 @@ def handle_withdraw_event(self, request):
         raise exc.HTTPForbidden()
 
     self.withdraw()
+    tickets = TicketCollection(request.session)
+    ticket = tickets.by_handler_id(self.id.hex)
+    EventMessage.create(self, ticket, request, 'withdrawn')
 
 
 @OrgApp.view(

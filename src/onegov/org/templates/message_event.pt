@@ -13,6 +13,10 @@
                     <a href="${model.event_link(request)}" i18n:name="event" i18n:translate>Event</a>
                     deleted.
                 </tal:b>
+                <tal:b case="'withdrawn'" i18n:translate>
+                    <a href="${model.event_link(request)}" i18n:name="event" i18n:translate>Event</a>
+                    withdrawn.
+                </tal:b>
             </tal:b>
         </metal:b>
     </metal:b>

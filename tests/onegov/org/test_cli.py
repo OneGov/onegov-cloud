@@ -86,7 +86,8 @@ def test_fetch_with_state_and_tickets(
             timezone='Europe/Zurich',
             tags=tags,
             location=location,
-            source=source
+            source=source,
+            organizer_email='triceracops@newyork.com'
         )
     commit()
 
@@ -121,6 +122,7 @@ def test_fetch_with_state_and_tickets(
     assert "2 added, 0 updated, 0 deleted" in result.output
     local_event = events().filter_by(title='1').first()
     assert local_event.state == 'submitted'
+    assert local_event.organizer_email == 'triceracops@newyork.com'
     assert TicketCollection(get_session(local)).query().count() == 2
     assert MessageCollection(get_session(local)).query().count() == 2
     assert TicketCollection(get_session(local)).query().first().muted is True
@@ -128,6 +130,9 @@ def test_fetch_with_state_and_tickets(
     ticket = collection.by_handler_id(local_event.id.hex)
     assert ticket.title == local_event.title
     assert ticket.handler.event == local_event
+    assert ticket.handler.source == 'fetch-bar-1'
+    assert ticket.handler.import_user == 'admin@example.org'
+    assert ticket.state == 'open'
 
     # Chance the state of one ticket
     remote_event = events(remote).filter_by(title='1').first()

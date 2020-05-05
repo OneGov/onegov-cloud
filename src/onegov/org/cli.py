@@ -1222,7 +1222,9 @@ def fetch(group_context, source, tag, location, create_tickets,
                     with local_session.no_autoflush:
                         tickets = TicketCollection(local_session)
                         new_ticket = tickets.open_ticket(
-                            handler_code='EVN', handler_id=event_.id.hex
+                            handler_code='EVN', handler_id=event_.id.hex,
+                            source=event_.meta['source'],
+                            user=local_admin.username
                         )
                         new_ticket.muted = True
                         TicketNote.create(new_ticket, request, (

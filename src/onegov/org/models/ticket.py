@@ -519,10 +519,18 @@ class EventSubmissionHandler(Handler):
         return self.event is None
 
     @cached_property
+    def source(self):
+        # values stored only when importing with cli
+        return self.data.get('source')
+
+    @cached_property
+    def import_user(self):
+        # values stored only when importing with cli
+        return self.data.get('user')
+
+    @cached_property
     def email(self):
-        if self.event.source:
-            return self.event.organizer_email
-        return self.event.meta.get('submitter_email')
+        return self.event and self.event.meta.get('submitter_email')
 
     @property
     def title(self):
@@ -601,9 +609,9 @@ class EventSubmissionHandler(Handler):
                         )
                     )
                 )
-            ) if self.event.source else (
+            ) if not self.event.source else (
                 Link(
-                    text=_("Reject imported event"),
+                    text=_("Withdraw event"),
                     url=layout.csrf_protected_url(request.link(
                         self.event, name='withdraw')),
                     attrs={'class': ('delete-link')},
@@ -619,8 +627,13 @@ class EventSubmissionHandler(Handler):
                             redirect_after=request.link(self.ticket)
                         )
                     )
+                ) if not self.event.state == 'withdrawn'
+                else Link(
+                    text=_("Re-publish event"),
+                    url=request.return_here(
+                        request.link(self.event, 'publish')),
+                    attrs={'class': 'accept-link'}
                 ),
-
             ), right_side=False))
 
         return links

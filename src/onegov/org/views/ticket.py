@@ -87,6 +87,10 @@ def view_ticket(self, request):
     if payment and payment.source == 'stripe_connect':
         payment_button = stripe_payment_button(payment, layout)
 
+    submitter = handler.deleted and self.snapshot.get('email') or handler.email
+    if handler.source:
+        submitter = handler.import_user
+
     return {
         'title': self.number,
         'layout': layout,
@@ -94,6 +98,8 @@ def view_ticket(self, request):
         'summary': summary,
         'deleted': handler.deleted,
         'handler': handler,
+        'event_source': handler.source,
+        'submitter': submitter,
         'payment_button': payment_button,
         'counts': counts,
         'feed_data': json.dumps(
