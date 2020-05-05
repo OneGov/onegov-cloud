@@ -24,16 +24,12 @@ from onegov.event.utils import GuidleExportData
 from onegov.file import DepotApp
 from onegov.file.utils import as_fileintent
 from onegov.gis import Coordinates
-from operator import add
-from pathlib import Path
 from pytz import UTC
 from requests import get
 from sedate import as_datetime
 from sedate import replace_timezone
 from sedate import standardize_date
 from sedate import to_timezone
-from sqlalchemy import or_
-from sqlalchemy.dialects.postgresql import array
 from urllib.parse import urlparse
 
 

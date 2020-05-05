@@ -15,17 +15,20 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta
 from libres.db.models import ReservedSlot
 from libres.modules.errors import InvalidEmailAddress, AlreadyReservedError
+
+from onegov.chat import MessageCollection
 from onegov.core.custom import json
 from onegov.core.cache import lru_cache
 from onegov.core.cli import command_group, pass_group_context, abort
 from onegov.core.csv import CSVFile
+from onegov.core.utils import Bunch
 from onegov.event import Event, Occurrence, EventCollection
 from onegov.event.collections.events import EventImportItem
 from onegov.form import FormCollection
 from onegov.org import log
 from onegov.org.formats import DigirezDB
 from onegov.org.forms.event import TAGS
-from onegov.org.models import Organisation, TicketNote
+from onegov.org.models import Organisation, TicketNote, TicketMessage
 from onegov.org.forms import ReservationForm
 from onegov.pay.models import ManualPayment
 from onegov.reservation import Allocation, Reservation
@@ -1028,8 +1031,9 @@ def fix_tags(group_context, dry_run):
               help="Usage: local:remote, e.g. published:withdrawn")
 @click.option('--published-only', is_flag=True, default=False,
               help='Only add event is they are publised on remote')
+@click.option('--delete-orphaned-tickets', is_flag=True)
 def fetch(group_context, source, tag, location, create_tickets,
-          state_transfers, published_only):
+          state_transfers, published_only, delete_orphaned_tickets):
     """ Fetches events from other instances.
 
     Only fetches events from the same namespace which have not been imported
@@ -1050,13 +1054,14 @@ def fetch(group_context, source, tag, location, create_tickets,
             automatically. If there are any tickets associated with the event,
             the will be closed automatically.
 
-            --create-tickets
-            For events that will be imported, will create a ticket type EVN
-            before publishing the event on the local instance.
-
             --pusblished_only:
             When passing the remote items to the EventCollection, only add
             events if they are published.
+
+            --delete-orphaned-tickets
+
+            Delete Tickets, TicketNotes and TicketMessasges if an
+            event gets deleted automatically.
 
     The following example will close tickets automatically for
     submitted and published events that were withdrawn on the remote.
@@ -1165,17 +1170,83 @@ def fetch(group_context, source, tag, location, create_tickets,
                 # be sure to switch back to the local schema, lest we
                 # accidentally update things on the remote
                 app.session_manager.set_current_schema(local_schema)
-                local_events = EventCollection(app.session_manager.session())
+                local_session = app.session_manager.session()
+                local_events = EventCollection(local_session)
+
+                # the responsible user is the first admin that was added
+                local_admin = local_session.query(User) \
+                    .filter_by(role='admin') \
+                    .order_by(User.created).first()
+
+                if create_tickets and not local_admin:
+                    abort("Can not create tickets, no admin is registered")
+
+                def ticket_for_event(event_id):
+                    return TicketCollection(local_session).by_handler_id(
+                        event_id.hex)
+
+                def close_ticket(ticket):
+                    if ticket.state == 'open':
+                        ticket.accept_ticket(local_admin)
+                        TicketMessage.create(
+                            ticket,
+                            helper_request,
+                            'opened'
+                        )
+
+                    TicketMessage.create(
+                        ticket,
+                        helper_request,
+                        'closed'
+                    )
+                    ticket.close_ticket()
+
+                helper_request = Bunch(
+                    current_username=local_admin.username,
+                    session=local_session)
+
+                added, updated, purged = local_events.from_import(
+                    remote_events(),
+                    purge=f'fetch-{key}',
+                    publish_immediately=False,
+                    valid_state_transfers=valid_state_transfers,
+                    published_only=published_only
+                )
+
+                for event_ in added:
+                    event_.submit()
+                    if not create_tickets:
+                        event_.publish()
+                        continue
+
+                    with local_session.no_autoflush:
+                        tickets = TicketCollection(local_session)
+                        new_ticket = tickets.open_ticket(
+                            handler_code='EVN', handler_id=event_.id.hex
+                        )
+                        new_ticket.muted = True
+                        TicketNote.create(new_ticket, request, (
+                            f"Importiert von Instanz {key}"
+
+                        ), owner=local_admin.username)
+
+                for event_id in purged:
+                    ticket = ticket_for_event(event_id)
+                    if ticket:
+                        if not delete_orphaned_tickets:
+                            close_ticket(ticket)
+                        else:
+                            messages = MessageCollection(
+                                local_session,
+                                channel_id=ticket.number
+                            )
+                            for msg in messages.query():
+                                local_session.delete(msg)
+                            local_session.delete(ticket)
 
                 result = vector_add(
                     result,
-                    local_events.from_import(
-                        remote_events(),
-                        purge=f'fetch-{key}',
-                        create_tickets=create_tickets,
-                        valid_state_transfers=valid_state_transfers,
-                        published_only=published_only
-                    )
+                    (len(added), len(updated), len(purged))
                 )
 
             click.secho(

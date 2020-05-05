@@ -6,9 +6,11 @@ import yaml
 from click.testing import CliRunner
 from transaction import commit
 
+from onegov.chat import MessageCollection
 from onegov.event import Event, EventCollection
 from onegov.org.cli import cli
 from onegov.ticket import TicketCollection
+from onegov.user import User
 
 
 def test_manage_orgs(postgres_dsn, temporary_directory, redis_url):
@@ -58,7 +60,8 @@ def test_manage_orgs(postgres_dsn, temporary_directory, redis_url):
     assert "New York was deleted successfully" in result.output
 
 
-def test_fetch_with_state_and_tickets(cfg_path, session_manager):
+def test_fetch_with_state_and_tickets(
+        cfg_path, session_manager, test_password):
     runner = CliRunner()
     local = 'baz'
     remote = 'bar'
@@ -87,6 +90,13 @@ def test_fetch_with_state_and_tickets(cfg_path, session_manager):
         )
     commit()
 
+    get_session(local).add(User(
+        username='admin@example.org',
+        password_hash=test_password,
+        role='admin'
+    ))
+    commit()
+
     # test published_only, import none
     result = runner.invoke(cli, [
         '--config', cfg_path,
@@ -112,6 +122,8 @@ def test_fetch_with_state_and_tickets(cfg_path, session_manager):
     local_event = events().filter_by(title='1').first()
     assert local_event.state == 'submitted'
     assert TicketCollection(get_session(local)).query().count() == 2
+    assert MessageCollection(get_session(local)).query().count() == 2
+    assert TicketCollection(get_session(local)).query().first().muted is True
     collection = TicketCollection(get_session(local))
     ticket = collection.by_handler_id(local_event.id.hex)
     assert ticket.title == local_event.title
@@ -135,7 +147,7 @@ def test_fetch_with_state_and_tickets(cfg_path, session_manager):
     assert result.exit_code == 0
     assert "0 added, 0 updated, 0 deleted" in result.output
 
-    # Withdraw event when ticket is still open and state is submitted
+    # Withdraw event when ticket is still open and state is initiated
     remote_event = events(remote).filter_by(title='1').first()
     remote_event.withdraw()
     commit()
@@ -147,7 +159,7 @@ def test_fetch_with_state_and_tickets(cfg_path, session_manager):
         'fetch',
         '--source', remote,
         '--create-tickets',
-        '--state-transfers', 'published:withdrawn',
+        '--state-transfers', 'initiated:withdrawn',
         '--state-transfers', 'submitted:withdrawn'
     ])
     assert result.exit_code == 0
@@ -160,7 +172,7 @@ def test_fetch_with_state_and_tickets(cfg_path, session_manager):
     assert ticket.state == 'open'
 
     # Change state of remaining to published
-    # Chance the state of one ticket
+    # Change the state of one ticket
     remote_event = events(remote).filter_by(title='2').first()
     remote_event.submit()
     remote_event.publish()
@@ -191,10 +203,31 @@ def test_fetch_with_state_and_tickets(cfg_path, session_manager):
         'fetch',
         '--source', remote,
         '--create-tickets',
+        '--delete-orphaned-tickets'
     ])
     assert result.exit_code == 0
     assert "0 added, 0 updated, 1 deleted" in result.output
     assert TicketCollection(get_session(local)).query().count() == 1
+    assert MessageCollection(get_session(local)).query().count() == 1
+
+    # Check closing local tickets when first event is deleted
+    remote_event = events(remote).filter_by(title='1').first()
+    get_session(remote).delete(remote_event)
+    commit()
+
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/baz',
+        'fetch',
+        '--source', remote,
+    ])
+    assert result.exit_code == 0
+    assert "0 added, 0 updated, 1 deleted" in result.output
+    ticket = TicketCollection(get_session(local)).query().one()
+
+    # for open tickets creates two ticket messages closed and opne
+    messages = MessageCollection(get_session(local)).query().all()
+    assert all(m.owner == 'admin@example.org' for m in messages)
 
 
 def test_fetch(cfg_path, session_manager):
