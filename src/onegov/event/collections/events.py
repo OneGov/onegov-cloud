@@ -179,6 +179,10 @@ class EventCollection(Pagination):
             for any {'valid_state': 'withdrawn'} that lead to an update of
             the local state, an existing ticket will be close automatically.
 
+            Be aware, that transferring state and creating tickets might lead
+            to inconsistencies. So adjust the script in that case to handle
+            the tickets automatically.
+
         :param published_only:
             Do not import unpublished events. Still do not ignore state
             like withdrawn.
@@ -310,8 +314,7 @@ class EventCollection(Pagination):
             for event in query:
                 ticket = ticket_for_event(event)
                 if ticket:
-                    # we can not take snapshots without a request
-                    close_ticket(ticket)
+                    self.session.delete(ticket)
                 event.state = 'withdrawn'  # remove occurrences
                 self.session.delete(event)
 

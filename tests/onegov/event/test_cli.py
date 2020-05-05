@@ -263,7 +263,8 @@ def test_fetch_with_state_and_tickets(cfg_path, session_manager):
     assert local_event.state == 'withdrawn'
     collection = TicketCollection(get_session(local))
     ticket = collection.by_handler_id(local_event.id.hex)
-    assert ticket.state == 'closed'
+    # do not touch tickets when updating state
+    assert ticket.state == 'open'
 
     # Change state of remaining to published
     # Chance the state of one ticket
@@ -285,6 +286,22 @@ def test_fetch_with_state_and_tickets(cfg_path, session_manager):
     assert "0 added, 1 updated, 0 deleted" in result.output
     event = events(local).filter_by(title='2').first()
     assert event.state == 'published'
+
+    # Delete the original event
+    remote_event = events(remote).filter_by(title='2').first()
+    get_session(remote).delete(remote_event)
+    commit()
+
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/foo/baz',
+        'fetch',
+        '--source', 'bar',
+        '--create-tickets',
+    ])
+    assert result.exit_code == 0
+    assert "0 added, 0 updated, 1 deleted" in result.output
+    assert TicketCollection(get_session(local)).query().count() == 1
 
 
 def test_fetch(cfg_path, session_manager):
