@@ -1,4 +1,6 @@
 """ Provides commands used to initialize org websites. """
+from io import BytesIO
+from pathlib import Path
 
 import click
 import html
@@ -13,15 +15,20 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta
 from libres.db.models import ReservedSlot
 from libres.modules.errors import InvalidEmailAddress, AlreadyReservedError
+
+from onegov.chat import MessageCollection
 from onegov.core.custom import json
 from onegov.core.cache import lru_cache
 from onegov.core.cli import command_group, pass_group_context, abort
 from onegov.core.csv import CSVFile
-from onegov.event import Event, Occurrence
+from onegov.core.utils import Bunch
+from onegov.event import Event, Occurrence, EventCollection
+from onegov.event.collections.events import EventImportItem
 from onegov.form import FormCollection
+from onegov.org import log
 from onegov.org.formats import DigirezDB
 from onegov.org.forms.event import TAGS
-from onegov.org.models import Organisation, TicketNote
+from onegov.org.models import Organisation, TicketNote, TicketMessage
 from onegov.org.forms import ReservationForm
 from onegov.pay.models import ManualPayment
 from onegov.reservation import Allocation, Reservation
@@ -31,11 +38,12 @@ from onegov.form import as_internal_id, parse_form
 from onegov.user import UserCollection, User
 from purl import URL
 from sedate import replace_timezone, utcnow
-from sqlalchemy import create_engine, event, text
+from sqlalchemy.dialects.postgresql import array
+from sqlalchemy import create_engine, event, text, or_
 from sqlalchemy.orm import Session
 from tqdm import tqdm
 from uuid import UUID, uuid4
-
+from operator import add as add_op
 
 cli = command_group()
 
@@ -1011,3 +1019,247 @@ def fix_tags(group_context, dry_run):
                                       f' in org/forms/event.py'
 
     return fixes_german_tags_in_db
+
+
+@cli.command('fetch')
+@pass_group_context
+@click.option('--source', multiple=True)
+@click.option('--tag', multiple=True)
+@click.option('--location', multiple=True)
+@click.option('--create-tickets', is_flag=True, default=False)
+@click.option('--state-transfers', multiple=True,
+              help="Usage: local:remote, e.g. published:withdrawn")
+@click.option('--published-only', is_flag=True, default=False,
+              help='Only add event is they are publised on remote')
+@click.option('--delete-orphaned-tickets', is_flag=True)
+def fetch(group_context, source, tag, location, create_tickets,
+          state_transfers, published_only, delete_orphaned_tickets):
+    """ Fetches events from other instances.
+
+    Only fetches events from the same namespace which have not been imported
+    themselves.
+
+    Example
+
+        onegov-org --select '/veranstaltungen/zug' fetch \
+            --source menzingen --source steinhausen
+            --tag Sport --tag Konzert
+            --location Zug
+
+    Additional parameters:
+
+            --state-transfers published:withdrawn
+
+            Will update the local event.state from published to withdrawn
+            automatically. If there are any tickets associated with the event,
+            the will be closed automatically.
+
+            --pusblished_only:
+            When passing the remote items to the EventCollection, only add
+            events if they are published.
+
+            --delete-orphaned-tickets
+
+            Delete Tickets, TicketNotes and TicketMessasges if an
+            event gets deleted automatically.
+
+    The following example will close tickets automatically for
+    submitted and published events that were withdrawn on the remote.
+
+    onegov-event --select '/veranstaltungen/zug' fetch \
+            --source menzingen --source steinhausen
+            --published-only
+            --create-tickets
+            --state-transfers published:withdrawn
+            --state-transfers submitted:withdrawm
+
+    """
+
+    def vector_add(a, b):
+        return list(map(add_op, a, b))
+
+    if not len(source):
+        abort("Provide at least one source")
+
+    valid_state_transfers = {}
+    valid_choices = ('initiated', 'submitted', 'published', 'withdrawn')
+    if len(state_transfers):
+        for string in state_transfers:
+            local, remote = string.split(':')
+            assert local, remote
+            assert local in valid_choices
+            assert remote in valid_choices
+            valid_state_transfers[local] = remote
+
+    def _fetch(request, app):
+
+        def event_file(reference):
+            # XXX use a proper depot manager for this
+            path = Path(app.depot_storage_path) / reference['path'] / 'file'
+            with open(path):
+                content = BytesIO(path.open('rb').read())
+            return content
+
+        try:
+            result = [0, 0, 0]
+
+            for key in source:
+                remote_schema = '{}-{}'.format(app.namespace, key)
+                local_schema = app.session_manager.current_schema
+                assert remote_schema in app.session_manager.list_schemas()
+
+                app.session_manager.set_current_schema(remote_schema)
+                remote_session = app.session_manager.session()
+                assert remote_session.info['schema'] == remote_schema
+
+                query = remote_session.query(Event)
+                query = query.filter(
+                    or_(
+                        Event.meta['source'].astext.is_(None),
+                        Event.meta['source'].astext == ''
+                    )
+                )
+                if tag:
+                    query = query.filter(Event._tags.has_any(array(tag)))
+                if location:
+                    query = query.filter(
+                        or_(*[
+                            Event.location.op('~')(f'\\y{term}\\y')
+                            for term in location
+                        ])
+                    )
+
+                def remote_events():
+                    for event_ in query:
+                        event_._es_skip = True
+                        yield EventImportItem(
+                            event=Event(
+                                state=event_.state,
+                                title=event_.title,
+                                start=event_.start,
+                                end=event_.end,
+                                timezone=event_.timezone,
+                                recurrence=event_.recurrence,
+                                content=event_.content,
+                                location=event_.location,
+                                tags=event_.tags,
+                                source=f'fetch-{key}-{event_.name}',
+                                coordinates=event_.coordinates,
+                                organizer=event_.organizer,
+                                organizer_email=event_.organizer_email,
+                                price=event_.price,
+                            ),
+                            image=(
+                                event_file(event_.image.reference)
+                                if event_.image else None
+                            ),
+                            image_filename=(
+                                event_.image.name
+                                if event_.image else None
+                            ),
+                            pdf=(
+                                event_file(event_.pdf.reference)
+                                if event_.pdf else None
+                            ),
+                            pdf_filename=(
+                                event_.pdf.name
+                                if event_.pdf else None
+                            )
+                        )
+
+                # be sure to switch back to the local schema, lest we
+                # accidentally update things on the remote
+                app.session_manager.set_current_schema(local_schema)
+                local_session = app.session_manager.session()
+                local_events = EventCollection(local_session)
+
+                # the responsible user is the first admin that was added
+                local_admin = local_session.query(User) \
+                    .filter_by(role='admin') \
+                    .order_by(User.created).first()
+
+                if create_tickets and not local_admin:
+                    abort("Can not create tickets, no admin is registered")
+
+                def ticket_for_event(event_id):
+                    return TicketCollection(local_session).by_handler_id(
+                        event_id.hex)
+
+                def close_ticket(ticket, user, request):
+                    if ticket.state == 'open':
+                        ticket.accept_ticket(user)
+                        TicketMessage.create(
+                            ticket,
+                            request,
+                            'opened'
+                        )
+
+                    TicketMessage.create(
+                        ticket,
+                        request,
+                        'closed'
+                    )
+                    ticket.close_ticket()
+
+                helper_request = Bunch(
+                    current_username=local_admin.username,
+                    session=local_session)
+
+                added, updated, purged = local_events.from_import(
+                    remote_events(),
+                    purge=f'fetch-{key}',
+                    publish_immediately=False,
+                    valid_state_transfers=valid_state_transfers,
+                    published_only=published_only
+                )
+
+                for event_ in added:
+                    event_.submit()
+                    if not create_tickets:
+                        event_.publish()
+                        continue
+
+                    with local_session.no_autoflush:
+                        tickets = TicketCollection(local_session)
+                        new_ticket = tickets.open_ticket(
+                            handler_code='EVN', handler_id=event_.id.hex,
+                            source=event_.meta['source'],
+                            user=local_admin.username
+                        )
+                        new_ticket.muted = True
+                        TicketNote.create(new_ticket, request, (
+                            f"Importiert von Instanz {key}"
+
+                        ), owner=local_admin.username)
+
+                for event_id in purged:
+                    ticket = ticket_for_event(event_id)
+                    if ticket:
+                        if not delete_orphaned_tickets:
+                            close_ticket(ticket, local_admin, helper_request)
+                        else:
+                            messages = MessageCollection(
+                                local_session,
+                                channel_id=ticket.number
+                            )
+                            for msg in messages.query():
+                                local_session.delete(msg)
+                            local_session.delete(ticket)
+
+                result = vector_add(
+                    result,
+                    (len(added), len(updated), len(purged))
+                )
+
+            click.secho(
+                f"Events successfully fetched "
+                f"({result[0]} added, {result[1]} updated, "
+                f"{result[2]} deleted)",
+                fg='green'
+            )
+
+        except Exception as e:
+            log.error("Error fetching events", exc_info=True)
+            raise(e)
+
+    return _fetch

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-05-04 14:10+0200\n"
+"POT-Creation-Date: 2020-05-06 04:22+0200\n"
 "PO-Revision-Date: 2020-04-09 05:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1721,6 +1721,7 @@ msgstr "Reservation absagen"
 
 #. Used in sentence: "${event} published."
 #. Used in sentence: "${event} deleted."
+#. Used in sentence: "${event} withdrawn."
 #.
 msgid "Event"
 msgstr "Veranstaltung"
@@ -1739,6 +1740,18 @@ msgstr "Möchten Sie diese Veranstaltung wirklich absagen?"
 
 msgid "Rejecting this event can't be undone."
 msgstr "Eine Absage kann nicht rückgängig gemacht werden."
+
+msgid "Withdraw event"
+msgstr "Veranstaltung zurückziehen"
+
+msgid "Do you really want to withdraw this event?"
+msgstr "Wollen sie diese Veranstaltung zurückziehen? "
+
+msgid "You can re-publish an imported event later."
+msgstr "Sie können importierte Veranstaltungen später wieder veröffentlichen."
+
+msgid "Re-publish event"
+msgstr "Veranstaltung wieder veröffentlichen"
 
 msgid "Directory Entry Submissions"
 msgstr "Verzeichniseintrag Eingaben"
@@ -2618,6 +2631,10 @@ msgstr "${event} veröffentlicht."
 msgid "${event} deleted."
 msgstr "${event} gelöscht."
 
+#. Canonical text for ${event} is: "Event"
+msgid "${event} withdrawn."
+msgstr "${event} zurückgezogen."
+
 msgid "File signed."
 msgstr "Datei signiert."
 
@@ -2944,6 +2961,9 @@ msgstr "Keine Ticket Updates via E-Mail"
 msgid "Enable E-Mails"
 msgstr "E-Mails aktivieren"
 
+msgid "E-Mails can not be sent for tickets of imported events"
+msgstr "E-mails für Tickets zu importierten Veranstaltungen sind deaktiviert"
+
 msgid "Send Message"
 msgstr "Nachricht senden"
 
@@ -2952,6 +2972,9 @@ msgstr "Zu geschlossenen Tickets können keine Nachrichten versendet werden"
 
 msgid "Please reopen the ticket to send a message"
 msgstr "Bitte öffnen Sie das Ticket wieder um eine Nachricht zu senden"
+
+msgid "Messages cannot be sent for imported events"
+msgstr "Nachrichten für importierte Events sind nicht möglich"
 
 msgid "${count} received"
 msgstr "${count} Empfangen"
@@ -3982,6 +4005,9 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "Messages cannot be sent for imported tickets"
+#~ msgstr "Zu importierten Events können keine Nachrichten gesendet werden"
 
 #~ msgid "Lecture"
 #~ msgstr "Lesung"

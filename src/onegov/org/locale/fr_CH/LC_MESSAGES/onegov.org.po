@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-05-04 14:10+0200\n"
+"POT-Creation-Date: 2020-05-06 04:22+0200\n"
 "PO-Revision-Date: 2020-03-17 11:04+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1723,6 +1723,7 @@ msgstr "Refuser la réservation"
 
 #. Used in sentence: "${event} published."
 #. Used in sentence: "${event} deleted."
+#. Used in sentence: "${event} withdrawn."
 #.
 msgid "Event"
 msgstr "Événement"
@@ -1741,6 +1742,18 @@ msgstr "Voulez-vous vraiment refuser cet événement ?"
 
 msgid "Rejecting this event can't be undone."
 msgstr "Rejeter cet événement est irréversible."
+
+msgid "Withdraw event"
+msgstr "Retirer l'événement"
+
+msgid "Do you really want to withdraw this event?"
+msgstr "Voulez-vous retirer l'événement?"
+
+msgid "You can re-publish an imported event later."
+msgstr "Vous pouvez republier un événement importé plus tard."
+
+msgid "Re-publish event"
+msgstr "Republier l'événement"
 
 msgid "Directory Entry Submissions"
 msgstr "Propositions d'entrée de répertoire"
@@ -2624,6 +2637,10 @@ msgstr "${event} publié."
 msgid "${event} deleted."
 msgstr "${event} effacé."
 
+#. Canonical text for ${event} is: "Event"
+msgid "${event} withdrawn."
+msgstr "${event} retiré."
+
 msgid "File signed."
 msgstr "Fichier signé."
 
@@ -2956,6 +2973,9 @@ msgstr "Aucune mise à jour de tickets par e-mail"
 msgid "Enable E-Mails"
 msgstr "Activer les e-mails"
 
+msgid "E-Mails can not be sent for tickets of imported events"
+msgstr "E-Mails ne peuvent pas être envoyés pour les tickets d'événements importés"
+
 msgid "Send Message"
 msgstr "Envoyer le message"
 
@@ -2964,6 +2984,9 @@ msgstr "Les messages ne peuvent pas être envoyés lorsque le ticket est fermé"
 
 msgid "Please reopen the ticket to send a message"
 msgstr "Veuillez rouvrir le ticket pour envoyer un message."
+
+msgid "Messages cannot be sent for imported events"
+msgstr "Messages ne peuvent pas être envoyés pour les tickets d'événements importés"
 
 msgid "${count} received"
 msgstr "${count} reçu(s)"

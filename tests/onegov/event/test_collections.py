@@ -772,7 +772,7 @@ def test_as_ical(session):
 def test_from_import(session):
     events = EventCollection(session)
 
-    assert events.from_import([
+    added, updated, purged = events.from_import([
         EventImportItem(
             event=Event(
                 state='initiated',
@@ -821,7 +821,8 @@ def test_from_import(session):
             pdf=None,
             pdf_filename=None,
         )
-    ]) == (2, 0, 0)
+    ])
+    assert (len(added), len(updated), len(purged)) == (2, 0, 0)
 
     def items():
         yield EventImportItem(
@@ -849,7 +850,8 @@ def test_from_import(session):
             pdf_filename=None,
         )
 
-    assert events.from_import(items()) == (1, 0, 0)
+    added, updated, purged = events.from_import(items())
+    assert (len(added), len(updated), len(purged)) == (1, 0, 0)
 
     # Already imported
     assert events.from_import([
@@ -877,10 +879,10 @@ def test_from_import(session):
             pdf=None,
             pdf_filename=None,
         )
-    ]) == (0, 0, 0)
+    ]) == ([], [], [])
 
     # Update and purge
-    assert events.from_import([
+    a, u, p = events.from_import([
         EventImportItem(
             event=Event(
                 state='initiated',
@@ -905,11 +907,12 @@ def test_from_import(session):
             pdf=None,
             pdf_filename=None,
         )
-    ], 'import-1') == (0, 1, 1)
+    ], 'import-1')
+    assert (len(a), len(u), len(p)) == (0, 1, 1)
     assert events.subset_count == 2
 
     # Don't purge
-    assert events.from_import(['import-1-A'], 'import-1') == (0, 0, 0)
+    assert events.from_import(['import-1-A'], 'import-1') == ([], [], [])
     assert events.subset_count == 2
 
     # Withdraw
@@ -939,7 +942,7 @@ def test_from_import(session):
             pdf=None,
             pdf_filename=None,
         )
-    ]) == (0, 0, 0)
+    ]) == ([], [], [])
     assert events.by_name('title-c').state == 'withdrawn'
 
 
