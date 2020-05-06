@@ -1223,9 +1223,9 @@
 </metal:search_result_default>
 
 
-<metal:ticket_status_page_message define-macro="ticket_status_page_message" i18n:domain="onegov.org">
+<metal:ticket_status_page_message define-macro="ticket_status_page_message" i18n:domain="onegov.org" tal:define="mute_all request.app.org.mute_all_tickets; skip request.app.org.tickets_skip_opening_email or []">
     <tal:b tal:condition="ticket.state == 'open'">
-        <tal:b tal:switch="python: not request.app.org.mute_all_tickets and ticket.handler_code in request.app.org.tickets_skip_opening_email or []">
+        <tal:b tal:switch="not mute_all and ticket.handler_code in skip">
             <p tal:case="False" i18n:translate>
                 Your request will be processed shortly. To see the state of
                 your process your may return to this page at any time.

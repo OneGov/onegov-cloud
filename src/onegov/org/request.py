@@ -46,4 +46,4 @@ class OrgRequest(CoreRequest):
             User.created).first()
 
     def auto_accept(self, ticket):
-        return ticket.handler_code in self.app.org.ticket_auto_accepts
+        return ticket.handler_code in (self.app.org.ticket_auto_accepts or [])
