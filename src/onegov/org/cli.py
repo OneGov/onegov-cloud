@@ -1185,18 +1185,18 @@ def fetch(group_context, source, tag, location, create_tickets,
                     return TicketCollection(local_session).by_handler_id(
                         event_id.hex)
 
-                def close_ticket(ticket):
+                def close_ticket(ticket, user, request):
                     if ticket.state == 'open':
-                        ticket.accept_ticket(local_admin)
+                        ticket.accept_ticket(user)
                         TicketMessage.create(
                             ticket,
-                            helper_request,
+                            request,
                             'opened'
                         )
 
                     TicketMessage.create(
                         ticket,
-                        helper_request,
+                        request,
                         'closed'
                     )
                     ticket.close_ticket()
@@ -1236,7 +1236,7 @@ def fetch(group_context, source, tag, location, create_tickets,
                     ticket = ticket_for_event(event_id)
                     if ticket:
                         if not delete_orphaned_tickets:
-                            close_ticket(ticket)
+                            close_ticket(ticket, local_admin, helper_request)
                         else:
                             messages = MessageCollection(
                                 local_session,

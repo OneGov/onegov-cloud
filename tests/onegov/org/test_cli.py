@@ -235,7 +235,7 @@ def test_fetch_with_state_and_tickets(
     assert all(m.owner == 'admin@example.org' for m in messages)
 
 
-def test_fetch(cfg_path, session_manager):
+def test_fetch(cfg_path, session_manager, test_password):
     runner = CliRunner()
 
     session_manager.ensure_schema_exists('foo-baz')
@@ -266,6 +266,13 @@ def test_fetch(cfg_path, session_manager):
             location=location,
             source=source
         )
+    commit()
+    for entity in ('bar', 'baz', 'qux'):
+        get_session(entity).add(User(
+            username='admin@example.org',
+            password_hash=test_password,
+            role='admin'
+        ))
     commit()
 
     assert get_session('bar').query(Event).count() == 7

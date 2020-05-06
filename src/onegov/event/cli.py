@@ -306,7 +306,8 @@ def import_ical(group_context, ical):
         added, updated, purged = collection.from_ical(ical.read())
         click.secho(
             f"Events successfully imported "
-            f"({added} added, {updated} updated, {purged} deleted)",
+            f"({len(added)} added, {len(updated)} updated, "
+            f"{len(purged)} deleted)",
             fg='green')
 
     return _import_ical
@@ -429,7 +430,8 @@ def import_guidle(group_context, url, tagmap, clear):
 
             click.secho(
                 f"Events successfully imported from '{url}' "
-                f"({added} added, {updated} updated, {purged} deleted)",
+                f"({len(added)} added, {len(updated)} updated, "
+                f"{len(purged)} deleted)",
                 fg='green'
             )
         except Exception as e:
