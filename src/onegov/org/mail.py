@@ -58,11 +58,6 @@ def send_ticket_mail(request, template, subject, receivers, ticket,
         if opened and ticket.handler_code in skip_handler_codes:
             return
 
-        skip_handler_codes = org.tickets_skip_changed_email or []
-        changed = ticket.state == 'pending'
-        if changed and ticket.handler_code in skip_handler_codes:
-            return
-
         if request.current_username in receivers:
             if len(receivers) == 1:
                 return
