@@ -44,10 +44,23 @@ def send_marketing_html_mail(*args, **kwargs):
 
 def send_ticket_mail(request, template, subject, receivers, ticket,
                      content=None, force=False, **kwargs):
-
+    org = request.app.org
     if not force:
 
+        if request.app.org.mute_all_tickets:
+            return
+
         if ticket.muted:
+            return
+
+        skip_handler_codes = org.tickets_mute_mails_for_states or []
+        opened = ticket.state == 'open'
+        if opened and ticket.handler_code in skip_handler_codes:
+            return
+
+        skip_handler_codes = org.tickets_skip_changed_email or []
+        changed = ticket.state == 'pending'
+        if changed and ticket.handler_code in skip_handler_codes:
             return
 
         if request.current_username in receivers:
