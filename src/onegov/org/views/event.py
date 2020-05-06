@@ -186,7 +186,7 @@ def view_event(self, request):
                 close_ticket(ticket, request.first_admin_available, request)
                 request.view(self, name='publish')
             except Exception:
-                request.warning(_("Your event could not be "
+                request.warning(_("Your request could not be "
                                   "accepted automatically!"))
 
         send_ticket_mail(

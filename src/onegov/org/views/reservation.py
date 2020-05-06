@@ -442,7 +442,7 @@ def finalize_reservation(self, request):
                 close_ticket(ticket, request.first_admin_available, request)
                 request.view(reservations[0], name='accept')
             except Exception:
-                request.warning(_("Your reservation could not be "
+                request.warning(_("Your request could not be "
                                   "accepted automatically!"))
         send_ticket_mail(
             request=request,
