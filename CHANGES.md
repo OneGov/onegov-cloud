@@ -1,8 +1,26 @@
 # Changes
 
+## Release `2020.53`
+
+> commits: **4 / [2d4cd916d4...1f89845b6b](https://github.com/OneGov/onegov-cloud/compare/2d4cd916d4^...1f89845b6b)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.53)](https://buildkite.com/seantis/onegov-cloud)
+
+### Event
+
+🎉 **Adds ticket creation for fetch cli for events**
+
+- Switch to import only published events
+- Flags for state transfer if existing
+- flag to automatically close or delete tickets of purged events
+- Adapted UI for tickets of imported events
+- moves cli to org due to app hierarchy
+
+**`Feature`** | **[VER-1](#VER-1)** | **[1f89845b6b](https://github.com/onegov/onegov-cloud/commit/1f89845b6bda80cb83712dad5a377072c2880afb)**
+
 ## Release `2020.52`
 
-> commits: **2 / [30dd5086f9...2f43f43559](https://github.com/OneGov/onegov-cloud/compare/30dd5086f9^...2f43f43559)**<br>
+> released: **2020-05-05 08:28**<br>
+> commits: **3 / [30dd5086f9...e7545454a7](https://github.com/OneGov/onegov-cloud/compare/30dd5086f9^...e7545454a7)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.52)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
