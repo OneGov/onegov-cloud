@@ -39,3 +39,11 @@ class OrgRequest(CoreRequest):
         if self.identity:
             return self.session.query(User) \
                 .filter_by(username=self.identity.userid).first()
+
+    @cached_property
+    def first_admin_available(self):
+        return self.session.query(User).filter_by(role='admin').order_by(
+            User.created).first()
+
+    def auto_accept(self, ticket):
+        return ticket.handler_code in (self.app.org.ticket_auto_accepts or [])

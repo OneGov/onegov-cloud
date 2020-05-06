@@ -19,6 +19,7 @@ from wtforms import validators
 from wtforms.fields.html5 import EmailField, URLField
 from wtforms_components import ColorField
 
+from onegov.ticket import handlers
 
 ERROR_LINE_RE = re.compile(r'line ([0-9]+)')
 
@@ -548,3 +549,26 @@ class HolidaySettingsForm(Form):
     def process_obj(self, model):
         super().process_obj(model)
         self.holiday_settings = model.holiday_settings
+
+
+class OrgTicketSettingsForm(Form):
+    ticket_auto_accepts = MultiCheckboxField(
+        label=_("Accept request and close ticket automatically "
+                "for these ticket categories"),
+        choices=[],
+    )
+
+    tickets_skip_opening_email = MultiCheckboxField(
+        label=_("Block email confirmation when "
+                "this ticket category is opened"),
+        choices=[],
+    )
+
+    mute_all_tickets = BooleanField(
+        label=_("Mute all tickets")
+    )
+
+    def on_request(self):
+        choices = tuple((key, key) for key in handlers.registry.keys())
+        self.ticket_auto_accepts.choices = choices
+        self.tickets_skip_opening_email.choices = choices

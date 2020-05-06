@@ -1021,6 +1021,23 @@ def fix_tags(group_context, dry_run):
     return fixes_german_tags_in_db
 
 
+def close_ticket(ticket, user, request):
+    if ticket.state == 'open':
+        ticket.accept_ticket(user)
+        TicketMessage.create(
+            ticket,
+            request,
+            'opened'
+        )
+
+    TicketMessage.create(
+        ticket,
+        request,
+        'closed'
+    )
+    ticket.close_ticket()
+
+
 @cli.command('fetch')
 @pass_group_context
 @click.option('--source', multiple=True)
@@ -1184,22 +1201,6 @@ def fetch(group_context, source, tag, location, create_tickets,
                 def ticket_for_event(event_id):
                     return TicketCollection(local_session).by_handler_id(
                         event_id.hex)
-
-                def close_ticket(ticket, user, request):
-                    if ticket.state == 'open':
-                        ticket.accept_ticket(user)
-                        TicketMessage.create(
-                            ticket,
-                            request,
-                            'opened'
-                        )
-
-                    TicketMessage.create(
-                        ticket,
-                        request,
-                        'closed'
-                    )
-                    ticket.close_ticket()
 
                 helper_request = Bunch(
                     current_username=local_admin.username,

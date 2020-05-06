@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-05-06 04:22+0200\n"
+"POT-Creation-Date: 2020-05-06 17:22+0200\n"
 "PO-Revision-Date: 2020-03-17 11:04+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1080,6 +1080,17 @@ msgstr "Veuillez renseigner une date par ligne"
 
 msgid "Please enter only day and month"
 msgstr "Veuillez ne renseigner que des jours et des mois"
+
+msgid ""
+"Accept request and close ticket automatically for these ticket categories"
+msgstr ""
+"Accepter la demande et fermer le ticket automatiquement pour ces catégories"
+
+msgid "Block email confirmation when this ticket category is opened"
+msgstr "N'envoyez pas d'e-mail lorsque cette catégorie de billets est ouverte"
+
+msgid "Mute all tickets"
+msgstr "Désactiver tous les emails de statut pour les tickets"
 
 msgid "E-Mail Address"
 msgstr "Adresse e-mail"
@@ -2217,6 +2228,11 @@ msgstr ""
 "présentes sur cette page ont été envoyées à votre adresse e-mail."
 
 msgid ""
+"Your request will be processed shortly. To see the state of your process "
+"your may return to this page at any time."
+msgstr ""
+
+msgid ""
 "Your request has been completed. If you asked for documents to be sent to "
 "your address, they should arrive shortly. If you asked to pick up documents "
 "at the municipality, the are now ready to be picked up."
@@ -2974,7 +2990,8 @@ msgid "Enable E-Mails"
 msgstr "Activer les e-mails"
 
 msgid "E-Mails can not be sent for tickets of imported events"
-msgstr "E-Mails ne peuvent pas être envoyés pour les tickets d'événements importés"
+msgstr ""
+"E-Mails ne peuvent pas être envoyés pour les tickets d'événements importés"
 
 msgid "Send Message"
 msgstr "Envoyer le message"
@@ -2986,7 +3003,8 @@ msgid "Please reopen the ticket to send a message"
 msgstr "Veuillez rouvrir le ticket pour envoyer un message."
 
 msgid "Messages cannot be sent for imported events"
-msgstr "Messages ne peuvent pas être envoyés pour les tickets d'événements importés"
+msgstr ""
+"Messages ne peuvent pas être envoyés pour les tickets d'événements importés"
 
 msgid "${count} received"
 msgstr "${count} reçu(s)"
@@ -3424,6 +3442,9 @@ msgstr ""
 "aux sociétés de la ville sont publiés. Les événements purement commerciaux "
 "ne sont pas publiés. Il n'ont aucuns droits à être publiés et les événements "
 "déjà publiés peuvent être supprimés de la page sans notification ni motif."
+
+msgid "Your request could not be accepted automatically!"
+msgstr "Votre demande n'a pas pu être traitée automatiquement."
 
 msgid "Your ticket has been opened"
 msgstr "Votre ticket a été ouvert"
@@ -3871,6 +3892,17 @@ msgstr "Analytics"
 msgid "Holidays"
 msgstr "Jours fériés"
 
+msgid "Ticket Settings"
+msgstr "Paramètres tickets"
+
+#, python-format
+msgid ""
+"The feature to automatically close tickets and accept their items is "
+"experimental. It works for ${handler_codes}."
+msgstr ""
+"La fonction permettant de fermer automatiquement les tickets et "
+"d'accepter leurs articles est expérimentale. Il fonctionne pour ${handler_codes}."
+
 msgid "No holidays defined"
 msgstr "Aucun jour férié défini"
 
@@ -3955,6 +3987,9 @@ msgstr "Vous avez clôturé ${number} ticket(s)"
 
 msgid "Your ticket has been closed"
 msgstr "Votre ticket a été fermé"
+
+msgid "The submitter email is not available"
+msgstr "L'adresse e-mail de l'expéditeur n'est pas disponible"
 
 msgid "The ticket cannot be re-opened because it's not closed"
 msgstr "Le ticket ne peut pas être réouvert car il n'est pas clôturé"
