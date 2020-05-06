@@ -1,16 +1,10 @@
 from click.testing import CliRunner
-from datetime import datetime
 from onegov.core.utils import module_path
 from onegov.event.cli import cli
-from onegov.event.collections import EventCollection
-from onegov.event.models import Event
 from os import path
 from pytest import mark
-from transaction import commit
 from unittest.mock import MagicMock
 from unittest.mock import patch
-
-from onegov.ticket import TicketCollection
 
 
 def test_import_ical(cfg_path, temporary_directory):
