@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-05-06 04:22+0200\n"
+"POT-Creation-Date: 2020-05-06 11:00+0200\n"
 "PO-Revision-Date: 2020-04-09 05:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -3302,6 +3302,10 @@ msgstr "Ungültige Adresse oder abgelaufener Link."
 
 msgid "A link was added to the clipboard"
 msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
+
+#, python-format
+msgid "The entry ${name} exists twice"
+msgstr "Der Eintrag ${name} existiert zweimal"
 
 msgid "Added a new directory"
 msgstr "Ein neues Verzeichnis wurde hinzugefügt"
