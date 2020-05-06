@@ -5,6 +5,7 @@ from morepath.request import Response
 from onegov.core.security import Private, Public
 from onegov.event import Event, EventCollection, OccurrenceCollection
 from onegov.org import _, OrgApp
+from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
 from onegov.org.forms import EventForm
 from onegov.org.layout import EventLayout
@@ -179,6 +180,14 @@ def view_event(self, request):
                 handler_code='EVN', handler_id=self.id.hex
             )
             TicketMessage.create(ticket, request, 'opened')
+
+        if request.auto_accept(ticket):
+            try:
+                close_ticket(ticket, request.first_admin_available, request)
+                request.view(self, name='publish')
+            except Exception:
+                request.warning(_("Your event could not be "
+                                  "accepted automatically!"))
 
         send_ticket_mail(
             request=request,
