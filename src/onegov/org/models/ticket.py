@@ -280,6 +280,8 @@ class ReservationHandler(Handler):
 
     @cached_property
     def resource(self):
+        if self.deleted:
+            return None
         query = self.session.query(Resource)
         query = query.filter(Resource.id == self.reservations[0].resource)
 
@@ -318,6 +320,8 @@ class ReservationHandler(Handler):
     @property
     def email(self):
         # the e-mail is the same over all reservations
+        if self.deleted:
+            return self.ticket.snapshot.get('email')
         return self.reservations[0].email
 
     @property

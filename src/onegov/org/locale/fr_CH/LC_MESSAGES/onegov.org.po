@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-04-29 14:29+0200\n"
+"POT-Creation-Date: 2020-04-30 12:29+0200\n"
 "PO-Revision-Date: 2020-03-17 11:04+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -3289,6 +3289,10 @@ msgstr ""
 msgid "A link was added to the clipboard"
 msgstr "Un lien a été ajouté au presse-papiers"
 
+#, python-format
+msgid "The entry ${name} exists twice"
+msgstr "L'entrée ${name} existe deux fois"
+
 msgid "Added a new directory"
 msgstr "Ajout d'un nouveau dossier"
 
@@ -3344,10 +3348,6 @@ msgstr "La colonne ${name} est manquante"
 #, python-format
 msgid "The file ${name} is missing"
 msgstr "Le fichier ${name} est manquante"
-
-#, python-format
-msgid "The entry ${name} exists twice"
-msgstr "L'entrée ${name} existe deux fois"
 
 msgid ""
 "The given file is invalid, does it include a metadata.json with a data.xlsx, "
@@ -3923,6 +3923,9 @@ msgstr "Vous avez clôturé ${number} ticket(s)"
 
 msgid "Your ticket has been closed"
 msgstr "Votre ticket a été fermé"
+
+msgid "The submitter email is not available"
+msgstr "L'adresse e-mail de l'expéditeur n'est pas disponible"
 
 msgid "The ticket cannot be re-opened because it's not closed"
 msgstr "Le ticket ne peut pas être réouvert car il n'est pas clôturé"
