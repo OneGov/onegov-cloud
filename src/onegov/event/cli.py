@@ -24,16 +24,12 @@ from onegov.event.utils import GuidleExportData
 from onegov.file import DepotApp
 from onegov.file.utils import as_fileintent
 from onegov.gis import Coordinates
-from operator import add
-from pathlib import Path
 from pytz import UTC
 from requests import get
 from sedate import as_datetime
 from sedate import replace_timezone
 from sedate import standardize_date
 from sedate import to_timezone
-from sqlalchemy import or_
-from sqlalchemy.dialects.postgresql import array
 from urllib.parse import urlparse
 
 
@@ -310,7 +306,8 @@ def import_ical(group_context, ical):
         added, updated, purged = collection.from_ical(ical.read())
         click.secho(
             f"Events successfully imported "
-            f"({added} added, {updated} updated, {purged} deleted)",
+            f"({len(added)} added, {len(updated)} updated, "
+            f"{len(purged)} deleted)",
             fg='green')
 
     return _import_ical
@@ -433,7 +430,8 @@ def import_guidle(group_context, url, tagmap, clear):
 
             click.secho(
                 f"Events successfully imported from '{url}' "
-                f"({added} added, {updated} updated, {purged} deleted)",
+                f"({len(added)} added, {len(updated)} updated, "
+                f"{len(purged)} deleted)",
                 fg='green'
             )
         except Exception as e:
@@ -441,129 +439,3 @@ def import_guidle(group_context, url, tagmap, clear):
             raise(e)
 
     return _import_guidle
-
-
-@cli.command()
-@pass_group_context
-@click.option('--source', multiple=True)
-@click.option('--tag', multiple=True)
-@click.option('--location', multiple=True)
-def fetch(group_context, source, tag, location):
-    """ Fetches events from other instances.
-
-    Only fetches events from the same namespace which have not been imported
-    themselves.
-
-    Example
-
-        onegov-event --select '/veranstaltungen/zug' fetch \
-            --source menzingen --source steinhausen
-            --tag Sport --tag Konzert
-            --location Zug
-
-    """
-
-    def vector_add(a, b):
-        return list(map(add, a, b))
-
-    if not len(source):
-        abort("Provide at least one source")
-
-    def _fetch(request, app):
-
-        def event_file(reference):
-            # XXX use a proper depot manager for this
-            path = Path(app.depot_storage_path) / reference['path'] / 'file'
-            with open(path):
-                content = BytesIO(path.open('rb').read())
-            return content
-
-        try:
-            result = [0, 0, 0]
-
-            for key in source:
-                remote_schema = '{}-{}'.format(app.namespace, key)
-                local_schema = app.session_manager.current_schema
-                assert remote_schema in app.session_manager.list_schemas()
-
-                app.session_manager.set_current_schema(remote_schema)
-                remote_session = app.session_manager.session()
-                assert remote_session.info['schema'] == remote_schema
-
-                query = remote_session.query(Event)
-                query = query.filter(
-                    or_(
-                        Event.meta['source'].astext.is_(None),
-                        Event.meta['source'].astext == ''
-                    )
-                )
-                if tag:
-                    query = query.filter(Event._tags.has_any(array(tag)))
-                if location:
-                    query = query.filter(
-                        or_(*[
-                            Event.location.op('~')(f'\\y{term}\\y')
-                            for term in location
-                        ])
-                    )
-
-                def remote_events():
-                    for event in query:
-                        event._es_skip = True
-                        yield EventImportItem(
-                            event=Event(
-                                state='initiated',
-                                title=event.title,
-                                start=event.start,
-                                end=event.end,
-                                timezone=event.timezone,
-                                recurrence=event.recurrence,
-                                content=event.content,
-                                location=event.location,
-                                tags=event.tags,
-                                source=f'fetch-{key}-{event.name}',
-                                coordinates=event.coordinates,
-                                organizer=event.organizer,
-                                organizer_email=event.organizer_email,
-                                price=event.price,
-                            ),
-                            image=(
-                                event_file(event.image.reference)
-                                if event.image else None
-                            ),
-                            image_filename=(
-                                event.image.name
-                                if event.image else None
-                            ),
-                            pdf=(
-                                event_file(event.pdf.reference)
-                                if event.pdf else None
-                            ),
-                            pdf_filename=(
-                                event.pdf.name
-                                if event.pdf else None
-                            )
-                        )
-
-                # be sure to switch back to the local schema, lest we
-                # accidentally update things on the remote
-                app.session_manager.set_current_schema(local_schema)
-                local_events = EventCollection(app.session_manager.session())
-
-                result = vector_add(
-                    result,
-                    local_events.from_import(remote_events(), f'fetch-{key}')
-                )
-
-            click.secho(
-                f"Events successfully fetched "
-                f"({result[0]} added, {result[1]} updated, "
-                f"{result[2]} deleted)",
-                fg='green'
-            )
-
-        except Exception as e:
-            log.error("Error fetching events", exc_info=True)
-            raise(e)
-
-    return _fetch

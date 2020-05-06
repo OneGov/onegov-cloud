@@ -17,7 +17,8 @@ from onegov.core import __version__
 from onegov.core.custom import json
 from onegov.core.utils import Bunch
 from onegov.core.utils import module_path
-from onegov.directory import DirectoryEntry
+from onegov.directory import DirectoryEntry, DirectoryCollection, \
+    DirectoryConfiguration
 from onegov.file import FileCollection
 from onegov.form import FormCollection, FormSubmission
 from onegov.gis import Coordinates
@@ -5309,3 +5310,48 @@ def test_zipcode_block(client):
     page.form['email'] = 'info@example.org'
     page.form['plz'] = '0000'
     page.form.submit().follow()
+
+
+def test_bug_semicolons_in_choices_with_filters(client):
+    session = client.app.session()
+    test_label = "A: with semicolon"
+
+    structure = f"""    
+    Name *= ___
+    Choice *= 
+        (x) {test_label}
+        ( ) B
+        ( ) C
+    """
+    DirectoryCollection(session, type='extended').add(
+        title='Choices',
+        structure=structure,
+        configuration=DirectoryConfiguration(
+            title="[Name]",
+            order=["Name"],
+            display={
+                'content': ['Name', 'Choice'],
+                'contact': []
+            },
+            keywords=['Choice']
+        )
+    )
+    session.flush()
+    transaction.commit()
+    client.login_admin()
+    page = client.get('/directories/choices')
+    # Test the counter for the filters
+    assert f'{test_label} (0)' in page
+
+    page = page.click('Eintrag')
+    page.form['name'] = '1'
+    page = page.form.submit().follow()
+    assert 'Ein neuer Verzeichniseintrag wurde hinzugefügt' in page
+
+    page = client.get('/directories/choices')
+    assert f'{test_label} (1)' in page
+
+    # Get the url with the filter
+    url = page.pyquery('.blank-label > a')[0].attrib['href']
+    page = client.get(url)
+    assert 'Choices' in page

@@ -75,18 +75,19 @@ def publish_event(self, request):
 
     session = request.session
     ticket = TicketCollection(session).by_handler_id(self.id.hex)
-
-    send_ticket_mail(
-        request=request,
-        template='mail_event_accepted.pt',
-        subject=_("Your event was accepted"),
-        receivers=(self.meta['submitter_email'], ),
-        ticket=ticket,
-        content={
-            'model': self,
-            'ticket': ticket
-        }
-    )
+    if not self.source:
+        # prevent sending emails for imported events when published via ticket
+        send_ticket_mail(
+            request=request,
+            template='mail_event_accepted.pt',
+            subject=_("Your event was accepted"),
+            receivers=(self.meta['submitter_email'], ),
+            ticket=ticket,
+            content={
+                'model': self,
+                'ticket': ticket
+            }
+        )
 
     EventMessage.create(self, ticket, request, 'published')
 
@@ -256,6 +257,9 @@ def handle_withdraw_event(self, request):
         raise exc.HTTPForbidden()
 
     self.withdraw()
+    tickets = TicketCollection(request.session)
+    ticket = tickets.by_handler_id(self.id.hex)
+    EventMessage.create(self, ticket, request, 'withdrawn')
 
 
 @OrgApp.view(

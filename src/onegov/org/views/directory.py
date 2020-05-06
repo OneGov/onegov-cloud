@@ -235,7 +235,7 @@ def keyword_count(request, collection):
     counts = {}
     for model in request.exclude_invisible(self.without_keywords().query()):
         for entry in model.keywords:
-            field_id, value = entry.split(':')
+            field_id, value = entry.split(':', 1)
             if field_id in fields:
                 f_count = counts.setdefault(field_id, defaultdict(int))
                 f_count[value] += 1

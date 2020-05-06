@@ -32,8 +32,7 @@
 
                     <div class="ticket-submitter-address">
                         <i class="fa fa-fw fa-envelope-o" aria-hidden="true"></i>
-                        <a tal:define="submitter ticket.snapshot.email|handler.email"
-                        href="mailto:${submitter}">${submitter}</a>
+                        <a href="mailto:${submitter}">${submitter}</a>
                     </div>
 
                     <div tal:condition="not:ticket.muted" class="ticket-submitter-notification-status">
@@ -56,25 +55,50 @@
                             No ticket updates by e-mail
                         </span>
 
-                        <a class="button small secondary" href="${request.link(ticket, 'unmute')}">
-                            <i class="fa fa-fw fa-microphone" aria-hidden="true"></i>
-                            <span i18n:translate>Enable E-Mails</span>
-                        </a>
+                        <tal:b condition="not event_source">
+                            <a class="button small secondary" href="${request.link(ticket, 'unmute')}">
+                                <i class="fa fa-fw fa-microphone" aria-hidden="true"></i>
+                                <span i18n:translate>Enable E-Mails</span>
+                            </a>
+                        </tal:b>
+
+                        <tal:b condition="event_source">
+                            <a class="button small secondary confirm disabled"
+                               data-confirm="E-Mails can not be sent for tickets of imported events"
+                                data-confirm-no="Cancel"
+                               i18n:attributes="data-confirm;data-confirm-no"
+                            >
+                                <i class="fa fa-fw fa-microphone" aria-hidden="true"></i>
+                                <span i18n:translate>Enable E-Mails</span>
+
+                            </a>
+                        </tal:b>
                     </div>
 
-                    <tal:b condition="ticket.state != 'closed'">
+                    <tal:b condition="not event_source and ticket.state != 'closed'">
                         <a class="button small primary" href="${request.link(ticket, 'message-to-submitter')}">
                             <i class="fa fa-fw fa-comment-o" aria-hidden="true"></i>
                             <span i18n:translate>Send Message</span>
                         </a>
                     </tal:b>
 
-                    <tal:b condition="ticket.state == 'closed'">
+                    <tal:b condition="not event_source and ticket.state == 'closed'">
                         <a class="button small disabled confirm"
                             data-confirm="Messages cannot be sent when the ticket is closed"
                             data-confirm-extra="Please reopen the ticket to send a message"
                             data-confirm-no="Cancel"
                             i18n:attributes="data-confirm;data-confirm-extra;data-confirm-no">
+
+                            <i class="fa fa-fw fa-comment-o" aria-hidden="true"></i>
+                            <span i18n:translate>Send Message</span>
+                        </a>
+                    </tal:b>
+
+                    <tal:b condition="event_source">
+                        <a class="button small disabled confirm"
+                            data-confirm="Messages cannot be sent for imported events"
+                            data-confirm-no="Cancel"
+                            i18n:attributes="data-confirm;data-confirm-no">
 
                             <i class="fa fa-fw fa-comment-o" aria-hidden="true"></i>
                             <span i18n:translate>Send Message</span>

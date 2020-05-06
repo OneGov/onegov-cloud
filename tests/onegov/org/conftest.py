@@ -1,3 +1,5 @@
+import os
+
 import onegov.ticket
 import transaction
 import pytest
@@ -10,6 +12,31 @@ from onegov.user import User
 from tests.shared import Client as BaseClient
 from tests.shared.utils import create_app
 from pytest_localserver.http import WSGIServer
+from yaml import dump
+
+
+@pytest.fixture(scope='function')
+def cfg_path(postgres_dsn, session_manager, temporary_directory, redis_url):
+    cfg = {
+        'applications': [
+            {
+                'path': '/foo/*',
+                'application': 'onegov.core.Framework',
+                'namespace': 'foo',
+                'configuration': {
+                    'dsn': postgres_dsn,
+                    'redis_url': redis_url
+                }
+            }
+        ]
+    }
+
+    session_manager.ensure_schema_exists('foo-bar')
+
+    cfg_path = os.path.join(temporary_directory, 'onegov.yml')
+    with open(cfg_path, 'w') as f:
+        f.write(dump(cfg))
+    return cfg_path
 
 
 class Client(BaseClient):

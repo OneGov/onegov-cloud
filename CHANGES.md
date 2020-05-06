@@ -1,8 +1,40 @@
 # Changes
 
+## Release `2020.53`
+
+> commits: **4 / [2d4cd916d4...1f89845b6b](https://github.com/OneGov/onegov-cloud/compare/2d4cd916d4^...1f89845b6b)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.53)](https://buildkite.com/seantis/onegov-cloud)
+
+### Event
+
+🎉 **Adds ticket creation for fetch cli for events**
+
+- Switch to import only published events
+- Flags for state transfer if existing
+- flag to automatically close or delete tickets of purged events
+- Adapted UI for tickets of imported events
+- moves cli to org due to app hierarchy
+
+**`Feature`** | **[VER-1](#VER-1)** | **[1f89845b6b](https://github.com/onegov/onegov-cloud/commit/1f89845b6bda80cb83712dad5a377072c2880afb)**
+
+## Release `2020.52`
+
+> released: **2020-05-05 08:28**<br>
+> commits: **3 / [30dd5086f9...e7545454a7](https://github.com/OneGov/onegov-cloud/compare/30dd5086f9^...e7545454a7)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.52)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Adds reservation quota for room resource**
+
+Adds a quota for allocations of Rooms so that multiple reservations per time slot are possible. If the time slot can be booked partially, the quota will be set to 1. Limit edit possiblities for allocations set to `partly_available`. Adds form validation for `EditRoomAllocationForm`.
+
+**`Feature`** | **[30dd5086f9](https://github.com/onegov/onegov-cloud/commit/30dd5086f9315ebbfa9ab6bf30eef8519149a1cc)**
+
 ## Release `2020.51`
 
-> commits: **4 / [d22727d4ae...35094d589a](https://github.com/OneGov/onegov-cloud/compare/d22727d4ae^...35094d589a)**<br>
+> released: **2020-04-30 14:15**<br>
+> commits: **5 / [d22727d4ae...651af27668](https://github.com/OneGov/onegov-cloud/compare/d22727d4ae^...651af27668)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.51)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Electionday
