@@ -13,6 +13,7 @@ from onegov.org.forms import HolidaySettingsForm
 from onegov.org.forms import HomepageSettingsForm
 from onegov.org.forms import MapSettingsForm
 from onegov.org.forms import ModuleSettingsForm
+from onegov.org.forms.settings import OrgTicketSettingsForm
 from onegov.org.layout import DefaultLayout
 from onegov.org.layout import SettingsLayout
 from onegov.org.models import Organisation
@@ -119,6 +120,15 @@ def handle_analytics_settings(self, request, form):
     icon='fa-calendar-o', order=-500)
 def handle_holiday_settings(self, request, form):
     return handle_generic_settings(self, request, form, _("Holidays"))
+
+
+@OrgApp.form(
+    model=Organisation, name='ticket-settings', template='form.pt',
+    permission=Secret, form=OrgTicketSettingsForm,
+    setting=_("Ticket Settings"), order=-950, icon='fa-ticket'
+)
+def handle_ticket_settings(self, request, form):
+    return handle_generic_settings(self, request, form, _("Ticket Settings"))
 
 
 @OrgApp.form(model=Organisation, name='holiday-settings-preview',
