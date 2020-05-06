@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-05-06 14:06+0200\n"
+"POT-Creation-Date: 2020-05-06 17:22+0200\n"
 "PO-Revision-Date: 2020-04-09 05:55+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1081,6 +1081,9 @@ msgstr "Akteptiere und schliesse Ticket automatisch für diese Kategorien"
 
 msgid "Block email confirmation when this ticket category is opened"
 msgstr "Keine Email-Benachrichtung nach Eröffnung dieser Ticket-Kategorie"
+
+msgid "Mute all tickets"
+msgstr "Email-Benachrichtigungen für alle Tickets deaktivieren"
 
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
@@ -3422,6 +3425,9 @@ msgstr ""
 "Veranstaltungen. Es besteht kein Publikationsrecht und bereits publizierte "
 "Veranstaltungen können jederzeit und ohne Angabe von Gründen gelöscht werden."
 
+msgid "Your request could not be accepted automatically!"
+msgstr "Ihre Anfrage konnte nicht automatisch verarbeitet werden!"
+
 msgid "Your ticket has been opened"
 msgstr "Ihr Ticket wurde eröffnet"
 
@@ -3868,6 +3874,14 @@ msgstr "Feiertage"
 msgid "Ticket Settings"
 msgstr "Ticket-Einstellungen"
 
+#, python-format
+msgid ""
+"The feature to automatically close tickets and accept their items is "
+"experimental. It works for ${handler_codes}."
+msgstr ""
+"Die Funktion für das automatische Schliessen der Tickets und das "
+"Akzeptieren ihrer Objekte ist experimentall. Es funktioniert für "
+"${handler_codes}."
 msgid "No holidays defined"
 msgstr "Keine Feiertage definiert"
 
@@ -4025,6 +4039,9 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "Block email confirmation on ticket change"
+#~ msgstr "Keine Email-Benachrichtigung bei Änderung (aus"
 
 #~ msgid "Messages cannot be sent for imported tickets"
 #~ msgstr "Zu importierten Events können keine Nachrichten gesendet werden"

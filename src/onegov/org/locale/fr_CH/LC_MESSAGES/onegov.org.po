@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-05-06 14:06+0200\n"
+"POT-Creation-Date: 2020-05-06 17:22+0200\n"
 "PO-Revision-Date: 2020-03-17 11:04+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1087,8 +1087,10 @@ msgstr ""
 "Accepter la demande et fermer le ticket automatiquement pour ces catégories"
 
 msgid "Block email confirmation when this ticket category is opened"
-msgstr ""
-"N'envoyez pas d'e-mail lorsque cette catégorie de billets est ouverte"
+msgstr "N'envoyez pas d'e-mail lorsque cette catégorie de billets est ouverte"
+
+msgid "Mute all tickets"
+msgstr "Désactiver tous les emails de statut pour les tickets"
 
 msgid "E-Mail Address"
 msgstr "Adresse e-mail"
@@ -3441,6 +3443,9 @@ msgstr ""
 "ne sont pas publiés. Il n'ont aucuns droits à être publiés et les événements "
 "déjà publiés peuvent être supprimés de la page sans notification ni motif."
 
+msgid "Your request could not be accepted automatically!"
+msgstr "Votre demande n'a pas pu être traitée automatiquement."
+
 msgid "Your ticket has been opened"
 msgstr "Votre ticket a été ouvert"
 
@@ -3889,6 +3894,14 @@ msgstr "Jours fériés"
 
 msgid "Ticket Settings"
 msgstr "Paramètres tickets"
+
+#, python-format
+msgid ""
+"The feature to automatically close tickets and accept their items is "
+"experimental. It works for ${handler_codes}."
+msgstr ""
+"La fonction permettant de fermer automatiquement les tickets et "
+"d'accepter leurs articles est expérimentale. Il fonctionne pour ${handler_codes}."
 
 msgid "No holidays defined"
 msgstr "Aucun jour férié défini"

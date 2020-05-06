@@ -564,7 +564,6 @@ class OrgTicketSettingsForm(Form):
         choices=[],
     )
 
-
     mute_all_tickets = BooleanField(
         label=_("Mute all tickets")
     )
