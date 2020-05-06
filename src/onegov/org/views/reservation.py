@@ -83,7 +83,7 @@ def reserve_allocation(self, request):
 
     Does not actually reserve anything, just keeps a list of things to
     reserve later. Though it will still check if the reservation is
-    feasable.
+    feasible.
 
     """
 
@@ -171,8 +171,12 @@ def delete_reservation(self, request):
 
     # this view is public, but only for a limited time
     assert_anonymous_access_only_temporary(resource, self, request)
+    tickets = TicketCollection(request.session)
+    ticket = tickets.by_handler_id(self.token.hex)
 
     try:
+        if ticket:
+            ticket.create_snapshot(request)
         resource.scheduler.remove_reservation(self.token, self.id)
     except LibresError as e:
         message = {
