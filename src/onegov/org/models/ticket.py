@@ -618,7 +618,7 @@ class EventSubmissionHandler(Handler):
                     traits=(
                         Confirm(
                             _("Do you really want to withdraw this event?"),
-                            _("Withdrawing this event can't be undone."),
+                            _("You can re-publish an imported event later."),
                             _("Withdraw event"),
                             _("Cancel")
                         ),

@@ -64,7 +64,7 @@
 
                         <tal:b condition="event_source">
                             <a class="button small secondary confirm disabled"
-                               data-confirm="Messages cannot be sent for imported tickets"
+                               data-confirm="E-Mails can not be sent for tickets of imported events"
                                 data-confirm-no="Cancel"
                                i18n:attributes="data-confirm;data-confirm-no"
                             >
