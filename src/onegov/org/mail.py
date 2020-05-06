@@ -47,13 +47,13 @@ def send_ticket_mail(request, template, subject, receivers, ticket,
     org = request.app.org
     if not force:
 
-        if request.app.org.mute_all_tickets:
+        if org.mute_all_tickets:
             return
 
         if ticket.muted:
             return
 
-        skip_handler_codes = org.tickets_mute_mails_for_states or []
+        skip_handler_codes = org.tickets_skip_opening_email or []
         opened = ticket.state == 'open'
         if opened and ticket.handler_code in skip_handler_codes:
             return
