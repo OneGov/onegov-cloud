@@ -1,8 +1,22 @@
 # Changes
 
+## Release `2020.54`
+
+> commits: **1 / [a588f63b57...a588f63b57](https://github.com/OneGov/onegov-cloud/compare/a588f63b57^...a588f63b57)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.54)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Global settings for the ticket email system (automatic handling)**
+
+Adds Ticket settings to organisation model. Two status emails for tickets can be configured individually. Adds feature to automatically close tickets and accept events (EVN) and reservations (RSV).
+
+**`Feature`** | **[a588f63b57](https://github.com/onegov/onegov-cloud/commit/a588f63b57828a31d11ceb1066fe1b54cacb61b3)**
+
 ## Release `2020.53`
 
-> commits: **4 / [2d4cd916d4...1f89845b6b](https://github.com/OneGov/onegov-cloud/compare/2d4cd916d4^...1f89845b6b)**<br>
+> released: **2020-05-06 10:29**<br>
+> commits: **5 / [2d4cd916d4...dde751266e](https://github.com/OneGov/onegov-cloud/compare/2d4cd916d4^...dde751266e)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.53)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Event
