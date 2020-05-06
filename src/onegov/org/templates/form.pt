@@ -22,6 +22,12 @@
             }[econtext.get('form_width', 'normal')]
         ?>
 
+        <tal:b tal:condition="warning_msg|nothing">
+            <div class="panel callout">
+                <tal:block replace="structure warning_msg" />
+            </div>
+        </tal:b>
+
         <tal:b tal:define="item definition|nothing" tal:condition="item">
             <div class="resource-group blank-label" tal:condition="item.group|nothing">
                 ${item.group}
