@@ -88,8 +88,10 @@ def view_ticket(self, request):
         payment_button = stripe_payment_button(payment, layout)
 
     submitter = handler.deleted and self.snapshot.get('email') or handler.email
-    if handler.source:
-        submitter = handler.import_user
+
+    # case of EventSubmissionHandler for imported events
+    if handler.data.get('source'):
+        submitter = handler.data.get('user', submitter)
 
     return {
         'title': self.number,
@@ -98,7 +100,7 @@ def view_ticket(self, request):
         'summary': summary,
         'deleted': handler.deleted,
         'handler': handler,
-        'event_source': handler.source,
+        'event_source': handler.data.get('source'),
         'submitter': submitter,
         'payment_button': payment_button,
         'counts': counts,
