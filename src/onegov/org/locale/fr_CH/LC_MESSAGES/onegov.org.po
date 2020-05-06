@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-05-06 11:00+0200\n"
+"POT-Creation-Date: 2020-05-06 14:06+0200\n"
 "PO-Revision-Date: 2020-03-17 11:04+0100\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1080,6 +1080,15 @@ msgstr "Veuillez renseigner une date par ligne"
 
 msgid "Please enter only day and month"
 msgstr "Veuillez ne renseigner que des jours et des mois"
+
+msgid ""
+"Accept request and close ticket automatically for these ticket categories"
+msgstr ""
+"Accepter la demande et fermer le ticket automatiquement pour ces catégories"
+
+msgid "Block email confirmation when this ticket category is opened"
+msgstr ""
+"N'envoyez pas d'e-mail lorsque cette catégorie de billets est ouverte"
 
 msgid "E-Mail Address"
 msgstr "Adresse e-mail"
@@ -2215,6 +2224,11 @@ msgstr ""
 "Votre demande va être traitée sous peu. Pour suivre l'état d'avancement, "
 "vous pouvez revenir sur cette page à tout moment. Toutes les informations "
 "présentes sur cette page ont été envoyées à votre adresse e-mail."
+
+msgid ""
+"Your request will be processed shortly. To see the state of your process "
+"your may return to this page at any time."
+msgstr ""
 
 msgid ""
 "Your request has been completed. If you asked for documents to be sent to "
@@ -3872,6 +3886,9 @@ msgstr "Analytics"
 
 msgid "Holidays"
 msgstr "Jours fériés"
+
+msgid "Ticket Settings"
+msgstr "Paramètres tickets"
 
 msgid "No holidays defined"
 msgstr "Aucun jour férié défini"

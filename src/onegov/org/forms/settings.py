@@ -553,16 +553,16 @@ class HolidaySettingsForm(Form):
 
 class OrgTicketSettingsForm(Form):
     ticket_auto_accepts = MultiCheckboxField(
-            label=_("Accept request and close ticket automatically "
-                    "for these ticket categories"),
-            choices=[],
-        )
+        label=_("Accept request and close ticket automatically "
+                "for these ticket categories"),
+        choices=[],
+    )
 
     tickets_skip_opening_email = MultiCheckboxField(
-            label=_("Block email confirmation when "
-                    "this ticket category is opened"),
-            choices=[],
-        )
+        label=_("Block email confirmation when "
+                "this ticket category is opened"),
+        choices=[],
+    )
 
     tickets_skip_changed_email = MultiCheckboxField(
         label=_("Block email confirmation on ticket change"),
