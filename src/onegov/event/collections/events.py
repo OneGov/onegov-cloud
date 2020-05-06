@@ -145,8 +145,8 @@ class EventCollection(Pagination):
         query = self.session.query(Event).filter(Event.id == id)
         return query.first()
 
-    def from_import(self, items, purge=None, publish_immediately=False,
-                    valid_state_transfers=None, published_only=True):
+    def from_import(self, items, purge=None, publish_immediately=True,
+                    valid_state_transfers=None, published_only=False):
         """ Add or updates the given events.
 
         Only updates events which have changed. Uses ``Event.source_updated``
@@ -376,4 +376,4 @@ class EventCollection(Pagination):
                 )
             )
 
-        return self.from_import(items)
+        return self.from_import(items, publish_immediately=True)
