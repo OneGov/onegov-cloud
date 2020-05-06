@@ -9,6 +9,7 @@ from onegov.core.security import Public, Private
 from onegov.form import FormCollection, merge_forms, as_internal_id
 from onegov.org import _, OrgApp
 from onegov.org import utils
+from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
 from onegov.org.forms import ReservationForm
 from onegov.org.layout import ReservationLayout
@@ -423,7 +424,6 @@ def finalize_reservation(self, request):
     else:
         if submission:
             forms.submissions.complete_submission(submission)
-
         with forms.session.no_autoflush:
             ticket = TicketCollection(request.session).open_ticket(
                 handler_code='RSV', handler_id=token
@@ -437,6 +437,13 @@ def finalize_reservation(self, request):
         else:
             form = None
 
+        if request.auto_accept(ticket):
+            try:
+                close_ticket(ticket, request.first_admin_available, request)
+                request.view(reservations[0], name='accept')
+            except Exception:
+                request.warning(_("Your reservation could not be "
+                                  "accepted automatically!"))
         send_ticket_mail(
             request=request,
             template='mail_ticket_opened.pt',
