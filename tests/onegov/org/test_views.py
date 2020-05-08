@@ -37,6 +37,8 @@ from unittest.mock import patch
 from webtest import Upload
 from yubico_client import Yubico
 
+from tests.shared.utils import open_in_browser
+
 
 def encode_map_value(dictionary):
     return b64encode(json.dumps(dictionary).encode('utf-8'))
@@ -2429,6 +2431,45 @@ def test_view_occurrence(client):
         text.startswith('BEGIN:VCALENDAR')
     assert event.click('Alle Termine exportieren').\
         text.startswith('BEGIN:VCALENDAR')
+
+
+def test_submit_event_auto_accept_no_emails(client):
+    client.login_admin()
+    settings = client.get('/ticket-settings')
+    settings.form['ticket_auto_accepts'] = ['EVN']
+    settings.form['tickets_skip_opening_email'] = ['EVN']
+    settings.form['tickets_skip_closing_email'] = ['EVN']
+    settings.form.submit()
+
+    anon = client.spawn()
+
+    form_page = anon.get('/events').click("Veranstaltung melden")
+
+    # Fill out event
+    start_date = date.today() + timedelta(days=1)
+    end_date = start_date + timedelta(days=4)
+    form_page.form['email'] = "test@example.org"
+    form_page.form['title'] = "My Event"
+    form_page.form['location'] = "Location"
+    form_page.form['organizer'] = "The Organizer"
+    form_page.form.set('tags', True, index=0)
+    form_page.form.set('tags', True, index=1)
+    form_page.form['start_date'] = start_date.isoformat()
+    form_page.form['start_time'] = "18:00"
+    form_page.form['end_time'] = "22:00"
+    form_page.form['end_date'] = end_date.isoformat()
+    preview_page = form_page.form.submit().follow()
+    # Submit event
+    confirmation_page = preview_page.form.submit().follow()
+
+    assert 'Ihr Anliegen wurde abgeschlossen' in confirmation_page
+    client.login_editor()
+    page = client.get('/events')
+    assert len(client.app.smtp.outbox) == 0
+    assert page.pyquery('.open-tickets').attr('data-count') == '0'
+    assert page.pyquery('.pending-tickets').attr('data-count') == '0'
+    assert page.pyquery('.closed-tickets').attr('data-count') == '1'
+    assert "My Event" in page
 
 
 def test_submit_event(client):
