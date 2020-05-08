@@ -129,11 +129,10 @@ def handle_holiday_settings(self, request, form):
 )
 def handle_ticket_settings(self, request, form):
     resp = handle_generic_settings(self, request, form, _("Ticket Settings"))
-    # if request.GET:
     if request.method == 'GET':
         resp['warning_msg'] = _(
-            "The feature to automatically close tickets and accept their items "
-            "is experimental. It works for ${handler_codes}.",
+            "The feature to automatically close tickets and accept their items"
+            " is experimental. It works for ${handler_codes}.",
             mapping={'handler_codes': ", ".join(('RSV', 'EVN'))}
         )
     return resp

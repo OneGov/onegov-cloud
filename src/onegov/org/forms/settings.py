@@ -564,6 +564,12 @@ class OrgTicketSettingsForm(Form):
         choices=[],
     )
 
+    tickets_skip_closing_email = MultiCheckboxField(
+        label=_("Block email confirmation when "
+                "this ticket category is closed"),
+        choices=[],
+    )
+
     mute_all_tickets = BooleanField(
         label=_("Mute all tickets")
     )
@@ -572,3 +578,4 @@ class OrgTicketSettingsForm(Form):
         choices = tuple((key, key) for key in handlers.registry.keys())
         self.ticket_auto_accepts.choices = choices
         self.tickets_skip_opening_email.choices = choices
+        self.tickets_skip_closing_email.choices = choices
