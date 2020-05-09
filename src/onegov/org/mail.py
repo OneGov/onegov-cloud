@@ -58,6 +58,9 @@ def send_ticket_mail(request, template, subject, receivers, ticket,
         if opened and ticket.handler_code in skip_handler_codes:
             return
 
+        if opened and request.auto_accept(ticket):
+            return
+
         skip_handler_codes = org.tickets_skip_closing_email or []
         closed = ticket.state == 'closed'
         if closed and ticket.handler_code in skip_handler_codes:
