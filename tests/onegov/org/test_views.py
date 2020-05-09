@@ -1393,6 +1393,50 @@ def test_allocation_holidays(client):
 
 
 @freeze_time("2015-08-28")
+def test_auto_accept_reservations(client):
+    # prepare the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    resource.definition = 'Note = ___'
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
+        whole_day=True,
+        quota=4,
+        quota_limit=4
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    admin_client = client
+    admin_client.login_admin()
+    settings = admin_client.get('/ticket-settings')
+    settings.form['ticket_auto_accepts'] = ['RSV']
+    # Test if with this setting the accept confirmation is still sent
+    settings.form['tickets_skip_closing_email'] = ['RSV']
+    settings.form.submit()
+
+    # create a reservation
+    result = reserve(quota=4, whole_day=True)
+    assert result.json == {'success': True}
+
+    # and fill out the form
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+    formular.form['note'] = 'Foobar'
+
+    page = formular.form.submit().follow().form.submit().follow()
+
+    assert 'Ihr Anliegen wurde abgeschlossen' in page
+    assert 'Die Reservationen wurden angenommen' in page
+    assert len(client.app.smtp.outbox) == 1
+    message = client.app.smtp.outbox[0]
+    assert 'Ihre Reservationen wurden angenommen' in message.get('subject')
+
+
+@freeze_time("2015-08-28")
 def test_reserve_allocation(client):
 
     # prepate the required data
@@ -2433,53 +2477,7 @@ def test_view_occurrence(client):
         text.startswith('BEGIN:VCALENDAR')
 
 
-def test_submit_event_auto_accept_no_emails(client):
-    client.login_admin()
-    settings = client.get('/ticket-settings')
-    settings.form['ticket_auto_accepts'] = ['EVN']
-    settings.form['tickets_skip_opening_email'] = ['EVN']
-    settings.form['tickets_skip_closing_email'] = ['EVN']
-    settings.form.submit()
-
-    anon = client.spawn()
-
-    form_page = anon.get('/events').click("Veranstaltung melden")
-
-    # Fill out event
-    start_date = date.today() + timedelta(days=1)
-    end_date = start_date + timedelta(days=4)
-    form_page.form['email'] = "test@example.org"
-    form_page.form['title'] = "My Event"
-    form_page.form['location'] = "Location"
-    form_page.form['organizer'] = "The Organizer"
-    form_page.form.set('tags', True, index=0)
-    form_page.form.set('tags', True, index=1)
-    form_page.form['start_date'] = start_date.isoformat()
-    form_page.form['start_time'] = "18:00"
-    form_page.form['end_time'] = "22:00"
-    form_page.form['end_date'] = end_date.isoformat()
-    preview_page = form_page.form.submit().follow()
-    # Submit event
-    confirmation_page = preview_page.form.submit().follow()
-
-    assert 'Ihr Anliegen wurde abgeschlossen' in confirmation_page
-    client.login_editor()
-    page = client.get('/events')
-    assert len(client.app.smtp.outbox) == 0
-    assert page.pyquery('.open-tickets').attr('data-count') == '0'
-    assert page.pyquery('.pending-tickets').attr('data-count') == '0'
-    assert page.pyquery('.closed-tickets').attr('data-count') == '1'
-    assert "My Event" in page
-
-
-def test_submit_event(client):
-    form_page = client.get('/events').click("Veranstaltung melden")
-
-    assert "Das Formular enthält Fehler" in form_page.form.submit()
-
-    # Fill out event
-    start_date = date.today() + timedelta(days=1)
-    end_date = start_date + timedelta(days=4)
+def fill_event_form(form_page, start_date, end_date):
     form_page.form['email'] = "test@example.org"
     form_page.form['title'] = "My Ewent"
     form_page.form['description'] = "My event is an event."
@@ -2491,6 +2489,58 @@ def test_submit_event(client):
     form_page.form['start_time'] = "18:00"
     form_page.form['end_time'] = "22:00"
     form_page.form['end_date'] = end_date.isoformat()
+    return form_page
+
+
+@pytest.mark.parametrize('mute,mail_count', [(False, 1), (True, 0)])
+def test_submit_event_auto_accept_no_emails(client, mute, mail_count):
+    client.login_admin()
+    settings = client.get('/ticket-settings')
+    settings.form['ticket_auto_accepts'] = ['EVN']
+
+    start_date = date.today() + timedelta(days=1)
+    end_date = start_date + timedelta(days=4)
+
+    if mute:
+        # this should even mute the accept confirmation email
+        settings.form['mute_all_tickets'] = 'yes'
+    settings.form.submit()
+
+    anon = client.spawn()
+
+    form_page = anon.get('/events').click("Veranstaltung melden")
+
+    # Fill out event
+    form = fill_event_form(form_page, start_date, end_date)
+    preview_page = form_page.form.submit().follow()
+    # Submit event
+    confirmation_page = preview_page.form.submit().follow()
+
+    assert 'Ihr Anliegen wurde abgeschlossen' in confirmation_page
+    client.login_editor()
+    page = client.get('/events')
+
+    assert len(client.app.smtp.outbox) == mail_count
+    if not mute:
+        message = client.app.smtp.outbox[0]
+        assert 'Ihre Veranstaltung wurde angenommen' in message.get('subject')
+
+    assert page.pyquery('.open-tickets').attr('data-count') == '0'
+    assert page.pyquery('.pending-tickets').attr('data-count') == '0'
+    assert page.pyquery('.closed-tickets').attr('data-count') == '1'
+    assert "My Ewent" in page
+
+
+def test_submit_event(client):
+    form_page = client.get('/events').click("Veranstaltung melden")
+
+    assert "Das Formular enthält Fehler" in form_page.form.submit()
+
+    start_date = date.today() + timedelta(days=1)
+    end_date = start_date + timedelta(days=4)
+
+    # Fill out event
+    form_page = fill_event_form(form_page, start_date, end_date)
     form_page.form['repeat'] = 'weekly'
     form_page.form.set('weekly', True, index=0)
     form_page.form.set('weekly', True, index=1)
