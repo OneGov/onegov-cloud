@@ -180,6 +180,14 @@ def view_event(self, request):
             )
             TicketMessage.create(ticket, request, 'opened')
 
+        send_ticket_mail(
+            request=request,
+            template='mail_ticket_opened.pt',
+            subject=_("Your ticket has been opened"),
+            receivers=(self.meta['submitter_email'],),
+            ticket=ticket,
+        )
+
         if request.auto_accept(ticket):
             try:
                 ticket.accept_ticket(request.first_admin_available)
