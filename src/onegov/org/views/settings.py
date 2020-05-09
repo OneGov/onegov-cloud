@@ -128,14 +128,7 @@ def handle_holiday_settings(self, request, form):
     setting=_("Ticket Settings"), order=-950, icon='fa-ticket'
 )
 def handle_ticket_settings(self, request, form):
-    resp = handle_generic_settings(self, request, form, _("Ticket Settings"))
-    if request.method == 'GET':
-        resp['warning_msg'] = _(
-            "The feature to automatically close tickets and accept their items"
-            " is experimental. It works for ${handler_codes}.",
-            mapping={'handler_codes': ", ".join(('RSV', 'EVN'))}
-        )
-    return resp
+    return handle_generic_settings(self, request, form, _("Ticket Settings"))
 
 
 @OrgApp.form(model=Organisation, name='holiday-settings-preview',

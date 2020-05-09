@@ -576,6 +576,6 @@ class OrgTicketSettingsForm(Form):
 
     def on_request(self):
         choices = tuple((key, key) for key in handlers.registry.keys())
-        self.ticket_auto_accepts.choices = choices
+        self.ticket_auto_accepts.choices = [('RSV', 'RSV'), ('EVN', 'EVN')]
         self.tickets_skip_opening_email.choices = choices
         self.tickets_skip_closing_email.choices = choices
