@@ -2509,7 +2509,7 @@ def test_submit_event_auto_accept_no_emails(client, mute, mail_count):
     form_page = anon.get('/events').click("Veranstaltung melden")
 
     # Fill out event
-    form = fill_event_form(form_page, start_date, end_date)
+    form_page = fill_event_form(form_page, start_date, end_date)
     preview_page = form_page.form.submit().follow()
     # Submit event
     confirmation_page = preview_page.form.submit().follow()
