@@ -2490,21 +2490,20 @@ def fill_event_form(form_page, start_date, end_date):
     return form_page
 
 
+@pytest.mark.skip('Re-enable if adding EVN to choices in ticket settings form')
 @pytest.mark.parametrize('mute,mail_count', [(False, 1), (True, 0)])
 def test_submit_event_auto_accept_no_emails(client, mute, mail_count):
     client.login_admin()
     settings = client.get('/ticket-settings')
     settings.form['ticket_auto_accepts'] = ['EVN']
-
-    start_date = date.today() + timedelta(days=1)
-    end_date = start_date + timedelta(days=4)
-
     if mute:
         # this should even mute the accept confirmation email
         settings.form['mute_all_tickets'] = 'yes'
     settings.form.submit()
-
     anon = client.spawn()
+
+    start_date = date.today() + timedelta(days=1)
+    end_date = start_date + timedelta(days=4)
 
     form_page = anon.get('/events').click("Veranstaltung melden")
 
