@@ -1414,8 +1414,6 @@ def test_auto_accept_reservations(client):
     admin_client.login_admin()
     settings = admin_client.get('/ticket-settings')
     settings.form['ticket_auto_accepts'] = ['RSV']
-    # Test if with this setting the accept confirmation is still sent
-    settings.form['tickets_skip_closing_email'] = ['RSV']
     settings.form.submit()
 
     # create a reservation
