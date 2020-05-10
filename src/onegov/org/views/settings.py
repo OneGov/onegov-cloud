@@ -128,7 +128,14 @@ def handle_holiday_settings(self, request, form):
     setting=_("Ticket Settings"), order=-950, icon='fa-ticket'
 )
 def handle_ticket_settings(self, request, form):
-    return handle_generic_settings(self, request, form, _("Ticket Settings"))
+    resp = handle_generic_settings(self, request, form, _("Ticket Settings"))
+    if request.method == 'GET':
+        resp['callout'] = _(
+            "Accepting and closing tickets automatically should be used "
+            "with care! This means that anonymous users can influence the "
+            "page content without user interaction of an admin! "
+            "Best activate this setting just for a limited period of time.")
+    return resp
 
 
 @OrgApp.form(model=Organisation, name='holiday-settings-preview',
