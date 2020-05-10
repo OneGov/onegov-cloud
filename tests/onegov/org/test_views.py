@@ -2531,7 +2531,16 @@ def test_submit_event_auto_accept_no_emails(client, mute, mail_count):
     assert "My Ewent" in page
 
 
-def test_submit_event(client):
+@pytest.mark.parametrize('skip_opening_email', [True, False])
+def test_submit_event(client, skip_opening_email):
+
+    if skip_opening_email:
+        client.login_admin()
+        settings = client.get('/ticket-settings')
+        settings.form['tickets_skip_opening_email'] = ['EVN']
+        settings.form.submit()
+        client = client.spawn()
+
     form_page = client.get('/events').click("Veranstaltung melden")
 
     assert "Das Formular enthält Fehler" in form_page.form.submit()
@@ -2581,6 +2590,9 @@ def test_submit_event(client):
 
     # Submit event
     confirmation_page = preview_page.form.submit().follow()
+    if skip_opening_email:
+        assert len(client.app.smtp.outbox) == 0
+        return
 
     assert "Vielen Dank für Ihre Eingabe!" in confirmation_page
     ticket_nr = confirmation_page.pyquery('.ticket-number').text()
