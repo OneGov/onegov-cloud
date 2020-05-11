@@ -437,18 +437,11 @@ def finalize_reservation(self, request):
         else:
             form = None
 
-        if request.auto_accept(ticket):
-            try:
-                close_ticket(ticket, request.first_admin_available, request)
-                request.view(reservations[0], name='accept')
-            except Exception:
-                request.warning(_("Your request could not be "
-                                  "accepted automatically!"))
         send_ticket_mail(
             request=request,
             template='mail_ticket_opened.pt',
             subject=_("Your ticket has been opened"),
-            receivers=(reservations[0].email, ),
+            receivers=(reservations[0].email,),
             ticket=ticket,
             content={
                 'model': ticket,
@@ -456,6 +449,16 @@ def finalize_reservation(self, request):
                 'show_submission': show_submission
             }
         )
+
+        if request.auto_accept(ticket):
+            try:
+                ticket.accept_ticket(request.first_admin_available)
+                request.view(reservations[0], name='accept')
+            except Exception:
+                request.warning(_("Your request could not be "
+                                  "accepted automatically!"))
+            else:
+                close_ticket(ticket, request.first_admin_available, request)
 
         request.success(_("Thank you for your reservation!"))
 

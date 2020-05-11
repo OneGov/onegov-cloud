@@ -74,8 +74,7 @@ def publish_event(self, request):
         'title': self.title
     }))
 
-    session = request.session
-    ticket = TicketCollection(session).by_handler_id(self.id.hex)
+    ticket = TicketCollection(request.session).by_handler_id(self.id.hex)
     if not self.source:
         # prevent sending emails for imported events when published via ticket
         send_ticket_mail(
@@ -181,21 +180,23 @@ def view_event(self, request):
             )
             TicketMessage.create(ticket, request, 'opened')
 
-        if request.auto_accept(ticket):
-            try:
-                close_ticket(ticket, request.first_admin_available, request)
-                request.view(self, name='publish')
-            except Exception:
-                request.warning(_("Your request could not be "
-                                  "accepted automatically!"))
-
         send_ticket_mail(
             request=request,
             template='mail_ticket_opened.pt',
             subject=_("Your ticket has been opened"),
-            receivers=(self.meta['submitter_email'], ),
+            receivers=(self.meta['submitter_email'],),
             ticket=ticket,
         )
+
+        if request.auto_accept(ticket):
+            try:
+                ticket.accept_ticket(request.first_admin_available)
+                request.view(self, name='publish')
+            except Exception:
+                request.warning(_("Your request could not be "
+                                  "accepted automatically!"))
+            else:
+                close_ticket(ticket, request.first_admin_available, request)
 
         request.success(_("Thank you for your submission!"))
 
