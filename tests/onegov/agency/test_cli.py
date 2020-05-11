@@ -1,5 +1,9 @@
+import csv
+
 from click.testing import CliRunner
 from onegov.agency.cli import cli
+from onegov.agency.data_import import with_open, import_bs_data_file
+from onegov.core.csv import CSVFile
 from onegov.core.utils import module_path
 from onegov.org.cli import cli as org_cli
 from onegov.org.models import Organisation
@@ -253,3 +257,18 @@ def test_enable_yubikey(temporary_directory, cfg_path, session_manager):
     assert result.exit_code == 0
     assert "YubiKey disabled" in result.output
     assert session.query(Organisation).one().meta['enable_yubikey'] is False
+
+
+def test_import_bs_data(cfg_path):
+    fp = '/home/lukas/seantis/staka_bs/CSV Dateien/Staatskalender_Export_April_2020_mod.csv'
+    runner = CliRunner()
+
+    result = runner.invoke(org_cli, [
+        '--config', cfg_path,
+        '--select', '/agency/zug',
+        'import-bs-data',
+        '--path', fp
+    ])
+    assert result.exit_code == 0
+
+
