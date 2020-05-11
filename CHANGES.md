@@ -1,8 +1,22 @@
 # Changes
 
+## Release `2020.55`
+
+> commits: **2 / [c04602a89d...8a1988818c](https://github.com/OneGov/onegov-cloud/compare/c04602a89d^...8a1988818c)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.55)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🐞 **Improves ticket email sending**
+
+Minor fixes and tests.
+
+**`Bugfix`** | **[8a1988818c](https://github.com/onegov/onegov-cloud/commit/8a1988818cf721543ff17ffd3f8a106914d03fe6)**
+
 ## Release `2020.54`
 
-> commits: **1 / [a588f63b57...a588f63b57](https://github.com/OneGov/onegov-cloud/compare/a588f63b57^...a588f63b57)**<br>
+> released: **2020-05-06 23:32**<br>
+> commits: **2 / [a588f63b57...442c4e9775](https://github.com/OneGov/onegov-cloud/compare/a588f63b57^...442c4e9775)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.54)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
