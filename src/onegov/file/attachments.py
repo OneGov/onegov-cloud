@@ -48,7 +48,6 @@ def limit_and_store_image_size(file, content, content_type):
         except ValueError:
             image.save(content, image.format)
 
-
     # the file size is stored in pixel as string (for browser usage)
     file.size = get_image_size(image)
 

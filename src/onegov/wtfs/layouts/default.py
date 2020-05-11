@@ -1,5 +1,3 @@
-import onegov.core
-
 from cached_property import cached_property
 from datetime import date
 from onegov.core.elements import Link

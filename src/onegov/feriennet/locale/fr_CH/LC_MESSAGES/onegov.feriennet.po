@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-03-23 17:49+0100\n"
+"POT-Creation-Date: 2020-04-30 09:49+0200\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -861,6 +861,9 @@ msgstr "Coût administratif"
 
 msgid "Must specify at least one date"
 msgstr "Vous devez saisir au moins une date"
+
+msgid "Minimum Age must be lower than maximum age"
+msgstr "L'age minimum doit ètre inférieur à l'âge maximum"
 
 msgid "Cannot adjust period, there are bookings linked to this occassion"
 msgstr ""
@@ -1754,17 +1757,6 @@ msgstr "Appeler ${name}"
 msgid "Passport"
 msgstr "Passeport"
 
-msgid "An commitment by Rega:"
-msgstr ""
-
-msgid ""
-"Register your child for a Rega patronage free of charge during holiday "
-"activities."
-msgstr ""
-
-msgid "Registraion and further information"
-msgstr ""
-
 msgid "We thank you for your support!"
 msgstr "Nous vous remercions pour votre soutien!"
 
@@ -2517,12 +2509,18 @@ msgstr "Voulez-vous vraiment rembourser ${montant} ?"
 msgid "Refund ${amount}"
 msgstr "Rembourser ${montant}"
 
+msgid "Could not import payments. Check your import data."
+msgstr "Aucun paiement n'a pu être importé. Vérifiez vos données importées."
+
 #, python-format
 msgid "Imported ${count} payments"
 msgstr "${count} paiements importés"
 
 msgid "No payments could be imported"
 msgstr "Aucun paiement n'a pu être importé"
+
+msgid "The submitted xml data could not be decoded"
+msgstr "Les données xml soumises n'ont pas pu être décodées"
 
 msgid "No transactions were found in the given file"
 msgstr "Aucune transaction n'a été trouvée dans le fichier donné"
@@ -2660,6 +2658,12 @@ msgstr "Votre don a été supprimé"
 
 msgid "This donation has already been paid"
 msgstr "Ce don a déjà été payé"
+
+msgid "Can not do matchings for an inactive period"
+msgstr "L'attribution n'est pass possible en cas d'une période inactive"
+
+msgid "Can not do matchings for an confirmed period"
+msgstr "L'attribution n'est pass possible en cas d'une période confirmée"
 
 msgid "The matching was confirmed successfully"
 msgstr "L'attribution a été confirmé avec succès"

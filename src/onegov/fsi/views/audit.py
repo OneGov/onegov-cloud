@@ -22,6 +22,10 @@ def invite_attendees_for_event(self, request, form):
         data = form.get_useful_data()
         self.course_id = data['course_id']
 
+        if self.course_id and not self.course:
+            request.alert(_("Selected course does not exist"))
+            return request.redirect(request.class_link(AuditCollection))
+
         if request.current_attendee.role != 'editor':
             self.organisation = data['organisation']
 

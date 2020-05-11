@@ -82,7 +82,14 @@ def view_directory_redirect(self, request):
              permission=Secret, form=get_directory_form_class)
 def handle_new_directory(self, request, form):
     if form.submitted(request):
-        directory = self.add_by_form(form, properties=('configuration', ))
+        try:
+            directory = self.add_by_form(form, properties=('configuration', ))
+        except DuplicateEntryError as e:
+            request.alert(_("The entry ${name} exists twice", mapping={
+                'name': e.name
+            }))
+            transaction.abort()
+            return request.redirect(request.link(self))
 
         request.success(_("Added a new directory"))
         return request.redirect(
@@ -228,7 +235,7 @@ def keyword_count(request, collection):
     counts = {}
     for model in request.exclude_invisible(self.without_keywords().query()):
         for entry in model.keywords:
-            field_id, value = entry.split(':')
+            field_id, value = entry.split(':', 1)
             if field_id in fields:
                 f_count = counts.setdefault(field_id, defaultdict(int))
                 f_count[value] += 1

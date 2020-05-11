@@ -5,6 +5,7 @@ from morepath.request import Response
 from onegov.core.security import Private, Public
 from onegov.event import Event, EventCollection, OccurrenceCollection
 from onegov.org import _, OrgApp
+from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
 from onegov.org.forms import EventForm
 from onegov.org.layout import EventLayout
@@ -73,20 +74,20 @@ def publish_event(self, request):
         'title': self.title
     }))
 
-    session = request.session
-    ticket = TicketCollection(session).by_handler_id(self.id.hex)
-
-    send_ticket_mail(
-        request=request,
-        template='mail_event_accepted.pt',
-        subject=_("Your event was accepted"),
-        receivers=(self.meta['submitter_email'], ),
-        ticket=ticket,
-        content={
-            'model': self,
-            'ticket': ticket
-        }
-    )
+    ticket = TicketCollection(request.session).by_handler_id(self.id.hex)
+    if not self.source:
+        # prevent sending emails for imported events when published via ticket
+        send_ticket_mail(
+            request=request,
+            template='mail_event_accepted.pt',
+            subject=_("Your event was accepted"),
+            receivers=(self.meta['submitter_email'], ),
+            ticket=ticket,
+            content={
+                'model': self,
+                'ticket': ticket
+            }
+        )
 
     EventMessage.create(self, ticket, request, 'published')
 
@@ -183,9 +184,19 @@ def view_event(self, request):
             request=request,
             template='mail_ticket_opened.pt',
             subject=_("Your ticket has been opened"),
-            receivers=(self.meta['submitter_email'], ),
+            receivers=(self.meta['submitter_email'],),
             ticket=ticket,
         )
+
+        if request.auto_accept(ticket):
+            try:
+                ticket.accept_ticket(request.first_admin_available)
+                request.view(self, name='publish')
+            except Exception:
+                request.warning(_("Your request could not be "
+                                  "accepted automatically!"))
+            else:
+                close_ticket(ticket, request.first_admin_available, request)
 
         request.success(_("Thank you for your submission!"))
 
@@ -256,6 +267,9 @@ def handle_withdraw_event(self, request):
         raise exc.HTTPForbidden()
 
     self.withdraw()
+    tickets = TicketCollection(request.session)
+    ticket = tickets.by_handler_id(self.id.hex)
+    EventMessage.create(self, ticket, request, 'withdrawn')
 
 
 @OrgApp.view(

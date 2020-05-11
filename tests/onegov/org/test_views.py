@@ -17,7 +17,8 @@ from onegov.core import __version__
 from onegov.core.custom import json
 from onegov.core.utils import Bunch
 from onegov.core.utils import module_path
-from onegov.directory import DirectoryEntry
+from onegov.directory import DirectoryEntry, DirectoryCollection, \
+    DirectoryConfiguration
 from onegov.file import FileCollection
 from onegov.form import FormCollection, FormSubmission
 from onegov.gis import Coordinates
@@ -35,6 +36,8 @@ from sedate import replace_timezone
 from unittest.mock import patch
 from webtest import Upload
 from yubico_client import Yubico
+
+from tests.shared.utils import open_in_browser
 
 
 def encode_map_value(dictionary):
@@ -1390,6 +1393,48 @@ def test_allocation_holidays(client):
 
 
 @freeze_time("2015-08-28")
+def test_auto_accept_reservations(client):
+    # prepare the required data
+    resources = ResourceCollection(client.app.libres_context)
+    resource = resources.by_name('tageskarte')
+    resource.definition = 'Note = ___'
+    scheduler = resource.get_scheduler(client.app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
+        whole_day=True,
+        quota=4,
+        quota_limit=4
+    )
+
+    reserve = client.bound_reserve(allocations[0])
+    transaction.commit()
+
+    admin_client = client
+    admin_client.login_admin()
+    settings = admin_client.get('/ticket-settings')
+    settings.form['ticket_auto_accepts'] = ['RSV']
+    settings.form.submit()
+
+    # create a reservation
+    result = reserve(quota=4, whole_day=True)
+    assert result.json == {'success': True}
+
+    # and fill out the form
+    formular = client.get('/resource/tageskarte/form')
+    formular.form['email'] = 'info@example.org'
+    formular.form['note'] = 'Foobar'
+
+    page = formular.form.submit().follow().form.submit().follow()
+
+    assert 'Ihr Anliegen wurde abgeschlossen' in page
+    assert 'Die Reservationen wurden angenommen' in page
+    assert len(client.app.smtp.outbox) == 1
+    message = client.app.smtp.outbox[0]
+    assert 'Ihre Reservationen wurden angenommen' in message.get('subject')
+
+
+@freeze_time("2015-08-28")
 def test_reserve_allocation(client):
 
     # prepate the required data
@@ -2430,14 +2475,7 @@ def test_view_occurrence(client):
         text.startswith('BEGIN:VCALENDAR')
 
 
-def test_submit_event(client):
-    form_page = client.get('/events').click("Veranstaltung melden")
-
-    assert "Das Formular enthält Fehler" in form_page.form.submit()
-
-    # Fill out event
-    start_date = date.today() + timedelta(days=1)
-    end_date = start_date + timedelta(days=4)
+def fill_event_form(form_page, start_date, end_date):
     form_page.form['email'] = "test@example.org"
     form_page.form['title'] = "My Ewent"
     form_page.form['description'] = "My event is an event."
@@ -2449,6 +2487,66 @@ def test_submit_event(client):
     form_page.form['start_time'] = "18:00"
     form_page.form['end_time'] = "22:00"
     form_page.form['end_date'] = end_date.isoformat()
+    return form_page
+
+
+@pytest.mark.skip('Re-enable if adding EVN to choices in ticket settings form')
+@pytest.mark.parametrize('mute,mail_count', [(False, 1), (True, 0)])
+def test_submit_event_auto_accept_no_emails(client, mute, mail_count):
+    client.login_admin()
+    settings = client.get('/ticket-settings')
+    settings.form['ticket_auto_accepts'] = ['EVN']
+    if mute:
+        # this should even mute the accept confirmation email
+        settings.form['mute_all_tickets'] = 'yes'
+    settings.form.submit()
+    anon = client.spawn()
+
+    start_date = date.today() + timedelta(days=1)
+    end_date = start_date + timedelta(days=4)
+
+    form_page = anon.get('/events').click("Veranstaltung melden")
+
+    # Fill out event
+    form_page = fill_event_form(form_page, start_date, end_date)
+    preview_page = form_page.form.submit().follow()
+    # Submit event
+    confirmation_page = preview_page.form.submit().follow()
+
+    assert 'Ihr Anliegen wurde abgeschlossen' in confirmation_page
+    client.login_editor()
+    page = client.get('/events')
+
+    assert len(client.app.smtp.outbox) == mail_count
+    if not mute:
+        message = client.app.smtp.outbox[0]
+        assert 'Ihre Veranstaltung wurde angenommen' in message.get('subject')
+
+    assert page.pyquery('.open-tickets').attr('data-count') == '0'
+    assert page.pyquery('.pending-tickets').attr('data-count') == '0'
+    assert page.pyquery('.closed-tickets').attr('data-count') == '1'
+    assert "My Ewent" in page
+
+
+@pytest.mark.parametrize('skip_opening_email', [True, False])
+def test_submit_event(client, skip_opening_email):
+
+    if skip_opening_email:
+        client.login_admin()
+        settings = client.get('/ticket-settings')
+        settings.form['tickets_skip_opening_email'] = ['EVN']
+        settings.form.submit()
+        client = client.spawn()
+
+    form_page = client.get('/events').click("Veranstaltung melden")
+
+    assert "Das Formular enthält Fehler" in form_page.form.submit()
+
+    start_date = date.today() + timedelta(days=1)
+    end_date = start_date + timedelta(days=4)
+
+    # Fill out event
+    form_page = fill_event_form(form_page, start_date, end_date)
     form_page.form['repeat'] = 'weekly'
     form_page.form.set('weekly', True, index=0)
     form_page.form.set('weekly', True, index=1)
@@ -2489,6 +2587,9 @@ def test_submit_event(client):
 
     # Submit event
     confirmation_page = preview_page.form.submit().follow()
+    if skip_opening_email:
+        assert len(client.app.smtp.outbox) == 0
+        return
 
     assert "Vielen Dank für Ihre Eingabe!" in confirmation_page
     ticket_nr = confirmation_page.pyquery('.ticket-number').text()
@@ -5309,3 +5410,48 @@ def test_zipcode_block(client):
     page.form['email'] = 'info@example.org'
     page.form['plz'] = '0000'
     page.form.submit().follow()
+
+
+def test_bug_semicolons_in_choices_with_filters(client):
+    session = client.app.session()
+    test_label = "A: with semicolon"
+
+    structure = f"""    
+    Name *= ___
+    Choice *= 
+        (x) {test_label}
+        ( ) B
+        ( ) C
+    """
+    DirectoryCollection(session, type='extended').add(
+        title='Choices',
+        structure=structure,
+        configuration=DirectoryConfiguration(
+            title="[Name]",
+            order=["Name"],
+            display={
+                'content': ['Name', 'Choice'],
+                'contact': []
+            },
+            keywords=['Choice']
+        )
+    )
+    session.flush()
+    transaction.commit()
+    client.login_admin()
+    page = client.get('/directories/choices')
+    # Test the counter for the filters
+    assert f'{test_label} (0)' in page
+
+    page = page.click('Eintrag')
+    page.form['name'] = '1'
+    page = page.form.submit().follow()
+    assert 'Ein neuer Verzeichniseintrag wurde hinzugefügt' in page
+
+    page = client.get('/directories/choices')
+    assert f'{test_label} (1)' in page
+
+    # Get the url with the filter
+    url = page.pyquery('.blank-label > a')[0].attrib['href']
+    page = client.get(url)
+    assert 'Choices' in page

@@ -2,7 +2,6 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
 from sqlalchemy import Column, Text, Date, Enum, ForeignKey
-from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 

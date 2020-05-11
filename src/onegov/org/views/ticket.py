@@ -87,6 +87,12 @@ def view_ticket(self, request):
     if payment and payment.source == 'stripe_connect':
         payment_button = stripe_payment_button(payment, layout)
 
+    submitter = handler.deleted and self.snapshot.get('email') or handler.email
+
+    # case of EventSubmissionHandler for imported events
+    if handler.data.get('source'):
+        submitter = handler.data.get('user', submitter)
+
     return {
         'title': self.number,
         'layout': layout,
@@ -94,6 +100,8 @@ def view_ticket(self, request):
         'summary': summary,
         'deleted': handler.deleted,
         'handler': handler,
+        'event_source': handler.data.get('source'),
+        'submitter': submitter,
         'payment_button': payment_button,
         'counts': counts,
         'feed_data': json.dumps(
@@ -188,7 +196,8 @@ def stripe_payment_button(payment, layout):
 
 def send_email_if_enabled(ticket, request, template, subject):
     email = ticket.snapshot.get('email') or ticket.handler.email
-
+    if not email:
+        return True
     send_ticket_mail(
         request=request,
         template=template,
@@ -369,12 +378,14 @@ def close_ticket(self, request):
                 'number': self.number
             }))
 
-            send_email_if_enabled(
+            email_missing = send_email_if_enabled(
                 ticket=self,
                 request=request,
                 template='mail_ticket_closed.pt',
                 subject=_("Your ticket has been closed")
             )
+            if email_missing:
+                request.alert(_("The submitter email is not available"))
 
     return morepath.redirect(
         request.link(TicketCollection(request.session)))
@@ -400,12 +411,14 @@ def reopen_ticket(self, request):
                 'number': self.number
             }))
 
-            send_email_if_enabled(
+            email_missing = send_email_if_enabled(
                 ticket=self,
                 request=request,
                 template='mail_ticket_reopened.pt',
                 subject=_("Your ticket has been reopened")
             )
+            if email_missing:
+                request.alert(_("The submitter email is not available"))
 
     return morepath.redirect(request.link(self))
 
@@ -440,6 +453,10 @@ def unmute_ticket(self, request):
              form=InternalTicketChatMessageForm, template='form.pt')
 def message_to_submitter(self, request, form):
     recipient = self.snapshot.get('email') or self.handler.email
+
+    if not recipient:
+        request.alert(_("The submitter email is not available"))
+        return request.redirect(request.link(self))
 
     if form.submitted(request):
         if self.state == 'closed':

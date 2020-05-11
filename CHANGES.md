@@ -1,8 +1,95 @@
 # Changes
 
+## Release `2020.55`
+
+> commits: **2 / [c04602a89d...8a1988818c](https://github.com/OneGov/onegov-cloud/compare/c04602a89d^...8a1988818c)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.55)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🐞 **Improves ticket email sending**
+
+Minor fixes and tests.
+
+**`Bugfix`** | **[8a1988818c](https://github.com/onegov/onegov-cloud/commit/8a1988818cf721543ff17ffd3f8a106914d03fe6)**
+
+## Release `2020.54`
+
+> released: **2020-05-06 23:32**<br>
+> commits: **2 / [a588f63b57...442c4e9775](https://github.com/OneGov/onegov-cloud/compare/a588f63b57^...442c4e9775)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.54)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Global settings for the ticket email system (automatic handling)**
+
+Adds Ticket settings to organisation model. Two status emails for tickets can be configured individually. Adds feature to automatically close tickets and accept events (EVN) and reservations (RSV).
+
+**`Feature`** | **[a588f63b57](https://github.com/onegov/onegov-cloud/commit/a588f63b57828a31d11ceb1066fe1b54cacb61b3)**
+
+## Release `2020.53`
+
+> released: **2020-05-06 10:29**<br>
+> commits: **5 / [2d4cd916d4...dde751266e](https://github.com/OneGov/onegov-cloud/compare/2d4cd916d4^...dde751266e)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.53)](https://buildkite.com/seantis/onegov-cloud)
+
+### Event
+
+🎉 **Adds ticket creation for fetch cli for events**
+
+- Switch to import only published events
+- Flags for state transfer if existing
+- flag to automatically close or delete tickets of purged events
+- Adapted UI for tickets of imported events
+- moves cli to org due to app hierarchy
+
+**`Feature`** | **[VER-1](#VER-1)** | **[1f89845b6b](https://github.com/onegov/onegov-cloud/commit/1f89845b6bda80cb83712dad5a377072c2880afb)**
+
+## Release `2020.52`
+
+> released: **2020-05-05 08:28**<br>
+> commits: **3 / [30dd5086f9...e7545454a7](https://github.com/OneGov/onegov-cloud/compare/30dd5086f9^...e7545454a7)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.52)](https://buildkite.com/seantis/onegov-cloud)
+
+### Org
+
+🎉 **Adds reservation quota for room resource**
+
+Adds a quota for allocations of Rooms so that multiple reservations per time slot are possible. If the time slot can be booked partially, the quota will be set to 1. Limit edit possiblities for allocations set to `partly_available`. Adds form validation for `EditRoomAllocationForm`.
+
+**`Feature`** | **[30dd5086f9](https://github.com/onegov/onegov-cloud/commit/30dd5086f9315ebbfa9ab6bf30eef8519149a1cc)**
+
+## Release `2020.51`
+
+> released: **2020-04-30 14:15**<br>
+> commits: **5 / [d22727d4ae...651af27668](https://github.com/OneGov/onegov-cloud/compare/d22727d4ae^...651af27668)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.51)](https://buildkite.com/seantis/onegov-cloud)
+
+### Electionday
+
+🐞 **Hides /districts tab for sz for 2020 ongoing**
+
+The districts tab should be hidden for votes if all entities are districts.
+Solves Problem of wrong label "Districts" in a vote with date 2020,
+but results using the entities from 2016.
+
+**`Bugfix`** | **[7de0e43cec](https://github.com/onegov/onegov-cloud/commit/7de0e43cec122dcda5f7615dfafcc37f7dab46d2)**
+
+### Onegov
+
+🐞 **Minor bugfixes and improved form validation**
+
+- changes the lint step to be more rigorous
+- Added additional form validations
+- deactives password reset for fsi application as default
+- adds app.disable_password_reset for org applications
+
+**`Bugfix`** | **[35094d589a](https://github.com/onegov/onegov-cloud/commit/35094d589a225399ddf4bd02a8cda60725f615f5)**
+
 ## Release `2020.50`
 
-> commits: **6 / [41923b358d...aa54ea3d10](https://github.com/OneGov/onegov-cloud/compare/41923b358d^...aa54ea3d10)**<br>
+> released: **2020-04-27 11:01**<br>
+> commits: **7 / [41923b358d...4ff04c134a](https://github.com/OneGov/onegov-cloud/compare/41923b358d^...4ff04c134a)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.50)](https://buildkite.com/seantis/onegov-cloud)
 
 ## Release `2020.49`

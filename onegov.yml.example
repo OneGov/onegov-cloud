@@ -106,6 +106,9 @@ configuration: &global-config
    # For Swissvotes, the Museum für Gestatlung has an api
   mfg_api_token:
 
+  # for org app, disable the password reset view (case the users have their own auth providers)
+  # disable_password_reset: true
+
   # How long a user can fill out a form before we consider it too old
   csrf_time_limit: 3600  # in minutes
 

@@ -295,7 +295,7 @@ class DepotApp(App):
 
         paths = (
             self.signing_services / f'{self.signing_service_id}.yml',
-            self.signing_services / f'__default__.yml',
+            self.signing_services / '__default__.yml',
         )
 
         for path in paths:

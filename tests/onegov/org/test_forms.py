@@ -235,13 +235,42 @@ def test_edit_room_allocation_form():
     form.apply_model(Bunch(
         display_start=lambda: datetime(2015, 1, 1, 12),
         display_end=lambda: datetime(2015, 1, 1, 18),
-        whole_day=False
+        whole_day=False,
+        quota=1
     ))
 
     assert form.dates == (
         datetime(2015, 1, 1, 12, 0),
         datetime(2015, 1, 1, 18, 0)
     )
+
+
+def test_edit_room_allocation_form_whole_day():
+    form = RoomAllocationEditForm(MultiDict([
+        ('date', '2020-01-01'),
+        ('as_whole_day', 'no'),
+        ('per_time_slot', 1),
+        ('start_time', '08:00'),
+        ('end_time', '08:00'),
+    ]))
+    assert form.per_time_slot.data == 1
+    form.request = Bunch(translate=lambda txt: txt, include=lambda src: None)
+    assert not form.validate()
+    assert form.errors == {
+        'start_time': ['Start time before end time']
+    }
+
+    # skip validation if whole day
+    form = RoomAllocationEditForm(MultiDict([
+        ('date', '2020-01-01'),
+        ('as_whole_day', 'yes'),
+        ('per_time_slot', 1),
+        ('start_time', '08:00'),
+        ('end_time', '08:00'),
+    ]))
+
+    assert form.validate()
+    assert not form.errors
 
 
 def test_event_form_update_apply():
@@ -387,3 +416,17 @@ def test_event_form_create_rrule():
     form.end_date.data = date(2015, 6, 10)
     form.weekly.data = ['MO', 'WE', 'FR']
     assert occurrences(form) == [date(2015, 6, day) for day in (3, 5, 8, 10)]
+
+
+@pytest.mark.parametrize('end', ['2015-06-23', '2015-08-23'])
+def test_form_registration_window_form(end):
+    form = FormRegistrationWindowForm(MultiDict([
+        ('start', '2015-08-23'),
+        ('end', end),
+        ('limit_attendees', 'no'),
+        ('waitinglist', 'no'),
+    ]))
+    form.request = Bunch(translate=lambda txt: txt, include=lambda src: None)
+
+    assert not form.validate()
+    assert form.errors == {'end': ['Please use a stop date after the start']}

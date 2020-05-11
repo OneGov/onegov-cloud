@@ -2,8 +2,7 @@ from onegov.core.elements import Link
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.course import CourseCollection
-from onegov.fsi.collections.course_event import CourseEventCollection, \
-    PastCourseEventCollection
+from onegov.fsi.collections.course_event import PastCourseEventCollection
 from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _

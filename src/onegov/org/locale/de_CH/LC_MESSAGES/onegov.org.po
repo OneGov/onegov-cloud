@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-04-09 05:53+0200\n"
-"PO-Revision-Date: 2020-04-09 05:55+0200\n"
+"POT-Creation-Date: 2020-05-10 10:44+0200\n"
+"PO-Revision-Date: 2020-05-10 10:56+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -177,11 +177,20 @@ msgstr "Kann abschnittweise reserviert werden"
 msgid "Options"
 msgstr "Optionen"
 
+msgid "Reservations per time slot"
+msgstr "Maximale Anzahl Reservationen per Zeiteinheit"
+
 msgid "From"
 msgstr "Von"
 
 msgid "Until"
 msgstr "Bis zum"
+
+msgid "Slots per Reservation"
+msgstr "Kontingent per Reservation"
+
+msgid "Start time before end time"
+msgstr "Start-Zeit vor End-Zeit"
 
 msgid "Lead"
 msgstr "Einleitung"
@@ -592,6 +601,9 @@ msgstr "Keine Anmeldungen akzeptieren"
 
 msgid "Advanced"
 msgstr "Erweitert"
+
+msgid "Please use a stop date after the start"
+msgstr "Bitte benutzen sie ein End-Datum, welches vor dem Start-Datum liegt"
 
 #, python-format
 msgid ""
@@ -1062,6 +1074,16 @@ msgstr "Bitte geben Sie ein Datum pro Zeile ein"
 
 msgid "Please enter only day and month"
 msgstr "Bitte geben Sie nur Tag und Monat ein"
+
+msgid ""
+"Accept request and close ticket automatically for these ticket categories"
+msgstr "Akteptiere und schliesse Ticket automatisch für diese Kategorien"
+
+msgid "Block email confirmation when this ticket category is opened"
+msgstr "Keine Email-Benachrichtung nach Eröffnung dieser Ticket-Kategorie"
+
+msgid "Mute all tickets"
+msgstr "Email-Benachrichtigungen für alle Tickets deaktivieren"
 
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
@@ -1709,6 +1731,7 @@ msgstr "Reservation absagen"
 
 #. Used in sentence: "${event} published."
 #. Used in sentence: "${event} deleted."
+#. Used in sentence: "${event} withdrawn."
 #.
 msgid "Event"
 msgstr "Veranstaltung"
@@ -1727,6 +1750,18 @@ msgstr "Möchten Sie diese Veranstaltung wirklich absagen?"
 
 msgid "Rejecting this event can't be undone."
 msgstr "Eine Absage kann nicht rückgängig gemacht werden."
+
+msgid "Withdraw event"
+msgstr "Veranstaltung zurückziehen"
+
+msgid "Do you really want to withdraw this event?"
+msgstr "Wollen sie diese Veranstaltung zurückziehen? "
+
+msgid "You can re-publish an imported event later."
+msgstr "Sie können importierte Veranstaltungen später wieder veröffentlichen."
+
+msgid "Re-publish event"
+msgstr "Veranstaltung wieder veröffentlichen"
 
 msgid "Directory Entry Submissions"
 msgstr "Verzeichniseintrag Eingaben"
@@ -2186,6 +2221,13 @@ msgstr ""
 "dieser Seite wurde an Ihre E-Mail Adresse gesendet."
 
 msgid ""
+"Your request will be processed shortly. To see the state of your process "
+"your may return to this page at any time."
+msgstr ""
+"Ihre Anfrage wird in Kürze bearbeitet. Sie können jederzeit zu dieser Seite "
+"zurückkehren um den Status Ihrer Anfrage abzufragen."
+
+msgid ""
 "Your request has been completed. If you asked for documents to be sent to "
 "your address, they should arrive shortly. If you asked to pick up documents "
 "at the municipality, the are now ready to be picked up."
@@ -2606,6 +2648,10 @@ msgstr "${event} veröffentlicht."
 msgid "${event} deleted."
 msgstr "${event} gelöscht."
 
+#. Canonical text for ${event} is: "Event"
+msgid "${event} withdrawn."
+msgstr "${event} zurückgezogen."
+
 msgid "File signed."
 msgstr "Datei signiert."
 
@@ -2932,6 +2978,9 @@ msgstr "Keine Ticket Updates via E-Mail"
 msgid "Enable E-Mails"
 msgstr "E-Mails aktivieren"
 
+msgid "E-Mails can not be sent for tickets of imported events"
+msgstr "E-mails für Tickets zu importierten Veranstaltungen sind deaktiviert"
+
 msgid "Send Message"
 msgstr "Nachricht senden"
 
@@ -2940,6 +2989,9 @@ msgstr "Zu geschlossenen Tickets können keine Nachrichten versendet werden"
 
 msgid "Please reopen the ticket to send a message"
 msgstr "Bitte öffnen Sie das Ticket wieder um eine Nachricht zu senden"
+
+msgid "Messages cannot be sent for imported events"
+msgstr "Nachrichten für importierte Events sind nicht möglich"
 
 msgid "${count} received"
 msgstr "${count} Empfangen"
@@ -3268,6 +3320,10 @@ msgstr "Ungültige Adresse oder abgelaufener Link."
 msgid "A link was added to the clipboard"
 msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
 
+#, python-format
+msgid "The entry ${name} exists twice"
+msgstr "Der Eintrag ${name} existiert zweimal"
+
 msgid "Added a new directory"
 msgstr "Ein neues Verzeichnis wurde hinzugefügt"
 
@@ -3324,10 +3380,6 @@ msgstr "Die Spalte ${name} fehlt"
 msgid "The file ${name} is missing"
 msgstr "Die Datei ${name} fehlt"
 
-#, python-format
-msgid "The entry ${name} exists twice"
-msgstr "Der Eintrag ${name} existiert zweimal"
-
 msgid ""
 "The given file is invalid, does it include a metadata.json with a data.xlsx, "
 "data.csv, or data.json?"
@@ -3375,6 +3427,9 @@ msgstr ""
 
 msgid "Your ticket has been opened"
 msgstr "Ihr Ticket wurde eröffnet"
+
+msgid "Your request could not be accepted automatically!"
+msgstr "Ihre Anfrage konnte nicht automatisch verarbeitet werden!"
 
 msgid "Thank you for your submission!"
 msgstr "Vielen Dank für Ihre Eingabe!"
@@ -3816,6 +3871,20 @@ msgstr "Web-Statistik"
 msgid "Holidays"
 msgstr "Feiertage"
 
+msgid "Ticket Settings"
+msgstr "Ticket-Einstellungen"
+
+msgid ""
+"Accepting and closing tickets automatically should be used with care! This "
+"means that anonymous users can influence the page content without user "
+"interaction of an admin! Best activate this setting just for a limited "
+"period of time."
+msgstr ""
+"Das automatische Annehmen und Schließen von Tickets ist mit Vorsicht zu "
+"genießen! Das bedeutet, dass anonyme Benutzer den Seiteninhalt ohne "
+"Benutzerinteraktion eines Admins beeinflussen können! Aktivieren Sie diese "
+"Einstellung am besten nur für einen begrenzten Zeitraum."
+
 msgid "No holidays defined"
 msgstr "Keine Feiertage definiert"
 
@@ -3902,6 +3971,9 @@ msgstr "Sie haben das Ticket ${number} abgeschlossen"
 msgid "Your ticket has been closed"
 msgstr "Ihr Ticket wurde geschlossen"
 
+msgid "The submitter email is not available"
+msgstr "Die Email des Antragstellers fehlt"
+
 msgid "The ticket cannot be re-opened because it's not closed"
 msgstr ""
 "Das Ticket kann nicht wieder geöffnet werden da es nicht geschlossen ist"
@@ -3970,6 +4042,20 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid ""
+#~ "The feature to automatically close tickets and accept their items is "
+#~ "experimental. It works for ${handler_codes}."
+#~ msgstr ""
+#~ "Die Funktion für das automatische Schliessen der Tickets und das "
+#~ "Akzeptieren ihrer Objekte ist experimentall. Es funktioniert für "
+#~ "${handler_codes}."
+
+#~ msgid "Block email confirmation on ticket change"
+#~ msgstr "Keine Email-Benachrichtigung bei Änderung (aus"
+
+#~ msgid "Messages cannot be sent for imported tickets"
+#~ msgstr "Zu importierten Events können keine Nachrichten gesendet werden"
 
 #~ msgid "Lecture"
 #~ msgstr "Lesung"

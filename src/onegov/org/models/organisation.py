@@ -93,6 +93,11 @@ class Organisation(Base, TimestampMixin):
     partner_4_url = meta_property()
     partner_4_name = meta_property()
 
+    # Ticket options
+    ticket_auto_accepts = meta_property()
+    tickets_skip_opening_email = meta_property()
+    mute_all_tickets = meta_property()
+
     @property
     def public_identity(self):
         """ The public identity is a globally unique SHA 256 hash of the

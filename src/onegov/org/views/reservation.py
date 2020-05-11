@@ -9,6 +9,7 @@ from onegov.core.security import Public, Private
 from onegov.form import FormCollection, merge_forms, as_internal_id
 from onegov.org import _, OrgApp
 from onegov.org import utils
+from onegov.org.cli import close_ticket
 from onegov.org.elements import Link
 from onegov.org.forms import ReservationForm
 from onegov.org.layout import ReservationLayout
@@ -83,7 +84,7 @@ def reserve_allocation(self, request):
 
     Does not actually reserve anything, just keeps a list of things to
     reserve later. Though it will still check if the reservation is
-    feasable.
+    feasible.
 
     """
 
@@ -171,8 +172,12 @@ def delete_reservation(self, request):
 
     # this view is public, but only for a limited time
     assert_anonymous_access_only_temporary(resource, self, request)
+    tickets = TicketCollection(request.session)
+    ticket = tickets.by_handler_id(self.token.hex)
 
     try:
+        if ticket:
+            ticket.create_snapshot(request)
         resource.scheduler.remove_reservation(self.token, self.id)
     except LibresError as e:
         message = {
@@ -419,7 +424,6 @@ def finalize_reservation(self, request):
     else:
         if submission:
             forms.submissions.complete_submission(submission)
-
         with forms.session.no_autoflush:
             ticket = TicketCollection(request.session).open_ticket(
                 handler_code='RSV', handler_id=token
@@ -437,7 +441,7 @@ def finalize_reservation(self, request):
             request=request,
             template='mail_ticket_opened.pt',
             subject=_("Your ticket has been opened"),
-            receivers=(reservations[0].email, ),
+            receivers=(reservations[0].email,),
             ticket=ticket,
             content={
                 'model': ticket,
@@ -445,6 +449,16 @@ def finalize_reservation(self, request):
                 'show_submission': show_submission
             }
         )
+
+        if request.auto_accept(ticket):
+            try:
+                ticket.accept_ticket(request.first_admin_available)
+                request.view(reservations[0], name='accept')
+            except Exception:
+                request.warning(_("Your request could not be "
+                                  "accepted automatically!"))
+            else:
+                close_ticket(ticket, request.first_admin_available, request)
 
         request.success(_("Thank you for your reservation!"))
 

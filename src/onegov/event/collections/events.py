@@ -1,3 +1,4 @@
+from uuid import uuid4
 from collections import namedtuple
 from datetime import date
 from datetime import datetime
@@ -140,12 +141,12 @@ class EventCollection(Pagination):
         return query.first()
 
     def by_id(self, id):
-        """ Return an event by its id. """
-
+        """ Return an event by its id. Hex representations work as well. """
         query = self.session.query(Event).filter(Event.id == id)
         return query.first()
 
-    def from_import(self, items, purge=None):
+    def from_import(self, items, purge=None, publish_immediately=True,
+                    valid_state_transfers=None, published_only=False):
         """ Add or updates the given events.
 
         Only updates events which have changed. Uses ``Event.source_updated``
@@ -162,6 +163,28 @@ class EventCollection(Pagination):
             Optionally removes all events with the given meta-source-prefix not
             present in the given events.
 
+        :param publish_immediately:
+            Set newly added events to published, else let them be initiated.
+
+        :param allowed_state_transfers:
+            Dict of existing : remote state should be considered when updating.
+
+            Example:
+
+            {'published': 'withdrawn'} would update locally published events
+            if the remote has been withdrawn.
+
+            for any {'valid_state': 'withdrawn'} that lead to an update of
+            the local state, an existing ticket will be close automatically.
+
+            Be aware, that transferring state and creating tickets might lead
+            to inconsistencies. So adjust the script in that case to handle
+            the tickets automatically.
+
+        :param published_only:
+            Do not import unpublished events. Still do not ignore state
+            like withdrawn.
+
         """
 
         if purge:
@@ -169,8 +192,9 @@ class EventCollection(Pagination):
             query = query.filter(Event.meta['source'].astext.startswith(purge))
             purge = set((r.source for r in query))
 
-        added = 0
-        updated = 0
+        added = []
+        updated = []
+        valid_state_transfers = valid_state_transfers or {}
 
         for item in items:
             if isinstance(item, str):
@@ -186,6 +210,9 @@ class EventCollection(Pagination):
                 purge -= set([event.source])
 
             if existing:
+                update_state = valid_state_transfers.get(
+                    existing.state) == event.state
+
                 if existing.source_updated:
                     changed = existing.source_updated != event.source_updated
                 else:
@@ -214,7 +241,6 @@ class EventCollection(Pagination):
                     )
 
                 if changed:
-                    updated += 1
                     state = existing.state  # avoid updating occurrences
                     existing.state = 'initiated'
                     existing.title = event.title
@@ -229,27 +255,38 @@ class EventCollection(Pagination):
                     existing.state = state
                     existing.set_image(item.image, item.image_filename)
                     existing.set_pdf(item.pdf, item.pdf_filename)
+                if update_state:
+                    existing.state = event.state
+
+                if changed or update_state:
+                    updated.append(existing)
 
             else:
-                added += 1
+                if published_only and not event.state == 'published':
+                    continue
+                event.id = uuid4()
                 event.name = self._get_unique_name(event.title)
                 event.state = 'initiated'
                 event.set_image(item.image, item.image_filename)
                 event.set_pdf(item.pdf, item.pdf_filename)
                 self.session.add(event)
-                event.submit()
-                event.publish()
+                if publish_immediately:
+                    event.submit()
+                    event.publish()
+                added.append(event)
 
+        purged_event_ids = []
         if purge:
             query = self.session.query(Event)
             query = query.filter(Event.meta['source'].in_(purge))
             for event in query:
                 event.state = 'withdrawn'  # remove occurrences
+                purged_event_ids.append(event.id)
                 self.session.delete(event)
 
         self.session.flush()
 
-        return added, updated, len(purge) if purge else 0
+        return added, updated, purged_event_ids
 
     def from_ical(self, ical):
         """ Imports the events from an iCalender string.
@@ -339,4 +376,4 @@ class EventCollection(Pagination):
                 )
             )
 
-        return self.from_import(items)
+        return self.from_import(items, publish_immediately=True)
