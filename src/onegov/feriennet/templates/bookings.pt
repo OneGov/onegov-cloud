@@ -272,7 +272,7 @@
 
                                     </div>
                                     <div class="right">
-                                        <img src="${layout.static_file_path('icon/rega.png')}" alt="Rega Logo" height="175" width="151">
+                                        <img src="${layout.static_file_path('icon/rega.png')}" alt="Rega Logo">
                                     </div>
                                 </div>
 
