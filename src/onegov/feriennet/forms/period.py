@@ -290,15 +290,15 @@ class PeriodForm(Form):
 
     @property
     def prebooking(self):
-        return (self.prebooking_start.data, self.prebooking_end.data)
+        return self.prebooking_start.data, self.prebooking_end.data
 
     @property
     def booking(self):
-        return (self.booking_start.data, self.booking_end.data)
+        return self.booking_start.data, self.booking_end.data
 
     @property
     def execution(self):
-        return (self.execution_start.data, self.execution_end.data)
+        return self.execution_start.data, self.execution_end.data
 
     @property
     def is_new(self):
