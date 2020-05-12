@@ -1,7 +1,4 @@
-from base64 import b64encode
-
 from cached_property import cached_property
-from purl import URL
 
 from onegov.activity import Activity, PeriodCollection, Occasion
 from onegov.activity import BookingCollection
