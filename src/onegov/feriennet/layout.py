@@ -139,23 +139,11 @@ class BookingCollectionLayout(DefaultLayout):
     def rega_link(self, attendee, period, grouped_bookings):
         if not any((period, attendee, grouped_bookings)):
             return
-
-        dates = []
-        for state, bookings in grouped_bookings[attendee].items():
-            if state not in ('open', 'accepted'):
-                continue
-            for booking in bookings:
-                for _date in booking.occasion.dates:
-                    dates.append(_date)
-        if not dates:
-            return
-
-        # if self.request.locale == 'de_CH':
-        if self.request.app.org.meta['locales'] == 'fr_CH':
-            return 'https://www.rega.ch/fr/partenariats/' \
-                   'lengagement-de-la-rega-en-faveur-de-pro-juventute'
-        return 'https://www.rega.ch/partner/' \
-               'das-pro-juventute-engagement-der-rega'
+        if self.request.app.org.meta['locales'] == 'de_CH':
+            return 'https://www.rega.ch/partner/' \
+                   'das-pro-juventute-engagement-der-rega'
+        return 'https://www.rega.ch/fr/partenariats/' \
+               'lengagement-de-la-rega-en-faveur-de-pro-juventute'
 
     @cached_property
     def title(self):
