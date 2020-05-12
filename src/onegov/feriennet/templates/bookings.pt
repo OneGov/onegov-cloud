@@ -262,14 +262,17 @@
 
                                     </tal:b>
                                     <div class="rega-widget panel" tal:define="rega_link layout.rega_link(attendee, period, grouped_bookings)" tal:condition="rega_link">
+
                                     <div class="left">
-                                        <img src="${layout.static_file_path('icon/rega.png')}" alt="Rega Logo" height="175" width="151">
+                                        <strong i18n:translate="" class="title">An commitment by Rega:</strong>
+                                        <span>
+                                            <span i18n:translate="">Register your child for a Rega patronage free of charge during holiday activities.</span>
+                                            <a href="${rega_link}" target="_blank" i18n:translate>Register here</a>
+                                        </span>
+
                                     </div>
                                     <div class="right">
-                                        <span i18n:translate="">An commitment by Rega:</span><br>
-                                        <span i18n:translate="">Register your child for a Rega patronage free of charge during holiday activities.</span>
-                                        <a href="${rega_link}" target="_blank" i18n:translate>Registraion and further information</a>
-
+                                        <img src="${layout.static_file_path('icon/rega.png')}" alt="Rega Logo" height="175" width="151">
                                     </div>
                                 </div>
 

@@ -140,8 +140,6 @@ class BookingCollectionLayout(DefaultLayout):
         self.user = user or request.current_user
 
     def rega_link(self, attendee, period, grouped_bookings):
-        base_url = 'https://example.rega.ch'
-        home_page = self.request.link(self.request.app.org)
         if not any((period, attendee, grouped_bookings)):
             return
 
@@ -155,31 +153,12 @@ class BookingCollectionLayout(DefaultLayout):
         if not dates:
             return
 
-        # url = URL(base_url)
-        # for _date in dates:
-        #     url = url.query_param('booked_date', _date.start.date())
-        # url = url.query_param('period_id', period.id)
-        # url = url.query_param('execution_start', period.execution_start)
-        # url = url.query_param('execution_end', period.execution_end)
-        # url = url.query_param('ferienpass_url', home_page)
-        #
-        # url_str = url.as_string()
-        # pure_params = url_str.replace(base_url)
-        # encoded_params = b64encode(pure_params)
-        data = dict(
-            period_id=period.id,
-            execution_start=period.execution_start,
-            execution_end=period.execution_end,
-            ferienpass_url=home_page
-        )
-        url = URL()
-        for key, val in data.items():
-            url = url.query_param(key, val)
-
-        encoded_params = b64encode(bytes(url.as_string(), 'utf-8'))
-        final_url = URL(base_url)
-        final_url = final_url.query_param('data', encoded_params)
-        return final_url.as_string()
+        # if self.request.locale == 'de_CH':
+        if self.request.app.org.meta['locales'] == 'fr_CH':
+            return 'https://www.rega.ch/fr/partenariats/' \
+                   'lengagement-de-la-rega-en-faveur-de-pro-juventute'
+        return 'https://www.rega.ch/partner/' \
+               'das-pro-juventute-engagement-der-rega'
 
     @cached_property
     def title(self):
