@@ -259,8 +259,7 @@
                                     </div>
                                     <div class="no-total-costs" tal:condition="not:show_total"></div>
 
-
-                                    </tal:b>
+                                </tal:b>
                                     <div class="rega-widget panel" tal:define="rega_link layout.rega_link(attendee, period, grouped_bookings)" tal:condition="rega_link">
 
                                     <div class="left">
