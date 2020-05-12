@@ -317,7 +317,8 @@ class PeriodForm(Form):
         if not self.is_new:
             self.confirmable.data = model.confirmable
 
-        if not self.confirmable.data:
+        adjust_defaults = model.booking_start != self.booking_start.data
+        if not self.confirmable.data and not adjust_defaults:
             also_exclude = ('prebooking_start', 'prebooking_end')
         else:
             also_exclude = ()
@@ -459,6 +460,12 @@ class PeriodForm(Form):
 
     def ensure_valid_daterange_periods(self):
         if self.prebooking_start.data and self.prebooking_end.data:
+
+            if self.confirmable.data is False:
+                # Adjust to booking start, as is the default when left empty
+                self.prebooking_start.data = self.booking_start.data
+                self.prebooking_end.data = self.booking_start.data
+
             if self.prebooking_start.data > self.prebooking_end.data:
                 self.prebooking_start.errors.append(_(
                     "Prebooking must start before it ends"))
