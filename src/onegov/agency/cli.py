@@ -21,6 +21,8 @@ from xlrd import open_workbook
 
 
 cli = command_group()
+
+
 @cli.command('import-agencies')
 @click.argument('file', type=click.Path(exists=True))
 @click.option('--clear/--no-clear', default=True)
