@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-05-12 14:12+0200\n"
+"POT-Creation-Date: 2020-05-13 12:39+0200\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1758,15 +1758,17 @@ msgid "Passport"
 msgstr "Passeport"
 
 msgid "An commitment by Rega:"
-msgstr ""
+msgstr "Un engagement de la Rega:"
 
 msgid ""
 "Register your child for a Rega patronage free of charge during holiday "
 "activities."
 msgstr ""
+"Affiliez gratuitement votre enfant à la Rega pour la durée de "
+"toutes les activités de vacances réservées pour 2020."
 
 msgid "Register here"
-msgstr ""
+msgstr "Inscriptions ici"
 
 msgid "We thank you for your support!"
 msgstr "Nous vous remercions pour votre soutien!"
