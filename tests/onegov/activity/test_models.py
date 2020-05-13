@@ -58,7 +58,6 @@ def test_year_age_barrier():
     # turns 8 next year
     occasion_date = date(2017, 6, 1)
     assert age_barrier.is_too_young(birth_day, occasion_date, min_age)
-
     birth_day = date(2014, 1, 1)
     occasion_date = date(2018, 5, 1)
     assert age_barrier.is_too_young(birth_day, occasion_date, 5)
