@@ -1,4 +1,5 @@
 from cached_property import cached_property
+
 from onegov.activity import Activity, PeriodCollection, Occasion
 from onegov.activity import BookingCollection
 from onegov.core.elements import Link, Confirm, Intercooler, Block
@@ -134,6 +135,15 @@ class BookingCollectionLayout(DefaultLayout):
     def __init__(self, model, request, user=None):
         super().__init__(model, request)
         self.user = user or request.current_user
+
+    def rega_link(self, attendee, period, grouped_bookings):
+        if not any((period, attendee, grouped_bookings)):
+            return
+        if self.request.app.org.meta['locales'] == 'de_CH':
+            return 'https://www.rega.ch/partner/' \
+                   'das-pro-juventute-engagement-der-rega'
+        return 'https://www.rega.ch/fr/partenariats/' \
+               'lengagement-de-la-rega-en-faveur-de-pro-juventute'
 
     @cached_property
     def title(self):

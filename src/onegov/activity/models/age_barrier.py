@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import datetime, date
+
 from dateutil import relativedelta
 
 
@@ -52,11 +53,12 @@ class YearAgeBarrier(AgeBarrier, name='year'):
     """ Checks the age by using the year of the start_date and the age.
 
     In German, we would say this is by "Jahrgang".
+    The person must be of that age during the year of the start date.
 
     """
 
     def is_too_young(self, birth_date, start_date, min_age):
-        return (start_date.year - birth_date.year) < min_age
+        return (birth_date.year + min_age) > start_date.year
 
     def is_too_old(self, birth_date, start_date, max_age):
-        return (start_date.year - birth_date.year) > max_age
+        return (birth_date.year + max_age + 1) < start_date.year

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-04-30 09:49+0200\n"
+"POT-Creation-Date: 2020-05-12 14:12+0200\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1757,6 +1757,17 @@ msgstr "Appeler ${name}"
 msgid "Passport"
 msgstr "Passeport"
 
+msgid "An commitment by Rega:"
+msgstr ""
+
+msgid ""
+"Register your child for a Rega patronage free of charge during holiday "
+"activities."
+msgstr ""
+
+msgid "Register here"
+msgstr ""
+
 msgid "We thank you for your support!"
 msgstr "Nous vous remercions pour votre soutien!"
 
@@ -2942,10 +2953,6 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
-
-#~ msgid "Can not do matchings for an unconfirmed period"
-#~ msgstr ""
-#~ "L'attribution n'est pass possible en cas d'une période non-confirmée"
 
 #~ msgid "I know that after confirmation, bills can only be adjusted manually."
 #~ msgstr ""

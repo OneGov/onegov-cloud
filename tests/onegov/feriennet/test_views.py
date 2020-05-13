@@ -2264,28 +2264,16 @@ def test_max_age_year(client, scenario):
         page = client.get('/activity/fishing').click("Anmelden")
         page.form['first_name'] = "Tom"
         page.form['last_name'] = "Sawyer"
+        page.form['birth_date'] = "2006-12-31"
+        page.form['gender'] = 'male'
+        assert "zu alt" in page.form.submit()
+
+        page = client.get('/activity/fishing').click("Anmelden")
+        page.form['first_name'] = "Tom"
+        page.form['last_name'] = "Sawyer"
+
+        # Allow even if child has the max age couple of hours in occasion year
         page.form['birth_date'] = "2007-01-01"
-        page.form['gender'] = 'male'
-        assert "zu alt" in page.form.submit()
-
-        page = client.get('/activity/fishing').click("Anmelden")
-        page.form['first_name'] = "Tom"
-        page.form['last_name'] = "Sawyer"
-        page.form['birth_date'] = "2007-12-31"
-        page.form['gender'] = 'male'
-        assert "zu alt" in page.form.submit()
-
-        page = client.get('/activity/fishing').click("Anmelden")
-        page.form['first_name'] = "Tom"
-        page.form['last_name'] = "Sawyer"
-        page.form['birth_date'] = "2008-01-01"
-        page.form['gender'] = 'male'
-        assert "zu alt" not in page.form.submit()
-
-        page = client.get('/activity/fishing').click("Anmelden")
-        page.form['first_name'] = "Tom"
-        page.form['last_name'] = "Sawyer"
-        page.form['birth_date'] = "2008-12-31"
         page.form['gender'] = 'male'
         assert "zu alt" not in page.form.submit()
 

@@ -10,6 +10,7 @@ from onegov.activity import Attendee
 from onegov.activity import AttendeeCollection
 from onegov.activity import Booking, BookingCollection
 from onegov.activity import Invoice, InvoiceCollection
+from onegov.activity.models.age_barrier import YearAgeBarrier
 from onegov.activity.models.invoice_reference import FeriennetSchema
 from onegov.activity.models.invoice_reference import ESRSchema
 from onegov.activity import Occasion, OccasionDate
@@ -24,6 +25,42 @@ from sqlalchemy.exc import IntegrityError
 from psycopg2.extras import NumericRange
 from pytz import utc
 from uuid import uuid4
+
+
+def test_year_age_barrier():
+
+    age_barrier = YearAgeBarrier()
+
+    birth_day = date(2011, 11, 6)
+    occasion_date = date(2020, 8, 6)
+    max_age = 8
+
+    # person is not yet 9 years old when occasion starts
+    assert not age_barrier.is_too_old(birth_day, occasion_date, max_age)
+
+    # occasion date after his birthday when he turned 9 already
+    occasion_date = date(2020, 12, 1)
+    assert not age_barrier.is_too_old(birth_day, occasion_date, max_age)
+
+    # edge case, be at the max age for some hours during this year
+    birth_day = date(2011, 1, 1)
+    assert not age_barrier.is_too_old(birth_day, occasion_date, max_age)
+
+    # Born a year earlier, he should be too old
+    birth_day = date(2010, 12, 31)
+    assert age_barrier.is_too_old(birth_day, occasion_date, max_age)
+
+    min_age = 8
+    occasion_date = date(2018, 6, 1)
+    # He will turn 8 this year, so he should not be rejected
+    assert not age_barrier.is_too_young(birth_day, occasion_date, min_age)
+
+    # turns 8 next year
+    occasion_date = date(2017, 6, 1)
+    assert age_barrier.is_too_young(birth_day, occasion_date, min_age)
+    birth_day = date(2014, 1, 1)
+    occasion_date = date(2018, 5, 1)
+    assert age_barrier.is_too_young(birth_day, occasion_date, 5)
 
 
 def test_add_activity(session, owner):
