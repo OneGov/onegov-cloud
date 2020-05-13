@@ -216,6 +216,18 @@ class SwissVote(Base, TimestampMixin, AssociatedFiles, ContentMixin):
     posters_yes_imgs = meta_property()
     posters_no_imgs = meta_property()
 
+    def poster_links(self, answer):
+        assert answer in ('yes', 'no')
+        if answer == 'yes':
+            if not self.posters_yes_imgs or not self.posters_yes:
+                return None
+            sources = self.posters_yes.split(' ')
+            return ((url, self.posters_yes_imgs.get(url)) for url in sources)
+        if not self.posters_no_imgs or not self.posters_no:
+            return None
+        sources = self.posters_no.split(' ')
+        return ((url, self.posters_no_imgs.get(url)) for url in sources)
+
     @property
     def title(self):
         if self.session_manager.current_locale == 'fr_CH':
