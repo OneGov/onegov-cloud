@@ -7,11 +7,10 @@ from onegov.core.utils import normalize_for_url
 
 
 def rewrite_without_empty_lines(fp, mod_fp):
-    with open(mod_fp, "w", encoding='iso-8859-1') as ff:
-        writer = csv.writer(ff, delimiter=";")
-        with open(fp, encoding='iso-8859-1') as f:
-            reader = csv.reader(f, delimiter=";")
-            for line in reader:
+    with open(fp, 'r', encoding='iso-8859-1') as f:
+        with open(mod_fp, "w", encoding='iso-8859-1') as ff:
+            writer = csv.writer(ff, delimiter=";")
+            for line in csv.reader(f, delimiter=";"):
                 if not line:
                     continue
                 else:
@@ -27,6 +26,31 @@ def with_open(func):
             return func(file, *args[1:])
     return _read
 
+
+@with_open
+def import_bs_agencies(csvfile, request):
+    session = request.session
+    agencies = {}
+
+    all_lines = list(csvfile.lines)
+
+    for header in csvfile.headers:
+        print(header)
+
+    assert False
+
+
+@with_open
+def import_bs_persons(csvfile, request):
+    session = request.session
+    persons = {}
+
+    all_lines = list(csvfile.lines)
+
+    for header in csvfile.headers:
+        print(header)
+
+    assert False
 
 @with_open
 def import_bs_data_file(csvfile, request):

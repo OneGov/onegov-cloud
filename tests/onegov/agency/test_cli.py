@@ -1,10 +1,10 @@
-import csv
+import os
 
 from click.testing import CliRunner
 from onegov.agency.cli import cli
-from onegov.agency.data_import import with_open, import_bs_data_file
-from onegov.core.csv import CSVFile
-from onegov.core.utils import module_path
+from onegov.agency.data_import import import_bs_agencies, \
+    rewrite_without_empty_lines
+from onegov.core.utils import module_path, Bunch
 from onegov.org.cli import cli as org_cli
 from onegov.org.models import Organisation
 from onegov.people.models import Agency
@@ -15,6 +15,24 @@ from textwrap import dedent
 from textwrap import indent
 from unittest.mock import patch
 
+
+def test_bs_data_import(session):
+    agency_file = '/home/lukas/seantis/staka_bs/CSV Dateien/Basis15-Organisationsstamm_FD.CSV'
+    person_file = '/home/lukas/seantis/staka_bs/CSV Dateien/Basis15-Personenstamm_FD.CSV'
+
+    # with open(agency_file, 'rb') as af:
+    #     data = af.read()
+    #     print(data.find(b'\x00'))
+    #
+    # with open(person_file, 'rb') as af:
+    #     data = af.read()
+    #     print(data.find(b'\x00'))
+
+    # rewrite_without_empty_lines(agency_file, agency_file + '.mod')
+    # rewrite_without_empty_lines(person_file, person_file + '.mod')
+
+    request = Bunch(session=session)
+    results = import_bs_agencies(agency_file, request)
 
 @mark.parametrize("file", [
     module_path('tests.onegov.agency', 'fixtures/export.xls'),
