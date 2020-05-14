@@ -1757,8 +1757,8 @@ msgstr "Appeler ${name}"
 msgid "Passport"
 msgstr "Passeport"
 
-msgid "An commitment by Rega:"
-msgstr "Un engagement de la Rega:"
+msgid "An commitment by Rega"
+msgstr "Un engagement de la Rega"
 
 msgid ""
 "Register your child for a Rega patronage free of charge during holiday "
