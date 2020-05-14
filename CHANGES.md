@@ -1,8 +1,36 @@
 # Changes
 
+## Release `2020.56`
+
+> commits: **6 / [38feae1527...5090c09252](https://github.com/OneGov/onegov-cloud/compare/38feae1527^...5090c09252)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.56)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🎉 **Adds rega widget and bugfixes**
+
+Adds rega banner for rega partnership to /my-bookings
+
+Fixes changing booking start when period was setup without wishing phase (FER-861). Fixes allowing children to book if they were at max age during the year of the occasion (FER-863).
+
+**`Feature`** | **[FER-718](https://issues.seantis.ch/browse/FER-718)** | **[2c8cd1d128](https://github.com/onegov/onegov-cloud/commit/2c8cd1d128888a7ef965fbb696983e0ee8022f3a)**
+
+### Swissvotes
+
+🐞 **Updates poster urls consequently**
+
+Replace all the image url consequently on update. Fixes removing poster url when source was removed
+
+**`Bugfix`** | **[ef626cbfbe](https://github.com/onegov/onegov-cloud/commit/ef626cbfbe619a62622c31bddc1d0c5ccefcdef8)**
+
+🐞 **Changes order of posters ot the one in the dataset**
+
+**`Bugfix`** | **[5090c09252](https://github.com/onegov/onegov-cloud/commit/5090c092528e466acc4488f294078fdb7a2828b5)**
+
 ## Release `2020.55`
 
-> commits: **2 / [c04602a89d...8a1988818c](https://github.com/OneGov/onegov-cloud/compare/c04602a89d^...8a1988818c)**<br>
+> released: **2020-05-11 08:33**<br>
+> commits: **3 / [c04602a89d...c7ec8af976](https://github.com/OneGov/onegov-cloud/compare/c04602a89d^...c7ec8af976)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.55)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Org
@@ -43,7 +71,7 @@ Adds Ticket settings to organisation model. Two status emails for tickets can be
 - Adapted UI for tickets of imported events
 - moves cli to org due to app hierarchy
 
-**`Feature`** | **[VER-1](#VER-1)** | **[1f89845b6b](https://github.com/onegov/onegov-cloud/commit/1f89845b6bda80cb83712dad5a377072c2880afb)**
+**`Feature`** | **[VER-1](https://kanton-zug.atlassian.net/browse/VER-1)** | **[1f89845b6b](https://github.com/onegov/onegov-cloud/commit/1f89845b6bda80cb83712dad5a377072c2880afb)**
 
 ## Release `2020.52`
 

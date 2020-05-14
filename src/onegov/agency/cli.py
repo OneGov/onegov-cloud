@@ -23,13 +23,6 @@ from onegov.agency import log
 
 cli = command_group()
 
-@cli.command(name='import-bs-data', context_settings={'singular': True})
-@click.option('--path', help='Path of file', required=True)
-def import_ims_data_cli(path):
-
-    def execute(request, app):
-        import_bs_data_file(path, request)
-    return execute
 
 @cli.command('import-agencies')
 @click.argument('file', type=click.Path(exists=True))

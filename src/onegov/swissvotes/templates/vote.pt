@@ -309,13 +309,13 @@
                     <tr tal:condition="vote.posters_yes_imgs">
                         <th class="column-30" style="vertical-align: top" i18n:translate="">Campaign material for a Yes</th>
                         <td>
-                            <tal:b metal:use-macro="layout.macros['image_gallery']" tal:define="items vote.posters_yes_imgs.items(); id_suffix 'yes'" />
+                            <tal:b metal:use-macro="layout.macros['image_gallery']" tal:define="items vote.poster_links('yes'); id_suffix 'yes'" />
                         </td>
                     </tr>
                     <tr tal:condition="vote.posters_no_imgs">
                         <th class="column-30" style="vertical-align: top" i18n:translate="">Campaign material for a No</th>
                         <td>
-                            <tal:b metal:use-macro="layout.macros['image_gallery']" tal:define="items vote.posters_no_imgs.items(); id_suffix 'no'" />
+                            <tal:b metal:use-macro="layout.macros['image_gallery']" tal:define="items vote.poster_links('no'); id_suffix 'no'" />
                         </td>
                     </tr>
                     <tr tal:condition="ad_analysis">

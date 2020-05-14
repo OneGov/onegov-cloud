@@ -60,20 +60,10 @@ def fetch_changed(poster_urls, image_urls, api_key,):
                 # it will always be updated, since the url is suffixed with
                 # ;jsessionid... that changes upon every api request
                 updated += 1
-            new_urls[url] = img_url
+        new_urls[url] = img_url
     if new_urls:
         assert any((added != 0, updated != 0))
     return new_urls, added, updated, failed
-
-
-def update_vote_dict(vote, attr, changed):
-    attr_data = getattr(vote, attr)
-    for k, v in changed.items():
-        if k not in attr_data:
-            attr_data[k] = v
-        elif attr_data[k] != v:
-            attr_data[k] = v
-    setattr(vote, attr, attr_data)
 
 
 def update_poster_urls(request):
@@ -89,10 +79,7 @@ def update_poster_urls(request):
         added_total += added
         failed_total += failed
         if changed:
-            if isinstance(vote.posters_yes_imgs, dict):
-                update_vote_dict(vote, 'posters_yes_imgs', changed)
-            else:
-                vote.posters_yes_imgs = changed
+            vote.posters_yes_imgs = changed
 
         changed, added, updated, failed = fetch_changed(
             vote.posters_no, vote.posters_no_imgs, key)
@@ -100,9 +87,6 @@ def update_poster_urls(request):
         added_total += added
         failed_total += failed
         if changed:
-            if isinstance(vote.posters_no_imgs, dict):
-                update_vote_dict(vote, 'posters_no_imgs', changed)
-            else:
-                vote.posters_no_imgs = changed
+            vote.posters_no_imgs = changed
 
     return added_total, updated_total, failed_total
