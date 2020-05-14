@@ -1,8 +1,24 @@
 # Changes
 
+## Release `2020.57`
+
+> commits: **1 / [48e335c296...48e335c296](https://github.com/OneGov/onegov-cloud/compare/48e335c296^...48e335c296)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.57)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🎉 **Minor adjustments Rega Widget**
+
+- remove italic font
+- place logo bottom right aligned with text
+- removes ":" in title
+
+**`Feature`** | **[48e335c296](https://github.com/onegov/onegov-cloud/commit/48e335c29652df7bdd23a24e3e5082835f9303e2)**
+
 ## Release `2020.56`
 
-> commits: **6 / [38feae1527...5090c09252](https://github.com/OneGov/onegov-cloud/compare/38feae1527^...5090c09252)**<br>
+> released: **2020-05-13 15:04**<br>
+> commits: **7 / [38feae1527...94c40f3668](https://github.com/OneGov/onegov-cloud/compare/38feae1527^...94c40f3668)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.56)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
