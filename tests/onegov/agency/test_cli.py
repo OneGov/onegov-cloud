@@ -1,10 +1,9 @@
 import os
 
+import pytest
 from click.testing import CliRunner
 from onegov.agency.cli import cli
-from onegov.agency.data_import import import_bs_agencies, \
-    rewrite_without_empty_lines
-from onegov.core.utils import module_path, Bunch
+from onegov.core.utils import module_path
 from onegov.org.cli import cli as org_cli
 from onegov.org.models import Organisation
 from onegov.people.models import Agency
@@ -16,23 +15,29 @@ from textwrap import indent
 from unittest.mock import patch
 
 
-def test_bs_data_import(session):
-    agency_file = '/home/lukas/seantis/staka_bs/CSV Dateien/Basis15-Organisationsstamm_FD.CSV'
-    person_file = '/home/lukas/seantis/staka_bs/CSV Dateien/Basis15-Personenstamm_FD.CSV'
+@pytest.mark.skip('Provide the files if you want to test this import again')
+def test_bs_data_import(cfg_path, session_manager):
+    runner = CliRunner()
 
-    # with open(agency_file, 'rb') as af:
-    #     data = af.read()
-    #     print(data.find(b'\x00'))
-    #
-    # with open(person_file, 'rb') as af:
-    #     data = af.read()
-    #     print(data.find(b'\x00'))
+    people_file = ""
+    agency_file = ""
 
-    # rewrite_without_empty_lines(agency_file, agency_file + '.mod')
-    # rewrite_without_empty_lines(person_file, person_file + '.mod')
+    result = runner.invoke(org_cli, [
+        '--config', cfg_path,
+        '--select', '/agency/bs',
+        'add', 'Kanton Basel'
+    ])
+    assert result.exit_code == 0
 
-    request = Bunch(session=session)
-    results = import_bs_agencies(agency_file, request)
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/agency/bs',
+        'import-bs-data',
+        agency_file,
+        people_file
+    ])
+    assert result.exit_code == 0
+
 
 @mark.parametrize("file", [
     module_path('tests.onegov.agency', 'fixtures/export.xls'),
