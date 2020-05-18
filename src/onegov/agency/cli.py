@@ -8,6 +8,7 @@ from html5lib.filters.whitespace import Filter as whitespace_filter
 from io import BytesIO
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
+from onegov.agency.data_import import import_bs_data
 from onegov.agency.excel_export import export_person_xlsx
 from onegov.agency.models import ExtendedAgencyMembership
 from onegov.core.cli import command_group
@@ -18,10 +19,31 @@ from onegov.people.collections import PersonCollection
 from requests import get
 from textwrap import indent
 from xlrd import open_workbook
-from onegov.agency.data_import import import_bs_data_file
-from onegov.agency import log
 
 cli = command_group()
+
+
+@cli.command('import-bs-data', context_settings={'singular': True})
+@click.argument('agency-file', type=click.Path(exists=True))
+@click.argument('poeple-file', type=click.Path(exists=True))
+@click.option('--dry-run', is_flag=True, default=False)
+def import_bs_data_files(agency_file, poeple_file, dry_run):
+    """
+    Usage:
+
+        onegov-agency  --select /onegov_agency/bs import-bs-data \
+        $agency_file \
+        $people_file \
+    """
+    def execute(request, app):
+        agencies, people = import_bs_data(agency_file, poeple_file, request)
+        click.secho(f"Imported {len(agencies.keys())} agencies "
+                    f"and {len(people.keys())} persons", fg='green')
+        if dry_run:
+            transaction.abort()
+            click.secho("Aborting transaction", fg='yellow')
+
+    return execute
 
 
 @cli.command('import-agencies')

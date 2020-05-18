@@ -1,93 +1,95 @@
-import csv
-from uuid import uuid4
+from collections import defaultdict
+from datetime import datetime
 
-from onegov.agency.models import ExtendedPerson, ExtendedAgency
+from onegov.agency.collections import ExtendedAgencyCollection, \
+    ExtendedPersonCollection
+from onegov.agency.models import ExtendedAgencyMembership
 from onegov.core.csv import CSVFile
-from onegov.core.utils import normalize_for_url
 
-
-def rewrite_without_empty_lines(fp, mod_fp):
-    with open(fp, 'r', encoding='iso-8859-1') as f:
-        with open(mod_fp, "w", encoding='iso-8859-1') as ff:
-            writer = csv.writer(ff, delimiter=";")
-            for line in csv.reader(f, delimiter=";"):
-                if not line:
-                    continue
-                else:
-                    writer.writerow(line)
 
 def with_open(func):
     def _read(*args):
         with open(args[0], 'rb') as f:
             file = CSVFile(
                 f,
-                encoding='iso-8859-1'
+                encoding='utf-16'
             )
             return func(file, *args[1:])
     return _read
 
 
+def get_agency_portrait(line):
+    portrait = ''
+    if line.postadresse:
+        portrait += line.postadresse
+    if line.offnungszeiten:
+        portrait += f"\nÖffnungszeiten: {line.offnungszeiten}"
+    if line.homepage:
+        portrait += f"\n\n{line.homepage}"
+    portrait = portrait.strip()
+    return portrait and f'<p>{portrait}</p>' or None
+
+
 @with_open
-def import_bs_agencies(csvfile, request):
-    session = request.session
-    agencies = {}
+def import_bs_agencies(csvfile, session):
+    agencies = ExtendedAgencyCollection(session)
+    lines_by_id = {line.basisid: line for line in csvfile.lines}
+    treat_as_root = tuple(
+        line.basisparentid for line in csvfile.lines
+        if line.basisparentid not in lines_by_id.keys()
+    )
+    added_agencies = {}
+    children = defaultdict(list)
+    roots = []
 
-    all_lines = list(csvfile.lines)
+    print('Treated as root agencies: ', ", ".join(treat_as_root))
+    for line in csvfile.lines:
+        parent_id = line.basisparentid or None
+        basisid = line.basisid
+        if parent_id:
+            if parent_id in treat_as_root:
+                parent_id = None
+                roots.append(basisid)
+            children[parent_id].append(basisid)
 
-    for header in csvfile.headers:
-        print(header)
+    def parse_agency(line, parent=None):
+        agency = agencies.add(
+            parent=parent,
+            title=line.bezeichnung,
+            description=line.kurzbezeichnung or None,
+            portrait=get_agency_portrait(line)
+        )
+        added_agencies[line.basisid] = agency
+        return agency
 
-    assert False
+    def add_children(basisid, parent=None):
+        line = lines_by_id[basisid]
+        agency = parse_agency(line, parent=parent)
+        for child_id in children.get(line.basisid, []):
+            add_children(child_id, parent=agency)
+
+    for basisid in roots:
+        add_children(basisid)
+    return added_agencies
 
 
 @with_open
-def import_bs_persons(csvfile, request):
-    session = request.session
+def import_bs_persons(csvfile, agencies, session):
     persons = {}
+    people = ExtendedPersonCollection(session)
 
-    all_lines = list(csvfile.lines)
+    def parse_date(date_string):
+        if not date_string:
+            return None
+        return datetime.strptime(date_string, '%d.%m.%Y').date()
 
-    for header in csvfile.headers:
-        print(header)
-
-    assert False
-
-@with_open
-def import_bs_data_file(csvfile, request):
-    persons = {}
-    agencies = {}
-    memberships = {}
-    session = request.session
-
-    all_lines = list(csvfile.lines)
-
-    for line in all_lines:
-
-        url = line.url1.strip()
-        url2 = line.url2.strip()
-
-        active = line.pers__aktiv == '1' or False
+    def parse_person(line):
         note = ""
         if line.bemerkung:
             note = line.bemerkung
 
-        if url2 and url2 != url:
-            note += f"\n {url2}"
-        if line.amstdauervon:
-            bis = line.amstdauerbis or ''
-            note += f"\nAmtsdauer {line.amstdauervon} - {bis}"
-
-        if line.sprechstunde:
-            note += f"\nSprechstunde: {line.sprechstunde}"
-
-        # first two keywords are the names
-        # keywords just contain information collection from other fields
-        # keywords = line.stichworte.split(";")[2:]
-        # if keywords:
-        #     note += "\n".join(keywords)
-
-        persons.setdefault(line.personid, ExtendedPerson(
-            id=uuid4(),
+        assert line.basisid not in persons
+        person_ = people.add(
             last_name=line.name,
             first_name=line.vorname,
             salutation=line.anrede or None,
@@ -95,31 +97,43 @@ def import_bs_data_file(csvfile, request):
             function=line.funktion or None,
             email=line.email or None,
             phone=line.telextern or None,
-            phone_direct=line.telmobil or None,
-            website=url or None,
+            phone_direct=line.telmobile or None,
+            website=None,
             notes=note or None,
-            born=line.geburtsdatum or None,
-            political_party=line.partei or None,
-            address=line.privatadresse or None,
-            access=line.suchbar == '1' and 'public' or 'secret'
-        ))
-        # agency_active = line.oe_aktiv == '1' or False
-        agency = agencies.setdefault(line.oe_id, ExtendedAgency(
-            title=line.oe_bezeichnung,
-            name=normalize_for_url(line.oe_bezeichnung)
-        ))
-        memberships_by_oe = memberships.setdefault(line.oe_id, set())
-        memberships_by_oe.add(line.personid)
+            born=None,
+            political_party=None,
+            address=None,
+            access='public'
+        )
+        persons[line.basisid] = person_
 
-    session.add_all(persons.values())
-    session.add_all(agencies.values())
-    session.flush()
+        # A person has only one membership
+        if line.basis_orgeinheitid:
+            parent_id = line.basis_orgeinheitid
+            agency = agencies.get(parent_id)
+            if agency:
+                person_.memberships.append(
+                    ExtendedAgencyMembership(
+                        agency_id=agency.id,
+                        title="",
+                        since=parse_date(line.eintrittsdatum),
+                        prefix=None,
+                        addition=None,
+                        note=None,
+                        order_within_agency=0,
+                        order_within_person=0
+                    )
+                )
+            else:
+                print(f'agency id {parent_id} not found in agencies')
 
-    for orig_id, agency in agencies.items():
-        members = memberships[orig_id]
-        for pers_id in members:
-            person = persons[pers_id]
-            agency.add_person(person.id, person.function)
-    #
-    # session.flush()
-    assert False
+    for line in csvfile.lines:
+        parse_person(line)
+    return persons
+
+
+def import_bs_data(agency_file, person_file, request):
+    session = request.session
+    agencies = import_bs_agencies(agency_file, session)
+    persons = import_bs_persons(person_file, agencies, session)
+    return agencies, persons
