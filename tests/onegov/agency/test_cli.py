@@ -19,8 +19,8 @@ from unittest.mock import patch
 def test_bs_data_import(cfg_path, session_manager):
     runner = CliRunner()
 
-    people_file = ""
-    agency_file = ""
+    people_file = "/home/lukas/seantis/staka_bs/CSV/Basis15-Personenstamm_FD_V2.csv"
+    agency_file = "/home/lukas/seantis/staka_bs/CSV/Basis15-Organisationsstamm_FD_V2.csv"
 
     result = runner.invoke(org_cli, [
         '--config', cfg_path,
