@@ -586,19 +586,22 @@ class EventSubmissionHandler(Handler):
                 url=request.return_here(request.link(self.event, 'publish')),
                 attrs={'class': 'accept-link'},
             ))
+        if not self.event:
+            return links
 
-        if self.event:
-            links.append(LinkGroup(_("Advanced"), links=(
-                Link(
-                    text=_('Edit event'),
-                    url=request.return_here(
-                        request.link(self.event, 'edit')
-                    ),
-                    attrs={'class': ('edit-link', 'border')}
-                ),
+        advanced_links = [
+            Link(
+                text=_('Edit event'),
+                url=request.return_here(request.link(self.event, 'edit')),
+                attrs={'class': ('edit-link', 'border')}
+            )]
+
+        if not self.event.source:
+            advanced_links.append(
                 Link(
                     text=_("Reject event"),
-                    url=layout.csrf_protected_url(request.link(self.event)),
+                    url=layout.csrf_protected_url(
+                        request.link(self.event)),
                     attrs={'class': ('delete-link')},
                     traits=(
                         Confirm(
@@ -613,7 +616,10 @@ class EventSubmissionHandler(Handler):
                         )
                     )
                 )
-            ) if not self.event.source else (
+            )
+
+        elif self.event.state in ('published', 'submitted'):
+            advanced_links.append(
                 Link(
                     text=_("Withdraw event"),
                     url=layout.csrf_protected_url(request.link(
@@ -631,14 +637,21 @@ class EventSubmissionHandler(Handler):
                             redirect_after=request.link(self.ticket)
                         )
                     )
-                ) if not self.event.state == 'withdrawn'
-                else Link(
+                )
+            )
+
+        elif self.event.state == 'withdrawn':
+            advanced_links.append(
+                Link(
                     text=_("Re-publish event"),
                     url=request.return_here(
                         request.link(self.event, 'publish')),
                     attrs={'class': 'accept-link'}
-                ),
-            ), right_side=False))
+                )
+            )
+
+        links.append(LinkGroup(_("Advanced"), links=advanced_links,
+                               right_side=False))
 
         return links
 

@@ -2577,7 +2577,7 @@ def test_submit_event(client, skip_opening_email):
             preview_page
 
     # Edit event
-    form_page = preview_page.click("Bearbeiten")
+    form_page = preview_page.click("Bearbeiten", index=0)
     form_page.form['title'] = "My Event"
 
     preview_page = form_page.form.submit().follow()
