@@ -509,7 +509,8 @@ class PeriodForm(Form):
 
     def ensure_no_payment_changes_after_confirmation(self):
         if isinstance(self.model, Period) and self.model.confirmed:
-            preview = Bunch(confirmable=self.model.confirmable)
+            preview = Bunch(confirmable=self.model.confirmable,
+                            booking_start=self.model.booking_start)
             self.populate_obj(preview)
 
             fields = (
