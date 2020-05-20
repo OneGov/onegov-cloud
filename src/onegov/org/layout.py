@@ -18,7 +18,6 @@ from onegov.core.static import StaticFile
 from onegov.core.utils import linkify
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryEntryCollection
-from onegov.directory.models.directory import DirectoryFile
 from onegov.event import OccurrenceCollection
 from onegov.file import File
 from onegov.form import FormCollection, as_internal_id
@@ -402,7 +401,7 @@ class Layout(ChameleonLayout):
         if not field.type == 'UploadField':
             return None
         if field.data.get('data', '').startswith('@'):
-            return self.request.session.query(DirectoryFile).filter_by(
+            return self.request.session.query(File).filter_by(
                 id=field.data['data'].lstrip('@')).first()
 
     @cached_property

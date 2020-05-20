@@ -544,7 +544,7 @@
                     </a>
                     <div tal:define="as_thumbnail 'thumbnail' in url|''" tal:condition="allow_views and field.is_image">
                         <img tal:condition="not: as_thumbnail" src="${url}" alt="" />
-                        <div class="photoswipe" tal:condition="as_thumbnail" tal:define="image layout.field_file(field)">
+                        <div class="photoswipe" tal:define="image layout.field_file(field)" tal:condition="image and as_thumbnail">
                             <p class="has-img thumbnail">
                                 <img src="${url}" alt="${image.note}" data-full-width="${image.reference.size[0]}" data-full-height="${image.reference.size[1]}" />
                             </p>
