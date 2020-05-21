@@ -31,8 +31,8 @@ def test_transitions():
 
     with pytest.raises(AssertionError):
         event.submit()
-    with pytest.raises(AssertionError):
-        event.withdraw()
+    # imported events that are submitted should not be deleted but withdrawn
+    event.withdraw()
     event.publish()
     assert event.state == 'published'
 
