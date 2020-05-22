@@ -1,3 +1,4 @@
+import pytest
 import transaction
 
 from datetime import datetime, timedelta, date
@@ -17,28 +18,34 @@ from onegov.feriennet.forms import VacationActivityForm
 from onegov.user import UserCollection
 
 
-def test_period_form(session):
-    # Fixes issue FER-861
-    form = PeriodForm(MultiDict([
-        ('title', 'My Period'),
-        ('confirmable', False),
-        ('finalizable', False),
-        ('booking_start', '2020-02-02'),
-        ('booking_end', '2020-02-11'),
-        ('execution_start', '2020-03-02'),
-        ('execution_end', '2020-03-11'),
+def create_form(session, confirmable, start, delta=timedelta(days=10)):
+    fmt = "%Y-%m-%d"
+    start_ = start
 
-    ]))
+    def iter_start():
+        nonlocal start_
+        start_ += delta
+        return start_.strftime(fmt)
+
+    form = PeriodForm(MultiDict([
+            ('title', 'My Period'),
+            ('confirmable', confirmable),
+            ('finalizable', False),
+            ('prebooking_start', start.strftime(fmt)),
+            ('prebooking_end', iter_start()),
+            ('booking_start', iter_start()),
+            ('booking_end', iter_start()),
+            ('execution_start', iter_start()),
+            ('execution_end', iter_start())
+        ]))
     form.request = Bunch(translate=lambda txt: txt, include=lambda src: None)
     form.model = PeriodCollection(session)
+    return form
 
-    assert form.validate()
-    assert form.confirmable.data is False
-    assert form.finalizable.data is False
-    assert form.prebooking == (None, None)
 
+def add_period_by_form(form, session):
     # add the period like in view name='new'
-    period = PeriodCollection(session).add(
+    return PeriodCollection(session).add(
         title=form.title.data,
         prebooking=form.prebooking,
         booking=form.booking,
@@ -48,23 +55,68 @@ def test_period_form(session):
         finalizable=form.finalizable.data,
         active=False
     )
-    # Test how these columns are filled by default
-    assert period.prebooking_start == period.booking_start
-    assert period.prebooking_end == period.booking_start
 
-    # Generate form from model
-    form.process(obj=period)
-    # Start much earlier, prebooking dates must be adjusted
-    start_before = date(2020, 2, 1)
-    form.booking_start.data = start_before
+def edit_period_by_form(form, period):
+    # simulated the edit view
+    form.model = period
+
+
+@pytest.mark.parametrize('confirmable,start, delta', [
+    (True, date(2020, 4, 1), timedelta(days=10)),
+    (False, date(2020, 4, 1), timedelta(days=10)),
+])
+def test_period_form(session, confirmable, start, delta):
+    # Fixes issue FER-861
+    booking_start = start + 2*delta
+
+    form = create_form(session, confirmable, start, delta)
+    assert form.confirmable.data is confirmable
+
+    assert form.booking_start.data == booking_start
     assert form.validate()
-    assert form.prebooking_start.data == start_before
-    assert form.prebooking_end.data == start_before
+    assert form.booking_start.data == booking_start
 
-    # test flushing result into db
+    period = add_period_by_form(form, session)
+
+    if not confirmable:
+        # The prebooking fields are hidden in the ui, but the user still could
+        # have filled in some dates, so check if the are resetted
+        assert form.prebooking == (None, None)
+        assert period.prebooking_end == booking_start
+        assert period.prebooking_start == booking_start
+
+    # Generate form from model and simulate get request
+    form.model = period
+    assert not form.is_new
+    form.process(obj=period)
+    assert form.prebooking_start.data == start if confirmable else booking_start
+
+    # Start earlier, no intersections
+    new_booking_start = form.booking_start.data
+    form.validate()
+    assert not form.errors
+    if not confirmable:
+        assert form.prebooking_start.data == new_booking_start
+        assert form.prebooking_end.data == new_booking_start
     form.populate_obj(period)
-    assert period.prebooking_start == start_before
     session.flush()
+
+    # Start earlier, adjust prebooking
+    new_booking_start = start - timedelta(days=100)
+    form.booking_start.data = new_booking_start
+    validated = form.validate()
+    if confirmable:
+        assert form.errors
+        return
+
+    assert validated
+    assert form.prebooking_start.data == new_booking_start
+    assert form.prebooking_end.data == new_booking_start
+    form.populate_obj(period)
+    session.flush()
+    assert period.prebooking_start == new_booking_start
+    assert period.prebooking_end == new_booking_start
+
 
 def test_vacation_activity_form(session, test_password):
     users = UserCollection(session)
