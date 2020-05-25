@@ -475,6 +475,9 @@ def test_occasions_form(client, scenario):
             'end': '2016-10-04 12:00:00'
         }]
     })
+    # test submitting empty, form ensurances must cope with missing data
+    occasion.form.submit()
+
     occasion.form['meeting_point'] = "Franz Karl Weber"
     occasion.form['note'] = "No griefers"
     occasion.form['min_age'] = 10
