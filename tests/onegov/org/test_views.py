@@ -19,8 +19,9 @@ from onegov.core.utils import Bunch
 from onegov.core.utils import module_path
 from onegov.directory import DirectoryEntry, DirectoryCollection, \
     DirectoryConfiguration
+from onegov.directory.models.directory import DirectoryFile
 from onegov.file import FileCollection, File
-from onegov.form import FormCollection, FormSubmission
+from onegov.form import FormCollection, FormSubmission, FormFile
 from onegov.gis import Coordinates
 from onegov.newsletter import RecipientCollection, NewsletterCollection
 from onegov.org.theme.org_theme import HELVETICA
@@ -4233,7 +4234,11 @@ def test_directory_submissions(client, postgres):
     accept_url = page.pyquery('.accept-link').attr('ic-post-to')
     client.post(accept_url)
     assert 'Washington' in client.get('/directories/points-of-interest')
-    assert client.app.session().query(File).one().type == 'directory'
+
+    # When accepting the the entry, add a directory file with same reference
+    formfile = client.app.session().query(FormFile).one()
+    dirfile = client.app.session().query(DirectoryFile).one()
+    assert formfile.reference == dirfile.reference
 
     # the description here is a multiline field
     desc = client.app.session().query(DirectoryEntry)\

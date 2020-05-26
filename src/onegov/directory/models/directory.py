@@ -149,9 +149,23 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
 
             for field in self.file_fields:
                 # migrate files during an entry migration
-                if values[field.id] is None or\
-                        isinstance(values[field.id], dict):
+                if isinstance(values[field.id], dict):
+                    file_id = values[field.id]['data'].lstrip('@')
+                    with session.no_autoflush:
+                        f = session.query(File).filter_by(id=file_id).first()
+                        if f and f.type != 'directory':
+                            new = DirectoryFile(
+                                id=random_token(),
+                                name=f.name,
+                                note=f.note,
+                                reference=f.reference
+                            )
+                            entry.files.append(new)
+                            values[field.id].update({'data': f'@{new.id}'})
 
+                    updated[field.id] = values[field.id]
+                    continue
+                if values[field.id] is None:
                     updated[field.id] = values[field.id]
                     continue
 
