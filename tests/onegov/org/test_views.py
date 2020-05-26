@@ -19,7 +19,7 @@ from onegov.core.utils import Bunch
 from onegov.core.utils import module_path
 from onegov.directory import DirectoryEntry, DirectoryCollection, \
     DirectoryConfiguration
-from onegov.file import FileCollection
+from onegov.file import FileCollection, File
 from onegov.form import FormCollection, FormSubmission
 from onegov.gis import Coordinates
 from onegov.newsletter import RecipientCollection, NewsletterCollection
@@ -4155,6 +4155,7 @@ def test_directory_submissions(client, postgres):
     page.form['structure'] = """
         Name *= ___
         Description = ...
+        File = *.txt|*.csv 
     """
     page.form['enable_submissions'] = False
     page.form['title_format'] = '[Name]'
@@ -4162,7 +4163,6 @@ def test_directory_submissions(client, postgres):
     page.form['price_per_submission'] = 100
     page.form['payment_method'] = 'manual'
     page = page.form.submit().follow()
-
     assert "Eintrag vorschlagen" not in page
 
     # change it to accept submissions
@@ -4173,6 +4173,7 @@ def test_directory_submissions(client, postgres):
     # this fails because there are invisible fields
     assert "«Description» nicht sichtbar" in page
     page.form['lead_format'] = '[Description]'
+    page.form['content_fields'] = "Name\nDescription\nFile"
     page = page.form.submit().follow()
 
     assert "Eintrag vorschlagen" in page
@@ -4192,6 +4193,8 @@ def test_directory_submissions(client, postgres):
 
     # add the missing field
     page.form['name'] = 'Washingtom Monument'
+
+    page.form['file'] = Upload('README.txt', b'content.')
     page = page.form.submit().follow()
 
     # check the result
@@ -4199,6 +4202,7 @@ def test_directory_submissions(client, postgres):
     assert "100.00" in page
     assert "Washingtom Monument" in page
     assert "George Washington" in page
+    assert "README" in page
 
     # fix the result
     page = page.click("Bearbeiten", index=1)
@@ -4221,6 +4225,7 @@ def test_directory_submissions(client, postgres):
     assert "info@example.org" in page
     assert "Washington" in page
     assert "National Mall" in page
+    assert "README" in page
 
     # if we adopt it it'll show up
     postgres.save()
@@ -4228,6 +4233,7 @@ def test_directory_submissions(client, postgres):
     accept_url = page.pyquery('.accept-link').attr('ic-post-to')
     client.post(accept_url)
     assert 'Washington' in client.get('/directories/points-of-interest')
+    assert client.app.session().query(File).one().type == 'directory'
 
     # the description here is a multiline field
     desc = client.app.session().query(DirectoryEntry)\
@@ -4247,6 +4253,7 @@ def test_directory_submissions(client, postgres):
     page.form['structure'] = """
         Name *= ___
         Description = ...
+        File = *.txt|*.csv 
         Category *= ___
     """
     page.form['lead_format'] = '[Description] [Category]'
