@@ -263,9 +263,8 @@ class ExtendedDirectory(Directory, AccessExtension, Extendable):
     @property
     def extensions(self):
         if self.enable_map == 'no':
-            return ('submitter', 'comment')
-        else:
-            return ('coordinates', 'submitter', 'comment')
+            return 'submitter', 'comment'
+        return 'coordinates', 'submitter', 'comment'
 
     @property
     def actual_price(self):
