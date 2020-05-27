@@ -1,8 +1,45 @@
 # Changes
 
+## Release `2020.59`
+
+> commits: **13 / [bb363d6795...3735433747](https://github.com/OneGov/onegov-cloud/compare/bb363d6795^...3735433747)**<br>
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.59)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🐞 **Fixes ensurance validation error**
+
+**`Bugfix`** | **[5eb3ef1444](https://github.com/onegov/onegov-cloud/commit/5eb3ef1444b756f08cc4aa2f10ba142578cfbf66)**
+
+### Org
+
+🐞 **Fixes withdrawing an imported event.py**
+
+- adapt breadcrumbs for event detail view
+- allow submitted events to be withdrawn
+- Change translations "Delete" to "Withdraw" on detail page
+
+**`Bugfix`** | **[c7bccd3fa9](https://github.com/onegov/onegov-cloud/commit/c7bccd3fa966fa5f8a83f1ca5562b4ecb08e7f64)**
+
+🐞 **Fixes creating ticket message**
+
+- Fix case where an event is withdrawn where there isn't a ticket
+- imported events can have no ticket but can be withdrawn
+
+**`Bugfix`** | **[7fdc7123dc](https://github.com/onegov/onegov-cloud/commit/7fdc7123dc30345b13ebe84a58b442640f1ed27b)**
+
+🐞 **Ensure DirectoryFile for all files on a DirectoryEntry**
+
+Uploaded files by form submissions resulted in FormFile attached to DirectoryEntry's.
+When adopting an entry from a submission, add references as DirectoryFile.
+Test manually also for change requests of the files.
+
+**`Bugfix`** | **[3735433747](https://github.com/onegov/onegov-cloud/commit/3735433747c70f67f67c04deef5d8a7c998055de)**
+
 ## Release `2020.58`
 
-> commits: **2 / [6f3e950596...11c4bda6b1](https://github.com/OneGov/onegov-cloud/compare/6f3e950596^...11c4bda6b1)**<br>
+> released: **2020-05-19 15:14**<br>
+> commits: **3 / [6f3e950596...e85d32ce84](https://github.com/OneGov/onegov-cloud/compare/6f3e950596^...e85d32ce84)**<br>
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.58)](https://buildkite.com/seantis/onegov-cloud)
 
 ## Release `2020.57`
