@@ -187,6 +187,7 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password):
                 base, "(objectClass=*)", attributes=attributes)
 
             if not success:
+                log.error("Error importing events", exc_info=True)
                 raise RuntimeError(f"Could not query '{base}'")
 
             yield from map_entries(connection.entries)
@@ -205,6 +206,7 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password):
             source_id = None
             force_role = False
         else:
+            log.error("Unknown auth provider", exc_info=False)
             raise NotImplementedError()
 
         user = ensure_user(
@@ -226,4 +228,4 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password):
 
         if ix % 1000 == 0:
             app.es_indexer.process()
-    log.info(f'LDAP users imported (#{count})')
+    # log.info(f'LDAP users imported (#{count})')
