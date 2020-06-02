@@ -18,7 +18,7 @@ def meta_data_url(obj_id, api_key):
     return f'https://www.emuseum.ch/objects/{obj_id}/xml?key={api_key}'
 
 
-def fetch_changed(poster_urls, image_urls, api_key,):
+def fetch_changed(poster_urls, image_urls, api_key):
     """Returns a dictionary with changed image urls as compared to the
     image_urls dictionary and if changed and how many added/updated.
     """
