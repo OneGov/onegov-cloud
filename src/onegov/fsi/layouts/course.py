@@ -82,7 +82,8 @@ class CourseCollectionLayout(DefaultLayout):
         coll = CourseEventCollection(
             self.request.session,
             upcoming_only=future_only,
-            show_hidden=self.request.current_attendee.role == 'admin'
+            show_hidden=self.request.current_attendee.role == 'admin',
+            sort_desc=True
         )
         result = []
         for course in self.model.query():
@@ -91,7 +92,7 @@ class CourseCollectionLayout(DefaultLayout):
                 dict(
                     title=course.name,
                     content=course.description,
-                    # Todo: how to inject html with intercooler?
+                    # Todo: Improve double queries first, than intercooler
                     # content_url=self.request.link(c, name='content-json'),
                     url=self.request.link(course),
                     events=coll.query().all()

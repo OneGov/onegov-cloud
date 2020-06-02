@@ -17,10 +17,12 @@ class CourseCollection(GenericCollection):
     def model_class(self):
         return Course
 
-    def query(self):
+    def query(self, with_events=False):
         query = super().query()
         if not self.show_hidden_from_public:
             query = query.filter_by(hidden_from_public=False)
+        if with_events:
+            query = query.join(Course.events)
         return query.order_by(Course.name)
 
     def by_id(self, id):
