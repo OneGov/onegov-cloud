@@ -148,8 +148,12 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
                     session.delete(f)
 
             for field in self.file_fields:
+                if not values[field.id]:
+                    updated[field.id] = values[field.id]
+                    continue
                 # migrate files during an entry migration
                 if isinstance(values[field.id], dict):
+                    updated[field.id] = values[field.id]
                     file_id = values[field.id]['data'].lstrip('@')
                     with session.no_autoflush:
                         f = session.query(File).filter_by(id=file_id).first()
@@ -161,12 +165,8 @@ class Directory(Base, ContentMixin, TimestampMixin, SearchableContent):
                                 reference=f.reference
                             )
                             entry.files.append(new)
-                            values[field.id].update({'data': f'@{new.id}'})
+                            updated[field.id].update({'data': f'@{new.id}'})
 
-                    updated[field.id] = values[field.id]
-                    continue
-                if values[field.id] is None:
-                    updated[field.id] = values[field.id]
                     continue
 
                 # keep files if selected in the dialog
