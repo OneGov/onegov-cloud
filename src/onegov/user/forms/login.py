@@ -8,7 +8,8 @@ class LoginForm(Form):
 
     username = StringField(
         label=_("E-Mail Address"),
-        validators=[validators.InputRequired()]
+        validators=[validators.InputRequired()],
+        render_kw={'autofocus': True}
     )
     password = PasswordField(
         label=_("Password"),

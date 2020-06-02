@@ -66,6 +66,7 @@ def handle_login(self, request, form):
         request.alert(_("Wrong e-mail address, password or yubikey."))
 
     layout = DefaultLayout(self, request)
+    request.include('scroll-to-username')
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
         Link(_("Login"), request.link(self, name='login'))
@@ -140,6 +141,7 @@ def handle_registration(self, request, form):
         Link(_("Homepage"), layout.homepage_url),
         Link(_("Register"), request.link(self, name='register'))
     ]
+    request.include('scroll-to-username')
 
     return {
         'layout': layout,
