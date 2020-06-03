@@ -3,14 +3,14 @@
     to a readable length.
 */
 
-$course-description-line-width: 87ex;
+$course-description-line-width: 100%;
 $green-color: #16b749;
 $red-color: #ca0020;
 $orange-color: #eda815;
 $dark-gray-color: #a9a9a9;
 $gray-color: #808080;
 
-.course-page-text {
+.page-text {
     p {
         max-width: $course-description-line-width;
     }
