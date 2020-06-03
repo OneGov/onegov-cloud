@@ -15,6 +15,14 @@ class ReservationFormMixin:
         return self.model.course_event
 
     @property
+    def event_collection(self):
+        return CourseEventCollection(
+            self.request.session,
+            upcoming_only=True,
+            show_hidden=self.request.is_manager
+        )
+
+    @property
     def attendee(self):
         return self.model.attendee
 
@@ -23,8 +31,8 @@ class ReservationFormMixin:
 
     def attendee_choice(self, attendee):
         if not attendee:
-            return '', self.request.translate(_('None'))
-        text = f'{str(attendee)}'
+            return self.none_choice
+        text = str(attendee)
         if attendee.user and attendee.user.source_id:
             text += f' | {attendee.user.source_id}'
         return str(attendee.id), text
@@ -51,14 +59,6 @@ class AddFsiReservationForm(Form, ReservationFormMixin):
             InputRequired()
         ]
     )
-
-    @property
-    def event_collection(self):
-        return CourseEventCollection(
-            self.request.session,
-            upcoming_only=True,
-            show_hidden=self.request.is_manager
-        )
 
     @property
     def attendee_collection(self):
@@ -127,14 +127,6 @@ class AddFsiPlaceholderReservationForm(Form, ReservationFormMixin):
     dummy_desc = StringField(
         label=_('Placeholder Description (optional)'),
     )
-
-    @property
-    def event_collection(self):
-        return CourseEventCollection(
-            self.request.session,
-            upcoming_only=True,
-            show_hidden=self.request.is_manager
-        )
 
     def get_event_choices(self):
 
