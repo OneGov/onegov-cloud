@@ -26,13 +26,6 @@
             <div class="columns small-12 end">
                 <div class="row">
                     <div class="columns small-12">
-                        <div class="hide-for-print" tal:condition="not: results">
-                            <ul>
-                                <li i18n:translate="">Hidden Courses are not shown in Dropdown</li>
-                                <li i18n:translate="">Courses withouth mandatory refresh are not shown in Dropdown</li>
-                            </ul>
-                        </div>
-
                         <tal:b condition="results">
                             <table class="tablesaw hover fullwidth">
                                 <thead>
