@@ -78,10 +78,10 @@ class CourseCollectionLayout(DefaultLayout):
 
         return links
 
-    def accordion_items(self, future_only=True):
+    def accordion_items(self, upcoming_only=True):
         coll = CourseEventCollection(
             self.request.session,
-            upcoming_only=future_only,
+            upcoming_only=upcoming_only,
             show_hidden=self.request.current_attendee.role == 'admin',
             sort_desc=True
         )
