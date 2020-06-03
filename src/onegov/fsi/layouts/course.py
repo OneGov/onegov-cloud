@@ -92,10 +92,8 @@ class CourseCollectionLayout(DefaultLayout):
                 dict(
                     title=course.name,
                     content=course.description,
-                    # Todo: Improve double queries first, than intercooler
-                    # content_url=self.request.link(c, name='content-json'),
+                    listing_url=self.request.link(coll, name='as-listing'),
                     url=self.request.link(course),
-                    events=coll.query().all()
                 )
             )
         return result

@@ -21,17 +21,19 @@
             <tal:b tal:repeat="item items">
                 <dd class="accordion-navigation"
                     tal:define="accordion_id 'accordion-panel-{}'.format(repeat.item.number)"
-                    tal:attributes="ic-get-from item['content_url']|nothing; ic-target '#' + accordion_id + 'content';"
-                    ic-trigger-on="click"
                 >
                     <a href="${'#'+ accordion_id}"><i class="fa fa-plus fa-fw" aria-hidden="true"></i> <strong>${item['title']}</strong></a>
-                    <div id="${accordion_id}" class="content page-text" >
-                        <tal:b tal:switch="python:True if item.get('content_url') else False" tal:define="events item['events']">
-                            <tal:b metal:use-macro="layout.macros['course_event_listing']" />
-                            <div tal:case="False" tal:condition="item['content']" tal:content="structure item['content']"/>
-                            <div tal:case="True" id="${accordion_id + 'content'}"></div>
+                    <div id="${accordion_id}" class="content page-text"  tal:define="lazy_load item.get('listing_url')">
+                        <div tal:condition="item['content']" tal:content="structure item['content']"/>
+                        <tal:b tal:condition="request.is_manager and item.get('url')">
+                            <a href="${item['url']}" class="button hollow" i18n:translate="">Details</a>
                         </tal:b>
-                        <span tal:condition="request.is_manager and item.get('url')"><a href="${item['url']}" class="button hollow" i18n:translate>Details</a></span>
+                        <tal:b tal:condition="not: lazy_load" metal:use-macro="layout.macros['course_event_listing']" tal:define="events item.get('events')" />
+                        <tal:b tal:condition="lazy_load">
+                            <div id="${accordion_id + '-event-listing'}" tal:attributes="ic-get-from item['listing_url']|nothing; ic-target '#'+accordion_id +'-event-listing';" ic-trigger-on="scrolled-into-view">
+                                <a class="button" tal:attributes="ic-get-from item['listing_url']|nothing; ic-target '#'+accordion_id +'-event-listing';" ic-trigger-on="click once" i18n:translate="">Show events</a>
+                            </div>
+                        </tal:b>
                     </div>
                 </dd>
             </tal:b>
@@ -141,42 +143,40 @@
 <metal:course_event_listing define-macro="course_event_listing">
     <tal:b tal:switch="events and True or False" tal:define="for_email for_email|False">
         <tal:b tal:case="True">
-            <tal:b tal:condition="events">
-                <table class="tablesaw hover events-table fullwidth">
-                    <thead>
-                        <th i18n:translate>Date</th>
-                        <th i18n:translate class="text-left">Start</th>
-                        <th i18n:translate class="text-left">End</th>
-                        <th i18n:translate class="text-left">Status</th>
-                        <th i18n:translate class="text-left">Presenter</th>
-                        <th i18n:translate class="text-left" tal:condition="not for_email">Presenter Company</th>
-                        <th i18n:translate class='text-left'>Free Space</th>
-                        <th tal:condition="not for_email and request.is_manager" i18n:translate>Hidden / Locked</th>
-                    </thead>
-                    <tbody>
-                        <tal:b tal:repeat="event events">
-                            <tr>
-                                <td class="no-wrap">
-                                    <a href="${request.link(event)}" class="${'grayed-out' if event.locked else ''}">
-                                        <strong>${layout.format_date(event.start, 'date_long')}</strong>
-                                    </a>
-                                </td>
+            <table class="tablesaw hover events-table fullwidth">
+                <thead>
+                    <th i18n:translate>Date</th>
+                    <th i18n:translate class="text-left">Start</th>
+                    <th i18n:translate class="text-left">End</th>
+                    <th i18n:translate class="text-left">Status</th>
+                    <th i18n:translate class="text-left">Presenter</th>
+                    <th i18n:translate class="text-left" tal:condition="not for_email">Presenter Company</th>
+                    <th i18n:translate class='text-left'>Free Space</th>
+                    <th tal:condition="not for_email and request.is_manager" i18n:translate>Hidden / Locked</th>
+                </thead>
+                <tbody>
+                    <tal:b tal:repeat="event events">
+                        <tr>
+                            <td class="no-wrap">
+                                <a href="${request.link(event)}" class="${'grayed-out' if event.locked else ''}">
+                                    <strong>${layout.format_date(event.start, 'date_long')}</strong>
+                                </a>
+                            </td>
 
-                                <td>${layout.format_date(event.start, 'time')}</td>
-                                <td>${layout.format_date(event.end, 'time')}</td>
-                                <td>${layout.format_status(event.status)}</td>
-                                <td>${event.presenter_name}</td>
-                                <td tal:condition="not for_email">${event.presenter_company}</td>
-                                <td class='text-left'>${event.available_seats}</td>
-                                <td tal:condition="request.is_manager and not for_email">
-                                    <span tal:condition="event.hidden_from_public" class="hidden-icon"></span>
-                                    <span tal:condition="event.locked_for_subscriptions" class="locked-icon"></span>
-                                </td>
-                            </tr>
-                        </tal:b>
-                    </tbody>
-                </table>
-            </tal:b>
+                            <td>${layout.format_date(event.start, 'time')}</td>
+                            <td>${layout.format_date(event.end, 'time')}</td>
+                            <td>${layout.format_status(event.status)}</td>
+                            <td>${event.presenter_name}</td>
+                            <td tal:condition="not for_email">${event.presenter_company}</td>
+                            <td class='text-left'>${event.available_seats}</td>
+                            <td tal:condition="request.is_manager and not for_email">
+                                <span tal:condition="event.hidden_from_public" class="hidden-icon"></span>
+                                <span tal:condition="event.locked_for_subscriptions" class="locked-icon"></span>
+                            </td>
+                        </tr>
+                    </tal:b>
+                </tbody>
+            </table>
         </tal:b>
         <p tal:case="False" i18n:translate="">No events found.</p>
     </tal:b>

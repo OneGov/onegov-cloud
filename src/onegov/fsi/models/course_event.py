@@ -2,6 +2,7 @@ import datetime
 from collections import OrderedDict
 from uuid import uuid4
 
+from cached_property import cached_property
 import pytz
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
@@ -182,10 +183,14 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         # Add criteria when a course should be hidden based on status or attr
         return self.hidden_from_public
 
+    @cached_property
+    def cached_reservation_count(self):
+        return self.reservations.count()
+
     @property
     def available_seats(self):
         if self.max_attendees:
-            seats = self.max_attendees - self.reservations.count()
+            seats = self.max_attendees - self.cached_reservation_count
             return 0 if seats < 0 else seats
         return None
 
@@ -193,7 +198,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     def booked(self):
         if not self.max_attendees:
             return False
-        return self.max_attendees <= self.reservations.count()
+        return self.max_attendees <= self.cached_reservation_count
 
     @property
     def bookable(self):
