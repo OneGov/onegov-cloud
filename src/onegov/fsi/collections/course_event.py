@@ -22,6 +22,7 @@ class CourseEventCollection(GenericCollection, Pagination):
             past_only=False,
             limit=None,
             show_hidden=False,
+            show_locked=True,
             course_id=None,
             sort_desc=False
     ):
@@ -33,6 +34,7 @@ class CourseEventCollection(GenericCollection, Pagination):
         self.past_only = past_only
         self.limit = limit
         self.show_hidden = show_hidden
+        self.show_locked = show_locked
         self.course_id = course_id
         self.sort_desc = sort_desc
 
@@ -65,6 +67,8 @@ class CourseEventCollection(GenericCollection, Pagination):
         query = super().query()
         if not self.show_hidden:
             query = query.filter(CourseEvent.hidden_from_public == False)
+        if not self.show_locked:
+            query = query.filter(CourseEvent.locked_for_subscriptions == False)
         if self.from_date:
             query = query.filter(CourseEvent.start > self.from_date)
         elif self.past_only:
@@ -100,6 +104,7 @@ class CourseEventCollection(GenericCollection, Pagination):
             past_only=self.past_only,
             limit=self.limit,
             show_hidden=self.show_hidden,
+            show_locked=self.show_locked,
             course_id=self.course_id,
             sort_desc=self.sort_desc
         )
@@ -136,6 +141,7 @@ class PastCourseEventCollection(CourseEventCollection):
             self, session,
             page=0,
             show_hidden=False,
+            show_locked=True,
             course_id=None
     ):
         super().__init__(
@@ -143,6 +149,7 @@ class PastCourseEventCollection(CourseEventCollection):
             page=page,
             past_only=True,
             show_hidden=show_hidden,
+            show_locked=show_locked,
             course_id=course_id,
             sort_desc=True
         )
@@ -152,5 +159,6 @@ class PastCourseEventCollection(CourseEventCollection):
             self.session,
             page=index,
             show_hidden=self.show_hidden,
+            show_locked=self.show_locked,
             course_id=self.course_id,
         )
