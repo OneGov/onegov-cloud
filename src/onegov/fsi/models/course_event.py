@@ -45,8 +45,9 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     default_reminder_before = datetime.timedelta(days=14)
 
     __tablename__ = 'fsi_course_events'
-    __table_args__ = (UniqueConstraint('start', 'end',
-                                       name='_start_end_uc'),)
+    __table_args__ = (
+        UniqueConstraint('start', 'end', name='_start_end_uc'),
+    )
 
     es_properties = {
         'name': {'type': 'localized'},
@@ -141,10 +142,10 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     cancellation_template = relationship("CancellationTemplate", uselist=False)
     reminder_template = relationship("ReminderTemplate", uselist=False)
 
-    # hides from member roles
+    # hides for members/editors
     hidden_from_public = Column(Boolean, nullable=False, default=False)
 
-    # to a locked event, only admin can place subscriptions
+    # to a locked event, only an admin can place subscriptions
     locked_for_subscriptions = Column(Boolean, default=False)
 
     # when before course start schedule reminder email
