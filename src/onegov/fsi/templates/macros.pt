@@ -197,7 +197,7 @@
                     </thead>
                     <tbody>
                         <tal:b tal:repeat="event events">
-                            <tr>
+                            <tr tal:define="res_count event.cached_reservation_count">
                                 <td tal:condition="show_course">${event.course.name}</td>
                                 <td class="no-wrap">
                                     <a href="${request.link(event)}">
@@ -208,7 +208,13 @@
                                 <td>${layout.format_date(event.start, 'time')}</td>
                                 <td>${layout.format_date(event.end, 'time')}</td>
                                 <td>${layout.format_status(event.status)}</td>
-                                <td><a href="${layout.subscriptions_link(event)}" i18n:translate="">Subscriptions</a></td>
+                                <td tal:condition="res_count > 0">
+                                    <a href="${layout.subscriptions_link(event)}" i18n:translate="" tal:condition="res_count > 0">Subscriptions</a>
+                                    <span>(${res_count}/${event.max_attendees})</span>
+                                </td>
+                                <td tal:condition="res_count == 0">
+                                    <span i18n:translate="">None</span>
+                                </td>
                             </tr>
                         </tal:b>
                     </tbody>
