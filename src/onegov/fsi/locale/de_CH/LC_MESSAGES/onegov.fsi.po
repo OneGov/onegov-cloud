@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-04-30 11:02+0200\n"
+"POT-Creation-Date: 2020-06-03 08:03+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -396,12 +396,6 @@ msgstr "Einladung für Kursanmeldung"
 msgid "Refresh Interval:"
 msgstr "Wiederholungsintervall:"
 
-msgid "Hidden Courses are not shown in Dropdown"
-msgstr "Versteckte Kurse sind nicht in der Liste"
-
-msgid "Courses withouth mandatory refresh are not shown in Dropdown"
-msgstr "Kurse ohne obligatorische Wiederholung sind nicht in der Liste"
-
 msgid "Last Event"
 msgstr "Letzte Durchführung"
 
@@ -476,6 +470,9 @@ msgstr "Keine Einträge gefunden"
 
 msgid "Email Preview"
 msgstr "Email Vorschau"
+
+msgid "Toggle hidden"
+msgstr "Versteckte umschalten"
 
 msgid "Subject:"
 msgstr "Betreff:"
@@ -733,6 +730,12 @@ msgstr "Anmeldung erfolgreich gelöscht"
 
 msgid "Placeholder successfully deleted"
 msgstr "Platzhalter erfolgreich gelöscht"
+
+#~ msgid "Hidden Courses are not shown in Dropdown"
+#~ msgstr "Versteckte Kurse sind nicht in der Liste"
+
+#~ msgid "Courses withouth mandatory refresh are not shown in Dropdown"
+#~ msgstr "Kurse ohne obligatorische Wiederholung sind nicht in der Liste"
 
 #~ msgid "Attendees Event ${event} - ${date}"
 #~ msgstr "Teilnehmer Durchführung ${event} - ${date}"

@@ -29,7 +29,7 @@ td {
 /*
     Accordion adjustments
 */
-dd.accordion-navigation + dd.accordion-navigation {
+dd.accordion-navigation + dd.accordion-navigation, dl.accordion + a {
     margin-top: 1rem;
 }
 

@@ -26,10 +26,14 @@ def test_course_collection_1(session, course):
     course(session, hidden_from_public=True, name='Hidden')
     course1, data = course(session)
     coll = CourseCollection(session)
+    # collection defaults to not return the hidden_from_public one's
     assert coll.query().count() == 1
     course1.hidden_from_public = True
     session.flush()
     assert coll.by_id(course1.id) is not None
+    assert coll.query().count() == 0
+    coll.show_hidden_from_public = True
+    assert coll.query().count() == 2
 
 
 def test_course_event_collection(session, course):

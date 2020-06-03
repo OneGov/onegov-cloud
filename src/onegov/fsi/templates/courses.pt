@@ -13,6 +13,7 @@
                                 <tal:b metal:use-macro="layout.macros['accordion']" />
                             </tal:b>
                         </tal:b>
+                        <a class="button" i18n:translate href="${request.link(model.toggled_hidden())}" tal:condition="request.is_admin">Toggle hidden</a>
                     </div>
                 </div>
             </div>
