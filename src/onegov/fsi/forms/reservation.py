@@ -89,7 +89,6 @@ class AddFsiReservationForm(Form, ReservationFormMixin):
         return (self.event_choice(e) for e in events)
 
     def get_attendee_choices(self):
-        assert self.request.view_name == 'add'
 
         if self.model.attendee_id:
             return self.attendee_choice(self.attendee),
