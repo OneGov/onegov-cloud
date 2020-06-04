@@ -6,7 +6,7 @@ from onegov.fsi.forms.reservation import AddFsiReservationForm, \
     AddFsiPlaceholderReservationForm
 from onegov.fsi.layouts.reservation import ReservationLayout, \
     ReservationCollectionLayout
-from onegov.fsi.models import CourseReservation, CourseEvent, CourseAttendee
+from onegov.fsi.models import CourseReservation, CourseEvent
 from onegov.fsi import _
 from onegov.fsi.views.notifcations import handle_send_email
 

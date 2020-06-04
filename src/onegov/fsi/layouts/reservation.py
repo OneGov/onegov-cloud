@@ -116,19 +116,18 @@ class ReservationCollectionLayout(DefaultLayout):
         return links
 
     def intercooler_btn_for_item(self, reservation):
-        if not reservation.is_placeholder:
-            confirm = Confirm(
-                    _("Do you want to cancel the subscription ?"),
-                    _("A confirmation email will be sent to the person."),
-                    _("Cancel subscription for course event"),
-                    _("Cancel")
-                )
-        else:
-            confirm = Confirm(
-                    _("Do you want to delete the placeholder ?"),
-                    yes=_("Delete"),
-                    no=_("Cancel")
-                )
+
+        confirm = Confirm(
+            _("Do you want to cancel the subscription ?"),
+            _("A confirmation email will be sent to the person."),
+            _("Cancel subscription for course event"),
+            _("Cancel")
+        ) if reservation.is_placeholder else \
+            Confirm(
+                _("Do you want to delete the placeholder ?"),
+                yes=_("Delete"),
+                no=_("Cancel")
+        )
         return Link(
             text=_("Delete"),
             url=self.csrf_protected_url(
@@ -143,7 +142,6 @@ class ReservationCollectionLayout(DefaultLayout):
                 )
             )
         )
-
 
 
 class ReservationLayout(DefaultLayout):
