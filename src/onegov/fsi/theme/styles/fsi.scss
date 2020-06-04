@@ -141,6 +141,18 @@ a.grayed-out {
     }
 }
 
+/*
+    Field Display adjustments
+*/
+
+.field-display > dd {
+
+    margin-bottom: 0;
+
+    &:last-child {
+        margin-bottom: 1rem;
+    }
+}
 
 /*
     Reservation/Subscription and general Printout
