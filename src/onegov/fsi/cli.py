@@ -223,6 +223,7 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password):
         user.attendee.first_name = data['first_name']
         user.attendee.last_name = data['last_name']
         user.attendee.organisation = data['organisation']
+        user.attendee.source_id = source_id
 
         count += 1
 

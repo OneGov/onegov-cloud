@@ -23,9 +23,9 @@
                                 <dt i18n:translate>Last name</dt>
                                 <dd>${model.last_name}</dd>
                             </dl>
-                            <dl class="field-display" tal:condition="model.user and model.user.source_id">
+                            <dl class="field-display" tal:condition="model.user_id and model.source_id">
                                 <dt i18n:translate>Shortcode</dt>
-                                <dd>${model.user.source_id}</dd>
+                                <dd>${model.source_id}</dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.organisation">
                                 <dt i18n:translate>Organisation Code</dt>

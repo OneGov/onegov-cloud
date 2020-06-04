@@ -29,7 +29,7 @@
                                                 <td tal:condition="not: layout.for_himself"><a href="${layout.link(reservation)}">${str(reservation)}</a></td>
                                                 <td tal:condition="not: layout.for_himself">
                                                     <tal:b tal:condition="reservation.attendee and reservation.attendee.user">
-                                                        ${reservation.attendee.user.source_id}
+                                                        ${reservation.attendee.source_id}
                                                     </tal:b>
                                                 </td>
                                                 <td tal:condition="not: has_course"><a href="${request.link(reservation.course_event)}">${reservation.course_event.name}</a></td>

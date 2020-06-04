@@ -104,3 +104,12 @@ def add_hidden_from_public_in_course(context):
             Column('hidden_from_public', Boolean, nullable=False,
                    default=False),
             default=lambda x: False)
+
+
+@upgrade_task('Adds source_id to attendee')
+def add_source_id_to_attendee(context):
+    if not context.has_column('fsi_attendees', 'source_id'):
+        context.add_column_with_defaults(
+            'fsi_attendees',
+            Column('source_id', Text, nullable=True),
+            default=lambda attendee: attendee.source_id)

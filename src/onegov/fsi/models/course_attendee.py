@@ -43,6 +43,9 @@ class CourseAttendee(Base, ORMSearchable):
     user_id = Column(UUID, ForeignKey('users.id'), nullable=True)
     user = relationship("User", backref=backref("attendee", uselist=False))
 
+    # mirrors the source_id field from user due to performance reasons
+    source_id = Column(Text, nullable=True)
+
     first_name = Column(Text, nullable=True)
     last_name = Column(Text, nullable=True)
 

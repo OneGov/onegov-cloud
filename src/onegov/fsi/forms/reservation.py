@@ -33,8 +33,8 @@ class ReservationFormMixin:
         if not attendee:
             return self.none_choice
         text = str(attendee)
-        if attendee.user_id and attendee.user.source_id:
-            text += f' | {attendee.user.source_id}'
+        if attendee.user_id and attendee.source_id:
+            text += f' | {attendee.source_id}'
         return str(attendee.id), text
 
     @property
