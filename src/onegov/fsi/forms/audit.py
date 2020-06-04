@@ -1,7 +1,8 @@
+from wtforms import SelectField
 from wtforms.validators import InputRequired
 
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import ChosenSelectMultipleField
 from onegov.fsi import _
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.models import CourseAttendee, Course
@@ -9,7 +10,7 @@ from onegov.fsi.models import CourseAttendee, Course
 
 class AuditForm(Form):
 
-    course_id = ChosenSelectField(
+    course_id = SelectField(
         label=_("Course"),
         choices=[],
         validators=[
@@ -19,7 +20,7 @@ class AuditForm(Form):
                       'mandatory refresh are not in the list')
     )
 
-    organisation = ChosenSelectField(
+    organisation = ChosenSelectMultipleField(
         label=_("Organisation"),
         choices=[],
         validators=[

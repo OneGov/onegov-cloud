@@ -27,7 +27,7 @@ class AuditCollection(GenericCollection):
         """
         Ranks all subscriptions of all events of a course
         windowed over the attendee_id and ranked after completed, most recent
-        Use this query for make a join with any collection of attendees.
+        Use this query to make a join with any collection of attendees.
         """
         ranked = self.session.query(
             CourseReservation.attendee_id,
@@ -47,7 +47,7 @@ class AuditCollection(GenericCollection):
 
     def last_completed_subscriptions_query(self):
         """Filter the ranked subscriptions by the rownum resulting
-        in a list of just the most recent and completed subscriptions
+        in a list of the most recent and completed subscriptions
         for every attendee_id
         """
         ranked = self.ranked_subscription_query().subquery('ranked')
