@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-06-04 09:10+0200\n"
+"POT-Creation-Date: 2020-06-04 18:33+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -163,6 +163,12 @@ msgstr "Teilnehmer"
 msgid "Course Event"
 msgstr "Kursdurchführung"
 
+msgid "There are other subscriptions for the same course in this year"
+msgstr "Für dieses Jahr gibt es bereits andere Anmeldungen für diesen Kurs"
+
+msgid "This course event can't be booked (anymore)."
+msgstr "Diese Durchführung kann (nicht) mehr gebucht werden."
+
 msgid "Placeholder Description (optional)"
 msgstr "Platzhalter-Beschreibung (optional)"
 
@@ -223,11 +229,14 @@ msgstr "Teilnehmer verwalten"
 msgid "All"
 msgstr "Alle"
 
-msgid "External"
-msgstr "Extern"
-
 msgid "Editors"
 msgstr "Sicherheitsbeauftragter"
+
+msgid "Admins"
+msgstr "Administratoren"
+
+msgid "External"
+msgstr "Extern"
 
 msgid "Edit Profile"
 msgstr "Profil bearbeiten"
@@ -360,6 +369,9 @@ msgstr "Anmeldung"
 msgid "Course Subscriptions"
 msgstr "Kursanmeldungen"
 
+msgid "Do you want to delete the placeholder ?"
+msgstr "Möchten Sie den Platzhalter löschen?"
+
 msgid "Do you want to cancel the subscription ?"
 msgstr "Wollen Sie diese Anmeldung löschen?"
 
@@ -368,9 +380,6 @@ msgstr "Eine Bestätigungs-Email wird an die Person gesendet."
 
 msgid "Cancel subscription for course event"
 msgstr "Anmeldung für Durchführung löschen"
-
-msgid "Do you want to delete the placeholder ?"
-msgstr "Möchten Sie den Platzhalter löschen?"
 
 msgid "Created"
 msgstr "Erstellt"
@@ -417,11 +426,8 @@ msgstr "Uhr"
 msgid "E-Mail"
 msgstr "E-Mail"
 
-msgid "First name"
-msgstr "Vorname"
-
-msgid "Last name"
-msgstr "Nachname"
+msgid "Name"
+msgstr "Name"
 
 msgid "Shortcode"
 msgstr "Kürzel"
@@ -441,8 +447,8 @@ msgstr "Total zu wiederholende Kurse"
 msgid "Unfinished courses"
 msgstr "Offene Kurse"
 
-msgid "Subscriptions"
-msgstr "Anmeldungen"
+msgid "Last ${count} Subscriptions"
+msgstr "Letzte ${count} Anmeldungen"
 
 msgid "Attendee has no subscriptions"
 msgstr "Teilnehmer hat keine Anmeldungen"
@@ -464,9 +470,6 @@ msgstr "Details"
 
 msgid "Registered"
 msgstr "Angemeldet"
-
-msgid "This course event can't be booked (anymore)."
-msgstr "Diese Durchführung kann (nicht) mehr gebucht werden."
 
 msgid "No entries found."
 msgstr "Keine Einträge gefunden."
@@ -518,6 +521,9 @@ msgstr "Versteckt / Gesperrt"
 
 msgid "No events found."
 msgstr "Keine Durchführungen gefunden."
+
+msgid "Subscriptions"
+msgstr "Anmeldungen"
 
 msgid "Roles"
 msgstr "Rollen"
@@ -710,9 +716,6 @@ msgstr "E-Mail / Benutzername / Kürzel"
 msgid "Send E-Mail Now"
 msgstr "Email jetzt senden"
 
-msgid "There are other subscriptions for the same course in this year"
-msgstr "Für dieses Jahr gibt es bereits andere Anmeldungen für diesen Kurs"
-
 msgid "Added a new subscription"
 msgstr "Neue Anmeldung wurde hinzugefügt"
 
@@ -746,6 +749,12 @@ msgstr "Anmeldung erfolgreich gelöscht"
 msgid "Placeholder successfully deleted"
 msgstr "Platzhalter erfolgreich gelöscht"
 
+#~ msgid "First name"
+#~ msgstr "Vorname"
+
+#~ msgid "Last name"
+#~ msgstr "Nachname"
+
 #~ msgid "Delete placeholder subscription for course event"
 #~ msgstr "Platzhalter-Reservierung löschen"
 
@@ -766,9 +775,6 @@ msgstr "Platzhalter erfolgreich gelöscht"
 
 #~ msgid "Events"
 #~ msgstr "Durchführungen"
-
-#~ msgid "Name"
-#~ msgstr "Name"
 
 #~ msgid "Details:"
 #~ msgstr "Details:"

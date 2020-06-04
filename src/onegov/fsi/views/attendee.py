@@ -1,5 +1,3 @@
-from sqlalchemy import desc
-
 from onegov.core.security import Private, Personal, Secret
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
@@ -8,7 +6,6 @@ from onegov.fsi.forms.course_attendee import CourseAttendeeForm, \
     AddExternalAttendeeForm
 from onegov.fsi.layouts.course_attendee import CourseAttendeeLayout, \
     CourseAttendeeCollectionLayout
-from onegov.fsi.models import CourseReservation
 from onegov.fsi.models.course_attendee import CourseAttendee
 
 
