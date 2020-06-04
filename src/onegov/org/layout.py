@@ -485,13 +485,14 @@ class Layout(ChameleonLayout):
 
 
 class DefaultLayout(Layout):
-    """ The defaut layout meant for the public facing parts of the site. """
+    """ The default layout meant for the public facing parts of the site. """
 
     def __init__(self, model, request):
         super().__init__(model, request)
 
         # always include the common js files
         self.request.include('common')
+        self.request.include('chosen')
 
         # always include the map components
         self.request.include(self.org.geo_provider)
