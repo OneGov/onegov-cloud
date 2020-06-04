@@ -322,6 +322,6 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         if isinstance(attendee_or_id, CourseAttendee):
             att_id = attendee_or_id.id
         for entry in self.excluded_subscribers(year, as_uids=True).all():
-            if entry.id == att_id:
+            if str(entry.id) == str(att_id):
                 return False
         return True
