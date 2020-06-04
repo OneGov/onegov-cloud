@@ -181,7 +181,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     @property
     def hidden(self):
         # Add criteria when a course should be hidden based on status or attr
-        return self.hidden_from_public
+        return self.hidden_from_public or self.course.hidden_from_public
 
     @cached_property
     def cached_reservation_count(self):

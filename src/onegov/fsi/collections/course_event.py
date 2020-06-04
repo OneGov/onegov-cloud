@@ -67,6 +67,8 @@ class CourseEventCollection(GenericCollection, Pagination):
         query = super().query()
         if not self.show_hidden:
             query = query.filter(CourseEvent.hidden_from_public == False)
+            query = query.join(Course)
+            query = query.filter(Course.hidden_from_public == False)
         if not self.show_locked:
             query = query.filter(CourseEvent.locked_for_subscriptions == False)
         if self.from_date:
