@@ -41,16 +41,7 @@ def view_add_reservation(self, request, form):
         course_event = request.session.query(CourseEvent).filter_by(
             id=event_id).first()
 
-        if course_event.locked and not request.is_admin:
-            request.warning(
-                _("This course event can't be booked (anymore)."))
-            return request.redirect(request.link(self))
-
-        attendee = request.session.query(CourseAttendee).filter_by(
-            id=attendee_id
-        ).first()
-
-        if not course_event.can_book(attendee):
+        if not course_event.can_book(attendee_id):
             request.warning(
                 _("There are other subscriptions for "
                   "the same course in this year"))

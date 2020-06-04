@@ -108,6 +108,28 @@ class AddFsiReservationForm(Form, ReservationFormMixin):
         self.attendee_id.default = [self.attendee_choice(self.attendee)]
         self.course_event_id.choices = self.get_event_choices()
 
+    @property
+    def event_from_form(self):
+        return self.course_event_id.data and CourseEventCollection(
+            self.request.session).by_id(self.course_event_id.data)
+
+    def ensure_no_other_subscriptions(self):
+        if self.attendee_id.data and self.course_event_id.data:
+            if not self.event_from_form.can_book(self.attendee_id.data):
+                self.attendee_id.errors.append(
+                    _("There are other subscriptions for "
+                      "the same course in this year")
+                )
+                return False
+
+    def ensure_can_book_if_locked(self):
+        if self.attendee_id.data and self.course_event_id.data:
+            if self.event_from_form.locked and not self.request.is_admin:
+                self.course_event_id.errors.append(
+                    _("This course event can't be booked (anymore).")
+                )
+                return False
+
 
 class AddFsiPlaceholderReservationForm(Form, ReservationFormMixin):
 
