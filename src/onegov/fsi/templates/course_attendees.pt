@@ -6,12 +6,11 @@
         <div class="row">
             <div class="columns small-12">
                 <div class="row">
-                    <div class="columns small-12" tal:define="has_entries model.query().count()">
+                    <div class="columns small-12">
                         <div class="tab-navigation clearfix" tal:condition="layout.menu">
                             <nav class="top-bar clearfix" data-topbar data-options="back_text: &lt;; is_hover: false; mobile_show_parent_link: false" role="navigation">
                                 <section class="top-bar-section">
                                     <ul class="left">
-
                                         <tal:b repeat="(title, link, active) layout.menu">
                                             <li tal:attributes="class python: 'active' if active else ''">
                                                 <a href="${link}">${title}</a>

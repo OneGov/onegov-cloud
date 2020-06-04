@@ -16,8 +16,10 @@ from onegov.fsi.models.course_attendee import CourseAttendee
 )
 def view_course_attendee_collection(self, request):
     layout = CourseAttendeeCollectionLayout(self, request)
+    has_entries = self.query().first() and True or False
     return {
         'title': layout.title,
+        'has_entries': has_entries,
         'layout': layout,
         'model': self
     }

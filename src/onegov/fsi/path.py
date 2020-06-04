@@ -101,11 +101,12 @@ def get_courses(request, show_hidden_from_public):
              converters=dict(
                  exclude_external=bool,
                  external_only=bool,
-                 editors_only=bool
+                 editors_only=bool,
+                 admins_ony=bool,
              ))
 def get_attendees(
         request, page=0, exclude_external=False, external_only=False,
-        editors_only=False):
+        editors_only=False, admins_only=False):
     """This collection has permission private, so no members can see it"""
 
     return CourseAttendeeCollection(
@@ -114,6 +115,7 @@ def get_attendees(
         external_only=external_only,
         auth_attendee=request.current_attendee,
         editors_only=editors_only,
+        admins_only=admins_only
     )
 
 

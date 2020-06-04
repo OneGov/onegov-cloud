@@ -18,6 +18,12 @@ class FsiTheme(OrgTheme):
         ]
 
     @property
+    def pre_imports(self):
+        return super().pre_imports + [
+            'fsi-foundation-mods'
+        ]
+
+    @property
     def extra_search_paths(self):
         base_paths = super().extra_search_paths
         return [module_path('onegov.fsi.theme', 'styles')] + base_paths

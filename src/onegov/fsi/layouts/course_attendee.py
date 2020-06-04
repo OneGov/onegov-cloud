@@ -59,6 +59,13 @@ class CourseAttendeeCollectionLayout(DefaultLayout):
         )
 
     @cached_property
+    def collection_admins(self):
+        return CourseAttendeeCollection(
+            self.request.session, auth_attendee=self.request.current_attendee,
+            admins_only=True
+        )
+
+    @cached_property
     def menu(self):
         if not self.request.is_admin:
             # Hide menu for editor since filtered by permissions
@@ -66,10 +73,12 @@ class CourseAttendeeCollectionLayout(DefaultLayout):
         return [
             (_('All'), self.request.link(self.collection),
              self.model.unfiltered),
+            (_('Editors'), self.request.link(self.collection_editors),
+             self.model.editors_only),
+            (_('Admins'), self.request.link(self.collection_admins),
+             self.model.admins_only),
             (_('External'), self.request.link(self.collection_externals),
              self.model.external_only),
-            (_('Editors'), self.request.link(self.collection_editors),
-             self.model.editors_only)
         ]
 
 
