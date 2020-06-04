@@ -317,9 +317,10 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         attachment.headers['Content-Disposition'] = content_disposition
         return attachment
 
-    def can_book(self, attendee, year=None):
-        assert isinstance(attendee, CourseAttendee), f'{type(attendee)}'
-        att_id = attendee.id
+    def can_book(self, attendee_or_id, year=None):
+        att_id = attendee_or_id
+        if isinstance(attendee_or_id, CourseAttendee):
+            att_id = attendee_or_id.id
         for entry in self.excluded_subscribers(year, as_uids=True).all():
             if entry.id == att_id:
                 return False
