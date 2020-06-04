@@ -15,13 +15,9 @@
                                     <span tal:condition="not: model.user">${model.email}</span>
                                 </dd>
                             </dl>
-                            <dl class="field-display" tal:condition="model.first_name">
-                                <dt i18n:translate>First name</dt>
-                                <dd>${model.first_name}</dd>
-                            </dl>
-                            <dl class="field-display" tal:condition="model.last_name">
-                                <dt i18n:translate>Last name</dt>
-                                <dd>${model.last_name}</dd>
+                            <dl class="field-display" tal:condition="model.first_name and model.last_name">
+                                <dt i18n:translate>Name</dt>
+                                <dd>${str(model)}</dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.user_id and model.source_id">
                                 <dt i18n:translate>Shortcode</dt>
