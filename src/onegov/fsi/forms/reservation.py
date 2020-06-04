@@ -5,7 +5,6 @@ from onegov.form.fields import ChosenSelectField
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi import _
-from onegov.fsi.models import CourseAttendee
 
 
 class ReservationFormMixin:

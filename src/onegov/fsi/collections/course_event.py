@@ -138,6 +138,7 @@ class CourseEventCollection(GenericCollection, Pagination):
 
 
 class PastCourseEventCollection(CourseEventCollection):
+    """This is used for past events to do the audit """
 
     def __init__(
             self, session,
@@ -164,3 +165,6 @@ class PastCourseEventCollection(CourseEventCollection):
             show_locked=self.show_locked,
             course_id=self.course_id,
         )
+
+    def query(self):
+        return super().query().filter(self.model_class.status == 'confirmed')

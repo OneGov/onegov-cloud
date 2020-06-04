@@ -11,6 +11,9 @@
                         <tal:b tal:condition="events">
                             <h4 tal:condition="layout.course">${layout.course.name}</h4>
                             <br>
+                            <div class="panel" i18n:translate="">
+                                Unconfirmed, hidden events or events of hidden courses are not displayed.
+                            </div>
                             <tal:b metal:use-macro="layout.macros['events_check_listing']"/>
                         </tal:b>
                         <div class="pagination-centered">

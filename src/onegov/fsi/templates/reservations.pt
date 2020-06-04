@@ -45,7 +45,8 @@
                                                 <td tal:condition="request.is_admin" class="hide-for-print">
                                                     <!--?  Delete Button -->
                                                     <metal:b tal:condition="not: reservation.course_event.is_past" tal:define="item reservation" use-macro="layout.macros['intercooler_btn_for_item']"/>
-                                                    <a href="${request.link(reservation, name='edit-placeholder' if reservation.is_placeholder else 'edit')}" class="button tiny secondary" i18n:translate="">Edit</a>
+<!--?                                                    <a href="${request.link(reservation, name='edit-placeholder' if reservation.is_placeholder else 'edit')}" class="button tiny secondary" i18n:translate="">Edit</a>-->
+                                                    <a tal:condition="reservation.is_placeholder" href="${request.link(reservation, name='edit-placeholder')}" class="button tiny secondary" i18n:translate="">Edit</a>
 
                                             </td>
                                         </tr>
