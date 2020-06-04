@@ -19,7 +19,8 @@ class ReservationFormMixin:
         return CourseEventCollection(
             self.request.session,
             upcoming_only=True,
-            show_hidden=self.request.is_manager
+            show_hidden=self.request.is_manager,
+            show_locked=self.request.is_admin
         )
 
     @property
