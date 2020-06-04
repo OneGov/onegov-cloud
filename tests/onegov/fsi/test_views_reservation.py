@@ -27,8 +27,7 @@ def test_locked_course_event_reservations(client_with_db):
     client.login_editor()
     # Hinzufügen - Teilnehmer als editor
     add_subscription = new.click('Teilnehmer', href='reservations', index=0)
-    page = add_subscription.form.submit().follow()
-    assert 'Neue Anmeldung wurde hinzugefügt' not in page
+    page = add_subscription.form.submit()
     assert 'Diese Durchführung kann (nicht) mehr gebucht werden.' in page
 
     client.login_admin()
