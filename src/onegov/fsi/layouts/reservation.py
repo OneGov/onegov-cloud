@@ -116,6 +116,19 @@ class ReservationCollectionLayout(DefaultLayout):
         return links
 
     def intercooler_btn_for_item(self, reservation):
+        if not reservation.is_placeholder:
+            confirm = Confirm(
+                    _("Do you want to cancel the subscription ?"),
+                    _("A confirmation email will be sent to the person."),
+                    _("Cancel subscription for course event"),
+                    _("Cancel")
+                )
+        else:
+            confirm = Confirm(
+                    _("Do you want to delete the placeholder ?"),
+                    yes=_("Delete"),
+                    no=_("Cancel")
+                )
         return Link(
             text=_("Delete"),
             url=self.csrf_protected_url(
@@ -123,18 +136,14 @@ class ReservationCollectionLayout(DefaultLayout):
             ),
             attrs={'class': 'button tiny alert'},
             traits=(
-                Confirm(
-                    _("Do you want to cancel the subscription ?"),
-                    _("A confirmation email will be sent to you later."),
-                    _("Cancel subscription for course event"),
-                    _("Cancel")
-                ),
+                confirm,
                 Intercooler(
                     request_method='DELETE',
                     redirect_after=self.request.link(self.model)
                 )
             )
         )
+
 
 
 class ReservationLayout(DefaultLayout):

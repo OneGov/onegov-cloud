@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-06-04 08:55+0200\n"
+"POT-Creation-Date: 2020-06-04 09:10+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -363,8 +363,14 @@ msgstr "Kursanmeldungen"
 msgid "Do you want to cancel the subscription ?"
 msgstr "Wollen Sie diese Anmeldung löschen?"
 
+msgid "A confirmation email will be sent to the person."
+msgstr "Eine Bestätigungs-Email wird an die Person gesendet."
+
 msgid "Cancel subscription for course event"
 msgstr "Anmeldung für Durchführung löschen"
+
+msgid "Do you want to delete the placeholder ?"
+msgstr "Möchten Sie den Platzhalter löschen?"
 
 msgid "Created"
 msgstr "Erstellt"
@@ -739,6 +745,9 @@ msgstr "Anmeldung erfolgreich gelöscht"
 
 msgid "Placeholder successfully deleted"
 msgstr "Platzhalter erfolgreich gelöscht"
+
+#~ msgid "Delete placeholder subscription for course event"
+#~ msgstr "Platzhalter-Reservierung löschen"
 
 #~ msgid "Hidden Courses are not shown in Dropdown"
 #~ msgstr "Versteckte Kurse sind nicht in der Liste"
