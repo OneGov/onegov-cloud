@@ -157,12 +157,7 @@ def get_top_navigation(request):
     if request.is_manager:
         yield Link(
             text=_("Attendee Check"),
-            url=request.link(
-                PastCourseEventCollection(
-                    request.session,
-                    show_hidden=request.is_manager
-                )
-            )
+            url=request.class_link(PastCourseEventCollection)
         )
 
     layout = DefaultLayout(request.app.org, request)

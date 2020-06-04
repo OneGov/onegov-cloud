@@ -36,7 +36,7 @@ def get_course_event_details(request, id):
 def get_past_events_view(
         request,
         page=0,
-        show_hidden=True,
+        show_hidden=False,
         course_id=None,
 ):
     if not request.is_manager and show_hidden:
