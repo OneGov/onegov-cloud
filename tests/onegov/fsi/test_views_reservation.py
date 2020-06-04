@@ -104,7 +104,7 @@ def test_edit_reservation(client_with_db):
     assert edit.form['attendee_id'].value == str(reservation.attendee_id)
     options = [opt[2] for opt in edit.form['attendee_id'].options]
     # Returns event.possible_subscribers, tested elsewhere
-    # Planner (admin) and attendee have reservation, not planner_editor (PE)
+    # Planner (admin) and attendee have reservation, not editor_attendee (PE)
     # L, F is the normal attendee
     assert options == ['L, F', 'PE, PE']
 

@@ -90,7 +90,7 @@ def test_event_collection_add_placeholder(session, course_event):
 
 
 def test_attendee_collection(
-        session, attendee, external_attendee, planner_editor):
+        session, attendee, external_attendee, editor_attendee):
 
     att, data = attendee(session)
     att_with_org, data = attendee(
@@ -125,7 +125,7 @@ def test_attendee_collection(
     assert coll.query().count() == 0
 
     # make the editor exist, and test if he gets himself
-    editor, data = planner_editor(session, id=auth_editor.id)
+    editor, data = editor_attendee(session, id=auth_editor.id)
     assert coll.query().count() == 1
 
     # check if he can see attendee with organisation
@@ -136,11 +136,11 @@ def test_attendee_collection(
 
 
 def test_reservation_collection_query(
-        session, attendee, planner, planner_editor, course_event,
+        session, attendee, admin_attendee, editor_attendee, course_event,
         future_course_reservation, external_attendee):
 
-    admin, data = planner(session)
-    editor, data = planner_editor(session)
+    admin, data = admin_attendee(session)
+    editor, data = editor_attendee(session)
     att, data = attendee(session)
     external, data = external_attendee(session)
     event, data = course_event(session)
@@ -229,14 +229,15 @@ def test_last_completed_subscriptions_query(
 
 
 def test_audit_collection(
-        session, course, course_event, attendee, planner_editor, planner):
+        session, course, course_event, attendee, editor_attendee,
+        admin_attendee):
     course_, data = course(session)
     org = 'SD / STVA'
-    editor, data = planner_editor(
+    editor, data = editor_attendee(
         session,
         permissions=[org]
     )
-    admin_att, data = planner(session)
+    admin_att, data = admin_attendee(session)
 
     attendees = []
     for i in range(4):

@@ -57,7 +57,7 @@ def editor_factory(session):
     return editor
 
 
-def planner_factory(session, **kwargs):
+def admin_attendee_factory(session, **kwargs):
     # aka Kursverantwortlicher, is an admin, has admin email
     user = admin_factory(session)
     data = dict(
@@ -75,7 +75,7 @@ def planner_factory(session, **kwargs):
     return planner, data
 
 
-def planner_editor_factory(session, **kwargs):
+def editor_attendee_factory(session, **kwargs):
     # aka Kursverantwortlicher, is an admin, has admin email
     user = editor_factory(session)
     data = dict(
@@ -249,8 +249,8 @@ def db_mock(session):
     in_the_future = datetime(2060, 1, 1, tzinfo=pytz.utc)
 
     attendee, data = attendee_factory(session, organisation='ORG')
-    planner, data = planner_factory(session)
-    planner_editor, data = planner_editor_factory(session, permissions=['ORG'])
+    planner, data = admin_attendee_factory(session)
+    planner_editor, data = editor_attendee_factory(session, permissions=['ORG'])
     course_event, data = course_event_factory(session)
     future_course_event, data = future_course_event_factory(session)
     empty_course_event, data = future_course_event_factory(
@@ -295,7 +295,7 @@ def db_mock(session):
     return namedtuple(
         'Mock',
         [
-            'attendee', 'planner', 'planner_editor', 'course_event',
+            'attendee', 'admin_attendee', 'editor_attendee', 'course_event',
             'future_course_event', 'placeholder', 'attendee_res',
             'attendee_future_res', 'planner_res', 'planner_future_res',
             'empty_course_event'

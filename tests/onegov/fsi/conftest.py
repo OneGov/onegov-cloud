@@ -9,7 +9,7 @@ from onegov.fsi import FsiApp
 from onegov.fsi.initial_content import create_new_organisation
 from tests.onegov.fsi.common import (
     global_password, admin_factory,
-    editor_factory, planner_factory, planner_editor_factory, member_factory,
+    editor_factory, admin_attendee_factory, editor_attendee_factory, member_factory,
     attendee_factory, external_attendee_factory, notification_template_factory,
     course_factory, course_event_factory, future_course_event_factory,
     future_course_reservation_factory, db_mock)
@@ -89,13 +89,13 @@ def editor():
 
 
 @pytest.fixture(scope='function')
-def planner(admin):
-    return planner_factory
+def admin_attendee(admin):
+    return admin_attendee_factory
 
 
 @pytest.fixture(scope='function')
-def planner_editor(editor):
-    return planner_editor_factory
+def editor_attendee(editor):
+    return editor_attendee_factory
 
 
 @pytest.fixture(scope='function')
