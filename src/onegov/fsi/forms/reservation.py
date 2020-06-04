@@ -63,6 +63,7 @@ class AddFsiReservationForm(Form, ReservationFormMixin):
 
     @property
     def attendee_collection(self):
+        # Already filtered by the organisations if auth_attendee is an editor
         return CourseAttendeeCollection(
             self.request.session,
             external_only=self.model.external_only,
@@ -98,16 +99,10 @@ class AddFsiReservationForm(Form, ReservationFormMixin):
             attendees = self.event.possible_subscribers(
                 external_only=self.model.external_only
             )
-            att = self.request.current_attendee
-            if att.role == 'editor':
-                attendees = attendees.filter(
-                    CourseAttendee.organisation.in_(att.permissions, )
-                )
         else:
             attendees = self.attendee_collection.query()
-        return (
-            self.attendee_choice(a) for a in attendees
-        ) if attendees.first() else [self.none_choice]
+        return tuple(
+            self.attendee_choice(a) for a in attendees) or [self.none_choice]
 
     def on_request(self):
         self.attendee_id.choices = self.get_attendee_choices()
@@ -142,9 +137,8 @@ class AddFsiPlaceholderReservationForm(Form, ReservationFormMixin):
                 show_hidden=self.request.is_manager,
                 show_locked=self.request.is_admin
             )
-        if not events.first():
-            return [self.none_choice]
-        return (self.event_choice(e) for e in events)
+        return tuple(
+            self.event_choice(e) for e in events) or [self.none_choice]
 
     def on_request(self):
         self.course_event_id.choices = self.get_event_choices()
@@ -193,11 +187,6 @@ class EditFsiReservationForm(Form, ReservationFormMixin):
         attendees = self.model.course_event.possible_subscribers(
             external_only=False
         )
-        att = self.request.current_attendee
-        if att.role == 'editor':
-            attendees = attendees.filter(
-                CourseAttendee.organisation.in_(att.permissions, )
-            )
         choices = [self.attendee_choice(self.attendee)]
         return choices + [self.attendee_choice(a) for a in attendees]
 
@@ -211,9 +200,7 @@ class EditFsiPlaceholderReservationForm(Form, ReservationFormMixin):
     course_event_id = ChosenSelectField(
         label=_("Course Event"),
         choices=[],
-        validators=[
-            InputRequired()
-        ]
+        validators=[InputRequired()]
     )
 
     dummy_desc = StringField(
