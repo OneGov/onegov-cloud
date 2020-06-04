@@ -168,7 +168,3 @@ class CourseAttendeeLayout(DefaultLayout):
                     )
                 )
         return links
-
-    @property
-    def attendee_permissions(self):
-        return self.model.permissions and "<br>".join(self.model.permissions)
