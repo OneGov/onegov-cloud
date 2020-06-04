@@ -270,11 +270,8 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
 
         excl = self.excluded_subscribers(year).subquery('excl')
 
-        if as_uids:
-            # Use this because its less costly
-            query = session.query(CourseAttendee.id)
-        else:
-            query = session.query(CourseAttendee)
+        # Use this because its less costly
+        query = session.query(as_uids and CourseAttendee.id or CourseAttendee)
 
         if external_only:
             query = query.filter(CourseAttendee.user_id == None)
