@@ -75,9 +75,11 @@ def view_notifications(self, request):
     layout = NotificationTemplateCollectionLayout(self, request)
     # This was a workaround and should be removed in the future
     self.auto_add_templates_if_not_existing()
+    has_entries = self.query().first() and True or False
 
     return {
-        'layout': layout
+        'layout': layout,
+        'has_entries': has_entries
     }
 
 

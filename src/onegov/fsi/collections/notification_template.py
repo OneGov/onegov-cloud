@@ -38,7 +38,7 @@ class CourseNotificationTemplateCollection(GenericCollection):
 
     def auto_add_templates_if_not_existing(self):
         assert self.course_event_id
-        if self.query().count() == 0:
+        if not self.query().first():
             # Owner id should be set in path.py if not present
             data = dict(course_event_id=self.course_event_id)
             self.session.add_all((
