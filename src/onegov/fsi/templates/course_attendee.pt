@@ -50,10 +50,13 @@
                                 <dt i18n:translate>Unfinished courses</dt>
                                 <dd>${model.undone_registered_courses.count()}</dd>
                             </dl>
-                            <dl class="field-display" tal:condition="request.is_admin" tal:define="subscriptions model.reservations.all()">
-                                <dt i18n:translate>Subscriptions</dt>
-                                <dd tal:condition="not: subscriptions" i18n:translate="">Attendee has no subscriptions</dd>
-                                <dd tal:condition="subscriptions" tal:repeat="s subscriptions">${s.course_event.name}, ${layout.format_date(s.course_event.start, 'date')} (${layout.format_date(s.course_event.start, 'time')} - ${layout.format_date(s.course_event.end, 'time')})</dd>
+                            <dl class="field-display" tal:condition="request.is_admin or layout.for_himself">
+                                <dt i18n:translate>Last <tal:b i18n:name="count" tal:replace="limit" /> Subscriptions</dt>
+                                <dd tal:condition="not: last_subscriptions" i18n:translate="">Attendee has no subscriptions</dd>
+
+                                <dd tal:condition="last_subscriptions" tal:repeat="s last_subscriptions">
+                                    <a href="${request.link(s.course_event)}">${s.course_event.name}, ${layout.format_date(s.course_event.start, 'date')} (${layout.format_date(s.course_event.start, 'time')} - ${layout.format_date(s.course_event.end, 'time')})</a>
+                                </dd>
 
 
                             </dl>

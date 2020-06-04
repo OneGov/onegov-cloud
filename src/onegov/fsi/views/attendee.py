@@ -36,12 +36,19 @@ def view_course_attendee_collection(self, request):
 def view_course_attendee(self, request):
     layout = CourseAttendeeLayout(self, request)
     limit = 5
+
+    def sort_subscriptions(subs, limit):
+        all = subs.all()
+        return sorted(
+            all, key=lambda s: s.course_event.start, reverse=True
+        )[0:min(limit, len(all))]
+
     return {
         'title': layout.title,
         'layout': layout,
         'model': self,
         'limit': limit,
-        'last_subscriptions': self.reservations.order_by(desc(CourseReservation.event.start)).limit(limit)
+        'last_subscriptions': sort_subscriptions(self.reservations, limit)
     }
 
 

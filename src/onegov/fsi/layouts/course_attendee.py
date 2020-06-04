@@ -168,3 +168,7 @@ class CourseAttendeeLayout(DefaultLayout):
                     )
                 )
         return links
+
+    @property
+    def for_himself(self):
+        return self.model.id == self.request.current_attendee.id
