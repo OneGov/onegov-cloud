@@ -1,5 +1,5 @@
-import datetime
 from collections import namedtuple
+from datetime import timedelta, datetime
 from uuid import uuid4
 
 import pytz
@@ -142,7 +142,7 @@ def course_factory(session, **kwargs):
         name='Course',
         description='Description',
         mandatory_refresh=True,
-        refresh_interval=datetime.timedelta(days=365)
+        refresh_interval=timedelta(days=365)
     )
     data.update(**kwargs)
     course = session.query(Course).filter_by(**data).first()
@@ -156,12 +156,12 @@ def course_factory(session, **kwargs):
 
 def course_event_factory(session, **kwargs):
     course_ = course_factory(session)
-    start = datetime.datetime(1950, 1, 1, tzinfo=pytz.utc)
+    start = datetime(1950, 1, 1, tzinfo=pytz.utc)
     data = dict(
         course_id=course_[0].id,
         location='Room42',
         start=start,
-        end=start - datetime.timedelta(days=30),
+        end=start - timedelta(days=30),
         presenter_name='Presenter',
         presenter_company='Company',
         presenter_email='presenter@presenter.org',
@@ -185,12 +185,12 @@ def course_event_factory(session, **kwargs):
 
 def future_course_event_factory(session, **kwargs):
     course_ = course_factory(session)
-    in_the_future = datetime.datetime(2050, 1, 1, tzinfo=pytz.utc)
+    in_the_future = datetime(2050, 1, 1, tzinfo=pytz.utc)
     data = dict(
         course_id=course_[0].id,
         location='Room42',
         start=in_the_future,
-        end=in_the_future + datetime.timedelta(hours=2),
+        end=in_the_future + timedelta(hours=2),
         presenter_name='Presenter',
         presenter_company='Company',
         presenter_email='presenter@presenter.org',
@@ -246,7 +246,7 @@ def future_course_reservation_factory(session, **kwargs):
 def db_mock(session):
     # Create the fixtures with the current session
 
-    in_the_future = datetime.datetime(2060, 1, 1, tzinfo=pytz.utc)
+    in_the_future = datetime(2060, 1, 1, tzinfo=pytz.utc)
 
     attendee, data = attendee_factory(session, organisation='ORG')
     planner, data = planner_factory(session)
@@ -256,7 +256,7 @@ def db_mock(session):
     empty_course_event, data = future_course_event_factory(
         session,
         start=in_the_future,
-        end=in_the_future + datetime.timedelta(hours=8),
+        end=in_the_future + timedelta(hours=8),
         location='Empty'
     )
 
