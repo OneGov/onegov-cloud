@@ -36,6 +36,12 @@ class CourseReservation(Base):
     def is_placeholder(self):
         return self.attendee_id is None
 
+    def can_be_confirmed(self, request):
+        if not request.is_admin:
+            return False
+        event = self.course_event
+        return event.is_past and event.status == 'confirmed'
+
     def __str__(self):
         if self.is_placeholder:
             return f'{self.dummy_desc or ""}'
