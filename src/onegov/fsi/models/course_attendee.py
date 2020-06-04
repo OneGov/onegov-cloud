@@ -199,7 +199,7 @@ class CourseAttendee(Base, ORMSearchable):
         return result
 
     def possible_course_events(self, show_hidden=True, show_locked=False):
-        """Used for the reservation form. Should exlucde past courses
+        """Used for the reservation form. Should exclude past courses
         and courses already registered"""
         from onegov.fsi.models import CourseEvent
         from onegov.fsi.models import CourseReservation
