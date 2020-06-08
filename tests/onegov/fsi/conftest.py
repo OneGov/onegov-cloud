@@ -14,6 +14,7 @@ from tests.onegov.fsi.common import (
     course_factory, course_event_factory, future_course_event_factory,
     future_course_reservation_factory, db_mock)
 from tests.onegov.fsi.common import hashed_password as _hashed_password
+from tests.shared.scenario import BaseScenario
 
 from tests.shared.utils import create_app
 from tests.shared import Client as BaseClient
@@ -213,3 +214,26 @@ def create_fsi_app(request, use_elasticsearch, hashed_password, mock_db=False):
     session.close_all()
 
     return app
+
+
+class FsiScenario(BaseScenario):
+
+    def __init__(self, session, test_password):
+        super().__init__(session, test_password)
+
+        self.attendees = []
+        self.courses = []
+        self.course_events = []
+        self.subscriptions = []
+
+    def add_attendee(self, role='admin'):
+        pass
+
+
+@pytest.fixture(scope='function')
+def scenario(request, session, plain_password):
+    for name in request.fixturenames:
+        if name in ('fsi_app', 'es_fsi_app'):
+            session = request.getfixturevalue(name).session()
+
+    yield FsiScenario(session, plain_password)

@@ -3,6 +3,7 @@ from datetime import timedelta, datetime
 from uuid import uuid4
 
 import pytz
+import transaction
 
 from onegov.core.crypto import hash_password
 from onegov.fsi.models import CourseAttendee, Course, CourseEvent, \
@@ -10,6 +11,7 @@ from onegov.fsi.models import CourseAttendee, Course, CourseEvent, \
 from onegov.fsi.models.course_notification_template import InfoTemplate, \
     ReservationTemplate, ReminderTemplate, CancellationTemplate
 from onegov.user import User
+from tests.shared.scenario import BaseScenario
 
 global_password = 'hunter2'
 hashed_password = hash_password(global_password)
