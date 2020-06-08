@@ -1,7 +1,4 @@
-import transaction
-
 from cached_property import cached_property
-from contextlib import contextmanager
 from datetime import datetime, timedelta, time
 from faker import Faker
 from onegov.activity import Activity
@@ -23,6 +20,8 @@ from onegov.user.models import User
 from sedate import standardize_date
 from sqlalchemy import inspect
 from psycopg2.extras import NumericRange
+
+from tests.shared.scenario import BaseScenario
 
 
 class Collections(object):
@@ -60,7 +59,7 @@ class Collections(object):
         return PaymentProviderCollection(self.session)
 
 
-class Scenario(object):
+class Scenario(BaseScenario):
     """ Helper class to ease the setup of testing fixtures for Feriennet.
 
     Feriennet has often repetitive steps to get to a test scenario. A period
@@ -89,11 +88,19 @@ class Scenario(object):
 
     """
 
+    cached_attributes = (
+        'activities',
+        'attendees',
+        'bookings',
+        'occasions',
+        'periods',
+        'users'
+    )
+
     def __init__(self, session, test_password, activity_model=Activity):
-        self.session = session
+        super().__init__(session, test_password)
         self.activity_model = activity_model
         self.activity_type = inspect(activity_model).polymorphic_identity
-        self.test_password = test_password
 
         self.faker = Faker()
 
@@ -104,40 +111,6 @@ class Scenario(object):
         self.needs = []
         self.periods = []
         self.users = []
-
-    def __getattribute__(self, name):
-        if name.startswith('add_') and not transaction.manager.manager._txn:
-            transaction.begin()
-
-        return super().__getattribute__(name)
-
-    def commit(self):
-        transaction.commit()
-
-    @contextmanager
-    def update(self):
-        self.refresh()
-        yield
-        self.commit()
-
-    def refresh(self):
-        transaction.begin()
-
-        caches = (
-            'activities',
-            'attendees',
-            'bookings',
-            'occasions',
-            'periods',
-            'users'
-        )
-
-        for name in caches:
-            cache = getattr(self, name)
-
-            for ix, item in enumerate(cache):
-                cache[ix] = self.session.merge(item)
-                self.session.refresh(cache[ix])
 
     @cached_property
     def c(self):
@@ -182,12 +155,6 @@ class Scenario(object):
 
     def date_offset(self, offset):
         return (datetime.now() + timedelta(days=offset)).date()
-
-    def add(self, model, **columns):
-        obj = model(**columns)
-        self.session.add(obj)
-
-        return obj
 
     def add_period(self, phase='wishlist', **columns):
         columns.setdefault('title', self.faker.sentence())
