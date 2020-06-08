@@ -1,8 +1,11 @@
+from datetime import timedelta
 from uuid import uuid4
 
 import pytest
 import transaction
 from faker import Faker
+from sedate import utcnow
+from sqlalchemy import desc
 
 from onegov.fsi.models import CourseAttendee, Course, CourseEvent
 from onegov.fsi.models.course_reservation import CourseReservation
@@ -222,7 +225,12 @@ def create_fsi_app(request, use_elasticsearch, hashed_password, mock_db=False):
 class FsiScenario(BaseScenario):
 
     cached_attributes = (
-        'users'
+        'users',
+        'attendees',
+        'courses',
+        'course_events',
+        'subscriptions',
+        'templates'
     )
 
     def __init__(self, session, test_password):
@@ -246,13 +254,18 @@ class FsiScenario(BaseScenario):
         if '.' in fn:
             fn, ln = fn.split('.')
 
+        exclude = ('organisation', 'permissions')
+
         if not external:
-            user = self.add_user(**columns)
+            user = self.add_user(
+                **{k: v for k, v in columns.items() if k not in exclude}
+            )
         else:
             columns.setdefault('_email', columns['username'])
 
         self.attendees.append(self.add(
             model=CourseAttendee,
+            id=uuid4(),
             user_id=not external and user.id,
             source_id=not external and user.source_id,
             first_name=fn,
@@ -268,6 +281,7 @@ class FsiScenario(BaseScenario):
         self.users.append(self.add(
             model=User,
             password_hash=self.test_password,
+            id=uuid4(),
             **columns
         ))
 
@@ -289,25 +303,32 @@ class FsiScenario(BaseScenario):
         columns.setdefault('description', 'default description')
         self.courses.append(self.add(
             Course,
-            **columns
+            **columns,
+            id=uuid4()
         ))
-        return self.courses[-1]
+        return self.courses[-1].id
 
     def add_course_event(self, **columns):
         columns.setdefault('presenter_name', self.faker.name())
         columns.setdefault('presenter_company', self.faker.company())
         columns.setdefault('presenter_email', self.faker.company_email())
+        columns.setdefault('location', self.faker.city())
+
+        now = utcnow()
+        columns.setdefault('start', now + timedelta(days=1))
+        columns.setdefault('end', columns['start'] + timedelta(hours=4))
 
         self.course_events.append(self.add(
             CourseEvent,
             **columns
         ))
-        return self.course_events[-1]
+        return self.latest_event
 
     def add_subscription(self, **columns):
         self.subscriptions.append(self.add(
             CourseReservation,
-            **columns
+            **columns,
+            id=uuid4()
         ))
         return self.subscriptions[-1]
 
@@ -323,9 +344,31 @@ class FsiScenario(BaseScenario):
         for t in types:
             self.templates.append(self.add(
                 TEMPLATE_MODEL_MAPPING[t],
-                **columns
+                **columns,
+                id=uuid4()
             ))
         return self.templates[-len(types)::]
+
+    def first_user(self, role='admin'):
+        return self.session.query(User).filter_by(
+            role=role).order_by(desc(User.created)).first()
+
+    @property
+    def latest_attendee(self):
+        return self.attendees[-1]
+
+    @property
+    def latest_course(self):
+        return self.courses[-1]
+
+    @property
+    def latest_event(self):
+        return self.course_events[-1]
+
+    def latest_subscriptions(self, count=1):
+        return self.subscriptions[-count::]
+
+
 
 
 @pytest.fixture(scope='function')

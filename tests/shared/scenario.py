@@ -40,6 +40,6 @@ class BaseScenario(object):
         for name in self.cached_attributes:
             cache = getattr(self, name)
 
-            for ix, item in enumerate(self.cached_attributes):
+            for ix, item in enumerate(cache):
                 cache[ix] = self.session.merge(item)
-                self.session.refresh(self.cached_attributes[ix])
+                self.session.refresh(cache[ix])
