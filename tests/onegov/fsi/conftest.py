@@ -2,17 +2,20 @@ from uuid import uuid4
 
 import pytest
 import transaction
+from faker import Faker
 
+from onegov.fsi.models import CourseAttendee, Course, CourseEvent
 from onegov.fsi.models.course_reservation import CourseReservation
 from onegov.user import User
 from onegov.fsi import FsiApp
 from onegov.fsi.initial_content import create_new_organisation
 from tests.onegov.fsi.common import (
     global_password, admin_factory,
-    editor_factory, admin_attendee_factory, editor_attendee_factory, member_factory,
+    editor_factory, admin_attendee_factory, editor_attendee_factory,
+    member_factory,
     attendee_factory, external_attendee_factory, notification_template_factory,
     course_factory, course_event_factory, future_course_event_factory,
-    future_course_reservation_factory, db_mock)
+    future_course_reservation_factory, db_mock, TEMPLATE_MODEL_MAPPING)
 from tests.onegov.fsi.common import hashed_password as _hashed_password
 from tests.shared.scenario import BaseScenario
 
@@ -218,22 +221,117 @@ def create_fsi_app(request, use_elasticsearch, hashed_password, mock_db=False):
 
 class FsiScenario(BaseScenario):
 
+    cached_attributes = (
+        'users'
+    )
+
     def __init__(self, session, test_password):
         super().__init__(session, test_password)
 
+        self.faker = Faker()
+        self.users = []
         self.attendees = []
         self.courses = []
         self.course_events = []
         self.subscriptions = []
+        self.templates = []
 
-    def add_attendee(self, role='admin'):
-        pass
+    def add_attendee(self, external=False, **columns):
+
+        assert 'first_name' not in columns, 'Provide email to construct'
+        assert 'last_name' not in columns, 'Provide email to construct'
+        columns.setdefault('username', self.faker.email())
+
+        fn, ln = columns['username'].split('@')
+        if '.' in fn:
+            fn, ln = fn.split('.')
+
+        if not external:
+            user = self.add_user(**columns)
+        else:
+            columns.setdefault('_email', columns['username'])
+
+        self.attendees.append(self.add(
+            model=CourseAttendee,
+            user_id=not external and user.id,
+            source_id=not external and user.source_id,
+            first_name=fn,
+            last_name=ln,
+            organisation=not external and columns.get('organisation'),
+            permissions=not external and columns.get('permissions')
+        ))
+
+    def add_user(self, **columns):
+        columns.setdefault('role', 'admin')
+        columns.setdefault('username', self.faker.email())
+
+        self.users.append(self.add(
+            model=User,
+            password_hash=self.test_password,
+            **columns
+        ))
+
+        user = self.users[-1]
+        user.realname = \
+            f'{self.faker.first_name()}\u00A0{self.faker.last_name()}'
+        user.data = user.data or {}
+        user.data['salutation'] = self.faker.random_element(
+            ('mr', 'ms'))
+        user.data['address'] = self.faker.address()
+        user.data['zip_code'] = self.faker.zipcode()
+        user.data['place'] = self.faker.city()
+        user.data['political_municipality'] = self.faker.city()
+        user.data['emergency'] = f'123 456 789 ({self.faker.name()})'
+        return user
+
+    def add_course(self, **columns):
+        columns.setdefault('name', f"Course {len(self.courses)}")
+        columns.setdefault('description', 'default description')
+        self.courses.append(self.add(
+            Course,
+            **columns
+        ))
+        return self.courses[-1]
+
+    def add_course_event(self, **columns):
+        columns.setdefault('presenter_name', self.faker.name())
+        columns.setdefault('presenter_company', self.faker.company())
+        columns.setdefault('presenter_email', self.faker.company_email())
+
+        self.course_events.append(self.add(
+            CourseEvent,
+            **columns
+        ))
+        return self.course_events[-1]
+
+    def add_subscription(self, **columns):
+        self.subscriptions.append(self.add(
+            CourseReservation,
+            **columns
+        ))
+        return self.subscriptions[-1]
+
+    def add_notification_template(self, all_types=True, **columns):
+        columns.setdefault('type', 'reservation')
+        columns.setdefault('subject', columns['type'].upper())
+        columns.setdefault('text', )
+
+        types = TEMPLATE_MODEL_MAPPING.keys()
+        if not all_types:
+            types = (columns['type'], )
+
+        for t in types:
+            self.templates.append(self.add(
+                TEMPLATE_MODEL_MAPPING[t],
+                **columns
+            ))
+        return self.templates[-len(types)::]
 
 
 @pytest.fixture(scope='function')
-def scenario(request, session, plain_password):
+def scenario(request, session, hashed_password):
     for name in request.fixturenames:
         if name in ('fsi_app', 'es_fsi_app'):
             session = request.getfixturevalue(name).session()
 
-    yield FsiScenario(session, plain_password)
+    yield FsiScenario(session, hashed_password)
