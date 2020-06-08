@@ -93,8 +93,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         return self.course.description
 
     def __str__(self):
-        format = '%d.%m.%Y'
-        date = self.start.strftime(format)
+        date = self.start.strftime('%d.%m.%Y')
         return f'{self.name} - {date}'
 
     # Event specific information
