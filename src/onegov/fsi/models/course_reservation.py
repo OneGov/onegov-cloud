@@ -45,9 +45,4 @@ class CourseReservation(Base):
     def __str__(self):
         if self.is_placeholder:
             return f'{self.dummy_desc or ""}'
-        attendee = self.attendee
-        fn = attendee.first_name
-        ln = attendee.last_name
-        if fn and ln:
-            return f'{ln.strip()}, {fn.strip()}'
-        return attendee.email
+        return str(self.attendee)
