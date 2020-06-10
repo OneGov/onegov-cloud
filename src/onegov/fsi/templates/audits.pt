@@ -37,7 +37,7 @@
                                 </thead>
                                 <tbody>
                                     <tal:b tal:repeat="result results">
-                                        <tr tal:define="date layout.next_event_date(result.start, layout.model.course.refresh_interval)">
+                                        <tr tal:define="date layout.next_event_date(result.start, layout.course.refresh_interval)">
                                             <td>${result.last_name}</td>
                                             <td>${result.first_name}</td>
                                             <td>${layout.render_start_end(result.start, result.end)} <span i18n:translate="" tal:condition="result.start">h</span></td>
