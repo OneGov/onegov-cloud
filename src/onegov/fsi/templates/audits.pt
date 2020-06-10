@@ -7,11 +7,14 @@
             <div class="columns small-12">
                 <div class="row">
                     <div tal:condition="show_form|True" class="columns small-12 medium-8">
-                        <div metal:use-macro="layout.macros['form']" />
-                        <dl class="field-display">
-                            <dt i18n:translate="">Refresh Interval:</dt>
-                            <dd>${layout.format_timedelta(layout.model.course.refresh_interval)}</dd>
-                        </dl>
+
+                        <div class="filter-panel">
+                            <div metal:use-macro="layout.macros['form']" />
+
+                            <h4 class="filter-title" i18n:translate>By last name</h4>
+                            <div metal:use-macro="layout.macros['tags']" tal:define="tags letters" />
+                        </div>
+
                     </div>
                     <div class="columns small-12 medium-4">
                         <div class="info-panel hide-for-print">
@@ -29,17 +32,17 @@
                         <tal:b condition="results">
                             <table class="tablesaw hover fullwidth">
                                 <thead>
-                                <th class="text-left" i18n:translate="">Last Name</th>
-                                <th class="text-left" i18n:translate="">First Name</th>
+                                <th class="text-left" i18n:translate="">Name</th>
+                                <th class="text-left" i18n:translate="">Shortcode</th>
                                     <th class="text-left" i18n:translate="">Last Event</th>
                                     <th class="text-left" i18n:translate="">Attended</th>
-                                    <th class="text-left" i18n:translate="">Due by</th>
+                                    <th class="text-left" i18n:translate="">Due by (every <span i18n:name="refresh_interval">${layout.format_timedelta(model.course.refresh_interval)})</span></th>
                                 </thead>
                                 <tbody>
                                     <tal:b tal:repeat="result results">
-                                        <tr tal:define="date layout.next_event_date(result.start, layout.course.refresh_interval)">
-                                            <td>${result.last_name}</td>
-                                            <td>${result.first_name}</td>
+                                        <tr tal:define="date layout.next_event_date(result.start, result.refresh_interval)">
+                                            <td>${result.last_name}, ${result.first_name}</td>
+                                            <td>${result.source_id}</td>
                                             <td>${layout.render_start_end(result.start, result.end)} <span i18n:translate="" tal:condition="result.start">h</span></td>
                                             <td>
                                                 <span tal:condition="result.event_completed" class="check-icon"></span>
@@ -56,6 +59,9 @@
                                     </tal:b>
                                 </tbody>
                             </table>
+                            <div class="pagination-centered">
+                                <div metal:use-macro="layout.macros['pagination']" tal:define="collection model; current_page model;" />
+                            </div>
                         </tal:b>
                     </div>
                 </div>

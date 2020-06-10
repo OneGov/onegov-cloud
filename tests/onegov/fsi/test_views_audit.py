@@ -23,7 +23,7 @@ def test_audit_for_course(client, scenario):
     now = utcnow()
     for ix in range(2):
         scenario.add_course_event(
-            course_id=course.id,
+            course,
             start=now + timedelta(days=30*ix)
         )
 
@@ -37,7 +37,8 @@ def test_audit_for_course(client, scenario):
     scenario.refresh()
 
     client.login_admin()
-    url = f'/fsi/audit?course_id={scenario.latest_course.id}'
+    # url = f'/fsi/audit?course_id={scenario.latest_course.id}'
+    url = f'/fsi/audit'
     page = client.get(url)
     client = client.spawn()
     client.login_editor()

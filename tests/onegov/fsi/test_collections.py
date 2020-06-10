@@ -42,8 +42,8 @@ def test_course_event_collection(session, course):
         CourseEvent(
             course_id=course(session)[0].id,
             location=f'Address, Room {i}',
-            start=now + datetime.timedelta(days=i),
-            end=now + datetime.timedelta(days=i, hours=2),
+            start=now + timedelta(days=i),
+            end=now + timedelta(days=i, hours=2),
             presenter_name=f'P{i}',
             presenter_company=f'C{i}',
             presenter_email=f'{i}@email.com'
@@ -75,7 +75,7 @@ def test_course_event_collection(session, course):
     assert event_coll.query().count() == 1
 
     # Test from specific date
-    tmr = now + datetime.timedelta(days=1)
+    tmr = now + timedelta(days=1)
     event_coll = CourseEventCollection(session, from_date=tmr)
     assert event_coll.query().count() == 1
 
@@ -281,5 +281,5 @@ def test_audit_collection(scenario):
     audits.organisations = ['AA']
     assert audits.query().count() == 3
     # get the one having ln starting with ZZZ
-    audits.ln_startswith = 'Z'
+    audits.letter = 'Z'
     assert audits.query().count() == 1

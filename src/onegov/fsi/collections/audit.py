@@ -1,12 +1,12 @@
 from cached_property import cached_property
 from sqlalchemy import func, desc, or_
 
-from onegov.core.collection import GenericCollection
+from onegov.core.collection import GenericCollection, Pagination
 from onegov.fsi.models import CourseAttendee, CourseReservation, CourseEvent, \
     Course
 
 
-class AuditCollection(GenericCollection):
+class AuditCollection(GenericCollection, Pagination):
     """
     Displays the list of attendees filtered by a course and organisation
     for evauluation if they subscribed and completed a course event.
@@ -15,15 +15,58 @@ class AuditCollection(GenericCollection):
 
     """
 
+    batch_size = 20
+
     def __init__(self, session, course_id, auth_attendee, organisations=None,
-                 letter=None):
+                 letter=None, page=0):
         super().__init__(session)
-        self.course_id = course_id
+        self.page = page
+
+        # When using the class link, the option with a course is still
+        self.course_id = course_id if course_id \
+            else self.relevant_courses[0].id
+
         self.auth_attendee = auth_attendee
 
         # e.g. SD / STVA or nothing in case of editor
         self.organisations = organisations or []
         self.letter = letter.upper() if letter else None
+
+    def subset(self):
+        return self.query()
+
+    @property
+    def page_index(self):
+        return self.page
+
+    def page_by_index(self, index):
+        return self.__class__(
+            self.session,
+            page=index,
+            course_id=self.course_id,
+            auth_attendee=self.auth_attendee,
+            organisations=self.organisations,
+            letter=self.letter
+        )
+
+    def by_letter(self, letter):
+        return self.__class__(
+            self.session,
+            page=0,
+            course_id=self.course_id,
+            auth_attendee=self.auth_attendee,
+            organisations=self.organisations,
+            letter=letter
+        )
+
+    def __eq__(self, other):
+        return all((
+            self.page == other.page,
+            self.course_id == other.course_id,
+            self.auth_attendee == other.auth_attendee,
+            self.organisations == other.organisations,
+            self.letter == other.letter
+        ))
 
     def ranked_subscription_query(self):
         """
@@ -34,6 +77,9 @@ class AuditCollection(GenericCollection):
         ranked = self.session.query(
             CourseReservation.attendee_id,
             CourseReservation.event_completed,
+            Course.name,
+            Course.refresh_interval,
+            CourseEvent.course_id,
             CourseEvent.start,
             CourseEvent.end,
             func.row_number().over(
@@ -43,10 +89,15 @@ class AuditCollection(GenericCollection):
                     CourseEvent.start]
             ).label('rownum'),
         )
-        ranked = ranked.join(CourseEvent)
-        ranked = ranked.filter(CourseEvent.course_id == self.course_id)
-
-        return ranked.filter(CourseReservation.attendee_id != None)
+        ranked = ranked.join(
+            CourseEvent, CourseEvent.id == CourseReservation.course_event_id)
+        ranked = ranked.join(
+            Course, Course.id == CourseEvent.course_id)
+        ranked = ranked.filter(
+            CourseEvent.course_id == self.course_id,
+            CourseReservation.attendee_id != None
+        )
+        return ranked
 
     def last_subscriptions(self):
         """Retrieve the last completed subscription by attemdee for
@@ -57,7 +108,9 @@ class AuditCollection(GenericCollection):
             CourseReservation.attendee_id,
             ranked.c.start,
             ranked.c.end,
-            ranked.c.event_completed
+            ranked.c.name,
+            ranked.c.event_completed,
+            ranked.c.refresh_interval,
         ).select_entity_from(ranked)
         return subquery.filter(ranked.c.rownum == 1)
 
@@ -86,9 +139,12 @@ class AuditCollection(GenericCollection):
             CourseAttendee.first_name,
             CourseAttendee.last_name,
             CourseAttendee.organisation,
+            CourseAttendee.source_id,
             last.c.start.label('start'),
             last.c.end.label('end'),
-            last.c.event_completed
+            last.c.event_completed,
+            last.c.refresh_interval,
+            last.c.name
         )
         if self.letter:
             query = query.filter(
@@ -113,3 +169,22 @@ class AuditCollection(GenericCollection):
     def course(self):
         return self.course_id and self.session.query(Course).filter_by(
             id=self.course_id).first()
+
+    @cached_property
+    def used_letters(self):
+        """ Returns a list of all the distinct first letters of the peoples
+        last names.
+
+        """
+        letter = func.left(CourseAttendee.last_name, 1)
+        letter = func.upper(func.unaccent(letter))
+        query = self.session.query(letter.distinct().label('letter'))
+        query = query.order_by(letter)
+        return [r.letter for r in query if r.letter]
+
+    @cached_property
+    def relevant_courses(self):
+        return tuple(self.session.query(Course.id, Course.name).filter(
+            Course.hidden_from_public == False,
+            Course.mandatory_refresh != None
+        ))

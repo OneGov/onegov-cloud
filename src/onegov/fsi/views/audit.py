@@ -1,5 +1,6 @@
 from sedate import utcnow
 
+from onegov.core.elements import Link
 from onegov.core.security import Private
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.audit import AuditCollection
@@ -17,32 +18,26 @@ from onegov.fsi import _
 def invite_attendees_for_event(self, request, form):
     layout = AuditLayout(self, request)
     now = utcnow()
+    form.method = 'GET'
 
-    if form.submitted(request):
-        data = form.get_useful_data()
-        self.course_id = data['course_id']
-
-        if self.course_id and not self.course:
-            request.alert(_("Selected course does not exist"))
-            return request.redirect(request.class_link(AuditCollection))
-
-        if request.current_attendee.role != 'editor':
-            self.organisation = data['organisation']
-
-        return {
-            'layout': layout,
-            'model': self,
-            'results': self.query().all(),
-            'form': form,
-            'button_text': _('Create Audit'),
-            'now': now,
-        }
+    letters = tuple(
+        Link(
+            text=letter,
+            url=request.link(
+                self.by_letter(
+                    letter=letter if (letter != self.letter) else None
+                )
+            ),
+            active=(letter == self.letter),
+        ) for letter in self.used_letters
+    )
 
     return {
         'layout': layout,
         'model': self,
-        'results': None,
+        'results': self.batch,
         'form': form,
-        'button_text': _('Create Audit'),
+        'button_text': _('Update'),
         'now': now,
+        'letters': letters
     }

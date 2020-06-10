@@ -168,11 +168,14 @@ def get_reservation_details(request, id):
 
 
 @FsiApp.path(model=AuditCollection, path='/fsi/audit',
-             converters=dict(course_id=UUID))
-def get_audit(request, course_id, organisation):
+             converters=dict(
+                 course_id=UUID, organisations=[str], page=int))
+def get_audit(request, course_id, organisations, page=0, letter=None):
     return AuditCollection(
         request.session,
         course_id,
         auth_attendee=request.current_attendee,
-        organisation=organisation
+        organisations=organisations,
+        page=page,
+        letter=letter
     )

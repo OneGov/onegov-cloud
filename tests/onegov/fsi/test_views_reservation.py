@@ -109,7 +109,7 @@ def test_edit_reservation(client_with_db):
 
     # course must be fixed
     options = [opt[2] for opt in edit.form['course_event_id'].options]
-    assert options == ['Course - 01.01.1950']
+    assert options == ['Course - 01.01.1950 00:00']
 
     new_id = edit.form['attendee_id'].options[1][0]
     edit.form['attendee_id'] = new_id
@@ -159,7 +159,7 @@ def test_create_delete_reservation(client_with_db):
     page = client.get(f'/fsi/reservations/add?attendee_id={attendee.id}')
     options = [opt[2] for opt in page.form['course_event_id'].options]
     assert options == [
-        'Course - 01.01.2060'
+        'Course - 01.01.2060 00:00'
     ]
 
     client.get(view)
@@ -174,8 +174,8 @@ def test_create_delete_reservation(client_with_db):
     options = [opt[2] for opt in new.form['course_event_id'].options]
     print(options)
     assert options == [
-        'Course - 01.01.2050',
-        'Course - 01.01.2060'
+        'Course - 01.01.2050 00:00',
+        'Course - 01.01.2060 00:00'
     ]
     # select course_id where there is no registration done (2060)
     new.form['course_event_id'] = str(events[1].id)
@@ -205,7 +205,7 @@ def test_create_delete_reservation(client_with_db):
     new = client.get(view)
     options = [opt[2] for opt in new.form['course_event_id'].options]
     # must asscending order from newest to oldest, past events excluded
-    assert options == ['Course - 01.01.2050', 'Course - 01.01.2060']
+    assert options == ['Course - 01.01.2050 00:00', 'Course - 01.01.2060 00:00']
     new.form['dummy_desc'] = 'Safe!'
     page = new.form.submit().follow()
     assert 'Safe!' in page
