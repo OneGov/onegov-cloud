@@ -6,6 +6,8 @@ from sqlalchemy import Column, ARRAY, Text, Boolean
 
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task
+from onegov.fsi.models import CourseAttendee
+from onegov.user import User
 
 
 @upgrade_task('Remove department column')
@@ -109,7 +111,13 @@ def add_hidden_from_public_in_course(context):
 @upgrade_task('Adds source_id to attendee')
 def add_source_id_to_attendee(context):
     if not context.has_column('fsi_attendees', 'source_id'):
-        context.add_column_with_defaults(
+        context.operations.add_column(
             'fsi_attendees',
-            Column('source_id', Text, nullable=True),
-            default=lambda attendee: attendee.source_id)
+            Column('source_id', Text, nullable=True))
+
+    context.session.execute("""
+        UPDATE fsi_attendees t2
+        SET source_id = t1.source_id
+        FROM users t1
+        WHERE  t2.user_id = t1.id
+    """)
