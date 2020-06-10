@@ -8,7 +8,7 @@ from onegov.fsi.collections.audit import AuditCollection
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.collections.reservation import ReservationCollection
-from onegov.fsi.models import CourseReservation
+from onegov.fsi.models import CourseAttendee
 
 from onegov.fsi.models.course_event import CourseEvent
 from tests.onegov.fsi.common import collection_attr_eq_test
@@ -194,120 +194,92 @@ def test_reservation_collection_query(
     assert coll.query().count() == 1
 
 
-def test_last_completed_subscriptions(scenario):
+def test_audit_collection(scenario):
 
     scenario.add_course(
         mandatory_refresh=True,
         refresh_interval=timedelta(days=30)
     )
     for i in range(6):
-        scenario.add_course_event(
-            course_id=scenario.latest_course.id,
+        scenario.add_course_event(scenario.latest_course)
+
+    orgs = ['AA', 'BB', None]
+    for i, org in enumerate(orgs):
+        scenario.add_attendee(
+            role='member',
+            organisation=org,
+            username=f'{i}.{org or "ZZZ"}@email.com'
         )
-    for i in range(3):
-        scenario.add_attendee(role='member')
         scenario.add_subscription(
-            course_event_id=scenario.course_events[i].id,
-            attendee_id=scenario.attendees[i].id,
+            scenario.course_events[i],
+            scenario.attendees[i],
             event_completed=True
         )
         # Add not completed courses more recent, should be discarded in query
         scenario.add_subscription(
-            course_event_id=scenario.course_events[i+3].id,
-            attendee_id=scenario.attendees[i].id,
+            scenario.course_events[i+3],
+            scenario.attendees[i],
             event_completed=False
         )
     # add some noise
-    scenario.add_course_event(course_id=scenario.latest_course.id)
-    scenario.add_attendee(external=True)
+    scenario.add_course_event(scenario.latest_course)
+    scenario.add_attendee(external=True, username='h.r@giger.ch')
     scenario.commit()
     scenario.refresh()
 
-    auth_attendee = authAttendee()
+    # ---- Check preparing query last_subscriptions ----
+    fake_admin = authAttendee()
+    fake_editor = authAttendee(role='editor', permissions=['AA'])
 
     audits = AuditCollection(
         scenario.session, scenario.latest_course.id,
-        auth_attendee
+        fake_admin
     )
     results = tuple(
         (e.attendee_id, e.start) for e in
         audits.last_subscriptions()
     )
-    from_scenario = (
-        (a.id, e.start) for a, e in zip(scenario.attendees, scenario.course_events[:3])
+    assert sorted(results) == sorted(
+        (a.id, e.start) for a, e in
+        zip(scenario.attendees, scenario.course_events[:3])
     )
-    assert sorted(results) == sorted(from_scenario)
 
     # add a subscription also for this attendee, but not completed
     scenario.add_subscription(
-        course_event_id=scenario.course_events[3].id,
-        attendee_id=scenario.latest_attendee.id
+        scenario.course_events[3],
+        scenario.latest_attendee
     )
     scenario.commit()
+    scenario.refresh()
     query = audits.last_subscriptions()
+    # Check if his subscription is added even if its not marked completed
     assert len(results) + 1 == query.count()
 
+    # Check filtering for admin obtaining all records
 
-def test_audit_collection(
-        session, course, course_event, attendee, editor_attendee,
-        admin_attendee):
-    course_, data = course(session)
-    org = 'SD / STVA'
-    editor, data = editor_attendee(
-        session,
-        permissions=[org]
-    )
-    admin_att, data = admin_attendee(session)
+    def get_filtered():
+        return audits.filter_attendees_by_role(all_atts_in_db)
 
-    attendees = []
-    for i in range(4):
-        att, data = attendee(
-            session,
-            first_name=f'Attendee{i}',
-            organisation=org
-        )
-        attendees.append(att)
+    all_atts_in_db = scenario.session.query(CourseAttendee)
+    assert get_filtered().count() == len(scenario.attendees)
 
-    # Create 3 events for the course
-    proto_event = course_event(session)[0]
-    events = [proto_event]
-    for i in range(2):
-        ev, data = course_event(
-            session,
-            start=proto_event.start + datetime.timedelta(days=i + 1),
-            end=proto_event.end + datetime.timedelta(days=i + 1)
-        )
-        events.append(ev)
+    audits.organisations = ['AA']
+    # also return the ones without org for admins
+    assert get_filtered().count() == 3
 
-    subscriptions = []
-    # last attendee should not have a subscription
-    for i, event in enumerate(events):
-        subscription = CourseReservation(
-            course_event_id=event.id,
-            attendee_id=attendees[i].id,
-            event_completed=True
-        )
-        subscriptions.append(subscription)
-    session.add_all(subscriptions)
-    session.flush()
-    assert attendees[-1].reservations.first() is None
+    # just the ones he has permissions, no more
+    audits.auth_attendee = fake_editor
+    assert get_filtered().count() == 1
 
-    # add the first attendee also to the second event
-    session.add(
-        CourseReservation(
-            attendee_id=attendees[0].id,
-            course_event_id=events[1].id
-        )
-    )
-    session.flush()
+    # Test filtering with alphabetical letter
 
-    # test for admin
-    coll = AuditCollection(
-        session,
-        course_.id,
-        admin_att,
-        organisation=org
-    )
-    for data in coll.query():
-        print(data)
-    assert coll.query().count() == len(attendees)
+    # ---- Check actual query joining filtered attendees ----
+    # Check for admin
+    audits.auth_attendee = fake_admin
+    audits.organisations = []
+    assert audits.query().count() == len(scenario.attendees)
+    audits.organisations = ['AA']
+    assert audits.query().count() == 3
+    # get the one having ln starting with ZZZ
+    audits.ln_startswith = 'Z'
+    assert audits.query().count() == 1

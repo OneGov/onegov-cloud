@@ -1,5 +1,5 @@
 from cached_property import cached_property
-from sqlalchemy import func, desc
+from sqlalchemy import func, desc, or_
 
 from onegov.core.collection import GenericCollection
 from onegov.fsi.models import CourseAttendee, CourseReservation, CourseEvent, \
@@ -15,13 +15,15 @@ class AuditCollection(GenericCollection):
 
     """
 
-    def __init__(self, session, course_id, auth_attendee, organisations=None):
+    def __init__(self, session, course_id, auth_attendee, organisations=None,
+                 letter=None):
         super().__init__(session)
         self.course_id = course_id
         self.auth_attendee = auth_attendee
 
         # e.g. SD / STVA or nothing in case of editor
-        self.organisations = organisations
+        self.organisations = organisations or []
+        self.letter = letter.upper() if letter else None
 
     def ranked_subscription_query(self):
         """
@@ -61,14 +63,21 @@ class AuditCollection(GenericCollection):
 
     def filter_attendees_by_role(self, query):
         """Filter permissions of editor, exclude external, """
-        if self.auth_attendee.role != 'editor' and self.organisations:
-            query = query.filter(
-                CourseAttendee.organisation == self.organisations)
+        if self.auth_attendee.role == 'admin':
+            if not self.organisations:
+                return query
+            return query.filter(
+                or_(CourseAttendee.organisation == None,
+                    CourseAttendee.organisation.in_(self.organisations))
+            )
         else:
-            query = query.filter(CourseAttendee.organisation.in_(
-                self.auth_attendee.permissions,
-            ))
-        return query
+            editors_permissions = self.auth_attendee.permissions or []
+            return query.filter(
+                CourseAttendee.organisation.in_(tuple(
+                    p for p in editors_permissions
+                    if p in self.organisations
+                ) if self.organisations else editors_permissions)
+            )
 
     def query(self):
         last = self.last_subscriptions().subquery()
@@ -81,14 +90,13 @@ class AuditCollection(GenericCollection):
             last.c.end.label('end'),
             last.c.event_completed
         )
-        if self.auth_attendee.role != 'editor':
-            assert self.organisation
-            query = query.filter_by(organisation=self.organisation)
-        else:
-            query = query.filter(CourseAttendee.organisation.in_(
-                self.auth_attendee.permissions,
-            ))
-
+        if self.letter:
+            query = query.filter(
+                func.upper(
+                    func.unaccent(CourseAttendee.last_name)
+                ).startswith(self.letter)
+            )
+        query = self.filter_attendees_by_role(query)
         query = query.join(
             last, CourseAttendee.id == last.c.attendee_id, isouter=True)
         query = query.order_by(
@@ -105,4 +113,3 @@ class AuditCollection(GenericCollection):
     def course(self):
         return self.course_id and self.session.query(Course).filter_by(
             id=self.course_id).first()
-
