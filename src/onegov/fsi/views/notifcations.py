@@ -23,7 +23,7 @@ def handle_send_email(self, request, recipients, cc_to_sender=True,
     if not recipients:
         request.alert(_("There are no recipients matching the selection"))
     else:
-        att = request.current_attendee
+        att = request.attendee
         handle_attendees = isinstance(recipients[0], CourseAttendee)
         att_ref = att if handle_attendees else att.id
         if cc_to_sender and att_ref not in recipients:
@@ -136,7 +136,7 @@ def view_email_preview(self, request):
         'layout': layout,
         'title': self.subject,
         'notification': self.text_html,
-        'attendee': request.current_attendee
+        'attendee': request.attendee
     }
 
 

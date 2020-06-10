@@ -49,7 +49,7 @@ class AuditForm(Form):
 
     @property
     def att(self):
-        return self.request.current_attendee
+        return self.request.attendee
 
     def get_course_choices(self):
         if not self.courses:

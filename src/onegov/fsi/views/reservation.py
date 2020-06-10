@@ -86,7 +86,7 @@ def view_edit_reservation(self, request, form):
             request.session,
             attendee_id=data['attendee_id'],
             course_event_id=event_id,
-            auth_attendee=request.current_attendee
+            auth_attendee=request.attendee
         )
         res_existing = coll.query().first()
         if not res_existing:
@@ -109,7 +109,7 @@ def view_edit_reservation(self, request, form):
             )
             return request.redirect(request.link(ReservationCollection(
                 request.session,
-                auth_attendee=request.current_attendee,
+                auth_attendee=request.attendee,
                 course_event_id=self.course_event_id,
                 attendee_id=self.attendee_id
             )))
@@ -146,7 +146,7 @@ def view_edit_placeholder_reservation(self, request, form):
         return request.redirect(request.link(ReservationCollection(
             request.session,
             course_event_id=self.course_event_id,
-            auth_attendee=request.current_attendee
+            auth_attendee=request.attendee
         )))
 
     if not form.errors:
@@ -227,7 +227,7 @@ def view_add_from_course_event(self, request):
 def view_delete_reservation(self, request):
     request.assert_valid_csrf_token()
     ReservationCollection(
-        request.session, auth_attendee=request.current_attendee).delete(self)
+        request.session, auth_attendee=request.attendee).delete(self)
     if not self.is_placeholder:
         request = handle_send_email(
             self.course_event.cancellation_template,

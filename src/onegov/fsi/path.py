@@ -92,7 +92,7 @@ def get_courses(request, show_hidden_from_public):
         show_hidden_from_public = False
     return CourseCollection(
         request.session,
-        auth_attendee=request.current_attendee,
+        auth_attendee=request.attendee,
         show_hidden_from_public=show_hidden_from_public
     )
 
@@ -113,7 +113,7 @@ def get_attendees(
         request.session, page,
         exclude_external=exclude_external,
         external_only=external_only,
-        auth_attendee=request.current_attendee,
+        auth_attendee=request.attendee,
         editors_only=editors_only,
         admins_only=admins_only
     )
@@ -157,7 +157,7 @@ def get_reservations(
         attendee_id=attendee_id,
         course_event_id=course_event_id,
         external_only=external_only,
-        auth_attendee=request.current_attendee,
+        auth_attendee=request.attendee,
         page=page
     )
 
@@ -174,7 +174,7 @@ def get_audit(request, course_id, organisations, page=0, letter=None):
     return AuditCollection(
         request.session,
         course_id,
-        auth_attendee=request.current_attendee,
+        auth_attendee=request.attendee,
         organisations=organisations,
         page=page,
         letter=letter

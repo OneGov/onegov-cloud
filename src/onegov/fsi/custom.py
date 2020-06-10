@@ -17,7 +17,7 @@ def get_base_tools(request):
 
     if request.is_logged_in:
 
-        usr = request.current_attendee
+        usr = request.attendee
         reservation_count = 0 if not usr else usr.reservations.count()
 
         profile_links = [

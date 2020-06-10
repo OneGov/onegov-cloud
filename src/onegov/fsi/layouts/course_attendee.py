@@ -41,27 +41,27 @@ class CourseAttendeeCollectionLayout(DefaultLayout):
     @cached_property
     def collection(self):
         return CourseAttendeeCollection(
-            self.request.session, auth_attendee=self.request.current_attendee
+            self.request.session, auth_attendee=self.request.attendee
         )
 
     @cached_property
     def collection_externals(self):
         return CourseAttendeeCollection(
-            self.request.session, auth_attendee=self.request.current_attendee,
+            self.request.session, auth_attendee=self.request.attendee,
             external_only=True
         )
 
     @cached_property
     def collection_editors(self):
         return CourseAttendeeCollection(
-            self.request.session, auth_attendee=self.request.current_attendee,
+            self.request.session, auth_attendee=self.request.attendee,
             editors_only=True
         )
 
     @cached_property
     def collection_admins(self):
         return CourseAttendeeCollection(
-            self.request.session, auth_attendee=self.request.current_attendee,
+            self.request.session, auth_attendee=self.request.attendee,
             admins_only=True
         )
 
@@ -93,7 +93,7 @@ class CourseAttendeeLayout(DefaultLayout):
     @cached_property
     def collection(self):
         return CourseAttendeeCollection(
-            self.request.session, auth_attendee=self.request.current_attendee)
+            self.request.session, auth_attendee=self.request.attendee)
 
     @cached_property
     def breadcrumbs(self):
@@ -122,7 +122,7 @@ class CourseAttendeeLayout(DefaultLayout):
                     _('Add Subscription'),
                     self.request.link(ReservationCollection(
                         self.request.session, attendee_id=self.model.id,
-                        auth_attendee=self.request.current_attendee),
+                        auth_attendee=self.request.attendee),
                         name='add'),
                     attrs={'class': 'add-icon'}
                 )
@@ -171,4 +171,4 @@ class CourseAttendeeLayout(DefaultLayout):
 
     @property
     def for_himself(self):
-        return self.model.id == self.request.current_attendee.id
+        return self.model.id == self.request.attendee.id

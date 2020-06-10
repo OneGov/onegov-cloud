@@ -71,7 +71,7 @@ class CourseEventCollectionLayout(DefaultLayout):
             return None
         return self.request.link(AuditCollection(
             self.request.session,
-            auth_attendee=self.request.current_attendee,
+            auth_attendee=self.request.attendee,
             course_id=course.id,
         ))
 
@@ -102,7 +102,7 @@ class CourseEventLayout(DefaultLayout, FormatMixin):
         return ReservationCollection(
             self.request.session,
             course_event_id=self.model.id,
-            auth_attendee=self.request.current_attendee
+            auth_attendee=self.request.attendee
         )
 
     @cached_property
@@ -142,7 +142,7 @@ class CourseEventLayout(DefaultLayout, FormatMixin):
                 self.request.link(
                     ReservationCollection(
                         self.request.session,
-                        auth_attendee=self.request.current_attendee,
+                        auth_attendee=self.request.attendee,
                         course_event_id=self.model.id),
                     name='add'
                 ),
@@ -173,7 +173,7 @@ class CourseEventLayout(DefaultLayout, FormatMixin):
                 self.request.link(
                     ReservationCollection(
                         self.request.session,
-                        auth_attendee=self.request.current_attendee,
+                        auth_attendee=self.request.attendee,
                         course_event_id=self.model.id,
                         external_only=True),
                     name='add'
@@ -266,7 +266,7 @@ class CourseEventLayout(DefaultLayout, FormatMixin):
                 self.request.link(
                     ReservationCollection(
                         self.request.session,
-                        auth_attendee=self.request.current_attendee,
+                        auth_attendee=self.request.attendee,
                         course_event_id=self.model.id,
                         attendee_id=self.request.attendee_id
                     ),

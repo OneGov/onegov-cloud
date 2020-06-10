@@ -66,7 +66,7 @@ class AddFsiReservationForm(Form, ReservationFormMixin):
         return CourseAttendeeCollection(
             self.request.session,
             external_only=self.model.external_only,
-            auth_attendee=self.request.current_attendee
+            auth_attendee=self.request.attendee
         )
 
     def get_event_choices(self):

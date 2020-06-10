@@ -109,7 +109,7 @@ def view_delete_reservation(self, request):
     if self.is_external:
         CourseAttendeeCollection(
             request.session,
-            auth_attendee=request.current_attendee).delete(self)
+            auth_attendee=request.attendee).delete(self)
         request.success(_('External attendee successfully deleted'))
     else:
         request.warning(_('Can only delete external attendees'))

@@ -82,7 +82,7 @@ class CourseCollectionLayout(DefaultLayout):
         coll = CourseEventCollection(
             self.request.session,
             upcoming_only=upcoming_only,
-            show_hidden=self.request.current_attendee.role == 'admin',
+            show_hidden=self.request.attendee.role == 'admin',
             sort_desc=True
         )
         result = []
@@ -104,7 +104,7 @@ class CourseLayout(CourseCollectionLayout):
     @cached_property
     def audit_collection(self):
         return AuditCollection(
-            self.request.session, self.model.id, self.request.current_attendee)
+            self.request.session, self.model.id, self.request.attendee)
 
     @cached_property
     def event_collection(self):

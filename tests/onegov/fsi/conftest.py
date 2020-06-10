@@ -325,10 +325,10 @@ class FsiScenario(BaseScenario):
             if others:
                 start = others[-1].start + timedelta(days=30)
                 columns.setdefault('start', start)
-        else:
-            start = utcnow() + timedelta(days=1)
+            else:
+                start = utcnow() + timedelta(days=1)
+            columns.setdefault('start', start)
 
-        columns.setdefault('start', start)
         columns.setdefault('end', columns['start'] + timedelta(hours=4))
 
         self.course_events.append(self.add(

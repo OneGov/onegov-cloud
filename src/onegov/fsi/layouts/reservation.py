@@ -151,7 +151,7 @@ class ReservationLayout(DefaultLayout):
     def collection(self):
         return ReservationCollection(
             self.request.session,
-            auth_attendee=self.request.current_attendee,
+            auth_attendee=self.request.attendee,
             attendee_id=None,
             course_event_id=self.model.course_event_id
         )

@@ -5,13 +5,13 @@ from onegov.org.request import OrgRequest
 class FsiRequest(OrgRequest):
 
     @cached_property
-    def current_attendee(self):
+    def attendee(self):
         return self.current_user and self.current_user.attendee or None
 
     @cached_property
     def attendee_id(self):
         return (
-            self.current_attendee and self.current_attendee.id or None
+                self.attendee and self.attendee.id or None
         )
 
     @cached_property
