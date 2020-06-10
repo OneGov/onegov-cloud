@@ -260,18 +260,20 @@ class FsiScenario(BaseScenario):
             user = self.add_user(
                 **{k: v for k, v in columns.items() if k not in exclude}
             )
+            columns.setdefault('user_id', user.id)
+            columns.setdefault('source_id', user.source_id)
         else:
             columns.setdefault('_email', columns['username'])
 
         self.attendees.append(self.add(
             model=CourseAttendee,
             id=uuid4(),
-            user_id=not external and user.id,
-            source_id=not external and user.source_id,
+            user_id=columns.get('user_id'),
+            source_id=columns.get('source_id'),
             first_name=fn,
             last_name=ln,
-            organisation=not external and columns.get('organisation'),
-            permissions=not external and columns.get('permissions')
+            organisation=columns.get('organisation'),
+            permissions=columns.get('permissions', [])
         ))
 
     def add_user(self, **columns):
@@ -314,13 +316,24 @@ class FsiScenario(BaseScenario):
         columns.setdefault('presenter_email', self.faker.company_email())
         columns.setdefault('location', self.faker.city())
 
-        now = utcnow()
-        columns.setdefault('start', now + timedelta(days=1))
+        if 'start' not in columns:
+            others = [
+                e for e in self.course_events if
+                e.course_id == columns['course_id']
+            ]
+            if others:
+                start = others[-1].start + timedelta(days=30)
+                columns.setdefault('start', start)
+            else:
+                start = utcnow() + timedelta(days=1)
+
+        columns.setdefault('start', start)
         columns.setdefault('end', columns['start'] + timedelta(hours=4))
 
         self.course_events.append(self.add(
             CourseEvent,
-            **columns
+            **columns,
+            id=uuid4()
         ))
         return self.latest_event
 

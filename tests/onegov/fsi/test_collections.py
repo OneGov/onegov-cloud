@@ -1,4 +1,4 @@
-import datetime
+from datetime import timedelta
 from uuid import uuid4
 
 from sedate import utcnow
@@ -194,38 +194,58 @@ def test_reservation_collection_query(
     assert coll.query().count() == 1
 
 
-def test_last_completed_subscriptions_query(
-        session, course_event, attendee):
-    org = 'Example'
-    attendee_, data = attendee(session, organisation=org)
-    auth_attendee = authAttendee(role='admin')
+def test_last_completed_subscriptions(scenario):
 
-    course_events = [
-        course_event(
-            session,
-            start=utcnow() + datetime.timedelta(days=i + 1))[0]
-        for i in range(2)
-    ]
-    session.add_all(course_events)
-    # Most recent last course was not completed, but the first
-    session.add_all((
-        CourseReservation(
-            attendee_id=attendee_.id,
-            course_event_id=course_events[0].id,
-            event_completed=True
-        ),
-        CourseReservation(
-            attendee_id=attendee_.id,
-            course_event_id=course_events[1].id)
-    ))
-    coll = AuditCollection(
-        session, course_events[0].course.id, auth_attendee, organisation=org)
-    assert coll.last_completed_subscriptions_query().all()[0] == (
-        attendee_.id,
-        course_events[0].start,
-        course_events[0].end,
-        True
+    scenario.add_course(
+        mandatory_refresh=True,
+        refresh_interval=timedelta(days=30)
     )
+    for i in range(6):
+        scenario.add_course_event(
+            course_id=scenario.latest_course.id,
+        )
+    for i in range(3):
+        scenario.add_attendee(role='member')
+        scenario.add_subscription(
+            course_event_id=scenario.course_events[i].id,
+            attendee_id=scenario.attendees[i].id,
+            event_completed=True
+        )
+        # Add not completed courses more recent, should be discarded in query
+        scenario.add_subscription(
+            course_event_id=scenario.course_events[i+3].id,
+            attendee_id=scenario.attendees[i].id,
+            event_completed=False
+        )
+    # add some noise
+    scenario.add_course_event(course_id=scenario.latest_course.id)
+    scenario.add_attendee(external=True)
+    scenario.commit()
+    scenario.refresh()
+
+    auth_attendee = authAttendee()
+
+    audits = AuditCollection(
+        scenario.session, scenario.latest_course.id,
+        auth_attendee
+    )
+    results = tuple(
+        (e.attendee_id, e.start) for e in
+        audits.last_subscriptions()
+    )
+    from_scenario = (
+        (a.id, e.start) for a, e in zip(scenario.attendees, scenario.course_events[:3])
+    )
+    assert sorted(results) == sorted(from_scenario)
+
+    # add a subscription also for this attendee, but not completed
+    scenario.add_subscription(
+        course_event_id=scenario.course_events[3].id,
+        attendee_id=scenario.latest_attendee.id
+    )
+    scenario.commit()
+    query = audits.last_subscriptions()
+    assert len(results) + 1 == query.count()
 
 
 def test_audit_collection(

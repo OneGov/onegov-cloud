@@ -15,13 +15,13 @@ class AuditCollection(GenericCollection):
 
     """
 
-    def __init__(self, session, course_id, auth_attendee, organisation=None):
+    def __init__(self, session, course_id, auth_attendee, organisations=None):
         super().__init__(session)
         self.course_id = course_id
         self.auth_attendee = auth_attendee
 
         # e.g. SD / STVA or nothing in case of editor
-        self.organisation = organisation
+        self.organisations = organisations
 
     def ranked_subscription_query(self):
         """
@@ -35,20 +35,20 @@ class AuditCollection(GenericCollection):
             CourseEvent.start,
             CourseEvent.end,
             func.row_number().over(
-                partition_by=CourseAttendee.id,
+                partition_by=CourseReservation.attendee_id,
                 order_by=[
                     desc(CourseReservation.event_completed),
                     CourseEvent.start]
             ).label('rownum'),
         )
-        ranked = ranked.join(CourseEvent).join(CourseAttendee)
+        ranked = ranked.join(CourseEvent)
         ranked = ranked.filter(CourseEvent.course_id == self.course_id)
+
         return ranked.filter(CourseReservation.attendee_id != None)
 
-    def last_completed_subscriptions_query(self):
-        """Filter the ranked subscriptions by the rownum resulting
-        in a list of the most recent and completed subscriptions
-        for every attendee_id
+    def last_subscriptions(self):
+        """Retrieve the last completed subscription by attemdee for
+        a given the course_id.
         """
         ranked = self.ranked_subscription_query().subquery('ranked')
         subquery = self.session.query(
@@ -59,8 +59,19 @@ class AuditCollection(GenericCollection):
         ).select_entity_from(ranked)
         return subquery.filter(ranked.c.rownum == 1)
 
+    def filter_attendees_by_role(self, query):
+        """Filter permissions of editor, exclude external, """
+        if self.auth_attendee.role != 'editor' and self.organisations:
+            query = query.filter(
+                CourseAttendee.organisation == self.organisations)
+        else:
+            query = query.filter(CourseAttendee.organisation.in_(
+                self.auth_attendee.permissions,
+            ))
+        return query
+
     def query(self):
-        last = self.last_completed_subscriptions_query().subquery()
+        last = self.last_subscriptions().subquery()
         query = self.session.query(
             CourseAttendee.id,
             CourseAttendee.first_name,
@@ -92,4 +103,6 @@ class AuditCollection(GenericCollection):
 
     @cached_property
     def course(self):
-        return self.session.query(Course).filter_by(id=self.course_id).first()
+        return self.course_id and self.session.query(Course).filter_by(
+            id=self.course_id).first()
+
