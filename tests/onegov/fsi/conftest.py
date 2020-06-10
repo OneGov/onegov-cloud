@@ -310,7 +310,8 @@ class FsiScenario(BaseScenario):
         ))
         return self.courses[-1].id
 
-    def add_course_event(self, **columns):
+    def add_course_event(self, course, **columns):
+        columns['course_id'] = course.id
         columns.setdefault('presenter_name', self.faker.name())
         columns.setdefault('presenter_company', self.faker.company())
         columns.setdefault('presenter_email', self.faker.company_email())
@@ -337,10 +338,12 @@ class FsiScenario(BaseScenario):
         ))
         return self.latest_event
 
-    def add_subscription(self, **columns):
+    def add_subscription(self, event, attendee, **columns):
         self.subscriptions.append(self.add(
             CourseReservation,
             **columns,
+            course_event_id=event.id,
+            attendee_id=attendee.id,
             id=uuid4()
         ))
         return self.subscriptions[-1]
@@ -380,8 +383,6 @@ class FsiScenario(BaseScenario):
 
     def latest_subscriptions(self, count=1):
         return self.subscriptions[-count::]
-
-
 
 
 @pytest.fixture(scope='function')
