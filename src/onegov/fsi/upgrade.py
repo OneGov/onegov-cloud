@@ -6,8 +6,6 @@ from sqlalchemy import Column, ARRAY, Text, Boolean
 
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task
-from onegov.fsi.models import CourseAttendee
-from onegov.user import User
 
 
 @upgrade_task('Remove department column')
