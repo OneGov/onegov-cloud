@@ -31,7 +31,13 @@ class AuditLayout(DefaultLayout):
                     'class': 'print-icon',
                     'onclick': 'window.print();return false;'
                 }
-            )
+            ),
+            Link(
+                text=_("PDF"),
+                url=self.request.link(self.model, name='pdf'),
+                attrs={'class': 'print-icon'}
+            ),
+
         ]
 
     def render_start_end(self, start, end):
