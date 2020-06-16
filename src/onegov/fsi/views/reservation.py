@@ -1,4 +1,7 @@
+from webob import Response
+
 from onegov.core.security import Personal, Secret, Private
+from onegov.core.utils import normalize_for_url
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.reservation import ReservationCollection
 from onegov.fsi.forms.reservation import AddFsiReservationForm, \
@@ -8,6 +11,7 @@ from onegov.fsi.layouts.reservation import ReservationLayout, \
     ReservationCollectionLayout
 from onegov.fsi.models import CourseReservation, CourseEvent
 from onegov.fsi import _
+from onegov.fsi.pdf import FsiPdf
 from onegov.fsi.views.notifcations import handle_send_email
 
 
@@ -22,6 +26,25 @@ def view_reservations(self, request):
         'layout': layout,
         'reservations': self.batch
     }
+
+
+@FsiApp.view(
+    model=ReservationCollection,
+    permission=Personal,
+    name='pdf'
+)
+def attendee_list_as_pdf(self, request):
+    layout = ReservationCollectionLayout(self, request)
+    result = FsiPdf.from_subscriptions(
+        self, layout, request.translate(layout.title))
+
+    return Response(
+        result.read(),
+        content_type='application/pdf',
+        content_disposition='inline; filename={}.pdf'.format(
+            normalize_for_url(f"{layout.title}")
+        )
+    )
 
 
 @FsiApp.form(

@@ -22,6 +22,76 @@ class FsiPdf(Pdf):
     previous_level_context = None
     pass
 
+    @property
+    def table_style(self):
+        return [
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+            ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
+        ]
+
+    @classmethod
+    def from_subscriptions(cls, collection, layout, title):
+        event = layout.model.course_event
+        translate = layout.request.translate
+        result = BytesIO()
+        pdf = cls(
+            result,
+            title=title,
+            created=f"{date.today():%d.%m.%Y}",
+        )
+        pdf.init_a4_portrait(
+            page_fn=pdf.page_fn,
+            page_fn_later=pdf.page_fn_later
+        )
+
+        pdf.h(title)
+        pdf.p(f"{translate(_('Printed'))} "
+              f"{layout.format_date(utcnow(), 'date')}")
+
+        pdf.spacer()
+
+        def get_headers():
+            headers = ['Attendee', 'Shortcode']
+            if not event:
+                headers.append('Course Name')
+                headers.append('Date')
+            headers += ['Course Status', 'Course attended', 'Last info mail']
+            return [translate(_(h)) for h in headers]
+
+        def get_row(subscription):
+            row = [str(subscription)]
+            sent = False
+            att = subscription.attendee
+            row.append(att and att.source_id or "")
+
+            if not event:
+                row.append(event.name)
+                row.append(
+                    layout.format_date(event.start, 'datetime')
+                )
+                sent = event.info_template.last_sent
+
+            row.append(
+                translate(layout.format_status(event.status)) if event else ""
+            )
+            row.append(subscription.event_completed and "✔" or "-")
+            row.append(sent and layout.format_date(sent, 'date') or '')
+            return row
+
+        data = [get_headers()] + sorted([
+            get_row(subs) for subs in collection.query()
+        ], key=lambda row: row[0])
+
+        pdf.table(
+            data,
+            columns='even',
+            style=pdf.table_style,
+        )
+        pdf.generate()
+        result.seek(0)
+        return result
+
     @classmethod
     def from_audit_collection(cls, collection, layout, title):
         now = utcnow()
@@ -68,14 +138,10 @@ class FsiPdf(Pdf):
         orange = HexColor('#f4cb71')
         red = colors.pink
 
-        complete_repr = {None: "-", True: "✔", False: "-"}
+        style = pdf.table_style
 
         def bgcolor(ix, row, color):
             return 'BACKGROUND', (row, ix), (row, ix), color
-
-        style = [('GRID', (0, 0), (-1, -1), 0.5, colors.black),
-                 ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
-                 ('VALIGN', (0, 0), (-1, -1), 'CENTER')]
 
         for ix, e in enumerate(collection.query()):
             dt = layout.next_event_date(e.start, refresh_interval)
@@ -94,7 +160,7 @@ class FsiPdf(Pdf):
             data_line = (
                 f"{e.last_name}, {e.first_name}",
                 e.source_id, layout.format_date(e.start, 'datetime'),
-                complete_repr[e.event_completed],
+                e.event_completed and "✔" or "-",
                 next_event_hint
             )
             data.append(data_line)

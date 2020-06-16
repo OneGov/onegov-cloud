@@ -46,11 +46,11 @@ class ReservationCollectionLayout(DefaultLayout):
     def editbar_links(self):
         links = [
             Link(
-                text=_("Print"),
-                url='#',
+                text=_("PDF"),
+                url=self.request.link(self.model, name='pdf'),
                 attrs={
                     'class': 'print-icon',
-                    'onclick': 'window.print();return false;'
+                    'target': '_blank'
                 }
             )
         ]

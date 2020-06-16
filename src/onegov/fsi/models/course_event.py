@@ -28,7 +28,7 @@ COURSE_EVENT_STATUSES_TRANSLATIONS = (
 
 
 # for forms...
-def course_status_choices(request=None):
+def course_status_choices(request=None, as_dict=False):
 
     if request:
         translations = (
@@ -37,8 +37,9 @@ def course_status_choices(request=None):
         translations = COURSE_EVENT_STATUSES_TRANSLATIONS
 
     return tuple(
-        (val, key) for val, key in zip(COURSE_EVENT_STATUSES,
-                                       translations))
+        as_dict and {val: key} or (val, key)
+        for val, key in zip(COURSE_EVENT_STATUSES, translations)
+    )
 
 
 class CourseEvent(Base, TimestampMixin, ORMSearchable):
