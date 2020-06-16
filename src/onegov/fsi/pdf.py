@@ -68,8 +68,6 @@ class FsiPdf(Pdf):
         orange = HexColor('#f4cb71')
         red = colors.pink
 
-        next_event_hint = ""
-
         complete_repr = {None: "-", True: "✔", False: "-"}
 
         def bgcolor(ix, row, color):
@@ -81,8 +79,6 @@ class FsiPdf(Pdf):
 
         for ix, e in enumerate(collection.query()):
             dt = layout.next_event_date(e.start, refresh_interval)
-            if e.last_name == 'Saxer':
-                print(e.event_completed)
             if dt:
                 if now > dt:
                     next_event_hint = now.year
@@ -90,9 +86,10 @@ class FsiPdf(Pdf):
                 else:
                     color = dt.year == now.year and orange or green
                     next_event_hint = f"{dt.month}/{dt.year}"
-                style.append(bgcolor(ix + 1, 4, color))
             else:
                 next_event_hint = now.year
+                color = red
+            style.append(bgcolor(ix + 1, 4, color))
 
             data_line = (
                 f"{e.last_name}, {e.first_name}",
