@@ -1,8 +1,7 @@
 from datetime import date
 from io import BytesIO
-
-import babel.dates
 from reportlab.lib import colors
+from reportlab.lib.colors import HexColor
 from reportlab.lib.units import cm
 from sedate import utcnow
 
@@ -23,24 +22,10 @@ class FsiPdf(Pdf):
     previous_level_context = None
     pass
 
-    @staticmethod
-    def audit_headers(request, refresh_interval):
-
-        def format_timedelta(timedelta):
-            return babel.dates.format_timedelta(
-                delta=timedelta,
-                locale=request.locale
-            )
-
-        title_rows = (
-            _("Name"), _("Shortcode"), _("Last Event"), _("Attended"),
-            _("Due by (every ${refresh_interval}",
-              mapping={'refresh_interval': format_timedelta(refresh_interval)})
-        )
-        return [request.translate(head) for head in title_rows]
-
     @classmethod
-    def from_audit_collection(cls, request, collection, layout, title):
+    def from_audit_collection(cls, collection, layout, title):
+        now = utcnow()
+        request = layout.request
         refresh_interval = collection.course.refresh_interval
         result = BytesIO()
         pdf = cls(
@@ -56,12 +41,12 @@ class FsiPdf(Pdf):
         pdf.h(title)
         filter_str = ""
         if collection.organisations:
-            orgs = " ,".join(collection.organisations)
+            orgs = ", ".join(collection.organisations)
             org_title = request.translate(_("Organisations"))
             filter_str = f"{org_title}: {orgs}"
 
         if collection.letter:
-            letter_title = request.translate(_("By Letter"))
+            letter_title = request.translate(_("Letter"))
             letter_title += f" {collection.letter}"
 
             if filter_str:
@@ -72,28 +57,42 @@ class FsiPdf(Pdf):
         if filter_str:
             pdf.h3(filter_str)
 
-        data = [pdf.audit_headers(request, refresh_interval)]
-        color_styles = []
-        now = utcnow()
-        color = colors.green
+        pdf.p(f"{request.translate(_('Printed'))} "
+              f"{layout.format_date(now, 'date')}")
+
+        pdf.spacer()
+
+        data = [layout.audit_table_headers]
+
+        green = HexColor('#1be45b')
+        orange = HexColor('#f4cb71')
+        red = colors.pink
+
         next_event_hint = ""
 
-        complete_repr = {None: "", True: "✔", False: "✘"}
+        complete_repr = {None: "-", True: "✔", False: "-"}
 
-        def tcolor(ix, row, color):
-            return 'TEXTCOLOR', (row, ix), (row, ix), color
+        def bgcolor(ix, row, color):
+            return 'BACKGROUND', (row, ix), (row, ix), color
+
+        style = [('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+                 ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
+                 ('VALIGN', (0, 0), (-1, -1), 'CENTER')]
 
         for ix, e in enumerate(collection.query()):
             dt = layout.next_event_date(e.start, refresh_interval)
-
+            if e.last_name == 'Saxer':
+                print(e.event_completed)
             if dt:
-                next_event_hint = f"{dt.month}/{dt.year}"
                 if now > dt:
-                    color = colors.red
                     next_event_hint = now.year
-                elif dt.year == now.year:
-                    color = colors.orange
-                color_styles.append(tcolor(ix, 4, color))
+                    color = red
+                else:
+                    color = dt.year == now.year and orange or green
+                    next_event_hint = f"{dt.month}/{dt.year}"
+                style.append(bgcolor(ix + 1, 4, color))
+            else:
+                next_event_hint = now.year
 
             data_line = (
                 f"{e.last_name}, {e.first_name}",
@@ -103,15 +102,12 @@ class FsiPdf(Pdf):
             )
             data.append(data_line)
 
-        style = [('GRID', (0, 0), (-1, -1), 0.5, colors.black),
-                 ('ALIGN', (3, 0), (4, -1), 'CENTER')]
-
-        print(color_styles)
         pdf.table(
             data,
-            columns=[None, None, None, 1.7 * cm, None],
-            style=style + color_styles
+            columns=[None, None, None, 1.7 * cm, 2.5 * cm],
+            style=style,
         )
+
         pdf.generate()
         result.seek(0)
         return result

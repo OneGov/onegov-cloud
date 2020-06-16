@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-06-04 18:33+0200\n"
+"POT-Creation-Date: 2020-06-16 07:31+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -59,6 +59,9 @@ msgstr "Registrieren"
 msgid "Courses"
 msgstr "Kurse"
 
+msgid "Audit"
+msgstr "Auswertung"
+
 msgid "Attendee Check"
 msgstr "Teilnahmekontrolle"
 
@@ -70,8 +73,8 @@ msgstr ""
 "Versteckte Kurse oder Kurse ohne obligatorische Wiederholung sind nicht in "
 "der Liste"
 
-msgid "Organisation"
-msgstr "Organisation"
+msgid "By Organisation"
+msgstr "Nach Organisation"
 
 msgid "None"
 msgstr "Keine"
@@ -181,17 +184,27 @@ msgstr "Ja"
 msgid "No"
 msgstr "Nein"
 
-msgid "Audit"
-msgstr "Auswertung"
+msgid "PDF"
+msgstr "PDF"
 
-msgid "Print"
-msgstr "Drucken"
+msgid "Name"
+msgstr "Name"
+
+msgid "Shortcode"
+msgstr "Kürzel"
+
+msgid "Last Event"
+msgstr "Letzte Durchführung"
+
+msgid "Attended"
+msgstr "Besucht"
+
+#, python-format
+msgid "Due by (every ${refresh_interval})"
+msgstr "Fällig bis (alle ${refresh_interval})"
 
 msgid "New Course"
 msgstr "Neuer Kurs"
-
-msgid "Invite Attendees"
-msgstr "Teilnehmer einladen"
 
 msgid "Add"
 msgstr "Hinzufügen"
@@ -219,6 +232,9 @@ msgstr "Abbrechen"
 
 msgid "Edit Course"
 msgstr "Kurs bearbeiten"
+
+msgid "Invite Attendees"
+msgstr "Teilnehmer einladen"
 
 msgid "Add External Attendee"
 msgstr "Externen Teilnehmer hinzufügen"
@@ -363,6 +379,9 @@ msgstr "Alle Kursanmeldungen für ${attendee}"
 msgid "All Event Subscriptions"
 msgstr "Alle Kursanmeldungen"
 
+msgid "Print"
+msgstr "Drucken"
+
 msgid "Subscription"
 msgstr "Anmeldung"
 
@@ -408,29 +427,23 @@ msgstr "Absage Kursveranstaltung"
 msgid "Course Subscription Invitation"
 msgstr "Einladung für Kursanmeldung"
 
-msgid "Refresh Interval:"
-msgstr "Wiederholungsintervall:"
+msgid "Organisations"
+msgstr "Organisationen"
 
-msgid "Last Event"
-msgstr "Letzte Durchführung"
+msgid "Letter"
+msgstr "Buchstabe"
 
-msgid "Attended"
-msgstr "Besucht"
+msgid "Printed"
+msgstr "Ausgedruckt"
 
-msgid "Due by"
-msgstr "Fällig bis"
+msgid "By last name"
+msgstr "Nach Nachname"
 
 msgid "h"
 msgstr "Uhr"
 
 msgid "E-Mail"
 msgstr "E-Mail"
-
-msgid "Name"
-msgstr "Name"
-
-msgid "Shortcode"
-msgstr "Kürzel"
 
 msgid "Organisation Code"
 msgstr "Kürzel Organisation"
@@ -458,6 +471,9 @@ msgstr "Keine Teilnehmer in der Datenbank"
 
 msgid "Family name, surname"
 msgstr "Nachname, Vorname"
+
+msgid "Organisation"
+msgstr "Organisation"
 
 msgid "True"
 msgstr "Ja"
@@ -670,11 +686,12 @@ msgstr "Externer Teilnehmer erfolgreich gelöscht"
 msgid "Can only delete external attendees"
 msgstr "Es können nur externe Teilnehmer gelöscht werden"
 
-msgid "Selected course does not exist"
-msgstr ""
+msgid "Update"
+msgstr "Aktualisieren"
 
-msgid "Create Audit"
-msgstr "Erstelle Auswertung"
+#, python-format
+msgid "Audit for ${course_name}"
+msgstr "Audit für ${course_name}"
 
 msgid "There are no recipients matching the selection"
 msgstr "Keine Empfänger die auf diese Auswahl zutreffen"
@@ -689,9 +706,6 @@ msgstr "Die folgenden Emails sind unbekannt: ${mail_list}"
 
 msgid "Added a new course"
 msgstr "Ein neuer Kurs wurde hinzugefügt"
-
-msgid "Update"
-msgstr "Aktualisieren"
 
 msgid "Send Invitation"
 msgstr "Einladung senden"
@@ -748,6 +762,15 @@ msgstr "Anmeldung erfolgreich gelöscht"
 
 msgid "Placeholder successfully deleted"
 msgstr "Platzhalter erfolgreich gelöscht"
+
+#~ msgid "Refresh Interval:"
+#~ msgstr "Wiederholungsintervall:"
+
+#~ msgid "Due by"
+#~ msgstr "Fällig bis"
+
+#~ msgid "Create Audit"
+#~ msgstr "Erstelle Auswertung"
 
 #~ msgid "First name"
 #~ msgstr "Vorname"

@@ -58,9 +58,7 @@ def get_audit_pdf(self, request):
 
     )
     result = FsiPdf.from_audit_collection(
-        request, self, AuditLayout(self, request), title)
-    # with open(result, 'rb') as file:
-    #     result = file.read()
+        self, AuditLayout(self, request), title)
 
     return Response(
         result.read(),

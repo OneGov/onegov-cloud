@@ -127,11 +127,6 @@ class CourseLayout(CourseCollectionLayout):
 
         links = [
             Link(
-                _('Invite Attendees'),
-                self.request.link(self.model, name='invite'),
-                attrs={'class': 'invite-attendees'}
-            ),
-            Link(
                 _('Audit'),
                 self.request.link(self.audit_collection),
                 attrs={'class': 'audit-icon'}
