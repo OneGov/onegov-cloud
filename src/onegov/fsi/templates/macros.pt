@@ -70,12 +70,12 @@
     </tal:b>
 </metal:email_recipients>
 
-<metal:confirmation_slider define-macro="confirmation_slider" tal:define="completed reservation.event_completed">
-    <div tal:condition="not: reservation.is_placeholder" tal:attributes="class python: 'switch round tiny confirmation-switch' + (' print-checked' if completed else ' print-unchecked')">
+<metal:confirmation_slider define-macro="confirmation_slider" tal:define="completed subscription.event_completed">
+    <div tal:condition="not: subscription.is_placeholder" tal:attributes="class python: 'switch round tiny confirmation-switch' + (' print-checked' if completed else ' print-unchecked')">
         <input
                 id="${switch_id}"
                 type="checkbox"
-                tal:attributes="disabled python: not reservation.can_be_confirmed(request); checked completed; ic-post-to url|nothing"
+                tal:attributes="disabled python: not subscription.can_be_confirmed(request); checked completed; ic-post-to url|nothing"
                 ic_target="${switch_id}"
                 ic-trigger-on="click"
         >

@@ -26,8 +26,8 @@
                                     <tal:b tal:switch="layout.reservation_collection.query().first() and True or False">
                                         <p tal:case="False" i18n:translate>No entries found.</p>
                                         <ul tal:case="True">
-                                            <tal:b tal:repeat="reservation layout.reservation_collection.query()">
-                                                <li tal:attributes="class python: 'grayed-out' if reservation.is_placeholder else ''">${str(reservation)}</li>
+                                            <tal:b tal:repeat="subscription layout.reservation_collection.query()">
+                                                <li tal:attributes="class python: 'grayed-out' if subscription.is_placeholder else ''">${str(subscription)}</li>
                                             </tal:b>
                                         </ul>
                                     </tal:b>
