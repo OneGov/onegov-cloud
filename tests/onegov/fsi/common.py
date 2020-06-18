@@ -9,7 +9,7 @@ from onegov.core.crypto import hash_password
 from onegov.fsi.models import CourseAttendee, Course, CourseEvent, \
     CourseSubscription
 from onegov.fsi.models.course_notification_template import InfoTemplate, \
-    ReservationTemplate, ReminderTemplate, CancellationTemplate
+    SubscriptionTemplate, ReminderTemplate, CancellationTemplate
 from onegov.user import User
 from tests.shared.scenario import BaseScenario
 
@@ -18,7 +18,7 @@ hashed_password = hash_password(global_password)
 
 
 TEMPLATE_MODEL_MAPPING = dict(
-    info=InfoTemplate, reservation=ReservationTemplate,
+    info=InfoTemplate, reservation=SubscriptionTemplate,
     cancellation=CancellationTemplate, reminder=ReminderTemplate
 )
 
@@ -177,7 +177,7 @@ def course_event_factory(session, **kwargs):
         session.add_all((
             course_event,
             InfoTemplate(course_event_id=data['id'], text='Info'),
-            ReservationTemplate(course_event_id=data['id']),
+            SubscriptionTemplate(course_event_id=data['id']),
             ReminderTemplate(course_event_id=data['id']),
             CancellationTemplate(course_event_id=data['id'])
         ))
@@ -205,7 +205,7 @@ def future_course_event_factory(session, **kwargs):
         session.add_all((
             course_event,
             InfoTemplate(course_event_id=data['id'], text='Info'),
-            ReservationTemplate(course_event_id=data['id']),
+            SubscriptionTemplate(course_event_id=data['id']),
             ReminderTemplate(course_event_id=data['id']),
             CancellationTemplate(course_event_id=data['id'])
         ))

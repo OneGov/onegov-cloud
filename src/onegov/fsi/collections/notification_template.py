@@ -5,7 +5,7 @@ from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.course_notification_template import (
     CourseNotificationTemplate,
     InfoTemplate,
-    ReservationTemplate,
+    SubscriptionTemplate,
     CancellationTemplate,
     ReminderTemplate,
 )
@@ -43,7 +43,7 @@ class CourseNotificationTemplateCollection(GenericCollection):
             data = dict(course_event_id=self.course_event_id)
             self.session.add_all((
                 InfoTemplate(**data),
-                ReservationTemplate(**data),
+                SubscriptionTemplate(**data),
                 CancellationTemplate(**data),
                 ReminderTemplate(**data)
             ))

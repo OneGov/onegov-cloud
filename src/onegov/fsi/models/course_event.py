@@ -138,7 +138,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
 
     # The associated notification templates
     info_template = relationship("InfoTemplate", uselist=False)
-    reservation_template = relationship("ReservationTemplate", uselist=False)
+    reservation_template = relationship("SubscriptionTemplate", uselist=False)
     cancellation_template = relationship("CancellationTemplate", uselist=False)
     reminder_template = relationship("ReminderTemplate", uselist=False)
 

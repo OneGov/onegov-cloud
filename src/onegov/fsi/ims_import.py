@@ -100,7 +100,7 @@ from sedate import replace_timezone
 from onegov.core.csv import CSVFile
 from onegov.fsi.models import CourseEvent, Course, CourseSubscription
 from onegov.fsi.models.course_notification_template import InfoTemplate, \
-    ReservationTemplate, CancellationTemplate, ReminderTemplate
+    SubscriptionTemplate, CancellationTemplate, ReminderTemplate
 from onegov.user import User
 
 
@@ -468,7 +468,7 @@ def import_ims_data(session, persons, courses, events, possible_ldap_users):
         data = {'course_event_id': event.id}
         session.add_all((
             InfoTemplate(**data),
-            ReservationTemplate(**data),
+            SubscriptionTemplate(**data),
             CancellationTemplate(**data),
             ReminderTemplate(**data)
         ))

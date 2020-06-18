@@ -124,7 +124,7 @@ class InfoTemplate(CourseNotificationTemplate):
     __mapper_args__ = {'polymorphic_identity': 'info'}
 
 
-class ReservationTemplate(CourseNotificationTemplate):
+class SubscriptionTemplate(CourseNotificationTemplate):
     __mapper_args__ = {'polymorphic_identity': 'reservation'}
 
 
