@@ -8,7 +8,7 @@ from onegov.fsi.collections.course_event import CourseEventCollection, \
     PastCourseEventCollection
 from onegov.fsi.collections.notification_template import \
     CourseNotificationTemplateCollection
-from onegov.fsi.collections.reservation import ReservationCollection
+from onegov.fsi.collections.subscription import ReservationCollection
 from onegov.fsi.models.course import Course
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent

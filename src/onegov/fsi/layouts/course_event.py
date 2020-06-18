@@ -6,7 +6,7 @@ from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.collections.notification_template import \
     CourseNotificationTemplateCollection
-from onegov.fsi.collections.reservation import ReservationCollection
+from onegov.fsi.collections.subscription import ReservationCollection
 from onegov.fsi.layout import DefaultLayout, FormatMixin
 from onegov.fsi import _
 

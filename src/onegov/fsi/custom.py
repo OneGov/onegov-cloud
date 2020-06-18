@@ -4,7 +4,7 @@ from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.audit import AuditCollection
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import PastCourseEventCollection
-from onegov.fsi.collections.reservation import ReservationCollection
+from onegov.fsi.collections.subscription import ReservationCollection
 from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
 from onegov.org.elements import LinkGroup

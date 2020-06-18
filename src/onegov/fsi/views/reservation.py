@@ -3,7 +3,7 @@ from webob import Response
 from onegov.core.security import Personal, Secret, Private
 from onegov.core.utils import normalize_for_url
 from onegov.fsi import FsiApp
-from onegov.fsi.collections.reservation import ReservationCollection
+from onegov.fsi.collections.subscription import ReservationCollection
 from onegov.fsi.forms.reservation import AddFsiReservationForm, \
     EditFsiReservationForm, EditFsiPlaceholderReservationForm, \
     AddFsiPlaceholderReservationForm

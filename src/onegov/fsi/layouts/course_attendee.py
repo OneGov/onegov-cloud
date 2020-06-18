@@ -2,7 +2,7 @@ from cached_property import cached_property
 
 from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
-from onegov.fsi.collections.reservation import ReservationCollection
+from onegov.fsi.collections.subscription import ReservationCollection
 from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
 
