@@ -7,7 +7,7 @@ from onegov.fsi.collections.subscription import SubscriptionsCollection
 from onegov.fsi.forms.reservation import AddFsiReservationForm, \
     EditFsiReservationForm, EditFsiPlaceholderReservationForm, \
     AddFsiPlaceholderReservationForm
-from onegov.fsi.layouts.reservation import ReservationLayout, \
+from onegov.fsi.layouts.subscription import ReservationLayout, \
     ReservationCollectionLayout
 from onegov.fsi.models import CourseSubscription, CourseEvent
 from onegov.fsi import _
