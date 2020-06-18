@@ -23,7 +23,7 @@ class CourseSubscription(Base):
     This table is defined in a way such that i can be used for a secondary
     join in CourseEvent.attendees.
 
-    attendee_id is Null if its a placeholder reservation.
+    attendee_id is Null if its a placeholder subscription.
 
     """
     __table__ = subscription_table

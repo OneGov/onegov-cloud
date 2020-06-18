@@ -7,7 +7,7 @@ from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi import _
 
 
-class ReservationFormMixin:
+class SubscriptionFormMixin:
 
     @property
     def event(self):
@@ -42,7 +42,7 @@ class ReservationFormMixin:
         return '', self.request.translate(_('None'))
 
 
-class AddFsiReservationForm(Form, ReservationFormMixin):
+class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
 
     attendee_id = ChosenSelectField(
         label=_("Attendee"),
@@ -130,7 +130,7 @@ class AddFsiReservationForm(Form, ReservationFormMixin):
                 return False
 
 
-class AddFsiPlaceholderReservationForm(Form, ReservationFormMixin):
+class AddFsiPlaceholderSubscriptionForm(Form, SubscriptionFormMixin):
 
     course_event_id = ChosenSelectField(
         label=_("Course Event"),
@@ -164,7 +164,7 @@ class AddFsiPlaceholderReservationForm(Form, ReservationFormMixin):
         self.course_event_id.choices = self.get_event_choices()
 
 
-class EditFsiReservationForm(Form, ReservationFormMixin):
+class EditFsiSubscriptionForm(Form, SubscriptionFormMixin):
 
     """
     The view of this form is not accessible for members
@@ -215,7 +215,7 @@ class EditFsiReservationForm(Form, ReservationFormMixin):
         self.attendee_id.choices = self.get_attendee_choices()
 
 
-class EditFsiPlaceholderReservationForm(Form, ReservationFormMixin):
+class EditFsiPlaceholderSubscriptionForm(Form, SubscriptionFormMixin):
 
     course_event_id = ChosenSelectField(
         label=_("Course Event"),

@@ -4,9 +4,9 @@ from onegov.core.security import Personal, Secret, Private
 from onegov.core.utils import normalize_for_url
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.subscription import SubscriptionsCollection
-from onegov.fsi.forms.subscription import AddFsiReservationForm, \
-    EditFsiReservationForm, EditFsiPlaceholderReservationForm, \
-    AddFsiPlaceholderReservationForm
+from onegov.fsi.forms.subscription import AddFsiSubscriptionForm, \
+    EditFsiSubscriptionForm, EditFsiPlaceholderSubscriptionForm, \
+    AddFsiPlaceholderSubscriptionForm
 from onegov.fsi.layouts.subscription import ReservationLayout, \
     ReservationCollectionLayout
 from onegov.fsi.models import CourseSubscription, CourseEvent
@@ -51,7 +51,7 @@ def attendee_list_as_pdf(self, request):
     model=SubscriptionsCollection,
     template='form.pt',
     name='add',
-    form=AddFsiReservationForm,
+    form=AddFsiSubscriptionForm,
     permission=Private
 )
 def view_add_reservation(self, request, form):
@@ -95,7 +95,7 @@ def view_add_reservation(self, request, form):
     model=CourseSubscription,
     template='form.pt',
     name='edit',
-    form=EditFsiReservationForm,
+    form=EditFsiSubscriptionForm,
     permission=Secret
 )
 def view_edit_reservation(self, request, form):
@@ -156,7 +156,7 @@ def view_edit_reservation(self, request, form):
     model=CourseSubscription,
     template='form.pt',
     name='edit-placeholder',
-    form=EditFsiPlaceholderReservationForm,
+    form=EditFsiPlaceholderSubscriptionForm,
     permission=Secret
 )
 def view_edit_placeholder_reservation(self, request, form):
@@ -188,7 +188,7 @@ def view_edit_placeholder_reservation(self, request, form):
     model=SubscriptionsCollection,
     template='form.pt',
     name='add-placeholder',
-    form=AddFsiPlaceholderReservationForm,
+    form=AddFsiPlaceholderSubscriptionForm,
     permission=Secret
 )
 def view_add_reservation_placeholder(self, request, form):
