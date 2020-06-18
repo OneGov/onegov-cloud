@@ -3,7 +3,7 @@ from webob import Response
 from onegov.core.security import Personal, Secret, Private
 from onegov.core.utils import normalize_for_url
 from onegov.fsi import FsiApp
-from onegov.fsi.collections.subscription import ReservationCollection
+from onegov.fsi.collections.subscription import SubscriptionsCollection
 from onegov.fsi.forms.reservation import AddFsiReservationForm, \
     EditFsiReservationForm, EditFsiPlaceholderReservationForm, \
     AddFsiPlaceholderReservationForm
@@ -16,7 +16,7 @@ from onegov.fsi.views.notifcations import handle_send_email
 
 
 @FsiApp.html(
-    model=ReservationCollection,
+    model=SubscriptionsCollection,
     template='reservations.pt',
     permission=Personal
 )
@@ -29,7 +29,7 @@ def view_reservations(self, request):
 
 
 @FsiApp.view(
-    model=ReservationCollection,
+    model=SubscriptionsCollection,
     permission=Personal,
     name='pdf'
 )
@@ -48,7 +48,7 @@ def attendee_list_as_pdf(self, request):
 
 
 @FsiApp.form(
-    model=ReservationCollection,
+    model=SubscriptionsCollection,
     template='form.pt',
     name='add',
     form=AddFsiReservationForm,
@@ -105,7 +105,7 @@ def view_edit_reservation(self, request, form):
     if form.submitted(request):
         data = form.get_useful_data()
         event_id = data['course_event_id']
-        coll = ReservationCollection(
+        coll = SubscriptionsCollection(
             request.session,
             attendee_id=data['attendee_id'],
             course_event_id=event_id,
@@ -130,7 +130,7 @@ def view_edit_reservation(self, request, form):
                 show_sent_count=False,
                 attachments=(course_event.as_ical_attachment(),)
             )
-            return request.redirect(request.link(ReservationCollection(
+            return request.redirect(request.link(SubscriptionsCollection(
                 request.session,
                 auth_attendee=request.attendee,
                 course_event_id=self.course_event_id,
@@ -166,7 +166,7 @@ def view_edit_placeholder_reservation(self, request, form):
     if form.submitted(request):
         form.update_model(self)
         request.success(_("Placeholder was updated"))
-        return request.redirect(request.link(ReservationCollection(
+        return request.redirect(request.link(SubscriptionsCollection(
             request.session,
             course_event_id=self.course_event_id,
             auth_attendee=request.attendee
@@ -185,7 +185,7 @@ def view_edit_placeholder_reservation(self, request, form):
 
 
 @FsiApp.form(
-    model=ReservationCollection,
+    model=SubscriptionsCollection,
     template='form.pt',
     name='add-placeholder',
     form=AddFsiPlaceholderReservationForm,
@@ -221,7 +221,7 @@ def view_add_reservation_placeholder(self, request, form):
 
 
 @FsiApp.html(
-    model=ReservationCollection,
+    model=SubscriptionsCollection,
     request_method='POST',
     name='add-from-course-event',
     permission=Personal
@@ -249,7 +249,7 @@ def view_add_from_course_event(self, request):
 )
 def view_delete_reservation(self, request):
     request.assert_valid_csrf_token()
-    ReservationCollection(
+    SubscriptionsCollection(
         request.session, auth_attendee=request.attendee).delete(self)
     if not self.is_placeholder:
         request = handle_send_email(

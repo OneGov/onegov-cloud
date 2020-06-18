@@ -7,7 +7,7 @@ from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.audit import AuditCollection
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
-from onegov.fsi.collections.subscription import ReservationCollection
+from onegov.fsi.collections.subscription import SubscriptionsCollection
 from onegov.fsi.models import CourseAttendee
 
 from onegov.fsi.models.course_event import CourseEvent
@@ -155,18 +155,18 @@ def test_reservation_collection_query(
     auth_attendee = authAttendee()
 
     # unfiltered for admin, must yield all
-    coll = ReservationCollection(session, auth_attendee=auth_attendee)
+    coll = SubscriptionsCollection(session, auth_attendee=auth_attendee)
     assert coll.query().count() == 3
 
     # test filter for attendee_id
-    coll = ReservationCollection(
+    coll = SubscriptionsCollection(
         session,
         auth_attendee=auth_attendee,
         attendee_id=att.id)
     assert coll.query().count() == 1
 
     # test for course_event_id
-    coll = ReservationCollection(
+    coll = SubscriptionsCollection(
         session,
         auth_attendee=auth_attendee,
         course_event_id=event.id)
@@ -174,7 +174,7 @@ def test_reservation_collection_query(
 
     # Test for editor with no permissions should see just his own
     auth_attendee = authAttendee(role='editor', id=editor.id)
-    coll = ReservationCollection(session, auth_attendee=auth_attendee)
+    coll = SubscriptionsCollection(session, auth_attendee=auth_attendee)
     assert coll.query().count() == 1
 
     # Add a the same organisation and get one entry more
@@ -183,7 +183,7 @@ def test_reservation_collection_query(
     assert coll.query().count() == 2
 
     # Test editor wants to get his own
-    coll = ReservationCollection(
+    coll = SubscriptionsCollection(
         session, auth_attendee=auth_attendee, attendee_id=editor.id)
     assert coll.query().count() == 1
 

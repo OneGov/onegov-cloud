@@ -7,7 +7,7 @@ from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.course_reservation import CourseReservation
 
 
-class ReservationCollection(GenericCollection, Pagination):
+class SubscriptionsCollection(GenericCollection, Pagination):
 
     batch_size = 30
 

@@ -6,7 +6,7 @@ from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi.collections.notification_template import \
     CourseNotificationTemplateCollection
-from onegov.fsi.collections.subscription import ReservationCollection
+from onegov.fsi.collections.subscription import SubscriptionsCollection
 from onegov.fsi.layout import DefaultLayout, FormatMixin
 from onegov.fsi import _
 
@@ -63,7 +63,7 @@ class CourseEventCollectionLayout(DefaultLayout):
         return links
 
     def subscriptions_link(self, event):
-        return self.request.link(ReservationCollection(
+        return self.request.link(SubscriptionsCollection(
             self.request.session, course_event_id=event.id))
 
     def audit_link(self, course):
@@ -99,7 +99,7 @@ class CourseEventLayout(DefaultLayout, FormatMixin):
 
     @cached_property
     def reservation_collection(self):
-        return ReservationCollection(
+        return SubscriptionsCollection(
             self.request.session,
             course_event_id=self.model.id,
             auth_attendee=self.request.attendee
@@ -140,7 +140,7 @@ class CourseEventLayout(DefaultLayout, FormatMixin):
             Link(
                 _('Attendee'),
                 self.request.link(
-                    ReservationCollection(
+                    SubscriptionsCollection(
                         self.request.session,
                         auth_attendee=self.request.attendee,
                         course_event_id=self.model.id),
@@ -171,7 +171,7 @@ class CourseEventLayout(DefaultLayout, FormatMixin):
             Link(
                 _('External Attendee'),
                 self.request.link(
-                    ReservationCollection(
+                    SubscriptionsCollection(
                         self.request.session,
                         auth_attendee=self.request.attendee,
                         course_event_id=self.model.id,
@@ -264,7 +264,7 @@ class CourseEventLayout(DefaultLayout, FormatMixin):
             text=_("Subscribe"),
             url=self.csrf_protected_url(
                 self.request.link(
-                    ReservationCollection(
+                    SubscriptionsCollection(
                         self.request.session,
                         auth_attendee=self.request.attendee,
                         course_event_id=self.model.id,

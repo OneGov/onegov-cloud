@@ -8,7 +8,7 @@ from onegov.fsi.collections.course_event import CourseEventCollection, \
     PastCourseEventCollection
 from onegov.fsi.collections.notification_template import \
     CourseNotificationTemplateCollection
-from onegov.fsi.collections.subscription import ReservationCollection
+from onegov.fsi.collections.subscription import SubscriptionsCollection
 from onegov.fsi.models.course import Course
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
@@ -136,7 +136,7 @@ def get_template_details(request, id):
     return CourseNotificationTemplateCollection(request.session).by_id(id)
 
 
-@FsiApp.path(model=ReservationCollection, path='/fsi/reservations',
+@FsiApp.path(model=SubscriptionsCollection, path='/fsi/reservations',
              converters=dict(
                  attendee_id=UUID, course_event_id=UUID, external_only=bool)
              )
@@ -152,7 +152,7 @@ def get_reservations(
     elif attendee_id != request.attendee_id and not request.is_manager:
         attendee_id = request.attendee_id
 
-    return ReservationCollection(
+    return SubscriptionsCollection(
         request.session,
         attendee_id=attendee_id,
         course_event_id=course_event_id,
@@ -164,7 +164,7 @@ def get_reservations(
 
 @FsiApp.path(model=CourseReservation, path='/fsi/reservation/{id}')
 def get_reservation_details(request, id):
-    return ReservationCollection(request.session).by_id(id)
+    return SubscriptionsCollection(request.session).by_id(id)
 
 
 @FsiApp.path(model=AuditCollection, path='/fsi/audit',

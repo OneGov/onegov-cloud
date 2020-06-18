@@ -1,7 +1,7 @@
 from cached_property import cached_property
 
 from onegov.core.elements import Link, Confirm, Intercooler, LinkGroup
-from onegov.fsi.collections.subscription import ReservationCollection
+from onegov.fsi.collections.subscription import SubscriptionsCollection
 from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
 
@@ -149,7 +149,7 @@ class ReservationLayout(DefaultLayout):
 
     @cached_property
     def collection(self):
-        return ReservationCollection(
+        return SubscriptionsCollection(
             self.request.session,
             auth_attendee=self.request.attendee,
             attendee_id=None,
