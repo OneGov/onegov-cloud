@@ -55,7 +55,7 @@ def invite_attendees_for_event(self, request, form):
     return {
         'layout': layout,
         'model': self,
-        'results': self.batch,
+        'results': self.batch if self.course_id else [],
         'form': form,
         'button_text': _('Update'),
         'now': now,

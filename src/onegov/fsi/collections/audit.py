@@ -24,7 +24,7 @@ class AuditCollection(GenericCollection, Pagination):
 
         # When using the class link, the option with a course is still
         self.course_id = course_id if course_id \
-            else self.relevant_courses[0].id
+            else self.relevant_courses and self.relevant_courses[0].id
 
         self.auth_attendee = auth_attendee
 

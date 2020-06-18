@@ -55,7 +55,7 @@ class AuditForm(Form):
 
     def get_course_choices(self):
         if not self.courses:
-            return self.none_choice
+            return [self.none_choice]
         return tuple((str(c.id), c.name) for c in self.courses)
 
     def for_admins(self):
