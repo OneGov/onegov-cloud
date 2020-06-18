@@ -12,6 +12,15 @@ from onegov.fsi import _
 from onegov.fsi.pdf import FsiPdf
 
 
+def set_cached_choices(self, request):
+    browser_session = request.browser_session
+    browser_session.last_chosen_organisations = self.organisations
+
+
+def cached_org_choices(request):
+    return request.browser_session.get('last_chosen_organisations')
+
+
 @FsiApp.form(
     model=AuditCollection,
     template='audits.pt',
@@ -21,7 +30,15 @@ from onegov.fsi.pdf import FsiPdf
 def invite_attendees_for_event(self, request, form):
     layout = AuditLayout(self, request)
     now = utcnow()
-    form.method = 'GET'
+
+    set_cached_choices(self, request)
+    cache = cached_org_choices(request)
+    if not self.organisations and cache:
+        return request.redirect(request.link(
+            self.by_organisations(
+                [o for o in cache if o in form.distinct_organisations]
+            )
+        ))
 
     letters = tuple(
         Link(

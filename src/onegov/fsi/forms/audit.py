@@ -10,6 +10,8 @@ from onegov.fsi.models import CourseAttendee
 
 class AuditForm(Form):
 
+    method = 'GET'
+
     course_id = SelectField(
         label=_("Course"),
         choices=[],
