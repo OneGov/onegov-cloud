@@ -80,8 +80,3 @@ def test_audit_for_course(client, scenario):
     page = page.click('M', index=-1)
     # Test reset of page when filtering with last name
     assert page.pyquery('ul.pagination > li.current > a')[0].text == "1"
-
-    page.form['organisations'].data = ['ZZW']
-    page = page.form.submit()
-    assert page.form['organisations'].value == ['ZZW']
-    assert page.pyquery('ul.pagination > li.current > a')[0].text == "1"
