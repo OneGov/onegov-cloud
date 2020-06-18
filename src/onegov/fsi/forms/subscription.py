@@ -230,7 +230,8 @@ class EditFsiPlaceholderSubscriptionForm(Form, SubscriptionFormMixin):
     def update_model(self, model):
         desc = self.dummy_desc.data
         if not desc:
-            default_desc = self.request.translate(_('Placeholder Reservation'))
+            default_desc = self.request.translate(
+                _('Placeholder Subscription'))
             desc = default_desc
         model.course_event_id = self.course_event_id.data
         model.dummy_desc = desc

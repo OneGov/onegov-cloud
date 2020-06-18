@@ -29,8 +29,8 @@
                                     <th i18n:translate="">Family name, surname</th>
                                     <th i18n:translate="">Email</th>
                                     <th i18n:translate="" tal:condition="not: layout.model.external_only">Organisation</th>
-<!--?                                    <th i18n:translate="">All Open Reservations</th>-->
-<!--?                                    <th i18n:translate="">Confirmed Open Reservations</th>-->
+<!--?                                    <th i18n:translate="">All Open Subscriptions</th>-->
+<!--?                                    <th i18n:translate="">Confirmed Open Subscriptions</th>-->
 <!--?                                    <th i18n:translate="">Total Course Events done</th>-->
                                     <th i18n:translate="" tal:condition="layout.model.unfiltered">External</th>
 
