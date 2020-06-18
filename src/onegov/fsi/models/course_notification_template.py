@@ -10,7 +10,7 @@ from onegov.fsi import _
 
 NOTIFICATION_TYPES = ('info', 'reservation', 'reminder', 'cancellation')
 NOTIFICATION_TYPE_TRANSLATIONS = (
-    _('Info Mail'), _('Reservation Confirmation'),
+    _('Info Mail'), _('Subscription Confirmation'),
     _('Event Reminder'), _('Cancellation Confirmation')
 )
 

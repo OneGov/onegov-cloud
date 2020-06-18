@@ -204,7 +204,7 @@ def view_add_reservation_placeholder(self, request, form):
                 _("This course event can't be booked (anymore)."))
             return request.redirect(request.link(self))
 
-        default_desc = request.translate(_('Placeholder Reservation'))
+        default_desc = request.translate(_('Placeholder Subscription'))
         if not data.get('dummy_desc'):
             data['dummy_desc'] = default_desc
 
@@ -213,7 +213,7 @@ def view_add_reservation_placeholder(self, request, form):
         return request.redirect(request.link(self))
 
     return {
-        'title': _('Add Placeholder Reservation'),
+        'title': _('Add Placeholder Subscription'),
         'model': self,
         'layout': layout,
         'form': form

@@ -175,7 +175,7 @@ msgstr "Diese Durchführung kann (nicht) mehr gebucht werden."
 msgid "Placeholder Description (optional)"
 msgstr "Platzhalter-Beschreibung (optional)"
 
-msgid "Placeholder Reservation"
+msgid "Placeholder Subscription"
 msgstr "Platzhalter-Reservation"
 
 msgid "Yes"
@@ -415,7 +415,7 @@ msgstr "Geplant"
 msgid "Info Mail"
 msgstr "Info E-Mail Kursveranstaltung"
 
-msgid "Reservation Confirmation"
+msgid "Subscription Confirmation"
 msgstr "Anmeldungsbestätigung"
 
 msgid "Event Reminder"
@@ -751,7 +751,7 @@ msgstr "Platzhalter bearbeiten"
 msgid "Added a new placeholder"
 msgstr "Platzhalter hinzugefügt"
 
-msgid "Add Placeholder Reservation"
+msgid "Add Placeholder Subscription"
 msgstr "Platzhalter-Anmeldung hinzufügen"
 
 msgid "New subscription successfully added"
