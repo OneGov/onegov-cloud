@@ -239,6 +239,23 @@ def test_audit_collection(scenario):
         (e.attendee_id, e.start) for e in
         audits.last_subscriptions()
     )
+
+    # Hide future subscriptions
+    assert not results
+
+    # Change all event dates to the past
+    for event in scenario.course_events:
+        event.start -= timedelta(days=5*365)
+        event.end -= timedelta(days=5*365)
+
+    scenario.commit()
+    scenario.refresh()
+
+    results = tuple(
+        (e.attendee_id, e.start) for e in
+        audits.last_subscriptions()
+    )
+
     assert sorted(results) == sorted(
         (a.id, e.start) for a, e in
         zip(scenario.attendees, scenario.course_events[:3])

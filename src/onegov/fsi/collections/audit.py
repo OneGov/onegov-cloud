@@ -1,4 +1,5 @@
 from cached_property import cached_property
+from sedate import utcnow
 from sqlalchemy import func, desc, or_
 
 from onegov.core.collection import GenericCollection, Pagination
@@ -78,7 +79,7 @@ class AuditCollection(GenericCollection, Pagination):
             self.letter == other.letter
         ))
 
-    def ranked_subscription_query(self):
+    def ranked_subscription_query(self, past_only=True):
         """
         Ranks all subscriptions of all events of a course
         windowed over the attendee_id and ranked after completed, most recent
@@ -107,6 +108,8 @@ class AuditCollection(GenericCollection, Pagination):
             CourseEvent.course_id == self.course_id,
             CourseReservation.attendee_id != None
         )
+        if past_only:
+            ranked = ranked.filter(CourseEvent.start < utcnow())
         return ranked
 
     def last_subscriptions(self):
