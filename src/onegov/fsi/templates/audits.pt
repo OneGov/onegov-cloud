@@ -35,7 +35,7 @@
                                 <th class="text-left" i18n:translate="">Name</th>
                                 <th class="text-left" i18n:translate="">Shortcode</th>
                                     <th class="text-left" i18n:translate="">Last Event</th>
-                                    <th class="text-left" i18n:translate="">Attended</th>
+                                    <th class="text-center" i18n:translate="">Attended</th>
                                     <th class="text-left" i18n:translate="">Due by (every <span i18n:name="refresh_interval">${layout.format_timedelta(model.course.refresh_interval)}</span>)</th>
                                 </thead>
                                 <tbody>
