@@ -144,7 +144,7 @@ class ReservationCollectionLayout(DefaultLayout):
         )
 
 
-class ReservationLayout(DefaultLayout):
+class SubscriptionLayout(DefaultLayout):
     """ Only used for editing since it does not contain fields """
 
     @cached_property

@@ -7,7 +7,7 @@ from onegov.fsi.collections.subscription import SubscriptionsCollection
 from onegov.fsi.forms.subscription import AddFsiSubscriptionForm, \
     EditFsiSubscriptionForm, EditFsiPlaceholderSubscriptionForm, \
     AddFsiPlaceholderSubscriptionForm
-from onegov.fsi.layouts.subscription import ReservationLayout, \
+from onegov.fsi.layouts.subscription import SubscriptionLayout, \
     ReservationCollectionLayout
 from onegov.fsi.models import CourseSubscription, CourseEvent
 from onegov.fsi import _
@@ -99,7 +99,7 @@ def view_add_reservation(self, request, form):
     permission=Secret
 )
 def view_edit_reservation(self, request, form):
-    layout = ReservationLayout(self, request)
+    layout = SubscriptionLayout(self, request)
     assert not self.is_placeholder
 
     if form.submitted(request):
@@ -160,7 +160,7 @@ def view_edit_reservation(self, request, form):
     permission=Secret
 )
 def view_edit_placeholder_reservation(self, request, form):
-    layout = ReservationLayout(self, request)
+    layout = SubscriptionLayout(self, request)
     assert self.is_placeholder
 
     if form.submitted(request):
