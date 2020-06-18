@@ -20,7 +20,7 @@ def test_attendee_1(
     course_event = future_course_event(session)
     attendee, data = attendee(session)
     member = member(session)
-    assert attendee.reservations.count() == 0
+    assert attendee.subscriptions.count() == 0
     assert attendee.possible_course_events().count() == 1
 
     assert attendee.user == member
@@ -31,7 +31,7 @@ def test_attendee_1(
         course_event_id=course_event[0].id, attendee_id=attendee.id)
     session.add(subscription)
     session.flush()
-    assert attendee.reservations.count() == 1
+    assert attendee.subscriptions.count() == 1
     assert course_event[0].start > utcnow()
     assert attendee.course_events.first() == course_event[0]
     assert attendee.possible_course_events().count() == 0
@@ -40,14 +40,14 @@ def test_attendee_1(
     assert subscription.attendee == attendee
 
     # Check the event of the the subscription
-    assert attendee.reservations[0].course_event == course_event[0]
+    assert attendee.subscriptions[0].course_event == course_event[0]
 
     # delete the subscription
-    attendee.reservations.remove(subscription)
+    attendee.subscriptions.remove(subscription)
 
     # and add it differently
-    attendee.reservations.append(subscription)
-    assert attendee.reservations.count() == 1
+    attendee.subscriptions.append(subscription)
+    assert attendee.subscriptions.count() == 1
 
 
 def test_course_event_1(session, course, course_event, attendee):
@@ -57,7 +57,7 @@ def test_course_event_1(session, course, course_event, attendee):
     delta = datetime.timedelta(days=265)
 
     assert event.attendees.count() == 0
-    assert event.reservations.count() == 0
+    assert event.subscriptions.count() == 0
 
     # Add a participant via a subscription
     placeholder = CourseSubscription(
@@ -68,7 +68,7 @@ def test_course_event_1(session, course, course_event, attendee):
     ))
     session.flush()
 
-    assert event.reservations.count() == 2
+    assert event.subscriptions.count() == 2
     assert event.attendees.count() == 1
     assert event.available_seats == 20 - 2
     assert event.possible_subscribers().first() is None
@@ -87,7 +87,7 @@ def test_course_event_1(session, course, course_event, attendee):
     # Add attendee2 also to event, so that can not book event2
     year = event.start.year
     assert year == event2.start.year
-    assert event2.reservations.first() is None
+    assert event2.subscriptions.first() is None
     session.add(
         CourseSubscription(
             attendee_id=attendee_2.id,
@@ -131,13 +131,13 @@ def test_reservation_1(session, attendee, course_event):
 
 
 def test_cascading_event_deletion(session, db_mock_session):
-    # If a course event is deleted, all the reservations should be deleted
+    # If a course event is deleted, all the subscriptions should be deleted
     session = db_mock_session(session)
     event = session.query(CourseEvent).first()
-    assert event.reservations.count() == 2
+    assert event.subscriptions.count() == 2
     session.delete(event)
     assert session.query(CourseSubscription).count() == 0
-    assert event.reservations.count() == 0
+    assert event.subscriptions.count() == 0
 
 
 def test_cascading_attendee_deletion(session, db_mock_session):

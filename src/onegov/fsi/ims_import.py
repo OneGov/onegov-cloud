@@ -271,7 +271,7 @@ def parse_subscriptions(csvfile, persons, events):
     """
     print('-- parse_subscriptions --')
 
-    # The selection of valid subscriptions/reservations
+    # The selection of valid subscriptions/subscriptions
     errors = OrderedDict()
     droppped_teilnehmer_ids = []
     maybe_external_in_ldap = OrderedDict()

@@ -34,7 +34,7 @@ class CourseNotificationTemplateCollection(GenericCollection):
 
     @cached_property
     def course_reservations(self):
-        return self.course_event.reservations
+        return self.course_event.subscriptions
 
     def auto_add_templates_if_not_existing(self):
         assert self.course_event_id

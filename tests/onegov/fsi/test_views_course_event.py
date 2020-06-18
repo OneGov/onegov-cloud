@@ -79,13 +79,13 @@ def test_add_delete_course_event(client_with_db):
     page = page.form.submit().follow()
     assert 'Eine neue Durchführung wurde hinzugefügt' in page
 
-    # Delete course without reservations
+    # Delete course without subscriptions
     session = client.app.session()
     event = session.query(CourseEvent).filter_by(
         presenter_email='p@t.com'
     ).one()
 
-    assert not event.reservations.count()
+    assert not event.subscriptions.count()
     view = f'/fsi/event/{event.id}'
 
     # csrf protected url must be used
@@ -158,7 +158,7 @@ def test_register_for_course_event_member(client_with_db):
 
     # Test cancellation emails upon unsubscribing
     client.login_admin()
-    view = f'/fsi/reservations?course_event_id={event.id}'
+    view = f'/fsi/subscriptions?course_event_id={event.id}'
     page = client.get(view)
     page.click('Löschen')
     assert len(client.app.smtp.outbox) == 2

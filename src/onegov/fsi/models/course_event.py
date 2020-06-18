@@ -121,7 +121,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         lazy='dynamic'
     )
 
-    reservations = relationship(
+    subscriptions = relationship(
         'CourseSubscription',
         backref=backref(
             'course_event',
@@ -184,7 +184,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
 
     @cached_property
     def cached_reservation_count(self):
-        return self.reservations.count()
+        return self.subscriptions.count()
 
     @property
     def available_seats(self):
@@ -231,7 +231,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         return self.__class__(**self.duplicate_dict)
 
     def has_reservation(self, attendee_id):
-        return self.reservations.filter_by(
+        return self.subscriptions.filter_by(
             attendee_id=attendee_id).first() is not None
 
     def excluded_subscribers(self, year=None, as_uids=True):

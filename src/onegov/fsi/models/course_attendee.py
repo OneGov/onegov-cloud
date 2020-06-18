@@ -86,7 +86,7 @@ class CourseAttendee(Base, ORMSearchable):
 
     meta = Column(JSON, nullable=True, default=dict)
 
-    reservations = relationship(
+    subscriptions = relationship(
         'CourseSubscription',
         backref='attendee',
         lazy='dynamic',
@@ -153,7 +153,7 @@ class CourseAttendee(Base, ORMSearchable):
     @property
     def total_done_course_events(self):
         from onegov.fsi.models import CourseSubscription  # circular
-        return self.reservations.filter(
+        return self.subscriptions.filter(
             CourseSubscription.event_completed == True)
 
     @property

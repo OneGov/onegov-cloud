@@ -24,7 +24,7 @@ def view_reservations(self, request):
     layout = ReservationCollectionLayout(self, request)
     return {
         'layout': layout,
-        'reservations': self.batch
+        'subscriptions': self.batch
     }
 
 

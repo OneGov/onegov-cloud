@@ -55,7 +55,7 @@ def test_reservation_details(client_with_db):
     client = client_with_db
     session = client.app.session()
     attendee = session.query(CourseAttendee).first()
-    subscription = attendee.reservations.first()
+    subscription = attendee.subscriptions.first()
 
     view = f'/fsi/reservation/{subscription.id}'
     # This view has just the delete method
@@ -124,7 +124,7 @@ def test_own_reservations(client_with_db):
     client.login_editor()
     page = client.get('/topics/informationen')
 
-    # check if the management bar shows the correct number of reservations
+    # check if the management bar shows the correct number of subscriptions
     res_count = page.pyquery('a.open-tickets').attr('data-count')
     assert res_count == '1'
     page = page.click('Kursanmeldung', href='attendee_id')
@@ -136,7 +136,7 @@ def test_create_delete_reservation(client_with_db):
     session = client.app.session()
 
     attendee = session.query(CourseAttendee).first()
-    att_res = attendee.reservations.all()
+    att_res = attendee.subscriptions.all()
     assert len(att_res) == 2
 
     # Lazy loading not possible

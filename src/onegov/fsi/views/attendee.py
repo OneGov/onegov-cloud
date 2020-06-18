@@ -45,7 +45,7 @@ def view_course_attendee(self, request):
         'layout': layout,
         'model': self,
         'limit': limit,
-        'last_subscriptions': sort_subscriptions(self.reservations, limit)
+        'last_subscriptions': sort_subscriptions(self.subscriptions, limit)
     }
 
 

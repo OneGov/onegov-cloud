@@ -146,7 +146,7 @@ def get_reservations(
 
     if not attendee_id:
         if not request.is_manager:
-            # check if someone has permission to see all reservations
+            # check if someone has permission to see all subscriptions
             attendee_id = request.attendee_id
         # can be none....still, so not protected, use permissions
     elif attendee_id != request.attendee_id and not request.is_manager:
