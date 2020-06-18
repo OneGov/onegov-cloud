@@ -4,7 +4,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
 table_name = 'fsi_reservations'
 
-reservation_table = Table(
+subscription_table = Table(
     table_name,
     Base.metadata,
     Column('id', UUID, primary_key=True, default=uuid4),
@@ -26,7 +26,7 @@ class CourseSubscription(Base):
     attendee_id is Null if its a placeholder reservation.
 
     """
-    __table__ = reservation_table
+    __table__ = subscription_table
     __tablename__ = table_name
     __mapper_args__ = {
         'confirm_deleted_rows': False

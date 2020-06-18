@@ -19,7 +19,7 @@ from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.fsi import _
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_subscription import CourseSubscription
-from onegov.fsi.models.course_subscription import reservation_table
+from onegov.fsi.models.course_subscription import subscription_table
 from onegov.search import ORMSearchable
 
 COURSE_EVENT_STATUSES = ('created', 'confirmed', 'canceled', 'planned')
@@ -114,10 +114,10 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
 
     attendees = relationship(
         CourseAttendee,
-        secondary=reservation_table,
-        primaryjoin=id == reservation_table.c.course_event_id,
-        secondaryjoin=reservation_table.c.attendee_id
-        == CourseAttendee.id,
+        secondary=subscription_table,
+        primaryjoin=id == subscription_table.c.course_event_id,
+        secondaryjoin=subscription_table.c.attendee_id
+                      == CourseAttendee.id,
         lazy='dynamic'
     )
 
