@@ -44,7 +44,7 @@
                                             <td>${result.last_name}, ${result.first_name}</td>
                                             <td>${result.source_id}</td>
                                             <td>${layout.format_date(result.start, 'datetime')} <span i18n:translate="" tal:condition="result.start">h</span></td>
-                                            <td>
+                                            <td class="text-center">
                                                 <span tal:condition="result.event_completed" class="check-icon"></span>
                                                 <span tal:condition="not result.event_completed">-</span>
                                             </td>
