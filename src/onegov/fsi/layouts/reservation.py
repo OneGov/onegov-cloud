@@ -12,14 +12,14 @@ class ReservationCollectionLayout(DefaultLayout):
     def for_himself(self):
         return self.model.attendee_id == self.request.attendee_id
 
-    def link(self, reservation):
-        if reservation.is_placeholder:
-            return self.request.link(reservation, name='edit-placeholder')
-        return self.request.link(reservation.attendee)
+    def link(self, subscription):
+        if subscription.is_placeholder:
+            return self.request.link(subscription, name='edit-placeholder')
+        return self.request.link(subscription.attendee)
 
-    def confirmation_link(self, reservation):
+    def confirmation_link(self, subscription):
         return self.csrf_protected_url(
-            self.request.link(reservation, name='toggle-confirm'))
+            self.request.link(subscription, name='toggle-confirm'))
 
     @cached_property
     def title(self):
@@ -115,9 +115,9 @@ class ReservationCollectionLayout(DefaultLayout):
             )
         return links
 
-    def intercooler_btn_for_item(self, reservation):
+    def intercooler_btn_for_item(self, subscription):
 
-        confirm = reservation.is_placeholder and Confirm(
+        confirm = subscription.is_placeholder and Confirm(
             _("Do you want to delete the placeholder ?"),
             yes=_("Delete"),
             no=_("Cancel")
@@ -131,7 +131,7 @@ class ReservationCollectionLayout(DefaultLayout):
         return Link(
             text=_("Delete"),
             url=self.csrf_protected_url(
-                self.request.link(reservation)
+                self.request.link(subscription)
             ),
             attrs={'class': 'button tiny alert'},
             traits=(
