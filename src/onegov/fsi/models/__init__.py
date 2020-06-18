@@ -3,12 +3,12 @@ from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.course_notification_template \
     import CourseNotificationTemplate
-from onegov.fsi.models.course_subscription import CourseReservation
+from onegov.fsi.models.course_subscription import CourseSubscription
 
 __all__ = (
     'Course',
     'CourseAttendee',
     'CourseEvent',
     'CourseNotificationTemplate',
-    'CourseReservation',
+    'CourseSubscription',
 )

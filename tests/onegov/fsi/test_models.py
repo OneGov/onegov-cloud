@@ -4,7 +4,7 @@ from sedate import utcnow
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.course_notification_template import get_template_default
-from onegov.fsi.models.course_subscription import CourseReservation
+from onegov.fsi.models.course_subscription import CourseSubscription
 
 
 def test_attendee_as_external(session, external_attendee):
@@ -27,7 +27,7 @@ def test_attendee_1(
     assert member.attendee == attendee
 
     # Add a reservation
-    reservation = CourseReservation(
+    reservation = CourseSubscription(
         course_event_id=course_event[0].id, attendee_id=attendee.id)
     session.add(reservation)
     session.flush()
@@ -60,11 +60,11 @@ def test_course_event_1(session, course, course_event, attendee):
     assert event.reservations.count() == 0
 
     # Add a participant via a reservation
-    placeholder = CourseReservation(
+    placeholder = CourseSubscription(
         dummy_desc='Placeholder', course_event_id=event.id)
     session.add_all((
         placeholder,
-        CourseReservation(course_event_id=event.id, attendee_id=attendee_.id)
+        CourseSubscription(course_event_id=event.id, attendee_id=attendee_.id)
     ))
     session.flush()
 
@@ -89,7 +89,7 @@ def test_course_event_1(session, course, course_event, attendee):
     assert year == event2.start.year
     assert event2.reservations.first() is None
     session.add(
-        CourseReservation(
+        CourseSubscription(
             attendee_id=attendee_2.id,
             course_event_id=event.id
         )
@@ -117,7 +117,7 @@ def test_course_event_1(session, course, course_event, attendee):
 def test_reservation_1(session, attendee, course_event):
     attendee = attendee(session)
     course_event = course_event(session)
-    res = CourseReservation(
+    res = CourseSubscription(
         course_event_id=course_event[0].id,
         attendee_id=attendee[0].id
     )
@@ -136,7 +136,7 @@ def test_cascading_event_deletion(session, db_mock_session):
     event = session.query(CourseEvent).first()
     assert event.reservations.count() == 2
     session.delete(event)
-    assert session.query(CourseReservation).count() == 0
+    assert session.query(CourseSubscription).count() == 0
     assert event.reservations.count() == 0
 
 
@@ -144,9 +144,9 @@ def test_cascading_attendee_deletion(session, db_mock_session):
     # If an attendee is deleted, his reservations should be deleted
     session = db_mock_session(session)
     attendee = session.query(CourseAttendee).first()
-    assert session.query(CourseReservation).count() == 2
+    assert session.query(CourseSubscription).count() == 2
     session.delete(attendee)
-    assert session.query(CourseReservation).count() == 1
+    assert session.query(CourseSubscription).count() == 1
 
 
 def test_notification_templates_1(session, course_event):

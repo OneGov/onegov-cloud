@@ -18,7 +18,7 @@ reservation_table = Table(
 )
 
 
-class CourseReservation(Base):
+class CourseSubscription(Base):
     """Linking table between CourseEvent and CourseAttendee.
     This table is defined in a way such that i can be used for a secondary
     join in CourseEvent.attendees.

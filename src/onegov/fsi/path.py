@@ -14,7 +14,7 @@ from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.course_notification_template import \
     CourseNotificationTemplate
-from onegov.fsi.models.course_subscription import CourseReservation
+from onegov.fsi.models.course_subscription import CourseSubscription
 
 
 @FsiApp.path(model=Course, path='/fsi/course/{id}')
@@ -162,7 +162,7 @@ def get_reservations(
     )
 
 
-@FsiApp.path(model=CourseReservation, path='/fsi/reservation/{id}')
+@FsiApp.path(model=CourseSubscription, path='/fsi/reservation/{id}')
 def get_reservation_details(request, id):
     return SubscriptionsCollection(request.session).by_id(id)
 

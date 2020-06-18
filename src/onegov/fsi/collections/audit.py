@@ -3,7 +3,7 @@ from sedate import utcnow
 from sqlalchemy import func, desc, or_
 
 from onegov.core.collection import GenericCollection, Pagination
-from onegov.fsi.models import CourseAttendee, CourseReservation, CourseEvent, \
+from onegov.fsi.models import CourseAttendee, CourseSubscription, CourseEvent, \
     Course
 
 
@@ -86,27 +86,27 @@ class AuditCollection(GenericCollection, Pagination):
         Use this query to make a join with any collection of attendees.
         """
         ranked = self.session.query(
-            CourseReservation.attendee_id,
-            CourseReservation.event_completed,
+            CourseSubscription.attendee_id,
+            CourseSubscription.event_completed,
             Course.name,
             Course.refresh_interval,
             CourseEvent.course_id,
             CourseEvent.start,
             CourseEvent.end,
             func.row_number().over(
-                partition_by=CourseReservation.attendee_id,
+                partition_by=CourseSubscription.attendee_id,
                 order_by=[
-                    desc(CourseReservation.event_completed),
+                    desc(CourseSubscription.event_completed),
                     CourseEvent.start]
             ).label('rownum'),
         )
         ranked = ranked.join(
-            CourseEvent, CourseEvent.id == CourseReservation.course_event_id)
+            CourseEvent, CourseEvent.id == CourseSubscription.course_event_id)
         ranked = ranked.join(
             Course, Course.id == CourseEvent.course_id)
         ranked = ranked.filter(
             CourseEvent.course_id == self.course_id,
-            CourseReservation.attendee_id != None
+            CourseSubscription.attendee_id != None
         )
         if past_only:
             ranked = ranked.filter(CourseEvent.start < utcnow())
@@ -118,7 +118,7 @@ class AuditCollection(GenericCollection, Pagination):
         """
         ranked = self.ranked_subscription_query().subquery('ranked')
         subquery = self.session.query(
-            CourseReservation.attendee_id,
+            CourseSubscription.attendee_id,
             ranked.c.start,
             ranked.c.end,
             ranked.c.name,

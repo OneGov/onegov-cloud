@@ -8,7 +8,7 @@ from sedate import utcnow
 from sqlalchemy import desc
 
 from onegov.fsi.models import CourseAttendee, Course, CourseEvent
-from onegov.fsi.models.course_subscription import CourseReservation
+from onegov.fsi.models.course_subscription import CourseSubscription
 from onegov.user import User
 from onegov.fsi import FsiApp
 from onegov.fsi.initial_content import create_new_organisation
@@ -165,12 +165,12 @@ def db_mock_session(course_event, attendee):
         attendee_ = attendee(session)
         course_event_ = course_event(session)
 
-        placeholder = CourseReservation(
+        placeholder = CourseSubscription(
             dummy_desc='Placeholder',
             id=uuid4(),
             course_event_id=course_event_[0].id)
         # Create Reservations
-        user_res = CourseReservation(
+        user_res = CourseSubscription(
             attendee_id=attendee_[0].id,
             course_event_id=course_event_[0].id
         )
@@ -340,7 +340,7 @@ class FsiScenario(BaseScenario):
 
     def add_subscription(self, event, attendee, **columns):
         self.subscriptions.append(self.add(
-            CourseReservation,
+            CourseSubscription,
             **columns,
             course_event_id=event.id,
             attendee_id=attendee.id,

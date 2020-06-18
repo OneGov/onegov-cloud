@@ -87,7 +87,7 @@ class CourseAttendee(Base, ORMSearchable):
     meta = Column(JSON, nullable=True, default=dict)
 
     reservations = relationship(
-        'CourseReservation',
+        'CourseSubscription',
         backref='attendee',
         lazy='dynamic',
         cascade='all, delete-orphan')
@@ -134,12 +134,12 @@ class CourseAttendee(Base, ORMSearchable):
          the attendee has a reservation record.
         """
         from onegov.fsi.models import CourseEvent  # circular
-        from onegov.fsi.models import CourseReservation  # circular
+        from onegov.fsi.models import CourseSubscription  # circular
 
         session = object_session(self)
-        result = session.query(CourseEvent).join(CourseReservation)
-        result = result.filter(CourseReservation.attendee_id == self.id)
-        result = result.filter(CourseReservation.event_completed == False)
+        result = session.query(CourseEvent).join(CourseSubscription)
+        result = result.filter(CourseSubscription.attendee_id == self.id)
+        result = result.filter(CourseSubscription.event_completed == False)
         result = result.filter(CourseEvent.start > utcnow())
 
         return result
@@ -152,9 +152,9 @@ class CourseAttendee(Base, ORMSearchable):
 
     @property
     def total_done_course_events(self):
-        from onegov.fsi.models import CourseReservation  # circular
+        from onegov.fsi.models import CourseSubscription  # circular
         return self.reservations.filter(
-            CourseReservation.event_completed == True)
+            CourseSubscription.event_completed == True)
 
     @property
     def repeating_courses(self):
@@ -175,41 +175,41 @@ class CourseAttendee(Base, ORMSearchable):
         # circular imports
         from onegov.fsi.models import Course
         from onegov.fsi.models import CourseEvent
-        from onegov.fsi.models import CourseReservation
+        from onegov.fsi.models import CourseSubscription
 
         session = object_session(self)
 
         result = session.query(CourseEvent).join(Course)\
             .filter(Course.mandatory_refresh == True)
 
-        result = result.join(CourseReservation)
-        result = result.filter(CourseReservation.attendee_id == self.id)
-        result = result.filter(CourseReservation.event_completed == True)
+        result = result.join(CourseSubscription)
+        result = result.filter(CourseSubscription.attendee_id == self.id)
+        result = result.filter(CourseSubscription.event_completed == True)
         result = result.filter(CourseEvent.next_event_start > utcnow())
         return result
 
     @property
     def undone_registered_courses(self):
         from onegov.fsi.models import CourseEvent
-        from onegov.fsi.models import CourseReservation
+        from onegov.fsi.models import CourseSubscription
 
         session = object_session(self)
-        result = session.query(CourseEvent).join(CourseReservation)
+        result = session.query(CourseEvent).join(CourseSubscription)
         result = result.filter(CourseEvent.status == 'confirmed')
         result = result.filter(CourseEvent.start < utcnow())
-        result = result.filter(CourseReservation.attendee_id == self.id)
-        result = result.filter(CourseReservation.event_completed == False)
+        result = result.filter(CourseSubscription.attendee_id == self.id)
+        result = result.filter(CourseSubscription.event_completed == False)
         return result
 
     def possible_course_events(self, show_hidden=True, show_locked=False):
         """Used for the reservation form. Should exclude past courses
         and courses already registered"""
         from onegov.fsi.models import CourseEvent
-        from onegov.fsi.models import CourseReservation
+        from onegov.fsi.models import CourseSubscription
 
         session = object_session(self)
-        excl = session.query(CourseEvent.id).join(CourseReservation)
-        excl = excl.filter(CourseReservation.attendee_id == self.id)
+        excl = session.query(CourseEvent.id).join(CourseSubscription)
+        excl = excl.filter(CourseSubscription.attendee_id == self.id)
         excl = excl.subquery('excl')
         result = session.query(CourseEvent).filter(CourseEvent.id.notin_(excl))
         result = result.filter(CourseEvent.start > utcnow())

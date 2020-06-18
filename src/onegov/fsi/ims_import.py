@@ -98,7 +98,7 @@ import dateutil.parser
 from sedate import replace_timezone
 
 from onegov.core.csv import CSVFile
-from onegov.fsi.models import CourseEvent, Course, CourseReservation
+from onegov.fsi.models import CourseEvent, Course, CourseSubscription
 from onegov.fsi.models.course_notification_template import InfoTemplate, \
     ReservationTemplate, CancellationTemplate, ReminderTemplate
 from onegov.user import User
@@ -483,7 +483,7 @@ def import_ims_data(session, persons, courses, events, possible_ldap_users):
         if not subscriptions:
             continue
         session.add_all((
-            CourseReservation(
+            CourseSubscription(
                 attendee_id=attendee.id,
                 course_event_id=r['course_event_id'],
                 event_completed=r['completed']
@@ -497,7 +497,7 @@ def import_ims_data(session, persons, courses, events, possible_ldap_users):
             continue
         statistics['external_found'] += 1
         session.add_all((
-            CourseReservation(
+            CourseSubscription(
                 attendee_id=attendee.id,
                 course_event_id=r['course_event_id']
             ) for r in record['subscriptions']

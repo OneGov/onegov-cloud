@@ -18,7 +18,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.fsi import _
 from onegov.fsi.models.course_attendee import CourseAttendee
-from onegov.fsi.models.course_subscription import CourseReservation
+from onegov.fsi.models.course_subscription import CourseSubscription
 from onegov.fsi.models.course_subscription import reservation_table
 from onegov.search import ORMSearchable
 
@@ -122,7 +122,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     )
 
     reservations = relationship(
-        'CourseReservation',
+        'CourseSubscription',
         backref=backref(
             'course_event',
             lazy='joined'
@@ -242,7 +242,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         session = object_session(self)
 
         excl = session.query(CourseAttendee.id if as_uids else CourseAttendee)
-        excl = excl.join(CourseReservation).join(CourseEvent)
+        excl = excl.join(CourseSubscription).join(CourseEvent)
 
         year = year or datetime.datetime.today().year
         bounds = (
@@ -257,7 +257,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
                     CourseEvent.start >= bounds[0],
                     CourseEvent.end <= bounds[1]
                 ),
-                CourseReservation.course_event_id == self.id
+                CourseSubscription.course_event_id == self.id
             )
         )
 

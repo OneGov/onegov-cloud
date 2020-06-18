@@ -9,7 +9,7 @@ from onegov.fsi.forms.reservation import AddFsiReservationForm, \
     AddFsiPlaceholderReservationForm
 from onegov.fsi.layouts.reservation import ReservationLayout, \
     ReservationCollectionLayout
-from onegov.fsi.models import CourseReservation, CourseEvent
+from onegov.fsi.models import CourseSubscription, CourseEvent
 from onegov.fsi import _
 from onegov.fsi.pdf import FsiPdf
 from onegov.fsi.views.notifcations import handle_send_email
@@ -92,7 +92,7 @@ def view_add_reservation(self, request, form):
 
 
 @FsiApp.form(
-    model=CourseReservation,
+    model=CourseSubscription,
     template='form.pt',
     name='edit',
     form=EditFsiReservationForm,
@@ -153,7 +153,7 @@ def view_edit_reservation(self, request, form):
 
 
 @FsiApp.form(
-    model=CourseReservation,
+    model=CourseSubscription,
     template='form.pt',
     name='edit-placeholder',
     form=EditFsiPlaceholderReservationForm,
@@ -243,7 +243,7 @@ def view_add_from_course_event(self, request):
 
 
 @FsiApp.html(
-    model=CourseReservation,
+    model=CourseSubscription,
     request_method='DELETE',
     permission=Secret
 )
@@ -265,7 +265,7 @@ def view_delete_reservation(self, request):
 
 
 @FsiApp.json(
-    model=CourseReservation,
+    model=CourseSubscription,
     request_method='POST',
     permission=Secret,
     name='toggle-confirm'

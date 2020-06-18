@@ -7,7 +7,7 @@ import transaction
 
 from onegov.core.crypto import hash_password
 from onegov.fsi.models import CourseAttendee, Course, CourseEvent, \
-    CourseReservation
+    CourseSubscription
 from onegov.fsi.models.course_notification_template import InfoTemplate, \
     ReservationTemplate, ReminderTemplate, CancellationTemplate
 from onegov.user import User
@@ -237,9 +237,9 @@ def future_course_reservation_factory(session, **kwargs):
         attendee_id=attendee_factory(session)[0].id
     )
     data.update(**kwargs)
-    res = session.query(CourseReservation).filter_by(**data).first()
+    res = session.query(CourseSubscription).filter_by(**data).first()
     if not res:
-        res = CourseReservation(**data)
+        res = CourseSubscription(**data)
         session.add(res)
         session.flush()
     return res, data
@@ -262,27 +262,27 @@ def db_mock(session):
         location='Empty'
     )
 
-    placeholder = CourseReservation(
+    placeholder = CourseSubscription(
         dummy_desc='Placeholder',
         id=uuid4(),
         course_event_id=course_event.id)
     # Create Reservations
-    attendee_res = CourseReservation(
+    attendee_res = CourseSubscription(
         attendee_id=attendee.id,
         course_event_id=course_event.id
     )
 
-    attendee_future_res = CourseReservation(
+    attendee_future_res = CourseSubscription(
         attendee_id=attendee.id,
         course_event_id=future_course_event.id
     )
 
-    planner_res = CourseReservation(
+    planner_res = CourseSubscription(
         attendee_id=planner.id,
         course_event_id=course_event.id
     )
 
-    planner_future_res = CourseReservation(
+    planner_future_res = CourseSubscription(
         attendee_id=planner_editor.id,
         course_event_id=future_course_event.id
     )

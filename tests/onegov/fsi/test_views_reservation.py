@@ -1,5 +1,5 @@
 from onegov.fsi.collections.course_event import CourseEventCollection
-from onegov.fsi.models import CourseReservation, CourseAttendee, CourseEvent, \
+from onegov.fsi.models import CourseSubscription, CourseAttendee, CourseEvent, \
     Course
 from onegov.user import User
 
@@ -65,11 +65,11 @@ def test_reservation_details(client_with_db):
 def test_edit_reservation(client_with_db):
     client = client_with_db
     session = client.app.session()
-    reservation = session.query(CourseReservation).filter(
-        CourseReservation.attendee_id != None).first()
+    reservation = session.query(CourseSubscription).filter(
+        CourseSubscription.attendee_id != None).first()
 
-    placeholder = session.query(CourseReservation).filter(
-        CourseReservation.attendee_id == None).first()
+    placeholder = session.query(CourseSubscription).filter(
+        CourseSubscription.attendee_id == None).first()
 
     events = session.query(CourseEvent).all()
     assert events[1].id != reservation.course_event_id
