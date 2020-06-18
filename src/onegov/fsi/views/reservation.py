@@ -8,7 +8,7 @@ from onegov.fsi.forms.subscription import AddFsiSubscriptionForm, \
     EditFsiSubscriptionForm, EditFsiPlaceholderSubscriptionForm, \
     AddFsiPlaceholderSubscriptionForm
 from onegov.fsi.layouts.subscription import SubscriptionLayout, \
-    ReservationCollectionLayout
+    SubscriptionCollectionLayout
 from onegov.fsi.models import CourseSubscription, CourseEvent
 from onegov.fsi import _
 from onegov.fsi.pdf import FsiPdf
@@ -21,7 +21,7 @@ from onegov.fsi.views.notifcations import handle_send_email
     permission=Personal
 )
 def view_reservations(self, request):
-    layout = ReservationCollectionLayout(self, request)
+    layout = SubscriptionCollectionLayout(self, request)
     return {
         'layout': layout,
         'subscriptions': self.batch
@@ -34,7 +34,7 @@ def view_reservations(self, request):
     name='pdf'
 )
 def attendee_list_as_pdf(self, request):
-    layout = ReservationCollectionLayout(self, request)
+    layout = SubscriptionCollectionLayout(self, request)
     result = FsiPdf.from_subscriptions(
         self, layout, request.translate(layout.title))
 
@@ -55,7 +55,7 @@ def attendee_list_as_pdf(self, request):
     permission=Private
 )
 def view_add_reservation(self, request, form):
-    layout = ReservationCollectionLayout(self, request)
+    layout = SubscriptionCollectionLayout(self, request)
 
     if form.submitted(request):
         data = form.get_useful_data()
@@ -192,7 +192,7 @@ def view_edit_placeholder_reservation(self, request, form):
     permission=Secret
 )
 def view_add_reservation_placeholder(self, request, form):
-    layout = ReservationCollectionLayout(self, request)
+    layout = SubscriptionCollectionLayout(self, request)
 
     if form.submitted(request):
         data = form.get_useful_data()

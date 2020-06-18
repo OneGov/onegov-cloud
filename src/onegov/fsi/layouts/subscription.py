@@ -6,7 +6,7 @@ from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
 
 
-class ReservationCollectionLayout(DefaultLayout):
+class SubscriptionCollectionLayout(DefaultLayout):
 
     @property
     def for_himself(self):
