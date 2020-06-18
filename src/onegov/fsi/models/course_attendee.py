@@ -131,7 +131,7 @@ class CourseAttendee(Base, ORMSearchable):
     def course_events(self):
         """
         Will return the query for not completed (future) courses events
-         the attendee has a reservation record.
+         the attendee has a subscription record.
         """
         from onegov.fsi.models import CourseEvent  # circular
         from onegov.fsi.models import CourseSubscription  # circular

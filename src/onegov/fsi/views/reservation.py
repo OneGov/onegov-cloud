@@ -4,7 +4,7 @@ from onegov.core.security import Personal, Secret, Private
 from onegov.core.utils import normalize_for_url
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.subscription import SubscriptionsCollection
-from onegov.fsi.forms.reservation import AddFsiReservationForm, \
+from onegov.fsi.forms.subscription import AddFsiReservationForm, \
     EditFsiReservationForm, EditFsiPlaceholderReservationForm, \
     AddFsiPlaceholderReservationForm
 from onegov.fsi.layouts.subscription import ReservationLayout, \
