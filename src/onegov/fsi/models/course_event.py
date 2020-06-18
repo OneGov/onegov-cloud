@@ -18,8 +18,8 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.fsi import _
 from onegov.fsi.models.course_attendee import CourseAttendee
-from onegov.fsi.models.course_reservation import CourseReservation
-from onegov.fsi.models.course_reservation import reservation_table
+from onegov.fsi.models.course_subscription import CourseReservation
+from onegov.fsi.models.course_subscription import reservation_table
 from onegov.search import ORMSearchable
 
 COURSE_EVENT_STATUSES = ('created', 'confirmed', 'canceled', 'planned')

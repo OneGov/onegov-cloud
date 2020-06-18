@@ -8,7 +8,7 @@ from sedate import utcnow
 from sqlalchemy import desc
 
 from onegov.fsi.models import CourseAttendee, Course, CourseEvent
-from onegov.fsi.models.course_reservation import CourseReservation
+from onegov.fsi.models.course_subscription import CourseReservation
 from onegov.user import User
 from onegov.fsi import FsiApp
 from onegov.fsi.initial_content import create_new_organisation

@@ -4,7 +4,7 @@ from sedate import utcnow
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.course_notification_template import get_template_default
-from onegov.fsi.models.course_reservation import CourseReservation
+from onegov.fsi.models.course_subscription import CourseReservation
 
 
 def test_attendee_as_external(session, external_attendee):
