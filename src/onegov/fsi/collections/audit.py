@@ -181,7 +181,7 @@ class AuditCollection(GenericCollection, Pagination):
     @cached_property
     def course(self):
         return self.course_id and self.session.query(Course).filter_by(
-            id=self.course_id).first()
+            id=self.course_id).first() or None
 
     @cached_property
     def used_letters(self):

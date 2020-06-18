@@ -69,6 +69,9 @@ def invite_attendees_for_event(self, request, form):
     permission=Private
 )
 def get_audit_pdf(self, request):
+    if not self.course_id:
+        return Response(status='503 Service Unavailable')
+
     title = request.translate(
         _("Audit for ${course_name}",
           mapping={'course_name': self.course.name})

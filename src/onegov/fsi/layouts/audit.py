@@ -21,6 +21,8 @@ class AuditLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
+        if not self.model.course_id or not self.model.subset_count:
+            return []
         return [
             Link(
                 text=_("PDF"),

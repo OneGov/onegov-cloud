@@ -27,6 +27,8 @@ def test_audit_for_course(client, scenario):
     # Course options should be hidden but there
     org_options = [opt[2] for opt in page.form['organisations'].options]
     assert org_options == ['Keine']
+    # Test pdf
+    assert 'PDF' not in page
 
     # Adds data
     scenario.add_course(
@@ -49,6 +51,7 @@ def test_audit_for_course(client, scenario):
     assert options == [scenario.latest_course.name]
     # Test if a course was chosen automatically
     assert page.form['course_id'].value == str(scenario.latest_course.id)
+    page.click('PDF')
 
     # add 21 attendee members
     for org in ('ZZW', 'ZHW', 'UBV'):
@@ -80,3 +83,6 @@ def test_audit_for_course(client, scenario):
     page = page.click('M', index=-1)
     # Test reset of page when filtering with last name
     assert page.pyquery('ul.pagination > li.current > a')[0].text == "1"
+
+    # Test pdf
+    page_pdf = page.click('PDF')
