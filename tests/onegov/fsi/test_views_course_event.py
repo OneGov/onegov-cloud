@@ -158,7 +158,7 @@ def test_register_for_course_event_member(client_with_db):
 
     # Test cancellation emails upon unsubscribing
     client.login_admin()
-    view = f'/fsi/subscriptions?course_event_id={event.id}'
+    view = f'/fsi/reservations?course_event_id={event.id}'
     page = client.get(view)
     page.click('Löschen')
     assert len(client.app.smtp.outbox) == 2
