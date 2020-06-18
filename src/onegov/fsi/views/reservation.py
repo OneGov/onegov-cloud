@@ -17,7 +17,7 @@ from onegov.fsi.views.notifcations import handle_send_email
 
 @FsiApp.html(
     model=SubscriptionsCollection,
-    template='reservations.pt',
+    template='subscriptions.pt',
     permission=Personal
 )
 def view_reservations(self, request):
