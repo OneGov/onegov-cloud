@@ -26,27 +26,27 @@ def test_attendee_1(
     assert attendee.user == member
     assert member.attendee == attendee
 
-    # Add a reservation
-    reservation = CourseSubscription(
+    # Add a subscription
+    subscription = CourseSubscription(
         course_event_id=course_event[0].id, attendee_id=attendee.id)
-    session.add(reservation)
+    session.add(subscription)
     session.flush()
     assert attendee.reservations.count() == 1
     assert course_event[0].start > utcnow()
     assert attendee.course_events.first() == course_event[0]
     assert attendee.possible_course_events().count() == 0
 
-    # Test reservation backref
-    assert reservation.attendee == attendee
+    # Test subscription backref
+    assert subscription.attendee == attendee
 
-    # Check the event of the the reservation
+    # Check the event of the the subscription
     assert attendee.reservations[0].course_event == course_event[0]
 
-    # delete the reservation
-    attendee.reservations.remove(reservation)
+    # delete the subscription
+    attendee.reservations.remove(subscription)
 
     # and add it differently
-    attendee.reservations.append(reservation)
+    attendee.reservations.append(subscription)
     assert attendee.reservations.count() == 1
 
 
@@ -59,7 +59,7 @@ def test_course_event_1(session, course, course_event, attendee):
     assert event.attendees.count() == 0
     assert event.reservations.count() == 0
 
-    # Add a participant via a reservation
+    # Add a participant via a subscription
     placeholder = CourseSubscription(
         dummy_desc='Placeholder', course_event_id=event.id)
     session.add_all((
@@ -159,6 +159,6 @@ def test_notification_templates_1(session, course_event):
 
     func = get_template_default
     assert event.info_template.subject == func(None, 'info')
-    assert event.reservation_template.subject == func(None, 'reservation')
+    assert event.reservation_template.subject == func(None, 'subscription')
     assert event.reminder_template.subject == func(None, 'reminder')
     assert event.cancellation_template.subject == func(None, 'cancellation')

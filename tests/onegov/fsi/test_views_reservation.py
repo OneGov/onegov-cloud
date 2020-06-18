@@ -55,9 +55,9 @@ def test_reservation_details(client_with_db):
     client = client_with_db
     session = client.app.session()
     attendee = session.query(CourseAttendee).first()
-    reservation = attendee.reservations.first()
+    subscription = attendee.reservations.first()
 
-    view = f'/fsi/reservation/{reservation.id}'
+    view = f'/fsi/reservation/{subscription.id}'
     # This view has just the delete method
     client.get(view, status=405)
 
@@ -65,14 +65,14 @@ def test_reservation_details(client_with_db):
 def test_edit_reservation(client_with_db):
     client = client_with_db
     session = client.app.session()
-    reservation = session.query(CourseSubscription).filter(
+    subscription = session.query(CourseSubscription).filter(
         CourseSubscription.attendee_id != None).first()
 
     placeholder = session.query(CourseSubscription).filter(
         CourseSubscription.attendee_id == None).first()
 
     events = session.query(CourseEvent).all()
-    assert events[1].id != reservation.course_event_id
+    assert events[1].id != subscription.course_event_id
 
     # --- Test edit a placeholder --
     client.login_admin()
@@ -90,8 +90,8 @@ def test_edit_reservation(client_with_db):
     # check if empty placeholder is replaced by default
     assert page.form['dummy_desc'].value == 'Platzhalter-Reservation'
 
-    # --- Test a normal reservation ---
-    view = f'/fsi/reservation/{reservation.id}/edit'
+    # --- Test a normal subscription ---
+    view = f'/fsi/reservation/{subscription.id}/edit'
     client.login_editor()
     client.get(view, status=403)
 
@@ -99,11 +99,11 @@ def test_edit_reservation(client_with_db):
     edit = client.get(view)
     assert 'Anmeldung bearbeiten' in edit
     assert edit.form['course_event_id'].value == str(
-        reservation.course_event_id)
-    assert edit.form['attendee_id'].value == str(reservation.attendee_id)
+        subscription.course_event_id)
+    assert edit.form['attendee_id'].value == str(subscription.attendee_id)
     options = [opt[2] for opt in edit.form['attendee_id'].options]
     # Returns event.possible_subscribers, tested elsewhere
-    # Planner (admin) and attendee have reservation, not editor_attendee (PE)
+    # Planner (admin) and attendee have subscription, not editor_attendee (PE)
     # L, F is the normal attendee
     assert options == ['L, F', 'PE, PE']
 
