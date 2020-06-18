@@ -62,7 +62,7 @@ dl.accordion + a {
     .add-icon::before { @include icon('\f067'); }
     .invite-attendees::before { @include icon('\f0a1'); }
     .new-event::before { @include icon('\f133'); }
-    .reservations::before { @include icon('\f1ae'); }
+    .subscriptions::before { @include icon('\f1ae'); }
     .add-external::before { @include icon('\f14c'); }
     .email-link::before { @include icon('\f003'); }
     .duplicate-link::before { @include icon('\f24d'); }
@@ -83,7 +83,7 @@ dl.accordion + a {
 */
 .globals {
     .attendees::before { @include icon('\f1ae'); }
-    .reservations::before { @include icon('\f19d'); }
+    .subscriptions::before { @include icon('\f19d'); }
 }
 
 /*

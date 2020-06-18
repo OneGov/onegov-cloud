@@ -159,7 +159,7 @@ class CourseEventLayout(DefaultLayout, FormatMixin):
         attendee_link = Link(
             _('Attendees'),
             self.request.link(self.reservation_collection),
-            attrs={'class': 'reservations'}
+            attrs={'class': 'subscriptions'}
         )
         if self.request.is_editor:
             return [

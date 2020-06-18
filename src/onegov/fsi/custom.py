@@ -64,7 +64,7 @@ def get_base_tools(request):
                     _('Event Subscriptions'),
                     request.link(SubscriptionsCollection(
                         request.session, auth_attendee=usr)),
-                    attrs={'class': 'reservations'}
+                    attrs={'class': 'subscriptions'}
                 )
             )
 
