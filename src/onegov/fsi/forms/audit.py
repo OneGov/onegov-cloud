@@ -30,6 +30,11 @@ class AuditForm(Form):
         ]
     )
 
+    letter = SelectField(
+        label="Always Hidden, used for redirection persistence",
+        choices=[]
+    )
+
     @property
     def none_choice(self):
         return '', self.request.translate(_('None'))
@@ -90,6 +95,12 @@ class AuditForm(Form):
         self.course_id.choices = self.get_course_choices()
         if not self.need_course_selection:
             self.hide(self.course_id)
+
+        self.hide(self.letter)
+        self.letter.choices = [
+            (le, le) for le in self.model.used_letters] or [self.none_choice]
+        if self.model.letter:
+            self.letter.data = self.model.letter
 
         if self.att.role == 'admin':
             self.for_admins()
