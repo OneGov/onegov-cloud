@@ -159,6 +159,6 @@ def test_notification_templates_1(session, course_event):
 
     func = get_template_default
     assert event.info_template.subject == func(None, 'info')
-    assert event.reservation_template.subject == func(None, 'subscription')
+    assert event.reservation_template.subject == func(None, 'reservation')
     assert event.reminder_template.subject == func(None, 'reminder')
     assert event.cancellation_template.subject == func(None, 'cancellation')
