@@ -3,14 +3,14 @@
     to a readable length.
 */
 
-$course-description-line-width: 87ex;
+$course-description-line-width: 100%;
 $green-color: #16b749;
 $red-color: #ca0020;
 $orange-color: #eda815;
 $dark-gray-color: #a9a9a9;
 $gray-color: #808080;
 
-.course-page-text {
+.page-text {
     p {
         max-width: $course-description-line-width;
     }
@@ -29,7 +29,9 @@ td {
 /*
     Accordion adjustments
 */
-dd.accordion-navigation + dd.accordion-navigation {
+
+dd.accordion-navigation + dd.accordion-navigation,
+dl.accordion + a {
     margin-top: 1rem;
 }
 
@@ -60,7 +62,7 @@ dd.accordion-navigation + dd.accordion-navigation {
     .add-icon::before { @include icon('\f067'); }
     .invite-attendees::before { @include icon('\f0a1'); }
     .new-event::before { @include icon('\f133'); }
-    .reservations::before { @include icon('\f1ae'); }
+    .subscriptions::before { @include icon('\f1ae'); }
     .add-external::before { @include icon('\f14c'); }
     .email-link::before { @include icon('\f003'); }
     .duplicate-link::before { @include icon('\f24d'); }
@@ -81,7 +83,7 @@ dd.accordion-navigation + dd.accordion-navigation {
 */
 .globals {
     .attendees::before { @include icon('\f1ae'); }
-    .reservations::before { @include icon('\f19d'); }
+    .subscriptions::before { @include icon('\f19d'); }
 }
 
 /*
@@ -134,13 +136,6 @@ a.grayed-out {
     margin-bottom: 1em;
     margin-top: 1em;
 
-    .top-bar-section {
-        li.active + a {
-            background: transparent;
-            background-color: transparent;
-        }
-    }
-
     .left {
         li.active {
             border-left: 2px solid $primary-color;
@@ -148,9 +143,21 @@ a.grayed-out {
     }
 }
 
+/*
+    Field Display adjustments
+*/
+
+.field-display > dd {
+
+    margin-bottom: 0;
+
+    &:last-child {
+        margin-bottom: 1rem;
+    }
+}
 
 /*
-    Reservation/Subscription and general Printout
+    Subscription and general Printout
 */
 @media print {
 
@@ -171,5 +178,54 @@ a.grayed-out {
         a.button {
             display: none;
         }
+    }
+}
+
+/*
+    Audit filter panel
+*/
+
+.filter-panel {
+
+    margin-bottom: 1rem;
+
+    .filter-title {
+        border-bottom: 2px solid $primary-color;
+        font-size: $h4-font-size - $h4-font-reduction;
+        margin-bottom: 1rem;
+        margin-top: 0;
+        padding: 0 0 .75rem;
+    }
+
+    ul.tags {
+        list-style: none;
+        margin: 0 0 .75rem;
+        padding: 0;
+
+        li {
+            display: inline-block;
+            font-size: .875rem;
+            margin-bottom: 8px;
+
+            &:hover .blank-label {
+                @include primary-color-background;
+                border: 1px solid $primary-color;
+            }
+        }
+
+        a {
+            font-size: .8rem;
+            line-height: .8rem;
+            white-space: normal;
+        }
+
+        span {
+            margin-bottom: 0;
+            text-align: left;
+        }
+    }
+
+    .filters ul + ul {
+        margin-top: .5rem;
     }
 }

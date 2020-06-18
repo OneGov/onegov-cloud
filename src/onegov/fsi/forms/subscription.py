@@ -5,14 +5,22 @@ from onegov.form.fields import ChosenSelectField
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
 from onegov.fsi import _
-from onegov.fsi.models import CourseAttendee
 
 
-class ReservationFormMixin:
+class SubscriptionFormMixin:
 
     @property
     def event(self):
         return self.model.course_event
+
+    @property
+    def event_collection(self):
+        return CourseEventCollection(
+            self.request.session,
+            upcoming_only=True,
+            show_hidden=self.request.is_manager,
+            show_locked=self.request.is_admin
+        )
 
     @property
     def attendee(self):
@@ -23,10 +31,10 @@ class ReservationFormMixin:
 
     def attendee_choice(self, attendee):
         if not attendee:
-            return '', self.request.translate(_('None'))
-        text = f'{str(attendee)}'
-        if attendee.user and attendee.user.source_id:
-            text += f' | {attendee.user.source_id}'
+            return self.none_choice
+        text = str(attendee)
+        if attendee.user_id and attendee.source_id:
+            text += f' | {attendee.source_id}'
         return str(attendee.id), text
 
     @property
@@ -34,7 +42,7 @@ class ReservationFormMixin:
         return '', self.request.translate(_('None'))
 
 
-class AddFsiReservationForm(Form, ReservationFormMixin):
+class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
 
     attendee_id = ChosenSelectField(
         label=_("Attendee"),
@@ -53,19 +61,12 @@ class AddFsiReservationForm(Form, ReservationFormMixin):
     )
 
     @property
-    def event_collection(self):
-        return CourseEventCollection(
-            self.request.session,
-            upcoming_only=True,
-            show_hidden=self.request.is_manager
-        )
-
-    @property
     def attendee_collection(self):
+        # Already filtered by the organisations if auth_attendee is an editor
         return CourseAttendeeCollection(
             self.request.session,
             external_only=self.model.external_only,
-            auth_attendee=self.request.current_attendee
+            auth_attendee=self.request.attendee
         )
 
     def get_event_choices(self):
@@ -88,7 +89,6 @@ class AddFsiReservationForm(Form, ReservationFormMixin):
         return (self.event_choice(e) for e in events)
 
     def get_attendee_choices(self):
-        assert self.request.view_name == 'add'
 
         if self.model.attendee_id:
             return self.attendee_choice(self.attendee),
@@ -97,24 +97,40 @@ class AddFsiReservationForm(Form, ReservationFormMixin):
             attendees = self.event.possible_subscribers(
                 external_only=self.model.external_only
             )
-            att = self.request.current_attendee
-            if att.role == 'editor':
-                attendees = attendees.filter(
-                    CourseAttendee.organisation.in_(att.permissions, )
-                )
         else:
             attendees = self.attendee_collection.query()
-        return (
-            self.attendee_choice(a) for a in attendees
-        ) if attendees.first() else [self.none_choice]
+        return tuple(
+            self.attendee_choice(a) for a in attendees) or [self.none_choice]
 
     def on_request(self):
         self.attendee_id.choices = self.get_attendee_choices()
         self.attendee_id.default = [self.attendee_choice(self.attendee)]
         self.course_event_id.choices = self.get_event_choices()
 
+    @property
+    def event_from_form(self):
+        return self.course_event_id.data and CourseEventCollection(
+            self.request.session).by_id(self.course_event_id.data)
 
-class AddFsiPlaceholderReservationForm(Form, ReservationFormMixin):
+    def ensure_no_other_subscriptions(self):
+        if self.attendee_id.data and self.course_event_id.data:
+            if not self.event_from_form.can_book(self.attendee_id.data):
+                self.attendee_id.errors.append(
+                    _("There are other subscriptions for "
+                      "the same course in this year")
+                )
+                return False
+
+    def ensure_can_book_if_locked(self):
+        if self.attendee_id.data and self.course_event_id.data:
+            if self.event_from_form.locked and not self.request.is_admin:
+                self.course_event_id.errors.append(
+                    _("This course event can't be booked (anymore).")
+                )
+                return False
+
+
+class AddFsiPlaceholderSubscriptionForm(Form, SubscriptionFormMixin):
 
     course_event_id = ChosenSelectField(
         label=_("Course Event"),
@@ -127,14 +143,6 @@ class AddFsiPlaceholderReservationForm(Form, ReservationFormMixin):
     dummy_desc = StringField(
         label=_('Placeholder Description (optional)'),
     )
-
-    @property
-    def event_collection(self):
-        return CourseEventCollection(
-            self.request.session,
-            upcoming_only=True,
-            show_hidden=self.request.is_manager
-        )
 
     def get_event_choices(self):
 
@@ -149,15 +157,14 @@ class AddFsiPlaceholderReservationForm(Form, ReservationFormMixin):
                 show_hidden=self.request.is_manager,
                 show_locked=self.request.is_admin
             )
-        if not events.first():
-            return [self.none_choice]
-        return (self.event_choice(e) for e in events)
+        return tuple(
+            self.event_choice(e) for e in events) or [self.none_choice]
 
     def on_request(self):
         self.course_event_id.choices = self.get_event_choices()
 
 
-class EditFsiReservationForm(Form, ReservationFormMixin):
+class EditFsiSubscriptionForm(Form, SubscriptionFormMixin):
 
     """
     The view of this form is not accessible for members
@@ -200,11 +207,6 @@ class EditFsiReservationForm(Form, ReservationFormMixin):
         attendees = self.model.course_event.possible_subscribers(
             external_only=False
         )
-        att = self.request.current_attendee
-        if att.role == 'editor':
-            attendees = attendees.filter(
-                CourseAttendee.organisation.in_(att.permissions, )
-            )
         choices = [self.attendee_choice(self.attendee)]
         return choices + [self.attendee_choice(a) for a in attendees]
 
@@ -213,14 +215,12 @@ class EditFsiReservationForm(Form, ReservationFormMixin):
         self.attendee_id.choices = self.get_attendee_choices()
 
 
-class EditFsiPlaceholderReservationForm(Form, ReservationFormMixin):
+class EditFsiPlaceholderSubscriptionForm(Form, SubscriptionFormMixin):
 
     course_event_id = ChosenSelectField(
         label=_("Course Event"),
         choices=[],
-        validators=[
-            InputRequired()
-        ]
+        validators=[InputRequired()]
     )
 
     dummy_desc = StringField(
@@ -230,7 +230,8 @@ class EditFsiPlaceholderReservationForm(Form, ReservationFormMixin):
     def update_model(self, model):
         desc = self.dummy_desc.data
         if not desc:
-            default_desc = self.request.translate(_('Placeholder Reservation'))
+            default_desc = self.request.translate(
+                _('Placeholder Subscription'))
             desc = default_desc
         model.course_event_id = self.course_event_id.data
         model.dummy_desc = desc

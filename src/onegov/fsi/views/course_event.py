@@ -1,4 +1,5 @@
 from onegov.core.security import Personal, Secret
+from onegov.core.templates import render_macro
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.course_event import CourseEventCollection, \
     PastCourseEventCollection
@@ -18,11 +19,30 @@ from onegov.fsi.views.notifcations import handle_send_email
 )
 def view_course_event_collection(self, request):
     layout = CourseEventCollectionLayout(self, request)
+    has_events = self.query().first()
     return {
         'layout': layout,
         'model': self,
-        'events': self.query().all()
+        'events': self.query() if has_events else None
     }
+
+
+@FsiApp.view(
+    model=CourseEventCollection,
+    permission=Personal,
+    name='as-listing'
+)
+def view_course_event_collection_json(self, request):
+    layout = CourseEventCollectionLayout(self, request)
+    has_events = self.query().first()
+    return render_macro(
+        layout.macros['course_event_listing'],
+        request,
+        {
+            'events': self.query() if has_events else None,
+            'layout': layout
+        }
+    )
 
 
 @FsiApp.html(
@@ -135,7 +155,7 @@ def view_duplicate_course_event(self, request, form):
 def delete_course_event(self, request):
 
     request.assert_valid_csrf_token()
-    if not self.reservations.first():
+    if not self.subscriptions.first():
         CourseEventCollection(request.session).delete(self)
     else:
         request.warning(_(

@@ -78,11 +78,12 @@ class CourseCollectionLayout(DefaultLayout):
 
         return links
 
-    def accordion_items(self, future_only=True):
+    def accordion_items(self, upcoming_only=True):
         coll = CourseEventCollection(
             self.request.session,
-            upcoming_only=future_only,
-            show_hidden=self.request.current_attendee.role == 'admin'
+            upcoming_only=upcoming_only,
+            show_hidden=self.request.attendee.role == 'admin',
+            sort_desc=True
         )
         result = []
         for course in self.model.query():
@@ -91,10 +92,8 @@ class CourseCollectionLayout(DefaultLayout):
                 dict(
                     title=course.name,
                     content=course.description,
-                    # Todo: how to inject html with intercooler?
-                    # content_url=self.request.link(c, name='content-json'),
+                    listing_url=self.request.link(coll, name='as-listing'),
                     url=self.request.link(course),
-                    events=coll.query().all()
                 )
             )
         return result
@@ -105,7 +104,7 @@ class CourseLayout(CourseCollectionLayout):
     @cached_property
     def audit_collection(self):
         return AuditCollection(
-            self.request.session, self.model.id, self.request.current_attendee)
+            self.request.session, self.model.id, self.request.attendee)
 
     @cached_property
     def event_collection(self):
@@ -127,11 +126,6 @@ class CourseLayout(CourseCollectionLayout):
             return []
 
         links = [
-            Link(
-                _('Invite Attendees'),
-                self.request.link(self.model, name='invite'),
-                attrs={'class': 'invite-attendees'}
-            ),
             Link(
                 _('Audit'),
                 self.request.link(self.audit_collection),

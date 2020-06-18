@@ -1,58 +1,108 @@
+from cached_property import cached_property
+from wtforms import SelectField
 from wtforms.validators import InputRequired
 
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import ChosenSelectMultipleField
 from onegov.fsi import _
-from onegov.fsi.collections.course import CourseCollection
-from onegov.fsi.models import CourseAttendee, Course
+from onegov.fsi.models import CourseAttendee
 
 
 class AuditForm(Form):
 
-    course_id = ChosenSelectField(
+    method = 'GET'
+
+    course_id = SelectField(
         label=_("Course"),
         choices=[],
         validators=[
             InputRequired()
         ],
         description=_('Hidden courses or courses without '
-                      'mandatory refresh are not in the list')
+                      'mandatory refresh are not in the list'),
     )
 
-    organisation = ChosenSelectField(
-        label=_("Organisation"),
+    organisations = ChosenSelectMultipleField(
+        label=_("By Organisation"),
         choices=[],
         validators=[
             InputRequired()
         ]
     )
 
+    letter = SelectField(
+        label="Always Hidden, used for redirection persistence",
+        choices=[]
+    )
+
     @property
     def none_choice(self):
         return '', self.request.translate(_('None'))
 
-    @property
-    def course_collection(self):
-        return CourseCollection(
-            self.request.session, self.request.current_attendee)
-
-    def get_organisation_choices(self):
-        att = self.request.current_attendee
-        if att.role == 'editor':
-            return [(p, p) for p in att.permissions] or self.none_choice
-
-        session = self.request.session
-        results = session.query(CourseAttendee.organisation).filter(
+    @cached_property
+    def distinct_organisations(self):
+        query = self.request.session.query(CourseAttendee.organisation).filter(
             CourseAttendee.organisation != None).distinct()
-        return [(e.organisation, e.organisation) for e in results]\
-            or self.none_choice
+        query = query.order_by(CourseAttendee.organisation)
+        return tuple(a.organisation for a in query)
+
+    @cached_property
+    def courses(self):
+        return self.model.relevant_courses
+
+    @cached_property
+    def need_course_selection(self):
+        return len(self.courses) > 1 if self.courses else True
+
+    @property
+    def att(self):
+        return self.request.attendee
 
     def get_course_choices(self):
-        session = self.request.session
-        results = session.query(Course).filter_by(hidden_from_public=False)
-        results = results.filter(Course.mandatory_refresh != None)
-        return [(str(c.id), c.name) for c in results] or self.none_choice
+        if not self.courses:
+            return [self.none_choice]
+        return tuple((str(c.id), c.name) for c in self.courses)
+
+    def for_admins(self):
+        self.organisations.choices = tuple(
+            (e, e) for e in self.distinct_organisations) or [self.none_choice]
+        self.organisations.validators = []
+        if self.model.organisations:
+            self.organisations.data = self.model.organisations
+
+    def for_editors(self):
+
+        permissions = self.att.permissions or []
+        choices = sorted((p, p) for p in permissions) or [self.none_choice]
+        self.organisations.choices = choices
+
+        if self.model.organisations:
+
+            self.organisations.data = self.model.organisations
+        else:
+            self.select_all('organisations')
+
+    def select_all(self, name):
+        field = getattr(self, name)
+        if not field.data:
+            field.data = list(next(zip(*field.choices)))
 
     def on_request(self):
+        # Roves crf token from query params since it's a get form
+        if hasattr(self, 'csrf_token'):
+            self.delete_field('csrf_token')
+
         self.course_id.choices = self.get_course_choices()
-        self.organisation.choices = self.get_organisation_choices()
+        if not self.need_course_selection:
+            self.hide(self.course_id)
+
+        self.hide(self.letter)
+        self.letter.choices = [
+            (le, le) for le in self.model.used_letters] or [self.none_choice]
+        if self.model.letter:
+            self.letter.data = self.model.letter
+
+        if self.att.role == 'admin':
+            self.for_admins()
+        else:
+            self.for_editors()

@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from cached_property import cached_property
 
 from onegov.core.elements import Link
@@ -23,15 +21,14 @@ class AuditLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
+        if not self.model.course_id or not self.model.subset_count:
+            return []
         return [
             Link(
-                text=_("Print"),
-                url='#',
-                attrs={
-                    'class': 'print-icon',
-                    'onclick': 'window.print();return false;'
-                }
-            )
+                text=_("PDF"),
+                url=self.request.link(self.model, name='pdf'),
+                attrs={'class': 'print-icon', 'target': '_blank'}
+            ),
         ]
 
     def render_start_end(self, start, end):
@@ -42,8 +39,24 @@ class AuditLayout(DefaultLayout):
         end = self.format_date(end, 'time')
         return f'{date_} {start} - {end}'
 
-    def next_event_date(self, start, refresh_interval):
+    @staticmethod
+    def next_event_date(start, refresh_interval):
         if not start:
             return
-        assert isinstance(refresh_interval, timedelta)
         return start + refresh_interval
+
+    @cached_property
+    def audit_table_headers(self):
+        if not self.model.course:
+            return ""
+        due_in = self.format_timedelta(self.model.course.refresh_interval)
+        titles = (
+            _("Name"),
+            _("Shortcode"),
+            _("Last Event"),
+            _("Attended"),
+            _("Due by (every ${refresh_interval})", mapping={
+                'refresh_interval': due_in}
+              )
+        )
+        return [self.request.translate(head) for head in titles]

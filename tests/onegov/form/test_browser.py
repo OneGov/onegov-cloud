@@ -51,6 +51,7 @@ def test_registry(browser):
 
 
 def test_formcode_format(browser):
+    # Todo: This test is flaky since mai 2020
     browser.visit('/formcode-format')
     browser.wait_for_js_variable('initFormcodeFormat')
     browser.execute_script("""

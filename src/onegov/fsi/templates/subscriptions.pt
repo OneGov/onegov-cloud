@@ -8,10 +8,10 @@
                 <div class="row">
                     <div class="columns small-12" tal:define="has_course layout.model.course_event_id">
 
-                        <p tal:condition="not: reservations"><strong i18n:translate="">No entries found</strong></p>
+                        <p tal:condition="not: subscriptions"><strong i18n:translate="">No entries found</strong></p>
                         <p tal:condition="request.is_editor and not layout.for_himself" i18n:translate="">You can only see subscriptions from attendees fitting your permissions.</p>
 
-                        <tal:b tal:condition="reservations|nothing">
+                        <tal:b tal:condition="subscriptions|nothing">
                                 <table class="subscription-table fullwidth">
                                     <thead>
                                         <th tal:condition="not:layout.for_himself" i18n:translate>Attendee</th>
@@ -24,28 +24,29 @@
                                         <th tal:condition="request.is_admin" i18n:translate="" class="hide-for-print">Manage</th>
                                     </thead>
                                     <tbody>
-                                        <tal:b tal:repeat="reservation reservations">
+                                        <tal:b tal:repeat="subscription subscriptions">
                                             <tr>
-                                                <td tal:condition="not: layout.for_himself"><a href="${layout.link(reservation)}">${str(reservation)}</a></td>
+                                                <td tal:condition="not: layout.for_himself"><a href="${layout.link(subscription)}">${str(subscription)}</a></td>
                                                 <td tal:condition="not: layout.for_himself">
-                                                    <tal:b tal:condition="reservation.attendee and reservation.attendee.user">
-                                                        ${reservation.attendee.user.source_id}
+                                                    <tal:b tal:condition="subscription.attendee and subscription.attendee.user">
+                                                        ${subscription.attendee.source_id}
                                                     </tal:b>
                                                 </td>
-                                                <td tal:condition="not: has_course"><a href="${request.link(reservation.course_event)}">${reservation.course_event.name}</a></td>
-                                                <td tal:condition="not: has_course">${layout.format_date(reservation.course_event.start, 'date')}</td>
-                                                <td>${layout.format_status(reservation.course_event.status)}</td>
+                                                <td tal:condition="not: has_course"><a href="${request.link(subscription.course_event)}">${subscription.course_event.name}</a></td>
+                                                <td tal:condition="not: has_course">${layout.format_date(subscription.course_event.start, 'datetime')}</td>
+                                                <td>${layout.format_status(subscription.course_event.status)}</td>
 
                                             <td>
-                                                <tal:b metal:use-macro="layout.macros['confirmation_slider']" tal:define="switch_id 'confirmation-switch-{}'.format(repeat.reservation.number); url layout.confirmation_link(reservation)" />
+                                                <tal:b metal:use-macro="layout.macros['confirmation_slider']" tal:define="switch_id 'confirmation-switch-{}'.format(repeat.subscription.number); url layout.confirmation_link(subscription)" />
                                             </td>
 
 
-                                                <td tal:define="sent reservation.course_event.info_template.last_sent">${layout.format_date(sent, 'date') if sent else ''}</td>
+                                                <td tal:define="sent subscription.course_event.info_template.last_sent">${layout.format_date(sent, 'date') if sent else ''}</td>
                                                 <td tal:condition="request.is_admin" class="hide-for-print">
                                                     <!--?  Delete Button -->
-                                                    <metal:b tal:condition="not: reservation.course_event.is_past" tal:define="item reservation" use-macro="layout.macros['intercooler_btn_for_item']"/>
-                                                    <a href="${request.link(reservation, name='edit-placeholder' if reservation.is_placeholder else 'edit')}" class="button tiny secondary" i18n:translate="">Edit</a>
+                                                    <metal:b tal:condition="not: subscription.course_event.is_past" tal:define="item subscription" use-macro="layout.macros['intercooler_btn_for_item']"/>
+<!--?                                                    <a href="${request.link(subscription, name='edit-placeholder' if subscription.is_placeholder else 'edit')}" class="button tiny secondary" i18n:translate="">Edit</a>-->
+                                                    <a tal:condition="subscription.is_placeholder" href="${request.link(subscription, name='edit-placeholder')}" class="button tiny secondary" i18n:translate="">Edit</a>
 
                                             </td>
                                         </tr>

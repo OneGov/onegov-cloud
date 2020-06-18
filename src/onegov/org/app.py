@@ -514,3 +514,8 @@ def get_fontpreview_asset():
 @OrgApp.webasset('form-length-counter')
 def get_form_length_counter_asset():
     yield 'form-length-counter.js'
+
+
+@OrgApp.webasset('scroll-to-username')
+def get_scroll_to_username_asset():
+    yield 'scroll_to_username.js'

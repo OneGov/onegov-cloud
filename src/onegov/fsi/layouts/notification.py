@@ -13,7 +13,7 @@ from onegov.fsi import _
 
 class MailLayout(OrgDefaultMailLayout, FormatMixin):
 
-    """Layout for emails expecting the model to be a reservation object.
+    """Layout for emails expecting the model to be a subscription object.
     Takes in a notification template linked to a course_event.
     """
 

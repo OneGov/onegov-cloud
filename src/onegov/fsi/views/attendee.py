@@ -16,8 +16,10 @@ from onegov.fsi.models.course_attendee import CourseAttendee
 )
 def view_course_attendee_collection(self, request):
     layout = CourseAttendeeCollectionLayout(self, request)
+    has_entries = self.query().first() and True or False
     return {
         'title': layout.title,
+        'has_entries': has_entries,
         'layout': layout,
         'model': self
     }
@@ -30,10 +32,20 @@ def view_course_attendee_collection(self, request):
 )
 def view_course_attendee(self, request):
     layout = CourseAttendeeLayout(self, request)
+    limit = 5
+
+    def sort_subscriptions(subs, limit):
+        all = subs.all()
+        return sorted(
+            all, key=lambda s: s.course_event.start, reverse=True
+        )[0:min(limit, len(all))]
+
     return {
         'title': layout.title,
         'layout': layout,
         'model': self,
+        'limit': limit,
+        'last_subscriptions': sort_subscriptions(self.subscriptions, limit)
     }
 
 
@@ -97,7 +109,7 @@ def view_delete_reservation(self, request):
     if self.is_external:
         CourseAttendeeCollection(
             request.session,
-            auth_attendee=request.current_attendee).delete(self)
+            auth_attendee=request.attendee).delete(self)
         request.success(_('External attendee successfully deleted'))
     else:
         request.warning(_('Can only delete external attendees'))

@@ -1,9 +1,10 @@
 from onegov.core.elements import Link
 from onegov.fsi import FsiApp
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
+from onegov.fsi.collections.audit import AuditCollection
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import PastCourseEventCollection
-from onegov.fsi.collections.reservation import ReservationCollection
+from onegov.fsi.collections.subscription import SubscriptionsCollection
 from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
 from onegov.org.elements import LinkGroup
@@ -16,8 +17,8 @@ def get_base_tools(request):
 
     if request.is_logged_in:
 
-        usr = request.current_attendee
-        reservation_count = 0 if not usr else usr.reservations.count()
+        usr = request.attendee
+        reservation_count = 0 if not usr else usr.subscriptions.count()
 
         profile_links = [
             Link(
@@ -61,9 +62,9 @@ def get_base_tools(request):
             links.append(
                 Link(
                     _('Event Subscriptions'),
-                    request.link(ReservationCollection(
+                    request.link(SubscriptionsCollection(
                         request.session, auth_attendee=usr)),
-                    attrs={'class': 'reservations'}
+                    attrs={'class': 'subscriptions'}
                 )
             )
 
@@ -109,7 +110,7 @@ def get_base_tools(request):
             reservation_count == 1 and _("Event Subscription")
             or _("Event Subscriptions"),
             request.link(
-                ReservationCollection(
+                SubscriptionsCollection(
                     request.session,
                     attendee_id=request.attendee_id,
                     auth_attendee=usr
@@ -156,13 +157,12 @@ def get_top_navigation(request):
     )
     if request.is_manager:
         yield Link(
+            text=_("Audit"),
+            url=request.class_link(AuditCollection)
+        )
+        yield Link(
             text=_("Attendee Check"),
-            url=request.link(
-                PastCourseEventCollection(
-                    request.session,
-                    show_hidden=request.is_manager
-                )
-            )
+            url=request.class_link(PastCourseEventCollection)
         )
 
     layout = DefaultLayout(request.app.org, request)

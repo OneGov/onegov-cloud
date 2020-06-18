@@ -1,22 +1,24 @@
-import datetime
 from collections import namedtuple
+from datetime import timedelta, datetime
 from uuid import uuid4
 
 import pytz
+import transaction
 
 from onegov.core.crypto import hash_password
 from onegov.fsi.models import CourseAttendee, Course, CourseEvent, \
-    CourseReservation
+    CourseSubscription
 from onegov.fsi.models.course_notification_template import InfoTemplate, \
-    ReservationTemplate, ReminderTemplate, CancellationTemplate
+    SubscriptionTemplate, ReminderTemplate, CancellationTemplate
 from onegov.user import User
+from tests.shared.scenario import BaseScenario
 
 global_password = 'hunter2'
 hashed_password = hash_password(global_password)
 
 
 TEMPLATE_MODEL_MAPPING = dict(
-    info=InfoTemplate, reservation=ReservationTemplate,
+    info=InfoTemplate, reservation=SubscriptionTemplate,
     cancellation=CancellationTemplate, reminder=ReminderTemplate
 )
 
@@ -57,7 +59,7 @@ def editor_factory(session):
     return editor
 
 
-def planner_factory(session, **kwargs):
+def admin_attendee_factory(session, **kwargs):
     # aka Kursverantwortlicher, is an admin, has admin email
     user = admin_factory(session)
     data = dict(
@@ -75,7 +77,7 @@ def planner_factory(session, **kwargs):
     return planner, data
 
 
-def planner_editor_factory(session, **kwargs):
+def editor_attendee_factory(session, **kwargs):
     # aka Kursverantwortlicher, is an admin, has admin email
     user = editor_factory(session)
     data = dict(
@@ -142,7 +144,7 @@ def course_factory(session, **kwargs):
         name='Course',
         description='Description',
         mandatory_refresh=True,
-        refresh_interval=datetime.timedelta(days=365)
+        refresh_interval=timedelta(days=365)
     )
     data.update(**kwargs)
     course = session.query(Course).filter_by(**data).first()
@@ -156,12 +158,12 @@ def course_factory(session, **kwargs):
 
 def course_event_factory(session, **kwargs):
     course_ = course_factory(session)
-    start = datetime.datetime(1950, 1, 1, tzinfo=pytz.utc)
+    start = datetime(1950, 1, 1, tzinfo=pytz.utc)
     data = dict(
         course_id=course_[0].id,
         location='Room42',
         start=start,
-        end=start - datetime.timedelta(days=30),
+        end=start - timedelta(days=30),
         presenter_name='Presenter',
         presenter_company='Company',
         presenter_email='presenter@presenter.org',
@@ -175,7 +177,7 @@ def course_event_factory(session, **kwargs):
         session.add_all((
             course_event,
             InfoTemplate(course_event_id=data['id'], text='Info'),
-            ReservationTemplate(course_event_id=data['id']),
+            SubscriptionTemplate(course_event_id=data['id']),
             ReminderTemplate(course_event_id=data['id']),
             CancellationTemplate(course_event_id=data['id'])
         ))
@@ -185,12 +187,12 @@ def course_event_factory(session, **kwargs):
 
 def future_course_event_factory(session, **kwargs):
     course_ = course_factory(session)
-    in_the_future = datetime.datetime(2050, 1, 1, tzinfo=pytz.utc)
+    in_the_future = datetime(2050, 1, 1, tzinfo=pytz.utc)
     data = dict(
         course_id=course_[0].id,
         location='Room42',
         start=in_the_future,
-        end=in_the_future + datetime.timedelta(hours=2),
+        end=in_the_future + timedelta(hours=2),
         presenter_name='Presenter',
         presenter_company='Company',
         presenter_email='presenter@presenter.org',
@@ -203,7 +205,7 @@ def future_course_event_factory(session, **kwargs):
         session.add_all((
             course_event,
             InfoTemplate(course_event_id=data['id'], text='Info'),
-            ReservationTemplate(course_event_id=data['id']),
+            SubscriptionTemplate(course_event_id=data['id']),
             ReminderTemplate(course_event_id=data['id']),
             CancellationTemplate(course_event_id=data['id'])
         ))
@@ -235,9 +237,9 @@ def future_course_reservation_factory(session, **kwargs):
         attendee_id=attendee_factory(session)[0].id
     )
     data.update(**kwargs)
-    res = session.query(CourseReservation).filter_by(**data).first()
+    res = session.query(CourseSubscription).filter_by(**data).first()
     if not res:
-        res = CourseReservation(**data)
+        res = CourseSubscription(**data)
         session.add(res)
         session.flush()
     return res, data
@@ -246,41 +248,41 @@ def future_course_reservation_factory(session, **kwargs):
 def db_mock(session):
     # Create the fixtures with the current session
 
-    in_the_future = datetime.datetime(2060, 1, 1, tzinfo=pytz.utc)
+    in_the_future = datetime(2060, 1, 1, tzinfo=pytz.utc)
 
     attendee, data = attendee_factory(session, organisation='ORG')
-    planner, data = planner_factory(session)
-    planner_editor, data = planner_editor_factory(session, permissions=['ORG'])
+    planner, data = admin_attendee_factory(session)
+    planner_editor, data = editor_attendee_factory(session, permissions=['ORG'])
     course_event, data = course_event_factory(session)
     future_course_event, data = future_course_event_factory(session)
     empty_course_event, data = future_course_event_factory(
         session,
         start=in_the_future,
-        end=in_the_future + datetime.timedelta(hours=8),
+        end=in_the_future + timedelta(hours=8),
         location='Empty'
     )
 
-    placeholder = CourseReservation(
+    placeholder = CourseSubscription(
         dummy_desc='Placeholder',
         id=uuid4(),
         course_event_id=course_event.id)
     # Create Reservations
-    attendee_res = CourseReservation(
+    attendee_res = CourseSubscription(
         attendee_id=attendee.id,
         course_event_id=course_event.id
     )
 
-    attendee_future_res = CourseReservation(
+    attendee_future_res = CourseSubscription(
         attendee_id=attendee.id,
         course_event_id=future_course_event.id
     )
 
-    planner_res = CourseReservation(
+    planner_res = CourseSubscription(
         attendee_id=planner.id,
         course_event_id=course_event.id
     )
 
-    planner_future_res = CourseReservation(
+    planner_future_res = CourseSubscription(
         attendee_id=planner_editor.id,
         course_event_id=future_course_event.id
     )
@@ -295,7 +297,7 @@ def db_mock(session):
     return namedtuple(
         'Mock',
         [
-            'attendee', 'planner', 'planner_editor', 'course_event',
+            'attendee', 'admin_attendee', 'editor_attendee', 'course_event',
             'future_course_event', 'placeholder', 'attendee_res',
             'attendee_future_res', 'planner_res', 'planner_future_res',
             'empty_course_event'

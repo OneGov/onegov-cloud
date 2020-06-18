@@ -1,25 +1,25 @@
 from cached_property import cached_property
 
 from onegov.core.elements import Link, Confirm, Intercooler, LinkGroup
-from onegov.fsi.collections.reservation import ReservationCollection
+from onegov.fsi.collections.subscription import SubscriptionsCollection
 from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
 
 
-class ReservationCollectionLayout(DefaultLayout):
+class SubscriptionCollectionLayout(DefaultLayout):
 
     @property
     def for_himself(self):
         return self.model.attendee_id == self.request.attendee_id
 
-    def link(self, reservation):
-        if reservation.is_placeholder:
-            return self.request.link(reservation, name='edit-placeholder')
-        return self.request.link(reservation.attendee)
+    def link(self, subscription):
+        if subscription.is_placeholder:
+            return self.request.link(subscription, name='edit-placeholder')
+        return self.request.link(subscription.attendee)
 
-    def confirmation_link(self, reservation):
+    def confirmation_link(self, subscription):
         return self.csrf_protected_url(
-            self.request.link(reservation, name='toggle-confirm'))
+            self.request.link(subscription, name='toggle-confirm'))
 
     @cached_property
     def title(self):
@@ -46,11 +46,11 @@ class ReservationCollectionLayout(DefaultLayout):
     def editbar_links(self):
         links = [
             Link(
-                text=_("Print"),
-                url='#',
+                text=_("PDF"),
+                url=self.request.link(self.model, name='pdf'),
                 attrs={
                     'class': 'print-icon',
-                    'onclick': 'window.print();return false;'
+                    'target': '_blank'
                 }
             )
         ]
@@ -115,20 +115,27 @@ class ReservationCollectionLayout(DefaultLayout):
             )
         return links
 
-    def intercooler_btn_for_item(self, reservation):
+    def intercooler_btn_for_item(self, subscription):
+
+        confirm = subscription.is_placeholder and Confirm(
+            _("Do you want to delete the placeholder ?"),
+            yes=_("Delete"),
+            no=_("Cancel")
+        ) or Confirm(
+            _("Do you want to cancel the subscription ?"),
+            _("A confirmation email will be sent to the person."),
+            _("Cancel subscription for course event"),
+            _("Cancel")
+        )
+
         return Link(
             text=_("Delete"),
             url=self.csrf_protected_url(
-                self.request.link(reservation)
+                self.request.link(subscription)
             ),
             attrs={'class': 'button tiny alert'},
             traits=(
-                Confirm(
-                    _("Do you want to cancel the subscription ?"),
-                    _("A confirmation email will be sent to you later."),
-                    _("Cancel subscription for course event"),
-                    _("Cancel")
-                ),
+                confirm,
                 Intercooler(
                     request_method='DELETE',
                     redirect_after=self.request.link(self.model)
@@ -137,14 +144,14 @@ class ReservationCollectionLayout(DefaultLayout):
         )
 
 
-class ReservationLayout(DefaultLayout):
+class SubscriptionLayout(DefaultLayout):
     """ Only used for editing since it does not contain fields """
 
     @cached_property
     def collection(self):
-        return ReservationCollection(
+        return SubscriptionsCollection(
             self.request.session,
-            auth_attendee=self.request.current_attendee,
+            auth_attendee=self.request.attendee,
             attendee_id=None,
             course_event_id=self.model.course_event_id
         )

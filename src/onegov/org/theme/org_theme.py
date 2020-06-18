@@ -87,7 +87,8 @@ class OrgTheme(BaseTheme):
     @property
     def post_imports(self):
         return [
-            'org'
+            'org',
+            'chosen'
         ]
 
     @property

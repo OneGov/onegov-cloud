@@ -4,10 +4,10 @@ from onegov.core.collection import GenericCollection, Pagination
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
-from onegov.fsi.models.course_reservation import CourseReservation
+from onegov.fsi.models.course_subscription import CourseSubscription
 
 
-class ReservationCollection(GenericCollection, Pagination):
+class SubscriptionsCollection(GenericCollection, Pagination):
 
     batch_size = 30
 
@@ -37,7 +37,7 @@ class ReservationCollection(GenericCollection, Pagination):
 
     @property
     def model_class(self):
-        return CourseReservation
+        return CourseSubscription
 
     @property
     def course_event(self):
@@ -67,15 +67,15 @@ class ReservationCollection(GenericCollection, Pagination):
             query = query.filter(
                 or_(CourseAttendee.organisation.in_(
                     self.auth_attendee.permissions or [], ),
-                    CourseReservation.attendee_id == self.auth_attendee.id)
+                    CourseSubscription.attendee_id == self.auth_attendee.id)
             )
         if self.attendee_id:
             # Always set in path for members to their own
             query = query.filter(
-                CourseReservation.attendee_id == self.attendee_id)
+                CourseSubscription.attendee_id == self.attendee_id)
         if self.course_event_id:
             query = query.filter(
-                CourseReservation.course_event_id == self.course_event_id)
+                CourseSubscription.course_event_id == self.course_event_id)
         return query
 
     def by_id(self, id):
