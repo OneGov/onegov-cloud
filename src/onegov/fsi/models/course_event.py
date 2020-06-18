@@ -116,8 +116,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         CourseAttendee,
         secondary=subscription_table,
         primaryjoin=id == subscription_table.c.course_event_id,
-        secondaryjoin=subscription_table.c.attendee_id
-                      == CourseAttendee.id,
+        secondaryjoin=subscription_table.c.attendee_id == CourseAttendee.id,
         lazy='dynamic'
     )
 

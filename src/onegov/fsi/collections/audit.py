@@ -3,8 +3,8 @@ from sedate import utcnow
 from sqlalchemy import func, desc, or_
 
 from onegov.core.collection import GenericCollection, Pagination
-from onegov.fsi.models import CourseAttendee, CourseSubscription, CourseEvent, \
-    Course
+from onegov.fsi.models import CourseAttendee, CourseSubscription, \
+    CourseEvent, Course
 
 
 class AuditCollection(GenericCollection, Pagination):
