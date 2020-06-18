@@ -150,7 +150,8 @@ class FsiPdf(Pdf):
                     next_event_hint = now.year
                     color = red
                 else:
-                    color = dt.year == now.year and orange or green
+                    color = (dt.year == now.year and e.event_completed) and \
+                            orange or green
                     next_event_hint = f"{dt.month}/{dt.year}"
             else:
                 next_event_hint = now.year
