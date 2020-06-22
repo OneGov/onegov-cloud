@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-05-18 07:31+0200\n"
+"POT-Creation-Date: 2020-06-22 10:16+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -2481,6 +2481,9 @@ msgstr "Fakturierung für ${title}"
 
 msgid "Create Bills"
 msgstr "Rechnungen erstellen"
+
+msgid "The period must be active in order to reset billing"
+msgstr "Die Periode muss aktiv sein, um die Fakturierung zurückzusetzen"
 
 msgid "The billing was successfully reset"
 msgstr "Die Fakturierung wurde erfolgreich zurückgesetzt"
