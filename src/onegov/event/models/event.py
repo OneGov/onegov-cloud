@@ -388,7 +388,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
 
         Withdraw the event will delete the occurrences."""
 
-        assert self.state == 'published'
+        assert self.state in ('submitted', 'published')
         self.state = 'withdrawn'
 
     def get_ical_vevents(self, url=None):

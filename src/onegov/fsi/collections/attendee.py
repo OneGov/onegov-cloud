@@ -13,6 +13,7 @@ class CourseAttendeeCollection(GenericCollection, Pagination):
                  external_only=False,
                  auth_attendee=None,
                  editors_only=False,
+                 admins_only=False
                  ):
         super().__init__(session)
         self.page = page
@@ -20,13 +21,15 @@ class CourseAttendeeCollection(GenericCollection, Pagination):
         self.external_only = external_only
         self.auth_attendee = auth_attendee
         self.editors_only = editors_only
+        self.admins_only = admins_only
 
     @property
     def unfiltered(self):
         return all((
             self.exclude_external is False,
             self.external_only is False,
-            self.editors_only is False
+            self.editors_only is False,
+            self.admins_only is False
         ))
 
     @property
@@ -69,11 +72,11 @@ class CourseAttendeeCollection(GenericCollection, Pagination):
             assert not self.exclude_external
             assert not self.external_only
             query = query.join(User)
-            # query = query.filter(or_(
-            #     CourseAttendee.permissions != [],
-            #     User.role == 'editor'
-            # ))
             query = query.filter(User.role == 'editor')
+        elif self.admins_only:
+            query = query.join(User)
+            query = query.filter(User.role == 'admin')
+
         return query
 
     def subset(self):

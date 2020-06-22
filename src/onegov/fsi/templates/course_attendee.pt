@@ -15,17 +15,13 @@
                                     <span tal:condition="not: model.user">${model.email}</span>
                                 </dd>
                             </dl>
-                            <dl class="field-display" tal:condition="model.first_name">
-                                <dt i18n:translate>First name</dt>
-                                <dd>${model.first_name}</dd>
+                            <dl class="field-display" tal:condition="model.first_name and model.last_name">
+                                <dt i18n:translate>Name</dt>
+                                <dd>${str(model)}</dd>
                             </dl>
-                            <dl class="field-display" tal:condition="model.last_name">
-                                <dt i18n:translate>Last name</dt>
-                                <dd>${model.last_name}</dd>
-                            </dl>
-                            <dl class="field-display" tal:condition="model.user and model.user.source_id">
+                            <dl class="field-display" tal:condition="model.user_id and model.source_id">
                                 <dt i18n:translate>Shortcode</dt>
-                                <dd>${model.user.source_id}</dd>
+                                <dd>${model.source_id}</dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.organisation">
                                 <dt i18n:translate>Organisation Code</dt>
@@ -39,7 +35,7 @@
 
                             <dl class="field-display" tal:condition="model.permissions">
                                 <dt i18n:translate>Permissions</dt>
-                                <dd tal:content="structure layout.attendee_permissions" />
+                                <dd tal:repeat="permission model.permissions">${permission}</dd>
                             </dl>
 
                             <dl class="field-display">
@@ -54,12 +50,15 @@
                                 <dt i18n:translate>Unfinished courses</dt>
                                 <dd>${model.undone_registered_courses.count()}</dd>
                             </dl>
-                            <dl class="field-display" tal:condition="request.is_admin" tal:define="subscriptions model.reservations.all()">
-                                <dt i18n:translate>Subscriptions</dt>
-                                <dd tal:condition="not: subscriptions" i18n:translate="">Attendee has no subscriptions</dd>
-                                <tal:b tal:condition="subscriptions" tal:repeat="s subscriptions">
-                                    <dd>${s.course_event.name}, ${layout.format_date(s.course_event.start, 'date')} (${layout.format_date(s.course_event.start, 'time')} - ${layout.format_date(s.course_event.end, 'time')})</dd>
-                                </tal:b>
+                            <dl class="field-display" tal:condition="request.is_admin or layout.for_himself">
+                                <dt i18n:translate>Last <tal:b i18n:name="count" tal:replace="limit" /> Subscriptions</dt>
+                                <dd tal:condition="not: last_subscriptions" i18n:translate="">Attendee has no subscriptions</dd>
+
+                                <dd tal:condition="last_subscriptions" tal:repeat="s last_subscriptions">
+                                    <a href="${request.link(s.course_event)}">${s.course_event.name}, ${layout.format_date(s.course_event.start, 'date')} (${layout.format_date(s.course_event.start, 'time')} - ${layout.format_date(s.course_event.end, 'time')})</a>
+                                </dd>
+
+
                             </dl>
                        </tal:b>
                     </div>

@@ -2,6 +2,7 @@ import datetime
 from collections import OrderedDict
 from uuid import uuid4
 
+from cached_property import cached_property
 import pytz
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
@@ -17,8 +18,8 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID, UTCDateTime
 from onegov.fsi import _
 from onegov.fsi.models.course_attendee import CourseAttendee
-from onegov.fsi.models.course_reservation import CourseReservation
-from onegov.fsi.models.course_reservation import reservation_table
+from onegov.fsi.models.course_subscription import CourseSubscription
+from onegov.fsi.models.course_subscription import subscription_table
 from onegov.search import ORMSearchable
 
 COURSE_EVENT_STATUSES = ('created', 'confirmed', 'canceled', 'planned')
@@ -27,7 +28,7 @@ COURSE_EVENT_STATUSES_TRANSLATIONS = (
 
 
 # for forms...
-def course_status_choices(request=None):
+def course_status_choices(request=None, as_dict=False):
 
     if request:
         translations = (
@@ -36,8 +37,9 @@ def course_status_choices(request=None):
         translations = COURSE_EVENT_STATUSES_TRANSLATIONS
 
     return tuple(
-        (val, key) for val, key in zip(COURSE_EVENT_STATUSES,
-                                       translations))
+        as_dict and {val: key} or (val, key)
+        for val, key in zip(COURSE_EVENT_STATUSES, translations)
+    )
 
 
 class CourseEvent(Base, TimestampMixin, ORMSearchable):
@@ -45,8 +47,9 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     default_reminder_before = datetime.timedelta(days=14)
 
     __tablename__ = 'fsi_course_events'
-    __table_args__ = (UniqueConstraint('start', 'end',
-                                       name='_start_end_uc'),)
+    __table_args__ = (
+        UniqueConstraint('start', 'end', name='_start_end_uc'),
+    )
 
     es_properties = {
         'name': {'type': 'localized'},
@@ -91,9 +94,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         return self.course.description
 
     def __str__(self):
-        format = '%d.%m.%Y'
-        date = self.start.strftime(format)
-        return f'{self.name} - {date}'
+        return f"{self.name} - {self.start.strftime('%d.%m.%Y %H:%M')}"
 
     # Event specific information
     location = Column(Text, nullable=False)
@@ -113,15 +114,14 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
 
     attendees = relationship(
         CourseAttendee,
-        secondary=reservation_table,
-        primaryjoin=id == reservation_table.c.course_event_id,
-        secondaryjoin=reservation_table.c.attendee_id
-        == CourseAttendee.id,
+        secondary=subscription_table,
+        primaryjoin=id == subscription_table.c.course_event_id,
+        secondaryjoin=subscription_table.c.attendee_id == CourseAttendee.id,
         lazy='dynamic'
     )
 
-    reservations = relationship(
-        'CourseReservation',
+    subscriptions = relationship(
+        'CourseSubscription',
         backref=backref(
             'course_event',
             lazy='joined'
@@ -137,14 +137,14 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
 
     # The associated notification templates
     info_template = relationship("InfoTemplate", uselist=False)
-    reservation_template = relationship("ReservationTemplate", uselist=False)
+    reservation_template = relationship("SubscriptionTemplate", uselist=False)
     cancellation_template = relationship("CancellationTemplate", uselist=False)
     reminder_template = relationship("ReminderTemplate", uselist=False)
 
-    # hides from member roles
+    # hides for members/editors
     hidden_from_public = Column(Boolean, nullable=False, default=False)
 
-    # to a locked event, only admin can place subscriptions
+    # to a locked event, only an admin can place subscriptions
     locked_for_subscriptions = Column(Boolean, default=False)
 
     # when before course start schedule reminder email
@@ -179,12 +179,16 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     @property
     def hidden(self):
         # Add criteria when a course should be hidden based on status or attr
-        return self.hidden_from_public
+        return self.hidden_from_public or self.course.hidden_from_public
+
+    @cached_property
+    def cached_reservation_count(self):
+        return self.subscriptions.count()
 
     @property
     def available_seats(self):
         if self.max_attendees:
-            seats = self.max_attendees - self.reservations.count()
+            seats = self.max_attendees - self.cached_reservation_count
             return 0 if seats < 0 else seats
         return None
 
@@ -192,7 +196,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     def booked(self):
         if not self.max_attendees:
             return False
-        return self.max_attendees <= self.reservations.count()
+        return self.max_attendees <= self.cached_reservation_count
 
     @property
     def bookable(self):
@@ -226,7 +230,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         return self.__class__(**self.duplicate_dict)
 
     def has_reservation(self, attendee_id):
-        return self.reservations.filter_by(
+        return self.subscriptions.filter_by(
             attendee_id=attendee_id).first() is not None
 
     def excluded_subscribers(self, year=None, as_uids=True):
@@ -237,7 +241,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         session = object_session(self)
 
         excl = session.query(CourseAttendee.id if as_uids else CourseAttendee)
-        excl = excl.join(CourseReservation).join(CourseEvent)
+        excl = excl.join(CourseSubscription).join(CourseEvent)
 
         year = year or datetime.datetime.today().year
         bounds = (
@@ -252,7 +256,7 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
                     CourseEvent.start >= bounds[0],
                     CourseEvent.end <= bounds[1]
                 ),
-                CourseReservation.course_event_id == self.id
+                CourseSubscription.course_event_id == self.id
             )
         )
 
@@ -264,11 +268,8 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
 
         excl = self.excluded_subscribers(year).subquery('excl')
 
-        if as_uids:
-            # Use this because its less costly
-            query = session.query(CourseAttendee.id)
-        else:
-            query = session.query(CourseAttendee)
+        # Use this because its less costly
+        query = session.query(as_uids and CourseAttendee.id or CourseAttendee)
 
         if external_only:
             query = query.filter(CourseAttendee.user_id == None)
@@ -314,10 +315,11 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         attachment.headers['Content-Disposition'] = content_disposition
         return attachment
 
-    def can_book(self, attendee, year=None):
-        assert isinstance(attendee, CourseAttendee), f'{type(attendee)}'
-        att_id = attendee.id
+    def can_book(self, attendee_or_id, year=None):
+        att_id = attendee_or_id
+        if isinstance(attendee_or_id, CourseAttendee):
+            att_id = attendee_or_id.id
         for entry in self.excluded_subscribers(year, as_uids=True).all():
-            if entry.id == att_id:
+            if str(entry.id) == str(att_id):
                 return False
         return True

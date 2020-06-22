@@ -1,4 +1,4 @@
-import datetime
+from datetime import timedelta
 from uuid import uuid4
 
 from sedate import utcnow
@@ -7,8 +7,8 @@ from onegov.fsi.collections.attendee import CourseAttendeeCollection
 from onegov.fsi.collections.audit import AuditCollection
 from onegov.fsi.collections.course import CourseCollection
 from onegov.fsi.collections.course_event import CourseEventCollection
-from onegov.fsi.collections.reservation import ReservationCollection
-from onegov.fsi.models import CourseReservation
+from onegov.fsi.collections.subscription import SubscriptionsCollection
+from onegov.fsi.models import CourseAttendee
 
 from onegov.fsi.models.course_event import CourseEvent
 from tests.onegov.fsi.common import collection_attr_eq_test
@@ -26,10 +26,14 @@ def test_course_collection_1(session, course):
     course(session, hidden_from_public=True, name='Hidden')
     course1, data = course(session)
     coll = CourseCollection(session)
+    # collection defaults to not return the hidden_from_public one's
     assert coll.query().count() == 1
     course1.hidden_from_public = True
     session.flush()
     assert coll.by_id(course1.id) is not None
+    assert coll.query().count() == 0
+    coll.show_hidden_from_public = True
+    assert coll.query().count() == 2
 
 
 def test_course_event_collection(session, course):
@@ -38,8 +42,8 @@ def test_course_event_collection(session, course):
         CourseEvent(
             course_id=course(session)[0].id,
             location=f'Address, Room {i}',
-            start=now + datetime.timedelta(days=i),
-            end=now + datetime.timedelta(days=i, hours=2),
+            start=now + timedelta(days=i),
+            end=now + timedelta(days=i, hours=2),
             presenter_name=f'P{i}',
             presenter_company=f'C{i}',
             presenter_email=f'{i}@email.com'
@@ -71,7 +75,7 @@ def test_course_event_collection(session, course):
     assert event_coll.query().count() == 1
 
     # Test from specific date
-    tmr = now + datetime.timedelta(days=1)
+    tmr = now + timedelta(days=1)
     event_coll = CourseEventCollection(session, from_date=tmr)
     assert event_coll.query().count() == 1
 
@@ -82,11 +86,11 @@ def test_event_collection_add_placeholder(session, course_event):
     # event_coll.add_placeholder('Placeholder', course_event)
     # Tests the secondary join event.attendees as well
     assert course_event.attendees.count() == 0
-    # assert course_event.reservations.count() == 1
+    # assert course_event.subscriptions.count() == 1
 
 
 def test_attendee_collection(
-        session, attendee, external_attendee, planner_editor):
+        session, attendee, external_attendee, editor_attendee):
 
     att, data = attendee(session)
     att_with_org, data = attendee(
@@ -121,7 +125,7 @@ def test_attendee_collection(
     assert coll.query().count() == 0
 
     # make the editor exist, and test if he gets himself
-    editor, data = planner_editor(session, id=auth_editor.id)
+    editor, data = editor_attendee(session, id=auth_editor.id)
     assert coll.query().count() == 1
 
     # check if he can see attendee with organisation
@@ -132,11 +136,11 @@ def test_attendee_collection(
 
 
 def test_reservation_collection_query(
-        session, attendee, planner, planner_editor, course_event,
+        session, attendee, admin_attendee, editor_attendee, course_event,
         future_course_reservation, external_attendee):
 
-    admin, data = planner(session)
-    editor, data = planner_editor(session)
+    admin, data = admin_attendee(session)
+    editor, data = editor_attendee(session)
     att, data = attendee(session)
     external, data = external_attendee(session)
     event, data = course_event(session)
@@ -151,18 +155,18 @@ def test_reservation_collection_query(
     auth_attendee = authAttendee()
 
     # unfiltered for admin, must yield all
-    coll = ReservationCollection(session, auth_attendee=auth_attendee)
+    coll = SubscriptionsCollection(session, auth_attendee=auth_attendee)
     assert coll.query().count() == 3
 
     # test filter for attendee_id
-    coll = ReservationCollection(
+    coll = SubscriptionsCollection(
         session,
         auth_attendee=auth_attendee,
         attendee_id=att.id)
     assert coll.query().count() == 1
 
     # test for course_event_id
-    coll = ReservationCollection(
+    coll = SubscriptionsCollection(
         session,
         auth_attendee=auth_attendee,
         course_event_id=event.id)
@@ -170,7 +174,7 @@ def test_reservation_collection_query(
 
     # Test for editor with no permissions should see just his own
     auth_attendee = authAttendee(role='editor', id=editor.id)
-    coll = ReservationCollection(session, auth_attendee=auth_attendee)
+    coll = SubscriptionsCollection(session, auth_attendee=auth_attendee)
     assert coll.query().count() == 1
 
     # Add a the same organisation and get one entry more
@@ -179,7 +183,7 @@ def test_reservation_collection_query(
     assert coll.query().count() == 2
 
     # Test editor wants to get his own
-    coll = ReservationCollection(
+    coll = SubscriptionsCollection(
         session, auth_attendee=auth_attendee, attendee_id=editor.id)
     assert coll.query().count() == 1
 
@@ -190,99 +194,109 @@ def test_reservation_collection_query(
     assert coll.query().count() == 1
 
 
-def test_last_completed_subscriptions_query(
-        session, course_event, attendee):
-    org = 'Example'
-    attendee_, data = attendee(session, organisation=org)
-    auth_attendee = authAttendee(role='admin')
+def test_audit_collection(scenario):
 
-    course_events = [
-        course_event(
-            session,
-            start=utcnow() + datetime.timedelta(days=i + 1))[0]
-        for i in range(2)
-    ]
-    session.add_all(course_events)
-    # Most recent last course was not completed, but the first
-    session.add_all((
-        CourseReservation(
-            attendee_id=attendee_.id,
-            course_event_id=course_events[0].id,
-            event_completed=True
-        ),
-        CourseReservation(
-            attendee_id=attendee_.id,
-            course_event_id=course_events[1].id)
-    ))
-    coll = AuditCollection(
-        session, course_events[0].course.id, auth_attendee, organisation=org)
-    assert coll.last_completed_subscriptions_query().all()[0] == (
-        attendee_.id,
-        course_events[0].start,
-        course_events[0].end,
-        True
+    scenario.add_course(
+        mandatory_refresh=True,
+        refresh_interval=timedelta(days=30)
     )
+    for i in range(6):
+        scenario.add_course_event(scenario.latest_course)
 
-
-def test_audit_collection(
-        session, course, course_event, attendee, planner_editor, planner):
-    course_, data = course(session)
-    org = 'SD / STVA'
-    editor, data = planner_editor(
-        session,
-        permissions=[org]
-    )
-    admin_att, data = planner(session)
-
-    attendees = []
-    for i in range(4):
-        att, data = attendee(
-            session,
-            first_name=f'Attendee{i}',
-            organisation=org
+    orgs = ['AA', 'BB', None]
+    for i, org in enumerate(orgs):
+        scenario.add_attendee(
+            role='member',
+            organisation=org,
+            username=f'{i}.{org or "ZZZ"}@email.com'
         )
-        attendees.append(att)
-
-    # Create 3 events for the course
-    proto_event = course_event(session)[0]
-    events = [proto_event]
-    for i in range(2):
-        ev, data = course_event(
-            session,
-            start=proto_event.start + datetime.timedelta(days=i + 1),
-            end=proto_event.end + datetime.timedelta(days=i + 1)
-        )
-        events.append(ev)
-
-    subscriptions = []
-    # last attendee should not have a subscription
-    for i, event in enumerate(events):
-        subscription = CourseReservation(
-            course_event_id=event.id,
-            attendee_id=attendees[i].id,
+        scenario.add_subscription(
+            scenario.course_events[i],
+            scenario.attendees[i],
             event_completed=True
         )
-        subscriptions.append(subscription)
-    session.add_all(subscriptions)
-    session.flush()
-    assert attendees[-1].reservations.first() is None
-
-    # add the first attendee also to the second event
-    session.add(
-        CourseReservation(
-            attendee_id=attendees[0].id,
-            course_event_id=events[1].id
+        # Add not completed courses more recent, should be discarded in query
+        scenario.add_subscription(
+            scenario.course_events[i+3],
+            scenario.attendees[i],
+            event_completed=False
         )
-    )
-    session.flush()
+    # add some noise
+    scenario.add_course_event(scenario.latest_course)
+    scenario.add_attendee(external=True, username='h.r@giger.ch')
+    scenario.commit()
+    scenario.refresh()
 
-    # test for admin
-    coll = AuditCollection(
-        session,
-        course_.id,
-        admin_att,
-        organisation=org
+    # ---- Check preparing query last_subscriptions ----
+    fake_admin = authAttendee()
+    fake_editor = authAttendee(role='editor', permissions=['AA'])
+
+    audits = AuditCollection(
+        scenario.session, scenario.latest_course.id,
+        fake_admin
     )
-    for data in coll.query():
-        print(data)
-    assert coll.query().count() == len(attendees)
+    results = tuple(
+        (e.attendee_id, e.start) for e in
+        audits.last_subscriptions()
+    )
+
+    # Hide future subscriptions
+    assert not results
+
+    # Change all event dates to the past
+    for event in scenario.course_events:
+        event.start -= timedelta(days=5*365)
+        event.end -= timedelta(days=5*365)
+
+    scenario.commit()
+    scenario.refresh()
+
+    results = tuple(
+        (e.attendee_id, e.start) for e in
+        audits.last_subscriptions()
+    )
+
+    assert sorted(results) == sorted(
+        (a.id, e.start) for a, e in
+        zip(scenario.attendees, scenario.course_events[:3])
+    )
+
+    # add a subscription also for this attendee, but not completed
+    scenario.add_subscription(
+        scenario.course_events[3],
+        scenario.latest_attendee
+    )
+    scenario.commit()
+    scenario.refresh()
+    query = audits.last_subscriptions()
+    # Check if his subscription is added even if its not marked completed
+    assert len(results) + 1 == query.count()
+
+    # Check filtering for admin obtaining all records
+
+    def get_filtered():
+        return audits.filter_attendees_by_role(all_atts_in_db)
+
+    all_atts_in_db = scenario.session.query(CourseAttendee)
+    assert get_filtered().count() == len(scenario.attendees)
+
+    audits.organisations = ['AA']
+    # also return the ones without org for admins
+    assert get_filtered().count() == 3
+
+    # just the ones he has permissions, no more
+    audits.auth_attendee = fake_editor
+    assert get_filtered().count() == 1
+
+    # Test filtering with alphabetical letter
+
+    # ---- Check actual query joining filtered attendees ----
+    # Check for admin
+    audits.auth_attendee = fake_admin
+    audits.organisations = []
+    assert audits.query().count() == len(scenario.attendees)
+    audits.organisations = ['AA']
+    assert audits.query().count() == 3
+    # get the one having ln starting with ZZZ
+    audits.letter = 'Z'
+    assert audits.query().count() == 1

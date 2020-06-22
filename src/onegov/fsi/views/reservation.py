@@ -1,38 +1,61 @@
+from webob import Response
+
 from onegov.core.security import Personal, Secret, Private
+from onegov.core.utils import normalize_for_url
 from onegov.fsi import FsiApp
-from onegov.fsi.collections.reservation import ReservationCollection
-from onegov.fsi.forms.reservation import AddFsiReservationForm, \
-    EditFsiReservationForm, EditFsiPlaceholderReservationForm, \
-    AddFsiPlaceholderReservationForm
-from onegov.fsi.layouts.reservation import ReservationLayout, \
-    ReservationCollectionLayout
-from onegov.fsi.models import CourseReservation, CourseEvent, CourseAttendee
+from onegov.fsi.collections.subscription import SubscriptionsCollection
+from onegov.fsi.forms.subscription import AddFsiSubscriptionForm, \
+    EditFsiSubscriptionForm, EditFsiPlaceholderSubscriptionForm, \
+    AddFsiPlaceholderSubscriptionForm
+from onegov.fsi.layouts.subscription import SubscriptionLayout, \
+    SubscriptionCollectionLayout
+from onegov.fsi.models import CourseSubscription, CourseEvent
 from onegov.fsi import _
+from onegov.fsi.pdf import FsiPdf
 from onegov.fsi.views.notifcations import handle_send_email
 
 
 @FsiApp.html(
-    model=ReservationCollection,
-    template='reservations.pt',
+    model=SubscriptionsCollection,
+    template='subscriptions.pt',
     permission=Personal
 )
 def view_reservations(self, request):
-    layout = ReservationCollectionLayout(self, request)
+    layout = SubscriptionCollectionLayout(self, request)
     return {
         'layout': layout,
-        'reservations': self.batch
+        'subscriptions': self.batch
     }
 
 
+@FsiApp.view(
+    model=SubscriptionsCollection,
+    permission=Personal,
+    name='pdf'
+)
+def attendee_list_as_pdf(self, request):
+    layout = SubscriptionCollectionLayout(self, request)
+    result = FsiPdf.from_subscriptions(
+        self, layout, request.translate(layout.title))
+
+    return Response(
+        result.read(),
+        content_type='application/pdf',
+        content_disposition='inline; filename={}.pdf'.format(
+            normalize_for_url(f"{layout.title}")
+        )
+    )
+
+
 @FsiApp.form(
-    model=ReservationCollection,
+    model=SubscriptionsCollection,
     template='form.pt',
     name='add',
-    form=AddFsiReservationForm,
+    form=AddFsiSubscriptionForm,
     permission=Private
 )
 def view_add_reservation(self, request, form):
-    layout = ReservationCollectionLayout(self, request)
+    layout = SubscriptionCollectionLayout(self, request)
 
     if form.submitted(request):
         data = form.get_useful_data()
@@ -41,16 +64,7 @@ def view_add_reservation(self, request, form):
         course_event = request.session.query(CourseEvent).filter_by(
             id=event_id).first()
 
-        if course_event.locked and not request.is_admin:
-            request.warning(
-                _("This course event can't be booked (anymore)."))
-            return request.redirect(request.link(self))
-
-        attendee = request.session.query(CourseAttendee).filter_by(
-            id=attendee_id
-        ).first()
-
-        if not course_event.can_book(attendee):
+        if not course_event.can_book(attendee_id):
             request.warning(
                 _("There are other subscriptions for "
                   "the same course in this year"))
@@ -78,24 +92,24 @@ def view_add_reservation(self, request, form):
 
 
 @FsiApp.form(
-    model=CourseReservation,
+    model=CourseSubscription,
     template='form.pt',
     name='edit',
-    form=EditFsiReservationForm,
+    form=EditFsiSubscriptionForm,
     permission=Secret
 )
 def view_edit_reservation(self, request, form):
-    layout = ReservationLayout(self, request)
+    layout = SubscriptionLayout(self, request)
     assert not self.is_placeholder
 
     if form.submitted(request):
         data = form.get_useful_data()
         event_id = data['course_event_id']
-        coll = ReservationCollection(
+        coll = SubscriptionsCollection(
             request.session,
             attendee_id=data['attendee_id'],
             course_event_id=event_id,
-            auth_attendee=request.current_attendee
+            auth_attendee=request.attendee
         )
         res_existing = coll.query().first()
         if not res_existing:
@@ -116,9 +130,9 @@ def view_edit_reservation(self, request, form):
                 show_sent_count=False,
                 attachments=(course_event.as_ical_attachment(),)
             )
-            return request.redirect(request.link(ReservationCollection(
+            return request.redirect(request.link(SubscriptionsCollection(
                 request.session,
-                auth_attendee=request.current_attendee,
+                auth_attendee=request.attendee,
                 course_event_id=self.course_event_id,
                 attendee_id=self.attendee_id
             )))
@@ -139,23 +153,23 @@ def view_edit_reservation(self, request, form):
 
 
 @FsiApp.form(
-    model=CourseReservation,
+    model=CourseSubscription,
     template='form.pt',
     name='edit-placeholder',
-    form=EditFsiPlaceholderReservationForm,
+    form=EditFsiPlaceholderSubscriptionForm,
     permission=Secret
 )
 def view_edit_placeholder_reservation(self, request, form):
-    layout = ReservationLayout(self, request)
+    layout = SubscriptionLayout(self, request)
     assert self.is_placeholder
 
     if form.submitted(request):
         form.update_model(self)
         request.success(_("Placeholder was updated"))
-        return request.redirect(request.link(ReservationCollection(
+        return request.redirect(request.link(SubscriptionsCollection(
             request.session,
             course_event_id=self.course_event_id,
-            auth_attendee=request.current_attendee
+            auth_attendee=request.attendee
         )))
 
     if not form.errors:
@@ -171,14 +185,14 @@ def view_edit_placeholder_reservation(self, request, form):
 
 
 @FsiApp.form(
-    model=ReservationCollection,
+    model=SubscriptionsCollection,
     template='form.pt',
     name='add-placeholder',
-    form=AddFsiPlaceholderReservationForm,
+    form=AddFsiPlaceholderSubscriptionForm,
     permission=Secret
 )
 def view_add_reservation_placeholder(self, request, form):
-    layout = ReservationCollectionLayout(self, request)
+    layout = SubscriptionCollectionLayout(self, request)
 
     if form.submitted(request):
         data = form.get_useful_data()
@@ -190,7 +204,7 @@ def view_add_reservation_placeholder(self, request, form):
                 _("This course event can't be booked (anymore)."))
             return request.redirect(request.link(self))
 
-        default_desc = request.translate(_('Placeholder Reservation'))
+        default_desc = request.translate(_('Placeholder Subscription'))
         if not data.get('dummy_desc'):
             data['dummy_desc'] = default_desc
 
@@ -199,7 +213,7 @@ def view_add_reservation_placeholder(self, request, form):
         return request.redirect(request.link(self))
 
     return {
-        'title': _('Add Placeholder Reservation'),
+        'title': _('Add Placeholder Subscription'),
         'model': self,
         'layout': layout,
         'form': form
@@ -207,7 +221,7 @@ def view_add_reservation_placeholder(self, request, form):
 
 
 @FsiApp.html(
-    model=ReservationCollection,
+    model=SubscriptionsCollection,
     request_method='POST',
     name='add-from-course-event',
     permission=Personal
@@ -229,14 +243,14 @@ def view_add_from_course_event(self, request):
 
 
 @FsiApp.html(
-    model=CourseReservation,
+    model=CourseSubscription,
     request_method='DELETE',
     permission=Secret
 )
 def view_delete_reservation(self, request):
     request.assert_valid_csrf_token()
-    ReservationCollection(
-        request.session, auth_attendee=request.current_attendee).delete(self)
+    SubscriptionsCollection(
+        request.session, auth_attendee=request.attendee).delete(self)
     if not self.is_placeholder:
         request = handle_send_email(
             self.course_event.cancellation_template,
@@ -251,7 +265,7 @@ def view_delete_reservation(self, request):
 
 
 @FsiApp.json(
-    model=CourseReservation,
+    model=CourseSubscription,
     request_method='POST',
     permission=Secret,
     name='toggle-confirm'

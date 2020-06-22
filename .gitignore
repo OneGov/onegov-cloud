@@ -69,6 +69,12 @@ eggs/
 # sublime
 *.sublime-workspace
 
+# vscode
+.vscode
+
+# pycharm
+.idea
+
 # Sphinx
 docs/_build
 

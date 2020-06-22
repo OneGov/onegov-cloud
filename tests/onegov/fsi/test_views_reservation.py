@@ -1,5 +1,5 @@
 from onegov.fsi.collections.course_event import CourseEventCollection
-from onegov.fsi.models import CourseReservation, CourseAttendee, CourseEvent, \
+from onegov.fsi.models import CourseSubscription, CourseAttendee, CourseEvent, \
     Course
 from onegov.user import User
 
@@ -27,8 +27,7 @@ def test_locked_course_event_reservations(client_with_db):
     client.login_editor()
     # Hinzufügen - Teilnehmer als editor
     add_subscription = new.click('Teilnehmer', href='reservations', index=0)
-    page = add_subscription.form.submit().follow()
-    assert 'Neue Anmeldung wurde hinzugefügt' not in page
+    page = add_subscription.form.submit()
     assert 'Diese Durchführung kann (nicht) mehr gebucht werden.' in page
 
     client.login_admin()
@@ -56,9 +55,9 @@ def test_reservation_details(client_with_db):
     client = client_with_db
     session = client.app.session()
     attendee = session.query(CourseAttendee).first()
-    reservation = attendee.reservations.first()
+    subscription = attendee.subscriptions.first()
 
-    view = f'/fsi/reservation/{reservation.id}'
+    view = f'/fsi/reservation/{subscription.id}'
     # This view has just the delete method
     client.get(view, status=405)
 
@@ -66,14 +65,14 @@ def test_reservation_details(client_with_db):
 def test_edit_reservation(client_with_db):
     client = client_with_db
     session = client.app.session()
-    reservation = session.query(CourseReservation).filter(
-        CourseReservation.attendee_id != None).first()
+    subscription = session.query(CourseSubscription).filter(
+        CourseSubscription.attendee_id != None).first()
 
-    placeholder = session.query(CourseReservation).filter(
-        CourseReservation.attendee_id == None).first()
+    placeholder = session.query(CourseSubscription).filter(
+        CourseSubscription.attendee_id == None).first()
 
     events = session.query(CourseEvent).all()
-    assert events[1].id != reservation.course_event_id
+    assert events[1].id != subscription.course_event_id
 
     # --- Test edit a placeholder --
     client.login_admin()
@@ -91,8 +90,8 @@ def test_edit_reservation(client_with_db):
     # check if empty placeholder is replaced by default
     assert page.form['dummy_desc'].value == 'Platzhalter-Reservation'
 
-    # --- Test a normal reservation ---
-    view = f'/fsi/reservation/{reservation.id}/edit'
+    # --- Test a normal subscription ---
+    view = f'/fsi/reservation/{subscription.id}/edit'
     client.login_editor()
     client.get(view, status=403)
 
@@ -100,17 +99,17 @@ def test_edit_reservation(client_with_db):
     edit = client.get(view)
     assert 'Anmeldung bearbeiten' in edit
     assert edit.form['course_event_id'].value == str(
-        reservation.course_event_id)
-    assert edit.form['attendee_id'].value == str(reservation.attendee_id)
+        subscription.course_event_id)
+    assert edit.form['attendee_id'].value == str(subscription.attendee_id)
     options = [opt[2] for opt in edit.form['attendee_id'].options]
     # Returns event.possible_subscribers, tested elsewhere
-    # Planner (admin) and attendee have reservation, not planner_editor (PE)
+    # Planner (admin) and attendee have subscription, not editor_attendee (PE)
     # L, F is the normal attendee
     assert options == ['L, F', 'PE, PE']
 
     # course must be fixed
     options = [opt[2] for opt in edit.form['course_event_id'].options]
-    assert options == ['Course - 01.01.1950']
+    assert options == ['Course - 01.01.1950 00:00']
 
     new_id = edit.form['attendee_id'].options[1][0]
     edit.form['attendee_id'] = new_id
@@ -125,7 +124,7 @@ def test_own_reservations(client_with_db):
     client.login_editor()
     page = client.get('/topics/informationen')
 
-    # check if the management bar shows the correct number of reservations
+    # check if the management bar shows the correct number of subscriptions
     res_count = page.pyquery('a.open-tickets').attr('data-count')
     assert res_count == '1'
     page = page.click('Kursanmeldung', href='attendee_id')
@@ -137,7 +136,7 @@ def test_create_delete_reservation(client_with_db):
     session = client.app.session()
 
     attendee = session.query(CourseAttendee).first()
-    att_res = attendee.reservations.all()
+    att_res = attendee.subscriptions.all()
     assert len(att_res) == 2
 
     # Lazy loading not possible
@@ -160,7 +159,7 @@ def test_create_delete_reservation(client_with_db):
     page = client.get(f'/fsi/reservations/add?attendee_id={attendee.id}')
     options = [opt[2] for opt in page.form['course_event_id'].options]
     assert options == [
-        'Course - 01.01.2060'
+        'Course - 01.01.2060 00:00'
     ]
 
     client.get(view)
@@ -175,8 +174,8 @@ def test_create_delete_reservation(client_with_db):
     options = [opt[2] for opt in new.form['course_event_id'].options]
     print(options)
     assert options == [
-        'Course - 01.01.2050',
-        'Course - 01.01.2060'
+        'Course - 01.01.2050 00:00',
+        'Course - 01.01.2060 00:00'
     ]
     # select course_id where there is no registration done (2060)
     new.form['course_event_id'] = str(events[1].id)
@@ -185,10 +184,10 @@ def test_create_delete_reservation(client_with_db):
     assert 'Course' in page
     assert '01.01.2060' in page
 
-    page = client.get(view).form.submit().follow()
-    print(page)
+    page = client.get(view).form.submit()
     msg = 'Für dieses Jahr gibt es bereits andere Anmeldungen für diesen Kurs'
     assert msg in page
+
     # Settings the attendee id should filter down to events the attendee
     # hasn't any subscription
     page = client.get(f'/fsi/reservations/add?attendee_id={attendee.id}')
@@ -206,7 +205,7 @@ def test_create_delete_reservation(client_with_db):
     new = client.get(view)
     options = [opt[2] for opt in new.form['course_event_id'].options]
     # must asscending order from newest to oldest, past events excluded
-    assert options == ['Course - 01.01.2050', 'Course - 01.01.2060']
+    assert options == ['Course - 01.01.2050 00:00', 'Course - 01.01.2060 00:00']
     new.form['dummy_desc'] = 'Safe!'
     page = new.form.submit().follow()
     assert 'Safe!' in page

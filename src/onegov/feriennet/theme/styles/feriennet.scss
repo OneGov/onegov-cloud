@@ -950,7 +950,6 @@ $booking-left-margin: 2rem;
 
         .rega-widget {
             display: flex;
-            font-style: italic;
             width: 100% !important;
 
             .left {
@@ -966,7 +965,8 @@ $booking-left-margin: 2rem;
             .right {
                 display: flex;
                 flex-direction: column;
-                justify-content: center;
+                justify-content: flex-end;
+                margin-bottom: 4px;
 
                 img {
                     height: auto;

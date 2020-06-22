@@ -451,6 +451,18 @@ class PeriodForm(Form):
             session.query(Activity).filter(Activity.id.in_(q.subquery()))
         )
 
+    def ensure_dependant_fields_empty(self):
+        if self.is_new and self.confirmable.data is False:
+            self.prebooking_start.data = None
+            self.prebooking_end.data = None
+
+    def ensure_hidden_fields_changed(self):
+        if self.is_new:
+            return
+        if not self.model.confirmable:
+            self.prebooking_start.data = self.booking_start.data
+            self.prebooking_end.data = self.booking_start.data
+
     def ensure_no_occasion_conflicts(self):
         if self.conflicting_activities:
             msg = _("The execution phase conflicts with existing occasions")
@@ -460,11 +472,6 @@ class PeriodForm(Form):
 
     def ensure_valid_daterange_periods(self):
         if self.prebooking_start.data and self.prebooking_end.data:
-
-            if self.confirmable.data is False:
-                # Adjust to booking start, as is the default when left empty
-                self.prebooking_start.data = self.booking_start.data
-                self.prebooking_end.data = self.booking_start.data
 
             if self.prebooking_start.data > self.prebooking_end.data:
                 self.prebooking_start.errors.append(_(
@@ -509,7 +516,8 @@ class PeriodForm(Form):
 
     def ensure_no_payment_changes_after_confirmation(self):
         if isinstance(self.model, Period) and self.model.confirmed:
-            preview = Bunch(confirmable=self.model.confirmable)
+            preview = Bunch(confirmable=self.model.confirmable,
+                            booking_start=self.model.booking_start)
             self.populate_obj(preview)
 
             fields = (

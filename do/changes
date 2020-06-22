@@ -244,7 +244,7 @@ def changelog_commits(release, repository, newer, older):
     lo = commits[0].hexsha[:10]
     hi = commits[-1].hexsha[:10]
     url = f'https://github.com/OneGov/onegov-cloud/compare/{lo}^...{hi}'
-    print(f"> commits: **{len(commits)} / [{lo}...{hi}]({url})**<br>")
+    print(f"> commits: **{len(commits)} / [{lo}...{hi}]({url})**  ")
     print((
         f"> [![Build status](https://badge.buildkite.com"
         f"/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg"

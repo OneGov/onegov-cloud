@@ -2,7 +2,7 @@ from cached_property import cached_property
 
 from onegov.core.elements import Link, Confirm, Intercooler
 from onegov.fsi.collections.attendee import CourseAttendeeCollection
-from onegov.fsi.collections.reservation import ReservationCollection
+from onegov.fsi.collections.subscription import SubscriptionsCollection
 from onegov.fsi.layout import DefaultLayout
 from onegov.fsi import _
 
@@ -41,21 +41,28 @@ class CourseAttendeeCollectionLayout(DefaultLayout):
     @cached_property
     def collection(self):
         return CourseAttendeeCollection(
-            self.request.session, auth_attendee=self.request.current_attendee
+            self.request.session, auth_attendee=self.request.attendee
         )
 
     @cached_property
     def collection_externals(self):
         return CourseAttendeeCollection(
-            self.request.session, auth_attendee=self.request.current_attendee,
+            self.request.session, auth_attendee=self.request.attendee,
             external_only=True
         )
 
     @cached_property
     def collection_editors(self):
         return CourseAttendeeCollection(
-            self.request.session, auth_attendee=self.request.current_attendee,
+            self.request.session, auth_attendee=self.request.attendee,
             editors_only=True
+        )
+
+    @cached_property
+    def collection_admins(self):
+        return CourseAttendeeCollection(
+            self.request.session, auth_attendee=self.request.attendee,
+            admins_only=True
         )
 
     @cached_property
@@ -66,10 +73,12 @@ class CourseAttendeeCollectionLayout(DefaultLayout):
         return [
             (_('All'), self.request.link(self.collection),
              self.model.unfiltered),
+            (_('Editors'), self.request.link(self.collection_editors),
+             self.model.editors_only),
+            (_('Admins'), self.request.link(self.collection_admins),
+             self.model.admins_only),
             (_('External'), self.request.link(self.collection_externals),
              self.model.external_only),
-            (_('Editors'), self.request.link(self.collection_editors),
-             self.model.editors_only)
         ]
 
 
@@ -84,7 +93,7 @@ class CourseAttendeeLayout(DefaultLayout):
     @cached_property
     def collection(self):
         return CourseAttendeeCollection(
-            self.request.session, auth_attendee=self.request.current_attendee)
+            self.request.session, auth_attendee=self.request.attendee)
 
     @cached_property
     def breadcrumbs(self):
@@ -111,9 +120,9 @@ class CourseAttendeeLayout(DefaultLayout):
             links = [
                 Link(
                     _('Add Subscription'),
-                    self.request.link(ReservationCollection(
+                    self.request.link(SubscriptionsCollection(
                         self.request.session, attendee_id=self.model.id,
-                        auth_attendee=self.request.current_attendee),
+                        auth_attendee=self.request.attendee),
                         name='add'),
                     attrs={'class': 'add-icon'}
                 )
@@ -161,5 +170,5 @@ class CourseAttendeeLayout(DefaultLayout):
         return links
 
     @property
-    def attendee_permissions(self):
-        return self.model.permissions and "<br>".join(self.model.permissions)
+    def for_himself(self):
+        return self.model.id == self.request.attendee.id

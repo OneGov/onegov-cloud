@@ -25,3 +25,10 @@ class CourseCollection(GenericCollection):
 
     def by_id(self, id):
         return super().query().filter(self.primary_key == id).first()
+
+    def toggled_hidden(self):
+        return self.__class__(
+            self.session,
+            self.auth_attendee,
+            show_hidden_from_public=not self.show_hidden_from_public
+        )

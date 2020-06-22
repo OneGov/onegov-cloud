@@ -104,3 +104,18 @@ def add_hidden_from_public_in_course(context):
             Column('hidden_from_public', Boolean, nullable=False,
                    default=False),
             default=lambda x: False)
+
+
+@upgrade_task('Adds source_id to attendee')
+def add_source_id_to_attendee(context):
+    if not context.has_column('fsi_attendees', 'source_id'):
+        context.operations.add_column(
+            'fsi_attendees',
+            Column('source_id', Text, nullable=True))
+
+    context.session.execute("""
+        UPDATE fsi_attendees t2
+        SET source_id = t1.source_id
+        FROM users t1
+        WHERE  t2.user_id = t1.id
+    """)

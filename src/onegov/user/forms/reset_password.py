@@ -9,7 +9,8 @@ class RequestPasswordResetForm(Form):
 
     email = StringField(
         label=_("E-Mail Address"),
-        validators=[validators.InputRequired(), validators.Email()]
+        validators=[validators.InputRequired(), validators.Email()],
+        render_kw={'autofocus': True}
     )
 
 
@@ -18,7 +19,8 @@ class PasswordResetForm(Form):
 
     email = StringField(
         label=_("E-Mail Address"),
-        validators=[validators.InputRequired(), validators.Email()]
+        validators=[validators.InputRequired(), validators.Email()],
+        render_kw={'autofocus': True}
     )
     password = PasswordField(
         label=_("New Password"),

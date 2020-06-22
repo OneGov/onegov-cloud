@@ -17,13 +17,17 @@ from libres.db.models import ReservedSlot
 from libres.modules.errors import InvalidEmailAddress, AlreadyReservedError
 
 from onegov.chat import MessageCollection
+from onegov.core.crypto import random_token
 from onegov.core.custom import json
 from onegov.core.cache import lru_cache
 from onegov.core.cli import command_group, pass_group_context, abort
 from onegov.core.csv import CSVFile
 from onegov.core.utils import Bunch
+from onegov.directory import DirectoryEntry
+from onegov.directory.models.directory import DirectoryFile
 from onegov.event import Event, Occurrence, EventCollection
 from onegov.event.collections.events import EventImportItem
+from onegov.file import File
 from onegov.form import FormCollection
 from onegov.org import log
 from onegov.org.formats import DigirezDB
@@ -1264,3 +1268,43 @@ def fetch(group_context, source, tag, location, create_tickets,
             raise(e)
 
     return _fetch
+
+
+@cli.command('fix-directory-files')
+@pass_group_context
+def fix_directory_files(group_context):
+    """
+    Not sure of this doubles the files, but actually the file
+    reference remains, so it shouldn't
+
+    This command will become obsolete as soon as the type of files in
+    submissions are set correctly with type 'directory'.
+
+    """
+    def execute(request, app):
+        count = 0
+        for entry in request.session.query(DirectoryEntry).all():
+            for field in entry.directory.file_fields:
+                field_data = entry.content['values'][field.id]
+                if field_data and field_data.get('data', '').startswith('@'):
+                    file_id = field_data['data'].lstrip('@')
+                    file = request.session.query(File).filter_by(
+                        id=file_id).first()
+                    if file and not file.type == 'directory':
+                        new = DirectoryFile(
+                            id=random_token(),
+                            name=file.name,
+                            note=file.note,
+                            reference=file.reference
+                        )
+                        entry.files.append(new)
+                        entry.content['values'][field.id]['data'] = \
+                            f'@{new.id}'
+                        entry.content.changed()
+                        count += 1
+        if count:
+            click.secho(
+                f"{app.schema} - {count} files adapted with type `directory`",
+                fg='green'
+            )
+    return execute

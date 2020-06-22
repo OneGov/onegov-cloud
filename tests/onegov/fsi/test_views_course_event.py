@@ -79,13 +79,13 @@ def test_add_delete_course_event(client_with_db):
     page = page.form.submit().follow()
     assert 'Eine neue Durchführung wurde hinzugefügt' in page
 
-    # Delete course without reservations
+    # Delete course without subscriptions
     session = client.app.session()
     event = session.query(CourseEvent).filter_by(
         presenter_email='p@t.com'
     ).one()
 
-    assert not event.reservations.count()
+    assert not event.subscriptions.count()
     view = f'/fsi/event/{event.id}'
 
     # csrf protected url must be used
@@ -202,17 +202,18 @@ def test_add_subscription_for_other_attendee(client_with_db):
     new = client.get('/fsi/reservations').click('Anmeldung')
 
     # There is already a subscription for this course and attendee
-    assert new.form['course_event_id'].options[0][2] == 'Course - 01.01.2050'
-
-    assert new.form['course_event_id'].options[1][2] == 'Course - 01.01.2060'
+    assert new.form['course_event_id'].options[0][2] == \
+           'Course - 01.01.2050 00:00'
+    assert new.form['course_event_id'].options[1][2] == \
+           'Course - 01.01.2060 00:00'
     bookable_id = new.form['course_event_id'].options[1][0]
 
-    # take the fist choices and fail to to it
-    page = new.form.submit().follow()
+    # take the fist choice and fail
+    page = new.form.submit()
     assert 'Für dieses Jahr gibt es bereits andere Anmeldungen' in page
 
-    new.form['course_event_id'] = bookable_id
-    page = new.form.submit().follow()
+    page.form['course_event_id'] = bookable_id
+    page = page.form.submit().follow()
     assert "Neue Anmeldung wurde hinzugefügt" in page
 
     assert len(client.app.smtp.outbox) == 1

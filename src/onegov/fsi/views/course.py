@@ -24,7 +24,7 @@ def handle_send_invitation_email(
     if not recipients:
         request.alert(_("There are no recipients matching the selection"))
     else:
-        att = request.current_attendee
+        att = request.attendee
         if cc_to_sender and att.id not in recipients:
             recipients = list(recipients)
             recipients.append(att.id)
@@ -94,7 +94,7 @@ def view_email_preview_for_course(self, request):
         'layout': mail_layout,
         'title': template.subject,
         'notification': template.text_html,
-        'attendee': request.current_attendee
+        'attendee': request.attendee
     }
 
 

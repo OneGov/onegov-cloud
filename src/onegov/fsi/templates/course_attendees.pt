@@ -6,12 +6,11 @@
         <div class="row">
             <div class="columns small-12">
                 <div class="row">
-                    <div class="columns small-12" tal:define="has_entries model.query().count()">
+                    <div class="columns small-12">
                         <div class="tab-navigation clearfix" tal:condition="layout.menu">
                             <nav class="top-bar clearfix" data-topbar data-options="back_text: &lt;; is_hover: false; mobile_show_parent_link: false" role="navigation">
                                 <section class="top-bar-section">
                                     <ul class="left">
-
                                         <tal:b repeat="(title, link, active) layout.menu">
                                             <li tal:attributes="class python: 'active' if active else ''">
                                                 <a href="${link}">${title}</a>
@@ -30,8 +29,8 @@
                                     <th i18n:translate="">Family name, surname</th>
                                     <th i18n:translate="">Email</th>
                                     <th i18n:translate="" tal:condition="not: layout.model.external_only">Organisation</th>
-<!--?                                    <th i18n:translate="">All Open Reservations</th>-->
-<!--?                                    <th i18n:translate="">Confirmed Open Reservations</th>-->
+<!--?                                    <th i18n:translate="">All Open Subscriptions</th>-->
+<!--?                                    <th i18n:translate="">Confirmed Open Subscriptions</th>-->
 <!--?                                    <th i18n:translate="">Total Course Events done</th>-->
                                     <th i18n:translate="" tal:condition="layout.model.unfiltered">External</th>
 

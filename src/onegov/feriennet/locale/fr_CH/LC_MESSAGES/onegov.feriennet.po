@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-05-13 12:39+0200\n"
+"POT-Creation-Date: 2020-06-22 10:16+0200\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -1757,15 +1757,15 @@ msgstr "Appeler ${name}"
 msgid "Passport"
 msgstr "Passeport"
 
-msgid "An commitment by Rega:"
-msgstr "Un engagement de la Rega:"
+msgid "Free sponsorship by Rega"
+msgstr "Affiliation gratuite à la Rega"
 
 msgid ""
 "Register your child for a Rega patronage free of charge during holiday "
 "activities."
 msgstr ""
-"Affiliez gratuitement votre enfant à la Rega pour la durée de "
-"toutes les activités de vacances réservées pour 2020."
+"Affiliez gratuitement votre enfant à la Rega pour la durée de toutes les "
+"activités de vacances réservées pour 2020."
 
 msgid "Register here"
 msgstr "Inscriptions ici"
@@ -2504,6 +2504,9 @@ msgstr "Facture pour ${title}"
 msgid "Create Bills"
 msgstr "Générer des factures"
 
+msgid "The period must be active in order to reset billing"
+msgstr "La période doit ètre active afin de réinitialiser la facturation"
+
 msgid "The billing was successfully reset"
 msgstr "La facturation a bien été réinitialisée."
 
@@ -2955,6 +2958,9 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
+
+#~ msgid "An commitment by Rega"
+#~ msgstr "Un engagement de la Rega"
 
 #~ msgid "I know that after confirmation, bills can only be adjusted manually."
 #~ msgstr ""

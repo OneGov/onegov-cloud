@@ -22,7 +22,7 @@ class FsiApp(OrgApp):
     def configure_organisation(self, **cfg):
         cfg.setdefault('enable_user_registration', False)
         cfg.setdefault('enable_yubikey', False)
-        cfg.setdefault('disable_password_reset', True)
+        cfg.setdefault('disable_password_reset', False)
         super().configure_organisation(**cfg)
 
     def on_login(self, request, user):
@@ -69,4 +69,4 @@ def get_webasset_output():
 @FsiApp.webasset('common')
 def get_common_asset():
     yield from default_common_asset()
-    yield 'ifs.js'
+    yield 'fsi.js'

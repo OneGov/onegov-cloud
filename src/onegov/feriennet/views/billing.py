@@ -238,9 +238,11 @@ def view_billing(self, request, form):
     permission=Secret,
     request_method="POST")
 def reset_billing(self, request):
-    assert self.period.active and self.period.booking_phase
+    if not self.period.active:
+        request.warning(
+            _("The period must be active in order to reset billing"))
+        return request.redirect(request.link(self))
 
-    invoice = self.period.id.hex
     session = request.session
 
     for invoice in self.invoices.query():

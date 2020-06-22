@@ -263,7 +263,7 @@
                                     <div class="rega-widget panel" tal:define="rega_link layout.rega_link(attendee, period, grouped_bookings)" tal:condition="rega_link">
 
                                     <div class="left">
-                                        <strong i18n:translate="" class="title">An commitment by Rega:</strong>
+                                        <strong i18n:translate="" class="title">Free sponsorship by Rega</strong>
                                         <span>
                                             <span i18n:translate="">Register your child for a Rega patronage free of charge during holiday activities.</span>
                                             <a href="${rega_link}" target="_blank" i18n:translate>Register here</a>

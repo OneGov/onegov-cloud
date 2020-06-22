@@ -5,7 +5,7 @@ from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.course_notification_template import (
     CourseNotificationTemplate,
     InfoTemplate,
-    ReservationTemplate,
+    SubscriptionTemplate,
     CancellationTemplate,
     ReminderTemplate,
 )
@@ -34,16 +34,16 @@ class CourseNotificationTemplateCollection(GenericCollection):
 
     @cached_property
     def course_reservations(self):
-        return self.course_event.reservations
+        return self.course_event.subscriptions
 
     def auto_add_templates_if_not_existing(self):
         assert self.course_event_id
-        if self.query().count() == 0:
+        if not self.query().first():
             # Owner id should be set in path.py if not present
             data = dict(course_event_id=self.course_event_id)
             self.session.add_all((
                 InfoTemplate(**data),
-                ReservationTemplate(**data),
+                SubscriptionTemplate(**data),
                 CancellationTemplate(**data),
                 ReminderTemplate(**data)
             ))

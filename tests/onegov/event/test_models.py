@@ -31,8 +31,8 @@ def test_transitions():
 
     with pytest.raises(AssertionError):
         event.submit()
-    with pytest.raises(AssertionError):
-        event.withdraw()
+    # imported events that are submitted should not be deleted but withdrawn
+    event.withdraw()
     event.publish()
     assert event.state == 'published'
 
@@ -115,7 +115,10 @@ def test_create_event(session):
 
     assert [o.id for o in event.occurrences] == [occurrence.id]
     assert occurrence.event.id == event.id
-
+    event.withdraw()
+    assert not event.occurrences
+    event.publish()
+    assert event.occurrences
 
 @mark.parametrize("path", [module_path('tests.onegov.event', 'fixtures')])
 def test_event_image(test_app, path):

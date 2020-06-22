@@ -8,13 +8,13 @@ from onegov.fsi.collections.course_event import CourseEventCollection, \
     PastCourseEventCollection
 from onegov.fsi.collections.notification_template import \
     CourseNotificationTemplateCollection
-from onegov.fsi.collections.reservation import ReservationCollection
+from onegov.fsi.collections.subscription import SubscriptionsCollection
 from onegov.fsi.models.course import Course
 from onegov.fsi.models.course_attendee import CourseAttendee
 from onegov.fsi.models.course_event import CourseEvent
 from onegov.fsi.models.course_notification_template import \
     CourseNotificationTemplate
-from onegov.fsi.models.course_reservation import CourseReservation
+from onegov.fsi.models.course_subscription import CourseSubscription
 
 
 @FsiApp.path(model=Course, path='/fsi/course/{id}')
@@ -36,7 +36,7 @@ def get_course_event_details(request, id):
 def get_past_events_view(
         request,
         page=0,
-        show_hidden=True,
+        show_hidden=False,
         course_id=None,
 ):
     if not request.is_manager and show_hidden:
@@ -92,7 +92,7 @@ def get_courses(request, show_hidden_from_public):
         show_hidden_from_public = False
     return CourseCollection(
         request.session,
-        auth_attendee=request.current_attendee,
+        auth_attendee=request.attendee,
         show_hidden_from_public=show_hidden_from_public
     )
 
@@ -101,19 +101,21 @@ def get_courses(request, show_hidden_from_public):
              converters=dict(
                  exclude_external=bool,
                  external_only=bool,
-                 editors_only=bool
+                 editors_only=bool,
+                 admins_ony=bool,
              ))
 def get_attendees(
         request, page=0, exclude_external=False, external_only=False,
-        editors_only=False):
+        editors_only=False, admins_only=False):
     """This collection has permission private, so no members can see it"""
 
     return CourseAttendeeCollection(
         request.session, page,
         exclude_external=exclude_external,
         external_only=external_only,
-        auth_attendee=request.current_attendee,
+        auth_attendee=request.attendee,
         editors_only=editors_only,
+        admins_only=admins_only
     )
 
 
@@ -134,7 +136,7 @@ def get_template_details(request, id):
     return CourseNotificationTemplateCollection(request.session).by_id(id)
 
 
-@FsiApp.path(model=ReservationCollection, path='/fsi/reservations',
+@FsiApp.path(model=SubscriptionsCollection, path='/fsi/reservations',
              converters=dict(
                  attendee_id=UUID, course_event_id=UUID, external_only=bool)
              )
@@ -144,33 +146,36 @@ def get_reservations(
 
     if not attendee_id:
         if not request.is_manager:
-            # check if someone has permission to see all reservations
+            # check if someone has permission to see all subscriptions
             attendee_id = request.attendee_id
         # can be none....still, so not protected, use permissions
     elif attendee_id != request.attendee_id and not request.is_manager:
         attendee_id = request.attendee_id
 
-    return ReservationCollection(
+    return SubscriptionsCollection(
         request.session,
         attendee_id=attendee_id,
         course_event_id=course_event_id,
         external_only=external_only,
-        auth_attendee=request.current_attendee,
+        auth_attendee=request.attendee,
         page=page
     )
 
 
-@FsiApp.path(model=CourseReservation, path='/fsi/reservation/{id}')
+@FsiApp.path(model=CourseSubscription, path='/fsi/reservation/{id}')
 def get_reservation_details(request, id):
-    return ReservationCollection(request.session).by_id(id)
+    return SubscriptionsCollection(request.session).by_id(id)
 
 
 @FsiApp.path(model=AuditCollection, path='/fsi/audit',
-             converters=dict(course_id=UUID))
-def get_audit(request, course_id, organisation):
+             converters=dict(
+                 course_id=UUID, organisations=[str], page=int))
+def get_audit(request, course_id, organisations, page=0, letter=None):
     return AuditCollection(
         request.session,
         course_id,
-        auth_attendee=request.current_attendee,
-        organisation=organisation
+        auth_attendee=request.attendee,
+        organisations=organisations,
+        page=page,
+        letter=letter
     )

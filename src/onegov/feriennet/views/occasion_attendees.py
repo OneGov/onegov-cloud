@@ -3,7 +3,6 @@ from onegov.activity import OccasionNeed, Volunteer
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.layout import OccasionAttendeeLayout
-from sqlalchemy.orm import joinedload
 
 
 @FeriennetApp.html(
@@ -13,14 +12,10 @@ from sqlalchemy.orm import joinedload
 def view_occasion_attendees(self, request):
 
     def occasion_volunteers(occasion):
-        return tuple(
-            request.session.query(Volunteer)
-            .options(joinedload(Volunteer.need))
-            .filter(OccasionNeed.occasion_id == occasion.id)
-            .filter(Volunteer.state == 'confirmed')
-            .order_by(Volunteer.first_name, Volunteer.last_name)
-        )
-
+        return tuple(request.session.query(Volunteer).join(OccasionNeed).
+                     filter(OccasionNeed.occasion_id == occasion.id).
+                     filter(Volunteer.state == 'confirmed').
+                     order_by(Volunteer.first_name, Volunteer.last_name))
     return {
         'layout': OccasionAttendeeLayout(self, request),
         'title': _("Attendees for ${period}", mapping={

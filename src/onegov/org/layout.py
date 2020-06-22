@@ -18,7 +18,6 @@ from onegov.core.static import StaticFile
 from onegov.core.utils import linkify
 from onegov.directory import DirectoryCollection
 from onegov.directory import DirectoryEntryCollection
-from onegov.directory.models.directory import DirectoryFile
 from onegov.event import OccurrenceCollection
 from onegov.file import File
 from onegov.form import FormCollection, as_internal_id
@@ -402,7 +401,7 @@ class Layout(ChameleonLayout):
         if not field.type == 'UploadField':
             return None
         if field.data.get('data', '').startswith('@'):
-            return self.request.session.query(DirectoryFile).filter_by(
+            return self.request.session.query(File).filter_by(
                 id=field.data['data'].lstrip('@')).first()
 
     @cached_property
@@ -486,13 +485,14 @@ class Layout(ChameleonLayout):
 
 
 class DefaultLayout(Layout):
-    """ The defaut layout meant for the public facing parts of the site. """
+    """ The default layout meant for the public facing parts of the site. """
 
     def __init__(self, model, request):
         super().__init__(model, request)
 
         # always include the common js files
         self.request.include('common')
+        self.request.include('chosen')
 
         # always include the map components
         self.request.include(self.org.geo_provider)
@@ -1486,83 +1486,97 @@ class EventLayout(EventBaseLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_manager:
-            if self.model.source:
-                return [
-                    Link(
-                        text=_("Edit"),
-                        attrs={'class': 'edit-link'},
-                        traits=(
-                            Block(
-                                _("This event can't be editet."),
-                                _("Imported events can not be editet."),
-                                _("Cancel")
-                            )
-                        )
-                    ),
-                    Link(
-                        text=_("Delete"),
-                        url=self.csrf_protected_url(
-                            self.request.link(self.model, 'withdraw'),
-                        ),
-                        attrs={'class': 'delete-link'},
-                        traits=(
-                            Confirm(
-                                _("Do you really want to delete this event?"),
-                                _("This cannot be undone."),
-                                _("Delete event"),
-                                _("Cancel")
-                            ),
-                            Intercooler(
-                                request_method='POST',
-                                redirect_after=self.events_url
-                            ),
+        imported_editable = self.request.is_manager and self.model.source
+        links = []
+        if imported_editable:
+            links = [
+                Link(
+                    text=_("Edit"),
+                    attrs={'class': 'edit-link'},
+                    traits=(
+                        Block(
+                            _("This event can't be editet."),
+                            _("Imported events can not be editet."),
+                            _("Cancel")
                         )
                     )
-                ]
-
-            edit_link = Link(
-                text=_("Edit"),
-                url=self.request.link(self.model, 'edit'),
-                attrs={'class': 'edit-link'}
-            )
-            if self.event_deletable(self.model):
-                delete_link = Link(
-                    text=_("Delete"),
+                )]
+        if imported_editable and self.model.state == 'published':
+            links.append(
+                Link(
+                    text=_("Withdraw event"),
                     url=self.csrf_protected_url(
-                        self.request.link(self.model)
+                        self.request.link(self.model, 'withdraw'),
                     ),
                     attrs={'class': 'delete-link'},
                     traits=(
                         Confirm(
-                            _("Do you really want to delete this event?"),
-                            _("This cannot be undone."),
-                            _("Delete event"),
+                            _("Do you really want to withdraw this event?"),
+                            _("You can re-publish an imported event later."),
+                            _("Withdraw event"),
                             _("Cancel")
                         ),
                         Intercooler(
-                            request_method='DELETE',
+                            request_method='POST',
                             redirect_after=self.events_url
-                        )
+                        ),
                     )
                 )
-            else:
-                delete_link = Link(
-                    text=_("Delete"),
-                    attrs={'class': 'delete-link'},
-                    traits=(
-                        Block(
-                            _("This event can't be deleted."),
-                            _(
-                                "To remove this event, go to the ticket "
-                                "and reject it."
-                            ),
-                            _("Cancel")
-                        )
-                    )
+            )
+        if imported_editable and self.model.state == 'withdrawn':
+            links.append(
+                Link(
+                    text=_("Re-publish event"),
+                    url=self.request.return_here(
+                        self.request.link(self.model, 'publish')),
+                    attrs={'class': 'accept-link'}
                 )
+            )
+        if imported_editable:
+            return links
 
-            return [edit_link, delete_link]
+        edit_link = Link(
+            text=_("Edit"),
+            url=self.request.link(self.model, 'edit'),
+            attrs={'class': 'edit-link'}
+        )
+        if self.event_deletable(self.model):
+            delete_link = Link(
+                text=_("Delete"),
+                url=self.csrf_protected_url(
+                    self.request.link(self.model)
+                ),
+                attrs={'class': 'delete-link'},
+                traits=(
+                    Confirm(
+                        _("Do you really want to delete this event?"),
+                        _("This cannot be undone."),
+                        _("Delete event"),
+                        _("Cancel")
+                    ),
+                    Intercooler(
+                        request_method='DELETE',
+                        redirect_after=self.events_url
+                    )
+                )
+            )
+        else:
+            delete_link = Link(
+                text=_("Delete"),
+                attrs={'class': 'delete-link'},
+                traits=(
+                    Block(
+                        _("This event can't be deleted."),
+                        _(
+                            "To remove this event, go to the ticket "
+                            "and reject it."
+                        ),
+                        _("Cancel")
+                    )
+                )
+            )
+
+        return [edit_link, delete_link]
 
 
 class NewsletterLayout(DefaultLayout):
