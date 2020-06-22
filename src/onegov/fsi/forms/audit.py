@@ -97,10 +97,12 @@ class AuditForm(Form):
             self.hide(self.course_id)
 
         self.hide(self.letter)
-        self.letter.choices = [
-            (le, le) for le in self.model.used_letters] or [self.none_choice]
+        self.letter.choices = [self.none_choice] + [
+            (le, le) for le in self.model.used_letters]
         if self.model.letter:
             self.letter.data = self.model.letter
+        else:
+            self.letter.data = ''
 
         if self.att.role == 'admin':
             self.for_admins()
