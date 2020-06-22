@@ -48,7 +48,9 @@ def invite_attendees_for_event(self, request, form):
     if cache and not self.organisations:
         return request.redirect(request.link(
             self.by_letter_and_orgs(
-                orgs=[o for o in cache if o in form.distinct_organisations]
+                orgs=[
+                    o for o in cache if o in form.distinct_organisations
+                ] or None
             )
         ))
 
