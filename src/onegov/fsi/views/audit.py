@@ -12,9 +12,9 @@ from onegov.fsi import _
 from onegov.fsi.pdf import FsiPdf
 
 
-def set_cached_choices(self, request):
+def set_cached_choices(request, organisations):
     browser_session = request.browser_session
-    browser_session.last_chosen_organisations = self.organisations
+    browser_session['last_chosen_organisations'] = organisations or ''
 
 
 def cached_org_choices(request):
@@ -31,12 +31,24 @@ def invite_attendees_for_event(self, request, form):
     layout = AuditLayout(self, request)
     now = utcnow()
 
-    set_cached_choices(self, request)
-    cache = cached_org_choices(request)
-    if not self.organisations and cache:
+    if form.submitted(request):
+        set_cached_choices(request, form.organisations.data)
         return request.redirect(request.link(
-            self.by_organisations(
-                [o for o in cache if o in form.distinct_organisations]
+            self.__class__(
+                session=self.session,
+                auth_attendee=self.auth_attendee,
+                organisations=form.organisations.data or None,
+                letter=form.letter.data or None,
+                page=0,
+                course_id=self.course_id
+            )
+        ))
+
+    cache = cached_org_choices(request)
+    if cache and not self.organisations:
+        return request.redirect(request.link(
+            self.by_letter_and_orgs(
+                orgs=[o for o in cache if o in form.distinct_organisations]
             )
         ))
 
@@ -44,7 +56,7 @@ def invite_attendees_for_event(self, request, form):
         Link(
             text=letter,
             url=request.link(
-                self.by_letter(
+                self.by_letter_and_orgs(
                     letter=letter if (letter != self.letter) else None
                 )
             ),

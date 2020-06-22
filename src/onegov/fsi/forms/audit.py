@@ -10,8 +10,6 @@ from onegov.fsi.models import CourseAttendee
 
 class AuditForm(Form):
 
-    method = 'GET'
-
     course_id = SelectField(
         label=_("Course"),
         choices=[],
@@ -67,7 +65,7 @@ class AuditForm(Form):
         self.organisations.choices = tuple(
             (e, e) for e in self.distinct_organisations) or [self.none_choice]
         self.organisations.validators = []
-        if self.model.organisations:
+        if self.model.organisations and self.request.method == 'GET':
             self.organisations.data = self.model.organisations
 
     def for_editors(self):
@@ -76,8 +74,7 @@ class AuditForm(Form):
         choices = sorted((p, p) for p in permissions) or [self.none_choice]
         self.organisations.choices = choices
 
-        if self.model.organisations:
-
+        if self.model.organisations and self.request.method == 'GET':
             self.organisations.data = self.model.organisations
         else:
             self.select_all('organisations')
@@ -88,10 +85,6 @@ class AuditForm(Form):
             field.data = list(next(zip(*field.choices)))
 
     def on_request(self):
-        # Roves crf token from query params since it's a get form
-        if hasattr(self, 'csrf_token'):
-            self.delete_field('csrf_token')
-
         self.course_id.choices = self.get_course_choices()
         if not self.need_course_selection:
             self.hide(self.course_id)

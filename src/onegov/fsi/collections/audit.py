@@ -50,24 +50,14 @@ class AuditCollection(GenericCollection, Pagination):
             letter=self.letter
         )
 
-    def by_letter(self, letter):
+    def by_letter_and_orgs(self, letter=None, orgs=None):
         return self.__class__(
             self.session,
             page=0,
             course_id=self.course_id,
             auth_attendee=self.auth_attendee,
-            organisations=self.organisations,
-            letter=letter
-        )
-
-    def by_organisations(self, organisations):
-        return self.__class__(
-            self.session,
-            page=self.page,
-            course_id=self.course_id,
-            auth_attendee=self.auth_attendee,
-            organisations=organisations,
-            letter=self.letter
+            organisations=orgs if orgs is not None else self.organisations,
+            letter=letter or self.letter
         )
 
     def __eq__(self, other):
