@@ -64,6 +64,13 @@ class ReportSelectionForm(Form):
         ),
     )
 
+    def ensure_valid_date_range(self):
+        if self.start.data and self.end.data:
+            if self.end.data.year > self.start.data.year + 2:
+                self.end.errors.append(
+                    _("Please limit your report to 2 years")
+                )
+
     def on_request(self):
         query = self.request.session.query(
             Municipality.id.label('id'),
