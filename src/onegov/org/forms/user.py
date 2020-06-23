@@ -4,7 +4,8 @@ from onegov.form.fields import TagsField
 from onegov.form.filters import yubikey_identifier
 from onegov.org import _
 from onegov.user import UserCollection
-from wtforms import BooleanField, RadioField, TextField, validators
+from wtforms import BooleanField, RadioField, validators, \
+    StringField
 from wtforms.fields.html5 import EmailField
 
 
@@ -40,7 +41,7 @@ class ManageUserForm(Form):
         fieldset=_("General"),
     )
 
-    yubikey = TextField(
+    yubikey = StringField(
         label=_("Yubikey"),
         fieldset=_("General"),
         description=_("Plug your YubiKey into a USB slot and press it."),

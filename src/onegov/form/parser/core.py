@@ -672,7 +672,7 @@ class TimeField(Field):
         return time(*map(int, value.split(':')))
 
 
-class TextField(Field):
+class StringField(Field):
     type = 'text'
 
     @classmethod

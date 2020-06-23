@@ -66,7 +66,6 @@ class BaseRenderer(object):
 
 @registry.register_for(
     'StringField',
-    'TextField',
     'TextAreaField',
 )
 class StringFieldRenderer(BaseRenderer):

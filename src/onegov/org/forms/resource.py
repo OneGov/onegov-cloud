@@ -11,7 +11,6 @@ from wtforms import BooleanField
 from wtforms import RadioField
 from wtforms import StringField
 from wtforms import TextAreaField
-from wtforms import TextField
 from wtforms import validators
 from wtforms.validators import ValidationError
 from wtforms.fields.html5 import DecimalField, IntegerField
@@ -148,7 +147,7 @@ class ResourceBaseForm(Form):
         depends_on=('pricing_method', 'per_hour')
     )
 
-    currency = TextField(
+    currency = StringField(
         label=_("Currency"),
         default="CHF",
         fieldset=_("Payments"),

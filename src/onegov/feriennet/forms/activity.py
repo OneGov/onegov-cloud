@@ -4,7 +4,7 @@ from onegov.form import Form
 from onegov.form.fields import OrderedMultiCheckboxField
 from onegov.org.forms.fields import HtmlField
 from onegov.user import User, UserCollection
-from wtforms import TextField, TextAreaField, SelectField
+from wtforms import TextAreaField, SelectField, StringField
 from wtforms.validators import InputRequired
 
 
@@ -40,7 +40,7 @@ TAGS = tuple((tag, tag) for tag in (
 
 class VacationActivityForm(Form):
 
-    title = TextField(
+    title = StringField(
         label=_("Title"),
         description=_("The title of the activity"),
         validators=[InputRequired()])

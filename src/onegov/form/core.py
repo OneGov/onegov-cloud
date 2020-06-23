@@ -94,7 +94,7 @@ class Form(BaseForm):
                 'yes': (10.0, 'CHF')
             })
 
-            discount_code = TextField('Discount Code', pricing={
+            discount_code = StringField('Discount Code', pricing={
                 'CAMPAIGN2017': (-5.0, 'CHF')
             })
 
