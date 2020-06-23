@@ -22,12 +22,25 @@ def test_views_report(client):
     )
     assert "Gemeindedaten importiert." in upload.form.submit().follow()
 
-    # Add a scan job
+    # Add two scan jobs
     with freeze_time("2019-01-01"):
         add = client.get('/scan-jobs/unrestricted').click(href='/add')
         add.form['type'].select("normal")
         add.form['municipality_id'].select(text="Adlikon (1)")
         add.form['dispatch_date'] = "2019-01-05"
+        add.form['dispatch_boxes'] = "1111"
+        add.form['dispatch_cantonal_tax_office'] = "2222"
+        add.form['dispatch_cantonal_scan_center'] = "3333"
+        add.form['dispatch_tax_forms_older'] = "4444"
+        add.form['dispatch_tax_forms_last_year'] = "5555"
+        add.form['dispatch_tax_forms_current_year'] = "6666"
+        add.form['dispatch_single_documents'] = "7777"
+        assert "Scan-Auftrag hinzugefügt." in add.form.submit().maybe_follow()
+
+        add = client.get('/scan-jobs/unrestricted').click(href='/add')
+        add.form['type'].select("normal")
+        add.form['municipality_id'].select(text="Adlikon (1)")
+        add.form['dispatch_date'] = "2020-01-05"
         add.form['dispatch_boxes'] = "1111"
         add.form['dispatch_cantonal_tax_office'] = "2222"
         add.form['dispatch_cantonal_scan_center'] = "3333"
