@@ -1,8 +1,33 @@
 # Changes
 
+## Release `2020.61`
+
+> commits: **8 / [391cbd795e...5951a6db01](https://github.com/OneGov/onegov-cloud/compare/391cbd795e^...5951a6db01)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.61)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🐞 **Fixes billing reset not possible when not in booking phase**
+
+**`Bugfix`** | **[391cbd795e](https://github.com/onegov/onegov-cloud/commit/391cbd795e78590db7ddd6c729eadd2544ae9cef)**
+
+### Fsi
+
+✨ **Fixes caching for last chosen organisations in /audit**
+
+Needs to be a Post request form in order to set and get cache.
+Mimic a Get request by redirecting the user to the new collection.
+
+**`Other`** | **[4977e43af0](https://github.com/onegov/onegov-cloud/commit/4977e43af0daeb6ef3474c0bfac689253fbf7a6d)**
+
+🐞 **Fixes rendering pdf for all subscriptions**
+
+**`Bugfix`** | **[5951a6db01](https://github.com/onegov/onegov-cloud/commit/5951a6db01b01e8701441a38ae316f8dd182548b)**
+
 ## Release `2020.60`
 
-> commits: **7 / [f2626f8640...36312db0ea](https://github.com/OneGov/onegov-cloud/compare/f2626f8640^...36312db0ea)**  
+> released: **2020-06-18 20:22**<br>
+> commits: **8 / [f2626f8640...c00ab10ea4](https://github.com/OneGov/onegov-cloud/compare/f2626f8640^...c00ab10ea4)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.60)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
