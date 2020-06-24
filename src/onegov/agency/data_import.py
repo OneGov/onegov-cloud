@@ -1,6 +1,7 @@
 from collections import defaultdict
 from datetime import datetime
 
+
 from onegov.agency.collections import ExtendedAgencyCollection, \
     ExtendedPersonCollection
 from onegov.agency.models import ExtendedAgencyMembership

@@ -25,9 +25,9 @@ cli = command_group()
 
 @cli.command('import-bs-data', context_settings={'singular': True})
 @click.argument('agency-file', type=click.Path(exists=True))
-@click.argument('poeple-file', type=click.Path(exists=True))
+@click.argument('people-file', type=click.Path(exists=True))
 @click.option('--dry-run', is_flag=True, default=False)
-def import_bs_data_files(agency_file, poeple_file, dry_run):
+def import_bs_data_files(agency_file, people_file, dry_run):
     """
     Usage:
 
@@ -36,7 +36,7 @@ def import_bs_data_files(agency_file, poeple_file, dry_run):
         $people_file \
     """
     def execute(request, app):
-        agencies, people = import_bs_data(agency_file, poeple_file, request)
+        agencies, people = import_bs_data(agency_file, people_file, request)
         click.secho(f"Imported {len(agencies.keys())} agencies "
                     f"and {len(people.keys())} persons", fg='green')
         if dry_run:

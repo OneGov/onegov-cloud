@@ -283,15 +283,18 @@ def test_enable_yubikey(temporary_directory, cfg_path, session_manager):
 
 
 def test_import_bs_data(cfg_path):
-    fp = '/home/lukas/seantis/staka_bs/CSV Dateien/Staatskalender_Export_April_2020_mod.csv'
+    agency_file = '/home/lukas/Nextcloud/seantis/staka_bs/XLSX/VERZORGEINHEIT.csv'
+    people_file = '/home/lukas/Nextcloud/seantis/staka_bs/XLSX/VERZPERSON.csv'
     runner = CliRunner()
 
     result = runner.invoke(org_cli, [
         '--config', cfg_path,
         '--select', '/agency/zug',
         'import-bs-data',
-        '--path', fp
+        '--agency-file', agency_file,
+        '--people-file', people_file
     ])
+    print(result.output)
     assert result.exit_code == 0
 
 
