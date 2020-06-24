@@ -1,3 +1,6 @@
+from collections import namedtuple, defaultdict
+from itertools import groupby
+
 from cached_property import cached_property
 from datetime import date
 from onegov.core.orm.func import unaccent
@@ -56,6 +59,74 @@ class Report(object):
     @cached_property
     def columns(self):
         return self.columns_dispatch + self.columns_return
+
+    def transform_query(self, query):
+        """Since the report can span over more than a year, adding up the
+        database columns get's messy in sql. This is a wrapper to enrich
+        the query results and return a new namedtuple.
+
+        if any of the returned columns contain one of the `id_parts`,
+        a new key is added with the `id_part` replaced by `_by_year`.
+        """
+
+        first = query.first()
+        if not first:
+            return []
+
+        transformed_suffix = '_by_year'
+
+        id_parts = ('_older', '_current_year', '_last_year')
+
+        def exclude(col, parts=id_parts):
+            for part in parts:
+                if part in col:
+                    return part
+
+        def replace(col):
+            to_replace = exclude(col)
+            if to_replace:
+                return col.replace(to_replace, transformed_suffix, 1)
+            return col
+
+        all_cols = first._fields
+        sum_cols = self.columns
+        normal_cols = set(all_cols) - set(sum_cols)
+
+        def year_key(col, year):
+            year = int(year)
+            if '_last_year' in col:
+                return str(year - 1)
+            if '_older' in col:
+                return f"older_{year - 2}"
+            return str(year)
+
+        def add_up(results):
+            """ Adds up the results correctly, imitating sum with a groupy by
+            bfs_number only for columns which do not have to be summed relative
+            to the return_date. """
+            store = {}
+            for result in results:
+                for col in all_cols:
+                    if exclude(col):
+                        current = store.setdefault(
+                            replace(col), defaultdict(int))
+                        current[year_key(col, result.year)] += getattr(
+                            result, col)
+                    elif col in sum_cols:
+                        store.setdefault(col, 0)
+                        store[col] += getattr(result, col)
+                    elif col in normal_cols:
+                        if col not in store:
+                            store[col] = getattr(result, col)
+                    else:
+                        raise NotImplementedError
+
+            return namedtuple('TransformedEntry', store.keys())(**store)
+
+        return [
+            add_up(res) for bfsnr, res in groupby(
+                self.query(), key=lambda e: e.bfs_number)
+        ]
 
     def query(self):
         query_in = self.session.query(ScanJob).join(Municipality)
@@ -128,6 +199,10 @@ class Report(object):
             *[sum(subquery.c, column) for column in self.columns],
         )
         return query.one()
+
+    @property
+    def years(self):
+        return tuple(range(self.start.year, self.end.year + 1))
 
 
 class ReportBoxes(Report):
