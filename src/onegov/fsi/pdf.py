@@ -32,7 +32,7 @@ class FsiPdf(Pdf):
 
     @classmethod
     def from_subscriptions(cls, collection, layout, title):
-        event = layout.model.course_event
+        chosen_event = layout.model.course_event
         translate = layout.request.translate
         result = BytesIO()
         pdf = cls(
@@ -53,7 +53,7 @@ class FsiPdf(Pdf):
 
         def get_headers():
             headers = ['Attendee', 'Shortcode']
-            if not event:
+            if not chosen_event:
                 headers.append('Course Name')
                 headers.append('Date')
             headers += ['Course Status', 'Course attended', 'Last info mail']
@@ -65,7 +65,8 @@ class FsiPdf(Pdf):
             att = subscription.attendee
             row.append(att and att.source_id or "")
 
-            if not event:
+            if not chosen_event:
+                event = subscription.course_event
                 row.append(event.name)
                 row.append(
                     layout.format_date(event.start, 'datetime')
@@ -73,7 +74,8 @@ class FsiPdf(Pdf):
                 sent = event.info_template.last_sent
 
             row.append(
-                translate(layout.format_status(event.status)) if event else ""
+                translate(layout.format_status(
+                    chosen_event.status if chosen_event else event.status))
             )
             row.append(subscription.event_completed and "✔" or "-")
             row.append(sent and layout.format_date(sent, 'date') or '')
