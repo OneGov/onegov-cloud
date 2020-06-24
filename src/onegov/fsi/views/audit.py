@@ -58,7 +58,7 @@ def invite_attendees_for_event(self, request, form):
         Link(
             text=letter,
             url=request.link(
-                self.by_letter_and_orgs(
+                self.by_letter(
                     letter=letter if (letter != self.letter) else None
                 )
             ),

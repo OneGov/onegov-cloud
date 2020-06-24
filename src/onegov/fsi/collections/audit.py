@@ -60,6 +60,16 @@ class AuditCollection(GenericCollection, Pagination):
             letter=letter or self.letter
         )
 
+    def by_letter(self, letter):
+        return self.__class__(
+            self.session,
+            page=0,
+            course_id=self.course_id,
+            auth_attendee=self.auth_attendee,
+            organisations=self.organisations,
+            letter=letter
+        )
+
     def __eq__(self, other):
         return all((
             self.page == other.page,
