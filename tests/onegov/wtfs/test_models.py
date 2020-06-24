@@ -268,6 +268,15 @@ def add_report_data(session):
                 [date(2019, 1, 2), 1, 2, 3, date(2019, 1, 4), 4],
             ]
         },
+        'Testikon': {
+            'municipality_id': uuid4(),
+            'bfs_number': 0,
+            'jobs': [
+                [date(2019, 5, 2), 1, 2, 3, date(2019, 5, 4), 10],
+                [date(2019, 5, 3), 4, 5, 6, date(2019, 5, 5), 10],
+                [date(2020, 1, 2), 1, 2, 3, date(2020, 1, 4), 10],
+            ]
+        },
     }
 
     delivery_number = 1
@@ -307,6 +316,15 @@ def add_report_data(session):
             delivery_number += 1
         session.flush()
     session.flush()
+
+
+def test_report_query(session):
+    add_report_data(session)
+    report = ReportBoxesAndForms(session, date(2019, 5, 2), date(2020, 5, 4))
+    assert report.query().all() == [
+        ('Testikon', 0, 2019.0, 4+1, 5+2, 6+3, 5+7+9, 20, 20),
+        ('Testikon', 0, 2020.0, 1, 2, 3, 1+2+3, 10, 10)
+    ]
 
 
 def test_daily_list_boxes(session):
@@ -395,6 +413,7 @@ def test_daily_list_boxes_and_forms(session):
 
 
 def test_report_boxes(session):
+    # Todo
     def _report(start, end):
         return ReportBoxes(session, start=start, end=end)
 
@@ -463,6 +482,7 @@ def test_report_boxes_and_forms(session):
 
 
 def test_report_forms_by_municipality(session):
+    # Todo
     def _report(start, end, municipality):
         query = session.query(Municipality).filter_by(name=municipality)
         return ReportFormsByMunicipality(
@@ -492,6 +512,7 @@ def test_report_forms_by_municipality(session):
 
 
 def test_report_forms_all_municipalities(session):
+    # Todo
     def _report(start, end):
         return ReportFormsAllMunicipalities(session, start=start, end=end)
 

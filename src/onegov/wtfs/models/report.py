@@ -58,11 +58,11 @@ class Report(object):
         return self.columns_dispatch + self.columns_return
 
     def query(self):
-        # aggregate on dispatch date
         query_in = self.session.query(ScanJob).join(Municipality)
         query_in = query_in.with_entities(
             Municipality.name.label('name'),
             Municipality.meta['bfs_number'].label('bfs_number'),
+            ScanJob.year,
             *[sum(ScanJob, column) for column in self.columns_dispatch],
             *[zero(column) for column in self.columns_return],
         )
@@ -78,7 +78,8 @@ class Report(object):
             )
         query_in = query_in.group_by(
             Municipality.name,
-            Municipality.meta['bfs_number'].label('bfs_number')
+            Municipality.meta['bfs_number'].label('bfs_number'),
+            ScanJob.year,
         )
 
         # aggregate on return date
@@ -86,6 +87,7 @@ class Report(object):
         query_out = query_out.with_entities(
             Municipality.name.label('name'),
             Municipality.meta['bfs_number'].label('bfs_number'),
+            ScanJob.year,
             *[zero(column) for column in self.columns_dispatch],
             *[sum(ScanJob, column) for column in self.columns_return],
         )
@@ -101,18 +103,23 @@ class Report(object):
             )
         query_out = query_out.group_by(
             Municipality.name,
-            Municipality.meta['bfs_number'].label('bfs_number')
+            Municipality.meta['bfs_number'].label('bfs_number'),
+            ScanJob.year
         )
-
-        # join
+        #
+        # # join
         union = query_in.union_all(query_out).subquery('union')
         query = self.session.query(
             union.c.name,
             union.c.bfs_number,
+            union.c.year,
             *[sum(union.c, column) for column in self.columns]
         )
-        query = query.group_by(union.c.name, union.c.bfs_number)
-        query = query.order_by(unaccent(union.c.name))
+        query = query.group_by(union.c.name, union.c.bfs_number, union.c.year)
+        query = query.order_by(
+            unaccent(union.c.name),
+            union.c.year
+        )
         return query
 
     def total(self):

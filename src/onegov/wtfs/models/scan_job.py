@@ -4,7 +4,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.wtfs import _
 from onegov.wtfs.models.municipality import Municipality
-from sqlalchemy import Column
+from sqlalchemy import Column, extract
 from sqlalchemy import Date
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
@@ -83,6 +83,14 @@ class ScanJob(Base, TimestampMixin, ContentMixin):
     return_tax_forms_current_year = Column(Integer, nullable=True)
     return_tax_forms_last_year = Column(Integer, nullable=True)
     return_tax_forms_older = Column(Integer, nullable=True)
+
+    @hybrid_property
+    def year(self):
+        return self.return_date.year
+
+    @year.expression
+    def year(cls):
+        return extract('year', cls.return_date)
 
     @hybrid_property
     def return_tax_forms(self):
