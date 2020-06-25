@@ -6,6 +6,7 @@ from onegov.form.fields import ChosenSelectMultipleField
 from onegov.fsi import _
 from onegov.form import Form
 from onegov.fsi.models import CourseAttendee
+from onegov.user import User
 
 
 class CourseAttendeeForm(Form):
@@ -64,6 +65,21 @@ class CourseAttendeeForm(Form):
 
 
 class AddExternalAttendeeForm(CourseAttendeeForm):
+
+    def ensure_email_not_existing(self):
+        email = self.email.data
+        att = self.request.session.query(CourseAttendee).filter_by(
+            _email=email).first()
+        if att:
+            self.email.errors.append(
+                _("An attendee with this email already exists"))
+            return False
+        user = self.request.session.query(User).filter_by(
+            username=email).first()
+        if user:
+            self.email.errors.append(
+                _("An attendee with this email already exists"))
+            return False
 
     def on_request(self):
         self.delete_field('permissions')

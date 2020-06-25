@@ -63,3 +63,14 @@ def test_add_external_attendee(client):
     new.form['first_name'] = 'New FN'
     new.form['last_name'] = 'New LN'
     new.form['email'] = 'external@example.org'
+
+    page = new.form.submit().follow()
+    assert 'external@example.org' in page
+
+    # Test adding twice
+    page = client.get(view)
+    page.form['first_name'] = 'Duplicate FN'
+    page.form['last_name'] = 'Duplicate LN'
+    page.form['email'] = 'external@example.org'
+    page = page.form.submit()
+    assert 'Ein Teilnehmer mit dieser E-Mail existiert bereits' in page
