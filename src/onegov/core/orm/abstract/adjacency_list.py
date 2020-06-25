@@ -478,3 +478,35 @@ class AdjacencyListCollection(object):
 
         for order, sibling in enumerate(new_order()):
             sibling.order = order
+
+
+def numeric_priority(string, max_len=4):
+    """ Transforms a alphabetical order into a numeric value that can be
+    used for the ordering of the siblings.
+    German Umlaute and also numbers are supported.
+    """
+    if not string:
+        return None
+
+    string = string.upper()
+    umls = {'Ä': 'AE', 'Ö': 'OE', 'Ü': 'UE'}
+    ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+    def replace(letter):
+        if letter in ALPHABET:
+            return letter
+        if letter in umls:
+            return umls[letter]
+        try:
+            ix = int(letter)
+            return ALPHABET[ix if ix != 0 else 1]
+        except ValueError:
+            return letter
+
+    repl_string = "".join(replace(le) for le in string)
+
+    pows = list(reversed(range(max_len)))
+    return sum([
+        ALPHABET.index(letter) * pow(10, pows[i])
+        for i, letter in enumerate(repl_string)
+    ])
