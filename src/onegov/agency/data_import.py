@@ -21,12 +21,6 @@ def with_open(func):
     return _read
 
 
-def remove_duplicates(parts):
-    res = []
-    [res.append(x) for x in parts if x not in res]
-    return res
-
-
 def v_(string):
     if not string or string == 'NULL' or not string.strip():
         return None
@@ -40,16 +34,6 @@ def cleaned(func):
             return None
         return func(cleaned)
     return clean
-
-
-@cleaned
-def is_co(string):
-    return 'c/o' in string.lower()
-
-
-@cleaned
-def possible_tel(string):
-    return re.search(r'\+?[\d|\s]+$', string)
 
 
 @cleaned
