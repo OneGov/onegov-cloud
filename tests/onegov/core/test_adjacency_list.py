@@ -6,6 +6,7 @@ from onegov.core.orm.abstract import (
     MoveDirection,
     sort_siblings,
 )
+from onegov.core.orm.abstract.adjacency_list import numeric_priority
 
 
 class FamilyMember(AdjacencyList):
@@ -272,3 +273,20 @@ def test_change_title_unordered(session):
     b.title = 'z'
 
     assert a.siblings.all() == [b, c, a]
+
+
+def test_numeric_priority():
+    assert numeric_priority('A') == 1000
+    assert numeric_priority('AA') == 1100
+    assert numeric_priority('BA') == 2100
+    assert numeric_priority('ABA') == 1210
+    input = (
+        'A',
+        'AA',
+        'BA',
+        'ABA',
+        'Z',
+    )
+    assert sorted(input, key=numeric_priority) == [
+        'A', 'AA', 'ABA', 'BA', 'Z'
+    ]

@@ -507,6 +507,6 @@ def numeric_priority(string, max_len=4):
 
     pows = list(reversed(range(max_len)))
     return sum([
-        ALPHABET.index(letter) * pow(10, pows[i])
+        (ALPHABET.index(letter) + 1) * pow(10, pows[i])
         for i, letter in enumerate(repl_string)
     ])
