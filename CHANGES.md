@@ -1,8 +1,20 @@
 # Changes
 
+## Release `2020.62`
+
+> commits: **9 / [7aee249d6c...4f1741be15](https://github.com/OneGov/onegov-cloud/compare/7aee249d6c^...4f1741be15)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.62)](https://buildkite.com/seantis/onegov-cloud)
+
+### Fsi
+
+🐞 **Ensure user not existing when adding external attendee**
+
+**`Bugfix`** | **[5ae103fd1e](https://github.com/onegov/onegov-cloud/commit/5ae103fd1eb4e14bf914f9480ae66a6bc6faa154)**
+
 ## Release `2020.61`
 
-> commits: **8 / [391cbd795e...5951a6db01](https://github.com/OneGov/onegov-cloud/compare/391cbd795e^...5951a6db01)**  
+> released: **2020-06-24 15:00**<br>
+> commits: **9 / [391cbd795e...4c39b3bbb6](https://github.com/OneGov/onegov-cloud/compare/391cbd795e^...4c39b3bbb6)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.61)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
