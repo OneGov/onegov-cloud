@@ -14,6 +14,7 @@ from onegov.agency.models import ExtendedAgencyMembership
 from onegov.core.cli import command_group
 from onegov.core.cli import pass_group_context
 from onegov.core.html import html_to_text
+from onegov.people import Agency, Person, AgencyMembership
 from onegov.people.collections import AgencyCollection
 from onegov.people.collections import PersonCollection
 from requests import get
@@ -27,7 +28,8 @@ cli = command_group()
 @click.argument('agency-file', type=click.Path(exists=True))
 @click.argument('people-file', type=click.Path(exists=True))
 @click.option('--dry-run', is_flag=True, default=False)
-def import_bs_data_files(agency_file, people_file, dry_run):
+@click.option('--clean', is_flag=True, default=False)
+def import_bs_data_files(agency_file, people_file, dry_run, clean):
     """
     Usage:
 
@@ -35,10 +37,38 @@ def import_bs_data_files(agency_file, people_file, dry_run):
         $agency_file \
         $people_file \
     """
+
+    buffer = 100
+
     def execute(request, app):
-        agencies, people = import_bs_data(agency_file, people_file, request)
+
+        if clean:
+            session = request.session
+            for ix, membership in enumerate(session.query(AgencyMembership)):
+                session.delete(membership)
+                if ix % buffer == 0:
+                    app.es_indexer.process()
+
+            for ix, person in enumerate(session.query(Person)):
+                session.delete(person)
+                if ix % buffer == 0:
+                    app.es_indexer.process()
+
+            for ix, agency in enumerate(session.query(Agency)):
+                session.delete(agency)
+                if ix % buffer == 0:
+                    app.es_indexer.process()
+
+            session.flush()
+            click.secho(
+                'All Memberships, Agencies and Persons removed', fg='green')
+
+        agencies, people = import_bs_data(
+            agency_file, people_file, request, app)
+
         click.secho(f"Imported {len(agencies.keys())} agencies "
-                    f"and {len(people.keys())} persons", fg='green')
+                    f"and {len(people)} persons",
+                    fg='green')
         if dry_run:
             transaction.abort()
             click.secho("Aborting transaction", fg='yellow')

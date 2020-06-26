@@ -1,11 +1,13 @@
+import re
 from collections import defaultdict
 from datetime import datetime
-
 
 from onegov.agency.collections import ExtendedAgencyCollection, \
     ExtendedPersonCollection
 from onegov.agency.models import ExtendedAgencyMembership
 from onegov.core.csv import CSVFile
+from onegov.core.orm.abstract.adjacency_list import numeric_priority
+from onegov.core.utils import linkify
 
 
 def with_open(func):
@@ -13,60 +15,154 @@ def with_open(func):
         with open(args[0], 'rb') as f:
             file = CSVFile(
                 f,
-                encoding='utf-16'
+                encoding='iso-8859-1'
             )
             return func(file, *args[1:])
     return _read
 
 
+def remove_duplicates(parts):
+    res = []
+    [res.append(x) for x in parts if x not in res]
+    return res
+
+
+def v_(string):
+    if not string or string == 'NULL' or not string.strip():
+        return None
+    return string.strip()
+
+
+def cleaned(func):
+    def clean(string):
+        cleaned = v_(string)
+        if not cleaned:
+            return None
+        return func(cleaned)
+    return clean
+
+
+@cleaned
+def is_co(string):
+    return 'c/o' in string.lower()
+
+
+@cleaned
+def possible_tel(string):
+    return re.search(r'\+?[\d|\s]+$', string)
+
+
+@cleaned
+def get_phone(string):
+    if string.startswith('00'):
+        return string.replace('00', '+', 1)
+    if not string.startswith('+'):
+        return string.replace('0', '+41 ', 1)
+
+
+def p(text):
+    return f'<p>{text}</p>'
+
+
+def br(text):
+    return text + '<br>'
+
+
+def get_address(line):
+    stao_addr, post_addr = v_(line.standortadresse), v_(line.postadresse)
+    if stao_addr and post_addr:
+        if stao_addr == post_addr:
+            return br(stao_addr)
+        else:
+            return br(stao_addr) + br(post_addr)
+    elif stao_addr:
+        return br(stao_addr)
+    if post_addr:
+        return br(post_addr)
+
+
 def get_agency_portrait(line):
     portrait = ''
-    if line.postadresse:
-        portrait += line.postadresse
-    if line.offnungszeiten:
-        portrait += f"\nÖffnungszeiten: {line.offnungszeiten}"
-    if line.homepage:
-        portrait += f"\n\n{line.homepage}"
+    address = get_address(line)
+    if address:
+        portrait += br(address)
+
+    if v_(line.telzentrale):
+        tel = linkify(get_phone(v_(line.telzentrale)))
+        portrait += br(f"Tel.: {tel}")
+
+    if v_(line.faxzentrale):
+        tel = linkify(get_phone(v_(line.faxzentrale)))
+        portrait += br(f"Fax: {tel}")
+
+    if v_(line.emailneutral):
+        portrait += br(f"{linkify(v_(line.emailneutral))}")
+
+    homepage = v_(line.homepageurl)
+    if homepage:
+        portrait += br(f'<a href="{homepage}">Homepage</a>')
+
+    stadtplanurl = v_(line.stadtplanurl)
+    if stadtplanurl:
+        portrait += br(f'<a href="{stadtplanurl}">Standort</a>')
+
+    if v_(line.oeffnungszeiten):
+        portrait += br(f"Öffnungszeiten:\n{v_(line.oeffnungszeiten)}")
+
+    if v_(line.wahlperiode):
+        portrait += br(f"Wahlperiode: {v_(line.wahlperiode)}")
+
+    if v_(line.bemerkung):
+        portrait += br(f"{v_(line.bemerkung)}")
+
     portrait = portrait.strip()
-    return portrait and f'<p>{portrait}</p>' or None
+    return portrait and p(portrait) or None
 
 
 @with_open
-def import_bs_agencies(csvfile, session):
+def import_bs_agencies(csvfile, session, app):
     agencies = ExtendedAgencyCollection(session)
-    lines_by_id = {line.basisid: line for line in csvfile.lines}
+    lines_by_id = {line.verzorgeinheitid: line for line in csvfile.lines}
     treat_as_root = tuple(
-        line.basisparentid for line in csvfile.lines
-        if line.basisparentid not in lines_by_id.keys()
+        line.verzorgeinheitid for line in csvfile.lines
+        if line.verzvorfahreoeid not in lines_by_id.keys()
     )
     added_agencies = {}
     children = defaultdict(list)
     roots = []
+    added_count = 0
 
     print('Treated as root agencies: ', ", ".join(treat_as_root))
     for line in csvfile.lines:
-        parent_id = line.basisparentid or None
-        basisid = line.basisid
+        parent_id = line.verzvorfahreoeid or None
+        basisid = line.verzorgeinheitid
+
         if parent_id:
-            if parent_id in treat_as_root:
+            if basisid in treat_as_root:
                 parent_id = None
                 roots.append(basisid)
             children[parent_id].append(basisid)
 
     def parse_agency(line, parent=None):
+        portrait = get_agency_portrait(line)
         agency = agencies.add(
             parent=parent,
-            title=line.bezeichnung,
-            description=line.kurzbezeichnung or None,
-            portrait=get_agency_portrait(line)
+            title=line.bezeichnung.strip(),
+            description=None,
+            portrait=portrait,
+            order=numeric_priority(v_(line.anzeigeprio))
         )
-        added_agencies[line.basisid] = agency
+        added_agencies[line.verzorgeinheitid] = agency
         return agency
 
     def add_children(basisid, parent=None):
+        nonlocal added_count
+        added_count += 1
+        if added_count % 50 == 0:
+            app.es_indexer.process()
         line = lines_by_id[basisid]
         agency = parse_agency(line, parent=parent)
-        for child_id in children.get(line.basisid, []):
+        for child_id in children.get(line.verzorgeinheitid, []):
             add_children(child_id, parent=agency)
 
     for basisid in roots:
@@ -75,9 +171,9 @@ def import_bs_agencies(csvfile, session):
 
 
 @with_open
-def import_bs_persons(csvfile, agencies, session):
-    persons = {}
+def import_bs_persons(csvfile, agencies, session, app):
     people = ExtendedPersonCollection(session)
+    persons = []
 
     def parse_date(date_string):
         if not date_string:
@@ -85,56 +181,66 @@ def import_bs_persons(csvfile, agencies, session):
         return datetime.strptime(date_string, '%d.%m.%Y').date()
 
     def parse_person(line):
-        note = ""
-        if line.bemerkung:
-            note = line.bemerkung
+        bemerkung = v_(line.bemerkung)
+        notiz = v_(line.notiz)
+        sprechstunde = v_(line.sprechstunde)
 
-        assert line.basisid not in persons
+        note = "\n".join([
+            s for s in (bemerkung, notiz, sprechstunde) if s]
+        )
+
+        if sprechstunde:
+            note += f"\n{sprechstunde}"
+
+        agency_id = line.verzorgeinheitid
+
         person_ = people.add(
-            last_name=line.name,
-            first_name=line.vorname,
-            salutation=line.anrede or None,
-            academic_title=line.titel or None,
-            function=line.funktion or None,
-            email=line.email or None,
-            phone=line.telextern or None,
-            phone_direct=line.telmobile or None,
-            website=None,
+            last_name=v_(line.name) or 'NACHNAME',
+            first_name=v_(line.vorname) or 'VORNAME',
+            salutation=v_(line.anrede),
+            academic_title=v_(line.titel),
+            function=v_(line.funktion),
+            email=v_(line.email),
+            phone=get_phone(line.telextern),
+            phone_direct=get_phone(line.telmobil),
+            website=v_(line.url1) or v_(line.url2) or None,
             notes=note or None,
-            born=None,
-            political_party=None,
-            address=None,
+            born=v_(line.geburtsdatum),
+            political_party=v_(line.partei),
+            address=v_(line.privatadresse),
             access='public'
         )
-        persons[line.basisid] = person_
+        persons.append(person_)
 
         # A person has only one membership
-        if line.basis_orgeinheitid:
-            parent_id = line.basis_orgeinheitid
-            agency = agencies.get(parent_id)
+        if agency_id:
+            agency = agencies.get(agency_id)
             if agency:
-                person_.memberships.append(
-                    ExtendedAgencyMembership(
-                        agency_id=agency.id,
-                        title="",
-                        since=parse_date(line.eintrittsdatum),
-                        prefix=None,
-                        addition=None,
-                        note=None,
-                        order_within_agency=0,
-                        order_within_person=0
-                    )
-                )
-            else:
-                print(f'agency id {parent_id} not found in agencies')
+                agency.memberships.append(ExtendedAgencyMembership(
+                    person_id=person_.id,
+                    title='',
+                    since=None,
+                    prefix=None,
+                    addition=None,
+                    note=None,
+                    order_within_agency=0,
+                    order_within_person=0
+                ))
 
-    for line in csvfile.lines:
+            else:
+                print(f'agency id {agency_id} not found in agencies')
+
+    for ix, line in enumerate(csvfile.lines):
+        if ix % 50 == 0:
+            app.es_indexer.process()
         parse_person(line)
+
     return persons
 
 
-def import_bs_data(agency_file, person_file, request):
+def import_bs_data(agency_file, person_file, request, app):
     session = request.session
-    agencies = import_bs_agencies(agency_file, session)
-    persons = import_bs_persons(person_file, agencies, session)
+    agencies = import_bs_agencies(agency_file, session, app)
+    persons = import_bs_persons(person_file, agencies, session, app)
+
     return agencies, persons
