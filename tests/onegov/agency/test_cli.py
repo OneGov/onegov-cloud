@@ -1,5 +1,3 @@
-import os
-
 import pytest
 from click.testing import CliRunner
 from onegov.agency.cli import cli
@@ -19,8 +17,8 @@ from unittest.mock import patch
 def test_bs_data_import(cfg_path, session_manager):
     runner = CliRunner()
 
-    people_file = "/home/lukas/seantis/staka_bs/CSV/Basis15-Personenstamm_FD_V2.csv"
-    agency_file = "/home/lukas/seantis/staka_bs/CSV/Basis15-Organisationsstamm_FD_V2.csv"
+    people_file = ""
+    agency_file = ""
 
     result = runner.invoke(org_cli, [
         '--config', cfg_path,
@@ -283,8 +281,8 @@ def test_enable_yubikey(temporary_directory, cfg_path, session_manager):
 
 
 def test_import_bs_data(cfg_path):
-    agency_file = '/home/lukas/Nextcloud/seantis/staka_bs/XLSX/VERZORGEINHEIT.csv'
-    people_file = '/home/lukas/Nextcloud/seantis/staka_bs/XLSX/VERZPERSON.csv'
+    agency_file = '/home/lukas/Desktop/staka_bs_data/VERZORGEINHEIT.csv'
+    people_file = '/home/lukas/Desktop/staka_bs_data/VERZPERSON.csv'
     runner = CliRunner()
 
     result = runner.invoke(org_cli, [
