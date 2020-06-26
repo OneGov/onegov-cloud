@@ -280,9 +280,10 @@ def test_enable_yubikey(temporary_directory, cfg_path, session_manager):
     assert session.query(Organisation).one().meta['enable_yubikey'] is False
 
 
+@pytest.mark.skip('Left here in case it is needed again ')
 def test_import_bs_data(cfg_path):
-    agency_file = '/home/lukas/Desktop/staka_bs_data/VERZORGEINHEIT.csv'
-    people_file = '/home/lukas/Desktop/staka_bs_data/VERZPERSON.csv'
+    agency_file = ''
+    people_file = ''
     runner = CliRunner()
 
     result = runner.invoke(org_cli, [
