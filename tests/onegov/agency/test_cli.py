@@ -1,3 +1,4 @@
+import pytest
 from click.testing import CliRunner
 from onegov.agency.cli import cli
 from onegov.core.utils import module_path
@@ -10,6 +11,30 @@ from pytest import mark
 from textwrap import dedent
 from textwrap import indent
 from unittest.mock import patch
+
+
+@pytest.mark.skip('Provide the files if you want to test this import again')
+def test_bs_data_import(cfg_path, session_manager):
+    runner = CliRunner()
+
+    people_file = ""
+    agency_file = ""
+
+    result = runner.invoke(org_cli, [
+        '--config', cfg_path,
+        '--select', '/agency/bs',
+        'add', 'Kanton Basel'
+    ])
+    assert result.exit_code == 0
+
+    result = runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/agency/bs',
+        'import-bs-data',
+        agency_file,
+        people_file
+    ])
+    assert result.exit_code == 0
 
 
 @mark.parametrize("file", [
@@ -253,3 +278,21 @@ def test_enable_yubikey(temporary_directory, cfg_path, session_manager):
     assert result.exit_code == 0
     assert "YubiKey disabled" in result.output
     assert session.query(Organisation).one().meta['enable_yubikey'] is False
+
+
+def test_import_bs_data(cfg_path):
+    agency_file = '/home/lukas/Desktop/staka_bs_data/VERZORGEINHEIT.csv'
+    people_file = '/home/lukas/Desktop/staka_bs_data/VERZPERSON.csv'
+    runner = CliRunner()
+
+    result = runner.invoke(org_cli, [
+        '--config', cfg_path,
+        '--select', '/agency/zug',
+        'import-bs-data',
+        '--agency-file', agency_file,
+        '--people-file', people_file
+    ])
+    print(result.output)
+    assert result.exit_code == 0
+
+

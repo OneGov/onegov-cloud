@@ -227,6 +227,6 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password):
 
         count += 1
 
-        if ix % 1000 == 0:
+        if ix % 200 == 0:
             app.es_indexer.process()
     # log.info(f'LDAP users imported (#{count})')
