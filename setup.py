@@ -59,7 +59,7 @@ setup(
         'blinker',
         'cached_property',
         'certifi',
-        'chameleon',
+        'chameleon==3.7.4',
         'click',
         'colour',
         'cssmin',

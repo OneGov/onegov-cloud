@@ -145,7 +145,6 @@ def test_view_notices(gazette_app):
         assert "Kantonsratswahlen" in editor_3.get('/notices/accepted')
 
 
-@pytest.mark.skip('Fix asap showing a chameleon bug')
 def test_view_notices_filter(gazette_app):
     with freeze_time("2017-11-01 11:00"):
 
