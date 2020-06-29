@@ -133,8 +133,7 @@ class AuditCollection(GenericCollection, Pagination):
             if not self.organisations:
                 return query
             return query.filter(
-                or_(CourseAttendee.organisation == None,
-                    CourseAttendee.organisation.in_(self.organisations))
+                    CourseAttendee.organisation.in_(self.organisations)
             )
         else:
             editors_permissions = self.auth_attendee.permissions or []
