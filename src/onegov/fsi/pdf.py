@@ -149,12 +149,12 @@ class FsiPdf(Pdf):
             dt = layout.next_event_date(e.start, refresh_interval)
             if dt:
                 if now > dt:
-                    next_event_hint = now.year
+                    next_event_hint = dt.year
                     color = red
                 else:
                     not_so_fine = (dt.year == now.year and e.event_completed)
                     color = orange if not_so_fine else green
-                    next_event_hint = f"{dt.month}/{dt.year}"
+                    next_event_hint = dt.year
             else:
                 next_event_hint = now.year
                 color = red
