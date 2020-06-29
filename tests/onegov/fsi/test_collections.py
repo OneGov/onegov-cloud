@@ -332,4 +332,7 @@ def test_audit_collection(scenario):
     assert audits.query().count() == 1
     # get the one having ln starting with ZZZ
     audits.letter = 'Z'
+    # Currently and att without org disregarded with a org filter
+    assert audits.query().count() == 0
+    audits.organisations = []
     assert audits.query().count() == 1
