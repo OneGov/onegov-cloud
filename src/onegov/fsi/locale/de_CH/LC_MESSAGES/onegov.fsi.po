@@ -551,19 +551,19 @@ msgid "Green"
 msgstr "Grün"
 
 msgid "Attendee should visit course next year or even later."
-msgstr "Der Teilnehmer sollte den Kurs frühestens nächstes Jahr besuchen."
+msgstr "Der Kurs wurde innerhalb der Frist von sechs Jahren absolviert."
 
 msgid "Orange"
 msgstr "Orange"
 
 msgid "Attendee should visit course this year."
-msgstr "Der Teilnehmer sollte den Kurs noch dieses Jahr besuchen."
+msgstr "Der Kurs muss noch in aktuellen Jahr absolviert werden."
 
 msgid "Red"
 msgstr "Rot"
 
 msgid "Attendee should have attended the course already, but didn't."
-msgstr "Der Teilnehmer sollte den Kurs bereits besucht haben."
+msgstr "Der nächste Kursbesuch ist ausstehend."
 
 msgid "Dear ${first_name} ${last_name},"
 msgstr "Sehr geehrte(r) ${first_name} ${last_name},"
@@ -691,7 +691,7 @@ msgstr "Aktualisieren"
 
 #, python-format
 msgid "Audit for ${course_name}"
-msgstr "Audit für ${course_name}"
+msgstr "Kursauswertung für ${course_name}"
 
 msgid "There are no recipients matching the selection"
 msgstr "Keine Empfänger die auf diese Auswahl zutreffen"
