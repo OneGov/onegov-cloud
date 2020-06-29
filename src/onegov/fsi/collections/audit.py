@@ -97,7 +97,7 @@ class AuditCollection(GenericCollection, Pagination):
                 partition_by=CourseSubscription.attendee_id,
                 order_by=[
                     desc(CourseSubscription.event_completed),
-                    CourseEvent.start]
+                    desc(CourseEvent.start)]
             ).label('rownum'),
         )
         ranked = ranked.join(

@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 from uuid import uuid4
 
 from sedate import utcnow
@@ -192,6 +192,39 @@ def test_reservation_collection_query(
     # coll.attendee_id will be set in path like
     coll.attendee_id = att.id
     assert coll.query().count() == 1
+
+
+def test_ranked_subscription_query(scenario):
+    scenario.add_attendee(role='member')
+    scenario.add_course(
+        mandatory_refresh=True,
+        refresh_interval=timedelta(days=30)
+    )
+    scenario.add_course_event(
+        scenario.latest_course, start=utcnow() - timedelta(days=700))
+
+    for i in range(3):
+        scenario.add_course_event(scenario.latest_course)
+        scenario.add_subscription(
+            scenario.latest_event,
+            scenario.latest_attendee,
+            event_completed=i != 2
+        )
+
+    scenario.commit()
+    scenario.refresh()
+
+    fake_admin = authAttendee()
+    audits = AuditCollection(
+        scenario.session, scenario.latest_course.id,
+        fake_admin
+    )
+    result = audits.ranked_subscription_query().all()
+
+    assert result[0].start > result[1].start
+    assert result[0].rownum == 1
+    assert result[1].rownum == 2
+    assert result[0].start != scenario.latest_event.start
 
 
 def test_audit_collection(scenario):
