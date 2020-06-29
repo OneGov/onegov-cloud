@@ -1,6 +1,6 @@
 from cached_property import cached_property
 from sedate import utcnow
-from sqlalchemy import func, desc, or_
+from sqlalchemy import func, desc
 
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.fsi.models import CourseAttendee, CourseSubscription, \
@@ -133,7 +133,7 @@ class AuditCollection(GenericCollection, Pagination):
             if not self.organisations:
                 return query
             return query.filter(
-                    CourseAttendee.organisation.in_(self.organisations)
+                CourseAttendee.organisation.in_(self.organisations)
             )
         else:
             editors_permissions = self.auth_attendee.permissions or []
