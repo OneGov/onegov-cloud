@@ -60,7 +60,7 @@ msgid "Courses"
 msgstr "Kurse"
 
 msgid "Audit"
-msgstr "Auswertung"
+msgstr "Kursauswertung"
 
 msgid "Attendee Check"
 msgstr "Teilnahmekontrolle"
