@@ -314,8 +314,8 @@ def test_audit_collection(scenario):
     assert get_filtered().count() == len(scenario.attendees)
 
     audits.organisations = ['AA']
-    # also return the ones without org for admins
-    assert get_filtered().count() == 3
+    # also do not return the ones without org for admins
+    assert get_filtered().count() == 1
 
     # just the ones he has permissions, no more
     audits.auth_attendee = fake_editor
@@ -329,7 +329,7 @@ def test_audit_collection(scenario):
     audits.organisations = []
     assert audits.query().count() == len(scenario.attendees)
     audits.organisations = ['AA']
-    assert audits.query().count() == 3
+    assert audits.query().count() == 1
     # get the one having ln starting with ZZZ
     audits.letter = 'Z'
     assert audits.query().count() == 1
