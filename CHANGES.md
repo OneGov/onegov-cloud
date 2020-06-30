@@ -1,8 +1,22 @@
 # Changes
 
+## Release `2020.63`
+
+> commits: **1 / [e0b7235d3f...e0b7235d3f](https://github.com/OneGov/onegov-cloud/compare/e0b7235d3f^...e0b7235d3f)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.63)](https://buildkite.com/seantis/onegov-cloud)
+
+### Fsi
+
+🐞 **Audit Improvements I**
+
+Fixes audit query, fixes non-localized course event repr, Adaptions for audit reports
+
+**`Bugfix`** | **[e0b7235d3f](https://github.com/onegov/onegov-cloud/commit/e0b7235d3f95d63296c662b029ecb37bbe79a60a)**
+
 ## Release `2020.62`
 
-> commits: **9 / [7aee249d6c...4f1741be15](https://github.com/OneGov/onegov-cloud/compare/7aee249d6c^...4f1741be15)**  
+> released: **2020-06-26 12:20**<br>
+> commits: **10 / [7aee249d6c...86888f7f6b](https://github.com/OneGov/onegov-cloud/compare/7aee249d6c^...86888f7f6b)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.62)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Fsi
