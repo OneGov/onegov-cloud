@@ -4,7 +4,7 @@ from onegov.redesign_test.theme.foundation6_theme import RedesignTheme
 
 
 class RedesignApp(Framework):
-   pass
+    pass
 
 
 @RedesignApp.template_directory()
