@@ -75,71 +75,60 @@ class BaseTheme(CoreTheme):
 
     @property
     def foundation_components(self):
-        """ All used foundation components. """
+        """ Foundation components without the prefix as in app.scss that will
+        be included. """
         return (
-            # 'grid',
-            'accordion',
-            'accordion-menu',
-            'badge',
-            # 'alert-boxes',
-            # 'block-grid',
-            'breadcrumbs',
-            'button-group',
+            'global-styles',
+            'forms',
+            'typography',
+            'xy-grid-classes',
+            'grid',
+            # 'flex-grid',
             'button',
-            'callout',
-            'card',
+            'button-group',
             'close-button',
-            'dropdown',
-            'dropdown-menu',
-            'flex',
-            'float',
-            'flex-video',
-            # 'forms',
-            # 'icon-bar',
-            # 'inline-lists',
-            # 'joyride',
-            # 'keystrokes',
             'label',
-            'media-object',
-            # 'magellan',
-            'menu',
-            'menu-icon',
-            'orbit',
-            'off-canvas',
-            'pagination',
-            # 'panels',
-            # 'pricing-tables',
             'progress-bar',
-            # 'range-slider',
-            'responsive-embed',
-            'reveal',
-            # 'side-nav',
             'slider',
-            'sticky',
-            # 'split-buttons',
-            # 'sub-nav',
             'switch',
             'table',
+            'badge',
+            'breadcrumbs',
+            'callout',
+            'card',
+            'dropdown',
+            'pagination',
+            'tooltip',
+            'accordion',
+            'media-object',
+            'orbit',
+            'responsive-embed',
             'tabs',
             'thumbnail',
-            'tooltip',
+            'menu',
+            'menu-icon',
+            'accordion-menu',
+            'drilldown-menu',
+            'dropdown-menu',
+            'off-canvas',
+            'reveal',
+            'sticky',
+            'title-bar',
             'top-bar',
-            # 'type',
-            'visibility',
+            'float-classes',
+            'flex-classes',
+            'visibility-classes',
+            'prototype-classes'
         )
 
     @property
     def imports(self):
         """ All imports, including the foundation ones. Override with care. """
         return chain(
-            self.pre_imports,
-            ('normalize', ),
-            (
-                'foundation/components/{}'.format(component)
-                for component in self.foundation_components
-            ),
-            ('fixes', ),
-            self.post_imports
+            (f"@import '{i}';" for i in self.pre_imports),
+            (f"@include foundation-{i};" for i in self.foundation_components),
+            (f"@import '{i}';" for i in self.post_imports),
+            # ('fixes', ),
         )
 
     @property
@@ -178,13 +167,15 @@ class BaseTheme(CoreTheme):
 
         theme = StringIO()
 
-        print("@import 'foundation/functions';", file=theme)
+        # As the mixins are not exported, we include them like in app.scss
+        print('@charset "utf-8";', file=theme)
+        print("@import 'foundation/settings/settings';", file=theme)
+        print("@import 'foundation/foundation';", file=theme)
 
         for key, value in _options.items():
-            print("${}: {};".format(key, value), file=theme)
+            print(f"${key}: {value};", file=theme)
 
-        for i in self.imports:
-            print("@import '{}';".format(i), file=theme)
+        print("\n".join(self.imports), file=theme)
 
         paths = self.extra_search_paths
         paths.append(self.foundation_path)
