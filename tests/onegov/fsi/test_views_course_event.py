@@ -203,9 +203,9 @@ def test_add_subscription_for_other_attendee(client_with_db):
 
     # There is already a subscription for this course and attendee
     assert new.form['course_event_id'].options[0][2] == \
-           'Course - 01.01.2050 00:00'
+           'Course - 01.01.2050 01:00'
     assert new.form['course_event_id'].options[1][2] == \
-           'Course - 01.01.2060 00:00'
+           'Course - 01.01.2060 01:00'
     bookable_id = new.form['course_event_id'].options[1][0]
 
     # take the fist choice and fail
