@@ -44,16 +44,18 @@ class SubscriptionCollectionLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        links = [
-            Link(
-                text=_("PDF"),
-                url=self.request.link(self.model, name='pdf'),
-                attrs={
-                    'class': 'print-icon',
-                    'target': '_blank'
-                }
+        links = []
+        if not self.request.view_name:
+            links.append(
+                Link(
+                    text=_("PDF"),
+                    url=self.request.link(self.model, name='pdf'),
+                    attrs={
+                        'class': 'print-icon',
+                        'target': '_blank'
+                    }
+                )
             )
-        ]
         if not self.request.is_manager:
             return links
 
