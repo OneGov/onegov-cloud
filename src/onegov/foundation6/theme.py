@@ -105,7 +105,7 @@ class BaseTheme(CoreTheme):
             'menu',
             'menu-icon',
             'orbit',
-            'off-canvas'
+            'off-canvas',
             'pagination',
             # 'panels',
             # 'pricing-tables',
