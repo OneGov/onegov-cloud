@@ -50,8 +50,8 @@
                                             </td>
                                             <td>
                                                 <tal:b tal:condition="date">
-                                                    <span class="text-red" tal:condition="now > date">${now.year}</span>
-                                                    <span class="${'text-orange' if date.year == now.year and result.event_completed else 'text-green'}" tal:condition="now < date">${date.month}/${date.year}</span>
+                                                    <span class="text-red" tal:condition="now > date">${date.year}</span>
+                                                    <span class="${'text-orange' if date.year == now.year and result.event_completed else 'text-green'}" tal:condition="now < date">${date.year}</span>
                                                 </tal:b>
                                                 <span class="text-red" tal:condition="not: date">${now.year}</span>
                                             </td>

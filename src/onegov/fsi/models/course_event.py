@@ -7,7 +7,7 @@ import pytz
 from icalendar import Calendar as vCalendar
 from icalendar import Event as vEvent
 from mailthon.enclosure import PlainText
-from sedate import utcnow
+from sedate import utcnow, to_timezone
 from sqlalchemy import Column, Boolean, SmallInteger, \
     Enum, Text, Interval, UniqueConstraint, ForeignKey, or_, and_
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -94,7 +94,17 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
         return self.course.description
 
     def __str__(self):
-        return f"{self.name} - {self.start.strftime('%d.%m.%Y %H:%M')}"
+        start = to_timezone(
+            self.start, 'Europe/Zurich').strftime('%d.%m.%Y %H:%M')
+        return f"{self.name} - {start}"
+
+    @cached_property
+    def localized_start(self):
+        return to_timezone(self.start, 'Europe/Zurich')
+
+    @cached_property
+    def localized_end(self):
+        return to_timezone(self.end, 'Europe/Zurich')
 
     # Event specific information
     location = Column(Text, nullable=False)
