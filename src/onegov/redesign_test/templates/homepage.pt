@@ -1,0 +1,23 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.redesign_test">
+    <tal:block metal:fill-slot="title">
+        Slot Fill title
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <h1>Title</h1>
+        <div class="row">
+            <div class="small-12 columns">
+                <div tal:condition="form.error_message|form.errors|nothing" data-alert class="alert-box alert">
+                    <tal:block tal:condition="not:form.error_message|nothing" i18n:translate>The form contains errors. Please check the fields marked in red.</tal:block>
+                    <tal:block tal:condition="form.error_message|nothing" i18n:translate>${form.error_message}</tal:block>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="small-12 columns">
+                <span i18n:translate>
+                    Forgot your password?
+                </span>
+            </div>
+        </div>
+    </tal:block>
+</div>

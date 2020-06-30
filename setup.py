@@ -44,6 +44,7 @@ setup(
         'onegov.user',
         'onegov.winterthur',
         'onegov.wtfs',
+        'onegov.redesign_test'
     ],
     install_requires=[
         'AIS.py',
