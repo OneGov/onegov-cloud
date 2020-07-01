@@ -74,16 +74,38 @@ class BaseTheme(CoreTheme):
         return []
 
     @property
+    def use_flex(self):
+        return False
+
+    @property
+    def use_xy_grid(self):
+        return True
+
+    @property
+    def _grid_settings(self):
+        """Defines the settings that are grid related as in the mixin
+        foundation_everything. """
+
+        settings = []
+        if not self.use_flex:
+            settings.append('@include foundation-grid;')
+            settings.append('@include foundation-flex-classes;')
+        else:
+            if self.use_xy_grid:
+                settings.append('$xy-grid: true !global;')
+                settings.append('@include foundation-xy-grid-classes;')
+            else:
+                settings.append('@include foundation-flex-grid;')
+        return settings
+
+    @property
     def foundation_components(self):
-        """ Foundation components without the prefix as in app.scss that will
-        be included. """
+        """ Foundation components except the grid without the prefix as in
+        app.scss that will be included. """
         return (
             'global-styles',
             'forms',
             'typography',
-            'xy-grid-classes',
-            'grid',
-            # 'flex-grid',
             'button',
             'button-group',
             'close-button',
@@ -116,19 +138,26 @@ class BaseTheme(CoreTheme):
             'title-bar',
             'top-bar',
             'float-classes',
-            'flex-classes',
             'visibility-classes',
             'prototype-classes'
         )
 
     @property
     def imports(self):
-        """ All imports, including the foundation ones. Override with care. """
+        """ All imports, including the foundation ones except the grid
+        settings. Override with care. """
+
+        not_allowed = ('flex-classes', 'flex-grid', 'grid', 'xy-grid-classes')
+
+        assert all(
+            (cmp not in not_allowed for cmp in self.foundation_components)
+        ), 'Set settings with use_flex and use_xy_grid'
+
         return chain(
             (f"@import '{i}';" for i in self.pre_imports),
+            (option for option in self._grid_settings),
             (f"@include foundation-{i};" for i in self.foundation_components),
             (f"@import '{i}';" for i in self.post_imports),
-            # ('fixes', ),
         )
 
     @property
