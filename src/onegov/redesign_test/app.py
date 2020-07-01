@@ -1,5 +1,4 @@
 from onegov.core import Framework, utils
-from onegov.org import OrgApp
 from onegov.redesign_test.theme.foundation6_theme import RedesignTheme
 
 
@@ -12,7 +11,7 @@ def get_template_directory():
     return 'templates'
 
 
-@OrgApp.static_directory()
+@RedesignApp.static_directory()
 def get_static_directory():
     return 'static'
 
@@ -25,6 +24,11 @@ def get_theme():
 @RedesignApp.webasset_path()
 def get_js_path():
     return 'assets/js'
+
+
+@RedesignApp.webasset_path()
+def get_foundation_js_path():
+    return utils.module_path('onegov.foundation6', 'precompiled')
 
 
 @RedesignApp.webasset_path()
@@ -42,3 +46,8 @@ def get_i18n_localedirs():
     return [
         utils.module_path('onegov.redesign_test', 'locale'),
     ]
+
+
+@RedesignApp.webasset('foundation-js')
+def get_foundation_js_assets():
+    yield 'foundation.min.js'
