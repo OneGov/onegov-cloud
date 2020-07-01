@@ -40,18 +40,31 @@ def update():
         )
 
     os.chdir('foundation-update')
-    if not os.path.exists('node_modules'):
-        os.system('yarn build')
 
-    click.secho('Create a backup')
+    click.secho('Create a backup', fg='green')
     shutil.move(foundation_src, foundation_bkp)
-    shutil.move(js_file, js_file_bkp)
+    if os.path.isfile(js_file):
+        shutil.move(js_file, js_file_bkp)
 
-    click.secho('Copy files')
-    shutil.copytree('node_modules/foundation-sites/_vendor', foundation_src)
-    shutil.copytree('node_modules/foundation-sites/scss', foundation_src)
+    click.prompt('Conitue?')
+
+    click.secho('Copy scss files')
+    shutil.copytree('node_modules/foundation-sites/_vendor',
+                    os.path.join(foundation_src, '_vendor'))
+    shutil.copytree('node_modules/foundation-sites/scss',
+                    os.path.join(foundation_src, 'scss'))
+
+    click.secho('Bundle js file with gulp', fg='green')
+    os.system('yarn build')
 
     shutil.copyfile('dist/assets/js/app.js', js_file)
-    os.system('rm -rf /tmp/foundation-update')
+
+    # Finally we move the _settings from scss/settings on level above since
+    # otherwise the util import is wrong
+    old_settings = os.path.join(
+        foundation_src, 'scss', 'settings', '_settings.scss')
+    if os.path.isfile(old_settings):
+        shutil.move(old_settings, os.path.join(foundation_src, 'scss'))
+
     click.secho('Finished. Check differences in git now and run some tests',
                 fg='green')

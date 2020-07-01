@@ -198,8 +198,8 @@ class BaseTheme(CoreTheme):
 
         # As the mixins are not exported, we include them like in app.scss
         print('@charset "utf-8";', file=theme)
-        print("@import 'foundation/settings/settings';", file=theme)
-        print("@import 'foundation/foundation';", file=theme)
+        print("@import 'foundation/scss/settings';", file=theme)
+        print("@import 'foundation/scss/foundation';", file=theme)
 
         for key, value in _options.items():
             print(f"${key}: {value};", file=theme)
