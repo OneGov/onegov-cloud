@@ -1,4 +1,6 @@
 import os.path
+import textwrap
+
 import sass
 
 from collections import OrderedDict
@@ -73,39 +75,63 @@ class BaseTheme(CoreTheme):
         """
         return []
 
-    @property
-    def use_flex(self):
-        return False
+    use_prototype = False
+    use_flex = False
 
     @property
-    def use_xy_grid(self):
-        return True
+    def foundation_helpers(self):
+        return textwrap.dedent("""
+        @include foundation-float-classes;
+        @if $flex { @include foundation-flex-classes; }
+        @include foundation-visibility-classes;
+        @if $prototype { @include foundation-prototype-classes; }
+        """)
 
     @property
-    def _grid_settings(self):
+    def foundation_config_vars(self):
+        vars = []
+        vars.append(
+            f'$flex: {"true" if self.use_flex else "false"};\n'
+            f'$prototype: {"true" if self.use_prototype else "false"};\n'
+            '$xy-grid: $xy-grid;'
+        )
+
+        vars.append(textwrap.dedent("""
+            @if $flex {
+              $global-flexbox: true !global;
+            }    
+            @if $xy-grid {
+              $xy-grid: true !global;
+            }"""))
+        return vars
+
+    @property
+    def foundation_grid(self):
         """Defines the settings that are grid related as in the mixin
-        foundation_everything. """
+                foundation_everything. """
+        return textwrap.dedent("""
+        @if not $flex {
+          @include foundation-grid;
+        }
+        @else {
+          @if $xy-grid {
+            @include foundation-xy-grid-classes;
+          }
+          @else {
+            @include foundation-flex-grid;
+          }
+        }
+        """)
 
-        settings = []
-        if not self.use_flex:
-            settings.append('@include foundation-grid;')
-            settings.append('@include foundation-flex-classes;')
-        else:
-            if self.use_xy_grid:
-                settings.append('$xy-grid: true !global;')
-                settings.append('@include foundation-xy-grid-classes;')
-            else:
-                settings.append('@include foundation-flex-grid;')
-        return settings
+    @property
+    def foundation_styles(self):
+        return 'global-styles', 'forms', 'typography'
 
     @property
     def foundation_components(self):
         """ Foundation components except the grid without the prefix as in
-        app.scss that will be included. """
+        app.scss that will be included. Be aware that order matters."""
         return (
-            'global-styles',
-            'forms',
-            'typography',
             'button',
             'button-group',
             'close-button',
@@ -137,26 +163,34 @@ class BaseTheme(CoreTheme):
             'sticky',
             'title-bar',
             'top-bar',
-            'float-classes',
-            'visibility-classes',
-            'prototype-classes'
         )
 
     @property
     def imports(self):
         """ All imports, including the foundation ones except the grid
-        settings. Override with care. """
+        settings. Override with care. It is following the order of the
+        the mixin foundation-everything."""
 
-        not_allowed = ('flex-classes', 'flex-grid', 'grid', 'xy-grid-classes')
+        not_allowed = ('flex-classes', 'flex-grid', 'grid', 'xy-grid-classes',
+                       'visibility-classes', 'prototype-classes',
+                       'float-classes', 'global-styles', 'forms', 'typography')
+        for cmp in self.foundation_components:
+            assert cmp not in not_allowed, f'{cmp} not supposed to go in here'
 
-        assert all(
-            (cmp not in not_allowed for cmp in self.foundation_components)
-        ), 'Set settings with use_flex and use_xy_grid'
+        initial_imports = (
+            '@charset "utf-8";',
+            "@import 'foundation/scss/settings';",
+            "@import 'foundation/scss/foundation';"
+        )
 
         return chain(
             (f"@import '{i}';" for i in self.pre_imports),
-            (option for option in self._grid_settings),
+            initial_imports,
+            (var_ for var_ in self.foundation_config_vars),
+            (f'@include foundation-{i};' for i in self.foundation_styles),
+            (self.foundation_grid, ),
             (f"@include foundation-{i};" for i in self.foundation_components),
+            (self.foundation_helpers, ),
             (f"@import '{i}';" for i in self.post_imports),
         )
 
@@ -196,15 +230,11 @@ class BaseTheme(CoreTheme):
 
         theme = StringIO()
 
-        # As the mixins are not exported, we include them like in app.scss
-        print('@charset "utf-8";', file=theme)
-        print("@import 'foundation/scss/settings';", file=theme)
-        print("@import 'foundation/scss/foundation';", file=theme)
-
         for key, value in _options.items():
             print(f"${key}: {value};", file=theme)
 
         print("\n".join(self.imports), file=theme)
+        print("\n".join(self.imports))
 
         paths = self.extra_search_paths
         paths.append(self.foundation_path)
