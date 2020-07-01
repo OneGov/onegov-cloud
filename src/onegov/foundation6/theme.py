@@ -227,7 +227,7 @@ class Theme(BaseTheme):
         from onegov.core import Framework
         from onegov.foundation import Theme
 
-        class App(Framework):
+        class App(FoundationApp):
             theme_options = {
                 'rowWidth': '1200px'
             }
