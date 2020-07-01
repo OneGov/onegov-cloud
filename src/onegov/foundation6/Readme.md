@@ -6,7 +6,7 @@ The source files were copied out of a `node_modules` folder using the
     npm install foundation-sites
     foundation new --framework sites --template zurb
     
-To update, copy contents of `node_modules/foundation_sites/scss` to foundation6/foundation/foundation.
+To update, use the provided command `onegov-foundation upgrade`.
 
     
 ## External dependencies

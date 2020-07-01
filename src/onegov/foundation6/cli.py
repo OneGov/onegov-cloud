@@ -24,19 +24,34 @@ def update():
         click.secho('Install yarn package manager')
         sys.exit()
 
+    foundation_src = module_path('onegov.foundation6', 'foundation/foundation')
+    foundation_bkp = module_path(
+        'onegov.foundation6', 'foundation/foundation.bak')
+    foundation_js = module_path('onegov.foundation6', 'precompiled')
+    js_name = 'foundation.min.js'
+    js_file = os.path.join(foundation_js, js_name)
+    js_file_bkp = os.path.join(foundation_js, js_name + '.bak')
+
     os.chdir('/tmp')
-    click.secho('Create dummy foundation project', fg='green')
-    os.system(
-        'echo foundation-update | '
-        'foundation new --framework sites --template zurb'
-    )
+    if not os.path.exists('/tmp/foundation-update'):
+        os.system(
+            'echo foundation-update | '
+            'foundation new --framework sites --template zurb'
+        )
+
     os.chdir('foundation-update')
-    os.system('yarn build')
-    click.secho('Copy scss and bundled javascript', fg='green')
-    shutil.copy('node_modules/foundation_sites/scss',
-                module_path('onegov.foundation6', 'foundation/foundation'))
-    shutil.copy('test-pr/dist/assets/js/app.js',
-                module_path('onegov.foundation6', 'precompiled'))
-    os.system('rm -rf foundation-update')
+    if not os.path.exists('node_modules'):
+        os.system('yarn build')
+
+    click.secho('Create a backup')
+    shutil.move(foundation_src, foundation_bkp)
+    shutil.move(js_file, js_file_bkp)
+
+    click.secho('Copy files')
+    shutil.copytree('node_modules/foundation-sites/_vendor', foundation_src)
+    shutil.copytree('node_modules/foundation-sites/scss', foundation_src)
+
+    shutil.copyfile('dist/assets/js/app.js', js_file)
+    os.system('rm -rf /tmp/foundation-update')
     click.secho('Finished. Check differences in git now and run some tests',
                 fg='green')
