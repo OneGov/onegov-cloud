@@ -66,5 +66,5 @@ def update():
     if os.path.isfile(old_settings):
         shutil.move(old_settings, os.path.join(foundation_src, 'scss'))
 
-    click.secho('Finished. Check differences in git now and run some tests',
-                fg='green')
+    click.secho('Finished.', fg='green')
+    click.secho('Remove .bak folder/file manually.', fg='green')
