@@ -35,27 +35,6 @@
     </script>
 </head>
 <body>
-    <main class="row">
-        <div class="columns small-12">
-            <div class="row">
-                <div class="small-12 columns" id="alert-boxes">
-                    <div tal:repeat="message request.consume_messages()" data-alert class="alert-box ${message.type}">
-                        <tal:block tal:content="structure message.text" />
-                        <a href="#" class="close">&times;</a>
-                    </div>
-                    <div i18n:translate tal:condition="request.agent['user_agent']['family'] == 'IE'" data-alert class="alert-box warning">
-                        This webpage is best viewed with a modern Browser. Consider to use Chrome, Firefox or Edge.
-                        <a href="#" class="close">&times;</a>
-                    </div>
-
-                </div>
-            </div>
-            <div class="row">
-                <div class="columns small-12">
-                    <div metal:define-slot="content"></div>
-                </div>
-            </div>
-        </div>
-    </main>
+<div metal:define-slot="content"></div>
 </body>
 </html>
