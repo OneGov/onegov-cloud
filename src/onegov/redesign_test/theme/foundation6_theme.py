@@ -4,6 +4,7 @@ from onegov.foundation6 import BaseTheme
 
 class RedesignTheme(BaseTheme):
     name = 'onegov.test.foundation6'
+    use_flex = True
 
     @property
     def extra_search_paths(self):
