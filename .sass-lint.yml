@@ -22,5 +22,6 @@ files:
   ignore:
     - '**/font-awesome/scss/*.scss'
     - '**/foundation/*/*.scss'
+    - '**/foundation6/foundation/**/**/*.scss'
     - '**/font-*.scss'
     - '**/fonts/*.scss'
