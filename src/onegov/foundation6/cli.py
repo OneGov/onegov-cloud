@@ -46,8 +46,6 @@ def update():
     if os.path.isfile(js_file):
         shutil.move(js_file, js_file_bkp)
 
-    click.prompt('Conitue?')
-
     click.secho('Copy scss files')
     shutil.copytree('node_modules/foundation-sites/_vendor',
                     os.path.join(foundation_src, '_vendor'))
