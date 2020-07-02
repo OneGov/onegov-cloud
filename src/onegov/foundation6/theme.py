@@ -99,7 +99,7 @@ class BaseTheme(CoreTheme):
         vars.append(textwrap.dedent("""
             @if $flex {
               $global-flexbox: true !global;
-            }    
+            }
             @if $xy-grid {
               $xy-grid: true !global;
             }"""))
