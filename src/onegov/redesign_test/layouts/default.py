@@ -1,8 +1,5 @@
-from onegov.core.layout import ChameleonLayout
+from onegov.foundation6.integration import FoundationLayout
 
 
-class DefaultLayout(ChameleonLayout):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.request.include('foundation-js')
+class DefaultLayout(FoundationLayout):
+    pass

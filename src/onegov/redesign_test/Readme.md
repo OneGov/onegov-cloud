@@ -11,3 +11,6 @@ Launch a new bootstrap project by
 Compare the results with:
 
     http://127.0.0.1:8080/onegov_redesign_test/
+
+This app also shows how to integrate foundation6. Just inherit from `FoundatioApp` instead of `Framework` 
+and inherit from `FoundationLayout` instead of `ChameleonLayout`.
