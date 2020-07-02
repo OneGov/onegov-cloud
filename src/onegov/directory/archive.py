@@ -107,11 +107,12 @@ class DirectoryArchiveReader(object):
             Called with the newly added entry, right after it has been added.
 
         """
-
-        directory = target or Directory()
+        meta_data = self.read_metadata()
+        directory = target or Directory.get_polymorphic_class(
+            meta_data.get('type'), Directory)()
 
         if apply_metadata:
-            self.apply_metadata(directory, self.read_metadata())
+            directory = self.apply_metadata(directory, meta_data)
 
         if skip_existing and target:
             existing = {
@@ -171,7 +172,6 @@ class DirectoryArchiveReader(object):
 
         directory.title = metadata['title']
         directory.lead = metadata['lead']
-        directory.type = metadata['type']
         directory.structure = metadata['structure']
         directory.configuration = DirectoryConfiguration(
             **metadata['configuration']
