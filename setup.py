@@ -44,6 +44,7 @@ setup(
         'onegov.user',
         'onegov.winterthur',
         'onegov.wtfs',
+        'onegov.redesign_test'
     ],
     install_requires=[
         'AIS.py',
@@ -157,6 +158,7 @@ setup(
             'lingua==3.12',
             'gitpython==3.0.9',
             'honyaku@git+https://github.com/seantis/honyaku#egg=honyaku',
+            'flake8'
         ],
         'docs': [
             'alabaster',
@@ -207,6 +209,7 @@ setup(
             'onegov-election-day=onegov.election_day.cli:cli',
             'onegov-event=onegov.event.cli:cli',
             'onegov-feriennet=onegov.feriennet.cli:cli',
+            'onegov-foundation=onegov.foundation6.cli:cli',
             'onegov-fsi=onegov.fsi.cli:cli',
             'onegov-gazette=onegov.gazette.cli:cli',
             'onegov-org=onegov.org.cli:cli',

@@ -75,7 +75,7 @@ class Theme(object):
 
     @property
     def default_options(self):
-        """ The default options of the theme, will be overritten by options
+        """ The default options of the theme, will be overwritten by options
         passed to :meth:`compile`.
 
         """
