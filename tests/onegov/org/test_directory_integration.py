@@ -37,6 +37,7 @@ class DummyRequest:
 
 
 @pytest.mark.parametrize('export_fmt,apply_metadata', [
+    ('csv', True),
     ('json', False),
     ('json', True),
 ])
