@@ -38,6 +38,9 @@ class DummyRequest:
 
 @pytest.mark.parametrize('export_fmt,apply_metadata', [
     ('csv', True),
+    ('csv', False),
+    ('xlsx', True),
+    ('xlsx', False),
     ('json', False),
     ('json', True),
 ])
@@ -74,28 +77,11 @@ def test_directory_roundtrip(
 
     events = directories.by_name('events')
 
-    archive = DirectoryZipArchive(temporary_path / 'archive.zip', export_fmt)
-    archive.write(events)
-
-    archive = DirectoryZipArchive.from_buffer(
-        (temporary_path / 'archive.zip').open('rb'))
-
-    directory = archive.read()
-    assert directory.type == 'extended'
-    assert isinstance(directory, ExtendedDirectory)
-
-    assert directory.title == "Events"
-    assert directory.lead == "The town's events"
-    assert directory.structure == dir_structure
-    assert len(directory.entries) == 1
-
-    # Now export as in view_zip_file in views
-
     def transform(key, value):
         return formatter(key), formatter(value)
 
     request = DummyRequest(session)
-    self = DirectoryEntryCollection(directory, type='extended')
+    self = DirectoryEntryCollection(events, type='extended')
     layout = DirectoryEntryCollectionLayout(self, request)
     formatter = layout.export_formatter(export_fmt)
 
@@ -104,7 +90,7 @@ def test_directory_roundtrip(
             temporary_path / f'{f.name}.zip', export_fmt, transform)
         archive.write(self.directory)
 
-    read_archive = DirectoryZipArchive.from_buffer(
+    archive = DirectoryZipArchive.from_buffer(
         (temporary_path / f'{f.name}.zip').open('rb'))
 
     count = 0
@@ -114,7 +100,7 @@ def test_directory_roundtrip(
         count += 1
 
     # Test add only new ones
-    read_directory = read_archive.read(
+    read_directory = archive.read(
         target=events,
         skip_existing=True,
         apply_metadata=apply_metadata,
