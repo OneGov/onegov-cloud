@@ -1,10 +1,12 @@
 from tempfile import NamedTemporaryFile
 
+import pytest
 import transaction
 
 from onegov.core.utils import Bunch
 from onegov.directory import DirectoryCollection, DirectoryConfiguration, \
     DirectoryZipArchive, DirectoryEntryCollection
+from onegov.org.forms import DirectoryImportForm
 from onegov.org.layout import DirectoryEntryCollectionLayout
 from onegov.org.models import ExtendedDirectory
 
@@ -34,8 +36,12 @@ class DummyRequest:
         return True
 
 
-def test_directory_roundtrip(session, temporary_path):
-    export_fmt = 'json'
+@pytest.mark.parametrize('export_fmt,apply_metadata', [
+    ('json', False),
+    ('json', True),
+])
+def test_directory_roundtrip(
+        session, temporary_path, export_fmt, apply_metadata):
     directories = DirectoryCollection(session, type='extended')
     dir_structure = "Name *= ___\nContact (for infos) = ___"
     events = directories.add(
@@ -80,7 +86,6 @@ def test_directory_roundtrip(session, temporary_path):
     assert directory.title == "Events"
     assert directory.lead == "The town's events"
     assert directory.structure == dir_structure
-    assert directory.fields[1].id == 'contact_for_infos_'
     assert len(directory.entries) == 1
 
     # Now export as in view_zip_file in views
@@ -97,3 +102,24 @@ def test_directory_roundtrip(session, temporary_path):
         archive = DirectoryZipArchive(
             temporary_path / f'{f.name}.zip', export_fmt, transform)
         archive.write(self.directory)
+
+    read_archive = DirectoryZipArchive.from_buffer(
+        (temporary_path / f'{f.name}.zip').open('rb'))
+
+    count = 0
+
+    def count_entry(entry):
+        nonlocal count
+        count += 1
+
+    # Test add only new ones
+    read_directory = read_archive.read(
+        target=events,
+        skip_existing=True,
+        apply_metadata=apply_metadata,
+        after_import=count_entry
+    )
+    assert count == 0
+    # Even though the metadata is not applied, the correct polymorphic class
+    # has been loaded using the metadata. So the type gets always applied.
+    assert read_directory.type == 'extended'
