@@ -166,36 +166,6 @@ def test_archive_import(session, temporary_path, archive_format):
     assert initech.files[0].name == 'initech.png'
 
 
-def test_zip_archive_from_buffer(session, temporary_path):
-    directories = DirectoryCollection(session)
-    businesses = directories.add(
-        title="Businesses",
-        lead="The town's businesses",
-        structure="Name *= ___",
-        configuration=DirectoryConfiguration(
-            title="[name]",
-            order=['name']
-        )
-    )
-
-    businesses.add(values=dict(name="Aesir Corp."))
-    transaction.commit()
-
-    businesses = directories.by_name('businesses')
-
-    archive = DirectoryZipArchive(temporary_path / 'archive.zip', 'json')
-    archive.write(businesses)
-
-    archive = DirectoryZipArchive.from_buffer(
-        (temporary_path / 'archive.zip').open('rb'))
-
-    directory = archive.read()
-    assert directory.title == "Businesses"
-    assert directory.lead == "The town's businesses"
-    assert directory.structure == "Name *= ___"
-    assert len(directory.entries) == 1
-
-
 def test_corodinates(session, temporary_path):
     directories = DirectoryCollection(session)
     points = directories.add(
