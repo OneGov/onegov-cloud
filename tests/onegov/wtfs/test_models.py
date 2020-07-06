@@ -436,15 +436,26 @@ def test_daily_list_boxes_and_forms(session):
 
 
 def test_report_boxes(session):
-    # Todo
     def _report(start, end):
         return ReportBoxes(session, start=start, end=end)
 
     report = _report(date.today(), date.today())
     assert report.query().all() == []
     assert report.total() == (0, 0, 0, 0)
+    assert report.query_results() == []
+    assert report.query_total() == (0, 0, 0, 0)
 
     add_report_data(session)
+
+    report = _report(date(2019, 5, 2), date(2020, 1, 4))
+    assert report.query().all()[0] == (
+        'Testikon',
+        0,
+        1+4+1,
+        2+5+2,
+        3+6+3,
+        3*10
+    )
 
     report = _report(date(2019, 1, 1), date(2019, 1, 1))
     assert report.query().all() == [
