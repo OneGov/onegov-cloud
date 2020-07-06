@@ -328,9 +328,20 @@ def test_report_query(session):
     ]
     assert results[0].return_scanned_tax_forms == 21
 
-    mod_results = report.transform_query(report.query())
+    assert 'name' in report.transformed_entry._fields
+    assert 'bfs_number' in report.transformed_entry._fields
+    mod_results = report.query_results()
+
     assert len(mod_results) == 1
+    assert report.year_dict == {
+        'older_2017': 0,
+        'older_2018': 0,
+        '2018': 0,
+        '2019': 0,
+        '2020': 0
+    }
     result = mod_results[0]
+    # Short overview of jobs to add up
     # 'jobs': [
     #     [date(2019, 5, 2), 1, 2, 3, date(2019, 5, 4), 10],
     #     [date(2019, 5, 3), 4, 5, 6, date(2019, 5, 5), 10],
@@ -342,6 +353,17 @@ def test_report_query(session):
     assert result.return_boxes == 30
     assert result.return_scanned_tax_forms == 21 + 6
     assert result.return_scanned_tax_forms_by_year == {
+        'older_2017': 1 + 4,
+        'older_2018': 1,
+        '2018': 2 + 5,
+        '2019': 3 + 6 + 2,
+        '2020': 3
+    }
+    totals = report.query_total()
+    assert totals.return_scanned_single_documents == 30
+    assert totals.return_boxes == 30
+    assert totals.return_scanned_tax_forms == 21 + 6
+    assert totals.return_scanned_tax_forms_by_year == {
         'older_2017': 1 + 4,
         'older_2018': 1,
         '2018': 2 + 5,
