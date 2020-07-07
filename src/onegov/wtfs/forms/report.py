@@ -69,7 +69,7 @@ class ReportSelectionForm(Form):
 
             if self.end.data < self.start.data:
                 self.start.errors.append(
-                    _("Start must begin before end"))
+                    _("Start date is after end date"))
                 return False
 
             if self.end.data.year > self.start.data.year + 2:
