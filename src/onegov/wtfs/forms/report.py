@@ -70,11 +70,13 @@ class ReportSelectionForm(Form):
             if self.end.data < self.start.data:
                 self.start.errors.append(
                     _("Start must begin before end"))
+                return False
 
             if self.end.data.year > self.start.data.year + 2:
                 self.end.errors.append(
                     _("Please limit your report to 2 years")
                 )
+                return False
 
     def on_request(self):
         query = self.request.session.query(

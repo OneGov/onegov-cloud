@@ -86,11 +86,11 @@ class ScanJob(Base, TimestampMixin, ContentMixin):
 
     @hybrid_property
     def year(self):
-        return self.return_date.year
+        return self.dispatch_date.year
 
     @year.expression
     def year(cls):
-        return extract('year', cls.return_date)
+        return extract('year', cls.dispatch_date)
 
     @hybrid_property
     def return_tax_forms(self):
