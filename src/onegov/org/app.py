@@ -10,6 +10,7 @@ from onegov.core.i18n import default_locale_negotiator
 from onegov.core.orm import orm_cached
 from onegov.file import DepotApp
 from onegov.form import FormApp
+from onegov.foundation6.integration import FoundationApp
 from onegov.gis import MapboxApp
 from onegov.org import directives
 from onegov.org.homepage_widgets import transform_homepage_structure
@@ -28,7 +29,7 @@ from purl import URL
 from sqlalchemy import desc
 
 
-class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
+class OrgApp(FoundationApp, LibresIntegration, ElasticsearchApp, MapboxApp,
              DepotApp, PayApp, FormApp, UserApp):
 
     serve_static_files = True

@@ -21,6 +21,7 @@ from onegov.directory import DirectoryEntryCollection
 from onegov.event import OccurrenceCollection
 from onegov.file import File
 from onegov.form import FormCollection, as_internal_id
+from onegov.foundation6.integration import FoundationLayout
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org import _
 from onegov.org import utils
@@ -50,7 +51,7 @@ from sedate import to_timezone
 capitalised_name = re.compile(r'[A-Z]{1}[a-z]+')
 
 
-class Layout(ChameleonLayout):
+class Layout(FoundationLayout):
     """ Contains methods to render a page inheriting from layout.pt.
 
     All pages inheriting from layout.pt rely on this class being present
