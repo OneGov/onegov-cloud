@@ -184,8 +184,8 @@ class BaseTheme(CoreTheme):
         )
 
         return chain(
-            (f"@import '{i}';" for i in self.pre_imports),
             initial_imports,
+            (f"@import '{i}';" for i in self.pre_imports),
             (var_ for var_ in self.foundation_config_vars),
             (f'@include foundation-{i};' for i in self.foundation_styles),
             (self.foundation_grid, ),
