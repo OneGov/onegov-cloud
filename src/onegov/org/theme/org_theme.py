@@ -1,7 +1,7 @@
 import os
 from collections import OrderedDict
 
-from onegov.foundation import BaseTheme
+from onegov.foundation6 import BaseTheme
 from onegov.core.utils import module_path
 
 HELVETICA = '"Helvetica Neue", Helvetica, Roboto, Arial, sans-serif !default;'
@@ -26,7 +26,7 @@ default_font_families = {
 
 
 class OrgTheme(BaseTheme):
-    name = 'onegov.org.foundation'
+    name = 'onegov.org.foundation6'
 
     _force_compile = False
 
