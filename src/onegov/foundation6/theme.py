@@ -179,7 +179,7 @@ class BaseTheme(CoreTheme):
 
         initial_imports = (
             '@charset "utf-8";',
-            "@import 'foundation/scss/settings';",
+            "@import 'foundation/scss/_settings';",
             "@import 'foundation/scss/foundation';"
         )
 
