@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-07-09 08:45+0200\n"
+"POT-Creation-Date: 2020-07-09 09:51+0200\n"
 "PO-Revision-Date: 2020-05-10 10:56+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -861,8 +861,8 @@ msgstr "Link zum Logo"
 msgid "Logo (Square)"
 msgstr "Logo (Quadratisch)"
 
-msgid "E-Mail Reply Address"
-msgstr "E-Mail Antwort Adresse"
+msgid "E-Mail Reply Address (Reply-To)"
+msgstr "E-Mail Antwort Adresse (Reply-To)"
 
 msgid "Replies to automated e-mails go to this address."
 msgstr "Antworten an automatisch generierte E-Mails gehen an diese Adresse."
@@ -4045,6 +4045,9 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "E-Mail Reply Address"
+#~ msgstr "E-Mail Antwort Adresse"
 
 #~ msgid ""
 #~ "The feature to automatically close tickets and accept their items is "

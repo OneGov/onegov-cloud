@@ -42,7 +42,7 @@ class GeneralSettingsForm(Form):
         render_kw={'class_': 'image-url'})
 
     reply_to = EmailField(
-        _("E-Mail Reply Address"), [validators.InputRequired()],
+        _("E-Mail Reply Address (Reply-To)"), [validators.InputRequired()],
         description=_("Replies to automated e-mails go to this address."))
 
     primary_color = ColorField(
