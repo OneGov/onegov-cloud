@@ -44,6 +44,12 @@ class BaseTheme(CoreTheme):
 
     If your variables rely on a certain order you need to pass an ordered dict.
 
+    If use_flex is set to False on the theme itself,
+    the float grid is used instead.
+
+    If $xy-grid is set to false by the subclassing theme,
+     the flex grid is used.
+
     """
 
     def __init__(self, compress=True):
