@@ -99,7 +99,8 @@ class FormDefinitionCollection(object):
 
         return form
 
-    def delete(self, name, with_submissions=False):
+    def delete(self, name, with_submissions=False,
+               with_registration_windows=False):
         """ Delete the given form. Only possible if there are no submissions
         associated with it, or if ``with_submissions`` is True.
 
@@ -114,6 +115,12 @@ class FormDefinitionCollection(object):
             submissions = submissions.filter(FormSubmission.state == 'pending')
 
         submissions.delete()
+
+        if with_registration_windows:
+            registration_windows = self.session.query(FormRegistrationWindow)
+            registration_windows = registration_windows.filter_by(name=name)
+            registration_windows.delete()
+            self.session.flush()
 
         # this will fail if there are any submissions left
         self.query().filter(FormDefinition.name == name).delete('fetch')
