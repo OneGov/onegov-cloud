@@ -59,9 +59,9 @@
 /*
     Fixes a foundation js error
 */
-.foundation-data-attribute-namespace {
-    font-family: false;
-}
+//.foundation-data-attribute-namespace {
+//    font-family: false;
+//}
 
 /*
     The maximum width of a line relative to the font. This limits textblocks
@@ -82,9 +82,9 @@ $full-width-banner-height: 333px;
     Zurb foundation uses this without !import, which causes IE11 to not
     apply the placeholder color.
 */
-:-ms-input-placeholder {
-    color: $input-placeholder-font-color !important;
-}
+//:-ms-input-placeholder {
+//    color: $input-placeholder-font-color !important;
+//}
 
 /*
     Links without href and no role should not show the cursor
@@ -230,18 +230,47 @@ input[type="date"]::-webkit-inner-spin-button {
 }
 
 /*
-    Heading sizes
+    Base Typography
 */
+
+$h1-font-size: rem-calc(44) !default;
+$h2-font-size: rem-calc(37) !default;
+$h3-font-size: rem-calc(27) !default;
+$h4-font-size: rem-calc(23) !default;
+$h5-font-size: rem-calc(18) !default;
+$h6-font-size: 1rem !default;
+
+$h1-font-reduction: 24;
+$h2-font-reduction: 20;
+$h3-font-reduction: 12;
+$h4-font-reduction: 7;
+$h5-font-reduction: 3;
+$h6-font-reduction: 0;
+
+$header-styles: (
+  small: (
+    'h1': ('font-size': $h1-font-size - $h1-font-reduction),
+    'h2': ('font-size': $h2-font-size - $h2-font-reduction),
+    'h3': ('font-size': $h3-font-size - $h3-font-reduction),
+    'h4': ('font-size': $h4-font-size - $h4-font-reduction),
+    'h5': ('font-size': $h5-font-size - $h5-font-reduction),
+    'h6': ('font-size': $h6-font-size - $h6-font-reduction),
+  ),
+  medium: (
+    'h1': ('font-size': $h1-font-size),
+    'h2': ('font-size': $h2-font-size),
+    'h3': ('font-size': $h3-font-size),
+    'h4': ('font-size': $h4-font-size),
+    'h5': ('font-size': $h5-font-size),
+    'h6': ('font-size': $h6-font-size),
+  ),
+);
+
 .h1-size { font-size: $h1-font-size - $h1-font-reduction; }
-
 .h2-size { font-size: $h2-font-size - $h2-font-reduction; }
-
 .h3-size { font-size: $h3-font-size - $h3-font-reduction; }
-
 .h4-size { font-size: $h4-font-size - $h4-font-reduction; }
-
 .h5-size { font-size: $h5-font-size - $h5-font-reduction; }
-
 .h6-size { font-size: $h6-font-size - $h6-font-reduction; }
 
 @media #{$medium-up} {
@@ -278,6 +307,7 @@ $globals-height: 2.5rem;
     margin-bottom: $globals-margin;
     min-height: $globals-height;
     width: 100%;
+    padding: 2rem;
 
     .row > .columns > ul {
         list-style: none;
@@ -430,9 +460,9 @@ del {
         margin-top: 1.5rem;
     }
 
-    h2 {
-        font-size: $h3-font-size;
-    }
+    //h2 {
+    //    font-size: $h3-font-size;
+    //}
 
     input[type="submit"] {
         width: 100%;
@@ -469,7 +499,7 @@ del {
     blank (uncolored) labels
 */
 .blank-label {
-    @include label($bg: $white);
+    //@include label($bg: $white);
     border: 1px solid $gray;
     font-size: .8rem;
     margin: 0 4px 7px 0;
@@ -806,7 +836,7 @@ form {
     }
 
     .group-label {
-        color: $form-label-font-color;
+        color: $form-label-color;
         font-size: $form-label-font-size;
     }
 
@@ -887,7 +917,7 @@ form {
         padding: 0;
 
         legend {
-            color: $input-font-color;
+            color: $input-color;
             font-size: $input-font-size;
             margin-bottom: .75rem;
             padding: 0 .75rem;
@@ -983,7 +1013,7 @@ form {
 
         // focused is a class because the wrapper doesn't get ':focus'
         &.focused {
-            border-color: $input-focus-border-color;
+            border-color: $select-triangle-color;
         }
     }
 
@@ -1001,9 +1031,9 @@ form {
 
     .code-editor {
         &.read-only {
-            background-color: $input-disabled-bg;
+            background-color: $input-background-disabled;
             color: $steel;
-            cursor: $input-disabled-cursor;
+            cursor: $input-cursor-disabled;
         }
     }
 
@@ -1015,11 +1045,11 @@ form {
     }
 
     .ace_scroller {
-        box-shadow: $input-box-shadow;
+        box-shadow: $input-shadow;
     }
 
     .focused .ace_scroller {
-        background: $input-focus-bg-color;
+        background: $input-background-focus;
     }
 
     .ace-syntax-error {
@@ -1704,7 +1734,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     }
 
     .label-text {
-        color: $form-label-font-color;
+        color: $form-label-color;
         display: inline-block;
         font-size: .875rem;
         margin-right: 1rem;
@@ -1736,7 +1766,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
             padding-right: 10px;
 
             &::after {
-                color: $form-label-font-color;
+                color: $form-label-color;
                 content: '-';
                 font-size: .875rem;
                 position: absolute;
@@ -1782,7 +1812,7 @@ h2 + .image-grid {
     position: relative;
 
     .delete {
-        background-color: $input-disabled-bg;
+        background-color: $input-background-disabled;
         border-radius: 15px;
         color: $button-font-color;
         height: 27px;
@@ -2408,12 +2438,15 @@ $ticket-number-bg: $yellow-light;
     font-weight: bold;
 }
 
+
+
 .ticket-number {
-    @include label(
-        $padding: .25rem .5rem,
-        $text-size: 1rem,
-        $bg: $ticket-number-bg
-    );
+    //@include label(
+    //    $padding: .25rem .5rem,
+    //    $text-size: 1rem,
+    //    $bg: $ticket-number-bg
+    //);
+    @include label;
     font-family: $font-family-monospace;
 }
 
@@ -2422,27 +2455,30 @@ $ticket-number-bg: $yellow-light;
 }
 
 .ticket-state-open {
-    @include label(
-        $padding: .25rem .5rem,
-        $text-size: 1rem,
-        $bg: $open-ticket-bg
-    );
+    //@include label(
+    //    $padding: .25rem .5rem,
+    //    $text-size: 1rem,
+    //    $bg: $open-ticket-bg
+    //);
+    @include label;
 }
 
 .ticket-state-pending {
-    @include label(
-        $padding: .25rem .5rem,
-        $text-size: 1rem,
-        $bg: $pending-ticket-bg
-    );
+    //@include label(
+    //    $padding: .25rem .5rem,
+    //    $text-size: 1rem,
+    //    $bg: $pending-ticket-bg
+    //);
+    @include label;
 }
 
 .ticket-state-closed {
-    @include label(
-        $padding: .25rem .5rem,
-        $text-size: 1rem,
-        $bg: $closed-ticket-bg
-    );
+    //@include label(
+    //    $padding: .25rem .5rem,
+    //    $text-size: 1rem,
+    //    $bg: $closed-ticket-bg
+    //);
+    @include label;
 }
 
 .ticket-timeline .message .title {
@@ -2596,10 +2632,10 @@ tr.ticket:hover {
 }
 
 .ticket-button {
-    @include button(
-        $padding: $button-tny,
-        $bg: $success-color
-    );
+    //@include button(
+    //    $padding: $button-tny,
+    //    $bg: $success-color
+    //);
     font-size: 1em;
     margin: 0;
 }
@@ -2944,10 +2980,10 @@ button {
 
     .fc button,
     .fc-button {
-        @include button(
-            $padding: $button-tny,
-            $bg: $smoke
-        );
+        //@include button(
+        //    $padding: $button-tny,
+        //    $bg: $smoke
+        //);
         background-image: none;
         box-shadow: none;
         font-size: .9rem;
@@ -3194,7 +3230,8 @@ button {
     }
 
     .occurrence > div:first-child {
-        margin-left: -($column-gutter / 2);
+        //margin-left: -($column-gutter / 2);
+        margin-left: -(50px / 2);
     }
 }
 
@@ -3404,7 +3441,7 @@ button {
         $size: 1rem;
 
         background: transparent;
-        color: $input-font-color;
+        color: $input-color;
         position: absolute;
         right: $size / 2;
         top: calc(50% - #{$size / 2});
@@ -3480,7 +3517,7 @@ ul.search-results {
     }
 
     a {
-        color: $input-font-color;
+        color: $input-color;
         display: block;
         font-size: $input-font-size;
     }
@@ -3642,7 +3679,7 @@ ul.search-results {
     padding: 1em;
 
     * {
-        color: $form-label-font-color;
+        color: $form-label-color;
         font-size: $form-label-font-size;
     }
 
@@ -4890,7 +4927,7 @@ h2 + div.timeline {
     Custom record submission
 */
 .submit-yours {
-    @include panel;
+    //@include panel;
     @include smooth-edges;
 
     padding: 1rem 1rem .5rem;
@@ -5048,7 +5085,8 @@ h2 + div.timeline {
 
     th span {
         @include circle;
-        @include label($bg: $white);
+        //@include label($bg: $white);
+        @include label;
         @include primary-color-background;
 
         border: 1px solid $primary-color;
@@ -5832,7 +5870,7 @@ h2 + div.timeline {
 .footer-partner {
     margin: 0 auto;
     max-width: $row-width;
-    padding: 0 $column-gutter / 2;
+    padding: 0 50px / 2;
 
     ul {
         display: flex;
@@ -5843,9 +5881,9 @@ h2 + div.timeline {
         li {
             background-color: $white;
             border: 1px solid #efefef;
-            margin-right: $column-gutter / 2;
-            padding: $column-gutter / 2;
-            width: calc(25% - #{$column-gutter} / 8 * 3);
+            margin-right: 50px / 2;
+            padding: 50px / 2;
+            width: calc(25% - #{50px} / 8 * 3);
         }
 
         li:last-child {
@@ -5854,7 +5892,7 @@ h2 + div.timeline {
 
         @media #{$small-only} {
             li {
-                margin-bottom: $column-gutter / 2;
+                margin-bottom: 50px / 2;
                 margin-right: 0;
                 width: 100%;
             }

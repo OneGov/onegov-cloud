@@ -46,35 +46,37 @@ class OrgTheme(BaseTheme):
         return options
 
     @property
+    def foundation_styles(self):
+        return 'global-styles', 'forms', 'typography'
+
+    @property
     def foundation_components(self):
         return (
-            'grid',
             'accordion',
-            'alert-boxes',
-            'block-grid',
+            # 'alert-boxes',
+            # 'block-grid',
             'breadcrumbs',
-            'button-groups',
-            'buttons',
-            'dropdown',
-            'dropdown-buttons',
-            'forms',
-            'inline-lists',
-            'labels',
+            'button-group',
+            'button',
+            'dropdown-menu',
+            # 'dropdown-buttons',
+            # 'inline-lists',
+            'label',
             'orbit',
             'pagination',
-            'panels',
-            'progress-bars',
+            # 'panel',
+            'progress-bar',
             'reveal',
-            'side-nav',
-            'switches',
-            'split-buttons',
-            'sub-nav',
-            'tables',
-            'thumbs',
-            'tooltips',
+            # 'side-nav',
+            'switch',
+            # 'split-buttons',
+            # 'sub-nav',
+            'table',
+            # 'thumbs',
+            'tooltip',
             'top-bar',
-            'type',
-            'visibility',
+            # 'type',
+            # 'visibility',
         )
 
     @property
