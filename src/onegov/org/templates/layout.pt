@@ -75,7 +75,7 @@
       <main>
 
         <header>
-          <div class="globals">
+          <div id="top-bar" class="globals">
             <div class="row">
               <div class="columns small-12">
                 <ul tal:condition="global_tools|nothing">
