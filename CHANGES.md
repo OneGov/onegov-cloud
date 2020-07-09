@@ -1,8 +1,22 @@
 # Changes
 
+## Release `2020.64`
+
+> commits: **5 / [8eedf97eda...4138cbdecb](https://github.com/OneGov/onegov-cloud/compare/8eedf97eda^...4138cbdecb)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.64)](https://buildkite.com/seantis/onegov-cloud)
+
+### Wtfs
+
+🐞 **Fixes reports spanning over a year**
+
+Adaption of all except one report view. Boxes and Forms are now added correctly being taking into account of the sending date.
+
+**`Bugfix`** | **[SA-53](https://stadt-winterthur.atlassian.net/browse/SA-53)** | **[4138cbdecb](https://github.com/onegov/onegov-cloud/commit/4138cbdecbb82e39f29bd6b4044b5426cc3a9127)**
+
 ## Release `2020.63`
 
-> commits: **1 / [e0b7235d3f...e0b7235d3f](https://github.com/OneGov/onegov-cloud/compare/e0b7235d3f^...e0b7235d3f)**  
+> released: **2020-06-30 15:23**<br>
+> commits: **2 / [e0b7235d3f...8ccbaafa73](https://github.com/OneGov/onegov-cloud/compare/e0b7235d3f^...8ccbaafa73)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.63)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Fsi
