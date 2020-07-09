@@ -1,13 +1,16 @@
 from collections import OrderedDict
 from onegov.core.orm.mixins import meta_property, content_property
-from onegov.core.utils import linkify
+from onegov.core.utils import linkify, normalize_for_url
 from onegov.form import FieldDependency, WTFormsClassBuilder
 from onegov.gis import CoordinatesMixin
 from onegov.org import _
 from onegov.org.forms.extensions import CoordinatesFormExtension
 from onegov.people import Person, PersonCollection
 from sqlalchemy.orm import object_session
-from wtforms import BooleanField, RadioField, StringField, TextAreaField
+from wtforms import BooleanField, RadioField, StringField, TextAreaField, \
+    ValidationError
+
+from onegov.reservation import Resource
 
 
 class ContentExtension(object):
@@ -357,3 +360,20 @@ class PersonLinkExtension(ContentExtension):
             )
 
         return builder.form_class
+
+
+class ResourceValidationExtension(ContentExtension):
+
+    def extend_form(self, form_class, request):
+
+        class WithResourceValidation(form_class):
+
+            def validate_title(self, field):
+                existing = self.request.session.query(Resource).\
+                    filter_by(name=normalize_for_url(field.data)).first()
+                if existing:
+                    raise ValidationError(
+                        _("A resource with this name already exists")
+                    )
+
+        return WithResourceValidation

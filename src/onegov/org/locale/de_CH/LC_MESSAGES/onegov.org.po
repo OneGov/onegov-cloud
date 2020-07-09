@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-05-10 10:44+0200\n"
+"POT-Creation-Date: 2020-07-09 08:45+0200\n"
 "PO-Revision-Date: 2020-05-10 10:56+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1370,6 +1370,18 @@ msgstr ""
 "Sie können die Veranstaltung jedoch in der Ticketansicht absagen, um sie zu "
 "entfernen."
 
+msgid "Withdraw event"
+msgstr "Veranstaltung zurückziehen"
+
+msgid "Do you really want to withdraw this event?"
+msgstr "Wollen sie diese Veranstaltung zurückziehen? "
+
+msgid "You can re-publish an imported event later."
+msgstr "Sie können importierte Veranstaltungen später wieder veröffentlichen."
+
+msgid "Re-publish event"
+msgstr "Veranstaltung wieder veröffentlichen"
+
 msgid "New"
 msgstr "Neu"
 
@@ -1487,6 +1499,9 @@ msgstr "Auf der Startseite anzeigen"
 
 msgid "Visibility"
 msgstr "Sichtbarkeit"
+
+msgid "A resource with this name already exists"
+msgstr "Eine Resource mit diesem Namen existiert bereits"
 
 msgid "This month"
 msgstr "Diesen Monat"
@@ -1750,18 +1765,6 @@ msgstr "Möchten Sie diese Veranstaltung wirklich absagen?"
 
 msgid "Rejecting this event can't be undone."
 msgstr "Eine Absage kann nicht rückgängig gemacht werden."
-
-msgid "Withdraw event"
-msgstr "Veranstaltung zurückziehen"
-
-msgid "Do you really want to withdraw this event?"
-msgstr "Wollen sie diese Veranstaltung zurückziehen? "
-
-msgid "You can re-publish an imported event later."
-msgstr "Sie können importierte Veranstaltungen später wieder veröffentlichen."
-
-msgid "Re-publish event"
-msgstr "Veranstaltung wieder veröffentlichen"
 
 msgid "Directory Entry Submissions"
 msgstr "Verzeichniseintrag Eingaben"

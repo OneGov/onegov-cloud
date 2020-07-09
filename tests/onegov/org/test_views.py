@@ -1099,6 +1099,13 @@ def test_resources(client):
 
     assert 'Besprechungsraum' in client.get('/resources')
 
+    # Check warning duplicate
+    duplicate = resources.click('Raum')
+    duplicate.form['title'] = 'Meeting Room'
+    page = new.form.submit()
+    assert "Eine Resource mit diesem Namen existiert bereits" in page
+
+
     resource = client.get('/resource/meeting-room')
     delete_link = resource.pyquery('a.delete-link').attr('ic-delete-from')
 
@@ -4950,6 +4957,11 @@ def test_allocation_rules_on_daypasses(client):
     page = resources.click('Tageskarte', index=0)
     page.form['title'] = 'Daypass'
     page.form.submit()
+
+    page = resources.click('Tageskarte', index=0)
+    page.form['title'] = 'Daypass'
+    page = page.form.submit()
+    assert "Eine Resource mit diesem Namen existiert bereits" in page
 
     def count_allocations():
         s = '2000-01-01'

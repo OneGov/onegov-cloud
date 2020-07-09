@@ -4,7 +4,8 @@ from datetime import datetime
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.orm.types import UUID
 from onegov.form.models import FormSubmission
-from onegov.org.models.extensions import ContactExtension
+from onegov.org.models.extensions import ContactExtension, \
+    ResourceValidationExtension
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.org.models.extensions import AccessExtension
 from onegov.org.models.extensions import PersonLinkExtension
@@ -127,7 +128,8 @@ class SharedMethods(object):
 
 class DaypassResource(Resource, AccessExtension, SearchableContent,
                       ContactExtension, PersonLinkExtension,
-                      CoordinatesExtension, SharedMethods):
+                      CoordinatesExtension, SharedMethods,
+                      ResourceValidationExtension):
     __mapper_args__ = {'polymorphic_identity': 'daypass'}
 
     es_type_name = 'daypasses'
@@ -144,7 +146,8 @@ class DaypassResource(Resource, AccessExtension, SearchableContent,
 
 class RoomResource(Resource, AccessExtension, SearchableContent,
                    ContactExtension, PersonLinkExtension,
-                   CoordinatesExtension, SharedMethods):
+                   CoordinatesExtension, SharedMethods,
+                   ResourceValidationExtension):
     __mapper_args__ = {'polymorphic_identity': 'room'}
 
     es_type_name = 'rooms'
