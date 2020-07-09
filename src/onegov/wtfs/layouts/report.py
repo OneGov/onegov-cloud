@@ -58,6 +58,13 @@ class SpecificReportBaseLayout(DefaultLayout):
             Link(self.subtitle, self.request.link(self.model)),
         ]
 
+    def translate_key(self, key):
+        if key.startswith('older_'):
+            return self.request.translate(_(
+                "before ${year}", mapping={'year': key.split('older_')[-1]}
+            ))
+        return key
+
 
 class ReportBoxesLayout(SpecificReportBaseLayout):
 

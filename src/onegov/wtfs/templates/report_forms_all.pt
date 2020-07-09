@@ -4,42 +4,42 @@
         <div class="row">
             <div class="columns small-12">
                 <h1>${layout.title}<br><small>${layout.subtitle}</small></h1>
-
-                <table>
-                    <thead>
+                <p tal:condition="not: results" i18n:translate="">No results found</p>
+                <table tal:condition="results">
+                    <thead tal:define="year_headers layout.model.year_dict">
                         <tr>
                             <th colspan="2"></th>
-                            <th class="center" colspan="4" i18n:translate>Dispatch to the tax office</th>
+                            <th class="center" colspan="${len(year_headers) + 1}" i18n:translate>Dispatch to the tax office</th>
                         </tr>
                         <tr>
                             <th class="center" colspan="2" i18n:translate>Municipality</th>
-                            <th class="center" colspan="4" i18n:translate>Tax forms</th>
+                            <th class="center" colspan="${len(year_headers) + 1}" i18n:translate>Tax forms</th>
                         </tr>
                         <tr>
                             <th class="subtitle" i18n:translate>Name</th>
                             <th class="right subtitle" i18n:translate>BFS number</th>
-                            <th class="right subtitle"><tal:block i18n:translate>until</tal:block> ${layout.model.end.year-2}</th>
-                            <th class="right subtitle">${layout.model.end.year-1}</th>
-                            <th class="right subtitle">${layout.model.end.year}</th>
+                            <tal:b tal:repeat="header year_headers">
+                                <th class="right subtitle">${layout.translate_key(header)}</th>
+                            </tal:b>
                             <th class="right subtitle" i18n:translate>Total</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr tal:repeat="result layout.model.query()">
+                        <tr tal:repeat="result results">
                             <td>${result.name}</td>
                             <td class="right">${result.bfs_number}</td>
-                            <td class="right">${result.return_scanned_tax_forms_older}</td>
-                            <td class="right">${result.return_scanned_tax_forms_last_year}</td>
-                            <td class="right">${result.return_scanned_tax_forms_current_year}</td>
+                            <tal:b tal:repeat="summed result.return_scanned_tax_forms_by_year.values()">
+                                <td class="right">${summed}</td>
+                            </tal:b>
                             <td class="right">${result.return_scanned_tax_forms}</td>
                         </tr>
                     </tbody>
                     <tfoot>
-                        <tr tal:define="total layout.model.total()">
+                        <tr>
                             <th colspan="2" i18n:translate>Total</th>
-                            <td class="right">${total.return_scanned_tax_forms_older}</td>
-                            <td class="right">${total.return_scanned_tax_forms_last_year}</td>
-                            <td class="right">${total.return_scanned_tax_forms_current_year}</td>
+                            <tal:b tal:repeat="summed total.return_scanned_tax_forms_by_year.values()">
+                                <td class="right">${summed}</td>
+                            </tal:b>
                             <td class="right">${total.return_scanned_tax_forms}</td>
                         </tr>
                     </tfoot>

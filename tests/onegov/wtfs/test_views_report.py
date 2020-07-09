@@ -3,8 +3,10 @@ from onegov.core.request import CoreRequest
 from unittest.mock import patch
 from webtest.forms import Upload
 
+from tests.shared.utils import open_in_browser
 
-def test_views_report(client):
+
+def test_views_report_1(client):
     # Add a municipality with dates
     client.login_admin()
 
@@ -22,7 +24,7 @@ def test_views_report(client):
     )
     assert "Gemeindedaten importiert." in upload.form.submit().follow()
 
-    # Add a scan job
+    # Add two scan jobs
     with freeze_time("2019-01-01"):
         add = client.get('/scan-jobs/unrestricted').click(href='/add')
         add.form['type'].select("normal")
@@ -51,6 +53,33 @@ def test_views_report(client):
         edit.form['return_unscanned_single_documents'] = "99"
         assert "Scan-Auftrag geändert." in edit.form.submit().maybe_follow()
 
+        add = client.get('/scan-jobs/unrestricted').click(href='/add')
+        add.form['type'].select("normal")
+        add.form['municipality_id'].select(text="Adlikon (1)")
+        add.form['dispatch_date'] = "2020-01-11"
+        add.form['dispatch_boxes'] = "100"
+        add.form['dispatch_cantonal_tax_office'] = "200"
+        add.form['dispatch_cantonal_scan_center'] = "300"
+        add.form['dispatch_tax_forms_older'] = "400"
+        add.form['dispatch_tax_forms_last_year'] = "500"
+        add.form['dispatch_tax_forms_current_year'] = "600"
+        add.form['dispatch_single_documents'] = "700"
+        assert "Scan-Auftrag hinzugefügt." in add.form.submit().maybe_follow()
+
+        edit = client.get('/scan-jobs/unrestricted') \
+            .click("11.01.2020").click("Bearbeiten")
+        edit.form['return_date'] = "2020-01-15"
+        edit.form['return_boxes'] = "1000"
+        edit.form['return_tax_forms_older'] = "2000"
+        edit.form['return_tax_forms_last_year'] = "3000"
+        edit.form['return_tax_forms_current_year'] = "4000"
+        edit.form['return_single_documents'] = "5000"
+        edit.form['return_unscanned_tax_forms_older'] = "1"
+        edit.form['return_unscanned_tax_forms_last_year'] = "2"
+        edit.form['return_unscanned_tax_forms_current_year'] = "3"
+        edit.form['return_unscanned_single_documents'] = "4"
+        assert "Scan-Auftrag geändert." in edit.form.submit().maybe_follow()
+
     def get_report(report_type, start, end, scan_job_type='all'):
         select = client.get('/report')
         select.form['start'] = start
@@ -61,6 +90,16 @@ def test_views_report(client):
         return select.form.submit().follow()
 
     # Boxes
+    view = get_report('boxes', '2019-01-05', '2020-01-15')
+    # total dispatch boxes
+    assert str(1111 + 100) in view
+    # return boxes
+    assert str(8888 + 1000) in view
+    # total dispatch cantonal scan center
+    assert str(3333 + 300) in view
+    # total dispatch cantonal tax office
+    assert str(2222 + 200) in view
+
     view = get_report('boxes', '2019-01-01', '2019-01-05')
     assert "1111" in view
     assert "2222" in view
@@ -81,6 +120,21 @@ def test_views_report(client):
     assert "9702" in view
     assert "9801" in view
 
+    view = get_report('boxes_and_forms', '2019-01-05', '2020-01-15')
+    # return_boxes
+    assert str(8888 + 1000) in view
+    # before 2017 scanned tax forms
+    assert str(9600 - 96) in view
+    # before 2018 scanned tax forms
+    assert str(2000 - 1) in view
+    # 2018
+    assert str(9700 - 97) in view
+    # 2019
+    assert str(9800 - 98 + 3000 - 2) in view
+    # 2020
+    assert str(4000 - 3) in view
+    # total return_scanned_tax_forms
+
     view = get_report('boxes_and_forms', '2019-01-06', '2019-01-10')
     assert "8888" not in view
     assert "9504" not in view
@@ -88,7 +142,23 @@ def test_views_report(client):
     assert "9702" not in view
     assert "9801" not in view
 
+    def check_transformed_values(view):
+        # before 2017 scanned tax forms
+        assert str(9600 - 96) in view
+        # before 2018 scanned tax forms
+        assert str(2000 - 1) in view
+        # 2018
+        assert str(9700 - 97) in view
+        # 2019
+        assert str(9800 - 98 + 3000 - 2) in view
+        # 2020
+        assert str(4000 - 3) in view
+
     # Forms
+    # over more than a year
+    view = get_report('forms', '2019-01-05', '2020-01-15')
+    check_transformed_values(view)
+
     view = get_report('forms', '2019-01-01', '2019-01-05')
     assert "9504" in view
     assert "9603" in view
@@ -100,6 +170,10 @@ def test_views_report(client):
     assert "9702" not in view
 
     # All forms
+
+    view = get_report('all_forms', '2019-01-05', '2020-01-15')
+    check_transformed_values(view)
+
     view = get_report('all_forms', '2019-01-01', '2019-01-05')
     assert "9504" in view
     assert "9603" in view
@@ -111,6 +185,10 @@ def test_views_report(client):
     assert "9702" not in view
 
     # By delivery
+
+    view = get_report('delivery', '2019-01-05', '2020-01-15')
+    check_transformed_values(view)
+
     view = get_report('delivery', '2019-01-01', '2019-01-05')
     assert "8888" in view
     assert "9504" in view
