@@ -48,7 +48,9 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, Extendable):
     registration_windows = relationship(
         'FormRegistrationWindow',
         backref='form',
-        order_by='FormRegistrationWindow.start')
+        order_by='FormRegistrationWindow.start',
+        cascade='all, delete-orphan'
+    )
 
     #: the currently active registration window
     #:
