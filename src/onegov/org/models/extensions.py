@@ -371,7 +371,7 @@ class ResourceValidationExtension(ContentExtension):
             def validate_title(self, field):
                 existing = self.request.session.query(Resource).\
                     filter_by(name=normalize_for_url(field.data)).first()
-                if existing:
+                if existing and not self.model == existing:
                     raise ValidationError(
                         _("A resource with this name already exists")
                     )

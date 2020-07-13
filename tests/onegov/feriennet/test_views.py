@@ -1,3 +1,5 @@
+import pytest
+
 import onegov.feriennet
 import re
 import requests_mock
@@ -8,11 +10,14 @@ from freezegun import freeze_time
 from onegov.activity import Booking, Invoice, InvoiceItem
 from onegov.activity.utils import generate_xml
 from onegov.core.custom import json
+from onegov.feriennet.utils import NAME_SEPARATOR
 from onegov.file import FileCollection
 from onegov.pay import Payment
 from tests.shared import utils
 from psycopg2.extras import NumericRange
 from webtest import Upload
+
+from tests.shared.utils import open_in_browser
 
 
 def test_view_permissions():
@@ -2573,3 +2578,34 @@ def test_booking_after_finalization_for_anonymous(client, scenario):
     client.login_admin()
     assert client.get('/activity/fishing').body.count(b"Anmelden") == 1
     assert client.get('/activity/fishing').body.count(b"Anmelden") == 1
+
+
+@pytest.mark.parametrize('attendee_owner', [
+    'anna.frisch@example.org',
+    'admin@example.org'
+])
+def test_attendee_view(scenario, client, attendee_owner):
+    # Edit an attendee as administrator
+    if not attendee_owner.startswith('admin'):
+        scenario.add_user(username='anna.frisch@example.org')
+    scenario.add_attendee(
+        username=attendee_owner,
+        name=f'Max{NAME_SEPARATOR}Frisch',
+        birth_date=datetime(2020, 1, 1)
+    )
+    scenario.add_attendee(
+        username=attendee_owner,
+        name=f'Bruno{NAME_SEPARATOR}Frisch',
+        birth_date=datetime(2020, 2, 1)
+    )
+    scenario.commit()
+    scenario.refresh()
+    client.login_admin()
+
+    page = client.get(f'/attendee/{scenario.latest_attendee.id}')
+    # Unique Child is not in the row of first_name
+    assert page.form['first_name'].value == 'Bruno'
+    assert page.form['last_name'].value == 'Frisch'
+    page.form['first_name'] = 'Max'
+    page = page.form.submit()
+    assert "Sie haben bereits ein Kind mit diesem Namen eingegeben" in page
