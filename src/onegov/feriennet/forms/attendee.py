@@ -48,7 +48,11 @@ class AttendeeBase(Form):
 
     def ensure_no_duplicate_child(self):
         attendees = AttendeeCollection(self.request.session)
-        query = attendees.by_username(self.username)
+        username = self.username
+        if hasattr(self.model, 'username'):
+            if self.username != self.model.username:
+                username = self.model.username
+        query = attendees.by_username(username)
         query = query.filter(Attendee.name == self.name)
         query = query.filter(Attendee.id != self.model.id)
 
