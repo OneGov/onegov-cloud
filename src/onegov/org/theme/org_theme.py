@@ -26,7 +26,7 @@ default_font_families = {
 
 
 class OrgTheme(BaseTheme):
-    name = 'onegov.org.foundation6'
+    name = 'onegov.org.foundation'
 
     _force_compile = False
 
