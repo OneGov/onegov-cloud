@@ -214,10 +214,10 @@ footer {
     Chrome shows a little up/down arrow on date fields which takes quite
     a bit of space, without being useful
 */
-input[type="date"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    display: none;
-}
+//input[type="date"]::-webkit-inner-spin-button {
+//    -webkit-appearance: none;
+//    display: none;
+//}
 
 /*
     Apply on a row to flip the order of columns on mobile
@@ -304,10 +304,10 @@ $globals-height: 2.5rem;
 
 
 .globals {
+    // Todo: the link text inside the second level should not wrap
     @include primary-color-background;
     margin-bottom: $globals-margin;
     min-height: $globals-height;
-    width: 100%;
     padding: .5rem;
 
     a {
@@ -319,24 +319,32 @@ $globals-height: 2.5rem;
     }
 
     .grid-x > .cell > ul {
+
         @include breakpoint(medium up) {
             display: flex;
             flex-direction: row-reverse;
         }
 
-        > li > a {
-            @include primary-color-background;
-            height: $globals-height;
-            line-height: $globals-height;
-            padding: 0 1rem;
+        > li {
+            > a {
+                @include primary-color-background;
+                height: $globals-height;
+                line-height: $globals-height;
+                padding: 0 1rem;
+            }
         }
     }
 
     .f-dropdown {
         a {
             color: $body-font-color;
+
             &:hover {
                 @include primary-color-background;
+            }
+
+            @include breakpoint(small only) {
+                color: $primary-fg-color;
             }
         }
     }
