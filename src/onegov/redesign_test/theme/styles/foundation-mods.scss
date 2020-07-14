@@ -4,4 +4,9 @@ Use to override global settings as found in _settings.scss of the foundation6 mo
 
 $global-font-size: 120%;
 
-$body-font-family: 'Verdana, Geneva, sans-serif !default;'
+$body-font-family: 'Verdana, Geneva, sans-serif !default';
+$table-border-color: smart-scale($table-background, $table-color-scale);
+
+$dropdownmenu-arrows: false;
+$dropdownmenu-arrow-color: $white;
+$drilldown-arrows: false;
