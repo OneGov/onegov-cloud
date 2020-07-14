@@ -173,7 +173,6 @@ class BaseTheme(CoreTheme):
             'top-bar',
         )
 
-    @property
     def post_imports(self):
         """
         Imports added after the foundation import. The imports must be found
