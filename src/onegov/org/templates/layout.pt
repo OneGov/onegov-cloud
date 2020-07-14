@@ -72,7 +72,7 @@
     <a class="show-for-sr" href="#content" i18n:translate>Skip navigation</a>
 
 
-      <main>
+    <main>
         <header>
           <div class="globals">
             <div class="grid-container">
@@ -98,7 +98,7 @@
             </div>
           </div>
         </header>
-      </main>
+    </main>
 
     <tal:b tal:content="structure layout.org.meta.analytics_code|nothing" />
 </body>
