@@ -29,6 +29,7 @@ class OrgTheme(BaseTheme):
     name = 'onegov.org.foundation'
 
     _force_compile = False
+    use_flex = True
 
     @property
     def default_options(self):
@@ -52,31 +53,37 @@ class OrgTheme(BaseTheme):
     @property
     def foundation_components(self):
         return (
-            'accordion',
-            # 'alert-boxes',
-            # 'block-grid',
-            'breadcrumbs',
-            'button-group',
             'button',
-            'dropdown-menu',
-            # 'dropdown-buttons',
-            # 'inline-lists',
+            'button-group',
+            'close-button',
             'label',
-            'orbit',
-            'pagination',
-            # 'panel',
-            'progress-bar',
-            'reveal',
-            # 'side-nav',
-            'switch',
-            # 'split-buttons',
-            # 'sub-nav',
+            # 'progress-bar',
+            # 'slider',
+            # 'switch',
             'table',
-            # 'thumbs',
+            # 'badge',
+            'breadcrumbs',
+            'callout',
+            # 'card',
+            'dropdown',
+            'pagination',
             'tooltip',
+            'accordion',
+            'media-object',
+            'orbit',
+            'responsive-embed',
+            'tabs',
+            'thumbnail',
+            'menu',
+            'menu-icon',
+            'accordion-menu',
+            'drilldown-menu',
+            'dropdown-menu',
+            'off-canvas',
+            'reveal',
+            'sticky',
+            'title-bar',
             'top-bar',
-            # 'type',
-            # 'visibility',
         )
 
     @property
