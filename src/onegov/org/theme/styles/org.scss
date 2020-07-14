@@ -309,129 +309,86 @@ $globals-height: 2.5rem;
     min-height: $globals-height;
     width: 100%;
     padding: .5rem;
-    //
-    //.grid-x > .cell > ul {
-    //
-    //    @include breakpoint(medium up) {
-    //        display: flex;
-    //        flex-direction: row-reverse;
-    //
-    //        > li + li:after {
-    //            content: '|';
-    //        }
-    //    }
-    //
-    //    @include breakpoint(small only) {
-    //        display: flex;
-    //        flex-direction: column;
-    //
-    //        > li > a {
-    //            align-self: flex-end !important;
-    //        }
-    //    }
-    //
-    //    > li {
-    //        display: inline-block;
-    //
-    //        &:hover {
-    //            @include primary-color-background;
-    //        }
-    //
-    //        + li::after {
-    //            color: $primary-fg-color;
-    //            margin-right: 5px;
-    //        }
-    //
-    //        > a {
-    //            color: $primary-fg-color;
-    //            display: inline-block;
-    //            font-size: .875rem;
-    //            height: $globals-height;
-    //            line-height: $globals-height;
-    //            padding: 0 .5rem;
-    //
-    //            &:hover {
-    //                @include primary-color-background;
-    //            }
-    //        }
-    //    }
-    //}
-    //
-    //.f-dropdown {
-    //
-    //    a {
-    //        color: $body-font-color;
-    //
-    //        &:hover {
-    //            @include primary-color-background;
-    //        }
-    //
-    //        @include breakpoint(small only) {
-    //
-    //            color: $primary-fg-color;
-    //        }
-    //    }
-    //
-    //}
-    //
-    //a {
-    //    &::before {
-    //        margin-right: 1ex;
-    //        text-align: center;
-    //    }
-    //}
-    //
-    //.login::before { @include icon('\f090'); }
-    //.logout::before { @include icon('\f08b'); }
-    //.register::before { @include icon('\f234'); }
-    //.user::before { @include icon('\f2bd'); }
-    //.users::before { @include icon('\f0c0'); }
-    //.payment::before { @include icon('\f09d'); }
-    //.payment-provider::before { @include icon('\f283'); }
-    //.profile::before { @include icon('\f2c3'); }
-    //.management::before { @include icon('\f013'); }
-    //.images::before { @include icon('\f03e'); }
-    //.files::before { @include icon('\f016'); }
-    //.settings::before { @include icon('\f1de'); }
-    //.timeline::before { @include icon('\f017'); }
-    //.no-tickets::before { @include icon('\f145'); }
-    //
-    //.with-count::before {
-    //    border: 1px solid $primary-fg-color;
-    //    border-radius: 1000px;
-    //    box-shadow: 0 0 2px $primary-fg-color;
-    //    box-sizing: content-box;
-    //    content: attr(data-count);
-    //    display: inline-block;
-    //    font-size: .75rem;
-    //    height: 22px;
-    //    line-height: 22px;
-    //    margin-right: 1ex;
-    //    min-width: 15px;
-    //    padding: 0 .25rem;
-    //    position: relative;
-    //    text-align: center;
-    //    top: -1px;
-    //}
-    //
-    //.alert.with-count::before {
-    //    background-color: $alert-color;
-    //    color: $white;
-    //}
-    //
-    //.success.with-count::before {
-    //    background-color: $success-color;
-    //    color: $white;
-    //}
-    //
-    //.info.with-count::before {
-    //    background-color: $info-color;
-    //    color: $white;
-    //}
-    //
-    //.secondary.with-count::before {
-    //    background-color: $secondary-color;
-    //    color: $body-font-color;
-    //}
+
+    a {
+        font-size: .875rem;
+        &::before {
+            margin-right: 1ex;
+            text-align: center;
+        }
+    }
+
+    .grid-x > .cell > ul {
+        @include breakpoint(medium up) {
+            display: flex;
+            flex-direction: row-reverse;
+        }
+
+        > li > a {
+            @include primary-color-background;
+            height: $globals-height;
+            line-height: $globals-height;
+            padding: 0 1rem;
+        }
+    }
+
+    .f-dropdown {
+        a {
+            color: $body-font-color;
+            &:hover {
+                @include primary-color-background;
+            }
+        }
+    }
+
+    .login::before { @include icon('\f090'); }
+    .logout::before { @include icon('\f08b'); }
+    .register::before { @include icon('\f234'); }
+    .user::before { @include icon('\f2bd'); }
+    .users::before { @include icon('\f0c0'); }
+    .payment::before { @include icon('\f09d'); }
+    .payment-provider::before { @include icon('\f283'); }
+    .profile::before { @include icon('\f2c3'); }
+    .management::before { @include icon('\f013'); }
+    .images::before { @include icon('\f03e'); }
+    .files::before { @include icon('\f016'); }
+    .settings::before { @include icon('\f1de'); }
+    .timeline::before { @include icon('\f017'); }
+    .no-tickets::before { @include icon('\f145'); }
+
+    .with-count::before {
+        border: 1px solid $primary-fg-color;
+        border-radius: 1000px;
+        box-shadow: 0 0 2px $primary-fg-color;
+        box-sizing: content-box;
+        content: attr(data-count);
+        display: inline-block;
+        font-size: .75rem;
+        line-height: 22px;
+        margin-right: 1ex;
+        min-width: 15px;
+        padding: 0 .25rem;
+        position: relative;
+    }
+
+    .alert.with-count::before {
+        background-color: $alert-color;
+        color: $white;
+    }
+
+    .success.with-count::before {
+        background-color: $success-color;
+        color: $white;
+    }
+
+    .info.with-count::before {
+        background-color: $info-color;
+        color: $white;
+    }
+
+    .secondary.with-count::before {
+        background-color: $secondary-color;
+        color: $body-font-color;
+    }
 }
 

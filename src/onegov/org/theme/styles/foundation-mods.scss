@@ -160,3 +160,21 @@ $button-font-color: $primary-fg-color;
     $crumb-font-color: scale-color($crumb-font-color, $lightness: -45%, $saturation: 10%);
     $side-nav-link-color: scale-color($side-nav-link-color, $lightness: -45%, $saturation: 10%);
 }
+
+/*
+Grid
+*/
+
+//$grid-container: 1200px;
+
+/*
+TopBar
+*/
+
+$topbar-submenu-background: $primary-fg-color;
+
+/*
+Dropdowns
+*/
+
+$dropdownmenu-arrow-color: $primary-fg-color;
