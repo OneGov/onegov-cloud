@@ -484,6 +484,12 @@ class Layout(FoundationLayout):
             self.request.class_link(Auth, name='reset-password')
         )
 
+    @property
+    def drilldown_back(self):
+        back = self.request.translate(_("back"))
+        return '<li class="js-drilldown-back">' \
+               f'<a class="new-back">{back}</a></li>'
+
 
 class DefaultLayout(Layout):
     """ The default layout meant for the public facing parts of the site. """
