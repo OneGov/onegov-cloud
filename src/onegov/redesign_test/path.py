@@ -16,7 +16,7 @@ def get_some_model(app):
 
 @RedesignApp.html(
     model=SomeModel,
-    template='homepage.pt'
+    template='test_page.pt'
 )
 def get_homepage(self, request):
     return {'layout': DefaultLayout(self, request)}
