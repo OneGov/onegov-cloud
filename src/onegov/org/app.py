@@ -471,12 +471,12 @@ def get_common_asset():
     yield 'locale.js'
     yield 'modernizr.js'
     yield 'jquery.js'
-    yield 'foundation.js'
-    yield 'foundation.alert.js'
-    yield 'foundation.dropdown.js'
-    yield 'foundation.orbit.js'
-    yield 'foundation.reveal.js'
-    yield 'foundation.topbar.js'
+    # yield 'foundation.js'
+    # yield 'foundation.alert.js'
+    # yield 'foundation.dropdown.js'
+    # yield 'foundation.orbit.js'
+    # yield 'foundation.reveal.js'
+    # yield 'foundation.topbar.js'
     yield 'intercooler.js'
     yield 'underscore.js'
     yield 'react.js'
@@ -499,7 +499,7 @@ def get_common_asset():
     yield 'lazyalttext.js'
     yield 'lazysizes.js'
     yield 'toggle.js'
-    yield 'common.js'
+    # yield 'common.js'
 
 
 @OrgApp.webasset('accordion')
