@@ -89,25 +89,7 @@
             </form>
 
             <!-- Menu -->
-            <ul class="vertical menu drilldown" data-drilldown data-back-button="${layout.drilldown_back}">
-                <li><a href="#">Portrait & Fakten</a></li>
-                <li>
-                    <a href="#">Politik & Verwaltung</a>
-                    <ul class="menu vertical nested">
-                        <li><a href="#">Behörden & Kommissionen</a>
-                            <ul class="menu vertical nested">
-                                <li><a href="#">Bürgerrechtskommission</a></li>
-                                <li><a href="#">Energie- und Werkkommission</a></li>
-                                <li><a href="#">Finanzausschuss</a></li>
-                                <li><a href="#">Jugendkommission</a></li>
-                            </ul>
-                        </li>
-                        <li><a href="#">Gemeinderat</a></li>
-                        <li><a href="#">Gemeindeversammlung</a></li>
-                    </ul>
-                </li>
-                <li><a href="#">Gesellschaft & Wohnen</a></li>
-            </ul>
+            <div metal:use-macro="layout.macros['side_navigation']"></div>
         </div>
 
         <div class="off-canvas-content" data-off-canvas-content>
@@ -153,7 +135,7 @@
                                         </a>
                                     </div>
                                     <div class="large-2 small-2 cell">
-                                        <button data-toggle="offCanvas"><i class="fas fa-search"></i><span class="hide-for-small-only">Suche</span></button>
+                                        <button data-toggle="offCanvas"><i class="fa fa-search"></i><span class="hide-for-small-only">Suche</span></button>
                                     </div>
                                 </div>
                             </div>

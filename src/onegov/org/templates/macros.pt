@@ -25,6 +25,27 @@
       </div>
 </metal:b>
 
+<metal:navigation define-macro="side-navigation">
+    <ul class="vertical menu drilldown" data-drilldown data-back-button="${layout.drilldown_back}" tal:define="links top_navigation|layout.top_navigation">
+        <li tal:repeat="link links" tal:content="structure link(layout)" />
+        <li>
+            <a href="#">Politik & Verwaltung</a>
+            <ul class="menu vertical nested">
+                <li><a href="#">Behörden & Kommissionen</a>
+                    <ul class="menu vertical nested">
+                        <li><a href="#">Bürgerrechtskommission</a></li>
+                        <li><a href="#">Energie- und Werkkommission</a></li>
+                        <li><a href="#">Finanzausschuss</a></li>
+                        <li><a href="#">Jugendkommission</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">Gemeinderat</a></li>
+                <li><a href="#">Gemeindeversammlung</a></li>
+            </ul>
+        </li>
+    </ul>
+</metal:navigation>
+
 <metal:navigation define-macro="top_navigation">
     <div class="main-navigation ${not links and 'empty'}" tal:define="links top_navigation|layout.top_navigation">
         <nav class="top-bar" data-topbar role="navigation" tal:condition="links">
