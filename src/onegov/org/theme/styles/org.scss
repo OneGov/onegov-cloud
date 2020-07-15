@@ -599,3 +599,100 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .upload::before { @include icon($upload-icon); }
     .view-link::before { @include icon($view-link); }
 }
+
+.breadcrumbs {
+    @include hairline;
+    font-style: italic;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    padding-bottom: .7rem;
+    padding-left: 1rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    li {
+        line-height: 1rem;
+
+        // highlight the parent
+        &:nth-last-child(2) {
+            font-weight: bold;
+        }
+    }
+
+}
+
+/*
+    content block
+*/
+.content {
+    margin-bottom: 1rem;
+}
+
+// we need to use exact pixel measurements for the footer or we end up with
+// inconsistent results across browsers, which might mean the difference between
+// showing a scrollbar and not showing one
+$footer-header-color: $charcoal;
+$footer-text-color: $steel;
+$footer-font-size: 13px;
+$footer-border-width: 0;
+
+.footer-content {
+    background-color: $topbar-bg-color;
+
+    box-shadow: 0 -2px 0 $primary-color;
+    max-width: 100% !important;
+
+    padding: 0;
+
+    > .cell > .grid-x {
+        margin: 0 auto;
+        max-width: $grid-row-width;
+    }
+
+    * {
+        background-color: $topbar-bg-color;
+        color: $footer-text-color;
+        font-size: $footer-font-size;
+        line-height: 25px;
+    }
+
+    h2 {
+        color: $footer-header-color;
+        font-weight: 500;
+        letter-spacing: 1px;
+        margin-bottom: 13px;
+        text-transform: uppercase;
+    }
+
+    h2.custom-links {
+        text-transform: none;
+    }
+
+    .footer-columns {
+        padding-bottom: .5rem;
+        padding-top: 1.25rem;
+
+        p {
+            line-height: 1.5rem;
+            margin-bottom: .5rem;
+        }
+    }
+
+    .footer-links {
+        padding: .5rem 0;
+        position: relative;
+        text-align: center;
+
+        .columns {
+            span + span::before {
+                content: '•';
+            }
+        }
+    }
+
+}
+
+#redactor-modal-box footer {
+    // the redactor also contains a footer which doesn't need a specific height
+    height: auto;
+}
