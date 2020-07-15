@@ -100,8 +100,8 @@
 
 <metal:footer define-macro="footer">
     <footer>
-        <div class="row footer-content">
-            <div class="small-12 columns">
+        <div class="grid-x grid-padding-x footer-content">
+            <div class="small-12 cell">
                 <metal:b use-macro="layout.macros['footer_columns']" />
                 <metal:b use-macro="layout.macros['footer_partner']" />
                 <metal:b use-macro="layout.macros['footer_links']" />
@@ -119,7 +119,7 @@
                        twitter layout.org.meta.twitter_url|nothing;
                        instagram layout.org.meta.instagram_url|nothing;
                        youtube layout.org.meta.youtube_url|nothing;">
-        <div class="row footer-columns" tal:condition="any((
+        <div class="grid-x footer-columns" tal:condition="any((
             contact,
             contact_url,
             opening_hours,
@@ -129,15 +129,15 @@
             instagram,
             youtube,
         ))">
-            <div class="small-12 medium-3 columns">
+            <div class="small-12 medium-3 cell">
                 <metal:b use-macro="layout.macros['footer_contact']" />
             </div>
 
-            <div class="small-12 medium-5 columns">
+            <div class="small-12 medium-5 cell">
                 <metal:b use-macro="layout.macros['footer_opening_hours']" />
             </div>
 
-            <div class="small-12 medium-4 columns">
+            <div class="small-12 medium-4 cell">
                 <metal:b use-macro="layout.macros['footer_social_media']" />
                 <metal:b use-macro="layout.macros['footer_custom_links']" />
             </div>
@@ -154,8 +154,8 @@
 </metal:footer_custom_links>
 
 <metal:footer_links define-macro="footer_links" i18n:domain="onegov.org">
-    <div class="row footer-links">
-      <div class="small-12 columns">
+    <div class="grid-x footer-links">
+      <div class="small-12 cell">
         <tal:b condition="not request.app.org.hide_onegov_footer|True">
             <span>
                 <a href="https://www.onegovcloud.ch">OneGov Cloud</a>
@@ -327,7 +327,7 @@
 
 <metal:fields define-macro="fields">
     <tal:b repeat="field fields">
-        <div tal:define="hidden form.is_hidden(field)|False" class="row field-${field.id} field-type-${field.type.lower()} ${hidden and 'field-hidden'}"><div class="large-12 columns">
+        <div tal:define="hidden form.is_hidden(field)|False" class="grid-x field-${field.id} field-type-${field.type.lower()} ${hidden and 'field-hidden'}"><div class="large-12 cell">
         <tal:b define="input_type field.widget.input_type|None">
             <tal:b condition="input_type == 'hidden'">
                 ${field()}
@@ -418,8 +418,8 @@
     <div class="newslist" tal:condition="news">
         <h2 i18n:translate tal:condition="not:hide_title|False">Latest news</h2>
 
-        <div class="row news-list-item" tal:repeat="item news">
-            <div class="small-12 columns">
+        <div class="grid-x news-list-item" tal:repeat="item news">
+            <div class="small-12 cell">
                 <a tal:attributes="href request.link(item)">
                     <h2 tal:condition="heading == 'h2'|True">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h2>
                     <h3 tal:condition="heading == 'h3'|nothing">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h3>
@@ -447,8 +447,8 @@
 
 <metal:access_hint_long define-macro="access_hint_long" i18n:domain="onegov.org">
     <tal:b condition="item.access == 'private'|False">
-        <div class="row">
-            <div class="small-12 columns">
+        <div class="grid-x">
+            <div class="small-12 cell">
                 <div class="panel callout">
                     <p i18n:translate>
                         This site is not public.
@@ -461,8 +461,8 @@
 
 <metal:empty_lead_hint define-macro="empty_page_lead_hint" i18n:domain="onegov.org">
     <tal:b condition="not item.lead and request.is_manager|nothing">
-        <div class="row">
-            <div class="small-12 columns">
+        <div class="grid-x">
+            <div class="small-12 cell">
                 <div class="panel callout">
                     <p i18n:translate>This site contains no lead. Leads are used for lists and search results.</p>
                 </div>
@@ -472,9 +472,9 @@
 </metal:empty_lead_hint>
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.org">
-    <div class="row" tal:define="show_side_panel show_side_panel|False; location location|False">
+    <div class="grid-x" tal:define="show_side_panel show_side_panel|False; location location|False">
         <tal:b condition="not: people or contact or coordinates or location or show_side_panel">
-            <div class="small-12 columns page-content-main">
+            <div class="small-12 cell page-content-main">
                 <div metal:define-slot="before-lead"></div>
                 <span class="page-lead" tal:condition="lead" tal:content="lead" />
                 <div metal:define-slot="after-lead"></div>
@@ -484,14 +484,14 @@
             </div>
         </tal:b>
         <tal:b condition="people or contact or coordinates or show_side_panel">
-            <div class="small-12 medium-8 columns page-content-main">
+            <div class="small-12 medium-8 cell page-content-main">
                 <span class="page-lead" tal:condition="lead" tal:content="lead" />
                 <div metal:define-slot="after-lead"></div>
 
                 <div class="page-text" tal:condition="text" tal:content="structure text" />
                 <div metal:define-slot="after-text"></div>
             </div>
-            <div class="small-12 medium-4 columns page-content-sidebar" tal:condition="people or contact or coordinates or show_side_panel" tal:define="highlight_contacts highlight_contacts|True">
+            <div class="small-12 medium-4 cell page-content-sidebar" tal:condition="people or contact or coordinates or show_side_panel" tal:define="highlight_contacts highlight_contacts|True">
                 <div metal:define-slot="before-panels"></div>
                 <div class="side-panel without-title ${highlight_contacts and 'highlighted'}" tal:condition="contact or coordinates or location">
                     <tal:b condition="contact" content="structure contact" />
@@ -632,8 +632,8 @@
 
 <metal:person_card define-macro="person_card" i18n:domain="onegov.org">
     <div class="person-card person-single-item" tal:define="exclude request.app.org.excluded_person_fields(request)">
-        <div class="row">
-            <div class="columns small-12 medium-4 large-3">
+        <div class="grid-x">
+            <div class="cell small-12 medium-4 large-3">
                 <div aria-hidden="true" tal:define="url person.picture_url">
                     <div class="person-card-portrait">
                         <i class="fa fa-user" tal:condition="not:url"></i>
@@ -641,7 +641,7 @@
                     </div>
                 </div>
             </div>
-            <div class="columns small-12 medium-8 large-9">
+            <div class="cell small-12 medium-8 large-9">
                 <ul>
                     <li tal:condition="person.function" class="person-card-function">
                         <em>${person.function}</em>
@@ -852,7 +852,7 @@
 
         <dt i18n:translate>List Preview</dt>
         <dd tal:define="occurrence event.latest_occurrence or event.virtual_occurrence; use_links False">
-            <div class="row">
+            <div class="grid-x">
                 <metal:b use-macro="layout.macros['occurrence_list_view']" />
             </div>
         </dd>
@@ -971,7 +971,7 @@
 
 <metal:occurrences define-macro="occurrences" i18n:domain="onegov.org">
     <tal:b repeat="occurrence occurrences">
-        <div class="row">
+        <div class="grid-x">
             <metal:b use-macro="layout.macros['occurrence_list_view']" />
         </div>
     </tal:b>
@@ -981,7 +981,7 @@
 
 <metal:occurrence_list_view define-macro="occurrence_list_view">
     <div class="occurrence" tal:define="use_links use_links|True">
-        <div class="large-3 medium-4 small-5 columns calendar-day-column">
+        <div class="large-3 medium-4 small-5 cell calendar-day-column">
             <metal:b
                 tal:define="
                     date occurrence.localized_start;
@@ -991,7 +991,7 @@
                 use-macro="layout.macros['calendar-day']"
             />
         </div>
-        <div class="large-9 medium-8 small-7 columns calendar-text-column">
+        <div class="large-9 medium-8 small-7 cell calendar-text-column">
             <h3>
                 <a href="${use_links and request.link(occurrence)}">${occurrence.title}</a>
                 <metal:hint use-macro="layout.macros['access_hint']" tal:define="item occurrence" />
@@ -1012,24 +1012,24 @@
         <form action="" method="GET">
             <div metal:define-slot="before-date-range"></div>
 
-            <div class="row date-range-selector">
-                <div class="large-6 columns">
-                    <div class="row collapse">
+            <div class="grid-x date-range-selector">
+                <div class="large-6 cell">
+                    <div class="grid-x collapse">
                         <label i18n:translate>From</label>
                         <input class="small" name="start" type="date" value="${start}" placeholder="${layout.today().isoformat()}">
                     </div>
                 </div>
-                <div class="large-6 columns">
-                    <div class="row collapse">
+                <div class="large-6 cell">
+                    <div class="grid-x collapse">
                         <label i18n:translate>To</label>
                         <input class="small" name="end" type="date" value="${end}" placeholder="${layout.today().isoformat()}">
                     </div>
                 </div>
             </div>
             <noscript>
-                <div class="row">
-                    <div class="large-6 columns">
-                        <div class="row collapse">
+                <div class="grid-x">
+                    <div class="large-6 cell">
+                        <div class="grid-x collapse">
                             <input type="submit" value="Filter by date" class="button" i18n:attributes="value">
                         </div>
                     </div>
@@ -1497,8 +1497,8 @@
 </metal:group_by_column>
 
 <metal:file_details define-macro="file-details" i18n:domain="onegov.org">
-    <div class="row">
-        <div class="columns small-4">
+    <div class="grid-x">
+        <div class="cell small-4">
             <a class="file-preview" href="${request.link(file)}" tal:condition="extension == 'pdf'">
                 <img class="pdf-preview" src="${request.link(file, name='medium')}">
             </a>
@@ -1538,7 +1538,7 @@
                 </svg>
             </a>
         </div>
-        <div class="columns small-6 file-status">
+        <div class="cell small-6 file-status">
 
             <tal:b condition="request.app.enable_yubikey and file.reference['content_type'] == 'application/pdf'">
                 <h3 i18n:translate>Digital Signature</h3>
@@ -1625,7 +1625,7 @@
                 </div>
             </tal:b>
         </div>
-        <div class="columns small-2 file-actions">
+        <div class="cell small-2 file-actions">
             <a class="button secondary confirm delete" role="button"
                 ic-delete-from="${request.link(file)}?csrf-token=${layout.csrf_token}"
                 ic-on-success="
