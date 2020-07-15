@@ -11,11 +11,6 @@ var setupRedirectAfter = function(elements) {
     });
 };
 
-var initFoundation = function() {
-    $(document).on('ready page:load', function() {
-        $(document).foundation();
-    });
-};
 
 // sets up the given nodes with the functionality provided by common.js
 // this is done at document.ready and can be repeated for out of band content
@@ -32,9 +27,6 @@ var processCommonNodes = function(elements, out_of_band) {
 
     // intercooler redirects
     setupRedirectAfter(targets.find('a'));
-
-    // initialise zurb foundation (only works on the document level)
-    initFoundation();
 
     // Make sure files open in another window
     targets.find('.page-text a[href*="/datei/"]').attr('target', '_blank');
