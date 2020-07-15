@@ -164,6 +164,10 @@
 
 
                 </header>
+                <div class="grid-container">
+                    <metal:footer use-macro="layout.macros['footer']" />
+                </div>
+
             </main>
             <tal:b tal:content="structure layout.org.meta.analytics_code|nothing" />
         </div>
