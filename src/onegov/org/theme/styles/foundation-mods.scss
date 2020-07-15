@@ -176,3 +176,12 @@ $dropdownmenu-arrow-color: $primary-fg-color;
 Accordion
 */
 $accordionmenu-arrow-color: $primary-fg-color;
+
+/*
+Off Canvas / SideBar
+*/
+
+$offcanvas-sizes: (
+  small: 250px,
+  medium: 350px
+);

@@ -484,7 +484,7 @@ class Layout(FoundationLayout):
             self.request.class_link(Auth, name='reset-password')
         )
 
-    @property
+    @cached_property
     def drilldown_back(self):
         back = self.request.translate(_("back"))
         return '<li class="js-drilldown-back">' \
