@@ -489,3 +489,113 @@ $globals-height: 2.5rem;
     }
 }
 
+/*
+    edit bar (and popup links)
+*/
+$accept-link-icon: '\f00c';
+$cleanup-link-icon: '\f0d0';
+$copy-link-icon: '\f0c5';
+$delete-link-icon: '\f014';
+$disabled-icon: '\f05e';
+$edit-link-icon: '\f040';
+$export-link-icon: '\f019';
+$file-link-icon: '\f0c6';
+$image-link-icon: '\f03e';
+$import-link-icon: '\f093';
+$internal-link-icon: '\f0c1';
+$manage-recipients: '\f003';
+$manage-subscribers: '\f0c0';
+$mark-as-paid: '\f058';
+$mark-as-unpaid: '\f057';
+$new-daypass-icon: '\f145';
+$new-directory-icon: '\f0e8';
+$new-directory-entry-icon: '\f114';
+$new-recipient: '\f1fa';
+$new-form-icon: '\f044';
+$new-link-icon: '\f0c1';
+$new-news-icon: '\f1ea';
+$new-newsletter-icon: '\f003';
+$new-note-icon: '\f24a';
+$new-page-icon: '\f0f6';
+$new-payment-icon: '\f09d';
+$new-person-icon: '\f007';
+$new-photo-album: '\f03e';
+$new-registration-window: '\f067';
+$new-reservation-icon: '\f271';
+$new-room-icon: '\f015';
+$new-stripe-connect-icon: '\f1f5';
+$new-user-icon: '\f234';
+$paste-link-icon: '\f0ea';
+$payment-capture-icon: '\f09d';
+$payment-refund-icon: '\f0e2';
+$payment-provider-icon: '\f283';
+$payments-icon: '\f09d';
+$rule-link-icon: '\f085';
+$select-icon: '\f14a';
+$send-link-icon: '\f1d9';
+$sync-icon: '\f021';
+$subscribe-link-icon: '\f0c1';
+$test-link-icon: '\f0e9';
+$occupancy-link-icon: '\f022';
+$upload-icon: '\f0ee';
+$view-link: '\f06e';
+
+$editbar-bg-color: $topbar-link-bg-hover;
+
+.edit-bar {
+
+    background-color: $editbar-bg-color;
+    margin-bottom: 2px;
+    margin-top: -2px;
+
+    .border {
+        border-bottom: 1px dashed $iron;
+    }
+
+    //a.right-side {
+    //    justify-self: flex-end;
+    //}
+
+    .accept-link::before { @include icon($accept-link-icon); }
+    .cleanup-link::before { @include icon($cleanup-link-icon); }
+    .copy-link::before { @include icon($copy-link-icon); }
+    .delete-link::before { @include icon($delete-link-icon); }
+    .edit-link::before { @include icon($edit-link-icon); }
+    .export-link::before { @include icon($export-link-icon); }
+    .file-url::before { @include icon($file-link-icon); }
+    .image-url::before { @include icon($image-link-icon); }
+    .import-link::before { @include icon($import-link-icon); }
+    .internal-url::before { @include icon($internal-link-icon); }
+    .manage-recipients::before { @include icon($manage-recipients); }
+    .manage-subscribers::before { @include icon($manage-subscribers); }
+    .new-daypass::before { @include icon($new-daypass-icon); }
+    .new-directory::before { @include icon($new-directory-icon); }
+    .new-directory-entry::before { @include icon($new-directory-entry-icon); }
+    .new-form::before { @include icon($new-form-icon); }
+    .new-link::before { @include icon($new-link-icon); }
+    .new-news::before { @include icon($new-news-icon); }
+    .new-newsletter::before { @include icon($new-newsletter-icon); }
+    .new-note::before { @include icon($new-note-icon); }
+    .new-page::before { @include icon($new-page-icon); }
+    .new-payment::before { @include icon($new-payment-icon); }
+    .new-person::before { @include icon($new-person-icon); }
+    .new-photo-album::before { @include icon($new-photo-album); }
+    .new-recipient::before { @include icon($new-recipient); }
+    .new-registration-window::before { @include icon($new-registration-window); }
+    .new-reservation::before { @include icon($new-reservation-icon); }
+    .new-room::before { @include icon($new-room-icon); }
+    .new-stripe-connect::before { @include icon($new-stripe-connect-icon); }
+    .new-user::before { @include icon($new-user-icon); }
+    .occupancy-link::before { @include icon($occupancy-link-icon); }
+    .paste-link::before { @include icon($paste-link-icon); }
+    .payment-provider::before { @include icon($payment-provider-icon); }
+    .payments::before { @include icon($payments-icon); }
+    .select::before { @include icon($select-icon); }
+    .send-link::before { @include icon($send-link-icon); }
+    .subscribe-link::before { @include icon($subscribe-link-icon); }
+    .test-link::before { @include icon($test-link-icon); }
+    .rule-link::before { @include icon($rule-link-icon); }
+    .sync::before { @include icon($sync-icon); }
+    .upload::before { @include icon($upload-icon); }
+    .view-link::before { @include icon($view-link); }
+}

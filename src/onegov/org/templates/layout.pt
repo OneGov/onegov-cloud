@@ -96,52 +96,67 @@
             <a class="show-for-sr" href="#content" i18n:translate>Skip navigation</a>
             <main>
                 <header>
-                  <div class="globals">
-                    <div class="grid-container">
-                      <div class="grid-x grid-padding-x">
-                          <div class="cell small-12">
-                            <ul tal:condition="global_tools|nothing" class="vertical medium-horizontal menu" data-responsive-menu="accordion medium-dropdown">
-                              <li tal:repeat="tool global_tools">
-                                <tal:b condition="tool.links|nothing" define="dropdown_id 'global-dropdown-{}'.format(repeat.tool.number)">
-                                  <a href="#" data-dropdown="${dropdown_id}" class="dropdown ${' '.join(tool.classes or '')}" tal:attributes="data-count tool.attributes['data-count']|nothing">${tool.title}</a>
-                                  <ul id="${dropdown_id}" data-dropdown-content class="vertical menu f-dropdown">
-                                      <li tal:repeat="link tool.links">
-                                          <tal:b replace="structure link(layout)" />
-                                      </li>
-                                  </ul>
-                                </tal:b>
-                                <tal:b condition="tool.url|tool.id|nothing" define="link tool">
-                                  <tal:b replace="structure link(layout)" />
-                                </tal:b>
-                              </li>
-                            </ul>
-                          </div>
+                    <div class="globals">
+                        <div class="grid-container">
+                          <div class="grid-x grid-padding-x">
+                              <div class="cell small-12">
+                                <ul tal:condition="global_tools|nothing" class="vertical medium-horizontal menu" data-responsive-menu="accordion medium-dropdown">
+                                  <li tal:repeat="tool global_tools">
+                                    <tal:b condition="tool.links|nothing" define="dropdown_id 'global-dropdown-{}'.format(repeat.tool.number)">
+                                      <a href="#" data-dropdown="${dropdown_id}" class="dropdown ${' '.join(tool.classes or '')}" tal:attributes="data-count tool.attributes['data-count']|nothing">${tool.title}</a>
+                                      <ul id="${dropdown_id}" data-dropdown-content class="vertical menu f-dropdown">
+                                          <li tal:repeat="link tool.links">
+                                              <tal:b replace="structure link(layout)" />
+                                          </li>
+                                      </ul>
+                                    </tal:b>
+                                    <tal:b condition="tool.url|tool.id|nothing" define="link tool">
+                                      <tal:b replace="structure link(layout)" />
+                                    </tal:b>
+                                  </li>
+                                </ul>
+                              </div>
+                            </div>
                         </div>
                     </div>
-                  </div>
-                </header>
-                <div data-sticky-container>
-                    <div id="nav-bar">
-                        <div data-sticky data-options="marginTop:0; stickyOn: small;">
-                            <div class="grid-container">
-                                <div class="grid-x grid-padding-x">
-                                    <div class="large-2 small-2 cell">
-                                        <button data-toggle="offCanvas"><i class="fas fa-bars"></i><span class="hide-for-small-only">Navigation</span></button>
-                                    </div>
-                                    <div class="large-8 small-8 cell">
-                                        <a href="${layout.homepage_url}" tal:define="logo_url layout.org.logo_url|nothing" aria-label="Back to the homepage" i18n:attributes="aria-label">
-                                            <img tal:condition="logo_url" src="${layout.org.logo_url}" alt="Logo" title="${layout.org.title}" i18n:attributes="alt"/>
-                                            <div tal:condition="not:logo_url" metal:use-macro="layout.svg['default_logo']"></div>
-                                        </a>
-                                    </div>
-                                    <div class="large-2 small-2 cell">
-                                        <button data-toggle="offCanvas"><i class="fa fa-search"></i><span class="hide-for-small-only">Suche</span></button>
+
+                    <div data-sticky-container>
+                        <div id="nav-bar">
+                            <div data-sticky data-options="marginTop:0; stickyOn: small;">
+                                <div class="grid-container">
+                                    <div class="grid-x grid-padding-x">
+                                        <div class="large-2 small-2 cell">
+                                            <button data-toggle="offCanvas"><i class="fas fa-bars"></i><span class="hide-for-small-only">Navigation</span></button>
+                                        </div>
+                                        <div class="large-8 small-8 cell">
+                                            <a href="${layout.homepage_url}" tal:define="logo_url layout.org.logo_url|nothing" aria-label="Back to the homepage" i18n:attributes="aria-label">
+                                                <img tal:condition="logo_url" src="${layout.org.logo_url}" alt="Logo" title="${layout.org.title}" i18n:attributes="alt"/>
+                                                <div tal:condition="not:logo_url" metal:use-macro="layout.svg['default_logo']"></div>
+                                            </a>
+                                        </div>
+                                        <div class="large-2 small-2 cell">
+                                            <button data-toggle="offCanvas"><i class="fa fa-search"></i><span class="hide-for-small-only">Suche</span></button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+
+                    <div class="grid-container">
+                        <div class="grid-x">
+                            <div class="small-12 cell">
+                                <div metal:use-macro="layout.macros['dropdown-editbar']"></div>
+                                <div metal:use-macro="layout.macros['breadcrumbs']"></div>
+                            </div>
+                        </div>
+                         <div class="grid-x">
+                            <div id="alert-boxes" class="cell small-12"></div>
+                        </div>
+                    </div>
+
+
+                </header>
             </main>
             <tal:b tal:content="structure layout.org.meta.analytics_code|nothing" />
         </div>

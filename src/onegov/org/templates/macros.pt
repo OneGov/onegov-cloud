@@ -46,61 +46,47 @@
     </ul>
 </metal:navigation>
 
-<metal:navigation define-macro="top_navigation">
-    <div class="main-navigation ${not links and 'empty'}" tal:define="links top_navigation|layout.top_navigation">
-        <nav class="top-bar" data-topbar role="navigation" tal:condition="links">
-            <ul class="title-area">
-                <!--! this section needs to be included (even though it's empty),
-                or the responsive menu bar icon won't be rendered -->
-                <li class="name" style="width: 0;"></li>
-                <li class="toggle-topbar menu-icon">
-                    <a href="#"><span>Menu</span></a>
-                </li>
-            </ul>
-            <section class="top-bar-section">
-                <ul class="left">
-                    <li tal:repeat="link links" tal:content="structure link(layout)" />
-                </ul>
-            </section>
-        </nav>
-        <div class="clearfix"></div>
-    </div>
-</metal:navigation>
 
-<metal:editbar define-macro="editbar">
-    <div class="row sub-navigation" tal:condition="layout.editbar_links">
-        <div class="small-12 columns">
-            <div class="edit-bar clearfix">
-                <tal:b repeat="group layout.editbar_links">
-                    <tal:b condition="group.links|nothing" define="dropdown_id 'editbar-dropdown-{}'.format(repeat.group.number)">
-                        <button href="#" data-dropdown="${dropdown_id}" class="${group.right_side and 'right-side'} tiny button dropdown">
-                            ${group.title}
-                        </button>
-                        <ul id="${dropdown_id}" data-dropdown-content class="f-dropdown disable-scroll">
+<metal:editbar define-macro="dropdown-editbar">
+    <div class="grid-x" tal:condition="layout.editbar_links">
+        <div class="small-12 cell">
+            <ul class="dropdown menu edit-bar" data-dropdown-menu >
+                <li tal:repeat="group layout.editbar_links">
+                    <tal:b condition="group.links|nothing">
+                        <a href="#">${group.title}</a>
+                        <ul class="menu">
                             <li tal:repeat="link group.links">
                                 <tal:b replace="structure link(layout)" />
                             </li>
                         </ul>
                     </tal:b>
                     <tal:b condition="group.url|group.attrs|nothing" define="link group">
-                        <tal:b replace="structure link(layout, ('tiny', 'button'))" />
+                        <tal:b replace="structure link(layout)" />
                     </tal:b>
-                </tal:b>
-            </div>
+                </li>
+
+            </ul>
         </div>
     </div>
 </metal:editbar>
 
+
 <metal:breadcrumbs define-macro="breadcrumbs">
-    <nav role="navigation" aria-label="You are here" i18n:attributes="aria-label">
-        <ul class="breadcrumbs" tal:condition="layout.breadcrumbs">
-            <tal:b repeat="link layout.breadcrumbs">
-                <li tal:attributes="class repeat.link.end and 'current' or ''"
-                    tal:content="structure link(layout)">
-                </li>
-            </tal:b>
-        </ul>
-    </nav>
+    <div id="breadcrumbs">
+        <div class="grid-container">
+            <div class="grid-x grid-padding-x" id="logo">
+                <div class="small-12 cell">
+                    <nav aria-label="You are here" role="navigation" i18n:attributes="aria-label">
+                        <ul class="breadcrumbs" tal:condition="layout.breadcrumbs">
+                            <tal:b repeat="link layout.breadcrumbs">
+                                <li tal:content="structure link(layout)"></li>
+                            </tal:b>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
 </metal:breadcrumbs>
 
 <metal:panel-links define-macro="panel-links">
