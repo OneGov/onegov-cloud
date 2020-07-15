@@ -68,39 +68,103 @@
     <!--! Adds a 'framed' class to the body if this document is shown inside an iframe -->
     <script>if (window !== window.parent) { document.querySelector('body').className += " framed"; }</script>
 
-    <!--! Skip navigation link for screenreaders -->
-    <a class="show-for-sr" href="#content" i18n:translate>Skip navigation</a>
+    <div class="off-canvas-wrapper">
+        <div class="off-canvas position-left sidebar" id="offCanvas" data-off-canvas>
+            <!-- Close button -->
+            <button class="close-button" aria-label="Close menu" type="button" data-close>
+                <span aria-hidden="true">&times;</span>
+            </button>
 
-
-    <main>
-        <header>
-          <div class="globals">
-            <div class="grid-container">
-              <div class="grid-x grid-padding-x">
-                  <div class="cell small-12">
-                    <ul tal:condition="global_tools|nothing" class="vertical medium-horizontal menu" data-responsive-menu="accordion medium-dropdown">
-                      <li tal:repeat="tool global_tools">
-                        <tal:b condition="tool.links|nothing" define="dropdown_id 'global-dropdown-{}'.format(repeat.tool.number)">
-                          <a href="#" data-dropdown="${dropdown_id}" class="dropdown ${' '.join(tool.classes or '')}" tal:attributes="data-count tool.attributes['data-count']|nothing">${tool.title}</a>
-                          <ul id="${dropdown_id}" data-dropdown-content class="vertical menu f-dropdown">
-                              <li tal:repeat="link tool.links">
-                                  <tal:b replace="structure link(layout)" />
-                              </li>
-                          </ul>
-                        </tal:b>
-                        <tal:b condition="tool.url|tool.id|nothing" define="link tool">
-                          <tal:b replace="structure link(layout)" />
-                        </tal:b>
-                      </li>
-                    </ul>
-                  </div>
+            <form class="searchbox" action="${layout.search_url}" method="GET" tal:condition="not:hide_search_header|nothing" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
+                <div class="input-group">
+                    <input class="input-group-field" type="search" id="search" data-typeahead-subject name="q" autocomplete="off" autocorrect="off" required maxlength="200">
+                    <div class="input-group-button">
+                        <input type="submit" class="button" value="Search" i18n:attributes="value">
+                    </div>
                 </div>
-            </div>
-          </div>
-        </header>
-    </main>
+                <div class="typeahead">
+                      <div class="columns small-12" data-typeahead-container>
+                      </div>
+                </div>
+            </form>
 
-    <tal:b tal:content="structure layout.org.meta.analytics_code|nothing" />
+            <!-- Menu -->
+            <ul class="vertical menu drilldown" data-drilldown data-back-button="${layout.drilldown_back}">
+                <li><a href="#">Portrait & Fakten</a></li>
+                <li>
+                    <a href="#">Politik & Verwaltung</a>
+                    <ul class="menu vertical nested">
+                        <li><a href="#">Behörden & Kommissionen</a>
+                            <ul class="menu vertical nested">
+                                <li><a href="#">Bürgerrechtskommission</a></li>
+                                <li><a href="#">Energie- und Werkkommission</a></li>
+                                <li><a href="#">Finanzausschuss</a></li>
+                                <li><a href="#">Jugendkommission</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#">Gemeinderat</a></li>
+                        <li><a href="#">Gemeindeversammlung</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">Gesellschaft & Wohnen</a></li>
+            </ul>
+        </div>
+
+        <div class="off-canvas-content" data-off-canvas-content>
+            <a class="show-for-sr" href="#content" i18n:translate>Skip navigation</a>
+            <main>
+                <header>
+                  <div class="globals">
+                    <div class="grid-container">
+                      <div class="grid-x grid-padding-x">
+                          <div class="cell small-12">
+                            <ul tal:condition="global_tools|nothing" class="vertical medium-horizontal menu" data-responsive-menu="accordion medium-dropdown">
+                              <li tal:repeat="tool global_tools">
+                                <tal:b condition="tool.links|nothing" define="dropdown_id 'global-dropdown-{}'.format(repeat.tool.number)">
+                                  <a href="#" data-dropdown="${dropdown_id}" class="dropdown ${' '.join(tool.classes or '')}" tal:attributes="data-count tool.attributes['data-count']|nothing">${tool.title}</a>
+                                  <ul id="${dropdown_id}" data-dropdown-content class="vertical menu f-dropdown">
+                                      <li tal:repeat="link tool.links">
+                                          <tal:b replace="structure link(layout)" />
+                                      </li>
+                                  </ul>
+                                </tal:b>
+                                <tal:b condition="tool.url|tool.id|nothing" define="link tool">
+                                  <tal:b replace="structure link(layout)" />
+                                </tal:b>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                    </div>
+                  </div>
+                </header>
+                <div data-sticky-container>
+                    <div id="nav-bar">
+                        <div data-sticky data-options="marginTop:0; stickyOn: small;">
+                            <div class="grid-container">
+                                <div class="grid-x grid-padding-x">
+                                    <div class="large-2 small-2 cell">
+                                        <button data-toggle="offCanvas"><i class="fas fa-bars"></i><span class="hide-for-small-only">Navigation</span></button>
+                                    </div>
+                                    <div class="large-8 small-8 cell">
+                                        <a href="${layout.homepage_url}" tal:define="logo_url layout.org.logo_url|nothing" aria-label="Back to the homepage" i18n:attributes="aria-label">
+                                            <img tal:condition="logo_url" src="${layout.org.logo_url}" alt="Logo" title="${layout.org.title}" i18n:attributes="alt"/>
+                                            <div tal:condition="not:logo_url" metal:use-macro="layout.svg['default_logo']"></div>
+                                        </a>
+                                    </div>
+                                    <div class="large-2 small-2 cell">
+                                        <button data-toggle="offCanvas"><i class="fas fa-search"></i><span class="hide-for-small-only">Suche</span></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <tal:b tal:content="structure layout.org.meta.analytics_code|nothing" />
+        </div>
+    </div>
+
 </body>
 
 </html>
