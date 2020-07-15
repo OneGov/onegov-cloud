@@ -162,9 +162,38 @@
                             </div>
                         </div>
                     </div>
-
-
                 </header>
+
+        <div class="grid-container">
+            <article class="grid-x content with-sidebar-links" tal:condition="layout.sidebar_links">
+              <div class="small-12 medium-3 large-3 cell sidebar show-for-medium-up">
+                <div metal:use-macro="layout.macros['sidebar']" />
+              </div>
+              <div class="small-12 medium-9 large-9 cell">
+                <div class="grid-x">
+                    <div class="small-12 cell">
+                      <section role="main" id="content">
+                        <h1 class="main-title"><div metal:define-slot="pre-title"></div><div metal:define-slot="title"></div><div metal:define-slot="post-title"></div></h1>
+                        <div metal:define-slot="content"></div>
+                      </section>
+                    </div>
+                </div>
+              </div>
+            </article>
+
+            <article class="grid-x content without-sidebar-links" tal:condition="not:layout.sidebar_links">
+              <div class="small-12 cell">
+                <div class="grid-x">
+                    <div class="small-12 cell">
+                      <section role="main" id="content">
+                        <h1 class="main-title"><div metal:define-slot="pre-title"></div><div metal:define-slot="title"></div><div metal:define-slot="post-title"></div></h1>
+                        <div metal:define-slot="content"></div>
+                      </section>
+                    </div>
+                </div>
+              </div>
+            </article>
+        </div>
                 <div class="grid-container">
                     <metal:footer use-macro="layout.macros['footer']" />
                 </div>
