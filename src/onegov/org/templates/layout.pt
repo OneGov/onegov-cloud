@@ -151,7 +151,14 @@
                             </div>
                         </div>
                          <div class="grid-x">
-                            <div id="alert-boxes" class="cell small-12"></div>
+                            <div id="alert-boxes" class="cell small-12">
+                                <div tal:condition="form.errors|nothing" data-alert class="callout alert" data-closable>
+                                    <tal:b i18n:translate>The form contains errors. Please check the fields marked in red.</tal:b>
+                                    <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
