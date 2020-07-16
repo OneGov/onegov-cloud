@@ -122,7 +122,7 @@
 
                     <div data-sticky-container>
                         <div id="nav-bar">
-                            <div data-sticky data-options="marginTop:0; stickyOn: small;">
+                            <div class="nav-bar-sticky" data-sticky data-options="marginTop:0; stickyOn: small;">
                                 <div class="grid-container">
                                     <div class="grid-x grid-padding-x">
                                         <div class="large-2 small-2 cell">
