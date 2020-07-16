@@ -1115,13 +1115,23 @@
 
 
 <metal:slider define-macro="slider" i18n:domain="onegov.org">
-    <ul tal:condition="images" class="slider" data-orbit="" data-options="slide_number:false; bullets:false; pause_on_hover:false; timer_speed: 7500;">
-        <li tal:repeat="image images" style="background: url('${image.src}') no-repeat center;">
-            <div class="orbit-caption" tal:condition="image.note">
-                ${image.note}
+    <div tal:condition="images" class="orbit" role="region" aria-label="Homepage Image Slider" data-orbit class="slider" data-use-m-u-i="false">
+        <div class="orbit-wrapper">
+            <div class="orbit-controls">
+                <button class="orbit-previous"><span class="show-for-sr">Previous Slide</span>&#9664;&#xFE0E;</button>
+                <button class="orbit-next"><span class="show-for-sr">Next Slide</span>&#9654;&#xFE0E;</button>
             </div>
-        </li>
-    </ul>
+            <ul class="orbit-container">
+                <li tal:repeat="image images" class="orbit-slide">
+                    <figure class="orbit-figure">
+                        <img class="orbit-image" src="${image.src}">
+                        <figcaption tal:condition="image.note" class="orbit-caption">${image.note}</figcaption>
+                    </figure>
+                </li>
+            </ul>
+        </div>
+        <metal:b use-macro="layout.macros['orbit-bullets']" />
+    </div>
     <div class="slider no-images" tal:condition="not images and request.is_manager">
         <tal:b i18n:translate>
             This space holds images from your photo-albums. To show photos add a few
@@ -1130,6 +1140,14 @@
     </div>
 </metal:slider>
 
+<metal:bullets define-macro="orbit-bullets" i18n:domain="onegov.org">
+    <nav class="orbit-bullets">
+        <button tal:repeat="image images" class="${'is-active' if repeat.image.start else ''}" tal:attributes="data-slide repeat.image.index">
+            <span class="show-for-sr" tal:condition="image.note">${image.note}</span>
+            <span tal:condition="repeat.image.start" class="show-for-sr" data-slide-active-label i18n:translate>Current Slide</span>
+        </button>
+    </nav>
+</metal:bullets>
 
 <metal:search_result_users define-macro="search_result_users" i18n:domain="onegov.org">
     <a href="${request.return_here(request.link(result))}">${result.title} <metal:hint use-macro="layout.macros['access_hint']" tal:define="item result" /></a>
