@@ -14,7 +14,7 @@ from sqlalchemy import func
 class RowWidget(object):
     template = """
         <xsl:template match="row">
-            <div class="row">
+            <div class="grid-x">
                 <xsl:apply-templates select="node()"/>
             </div>
         </xsl:template>
@@ -25,7 +25,7 @@ class RowWidget(object):
 class ColumnWidget(object):
     template = """
         <xsl:template match="column">
-            <div class="small-12 medium-{@span} columns">
+            <div class="small-12 medium-{@span} cell">
                 <xsl:apply-templates select="node()"/>
             </div>
         </xsl:template>
