@@ -400,7 +400,14 @@ $globals-height: 2.5rem;
     }
 }
 
+$navbar-shadow: 0px 15px 10px -15px rgba(10, 10, 10, 0.25);
+
 #nav-bar {
+
+    .nav-bar-sticky {
+        background-color: $white;
+        box-shadow: $navbar-shadow;
+    }
 
     .cell {
         display: flex;
@@ -411,9 +418,7 @@ $globals-height: 2.5rem;
 
     > div {
         min-height: 140px;
-        width:100%;
-        background: $white;
-        box-shadow: 0 15 10 -15 rgba(10, 10, 10, 0.25)
+        width: 100%;
     }
 
     img {
@@ -605,8 +610,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     font-style: italic;
     margin-bottom: 1rem;
     overflow: hidden;
-    padding-bottom: .7rem;
-    padding-left: 1rem;
+    padding: 1rem 0 .7rem 1rem;
     text-overflow: ellipsis;
     white-space: nowrap;
 
