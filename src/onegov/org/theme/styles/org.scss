@@ -1,62 +1,4 @@
 /*
-    useful mixins
-*/
-
-// sass-lint:disable-all
-@mixin grayscale {
-    filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale");
-            filter: grayscale(100%);
-       -moz-filter: grayscale(100%);
-        -ms-filter: grayscale(100%);
-         -o-filter: grayscale(100%);
-            filter: gray;
-    -webkit-filter: grayscale(100%);
-}
-
-@mixin reset-filter {
-       -moz-filter: none;
-        -ms-filter: none;
-         -o-filter: none;
-            filter: none;
-    -webkit-filter: none;
-}
-// sass-lint:enable-all
-
-@mixin hairline {
-    border: 0;
-    border-bottom: 1px solid $gray;
-}
-
-@mixin smooth-edges {
-    border-radius: 2px;
-}
-
-@mixin circle {
-    border-radius: 1000px;
-}
-
-@mixin icon($icon) {
-    content: $icon;
-    display: inline-block;
-    font-family: 'FontAwesome';
-    font-weight: normal;
-    width: 1.5ex;
-}
-
-@mixin prefix ($prop, $val) {
-    // sass-lint:disable-block property-sort-order
-    -webkit-#{$prop}: #{$val};
-    -moz-#{$prop}: #{$val};
-    -ms-#{$prop}: #{$val};
-    #{$prop}: #{$val};
-}
-
-@mixin primary-color-background {
-    background-color: $primary-color;
-    color: $primary-fg-color;
-}
-
-/*
     Fixes a foundation js error
 */
 //.foundation-data-attribute-namespace {
@@ -220,16 +162,6 @@ footer {
 //}
 
 /*
-    Apply on a row to flip the order of columns on mobile
-*/
-@media #{$small-only} {
-    .reverse-on-mobile {
-        display: flex;
-        flex-direction: column-reverse;
-    }
-}
-
-/*
     Base Typography
 */
 
@@ -297,313 +229,203 @@ $header-styles: (
 }
 
 /*
-    The global tools header
+    main title
 */
-$globals-margin: .75rem;
-$globals-height: 2.5rem;
 
+.main-title {
+    margin-bottom: 1rem;
+    margin-top: -.5rem;
+}
 
-.globals {
-    // Todo: the link text inside the second level should not wrap
-    @include primary-color-background;
-    margin-bottom: $globals-margin;
-    min-height: $globals-height;
-    padding: .5rem;
+/*
+    page lead
+*/
+.page-lead {
+    display: block;
+    font-size: $h5-font-size;
+    font-weight: 400;
+    margin-bottom: 1rem;
+    max-width: $max-line-width;
+}
 
-    a {
-        font-size: .875rem;
-        &::before {
-            margin-right: 1ex;
-            text-align: center;
+/*
+    image subtitles
+*/
+.alt-text {
+    background-color: $vapor;
+    color: $monsoon;
+    display: block;
+    font-size: .875rem;
+    padding: .25em .75em;
+    transition: background .5s ease-in-out;
+}
+
+.alt-text-missing {
+    background-color: $yellow-pastel;
+    font-style: italic;
+}
+
+.alt-text-changed-success {
+    background-color: $green-light;
+}
+
+.alt-text-changed-error {
+    background-color: $red-light;
+}
+
+/*
+    homepage tiles images
+*/
+
+#homepage-tile-1 .tile-image { background-image: url(#{$tile-image-1});}
+#homepage-tile-2 .tile-image { background-image: url(#{$tile-image-2});}
+#homepage-tile-3 .tile-image { background-image: url(#{$tile-image-3});}
+#homepage-tile-4 .tile-image { background-image: url(#{$tile-image-4});}
+#homepage-tile-5 .tile-image { background-image: url(#{$tile-image-5});}
+#homepage-tile-6 .tile-image { background-image: url(#{$tile-image-6});}
+
+/*
+    input buttons
+*/
+.input-with-button {
+    .button {
+        border-left: 0;
+        padding: 0;
+
+        // IE 9, 10 and 11 will put the link inside the button element because
+        // Internet Explorer. Here we hide the result.
+        a,
+        .redactor-selection-marker {
+            display: none;
         }
     }
 
-    .grid-x > .cell > ul {
-
-        @include breakpoint(medium up) {
-            display: flex;
-            flex-direction: row-reverse;
+    #redactor-modal-link-insert {
+        > input,
+        > label {
+            display: none;
         }
-
-        > li {
-            > a {
-                @include primary-color-background;
-                height: $globals-height;
-                line-height: $globals-height;
-                padding: 0 1rem;
-            }
-        }
-    }
-
-    .f-dropdown {
-        a {
-            color: $body-font-color;
-
-            &:hover {
-                @include primary-color-background;
-            }
-
-            @include breakpoint(small only) {
-                color: $primary-fg-color;
-            }
-        }
-    }
-
-    .login::before { @include icon('\f090'); }
-    .logout::before { @include icon('\f08b'); }
-    .register::before { @include icon('\f234'); }
-    .user::before { @include icon('\f2bd'); }
-    .users::before { @include icon('\f0c0'); }
-    .payment::before { @include icon('\f09d'); }
-    .payment-provider::before { @include icon('\f283'); }
-    .profile::before { @include icon('\f2c3'); }
-    .management::before { @include icon('\f013'); }
-    .images::before { @include icon('\f03e'); }
-    .files::before { @include icon('\f016'); }
-    .settings::before { @include icon('\f1de'); }
-    .timeline::before { @include icon('\f017'); }
-    .no-tickets::before { @include icon('\f145'); }
-
-    .with-count::before {
-        border: 1px solid $primary-fg-color;
-        border-radius: 1000px;
-        box-shadow: 0 0 2px $primary-fg-color;
-        box-sizing: content-box;
-        content: attr(data-count);
-        display: inline-block;
-        font-size: .75rem;
-        line-height: 22px;
-        margin-right: 1ex;
-        min-width: 15px;
-        padding: 0 .25rem;
-        position: relative;
-    }
-
-    .alert.with-count::before {
-        background-color: $alert-color;
-        color: $white;
-    }
-
-    .success.with-count::before {
-        background-color: $success-color;
-        color: $white;
-    }
-
-    .info.with-count::before {
-        background-color: $info-color;
-        color: $white;
-    }
-
-    .secondary.with-count::before {
-        background-color: $secondary-color;
-        color: $body-font-color;
     }
 }
 
-$navbar-shadow: 0px 15px 10px -15px rgba(10, 10, 10, 0.25);
-
-#nav-bar {
-
-    .nav-bar-sticky {
-        background-color: $white;
-        box-shadow: $navbar-shadow;
+/*
+    simple listed content
+*/
+.with-lead {
+    li + li {
+        margin-top: .5rem;
     }
 
-    .cell {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 25px 0;
+    .list-title {
+        font-weight: bold;
     }
 
-    > div {
-        min-height: 140px;
-        width: 100%;
+    .list-lead {
+        margin-bottom: .2em;
+        max-width: $max-line-width;
+
+        em {
+            font-style: normal;
+            font-weight: bold;
+        }
+    }
+}
+
+/*
+    page text
+*/
+
+.page-text {
+    margin-bottom: 2rem;
+
+    blockquote {
+        background-color: $topbar-bg-color;
+        padding: .5rem 1rem;
+    }
+
+    hr {
+        @include hairline;
     }
 
     img {
-        height: 7em;
-        object-fit: contain;
-    }
-}
-
-.searchbox {
-    margin-top: 2rem;
-    padding: 1rem;
-}
-
-/*
-    Search result typeahead
-*/
-.typeahead {
-    position: relative;
-
-    ul {
-        background-color: $white;
-        border-width: 0 1px 1px;
-        box-shadow: 0 0 5px $jumbo;
-        left: 1em;
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-        position: absolute;
-        //right: 1em;
-        z-index: 1;
-        overflow: visible;
-    }
-
-    a {
-        color: $input-color;
+        border-radius: 2px;
         display: block;
-        font-size: $input-font-size;
     }
 
-    li {
-        padding: 0 5px;
+    p {
+        max-width: $max-line-width;
+    }
 
-        // highlight links with the active class
-        &.active {
-            background-color: $topbar-bg-color;
+    pre {
+        @include smooth-edges;
 
-            a {
-                color: $primary-color;
-                font-weight: bold;
-            }
+        background: $white-smoke;
+        display: inline-block;
+        font-size: .9rem;
+        margin-bottom: 1rem;
+        padding: .75rem 1rem;
+    }
+
+    .has-img,
+    .has-video {
+        max-width: none;
+    }
+
+    .has-video {
+        background-color: $gray-pastel;
+        cursor: pointer;
+        display: block;
+        min-height: 360px;
+        position: relative;
+        text-align: center;
+        width: 100%;
+
+        @media #{$medium-only} {
+            min-height: 300px;
         }
 
-        // highlight links when hovering
-        &:hover {
-            background-color: $topbar-bg-color !important;
-
-            a {
-                color: $primary-color !important;
-                font-weight: bold !important;
-            }
+        @media #{$small-only} {
+            min-height: 200px;
         }
     }
 
-    // do not highlight links with the active class when hovering (so we
-    // get a different highlight when hovering)
-    &:hover li.active {
-        background-color: $white;
+    .video-wrapper {
+        height: 0;
+        padding-bottom: 56.25%; /* 16:9 */
+        position: relative;
 
-        a {
-            color: $body-font-color;
-            font-weight: normal;
+        iframe {
+            height: 100%;
+            left: 0;
+            position: absolute;
+            top: 0;
+            width: 100%;
         }
     }
 }
 
 /*
-    edit bar (and popup links)
+    page links
 */
-$accept-link-icon: '\f00c';
-$cleanup-link-icon: '\f0d0';
-$copy-link-icon: '\f0c5';
-$delete-link-icon: '\f014';
-$disabled-icon: '\f05e';
-$edit-link-icon: '\f040';
-$export-link-icon: '\f019';
-$file-link-icon: '\f0c6';
-$image-link-icon: '\f03e';
-$import-link-icon: '\f093';
-$internal-link-icon: '\f0c1';
-$manage-recipients: '\f003';
-$manage-subscribers: '\f0c0';
-$mark-as-paid: '\f058';
-$mark-as-unpaid: '\f057';
-$new-daypass-icon: '\f145';
-$new-directory-icon: '\f0e8';
-$new-directory-entry-icon: '\f114';
-$new-recipient: '\f1fa';
-$new-form-icon: '\f044';
-$new-link-icon: '\f0c1';
-$new-news-icon: '\f1ea';
-$new-newsletter-icon: '\f003';
-$new-note-icon: '\f24a';
-$new-page-icon: '\f0f6';
-$new-payment-icon: '\f09d';
-$new-person-icon: '\f007';
-$new-photo-album: '\f03e';
-$new-registration-window: '\f067';
-$new-reservation-icon: '\f271';
-$new-room-icon: '\f015';
-$new-stripe-connect-icon: '\f1f5';
-$new-user-icon: '\f234';
-$paste-link-icon: '\f0ea';
-$payment-capture-icon: '\f09d';
-$payment-refund-icon: '\f0e2';
-$payment-provider-icon: '\f283';
-$payments-icon: '\f09d';
-$rule-link-icon: '\f085';
-$select-icon: '\f14a';
-$send-link-icon: '\f1d9';
-$sync-icon: '\f021';
-$subscribe-link-icon: '\f0c1';
-$test-link-icon: '\f0e9';
-$occupancy-link-icon: '\f022';
-$upload-icon: '\f0ee';
-$view-link: '\f06e';
 
-$editbar-bg-color: $topbar-link-bg-hover;
+.page-links {
+    li {
+        margin-left: 0;
+        margin-right: 1rem;
 
-.edit-bar {
+        a::after {
+            color: transparentize($primary-color, .8);
+            content: ' | ';
+            display: inline-block;
+            margin-left: 1rem;
+        }
 
-    background-color: $editbar-bg-color;
-    margin-bottom: 2px;
-    margin-top: -2px;
-
-    .border {
-        border-bottom: 1px dashed $iron;
+        &:last-child a::after {
+            content: '';
+        }
     }
-
-    //a.right-side {
-    //    justify-self: flex-end;
-    //}
-
-    .accept-link::before { @include icon($accept-link-icon); }
-    .cleanup-link::before { @include icon($cleanup-link-icon); }
-    .copy-link::before { @include icon($copy-link-icon); }
-    .delete-link::before { @include icon($delete-link-icon); }
-    .edit-link::before { @include icon($edit-link-icon); }
-    .export-link::before { @include icon($export-link-icon); }
-    .file-url::before { @include icon($file-link-icon); }
-    .image-url::before { @include icon($image-link-icon); }
-    .import-link::before { @include icon($import-link-icon); }
-    .internal-url::before { @include icon($internal-link-icon); }
-    .manage-recipients::before { @include icon($manage-recipients); }
-    .manage-subscribers::before { @include icon($manage-subscribers); }
-    .new-daypass::before { @include icon($new-daypass-icon); }
-    .new-directory::before { @include icon($new-directory-icon); }
-    .new-directory-entry::before { @include icon($new-directory-entry-icon); }
-    .new-form::before { @include icon($new-form-icon); }
-    .new-link::before { @include icon($new-link-icon); }
-    .new-news::before { @include icon($new-news-icon); }
-    .new-newsletter::before { @include icon($new-newsletter-icon); }
-    .new-note::before { @include icon($new-note-icon); }
-    .new-page::before { @include icon($new-page-icon); }
-    .new-payment::before { @include icon($new-payment-icon); }
-    .new-person::before { @include icon($new-person-icon); }
-    .new-photo-album::before { @include icon($new-photo-album); }
-    .new-recipient::before { @include icon($new-recipient); }
-    .new-registration-window::before { @include icon($new-registration-window); }
-    .new-reservation::before { @include icon($new-reservation-icon); }
-    .new-room::before { @include icon($new-room-icon); }
-    .new-stripe-connect::before { @include icon($new-stripe-connect-icon); }
-    .new-user::before { @include icon($new-user-icon); }
-    .occupancy-link::before { @include icon($occupancy-link-icon); }
-    .paste-link::before { @include icon($paste-link-icon); }
-    .payment-provider::before { @include icon($payment-provider-icon); }
-    .payments::before { @include icon($payments-icon); }
-    .select::before { @include icon($select-icon); }
-    .send-link::before { @include icon($send-link-icon); }
-    .subscribe-link::before { @include icon($subscribe-link-icon); }
-    .test-link::before { @include icon($test-link-icon); }
-    .rule-link::before { @include icon($rule-link-icon); }
-    .sync::before { @include icon($sync-icon); }
-    .upload::before { @include icon($upload-icon); }
-    .view-link::before { @include icon($view-link); }
 }
+
 
 .breadcrumbs {
     @include hairline;
@@ -630,73 +452,4 @@ $editbar-bg-color: $topbar-link-bg-hover;
 */
 .content {
     margin-bottom: 1rem;
-}
-
-// we need to use exact pixel measurements for the footer or we end up with
-// inconsistent results across browsers, which might mean the difference between
-// showing a scrollbar and not showing one
-$footer-header-color: $charcoal;
-$footer-text-color: $steel;
-$footer-font-size: 13px;
-$footer-border-width: 0;
-
-.footer-content {
-    background-color: $topbar-bg-color;
-
-    box-shadow: 0 -2px 0 $primary-color;
-    max-width: 100% !important;
-
-    padding: 0;
-
-    > .cell > .grid-x {
-        margin: 0 auto;
-        max-width: $grid-row-width;
-    }
-
-    * {
-        background-color: $topbar-bg-color;
-        color: $footer-text-color;
-        font-size: $footer-font-size;
-        line-height: 25px;
-    }
-
-    h2 {
-        color: $footer-header-color;
-        font-weight: 500;
-        letter-spacing: 1px;
-        margin-bottom: 13px;
-        text-transform: uppercase;
-    }
-
-    h2.custom-links {
-        text-transform: none;
-    }
-
-    .footer-columns {
-        padding-bottom: .5rem;
-        padding-top: 1.25rem;
-
-        p {
-            line-height: 1.5rem;
-            margin-bottom: .5rem;
-        }
-    }
-
-    .footer-links {
-        padding: .5rem 0;
-        position: relative;
-        text-align: center;
-
-        .columns {
-            span + span::before {
-                content: '•';
-            }
-        }
-    }
-
-}
-
-#redactor-modal-box footer {
-    // the redactor also contains a footer which doesn't need a specific height
-    height: auto;
 }

@@ -1,0 +1,22 @@
+/*
+    Pdf Preview
+*/
+.pdf-preview {
+    background: $white;
+    box-shadow: 4px 4px 10px rgba(100, 100, 100, .4);
+
+    max-height: 256px;
+    max-width: 256px;
+}
+
+/*
+    Icon widget customisation
+*/
+.icon-widget {
+    li:hover,
+    li.active {
+        background: $primary-color !important;
+        border-color: $primary-fg-color !important;
+        color: $primary-fg-color !important;
+    }
+}

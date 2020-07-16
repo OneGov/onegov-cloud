@@ -1,0 +1,209 @@
+/*
+    Print Styles
+*/
+@media print {
+    .globals,
+    .alert-box,
+    .calendar-day .calendar-day-thumbnail,
+    .date-range-selector,
+    .date-range-selector-result,
+    .edit-bar,
+    footer,
+    .occurrence-exports,
+    .occurrences-filter-tags,
+    .page-links,
+    .searchbox,
+    .side-nav,
+    div.push,
+    .counts,
+    .top-bar {
+        display: none !important;
+    }
+
+    .side-panel {
+        border: 1px solid $tuatara;
+        border-radius: 3px;
+        margin-bottom: .5rem;
+
+        .field-display-block {
+            float: left;
+            margin-right: 1.5rem;
+        }
+    }
+
+    html,
+    body {
+        height: 99%; // avoids blank pages at the end
+    }
+
+    body {
+        font-size: 12px !important;
+    }
+
+    .field-display-block .field-display-label,
+    .field-display-block .field-display-data,
+    .field-display-block .field-display-data * {
+        background-color: transparent;
+        color: $body-font-color !important;
+        font-size: 12px !important;
+        margin: 0 !important;
+        padding: 0;
+    }
+
+    .side-panel .ticket-number {
+        display: block !important;
+        line-height: 1.5 !important;
+    }
+
+    .ticket-summary h2,
+    .ticket-timeline h2 {
+        font-weight: bold;
+    }
+
+    .ticket-submitter-notification-status {
+        display: none;
+    }
+
+    .ticket-summary {
+        margin-bottom: 0;
+
+        * {
+            font-size: 12px !important;
+        }
+
+        ul {
+            margin-bottom: 0;
+        }
+    }
+
+    .ticket-panel *,
+    .ticket-timeline * {
+        font-size: 12px !important;
+    }
+
+    .ticket-panel {
+        background: $white !important;
+        display: flex;
+        flex-wrap: wrap;
+        padding: 0 !important;
+
+        > * {
+            margin: 0 1rem 0 0 !important;
+        }
+
+        > h2 {
+            flex: 0 0 100%;
+            margin-bottom: .25rem !important;
+        }
+    }
+
+    .ticket-panel .button {
+        display: none !important;
+    }
+
+    .timeline {
+        * {
+            font-size: 12px !important;
+        }
+
+        .identicon {
+            height: 30px;
+            margin-right: -10px;
+            visibility: hidden;
+            width: 10px;
+        }
+
+        .title {
+            margin-bottom: 2px;
+        }
+
+        .text {
+            margin-bottom: 2px;
+        }
+    }
+
+    .payment-state {
+        background: none !important;
+        border: 0 !important;
+        padding: 0 !important;
+    }
+
+    h1 {
+        font-size: 1.6rem;
+    }
+
+    h2 {
+        @include hairline;
+        font-size: 1.2rem;
+        margin-bottom: .25rem;
+    }
+
+    h3 {
+        font-size: 1.1rem;
+        margin-bottom: .15rem;
+    }
+
+    h4,
+    h5,
+    h6 {
+        font-size: 1rem;
+    }
+
+    .header {
+        max-height: 50px;
+    }
+
+    .logo {
+        max-height: 40px;
+
+        img,
+        svg {
+            max-height: 45px;
+            width: auto;
+        }
+    }
+
+    ul.breadcrumbs {
+        padding: 0 0 .25rem 1rem;
+
+        * {
+            font-size: 9px;
+        }
+    }
+
+    .occupancy-block {
+        h2 {
+            font-weight: bold;
+        }
+
+        .occupancy-entry {
+            .date,
+            .quota {
+                font-weight: normal;
+            }
+        }
+
+        * {
+            font-size: 12px;
+        }
+
+        > .columns {
+            margin-bottom: 0;
+        }
+    }
+
+    .calendar-day {
+        border-bottom: 2px solid $body-font-color !important;
+    }
+
+    .calendar-day-date {
+        background: $white !important;
+
+    }
+
+    .calendar-day .calendar-day-date > * {
+        background: $white !important;
+        color: $body-font-color !important;
+        padding-left: 0 !important;
+    }
+}

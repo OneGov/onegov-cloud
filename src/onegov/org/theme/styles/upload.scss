@@ -1,0 +1,52 @@
+/*
+    Upload
+*/
+.dropzone {
+    @include prefix(transition, border 100ms ease-out);
+
+    border: 1px dashed $gainsboro;
+    display: flex;
+    flex-direction: column;
+    height: 10rem;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    text-align: center;
+
+    &.drag-over {
+        border-color: $anchor-font-color;
+    }
+}
+
+.upload-filelist-header {
+    margin-bottom: 1.5rem;
+}
+
+.upload-progress {
+    margin-bottom: 1.5rem;
+
+    .progress {
+        margin-left: 25%;
+        width: 75%;
+
+        &::before {
+            content: attr(data-filename);
+            font-size: .875rem;
+            left: 1rem;
+            overflow: hidden;
+            position: absolute;
+            text-align: left;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 22.5%;
+        }
+
+        &.alert::after {
+            color: $white;
+            content: attr(data-error);
+            font-size: .8rem;
+            margin-left: .75ex;
+            margin-top: -1.2rem;
+            position: absolute;
+        }
+    }
+}
