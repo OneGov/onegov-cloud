@@ -134,23 +134,6 @@ footer {
     line-height: inherit;
 }
 
-/*
-    Small text
-*/
-.small-text {
-    font-size: .875rem;
-}
-
-.tiny-text {
-    font-size: .8rem;
-}
-
-/*
-    Small atomic text particles whose white-space should not be wrapped
-*/
-.nowrap {
-    white-space: nowrap;
-}
 
 /*
     Chrome shows a little up/down arrow on date fields which takes quite
@@ -160,73 +143,6 @@ footer {
 //    -webkit-appearance: none;
 //    display: none;
 //}
-
-/*
-    Base Typography
-*/
-
-$h1-font-size: rem-calc(44) !default;
-$h2-font-size: rem-calc(37) !default;
-$h3-font-size: rem-calc(27) !default;
-$h4-font-size: rem-calc(23) !default;
-$h5-font-size: rem-calc(18) !default;
-$h6-font-size: 1rem !default;
-
-$h1-font-reduction: 24;
-$h2-font-reduction: 20;
-$h3-font-reduction: 12;
-$h4-font-reduction: 7;
-$h5-font-reduction: 3;
-$h6-font-reduction: 0;
-
-$header-styles: (
-  small: (
-    'h1': ('font-size': $h1-font-size - $h1-font-reduction),
-    'h2': ('font-size': $h2-font-size - $h2-font-reduction),
-    'h3': ('font-size': $h3-font-size - $h3-font-reduction),
-    'h4': ('font-size': $h4-font-size - $h4-font-reduction),
-    'h5': ('font-size': $h5-font-size - $h5-font-reduction),
-    'h6': ('font-size': $h6-font-size - $h6-font-reduction),
-  ),
-  medium: (
-    'h1': ('font-size': $h1-font-size),
-    'h2': ('font-size': $h2-font-size),
-    'h3': ('font-size': $h3-font-size),
-    'h4': ('font-size': $h4-font-size),
-    'h5': ('font-size': $h5-font-size),
-    'h6': ('font-size': $h6-font-size),
-  ),
-);
-
-.h1-size { font-size: $h1-font-size - $h1-font-reduction; }
-.h2-size { font-size: $h2-font-size - $h2-font-reduction; }
-.h3-size { font-size: $h3-font-size - $h3-font-reduction; }
-.h4-size { font-size: $h4-font-size - $h4-font-reduction; }
-.h5-size { font-size: $h5-font-size - $h5-font-reduction; }
-.h6-size { font-size: $h6-font-size - $h6-font-reduction; }
-
-@media #{$medium-up} {
-    .h1-size,
-    .h2-size,
-    .h3-size,
-    .h4-size,
-    .h5-size,
-    .h6-size {
-        line-height: $header-line-height;
-    }
-
-    .h1-size { font-size: $h1-font-size; }
-
-    .h2-size { font-size: $h2-font-size; }
-
-    .h3-size { font-size: $h3-font-size; }
-
-    .h4-size { font-size: $h4-font-size; }
-
-    .h5-size { font-size: $h5-font-size; }
-
-    .h6-size { font-size: $h6-font-size; }
-}
 
 /*
     main title
