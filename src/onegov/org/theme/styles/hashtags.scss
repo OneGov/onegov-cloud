@@ -1,0 +1,20 @@
+/*
+    Hashtags
+*/
+
+.hashtag {
+    border-radius: 3px;
+    box-shadow: 1px 1px 2px $gray;
+    display: inline-block !important;
+    font-size: .875rem;
+    font-weight: bold;
+    padding: 0 4px;
+}
+
+.hashtag:empty {
+    display: none;
+}
+
+.page-lead .hashtag {
+    font-size: 1rem;
+}

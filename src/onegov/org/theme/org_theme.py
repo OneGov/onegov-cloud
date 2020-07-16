@@ -98,7 +98,15 @@ class OrgTheme(BaseTheme):
     @property
     def post_imports(self):
         return [
+            'custom_mixins',
+            'header',
             'org',
+            'sortable',
+            'search',
+            'forms',
+            'settings',
+            'helpers',
+            'footer',
             'chosen'
         ]
 

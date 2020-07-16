@@ -1,0 +1,79 @@
+/*
+    Usermanagement
+*/
+.user-inactive td {
+    color: lighten($body-font-color, 25%);
+}
+
+.usermanagement {
+    width: 100%;
+
+    td:last-child {
+        text-align: right;
+        width: 1%;
+    }
+
+    td.text-links {
+        white-space: nowrap;
+    }
+
+    .subheader td {
+        border-color: $oil;
+
+        &:first-child {
+            font-weight: bold;
+        }
+    }
+
+    tbody + tbody tr:first-child td {
+        padding-top: 1.5rem;
+    }
+}
+
+.yubikey {
+    background-color: $smoke;
+    border: 1px solid $iron;
+    border-radius: 3px;
+    color: $tuatara;
+    display: inline-block;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+    font-size: .8em;
+    padding: 2px 4px;
+}
+
+.user-inactive .yubikey {
+    background-color: $snow;
+    border-color: $smoke;
+    color: $base;
+}
+
+.userprofile-settings {
+    .field-display-label {
+        margin-bottom: .25rem;
+    }
+}
+
+/*
+    New account
+*/
+
+.no-account-yet span:last-child {
+    display: inline-block;
+    font-weight: bold;
+    margin-bottom: .6rem;
+}
+
+/*
+    Userlinks view
+*/
+.linkgroup select {
+    max-width: 300px;
+}
+
+/*
+    Signup Link
+*/
+.signup-link {
+    display: block;
+    word-break: break-all;
+}

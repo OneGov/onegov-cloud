@@ -1,0 +1,23 @@
+/*
+    Hide the spam bot honeypot field
+*/
+.field-roboter_falle {
+    display: none;
+}
+
+/*
+    Hide hidden fields
+*/
+.field-hidden {
+    display: none;
+}
+
+/*
+    Apply on a row to flip the order of columns on mobile
+*/
+@media #{$small-only} {
+    .reverse-on-mobile {
+        display: flex;
+        flex-direction: column-reverse;
+    }
+}
