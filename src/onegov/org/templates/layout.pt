@@ -83,7 +83,7 @@
                     </div>
                 </div>
                 <div class="typeahead">
-                      <div class="columns small-12" data-typeahead-container>
+                      <div class="cell small-12" data-typeahead-container>
                       </div>
                 </div>
             </form>

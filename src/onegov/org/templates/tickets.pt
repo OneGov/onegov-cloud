@@ -8,7 +8,7 @@
                 <tr>
                     <th colspan="6">
                         <div class="grid-x ticket-filters">
-                            <div class="columns small-12 medium-6">
+                            <div class="cell small-12 medium-6">
                                 <dl class="sub-nav">
                                     <dt class="show-for-sr" i18n:translate>State:</dt>
                                     <tal:b repeat="link filters">
@@ -18,7 +18,7 @@
                                     </tal:b>
                                 </dl>
                             </div>
-                            <div class="columns small-12 medium-6">
+                            <div class="cell small-12 medium-6">
                                 <span>
                                     <button href="#" data-dropdown="owners" aria-controls="owners" aria-expanded="false" class="${has_owner_filter and 'tiny primary radius button dropdown' or 'tiny secondary radius button dropdown'} selected-owner">
                                         <span i18n:translate class="show-for-sr">Owner:</span>

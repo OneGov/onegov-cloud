@@ -7,7 +7,7 @@
             ${explanation}
         </div>
         <div class="grid-x">
-            <div class="small-12 medium-8 large-6 columns">
+            <div class="small-12 medium-8 large-6 cell">
                 <div metal:use-macro="layout.macros['form']" />
             </div>
         </div>

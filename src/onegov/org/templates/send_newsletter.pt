@@ -4,7 +4,7 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
         <div class="grid-x">
-            <div class="small-12 columns">
+            <div class="small-12 cell">
                 <ul class="fa-ul">
                     <li tal:condition="not:newsletter.sent">
                         <i class="fa-li fa fa-times"></i>
@@ -43,13 +43,13 @@
             </div>
         </div>
         <div class="grid-x" tal:condition="open_recipients">
-            <div class="small-12 medium-8 large-6 columns">
+            <div class="small-12 medium-8 large-6 cell">
                 <h2 i18n:translate>Delivery</h2>
                 <div metal:use-macro="layout.macros['form']" />
             </div>
         </div>
         <div class="grid-x" tal:condition="previous_recipients">
-            <div class="small-12 medium-8 large-6 columns">
+            <div class="small-12 medium-8 large-6 cell">
                 <h2 i18n:translate>Recipients</h2>
                 <div class="previous-recipients">
                     <p i18n:translate>

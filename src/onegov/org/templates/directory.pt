@@ -5,7 +5,7 @@
     <tal:b metal:fill-slot="content">
 
         <div class="grid-x" tal:condition="directory.enable_map == 'everywhere'">
-            <div class="columns medium-12">
+            <div class="cell medium-12">
                 <div class="geojson-map directories-map"
                     data-geojson="${geojson}"
                     data-lat="${layout.default_map_view.lat}"
@@ -17,7 +17,7 @@
         </div>
 
         <div class="grid-x reverse-on-mobile">
-            <div class="columns medium-8">
+            <div class="cell medium-8">
                 <p tal:condition="not:entries" i18n:translate="">No entries found.</p>
 
                 <ul class="with-lead ${show_thumbnails and 'with-thumbnails' or ''}" tal:condition="entries">
@@ -48,9 +48,9 @@
 
             </div>
 
-            <div class="columns medium-4">
+            <div class="cell medium-4">
                 <div class="grid-x" tal:condition="searchwidget">
-                    <div class="columns medium-12">
+                    <div class="cell medium-12">
                         <tal:b replace="structure searchwidget.html(layout)" />
                     </div>
                 </div>

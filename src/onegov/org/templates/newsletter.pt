@@ -26,7 +26,7 @@
             <tal:b condition="occurrences">
                 <h2 i18n:translate>Events</h2>
                 <div class="grid-x">
-                    <div class="columns small-12 medium-8 end">
+                    <div class="cell small-12 medium-8 end">
                         <metal:occurrences use-macro="layout.macros['occurrences']" />
                     </div>
                 </div>

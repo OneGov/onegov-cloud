@@ -8,17 +8,17 @@
         column sizes are relative we need to adjust for that. -->
         <?python
             size = {
-                'small': 'small-12 medium-7 large-5 columns',
-                'normal': 'small-12 medium-8 large-6 columns',
-                'large': 'small-12 medium-9 large-7 columns',
-                'huge': 'small-12 medium-10 large-8 columns',
+                'small': 'small-12 medium-7 large-5 cell',
+                'normal': 'small-12 medium-8 large-6 cell',
+                'large': 'small-12 medium-9 large-7 cell',
+                'huge': 'small-12 medium-10 large-8 cell',
             }[econtext.get('form_width', 'normal')]
 
             boxed_size = {
-                'small': 'small-12 medium-10 large-8 columns',
-                'normal': 'small-12 medium-11 large-9 columns',
-                'large': 'small-12 medium-12 large-10 columns',
-                'huge': 'small-12 medium-12 large-11 columns',
+                'small': 'small-12 medium-10 large-8 cell',
+                'normal': 'small-12 medium-11 large-9 cell',
+                'large': 'small-12 medium-12 large-10 cell',
+                'huge': 'small-12 medium-12 large-11 cell',
             }[econtext.get('form_width', 'normal')]
         ?>
 
@@ -43,7 +43,7 @@
                    tal:define="lead lead|nothing;text text|nothing; people people|nothing; contact contact|nothing; coordinates coordinates|nothing">
             <tal:b metal:fill-slot="after-text">
                 <div class="grid-x" tal:condition="hints|nothing">
-                    <div class="columns small-12 panel ${hints_callout and 'callout' or ''}">
+                    <div class="cell small-12 panel ${hints_callout and 'callout' or ''}">
                         <div class="hints" tal:condition="hints|nothing">
                             <div tal:repeat="(name, hint) hints" class="hint hint-${name}">${hint}</div>
                         </div>

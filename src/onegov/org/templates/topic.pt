@@ -13,7 +13,7 @@
              tal:define="lead page.content.get('lead');text page.content.get('text'); people page.people; contact page.contact_html; coordinates page.coordinates">
                 <tal:b metal:fill-slot="after-text">
                      <div class="grid-x" tal:condition="children">
-                        <div class="small-12 columns">
+                        <div class="small-12 cell">
                             <ul class="inline-list page-links">
                                 <li tal:repeat="link children">
                                     <tal:b replace="structure link(layout)" />
@@ -26,7 +26,7 @@
         </tal:b>
         <tal:b condition="page.trait == 'link'">
             <div class="grid-x">
-                <div class="small-12 columns">
+                <div class="small-12 cell">
                     <div class="panel">
                         <p i18n:translate>
                         You've reached this site because you are logged in. Visitors
