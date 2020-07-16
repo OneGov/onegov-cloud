@@ -90,9 +90,11 @@ ul.panel-links {
     }
 }
 
+$right-side-panel-margin: 0 0 2rem 1rem;
+
 .side-panel {
     border: 1px solid $gray;
-    margin-bottom: 2rem;
+    margin: $right-side-panel-margin;
 
     h2 {
         border-bottom: 2px solid $primary-color;

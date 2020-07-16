@@ -99,6 +99,7 @@ class OrgTheme(BaseTheme):
     def post_imports(self):
         return [
             'custom_mixins',
+            'typography',
             'header',
             'org',
             'sortable',
