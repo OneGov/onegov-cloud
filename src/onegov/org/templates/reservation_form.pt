@@ -11,7 +11,7 @@
         <metal:b use-macro="layout.macros['reservation_infos']" />
 
         <div tal:condition="reservation_infos" class="grid-x reservation-form">
-            <div class="small-12 medium-7 large-5 columns">
+            <div class="small-12 medium-7 large-5 cell">
                 <div metal:use-macro="layout.macros['form']" />
             </div>
         </div>

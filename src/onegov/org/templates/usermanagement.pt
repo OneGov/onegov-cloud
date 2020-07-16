@@ -4,7 +4,7 @@
     </tal:b>
     <tal:b metal:fill-slot="content">
         <div class="grid-x">
-            <div class="columns medium-9">
+            <div class="cell medium-9">
                 <table class="usermanagement">
                     <tal:b repeat="role ('admin', 'editor', 'member')">
                         <tbody tal:condition="users.get(role)" tal:define="enable_yubikey request.app.enable_yubikey">
@@ -51,7 +51,7 @@
                     </tal:b>
                 </table>
             </div>
-            <div class="columns medium-3 filter-panel">
+            <div class="cell medium-3 filter-panel">
                 <div tal:condition="filters['active']|nothing" class="filter-active">
                     <h2 class="filter-title" i18n:translate>State</h2>
                     <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['active']" />
