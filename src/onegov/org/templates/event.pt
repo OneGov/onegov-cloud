@@ -15,7 +15,7 @@
             </p>
         </div>
 
-        <div class="row collapse event-preview">
+        <div class="grid-x collapse event-preview">
             <div class="large-8 medium-8 columns">
                 <tal:b metal:use-macro="layout.macros['display_event']" tal:define="event event"/>
             </div>
@@ -25,7 +25,7 @@
             </div>
         </div>
 
-        <div class="row fieldset-display-submit" tal:condition="completable">
+        <div class="grid-x fieldset-display-submit" tal:condition="completable">
             <div class="small-12 columns">
                 <form action="" method="POST">
                     <input type="hidden" name="complete">

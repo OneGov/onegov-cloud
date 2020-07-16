@@ -7,7 +7,7 @@
             <thead>
                 <tr>
                     <th colspan="6">
-                        <div class="row ticket-filters">
+                        <div class="grid-x ticket-filters">
                             <div class="columns small-12 medium-6">
                                 <dl class="sub-nav">
                                     <dt class="show-for-sr" i18n:translate>State:</dt>
