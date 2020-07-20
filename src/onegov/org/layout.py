@@ -118,7 +118,7 @@ class Layout(FoundationLayout):
     @cached_property
     def font_awesome_path(self):
         return self.request.link(StaticFile(
-            'font-awesome/css/font-awesome.min.css',
+            'font-awesome5/css/fontawesome.min.css',
             version=self.app.version
         ))
 
