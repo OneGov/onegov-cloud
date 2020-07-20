@@ -125,12 +125,14 @@ class BaseTheme(CoreTheme):
 
     @property
     def foundation_styles(self):
+        """The default styles"""
         return 'global-styles', 'forms', 'typography'
 
     @property
     def foundation_components(self):
         """ Foundation components except the grid without the prefix as in
-        app.scss that will be included. Be aware that order matters."""
+        app.scss that will be included. Be aware that order matters. These are
+        included, not imported."""
         return (
             'button',
             'button-group',
@@ -166,35 +168,6 @@ class BaseTheme(CoreTheme):
         )
 
     @property
-    def imports(self):
-        """ All imports, including the foundation ones except the grid
-        settings. Override with care. It is following the order of the
-        the mixin foundation-everything."""
-
-        not_allowed = ('flex-classes', 'flex-grid', 'grid', 'xy-grid-classes',
-                       'visibility-classes', 'prototype-classes',
-                       'float-classes', 'global-styles', 'forms', 'typography')
-        for cmp in self.foundation_components:
-            assert cmp not in not_allowed, f'{cmp} not supposed to go in here'
-
-        initial_imports = (
-            '@charset "utf-8";',
-            "@import 'foundation/scss/_settings';",
-            "@import 'foundation/scss/foundation';"
-        )
-
-        return chain(
-            initial_imports,
-            (f"@import '{i}';" for i in self.pre_imports),
-            (var_ for var_ in self.foundation_config_vars),
-            (f'@include foundation-{i};' for i in self.foundation_styles),
-            (self.foundation_grid, ),
-            (f"@include foundation-{i};" for i in self.foundation_components),
-            (self.foundation_helpers, ),
-            (f"@import '{i}';" for i in self.post_imports),
-        )
-
-    @property
     def post_imports(self):
         """
         Imports added after the foundation import. The imports must be found
@@ -221,6 +194,116 @@ class BaseTheme(CoreTheme):
         """
         return os.path.join(os.path.dirname(__file__), 'foundation')
 
+    @property
+    def get_foundation_file(self):
+        """
+        Create the foundation.scss in code, since the pre_imports
+        must go there. Afterwards, in def compile, all the includes are added.
+        We import everything by default, and the include what is needed by
+        foundation_components.
+        """
+        deps = 'missing-dependencies'
+        pre_imports = '\n'.join(f"@import '{i}';" for i in self.pre_imports)
+        post_imports = '\n'.join(f"@import '{i}';" for i in self.post_imports)
+        fp = 'foundation/scss'
+        _vendor = 'foundation/_vendor'
+        return textwrap.dedent(f"""
+        /**
+         * Foundation for Sites
+         * Version 6.6.3
+         * https://get.foundation
+         * Licensed under MIT Open Source
+         */
+        
+        // --- Dependencies ---
+        @import '{fp}/vendor/normalize';
+        @import '{_vendor}/sassy-lists/stylesheets/helpers/{deps}';
+        @import '{_vendor}/sassy-lists/stylesheets/helpers/true';
+        @import '{_vendor}/sassy-lists/stylesheets/functions/contain';
+        @import '{_vendor}/sassy-lists/stylesheets/functions/purge';
+        @import '{_vendor}/sassy-lists/stylesheets/functions/remove';
+        @import '{_vendor}/sassy-lists/stylesheets/functions/replace';
+        @import '{_vendor}/sassy-lists/stylesheets/functions/to-list';
+
+        @import '{fp}/_settings';
+
+        {pre_imports}
+        
+        // --- Components ---
+        // Utilities
+        @import '{fp}/util/util';
+        // Global styles
+        @import '{fp}/global';
+        @import '{fp}/forms/forms';
+        @import '{fp}/typography/typography';
+        
+        // Grids
+        @import '{fp}/grid/grid';
+        @import '{fp}/xy-grid/xy-grid';
+        // Generic components
+        @import '{fp}/components/button';
+        @import '{fp}/components/button-group';
+        @import '{fp}/components/close-button';
+        @import '{fp}/components/label';
+        @import '{fp}/components/progress-bar';
+        @import '{fp}/components/slider';
+        @import '{fp}/components/switch';
+        @import '{fp}/components/table';
+        // Basic components
+        @import '{fp}/components/badge';
+        @import '{fp}/components/breadcrumbs';
+        @import '{fp}/components/callout';
+        @import '{fp}/components/card';
+        @import '{fp}/components/dropdown';
+        @import '{fp}/components/pagination';
+        @import '{fp}/components/tooltip';
+        
+        // Containers
+        @import '{fp}/components/accordion';
+        @import '{fp}/components/media-object';
+        @import '{fp}/components/orbit';
+        @import '{fp}/components/responsive-embed';
+        @import '{fp}/components/tabs';
+        @import '{fp}/components/thumbnail';
+        // Menu-based containers
+        @import '{fp}/components/menu';
+        @import '{fp}/components/menu-icon';
+        @import '{fp}/components/accordion-menu';
+        @import '{fp}/components/drilldown';
+        @import '{fp}/components/dropdown-menu';
+        
+        // Layout components
+        @import '{fp}/components/off-canvas';
+        @import '{fp}/components/reveal';
+        @import '{fp}/components/sticky';
+        @import '{fp}/components/title-bar';
+        @import '{fp}/components/top-bar';
+        
+        // Helpers
+        @import '{fp}/components/float';
+        @import '{fp}/components/flex';
+        @import '{fp}/components/visibility';
+        @import '{fp}/prototype/prototype';
+
+        {post_imports}
+        """)
+
+    @property
+    def includes(self):
+        not_allowed = ('flex-classes', 'flex-grid', 'grid', 'xy-grid-classes',
+                       'visibility-classes', 'prototype-classes',
+                       'float-classes', 'global-styles', 'forms', 'typography')
+        for cmp in self.foundation_components:
+            assert cmp not in not_allowed, f'{cmp} not supposed to go in here'
+
+        return chain(
+            (var_ for var_ in self.foundation_config_vars),
+            (f'@include foundation-{i};' for i in self.foundation_styles),
+            (self.foundation_grid, ),
+            (f"@include foundation-{i};" for i in self.foundation_components),
+            (self.foundation_helpers, )
+        )
+
     def compile(self, options={}):
         """ Compiles the theme with the given options. """
 
@@ -230,11 +313,14 @@ class BaseTheme(CoreTheme):
 
         theme = StringIO()
 
+        print('@charset "utf-8";', file=theme)
+
         for key, value in _options.items():
             print(f"${key}: {value};", file=theme)
 
-        print("\n".join(self.imports), file=theme)
-        print("\n".join(self.imports))
+        print(self.get_foundation_file, file=theme)
+
+        print("\n".join(self.includes), file=theme)
 
         paths = self.extra_search_paths
         paths.append(self.foundation_path)
