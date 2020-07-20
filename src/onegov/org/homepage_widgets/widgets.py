@@ -60,9 +60,9 @@ class LinksWidget(object):
     template = """
         <xsl:template match="links">
             <xsl:if test="@title">
-                <h2>
+                <h3>
                     <xsl:value-of select="@title" />
-                </h2>
+                </h3>
             </xsl:if>
             <ul class="panel-links">
                 <xsl:for-each select="link">
@@ -134,7 +134,7 @@ class NewsWidget(object):
     template = """
         <xsl:template match="news">
             <div metal:use-macro="layout.macros.newslist"
-                tal:define="heading 'h3'; show_all_news_link True;
+                tal:define="heading 'h4'; show_all_news_link True;
                 hide_date True"
             />
         </xsl:template>
