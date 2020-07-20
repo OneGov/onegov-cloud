@@ -25,3 +25,7 @@ class TownTheme(OrgTheme):
     def extra_search_paths(self):
         base_paths = super().extra_search_paths
         return [module_path('onegov.town.theme', 'styles')] + base_paths
+
+    @property
+    def font_search_path(self):
+        return module_path('onegov.org.theme', 'fonts')
