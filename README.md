@@ -196,6 +196,10 @@ Then, start your local instance:
 And open the local url in your browser:
 
     open http://localhost/onegov_town/govikon
+    
+To auto-reload chameleon templates, set `ONEGOV_DEVELOPMENT` environment variable:
+
+    export ONEGOV_DEVELOPMENT='1'
 
 ## Updates 🙌
 
