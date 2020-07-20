@@ -4,7 +4,7 @@ This is basically a copy of more.chameleon, with the additional inclusion of a
 gettext translation function defined by :mod:`onegov.core.i18n`.
 
 To use a chameleon template, applications have to specify the templates
-directiory, in addition to inheriting from
+directory, in addition to inheriting from
 :class:`onegov.core.framework.Framework`.
 
 For example::
