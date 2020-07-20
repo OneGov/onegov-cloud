@@ -296,11 +296,11 @@ footer {
         text-align: center;
         width: 100%;
 
-        @media #{$medium-only} {
+        @include breakpoint(medium only) {
             min-height: 300px;
         }
 
-        @media #{$small-only} {
+        @include breakpoint(small only) {
             min-height: 200px;
         }
     }

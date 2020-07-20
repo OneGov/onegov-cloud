@@ -34,14 +34,14 @@
     }
 }
 
-@media #{$medium-only} {
+@include breakpoint(medium only) {
     .boardlet {
         width: calc(50% - 1rem);
     }
 }
 
 
-@media #{$small-only} {
+@include breakpoint(small only) {
     .boardlet {
         width: 100%;
     }

@@ -15,7 +15,7 @@
 /*
     Apply on a row to flip the order of columns on mobile
 */
-@media #{$small-only} {
+@include breakpoint(medium only) {
     .reverse-on-mobile {
         display: flex;
         flex-direction: column-reverse;
