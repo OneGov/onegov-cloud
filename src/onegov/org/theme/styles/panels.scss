@@ -97,7 +97,7 @@ $right-side-panel-margin: 0 0 2rem 1rem;
     margin: $right-side-panel-margin;
 
     h2 {
-
+        font-size: $h3-font-size - $h3-font-reduction;
     }
 
     //h2 {
