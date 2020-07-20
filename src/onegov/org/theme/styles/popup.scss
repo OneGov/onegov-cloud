@@ -133,7 +133,7 @@
 }
 
 // on smartphones, the popup becomes a modal dialog
-@media #{$small-only} {
+@include breakpoint(small only) {
     .popup {
         bottom: 20%;
         left: 5%;

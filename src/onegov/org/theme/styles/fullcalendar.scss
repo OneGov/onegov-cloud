@@ -211,39 +211,39 @@
 /*
     Fullcalendar responsive design
 */
-@media #{$small-up} {
+@include breakpoint(medium up) {
     .fc .fc-toolbar {
         width: 100%;
     }
 }
 
-@media #{$large-up} {
+@include breakpoint(large only) {
     .fc .fc-toolbar {
         width: 80%;
     }
 }
 
-@media (max-width: 850px) {
+@media screen and (max-width: 850px) {
     .fc-center {
         display: block;
         width: 100%;
     }
 }
 
-@media (min-width: 850px) {
+@media screen and (min-width: 850px) {
     .fc-center {
         display: inline-block;
         width: 40%;
     }
 }
 
-@media #{$small-only} {
+@include breakpoint(small only) {
     .calendar-footer {
         display: none !important;
     }
 }
 
-@media #{$medium-only} {
+@include breakpoint(medium only) {
     .calendar-footer {
         width: 75%;
     }
@@ -322,7 +322,7 @@
     }
 }
 
-@media #{$small-only} {
+@include breakpoint(small only) {
     .occurrece {
         margin-bottom: 1rem !important;
     }

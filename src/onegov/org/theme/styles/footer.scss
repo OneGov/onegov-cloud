@@ -88,7 +88,7 @@ $footer-border-width: 0;
             margin-right: 0;
         }
 
-        @media #{$small-only} {
+        @include breakpoint(small only) {
             li {
                 margin-bottom: 50px / 2;
                 margin-right: 0;

@@ -21,7 +21,7 @@
         }
     }
 
-    @media #{$small-only} {
+    @include breakpoint(small only) {
         .allocation-rule {
             flex: 0 0 100%;
             margin-right: 0;
