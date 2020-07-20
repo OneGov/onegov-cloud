@@ -214,7 +214,6 @@ class BaseTheme(CoreTheme):
          * https://get.foundation
          * Licensed under MIT Open Source
          */
-        
         // --- Dependencies ---
         @import '{fp}/vendor/normalize';
         @import '{_vendor}/sassy-lists/stylesheets/helpers/{deps}';
@@ -224,11 +223,8 @@ class BaseTheme(CoreTheme):
         @import '{_vendor}/sassy-lists/stylesheets/functions/remove';
         @import '{_vendor}/sassy-lists/stylesheets/functions/replace';
         @import '{_vendor}/sassy-lists/stylesheets/functions/to-list';
-
         @import '{fp}/_settings';
-
         {pre_imports}
-        
         // --- Components ---
         // Utilities
         @import '{fp}/util/util';
@@ -236,7 +232,6 @@ class BaseTheme(CoreTheme):
         @import '{fp}/global';
         @import '{fp}/forms/forms';
         @import '{fp}/typography/typography';
-        
         // Grids
         @import '{fp}/grid/grid';
         @import '{fp}/xy-grid/xy-grid';
@@ -257,7 +252,6 @@ class BaseTheme(CoreTheme):
         @import '{fp}/components/dropdown';
         @import '{fp}/components/pagination';
         @import '{fp}/components/tooltip';
-        
         // Containers
         @import '{fp}/components/accordion';
         @import '{fp}/components/media-object';
@@ -271,14 +265,12 @@ class BaseTheme(CoreTheme):
         @import '{fp}/components/accordion-menu';
         @import '{fp}/components/drilldown';
         @import '{fp}/components/dropdown-menu';
-        
         // Layout components
         @import '{fp}/components/off-canvas';
         @import '{fp}/components/reveal';
         @import '{fp}/components/sticky';
         @import '{fp}/components/title-bar';
         @import '{fp}/components/top-bar';
-        
         // Helpers
         @import '{fp}/components/float';
         @import '{fp}/components/flex';
