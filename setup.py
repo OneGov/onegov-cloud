@@ -61,7 +61,7 @@ setup(
         'bleach',
         'blinker',
         'cached_property',
-        'chameleon==3.7.4',
+        'chameleon',
         'certifi',
         'click',
         'colour',

@@ -42,8 +42,30 @@ from chameleon.tal import RepeatDict
 from chameleon.utils import Scope, decode_string
 from onegov.core.framework import Framework
 
+# from chameleon.zpt.loader import TemplateLoader
+# from chameleon.loader import TemplateLoader
 
 AUTO_RELOAD = os.environ.get('ONEGOV_DEVELOPMENT') == '1'
+
+BOOLEAN_HTML_ATTRS = frozenset(
+    [
+        # List of Boolean attributes in HTML that should be rendered in
+        # minimized form (e.g. <img ismap> rather than <img ismap="">)
+        # From http://www.w3.org/TR/xhtml1/#guidelines (C.10)
+        "compact",
+        "nowrap",
+        "ismap",
+        "declare",
+        "noshade",
+        "checked",
+        "disabled",
+        "readonly",
+        "multiple",
+        "selected",
+        "noresize",
+        "defer",
+    ]
+)
 
 
 def get_default_vars(request, content, suppress_global_variables=False):
@@ -67,6 +89,10 @@ class TemplateLoader(PageTemplateLoader):
     lookup macros in various folders.
 
     """
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("boolean_attributes", BOOLEAN_HTML_ATTRS)
+        super(TemplateLoader, self).__init__(*args, **kwargs)
 
     @cached_property
     def macros(self):
