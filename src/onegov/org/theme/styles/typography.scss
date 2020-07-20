@@ -2,7 +2,9 @@
 Body Font Family
 */
 $body-font-family: $font-family-sans-serif !default;
-$header-font-family: $body-font-family !default;
+$header-font-family: 'Roboto Condensed', sans-serif;
+
+// Todo: Add this to the settings
 
 /*
     Small text
