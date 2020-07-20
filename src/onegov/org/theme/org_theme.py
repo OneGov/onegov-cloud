@@ -97,6 +97,7 @@ class OrgTheme(BaseTheme):
 
     @property
     def post_imports(self):
+        """Our scss code split into various files"""
         return [
             'custom_mixins',
             'typography',
