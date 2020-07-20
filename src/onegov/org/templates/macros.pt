@@ -271,13 +271,13 @@
 </metal:footer_locales>
 
 <metal:panel define-macro="events-panel">
-    <h2 i18n:translate>Events</h2>
+    <h3 i18n:translate>Events</h3>
     <metal:b use-macro="layout.macros['panel-links']" tal:define="panel event_panel"/>
 </metal:panel>
 
 <metal:panel define-macro="directories-panel">
     <tal:b condition="directory_panel.links">
-        <h2 i18n:translate>Directories</h2>
+        <h3 i18n:translate>Directories</h3>
         <metal:b use-macro="layout.macros['panel-links']" tal:define="panel directory_panel" />
     </tal:b>
 </metal:panel>
@@ -416,13 +416,16 @@
 
 <metal:newslist define-macro="newslist" i18n:domain="onegov.org">
     <div class="newslist" tal:condition="news">
-        <h2 i18n:translate tal:condition="not:hide_title|False">Latest news</h2>
+        <h3 i18n:translate tal:condition="not:hide_title|False">Latest news</h3>
 
         <div class="grid-x news-list-item" tal:repeat="item news">
             <div class="small-12 cell">
                 <a tal:attributes="href request.link(item)">
-                    <h2 tal:condition="heading == 'h2'|True">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h2>
-                    <h3 tal:condition="heading == 'h3'|nothing">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h3>
+                    <tal:b tal:switch="heading">
+                        <h3 tal:case="'h3'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h3>
+                        <h4 tal:case="'h4'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h4>
+                        <h2 tal:case="default">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h2>
+                    </tal:b>
                 </a>
                 <p class="news-date" tal:condition="not:hide_date|False">${layout.format_date(item.created, 'relative')}</p>
                 <p class="news-lead">${item.content.lead}</p>
@@ -496,12 +499,12 @@
                 <div class="side-panel without-title ${highlight_contacts and 'highlighted'}" tal:condition="contact or coordinates or location">
                     <tal:b condition="contact" content="structure contact" />
                     <br tal:condition="coordinates and contact" />
-                    <h2 i18n:translate tal:condition="not contact">Map</h2>
+                    <h3 i18n:translate tal:condition="not contact">Map</h3>
                     <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" data-marker-icon="${marker_icon|nothing}" data-marker-color="${marker_color|nothing}"></div>
                     <div class="location" tal:condition="location">${location}</div>
                 </div>
                 <div class="side-panel people-panel" tal:condition="people">
-                    <h2 i18n:translate>People</h2>
+                    <h3 i18n:translate>People</h3>
                     <ul class="panel-links" data-sortable data-sortable-url="${layout.move_person_url_template}">
                         <li tal:repeat="person people" data-sortable-id="${request.is_manager and person.id}">
                             <a href="${request.link(person)}">${person.title}</a>
