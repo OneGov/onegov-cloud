@@ -4,11 +4,11 @@ from collections import OrderedDict
 from onegov.foundation6 import BaseTheme
 from onegov.core.utils import module_path
 
-HELVETICA = '"Helvetica Neue", Helvetica, Roboto, Arial, sans-serif !default;'
-ARIAL = 'Arial, sans-serif !default;'
-VERDANA = 'Verdana, Geneva, sans-serif !default;'
-COURIER_NEW = '"Courier New", Courier, monospace !default;'     # monospace
-ROBOTO_CONDENSED = "'Roboto Condensed', sans-serif !default;"
+HELVETICA = '"Helvetica Neue", Helvetica, Roboto, Arial, sans-serif !default'
+ARIAL = 'Arial, sans-serif !default'
+VERDANA = 'Verdana, Geneva, sans-serif !default'
+COURIER_NEW = '"Courier New", Courier, monospace !default'     # monospace
+ROBOTO_CONDENSED = "'Roboto Condensed', sans-serif !default"
 
 # options editable by the user
 user_options = {
