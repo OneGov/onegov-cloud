@@ -90,10 +90,10 @@
 </metal:breadcrumbs>
 
 <metal:panel-links define-macro="panel-links">
-    <ul class="panel-links">
+    <ul class="panel-links callout">
         <li tal:repeat="link panel.links">
             <tal:b content="structure link(layout)" />
-            <small>${link.subtitle}</small>
+            <small tal:condition="show_subtitle|True">${link.subtitle}</small>
         </li>
     </ul>
 </metal:panel-links>
@@ -276,10 +276,13 @@
 </metal:panel>
 
 <metal:panel define-macro="directories-panel">
-    <tal:b condition="directory_panel.links">
-        <h3 i18n:translate>Directories</h3>
-        <metal:b use-macro="layout.macros['panel-links']" tal:define="panel directory_panel" />
-    </tal:b>
+    <div class="directories-panel">
+        <tal:b condition="directory_panel.links">
+            <h3 i18n:translate>Directories</h3>
+            <metal:b use-macro="layout.macros['panel-links']" tal:define="panel directory_panel" />
+        </tal:b>
+    </div>
+
 </metal:panel>
 
 <metal:form define-macro="form">
