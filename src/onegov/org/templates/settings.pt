@@ -5,7 +5,7 @@
     <tal:b metal:fill-slot="content">
         <ul class="org-settings">
             <li tal:repeat="setting settings" class="${setting.name}">
-                <i class="fa ${setting.icon}" aria-hidden="true"></i>
+                <i class="fas ${setting.icon}" aria-hidden="true"></i>
                 <a href="${setting.link}">${setting.title}</a>
             </li>
         </ul>
