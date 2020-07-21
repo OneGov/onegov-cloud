@@ -127,6 +127,15 @@ $navbar-shadow: 0px 15px 10px -15px rgba(10, 10, 10, 0.25);
         height: 7em;
         object-fit: contain;
     }
+
+    i {
+        margin-right: .5rem;
+        color: $primary-color;
+
+        @include breakpoint(medium up) {
+            font-size: 1.25rem;
+        }
+    }
 }
 
 
