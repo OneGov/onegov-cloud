@@ -69,7 +69,7 @@ def handle_generic_settings(self, request, form, title):
 @OrgApp.form(
     model=Organisation, name='general-settings', template='form.pt',
     permission=Secret, form=GeneralSettingsForm, setting=_("General"),
-    icon='fa-sliders', order=-1000)
+    icon='fa-cogs', order=-1000)
 def handle_general_settings(self, request, form):
     return handle_generic_settings(self, request, form, _("General"))
 
@@ -101,7 +101,7 @@ def handle_module_settings(self, request, form):
 @OrgApp.form(
     model=Organisation, name='map-settings', template='form.pt',
     permission=Secret, form=MapSettingsForm, setting=_("Map"),
-    icon='fa-map-marker', order=-700)
+    icon='fa-map-marker-alt', order=-700)
 def handle_map_settings(self, request, form):
     return handle_generic_settings(self, request, form, _("Map"))
 
@@ -109,7 +109,7 @@ def handle_map_settings(self, request, form):
 @OrgApp.form(
     model=Organisation, name='analytics-settings', template='form.pt',
     permission=Secret, form=AnalyticsSettingsForm, setting=_("Analytics"),
-    icon='fa-line-chart ', order=-600)
+    icon='fa-chart-bar ', order=-600)
 def handle_analytics_settings(self, request, form):
     return handle_generic_settings(self, request, form, _("Analytics"))
 
@@ -117,7 +117,7 @@ def handle_analytics_settings(self, request, form):
 @OrgApp.form(
     model=Organisation, name='holiday-settings', template='form.pt',
     permission=Secret, form=HolidaySettingsForm, setting=_("Holidays"),
-    icon='fa-calendar-o', order=-500)
+    icon='fa-calendar', order=-500)
 def handle_holiday_settings(self, request, form):
     return handle_generic_settings(self, request, form, _("Holidays"))
 
@@ -125,7 +125,7 @@ def handle_holiday_settings(self, request, form):
 @OrgApp.form(
     model=Organisation, name='ticket-settings', template='form.pt',
     permission=Secret, form=OrgTicketSettingsForm,
-    setting=_("Ticket Settings"), order=-950, icon='fa-ticket'
+    setting=_("Ticket Settings"), order=-950, icon='fa-ticket-alt'
 )
 def handle_ticket_settings(self, request, form):
     resp = handle_generic_settings(self, request, form, _("Ticket Settings"))
