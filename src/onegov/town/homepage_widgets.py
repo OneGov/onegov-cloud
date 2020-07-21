@@ -10,11 +10,13 @@ from onegov.town import TownApp, _
 class ServicesWidget(object):
     template = """
         <xsl:template match="services">
-            <h3 tal:content="services_panel.title"></h3>
-
-            <metal:block use-macro="layout.macros['panel-links']"
-                tal:define="panel services_panel"
-            />
+            <div class="services-panel">
+                <h3 tal:content="services_panel.title"></h3>
+    
+                <metal:block use-macro="layout.macros['panel-links']"
+                    tal:define="panel services_panel; show_subtitle False"
+                />
+            </div>
         </xsl:template>
     """
 
@@ -26,7 +28,7 @@ class ServicesWidget(object):
                 layout.org.meta.get('online_counter_label')
                 or _("Forms and applications")
             ),
-            classes=('online-counter',)
+            classes=('online-counter', 'h5-size')
         )
 
         # only if there are publications, will we enable the link to them
@@ -38,7 +40,7 @@ class ServicesWidget(object):
                     layout.org.meta.get('publications_label')
                     or _("Official Documents")
                 ),
-                classes=('publications',)
+                classes=('publications', 'h5-size')
             )
 
         yield Link(
@@ -48,7 +50,7 @@ class ServicesWidget(object):
                 layout.org.meta.get('reservations_label')
                 or _("Daypasses and rooms")
             ),
-            classes=('reservations',)
+            classes=('reservations', 'h5-size')
         )
 
         if layout.org.meta.get('e_move_url'):
@@ -59,7 +61,7 @@ class ServicesWidget(object):
                     layout.org.meta.get('e_move_label')
                     or _("Move with eMovingCH")
                 ),
-                classes=('e-move',)
+                classes=('e-move', 'h5-size')
             )
 
         resources = ResourceCollection(layout.app.libres_context)
@@ -76,7 +78,7 @@ class ServicesWidget(object):
                     layout.org.meta.get('daypass_label')
                     or _("Generalabonnement for Towns")
                 ),
-                classes=('sbb-daypass',)
+                classes=('sbb-daypass', 'h5-size')
             )
 
     def get_variables(self, layout):
@@ -110,12 +112,14 @@ class ContactsAndAlbumsWidget(object):
                     Link(
                         text=_("People"),
                         url=request.class_link(PersonCollection),
-                        subtitle=_("All contacts")
+                        subtitle=_("All contacts"),
+                        classes=('h5-size',)
                     ),
                     Link(
                         text=_("Photo Albums"),
                         url=request.class_link(ImageSetCollection),
-                        subtitle=_("Impressions")
+                        subtitle=_("Impressions"),
+                        classes=('h5-size',)
                     ),
                 ]
             )
