@@ -147,7 +147,7 @@ function showAlertMessage(message, type, target) {
         .append($('<a href="#" class="close">&times;</a>'));
 
     $(target || '#alert-boxes').append(alert);
-    initFoundation();
+    // initFoundation();
 }
 
 $(document).on('show-alert', function(_, data) {
@@ -181,9 +181,9 @@ $(document).ajaxError(function(_e, xhr, _settings, error) {
 });
 
 // show the slider once everything has loaded
-$(document).ready(function() {
-    $('.slider').css('opacity', 1);
-});
+// $(document).ready(function() {
+//     $('.slider').css('opacity', 1);
+// });
 
 // support some extraordinary styling
 $(document).ready(function() {
