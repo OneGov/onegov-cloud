@@ -91,14 +91,64 @@ ul.panel-links {
 }
 
 $right-side-panel-margin: 0 0 2rem 1rem;
+$icon-margin-right: 1ex;
+$icon-padding-right: .8ex;
+$side-panel-padding: 1rem;
+
+$tasks-icon: "\f0ae";
+$calendar-icon: "\f133";
+$emove-icon: "\f472";
+$train-icon: "\f238";
+$chevron-right-icon: "\f054";
+
+.panel-links {
+    border: 1px solid $editbar-bg-color;
+}
 
 .side-panel {
-    border: 1px solid $gray;
-    margin: $right-side-panel-margin;
 
-    h2 {
-        font-size: $h3-font-size - $h3-font-reduction;
+    padding: $side-panel-padding;
+
+    .services-panel {
+        a.online-counter::before { @include icon($tasks-icon); }
+        a.publications::before { @include icon($tasks-icon); }
+        a.reservations::before { @include icon($calendar-icon); }
+        a.e-move::before { @include icon($emove-icon); }
+        a.sbb-daypass::before { @include icon($train-icon); }
+
+        a::before {
+            margin-right: $icon-margin-right;
+            padding-right: $icon-padding-right;
+        }
+
+        a::after {
+            @include icon($chevron-right-icon);
+            float: right;
+        }
+
+        a {
+            color: $primary-fg-color;
+        }
+
+        .panel-links {
+            color: $primary-fg-color;
+            background-color: $primary-color;
+        }
+
+        li {
+            border-bottom: 1px solid rgba(255, 255, 255, .3);
+            padding: 1rem 0;
+        }
+
+        li:last-of-type {
+            border: none;
+            //padding-bottom: 0;
+        }
+        li:first-of-type {
+            //padding-top: 0;
+        }
     }
+
 
     //h2 {
     //    border-bottom: 2px solid $primary-color;
@@ -187,62 +237,67 @@ $right-side-panel-margin: 0 0 2rem 1rem;
     //}
 }
 
-.borderless-side-panel {
-    margin-bottom: 1.5rem;
+//.borderless-side-panel {
+//    margin-bottom: 1.5rem;
+//
+//    h2 {
+//        border-bottom: 2px solid $primary-color;
+//        font-size: 1rem;
+//        margin-bottom: .6rem;
+//        padding-bottom: .5rem;
+//    }
+//
+//    ul {
+//        list-style: none;
+//        margin: 0;
+//
+//        li {
+//            font-size: .875rem;
+//            margin-bottom: .4rem;
+//        }
+//    }
+//}
 
-    h2 {
-        border-bottom: 2px solid $primary-color;
-        font-size: 1rem;
-        margin-bottom: .6rem;
-        padding-bottom: .5rem;
-    }
-
-    ul {
-        list-style: none;
-        margin: 0;
-
-        li {
-            font-size: .875rem;
-            margin-bottom: .4rem;
-        }
-    }
-}
+$checklist-icon: "\f0ae";
 
 .homepage .side-panel:first-child,
 .side-panel.highlighted {
-    background-color: $topbar-bg-color;
-    border: 0;
-
-    .marker-map {
-        border-bottom: 1rem solid $topbar-bg-color;
+    .panel-links {
+        border: 0;
     }
 
-    h2 {
-        @include primary-color-background;
-        border-bottom: 0;
-        padding: .75rem 1rem;
-        text-transform: uppercase;
-    }
 
-    &.without-title {
-        > ul {
-            padding: 0 0 1rem;
-
-            li:first-child {
-                @include primary-color-background;
-                margin-bottom: 1rem;
-                padding: .75rem 1rem;
-                text-transform: uppercase;
-            }
-
-            li {
-                min-height: .5rem;
-                padding: 0 1rem;
-
-                + li {
-                    margin-top: .25rem;
-                }
-            }
-        }
-    }
+//
+//    .marker-map {
+//        border-bottom: 1rem solid $topbar-bg-color;
+//    }
+//
+//    h2 {
+//        @include primary-color-background;
+//        border-bottom: 0;
+//        padding: .75rem 1rem;
+//        text-transform: uppercase;
+//    }
+//
+//    &.without-title {
+//        > ul {
+//            padding: 0 0 1rem;
+//
+//            li:first-child {
+//                @include primary-color-background;
+//                margin-bottom: 1rem;
+//                padding: .75rem 1rem;
+//                text-transform: uppercase;
+//            }
+//
+//            li {
+//                min-height: .5rem;
+//                padding: 0 1rem;
+//
+//                + li {
+//                    margin-top: .25rem;
+//                }
+//            }
+//        }
+//    }
 }
