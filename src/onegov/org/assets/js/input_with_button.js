@@ -37,10 +37,10 @@ var setup_internal_link_select = function(input) {
         return;
     }
 
-    input.wrap('<div class="small-11 columns"></div>');
-    input.closest('.columns').wrap('<div class="row collapse input-with-button">');
-    input.closest('.row').append(
-        '<div class="small-1 columns"><a class="button secondary postfix">' + button + '</a></div>'
+    input.wrap('<div class="small-11 cell"></div>');
+    input.closest('.cell').wrap('<div class="grid-x collapse input-with-button">');
+    input.closest('.grid-x').append(
+        '<div class="small-1 cell"><a class="button secondary postfix">' + button + '</a></div>'
     );
 
     var row = input.closest('.row');
