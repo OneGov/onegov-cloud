@@ -134,7 +134,7 @@ class NewsWidget(object):
     template = """
         <xsl:template match="news">
             <div metal:use-macro="layout.macros.newslist"
-                tal:define="heading 'h4'; show_all_news_link True;
+                tal:define="heading 'h5'; show_all_news_link True;
                 hide_date True"
             />
         </xsl:template>

@@ -64,7 +64,7 @@ class OrgTheme(BaseTheme):
             # 'badge',
             'breadcrumbs',
             'callout',
-            # 'card',
+            'card',
             'dropdown',
             'pagination',
             'tooltip',
@@ -111,7 +111,8 @@ class OrgTheme(BaseTheme):
             'settings',
             'helpers',
             'footer',
-            'chosen'
+            'chosen',
+            'news'
         ]
 
     @property

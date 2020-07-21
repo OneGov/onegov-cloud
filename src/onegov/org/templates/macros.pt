@@ -417,26 +417,40 @@
     </form>
 </metal:upload>
 
-<metal:newslist define-macro="newslist" i18n:domain="onegov.org">
-    <div class="newslist" tal:condition="news">
-        <h3 i18n:translate tal:condition="not:hide_title|False">Latest news</h3>
+<metal:newslist define-macro="news-item-card">
+    <div class="card">
+        <div tal:condition="item.image_url|nothing" class="card-header">
+            <img src="${item.image_url}">
+        </div>
+        <div class="card-section">
+            <h6 tal:condition="not:hide_date|False" class="subheader"><small>${layout.format_date(item.created, 'relative')}</small></h6>
+            <tal:b tal:switch="heading|'h5'">
+                <h3 tal:case="'h3'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h3>
+                <h4 tal:case="'h4'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h4>
+                <h5 tal:case="default">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h5>
+            </tal:b>
+            <p class="news-lead">${item.content.lead}</p>
+            <div><a href="${request.link(item)}"><i class="fas fa-chevron-right"></i><span i18n:translate>read more</span></a></div>
+        </div>
+    </div>
+</metal:newslist>
 
-        <div class="grid-x news-list-item" tal:repeat="item news">
-            <div class="small-12 cell">
-                <a tal:attributes="href request.link(item)">
-                    <tal:b tal:switch="heading|'h2'">
-                        <h3 tal:case="'h3'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h3>
-                        <h4 tal:case="'h4'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h4>
-                        <h2 tal:case="default">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h2>
-                    </tal:b>
-                </a>
-                <p class="news-date" tal:condition="not:hide_date|False">${layout.format_date(item.created, 'relative')}</p>
-                <p class="news-lead">${item.content.lead}</p>
-            </div>
+<metal:newslist define-macro="newslist" i18n:domain="onegov.org">
+    <div class="newslist grid-x grid-padding-x" tal:condition="news">
+        <div class="cell small-12">
+            <h3 i18n:translate tal:condition="not:hide_title|False">
+                <span i18n:translate="">Latest news</span>
+                <small tal:condition="show_all_news_link|nothing">
+                    <a href="${layout.newsletter_url}"><i class="fas fa-chevron-right" aria-hidden="true"></i><span i18n:translate>All articles</span></a>
+                </small>
+            </h3>
+        </div>
+
+        <div class="cell small-12 large-4 news-list-item" tal:repeat="item news">
+            <metal:newlist use-macro="layout.macros['news-item-card']" />
         </div>
 
         <h3 class="all-news" tal:condition="show_all_news_link|nothing">
-            <a href="${layout.news_url}" i18n:translate>All news</a>
             <a href="${layout.newsletter_url}" i18n:translate>Newsletter</a>
         </h3>
     </div>
