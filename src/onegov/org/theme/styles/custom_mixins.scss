@@ -35,12 +35,21 @@
     border-radius: 1000px;
 }
 
+@mixin icon-base() {
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-family: 'Font Awesome 5 Free';
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+}
+
 @mixin icon($icon) {
     content: $icon;
-    display: inline-block;
-    font-family: 'FontAwesome';
-    font-weight: normal;
-    width: 1.5ex;
+    font-weight: 900;
+    @include icon-base;
 }
 
 @mixin prefix ($prop, $val) {
