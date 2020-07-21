@@ -70,7 +70,7 @@ var attach_button = function(input) {
     }
 
     // inject a button with which to launch the datetime picker
-    var button = $('<a href="#" role="presentation" tabindex="-1" class="button secondary postfix datetimepicker"><i class="fa fa-calendar"></i></a>');
+    var button = $('<a href="#" role="presentation" tabindex="-1" class="button secondary postfix datetimepicker"><i class="fas fa-calendar"></i></a>');
     var grid = $([
         '<div class="grid-x collapse">',
         '<div class="' + large_column + ' cell"></div>',
