@@ -424,7 +424,7 @@
         <div class="grid-x news-list-item" tal:repeat="item news">
             <div class="small-12 cell">
                 <a tal:attributes="href request.link(item)">
-                    <tal:b tal:switch="heading">
+                    <tal:b tal:switch="heading|'h2'">
                         <h3 tal:case="'h3'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h3>
                         <h4 tal:case="'h4'">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h4>
                         <h2 tal:case="default">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h2>
