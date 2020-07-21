@@ -25,7 +25,8 @@ class ServicesWidget(object):
             subtitle=(
                 layout.org.meta.get('online_counter_label')
                 or _("Forms and applications")
-            )
+            ),
+            classes=('online-counter',)
         )
 
         # only if there are publications, will we enable the link to them
@@ -36,7 +37,8 @@ class ServicesWidget(object):
                 subtitle=_(
                     layout.org.meta.get('publications_label')
                     or _("Official Documents")
-                )
+                ),
+                classes=('publications',)
             )
 
         yield Link(
@@ -45,7 +47,8 @@ class ServicesWidget(object):
             subtitle=(
                 layout.org.meta.get('reservations_label')
                 or _("Daypasses and rooms")
-            )
+            ),
+            classes=('reservations',)
         )
 
         if layout.org.meta.get('e_move_url'):
@@ -55,7 +58,8 @@ class ServicesWidget(object):
                 subtitle=(
                     layout.org.meta.get('e_move_label')
                     or _("Move with eMovingCH")
-                )
+                ),
+                classes=('e-move',)
             )
 
         resources = ResourceCollection(layout.app.libres_context)
@@ -71,7 +75,8 @@ class ServicesWidget(object):
                 subtitle=(
                     layout.org.meta.get('daypass_label')
                     or _("Generalabonnement for Towns")
-                )
+                ),
+                classes=('sbb-daypass',)
             )
 
     def get_variables(self, layout):
