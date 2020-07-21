@@ -27,14 +27,14 @@ class Prefixed(object):
     def count(self):
         # note, this cannot be used in a Redis cluster - if we use that
         # we have to keep track of all keys separately
-        return self.cache.backend.proxied.client.eval("""
+        return self.cache.backend.proxied.reader_client.eval("""
             return #redis.pcall('keys', ARGV[1])
         """, 0, f'*:{self.prefix}:*')
 
     def flush(self):
         # note, this cannot be used in a Redis cluster - if we use that
         # we have to keep track of all keys separately
-        return self.cache.backend.proxied.client.eval("""
+        return self.cache.backend.proxied.reader_client.eval("""
             if #redis.pcall('keys', ARGV[1]) > 0 then
                 return redis.pcall('del', unpack(redis.call('keys', ARGV[1])))
             end
