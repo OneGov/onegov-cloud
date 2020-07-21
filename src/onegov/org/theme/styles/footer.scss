@@ -53,7 +53,7 @@ $footer-border-width: 0;
         position: relative;
         text-align: center;
 
-        .columns {
+        .cell {
             span + span::before {
                 content: '•';
             }
