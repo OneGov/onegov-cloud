@@ -43,7 +43,7 @@ var setup_internal_link_select = function(input) {
         '<div class="small-1 cell"><a class="button secondary postfix">' + button + '</a></div>'
     );
 
-    var row = input.closest('.row');
+    var row = input.closest('.grid-x');
     for (var i=0; i<types.length; i++) {
         row.addClass(types[i]);
     }
@@ -119,13 +119,13 @@ var get_types = function(input) {
 var get_button_face = function(types) {
     if (types.length == 1) {
         if (types[0] == 'image-url') {
-            return '<i class="fa fa-picture-o"></i>';
+            return '<i class="fas fa-image"></i>';
         }
         if (types[0] == 'file-url') {
-            return '<i class="fa fa-paperclip"></i>';
+            return '<i class="fas fa-paperclip"></i>';
         }
         if (types[0] == 'internal-url') {
-            return '<i class="fa fa-link"></i>';
+            return '<i class="fas fa-link"></i>';
         }
     }
 
