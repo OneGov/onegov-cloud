@@ -6,8 +6,8 @@ $events-icon-margin-right: 1.25rem;
     a {
         color: $primary-color;
         i { margin-right: $events-icon-margin-right; }
-        font-weight: bold;
     }
+    .card-section a { font-weight: bold; }
 
     h3 {
         display: inline-block;
