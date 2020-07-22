@@ -1,15 +1,10 @@
 /*
     Events
 */
-$events-icon-margin-right: 2rem;
+$events-icon-width: 3ex;
 
 .events {
-    a {
-        color: $primary-color;
-        i {
-            width: $events-icon-margin-right;
-        }
-    }
+    a i { width: $events-icon-width; }
     .card-section a {
         font-family: $header-font-family;
         font-weight: bold;

@@ -53,14 +53,35 @@
     panels
 */
 
-$more-link-icon: '\f105';
 
 ul.panel-links {
+
     list-style: none;
     margin: 0;
 
     a {
+        display: block;
         font-weight: bold;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &.more-link {
+            font-size: .875rem;
+            font-weight: 500;
+        }
+    }
+
+    small {
+        display: block;
+        font-size: .875rem;
+    }
+
+    li {
+        margin-bottom: .5em;
+    }
+
+    li:last-child {
+        margin-bottom: 0;
     }
 }
 
@@ -107,11 +128,7 @@ $tasks-icon: "\f0ae";
 $calendar-icon: "\f133";
 $emove-icon: "\f472";
 $train-icon: "\f238";
-$chevron-right-icon: "\f054";
 
-.panel-links {
-    border: 1px solid $editbar-bg-color;
-}
 
 .side-panel {
 
@@ -128,10 +145,10 @@ $chevron-right-icon: "\f054";
             padding-right: $panel-icon-padding-right;
         }
 
-        @include link-chevron-after();
+        @include more-link-after();
 
         a {
-            color: $primary-fg-color;
+            color: $primary-fg-color !important;
             font-family: $header-font-family;
         }
 

@@ -16,7 +16,7 @@
         list-style: none;
     }
 
-    @include link-chevron-after();
+    @include more-link-after();
 
     li {
         padding: .5rem 0;
@@ -31,7 +31,6 @@
     }
 
     a {
-        color: $primary-color;
         font-family: $header-font-family;
     }
 

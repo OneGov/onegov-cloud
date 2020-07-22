@@ -62,12 +62,14 @@
 
 @mixin primary-color-background {
     background-color: $primary-color;
-    color: $primary-fg-color;
+    color: $primary-fg-color !important;
 }
 
-@mixin link-chevron-after() {
+$more-link-icon: "\f054";
+
+@mixin more-link-after() {
   a::after {
-    @include icon($chevron-right-icon);
+    @include icon($more-link-icon);
     float: right;
   }
 }
