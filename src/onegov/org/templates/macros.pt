@@ -73,7 +73,7 @@
 
 <metal:breadcrumbs define-macro="breadcrumbs">
     <div id="breadcrumbs">
-        <div class="grid-x" id="logo">
+        <div class="grid-x grid-padding-x" id="logo">
             <div class="small-12 cell">
                 <nav aria-label="You are here" role="navigation" i18n:attributes="aria-label">
                     <ul class="breadcrumbs" tal:condition="layout.breadcrumbs">
@@ -372,18 +372,25 @@
     </tal:b>
 </metal:fields>
 
-<metal:homepage-tiles define-macro="homepage-tiles" i18n:domain="onegov.org">
+<metal:homepage-tiles define-macro="homepage-tile-card">
+    <div class="card" id="homepage-tile-${item.number}">
+        <div class="card-divider">
+            <h5>${item.page.text}</h5>
+        </div>
+        <div class="card-section">
+            <ul>
+                <li tal:repeat="link item.links" tal:content="structure link(layout)" />
+            </ul>
+        </div>
+    </div>
+</metal:homepage-tiles>
+
+<metal:homepage-tiles define-macro="homepage-tiles">
     <div tal:define="show_title show_title|nothing">
-        <h2 i18n:translate class="${'' if show_title else 'show-for-sr'}">Selected Topics</h2>
-        <div class="homepage-tiles">
-            <div tal:repeat="tile tiles" class="homepage-tile" id="homepage-tile-${tile.number}">
-                <a href="${tile.page.url}" class="tile-link">
-                    <div class="tile-image"></div>
-                    <h3>${tile.page.text}</h3>
-                </a>
-                <div class="child-links">
-                    <tal:b repeat="link tile.links" tal:content="structure link(layout)" />
-                </div>
+        <h3 i18n:translate class="${'' if show_title else 'show-for-sr'}">Selected Topics</h3>
+        <div class="grid-x grid-padding-x homepage-tiles">
+            <div class="cell small-12 medium-6 large-4 homepgage-tile" tal:repeat="item tiles">
+                <metal:homepage-tiles use-macro="layout.macros['homepage-tile-card']" />
             </div>
         </div>
     </div>
@@ -470,7 +477,7 @@
             </h3>
         </div>
 
-        <div class="cell small-12 large-4 medium-6 news-list-item" tal:repeat="item news">
+        <div class="cell small-12 medium-6 news-list-item" tal:repeat="item news">
             <metal:newlist use-macro="layout.macros['news-item-card']" />
         </div>
 

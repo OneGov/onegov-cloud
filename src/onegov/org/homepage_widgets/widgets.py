@@ -28,7 +28,7 @@ def get_lead(text, max_chars=180, consider_sentences=True):
 class RowWidget(object):
     template = """
         <xsl:template match="row">
-            <div class="grid-x">
+            <div class="grid-x grid-padding-x">
                 <xsl:apply-templates select="node()"/>
             </div>
         </xsl:template>

@@ -64,3 +64,10 @@
     background-color: $primary-color;
     color: $primary-fg-color;
 }
+
+@mixin link-chevron-after() {
+  a::after {
+    @include icon($chevron-right-icon);
+    float: right;
+  }
+}
