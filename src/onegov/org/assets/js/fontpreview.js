@@ -1,3 +1,3 @@
-$('#font_family_sans_serif').children('option').each(function() {
+$('#body_font_family_ui').children('option').each(function() {
     this.style.fontFamily = this.value.replace(';', '').replace(' !default', '');
 });

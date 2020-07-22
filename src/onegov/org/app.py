@@ -169,7 +169,7 @@ class OrgApp(FoundationApp, LibresIntegration, ElasticsearchApp, MapboxApp,
 
     @property
     def font_family(self):
-        return self.theme_options.get('font-family-sans-serif')
+        return self.theme_options.get('body-font-family-ui')
 
     def checkout_button(self, button_label, title, price, email, locale):
         provider = self.default_payment_provider

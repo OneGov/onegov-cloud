@@ -216,15 +216,8 @@ class CoreRequest(IncludeRequest, ContentSecurityRequest, ReturnToMixin):
             and self.headers.get('cache-control') == 'no-cache'
             and self.headers.get('x-requested-with') != 'XMLHttpRequest')
 
-        # todo: make migration and change primary-color since it conflicts
-        theme_options = self.app.theme_options.copy()
-        if 'primary-color' in theme_options:
-            theme_options.update(
-                {'primary-color-ui': theme_options['primary-color']})
-            del theme_options['primary-color']
-
         filename = self.app.modules.theme.compile(
-            self.app.themestorage, theme, theme_options,
+            self.app.themestorage, theme, self.app.theme_options,
             force=force
         )
 

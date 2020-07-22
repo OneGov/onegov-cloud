@@ -100,7 +100,7 @@ filesets:
 
 organisation:
   theme_options:
-    primary-color: '#006fba'
+    primary-color-ui: '#006fba'
   meta:
     contact: |
       Ferienpass Musterlingen

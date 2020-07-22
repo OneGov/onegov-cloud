@@ -6,8 +6,9 @@ from onegov.org.theme.org_theme import HELVETICA
 
 # options editable by the user
 user_options = {
-    'primary-color': '#006fba',
-    'font-family-sans-serif': HELVETICA
+    'primary-color-ui': '#006fba',
+    'body-font-family-ui': HELVETICA,
+    'header-font-family-ui': HELVETICA,
 
 }
 
