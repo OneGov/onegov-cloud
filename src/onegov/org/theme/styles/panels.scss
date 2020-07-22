@@ -91,8 +91,8 @@ ul.panel-links {
 }
 
 $right-side-panel-margin: 0 0 2rem 1rem;
-$icon-margin-right: 1ex;
-$icon-padding-right: .8ex;
+$panel-icon-margin-right: 1ex;
+$panel-icon-padding-right: .8ex;
 $side-panel-padding: 1rem;
 
 $tasks-icon: "\f0ae";
@@ -117,8 +117,8 @@ $chevron-right-icon: "\f054";
         a.sbb-daypass::before { @include icon($train-icon); }
 
         a::before {
-            margin-right: $icon-margin-right;
-            padding-right: $icon-padding-right;
+            margin-right: $panel-icon-margin-right;
+            padding-right: $panel-icon-padding-right;
         }
 
         a::after {
