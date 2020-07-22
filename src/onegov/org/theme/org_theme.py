@@ -112,7 +112,8 @@ class OrgTheme(BaseTheme):
             'helpers',
             'footer',
             'chosen',
-            'news'
+            'news',
+            'events'
         ]
 
     @property

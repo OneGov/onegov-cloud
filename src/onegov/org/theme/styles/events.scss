@@ -1,6 +1,19 @@
 /*
     Events
 */
+$events-icon-margin-right: 1.25rem;
+.events {
+    a {
+        color: $primary-color;
+        i { margin-right: $events-icon-margin-right; }
+        font-weight: bold;
+    }
+
+    h3 {
+        display: inline-block;
+    }
+}
+
 .imported-event-panel p {
     font-size: .875rem;
 }
@@ -14,7 +27,7 @@
 
 .calendar-export-list {
     a::before {
-        @include icon('\f133');
+        @include icon($calendar-icon);
         color: $body-font-color;
         margin-right: 1ex;
     }
