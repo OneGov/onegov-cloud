@@ -90,3 +90,21 @@ $header-styles: (
 
     .h6-size { font-size: $h6-font-size; }
 }
+
+.more-link {
+    &::before {
+        @include icon($more-link-icon);
+        width: 1.5ex;
+    }
+
+}
+
+/* Global coloring of links */
+
+#page-root a {
+    color: $primary-color;
+
+    &:hover {
+        color: darken($primary-color, 10%);
+    }
+}
