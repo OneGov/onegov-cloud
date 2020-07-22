@@ -13,7 +13,6 @@ from onegov.core.custom import json
 from onegov.core.elements import Block, Confirm, Intercooler
 from onegov.core.elements import Link, LinkGroup
 from onegov.core.i18n import SiteLocale
-from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.core.utils import linkify
 from onegov.directory import DirectoryCollection

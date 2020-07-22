@@ -205,7 +205,7 @@ EventCard = namedtuple(
 class EventsWidget(object):
     template = """
         <xsl:template match="events">
-            <metal:block use-macro="layout.macros['event-cards']" 
+            <metal:block use-macro="layout.macros['event-cards']"
             tal:define="with_lead True" />
         </xsl:template>
     """
