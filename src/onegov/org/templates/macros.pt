@@ -271,11 +271,11 @@
 <metal:events define-macro="event-item-card">
     <div class="card">
         <div class="card-section">
-            <div><a href=""><i class="far fa-calendar-alt"></i>${item.subtitle}</a></div>
-            <div tal:condition="item.location"><a href=""><i class="fas fa-map-marker-alt"></i>${item.location}</a></div>
+            <div><a href="${item.url}"><i class="far fa-calendar-alt"></i>${item.subtitle}</a></div>
+            <div tal:condition="item.location"><a href="${item.url}"><i class="fas fa-map-marker-alt"></i>${item.location}</a></div>
         </div>
         <img tal:condition="item.image_url" src="${item.image_url}">
-        <div class="card-section">
+        <div class="card-section" tal:condition="with_lead|False">
             <h5>${item.lead}</h5>
         </div>
     </div>
@@ -285,6 +285,7 @@
     <div class="events grid-x grid-padding-x">
         <div class="cell small-12">
             <h3 i18n:translate>Events</h3>
+            <h3 class="float-right" tal:content="structure all_events_link(layout)" />
         </div>
         <div class="cell small-12 large-4 medium-6 event-item" tal:repeat="item event_panel.links">
             <metal:b use-macro="layout.macros['event-item-card']" />
