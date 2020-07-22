@@ -214,76 +214,76 @@ class BaseTheme(CoreTheme):
         fp = 'foundation/scss'
         _vendor = 'foundation/_vendor'
         return textwrap.dedent(f"""
-        /**
-         * Foundation for Sites
-         * Version 6.6.3
-         * https://get.foundation
-         * Licensed under MIT Open Source
-         */
-        // --- Dependencies ---
-        @import '{fp}/vendor/normalize';
-        @import '{_vendor}/sassy-lists/stylesheets/helpers/{deps}';
-        @import '{_vendor}/sassy-lists/stylesheets/helpers/true';
-        @import '{_vendor}/sassy-lists/stylesheets/functions/contain';
-        @import '{_vendor}/sassy-lists/stylesheets/functions/purge';
-        @import '{_vendor}/sassy-lists/stylesheets/functions/remove';
-        @import '{_vendor}/sassy-lists/stylesheets/functions/replace';
-        @import '{_vendor}/sassy-lists/stylesheets/functions/to-list';
-        @import '{fp}/_settings';
-        {pre_imports}
-        // --- Components ---
-        // Utilities
-        @import '{fp}/util/util';
-        // Global styles
-        @import '{fp}/global';
-        @import '{fp}/forms/forms';
-        @import '{fp}/typography/typography';
-        // Grids
-        @import '{fp}/grid/grid';
-        @import '{fp}/xy-grid/xy-grid';
-        // Generic components
-        @import '{fp}/components/button';
-        @import '{fp}/components/button-group';
-        @import '{fp}/components/close-button';
-        @import '{fp}/components/label';
-        @import '{fp}/components/progress-bar';
-        @import '{fp}/components/slider';
-        @import '{fp}/components/switch';
-        @import '{fp}/components/table';
-        // Basic components
-        @import '{fp}/components/badge';
-        @import '{fp}/components/breadcrumbs';
-        @import '{fp}/components/callout';
-        @import '{fp}/components/card';
-        @import '{fp}/components/dropdown';
-        @import '{fp}/components/pagination';
-        @import '{fp}/components/tooltip';
-        // Containers
-        @import '{fp}/components/accordion';
-        @import '{fp}/components/media-object';
-        @import '{fp}/components/orbit';
-        @import '{fp}/components/responsive-embed';
-        @import '{fp}/components/tabs';
-        @import '{fp}/components/thumbnail';
-        // Menu-based containers
-        @import '{fp}/components/menu';
-        @import '{fp}/components/menu-icon';
-        @import '{fp}/components/accordion-menu';
-        @import '{fp}/components/drilldown';
-        @import '{fp}/components/dropdown-menu';
-        // Layout components
-        @import '{fp}/components/off-canvas';
-        @import '{fp}/components/reveal';
-        @import '{fp}/components/sticky';
-        @import '{fp}/components/title-bar';
-        @import '{fp}/components/top-bar';
-        // Helpers
-        @import '{fp}/components/float';
-        @import '{fp}/components/flex';
-        @import '{fp}/components/visibility';
-        @import '{fp}/prototype/prototype';
+/**
+ * Foundation for Sites
+ * Version 6.6.3
+ * https://get.foundation
+ * Licensed under MIT Open Source
+ */
+// --- Dependencies ---
+@import '{fp}/vendor/normalize';
+@import '{_vendor}/sassy-lists/stylesheets/helpers/{deps}';
+@import '{_vendor}/sassy-lists/stylesheets/helpers/true';
+@import '{_vendor}/sassy-lists/stylesheets/functions/contain';
+@import '{_vendor}/sassy-lists/stylesheets/functions/purge';
+@import '{_vendor}/sassy-lists/stylesheets/functions/remove';
+@import '{_vendor}/sassy-lists/stylesheets/functions/replace';
+@import '{_vendor}/sassy-lists/stylesheets/functions/to-list';
+@import '{fp}/_settings';
+{pre_imports}
+// --- Components ---
+// Utilities
+@import '{fp}/util/util';
+// Global styles
+@import '{fp}/global';
+@import '{fp}/forms/forms';
+@import '{fp}/typography/typography';
+// Grids
+@import '{fp}/grid/grid';
+@import '{fp}/xy-grid/xy-grid';
+// Generic components
+@import '{fp}/components/button';
+@import '{fp}/components/button-group';
+@import '{fp}/components/close-button';
+@import '{fp}/components/label';
+@import '{fp}/components/progress-bar';
+@import '{fp}/components/slider';
+@import '{fp}/components/switch';
+@import '{fp}/components/table';
+// Basic components
+@import '{fp}/components/badge';
+@import '{fp}/components/breadcrumbs';
+@import '{fp}/components/callout';
+@import '{fp}/components/card';
+@import '{fp}/components/dropdown';
+@import '{fp}/components/pagination';
+@import '{fp}/components/tooltip';
+// Containers
+@import '{fp}/components/accordion';
+@import '{fp}/components/media-object';
+@import '{fp}/components/orbit';
+@import '{fp}/components/responsive-embed';
+@import '{fp}/components/tabs';
+@import '{fp}/components/thumbnail';
+// Menu-based containers
+@import '{fp}/components/menu';
+@import '{fp}/components/menu-icon';
+@import '{fp}/components/accordion-menu';
+@import '{fp}/components/drilldown';
+@import '{fp}/components/dropdown-menu';
+// Layout components
+@import '{fp}/components/off-canvas';
+@import '{fp}/components/reveal';
+@import '{fp}/components/sticky';
+@import '{fp}/components/title-bar';
+@import '{fp}/components/top-bar';
+// Helpers
+@import '{fp}/components/float';
+@import '{fp}/components/flex';
+@import '{fp}/components/visibility';
+@import '{fp}/prototype/prototype';
 
-        {post_imports}
+{post_imports}
         """)
 
     @property
@@ -322,6 +322,8 @@ class BaseTheme(CoreTheme):
 
         paths = self.extra_search_paths
         paths.append(self.foundation_path)
+
+        print(theme.getvalue())
 
         return sass.compile(
             string=theme.getvalue(),
