@@ -5,17 +5,10 @@
 
 .newslist {
 
-  small > *, h3 > a {
-    color: $primary-color;
-  }
-
   i {
     margin-right: $icon-margin-right;
   }
 
-  .card-section a {
-    color: $primary-color;
-  }
 
   h3 {
     display: inline-block;
