@@ -119,28 +119,26 @@
                             </div>
                         </div>
                     </div>
-
-                    <div data-sticky-container>
-                        <div id="nav-bar">
-                            <div class="nav-bar-sticky" data-sticky data-options="marginTop:0; stickyOn: small;">
-                                <div class="grid-container">
-                                    <div class="grid-x grid-padding-x">
-                                        <div class="large-2 small-2 cell">
-                                            <button data-toggle="offCanvas"><i class="fas fa-bars"></i><span class="hide-for-small-only">Navigation</span></button>
-                                        </div>
-                                        <div class="large-8 small-8 cell">
-                                            <a href="${layout.homepage_url}" tal:define="logo_url layout.org.logo_url|nothing" aria-label="Back to the homepage" i18n:attributes="aria-label">
-                                                <img tal:condition="logo_url" src="${layout.org.logo_url}" alt="Logo" title="${layout.org.title}" i18n:attributes="alt"/>
-                                                <div tal:condition="not:logo_url" metal:use-macro="layout.svg['default_logo']"></div>
-                                            </a>
-                                        </div>
-                                        <div class="large-2 small-2 cell">
-                                            <button data-toggle="offCanvas"><i class="fa fa-search"></i><span class="hide-for-small-only">Suche</span></button>
-                                        </div>
+                    <div data-sticky-container id="nav-bar">
+                        <div class="nav-bar-sticky" data-sticky data-options="marginTop:0; stickyOn: small;">
+                            <div class="grid-container">
+                                <div class="grid-x">
+                                    <div class="large-2 small-2 cell">
+                                        <button data-toggle="offCanvas"><i class="fas fa-bars"></i><span class="hide-for-small-only">Navigation</span></button>
+                                    </div>
+                                    <div class="large-8 small-8 cell middle">
+                                        <a href="${layout.homepage_url}" tal:define="logo_url layout.org.logo_url|nothing" aria-label="Back to the homepage" i18n:attributes="aria-label">
+                                            <img tal:condition="logo_url" src="${layout.org.logo_url}" alt="Logo" title="${layout.org.title}" i18n:attributes="alt"/>
+                                            <div tal:condition="not:logo_url" metal:use-macro="layout.svg['default_logo']"></div>
+                                        </a>
+                                    </div>
+                                    <div class="large-2 small-2 cell right-side">
+                                        <button data-toggle="offCanvas"><i class="fa fa-search"></i><span class="hide-for-small-only">Suche</span></button>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
                     </div>
 
                     <div class="grid-container">
