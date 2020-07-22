@@ -190,7 +190,6 @@ $offcanvas-sizes: (
   medium: 350px
 );
 
-/* Global settings */
-a {
-    color: $primary-color;
-}
+/* default fa icon paddings */
+
+$icon-margin-right: .25rem;
