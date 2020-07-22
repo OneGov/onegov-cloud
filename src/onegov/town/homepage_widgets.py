@@ -14,7 +14,8 @@ class ServicesWidget(object):
                 <h3 tal:content="services_panel.title"></h3>
     
                 <metal:block use-macro="layout.macros['panel-links']"
-                    tal:define="panel services_panel; show_subtitle False"
+                    tal:define="panel services_panel; show_subtitle False;
+                     as_callout True"
                 />
             </div>
         </xsl:template>
