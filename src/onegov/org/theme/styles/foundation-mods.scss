@@ -178,6 +178,9 @@ Accordion
 */
 $accordionmenu-arrow-color: $primary-fg-color;
 
+/* Drilldown */
+$drilldown-arrow-color: get-color(primary);
+
 /*
 Off Canvas / SideBar
 */
@@ -186,3 +189,8 @@ $offcanvas-sizes: (
   small: 250px,
   medium: 350px
 );
+
+/* Global settings */
+a {
+    color: $primary-color;
+}
