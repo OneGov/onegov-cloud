@@ -4,7 +4,7 @@ from chameleon import PageTemplate
 from collections import defaultdict
 from dectate import directive
 from more.content_security import SELF
-from onegov.core import Framework, utils
+from onegov.core import utils
 from onegov.core.framework import default_content_security_policy
 from onegov.core.i18n import default_locale_negotiator
 from onegov.core.orm import orm_cached
