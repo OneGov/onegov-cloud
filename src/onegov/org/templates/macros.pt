@@ -268,9 +268,31 @@
     </div>
 </metal:footer_locales>
 
-<metal:panel define-macro="events-panel">
-    <h3 i18n:translate>Events</h3>
-    <metal:b use-macro="layout.macros['panel-links']" tal:define="panel event_panel"/>
+<metal:events define-macro="event-item-card">
+    <div class="card">
+        <div class="card-section">
+            <div><a href=""><i class="far fa-calendar-alt"></i>${item.subtitle}</a></div>
+            <div tal:condition="item.location"><a href=""><i class="fas fa-map-marker-alt"></i>${item.location}</a></div>
+        </div>
+        <img tal:condition="item.image_url" src="${item.image_url}">
+        <div class="card-section">
+            <h5>${item.lead}</h5>
+        </div>
+    </div>
+</metal:events>
+
+<metal:panel define-macro="event-cards">
+    <div class="events grid-x grid-padding-x">
+        <div class="cell small-12">
+            <h3 i18n:translate>Events</h3>
+        </div>
+        <div class="cell small-12 large-4 medium-6 event-item" tal:repeat="item event_panel.links">
+            <metal:b use-macro="layout.macros['event-item-card']" />
+        </div>
+    </div>
+
+
+
 </metal:panel>
 
 <metal:panel define-macro="directories-panel">
@@ -447,7 +469,7 @@
             </h3>
         </div>
 
-        <div class="cell small-12 large-4 news-list-item" tal:repeat="item news">
+        <div class="cell small-12 large-4 medium-6 news-list-item" tal:repeat="item news">
             <metal:newlist use-macro="layout.macros['news-item-card']" />
         </div>
 

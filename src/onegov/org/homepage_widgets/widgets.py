@@ -10,6 +10,20 @@ from onegov.file.models.fileset import file_to_set_associations
 from sqlalchemy import func
 
 
+def get_lead(text, max_chars=180, consider_sentences=True):
+    if len(text) > max_chars:
+        first_point_ix = text.find('.')
+        if not first_point_ix or not consider_sentences:
+            return text[0:max_chars] + '...'
+        elif first_point_ix >= max_chars:
+            return text
+        else:
+            end = text[0:max_chars].rindex('.') + 1
+            return text[0:end]
+
+    return text
+
+
 @OrgApp.homepage_widget(tag='row')
 class RowWidget(object):
     template = """
@@ -181,12 +195,15 @@ class CoverWidget(object):
         </xsl:template>
     """
 
+EventCard = namedtuple(
+    'EventCard', ['text', 'url', 'subtitle', 'image_url', 'location', 'lead']
+)
 
 @OrgApp.homepage_widget(tag='events')
 class EventsWidget(object):
     template = """
         <xsl:template match="events">
-            <metal:block use-macro="layout.macros['events-panel']" />
+            <metal:block use-macro="layout.macros['event-cards']" />
         </xsl:template>
     """
 
@@ -196,21 +213,16 @@ class EventsWidget(object):
 
         event_layout = EventBaseLayout(layout.model, layout.request)
         event_links = [
-            Link(
+            EventCard(
                 text=o.title,
                 url=layout.request.link(o),
                 subtitle=event_layout.format_date(o.localized_start, 'event')
-                .title()
+                .title(),
+                image_url=o.event.image and layout.request.link(o.event.image),
+                location=o.location,
+                lead=get_lead(o.event.description)
             ) for o in occurrences
         ]
-
-        event_links.append(
-            Link(
-                text=_("All events"),
-                url=event_layout.events_url,
-                classes=('more-link', )
-            )
-        )
 
         latest_events = LinkGroup(
             title=_("Events"),
@@ -218,7 +230,13 @@ class EventsWidget(object):
         )
 
         return {
-            'event_panel': latest_events
+            'event_panel': latest_events,
+            'all_events_link': Link(
+                text=_("All events"),
+                url=event_layout.events_url,
+                classes=('more-link', )
+            ),
+
         }
 
 
