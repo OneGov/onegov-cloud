@@ -76,7 +76,7 @@ class Organisation(Base, TimestampMixin):
     custom_link_3_name = meta_property()
     custom_link_3_url = meta_property()
 
-    # parter logos
+    # partner logos
     partner_1_img = meta_property()
     partner_1_url = meta_property()
     partner_1_name = meta_property()
