@@ -102,7 +102,6 @@ ul.panel-links {
 $right-side-panel-margin: 0 0 2rem 1rem;
 $panel-icon-margin-right: 1ex;
 $panel-icon-padding-right: .8ex;
-$side-panel-padding: 1rem;
 
 $tasks-icon: "\f0ae";
 $calendar-icon: "\f133";
@@ -116,7 +115,6 @@ $chevron-right-icon: "\f054";
 
 .side-panel {
 
-    padding: $side-panel-padding;
 
     .services-panel {
         a.online-counter::before { @include icon($tasks-icon); }
@@ -130,13 +128,11 @@ $chevron-right-icon: "\f054";
             padding-right: $panel-icon-padding-right;
         }
 
-        a::after {
-            @include icon($chevron-right-icon);
-            float: right;
-        }
+        @include link-chevron-after();
 
         a {
             color: $primary-fg-color;
+            font-family: $header-font-family;
         }
 
         .panel-links {

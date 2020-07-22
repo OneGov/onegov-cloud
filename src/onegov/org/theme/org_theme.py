@@ -113,7 +113,8 @@ class OrgTheme(BaseTheme):
             'footer',
             'chosen',
             'news',
-            'events'
+            'events',
+            'homepage-tiles'
         ]
 
     @property

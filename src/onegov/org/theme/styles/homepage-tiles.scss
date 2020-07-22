@@ -1,0 +1,58 @@
+/*
+    homepage tiles images
+*/
+
+#homepage-tile-1 .tile-image { background-image: url(#{$tile-image-1});}
+#homepage-tile-2 .tile-image { background-image: url(#{$tile-image-2});}
+#homepage-tile-3 .tile-image { background-image: url(#{$tile-image-3});}
+#homepage-tile-4 .tile-image { background-image: url(#{$tile-image-4});}
+#homepage-tile-5 .tile-image { background-image: url(#{$tile-image-5});}
+#homepage-tile-6 .tile-image { background-image: url(#{$tile-image-6});}
+
+.homepage-tiles {
+    ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    @include link-chevron-after();
+
+    li {
+        padding: .5rem 0;
+        border-bottom: 1px solid #f5f5f5;
+        font-weight: bold;
+
+        &:first-of-type {padding-top: 0}
+        &:last-of-type {
+            border: none;
+            padding-bottom: 0;
+        }
+    }
+
+    a {
+        color: $primary-color;
+        font-family: $header-font-family;
+    }
+
+}
+
+#topics {
+    margin: 1rem 0;
+}
+
+#topics ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#topics ul li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f5f5f5;
+    font-weight: bold;
+}
+
+#topics ul li:last-of-type {
+    border: none;
+}
