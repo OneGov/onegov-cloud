@@ -88,7 +88,7 @@
 </metal:breadcrumbs>
 
 <metal:panel-links define-macro="panel-links">
-    <ul class="panel-links callout">
+    <ul class="${'panel-links' + (' callout' if as_callout else '')}" tal:define="as_callout as_callout|False">
         <li tal:repeat="link panel.links">
             <tal:b content="structure link(layout)" />
             <small tal:condition="show_subtitle|True">${link.subtitle}</small>
@@ -458,7 +458,7 @@
                 <h5 tal:case="default">${item.title} <metal:hint use-macro="layout.macros['access_hint']" /></h5>
             </tal:b>
             <p class="news-lead">${item.content.lead}</p>
-            <div><a href="${request.link(item)}"><i class="fas fa-chevron-right"></i><span i18n:translate>read more</span></a></div>
+            <div><a i18n:translate href="${request.link(item)}" class="more-link">read more</a></div>
         </div>
     </div>
 </metal:newslist>
