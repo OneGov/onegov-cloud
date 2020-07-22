@@ -5,7 +5,7 @@
 
 .newslist {
 
-  small:first-of-type {
+  small > *, h3 > a {
     color: $primary-color;
   }
 
@@ -15,6 +15,10 @@
 
   .card-section a {
     color: $primary-color;
+  }
+
+  h3 {
+    display: inline-block;
   }
 
 }

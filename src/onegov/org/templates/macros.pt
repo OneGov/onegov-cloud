@@ -444,15 +444,15 @@
                     <a href="${layout.newsletter_url}"><i class="fas fa-chevron-right" aria-hidden="true"></i><span i18n:translate>All articles</span></a>
                 </small>
             </h3>
+            <h3 class="all-news float-right" tal:condition="show_all_news_link|nothing">
+                <a href="${layout.newsletter_url}" i18n:translate>Newsletter</a>
+            </h3>
         </div>
 
         <div class="cell small-12 large-4 news-list-item" tal:repeat="item news">
             <metal:newlist use-macro="layout.macros['news-item-card']" />
         </div>
 
-        <h3 class="all-news" tal:condition="show_all_news_link|nothing">
-            <a href="${layout.newsletter_url}" i18n:translate>Newsletter</a>
-        </h3>
     </div>
 </metal:newslist>
 
