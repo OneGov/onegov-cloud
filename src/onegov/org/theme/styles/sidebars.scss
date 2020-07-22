@@ -1,31 +1,74 @@
 /*
-    sidebar navigation
+    sidebar navigation left
 */
 
-.sidebar {
-    ul {
-        list-style: none;
+.sidebar a {
+   color: $primary-color;
+}
 
-        li .group-title {
-            display: block;
-            margin-bottom: .4rem;
+.searchbox {
+    margin-top: 2rem;
+    padding: 1rem;
+    input[type=submit] {
+        background-color: $primary-color;
+    }
+}
+
+.typeahead {
+    position: relative;
+
+    ul {
+        background-color: $white;
+        border-width: 0 1px 1px;
+        box-shadow: 0 0 5px $jumbo;
+        left: 1em;
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        position: absolute;
+        //right: 1em;
+        z-index: 1;
+        overflow: visible;
+    }
+
+    a {
+        color: $input-color;
+        display: block;
+        font-size: $input-font-size;
+    }
+
+    li {
+        padding: 0 5px;
+
+        // highlight links with the active class
+        &.active {
+            background-color: $topbar-bg-color;
+
+            a {
+                color: $primary-color;
+                font-weight: bold;
+            }
         }
 
-        .children {
-            margin-left: 0;
+        // highlight links when hovering
+        &:hover {
+            background-color: $topbar-bg-color !important;
 
-            .new-content-placeholder,
             a {
-                color: $oil;
-                overflow: hidden;
-                padding-left: 2rem;
-                text-overflow: ellipsis;
-                white-space: nowrap;
+                color: $primary-color !important;
+                font-weight: bold !important;
             }
+        }
+    }
 
-            .new-content-placeholder {
-                display: none;
-            }
+    // do not highlight links with the active class when hovering (so we
+    // get a different highlight when hovering)
+    &:hover li.active {
+        background-color: $white;
+
+        a {
+            color: $body-font-color;
+            font-weight: normal;
         }
     }
 }

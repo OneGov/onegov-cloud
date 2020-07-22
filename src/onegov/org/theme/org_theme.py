@@ -104,7 +104,7 @@ class OrgTheme(BaseTheme):
             'header',
             'org',
             'sortable',
-            'search',
+            'sidebars',
             'forms',
             'panels',
             'sliders',
