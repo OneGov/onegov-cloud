@@ -73,17 +73,15 @@
 
 <metal:breadcrumbs define-macro="breadcrumbs">
     <div id="breadcrumbs">
-        <div class="grid-container">
-            <div class="grid-x grid-padding-x" id="logo">
-                <div class="small-12 cell">
-                    <nav aria-label="You are here" role="navigation" i18n:attributes="aria-label">
-                        <ul class="breadcrumbs" tal:condition="layout.breadcrumbs">
-                            <tal:b repeat="link layout.breadcrumbs">
-                                <li tal:content="structure link(layout)"></li>
-                            </tal:b>
-                        </ul>
-                    </nav>
-                </div>
+        <div class="grid-x" id="logo">
+            <div class="small-12 cell">
+                <nav aria-label="You are here" role="navigation" i18n:attributes="aria-label">
+                    <ul class="breadcrumbs" tal:condition="layout.breadcrumbs">
+                        <tal:b repeat="link layout.breadcrumbs">
+                            <li tal:content="structure link(layout)"></li>
+                        </tal:b>
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>
