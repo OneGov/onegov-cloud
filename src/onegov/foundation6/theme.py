@@ -323,8 +323,6 @@ class BaseTheme(CoreTheme):
         paths = self.extra_search_paths
         paths.append(self.foundation_path)
 
-        print(theme.getvalue())
-
         return sass.compile(
             string=theme.getvalue(),
             include_paths=paths,
