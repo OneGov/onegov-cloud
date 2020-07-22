@@ -15,7 +15,7 @@ class OnboardingTheme(BaseTheme):
     @property
     def default_options(self):
         return OrderedDict((
-            ('primary-color', '#005BA1'),
+            ('primary-color-ui', '#005BA1'),
 
             # base colors
             ('gray', '#e0e3e5'),

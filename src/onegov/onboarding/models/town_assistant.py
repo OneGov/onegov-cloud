@@ -146,7 +146,7 @@ class TownAssistant(Assistant):
                 create_new_organisation(self.app, name=name, reply_to=user)
 
             org = session.query(Organisation).first()
-            org.theme_options['primary-color'] = color
+            org.theme_options['primary-color-ui'] = color
 
             users = UserCollection(self.app.session_manager.session())
             assert not users.query().first()

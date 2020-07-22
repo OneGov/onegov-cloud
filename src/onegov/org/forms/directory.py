@@ -382,8 +382,8 @@ class DirectoryBaseForm(Form):
 
     @property
     def default_marker_color(self):
-        return self.request.app.org.theme_options.get('primary-color')\
-            or user_options['primary-color']
+        return self.request.app.org.theme_options.get('primary-color-ui')\
+            or user_options['primary-color-ui']
 
     @property
     def marker_color(self):

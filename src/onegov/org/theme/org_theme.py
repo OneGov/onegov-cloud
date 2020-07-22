@@ -8,12 +8,15 @@ HELVETICA = '"Helvetica Neue", Helvetica, Roboto, Arial, sans-serif !default'
 ARIAL = 'Arial, sans-serif !default'
 VERDANA = 'Verdana, Geneva, sans-serif !default'
 COURIER_NEW = '"Courier New", Courier, monospace !default'     # monospace
-ROBOTO_CONDENSED = "'Roboto Condensed', sans-serif !default"
+ROBOTO_CONDENSED = '"Roboto Condensed", sans-serif !default'
+MERRIWEATHER = 'Merriweather, sans-serif !default'
 
+# "Merriweather","Helvetica Neue",Helvetica,Roboto,Arial,sans-serif
 # options editable by the user
 user_options = {
-    'primary-color': '#006fba',
-    'font-family-sans-serif': ROBOTO_CONDENSED
+    'primary-color-ui': '#006fba',
+    'body-font-family-ui': MERRIWEATHER,
+    'header-font-family-ui': ROBOTO_CONDENSED
 }
 
 default_font_families = {
