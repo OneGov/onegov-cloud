@@ -64,16 +64,17 @@ $table-border-color: smart-scale($table-background, $table-color-scale);
 */
 
 $foundation-palette: (
+  primary: $primary-color-ui,
   secondary: $gray,
   success: $green-dark,
   warning: $orange-dark,
   alert: $red-dark,
   info: $blue-dark
-) !default;
+);
 
-//$label-palette: map-merge($foundation-palette, (
-//    purple: #bb00ff
-//)) !default;
+//$foundation-palette: map-merge($foundation-palette, (
+//    primary: $primary-color-ui
+//));
 
 // not supported by the palette
 $info-color: $blue-dark;
