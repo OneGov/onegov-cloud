@@ -155,13 +155,8 @@ def migrate_homepage_structure(context):
             </column>
         </row>
         <row>
-            <column span="8">        
+            <column span="12">        
                 <news />
-            </column>
-            <column span="4">        
-                <panel>
-                   <directories />
-                 </panel>
             </column>
         </row>
         <line />
