@@ -1,10 +1,7 @@
 // we need to use exact pixel measurements for the footer or we end up with
 // inconsistent results across browsers, which might mean the difference between
 // showing a scrollbar and not showing one
-$footer-header-color: $charcoal;
-$footer-text-color: $steel;
-$footer-font-size: 13px;
-$footer-border-width: 0;
+$footer-text-color: $primary-fg-color;
 
 .footer-container {
     background-color: $primary-color;
@@ -23,13 +20,8 @@ $footer-border-width: 0;
     }
 
     * {
-        //color: $footer-text-color;
-        font-size: $footer-font-size;
-        line-height: 25px;
-    }
-
-    a, h2, .footer-columns p, .footer-links {
-        color: $primary-fg-color;
+        color: $footer-text-color;
+        line-height: 1.5rem;
     }
 
     h2 {
