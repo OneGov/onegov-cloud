@@ -171,7 +171,6 @@
                                             <div metal:define-slot="post-title"></div>
                                         </h1>
                                         <p tal:condition="layout.sidebar_links">This page has sidebarlinks. its just a hint four you!</p>
-                                        <p tal:condition="layout.on_homepage">Your now on the landing page</p>
                                     </div>
                                 </div>
                             </div>
