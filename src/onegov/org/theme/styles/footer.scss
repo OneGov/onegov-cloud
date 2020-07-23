@@ -6,10 +6,13 @@ $footer-text-color: $steel;
 $footer-font-size: 13px;
 $footer-border-width: 0;
 
-.footer-content {
-    background-color: $topbar-bg-color;
+.footer-container {
+    background-color: $primary-color;
+}
 
-    box-shadow: 0 -2px 0 $primary-color;
+.footer-content {
+
+    //box-shadow: 0 -2px 0 $white;
     max-width: 100% !important;
 
     padding: 0;
@@ -20,14 +23,16 @@ $footer-border-width: 0;
     }
 
     * {
-        background-color: $topbar-bg-color;
-        color: $footer-text-color;
+        //color: $footer-text-color;
         font-size: $footer-font-size;
         line-height: 25px;
     }
 
+    a, h2, .footer-columns p, .footer-links {
+        color: $primary-fg-color;
+    }
+
     h2 {
-        color: $footer-header-color;
         font-weight: 500;
         letter-spacing: 1px;
         margin-bottom: 13px;
@@ -41,6 +46,8 @@ $footer-border-width: 0;
     .footer-columns {
         padding-bottom: .5rem;
         padding-top: 1.25rem;
+
+        @include clean-ul();
 
         p {
             line-height: 1.5rem;
@@ -60,59 +67,4 @@ $footer-border-width: 0;
         }
     }
 
-}
-
-/*
-    Footer partner
-*/
-.footer-partner {
-    margin: 0 auto;
-    max-width: $row-width;
-    padding: 0 50px / 2;
-
-    ul {
-        display: flex;
-        flex-wrap: wrap;
-        list-style: none;
-        margin: 0;
-
-        li {
-            background-color: $white;
-            border: 1px solid #efefef;
-            margin-right: 50px / 2;
-            padding: 50px / 2;
-            width: calc(25% - #{50px} / 8 * 3);
-        }
-
-        li:last-child {
-            margin-right: 0;
-        }
-
-        @include breakpoint(small only) {
-            li {
-                margin-bottom: 50px / 2;
-                margin-right: 0;
-                width: 100%;
-            }
-        }
-
-        li.empty {
-            background: transparent;
-            border-color: transparent;
-            height: 0;
-            margin-bottom: 0;
-            padding: 0;
-        }
-    }
-
-    a {
-        background-color: $white;
-        background-position: center center;
-        background-repeat: no-repeat;
-        background-size: contain;
-        display: block;
-        height: 0;
-        padding-top: 50%;
-        width: 100%;
-    }
 }
