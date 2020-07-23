@@ -145,11 +145,10 @@ $train-icon: "\f238";
             padding-right: $panel-icon-padding-right;
         }
 
-        @include more-link-after();
+        @include more-link-after;
 
         a {
             color: $primary-fg-color !important;
-            font-family: $header-font-family;
         }
 
         .panel-links {

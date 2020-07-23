@@ -35,7 +35,8 @@
     border-radius: 1000px;
 }
 
-@mixin icon-base() {
+// This is the base fa uses for the class .fa and .fas
+@mixin icon-base {
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
     display: inline-block;
@@ -67,14 +68,14 @@
 
 $more-link-icon: "\f054";
 
-@mixin more-link-after() {
+@mixin more-link-after {
   a::after {
     @include icon($more-link-icon);
     float: right;
   }
 }
 
-@mixin clean-ul() {
+@mixin clean-ul {
   ul {
     list-style: none;
     margin: 0;

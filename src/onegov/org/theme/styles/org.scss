@@ -358,3 +358,8 @@ footer {
 .content {
     margin-bottom: 1rem;
 }
+
+/* Card component tuning */
+.card-section {
+    @include clean-ul();
+}

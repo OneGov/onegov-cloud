@@ -108,3 +108,13 @@ html a {
         color: darken($primary-color, 10%);
     }
 }
+
+/* Font family settings */
+
+a, button, button *, span, span * {
+    font-family: $header-font-family;
+}
+
+p, p > * {
+    font-family: $body-font-family;
+}

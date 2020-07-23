@@ -12,11 +12,11 @@
 .homepage-tiles {
     ul {
         padding: 0;
-        @include clean-ul();
+        @include clean-ul;
 
     }
 
-    @include more-link-after();
+    @include more-link-after;
 
     li {
         padding: .5rem 0;
@@ -42,7 +42,7 @@
 
 #topics ul {
     padding: 0;
-    @include clean-ul();
+    @include clean-ul;
 }
 
 #topics ul li {
