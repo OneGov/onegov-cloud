@@ -92,7 +92,7 @@ $globals-height: 2.5rem;
     }
 
     .info.with-count::before {
-        background-color: $info-color;
+        background-color: get-color(info);
         color: $white;
     }
 
