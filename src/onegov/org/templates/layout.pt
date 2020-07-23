@@ -162,13 +162,19 @@
 
                 <article class="content without-sidebar-links" tal:condition="layout.on_homepage">
                           <section role="main" id="content">
-                            <h1 class="main-title">
-                                <div metal:define-slot="pre-title"></div>
-                                <div metal:define-slot="title"></div>
-                                <div metal:define-slot="post-title"></div>
-                            </h1>
-                              <p tal:condition="layout.sidebar_links">This page has sidebarlinks. its just a hint four you!</p>
-                              <p tal:condition="layout.on_homepage">Your now on the landing page</p>
+                            <div class="grid-container">
+                                <div class="grid-x grid-padding-x">
+                                    <div class="cell small-12">
+                                        <h1 class="main-title">
+                                            <div metal:define-slot="pre-title"></div>
+                                            <div metal:define-slot="title"></div>
+                                            <div metal:define-slot="post-title"></div>
+                                        </h1>
+                                        <p tal:condition="layout.sidebar_links">This page has sidebarlinks. its just a hint four you!</p>
+                                        <p tal:condition="layout.on_homepage">Your now on the landing page</p>
+                                    </div>
+                                </div>
+                            </div>
                             <div metal:define-slot="content"></div>
                           </section>
                 </article>
