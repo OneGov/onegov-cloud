@@ -195,15 +195,16 @@
                 </article>
                 </div>
 
-
-
-                <div class="grid-container fluid footer-container">
-                    <div class="grid-x grid-padding-x">
-                        <div class="cell small-12">
-                            <metal:footer use-macro="layout.macros['footer']" />
+                <div class="footer-container">
+                     <div class="grid-container">
+                        <div class="grid-x grid-padding-x">
+                            <div class="cell small-12">
+                                <metal:footer use-macro="layout.macros['footer']" />
+                            </div>
                         </div>
                     </div>
                 </div>
+
             </main>
             <tal:b tal:content="structure layout.org.meta.analytics_code|nothing" />
         </div>
