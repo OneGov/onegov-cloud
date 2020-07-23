@@ -28,8 +28,23 @@ def get_lead(text, max_chars=180, consider_sentences=True):
 class RowWidget(object):
     template = """
         <xsl:template match="row">
-            <div class="grid-x grid-padding-x">
-                <xsl:apply-templates select="node()"/>
+            <div class="grid-container">
+                <div class="grid-x grid-padding-x">
+                    <xsl:apply-templates select="node()"/>
+                </div>
+            </div>
+        </xsl:template>
+    """
+
+
+@OrgApp.homepage_widget(tag='row-wide')
+class RowWidget(object):
+    template = """
+        <xsl:template match="row-wide">
+            <div class="grid-container fluid">
+                <div class="grid-x">
+                    <xsl:apply-templates select="node()"/>
+                </div>
             </div>
         </xsl:template>
     """
