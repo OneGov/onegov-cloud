@@ -531,6 +531,10 @@ class DefaultLayout(Layout):
         """ Returns the breadcrumbs for the current page. """
         return [Link(_("Homepage"), self.homepage_url)]
 
+    @property
+    def on_homepage(self):
+        return self.request.url == self.homepage_url
+
     @cached_property
     def root_pages(self):
         return self.request.exclude_invisible(self.app.root_pages)
