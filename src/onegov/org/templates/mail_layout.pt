@@ -181,7 +181,7 @@
     ul.flat,
     ul.flat li {
         list-style: none;
-        Margin: 0;
+        margin: 0;
         padding: 0;
     }
 
