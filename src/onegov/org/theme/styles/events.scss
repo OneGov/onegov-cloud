@@ -6,7 +6,6 @@ $events-icon-width: 3ex;
 .events {
     a i { width: $events-icon-width; }
     .card-section a {
-        font-family: $header-font-family;
         font-weight: bold;
     }
 
@@ -21,7 +20,6 @@ $events-icon-width: 3ex;
 
 .imported-event {
     display: inline-block;
-    font-family: $font-family-monospace;
     font-size: .8rem;
     margin-top: .5rem;
 }
