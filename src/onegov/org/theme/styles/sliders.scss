@@ -1,59 +1,21 @@
 /*
     Homepage slider
 */
-.orbit-container {
-    //margin-bottom: 1.75rem;
-
-    //.orbit-timer {
-    //    display: none;
-    //}
-
-    //.orbit-prev,
-    //.orbit-next {
-    //    display: none;
-    //}
-
-    //&:hover {
-    //    .orbit-prev,
-    //    .orbit-next {
-    //        display: block;
-    //    }
-    //}
-
-    //.slider .orbit-caption {
-    //    background-color: rgba(50, 50, 50, .5);
-    //}
-}
 
 .slider {
-    //height: $full-width-banner-height;
 
-    //.orbit-wrapper {
-    //    max-height: $full-width-banner-height;
-    //}
-    //
-    //.orbit-image {
-    //    max-height: $full-width-banner-height;
-    //    width: auto;
-    //}
-    //
-    //li.orbit-slide {
-    //    height: $full-width-banner-height;
-    //}
+    .orbit-figure {
+        max-height: $full-width-banner-height;
+        img {
+            object-fit: cover;
+            @include smooth-edges;
+        }
+    }
 
-    //li {
-    //    @include smooth-edges;
-    //
-    //    background-position: center center !important;
-    //    background-size: cover !important;
-    //
-    //    height: $full-width-banner-height;
-    //}
-    //
-    //&.no-images {
-    //    background-color: $tuatara;
-    //    color: $white;
-    //    margin-bottom: 1rem;
-    //    padding: 1rem;
-    //}
+    &.no-images {
+        background-color: $tuatara;
+        color: $white;
+        margin-bottom: 1rem;
+        padding: 1rem;
+    }
 }
