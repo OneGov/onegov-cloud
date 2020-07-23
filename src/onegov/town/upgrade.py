@@ -135,11 +135,11 @@ def migrate_homepage_structure(context):
         return
 
     org.meta['homepage_structure'] = textwrap.dedent("""\
-            <row>
+            <row-wide>
             <column span="12">
                 <slider />
             </column>
-        </row>
+        </row-wide>
         <row>
             <column span="12">
                 <row>
