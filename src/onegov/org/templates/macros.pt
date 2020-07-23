@@ -191,22 +191,22 @@
     <ul class="social-media-links" tal:condition="facebook or twitter">
         <li tal:condition="facebook">
             <a tal:attributes="href facebook">
-                <i class="fa fa-facebook-official fa-fw"></i> Facebook
+                <i class="fab fa-facebook fa-fw"></i> Facebook
             </a>
         </li>
         <li tal:condition="twitter">
             <a tal:attributes="href twitter">
-                <i class="fa fa-twitter fa-fw"></i> Twitter
+                <i class="fab fa-twitter fa-fw"></i> Twitter
             </a>
         </li>
         <li tal:condition="instagram">
             <a tal:attributes="href instagram">
-                <i class="fa fa-instagram fa-fw"></i> Instagram
+                <i class="fab fa-instagram fa-fw"></i> Instagram
             </a>
         </li>
         <li tal:condition="youtube">
             <a tal:attributes="href youtube">
-                <i class="fa fa-youtube fa-fw"></i> YouTube
+                <i class="fab fa-youtube fa-fw"></i> YouTube
             </a>
         </li>
     </ul>
