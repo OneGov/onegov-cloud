@@ -161,7 +161,7 @@
                 </header>
 
 
-                <article class="grid-x grid-padding-x content with-sidebar-links" tal:condition="layout.sidebar_links">
+              <!--?  <article class="grid-x grid-padding-x content with-sidebar-links" tal:condition="layout.sidebar_links">
                   <div class="small-12 medium-3 cell sidebar show-for-medium-up">
                     <div metal:use-macro="layout.macros['sidebar']" />
                   </div>
@@ -175,23 +175,18 @@
                         </div>
                     </div>
                   </div>
-                </article>
+                </article>-->
 
-                <article class="grid-x content without-sidebar-links" tal:condition="not:layout.sidebar_links">
-                  <div class="small-12 cell">
-                    <div class="grid-x grid-padding-x">
-                        <div class="small-12 cell">
+                <article class="grid-x content without-sidebar-links">
                           <section role="main" id="content">
                             <h1 class="main-title">
                                 <div metal:define-slot="pre-title"></div>
                                 <div metal:define-slot="title"></div>
                                 <div metal:define-slot="post-title"></div>
                             </h1>
+                              <p tal:condition="layout.sidebar_links">This page has sidebarlinks. its just a hint four you!</p>
                             <div metal:define-slot="content"></div>
                           </section>
-                        </div>
-                    </div>
-                  </div>
                 </article>
 
                 <div class="grid-container">

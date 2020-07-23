@@ -649,6 +649,7 @@ class PageLayout(AdjacencyListLayout):
 
     @cached_property
     def sidebar_links(self):
+        # Todo: Rename this and remove the sidebars in templates
         return tuple(self.get_sidebar(type='topic'))
 
 
