@@ -42,11 +42,11 @@
     padding: 2px 8px;
 
     &.payment-state-open {
-        border: 1px solid $info-color;
+        border: 1px solid get-color(info);
 
         &::before {
             @include icon('\f059');
-            color: $info-color;
+            color: get-color(info);
             margin-right: .75ex;
         }
     }
