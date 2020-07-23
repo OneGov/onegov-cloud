@@ -122,3 +122,69 @@ def upgrade_homepage_structure_to_include_directories(context):
             </column>
         </row>
     """)
+
+
+@upgrade_task('Add structure for foundation layout')
+def migrate_homepage_structure(context):
+    org = context.session.query(Organisation).first()
+
+    if org is None:
+        return
+
+    if '<services />' not in org.meta['homepage_structure']:
+        return
+
+    org.meta['homepage_structure'] = textwrap.dedent("""\
+            <row>
+            <column span="12">
+                <slider />
+            </column>
+        </row>
+        <row>
+            <column span="12">
+                <row>
+                    <column span="8">                
+                    </column>
+                    <column span="4">
+                        <panel>
+                            <services />
+                        </panel>
+                    </column>
+                </row>
+                <line />
+            </column>
+        </row>
+        <row>
+            <column span="8">        
+                <news />
+            </column>
+            <column span="4">        
+                <panel>
+                   <directories />
+                 </panel>
+            </column>
+        </row>
+        <line />
+        <row>
+            <column span="12">
+                <events />
+            </column>
+        </row>
+        <line />
+        <row>
+            <column span="12">
+                <homepage-tiles />
+            </column>               
+        </row>
+        <line />
+        <row>
+            <column span="12">
+                <directories />
+            </column>
+        </row>
+        <row>
+            <column span="12">
+                <partners />
+            </column>
+        </row>
+    """)
