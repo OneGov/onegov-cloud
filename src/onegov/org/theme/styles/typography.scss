@@ -91,10 +91,21 @@ $header-styles: (
     .h6-size { font-size: $h6-font-size; }
 }
 
+$default-icon-width: 1.5ex;
+$default-icon-margin: .25rem;
+
 .more-link {
     &::before {
         @include icon($more-link-icon);
-        width: 1.5ex;
+        width: $default-icon-width;
+    }
+
+}
+
+.more-link-after {
+    &::after {
+        @include icon($more-link-icon);
+        width: $default-icon-width;
     }
 
 }
