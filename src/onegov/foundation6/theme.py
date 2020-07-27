@@ -240,8 +240,6 @@ class BaseTheme(CoreTheme):
         print("\n".join(
             f"${var}: null;" for var in self._uninitialized_vars), file=theme)
 
-        print("@import 'settings/_settings';", file=theme)
-
         for key, value in _options.items():
             print(f"${key}: {value};", file=theme)
 
