@@ -356,7 +356,7 @@
 <metal:homepage-tiles define-macro="homepage-tiles">
     <div tal:define="show_title show_title|nothing">
         <h3 i18n:translate class="${'' if show_title else 'show-for-sr'}">Selected Topics</h3>
-        <div class="grid-x grid-padding-x homepage-tiles">
+        <div class="grid-x grid-padding-x more-list">
             <div class="cell small-12 medium-6 large-4 homepgage-tile" tal:repeat="item tiles">
                 <metal:homepage-tiles use-macro="layout.macros['homepage-tile-card']" />
             </div>

@@ -305,28 +305,6 @@ footer {
     }
 }
 
-/*
-    page links
-*/
-
-.page-links {
-    li {
-        margin-left: 0;
-        margin-right: 1rem;
-
-        a::after {
-            color: transparentize($primary-color, .8);
-            content: ' | ';
-            display: inline-block;
-            margin-left: 1rem;
-        }
-
-        &:last-child a::after {
-            content: '';
-        }
-    }
-}
-
 
 .breadcrumbs {
     @include hairline;
