@@ -70,6 +70,36 @@ $foundation-palette: (
 );
 
 
+/* they should put the first access to these vars in _global,
+so that we would not have to overwrite it here again */
+@include add-foundation-colors;
+
+$badge-palette: $foundation-palette;
+$button-palette: $foundation-palette;
+$label-palette: $foundation-palette;
+
+// add all vars again which used the colors already
+$anchor-color: $primary-color;
+$accordion-item-color: $primary-color;
+$accordionmenu-arrow-color: $primary-color;
+$badge-background: $primary-color;
+$breadcrumbs-item-color: $primary-color;
+$button-background: $primary-color;
+$button-background-hover: scale-color($button-background, $lightness: -15%);
+$drilldown-arrow-color: $primary-color;
+$label-background: $primary-color;
+$pagination-item-background-current: $primary-color;
+$progress-meter-background: $primary-color;
+$prototype-separator-background: $primary-color;
+$slider-handle-background: $primary-color;
+$switch-background-active: $primary-color;
+$tab-color: $primary-color;
+$tab-active-color: $primary-color;
+$thumbnail-shadow-hover: 0 0 6px 1px rgba($primary-color, 0.5);
+$meter-fill-good: $success-color;
+$meter-fill-medium: $warning-color;
+$meter-fill-bad: $alert-color;
+
 /*
     Anchors
 */
