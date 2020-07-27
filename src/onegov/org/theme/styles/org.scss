@@ -318,10 +318,10 @@ footer {
     li {
         line-height: 1rem;
 
-        // highlight the parent
-        &:nth-last-child(2) {
-            font-weight: bold;
-        }
+        // color last element
+       &:last-child a {
+           color: $black;
+       }
     }
 
 }
