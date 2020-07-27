@@ -66,7 +66,7 @@
     <!--! Adds a 'framed' class to the body if this document is shown inside an iframe -->
     <script>if (window !== window.parent) { document.querySelector('body').className += " framed"; }</script>
 
-    <div class="off-canvas-wrapper">
+
         <div class="off-canvas position-left sidebar" id="offCanvas" data-off-canvas>
             <!-- Close button -->
             <button class="close-button" aria-label="Close menu" type="button" data-close>
@@ -199,7 +199,7 @@
             </main>
             <tal:b tal:content="structure layout.org.meta.analytics_code|nothing" />
         </div>
-    </div>
+
 
 </body>
 
