@@ -111,7 +111,7 @@ class OrgTheme(BaseTheme):
             'forms',
             'panels',
             'sliders',
-            'settings',
+            'org-settings',
             'helpers',
             'footer',
             'chosen',
