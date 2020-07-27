@@ -29,7 +29,7 @@
     <ul class="vertical menu" data-responsive-menu="drilldown medium-accordion" tal:define="links top_navigation|layout.top_navigation">
         <li tal:repeat="(link, children) links">
             <tal:b tal:content="structure link(layout)"/>
-            <ul class="menu vertical" tal:condition="children">
+            <ul class="menu vertical" tal:condition="add_chidlren|False and children">
                 <li tal:repeat="sublink children" tal:content="structure sublink(layout)" />
             </ul>
         </li>
