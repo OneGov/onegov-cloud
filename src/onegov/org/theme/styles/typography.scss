@@ -110,15 +110,6 @@ $default-icon-margin: .25rem;
 
 }
 
-/* Global coloring of links */
-
-html a {
-    color: $primary-color;
-
-    &:hover {
-        color: darken($primary-color, 10%);
-    }
-}
 
 /* Font family settings */
 
