@@ -26,11 +26,11 @@
 </metal:b>
 
 <metal:navigation define-macro="side-navigation">
-    <ul class="vertical menu drilldown" data-drilldown data-back-button="${layout.drilldown_back}" tal:define="links top_navigation|layout.top_navigation">
+    <ul class="vertical menu" data-responsive-menu="drilldown medium-accordion" tal:define="links top_navigation|layout.top_navigation">
         <li tal:repeat="(link, children) links">
             <tal:b tal:content="structure link(layout)"/>
-            <ul class="menu vertical nested" tal:condition="children">
-                <tal:b tal:repeat="sublink children" tal:content="structure sublink(layout)"/>
+            <ul class="menu vertical" tal:condition="children">
+                <li tal:repeat="sublink children" tal:content="structure sublink(layout)" />
             </ul>
         </li>
     </ul>
