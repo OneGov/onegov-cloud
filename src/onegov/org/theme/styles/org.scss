@@ -90,17 +90,8 @@ a[href^="mailto:"] {
     Our footer is kept at the bottom without being "sticky", thanks to this
     approach: https://dev.to/domysee/keeping-the-footer-at-the-bottom-with-css-flexbox-5h5f
 */
-//html,
-//body {
-//    height: 100%;
-//    width: 100%;
-//}
-//
-//footer {
-//    margin-top: .5rem;
-//}
 
-html, body, .off-canvas-wrapper, .off-canvas-content {
+html, body {
     width: 100%;
     height: 100%;
 }
@@ -130,12 +121,6 @@ article,
 footer {
     flex-shrink: 0;
 }
-
-/*
-    Normalized body text
-*/
-
-
 
 /*
     Chrome shows a little up/down arrow on date fields which takes quite
