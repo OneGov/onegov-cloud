@@ -542,7 +542,10 @@ class DefaultLayout(Layout):
     @cached_property
     def top_navigation(self):
         return tuple(
-            Link(r.title, self.request.link(r)) for r in self.root_pages
+            (Link(r.title, self.request.link(r)), tuple(
+                Link(c.title, self.request.link(c))
+                for c in self.request.exclude_invisible(r.children)
+            )) for r in self.root_pages
         )
 
 
