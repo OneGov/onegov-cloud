@@ -27,20 +27,10 @@
 
 <metal:navigation define-macro="side-navigation">
     <ul class="vertical menu drilldown" data-drilldown data-back-button="${layout.drilldown_back}" tal:define="links top_navigation|layout.top_navigation">
-        <li tal:repeat="link links" tal:content="structure link(layout)" />
-        <li>
-            <a href="#">Politik & Verwaltung</a>
-            <ul class="menu vertical nested">
-                <li><a href="#">Behörden & Kommissionen</a>
-                    <ul class="menu vertical nested">
-                        <li><a href="#">Bürgerrechtskommission</a></li>
-                        <li><a href="#">Energie- und Werkkommission</a></li>
-                        <li><a href="#">Finanzausschuss</a></li>
-                        <li><a href="#">Jugendkommission</a></li>
-                    </ul>
-                </li>
-                <li><a href="#">Gemeinderat</a></li>
-                <li><a href="#">Gemeindeversammlung</a></li>
+        <li tal:repeat="(link, children) links">
+            <tal:b tal:content="structure link(layout)"/>
+            <ul class="menu vertical nested" tal:condition="children">
+                <tal:b tal:repeat="sublink children" tal:content="structure sublink(layout)"/>
             </ul>
         </li>
     </ul>
@@ -486,7 +476,7 @@
 </metal:empty_lead_hint>
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.org">
-    <div class="grid-x" tal:define="show_side_panel show_side_panel|False; location location|False">
+    <div class="grid-x grid-padding-x" tal:define="show_side_panel show_side_panel|False; location location|False">
         <tal:b condition="not: people or contact or coordinates or location or show_side_panel">
             <div class="small-12 cell page-content-main">
                 <div metal:define-slot="before-lead"></div>
