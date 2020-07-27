@@ -65,10 +65,10 @@ ul.panel-links {
         overflow: hidden;
         text-overflow: ellipsis;
 
-        &.more-link {
-            font-size: .875rem;
-            font-weight: 500;
-        }
+        //&.more-link {
+        //    font-size: .875rem;
+        //    font-weight: 500;
+        //}
     }
 
     small {
@@ -132,6 +132,8 @@ $train-icon: "\f238";
 
 .side-panel {
 
+    @include clean-ul;
+    margin-bottom: 1rem;
 
     .services-panel {
         a.online-counter::before { @include icon($tasks-icon); }
@@ -279,42 +281,26 @@ $checklist-icon: "\f0ae";
 
 .homepage .side-panel:first-child,
 .side-panel.highlighted {
-    .panel-links {
-        border: 0;
+
+    &.without-title {
+        > ul {
+
+            li:first-child {
+                margin-bottom: .5rem;
+                font-size: $h3-font-size;
+                font-family: $header-font-family;
+            }
+
+
+
+            li {
+                a { font-family: $body-font-family; }
+                min-height: .5rem;
+
+                + li {
+                    margin-top: .25rem;
+                }
+            }
+        }
     }
-
-
-//
-//    .marker-map {
-//        border-bottom: 1rem solid $topbar-bg-color;
-//    }
-//
-//    h2 {
-//        @include primary-color-background;
-//        border-bottom: 0;
-//        padding: .75rem 1rem;
-//        text-transform: uppercase;
-//    }
-//
-//    &.without-title {
-//        > ul {
-//            padding: 0 0 1rem;
-//
-//            li:first-child {
-//                @include primary-color-background;
-//                margin-bottom: 1rem;
-//                padding: .75rem 1rem;
-//                text-transform: uppercase;
-//            }
-//
-//            li {
-//                min-height: .5rem;
-//                padding: 0 1rem;
-//
-//                + li {
-//                    margin-top: .25rem;
-//                }
-//            }
-//        }
-//    }
 }
