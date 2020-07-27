@@ -78,11 +78,13 @@
 </metal:panel-links>
 
 <metal:footer define-macro="footer">
-    <footer>
-        <div class="grid-x grid-padding-x footer-content">
-            <div class="small-12 cell">
-                <metal:b use-macro="layout.macros['footer_columns']" />
-                <metal:b use-macro="layout.macros['footer_links']" />
+    <footer class="footer-container">
+        <div class="grid-container">
+            <div class="grid-x grid-padding-x footer-content">
+                <div class="small-12 cell">
+                    <metal:b use-macro="layout.macros['footer_columns']" />
+                    <metal:b use-macro="layout.macros['footer_links']" />
+                </div>
             </div>
         </div>
     </footer>
