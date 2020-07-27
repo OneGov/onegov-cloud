@@ -359,3 +359,9 @@ footer {
 .card-section {
     @include clean-ul();
 }
+
+/*
+Tables
+*/
+// Todo: not used anymore in foundation6
+$table-border-color: smart-scale($table-background, $table-color-scale);
