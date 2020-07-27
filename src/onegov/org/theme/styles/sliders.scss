@@ -8,7 +8,6 @@
         max-height: $full-width-banner-height;
         img {
             object-fit: cover;
-            @include smooth-edges;
         }
     }
 
