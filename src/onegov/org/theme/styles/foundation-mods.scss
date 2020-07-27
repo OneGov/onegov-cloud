@@ -1,3 +1,5 @@
+@import 'util/util';
+
 /*
     Base colors
 */
@@ -68,31 +70,76 @@ $foundation-palette: (
 so that we would not have to overwrite it here again */
 @include add-foundation-colors;
 
-$badge-palette: $foundation-palette;
-$button-palette: $foundation-palette;
-$label-palette: $foundation-palette;
+/*
+Body Font Family
+*/
 
-// add all vars again which used the colors already
-$anchor-color: $primary-color;
-$accordion-item-color: $primary-color;
-$accordionmenu-arrow-color: $primary-color;
-$badge-background: $primary-color;
-$breadcrumbs-item-color: $primary-color;
-$button-background: $primary-color;
-$button-background-hover: scale-color($button-background, $lightness: -15%);
-$drilldown-arrow-color: $primary-color;
-$label-background: $primary-color;
-$pagination-item-background-current: $primary-color;
-$progress-meter-background: $primary-color;
-$prototype-separator-background: $primary-color;
-$slider-handle-background: $primary-color;
-$switch-background-active: $primary-color;
-$tab-color: $primary-color;
-$tab-active-color: $primary-color;
-$thumbnail-shadow-hover: 0 0 6px 1px rgba($primary-color, 0.5);
-$meter-fill-good: $success-color;
-$meter-fill-medium: $warning-color;
-$meter-fill-bad: $alert-color;
+$body-font-family: $body-font-family-ui;
+$header-font-family: $header-font-family-ui;
+$header-lineheight: 1.4;
+
+$h1-font-size: rem-calc(44);
+$h2-font-size: rem-calc(37);
+$h3-font-size: rem-calc(27);
+$h4-font-size: rem-calc(23);
+$h5-font-size: rem-calc(18);
+$h6-font-size: 1rem !default;
+
+$h1-font-reduction: 24;
+$h2-font-reduction: 20;
+$h3-font-reduction: 12;
+$h4-font-reduction: 7;
+$h5-font-reduction: 3;
+$h6-font-reduction: 0;
+
+$header-styles: (
+  small: (
+    'h1': ('font-size': $h1-font-size - $h1-font-reduction),
+    'h2': ('font-size': $h2-font-size - $h2-font-reduction),
+    'h3': ('font-size': $h3-font-size - $h3-font-reduction),
+    'h4': ('font-size': $h4-font-size - $h4-font-reduction),
+    'h5': ('font-size': $h5-font-size - $h5-font-reduction),
+    'h6': ('font-size': $h6-font-size - $h6-font-reduction),
+  ),
+  medium: (
+    'h1': ('font-size': $h1-font-size),
+    'h2': ('font-size': $h2-font-size),
+    'h3': ('font-size': $h3-font-size),
+    'h4': ('font-size': $h4-font-size),
+    'h5': ('font-size': $h5-font-size),
+    'h6': ('font-size': $h6-font-size),
+  ),
+);
+
+.h1-size { font-size: $h1-font-size - $h1-font-reduction; }
+.h2-size { font-size: $h2-font-size - $h2-font-reduction; }
+.h3-size { font-size: $h3-font-size - $h3-font-reduction; }
+.h4-size { font-size: $h4-font-size - $h4-font-reduction; }
+.h5-size { font-size: $h5-font-size - $h5-font-reduction; }
+.h6-size { font-size: $h6-font-size - $h6-font-reduction; }
+
+@include breakpoint(medium up) {
+    .h1-size,
+    .h2-size,
+    .h3-size,
+    .h4-size,
+    .h5-size,
+    .h6-size {
+        line-height: $header-lineheight;
+    }
+
+    .h1-size { font-size: $h1-font-size; }
+
+    .h2-size { font-size: $h2-font-size; }
+
+    .h3-size { font-size: $h3-font-size; }
+
+    .h4-size { font-size: $h4-font-size; }
+
+    .h5-size { font-size: $h5-font-size; }
+
+    .h6-size { font-size: $h6-font-size; }
+}
 
 /*
     Anchors
@@ -189,7 +236,7 @@ Accordion
 $accordionmenu-arrow-color: $primary-fg-color;
 
 /* Drilldown */
-$drilldown-arrow-color: get-color(primary);
+$drilldown-arrow-color: $primary-color;
 
 /*
 Off Canvas / SideBar
@@ -205,4 +252,4 @@ $offcanvas-sizes: (
 $icon-margin-right: .25rem;
 
 /* possible bug in the breadcrumbs component which is set to default $primary-color blue */
-$breadcrumbs-item-color: get-color(primary);
+$breadcrumbs-item-color: $primary-color;
