@@ -2,12 +2,13 @@
     sidebar navigation left
 */
 
+.sidebar {
+
+}
+
 .searchbox {
     margin-top: 2rem;
     padding: 1rem;
-    input[type=submit] {
-        background-color: $primary-color;
-    }
 }
 
 .typeahead {
