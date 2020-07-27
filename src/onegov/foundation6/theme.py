@@ -259,9 +259,6 @@ class BaseTheme(CoreTheme):
         paths = self.extra_search_paths
         paths.append(self.foundation_path)
 
-        with open('/home/lukas/Repos/onegov-cloud/tests/org.scss', 'w') as f:
-            print(theme.getvalue(), file=f)
-
         return sass.compile(
             string=theme.getvalue(),
             include_paths=paths,
