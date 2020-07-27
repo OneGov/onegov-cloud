@@ -496,11 +496,6 @@ def get_common_asset():
     # yield 'common.js'
 
 
-@OrgApp.webasset('accordion')
-def get_accordion_asset():
-    yield 'foundation.accordion.js'
-
-
 @OrgApp.webasset('fontpreview')
 def get_fontpreview_asset():
     yield 'fontpreview.js'
