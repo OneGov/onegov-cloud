@@ -303,11 +303,10 @@ footer {
 }
 
 .breadcrumbs {
-    @include hairline;
     font-style: italic;
     margin-bottom: 1rem;
     overflow: hidden;
-    padding: 1rem 0 .7rem 1rem;
+    padding: 1rem 0 .7rem 0;
     text-overflow: ellipsis;
     white-space: nowrap;
 
