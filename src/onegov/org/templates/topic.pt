@@ -14,7 +14,7 @@
                 <tal:b metal:fill-slot="after-text">
                      <div class="grid-x" tal:condition="children">
                         <div class="small-12 cell">
-                            <ul class="more-list">
+                            <ul class="more-list page-links">
                                 <li tal:repeat="link children">
                                     <tal:b replace="structure link(layout)" />
                                 </li>

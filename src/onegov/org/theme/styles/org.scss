@@ -305,6 +305,11 @@ footer {
     }
 }
 
+/* Page Links */
+
+.page-links {
+    max-width: $max-line-width;
+}
 
 .breadcrumbs {
     @include hairline;
