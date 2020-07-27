@@ -139,6 +139,7 @@ $navbar-shadow: 0px 15px 10px -15px rgba(10, 10, 10, 0.25);
 
         @include breakpoint(medium up) {
             font-size: 1.25rem;
+            padding-top: 2px;
         }
     }
 }
