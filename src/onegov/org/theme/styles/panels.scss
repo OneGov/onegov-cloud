@@ -128,6 +128,7 @@ $tasks-icon: "\f0ae";
 $calendar-icon: "\f133";
 $emove-icon: "\f472";
 $train-icon: "\f238";
+$publications-icon: '\f1ea';
 
 
 .side-panel {
@@ -136,11 +137,11 @@ $train-icon: "\f238";
     margin-bottom: 1rem;
 
     .services-panel {
-        a.online-counter::before { @include icon($tasks-icon); }
-        a.publications::before { @include icon($tasks-icon); }
-        a.reservations::before { @include icon($calendar-icon); }
-        a.e-move::before { @include icon($emove-icon); }
-        a.sbb-daypass::before { @include icon($train-icon); }
+        a.online-counter::before { @include icon-bold($tasks-icon); }
+        a.publications::before { @include icon-bold($publications-icon); }
+        a.reservations::before { @include icon-bold($calendar-icon); }
+        a.e-move::before { @include icon-bold($emove-icon); }
+        a.sbb-daypass::before { @include icon-bold($train-icon); }
 
         a::before {
             margin-right: $panel-icon-margin-right;
