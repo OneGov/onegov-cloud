@@ -1348,7 +1348,7 @@
     <ul class="tags">
         <li tal:repeat="link tags" class="click-through">
             <span tal:content="structure link(layout)"
-                class="${link.active and 'active'} blank-label ${getattr(link, 'rounded', None) and 'rounded'}"
+                class="${link.active and 'active' or ''} blank-label ${getattr(link, 'rounded', None) and 'rounded'}"
             />
         </li>
     </ul>
