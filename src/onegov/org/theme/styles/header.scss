@@ -56,17 +56,17 @@ $globals-height: 2.5rem;
     }
 
     .login::before { @include icon("\f2f6"); }
-    .logout::before { @include icon("\f2f5"); }
+    .logout::before { @include icon-bold("\f2f5"); }
     .register::before { @include icon("\f234"); }
     .user::before { @include icon("\f007"); }
-    .users::before { @include icon("\f0c0"); }
+    .users::before { @include icon-bold("\f0c0"); }
     .payment::before { @include icon('\f09d'); }
     .payment-provider::before { @include icon('\f283'); }
     .profile::before { @include icon("\f2bd"); }
-    .management::before { @include icon('\f013'); }
+    .management::before { @include icon-bold('\f013'); }
     .images::before { @include icon('\f03e'); }
     .files::before { @include icon("\f15c"); }
-    .settings::before { @include icon('\f1de'); }
+    .settings::before { @include icon-bold('\f1de'); }
     .timeline::before { @include icon('\f017'); }
     .no-tickets::before { @include icon('\f145'); }
 

@@ -68,7 +68,6 @@ $ticket-number-bg: $yellow-light;
 /*
     Tickets list
 */
-$accept-ticket-icon: '\f1db';
 $accept-ticket-icon-hover: '\f192';
 $close-ticket-icon: '\f1db';
 $close-ticket-icon-hover: '\f05d';
@@ -79,33 +78,30 @@ $frm-handler-icon: '\f044';
 $rsv-handler-icon: '\f073';
 $evn-handler-icon: '\f133';
 $dir-handler-icon: '\f114';
-$open-ticket-icon: '\f10c';
+$open-ticket-icon: '\f111';
 $pending-ticket-icon: '\f192';
-$closed-ticket-icon: '\f05d';
+$accept-ticket-icon: $open-ticket-icon;
+$closed-ticket-icon: '\f058';
 $all-ticket-icon: '\f055';
 
 .ticket-filter-open::before {
     @include icon($open-ticket-icon);
-    margin-right: 1ex;
-    padding-right: .8ex;
+    width: 2 * $default-icon-width;
 }
 
 .ticket-filter-pending::before {
     @include icon($pending-ticket-icon);
-    margin-right: 1ex;
-    padding-right: .8ex;
+    width: 2 * $default-icon-width;
 }
 
 .ticket-filter-closed::before {
     @include icon($closed-ticket-icon);
-    margin-right: 1ex;
-    padding-right: .8ex;
+    width: 2 * $default-icon-width;
 }
 
 .ticket-filter-all::before {
-    @include icon($all-ticket-icon);
-    margin-right: 1ex;
-    padding-right: .8ex;
+    @include icon-bold($all-ticket-icon);
+    width: 2 * $default-icon-width;
 }
 
 .no-tickets {
@@ -115,11 +111,15 @@ $all-ticket-icon: '\f055';
     text-align: center;
 }
 
+
 .tickets-table {
     width: 100%;
 
     td {
         vertical-align: top;
+        font-size: .875rem;
+
+        .button { margin-bottom: 0; }
 
         &.ticket-date,
         &.ticket-state,
@@ -144,36 +144,13 @@ $all-ticket-icon: '\f055';
         }
     }
 
-    th {
-        button,
-        dl {
-            margin: 0;
-        }
-
-        dl dd {
-            margin-left: 0;
-        }
-
-        dd + dd {
-            margin-left: .75em;
-        }
-
-        button {
-            float: right;
-        }
-
-        ul li {
-            font-size: .8rem;
-            font-weight: normal;
-        }
-    }
 }
 
-.ALL-link::before { @include icon($all-handler-icon); }
-.FRM-link::before { @include icon($frm-handler-icon); }
-.RSV-link::before { @include icon($rsv-handler-icon); }
-.EVN-link::before { @include icon($evn-handler-icon); }
-.DIR-link::before { @include icon($dir-handler-icon); }
+.ALL-link::before { @include icon-bold($all-handler-icon); }
+.FRM-link::before { @include icon-bold($frm-handler-icon); }
+.RSV-link::before { @include icon-bold($rsv-handler-icon); }
+.EVN-link::before { @include icon-bold($evn-handler-icon); }
+.DIR-link::before { @include icon-bold($dir-handler-icon); }
 
 .ALL-link::before,
 .FRM-link::before,
@@ -206,10 +183,6 @@ tr.ticket:hover {
 }
 
 .ticket-button {
-    //@include button(
-    //    $padding: $button-tny,
-    //    $bg: $success-color
-    //);
     font-size: 1em;
     margin: 0;
 }
@@ -257,64 +230,101 @@ tr.ticket:hover {
     }
 }
 
+
 /*
     Tickets filter dropdown
 */
 
-.ticket-filters button.dropdown.tiny {
-    font-size: .8rem;
-    overflow: hidden;
-    padding: .5rem 2.25rem .5rem 1rem;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 
-    &::after {
-        right: .9rem;
-    }
-}
+/* ticket filter fake table header */
+.ticket-filters {
 
-.f-dropdown {
-    max-height: 400px;
-    max-width: 275px;
-    overflow-x: hidden;
-    overflow-y: auto;
+    display: flex;
+    justify-content: space-between;
+    padding: .5rem;
 
-    li:hover {
-        @include primary-color-background;
+    .dropdown-pane {
+        max-width: 275px;
+        padding: 0;
     }
 
-    a {
-        font-size: .875rem;
+    .f-dropdown {
+        overflow-x: hidden;
+        overflow-y: auto;
+        max-height: 400px;
+        padding: 0;
+        margin: 0;
+
+        li:hover {
+            @include primary-color-background;
+            a { color: $white; }
+        }
+
+        li:first-of-type {
+            padding-bottom: .25rem;
+        }
+
+        a {
+            font-size: .875rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding: .5rem;
+
+            ::before {
+                font-weight: normal;
+            }
+
+            &.is-parent {
+                margin-bottom: -.2rem;
+            }
+
+            .user-initials-small {
+                margin-right: .5rem;
+            }
+
+            &.ticket-group-filter {
+                font-weight: normal;
+                margin-left: 1.4rem;
+            }
+        }
+    }
+
+    button.small {
+        font-size: .9rem;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        margin-bottom: 0;
+        margin-left: 1rem;
 
-        &:hover {
-            color: $white;
+        @include breakpoint(small only) {
+            max-width: 160px;
+            overflow-x: hidden;
+
+            margin-right: 0;
+            margin-bottom: 1rem;
+
+            &:first-of-type {
+                margin-bottom: .5rem;
+            }
+
         }
 
-        ::before {
-            font-weight: normal;
-        }
-
-        &.is-parent {
-            margin-bottom: -.2rem;
-        }
-
-        &.ticket-group-filter {
-            font-weight: normal;
-            margin-left: 1.4rem;
-            padding-bottom: .3rem;
-            padding-top: .3rem;
+        &::after {
+            right: .9rem;
         }
     }
+
+    background-color: $table-striped-background;
 }
 
+
 button {
-    .ALL-sub-link::before { @include icon($all-handler-icon); }
-    .FRM-sub-link::before { @include icon($frm-handler-icon); }
-    .RSV-sub-link::before { @include icon($rsv-handler-icon); }
-    .EVN-sub-link::before { @include icon($evn-handler-icon); }
+    .ALL-sub-link::before { @include icon-bold($all-handler-icon); }
+    .FRM-sub-link::before { @include icon-bold($frm-handler-icon); }
+    .RSV-sub-link::before { @include icon-bold($rsv-handler-icon); }
+    .EVN-sub-link::before { @include icon-bold($evn-handler-icon); }
 
     .ALL-sub-link::before,
     .FRM-sub-link::before,
@@ -326,11 +336,11 @@ button {
 }
 
 .selected-owner {
-    margin-left: 1rem !important;
+    //margin-left: 1rem !important;
 
     &.secondary {
         ::before {
-            @include icon($all-handler-icon);
+            @include icon-bold($all-handler-icon);
             display: inline-block;
             margin-right: 1ex;
         }

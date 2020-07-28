@@ -49,6 +49,13 @@
 
 @mixin icon($icon) {
     content: $icon;
+    font-weight: 400;
+    @include icon-base;
+    line-height: inherit;
+}
+
+@mixin icon-bold($icon) {
+    content: $icon;
     font-weight: 900;
     @include icon-base;
     line-height: inherit;
