@@ -1,8 +1,42 @@
 # Changes
 
+## Release `2020.65`
+
+> commits: **17 / [3d8af21ce6...7e08a8d0a8](https://github.com/OneGov/onegov-cloud/compare/3d8af21ce6^...7e08a8d0a8)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.65)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🐞 **Fixes name validation in attendee form**
+
+Fixes situation where an admin edits somebody elses attendee using duplicate names.
+
+**`Bugfix`** | **[3fd6622ae9](https://github.com/onegov/onegov-cloud/commit/3fd6622ae9c0b41012152b146b20317413c7d541)**
+
+### Fsi
+
+🐞 **Change refresh interval to years**
+
+Use an int as year as course refresh_interval instead of vaguely defined intervals consisting of days and then translated to months/years.
+
+**`Bugfix`** | **[FSI-36](https://kanton-zug.atlassian.net/browse/FSI-36)** | **[afdf5cbff3](https://github.com/onegov/onegov-cloud/commit/afdf5cbff37837aa2ef11decc817dd0f5aebdde7)**
+
+🐞 **Fix empty confirmation email**
+
+Fixes refactoring bug.
+
+**`Bugfix`** | **[FSI-37](https://kanton-zug.atlassian.net/browse/FSI-37)** | **[534f8b1f82](https://github.com/onegov/onegov-cloud/commit/534f8b1f82b1bc5aaa688f2ef6221ce214024c06)**
+
+### Org
+
+🐞 **Fixes error adding resources with duplicate name**
+
+**`Bugfix`** | **[3d8af21ce6](https://github.com/onegov/onegov-cloud/commit/3d8af21ce69d2677742b435b509624f45d3788bc)**
+
 ## Release `2020.64`
 
-> commits: **5 / [8eedf97eda...4138cbdecb](https://github.com/OneGov/onegov-cloud/compare/8eedf97eda^...4138cbdecb)**  
+> released: **2020-07-09 07:44**<br>
+> commits: **6 / [8eedf97eda...c73534ab01](https://github.com/OneGov/onegov-cloud/compare/8eedf97eda^...c73534ab01)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.64)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Wtfs
