@@ -140,6 +140,8 @@ function release() {
     rm src/onegov/core/__init__.py.bak
 
     pushd "$REPO" > /dev/null
+    git add CHANGES.md
+    git add src/onegov/core/__init__.py
     git commit -m "Release $(new-version)"
     git tag "$(new-version)"
     git push
