@@ -32,7 +32,7 @@ def test_audit_for_course(client, scenario):
 
     # Adds data
     scenario.add_course(
-        refresh_interval=timedelta(days=2*365), mandatory_refresh=True)
+        refresh_interval=2, mandatory_refresh=True)
     scenario.commit()
     scenario.refresh()
     course = scenario.latest_course

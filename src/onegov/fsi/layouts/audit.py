@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from cached_property import cached_property
 
 from onegov.core.elements import Link
@@ -39,17 +41,27 @@ class AuditLayout(DefaultLayout):
         end = self.format_date(end, 'time')
         return f'{date_} {start} - {end}'
 
+    def format_refresh_interval(self, num_years):
+        assert isinstance(num_years, int)
+        return self.format_timedelta(
+            timedelta(days=num_years * 365)
+        )
+
     @staticmethod
     def next_event_date(start, refresh_interval):
         if not start:
             return
-        return start + refresh_interval
+        if refresh_interval is None:
+            return
+        assert isinstance(refresh_interval, int)
+        return start.replace(year=start.year + refresh_interval)
 
     @cached_property
     def audit_table_headers(self):
         if not self.model.course:
             return ""
-        due_in = self.format_timedelta(self.model.course.refresh_interval)
+        due_in = self.format_refresh_interval(
+            self.model.course.refresh_interval)
         titles = (
             _("Name"),
             _("Shortcode"),

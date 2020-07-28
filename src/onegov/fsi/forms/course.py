@@ -116,10 +116,10 @@ class CourseForm(Form):
     )
 
     refresh_interval = IntegerField(
-        label=_('Refresh Interval (months)'),
-        description=_('Number of months'),
+        label=_('Refresh Interval (years)'),
+        description=_('Number of years'),
         depends_on=('mandatory_refresh', 'y'),
-        default=12,
+        default=6,
     )
 
     hidden_from_public = BooleanField(
@@ -133,18 +133,13 @@ class CourseForm(Form):
             result['description'] = linkify(
                 self.description.data, escape=False)
 
-        if self.refresh_interval.data:
-            result['refresh_interval'] = months_to_timedelta(
-                self.refresh_interval.data)
-
         return result
 
     def apply_model(self, model):
         self.name.data = model.name
         self.description.data = model.description
         self.mandatory_refresh.data = model.mandatory_refresh
-        self.refresh_interval.data = months_from_timedelta(
-            model.refresh_interval)
+        self.refresh_interval.data = model.refresh_interval
         self.hidden_from_public.data = model.hidden_from_public
 
     def update_model(self, model):
@@ -155,8 +150,7 @@ class CourseForm(Form):
         if not model.mandatory_refresh:
             model.refresh_interval = None
         else:
-            model.refresh_interval = months_to_timedelta(
-                self.refresh_interval.data)
+            model.refresh_interval = self.refresh_interval.data
 
 
 class InviteCourseForm(Form):
