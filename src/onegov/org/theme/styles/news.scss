@@ -54,19 +54,19 @@
 //    }
 //}
 //
-//.news-years {
-//    list-style: none;
-//    margin-left: 0;
-//    padding: 0;
-//
-//    li {
-//        display: inline;
-//
-//        + li::before {
-//            content: '/';
-//        }
-//    }
-//}
+.news-years {
+    list-style: none;
+    margin-left: 0;
+    padding: 0;
+
+    li {
+        display: inline;
+
+        + li::before {
+            content: '/';
+        }
+    }
+}
 //
 //.all-news {
 //    font-size: .875rem;
