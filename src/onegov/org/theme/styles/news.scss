@@ -19,7 +19,7 @@
 .news-list-item {
   // Select the title which is the first child
   div.card-section > *:first-child {
-    font-size: $h5-font-size;
+    font-size: $h4-font-size;
     font-weight: bold;
   }
 }
