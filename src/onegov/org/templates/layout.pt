@@ -102,7 +102,7 @@
                                   <li tal:repeat="tool global_tools">
                                     <tal:b condition="tool.links|nothing" define="dropdown_id 'global-dropdown-{}'.format(repeat.tool.number)">
                                       <a href="#" data-dropdown="${dropdown_id}" class="dropdown ${' '.join(tool.classes or '')}" tal:attributes="data-count tool.attributes['data-count']|nothing">${tool.title}</a>
-                                      <ul id="${dropdown_id}" data-dropdown-content class="vertical menu f-dropdown">
+                                      <ul id="${dropdown_id}" data-dropdown-content class="vertical menu">
                                           <li tal:repeat="link tool.links">
                                               <tal:b replace="structure link(layout)" />
                                           </li>
