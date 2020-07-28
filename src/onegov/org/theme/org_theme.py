@@ -117,7 +117,9 @@ class OrgTheme(BaseTheme):
             'chosen',
             'news',
             'events',
-            'homepage-tiles'
+            'homepage-tiles',
+            'tickets',
+            'user',
         ]
 
     @property
