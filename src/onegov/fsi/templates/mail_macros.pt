@@ -15,7 +15,7 @@
         <tal:b tal:case="'info'">
             <p i18n:translate="">Please take notice about the information below.</p>
         </tal:b>
-        <tal:b tal:case="'subscription'">
+        <tal:b tal:case="'reservation'">
             <p i18n:translate="">You have successfully subscribed to the following course event:</p>
             <h3>${layout.model.course_event.name}</h3>
             <metal:b use-macro="layout.default_macros['course_event_details']" tal:define="model layout.model.course_event; for_email True"/>
