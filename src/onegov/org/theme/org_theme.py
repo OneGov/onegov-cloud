@@ -120,6 +120,7 @@ class OrgTheme(BaseTheme):
             'homepage-tiles',
             'tickets',
             'user',
+            'timeline'
         ]
 
     @property
