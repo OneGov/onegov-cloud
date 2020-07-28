@@ -2,6 +2,8 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+import textwrap
+
 from sqlalchemy import Column, ARRAY, Text, Boolean
 
 from onegov.core.orm.types import UTCDateTime
@@ -119,3 +121,12 @@ def add_source_id_to_attendee(context):
         FROM users t1
         WHERE  t2.user_id = t1.id
     """)
+
+
+@upgrade_task('Change refresh_interval to integer representing years')
+def change_refresh_interval(context):
+    if context.has_column('fsi_courses', 'refresh_interval'):
+        context.session.execute(textwrap.dedent("""\
+        ALTER TABLE fsi_courses ALTER COLUMN refresh_interval
+        TYPE INT USING extract(days FROM refresh_interval) / 30 / 12::int
+        """))

@@ -198,7 +198,7 @@ def test_ranked_subscription_query(scenario):
     scenario.add_attendee(role='member')
     scenario.add_course(
         mandatory_refresh=True,
-        refresh_interval=timedelta(days=30)
+        refresh_interval=1
     )
     scenario.add_course_event(
         scenario.latest_course, start=utcnow() - timedelta(days=700))
@@ -231,7 +231,7 @@ def test_audit_collection(scenario):
 
     scenario.add_course(
         mandatory_refresh=True,
-        refresh_interval=timedelta(days=30)
+        refresh_interval=1
     )
     for i in range(6):
         scenario.add_course_event(scenario.latest_course)

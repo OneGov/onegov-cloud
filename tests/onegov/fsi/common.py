@@ -144,7 +144,7 @@ def course_factory(session, **kwargs):
         name='Course',
         description='Description',
         mandatory_refresh=True,
-        refresh_interval=timedelta(days=365)
+        refresh_interval=1
     )
     data.update(**kwargs)
     course = session.query(Course).filter_by(**data).first()

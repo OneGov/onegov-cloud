@@ -3,7 +3,7 @@ from onegov.core.html import html_to_text
 from onegov.core.orm import Base
 from onegov.core.orm.types import UUID
 from onegov.search import ORMSearchable
-from sqlalchemy import Column, Text, Boolean, Interval
+from sqlalchemy import Column, Text, Boolean, Integer
 from sqlalchemy.ext.hybrid import hybrid_property
 from uuid import uuid4
 
@@ -23,8 +23,8 @@ class Course(Base, ORMSearchable):
 
     description = Column(Text, nullable=False)
 
-    # given in months
-    refresh_interval = Column(Interval)
+    # saved as integer (years), accessed as years
+    refresh_interval = Column(Integer)
 
     # If the course has to be refreshed after some interval
     mandatory_refresh = Column(Boolean, nullable=False, default=False)
