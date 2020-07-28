@@ -245,7 +245,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .new-reservation::before { @include icon($new-reservation-icon); }
     .new-room::before { @include icon($new-room-icon); }
     .new-stripe-connect::before { @include icon($new-stripe-connect-icon); }
-    .new-user::before { @include icon($new-user-icon); }
+    .new-user::before { @include icon-bold($new-user-icon); }
     .occupancy-link::before { @include icon($occupancy-link-icon); }
     .paste-link::before { @include icon($paste-link-icon); }
     .payment-provider::before { @include icon($payment-provider-icon); }
