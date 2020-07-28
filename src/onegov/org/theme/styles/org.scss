@@ -368,3 +368,7 @@ $table-border-color: smart-scale($table-background, $table-color-scale);
 table {
     font-family: $header-font-family;
 }
+
+table tr th, table tr td {
+    font-size: .875rem;
+}
