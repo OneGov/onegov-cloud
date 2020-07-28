@@ -22,7 +22,7 @@ $default-icon-margin: .25rem;
 
 .more-link {
     &::before {
-        @include icon($more-link-icon);
+        @include icon-bold($more-link-icon);
         width: $default-icon-width;
     }
 
@@ -30,7 +30,7 @@ $default-icon-margin: .25rem;
 
 .more-link-after {
     &::after {
-        @include icon($more-link-icon);
+        @include icon-bold($more-link-icon);
         width: $default-icon-width;
     }
 

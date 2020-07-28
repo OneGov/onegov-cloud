@@ -78,7 +78,7 @@ $more-link-icon: "\f054";
 
 @mixin more-link-after {
   a::after {
-    @include icon($more-link-icon);
+    @include icon-bold($more-link-icon);
     float: right;
   }
 }
