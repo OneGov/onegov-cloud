@@ -32,11 +32,15 @@ $globals-height: 2.5rem;
                 height: $globals-height;
                 line-height: $globals-height;
                 padding: 0 1rem;
+                &::after {
+                    border-color: $white transparent transparent !important;
+                }
             }
         }
     }
 
-    .f-dropdown {
+    .is-dropdown-submenu, .is-accordion-submenu {
+
         a {
             color: $body-font-color;
 
@@ -46,6 +50,7 @@ $globals-height: 2.5rem;
 
             @include breakpoint(small only) {
                 color: $primary-fg-color;
+                margin-left: .5rem;
             }
         }
     }
