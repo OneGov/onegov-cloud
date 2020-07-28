@@ -17,16 +17,19 @@
         white-space: nowrap;
     }
 
-    .subheader td {
-        border-color: $oil;
-
-        &:first-child {
-            font-weight: bold;
+    thead {
+        background-color: $white;
+        &:not(:first-of-type) td {
+            padding-top: 1.5rem;
         }
     }
 
-    tbody + tbody tr:first-child td {
-        padding-top: 1.5rem;
+    thead tr td:not(:first-of-type) {
+        font-weight: normal;
+    }
+
+    thead td {
+        border-color: $oil;
     }
 }
 
