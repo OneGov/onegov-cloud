@@ -155,6 +155,9 @@ def test_register_for_course_event_member(client_with_db):
     message = client.app.smtp.outbox[0]
     assert message['To'] == 'member@example.org'
     assert message['Subject'] == '=?utf-8?q?Anmeldungsbest=C3=A4tigung?='
+    text = message.get_payload(0).get_payload(0).get_payload(decode=True)
+    text = text.decode('utf-8')
+    assert 'Sie haben sich erfolgreich für folgenden Kurs angemeldet' in text
 
     # Test cancellation emails upon unsubscribing
     client.login_admin()
