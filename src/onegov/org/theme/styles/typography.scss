@@ -46,3 +46,7 @@ a, button, button *, span, span *, thead {
 p, p > * {
     font-family: $body-font-family;
 }
+
+.page-text ul li a {
+    font-family: $body-font-family !important;
+}
