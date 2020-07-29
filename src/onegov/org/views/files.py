@@ -88,7 +88,6 @@ class Img(object):
 @OrgApp.html(model=GeneralFileCollection, template='files.pt',
              permission=Private)
 def view_get_file_collection(self, request):
-    request.include('common')
     request.include('upload')
     request.include('prompt')
 
