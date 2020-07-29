@@ -501,7 +501,7 @@ class DefaultLayout(Layout):
         self.request.include('chosen')
 
         # always include the map components
-        # self.request.include(self.org.geo_provider)
+        self.request.include(self.org.geo_provider)
 
         if self.request.is_manager:
             self.request.include('sortable')
