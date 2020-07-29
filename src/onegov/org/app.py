@@ -470,7 +470,6 @@ def get_common_asset():
     yield 'jquery.datetimepicker.css'
     yield 'locale.js'
     yield 'modernizr.js'
-    yield 'jquery.js'
     yield 'intercooler.js'
     yield 'underscore.js'
     yield 'react.js'
