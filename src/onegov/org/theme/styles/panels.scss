@@ -299,7 +299,6 @@ $checklist-icon: "\f0ae";
 
 
             li {
-                a { font-family: $body-font-family; }
                 min-height: .5rem;
 
                 + li {
@@ -308,4 +307,10 @@ $checklist-icon: "\f0ae";
             }
         }
     }
+}
+
+.side-panel.highlighted {
+    background-color: $light-gray;
+    padding: 1rem;
+    font-family: $header-font-family;
 }
