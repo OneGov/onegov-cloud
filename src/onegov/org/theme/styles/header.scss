@@ -200,7 +200,10 @@ $occupancy-link-icon: '\f022';
 $upload-icon: '\f0ee';
 $view-link: '\f06e';
 
-$editbar-bg-color: $topbar-link-bg-hover;
+$editbar-bg-color: $black;
+$editbar-bg-color-active: lighten($black, 15%);
+$editbar-fg-color: $white;
+$editbar-fg-color-active: $white;
 
 .edit-bar {
 
@@ -208,13 +211,34 @@ $editbar-bg-color: $topbar-link-bg-hover;
     margin-bottom: 2px;
     margin-top: -2px;
 
+    li a:before {
+        margin-right: 2 * $default-icon-margin;
+    }
+
+
+    > li > a {
+        color: $editbar-fg-color;
+        &::after {
+            border-color: $editbar-fg-color transparent transparent !important;
+        }
+    }
+
+    // Top-level item active state
+    > li.is-active > a {
+      background: $editbar-bg-color-active !important;
+      color: $editbar-fg-color-active !important;
+    }
+
+    .submenu > li a {
+        color: $editbar-bg-color;
+        &:hover {
+            color: $editbar-bg-color-active;
+        }
+    }
+
     .border {
         border-bottom: 1px dashed $iron;
     }
-
-    //a.right-side {
-    //    justify-self: flex-end;
-    //}
 
     .accept-link::before { @include icon($accept-link-icon); }
     .cleanup-link::before { @include icon($cleanup-link-icon); }
@@ -232,7 +256,7 @@ $editbar-bg-color: $topbar-link-bg-hover;
     .new-directory::before { @include icon($new-directory-icon); }
     .new-directory-entry::before { @include icon($new-directory-entry-icon); }
     .new-form::before { @include icon($new-form-icon); }
-    .new-link::before { @include icon($new-link-icon); }
+    .new-link::before { @include icon-bold($new-link-icon); }
     .new-news::before { @include icon($new-news-icon); }
     .new-newsletter::before { @include icon($new-newsletter-icon); }
     .new-note::before { @include icon($new-note-icon); }
