@@ -124,7 +124,6 @@ class OrgTheme(BaseTheme):
             'upload',
             'files',
             'publication_signature',
-            'pdf'
         ]
 
     @property

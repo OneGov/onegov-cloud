@@ -1521,176 +1521,174 @@
 </metal:group_by_column>
 
 <metal:file_details define-macro="file-details" i18n:domain="onegov.org">
-    <div class="grid-x grid-padding-x">
-        <div class="cell small-4">
-            <a class="file-preview" href="${request.link(file)}" tal:condition="extension == 'pdf'">
-                <img class="pdf-preview" src="${request.link(file, name='medium')}">
-            </a>
-            <a class="file-preview" href="${request.link(file)}" tal:condition="extension != 'pdf'">
-                <svg width="204px" height="261px" viewBox="0 0 204 261" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:relative; left: -6px;">
-                    <defs>
-                        <filter x="-7.8%" y="-5.9%" width="120.0%" height="115.3%" filterUnits="objectBoundingBox" id="filter-1">
-                            <feOffset dx="4" dy="4" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
-                            <feGaussianBlur stdDeviation="5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
-                            <feColorMatrix values="0 0 0 0 0.392156863   0 0 0 0 0.392156863   0 0 0 0 0.392156863  0 0 0 0.4 0" type="matrix" in="shadowBlurOuter1" result="shadowMatrixOuter1"></feColorMatrix>
-                            <feMerge>
-                                <feMergeNode in="shadowMatrixOuter1"></feMergeNode>
-                                <feMergeNode in="SourceGraphic"></feMergeNode>
-                            </feMerge>
-                        </filter>
-                        <path d="M180,55.8004032 L180,233.892177 C180,235.962291 178.328034,237.640449 176.26556,237.640449 L3.73443983,237.640449 C1.67196566,237.640449 0,235.962291 0,233.892177 L0,3.74827207 C0,1.67815857 1.67196566,0 3.73443983,0 L124.368614,7.10542736e-15 C127.027185,1.13396268e-14 129.576325,1.05864997 131.452741,2.94201554 L177.084127,48.7424188 C178.9515,50.6167086 180,53.1546434 180,55.8004032 Z" id="path-2"></path>
-                        <path d="M180,55.8004032 L180,233.892177 C180,235.962291 178.328034,237.640449 176.26556,237.640449 L3.73443983,237.640449 C1.67196566,237.640449 0,235.962291 0,233.892177 L0,3.74827207 C0,1.67815857 1.67196566,0 3.73443983,0 L124.368614,7.10542736e-15 C127.027185,1.13396268e-14 129.576325,1.05864997 131.452741,2.94201554 L177.084127,48.7424188 C178.9515,50.6167086 180,53.1546434 180,55.8004032 Z" id="path-4"></path>
-                    </defs>
-                    <g id="Artboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                        <g id="Group" filter="url(#filter-1)" transform="translate(7.000000, 7.000000)">
-                            <g id="Page">
-                                <mask id="mask-3" fill="white">
-                                    <use xlink:href="#path-2"></use>
-                                </mask>
-                                <use id="Mask" stroke="#DDDDDD" stroke-width="2" fill="#F7F8F8" fill-rule="nonzero" xlink:href="#path-2"></use>
-                                <rect id="Corner" fill="#DDDDDD" mask="url(#mask-3)" x="127.717842" y="-3.74827207" width="56.0165975" height="56.2240811" rx="4"></rect>
-                            </g>
-                            <mask id="mask-5" fill="white">
-                                <use xlink:href="#path-4"></use>
+    <div class="file-details">
+        <a class="file-preview" href="${request.link(file)}" tal:condition="extension == 'pdf'">
+            <img class="pdf-preview" src="${request.link(file, name='medium')}">
+        </a>
+        <a class="file-preview" href="${request.link(file)}" tal:condition="extension != 'pdf'">
+            <svg width="204px" height="261px" viewBox="0 0 204 261" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:relative; left: -6px;">
+                <defs>
+                    <filter x="-7.8%" y="-5.9%" width="120.0%" height="115.3%" filterUnits="objectBoundingBox" id="filter-1">
+                        <feOffset dx="4" dy="4" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+                        <feGaussianBlur stdDeviation="5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+                        <feColorMatrix values="0 0 0 0 0.392156863   0 0 0 0 0.392156863   0 0 0 0 0.392156863  0 0 0 0.4 0" type="matrix" in="shadowBlurOuter1" result="shadowMatrixOuter1"></feColorMatrix>
+                        <feMerge>
+                            <feMergeNode in="shadowMatrixOuter1"></feMergeNode>
+                            <feMergeNode in="SourceGraphic"></feMergeNode>
+                        </feMerge>
+                    </filter>
+                    <path d="M180,55.8004032 L180,233.892177 C180,235.962291 178.328034,237.640449 176.26556,237.640449 L3.73443983,237.640449 C1.67196566,237.640449 0,235.962291 0,233.892177 L0,3.74827207 C0,1.67815857 1.67196566,0 3.73443983,0 L124.368614,7.10542736e-15 C127.027185,1.13396268e-14 129.576325,1.05864997 131.452741,2.94201554 L177.084127,48.7424188 C178.9515,50.6167086 180,53.1546434 180,55.8004032 Z" id="path-2"></path>
+                    <path d="M180,55.8004032 L180,233.892177 C180,235.962291 178.328034,237.640449 176.26556,237.640449 L3.73443983,237.640449 C1.67196566,237.640449 0,235.962291 0,233.892177 L0,3.74827207 C0,1.67815857 1.67196566,0 3.73443983,0 L124.368614,7.10542736e-15 C127.027185,1.13396268e-14 129.576325,1.05864997 131.452741,2.94201554 L177.084127,48.7424188 C178.9515,50.6167086 180,53.1546434 180,55.8004032 Z" id="path-4"></path>
+                </defs>
+                <g id="Artboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                    <g id="Group" filter="url(#filter-1)" transform="translate(7.000000, 7.000000)">
+                        <g id="Page">
+                            <mask id="mask-3" fill="white">
+                                <use xlink:href="#path-2"></use>
                             </mask>
-                            <use id="Mask" stroke="#DDDDDD" stroke-width="2" fill="#F7F8F8" fill-rule="nonzero" xlink:href="#path-4"></use>
-                            <rect id="Corner" fill="#DDDDDD" mask="url(#mask-5)" x="128.426966" y="-5.05617978" width="55.6179775" height="56.6292135" rx="4"></rect>
-                            <path d="M-0.0112359551,167.853933 L-0.0112359551,233.651685 C-0.0112359551,235.860824 1.77962505,237.651685 3.98876404,237.651685 L176.011236,237.651685 C178.220375,237.651685 180.011236,235.860824 180.011236,233.651685 L180.011236,167.853933 L-0.0112359551,167.853933 Z" id="Banner" stroke="#DDDDDD" stroke-width="2" fill="${color}" mask="url(#mask-5)"></path>
-                            <text id="PDF" mask="url(#mask-5)" font-family="OpenSans-Bold, Open Sans, Helvetica Neue, Arial, sans-serif" font-size="41" font-weight="bold" fill="#FFFFFF" text-anchor="middle" y="216" x="44.5%">${extension.upper()}</text>
+                            <use id="Mask" stroke="#DDDDDD" stroke-width="2" fill="#F7F8F8" fill-rule="nonzero" xlink:href="#path-2"></use>
+                            <rect id="Corner" fill="#DDDDDD" mask="url(#mask-3)" x="127.717842" y="-3.74827207" width="56.0165975" height="56.2240811" rx="4"></rect>
                         </g>
+                        <mask id="mask-5" fill="white">
+                            <use xlink:href="#path-4"></use>
+                        </mask>
+                        <use id="Mask" stroke="#DDDDDD" stroke-width="2" fill="#F7F8F8" fill-rule="nonzero" xlink:href="#path-4"></use>
+                        <rect id="Corner" fill="#DDDDDD" mask="url(#mask-5)" x="128.426966" y="-5.05617978" width="55.6179775" height="56.6292135" rx="4"></rect>
+                        <path d="M-0.0112359551,167.853933 L-0.0112359551,233.651685 C-0.0112359551,235.860824 1.77962505,237.651685 3.98876404,237.651685 L176.011236,237.651685 C178.220375,237.651685 180.011236,235.860824 180.011236,233.651685 L180.011236,167.853933 L-0.0112359551,167.853933 Z" id="Banner" stroke="#DDDDDD" stroke-width="2" fill="${color}" mask="url(#mask-5)"></path>
+                        <text id="PDF" mask="url(#mask-5)" font-family="OpenSans-Bold, Open Sans, Helvetica Neue, Arial, sans-serif" font-size="41" font-weight="bold" fill="#FFFFFF" text-anchor="middle" y="216" x="44.5%">${extension.upper()}</text>
                     </g>
-                </svg>
-            </a>
-        </div>
-        <div class="cell small-6 file-status">
+                </g>
+            </svg>
+        </a>
+    </div>
+    <div class="file-status">
 
-            <tal:b condition="request.app.enable_yubikey and file.reference['content_type'] == 'application/pdf'">
-                <h3 i18n:translate>Digital Signature</h3>
-                <div class="signature">
-                    <div class="file-status-tag">
-                        <metal:b use-macro="layout.macros['signature_status']" />
-                    </div>
-                </div>
-            </tal:b>
-
-            <h3 i18n:translate>Publication</h3>
-            <div class="publication" tal:define="
-                post_url layout.csrf_protected_url(request.link(file, name='update-publish-date'));
-                publish_date file.publish_date and layout.to_timezone(file.publish_date, layout.timezone);
-            ">
-                <div tal:condition="file.published" class="file-status-tag">
-                    <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='unpublish'))}"
-                       ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
-                       class="is-published">
-                        <i class="far fa-fw fa-check-circle" aria-hidden="true"></i> <span i18n:translate>Public</span>
-                    </a>
-                </div>
-                <div tal:condition="not:file.published" class="file-status-tag">
-                    <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='publish'))}"
-                       ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
-                       class="is-not-published">
-                        <i class="far fa-fw fa-eye-slash" aria-hidden="true"></i> <span i18n:translate>Private</span>
-                    </a>
-                </div>
-
-                <div class="publication-settings ${publish_date and 'publication-date-set' or 'publication-date-not-set'}" tal:condition="not:file.published">
-                    <form method="POST">
-                        <fieldset>
-                            <legend tal:condition="publish_date" i18n:translate>Will be published on:</legend>
-                            <legend tal:condition="not:publish_date" i18n:translate>Publication date:</legend>
-
-                            <div class="publication-settings-input">
-                                <input type="date" name="date" class="small" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))" value="${publish_date and publish_date.date().isoformat() or ''}" required="required">
-
-                                <select name="hour" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
-                                    <option tal:condition="not:publish_date"></option>
-                                    <tal:b repeat="hour range(24)" tal:define="publish_time publish_date and '{:0>2}:00'.format(publish_date.hour)">
-                                        <option tal:define="time '{:0>2}:00'.format(hour)" tal:attributes="selected publish_time == time" value="${time}">${time}</option>
-                                    </tal:b>
-                                </select>
-
-                                <a ic-post-to="${post_url}&clear=1" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
-                                    <i class="far fa-times-circle"></i>
-                                    <span class="show-for-sr" i18n:translate>Reset</span>
-                                </a>
-                            </div>
-                        </fieldset>
-                    </form>
+        <tal:b condition="request.app.enable_yubikey and file.reference['content_type'] == 'application/pdf'">
+            <h3 i18n:translate>Digital Signature</h3>
+            <div class="signature">
+                <div class="file-status-tag">
+                    <metal:b use-macro="layout.macros['signature_status']" />
                 </div>
             </div>
+        </tal:b>
 
-            <tal:b condition="file.reference['content_type'] == 'application/pdf'">
-                <h3 i18n:translate>Content</h3>
-                <div class="file-content">
-                    <div class="file-status-tag">
-                        <div tal:condition="file.stats.get('pages', 0) <= 1">
-                            <i class="far fa-fw fa-file-alt" aria-hidden="true"></i>
-                            <span i18n:translate>1 page</span>
+        <h3 i18n:translate>Publication</h3>
+        <div class="publication" tal:define="
+            post_url layout.csrf_protected_url(request.link(file, name='update-publish-date'));
+            publish_date file.publish_date and layout.to_timezone(file.publish_date, layout.timezone);
+        ">
+            <div tal:condition="file.published" class="file-status-tag">
+                <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='unpublish'))}"
+                   ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                   class="is-published">
+                    <i class="far fa-fw fa-check-circle" aria-hidden="true"></i> <span i18n:translate>Public</span>
+                </a>
+            </div>
+            <div tal:condition="not:file.published" class="file-status-tag">
+                <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='publish'))}"
+                   ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
+                   class="is-not-published">
+                    <i class="far fa-fw fa-eye-slash" aria-hidden="true"></i> <span i18n:translate>Private</span>
+                </a>
+            </div>
+
+            <div class="publication-settings ${publish_date and 'publication-date-set' or 'publication-date-not-set'}" tal:condition="not:file.published">
+                <form method="POST">
+                    <fieldset>
+                        <legend tal:condition="publish_date" i18n:translate>Will be published on:</legend>
+                        <legend tal:condition="not:publish_date" i18n:translate>Publication date:</legend>
+
+                        <div class="publication-settings-input">
+                            <input type="date" name="date" class="small" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))" value="${publish_date and publish_date.date().isoformat() or ''}" required="required">
+
+                            <select name="hour" ic-post-to="${post_url}" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                                <option tal:condition="not:publish_date"></option>
+                                <tal:b repeat="hour range(24)" tal:define="publish_time publish_date and '{:0>2}:00'.format(publish_date.hour)">
+                                    <option tal:define="time '{:0>2}:00'.format(hour)" tal:attributes="selected publish_time == time" value="${time}">${time}</option>
+                                </tal:b>
+                            </select>
+
+                            <a ic-post-to="${post_url}&clear=1" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
+                                <i class="far fa-times-circle"></i>
+                                <span class="show-for-sr" i18n:translate>Reset</span>
+                            </a>
                         </div>
-                        <div tal:condition="file.stats.get('pages', 0) > 1">
-                            <i class="far fa-file-alt" aria-hidden="true"></i>
-                            <span i18n:translate><tal:b i18n:name="count">${file.stats.get('pages', 0)}</tal:b> pages</span>
-                        </div>
-                        <div tal:define="words file.stats.get('words', 0)">
-                            <tal:b condition="words == 0">
-                                <i class="fas fa-fw fa-exclamation-triangle" aria-hidden="true"></i>
-                                <span i18n:translate>Contains no readable text</span>
-                            </tal:b>
-                            <tal:b condition="words == 1">
-                                <i class="fas fa-fw fa-font" aria-hidden="true"></i>
-                                <span i18n:translate>1 word</span>
-                            </tal:b>
-                            <tal:b condition="words > 1">
-                                <i class="fas fa-fw fa-font" aria-hidden="true"></i>
-                                <span i18n:translate><tal:b i18n:name="count">${words}</tal:b> words</span>
-                            </tal:b>
-                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+
+        <tal:b condition="file.reference['content_type'] == 'application/pdf'">
+            <h3 i18n:translate>Content</h3>
+            <div class="file-content">
+                <div class="file-status-tag">
+                    <div tal:condition="file.stats.get('pages', 0) <= 1">
+                        <i class="far fa-fw fa-file-alt" aria-hidden="true"></i>
+                        <span i18n:translate>1 page</span>
+                    </div>
+                    <div tal:condition="file.stats.get('pages', 0) > 1">
+                        <i class="far fa-file-alt" aria-hidden="true"></i>
+                        <span i18n:translate><tal:b i18n:name="count">${file.stats.get('pages', 0)}</tal:b> pages</span>
+                    </div>
+                    <div tal:define="words file.stats.get('words', 0)">
+                        <tal:b condition="words == 0">
+                            <i class="fas fa-fw fa-exclamation-triangle" aria-hidden="true"></i>
+                            <span i18n:translate>Contains no readable text</span>
+                        </tal:b>
+                        <tal:b condition="words == 1">
+                            <i class="fas fa-fw fa-font" aria-hidden="true"></i>
+                            <span i18n:translate>1 word</span>
+                        </tal:b>
+                        <tal:b condition="words > 1">
+                            <i class="fas fa-fw fa-font" aria-hidden="true"></i>
+                            <span i18n:translate><tal:b i18n:name="count">${words}</tal:b> words</span>
+                        </tal:b>
                     </div>
                 </div>
-            </tal:b>
-        </div>
-        <div class="cell small-2 file-actions">
-            <a class="button secondary confirm delete" role="button"
-                ic-delete-from="${request.link(file)}?csrf-token=${layout.csrf_token}"
-                ic-on-success="
-                    var info = $(elt).closest('tr');
-                    info.prev().remove();
-                    info.next().remove();
-                    info.remove();
-                "
-                data-confirm="Do you really want to delete this file?"
-                data-confirm-extra="${file.name}"
-                data-confirm-yes="Delete File"
-                data-confirm-no="Cancel"
-                i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"
-                i18n:translate>
-                Delete
-            </a>
-            <a class="button secondary rename prompt" role="button"
-                data-prompt="Please provide the new name for the file"
-                data-prompt-ok="Rename"
-                data-prompt-cancel="Cancel"
-                data-prompt-value="${file.name}"
-                data-prompt-success="(function(value) {
-                    var url = '${request.link(file, 'rename')}?csrf-token=${layout.csrf_token}';
-                    var ext = '.${file.name.split('.')[-1].strip()}';
-                    var elt = $(this);
+            </div>
+        </tal:b>
+    </div>
+    <div class="file-actions">
+        <a class="button secondary confirm delete" role="button"
+            ic-delete-from="${request.link(file)}?csrf-token=${layout.csrf_token}"
+            ic-on-success="
+                var info = $(elt).closest('tr');
+                info.prev().remove();
+                info.next().remove();
+                info.remove();
+            "
+            data-confirm="Do you really want to delete this file?"
+            data-confirm-extra="${file.name}"
+            data-confirm-yes="Delete File"
+            data-confirm-no="Cancel"
+            i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"
+            i18n:translate>
+            Delete
+        </a>
+        <a class="button secondary rename prompt" role="button"
+            data-prompt="Please provide the new name for the file"
+            data-prompt-ok="Rename"
+            data-prompt-cancel="Cancel"
+            data-prompt-value="${file.name}"
+            data-prompt-success="(function(value) {
+                var url = '${request.link(file, 'rename')}?csrf-token=${layout.csrf_token}';
+                var ext = '.${file.name.split('.')[-1].strip()}';
+                var elt = $(this);
 
-                    value = value.substring(value.length - ext.length, value.length) === ext && value || value + ext;
+                value = value.substring(value.length - ext.length, value.length) === ext && value || value + ext;
 
-                    jQuery.post(url, {'name': value}, function() {
-                        var actions = elt;
+                jQuery.post(url, {'name': value}, function() {
+                    var actions = elt;
 
-                        actions.closest('tr').prev().find('td:first').text(value);
-                        actions.find('a.prompt').data('prompt-value', value);
-                        actions.find('a.delete').data('confirm-extra', value);
-                    });
-                })"
-                i18n:attributes="data-prompt;data-prompt-ok;data-prompt-cancel"
-                i18n:translate>
-                Rename
-            </a>
-        </div>
+                    actions.closest('tr').prev().find('td:first').text(value);
+                    actions.find('a.prompt').data('prompt-value', value);
+                    actions.find('a.delete').data('confirm-extra', value);
+                });
+            })"
+            i18n:attributes="data-prompt;data-prompt-ok;data-prompt-cancel"
+            i18n:translate>
+            Rename
+        </a>
     </div>
 </metal:file_details>
 
@@ -1768,7 +1766,7 @@
         file_number file.number|file.id;
         file_upload file.upload_date|file.created
     ">
-        <tr class="file-info ${file.signed and 'signed'}">
+        <tr class="file-info ${file.signed and 'signed' or ''}">
             <td>
                 ${file.name}
             </td>
@@ -1788,7 +1786,9 @@
             <td colspan="4">
                 <div ic-trigger-from="#button-${file_number}"
                      ic-trigger-on="click once"
-                     ic-get-from="${actions_url(file.id)}">
+                     ic-get-from="${actions_url(file.id)}"
+                     class="file-preview-wrapper"
+                >
                 </div>
             </td>
         </tr>
