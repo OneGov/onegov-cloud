@@ -17,4 +17,10 @@
         margin-bottom: 1rem;
         padding: 1rem;
     }
+
+}
+
+// FIXME: hack to make sure the actice button isn't jumping in Safari
+.orbit-bullets button.is-active span {
+    display: none
 }
