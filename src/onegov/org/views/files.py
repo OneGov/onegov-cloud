@@ -213,11 +213,12 @@ def handle_update_publish_date(self, request):
 @OrgApp.html(model=ImageFileCollection, template='images.pt',
              permission=Private)
 def view_get_image_collection(self, request):
+
+    layout = DefaultLayout(self, request)
+
     request.include('common')
     request.include('upload')
     request.include('editalttext')
-
-    layout = DefaultLayout(self, request)
 
     images = view_get_image_collection_json(
         self, request, produce_image=lambda image: Img.from_image(
