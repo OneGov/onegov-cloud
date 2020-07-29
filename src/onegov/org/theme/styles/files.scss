@@ -43,8 +43,7 @@
 
     th span {
         @include label;
-        background-color: $white;
-
+        @include primary-color-background;
         border: 1px solid $primary-color;
         @include circle;
         font-size: .875rem;
@@ -108,7 +107,7 @@
     margin-bottom: .5rem;
     padding-left: 0;
     padding-right: 0;
-    text-align: center;
+    //text-align: right;
 }
 
 /*

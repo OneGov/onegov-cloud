@@ -122,7 +122,9 @@ class OrgTheme(BaseTheme):
             'user',
             'timeline',
             'upload',
-            'files'
+            'files',
+            'publication_signature',
+            'pdf'
         ]
 
     @property
