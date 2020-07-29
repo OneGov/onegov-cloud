@@ -1,4 +1,32 @@
 /*
+    Pdf Preview
+*/
+
+$pdf-preview-max-height: 256px;
+$pdf-preview-max-width: 256px;
+
+
+.pdf-preview {
+    background: $white;
+    box-shadow: 4px 4px 10px rgba(100, 100, 100, .4);
+
+    max-height: $pdf-preview-max-height;
+    max-width: $pdf-preview-max-width;
+}
+
+/*
+    Icon widget customisation
+*/
+.icon-widget {
+    li:hover,
+    li.active {
+        background: $primary-color !important;
+        border-color: $primary-fg-color !important;
+        color: $primary-fg-color !important;
+    }
+}
+
+/*
     Files list
 */
 .files {
@@ -102,20 +130,41 @@
     }
 }
 
-.file-actions a {
-    display: block;
-    margin-bottom: .5rem;
-    padding-left: 0;
-    padding-right: 0;
-    //text-align: right;
+.file-preview-wrapper {
+    display: flex;
+    //:nth-child(1) {
+    //    //width: 40%;
+    //}
+
+    //&:nth-child(2) {
+    //    width: 30%;
+    //}
+    //
+    //&:nth-child(3) {
+    //    width: 40%;
+    //}
+}
+
+.file-details {
+    width: rem-calc($pdf-preview-max-width) + 1rem;
+}
+
+.file-actions {
+
+    display: flex;
+    flex-direction: column;
+
+    a {
+        margin-bottom: .5rem;
+    }
 }
 
 /*
     File Status
 */
+
 .file-status {
-    margin-left: -2.75rem;
-    padding-top: .35rem;
+    flex-grow: 1;
 
     h3 {
         color: $steel;
@@ -147,7 +196,7 @@
         }
     }
 
-    .fa {
+    .fa, .fas, .far {
         @include prefix(transition-duration, .5s);
         @include prefix(filter, blur(0));
     }
