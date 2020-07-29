@@ -88,10 +88,12 @@ class Img(object):
 @OrgApp.html(model=GeneralFileCollection, template='files.pt',
              permission=Private)
 def view_get_file_collection(self, request):
+
+    layout = DefaultLayout(self, request)
+
     request.include('upload')
     request.include('prompt')
 
-    layout = DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
         Link(_("Files"), '#')
