@@ -10,8 +10,11 @@
         padding-top: 2rem;
     }
 
-    tr:first-child th {
+    tr:first-child  {
         padding-top: 1rem;
+        &:first-of-type {
+            text-align: left;
+        }
     }
 
     tr:first-child th,
@@ -39,15 +42,13 @@
     }
 
     th span {
-        @include circle;
-        //@include label($bg: $white);
         @include label;
-        @include primary-color-background;
+        background-color: $white;
 
         border: 1px solid $primary-color;
+        @include circle;
         font-size: .875rem;
         font-weight: bold;
-        text-align: right;
     }
 
     .file-info {
