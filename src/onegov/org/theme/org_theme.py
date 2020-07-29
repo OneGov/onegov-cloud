@@ -121,7 +121,8 @@ class OrgTheme(BaseTheme):
             'tickets',
             'user',
             'timeline',
-            'upload'
+            'upload',
+            'files'
         ]
 
     @property
