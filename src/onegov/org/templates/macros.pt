@@ -1582,14 +1582,14 @@
                     <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='unpublish'))}"
                        ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
                        class="is-published">
-                        <i class="fa fa-fw fa-check-circle" aria-hidden="true"></i> <span i18n:translate>Public</span>
+                        <i class="far fa-fw fa-check-circle" aria-hidden="true"></i> <span i18n:translate>Public</span>
                     </a>
                 </div>
                 <div tal:condition="not:file.published" class="file-status-tag">
                     <a ic-post-to="${layout.csrf_protected_url(request.link(file, name='publish'))}"
                        ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))"
                        class="is-not-published">
-                        <i class="fa fa-fw fa-eye-slash" aria-hidden="true"></i> <span i18n:translate>Private</span>
+                        <i class="far fa-fw fa-eye-slash" aria-hidden="true"></i> <span i18n:translate>Private</span>
                     </a>
                 </div>
 
@@ -1610,7 +1610,7 @@
                                 </select>
 
                                 <a ic-post-to="${post_url}&clear=1" ic-on-success="Intercooler.triggerRequest($(elt).closest('[ic-get-from]'))">
-                                    <i class="fa fa-times-circle" aria-hidden="true"></i>
+                                    <i class="far fa-times-circle"></i>
                                     <span class="show-for-sr" i18n:translate>Reset</span>
                                 </a>
                             </div>
@@ -1624,7 +1624,7 @@
                 <div class="file-content">
                     <div class="file-status-tag">
                         <div tal:condition="file.stats.get('pages', 0) <= 1">
-                            <i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i>
+                            <i class="far fa-fw fa-file-alt" aria-hidden="true"></i>
                             <span i18n:translate>1 page</span>
                         </div>
                         <div tal:condition="file.stats.get('pages', 0) > 1">
@@ -1633,15 +1633,15 @@
                         </div>
                         <div tal:define="words file.stats.get('words', 0)">
                             <tal:b condition="words == 0">
-                                <i class="fa fa-fw fa-exclamation-triangle" aria-hidden="true"></i>
+                                <i class="fas fa-fw fa-exclamation-triangle" aria-hidden="true"></i>
                                 <span i18n:translate>Contains no readable text</span>
                             </tal:b>
                             <tal:b condition="words == 1">
-                                <i class="fa fa-fw fa-font" aria-hidden="true"></i>
+                                <i class="fas fa-fw fa-font" aria-hidden="true"></i>
                                 <span i18n:translate>1 word</span>
                             </tal:b>
                             <tal:b condition="words > 1">
-                                <i class="fa fa-fw fa-font" aria-hidden="true"></i>
+                                <i class="fas fa-fw fa-font" aria-hidden="true"></i>
                                 <span i18n:translate><tal:b i18n:name="count">${words}</tal:b> words</span>
                             </tal:b>
                         </div>
