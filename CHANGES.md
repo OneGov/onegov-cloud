@@ -1,8 +1,14 @@
 # Changes
 
+## Release `2020.66`
+
+> commits: **1 / [dd7108ebfa...dd7108ebfa](https://github.com/OneGov/onegov-cloud/compare/dd7108ebfa^...dd7108ebfa)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.66)](https://buildkite.com/seantis/onegov-cloud)
+
 ## Release `2020.65`
 
-> commits: **17 / [3d8af21ce6...7e08a8d0a8](https://github.com/OneGov/onegov-cloud/compare/3d8af21ce6^...7e08a8d0a8)**  
+> released: **2020-07-28 15:02**<br>
+> commits: **18 / [3d8af21ce6...058c55662c](https://github.com/OneGov/onegov-cloud/compare/3d8af21ce6^...058c55662c)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.65)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
