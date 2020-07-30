@@ -13,7 +13,7 @@
         <div class="grid-x" tal:condition="connection">
             <div class="cell small-12 medium-8">
                 <form class="searchbox" action="${request.link(model).split('?')[0]}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
-                    <div class="grid-x collapse">
+                    <div class="grid-x">
                         <label>${searchlabel}</label>
                         <div class="cell small-11">
                             <label for="search" class="show-for-sr" i18n:translate>Search</label>

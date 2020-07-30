@@ -15,7 +15,7 @@
             </p>
         </div>
 
-        <div class="grid-x collapse event-preview">
+        <div class="grid-x event-preview">
             <div class="large-8 medium-8 cell">
                 <tal:b metal:use-macro="layout.macros['display_event']" tal:define="event event"/>
             </div>
