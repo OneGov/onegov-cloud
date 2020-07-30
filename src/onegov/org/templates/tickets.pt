@@ -104,9 +104,7 @@
             </tbody>
         </table>
 
-        <div class="pagination-centered">
-            <div metal:use-macro="layout.macros['pagination']" tal:define="
-            collection layout.model; current_page layout.model;" />
-        </div>
+        <div metal:use-macro="layout.macros['pagination']" tal:define="
+        collection layout.model; current_page layout.model; pagination_centered True" />
     </tal:b>
 </div>
