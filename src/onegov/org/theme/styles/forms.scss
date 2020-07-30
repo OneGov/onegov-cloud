@@ -14,6 +14,17 @@ form {
 }
 
 /*
+    the color picker field does not look right with zurb foundation
+*/
+input[type='color'] {
+    background-color: transparent;
+    border: 0;
+    display: block;
+    margin-bottom: 1rem;
+    padding: 0;
+}
+
+/*
     input buttons
 */
 .input-with-button {
