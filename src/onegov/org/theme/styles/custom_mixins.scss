@@ -117,3 +117,23 @@ $more-link-icon: "\f054";
 .more-list {
   @include more-list;
 }
+
+/*
+  Form customisation needed coming from foundation5
+*/
+
+// We use this mixin to create postfix/prefix form Labels
+@mixin prefix-postfix-base {
+  border: $input-prefix-border;
+  display: block;
+  font-size: $form-label-font-size;
+  height: ($input-font-size + ($form-spacing * 1.5) - rem-calc(2));
+  line-height: ($input-font-size + ($form-spacing * 1.5) - rem-calc(2));
+  overflow: visible;
+  padding-bottom: 0;
+  padding-top: 0;
+  position: relative;
+  text-align: center;
+  width: 100%;
+  z-index: 2;
+}

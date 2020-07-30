@@ -17,9 +17,11 @@ form {
     input buttons
 */
 .input-with-button {
+
     .button {
-        border-left: 0;
-        padding: 0;
+        box-sizing: border-box;
+        @include prefix-postfix-base;
+        border-left: none;
 
         // IE 9, 10 and 11 will put the link inside the button element because
         // Internet Explorer. Here we hide the result.
