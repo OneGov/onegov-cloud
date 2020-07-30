@@ -18,9 +18,9 @@
                                 </p>
                             </div>
 
-                            <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4 upload-filelist image-grid">
+                            <div class="upload-filelist image-grid">
 
-                            </ul>
+                            </div>
                         </div>
                     </tal:b>
                 </tal:b>

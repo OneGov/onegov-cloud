@@ -16,8 +16,8 @@
 
                     <tal:b tal:repeat="group images">
                         <h3 i18n:translate="">${group['group']}</h3>
-                            <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4 image-select">
-                                <li tal:repeat="image group['images']" id="image-${repeat.image.index}" class="${image.selected and 'image-box selected' or 'image-box'}">
+                            <ul class="image-grid image-select">
+                                <li tal:repeat="image group['images']" id="image-${repeat.image.index}" class="image-container ${image.selected and 'selected' or ''}">
                                     <img data-src="${image.src}" class="lazyload" />
                                     <tal:b condition="image.selected">
                                         <input type="checkbox" class="checkbox" name="${image.id}" checked />
