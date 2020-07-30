@@ -124,6 +124,7 @@ class OrgTheme(BaseTheme):
             'upload',
             'files',
             'publication_signature',
+            'image-grid'
         ]
 
     @property

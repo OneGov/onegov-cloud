@@ -30,11 +30,11 @@
             <div class="small-12 cell">
                 <tal:b tal:repeat="group images">
                     <h2 i18n:translate="">${group['group']}</h2>
-                    <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4 image-grid">
+                    <div class="image-grid">
                         <tal:b repeat="image group['images']">
                             <tal:b metal:use-macro="layout.macros.uploaded_image" define="index repeat.image.index" />
                         </tal:b>
-                    </ul>
+                    </div>
                 </tal:b>
                 <tal:b condition="not:images">
                     <p i18n:translate="">No images uploaded yet</p>
