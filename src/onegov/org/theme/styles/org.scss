@@ -177,30 +177,6 @@ footer {
 }
 
 /*
-    input buttons
-*/
-.input-with-button {
-    .button {
-        border-left: 0;
-        padding: 0;
-
-        // IE 9, 10 and 11 will put the link inside the button element because
-        // Internet Explorer. Here we hide the result.
-        a,
-        .redactor-selection-marker {
-            display: none;
-        }
-    }
-
-    #redactor-modal-link-insert {
-        > input,
-        > label {
-            display: none;
-        }
-    }
-}
-
-/*
     simple listed content
 */
 .with-lead {
