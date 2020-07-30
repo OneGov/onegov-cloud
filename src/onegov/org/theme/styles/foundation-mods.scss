@@ -279,7 +279,10 @@ $pagination-item-color: $aluminum;
 /*
     Forms
 */
+$fieldset-border: 1px solid $gainsboro;
+$input-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+$input-color: rgba($black, .75);
+$input-prefix-color: rgba($black, .75);
+$input-font-size: rem-calc(14);  // same as the label
+$form-label-color: scale-color($black, $lightness: 30%);
 
-$form-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-$input-font-family: $form-font-family;
-$input-font-size: 1rem;
