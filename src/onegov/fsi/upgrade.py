@@ -125,8 +125,12 @@ def add_source_id_to_attendee(context):
 
 @upgrade_task('Change refresh_interval to integer representing years')
 def change_refresh_interval(context):
-    if context.has_column('fsi_courses', 'refresh_interval'):
-        context.session.execute(textwrap.dedent("""\
+    if not context.has_column('fsi_courses', 'refresh_interval'):
+        return
+    if context.is_empty_table('fsi_courses'):
+        return
+
+    context.session.execute(textwrap.dedent("""\
         ALTER TABLE fsi_courses ALTER COLUMN refresh_interval
         TYPE INT USING extract(days FROM refresh_interval) / 30 / 12::int
         """))
