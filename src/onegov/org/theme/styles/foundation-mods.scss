@@ -270,3 +270,10 @@ $pagination-arrows: false;
 $pagination-mobile-items: true;
 $pagination-mobile-current-item: true;
 $pagination-item-color: $aluminum;
+
+/*
+    Forms
+*/
+
+$form-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+$input-font-family: $form-font-family;
