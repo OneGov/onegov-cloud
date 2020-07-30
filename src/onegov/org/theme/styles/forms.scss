@@ -1,11 +1,15 @@
 /*
-    form display rendering
+    Forms
 */
 
 form {
-    label ul {
+    label ul, ul {
         list-style: none;
-        margin-left: 0;
+        margin: 0;
+    }
+
+    label {
+        font-family: $header-font-family;
     }
 }
 
