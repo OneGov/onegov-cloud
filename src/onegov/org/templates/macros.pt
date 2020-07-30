@@ -1800,7 +1800,7 @@
 </metal:file_info>
 
 <metal:uploaded_image define-macro="uploaded_image" i18n:domain="onegov.org">
-    <li id="image-${index}" class="image-box">
+    <div id="image-${index}" class="image-container">
         <a href="${image.url}" tal:condition="image" class="editable-alt" data-note-update-url="${image.extra}">
             <img tal:condition="image.alt" data-src="${image.src}" class="lazyload static-alt" alt="${image.alt}" width="${image.width}" height="${image.height}" />
             <img tal:condition="not:image.alt" data-src="${image.src}" class="lazyload missing-alt static-alt" alt="Click to add a description" i18n:attributes="alt" width="${image.width}" height="${image.height}"/>
@@ -1812,7 +1812,7 @@
            data-confirm-yes="Delete Image"
            data-confirm-no="Cancel"
            i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"><i class="fa fa-times" aria-hidden="true"></i></a>
-    </li>
+    </div>
 </metal:uploaded_image>
 
 <metal:digest_result define-macro="digest_result" i18n:domain="onegov.org">
