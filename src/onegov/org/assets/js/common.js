@@ -133,7 +133,7 @@ $('.image-select input[type="checkbox"]').on('click', function(e) {
     var target = $(e.target);
     var checked = target.is(':checked');
 
-    target.closest('.image-box').toggleClass('selected', checked);
+    target.closest('.image-container').toggleClass('selected', checked);
 });
 
 // A generic error messages handler
