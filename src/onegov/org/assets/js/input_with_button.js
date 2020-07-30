@@ -38,7 +38,7 @@ var setup_internal_link_select = function(input) {
     }
 
     input.wrap('<div class="small-11 cell"></div>');
-    input.closest('.cell').wrap('<div class="grid-x collapse input-with-button">');
+    input.closest('.cell').wrap('<div class="grid-x input-with-button">');
     input.closest('.grid-x').append(
         '<div class="small-1 cell"><a class="button secondary postfix">' + button + '</a></div>'
     );
