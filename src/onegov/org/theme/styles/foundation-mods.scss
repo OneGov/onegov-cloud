@@ -220,6 +220,13 @@ $button-font-color: $primary-fg-color;
 }
 
 /*
+  FA icons
+ */
+
+$chevron-left-icon: '\f053';
+$chevron-right-icon:'\f054';
+
+/*
 Grid
 */
 
@@ -254,3 +261,12 @@ $dropdown-width: 400px;
  */
 
 $table-border: none;
+
+/*
+    Pagination
+*/
+
+$pagination-arrows: false;
+$pagination-mobile-items: true;
+$pagination-mobile-current-item: true;
+$pagination-item-color: $aluminum;

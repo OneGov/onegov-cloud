@@ -411,3 +411,18 @@ table {
 table tr th, table tr td {
     font-size: .875rem;
 }
+
+
+/*
+    Pagination customisations
+*/
+
+ul.pagination li {
+
+    &.current > a {
+        color: $primary-fg-color;
+        pointer-events: none;
+        font-weight: bold;
+    }
+
+}
