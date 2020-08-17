@@ -187,6 +187,7 @@ setup(
             'pytest-localserver',
             'pytest-redis',
             'pytest-rerunfailures',
+            'pytest-timeout',
             'pyyaml',
             'requests',
             'requests-mock',
