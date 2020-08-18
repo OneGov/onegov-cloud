@@ -42,8 +42,6 @@ from chameleon.tal import RepeatDict
 from chameleon.utils import Scope, decode_string
 from onegov.core.framework import Framework
 
-# from chameleon.zpt.loader import TemplateLoader
-# from chameleon.loader import TemplateLoader
 
 AUTO_RELOAD = os.environ.get('ONEGOV_DEVELOPMENT') == '1'
 
