@@ -1,3 +1,5 @@
+import textwrap
+
 import morepath
 import os
 import os.path
@@ -6,9 +8,11 @@ import polib
 from onegov.core.framework import Framework
 from onegov.core import utils
 from onegov.core.layout import ChameleonLayout
-from onegov.core.templates import render_macro
+from onegov.core.templates import render_macro, BOOLEAN_HTML_ATTRS
 from translationstring import TranslationStringFactory
 from webtest import TestApp as Client
+
+from tests.shared.utils import open_in_browser
 
 
 def test_chameleon_with_translation(temporary_directory, redis_url):
@@ -180,6 +184,27 @@ def test_inject_default_vars(temporary_directory, redis_url):
     assert 'child' in child_page
     assert 'padre' in child_page
     assert 'niño' in child_page
+
+
+def test_boolean_attrs_directly():
+    from chameleon.zpt.template import PageTemplate
+    ts = textwrap.dedent(
+        """
+         <select> 
+            <option value="1" tal:attributes="selected True">Selected</option> 
+            <option value="2" tal:attributes="selected 1 == 1">Selected, too</option>
+            <option value="3" tal:attributes="selected False">Not selected</option> 
+            <option value="4" tal:attributes="selected None">OK</option>
+            
+        </select>
+        """
+    )
+    page = PageTemplate(ts, boolean_attributes=BOOLEAN_HTML_ATTRS)()
+    assert '<option value="" tal:attributes="selected True">Selected</option>' in page
+    assert '<option value="1" selected>Selected</option>' in page
+    assert '<option value="2" selected>Selected, too</option>' in page
+    assert '<option value="3" selected>Not selected</option>' in page
+    assert '<option value="4" selected>OK</option>' in page
 
 
 def test_macro_lookup(temporary_directory, redis_url):
