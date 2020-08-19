@@ -642,7 +642,7 @@
     </div>
 </metal:periods>
 
-<metal:users define-macro="users" i18n:domain="onegov.feriennet" i18n:domain="onegov.feriennet">
+<metal:users define-macro="users" i18n:domain="onegov.feriennet">
     <div class="filter-panel" tal:condition="request.is_admin and users">
         <h2 class="filter-title" i18n:translate>User</h2>
         <select onchange="location = this.value;">
