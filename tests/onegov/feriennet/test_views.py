@@ -1217,6 +1217,7 @@ def test_occasion_attendance_collection(client, scenario):
 
 
 def test_send_email(client, scenario):
+    scenario.add_period(title="Ferienpass 2015", active=False)
     scenario.add_period(title="Ferienpass 2016")
     scenario.commit()
 
@@ -1228,6 +1229,7 @@ def test_send_email(client, scenario):
     page = page.form.submit().follow()
 
     page = page.click('Versand')
+    assert 'selected="False"' not in page
     assert "Ferienpass 2016 subject" in page
     assert "Ferienpass 2016 body" in page
     assert "keine Empfänger gefunden" in page.form.submit()

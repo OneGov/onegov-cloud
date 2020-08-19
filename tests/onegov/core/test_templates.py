@@ -192,19 +192,16 @@ def test_boolean_attrs_directly():
         """
          <select> 
             <option value="1" tal:attributes="selected True">Selected</option> 
-            <option value="2" tal:attributes="selected 1 == 1">Selected, too</option>
-            <option value="3" tal:attributes="selected False">Not selected</option> 
-            <option value="4" tal:attributes="selected None">OK</option>
-            
+            <option value="2" tal:attributes="selected False">Not selected</option> 
+            <option value="3" tal:attributes="selected None">OK</option>            
         </select>
         """
     )
     page = PageTemplate(ts, boolean_attributes=BOOLEAN_HTML_ATTRS)()
-    assert '<option value="" tal:attributes="selected True">Selected</option>' in page
-    assert '<option value="1" selected>Selected</option>' in page
-    assert '<option value="2" selected>Selected, too</option>' in page
-    assert '<option value="3" selected>Not selected</option>' in page
-    assert '<option value="4" selected>OK</option>' in page
+    print(page)
+    assert '<option value="1" selected="selected">Selected</option>' in page
+    assert '<option value="2">Not selected</option>' in page
+    assert '<option value="3">OK</option>' in page
 
 
 def test_macro_lookup(temporary_directory, redis_url):
