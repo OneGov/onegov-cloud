@@ -12,8 +12,6 @@ from onegov.core.templates import render_macro, BOOLEAN_HTML_ATTRS
 from translationstring import TranslationStringFactory
 from webtest import TestApp as Client
 
-from tests.shared.utils import open_in_browser
-
 
 def test_chameleon_with_translation(temporary_directory, redis_url):
     # Test chameleon in a real scenario with templating and translations
@@ -254,6 +252,9 @@ def test_macro_lookup(temporary_directory, redis_url):
 
                 <metal:block define-macro="id">
                     Child
+                    <select>
+                    <option value="" tal:attributes="selected False"></option>
+                    </select>
                 </metal:block>
             </html>
         """)
@@ -296,3 +297,4 @@ def test_macro_lookup(temporary_directory, redis_url):
     assert 'Foo' in page
     assert 'Bar' in page
     assert 'Child' in page
+    assert 'selected="False"' not in page
