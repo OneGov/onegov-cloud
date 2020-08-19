@@ -52,6 +52,7 @@ def br(text):
 
 
 def get_address(line):
+    # Todo: Split addresses using plz and place a line down below
     stao_addr, post_addr = v_(line.standortadresse), v_(line.postadresse)
     if stao_addr and post_addr:
         if stao_addr == post_addr:
