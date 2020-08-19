@@ -185,6 +185,9 @@ def test_inject_default_vars(temporary_directory, redis_url):
 
 
 def test_boolean_attrs_directly():
+    """
+    See https://github.com/malthe/chameleon/issues/318
+    """
     from chameleon.zpt.template import PageTemplate
     ts = textwrap.dedent(
         """
@@ -196,7 +199,6 @@ def test_boolean_attrs_directly():
         """
     )
     page = PageTemplate(ts, boolean_attributes=BOOLEAN_HTML_ATTRS)()
-    print(page)
     assert '<option value="1" selected="selected">Selected</option>' in page
     assert '<option value="2">Not selected</option>' in page
     assert '<option value="3">OK</option>' in page
