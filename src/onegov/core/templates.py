@@ -88,9 +88,10 @@ class TemplateLoader(PageTemplateLoader):
 
     """
 
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault("boolean_attributes", BOOLEAN_HTML_ATTRS)
-        super(TemplateLoader, self).__init__(*args, **kwargs)
+    # Use this when chameleon is ready to withstand test in core/test_templates
+    # def __init__(self, *args, **kwargs):
+    #     kwargs.setdefault("boolean_attributes", BOOLEAN_HTML_ATTRS)
+    #     super(TemplateLoader, self).__init__(*args, **kwargs)
 
     @cached_property
     def macros(self):
