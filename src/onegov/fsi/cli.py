@@ -34,6 +34,17 @@ def import_ims_data_cli(path):
     return execute
 
 
+schools = {
+        '@gibz.ch': 'VD / GIBZ',
+        '@kbz-zug.ch': 'VD / KBZ',
+        '@aba-zug.ch': 'VD / ABA',
+        '@ksmenzingen.ch': 'DBK / AMH / Kantonsschule Menzingen',
+        '@ksz.ch': 'DBK / AMH / Kantonsschule Zug',
+        '@phzg.ch': 'DBK / AMH / Pädagogische Hochschule Zug',
+        '@fms-zg.ch': 'DBK / AMH / Fachmittelschule Zug',
+    }
+
+
 @cli.command(name='fetch-users', context_settings={'singular': True})
 @click.option('--ldap-server', required=True)
 @click.option('--ldap-username', required=True)
@@ -79,16 +90,6 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password):
         'zgXDirektionAbk': 'directorate',
         'zgXAmtAbk': 'agency',
         'zgXAbteilung': 'department',
-    }
-
-    schools = {
-        '@gibz.ch': 'VD / GIBZ',
-        '@kbz-zug.ch': 'VD / KBZ',
-        '@aba-zug.ch': 'VD / ABA',
-        '@ksmenzingen.ch': 'DBK / AMH / Kantonsschule Menzingen',
-        '@ksz.ch': 'DBK / AMH / Kantonsschule Zug',
-        '@phzg.ch': 'DBK / AMH / Pädagogische Hochschule Zug',
-        '@fms-zg.ch': 'DBK / AMH / Fachmittelschule Zug',
     }
 
     @lru_cache(maxsize=1)
