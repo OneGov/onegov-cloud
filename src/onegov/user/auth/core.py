@@ -100,7 +100,8 @@ class Auth(object):
             raise NotImplementedError
 
     def authenticate(self, request, username, password,
-                     client='unknown', second_factor=None):
+                     client='unknown', second_factor=None,
+                     skip_providers=False):
         """ Takes the given username and password and matches them against the
         users collection. This does not login the user, use :meth:`login_to` to
         accomplish that.
@@ -117,6 +118,11 @@ class Auth(object):
         :param second_factor:
             The value of the second factor or None.
 
+        :skip_providers:
+            In special cases where e.g. an LDAP-Provider is a source of users
+            but can't offer the password for authentication, you can login
+            using the application database.
+
         :return: The matched user, if successful, or None.
 
         """
@@ -126,7 +132,7 @@ class Auth(object):
         user = None
         source = None
 
-        if isinstance(self.app, UserApp):
+        if isinstance(self.app, UserApp) and not skip_providers:
             for provider in self.app.providers:
                 if provider.kind == 'integrated':
                     user = provider.authenticate_user(
@@ -181,7 +187,8 @@ class Auth(object):
 
         return self.users.by_username(identity.userid)
 
-    def login_to(self, username, password, request, second_factor=None):
+    def login_to(self, username, password, request, second_factor=None,
+                 skip_providers=False):
         """ Takes a user login request and remembers the user if the
         authentication completes successfully.
 
@@ -197,6 +204,9 @@ class Auth(object):
         :param second_factor:
             The second factor, if any.
 
+        :skip_providers:
+            Pass option skip_providers to skip any configured auth providers.
+
         :return: A redirect response to ``self.to`` with the identity
         remembered as a cookie. If not successful, None is returned.
 
@@ -207,7 +217,9 @@ class Auth(object):
             username=username,
             password=password,
             client=request.client_addr,
-            second_factor=second_factor)
+            second_factor=second_factor,
+            skip_providers=skip_providers
+        )
 
         if user is None:
             return None

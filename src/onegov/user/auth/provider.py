@@ -419,8 +419,12 @@ class LDAPProvider(
 
             # if successful we need the e-mail address
             for name, attrs in (entries or {}).items():
-                username = attrs[self.attributes.mails][0]
-
+                try:
+                    username = attrs[self.attributes.mails][0]
+                except IndexError:
+                    log.warning(
+                        f'Email missing in LDAP for user with uid {username}')
+                    return
                 break
 
         # then, we give up
