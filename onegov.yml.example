@@ -211,9 +211,9 @@ applications:
     configuration:
       <<: *global-config
 
-  - path: /onegov_fsi/*
+  - path: /fsi/*
     application: onegov.fsi.FsiApp
-    namespace: onegov_fsi
+    namespace: fsi
     configuration:
       <<: *global-config
 
