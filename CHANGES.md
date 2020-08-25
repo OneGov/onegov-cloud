@@ -1,8 +1,24 @@
 # Changes
 
+## Release `2020.68`
+
+> commits: **1 / [7924da746a...7924da746a](https://github.com/OneGov/onegov-cloud/compare/7924da746a^...7924da746a)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.68)](https://buildkite.com/seantis/onegov-cloud)
+
+### Fsi
+
+🐞 **Fixes login for users attached to schools**
+
+Fixes login issue for fsi user, adapts core components and fsi login form.
+
+Issue: FSI-2
+
+**`Bugfix`** | **[7924da746a](https://github.com/onegov/onegov-cloud/commit/7924da746ac804dd270f44215e71224a2d4d85f6)**
+
 ## Release `2020.67`
 
-> commits: **10 / [cc1c4e45bc...d921030e63](https://github.com/OneGov/onegov-cloud/compare/cc1c4e45bc^...d921030e63)**  
+> released: **2020-08-24 08:25**<br>
+> commits: **11 / [cc1c4e45bc...3eccf9d865](https://github.com/OneGov/onegov-cloud/compare/cc1c4e45bc^...3eccf9d865)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.67)](https://buildkite.com/seantis/onegov-cloud)
 
 ## Release `2020.66`
