@@ -252,6 +252,12 @@ applications:
     configuration:
       <<: *global-config
 
+  - path: /translator_directory/*
+    application: onegov.translator_directory.TranslatorDirectoryApp
+    namespace: translator_directory
+    configuration:
+      <<: *global-config
+
   - path: /onegov_onboarding
     application: onegov.onboarding.OnboardingApp
     namespace: onegov_onboarding
