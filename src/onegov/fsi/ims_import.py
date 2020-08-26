@@ -93,11 +93,14 @@ wurden berücksichtigt, sofern eine Email vorlag.
 
 """
 from collections import OrderedDict, defaultdict
+from datetime import datetime
 from uuid import uuid4
 import dateutil.parser
 from sedate import replace_timezone
+from sqlalchemy import cast, Date
 
 from onegov.core.csv import CSVFile
+from onegov.fsi.collections.subscription import SubscriptionsCollection
 from onegov.fsi.models import CourseEvent, Course, CourseSubscription
 from onegov.fsi.models.course_notification_template import InfoTemplate, \
     SubscriptionTemplate, CancellationTemplate, ReminderTemplate
@@ -159,6 +162,52 @@ def with_open(func):
             )
             return func(file, *args[1:])
     return _read
+
+
+@with_open
+def import_teacher_data(csvfile, request):
+
+    session = request.session
+
+    sgk = session.query(Course).filter_by(
+        name='Sicherheitsgrundkurs (SGK)').one()
+
+    subscriptions = SubscriptionsCollection(session)
+    total_lines = 0
+    matched_count = 0
+
+    for ix, line in enumerate(csvfile.lines):
+        total_lines += 1
+        email = line.emailadresse.lower()
+        course_name = line.kursbezeichnung
+        if 'Sicherheitsgrundkurs' not in course_name:
+            continue
+
+        course_date = datetime.strptime(line.kursdatum, '%d.%m.%Y').date()
+        confirmed = line.besucht == 'J' and True or False
+
+        matched_teacher = session.query(User).filter_by(username=email).first()
+        if not matched_teacher:
+            print(f'{email} not found')
+            continue
+
+        matched_event = sgk.events.filter(
+            cast(CourseEvent.start, Date) == course_date
+        ).order_by(CourseEvent.start).first()
+
+        if matched_event:
+            if not confirmed:
+                print(f'{email} for {str(course_date)} not confirmed')
+            # print(f'Found {email} in database and event that day')
+            matched_count += 1
+            subscriptions.add(
+                course_event_id=matched_event.id,
+                attendee_id=matched_teacher.attendee.id,
+                event_completed=confirmed
+            )
+
+    print(f'Total lines: {total_lines}')
+    print(f'Matched emails/events: {matched_count}')
 
 
 def parse_completed(val):

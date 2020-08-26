@@ -3,7 +3,8 @@ import click
 from onegov.core.cache import lru_cache
 from onegov.core.cli import command_group
 from onegov.fsi import log
-from onegov.fsi.ims_import import parse_ims_data, import_ims_data
+from onegov.fsi.ims_import import parse_ims_data, import_ims_data, \
+    import_teacher_data
 from onegov.fsi.models import CourseAttendee
 from onegov.user.auth.clients import LDAPClient
 from onegov.user.auth.provider import ensure_user
@@ -31,6 +32,15 @@ def import_ims_data_cli(path):
 
     def execute(request, app):
         do_ims_import(path, request)
+    return execute
+
+
+@cli.command(name='import-teacher-data', context_settings={'singular': True})
+@click.option('--path', help='Filepath', required=True)
+def import_teacher_data_cli(path):
+
+    def execute(request, app):
+        import_teacher_data(path, request)
     return execute
 
 
