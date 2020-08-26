@@ -1,5 +1,3 @@
-from datetime import date, timedelta
-
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 from tests.onegov.translator_directory.shared import create_languages, \
