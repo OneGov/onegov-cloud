@@ -6,6 +6,8 @@ from sqlalchemy import Column, Text, ForeignKey, ARRAY, desc
 from sqlalchemy.orm import relationship, object_session, backref
 from uuid import uuid4
 
+external_attendee_org = "Externe Kursteilnehmer"
+
 
 class CourseAttendee(Base, ORMSearchable):
     """

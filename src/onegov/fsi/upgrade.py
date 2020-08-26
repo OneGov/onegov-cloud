@@ -8,6 +8,8 @@ from sqlalchemy import Column, ARRAY, Text, Boolean
 
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task
+from onegov.fsi.models import CourseAttendee
+from onegov.fsi.models.course_attendee import external_attendee_org
 
 
 @upgrade_task('Remove department column')
@@ -134,3 +136,12 @@ def change_refresh_interval(context):
         ALTER TABLE fsi_courses ALTER COLUMN refresh_interval
         TYPE INT USING extract(days FROM refresh_interval) / 30 / 12::int
         """))
+
+
+@upgrade_task('Adds organisation to external attendees')
+def add_org_to_external_attendee(context):
+    query = context.session.query(CourseAttendee).filter(
+        CourseAttendee.user_id == None)
+
+    for attendee in query:
+        attendee.organisation = external_attendee_org
