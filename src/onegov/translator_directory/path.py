@@ -1,7 +1,25 @@
 from onegov.translator_directory import TranslatorDirectoryApp
+from onegov.translator_directory.collections.language import LanguageCollection
+from onegov.translator_directory.collections.translator import \
+    TranslatorCollection
+from onegov.translator_directory.models.translator import Translator, Language
 
 
+@TranslatorDirectoryApp.path(
+    model=Translator, path='/translator/{pers_id}',
+    converters=dict(pers_id=int)
+)
+def get_translator(request, pers_id):
+    return TranslatorCollection(request.session).by_id(pers_id)
 
+
+@TranslatorDirectoryApp.path(
+    model=TranslatorCollection, path='/translators',
+    converters=dict(page=int, wlang=[int], slang=[int])
+)
+def get_translators(request, page=None, wlang=None, slang=None):
+    return TranslatorCollection(
+        request.session, page, written_langs=wlang, spoken_langs=slang)
 
 
 @TranslatorDirectoryApp.path(
