@@ -4,6 +4,7 @@ from onegov.org.models import Organisation
 
 
 def create_new_organisation(app, name, locale='de_CH'):
+    # Todo: add default languages
     assert locale == 'de_CH'
 
     path = module_path('onegov.translator_directory', 'content/de.yaml')
