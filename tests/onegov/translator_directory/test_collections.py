@@ -1,3 +1,4 @@
+from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 from tests.onegov.translator_directory.shared import create_languages, \
@@ -61,3 +62,9 @@ def test_collection_wrong_user_input(session):
     assert coll.order_desc is False
     assert coll.order_by == 'last_name'
 
+
+def test_language_collection(session):
+    coll = LanguageCollection(session)
+    zulu = coll.add(name='Zulu')
+    arabic = coll.add(name='Arabic')
+    assert coll.query().all() == [arabic, zulu]
