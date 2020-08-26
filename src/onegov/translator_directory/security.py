@@ -14,5 +14,3 @@ Secret: admins
 @TranslatorDirectoryApp.permission_rule(model=object, permission=Personal)
 def local_is_logged_in(app, identity, model, permission):
     return identity.role in ('admin', 'editor', 'member')
-
-
