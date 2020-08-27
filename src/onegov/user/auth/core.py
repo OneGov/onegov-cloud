@@ -118,7 +118,7 @@ class Auth(object):
         :param second_factor:
             The value of the second factor or None.
 
-        :skip_providers:
+        :param skip_providers:
             In special cases where e.g. an LDAP-Provider is a source of users
             but can't offer the password for authentication, you can login
             using the application database.
