@@ -11,7 +11,7 @@ def test_translator_collection(session):
     james = create_translator(session, email='james@memo.com', last_name='Z')
 
     translator = session.query(collection.model_class).one()
-    assert translator == collection.by_id(translator.pers_id)
+    assert translator == collection.by_id(translator.id)
     assert collection.query().all() == [translator]
 
     # Adds second translator

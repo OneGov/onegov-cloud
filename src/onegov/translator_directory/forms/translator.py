@@ -1,5 +1,5 @@
 from wtforms import SelectField, StringField, BooleanField, TextAreaField
-from wtforms.fields.html5 import DateField, EmailField
+from wtforms.fields.html5 import DateField, EmailField, IntegerField
 from wtforms.validators import InputRequired, Email, Optional
 
 from onegov.form import Form
@@ -37,6 +37,10 @@ class TranslatorForm(Form):
         label=_('Last name'),
         validators=[InputRequired()],
         fieldset=_('Personal Information')
+    )
+
+    pers_id = IntegerField(
+        label=_('Personal ID')
     )
 
     address = StringField(
@@ -92,7 +96,7 @@ class TranslatorForm(Form):
 
     email = EmailField(
         label=_('Email'),
-        validators=[InputRequired(), Email()],
+        validators=[Optional(), Email()],
         fieldset=_('Contact Information')
     )
 
@@ -116,14 +120,12 @@ class TranslatorForm(Form):
 
     availability = StringField(
         label=_('Availability'),
-        validators=[InputRequired()],
         fieldset=_('Contact Information')
     )
 
     # Todo: Add description field
     confirm_name_reveal = BooleanField(
         label=_('Name revealing confirmation'),
-        default=False
     )
 
     mother_tongue = SelectField(

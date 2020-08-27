@@ -6,11 +6,11 @@ from onegov.translator_directory.models.translator import Translator, Language
 
 
 @TranslatorDirectoryApp.path(
-    model=Translator, path='/translator/{pers_id}',
-    converters=dict(pers_id=int)
+    model=Translator, path='/translator/{id}',
+    converters=dict(id=int)
 )
-def get_translator(request, pers_id):
-    return TranslatorCollection(request.session).by_id(pers_id)
+def get_translator(request, id):
+    return TranslatorCollection(request.session).by_id(id)
 
 
 @TranslatorDirectoryApp.path(
