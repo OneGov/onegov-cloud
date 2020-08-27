@@ -1,3 +1,4 @@
+from onegov.fsi.models.course_attendee import external_attendee_org
 from onegov.user import User
 
 
@@ -66,6 +67,7 @@ def test_add_external_attendee(client):
 
     page = new.form.submit().follow()
     assert 'external@example.org' in page
+    assert external_attendee_org in page
 
     # Test adding twice
     page = client.get(view)

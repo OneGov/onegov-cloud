@@ -6,6 +6,7 @@ from onegov.form.fields import ChosenSelectMultipleField
 from onegov.fsi import _
 from onegov.form import Form
 from onegov.fsi.models import CourseAttendee
+from onegov.fsi.models.course_attendee import external_attendee_org
 from onegov.user import User
 
 
@@ -83,3 +84,8 @@ class AddExternalAttendeeForm(CourseAttendeeForm):
 
     def on_request(self):
         self.delete_field('permissions')
+
+    def get_useful_data(self, exclude={'csrf_token'}):
+        data = super().get_useful_data()
+        data['organisation'] = external_attendee_org
+        return data
