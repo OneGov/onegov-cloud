@@ -135,7 +135,7 @@ class Translator(Base, TimestampMixin, TranslatorDocumentsMixin):
     bank_address = Column(Text)
     account_owner = Column(Text)
 
-    email = Column(Text, unique=True)
+    email = Column(Text)
 
     # Which phone number should always be provided?
     tel_mobile = Column(Text,)
