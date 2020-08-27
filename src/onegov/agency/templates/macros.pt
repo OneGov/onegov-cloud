@@ -207,6 +207,18 @@
         </p>
     </metal:search_result_people>
 
+    <metal:search_result_people_bs define-macro="search_result_people_bs" i18n:domain="onegov.agency">
+        <a href="${request.link(result)}" class="worked">${result.title}</a>
+        <p tal:define="memberships result.memberships_by_agency">
+            <tal:block tal:repeat="membership memberships">
+                <span tal:condition="(membership.access == 'public' and agency.access == 'public') or request.is_logged_in" tal:define="agency membership.agency; parent agency.parent">
+                     <tal:b tal:define="parent_2 parent.parent|nothing" tal:condition="parent and parent_2">${parent_2.title} | </tal:b><tal:b tal:condition="parent">${parent.title} | </tal:b>${agency.title}<br>
+                </span>
+            </tal:block>
+            <span tal:condition="not:memberships|nothing" i18n:translate>People</span>
+        </p>
+    </metal:search_result_people_bs>
+
     <metal:search_result_agencies define-macro="search_result_agencies" i18n:domain="onegov.agency">
         <a href="${request.link(result)}">${result.title}</a>
         <p i18n:translate>Agencies</p>
