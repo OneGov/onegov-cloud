@@ -21,3 +21,5 @@ def test_translator(session):
     translator.written_languages.append(written)
     assert written.writers == [translator]
     assert translator.written_languages == [written]
+    assert not translator.certificates
+    assert not translator.applications

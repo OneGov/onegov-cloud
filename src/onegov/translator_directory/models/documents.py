@@ -22,7 +22,7 @@ class ConfirmationFile(File):
 
 
 class ComplaintFile(File):
-    """  """
+    """ Beschwerden """
     __mapper_args__ = {'polymorphic_identity': 'complaint'}
 
 

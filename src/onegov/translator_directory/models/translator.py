@@ -6,7 +6,11 @@ from sqlalchemy import Column, Text, Enum, Date, Integer, Table, ForeignKey, \
 from sqlalchemy.orm import relationship
 
 from onegov.core.orm import Base
+from onegov.core.orm.abstract import associated
 from onegov.core.orm.types import UUID
+from onegov.translator_directory.models.documents import CertificateFile, \
+    ApplicationFile, ClarificationFile, ConfirmationFile, ComplaintFile, \
+    CorrespondenceFile, MiscFile
 
 ADMISSIONS = ('uncertified', 'in_progress', 'certified')
 GENDERS = ('F', 'M', 'N')
@@ -75,7 +79,21 @@ editor_can_see = member_can_see + (
 )
 
 
-class Translator(Base, TimestampMixin):
+class TranslatorDocumentsMixin(object):
+    # Associated files
+    certificates = associated(CertificateFile, 'certificates', 'one-to-many')
+    applications = associated(ApplicationFile, 'applications', 'one-to-many')
+    clarifications = associated(
+        ClarificationFile, 'clarifications', 'one-to-many')
+    confirmations = associated(
+        ConfirmationFile, 'confirmations', 'one-to-many')
+    complaints = associated(ComplaintFile, 'complaints', 'one-to-many')
+    correspondences = associated(
+        CorrespondenceFile, 'correspondences', 'one-to-many')
+    other_files = associated(MiscFile, 'other_files', 'one-to-many')
+
+
+class Translator(Base, TimestampMixin, TranslatorDocumentsMixin):
 
     __tablename__ = 'translators'
 
@@ -157,10 +175,6 @@ class Translator(Base, TimestampMixin):
 
     # pre-defined certificates
     certificate = Column(Enum(*CERTIFICATES, name='certificate'))
-
-    # Associated files
-    # certificates = associated(CertificateFile, 'files', 'one-to-many')
-    # applications = associated(ApplicationFile, 'files', 'one-to-many')
 
     # Bemerkungen
     comments = Column(Text)
