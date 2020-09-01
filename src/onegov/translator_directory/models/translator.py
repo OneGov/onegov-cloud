@@ -182,3 +182,7 @@ class Translator(Base, TimestampMixin, TranslatorDocumentsMixin):
 
     # field for hiding to users except admins
     hidden = Column(Boolean, default=False, nullable=False)
+
+    @property
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
