@@ -10,6 +10,7 @@ from onegov.core.orm.types import UTCDateTime
 from onegov.core.upgrade import upgrade_task
 from onegov.fsi.models import CourseAttendee
 from onegov.fsi.models.course_attendee import external_attendee_org
+from onegov.user import User
 
 
 @upgrade_task('Remove department column')
@@ -145,3 +146,16 @@ def add_org_to_external_attendee(context):
 
     for attendee in query:
         attendee.organisation = external_attendee_org
+
+
+@upgrade_task('Adds permission for external attendees to role editor')
+def add_org_to_external_attendee(context):
+    query = context.session.query(CourseAttendee).join(User).filter(
+        User.role == 'editor')
+
+    for att in query:
+        if att.user_id and att.user.role == 'editor':
+            if not att.permissions:
+                att.permissions = [external_attendee_org]
+            elif external_attendee_org not in att.permissions:
+                att.permissions.append(external_attendee_org)

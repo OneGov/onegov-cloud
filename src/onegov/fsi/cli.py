@@ -6,6 +6,7 @@ from onegov.fsi import log
 from onegov.fsi.ims_import import parse_ims_data, import_ims_data, \
     import_teacher_data
 from onegov.fsi.models import CourseAttendee
+from onegov.fsi.models.course_attendee import external_attendee_org
 from onegov.user.auth.clients import LDAPClient
 from onegov.user.auth.provider import ensure_user
 
@@ -229,7 +230,10 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password):
             force_role=force_role)
 
         if not user.attendee:
-            user.attendee = CourseAttendee()
+            permissions = user.role == 'editor' \
+                          and external_attendee_org or None
+            user.attendee = CourseAttendee(permissions=permissions)
+
 
         user.attendee.first_name = data['first_name']
         user.attendee.last_name = data['last_name']
