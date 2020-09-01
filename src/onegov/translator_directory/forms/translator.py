@@ -5,7 +5,8 @@ from wtforms.validators import InputRequired, Email, Optional
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectField
 
-from onegov.form.validators import ValidPhoneNumber
+from onegov.form.validators import ValidPhoneNumber, \
+    ValidSwissSocialSecurityNumber
 from onegov.translator_directory import _
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import order_cols
@@ -20,12 +21,6 @@ class LanguageFormMixin:
 
 
 class TranslatorForm(Form):
-
-    """
-    Todo:
-    - validate unique email
-    - ....
-    """
 
     first_name = StringField(
         label=_('First name'),
@@ -84,7 +79,7 @@ class TranslatorForm(Form):
 
     social_sec_number = StringField(
         label=_('Swiss social security number'),
-        validators=[InputRequired()],
+        validators=[InputRequired(), ValidSwissSocialSecurityNumber()],
         fieldset=_('Personal Information')
     )
 
