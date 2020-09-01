@@ -1,0 +1,185 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE 1.0\n"
+"POT-Creation-Date: 2020-08-27 15:52+0200\n"
+"PO-Revision-Date: 2020-03-05 14:36+0100\n"
+"Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
+"Language-Team: German\n"
+"Language: de_CH\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Lingua 3.12\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.3\n"
+
+msgid "Profile"
+msgstr "Profil"
+
+msgid "User Profile"
+msgstr "Benutzerprofil"
+
+msgid "Logout"
+msgstr "Abmelden"
+
+msgid "Settings"
+msgstr "Einstellungen"
+
+msgid "Users"
+msgstr "Benutzer"
+
+msgid "Management"
+msgstr "Verwaltung"
+
+msgid "Login"
+msgstr "Anmelden"
+
+msgid "Some Link"
+msgstr ""
+
+msgid "Personal ID"
+msgstr "Personal Nr."
+
+msgid "Personal Information"
+msgstr "Persönliche Informationen"
+
+msgid "First name"
+msgstr "Vorname"
+
+msgid "Last name"
+msgstr "Nachname"
+
+msgid "Address"
+msgstr "Addresse"
+
+msgid "Zip Code"
+msgstr "PLZ"
+
+msgid "City"
+msgstr "Ort"
+
+msgid "Gender"
+msgstr "Geschlecht"
+
+msgid "Date of birth"
+msgstr "Geburtsdatum"
+
+msgid "Nationality"
+msgstr "Nationalität"
+
+msgid "Swiss social security number"
+msgstr "AHV-Nr."
+
+msgid "Withholding tax"
+msgstr "Quellensteuer"
+
+msgid "Email"
+msgstr ""
+
+msgid "Contact Information"
+msgstr "Kontaktinformationen"
+
+msgid "Mobile Phone Number"
+msgstr "Telefon Mobile"
+
+msgid "Private Phone Number"
+msgstr "Telefon Privat"
+
+msgid "Office Phone Number"
+msgstr "Telefon Geschäft"
+
+msgid "Availability"
+msgstr "Erreich- und Verfügbarkeit"
+
+msgid "Mother tongue"
+msgstr "Muttersprache"
+
+msgid "Languages skills"
+msgstr "Sprachkenntnisse"
+
+msgid "Spoken languages"
+msgstr "Sprachen Wort"
+
+msgid "Written languages"
+msgstr "Sprachen Schrift"
+
+msgid "Name reveal confirmation"
+msgstr "Zustimmung Namensbekanntgabe"
+
+msgid "Comments"
+msgstr "Bemerkungen"
+
+msgid "Order by"
+msgstr "Sortiere nach"
+
+msgid "Driving distance"
+msgstr "Wegberechnung"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nein"
+
+msgid "Unknown"
+msgstr "Unbekannt"
+
+msgid "Translators"
+msgstr "Übersetzer/innen"
+
+msgid "Edit translator"
+msgstr "Übersetzer/in"
+
+msgid "Edit"
+msgstr "Bearbeiten"
+
+msgid "Add translator"
+msgstr "Übersetzer/in hinzufügen"
+
+msgid "Add"
+msgstr "Hinzufügen"
+
+msgid "masculin"
+msgstr "Männlich"
+
+msgid "feminin"
+msgstr "Weiblich"
+
+msgid "neutral"
+msgstr "Neutral"
+
+msgid "Bank name"
+msgstr "Bank Name"
+
+msgid "Account owner"
+msgstr "Bank Konto lautend auf"
+
+msgid "Date of application"
+msgstr "Bewerbung Datum"
+
+msgid "Date of decision"
+msgstr "Entscheid Datum"
+
+msgid "Proof of preconditions"
+msgstr "Nachweis der Voraussetzung"
+
+msgid "Agency references"
+msgstr "Referenzen Behörden"
+
+msgid "Education as interpreter"
+msgstr "Ausbildung Dolmetscher"
+
+msgid "Certificate"
+msgstr "Zertifikat"
+
+msgid "Added a new translator"
+msgstr "Übersetzer/in hinzugefügt"
+
+msgid "Your changes were saved"
+msgstr "Ihre Änderungen wurden gespeichert"
+
+#~ msgid "Name revealing confirmation"
+#~ msgstr "Zustimmung Namensbekanntgabe"
+
+#~ msgid "Mobile Number"
+#~ msgstr "Telefon Mobile"

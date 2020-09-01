@@ -1,0 +1,145 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.translator_directory">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="row">
+            <div class="columns small-12">
+                <div class="row">
+                    <div class="columns small-12 medium-6">
+                        <tal:b tal:condition="model|nothing">
+                            <dl class="field-display" tal:condition="model.pers_id is not None and not layout.show('pers_id')">
+                                <dt i18n:translate>Personal ID</dt>
+                                <dd>${model.pers_id}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.gender and layout.show('gender')">
+                                <dt i18n:translate>Gender</dt>
+                                <dd>${layout.format_gender(model.gender)}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.date_of_birth and layout.show('date_of_birth')">
+                                <dt i18n:translate>Date of birth</dt>
+                                <dd>${layout.format_date(model.date_of_birth, 'date')}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.nationality and layout.show('nationality')">
+                                <dt i18n:translate>Nationality</dt>
+                                <dd>${model.nationality}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.address and layout.show('address')">
+                                <dt i18n:translate>Address</dt>
+                                <dd>${model.address}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.zip_code and layout.show('zip_code')">
+                                <dt i18n:translate>Zip Code</dt>
+                                <dd>${model.zip_code}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.city and layout.show('city')">
+                                <dt i18n:translate>City</dt>
+                                <dd>${model.city}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.drive_distance and layout.show('drive_distance')">
+                                <dt i18n:translate>Driving distance</dt>
+                                <dd>${layout.format_distance(model.drive_distance)}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.social_sec_number and layout.show('social_sec_number')">
+                                <dt i18n:translate>Swiss social security number</dt>
+                                <dd>${model.social_sec_number}</dd>
+                            </dl>
+                             <dl class="field-display" tal:condition="model.bank_name and layout.show('bank_name')">
+                                <dt i18n:translate>Bank name</dt>
+                                <dd>${model.bank_name}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.bank_address and layout.show('bank_address')">
+                                <dt i18n:translate>Bank address</dt>
+                                <dd>${model.address}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.account_owner and layout.show('account_owner')">
+                                <dt i18n:translate>Account owner</dt>
+                                <dd>${model.account_owner}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.email and layout.show('email')">
+                                <dt i18n:translate>Email</dt>
+                                <dd tal:replace="structure layout.linkify(model.email)"></dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.tel_private and layout.show('tel_private')">
+                                <dt i18n:translate>Private Phone Number</dt>
+                                <dd tal:replace="structure layout.linkify(model.tel_private)"></dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.tel_mobile and layout.show('tel_mobile')">
+                                <dt i18n:translate>Mobile Phone Number</dt>
+                                <dd tal:replace="structure layout.linkify(model.tel_mobile)"></dd>
+                            </dl>
+                             <dl class="field-display" tal:condition="model.tel_office and layout.show('tel_office')">
+                                <dt i18n:translate>Office Phone Number</dt>
+                                <dd tal:replace="structure layout.linkify(model.tel_office)"></dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.availability and layout.show('availability')">
+                                <dt i18n:translate>Availability</dt>
+                                <dd>${model.availability}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.availability and layout.show('availability')">
+                                <dt i18n:translate>Availability</dt>
+                                <dd>${model.availability}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.confirm_name_reveal and layout.show('confirm_name_reveal')">
+                                <dt i18n:translate>Name reveal confirmation</dt>
+                                <dd>${model.confirm_name_reveal}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.confirm_name_reveal and layout.show('confirm_name_reveal')">
+                                <dt i18n:translate>Name reveal confirmation</dt>
+                                <dd>${layout.format_boolean(model.confirm_name_reveal)}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.date_of_application and layout.show('date_of_application')">
+                                <dt i18n:translate>Date of application</dt>
+                                <dd>${layout.format_date(model.date_of_application, 'date')}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.date_of_decision and layout.show('date_of_decision')">
+                                <dt i18n:translate>Date of decision</dt>
+                                <dd>${layout.format_date(model.date_of_decision, 'date')}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.mother_tongue and layout.show('mother_tongue')">
+                                <dt i18n:translate>Mother tongue</dt>
+                                <dd>${model.mother_tongue.name}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.spoken_languages and layout.show('spoken_languages')">
+                                <dt i18n:translate>Spoken languages</dt>
+                                <dd >${layout.format_languages(model.spoken_languages)}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.written_languages and layout.show('written_languages')">
+                                <dt i18n:translate>Written languages</dt>
+                                <dd >${layout.format_languages(model.written_languages)}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.proof_of_preconditions and layout.show('proof_of_preconditions')">
+                                <dt i18n:translate>Proof of preconditions</dt>
+                                <dd >${model.proof_of_preconditions}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.agency_references and layout.show('agency_references')">
+                                <dt i18n:translate>Agency references</dt>
+                                <dd >${model.agency_references}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.proof_of_preconditions and layout.show('proof_of_preconditions')">
+                                <dt i18n:translate>Proof of preconditions</dt>
+                                <dd >${model.proof_of_preconditions}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.education_as_interpreter and layout.show('education_as_interpreter')">
+                                <dt i18n:translate>Education as interpreter</dt>
+                                <dd >${layout.format_bool_or_none(model.education_as_interpreter)}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.proof_of_preconditions and layout.show('proof_of_preconditions')">
+                                <dt i18n:translate>Proof of preconditions</dt>
+                                <dd >${model.proof_of_preconditions}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.certificate and layout.show('certificate')">
+                                <dt i18n:translate>Certificate</dt>
+                                <dd >${model.certificate}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.comments and layout.show('comments')">
+                                <dt i18n:translate>Comments</dt>
+                                <dd >${model.comments}</dd>
+                            </dl>
+                       </tal:b>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </tal:b>
+</div>
