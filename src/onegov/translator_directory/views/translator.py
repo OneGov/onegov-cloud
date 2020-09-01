@@ -38,12 +38,11 @@ def add_new_translator(self, request, form):
     template='translator.pt',
     permission=Personal
 )
-def view_translator(self, request, form):
+def view_translator(self, request):
     layout = TranslatorLayout(self, request)
     return {
         'layout': layout,
         'model': self,
-        'form': form,
         'title': self.title
     }
 
