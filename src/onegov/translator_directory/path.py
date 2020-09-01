@@ -1,4 +1,3 @@
-from onegov.core.orm.types import UUID
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import \
@@ -19,7 +18,7 @@ def get_translator(request, id):
 )
 def get_translators(request, page=None, wlang=None, slang=None):
     return TranslatorCollection(
-        request.session, page, written_langs=wlang, spoken_langs=slang)
+        request.session, page or 0, written_langs=wlang, spoken_langs=slang)
 
 
 @TranslatorDirectoryApp.path(
