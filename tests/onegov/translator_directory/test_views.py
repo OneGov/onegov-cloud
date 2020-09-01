@@ -91,3 +91,37 @@ def test_view_translator(client):
     tel_mobile = translator_data['tel_mobile']
     assert f'<a href="mailto:{mail}">{mail}</a>' in page
     assert f'<a href="tel:{tel_mobile}">{tel_mobile}</a>' in page
+
+
+def test_view_languages(client):
+    client.get('/languages', status=403)
+    client.login_member()
+    page = client.get('/languages')
+    assert 'Keine Ergebnisse gefunden' in page
+
+    create_languages(client.app.session())
+    transaction.commit()
+
+    page = client.get('/languages')
+    assert 'Italian' in page
+
+
+def test_create_new_language(client):
+    client.login_editor()
+    client.get('/languages/new', status=403)
+    client.login_admin()
+    page = client.get('/languages/new')
+
+    page.form['name'] = '     '
+    page = page.form.submit()
+    assert 'Dieses Feld wird benötigt' in page
+
+    page.form['name'] = ' enGlish   '
+    page = page.form.submit().follow()
+    assert 'Added language English' in page
+    assert 'English' in page
+
+    page = client.get('/languages/new')
+    page.form['name'] = 'English'
+    page = page.form.submit()
+    assert 'English existiert bereits' in page

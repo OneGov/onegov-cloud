@@ -2,7 +2,7 @@ from uuid import uuid4
 from onegov.translator_directory import _
 from libres.db.models.timestamp import TimestampMixin
 from sqlalchemy import Column, Text, Enum, Date, Integer, Table, ForeignKey, \
-    Boolean
+    Boolean, Index
 from sqlalchemy.orm import relationship
 
 from onegov.core.orm import Base
@@ -21,6 +21,10 @@ CERTIFICATES = ('ZHAW', 'OGZH')
 class Language(Base):
 
     __tablename__ = 'languages'
+
+    __table_args__ = (
+        Index('unique_name', 'name', unique=True),
+    )
 
     id = Column(UUID, primary_key=True, default=uuid4)
     name = Column(Text, nullable=False)
