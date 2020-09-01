@@ -144,13 +144,13 @@ class TranslatorForm(Form, LanguageFormMixin):
         choices=[]
     )
 
-    spoken_languages = ChosenSelectField(
+    spoken_languages = ChosenSelectMultipleField(
         label=_('Spoken languages'),
         validators=[StrictOptional()],
         choices=[]
     )
 
-    written_languages = ChosenSelectField(
+    written_languages = ChosenSelectMultipleField(
         label=_('Written languages'),
         validators=[StrictOptional()],
         choices=[]
