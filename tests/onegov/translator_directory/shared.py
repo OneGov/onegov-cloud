@@ -4,18 +4,21 @@ from datetime import date, timedelta
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
+from onegov.translator_directory.models.translator import GENDERS
 
 translator_data = dict(
+    pers_id=1234,
     first_name='Hugo',
     last_name='Benito',
     admission=None,
     withholding_tax='No idea what datatype this is',
-    gender='M',
+    gender=GENDERS[0],
     date_of_birth=date.today(),
     nationality='CH',
     address='Downing Street 5',
     zip_code='4000',
     city='Luzern',
+    drive_distance=None,
     social_sec_number='1234',
     bank_name='R-BS',
     bank_address='Bullstreet 5',
@@ -28,6 +31,11 @@ translator_data = dict(
     confirm_name_reveal=None,
     date_of_application=date.today() - timedelta(days=100),
     date_of_decision=date.today() - timedelta(days=50),
+    proof_of_preconditions='all okay',
+    agency_references='Some ref',
+    education_as_interpreter=False,
+    certificate=None,
+    comments=None
 )
 
 
