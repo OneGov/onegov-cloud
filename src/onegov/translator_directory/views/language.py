@@ -42,7 +42,7 @@ def view_translators(self, request):
         'layout': DefaultLayout(self, request),
         'model': self,
         'title': _('Languages'),
-        'languages': self.query()
+        'languages': self.batch
     }
 
 
