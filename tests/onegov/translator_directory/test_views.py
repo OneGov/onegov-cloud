@@ -66,6 +66,16 @@ def test_view_new_translator(client):
     # test written languages
     assert language_names[2] in page
 
+    # try adding another with same email
+    page = client.get('/translators/new')
+    page.form['first_name'] = 'Uncle'
+    page.form['last_name'] = 'Bob'
+    page.form['agency_references'] = 'All okay'
+    page.form['email'] = 'test@test.com'
+
+    page = page.form.submit()
+    assert 'Ein(e) Übersetzer/in mit dieser Email existiert bereits' in page
+
 
 def test_view_translator(client):
     session = client.app.session()

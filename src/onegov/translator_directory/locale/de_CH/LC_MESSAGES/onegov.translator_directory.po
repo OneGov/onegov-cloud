@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-08-27 15:52+0200\n"
+"POT-Creation-Date: 2020-09-01 11:00+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -40,14 +40,23 @@ msgstr ""
 msgid "Personal ID"
 msgstr "Personal Nr."
 
-msgid "Personal Information"
-msgstr "Persönliche Informationen"
-
 msgid "First name"
 msgstr "Vorname"
 
 msgid "Last name"
 msgstr "Nachname"
+
+msgid "Gender"
+msgstr "Geschlecht"
+
+msgid "Date of birth"
+msgstr "Geburtsdatum"
+
+msgid "Personal Information"
+msgstr "Persönliche Informationen"
+
+msgid "Nationality"
+msgstr "Nationalität"
 
 msgid "Address"
 msgstr "Addresse"
@@ -58,28 +67,28 @@ msgstr "PLZ"
 msgid "City"
 msgstr "Ort"
 
-msgid "Gender"
-msgstr "Geschlecht"
-
-msgid "Date of birth"
-msgstr "Geburtsdatum"
-
-msgid "Nationality"
-msgstr "Nationalität"
+msgid "Drive distance"
+msgstr "Wegberechung"
 
 msgid "Swiss social security number"
 msgstr "AHV-Nr."
 
-msgid "Withholding tax"
-msgstr "Quellensteuer"
+msgid "Bank name"
+msgstr "Bank Name"
+
+msgid "Bank address"
+msgstr ""
+
+msgid "Account owner"
+msgstr "Bank Konto lautend auf"
 
 msgid "Email"
 msgstr ""
 
-msgid "Contact Information"
-msgstr "Kontaktinformationen"
+msgid "Withholding tax"
+msgstr "Quellensteuer"
 
-msgid "Mobile Phone Number"
+msgid "Mobile Number"
 msgstr "Telefon Mobile"
 
 msgid "Private Phone Number"
@@ -91,11 +100,17 @@ msgstr "Telefon Geschäft"
 msgid "Availability"
 msgstr "Erreich- und Verfügbarkeit"
 
+msgid "Name revealing confirmation"
+msgstr "Zustimmung Namensbekanntgabe"
+
+msgid "Date of application"
+msgstr "Bewerbung Datum"
+
+msgid "Date of decision"
+msgstr "Entscheid Datum"
+
 msgid "Mother tongue"
 msgstr "Muttersprache"
-
-msgid "Languages skills"
-msgstr "Sprachkenntnisse"
 
 msgid "Spoken languages"
 msgstr "Sprachen Wort"
@@ -103,26 +118,26 @@ msgstr "Sprachen Wort"
 msgid "Written languages"
 msgstr "Sprachen Schrift"
 
-msgid "Name reveal confirmation"
-msgstr "Zustimmung Namensbekanntgabe"
+msgid "Proof of preconditions"
+msgstr "Nachweis der Voraussetzung"
+
+msgid "Agency references"
+msgstr "Referenzen Behörden"
+
+msgid "Education as interpreter"
+msgstr "Ausbildung Dolmetscher"
+
+msgid "Certificate"
+msgstr "Zertifikat"
 
 msgid "Comments"
 msgstr "Bemerkungen"
 
+msgid "A translator with this email already exists"
+msgstr "Ein(e) Übersetzer/in mit dieser Email existiert bereits"
+
 msgid "Order by"
 msgstr "Sortiere nach"
-
-msgid "Driving distance"
-msgstr "Wegberechnung"
-
-msgid "Yes"
-msgstr "Ja"
-
-msgid "No"
-msgstr "Nein"
-
-msgid "Unknown"
-msgstr "Unbekannt"
 
 msgid "Translators"
 msgstr "Übersetzer/innen"
@@ -145,32 +160,14 @@ msgstr "Männlich"
 msgid "feminin"
 msgstr "Weiblich"
 
-msgid "neutral"
-msgstr "Neutral"
+msgid "Driving distance"
+msgstr "Wegberechnung"
 
-msgid "Bank name"
-msgstr "Bank Name"
+msgid "Mobile Phone Number"
+msgstr "Telefon Mobile"
 
-msgid "Account owner"
-msgstr "Bank Konto lautend auf"
-
-msgid "Date of application"
-msgstr "Bewerbung Datum"
-
-msgid "Date of decision"
-msgstr "Entscheid Datum"
-
-msgid "Proof of preconditions"
-msgstr "Nachweis der Voraussetzung"
-
-msgid "Agency references"
-msgstr "Referenzen Behörden"
-
-msgid "Education as interpreter"
-msgstr "Ausbildung Dolmetscher"
-
-msgid "Certificate"
-msgstr "Zertifikat"
+msgid "Name reveal confirmation"
+msgstr "Zustimmung Namensbekanntgabe"
 
 msgid "Added a new translator"
 msgstr "Übersetzer/in hinzugefügt"
@@ -178,8 +175,20 @@ msgstr "Übersetzer/in hinzugefügt"
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
-#~ msgid "Name revealing confirmation"
-#~ msgstr "Zustimmung Namensbekanntgabe"
+#~ msgid "Contact Information"
+#~ msgstr "Kontaktinformationen"
 
-#~ msgid "Mobile Number"
-#~ msgstr "Telefon Mobile"
+#~ msgid "Languages skills"
+#~ msgstr "Sprachkenntnisse"
+
+#~ msgid "Yes"
+#~ msgstr "Ja"
+
+#~ msgid "No"
+#~ msgstr "Nein"
+
+#~ msgid "Unknown"
+#~ msgstr "Unbekannt"
+
+#~ msgid "neutral"
+#~ msgstr "Neutral"

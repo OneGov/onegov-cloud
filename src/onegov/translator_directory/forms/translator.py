@@ -75,7 +75,7 @@ class TranslatorForm(Form, LanguageFormMixin):
     )
 
     drive_distance = IntegerField(
-        label=_('Driving Distance'),
+        label=_('Drive distance'),
         validators=[Optional()]
     )
 
@@ -237,7 +237,7 @@ class TranslatorSearchForm(Form, LanguageFormMixin):
         label=_('Order by'),
         choices=[
             (order_cols[0], _('Last name')),
-            (order_cols[1], _('Driving distance'))
+            (order_cols[1], _('Drive distance'))
         ]
     )
 
