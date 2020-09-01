@@ -12,7 +12,7 @@ def get_base_tools(request):
 
     if request.is_logged_in:
 
-        usr = request.current_username
+        usr = request.current_user
 
         profile_links = [
             Link(
