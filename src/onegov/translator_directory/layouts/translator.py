@@ -7,7 +7,7 @@ from onegov.org.layout import DefaultLayout as BaseLayout
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 from onegov.translator_directory.models.translator import member_can_see, \
-    editor_can_see, GENDERS_DESC, GENDERS
+    editor_can_see, GENDERS_DESC, GENDERS, Language
 
 
 class DefaultLayout(BaseLayout):
@@ -42,7 +42,13 @@ class TranslatorLayout(DefaultLayout):
 
     @staticmethod
     def format_drive_distance(number):
+        if not number:
+            return ''
         return f'{number} km'
+
+    @staticmethod
+    def format_languages(languages):
+        return ', '.join(sorted((lang.name for lang in languages or [])))
 
 
 class EditTranslatorLayout(TranslatorLayout):

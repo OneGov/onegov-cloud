@@ -16,7 +16,9 @@ def test_view_new_translator(client):
     """
 
     session = client.app.session()
-    create_languages(session)
+    languages = create_languages(session)
+    language_ids = [str(lang.id) for lang in languages]
+    language_names = [lang.name for lang in languages]
     transaction.commit()
 
     client.login_editor()
@@ -42,12 +44,27 @@ def test_view_new_translator(client):
 
     # non required fields
     page.form['email'] = 'Test@test.com'
+    page.form['spoken_languages'] = [
+        language_ids[0], language_ids[1]
+    ]
+    page.form['written_languages'] = [
+        language_ids[2]
+    ]
+
     page = page.form.submit().follow()
     assert 'Uncle' in page
     # test lower-casing the user input
     assert 'test@test.com' in page
+
     # Test mother tongue set
     assert 'Arabic' in page
+
+    # test spoken languages
+    assert language_names[0] in page
+    assert language_names[1] in page
+
+    # test written languages
+    assert language_names[2] in page
 
 
 def test_view_translator(client):

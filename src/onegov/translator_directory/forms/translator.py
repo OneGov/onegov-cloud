@@ -4,7 +4,7 @@ from wtforms.fields.html5 import DateField, EmailField, IntegerField
 from wtforms.validators import InputRequired, Email, Optional, ValidationError
 
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectField
+from onegov.form.fields import ChosenSelectField, ChosenSelectMultipleField
 
 from onegov.form.validators import ValidPhoneNumber, \
     ValidSwissSocialSecurityNumber, StrictOptional
@@ -198,8 +198,20 @@ class TranslatorForm(Form, LanguageFormMixin):
 
     def get_useful_data(self, exclude={'csrf_token'}):
         data = super().get_useful_data(
-            exclude={'csrf_token', 'spoken_languages', 'written_languages',
-                     'mother_tongue'})
+            exclude={'csrf_token', 'spoken_languages', 'written_languages'})
+
+        languages = LanguageCollection(self.request.session)
+
+        if self.spoken_languages:
+            spoken = languages.by_ids(self.spoken_languages.data).all()
+            assert len(spoken) == len(self.spoken_languages.data)
+            data['spoken_languages'] = spoken
+
+        if self.written_languages:
+            written = languages.by_ids(self.written_languages.data).all()
+            assert len(written) == len(self.written_languages.data)
+            data['written_languages'] = written
+
         return data
 
     def validate_email(self, field):
