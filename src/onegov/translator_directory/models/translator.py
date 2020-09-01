@@ -1,5 +1,5 @@
 from uuid import uuid4
-
+from onegov.translator_directory import _
 from libres.db.models.timestamp import TimestampMixin
 from sqlalchemy import Column, Text, Enum, Date, Integer, Table, ForeignKey, \
     Boolean
@@ -13,7 +13,8 @@ from onegov.translator_directory.models.documents import CertificateFile, \
     CorrespondenceFile, MiscFile
 
 ADMISSIONS = ('uncertified', 'in_progress', 'certified')
-GENDERS = ('F', 'M', 'N')
+GENDERS = ('M', 'F', 'N')
+GENDERS_DESC = (_('masculin'), _('feminin'), 'neutral')
 CERTIFICATES = ('ZHAW', 'OGZH')
 
 
