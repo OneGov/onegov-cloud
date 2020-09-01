@@ -1,3 +1,4 @@
+from onegov.core.orm.types import UUID
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import \
@@ -6,8 +7,7 @@ from onegov.translator_directory.models.translator import Translator, Language
 
 
 @TranslatorDirectoryApp.path(
-    model=Translator, path='/translator/{id}',
-    converters=dict(id=int)
+    model=Translator, path='/translator/{id}'
 )
 def get_translator(request, id):
     return TranslatorCollection(request.session).by_id(id)
