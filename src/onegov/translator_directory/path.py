@@ -14,7 +14,7 @@ def get_translator(request, id):
 
 @TranslatorDirectoryApp.path(
     model=TranslatorCollection, path='/translators',
-    converters=dict(page=int, wlang=[int], slang=[int])
+    converters=dict(page=int, wlang=[], slang=[])
 )
 def get_translators(request, page=None, wlang=None, slang=None):
     return TranslatorCollection(
