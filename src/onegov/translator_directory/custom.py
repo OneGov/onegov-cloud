@@ -1,5 +1,7 @@
 from onegov.core.elements import Link
 from onegov.translator_directory import TranslatorDirectoryApp
+from onegov.translator_directory.collections.translator import \
+    TranslatorCollection
 
 from onegov.translator_directory.layout import DefaultLayout
 from onegov.translator_directory import _
@@ -88,8 +90,8 @@ def get_top_navigation(request):
 
     # inject an activites link in front of all top navigation links
     yield Link(
-        text=_("Some Link"),
-        url=''
+        text=_("Translators"),
+        url=request.class_link(TranslatorCollection)
     )
 
     layout = DefaultLayout(request.app.org, request)
