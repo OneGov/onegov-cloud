@@ -5,7 +5,6 @@ from onegov.translator_directory.collections.translator import \
 from onegov.translator_directory.models.translator import CERTIFICATES
 from tests.onegov.translator_directory.shared import translator_data, \
     create_languages
-from tests.shared.utils import open_in_browser
 
 
 def test_view_new_translator(client):
@@ -47,6 +46,8 @@ def test_view_new_translator(client):
     assert 'Uncle' in page
     # test lower-casing the user input
     assert 'test@test.com' in page
+    # Test mother tongue set
+    assert 'Arabic' in page
 
 
 def test_view_translator(client):

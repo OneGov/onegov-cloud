@@ -138,7 +138,7 @@ class TranslatorForm(Form, LanguageFormMixin):
         validators=[Optional()]
     )
 
-    mother_tongue = SelectField(
+    mother_tongue_id = SelectField(
         label=_('Mother tongue'),
         validators=[InputRequired()],
         choices=[]
@@ -192,7 +192,7 @@ class TranslatorForm(Form, LanguageFormMixin):
 
     def on_request(self):
         self.gender.choices = self.gender_choices
-        self.mother_tongue.choices = self.language_choices
+        self.mother_tongue_id.choices = self.language_choices
         self.spoken_languages.choices = self.language_choices
         self.written_languages.choices = self.language_choices
 
