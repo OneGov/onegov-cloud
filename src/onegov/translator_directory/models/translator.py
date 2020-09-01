@@ -22,7 +22,7 @@ class Language(Base):
 
     __tablename__ = 'languages'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(UUID, primary_key=True, default=uuid4)
     name = Column(Text, nullable=False)
 
 
@@ -34,7 +34,7 @@ spoken_association_table = Table(
         UUID,
         ForeignKey('translators.id'),
         nullable=False),
-    Column('lang_id', Integer, ForeignKey('languages.id'), nullable=False)
+    Column('lang_id', UUID, ForeignKey('languages.id'), nullable=False)
 )
 
 written_association_table = Table(
@@ -45,7 +45,7 @@ written_association_table = Table(
         UUID,
         ForeignKey('translators.id'),
         nullable=False),
-    Column('lang_id', Integer, ForeignKey('languages.id'), nullable=False)
+    Column('lang_id', UUID, ForeignKey('languages.id'), nullable=False)
 )
 
 
@@ -154,7 +154,7 @@ class Translator(Base, TimestampMixin, TranslatorDocumentsMixin):
 
     # Language Information
     mother_tongue_id = Column(
-        Integer, ForeignKey('languages.id')
+        UUID, ForeignKey('languages.id')
     )
     mother_tongue = relationship('Language')
 

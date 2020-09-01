@@ -23,8 +23,7 @@ def get_translators(request, page=None, wlang=None, slang=None):
 
 
 @TranslatorDirectoryApp.path(
-    model=Language, path='/language/{id}',
-    converters=dict(id=int)
+    model=Language, path='/language/{id}'
 )
 def get_language(request, id):
     return LanguageCollection(request.session).by_id(id)
