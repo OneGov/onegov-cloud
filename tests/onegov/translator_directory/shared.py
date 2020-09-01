@@ -34,7 +34,7 @@ translator_data = dict(
 def create_languages(session):
     languages = []
     collection = LanguageCollection(session)
-    for lang in ('German', 'French', 'Italian'):
+    for lang in ('German', 'French', 'Italian', 'Arabic'):
         languages.append(collection.add(name=lang))
     return languages
 
