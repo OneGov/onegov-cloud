@@ -225,12 +225,14 @@ class TranslatorForm(Form, LanguageFormMixin):
 
 class TranslatorSearchForm(Form, LanguageFormMixin):
 
-    spoken_languages = ChosenSelectField(
-        label=_('Spoken languages')
+    spoken_langs = ChosenSelectMultipleField(
+        label=_('Spoken languages'),
+        choices=[]
     )
 
-    written_languages = ChosenSelectField(
-        label=_('Written languages')
+    written_langs = ChosenSelectMultipleField(
+        label=_('Written languages'),
+        choices=[]
     )
 
     order_by = SelectField(
@@ -241,6 +243,14 @@ class TranslatorSearchForm(Form, LanguageFormMixin):
         ]
     )
 
+    order_desc = SelectField(
+        label=_('Order by'),
+        choices=[
+            ('', _('Ascending')),
+            ('yes', _('Descending'))
+        ]
+    )
+
     def on_request(self):
-        self.spoken_languages.choices = self.language_choices
-        self.written_languages.choices = self.language_choices
+        self.spoken_langs.choices = self.language_choices
+        self.written_langs.choices = self.language_choices

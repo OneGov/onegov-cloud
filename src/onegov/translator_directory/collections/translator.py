@@ -29,8 +29,8 @@ class TranslatorCollection(GenericCollection, Pagination):
         if written_langs:
             assert isinstance(written_langs, list)
 
-        self.written_langs = written_langs
-        self.spoken_langs = spoken_langs
+        self.written_langs = written_langs and set(written_langs)
+        self.spoken_langs = spoken_langs and set(spoken_langs)
 
         if not order_by or order_by not in order_cols:
             order_by = order_cols[0]
@@ -80,7 +80,7 @@ class TranslatorCollection(GenericCollection, Pagination):
         )
 
     def page_by_index(self, index):
-        self.__class__(
+        return self.__class__(
             self.session,
             page=index,
             written_langs=self.written_langs,
@@ -99,3 +99,11 @@ class TranslatorCollection(GenericCollection, Pagination):
 
         query = query.order_by(self.order_expression)
         return query
+
+    def by_form(self, form):
+        return self.__class__(
+            self.session,
+            page=0,
+            order_desc=form.order_desc.data and True or False,
+            **form.get_useful_data(exclude={'csrf_token', 'order_desc'})
+        )

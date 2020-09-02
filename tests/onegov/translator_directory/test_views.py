@@ -2,7 +2,8 @@ import transaction
 
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
-from onegov.translator_directory.models.translator import CERTIFICATES
+from onegov.translator_directory.models.translator import CERTIFICATES, \
+    Translator, Language
 from tests.onegov.translator_directory.shared import translator_data, \
     create_languages
 
@@ -125,3 +126,26 @@ def test_create_new_language(client):
     page.form['name'] = 'English'
     page = page.form.submit()
     assert 'English existiert bereits' in page
+
+
+def test_view_translators_search(client):
+    """
+    - test pagination
+    - test fields not to be shown for member and
+
+    """
+    client.get('/translators', status=403)
+    client.login_member()
+    page = client.get('/translators')
+    assert 'Keine Ergebnisse gefunden' in page
+
+    session = client.app.session()
+    create_languages(session)
+    translators = TranslatorCollection(session)
+    translators.add(**translator_data)
+    transaction.commit()
+
+    translator = session.query(Translator).one()
+    languages = session.query(Language).all()
+
+    page = client.get('/translators')

@@ -1,0 +1,62 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.translator_directory">
+    <tal:b metal:fill-slot="title">
+        ${title}
+    </tal:b>
+    <tal:b metal:fill-slot="content">
+        <div class="row">
+            <div class="columns small-12">
+                <div class="row">
+                    <div class="columns small-12 medium-6">
+                        <div class="translators-filter">
+                            <div class="search"></div>
+                        </div>
+                        <div class="search-results">
+                            <p tal:condition="not: results" i18n:translate="">
+                                No results found
+                            </p>
+                            <table class="search-results-table" tal:condition="results">
+                                <thead>
+                                    <th i18n:translate="" tal:condition="layout.show('pers_id')">Personal ID</th>
+                                    <th i18n:translate="" tal:condition="layout.show('withholding_tax')">Withholding tax</th>
+                                    <th i18n:translate="">Name</th>
+                                    <th i18n:translate="">Written languages</th>
+                                    <th i18n:translate="">Spoken languages</th>
+                                    <th i18n:translate="">Drive distance</th>
+                                    <th i18n:translate="">Phone numbers</th>
+                                    <th i18n:translate="">Email</th>
+                                </thead>
+                                <tbody>
+                                    <tr tal:repeat="translator results">
+                                        <td tal:condition="layout.show('pers_id')">${translator.pers_id or ''}</td>
+                                        <td tal:condition="layout.show('withholding_tax')">${translator.withholding_tax or ''}</td>
+                                        <td><a href="${request.link(translator)}">${translator.full_name}</a></td>
+                                        <td>
+                                            <tal:b tal:repeat="language translator.written_languages">
+                                                <p tal:define="count language.writers.count()">${language.name} (${count}})</p>
+                                            </tal:b>
+                                        </td>
+                                        <td>
+                                            <tal:b tal:repeat="language translator.spoken_languages">
+                                                <p tal:define="count language.speakers.count()">${language.name} (${count}})</p>
+                                            </tal:b>
+                                        </td>
+                                        <td>
+                                        </td>
+                                        <td>${layout.format_drive_distance(translator.drive_distance)}</td>
+                                        <td>
+                                            <p class="mobile-phone" tal:condition="translator.tel_mobile" tal:replace="structure layout.linkify(translator.tel_mobile)"></p>
+                                            <p class="private-phone" tal:condition="translator.tel_private" tal:replace="structure layout.linkify(translator.tel_private)"></p>
+                                            <p class="office-phone" tal:condition="translator.tel_office" tal:replace="structure layout.linkify(translator.tel_office)"></p>
+                                        </td>
+                                        <td tal:replace="structure layout.linkify(translator.email or '')"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </tal:b>
+</div>

@@ -1,5 +1,6 @@
 from onegov.core.elements import Link
 from onegov.translator_directory import TranslatorDirectoryApp
+from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 
@@ -16,22 +17,7 @@ def get_base_tools(request):
 
         usr = request.current_user
 
-        profile_links = [
-            Link(
-                _("Profile"), request.link(usr),
-                attrs={'class': 'profile'}
-            )
-        ] if usr else []
-        if request.is_admin:
-            profile_links.append(
-                Link(
-                    _("User Profile"),
-                    request.link(request.app.org, name='userprofile'),
-                    attrs={'class': 'profile'}
-                )
-            )
-
-        profile_links.append(
+        profile_links = (
             Link(
                 _("Logout"), request.link(
                     Auth.from_request(
@@ -92,6 +78,11 @@ def get_top_navigation(request):
     yield Link(
         text=_("Translators"),
         url=request.class_link(TranslatorCollection)
+    )
+
+    yield Link(
+        text=_('Languages'),
+        url=request.class_link(LanguageCollection)
     )
 
     layout = DefaultLayout(request.app.org, request)

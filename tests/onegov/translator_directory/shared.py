@@ -11,7 +11,7 @@ translator_data = dict(
     first_name='Hugo',
     last_name='Benito',
     admission=None,
-    withholding_tax='No idea what datatype this is',
+    withholding_tax='tax',
     gender=GENDERS[0],
     date_of_birth=date.today(),
     nationality='CH',
@@ -56,3 +56,18 @@ def create_translator(session, email=None, **kwargs):
         data['email'] = email
 
     return TranslatorCollection(session).add(**data)
+
+
+def create_translators(session, count=1):
+    translators = TranslatorCollection(session)
+    results = []
+    for i in range(count):
+        data = deepcopy(translator_data)
+        data['pers_id'] = i
+        data['email'] = f'translator{i}@test.com'
+        data['first_name'] = f'trans_{1}'
+        data['last_name'] = f'later_{1}'
+        results.append(translators.add(**data))
+
+    return results
+

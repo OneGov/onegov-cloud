@@ -1,0 +1,15 @@
+$mobile-phone-icon: '\f10b';
+$office-icon: '\f1ad';
+$phone-icon: '\f095';
+
+.mobile-phone {
+  &::before{ @include icon($mobile-phone-icon); }
+}
+
+.private-phone {
+  &::before{ @include icon($phone-icon); }
+}
+
+.office-phone {
+  &::before{ @include icon($office-icon); }
+}

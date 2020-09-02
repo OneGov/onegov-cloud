@@ -33,6 +33,24 @@ def add_new_translator(self, request, form):
     }
 
 
+@TranslatorDirectoryApp.form(
+    model=TranslatorCollection,
+    template='translators.pt',
+    permission=Personal,
+    form=TranslatorSearchForm
+)
+def view_translators(self, request, form):
+    layout = TranslatorCollectionLayout(self, request)
+
+    return {
+        'layout': layout,
+        'model': self,
+        'title': layout.title,
+        'form': form,
+        'results': self.batch
+    }
+
+
 @TranslatorDirectoryApp.html(
     model=Translator,
     template='translator.pt',

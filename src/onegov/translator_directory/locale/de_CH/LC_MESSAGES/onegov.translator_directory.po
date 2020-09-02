@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-09-01 11:00+0200\n"
+"POT-Creation-Date: 2020-09-01 15:24+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -12,12 +12,6 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.3\n"
-
-msgid "Profile"
-msgstr "Profil"
-
-msgid "User Profile"
-msgstr "Benutzerprofil"
 
 msgid "Logout"
 msgstr "Abmelden"
@@ -34,8 +28,18 @@ msgstr "Verwaltung"
 msgid "Login"
 msgstr "Anmelden"
 
-msgid "Some Link"
-msgstr ""
+msgid "Translators"
+msgstr "Übersetzer/innen"
+
+msgid "Languages"
+msgstr "Sprachen"
+
+msgid "Name"
+msgstr "Name"
+
+#, python-format
+msgid "${language} already exists"
+msgstr "${language} existiert bereits"
 
 msgid "Personal ID"
 msgstr "Personal Nr."
@@ -139,8 +143,11 @@ msgstr "Ein(e) Übersetzer/in mit dieser Email existiert bereits"
 msgid "Order by"
 msgstr "Sortiere nach"
 
-msgid "Translators"
-msgstr "Übersetzer/innen"
+msgid "Ascending"
+msgstr "Aufsteigend"
+
+msgid "Descending"
+msgstr "Absteigend"
 
 msgid "Edit translator"
 msgstr "Übersetzer/in"
@@ -154,11 +161,23 @@ msgstr "Übersetzer/in hinzufügen"
 msgid "Add"
 msgstr "Hinzufügen"
 
+msgid "Search for translators"
+msgstr "Suche nach Übersetzer/Übersetzerin"
+
 msgid "masculin"
 msgstr "Männlich"
 
 msgid "feminin"
 msgstr "Weiblich"
+
+msgid "No results found"
+msgstr "Keine Ergebnisse gefunden"
+
+msgid "Speakers"
+msgstr ""
+
+msgid "Writers"
+msgstr ""
 
 msgid "Driving distance"
 msgstr "Wegberechnung"
@@ -169,11 +188,29 @@ msgstr "Telefon Mobile"
 msgid "Name reveal confirmation"
 msgstr "Zustimmung Namensbekanntgabe"
 
+msgid "Withholding Tax"
+msgstr ""
+
+msgid "Phone numbers"
+msgstr "Telefonischer Kontakt"
+
+msgid "Added a new language"
+msgstr "Neue Sprache hinzugefügt"
+
+msgid "Add new language"
+msgstr "Neue Sprache hinzufügen"
+
 msgid "Added a new translator"
 msgstr "Übersetzer/in hinzugefügt"
 
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
+
+#~ msgid "Profile"
+#~ msgstr "Profil"
+
+#~ msgid "User Profile"
+#~ msgstr "Benutzerprofil"
 
 #~ msgid "Contact Information"
 #~ msgstr "Kontaktinformationen"
