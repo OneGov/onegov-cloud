@@ -80,7 +80,8 @@ editor_can_see = member_can_see + (
     'social_sec_number',
     'bank_name',
     'bank_address',
-    'account_owner'
+    'account_owner',
+    'iban'
 )
 
 
@@ -139,6 +140,7 @@ class Translator(Base, TimestampMixin, TranslatorDocumentsMixin):
     bank_name = Column(Text)
     bank_address = Column(Text)
     account_owner = Column(Text)
+    iban = Column(Text)
 
     email = Column(Text)
 
