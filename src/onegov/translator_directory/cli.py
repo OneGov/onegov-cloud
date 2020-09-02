@@ -124,6 +124,12 @@ def parse_distance(field):
     return float(field)
 
 
+def parse_phone(field):
+    if not field or field == '-':
+        return
+    return field
+
+
 @with_open
 def import_translators(csvfile, session):
     count = 0
@@ -154,9 +160,9 @@ def import_translators(csvfile, session):
         trs.iban = line.iban
         trs.account_owner = line.bank_konto_lautet_auf
         trs.email = line.e_mail
-        trs.tel_private = line.telefon_privat
-        trs.tel_mobile = line.natel
-        trs.tel_office = line.telefon_geschaft
+        trs.tel_private = parse_phone(line.telefon_privat)
+        trs.tel_mobile = parse_phone(line.natel)
+        trs.tel_office = parse_phone(line.telefon_geschaft)
         trs.availability = line.erreich_und_verfugbarkeit
         trs.confirm_name_reveal = parse_confirm_name_reveal(line)
         trs.date_of_application = parse_date(line.bewerbung)
