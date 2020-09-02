@@ -1,4 +1,4 @@
-from onegov.translator_directory.layouts.translator import TranslatorLayout
+from onegov.translator_directory.layout import TranslatorLayout
 
 
 def test_translator_layout(session):

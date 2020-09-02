@@ -3,7 +3,7 @@ from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.forms.language import LanguageForm
 from onegov.translator_directory import _
-from onegov.translator_directory.layouts.translator import DefaultLayout
+from onegov.translator_directory.layout import DefaultLayout
 from onegov.translator_directory.models.translator import Language
 
 

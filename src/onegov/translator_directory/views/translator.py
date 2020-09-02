@@ -3,10 +3,10 @@ from onegov.core.security import Secret, Personal
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
-from onegov.translator_directory.forms.translator import TranslatorForm
-from onegov.translator_directory.layouts.translator import (
-    AddTranslatorLayout, TranslatorLayout
-)
+from onegov.translator_directory.forms.translator import TranslatorForm, \
+    TranslatorSearchForm
+from onegov.translator_directory.layout import AddTranslatorLayout, \
+    TranslatorCollectionLayout, TranslatorLayout
 from onegov.translator_directory.models.translator import Translator
 
 
