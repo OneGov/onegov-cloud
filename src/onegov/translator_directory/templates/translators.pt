@@ -6,7 +6,7 @@
         <div class="row">
             <div class="columns small-12">
                 <div class="row">
-                    <div class="columns small-12 medium-6">
+                    <div class="columns small-12">
                         <div class="translators-filter">
                             <div class="search"></div>
                         </div>
@@ -14,7 +14,7 @@
                             <p tal:condition="not: results" i18n:translate="">
                                 No results found
                             </p>
-                            <table class="search-results-table" tal:condition="results">
+                            <table id="search-results-table" class="fullwidth" tal:condition="results">
                                 <thead>
                                     <th i18n:translate="" tal:condition="layout.show('pers_id')">Personal ID</th>
                                     <th i18n:translate="" tal:condition="layout.show('withholding_tax')">Withholding tax</th>
@@ -32,29 +32,29 @@
                                         <td><a href="${request.link(translator)}">${translator.full_name}</a></td>
                                         <td>
                                             <tal:b tal:repeat="language translator.written_languages">
-                                                <p tal:define="count language.writers.count()">${language.name} (${count}})</p>
+                                                <span tal:attributes="class layout.color_class(language.writers_count)">${language.name} (${language.writers_count})</span>
                                             </tal:b>
                                         </td>
                                         <td>
                                             <tal:b tal:repeat="language translator.spoken_languages">
-                                                <p tal:define="count language.speakers.count()">${language.name} (${count}})</p>
+                                                <span>${language.name} (${language.speakers_count})</span>
                                             </tal:b>
-                                        </td>
-                                        <td>
                                         </td>
                                         <td>${layout.format_drive_distance(translator.drive_distance)}</td>
                                         <td>
-                                            <p class="mobile-phone" tal:condition="translator.tel_mobile" tal:replace="structure layout.linkify(translator.tel_mobile)"></p>
-                                            <p class="private-phone" tal:condition="translator.tel_private" tal:replace="structure layout.linkify(translator.tel_private)"></p>
-                                            <p class="office-phone" tal:condition="translator.tel_office" tal:replace="structure layout.linkify(translator.tel_office)"></p>
+                                            <span class="mobile-phone nowrap" tal:condition="translator.tel_mobile" tal:content="structure layout.linkify(translator.tel_mobile)"></span>
+                                            <span class="private-phone nowrap" tal:condition="translator.tel_private" tal:content="structure layout.linkify(translator.tel_private)"></span>
+                                            <span class="office-phone nowrap" tal:condition="translator.tel_office" tal:content="structure layout.linkify(translator.tel_office)"></span>
                                         </td>
-                                        <td tal:replace="structure layout.linkify(translator.email or '')"></td>
+                                        <td tal:content="structure layout.linkify(translator.email or '')"></td>
                                     </tr>
                                 </tbody>
                             </table>
+                            <div class="pagination-centered">
+                                <div metal:use-macro="layout.macros['pagination']" tal:define="collection model; current_page model;" />
+                            </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>

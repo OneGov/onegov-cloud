@@ -1,3 +1,5 @@
+import copy
+
 import transaction
 
 from onegov.translator_directory.collections.translator import \
@@ -133,7 +135,7 @@ def test_create_new_language(client):
     assert 'English existiert bereits' in page
 
 
-def test_view_translators_search(client):
+def test_view_search_translator(client):
     """
     - test pagination
     - test fields not to be shown for member and
@@ -145,12 +147,22 @@ def test_view_translators_search(client):
     assert 'Keine Ergebnisse gefunden' in page
 
     session = client.app.session()
-    create_languages(session)
+    languages = create_languages(session)
     translators = TranslatorCollection(session)
-    translators.add(**translator_data)
+    for i in range(len(languages)):
+        data = copy.deepcopy(translator_data)
+        data['email'] = f'translator{1}@test.com'
+        data['mother_tongues'] = [languages[i]]
+        data['spoken_languages'] = [languages[i]]
+        data['written_languages'] = [languages[0]]
+        translators.add(**translator_data)
+
     transaction.commit()
 
-    translator = session.query(Translator).one()
+    translator = session.query(Translator).first()
     languages = session.query(Language).all()
 
     page = client.get('/translators')
+    open_in_browser(page)
+    assert 'translator1@test.com' in page
+

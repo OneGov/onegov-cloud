@@ -18,10 +18,12 @@ def test_translator(session):
     translator.spoken_languages.append(spoken)
     assert translator.spoken_languages
     assert spoken.speakers == [translator]
+    assert spoken.speakers_count == 1
 
     written = langs[1]
     translator.written_languages.append(written)
     assert written.writers == [translator]
+    assert written.writers_count == 1
     assert translator.written_languages == [written]
     assert not translator.certificates
     assert not translator.applications

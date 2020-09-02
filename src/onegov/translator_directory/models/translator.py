@@ -3,7 +3,7 @@ from onegov.translator_directory import _
 from libres.db.models.timestamp import TimestampMixin
 from sqlalchemy import Column, Text, Enum, Date, Integer, Table, ForeignKey, \
     Boolean, Index, Float
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, object_session
 
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
@@ -28,6 +28,18 @@ class Language(Base):
 
     id = Column(UUID, primary_key=True, default=uuid4)
     name = Column(Text, nullable=False)
+
+    @property
+    def speakers_count(self):
+        session = object_session(self)
+        return session.query(
+            spoken_association_table).filter_by(lang_id=self.id).count()
+
+    @property
+    def writers_count(self):
+        session = object_session(self)
+        return session.query(
+            written_association_table).filter_by(lang_id=self.id).count()
 
 
 spoken_association_table = Table(

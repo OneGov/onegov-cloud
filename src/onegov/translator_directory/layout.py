@@ -65,6 +65,13 @@ class TranslatorLayout(DefaultLayout):
     def format_languages(languages):
         return ', '.join(sorted((lang.name for lang in languages or [])))
 
+    def color_class(self, count):
+        """ Depending how rare a language is offered by translators,
+        apply a color code using the returned css class
+        """
+        if count <= 5:
+            return 'text-orange'
+
 
 class EditTranslatorLayout(TranslatorLayout):
     @cached_property

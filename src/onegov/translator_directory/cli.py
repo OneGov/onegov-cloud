@@ -103,13 +103,19 @@ def get_languages(names, session):
     return langs
 
 
+def get_certificates(certs, session):
+    return session.query(LanguageCertificate).filter(
+        LanguageCertificate.name.in_(certs)).all()
+
+
 def parse_certificates(field):
-    if not field:
+    if not field or field == '-':
         return
-    if field not in CERTIFICATES:
-        print('found new certificate:', field)
-        assert False
-    return field
+    certs = field.split(', ')
+    for cert in certs:
+        if cert not in CERTIFICATES:
+            raise ValueError(f"Can't import unknown certificate {field}")
+    return certs
 
 
 def parse_boolean(field):
@@ -172,7 +178,8 @@ def import_translators(csvfile, session):
         trs.agency_references = line.referenzen_behorden
         trs.education_as_interpreter = parse_boolean(
             line.ausbildung_ubersetzen_dolmetschen)
-        # trs.certificates
+        trs.certificates = get_certificates(
+            parse_certificates(line.zertifikate), session)
         trs.comments = line.bemerkungen
         trs.other_certificates = line.andere_zertifikate
         trs.operation_comments = line.besondere_hinweise_einsatzmoglichkeiten
