@@ -151,8 +151,7 @@ class Translator(Base, TimestampMixin, TranslatorDocumentsMixin):
 
     availability = Column(Text)
 
-    # Not set is also a state, namely not known here
-    confirm_name_reveal = Column(Boolean)
+    confirm_name_reveal = Column(Boolean, default=False)
 
     # The translator applies to be in the directory and gets a decision
     date_of_application = Column(Date)
