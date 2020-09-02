@@ -131,7 +131,7 @@ msgstr "Referenzen Behörden"
 msgid "Education as interpreter"
 msgstr "Ausbildung Dolmetscher"
 
-msgid "Certificate"
+msgid "LanguageCertificate"
 msgstr "Zertifikat"
 
 msgid "Comments"

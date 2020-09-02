@@ -2,7 +2,7 @@ from uuid import uuid4
 from onegov.translator_directory import _
 from libres.db.models.timestamp import TimestampMixin
 from sqlalchemy import Column, Text, Enum, Date, Integer, Table, ForeignKey, \
-    Boolean, Index
+    Boolean, Index, Float
 from sqlalchemy.orm import relationship
 
 from onegov.core.orm import Base
@@ -52,6 +52,29 @@ written_association_table = Table(
     Column('lang_id', UUID, ForeignKey('languages.id'), nullable=False)
 )
 
+mother_tongue_association_table = Table(
+    'mother_tongue_association',
+    Base.metadata,
+    Column(
+        'translator_id',
+        UUID,
+        ForeignKey('translators.id'),
+        nullable=False),
+    Column('lang_id', UUID, ForeignKey('languages.id'), nullable=False)
+)
+
+
+certificate_association_table = Table(
+    'certifcate_association',
+    Base.metadata,
+    Column(
+        'translator_id',
+        UUID,
+        ForeignKey('translators.id'),
+        nullable=False),
+    Column('cert_id', UUID, ForeignKey('language_certificates.id'),
+           nullable=False)
+)
 
 member_can_see = (
     'first_name',
@@ -71,7 +94,7 @@ member_can_see = (
     'tel_private',
     'tel_office',
     'availability',
-    'mother_tongue',
+    'mother_tongues',
     'languages_written',
     'languages_spoken'
 )
@@ -131,7 +154,7 @@ class Translator(Base, TimestampMixin, TranslatorDocumentsMixin):
     city = Column(Text)
 
     # distance calculated from address to a fix point via api, im km
-    drive_distance = Column(Integer)
+    drive_distance = Column(Float(precision=2))
 
     # AHV-Nr.
     social_sec_number = Column(Text)
@@ -158,10 +181,12 @@ class Translator(Base, TimestampMixin, TranslatorDocumentsMixin):
     date_of_decision = Column(Date)
 
     # Language Information
-    mother_tongue_id = Column(
-        UUID, ForeignKey('languages.id')
+
+    mother_tongues = relationship(
+        "Language",
+        secondary=mother_tongue_association_table,
+        backref='mother_tongues'
     )
-    mother_tongue = relationship('Language')
 
     # Todo: sort these while queriing
     spoken_languages = relationship(
@@ -179,14 +204,23 @@ class Translator(Base, TimestampMixin, TranslatorDocumentsMixin):
     # Ausbildung Dolmetscher
     education_as_interpreter = Column(Boolean, default=False, nullable=False)
 
-    # pre-defined certificates
-    certificate = Column(Enum(*CERTIFICATES, name='certificate'))
+    certificates = relationship(
+        'LanguageCertificate',
+        secondary=certificate_association_table,
+        backref='owners')
 
     # Bemerkungen
     comments = Column(Text)
 
     # field for hiding to users except admins
     hidden = Column(Boolean, default=False, nullable=False)
+
+    # the below might never be used, but we import it if customer wants them
+    occupation = Column(Text)
+    other_certificates = Column(Text)
+
+    # Besondere Hinweise Einsatzmöglichkeiten
+    operation_comments = Column(Text)
 
     @property
     def full_name(self):

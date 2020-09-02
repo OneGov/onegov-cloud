@@ -59,5 +59,3 @@ def delete_language(self, request):
     else:
         LanguageCollection(request.session).delete(self)
         request.success(_('Language successfully deleted'))
-
-

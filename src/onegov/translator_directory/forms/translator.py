@@ -4,22 +4,28 @@ from wtforms.fields.html5 import DateField, EmailField, IntegerField
 from wtforms.validators import InputRequired, Email, Optional, ValidationError
 
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectField, ChosenSelectMultipleField
+from onegov.form.fields import ChosenSelectMultipleField
 
 from onegov.form.validators import ValidPhoneNumber, \
     ValidSwissSocialSecurityNumber, StrictOptional
 from onegov.translator_directory import _
+from onegov.translator_directory.collections.certificate import \
+    LanguageCertificateCollection
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import order_cols
 from onegov.translator_directory.models.translator import GENDERS, \
-    GENDERS_DESC, CERTIFICATES, Translator
+    GENDERS_DESC, Translator
 
 
-class LanguageFormMixin:
+class FormChoicesMixin:
 
     @property
     def available_languages(self):
         return LanguageCollection(self.request.session).query()
+
+    @property
+    def available_certificates(self):
+        return LanguageCertificateCollection(self.request.session).query()
 
     @cached_property
     def language_choices(self):
@@ -27,8 +33,21 @@ class LanguageFormMixin:
             (str(lang.id), lang.name) for lang in self.available_languages
         )
 
+    @cached_property
+    def certificate_choices(self):
+        return tuple(
+            (str(cert.id), cert.name) for cert in self.available_certificates
+        )
 
-class TranslatorForm(Form, LanguageFormMixin):
+    @cached_property
+    def gender_choices(self):
+        return tuple(
+            (id_, self.request.translate(choice))
+            for id_, choice in zip(GENDERS, GENDERS_DESC)
+        )
+
+
+class TranslatorForm(Form, FormChoicesMixin):
 
     pers_id = IntegerField(
         label=_('Personal ID'),
@@ -138,7 +157,7 @@ class TranslatorForm(Form, LanguageFormMixin):
         validators=[Optional()]
     )
 
-    mother_tongue_id = SelectField(
+    mother_tongues = ChosenSelectMultipleField(
         label=_('Mother tongue'),
         validators=[InputRequired()],
         choices=[]
@@ -170,11 +189,11 @@ class TranslatorForm(Form, LanguageFormMixin):
         default=False
     )
 
-    # certificates, multi file upload field
-    certificate = SelectField(
-        label=_('Certificate'),
+    # certificates
+    certificates = ChosenSelectMultipleField(
+        label=_('Language Certificates'),
         validators=[Optional()],
-        choices=tuple((cert, cert) for cert in CERTIFICATES)
+        choices=[]
     )
 
     comments = TextAreaField(
@@ -183,34 +202,40 @@ class TranslatorForm(Form, LanguageFormMixin):
 
     # Here come the actual file fields to upload stuff
 
-    @cached_property
-    def gender_choices(self):
-        return tuple(
-            (id_, self.request.translate(choice))
-            for id_, choice in zip(GENDERS, GENDERS_DESC)
-        )
-
     def on_request(self):
         self.gender.choices = self.gender_choices
-        self.mother_tongue_id.choices = self.language_choices
+        self.mother_tongues.choices = self.language_choices
         self.spoken_languages.choices = self.language_choices
         self.written_languages.choices = self.language_choices
+        self.certificates.choices = self.certificate_choices
 
     def get_useful_data(self, exclude={'csrf_token'}):
         data = super().get_useful_data(
-            exclude={'csrf_token', 'spoken_languages', 'written_languages'})
+            exclude={'csrf_token', 'spoken_languages', 'written_languages',
+                     'certificates', 'mother_tongues'})
 
         languages = LanguageCollection(self.request.session)
 
-        if self.spoken_languages:
+        if self.mother_tongues.data:
+            langs = languages.by_ids(self.mother_tongues.data).all()
+            assert len(langs) == len(self.mother_tongues.data)
+            data['mother_tongues'] = langs
+
+        if self.spoken_languages.data:
             spoken = languages.by_ids(self.spoken_languages.data).all()
             assert len(spoken) == len(self.spoken_languages.data)
             data['spoken_languages'] = spoken
 
-        if self.written_languages:
+        if self.written_languages.data:
             written = languages.by_ids(self.written_languages.data).all()
             assert len(written) == len(self.written_languages.data)
             data['written_languages'] = written
+
+        lang_certs = LanguageCertificateCollection(self.request.session)
+        if self.certificates.data:
+            certs = lang_certs.by_ids(self.certificates.data).all()
+            assert len(certs) == len(self.certificates.data)
+            data['certificates'] = certs
 
         return data
 
@@ -223,7 +248,7 @@ class TranslatorForm(Form, LanguageFormMixin):
                     _("A translator with this email already exists"))
 
 
-class TranslatorSearchForm(Form, LanguageFormMixin):
+class TranslatorSearchForm(Form, FormChoicesMixin):
 
     spoken_langs = ChosenSelectMultipleField(
         label=_('Spoken languages'),

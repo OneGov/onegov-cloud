@@ -5,7 +5,8 @@ from onegov.translator_directory.collections.translator import \
 from onegov.translator_directory.models.translator import CERTIFICATES, \
     Translator, Language
 from tests.onegov.translator_directory.shared import translator_data, \
-    create_languages
+    create_languages, create_certificates
+from tests.shared.utils import open_in_browser
 
 
 def test_view_new_translator(client):
@@ -18,6 +19,9 @@ def test_view_new_translator(client):
 
     session = client.app.session()
     languages = create_languages(session)
+    certs = create_certificates(session)
+    cert_names = [cert.name for cert in certs]
+    cert_ids = [str(cert.id) for cert in certs]
     language_ids = [str(lang.id) for lang in languages]
     language_names = [lang.name for lang in languages]
     transaction.commit()
@@ -29,8 +33,8 @@ def test_view_new_translator(client):
 
     # check choices
     assert 'Männlich' in page
-    assert 'Arabic' in page
-    assert CERTIFICATES[0] in page
+    assert language_names[0] in page
+    assert cert_names[0] in page
 
     page.form['first_name'] = 'Uncle'
     page.form['last_name'] = 'Bob'
@@ -52,13 +56,14 @@ def test_view_new_translator(client):
         language_ids[2]
     ]
 
+    page.form['mother_tongues'] = [language_ids[-1]]
     page = page.form.submit().follow()
     assert 'Uncle' in page
     # test lower-casing the user input
     assert 'test@test.com' in page
 
-    # Test mother tongue set
-    assert 'Arabic' in page
+    # Test mother tongue set to the first ordered option
+    assert language_names[-1] in page
 
     # test spoken languages
     assert language_names[0] in page

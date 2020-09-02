@@ -46,7 +46,8 @@ setup(
         'onegov.user',
         'onegov.winterthur',
         'onegov.wtfs',
-        'onegov.redesign_test'
+        'onegov.redesign_test',
+        'onegov.translator_directory',
     ],
     install_requires=[
         'AIS.py',
@@ -224,6 +225,7 @@ setup(
             'onegov-user=onegov.user.cli:cli',
             'onegov-winterthur=onegov.winterthur.cli:cli',
             'onegov-wtfs=onegov.wtfs.cli:cli',
+            'onegov-translator=onegov.translator_directory.cli:cli',
         ],
         'onegov_upgrades': [
             'onegov.activity=onegov.activity.upgrade',
@@ -261,5 +263,6 @@ setup(
             'onegov.user=onegov.user.upgrade',
             'onegov.winterthur=onegov.winterthur.upgrade',
             'onegov.wtfs=onegov.wtfs.upgrade',
+            'onegov.translator=onegov.translator_directory.upgrade'
         ]
     })

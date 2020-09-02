@@ -84,7 +84,6 @@ class AddTranslatorLayout(TranslatorLayout):
     def title(self):
         return _('Add translator')
 
-
     @cached_property
     def breadcrumbs(self):
         links = super().breadcrumbs

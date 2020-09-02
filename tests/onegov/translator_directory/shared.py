@@ -1,6 +1,8 @@
 from copy import deepcopy
 from datetime import date, timedelta
 
+from onegov.translator_directory.collections.certificate import \
+    LanguageCertificateCollection
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
@@ -34,7 +36,6 @@ translator_data = dict(
     proof_of_preconditions='all okay',
     agency_references='Some ref',
     education_as_interpreter=False,
-    certificate=None,
     comments=None
 )
 
@@ -45,6 +46,14 @@ def create_languages(session):
     for lang in ('German', 'French', 'Italian', 'Arabic'):
         languages.append(collection.add(name=lang))
     return languages
+
+
+def create_certificates(session):
+    certs = []
+    collection = LanguageCertificateCollection(session)
+    for cert in ('AAAA', 'BBBB', 'CCCC', 'DDDD'):
+        certs.append(collection.add(name=cert))
+    return certs
 
 
 def create_translator(session, email=None, **kwargs):

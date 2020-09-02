@@ -96,13 +96,13 @@
                                 <dt i18n:translate>Date of decision</dt>
                                 <dd>${layout.format_date(model.date_of_decision, 'date')}</dd>
                             </dl>
-                            <dl class="field-display" tal:condition="model.mother_tongue and layout.show('mother_tongue')">
-                                <dt i18n:translate>Mother tongue</dt>
-                                <dd>${model.mother_tongue.name}</dd>
+                            <dl class="field-display" tal:condition="model.mother_tongues and layout.show('mother_tongues')">
+                                <dt i18n:translate>Mother tongues</dt>
+                                <dd>${layout.format_languages(model.mother_tongues)}</dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.spoken_languages and layout.show('spoken_languages')">
                                 <dt i18n:translate>Spoken languages</dt>
-                                <dd >${layout.format_languages(model.spoken_languages)}</dd>
+                                <dd>${layout.format_languages(model.spoken_languages)}</dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.written_languages and layout.show('written_languages')">
                                 <dt i18n:translate>Written languages</dt>
@@ -128,9 +128,9 @@
                                 <dt i18n:translate>Proof of preconditions</dt>
                                 <dd >${model.proof_of_preconditions}</dd>
                             </dl>
-                            <dl class="field-display" tal:condition="model.certificate and layout.show('certificate')">
+                            <dl class="field-display" tal:condition="model.certificates and layout.show('certificates')">
                                 <dt i18n:translate>Certificate</dt>
-                                <dd >${model.certificate}</dd>
+                                <dd >${layout.format_languages(model.certificates)}</dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.comments and layout.show('comments')">
                                 <dt i18n:translate>Comments</dt>

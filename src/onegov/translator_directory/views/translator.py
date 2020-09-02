@@ -85,4 +85,3 @@ def edit_translator(self, request, form):
         'form': form,
         'title': layout.title
     }
-
