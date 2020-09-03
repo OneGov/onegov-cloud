@@ -182,7 +182,8 @@ class TranslatorForm(Form, FormChoicesMixin):
 
     agency_references = TextAreaField(
         label=_('Agency references'),
-        validators=[InputRequired()]
+        validators=[InputRequired()],
+        render_kw={'rows': 3}
     )
 
     education_as_interpreter = BooleanField(
@@ -201,7 +202,7 @@ class TranslatorForm(Form, FormChoicesMixin):
         label=_('Comments')
     )
 
-    hidden = BooleanField(
+    hide = BooleanField(
         label=_('Hidden'),
         default=False
     )
