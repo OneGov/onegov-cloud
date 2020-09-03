@@ -38,5 +38,5 @@ def get_language(request, id):
 @TranslatorDirectoryApp.path(
     model=LanguageCollection, path='/languages',
 )
-def get_language_collection(request):
-    return LanguageCollection(request.session)
+def get_language_collection(request, page=0, letter=None):
+    return LanguageCollection(request.session, page, letter)

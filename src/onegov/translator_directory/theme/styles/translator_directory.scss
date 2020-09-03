@@ -36,3 +36,33 @@ $dark-orange:  #be860e;
 .text-orange {
     color: $dark-orange;
 }
+
+// Tags list
+
+ul.tags {
+    list-style: none;
+    margin: 0 0 .75rem;
+    padding: 0;
+
+    li {
+        display: inline-block;
+        font-size: .875rem;
+        margin-bottom: 8px;
+
+        &:hover .blank-label {
+            @include primary-color-background;
+            border: 1px solid $primary-color;
+        }
+    }
+
+    a {
+        font-size: .8rem;
+        line-height: .8rem;
+        white-space: normal;
+    }
+
+    span {
+        margin-bottom: 0;
+        text-align: left;
+    }
+}

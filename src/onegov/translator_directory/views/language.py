@@ -1,3 +1,4 @@
+from onegov.core.elements import Link
 from onegov.core.security import Secret, Personal
 from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.language import LanguageCollection
@@ -38,11 +39,24 @@ def add_new_language(self, request, form):
 )
 def view_translators(self, request):
 
+    letters = tuple(
+        Link(
+            text=letter,
+            url=request.link(
+                self.by_letter(
+                    letter=letter if (letter != self.letter) else None
+                )
+            ),
+            active=(letter == self.letter),
+        ) for letter in self.used_letters
+    )
+
     return {
         'layout': DefaultLayout(self, request),
         'model': self,
         'title': _('Languages'),
-        'languages': self.batch
+        'languages': self.batch,
+        'letters': letters
     }
 
 
