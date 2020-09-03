@@ -174,7 +174,7 @@ msgid "Add"
 msgstr "Hinzufügen"
 
 msgid "Search for translators"
-msgstr "Suche nach Übersetzer/Übersetzerin"
+msgstr "Suche nach Übersetzer/in"
 
 msgid "Add language"
 msgstr "Sprache hinzufügen"

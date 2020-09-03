@@ -11,7 +11,7 @@ order_cols = (
 
 class TranslatorCollection(GenericCollection, Pagination):
 
-    batch_size = 20
+    batch_size = 10
 
     def __init__(
             self, session,
@@ -99,7 +99,7 @@ class TranslatorCollection(GenericCollection, Pagination):
             query = query.filter(and_(*self.by_written_lang_expression))
 
         if not self.user_role == 'admin':
-            query = query.filter(Translator.hidden == False)
+            query = query.filter(Translator.hide == False)
 
         query = query.order_by(self.order_expression)
         return query

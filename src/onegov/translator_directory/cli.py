@@ -26,12 +26,13 @@ def with_open(func):
 
 skip_languages = ['-', 'Kein Einsatz']
 
+split_pattern = re.compile(r',(?![^\(\[]*[\]\)])')
+
 
 def parse_language_field(languages):
     """The fields can have commas in it, so we can not split by comma"""
-
-    split_pattern = re.compile(r',(?![^\(\[]*[\]\)])')
-
+    if not languages:
+        return
     for lang in split_pattern.split(languages):
         if not lang or lang in skip_languages:
             continue
@@ -100,12 +101,16 @@ def parse_confirm_name_reveal(line):
 
 
 def get_languages(names, session):
+    if names is None:
+        return
     langs = session.query(Language).filter(Language.name.in_(names)).all()
     assert len(langs) == len(names)
     return langs
 
 
 def get_certificates(certs, session):
+    if not certs:
+        return []
     return session.query(LanguageCertificate).filter(
         LanguageCertificate.name.in_(certs)).all()
 
