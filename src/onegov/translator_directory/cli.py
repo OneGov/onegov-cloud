@@ -83,8 +83,8 @@ def parse_gender(field):
     if not field:
         return GENDERS[-1]
     if field == 'Männlich':
-        return field[0]
-    return field[1]
+        return GENDERS[0]
+    return GENDERS[1]
 
 
 def parse_date(field):
@@ -202,7 +202,18 @@ def import_translators(csvfile, session):
     click.secho(f'Imported {count} translators')
 
 
-def import_translator_file(session, path):
+def clear_all_records(session):
+    for translator in session.query(Translator):
+        session.delete(translator)
+    for certificate in session.query(LanguageCertificate):
+        session.delete(certificate)
+    for language in session.query(Language):
+        session.delete(language)
+
+
+def import_translator_file(session, path, clear):
+    if clear:
+        clear_all_records(session)
     import_certifcates(path, session)
     import_languages(path, session)
     import_translators(path, session)
@@ -210,8 +221,9 @@ def import_translator_file(session, path):
 
 @cli.command(name='import', context_settings={'singular': True})
 @click.option('--path', required=True)
-def do_import(path):
+@click.option('--clear', is_flag=True)
+def do_import(path, clear):
 
     def execute(request, app):
-        return import_translator_file(request.session, path)
+        return import_translator_file(request.session, path, clear)
     return execute
