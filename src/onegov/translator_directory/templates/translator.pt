@@ -134,7 +134,7 @@
                             </dl>
                             <dl class="field-display" tal:condition="model.education_as_interpreter and layout.show('education_as_interpreter')">
                                 <dt i18n:translate>Education as interpreter</dt>
-                                <dd >${layout.format_bool_or_none(model.education_as_interpreter)}</dd>
+                                <dd >${layout.format_boolean(model.education_as_interpreter)}</dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.proof_of_preconditions and layout.show('proof_of_preconditions')">
                                 <dt i18n:translate>Proof of preconditions</dt>
