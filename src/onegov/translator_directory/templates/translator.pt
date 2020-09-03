@@ -38,7 +38,7 @@
                             </dl>
                             <dl class="field-display" tal:condition="model.drive_distance and layout.show('drive_distance')">
                                 <dt i18n:translate>Driving distance</dt>
-                                <dd>${layout.format_distance(model.drive_distance)}</dd>
+                                <dd>${layout.format_drive_distance(model.drive_distance)}</dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.social_sec_number and layout.show('social_sec_number')">
                                 <dt i18n:translate>Swiss social security number</dt>
