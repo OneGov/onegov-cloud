@@ -41,15 +41,16 @@ class TranslatorLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        return [
-            Link(
-                text=_("Edit"),
-                url=self.request.link(
-                    self.model, name='edit'
-                ),
-                attrs={'class': 'edit-icon'}
-            )
-        ]
+        if self.request.is_admin:
+            return [
+                Link(
+                    text=_("Edit"),
+                    url=self.request.link(
+                        self.model, name='edit'
+                    ),
+                    attrs={'class': 'edit-icon'}
+                )
+            ]
 
     @cached_property
     def breadcrumbs(self):
@@ -125,19 +126,20 @@ class TranslatorCollectionLayout(TranslatorLayout):
 
     @cached_property
     def editbar_links(self):
-        return [
-            Link(
-                text=_("Add translator"),
-                url=self.request.class_link(
-                    TranslatorCollection, name='new'
+        if self.request.is_admin:
+            return [
+                Link(
+                    text=_("Add translator"),
+                    url=self.request.class_link(
+                        TranslatorCollection, name='new'
+                    ),
+                    attrs={'class': 'add-icon'}
                 ),
-                attrs={'class': 'add-icon'}
-            ),
-            Link(
-                text=_("Add language"),
-                url=self.request.class_link(
-                    LanguageCollection, name='new'
+                Link(
+                    text=_("Add language"),
+                    url=self.request.class_link(
+                        LanguageCollection, name='new'
+                    ),
+                    attrs={'class': 'add-icon'}
                 ),
-                attrs={'class': 'add-icon'}
-            ),
-        ]
+            ]
