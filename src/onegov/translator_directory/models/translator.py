@@ -1,4 +1,6 @@
 from uuid import uuid4
+
+from onegov.search import ORMSearchable
 from onegov.translator_directory import _
 from libres.db.models.timestamp import TimestampMixin
 from sqlalchemy import Column, Text, Enum, Date, Integer, Table, ForeignKey, \
@@ -128,7 +130,7 @@ editor_can_see = member_can_see + (
 )
 
 
-class TranslatorDocumentsMixin(object):
+class DocumentsMixin(object):
     # Associated files
     certificates = associated(CertificateFile, 'certificates', 'one-to-many')
     applications = associated(ApplicationFile, 'applications', 'one-to-many')
@@ -142,9 +144,21 @@ class TranslatorDocumentsMixin(object):
     other_files = associated(MiscFile, 'other_files', 'one-to-many')
 
 
-class Translator(Base, TimestampMixin, TranslatorDocumentsMixin):
+class Translator(Base, TimestampMixin, DocumentsMixin, ORMSearchable):
 
     __tablename__ = 'translators'
+
+    es_properties = {
+        'last_name': {'type': 'text'},
+        'first_name': {'type': 'text'},
+        'email': {'type': 'text'}
+    }
+
+    es_public = False
+
+    @property
+    def es_suggestion(self):
+        return self.full_name
 
     id = Column(UUID, primary_key=True, default=uuid4)
 
@@ -218,7 +232,7 @@ class Translator(Base, TimestampMixin, TranslatorDocumentsMixin):
     # Nachweis der Voraussetzungen
     proof_of_preconditions = Column(Text)
 
-    # Referenzen Behörden (???)
+    # Referenzen Behörden
     agency_references = Column(Text)
 
     # Ausbildung Dolmetscher
@@ -245,3 +259,11 @@ class Translator(Base, TimestampMixin, TranslatorDocumentsMixin):
     @property
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
+
+    @property
+    def title(self):
+        return self.full_name
+
+    @property
+    def lead(self):
+        return ', '.join(la.name for la in self.mother_tongues or [])
