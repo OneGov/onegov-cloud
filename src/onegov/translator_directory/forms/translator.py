@@ -201,6 +201,11 @@ class TranslatorForm(Form, FormChoicesMixin):
         label=_('Comments')
     )
 
+    hidden = BooleanField(
+        label=_('Hidden'),
+        default=False
+    )
+
     # Here come the actual file fields to upload stuff
 
     def on_request(self):

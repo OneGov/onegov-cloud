@@ -19,10 +19,12 @@ class TranslatorCollection(GenericCollection, Pagination):
             written_langs=None,
             spoken_langs=None,
             order_by=None,
-            order_desc=False
+            order_desc=False,
+            user_role=None
     ):
         super().__init__(session)
         self.page = page
+        self.user_role = user_role
 
         if spoken_langs:
             assert isinstance(spoken_langs, list)
@@ -90,12 +92,14 @@ class TranslatorCollection(GenericCollection, Pagination):
         )
 
     def query(self):
-        # todo: Filter the hidden ones for non admins
         query = super().query()
         if self.spoken_langs:
             query = query.filter(and_(*self.by_spoken_lang_expression))
         if self.written_langs:
             query = query.filter(and_(*self.by_written_lang_expression))
+
+        if not self.user_role == 'admin':
+            query = query.filter(Translator.hidden == False)
 
         query = query.order_by(self.order_expression)
         return query

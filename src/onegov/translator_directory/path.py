@@ -24,7 +24,8 @@ def get_translators(request, page=None, written_langs=None, spoken_langs=None,
         written_langs=written_langs,
         spoken_langs=spoken_langs,
         order_by=order_by,
-        order_desc=order_desc
+        order_desc=order_desc,
+        user_role=request.current_user.role
     )
 
 
