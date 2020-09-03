@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-09-01 15:24+0200\n"
+"POT-Creation-Date: 2020-09-03 09:27+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -36,6 +36,9 @@ msgstr "Sprachen"
 
 msgid "Name"
 msgstr "Name"
+
+msgid "This field is required."
+msgstr "Dieses Feld wird benötigt."
 
 #, python-format
 msgid "${language} already exists"
@@ -81,7 +84,7 @@ msgid "Bank name"
 msgstr "Bank Name"
 
 msgid "Bank address"
-msgstr ""
+msgstr "Bank-Adresse"
 
 msgid "Account owner"
 msgstr "Bank Konto lautend auf"
@@ -131,8 +134,8 @@ msgstr "Referenzen Behörden"
 msgid "Education as interpreter"
 msgstr "Ausbildung Dolmetscher"
 
-msgid "LanguageCertificate"
-msgstr "Zertifikat"
+msgid "Language Certificates"
+msgstr "Zertifikate"
 
 msgid "Comments"
 msgstr "Bemerkungen"
@@ -142,6 +145,9 @@ msgstr "Ein(e) Übersetzer/in mit dieser Email existiert bereits"
 
 msgid "Order by"
 msgstr "Sortiere nach"
+
+msgid "Order direction"
+msgstr "Sortierung"
 
 msgid "Ascending"
 msgstr "Aufsteigend"
@@ -164,6 +170,9 @@ msgstr "Hinzufügen"
 msgid "Search for translators"
 msgstr "Suche nach Übersetzer/Übersetzerin"
 
+msgid "Add language"
+msgstr "Sprache hinzufügen"
+
 msgid "masculin"
 msgstr "Männlich"
 
@@ -174,10 +183,10 @@ msgid "No results found"
 msgstr "Keine Ergebnisse gefunden"
 
 msgid "Speakers"
-msgstr ""
+msgstr "Sprechende"
 
 msgid "Writers"
-msgstr ""
+msgstr "Schreibende"
 
 msgid "Driving distance"
 msgstr "Wegberechnung"
@@ -188,23 +197,39 @@ msgstr "Telefon Mobile"
 msgid "Name reveal confirmation"
 msgstr "Zustimmung Namensbekanntgabe"
 
-msgid "Withholding Tax"
-msgstr ""
+msgid "Mother tongues"
+msgstr "Muttersprachen"
+
+msgid "Certificate"
+msgstr "Zertifikat"
 
 msgid "Phone numbers"
 msgstr "Telefonischer Kontakt"
 
-msgid "Added a new language"
-msgstr "Neue Sprache hinzugefügt"
+#, python-format
+msgid "Added language ${name}"
+msgstr "Sprache ${name} hinzugefügt"
 
 msgid "Add new language"
 msgstr "Neue Sprache hinzufügen"
+
+msgid "This language is used and can't be deleted"
+msgstr "Diese Sprache wird benutzt und kann nicht gelöscht werden"
+
+msgid "Language successfully deleted"
+msgstr "Sprache erfolgreich gelöscht"
 
 msgid "Added a new translator"
 msgstr "Übersetzer/in hinzugefügt"
 
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
+
+#~ msgid "LanguageCertificate"
+#~ msgstr "Zertifikat"
+
+#~ msgid "Added a new language"
+#~ msgstr "Neue Sprache hinzugefügt"
 
 #~ msgid "Profile"
 #~ msgstr "Profil"

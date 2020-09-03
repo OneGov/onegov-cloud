@@ -14,6 +14,7 @@
                             <p tal:condition="not: results" i18n:translate="">
                                 No results found
                             </p>
+                            <div tal:condition="results" metal:use-macro="layout.macros['form']" />
                             <table id="search-results-table" class="fullwidth" tal:condition="results">
                                 <thead>
                                     <th i18n:translate="" tal:condition="layout.show('pers_id')">Personal ID</th>
@@ -32,12 +33,16 @@
                                         <td><a href="${request.link(translator)}">${translator.full_name}</a></td>
                                         <td>
                                             <tal:b tal:repeat="language translator.written_languages">
-                                                <span tal:attributes="class layout.color_class(language.writers_count)">${language.name} (${language.writers_count})</span>
+                                                <span tal:attributes="class layout.color_class(language.writers_count)">
+                                                    ${language.name} (${language.writers_count})
+                                                </span>
                                             </tal:b>
                                         </td>
                                         <td>
                                             <tal:b tal:repeat="language translator.spoken_languages">
-                                                <span>${language.name} (${language.speakers_count})</span>
+                                                <span tal:attributes="class layout.color_class(language.writers_count)">
+                                                ${language.name} (${language.speakers_count})
+                                                </span>
                                             </tal:b>
                                         </td>
                                         <td>${layout.format_drive_distance(translator.drive_distance)}</td>

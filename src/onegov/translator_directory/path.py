@@ -14,13 +14,17 @@ def get_translator(request, id):
 
 @TranslatorDirectoryApp.path(
     model=TranslatorCollection, path='/translators',
-    converters=dict(page=int, wlang=[], slang=[])
+    converters=dict(page=int, written_langs=[str], spoken_langs=[str],
+                    order_desc=bool)
 )
-def get_translators(request, page=None, written_langs=None, spoken_langs=None):
+def get_translators(request, page=None, written_langs=None, spoken_langs=None,
+                    order_by=None, order_desc=None):
     return TranslatorCollection(
         request.session, page or 0,
         written_langs=written_langs,
-        spoken_langs=spoken_langs
+        spoken_langs=spoken_langs,
+        order_by=order_by,
+        order_desc=order_desc
     )
 
 

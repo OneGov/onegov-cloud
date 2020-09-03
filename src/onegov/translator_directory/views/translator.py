@@ -42,6 +42,13 @@ def add_new_translator(self, request, form):
 def view_translators(self, request, form):
     layout = TranslatorCollectionLayout(self, request)
 
+    if form.submitted(request):
+        form.update_model(self)
+        return request.redirect(request.link(self))
+
+    if not form.errors:
+        form.apply_model(self)
+
     return {
         'layout': layout,
         'model': self,

@@ -1,5 +1,6 @@
 from cached_property import cached_property
-from wtforms import SelectField, StringField, BooleanField, TextAreaField
+from wtforms import SelectField, StringField, BooleanField, TextAreaField, \
+    RadioField
 from wtforms.fields.html5 import DateField, EmailField, IntegerField
 from wtforms.validators import InputRequired, Email, Optional, ValidationError
 
@@ -260,21 +261,39 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         choices=[]
     )
 
-    order_by = SelectField(
+    order_by = RadioField(
         label=_('Order by'),
-        choices=[
+        choices=(
             (order_cols[0], _('Last name')),
-            (order_cols[1], _('Drive distance'))
-        ]
+            (order_cols[1], _('Drive distance')),
+        ),
+        default=order_cols[0]
     )
 
-    order_desc = SelectField(
-        label=_('Order by'),
-        choices=[
-            ('', _('Ascending')),
-            ('yes', _('Descending'))
-        ]
+    order_desc = RadioField(
+        label=_("Order direction"),
+        choices=(
+            ('0', _("Ascending")),
+            ('1', _("Descending"))
+        ),
+        default='0'
     )
+
+    def apply_model(self, model):
+
+        if model.spoken_langs:
+            self.spoken_langs.data = model.spoken_langs
+
+        if model.written_langs:
+            self.written_langs.data = model.written_langs
+        self.order_by.data = model.order_by
+        self.order_desc.data = model.order_desc and '1' or '0'
+
+    def update_model(self, model):
+        model.spoken_langs = self.spoken_langs.data
+        model.written_langs = self.written_langs.data
+        model.order_by = self.order_by.data
+        model.order_desc = self.order_desc == '1' and True or False
 
     def on_request(self):
         self.spoken_langs.choices = self.language_choices
