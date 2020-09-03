@@ -42,6 +42,13 @@ class Language(Base):
         return session.query(
             written_association_table).filter_by(lang_id=self.id).count()
 
+    @property
+    def native_speakers_count(self):
+        """Having it as mother tongue..."""
+        session = object_session(self)
+        return session.query(
+            mother_tongue_association_table).filter_by(lang_id=self.id).count()
+
 
 spoken_association_table = Table(
     'spoken_lang_association',

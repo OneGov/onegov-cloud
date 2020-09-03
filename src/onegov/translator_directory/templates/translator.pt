@@ -98,15 +98,27 @@
                             </dl>
                             <dl class="field-display" tal:condition="model.mother_tongues and layout.show('mother_tongues')">
                                 <dt i18n:translate>Mother tongues</dt>
-                                <dd>${layout.format_languages(model.mother_tongues)}</dd>
+                                <dd>
+                                    <span tal:repeat="lang model.mother_tongues" tal:attributes="class layout.color_class(lang.native_speakers_count)">
+                                        ${lang.name}<tal:b tal:condition="not: repeat.lang.end">,</tal:b>
+                                    </span>
+                                </dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.spoken_languages and layout.show('spoken_languages')">
                                 <dt i18n:translate>Spoken languages</dt>
-                                <dd>${layout.format_languages(model.spoken_languages)}</dd>
+                                <dd>
+                                    <span tal:repeat="lang model.spoken_languages" tal:attributes="class layout.color_class(lang.speakers_count)">
+                                        ${lang.name}<tal:b tal:condition="not: repeat.lang.end">,</tal:b>
+                                    </span>
+                                </dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.written_languages and layout.show('written_languages')">
                                 <dt i18n:translate>Written languages</dt>
-                                <dd >${layout.format_languages(model.written_languages)}</dd>
+                                <dd>
+                                    <span tal:repeat="lang model.written_languages" tal:attributes="class layout.color_class(lang.writers_count)">
+                                        ${lang.name}<tal:b tal:condition="not: repeat.lang.end">,</tal:b>
+                                    </span>
+                                </dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.proof_of_preconditions and layout.show('proof_of_preconditions')">
                                 <dt i18n:translate>Proof of preconditions</dt>
