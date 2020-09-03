@@ -80,9 +80,11 @@ def import_certifcates(csvfile, session):
 
 
 def parse_gender(field):
-    if field and field[0] in GENDERS:
+    if not field:
+        return GENDERS[-1]
+    if field == 'Männlich':
         return field[0]
-    return GENDERS[-1]
+    return field[1]
 
 
 def parse_date(field):
