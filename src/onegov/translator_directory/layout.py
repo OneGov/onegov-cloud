@@ -7,7 +7,7 @@ from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 from onegov.translator_directory.models.translator import GENDERS_DESC, \
-    GENDERS, member_can_see, editor_can_see
+    GENDERS, member_can_see, editor_can_see, ADMISSIONS_DESC, ADMISSIONS
 
 
 class DefaultLayout(BaseLayout):
@@ -32,6 +32,9 @@ class DefaultLayout(BaseLayout):
     def format_boolean(self, val):
         assert isinstance(val, bool)
         return self.request.translate((_('Yes') if val else _('No')))
+
+    def format_admission(self, val):
+        return self.request.translate(ADMISSIONS_DESC[ADMISSIONS.index(val)])
 
 
 class TranslatorLayout(DefaultLayout):

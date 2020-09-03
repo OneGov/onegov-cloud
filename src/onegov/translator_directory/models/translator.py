@@ -13,6 +13,7 @@ from onegov.translator_directory.models.documents import CertificateFile, \
     CorrespondenceFile, MiscFile
 
 ADMISSIONS = ('uncertified', 'in_progress', 'certified')
+ADMISSIONS_DESC = (_('uncertified'), _('in progress'), _('certified'))
 GENDERS = ('M', 'F', 'N')
 GENDERS_DESC = (_('masculin'), _('feminin'), 'neutral')
 CERTIFICATES = ('ZHAW', 'OGZH')

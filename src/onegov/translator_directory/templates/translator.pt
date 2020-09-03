@@ -8,9 +8,13 @@
                 <div class="row">
                     <div class="columns small-12 medium-6">
                         <tal:b tal:condition="model|nothing">
-                            <dl class="field-display" tal:condition="model.pers_id is not None and not layout.show('pers_id')">
+                            <dl class="field-display" tal:condition="model.pers_id is not None and layout.show('pers_id')">
                                 <dt i18n:translate>Personal ID</dt>
                                 <dd>${model.pers_id}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="layout.show('admission')">
+                                <dt i18n:translate>Admission</dt>
+                                <dd>${layout.format_admission(model.admission)}</dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.gender and layout.show('gender')">
                                 <dt i18n:translate>Gender</dt>
@@ -79,10 +83,6 @@
                             <dl class="field-display" tal:condition="model.availability and layout.show('availability')">
                                 <dt i18n:translate>Availability</dt>
                                 <dd>${model.availability}</dd>
-                            </dl>
-                            <dl class="field-display" tal:condition="model.confirm_name_reveal and layout.show('confirm_name_reveal')">
-                                <dt i18n:translate>Name reveal confirmation</dt>
-                                <dd>${model.confirm_name_reveal}</dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.confirm_name_reveal and layout.show('confirm_name_reveal')">
                                 <dt i18n:translate>Name reveal confirmation</dt>
