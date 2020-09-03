@@ -29,6 +29,10 @@ class DefaultLayout(BaseLayout):
             return ''
         return f'{number} km'
 
+    def format_boolean(self, val):
+        assert isinstance(val, bool)
+        return self.request.translate((_('Yes') if val else _('No')))
+
 
 class TranslatorLayout(DefaultLayout):
 
