@@ -6,7 +6,7 @@ from onegov.translator_directory.collections.translator import \
 from onegov.translator_directory.forms.translator import TranslatorForm, \
     TranslatorSearchForm
 from onegov.translator_directory.layout import AddTranslatorLayout, \
-    TranslatorCollectionLayout, TranslatorLayout
+    TranslatorCollectionLayout, TranslatorLayout, EditTranslatorLayout
 from onegov.translator_directory.models.translator import Translator
 
 
@@ -85,7 +85,9 @@ def edit_translator(self, request, form):
         form.populate_obj(self)
         request.success(_("Your changes were saved"))
         return request.redirect(request.link(self))
-    layout = AddTranslatorLayout(self, request)
+    if not form.errors:
+        form.apply_model(self)
+    layout = EditTranslatorLayout(self, request)
     return {
         'layout': layout,
         'model': self,

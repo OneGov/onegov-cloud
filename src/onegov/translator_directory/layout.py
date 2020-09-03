@@ -40,6 +40,18 @@ class DefaultLayout(BaseLayout):
 class TranslatorLayout(DefaultLayout):
 
     @cached_property
+    def editbar_links(self):
+        return [
+            Link(
+                text=_("Edit"),
+                url=self.request.link(
+                    self.model, name='edit'
+                ),
+                attrs={'class': 'edit-icon'}
+            )
+        ]
+
+    @cached_property
     def breadcrumbs(self):
         links = super().breadcrumbs
         links.append(

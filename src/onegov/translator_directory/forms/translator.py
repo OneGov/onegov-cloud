@@ -47,6 +47,12 @@ class FormChoicesMixin:
             for id_, choice in zip(GENDERS, GENDERS_DESC)
         )
 
+    @staticmethod
+    def associated_ids(model, attr):
+        return [
+            str(item.id) for item in getattr(model, attr)
+        ]
+
 
 class TranslatorForm(Form, FormChoicesMixin):
 
@@ -94,7 +100,7 @@ class TranslatorForm(Form, FormChoicesMixin):
         label=_('City'),
     )
 
-    drive_distance = IntegerField(
+    drive_distance = StringField(
         label=_('Drive distance'),
         validators=[Optional()]
     )
@@ -253,6 +259,24 @@ class TranslatorForm(Form, FormChoicesMixin):
                     email=field.data).first():
                 raise ValidationError(
                     _("A translator with this email already exists"))
+
+    def validate_drive_distance(self, field):
+        if field.data:
+            try:
+                field.data = float(field.data)
+            except ValueError:
+                raise ValidationError(_('Not a valid number'))
+
+    def apply_model(self, model):
+        # {k: v for k, v in self.data.items() if k not in exclude}
+        associated_items = {
+            'spoken_languages', 'written_languages', 'mother_tongues',
+            'certificates'
+        }
+        for attr in (field for field in self._fields if field != 'csrf_token'):
+            getattr(self, attr).data = getattr(model, attr)
+        for attr in associated_items:
+            getattr(self, attr).data = self.associated_ids(model, attr)
 
 
 class TranslatorSearchForm(Form, FormChoicesMixin):

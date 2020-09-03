@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-09-03 11:09+0200\n"
+"POT-Creation-Date: 2020-09-03 18:35+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -140,8 +140,14 @@ msgstr "Zertifikate"
 msgid "Comments"
 msgstr "Bemerkungen"
 
+msgid "Hidden"
+msgstr "Versteckt"
+
 msgid "A translator with this email already exists"
 msgstr "Ein(e) Übersetzer/in mit dieser Email existiert bereits"
+
+msgid "Not a valid number"
+msgstr "Keine gültige Zahl"
 
 msgid "Order by"
 msgstr "Sortiere nach"
@@ -161,11 +167,11 @@ msgstr "Ja"
 msgid "No"
 msgstr "Nein"
 
-msgid "Edit translator"
-msgstr "Übersetzer/in"
-
 msgid "Edit"
 msgstr "Bearbeiten"
+
+msgid "Edit translator"
+msgstr "Übersetzer/in"
 
 msgid "Add translator"
 msgstr "Übersetzer/in hinzufügen"

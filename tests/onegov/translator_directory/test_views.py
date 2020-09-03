@@ -74,6 +74,9 @@ def test_view_new_translator(client):
     # test written languages
     assert language_names[2] in page
 
+    # edit the hide attribute
+    page = page.click('Bearbeiten')
+
     # try adding another with same email
     page = client.get('/translators/new')
     page.form['first_name'] = 'Uncle'
