@@ -129,7 +129,7 @@ def test_create_new_language(client):
 
     page.form['name'] = ' enGlish   '
     page = page.form.submit().follow()
-    assert 'Added language English' in page
+    assert 'Sprache English hinzugefügt' in page
     assert 'English' in page
 
     page = client.get('/languages/new')
