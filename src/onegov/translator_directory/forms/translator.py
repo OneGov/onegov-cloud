@@ -1,6 +1,6 @@
 from cached_property import cached_property
 from wtforms import SelectField, StringField, BooleanField, TextAreaField, \
-    RadioField
+    RadioField, FloatField
 from wtforms.fields.html5 import DateField, EmailField, IntegerField
 from wtforms.validators import InputRequired, Email, Optional, ValidationError
 
@@ -100,7 +100,7 @@ class TranslatorForm(Form, FormChoicesMixin):
         label=_('City'),
     )
 
-    drive_distance = StringField(
+    drive_distance = FloatField(
         label=_('Drive distance'),
         validators=[Optional()]
     )
@@ -259,13 +259,6 @@ class TranslatorForm(Form, FormChoicesMixin):
                     email=field.data).first():
                 raise ValidationError(
                     _("A translator with this email already exists"))
-
-    def validate_drive_distance(self, field):
-        if field.data:
-            try:
-                field.data = float(field.data)
-            except ValueError:
-                raise ValidationError(_('Not a valid number'))
 
     def apply_model(self, model):
         # {k: v for k, v in self.data.items() if k not in exclude}
