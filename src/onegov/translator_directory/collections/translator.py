@@ -65,7 +65,7 @@ class TranslatorCollection(GenericCollection, Pagination):
     @property
     def order_expression(self):
         order_by = getattr(self.model_class, self.order_by)
-        return desc(order_by) if self.order_desc == '1' else order_by
+        return desc(order_by) if self.order_desc else order_by
 
     @property
     def by_spoken_lang_expression(self):
@@ -108,7 +108,7 @@ class TranslatorCollection(GenericCollection, Pagination):
         return self.__class__(
             self.session,
             page=0,
-            order_desc=form.order_desc.data and True or False,
+            order_desc=form.order_desc.data,
             written_langs=form.written_langs.data,
             spoken_langs=form.spoken_langs.data,
             order_by=form.order_by.data
