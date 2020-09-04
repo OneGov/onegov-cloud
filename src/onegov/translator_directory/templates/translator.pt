@@ -132,7 +132,7 @@
                                 <dt i18n:translate>Proof of preconditions</dt>
                                 <dd >${model.proof_of_preconditions}</dd>
                             </dl>
-                            <dl class="field-display" tal:condition="model.education_as_interpreter and layout.show('education_as_interpreter')">
+                            <dl class="field-display" tal:condition="layout.show('education_as_interpreter')">
                                 <dt i18n:translate>Education as interpreter</dt>
                                 <dd >${layout.format_boolean(model.education_as_interpreter)}</dd>
                             </dl>
@@ -141,12 +141,16 @@
                                 <dd >${model.proof_of_preconditions}</dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.certificates and layout.show('certificates')">
-                                <dt i18n:translate>Certificate</dt>
+                                <dt i18n:translate>Certificates</dt>
                                 <dd >${layout.format_languages(model.certificates)}</dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.comments and layout.show('comments')">
                                 <dt i18n:translate>Comments</dt>
                                 <dd >${model.comments}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="request.is_admin">
+                                <dt i18n:translate>Hidden</dt>
+                                <dd >${layout.format_boolean(model.hide)}</dd>
                             </dl>
                        </tal:b>
                     </div>
