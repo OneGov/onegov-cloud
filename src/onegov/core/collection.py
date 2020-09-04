@@ -26,6 +26,11 @@ class GenericCollection(object):
     def by_id(self, id):
         return self.query().filter(self.primary_key == id).first()
 
+    def by_ids(self, ids):
+        return self.query().filter(
+            self.primary_key.in_(ids)
+        ).all() if ids else []
+
     def add(self, **kwargs):
         item = self.model_class(**kwargs)
 

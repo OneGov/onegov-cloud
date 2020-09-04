@@ -29,11 +29,6 @@ class LanguageCollection(GenericCollection, Pagination):
                 func.unaccent(Language.name).startswith(self.letter))
         return query.order_by(Language.name)
 
-    def by_ids(self, ids):
-        return self.session.query(Language).filter(
-            Language.id.in_(ids)
-        )
-
     def __eq__(self, other):
         return other.page == self.page
 
