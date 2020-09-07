@@ -181,7 +181,8 @@ def import_translators(csvfile, session):
         trs.date_of_application = parse_date(line.bewerbung)
         trs.date_of_decision = parse_date(line.entscheid_datum)
         trs.occupation = line.berufliche_qualifikation_tatigkeit
-        trs.proof_of_preconditions = line.nachweis_der_voraussetzungen
+        trs.proof_of_preconditions = parse_phone(
+            line.nachweis_der_voraussetzungen)
         trs.agency_references = line.referenzen_behorden
         trs.education_as_interpreter = parse_boolean(
             line.ausbildung_ubersetzen_dolmetschen)
