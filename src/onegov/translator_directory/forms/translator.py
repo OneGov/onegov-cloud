@@ -264,6 +264,10 @@ class TranslatorForm(Form, FormChoicesMixin):
 
         return data
 
+    def validate_zip_code(self, field):
+        if field.data and not re.match(r'\d{4}', field.data):
+            raise ValidationError(_('Zip code must consist of 4 digits'))
+
     def validate_email(self, field):
         if field.data:
             field.data = field.data.lower()
