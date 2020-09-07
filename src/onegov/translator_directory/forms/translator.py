@@ -330,7 +330,7 @@ class TranslatorForm(Form, FormChoicesMixin):
         model.agency_references = self.agency_references.data or None
         model.education_as_interpreter = self.education_as_interpreter.data
         model.comments = self.comments.data or None
-        # model.for_admins_only = self.for_admins_only.data
+        model.for_admins_only = self.for_admins_only.data
 
         self.update_association(model, 'mother_tongues', '_ids')
         self.update_association(model, 'spoken_languages', '_ids')
