@@ -108,7 +108,7 @@ def test_view_new_translator(client):
     page.form['education_as_interpreter'] = True
     page.form['comments'] = 'My Comments'
 
-    # Todo: whenever below field is activated, there is a 404 and a new model is created!!!
+    # Todo: uncomment below and you get 404 cause a new model is beeing created wtf
     # page.form['for_admins_only'] = True
 
     # test removing all languages
@@ -156,7 +156,7 @@ def test_view_new_translator(client):
 
     page = page.form.submit()
     assert 'Ein(e) Übersetzer/in mit dieser Email existiert bereits' in page
-
+    assert False
     # editor = client.spawn()
     # editor.login_editor()
     # editor.get(f'/translator/{tr_id}', status=403)
