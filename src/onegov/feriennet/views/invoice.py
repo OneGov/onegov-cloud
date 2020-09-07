@@ -1,5 +1,6 @@
 from decimal import Decimal
-from onegov.activity import Period, Invoice, InvoiceItem, InvoiceCollection
+from onegov.activity import Period, Invoice, InvoiceItem, InvoiceCollection, \
+    PeriodCollection
 from onegov.core.security import Personal, Secret
 from onegov.core.templates import render_macro
 from onegov.feriennet import FeriennetApp, _
@@ -52,7 +53,9 @@ def view_creditcard_payments(self, request):
     template='invoices.pt',
     permission=Personal)
 def view_my_invoices(self, request):
-    periods = {p.id.hex: p for p in request.app.periods if p.finalized}
+    query = PeriodCollection(request.session).query()
+    query = query.filter(Period.finalized == True)
+    periods = {p.id.hex: p for p in query}
 
     # By default, we want to see all the invoices, unless a specific one
     # is selected. This is a bit of a code-smell, because we usually would
