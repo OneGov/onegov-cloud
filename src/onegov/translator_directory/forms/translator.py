@@ -52,7 +52,7 @@ class FormChoicesMixin:
         )
 
     @staticmethod
-    def associated_ids(model, attr):
+    def get_ids(model, attr):
         return [
             str(item.id) for item in getattr(model, attr)
         ]
@@ -176,19 +176,19 @@ class TranslatorForm(Form, FormChoicesMixin):
         validators=[Optional()]
     )
 
-    mother_tongues = ChosenSelectMultipleField(
+    mother_tongues_ids = ChosenSelectMultipleField(
         label=_('Mother tongue'),
         validators=[InputRequired()],
         choices=[]
     )
 
-    spoken_languages = ChosenSelectMultipleField(
+    spoken_languages_ids = ChosenSelectMultipleField(
         label=_('Spoken languages'),
         validators=[StrictOptional()],
         choices=[]
     )
 
-    written_languages = ChosenSelectMultipleField(
+    written_languages_ids = ChosenSelectMultipleField(
         label=_('Written languages'),
         validators=[StrictOptional()],
         choices=[]
@@ -209,8 +209,7 @@ class TranslatorForm(Form, FormChoicesMixin):
         default=False
     )
 
-    # certificates
-    certificates = ChosenSelectMultipleField(
+    certificates_ids = ChosenSelectMultipleField(
         label=_('Language Certificates'),
         validators=[Optional()],
         choices=[]
@@ -220,48 +219,60 @@ class TranslatorForm(Form, FormChoicesMixin):
         label=_('Comments')
     )
 
-    hide = BooleanField(
+    for_admins_only = BooleanField(
         label=_('Hidden'),
         default=False
     )
+
+    @property
+    def lang_collection(self):
+        return LanguageCollection(self.request.session)
+
+    @property
+    def cert_collection(self):
+        return LanguageCollection(self.request.session)
+
+    @property
+    def certificates(self):
+        return self.cert_collection.by_ids(self.certificates_ids.data)
+
+    @property
+    def mother_tongues(self):
+        return self.lang_collection.by_ids(self.mother_tongues_ids.data)
+
+    @property
+    def spoken_languages(self):
+        return self.lang_collection.by_ids(self.spoken_languages_ids.data)
+
+    @property
+    def written_languages(self):
+        return self.lang_collection.by_ids(self.written_languages_ids.data)
+
+    special_fields = {
+        'mother_tongues_ids': mother_tongue_association_table,
+        'spoken_languages_ids': spoken_association_table,
+        'written_languages_ids': written_association_table,
+        'certificates_ids': certificate_association_table
+    }
 
     # Here come the actual file fields to upload stuff
 
     def on_request(self):
         self.gender.choices = self.gender_choices
-        self.mother_tongues.choices = self.language_choices
-        self.spoken_languages.choices = self.language_choices
-        self.written_languages.choices = self.language_choices
-        self.certificates.choices = self.certificate_choices
+        self.mother_tongues_ids.choices = self.language_choices
+        self.spoken_languages_ids.choices = self.language_choices
+        self.written_languages_ids.choices = self.language_choices
+        self.certificates_ids.choices = self.certificate_choices
 
-    def get_useful_data(self, exclude={'csrf_token'}):
+    def get_useful_data(self):
+        """Do not use to update and instance of a translator."""
         data = super().get_useful_data(
-            exclude={'csrf_token', 'spoken_languages', 'written_languages',
-                     'certificates', 'mother_tongues'})
+            exclude={'csrf_token', *self.special_fields.keys()})
 
-        languages = LanguageCollection(self.request.session)
-
-        if self.mother_tongues.data:
-            langs = languages.by_ids(self.mother_tongues.data).all()
-            assert len(langs) == len(self.mother_tongues.data)
-            data['mother_tongues'] = langs
-
-        if self.spoken_languages.data:
-            spoken = languages.by_ids(self.spoken_languages.data).all()
-            assert len(spoken) == len(self.spoken_languages.data)
-            data['spoken_languages'] = spoken
-
-        if self.written_languages.data:
-            written = languages.by_ids(self.written_languages.data).all()
-            assert len(written) == len(self.written_languages.data)
-            data['written_languages'] = written
-
-        lang_certs = LanguageCertificateCollection(self.request.session)
-        if self.certificates.data:
-            certs = lang_certs.by_ids(self.certificates.data).all()
-            assert len(certs) == len(self.certificates.data)
-            data['certificates'] = certs
-
+        data['mother_tongues'] = self.mother_tongues
+        data['spoken_languages'] = self.spoken_languages
+        data['written_languages'] = self.written_languages
+        data['certificates'] = self.certificates
         return data
 
     def validate_zip_code(self, field):
@@ -274,23 +285,57 @@ class TranslatorForm(Form, FormChoicesMixin):
         if isinstance(self.model, Translator):
             if str(self.model.email) == field.data:
                 return
-
-        trs = self.request.session.query(Translator).filter_by(
-                    email=field.data).first()
+        query = self.request.session.query
+        trs = query(Translator).filter_by(email=field.data).first()
         if trs:
             raise ValidationError(
                 _("A translator with this email already exists"))
 
-    def apply_model(self, model):
-        # {k: v for k, v in self.data.items() if k not in exclude}
-        associated_items = {
-            'spoken_languages', 'written_languages', 'mother_tongues',
-            'certificates'
-        }
-        for attr in (field for field in self._fields if field != 'csrf_token'):
-            getattr(self, attr).data = getattr(model, attr)
-        for attr in associated_items:
-            getattr(self, attr).data = self.associated_ids(model, attr)
+    def update_association(self, model, db_field, suffix):
+        field = f'{db_field}{suffix}'
+        setattr(model, db_field, [])
+        if not getattr(self, field).data:
+            return
+        for item in getattr(self, db_field):
+            getattr(model, db_field).append(item)
+
+    def update_model(self, model):
+        """
+        We update the model by field explicitely, since using field names with
+        setattr or getattr creates new database instance of the model
+        """
+        model.pers_id = self.pers_id.data or None
+        model.admission = self.admission.data
+        model.withholding_tax = self.withholding_tax.data or None
+        model.gender = self.gender.data
+        model.date_of_birth = self.date_of_birth.data or None
+        model.nationality = self.nationality.data or None
+        model.address = self.address.data or None
+        model.zip_code = self.zip_code.data or None
+        model.city = self.city.data or None
+        model.drive_distance = self.drive_distance.data or None
+        model.social_sec_number = self.social_sec_number.data or None
+        model.bank_name = self.bank_name.data or None
+        model.bank_address = self.bank_address.data or None
+        model.account_owner = self.account_owner.data or None
+        model.email = self.email.data or None
+        model.tel_mobile = self.tel_mobile.data or None
+        model.tel_private = self.tel_private.data or None
+        model.tel_office = self.tel_office.data or None
+        model.availability = self.availability.data or None
+        model.confirm_name_reveal = self.confirm_name_reveal.data
+        model.date_of_application = self.date_of_application.data or None
+        model.date_of_decision = self.date_of_decision.data or None
+        model.proof_of_preconditions = self.proof_of_preconditions.data or None
+        model.agency_references = self.agency_references.data or None
+        model.education_as_interpreter = self.education_as_interpreter.data
+        model.comments = self.comments.data or None
+        # model.for_admins_only = self.for_admins_only.data
+
+        self.update_association(model, 'mother_tongues', '_ids')
+        self.update_association(model, 'spoken_languages', '_ids')
+        self.update_association(model, 'written_languages', '_ids')
+        self.update_association(model, 'certificates', '_ids')
 
 
 class TranslatorSearchForm(Form, FormChoicesMixin):

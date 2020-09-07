@@ -4,8 +4,7 @@ import transaction
 
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
-from onegov.translator_directory.models.translator import CERTIFICATES, \
-    Translator, Language
+from onegov.translator_directory.models.translator import Translator, Language
 from tests.onegov.translator_directory.shared import translator_data, \
     create_languages, create_certificates
 from tests.shared.utils import open_in_browser
@@ -17,13 +16,13 @@ def test_view_new_translator(client):
     - validate always lowercase email
     - validate social security number
     - make a run to fill all the fields
+    - Test email validation in edit and new
     """
 
     session = client.app.session()
     languages = create_languages(session)
     certs = create_certificates(session)
     cert_names = [cert.name for cert in certs]
-    cert_ids = [str(cert.id) for cert in certs]
     language_ids = [str(lang.id) for lang in languages]
     language_names = [lang.name for lang in languages]
     transaction.commit()
@@ -41,31 +40,34 @@ def test_view_new_translator(client):
     page.form['first_name'] = 'Uncle'
     page.form['last_name'] = 'Bob'
     page.form['social_sec_number'] = 'xxxx'
+    page.form['zip_code'] = 'xxxx'
     page = page.form.submit()
     assert "Ungültige AHV-Nummer" in page
+    assert "Postleitzahl muss aus 4 Ziffern bestehen" in page
 
     # input required fields
     page.form['social_sec_number'] = '756.1234.5678.97'
     page.form['tel_mobile'] = '079 700 80 97'
     page.form['agency_references'] = 'All okay'
+    page.form['zip_code'] = '7890'
+    page.form['mother_tongues_ids'] = [language_ids[3]]
 
     # non required fields
     page.form['email'] = 'Test@test.com'
-    page.form['spoken_languages'] = [
-        language_ids[0], language_ids[1]
-    ]
-    page.form['written_languages'] = [
-        language_ids[2]
-    ]
+    page.form['spoken_languages_ids'] = [language_ids[0], language_ids[1]]
+    page.form['written_languages_ids'] = [language_ids[2]]
 
-    page.form['mother_tongues'] = [language_ids[-1]]
     page = page.form.submit().follow()
     assert 'Uncle' in page
+    assert 'Bob' in page
     # test lower-casing the user input
     assert 'test@test.com' in page
+    assert '756.1234.5678.97' in page
+    assert 'All okay' in page
+    assert '7890' in page
 
     # Test mother tongue set to the first ordered option
-    assert language_names[-1] in page
+    assert language_names[3] in page
 
     # test spoken languages
     assert language_names[0] in page
@@ -73,11 +75,79 @@ def test_view_new_translator(client):
 
     # test written languages
     assert language_names[2] in page
+    # open_in_browser(page)
 
-    # edit the hide attribute
+    # edit some key attribute
     page = page.click('Bearbeiten')
+    assert 'Zulassung' in page
 
-    # try adding another with same email
+    # Doing any change will create a new model instance ?!
+    page.form['pers_id'] = 123456
+    page.form['admission'] = 'in_progress'
+    page.form['withholding_tax'] = 'ATAX'
+    page.form['gender'] = 'F'
+    page.form['date_of_birth'] = '2019-01-01'
+    page.form['nationality'] = 'PERU'
+    page.form['address'] = 'Somestreet'
+    page.form['zip_code'] = '4052'
+    page.form['city'] = 'Somecity'
+    page.form['drive_distance'] = 60.01
+    page.form['social_sec_number'] = '756.1111.1111.11'
+    page.form['bank_name'] = 'Abank'
+    page.form['bank_address'] = 'AB Address'
+    page.form['account_owner'] = 'AccountOwner'
+    page.form['tel_mobile'] = '044 123 50 50'
+    page.form['tel_private'] = '044 123 50 51'
+    page.form['tel_office'] = '044 123 50 52'
+    page.form['availability'] = 'always 24h'
+    page.form['confirm_name_reveal'] = False
+    page.form['date_of_application'] = '2015-01-01'
+    page.form['date_of_decision'] = '2016-01-01'
+    page.form['proof_of_preconditions'] = 'ZHCW'
+    page.form['agency_references'] = 'Kt. ZG'
+    page.form['education_as_interpreter'] = True
+    page.form['comments'] = 'My Comments'
+
+    # Todo: whenever below field is activated, there is a 404 and a new model is created!!!
+    # page.form['for_admins_only'] = True
+
+    # test removing all languages
+    page.form['spoken_languages_ids'] = []
+    page.form['written_languages_ids'] = []
+
+    page = page.form.submit().follow()
+    assert 'Ihre Änderungen wurden gespeichert' in page
+
+    assert '123456' in page
+    assert 'im Zulassungsverfahren' in page
+    assert 'ATAX' in page
+    assert 'Weiblich' in page
+    assert '01.01.2019' in page
+    assert 'PERU' in page
+    assert 'Somestreet' in page
+    assert '4052' in page
+    assert 'Somecity' in page
+    assert '60.01' in page
+    assert '756.1111.1111.11' in page
+    assert 'Abank' in page
+    assert 'AB Address' in page
+    assert 'AccountOwner' in page
+    assert '044 123 50 50' in page
+    assert '044 123 50 51' in page
+    assert '044 123 50 52' in page
+    assert 'always 24h' in page
+    assert '01.01.2015' in page
+    assert '01.01.2016' in page
+    assert 'ZHCW' in page
+    assert 'Kt. ZG' in page
+    assert 'My Comments' in page
+
+    assert language_names[3] in page
+    assert language_names[0] not in page
+    assert language_names[1] not in page
+    assert language_names[2] not in page
+
+    # # try adding another with same email
     page = client.get('/translators/new')
     page.form['first_name'] = 'Uncle'
     page.form['last_name'] = 'Bob'
@@ -87,13 +157,18 @@ def test_view_new_translator(client):
     page = page.form.submit()
     assert 'Ein(e) Übersetzer/in mit dieser Email existiert bereits' in page
 
+    # editor = client.spawn()
+    # editor.login_editor()
+    # editor.get(f'/translator/{tr_id}', status=403)
 
-def test_view_translator(client):
+def test_view_edit_translator(client):
     session = client.app.session()
     translators = TranslatorCollection(session)
     translator = translators.add(**translator_data)
     tr_id = translator.id
+    lang_ids = [str(l.id) for l in create_languages(session)]
     transaction.commit()
+
     client.get(f'/translator/{tr_id}', status=403)
     client.login_member()
     page = client.get(f'/translator/{tr_id}')
@@ -155,9 +230,9 @@ def test_view_search_translator(client):
     for i in range(len(languages)):
         data = copy.deepcopy(translator_data)
         data['email'] = f'translator{1}@test.com'
-        data['mother_tongues'] = [languages[i]]
-        data['spoken_languages'] = [languages[i]]
-        data['written_languages'] = [languages[0]]
+        data['mother_tongues_ids'] = [languages[i]]
+        data['spoken_languages_ids'] = [languages[i]]
+        data['written_languages_ids'] = [languages[0]]
         translators.add(**translator_data)
 
     transaction.commit()
@@ -166,6 +241,5 @@ def test_view_search_translator(client):
     languages = session.query(Language).all()
 
     page = client.get('/translators')
-    open_in_browser(page)
     assert 'translator1@test.com' in page
 

@@ -82,11 +82,15 @@ def view_translator(self, request):
 def edit_translator(self, request, form):
 
     if form.submitted(request):
-        form.populate_obj(self)
+        form.update_model(self)
         request.success(_("Your changes were saved"))
         return request.redirect(request.link(self))
     if not form.errors:
-        form.apply_model(self)
+        form.process(
+            obj=self,
+            **{attr: form.get_ids(self, attr.split('_ids')[0])
+                for attr in form.special_fields}
+        )
     layout = EditTranslatorLayout(self, request)
     return {
         'layout': layout,
