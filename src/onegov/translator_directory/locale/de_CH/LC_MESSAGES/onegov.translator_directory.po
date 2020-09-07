@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-09-03 18:35+0200\n"
+"POT-Creation-Date: 2020-09-07 15:54+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -46,6 +46,9 @@ msgstr "${language} existiert bereits"
 
 msgid "Personal ID"
 msgstr "Personal Nr."
+
+msgid "Admission"
+msgstr "Zulassung"
 
 msgid "First name"
 msgstr "Vorname"
@@ -116,15 +119,6 @@ msgstr "Bewerbung Datum"
 msgid "Date of decision"
 msgstr "Entscheid Datum"
 
-msgid "Mother tongue"
-msgstr "Muttersprache"
-
-msgid "Spoken languages"
-msgstr "Sprachen Wort"
-
-msgid "Written languages"
-msgstr "Sprachen Schrift"
-
 msgid "Proof of preconditions"
 msgstr "Nachweis der Voraussetzung"
 
@@ -133,9 +127,6 @@ msgstr "Referenzen Behörden"
 
 msgid "Education as interpreter"
 msgstr "Ausbildung Dolmetscher"
-
-msgid "Language Certificates"
-msgstr "Zertifikate"
 
 msgid "Comments"
 msgstr "Bemerkungen"
@@ -146,8 +137,14 @@ msgstr "Versteckt"
 msgid "A translator with this email already exists"
 msgstr "Ein(e) Übersetzer/in mit dieser Email existiert bereits"
 
-msgid "Not a valid number"
-msgstr "Keine gültige Zahl"
+msgid "Zip code must consist of 4 digits"
+msgstr "Postleitzahl muss aus 4 Ziffern bestehen"
+
+msgid "Spoken languages"
+msgstr "Sprachen Wort"
+
+msgid "Written languages"
+msgstr "Sprachen Schrift"
 
 msgid "Order by"
 msgstr "Sortiere nach"
@@ -215,9 +212,6 @@ msgstr "Sprechende"
 msgid "Writers"
 msgstr "Schreibende"
 
-msgid "Admission"
-msgstr "Zulassung"
-
 msgid "Driving distance"
 msgstr "Wegberechnung"
 
@@ -230,8 +224,8 @@ msgstr "Zustimmung Namensbekanntgabe"
 msgid "Mother tongues"
 msgstr "Muttersprachen"
 
-msgid "Certificate"
-msgstr "Zertifikat"
+msgid "Certificates"
+msgstr "Zertifikate"
 
 msgid "Phone numbers"
 msgstr "Telefonischer Kontakt"
@@ -254,6 +248,18 @@ msgstr "Übersetzer/in hinzugefügt"
 
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
+
+#~ msgid "Mother tongue"
+#~ msgstr "Muttersprache"
+
+#~ msgid "Language Certificates"
+#~ msgstr "Zertifikate"
+
+#~ msgid "Not a valid number"
+#~ msgstr "Keine gültige Zahl"
+
+#~ msgid "Certificate"
+#~ msgstr "Zertifikat"
 
 #~ msgid "LanguageCertificate"
 #~ msgstr "Zertifikat"
