@@ -247,7 +247,7 @@ class Translator(Base, TimestampMixin, DocumentsMixin, ORMSearchable):
     comments = Column(Text)
 
     # field for hiding to users except admins
-    hide = Column(Boolean, default=False, nullable=False)
+    for_admins_only = Column(Boolean, default=False, nullable=False)
 
     # the below might never be used, but we import it if customer wants them
     occupation = Column(Text)

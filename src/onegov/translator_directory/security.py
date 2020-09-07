@@ -19,6 +19,6 @@ def local_is_logged_in(app, identity, model, permission):
 
 @TranslatorDirectoryApp.permission_rule(model=Translator, permission=object)
 def hide_translator_for_non_admins(app, identity, model, permission):
-    if model.hide and identity.role != 'admin':
+    if model.for_admins_only and identity.role != 'admin':
         return False
     return local_is_logged_in(app, identity, model, permission)
