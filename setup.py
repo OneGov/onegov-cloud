@@ -263,6 +263,6 @@ setup(
             'onegov.user=onegov.user.upgrade',
             'onegov.winterthur=onegov.winterthur.upgrade',
             'onegov.wtfs=onegov.wtfs.upgrade',
-            'onegov.translator=onegov.translator_directory.upgrade'
+            'onegov.translator_directory=onegov.translator_directory.upgrade'
         ]
     })
