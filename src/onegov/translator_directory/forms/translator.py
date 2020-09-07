@@ -255,8 +255,9 @@ class TranslatorForm(Form, FormChoicesMixin):
     def validate_email(self, field):
         if field.data:
             field.data = field.data.lower()
-            if self.request.session.query(Translator).filter_by(
-                    email=field.data).first():
+            trs = self.request.session.query(Translator).filter_by(
+                    email=field.data).first()
+            if trs and getattr(self.model, 'id', trs.id) != trs.id:
                 raise ValidationError(
                     _("A translator with this email already exists"))
 
