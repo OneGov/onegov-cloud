@@ -68,6 +68,15 @@ def event_form(model, request):
 def publish_event(self, request):
     """ Publish an event. """
 
+    if self.state == 'initiated':
+        request.warning(
+            _('The event submitter has not yet completed his submission'))
+        return request.redirect(request.link(self))
+    if self.state == 'published':
+        request.warning(
+            _('This event has already been published'))
+        return request.redirect(request.link(self))
+
     self.publish()
 
     request.success(_("You have accepted the event ${title}", mapping={

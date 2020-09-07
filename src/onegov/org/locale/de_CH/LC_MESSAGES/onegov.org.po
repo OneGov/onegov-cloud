@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-07-09 09:51+0200\n"
+"POT-Creation-Date: 2020-09-07 13:24+0200\n"
 "PO-Revision-Date: 2020-05-10 10:56+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -3406,6 +3406,12 @@ msgstr ""
 "berücksichtigt werden. Um mehr Einträge zu importieren muss der Import "
 "wiederholt werden."
 
+msgid "The event submitter has not yet completed his submission"
+msgstr "Der/die Antragsteller/in hat ihren Antrag noch nicht abgeschlosesen"
+
+msgid "This event has already been published"
+msgstr "Diese Veranstaltung wurde bereits veröffentlicht."
+
 #, python-format
 msgid "You have accepted the event ${title}"
 msgstr "Sie haben die Veranstaltung ${title} angenommen"
@@ -4045,6 +4051,9 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "Only withdrawn events or submitted events can be published"
+#~ msgstr "Nur abgelehnte oder "
 
 #~ msgid "E-Mail Reply Address"
 #~ msgstr "E-Mail Antwort Adresse"
