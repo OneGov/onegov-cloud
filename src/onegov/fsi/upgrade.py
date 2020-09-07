@@ -149,7 +149,7 @@ def add_org_to_external_attendee(context):
 
 
 @upgrade_task('Adds permission for external attendees to role editor')
-def add_org_to_external_attendee(context):
+def append_org_to_external_attendee(context):
     query = context.session.query(CourseAttendee).join(User).filter(
         User.role == 'editor')
 

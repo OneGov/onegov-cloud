@@ -230,10 +230,9 @@ def fetch_users(app, session, ldap_server, ldap_username, ldap_password):
             force_role=force_role)
 
         if not user.attendee:
-            permissions = user.role == 'editor' \
-                          and external_attendee_org or None
+            is_editor = user.role == 'editor'
+            permissions = is_editor and external_attendee_org or None
             user.attendee = CourseAttendee(permissions=permissions)
-
 
         user.attendee.first_name = data['first_name']
         user.attendee.last_name = data['last_name']
