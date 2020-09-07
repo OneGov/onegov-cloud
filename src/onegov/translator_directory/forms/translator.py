@@ -1,3 +1,5 @@
+import re
+
 from cached_property import cached_property
 from wtforms import SelectField, StringField, BooleanField, TextAreaField, \
     RadioField, FloatField
@@ -15,7 +17,9 @@ from onegov.translator_directory.collections.certificate import \
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import order_cols
 from onegov.translator_directory.models.translator import GENDERS, \
-    GENDERS_DESC, Translator
+    GENDERS_DESC, Translator, mother_tongue_association_table, \
+    spoken_association_table, written_association_table, \
+    certificate_association_table, ADMISSIONS, ADMISSIONS_DESC
 
 
 class FormChoicesMixin:
@@ -59,6 +63,14 @@ class TranslatorForm(Form, FormChoicesMixin):
     pers_id = IntegerField(
         label=_('Personal ID'),
         validators=[Optional()]
+    )
+
+    admission = RadioField(
+        label=_('Admission'),
+        choices=tuple(
+            (id_, label) for id_, label in zip(ADMISSIONS, ADMISSIONS_DESC)
+        ),
+        default=ADMISSIONS[0]
     )
 
     first_name = StringField(
