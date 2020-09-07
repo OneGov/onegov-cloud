@@ -114,7 +114,14 @@ class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
 
     def ensure_no_other_subscriptions(self):
         if self.attendee_id.data and self.course_event_id.data:
-            if not self.event_from_form.can_book(self.attendee_id.data):
+            event = self.event_from_form
+            if not event:
+                self.course_event_id.errors.append(
+                    _("The selected course was deleted. "
+                      "Please refresh the page")
+                )
+                return False
+            if not event.can_book(self.attendee_id.data):
                 self.attendee_id.errors.append(
                     _("There are other subscriptions for "
                       "the same course in this year")
@@ -123,6 +130,13 @@ class AddFsiSubscriptionForm(Form, SubscriptionFormMixin):
 
     def ensure_can_book_if_locked(self):
         if self.attendee_id.data and self.course_event_id.data:
+            event = self.event_from_form
+            if not event:
+                self.course_event_id.errors.append(
+                    _("The selected course was deleted. "
+                      "Please refresh the page")
+                )
+                return False
             if self.event_from_form.locked and not self.request.is_admin:
                 self.course_event_id.errors.append(
                     _("This course event can't be booked (anymore).")
