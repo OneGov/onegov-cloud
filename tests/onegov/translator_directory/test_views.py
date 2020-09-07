@@ -156,10 +156,10 @@ def test_view_new_translator(client):
 
     page = page.form.submit()
     assert 'Ein(e) Übersetzer/in mit dieser Email existiert bereits' in page
-    assert False
     # editor = client.spawn()
     # editor.login_editor()
     # editor.get(f'/translator/{tr_id}', status=403)
+
 
 def test_view_edit_translator(client):
     session = client.app.session()
@@ -229,11 +229,11 @@ def test_view_search_translator(client):
     translators = TranslatorCollection(session)
     for i in range(len(languages)):
         data = copy.deepcopy(translator_data)
-        data['email'] = f'translator{1}@test.com'
-        data['mother_tongues_ids'] = [languages[i]]
-        data['spoken_languages_ids'] = [languages[i]]
-        data['written_languages_ids'] = [languages[0]]
-        translators.add(**translator_data)
+        data['email'] = f'translator{i}@test.com'
+        data['mother_tongues'] = [languages[i]]
+        data['spoken_languages'] = [languages[i]]
+        data['written_languages'] = [languages[0]]
+        translators.add(**data)
 
     transaction.commit()
 
