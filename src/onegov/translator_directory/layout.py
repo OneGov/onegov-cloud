@@ -185,7 +185,9 @@ class TranslatorCollectionLayout(TranslatorLayout):
                         )
                     )
                 ),
-                Link(_('Export Excel'), url=self.request.class_link(
+                Link(
+                    _('Export Excel'),
+                    url=self.request.class_link(
                         TranslatorCollection, name='export'))
             ]
 

@@ -6,25 +6,25 @@ $orange-color: #eda815;
 $dark-orange:  #be860e;
 
 .mobile-phone {
-  &::before{ @include icon($mobile-phone-icon); }
+    &::before { @include icon($mobile-phone-icon); }
 }
 
 .private-phone {
-  &::before{ @include icon($phone-icon); }
+    &::before { @include icon($phone-icon); }
 }
 
 .office-phone {
-  &::before{ @include icon($office-icon); }
+    &::before { @include icon($office-icon); }
 }
 
 .new-language {
-  &::before { @include icon($new-language-icon); }
+    &::before { @include icon($new-language-icon); }
 }
 
 #search-results-table {
-  td > span {
-    display: block;
-  }
+    td > span {
+        display: block;
+    }
 }
 
 .fullwidth {
@@ -32,7 +32,7 @@ $dark-orange:  #be860e;
 }
 
 .nowrap {
-  white-space: nowrap;
+    white-space: nowrap;
 }
 
 // language color codes

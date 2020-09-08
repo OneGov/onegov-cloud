@@ -15,6 +15,7 @@ from onegov.translator_directory.layout import AddTranslatorLayout, \
 from onegov.translator_directory.models.translator import Translator
 from morepath.request import Response
 
+
 @TranslatorDirectoryApp.form(
     model=TranslatorCollection,
     template='form.pt',
