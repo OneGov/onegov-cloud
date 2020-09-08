@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-09-07 15:54+0200\n"
+"POT-Creation-Date: 2020-09-08 12:33+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -15,9 +15,6 @@ msgstr ""
 
 msgid "Logout"
 msgstr "Abmelden"
-
-msgid "Settings"
-msgstr "Einstellungen"
 
 msgid "Users"
 msgstr "Benutzer"
@@ -119,6 +116,15 @@ msgstr "Bewerbung Datum"
 msgid "Date of decision"
 msgstr "Entscheid Datum"
 
+msgid "Mother tongues"
+msgstr "Muttersprachen"
+
+msgid "Spoken languages"
+msgstr "Sprachen Wort"
+
+msgid "Written languages"
+msgstr "Sprachen Schrift"
+
 msgid "Proof of preconditions"
 msgstr "Nachweis der Voraussetzung"
 
@@ -128,23 +134,20 @@ msgstr "Referenzen Behörden"
 msgid "Education as interpreter"
 msgstr "Ausbildung Dolmetscher"
 
+msgid "Language Certificates"
+msgstr "Zertifikate"
+
 msgid "Comments"
 msgstr "Bemerkungen"
 
 msgid "Hidden"
 msgstr "Versteckt"
 
-msgid "A translator with this email already exists"
-msgstr "Ein(e) Übersetzer/in mit dieser Email existiert bereits"
-
 msgid "Zip code must consist of 4 digits"
 msgstr "Postleitzahl muss aus 4 Ziffern bestehen"
 
-msgid "Spoken languages"
-msgstr "Sprachen Wort"
-
-msgid "Written languages"
-msgstr "Sprachen Schrift"
+msgid "A translator with this email already exists"
+msgstr "Ein(e) Übersetzer/in mit dieser Email existiert bereits"
 
 msgid "Order by"
 msgstr "Sortiere nach"
@@ -164,17 +167,32 @@ msgstr "Ja"
 msgid "No"
 msgstr "Nein"
 
-msgid "Edit"
-msgstr "Bearbeiten"
-
-msgid "Edit translator"
-msgstr "Übersetzer/in"
+msgid "Add"
+msgstr "Hinzufügen"
 
 msgid "Add translator"
 msgstr "Übersetzer/in hinzufügen"
 
-msgid "Add"
-msgstr "Hinzufügen"
+msgid "Edit"
+msgstr "Bearbeiten"
+
+msgid "Delete"
+msgstr "Löschen"
+
+msgid "Do you really want to delete this translator?"
+msgstr "Wollen Sie diese(n) Übersetzer/in wirklich löschen?"
+
+msgid "This cannot be undone."
+msgstr "Dies kann nicht rückgangig gemacht werden"
+
+msgid "Delete translator"
+msgstr "Übersetzer/in löschen"
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid "Edit translator"
+msgstr "Übersetzer/in"
 
 msgid "Search for translators"
 msgstr "Suche nach Übersetzer/in"
@@ -221,9 +239,6 @@ msgstr "Telefon Mobile"
 msgid "Name reveal confirmation"
 msgstr "Zustimmung Namensbekanntgabe"
 
-msgid "Mother tongues"
-msgstr "Muttersprachen"
-
 msgid "Certificates"
 msgstr "Zertifikate"
 
@@ -237,6 +252,13 @@ msgstr "Sprache ${name} hinzugefügt"
 msgid "Add new language"
 msgstr "Neue Sprache hinzufügen"
 
+#, python-format
+msgid "Updated language ${name}"
+msgstr "Sprache ${name} aktualisiert"
+
+msgid "Edit language"
+msgstr "Sprache bearbeiten"
+
 msgid "This language is used and can't be deleted"
 msgstr "Diese Sprache wird benutzt und kann nicht gelöscht werden"
 
@@ -249,11 +271,14 @@ msgstr "Übersetzer/in hinzugefügt"
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
+msgid "Translator successfully deleted"
+msgstr "Übersetzer/in erfolgreich gelöscht"
+
+#~ msgid "Settings"
+#~ msgstr "Einstellungen"
+
 #~ msgid "Mother tongue"
 #~ msgstr "Muttersprache"
-
-#~ msgid "Language Certificates"
-#~ msgstr "Zertifikate"
 
 #~ msgid "Not a valid number"
 #~ msgstr "Keine gültige Zahl"

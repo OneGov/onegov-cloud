@@ -1,6 +1,6 @@
 from cached_property import cached_property
 from onegov.translator_directory import _
-from onegov.core.elements import Link
+from onegov.core.elements import Link, LinkGroup, Confirm, Intercooler
 from onegov.core.utils import linkify
 from onegov.org.layout import DefaultLayout as BaseLayout
 from onegov.translator_directory.collections.language import LanguageCollection
@@ -43,12 +43,46 @@ class TranslatorLayout(DefaultLayout):
     def editbar_links(self):
         if self.request.is_admin:
             return [
+                LinkGroup(
+                    title=_('Add'),
+                    links=(
+                        Link(
+                            text=_("Add translator"),
+                            url=self.request.class_link(
+                                TranslatorCollection, name='new'
+                            ),
+                            attrs={'class': 'new-person'}
+                        ),
+                    )
+                ),
                 Link(
                     text=_("Edit"),
                     url=self.request.link(
                         self.model, name='edit'
                     ),
-                    attrs={'class': 'edit-icon'}
+                    attrs={'class': 'edit-link'}
+                ),
+                Link(
+                    _('Delete'),
+                    self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    attrs={'class': 'delete-link'},
+                    traits=(
+                        Confirm(
+                            _("Do you really want to delete "
+                              "this translator?"),
+                            _("This cannot be undone."),
+                            _("Delete translator"),
+                            _("Cancel")
+                        ),
+                        Intercooler(
+                            request_method='DELETE',
+                            redirect_after=self.request.class_link(
+                                TranslatorCollection
+                            )
+                        )
+                    )
                 )
             ]
 
@@ -117,6 +151,10 @@ class AddTranslatorLayout(TranslatorLayout):
         links.append(Link(_('Add')))
         return links
 
+    @property
+    def editbar_links(self):
+        return []
+
 
 class TranslatorCollectionLayout(TranslatorLayout):
 
@@ -128,18 +166,86 @@ class TranslatorCollectionLayout(TranslatorLayout):
     def editbar_links(self):
         if self.request.is_admin:
             return [
-                Link(
-                    text=_("Add translator"),
-                    url=self.request.class_link(
-                        TranslatorCollection, name='new'
-                    ),
-                    attrs={'class': 'add-icon'}
-                ),
+                LinkGroup(
+                    _('Add'),
+                    links=(
+                        Link(
+                            text=_("Add translator"),
+                            url=self.request.class_link(
+                                TranslatorCollection, name='new'
+                            ),
+                            attrs={'class': 'new-person'}
+                        ),
+                        Link(
+                            text=_("Add language"),
+                            url=self.request.class_link(
+                                LanguageCollection, name='new'
+                            ),
+                            attrs={'class': 'new-language'}
+                        )
+                    )
+                )
+            ]
+
+
+class LanguageCollectionLayout(DefaultLayout):
+
+    @property
+    def breadcrumbs(self):
+        links = super().breadcrumbs
+        links.append(Link(_('Languages')))
+        return links
+
+    @property
+    def editbar_links(self):
+        return [LinkGroup(
+            _('Add'),
+            links=(
                 Link(
                     text=_("Add language"),
                     url=self.request.class_link(
                         LanguageCollection, name='new'
                     ),
-                    attrs={'class': 'add-icon'}
+                    attrs={'class': 'new-language'}
                 ),
-            ]
+            )
+        )]
+
+
+class LanguageLayout(DefaultLayout):
+
+    @property
+    def breadcrumbs(self):
+        links = super().breadcrumbs
+        links.append(
+            Link(_('Languages'),
+                 url=self.request.class_link(LanguageCollection))
+        )
+        return links
+
+
+class EditLanguageLayout(LanguageLayout):
+
+    @property
+    def breadcrumbs(self):
+        links = super().breadcrumbs
+        links.append(Link(self.model.name))
+        links.append(Link(_('Edit')))
+        return links
+
+    @property
+    def editbar_links(self):
+        return []
+
+
+class AddLanguageLayout(LanguageLayout):
+
+    @property
+    def breadcrumbs(self):
+        links = super().breadcrumbs
+        links.append(Link(_('Add')))
+        return links
+
+    @property
+    def editbar_links(self):
+        return []

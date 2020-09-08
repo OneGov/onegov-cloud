@@ -1,6 +1,7 @@
 $mobile-phone-icon: '\f10b';
 $office-icon: '\f1ad';
 $phone-icon: '\f095';
+$new-language-icon: '\f1ab';
 $orange-color: #eda815;
 $dark-orange:  #be860e;
 
@@ -14,6 +15,10 @@ $dark-orange:  #be860e;
 
 .office-phone {
   &::before{ @include icon($office-icon); }
+}
+
+.new-language {
+  &::before { @include icon($new-language-icon); }
 }
 
 #search-results-table {

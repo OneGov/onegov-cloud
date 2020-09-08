@@ -177,7 +177,7 @@ class TranslatorForm(Form, FormChoicesMixin):
     )
 
     mother_tongues_ids = ChosenSelectMultipleField(
-        label=_('Mother tongue'),
+        label=_('Mother tongues'),
         validators=[InputRequired()],
         choices=[]
     )

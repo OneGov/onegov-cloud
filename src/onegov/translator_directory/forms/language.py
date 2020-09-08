@@ -3,6 +3,8 @@ from wtforms.validators import InputRequired
 
 from onegov.form import Form
 from onegov.translator_directory import _
+from onegov.translator_directory.collections.language import LanguageCollection
+from onegov.translator_directory.models.translator import Language
 
 
 class LanguageForm(Form):
@@ -22,9 +24,14 @@ class LanguageForm(Form):
         # We correct user input here
         field.data = field.data.strip().lower().capitalize()
 
-        query = self.request.session.query(self.model.model_class)
-
-        if query.filter_by(name=field.data).first():
+        query = self.request.session.query(Language)
+        lang = query.filter_by(name=field.data).first()
+        if isinstance(self.model, LanguageCollection) and lang:
+            raise ValidationError(
+                _("${language} already exists",
+                  mapping={'language': field.data})
+            )
+        elif lang and not lang.id == self.model.id:
             raise ValidationError(
                 _("${language} already exists",
                   mapping={'language': field.data})

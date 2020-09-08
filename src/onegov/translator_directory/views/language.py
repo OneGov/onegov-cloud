@@ -4,7 +4,8 @@ from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.forms.language import LanguageForm
 from onegov.translator_directory import _
-from onegov.translator_directory.layout import DefaultLayout
+from onegov.translator_directory.layout import DefaultLayout, \
+    LanguageCollectionLayout, AddLanguageLayout, EditLanguageLayout
 from onegov.translator_directory.models.translator import Language
 
 
@@ -25,7 +26,7 @@ def add_new_language(self, request, form):
         return request.redirect(request.class_link(LanguageCollection))
 
     return {
-        'layout': DefaultLayout(self, request),
+        'layout': AddLanguageLayout(self, request),
         'model': self,
         'form': form,
         'title': _('Add new language')
@@ -37,7 +38,7 @@ def add_new_language(self, request, form):
     template='languages.pt',
     permission=Personal,
 )
-def view_translators(self, request):
+def view_languages(self, request):
 
     letters = tuple(
         Link(
@@ -52,11 +53,40 @@ def view_translators(self, request):
     )
 
     return {
-        'layout': DefaultLayout(self, request),
+        'layout': LanguageCollectionLayout(self, request),
         'model': self,
         'title': _('Languages'),
         'languages': self.batch,
         'letters': letters
+    }
+
+
+@TranslatorDirectoryApp.form(
+    model=Language,
+    permission=Secret,
+    name='edit',
+    form=LanguageForm,
+    template='form.pt'
+)
+def edit_language(self, request, form):
+
+    if form.submitted(request):
+        form.populate_obj(self)
+        request.success(
+            _('Updated language ${name}', mapping={'name': self.name})
+        )
+        return request.redirect(request.link(LanguageCollection(
+            request.session, letter=self.name[0].upper()
+        )))
+
+    if not form.errors:
+        form.process(obj=self)
+
+    return {
+        'layout': EditLanguageLayout(self, request),
+        'model': self,
+        'form': form,
+        'title': _('Edit language')
     }
 
 
