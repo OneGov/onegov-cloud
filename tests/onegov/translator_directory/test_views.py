@@ -61,7 +61,9 @@ def test_view_new_translator(client):
     assert 'Uncle' in page
     assert 'Bob' in page
     # test lower-casing the user input
-    assert 'test@test.com' in page
+    mail = 'test@test.com'
+    assert f'<a href="mailto:{mail}">{mail}</a>' in page
+
     assert '756.1234.5678.97' in page
     assert 'All okay' in page
     assert '7890' in page
@@ -82,6 +84,7 @@ def test_view_new_translator(client):
     assert 'Zulassung' in page
 
     # Doing any change will create a new model instance ?!
+    tel_mobile = '044 123 50 50'
     page.form['pers_id'] = 123456
     page.form['admission'] = 'in_progress'
     page.form['withholding_tax'] = 'ATAX'
@@ -96,7 +99,7 @@ def test_view_new_translator(client):
     page.form['bank_name'] = 'Abank'
     page.form['bank_address'] = 'AB Address'
     page.form['account_owner'] = 'AccountOwner'
-    page.form['tel_mobile'] = '044 123 50 50'
+    page.form['tel_mobile'] = tel_mobile
     page.form['tel_private'] = '044 123 50 51'
     page.form['tel_office'] = '044 123 50 52'
     page.form['availability'] = 'always 24h'
@@ -132,7 +135,7 @@ def test_view_new_translator(client):
     assert 'Abank' in page
     assert 'AB Address' in page
     assert 'AccountOwner' in page
-    assert '044 123 50 50' in page
+    assert f'<a href="tel:{tel_mobile}">{tel_mobile}</a>' in page
     assert '044 123 50 51' in page
     assert '044 123 50 52' in page
     assert 'always 24h' in page
@@ -159,24 +162,6 @@ def test_view_new_translator(client):
     # editor = client.spawn()
     # editor.login_editor()
     # editor.get(f'/translator/{tr_id}', status=403)
-
-
-def test_view_edit_translator(client):
-    session = client.app.session()
-    translators = TranslatorCollection(session)
-    translator = translators.add(**translator_data)
-    tr_id = translator.id
-    lang_ids = [str(l.id) for l in create_languages(session)]
-    transaction.commit()
-
-    client.get(f'/translator/{tr_id}', status=403)
-    client.login_member()
-    page = client.get(f'/translator/{tr_id}')
-
-    mail = translator_data['email']
-    tel_mobile = translator_data['tel_mobile']
-    assert f'<a href="mailto:{mail}">{mail}</a>' in page
-    assert f'<a href="tel:{tel_mobile}">{tel_mobile}</a>' in page
 
 
 def test_view_languages(client):
