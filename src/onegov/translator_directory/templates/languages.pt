@@ -22,7 +22,7 @@
                                 </thead>
                                 <tbody>
                                     <tr tal:repeat="language languages">
-                                        <td>${language.name}</td>
+                                        <td><a href="${request.link(language)}">${language.name}</a></td>
                                         <td>${language.native_speakers_count}</td>
                                         <td>${language.speakers_count}</td>
                                         <td>${language.writers_count}</td>
