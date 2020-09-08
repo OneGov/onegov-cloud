@@ -98,3 +98,15 @@ def edit_translator(self, request, form):
         'form': form,
         'title': layout.title
     }
+
+
+@TranslatorDirectoryApp.view(
+    model=Translator,
+    request_method='DELETE',
+    permission=Secret
+)
+def delete_course_event(self, request):
+
+    request.assert_valid_csrf_token()
+    TranslatorCollection(request.session).delete(self)
+    request.success(_('Translator successfully deleted'))
