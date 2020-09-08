@@ -30,15 +30,6 @@ def get_base_tools(request):
         links = []
 
         if request.is_admin:
-
-            links.append(
-                Link(
-                    _("Settings"), request.link(
-                        request.app.org, 'settings'
-                    ), attrs={'class': 'settings'}
-                )
-            )
-
             links.append(
                 Link(
                     _("Users"), request.class_link(UserCollection),
