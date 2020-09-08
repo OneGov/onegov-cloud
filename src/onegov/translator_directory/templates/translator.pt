@@ -41,7 +41,7 @@
                                 <dd>${model.city}</dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.drive_distance and layout.show('drive_distance')">
-                                <dt i18n:translate>Driving distance</dt>
+                                <dt i18n:translate>Drive distance</dt>
                                 <dd>${layout.format_drive_distance(model.drive_distance)}</dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.social_sec_number and layout.show('social_sec_number')">
@@ -79,10 +79,6 @@
                              <dl class="field-display" tal:condition="model.tel_office and layout.show('tel_office')">
                                 <dt i18n:translate>Office Phone Number</dt>
                                 <dd tal:content="structure layout.linkify(model.tel_office)"></dd>
-                            </dl>
-                            <dl class="field-display" tal:condition="model.availability and layout.show('availability')">
-                                <dt i18n:translate>Availability</dt>
-                                <dd>${model.availability}</dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.availability and layout.show('availability')">
                                 <dt i18n:translate>Availability</dt>
@@ -132,17 +128,9 @@
                                 <dt i18n:translate>Agency references</dt>
                                 <dd >${model.agency_references}</dd>
                             </dl>
-                            <dl class="field-display" tal:condition="model.proof_of_preconditions and layout.show('proof_of_preconditions')">
-                                <dt i18n:translate>Proof of preconditions</dt>
-                                <dd >${model.proof_of_preconditions}</dd>
-                            </dl>
                             <dl class="field-display" tal:condition="layout.show('education_as_interpreter')">
                                 <dt i18n:translate>Education as interpreter</dt>
                                 <dd >${layout.format_boolean(model.education_as_interpreter)}</dd>
-                            </dl>
-                            <dl class="field-display" tal:condition="model.proof_of_preconditions and layout.show('proof_of_preconditions')">
-                                <dt i18n:translate>Proof of preconditions</dt>
-                                <dd >${model.proof_of_preconditions}</dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.certificates and layout.show('certificates')">
                                 <dt i18n:translate>Certificates</dt>
