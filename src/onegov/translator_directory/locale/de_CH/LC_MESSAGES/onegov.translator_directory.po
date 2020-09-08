@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-09-08 12:33+0200\n"
+"POT-Creation-Date: 2020-09-08 14:37+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -84,7 +84,7 @@ msgid "Bank name"
 msgstr "Bank Name"
 
 msgid "Bank address"
-msgstr "Bank-Adresse"
+msgstr "Bank Adresse"
 
 msgid "Account owner"
 msgstr "Bank Konto lautend auf"
@@ -200,6 +200,9 @@ msgstr "Suche nach Übersetzer/in"
 msgid "Add language"
 msgstr "Sprache hinzufügen"
 
+msgid "Export Excel"
+msgstr "Export Excel"
+
 msgid "uncertified"
 msgstr "nicht zertifiziert / Einsatz Dringlichkeit"
 
@@ -229,9 +232,6 @@ msgstr "Sprechende"
 
 msgid "Writers"
 msgstr "Schreibende"
-
-msgid "Driving distance"
-msgstr "Wegberechnung"
 
 msgid "Mobile Phone Number"
 msgstr "Telefon Mobile"
@@ -268,11 +268,17 @@ msgstr "Sprache erfolgreich gelöscht"
 msgid "Added a new translator"
 msgstr "Übersetzer/in hinzugefügt"
 
+msgid "Translator directory"
+msgstr "Übersetzerverzeichnis"
+
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
 msgid "Translator successfully deleted"
 msgstr "Übersetzer/in erfolgreich gelöscht"
+
+#~ msgid "Driving distance"
+#~ msgstr "Wegberechnung"
 
 #~ msgid "Settings"
 #~ msgstr "Einstellungen"

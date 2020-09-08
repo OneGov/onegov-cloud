@@ -184,7 +184,9 @@ class TranslatorCollectionLayout(TranslatorLayout):
                             attrs={'class': 'new-language'}
                         )
                     )
-                )
+                ),
+                Link(_('Export Excel'), url=self.request.class_link(
+                        TranslatorCollection, name='export'))
             ]
 
 
@@ -209,7 +211,7 @@ class LanguageCollectionLayout(DefaultLayout):
                     attrs={'class': 'new-language'}
                 ),
             )
-        )]
+        )] if self.request.is_admin else []
 
 
 class LanguageLayout(DefaultLayout):
