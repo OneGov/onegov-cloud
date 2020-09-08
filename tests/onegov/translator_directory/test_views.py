@@ -200,9 +200,7 @@ def test_create_new_language(client):
 
 def test_view_search_translator(client):
     """
-    - test pagination
-    - test fields not to be shown for member and
-
+    - test excluding hidden ones for non-admins
     """
     client.get('/translators', status=403)
     client.login_member()
@@ -211,20 +209,38 @@ def test_view_search_translator(client):
 
     session = client.app.session()
     languages = create_languages(session)
+    lang_ids = [str(lang.id) for lang in languages]
     translators = TranslatorCollection(session)
-    for i in range(len(languages)):
-        data = copy.deepcopy(translator_data)
-        data['email'] = f'translator{i}@test.com'
-        data['mother_tongues'] = [languages[i]]
-        data['spoken_languages'] = [languages[i]]
-        data['written_languages'] = [languages[0]]
-        translators.add(**data)
+
+    data = copy.deepcopy(translator_data)
+    mail = 'first@test.com'
+    data['email'] = mail
+    data['spoken_languages'] = [languages[0]]
+    data['written_languages'] = [languages[1]]
+    translators.add(**data)
+
+    data = copy.deepcopy(translator_data)
+    hide_mail = 'hidden@test.com'
+    data['email'] = hide_mail
+    data['spoken_languages'] = []
+    data['written_languages'] = []
+    translators.add(**data)
 
     transaction.commit()
 
-    translator = session.query(Translator).first()
-    languages = session.query(Language).all()
-
     page = client.get('/translators')
-    assert 'translator1@test.com' in page
+    assert mail in page
+    page.form['spoken_langs'] = [lang_ids[0]]
+    page = page.form.submit().follow()
+    assert mail in page
+    assert hide_mail not in page
 
+    # Check condition both must be fulfilled (AND not OR)
+    page.form['spoken_langs'] = [lang_ids[0]]
+    page.form['written_langs'] = [lang_ids[0]]
+    page = page.form.submit().follow()
+    assert 'Keine Ergebnisse gefunden' in page
+
+    page.form['spoken_langs'] = [lang_ids[0], lang_ids[1]]
+    page.form['written_langs'] = []
+    assert 'Keine Ergebnisse gefunden' in page
