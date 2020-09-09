@@ -112,7 +112,7 @@ def test_view_new_translator(client):
     page.form['comments'] = 'My Comments'
 
     # Todo: uncomment below and you get 404 cause a new model is beeing created wtf
-    # page.form['for_admins_only'] = True
+    page.form['for_admins_only'] = True
 
     # test removing all languages
     page.form['spoken_languages_ids'] = []
