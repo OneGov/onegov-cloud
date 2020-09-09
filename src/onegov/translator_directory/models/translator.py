@@ -204,7 +204,6 @@ class Translator(Base, TimestampMixin, ContentMixin, CoordinatesMixin,
 
     email = Column(Text)
 
-    # Which phone number should always be provided?
     tel_mobile = Column(Text,)
     tel_private = Column(Text)
     tel_office = Column(Text)
@@ -218,7 +217,6 @@ class Translator(Base, TimestampMixin, ContentMixin, CoordinatesMixin,
     date_of_decision = Column(Date)
 
     # Language Information
-
     mother_tongues = relationship(
         "Language",
         secondary=mother_tongue_association_table,
