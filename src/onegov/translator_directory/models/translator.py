@@ -1,5 +1,7 @@
 from uuid import uuid4
 
+from onegov.core.orm.mixins import ContentMixin
+from onegov.gis import CoordinatesMixin
 from onegov.search import ORMSearchable
 from onegov.translator_directory import _
 from libres.db.models.timestamp import TimestampMixin
@@ -144,7 +146,8 @@ class DocumentsMixin(object):
     other_files = associated(MiscFile, 'other_files', 'one-to-many')
 
 
-class Translator(Base, TimestampMixin, DocumentsMixin, ORMSearchable):
+class Translator(Base, TimestampMixin, ContentMixin, CoordinatesMixin,
+                 DocumentsMixin, ORMSearchable):
 
     __tablename__ = 'translators'
 
@@ -222,7 +225,6 @@ class Translator(Base, TimestampMixin, DocumentsMixin, ORMSearchable):
         backref='mother_tongues'
     )
 
-    # Todo: sort these while queriing
     spoken_languages = relationship(
         "Language", secondary=spoken_association_table, backref="speakers"
     )

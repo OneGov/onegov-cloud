@@ -2,23 +2,17 @@ import copy
 
 import transaction
 
+from onegov.gis import Coordinates
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 from onegov.translator_directory.models.translator import Translator, Language
 from tests.onegov.translator_directory.shared import translator_data, \
     create_languages, create_certificates
-from tests.shared.utils import open_in_browser
+from tests.shared.utils import open_in_browser, encode_map_value, \
+    decode_map_value
 
 
 def test_view_new_translator(client):
-    """
-    - validate unique email
-    - validate always lowercase email
-    - validate social security number
-    - make a run to fill all the fields
-    - Test email validation in edit and new
-    """
-
     session = client.app.session()
     languages = create_languages(session)
     certs = create_certificates(session)
@@ -83,7 +77,6 @@ def test_view_new_translator(client):
     page = page.click('Bearbeiten')
     assert 'Zulassung' in page
 
-    # Doing any change will create a new model instance ?!
     tel_mobile = '044 123 50 50'
     page.form['pers_id'] = 123456
     page.form['admission'] = 'in_progress'
@@ -110,6 +103,11 @@ def test_view_new_translator(client):
     page.form['agency_references'] = 'Kt. ZG'
     page.form['education_as_interpreter'] = True
     page.form['comments'] = 'My Comments'
+
+    # # Todo: self.content is nullable so I don't get it, in EventForm is works too
+    # page.form['coordinates'] = encode_map_value({
+    #     'lat': 47, 'lon': 8, 'zoom': 12
+    # })
 
     # Todo: uncomment below and you get 404 cause a new model is beeing created wtf
     page.form['for_admins_only'] = True
