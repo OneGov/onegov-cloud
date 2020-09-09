@@ -27,7 +27,7 @@ def get_template_directory():
     return 'templates'
 
 
-@OrgApp.static_directory()
+@TranslatorDirectoryApp.static_directory()
 def get_static_directory():
     return 'static'
 
