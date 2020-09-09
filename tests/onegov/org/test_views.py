@@ -3209,9 +3209,9 @@ def test_map_default_view(client):
 
     settings = client.get('/map-settings')
     coordinates = decode_map_value(settings.form['default_map_view'].value)
-    assert coordinates.lat == 47
-    assert coordinates.lon == 8
-    assert coordinates.zoom == 12
+    assert coordinates['lat'] == 47
+    assert coordinates['lon'] == 8
+    assert coordinates['zoom'] == 12
 
     edit = client.get('/editor/edit/page/1')
     assert 'data-default-lat="47"' in edit
