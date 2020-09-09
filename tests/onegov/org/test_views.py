@@ -8,7 +8,6 @@ import textwrap
 import transaction
 import vcr
 
-from base64 import b64decode, b64encode
 from datetime import datetime, date, timedelta
 from freezegun import freeze_time
 from libres.modules.errors import AffectedReservationError
@@ -20,7 +19,7 @@ from onegov.core.utils import module_path
 from onegov.directory import DirectoryEntry, DirectoryCollection, \
     DirectoryConfiguration
 from onegov.directory.models.directory import DirectoryFile
-from onegov.file import FileCollection, File
+from onegov.file import FileCollection
 from onegov.form import FormCollection, FormSubmission, FormFile
 from onegov.gis import Coordinates
 from onegov.newsletter import RecipientCollection, NewsletterCollection
@@ -38,15 +37,8 @@ from unittest.mock import patch
 from webtest import Upload
 from yubico_client import Yubico
 
-from tests.shared.utils import open_in_browser
-
-
-def encode_map_value(dictionary):
-    return b64encode(json.dumps(dictionary).encode('utf-8'))
-
-
-def decode_map_value(value):
-    return json.loads(b64decode(value).decode('utf-8'))
+from tests.shared.utils import decode_map_value, \
+    encode_map_value
 
 
 def test_view_permissions():
