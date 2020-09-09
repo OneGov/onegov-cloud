@@ -266,4 +266,7 @@ class Translator(Base, TimestampMixin, DocumentsMixin, ORMSearchable):
 
     @property
     def lead(self):
-        return ', '.join(la.name for la in self.mother_tongues or [])
+        return ', '.join({
+            *(la.name for la in self.written_languages or []),
+            *(la.name for la in self.spoken_languages or [])
+        })
