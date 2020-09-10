@@ -211,13 +211,6 @@ class OccasionForm(Form):
             self.dates.errors = [_("Must specify at least one date")]
             return False
 
-    def ensure_min_max_age(self):
-        if self.min_age.data and self.max_age.data:
-            if self.min_age.data > self.max_age.data:
-                self.min_age.errors = [
-                    _("Minimum Age must be lower than maximum age")]
-                return False
-
     def ensure_safe_period_change(self):
         # the period may only be changed if there are no booking associated
         # with the occasion, otherwise this is unsafe and results in
@@ -280,12 +273,11 @@ class OccasionForm(Form):
 
         return valid
 
-    def ensure_max_age_after_min_age(self):
-        if self.min_age.data and self.max_age.data:
+    def ensure_min_max_age(self):
+        if self.min_age.data is not None and self.max_age.data:
             if self.min_age.data > self.max_age.data:
-                self.min_age.errors.append(_(
-                    "The minium age cannot be higher than the maximum age"
-                ))
+                self.min_age.errors = [
+                    _("Minimum Age must be lower than maximum age")]
                 return False
 
     def ensure_max_spots_after_min_spots(self):

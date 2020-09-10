@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-06-22 10:16+0200\n"
+"POT-Creation-Date: 2020-09-10 08:58+0200\n"
 "PO-Revision-Date: 2017-10-26 16:52+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: French\n"
@@ -862,9 +862,6 @@ msgstr "Coût administratif"
 msgid "Must specify at least one date"
 msgstr "Vous devez saisir au moins une date"
 
-msgid "Minimum Age must be lower than maximum age"
-msgstr "L'age minimum doit ètre inférieur à l'âge maximum"
-
 msgid "Cannot adjust period, there are bookings linked to this occassion"
 msgstr ""
 "Impossible de modifier la période, il y a des réservations liées à cette "
@@ -882,8 +879,8 @@ msgstr "La date chevauche avec une autre date de cet événement"
 msgid "Date validation failed"
 msgstr "Échec, la date n'est pas validée"
 
-msgid "The minium age cannot be higher than the maximum age"
-msgstr "L'âge minimum ne peut être plus élevé que l'âge maximum"
+msgid "Minimum Age must be lower than maximum age"
+msgstr "L'age minimum doit ètre inférieur à l'âge maximum"
 
 msgid ""
 "The minium number of participants cannot be higher than the maximum number "
@@ -2958,6 +2955,9 @@ msgstr "Réservations pour ${period}"
 #, python-format
 msgid "Billing for ${period}"
 msgstr "Facturation pour ${period}"
+
+#~ msgid "The minium age cannot be higher than the maximum age"
+#~ msgstr "L'âge minimum ne peut être plus élevé que l'âge maximum"
 
 #~ msgid "An commitment by Rega"
 #~ msgstr "Un engagement de la Rega"
