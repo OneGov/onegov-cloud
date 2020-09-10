@@ -79,6 +79,8 @@ class FormRegistrationWindowForm(Form):
         def ensure_start_end(self) would also be run in side the validate
         function, but the error is not clear. """
 
+        if not self.start.data or not self.end.data:
+            return
         if self.start.data >= self.end.data:
             self.end.errors = [_("Please use a stop date after the start")]
             return False

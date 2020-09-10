@@ -31,6 +31,8 @@ class NotificationTemplateForm(Form):
     )
 
     def ensure_not_duplicate_subject(self):
+        if not self.subject.data:   # caught by input required
+            return
         c = exists().where(NotificationTemplate.subject == self.subject.data)
 
         # in edit mode we must exclude the current model
