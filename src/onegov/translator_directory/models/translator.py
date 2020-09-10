@@ -146,10 +146,7 @@ class DocumentsMixin(object):
     other_files = associated(MiscFile, 'other_files', 'one-to-many')
 
 
-class Translator(Base, TimestampMixin, ContentMixin, CoordinatesMixin,
-                 DocumentsMixin, ORMSearchable):
-
-    __tablename__ = 'translators'
+class ESMixin(ORMSearchable):
 
     es_properties = {
         'last_name': {'type': 'text'},
@@ -162,6 +159,22 @@ class Translator(Base, TimestampMixin, ContentMixin, CoordinatesMixin,
     @property
     def es_suggestion(self):
         return self.full_name
+
+    @property
+    def title(self):
+        return self.full_name
+
+    @property
+    def lead(self):
+        return ', '.join({
+            *(la.name for la in self.written_languages or []),
+            *(la.name for la in self.spoken_languages or [])
+        })
+
+
+class Translator(Base, TimestampMixin, DocumentsMixin):
+
+    __tablename__ = 'translators'
 
     id = Column(UUID, primary_key=True, default=uuid4)
 
@@ -259,14 +272,3 @@ class Translator(Base, TimestampMixin, ContentMixin, CoordinatesMixin,
     @property
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
-
-    @property
-    def title(self):
-        return self.full_name
-
-    @property
-    def lead(self):
-        return ', '.join({
-            *(la.name for la in self.written_languages or []),
-            *(la.name for la in self.spoken_languages or [])
-        })
