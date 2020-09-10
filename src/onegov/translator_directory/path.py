@@ -8,8 +8,8 @@ from onegov.translator_directory.models.translator import Translator, Language
 @TranslatorDirectoryApp.path(
     model=Translator, path='/translator/{id}'
 )
-def get_translator(request, id):
-    return TranslatorCollection(request.session).by_id(id)
+def get_translator(app, id):
+    return TranslatorCollection(app.session()).by_id(id)
 
 
 @TranslatorDirectoryApp.path(
@@ -33,12 +33,12 @@ def get_translators(request, page=None, written_langs=None, spoken_langs=None,
 @TranslatorDirectoryApp.path(
     model=Language, path='/language/{id}'
 )
-def get_language(request, id):
-    return LanguageCollection(request.session).by_id(id)
+def get_language(app, id):
+    return LanguageCollection(app.session()).by_id(id)
 
 
 @TranslatorDirectoryApp.path(
     model=LanguageCollection, path='/languages',
 )
-def get_language_collection(request, page=0, letter=None):
-    return LanguageCollection(request.session, page, letter)
+def get_language_collection(app, page=0, letter=None):
+    return LanguageCollection(app.session(), page, letter)
