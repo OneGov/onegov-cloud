@@ -5,6 +5,35 @@ from tests.onegov.translator_directory.shared import create_languages, \
     create_translator
 
 
+def test_translator_search(session):
+    seba = create_translator(
+        session,
+        email='sm@mh.ch',
+        first_name='Sebastian Hans',
+        last_name='Meier Hugentobler'
+    )
+
+    mary = create_translator(
+        session,
+        email='mary@t.ch',
+        first_name='Mary Astiana',
+        last_name='Sitkova Lavrova'
+    )
+
+    translators = TranslatorCollection(session)
+    translators.search = 'Lavrov'
+    assert translators.query().one().last_name == 'Sitkova Lavrova'
+
+    translators.search = 'mari sitkova'
+    assert translators.query().one().last_name == 'Sitkova Lavrova'
+
+    translators.search = 'Sebastian astian'
+    assert translators.query().all() == [seba, mary]
+
+    translators.search = 'astian'
+    assert translators.query().all() == [seba, mary]
+
+
 def test_translator_collection(session):
     langs = create_languages(session)
     collection = TranslatorCollection(session)

@@ -4,7 +4,9 @@ from cached_property import cached_property
 from wtforms import SelectField, StringField, BooleanField, TextAreaField, \
     RadioField, FloatField
 from wtforms.fields.html5 import DateField, EmailField, IntegerField
-from wtforms.validators import InputRequired, Email, Optional, ValidationError
+from wtforms.validators import (
+    InputRequired, Email, Optional, ValidationError, Length
+)
 
 from onegov.form import Form
 from onegov.form.fields import ChosenSelectMultipleField
@@ -368,6 +370,11 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         default='0'
     )
 
+    search = StringField(
+        label=_('Search in first and last name'),
+        validators=[Optional(), Length(max=25)]
+    )
+
     def apply_model(self, model):
 
         if model.spoken_langs:
@@ -377,12 +384,14 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
             self.written_langs.data = model.written_langs
         self.order_by.data = model.order_by
         self.order_desc.data = model.order_desc and '1' or '0'
+        self.search.data = model.search
 
     def update_model(self, model):
         model.spoken_langs = self.spoken_langs.data
         model.written_langs = self.written_langs.data
         model.order_by = self.order_by.data
         model.order_desc = self.order_desc.data == '1' and True or False
+        model.search = self.search.data
 
     def on_request(self):
         self.spoken_langs.choices = self.language_choices

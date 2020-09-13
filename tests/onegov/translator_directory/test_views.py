@@ -207,6 +207,7 @@ def test_view_search_translator(client):
     client.login_member()
     page = client.get('/translators')
     assert 'Keine Ergebnisse gefunden' in page
+    assert 'Suche in Vor- und Nachname' in page
 
     session = client.app.session()
     languages = create_languages(session)
@@ -218,6 +219,9 @@ def test_view_search_translator(client):
     data['email'] = mail
     data['spoken_languages'] = [languages[0]]
     data['written_languages'] = [languages[1]]
+    data['first_name'] = 'Sebastian Stefan'
+    data['last_name'] = 'Hugentobler Meeringer'
+
     translators.add(**data)
 
     data = copy.deepcopy(translator_data)
@@ -225,6 +229,8 @@ def test_view_search_translator(client):
     data['email'] = hide_mail
     data['spoken_languages'] = []
     data['written_languages'] = []
+    data['first_name'] = 'Maryan'
+    data['last_name'] = 'Sitkova Lavrova'
     translators.add(**data)
 
     transaction.commit()
@@ -244,4 +250,13 @@ def test_view_search_translator(client):
 
     page.form['spoken_langs'] = [lang_ids[0], lang_ids[1]]
     page.form['written_langs'] = []
+    page = page.form.submit().follow()
     assert 'Keine Ergebnisse gefunden' in page
+
+    page.form['spoken_langs'] = []
+
+    # Test search simple search, the rest is covered in the collection tests
+    page.form['search'] = 'xxx Lavrov'
+    page = page.form.submit().follow()
+    assert 'Sitkova Lavrova' in page
+    assert 'Hugentobler' not in page

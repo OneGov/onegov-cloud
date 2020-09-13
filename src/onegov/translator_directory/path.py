@@ -18,7 +18,7 @@ def get_translator(request, id):
                     order_desc=bool)
 )
 def get_translators(request, page=None, written_langs=None, spoken_langs=None,
-                    order_by=None, order_desc=None):
+                    order_by=None, order_desc=None, search=None):
     user = request.current_user
     return TranslatorCollection(
         request.session, page or 0,
@@ -26,7 +26,8 @@ def get_translators(request, page=None, written_langs=None, spoken_langs=None,
         spoken_langs=spoken_langs,
         order_by=order_by,
         order_desc=order_desc,
-        user_role=user and user.role or None
+        user_role=user and user.role or None,
+        search=search
     )
 
 

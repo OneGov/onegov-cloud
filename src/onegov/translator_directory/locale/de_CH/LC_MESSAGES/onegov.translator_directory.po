@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-09-08 14:37+0200\n"
+"POT-Creation-Date: 2020-09-13 12:20+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -160,6 +160,9 @@ msgstr "Aufsteigend"
 
 msgid "Descending"
 msgstr "Absteigend"
+
+msgid "Search in first and last name"
+msgstr "Suche in Vor- und Nachname"
 
 msgid "Yes"
 msgstr "Ja"

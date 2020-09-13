@@ -1,5 +1,5 @@
 
-from sqlalchemy import desc, and_
+from sqlalchemy import desc, and_, or_
 from onegov.core.collection import GenericCollection, Pagination
 from onegov.translator_directory.models.translator import Translator
 
@@ -55,8 +55,8 @@ class TranslatorCollection(GenericCollection, Pagination):
         ))
 
     @staticmethod
-    def truncate(text, maxchars=50):
-        return text[:maxchars] if len(text) > maxchars else text
+    def truncate(text, maxchars=25):
+        return text[:maxchars] if text and len(text) > maxchars else text
 
     @property
     def model_class(self):
@@ -88,6 +88,13 @@ class TranslatorCollection(GenericCollection, Pagination):
             for lang_id in self.written_langs
         )
 
+    @property
+    def by_search_term_expression(self):
+        """Search for any word in any field of the search columns"""
+        words = self.search.split(' ')
+        cols = self.search_columns
+        return tuple(col.ilike(f'%{word}%') for col in cols for word in words)
+
     def page_by_index(self, index):
         return self.__class__(
             self.session,
@@ -98,6 +105,15 @@ class TranslatorCollection(GenericCollection, Pagination):
             order_desc=self.order_desc
         )
 
+    @property
+    def search_columns(self):
+        """ The columns used for text search. """
+
+        return [
+            self.model_class.first_name,
+            self.model_class.last_name
+        ]
+
     def query(self):
         query = super().query()
         if self.spoken_langs:
@@ -107,6 +123,9 @@ class TranslatorCollection(GenericCollection, Pagination):
 
         if self.user_role != 'admin':
             query = query.filter(Translator.for_admins_only == False)
+
+        if self.search:
+            query = query.filter(or_(*self.by_search_term_expression))
 
         query = query.order_by(self.order_expression)
         return query
