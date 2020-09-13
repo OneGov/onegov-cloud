@@ -18,10 +18,13 @@ from onegov.translator_directory.collections.certificate import \
     LanguageCertificateCollection
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import order_cols
-from onegov.translator_directory.models.translator import GENDERS, \
-    GENDERS_DESC, Translator, mother_tongue_association_table, \
+from onegov.translator_directory.constants import (
+    full_text_max_chars, GENDERS, GENDERS_DESC, ADMISSIONS, ADMISSIONS_DESC
+)
+from onegov.translator_directory.models.translator import Translator, \
+    mother_tongue_association_table, \
     spoken_association_table, written_association_table, \
-    certificate_association_table, ADMISSIONS, ADMISSIONS_DESC
+    certificate_association_table
 
 
 class FormChoicesMixin:
@@ -372,7 +375,7 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
 
     search = StringField(
         label=_('Search in first and last name'),
-        validators=[Optional(), Length(max=25)]
+        validators=[Optional(), Length(max=full_text_max_chars)]
     )
 
     def apply_model(self, model):

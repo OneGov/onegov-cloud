@@ -1,6 +1,7 @@
 
 from sqlalchemy import desc, and_, or_
 from onegov.core.collection import GenericCollection, Pagination
+from onegov.translator_directory.constants import full_text_max_chars
 from onegov.translator_directory.models.translator import Translator
 
 order_cols = (
@@ -26,7 +27,7 @@ class TranslatorCollection(GenericCollection, Pagination):
         super().__init__(session)
         self.page = page
         self.user_role = user_role
-        self.search = self.truncate(search)
+        self.search = self.truncate(search, maxchars=full_text_max_chars)
 
         if spoken_langs:
             assert isinstance(spoken_langs, list)

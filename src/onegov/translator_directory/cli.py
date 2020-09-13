@@ -5,10 +5,10 @@ import click
 
 from onegov.core.cli import command_group
 from onegov.core.csv import CSVFile
+from onegov.translator_directory.constants import GENDERS, CERTIFICATES
 from onegov.translator_directory.models.certificate import \
     LanguageCertificate
-from onegov.translator_directory.models.translator import Language, GENDERS, \
-    Translator, CERTIFICATES
+from onegov.translator_directory.models.translator import Language, Translator
 
 cli = command_group()
 

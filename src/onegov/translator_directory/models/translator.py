@@ -1,7 +1,6 @@
 from uuid import uuid4
 
 from onegov.search import ORMSearchable
-from onegov.translator_directory import _
 from libres.db.models.timestamp import TimestampMixin
 from sqlalchemy import Column, Text, Enum, Date, Integer, Table, ForeignKey, \
     Boolean, Index, Float
@@ -10,15 +9,10 @@ from sqlalchemy.orm import relationship, object_session
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
 from onegov.core.orm.types import UUID
+from onegov.translator_directory.constants import ADMISSIONS, GENDERS
 from onegov.translator_directory.models.documents import CertificateFile, \
     ApplicationFile, ClarificationFile, ConfirmationFile, ComplaintFile, \
     CorrespondenceFile, MiscFile
-
-ADMISSIONS = ('uncertified', 'in_progress', 'certified')
-ADMISSIONS_DESC = (_('uncertified'), _('in progress'), _('certified'))
-GENDERS = ('M', 'F', 'N')
-GENDERS_DESC = (_('masculin'), _('feminin'), 'neutral')
-CERTIFICATES = ('ZHAW', 'OGZH')
 
 
 class Language(Base):
@@ -96,37 +90,6 @@ certificate_association_table = Table(
         nullable=False),
     Column('cert_id', UUID, ForeignKey('language_certificates.id'),
            nullable=False)
-)
-
-member_can_see = (
-    'first_name',
-    'last_name',
-    'pers_id',
-    'admission',
-    'withholding_tax',
-    'gender',
-    'date_of_birth',
-    'nationality',
-    'address',
-    'zip_code',
-    'city',
-    'drive_distance',
-    'email',
-    'tel_mobile',
-    'tel_private',
-    'tel_office',
-    'availability',
-    'mother_tongues',
-    'languages_written',
-    'languages_spoken'
-)
-
-editor_can_see = member_can_see + (
-    'social_sec_number',
-    'bank_name',
-    'bank_address',
-    'account_owner',
-    'iban'
 )
 
 

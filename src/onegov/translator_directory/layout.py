@@ -6,8 +6,8 @@ from onegov.org.layout import DefaultLayout as BaseLayout
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
-from onegov.translator_directory.models.translator import GENDERS_DESC, \
-    GENDERS, member_can_see, editor_can_see, ADMISSIONS_DESC, ADMISSIONS
+from onegov.translator_directory.constants import member_can_see, \
+    editor_can_see, GENDERS_DESC, GENDERS, ADMISSIONS_DESC, ADMISSIONS
 
 
 class DefaultLayout(BaseLayout):
