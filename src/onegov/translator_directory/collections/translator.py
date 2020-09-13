@@ -20,11 +20,13 @@ class TranslatorCollection(GenericCollection, Pagination):
             spoken_langs=None,
             order_by=None,
             order_desc=False,
-            user_role=None
+            user_role=None,
+            search=None
     ):
         super().__init__(session)
         self.page = page
         self.user_role = user_role
+        self.search = self.truncate(search)
 
         if spoken_langs:
             assert isinstance(spoken_langs, list)
@@ -48,8 +50,13 @@ class TranslatorCollection(GenericCollection, Pagination):
             self.written_langs == other.written_langs,
             self.spoken_langs == other.spoken_langs,
             self.order_by == other.order_by,
-            self.order_desc == other.order_desc
+            self.order_desc == other.order_desc,
+            self.search == other.search
         ))
+
+    @staticmethod
+    def truncate(text, maxchars=50):
+        return text[:maxchars] if len(text) > maxchars else text
 
     @property
     def model_class(self):
