@@ -35,12 +35,4 @@ def test_translator(session):
     session.flush()
     assert translator.certificates
     translator.drive_distance = 60.5
-    assert translator.coordinates.lat is None
-    assert translator.coordinates.lon is None
-    assert translator.coordinates.zoom is None
-    translator.coordinates = Coordinates(
-        lat=47.05183585,
-        lon=8.30576869173879,
-        zoom=10
-    )
     session.flush()
