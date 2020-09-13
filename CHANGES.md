@@ -1,8 +1,36 @@
 # Changes
 
+## Release `2020.70`
+
+> commits: **9 / [b2369ca4cb...a77dbc37fd](https://github.com/OneGov/onegov-cloud/compare/b2369ca4cb^...a77dbc37fd)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.70)](https://buildkite.com/seantis/onegov-cloud)
+
+### Feriennet
+
+🐞 **Fixes detached instance for periods**
+
+Using the request.session instead of app.session()
+
+**`Bugfix`** | **[ec6022d105](https://github.com/onegov/onegov-cloud/commit/ec6022d10564480cc34f08a4504594e4023b83cf)**
+
+### Fsi
+
+🐞 **Fix form validation for the case an event has been deleted**
+
+If it happens so that the event is deleted between getting and sending the form.
+
+**`Bugfix`** | **[3c632f589c](https://github.com/onegov/onegov-cloud/commit/3c632f589c473903edd16dc3a95965d121b63795)**
+
+### Org
+
+🐞 **Fixes errors in publishing events**
+
+**`Bugfix`** | **[1b1c1859cc](https://github.com/onegov/onegov-cloud/commit/1b1c1859cc4ab14ea5420aca6c81ad4dbe2e2181)**
+
 ## Release `2020.69`
 
-> commits: **3 / [4522ba520c...df6b633a01](https://github.com/OneGov/onegov-cloud/compare/4522ba520c^...df6b633a01)**  
+> released: **2020-08-26 19:17**<br>
+> commits: **4 / [4522ba520c...2594ab1ec2](https://github.com/OneGov/onegov-cloud/compare/4522ba520c^...2594ab1ec2)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.69)](https://buildkite.com/seantis/onegov-cloud)
 
 ## Release `2020.68`
