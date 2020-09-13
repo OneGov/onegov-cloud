@@ -166,16 +166,14 @@ def test_view_new_translator(client):
 
 
 def test_view_languages(client):
+    create_languages(client.app.session())
+    transaction.commit()
     client.get('/languages', status=403)
     client.login_member()
     page = client.get('/languages')
-    assert 'Keine Ergebnisse gefunden' in page
-
-    create_languages(client.app.session())
-    transaction.commit()
-
-    page = client.get('/languages')
     assert 'Italian' in page
+    assert 'French' in page
+    assert 'Arabic' in page
 
 
 def test_create_new_language(client):
