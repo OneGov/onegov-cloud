@@ -2,95 +2,21 @@ from uuid import uuid4
 
 from onegov.search import ORMSearchable
 from libres.db.models.timestamp import TimestampMixin
-from sqlalchemy import Column, Text, Enum, Date, Integer, Table, ForeignKey, \
-    Boolean, Index, Float
-from sqlalchemy.orm import relationship, object_session
+from sqlalchemy import Column, Text, Enum, Date, Integer, Boolean, Float
+from sqlalchemy.orm import relationship
 
 from onegov.core.orm import Base
 from onegov.core.orm.abstract import associated
 from onegov.core.orm.types import UUID
 from onegov.translator_directory.constants import ADMISSIONS, GENDERS
+from onegov.translator_directory.models.certificate import \
+    certificate_association_table
 from onegov.translator_directory.models.documents import CertificateFile, \
     ApplicationFile, ClarificationFile, ConfirmationFile, ComplaintFile, \
     CorrespondenceFile, MiscFile
-
-
-class Language(Base):
-
-    __tablename__ = 'languages'
-
-    __table_args__ = (
-        Index('unique_name', 'name', unique=True),
-    )
-
-    id = Column(UUID, primary_key=True, default=uuid4)
-    name = Column(Text, nullable=False)
-
-    @property
-    def speakers_count(self):
-        session = object_session(self)
-        return session.query(
-            spoken_association_table).filter_by(lang_id=self.id).count()
-
-    @property
-    def writers_count(self):
-        session = object_session(self)
-        return session.query(
-            written_association_table).filter_by(lang_id=self.id).count()
-
-    @property
-    def native_speakers_count(self):
-        """Having it as mother tongue..."""
-        session = object_session(self)
-        return session.query(
-            mother_tongue_association_table).filter_by(lang_id=self.id).count()
-
-
-spoken_association_table = Table(
-    'spoken_lang_association',
-    Base.metadata,
-    Column(
-        'translator_id',
-        UUID,
-        ForeignKey('translators.id'),
-        nullable=False),
-    Column('lang_id', UUID, ForeignKey('languages.id'), nullable=False)
-)
-
-written_association_table = Table(
-    'written_lang_association',
-    Base.metadata,
-    Column(
-        'translator_id',
-        UUID,
-        ForeignKey('translators.id'),
-        nullable=False),
-    Column('lang_id', UUID, ForeignKey('languages.id'), nullable=False)
-)
-
-mother_tongue_association_table = Table(
-    'mother_tongue_association',
-    Base.metadata,
-    Column(
-        'translator_id',
-        UUID,
-        ForeignKey('translators.id'),
-        nullable=False),
-    Column('lang_id', UUID, ForeignKey('languages.id'), nullable=False)
-)
-
-
-certificate_association_table = Table(
-    'certifcate_association',
-    Base.metadata,
-    Column(
-        'translator_id',
-        UUID,
-        ForeignKey('translators.id'),
-        nullable=False),
-    Column('cert_id', UUID, ForeignKey('language_certificates.id'),
-           nullable=False)
-)
+from onegov.translator_directory.models.language import \
+    mother_tongue_association_table, spoken_association_table, \
+    written_association_table
 
 
 class DocumentsMixin(object):

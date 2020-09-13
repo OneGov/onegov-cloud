@@ -4,7 +4,7 @@ from wtforms.validators import InputRequired
 from onegov.form import Form
 from onegov.translator_directory import _
 from onegov.translator_directory.collections.language import LanguageCollection
-from onegov.translator_directory.models.translator import Language
+from onegov.translator_directory.models.language import Language
 
 
 class LanguageForm(Form):

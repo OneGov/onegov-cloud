@@ -8,7 +8,8 @@ from onegov.core.csv import CSVFile
 from onegov.translator_directory.constants import GENDERS, CERTIFICATES
 from onegov.translator_directory.models.certificate import \
     LanguageCertificate
-from onegov.translator_directory.models.translator import Language, Translator
+from onegov.translator_directory.models.language import Language
+from onegov.translator_directory.models.translator import Translator
 
 cli = command_group()
 

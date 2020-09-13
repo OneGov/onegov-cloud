@@ -2,7 +2,8 @@ from onegov.translator_directory import TranslatorDirectoryApp
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
-from onegov.translator_directory.models.translator import Translator, Language
+from onegov.translator_directory.models.language import Language
+from onegov.translator_directory.models.translator import Translator
 
 
 @TranslatorDirectoryApp.path(

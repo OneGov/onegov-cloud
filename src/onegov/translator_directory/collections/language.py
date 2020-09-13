@@ -2,7 +2,7 @@ from cached_property import cached_property
 from sqlalchemy import func
 
 from onegov.core.collection import GenericCollection, Pagination
-from onegov.translator_directory.models.translator import Language
+from onegov.translator_directory.models.language import Language
 
 
 class LanguageCollection(GenericCollection, Pagination):

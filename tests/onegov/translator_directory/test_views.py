@@ -5,7 +5,8 @@ import transaction
 from onegov.gis import Coordinates
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
-from onegov.translator_directory.models.translator import Translator, Language
+from onegov.translator_directory.models.translator import Translator
+from onegov.translator_directory.models.language import Language
 from tests.onegov.translator_directory.shared import translator_data, \
     create_languages, create_certificates
 from tests.shared.utils import open_in_browser, encode_map_value, \

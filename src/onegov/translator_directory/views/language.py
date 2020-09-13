@@ -6,7 +6,7 @@ from onegov.translator_directory.forms.language import LanguageForm
 from onegov.translator_directory import _
 from onegov.translator_directory.layout import LanguageCollectionLayout, \
     AddLanguageLayout, EditLanguageLayout
-from onegov.translator_directory.models.translator import Language
+from onegov.translator_directory.models.language import Language
 
 
 @TranslatorDirectoryApp.form(
