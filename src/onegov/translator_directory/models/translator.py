@@ -1,7 +1,5 @@
 from uuid import uuid4
 
-from onegov.core.orm.mixins import ContentMixin
-from onegov.gis import CoordinatesMixin
 from onegov.search import ORMSearchable
 from onegov.translator_directory import _
 from libres.db.models.timestamp import TimestampMixin

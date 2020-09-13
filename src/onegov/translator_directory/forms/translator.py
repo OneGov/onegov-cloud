@@ -11,7 +11,6 @@ from onegov.form.fields import ChosenSelectMultipleField
 
 from onegov.form.validators import ValidPhoneNumber, \
     ValidSwissSocialSecurityNumber, StrictOptional
-from onegov.gis import CoordinatesField
 from onegov.translator_directory import _
 from onegov.translator_directory.collections.certificate import \
     LanguageCertificateCollection
@@ -112,15 +111,6 @@ class TranslatorForm(Form, FormChoicesMixin):
     city = StringField(
         label=_('City'),
     )
-
-    # Todo: Activating this field will result in an error when setting the
-    # value in the CoordinatesMixin: self.content is None, while it should be
-    # a field that is not nullable
-    # coordinates = CoordinatesField(
-    #     label=_("Coordinates"),
-    #     description=_("The marker can be moved by dragging it with the mouse"),
-    #     render_kw={'data-map-type': 'marker'}
-    # )
 
     drive_distance = FloatField(
         label=_('Drive distance'),
