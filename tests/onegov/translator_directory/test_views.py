@@ -147,6 +147,7 @@ def test_view_new_translator(client):
     assert language_names[0] not in page
     assert language_names[1] not in page
     assert language_names[2] not in page
+    trs_url = page.request.url
 
     # # try adding another with same email
     page = client.get('/translators/new')
@@ -157,9 +158,11 @@ def test_view_new_translator(client):
 
     page = page.form.submit()
     assert 'Ein(e) Übersetzer/in mit dieser Email existiert bereits' in page
-    # editor = client.spawn()
-    # editor.login_editor()
-    # editor.get(f'/translator/{tr_id}', status=403)
+
+    # Test if the for_admins_only works
+    editor = client.spawn()
+    editor.login_editor()
+    editor.get(trs_url, status=403)
 
 
 def test_view_languages(client):

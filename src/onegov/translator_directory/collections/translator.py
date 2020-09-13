@@ -98,7 +98,7 @@ class TranslatorCollection(GenericCollection, Pagination):
         if self.written_langs:
             query = query.filter(and_(*self.by_written_lang_expression))
 
-        if not self.user_role == 'admin':
+        if self.user_role != 'admin':
             query = query.filter(Translator.for_admins_only == False)
 
         query = query.order_by(self.order_expression)

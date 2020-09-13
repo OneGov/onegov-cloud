@@ -8,8 +8,8 @@ from onegov.translator_directory.models.translator import Translator, Language
 @TranslatorDirectoryApp.path(
     model=Translator, path='/translator/{id}'
 )
-def get_translator(app, id):
-    return TranslatorCollection(app.session()).by_id(id)
+def get_translator(request, id):
+    return request.session.query(Translator).filter_by(id=id).first()
 
 
 @TranslatorDirectoryApp.path(
