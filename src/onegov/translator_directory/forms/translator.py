@@ -382,7 +382,7 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         model.spoken_langs = self.spoken_langs.data
         model.written_langs = self.written_langs.data
         model.order_by = self.order_by.data
-        model.order_desc = self.order_desc == '1' and True or False
+        model.order_desc = self.order_desc.data == '1' and True or False
 
     def on_request(self):
         self.spoken_langs.choices = self.language_choices
