@@ -26,14 +26,15 @@ def with_open(func):
 
 skip_languages = ['-', 'Kein Einsatz']
 
-split_pattern = re.compile(r',(?![^\(\[]*[\]\)])')
+# pattern that deals with languages containing commas within brackets
+lang_split_pattern = re.compile(r',(?![^\(\[]*[\]\)])')
 
 
 def parse_language_field(languages):
     """The fields can have commas in it, so we can not split by comma"""
     if not languages:
         return
-    for lang in split_pattern.split(languages):
+    for lang in lang_split_pattern.split(languages):
         if not lang or lang in skip_languages:
             continue
         yield lang.strip()
