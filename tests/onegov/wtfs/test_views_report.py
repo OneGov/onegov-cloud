@@ -66,8 +66,12 @@ def test_views_report(client):
     page = client.get('/report')
     page.form['start'] = '2018-12-31'
     page.form['end'] = '2019-01-01'
+    page.form['report_type'] = 'boxes_and_forms'
     page = page.form.submit()
     assert 'Start und Ende müssen im gleichen Jahr liegen' in page
+
+    # if errors, the redirect fails, boxes do not need start end restriction
+    view = get_report('boxes', '2018-12-31', '2019-01-01')
 
     # Boxes
     view = get_report('boxes', '2019-01-01', '2019-01-05')

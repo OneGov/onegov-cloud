@@ -65,6 +65,8 @@ class ReportSelectionForm(Form):
     )
 
     def ensure_start_end_in_same_year(self):
+        if self.report_type.data == 'boxes':
+            return
         if self.start.data and self.end.data:
             if self.start.data.year != self.end.data.year:
                 self.end.errors.append(
