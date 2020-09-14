@@ -13,12 +13,12 @@
                             <th class="center" colspan="4" i18n:translate>Tax forms</th>
                             <th i18n:translate>Single documents</th>
                         </tr>
-                        <tr>
+                        <tr tal:define="dispatch_year layout.model.dispatch_date.year">
                             <th></th>
                             <th colspan="2"></th>
-                            <th class="right subtitle"><tal:block i18n:translate>until</tal:block> ${layout.current_year-2}</th>
-                            <th class="right subtitle">${layout.current_year-1}</th>
-                            <th class="right subtitle">${layout.current_year}</th>
+                            <th class="right subtitle"><tal:block i18n:translate>until</tal:block> ${dispatch_year-2}</th>
+                            <th class="right subtitle">${dispatch_year-1}</th>
+                            <th class="right subtitle">${dispatch_year}</th>
                             <th class="right subtitle" i18n:translate>Total</th>
                             <th></th>
                         </tr>

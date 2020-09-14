@@ -51,6 +51,9 @@ def test_views_scan_job(client):
     assert all([f">{number}<" in view for number in range(1, 7 + 1)])
     assert "Lieferung an das Steueramt Winterthur am 05.01.2019" in view
     assert "Bemerkung zur Abholung" in view
+    assert '2017' in view.pyquery('.subtitle')[0].text
+    assert '2018' in view.pyquery('.subtitle')[1].text
+    assert '2019' in view.pyquery('.subtitle')[2].text
 
     # Delivery note
     view = view.click("Lieferschein")
@@ -58,6 +61,7 @@ def test_views_scan_job(client):
     assert "05.01.2019" in view
     assert all([f">{number}<" in view for number in range(1, 5 + 1)])
     assert "Lieferung an das Steueramt Winterthur" in view
+    assert view.pyquery('th.center.green')[2].text == 'bis 2017'
 
     # Edit scan job
     client.logout()
