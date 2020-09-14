@@ -15,3 +15,4 @@ To update, use the provided command `onegov-foundation upgrade`.
 
 Here are some hints what must be changed:
 https://github.com/foundation/foundation-sites/wiki/Upgrading-to-Foundation-6.2
+
