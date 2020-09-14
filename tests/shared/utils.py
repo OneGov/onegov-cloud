@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 
@@ -10,6 +11,15 @@ from onegov.core.utils import Bunch, scan_morepath_modules, module_path
 from PIL import Image
 from random import randint
 from uuid import uuid4
+from base64 import b64decode, b64encode
+
+
+def encode_map_value(dictionary):
+    return b64encode(json.dumps(dictionary).encode('utf-8'))
+
+
+def decode_map_value(value):
+    return json.loads(b64decode(value).decode('utf-8'))
 
 
 def open_in_browser(response, browser='firefox'):

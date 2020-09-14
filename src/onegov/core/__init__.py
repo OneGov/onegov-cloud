@@ -60,6 +60,7 @@ LEVELS = (
         'onegov.swissvotes',
         'onegov.redesign_test',
         'onegov.town',
+        'onegov.translator_directory',
         'onegov.winterthur',
         'onegov.wtfs',
     ),
