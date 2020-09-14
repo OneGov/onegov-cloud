@@ -3,6 +3,8 @@ from onegov.core.request import CoreRequest
 from unittest.mock import patch
 from webtest.forms import Upload
 
+from tests.shared.utils import open_in_browser
+
 
 def test_views_report(client):
     # Add a municipality with dates
@@ -59,6 +61,13 @@ def test_views_report(client):
         select.form['scan_job_type'].select(scan_job_type)
         select.form['municipality_id'].select(text='Adlikon (1)')
         return select.form.submit().follow()
+
+    # Form validation
+    page = client.get('/report')
+    page.form['start'] = '2018-12-31'
+    page.form['end'] = '2019-01-01'
+    page = page.form.submit()
+    assert 'Start und Ende müssen im gleichen Jahr liegen' in page
 
     # Boxes
     view = get_report('boxes', '2019-01-01', '2019-01-05')

@@ -64,6 +64,14 @@ class ReportSelectionForm(Form):
         ),
     )
 
+    def ensure_start_end_in_same_year(self):
+        if self.start.data and self.end.data:
+            if self.start.data.year != self.end.data.year:
+                self.end.errors.append(
+                    _('Start and end must be in the same year')
+                )
+                return False
+
     def on_request(self):
         query = self.request.session.query(
             Municipality.id.label('id'),
