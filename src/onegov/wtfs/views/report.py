@@ -42,11 +42,7 @@ def view_select_report(self, request, form):
     permission=ViewModel
 )
 def view_report_boxes(self, request):
-    return {
-        'layout': ReportBoxesLayout(self, request),
-        'results': self.query().all(),
-        'total': self.total()
-    }
+    return {'layout': ReportBoxesLayout(self, request)}
 
 
 @WtfsApp.html(
@@ -55,11 +51,7 @@ def view_report_boxes(self, request):
     permission=ViewModel
 )
 def view_report_boxes_and_forms(self, request):
-    return {
-        'layout': ReportBoxesAndFormsLayout(self, request),
-        'results': self.query_results(),
-        'total': self.query_total()
-    }
+    return {'layout': ReportBoxesAndFormsLayout(self, request)}
 
 
 @WtfsApp.html(
@@ -68,11 +60,7 @@ def view_report_boxes_and_forms(self, request):
     permission=ViewModel
 )
 def view_report_forms(self, request):
-    return {
-        'layout': ReportFormsByMunicipalityLayout(self, request),
-        'results': self.query_results(),
-        'total': self.query_total()
-    }
+    return {'layout': ReportFormsByMunicipalityLayout(self, request)}
 
 
 @WtfsApp.html(
@@ -81,11 +69,7 @@ def view_report_forms(self, request):
     permission=ViewModel
 )
 def view_report_forms_all(self, request):
-    return {
-        'layout': ReportFormsAllMunicipalitiesLayout(self, request),
-        'results': self.query_results(),
-        'total': self.query_total()
-    }
+    return {'layout': ReportFormsAllMunicipalitiesLayout(self, request)}
 
 
 @WtfsApp.html(
@@ -94,8 +78,4 @@ def view_report_forms_all(self, request):
     permission=ViewModel
 )
 def view_report_delivery(self, request):
-    return {
-        'layout': ReportBoxesAndFormsByDeliveryLayout(self, request),
-        'results': self.query_results(),
-        'total': self.query_total()
-    }
+    return {'layout': ReportBoxesAndFormsByDeliveryLayout(self, request)}
