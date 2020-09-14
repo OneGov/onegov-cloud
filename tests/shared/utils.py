@@ -1,4 +1,4 @@
-import json
+from onegov.core.custom import json
 import os
 import shutil
 
