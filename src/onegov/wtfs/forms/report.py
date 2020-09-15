@@ -64,17 +64,13 @@ class ReportSelectionForm(Form):
         ),
     )
 
-    def ensure_valid_date_range(self):
+    def ensure_start_end_in_same_year(self):
+        if self.report_type.data == 'boxes':
+            return
         if self.start.data and self.end.data:
-
-            if self.end.data < self.start.data:
-                self.start.errors.append(
-                    _("Start date is after end date"))
-                return False
-
-            if self.end.data.year > self.start.data.year + 2:
+            if self.start.data.year != self.end.data.year:
                 self.end.errors.append(
-                    _("Please limit your report to 2 years")
+                    _('Start and end must be in the same year')
                 )
                 return False
 

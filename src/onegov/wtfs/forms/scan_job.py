@@ -250,7 +250,7 @@ class EditScanJobForm(Form):
     )
 
     def update_labels(self):
-        year = date.today().year
+        year = self.model.dispatch_date.year
         self.dispatch_tax_forms_older.label.text = _(
             "Tax forms until ${year}", mapping={'year': year - 2}
         )
