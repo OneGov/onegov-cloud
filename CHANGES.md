@@ -1,8 +1,22 @@
 # Changes
 
+## Release `2020.71`
+
+> commits: **5 / [01f2217fae...7f47ca402c](https://github.com/OneGov/onegov-cloud/compare/01f2217fae^...7f47ca402c)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.71)](https://buildkite.com/seantis/onegov-cloud)
+
+### Wtfs
+
+🐞 **Reverting branch winterthur_report_fix**
+
+Accumulation of returned boxes from different tax periods was re-evaluated with the customer. Former development was working but a code smell. Report start and end dates are limited to one year by form validation. Labels have been adjusted according to dispatch_date.
+
+**`Bugfix`** | **[dd6d9681a4](https://github.com/onegov/onegov-cloud/commit/dd6d9681a4e29a76c868404bd6be0e6fe3f5c6c3)**
+
 ## Release `2020.70`
 
-> commits: **9 / [b2369ca4cb...a77dbc37fd](https://github.com/OneGov/onegov-cloud/compare/b2369ca4cb^...a77dbc37fd)**  
+> released: **2020-09-13 13:00**<br>
+> commits: **10 / [b2369ca4cb...88b99960c1](https://github.com/OneGov/onegov-cloud/compare/b2369ca4cb^...88b99960c1)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.70)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Feriennet
