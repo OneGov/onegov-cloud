@@ -113,7 +113,7 @@ class ProcessedUploadedFile(UploadedFile):
             # it uses poppler apt package in the background resulting in old
             # versions installed on the host. We still would like to sign
             # the pdfs in which case file.stats has hopefully been set already
-            if content.signed:
+            if self.signed:
                 pass
             else:
                 raise
