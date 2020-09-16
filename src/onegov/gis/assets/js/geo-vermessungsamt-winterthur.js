@@ -42,7 +42,8 @@ function spawnDefaultMap(target, options, cb) {
     L.tileLayer.wms(service, {
         'layers': layers,
         'maxZoom': maxZoom,
-        'minZoom': 0
+        'minZoom': 0,
+        'format': 'image/png'
     }).addTo(map);
 
     cb(map);
