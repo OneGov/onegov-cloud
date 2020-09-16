@@ -142,7 +142,7 @@ class AddScanJobForm(Form):
         )
         query = query.filter(PickupDate.date > after)
         query = query.order_by(PickupDate.date)
-        return [r.date for r in query]
+        return [r.date for r in query] or [date(2018, 1, 1), date.today()]
 
     @property
     def return_date(self):

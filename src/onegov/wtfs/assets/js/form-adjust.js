@@ -24,8 +24,8 @@ var updateLabels = function (dispatchYear) {
             } else {
                 replace_year = year - 2
             }
-            var label = $(input_ids[i]).parent().children().first()
-            label.text(label.text().replace(yearPattern, replace_year))
+            var label = $(input_ids[i]).parent().children().first();
+            label.text(label.text().replace(yearPattern, replace_year));
         }
     }
 }
@@ -33,17 +33,22 @@ var updateLabels = function (dispatchYear) {
 var updateDispatchDates = function(dispatch_date, return_date) {
     $('#dispatch_date').val(dispatch_date);
     $('#return_date').val(return_date);
-    updateLabels(dispatch_date.split('-')[0])
+    updateLabels(dispatch_date.split('-')[0]);
 }
 
-function modifyScanJobForm () {
+function updateScanJobFormLabels () {
     $('#dispatch_date').on('input', function () {
         var dispatchYear = this.value.split('-')[0];
-        updateLabels(dispatchYear)
+        updateLabels(dispatchYear);
+    })
+
+    $('#dispatch_date_normal').on('change', function () {
+        var date = $(this).find("option:selected").attr('value')
+        updateLabels(date.split('-')[0]);
     })
 
 }
 $(document).ready(function () {
-    modifyScanJobForm();
+    updateScanJobFormLabels();
 })
 
