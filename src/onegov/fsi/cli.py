@@ -38,10 +38,12 @@ def import_ims_data_cli(path):
 
 @cli.command(name='import-teacher-data', context_settings={'singular': True})
 @click.option('--path', help='Filepath', required=True)
-def import_teacher_data_cli(path):
+@click.option('--clear', is_flag=True, default=False,
+              help='Clear imported data')
+def import_teacher_data_cli(path, clear):
 
     def execute(request, app):
-        import_teacher_data(path, request)
+        import_teacher_data(path, request, clear)
     return execute
 
 

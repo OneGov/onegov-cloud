@@ -165,7 +165,7 @@ def with_open(func):
 
 
 @with_open
-def import_teacher_data(csvfile, request):
+def import_teacher_data(csvfile, request, clean=False):
 
     session = request.session
 
@@ -175,6 +175,7 @@ def import_teacher_data(csvfile, request):
     subscriptions = SubscriptionsCollection(session)
     total_lines = 0
     matched_count = 0
+    deleted_count = 0
 
     for ix, line in enumerate(csvfile.lines):
         total_lines += 1
@@ -200,14 +201,26 @@ def import_teacher_data(csvfile, request):
                 print(f'{email} for {str(course_date)} not confirmed')
             # print(f'Found {email} in database and event that day')
             matched_count += 1
-            subscriptions.add(
-                course_event_id=matched_event.id,
-                attendee_id=matched_teacher.attendee.id,
-                event_completed=confirmed
-            )
+            if not clean:
+                subscriptions.add(
+                    course_event_id=matched_event.id,
+                    attendee_id=matched_teacher.attendee.id,
+                    event_completed=confirmed
+                )
+            else:
+                attendee_id = matched_teacher.attendee.id
+                subs = session.query(CourseSubscription).filter(
+                    CourseSubscription.course_event_id == matched_event.id,
+                    CourseSubscription.attendee_id == attendee_id
+                ).first()
+                if subs:
+                    deleted_count += 1
+                    session.delete(subs)
 
     print(f'Total lines: {total_lines}')
     print(f'Matched emails/events: {matched_count}')
+    if clean:
+        print(f'Deleted {deleted_count} subscriptions')
 
 
 def parse_completed(val):
