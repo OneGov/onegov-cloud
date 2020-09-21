@@ -80,6 +80,7 @@ class WhitelistedMimeType(object):
         'image/png',
         'image/x-ms-bmp',
         'text/plain',
+        'text/csv'
     }
 
     message = _("Files of this type are not supported.")
