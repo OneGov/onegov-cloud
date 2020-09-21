@@ -9,7 +9,7 @@ from icalendar import Event as vEvent
 from mailthon.enclosure import PlainText
 from sedate import utcnow, to_timezone
 from sqlalchemy import Column, Boolean, SmallInteger, \
-    Enum, Text, Interval, UniqueConstraint, ForeignKey, or_, and_
+    Enum, Text, Interval, ForeignKey, or_, and_
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, backref, object_session
 
@@ -47,9 +47,6 @@ class CourseEvent(Base, TimestampMixin, ORMSearchable):
     default_reminder_before = datetime.timedelta(days=14)
 
     __tablename__ = 'fsi_course_events'
-    __table_args__ = (
-        UniqueConstraint('start', 'end', name='_start_end_uc'),
-    )
 
     es_properties = {
         'name': {'type': 'localized'},

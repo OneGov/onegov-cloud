@@ -1,11 +1,15 @@
+from datetime import date, datetime, timezone
+
 import click
+from sedate import replace_timezone
+from sqlalchemy import cast, Date
 
 from onegov.core.cache import lru_cache
 from onegov.core.cli import command_group
 from onegov.fsi import log
 from onegov.fsi.ims_import import parse_ims_data, import_ims_data, \
-    import_teacher_data
-from onegov.fsi.models import CourseAttendee
+    import_teacher_data, with_open, parse_date, validate_integer, parse_status
+from onegov.fsi.models import CourseAttendee, CourseEvent
 from onegov.fsi.models.course_attendee import external_attendee_org
 from onegov.user.auth.clients import LDAPClient
 from onegov.user.auth.provider import ensure_user
@@ -36,12 +40,125 @@ def import_ims_data_cli(path):
     return execute
 
 
+@cli.command(name='correct-ims-data', context_settings={'singular': True})
+@click.option('--path', help='Path Ausführungen.txt', required=False)
+def correct_ims_data_cli(path):
+
+    def fix_original_ims_import(request, app):
+        # Import of data was done according to timestamps 15.01.2020
+        session = request.session
+
+        def delete_events_without_subscriptions(session):
+            query = session.query(CourseEvent).filter(
+                cast(CourseEvent.created, Date) == date(2020, 1, 15)
+            )
+            total = query.count()
+            deleted = 0
+            for event in query:
+                if event.attendees.count() == 0:
+                    deleted += 1
+                    session.delete(event)
+            return total, deleted
+
+        def parse_date_correct(val, default=None):
+            if not val:
+                return default
+            date_ = datetime.strptime(val, '%d/%m/%Y %H:%M:%S')
+            return replace_timezone(date_, 'UTC')
+
+        def correct_datetime(dt):
+            return datetime(
+                dt.year,
+                dt.day,
+                dt.month,
+                dt.hour,
+                dt.minute,
+                tzinfo=timezone.utc)
+
+        @with_open
+        def open_events_file(csvfile, session):
+            corrected_event_ids = set()
+            control_messages = []
+            for line in csvfile.lines:
+                date_lacking = not line.kurs_von or not line.kurs_bis
+                if date_lacking:
+                    continue
+                start = parse_date(line.kurs_von)
+                correct_start = parse_date_correct(line.kurs_von)
+                min_att = validate_integer(line.teilnehmer_min)
+                max_att = validate_integer(line.teilnehmer_max)
+                buchungsstatus = line.buchungsstatus
+                if start == correct_start or \
+                        buchungsstatus == 'Keine Buchungen':
+                    continue
+
+                events = session.query(CourseEvent).filter_by(
+                    start=start,
+                    min_attendees=min_att,
+                    max_attendees=max_att,
+                    status=parse_status(line.status)
+                )
+                if corrected_event_ids:
+                    events = events.filter(
+                        CourseEvent.id.notin_(corrected_event_ids)
+                    )
+
+                events = events.all()
+
+                if events:
+                    names = []
+                    for ev in events:
+                        # be sure that there are not duplicate courses!!!
+                        course_name = ev.course.name
+                        assert course_name not in names
+                        names.append(course_name)
+
+                    # correct events and register them as changed
+                    for event in events:
+                        corrected_event_ids.add(event.id)
+                        new_start = correct_datetime(event.start)
+                        assert new_start == correct_start
+                        event.start = correct_datetime(event.start)
+                        event.end = correct_datetime(event.end)
+
+            # corrected using the created data
+            to_change_ids = set()
+            by_created_query = session.query(CourseEvent).filter(
+                cast(CourseEvent.created, Date) == date(2020, 1, 15)
+            )
+            for event in by_created_query:
+                start = event.start
+                if start.day < 13 and not start.day == start.month:
+                    to_change_ids.add(event.id)
+            print(f'To correct by using created date: {len(to_change_ids)}')
+            assert len(to_change_ids) == len(corrected_event_ids)
+
+            return corrected_event_ids, control_messages
+
+        # delete old course events
+        total, deleted_count = delete_events_without_subscriptions(session)
+        session.flush()
+        print(f'Deleted course events without subs: {deleted_count}/{total}')
+        corrected_ids, ctrl_msgs = open_events_file(path, session)
+        session.flush()
+
+        print(f'Corrected course events using '
+              f'original file: {len(corrected_ids)}')
+
+        with open('changed_events.log', 'w') as log_file:
+            print('\n'.join((str(i) for i in corrected_ids)), file=log_file)
+
+    return fix_original_ims_import
+
+
 @cli.command(name='import-teacher-data', context_settings={'singular': True})
 @click.option('--path', help='Filepath', required=True)
-def import_teacher_data_cli(path):
+@click.option('--clear', is_flag=True, default=False,
+              help='Clear imported data')
+def import_teacher_data_cli(path, clear):
 
     def execute(request, app):
-        import_teacher_data(path, request)
+        import_teacher_data(path, request, clear)
     return execute
 
 
