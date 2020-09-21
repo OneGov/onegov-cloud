@@ -17,8 +17,6 @@ from tests.shared import utils
 from psycopg2.extras import NumericRange
 from webtest import Upload
 
-from tests.shared.utils import open_in_browser
-
 
 def test_view_permissions():
     utils.assert_explicit_permissions(

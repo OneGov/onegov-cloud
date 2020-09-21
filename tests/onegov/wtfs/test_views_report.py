@@ -3,8 +3,6 @@ from onegov.core.request import CoreRequest
 from unittest.mock import patch
 from webtest.forms import Upload
 
-from tests.shared.utils import open_in_browser
-
 
 def test_views_report(client):
     # Add a municipality with dates

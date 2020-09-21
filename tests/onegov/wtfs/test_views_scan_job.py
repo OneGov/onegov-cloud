@@ -3,8 +3,6 @@ from onegov.core.request import CoreRequest
 from unittest.mock import patch
 from webtest.forms import Upload
 
-from tests.shared.utils import open_in_browser
-
 
 def test_views_scan_job(client):
     # Add municipality dates
@@ -33,7 +31,6 @@ def test_views_scan_job(client):
         add.form['dispatch_cantonal_tax_office'] = "6"
         add.form['dispatch_cantonal_scan_center'] = "7"
         add.form['dispatch_note'] = "Bemerkung zur Abholung"
-        open_in_browser(add)
         added = add.form.submit().follow()
         assert "Scan-Auftrag hinzugefügt." in added
         assert "05.01.2019" in added
