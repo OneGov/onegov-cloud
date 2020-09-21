@@ -55,7 +55,7 @@ def test_edit_course_event(client_with_db):
     assert 'This course is hidden.' not in page
     # test no changes
     page = client.get(view)
-    page.form.submit.follow()
+    page.form.submit().follow()
 
 
 def test_add_delete_course_event(client_with_db):
