@@ -8,7 +8,8 @@ from wtforms.validators import InputRequired
 from onegov.fsi import _
 from onegov.form import Form
 from onegov.fsi.collections.course import CourseCollection
-from onegov.fsi.models.course_event import course_status_choices
+from onegov.fsi.collections.course_event import CourseEventCollection
+from onegov.fsi.models.course_event import course_status_choices, CourseEvent
 
 
 class CourseEventForm(Form):
@@ -97,6 +98,21 @@ class CourseEventForm(Form):
         if self.start.data >= self.end.data:
             self.start.errors = [_("Please use a start prior to the end")]
             return False
+
+    def ensure_no_duplicates(self):
+        if not isinstance(self.model, CourseEventCollection):
+            return  # skip for edit views
+        if self.start.data and self.end.data and self.course_id.data:
+            existing = self.request.session.query(CourseEvent).filter_by(
+                start=self.start.data,
+                end=self.end.data,
+                course_id=self.course_id.data
+            ).first()
+            if existing:
+                self.course_id.errors.append(
+                    _('A duplicate event already exists')
+                )
+                return False
 
     def on_request(self):
         collection = CourseCollection(self.request.session)

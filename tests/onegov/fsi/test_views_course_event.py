@@ -53,6 +53,9 @@ def test_edit_course_event(client_with_db):
     assert f'min. 2 max. 3' in page
     # String will not be rendered in email preview
     assert 'This course is hidden.' not in page
+    # test no changes
+    page = client.get(view)
+    page.form.submit.follow()
 
 
 def test_add_delete_course_event(client_with_db):
@@ -64,7 +67,7 @@ def test_add_delete_course_event(client_with_db):
     client.login_admin()
     page = client.get(view)
     assert page.form['course_id'].value
-    print('course_id value: ', page.form['course_id'].value)
+
     page.form['presenter_name'] = 'Presenter'
     page.form['presenter_name'] = 'Presenter'
     page.form['presenter_company'] = 'Company'
@@ -78,6 +81,19 @@ def test_add_delete_course_event(client_with_db):
     # Follow will not work if there are error in the form
     page = page.form.submit().follow()
     assert 'Eine neue Durchführung wurde hinzugefügt' in page
+
+    # Test add duplicate
+    page = client.get(view)
+    page.form['presenter_name'] = 'Presenter'
+    page.form['presenter_name'] = 'Presenter'
+    page.form['presenter_company'] = 'Company'
+    page.form['presenter_email'] = 'p@t.com'
+    page.form['start'] = '2016-10-04 10:00:00'
+    page.form['end'] = '2016-10-04 12:00:00'
+    page.form['location'] = 'location'
+    page.form['max_attendees'] = '10'
+    page = page.form.submit()
+    assert 'Ein Duplikat dieser Durchführung existiert bereits' in page
 
     # Delete course without subscriptions
     session = client.app.session()
