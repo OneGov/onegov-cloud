@@ -633,6 +633,11 @@ def binary_to_dictionary(binary, filename=None):
     assert isinstance(binary, bytes)
 
     mimetype = magic.from_buffer(binary, mime=True)
+
+    # according to https://tools.ietf.org/html/rfc7111, text/csv should be used
+    if mimetype == 'application/csv':
+        mimetype = 'text/csv'
+
     gzipdata = BytesIO()
 
     with gzip.GzipFile(fileobj=gzipdata, mode='wb') as f:
