@@ -118,7 +118,7 @@ name is valid (first character must be uppercase!).
 To run OneGov Cloud locally, you must meet the following requirements:
 
 * Linux/MacOS
-* Postgres 10+
+* Postgres 12+
 * Python 3.8+
 * OpenJDK 11+
 * Elasticsearch 7.x

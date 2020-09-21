@@ -1795,8 +1795,9 @@ def test_selectable_sql_query(session):
         )
     ).fetchall()
 
-    assert columns == [('groname', )]
+    assert columns == [('groname', ), ('grosysid', )]
     assert columns[0].column_name == 'groname'
+    assert columns[1].column_name == 'grosysid'
 
     columns = session.execute(
         select((stmt.c.column_name, )).where(
@@ -1807,9 +1808,8 @@ def test_selectable_sql_query(session):
         ).order_by(stmt.c.column_name)
     ).fetchall()
 
-    assert columns == [('grolist', ), ('grosysid', )]
+    assert columns == [('grolist', )]
     assert columns[0].column_name == 'grolist'
-    assert columns[1].column_name == 'grosysid'
 
 
 def test_selectable_sql_query_with_array(session):
