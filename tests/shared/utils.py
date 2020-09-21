@@ -23,7 +23,9 @@ def decode_map_value(value):
 
 
 def open_in_browser(response, browser='firefox'):
-    assert shutil.which(browser)
+    if not shutil.which(browser):
+        print(f'{browser} is not installed, skipping...')
+        return
     path = '/tmp/test.html'
     with open(path, 'w') as f:
         print(response.text, file=f)
