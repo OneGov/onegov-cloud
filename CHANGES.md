@@ -1,8 +1,55 @@
 # Changes
 
+## Release `2020.72`
+
+> commits: **16 / [49ede628a7...296c5a9266](https://github.com/OneGov/onegov-cloud/compare/49ede628a7^...296c5a9266)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.72)](https://buildkite.com/seantis/onegov-cloud)
+
+### Core
+
+🐞 **Fix mimetype derived from libmagic**
+
+- replace application/csv with text/csv
+
+**`Bugfix`** | **[092a9691ff](https://github.com/onegov/onegov-cloud/commit/092a9691ffa046c1c0f6b4e6bee9a8189dc07d0f)**
+
+### Electionday
+
+🐞 **Fix file upload for additional mimetypes**
+
+libmagic might derive application/csv (which is replaced by text/csv)
+
+**`Bugfix`** | **[001e25c3ce](https://github.com/onegov/onegov-cloud/commit/001e25c3ce78d582fa98297f6dc33af8e54cd089)**
+
+### File
+
+🐞 **Allow failing of file stats for signed pdfs**
+
+- Assuming that the stats have been already filled
+- and signing does not change the pdf's content
+
+**`Bugfix`** | **[d0bd509b1e](https://github.com/onegov/onegov-cloud/commit/d0bd509b1ee2f89dbe2458ff411515da7989c113)**
+
+### Fsi
+
+🐞 **Adds cli to correct imported data**
+
+Adds '--clear' flag to revert imported teacher data. Adds cli to clean duplicate course events without subscriptions and correct day/month for imported courses
+
+**`Bugfix`** | **[9978a282d9](https://github.com/onegov/onegov-cloud/commit/9978a282d90725ca9a66925b7dff10185c44a289)**
+
+### Winterthur
+
+✨ **Changes WMS Tile Layer format to png**
+
+- format jpeg was not available anymore
+
+**`Other`** | **[49ede628a7](https://github.com/onegov/onegov-cloud/commit/49ede628a7f42d01c1146bc8f1fe95e8239e2c53)**
+
 ## Release `2020.71`
 
-> commits: **5 / [01f2217fae...7f47ca402c](https://github.com/OneGov/onegov-cloud/compare/01f2217fae^...7f47ca402c)**  
+> released: **2020-09-15 11:16**<br>
+> commits: **6 / [01f2217fae...5609d31d78](https://github.com/OneGov/onegov-cloud/compare/01f2217fae^...5609d31d78)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.71)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Wtfs
