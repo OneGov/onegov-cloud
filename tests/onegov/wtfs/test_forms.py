@@ -623,6 +623,10 @@ def test_edit_scan_job_form(session):
 
 
 def test_unrestricted_scan_job_form(session):
+
+    class FakeModel:
+        pass
+
     municipalities = MunicipalityCollection(session)
     municipality_1 = municipalities.add(name="Boppelsen", bfs_number=82)
     municipality_1.pickup_dates.append(PickupDate(date=date(2019, 1, 7)))
@@ -635,6 +639,7 @@ def test_unrestricted_scan_job_form(session):
     # Test on request
     form = UnrestrictedScanJobForm()
     form.request = Request(session, groupid=municipality_1.id.hex)
+    form.model = FakeModel
     with freeze_time("2019-01-05"):
         form.on_request()
         assert form.type.choices == [
@@ -745,6 +750,7 @@ def test_unrestricted_scan_job_form(session):
     # Test validation
     with freeze_time("2019-01-05"):
         form = UnrestrictedScanJobForm()
+        form.model = FakeModel
         form.request = Request(session, groupid=municipality_1.id.hex)
         form.on_request()
         assert not form.validate()
@@ -754,6 +760,7 @@ def test_unrestricted_scan_job_form(session):
             'type': 'normal',
             'dispatch_date': '2019-01-18'
         }))
+        form.model = FakeModel
         form.request = Request(session, groupid=municipality_1.id.hex)
         form.on_request()
 
