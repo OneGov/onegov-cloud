@@ -48,8 +48,7 @@ def load_csv(
     csv = None
     error = None
     csvfile = file
-
-    if mimetype != 'text/plain':
+    if mimetype not in ('text/plain', 'text/csv'):
         try:
             csvfile = convert_xls_to_csv(file, 'Resultate')
             dialect = 'excel'
