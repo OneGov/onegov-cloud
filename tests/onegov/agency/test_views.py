@@ -1,5 +1,7 @@
 from io import BytesIO
 from PyPDF2 import PdfFileReader
+
+from onegov.org.models import Organisation
 from tests.onegov.core.test_utils import valid_test_phone_numbers
 
 
@@ -313,6 +315,13 @@ def test_views_hidden(client):
 
 
 def test_view_pdf_settings(client):
+
+    org = client.app.session().query(Organisation).one()
+    assert org.pdf_layout is None
+    assert org.page_break_on_level_root_pdf is None
+    assert org.page_break_on_level_org_pdf is None
+    assert org.report_changes is None
+
     def get_pdf():
         agencies = client.get('/organizations')
         agencies = agencies.click("PDF erstellen").form.submit().follow()
@@ -332,8 +341,26 @@ def test_view_pdf_settings(client):
     assert get_pdf() == '1\nGovikon\n0\nPlaceholder for table of contents\n'
 
     settings = client.get('/agency-settings')
+
+    # Test default options for pdf rendering
+    assert settings.form['pdf_layout'].value == 'default'
+    assert settings.form['root_pdf_page_break'].value == '1'
+    assert settings.form['orga_pdf_page_break'].value == '1'
+    assert settings.form['report_changes'].value == 'y'
+
     settings.form['pdf_layout'] = 'zg'
-    settings.form.submit()
+    settings.form['root_pdf_page_break'] = '2'
+    settings.form['orga_pdf_page_break'] = '2'
+    settings.form['report_changes'] = False
+
+    page = settings.form.submit().follow()
+    assert 'Ihre Änderungen wurden gespeichert' in page
+
+    settings = client.get('/agency-settings')
+    assert settings.form['pdf_layout'].value == 'zg'
+    assert settings.form['root_pdf_page_break'].value == '2'
+    assert settings.form['orga_pdf_page_break'].value == '2'
+    assert settings.form['report_changes'].value is None
 
     assert get_pdf() == 'Govikon\n0\nPlaceholder for table of contents\n'
 
