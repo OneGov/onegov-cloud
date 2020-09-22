@@ -7,8 +7,8 @@ from onegov.agency import _
 from onegov.agency import AgencyApp
 from onegov.agency.collections import ExtendedPersonCollection
 from onegov.agency.excel_export import export_person_xlsx
-from onegov.agency.layouts import ExtendedPersonCollectionLayout
-from onegov.agency.layouts import ExtendedPersonLayout
+from onegov.agency.layout import ExtendedPersonCollectionLayout
+from onegov.agency.layout import ExtendedPersonLayout
 from onegov.agency.models import ExtendedPerson
 from onegov.core.security import Private
 from onegov.core.security import Public
