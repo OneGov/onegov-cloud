@@ -2,7 +2,7 @@ from onegov.agency import _
 from onegov.agency import AgencyApp
 from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.collections import ExtendedPersonCollection
-from onegov.org.layout import DefaultLayout
+from onegov.agency.layouts.default import DefaultLayout
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedPerson
 from onegov.core.security import Private

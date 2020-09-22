@@ -8,7 +8,7 @@ from onegov.core.elements import Link
 from onegov.core.elements import LinkGroup
 from onegov.org import _
 from onegov.org.layout import AdjacencyListLayout
-from onegov.org.layout import DefaultLayout
+from onegov.agency.layouts.default import DefaultLayout
 
 
 class MoveAgencyMixin(object):
