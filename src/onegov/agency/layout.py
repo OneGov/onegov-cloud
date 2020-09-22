@@ -209,8 +209,8 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
 
 class AgencyPathMixin(object):
 
-    def agency_path(self, agency):
-        return ' > '.join((
+    def agency_path(self, agency, sep=' > '):
+        return sep.join((
             self.request.translate(bc.text)
             for bc in AgencyLayout(agency, self.request).breadcrumbs[2:]
         ))
