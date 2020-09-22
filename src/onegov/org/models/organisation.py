@@ -108,6 +108,10 @@ class Organisation(Base, TimestampMixin):
     page_break_on_level_root_pdf = meta_property()
     page_break_on_level_org_pdf = meta_property()
 
+    # For custom search results or on the people detail view, include topmost
+    # n levels as indexes of agency.ancestors, type: list of integers
+    agency_display_levels = meta_property()
+
     @property
     def public_identity(self):
         """ The public identity is a globally unique SHA 256 hash of the
