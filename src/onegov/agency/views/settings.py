@@ -28,6 +28,7 @@ class AgencySettingsForm(Form):
             ('2', _("1.1 Heading")),
             ('3', _("1.1.1 Heading")),
         ],
+        default='1'
     )
 
     orga_pdf_page_break = RadioField(
@@ -38,6 +39,7 @@ class AgencySettingsForm(Form):
             ('2', _("1.1 Heading")),
             ('3', _("1.1.1 Heading")),
         ],
+        default='1'
     )
 
     report_changes = BooleanField(
@@ -48,21 +50,19 @@ class AgencySettingsForm(Form):
 
     def process_obj(self, obj):
         super().process_obj(obj)
-        self.pdf_layout.data = obj.meta.get('pdf_layout', 'default')
-        self.root_pdf_page_break.data = str(obj.meta.get(
-            'page_break_on_level_root_pdf', 1))
-        self.orga_pdf_page_break.data = str(obj.meta.get(
-            'page_break_on_level_org_pdf', 1))
+        self.pdf_layout.data = obj.pdf_layout or 'default'
+        self.root_pdf_page_break.data = str(
+            obj.page_break_on_level_root_pdf or 1)
+        self.orga_pdf_page_break.data = str(
+            obj.page_break_on_level_org_pdf or 1)
         self.report_changes.data = obj.meta.get('report_changes', True)
 
     def populate_obj(self, obj, *args, **kwargs):
         super().populate_obj(obj, *args, **kwargs)
-        obj.meta['pdf_layout'] = self.pdf_layout.data
-        obj.meta['report_changes'] = self.report_changes.data
-        obj.meta['page_break_on_level_root_pdf'] = \
-            int(self.root_pdf_page_break.data)
-        obj.meta['page_break_on_level_org_pdf'] = \
-            int(self.orga_pdf_page_break.data)
+        obj.pdf_layout = self.pdf_layout.data
+        obj.report_changes = self.report_changes.data
+        obj.page_break_on_level_root_pdf = int(self.root_pdf_page_break.data)
+        obj.page_break_on_level_org_pdf = int(self.orga_pdf_page_break.data)
 
 
 @AgencyApp.form(
