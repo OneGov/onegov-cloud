@@ -98,6 +98,16 @@ class Organisation(Base, TimestampMixin):
     tickets_skip_opening_email = meta_property()
     mute_all_tickets = meta_property()
 
+    # Type boolean
+    report_changes = meta_property()
+
+    # PDF rendering options
+    pdf_layout = meta_property()
+
+    # break points of pages after title of level x, type integer
+    page_break_on_level_root_pdf = meta_property()
+    page_break_on_level_org_pdf = meta_property()
+
     @property
     def public_identity(self):
         """ The public identity is a globally unique SHA 256 hash of the
