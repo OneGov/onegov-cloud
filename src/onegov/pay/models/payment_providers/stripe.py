@@ -414,6 +414,10 @@ class StripeConnect(PaymentProvider):
             payment.sync(remote_obj=by_payment[payment.id.hex])
 
     def sync_payouts(self, session):
+        """
+        see https://stripe.com/docs/api/balance_transactions/list
+        and https://stripe.com/docs/api/payouts
+        """
 
         payouts = self.paged(stripe.Payout.list, limit=100, status='paid')
         latest_payout = None
@@ -427,13 +431,17 @@ class StripeConnect(PaymentProvider):
             if payout.id == self.latest_payout:
                 break
 
+            # We have to skip payouts that were manually triggered
+            # otherwise resulting in error with http_status of 400
+            if not payout.automatic:
+                continue
+
             transactions = self.paged(
                 stripe.BalanceTransaction.list,
                 limit=100,
                 payout=payout.id,
                 type='charge'
             )
-
             for charge in transactions:
                 paid_charges[charge.source] = (
                     datetime.fromtimestamp(payout.arrival_date),
