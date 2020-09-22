@@ -2,12 +2,15 @@ from onegov.agency import _
 from onegov.agency.app import AgencyApp
 from onegov.core.security import Secret
 from onegov.form import Form
+from onegov.form.fields import ChosenSelectMultipleField
 from onegov.org.models import Organisation
 from onegov.org.views.settings import handle_generic_settings
 from wtforms import BooleanField, RadioField
 
 
 class AgencySettingsForm(Form):
+
+    topmost_levels = 1, 2, 3
 
     pdf_layout = RadioField(
         label=_("PDF Layout"),
@@ -42,11 +45,28 @@ class AgencySettingsForm(Form):
         default='1'
     )
 
+    agency_display = ChosenSelectMultipleField(
+        label=_('Show additional agencies to search results'),
+        fieldset=_('Customize search results'),
+        description=_(
+            'Level 1 represents the root agencies, Level 2 their children'),
+        choices=[]
+    )
+
     report_changes = BooleanField(
         label=_("Users may report corrections"),
         fieldset=_("Data"),
         default=True,
     )
+
+    def level_choice(self, lvl):
+        return str(lvl), self.request.translate(
+            _('Level ${lvl}', mapping={'lvl': lvl}))
+
+    def on_request(self):
+        self.agency_display.choices = [
+            self.level_choice(lvl) for lvl in self.topmost_levels
+        ]
 
     def process_obj(self, obj):
         super().process_obj(obj)
@@ -56,6 +76,9 @@ class AgencySettingsForm(Form):
         self.orga_pdf_page_break.data = str(
             obj.page_break_on_level_org_pdf or 1)
         self.report_changes.data = obj.meta.get('report_changes', True)
+        self.agency_display.data = [
+            str(num) for num in obj.agency_display_levels or []
+        ]
 
     def populate_obj(self, obj, *args, **kwargs):
         super().populate_obj(obj, *args, **kwargs)
@@ -63,6 +86,9 @@ class AgencySettingsForm(Form):
         obj.report_changes = self.report_changes.data
         obj.page_break_on_level_root_pdf = int(self.root_pdf_page_break.data)
         obj.page_break_on_level_org_pdf = int(self.orga_pdf_page_break.data)
+        obj.agency_display_levels = [
+            int(num) for num in self.agency_display.data
+        ]
 
 
 @AgencyApp.form(
