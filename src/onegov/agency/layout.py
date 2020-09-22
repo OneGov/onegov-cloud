@@ -209,10 +209,22 @@ class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
 
 class AgencyPathMixin(object):
 
+    def get_ancestors(self, item, with_item=True, exclude_invisible=False):
+        for ancestor in item.ancestors:
+            if not exclude_invisible:
+                yield Link(ancestor.title, self.request.link(ancestor))
+            elif self.request.is_visible(ancestor):
+                yield Link(ancestor.title, self.request.link(ancestor))
+        if with_item:
+            if not exclude_invisible:
+                yield Link(item.title, self.request.link(item))
+            elif self.request.is_visible(item):
+                yield Link(item.title, self.request.link(item))
+
     def agency_path(self, agency, sep=' > '):
         return sep.join((
-            self.request.translate(bc.text)
-            for bc in AgencyLayout(agency, self.request).breadcrumbs[2:]
+            self.request.translate(ln.text)
+            for ln in self.get_ancestors(agency, True)
         ))
 
 
