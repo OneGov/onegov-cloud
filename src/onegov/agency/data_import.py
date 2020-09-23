@@ -41,6 +41,7 @@ def get_phone(string):
         return string.replace('00', '+', 1)
     if not string.startswith('+'):
         return string.replace('0', '+41 ', 1)
+    return string
 
 
 def p(text):
