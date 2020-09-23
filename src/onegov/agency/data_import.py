@@ -51,18 +51,24 @@ def br(text):
     return text + '<br>'
 
 
+def split_address_on_new_line(address, newline=False):
+    new_addr = '<br>'.join(part.strip() for part in address.split(','))
+    new_addr = new_addr + '<br>' if newline else new_addr
+    return new_addr
+
+
 def get_address(line):
-    # Todo: Split addresses using plz and place a line down below
     stao_addr, post_addr = v_(line.standortadresse), v_(line.postadresse)
     if stao_addr and post_addr:
         if stao_addr == post_addr:
-            return br(stao_addr)
+            return br(split_address_on_new_line(stao_addr))
         else:
-            return br(stao_addr) + br(post_addr)
+            return br(split_address_on_new_line(stao_addr, True)) +\
+                   br(split_address_on_new_line(post_addr))
     elif stao_addr:
-        return br(stao_addr)
+        return br(split_address_on_new_line(stao_addr))
     if post_addr:
-        return br(post_addr)
+        return br(split_address_on_new_line(post_addr))
 
 
 def get_agency_portrait(line):
