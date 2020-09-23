@@ -221,7 +221,7 @@ def import_bs_persons(csvfile, agencies, session, app):
                     prefix=None,
                     addition=None,
                     note=None,
-                    order_within_agency=0,
+                    order_within_agency=numeric_priority(v_(line.anzeigeprio)),
                     order_within_person=0
                 ))
 
