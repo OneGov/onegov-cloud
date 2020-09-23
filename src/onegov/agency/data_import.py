@@ -134,7 +134,8 @@ def import_bs_agencies(csvfile, session, app):
             title=line.bezeichnung.strip(),
             description=None,
             portrait=portrait,
-            order=numeric_priority(v_(line.anzeigeprio))
+            order=numeric_priority(v_(line.anzeigeprio)),
+            export_fields=["person.title", "person.phone"]
         )
         added_agencies[line.verzorgeinheitid] = agency
         return agency
