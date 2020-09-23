@@ -214,16 +214,14 @@ def import_bs_persons(csvfile, agencies, session, app):
         if agency_id:
             agency = agencies.get(agency_id)
             if agency:
-                agency.memberships.append(ExtendedAgencyMembership(
-                    person_id=person_.id,
+                agency.add_person(
+                    person_.id,
                     title='',
                     since=None,
                     prefix=None,
                     addition=None,
                     note=None,
-                    order_within_agency=numeric_priority(v_(line.anzeigeprio)),
-                    order_within_person=0
-                ))
+                )
 
             else:
                 print(f'agency id {agency_id} not found in agencies')
@@ -240,5 +238,8 @@ def import_bs_data(agency_file, person_file, request, app):
     session = request.session
     agencies = import_bs_agencies(agency_file, session, app)
     persons = import_bs_persons(person_file, agencies, session, app)
+
+    for agency in agencies.values():
+        agency.sort_relationships()
 
     return agencies, persons
