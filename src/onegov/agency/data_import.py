@@ -118,6 +118,12 @@ def import_bs_agencies(csvfile, session, app):
         line.verzorgeinheitid for line in csvfile.lines
         if line.verzvorfahreoeid not in lines_by_id.keys()
     )
+    if len(treat_as_root) == 1:
+        # Use the first level as root
+        treat_as_root = tuple(
+            line.verzorgeinheitid for line in csvfile.lines
+            if line.verzvorfahreoeid in treat_as_root
+        )
     added_agencies = {}
     children = defaultdict(list)
     roots = []
