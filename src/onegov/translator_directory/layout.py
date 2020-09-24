@@ -88,13 +88,14 @@ class TranslatorLayout(DefaultLayout):
 
     @cached_property
     def breadcrumbs(self):
-        links = super().breadcrumbs
-        links.append(
+        links = super().breadcrumbs + [
             Link(
                 text=_('Translators'),
                 url=self.request.class_link(TranslatorCollection)
-            )
-        )
+            ),
+            Link(text=self.model.title)
+        ]
+
         return links
 
     def show(self, attribute_name):
