@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-09-13 12:20+0200\n"
+"POT-Creation-Date: 2020-09-24 16:10+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -12,6 +12,21 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.3\n"
+
+msgid "uncertified"
+msgstr "nicht zertifiziert / Einsatz Dringlichkeit"
+
+msgid "in progress"
+msgstr "im Zulassungsverfahren"
+
+msgid "certified"
+msgstr "zertifiziert"
+
+msgid "masculin"
+msgstr "Männlich"
+
+msgid "feminin"
+msgstr "Weiblich"
 
 msgid "Logout"
 msgstr "Abmelden"
@@ -206,21 +221,6 @@ msgstr "Sprache hinzufügen"
 msgid "Export Excel"
 msgstr "Export Excel"
 
-msgid "uncertified"
-msgstr "nicht zertifiziert / Einsatz Dringlichkeit"
-
-msgid "in progress"
-msgstr "im Zulassungsverfahren"
-
-msgid "certified"
-msgstr "zertifiziert"
-
-msgid "masculin"
-msgstr "Männlich"
-
-msgid "feminin"
-msgstr "Weiblich"
-
 msgid "No results found"
 msgstr "Keine Ergebnisse gefunden"
 
@@ -270,6 +270,9 @@ msgstr "Sprache erfolgreich gelöscht"
 
 msgid "Added a new translator"
 msgstr "Übersetzer/in hinzugefügt"
+
+msgid "Submit Search"
+msgstr "Suchen"
 
 msgid "Translator directory"
 msgstr "Übersetzerverzeichnis"

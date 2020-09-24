@@ -60,7 +60,8 @@ def view_translators(self, request, form):
         'model': self,
         'title': layout.title,
         'form': form,
-        'results': self.batch
+        'results': self.batch,
+        'button_text': _('Submit Search')
     }
 
 
