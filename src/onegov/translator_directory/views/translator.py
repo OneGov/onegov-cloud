@@ -134,7 +134,7 @@ def export_translator_directory(self, request):
             trs.bank_address or '',
             trs.account_owner or '',
             trs.email or '',
-            trs.withholding_tax or '',
+            trs.withholding_tax and 1 or 0,
             trs.tel_private or '',
             trs.tel_mobile or '',
             trs.tel_office or '',

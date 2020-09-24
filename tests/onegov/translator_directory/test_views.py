@@ -76,7 +76,7 @@ def test_view_new_translator(client):
     tel_mobile = '044 123 50 50'
     page.form['pers_id'] = 123456
     page.form['admission'] = 'in_progress'
-    page.form['withholding_tax'] = 'ATAX'
+    page.form['withholding_tax'] = True
     page.form['gender'] = 'F'
     page.form['date_of_birth'] = '2019-01-01'
     page.form['nationality'] = 'PERU'
@@ -117,7 +117,7 @@ def test_view_new_translator(client):
 
     assert '123456' in page
     assert 'im Zulassungsverfahren' in page
-    assert 'ATAX' in page
+    assert 'Ja' in page
     assert 'Weiblich' in page
     assert '01.01.2019' in page
     assert 'PERU' in page

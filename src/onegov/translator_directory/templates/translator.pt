@@ -66,7 +66,7 @@
                             </dl>
                             <dl class="field-display" tal:condition="model.withholding_tax and layout.show('withholding_tax')">
                                 <dt i18n:translate>Withholding tax</dt>
-                                <dd>${model.withholding_tax}</dd>
+                                <dd>${layout.format_boolean(model.withholding_tax)}</dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.tel_private and layout.show('tel_private')">
                                 <dt i18n:translate>Private Phone Number</dt>

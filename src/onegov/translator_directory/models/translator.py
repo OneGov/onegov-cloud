@@ -79,7 +79,7 @@ class Translator(Base, TimestampMixin, DocumentsMixin):
     )
 
     # Quellensteuer
-    withholding_tax = Column(Text)
+    withholding_tax = Column(Boolean, default=False)
 
     gender = Column(Enum(*GENDERS, name='gender'))
     date_of_birth = Column(Date)

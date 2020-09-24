@@ -144,8 +144,9 @@ class TranslatorForm(Form, FormChoicesMixin):
         validators=[Optional(), Email()],
     )
 
-    withholding_tax = StringField(
+    withholding_tax = BooleanField(
         label=_('Withholding tax'),
+        default=False
     )
 
     tel_mobile = StringField(
@@ -311,7 +312,7 @@ class TranslatorForm(Form, FormChoicesMixin):
         """
         model.pers_id = self.pers_id.data or None
         model.admission = self.admission.data
-        model.withholding_tax = self.withholding_tax.data or None
+        model.withholding_tax = self.withholding_tax.data
         model.gender = self.gender.data
         model.date_of_birth = self.date_of_birth.data or None
         model.nationality = self.nationality.data or None
