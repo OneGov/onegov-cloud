@@ -78,14 +78,14 @@ class TranslatorForm(Form, FormChoicesMixin):
         default=ADMISSIONS[0]
     )
 
-    first_name = StringField(
-        label=_('First name'),
-        validators=[InputRequired()],
-    )
-
     last_name = StringField(
         label=_('Last name'),
         validators=[InputRequired()]
+    )
+
+    first_name = StringField(
+        label=_('First name'),
+        validators=[InputRequired()],
     )
 
     gender = SelectField(
