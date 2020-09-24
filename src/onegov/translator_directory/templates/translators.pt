@@ -30,7 +30,7 @@
                                     <tr tal:repeat="translator results">
                                         <td tal:condition="layout.show('pers_id')">${translator.pers_id or ''}</td>
                                         <td tal:condition="layout.show('withholding_tax')">${layout.format_boolean(translator.withholding_tax)}</td>
-                                        <td><a href="${request.link(translator)}">${translator.title}</a></td>
+                                        <td><a href="${request.link(translator)}">${translator.full_name}</a></td>
                                         <td>
                                             <tal:b tal:repeat="language translator.written_languages">
                                                 <span tal:attributes="class layout.color_class(language.writers_count)">
