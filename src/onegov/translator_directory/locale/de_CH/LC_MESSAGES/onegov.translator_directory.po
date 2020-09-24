@@ -75,7 +75,7 @@ msgid "City"
 msgstr "Ort"
 
 msgid "Drive distance"
-msgstr "Wegberechung"
+msgstr "Wegberechnung"
 
 msgid "Swiss social security number"
 msgstr "AHV-Nr."
