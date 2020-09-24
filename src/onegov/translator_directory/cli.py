@@ -5,6 +5,7 @@ import click
 
 from onegov.core.cli import command_group
 from onegov.core.csv import CSVFile
+from onegov.fsi.cli import fetch_users
 from onegov.translator_directory.constants import GENDERS, CERTIFICATES
 from onegov.translator_directory.models.certificate import \
     LanguageCertificate
@@ -234,4 +235,35 @@ def do_import(path, clear):
 
     def execute(request, app):
         return import_translator_file(request.session, path, clear)
+    return execute
+
+
+@cli.command(name='fetch-users', context_settings={'singular': True})
+@click.option('--ldap-server', required=True)
+@click.option('--ldap-username', required=True)
+@click.option('--ldap-password', required=True)
+def fetch_users_cli(ldap_server, ldap_username, ldap_password):
+    """ Updates the list of users/course attendees by fetching matching users
+    from a remote LDAP server.
+
+    This is currently highly specific for the Canton of Zug and therefore most
+    values are hard-coded.
+
+    Example:
+
+        onegov-translator --select /translator_directory/zug fetch-users \\
+            --ldap-server 'ldaps://1.2.3.4' \\
+            --ldap-username 'foo' \\
+            --ldap-password 'bar' \\
+
+    """
+
+    def execute(request, app):
+        fetch_users(
+            app,
+            request.session,
+            ldap_server,
+            ldap_username,
+            ldap_password)
+
     return execute
