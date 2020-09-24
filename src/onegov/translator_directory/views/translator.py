@@ -180,7 +180,7 @@ def view_translator(self, request):
     return {
         'layout': layout,
         'model': self,
-        'title': self.full_name
+        'title': self.title
     }
 
 
