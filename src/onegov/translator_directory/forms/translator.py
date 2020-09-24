@@ -78,6 +78,11 @@ class TranslatorForm(Form, FormChoicesMixin):
         default=ADMISSIONS[0]
     )
 
+    withholding_tax = BooleanField(
+        label=_('Withholding tax'),
+        default=False
+    )
+
     last_name = StringField(
         label=_('Last name'),
         validators=[InputRequired()]
@@ -142,11 +147,6 @@ class TranslatorForm(Form, FormChoicesMixin):
     email = EmailField(
         label=_('Email'),
         validators=[Optional(), Email()],
-    )
-
-    withholding_tax = BooleanField(
-        label=_('Withholding tax'),
-        default=False
     )
 
     tel_mobile = StringField(

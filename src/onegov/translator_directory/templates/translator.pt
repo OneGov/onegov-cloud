@@ -16,6 +16,10 @@
                                 <dt i18n:translate>Admission</dt>
                                 <dd>${layout.format_admission(model.admission)}</dd>
                             </dl>
+                             <dl class="field-display" tal:condition="model.withholding_tax and layout.show('withholding_tax')">
+                                <dt i18n:translate>Withholding tax</dt>
+                                <dd>${layout.format_boolean(model.withholding_tax)}</dd>
+                            </dl>
                             <dl class="field-display" tal:condition="model.gender and layout.show('gender')">
                                 <dt i18n:translate>Gender</dt>
                                 <dd>${layout.format_gender(model.gender)}</dd>
@@ -63,10 +67,6 @@
                             <dl class="field-display" tal:condition="model.email and layout.show('email')">
                                 <dt i18n:translate>Email</dt>
                                 <dd tal:content="structure layout.linkify(model.email)"></dd>
-                            </dl>
-                            <dl class="field-display" tal:condition="model.withholding_tax and layout.show('withholding_tax')">
-                                <dt i18n:translate>Withholding tax</dt>
-                                <dd>${layout.format_boolean(model.withholding_tax)}</dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.tel_private and layout.show('tel_private')">
                                 <dt i18n:translate>Private Phone Number</dt>
