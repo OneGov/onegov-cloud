@@ -85,51 +85,61 @@ class TranslatorForm(Form, FormChoicesMixin):
 
     last_name = StringField(
         label=_('Last name'),
-        validators=[InputRequired()]
+        validators=[InputRequired()],
+        fieldset=_('Personal Information')
     )
 
     first_name = StringField(
         label=_('First name'),
         validators=[InputRequired()],
+        fieldset=_('Personal Information')
     )
 
     gender = SelectField(
         label=_('Gender'),
         validators=[StrictOptional()],
-        choices=[]
+        choices=[],
+        fieldset=_('Personal Information')
     )
 
     date_of_birth = DateField(
         label=_('Date of birth'),
-        fieldset=_('Personal Information'),
-        validators=[Optional()]
+        validators=[Optional()],
+        fieldset=_('Personal Information')
     )
 
     nationality = StringField(
         label=_('Nationality'),
-        validators=[Optional()]
+        validators=[Optional()],
+        fieldset=_('Personal Information')
     )
 
     address = StringField(
-        label=_('Address'),
+        label=_('Street and house number'),
+        fieldset=_('Address')
     )
 
     zip_code = StringField(
         label=_('Zip Code'),
+        fieldset=_('Address')
     )
 
     city = StringField(
         label=_('City'),
+        fieldset=_('Address')
     )
 
     drive_distance = FloatField(
         label=_('Drive distance'),
-        validators=[Optional()]
+        validators=[Optional()],
+        fieldset=_('Address'),
+        render_kw={'disabled': True}
     )
 
     social_sec_number = StringField(
         label=_('Swiss social security number'),
         validators=[Optional(), ValidSwissSocialSecurityNumber()],
+        fieldset=_('Identification / bank account')
     )
 
     bank_name = StringField(
@@ -147,6 +157,7 @@ class TranslatorForm(Form, FormChoicesMixin):
     email = EmailField(
         label=_('Email'),
         validators=[Optional(), Email()],
+        fieldset=_('Contact information')
     )
 
     tel_mobile = StringField(
@@ -170,22 +181,27 @@ class TranslatorForm(Form, FormChoicesMixin):
 
     confirm_name_reveal = BooleanField(
         label=_('Name revealing confirmation'),
+        fieldset=_('Legal information'),
+        description=_('Consent to the disclosure of the name '
+                      'to other persons and authorities')
     )
 
     date_of_application = DateField(
         label=_('Date of application'),
-        validators=[Optional()]
+        validators=[Optional()],
+        fieldset=_('Admission to the directory')
     )
 
     date_of_decision = DateField(
         label=_('Date of decision'),
-        validators=[Optional()]
+        validators=[Optional()],
     )
 
     mother_tongues_ids = ChosenSelectMultipleField(
         label=_('Mother tongues'),
         validators=[InputRequired()],
-        choices=[]
+        choices=[],
+        fieldset=_('Language training')
     )
 
     spoken_languages_ids = ChosenSelectMultipleField(

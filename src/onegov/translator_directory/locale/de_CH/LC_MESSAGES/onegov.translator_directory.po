@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-09-24 16:10+0200\n"
+"POT-Creation-Date: 2020-09-24 20:54+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -62,11 +62,17 @@ msgstr "Personal Nr."
 msgid "Admission"
 msgstr "Zulassung"
 
-msgid "First name"
-msgstr "Vorname"
+msgid "Withholding tax"
+msgstr "Quellensteuer"
 
 msgid "Last name"
 msgstr "Nachname"
+
+msgid "Personal Information"
+msgstr "Persönliche Informationen"
+
+msgid "First name"
+msgstr "Vorname"
 
 msgid "Gender"
 msgstr "Geschlecht"
@@ -74,14 +80,14 @@ msgstr "Geschlecht"
 msgid "Date of birth"
 msgstr "Geburtsdatum"
 
-msgid "Personal Information"
-msgstr "Persönliche Informationen"
-
 msgid "Nationality"
 msgstr "Nationalität"
 
+msgid "Street and house number"
+msgstr "Strasse und Hausnummer"
+
 msgid "Address"
-msgstr "Addresse"
+msgstr "Anschrift"
 
 msgid "Zip Code"
 msgstr "PLZ"
@@ -95,6 +101,9 @@ msgstr "Wegberechnung"
 msgid "Swiss social security number"
 msgstr "AHV-Nr."
 
+msgid "Identification / bank account"
+msgstr "Identifikation / Bankverbindung"
+
 msgid "Bank name"
 msgstr "Bank Name"
 
@@ -107,8 +116,8 @@ msgstr "Bank Konto lautend auf"
 msgid "Email"
 msgstr ""
 
-msgid "Withholding tax"
-msgstr "Quellensteuer"
+msgid "Contact information"
+msgstr "Kontakt"
 
 msgid "Mobile Number"
 msgstr "Telefon Mobile"
@@ -125,14 +134,26 @@ msgstr "Erreich- und Verfügbarkeit"
 msgid "Name revealing confirmation"
 msgstr "Zustimmung Namensbekanntgabe"
 
+msgid "Legal information"
+msgstr "Rechtliches"
+
+msgid "Consent to the disclosure of the name to other persons and authorities"
+msgstr "Zustimmung zur Bekanntgabe des Namens an weitere Personen und Behörden"
+
 msgid "Date of application"
 msgstr "Bewerbung Datum"
+
+msgid "Admission to the directory"
+msgstr "Zulassung ins Verzeichnis"
 
 msgid "Date of decision"
 msgstr "Entscheid Datum"
 
 msgid "Mother tongues"
 msgstr "Muttersprachen"
+
+msgid "Language training"
+msgstr "Sprachausbildung"
 
 msgid "Spoken languages"
 msgstr "Sprachen Wort"
