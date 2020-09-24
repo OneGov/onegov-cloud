@@ -44,14 +44,6 @@ class ESMixin(ORMSearchable):
     es_public = False
 
     @property
-    def es_suggestion(self):
-        return self.full_name
-
-    @property
-    def title(self):
-        return self.full_name
-
-    @property
     def lead(self):
         return ', '.join({
             *(la.name for la in self.written_languages or []),
@@ -157,5 +149,5 @@ class Translator(Base, TimestampMixin, DocumentsMixin):
     operation_comments = Column(Text)
 
     @property
-    def full_name(self):
-        return f'{self.first_name} {self.last_name}'
+    def title(self):
+        return f'{self.last_name}, {self.first_name}'
