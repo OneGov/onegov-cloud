@@ -231,7 +231,7 @@ msgid "Cancel"
 msgstr "Abbrechen"
 
 msgid "Edit translator"
-msgstr "Übersetzer/in"
+msgstr "Übersetzer/in bearbeiten"
 
 msgid "Search for translators"
 msgstr "Suche nach Übersetzer/in"
