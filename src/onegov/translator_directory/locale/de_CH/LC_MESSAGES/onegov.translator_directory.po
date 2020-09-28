@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-09-28 17:20+0200\n"
+"POT-Creation-Date: 2020-09-28 17:36+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -182,12 +182,6 @@ msgstr "Telefon Geschäft"
 msgid "Availability"
 msgstr "Erreich- und Verfügbarkeit"
 
-msgid "Expertise by professional guild"
-msgstr ""
-
-msgid "Expertise by interpreting type"
-msgstr ""
-
 msgid "Comments on possible field of application"
 msgstr "Besondere Hinweise Einsatzmöglichkeiten"
 
@@ -212,14 +206,20 @@ msgstr "Entscheid Datum"
 msgid "Mother tongues"
 msgstr "Muttersprachen"
 
-msgid "Language training"
-msgstr "Sprachausbildung"
+msgid "Language training and expertise"
+msgstr "Sprachausbildung und Expertise"
 
 msgid "Spoken languages"
 msgstr "Sprachen Wort"
 
 msgid "Written languages"
 msgstr "Sprachen Schrift"
+
+msgid "Expertise by professional guild"
+msgstr "Fachkenntnisse nach Berufssparte"
+
+msgid "Expertise by interpreting type"
+msgstr "Fachkenntnisse nach Dolmetscherart"
 
 msgid "Proof of preconditions"
 msgstr "Nachweis der Voraussetzung"
@@ -366,6 +366,9 @@ msgstr "Ihre Änderungen wurden gespeichert"
 
 msgid "Translator successfully deleted"
 msgstr "Übersetzer/in erfolgreich gelöscht"
+
+#~ msgid "Language training"
+#~ msgstr "Sprachausbildung"
 
 #~ msgid "Users"
 #~ msgstr "Benutzer"
