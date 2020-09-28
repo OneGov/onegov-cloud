@@ -36,6 +36,22 @@ class DefaultLayout(BaseLayout):
     def format_admission(self, val):
         return self.request.translate(ADMISSIONS_DESC[ADMISSIONS.index(val)])
 
+    def show(self, attribute_name):
+        """Some attributes on the translator are hidden for less privileged
+        users"""
+        if self.request.is_member:
+            return attribute_name in member_can_see
+        if self.request.is_editor:
+            return attribute_name in editor_can_see
+        return True
+
+    def color_class(self, count):
+        """ Depending how rare a language is offered by translators,
+        apply a color code using the returned css class
+        """
+        if count <= 5:
+            return 'text-orange'
+
 
 class TranslatorLayout(DefaultLayout):
 
@@ -97,35 +113,6 @@ class TranslatorLayout(DefaultLayout):
         ]
 
         return links
-
-    def show(self, attribute_name):
-        """Some attributes on the translator are hidden for less privileged
-        users"""
-        if self.request.is_member:
-            return attribute_name in member_can_see
-        if self.request.is_editor:
-            return attribute_name in editor_can_see
-        return True
-
-    def format_gender(self, gender):
-        return self.request.translate(GENDERS_DESC[GENDERS.index(gender)])
-
-    @staticmethod
-    def format_drive_distance(number):
-        if not number:
-            return ''
-        return f'{number} km'
-
-    @staticmethod
-    def format_languages(languages):
-        return ', '.join(sorted((lang.name for lang in languages or [])))
-
-    def color_class(self, count):
-        """ Depending how rare a language is offered by translators,
-        apply a color code using the returned css class
-        """
-        if count <= 5:
-            return 'text-orange'
 
 
 class EditTranslatorLayout(TranslatorLayout):
