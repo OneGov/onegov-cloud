@@ -343,10 +343,6 @@ class TranslatorForm(Form, FormChoicesMixin):
             getattr(model, db_field).append(item)
 
     def update_model(self, model):
-        """
-        We update the model by field explicitely, since using field names with
-        setattr or getattr creates new database instance of the model
-        """
         model.pers_id = self.pers_id.data or None
         model.admission = self.admission.data
         model.withholding_tax = self.withholding_tax.data
