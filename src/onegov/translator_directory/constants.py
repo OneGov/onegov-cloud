@@ -48,8 +48,7 @@ PROFESSIONAL_GUILDS = {
     'social_science': _('Social science'),
     'industry_service_sector': _('Industry and service sector'),
     'engineering': _('Engineering'),
-    'internation_relations': _('International relations and '
-                                'organisations'),
+    'internation_relations': _('International relations and organisations'),
     'law_insurance': _('Law and insurance industry'),
     'military': _('Military')
 }
