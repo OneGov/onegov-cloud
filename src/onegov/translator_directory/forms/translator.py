@@ -63,6 +63,17 @@ class FormChoicesMixin:
         ]
 
 
+class EditorTranslatorForm(Form, FormChoicesMixin):
+
+    pers_id = IntegerField(
+        label=_('Personal ID'),
+        validators=[Optional()]
+    )
+
+    def update_model(self, model):
+        model.pers_id = self.pers_id.data or None
+
+
 class TranslatorForm(Form, FormChoicesMixin):
 
     pers_id = IntegerField(

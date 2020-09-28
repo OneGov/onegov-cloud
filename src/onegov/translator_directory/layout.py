@@ -101,6 +101,16 @@ class TranslatorLayout(DefaultLayout):
                     )
                 )
             ]
+        elif self.request.is_editor:
+            return [
+                Link(
+                    text=_("Edit"),
+                    url=self.request.link(
+                        self.model, name='edit-restricted'
+                    ),
+                    attrs={'class': 'edit-link'}
+                )
+            ]
 
     @cached_property
     def breadcrumbs(self):

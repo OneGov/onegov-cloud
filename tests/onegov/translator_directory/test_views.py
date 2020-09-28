@@ -27,6 +27,7 @@ def test_view_new_translator(client):
     assert language_names[0] in page
     assert cert_names[0] in page
 
+    page.form['pers_id'] = 978654
     page.form['first_name'] = 'Uncle'
     page.form['last_name'] = 'Bob'
     page.form['social_sec_number'] = 'xxxx'
@@ -51,6 +52,7 @@ def test_view_new_translator(client):
     page.form['iban'] = 'DE07 1234 1234 1234 1234 12'
 
     page = page.form.submit().follow()
+    assert '978654' in page
     assert 'Uncle' in page
     assert 'Bob' in page
     # test lower-casing the user input
@@ -71,6 +73,15 @@ def test_view_new_translator(client):
 
     # test written languages
     assert language_names[2] in page
+
+    # test editors access on the edit view
+    trs_url = page.request.url
+    editor = client.spawn()
+    editor.login_editor()
+    edit_page = editor.get(trs_url).click('Bearbeiten')
+    assert '978654' in page
+    edit_page.form['pers_id'] = 123456
+    edit_page.form.submit().follow()
 
     # edit some key attribute
     page = page.click('Bearbeiten')
@@ -108,7 +119,6 @@ def test_view_new_translator(client):
     #     'lat': 47, 'lon': 8, 'zoom': 12
     # })
 
-    # Todo: uncomment below and you get 404 cause a new model is beeing created wtf
     page.form['for_admins_only'] = True
 
     # test removing all languages
@@ -146,7 +156,6 @@ def test_view_new_translator(client):
     assert language_names[0] not in page
     assert language_names[1] not in page
     assert language_names[2] not in page
-    trs_url = page.request.url
 
     # # try adding another with same email
     page = client.get('/translators/new')
