@@ -19,7 +19,7 @@ from onegov.translator_directory.collections.certificate import \
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import order_cols
 from onegov.translator_directory.constants import (
-    full_text_max_chars, GENDERS, GENDERS_DESC, ADMISSIONS, ADMISSIONS_DESC,
+    full_text_max_chars, GENDERS, ADMISSIONS,
     INTERPRETING_TYPES, PROFESSIONAL_GUILDS
 )
 from onegov.translator_directory.models.translator import Translator, \
@@ -54,7 +54,7 @@ class FormChoicesMixin:
     def gender_choices(self):
         return tuple(
             (id_, self.request.translate(choice))
-            for id_, choice in zip(GENDERS, GENDERS_DESC)
+            for id_, choice in GENDERS.items()
         )
 
     @staticmethod
@@ -99,9 +99,9 @@ class TranslatorForm(Form, FormChoicesMixin):
     admission = RadioField(
         label=_('Admission'),
         choices=tuple(
-            (id_, label) for id_, label in zip(ADMISSIONS, ADMISSIONS_DESC)
+            (id_, label) for id_, label in ADMISSIONS.items()
         ),
-        default=ADMISSIONS[0]
+        default=list(ADMISSIONS)[0]
     )
 
     withholding_tax = BooleanField(

@@ -7,8 +7,8 @@ from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 from onegov.translator_directory.constants import member_can_see, \
-    editor_can_see, GENDERS_DESC, GENDERS, ADMISSIONS_DESC, ADMISSIONS, \
-    PROFESSIONAL_GUILDS, INTERPRETING_TYPES
+    editor_can_see, GENDERS, ADMISSIONS, PROFESSIONAL_GUILDS, \
+    INTERPRETING_TYPES
 
 
 class DefaultLayout(BaseLayout):
@@ -22,7 +22,7 @@ class DefaultLayout(BaseLayout):
         return ', '.join(sorted((lang.name for lang in languages or [])))
 
     def format_gender(self, gender):
-        return self.request.translate(GENDERS_DESC[GENDERS.index(gender)])
+        return self.request.translate(GENDERS[gender])
 
     @staticmethod
     def format_drive_distance(number):
@@ -35,7 +35,7 @@ class DefaultLayout(BaseLayout):
         return self.request.translate((_('Yes') if val else _('No')))
 
     def format_admission(self, val):
-        return self.request.translate(ADMISSIONS_DESC[ADMISSIONS.index(val)])
+        return self.request.translate(ADMISSIONS[val])
 
     def show(self, attribute_name):
         """Some attributes on the translator are hidden for less privileged

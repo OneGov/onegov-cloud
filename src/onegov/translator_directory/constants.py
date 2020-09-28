@@ -32,10 +32,13 @@ editor_can_see = member_can_see + (
     'iban'
 )
 
-ADMISSIONS = ('uncertified', 'in_progress', 'certified')
-ADMISSIONS_DESC = (_('uncertified'), _('in progress'), _('certified'))
-GENDERS = ('M', 'F', 'N')
-GENDERS_DESC = (_('masculin'), _('feminin'), 'neutral')
+ADMISSIONS = {
+    'uncertified': _('uncertified'),
+    'in_progress': _('in progress'),
+    'certified': _('certified')
+}
+
+GENDERS = {'M': _('masculin'), 'F': _('feminin'), 'N': _('neutral')}
 CERTIFICATES = ('ZHAW', 'OGZH')
 
 # Static form choices, we don't know how the app will be further developed
