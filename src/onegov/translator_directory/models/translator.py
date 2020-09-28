@@ -154,6 +154,9 @@ class Translator(Base, TimestampMixin, DocumentsMixin):
     # List of types of professional guilds
     expertise_professional_guilds = Column(ARRAY(Text), default=list)
 
+    # If entry was imported, for the form and the expertise fields
+    imported = Column(Boolean, default=False, nullable=False)
+
     @property
     def title(self):
         return f'{self.last_name}, {self.first_name}'

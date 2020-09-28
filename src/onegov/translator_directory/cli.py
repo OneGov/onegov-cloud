@@ -204,6 +204,7 @@ def import_translators(csvfile, session):
         trs.written_languages = get_languages(
             tuple(parse_language_field(line.sprachen_wort)), session
         )
+        trs.imported = True
 
         session.add(trs)
         session.flush()

@@ -2,7 +2,7 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
-from sqlalchemy import Column, ARRAY, Text
+from sqlalchemy import Column, ARRAY, Text, Boolean
 
 from onegov.core.upgrade import upgrade_task
 
@@ -30,3 +30,12 @@ def add_expertise_columns(context):
                 column=Column(col_name, ARRAY(Text)),
                 default=lambda x: []
             )
+
+
+@upgrade_task('Adds imported tag for translators')
+def add_imported_column(context):
+    if not context.has_column('translators', 'imported'):
+        context.add_column_with_defaults(
+            table='translators',
+            column=Column('imported', Boolean, nullable=False),
+            default=lambda x: False)
