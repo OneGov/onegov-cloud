@@ -196,20 +196,6 @@ class TranslatorForm(Form, FormChoicesMixin):
         label=_('Availability'),
     )
 
-    expertise_professional_guilds = MultiCheckboxField(
-        label=_('Expertise by professional guild'),
-        choices=[
-            (id_, label) for id_, label in PROFESSIONAL_GUILDS.items()
-        ]
-    )
-
-    expertise_interpreting_types = MultiCheckboxField(
-        label=_('Expertise by interpreting type'),
-        choices=[
-            (id_, label) for id_, label in INTERPRETING_TYPES.items()
-        ]
-    )
-
     operation_comments = TextAreaField(
         label=_('Comments on possible field of application'),
         render_kw={'rows': 3}
@@ -237,7 +223,7 @@ class TranslatorForm(Form, FormChoicesMixin):
         label=_('Mother tongues'),
         validators=[InputRequired()],
         choices=[],
-        fieldset=_('Language training')
+        fieldset=_('Language training and expertise')
     )
 
     spoken_languages_ids = ChosenSelectMultipleField(
@@ -250,6 +236,20 @@ class TranslatorForm(Form, FormChoicesMixin):
         label=_('Written languages'),
         validators=[StrictOptional()],
         choices=[]
+    )
+
+    expertise_professional_guilds = MultiCheckboxField(
+        label=_('Expertise by professional guild'),
+        choices=[
+            (id_, label) for id_, label in PROFESSIONAL_GUILDS.items()
+        ]
+    )
+
+    expertise_interpreting_types = MultiCheckboxField(
+        label=_('Expertise by interpreting type'),
+        choices=[
+            (id_, label) for id_, label in INTERPRETING_TYPES.items()
+        ]
     )
 
     proof_of_preconditions = StringField(

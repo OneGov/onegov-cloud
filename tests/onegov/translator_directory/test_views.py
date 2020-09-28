@@ -26,6 +26,8 @@ def test_view_new_translator(client):
     assert 'Männlich' in page
     assert language_names[0] in page
     assert cert_names[0] in page
+    assert 'Simultandolmetschen' in page
+    assert 'Human- und Sozialwissenschaften' in page
 
     page.form['pers_id'] = 978654
     page.form['first_name'] = 'Uncle'
