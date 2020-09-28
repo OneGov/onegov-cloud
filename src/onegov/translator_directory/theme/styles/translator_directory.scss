@@ -71,3 +71,6 @@ ul.tags {
         text-align: left;
     }
 }
+
+// Icons
+.check-icon::before { @include icon('\f00c'); }
