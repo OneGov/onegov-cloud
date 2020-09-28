@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-09-28 15:54+0200\n"
+"POT-Creation-Date: 2020-09-28 17:20+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -27,6 +27,54 @@ msgstr "Männlich"
 
 msgid "feminin"
 msgstr "Weiblich"
+
+msgid "Nutrition and agriculture"
+msgstr "Ernährung und Landwirtschaft"
+
+msgid "Economy"
+msgstr "Wirtschaft"
+
+msgid "Art and leisure"
+msgstr "Kunst und Freizeit"
+
+msgid "Business economics"
+msgstr "Betriebswirtschaft"
+
+msgid "Banking and finance"
+msgstr "Banken und Finanzen"
+
+msgid "Social science"
+msgstr "Human- und Sozialwissenschaften"
+
+msgid "Industry and service sector"
+msgstr "Industrie und Dienstleistungssektor"
+
+msgid "Engineering"
+msgstr "Ingenieurwesen"
+
+msgid "International relations and organisations"
+msgstr "Internat. Beziehungen und internationale Organisationen"
+
+msgid "Law and insurance industry"
+msgstr "Recht und Versicherungswesen"
+
+msgid "Military"
+msgstr "Militär"
+
+msgid "Simultaneous interpreting"
+msgstr "Simultandolmetschen"
+
+msgid "Consecutive interpreting"
+msgstr "Konsektutivdolmetschen"
+
+msgid "Negotiation interpreting"
+msgstr "Verhandlungsdolmetschen"
+
+msgid "Whisper interpreting"
+msgstr "Flüsterdolmetschen"
+
+msgid "Written translations"
+msgstr "Schriftliche Übersetzungen"
 
 msgid "Logout"
 msgstr "Abmelden"
@@ -133,6 +181,12 @@ msgstr "Telefon Geschäft"
 
 msgid "Availability"
 msgstr "Erreich- und Verfügbarkeit"
+
+msgid "Expertise by professional guild"
+msgstr ""
+
+msgid "Expertise by interpreting type"
+msgstr ""
 
 msgid "Comments on possible field of application"
 msgstr "Besondere Hinweise Einsatzmöglichkeiten"

@@ -9,7 +9,7 @@ from wtforms.validators import (
 )
 
 from onegov.form import Form
-from onegov.form.fields import ChosenSelectMultipleField
+from onegov.form.fields import ChosenSelectMultipleField, MultiCheckboxField
 
 from onegov.form.validators import ValidPhoneNumber, \
     ValidSwissSocialSecurityNumber, StrictOptional, Stdnum
@@ -19,7 +19,8 @@ from onegov.translator_directory.collections.certificate import \
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import order_cols
 from onegov.translator_directory.constants import (
-    full_text_max_chars, GENDERS, GENDERS_DESC, ADMISSIONS, ADMISSIONS_DESC
+    full_text_max_chars, GENDERS, GENDERS_DESC, ADMISSIONS, ADMISSIONS_DESC,
+    INTERPRETING_TYPES, PROFESSIONAL_GUILDS
 )
 from onegov.translator_directory.models.translator import Translator, \
     mother_tongue_association_table, \
@@ -195,6 +196,20 @@ class TranslatorForm(Form, FormChoicesMixin):
         label=_('Availability'),
     )
 
+    expertise_professional_guilds = MultiCheckboxField(
+        label=_('Expertise by professional guild'),
+        choices=[
+            (id_, label) for id_, label in PROFESSIONAL_GUILDS.items()
+        ]
+    )
+
+    expertise_interpreting_types = MultiCheckboxField(
+        label=_('Expertise by interpreting type'),
+        choices=[
+            (id_, label) for id_, label in INTERPRETING_TYPES.items()
+        ]
+    )
+
     operation_comments = TextAreaField(
         label=_('Comments on possible field of application'),
         render_kw={'rows': 3}
@@ -307,6 +322,10 @@ class TranslatorForm(Form, FormChoicesMixin):
         self.written_languages_ids.choices = self.language_choices
         self.certificates_ids.choices = self.certificate_choices
 
+        if isinstance(self.model, Translator) and self.model.imported:
+            self.delete_field('expertise_interpreting_types')
+            self.delete_field('expertise_professional_guilds')
+
     def get_useful_data(self):
         """Do not use to update and instance of a translator."""
         data = super().get_useful_data(
@@ -376,6 +395,12 @@ class TranslatorForm(Form, FormChoicesMixin):
         self.update_association(model, 'spoken_languages', '_ids')
         self.update_association(model, 'written_languages', '_ids')
         self.update_association(model, 'certificates', '_ids')
+
+        if not self.model.imported:
+            model.expertise_professional_guilds = \
+                self.expertise_professional_guilds.data
+            model.expertise_interpreting_types = \
+                self.expertise_interpreting_types.data
 
 
 class TranslatorSearchForm(Form, FormChoicesMixin):
