@@ -12,7 +12,7 @@ from onegov.form import Form
 from onegov.form.fields import ChosenSelectMultipleField
 
 from onegov.form.validators import ValidPhoneNumber, \
-    ValidSwissSocialSecurityNumber, StrictOptional
+    ValidSwissSocialSecurityNumber, StrictOptional, Stdnum
 from onegov.translator_directory import _
 from onegov.translator_directory.collections.certificate import \
     LanguageCertificateCollection
@@ -152,6 +152,11 @@ class TranslatorForm(Form, FormChoicesMixin):
 
     account_owner = StringField(
         label=_('Account owner')
+    )
+
+    iban = StringField(
+        label=_('IBAN'),
+        validators=[Optional(), Stdnum(format='iban')]
     )
 
     email = EmailField(
