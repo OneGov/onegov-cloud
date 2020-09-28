@@ -7,7 +7,8 @@ from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
 from onegov.translator_directory.constants import member_can_see, \
-    editor_can_see, GENDERS_DESC, GENDERS, ADMISSIONS_DESC, ADMISSIONS
+    editor_can_see, GENDERS_DESC, GENDERS, ADMISSIONS_DESC, ADMISSIONS, \
+    PROFESSIONAL_GUILDS, INTERPRETING_TYPES
 
 
 class DefaultLayout(BaseLayout):
@@ -51,6 +52,12 @@ class DefaultLayout(BaseLayout):
         """
         if count <= 5:
             return 'text-orange'
+
+    def format_prof_guild(self, key):
+        return self.request.translate(PROFESSIONAL_GUILDS[key])
+
+    def format_interpreting_type(self, key):
+        return self.request.translate(INTERPRETING_TYPES[key])
 
 
 class TranslatorLayout(DefaultLayout):

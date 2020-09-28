@@ -92,6 +92,18 @@
                                 <dt i18n:translate>Availability</dt>
                                 <dd>${model.availability}</dd>
                             </dl>
+                            <dl class="field-display" tal:condition="model.expertise_interpreting_types and layout.show('expertise_interpreting_types')">
+                                <dt i18n:translate>Expertise by interpreting type</dt>
+                                <dd>
+                                    <tal:b tal:repeat="expertise model.expertise_interpreting_types">${layout.format_interpreting_type(expertise)}<br></tal:b>
+                                </dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.expertise_professional_guilds and layout.show('expertise_professional_guilds')">
+                                <dt i18n:translate>Expertise by professional guild</dt>
+                                <dd>
+                                    <tal:b tal:repeat="expertise model.expertise_professional_guilds">${layout.format_prof_guild(expertise)}<br></tal:b>
+                                </dd>
+                            </dl>
                             <dl class="field-display" tal:condition="model.operation_comments and layout.show('operation_comments')">
                                 <dt i18n:translate>Comments on possible field of application</dt>
                                 <dd>${model.operation_comments}</dd>
