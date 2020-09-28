@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-09-24 20:54+0200\n"
+"POT-Creation-Date: 2020-09-28 15:54+0200\n"
 "PO-Revision-Date: 2020-03-05 14:36+0100\n"
 "Last-Translator: Lukas Burkhard <lukas.burkhard@seantis.ch>\n"
 "Language-Team: German\n"
@@ -31,8 +31,8 @@ msgstr "Weiblich"
 msgid "Logout"
 msgstr "Abmelden"
 
-msgid "Users"
-msgstr "Benutzer"
+msgid "Settings"
+msgstr "Einstellungen"
 
 msgid "Management"
 msgstr "Verwaltung"
@@ -113,6 +113,9 @@ msgstr "Bank Adresse"
 msgid "Account owner"
 msgstr "Bank Konto lautend auf"
 
+msgid "IBAN"
+msgstr ""
+
 msgid "Email"
 msgstr ""
 
@@ -130,6 +133,9 @@ msgstr "Telefon Geschäft"
 
 msgid "Availability"
 msgstr "Erreich- und Verfügbarkeit"
+
+msgid "Comments on possible field of application"
+msgstr "Besondere Hinweise Einsatzmöglichkeiten"
 
 msgid "Name revealing confirmation"
 msgstr "Zustimmung Namensbekanntgabe"
@@ -260,9 +266,6 @@ msgstr "Schreibende"
 msgid "Mobile Phone Number"
 msgstr "Telefon Mobile"
 
-msgid "Name reveal confirmation"
-msgstr "Zustimmung Namensbekanntgabe"
-
 msgid "Certificates"
 msgstr "Zertifikate"
 
@@ -289,6 +292,9 @@ msgstr "Diese Sprache wird benutzt und kann nicht gelöscht werden"
 msgid "Language successfully deleted"
 msgstr "Sprache erfolgreich gelöscht"
 
+msgid "E-Mail Address / Username / Shortcut"
+msgstr "E-Mail / Benutzername / Kürzel"
+
 msgid "Added a new translator"
 msgstr "Übersetzer/in hinzugefügt"
 
@@ -298,17 +304,20 @@ msgstr "Suchen"
 msgid "Translator directory"
 msgstr "Übersetzerverzeichnis"
 
+msgid "Name reveal confirmation"
+msgstr "Zustimmung Namensbekanntgabe"
+
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
 msgid "Translator successfully deleted"
 msgstr "Übersetzer/in erfolgreich gelöscht"
 
+#~ msgid "Users"
+#~ msgstr "Benutzer"
+
 #~ msgid "Driving distance"
 #~ msgstr "Wegberechnung"
-
-#~ msgid "Settings"
-#~ msgstr "Einstellungen"
 
 #~ msgid "Mother tongue"
 #~ msgstr "Muttersprache"

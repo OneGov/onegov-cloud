@@ -113,6 +113,7 @@ def test_view_new_translator(client):
     page.form['agency_references'] = 'Kt. ZG'
     page.form['education_as_interpreter'] = True
     page.form['comments'] = 'My Comments'
+    page.form['operation_comments'] = 'operational'
 
     # # Todo: self.content is nullable so I don't get it, in EventForm is works too
     # page.form['coordinates'] = encode_map_value({
@@ -151,6 +152,7 @@ def test_view_new_translator(client):
     assert 'ZHCW' in page
     assert 'Kt. ZG' in page
     assert 'My Comments' in page
+    assert 'operational' in page
 
     assert language_names[3] in page
     assert language_names[0] not in page

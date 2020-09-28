@@ -195,6 +195,11 @@ class TranslatorForm(Form, FormChoicesMixin):
         label=_('Availability'),
     )
 
+    operation_comments = TextAreaField(
+        label=_('Comments on possible field of application'),
+        render_kw={'rows': 3}
+    )
+
     confirm_name_reveal = BooleanField(
         label=_('Name revealing confirmation'),
         fieldset=_('Legal information'),
@@ -369,6 +374,7 @@ class TranslatorForm(Form, FormChoicesMixin):
         model.education_as_interpreter = self.education_as_interpreter.data
         model.comments = self.comments.data or None
         model.for_admins_only = self.for_admins_only.data
+        model.operation_comments = self.operation_comments.data or None
 
         self.update_association(model, 'mother_tongues', '_ids')
         self.update_association(model, 'spoken_languages', '_ids')

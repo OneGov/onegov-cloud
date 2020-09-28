@@ -88,9 +88,13 @@
                                 <dt i18n:translate>Availability</dt>
                                 <dd>${model.availability}</dd>
                             </dl>
-                            <dl class="field-display" tal:condition="model.confirm_name_reveal and layout.show('confirm_name_reveal')">
-                                <dt i18n:translate>Name reveal confirmation</dt>
-                                <dd>${layout.format_boolean(model.confirm_name_reveal)}</dd>
+                            <dl class="field-display" tal:condition="model.availability and layout.show('availability')">
+                                <dt i18n:translate>Availability</dt>
+                                <dd>${model.availability}</dd>
+                            </dl>
+                            <dl class="field-display" tal:condition="model.operation_comments and layout.show('operation_comments')">
+                                <dt i18n:translate>Comments on possible field of application</dt>
+                                <dd>${model.operation_comments}</dd>
                             </dl>
                             <dl class="field-display" tal:condition="model.date_of_application and layout.show('date_of_application')">
                                 <dt i18n:translate>Date of application</dt>
