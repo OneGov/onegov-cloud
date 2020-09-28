@@ -36,7 +36,9 @@ translator_data = dict(
     proof_of_preconditions='all okay',
     agency_references='Some ref',
     education_as_interpreter=False,
-    comments=None
+    comments=None,
+    expertise_professional_guilds=tuple(),
+    expertise_interpreting_types=tuple()
 )
 
 

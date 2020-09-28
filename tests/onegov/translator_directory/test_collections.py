@@ -1,23 +1,31 @@
 from onegov.translator_directory.collections.language import LanguageCollection
 from onegov.translator_directory.collections.translator import \
     TranslatorCollection
+from onegov.translator_directory.constants import INTERPRETING_TYPES, \
+    PROFESSIONAL_GUILDS
 from tests.onegov.translator_directory.shared import create_languages, \
     create_translator
 
 
 def test_translator_search(session):
+    interpreting_types = list(INTERPRETING_TYPES.keys())
+    guild_types = list(PROFESSIONAL_GUILDS.keys())
     seba = create_translator(
         session,
         email='sm@mh.ch',
         first_name='Sebastian Hans',
-        last_name='Meier Hugentobler'
+        last_name='Meier Hugentobler',
+        expertise_interpreting_types=[],
+        expertise_professional_guilds=guild_types[0:3]
     )
 
     mary = create_translator(
         session,
         email='mary@t.ch',
         first_name='Mary Astiana',
-        last_name='Sitkova Lavrova'
+        last_name='Sitkova Lavrova',
+        expertise_interpreting_types=interpreting_types[0:1],
+        expertise_professional_guilds=[]
     )
 
     translators = TranslatorCollection(session)
@@ -32,6 +40,15 @@ def test_translator_search(session):
 
     translators.search = 'astian'
     assert translators.query().all() == [seba, mary]
+
+    translators.interpret_types = [interpreting_types[0]]
+    assert translators.query().all() == [mary]
+    translators.interpret_types.append(interpreting_types[1])
+    assert translators.query().all() == []
+
+    translators.interpret_types = []
+    translators.guilds = guild_types[0:2]
+    assert translators.query().all() == [seba]
 
 
 def test_translator_collection(session):
