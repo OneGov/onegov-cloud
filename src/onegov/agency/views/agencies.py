@@ -8,8 +8,8 @@ from onegov.agency.collections import ExtendedAgencyCollection
 from onegov.agency.forms import ExtendedAgencyForm
 from onegov.agency.forms import MembershipForm
 from onegov.agency.forms import MoveAgencyForm
-from onegov.agency.layouts import AgencyCollectionLayout
-from onegov.agency.layouts import AgencyLayout
+from onegov.agency.layout import AgencyCollectionLayout
+from onegov.agency.layout import AgencyLayout
 from onegov.agency.models import AgencyMove
 from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedAgencyMembership

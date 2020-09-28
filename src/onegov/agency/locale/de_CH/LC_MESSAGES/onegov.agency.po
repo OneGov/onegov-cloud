@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2019-08-29 09:10+0200\n"
+"POT-Creation-Date: 2020-09-22 18:14+0200\n"
 "PO-Revision-Date: 2019-08-29 09:16+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -279,6 +279,9 @@ msgstr "Neue Mitgliedschaft"
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
+msgid "Update"
+msgstr ""
+
 msgid "Agency moved"
 msgstr "Organisation verschoben"
 
@@ -347,8 +350,29 @@ msgstr "1.1.1 Titel"
 msgid "For organisation PDF's, page after every:"
 msgstr "Für PDF's der Organisationen, Seitenwechsel nach:"
 
+msgid "Show additional agencies to search results"
+msgstr "Zusätzliche Organisation in den Suchresultaten anzeigen"
+
+msgid "Customize search results"
+msgstr "Suchresultate anpassen"
+
+msgid "Level 1 represents the root agencies, Level 2 their children"
+msgstr ""
+"Ebene 1 entspricht der obersten Organisationebene, Ebene 2 deren "
+"Unterorganisationen"
+
 msgid "Users may report corrections"
 msgstr "Benutzer können Mutationen melden"
 
 msgid "Data"
 msgstr "Daten"
+
+#, python-format
+msgid "Level ${lvl}"
+msgstr "Ebene ${lvl}"
+
+#~ msgid "Chose levels in the agency tree"
+#~ msgstr "Wähle Lage innerhalb des Organistionsbaums"
+
+#~ msgid "Adds the agencies of topmost chosen levels to search results"
+#~ msgstr "Zeigt die Organisation gewählten Lagen "

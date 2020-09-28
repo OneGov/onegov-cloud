@@ -199,8 +199,8 @@
         <a href="${request.link(result)}">${result.title}</a>
         <p tal:define="memberships result.memberships_by_agency">
             <tal:block tal:repeat="membership memberships">
-                <span tal:condition="(membership.access == 'public' and membership.agency.access == 'public') or request.is_logged_in">
-                    ${membership.title} ${membership.agency.title}<br>
+                <span tal:condition="(membership.access == 'public' and membership.agency.access == 'public') or request.is_logged_in" tal:define="display_levels request.app.org.agency_display_levels; sep ' > '">
+                    <tal:b tal:condition="display_levels" tal:define="path layout.agency_path(membership.agency, sep, with_item=False, levels=display_levels)">${path + sep if path else ''}</tal:b>${membership.title} ${membership.agency.title}<br>
                 </span>
             </tal:block>
             <span tal:condition="not:memberships|nothing" i18n:translate>People</span>

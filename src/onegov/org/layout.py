@@ -569,10 +569,9 @@ class DefaultMailLayout(Layout):
         )
 
 
-class AdjacencyListLayout(DefaultLayout):
+class AdjacencyListMixin:
     """ Provides layouts for for models inheriting from
-    :class:`onegov.core.orm.abstract.AdjacencyList`
-
+        :class:`onegov.core.orm.abstract.AdjacencyList`
     """
 
     @cached_property
@@ -610,6 +609,10 @@ class AdjacencyListLayout(DefaultLayout):
                     links=tuple(children),
                     model=item
                 )
+
+
+class AdjacencyListLayout(DefaultLayout, AdjacencyListMixin):
+    pass
 
 
 class SettingsLayout(DefaultLayout):
