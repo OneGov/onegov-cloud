@@ -64,6 +64,10 @@
                                 <dt i18n:translate>Account owner</dt>
                                 <dd>${model.account_owner}</dd>
                             </dl>
+                            <dl class="field-display" tal:condition="model.iban and layout.show('iban')">
+                                <dt i18n:translate>IBAN</dt>
+                                <dd>${model.iban}</dd>
+                            </dl>
                             <dl class="field-display" tal:condition="model.email and layout.show('email')">
                                 <dt i18n:translate>Email</dt>
                                 <dd tal:content="structure layout.linkify(model.email)"></dd>
