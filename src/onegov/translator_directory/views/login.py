@@ -1,4 +1,4 @@
-from onegov.fsi import _
+from onegov.translator_directory import _
 from onegov.core.security import Public
 from onegov.fsi.views.login import FsiLoginForm
 from onegov.translator_directory import TranslatorDirectoryApp
