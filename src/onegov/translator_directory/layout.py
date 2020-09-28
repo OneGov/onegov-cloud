@@ -140,28 +140,20 @@ class EditTranslatorLayout(TranslatorLayout):
         return links
 
 
-class AddTranslatorLayout(TranslatorLayout):
-
-    @cached_property
-    def title(self):
-        return _('Add translator')
-
-    @cached_property
-    def breadcrumbs(self):
-        links = super().breadcrumbs
-        links.append(Link(_('Add')))
-        return links
-
-    @property
-    def editbar_links(self):
-        return []
-
-
-class TranslatorCollectionLayout(TranslatorLayout):
+class TranslatorCollectionLayout(DefaultLayout):
 
     @cached_property
     def title(self):
         return _('Search for translators')
+
+    @cached_property
+    def breadcrumbs(self):
+        return super().breadcrumbs + [
+            Link(
+                text=_('Translators'),
+                url=self.request.class_link(TranslatorCollection)
+            )
+        ]
 
     @cached_property
     def editbar_links(self):
@@ -191,6 +183,23 @@ class TranslatorCollectionLayout(TranslatorLayout):
                     url=self.request.class_link(
                         TranslatorCollection, name='export'))
             ]
+
+
+class AddTranslatorLayout(TranslatorCollectionLayout):
+
+    @cached_property
+    def title(self):
+        return _('Add translator')
+
+    @cached_property
+    def breadcrumbs(self):
+        links = super().breadcrumbs
+        links.append(Link(_('Add')))
+        return links
+
+    @property
+    def editbar_links(self):
+        return []
 
 
 class LanguageCollectionLayout(DefaultLayout):
