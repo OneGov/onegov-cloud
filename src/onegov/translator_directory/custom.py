@@ -8,7 +8,7 @@ from onegov.translator_directory.layout import DefaultLayout
 from onegov.translator_directory import _
 from onegov.org.elements import LinkGroup
 from onegov.org.custom import logout_path
-from onegov.user import Auth, UserCollection
+from onegov.user import Auth
 
 
 def get_base_tools(request):
@@ -32,11 +32,11 @@ def get_base_tools(request):
         if request.is_admin:
             links.append(
                 Link(
-                    _("Users"), request.class_link(UserCollection),
-                    attrs={'class': 'users'}
+                    _("Settings"), request.link(
+                        request.app.org, 'settings'
+                    ), attrs={'class': 'settings'}
                 )
             )
-        if request.is_manager:
             yield LinkGroup(_("Management"), classes=('management',),
                             links=links)
 
