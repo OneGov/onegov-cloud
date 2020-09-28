@@ -2,7 +2,7 @@ from uuid import uuid4
 
 from onegov.search import ORMSearchable
 from libres.db.models.timestamp import TimestampMixin
-from sqlalchemy import Column, Text, Enum, Date, Integer, Boolean, Float
+from sqlalchemy import Column, Text, Enum, Date, Integer, Boolean, Float, ARRAY
 from sqlalchemy.orm import relationship
 
 from onegov.core.orm import Base
@@ -147,6 +147,12 @@ class Translator(Base, TimestampMixin, DocumentsMixin):
 
     # Besondere Hinweise Einsatzmöglichkeiten
     operation_comments = Column(Text)
+
+    # List of types of interpreting the interpreter can do
+    expertise_interpreting_types = Column(ARRAY(Text), default=list)
+
+    # List of types of professional guilds
+    expertise_professional_guilds = Column(ARRAY(Text), default=list)
 
     @property
     def title(self):

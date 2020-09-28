@@ -2,6 +2,8 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from sqlalchemy import Column, ARRAY, Text
+
 from onegov.core.upgrade import upgrade_task
 
 
@@ -13,3 +15,18 @@ def change_withholding_tax_column_type(context):
             'ALTER COLUMN withholding_tax TYPE BOOLEAN '
             'USING false'
         )
+
+
+@upgrade_task('Adds expertise columns')
+def add_expertise_columns(context):
+    table = 'translators'
+    new_cols = (
+        'expertise_interpreting_types', 'expertise_professional_guilds'
+    )
+    for col_name in new_cols:
+        if not context.has_column(table, col_name):
+            context.add_column_with_defaults(
+                table=table,
+                column=Column(col_name, ARRAY(Text)),
+                default=lambda x: []
+            )
