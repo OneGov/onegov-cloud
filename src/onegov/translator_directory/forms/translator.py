@@ -63,6 +63,20 @@ class FormChoicesMixin:
             str(item.id) for item in getattr(model, attr)
         ]
 
+    @cached_property
+    def interpret_types_choices(self):
+        return tuple(
+            (k, self.request.translate(v))
+            for k, v in INTERPRETING_TYPES.items()
+        )
+
+    @cached_property
+    def guilds_choices(self):
+        return tuple(
+            (k, self.request.translate(v))
+            for k, v in PROFESSIONAL_GUILDS.items()
+        )
+
 
 class EditorTranslatorForm(Form, FormChoicesMixin):
 
@@ -415,6 +429,16 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         choices=[]
     )
 
+    interpret_types = ChosenSelectMultipleField(
+        label=_('Expertise by interpreting type'),
+        choices=[]
+    )
+
+    guilds = ChosenSelectMultipleField(
+        label=_('Expertise by professional guild'),
+        choices=[]
+    )
+
     order_by = RadioField(
         label=_('Order by'),
         choices=(
@@ -448,6 +472,8 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         self.order_by.data = model.order_by
         self.order_desc.data = model.order_desc and '1' or '0'
         self.search.data = model.search
+        self.interpret_types.data = model.interpret_types or []
+        self.guilds.data = model.guilds or []
 
     def update_model(self, model):
         model.spoken_langs = self.spoken_langs.data
@@ -455,7 +481,11 @@ class TranslatorSearchForm(Form, FormChoicesMixin):
         model.order_by = self.order_by.data
         model.order_desc = self.order_desc.data == '1' and True or False
         model.search = self.search.data
+        model.interpret_types = self.interpret_types.data
+        model.guilds = self.guilds.data
 
     def on_request(self):
         self.spoken_langs.choices = self.language_choices
         self.written_langs.choices = self.language_choices
+        self.guilds.choices = self.guilds_choices
+        self.interpret_types.choices = self.interpret_types_choices
