@@ -47,6 +47,11 @@ def fetch_changed(poster_urls, image_urls, api_key):
             continue
         try:
             img_url = parse_xml(resp)
+
+            if not img_url:
+                failed += 1
+                continue
+
             # eMuseum should deliver urls as https when they redirect anyway
             img_url = img_url.replace('http:', 'https:')
         except ElementTree.ParseError:
