@@ -298,12 +298,14 @@ function addGeocoder(map) {
 }
 
 function getMapboxTiles() {
-    var url = 'https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}';
-    url += (L.Browser.retina ? '@2x.png' : '.png');
-    url += '?access_token=' + getMapboxToken();
+    var url = 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}';
 
     return L.tileLayer(url, {
-        attribution: '<ul><li><a href="https://www.mapbox.com/map-feedback/">© Mapbox</a></li><li><a href="http://www.openstreetmap.org/copyright">© OpenStreetMap</a></li></ul>'
+        attribution: '<ul><li><a href="https://www.mapbox.com/map-feedback/">© Mapbox</a></li><li><a href="http://www.openstreetmap.org/copyright">© OpenStreetMap</a></li></ul>',
+        tileSize: 512,
+        zoomOffset: -1,
+        id: 'mapbox/streets-v11',
+        accessToken: getMapboxToken()
     });
 }
 
