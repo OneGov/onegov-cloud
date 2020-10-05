@@ -1,8 +1,36 @@
 # Changes
 
+## Release `2020.73`
+
+> commits: **4 / [add5c37f89...52c33925fc](https://github.com/OneGov/onegov-cloud/compare/add5c37f89^...52c33925fc)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.73)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+🎉 **Adds agency setting to customize search results**
+
+Adds customization of search results (/search) for display of not only the membership organisation, but also its parents of Level 1, 2 or 3.
+
+**`Feature`** | **[e143c55016](https://github.com/onegov/onegov-cloud/commit/e143c55016ef64234fd6ff7e9061ec5f3c0361b1)**
+
+### Feriennet
+
+🐞 **Skips manual payouts from payment sync**
+
+**`Bugfix`** | **[add5c37f89](https://github.com/onegov/onegov-cloud/commit/add5c37f89dec0c1c47002a1c44220ca4faf204e)**
+
+### Gis
+
+🐞 **Updates leaflet integration for mapbox.streets api**
+
+Migrating to the modern Static Tiles API using vector tiles.
+
+**`Bugfix`** | **[52c33925fc](https://github.com/onegov/onegov-cloud/commit/52c33925fcd3c53dbdab192d1901f2f34ee7c6dd)**
+
 ## Release `2020.72`
 
-> commits: **16 / [49ede628a7...296c5a9266](https://github.com/OneGov/onegov-cloud/compare/49ede628a7^...296c5a9266)**  
+> released: **2020-09-21 16:51**<br>
+> commits: **17 / [49ede628a7...147a21ad9e](https://github.com/OneGov/onegov-cloud/compare/49ede628a7^...147a21ad9e)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.72)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Core
