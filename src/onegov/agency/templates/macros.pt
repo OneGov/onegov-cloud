@@ -247,4 +247,19 @@
         </dl>
     </metal:display_person_mutation>
 
+    <metal:agency_nav_tree define-macro="agency_nav_tree" i18n:domain="onegov.agency">
+        <ul class="agencies" data-sortable data-sortable-url="${layout.move_agency_url_template}">
+            <li tal:repeat="agency agencies" class="agency-card agency-list-card" data-sortable-id="${agency.id}">
+                <strong><a href="${request.link(agency)}">${agency.title}</a></strong>
+                <ul>
+                    <tal:block tal:repeat="child agency.children">
+                        <li tal:condition="child.access == 'public' or request.is_logged_in">
+                            <a href="${request.link(child)}">${child.title}</a>
+                        </li>
+                    </tal:block>
+                </ul>
+            </li>
+        </ul>
+    </metal:agency_nav_tree>
+
 </body>
