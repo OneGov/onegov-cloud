@@ -1,4 +1,9 @@
 $sort-icon: '\f074';
+$caret-right: '\f0da';
+$caret-down: '\f0d7';
+$building-icon: '\f0f7';
+$person-icon: '\f2bd';
+$arrow-right: '\f061';
 
 .agencies {
     list-style: none;
@@ -80,4 +85,85 @@ body.is-logged-out li[data-sortable-id] a {
 h1 small::after {
     content: '\A';
     white-space: pre;
+}
+
+/*
+    Navigation Tree
+*/
+
+ul.agency-nav {
+
+    margin-left: 0;
+
+    > li {
+        > .collapsible > a.title:first-of-type {
+            font-size: 1rem;
+            font-weight: bold;
+        }
+    }
+
+    ul {
+        margin-left: 1rem;
+    }
+
+    .content {
+        display: none;
+    }
+
+    .person {
+
+        padding: .25rem;
+
+        a {
+            &::before {
+                @include icon($person-icon);
+                color: $anchor-font-color;
+                margin-right: .25rem;
+            }
+
+            &:hover {
+                color: $anchor-font-color-hover;
+            }
+        }
+    }
+
+    .no-children {
+        &::before { @include icon($building-icon); }
+    }
+
+    .details {
+        margin-bottom: .5rem;
+        margin-top: .5rem;
+
+        a { float: right; }
+    }
+
+    .collapsible {
+
+        @include hairline;
+        cursor: pointer;
+        padding-bottom: .25rem;
+        padding-top: .25rem;
+
+        &::before {
+            @include icon($caret-right);
+            color: $anchor-font-color;
+        }
+
+        &:hover::before,
+        &.active::before {
+            @include icon($caret-down);
+            color: $anchor-font-color-hover;
+        }
+    }
+
+    li {
+        font-size: .875rem;
+        list-style: none;
+        margin-left: 0;
+    }
+
+    li:last-of-type {
+        border-bottom: 0;
+    }
 }

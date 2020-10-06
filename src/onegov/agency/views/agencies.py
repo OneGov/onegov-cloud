@@ -15,6 +15,7 @@ from onegov.agency.models import ExtendedAgency
 from onegov.agency.models import ExtendedAgencyMembership
 from onegov.core.security import Private
 from onegov.core.security import Public
+from onegov.core.templates import render_macro
 from onegov.core.utils import normalize_for_url
 from onegov.form import Form
 from onegov.org.elements import Link
@@ -48,12 +49,13 @@ def view_agencies(self, request):
     if root_pdf_modified is not None:
         self.root_pdf_modified = str(root_pdf_modified.timestamp())
         pdf_link = request.link(self, name='pdf')
-
+    layout = AgencyCollectionLayout(self, request)
+    request.include('nav')
     return {
         'title': _("Agencies"),
         'agencies': self.roots,
         'pdf_link': pdf_link,
-        'layout': AgencyCollectionLayout(self, request)
+        'layout': layout
     }
 
 
@@ -84,6 +86,24 @@ def view_agency(self, request):
         'agency': self,
         'layout': AgencyLayout(self, request)
     }
+
+
+@AgencyApp.view(
+    model=ExtendedAgency,
+    permission=Public,
+    name='as-nav-item'
+)
+def view_agency_as_nav_item(self, request):
+    layout = AgencyCollectionLayout(self, request)
+    return render_macro(
+        layout.macros['agency_nav_item'],
+        request,
+        {
+            'agency': self,
+            'layout': layout,
+            'content_only': True
+        }
+    )
 
 
 @AgencyApp.form(

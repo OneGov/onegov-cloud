@@ -66,6 +66,9 @@ class AgencyCollectionLayout(DefaultLayout, MoveAgencyMixin):
                 ),
             ]
 
+    def nav_item_url(self, agency):
+        return self.request.link(agency.proxy(), 'as-nav-item')
+
 
 class AgencyLayout(AdjacencyListLayout, MoveAgencyMixin):
 

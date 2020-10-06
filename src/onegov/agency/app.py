@@ -136,3 +136,8 @@ def get_redactor_asserts():
 @AgencyApp.webasset('editor')
 def get_editor_assets():
     yield from editor_assets()
+
+
+@AgencyApp.webasset('nav')
+def get_nav_assets():
+    yield 'agency-nav.js'

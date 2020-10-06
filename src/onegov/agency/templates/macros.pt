@@ -247,17 +247,41 @@
         </dl>
     </metal:display_person_mutation>
 
-    <metal:agency_nav_tree define-macro="agency_nav_tree" i18n:domain="onegov.agency">
-        <ul class="agencies" data-sortable data-sortable-url="${layout.move_agency_url_template}">
-            <li tal:repeat="agency agencies" class="agency-card agency-list-card" data-sortable-id="${agency.id}">
-                <strong><a href="${request.link(agency)}">${agency.title}</a></strong>
-                <ul>
-                    <tal:block tal:repeat="child agency.children">
-                        <li tal:condition="child.access == 'public' or request.is_logged_in">
-                            <a href="${request.link(child)}">${child.title}</a>
+    <metal:agency_nav_item define-macro="agency_nav_item" i18n:domain="onegov.agency">
+        <tal:b>
+            <div tal:condition="not: content_only|False" class="collapsible">
+                <a class="title" href="javascript:;">${agency.title}</a>
+            </div>
+
+            <div id="${str(agency.id)}" class="content" tal:define="memberships agency.memberships; children agency.children">
+                <div class="details">
+                    <a href="${request.link(agency)}">Show agency</a>
+                </div>
+                <ul class="memberships" tal:condition="memberships">
+                   <li class="person" tal:repeat="membership memberships">
+                       <tal:b tal:define="person membership.person">
+                           <a href="${request.link(person)}">${person.title}</a>
+                       </tal:b>
+                   </li>
+                </ul>
+                <ul class="children" tal:condition="children">
+                    <tal:block tal:repeat="child children">
+                        <li class="child" tal:condition="child.access == 'public' or request.is_logged_in">
+                            <div class="collapsible" tal:attributes="ic-get-from layout.nav_item_url(child); ic-target '#' + str(child.id);" ic-trigger-on="click once" ic-replace-target="true">
+                                <a class="title" href="javascript:;">${child.title}</a>
+                            </div>
+                            <div id="${str(child.id)}" class="content"></div>
                         </li>
                     </tal:block>
                 </ul>
+            </div>
+        </tal:b>
+    </metal:agency_nav_item>
+
+    <metal:agency_nav_tree define-macro="agency_nav_tree" i18n:domain="onegov.agency">
+        <ul class="agency-nav">
+            <li tal:repeat="agency agencies">
+                <tal:b metal:use-macro="layout.macros.agency_nav_item"/>
             </li>
         </ul>
     </metal:agency_nav_tree>
