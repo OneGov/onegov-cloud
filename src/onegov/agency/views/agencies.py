@@ -58,6 +58,21 @@ def view_agencies(self, request):
 
 
 @AgencyApp.html(
+    model=ExtendedAgencyCollection,
+    template='root_agencies.pt',
+    name='sort',
+    permission=Private
+)
+def view_sort_root_agencies(self, request):
+
+    return {
+        'title': _("Sort root agencies"),
+        'agencies': self.roots,
+        'layout': AgencyCollectionLayout(self, request)
+    }
+
+
+@AgencyApp.html(
     model=ExtendedAgency,
     template='agency.pt',
     permission=Public

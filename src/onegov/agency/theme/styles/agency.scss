@@ -1,3 +1,5 @@
+$sort-icon: '\f074';
+
 .agencies {
     list-style: none;
     margin-left: 0;
@@ -44,6 +46,7 @@
     .new-agency::before { @include icon('\f0e8'); }
     .sort-alphabetically::before { @include icon('\f15d'); }
     .view-hidden::before { @include icon('\f070'); }
+    .sort::before { @include icon($sort-icon); }
 }
 
 

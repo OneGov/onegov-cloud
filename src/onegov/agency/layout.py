@@ -46,6 +46,11 @@ class AgencyCollectionLayout(DefaultLayout, MoveAgencyMixin):
                     url=self.request.link(self.model, 'create-pdf'),
                     attrs={'class': 'create-pdf'}
                 ),
+                Link(
+                    text=_("Sort root agencies"),
+                    url=self.request.link(self.model, 'sort'),
+                    attrs={'class': 'sort'}
+                ),
                 LinkGroup(
                     title=_("Add"),
                     links=[
