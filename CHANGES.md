@@ -1,8 +1,22 @@
 # Changes
 
+## Release `2020.74`
+
+> commits: **3 / [67fdaff5dc...d26fc0c0ac](https://github.com/OneGov/onegov-cloud/compare/67fdaff5dc^...d26fc0c0ac)**  
+> [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.74)](https://buildkite.com/seantis/onegov-cloud)
+
+### Agency
+
+✨ **Adds navigation tree incl. people**
+
+The whole organisation tree can be viewed on `/organisation` including memberships.
+
+**`Other`** | **[67fdaff5dc](https://github.com/onegov/onegov-cloud/commit/67fdaff5dc89e43011cfd692ec0b126120d6947e)**
+
 ## Release `2020.73`
 
-> commits: **4 / [add5c37f89...52c33925fc](https://github.com/OneGov/onegov-cloud/compare/add5c37f89^...52c33925fc)**  
+> released: **2020-10-05 10:16**<br>
+> commits: **5 / [add5c37f89...9ffb45cc10](https://github.com/OneGov/onegov-cloud/compare/add5c37f89^...9ffb45cc10)**  
 > [![Build status](https://badge.buildkite.com/400d427112a4df24baa12351dea74ccc3ff1cc977a1703a82f.svg?branch=release-2020.73)](https://buildkite.com/seantis/onegov-cloud)
 
 ### Agency
