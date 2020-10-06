@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-10-06 02:11+0200\n"
+"POT-Creation-Date: 2020-10-06 16:31+0200\n"
 "PO-Revision-Date: 2019-08-29 09:16+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -260,6 +260,9 @@ msgstr "Mutationsmeldung"
 
 msgid "Path"
 msgstr "Pfad"
+
+msgid "Show agency"
+msgstr "Organisation anzeigen"
 
 msgid "Export a vCard of this person"
 msgstr "Elektronische Visitenkarte (vCard)"

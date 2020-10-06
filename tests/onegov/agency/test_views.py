@@ -86,7 +86,7 @@ def test_views_1(client):
     new_agency = agencies.click('Organisation', href='new')
     new_agency.form['title'] = 'Bundesbehörden'
     bund = new_agency.form.submit().follow()
-
+    bund_url = bund.request.url
     assert 'Bundesbehörden' in bund
 
     tel_nr = valid_test_phone_numbers[0]
@@ -117,21 +117,22 @@ def test_views_1(client):
     assert 'Ständerat' in sr
 
     # ... sort agencies
-    bund = client.get('/organizations').click('Bundesbehörden')
-    url = bund.pyquery('ul.children').attr('data-sortable-url')
+    sort = client.get('/organizations').click('Hauptorganisationen sortieren')
+    url = sort.pyquery('ul.agencies').attr('data-sortable-url')
+
     url = url.replace('%7Bsubject_id%7D', '2')
     url = url.replace('%7Bdirection%7D', 'below')
     url = url.replace('%7Btarget_id%7D', '3')
     client.put(url)
 
-    bund = client.get('/organizations').click('Bundesbehörden')
+    bund = client.get(bund_url)
     assert [a.text for a in bund.pyquery('ul.children li a')] == [
         'Ständerat', 'Nationalrat',
     ]
 
     bund.click("Unterorganisationen", href='sort')
 
-    bund = client.get('/organizations').click('Bundesbehörden')
+    bund = client.get(bund_url)
     assert [a.text for a in bund.pyquery('ul.children li a')] == [
         'Nationalrat', 'Ständerat',
     ]
@@ -196,7 +197,7 @@ def test_views_1(client):
 
     # ... PDFs
     client.login_editor()
-    bund = client.get('/organizations').click("Bundesbehörden")
+    bund = client.get(bund_url)
     bund = bund.click("PDF erstellen").form.submit().follow()
 
     pdf = bund.click("Organisation als PDF speichern")
@@ -227,23 +228,23 @@ def test_views_1(client):
     move = sr.click("Verschieben")
     move.form['parent_id'].select(text="- oberste Ebene -")
     sr = move.form.submit().maybe_follow()
+    sr_url = sr.request.url
     assert "Organisation verschoben" in sr
 
     move = bund.click("Verschieben")
     move.form['parent_id'].select(text="Ständerat")
     bund = move.form.submit().maybe_follow()
     assert "Organisation verschoben" in bund
-
-    client.get('/organizations').click("Ständerat").click("Eder Joachim")
-    client.get('/organizations').click("Ständerat").click("Bundesbehörden")\
+    client.get(sr_url).click("Eder Joachim")
+    client.get(sr_url).click("Bundesbehörden")\
         .click("Nationalrat")
-    client.get('/organizations').click("Ständerat").click("Bundesbehörden")\
+    client.get(sr_url).click("Bundesbehörden")\
         .click("Nationalrat")
-    client.get('/organizations').click("Ständerat").click("Bundesbehörden")\
+    client.get(sr_url).click("Bundesbehörden")\
         .click("Nationalrat").click("Aeschi Thomas")
 
     # Delete agency
-    bund = client.get('/organizations').click("Ständerat")
+    bund = client.get(sr_url)
     agencies = bund.click("Löschen")
     assert "noch keine Organisationen" in client.get('/organizations')
 
@@ -263,17 +264,17 @@ def test_views_hidden(client):
 
     new_agency = client.get('/organizations').click('Organisation', href='new')
     new_agency.form['title'] = 'Bundesbehörden'
-    root = new_agency.form.submit().follow()
-    assert 'Bundesbehörden' in root
+    bund = new_agency.form.submit().follow()
+    assert 'Bundesbehörden' in bund
 
-    new_agency = root.click('Organisation', href='new')
+    new_agency = bund.click('Organisation', href='new')
     new_agency.form['title'] = 'Nationalrat'
     new_agency.form['access'] = 'private'
     child = new_agency.form.submit().follow()
     assert 'Nationalrat' in child
-    assert 'Nationalrat' in client.get('/organizations')
+    assert 'Nationalrat' in client.get(bund.request.url)
 
-    new_membership = root.click("Mitgliedschaft", href='new')
+    new_membership = bund.click("Mitgliedschaft", href='new')
     new_membership.form['title'] = "Mitglied von Zug"
     new_membership.form['person_id'].select(text="Aeschi Thomas")
     new_membership.form['access'] = 'private'

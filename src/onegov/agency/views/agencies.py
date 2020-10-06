@@ -50,7 +50,7 @@ def view_agencies(self, request):
         self.root_pdf_modified = str(root_pdf_modified.timestamp())
         pdf_link = request.link(self, name='pdf')
     layout = AgencyCollectionLayout(self, request)
-    request.include('nav')
+
     return {
         'title': _("Agencies"),
         'agencies': self.roots,
@@ -96,12 +96,11 @@ def view_agency(self, request):
 def view_agency_as_nav_item(self, request):
     layout = AgencyCollectionLayout(self, request)
     return render_macro(
-        layout.macros['agency_nav_item'],
+        layout.macros['agency_nav_item_content'],
         request,
         {
             'agency': self,
             'layout': layout,
-            'content_only': True
         }
     )
 

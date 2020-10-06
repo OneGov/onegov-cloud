@@ -106,10 +106,6 @@ ul.agency-nav {
         margin-left: 1rem;
     }
 
-    .content {
-        display: none;
-    }
-
     .person {
 
         padding: .25rem;
@@ -132,10 +128,9 @@ ul.agency-nav {
     }
 
     .details {
-        margin-bottom: .5rem;
+        display: flex;
+        justify-content: flex-end;
         margin-top: .5rem;
-
-        a { float: right; }
     }
 
     .collapsible {
