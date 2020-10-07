@@ -279,9 +279,15 @@ $globals-height: 2.5rem;
     min-height: $globals-height;
     width: 100%;
 
+    .row > .columns {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
     .row > .columns > ul {
         list-style: none;
-        margin: 0 auto;
+        margin: 0;
 
         > li {
             display: inline-block;
