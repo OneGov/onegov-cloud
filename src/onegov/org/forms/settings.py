@@ -104,7 +104,7 @@ class GeneralSettingsForm(Form):
 
     def process_obj(self, model):
         super().process_obj(model)
-        self.theme_options = model.theme_options
+        self.theme_options = model.theme_options or {}
 
     def populate_font_families(self):
         self.font_family_sans_serif.choices = tuple(
