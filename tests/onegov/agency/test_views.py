@@ -511,7 +511,4 @@ def test_basic_search(client_with_es):
     client.app.es_client.indices.refresh(index='_all')
 
     client = client.spawn()
-    root_page = client.get('/')
-    root_page.form['q'] = "Nick"
-    search_page = root_page.form.submit()
-    assert 'Rivera' in search_page
+    search_page = client.get('/search?q=Nick')
