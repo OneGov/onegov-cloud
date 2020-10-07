@@ -512,3 +512,21 @@ def test_basic_search(client_with_es):
 
     client = client.spawn()
     search_page = client.get('/search?q=Nick')
+
+
+def test_footer_settings_custom_links(client):
+    client.login_admin()
+
+    # footer settings custom links
+    settings = client.get('/footer-settings')
+    custom_url = 'https://custom.com/1'
+    custom_name = 'Custom1'
+
+    settings.form['custom_link_1_name'] = custom_name
+    settings.form['custom_link_1_url'] = custom_url
+    settings.form['custom_link_2_name'] = 'Custom2'
+    settings.form['custom_link_2_url'] = None
+
+    page = settings.form.submit().follow()
+    assert f'<a href="{custom_url}">{custom_name}</a>' in page
+    assert 'Custom2' not in page
