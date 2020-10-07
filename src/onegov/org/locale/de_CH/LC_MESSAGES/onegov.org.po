@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2020-09-07 13:24+0200\n"
+"POT-Creation-Date: 2020-10-07 17:24+0200\n"
 "PO-Revision-Date: 2020-05-10 10:56+0200\n"
 "Last-Translator: Marc Sommerhalder <marc.sommerhalder@seantis.ch>\n"
 "Language-Team: German\n"
@@ -978,6 +978,21 @@ msgstr "Dritter Partner"
 
 msgid "Fourth Partner"
 msgstr "Vierter Partner"
+
+msgid "Title header left side"
+msgstr "Titel Kopfzeile links"
+
+msgid "Optional"
+msgstr ""
+
+msgid "Font color"
+msgstr "Schriftfarbe"
+
+msgid "Relative font size"
+msgstr "Relative Schriftgrösse"
+
+msgid "Color could not be converted"
+msgstr "Fehler beim Konvertieren der Farbe"
 
 msgid "Homepage Image #1"
 msgstr "Startseiten Bild #1"
@@ -3871,6 +3886,9 @@ msgstr "Suche Nicht Verfügbar"
 msgid "Footer"
 msgstr "Fusszeile"
 
+msgid "Header"
+msgstr "Kopfzeile"
+
 msgid "Modules"
 msgstr "Module"
 
@@ -4051,6 +4069,15 @@ msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "Header font color"
+#~ msgstr "Farbe Kopfzeile"
+
+#~ msgid "Header left side"
+#~ msgstr "Kopfzeile links"
+
+#~ msgid "Optional url to generate a link"
+#~ msgstr "Optionale URL"
 
 #~ msgid "Only withdrawn events or submitted events can be published"
 #~ msgstr "Nur abgelehnte oder "

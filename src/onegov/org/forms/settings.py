@@ -2,6 +2,8 @@ import re
 
 from cached_property import cached_property
 from lxml import etree
+from wtforms.validators import NumberRange
+
 from onegov.form import Form
 from onegov.form import with_options
 from onegov.form.fields import MultiCheckboxField, TagsField, ChosenSelectField
@@ -13,7 +15,8 @@ from onegov.org.homepage_widgets import transform_homepage_structure
 from onegov.org.homepage_widgets import XML_LINE_OFFSET
 from onegov.org.theme import user_options
 from purl import URL
-from wtforms import BooleanField, StringField, TextAreaField, RadioField
+from wtforms import BooleanField, StringField, TextAreaField, RadioField, \
+    FloatField
 from wtforms import ValidationError
 from wtforms import validators
 from wtforms.fields.html5 import EmailField, URLField
@@ -273,6 +276,65 @@ class FooterSettingsForm(Form):
         label=_("Website"),
         description=_("The partner's website"),
         fieldset=_("Fourth Partner"))
+
+
+class HeaderSettingsForm(Form):
+
+    left_header_name = StringField(
+        label=_("Name"),
+        description=_(""),
+        fieldset=_("Title header left side")
+    )
+
+    left_header_url = URLField(
+        label=_("URL"),
+        description=_("Optional"),
+        fieldset=_("Title header left side")
+    )
+
+    left_header_color = ColorField(
+        label=_("Font color"),
+        fieldset=_("Title header left side")
+    )
+
+    left_header_rem = FloatField(
+        label=_("Relative font size"),
+        fieldset=_("Title header left side"),
+        validators=[
+            NumberRange(0.5, 7)
+        ],
+        default=1
+    )
+
+    def validate_left_header_color(self, field):
+        try:
+            field.data = field.data.get_hex()
+        except Exception:
+            raise ValidationError(_("Color could not be converted"))
+
+    @property
+    def header_options(self):
+        return {
+            'left_header_name': self.left_header_name.data or None,
+            'left_header_url': self.left_header_url.data or None,
+            'left_header_color': self.left_header_color.data,
+            'left_header_rem': self.left_header_rem.data
+        }
+
+    @header_options.setter
+    def header_options(self, options):
+        self.left_header_name.data = options.get('left_header_name')
+        self.left_header_url.data = options.get('left_header_url')
+        self.left_header_color.data = options.get('left_header_color')
+        self.left_header_rem.data = options.get('left_header_rem', 1)
+
+    def populate_obj(self, model):
+        super().populate_obj(model)
+        model.header_options = self.header_options
+
+    def process_obj(self, model):
+        super().process_obj(model)
+        self.header_options = model.header_options or {}
 
 
 class HomepageSettingsForm(Form):
